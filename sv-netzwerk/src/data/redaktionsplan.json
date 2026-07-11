@@ -1,0 +1,14 @@
+{
+  "version": "7.0",
+  "date": "2026-07-11",
+  "cadence": {
+    "Monday": "Fachbeitrag / Praxisfall Schadenregulierung",
+    "Tuesday": "A-Fachbeitrag 1.500–2.500 Wörter",
+    "Wednesday": "Fachbeitrag / Wissensbibliothek",
+    "Thursday": "Gutachter-Plattform-Updatebeitrag",
+    "Friday": "Fachbeitrag / LinkedIn-Begleitung",
+    "Saturday": "Praxis-/Tippbeitrag Gutachter-Plattform",
+    "Sunday": "Kurzbeitrag / Archiv / Roadmap"
+  },
+  "today": "Samstag: Praxis-/Tippbeitrag zur Gutachter-Plattform"
+}
