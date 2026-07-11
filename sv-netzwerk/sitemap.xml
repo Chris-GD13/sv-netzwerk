@@ -1,10 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.sv-netzwerk.eu/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://www.sv-netzwerk.eu/wissen/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://www.sv-netzwerk.eu/gutachter-plattform/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://www.sv-netzwerk.eu/gutachter-plattform/gutachter-plattform-praxistipp-vorpruefung-auftragsklarheit/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://www.sv-netzwerk.eu/recht-compliance/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://www.sv-netzwerk.eu/seminare/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://www.sv-netzwerk.eu/medienbibliothek/</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://www.sv-netzwerk.eu/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/datenschutzerklaerung/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/experten/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/experten/carmen-gohl/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/experten/christian-waechter/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/experten/claudius-freiberg/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/experten/lenna-maria-walczok/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/experten/marc-schuett/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/experten/susanne-waechter/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/fachwissen/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/fachwissen/baucontrolling-nachtragsmanagement/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/fachwissen/fenster-tueren-fassaden/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/fachwissen/komplexschaeden-regulierung/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/fachwissen/oberflaechenschaeden/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/fachwissen/schimmelpilzschaeden-feuchte/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/grossschadenregulierung/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/gutachter-plattform/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/gutachter-plattform/demo-buchen/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/gutachter-plattform/fuer-regulierer/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/gutachter-plattform/fuer-sachverstaendige/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/gutachter-plattform/fuer-versicherungen/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/impressum/</loc></url>
+  
+  <url><loc>https://www.sv-netzwerk.eu/komplexschaeden/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/kontakt/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/leistungen/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/netzwerk/</loc></url>
+  
+  <url><loc>https://www.sv-netzwerk.eu/termin-vereinbaren/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/ueber-uns/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/versicherungen/</loc></url>
+  <url><loc>https://www.sv-netzwerk.eu/fachwissen/schadenreserve-grossschaden-regulierung/</loc><lastmod>2026-07-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://www.sv-netzwerk.eu/fachwissen/bestimmungswidriger-austritt-leitungswasser/</loc><lastmod>2026-07-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://www.sv-netzwerk.eu/gutachter-plattform/versicherer-steuerung-qualitaet/</loc><lastmod>2026-07-07</lastmod><priority>0.8</priority></url>
+<url><loc>https://www.sv-netzwerk.eu/fachwissen/prueffaehige-unterlagen-schadenregulierung/</loc><lastmod>2026-07-08</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+<url><loc>https://www.sv-netzwerk.eu/experten/katja-schaefer/</loc><lastmod>2026-07-09</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url><url><loc>https://www.sv-netzwerk.eu/experten/holger-roth/</loc><lastmod>2026-07-09</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://www.sv-netzwerk.eu/versicherer/</loc><lastmod>2026-07-09</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>  <url><loc>https://www.sv-netzwerk.eu/gutachter-plattform/qualitaet-dokumentation/</loc><lastmod>2026-07-09</lastmod></url>
+<url><loc>https://www.sv-netzwerk.eu/gutachter-plattform/anfrage/</loc><lastmod>2026-07-09</lastmod><priority>0.80</priority></url><url><loc>https://www.sv-netzwerk.eu/gutachter-plattform/seo-indexierung-schadensteuerung/</loc><lastmod>2026-07-10</lastmod><changefreq>weekly</changefreq><priority>0.80</priority></url><url><loc>https://www.sv-netzwerk.eu/fachwissen/gutachter-plattform-seo-indexierung-schadensteuerung/</loc><lastmod>2026-07-10</lastmod><changefreq>weekly</changefreq><priority>0.80</priority></url>  <url><loc>https://www.sv-netzwerk.eu/gutachter-plattform/prozessvorteile-schadenakte/</loc><lastmod>2026-07-11</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
 </urlset>

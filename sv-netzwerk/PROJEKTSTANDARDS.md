@@ -1,20 +1,24 @@
 # Projektstandards SV-Netzwerk
 
-## Corporate-Standard ab 10.07.2026
+Stand: 11.07.2026
 
-Standardportrait:
-`christian_waechter_sv-netzwerk_standard_vortrag_polo_blau_orange_2026-07-10.png`
+## Verbindlicher Start jeder Aufgabe
 
-Ablage:
-`Meine Ablage/Webseite/Medienbibliothek/Teamfotos_Gruppenfoto_Experten`
+1. Google-Drive-Zugriff aktiv testen.
+2. Aktuelle MASTER-Datei und `MASTER_ARBEITSSTANDARD.md` lesen.
+3. Letzten funktionierenden Stand bestimmen.
+4. Aufgabe vollständig ausführen.
+5. Ergebnis prüfen, vollständig packen und in Google Drive ablegen.
+6. Nur den echten Downloadlink ausgeben.
 
-Look:
-Dunkelblaues Poloshirt passend zur Website, orangefarbenes SV-Netzwerk-Logo auf der Brust, dunkelblauer SV-Netzwerk-Hintergrund mit orangefarbenem Logo, freundliches leichtes Lächeln, Bart erhalten, keine sichtbaren Hände, kein Mikrofon.
+## Uploadstandard
 
-Farbstandard:
-- sehr dunkles SV-Blau/Navy als Grundfarbe
-- Orange als Akzentfarbe für Logo und CTA
-- Weiß für Kontrastflächen und Text
+Es wird immer eine vollständige Upload-ZIP erzeugt. Die ZIP basiert auf dem zuletzt funktionierenden MASTER-Stand und enthält die komplette Website-Struktur. Teilpakete und Patch-ZIPs sind nicht zulässig.
 
-Einsatzbereiche:
-Website, LinkedIn, Seminar-/Vortragsbereich, Medienbibliothek und „Wissen in 180 Sekunden“.
+## Fehlerstandard
+
+Ein fehlender Zugriff oder eine fehlende Funktion darf erst behauptet werden, nachdem der konkrete Connector bzw. der konkrete Dateivorgang tatsächlich getestet wurde. Bei Fehlern ist der konkrete technische Schritt und die tatsächliche Fehlermeldung zu dokumentieren.
+
+## 14:00-Uhr-Zwischenlauf
+
+Der Zwischenlauf ergänzt den 06:00-Uhr-Hauptlauf um Gutachter-Plattform, Vermarktung, SEO, Indexierung und interne Verlinkungen. Er verwendet eine halbe Zwischenversion und verändert die Hauptversionslogik nicht.
