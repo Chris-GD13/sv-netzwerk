@@ -34,12 +34,12 @@ jobs:
           ls -la dist
 
       - name: Deploy to IONOS via SFTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: Dylan700/sftp-upload-action@latest
         with:
           server: ${{ secrets.SFTP_HOST }}
           username: ${{ secrets.SFTP_USERNAME }}
           password: ${{ secrets.SFTP_PASSWORD }}
           protocol: sftp
           port: ${{ secrets.SFTP_PORT }}
-          local-dir: sv-netzwerk/dist/
+          local-dir: dist/
           server-dir: ${{ secrets.SFTP_REMOTE_DIR }}
