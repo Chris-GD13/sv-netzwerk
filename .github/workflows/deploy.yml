@@ -33,13 +33,13 @@ jobs:
           test -d dist
           ls -la dist
 
-      - name: Deploy to IONOS via SFTP
+      -       - name: Deploy to IONOS via SFTP
         uses: Dylan700/sftp-upload-action@latest
         with:
           server: ${{ secrets.SFTP_HOST }}
           username: ${{ secrets.SFTP_USERNAME }}
           password: ${{ secrets.SFTP_PASSWORD }}
-          protocol: sftp
           port: ${{ secrets.SFTP_PORT }}
-          local-dir: dist/
-          server-dir: ${{ secrets.SFTP_REMOTE_DIR }}
+
+          uploads: |
+            dist/ => ${{ secrets.SFTP_REMOTE_DIR }}
