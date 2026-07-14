@@ -1,0 +1,6 @@
+---
+interface Props { name:string; role:string; qualification?:string; href?:string; initials?:string }
+const {name,role,qualification,href,initials=name.split(' ').map(x=>x[0]).join('').slice(0,2)}=Astro.props;
+---
+<article class="team-card sv-card"><div class="avatar" aria-hidden="true">{initials}</div><div><h3>{name}</h3><p>{role}</p>{qualification&&<small>{qualification}</small>}{href&&<a href={href}>Profil ansehen →</a>}</div></article>
+<style>.team-card{display:grid;grid-template-columns:5rem 1fr;gap:1.25rem;padding:1.5rem}.avatar{display:grid;aspect-ratio:1;place-items:center;border-radius:1rem;background:linear-gradient(145deg,var(--sv-color-primary),var(--sv-color-ink));color:white;font-size:1.4rem;font-weight:900}.team-card p{margin-bottom:.25rem;color:var(--sv-color-muted)}small{display:block;margin-bottom:.75rem;color:var(--sv-color-muted)}a{font-weight:800;text-decoration:none}</style>

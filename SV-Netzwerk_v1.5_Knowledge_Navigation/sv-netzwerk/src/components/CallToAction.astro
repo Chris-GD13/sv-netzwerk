@@ -1,0 +1,6 @@
+---
+interface Props { title:string; text:string; href:string; label?:string; }
+const {title,text,href,label='Kontakt aufnehmen'}=Astro.props;
+---
+<section class="cta"><div class="sv-container cta-inner"><div><p class="sv-eyebrow">Nächster Schritt</p><h2>{title}</h2><p>{text}</p></div><a class="sv-button sv-button-light" href={href}>{label}</a></div></section>
+<style>.cta{padding-block:clamp(3.5rem,7vw,6rem);background:var(--sv-color-primary);color:white}.cta-inner{display:flex;align-items:center;justify-content:space-between;gap:2rem}.cta h2{max-width:48rem}.cta p:not(.sv-eyebrow){max-width:45rem;color:#dce7ee}.cta .sv-eyebrow{color:#f0c56f}@media(max-width:42rem){.cta-inner{align-items:flex-start;flex-direction:column}}</style>

@@ -1,0 +1,80 @@
+name: SV-Netzwerk bereitstellen
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "sv-netzwerk/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-sv-netzwerk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Node.js 22 LTS einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+          registry-url: https://registry.npmjs.org
+
+      - name: Laufzeitumgebung prüfen
+        run: |
+          echo "Runner: $RUNNER_OS"
+          echo "Arbeitsverzeichnis: $(pwd)"
+          node --version
+          npm --version
+          npm config get registry
+          test -f package.json
+          test -f package-lock.json
+
+      - name: Abhängigkeiten reproduzierbar installieren
+        env:
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+          NPM_CONFIG_AUDIT: "false"
+          NPM_CONFIG_FUND: "false"
+          NPM_CONFIG_PROGRESS: "false"
+          NPM_CONFIG_FETCH_RETRIES: "2"
+          NPM_CONFIG_FETCH_RETRY_MINTIMEOUT: "10000"
+          NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: "30000"
+        run: npm ci --no-audit --no-fund --loglevel=notice
+
+      - name: Astro-Projekt prüfen und bauen
+        run: npm run build
+
+      - name: Build-Ausgabe prüfen
+        run: |
+          test -d dist
+          test -n "$(find dist -type f -print -quit)"
+          echo "Build erfolgreich; erzeugte Dateien:"
+          find dist -type f | sort | head -n 100
+
+      - name: Zu IONOS per SFTP übertragen
+        if: success()
+        uses: Dylan700/sftp-upload-action@latest
+        with:
+          server: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          port: ${{ secrets.SFTP_PORT }}
+          uploads: |
+            sv-netzwerk/dist/ => ${{ secrets.SFTP_REMOTE_DIR }}
