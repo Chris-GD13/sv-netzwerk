@@ -1,28 +1,14 @@
-# Release Notes – SV-Netzwerk v1.3 Website Core
+# Release Notes – SV-Netzwerk v1.4 Modern Website
 
-## Zweck
+v1.4 führt das in v1.3 vorbereitete Website-Core-System produktiv in die Startseite und zentrale Einstiegsseiten ein.
 
-Aufbau eines einheitlichen, wiederverwendbaren Website-Kerns für die schrittweise Migration bestehender Seiten.
-
-## Enthalten
-
-- zentrales `BaseLayout.astro`
-- einheitliche SEO-Komponente
-- Header und responsive Navigation
-- Footer
-- Breadcrumbs
-- Autorenbox
-- CTA-Box
-- Downloadbox
-- Hinweisbox
-- Praxisfall-Komponente
-- zentrale Website-Daten
-- Design Tokens und globale CSS-Grundlagen
-
-## Sicherheitsprinzip
-
-Keine bestehende produktive Seite wird automatisch ersetzt. Die Komponenten werden zunächst additiv bereitgestellt. Dadurch bleibt der aktuelle Live-Stand erhalten.
-
-## Nächster Schritt
-
-In v1.4 werden ausgewählte Seiten kontrolliert auf das neue Grundlayout migriert.
+## Wesentliche Änderungen
+- vollständig neuer responsiver Header mit mobiler Navigation
+- modernes Hero-System
+- vereinheitlichte Cards, Grids und Buttons
+- modernisierter Footer
+- neue Startseite mit Leistungs-, SVOS-, Fachwissen-, Personen- und CTA-Bereichen
+- vorbereitete Fachwissensbibliothek mit Kategorienavigation
+- strengere TypeScript- und Astro-Prüfung
+- Prefetching, Sitemap und optimierter statischer Build
+- semantische Struktur, Skip-Link, Focus-Zustände und Reduced-Motion-Unterstützung

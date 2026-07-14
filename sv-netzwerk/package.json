@@ -1,12 +1,19 @@
 {
+  "name": "sv-netzwerk",
+  "version": "1.4.0",
+  "private": true,
+  "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview"
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check"
   },
   "dependencies": {
+    "@astrojs/check": "latest",
     "@astrojs/sitemap": "latest",
-    "astro": "latest"
+    "astro": "latest",
+    "typescript": "latest"
   },
   "devDependencies": {}
 }

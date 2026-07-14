@@ -1,21 +1,21 @@
 export const site = {
   name: 'SV-Netzwerk',
-  title: 'SV-Netzwerk – Sachverständige und Großschadenregulierung',
-  description:
-    'Fachwissen, Sachverständigenleistungen und strukturierte Großschadenregulierung.',
+  legalName: 'SV-Netzwerk Bau & Schaden',
+  description: 'Sachverständige, Großschadenregulierung und vernetzte Fachkompetenz für komplexe Bau- und Versicherungsschäden.',
   url: 'https://www.sv-netzwerk.eu',
-  language: 'de-DE',
+  email: 'cw@sv-schuett.eu',
+  phone: '07367 / 393 97 83',
+  address: ['Nordstraße 17', '73432 Aalen'],
   author: {
     name: 'Christian Wächter',
     role: 'Sachverständiger & Großschadenregulierer',
-    qualification: 'DIN EN ISO/IEC 17024 zertifiziert',
+    qualification: 'DIN EN ISO/IEC 17024 zertifiziert'
   },
   navigation: [
-    { label: 'Start', href: '/' },
     { label: 'Leistungen', href: '/leistungen/' },
+    { label: 'Komplexschäden', href: '/komplexschaeden/' },
     { label: 'Fachwissen', href: '/fachwissen/' },
-    { label: 'Großschadenregulierung', href: '/grossschadenregulierung/' },
-    { label: 'Gutachter-Plattform', href: '/gutachter-plattform/' },
-    { label: 'Kontakt', href: '/kontakt/' },
-  ],
+    { label: 'Experten', href: '/experten/' },
+    { label: 'Gutachter-Plattform', href: '/gutachter-plattform/' }
+  ]
 } as const;

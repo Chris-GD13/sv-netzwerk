@@ -1,63 +1,16 @@
 ---
-import { site } from '../data/site';
-const year = new Date().getFullYear();
+import { site } from '../data/site'; const year = new Date().getFullYear();
 ---
-
 <footer class="site-footer">
   <div class="sv-container footer-grid">
-    <div>
-      <strong>{site.name}</strong>
-      <p>{site.author.name}<br />{site.author.role}<br />{site.author.qualification}</p>
-    </div>
-
-    <nav aria-label="Fußnavigation">
-      <a href="/impressum/">Impressum</a>
-      <a href="/datenschutzerklaerung/">Datenschutz</a>
-      <a href="/kontakt/">Kontakt</a>
-    </nav>
+    <div class="footer-intro"><span class="footer-mark">SV</span><h2>Belastbare Entscheidungen bei komplexen Schäden.</h2><p>Technische Bewertung, strukturierte Regulierung und vernetzte Fachkompetenz.</p></div>
+    <div><h3>Leistungen</h3><a href="/leistungen/">Übersicht</a><a href="/komplexschaeden/">Komplexschäden</a><a href="/grossschadenregulierung/">Großschadenregulierung</a><a href="/schaden-melden/">Schaden melden</a></div>
+    <div><h3>Fachwissen</h3><a href="/fachwissen/">Bibliothek</a><a href="/wissen-in-180-sekunden/">Wissen in 180 Sekunden</a><a href="/downloads/">Downloads</a><a href="/gutachter-plattform/">Gutachter-Plattform</a></div>
+    <div><h3>Kontakt</h3><p>{site.author.name}<br />{site.address[0]}<br />{site.address[1]}</p><a href={`mailto:${site.email}`}>{site.email}</a><a href={`tel:${site.phone.replace(/\D/g,'')}`}>{site.phone}</a></div>
   </div>
-
-  <div class="sv-container copyright">
-    © {year} {site.author.name}. Alle Rechte vorbehalten.
-  </div>
+  <div class="sv-container footer-bottom"><span>© {year} {site.legalName}</span><nav aria-label="Rechtliches"><a href="/impressum/">Impressum</a><a href="/datenschutz/">Datenschutz</a></nav></div>
 </footer>
-
 <style>
-  .site-footer {
-    margin-top: var(--sv-space-8);
-    padding-block: var(--sv-space-7) var(--sv-space-5);
-    border-top: 1px solid var(--sv-color-border);
-    background: var(--sv-color-surface);
-  }
-
-  .footer-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr);
-    gap: var(--sv-space-6);
-  }
-
-  p {
-    margin-bottom: 0;
-    color: var(--sv-color-muted);
-  }
-
-  nav {
-    display: grid;
-    align-content: start;
-    gap: var(--sv-space-2);
-  }
-
-  .copyright {
-    margin-top: var(--sv-space-6);
-    padding-top: var(--sv-space-4);
-    border-top: 1px solid var(--sv-color-border);
-    color: var(--sv-color-muted);
-    font-size: 0.85rem;
-  }
-
-  @media (max-width: 42rem) {
-    .footer-grid {
-      grid-template-columns: 1fr;
-    }
-  }
+.site-footer{padding-top:clamp(4rem,8vw,7rem);background:var(--sv-color-ink);color:#dce7ee}.footer-grid{display:grid;grid-template-columns:2fr repeat(3,1fr);gap:clamp(2rem,5vw,5rem)}.footer-intro h2{max-width:34rem;color:white;font-size:clamp(1.8rem,3vw,3rem)}.footer-mark{display:grid;width:3rem;aspect-ratio:1;place-items:center;margin-bottom:1.5rem;border-radius:.7rem;background:var(--sv-color-accent);color:var(--sv-color-ink);font-weight:900}.site-footer h3{color:white;font-family:var(--sv-font-sans);font-size:1rem}.site-footer a{display:block;margin:.55rem 0;color:#dce7ee;text-decoration:none}.site-footer a:hover{color:white}.site-footer p{color:#aebfca}.footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:4rem;padding-block:1.35rem;border-top:1px solid rgba(255,255,255,.15);font-size:.88rem}.footer-bottom nav{display:flex;gap:1.25rem}
+@media(max-width:58rem){.footer-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:36rem){.footer-grid{grid-template-columns:1fr}.footer-bottom{align-items:flex-start;flex-direction:column}}
 </style>

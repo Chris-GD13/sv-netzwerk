@@ -1,43 +1,16 @@
 ---
 import { site } from '../data/site';
-
-interface Props {
-  title: string;
-  description?: string;
-  canonical?: string;
-  image?: string;
-  type?: 'website' | 'article';
-  noindex?: boolean;
-}
-
-const {
-  title,
-  description = site.description,
-  canonical = Astro.url.href,
-  image,
-  type = 'website',
-  noindex = false,
-} = Astro.props;
-
-const pageTitle = title === site.name ? title : `${title} | ${site.name}`;
-const canonicalUrl = new URL(canonical, site.url).href;
-const imageUrl = image ? new URL(image, site.url).href : undefined;
+interface Props { title: string; description: string; canonical?: string; image?: string; type?: 'website'|'article'; noindex?: boolean; }
+const { title, description, canonical = new URL(Astro.url.pathname, site.url).toString(), image = `${site.url}/og-default.svg`, type = 'website', noindex = false } = Astro.props;
+const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
 ---
-
-<title>{pageTitle}</title>
+<title>{fullTitle}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={canonicalUrl} />
-<meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
-
-<meta property="og:locale" content="de_DE" />
-<meta property="og:type" content={type} />
-<meta property="og:site_name" content={site.name} />
-<meta property="og:title" content={pageTitle} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex,nofollow" />}
+<meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
-<meta property="og:url" content={canonicalUrl} />
-{imageUrl && <meta property="og:image" content={imageUrl} />}
-
-<meta name="twitter:card" content={imageUrl ? 'summary_large_image' : 'summary'} />
-<meta name="twitter:title" content={pageTitle} />
-<meta name="twitter:description" content={description} />
-{imageUrl && <meta name="twitter:image" content={imageUrl} />}
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={image} />
+<meta name="twitter:card" content="summary_large_image" />
