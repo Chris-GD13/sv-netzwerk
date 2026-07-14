@@ -1,0 +1,18 @@
+SV-NETZWERK – SEO-/INDEXIERUNGSPRÜFUNG 14:00-UHR-LAUF
+Stand: 11.07.2026 | Zwischenversion v7.05
+
+ÖFFENTLICHE SUCHPRÜFUNG
+Geprüft wurden Suchanfragen zu site:sv-netzwerk.eu, Gutachter-Plattform, Goran Krstic und Schadensteuerung. Zum Prüfzeitpunkt wurden für diese Abfragen keine belastbaren öffentlichen Suchtreffer ausgegeben. Daraus folgt kein sicherer Nachweis einer vollständigen Nichtindexierung; es zeigt jedoch, dass die Plattformseiten aktuell noch keine ausreichende sichtbare Suchpräsenz besitzen.
+
+UMGESETZTE MASSNAHMEN
+1. Neue indexierbare Themenseite /gutachter-plattform/prozessvorteile-schadenakte/.
+2. Eigenständiger Title, Meta-Description, Canonical, Robots-Meta und Open-Graph-Daten.
+3. Article- und FAQPage-Strukturdaten nach schema.org.
+4. Interne Links von Startseite, Plattform-Hauptseite und Fachwissen-Übersicht.
+5. Sitemap um neue URL mit lastmod, changefreq und priority ergänzt.
+6. robots.txt neu angelegt und Sitemap referenziert.
+7. Zielgruppenbegriffe Versicherer, Regulierer, Sachverständige, Sanierer und Dienstleister eingebunden.
+8. Goran Krstic korrekt als Geschäftsführer der GASD GmbH und Projektleiter eingeordnet. Christian Wächter wird nicht als Entwickler bezeichnet.
+
+NÄCHSTE PRÜFPUNKTE
+Nach Upload HTTP-Status 200, Canonical-Ausgabe, mobile Darstellung und Sitemap-Erreichbarkeit kontrollieren. Danach Search Console URL-Prüfung und Sitemap-Einreichung vornehmen.

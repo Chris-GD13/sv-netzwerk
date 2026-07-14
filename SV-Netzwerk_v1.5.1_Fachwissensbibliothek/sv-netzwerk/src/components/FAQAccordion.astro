@@ -1,0 +1,7 @@
+---
+interface Item { question:string; answer:string }
+interface Props { items:Item[] }
+const {items}=Astro.props;
+---
+<div class="faq">{items.map((item,index)=><details class="sv-card" open={index===0}><summary>{item.question}</summary><p>{item.answer}</p></details>)}</div>
+<style>.faq{display:grid;gap:.75rem}details{padding:1.1rem 1.25rem}summary{cursor:pointer;font-weight:850}details p{margin:1rem 0 0;color:var(--sv-color-muted)}</style>

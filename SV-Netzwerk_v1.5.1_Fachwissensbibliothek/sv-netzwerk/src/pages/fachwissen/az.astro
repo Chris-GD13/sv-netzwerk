@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import AlphabeticalNavigation from '../../components/AlphabeticalNavigation.astro';
+import { sortedLibrary } from '../../data/library';
+const alphabetical = [...sortedLibrary].sort((a,b)=>a.title.localeCompare(b.title,'de'));
+const groups = alphabetical.reduce<Record<string, typeof alphabetical>>((acc,item)=>{const letter=item.title.charAt(0).toLocaleUpperCase('de-DE');(acc[letter]??=[]).push(item);return acc;},{});
+---
+<BaseLayout title="Fachwissen von A bis Z | SV-Netzwerk" description="Alphabetisches Verzeichnis der Fachbeiträge und Praxishinweise des SV-Netzwerks.">
+  <Hero eyebrow="Fachwissensbibliothek" title="Fachwissen von A bis Z" text="Alle Beiträge alphabetisch und direkt erreichbar." />
+  <section class="sv-section"><div class="sv-container"><AlphabeticalNavigation items={alphabetical}/><div class="az-list">{Object.entries(groups).map(([letter,items])=><section id={`letter-${letter}`}><h2>{letter}</h2><ul>{items.map(item=><li><a href={item.href}>{item.title}</a><span>{item.category}</span></li>)}</ul></section>)}</div></div></section>
+</BaseLayout>
+<style>.az-list{display:grid;gap:2rem}.az-list section{scroll-margin-top:7rem}.az-list h2{padding-bottom:.5rem;border-bottom:2px solid var(--sv-color-primary)}.az-list ul{display:grid;gap:.7rem;margin:0;padding:0;list-style:none}.az-list li{display:flex;justify-content:space-between;gap:1rem;padding:.9rem 0;border-bottom:1px solid var(--sv-color-border)}.az-list li span{color:var(--sv-color-muted);font-size:.9rem}@media(max-width:38rem){.az-list li{align-items:flex-start;flex-direction:column}}</style>

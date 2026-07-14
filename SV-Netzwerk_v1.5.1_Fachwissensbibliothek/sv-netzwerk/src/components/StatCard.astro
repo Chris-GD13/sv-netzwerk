@@ -1,0 +1,6 @@
+---
+interface Props { value:string; label:string; text?:string }
+const {value,label,text}=Astro.props;
+---
+<div class="stat-card"><strong>{value}</strong><span>{label}</span>{text&&<p>{text}</p>}</div>
+<style>.stat-card{padding:1.5rem;border-left:3px solid var(--sv-color-accent)}strong,span{display:block}strong{font-family:var(--sv-font-display);font-size:clamp(2rem,5vw,3.8rem);line-height:1;color:var(--sv-color-primary)}span{margin-top:.5rem;font-weight:850}p{margin:.5rem 0 0;color:var(--sv-color-muted)}</style>

@@ -1,0 +1,20 @@
+---
+interface Props { currentPage: number; totalPages: number; basePath?: string; }
+const { currentPage, totalPages, basePath = '/fachwissen/seite' } = Astro.props;
+const hrefFor = (page: number) => page === 1 ? '/fachwissen/' : `${basePath}/${page}/`;
+---
+{totalPages > 1 && (
+  <nav class="pagination" aria-label="Seitennavigation">
+    {currentPage > 1 ? <a rel="prev" href={hrefFor(currentPage - 1)}>← Zurück</a> : <span aria-hidden="true"></span>}
+    <ol>
+      {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+        <li><a aria-current={page === currentPage ? 'page' : undefined} href={hrefFor(page)}>{page}</a></li>
+      ))}
+    </ol>
+    {currentPage < totalPages ? <a rel="next" href={hrefFor(currentPage + 1)}>Weiter →</a> : <span aria-hidden="true"></span>}
+  </nav>
+)}
+<style>
+  .pagination{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;margin:3rem 0}.pagination>a:last-child{text-align:right}.pagination ol{display:flex;gap:.4rem;margin:0;padding:0;list-style:none}.pagination ol a{display:grid;width:2.4rem;height:2.4rem;place-items:center;border:1px solid var(--sv-color-border);border-radius:50%;text-decoration:none}.pagination ol a[aria-current="page"]{border-color:var(--sv-color-primary);background:var(--sv-color-primary);color:white}
+  @media(max-width:38rem){.pagination{grid-template-columns:1fr 1fr}.pagination ol{grid-column:1/-1;grid-row:1;justify-content:center}}
+</style>

@@ -1,0 +1,11 @@
+---
+import type { LibraryItem } from '../data/library';
+interface Props { items: LibraryItem[]; }
+const { items } = Astro.props;
+const letters = [...new Set(items.map((item) => item.title.trim().charAt(0).toLocaleUpperCase('de-DE')))].sort((a,b)=>a.localeCompare(b,'de'));
+---
+<nav class="alphabet" aria-label="Alphabetische Navigation">
+  <span>Alphabetisch:</span>
+  {letters.map((letter) => <a href={`#letter-${encodeURIComponent(letter)}`}>{letter}</a>)}
+</nav>
+<style>.alphabet{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin:1.25rem 0}.alphabet span{margin-right:.35rem;font-weight:800}.alphabet a{display:grid;width:2rem;height:2rem;place-items:center;border:1px solid var(--sv-color-border);border-radius:50%;text-decoration:none}.alphabet a:hover{background:var(--sv-color-primary);color:white}</style>

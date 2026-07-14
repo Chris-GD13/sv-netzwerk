@@ -1,0 +1,6 @@
+---
+interface Props { number?:string; title:string; text:string; href:string; label?:string }
+const {number,title,text,href,label='Leistung ansehen'}=Astro.props;
+---
+<article class="service-card sv-card sv-card-lift">{number&&<span>{number}</span>}<h3>{title}</h3><p>{text}</p><a href={href}>{label} <b aria-hidden="true">→</b></a></article>
+<style>.service-card{display:flex;min-height:19rem;flex-direction:column;padding:clamp(1.5rem,3vw,2.25rem)}span{color:var(--sv-color-accent);font-weight:900;letter-spacing:.1em}h3{margin-top:auto}p{color:var(--sv-color-muted)}a{font-weight:800;text-decoration:none}</style>
