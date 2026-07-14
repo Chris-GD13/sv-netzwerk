@@ -1,12 +1,12 @@
 # Changelog
 
-## 1.7.0 – 2026-07-14
-- sichtbares Frontend-Redesign der produktiven Astro-Seiten
-- Header, Mega-Menü und Mobile Navigation neu gestaltet
-- Hero-System und Startseite vollständig modernisiert
-- Farb-, Typografie-, Karten- und Button-System überarbeitet
-- Footer und Kontaktführung modernisiert
-- bestehende SVOS-Module und Inhalte beibehalten
+## 2.0.0 – 2026-07-14
+- vollständiges visuelles Frontend-Redesign
+- responsive Navigation 2.0 mit Mobile-Off-Canvas-Menü
+- neue Mega-Menüs für Leistungen, Fachwissen und SVOS
+- neuer Hero mit SVOS-Prozessvisualisierung
+- neue Startseitenarchitektur und Schnellnavigation
+- modernisierte Karten, Buttons, Typografie, Farben und Footer
 
 ## 1.6.4 – 2026-07-14
 - SVOS Practice-Cases-Modul eingeführt

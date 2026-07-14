@@ -1,15 +1,19 @@
-# Release Notes – SV-Netzwerk v1.7.0 Visual Redesign
+# Release Notes – SV-Netzwerk v2.0 Visual System
 
-## Zweck
-Sichtbare Modernisierung der produktiven Website auf Basis des bestehenden Astro-/SVOS-Repositorys.
+## Schwerpunkt
+Vollständige visuelle Neuausrichtung der tatsächlich gerenderten Astro-Oberfläche.
 
-## Änderungen
-- vollständig überarbeiteter Header mit Akzentleiste, Mega-Menüs, Suche und klarer Schaden-CTA
-- neuer Hero mit SVOS-Systemgrafik, Vertrauensmerkmalen und klarer Handlungsführung
-- neu strukturierte Startseite mit Prozessleiste, Leistungsmodulen, SVOS-Workflow, Fachwissen und Expertenbereich
-- modernisiertes Farb-, Typografie-, Button-, Karten- und Abstandsdesign
-- vollständig modernisierter Footer mit prominenter Kontakt-CTA
-- responsive Optimierungen für Navigation, Hero und Inhaltsraster
+## Sichtbare Änderungen
+- neue responsive Hauptnavigation mit Mega-Menüs
+- vollständig funktionierendes Mobile-Off-Canvas-Menü
+- neuer Hero mit SVOS-Prozessvisualisierung
+- neue Startseitenarchitektur mit Schnellnavigation
+- neu gestaltete Leistungs-, SVOS-, Fachportal- und Expertenbereiche
+- modernisierte Typografie, Farben, Buttons, Karten und Abstände
+- neuer Footer mit direktem Schaden-CTA
 
-## Technischer Stand
-Die bestehenden Content Collections, Fachwissens-, Such-, Download- und Praxisfallmodule bleiben erhalten.
+## Technische Änderungen
+- zentrale Design Tokens auf v2.0 aktualisiert
+- Header-Interaktion mit Scrollzustand, Escape-Taste und Backdrop
+- mobile Navigation erhält korrekte ARIA-Zustände
+- bestehende Routing-, SEO-, Content- und CI-Struktur bleibt erhalten
