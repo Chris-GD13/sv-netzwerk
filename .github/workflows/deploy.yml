@@ -71,6 +71,52 @@ jobs:
           echo "Build erfolgreich; erzeugte Dateien:"
           find dist -type f | sort | head -n 100
 
+      - name: SFTP-Werkzeug installieren
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes lftp
+
+      - name: Document Root der Domain ermitteln
+        id: document-root
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          live_index="$(mktemp)"
+          remote_files="$(mktemp)"
+          candidate_index="$(mktemp)"
+          trap 'rm -f "$live_index" "$remote_files" "$candidate_index"' EXIT
+
+          curl --fail --silent --show-error --retry 5 --retry-delay 10 --retry-all-errors \
+            https://sv-netzwerk.eu/ --output "$live_index"
+          live_hash="$(sha256sum "$live_index" | cut -d ' ' -f 1)"
+
+          lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" \
+            -e "set sftp:auto-confirm yes; find .; bye" > "$remote_files"
+          mapfile -t remote_indexes < <(grep -E '(^|/)index\.html$' "$remote_files")
+
+          matches=()
+          for remote_index in "${remote_indexes[@]}"; do
+            lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" \
+              -e "set sftp:auto-confirm yes; get \"$remote_index\" -o \"$candidate_index\"; bye" \
+              > /dev/null
+            candidate_hash="$(sha256sum "$candidate_index" | cut -d ' ' -f 1)"
+            if [ "$candidate_hash" = "$live_hash" ]; then
+              matches+=("$remote_index")
+            fi
+          done
+
+          if [ "${#matches[@]}" -ne 1 ]; then
+            echo "::error::Document Root nicht eindeutig: ${#matches[@]} passende index.html-Dateien gefunden."
+            exit 1
+          fi
+
+          remote_dir="${matches[0]%index.html}"
+          printf 'remote_dir=%s\n' "$remote_dir" >> "$GITHUB_OUTPUT"
+          echo "Ermitteltes Document Root: $remote_dir"
+
       - name: Zu IONOS per SFTP übertragen
         if: success()
         uses: Dylan700/sftp-upload-action@v1.2.3
@@ -80,7 +126,7 @@ jobs:
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
           uploads: |
-            sv-netzwerk/dist/ => ./
+            sv-netzwerk/dist/ => ${{ steps.document-root.outputs.remote_dir }}
 
       - name: Deployment online verifizieren
         if: success()
