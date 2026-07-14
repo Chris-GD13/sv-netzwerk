@@ -1,11 +1,21 @@
 ---
 import type { ExpertProfile } from '../../types/platform';
-interface Props { expert: ExpertProfile }
+interface Props { expert: ExpertProfile; }
 const { expert } = Astro.props;
-const initials = expert.name.split(' ').map((part)=>part[0]).join('').slice(0,2);
 ---
-<article class="expert-card sv-card">
-  {expert.image ? <img src={expert.image} alt={`Porträt von ${expert.name}`} width="320" height="320" loading="lazy" decoding="async" /> : <div class="expert-card__avatar" aria-hidden="true">{initials}</div>}
-  <div><p class="sv-eyebrow">{expert.role}</p><h2>{expert.name}</h2><strong>{expert.function}</strong><p>{expert.shortProfile}</p><ul>{expert.expertise.slice(0,4).map((item)=><li>{item}</li>)}</ul><a href={`/experten/${expert.slug}/`}>Expertenprofil <span aria-hidden="true">→</span></a></div>
+<article class="expert-card sv-card sv-card-lift">
+  <a class="expert-card__portrait" href={`/experten/${expert.slug}/`} aria-label={`Profil von ${expert.name} öffnen`}>
+    {expert.image ? <img src={expert.image} alt={`Portrait von ${expert.name}`} width="720" height="720" loading="lazy" /> : <span aria-hidden="true">{expert.name.split(' ').map((part)=>part[0]).join('').slice(0,2)}</span>}
+  </a>
+  <div class="expert-card__body">
+    <p class="sv-eyebrow">{expert.group === 'backoffice' ? 'Backoffice' : expert.role}</p>
+    <h2><a href={`/experten/${expert.slug}/`}>{expert.name}</a></h2>
+    <strong>{expert.function}</strong>
+    <p>{expert.shortProfile}</p>
+    <ul aria-label={`Fachgebiete von ${expert.name}`}>{expert.expertise.slice(0,4).map((item)=><li>{item}</li>)}</ul>
+    <a class="expert-card__link" href={`/experten/${expert.slug}/`}>Profil und Beschreibung <span aria-hidden="true">→</span></a>
+  </div>
 </article>
-<style>.expert-card{display:grid;grid-template-columns:minmax(8rem,.55fr) minmax(0,1.45fr);gap:1.5rem;padding:1.5rem}.expert-card img,.expert-card__avatar{width:100%;aspect-ratio:1;border-radius:1rem}.expert-card img{object-fit:cover}.expert-card__avatar{display:grid;place-items:center;background:linear-gradient(145deg,var(--sv-color-primary),var(--sv-color-ink));color:white;font-size:2rem;font-weight:900}.expert-card h2{font-size:1.8rem}.expert-card strong{display:block;margin-bottom:.7rem}.expert-card p:not(.sv-eyebrow),.expert-card li{color:var(--sv-color-muted)}.expert-card ul{display:flex;flex-wrap:wrap;gap:.4rem;margin:1rem 0;padding:0;list-style:none}.expert-card li{padding:.3rem .55rem;border-radius:999px;background:var(--sv-color-surface-alt);font-size:.76rem}.expert-card a{font-weight:850;text-decoration:none}@media(max-width:38rem){.expert-card{grid-template-columns:1fr}.expert-card img,.expert-card__avatar{width:7rem}}</style>
+<style>
+.expert-card{display:flex;min-height:100%;flex-direction:column;overflow:hidden}.expert-card__portrait{display:block;aspect-ratio:4/3;overflow:hidden;background:linear-gradient(145deg,var(--sv-color-primary),var(--sv-color-ink));text-decoration:none}.expert-card__portrait img{width:100%;height:100%;object-fit:cover;object-position:center 24%;transition:transform var(--sv-transition)}.expert-card:hover .expert-card__portrait img{transform:scale(1.025)}.expert-card__portrait span{display:grid;width:100%;height:100%;place-items:center;color:white;font-size:3rem;font-weight:900}.expert-card__body{display:flex;flex:1;flex-direction:column;padding:1.35rem}.expert-card h2{margin:.15rem 0 .35rem;font-size:1.55rem}.expert-card h2 a{color:inherit;text-decoration:none}.expert-card strong{display:block;min-height:2.8em;margin-bottom:.75rem;line-height:1.4}.expert-card p:not(.sv-eyebrow){color:var(--sv-color-muted);font-size:.9rem}.expert-card ul{display:flex;flex-wrap:wrap;gap:.4rem;margin:1rem 0;padding:0;list-style:none}.expert-card li{padding:.3rem .55rem;border-radius:999px;background:var(--sv-color-surface-alt);color:var(--sv-color-muted);font-size:.72rem}.expert-card__link{margin-top:auto;font-weight:850;text-decoration:none}
+</style>

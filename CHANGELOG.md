@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.1.1 – 2026-07-14
+
+- Vollständigen historischen Expertenbestand mit sechs Fachprofilen wiederhergestellt.
+- Backoffice mit Susanne Wächter und Katja Schäfer als eigenständigen Bereich sichtbar gemacht.
+- Alle acht Profile mit lokal ausgeliefertem Portrait, Beschreibung, Funktion und Schwerpunkten ergänzt.
+- Dynamische Profilseiten und Suchindex auf den vollständigen Personenbestand erweitert.
+
 ## 5.1.0 – 2026-07-14
 
 - SVOS Core Platform mit Modulen, Prozessdarstellung und Roadmap ausgebaut

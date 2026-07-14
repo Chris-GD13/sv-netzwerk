@@ -7,7 +7,7 @@ export const GET: APIRoute = async () => {
   const searchIndex = await buildSearchIndex();
   return new Response(
   JSON.stringify({
-    version: '5.1.0',
+    version: '5.1.1',
     generatedAt: new Date().toISOString(),
     count: searchIndex.length,
     facets: {

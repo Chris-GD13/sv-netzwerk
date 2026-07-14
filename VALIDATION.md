@@ -1,4 +1,4 @@
-# Validierung – SV-Netzwerk v5.1.0
+# Validierung – SV-Netzwerk v5.1.1
 
 Stand: 14.07.2026
 
@@ -9,7 +9,7 @@ Stand: 14.07.2026
 - gemeldete Schwachstellen: 0
 - `npm run build`: erfolgreich
 - Astro-/TypeScript-Prüfung: 114 Dateien, 0 Fehler, 0 Warnungen, 0 Hinweise
-- statischer Build: 118 Seiten
+- statischer Build: 125 Seiten
 - `dist/deploy-version.txt`: vorhanden
 - kein Unterordner `dist/dist/`
 
@@ -24,7 +24,7 @@ Stand: 14.07.2026
 
 ## Erzeugte Kernbereiche
 
-- `/experten/` und ein bestätigtes Expertenprofil
+- `/experten/` mit sechs fachlichen Experten, zwei Backoffice-Profilen und acht dynamischen Detailseiten
 - `/svos/` mit Modulen, Prozessmodell und Roadmap
 - `/schaden-melden/` mit achtstufiger lokaler Erfassung
 - `/schadenarten/` mit zwölf datengetriebenen Schadenarten und Detailseiten
@@ -49,3 +49,4 @@ GitHub-Actions-Prüfung und Live-Verifikation erfolgen anhand des veröffentlich
 - ESC schließt das Menü und führt den Fokus zu „Menü öffnen“ zurück
 - keine Browser-Konsolenfehler oder -warnungen
 - Desktop- und Mobile-Screenshot erzeugt
+- alle acht Portraitbilder lokal ausgeliefert und erfolgreich geladen

@@ -1,10 +1,11 @@
-export type ExpertRole = 'Sachverständiger' | 'Großschadenregulierer' | 'Regulierer' | 'Fachberater' | 'Dienstleister' | 'Restaurator' | 'Spezialunternehmen';
+export type ExpertRole = 'Sachverständiger' | 'Großschadenregulierer' | 'Regulierer' | 'Fachberater' | 'Dienstleister' | 'Restaurator' | 'Spezialunternehmen' | 'Backoffice';
 
 export interface ExpertProfile {
   id: string;
   slug: string;
   name: string;
   role: ExpertRole;
+  group: 'expert' | 'backoffice';
   function: string;
   expertise: string[];
   regions: string[];
