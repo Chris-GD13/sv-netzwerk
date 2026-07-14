@@ -5,6 +5,8 @@ import LibraryFilters from '../../components/LibraryFilters.astro';
 import LibraryGrid from '../../components/LibraryGrid.astro';
 import Pagination from '../../components/Pagination.astro';
 import AlphabeticalNavigation from '../../components/AlphabeticalNavigation.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import FeatureCard from '../../components/FeatureCard.astro';
 import { PAGE_SIZE, sortedLibrary } from '../../data/library';
 
 const pageItems = sortedLibrary.slice(0, PAGE_SIZE);
@@ -18,6 +20,26 @@ const totalPages = Math.ceil(sortedLibrary.length / PAGE_SIZE);
       <AlphabeticalNavigation items={sortedLibrary} />
       <LibraryGrid items={pageItems} />
       <Pagination currentPage={1} totalPages={totalPages} />
+    </div>
+  </section>
+  <section class="sv-section sv-section-alt" id="normen-rechtsprechung" aria-labelledby="normen-title">
+    <div class="sv-container">
+      <SectionHeader id="normen-title" eyebrow="Regelwerke im Kontext" title="Normen und Rechtsprechung" text="Technische Regeln und gerichtliche Entscheidungen werden dort eingeordnet, wo sie die Schadenbewertung, Beweissicherung und Regulierung konkret beeinflussen." />
+      <div class="sv-grid sv-grid-3">
+        <FeatureCard title="Technische Regelwerke" text="Anforderungen aus Normen, Richtlinien und anerkannten Regeln der Technik mit Blick auf den konkreten Schadenzeitpunkt." tone="soft" />
+        <FeatureCard title="Vertrag und Haftung" text="Schnittstellen zwischen geschuldeter Leistung, Ausführungsabweichung, Ursache und technisch begründbarer Verantwortlichkeit." tone="soft" />
+        <FeatureCard title="Rechtsprechung einordnen" text="Entscheidungen werden auf ihre technischen Annahmen und ihre Übertragbarkeit auf den jeweiligen Einzelfall geprüft." tone="soft" />
+      </div>
+    </div>
+  </section>
+  <section class="sv-section" id="wissen-180" aria-labelledby="wissen-title">
+    <div class="sv-container">
+      <SectionHeader id="wissen-title" eyebrow="Kompaktformat" title="Wissen in 180 Sekunden" text="Kurze Facheinordnungen für wiederkehrende Fragen – mit klarer Kernaussage, fachlichem Hintergrund und direktem Praxisbezug." />
+      <div class="sv-grid sv-grid-3">
+        <FeatureCard title="Ursache oder Schadenbild?" text="Warum sichtbare Spuren allein noch keine belastbare Ursachenzuordnung erlauben." href="/fachwissen/" linkLabel="Bibliothek durchsuchen" />
+        <FeatureCard title="Trocknung nachvollziehen" text="Welche Messwerte, Randbedingungen und Dokumentationsschritte für eine prüffähige Bewertung erforderlich sind." href="/downloads/" linkLabel="Arbeitshilfen öffnen" />
+        <FeatureCard title="Regulierung dokumentieren" text="Wie Feststellungen, Abgrenzungen und Entscheidungen so aufgebaut werden, dass der Vorgang fachlich überprüfbar bleibt." href="/praxisfaelle/" linkLabel="Praxisfälle ansehen" />
+      </div>
     </div>
   </section>
 </BaseLayout>

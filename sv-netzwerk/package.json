@@ -1,6 +1,6 @@
 {
   "name": "sv-netzwerk",
-  "version": "3.0.1",
+  "version": "5.0.1",
   "private": true,
   "type": "module",
   "scripts": {

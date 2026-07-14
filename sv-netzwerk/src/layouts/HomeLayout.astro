@@ -2,9 +2,12 @@
 import SEO from '../components/SEO.astro';
 import PerformanceHints from '../components/PerformanceHints.astro';
 import AccessibilityStatus from '../components/AccessibilityStatus.astro';
-import HomeHeader from '../components/home/HomeHeader.astro';
-import HomeFooter from '../components/home/HomeFooter.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SearchOverlay from '../components/SearchOverlay.astro';
 import '../styles/global.css';
+import '../styles/header.css';
+import '../styles/navigation.css';
 import '../styles/home-v4.css';
 
 interface Props { title: string; description: string }
@@ -22,10 +25,18 @@ const props = Astro.props;
     <SEO {...props} />
   </head>
   <body class="home-v4">
-    <a class="v4-skip" href="#home-main">Zum Inhalt springen</a>
+    <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
     <AccessibilityStatus />
-    <HomeHeader currentPath={Astro.url.pathname} />
-    <main id="home-main" tabindex="-1"><slot /></main>
-    <HomeFooter />
+    <Header />
+    <main id="main-content" tabindex="-1"><slot /></main>
+    <Footer />
+    <SearchOverlay />
   </body>
 </html>
+
+<style is:global>
+  .skip-link{position:fixed;top:.65rem;left:.65rem;z-index:220;transform:translateY(-160%);padding:.7rem 1rem;border-radius:.65rem;background:#fff;color:var(--sv-color-ink);font-weight:900;box-shadow:var(--sv-shadow-md)}
+  .skip-link:focus{transform:none}
+  .search-open{overflow:hidden}
+  #main-content:focus{outline:none}
+</style>

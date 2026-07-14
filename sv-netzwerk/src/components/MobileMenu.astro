@@ -1,6 +1,6 @@
 ---
 import SearchButton from './SearchButton.astro';
-import type { NavItem } from './Header.astro';
+import type { NavItem } from '../data/navigation';
 
 interface Props { items: NavItem[]; currentPath: string }
 const { items, currentPath } = Astro.props;
@@ -79,11 +79,12 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && menu?.classList.contains('is-open')) setOpen(false);
       if (event.key !== 'Tab' || !menu?.classList.contains('is-open')) return;
-      const focusable = [...menu.querySelectorAll(focusableSelector)].filter((element) => element instanceof HTMLElement && !element.hidden);
+      const focusable = [...menu.querySelectorAll(focusableSelector)].filter((element) => element instanceof HTMLElement && element.offsetParent !== null);
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
       if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     });
+    menu?.querySelector('[data-search-open]')?.addEventListener('click', () => setOpen(false));
   })();
 </script>

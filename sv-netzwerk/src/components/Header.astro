@@ -3,47 +3,9 @@ import Navigation from './Navigation.astro';
 import MobileMenu from './MobileMenu.astro';
 import HamburgerButton from './HamburgerButton.astro';
 import SearchButton from './SearchButton.astro';
-
-export type NavChild = { label: string; href: string; description: string };
-export type NavItem = { label: string; href: string; description?: string; children?: NavChild[] };
+import { navigation } from '../data/navigation';
 
 const currentPath = Astro.url.pathname;
-const navigation: NavItem[] = [
-  {
-    label: 'Leistungen',
-    href: '/leistungen/',
-    description: 'Vom Schadenbild zur belastbaren Entscheidung.',
-    children: [
-      { label: 'Alle Leistungen', href: '/leistungen/', description: 'Unser Leistungsspektrum im Überblick.' },
-      { label: 'Komplexschäden', href: '/komplexschaeden/', description: 'Interdisziplinäre Bewertung komplexer Schadenbilder.' },
-      { label: 'Großschadenregulierung', href: '/grossschadenregulierung/', description: 'Struktur und Steuerung für hohe Schadenvolumina.' },
-      { label: 'Schaden melden', href: '/schaden-melden/', description: 'Einen neuen Schaden direkt an uns übermitteln.' },
-    ],
-  },
-  {
-    label: 'Wissen',
-    href: '/fachwissen/',
-    description: 'Fachwissen, das in der Praxis weiterhilft.',
-    children: [
-      { label: 'Fachwissen', href: '/fachwissen/', description: 'Fundierte Beiträge aus Technik und Regulierung.' },
-      { label: 'Praxisfälle', href: '/praxisfaelle/', description: 'Reale Fälle nachvollziehbar aufbereitet.' },
-      { label: 'Downloads', href: '/downloads/', description: 'Checklisten und Arbeitshilfen zum Mitnehmen.' },
-      { label: 'Wissen in 180 Sekunden', href: '/wissen-in-180-sekunden/', description: 'Komplexe Themen schnell auf den Punkt gebracht.' },
-    ],
-  },
-  {
-    label: 'SVOS',
-    href: '/svos/',
-    description: 'Ein System für konsistente Schadenbearbeitung.',
-    children: [
-      { label: 'SV Operating System', href: '/svos/', description: 'Standards, Prozesse und Wissen in einem System.' },
-      { label: 'Gutachter-Plattform', href: '/gutachter-plattform/', description: 'Digitale Zusammenarbeit für Sachverständige.' },
-      { label: 'Für Versicherer', href: '/versicherer/', description: 'Prüffähige Abläufe und transparente Ergebnisse.' },
-      { label: 'Expertennetzwerk', href: '/netzwerk/', description: 'Spezialisierte Kompetenz gezielt vernetzt.' },
-    ],
-  },
-  { label: 'Netzwerk', href: '/netzwerk/' },
-];
 ---
 
 <header class="site-header" data-site-header>
@@ -61,7 +23,6 @@ const navigation: NavItem[] = [
     <Navigation items={navigation} currentPath={currentPath} />
 
     <div class="site-header__actions">
-      <span class="header-availability"><i aria-hidden="true"></i> Bundesweit verfügbar</span>
       <SearchButton />
       <a class="header-cta" href="/schaden-melden/">
         Schaden melden

@@ -1,5 +1,42 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'; import Hero from '../../components/Hero.astro'; import FeatureCard from '../../components/FeatureCard.astro'; import CallToAction from '../../components/CallToAction.astro';
-const items=[['Schadenaufnahme & Erstbewertung','Strukturierte Erfassung von Schadenbild, Ursache, Umfang, Beteiligten und Sofortmaßnahmen.'],['Komplex- und Großschadenregulierung','Steuerung umfangreicher Schadenfälle mit belastbaren Berichten, Reserven und dokumentierten Entscheidungen.'],['KVA- und Rechnungsprüfung','Positionsweise Prüfung von Mengen, Leistungen, Preisen, Nachträgen und schadenbedingter Erforderlichkeit.'],['Schadenabgrenzung','Trennung von versichertem Schaden, Vorschaden, Mangel, Instandhaltung und nicht schadenbedingten Kosten.'],['Bautechnische Bewertung','Fachliche Einordnung von Konstruktionen, Feuchte-, Brand-, Oberflächen- und Materialschäden.'],['Digitale Prozessunterstützung','Strukturierte Akten, Aufgaben, Dokumente und Bearbeitungsstände auf Basis des SVOS.']];
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import FeatureCard from '../../components/FeatureCard.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import CallToAction from '../../components/CallToAction.astro';
+
+const services = [
+  { id: 'sachverstaendigenleistungen', title: 'Sachverständigenleistungen', text: 'Schadenaufnahme, technische Feststellungen, Ursacheneinordnung, Bewertung und eine verständliche Empfehlung für den konkreten Prüfauftrag.' },
+  { id: 'grossschadenregulierung', title: 'Großschadenregulierung', text: 'Koordination umfangreicher Vorgänge mit belastbaren Berichten, abgestimmten Reserven, Terminsteuerung und dokumentierten Entscheidungen.' },
+  { id: 'technische-schadenbewertung', title: 'Technische Schadenbewertung', text: 'Abgrenzung von Schaden, Vorschaden, Mangel und Instandhaltung sowie Prüfung des erforderlichen Wiederherstellungsumfangs.' },
+  { id: 'beweissicherung', title: 'Beweissicherung', text: 'Nachvollziehbare Dokumentation von Zuständen, Spuren, Messwerten und Bauteilöffnungen als Grundlage für die weitere Bearbeitung.' },
+  { id: 'versicherer', title: 'Leistungen für Versicherer', text: 'Prüffähige Entscheidungsvorlagen, KVA- und Rechnungsprüfung sowie klare Kommunikation von offenen Punkten und Handlungsbedarf.' },
+  { id: 'gutachter-plattform', title: 'Gutachter-Plattform', text: 'Strukturierte digitale Zusammenarbeit mit einheitlichen Vorgängen, Aufgaben, Unterlagen und fachlichen Bearbeitungsständen.' },
+];
 ---
-<BaseLayout title="Leistungen" description="Leistungen des SV-Netzwerks für Sachverständigenarbeit, Schadenregulierung, Prüfungen und digitale Schadenprozesse."><Hero compact eyebrow="Leistungen" title="Technische Bewertung mit klarer Regulierungslinie." text="Vom ersten Schadenbild bis zur abschließenden Empfehlung: strukturiert, nachvollziehbar und auf den konkreten Prüfauftrag ausgerichtet." primaryLabel="Schaden melden" primaryHref="/schaden-melden/"/><section class="sv-section"><div class="sv-container"><div class="sv-grid sv-grid-3">{items.map(([title,text],i)=><FeatureCard index={`0${i+1}`} title={title} text={text}/>)}</div></div></section><CallToAction title="Leistungsbedarf fachlich einordnen" text="Senden Sie uns Schadenart, Objekt, Auftraggeber und vorhandene Unterlagen. Wir prüfen, welche Bearbeitung sinnvoll ist." href="/kontakt/"/></BaseLayout>
+
+<BaseLayout title="Leistungen | SV-Netzwerk" description="Sachverständigenleistungen, Großschadenregulierung, technische Schadenbewertung und Beweissicherung für Bau- und Versicherungsschäden." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen'}]}>
+  <Hero compact eyebrow="Leistungen" title="Prüfen, einordnen und belastbar entscheiden." text="Das SV-Netzwerk verbindet technische Feststellung, regulierungsbezogene Bewertung und dokumentierte Handlungsempfehlung in einem klaren Bearbeitungsweg." primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Kontakt aufnehmen" secondaryHref="/kontakt/" />
+  <section class="sv-section">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Leistungsbild" title="Sechs Bausteine für eine prüffähige Bearbeitung" text="Umfang und Tiefe richten sich nach Schadenbild, Auftrag und Entscheidungsbedarf. Jeder Baustein wird mit Zuständigkeit, Ergebnis und offenen Punkten dokumentiert." />
+      <div class="service-grid">
+        {services.map((service, index) => (
+          <div id={service.id} class="service-anchor"><FeatureCard index={`0${index + 1}`} title={service.title} text={service.text} /></div>
+        ))}
+      </div>
+    </div>
+  </section>
+  <section class="sv-section sv-section-alt">
+    <div class="sv-container decision-grid">
+      <div><p class="sv-eyebrow">Ergebnisorientiert</p><h2>Der Auftrag bestimmt die Prüfung.</h2></div>
+      <div class="sv-prose"><p>Vor Beginn werden Fragestellung, verfügbare Unterlagen und erwartetes Ergebnis geklärt. So bleibt erkennbar, welche Aussagen technisch gesichert sind, wo Annahmen notwendig waren und welche Informationen noch fehlen.</p><p>Die Bearbeitung endet nicht bei einer Befundsammlung. Sie führt zu einer verständlichen Einordnung für Regulierung, Sanierungsplanung oder weitere Beweissicherung.</p></div>
+    </div>
+  </section>
+  <CallToAction title="Leistungsbedarf fachlich einordnen" text="Senden Sie uns Schadenart, Objekt, Auftraggeber und vorhandene Unterlagen. Wir ordnen den notwendigen Prüfungsumfang ein." href="/kontakt/" label="Anfrage vorbereiten" />
+</BaseLayout>
+
+<style>
+  .service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sv-space-5)}.service-anchor{scroll-margin-top:7rem}.service-anchor :global(.feature-card){height:100%}.decision-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(2rem,7vw,7rem)}
+  @media(max-width:58rem){.service-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:42rem){.service-grid,.decision-grid{grid-template-columns:1fr}}
+</style>

@@ -5,43 +5,20 @@ import Hero from '../../components/Hero.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import StatCard from '../../components/StatCard.astro';
 import InfoGrid from '../../components/InfoGrid.astro';
+import FeatureCard from '../../components/FeatureCard.astro';
+import CallToAction from '../../components/CallToAction.astro';
 
 const [knowledge, downloads, practiceCases, authors] = await Promise.all([
-  getCollection('knowledge'),
-  getCollection('downloads'),
-  getCollection('practiceCases'),
-  getCollection('authors'),
+  getCollection('knowledge'), getCollection('downloads'), getCollection('practiceCases'), getCollection('authors'),
 ]);
 ---
-<BaseLayout
-  title="SVOS Foundation | SV-Netzwerk"
-  description="Technische Grundlage des SV Operating System für strukturierte Inhalte, Datenmodelle und skalierbare Fachportale."
-  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'SVOS Foundation' }]}
->
-  <Hero eyebrow="Version 1.6.0" title="SVOS Foundation" text="Einheitliche Datenmodelle, validierte Inhalte und wiederverwendbare technische Grundlagen für das SV-Netzwerk." />
 
-  <section class="sv-section">
-    <div class="sv-container">
-      <SectionHeader eyebrow="Systemstatus" title="Strukturierte Inhaltsbereiche" text="Alle Kernbereiche werden durch Content Collections mit verbindlichen Schemas abgebildet." />
-      <InfoGrid columns={4}>
-        <StatCard value={String(knowledge.length)} label="Fachwissen" />
-        <StatCard value={String(downloads.length)} label="Downloads" />
-        <StatCard value={String(practiceCases.length)} label="Praxisfälle" />
-        <StatCard value={String(authors.length)} label="Autoren" />
-      </InfoGrid>
-    </div>
-  </section>
-
-  <section class="sv-section sv-section--muted">
-    <div class="sv-container prose">
-      <SectionHeader eyebrow="Architektur" title="Verbindliche SVOS-Grundlagen" />
-      <ul>
-        <li>Validierte Schemas für Fachwissen, Downloads, Praxisfälle und Autoren</li>
-        <li>Einheitliche Veröffentlichungsstatus: Entwurf, Prüfung, veröffentlicht und archiviert</li>
-        <li>Zentrale TypeScript-Typen für SEO, Taxonomien und Suchdokumente</li>
-        <li>Utility-Module für Sortierung, Veröffentlichung, Slugs und Routen</li>
-        <li>Vorbereitung für Knowledge Engine, Suche, Downloadcenter und Praxisfalldatenbank</li>
-      </ul>
-    </div>
-  </section>
+<BaseLayout title="SVOS | SV-Netzwerk" description="Das SV Operating System verbindet Vorgänge, Fachwissen, Dokumente und Qualitätsstandards für nachvollziehbare Schadenbearbeitung." breadcrumbs={[{label:'Start',href:'/'},{label:'SVOS'}]}>
+  <Hero compact eyebrow="SV Operating System" title="Ein gemeinsamer Standard für jeden Bearbeitungsstand." text="SVOS ordnet Informationen nicht nur ab. Es verbindet Auftrag, Feststellungen, Aufgaben, Dokumente und Entscheidungen zu einem nachvollziehbaren Vorgang." primaryLabel="SVOS Fachwissen" primaryHref="/svos/fachwissen/" secondaryLabel="Gutachter-Plattform" secondaryHref="/gutachter-plattform/" />
+  <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Systembereiche" title="Strukturierte Inhalte mit verbindlichen Metadaten" text="Veröffentlichungsstatus, Kategorien, Versionen und Zuständigkeiten werden systematisch geführt."/><InfoGrid columns={4}><StatCard value={String(knowledge.length)} label="Fachbeiträge"/><StatCard value={String(downloads.length)} label="Downloads"/><StatCard value={String(practiceCases.length)} label="Praxisfälle"/><StatCard value={String(authors.length)} label="Autorenprofile"/></InfoGrid></div></section>
+  <section class="sv-section sv-section-alt"><div class="sv-container"><SectionHeader eyebrow="Bearbeitungslogik" title="Vom Eingang bis zur Entscheidung"/><div class="sv-grid sv-grid-3"><FeatureCard index="01" title="Vorgang strukturieren" text="Auftrag, Beteiligte, Objekt, Schadenart und Termine bilden den nachvollziehbaren Rahmen."/><FeatureCard index="02" title="Prüfung dokumentieren" text="Unterlagen, Feststellungen, offene Punkte und fachliche Beiträge bleiben miteinander verknüpft."/><FeatureCard index="03" title="Wissen nutzbar machen" text="Fachartikel, Praxisfälle und Arbeitshilfen werden über Taxonomien und Suche zugänglich."/></div></div></section>
+  <section class="sv-section"><div class="sv-container svos-grid"><div><p class="sv-eyebrow">Qualitätssicherung</p><h2>Einheitlich, ohne fachliche Unterschiede zu verdecken.</h2></div><div class="sv-prose"><p>SVOS gibt eine gemeinsame Dokumentations- und Übergabestruktur vor. Die fachliche Beurteilung bleibt beim verantwortlichen Sachverständigen und wird mit ihrer Grundlage und Aussagegrenze ausgewiesen.</p><p>So können Auftraggeber Bearbeitungsstände vergleichen, Rückfragen gezielt stellen und Entscheidungen auf den dokumentierten Sachstand beziehen.</p></div></div></section>
+  <CallToAction title="SVOS in der Zusammenarbeit einsetzen" text="Für Versicherer, Regulierer und Sachverständige lässt sich der passende Einstieg anhand des Prozessbedarfs bestimmen." href="/kontakt/" label="Anwendungsfall besprechen" />
 </BaseLayout>
+
+<style>.svos-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(2rem,7vw,7rem)}@media(max-width:42rem){.svos-grid{grid-template-columns:1fr}}</style>

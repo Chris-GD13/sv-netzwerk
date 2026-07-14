@@ -15,7 +15,7 @@ const commit = process.env.GITHUB_SHA?.trim() || execFileSync('git', ['rev-parse
 const contents = [
   `Commit: ${commit}`,
   `Build-Zeit: ${new Date().toISOString()}`,
-  'Version: Homepage-v4',
+  'Version: Homepage-v5',
   ''
 ].join('\n');
 

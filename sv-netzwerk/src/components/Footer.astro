@@ -2,20 +2,87 @@
 import { site } from '../data/site';
 const year = new Date().getFullYear();
 ---
+
 <footer class="site-footer">
-  <div class="footer-glow"></div>
-  <div class="sv-container footer-top">
-    <div class="footer-brand"><div class="footer-logo"><span>SV</span></div><div><strong>SV-Netzwerk</strong><small>Kompetenzzentrum für Bau- und Versicherungsschäden</small></div></div>
-    <a class="footer-contact" href="/kontakt/">Kontakt aufnehmen <span>→</span></a>
+  <div class="footer-accent" aria-hidden="true"></div>
+  <div class="sv-container footer-lead">
+    <div class="footer-brand">
+      <span class="footer-brand__mark" aria-hidden="true">SV</span>
+      <div><strong>SV-Netzwerk</strong><small>Bau · Schaden · Regulierung</small></div>
+    </div>
+    <div class="footer-lead__copy">
+      <p class="sv-eyebrow">Standort Aalen · bundesweit im Einsatz</p>
+      <h2>Technische Klarheit für belastbare Schadenentscheidungen.</h2>
+    </div>
+    <a class="footer-contact" href="/kontakt/">Kontakt aufnehmen <span aria-hidden="true">→</span></a>
   </div>
-  <div class="sv-container footer-grid">
-    <div class="footer-intro"><h2>Belastbare Entscheidungen bei komplexen Schäden.</h2><p>Technische Bewertung, strukturierte Regulierung und vernetzte Fachkompetenz – verbunden durch SVOS.</p></div>
-    <div><h3>Leistungen</h3><a href="/leistungen/">Übersicht</a><a href="/komplexschaeden/">Komplexschäden</a><a href="/grossschadenregulierung/">Großschadenregulierung</a><a href="/schaden-melden/">Schaden melden</a></div>
-    <div><h3>Wissen & SVOS</h3><a href="/fachwissen/">Fachwissen</a><a href="/praxisfaelle/">Praxisfälle</a><a href="/downloads/">Downloads</a><a href="/svos/">SV Operating System</a></div>
-    <div><h3>Kontakt</h3><p>{site.author.name}<br />{site.address[0]}<br />{site.address[1]}</p><a href={`mailto:${site.email}`}>{site.email}</a><a href={`tel:${site.phone.replace(/\D/g,'')}`}>{site.phone}</a></div>
+
+  <div class="sv-container footer-directory">
+    <div class="footer-column">
+      <h3>Leistungen</h3>
+      <a href="/leistungen/#sachverstaendigenleistungen">Sachverständigenleistungen</a>
+      <a href="/leistungen/#grossschadenregulierung">Großschadenregulierung</a>
+      <a href="/leistungen/#beweissicherung">Beweissicherung</a>
+      <a href="/schadenarten/">Schadenarten</a>
+    </div>
+    <div class="footer-column">
+      <h3>Wissen</h3>
+      <a href="/fachwissen/">Fachartikel</a>
+      <a href="/praxisfaelle/">Praxisfälle</a>
+      <a href="/downloads/">Downloads</a>
+      <a href="/fachwissen/#wissen-180">Wissen in 180 Sekunden</a>
+    </div>
+    <div class="footer-column">
+      <h3>SVOS</h3>
+      <a href="/svos/">Systemübersicht</a>
+      <a href="/svos/fachwissen/">Knowledge Engine</a>
+      <a href="/gutachter-plattform/">Gutachter-Plattform</a>
+    </div>
+    <div class="footer-column">
+      <h3>Netzwerk</h3>
+      <a href="/netzwerk/">Kompetenzen</a>
+      <a href="/partner/">Fachpartner</a>
+      <a href="/ueber-uns/">Über uns</a>
+    </div>
+    <div class="footer-column">
+      <h3>Kontakt</h3>
+      <a href={`mailto:${site.email}`}>{site.email}</a>
+      <a href={`tel:${site.phone.replace(/\D/g,'')}`}>{site.phone}</a>
+      <p>{site.address[0]}<br />{site.address[1]}</p>
+      <a href="/schaden-melden/">Schaden melden</a>
+    </div>
+    <div class="footer-column">
+      <h3>Rechtliches</h3>
+      <a href="/impressum/">Impressum</a>
+      <a href="/datenschutzerklaerung/">Datenschutz</a>
+      <a href="/barrierefreiheit/">Barrierefreiheit</a>
+    </div>
+    <div class="footer-column">
+      <h3>Social Media</h3>
+      <a href="https://www.linkedin.com/in/christian-w-156408204/" target="_blank" rel="noopener noreferrer">LinkedIn <span class="sr-only">(öffnet in neuem Fenster)</span></a>
+    </div>
   </div>
-  <div class="sv-container footer-bottom"><span>© {year} {site.legalName}</span><nav aria-label="Rechtliches"><a href="/impressum/">Impressum</a><a href="/datenschutz/">Datenschutz</a><a href="/barrierefreiheit/">Barrierefreiheit</a></nav></div>
+
+  <div class="sv-container footer-proof">
+    <p><strong>Zertifizierungshinweis</strong><br />Sachverständigenkompetenz nach DIN EN ISO/IEC 17024 im Netzwerk. Projektbezogene Zuständigkeiten und Qualifikationen werden im jeweiligen Auftrag ausgewiesen.</p>
+    <p><strong>Standort</strong><br />Aalen, Baden-Württemberg · Koordination bundesweiter Einsätze</p>
+  </div>
+
+  <div class="sv-container footer-bottom">
+    <span>© {year} {site.legalName}</span>
+    <span>Version 5.0.1 · Informationsarchitektur</span>
+  </div>
 </footer>
+
 <style>
-.site-footer{position:relative;overflow:hidden;padding-top:4rem;background:#051424;color:#d7e4ed}.footer-glow{position:absolute;top:-18rem;left:20%;width:36rem;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(11,79,122,.45),transparent 68%)}.footer-top{position:relative;display:flex;align-items:center;justify-content:space-between;gap:2rem;padding-bottom:2rem;border-bottom:1px solid rgba(255,255,255,.13)}.footer-brand{display:flex;align-items:center;gap:.85rem}.footer-logo{display:grid;width:3rem;aspect-ratio:1;place-items:center;border-radius:.85rem;background:var(--sv-color-accent);color:#111;font-weight:900}.footer-brand strong,.footer-brand small{display:block}.footer-brand small{margin-top:.25rem;color:#9fb5c5;font-size:.72rem}.footer-contact{display:flex;align-items:center;gap:.7rem;color:white;font-weight:850;text-decoration:none}.footer-contact span{color:var(--sv-color-accent)}.footer-grid{position:relative;display:grid;grid-template-columns:2fr repeat(3,1fr);gap:clamp(2rem,5vw,5rem);padding-block:4rem}.footer-intro h2{max-width:34rem;color:white;font-size:clamp(1.8rem,3vw,3rem)}.footer-intro p{max-width:32rem;color:#aebfca}.site-footer h3{color:white;font-size:.95rem;letter-spacing:.05em}.site-footer a{display:block;margin:.55rem 0;color:#d7e4ed;text-decoration:none}.site-footer a:hover{color:white}.site-footer p{color:#9fb5c5}.footer-bottom{position:relative;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-block:1.35rem;border-top:1px solid rgba(255,255,255,.13);font-size:.84rem}.footer-bottom nav{display:flex;gap:1.25rem}@media(max-width:62rem){.footer-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:42rem){.footer-top,.footer-bottom{align-items:flex-start;flex-direction:column}.footer-grid{grid-template-columns:1fr}.footer-bottom nav{flex-wrap:wrap}}
+  .site-footer{position:relative;overflow:hidden;padding-top:clamp(4rem,7vw,6.5rem);background:#051424;color:#d7e4ed}.footer-accent{position:absolute;top:-22rem;right:-14rem;width:42rem;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(20,107,149,.48),transparent 68%)}
+  .footer-lead{position:relative;display:grid;grid-template-columns:auto minmax(18rem,1fr) auto;align-items:end;gap:clamp(2rem,5vw,5rem);padding-bottom:3rem;border-bottom:1px solid rgba(255,255,255,.14)}
+  .footer-brand{display:flex;align-items:center;gap:.8rem}.footer-brand__mark{display:grid;width:3.2rem;aspect-ratio:1;place-items:center;border-radius:.9rem;background:var(--sv-color-accent);color:#111923;font-weight:950}.footer-brand strong,.footer-brand small{display:block}.footer-brand strong{color:#fff}.footer-brand small{margin-top:.2rem;color:#96adbc;font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+  .footer-lead__copy{max-width:46rem}.footer-lead .sv-eyebrow{color:#e9b75e}.footer-lead h2{margin:0;color:#fff;font-size:clamp(1.8rem,3.2vw,3.4rem)}.footer-contact{display:inline-flex;align-items:center;gap:.6rem;color:#fff;font-weight:900;text-decoration:none}.footer-contact span{color:var(--sv-color-accent)}
+  .footer-directory{position:relative;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:clamp(1.25rem,2.5vw,2.5rem);padding-block:3.5rem}.footer-column h3{margin-bottom:1rem;color:#fff;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}.footer-column a{display:block;margin:.55rem 0;color:#c5d4de;font-size:.84rem;text-decoration:none}.footer-column a:hover{color:#fff}.footer-column p{margin:.55rem 0;color:#93aab9;font-size:.82rem}
+  .footer-proof{display:grid;grid-template-columns:1.4fr 1fr;gap:2rem;padding-block:1.6rem;border-top:1px solid rgba(255,255,255,.12);color:#91a8b7}.footer-proof p{margin:0;font-size:.78rem}.footer-proof strong{color:#dce7ed}
+  .footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-block:1.25rem;border-top:1px solid rgba(255,255,255,.12);color:#8fa6b5;font-size:.76rem}
+  @media(max-width:72rem){.footer-lead{grid-template-columns:auto 1fr}.footer-contact{grid-column:2}.footer-directory{grid-template-columns:repeat(4,1fr)}}
+  @media(max-width:48rem){.footer-lead{grid-template-columns:1fr;align-items:start}.footer-contact{grid-column:auto}.footer-directory{grid-template-columns:repeat(2,1fr)}.footer-proof{grid-template-columns:1fr}.footer-bottom{align-items:flex-start;flex-direction:column}}
+  @media(max-width:28rem){.footer-directory{grid-template-columns:1fr}}
 </style>

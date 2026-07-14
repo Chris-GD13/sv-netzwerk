@@ -1,9 +1,12 @@
 ---
-import type { NavItem } from './Header.astro';
+import type { NavItem } from '../data/navigation';
 
 interface Props { item: NavItem; id: string; currentPath: string }
 const { item, id, currentPath } = Astro.props;
-const active = (href: string) => href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+const active = (href: string) => {
+  if (href.includes('#')) return false;
+  return href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+};
 ---
 
 <div class="mega-menu" id={id} data-mega-menu hidden>

@@ -1,11 +1,15 @@
 export const routes = {
   home: '/',
+  services: '/leistungen/',
+  damageTypes: '/schadenarten/',
   knowledge: '/fachwissen/',
   downloads: '/downloads/',
   practiceCases: '/praxisfaelle/',
   team: '/netzwerk/',
   search: '/suche/',
   svos: '/svos/',
+  about: '/ueber-uns/',
+  contact: '/kontakt/',
 } as const;
 
 export const knowledgeRoute = (slug: string) => `${routes.knowledge}${slug}/`;

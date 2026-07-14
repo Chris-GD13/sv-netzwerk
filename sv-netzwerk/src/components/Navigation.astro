@@ -1,6 +1,6 @@
 ---
 import MegaMenu from './MegaMenu.astro';
-import type { NavItem } from './Header.astro';
+import type { NavItem } from '../data/navigation';
 
 interface Props { items: NavItem[]; currentPath: string }
 const { items, currentPath } = Astro.props;
@@ -17,6 +17,7 @@ const itemIsActive = (item: NavItem) => pathIsActive(item.href) || Boolean(item.
             class:list={["desktop-nav__trigger", { "is-active": itemIsActive(item) }]}
             type="button"
             aria-expanded="false"
+            aria-haspopup="true"
             aria-controls={`mega-menu-${index}`}
             data-mega-trigger
           >
@@ -53,6 +54,16 @@ const itemIsActive = (item: NavItem) => pathIsActive(item.href) || Boolean(item.
         trigger.setAttribute('aria-expanded', String(open));
         if (panel) panel.hidden = !open;
       });
+    });
+
+    nav?.addEventListener('keydown', (event) => {
+      const controls = [...nav.querySelectorAll('[data-mega-trigger], .desktop-nav__link')];
+      const index = controls.indexOf(document.activeElement);
+      if (index < 0 || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      if (event.key === 'Home') controls[0]?.focus();
+      else if (event.key === 'End') controls.at(-1)?.focus();
+      else controls[(index + (event.key === 'ArrowRight' ? 1 : -1) + controls.length) % controls.length]?.focus();
     });
 
     document.addEventListener('pointerdown', (event) => {

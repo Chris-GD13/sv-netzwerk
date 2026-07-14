@@ -69,7 +69,7 @@ jobs:
           test -n "$(find dist -type f -print -quit)"
           test -f dist/deploy-version.txt
           grep -Fx "Commit: $GITHUB_SHA" dist/deploy-version.txt
-          grep -Fx "Version: Homepage-v4" dist/deploy-version.txt
+          grep -Fx "Version: Homepage-v5" dist/deploy-version.txt
           echo "Build erfolgreich; erzeugte Dateien:"
           find dist -type f | sort | head -n 100
 
