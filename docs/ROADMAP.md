@@ -6,7 +6,7 @@ Gemeinsamer Header, Navigation, Footer und belastbare Hauptbereiche. Status: abg
 
 ## 5.1 – SVOS Core Platform
 
-Datengetriebene Schadenarten, eigenständiger Expertenbereich, Wissen in 180 Sekunden, Suche 2.0, täglicher Fachwissensstandard und sichere Vorbereitung der Schadenmeldung. Status: umgesetzt und in fortlaufender Validierung.
+Datengetriebene Schadenarten, eigenständiger Expertenbereich, Suche 2.0, täglicher Fachwissensstandard und sichere Vorbereitung der Schadenmeldung. Das Avatar-Format „Wissen in 180 Sekunden“ bleibt bis zur echten Videoproduktion ausgeblendet.
 
 ## 5.2 – Vorgangs- und Rollenmodell
 

@@ -141,15 +141,6 @@ export const library: LibraryItem[] = [
     date: '2026-06-30',
     type: 'download',
   },
-  {
-    title: 'Wissen in 180 Sekunden: Schadenabgrenzung',
-    description: 'Kompakte fachliche Einordnung für die Praxis.',
-    href: '/wissen-in-180-sekunden/',
-    category: 'Video',
-    tags: ['Video', 'Schadenabgrenzung'],
-    date: '2026-06-29',
-    type: 'video',
-  },
 ];
 
 export const categories = [...new Set(library.map((item) => item.category))]

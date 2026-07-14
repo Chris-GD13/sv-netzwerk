@@ -11,7 +11,7 @@ export const experts: ExpertProfile[] = [
     qualifications: ['Sachverständiger für Bau- und Versicherungsschäden', 'Großschadenregulierer'],
     certifications: ['Personenzertifizierung nach DIN EN ISO/IEC 17024'],
     shortProfile: 'Sachverständiger und Großschadenregulierer mit DIN EN ISO/IEC 17024-Zertifizierung. Schwerpunkt: komplexe Gebäude-, Hausrat- und Großschäden, gerichtsfeste Gutachten sowie regulierungssichere Schadenbearbeitung.',
-    contact: centralContact, image: '/assets/images/team/christian-waechter.jpg', status: 'active',
+    contact: centralContact, image: '/assets/images/team/christian-waechter-bw.webp', status: 'active',
     tags: ['Komplexschäden', 'Großschadenregulierung', 'Bauforensik'], publications: ['/fachwissen/'],
     practiceCases: ['/praxisfaelle/leitungswasser-technische-abgrenzung/'], articles: ['/fachwissen/schadenabgrenzung/'],
   },

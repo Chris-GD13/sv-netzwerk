@@ -2,7 +2,7 @@
 
 ## Renderkette
 
-Astro erzeugt statische Seiten. `BaseLayout.astro` beziehungsweise `HomeLayout.astro` binden zentrale SEO-, Header-, Footer- und Suchkomponenten ein. Content Collections liefern Fachwissen, Praxisfälle, Downloads, Autoren und Kurzvideos.
+Astro erzeugt statische Seiten. `BaseLayout.astro` beziehungsweise `HomeLayout.astro` binden zentrale SEO-, Header-, Footer- und Suchkomponenten ein. Content Collections liefern Fachwissen, Praxisfälle, Downloads und Autoren. Kurzvideo-Daten bleiben intern vorbereitet, werden aber erst mit echten Avatar-Videos veröffentlicht.
 
 ## Plattformdaten
 
@@ -12,7 +12,7 @@ Astro erzeugt statische Seiten. `BaseLayout.astro` beziehungsweise `HomeLayout.a
 - `src/content/knowledge/`: Fachbeiträge mit Tagesstandard
 - `src/content/practice-cases/`: anonymisierte Praxisfälle
 - `src/content/downloads/`: versionierte Arbeitshilfen
-- `src/content/videos-library/`: Wissen in 180 Sekunden
+- `src/content/videos-library/`: interne Vorbereitung für künftige Avatar-Videos
 
 ## SVOS
 
@@ -20,7 +20,7 @@ SVOS verbindet Schadenmeldung, Erstklassifizierung, technische Bewertung, Expert
 
 ## Suche
 
-Der Suchindex wird beim Build aus Seiten, Fachbeiträgen, Schadenarten, Praxisfällen, Downloads, Videos und Experten erzeugt. Ranking gewichtet exakten Titel, Titelanfang, Kategorie, Tags, Beschreibung und Aktualität.
+Der Suchindex wird beim Build aus Seiten, Fachbeiträgen, Schadenarten, Praxisfällen, Downloads und Experten erzeugt. Ranking gewichtet exakten Titel, Titelanfang, Kategorie, Tags, Beschreibung und Aktualität.
 
 ## Deployment
 

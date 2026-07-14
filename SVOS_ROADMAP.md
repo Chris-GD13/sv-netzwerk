@@ -9,7 +9,7 @@ SVOS ist die zukünftige Daten-, Wissens- und Arbeitsplattform für nachvollzieh
 - öffentliche Modulübersicht und Prozessdarstellung
 - elf datengetriebene Schadenarten
 - eigenständiger Expertenbereich
-- Fachwissen, Praxisfälle, Downloads und Kurzvideos
+- Fachwissen, Praxisfälle und Downloads; Avatar-Kurzvideos nach gesicherter Produktion
 - Suche 2.0
 - täglicher Fachwissens-Pflichtlauf
 - lokale Schadenmeldungs-Vorbereitung ohne Datenübertragung

@@ -11,15 +11,14 @@
 
 - `/experten/` und `/experten/[slug]/`
 - `/schadenarten/[slug]/`
-- `/wissen-in-180-sekunden/` und Detailseiten
 - `/schaden-melden/`
 - dynamische Fachbeiträge unter `/fachwissen/[id]/`
 
 ## Wissen und Suche
 
 - Fachbeiträge für 12., 13. und 14.07.2026
-- Videos-Collection für Wissen in 180 Sekunden
-- Suchindex aus Seiten, Artikeln, Schadenarten, Praxisfällen, Downloads, Videos und Experten
+- intern vorbereitete Videos-Collection für künftige Avatar-Filme
+- Suchindex aus Seiten, Artikeln, Schadenarten, Praxisfällen, Downloads und Experten
 - Validierungsskript und GitHub-Workflow für den täglichen Fachwissensstandard
 
 ## Projektdokumentation

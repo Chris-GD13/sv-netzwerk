@@ -1,12 +1,3 @@
 ---
-import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Hero from '../../components/Hero.astro';
-import SectionHeader from '../../components/SectionHeader.astro';
-const videos=(await getCollection('videos',({data})=>data.publication.status==='published')).sort((a,b)=>b.data.publication.publishedAt.getTime()-a.data.publication.publishedAt.getTime());
+return Astro.redirect('/fachwissen/', 302);
 ---
-<BaseLayout title="Wissen in 180 Sekunden" description="Technische Kernthemen aus Schadenbewertung und Regulierung als Kurzskript mit Transkript und weiterführenden Quellen." breadcrumbs={[{label:'Start',href:'/'},{label:'Fachwissen',href:'/fachwissen/'},{label:'Wissen in 180 Sekunden'}]}>
-  <Hero compact eyebrow="Kurzformat" title="Wissen in 180 Sekunden" text="Jede Ausgabe verbindet ein kompaktes Skript mit Transkript, Schadenart, Fachbeitrag und passenden Arbeitshilfen. Plattformlinks werden erst veröffentlicht, wenn ein Video tatsächlich bereitsteht." />
-  <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Bibliothek" title={`${videos.length} veröffentlichte Kurzskripte`} text="Die Inhalte sind vollständig lesbar und benötigen keine externe Videoplattform."/><div class="video-grid">{videos.map((entry)=><article class="sv-card"><div><span>{entry.data.duration}</span><small>{entry.data.damageType}</small></div><h2><a href={`/wissen-in-180-sekunden/${entry.id}/`}>{entry.data.title}</a></h2><p>{entry.data.description}</p><ul>{entry.data.tags.map((tag)=><li>#{tag}</li>)}</ul><a href={`/wissen-in-180-sekunden/${entry.id}/`}>Transkript lesen →</a></article>)}</div></div></section>
-</BaseLayout>
-<style>.video-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.video-grid article{display:flex;min-height:20rem;flex-direction:column;padding:1.4rem}.video-grid article>div{display:flex;justify-content:space-between;color:var(--sv-color-muted)}.video-grid h2{margin-top:1.3rem;font-size:1.4rem}.video-grid h2 a{color:inherit;text-decoration:none}.video-grid p,.video-grid li{color:var(--sv-color-muted)}.video-grid ul{display:flex;flex-wrap:wrap;gap:.4rem;padding:0;list-style:none}.video-grid article>a{margin-top:auto;font-weight:850;text-decoration:none}@media(max-width:58rem){.video-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:38rem){.video-grid{grid-template-columns:1fr}}</style>

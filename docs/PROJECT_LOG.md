@@ -15,8 +15,8 @@
 - Datenmodelle für Experten und elf angebotene Schadenarten eingeführt
 - Schadenarten-Übersicht und Detailseiten aus gemeinsamer Datenquelle aufgebaut
 - SVOS Core Platform mit Modulen, Prozess und Roadmap erweitert
-- Wissen in 180 Sekunden als echte Collection mit Übersicht und Detailseiten eingeführt
-- globale Suche um Schadenarten, Praxisfälle, Experten, Videos und Plattformseiten erweitert
+- Wissen in 180 Sekunden intern als Collection vorbereitet und bis zur echten Avatar-Videoproduktion ausgeblendet
+- globale Suche um Schadenarten, Praxisfälle, Experten und Plattformseiten erweitert
 - strukturierte, lokal arbeitende Schadenmeldung ohne vorgetäuschte Serverübertragung ergänzt
 - Fachwissens-Pflichtbeiträge für 12., 13. und 14.07. konsolidiert
 - CI-Validierung für Tageskategorie, Wortumfang, Pflichtfelder, Suche, Sitemap und Links vorbereitet

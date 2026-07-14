@@ -48,7 +48,3 @@ Der Rückbau folgt der nachgewiesenen Betroffenheit und der Trocknungsfähigkeit
 ### LinkedIn-Kurzfassung
 
 Kontrollierter Rückbau heißt: erst Ursache und Konstruktion verstehen, dann gezielt öffnen und den weiteren Umfang aus den Feststellungen ableiten.
-
-### Video-Skript „Wissen in 180 Sekunden“
-
-Wasser stoppen, Schadenbereich sichern, Konstruktion erfassen. Messwerte werden mit Referenzen dokumentiert. Gezielte Kontrollöffnungen beantworten konkrete Fragen. Danach wird entschieden, ob Trocknung, lokaler Ausbau oder eine Erweiterung erforderlich ist.

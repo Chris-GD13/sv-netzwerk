@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.1.6 – 2026-07-14
+
+- „Wissen in 180 Sekunden“ bis zur Verfügbarkeit echter Avatar-Videos aus Navigation, Footer, Fachwissen, Suche und Sitemap ausgeblendet
+- bisherige Kurzskript-Adressen auf das Fachwissen weitergeleitet
+- Expertenfoto von Christian Wächter durch die neue Schwarz-Weiß-Aufnahme ersetzt
+- orangefarbenes, kantiges S-Signet aus der Markenvorlage in Header, Mobilmenü und Footer umgesetzt
+
 ## 5.1.5 – 2026-07-14
 
 - generische Übersichtslinks aus allen mobilen Untermenüs entfernt

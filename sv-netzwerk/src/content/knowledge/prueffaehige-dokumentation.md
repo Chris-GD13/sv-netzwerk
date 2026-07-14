@@ -80,7 +80,3 @@ Prüffähigkeit entsteht durch eindeutige Zuordnung, nicht durch Dokumentenmenge
 ### LinkedIn-Kurzfassung
 
 Eine vollständige Akte ist noch keine prüffähige Akte. Entscheidend ist die Verbindung von Auftrag, Feststellung, Bewertung, Maßnahme, Kosten und Entscheidung.
-
-### Video-Skript „Wissen in 180 Sekunden“
-
-Starten Sie mit Auftrag und Unterlagenstand. Trennen Sie Beobachtung von Bewertung. Ordnen Sie jede Maßnahme einer Feststellung und jede Kostenposition einem Schadenbereich zu. Führen Sie offene Punkte sichtbar und aktualisieren Sie Entscheidungen mit Datum und Grundlage.

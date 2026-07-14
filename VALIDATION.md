@@ -1,4 +1,4 @@
-# Validierung – SV-Netzwerk v5.1.5
+# Validierung – SV-Netzwerk v5.1.6
 
 Stand: 14.07.2026
 
@@ -29,11 +29,11 @@ Stand: 14.07.2026
 - `/svos/` mit Modulen, Prozessmodell und Roadmap
 - `/schaden-melden/` mit achtstufiger lokaler Erfassung
 - `/schadenarten/` mit elf datengetriebenen Schadenarten und Detailseiten
-- `/wissen-in-180-sekunden/` mit drei Beiträgen und Detailseiten
+- „Wissen in 180 Sekunden“ bis zur Bereitstellung echter Avatar-Videos nicht öffentlich verlinkt und nicht in der Sitemap
 - `/fachwissen/` mit dynamischen Detailseiten für den täglichen Pflichtlauf
 - `/praxisfaelle/` mit Schadenart-, Objekt-, Bereichs-, Regions- und Schadenhöhenfilter
 - `/downloads/` mit Kategorie- und Formatfilter
-- `/suche/` und `/search-index.json` mit Artikeln, Downloads, Videos, Seiten, Schadenarten, Fällen und Experten
+- `/suche/` und `/search-index.json` mit Artikeln, Downloads, Seiten, Schadenarten, Fällen und Experten
 
 ## Deployment-Prüfung
 

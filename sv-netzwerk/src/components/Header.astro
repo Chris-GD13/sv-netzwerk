@@ -3,6 +3,7 @@ import Navigation from './Navigation.astro';
 import MobileMenu from './MobileMenu.astro';
 import HamburgerButton from './HamburgerButton.astro';
 import SearchButton from './SearchButton.astro';
+import LogoMark from './LogoMark.astro';
 import { navigation } from '../data/navigation';
 
 const currentPath = Astro.url.pathname;
@@ -11,7 +12,7 @@ const currentPath = Astro.url.pathname;
 <header class="site-header" data-site-header>
   <div class="sv-container site-header__bar">
     <a class="site-brand" href="/" aria-label="SV-Netzwerk – Startseite">
-      <span class="site-brand__symbol" aria-hidden="true">SV</span>
+      <span class="site-brand__symbol" aria-hidden="true"><LogoMark /></span>
       <span class="site-brand__copy">
         <strong>SV-Netzwerk</strong>
         <small>Bau · Schaden · Regulierung</small>

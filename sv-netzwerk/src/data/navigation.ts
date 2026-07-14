@@ -49,7 +49,6 @@ export const navigation: NavItem[] = [
       { label: 'Normen und Rechtsprechung', href: '/fachwissen/#normen-rechtsprechung', description: 'Regelwerke und Entscheidungen praxisnah eingeordnet.' },
       { label: 'Praxisfälle', href: '/praxisfaelle/', description: 'Anonymisierte Fälle mit Feststellung und Bewertung.' },
       { label: 'Downloads', href: '/downloads/', description: 'Prüfschemata, Checklisten und Arbeitshilfen.' },
-      { label: 'Wissen in 180 Sekunden', href: '/wissen-in-180-sekunden/', description: 'Kernfragen kompakt und fachlich präzise erklärt.' },
     ],
   },
   { label: 'Experten', href: '/experten/' },

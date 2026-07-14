@@ -98,6 +98,8 @@ Die Verantwortung bleibt sichtbar. Ein Laborergebnis beschreibt eine untersuchte
 
 Schadenabgrenzung wird belastbarer, wenn wiederkehrende Prüfpunkte aus Fachwissen, Praxisfällen und Arbeitshilfen erreichbar sind. Der Bereich [Schadenarten](/schadenarten/) führt typische Schadenbilder und Prüfgegenstände. Das [Downloadcenter](/downloads/) stellt versionierte Prüfschemata bereit. Diese Inhalte ersetzen keine Einzelfallprüfung, schaffen aber eine gemeinsame Sprache und reduzieren vermeidbare Lücken.
 
+Vor einer Übergabe werden Verweise auf den konkreten Bearbeitungsstand geprüft. So bleibt erkennbar, welche Fassung einer Arbeitshilfe angewendet wurde und welche Feststellungen aus dem Einzelfall stammen.
+
 ## Fortschreibung während der Bearbeitung
 
 Schadenabgrenzung ist bei laufenden Maßnahmen kein einmaliger Vermerk. Neue Öffnungen, Messungen, Angebote oder Rückmeldungen können den Sachstand verändern. Jede Fortschreibung benennt die neue Information und zeigt, welche frühere Annahme bestätigt, angepasst oder verworfen wird. Der Bericht bleibt dadurch verständlich, ohne frühere Bearbeitungsstände zu löschen.
@@ -121,7 +123,3 @@ Eine gute Abgrenzung kann den Umfang bestätigen, erweitern oder begrenzen. Ihr 
 ### LinkedIn-Kurzfassung
 
 Technische Schadenabgrenzung beginnt bei Ursache, Einwirkungsweg und Bauteilzustand. Erst danach folgen Maßnahmen, Mengen und Kosten. Entscheidend ist die nachvollziehbare Kette von Feststellung, Bewertung und Empfehlung.
-
-### Video-Skript „Wissen in 180 Sekunden“
-
-Schritt eins: Ereignis und Prüfauftrag klären. Schritt zwei: betroffene Bauteile, Referenzbereiche und Einwirkungswege dokumentieren. Schritt drei: Vorschäden, Instandhaltung und offene Fragen getrennt führen. Schritt vier: Maßnahmen aus Feststellungen ableiten. Schritt fünf: Mengen und Kosten dem Schadenbereich zuordnen. So wird aus einer Akte eine überprüfbare Entscheidung.

@@ -1,5 +1,6 @@
 ---
 import SearchButton from './SearchButton.astro';
+import LogoMark from './LogoMark.astro';
 import type { NavItem } from '../data/navigation';
 
 interface Props { items: NavItem[]; currentPath: string }
@@ -12,7 +13,7 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
 <aside class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true" aria-label="Mobile Navigation">
   <div class="mobile-menu__top">
     <a class="site-brand site-brand--mobile" href="/" aria-label="SV-Netzwerk – Startseite">
-      <span class="site-brand__symbol" aria-hidden="true">SV</span>
+      <span class="site-brand__symbol" aria-hidden="true"><LogoMark /></span>
       <span class="site-brand__copy"><strong>SV-Netzwerk</strong><small>Navigation</small></span>
     </a>
     <button class="mobile-menu__close" type="button" data-menu-close aria-label="Menü schließen">
