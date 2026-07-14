@@ -78,6 +78,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes lftp
 
+      - name: Document Root vor dem Upload prüfen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          listing="$(lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" \
+            -e "set sftp:auto-confirm yes; cls -1F $SFTP_REMOTE_DIR; bye")"
+          printf '%s\n' "$listing"
+
+          if printf '%s\n' "$listing" | grep -Eq '(^|/)dist/$'; then
+            echo "::error::$SFTP_REMOTE_DIR/dist/ existiert bereits. Upload wird abgebrochen."
+            exit 1
+          fi
+
       - name: Inhalt von dist nach IONOS übertragen
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
@@ -102,6 +118,11 @@ jobs:
           printf '%s\n' "$listing" | grep -Eq '(^|/)index\.html$'
           printf '%s\n' "$listing" | grep -Eq '(^|/)assets/$'
           printf '%s\n' "$listing" | grep -Eq '(^|/)deploy-version\.txt$'
+
+          if printf '%s\n' "$listing" | grep -Eq '(^|/)dist/$'; then
+            echo "::error::$SFTP_REMOTE_DIR/dist/ wurde unerwartet angelegt."
+            exit 1
+          fi
 
       - name: Deployment online verifizieren
         env:
