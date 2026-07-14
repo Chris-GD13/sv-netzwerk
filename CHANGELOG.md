@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.1.5 – 2026-07-14
+
+- generische Übersichtslinks aus allen mobilen Untermenüs entfernt
+- redundante „Bereich entdecken“-Verweise aus den Desktop-Mega-Menüs entfernt
+- Netzwerkseite als eindeutigen Inhaltspunkt „Netzwerk & Organisation“ eingeordnet
+
 ## 5.1.4 – 2026-07-14
 
 - redundanten Übersichtslink im Schadenarten-Untermenü entfernt

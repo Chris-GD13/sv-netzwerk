@@ -8,7 +8,6 @@ export type NavItem = {
   label: string;
   href: string;
   description?: string;
-  showOverview?: boolean;
   children?: NavChild[];
 };
 
@@ -29,7 +28,6 @@ export const navigation: NavItem[] = [
   {
     label: 'Schadenarten',
     href: '/schadenarten/',
-    showOverview: false,
     description: 'Technische Einordnung nach Schadenbild, Ursache und Bauteil.',
     children: [
       { label: 'Brand', href: '/schadenarten/#brand', description: 'Brandursache, Beaufschlagung und Sanierungsumfang.' },
@@ -60,6 +58,7 @@ export const navigation: NavItem[] = [
     href: '/netzwerk/',
     description: 'Menschen, Organisation und digitale Zusammenarbeit im SV-Netzwerk.',
     children: [
+      { label: 'Netzwerk & Organisation', href: '/netzwerk/', description: 'Aufbau, Zusammenarbeit und fachliche Zuständigkeiten im Netzwerk.' },
       { label: 'Über uns', href: '/ueber-uns/', description: 'Arbeitsweise, Qualitätsverständnis und Verantwortung.' },
       { label: 'Fachpartner', href: '/partner/', description: 'Spezialisierte Partner und ergänzende Fachkompetenz.' },
       { label: 'SVOS Core Platform', href: '/svos/', description: 'Die gemeinsame Daten-, Wissens- und Prozessstruktur.' },
