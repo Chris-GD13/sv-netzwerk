@@ -1,0 +1,4 @@
+name: Link Checker
+on:
+  schedule:
+    - cron: '0 3 * * 1'
