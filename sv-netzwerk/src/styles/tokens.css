@@ -52,3 +52,11 @@
   --sv-transition-fast: 120ms ease;
   --sv-transition-slow: 320ms ease;
 }
+
+/* v1.5.4 Performance & Accessibility */
+:root {
+  --sv-tap-target: 2.75rem;
+  --sv-reading-width: 72ch;
+  --sv-outline-width: 3px;
+  --sv-content-visibility-space: 50rem;
+}

@@ -1,21 +1,16 @@
-# Release Notes – SV-Netzwerk v1.5.3 Komponentenbibliothek
+# Release Notes – SV-Netzwerk v1.5.4
 
-## Zweck
-Vereinheitlichung der wiederverwendbaren Astro-Komponenten für Website, Fachwissensbibliothek und SVOS.
+## Schwerpunkt
+Performance, Barrierefreiheit und technische Robustheit.
 
-## Neu und überarbeitet
-- FeatureCard
-- ServiceCard
-- TeamCard mit optionalem Bild
-- StatCard
-- InfoGrid
-- SectionHeader
-- Timeline
-- FAQAccordion
-- IconList
-- gemeinsame TypeScript-Props in `src/types/components.ts`
-- Design-Token-Erweiterungen
-- Referenzseite unter `/komponenten/`
-
-## Hinweis
-Das Paket wurde auf Basis von v1.5.2 erstellt. Ein vollständiger Produktionsbuild wurde auf ausdrücklichen Wunsch nicht vorausgesetzt.
+## Änderungen
+- scrolloptimierter Sticky Header mit `requestAnimationFrame`
+- Escape- und Fokusverhalten für das mobile Menü
+- ARIA-Livestatus für Menüaktionen
+- zentrale Performance-Hinweise und optionale Bildvorladung
+- `content-visibility` für umfangreiche Start- und Bibliotheksseiten
+- verbesserte Fokus-, Kontrast-, Druck- und Reduced-Motion-Regeln
+- Mindestgrößen für interaktive Bedienelemente
+- neue Informationsseite `/barrierefreiheit/`
+- Design-Tokens und globale Styles erweitert
+- Versions- und Projektdokumentation auf 1.5.4 aktualisiert

@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import IconList from '../../components/IconList.astro';
+const measures = [
+  'Semantische HTML-Struktur und nachvollziehbare Überschriftenhierarchie',
+  'Tastaturbedienbare Navigation, Suchfunktion und interaktive Komponenten',
+  'Sichtbare Fokuszustände und Sprunglink zum Hauptinhalt',
+  'Berücksichtigung reduzierter Bewegung und erhöhter Kontraste',
+  'Responsive Darstellung mit ausreichend großen Bedienflächen'
+];
+---
+<BaseLayout title="Barrierefreiheit" description="Informationen zur barrierearmen Nutzung der Website SV-Netzwerk.">
+  <Hero eyebrow="Qualitätsstandard" title="Barrierefreiheit" text="SV-Netzwerk entwickelt die Website schrittweise nach anerkannten Anforderungen an Wahrnehmbarkeit, Bedienbarkeit, Verständlichkeit und Robustheit weiter." compact />
+  <section class="sv-section">
+    <div class="sv-container sv-prose">
+      <SectionHeader eyebrow="Umgesetzte Maßnahmen" title="Technische und redaktionelle Grundlagen" />
+      <IconList items={measures} />
+      <h2>Rückmeldung</h2>
+      <p>Hinweise zu Barrieren oder nicht zugänglichen Inhalten können per E-Mail an <a href="mailto:info@sv-netzwerk.eu">info@sv-netzwerk.eu</a> übermittelt werden.</p>
+      <h2>Stand</h2>
+      <p>Diese Information wurde mit Version 1.5.4 am 14. Juli 2026 aktualisiert.</p>
+    </div>
+  </section>
+</BaseLayout>

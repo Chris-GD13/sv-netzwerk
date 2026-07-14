@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.4 – 2026-07-14
+- Performance- und Accessibility-Grundlagen erweitert
+- Sticky Header für Scroll-Ereignisse optimiert
+- mobile Navigation um Escape-, Fokus- und Statusverhalten ergänzt
+- optionale Bildvorladung und zentrale Performance-Hinweise eingeführt
+- Kontrast-, Druck-, Reduced-Motion- und Mindestbedienflächen-Regeln ergänzt
+- neue Seite „Barrierefreiheit“ hinzugefügt
+- Dokumentation und Versionierung aktualisiert
+
+
 ## 1.5.3 – 2026-07-14
 - Komponentenbibliothek vereinheitlicht und erweitert
 - gemeinsame TypeScript-Props eingeführt

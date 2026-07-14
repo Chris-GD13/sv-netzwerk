@@ -1,21 +1,19 @@
-# Manifest – SV-Netzwerk v1.5.3
+# Manifest – SV-Netzwerk v1.5.4
 
 ## Neue Dateien
-- `sv-netzwerk/src/types/components.ts`
-- `sv-netzwerk/src/pages/komponenten/index.astro`
+- `sv-netzwerk/src/components/PerformanceHints.astro`
+- `sv-netzwerk/src/components/AccessibilityStatus.astro`
+- `sv-netzwerk/src/pages/barrierefreiheit/index.astro`
 
-## Überarbeitete Komponenten
-- `FeatureCard.astro`
-- `ServiceCard.astro`
-- `TeamCard.astro`
-- `StatCard.astro`
-- `InfoGrid.astro`
-- `SectionHeader.astro`
-- `Timeline.astro`
-- `FAQAccordion.astro`
-- `IconList.astro`
-
-## Weitere Änderungen
-- Design Tokens erweitert
-- Versionen in `package.json` und `package-lock.json` auf 1.5.3 gesetzt
-- Release-Dokumentation aktualisiert
+## Geänderte Kerndateien
+- `sv-netzwerk/src/layouts/BaseLayout.astro`
+- `sv-netzwerk/src/components/Header.astro`
+- `sv-netzwerk/src/components/Footer.astro`
+- `sv-netzwerk/src/styles/tokens.css`
+- `sv-netzwerk/src/styles/global.css`
+- `sv-netzwerk/package.json`
+- `sv-netzwerk/package-lock.json`
+- `CHANGELOG.md`
+- `RELEASE_NOTES.md`
+- `VALIDATION.md`
+- `VERSION`

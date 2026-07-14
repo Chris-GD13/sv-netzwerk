@@ -1,0 +1,10 @@
+---
+interface Props {
+  preloadImage?: string;
+  preloadType?: string;
+}
+const { preloadImage, preloadType = 'image/webp' } = Astro.props;
+---
+<link rel="dns-prefetch" href="//www.sv-netzwerk.eu" />
+{preloadImage && <link rel="preload" as="image" href={preloadImage} type={preloadType} fetchpriority="high" />}
+<meta name="format-detection" content="telephone=no" />
