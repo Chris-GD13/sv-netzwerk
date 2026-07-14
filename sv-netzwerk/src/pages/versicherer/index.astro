@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import FeatureCard from '../../components/FeatureCard.astro';
+import CallToAction from '../../components/CallToAction.astro';
+const services=[
+  {title:'Technische Erstbewertung',text:'Schadenbild, Dringlichkeit, Prüfziel und erforderliche Fachdisziplin werden zu Beginn eindeutig eingeordnet.'},
+  {title:'Prüffähige Berichte',text:'Feststellungen, Kausalität, Kosten und offene Punkte werden nachvollziehbar dokumentiert.'},
+  {title:'Regulierungsbegleitung',text:'Abstimmungen, Reserven, Maßnahmen und Bearbeitungsstände bleiben über den gesamten Vorgang transparent.'},
+];
+---
+<BaseLayout title="Leistungen für Versicherer" description="Sachverständigenleistungen und Schadenregulierung für Versicherer mit klaren Zuständigkeiten und prüffähiger Dokumentation." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Versicherer'}]}>
+  <Hero compact eyebrow="Für Versicherer" title="Belastbare Grundlagen für Schadenentscheidungen." text="Das SV-Netzwerk verbindet technische Fachkompetenz, regulierungsnahe Kommunikation und eine nachvollziehbare Dokumentation für Sach-, Haftpflicht- und Großschäden." primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Experten ansehen" secondaryHref="/experten/" />
+  <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Zusammenarbeit" title="Vom Prüfauftrag bis zum Abschluss"/><div class="sv-grid sv-grid-3">{services.map((item,index)=><FeatureCard index={`0${index+1}`} title={item.title} text={item.text}/>)}</div></div></section>
+  <CallToAction title="Schadenfall direkt einordnen" text="Senden Sie Schadennummer, Objekt, Schadenart und vorhandene Unterlagen. Das Backoffice koordiniert die fachlich passende Zuständigkeit." href="/kontakt/" label="Kontakt aufnehmen" />
+</BaseLayout>

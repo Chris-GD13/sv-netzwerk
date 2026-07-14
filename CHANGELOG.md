@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.1.2 – 2026-07-14
+
+- zentrales Astro-Layout auf den weiterhin verlinkten Altseiten eingeführt
+- Datenschutz, Impressum, Versicherer, Gutachter-Plattform, Komplexschäden und Großschadenregulierung in die aktuelle Renderkette übernommen
+- blaues Header-Symbol durch ein klares oranges SV-Logo ersetzt
+- Logo-Darstellung in Desktop-Navigation, Mobile-Menü und Footer vereinheitlicht
+
 ## 5.1.1 – 2026-07-14
 
 - Vollständigen historischen Expertenbestand mit sechs Fachprofilen wiederhergestellt.

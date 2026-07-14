@@ -1,4 +1,4 @@
-# Validierung – SV-Netzwerk v5.1.1
+# Validierung – SV-Netzwerk v5.1.2
 
 Stand: 14.07.2026
 
@@ -8,8 +8,8 @@ Stand: 14.07.2026
 - installierte Pakete: 279
 - gemeldete Schwachstellen: 0
 - `npm run build`: erfolgreich
-- Astro-/TypeScript-Prüfung: 114 Dateien, 0 Fehler, 0 Warnungen, 0 Hinweise
-- statischer Build: 125 Seiten
+- Astro-/TypeScript-Prüfung: 120 Dateien, 0 Fehler, 0 Warnungen, 0 Hinweise
+- statischer Build: 131 Seiten
 - `dist/deploy-version.txt`: vorhanden
 - kein Unterordner `dist/dist/`
 
@@ -25,6 +25,7 @@ Stand: 14.07.2026
 ## Erzeugte Kernbereiche
 
 - `/experten/` mit sechs fachlichen Experten, zwei Backoffice-Profilen und acht dynamischen Detailseiten
+- `/datenschutzerklaerung/`, `/impressum/`, `/versicherer/`, `/gutachter-plattform/`, `/komplexschaeden/` und `/grossschadenregulierung/` im zentralen Astro-Layout
 - `/svos/` mit Modulen, Prozessmodell und Roadmap
 - `/schaden-melden/` mit achtstufiger lokaler Erfassung
 - `/schadenarten/` mit zwölf datengetriebenen Schadenarten und Detailseiten

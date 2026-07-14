@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import FeatureCard from '../../components/FeatureCard.astro';
+import CallToAction from '../../components/CallToAction.astro';
+const modules=[
+  {title:'Klare Auftragsdaten',text:'Fragestellung, Beteiligte, Objekt und Unterlagen werden vor der fachlichen Bearbeitung strukturiert erfasst.'},
+  {title:'Passende Fachkompetenz',text:'Fachgebiet, Region, Qualifikation und Verfügbarkeit bilden die Grundlage der Expertenzuordnung.'},
+  {title:'Nachvollziehbare Zusammenarbeit',text:'Bearbeitungsstände, Rückfragen und Ergebnisse werden entlang eines gemeinsamen Vorgangsmodells geführt.'},
+];
+---
+<BaseLayout title="Gutachter-Plattform" description="Die Gutachter-Plattform verbindet strukturierte Aufträge, passende Experten und nachvollziehbare Schadenbearbeitung." breadcrumbs={[{label:'Start',href:'/'},{label:'SVOS',href:'/svos/'},{label:'Gutachter-Plattform'}]}>
+  <Hero compact eyebrow="SVOS · Gutachter-Plattform" title="Menschen, Aufträge und Fachwissen sinnvoll verbinden." text="Die Gutachter-Plattform ist der künftige Arbeitsbereich für strukturierte Sachverständigen- und Schadenprozesse. Fachliche Verantwortung bleibt dabei immer einer konkret benannten Person zugeordnet." primaryLabel="SVOS ansehen" primaryHref="/svos/" secondaryLabel="Experten entdecken" secondaryHref="/experten/" />
+  <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Plattformprinzip" title="Technik unterstützt fachliche Verantwortung"/><div class="sv-grid sv-grid-3">{modules.map((item,index)=><FeatureCard index={`0${index+1}`} title={item.title} text={item.text}/>)}</div></div></section>
+  <CallToAction title="Anwendungsfall besprechen" text="Die Weiterentwicklung orientiert sich an realen Anforderungen von Versicherern, Regulierern, Sachverständigen und Dienstleistern." href="/kontakt/" label="Kontakt aufnehmen" />
+</BaseLayout>

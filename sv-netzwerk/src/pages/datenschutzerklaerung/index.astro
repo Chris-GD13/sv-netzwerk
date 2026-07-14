@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+---
+
+<BaseLayout title="Datenschutzerklärung" description="Datenschutzerklärung für die Website des SV-Netzwerks." breadcrumbs={[{label:'Start',href:'/'},{label:'Datenschutz'}]}>
+  <Hero compact eyebrow="Datenschutz" title="Datenschutzerklärung" text="Informationen zur Verarbeitung personenbezogener Daten auf sv-netzwerk.eu. Stand: 14.07.2026." />
+  <section class="sv-section">
+    <div class="sv-container legal-copy sv-prose">
+      <aside><strong>Kurzfassung</strong><p>Personenbezogene Daten werden nur verarbeitet, soweit dies für Betrieb, Sicherheit, Kontaktaufnahme oder die Bearbeitung einer Anfrage erforderlich ist.</p></aside>
+      <h2>1. Verantwortliche Stelle</h2>
+      <p>Verantwortlich für die Verarbeitung personenbezogener Daten im Rahmen dieser Website ist die Sachverständigengemeinschaft SV-Netzwerk Bau &amp; Schaden, erreichbar per E-Mail unter <a href="mailto:info@sv-netzwerk.eu">info@sv-netzwerk.eu</a>.</p>
+      <h2>2. Hosting und Server-Logfiles</h2>
+      <p>Beim Aufruf dieser Website werden technisch erforderliche Zugriffsdaten verarbeitet. Dazu können insbesondere IP-Adresse, Datum und Uhrzeit des Zugriffs, abgerufene Datei, übertragene Datenmenge, Browsertyp, Betriebssystem und Referrer-URL gehören. Die Verarbeitung erfolgt zur technischen Bereitstellung, Stabilität und Sicherheit der Website.</p>
+      <h2>3. Kontaktaufnahme und Anfragen</h2>
+      <p>Bei Kontaktaufnahme per E-Mail oder Formular werden die übermittelten Angaben zur Bearbeitung der Anfrage, zur fachlichen Einordnung und zur weiteren Kommunikation verarbeitet. Die Verarbeitung erfolgt auf Grundlage der Anfrage und, soweit einschlägig, zur Durchführung vorvertraglicher oder vertraglicher Maßnahmen.</p>
+      <h2>4. Gutachter-Plattform und SVOS</h2>
+      <p>Die Plattformbereiche sind auf strukturierte, nachvollziehbare und datenschutzbewusste Schaden- und Gutachtenprozesse ausgerichtet. Technische und datenschutzrechtliche Einzelheiten werden vor der Verarbeitung auftragsbezogener Daten gesondert bereitgestellt.</p>
+      <h2>5. Cookies, Tracking und externe Dienste</h2>
+      <p>Diese Website ist darauf ausgerichtet, ohne unnötige Tracking- oder Analysemechanismen betrieben zu werden. Soweit externe Dienste, Analysewerkzeuge, Karten, Videos oder vergleichbare Einbindungen eingesetzt werden, wird diese Datenschutzerklärung entsprechend ergänzt.</p>
+      <h2>6. Rechtsgrundlagen</h2>
+      <p>Die Verarbeitung erfolgt insbesondere auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO, soweit sie zur Bearbeitung von Anfragen oder zur Durchführung vorvertraglicher Maßnahmen erforderlich ist, sowie auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO für den sicheren und stabilen Betrieb der Website.</p>
+      <h2>7. Speicherdauer</h2>
+      <p>Personenbezogene Daten werden nur so lange gespeichert, wie dies für den jeweiligen Zweck erforderlich ist oder gesetzliche Aufbewahrungspflichten bestehen.</p>
+      <h2>8. Rechte betroffener Personen</h2>
+      <p>Betroffene Personen haben nach Maßgabe der gesetzlichen Vorschriften Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit sowie Widerspruch. Zudem besteht ein Beschwerderecht bei einer zuständigen Datenschutzaufsichtsbehörde.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>.legal-copy{max-width:58rem}.legal-copy aside{margin-bottom:3rem;padding:1.4rem 1.6rem;border:1px solid #b9dec9;border-radius:1rem;background:#edf8f1}.legal-copy aside p{margin:.35rem 0 0}.legal-copy h2{margin-top:2.4rem;font-size:clamp(1.2rem,2vw,1.55rem)}</style>

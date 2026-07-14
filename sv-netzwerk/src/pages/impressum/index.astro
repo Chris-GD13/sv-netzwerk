@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+---
+
+<BaseLayout title="Impressum" description="Impressum und Anbieterkennzeichnung des SV-Netzwerks Bau & Schaden." breadcrumbs={[{label:'Start',href:'/'},{label:'Impressum'}]}>
+  <Hero compact eyebrow="Rechtliches" title="Impressum" text="Anbieterkennzeichnung des SV-Netzwerks Bau & Schaden. Stand: 14.07.2026." />
+  <section class="sv-section">
+    <div class="sv-container legal-copy sv-prose">
+      <h2>Angaben gemäß § 5 DDG</h2>
+      <h3>Sachverständigengemeinschaft – SV-Netzwerk Bau &amp; Schaden</h3>
+      <p><strong>Vertreten durch:</strong><br />Marc Schütt, Christian Wächter, Carmen Gohl sowie weitere eigenständig tätige Netzwerkpartner, soweit diese auf den Expertenseiten namentlich genannt werden.</p>
+      <h2>Rechtsform und Netzwerkstruktur</h2>
+      <p>Das SV-Netzwerk Bau &amp; Schaden ist eine partnerschaftlich organisierte Arbeitsgemeinschaft rechtlich selbstständig tätiger Sachverständiger, Regulierer und Dienstleister. Die jeweils beauftragten Leistungen werden durch den konkret benannten Auftragnehmer oder Netzwerkpartner erbracht.</p>
+      <h2>Kontakt</h2>
+      <p>E-Mail: <a href="mailto:info@sv-netzwerk.eu">info@sv-netzwerk.eu</a><br />Internet: <a href="https://www.sv-netzwerk.eu/">www.sv-netzwerk.eu</a></p>
+      <h2>Gutachter-Plattform</h2>
+      <p>Die Gutachter-Plattform wird unter Projektleitung von Goran Krstic, Geschäftsführer der GASD GmbH, weiterentwickelt und organisatorisch betreut. Das SV-Netzwerk ordnet die Plattform fachlich in digitale Schadenbearbeitung, prüffähige Unterlagen und strukturierte Gutachtenprozesse ein.</p>
+      <h2>Haftung für Inhalte und Links</h2>
+      <p>Die Inhalte dieser Website wurden mit Sorgfalt erstellt. Für Richtigkeit, Vollständigkeit und Aktualität wird keine Gewähr übernommen. Für Inhalte verlinkter externer Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich.</p>
+      <h2>Urheberrecht</h2>
+      <p>Die auf dieser Website erstellten Inhalte, Texte, Strukturen und Darstellungen unterliegen dem deutschen Urheberrecht. Eine Verwertung außerhalb der gesetzlichen Grenzen bedarf der vorherigen Zustimmung des jeweiligen Rechteinhabers.</p>
+      <h2>Verbraucherstreitbeilegung</h2>
+      <p>Eine Teilnahme an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle ist nicht vorgesehen, soweit keine gesetzliche Verpflichtung besteht.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>.legal-copy{max-width:58rem}.legal-copy h2{margin-top:2.5rem;font-size:clamp(1.25rem,2vw,1.65rem)}.legal-copy h2:first-child{margin-top:0}</style>

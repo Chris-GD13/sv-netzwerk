@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import FeatureCard from '../../components/FeatureCard.astro';
+import CallToAction from '../../components/CallToAction.astro';
+const steps=[
+  {title:'Schadenbild abgrenzen',text:'Ursachen, Bauteile, Nutzungen und mögliche Vorschäden werden getrennt betrachtet.'},
+  {title:'Disziplinen koordinieren',text:'Die erforderlichen Experten werden nach Prüfziel und fachlicher Zuständigkeit zusammengeführt.'},
+  {title:'Entscheidungen dokumentieren',text:'Feststellungen, Maßnahmen, Kosten und offene Punkte bleiben für alle Beteiligten nachvollziehbar.'},
+];
+---
+<BaseLayout title="Komplexschäden" description="Interdisziplinäre Untersuchung und strukturierte Bearbeitung komplexer Bau- und Versicherungsschäden." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Komplexschäden'}]}>
+  <Hero compact eyebrow="Komplexschäden" title="Mehrere Ursachen. Klare fachliche Führung." text="Bei umfangreichen Schadenbildern verbindet das SV-Netzwerk die benötigten Fachrichtungen, trennt gesicherte Feststellungen von Annahmen und hält Entscheidungen prüffähig fest." primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Schadenarten" secondaryHref="/schadenarten/" />
+  <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Bearbeitungsprinzip" title="Komplexität strukturiert reduzieren"/><div class="sv-grid sv-grid-3">{steps.map((item,index)=><FeatureCard index={`0${index+1}`} title={item.title} text={item.text}/>)}</div></div></section>
+  <CallToAction title="Komplexschaden frühzeitig einordnen" text="Eine klare Erststruktur verhindert Doppelprüfungen, Informationsverluste und unklare Zuständigkeiten." href="/kontakt/" label="Fall abstimmen" />
+</BaseLayout>
