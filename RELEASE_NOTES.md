@@ -10,7 +10,7 @@ Experten sind wieder ein eigenständiger Hauptbereich. Das Netzwerk beschreibt O
 
 ## Datengetriebene Kompetenz
 
-Zwölf Schadenarten verwenden eine zentrale Datenquelle für Übersicht, Detailseiten, Suche und Querverweise. Wissen in 180 Sekunden besitzt eine eigene Collection mit Transkript und weiterführenden Inhalten.
+Elf angebotene Schadenarten verwenden eine zentrale Datenquelle für Übersicht, Detailseiten, Suche und Querverweise. Wissen in 180 Sekunden besitzt eine eigene Collection mit Transkript und weiterführenden Inhalten.
 
 ## Fachwissen-Pflichtlauf
 

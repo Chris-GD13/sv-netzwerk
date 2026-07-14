@@ -30,7 +30,7 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg>
           </summary>
           <div class="mobile-menu__subnav">
-            <a class:list={{ "is-active": currentPath === item.href }} href={item.href} aria-current={currentPath === item.href ? 'page' : undefined}>{item.label} – Übersicht</a>
+            {item.showOverview !== false && <a class:list={{ "is-active": currentPath === item.href }} href={item.href} aria-current={currentPath === item.href ? 'page' : undefined}>{item.label} – Übersicht</a>}
             {item.children.map((child) => (
               <a class:list={{ "is-active": isActive(child.href) }} href={child.href} aria-current={isActive(child.href) ? 'page' : undefined}>{child.label}</a>
             ))}

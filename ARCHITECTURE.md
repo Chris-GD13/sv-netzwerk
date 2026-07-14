@@ -7,7 +7,7 @@ Astro erzeugt statische Seiten. `BaseLayout.astro` beziehungsweise `HomeLayout.a
 ## Plattformdaten
 
 - `src/data/navigation.ts`: zentrale Hauptnavigation
-- `src/data/damage-types.ts`: zwölf Schadenarten mit Prüfpunkten und Querverweisen
+- `src/data/damage-types.ts`: elf Schadenarten mit Prüfpunkten und Querverweisen
 - `src/data/experts.ts`: Expertenprofile, Rollen, Regionen und fachliche Verknüpfungen
 - `src/content/knowledge/`: Fachbeiträge mit Tagesstandard
 - `src/content/practice-cases/`: anonymisierte Praxisfälle

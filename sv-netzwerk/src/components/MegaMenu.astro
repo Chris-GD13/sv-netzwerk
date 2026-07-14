@@ -13,7 +13,7 @@ const active = (href: string) => {
   <div class="mega-menu__overview">
     <span>{item.label}</span>
     <h2>{item.description}</h2>
-    <a href={item.href}>Bereich entdecken <b aria-hidden="true">→</b></a>
+    {item.showOverview !== false && <a href={item.href}>Bereich entdecken <b aria-hidden="true">→</b></a>}
   </div>
   <div class="mega-menu__links">
     {item.children?.map((child, index) => (

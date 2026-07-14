@@ -7,7 +7,7 @@ SVOS ist die zukünftige Daten-, Wissens- und Arbeitsplattform für nachvollzieh
 ## 5.1 Core Platform
 
 - öffentliche Modulübersicht und Prozessdarstellung
-- zwölf datengetriebene Schadenarten
+- elf datengetriebene Schadenarten
 - eigenständiger Expertenbereich
 - Fachwissen, Praxisfälle, Downloads und Kurzvideos
 - Suche 2.0

@@ -12,7 +12,7 @@
 ## 14.07.2026 – Version 5.1
 
 - Experten als eigenständigen Hauptbereich wiederhergestellt
-- Datenmodelle für Experten und zwölf Schadenarten eingeführt
+- Datenmodelle für Experten und elf angebotene Schadenarten eingeführt
 - Schadenarten-Übersicht und Detailseiten aus gemeinsamer Datenquelle aufgebaut
 - SVOS Core Platform mit Modulen, Prozess und Roadmap erweitert
 - Wissen in 180 Sekunden als echte Collection mit Übersicht und Detailseiten eingeführt

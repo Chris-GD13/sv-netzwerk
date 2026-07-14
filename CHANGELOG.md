@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.1.4 – 2026-07-14
+
+- redundanten Übersichtslink im Schadenarten-Untermenü entfernt
+- Photovoltaik aus Navigation, Kompetenzdaten, Suche und Schadenartenübersicht entfernt
+- bisherige Photovoltaik-Detailadresse dauerhaft auf die Schadenarten weitergeleitet
+- Schadenartenbestand und Projektdokumentation auf elf Kompetenzbereiche korrigiert
+
 ## 5.1.3 – 2026-07-14
 
 - Hauptnavigation von zehn auf sechs klare Einstiege reduziert

@@ -1,4 +1,4 @@
-# Validierung – SV-Netzwerk v5.1.3
+# Validierung – SV-Netzwerk v5.1.4
 
 Stand: 14.07.2026
 
@@ -28,7 +28,7 @@ Stand: 14.07.2026
 - `/datenschutzerklaerung/`, `/impressum/`, `/versicherer/`, `/gutachter-plattform/`, `/komplexschaeden/` und `/grossschadenregulierung/` im zentralen Astro-Layout
 - `/svos/` mit Modulen, Prozessmodell und Roadmap
 - `/schaden-melden/` mit achtstufiger lokaler Erfassung
-- `/schadenarten/` mit zwölf datengetriebenen Schadenarten und Detailseiten
+- `/schadenarten/` mit elf datengetriebenen Schadenarten und Detailseiten
 - `/wissen-in-180-sekunden/` mit drei Beiträgen und Detailseiten
 - `/fachwissen/` mit dynamischen Detailseiten für den täglichen Pflichtlauf
 - `/praxisfaelle/` mit Schadenart-, Objekt-, Bereichs-, Regions- und Schadenhöhenfilter

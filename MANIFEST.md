@@ -3,7 +3,7 @@
 ## Plattformkern
 
 - zentrale Typen für Schadenarten, Experten und Module
-- Datenquellen für zwölf Schadenarten und bestätigte Experten
+- Datenquellen für elf Schadenarten und bestätigte Experten
 - wiederverwendbare DamageCard, ExpertCard, ModuleCard und ProcessFlow
 - SVOS-Dashboard mit Modulen, Rollen, Prozess und Roadmap
 

@@ -8,6 +8,7 @@ export type NavItem = {
   label: string;
   href: string;
   description?: string;
+  showOverview?: boolean;
   children?: NavChild[];
 };
 
@@ -28,6 +29,7 @@ export const navigation: NavItem[] = [
   {
     label: 'Schadenarten',
     href: '/schadenarten/',
+    showOverview: false,
     description: 'Technische Einordnung nach Schadenbild, Ursache und Bauteil.',
     children: [
       { label: 'Brand', href: '/schadenarten/#brand', description: 'Brandursache, Beaufschlagung und Sanierungsumfang.' },
@@ -36,7 +38,6 @@ export const navigation: NavItem[] = [
       { label: 'Elementar', href: '/schadenarten/#elementar', description: 'Überflutung, Rückstau und Naturgefahren.' },
       { label: 'Schimmel', href: '/schadenarten/#schimmel', description: 'Feuchtequelle, mikrobieller Befall und Sanierung.' },
       { label: 'Haftpflicht', href: '/schadenarten/#haftpflicht', description: 'Verursachungsbeitrag und schadenbedingter Umfang.' },
-      { label: 'Photovoltaik', href: '/schadenarten/#photovoltaik', description: 'Module, Unterkonstruktion und elektrische Komponenten.' },
       { label: 'Fenster und Fassade', href: '/schadenarten/#fenster-fassade', description: 'Anschlüsse, Dichtheit und Oberflächenschäden.' },
       { label: 'Technische Gebäudeausrüstung', href: '/schadenarten/#tga', description: 'Anlagen, Leitungen und technische Schnittstellen.' },
     ],
