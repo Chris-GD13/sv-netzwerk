@@ -1,13 +1,20 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Hero from '../../components/Hero.astro';
-import { categories, tags } from '../../data/library';
-import { searchIndex as searchDocuments } from '../../lib/search';
+import { buildSearchIndex } from '../../lib/search/build';
+
+const searchDocuments = await buildSearchIndex();
+const categories = [...new Set(searchDocuments.map((item)=>item.category))].sort((a,b)=>a.localeCompare(b,'de'));
+const tags = [...new Set(searchDocuments.flatMap((item)=>item.tags))].sort((a,b)=>a.localeCompare(b,'de'));
 
 const typeLabels = {
   article: 'Fachbeitrag',
   download: 'Download',
   video: 'Video',
+  page: 'Seite',
+  damage: 'Schadenart',
+  case: 'Praxisfall',
+  expert: 'Experte',
 };
 ---
 <BaseLayout title="Suche" description="Fachwissen, Downloads und Videos des SV-Netzwerks durchsuchen." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Suche' }]}>
@@ -38,6 +45,10 @@ const typeLabels = {
             <option value="article">Fachbeiträge</option>
             <option value="download">Downloads</option>
             <option value="video">Videos</option>
+            <option value="damage">Schadenarten</option>
+            <option value="case">Praxisfälle</option>
+            <option value="expert">Experten</option>
+            <option value="page">Seiten</option>
           </select>
         </label>
         <fieldset>

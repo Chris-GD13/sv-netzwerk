@@ -13,6 +13,25 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Technische Schadenabgrenzung als Grundlage der Regulierung',
+    description: 'Wie Ursache, Vorschaden, Folgeschaden, erforderliche Wiederherstellung und Kosten methodisch getrennt werden.',
+    href: '/fachwissen/schadenabgrenzung/',
+    category: 'Schadenregulierung',
+    tags: ['Schadenabgrenzung', 'Kausalität', 'Vorschaden'],
+    date: '2026-07-14',
+    type: 'article',
+    featured: true,
+  },
+  {
+    title: 'Technische Dokumentation bei komplexen Gebäudeschäden',
+    description: 'Wie Feststellungen, Bewertungen, Maßnahmen und Kosten bei mehrgewerklichen Schäden prüffähig zusammengeführt werden.',
+    href: '/fachwissen/prueffaehige-dokumentation/',
+    category: 'Prozessqualität',
+    tags: ['Dokumentation', 'Prüffähigkeit', 'Gebäudeschaden'],
+    date: '2026-07-13',
+    type: 'article',
+  },
+  {
     title: 'Wasserschaden: Rückbau technisch abgrenzen',
     description: 'Warum ein vollständiger Rückbau nicht automatisch erforderlich ist und welche Feststellungen für eine belastbare Abgrenzung entscheidend sind.',
     href: '/fachwissen/wasserschaden-rueckbau-technische-abgrenzung/',
@@ -23,11 +42,11 @@ export const library: LibraryItem[] = [
     featured: true,
   },
   {
-    title: 'Bestimmungswidriger Austritt von Leitungswasser',
-    description: 'Technische und versicherungsrechtliche Einordnung von Ursache, Austrittsstelle, Folgeschaden und Deckungsrelevanz.',
-    href: '/fachwissen/bestimmungswidriger-austritt-leitungswasser/',
+    title: 'Kontrollierter Rückbau bei Leitungswasserschäden',
+    description: 'Wie Schadenminderung, gezielte Öffnungen und technische Trocknung ohne pauschalen Komplettausbau zusammenwirken.',
+    href: '/fachwissen/kontrollierter-rueckbau-bei-leitungswasserschaeden/',
     category: 'Leitungswasser',
-    tags: ['Leitungswasser', 'Kausalität', 'Deckungsprüfung'],
+    tags: ['Leitungswasser', 'Schadenminderung', 'Rückbau'],
     date: '2026-07-12',
     type: 'article',
   },

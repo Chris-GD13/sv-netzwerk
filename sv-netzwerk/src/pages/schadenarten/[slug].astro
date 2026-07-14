@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import FeatureCard from '../../components/FeatureCard.astro';
+import ExpertCard from '../../components/platform/ExpertCard.astro';
+import CallToAction from '../../components/CallToAction.astro';
+import { damageTypes } from '../../data/damage-types';
+import { experts } from '../../data/experts';
+import type { DamageType } from '../../types/platform';
+export function getStaticPaths(){return damageTypes.map((item)=>({params:{slug:item.slug},props:{item}}));}
+interface Props { item: DamageType }
+const { item } = Astro.props;
+const relatedExperts=experts.filter((expert)=>item.relatedExperts.includes(expert.slug));
+---
+<BaseLayout title={item.seoTitle} description={item.seoDescription} breadcrumbs={[{label:'Start',href:'/'},{label:'Schadenarten',href:'/schadenarten/'},{label:item.shortTitle}]}>
+  <Hero compact eyebrow="Kompetenzbereich" title={item.title} text={item.description} primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Experten" secondaryHref="/experten/" />
+  <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Schadenpraxis" title="Typische Schadenbilder"/><div class="sv-grid sv-grid-3">{item.typicalLosses.map((text,index)=><FeatureCard index={String(index+1).padStart(2,'0')} title={text} text={`Die konkrete Bewertung erfolgt anhand von Ursache, Konstruktion, Ausdehnung und dokumentiertem Zustand.`}/>)}</div></div></section>
+  <section class="sv-section sv-section-alt"><div class="sv-container"><SectionHeader eyebrow="Prüfauftrag" title="Fachliche Prüfgegenstände"/><div class="sv-grid sv-grid-3">{item.inspectionTopics.map((text,index)=><FeatureCard index={String(index+1).padStart(2,'0')} title={text} text="Feststellung, Bewertungsgrundlage, Aussagegrenze und Empfehlung werden getrennt ausgewiesen." tone="soft"/>)}</div></div></section>
+  <section class="sv-section"><div class="sv-container links"><div><h2>Verknüpfte Inhalte</h2><p>Fachartikel, Praxisfälle und Downloads werden über stabile Kennungen dieser Schadenart zugeordnet.</p></div><nav aria-label="Verknüpfte Inhalte"><a href="/fachwissen/">Fachwissen ({item.relatedKnowledge.length})</a><a href="/praxisfaelle/">Praxisfälle ({item.relatedCases.length})</a><a href="/downloads/">Downloads ({item.relatedDownloads.length})</a></nav></div></section>
+  {relatedExperts.length>0&&<section class="sv-section sv-section-alt"><div class="sv-container"><SectionHeader eyebrow="Ansprechpartner" title="Passende Experten"/><div class="sv-grid">{relatedExperts.map((expert)=><ExpertCard expert={expert}/>)}</div></div></section>}
+  <CallToAction title={`${item.shortTitle}-Schaden strukturiert einordnen`} text="Fotos, zeitlichen Verlauf, Objektangaben und vorhandene Unterlagen für die technische Erstklassifizierung bereitstellen." href="/schaden-melden/" label="Schadenmeldung starten" />
+</BaseLayout>
+<style>.links{display:grid;grid-template-columns:1fr 1fr;gap:3rem}.links nav{display:grid;gap:.7rem}.links a{padding:1rem;border:1px solid var(--sv-color-line);border-radius:.8rem;font-weight:850;text-decoration:none}@media(max-width:42rem){.links{grid-template-columns:1fr}}</style>

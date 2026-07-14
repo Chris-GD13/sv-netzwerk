@@ -5,6 +5,8 @@ category: "Checklisten"
 tags: ["Schadenaufnahme", "Dokumentation", "Ortstermin"]
 file: "/downloads/pruefliste-schadenaufnahme.pdf"
 fileType: "PDF"
+format: "PDF"
+damageTypes: ["Gebäude", "Hausrat", "Gewerbe", "Industrie"]
 fileSize: "42 KB"
 version: "1.1"
 audience: ["Sachverständige", "Regulierer"]

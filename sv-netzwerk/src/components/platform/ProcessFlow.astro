@@ -1,0 +1,7 @@
+---
+interface Step { title: string; text: string }
+interface Props { steps: Step[] }
+const { steps } = Astro.props;
+---
+<ol class="process-flow">{steps.map((step,index)=><li><span>{String(index+1).padStart(2,'0')}</span><div><h3>{step.title}</h3><p>{step.text}</p></div></li>)}</ol>
+<style>.process-flow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.7rem;margin:0;padding:0;list-style:none;counter-reset:flow}.process-flow li{position:relative;min-height:13rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-lg);background:var(--sv-color-surface)}.process-flow li:not(:last-child)::after{position:absolute;z-index:2;top:2rem;right:-.65rem;color:var(--sv-color-accent-hover);content:'→';font-weight:900}.process-flow span{color:var(--sv-color-accent-hover);font-size:.72rem;font-weight:950}.process-flow h3{margin-top:1rem;font-size:1rem}.process-flow p{margin:0;color:var(--sv-color-muted);font-size:.82rem}@media(max-width:70rem){.process-flow{grid-template-columns:repeat(3,1fr)}.process-flow li:not(:last-child)::after{display:none}}@media(max-width:42rem){.process-flow{grid-template-columns:1fr}.process-flow li{min-height:0}}</style>

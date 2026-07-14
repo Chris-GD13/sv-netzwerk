@@ -31,6 +31,7 @@
   const input = document.querySelector('[data-search-input]');
   const results = document.querySelector('[data-search-results]');
   const status = document.querySelector('[data-search-status]');
+  const typeLabels = { article: 'Fachbeitrag', download: 'Download', video: 'Video', page: 'Seite', damage: 'Schadenart', case: 'Praxisfall', expert: 'Experte' };
 
   const normalize = (value = '') => value.toLocaleLowerCase('de-DE').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ß/g, 'ss').replace(/[^a-z0-9]+/g, ' ').trim();
 
@@ -84,7 +85,7 @@
     status.textContent = found.length === 1 ? '1 passender Inhalt' : `${found.length} passende Inhalte`;
     results.setAttribute('aria-busy', 'false');
     results.innerHTML = found.length
-      ? found.map((item) => `<a href="${item.href}"><span class="result-meta">${item.category} · ${item.type === 'article' ? 'Fachbeitrag' : item.type === 'download' ? 'Download' : 'Video'}</span><strong>${item.title}</strong><span>${item.description}</span></a>`).join('')
+      ? found.map((item) => `<a href="${item.href}"><span class="result-meta">${item.category} · ${typeLabels[item.type] || 'Inhalt'}</span><strong>${item.title}</strong><span>${item.description}</span></a>`).join('')
       : '<p class="empty-result">Keine passenden Inhalte gefunden. Nutzen Sie einen allgemeineren Suchbegriff.</p>';
   }
 

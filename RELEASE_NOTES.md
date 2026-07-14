@@ -1,32 +1,23 @@
-# Release Notes – SV-Netzwerk v5.0.1
+# Release Notes – SV-Netzwerk v5.1
 
-## Informationsarchitektur
+## SVOS Core Platform
 
-Version 5.0.1 führt alle Inhalte über eine gemeinsame Navigation zusammen. Die Hauptbereiche Leistungen, Schadenarten, Fachwissen, Praxisfälle, Downloads, Netzwerk, SVOS, Über uns und Kontakt sind auf jeder gerenderten Seite erreichbar.
+SVOS verbindet erstmals Schadenmeldung, Kompetenzzentrum, Fachwissen, Praxisfälle, Downloads und Experten in einer gemeinsamen öffentlichen Plattformstruktur. Der siebenstufige Prozess reicht von der Schadenmeldung bis zum dokumentierten Abschluss.
 
-### Navigation und Header
+## Menschen im Mittelpunkt
 
-- drei Desktop-Mega-Menüs mit fachlich gegliederten Zielen
-- mobile Off-Canvas-Navigation mit aufklappbaren Untermenüs
-- Schließen über ESC, Overlay, Links und Schließen-Schaltfläche
-- Fokusführung, Fokusfalle, Fokus-Rückgabe und Scroll-Lock
-- Sticky Header mit kompaktem Scroll-Zustand, Suche und CTA „Schaden melden“
-- aktive Menümarkierung und sichtbare Tastaturfokusse
+Experten sind wieder ein eigenständiger Hauptbereich. Das Netzwerk beschreibt Organisation und Zusammenarbeit; Expertenprofile bilden Menschen, Fachgebiete, Regionen, Qualifikationen und fachliche Verknüpfungen ab.
 
-### Seiten und Inhalte
+## Datengetriebene Kompetenz
 
-- neue Schadenarten-Übersicht für neun relevante Schadenbilder
-- neue Seite Über uns mit Arbeitsprinzipien, Qualität und Standort Aalen
-- überarbeitete Seiten für Leistungen, Netzwerk und SVOS
-- Fachwissensbereich um Normen und Rechtsprechung sowie Wissen in 180 Sekunden ergänzt
-- bestehende Praxisfälle, Downloads, Fachartikel und funktionierende Detailrouten bleiben erhalten
+Zwölf Schadenarten verwenden eine zentrale Datenquelle für Übersicht, Detailseiten, Suche und Querverweise. Wissen in 180 Sekunden besitzt eine eigene Collection mit Transkript und weiterführenden Inhalten.
 
-### Gemeinsame Oberfläche
+## Fachwissen-Pflichtlauf
 
-- Startseite und Unterseiten verwenden denselben Header, dieselbe Navigation und denselben Footer
-- Footer mit Leistungen, Wissen, SVOS, Netzwerk, Kontakt, Rechtlichem, Social Media, Zertifizierungshinweis und Standort Aalen
-- doppelte Homepage-Navigationskomponenten entfernt
+Die Beiträge vom 12., 13. und 14. Juli entsprechen dem C-, B- beziehungsweise A-Standard. Ein Repository-Skript prüft täglich Datum, Umfang, Pflichtfelder, Slugs sowie nach dem Build Route, Suche, Sitemap und interne Links.
 
-### Deployment
+## Sicherer technischer Status
 
-Der Build-Inhalt wird direkt nach `/sv-netzwerk` übertragen. `deploy-version.txt` weist Commit, UTC-Buildzeit und `Homepage-v5` aus.
+Die neue Schadenmeldung bereitet Angaben lokal in acht Schritten vor. Sie weist ausdrücklich darauf hin, dass noch keine Daten oder Dateien an einen Server übertragen werden. Sichere API- und Uploadfunktionen folgen erst nach Datenschutz- und Sicherheitsentscheidung.
+
+Das bestätigte Deployment nach `/sv-netzwerk` bleibt unverändert.

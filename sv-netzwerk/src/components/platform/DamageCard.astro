@@ -1,0 +1,12 @@
+---
+import type { DamageType } from '../../types/platform';
+interface Props { item: DamageType; index?: number }
+const { item, index } = Astro.props;
+---
+<article class="damage-card sv-card" style={`--damage-color:var(--damage-${item.color},var(--sv-color-primary))`}>
+  <div class="damage-card__meta"><span aria-hidden="true">{index ? String(index).padStart(2,'0') : item.icon}</span><small>{item.shortTitle}</small></div>
+  <h2>{item.title}</h2><p>{item.description}</p>
+  <ul>{item.inspectionTopics.slice(0,3).map((topic)=><li>{topic}</li>)}</ul>
+  <a href={`/schadenarten/${item.slug}/`}>Schadenart öffnen <span aria-hidden="true">→</span></a>
+</article>
+<style>.damage-card{position:relative;display:flex;min-height:25rem;flex-direction:column;padding:1.5rem;overflow:hidden}.damage-card::before{position:absolute;inset:0 auto 0 0;width:.3rem;background:var(--damage-color);content:""}.damage-card__meta{display:flex;align-items:center;justify-content:space-between;color:var(--sv-color-muted)}.damage-card__meta>span{display:grid;width:2.6rem;aspect-ratio:1;place-items:center;border-radius:.7rem;background:var(--sv-color-surface-alt);font-weight:900}.damage-card h2{margin-top:1.5rem;font-size:1.55rem}.damage-card p,.damage-card li{color:var(--sv-color-muted)}.damage-card ul{display:grid;gap:.45rem;padding-left:1.1rem}.damage-card a{margin-top:auto;font-weight:850;text-decoration:none}</style>

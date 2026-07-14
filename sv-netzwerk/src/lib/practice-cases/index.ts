@@ -24,6 +24,9 @@ export function practiceCaseTaxonomy(entries: PracticeCaseEntry[]) {
   return {
     lossTypes: unique(entries.map((entry) => entry.data.lossType)),
     objectTypes: unique(entries.map((entry) => entry.data.objectType)),
+    segments: unique(entries.map((entry) => entry.data.segment)),
+    regions: unique(entries.flatMap((entry) => entry.data.region ? [entry.data.region] : [])),
+    lossRanges: unique(entries.flatMap((entry) => entry.data.lossRange ? [entry.data.lossRange] : [])),
     tags: unique(entries.flatMap((entry) => entry.data.tags)),
   };
 }

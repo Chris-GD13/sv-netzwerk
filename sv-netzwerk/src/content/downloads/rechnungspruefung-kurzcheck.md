@@ -5,6 +5,8 @@ category: "Regulierung"
 tags: ["Rechnung", "KVA", "BKI", "Dubletten"]
 file: "/downloads/kurzcheck-rechnungspruefung.pdf"
 fileType: "PDF"
+format: "PDF"
+damageTypes: ["Gebäude", "Gewerbe", "Industrie"]
 fileSize: "41 KB"
 version: "1.0"
 audience: ["Regulierer", "Sachverständige"]

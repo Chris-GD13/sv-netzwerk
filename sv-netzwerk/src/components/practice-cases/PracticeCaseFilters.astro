@@ -1,14 +1,18 @@
 ---
-interface Props { lossTypes: string[]; objectTypes: string[]; }
-const { lossTypes, objectTypes } = Astro.props;
+import { lossRangeLabels } from '../../types/practice-cases';
+interface Props { lossTypes: string[]; objectTypes: string[]; segments: string[]; regions: string[]; lossRanges: string[]; }
+const { lossTypes, objectTypes, segments, regions, lossRanges } = Astro.props;
 ---
 <form class="case-filters sv-card" data-case-filters>
   <label>Schadenart<select name="lossType"><option value="">Alle Schadenarten</option>{lossTypes.map((item)=><option value={item}>{item}</option>)}</select></label>
   <label>Objektart<select name="objectType"><option value="">Alle Objektarten</option>{objectTypes.map((item)=><option value={item}>{item}</option>)}</select></label>
+  <label>Bereich<select name="segment"><option value="">Gebäude, Hausrat, Gewerbe, Industrie</option>{segments.map((item)=><option value={item}>{item}</option>)}</select></label>
+  <label>Region<select name="region"><option value="">Alle Regionen</option>{regions.map((item)=><option value={item}>{item}</option>)}</select></label>
+  <label>Schadenhöhe<select name="lossRange"><option value="">Alle Schadenhöhen</option>{lossRanges.map((item)=><option value={item}>{lossRangeLabels[item as keyof typeof lossRangeLabels]}</option>)}</select></label>
   <label>Suche<input type="search" name="query" placeholder="Titel, Ursache, Tag …" /></label>
   <button class="sv-button sv-button-secondary" type="reset">Filter zurücksetzen</button>
 </form>
 <script is:inline>
-const form=document.querySelector('[data-case-filters]');const cards=[...document.querySelectorAll('[data-case-card]')];const count=document.querySelector('[data-case-count]');const apply=()=>{const data=new FormData(form);const loss=String(data.get('lossType')||'').toLowerCase();const object=String(data.get('objectType')||'').toLowerCase();const query=String(data.get('query')||'').trim().toLowerCase();let visible=0;cards.forEach(card=>{const hay=card.textContent.toLowerCase();const show=(!loss||card.dataset.lossType===loss)&&(!object||card.dataset.objectType===object)&&(!query||hay.includes(query));card.hidden=!show;if(show)visible++});if(count)count.textContent=String(visible)};form?.addEventListener('input',apply);form?.addEventListener('reset',()=>setTimeout(apply));
+const form=document.querySelector('[data-case-filters]');const cards=[...document.querySelectorAll('[data-case-card]')];const count=document.querySelector('[data-case-count]');const apply=()=>{if(!(form instanceof HTMLFormElement))return;const data=new FormData(form);const value=(key)=>String(data.get(key)||'').toLowerCase();const loss=value('lossType');const object=value('objectType');const segment=value('segment');const region=value('region');const range=value('lossRange');const query=value('query').trim();let visible=0;cards.forEach(card=>{if(!(card instanceof HTMLElement))return;const hay=(card.textContent||'').toLowerCase();const show=(!loss||card.dataset.lossType===loss)&&(!object||card.dataset.objectType===object)&&(!segment||card.dataset.segment===segment)&&(!region||card.dataset.region===region)&&(!range||card.dataset.lossRange===range)&&(!query||hay.includes(query));card.hidden=!show;if(show)visible++});if(count)count.textContent=String(visible)};form.addEventListener('input',apply);form.addEventListener('reset',()=>setTimeout(apply));
 </script>
 <style>.case-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:var(--sv-space-4);align-items:end;margin-bottom:var(--sv-space-6);padding:var(--sv-space-5)}label{display:grid;gap:.4rem;color:var(--sv-color-ink-soft);font-size:.8rem;font-weight:800}select,input{width:100%;min-height:3rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-sm);background:white;padding:.65rem .75rem;color:var(--sv-color-ink)}@media(max-width:58rem){.case-filters{grid-template-columns:1fr 1fr}}@media(max-width:38rem){.case-filters{grid-template-columns:1fr}}</style>

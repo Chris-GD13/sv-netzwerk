@@ -1,4 +1,4 @@
-import type { LibraryType } from '../../data/library';
+export type SearchContentType = 'article' | 'download' | 'video' | 'page' | 'damage' | 'case' | 'expert';
 
 export type SearchIndexItem = {
   id: string;
@@ -10,7 +10,7 @@ export type SearchIndexItem = {
   tags: string[];
   tagSlugs: string[];
   date: string;
-  type: LibraryType;
+  type: SearchContentType;
   featured: boolean;
   searchable: string;
   tokens: string[];
@@ -19,7 +19,7 @@ export type SearchIndexItem = {
 export type SearchFilters = {
   query: string;
   category: string;
-  type: LibraryType | 'all';
+  type: SearchContentType | 'all';
   tag: string;
 };
 

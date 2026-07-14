@@ -1,0 +1,15 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+export async function getStaticPaths(){const entries=await getCollection('videos',({data})=>data.publication.status==='published');return entries.map((entry)=>({params:{id:entry.id},props:{entry}}));}
+interface Props { entry: CollectionEntry<'videos'> }
+const { entry }=Astro.props;const { Content }=await render(entry);
+const schema={'@context':'https://schema.org','@type':'VideoObject',name:entry.data.title,description:entry.data.description,uploadDate:entry.data.publication.publishedAt.toISOString(),duration:'PT3M',transcript:entry.data.transcript};
+---
+<BaseLayout title={entry.data.seo.title??entry.data.title} description={entry.data.seo.description??entry.data.description} breadcrumbs={[{label:'Start',href:'/'},{label:'Wissen in 180 Sekunden',href:'/wissen-in-180-sekunden/'},{label:entry.data.title}]}>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <Hero compact eyebrow={`${entry.data.damageType} · ${entry.data.duration}`} title={entry.data.title} text={entry.data.description} secondaryLabel="Alle Kurzskripte" secondaryHref="/wissen-in-180-sekunden/" />
+  <article class="sv-section"><div class="sv-container transcript"><h2>Transkript</h2><p>{entry.data.transcript}</p><Content/><h2>Weiterführende Inhalte</h2><nav>{entry.data.relatedKnowledge.map((id)=><a href={`/fachwissen/${id}/`}>Fachbeitrag öffnen</a>)}{entry.data.downloadHints.map((href)=><a href={href}>Arbeitshilfen öffnen</a>)}</nav></div></article>
+</BaseLayout>
+<style>.transcript{max-width:48rem}.transcript>p{font-size:1.15rem}.transcript nav{display:flex;flex-wrap:wrap;gap:.7rem}.transcript nav a{padding:.8rem 1rem;border:1px solid var(--sv-color-line);border-radius:.7rem;font-weight:850;text-decoration:none}</style>

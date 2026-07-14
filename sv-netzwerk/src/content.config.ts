@@ -26,6 +26,14 @@ const knowledge = defineCollection({
     author: z.string(),
     featured: z.boolean().default(false),
     readingMinutes: z.number().int().positive().optional(),
+    dailyStandard: z.boolean().default(false),
+    contentLevel: z.enum(['A', 'B', 'C']).optional(),
+    teaser: z.string().optional(),
+    linkedinSummary: z.string().optional(),
+    videoScript: z.string().optional(),
+    cta: z.object({ label: z.string(), href: z.string() }).optional(),
+    relatedLinks: z.array(z.string()).default([]),
+    damageTypes: z.array(z.string()).default([]),
     publication: publicationSchema,
     seo: seoSchema.default({ noindex: false }),
   }),
@@ -43,6 +51,8 @@ const downloads = defineCollection({
     fileSize: z.string().optional(),
     version: z.string().optional(),
     audience: z.array(z.string()).default([]),
+    damageTypes: z.array(z.string()).default([]),
+    format: z.enum(['PDF', 'Word', 'Excel', 'Video']).optional(),
     publication: publicationSchema,
     seo: seoSchema.default({ noindex: false }),
   }),
@@ -55,6 +65,7 @@ const practiceCases = defineCollection({
     description: z.string(),
     lossType: z.string(),
     objectType: z.string(),
+    segment: z.enum(['Gebäude', 'Hausrat', 'Gewerbe', 'Industrie']).default('Gebäude'),
     region: z.string().optional(),
     lossRange: z.enum(['unter-25k', '25k-100k', '100k-500k', 'ueber-500k']).optional(),
     tags: z.array(z.string()).default([]),
@@ -65,6 +76,8 @@ const practiceCases = defineCollection({
     finding: z.string().optional(),
     assessment: z.string().optional(),
     recommendation: z.string().optional(),
+    measures: z.array(z.string()).default([]),
+    result: z.string().optional(),
     reserve: z.string().optional(),
     duration: z.string().optional(),
     featured: z.boolean().default(false),
@@ -88,4 +101,22 @@ const authors = defineCollection({
   }),
 });
 
-export const collections = { knowledge, downloads, practiceCases, authors };
+const videos = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/videos-library' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    topic: z.string(),
+    damageType: z.string(),
+    duration: z.string(),
+    transcript: z.string(),
+    platformLinks: z.array(z.string()).default([]),
+    tags: z.array(z.string()).default([]),
+    relatedKnowledge: z.array(z.string()).default([]),
+    downloadHints: z.array(z.string()).default([]),
+    publication: publicationSchema,
+    seo: seoSchema.default({ noindex: false }),
+  }),
+});
+
+export const collections = { knowledge, downloads, practiceCases, authors, videos };

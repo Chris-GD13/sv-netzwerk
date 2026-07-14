@@ -1,5 +1,17 @@
 # Changelog
 
+## 5.1.0 – 2026-07-14
+
+- SVOS Core Platform mit Modulen, Prozessdarstellung und Roadmap ausgebaut
+- Experten als eigenständigen Hauptbereich mit datengetriebenen Profilen wiederhergestellt
+- zwölf Schadenarten mit gemeinsamer Datenquelle und echten Detailseiten eingeführt
+- Suche auf Seiten, Fachartikel, Schadenarten, Praxisfälle, Downloads, Videos und Experten erweitert
+- Wissen in 180 Sekunden als Content Collection und Bibliotheksbereich umgesetzt
+- sichere lokale Vorbereitung der Schadenmeldung ohne vorgetäuschte Datenübertragung ergänzt
+- Fachbeiträge für 12., 13. und 14. Juli auf den verbindlichen Tagesstandard gebracht
+- tägliche Fachwissensvalidierung in Build und GitHub Actions verankert
+- Projektgrundsatz 019 mit Projektdokumentation und fünf ADRs eingeführt
+
 ## 5.0.1 – 2026-07-14
 
 - Informationsarchitektur mit neun konsistenten Hauptbereichen neu aufgebaut

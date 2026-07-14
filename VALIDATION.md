@@ -1,4 +1,6 @@
-# Validierung – SV-Netzwerk v5.0.1
+# Validierung – SV-Netzwerk v5.1.0
+
+Stand: 14.07.2026
 
 ## Installation und Build
 
@@ -6,48 +8,44 @@
 - installierte Pakete: 279
 - gemeldete Schwachstellen: 0
 - `npm run build`: erfolgreich
-- Astro-Prüfung: 98 Dateien, 0 Fehler, 0 Warnungen, 0 Hinweise
-- statischer Build: 85 Seiten
-- `dist/deploy-version.txt`: vorhanden, mit Git-Commit, UTC-Buildzeit und `Homepage-v5`
+- Astro-/TypeScript-Prüfung: 114 Dateien, 0 Fehler, 0 Warnungen, 0 Hinweise
+- statischer Build: 118 Seiten
+- `dist/deploy-version.txt`: vorhanden
 - kein Unterordner `dist/dist/`
 
-## Erzeugte Pflichtseiten
+## Fachwissens-Pflichtlauf
 
-- `/leistungen/`
-- `/schadenarten/`
-- `/fachwissen/`
-- `/praxisfaelle/`
-- `/downloads/`
-- `/netzwerk/`
-- `/svos/`
-- `/ueber-uns/`
-- `/kontakt/`
+- 12.07.2026: Kategorie C, 347 Wörter, „Kontrollierter Rückbau bei Leitungswasserschäden“
+- 13.07.2026: Kategorie B, 816 Wörter, „Technische Dokumentation bei komplexen Gebäudeschäden“
+- 14.07.2026: Kategorie A, 1.527 Wörter, „Technische Schadenabgrenzung als Grundlage der Regulierung“
+- `npm run validate:knowledge`: erfolgreich
+- `npm run validate:knowledge -- --dist`: erfolgreich
+- Build-Routen, Suchindex, Sitemap und interne Links: erfolgreich geprüft
 
-## Interaktionsprüfung
+## Erzeugte Kernbereiche
 
-Desktop bei 1440 × 1000 Pixel:
-
-- alle neun Hauptnavigationspunkte sichtbar
-- Mega-Menü „Leistungen“ öffnet und schließt korrekt
-- `aria-expanded` wechselt zwischen `false` und `true`
-- ESC schließt das Mega-Menü und führt den Fokus zum Auslöser zurück
-
-Mobil bei 390 × 844 Pixel:
-
-- Hamburger-Schaltfläche sichtbar
-- Off-Canvas-Menü öffnet mit `aria-hidden="false"`
-- Scroll-Lock über `html.has-open-menu` aktiv
-- Fokus wird auf die Schließen-Schaltfläche geführt
-- ESC schließt das Menü mit `aria-hidden="true"`
-- Overlay- und Link-Schließen sind verdrahtet
-- Untermenüs sind als native, tastaturbedienbare `details`-Elemente umgesetzt
-
-## Visuelle Prüfung
-
-- Desktop-Screenshot der gebauten Startseite erstellt
-- Mobile-Screenshot mit geöffnetem Off-Canvas-Menü erstellt
-- keine Browser-Konsolenfehler festgestellt
+- `/experten/` und ein bestätigtes Expertenprofil
+- `/svos/` mit Modulen, Prozessmodell und Roadmap
+- `/schaden-melden/` mit achtstufiger lokaler Erfassung
+- `/schadenarten/` mit zwölf datengetriebenen Schadenarten und Detailseiten
+- `/wissen-in-180-sekunden/` mit drei Beiträgen und Detailseiten
+- `/fachwissen/` mit dynamischen Detailseiten für den täglichen Pflichtlauf
+- `/praxisfaelle/` mit Schadenart-, Objekt-, Bereichs-, Regions- und Schadenhöhenfilter
+- `/downloads/` mit Kategorie- und Formatfilter
+- `/suche/` und `/search-index.json` mit Artikeln, Downloads, Videos, Seiten, Schadenarten, Fällen und Experten
 
 ## Deployment-Prüfung
 
 Der Workflow verwendet ausschließlich `/sv-netzwerk` als IONOS-Document-Root, überträgt den Inhalt von `dist/` direkt dorthin, verhindert `/sv-netzwerk/dist/` und vergleicht die live gelesene Commit-ID aus `deploy-version.txt` mit `github.sha`.
+
+GitHub-Actions-Prüfung und Live-Verifikation erfolgen anhand des veröffentlichten Commits.
+
+## Visuelle und interaktive Prüfung
+
+- Desktop 1440 × 1000: zentrale Navigation einschließlich „Experten“ sichtbar, kein horizontaler Überlauf
+- Mobil 390 × 844: Hamburger sichtbar, Off-Canvas-Menü ohne horizontalen Überlauf
+- Fokus beim Öffnen auf „Menü schließen“ geführt
+- Scroll-Lock im geöffneten Zustand aktiv
+- ESC schließt das Menü und führt den Fokus zu „Menü öffnen“ zurück
+- keine Browser-Konsolenfehler oder -warnungen
+- Desktop- und Mobile-Screenshot erzeugt

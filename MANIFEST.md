@@ -1,50 +1,37 @@
-# Manifest – SV-Netzwerk v5.0.1
+# Manifest – SV-Netzwerk v5.1
 
-## Gemeinsame Navigation
+## Plattformkern
 
-- `sv-netzwerk/src/data/navigation.ts`
-- `sv-netzwerk/src/data/site.ts`
-- `sv-netzwerk/src/utils/routes.ts`
-- `sv-netzwerk/src/components/Header.astro`
-- `sv-netzwerk/src/components/Navigation.astro`
-- `sv-netzwerk/src/components/MegaMenu.astro`
-- `sv-netzwerk/src/components/MobileMenu.astro`
-- `sv-netzwerk/src/styles/header.css`
-- `sv-netzwerk/src/styles/navigation.css`
-- `sv-netzwerk/src/layouts/HomeLayout.astro`
+- zentrale Typen für Schadenarten, Experten und Module
+- Datenquellen für zwölf Schadenarten und bestätigte Experten
+- wiederverwendbare DamageCard, ExpertCard, ModuleCard und ProcessFlow
+- SVOS-Dashboard mit Modulen, Rollen, Prozess und Roadmap
 
-## Gemeinsamer Footer
+## Neue Routen
 
-- `sv-netzwerk/src/components/Footer.astro`
+- `/experten/` und `/experten/[slug]/`
+- `/schadenarten/[slug]/`
+- `/wissen-in-180-sekunden/` und Detailseiten
+- `/schaden-melden/`
+- dynamische Fachbeiträge unter `/fachwissen/[id]/`
 
-## Seitenstruktur
+## Wissen und Suche
 
-- `sv-netzwerk/src/pages/leistungen/index.astro`
-- `sv-netzwerk/src/pages/schadenarten/index.astro`
-- `sv-netzwerk/src/pages/fachwissen/index.astro`
-- `sv-netzwerk/src/pages/netzwerk/index.astro`
-- `sv-netzwerk/src/pages/svos/index.astro`
-- `sv-netzwerk/src/pages/ueber-uns/index.astro`
+- Fachbeiträge für 12., 13. und 14.07.2026
+- Videos-Collection für Wissen in 180 Sekunden
+- Suchindex aus Seiten, Artikeln, Schadenarten, Praxisfällen, Downloads, Videos und Experten
+- Validierungsskript und GitHub-Workflow für den täglichen Fachwissensstandard
 
-## Entfernte Doppelkomponenten
+## Projektdokumentation
 
-- `sv-netzwerk/src/components/home/HomeHeader.astro`
-- `sv-netzwerk/src/components/home/HomeNavigation.astro`
-- `sv-netzwerk/src/components/home/HomeMobileMenu.astro`
-- `sv-netzwerk/src/components/home/HomeFooter.astro`
+- `docs/PROJECT_RULES.md`
+- `docs/PROJECT_LOG.md`
+- `docs/ROADMAP.md`
+- `docs/DECISIONS.md`
+- `docs/LESSONS_LEARNED.md`
+- `docs/WORKFLOW_STANDARD.md`
+- fünf ADRs unter `docs/adr/`
+- `ARCHITECTURE.md`, `CONTENT_STANDARD.md`, `SVOS_ROADMAP.md`
+- aktualisierte README-, Changelog-, Release-, Validierungs- und Deployment-Dokumentation
 
-## Version und Deployment
-
-- `sv-netzwerk/package.json`
-- `sv-netzwerk/package-lock.json`
-- `sv-netzwerk/VERSION`
-- `sv-netzwerk/scripts/write-deploy-version.mjs`
-- `.github/workflows/deploy.yml`
-- `DEPLOYMENT.md`
-
-## Release-Dokumentation
-
-- `CHANGELOG.md`
-- `RELEASE_NOTES.md`
-- `MANIFEST.md`
-- `VALIDATION.md`
+Die vollständige technische Dateiliste wird über `git diff --name-status` nachgewiesen.

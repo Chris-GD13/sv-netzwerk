@@ -5,6 +5,8 @@ category: "Prüfschemata"
 tags: ["Kausalität", "Schadenabgrenzung", "Bewertung"]
 file: "/downloads/pruefschema-schadenabgrenzung.pdf"
 fileType: "PDF"
+format: "PDF"
+damageTypes: ["Leitungswasser", "Gebäude"]
 fileSize: "39 KB"
 version: "1.0"
 audience: ["Sachverständige", "Versicherer"]

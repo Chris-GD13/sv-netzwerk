@@ -16,7 +16,7 @@ const { id, title, description, category, tags = [], file, fileType, fileSize, v
 const meta = [fileType, fileSize, version ? `Version ${version}` : undefined].filter(Boolean).join(' · ');
 const searchText = [title, description, category, ...tags].join(' ').toLocaleLowerCase('de');
 ---
-<article class="download-card sv-card sv-card-lift" data-download-card data-category={category} data-search={searchText}>
+<article class="download-card sv-card sv-card-lift" data-download-card data-category={category} data-format={fileType} data-search={searchText}>
   <div class="download-card__top">
     <span class="sv-pill">{category}</span>
     <span class="download-card__type" aria-label={`Dateityp ${fileType}`}>{fileType}</span>

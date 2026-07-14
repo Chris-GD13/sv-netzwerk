@@ -19,3 +19,7 @@ Der Build erzeugt `dist/deploy-version.txt` mit:
 - Kennzeichnung `Homepage-v5`
 
 Nach dem Upload ruft der Workflow `https://sv-netzwerk.eu/deploy-version.txt` ab. Das Deployment gilt nur dann als erfolgreich, wenn die dort gelesene Commit-ID exakt `github.sha` entspricht.
+
+## Fachwissensprüfung
+
+Der Build führt vor der statischen Erzeugung den täglichen Fachwissensstandard aus. Ein separater GitHub-Workflow prüft den vorhandenen Tagesbeitrag um 04:00 und 12:00 UTC; fachlich entsprechen diese Läufe am 14.07.2026 den vorgesehenen Prüfzeiten 06:00 und 14:00 Uhr Europe/Berlin. Es findet keine automatische Inhaltserzeugung oder Veröffentlichung statt.

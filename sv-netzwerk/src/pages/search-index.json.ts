@@ -1,11 +1,13 @@
 import type { APIRoute } from 'astro';
-import { searchIndex } from '../lib/search';
+import { buildSearchIndex } from '../lib/search/build';
 
 export const prerender = true;
 
-export const GET: APIRoute = () => new Response(
+export const GET: APIRoute = async () => {
+  const searchIndex = await buildSearchIndex();
+  return new Response(
   JSON.stringify({
-    version: '1.6.2',
+    version: '5.1.0',
     generatedAt: new Date().toISOString(),
     count: searchIndex.length,
     facets: {
@@ -22,4 +24,5 @@ export const GET: APIRoute = () => new Response(
       'X-Content-Type-Options': 'nosniff',
     },
   },
-);
+  );
+};

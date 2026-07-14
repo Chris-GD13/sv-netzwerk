@@ -12,6 +12,10 @@ export function downloadCategories(entries: DownloadEntry[]) {
   return [...new Set(entries.map((entry) => entry.data.category))].sort((a, b) => a.localeCompare(b, 'de'));
 }
 
+export function downloadFormats(entries: DownloadEntry[]) {
+  return [...new Set(entries.map((entry) => entry.data.format ?? entry.data.fileType))].sort((a, b) => a.localeCompare(b, 'de'));
+}
+
 export function downloadTags(entries: DownloadEntry[]) {
   return [...new Set(entries.flatMap((entry) => entry.data.tags))].sort((a, b) => a.localeCompare(b, 'de'));
 }

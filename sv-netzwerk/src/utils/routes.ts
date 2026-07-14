@@ -4,6 +4,7 @@ export const routes = {
   damageTypes: '/schadenarten/',
   knowledge: '/fachwissen/',
   downloads: '/downloads/',
+  experts: '/experten/',
   practiceCases: '/praxisfaelle/',
   team: '/netzwerk/',
   search: '/suche/',
