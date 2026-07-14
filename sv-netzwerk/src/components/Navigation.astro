@@ -1,0 +1,66 @@
+---
+import MegaMenu from './MegaMenu.astro';
+import type { NavItem } from './Header.astro';
+
+interface Props { items: NavItem[]; currentPath: string }
+const { items, currentPath } = Astro.props;
+const isActive = (href: string) => href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.children?.some((child) => isActive(child.href)));
+---
+
+<nav class="desktop-nav" aria-label="Hauptnavigation">
+  <ul>
+    {items.map((item, index) => item.children ? (
+      <li class="desktop-nav__item" data-nav-item>
+        <button
+          class:list={["desktop-nav__trigger", { "is-active": isItemActive(item) }]}
+          type="button"
+          aria-expanded="false"
+          aria-controls={`mega-menu-${index}`}
+          data-mega-trigger
+        >
+          {item.label}
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg>
+        </button>
+        <MegaMenu item={item} id={`mega-menu-${index}`} currentPath={currentPath} />
+      </li>
+    ) : (
+      <li>
+        <a class:list={["desktop-nav__link", { "is-active": isActive(item.href) }]} href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<script is:inline>
+  (() => {
+    const items = [...document.querySelectorAll('[data-nav-item]')];
+    const closeAll = (except = null) => items.forEach((item) => {
+      if (item === except) return;
+      item.querySelector('[data-mega-trigger]')?.setAttribute('aria-expanded', 'false');
+      const menu = item.querySelector('[data-mega-menu]');
+      if (menu) menu.hidden = true;
+    });
+
+    items.forEach((item) => {
+      const trigger = item.querySelector('[data-mega-trigger]');
+      const menu = item.querySelector('[data-mega-menu]');
+      trigger?.addEventListener('click', () => {
+        const willOpen = trigger.getAttribute('aria-expanded') !== 'true';
+        closeAll(item);
+        trigger.setAttribute('aria-expanded', String(willOpen));
+        if (menu) menu.hidden = !willOpen;
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!(event.target instanceof Element) || !event.target.closest('[data-nav-item]')) closeAll();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      const openTrigger = document.querySelector('[data-mega-trigger][aria-expanded="true"]');
+      closeAll();
+      if (openTrigger instanceof HTMLElement) openTrigger.focus();
+    });
+  })();
+</script>

@@ -1,0 +1,89 @@
+---
+import SearchButton from './SearchButton.astro';
+import type { NavItem } from './Header.astro';
+
+interface Props { items: NavItem[]; currentPath: string }
+const { items, currentPath } = Astro.props;
+const isActive = (href: string) => href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.children?.some((child) => isActive(child.href)));
+---
+
+<div class="mobile-menu__backdrop" data-menu-backdrop hidden></div>
+<aside class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true" aria-label="Mobile Navigation">
+  <div class="mobile-menu__top">
+    <a class="site-brand site-brand--mobile" href="/" aria-label="SV-Netzwerk – Startseite">
+      <span class="site-brand__mark" aria-hidden="true"><span>SV</span></span>
+      <span class="site-brand__copy"><strong>SV-Netzwerk</strong><small>Navigation</small></span>
+    </a>
+    <button class="mobile-menu__close" type="button" data-menu-close aria-label="Menü schließen">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19" /></svg>
+    </button>
+  </div>
+
+  <div class="mobile-menu__scroll">
+    <nav aria-label="Mobile Hauptnavigation">
+      <a class:list={["mobile-menu__direct", { "is-active": currentPath === '/' }]} href="/" aria-current={currentPath === '/' ? 'page' : undefined}>Startseite</a>
+      {items.map((item) => item.children ? (
+        <details class="mobile-menu__group" open={isItemActive(item)}>
+          <summary>
+            <span>{item.label}</span>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg>
+          </summary>
+          <div class="mobile-menu__subnav">
+            <a class:list={{ "is-active": currentPath === item.href }} href={item.href} aria-current={currentPath === item.href ? 'page' : undefined}>{item.label} – Übersicht</a>
+            {item.children.map((child) => (
+              <a class:list={{ "is-active": isActive(child.href) }} href={child.href} aria-current={isActive(child.href) ? 'page' : undefined}>{child.label}</a>
+            ))}
+          </div>
+        </details>
+      ) : (
+        <a class:list={["mobile-menu__direct", { "is-active": isActive(item.href) }]} href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
+      ))}
+    </nav>
+  </div>
+
+  <div class="mobile-menu__footer">
+    <SearchButton />
+    <a class="mobile-menu__cta" href="/schaden-melden/">Schaden melden <span aria-hidden="true">→</span></a>
+    <div><a href="tel:+4973673939783">07367 / 393 97 83</a><span>Persönlich erreichbar</span></div>
+  </div>
+</aside>
+
+<script is:inline>
+  (() => {
+    const menu = document.querySelector('[data-mobile-menu]');
+    const backdrop = document.querySelector('[data-menu-backdrop]');
+    const openButton = document.querySelector('[data-menu-open]');
+    const closeButton = document.querySelector('[data-menu-close]');
+    let previousFocus = null;
+
+    const focusableSelector = 'a[href], button:not([disabled]), summary, input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const setOpen = (open) => {
+      if (!menu || !backdrop || !openButton) return;
+      if (open) previousFocus = document.activeElement;
+      menu.setAttribute('aria-hidden', String(!open));
+      openButton.setAttribute('aria-expanded', String(open));
+      openButton.setAttribute('aria-label', open ? 'Menü schließen' : 'Menü öffnen');
+      menu.classList.toggle('is-open', open);
+      backdrop.hidden = !open;
+      requestAnimationFrame(() => backdrop.classList.toggle('is-open', open));
+      document.documentElement.classList.toggle('has-open-menu', open);
+      if (open) closeButton?.focus();
+      else if (previousFocus instanceof HTMLElement) previousFocus.focus();
+    };
+
+    openButton?.addEventListener('click', () => setOpen(openButton.getAttribute('aria-expanded') !== 'true'));
+    closeButton?.addEventListener('click', () => setOpen(false));
+    backdrop?.addEventListener('click', () => setOpen(false));
+    menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && menu?.classList.contains('is-open')) setOpen(false);
+      if (event.key !== 'Tab' || !menu?.classList.contains('is-open')) return;
+      const focusable = [...menu.querySelectorAll(focusableSelector)].filter((element) => element instanceof HTMLElement && !element.hidden);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    });
+  })();
+</script>

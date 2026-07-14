@@ -1,0 +1,28 @@
+.desktop-nav { align-self: stretch; }
+.desktop-nav > ul { display: flex; height: 100%; align-items: center; gap: .12rem; margin: 0; padding: 0; list-style: none; }
+.desktop-nav__item { position: static; }
+.desktop-nav__trigger, .desktop-nav__link { position: relative; display: flex; min-height: 2.9rem; align-items: center; gap: .28rem; padding: .65rem .68rem; border: 0; border-radius: .7rem; background: transparent; color: #294860; font-size: .83rem; font-weight: 850; text-decoration: none; cursor: pointer; transition: color var(--sv-transition), background var(--sv-transition); }
+.desktop-nav__trigger:hover, .desktop-nav__trigger[aria-expanded="true"], .desktop-nav__link:hover, .desktop-nav__trigger.is-active, .desktop-nav__link.is-active { background: rgba(224, 237, 244, .7); color: var(--sv-color-ink); }
+.desktop-nav__trigger.is-active::after, .desktop-nav__link.is-active::after { position: absolute; right: .7rem; bottom: .2rem; left: .7rem; height: 2px; border-radius: 2px; background: var(--sv-color-accent); content: ""; }
+.desktop-nav__trigger svg { width: .72rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; transition: transform var(--sv-transition); }
+.desktop-nav__trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.mega-menu { position: absolute; top: calc(100% - .3rem); left: 50%; display: grid; width: min(72rem, calc(100vw - 2rem)); grid-template-columns: minmax(16rem, .72fr) minmax(30rem, 1.55fr); gap: .75rem; transform: translate(-50%, -.4rem); padding: .75rem; border: 1px solid rgba(205, 218, 227, .9); border-radius: 1.35rem; background: rgba(255, 255, 255, .96); box-shadow: 0 30px 80px rgba(7, 26, 46, .18); -webkit-backdrop-filter: blur(26px) saturate(150%); backdrop-filter: blur(26px) saturate(150%); animation: mega-in .18s ease forwards; }
+.mega-menu__intro { display: flex; min-height: 18rem; flex-direction: column; align-items: flex-start; padding: 1.55rem; border-radius: 1rem; background: radial-gradient(circle at 100% 0, rgba(26, 118, 160, .7), transparent 42%), linear-gradient(145deg, #09243b, #06192c); color: white; }
+.mega-menu__eyebrow { color: #ffbd5c; font-size: .7rem; font-weight: 950; letter-spacing: .14em; text-transform: uppercase; }
+.mega-menu__intro h2 { margin: .75rem 0 .8rem; color: white; font-size: clamp(1.35rem, 2vw, 1.85rem); letter-spacing: -.035em; line-height: 1.12; }
+.mega-menu__intro p { color: #c9d8e3; font-size: .86rem; line-height: 1.55; }
+.mega-menu__intro a { display: inline-flex; align-items: center; gap: .5rem; margin-top: auto; color: white; font-size: .83rem; font-weight: 900; text-decoration: none; }
+.mega-menu__intro a svg { width: 1rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+.mega-menu__content { padding: 1rem; }
+.mega-menu__label { margin: 0 0 .65rem; color: var(--sv-color-muted); font-size: .69rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.mega-menu__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .45rem; }
+.mega-menu__card { display: grid; min-height: 7.2rem; grid-template-columns: auto 1fr auto; align-items: start; gap: .75rem; padding: 1rem; border: 1px solid transparent; border-radius: .85rem; color: var(--sv-color-ink); text-decoration: none; transition: transform var(--sv-transition), background var(--sv-transition), border-color var(--sv-transition); }
+.mega-menu__card:hover, .mega-menu__card.is-active { transform: translateY(-2px); border-color: #d8e4eb; background: #f1f6f9; color: var(--sv-color-ink); }
+.mega-menu__number { color: var(--sv-color-accent-hover); font-size: .65rem; font-weight: 950; }
+.mega-menu__card strong, .mega-menu__card small { display: block; }
+.mega-menu__card strong { margin-bottom: .3rem; font-size: .88rem; }
+.mega-menu__card small { color: var(--sv-color-muted); font-size: .75rem; line-height: 1.42; }
+.mega-menu__card > svg { width: .88rem; fill: none; stroke: var(--sv-color-primary); stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+
+@keyframes mega-in { to { transform: translate(-50%, 0); } }

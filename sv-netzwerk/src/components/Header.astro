@@ -1,185 +1,92 @@
 ---
-type NavChild = { label: string; href: string; description?: string };
-type NavItem = { label: string; href: string; children?: NavChild[] };
+import Navigation from './Navigation.astro';
+import MobileMenu from './MobileMenu.astro';
+import HamburgerButton from './HamburgerButton.astro';
+import SearchButton from './SearchButton.astro';
 
-const current = Astro.url.pathname;
-const nav: NavItem[] = [
+export type NavChild = { label: string; href: string; description: string };
+export type NavItem = { label: string; href: string; description?: string; children?: NavChild[] };
+
+const currentPath = Astro.url.pathname;
+const navigation: NavItem[] = [
   {
     label: 'Leistungen',
     href: '/leistungen/',
+    description: 'Schäden strukturiert prüfen, bewerten und regulieren.',
     children: [
-      { label: 'Leistungsübersicht', href: '/leistungen/', description: 'Technische Prüfung und Schadenregulierung' },
-      { label: 'Komplexschäden', href: '/komplexschaeden/', description: 'Interdisziplinäre Bearbeitung anspruchsvoller Schäden' },
-      { label: 'Großschadenregulierung', href: '/grossschadenregulierung/', description: 'Strukturierte Steuerung hoher Schadenvolumina' },
-      { label: 'Schaden melden', href: '/schaden-melden/', description: 'Direkte Übermittlung der Eckdaten' },
+      { label: 'Leistungsübersicht', href: '/leistungen/', description: 'Technische Prüfung und Schadenregulierung aus einer Hand.' },
+      { label: 'Komplexschäden', href: '/komplexschaeden/', description: 'Interdisziplinäre Bearbeitung anspruchsvoller Schadenbilder.' },
+      { label: 'Großschadenregulierung', href: '/grossschadenregulierung/', description: 'Klare Steuerung bei hohen Schadenvolumina.' },
+      { label: 'Schaden melden', href: '/schaden-melden/', description: 'Eckdaten sicher und direkt an uns übermitteln.' },
     ],
   },
   {
     label: 'Fachwissen',
     href: '/fachwissen/',
+    description: 'Praxiserprobtes Wissen für fundierte Entscheidungen.',
     children: [
-      { label: 'Wissensbibliothek', href: '/fachwissen/', description: 'Fachbeiträge aus Technik und Regulierung' },
-      { label: 'Praxisfälle', href: '/praxisfaelle/', description: 'Nachvollziehbare Fälle aus der Schadenpraxis' },
-      { label: 'Downloads', href: '/downloads/', description: 'Prüfschemata, Checklisten und Arbeitshilfen' },
-      { label: 'Wissen in 180 Sekunden', href: '/wissen-in-180-sekunden/', description: 'Fachthemen kompakt erklärt' },
+      { label: 'Wissensbibliothek', href: '/fachwissen/', description: 'Fachbeiträge aus Technik und Regulierung.' },
+      { label: 'Praxisfälle', href: '/praxisfaelle/', description: 'Nachvollziehbare Fälle aus der Schadenpraxis.' },
+      { label: 'Downloads', href: '/downloads/', description: 'Prüfschemata, Checklisten und Arbeitshilfen.' },
+      { label: 'Wissen in 180 Sekunden', href: '/wissen-in-180-sekunden/', description: 'Komplexe Fachthemen kompakt erklärt.' },
     ],
   },
   {
     label: 'SVOS',
     href: '/svos/',
+    description: 'Digitale Standards für vernetzte Sachverständigenarbeit.',
     children: [
-      { label: 'SV Operating System', href: '/svos/', description: 'Standardisierte Fach- und Prozessarchitektur' },
-      { label: 'Gutachter-Plattform', href: '/gutachter-plattform/', description: 'Vernetzung qualifizierter Sachverständiger' },
-      { label: 'Für Sachverständige', href: '/fuer-sachverstaendige/', description: 'Werkzeuge, Standards und Zusammenarbeit' },
-      { label: 'Für Regulierer', href: '/fuer-regulierer/', description: 'Prüffähige und dokumentationsstarke Abläufe' },
+      { label: 'SV Operating System', href: '/svos/', description: 'Standardisierte Fach- und Prozessarchitektur.' },
+      { label: 'Gutachter-Plattform', href: '/gutachter-plattform/', description: 'Qualifizierte Sachverständige intelligent vernetzen.' },
+      { label: 'Für Sachverständige', href: '/experten/', description: 'Werkzeuge, Standards und starke Zusammenarbeit.' },
+      { label: 'Für Versicherer', href: '/versicherer/', description: 'Prüffähige und dokumentationsstarke Abläufe.' },
     ],
   },
   { label: 'Netzwerk', href: '/netzwerk/' },
 ];
-
-const active = (href: string) => href === '/' ? current === '/' : current.startsWith(href);
 ---
 
 <header class="site-header" data-site-header>
-  <div class="service-bar">
-    <div class="sv-container service-bar__inner">
-      <span>Bundesweite Schadenbearbeitung</span>
-      <span class="service-bar__cert">DIN EN ISO/IEC 17024 zertifiziert</span>
-      <a href="tel:+4973673939783">07367 / 393 97 83</a>
+  <div class="site-header__utility">
+    <div class="sv-container site-header__utility-inner">
+      <p><span class="status-dot" aria-hidden="true"></span> Bundesweit für Sie im Einsatz</p>
+      <div>
+        <span>DIN EN ISO/IEC 17024 zertifiziert</span>
+        <a href="tel:+4973673939783" aria-label="Anrufen unter 07367 393 97 83">07367 / 393 97 83</a>
+      </div>
     </div>
   </div>
 
-  <div class="sv-container navigation-shell">
-    <a class="brand" href="/" aria-label="SV-Netzwerk – Startseite">
-      <span class="brand__mark" aria-hidden="true">
-        <span>SV</span>
-      </span>
-      <span class="brand__text">
+  <div class="sv-container site-header__bar">
+    <a class="site-brand" href="/" aria-label="SV-Netzwerk – Startseite">
+      <span class="site-brand__mark" aria-hidden="true"><span>SV</span></span>
+      <span class="site-brand__copy">
         <strong>SV-Netzwerk</strong>
         <small>Bau · Schaden · Regulierung</small>
       </span>
     </a>
 
-    <nav class="desktop-navigation" aria-label="Hauptnavigation">
-      {nav.map((item) => item.children ? (
-        <div class="desktop-navigation__item">
-          <a class:list={["desktop-navigation__link", { "is-active": active(item.href) }]} href={item.href}>
-            {item.label}
-            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg>
-          </a>
-          <div class="mega-menu">
-            <div class="mega-menu__lead">
-              <span>{item.label}</span>
-              <strong>Direkter Zugang zu Fachkompetenz.</strong>
-              <p>Leistungen, Wissen und digitale Standards des SV-Netzwerks strukturiert erschließen.</p>
-              <a href={item.href}>Bereich öffnen <span aria-hidden="true">→</span></a>
-            </div>
-            <div class="mega-menu__links">
-              {item.children.map((child) => (
-                <a href={child.href}>
-                  <span><strong>{child.label}</strong><small>{child.description}</small></span>
-                  <b aria-hidden="true">↗</b>
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <a class:list={["desktop-navigation__link", { "is-active": active(item.href) }]} href={item.href}>{item.label}</a>
-      ))}
-    </nav>
+    <Navigation items={navigation} currentPath={currentPath} />
 
-    <div class="navigation-actions">
-      <button class="icon-button desktop-search" type="button" data-search-open aria-label="Suche öffnen">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
-      </button>
-      <a class="header-contact" href="/kontakt/">Kontakt</a>
-      <a class="header-cta" href="/schaden-melden/">Schaden melden <span aria-hidden="true">→</span></a>
-      <button class="mobile-toggle" type="button" data-mobile-toggle aria-controls="mobile-navigation" aria-expanded="false">
-        <span class="mobile-toggle__icon" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="mobile-toggle__label">Menü</span>
-      </button>
+    <div class="site-header__actions">
+      <SearchButton />
+      <a class="header-link" href="/kontakt/">Kontakt</a>
+      <a class="header-cta" href="/schaden-melden/">
+        Schaden melden
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" /></svg>
+      </a>
+      <HamburgerButton />
     </div>
   </div>
 </header>
 
-<div class="mobile-backdrop" data-mobile-backdrop hidden></div>
-<aside id="mobile-navigation" class="mobile-navigation" data-mobile-navigation aria-hidden="true" aria-label="Mobile Navigation">
-  <div class="mobile-navigation__head">
-    <a class="brand brand--mobile" href="/">
-      <span class="brand__mark"><span>SV</span></span>
-      <span class="brand__text"><strong>SV-Netzwerk</strong><small>Navigation</small></span>
-    </a>
-    <button class="mobile-close" type="button" data-mobile-close aria-label="Menü schließen">×</button>
-  </div>
-
-  <div class="mobile-navigation__body">
-    <a class="mobile-home" href="/">Startseite</a>
-    {nav.map((item) => item.children ? (
-      <details class="mobile-group">
-        <summary><span>{item.label}</span><b aria-hidden="true">+</b></summary>
-        <div class="mobile-group__links">
-          <a href={item.href}><strong>{item.label} – Übersicht</strong></a>
-          {item.children.map((child) => <a href={child.href}>{child.label}</a>)}
-        </div>
-      </details>
-    ) : (
-      <a class="mobile-direct" href={item.href}>{item.label}</a>
-    ))}
-  </div>
-
-  <div class="mobile-navigation__footer">
-    <button type="button" class="mobile-search" data-search-open>Website durchsuchen</button>
-    <a class="mobile-primary" href="/schaden-melden/">Schaden melden</a>
-    <a class="mobile-secondary" href="/kontakt/">Kontakt aufnehmen</a>
-  </div>
-</aside>
+<MobileMenu items={navigation} currentPath={currentPath} />
 
 <script is:inline>
   (() => {
     const header = document.querySelector('[data-site-header]');
-    const toggle = document.querySelector('[data-mobile-toggle]');
-    const close = document.querySelector('[data-mobile-close]');
-    const menu = document.querySelector('[data-mobile-navigation]');
-    const backdrop = document.querySelector('[data-mobile-backdrop]');
-    let lastFocused = null;
-
-    const setMenu = (open) => {
-      if (!toggle || !menu || !backdrop) return;
-      if (open) lastFocused = document.activeElement;
-      toggle.setAttribute('aria-expanded', String(open));
-      menu.setAttribute('aria-hidden', String(!open));
-      menu.classList.toggle('is-open', open);
-      backdrop.hidden = !open;
-      requestAnimationFrame(() => backdrop.classList.toggle('is-open', open));
-      document.documentElement.classList.toggle('has-open-menu', open);
-      if (open) menu.querySelector('[data-mobile-close]')?.focus();
-      else if (lastFocused instanceof HTMLElement) lastFocused.focus();
-    };
-
-    toggle?.addEventListener('click', () => setMenu(toggle.getAttribute('aria-expanded') !== 'true'));
-    close?.addEventListener('click', () => setMenu(false));
-    backdrop?.addEventListener('click', () => setMenu(false));
-    menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setMenu(false)));
-    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') setMenu(false); });
-
-    const updateHeader = () => header?.classList.toggle('is-scrolled', window.scrollY > 18);
+    const updateHeader = () => header?.classList.toggle('is-scrolled', window.scrollY > 12);
     updateHeader();
     window.addEventListener('scroll', updateHeader, { passive: true });
   })();
 </script>
-
-<style>
-  .site-header{position:sticky;top:0;z-index:90;border-bottom:1px solid rgba(7,26,46,.09);background:rgba(255,255,255,.94);backdrop-filter:blur(18px) saturate(150%);transition:box-shadow .2s ease,background .2s ease}.site-header.is-scrolled{background:rgba(255,255,255,.98);box-shadow:0 16px 40px rgba(7,26,46,.12)}
-  .service-bar{background:#06192c;color:#dce7ef;font-size:.76rem}.service-bar__inner{display:flex;min-height:2.15rem;align-items:center;justify-content:flex-end;gap:1.4rem}.service-bar a{color:#fff;font-weight:800;text-decoration:none}.service-bar__cert{color:#ffbd5c}
-  .navigation-shell{display:flex;min-height:5.65rem;align-items:center;justify-content:space-between;gap:2rem;transition:min-height .2s ease}.is-scrolled .navigation-shell{min-height:4.8rem}
-  .brand{display:inline-flex;flex:none;align-items:center;gap:.85rem;color:#071a2e;text-decoration:none}.brand__mark{display:grid;width:3.15rem;aspect-ratio:1;place-items:center;border-radius:1rem;background:linear-gradient(145deg,#0b4f7a,#06192c);box-shadow:0 12px 30px rgba(11,79,122,.26)}.brand__mark span{display:grid;width:2.1rem;aspect-ratio:1;place-items:center;border:1px solid rgba(255,255,255,.35);transform:rotate(45deg);color:#fff;font-size:.72rem;font-weight:950}.brand__mark span::first-line{transform:rotate(-45deg)}.brand__text strong,.brand__text small{display:block;line-height:1.08}.brand__text strong{font-size:1.08rem;letter-spacing:-.02em}.brand__text small{margin-top:.32rem;color:#62788b;font-size:.66rem;font-weight:850;letter-spacing:.11em;text-transform:uppercase}
-  .desktop-navigation{display:flex;align-items:stretch;gap:.25rem}.desktop-navigation__item{position:relative;display:flex;align-items:center}.desktop-navigation__link{display:flex;min-height:3rem;align-items:center;gap:.25rem;padding:.65rem .8rem;border-radius:.75rem;color:#28455e;font-size:.91rem;font-weight:850;text-decoration:none}.desktop-navigation__link svg{width:.8rem;fill:none;stroke:currentColor;stroke-width:1.8}.desktop-navigation__link:hover,.desktop-navigation__link.is-active{background:#f0f6fa;color:#071a2e}.desktop-navigation__link.is-active::after{position:absolute;right:.8rem;bottom:.15rem;left:.8rem;height:2px;border-radius:2px;background:#ff9d12;content:""}
-  .mega-menu{position:absolute;top:calc(100% + .7rem);left:50%;display:grid;width:min(47rem,80vw);grid-template-columns:.9fr 1.5fr;gap:1rem;transform:translate(-50%,-.5rem);padding:1rem;border:1px solid #d8e3ea;border-radius:1.45rem;background:#fff;box-shadow:0 30px 80px rgba(7,26,46,.19);opacity:0;visibility:hidden;transition:opacity .18s ease,transform .18s ease,visibility .18s ease}.desktop-navigation__item:hover .mega-menu,.desktop-navigation__item:focus-within .mega-menu{transform:translate(-50%,0);opacity:1;visibility:visible}.mega-menu__lead{padding:1.55rem;border-radius:1.1rem;background:linear-gradient(145deg,#071a2e,#0b4f7a);color:#fff}.mega-menu__lead>span{color:#ffbd5c;font-size:.72rem;font-weight:950;letter-spacing:.14em;text-transform:uppercase}.mega-menu__lead strong{display:block;margin:.8rem 0;font-size:1.45rem;line-height:1.12}.mega-menu__lead p{color:#c7d7e3;font-size:.9rem}.mega-menu__lead>a{display:inline-flex;gap:.4rem;color:#fff;font-weight:850;text-decoration:none}.mega-menu__links{display:grid;grid-template-columns:1fr 1fr;gap:.35rem}.mega-menu__links>a{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;padding:1rem;border-radius:.9rem;color:#071a2e;text-decoration:none}.mega-menu__links>a:hover{background:#f1f6f9}.mega-menu__links strong,.mega-menu__links small{display:block}.mega-menu__links strong{font-size:.9rem}.mega-menu__links small{margin-top:.25rem;color:#62788b;font-size:.76rem;line-height:1.35}.mega-menu__links b{color:#ff9d12}
-  .navigation-actions{display:flex;flex:none;align-items:center;gap:.55rem}.icon-button,.mobile-toggle{border:1px solid #d5e0e7;background:#fff;color:#071a2e}.icon-button{display:grid;width:2.85rem;height:2.85rem;place-items:center;border-radius:.82rem;cursor:pointer}.icon-button svg{width:1.15rem;fill:none;stroke:currentColor;stroke-width:1.9}.header-contact{padding:.72rem .45rem;color:#28455e;font-size:.88rem;font-weight:850;text-decoration:none}.header-cta{display:inline-flex;min-height:2.95rem;align-items:center;gap:.55rem;padding:.7rem 1rem;border-radius:.8rem;background:#ff9d12;color:#111b22;font-size:.87rem;font-weight:950;text-decoration:none;box-shadow:0 12px 28px rgba(255,157,18,.25)}.header-cta:hover{background:#ed8c00;color:#111b22}
-  .mobile-toggle{display:none;min-height:3rem;align-items:center;gap:.55rem;padding:.6rem .78rem;border-radius:.82rem;cursor:pointer}.mobile-toggle__icon{display:grid;gap:4px}.mobile-toggle__icon i{display:block;width:1.25rem;height:2px;border-radius:2px;background:currentColor}.mobile-toggle__label{font-size:.82rem;font-weight:950}
-  .mobile-backdrop{position:fixed;inset:0;z-index:109;background:rgba(4,15,27,.7);opacity:0;transition:opacity .22s ease}.mobile-backdrop.is-open{opacity:1}.mobile-navigation{position:fixed;top:0;right:0;z-index:110;display:flex;width:min(29rem,94vw);height:100dvh;flex-direction:column;transform:translateX(103%);background:#fff;box-shadow:-30px 0 80px rgba(4,15,27,.24);visibility:hidden;transition:transform .28s ease,visibility .28s ease}.mobile-navigation.is-open{transform:none;visibility:visible}.mobile-navigation__head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.1rem;border-bottom:1px solid #d8e3ea}.brand--mobile .brand__mark{width:2.75rem}.mobile-close{display:grid;width:2.75rem;height:2.75rem;place-items:center;border:0;border-radius:.8rem;background:#edf3f6;color:#071a2e;font-size:1.8rem;cursor:pointer}.mobile-navigation__body{flex:1;overflow:auto;padding:.75rem 1.1rem}.mobile-home,.mobile-direct{display:flex;padding:1rem .2rem;border-bottom:1px solid #e1e8ed;color:#071a2e;font-weight:900;text-decoration:none}.mobile-group{border-bottom:1px solid #e1e8ed}.mobile-group summary{display:flex;align-items:center;justify-content:space-between;padding:1rem .2rem;color:#071a2e;font-weight:950;cursor:pointer;list-style:none}.mobile-group summary::-webkit-details-marker{display:none}.mobile-group summary b{display:grid;width:1.75rem;height:1.75rem;place-items:center;border-radius:.5rem;background:#edf3f6;color:#0b4f7a}.mobile-group[open] summary b{transform:rotate(45deg)}.mobile-group__links{display:grid;padding:0 0 .8rem .6rem}.mobile-group__links a{padding:.68rem .75rem;border-radius:.65rem;color:#36546d;font-size:.9rem;font-weight:760;text-decoration:none}.mobile-group__links a:hover{background:#edf3f6}.mobile-navigation__footer{display:grid;gap:.6rem;padding:1rem 1.1rem calc(1rem + env(safe-area-inset-bottom));border-top:1px solid #d8e3ea;background:#f7fafc}.mobile-search,.mobile-primary,.mobile-secondary{display:flex;min-height:3.1rem;align-items:center;justify-content:center;border-radius:.8rem;font-weight:900;text-decoration:none}.mobile-search{border:1px solid #cfdce5;background:#fff;color:#071a2e}.mobile-primary{background:#ff9d12;color:#111b22}.mobile-secondary{border:1px solid #0b4f7a;color:#0b4f7a}
-  @media(max-width:76rem){.desktop-navigation,.desktop-search,.header-contact{display:none}.mobile-toggle{display:flex}}
-  @media(max-width:48rem){.service-bar{display:none}.navigation-shell{min-height:4.75rem;gap:.75rem}.is-scrolled .navigation-shell{min-height:4.4rem}.brand__mark{width:2.7rem;border-radius:.85rem}.brand__text small{display:none}.header-cta{display:none}.mobile-toggle{display:flex}.mobile-toggle__label{display:inline}.navigation-actions{margin-left:auto}}
-  @media(max-width:23rem){.brand__text strong{font-size:.98rem}.mobile-toggle__label{display:none}}
-</style>
