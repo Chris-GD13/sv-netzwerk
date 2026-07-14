@@ -1,19 +1,23 @@
-# Manifest – SV-Netzwerk v1.5.4
+# Manifest – SV-Netzwerk v1.6.0
 
-## Neue Dateien
-- `sv-netzwerk/src/components/PerformanceHints.astro`
-- `sv-netzwerk/src/components/AccessibilityStatus.astro`
-- `sv-netzwerk/src/pages/barrierefreiheit/index.astro`
+## Neu
+- `sv-netzwerk/src/content.config.ts`
+- `sv-netzwerk/src/content/knowledge/svos-foundation.md`
+- `sv-netzwerk/src/content/downloads/schadenaufnahme-pruefliste.md`
+- `sv-netzwerk/src/content/practice-cases/leitungswasser-technische-abgrenzung.md`
+- `sv-netzwerk/src/content/authors/christian-waechter.json`
+- `sv-netzwerk/src/types/svos.ts`
+- `sv-netzwerk/src/utils/content.ts`
+- `sv-netzwerk/src/utils/routes.ts`
+- `sv-netzwerk/src/pages/svos/index.astro`
+- `docs/releases/v1.6.0/ARCHITECTURE.md`
+- `docs/releases/v1.6.0/MIGRATION.md`
 
-## Geänderte Kerndateien
-- `sv-netzwerk/src/layouts/BaseLayout.astro`
-- `sv-netzwerk/src/components/Header.astro`
-- `sv-netzwerk/src/components/Footer.astro`
-- `sv-netzwerk/src/styles/tokens.css`
-- `sv-netzwerk/src/styles/global.css`
-- `sv-netzwerk/package.json`
-- `sv-netzwerk/package-lock.json`
+## Aktualisiert
+- `VERSION`
 - `CHANGELOG.md`
 - `RELEASE_NOTES.md`
 - `VALIDATION.md`
-- `VERSION`
+- `sv-netzwerk/package.json`
+- `sv-netzwerk/package-lock.json`
+- `sv-netzwerk/CHANGELOG.md`

@@ -1,18 +1,18 @@
-# Validation – SV-Netzwerk v1.5.4
+# Validation – v1.6.0
 
-## Durchgeführte Prüfungen
-- `npm ci --no-audit --no-fund`
-- `npm run build`
-- Astro Check für 51 Dateien
-- statischer Produktionsbuild
-- Erzeugung aller Fachwissens-, Tag-, Kategorie-, Such- und Systemseiten
+- [x] Versionsnummern auf 1.6.0 aktualisiert
+- [x] vier Content Collections definiert
+- [x] Schemas für Veröffentlichung und SEO ergänzt
+- [x] Beispieldatensätze für alle Collections angelegt
+- [x] zentrale SVOS-Typen und Utilities ergänzt
+- [x] SVOS-Statusseite angelegt
+- [x] `npm ci` erfolgreich
+- [x] `npm run build` erfolgreich
+- [ ] GitHub Actions erfolgreich
+- [ ] IONOS-Deployment erfolgreich
 
-## Ergebnis
-- Astro Check: 0 Fehler, 0 Warnungen, 0 Hinweise
+## Lokales Ergebnis
+- Astro Check: 0 Fehler, 0 Warnungen
 - Produktionsbuild: erfolgreich
-- erzeugte Seiten: 59
+- erzeugte Seiten: 60
 - Sitemap: erfolgreich erzeugt
-- neue Seite `/barrierefreiheit/`: erfolgreich erzeugt
-
-## Zusätzlich behobener Bestandsfehler
-`BaseLayout.astro` unterstützt nun die bereits von der Komponenten-Referenzseite verwendete `breadcrumbs`-Property und bindet die Breadcrumb-Komponente zentral ein.

@@ -1,16 +1,21 @@
-# Release Notes – SV-Netzwerk v1.5.4
+# Release Notes – SV-Netzwerk v1.6.0 SVOS Foundation
 
-## Schwerpunkt
-Performance, Barrierefreiheit und technische Robustheit.
+## Ziel
+Version 1.6.0 schafft die verbindliche Content- und Datenarchitektur des SV Operating System (SVOS). Inhalte werden nicht mehr ausschließlich in statischen Datenlisten geführt, sondern können über validierte Astro Content Collections verarbeitet werden.
 
-## Änderungen
-- scrolloptimierter Sticky Header mit `requestAnimationFrame`
-- Escape- und Fokusverhalten für das mobile Menü
-- ARIA-Livestatus für Menüaktionen
-- zentrale Performance-Hinweise und optionale Bildvorladung
-- `content-visibility` für umfangreiche Start- und Bibliotheksseiten
-- verbesserte Fokus-, Kontrast-, Druck- und Reduced-Motion-Regeln
-- Mindestgrößen für interaktive Bedienelemente
-- neue Informationsseite `/barrierefreiheit/`
-- Design-Tokens und globale Styles erweitert
-- Versions- und Projektdokumentation auf 1.5.4 aktualisiert
+## Neue Collections
+- `knowledge`: Fachartikel und technische Wissensbausteine
+- `downloads`: Checklisten, Formulare und Arbeitshilfen
+- `practiceCases`: anonymisierte Praxisfälle
+- `authors`: Autoren- und Fachprofile
+
+## Technische Grundlagen
+- zentrale Veröffentlichungssystematik mit `draft`, `review`, `published` und `archived`
+- einheitliche SEO-Metadaten
+- zentrale Typdefinitionen
+- wiederverwendbare Content-Utilities
+- verbindliche Routing-Helfer
+- Statusseite `/svos/`
+
+## Kompatibilität
+Die vorhandene Fachwissensbibliothek und die bestehenden statischen Datenquellen bleiben erhalten. Die Migration auf die neuen Collections erfolgt schrittweise in den Folgeversionen.

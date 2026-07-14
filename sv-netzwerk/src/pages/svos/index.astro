@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import StatCard from '../../components/StatCard.astro';
+import InfoGrid from '../../components/InfoGrid.astro';
+
+const [knowledge, downloads, practiceCases, authors] = await Promise.all([
+  getCollection('knowledge'),
+  getCollection('downloads'),
+  getCollection('practiceCases'),
+  getCollection('authors'),
+]);
+---
+<BaseLayout
+  title="SVOS Foundation | SV-Netzwerk"
+  description="Technische Grundlage des SV Operating System für strukturierte Inhalte, Datenmodelle und skalierbare Fachportale."
+  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'SVOS Foundation' }]}
+>
+  <Hero eyebrow="Version 1.6.0" title="SVOS Foundation" text="Einheitliche Datenmodelle, validierte Inhalte und wiederverwendbare technische Grundlagen für das SV-Netzwerk." />
+
+  <section class="sv-section">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Systemstatus" title="Strukturierte Inhaltsbereiche" text="Alle Kernbereiche werden durch Content Collections mit verbindlichen Schemas abgebildet." />
+      <InfoGrid columns={4}>
+        <StatCard value={String(knowledge.length)} label="Fachwissen" />
+        <StatCard value={String(downloads.length)} label="Downloads" />
+        <StatCard value={String(practiceCases.length)} label="Praxisfälle" />
+        <StatCard value={String(authors.length)} label="Autoren" />
+      </InfoGrid>
+    </div>
+  </section>
+
+  <section class="sv-section sv-section--muted">
+    <div class="sv-container prose">
+      <SectionHeader eyebrow="Architektur" title="Verbindliche SVOS-Grundlagen" />
+      <ul>
+        <li>Validierte Schemas für Fachwissen, Downloads, Praxisfälle und Autoren</li>
+        <li>Einheitliche Veröffentlichungsstatus: Entwurf, Prüfung, veröffentlicht und archiviert</li>
+        <li>Zentrale TypeScript-Typen für SEO, Taxonomien und Suchdokumente</li>
+        <li>Utility-Module für Sortierung, Veröffentlichung, Slugs und Routen</li>
+        <li>Vorbereitung für Knowledge Engine, Suche, Downloadcenter und Praxisfalldatenbank</li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
