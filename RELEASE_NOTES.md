@@ -1,19 +1,15 @@
-# Release Notes – SV-Netzwerk v1.6.4 Download Center
+# Release Notes – SV-Netzwerk v1.7.0 Visual Redesign
 
 ## Zweck
+Sichtbare Modernisierung der produktiven Website auf Basis des bestehenden Astro-/SVOS-Repositorys.
 
-Dieses Release erweitert die SVOS-Grundlage um ein zentrales, versioniertes Download Center.
+## Änderungen
+- vollständig überarbeiteter Header mit Akzentleiste, Mega-Menüs, Suche und klarer Schaden-CTA
+- neuer Hero mit SVOS-Systemgrafik, Vertrauensmerkmalen und klarer Handlungsführung
+- neu strukturierte Startseite mit Prozessleiste, Leistungsmodulen, SVOS-Workflow, Fachwissen und Expertenbereich
+- modernisiertes Farb-, Typografie-, Button-, Karten- und Abstandsdesign
+- vollständig modernisierter Footer mit prominenter Kontakt-CTA
+- responsive Optimierungen für Navigation, Hero und Inhaltsraster
 
-## Enthalten
-
-- Content-Collection-basierte Downloadverwaltung
-- Downloadkarten mit Kategorie, Tags, Version, Dateityp und Aktualisierungsstand
-- clientseitige Suche und Kategorienfilter
-- statische Detailseiten für veröffentlichte Downloads
-- gemeinsame Typen und Utilities
-- drei tatsächlich bereitgestellte PDF-Arbeitshilfen
-- vorbereitete Zielgruppen- und Versionsfelder
-
-## Sicherheit und Nachvollziehbarkeit
-
-Nur Datensätze mit Status `published` werden öffentlich ausgegeben. Hinweise zur fallbezogenen Prüfung bleiben Bestandteil jeder Detailseite.
+## Technischer Stand
+Die bestehenden Content Collections, Fachwissens-, Such-, Download- und Praxisfallmodule bleiben erhalten.

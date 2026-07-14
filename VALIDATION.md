@@ -1,9 +1,8 @@
-# Validierung – SV-Netzwerk v1.6.4
+# Validation – SV-Netzwerk v1.7.0 Visual Redesign
 
-- [x] Download-Collection erweitert
-- [x] ausschließlich veröffentlichte Datensätze werden angezeigt
-- [x] Filter und Live-Status barrierearm umgesetzt
-- [x] Detailseiten statisch generiert
-- [x] Downloadpfade zeigen auf vorhandene Dateien
-- [ ] GitHub Actions nach Übernahme prüfen
-- [ ] IONOS-Deployment nach Push prüfen
+- `npm ci --no-audit --no-fund`: erfolgreich
+- `npm run build`: erfolgreich
+- Astro Check: 81 Dateien, 0 Fehler, 0 Warnungen
+- Astro Build: 83 Seiten erfolgreich erzeugt
+- Sitemap: erfolgreich erzeugt
+- geprüfte Kernbereiche: Header, Mega-Menü, Mobile Navigation, Hero, Startseite, Karten-/Button-System, Footer
