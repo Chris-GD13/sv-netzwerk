@@ -1,3 +1,61 @@
 name: Lighthouse
+
 on:
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Node.js einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Website bauen
+        run: npm run build
+
+      - name: Statischen Server starten
+        run: |
+          npx --yes serve@14 dist -l 4173 > /tmp/sv-netzwerk-serve.log 2>&1 &
+          echo $! > /tmp/sv-netzwerk-serve.pid
+          for i in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:4173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/sv-netzwerk-serve.log
+          exit 1
+
+      - name: Lighthouse-Bericht erzeugen
+        run: |
+          mkdir -p lighthouse-results
+          npx --yes lighthouse@12 http://127.0.0.1:4173/ \
+            --chrome-flags="--headless --no-sandbox" \
+            --output=html \
+            --output=json \
+            --output-path=./lighthouse-results/report
+
+      - name: Lighthouse-Bericht speichern
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: sv-netzwerk/lighthouse-results/
+          retention-days: 14

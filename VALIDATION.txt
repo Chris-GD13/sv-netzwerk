@@ -1,0 +1,6 @@
+YAML-Syntaxprüfung erfolgreich:
+- .github/dependabot.yml: OK
+- .github/workflows/build-check.yml: OK
+- .github/workflows/linkcheck.yml: OK
+- .github/workflows/html-validator.yml: OK
+- .github/workflows/lighthouse.yml: OK

@@ -1,4 +1,44 @@
 name: Link Checker
+
 on:
-  schedule:
-    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linkcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Node.js einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+
+      - name: Abhängigkeiten installieren
+        working-directory: sv-netzwerk
+        run: npm ci
+
+      - name: Website bauen
+        working-directory: sv-netzwerk
+        run: npm run build
+
+      - name: Links in der Build-Ausgabe prüfen
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --verbose
+            --no-progress
+            --exclude-mail
+            --max-retries 2
+            --accept 200,204,206,301,302,307,308,429
+            "sv-netzwerk/dist/**/*.html"
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
