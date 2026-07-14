@@ -11,17 +11,13 @@ export const site = {
     role: 'Sachverständiger & Großschadenregulierer',
     qualification: 'DIN EN ISO/IEC 17024 zertifiziert'
   },
-  version: '5.1.2',
+  version: '5.1.3',
   navigation: [
     { label: 'Leistungen', href: '/leistungen/' },
     { label: 'Schadenarten', href: '/schadenarten/' },
-    { label: 'Fachwissen', href: '/fachwissen/' },
-    { label: 'Praxisfälle', href: '/praxisfaelle/' },
-    { label: 'Downloads', href: '/downloads/' },
+    { label: 'Wissen', href: '/fachwissen/' },
     { label: 'Experten', href: '/experten/' },
     { label: 'Netzwerk', href: '/netzwerk/' },
-    { label: 'SVOS', href: '/svos/' },
-    { label: 'Über uns', href: '/ueber-uns/' },
     { label: 'Kontakt', href: '/kontakt/' }
   ]
 } as const;

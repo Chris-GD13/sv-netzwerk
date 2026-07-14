@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.1.3 – 2026-07-14
+
+- Hauptnavigation von zehn auf sechs klare Einstiege reduziert
+- Fachwissen, Praxisfälle, Downloads und Kurzvideos unter „Wissen“ gebündelt
+- SVOS, Gutachter-Plattform, Über uns und Fachpartner im Netzwerk-Menü zusammengeführt
+- identische Informationsarchitektur für Desktop- und Mobilnavigation sichergestellt
+
 ## 5.1.2 – 2026-07-14
 
 - zentrales Astro-Layout auf den weiterhin verlinkten Altseiten eingeführt

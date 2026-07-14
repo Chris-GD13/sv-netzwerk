@@ -42,7 +42,7 @@ export const navigation: NavItem[] = [
     ],
   },
   {
-    label: 'Fachwissen',
+    label: 'Wissen',
     href: '/fachwissen/',
     description: 'Fachliche Grundlagen für Prüfung, Dokumentation und Entscheidung.',
     children: [
@@ -53,11 +53,17 @@ export const navigation: NavItem[] = [
       { label: 'Wissen in 180 Sekunden', href: '/wissen-in-180-sekunden/', description: 'Kernfragen kompakt und fachlich präzise erklärt.' },
     ],
   },
-  { label: 'Praxisfälle', href: '/praxisfaelle/' },
-  { label: 'Downloads', href: '/downloads/' },
   { label: 'Experten', href: '/experten/' },
-  { label: 'Netzwerk', href: '/netzwerk/' },
-  { label: 'SVOS', href: '/svos/' },
-  { label: 'Über uns', href: '/ueber-uns/' },
+  {
+    label: 'Netzwerk',
+    href: '/netzwerk/',
+    description: 'Menschen, Organisation und digitale Zusammenarbeit im SV-Netzwerk.',
+    children: [
+      { label: 'Über uns', href: '/ueber-uns/', description: 'Arbeitsweise, Qualitätsverständnis und Verantwortung.' },
+      { label: 'Fachpartner', href: '/partner/', description: 'Spezialisierte Partner und ergänzende Fachkompetenz.' },
+      { label: 'SVOS Core Platform', href: '/svos/', description: 'Die gemeinsame Daten-, Wissens- und Prozessstruktur.' },
+      { label: 'Gutachter-Plattform', href: '/gutachter-plattform/', description: 'Strukturierte Zusammenarbeit für moderne Gutachtenprozesse.' },
+    ],
+  },
   { label: 'Kontakt', href: '/kontakt/' },
 ];
