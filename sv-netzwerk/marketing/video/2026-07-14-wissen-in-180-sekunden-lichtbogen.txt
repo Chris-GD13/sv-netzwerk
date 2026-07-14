@@ -1,0 +1,24 @@
+WISSEN IN 180 SEKUNDEN
+
+Titel: Lichtbogen an LED-Lichtleisten – warum geringe Leistung nicht vor Brand schützt
+
+Eine LED-Lichtleiste hat meist nur eine geringe Anschlussleistung. Trotzdem kann sie zur Brandursache werden.
+
+Der Grund ist häufig kein klassischer Kurzschluss, sondern eine lockere oder beschädigte Kontaktstelle. Dort steigt der Übergangswiderstand. Die Verbindung erwärmt sich, Material verkohlt und schließlich kann ein serieller Lichtbogen entstehen. Dabei konzentriert sich die Energie auf einen sehr kleinen Bereich. Die Temperatur reicht aus, um Kunststoffgehäuse oder angrenzende Textilien zu entzünden.
+
+Das Gefährliche: Der Strom kann unterhalb des Auslösestroms des Leitungsschutzschalters bleiben. Die Sicherung muss also nicht sofort abschalten.
+
+Bei der Untersuchung dürfen Schmelzstellen nicht vorschnell als Ursache bewertet werden. Leitungen können auch erst durch den bereits laufenden Brand beschädigt werden. Dann handelt es sich um sekundäre Lichtbogenspuren.
+
+Entscheidend sind deshalb vier Punkte:
+
+Erstens: die unveränderte Spurenlage fotografisch sichern.
+Zweitens: Leuchte, Netzteil, Anschlussleitung und Kontakte zusammenhängend untersuchen.
+Drittens: primäre und sekundäre Schmelzspuren abgrenzen.
+Viertens: regressrelevante Bauteile nicht entsorgen, sondern eindeutig gekennzeichnet asservieren.
+
+Für die Regulierung werden anschließend Brand-, Rauch-, Ruß- und Löschschäden getrennt erfasst. Zusätzlich ist zu prüfen, ob ein Produkt-, Montage- oder Wartungsfehler vorliegt.
+
+Die Kernaussage lautet: Eine geringe elektrische Leistung bedeutet nicht automatisch ein geringes Brandrisiko. Entscheidend sind Kontaktqualität, Einbausituation und eine fachgerechte Ursachenanalyse.
+
+Mehr dazu unter sv-netzwerk.eu im Bereich Fachwissen.
