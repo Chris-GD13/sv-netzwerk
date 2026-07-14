@@ -1,0 +1,55 @@
+---
+import HomeNavigation from './HomeNavigation.astro';
+import HomeMobileMenu from './HomeMobileMenu.astro';
+
+export type HomeNavChild = { label: string; href: string; text: string };
+export type HomeNavItem = { label: string; href: string; text?: string; children?: HomeNavChild[] };
+interface Props { currentPath: string }
+const { currentPath } = Astro.props;
+
+const items: HomeNavItem[] = [
+  { label: 'Leistungen', href: '/leistungen/', text: 'Technische Klarheit für jede Schadenphase.', children: [
+    { label: 'Sachverständigenleistung', href: '/leistungen/', text: 'Feststellen, bewerten und nachvollziehbar empfehlen.' },
+    { label: 'Komplexschäden', href: '/komplexschaeden/', text: 'Interdisziplinäre Bearbeitung anspruchsvoller Schäden.' },
+    { label: 'Großschadenregulierung', href: '/grossschadenregulierung/', text: 'Strukturierte Steuerung hoher Schadenvolumina.' },
+  ]},
+  { label: 'Wissen', href: '/fachwissen/', text: 'Praxiserprobtes Wissen für bessere Entscheidungen.', children: [
+    { label: 'Fachwissen', href: '/fachwissen/', text: 'Beiträge aus Bautechnik und Schadenregulierung.' },
+    { label: 'Praxisfälle', href: '/praxisfaelle/', text: 'Reale Fälle mit Feststellung und Empfehlung.' },
+    { label: 'Downloads', href: '/downloads/', text: 'Prüfschemata und Checklisten für die Praxis.' },
+  ]},
+  { label: 'SVOS', href: '/svos/', text: 'Der Standard für konsistente Schadenbearbeitung.', children: [
+    { label: 'Operating System', href: '/svos/', text: 'Prozesse, Wissen und Qualität in einem System.' },
+    { label: 'Gutachter-Plattform', href: '/gutachter-plattform/', text: 'Digitale Zusammenarbeit für Sachverständige.' },
+    { label: 'Netzwerk', href: '/netzwerk/', text: 'Spezialwissen gezielt und verantwortlich verbinden.' },
+  ]},
+  { label: 'Kontakt', href: '/kontakt/' },
+];
+---
+
+<header class="v4-header" data-v4-header>
+  <div class="v4-shell v4-header__inner">
+    <a class="v4-brand" href="/" aria-label="SV-Netzwerk – Startseite">
+      <span class="v4-brand__icon" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span><strong>SV-Netzwerk</strong><small>Bau · Schaden · Regulierung</small></span>
+    </a>
+    <HomeNavigation items={items} currentPath={currentPath} />
+    <div class="v4-header__actions">
+      <a class="v4-search" href="/suche/" aria-label="Website durchsuchen">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/></svg>
+      </a>
+      <a class="v4-header__cta" href="/schaden-melden/">Schaden melden <span aria-hidden="true">↗</span></a>
+      <button class="v4-menu-button" type="button" aria-controls="v4-mobile-menu" aria-expanded="false" data-v4-menu-open>
+        <span aria-hidden="true"><i></i><i></i></span><b>Menü</b>
+      </button>
+    </div>
+  </div>
+</header>
+<HomeMobileMenu items={items} currentPath={currentPath} />
+
+<script is:inline>
+  const v4Header = document.querySelector('[data-v4-header]');
+  const setV4HeaderState = () => v4Header?.classList.toggle('is-scrolled', window.scrollY > 20);
+  setV4HeaderState();
+  window.addEventListener('scroll', setV4HeaderState, { passive: true });
+</script>

@@ -1,0 +1,5 @@
+---
+import { getCollection } from 'astro:content';
+const downloads = (await getCollection('downloads')).filter((entry) => entry.data.publication.status === 'published').sort((a,b) => b.data.publication.publishedAt.getTime()-a.data.publication.publishedAt.getTime()).slice(0,3);
+---
+<section class="v4-section v4-downloads"><div class="v4-shell v4-downloads__layout"><div class="v4-downloads__intro"><p class="v4-kicker"><span></span>Werkzeuge für die Praxis</p><h2>Prüfen.<br/>Einordnen.<br/>Dokumentieren.</h2><p>Unsere Arbeitshilfen bringen Struktur in wiederkehrende Prüfschritte und machen Ergebnisse schneller nachvollziehbar.</p><a class="v4-button v4-button--outline" href="/downloads/">Alle Downloads <span>→</span></a></div><div class="v4-downloads__list">{downloads.map((entry,index) => <a href={`/downloads/${entry.id}/`}><span class="v4-downloads__number">0{index+1}</span><div><small>{entry.data.category} · {entry.data.fileType}{entry.data.fileSize ? ` · ${entry.data.fileSize}` : ''}</small><h3>{entry.data.title}</h3><p>{entry.data.description}</p></div><b aria-hidden="true">↓</b></a>)}</div></div></section>

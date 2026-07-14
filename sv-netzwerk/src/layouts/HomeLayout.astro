@@ -1,0 +1,31 @@
+---
+import SEO from '../components/SEO.astro';
+import PerformanceHints from '../components/PerformanceHints.astro';
+import AccessibilityStatus from '../components/AccessibilityStatus.astro';
+import HomeHeader from '../components/home/HomeHeader.astro';
+import HomeFooter from '../components/home/HomeFooter.astro';
+import '../styles/global.css';
+import '../styles/home-v4.css';
+
+interface Props { title: string; description: string }
+const props = Astro.props;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a2238" />
+    <meta name="color-scheme" content="light" />
+    <PerformanceHints />
+    <SEO {...props} />
+  </head>
+  <body class="home-v4">
+    <a class="v4-skip" href="#home-main">Zum Inhalt springen</a>
+    <AccessibilityStatus />
+    <HomeHeader currentPath={Astro.url.pathname} />
+    <main id="home-main" tabindex="-1"><slot /></main>
+    <HomeFooter />
+  </body>
+</html>

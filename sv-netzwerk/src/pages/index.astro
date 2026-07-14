@@ -1,53 +1,23 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/Hero.astro';
-import ArticleCard from '../components/ArticleCard.astro';
-import SectionHeader from '../components/SectionHeader.astro';
-import CallToAction from '../components/CallToAction.astro';
-import { library } from '../data/library';
-const articles = library.filter(i => i.type === 'article').slice(0,3);
-const services = [
-  {n:'01',title:'Komplex- und Großschäden',text:'Technische Einordnung, Reservebewertung und strukturierte Steuerung mehrstufiger Schadenverläufe.',href:'/komplexschaeden/'},
-  {n:'02',title:'Sachverständigenleistungen',text:'Belastbare Feststellungen, fachliche Bewertungen und klare Empfehlungen für Auftraggeber und Versicherer.',href:'/leistungen/'},
-  {n:'03',title:'Großschadenregulierung',text:'Nachvollziehbare Schadenbearbeitung von der Erstaufnahme bis zur Schlusserklärung.',href:'/grossschadenregulierung/'},
-  {n:'04',title:'Gutachter-Plattform',text:'Digitale Zusammenarbeit, Wissenszugriff und vernetzte Fachkompetenz für moderne Prozesse.',href:'/gutachter-plattform/'}
-];
-const cases = [
-  {tag:'Brandschaden',title:'Lichtbogen an einer Lichtleiste',text:'Technische Ursachenabgrenzung zwischen elektrischem Defekt, Folgeschaden und Sanierungsumfang.',href:'/praxisfaelle/'},
-  {tag:'Leitungswasser',title:'Rückbau technisch begrenzen',text:'Warum ein vollständiger Rückbau nicht automatisch erforderlich und eine differenzierte Prüfung entscheidend ist.',href:'/praxisfaelle/'},
-  {tag:'Schimmel',title:'Dachbereich fachlich einordnen',text:'Abgrenzung von Feuchteursache, Bauteilöffnung und erforderlichem Sanierungsumfang.',href:'/praxisfaelle/'}
-];
+import HomeLayout from '../layouts/HomeLayout.astro';
+import HomeHero from '../components/home/HomeHero.astro';
+import HomeServices from '../components/home/HomeServices.astro';
+import HomeCases from '../components/home/HomeCases.astro';
+import HomeKnowledge from '../components/home/HomeKnowledge.astro';
+import HomeDownloads from '../components/home/HomeDownloads.astro';
+import HomeTeam from '../components/home/HomeTeam.astro';
+import HomeCta from '../components/home/HomeCta.astro';
 ---
-<BaseLayout title="SV-Netzwerk – Kompetenzzentrum für Bau- und Versicherungsschäden" description="Sachverständige, Großschadenregulierung, Fachwissen und SVOS für belastbare Schadenentscheidungen.">
-  <Hero eyebrow="Kompetenzzentrum für Bau- und Versicherungsschäden" title="Schäden verstehen. Entscheidungen absichern." text="Wir verbinden technische Sachverständigenleistung, strukturierte Großschadenregulierung und digitale Prozesse zu einer klaren Entscheidungsgrundlage – bundesweit und persönlich verantwortet." primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Leistungen entdecken" secondaryHref="/leistungen/" />
 
-  <section class="sv-section"><div class="sv-container">
-    <SectionHeader eyebrow="Leistungen" title="Ein System für Prüfung, Regulierung und Entscheidung." text="Vom Ortstermin bis zur Schlusserklärung greifen technische Bewertung, Organisation und Dokumentation ineinander." href="/leistungen/" label="Alle Leistungen" />
-    <div class="service-grid">{services.map(service => <a class="service-card" href={service.href}><span>{service.n}</span><h3>{service.title}</h3><p>{service.text}</p><b>Mehr erfahren →</b></a>)}</div>
-  </div></section>
-
-  <section class="sv-section sv-section-alt"><div class="sv-container process-layout">
-    <div><p class="sv-eyebrow">SV Operating System</p><h2>Ein verbindlicher Standard für jeden Bearbeitungsschritt.</h2><p class="sv-lead">SVOS verbindet technische Prüfung, nachvollziehbare Dokumentation und klare Verantwortlichkeiten zu einem durchgängigen Arbeitsmodell.</p><a class="sv-button sv-button-secondary" href="/svos/">SVOS kennenlernen</a></div>
-    <div class="process-steps"><article><span>01</span><div><h3>Auftrag klären</h3><p>Prüfgegenstand, Rollen, Unterlagen und Zielsetzung eindeutig festlegen.</p></div></article><article><span>02</span><div><h3>Schaden abgrenzen</h3><p>Schadenbedingte Maßnahmen von Mängeln, Vorschäden und Instandhaltung trennen.</p></div></article><article><span>03</span><div><h3>Entscheidung dokumentieren</h3><p>Bewertung, Freigabe, Reserve und Empfehlung belastbar festhalten.</p></div></article></div>
-  </div></section>
-
-  <section class="sv-section case-section"><div class="sv-container">
-    <SectionHeader eyebrow="Praxisfälle" title="Aus realen Schäden wird nutzbares Fachwissen." text="Typische Fragestellungen, technische Abgrenzungen und regulierungsrelevante Entscheidungen aus der Praxis." href="/praxisfaelle/" label="Alle Praxisfälle" />
-    <div class="case-grid">{cases.map((item,index)=><a class="case-card" href={item.href}><div class={`case-visual visual-${index+1}`}><span>{item.tag}</span><b>0{index+1}</b></div><div class="case-copy"><h3>{item.title}</h3><p>{item.text}</p><strong>Fall ansehen →</strong></div></a>)}</div>
-  </div></section>
-
-  <section class="sv-section knowledge-section"><div class="sv-container">
-    <SectionHeader eyebrow="Fachwissen" title="Wissen, das Entscheidungen beschleunigt." text="Fachbeiträge, Prüfschemata und Praxiswissen für Sachverständige, Regulierer, Versicherer und Dienstleister." href="/fachwissen/" label="Bibliothek öffnen" />
-    <div class="sv-grid sv-grid-3">{articles.map(article => <ArticleCard {...article} />)}</div>
-  </div></section>
-
-  <section class="platform-section"><div class="sv-container platform-grid"><div><p class="sv-eyebrow">Gutachter-Plattform</p><h2>Digitale Zusammenarbeit für Sachverständige und Regulierer.</h2><p>Akten, Gutachten, Rechnungen, Wissensmodule und KI-gestützte Vorprüfung in einer strukturierten Arbeitsumgebung.</p><div class="sv-stack"><a class="sv-button sv-button-primary" href="/gutachter-plattform/">Plattform ansehen</a><a class="sv-button platform-secondary" href="/kontakt/">Demo abstimmen</a></div></div><div class="platform-dashboard"><div class="dashboard-head"><span>SVOS Dashboard</span><b>Aktiv</b></div><div class="dashboard-metrics"><article><small>Offene Vorgänge</small><strong>12</strong></article><article><small>Prüfungen</small><strong>47</strong></article><article><small>Freigaben</small><strong>08</strong></article></div><div class="dashboard-list"><span><i></i> Schadenakte geprüft <b>heute</b></span><span><i></i> Reserve aktualisiert <b>heute</b></span><span><i></i> Schlusserklärung erstellt <b>gestern</b></span></div></div></div></section>
-
-  <section class="sv-section"><div class="sv-container partner-row"><div><p class="sv-eyebrow">Netzwerk</p><h2>Persönliche Verantwortung. Vernetzte Fachkompetenz.</h2><p class="sv-lead">Der Bearbeitungsstand bleibt klar zugeordnet. Spezialwissen wird gezielt eingebunden, ohne Verantwortlichkeiten zu verwischen.</p></div><a class="sv-button sv-button-secondary" href="/netzwerk/">Netzwerk kennenlernen</a></div></section>
-
-  <section class="sv-container final-cta"><CallToAction title="Komplexer Schaden oder fachliche Rückfrage?" text="Schildern Sie den Fall. Wir ordnen die Anfrage ein und führen sie zum passenden Ansprechpartner." href="/schaden-melden/" label="Anfrage starten" /></section>
-</BaseLayout>
-
-<style>
-.service-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}.service-card{display:flex;min-height:22rem;flex-direction:column;padding:1.6rem;border:1px solid var(--sv-color-line);border-radius:1.4rem;background:white;color:var(--sv-color-ink);text-decoration:none;box-shadow:var(--sv-shadow-sm);transition:transform var(--sv-transition),box-shadow var(--sv-transition),background var(--sv-transition)}.service-card:hover{transform:translateY(-7px);background:linear-gradient(160deg,#fff,var(--sv-color-primary-light));box-shadow:var(--sv-shadow-md)}.service-card>span{color:var(--sv-color-accent);font-size:.78rem;font-weight:900;letter-spacing:.12em}.service-card h3{margin-top:auto}.service-card p{color:var(--sv-color-muted)}.service-card b{margin-top:auto;color:var(--sv-color-primary)}.process-layout{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:clamp(3rem,7vw,7rem)}.process-steps{display:grid;gap:1rem}.process-steps article{display:grid;grid-template-columns:auto 1fr;gap:1rem;padding:1.35rem;border:1px solid var(--sv-color-line);border-radius:1.2rem;background:white;box-shadow:var(--sv-shadow-sm)}.process-steps span{display:grid;width:3rem;aspect-ratio:1;place-items:center;border-radius:.85rem;background:var(--sv-color-ink);color:white;font-weight:900}.process-steps p{margin:0;color:var(--sv-color-muted)}.case-section{background:var(--sv-color-ink);color:white}.case-section :global(.sv-section-head h2){color:white}.case-section :global(.sv-section-head p){color:#b9cbd8}.case-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}.case-card{overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:1.45rem;background:rgba(255,255,255,.06);color:white;text-decoration:none;transition:transform var(--sv-transition),background var(--sv-transition)}.case-card:hover{transform:translateY(-7px);background:rgba(255,255,255,.1)}.case-visual{position:relative;display:flex;min-height:13rem;align-items:flex-start;justify-content:space-between;padding:1.2rem;background:linear-gradient(135deg,#0b4f7a,#14324c)}.case-visual::after{position:absolute;inset:auto -3rem -5rem auto;width:12rem;aspect-ratio:1;border:1px solid rgba(255,255,255,.2);border-radius:50%;content:""}.visual-2{background:linear-gradient(135deg,#1c6475,#0c3b59)}.visual-3{background:linear-gradient(135deg,#385c55,#102f49)}.case-visual span{padding:.4rem .65rem;border-radius:999px;background:rgba(255,255,255,.14);font-size:.72rem;font-weight:850}.case-visual b{font-size:3rem;opacity:.23}.case-copy{padding:1.35rem}.case-copy p{color:#bfd0dc}.case-copy strong{color:#ffc56f}.knowledge-section{background:white}.platform-section{position:relative;overflow:hidden;padding-block:clamp(5rem,9vw,8rem);background:linear-gradient(135deg,#eef6fb,#fff6e8)}.platform-grid{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:clamp(3rem,7vw,7rem)}.platform-grid>div:first-child>p:not(.sv-eyebrow){max-width:42rem;color:var(--sv-color-ink-soft);font-size:1.15rem}.platform-secondary{border-color:var(--sv-color-primary);color:var(--sv-color-primary)}.platform-dashboard{padding:1.1rem;border:1px solid rgba(11,79,122,.14);border-radius:1.5rem;background:rgba(255,255,255,.84);box-shadow:var(--sv-shadow-lg);backdrop-filter:blur(12px)}.dashboard-head{display:flex;align-items:center;justify-content:space-between;padding:.4rem .4rem 1rem;font-weight:850}.dashboard-head b{padding:.3rem .55rem;border-radius:999px;background:#ddf7e8;color:#24714b;font-size:.72rem}.dashboard-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}.dashboard-metrics article{padding:1rem;border-radius:1rem;background:var(--sv-color-surface-alt)}.dashboard-metrics small,.dashboard-metrics strong{display:block}.dashboard-metrics small{color:var(--sv-color-muted)}.dashboard-metrics strong{margin-top:.25rem;color:var(--sv-color-primary);font-size:2rem}.dashboard-list{display:grid;gap:.65rem;margin-top:.8rem}.dashboard-list span{display:flex;align-items:center;gap:.55rem;padding:.85rem;border:1px solid var(--sv-color-line);border-radius:.8rem;font-size:.84rem}.dashboard-list i{width:.5rem;aspect-ratio:1;border-radius:50%;background:#35b879}.dashboard-list b{margin-left:auto;color:var(--sv-color-muted);font-size:.72rem}.partner-row{display:flex;align-items:end;justify-content:space-between;gap:3rem}.final-cta{padding-bottom:clamp(4rem,8vw,8rem)}@media(max-width:68rem){.service-grid{grid-template-columns:repeat(2,1fr)}.process-layout,.platform-grid{grid-template-columns:1fr}.case-grid{grid-template-columns:1fr 1fr}}@media(max-width:44rem){.service-grid,.case-grid{grid-template-columns:1fr}.service-card{min-height:18rem}.dashboard-metrics{grid-template-columns:1fr}.partner-row{align-items:flex-start;flex-direction:column}}
-</style>
+<HomeLayout
+  title="SV-Netzwerk – Kompetenz für komplexe Bau- und Versicherungsschäden"
+  description="Sachverständigenleistung, Großschadenregulierung und digitale Standards für klare Entscheidungen bei komplexen Schäden."
+>
+  <HomeHero />
+  <HomeServices />
+  <HomeCases />
+  <HomeKnowledge />
+  <HomeDownloads />
+  <HomeTeam />
+  <HomeCta />
+</HomeLayout>

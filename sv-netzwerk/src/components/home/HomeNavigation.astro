@@ -1,0 +1,50 @@
+---
+import type { HomeNavItem } from './HomeHeader.astro';
+interface Props { items: HomeNavItem[]; currentPath: string }
+const { items, currentPath } = Astro.props;
+const active = (href: string) => href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+const itemActive = (item: HomeNavItem) => active(item.href) || Boolean(item.children?.some((child) => active(child.href)));
+---
+
+<nav class="v4-nav" aria-label="Hauptnavigation" data-v4-nav>
+  <ul>
+    {items.map((item, index) => (
+      <li data-v4-nav-item>
+        {item.children ? (
+          <button class:list={{ 'is-active': itemActive(item) }} type="button" aria-expanded="false" aria-controls={`v4-mega-${index}`} data-v4-mega-trigger>
+            {item.label}<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2.5 4.5 3.5 3 3.5-3"/></svg>
+          </button>
+        ) : (
+          <a class:list={{ 'is-active': itemActive(item) }} href={item.href} aria-current={itemActive(item) ? 'page' : undefined}>{item.label}</a>
+        )}
+        {item.children && (
+          <div class="v4-mega" id={`v4-mega-${index}`} data-v4-mega hidden>
+            <div class="v4-mega__intro"><span>0{index + 1}</span><h2>{item.label}</h2><p>{item.text}</p><a href={item.href}>Bereich öffnen <b>→</b></a></div>
+            <div class="v4-mega__links">{item.children.map((child) => <a href={child.href}><span><strong>{child.label}</strong><small>{child.text}</small></span><b>↗</b></a>)}</div>
+          </div>
+        )}
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<script is:inline>
+  const v4NavItems = [...document.querySelectorAll('[data-v4-nav-item]')];
+  const closeV4Menus = (except = null) => v4NavItems.forEach((item) => {
+    if (item === except) return;
+    item.querySelector('[data-v4-mega-trigger]')?.setAttribute('aria-expanded', 'false');
+    const panel = item.querySelector('[data-v4-mega]');
+    if (panel) panel.hidden = true;
+  });
+  v4NavItems.forEach((item) => {
+    const trigger = item.querySelector('[data-v4-mega-trigger]');
+    const panel = item.querySelector('[data-v4-mega]');
+    trigger?.addEventListener('click', () => {
+      const open = trigger.getAttribute('aria-expanded') !== 'true';
+      closeV4Menus(item); trigger.setAttribute('aria-expanded', String(open));
+      if (panel) panel.hidden = !open;
+    });
+  });
+  document.addEventListener('click', (event) => { if (!(event.target instanceof Element) || !event.target.closest('[data-v4-nav]')) closeV4Menus(); });
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeV4Menus(); });
+</script>

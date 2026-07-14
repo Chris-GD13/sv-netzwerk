@@ -1,0 +1,9 @@
+---
+import { getCollection } from 'astro:content';
+const cases = (await getCollection('practiceCases')).filter((entry) => entry.data.publication.status === 'published').sort((a,b) => Number(b.data.featured)-Number(a.data.featured) || b.data.publication.publishedAt.getTime()-a.data.publication.publishedAt.getTime()).slice(0,3);
+const tones = ['amber','blue','green'];
+---
+<section class="v4-section v4-cases">
+  <div class="v4-shell"><div class="v4-section-head v4-section-head--light"><div><p class="v4-kicker"><span></span>Aus der Praxis</p><h2>Reale Schäden.<br/>Konkrete Erkenntnisse.</h2></div><a class="v4-text-link" href="/praxisfaelle/">Alle Praxisfälle <span>→</span></a></div>
+  <div class="v4-cases__grid">{cases.map((entry,index) => <a class={`v4-case v4-case--${tones[index]}`} href={`/praxisfaelle/${entry.id}/`}><div class="v4-case__visual"><span>{entry.data.lossType}</span><b>0{index+1}</b><i></i></div><div class="v4-case__body"><small>{entry.data.objectType}{entry.data.region ? ` · ${entry.data.region}` : ''}</small><h3>{entry.data.title}</h3><p>{entry.data.description}</p><strong>Fall öffnen <span>↗</span></strong></div></a>)}</div></div>
+</section>
