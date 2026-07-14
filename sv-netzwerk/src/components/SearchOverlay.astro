@@ -1,8 +1,125 @@
-<div class="search-overlay" data-search-overlay hidden><div class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title"><div class="search-head"><div><p class="sv-eyebrow">SVOS Suche</p><h2 id="search-title">Fachwissen durchsuchen</h2></div><button type="button" data-search-close aria-label="Suche schließen">×</button></div><label for="site-search">Suchbegriff</label><input id="site-search" type="search" placeholder="z. B. Leitungswasser, Rückbau, Brandschaden" autocomplete="off" data-search-input/><div class="search-results" data-search-results aria-live="polite"><p>Geben Sie mindestens zwei Zeichen ein.</p></div><p class="search-hint"><a href="/suche/">Erweiterte Suche und Filter öffnen</a></p></div></div>
+<div class="search-overlay" data-search-overlay hidden>
+  <div class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title">
+    <div class="search-head">
+      <div>
+        <p class="sv-eyebrow">SVOS Suche</p>
+        <h2 id="search-title">Fachwissen durchsuchen</h2>
+      </div>
+      <button type="button" data-search-close aria-label="Suche schließen">×</button>
+    </div>
+
+    <label for="site-search">Suchbegriff</label>
+    <div class="search-field">
+      <span aria-hidden="true">⌕</span>
+      <input id="site-search" type="search" placeholder="z. B. Leitungswasser, Rückbau, Brandschaden" autocomplete="off" data-search-input />
+      <kbd>Esc</kbd>
+    </div>
+
+    <div class="search-meta">
+      <span data-search-status>Geben Sie mindestens zwei Zeichen ein.</span>
+      <a href="/suche/">Erweiterte Suche</a>
+    </div>
+
+    <div class="search-results" data-search-results aria-live="polite"></div>
+  </div>
+</div>
+
 <script is:inline>
-let searchData=[];const overlay=document.querySelector('[data-search-overlay]');const input=document.querySelector('[data-search-input]');const results=document.querySelector('[data-search-results]');
-async function load(){if(!searchData.length){searchData=await fetch('/search-index.json').then(r=>r.json()).catch(()=>[]);}}
-function render(q){const n=q.trim().toLowerCase();if(n.length<2){results.innerHTML='<p>Geben Sie mindestens zwei Zeichen ein.</p>';return;}const found=searchData.filter(i=>[i.title,i.description,i.category,...i.tags].join(' ').toLowerCase().includes(n)).slice(0,8);results.innerHTML=found.length?found.map(i=>`<a href="${i.href}"><strong>${i.title}</strong><span>${i.category} · ${i.description}</span></a>`).join(''):'<p>Keine passenden Inhalte gefunden.</p>';}
-document.querySelectorAll('[data-search-open]').forEach(b=>b.addEventListener('click',async()=>{await load();overlay.hidden=false;document.body.classList.add('search-open');setTimeout(()=>input.focus(),0);}));document.querySelector('[data-search-close]')?.addEventListener('click',()=>{overlay.hidden=true;document.body.classList.remove('search-open');});overlay?.addEventListener('click',e=>{if(e.target===overlay){overlay.hidden=true;document.body.classList.remove('search-open');}});input?.addEventListener('input',e=>render(e.target.value));document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden){overlay.hidden=true;document.body.classList.remove('search-open');}});
+  let searchData = [];
+  let activeIndex = -1;
+  const overlay = document.querySelector('[data-search-overlay]');
+  const input = document.querySelector('[data-search-input]');
+  const results = document.querySelector('[data-search-results]');
+  const status = document.querySelector('[data-search-status]');
+
+  const normalize = (value = '') => value.toLocaleLowerCase('de-DE').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ß/g, 'ss').replace(/[^a-z0-9]+/g, ' ').trim();
+
+  async function load() {
+    if (searchData.length) return;
+    const response = await fetch('/search-index.json');
+    if (!response.ok) throw new Error('Search index unavailable');
+    const payload = await response.json();
+    searchData = Array.isArray(payload) ? payload : payload.items || [];
+  }
+
+  function score(item, term) {
+    const title = normalize(item.title);
+    const category = normalize(item.category);
+    let value = 0;
+    if (title === term) value += 120;
+    if (title.startsWith(term)) value += 80;
+    if (title.includes(term)) value += 50;
+    if (category.includes(term)) value += 20;
+    if ((item.searchable || '').includes(term)) value += 10;
+    if (item.featured) value += 5;
+    return value;
+  }
+
+  function setActive(index) {
+    const links = [...results.querySelectorAll('a')];
+    links.forEach((link, current) => link.classList.toggle('is-active', current === index));
+    activeIndex = links.length ? Math.max(0, Math.min(index, links.length - 1)) : -1;
+    links[activeIndex]?.scrollIntoView({ block: 'nearest' });
+  }
+
+  function render(query) {
+    const term = normalize(query);
+    activeIndex = -1;
+    if (term.length < 2) {
+      status.textContent = 'Geben Sie mindestens zwei Zeichen ein.';
+      results.innerHTML = '';
+      return;
+    }
+
+    const found = searchData
+      .map((item) => ({ item, score: score(item, term) }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score || b.item.date.localeCompare(a.item.date))
+      .slice(0, 8)
+      .map((entry) => entry.item);
+
+    status.textContent = found.length === 1 ? '1 passender Inhalt' : `${found.length} passende Inhalte`;
+    results.innerHTML = found.length
+      ? found.map((item) => `<a href="${item.href}"><span class="result-meta">${item.category} · ${item.type === 'article' ? 'Fachbeitrag' : item.type === 'download' ? 'Download' : 'Video'}</span><strong>${item.title}</strong><span>${item.description}</span></a>`).join('')
+      : '<p class="empty-result">Keine passenden Inhalte gefunden. Nutzen Sie einen allgemeineren Suchbegriff.</p>';
+  }
+
+  async function openSearch() {
+    try {
+      await load();
+      overlay.hidden = false;
+      document.body.classList.add('search-open');
+      setTimeout(() => input.focus(), 0);
+    } catch {
+      status.textContent = 'Die Suche konnte nicht geladen werden.';
+      overlay.hidden = false;
+    }
+  }
+
+  function closeSearch() {
+    overlay.hidden = true;
+    document.body.classList.remove('search-open');
+    input.value = '';
+    results.innerHTML = '';
+    status.textContent = 'Geben Sie mindestens zwei Zeichen ein.';
+  }
+
+  document.querySelectorAll('[data-search-open]').forEach((button) => button.addEventListener('click', openSearch));
+  document.querySelector('[data-search-close]')?.addEventListener('click', closeSearch);
+  overlay?.addEventListener('click', (event) => { if (event.target === overlay) closeSearch(); });
+  input?.addEventListener('input', (event) => render(event.target.value));
+  input?.addEventListener('keydown', (event) => {
+    const links = [...results.querySelectorAll('a')];
+    if (event.key === 'ArrowDown' && links.length) { event.preventDefault(); setActive(activeIndex + 1); }
+    if (event.key === 'ArrowUp' && links.length) { event.preventDefault(); setActive(activeIndex <= 0 ? links.length - 1 : activeIndex - 1); }
+    if (event.key === 'Enter' && activeIndex >= 0) { event.preventDefault(); links[activeIndex].click(); }
+  });
+  document.addEventListener('keydown', (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openSearch(); }
+    if (event.key === 'Escape' && !overlay.hidden) closeSearch();
+  });
 </script>
-<style>.search-overlay{position:fixed;inset:0;z-index:100;background:rgba(8,24,36,.68);backdrop-filter:blur(8px);padding:clamp(1rem,6vw,5rem)}.search-panel{max-width:52rem;margin:auto;padding:clamp(1.25rem,4vw,2.5rem);border-radius:var(--sv-radius-xl);background:white;box-shadow:var(--sv-shadow-lg)}.search-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}.search-head button{border:0;background:transparent;font-size:2rem;cursor:pointer}.search-panel label{display:block;margin-bottom:.4rem;font-weight:800}.search-panel input{width:100%;padding:1rem;border:2px solid var(--sv-color-line);border-radius:.8rem}.search-results{display:grid;gap:.5rem;margin-top:1rem;max-height:45vh;overflow:auto}.search-results :global(a){display:grid;padding:1rem;border:1px solid var(--sv-color-line);border-radius:.75rem;text-decoration:none}.search-results :global(span){color:var(--sv-color-muted);font-size:.9rem}.search-hint{margin:1rem 0 0}</style>
+
+<style>
+  .search-overlay{position:fixed;inset:0;z-index:100;background:rgba(8,24,36,.7);backdrop-filter:blur(10px);padding:clamp(1rem,6vw,5rem);overflow:auto}.search-panel{max-width:54rem;margin:auto;padding:clamp(1.25rem,4vw,2.5rem);border-radius:var(--sv-radius-xl);background:white;box-shadow:var(--sv-shadow-lg)}.search-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}.search-head h2{margin:.15rem 0 1.5rem}.search-head button{border:0;background:transparent;font-size:2rem;line-height:1;cursor:pointer}.search-panel label{display:block;margin-bottom:.45rem;font-weight:800}.search-field{display:flex;align-items:center;gap:.65rem;padding:0 .9rem;border:2px solid var(--sv-color-line);border-radius:.85rem;background:white}.search-field:focus-within{border-color:var(--sv-color-primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--sv-color-primary) 18%,transparent)}.search-field input{width:100%;padding:1rem 0;border:0;outline:0;font:inherit}.search-field kbd{padding:.2rem .4rem;border:1px solid var(--sv-color-line);border-radius:.35rem;background:var(--sv-color-surface-alt);font-size:.72rem}.search-meta{display:flex;justify-content:space-between;gap:1rem;margin-top:.8rem;color:var(--sv-color-muted);font-size:.88rem}.search-results{display:grid;gap:.55rem;margin-top:1rem;max-height:50vh;overflow:auto}.search-results :global(a){display:grid;gap:.25rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:.8rem;color:var(--sv-color-ink);text-decoration:none}.search-results :global(a:hover),.search-results :global(a.is-active){border-color:var(--sv-color-primary);background:var(--sv-color-surface-alt)}.search-results :global(a>span:last-child){color:var(--sv-color-muted);font-size:.9rem}.search-results :global(.result-meta){color:var(--sv-color-primary);font-size:.72rem;font-weight:850;letter-spacing:.06em;text-transform:uppercase}.empty-result{padding:1rem;border-radius:.8rem;background:var(--sv-color-surface-alt)}@media(max-width:36rem){.search-overlay{padding:.5rem}.search-panel{border-radius:1rem}.search-meta{align-items:flex-start;flex-direction:column}.search-field kbd{display:none}}
+</style>

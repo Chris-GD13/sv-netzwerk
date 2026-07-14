@@ -1,22 +1,20 @@
-# Release Notes – SV-Netzwerk v1.5.1 Fachwissensbibliothek
+# Release Notes – SV-Netzwerk v1.5.2 Suchsystem
 
 ## Zweck
 
-Dieses Release erweitert die in v1.5 vorbereitete Wissensstruktur zu einer statisch generierten, SEO-fähigen Fachwissensbibliothek.
+Ausbau der vorbereiteten Suche zu einer belastbaren clientseitigen SVOS-Wissenssuche.
 
-## Enthalten
+## Änderungen
 
-- eigenständige Astro-Übersichtsseite für `/fachwissen/`
-- Kategorieseiten für sämtliche Fachgebiete
-- Tag-Seiten für alle Schlagwörter
-- einheitliches Kartenlayout mit Kategorie-, Typ-, Datums- und Tag-Angaben
-- serverseitig erzeugte Pagination mit sechs Einträgen pro Seite
-- clientseitige Suche innerhalb der aktuell dargestellten Ergebnisse
-- alphabetische A–Z-Navigation und separates Gesamtverzeichnis
-- kanonische, sprechende und statisch generierte URLs
-- erweiterter Datenbestand für bestehende Fachbeiträge
-- responsive und barrierearme Filter- und Navigationskomponenten
+- versionierter statischer Suchindex mit normalisierten Suchfeldern
+- gewichtete Suche nach Titel, Kategorie, Beschreibung und Schlagworten
+- Such-Overlay mit Tastatursteuerung und Shortcut `Strg/Cmd + K`
+- erweiterte Suchseite mit Kategorie-, Typ- und Tag-Filtern
+- Sortierung nach Relevanz, Aktualität und Alphabet
+- URL-Parameter für reproduzierbare Suchergebnisse
+- leere Ergebniszustände und verbesserte Accessibility
+- korrigierte Kategoriepfade in der Hauptnavigation
 
 ## Kompatibilität
 
-Die vorhandenen Fachbeiträge und statischen Seiten bleiben erhalten. Neue Astro-Seiten ergänzen die bestehende Struktur und werden beim Build in das produktive `dist`-Verzeichnis übernommen.
+Die bestehende Astro-, CI/CD- und IONOS-Struktur bleibt erhalten.

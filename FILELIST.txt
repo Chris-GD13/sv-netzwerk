@@ -150,6 +150,7 @@
 ./sv-netzwerk/src/data/corporate-standard.json
 ./sv-netzwerk/src/data/library.ts
 ./sv-netzwerk/src/data/redaktionsplan.json
+./sv-netzwerk/src/data/search.ts
 ./sv-netzwerk/src/data/site.ts
 ./sv-netzwerk/src/env.d.ts
 ./sv-netzwerk/src/layouts/BaseLayout.astro

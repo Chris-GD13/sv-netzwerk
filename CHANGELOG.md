@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.2 – 2026-07-14
+
+### Suchsystem
+- versionierten statischen Suchindex eingeführt
+- gewichtete clientseitige Volltextsuche vorbereitet
+- Such-Overlay um Tastatursteuerung und Shortcut erweitert
+- erweiterte Suche mit Kategorien, Inhaltstypen, Tags und Sortierung umgesetzt
+- URL-Parameter für teilbare Suchzustände ergänzt
+- Kategoriepfade der Navigation korrigiert
+
 ## 1.5.1 – 2026-07-14
 
 ### Fachwissensbibliothek

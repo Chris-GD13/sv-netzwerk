@@ -1,18 +1,15 @@
-# Validation – SV-Netzwerk v1.5.1
+# Validation – SV-Netzwerk v1.5.2
+
+## Prüfumfang
+
+- konsistente Versionierung 1.5.2
+- statische Generierung des Suchindex
+- Astro-Typprüfung
+- Astro-Produktionsbuild
+- Suchfilter, Sortierung und URL-Parameter logisch geprüft
+- Tastaturbedienung des Such-Overlays berücksichtigt
+- bestehende CI/CD-Workflows unverändert übernommen
 
 ## Ergebnis
 
-- `npm ci --no-audit --no-fund`: erfolgreich
-- `npm run build`: erfolgreich
-- Astro Check: 0 Fehler, 0 Warnungen, 0 Hinweise
-- Produktionsbuild: 57 Seiten erzeugt
-- Fachwissen-Pagination: Seiten 2 und 3 erzeugt
-- Kategorie-Seiten: erzeugt
-- Tag-Seiten: erzeugt
-- A–Z-Verzeichnis: erzeugt
-- Sitemap-Index: erzeugt
-- Merge-Marker-Prüfung: erfolgreich
-
-## Buildzeit
-
-- Astro-Build einschließlich statischer Routen: ca. 1,3 Sekunden in der Prüfumgebung
+Der lokale Produktionsbuild wurde erfolgreich ausgeführt. Das Paket ist für Commit, Push und GitHub-Actions-Prüfung vorbereitet.
