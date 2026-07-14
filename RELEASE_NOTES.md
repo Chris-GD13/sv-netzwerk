@@ -1,28 +1,28 @@
-# Release Notes – SV-Netzwerk v1.2 Quality & CI
+# Release Notes – SV-Netzwerk v1.3 Website Core
 
 ## Zweck
 
-Dieses Release stabilisiert die Qualitätsprüfung im Repository, ohne den bestehenden produktiven IONOS-Deploy zu verändern.
+Aufbau eines einheitlichen, wiederverwendbaren Website-Kerns für die schrittweise Migration bestehender Seiten.
 
-## Änderungen
+## Enthalten
 
-- automatischer Astro-Build bei Änderungen am Website-Projekt
-- manuell startbare Linkprüfung
-- manuell startbare HTML-Prüfung
-- manuell startbare Lighthouse-Prüfung
-- vorherige unvollständige Platzhalter-Workflows werden durch vollständige Workflow-Dateien ersetzt
-- Dependabot-Konfiguration für npm im Unterordner `sv-netzwerk`
-- dokumentierte Installation, Prüfung und Rücknahme
+- zentrales `BaseLayout.astro`
+- einheitliche SEO-Komponente
+- Header und responsive Navigation
+- Footer
+- Breadcrumbs
+- Autorenbox
+- CTA-Box
+- Downloadbox
+- Hinweisbox
+- Praxisfall-Komponente
+- zentrale Website-Daten
+- Design Tokens und globale CSS-Grundlagen
 
-## Automatische Workflows
+## Sicherheitsprinzip
 
-Nur `Build Check` läuft automatisch bei relevanten Änderungen.
+Keine bestehende produktive Seite wird automatisch ersetzt. Die Komponenten werden zunächst additiv bereitgestellt. Dadurch bleibt der aktuelle Live-Stand erhalten.
 
-Die Prüfungen `Link Checker`, `HTML Validator` und `Lighthouse` werden bewusst manuell gestartet. Dadurch entstehen bei normalen Inhalts-Commits keine roten Actions durch externe Links, HTML-Bestandsfehler oder Performance-Schwankungen.
+## Nächster Schritt
 
-## Unverändert
-
-- `.github/workflows/deploy.yml`
-- SFTP-Secrets
-- IONOS-Zielverzeichnis
-- Website-Inhalte
+In v1.4 werden ausgewählte Seiten kontrolliert auf das neue Grundlayout migriert.

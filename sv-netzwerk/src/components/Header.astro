@@ -1,0 +1,99 @@
+---
+import { site } from '../data/site';
+const currentPath = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="sv-container header-inner">
+    <a class="brand" href="/" aria-label={`${site.name} – Startseite`}>
+      <span class="brand-name">{site.name}</span>
+      <span class="brand-claim">Sachverständige & Großschadenregulierung</span>
+    </a>
+
+    <nav aria-label="Hauptnavigation">
+      <ul>
+        {site.navigation.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={currentPath === item.href ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--sv-color-border);
+    background: rgb(255 255 255 / 96%);
+    backdrop-filter: blur(0.75rem);
+  }
+
+  .header-inner {
+    display: flex;
+    min-height: 5rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sv-space-5);
+  }
+
+  .brand {
+    display: grid;
+    color: var(--sv-color-text);
+    text-decoration: none;
+  }
+
+  .brand-name {
+    font-size: 1.25rem;
+    font-weight: 750;
+  }
+
+  .brand-claim {
+    color: var(--sv-color-muted);
+    font-size: 0.78rem;
+  }
+
+  nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sv-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  nav a {
+    display: block;
+    padding: var(--sv-space-2) var(--sv-space-3);
+    border-radius: var(--sv-radius-sm);
+    color: var(--sv-color-text);
+    font-size: 0.94rem;
+    text-decoration: none;
+  }
+
+  nav a:hover,
+  nav a[aria-current='page'] {
+    background: var(--sv-color-surface);
+    color: var(--sv-color-primary);
+  }
+
+  @media (max-width: 60rem) {
+    .header-inner {
+      align-items: flex-start;
+      flex-direction: column;
+      padding-block: var(--sv-space-4);
+    }
+
+    nav ul {
+      gap: 0;
+    }
+  }
+</style>

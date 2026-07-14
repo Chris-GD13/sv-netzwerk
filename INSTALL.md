@@ -1,4 +1,4 @@
-# Installation – SV-Netzwerk v1.2 Quality & CI
+# Installation – SV-Netzwerk v1.3 Website Core
 
 ## Zielverzeichnis
 
@@ -8,23 +8,18 @@ Den vollständigen Inhalt dieses Pakets in den lokalen Repository-Stamm kopieren
 
 Vorhandene Dateien mit gleichem Namen ersetzen.
 
-Der Repository-Stamm ist der Ordner, in dem `.github`, `README.md` und der Unterordner `sv-netzwerk` liegen.
-
 ## Übernahme
 
 1. ZIP entpacken.
 2. Gesamten Inhalt in den Repository-Stamm kopieren.
-3. Vorhandene Dateien ersetzen.
-4. GitHub Desktop öffnen.
-5. Änderungen prüfen.
-6. Commit-Nachricht verwenden:
+3. GitHub Desktop öffnen.
+4. Änderungen kontrollieren.
+5. Commit-Nachricht: `SV-Netzwerk v1.3 Website Core`
+6. Commit und Push ausführen.
+7. Unter GitHub → Actions prüfen:
+   - Build Check grün
+   - Deploy SV-Netzwerk grün
 
-   `SV-Netzwerk v1.2 Quality & CI`
+## Wirkung
 
-7. `Commit to main`.
-8. `Push origin`.
-9. Unter GitHub → Actions den automatischen Lauf `Build Check` prüfen.
-
-## Hinweis
-
-Der bestehende produktive Workflow `.github/workflows/deploy.yml` wird durch dieses Paket nicht verändert.
+Dieses Paket ergänzt ein wiederverwendbares Astro-Grundsystem. Bestehende Seiten werden noch nicht automatisch umgestellt. Die Live-Darstellung bleibt deshalb unverändert, bis einzelne Seiten ausdrücklich auf `BaseLayout.astro` migriert werden.

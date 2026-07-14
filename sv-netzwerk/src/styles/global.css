@@ -1,0 +1,89 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--sv-color-text);
+  background: var(--sv-color-background);
+  font-family: var(--sv-font-sans);
+  line-height: 1.65;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: var(--sv-color-primary);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.16em;
+}
+
+a:hover {
+  color: var(--sv-color-primary-hover);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.sv-container {
+  width: min(calc(100% - 2rem), var(--sv-container));
+  margin-inline: auto;
+}
+
+.sv-content {
+  width: min(100%, var(--sv-content));
+}
+
+.sv-main {
+  min-height: 60vh;
+  padding-block: var(--sv-space-7);
+}
+
+.sv-card {
+  border: 1px solid var(--sv-color-border);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-color-background);
+  box-shadow: var(--sv-shadow-sm);
+}
+
+.sv-skip-link {
+  position: fixed;
+  top: var(--sv-space-3);
+  left: var(--sv-space-3);
+  z-index: 9999;
+  padding: var(--sv-space-3) var(--sv-space-4);
+  border-radius: var(--sv-radius-sm);
+  background: var(--sv-color-primary);
+  color: white;
+  transform: translateY(-200%);
+}
+
+.sv-skip-link:focus {
+  transform: translateY(0);
+}

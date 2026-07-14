@@ -1,0 +1,65 @@
+---
+interface Props {
+  title: string;
+  text: string;
+  href: string;
+  label?: string;
+}
+
+const { title, text, href, label = 'Kontakt aufnehmen' } = Astro.props;
+---
+
+<aside class="cta sv-card">
+  <div>
+    <h2>{title}</h2>
+    <p>{text}</p>
+  </div>
+  <a class="button" href={href}>{label}</a>
+</aside>
+
+<style>
+  .cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sv-space-5);
+    margin-block: var(--sv-space-7);
+    padding: var(--sv-space-6);
+    border-left: 0.3rem solid var(--sv-color-accent);
+  }
+
+  h2 {
+    margin-top: 0;
+  }
+
+  p {
+    margin-bottom: 0;
+    color: var(--sv-color-muted);
+  }
+
+  .button {
+    flex: none;
+    padding: 0.8rem 1rem;
+    border-radius: var(--sv-radius-sm);
+    background: var(--sv-color-primary);
+    color: white;
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .button:hover {
+    background: var(--sv-color-primary-hover);
+    color: white;
+  }
+
+  @media (max-width: 42rem) {
+    .cta {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .button {
+      text-align: center;
+    }
+  }
+</style>

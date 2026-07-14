@@ -1,6 +1,7 @@
-YAML-Syntaxprüfung erfolgreich:
-- .github/dependabot.yml: OK
-- .github/workflows/build-check.yml: OK
-- .github/workflows/linkcheck.yml: OK
-- .github/workflows/html-validator.yml: OK
-- .github/workflows/lighthouse.yml: OK
+Paketprüfung erfolgreich.
+
+- Astro-Dateien: 10
+- TypeScript-Dateien: 1
+- CSS-Dateien: 2
+- Bestehende Seiten werden nicht überschrieben.
+- Produktiver Deploy-Workflow wird nicht verändert.

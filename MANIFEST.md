@@ -1,25 +1,30 @@
-# Manifest – SV-Netzwerk v1.2 Quality & CI
+# Manifest – SV-Netzwerk v1.3 Website Core
 
-Version: 1.2.0  
-Paket: `SV-Netzwerk_v1.2_Quality_CI.zip`
+Version: 1.3.0
 
-## Neue oder ersetzte Dateien
+## Neue Dateien
 
-- `.github/dependabot.yml`
-- `.github/workflows/build-check.yml`
-- `.github/workflows/linkcheck.yml`
-- `.github/workflows/html-validator.yml`
-- `.github/workflows/lighthouse.yml`
-- `docs/releases/v1.2/CHECKLIST.md`
-- `docs/releases/v1.2/ROLLBACK.md`
-- `VERSION`
-- `INSTALL.md`
-- `RELEASE_NOTES.md`
-- `MANIFEST.md`
+- `sv-netzwerk/src/data/site.ts`
+- `sv-netzwerk/src/styles/tokens.css`
+- `sv-netzwerk/src/styles/global.css`
+- `sv-netzwerk/src/layouts/BaseLayout.astro`
+- `sv-netzwerk/src/components/SEO.astro`
+- `sv-netzwerk/src/components/Header.astro`
+- `sv-netzwerk/src/components/Footer.astro`
+- `sv-netzwerk/src/components/Breadcrumbs.astro`
+- `sv-netzwerk/src/components/CallToAction.astro`
+- `sv-netzwerk/src/components/DownloadBox.astro`
+- `sv-netzwerk/src/components/AuthorBox.astro`
+- `sv-netzwerk/src/components/NoticeBox.astro`
+- `sv-netzwerk/src/components/PracticeCase.astro`
+- `docs/releases/v1.3/MIGRATION.md`
+- `docs/releases/v1.3/CHECKLIST.md`
+- `docs/releases/v1.3/ROLLBACK.md`
 
-## Nicht Bestandteil
+## Nicht verändert
 
-- keine Änderung am produktiven Deploy-Workflow
-- keine Änderung an SFTP-Zugangsdaten
-- keine Änderung an Website-Quelltexten
-- keine Änderung am IONOS-Webspace
+- produktiver Deploy-Workflow
+- SFTP-Konfiguration
+- vorhandene Seiten
+- bestehende HTML-/PHP-Dateien
+- bestehende Inhalte
