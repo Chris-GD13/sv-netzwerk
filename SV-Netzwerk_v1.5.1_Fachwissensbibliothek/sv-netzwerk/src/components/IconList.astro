@@ -1,6 +1,0 @@
----
-interface Props { items:string[] }
-const {items}=Astro.props;
----
-<ul class="icon-list">{items.map(item=><li><span aria-hidden="true">✓</span>{item}</li>)}</ul>
-<style>.icon-list{display:grid;gap:.8rem;margin:0;padding:0;list-style:none}.icon-list li{display:flex;gap:.75rem;align-items:flex-start}.icon-list span{display:grid;flex:0 0 1.5rem;height:1.5rem;place-items:center;border-radius:50%;background:var(--sv-color-accent-soft);color:var(--sv-color-primary);font-size:.8rem;font-weight:900}</style>

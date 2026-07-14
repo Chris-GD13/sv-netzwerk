@@ -1,6 +1,0 @@
----
-interface Props { eyebrow?:string; title:string; text?:string; href?:string; label?:string; align?:'left'|'center' }
-const {eyebrow,title,text,href,label='Mehr erfahren',align='left'}=Astro.props;
----
-<header class:list={['section-header',`is-${align}`]}>{eyebrow&&<p class="sv-eyebrow">{eyebrow}</p>}<h2>{title}</h2>{text&&<p class="sv-lead">{text}</p>}{href&&<a class="sv-button sv-button-secondary" href={href}>{label}</a>}</header>
-<style>.section-header{max-width:54rem;margin-bottom:var(--sv-space-7)}.section-header.is-center{margin-inline:auto;text-align:center}.section-header.is-center .sv-lead{margin-inline:auto}.section-header .sv-button{margin-top:var(--sv-space-3)}</style>

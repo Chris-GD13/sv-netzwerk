@@ -1,6 +1,0 @@
----
-interface Props { eyebrow?: string; title: string; text: string; href?: string; linkLabel?: string; index?: string; }
-const { eyebrow,title,text,href,linkLabel='Mehr erfahren',index }=Astro.props;
----
-<article class="feature sv-card sv-card-lift">{index&&<span class="index">{index}</span>}{eyebrow&&<p class="sv-eyebrow">{eyebrow}</p>}<h3>{title}</h3><p>{text}</p>{href&&<a href={href}>{linkLabel} <span aria-hidden="true">→</span></a>}</article>
-<style>.feature{position:relative;padding:clamp(1.4rem,3vw,2rem)}.feature p:not(.sv-eyebrow){color:var(--sv-color-muted)}.feature a{font-weight:750;text-decoration:none}.index{display:inline-grid;width:2.4rem;aspect-ratio:1;place-items:center;margin-bottom:1.25rem;border-radius:50%;background:var(--sv-color-accent-soft);color:var(--sv-color-primary);font-weight:850}</style>

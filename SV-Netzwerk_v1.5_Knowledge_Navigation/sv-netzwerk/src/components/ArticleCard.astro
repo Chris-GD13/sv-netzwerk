@@ -1,6 +1,0 @@
----
-interface Props { category:string; title:string; text:string; href:string; date?:string; }
-const {category,title,text,href,date}=Astro.props;
----
-<article class="article sv-card sv-card-lift"><div class="article-meta"><span>{category}</span>{date&&<time>{date}</time>}</div><h3><a href={href}>{title}</a></h3><p>{text}</p><a class="read" href={href}>Beitrag lesen <span aria-hidden="true">→</span></a></article>
-<style>.article{display:flex;min-height:100%;flex-direction:column;padding:1.75rem}.article-meta{display:flex;justify-content:space-between;gap:1rem;margin-bottom:1.25rem;color:var(--sv-color-muted);font-size:.78rem;font-weight:750;letter-spacing:.08em;text-transform:uppercase}.article h3 a{color:var(--sv-color-ink);text-decoration:none}.article p{color:var(--sv-color-muted)}.read{margin-top:auto;padding-top:1rem;font-weight:750;text-decoration:none}</style>

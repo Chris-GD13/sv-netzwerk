@@ -1,7 +1,0 @@
-Paketprüfung erfolgreich.
-
-- Astro-Dateien: 10
-- TypeScript-Dateien: 1
-- CSS-Dateien: 2
-- Bestehende Seiten werden nicht überschrieben.
-- Produktiver Deploy-Workflow wird nicht verändert.

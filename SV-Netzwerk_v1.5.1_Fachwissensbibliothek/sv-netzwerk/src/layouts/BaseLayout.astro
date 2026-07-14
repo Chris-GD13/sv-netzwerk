@@ -1,7 +1,0 @@
----
-import SEO from '../components/SEO.astro'; import Header from '../components/Header.astro'; import Footer from '../components/Footer.astro'; import SearchOverlay from '../components/SearchOverlay.astro'; import '../styles/global.css'; import { site } from '../data/site';
-interface Props { title:string; description:string; canonical?:string; image?:string; type?:'website'|'article'; }
-const props=Astro.props; const schema={'@context':'https://schema.org','@type':'ProfessionalService',name:site.legalName,url:site.url,email:site.email,telephone:site.phone,address:{'@type':'PostalAddress',streetAddress:site.address[0],postalCode:'73432',addressLocality:'Aalen',addressCountry:'DE'}};
----
-<!doctype html><html lang="de"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="theme-color" content="#163f5d"/><meta name="color-scheme" content="light"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/><SEO {...props}/><script is:inline type="application/ld+json" set:html={JSON.stringify(schema)}/></head><body><a class="skip" href="#main">Zum Inhalt</a><Header/><main id="main"><slot/></main><Footer/><SearchOverlay/></body></html>
-<style is:global>.skip{position:fixed;top:.5rem;left:.5rem;z-index:120;transform:translateY(-150%);padding:.7rem 1rem;background:white;color:var(--sv-color-ink);font-weight:800}.skip:focus{transform:none}.search-open,.menu-open{overflow:hidden}</style>

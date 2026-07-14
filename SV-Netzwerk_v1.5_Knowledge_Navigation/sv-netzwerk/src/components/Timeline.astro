@@ -1,7 +1,0 @@
----
-interface Item { title:string; text:string }
-interface Props { items:Item[] }
-const {items}=Astro.props;
----
-<ol class="timeline">{items.map((item,index)=><li><span>{String(index+1).padStart(2,'0')}</span><div><h3>{item.title}</h3><p>{item.text}</p></div></li>)}</ol>
-<style>.timeline{margin:0;padding:0;list-style:none}.timeline li{display:grid;grid-template-columns:4rem 1fr;gap:1.25rem;padding:1.5rem 0;border-bottom:1px solid var(--sv-color-line)}.timeline span{display:grid;width:3rem;height:3rem;place-items:center;border-radius:50%;background:var(--sv-color-accent-soft);color:var(--sv-color-primary);font-weight:900}.timeline p{margin:0;color:var(--sv-color-muted)}</style>
