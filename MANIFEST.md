@@ -1,20 +1,27 @@
-# Manifest – SV-Netzwerk v1.4 Modern Website
+# Manifest – SV-Netzwerk v1.4.1 CI & Stabilisierung
 
-## Kern
-- Astro-Konfiguration, TypeScript und Paketdefinition
-- BaseLayout, SEO, Header, Footer
-- Hero-, Card-, Grid-, Button- und CTA-System
-- Design Tokens und globale Styles
+## Geänderte Infrastrukturdateien
 
-## Seiten
-- neue Startseite
-- Leistungen
-- Fachwissensbibliothek
-- Kontakt
+- `.github/workflows/build-check.yml`
+- `.github/workflows/deploy.yml`
+- `sv-netzwerk/package-lock.json`
 
-## Infrastruktur
-- robots.txt
-- Open-Graph-Standardgrafik
-- Release-, Migrations-, Rollback- und Validierungsdokumentation
+## Aktualisierte Release-Dokumentation
 
-Bestehende, nicht im Paket enthaltene Fachseiten und Inhalte werden beim Kopieren nicht gelöscht.
+- `VERSION`
+- `CHANGELOG.md`
+- `INSTALL.md`
+- `MANIFEST.md`
+- `RELEASE_NOTES.md`
+- `VALIDATION.md`
+
+## Paketumfang
+
+Das ZIP enthält den vollständigen Projektstand mit allen Website-Dateien und Unterordnern. Ausgeschlossen sind ausschließlich lokale beziehungsweise generierte Verzeichnisse, die nicht in ein Austauschpaket gehören:
+
+- `.git/`
+- `node_modules/`
+- `.astro/`
+- `dist/`
+
+Diese Verzeichnisse werden lokal beziehungsweise in GitHub Actions neu erzeugt. Bestehende Repository-Metadaten bleiben dadurch unangetastet.
