@@ -78,6 +78,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes lftp
 
+      - name: Einmalig veralteten dist-Unterordner entfernen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" \
+            -e "set sftp:auto-confirm yes; rm -r /sv-netzwerk/dist/; bye"
+
       - name: Document Root vor dem Upload prüfen
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
