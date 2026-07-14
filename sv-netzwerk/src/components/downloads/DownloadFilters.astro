@@ -1,0 +1,47 @@
+---
+interface Props { categories: string[]; }
+const { categories } = Astro.props;
+---
+<form class="download-filters sv-card" data-download-filters>
+  <div>
+    <label for="download-search">Downloads durchsuchen</label>
+    <input id="download-search" type="search" placeholder="Titel, Thema oder Schlagwort" autocomplete="off" data-download-search />
+  </div>
+  <div>
+    <label for="download-category">Kategorie</label>
+    <select id="download-category" data-download-category>
+      <option value="">Alle Kategorien</option>
+      {categories.map((category) => <option value={category}>{category}</option>)}
+    </select>
+  </div>
+  <button class="sv-button sv-button-secondary" type="reset">Filter zurücksetzen</button>
+  <p class="download-filters__status" aria-live="polite" data-download-status></p>
+</form>
+<script>
+  const form = document.querySelector('[data-download-filters]');
+  if (form instanceof HTMLFormElement) {
+    const search = form.querySelector('[data-download-search]');
+    const category = form.querySelector('[data-download-category]');
+    const status = form.querySelector('[data-download-status]');
+    const cards = [...document.querySelectorAll('[data-download-card]')];
+    const update = () => {
+      const query = search instanceof HTMLInputElement ? search.value.trim().toLocaleLowerCase('de') : '';
+      const selected = category instanceof HTMLSelectElement ? category.value : '';
+      let visible = 0;
+      cards.forEach((card) => {
+        const text = card.getAttribute('data-search') ?? '';
+        const cardCategory = card.getAttribute('data-category') ?? '';
+        const match = (!query || text.includes(query)) && (!selected || cardCategory === selected);
+        card.toggleAttribute('hidden', !match);
+        if (match) visible += 1;
+      });
+      if (status) status.textContent = `${visible} ${visible === 1 ? 'Download' : 'Downloads'} angezeigt`;
+    };
+    form.addEventListener('input', update);
+    form.addEventListener('reset', () => requestAnimationFrame(update));
+    update();
+  }
+</script>
+<style>
+.download-filters{display:grid;grid-template-columns:minmax(14rem,2fr) minmax(12rem,1fr) auto;align-items:end;gap:var(--sv-space-4);padding:var(--sv-space-5);margin-bottom:var(--sv-space-7)}.download-filters label{display:block;margin-bottom:.35rem;font-weight:800}.download-filters input,.download-filters select{width:100%;min-height:3rem;padding:.65rem .8rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-sm);background:white;color:var(--sv-color-ink)}.download-filters__status{grid-column:1/-1;margin:0;color:var(--sv-color-muted);font-size:.88rem}@media(max-width:48rem){.download-filters{grid-template-columns:1fr}.download-filters__status{grid-column:auto}}
+</style>

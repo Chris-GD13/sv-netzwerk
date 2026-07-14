@@ -1,0 +1,40 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  tags?: string[];
+  file: string;
+  fileType: string;
+  fileSize?: string;
+  version?: string;
+  updatedAt?: Date;
+}
+
+const { id, title, description, category, tags = [], file, fileType, fileSize, version, updatedAt } = Astro.props;
+const meta = [fileType, fileSize, version ? `Version ${version}` : undefined].filter(Boolean).join(' · ');
+const searchText = [title, description, category, ...tags].join(' ').toLocaleLowerCase('de');
+---
+<article class="download-card sv-card sv-card-lift" data-download-card data-category={category} data-search={searchText}>
+  <div class="download-card__top">
+    <span class="sv-pill">{category}</span>
+    <span class="download-card__type" aria-label={`Dateityp ${fileType}`}>{fileType}</span>
+  </div>
+  <div>
+    <h2><a href={`/downloads/${id}/`}>{title}</a></h2>
+    <p>{description}</p>
+  </div>
+  <div class="download-card__meta">
+    <span>{meta}</span>
+    {updatedAt && <time datetime={updatedAt.toISOString()}>Stand {updatedAt.toLocaleDateString('de-DE')}</time>}
+  </div>
+  {tags.length > 0 && <ul class="download-card__tags" aria-label="Schlagwörter">{tags.map((tag) => <li>{tag}</li>)}</ul>}
+  <div class="download-card__actions">
+    <a class="sv-button sv-button-secondary" href={`/downloads/${id}/`}>Details</a>
+    <a class="sv-button sv-button-primary" href={file} download>Herunterladen</a>
+  </div>
+</article>
+<style>
+.download-card{display:flex;flex-direction:column;gap:var(--sv-space-5);padding:var(--sv-card-padding);min-height:100%}.download-card__top,.download-card__meta,.download-card__actions{display:flex;align-items:center;justify-content:space-between;gap:var(--sv-space-3);flex-wrap:wrap}.download-card__type{font-weight:850;color:var(--sv-color-muted);font-size:.82rem}.download-card h2{font-size:clamp(1.35rem,2vw,1.75rem);margin-bottom:var(--sv-space-3)}.download-card h2 a{color:inherit;text-decoration:none}.download-card p{color:var(--sv-color-ink-soft)}.download-card__meta{font-size:.82rem;color:var(--sv-color-muted)}.download-card__tags{display:flex;flex-wrap:wrap;gap:.45rem;padding:0;margin:0;list-style:none}.download-card__tags li{padding:.25rem .55rem;border:1px solid var(--sv-color-line);border-radius:999px;font-size:.76rem}.download-card__actions{margin-top:auto;justify-content:flex-start}
+</style>

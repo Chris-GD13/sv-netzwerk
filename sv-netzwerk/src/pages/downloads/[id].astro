@@ -1,0 +1,27 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import DownloadBox from '../../components/DownloadBox.astro';
+import NoticeBox from '../../components/NoticeBox.astro';
+import { publishedDownloads } from '../../lib/downloads';
+
+export async function getStaticPaths() {
+  const entries = publishedDownloads(await getCollection('downloads'));
+  return entries.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const updated = entry.data.publication.updatedAt ?? entry.data.publication.publishedAt;
+---
+<BaseLayout title={entry.data.seo.title ?? entry.data.title} description={entry.data.seo.description ?? entry.data.description} canonical={entry.data.seo.canonical} breadcrumbs={[{label:'Start',href:'/'},{label:'Downloads',href:'/downloads/'},{label:entry.data.title}]}>
+  <Hero compact eyebrow={entry.data.category} title={entry.data.title} text={entry.data.description} />
+  <section class="sv-section"><div class="sv-container download-detail">
+    <div class="sv-prose"><Content /></div>
+    <aside class="download-detail__side">
+      <DownloadBox title={entry.data.title} description={`Version ${entry.data.version ?? 'ohne Angabe'} · Stand ${updated.toLocaleDateString('de-DE')}`} href={entry.data.file} fileType={entry.data.fileType} fileSize={entry.data.fileSize} />
+      <NoticeBox title="Dokumentenhinweis">Vor der Verwendung ist zu prüfen, ob die Arbeitshilfe zum konkreten Auftrag, Versicherungsvertrag und Schadenbild passt.</NoticeBox>
+    </aside>
+  </div></section>
+</BaseLayout>
+<style>.download-detail{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(18rem,.8fr);gap:var(--sv-space-7);align-items:start}.download-detail__side{display:grid;gap:var(--sv-space-5);position:sticky;top:7rem}@media(max-width:52rem){.download-detail{grid-template-columns:1fr}.download-detail__side{position:static}}</style>

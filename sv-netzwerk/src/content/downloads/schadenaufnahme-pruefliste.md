@@ -2,14 +2,20 @@
 title: "Prüfliste Schadenaufnahme"
 description: "Strukturierte Prüfpunkte für die technische Erstaufnahme und nachvollziehbare Dokumentation."
 category: "Checklisten"
-tags: ["Schadenaufnahme", "Dokumentation"]
+tags: ["Schadenaufnahme", "Dokumentation", "Ortstermin"]
 file: "/downloads/pruefliste-schadenaufnahme.pdf"
 fileType: "PDF"
-version: "1.0"
+fileSize: "42 KB"
+version: "1.1"
+audience: ["Sachverständige", "Regulierer"]
 publication:
   publishedAt: 2026-07-14
-  status: draft
+  updatedAt: 2026-07-14
+  status: published
 seo: {}
 ---
+Die Prüfliste unterstützt die vollständige Erstaufnahme eines Schadenfalls. Sie führt durch Auftragsdaten, Versicherungsverhältnisse, Schadenhergang, technische Feststellungen, Schadenumfang, Nachweise und offene Punkte.
 
-Der Datensatz bereitet die spätere zentrale Verwaltung von Downloads vor. Die Datei wird erst mit Freigabe und Bereitstellung im öffentlichen Downloadverzeichnis veröffentlicht.
+## Anwendungszweck
+
+Die Arbeitshilfe dient als strukturierte Grundlage für Ortstermine und die anschließende Berichterstellung. Sie ersetzt nicht die Prüfung des konkreten Versicherungsvertrags oder individueller Auftragshinweise.

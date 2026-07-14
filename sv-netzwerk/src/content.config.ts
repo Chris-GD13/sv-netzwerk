@@ -42,6 +42,7 @@ const downloads = defineCollection({
     fileType: z.string(),
     fileSize: z.string().optional(),
     version: z.string().optional(),
+    audience: z.array(z.string()).default([]),
     publication: publicationSchema,
     seo: seoSchema.default({ noindex: false }),
   }),

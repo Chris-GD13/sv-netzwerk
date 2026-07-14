@@ -1,4 +1,25 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'; import Hero from '../../components/Hero.astro'; import DownloadBox from '../../components/DownloadBox.astro'; import SectionHeader from '../../components/SectionHeader.astro';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import DownloadCard from '../../components/downloads/DownloadCard.astro';
+import DownloadFilters from '../../components/downloads/DownloadFilters.astro';
+import { downloadCategories, publishedDownloads } from '../../lib/downloads';
+
+const downloads = publishedDownloads(await getCollection('downloads'));
+const categories = downloadCategories(downloads);
 ---
-<BaseLayout title="Downloads" description="Prüflisten und Arbeitshilfen für Schadenaufnahme, Dokumentation und Regulierung."><Hero compact eyebrow="Downloads" title="Prüffähige Arbeitshilfen für die Praxis." text="Vorbereitete Downloadstruktur für Checklisten, Formulare und dokumentationsstarke Arbeitshilfen."/><section class="sv-section"><div class="sv-container"><SectionHeader title="Aktuelle Arbeitshilfen" text="Die Downloads werden versioniert und mit eindeutigem Anwendungszweck bereitgestellt."/><div class="downloads"><DownloadBox title="Prüfliste Schadenaufnahme" description="Strukturierte Erstaufnahme mit Feststellungen, offenen Punkten und Nachweisen." href="#" fileType="PDF – in Vorbereitung"/><DownloadBox title="Prüfschema Schadenabgrenzung" description="Fragestellung, Feststellung, Bewertung und Empfehlung in konsistenter Reihenfolge." href="#" fileType="PDF – in Vorbereitung"/></div></div></section></BaseLayout><style>.downloads{display:grid;gap:1rem}</style>
+<BaseLayout title="Download Center" description="Versionierte Checklisten, Prüfschemata und Arbeitshilfen für Schadenaufnahme, Dokumentation und Regulierung." breadcrumbs={[{label:'Start',href:'/'},{label:'Downloads'}]}>
+  <Hero compact eyebrow="SVOS Download Center" title="Prüffähige Arbeitshilfen für die Praxis." text="Versionierte Checklisten, Prüfschemata und Vorlagen für eine strukturierte, nachvollziehbare Schadenbearbeitung." />
+  <section class="sv-section">
+    <div class="sv-container">
+      <SectionHeader title="Arbeitshilfen" text="Alle veröffentlichten Dokumente sind nach Kategorie, Version und Aktualisierungsstand nachvollziehbar erfasst." />
+      <DownloadFilters categories={categories} />
+      <div class="sv-grid sv-grid-2" data-download-grid>
+        {downloads.map((entry) => <DownloadCard id={entry.id} title={entry.data.title} description={entry.data.description} category={entry.data.category} tags={entry.data.tags} file={entry.data.file} fileType={entry.data.fileType} fileSize={entry.data.fileSize} version={entry.data.version} updatedAt={entry.data.publication.updatedAt ?? entry.data.publication.publishedAt} />)}
+      </div>
+      {downloads.length === 0 && <p>Derzeit sind keine Downloads veröffentlicht.</p>}
+    </div>
+  </section>
+</BaseLayout>

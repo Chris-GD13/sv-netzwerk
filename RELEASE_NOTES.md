@@ -1,16 +1,19 @@
-# Release Notes – SV-Netzwerk v1.6.2 Search Engine
+# Release Notes – SV-Netzwerk v1.6.3 Download Center
 
 ## Zweck
-Die Wissenssuche wird als eigenständiges SVOS-Modul strukturiert und für wachsende Inhaltsmengen vorbereitet.
+
+Dieses Release erweitert die SVOS-Grundlage um ein zentrales, versioniertes Download Center.
 
 ## Enthalten
-- typisierter Suchindex
-- deutsche Textnormalisierung und Tokenisierung
-- gewichtetes Relevanzranking
-- Kategorien-, Tag- und Typfacetten
-- cachebarer statischer JSON-Endpunkt
-- Suchoverlay mit Tastaturnavigation
-- erweiterte Suchseite mit URL-synchronisierten Filtern
 
-## Kompatibilität
-Die vorhandenen Inhalte und URLs bleiben unverändert. Der Suchindex wird beim Astro-Build statisch erzeugt.
+- Content-Collection-basierte Downloadverwaltung
+- Downloadkarten mit Kategorie, Tags, Version, Dateityp und Aktualisierungsstand
+- clientseitige Suche und Kategorienfilter
+- statische Detailseiten für veröffentlichte Downloads
+- gemeinsame Typen und Utilities
+- drei tatsächlich bereitgestellte PDF-Arbeitshilfen
+- vorbereitete Zielgruppen- und Versionsfelder
+
+## Sicherheit und Nachvollziehbarkeit
+
+Nur Datensätze mit Status `published` werden öffentlich ausgegeben. Hinweise zur fallbezogenen Prüfung bleiben Bestandteil jeder Detailseite.

@@ -1,18 +1,18 @@
-# Manifest – SV-Netzwerk v1.6.2 Search Engine
+# Manifest – SV-Netzwerk v1.6.3 Download Center
 
-## Neue Dateien
-- `sv-netzwerk/src/lib/search/types.ts`
-- `sv-netzwerk/src/lib/search/normalize.ts`
-- `sv-netzwerk/src/lib/search/index.ts`
-- `docs/releases/v1.6.2/ARCHITECTURE.md`
-- `docs/releases/v1.6.2/CHECKLIST.md`
-- `docs/releases/v1.6.2/ROLLBACK.md`
+## Neue Kernbestandteile
 
-## Geänderte Dateien
-- `sv-netzwerk/src/data/search.ts`
-- `sv-netzwerk/src/pages/search-index.json.ts`
-- `sv-netzwerk/src/pages/suche/index.astro`
-- `sv-netzwerk/src/components/SearchOverlay.astro`
-- `sv-netzwerk/package.json`
-- `sv-netzwerk/package-lock.json`
-- Release-Dokumentation und Versionsdatei
+- `sv-netzwerk/src/types/downloads.ts`
+- `sv-netzwerk/src/lib/downloads/index.ts`
+- `sv-netzwerk/src/components/downloads/DownloadCard.astro`
+- `sv-netzwerk/src/components/downloads/DownloadFilters.astro`
+- `sv-netzwerk/src/pages/downloads/[id].astro`
+- drei veröffentlichte Datensätze in `src/content/downloads`
+- drei PDF-Dateien in `public/downloads`
+
+## Geändert
+
+- Downloadübersicht
+- Content-Schema
+- Paketversion
+- Release-Dokumentation

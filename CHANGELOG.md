@@ -1,4 +1,11 @@
 # Changelog
+## 1.6.3 – 2026-07-14
+- SVOS Download Center mit Collection-Datenmodell eingeführt
+- Kategorien, Tags, Versionen und Zielgruppen ergänzt
+- clientseitige Suche und Kategorienfilter umgesetzt
+- Download-Detailseiten und drei PDF-Arbeitshilfen bereitgestellt
+- Dokumentation und Paketversion aktualisiert
+
 
 ## 1.6.2 – 2026-07-14
 - modulare SVOS Search Engine eingeführt
