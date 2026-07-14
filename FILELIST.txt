@@ -161,6 +161,7 @@
 ./sv-netzwerk/src/pages/fachwissen/seite/[page].astro
 ./sv-netzwerk/src/pages/fachwissen/tag/[tag].astro
 ./sv-netzwerk/src/pages/index.astro
+./sv-netzwerk/src/pages/komponenten/index.astro
 ./sv-netzwerk/src/pages/kontakt/index.astro
 ./sv-netzwerk/src/pages/leistungen/index.astro
 ./sv-netzwerk/src/pages/netzwerk/index.astro
@@ -169,6 +170,7 @@
 ./sv-netzwerk/src/pages/suche/index.astro
 ./sv-netzwerk/src/styles/global.css
 ./sv-netzwerk/src/styles/tokens.css
+./sv-netzwerk/src/types/components.ts
 ./sv-netzwerk/termin-vereinbaren/index.html
 ./sv-netzwerk/tsconfig.json
 ./sv-netzwerk/ueber-uns/index.html

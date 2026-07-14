@@ -1,6 +1,14 @@
 ---
-interface Props { number?:string; title:string; text:string; href:string; label?:string }
-const {number,title,text,href,label='Leistung ansehen'}=Astro.props;
+import type { ServiceCardProps } from '../types/components';
+const { number, title, text, href, label='Leistung ansehen', tone='default' } = Astro.props as ServiceCardProps;
 ---
-<article class="service-card sv-card sv-card-lift">{number&&<span>{number}</span>}<h3>{title}</h3><p>{text}</p><a href={href}>{label} <b aria-hidden="true">→</b></a></article>
-<style>.service-card{display:flex;min-height:19rem;flex-direction:column;padding:clamp(1.5rem,3vw,2.25rem)}span{color:var(--sv-color-accent);font-weight:900;letter-spacing:.1em}h3{margin-top:auto}p{color:var(--sv-color-muted)}a{font-weight:800;text-decoration:none}</style>
+<article class:list={['service-card','sv-card','sv-card-lift',`tone-${tone}`]}>
+  {number && <span class="service-number">{number}</span>}
+  <h3>{title}</h3><p>{text}</p>
+  <a href={href}>{label}<span aria-hidden="true">→</span></a>
+</article>
+<style>
+  .service-card{display:flex;min-height:19rem;flex-direction:column;padding:clamp(1.5rem,3vw,2.25rem)}
+  .service-number{color:var(--sv-color-accent);font-weight:900;letter-spacing:.1em}.service-card h3{margin-top:auto}.service-card p{color:var(--sv-color-muted)}.service-card a{display:inline-flex;gap:.5rem;font-weight:800;text-decoration:none}
+  .tone-soft{background:var(--sv-color-surface-alt)}.tone-accent{border-top:4px solid var(--sv-color-accent)}.tone-dark{border-color:var(--sv-color-ink);background:var(--sv-color-ink);color:white}.tone-dark p{color:rgba(255,255,255,.72)}.tone-dark a{color:white}
+</style>

@@ -1,6 +1,28 @@
 ---
-interface Props { eyebrow?: string; title: string; text: string; href?: string; linkLabel?: string; index?: string; }
-const { eyebrow,title,text,href,linkLabel='Mehr erfahren',index }=Astro.props;
+import type { FeatureCardProps } from '../types/components';
+const {
+  eyebrow,
+  title,
+  text,
+  href,
+  linkLabel = 'Mehr erfahren',
+  index,
+  tone = 'default',
+} = Astro.props as FeatureCardProps;
 ---
-<article class="feature sv-card sv-card-lift">{index&&<span class="index">{index}</span>}{eyebrow&&<p class="sv-eyebrow">{eyebrow}</p>}<h3>{title}</h3><p>{text}</p>{href&&<a href={href}>{linkLabel} <span aria-hidden="true">→</span></a>}</article>
-<style>.feature{position:relative;padding:clamp(1.4rem,3vw,2rem)}.feature p:not(.sv-eyebrow){color:var(--sv-color-muted)}.feature a{font-weight:750;text-decoration:none}.index{display:inline-grid;width:2.4rem;aspect-ratio:1;place-items:center;margin-bottom:1.25rem;border-radius:50%;background:var(--sv-color-accent-soft);color:var(--sv-color-primary);font-weight:850}</style>
+<article class:list={['feature-card', 'sv-card', 'sv-card-lift', `tone-${tone}`]}>
+  {index && <span class="feature-index">{index}</span>}
+  {eyebrow && <p class="sv-eyebrow">{eyebrow}</p>}
+  <h3>{title}</h3>
+  <p>{text}</p>
+  {href && <a class="feature-link" href={href}>{linkLabel}<span aria-hidden="true">→</span></a>}
+</article>
+<style>
+  .feature-card{position:relative;display:flex;min-height:18rem;flex-direction:column;padding:clamp(1.4rem,3vw,2rem);overflow:hidden}
+  .feature-card p:not(.sv-eyebrow){color:var(--sv-color-muted)}
+  .feature-link{display:inline-flex;align-items:center;gap:.5rem;margin-top:auto;font-weight:800;text-decoration:none}
+  .feature-index{display:inline-grid;width:2.5rem;aspect-ratio:1;place-items:center;margin-bottom:1.25rem;border-radius:50%;background:var(--sv-color-accent-soft);color:var(--sv-color-primary);font-weight:900}
+  .tone-soft{background:var(--sv-color-surface-alt)}
+  .tone-accent{border-color:color-mix(in srgb,var(--sv-color-accent) 45%,var(--sv-color-line))}
+  .tone-dark{border-color:var(--sv-color-ink);background:var(--sv-color-ink);color:white}.tone-dark p:not(.sv-eyebrow),.tone-dark .sv-eyebrow{color:rgba(255,255,255,.76)}.tone-dark a{color:white}
+</style>

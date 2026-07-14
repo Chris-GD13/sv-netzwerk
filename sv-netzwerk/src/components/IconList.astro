@@ -1,6 +1,8 @@
 ---
-interface Props { items:string[] }
-const {items}=Astro.props;
+import type { IconListItem } from '../types/components';
+interface Props { items: Array<string|IconListItem>; icon?: string; }
+const {items,icon='✓'}=Astro.props as Props;
+const normalized=items.map((item)=>typeof item==='string'?{text:item,icon}:{text:item.text,icon:item.icon??icon});
 ---
-<ul class="icon-list">{items.map(item=><li><span aria-hidden="true">✓</span>{item}</li>)}</ul>
-<style>.icon-list{display:grid;gap:.8rem;margin:0;padding:0;list-style:none}.icon-list li{display:flex;gap:.75rem;align-items:flex-start}.icon-list span{display:grid;flex:0 0 1.5rem;height:1.5rem;place-items:center;border-radius:50%;background:var(--sv-color-accent-soft);color:var(--sv-color-primary);font-size:.8rem;font-weight:900}</style>
+<ul class="icon-list">{normalized.map(item=><li><span aria-hidden="true">{item.icon}</span><span>{item.text}</span></li>)}</ul>
+<style>.icon-list{display:grid;gap:.8rem;margin:0;padding:0;list-style:none}.icon-list li{display:flex;gap:.75rem;align-items:flex-start}.icon-list li>span:first-child{display:grid;flex:0 0 1.5rem;height:1.5rem;place-items:center;border-radius:50%;background:var(--sv-color-accent-soft);color:var(--sv-color-primary);font-size:.8rem;font-weight:900}</style>

@@ -1,6 +1,8 @@
 ---
-interface Props { columns?:2|3|4; }
-const {columns=3}=Astro.props;
+import type { GridColumns } from '../types/components';
+interface Props { columns?: GridColumns; as?: 'div'|'section'|'ul'; labelledby?: string; }
+const { columns=3, as='div', labelledby } = Astro.props as Props;
+const Tag = as;
 ---
-<div class:list={['info-grid',`cols-${columns}`]}><slot/></div>
-<style>.info-grid{display:grid;gap:var(--sv-space-5)}.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:58rem){.cols-3,.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:38rem){.info-grid{grid-template-columns:1fr}}</style>
+<Tag class:list={['info-grid',`cols-${columns}`]} aria-labelledby={labelledby}><slot /></Tag>
+<style>.info-grid{display:grid;gap:var(--sv-space-5);margin:0;padding:0}.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:58rem){.cols-3,.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:38rem){.info-grid{grid-template-columns:1fr}}</style>

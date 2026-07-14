@@ -38,3 +38,17 @@
   --sv-space-10: 8rem;
   --sv-max-text: 68ch;
 }
+
+/* v1.5.3 Komponentenbibliothek */
+:root {
+  --sv-component-gap: clamp(1rem, 2vw, 1.5rem);
+  --sv-card-padding: clamp(1.25rem, 2.5vw, 2rem);
+  --sv-card-min-height: 18rem;
+  --sv-color-info: #2a6f9e;
+  --sv-color-warning: #9a6614;
+  --sv-color-danger: #a43d3d;
+  --sv-color-overlay: rgba(16,35,52,.72);
+  --sv-ring: 0 0 0 3px color-mix(in srgb, var(--sv-color-focus) 38%, transparent);
+  --sv-transition-fast: 120ms ease;
+  --sv-transition-slow: 320ms ease;
+}

@@ -1,19 +1,21 @@
-# Manifest – SV-Netzwerk v1.5.2 Suchsystem
+# Manifest – SV-Netzwerk v1.5.3
 
-## Neu
+## Neue Dateien
+- `sv-netzwerk/src/types/components.ts`
+- `sv-netzwerk/src/pages/komponenten/index.astro`
 
-- `sv-netzwerk/src/data/search.ts`
+## Überarbeitete Komponenten
+- `FeatureCard.astro`
+- `ServiceCard.astro`
+- `TeamCard.astro`
+- `StatCard.astro`
+- `InfoGrid.astro`
+- `SectionHeader.astro`
+- `Timeline.astro`
+- `FAQAccordion.astro`
+- `IconList.astro`
 
-## Überarbeitet
-
-- `sv-netzwerk/src/pages/search-index.json.ts`
-- `sv-netzwerk/src/pages/suche/index.astro`
-- `sv-netzwerk/src/components/SearchOverlay.astro`
-- `sv-netzwerk/src/components/Header.astro`
-- `sv-netzwerk/package.json`
-- `sv-netzwerk/package-lock.json`
-- `CHANGELOG.md`
-- `RELEASE_NOTES.md`
-- `MANIFEST.md`
-- `VALIDATION.md`
-- `VERSION`
+## Weitere Änderungen
+- Design Tokens erweitert
+- Versionen in `package.json` und `package-lock.json` auf 1.5.3 gesetzt
+- Release-Dokumentation aktualisiert

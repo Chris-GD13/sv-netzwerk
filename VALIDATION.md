@@ -1,15 +1,11 @@
-# Validation – SV-Netzwerk v1.5.2
+# Validation – v1.5.3
 
-## Prüfumfang
+## Strukturprüfung
+- Komponentenverzeichnis vorhanden
+- gemeinsame Props-Typen vorhanden
+- Demo-/Referenzseite vorhanden
+- Dokumentation aktualisiert
+- Versionsstände vereinheitlicht
 
-- konsistente Versionierung 1.5.2
-- statische Generierung des Suchindex
-- Astro-Typprüfung
-- Astro-Produktionsbuild
-- Suchfilter, Sortierung und URL-Parameter logisch geprüft
-- Tastaturbedienung des Such-Overlays berücksichtigt
-- bestehende CI/CD-Workflows unverändert übernommen
-
-## Ergebnis
-
-Der lokale Produktionsbuild wurde erfolgreich ausgeführt. Das Paket ist für Commit, Push und GitHub-Actions-Prüfung vorbereitet.
+## Buildstatus
+Ein vollständiger Build- und Regressionstest wurde nicht als Voraussetzung verlangt. Die abschließende Prüfung erfolgt über GitHub Actions nach Commit und Push.

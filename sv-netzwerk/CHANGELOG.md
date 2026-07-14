@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.3 – 2026-07-14
+- Komponentenbibliothek vereinheitlicht und erweitert
+- gemeinsame TypeScript-Props eingeführt
+- Design Tokens ergänzt
+- Demo-/Referenzseite `/komponenten/` ergänzt
+- Komponenten für Karten, Team, Statistik, Raster, Timeline, FAQ und Listen überarbeitet
+- Dokumentation und Versionsstände aktualisiert
+
+
 ## 1.5.2 – 2026-07-14
 
 ### Suchsystem
