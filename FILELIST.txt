@@ -49,6 +49,7 @@
 ./sv-netzwerk/SECURITY.md
 ./sv-netzwerk/SEO_INDEXIERUNGSNOTIZ_2026-07-11_v7.05.txt
 ./sv-netzwerk/UPLOAD-HINWEIS.md
+./sv-netzwerk/VERSION
 ./sv-netzwerk/WEBSITE_TEASER_2026-07-11_v7.05.txt
 ./sv-netzwerk/anfrage-gutachter-plattform.php
 ./sv-netzwerk/anfrage-versicherer.php
@@ -160,6 +161,9 @@
 ./sv-netzwerk/src/components/knowledge/KnowledgeMeta.astro
 ./sv-netzwerk/src/components/knowledge/KnowledgeTaxonomy.astro
 ./sv-netzwerk/src/components/knowledge/RelatedKnowledge.astro
+./sv-netzwerk/src/components/practice-cases/PracticeCaseCard.astro
+./sv-netzwerk/src/components/practice-cases/PracticeCaseFacts.astro
+./sv-netzwerk/src/components/practice-cases/PracticeCaseFilters.astro
 ./sv-netzwerk/src/content.config.ts
 ./sv-netzwerk/src/content/authors/christian-waechter.json
 ./sv-netzwerk/src/content/downloads/pruefschema-schadenabgrenzung.md
@@ -170,7 +174,9 @@
 ./sv-netzwerk/src/content/knowledge/schadenabgrenzung.md
 ./sv-netzwerk/src/content/knowledge/svos-foundation.md
 ./sv-netzwerk/src/content/linkedin/2026-07-11_gutachter-plattform-praxistipp.txt
+./sv-netzwerk/src/content/practice-cases/brandschaden-lichtbogen-schlafzimmer.md
 ./sv-netzwerk/src/content/practice-cases/leitungswasser-technische-abgrenzung.md
+./sv-netzwerk/src/content/practice-cases/schimmel-dachbereich-ursachenabgrenzung.md
 ./sv-netzwerk/src/content/videos/2026-07-11_wissen-in-180-sekunden_gutachter-plattform-vorpruefung.txt
 ./sv-netzwerk/src/data/corporate-standard.json
 ./sv-netzwerk/src/data/library.ts
@@ -180,6 +186,7 @@
 ./sv-netzwerk/src/env.d.ts
 ./sv-netzwerk/src/layouts/BaseLayout.astro
 ./sv-netzwerk/src/lib/downloads/index.ts
+./sv-netzwerk/src/lib/practice-cases/index.ts
 ./sv-netzwerk/src/lib/search/index.ts
 ./sv-netzwerk/src/lib/search/normalize.ts
 ./sv-netzwerk/src/lib/search/types.ts
@@ -191,12 +198,15 @@
 ./sv-netzwerk/src/pages/fachwissen/kategorie/[category].astro
 ./sv-netzwerk/src/pages/fachwissen/seite/[page].astro
 ./sv-netzwerk/src/pages/fachwissen/tag/[tag].astro
+./sv-netzwerk/src/pages/fachwissen/wasserschaden-rueckbau-technische-abgrenzung/index.astro
 ./sv-netzwerk/src/pages/index.astro
 ./sv-netzwerk/src/pages/komponenten/index.astro
 ./sv-netzwerk/src/pages/kontakt/index.astro
 ./sv-netzwerk/src/pages/leistungen/index.astro
 ./sv-netzwerk/src/pages/netzwerk/index.astro
 ./sv-netzwerk/src/pages/partner/index.astro
+./sv-netzwerk/src/pages/praxisfaelle/[id].astro
+./sv-netzwerk/src/pages/praxisfaelle/index.astro
 ./sv-netzwerk/src/pages/search-index.json.ts
 ./sv-netzwerk/src/pages/suche/index.astro
 ./sv-netzwerk/src/pages/svos/fachwissen/[id].astro
@@ -208,6 +218,7 @@
 ./sv-netzwerk/src/styles/tokens.css
 ./sv-netzwerk/src/types/components.ts
 ./sv-netzwerk/src/types/downloads.ts
+./sv-netzwerk/src/types/practice-cases.ts
 ./sv-netzwerk/src/types/svos.ts
 ./sv-netzwerk/src/utils/content.ts
 ./sv-netzwerk/src/utils/knowledge.ts

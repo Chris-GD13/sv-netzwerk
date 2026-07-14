@@ -1,8 +1,9 @@
-# Validierung – SV-Netzwerk v2.0
+# Validierung – SV-Netzwerk v1.6.4
 
-- Astro-Typprüfung wird über `npm run build` ausgeführt.
-- Produktionsbuild wird über `astro build` erzeugt.
-- Mobile Navigation ist ab 72rem und kleiner sichtbar.
-- Menü unterstützt Öffnen, Schließen, Backdrop und Escape-Taste.
-- Desktop-Navigation enthält zugängliche Mega-Menüs über Hover und Fokus.
-- Startseite verwendet die neu aufgebauten sichtbaren Kernkomponenten.
+- [x] Download-Collection erweitert
+- [x] ausschließlich veröffentlichte Datensätze werden angezeigt
+- [x] Filter und Live-Status barrierearm umgesetzt
+- [x] Detailseiten statisch generiert
+- [x] Downloadpfade zeigen auf vorhandene Dateien
+- [ ] GitHub Actions nach Übernahme prüfen
+- [ ] IONOS-Deployment nach Push prüfen

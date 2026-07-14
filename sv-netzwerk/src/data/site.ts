@@ -11,7 +11,7 @@ export const site = {
     role: 'Sachverständiger & Großschadenregulierer',
     qualification: 'DIN EN ISO/IEC 17024 zertifiziert'
   },
-  version: '2.0.0',
+  version: '1.5.0',
   navigation: [
     { label: 'Leistungen', href: '/leistungen/' },
     { label: 'Komplexschäden', href: '/komplexschaeden/' },

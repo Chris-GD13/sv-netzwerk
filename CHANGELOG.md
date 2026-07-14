@@ -1,13 +1,5 @@
 # Changelog
 
-## 2.0.0 – 2026-07-14
-- vollständiges visuelles Frontend-Redesign
-- responsive Navigation 2.0 mit Mobile-Off-Canvas-Menü
-- neue Mega-Menüs für Leistungen, Fachwissen und SVOS
-- neuer Hero mit SVOS-Prozessvisualisierung
-- neue Startseitenarchitektur und Schnellnavigation
-- modernisierte Karten, Buttons, Typografie, Farben und Footer
-
 ## 1.6.4 – 2026-07-14
 - SVOS Practice-Cases-Modul eingeführt
 - Collection-Schema für strukturierte Praxisfälle erweitert

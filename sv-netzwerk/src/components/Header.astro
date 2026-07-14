@@ -1,93 +1,84 @@
 ---
 const current = Astro.url.pathname;
-const groups = [
-  { label: 'Leistungen', href: '/leistungen/', description: 'Technische Bewertung und Regulierung', items: [
-    ['Komplex- und Großschäden','/komplexschaeden/','Strukturierte Bearbeitung komplexer Schadenlagen'],
-    ['Großschadenregulierung','/grossschadenregulierung/','Koordination, Prüfung und belastbare Entscheidungen'],
-    ['Sachverständigenleistungen','/leistungen/','Technische Expertise für Bau- und Versicherungsschäden']
+const nav = [
+  { label: 'Leistungen', href: '/leistungen/', children: [
+    ['Komplex- und Großschäden','/komplexschaeden/'],
+    ['Großschadenregulierung','/grossschadenregulierung/'],
+    ['Sachverständigenleistungen','/leistungen/'],
+    ['Schaden melden','/schaden-melden/']
   ]},
-  { label: 'Fachwissen', href: '/fachwissen/', description: 'Praxiswissen für bessere Entscheidungen', items: [
-    ['Fachwissensbibliothek','/fachwissen/','Beiträge, Normen und technische Einordnungen'],
-    ['Praxisfälle','/praxisfaelle/','Reale Fälle strukturiert dokumentiert'],
-    ['Downloads','/downloads/','Prüflisten, Merkblätter und Arbeitshilfen']
+  { label: 'Fachwissen', href: '/fachwissen/', children: [
+    ['Wissensbibliothek','/fachwissen/'],
+    ['Praxisfälle','/praxisfaelle/'],
+    ['Downloads','/downloads/'],
+    ['Wissen in 180 Sekunden','/wissen-in-180-sekunden/']
   ]},
-  { label: 'SVOS', href: '/svos/', description: 'Das Operating System für Schadenprozesse', items: [
-    ['SVOS Foundation','/svos/','Einheitliche Standards und digitale Prozesse'],
-    ['Gutachter-Plattform','/gutachter-plattform/','Experten, Aufträge und prüffähige Unterlagen'],
-    ['Netzwerk','/netzwerk/','Vernetzte Kompetenz mit klarer Verantwortung']
+  { label: 'SVOS', href: '/svos/', children: [
+    ['SV Operating System','/svos/'],
+    ['Gutachter-Plattform','/gutachter-plattform/'],
+    ['Für Sachverständige','/fuer-sachverstaendige/'],
+    ['Für Regulierer','/fuer-regulierer/']
   ]}
 ];
+const active = (href:string) => href === '/' ? current === '/' : current.startsWith(href);
 ---
 <header class="site-header" data-header>
-  <div class="header-shell sv-container">
+  <div class="topline"><div class="sv-container"><span>Bundesweite Schadenbearbeitung</span><span>DIN EN ISO/IEC 17024 zertifiziert</span><a href="/kontakt/">Kontakt</a></div></div>
+  <div class="sv-container header-main">
     <a class="brand" href="/" aria-label="SV-Netzwerk Startseite">
-      <span class="brand-symbol" aria-hidden="true"><span>SV</span></span>
-      <span class="brand-copy"><strong>SV-Netzwerk</strong><small>Bau · Schaden · Regulierung</small></span>
+      <span class="brand-symbol" aria-hidden="true"><i></i><b>SV</b></span>
+      <span class="brand-copy"><strong>SV-Netzwerk</strong><small>Sachverständige · Regulierung · SVOS</small></span>
     </a>
-
     <nav class="desktop-nav" aria-label="Hauptnavigation">
-      {groups.map((group) => (
-        <div class="nav-group">
-          <a class="nav-link" href={group.href} aria-current={current.startsWith(group.href) ? 'page' : undefined}>{group.label}<span aria-hidden="true">⌄</span></a>
-          <div class="mega-menu">
-            <div class="mega-intro"><span>{group.label}</span><strong>{group.description}</strong><a href={group.href}>Übersicht öffnen →</a></div>
-            <div class="mega-links">{group.items.map((item) => <a href={item[1]}><strong>{item[0]}</strong><small>{item[2]}</small></a>)}</div>
+      {nav.map(item => (
+        <div class="nav-item">
+          <a href={item.href} aria-current={active(item.href) ? 'page' : undefined}>{item.label}</a>
+          <div class="mega-panel">
+            <div class="mega-intro"><span>{item.label}</span><strong>Fachkompetenz systematisch erschließen.</strong><p>Direkter Zugang zu Leistungen, Wissen und digitalen Prozessen.</p></div>
+            <div class="mega-links">{item.children.map(child => <a href={child[1]}><span>{child[0]}</span><b>→</b></a>)}</div>
           </div>
         </div>
       ))}
-      <a class="nav-link" href="/partner/" aria-current={current.startsWith('/partner/') ? 'page' : undefined}>Partner</a>
+      <a href="/netzwerk/" aria-current={active('/netzwerk/') ? 'page' : undefined}>Netzwerk</a>
     </nav>
-
     <div class="header-actions">
-      <button class="search-trigger" type="button" data-search-open aria-label="Suche öffnen"><span aria-hidden="true">⌕</span><b>Suche</b></button>
-      <a class="sv-button sv-button-primary desktop-cta" href="/schaden-melden/">Schaden melden</a>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" data-menu-toggle>
-        <span></span><span></span><span></span><b class="sr-only">Navigation öffnen</b>
+      <button class="search-button" type="button" data-search-open aria-label="Suche öffnen"><span aria-hidden="true">⌕</span></button>
+      <a class="header-cta" href="/schaden-melden/">Schaden melden</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span></span><span></span><span></span><b class="sr-only">Menü öffnen</b>
       </button>
     </div>
   </div>
-
-  <div class="mobile-backdrop" data-mobile-backdrop></div>
-  <aside id="mobile-nav" class="mobile-nav" data-nav aria-label="Mobile Navigation" aria-hidden="true">
-    <div class="mobile-head"><strong>Navigation</strong><button type="button" data-menu-close aria-label="Navigation schließen">×</button></div>
-    <div class="mobile-content">
-      {groups.map((group) => (
+  <div id="mobile-menu" class="mobile-menu" data-mobile-menu aria-hidden="true">
+    <div class="mobile-menu-head"><strong>Navigation</strong><button type="button" data-menu-close aria-label="Menü schließen">×</button></div>
+    <div class="mobile-menu-body">
+      {nav.map(item => (
         <details>
-          <summary>{group.label}<span>+</span></summary>
-          <a class="mobile-overview" href={group.href}>{group.description}</a>
-          {group.items.map((item) => <a href={item[1]}><strong>{item[0]}</strong><small>{item[2]}</small></a>)}
+          <summary>{item.label}<span>+</span></summary>
+          <a href={item.href}>Übersicht</a>
+          {item.children.map(child => <a href={child[1]}>{child[0]}</a>)}
         </details>
       ))}
-      <a class="mobile-single" href="/partner/">Partner</a>
-      <a class="mobile-single" href="/kontakt/">Kontakt</a>
+      <a class="mobile-main-link" href="/netzwerk/">Netzwerk</a>
+      <a class="mobile-main-link" href="/kontakt/">Kontakt</a>
       <a class="sv-button sv-button-primary mobile-cta" href="/schaden-melden/">Schaden melden</a>
     </div>
-  </aside>
+  </div>
+  <button class="menu-backdrop" type="button" data-menu-backdrop aria-label="Menü schließen"></button>
 </header>
 <script is:inline>
-  const header=document.querySelector('[data-header]');
-  const toggle=document.querySelector('[data-menu-toggle]');
-  const close=document.querySelector('[data-menu-close]');
-  const nav=document.querySelector('[data-nav]');
-  const backdrop=document.querySelector('[data-mobile-backdrop]');
-  let ticking=false;
-  const updateHeader=()=>{header?.classList.toggle('is-compact',window.scrollY>28);ticking=false};
-  window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(updateHeader);ticking=true}},{passive:true});
-  const setMenu=(open)=>{
-    toggle?.setAttribute('aria-expanded',String(open));
-    nav?.setAttribute('aria-hidden',String(!open));
-    nav?.classList.toggle('is-open',open);
-    backdrop?.classList.toggle('is-open',open);
-    document.body.classList.toggle('menu-open',open);
-  };
-  toggle?.addEventListener('click',()=>setMenu(toggle.getAttribute('aria-expanded')!=='true'));
-  close?.addEventListener('click',()=>setMenu(false));
-  backdrop?.addEventListener('click',()=>setMenu(false));
-  document.addEventListener('keydown',(event)=>{if(event.key==='Escape'){setMenu(false);toggle?.focus()}});
-  nav?.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>setMenu(false)));
+const header=document.querySelector('[data-header]');
+const toggle=document.querySelector('[data-menu-toggle]');
+const closeButton=document.querySelector('[data-menu-close]');
+const menu=document.querySelector('[data-mobile-menu]');
+const backdrop=document.querySelector('[data-menu-backdrop]');
+const setOpen=(open)=>{toggle?.setAttribute('aria-expanded',String(open));menu?.classList.toggle('is-open',open);menu?.setAttribute('aria-hidden',String(!open));backdrop?.classList.toggle('is-open',open);document.body.classList.toggle('menu-open',open)};
+toggle?.addEventListener('click',()=>setOpen(toggle.getAttribute('aria-expanded')!=='true'));
+closeButton?.addEventListener('click',()=>setOpen(false));backdrop?.addEventListener('click',()=>setOpen(false));
+menu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setOpen(false)));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)});
+window.addEventListener('scroll',()=>header?.classList.toggle('is-compact',window.scrollY>24),{passive:true});
 </script>
 <style>
-.site-header{position:sticky;top:0;z-index:100;border-bottom:1px solid color-mix(in srgb,var(--sv-color-line) 80%,transparent);background:rgba(255,255,255,.92);backdrop-filter:blur(18px);transition:box-shadow var(--sv-transition),background var(--sv-transition)}.site-header.is-compact{box-shadow:0 10px 36px rgba(7,26,45,.1);background:rgba(255,255,255,.97)}.header-shell{display:flex;min-height:5.4rem;align-items:center;justify-content:space-between;gap:1.5rem;transition:min-height var(--sv-transition)}.is-compact .header-shell{min-height:4.5rem}.brand{display:flex;align-items:center;gap:.8rem;color:var(--sv-color-ink);text-decoration:none}.brand-symbol{display:grid;width:3rem;aspect-ratio:1;place-items:center;clip-path:polygon(50% 0,94% 25%,94% 75%,50% 100%,6% 75%,6% 25%);background:linear-gradient(135deg,var(--sv-color-primary),var(--sv-color-primary-bright));color:white;font-size:.8rem;font-weight:950}.brand-copy strong,.brand-copy small{display:block;line-height:1.05}.brand-copy strong{font-size:1.05rem;letter-spacing:-.025em}.brand-copy small{margin-top:.25rem;color:var(--sv-color-muted);font-size:.63rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.desktop-nav{display:flex;align-items:center;gap:.3rem}.nav-group{position:relative}.nav-link{display:flex;align-items:center;gap:.35rem;padding:1rem .72rem;border-radius:.65rem;color:var(--sv-color-ink-soft);font-size:.9rem;font-weight:850;text-decoration:none}.nav-link:hover,.nav-link[aria-current="page"]{background:var(--sv-color-surface-alt);color:var(--sv-color-primary)}.nav-group:hover .mega-menu,.nav-group:focus-within .mega-menu{visibility:visible;transform:translate(-50%,0);opacity:1;pointer-events:auto}.mega-menu{position:absolute;top:calc(100% + .7rem);left:50%;display:grid;visibility:hidden;width:min(44rem,80vw);grid-template-columns:.8fr 1.6fr;transform:translate(-50%,-.5rem);overflow:hidden;border:1px solid var(--sv-color-line);border-radius:1.2rem;background:white;box-shadow:var(--sv-shadow-lg);opacity:0;pointer-events:none;transition:opacity var(--sv-transition),transform var(--sv-transition),visibility var(--sv-transition)}.mega-intro{padding:1.5rem;background:linear-gradient(145deg,var(--sv-color-primary),#08243c);color:white}.mega-intro>span{color:#ffc95f;font-size:.72rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.mega-intro strong{display:block;margin:.75rem 0 1.3rem;font-size:1.35rem;line-height:1.2}.mega-intro a{color:white;font-size:.86rem;font-weight:800;text-decoration:none}.mega-links{display:grid;padding:.7rem}.mega-links a{display:block;padding:1rem;border-radius:.8rem;color:var(--sv-color-ink);text-decoration:none}.mega-links a:hover{background:var(--sv-color-surface-alt)}.mega-links strong,.mega-links small{display:block}.mega-links small{margin-top:.18rem;color:var(--sv-color-muted);font-size:.78rem;line-height:1.4}.header-actions{display:flex;align-items:center;gap:.6rem}.search-trigger{display:flex;min-height:2.9rem;align-items:center;gap:.4rem;padding:.65rem .8rem;border:1px solid var(--sv-color-line);border-radius:.7rem;background:white;color:var(--sv-color-ink);cursor:pointer}.search-trigger span{font-size:1.25rem}.search-trigger b{font-size:.78rem}.menu-toggle{display:none;width:3rem;height:3rem;padding:.7rem;border:1px solid var(--sv-color-line);border-radius:.7rem;background:white;cursor:pointer}.menu-toggle span{display:block;width:1.55rem;height:2px;margin:.25rem auto;background:var(--sv-color-ink)}.mobile-nav,.mobile-backdrop{display:none}
-@media(max-width:72rem){.desktop-nav,.desktop-cta,.search-trigger b{display:none}.menu-toggle{display:block}.mobile-backdrop{position:fixed;inset:0;display:block;visibility:hidden;background:rgba(4,18,31,.55);opacity:0;transition:opacity var(--sv-transition),visibility var(--sv-transition)}.mobile-backdrop.is-open{visibility:visible;opacity:1}.mobile-nav{position:fixed;inset:0 0 0 auto;display:flex;width:min(31rem,94vw);flex-direction:column;transform:translateX(105%);background:white;box-shadow:-30px 0 80px rgba(7,26,45,.24);transition:transform var(--sv-transition-slow)}.mobile-nav.is-open{transform:none}.mobile-head{display:flex;align-items:center;justify-content:space-between;padding:1.25rem;border-bottom:1px solid var(--sv-color-line)}.mobile-head strong{font-size:1.1rem}.mobile-head button{width:2.7rem;height:2.7rem;border:0;border-radius:.7rem;background:var(--sv-color-surface-alt);font-size:1.8rem;cursor:pointer}.mobile-content{overflow:auto;padding:1rem 1rem 2rem}.mobile-content details{border-bottom:1px solid var(--sv-color-line)}.mobile-content summary{display:flex;align-items:center;justify-content:space-between;padding:1rem .25rem;cursor:pointer;font-weight:900;list-style:none}.mobile-content summary::-webkit-details-marker{display:none}.mobile-content details>a{display:block;padding:.75rem;border-radius:.7rem;color:var(--sv-color-ink);text-decoration:none}.mobile-content details>a:hover{background:var(--sv-color-surface-alt)}.mobile-content details strong,.mobile-content details small{display:block}.mobile-content details small{margin-top:.15rem;color:var(--sv-color-muted);font-size:.76rem}.mobile-overview{background:var(--sv-color-surface-blue);font-weight:800}.mobile-single{display:block;padding:1rem .25rem;border-bottom:1px solid var(--sv-color-line);color:var(--sv-color-ink);font-weight:900;text-decoration:none}.mobile-cta{width:100%;margin-top:1.2rem}}
-@media(max-width:34rem){.header-shell{min-height:4.7rem}.brand-copy small{display:none}.brand-symbol{width:2.7rem}}
+.site-header{position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(7,26,46,.08);background:rgba(255,255,255,.96);backdrop-filter:blur(18px);transition:box-shadow var(--sv-transition),background var(--sv-transition)}.site-header.is-compact{box-shadow:0 12px 30px rgba(7,26,46,.1)}.topline{background:var(--sv-color-ink);color:#cbd9e5;font-size:.75rem}.topline .sv-container{display:flex;min-height:2.1rem;align-items:center;justify-content:flex-end;gap:1.3rem}.topline a{color:white;text-decoration:none}.header-main{display:flex;min-height:5.4rem;align-items:center;justify-content:space-between;gap:2rem;transition:min-height var(--sv-transition)}.is-compact .header-main{min-height:4.6rem}.brand{display:flex;align-items:center;gap:.85rem;color:var(--sv-color-ink);text-decoration:none}.brand-symbol{position:relative;display:grid;width:3.1rem;aspect-ratio:1;place-items:center;overflow:hidden;border-radius:.9rem;background:linear-gradient(145deg,var(--sv-color-primary),#102f49);color:white;box-shadow:0 12px 28px rgba(11,79,122,.24)}.brand-symbol i{position:absolute;inset:.4rem;border:1px solid rgba(255,255,255,.28);transform:rotate(45deg)}.brand-symbol b{position:relative;font-size:.83rem;letter-spacing:.03em}.brand-copy strong,.brand-copy small{display:block;line-height:1.1}.brand-copy strong{font-size:1.08rem}.brand-copy small{margin-top:.28rem;color:var(--sv-color-muted);font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.desktop-nav{display:flex;align-items:center;gap:1.65rem}.desktop-nav>a,.nav-item>a{position:relative;color:var(--sv-color-ink-soft);font-size:.92rem;font-weight:820;text-decoration:none}.desktop-nav>a::after,.nav-item>a::after{position:absolute;right:0;bottom:-.55rem;left:0;height:2px;transform:scaleX(0);background:var(--sv-color-accent);content:"";transition:transform var(--sv-transition)}.desktop-nav>a:hover::after,.desktop-nav>a[aria-current="page"]::after,.nav-item>a:hover::after,.nav-item>a[aria-current="page"]::after{transform:scaleX(1)}.nav-item{position:relative;padding-block:1.9rem}.mega-panel{position:absolute;top:calc(100% - .6rem);left:50%;display:grid;width:39rem;grid-template-columns:1fr 1.25fr;gap:1rem;transform:translate(-50%,-.5rem);padding:1rem;border:1px solid var(--sv-color-line);border-radius:1.35rem;background:white;box-shadow:var(--sv-shadow-lg);opacity:0;visibility:hidden;transition:opacity var(--sv-transition),transform var(--sv-transition),visibility var(--sv-transition)}.nav-item:hover .mega-panel,.nav-item:focus-within .mega-panel{transform:translate(-50%,0);opacity:1;visibility:visible}.mega-intro{padding:1.25rem;border-radius:1rem;background:linear-gradient(145deg,var(--sv-color-ink),var(--sv-color-primary));color:white}.mega-intro>span{color:#ffc56f;font-size:.72rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}.mega-intro strong{display:block;margin:.8rem 0;font-size:1.25rem;line-height:1.2}.mega-intro p{margin:0;color:#ccdae5;font-size:.9rem}.mega-links{display:grid}.mega-links a{display:flex;align-items:center;justify-content:space-between;padding:.85rem .95rem;border-radius:.75rem;color:var(--sv-color-ink);font-weight:780;text-decoration:none}.mega-links a:hover{background:var(--sv-color-surface-alt)}.mega-links b{color:var(--sv-color-accent)}.header-actions{display:flex;align-items:center;gap:.65rem}.search-button,.menu-toggle{display:grid;width:2.85rem;height:2.85rem;place-items:center;border:1px solid var(--sv-color-line);border-radius:.75rem;background:white;color:var(--sv-color-ink);cursor:pointer}.search-button span{font-size:1.35rem}.header-cta{display:inline-flex;min-height:2.9rem;align-items:center;padding:.65rem 1rem;border-radius:.75rem;background:var(--sv-color-accent);color:#101820;font-size:.88rem;font-weight:900;text-decoration:none;box-shadow:0 10px 24px rgba(255,157,18,.25)}.menu-toggle{display:none;padding:.65rem}.menu-toggle span{display:block;width:1.3rem;height:2px;margin:.16rem;background:var(--sv-color-ink);transition:transform var(--sv-transition),opacity var(--sv-transition)}.menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(5px) rotate(45deg)}.menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}.menu-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-5px) rotate(-45deg)}.mobile-menu{position:fixed;top:0;right:0;z-index:120;width:min(31rem,92vw);height:100dvh;transform:translateX(105%);background:white;box-shadow:var(--sv-shadow-lg);transition:transform var(--sv-transition-slow);overflow:auto}.mobile-menu.is-open{transform:none}.mobile-menu-head{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.25rem;border-bottom:1px solid var(--sv-color-line)}.mobile-menu-head button{display:grid;width:2.6rem;height:2.6rem;place-items:center;border:0;border-radius:.65rem;background:var(--sv-color-surface-alt);font-size:1.8rem;cursor:pointer}.mobile-menu-body{display:grid;padding:1rem 1.25rem 2rem}.mobile-menu details{border-bottom:1px solid var(--sv-color-line)}.mobile-menu summary{display:flex;align-items:center;justify-content:space-between;padding:1.05rem 0;cursor:pointer;font-weight:900;list-style:none}.mobile-menu summary::-webkit-details-marker{display:none}.mobile-menu details>a{display:block;padding:.7rem .85rem;border-radius:.65rem;color:var(--sv-color-ink-soft);font-weight:700;text-decoration:none}.mobile-menu details>a:hover{background:var(--sv-color-surface-alt)}.mobile-main-link{padding:1rem 0;border-bottom:1px solid var(--sv-color-line);color:var(--sv-color-ink);font-weight:900;text-decoration:none}.mobile-cta{margin-top:1.2rem}.menu-backdrop{position:fixed;inset:0;z-index:110;display:block;border:0;background:rgba(4,17,30,.62);opacity:0;pointer-events:none;transition:opacity var(--sv-transition)}.menu-backdrop.is-open{opacity:1;pointer-events:auto}@media(max-width:74rem){.desktop-nav{display:none}.menu-toggle{display:grid}}@media(max-width:46rem){.topline{display:none}.header-main{min-height:4.75rem}.header-cta{display:none}.brand-copy small{display:none}.brand-symbol{width:2.7rem}.search-button{display:none}}
 </style>

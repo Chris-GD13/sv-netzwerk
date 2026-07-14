@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.0 – 2026-07-14
+- vollständiges sichtbares Frontend-Redesign
+- neuer Sticky Header mit Mega-Menüs
+- funktionsfähiges Mobile-Off-Canvas-Menü
+- neuer Hero mit SVOS-Prozessdarstellung
+- neue Startseite mit Leistungen, Praxisfällen, Fachwissen, Plattform und Netzwerk
+- neues Farb-, Typografie- und Kartensystem
+- neuer Footer
+
+
 ## 1.6.0 – 2026-07-14
 
 ### SVOS Foundation
