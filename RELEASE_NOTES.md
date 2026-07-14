@@ -1,19 +1,17 @@
-# Release Notes – SV-Netzwerk v1.6.4 Download Center
+# Release Notes – SV-Netzwerk v3.0.1
 
-## Zweck
+## Sprint 1: Header und Navigation
 
-Dieses Release erweitert die SVOS-Grundlage um ein zentrales, versioniertes Download Center.
+Dieses Release ersetzt den tatsächlich gerenderten Header durch eine neue responsive Navigationsarchitektur.
 
-## Enthalten
+### Sichtbare Änderungen
+- neuer Markenbereich im Header
+- neue Desktop-Navigation
+- Mega-Menüs für Leistungen, Fachwissen und SVOS
+- sichtbare Menüschaltfläche auf Smartphone und Tablet
+- mobiles Off-Canvas-Menü
+- neue Kontakt- und Schaden-melden-Aktionen
+- kompakter Sticky Header beim Scrollen
 
-- Content-Collection-basierte Downloadverwaltung
-- Downloadkarten mit Kategorie, Tags, Version, Dateityp und Aktualisierungsstand
-- clientseitige Suche und Kategorienfilter
-- statische Detailseiten für veröffentlichte Downloads
-- gemeinsame Typen und Utilities
-- drei tatsächlich bereitgestellte PDF-Arbeitshilfen
-- vorbereitete Zielgruppen- und Versionsfelder
-
-## Sicherheit und Nachvollziehbarkeit
-
-Nur Datensätze mit Status `published` werden öffentlich ausgegeben. Hinweise zur fallbezogenen Prüfung bleiben Bestandteil jeder Detailseite.
+### Technische Prüfung
+Der Astro-Check und der vollständige Produktionsbuild wurden lokal erfolgreich ausgeführt.

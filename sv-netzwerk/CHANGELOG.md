@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.0.1 – 2026-07-14
+- sichtbaren Header vollständig neu aufgebaut
+- robuste Desktop-Navigation mit Mega-Menüs integriert
+- mobile Navigation als Off-Canvas-Menü mit deutlich sichtbarer Menüschaltfläche umgesetzt
+- Fokusführung, ESC-Schließen, Backdrop und Scroll-Lock ergänzt
+- Header-CTA, Suche, Kontakt und aktive Navigation vereinheitlicht
+- responsive Darstellung für Smartphone, Tablet und Desktop überarbeitet
+
+
 ## 3.0.0 – 2026-07-14
 - vollständiges sichtbares Frontend-Redesign
 - neuer Sticky Header mit Mega-Menüs

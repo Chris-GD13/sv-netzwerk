@@ -1,9 +1,9 @@
-# Validierung – SV-Netzwerk v1.6.4
+# Validierung – SV-Netzwerk v3.0.1 Header & Navigation
 
-- [x] Download-Collection erweitert
-- [x] ausschließlich veröffentlichte Datensätze werden angezeigt
-- [x] Filter und Live-Status barrierearm umgesetzt
-- [x] Detailseiten statisch generiert
-- [x] Downloadpfade zeigen auf vorhandene Dateien
-- [ ] GitHub Actions nach Übernahme prüfen
-- [ ] IONOS-Deployment nach Push prüfen
+- `npm ci --no-audit --no-fund`: erfolgreich
+- `astro check`: 81 Dateien, 0 Fehler, 0 Warnungen, 0 Hinweise
+- `astro build`: erfolgreich
+- erzeugte Seiten: 83
+- neue Desktop-Navigation im erzeugten `dist/index.html` nachgewiesen
+- sichtbare mobile Menüschaltfläche im erzeugten `dist/index.html` nachgewiesen
+- Off-Canvas-Menü, Backdrop, ESC-Schließen und Fokus-Rückgabe implementiert
