@@ -36,6 +36,7 @@
 
   async function load() {
     if (searchData.length) return;
+    results.setAttribute('aria-busy', 'true');
     const response = await fetch('/search-index.json');
     if (!response.ok) throw new Error('Search index unavailable');
     const payload = await response.json();
@@ -51,6 +52,8 @@
     if (title.includes(term)) value += 50;
     if (category.includes(term)) value += 20;
     if ((item.searchable || '').includes(term)) value += 10;
+    const queryTokens = term.split(/\s+/).filter(Boolean);
+    value += queryTokens.filter((token) => (item.tokens || []).some((candidate) => candidate.includes(token))).length * 8;
     if (item.featured) value += 5;
     return value;
   }
@@ -79,6 +82,7 @@
       .map((entry) => entry.item);
 
     status.textContent = found.length === 1 ? '1 passender Inhalt' : `${found.length} passende Inhalte`;
+    results.setAttribute('aria-busy', 'false');
     results.innerHTML = found.length
       ? found.map((item) => `<a href="${item.href}"><span class="result-meta">${item.category} · ${item.type === 'article' ? 'Fachbeitrag' : item.type === 'download' ? 'Download' : 'Video'}</span><strong>${item.title}</strong><span>${item.description}</span></a>`).join('')
       : '<p class="empty-result">Keine passenden Inhalte gefunden. Nutzen Sie einen allgemeineren Suchbegriff.</p>';

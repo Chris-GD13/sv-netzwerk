@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Hero from '../../components/Hero.astro';
 import { categories, tags } from '../../data/library';
-import { searchDocuments } from '../../data/search';
+import { searchIndex as searchDocuments } from '../../lib/search';
 
 const typeLabels = {
   article: 'Fachbeitrag',
@@ -10,7 +10,7 @@ const typeLabels = {
   video: 'Video',
 };
 ---
-<BaseLayout title="Suche" description="Fachwissen, Downloads und Videos des SV-Netzwerks durchsuchen.">
+<BaseLayout title="Suche" description="Fachwissen, Downloads und Videos des SV-Netzwerks durchsuchen." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Suche' }]}>
   <Hero compact eyebrow="Suche" title="SVOS Wissenssuche" text="Durchsuchen Sie Fachbeiträge, Downloads und Videos nach Begriffen, Kategorien und Schlagworten." />
 
   <section class="sv-section">
@@ -69,6 +69,7 @@ const typeLabels = {
               data-title={item.title.toLocaleLowerCase('de-DE')}
               data-date={item.date}
               data-search={item.searchable}
+              data-tokens={item.tokens.join('|')}
               data-cat={item.category}
               data-type={item.type}
               data-tags={item.tags.join('|')}
@@ -125,6 +126,9 @@ const typeLabels = {
     if (normalize(item.dataset.title).startsWith(term)) value += 70;
     if (normalize(item.dataset.title).includes(term)) value += 45;
     if (item.dataset.search.includes(term)) value += 10;
+    const queryTokens = term.split(/\s+/).filter(Boolean);
+    const tokens = (item.dataset.tokens || '').split('|');
+    value += queryTokens.filter((token) => tokens.some((candidate) => candidate.includes(token))).length * 8;
     return value;
   }
 

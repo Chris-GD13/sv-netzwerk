@@ -1,27 +1,18 @@
-# Manifest – SV-Netzwerk v1.6.1
+# Manifest – SV-Netzwerk v1.6.2 Search Engine
 
-Neu: `src/utils/knowledge.ts`, vier Knowledge-Komponenten, dynamische SVOS-Fachwissensrouten und zwei Knowledge-Inhalte.
+## Neue Dateien
+- `sv-netzwerk/src/lib/search/types.ts`
+- `sv-netzwerk/src/lib/search/normalize.ts`
+- `sv-netzwerk/src/lib/search/index.ts`
+- `docs/releases/v1.6.2/ARCHITECTURE.md`
+- `docs/releases/v1.6.2/CHECKLIST.md`
+- `docs/releases/v1.6.2/ROLLBACK.md`
 
-# Manifest – SV-Netzwerk v1.6.0
-
-## Neu
-- `sv-netzwerk/src/content.config.ts`
-- `sv-netzwerk/src/content/knowledge/svos-foundation.md`
-- `sv-netzwerk/src/content/downloads/schadenaufnahme-pruefliste.md`
-- `sv-netzwerk/src/content/practice-cases/leitungswasser-technische-abgrenzung.md`
-- `sv-netzwerk/src/content/authors/christian-waechter.json`
-- `sv-netzwerk/src/types/svos.ts`
-- `sv-netzwerk/src/utils/content.ts`
-- `sv-netzwerk/src/utils/routes.ts`
-- `sv-netzwerk/src/pages/svos/index.astro`
-- `docs/releases/v1.6.0/ARCHITECTURE.md`
-- `docs/releases/v1.6.0/MIGRATION.md`
-
-## Aktualisiert
-- `VERSION`
-- `CHANGELOG.md`
-- `RELEASE_NOTES.md`
-- `VALIDATION.md`
+## Geänderte Dateien
+- `sv-netzwerk/src/data/search.ts`
+- `sv-netzwerk/src/pages/search-index.json.ts`
+- `sv-netzwerk/src/pages/suche/index.astro`
+- `sv-netzwerk/src/components/SearchOverlay.astro`
 - `sv-netzwerk/package.json`
 - `sv-netzwerk/package-lock.json`
-- `sv-netzwerk/CHANGELOG.md`
+- Release-Dokumentation und Versionsdatei

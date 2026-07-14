@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.2 – 2026-07-14
+- modulare SVOS Search Engine eingeführt
+- zentralen, typisierten Suchindex und Normalisierung ergänzt
+- gewichtetes Ranking für Titel, Kategorien, Tags und Beschreibungen umgesetzt
+- JSON-Suchindex um Facetten und Cache-Header erweitert
+- erweiterte Suche und Suchoverlay auf gemeinsame Indexstruktur umgestellt
+- Dokumentation und Prüflisten ergänzt
+
 ## 1.6.1 – 2026-07-14
 - SVOS Knowledge Engine mit automatisch erzeugten Beitragslisten ergänzt
 - Kategorie- und Tag-Routen aus Content Collections generiert

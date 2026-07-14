@@ -1,31 +1,16 @@
-# Validation – SV-Netzwerk v1.6.1
+# Validierung – v1.6.2
 
-- Content-Schemas werden durch Astro validiert.
-- Dynamische Routen werden ausschließlich für veröffentlichte Inhalte erzeugt.
-- Buildprüfung: `npm run build`.
+## Strukturelle Prüfung
+- Suchmodul von UI und Datenquelle getrennt
+- gemeinsame Typen für Index und Treffer vorhanden
+- bestehende Suchschnittstelle kompatibel gehalten
+- statischer JSON-Endpunkt mit Facetten erweitert
 
-# Validation – v1.6.0
+## Technische Prüfung
+Der Produktionsbuild wird mit `npm ci` und `npm run build` geprüft. Das Ergebnis ist zusätzlich in `VALIDATION.txt` dokumentiert.
 
-- [x] Versionsnummern auf 1.6.0 aktualisiert
-- [x] vier Content Collections definiert
-- [x] Schemas für Veröffentlichung und SEO ergänzt
-- [x] Beispieldatensätze für alle Collections angelegt
-- [x] zentrale SVOS-Typen und Utilities ergänzt
-- [x] SVOS-Statusseite angelegt
-- [x] `npm ci` erfolgreich
-- [x] `npm run build` erfolgreich
-- [ ] GitHub Actions erfolgreich
-- [ ] IONOS-Deployment erfolgreich
-
-## Lokales Ergebnis
-- Astro Check: 0 Fehler, 0 Warnungen
-- Produktionsbuild: erfolgreich
-- erzeugte Seiten: 60
-- Sitemap: erfolgreich erzeugt
-
-## Tatsächliche Buildvalidierung
-
+## Ergebnis
 - `npm ci --no-audit --no-fund`: erfolgreich
-- `npm run build`: erfolgreich
-- Astro Check: 0 Fehler, 0 Warnungen, 0 Hinweise
-- 75 statische Seiten erzeugt
+- `astro check`: 0 Fehler, 0 Warnungen, 0 Hinweise
+- `astro build`: erfolgreich
+- 75 statische Seiten einschließlich `/search-index.json` erzeugt
