@@ -1,3 +1,7 @@
+# Manifest – SV-Netzwerk v1.6.1
+
+Neu: `src/utils/knowledge.ts`, vier Knowledge-Komponenten, dynamische SVOS-Fachwissensrouten und zwei Knowledge-Inhalte.
+
 # Manifest – SV-Netzwerk v1.6.0
 
 ## Neu

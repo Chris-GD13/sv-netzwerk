@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Hero from '../../../components/Hero.astro';
+import KnowledgeCard from '../../../components/knowledge/KnowledgeCard.astro';
+import KnowledgeTaxonomy from '../../../components/knowledge/KnowledgeTaxonomy.astro';
+import { getPublishedKnowledge, getKnowledgeCategories, getKnowledgeTags } from '../../../utils/knowledge';
+
+const entries = await getPublishedKnowledge();
+const categories = getKnowledgeCategories(entries);
+const tags = getKnowledgeTags(entries);
+---
+<BaseLayout title="SVOS Knowledge Engine | SV-Netzwerk" description="Automatisch erzeugte Fachwissensübersicht mit Kategorien, Tags und validierten Metadaten." breadcrumbs={[{label:'Start',href:'/'},{label:'SVOS',href:'/svos/'},{label:'Fachwissen'}]}>
+  <Hero eyebrow="SVOS Knowledge Engine" title="Fachwissen aus strukturierten Inhalten" text="Veröffentlichte Beiträge werden automatisch sortiert, kategorisiert und für interne Verknüpfungen aufbereitet." />
+  <section class="sv-section"><div class="sv-container">
+    <div class="taxonomy-grid"><KnowledgeTaxonomy title="Kategorien" terms={categories} basePath="/svos/fachwissen/kategorie"/><KnowledgeTaxonomy title="Schlagwörter" terms={tags} basePath="/svos/fachwissen/tag"/></div>
+    <div class="knowledge-grid">{entries.map((entry) => <KnowledgeCard entry={entry}/>)}</div>
+  </div></section>
+</BaseLayout>
+<style>.taxonomy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:var(--sv-space-5);margin-bottom:var(--sv-space-7)}.knowledge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:var(--sv-space-5)}</style>

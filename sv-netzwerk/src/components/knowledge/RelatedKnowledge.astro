@@ -1,0 +1,11 @@
+---
+import type { KnowledgeEntry } from '../../utils/knowledge';
+import KnowledgeCard from './KnowledgeCard.astro';
+interface Props { entries: KnowledgeEntry[]; }
+const { entries } = Astro.props;
+---
+{entries.length > 0 && <section class="related" aria-labelledby="related-heading">
+  <h2 id="related-heading">Verwandte Fachbeiträge</h2>
+  <div class="related-grid">{entries.map((entry) => <KnowledgeCard entry={entry} compact />)}</div>
+</section>}
+<style>.related{margin-top:var(--sv-space-8);padding-top:var(--sv-space-7);border-top:1px solid var(--sv-color-border)}.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:var(--sv-space-5)}</style>

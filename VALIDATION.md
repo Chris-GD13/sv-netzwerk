@@ -1,3 +1,9 @@
+# Validation – SV-Netzwerk v1.6.1
+
+- Content-Schemas werden durch Astro validiert.
+- Dynamische Routen werden ausschließlich für veröffentlichte Inhalte erzeugt.
+- Buildprüfung: `npm run build`.
+
 # Validation – v1.6.0
 
 - [x] Versionsnummern auf 1.6.0 aktualisiert
@@ -16,3 +22,10 @@
 - Produktionsbuild: erfolgreich
 - erzeugte Seiten: 60
 - Sitemap: erfolgreich erzeugt
+
+## Tatsächliche Buildvalidierung
+
+- `npm ci --no-audit --no-fund`: erfolgreich
+- `npm run build`: erfolgreich
+- Astro Check: 0 Fehler, 0 Warnungen, 0 Hinweise
+- 75 statische Seiten erzeugt

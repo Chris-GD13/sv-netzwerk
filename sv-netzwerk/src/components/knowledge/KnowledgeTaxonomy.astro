@@ -1,0 +1,10 @@
+---
+import type { TaxonomyTerm } from '../../types/svos';
+interface Props { title: string; terms: TaxonomyTerm[]; basePath: string; }
+const { title, terms, basePath } = Astro.props;
+---
+<nav class="taxonomy" aria-label={title}>
+  <h2>{title}</h2>
+  <ul>{terms.map((term) => <li><a href={`${basePath}/${term.slug}/`}>{term.label}<span>{term.count}</span></a></li>)}</ul>
+</nav>
+<style>.taxonomy{padding:var(--sv-space-6);border:1px solid var(--sv-color-border);border-radius:var(--sv-radius-lg);background:var(--sv-color-surface)}.taxonomy h2{margin-top:0;font-size:1.15rem}.taxonomy ul{display:flex;flex-wrap:wrap;gap:.55rem;margin:0;padding:0;list-style:none}.taxonomy a{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem .75rem;border-radius:999px;background:var(--sv-color-surface-alt);text-decoration:none}.taxonomy span{display:grid;min-width:1.5rem;height:1.5rem;place-items:center;border-radius:999px;background:var(--sv-color-primary);color:white;font-size:.72rem}</style>

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.6.1 – 2026-07-14
+- SVOS Knowledge Engine mit automatisch erzeugten Beitragslisten ergänzt
+- Kategorie- und Tag-Routen aus Content Collections generiert
+- Metadaten, Lesedauer und verwandte Beiträge integriert
+- neue Knowledge-Komponenten und Utility-Funktionen ergänzt
+- zwei strukturierte Beispielbeiträge ergänzt
+
+# Changelog
+
 ## 1.6.0 – 2026-07-14
 
 ### SVOS Foundation

@@ -1,0 +1,29 @@
+---
+import type { KnowledgeEntry } from '../../utils/knowledge';
+import { knowledgePath, formatKnowledgeDate } from '../../utils/knowledge';
+import { slugify } from '../../utils/content';
+
+interface Props { entry: KnowledgeEntry; compact?: boolean; }
+const { entry, compact = false } = Astro.props;
+---
+<article class:list={['knowledge-card', 'sv-card', 'sv-card-lift', { compact, featured: entry.data.featured }]}>
+  <div class="meta">
+    <a href={`/svos/fachwissen/kategorie/${slugify(entry.data.category)}/`}>{entry.data.category}</a>
+    <time datetime={entry.data.publication.publishedAt.toISOString()}>{formatKnowledgeDate(entry.data.publication.publishedAt)}</time>
+  </div>
+  <h2><a href={knowledgePath(entry)}>{entry.data.title}</a></h2>
+  <p>{entry.data.description}</p>
+  {!compact && <ul aria-label="Schlagwörter">{entry.data.tags.map((tag) => <li><a href={`/svos/fachwissen/tag/${slugify(tag)}/`}>#{tag}</a></li>)}</ul>}
+  <a class="read" href={knowledgePath(entry)}>Fachbeitrag lesen <span aria-hidden="true">→</span></a>
+</article>
+<style>
+.knowledge-card{display:flex;min-height:100%;flex-direction:column;padding:var(--sv-space-6)}
+.knowledge-card.featured{border-color:color-mix(in srgb,var(--sv-color-accent) 55%,var(--sv-color-border))}
+.meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.75rem;color:var(--sv-color-muted);font-size:.78rem;font-weight:750}
+.meta a,h2 a,.read{text-decoration:none}.meta a{color:var(--sv-color-primary)}
+h2{margin:.9rem 0 .65rem;font-size:clamp(1.2rem,2vw,1.5rem)}h2 a{color:var(--sv-color-ink)}
+p{color:var(--sv-color-muted)}
+ul{display:flex;flex-wrap:wrap;gap:.45rem;margin:1rem 0 1.4rem;padding:0;list-style:none}
+li a{display:inline-flex;padding:.3rem .6rem;border-radius:999px;background:var(--sv-color-surface-alt);font-size:.78rem;text-decoration:none}
+.read{margin-top:auto;font-weight:800}.compact ul{display:none}
+</style>

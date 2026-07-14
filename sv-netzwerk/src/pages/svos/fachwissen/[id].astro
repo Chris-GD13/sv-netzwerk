@@ -1,0 +1,30 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import KnowledgeMeta from '../../../components/knowledge/KnowledgeMeta.astro';
+import RelatedKnowledge from '../../../components/knowledge/RelatedKnowledge.astro';
+import { getPublishedKnowledge, estimateReadingMinutes, findRelatedKnowledge } from '../../../utils/knowledge';
+import { slugify } from '../../../utils/content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('knowledge', ({ data }) => data.publication.status === 'published');
+  return entries.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+interface Props { entry: CollectionEntry<'knowledge'>; }
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const allEntries = await getPublishedKnowledge();
+const related = findRelatedKnowledge(entry, allEntries);
+const readingMinutes = estimateReadingMinutes(entry.body ?? '', entry.data.readingMinutes);
+const seoTitle = entry.data.seo.title ?? `${entry.data.title} | SV-Netzwerk`;
+const seoDescription = entry.data.seo.description ?? entry.data.description;
+---
+<BaseLayout title={seoTitle} description={seoDescription} canonical={entry.data.seo.canonical} image={entry.data.seo.image} type="article" breadcrumbs={[{label:'Start',href:'/'},{label:'SVOS',href:'/svos/'},{label:'Fachwissen',href:'/svos/fachwissen/'},{label:entry.data.title}]}>
+  <article class="sv-section"><div class="sv-container article-shell">
+    <header><p class="eyebrow"><a href={`/svos/fachwissen/kategorie/${slugify(entry.data.category)}/`}>{entry.data.category}</a></p><h1>{entry.data.title}</h1><p class="lead">{entry.data.description}</p><KnowledgeMeta author={entry.data.author} publishedAt={entry.data.publication.publishedAt} updatedAt={entry.data.publication.updatedAt} readingMinutes={readingMinutes}/></header>
+    <div class="prose"><Content /></div>
+    <footer><ul aria-label="Schlagwörter">{entry.data.tags.map((tag) => <li><a href={`/svos/fachwissen/tag/${slugify(tag)}/`}>#{tag}</a></li>)}</ul></footer>
+    <RelatedKnowledge entries={related}/>
+  </div></article>
+</BaseLayout>
+<style>.article-shell{max-width:54rem}.eyebrow{font-weight:800}.eyebrow a{text-decoration:none}h1{max-width:18ch}.lead{max-width:65ch;color:var(--sv-color-muted);font-size:1.18rem}.prose{margin-top:var(--sv-space-7);font-size:1.04rem;line-height:1.75}.prose :global(h2){margin-top:2.3rem}.prose :global(a){text-underline-offset:.18em}footer ul{display:flex;flex-wrap:wrap;gap:.5rem;margin:var(--sv-space-7) 0 0;padding:0;list-style:none}footer a{display:inline-flex;padding:.35rem .65rem;border-radius:999px;background:var(--sv-color-surface-alt);text-decoration:none}</style>

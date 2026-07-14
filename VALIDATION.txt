@@ -1,18 +1,16 @@
-# Validation – v1.6.0
+SV-Netzwerk v1.6.1 – Knowledge Engine
 
-- [x] Versionsnummern auf 1.6.0 aktualisiert
-- [x] vier Content Collections definiert
-- [x] Schemas für Veröffentlichung und SEO ergänzt
-- [x] Beispieldatensätze für alle Collections angelegt
-- [x] zentrale SVOS-Typen und Utilities ergänzt
-- [x] SVOS-Statusseite angelegt
-- [x] `npm ci` erfolgreich
-- [x] `npm run build` erfolgreich
-- [ ] GitHub Actions erfolgreich
-- [ ] IONOS-Deployment erfolgreich
+Prüfdatum: 2026-07-14
 
-## Lokales Ergebnis
-- Astro Check: 0 Fehler, 0 Warnungen
-- Produktionsbuild: erfolgreich
-- erzeugte Seiten: 60
-- Sitemap: erfolgreich erzeugt
+Ausgeführt:
+- npm ci --no-audit --no-fund: erfolgreich
+- npm run build: erfolgreich
+- Astro Check: 0 Fehler, 0 Warnungen, 0 Hinweise
+- statischer Astro-Build: erfolgreich
+- 75 Seiten erzeugt
+- Sitemap-Index erzeugt
+
+Paketbereinigung:
+- node_modules nicht enthalten
+- dist nicht enthalten
+- .astro Cache nicht enthalten

@@ -1,3 +1,7 @@
+# Release Notes – SV-Netzwerk v1.6.1 Knowledge Engine
+
+Dieses Release macht die in v1.6.0 eingeführte Content-Architektur erstmals als automatisierte Fachwissensoberfläche nutzbar. Veröffentlichte Knowledge-Einträge erzeugen Übersichten, Detailseiten, Kategorien, Tags, Lesedauer und verwandte Beiträge.
+
 # Release Notes – SV-Netzwerk v1.6.0 SVOS Foundation
 
 ## Ziel
