@@ -65,16 +65,35 @@ jobs:
         run: |
           test -d dist
           test -n "$(find dist -type f -print -quit)"
+          test -f dist/deploy-version.txt
+          grep -Fx "Commit: $GITHUB_SHA" dist/deploy-version.txt
+          grep -Fx "Version: Homepage-v4" dist/deploy-version.txt
           echo "Build erfolgreich; erzeugte Dateien:"
           find dist -type f | sort | head -n 100
 
       - name: Zu IONOS per SFTP übertragen
         if: success()
-        uses: Dylan700/sftp-upload-action@latest
+        uses: Dylan700/sftp-upload-action@v1.2.3
         with:
           server: ${{ secrets.SFTP_HOST }}
           username: ${{ secrets.SFTP_USERNAME }}
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
           uploads: |
-            sv-netzwerk/dist/ => ${{ secrets.SFTP_REMOTE_DIR }}
+            sv-netzwerk/dist/ => ./
+
+      - name: Deployment online verifizieren
+        if: success()
+        working-directory: sv-netzwerk
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          response="$(curl --fail --silent --show-error --retry 5 --retry-delay 10 --retry-all-errors \
+            https://sv-netzwerk.eu/deploy-version.txt)"
+          printf '%s\n' "$response"
+
+          actual_sha="$(printf '%s\n' "$response" | sed -n 's/^Commit:[[:space:]]*//p' | head -n 1)"
+          if [ "$actual_sha" != "$EXPECTED_SHA" ]; then
+            echo "::error::Online-Commit $actual_sha stimmt nicht mit $EXPECTED_SHA überein."
+            exit 1
+          fi

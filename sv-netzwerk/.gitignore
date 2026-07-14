@@ -6,6 +6,7 @@ node_modules/
 
 # Build
 dist/
+public/deploy-version.txt
 
 # Logs
 npm-debug.log*
