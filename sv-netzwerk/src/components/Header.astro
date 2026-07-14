@@ -12,34 +12,34 @@ const navigation: NavItem[] = [
   {
     label: 'Leistungen',
     href: '/leistungen/',
-    description: 'Schäden strukturiert prüfen, bewerten und regulieren.',
+    description: 'Vom Schadenbild zur belastbaren Entscheidung.',
     children: [
-      { label: 'Leistungsübersicht', href: '/leistungen/', description: 'Technische Prüfung und Schadenregulierung aus einer Hand.' },
-      { label: 'Komplexschäden', href: '/komplexschaeden/', description: 'Interdisziplinäre Bearbeitung anspruchsvoller Schadenbilder.' },
-      { label: 'Großschadenregulierung', href: '/grossschadenregulierung/', description: 'Klare Steuerung bei hohen Schadenvolumina.' },
-      { label: 'Schaden melden', href: '/schaden-melden/', description: 'Eckdaten sicher und direkt an uns übermitteln.' },
+      { label: 'Alle Leistungen', href: '/leistungen/', description: 'Unser Leistungsspektrum im Überblick.' },
+      { label: 'Komplexschäden', href: '/komplexschaeden/', description: 'Interdisziplinäre Bewertung komplexer Schadenbilder.' },
+      { label: 'Großschadenregulierung', href: '/grossschadenregulierung/', description: 'Struktur und Steuerung für hohe Schadenvolumina.' },
+      { label: 'Schaden melden', href: '/schaden-melden/', description: 'Einen neuen Schaden direkt an uns übermitteln.' },
     ],
   },
   {
-    label: 'Fachwissen',
+    label: 'Wissen',
     href: '/fachwissen/',
-    description: 'Praxiserprobtes Wissen für fundierte Entscheidungen.',
+    description: 'Fachwissen, das in der Praxis weiterhilft.',
     children: [
-      { label: 'Wissensbibliothek', href: '/fachwissen/', description: 'Fachbeiträge aus Technik und Regulierung.' },
-      { label: 'Praxisfälle', href: '/praxisfaelle/', description: 'Nachvollziehbare Fälle aus der Schadenpraxis.' },
-      { label: 'Downloads', href: '/downloads/', description: 'Prüfschemata, Checklisten und Arbeitshilfen.' },
-      { label: 'Wissen in 180 Sekunden', href: '/wissen-in-180-sekunden/', description: 'Komplexe Fachthemen kompakt erklärt.' },
+      { label: 'Fachwissen', href: '/fachwissen/', description: 'Fundierte Beiträge aus Technik und Regulierung.' },
+      { label: 'Praxisfälle', href: '/praxisfaelle/', description: 'Reale Fälle nachvollziehbar aufbereitet.' },
+      { label: 'Downloads', href: '/downloads/', description: 'Checklisten und Arbeitshilfen zum Mitnehmen.' },
+      { label: 'Wissen in 180 Sekunden', href: '/wissen-in-180-sekunden/', description: 'Komplexe Themen schnell auf den Punkt gebracht.' },
     ],
   },
   {
     label: 'SVOS',
     href: '/svos/',
-    description: 'Digitale Standards für vernetzte Sachverständigenarbeit.',
+    description: 'Ein System für konsistente Schadenbearbeitung.',
     children: [
-      { label: 'SV Operating System', href: '/svos/', description: 'Standardisierte Fach- und Prozessarchitektur.' },
-      { label: 'Gutachter-Plattform', href: '/gutachter-plattform/', description: 'Qualifizierte Sachverständige intelligent vernetzen.' },
-      { label: 'Für Sachverständige', href: '/experten/', description: 'Werkzeuge, Standards und starke Zusammenarbeit.' },
-      { label: 'Für Versicherer', href: '/versicherer/', description: 'Prüffähige und dokumentationsstarke Abläufe.' },
+      { label: 'SV Operating System', href: '/svos/', description: 'Standards, Prozesse und Wissen in einem System.' },
+      { label: 'Gutachter-Plattform', href: '/gutachter-plattform/', description: 'Digitale Zusammenarbeit für Sachverständige.' },
+      { label: 'Für Versicherer', href: '/versicherer/', description: 'Prüffähige Abläufe und transparente Ergebnisse.' },
+      { label: 'Expertennetzwerk', href: '/netzwerk/', description: 'Spezialisierte Kompetenz gezielt vernetzt.' },
     ],
   },
   { label: 'Netzwerk', href: '/netzwerk/' },
@@ -47,19 +47,11 @@ const navigation: NavItem[] = [
 ---
 
 <header class="site-header" data-site-header>
-  <div class="site-header__utility">
-    <div class="sv-container site-header__utility-inner">
-      <p><span class="status-dot" aria-hidden="true"></span> Bundesweit für Sie im Einsatz</p>
-      <div>
-        <span>DIN EN ISO/IEC 17024 zertifiziert</span>
-        <a href="tel:+4973673939783" aria-label="Anrufen unter 07367 393 97 83">07367 / 393 97 83</a>
-      </div>
-    </div>
-  </div>
-
   <div class="sv-container site-header__bar">
     <a class="site-brand" href="/" aria-label="SV-Netzwerk – Startseite">
-      <span class="site-brand__mark" aria-hidden="true"><span>SV</span></span>
+      <span class="site-brand__symbol" aria-hidden="true">
+        <svg viewBox="0 0 42 42"><path d="M8 9h26v24H8z"/><path d="M14 15h14M14 21h9M14 27h14"/></svg>
+      </span>
       <span class="site-brand__copy">
         <strong>SV-Netzwerk</strong>
         <small>Bau · Schaden · Regulierung</small>
@@ -69,8 +61,8 @@ const navigation: NavItem[] = [
     <Navigation items={navigation} currentPath={currentPath} />
 
     <div class="site-header__actions">
+      <span class="header-availability"><i aria-hidden="true"></i> Bundesweit verfügbar</span>
       <SearchButton />
-      <a class="header-link" href="/kontakt/">Kontakt</a>
       <a class="header-cta" href="/schaden-melden/">
         Schaden melden
         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" /></svg>
@@ -85,8 +77,8 @@ const navigation: NavItem[] = [
 <script is:inline>
   (() => {
     const header = document.querySelector('[data-site-header]');
-    const updateHeader = () => header?.classList.toggle('is-scrolled', window.scrollY > 12);
-    updateHeader();
-    window.addEventListener('scroll', updateHeader, { passive: true });
+    const update = () => header?.classList.toggle('is-scrolled', window.scrollY > 16);
+    update();
+    window.addEventListener('scroll', update, { passive: true });
   })();
 </script>

@@ -1,40 +1,24 @@
 ---
 import type { NavItem } from './Header.astro';
 
-interface Props {
-  item: NavItem;
-  id: string;
-  currentPath: string;
-}
-
+interface Props { item: NavItem; id: string; currentPath: string }
 const { item, id, currentPath } = Astro.props;
-const isActive = (href: string) => href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+const active = (href: string) => href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 ---
 
 <div class="mega-menu" id={id} data-mega-menu hidden>
-  <div class="mega-menu__intro">
-    <span class="mega-menu__eyebrow">{item.label}</span>
+  <div class="mega-menu__overview">
+    <span>{item.label}</span>
     <h2>{item.description}</h2>
-    <p>Fachkompetenz, klare Prozesse und verlässliche Ergebnisse für anspruchsvolle Schadenfälle.</p>
-    <a href={item.href}>
-      Alle Inhalte ansehen
-      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" /></svg>
-    </a>
+    <a href={item.href}>Bereich entdecken <b aria-hidden="true">→</b></a>
   </div>
-
-  <div class="mega-menu__content">
-    <p class="mega-menu__label">Direkt einsteigen</p>
-    <div class="mega-menu__grid">
-      {item.children?.map((child, index) => (
-        <a class:list={["mega-menu__card", { "is-active": isActive(child.href) }]} href={child.href} aria-current={isActive(child.href) ? 'page' : undefined}>
-          <span class="mega-menu__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-          <span>
-            <strong>{child.label}</strong>
-            <small>{child.description}</small>
-          </span>
-          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 14 14 6m-7 0h7v7" /></svg>
-        </a>
-      ))}
-    </div>
+  <div class="mega-menu__links">
+    {item.children?.map((child, index) => (
+      <a class:list={{ 'is-active': active(child.href) }} href={child.href} aria-current={active(child.href) ? 'page' : undefined}>
+        <span class="mega-menu__index" aria-hidden="true">0{index + 1}</span>
+        <span><strong>{child.label}</strong><small>{child.description}</small></span>
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 14 14 6m-7 0h7v7" /></svg>
+      </a>
+    ))}
   </div>
 </div>

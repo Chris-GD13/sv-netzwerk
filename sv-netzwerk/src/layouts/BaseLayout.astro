@@ -1,7 +1,75 @@
 ---
-import SEO from '../components/SEO.astro'; import Header from '../components/Header.astro'; import Footer from '../components/Footer.astro'; import SearchOverlay from '../components/SearchOverlay.astro'; import Breadcrumbs from '../components/Breadcrumbs.astro'; import PerformanceHints from '../components/PerformanceHints.astro'; import AccessibilityStatus from '../components/AccessibilityStatus.astro'; import '../styles/global.css'; import '../styles/header.css'; import '../styles/navigation.css'; import { site } from '../data/site';
-interface BreadcrumbItem { label:string; href?:string; } interface Props { title:string; description:string; canonical?:string; image?:string; type?:'website'|'article'; preloadImage?:string; breadcrumbs?:BreadcrumbItem[]; }
-const props=Astro.props; const schema={'@context':'https://schema.org','@type':'ProfessionalService',name:site.legalName,url:site.url,email:site.email,telephone:site.phone,address:{'@type':'PostalAddress',streetAddress:site.address[0],postalCode:'73432',addressLocality:'Aalen',addressCountry:'DE'}};
+import SEO from '../components/SEO.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SearchOverlay from '../components/SearchOverlay.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import PerformanceHints from '../components/PerformanceHints.astro';
+import AccessibilityStatus from '../components/AccessibilityStatus.astro';
+import { site } from '../data/site';
+import '../styles/global.css';
+import '../styles/header.css';
+import '../styles/navigation.css';
+
+interface BreadcrumbItem { label: string; href?: string }
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  preloadImage?: string;
+  breadcrumbs?: BreadcrumbItem[];
+}
+
+const props = Astro.props;
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: site.legalName,
+  url: site.url,
+  email: site.email,
+  telephone: site.phone,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address[0],
+    postalCode: '73432',
+    addressLocality: 'Aalen',
+    addressCountry: 'DE',
+  },
+};
 ---
-<!doctype html><html lang="de"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="theme-color" content="#071a2e"/><meta name="color-scheme" content="light"/><PerformanceHints preloadImage={props.preloadImage}/><SEO {...props}/><script is:inline type="application/ld+json" set:html={JSON.stringify(schema)}/></head><body><a class="skip" href="#main">Zum Inhalt</a><AccessibilityStatus/><Header/><main id="main" tabindex="-1">{props.breadcrumbs && <div class="sv-container breadcrumb-wrap"><Breadcrumbs items={props.breadcrumbs}/></div>}<slot/></main><Footer/><SearchOverlay/></body></html>
-<style is:global>.skip{position:fixed;top:.5rem;left:.5rem;z-index:120;transform:translateY(-150%);padding:.7rem 1rem;background:white;color:var(--sv-color-ink);font-weight:800}.skip:focus{transform:none}.search-open,.menu-open{overflow:hidden}.breadcrumb-wrap{padding-top:var(--sv-space-4)}</style>
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071a2e" />
+    <meta name="color-scheme" content="light" />
+    <PerformanceHints preloadImage={props.preloadImage} />
+    <SEO {...props} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
+    <AccessibilityStatus />
+    <Header />
+    <main id="main-content" tabindex="-1">
+      {props.breadcrumbs && (
+        <div class="sv-container breadcrumb-wrap"><Breadcrumbs items={props.breadcrumbs} /></div>
+      )}
+      <slot />
+    </main>
+    <Footer />
+    <SearchOverlay />
+  </body>
+</html>
+
+<style is:global>
+  .skip-link{position:fixed;top:.65rem;left:.65rem;z-index:200;transform:translateY(-160%);padding:.7rem 1rem;border-radius:.65rem;background:#fff;color:var(--sv-color-ink);font-weight:900;box-shadow:var(--sv-shadow-md)}
+  .skip-link:focus{transform:none}
+  .search-open{overflow:hidden}
+  .breadcrumb-wrap{padding-top:var(--sv-space-4)}
+  #main-content:focus{outline:none}
+</style>

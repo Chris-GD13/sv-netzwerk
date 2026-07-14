@@ -4,29 +4,29 @@ import type { NavItem } from './Header.astro';
 
 interface Props { items: NavItem[]; currentPath: string }
 const { items, currentPath } = Astro.props;
-const isActive = (href: string) => href === '/' ? currentPath === '/' : currentPath.startsWith(href);
-const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.children?.some((child) => isActive(child.href)));
+const pathIsActive = (href: string) => href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+const itemIsActive = (item: NavItem) => pathIsActive(item.href) || Boolean(item.children?.some((child) => pathIsActive(child.href)));
 ---
 
-<nav class="desktop-nav" aria-label="Hauptnavigation">
+<nav class="desktop-nav" aria-label="Hauptnavigation" data-desktop-nav>
   <ul>
-    {items.map((item, index) => item.children ? (
+    {items.map((item, index) => (
       <li class="desktop-nav__item" data-nav-item>
-        <button
-          class:list={["desktop-nav__trigger", { "is-active": isItemActive(item) }]}
-          type="button"
-          aria-expanded="false"
-          aria-controls={`mega-menu-${index}`}
-          data-mega-trigger
-        >
-          {item.label}
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg>
-        </button>
-        <MegaMenu item={item} id={`mega-menu-${index}`} currentPath={currentPath} />
-      </li>
-    ) : (
-      <li>
-        <a class:list={["desktop-nav__link", { "is-active": isActive(item.href) }]} href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
+        {item.children ? (
+          <button
+            class:list={["desktop-nav__trigger", { "is-active": itemIsActive(item) }]}
+            type="button"
+            aria-expanded="false"
+            aria-controls={`mega-menu-${index}`}
+            data-mega-trigger
+          >
+            <span>{item.label}</span>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg>
+          </button>
+        ) : (
+          <a class:list={["desktop-nav__link", { "is-active": itemIsActive(item) }]} href={item.href} aria-current={itemIsActive(item) ? 'page' : undefined}>{item.label}</a>
+        )}
+        {item.children && <MegaMenu item={item} id={`mega-menu-${index}`} currentPath={currentPath} />}
       </li>
     ))}
   </ul>
@@ -34,33 +34,35 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
 
 <script is:inline>
   (() => {
-    const items = [...document.querySelectorAll('[data-nav-item]')];
-    const closeAll = (except = null) => items.forEach((item) => {
+    const nav = document.querySelector('[data-desktop-nav]');
+    const items = [...(nav?.querySelectorAll('[data-nav-item]') ?? [])];
+
+    const close = (except = null) => items.forEach((item) => {
       if (item === except) return;
       item.querySelector('[data-mega-trigger]')?.setAttribute('aria-expanded', 'false');
-      const menu = item.querySelector('[data-mega-menu]');
-      if (menu) menu.hidden = true;
+      const panel = item.querySelector('[data-mega-menu]');
+      if (panel) panel.hidden = true;
     });
 
     items.forEach((item) => {
       const trigger = item.querySelector('[data-mega-trigger]');
-      const menu = item.querySelector('[data-mega-menu]');
+      const panel = item.querySelector('[data-mega-menu]');
       trigger?.addEventListener('click', () => {
-        const willOpen = trigger.getAttribute('aria-expanded') !== 'true';
-        closeAll(item);
-        trigger.setAttribute('aria-expanded', String(willOpen));
-        if (menu) menu.hidden = !willOpen;
+        const open = trigger.getAttribute('aria-expanded') !== 'true';
+        close(item);
+        trigger.setAttribute('aria-expanded', String(open));
+        if (panel) panel.hidden = !open;
       });
     });
 
-    document.addEventListener('click', (event) => {
-      if (!(event.target instanceof Element) || !event.target.closest('[data-nav-item]')) closeAll();
+    document.addEventListener('pointerdown', (event) => {
+      if (!(event.target instanceof Element) || !event.target.closest('[data-desktop-nav]')) close();
     });
     document.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape') return;
-      const openTrigger = document.querySelector('[data-mega-trigger][aria-expanded="true"]');
-      closeAll();
-      if (openTrigger instanceof HTMLElement) openTrigger.focus();
+      const active = nav?.querySelector('[data-mega-trigger][aria-expanded="true"]');
+      close();
+      if (active instanceof HTMLElement) active.focus();
     });
   })();
 </script>

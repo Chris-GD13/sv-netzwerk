@@ -1,31 +1,91 @@
 ---
-interface Props { eyebrow?: string; title: string; text: string; primaryLabel?: string; primaryHref?: string; secondaryLabel?: string; secondaryHref?: string; compact?: boolean; }
-const { eyebrow, title, text, primaryLabel, primaryHref, secondaryLabel, secondaryHref, compact=false } = Astro.props;
+interface Props {
+  eyebrow?: string;
+  title: string;
+  text: string;
+  primaryLabel?: string;
+  primaryHref?: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
+  compact?: boolean;
+}
+
+const {
+  eyebrow,
+  title,
+  text,
+  primaryLabel,
+  primaryHref,
+  secondaryLabel,
+  secondaryHref,
+  compact = false,
+} = Astro.props;
 ---
-<section class:list={['hero-v3',{compact}]}>
-  <div class="hero-orb orb-one"></div><div class="hero-orb orb-two"></div>
-  <div class="sv-container hero-layout">
-    <div class="hero-copy">
-      {eyebrow && <p class="hero-eyebrow">{eyebrow}</p>}
+
+<section class:list={['hero', { 'hero--compact': compact }]}>
+  <div class="hero__grid" aria-hidden="true"></div>
+  <div class="sv-container hero__layout">
+    <div class="hero__copy">
+      {eyebrow && <p class="hero__eyebrow"><span></span>{eyebrow}</p>}
       <h1>{title}</h1>
-      <p class="hero-lead">{text}</p>
-      <div class="hero-actions">
-        {primaryLabel && primaryHref && <a class="sv-button sv-button-primary" href={primaryHref}>{primaryLabel}<span>→</span></a>}
-        {secondaryLabel && secondaryHref && <a class="sv-button hero-secondary" href={secondaryHref}>{secondaryLabel}</a>}
+      <p class="hero__lead">{text}</p>
+
+      <div class="hero__actions">
+        {primaryLabel && primaryHref && (
+          <a class="hero__primary" href={primaryHref}>
+            {primaryLabel}
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" /></svg>
+          </a>
+        )}
+        {secondaryLabel && secondaryHref && <a class="hero__secondary" href={secondaryHref}>{secondaryLabel}</a>}
       </div>
-      <div class="hero-trust"><span>Technisch belastbar</span><span>Dokumentationsstark</span><span>Bundesweit vernetzt</span></div>
+
+      <dl class="hero__facts">
+        <div><dt>Bundesweit</dt><dd>koordiniert im Einsatz</dd></div>
+        <div><dt>ISO 17024</dt><dd>zertifizierte Kompetenz</dd></div>
+        <div><dt>SVOS</dt><dd>einheitlicher Standard</dd></div>
+      </dl>
     </div>
-    <div class="hero-system" aria-label="SVOS Prozessübersicht">
-      <div class="system-head"><span>SV Operating System</span><b>LIVE</b></div>
-      <div class="system-flow">
-        <article><small>01</small><strong>Erfassen</strong><p>Schadenbild, Unterlagen und Beteiligte strukturiert zusammenführen.</p></article>
-        <article><small>02</small><strong>Prüfen</strong><p>Kausalität, Umfang, Plausibilität und Kosten fachlich bewerten.</p></article>
-        <article><small>03</small><strong>Entscheiden</strong><p>Freigaben, Reserven und Empfehlungen nachvollziehbar dokumentieren.</p></article>
+
+    <div class="hero__visual" aria-label="Strukturierte Schadenbearbeitung mit dem SV Operating System">
+      <div class="hero__visual-top">
+        <span>SV Operating System</span>
+        <strong><i></i> Prozess aktiv</strong>
       </div>
-      <div class="system-status"><span><i></i> Prozessstandard aktiv</span><strong>SVOS 3.0</strong></div>
+      <div class="hero__case">
+        <span class="hero__case-id">Vorgang 24-0714</span>
+        <p>Komplexschaden · Gewerbe</p>
+        <strong>Entscheidungsvorlage</strong>
+        <div class="hero__progress"><i></i></div>
+        <small>Prüfstatus 78 %</small>
+      </div>
+      <ol class="hero__steps">
+        <li class="is-complete"><span>01</span><div><strong>Erfassen</strong><small>Schadenbild strukturiert</small></div><b>✓</b></li>
+        <li class="is-complete"><span>02</span><div><strong>Prüfen</strong><small>Kausalität und Umfang</small></div><b>✓</b></li>
+        <li class="is-active"><span>03</span><div><strong>Entscheiden</strong><small>Empfehlung dokumentieren</small></div><b>→</b></li>
+      </ol>
+      <div class="hero__visual-foot"><span>Nachvollziehbar</span><span>Prüffähig</span><span>Digital</span></div>
     </div>
   </div>
 </section>
+
 <style>
-.hero-v3{position:relative;isolation:isolate;overflow:hidden;padding-block:clamp(5rem,10vw,9rem);background:linear-gradient(125deg,#06172a 0%,#0a3154 56%,#0c5b87 100%);color:white}.hero-v3.compact{padding-block:4rem}.hero-v3::before{position:absolute;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:44px 44px;content:"";mask-image:linear-gradient(to bottom,black,transparent)}.hero-orb{position:absolute;z-index:-1;border-radius:50%;filter:blur(8px)}.orb-one{top:-14rem;right:-8rem;width:34rem;aspect-ratio:1;background:radial-gradient(circle,rgba(255,157,18,.22),transparent 68%)}.orb-two{bottom:-16rem;left:25%;width:30rem;aspect-ratio:1;background:radial-gradient(circle,rgba(41,145,204,.32),transparent 68%)}.hero-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(22rem,.9fr);align-items:center;gap:clamp(3rem,7vw,7rem)}.hero-copy h1{max-width:57rem}.hero-eyebrow{display:inline-flex;margin:0 0 1.3rem;padding:.48rem .75rem;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(255,255,255,.06);color:#ffc56f;font-size:.76rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}.hero-lead{max-width:47rem;margin-bottom:2rem;color:#d4e2ed;font-size:clamp(1.08rem,2vw,1.35rem)}.hero-actions{display:flex;flex-wrap:wrap;gap:.8rem}.hero-secondary{border-color:rgba(255,255,255,.38);background:rgba(255,255,255,.06);color:white}.hero-secondary:hover{background:white;color:var(--sv-color-primary)}.hero-trust{display:flex;flex-wrap:wrap;gap:1rem;margin-top:2rem;color:#b9cbd8;font-size:.82rem;font-weight:750}.hero-trust span{display:flex;align-items:center;gap:.45rem}.hero-trust span::before{width:.45rem;aspect-ratio:1;border-radius:50%;background:var(--sv-color-accent);content:""}.hero-system{padding:1rem;border:1px solid rgba(255,255,255,.16);border-radius:1.65rem;background:rgba(255,255,255,.08);box-shadow:0 34px 80px rgba(0,0,0,.28);backdrop-filter:blur(18px)}.system-head,.system-status{display:flex;align-items:center;justify-content:space-between}.system-head{padding:.35rem .35rem 1rem;color:#d8e6ef;font-size:.82rem;font-weight:850}.system-head b{padding:.28rem .5rem;border-radius:999px;background:rgba(52,204,133,.15);color:#75e5ad;font-size:.66rem;letter-spacing:.08em}.system-flow{display:grid;gap:.75rem}.system-flow article{position:relative;padding:1.15rem 1.15rem 1.15rem 4rem;border:1px solid rgba(255,255,255,.12);border-radius:1rem;background:rgba(255,255,255,.07)}.system-flow small{position:absolute;top:1.1rem;left:1.15rem;display:grid;width:2rem;aspect-ratio:1;place-items:center;border-radius:.6rem;background:rgba(255,157,18,.17);color:#ffc56f;font-weight:900}.system-flow strong{display:block;margin-bottom:.25rem;font-size:1.05rem}.system-flow p{margin:0;color:#c7d8e4;font-size:.84rem;line-height:1.5}.system-status{margin-top:.8rem;padding:.85rem .35rem .15rem;color:#afc4d3;font-size:.75rem}.system-status span{display:flex;align-items:center;gap:.45rem}.system-status i{width:.55rem;aspect-ratio:1;border-radius:50%;background:#4add92;box-shadow:0 0 0 5px rgba(74,221,146,.12)}.system-status strong{color:white}@media(max-width:62rem){.hero-layout{grid-template-columns:1fr}.hero-system{max-width:42rem}}@media(max-width:38rem){.hero-v3{padding-top:4rem}.hero-actions{display:grid}.hero-actions .sv-button{width:100%}.hero-trust{display:grid;gap:.55rem}}
+  .hero{position:relative;isolation:isolate;overflow:hidden;padding-block:clamp(5rem,9vw,8.5rem);background:linear-gradient(135deg,#f7fafc 0%,#edf5f8 48%,#fff7eb 100%);color:var(--sv-color-ink)}
+  .hero--compact{padding-block:clamp(3.5rem,7vw,5.5rem)}
+  .hero::before{position:absolute;z-index:-1;top:-14rem;right:-9rem;width:38rem;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,157,18,.2),transparent 68%);content:""}
+  .hero::after{position:absolute;z-index:-1;bottom:-18rem;left:-12rem;width:38rem;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(11,79,122,.15),transparent 68%);content:""}
+  .hero__grid{position:absolute;z-index:-1;inset:0;background-image:linear-gradient(rgba(11,79,122,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(11,79,122,.045) 1px,transparent 1px);background-size:56px 56px;mask-image:linear-gradient(90deg,black,transparent 68%)}
+  .hero__layout{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(24rem,.92fr);align-items:center;gap:clamp(3rem,7vw,7rem)}
+  .hero__copy{max-width:48rem}.hero__eyebrow{display:flex;align-items:center;gap:.7rem;margin:0 0 1.4rem;color:var(--sv-color-primary);font-size:.75rem;font-weight:950;letter-spacing:.14em;text-transform:uppercase}.hero__eyebrow span{width:2.2rem;height:2px;background:var(--sv-color-accent)}
+  .hero h1{max-width:55rem;margin-bottom:1.35rem;font-size:clamp(3.2rem,6.3vw,6.65rem);line-height:.94;letter-spacing:-.065em}.hero__lead{max-width:43rem;margin-bottom:2rem;color:var(--sv-color-ink-soft);font-size:clamp(1.08rem,1.7vw,1.3rem);line-height:1.65}
+  .hero__actions{display:flex;flex-wrap:wrap;gap:.75rem}.hero__primary,.hero__secondary{display:inline-flex;min-height:3.35rem;align-items:center;justify-content:center;padding:.78rem 1.15rem;border-radius:.85rem;font-size:.88rem;font-weight:950;text-decoration:none;transition:transform var(--sv-transition),box-shadow var(--sv-transition),background var(--sv-transition)}.hero__primary{gap:.65rem;background:var(--sv-color-ink);color:white;box-shadow:0 16px 34px rgba(7,26,46,.2)}.hero__primary:hover{transform:translateY(-2px);background:var(--sv-color-primary);color:white}.hero__primary svg{width:1rem;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.9}.hero__secondary{border:1px solid #bdced8;background:rgba(255,255,255,.55);color:var(--sv-color-primary)}.hero__secondary:hover{transform:translateY(-2px);background:white;color:var(--sv-color-primary)}
+  .hero__facts{display:flex;gap:0;margin:2.6rem 0 0}.hero__facts div{padding:0 1.25rem;border-left:1px solid #cbd9e1}.hero__facts div:first-child{padding-left:0;border-left:0}.hero__facts dt{color:var(--sv-color-ink);font-size:.85rem;font-weight:950}.hero__facts dd{margin:.12rem 0 0;color:var(--sv-color-muted);font-size:.7rem}
+  .hero__visual{position:relative;padding:1rem;border:1px solid rgba(173,195,208,.72);border-radius:1.6rem;background:rgba(255,255,255,.67);box-shadow:0 32px 80px rgba(7,26,46,.16);backdrop-filter:blur(22px) saturate(150%);transform:rotate(1.2deg)}
+  .hero__visual::before{position:absolute;z-index:-1;inset:1.2rem -1rem -1rem 1.5rem;border-radius:1.6rem;background:#0a2c47;content:"";transform:rotate(-3deg)}
+  .hero__visual-top{display:flex;align-items:center;justify-content:space-between;padding:.25rem .3rem 1rem;color:var(--sv-color-muted);font-size:.72rem;font-weight:900}.hero__visual-top strong{display:flex;align-items:center;gap:.42rem;padding:.3rem .5rem;border-radius:999px;background:#e2f6ea;color:#24714b;font-size:.65rem}.hero__visual-top i{width:.4rem;aspect-ratio:1;border-radius:50%;background:#35b879;box-shadow:0 0 0 4px rgba(53,184,121,.12)}
+  .hero__case{padding:1.2rem;border-radius:1rem;background:linear-gradient(135deg,#08233b,#0b4f7a);color:white}.hero__case-id{color:#ffbd5c;font-size:.64rem;font-weight:950;letter-spacing:.1em;text-transform:uppercase}.hero__case p{margin:.55rem 0 .1rem;color:#bcd0de;font-size:.75rem}.hero__case>strong{font-size:1.25rem}.hero__progress{height:.35rem;margin-top:1rem;overflow:hidden;border-radius:999px;background:rgba(255,255,255,.15)}.hero__progress i{display:block;width:78%;height:100%;border-radius:inherit;background:var(--sv-color-accent)}.hero__case small{display:block;margin-top:.45rem;color:#bdd0dc;text-align:right}
+  .hero__steps{display:grid;gap:.45rem;margin:1rem 0;padding:0;list-style:none}.hero__steps li{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.75rem;padding:.78rem;border:1px solid #dce6eb;border-radius:.8rem;background:rgba(255,255,255,.75)}.hero__steps li>span{display:grid;width:2rem;aspect-ratio:1;place-items:center;border-radius:.58rem;background:#eaf1f5;color:var(--sv-color-primary);font-size:.65rem;font-weight:950}.hero__steps strong,.hero__steps small{display:block}.hero__steps strong{font-size:.78rem}.hero__steps small{color:var(--sv-color-muted);font-size:.66rem}.hero__steps b{display:grid;width:1.65rem;aspect-ratio:1;place-items:center;border-radius:50%;background:#e2f6ea;color:#24714b;font-size:.72rem}.hero__steps .is-active{border-color:#f2bd6f;background:#fff8ec}.hero__steps .is-active b{background:var(--sv-color-accent);color:#111}
+  .hero__visual-foot{display:flex;justify-content:space-between;gap:.5rem;padding:.15rem .35rem;color:var(--sv-color-muted);font-size:.62rem;font-weight:850;text-transform:uppercase;letter-spacing:.08em}
+  @media(max-width:64rem){.hero__layout{grid-template-columns:1fr}.hero__visual{max-width:38rem;transform:none}.hero__visual::before{display:none}}
+  @media(max-width:42rem){.hero{padding-top:4rem}.hero h1{font-size:clamp(3rem,15vw,4.6rem)}.hero__actions{display:grid}.hero__primary,.hero__secondary{width:100%}.hero__facts{display:grid;gap:.75rem}.hero__facts div,.hero__facts div:first-child{padding:0 0 0 .85rem;border-left:2px solid var(--sv-color-accent)}.hero__visual{padding:.7rem;border-radius:1.2rem}.hero__visual-foot{font-size:.55rem}}
 </style>
