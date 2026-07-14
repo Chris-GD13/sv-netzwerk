@@ -1,4 +1,14 @@
 # Changelog
+
+## 1.6.4 – 2026-07-14
+- SVOS Practice-Cases-Modul eingeführt
+- Collection-Schema für strukturierte Praxisfälle erweitert
+- Übersichtsseite mit clientseitigen Filtern erstellt
+- dynamische Detailseiten mit Fakten, Bewertung und Empfehlung ergänzt
+- wiederverwendbare Praxisfall-Komponenten und Typdefinitionen angelegt
+- drei anonymisierte Beispielsfälle veröffentlicht
+- Navigation um Praxisfälle erweitert
+
 ## 1.6.3 – 2026-07-14
 - SVOS Download Center mit Collection-Datenmodell eingeführt
 - Kategorien, Tags, Versionen und Zielgruppen ergänzt

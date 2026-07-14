@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import PracticeCaseCard from '../../components/practice-cases/PracticeCaseCard.astro';
+import PracticeCaseFilters from '../../components/practice-cases/PracticeCaseFilters.astro';
+import { publishedPracticeCases, practiceCaseTaxonomy } from '../../lib/practice-cases';
+const cases = publishedPracticeCases(await getCollection('practiceCases'));
+const taxonomy = practiceCaseTaxonomy(cases);
+---
+<BaseLayout title="Praxisfälle aus der Schadenregulierung" description="Anonymisierte und fachlich strukturierte Praxisfälle mit Feststellungen, Bewertungen und nachvollziehbaren Regulierungsempfehlungen." breadcrumbs={[{label:'Start',href:'/'},{label:'Praxisfälle'}]}>
+  <Hero compact eyebrow="SVOS Practice Cases" title="Praxisfälle nachvollziehbar dokumentiert" text="Technische Feststellung, versicherungsbezogene Bewertung und Regulierungsempfehlung werden in einer einheitlichen Fallstruktur zusammengeführt." />
+  <section class="sv-section"><div class="sv-container">
+    <div class="sv-section-head"><div><p class="sv-eyebrow">Fallbibliothek</p><h2>Schadenbilder systematisch vergleichen</h2><p class="sv-lead">Alle veröffentlichten Beispiele sind anonymisiert und dienen der fachlichen Einordnung.</p></div><strong><span data-case-count>{cases.length}</span> Fälle</strong></div>
+    <PracticeCaseFilters lossTypes={taxonomy.lossTypes} objectTypes={taxonomy.objectTypes} />
+    <div class="sv-grid sv-grid-3">{cases.map((entry)=><div data-case-card data-loss-type={entry.data.lossType.toLowerCase()} data-object-type={entry.data.objectType.toLowerCase()}><PracticeCaseCard entry={entry}/></div>)}</div>
+  </div></section>
+</BaseLayout>

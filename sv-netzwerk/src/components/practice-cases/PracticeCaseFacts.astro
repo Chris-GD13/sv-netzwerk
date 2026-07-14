@@ -1,0 +1,7 @@
+---
+interface Fact { label: string; value?: string | number; }
+interface Props { facts: Fact[]; }
+const { facts } = Astro.props;
+---
+<dl class="case-facts sv-card">{facts.filter((fact)=>fact.value!==undefined && fact.value!=='').map((fact)=><div><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl>
+<style>.case-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:0;padding:var(--sv-space-5)}.case-facts div{padding:var(--sv-space-3);border-bottom:1px solid var(--sv-color-line)}dt{color:var(--sv-color-muted);font-size:.78rem;font-weight:800;text-transform:uppercase}dd{margin:.2rem 0 0;font-weight:800}@media(max-width:34rem){.case-facts{grid-template-columns:1fr}}</style>

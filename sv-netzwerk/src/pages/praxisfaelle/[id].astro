@@ -1,0 +1,32 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import NoticeBox from '../../components/NoticeBox.astro';
+import PracticeCaseFacts from '../../components/practice-cases/PracticeCaseFacts.astro';
+import { publishedPracticeCases } from '../../lib/practice-cases';
+import { lossRangeLabels } from '../../types/practice-cases';
+export async function getStaticPaths(){return publishedPracticeCases(await getCollection('practiceCases')).map((entry)=>({params:{id:entry.id},props:{entry}}));}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const facts=[
+ {label:'Schadenart',value:entry.data.lossType},{label:'Objektart',value:entry.data.objectType},{label:'Sparte',value:entry.data.insuranceLine},{label:'Region',value:entry.data.region},{label:'Schadenhöhe',value:entry.data.lossRange?lossRangeLabels[entry.data.lossRange]:undefined},{label:'Bearbeitungsdauer',value:entry.data.duration},{label:'Reserve',value:entry.data.reserve}
+];
+const caseSchema={'@context':'https://schema.org','@type':'Article',headline:entry.data.title,description:entry.data.description,datePublished:entry.data.publication.publishedAt.toISOString(),dateModified:(entry.data.publication.updatedAt??entry.data.publication.publishedAt).toISOString(),about:[entry.data.lossType,entry.data.objectType,...entry.data.tags]};
+---
+<BaseLayout type="article" title={entry.data.seo.title??entry.data.title} description={entry.data.seo.description??entry.data.description} canonical={entry.data.seo.canonical} breadcrumbs={[{label:'Start',href:'/'},{label:'Praxisfälle',href:'/praxisfaelle/'},{label:entry.data.title}]}>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(caseSchema)} />
+  <Hero compact eyebrow={`${entry.data.lossType} · ${entry.data.objectType}`} title={entry.data.title} text={entry.data.description} />
+  <section class="sv-section"><div class="sv-container case-layout">
+    <article class="sv-prose case-content">
+      <PracticeCaseFacts facts={facts} />
+      {entry.data.cause && <section><h2>Schadenursache</h2><p>{entry.data.cause}</p></section>}
+      {entry.data.finding && <section><h2>Feststellungen</h2><p>{entry.data.finding}</p></section>}
+      {entry.data.assessment && <section><h2>Bewertung</h2><p>{entry.data.assessment}</p></section>}
+      {entry.data.recommendation && <section><h2>Empfehlung</h2><p>{entry.data.recommendation}</p></section>}
+      <Content />
+    </article>
+    <aside><NoticeBox title="Anonymisierter Praxisfall">Personen-, Vertrags- und Objektdaten wurden entfernt oder abstrahiert. Der Fall ersetzt keine Prüfung des konkreten Versicherungsvertrags.</NoticeBox><div class="sv-card case-tags"><strong>Schlagworte</strong>{entry.data.tags.map((tag)=><span>#{tag}</span>)}</div></aside>
+  </div></section>
+</BaseLayout>
+<style>.case-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(17rem,.7fr);gap:var(--sv-space-7);align-items:start}.case-content>section{margin-top:var(--sv-space-7)}aside{display:grid;gap:var(--sv-space-5);position:sticky;top:7rem}.case-tags{display:flex;flex-wrap:wrap;gap:.55rem;padding:var(--sv-space-5)}.case-tags strong{width:100%}.case-tags span{color:var(--sv-color-muted);font-size:.82rem}@media(max-width:52rem){.case-layout{grid-template-columns:1fr}aside{position:static}}</style>

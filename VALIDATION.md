@@ -1,4 +1,4 @@
-# Validierung – SV-Netzwerk v1.6.3
+# Validierung – SV-Netzwerk v1.6.4
 
 - [x] Download-Collection erweitert
 - [x] ausschließlich veröffentlichte Datensätze werden angezeigt

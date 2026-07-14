@@ -1,0 +1,22 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { lossRangeLabels } from '../../types/practice-cases';
+interface Props { entry: CollectionEntry<'practiceCases'>; }
+const { entry } = Astro.props;
+const range = entry.data.lossRange ? lossRangeLabels[entry.data.lossRange] : undefined;
+---
+<article class="case-card sv-card sv-card-lift">
+  <div class="case-card__meta"><span class="sv-pill">{entry.data.lossType}</span><span>{entry.data.objectType}</span></div>
+  <h2><a href={`/praxisfaelle/${entry.id}/`}>{entry.data.title}</a></h2>
+  <p>{entry.data.description}</p>
+  <dl>
+    {range && <div><dt>Schadenhöhe</dt><dd>{range}</dd></div>}
+    {entry.data.region && <div><dt>Region</dt><dd>{entry.data.region}</dd></div>}
+    {entry.data.insuranceLine && <div><dt>Sparte</dt><dd>{entry.data.insuranceLine}</dd></div>}
+  </dl>
+  <div class="case-card__tags">{entry.data.tags.slice(0,4).map((tag) => <span>#{tag}</span>)}</div>
+  <a class="case-card__link" href={`/praxisfaelle/${entry.id}/`}>Praxisfall ansehen <span aria-hidden="true">→</span></a>
+</article>
+<style>
+.case-card{display:flex;flex-direction:column;padding:var(--sv-space-5)}.case-card__meta{display:flex;align-items:center;justify-content:space-between;gap:1rem;color:var(--sv-color-muted);font-size:.82rem}.case-card h2{margin-top:var(--sv-space-4);font-size:1.45rem}.case-card h2 a{color:var(--sv-color-ink);text-decoration:none}.case-card p{color:var(--sv-color-ink-soft)}dl{display:grid;gap:.5rem;margin:0 0 var(--sv-space-4)}dl div{display:flex;justify-content:space-between;gap:1rem;border-top:1px solid var(--sv-color-line);padding-top:.5rem}dt{color:var(--sv-color-muted);font-size:.82rem}dd{margin:0;font-weight:750;text-align:right}.case-card__tags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:auto;color:var(--sv-color-muted);font-size:.78rem}.case-card__link{display:flex;justify-content:space-between;margin-top:var(--sv-space-4);font-weight:800;text-decoration:none}
+</style>
