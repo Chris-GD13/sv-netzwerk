@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.1.12 – 2026-07-15
+
+- LinkedIn-Motiv zum Fachbeitrag „Fachliche Zuständigkeit im Schadenfall klar zuordnen“ im aktuellen SV-Netzwerk-Design erstellt
+- Social-Media-Bild als Open-Graph-Bild des zugehörigen Fachartikels eingebunden
+
 ## 5.1.11 – 2026-07-15
 
 - großflächigen Einstieg „Fachwissensbibliothek“ von der Fachwissensseite entfernt

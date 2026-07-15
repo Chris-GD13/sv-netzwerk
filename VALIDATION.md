@@ -1,4 +1,4 @@
-# Validierung – SV-Netzwerk v5.1.11
+# Validierung – SV-Netzwerk v5.1.12
 
 Stand: 15.07.2026
 

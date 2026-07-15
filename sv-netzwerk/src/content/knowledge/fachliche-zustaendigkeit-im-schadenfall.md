@@ -20,6 +20,7 @@ publication:
 seo:
   title: "Experten im Schadenfall fachlich zuordnen"
   description: "Prüfziel, Fachgebiet, Region und Verantwortung für eine belastbare Expertenzuordnung im Schadenfall verbinden."
+  image: "https://www.sv-netzwerk.eu/assets/images/linkedin/fachliche-zustaendigkeit-schadenfall.png"
 ---
 
 Bei komplexen Bau- und Versicherungsschäden entscheidet die fachliche Zuständigkeit wesentlich über Qualität, Geschwindigkeit und Nachvollziehbarkeit der Bearbeitung. Ein großes Kontaktverzeichnis allein löst diese Aufgabe nicht. Entscheidend ist, welche konkrete Frage beantwortet werden muss, welches Ergebnis der Auftraggeber benötigt und wer die Verantwortung für die fachliche Aussage übernimmt.
