@@ -13,6 +13,7 @@ export interface ExpertProfile {
   certifications: string[];
   shortProfile: string;
   contact: { email: string; phone?: string };
+  linkedin?: string;
   image?: string;
   status: 'active' | 'onboarding';
   tags: string[];

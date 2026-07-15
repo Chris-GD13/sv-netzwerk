@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.1.10 – 2026-07-15
+
+- Christians Profilüberschrift um die DIN EN ISO/IEC 17024-Zertifizierung ergänzt
+- Qualifikationen aus dem fachlichen Portfolio einschließlich EU-Bausachverständiger, Thermografie, Bauforensik, Fenstertechnik und Drohnenführerschein aufgenommen
+- LinkedIn-Profile für Christian Wächter, Marc Schütt, Lenna Maria Walczok, Holger Roth, Carmen Gohl und Claudius Freiberg ergänzt
+- Portrait von Christian Wächter mit einem freundlicheren, dezent lächelnden Gesichtsausdruck aktualisiert
+
 ## 5.1.9 – 2026-07-15
 
 - alle Seiten mit einem dezenten, weich verlaufenden Hintergrund aus Logo-Blau und Logo-Orange versehen
