@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.1.9 – 2026-07-15
+
+- alle Seiten mit einem dezenten, weich verlaufenden Hintergrund aus Logo-Blau und Logo-Orange versehen
+- weiße Startseitenabschnitte durch transparente Farbflächen und gläserne Karten ersetzt
+- alternative Inhaltsabschnitte und Standardkarten an das neue seitenweite Hintergrundsystem angepasst
+
 ## 5.1.8 – 2026-07-15
 
 - Leistungsübersicht „Ein Netzwerk. Klare Verantwortung.“ an die oberste Stelle der Startseite gesetzt
