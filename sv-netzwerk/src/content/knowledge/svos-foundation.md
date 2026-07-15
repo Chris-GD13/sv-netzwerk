@@ -13,4 +13,4 @@ seo:
   description: "Content- und Datenarchitektur des SV Operating System für Fachwissen, Downloads und Praxisfälle."
 ---
 
-Die SVOS Foundation vereinheitlicht Datenmodelle, Veröffentlichungsstatus und Metadaten. Neue Inhalte werden künftig anhand definierter Schemas validiert und können automatisiert in Übersichten, Suche und internen Verknüpfungen verwendet werden.
+Die SVOS Foundation vereinheitlicht Datenmodelle, Veröffentlichungsstatus und Metadaten. Fachbeiträge werden anhand definierter Schemas validiert und in Übersichten, Suche und thematischen Verknüpfungen bereitgestellt.

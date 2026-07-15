@@ -69,7 +69,7 @@ Entscheidungen sollten deshalb einen eindeutigen Bezug zur Bewertungsgrundlage b
 
 ## Datenschutz und notwendiger Umfang
 
-Prüffähigkeit bedeutet nicht, beliebig viele personenbezogene oder vertrauliche Angaben zu sammeln. Dokumentiert werden nur Informationen, die für Auftrag, technische Bewertung, Kommunikation und Entscheidung erforderlich sind. Zugriffsrechte, Aufbewahrung und spätere Löschung gehören zur geplanten sicheren SVOS-Ausbaustufe. Bis diese Funktionen bereitstehen, dürfen sensible Unterlagen nicht in ungesicherte Formulare oder öffentliche Bereiche übertragen werden.
+Prüffähigkeit bedeutet nicht, beliebig viele personenbezogene oder vertrauliche Angaben zu sammeln. Dokumentiert werden nur Informationen, die für Auftrag, technische Bewertung, Kommunikation und Entscheidung erforderlich sind. Vertrauliche Unterlagen gehören ausschließlich in freigegebene, zugriffsgeschützte Systeme. Öffentliche Formulare und ungesicherte Übertragungswege sind dafür nicht geeignet.
 
 ## Fazit
 

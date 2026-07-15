@@ -20,7 +20,7 @@ const formats = downloadFormats(downloads);
       <div class="sv-grid sv-grid-2" data-download-grid>
         {downloads.map((entry) => <DownloadCard id={entry.id} title={entry.data.title} description={entry.data.description} category={entry.data.category} tags={entry.data.tags} file={entry.data.file} fileType={entry.data.fileType} fileSize={entry.data.fileSize} version={entry.data.version} updatedAt={entry.data.publication.updatedAt ?? entry.data.publication.publishedAt} />)}
       </div>
-      {downloads.length === 0 && <p>Derzeit sind keine Downloads veröffentlicht.</p>}
+      {downloads.length === 0 && <p>Keine Downloads verfügbar.</p>}
     </div>
   </section>
 </BaseLayout>

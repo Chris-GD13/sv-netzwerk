@@ -1,6 +1,6 @@
-# Validierung – SV-Netzwerk v5.1.6
+# Validierung – SV-Netzwerk v5.1.7
 
-Stand: 14.07.2026
+Stand: 15.07.2026
 
 ## Installation und Build
 
@@ -8,8 +8,9 @@ Stand: 14.07.2026
 - installierte Pakete: 279
 - gemeldete Schwachstellen: 0
 - `npm run build`: erfolgreich
-- Astro-/TypeScript-Prüfung: 120 Dateien, 0 Fehler, 0 Warnungen, 0 Hinweise
-- statischer Build: 131 Seiten
+- Astro-/TypeScript-Prüfung: 123 Dateien, 0 Fehler, 0 Warnungen, 0 Hinweise
+- statischer Build: 136 Seiten
+- Prüfung aller veröffentlichten Seitentexte: keine internen Hinweise oder Arbeitsmarkierungen
 - `dist/deploy-version.txt`: vorhanden
 - kein Unterordner `dist/dist/`
 
@@ -18,15 +19,16 @@ Stand: 14.07.2026
 - 12.07.2026: Kategorie C, 347 Wörter, „Kontrollierter Rückbau bei Leitungswasserschäden“
 - 13.07.2026: Kategorie B, 816 Wörter, „Technische Dokumentation bei komplexen Gebäudeschäden“
 - 14.07.2026: Kategorie A, 1.527 Wörter, „Technische Schadenabgrenzung als Grundlage der Regulierung“
+- 15.07.2026: Kategorie B, 835 Wörter, „Fachliche Zuständigkeit im Schadenfall“
 - `npm run validate:knowledge`: erfolgreich
 - `npm run validate:knowledge -- --dist`: erfolgreich
 - Build-Routen, Suchindex, Sitemap und interne Links: erfolgreich geprüft
 
 ## Erzeugte Kernbereiche
 
-- `/experten/` mit sechs fachlichen Experten, zwei Backoffice-Profilen und acht dynamischen Detailseiten
+- `/experten/` mit sechs fachlichen Experten, zwei Backoffice-Profilen und acht dynamischen Detailseiten; Profile und Backoffice stehen direkt nach dem kompakten Einstieg
 - `/datenschutzerklaerung/`, `/impressum/`, `/versicherer/`, `/gutachter-plattform/`, `/komplexschaeden/` und `/grossschadenregulierung/` im zentralen Astro-Layout
-- `/svos/` mit Modulen, Prozessmodell und Roadmap
+- `/svos/` mit direkt zugänglichen Modulen und Prozessmodell
 - `/schaden-melden/` mit achtstufiger lokaler Erfassung
 - `/schadenarten/` mit elf datengetriebenen Schadenarten und Detailseiten
 - „Wissen in 180 Sekunden“ bis zur Bereitstellung echter Avatar-Videos nicht öffentlich verlinkt und nicht in der Sitemap
@@ -51,3 +53,5 @@ GitHub-Actions-Prüfung und Live-Verifikation erfolgen anhand des veröffentlich
 - keine Browser-Konsolenfehler oder -warnungen
 - Desktop- und Mobile-Screenshot erzeugt
 - alle acht Portraitbilder lokal ausgeliefert und erfolgreich geladen
+- neues Schwarz-Weiß-Portrait von Christian Wächter (1.200 × 900 Pixel) erfolgreich geladen
+- orange Wortmarke „SV“ in Desktop- und Mobilansicht sichtbar

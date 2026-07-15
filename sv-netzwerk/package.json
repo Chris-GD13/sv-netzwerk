@@ -1,15 +1,16 @@
 {
   "name": "sv-netzwerk",
-  "version": "5.1.6",
+  "version": "5.1.7",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "astro dev",
     "prebuild": "npm run validate:knowledge && node scripts/write-deploy-version.mjs",
-    "build": "astro check && astro build",
+    "build": "astro check && astro build && npm run validate:public-copy",
     "preview": "astro preview",
     "check": "astro check",
-    "validate:knowledge": "node scripts/validate-knowledge.mjs"
+    "validate:knowledge": "node scripts/validate-knowledge.mjs",
+    "validate:public-copy": "node scripts/validate-public-copy.mjs"
   },
   "dependencies": {
     "@astrojs/check": "latest",

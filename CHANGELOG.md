@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.1.7 – 2026-07-15
+
+- alle gerenderten Seiten auf interne Arbeitsnotizen, Übergangsformulierungen und Platzhalterhinweise geprüft und bereinigt
+- interne Komponentenbibliothek aus dem öffentlichen Seitenbestand entfernt
+- automatisierte Prüfung der erzeugten HTML-Seiten auf nicht veröffentlichungsfähige Hinweise in den Build integriert
+- Expertenporträt von Christian Wächter freigestellt, oberhalb der Hände zugeschnitten und auf neutralem grauem Hintergrund vereinheitlicht
+- Experten und Backoffice unmittelbar nach dem Seiteneinstieg platziert; zentrale Inhalte auch auf Startseite und SVOS nach vorn gezogen
+- kantiges S-Signet durch ein klares oranges „SV“ für Sachverständige ersetzt
+- täglichen Fachbeitrag zur fachlichen Expertenzuordnung veröffentlicht
+
 ## 5.1.6 – 2026-07-14
 
 - „Wissen in 180 Sekunden“ bis zur Verfügbarkeit echter Avatar-Videos aus Navigation, Footer, Fachwissen, Suche und Sitemap ausgeblendet

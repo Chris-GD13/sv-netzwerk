@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Fachliche Zuständigkeit im Schadenfall klar zuordnen',
+    description: 'Wie Prüfziel, Fachgebiet, Region und Verantwortung zu einer belastbaren Expertenzuordnung zusammengeführt werden.',
+    href: '/fachwissen/fachliche-zustaendigkeit-im-schadenfall/',
+    category: 'Prozessqualität',
+    tags: ['Experten', 'Zuständigkeit', 'Schadenregulierung'],
+    date: '2026-07-15',
+    type: 'article',
+    featured: true,
+  },
+  {
     title: 'Technische Schadenabgrenzung als Grundlage der Regulierung',
     description: 'Wie Ursache, Vorschaden, Folgeschaden, erforderliche Wiederherstellung und Kosten methodisch getrennt werden.',
     href: '/fachwissen/schadenabgrenzung/',

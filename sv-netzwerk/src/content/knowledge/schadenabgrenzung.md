@@ -94,7 +94,7 @@ Nicht jede Schadenart kann aus einer Disziplin vollständig beurteilt werden. El
 
 Die Verantwortung bleibt sichtbar. Ein Laborergebnis beschreibt eine untersuchte Probe. Ein Fachberater beurteilt einen abgegrenzten Gegenstand. Die Übertragung auf den gesamten Schadenbereich muss gesondert begründet werden. Das [SV Operating System](/svos/) sieht dafür verknüpfte Beiträge und dokumentierte Übergaben vor.
 
-## Interne Verknüpfungen als Qualitätsmerkmal
+## Fachliche Verknüpfungen als Qualitätsmerkmal
 
 Schadenabgrenzung wird belastbarer, wenn wiederkehrende Prüfpunkte aus Fachwissen, Praxisfällen und Arbeitshilfen erreichbar sind. Der Bereich [Schadenarten](/schadenarten/) führt typische Schadenbilder und Prüfgegenstände. Das [Downloadcenter](/downloads/) stellt versionierte Prüfschemata bereit. Diese Inhalte ersetzen keine Einzelfallprüfung, schaffen aber eine gemeinsame Sprache und reduzieren vermeidbare Lücken.
 
