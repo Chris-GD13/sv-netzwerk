@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.1.8 – 2026-07-15
+
+- Leistungsübersicht „Ein Netzwerk. Klare Verantwortung.“ an die oberste Stelle der Startseite gesetzt
+- bisherigen Einstieg „Wenn Schäden komplex werden …“ vollständig von der Startseite entfernt
+
 ## 5.1.7 – 2026-07-15
 
 - alle gerenderten Seiten auf interne Arbeitsnotizen, Übergangsformulierungen und Platzhalterhinweise geprüft und bereinigt

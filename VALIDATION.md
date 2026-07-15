@@ -1,4 +1,4 @@
-# Validierung – SV-Netzwerk v5.1.7
+# Validierung – SV-Netzwerk v5.1.8
 
 Stand: 15.07.2026
 
@@ -8,7 +8,7 @@ Stand: 15.07.2026
 - installierte Pakete: 279
 - gemeldete Schwachstellen: 0
 - `npm run build`: erfolgreich
-- Astro-/TypeScript-Prüfung: 123 Dateien, 0 Fehler, 0 Warnungen, 0 Hinweise
+- Astro-/TypeScript-Prüfung: 122 Dateien, 0 Fehler, 0 Warnungen, 0 Hinweise
 - statischer Build: 136 Seiten
 - Prüfung aller veröffentlichten Seitentexte: keine internen Hinweise oder Arbeitsmarkierungen
 - `dist/deploy-version.txt`: vorhanden
