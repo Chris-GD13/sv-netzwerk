@@ -47,8 +47,8 @@ const { activeCategory, activeTag } = Astro.props;
 </script>
 
 <style>
-  .library-tools{display:grid;gap:1.25rem;margin:2rem 0;padding:1.5rem;border:1px solid var(--sv-color-border);border-radius:var(--sv-radius-lg);background:var(--sv-color-surface)}
-  .search-row{display:grid;gap:.45rem}.search-row label,.filter-group>span{font-weight:800}.search-row input{width:100%;padding:.85rem 1rem;border:1px solid var(--sv-color-border);border-radius:var(--sv-radius-sm);background:white;color:var(--sv-color-ink);font:inherit}
+  .library-tools{display:grid;gap:.9rem;margin:0 0 2rem;padding:1rem 1.25rem;border:1px solid var(--sv-color-border);border-radius:var(--sv-radius-lg);background:rgba(255,255,255,.62);backdrop-filter:blur(16px)}
+  .search-row{display:grid;gap:.3rem}.search-row label,.filter-group>span{font-weight:800}.search-row input{width:100%;min-height:2.75rem;padding:.3rem .8rem;border:1px solid var(--sv-color-border);border-radius:var(--sv-radius-sm);background:rgba(255,255,255,.78);color:var(--sv-color-ink);font:inherit}
   .chips{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:.7rem}.chips a{padding:.48rem .72rem;border:1px solid var(--sv-color-border);border-radius:999px;color:var(--sv-color-ink);font-size:.86rem;text-decoration:none}.chips a:hover,.chips a.active{border-color:var(--sv-color-primary);background:var(--sv-color-primary);color:white}
   details summary{cursor:pointer;font-weight:800}.tags{margin-top:1rem}.result-count{margin:0;color:var(--sv-color-muted);font-size:.9rem}
 </style>

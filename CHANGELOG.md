@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.1.11 – 2026-07-15
+
+- großflächigen Einstieg „Fachwissensbibliothek“ von der Fachwissensseite entfernt
+- Such- und Filterbereich deutlich kompakter gestaltet und das Suchfeld auf eine reduzierte, weiterhin gut bedienbare Höhe gesetzt
+
 ## 5.1.10 – 2026-07-15
 
 - Christians Profilüberschrift um die DIN EN ISO/IEC 17024-Zertifizierung ergänzt

@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Hero from '../../components/Hero.astro';
 import LibraryFilters from '../../components/LibraryFilters.astro';
 import LibraryGrid from '../../components/LibraryGrid.astro';
 import Pagination from '../../components/Pagination.astro';
@@ -13,8 +12,7 @@ const pageItems = sortedLibrary.slice(0, PAGE_SIZE);
 const totalPages = Math.ceil(sortedLibrary.length / PAGE_SIZE);
 ---
 <BaseLayout title="Fachwissensbibliothek | SV-Netzwerk" description="Technisches und regulierungsrelevantes Fachwissen zu Leitungswasser-, Brand-, Feuchte-, Gebäude- und Komplexschäden.">
-  <Hero eyebrow="SVOS Fachwissen" title="Fachwissensbibliothek" text="Strukturiertes Fachwissen für Schadenregulierung, technische Bewertung und nachvollziehbare Entscheidungen." />
-  <section class="sv-section">
+  <section class="sv-section knowledge-index">
     <div class="sv-container">
       <LibraryFilters />
       <AlphabeticalNavigation items={sortedLibrary} />
@@ -33,3 +31,5 @@ const totalPages = Math.ceil(sortedLibrary.length / PAGE_SIZE);
     </div>
   </section>
 </BaseLayout>
+
+<style>.knowledge-index{padding-top:clamp(1.5rem,4vw,3rem)}</style>
