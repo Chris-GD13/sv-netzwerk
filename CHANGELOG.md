@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.1.13 – 2026-07-16
+
+- Nachmittagsbeitrag „Regiekosten im Schadenfall prüffähig bewerten“ als Fachbeitrag der Stufe A veröffentlicht
+- SEO-Daten, Kategorie, Tags, interne Verlinkungen, LinkedIn-Kurzfassung und Video-Skript im Content-Modell integriert
+- Fachwissensübersichten, Kategorien, Schlagworte, Breadcrumbs, Sitemap und strukturierte Seitendaten werden aus der Content Collection automatisch aktualisiert
+- Inhalts-Commit: `8f5ffe1ec638abd8cd57903e2647f589d7cddecd`
+- Qualitäts-, Build- und Deploymentstatus: Prüfung über GitHub Actions und Online-Verifikation
+
 ## 5.1.12 – 2026-07-15
 
 - LinkedIn-Motiv zum Fachbeitrag „Fachliche Zuständigkeit im Schadenfall klar zuordnen“ im aktuellen SV-Netzwerk-Design erstellt
@@ -33,7 +41,7 @@
 - alle gerenderten Seiten auf interne Arbeitsnotizen, Übergangsformulierungen und Platzhalterhinweise geprüft und bereinigt
 - interne Komponentenbibliothek aus dem öffentlichen Seitenbestand entfernt
 - automatisierte Prüfung der erzeugten HTML-Seiten auf nicht veröffentlichungsfähige Hinweise in den Build integriert
-- Expertenporträt von Christian Wächter freigestellt, oberhalb der Hände zugeschnitten und auf neutralem grauem Hintergrund vereinheitlicht
+- Expertenporträt von Christian Wächter freigestellt, oberhalb der Hände zugeschnitten und auf neutralem grauen Hintergrund vereinheitlicht
 - Experten und Backoffice unmittelbar nach dem Seiteneinstieg platziert; zentrale Inhalte auch auf Startseite und SVOS nach vorn gezogen
 - kantiges S-Signet durch ein klares oranges „SV“ für Sachverständige ersetzt
 - täglichen Fachbeitrag zur fachlichen Expertenzuordnung veröffentlicht
