@@ -102,7 +102,7 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" \
-            -e "set sftp:auto-confirm yes; mirror --reverse --verbose --parallel=4 dist/ $SFTP_REMOTE_DIR/; bye"
+            -e "set sftp:auto-confirm yes; mirror --reverse --verbose --parallel=4 --delete dist/ $SFTP_REMOTE_DIR/; bye"
 
       - name: Inhalt des Document Root prüfen
         env:
