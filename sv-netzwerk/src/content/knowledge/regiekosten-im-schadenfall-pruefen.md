@@ -160,6 +160,23 @@ Eine zweckmäßige Struktur lautet:
 
 Damit bleibt die Entscheidung auch für Versicherer, Versicherungsnehmer, Dienstleister und eine spätere Nachprüfung verständlich.
 
+## Kompakte Prüf-Checkliste für die Freigabe
+
+Vor der abschließenden Freigabe hilft eine feste Reihenfolge, um Zeitdruck und Dokumentationslücken systematisch zu beherrschen. Die folgenden Prüffragen lassen sich in nahezu jedem Schadenfall anwenden:
+
+1. **Auftrag geklärt?** Liegt ein nachvollziehbarer Auslöser vor (Notmaßnahme, ergänzende Weisung, abgestimmte Zusatzleistung)?
+2. **Schadenbezug belegt?** Ist jede Position einem konkreten betroffenen Bereich und einer schadenbedingten Ursache zugeordnet?
+3. **Zeit plausibel?** Stimmen Personalanzahl, Dauer, Pausen, Fahrtzeiten und Tagesablauf mit den übrigen Unterlagen überein?
+4. **Qualifikation passend?** Entspricht der eingesetzte Mitarbeiter-Mix der tatsächlichen technischen Anforderung?
+5. **Material transparent?** Sind Verbrauch, Einbau und Preisgrundlage nachvollziehbar oder bestehen Überschneidungen mit Pauschalen?
+6. **Drittleistung sauber getrennt?** Liegen belastbare Ursprungsbelege der Nachunternehmer vor und ist ein Zuschlag begründet?
+7. **Doppelansätze ausgeschlossen?** Wurden Regiepositionen mit Angeboten, Nachträgen und bereits freigegebenen Rechnungen abgeglichen?
+8. **Entscheidung dokumentiert?** Ist je Position klar, was freigegeben, gekürzt oder zurückgestellt wurde – inklusive kurzer Begründung?
+
+Besonders hilfreich ist es, offene Punkte nicht erst am Ende zu sammeln, sondern bereits während der laufenden Prüfung als „Nachforderungsliste“ zu führen. Dazu zählen beispielsweise fehlende Tagesberichte, unleserliche Stundenzettel, nicht zuordenbare Materialbezeichnungen oder unklare Ortsangaben. Werden diese Punkte frühzeitig benannt, können Dienstleister fehlende Angaben meist ohne größeren Aufwand ergänzen. Das reduziert Rückfragen, verkürzt Durchlaufzeiten und verhindert, dass pauschale Kürzungen allein wegen Zeitdrucks ausgesprochen werden.
+
+Für eine faire und rechtssichere Entscheidung sollte außerdem zwischen **nicht nachgewiesen**, **nicht erforderlich** und **nicht schadenbedingt** unterschieden werden. Diese drei Bewertungsgründe führen zwar jeweils zu einer Kürzung oder Zurückstellung, haben aber unterschiedliche fachliche und kommunikative Konsequenzen im Prüfprozess. Ein nicht nachgewiesener Aufwand kann häufig durch Belege nachträglich geklärt werden. Ein nicht erforderlicher Aufwand bleibt dagegen selbst bei vollständiger Dokumentation regelmäßig nicht freigabefähig. Ein nicht schadenbedingter Aufwand ist dem eigentlichen Schadenereignis zu entkoppeln und separat zu behandeln.
+
 ## Fazit
 
 Regiekosten sind ein geeignetes Abrechnungsmodell für tatsächlich nicht vorab bestimmbaren Aufwand. Sie verlangen jedoch eine besonders zeitnahe und konkrete Dokumentation. Auftrag, Schadenbezug, Personal, Zeit, Material, Geräte und Fremdleistungen müssen zusammenpassen. Überschneidungen mit Pauschalen oder Angeboten sind auszuschließen.
