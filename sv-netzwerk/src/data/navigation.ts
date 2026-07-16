@@ -48,7 +48,6 @@ export const navigation: NavItem[] = [
       { label: 'Fachartikel', href: '/fachwissen/', description: 'Technische Beiträge aus Schadenpraxis und Regulierung.' },
       { label: 'Normen und Rechtsprechung', href: '/fachwissen/#normen-rechtsprechung', description: 'Regelwerke und Entscheidungen praxisnah eingeordnet.' },
       { label: 'Praxisfälle', href: '/praxisfaelle/', description: 'Anonymisierte Fälle mit Feststellung und Bewertung.' },
-      { label: 'Downloads', href: '/downloads/', description: 'Prüfschemata, Checklisten und Arbeitshilfen.' },
     ],
   },
   { label: 'Experten', href: '/experten/' },

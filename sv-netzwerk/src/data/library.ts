@@ -1,4 +1,4 @@
-export type LibraryType = 'article' | 'download' | 'video';
+export type LibraryType = 'article' | 'video';
 
 export type LibraryItem = {
   title: string;
@@ -141,15 +141,6 @@ export const library: LibraryItem[] = [
     tags: ['Digitalisierung', 'SEO', 'Schadensteuerung'],
     date: '2026-07-01',
     type: 'article',
-  },
-  {
-    title: 'Prüfliste Schadenaufnahme',
-    description: 'Strukturierte Prüfpunkte für eine nachvollziehbare Erstaufnahme komplexer Schäden.',
-    href: '/downloads/',
-    category: 'Downloads',
-    tags: ['Checkliste', 'Erstaufnahme', 'Dokumentation'],
-    date: '2026-06-30',
-    type: 'download',
   },
 ];
 

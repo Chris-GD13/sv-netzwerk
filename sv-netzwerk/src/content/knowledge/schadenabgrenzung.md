@@ -13,7 +13,7 @@ videoScript: "Wissen in 180 Sekunden: Erst das Ereignis und den Einwirkungsweg k
 cta:
   label: "Schaden fachlich einordnen"
   href: "/schaden-melden/"
-relatedLinks: ["/schadenarten/", "/praxisfaelle/leitungswasser-technische-abgrenzung/", "/downloads/", "/experten/"]
+relatedLinks: ["/schadenarten/", "/praxisfaelle/leitungswasser-technische-abgrenzung/", "/experten/"]
 damageTypes: ["leitungswasser", "gebaeude", "haftpflicht"]
 publication:
   publishedAt: 2026-07-14
@@ -96,7 +96,7 @@ Die Verantwortung bleibt sichtbar. Ein Laborergebnis beschreibt eine untersuchte
 
 ## Fachliche Verknüpfungen als Qualitätsmerkmal
 
-Schadenabgrenzung wird belastbarer, wenn wiederkehrende Prüfpunkte aus Fachwissen, Praxisfällen und Arbeitshilfen erreichbar sind. Der Bereich [Schadenarten](/schadenarten/) führt typische Schadenbilder und Prüfgegenstände. Das [Downloadcenter](/downloads/) stellt versionierte Prüfschemata bereit. Diese Inhalte ersetzen keine Einzelfallprüfung, schaffen aber eine gemeinsame Sprache und reduzieren vermeidbare Lücken.
+Schadenabgrenzung wird belastbarer, wenn wiederkehrende Prüfpunkte aus Fachwissen und Praxisfällen erreichbar sind. Der Bereich [Schadenarten](/schadenarten/) führt typische Schadenbilder und Prüfgegenstände. Diese Inhalte ersetzen keine Einzelfallprüfung, schaffen aber eine gemeinsame Sprache und reduzieren vermeidbare Lücken.
 
 Vor einer Übergabe werden Verweise auf den konkreten Bearbeitungsstand geprüft. So bleibt erkennbar, welche Fassung einer Arbeitshilfe angewendet wurde und welche Feststellungen aus dem Einzelfall stammen.
 

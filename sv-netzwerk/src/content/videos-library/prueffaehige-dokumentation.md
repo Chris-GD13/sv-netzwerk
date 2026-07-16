@@ -8,7 +8,7 @@ transcript: "Eine prüffähige Akte nennt Auftrag und Unterlagenstand. Sie trenn
 platformLinks: []
 tags: ["Dokumentation", "Prüffähigkeit", "SVOS"]
 relatedKnowledge: ["prueffaehige-dokumentation"]
-downloadHints: ["/downloads/"]
+downloadHints: []
 publication:
   publishedAt: 2026-07-13
   status: published
