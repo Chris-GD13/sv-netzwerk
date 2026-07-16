@@ -4,7 +4,7 @@ import { formatDate, slugify, type LibraryItem } from '../data/library';
 interface Props extends LibraryItem {}
 
 const { category, title, description, href, date, tags, type, featured = false } = Astro.props;
-const typeLabel = type === 'download' ? 'Download' : type === 'video' ? 'Video' : 'Fachbeitrag';
+const typeLabel = type === 'video' ? 'Video' : 'Fachbeitrag';
 ---
 <article class:list={['article', 'sv-card', 'sv-card-lift', { featured }]}>
   <div class="article-meta">
@@ -18,7 +18,7 @@ const typeLabel = type === 'download' ? 'Download' : type === 'video' ? 'Video' 
   </ul>
   <div class="article-footer">
     <time datetime={date}>{formatDate(date)}</time>
-    <a class="read" href={href}>{type === 'download' ? 'Download öffnen' : type === 'video' ? 'Video ansehen' : 'Beitrag lesen'} <span aria-hidden="true">→</span></a>
+    <a class="read" href={href}>{type === 'video' ? 'Video ansehen' : 'Beitrag lesen'} <span aria-hidden="true">→</span></a>
   </div>
 </article>
 
