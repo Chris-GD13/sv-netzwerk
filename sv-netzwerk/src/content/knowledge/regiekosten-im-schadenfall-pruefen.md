@@ -173,7 +173,9 @@ Vor der abschließenden Freigabe hilft eine feste Reihenfolge, um Zeitdruck und 
 7. **Doppelansätze ausgeschlossen?** Wurden Regiepositionen mit Angeboten, Nachträgen und bereits freigegebenen Rechnungen abgeglichen?
 8. **Entscheidung dokumentiert?** Ist je Position klar, was freigegeben, gekürzt oder zurückgestellt wurde – inklusive kurzer Begründung?
 
-Besonders hilfreich ist es, offene Punkte nicht erst am Ende zu sammeln, sondern bereits während der laufenden Prüfung als „Nachforderungsliste“ zu führen. Dazu zählen beispielsweise fehlende Tagesberichte, unleserliche Stundenzettel, nicht zuordenbare Materialbezeichnungen oder unklare Ortsangaben. Werden diese Punkte frühzeitig benannt, können Dienstleister fehlende Angaben meist ohne größeren Aufwand ergänzen. Das reduziert Rückfragen, verkürzt Durchlaufzeiten und verhindert, dass pauschale Kürzungen allein wegen Zeitdrucks ausgesprochen werden.
+Besonders hilfreich ist es, offene Punkte nicht erst am Ende zu sammeln, sondern bereits während der laufenden Prüfung als „Nachforderungsliste“ zu führen. Dazu zählen beispielsweise fehlende Tagesberichte, unleserliche Stundenzettel, nicht zuordenbare Materialbezeichnungen oder unklare Ortsangaben.
+
+Werden diese Punkte frühzeitig benannt, können Dienstleister fehlende Angaben meist ohne größeren Aufwand ergänzen. Das reduziert Rückfragen, verkürzt Durchlaufzeiten und verhindert, dass pauschale Kürzungen allein wegen Zeitdrucks ausgesprochen werden.
 
 Für eine faire und rechtssichere Entscheidung sollte außerdem zwischen **nicht nachgewiesen**, **nicht erforderlich** und **nicht schadenbedingt** unterschieden werden. Diese drei Bewertungsgründe führen zwar jeweils zu einer Kürzung oder Zurückstellung, haben aber unterschiedliche fachliche und kommunikative Konsequenzen im Prüfprozess. Ein nicht nachgewiesener Aufwand kann häufig durch Belege nachträglich geklärt werden. Ein nicht erforderlicher Aufwand bleibt dagegen selbst bei vollständiger Dokumentation regelmäßig nicht freigabefähig. Ein nicht schadenbedingter Aufwand ist dem eigentlichen Schadenereignis zu entkoppeln und separat zu behandeln.
 
