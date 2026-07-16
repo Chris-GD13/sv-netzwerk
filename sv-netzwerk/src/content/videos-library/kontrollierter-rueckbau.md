@@ -8,7 +8,7 @@ transcript: "Erst Ursache stoppen und Konstruktion erfassen. Messungen mit Refer
 platformLinks: []
 tags: ["Leitungswasser", "Rückbau", "Trocknung"]
 relatedKnowledge: ["kontrollierter-rueckbau-bei-leitungswasserschaeden"]
-downloadHints: ["/downloads/"]
+downloadHints: []
 publication:
   publishedAt: 2026-07-12
   status: published

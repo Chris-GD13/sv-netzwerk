@@ -1,6 +1,6 @@
 import type { DamageType } from '../types/platform';
 
-const sharedDownloads = ['/downloads/'];
+const sharedDownloads: string[] = [];
 const sharedExperts = ['christian-waechter'];
 
 export const damageTypes: DamageType[] = [

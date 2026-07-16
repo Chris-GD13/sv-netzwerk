@@ -31,7 +31,7 @@
   const input = document.querySelector('[data-search-input]');
   const results = document.querySelector('[data-search-results]');
   const status = document.querySelector('[data-search-status]');
-  const typeLabels = { article: 'Fachbeitrag', download: 'Download', video: 'Video', page: 'Seite', damage: 'Schadenart', case: 'Praxisfall', expert: 'Experte' };
+  const typeLabels = { article: 'Fachbeitrag', video: 'Video', page: 'Seite', damage: 'Schadenart', case: 'Praxisfall', expert: 'Experte' };
 
   const normalize = (value = '') => value.toLocaleLowerCase('de-DE').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ß/g, 'ss').replace(/[^a-z0-9]+/g, ' ').trim();
 

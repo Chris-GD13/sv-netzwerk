@@ -14,10 +14,9 @@ import type { PlatformModule } from '../../types/platform';
 const [knowledge,practiceCases]=await Promise.all([getCollection('knowledge'),getCollection('practiceCases')]);
 const modules:PlatformModule[]=[
  {title:'Schadenmeldung',description:'Strukturierter Einstieg für Schadenart, Objekt, Beteiligte und vorhandene Unterlagen.',href:'/schaden-melden/',status:'verfügbar',audience:['Auftraggeber','Versicherer']},
- {title:'Kompetenzzentrum',description:'Schadenarten mit Prüfpunkten, Wissen, Fällen, Downloads und Experten verbinden.',href:'/schadenarten/',status:'verfügbar',audience:['Sachverständige','Regulierer']},
+ {title:'Kompetenzzentrum',description:'Schadenarten mit Prüfpunkten, Wissen, Fällen und Experten verbinden.',href:'/schadenarten/',status:'verfügbar',audience:['Sachverständige','Regulierer']},
  {title:'Fachwissen',description:'Versionierte Fachbeiträge mit Taxonomien, Autoren und verbindlichem Veröffentlichungslauf.',href:'/fachwissen/',status:'verfügbar',audience:['Alle Rollen']},
  {title:'Praxisfälle',description:'Anonymisierte Fälle mit Feststellung, Bewertung, Maßnahmen und Ergebnis.',href:'/praxisfaelle/',status:'verfügbar',audience:['Versicherer','Regulierer']},
- {title:'Downloadcenter',description:'Prüfschemata und Arbeitshilfen mit Version, Zielgruppe und Zuordnung.',href:'/downloads/',status:'verfügbar',audience:['Alle Rollen']},
  {title:'Expertennetzwerk',description:'Menschen, Fachgebiete, Regionen und Qualifikationen datengetrieben zuordnen.',href:'/experten/',status:'verfügbar',audience:['Auftraggeber','Experten']},
 ];
 const steps=[{title:'Schadenmeldung',text:'Grunddaten und Unterlagen strukturiert erfassen.'},{title:'Erstklassifizierung',text:'Schadenart, Objekt und Dringlichkeit zuordnen.'},{title:'Technische Bewertung',text:'Prüfziel und erforderliche Fachdisziplin bestimmen.'},{title:'Sachverständigenzuordnung',text:'Qualifikation, Region und Verfügbarkeit abgleichen.'},{title:'Dokumentation',text:'Feststellungen und offene Punkte nachvollziehbar führen.'},{title:'Regulierung',text:'Maßnahmen, Kosten und Entscheidungen fortschreiben.'},{title:'Abschluss',text:'Ergebnis, Unterlagen und Erkenntnisse sichern.'}];

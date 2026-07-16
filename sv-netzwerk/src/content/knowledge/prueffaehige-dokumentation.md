@@ -12,7 +12,7 @@ videoScript: "Wissen in 180 Sekunden: Eine prüffähige Schadenakte beantwortet 
 cta:
   label: "Dokumentationsbedarf besprechen"
   href: "/kontakt/"
-relatedLinks: ["/svos/", "/downloads/", "/praxisfaelle/"]
+relatedLinks: ["/svos/", "/praxisfaelle/"]
 damageTypes: ["gebaeude", "gewerbe-industrie"]
 publication:
   publishedAt: 2026-07-13
@@ -59,7 +59,7 @@ Erst nach dieser Zuordnung werden Leistungen freigegeben. Wenn eine Kontrollöff
 
 Gute Dokumentation reduziert nicht automatisch jede Meinungsverschiedenheit. Sie macht jedoch sichtbar, worüber fachlich gesprochen wird. Gesicherte Feststellungen, plausible Schlussfolgerungen und offene Punkte erhalten jeweils ihren Platz. Verantwortlichkeiten bleiben erkennbar, und spätere Bearbeiter müssen den Vorgang nicht aus unverbundenen Dateien rekonstruieren.
 
-Die Struktur des [SV Operating System](/svos/) unterstützt diese Trennung. Arbeitshilfen im [Downloadcenter](/downloads/) und veröffentlichte [Praxisfälle](/praxisfaelle/) zeigen, wie wiederkehrende Angaben vereinheitlicht werden können.
+Die Struktur des [SV Operating System](/svos/) unterstützt diese Trennung. [Veröffentlichte Praxisfälle](/praxisfaelle/) zeigen, wie wiederkehrende Angaben vereinheitlicht werden können.
 
 ## Übergaben und Entscheidungen protokollieren
 

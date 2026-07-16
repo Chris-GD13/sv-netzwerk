@@ -1,4 +1,4 @@
-export type SearchContentType = 'article' | 'download' | 'video' | 'page' | 'damage' | 'case' | 'expert';
+export type SearchContentType = 'article' | 'video' | 'page' | 'damage' | 'case' | 'expert';
 
 export type SearchIndexItem = {
   id: string;

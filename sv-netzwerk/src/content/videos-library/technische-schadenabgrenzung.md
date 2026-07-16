@@ -8,7 +8,7 @@ transcript: "Prüfauftrag und Ereignis klären. Betroffene Bauteile und Referenz
 platformLinks: []
 tags: ["Schadenabgrenzung", "Kausalität", "Regulierung"]
 relatedKnowledge: ["schadenabgrenzung"]
-downloadHints: ["/downloads/"]
+downloadHints: []
 publication:
   publishedAt: 2026-07-14
   status: published

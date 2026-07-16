@@ -9,7 +9,6 @@ const tags = [...new Set(searchDocuments.flatMap((item)=>item.tags))].sort((a,b)
 
 const typeLabels = {
   article: 'Fachbeitrag',
-  download: 'Download',
   video: 'Video',
   page: 'Seite',
   damage: 'Schadenart',
@@ -17,8 +16,8 @@ const typeLabels = {
   expert: 'Experte',
 };
 ---
-<BaseLayout title="Suche" description="Fachwissen, Downloads, Praxisfälle und Experten des SV-Netzwerks durchsuchen." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Suche' }]}>
-  <Hero compact eyebrow="Suche" title="SVOS Wissenssuche" text="Durchsuchen Sie Fachbeiträge, Downloads, Praxisfälle und Experten nach Begriffen, Kategorien und Schlagworten." />
+<BaseLayout title="Suche" description="Fachwissen, Praxisfälle und Experten des SV-Netzwerks durchsuchen." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Suche' }]}>
+  <Hero compact eyebrow="Suche" title="SVOS Wissenssuche" text="Durchsuchen Sie Fachbeiträge, Praxisfälle und Experten nach Begriffen, Kategorien und Schlagworten." />
 
   <section class="sv-section">
     <div class="sv-container search-layout">
@@ -43,7 +42,6 @@ const typeLabels = {
           <select data-type>
             <option value="all">Alle Typen</option>
             <option value="article">Fachbeiträge</option>
-            <option value="download">Downloads</option>
             <option value="damage">Schadenarten</option>
             <option value="case">Praxisfälle</option>
             <option value="expert">Experten</option>

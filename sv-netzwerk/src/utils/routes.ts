@@ -3,7 +3,6 @@ export const routes = {
   services: '/leistungen/',
   damageTypes: '/schadenarten/',
   knowledge: '/fachwissen/',
-  downloads: '/downloads/',
   experts: '/experten/',
   practiceCases: '/praxisfaelle/',
   team: '/netzwerk/',
