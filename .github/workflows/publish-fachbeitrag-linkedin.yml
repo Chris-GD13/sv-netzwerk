@@ -31,19 +31,28 @@ jobs:
       - name: Get latest Fachbeitrag metadata
         id: latest_fachbeitrag
         run: |
-          # Finde die neueste Fachbeitrag-Datei in src/content/knowledge/
-          LATEST_FILE=$(find src/content/knowledge -name 'index.md' -type f | sort -V | tail -1)
+          cd sv-netzwerk
+          
+          # Finde die neueste Fachbeitrag-Datei
+          LATEST_FILE=$(find src/content/knowledge -maxdepth 1 -name '*.md' -type f ! -name 'svos-foundation.md' | sort | tail -1)
           
           if [ -z "$LATEST_FILE" ]; then
             echo "error=no_fachbeitrag_found" >> $GITHUB_OUTPUT
             exit 1
           fi
           
-          # Extrahiere Frontmatter (title, description, slug)
-          TITLE=$(grep -m 1 '^title:' "$LATEST_FILE" | sed 's/^title: *//' | sed "s/['\"]//g")
-          DESCRIPTION=$(grep -m 1 '^description:' "$LATEST_FILE" | sed 's/^description: *//' | sed "s/['\"]//g")
-          SLUG=$(grep -m 1 '^slug:' "$LATEST_FILE" | sed 's/^slug: *//' | sed "s/['\"]//g")
-          DATE=$(grep -m 1 '^pubDate:' "$LATEST_FILE" | sed 's/^pubDate: *//' | sed "s/['\"]//g")
+          # Extrahiere Metadaten
+          TITLE=$(grep -m 1 '^title:' "$LATEST_FILE" | sed 's/^title: *"//' | sed 's/"$//')
+          DESCRIPTION=$(grep -m 1 '^description:' "$LATEST_FILE" | sed 's/^description: *"//' | sed 's/"$//')
+          SLUG=$(basename "$LATEST_FILE" .md)
+          TAGS=$(grep '^tags:' "$LATEST_FILE" | sed 's/^tags: *\[//' | sed 's/\]$//' | sed 's/"//g' | sed 's/, /|/g')
+          DATE=$(grep -m 1 '^pubDate:' "$LATEST_FILE" | sed 's/^pubDate: *\[//' | sed 's/\].*//' | sed 's/"//g')
+          
+          # Extrahiere den ersten Absatz (erste ~300 Zeichen nach dem Frontmatter)
+          FIRST_PARAGRAPH=$(tail -n +26 "$LATEST_FILE" | head -20 | grep -v '^$' | head -1 | cut -c1-280)
+          
+          # Generiere Hashtags aus Tags
+          HASHTAGS=$(echo "$TAGS" | sed 's/|/ #/g' | sed 's/^/#/')
           
           # URL zusammenbauen
           URL="https://sv-netzwerk.eu/fachwissen/$SLUG/"
@@ -54,10 +63,30 @@ jobs:
           echo "slug=$SLUG" >> $GITHUB_OUTPUT
           echo "date=$DATE" >> $GITHUB_OUTPUT
           echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+          echo "first_paragraph=$FIRST_PARAGRAPH" >> $GITHUB_OUTPUT
+          echo "hashtags=$HASHTAGS" >> $GITHUB_OUTPUT
           echo "file=$LATEST_FILE" >> $GITHUB_OUTPUT
       
-      - name: Build website
-        run: npm run build
+      - name: Fetch image from Unsplash
+        id: unsplash_image
+        run: |
+          UNSPLASH_KEY="${{ secrets.UNSPLASH_ACCESS_KEY }}"
+          SEARCH_TERM="${{ steps.latest_fachbeitrag.outputs.title }}"
+          
+          # Suche Bild bei Unsplash
+          RESPONSE=$(curl -s "https://api.unsplash.com/search/photos?query=$SEARCH_TERM&per_page=1&client_id=$UNSPLASH_KEY")
+          
+          # Extrahiere die beste passende Bild-URL
+          IMAGE_URL=$(echo "$RESPONSE" | jq -r '.results[0].urls.regular // empty')
+          
+          if [ -z "$IMAGE_URL" ] || [ "$IMAGE_URL" = "null" ]; then
+            echo "warning=no_unsplash_image_found, using generic image" >> $GITHUB_OUTPUT
+            IMAGE_URL="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=630&fit=crop"
+          fi
+          
+          echo "image_url=$IMAGE_URL" >> $GITHUB_OUTPUT
+          echo "✅ Image URL: $IMAGE_URL"
       
       - name: Validate build
         run: |
@@ -76,10 +105,13 @@ jobs:
             exit 0
           fi
           
-          PAYLOAD=$(cat <<EOF
+          PAYLOAD=$(cat <<'EOF'
           {
             "title": "${{ steps.latest_fachbeitrag.outputs.title }}",
             "description": "${{ steps.latest_fachbeitrag.outputs.description }}",
+            "first_paragraph": "${{ steps.latest_fachbeitrag.outputs.first_paragraph }}",
+            "hashtags": "${{ steps.latest_fachbeitrag.outputs.hashtags }}",
+            "image_url": "${{ steps.unsplash_image.outputs.image_url }}",
             "url": "${{ steps.latest_fachbeitrag.outputs.url }}",
             "date": "${{ steps.latest_fachbeitrag.outputs.date }}",
             "slug": "${{ steps.latest_fachbeitrag.outputs.slug }}"
@@ -93,7 +125,7 @@ jobs:
             --retry 3 \
             --retry-delay 2
           
-          echo "✅ LinkedIn webhook triggered"
+          echo "✅ LinkedIn webhook triggered with image"
       
       - name: Deploy to GitHub Pages (if needed)
         run: |
