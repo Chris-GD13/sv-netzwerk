@@ -1,0 +1,113 @@
+name: Fachbeitrag veröffentlichen & LinkedIn posten
+
+on:
+  schedule:
+    # Montag und Freitag um 05:30 Berlin-Zeit (Europe/Berlin)
+    # Cron ist UTC: 03:30 UTC im Winter (UTC+1), 04:30 UTC im Sommer (UTC+2)
+    # Wir verwenden 04:30 UTC als Kompromiß (näher am gewünschten 05:30 Berlin)
+    - cron: '30 4 * * 1,5'  # Montag (1) und Freitag (5) um 04:30 UTC
+  workflow_dispatch:  # Manuelle Auslösung erlaubt
+
+jobs:
+  publish_and_notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Get latest Fachbeitrag metadata
+        id: latest_fachbeitrag
+        run: |
+          # Finde die neueste Fachbeitrag-Datei in src/content/knowledge/
+          LATEST_FILE=$(find src/content/knowledge -name 'index.md' -type f | sort -V | tail -1)
+          
+          if [ -z "$LATEST_FILE" ]; then
+            echo "error=no_fachbeitrag_found" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          # Extrahiere Frontmatter (title, description, slug)
+          TITLE=$(grep -m 1 '^title:' "$LATEST_FILE" | sed 's/^title: *//' | sed "s/['\"]//g")
+          DESCRIPTION=$(grep -m 1 '^description:' "$LATEST_FILE" | sed 's/^description: *//' | sed "s/['\"]//g")
+          SLUG=$(grep -m 1 '^slug:' "$LATEST_FILE" | sed 's/^slug: *//' | sed "s/['\"]//g")
+          DATE=$(grep -m 1 '^pubDate:' "$LATEST_FILE" | sed 's/^pubDate: *//' | sed "s/['\"]//g")
+          
+          # URL zusammenbauen
+          URL="https://sv-netzwerk.eu/fachwissen/$SLUG/"
+          
+          # Ausgaben setzen
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "description=$DESCRIPTION" >> $GITHUB_OUTPUT
+          echo "slug=$SLUG" >> $GITHUB_OUTPUT
+          echo "date=$DATE" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "file=$LATEST_FILE" >> $GITHUB_OUTPUT
+      
+      - name: Build website
+        run: npm run build
+      
+      - name: Validate build
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Build failed: dist directory not found"
+            exit 1
+          fi
+      
+      - name: Trigger Zapier webhook (LinkedIn post)
+        if: success()
+        run: |
+          WEBHOOK_URL="${{ secrets.ZAPIER_WEBHOOK_URL }}"
+          
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "WARNING: ZAPIER_WEBHOOK_URL secret not set"
+            exit 0
+          fi
+          
+          PAYLOAD=$(cat <<EOF
+          {
+            "title": "${{ steps.latest_fachbeitrag.outputs.title }}",
+            "description": "${{ steps.latest_fachbeitrag.outputs.description }}",
+            "url": "${{ steps.latest_fachbeitrag.outputs.url }}",
+            "date": "${{ steps.latest_fachbeitrag.outputs.date }}",
+            "slug": "${{ steps.latest_fachbeitrag.outputs.slug }}"
+          }
+          EOF
+          )
+          
+          curl -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            --retry 3 \
+            --retry-delay 2
+          
+          echo "✅ LinkedIn webhook triggered"
+      
+      - name: Deploy to GitHub Pages (if needed)
+        run: |
+          # Dieser Schritt ist optional — ruf deine deploy-Logik hier auf
+          # Falls vorhanden: npm run deploy
+          echo "✅ Build complete — ready for deployment"
+
+  notify_on_failure:
+    runs-on: ubuntu-latest
+    needs: publish_and_notify
+    if: failure()
+    
+    steps:
+      - name: Notify failure
+        run: |
+          echo "⚠️ Fachbeitrag-Veröffentlichung fehlgeschlagen"
+          echo "Bitte manuell prüfen: https://github.com/${{ github.repository }}/actions"
