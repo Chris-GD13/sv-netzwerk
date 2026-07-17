@@ -1,30 +1,94 @@
-name: Fachwissensstandard
+name: Fachbeitrags-Automation
 
 on:
   schedule:
-    - cron: "0 4 * * *"
-    - cron: "0 12 * * *"
+    # Europe/Berlin 06:00 bei Sommerzeit (UTC+2)
+    - cron: "0 4 * * 1,5"
+    # Europe/Berlin 06:00 bei Winterzeit (UTC+1)
+    - cron: "0 5 * * 1,5"
   workflow_dispatch:
   pull_request:
     paths:
       - "sv-netzwerk/src/content/knowledge/**"
+      - "sv-netzwerk/src/content/linkedin/**"
+      - "sv-netzwerk/src/content/videos/**"
+      - "sv-netzwerk/src/data/library.ts"
+      - "sv-netzwerk/src/data/redaktionsplan.json"
       - "sv-netzwerk/scripts/validate-knowledge.mjs"
+      - "sv-netzwerk/scripts/validate-fachbeitrag-preflight.mjs"
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: fachbeitrag-automation-main
+  cancel-in-progress: false
 
 jobs:
-  validate:
+  publish-and-validate:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: sv-netzwerk
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Node.js 22 LTS einrichten
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: sv-netzwerk/package-lock.json
-      - run: npm ci --no-audit --no-fund
-      - run: npm run validate:knowledge
+
+      - name: Laufzeitfenster in Europe/Berlin prüfen
+        id: run-window
+        if: github.event_name == 'schedule'
+        run: |
+          berlin_hour="$(TZ=Europe/Berlin date +%H)"
+          if [ "$berlin_hour" != "06" ]; then
+            echo "allowed=false" >> "$GITHUB_OUTPUT"
+            echo "Außerhalb des 06:00-Europe/Berlin-Zeitfensters. Lauf wird beendet."
+            exit 0
+          fi
+          echo "allowed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Abhängigkeiten installieren
+        if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
+        run: npm ci --no-audit --no-fund
+
+      - name: Berlin-Datum ermitteln
+        if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
+        run: echo "BERLIN_DATE=$(TZ=Europe/Berlin date +%F)" >> "$GITHUB_ENV"
+
+      - name: Preflight: letzter Beitrag, Slugs, Fokus, Integrationsstand
+        if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
+        run: node scripts/validate-fachbeitrag-preflight.mjs "$BERLIN_DATE"
+
+      - name: Fachbeitragsstandard prüfen
+        if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
+        run: npm run validate:knowledge -- "$BERLIN_DATE"
+
+      - name: Build ausführen
+        if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
+        run: npm run build
+
+      - name: Build-Integration prüfen (Suche/Sitemap/Links)
+        if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
+        run: npm run validate:knowledge -- --dist "$BERLIN_DATE"
+
+      - name: Commit und Push nach main (nur Automation-Läufe)
+        if: github.event_name != 'pull_request' && (github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true')
+        run: |
+          if git diff --quiet; then
+            echo "Keine Änderungen seit Checkout; kein Commit und kein Push."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: publish fachbeitrag ${BERLIN_DATE}"
+          git push origin HEAD:main
+          echo "Push auf main erfolgreich. Deployment wird durch push-trigger in deploy.yml ausgelöst."

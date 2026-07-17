@@ -1,12 +1,10 @@
 # Täglicher Fachwissensstandard
 
-## Umfang nach Wochentag
+## Umfang nach Wochentag (aktiver Rhythmus)
 
 | Tag | Kategorie | Wortumfang |
 |---|---:|---:|
-| Samstag, Sonntag | C | 300–500 |
-| Montag, Mittwoch, Freitag | B | 800–1.200 |
-| Dienstag, Donnerstag | A | 1.500–2.500 |
+| Montag, Freitag | B | 800–1.200 |
 
 ## Pflichtbestandteile
 
@@ -16,10 +14,10 @@ Normen, Urteile, Messwerte, Schadenfälle und Zahlen werden nur genannt, wenn si
 
 ## Pflichtläufe
 
-- 06:00 Uhr Europe/Berlin: Planungs- und Vollständigkeitsprüfung
-- 14:00 Uhr Europe/Berlin: Veröffentlichungskontrolle
+- 06:00 Uhr Europe/Berlin an Montag und Freitag: Planungs-, Dubletten- und Vollständigkeitsprüfung inklusive Build
+- Nach erfolgreichem Lauf: Commit + Push auf `main`, anschließend Deployment per Push-Trigger
 
-Die GitHub-Zeitpläne sind UTC-basiert. Sie prüfen ausschließlich vorhandene Inhalte und erzeugen keine Texte.
+Die GitHub-Zeitpläne sind UTC-basiert und über Sommer-/Winterzeit abgesichert. Andere zeitgesteuerte Content-Läufe bleiben deaktiviert.
 
 ## Befehle
 

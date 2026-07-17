@@ -1,15 +1,5 @@
 version: 2
 
-updates:
-  - package-ecosystem: "npm"
-    directory: "/sv-netzwerk"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "04:00"
-      timezone: "Europe/Berlin"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-    commit-message:
-      prefix: "deps"
+# Zeitgesteuerte Dependabot-Läufe sind deaktiviert, um nur den
+# Montag/Freitag-Fachbeitragsrhythmus als aktive Content-Automation zu behalten.
+updates: []

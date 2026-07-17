@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.1.0 – 2026-07-17
+- neuen Fachbeitrag veröffentlicht: „Brandschaden nach Erstmaßnahmen: Übergang zur Wiederherstellung sauber steuern“
+- Fachwissensübersicht mit neuem Eintrag (Kategorie/Tags/Filter) als aktuellsten Beitrag ergänzt
+- statische Sitemap auf neue Fachwissensroute und aktualisiertes Lastmod-Datum erweitert
+- LinkedIn-Begleittext und Wissen-in-180-Sekunden-Skript für den 17.07.2026 abgelegt
+- Automationsrhythmus verbindlich auf Montag/Freitag umgestellt (Europe/Berlin, DST-sicher über duale UTC-Crons mit Zeitfensterprüfung)
+- automatische Fachbeitrags-Preflight-Prüfung für letzten Beitrag, Slug-/Titel-Dubletten, Übersichtsintegration und Companion-Dateien ergänzt
+- alle übrigen zeitgesteuerten Automationen deaktiviert (u. a. Dependabot-Schedule), manuelle technische Workflows bleiben verfügbar
+
 ## 3.0.1 – 2026-07-14
 - sichtbaren Header vollständig neu aufgebaut
 - robuste Desktop-Navigation mit Mega-Menüs integriert

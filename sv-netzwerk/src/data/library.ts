@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Brandschaden nach Erstmaßnahmen: Übergang zur Wiederherstellung sauber steuern',
+    description: 'Wie nach Löschung und Sicherung die technische Trennung von Gefahrenabwehr, Wiederherstellung und Instandhaltung gelingt.',
+    href: '/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/',
+    category: 'Brandschaden',
+    tags: ['Brandschaden', 'Notmaßnahmen', 'Schadenabgrenzung'],
+    date: '2026-07-17',
+    type: 'article',
+    featured: true,
+  },
+  {
     title: 'Fachliche Zuständigkeit im Schadenfall klar zuordnen',
     description: 'Wie Prüfziel, Fachgebiet, Region und Verantwortung zu einer belastbaren Expertenzuordnung zusammengeführt werden.',
     href: '/fachwissen/fachliche-zustaendigkeit-im-schadenfall/',
