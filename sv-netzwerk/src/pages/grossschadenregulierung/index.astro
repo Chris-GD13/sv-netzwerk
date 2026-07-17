@@ -10,8 +10,8 @@ const phases=[
   {title:'Steuerung und Abschluss',text:'Termine, Schnittstellen, Restpunkte und Abschlussunterlagen werden bis zur nachvollziehbaren Entscheidung koordiniert.'},
 ];
 ---
-<BaseLayout title="Großschadenregulierung" description="Strukturierte Großschadenregulierung mit technischer Bewertung, transparenter Reserve und dokumentierter Steuerung." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Großschadenregulierung'}]}>
-  <Hero compact eyebrow="Großschadenregulierung" title="Umfangreiche Schäden kontrolliert bearbeiten." text="Das SV-Netzwerk verbindet technische Schadenbewertung, koordinierte Kommunikation und dokumentierte Entscheidungsstände vom ersten Ortstermin bis zum Abschluss." primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Experten" secondaryHref="/experten/" />
+<BaseLayout title="Großschaden- und Komplexschadenregulierung" description="Strukturierte Großschaden- und Komplexschadenregulierung mit technischer Bewertung, transparenter Reserve und dokumentierter Steuerung." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Großschaden- und Komplexschadenregulierung'}]}>
+  <Hero compact eyebrow="Großschaden- und Komplexschadenregulierung" title="Umfangreiche Schäden kontrolliert bearbeiten." text="Das SV-Netzwerk verbindet technische Schadenbewertung, koordinierte Kommunikation und dokumentierte Entscheidungsstände vom ersten Ortstermin bis zum Abschluss." primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Experten" secondaryHref="/experten/" />
   <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Ablauf" title="Drei Phasen mit klarer Verantwortung"/><div class="sv-grid sv-grid-3">{phases.map((item,index)=><FeatureCard index={`0${index+1}`} title={item.title} text={item.text}/>)}</div></div></section>
-  <CallToAction title="Großschaden abstimmen" text="Für die Erstzuordnung genügen Schadenart, Objekt, Schadendatum und die vorhandenen Unterlagen." href="/kontakt/" label="Kontakt aufnehmen" />
+  <CallToAction title="Groß- oder Komplexschaden abstimmen" text="Für die Erstzuordnung genügen Schadenart, Objekt, Schadendatum und die vorhandenen Unterlagen." href="/kontakt/" label="Kontakt aufnehmen" />
 </BaseLayout>

@@ -18,10 +18,11 @@ export const navigation: NavItem[] = [
     description: 'Prüfaufträge, Bewertungen und Regulierung strukturiert aus einer Hand.',
     children: [
       { label: 'Sachverständigenleistungen', href: '/leistungen/#sachverstaendigenleistungen', description: 'Feststellungen, Bewertungen und belastbare Empfehlungen.' },
-      { label: 'Großschadenregulierung', href: '/leistungen/#grossschadenregulierung', description: 'Steuerung komplexer Vorgänge mit klaren Entscheidungsständen.' },
+      { label: 'Kumulschadenmanagement', href: '/leistungen/kumulschadenmanagement/', description: 'Skalierbare Bearbeitung gleichartiger Schäden bei Unwetterlagen.' },
+      { label: 'Leistungen für Versicherer', href: '/versicherer/', description: 'Prüffähige Zuarbeit für Schadenabteilungen und Regulierer.' },
+      { label: 'Großschaden- und Komplexschadenregulierung', href: '/grossschadenregulierung/', description: 'Steuerung komplexer Vorgänge mit klaren Entscheidungsständen.' },
       { label: 'Technische Schadenbewertung', href: '/leistungen/#technische-schadenbewertung', description: 'Ursache, Umfang und Wiederherstellung fachlich einordnen.' },
       { label: 'Beweissicherung', href: '/leistungen/#beweissicherung', description: 'Zustände, Spuren und technische Zusammenhänge dokumentieren.' },
-      { label: 'Versicherer', href: '/versicherer/', description: 'Prüffähige Zuarbeit für Schadenabteilungen und Regulierer.' },
       { label: 'Gutachter-Plattform', href: '/gutachter-plattform/', description: 'Digitale Zusammenarbeit im Sachverständigennetzwerk.' },
     ],
   },

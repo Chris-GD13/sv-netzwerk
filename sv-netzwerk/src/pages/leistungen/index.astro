@@ -7,19 +7,20 @@ import CallToAction from '../../components/CallToAction.astro';
 
 const services = [
   { id: 'sachverstaendigenleistungen', title: 'Sachverständigenleistungen', text: 'Schadenaufnahme, technische Feststellungen, Ursacheneinordnung, Bewertung und eine verständliche Empfehlung für den konkreten Prüfauftrag.' },
-  { id: 'grossschadenregulierung', title: 'Großschadenregulierung', text: 'Koordination umfangreicher Vorgänge mit belastbaren Berichten, abgestimmten Reserven, Terminsteuerung und dokumentierten Entscheidungen.' },
+  { id: 'kumulschadenmanagement', title: 'Kumulschadenmanagement', text: 'Kurzfristige Zusatzkapazitäten, priorisierte Erstaufnahme und strukturierte Bearbeitung bei regionalen und überregionalen Schadenlagen.' },
+  { id: 'versicherer', title: 'Leistungen für Versicherer', text: 'Prüffähige Entscheidungsvorlagen, KVA- und Rechnungsprüfung sowie klare Kommunikation von offenen Punkten und Handlungsbedarf.' },
+  { id: 'grossschaden-und-komplexschadenregulierung', title: 'Großschaden- und Komplexschadenregulierung', text: 'Koordination umfangreicher Vorgänge mit belastbaren Berichten, abgestimmten Reserven, Terminsteuerung und dokumentierten Entscheidungen.' },
   { id: 'technische-schadenbewertung', title: 'Technische Schadenbewertung', text: 'Abgrenzung von Schaden, Vorschaden, Mangel und Instandhaltung sowie Prüfung des erforderlichen Wiederherstellungsumfangs.' },
   { id: 'beweissicherung', title: 'Beweissicherung', text: 'Nachvollziehbare Dokumentation von Zuständen, Spuren, Messwerten und Bauteilöffnungen als Grundlage für die weitere Bearbeitung.' },
-  { id: 'versicherer', title: 'Leistungen für Versicherer', text: 'Prüffähige Entscheidungsvorlagen, KVA- und Rechnungsprüfung sowie klare Kommunikation von offenen Punkten und Handlungsbedarf.' },
   { id: 'gutachter-plattform', title: 'Gutachter-Plattform', text: 'Strukturierte digitale Zusammenarbeit mit einheitlichen Vorgängen, Aufgaben, Unterlagen und fachlichen Bearbeitungsständen.' },
 ];
 ---
 
-<BaseLayout title="Leistungen | SV-Netzwerk" description="Sachverständigenleistungen, Großschadenregulierung, technische Schadenbewertung und Beweissicherung für Bau- und Versicherungsschäden." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen'}]}>
+<BaseLayout title="Leistungen | SV-Netzwerk" description="Sachverständigenleistungen, Kumulschadenmanagement, Leistungen für Versicherer sowie Großschaden- und Komplexschadenregulierung für Bau- und Versicherungsschäden." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen'}]}>
   <Hero compact eyebrow="Leistungen" title="Prüfen, einordnen und belastbar entscheiden." text="Das SV-Netzwerk verbindet technische Feststellung, regulierungsbezogene Bewertung und dokumentierte Handlungsempfehlung in einem klaren Bearbeitungsweg." primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Kontakt aufnehmen" secondaryHref="/kontakt/" />
   <section class="sv-section">
     <div class="sv-container">
-      <SectionHeader eyebrow="Leistungsbild" title="Sechs Bausteine für eine prüffähige Bearbeitung" text="Umfang und Tiefe richten sich nach Schadenbild, Auftrag und Entscheidungsbedarf. Jeder Baustein wird mit Zuständigkeit, Ergebnis und offenen Punkten dokumentiert." />
+      <SectionHeader eyebrow="Leistungsbild" title="Sieben Bausteine für eine prüffähige Bearbeitung" text="Umfang und Tiefe richten sich nach Schadenbild, Auftrag und Entscheidungsbedarf. Jeder Baustein wird mit Zuständigkeit, Ergebnis und offenen Punkten dokumentiert." />
       <div class="service-grid">
         {services.map((service, index) => (
           <div id={service.id} class="service-anchor"><FeatureCard index={`0${index + 1}`} title={service.title} text={service.text} /></div>
@@ -37,6 +38,6 @@ const services = [
 </BaseLayout>
 
 <style>
-  .service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sv-space-5)}.service-anchor{scroll-margin-top:7rem}.service-anchor :global(.feature-card){height:100%}.decision-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(2rem,7vw,7rem)}
-  @media(max-width:58rem){.service-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:42rem){.service-grid,.decision-grid{grid-template-columns:1fr}}
+  .service-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sv-space-5)}.service-anchor{scroll-margin-top:7rem}.service-anchor :global(.feature-card){height:100%}.decision-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(2rem,7vw,7rem)}
+  @media(max-width:72rem){.service-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:58rem){.service-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:42rem){.service-grid,.decision-grid{grid-template-columns:1fr}}
 </style>

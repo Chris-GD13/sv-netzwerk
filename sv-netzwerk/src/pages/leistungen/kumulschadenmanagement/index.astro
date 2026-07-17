@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Hero from '../../../components/Hero.astro';
+import SectionHeader from '../../../components/SectionHeader.astro';
+import CallToAction from '../../../components/CallToAction.astro';
+
+const services = [
+  'Kurzfristige Bereitstellung zusätzlicher Regulierungskapazitäten',
+  'Priorisierte Erstaufnahme bei regionalen und überregionalen Unwetterlagen',
+  'Strukturierte Bearbeitung einer Vielzahl gleichartiger Schadenfälle',
+  'Einheitliche digitale Schadenaufnahme und Dokumentation',
+  'Schnelle Ersteinschätzung und Reservenbildung',
+  'Zentrale Status-, Kosten- und Bearbeitungsübersichten',
+  'Koordinierte Kommunikation mit Versicherern und Beteiligten',
+  'Bearbeitung von Sturm-, Hagel-, Starkregen- und Überschwemmungsschäden',
+];
+---
+<BaseLayout title="Kumulschadenmanagement | SV-Netzwerk" description="Kumulschadenmanagement für Unwetterlagen mit priorisierter Erstaufnahme, skalierbarer Fallbearbeitung und zentraler Transparenz für Versicherer." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Kumulschadenmanagement'}]}>
+  <Hero compact eyebrow="Kumulschadenmanagement" title="Schadenwellen strukturiert und priorisiert steuern." text="Das SV-Netzwerk stellt bei Kumulereignissen kurzfristig zusätzliche Kapazitäten bereit und sichert eine einheitliche, digitale und nachvollziehbare Bearbeitung." primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Kontakt aufnehmen" secondaryHref="/kontakt/" />
+  <section class="sv-section">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Leistungsumfang" title="Operative Stabilität bei hoher Fallzahl" text="Wir kombinieren schnelle Erstaufnahme, einheitliche Prozesse und zentrale Steuerung für belastbare Entscheidungen bei Großlagen." />
+      <ul class="kumul-list">
+        {services.map((item) => <li>{item}</li>)}
+      </ul>
+    </div>
+  </section>
+  <CallToAction title="Kumulfalllage abstimmen" text="Für den Start genügen Region, Schadenlage, erwartetes Volumen und vorhandene Steuerungsanforderungen." href="/kontakt/" label="Kontakt aufnehmen" />
+</BaseLayout>
+
+<style>
+  .kumul-list{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sv-space-4)}
+  .kumul-list li{position:relative;padding:1.15rem 1.25rem 1.15rem 2.2rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-md);background:var(--sv-color-surface)}
+  .kumul-list li::before{content:"";position:absolute;left:1rem;top:1.55rem;width:.6rem;aspect-ratio:1;border-radius:50%;background:var(--sv-color-accent)}
+  @media(max-width:58rem){.kumul-list{grid-template-columns:1fr}}
+</style>

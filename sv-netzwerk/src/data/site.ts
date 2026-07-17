@@ -1,7 +1,7 @@
 export const site = {
   name: 'SV-Netzwerk',
   legalName: 'SV-Netzwerk Bau & Schaden',
-  description: 'Sachverständige, Großschadenregulierung und vernetzte Fachkompetenz für komplexe Bau- und Versicherungsschäden.',
+  description: 'Sachverständige, Großschaden- und Komplexschadenregulierung und vernetzte Fachkompetenz für komplexe Bau- und Versicherungsschäden.',
   url: 'https://www.sv-netzwerk.eu',
   email: 'cw@sv-schuett.eu',
   phone: '07367 / 393 97 83',
