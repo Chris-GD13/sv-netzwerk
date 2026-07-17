@@ -549,9 +549,9 @@
 .v4-hero h1 {
   max-width: 50rem;
   margin: 0 0 1.5rem;
-  font-size: clamp(3.6rem, 6.7vw, 7.1rem);
-  line-height: 0.91;
-  letter-spacing: -0.07em;
+  font-size: clamp(1.75rem, 2.9vw, 2.2rem);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
 }
 .v4-hero h1 em {
   color: var(--v4-blue);
@@ -795,22 +795,23 @@
   }
 }
 .v4-section {
-  padding-block: clamp(5rem, 9vw, 8.5rem);
+  padding-block: clamp(3.5rem, 6.5vw, 5.5rem);
 }
 .v4-section-head {
   display: flex;
   align-items: end;
   justify-content: space-between;
-  gap: 3rem;
-  margin-bottom: 3rem;
+  gap: clamp(1.4rem, 3vw, 2.4rem);
+  margin-bottom: clamp(1.4rem, 2.8vw, 2.1rem);
 }
 .v4-section-head > div {
   max-width: 50rem;
 }
 .v4-section-head h2 {
   margin: 0;
-  font-size: clamp(2.5rem, 4.5vw, 4.8rem);
-  line-height: 0.96;
+  font-size: clamp(1.55rem, 2.25vw, 2.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 .v4-section-head > p {
   max-width: 34rem;
@@ -1084,8 +1085,9 @@
   gap: clamp(3rem, 7vw, 7rem);
 }
 .v4-downloads__intro h2 {
-  font-size: clamp(2.7rem, 5vw, 5rem);
-  line-height: 0.94;
+  font-size: clamp(1.55rem, 2.25vw, 2.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 .v4-downloads__intro > p:not(.v4-kicker) {
   max-width: 32rem;
@@ -1141,18 +1143,19 @@
   color: #fff;
 }
 .v4-team {
+  padding-block: clamp(3.25rem, 5.5vw, 4.85rem);
   background: linear-gradient(120deg, rgba(11, 79, 122, 0.15), rgba(255, 255, 255, 0.18) 55%, rgba(255, 157, 18, 0.1));
 }
 .v4-team__grid {
   display: grid;
   grid-template-columns: 0.85fr 1.15fr;
   align-items: center;
-  gap: clamp(3rem, 8vw, 8rem);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
 }
 .v4-team__portrait {
   position: relative;
   display: flex;
-  min-height: 32rem;
+  min-height: 24rem;
   flex-direction: column;
   justify-content: space-between;
   padding: 1.5rem;
@@ -1205,8 +1208,10 @@
   color: #bcd0dc;
 }
 .v4-team__copy h2 {
-  font-size: clamp(2.7rem, 5vw, 5rem);
-  line-height: 0.94;
+  max-width: 18ch;
+  font-size: clamp(1.55rem, 2.15vw, 2.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 .v4-team__copy > p:not(.v4-kicker) {
   max-width: 40rem;
@@ -1228,7 +1233,7 @@
   font-weight: 800;
 }
 .v4-cta {
-  padding-block: clamp(5rem, 9vw, 8rem);
+  padding-block: clamp(3.5rem, 6.5vw, 5.5rem);
   background: var(--v4-blue);
   color: #fff;
 }
@@ -1244,8 +1249,9 @@
 .v4-cta h2 {
   max-width: 55rem;
   margin: 0;
-  font-size: clamp(2.8rem, 5.5vw, 5.8rem);
-  line-height: 0.94;
+  font-size: clamp(1.6rem, 2.35vw, 2.2rem);
+  line-height: 1.14;
+  letter-spacing: -0.03em;
   color: #fff;
 }
 .v4-cta__inner > div:first-child > p:last-child {
@@ -1396,7 +1402,7 @@
     padding-block: 4.5rem;
   }
   .v4-hero h1 {
-    font-size: clamp(3.2rem, 15vw, 5rem);
+    font-size: clamp(1.7rem, 7.2vw, 2.1rem);
   }
   .v4-hero__actions {
     align-items: stretch;
