@@ -63,7 +63,7 @@ jobs:
         if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
         run: echo "BERLIN_DATE=$(TZ=Europe/Berlin date +%F)" >> "$GITHUB_ENV"
 
-      - name: Preflight: letzter Beitrag, Slugs, Fokus, Integrationsstand
+      - name: "Preflight: letzter Beitrag, Slugs, Fokus, Integrationsstand"
         if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
         run: node scripts/validate-fachbeitrag-preflight.mjs "$BERLIN_DATE"
 
