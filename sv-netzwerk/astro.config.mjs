@@ -6,7 +6,7 @@ export default defineConfig({
   integrations: [
     sitemap({
       filter: (page) =>
-        !page.includes('/wissen-in-180-sekunden') && !page.includes('/komponenten')
+        !page.includes('/wissen-in-180-sekunden') && !page.includes('/komponenten') && !page.includes('/praxisfaelle')
     })
   ],
   prefetch: true,

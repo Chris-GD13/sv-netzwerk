@@ -57,13 +57,13 @@ h2 {
   font-weight: 850;
 }
 h1 {
-  font-size: clamp(2.9rem, 6.5vw, 6.25rem);
+  font-size: clamp(1.75rem, 2.5vw, 2.5rem);
 }
 h2 {
-  font-size: clamp(2.15rem, 4vw, 3.85rem);
+  font-size: clamp(1.45rem, 2vw, 2rem);
 }
 h3 {
-  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  font-size: clamp(1rem, 1.3vw, 1.25rem);
 }
 p {
   margin: 0 0 var(--sv-space-4);
