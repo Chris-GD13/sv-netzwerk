@@ -1,13 +1,13 @@
 ---
-title: "Spartentrennung bei Leitungswasserschäden: Hausrat und Gebäude fachlich abgrenzen"
-description: "Leitungswasserschäden betreffen häufig Gebäudebauteile und Einrichtungsgegenstände gleichzeitig. Wer beide Sparten frühzeitig korrekt abgrenzt, schafft die Grundlage für eine belastbare und nachvollziehbare Regulierung."
+title: "Spartentrennung bei Leitungswasserschäden"
+description: "Gebäudebauteile und Hausrategenstände müssen bei einem Leitungswasserschaden von Beginn an getrennt erfasst werden."
 category: "Schadenregulierung"
 tags: ["Leitungswasser", "Spartentrennung", "Hausrat", "Wohngebäude", "Regulierung"]
 author: "christian-waechter"
 featured: false
 dailyStandard: true
 contentLevel: "B"
-teaser: "Einrichtungsgegenstände wie Sideboards oder Kommoden fallen unter die Hausratversicherung, nicht unter die Wohngebäudeversicherung. Diese Abgrenzung muss in der Schadenaufnahme von Anfang an mitgedacht werden."
+teaser: "Wer Hausrat und Gebäude beim Leitungswasserschaden von der ersten Aufnahme an trennt, verhindert Regulierungsfehler und Deckungslücken."
 linkedinSummary: "Leitungswasserschäden betreffen häufig Gebäudebauteile und Hausrategenstände in einem Zug. Wer beide Sparten von der ersten Aufnahme an trennt, vermeidet Regulierungsfehler, Rückforderungen und vermeidbare Verzögerungen."
 videoScript: "Wissen in 180 Sekunden: Gebäudebauteile auf der einen, Einrichtungsgegenstände auf der anderen Seite. Beim Leitungswasserschaden zählen Bodenbelag, Putz und Einbauten zur Gebäudeversicherung. Teppiche, Möbel und persönliche Gegenstände gehören zur Hausratversicherung. Beide Sparten müssen von Anfang an getrennt dokumentiert werden. Eine Vermischung kostet Zeit, erzeugt Rückfragen und gefährdet die Vollständigkeit der Regulierung."
 cta:
