@@ -1,0 +1,31 @@
+Titel: Sturmschaden – Windwirkung und Vorschaden technisch trennen
+
+Sprechertext (ca. 180 Sekunden):
+
+Nach einem Sturmereignis liegen oft viele Schadenmeldungen gleichzeitig vor.
+Die Windstärke am Ort allein sagt aber noch nichts darüber aus, ob ein einzelnes Bauteil tatsächlich sturmbedingt versagt hat.
+
+Entscheidend ist die bauteilbezogene Prüfung in drei Ebenen:
+
+Erstens Feststellung.
+Welches Bauteil ist betroffen?
+Wie ist es befestigt?
+Welche Wetterdaten liegen für Ort und Zeitpunkt vor?
+
+Zweitens Bewertung.
+Passt die Windangriffsfläche des Bauteils zur dokumentierten Windwirkung?
+Deutet der Befestigungszustand auf Sturmversagen hin, oder auf Alterung und Vorschaden?
+Ist das Schadenbild zeitlich mit dem Ereignis vereinbar?
+
+Drittens Empfehlung.
+Welche Maßnahme folgt konkret daraus?
+Notsicherung?
+Ergänzende Untersuchung?
+Oder eine klare Trennung von sturmbedingter Reparatur und ohnehin fälliger Instandhaltung?
+
+Ein häufiger Fehler: Alle Schäden einer Serie werden pauschal anerkannt oder pauschal gekürzt, ohne Einzelprüfung am Bauteil.
+
+Besser ist die konsequente Trennung von Windwirkung, Befestigungszustand, Alterung und zeitlicher Plausibilität.
+
+Fazit:
+Wer Sturmschäden bauteilbezogen statt pauschal prüft, schafft eine belastbare und prüffähige Regulierungsgrundlage.

@@ -23,6 +23,15 @@ export const library: LibraryItem[] = [
     featured: true,
   },
   {
+    title: 'Sturmschaden: Windwirkung, Vorschaden und Bauteilversagen technisch abgrenzen',
+    description: 'Wie Windangriffsfläche, Befestigungszustand, Alterung und zeitliche Plausibilität nach Sturm- und Hagelereignissen methodisch getrennt werden.',
+    href: '/fachwissen/sturmschaden-windwirkung-vorschaden-abgrenzung/',
+    category: 'Sturm- und Hagelschäden',
+    tags: ['Sturmschaden', 'Hagelschaden', 'Schadenabgrenzung'],
+    date: '2026-07-17',
+    type: 'article',
+  },
+  {
     title: 'Fachliche Zuständigkeit im Schadenfall klar zuordnen',
     description: 'Wie Prüfziel, Fachgebiet, Region und Verantwortung zu einer belastbaren Expertenzuordnung zusammengeführt werden.',
     href: '/fachwissen/fachliche-zustaendigkeit-im-schadenfall/',

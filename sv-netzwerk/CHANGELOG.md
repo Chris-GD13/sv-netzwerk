@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.2.0 – 2026-07-17
+- weiteren Fachbeitrag im Bereich Fachwissen veröffentlicht: „Sturmschaden: Windwirkung, Vorschaden und Bauteilversagen technisch abgrenzen“
+- Fachwissensübersicht um neuen Eintrag (Kategorie/Tags/Filter) ergänzt
+- statische Sitemap um neue Fachwissensroute erweitert
+- LinkedIn-Begleittext und Wissen-in-180-Sekunden-Skript für den Sturmschaden-Beitrag abgelegt
+
 ## 3.1.0 – 2026-07-17
 - neuen Fachbeitrag veröffentlicht: „Brandschaden nach Erstmaßnahmen: Übergang zur Wiederherstellung sauber steuern“
 - Fachwissensübersicht mit neuem Eintrag (Kategorie/Tags/Filter) als aktuellsten Beitrag ergänzt
