@@ -819,18 +819,41 @@
   font-size: 1.05rem;
 }
 .v4-services {
+  padding-block: clamp(3.25rem, 6vw, 5.25rem);
   background: linear-gradient(135deg, rgba(11, 79, 122, 0.13), rgba(255, 255, 255, 0.22) 52%, rgba(255, 157, 18, 0.14));
+}
+.v4-services .v4-shell {
+  padding-top: clamp(0.65rem, 1.6vw, 1.4rem);
+}
+.v4-services .v4-section-head {
+  align-items: start;
+  gap: clamp(1.25rem, 3.2vw, 2.5rem);
+  margin-bottom: clamp(1.4rem, 2.6vw, 2rem);
+}
+.v4-services .v4-section-head > div {
+  max-width: 44rem;
+}
+.v4-services .v4-section-head h2 {
+  max-width: 18ch;
+  font-size: clamp(1.55rem, 2.15vw, 2.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+.v4-services .v4-section-head > p {
+  max-width: 37rem;
+  font-size: clamp(0.97rem, 1.15vw, 1.08rem);
+  line-height: 1.6;
 }
 .v4-services__grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.8rem;
+  gap: 0.95rem;
 }
 .v4-services__grid > a {
   display: flex;
-  min-height: 24rem;
+  min-height: clamp(16.5rem, 22vw, 19rem);
   flex-direction: column;
-  padding: 1.4rem;
+  padding: 1.3rem;
   border: 1px solid rgba(181, 204, 216, 0.9);
   border-radius: 1.1rem;
   background: rgba(255, 255, 255, 0.62);
@@ -867,12 +890,15 @@
   stroke-width: 1.4;
 }
 .v4-services h3 {
-  margin: auto 0 0.75rem;
+  margin: 1rem 0 0.72rem;
   font-size: 1.35rem;
+  line-height: 1.18;
 }
 .v4-services__grid p {
+  margin: 0 0 1rem;
   color: var(--v4-muted);
   font-size: 0.88rem;
+  line-height: 1.55;
 }
 .v4-services__grid > a > b {
   margin-top: auto;
@@ -1406,7 +1432,7 @@
     grid-column: auto;
   }
   .v4-services__grid > a {
-    min-height: 19rem;
+    min-height: 16.5rem;
   }
   .v4-downloads__list > a {
     grid-template-columns: auto 1fr;
