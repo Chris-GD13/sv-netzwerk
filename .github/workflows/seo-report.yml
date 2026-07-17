@@ -2,6 +2,7 @@ name: Monatlicher SEO-Statusbericht
 
 on:
   schedule:
+    # 1. des Monats um 07:00 UTC = 08:00 Uhr Europe/Berlin (Winterzeit) / 09:00 Uhr (Sommerzeit)
     - cron: "0 7 1 * *"
   workflow_dispatch:
 
