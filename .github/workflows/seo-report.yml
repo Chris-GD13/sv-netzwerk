@@ -1,0 +1,50 @@
+name: Monatlicher SEO-Statusbericht
+
+on:
+  schedule:
+    - cron: "0 7 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Node.js 22 LTS einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+
+      - name: Abhängigkeiten installieren
+        run: npm ci --no-audit --no-fund
+
+      - name: SEO-Bericht erzeugen
+        run: node scripts/seo-report.mjs --out=/tmp/seo-report.md
+
+      - name: GitHub Issue erstellen
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('/tmp/seo-report.md', 'utf8');
+            const now = new Date();
+            const month = now.toISOString().slice(0, 7);
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `SEO-Statusbericht ${month}`,
+              body,
+            });
