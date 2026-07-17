@@ -1,6 +1,6 @@
 ---
-title: "Rohrbruch im Wohngebäude: Hausrat konsequent von Gebäudeschäden trennen"
-description: "Nach einem Rohrbruch wurden Möbelstücke beschädigt. Die Regulierung erforderte eine klare Spartentrennung: Sideboards und weiteres Mobiliar fallen unter die Hausratversicherung, nicht unter die Wohngebäudeversicherung."
+title: "Rohrbruch mit Hausratschäden: Sparte korrekt abgrenzen"
+description: "Rohrbruch in einem Wohngebäude: Sideboards und Mobiliar werden als Hausrat erkannt und korrekt von Gebäudebauteilen abgegrenzt."
 lossType: "Leitungswasser"
 objectType: "Wohngebäude"
 segment: "Hausrat"
