@@ -73,7 +73,7 @@ p {
   margin-inline: auto;
 }
 .sv-section {
-  padding-block: clamp(4.5rem, 8vw, 8rem);
+  padding-block: clamp(2rem, 4vw, 4rem);
 }
 .sv-section-alt {
   background: linear-gradient(
