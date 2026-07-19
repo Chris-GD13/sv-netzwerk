@@ -5,7 +5,11 @@ import type { NavItem } from '../data/navigation';
 
 interface Props { items: NavItem[]; currentPath: string }
 const { items, currentPath } = Astro.props;
-const isActive = (href: string) => href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+const normalizeHref = (href: string) => href.split('#')[0] || href;
+const isActive = (href: string) => {
+  const normalizedHref = normalizeHref(href);
+  return normalizedHref === '/' ? currentPath === '/' : currentPath.startsWith(normalizedHref);
+};
 const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.children?.some((child) => isActive(child.href)));
 ---
 
