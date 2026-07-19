@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Kumulschäden in der Region: Priorisierung, Koordination und belastbare Dokumentation',
+    description: 'Wie bei regional gehäuften Schadenlagen Prioritäten gesetzt, Rollen geklärt und die Schadenaufnahme unter Zeitdruck belastbar gehalten wird.',
+    href: '/fachwissen/kumulschaeden-in-der-region-priorisierung-koordination-dokumentation/',
+    category: 'Kumulschadenmanagement',
+    tags: ['Kumulschaden', 'Schadenlage', 'Priorisierung'],
+    date: '2026-07-19',
+    type: 'article',
+    featured: true,
+  },
+  {
     title: 'Brandschaden nach Erstmaßnahmen: Übergang zur Wiederherstellung sauber steuern',
     description: 'Wie nach Löschung und Sicherung die technische Trennung von Gefahrenabwehr, Wiederherstellung und Instandhaltung gelingt.',
     href: '/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/',
