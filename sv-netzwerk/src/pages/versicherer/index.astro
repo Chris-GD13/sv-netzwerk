@@ -3,15 +3,148 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Hero from '../../components/Hero.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import FeatureCard from '../../components/FeatureCard.astro';
-import CallToAction from '../../components/CallToAction.astro';
-const services=[
-  {title:'Technische Erstbewertung',text:'Schadenbild, Dringlichkeit, Prüfziel und erforderliche Fachdisziplin werden zu Beginn eindeutig eingeordnet.'},
-  {title:'Prüffähige Berichte',text:'Feststellungen, Kausalität, Kosten und offene Punkte werden nachvollziehbar dokumentiert.'},
-  {title:'Regulierungsbegleitung',text:'Abstimmungen, Reserven, Maßnahmen und Bearbeitungsstände bleiben über den gesamten Vorgang transparent.'},
+
+const sent = Astro.url.searchParams.get('gesendet') === '1';
+const error = Astro.url.searchParams.get('fehler');
+const modules = [
+  {
+    title: 'Grossschaeden',
+    text: 'Soforteinstieg fuer Grossschaeden mit priorisierter Terminierung, klarer Rollenverteilung und belastbarer Schadenreserve.'
+  },
+  {
+    title: 'Kumulmanagement',
+    text: 'Skalierbare Bearbeitung gleichartiger Ereignisse mit zentralem Lagebild, Segmentierung und standardisierten Rueckmeldungen.'
+  },
+  {
+    title: 'Beauftragungen',
+    text: 'Klare Beauftragungsdaten, einheitliche Unterlagenanforderung und nachvollziehbare Bearbeitungsstaende.'
+  }
 ];
 ---
-<BaseLayout title="Leistungen für Versicherer" description="Sachverständigenleistungen und Schadenregulierung für Versicherer mit klaren Zuständigkeiten und prüffähiger Dokumentation." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Versicherer'}]}>
-  <Hero compact eyebrow="Für Versicherer" title="Belastbare Grundlagen für Schadenentscheidungen." text="Das SV-Netzwerk verbindet technische Fachkompetenz, regulierungsnahe Kommunikation und eine nachvollziehbare Dokumentation für Sach-, Haftpflicht- und Großschäden." primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Experten ansehen" secondaryHref="/experten/" />
-  <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Zusammenarbeit" title="Vom Prüfauftrag bis zum Abschluss"/><div class="sv-grid sv-grid-3">{services.map((item,index)=><FeatureCard index={`0${index+1}`} title={item.title} text={item.text}/>)}</div></div></section>
-  <CallToAction title="Schadenfall direkt einordnen" text="Senden Sie Schadennummer, Objekt, Schadenart und vorhandene Unterlagen. Das Backoffice koordiniert die fachlich passende Zuständigkeit." href="/kontakt/" label="Kontakt aufnehmen" />
+
+<BaseLayout
+  title="Fuer Versicherer"
+  description="Schadenservice fuer Versicherer mit direktem Einstieg fuer Gross- und Kumulschadenlagen."
+  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Fuer Versicherer' }]}
+>
+  <Hero
+    compact
+    eyebrow="Versicherer"
+    title="Schnelle, belastbare Steuerung komplexer Schaeden."
+    text="Direkte Einstiege fuer Grossschaeden und Kumulereignisse, klare Ansprechpartner und serverseitige Beauftragungsuebermittlung."
+    primaryLabel="Anfrage / Beauftragung"
+    primaryHref="#anfrage"
+    secondaryLabel="Grossschadenregulierung"
+    secondaryHref="/grossschadenregulierung/"
+  />
+
+  <section class="sv-section">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Direkteinstiege" title="Sofort in die passende Bearbeitung wechseln" />
+      <div class="sv-grid sv-grid-3">
+        {modules.map((module, index) => <FeatureCard index={`0${index + 1}`} title={module.title} text={module.text} />)}
+      </div>
+      <div class="quick-links">
+        <a class="sv-button sv-button-primary" href="/grossschadenregulierung/">Direkteinstieg Grossschaden</a>
+        <a class="sv-button sv-button-secondary" href="/leistungen/kumulschadenmanagement/">Direkteinstieg Kumulschaden</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sv-section" id="anfrage">
+    <div class="sv-container form-layout">
+      <article class="sv-card contacts">
+        <h2>Ansprechpartner</h2>
+        <p><strong>SV-Netzwerk Bau & Schaden</strong><br />Nordstrasse 17, 73432 Aalen</p>
+        <p>E-Mail: <a href="mailto:info@sv-netzwerk.eu">info@sv-netzwerk.eu</a><br />Telefon: <a href="tel:+4973673939783">07367 / 393 97 83</a></p>
+        <p>Bitte Schadennummer, Schadenort, Schadenart und den gewuenschten Leistungsumfang direkt mit uebermitteln.</p>
+      </article>
+      <article class="sv-card form-card">
+        <h2>Anfrage oder Beauftragung senden</h2>
+        {sent && <p class="status success">Die Anfrage wurde erfolgreich uebermittelt. Eine Eingangsbestaetigung wurde versendet.</p>}
+        {error && <p class="status error">Die Anfrage konnte nicht verarbeitet werden. Bitte Eingaben pruefen.</p>}
+        <form action="/anfrage-versicherer.php" method="post" accept-charset="UTF-8">
+          <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <div class="form-grid">
+            <label>Vorgangsart
+              <select name="Vorgangsart" required>
+                <option value="Anfrage">Anfrage</option>
+                <option value="Beauftragung">Beauftragung</option>
+                <option value="Anfrage mit optionaler Beauftragung">Anfrage mit optionaler Beauftragung</option>
+              </select>
+            </label>
+            <label>Auftraggeber
+              <input name="Auftraggeber" required />
+            </label>
+            <label>Ansprechpartner
+              <input name="Ansprechpartner" required />
+            </label>
+            <label>E-Mail
+              <input name="E-Mail" type="email" required />
+            </label>
+            <label>Telefon
+              <input name="Telefon" type="tel" />
+            </label>
+            <label>Schadennummer
+              <input name="Schadennummer" required />
+            </label>
+            <label class="full">Schadenort
+              <input name="Schadenort" required />
+            </label>
+            <label class="full">Kurzbeschreibung
+              <textarea name="Kurzbeschreibung" rows="6" required></textarea>
+            </label>
+          </div>
+
+          <div class="checks">
+            <h3>Schadenbereich</h3>
+            <div class="check-grid">
+              <label><input type="checkbox" name="Schadenbereich[]" value="Hausrat" /> Hausrat</label>
+              <label><input type="checkbox" name="Schadenbereich[]" value="Gebaeude" /> Gebaeude</label>
+              <label><input type="checkbox" name="Schadenbereich[]" value="Haftpflicht" /> Haftpflicht</label>
+              <label><input type="checkbox" name="Schadenbereich[]" value="Mietsachschaden" /> Mietsachschaden</label>
+              <label><input type="checkbox" name="Schadenbereich[]" value="Betriebsunterbrechung" /> Betriebsunterbrechung</label>
+              <label><input type="checkbox" name="Schadenbereich[]" value="Sonstiges" /> Sonstiges</label>
+            </div>
+          </div>
+
+          <div class="checks">
+            <h3>Schadenart</h3>
+            <div class="check-grid">
+              <label><input type="checkbox" name="Schadenart[]" value="Leitungswasser" /> Leitungswasser</label>
+              <label><input type="checkbox" name="Schadenart[]" value="Feuer" /> Feuer</label>
+              <label><input type="checkbox" name="Schadenart[]" value="Einbruchdiebstahl" /> Einbruchdiebstahl</label>
+              <label><input type="checkbox" name="Schadenart[]" value="Anprall" /> Anprall</label>
+              <label><input type="checkbox" name="Schadenart[]" value="Sturm/Hagel" /> Sturm/Hagel</label>
+              <label><input type="checkbox" name="Schadenart[]" value="Elementar" /> Elementar</label>
+              <label><input type="checkbox" name="Schadenart[]" value="Vandalismus" /> Vandalismus</label>
+              <label><input type="checkbox" name="Schadenart[]" value="Sonstiges" /> Sonstiges</label>
+            </div>
+          </div>
+
+          <button class="sv-button sv-button-primary" type="submit">Anfrage / Beauftragung senden</button>
+        </form>
+      </article>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .quick-links{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1.25rem}
+  .form-layout{display:grid;grid-template-columns:minmax(16rem,.75fr) minmax(0,1.25fr);gap:2rem}
+  .contacts,.form-card{padding:clamp(1.4rem,3vw,2.2rem)}
+  .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem}
+  .form-grid .full{grid-column:1/-1}
+  label{display:grid;gap:.4rem;font-weight:800}
+  input,select,textarea{width:100%;padding:.8rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:white}
+  .checks{margin-top:1rem}
+  .checks h3{margin-bottom:.6rem}
+  .check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem}
+  .check-grid label{display:flex;align-items:center;gap:.45rem;font-weight:600}
+  .status{padding:.85rem 1rem;border-radius:.6rem;font-weight:700}
+  .status.success{background:#e7f7ef;border:1px solid #6db58d;color:#174f31}
+  .status.error{background:#fbe9e9;border:1px solid #cc7e7e;color:#6d1f1f}
+  .hp-field{position:absolute;left:-100vw;width:1px;height:1px;opacity:0}
+  @media (max-width:58rem){.form-layout{grid-template-columns:1fr}.form-grid,.check-grid{grid-template-columns:1fr}}
+</style>

@@ -82,7 +82,7 @@ export const library: LibraryItem[] = [
   {
     title: 'Lichtbogen an einer LED-Lichtleiste',
     description: 'Technische Einordnung eines elektrischen Entstehungsbrandes mit Fokus auf Brandursache, Spurenbild und Schadenumfang.',
-    href: '/fachwissen/lichtbogen-led-lichtleiste-brandschaden/',
+    href: '/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/',
     category: 'Brandschaden',
     tags: ['Elektrotechnik', 'Brandursache', 'Lichtbogen'],
     date: '2026-07-09',
@@ -92,7 +92,7 @@ export const library: LibraryItem[] = [
   {
     title: 'Komplexschäden strukturiert regulieren',
     description: 'Prüf- und Dokumentationsstruktur für Groß- und Komplexschäden mit klaren Zuständigkeiten, Reserven und Entscheidungspunkten.',
-    href: '/fachwissen/komplexschaeden-regulierung/',
+    href: '/fachwissen/schadenabgrenzung/',
     category: 'Schadenregulierung',
     tags: ['Großschaden', 'SVOS', 'Dokumentation'],
     date: '2026-07-08',
@@ -101,7 +101,7 @@ export const library: LibraryItem[] = [
   {
     title: 'Schadenreserve im Großschaden richtig herleiten',
     description: 'Wie belastbare Reserven aus Schadenbild, Mengen, Leistungen, Preisständen und verbleibenden Unsicherheiten entwickelt werden.',
-    href: '/fachwissen/schadenreserve-grossschaden-regulierung/',
+    href: '/fachwissen/regiekosten-im-schadenfall-pruefen/',
     category: 'Schadenregulierung',
     tags: ['Reserve', 'Großschaden', 'Kalkulation'],
     date: '2026-07-07',
@@ -110,7 +110,7 @@ export const library: LibraryItem[] = [
   {
     title: 'Prüffähige Unterlagen in der Schadenregulierung',
     description: 'Welche Angaben, Nachweise und Belege für eine nachvollziehbare technische und kaufmännische Prüfung erforderlich sind.',
-    href: '/fachwissen/prueffaehige-unterlagen-schadenregulierung/',
+    href: '/fachwissen/prueffaehige-dokumentation/',
     category: 'Prozessqualität',
     tags: ['Prüffähigkeit', 'Rechnungsprüfung', 'Nachweise'],
     date: '2026-07-06',
@@ -119,7 +119,7 @@ export const library: LibraryItem[] = [
   {
     title: 'Baucontrolling und Nachtragsmanagement',
     description: 'Methodik zur Prüfung von Leistungsänderungen, Mengen, Nachträgen und Kostenentwicklungen in laufenden Sanierungsmaßnahmen.',
-    href: '/fachwissen/baucontrolling-nachtragsmanagement/',
+    href: '/fachwissen/regiekosten-im-schadenfall-pruefen/',
     category: 'Baucontrolling',
     tags: ['Nachträge', 'Kostenkontrolle', 'Leistungsprüfung'],
     date: '2026-07-05',
@@ -128,7 +128,7 @@ export const library: LibraryItem[] = [
   {
     title: 'Schimmelpilzschäden fachlich bewerten',
     description: 'Ursachenklärung, Feuchtepfade, Nutzungseinflüsse und erforderliche Sanierungsschritte nachvollziehbar voneinander abgrenzen.',
-    href: '/fachwissen/schimmelpilzschaeden-feuchte/',
+    href: '/fachwissen/leitungswasserschaden-erstmassnahmen/',
     category: 'Feuchte und Schimmel',
     tags: ['Schimmel', 'Feuchte', 'Ursachenanalyse'],
     date: '2026-07-04',
@@ -137,7 +137,7 @@ export const library: LibraryItem[] = [
   {
     title: 'Fenster, Türen und Fassaden technisch beurteilen',
     description: 'Bewertung typischer Schadenbilder an Gebäudehülle, Anschlüssen, Beschlägen und Verglasungen.',
-    href: '/fachwissen/fenster-tueren-fassaden/',
+    href: '/fachwissen/wasserschaden-rueckbau-technische-abgrenzung/',
     category: 'Gebäudehülle',
     tags: ['Fenster', 'Fassade', 'Bautechnik'],
     date: '2026-07-03',
@@ -146,7 +146,7 @@ export const library: LibraryItem[] = [
   {
     title: 'Oberflächenschäden richtig zuordnen',
     description: 'Abgrenzung von Beschädigung, Verschleiß, Vorschaden, optischer Beeinträchtigung und technisch notwendiger Wiederherstellung.',
-    href: '/fachwissen/oberflaechenschaeden/',
+    href: '/fachwissen/schadenabgrenzung/',
     category: 'Bautechnik',
     tags: ['Oberflächen', 'Vorschaden', 'Wiederherstellung'],
     date: '2026-07-02',
@@ -155,7 +155,7 @@ export const library: LibraryItem[] = [
   {
     title: 'Gutachter-Plattform: SEO und Schadensteuerung',
     description: 'Wie strukturierte digitale Prozesse Sichtbarkeit, Auftragsklarheit und Qualität in der Schadensteuerung verbessern.',
-    href: '/fachwissen/gutachter-plattform-seo-indexierung-schadensteuerung/',
+    href: '/fachwissen/svos-foundation/',
     category: 'Gutachter-Plattform',
     tags: ['Digitalisierung', 'SEO', 'Schadensteuerung'],
     date: '2026-07-01',

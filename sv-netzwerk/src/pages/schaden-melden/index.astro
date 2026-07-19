@@ -1,34 +1,126 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Hero from '../../components/Hero.astro';
-import NoticeBox from '../../components/NoticeBox.astro';
-import { damageTypes } from '../../data/damage-types';
-const steps=['Schadenart','Objekt','Versicherungsverhältnis','Kontaktdaten','Beschreibung','Bilder und Dokumente','Zusammenfassung','Kontakt'];
+
+const sent = Astro.url.searchParams.get('gesendet') === '1';
+const error = Astro.url.searchParams.get('fehler');
 ---
-<BaseLayout title="Schaden melden | Strukturierte Erstaufnahme" description="Schadenart, Objekt und Kontaktdaten für eine fachliche Erstklassifizierung sicher vorbereiten." breadcrumbs={[{label:'Start',href:'/'},{label:'Schaden melden'}]}>
-  <Hero compact eyebrow="Strukturierte Erstaufnahme" title="Einen Schaden strukturiert melden." text="Bereiten Sie die wichtigsten Angaben in acht nachvollziehbaren Schritten vor. Die Zusammenfassung bleibt in Ihrem Browser und kann anschließend telefonisch oder per E-Mail übermittelt werden." />
-  <section class="sv-section"><div class="sv-container report-layout">
-    <aside><h2>Ablauf</h2><ol>{steps.map((step,index)=><li class:list={{'is-current':index===0}} data-step-indicator={index+1}><span>{index+1}</span>{step}</li>)}</ol></aside>
-    <div>
-      <NoticeBox title="Datenschutz bei der Vorbereitung">Ihre Eingaben bleiben auf diesem Gerät. Für die verbindliche Schadenmeldung nehmen Sie nach der Zusammenfassung telefonisch oder per E-Mail Kontakt mit uns auf.</NoticeBox>
-      <form class="sv-card report-form" data-report-form novalidate>
-        <fieldset data-step="1"><legend>1. Schadenart</legend><p>Welche Erstklassifizierung passt am ehesten?</p><label>Schadenart<select name="damageType" required><option value="">Bitte auswählen</option>{damageTypes.map((item)=><option value={item.shortTitle}>{item.title}</option>)}</select></label></fieldset>
-        <fieldset data-step="2" hidden><legend>2. Objekt</legend><label>Objektart<select name="objectType" required><option value="">Bitte auswählen</option><option>Wohngebäude</option><option>Gewerbegebäude</option><option>Industrieanlage</option><option>Hausrat</option><option>Sonstiges Objekt</option></select></label><label>Schadenort<input name="location" autocomplete="address-level2" required /></label></fieldset>
-        <fieldset data-step="3" hidden><legend>3. Versicherungsverhältnis</legend><label>Ihre Rolle<select name="insuranceRole" required><option value="">Bitte auswählen</option><option>Versicherungsnehmer</option><option>Versicherer oder Regulierer</option><option>Hausverwaltung</option><option>beauftragter Dienstleister</option><option>sonstige Beteiligung</option></select></label></fieldset>
-        <fieldset data-step="4" hidden><legend>4. Kontaktdaten</legend><label>Name<input name="name" autocomplete="name" required /></label><label>E-Mail<input name="email" type="email" autocomplete="email" required /></label><label>Telefon<input name="phone" type="tel" autocomplete="tel" /></label></fieldset>
-        <fieldset data-step="5" hidden><legend>5. Schadenbeschreibung</legend><label>Zeitpunkt oder Feststellungsdatum<input name="date" type="date" required /></label><label>Was ist geschehen?<textarea name="description" rows="7" minlength="30" required></textarea></label></fieldset>
-        <fieldset data-step="6" hidden><legend>6. Bilder und Dokumente</legend><p>Halten Sie Übersichtsfotos, Detailfotos, Versicherungsnummer und vorhandene Berichte für den persönlichen Kontakt bereit.</p><label><input name="filesReady" type="checkbox" /> Unterlagen sind für die weitere Abstimmung verfügbar</label></fieldset>
-        <fieldset data-step="7" hidden><legend>7. Zusammenfassung</legend><dl data-summary></dl></fieldset>
-        <fieldset data-step="8" hidden><legend>8. Kontakt aufnehmen</legend><p>Die Angaben sind für das Erstgespräch vorbereitet. Nehmen Sie per E-Mail oder Telefon Kontakt mit uns auf.</p><div class="contact-options"><a class="sv-button sv-button-primary" href="mailto:cw@sv-schuett.eu">Per E-Mail fortsetzen</a><a class="sv-button sv-button-secondary" href="tel:+4973673939783">07367 / 393 97 83</a></div></fieldset>
-        <p class="form-error" data-form-error role="alert" hidden>Bitte füllen Sie die erforderlichen Angaben dieses Schritts aus.</p>
-        <div class="form-actions"><button class="sv-button sv-button-secondary" type="button" data-back hidden>Zurück</button><button class="sv-button sv-button-primary" type="button" data-next>Weiter</button></div>
-      </form>
+
+<BaseLayout
+  title="Schaden melden"
+  description="Serverseitige Schadenmeldung mit Dateiupload fuer eine schnelle Erstbearbeitung."
+  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Schaden melden' }]}
+>
+  <Hero
+    compact
+    eyebrow="Schadenmeldung"
+    title="Schadenfall direkt serverseitig einreichen."
+    text="Die Meldung wird serverseitig validiert, protiokolliert und per E-Mail verarbeitet. Datei-Uploads sind fuer Erstunterlagen moeglich."
+  />
+
+  <section class="sv-section">
+    <div class="sv-container report-grid">
+      <article class="sv-card info-card">
+        <h2>Hinweise zur Einreichung</h2>
+        <ul>
+          <li>Moegliche Uploads: JPG, PNG, WEBP, HEIC, PDF (je Datei bis 10 MB)</li>
+          <li>Bitte Schadendatum und Schadenort moeglichst exakt angeben</li>
+          <li>Sie erhalten automatisch eine Eingangsbestätigung per E-Mail</li>
+          <li>Das Team meldet sich mit dem weiteren Vorgehen zurueck</li>
+        </ul>
+      </article>
+
+      <article class="sv-card form-card">
+        <h2>Schadenformular</h2>
+        {sent && <p class="status success">Die Schadenmeldung wurde erfolgreich uebermittelt.</p>}
+        {error && <p class="status error">Die Schadenmeldung konnte nicht verarbeitet werden. Bitte Eingaben pruefen.</p>}
+
+        <form action="/schadenmeldung.php" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
+          <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <div class="form-grid">
+            <label>Schadenart
+              <select name="Schadenart" required>
+                <option value="">Bitte auswaehlen</option>
+                <option>Leitungswasser</option>
+                <option>Brand</option>
+                <option>Sturm / Hagel</option>
+                <option>Elementar</option>
+                <option>Haftpflicht</option>
+                <option>Sonstiges</option>
+              </select>
+            </label>
+            <label>Objektart
+              <select name="Objektart" required>
+                <option value="">Bitte auswaehlen</option>
+                <option>Wohngebaeude</option>
+                <option>Gewerbe</option>
+                <option>Industrie</option>
+                <option>Hausrat</option>
+                <option>Sonstiges Objekt</option>
+              </select>
+            </label>
+            <label>Schadenort
+              <input name="Schadenort" required />
+            </label>
+            <label>Schadennummer (optional)
+              <input name="Schadennummer" />
+            </label>
+            <label>Name
+              <input name="Name" required />
+            </label>
+            <label>Unternehmen / Auftraggeber
+              <input name="Unternehmen" />
+            </label>
+            <label>E-Mail
+              <input name="E-Mail" type="email" required />
+            </label>
+            <label>Telefon
+              <input name="Telefon" type="tel" />
+            </label>
+            <label>Schadendatum
+              <input name="Schadendatum" type="date" required />
+            </label>
+            <label>Dringlichkeit
+              <select name="Dringlichkeit" required>
+                <option value="">Bitte auswaehlen</option>
+                <option>Akut (Sofortmassnahmen noetig)</option>
+                <option>Hoch (Bearbeitung innerhalb 24h)</option>
+                <option>Normal</option>
+              </select>
+            </label>
+            <label class="full">Kurzbeschreibung
+              <textarea name="Kurzbeschreibung" rows="8" minlength="30" required></textarea>
+            </label>
+            <label class="full">Dateien
+              <input name="Dateien[]" type="file" multiple accept=".jpg,.jpeg,.png,.pdf,.webp,.heic" />
+            </label>
+            <label class="full check">
+              <input type="checkbox" name="Datenschutz" value="akzeptiert" required />
+              Ich bestaetige die datenschutzkonforme Verarbeitung zur Bearbeitung meiner Schadenmeldung.
+            </label>
+          </div>
+
+          <button class="sv-button sv-button-primary" type="submit">Schadenmeldung senden</button>
+        </form>
+      </article>
     </div>
-  </div></section>
+  </section>
 </BaseLayout>
-<script is:inline>
-  (()=>{const form=document.querySelector('[data-report-form]');if(!form)return;const fields=[...form.querySelectorAll('fieldset[data-step]')];const indicators=[...document.querySelectorAll('[data-step-indicator]')];const back=form.querySelector('[data-back]');const next=form.querySelector('[data-next]');const error=form.querySelector('[data-form-error]');let current=0;
-  const show=()=>{fields.forEach((field,index)=>field.hidden=index!==current);indicators.forEach((item,index)=>item.classList.toggle('is-current',index===current));back.hidden=current===0;next.hidden=current===fields.length-1;next.textContent=current===fields.length-2?'Zusammenfassung bestätigen':'Weiter';error.hidden=true;if(current===6){const data=new FormData(form);const summary=form.querySelector('[data-summary]');summary.innerHTML='';[['Schadenart','damageType'],['Objekt','objectType'],['Ort','location'],['Rolle','insuranceRole'],['Name','name'],['E-Mail','email'],['Datum','date'],['Beschreibung','description']].forEach(([label,key])=>{const dt=document.createElement('dt');const dd=document.createElement('dd');dt.textContent=label;dd.textContent=String(data.get(key)||'–');summary.append(dt,dd);});}fields[current].querySelector('input,select,textarea')?.focus();};
-  next.addEventListener('click',()=>{const controls=[...fields[current].querySelectorAll('[required]')];if(!controls.every((control)=>control.checkValidity())){error.hidden=false;controls.find((control)=>!control.checkValidity())?.focus();return;}if(current<fields.length-1){current+=1;show();}});back.addEventListener('click',()=>{if(current>0){current-=1;show();}});show();})();
-</script>
-<style>.report-layout{display:grid;grid-template-columns:minmax(15rem,.55fr) minmax(0,1.45fr);gap:2rem;align-items:start}.report-layout aside{position:sticky;top:7rem}.report-layout aside ol{display:grid;gap:.25rem;padding:0;list-style:none}.report-layout aside li{display:flex;align-items:center;gap:.7rem;padding:.65rem;border-radius:.6rem;color:var(--sv-color-muted)}.report-layout aside li.is-current{background:var(--sv-color-surface-alt);color:var(--sv-color-ink);font-weight:850}.report-layout aside span{display:grid;width:1.8rem;aspect-ratio:1;place-items:center;border:1px solid var(--sv-color-line);border-radius:50%;font-size:.72rem}.report-form{margin-top:1rem;padding:clamp(1.3rem,4vw,2.3rem)}.report-form fieldset{display:grid;gap:1rem;padding:0;border:0}.report-form legend{margin-bottom:1.2rem;font-family:var(--sv-font-display);font-size:2rem;font-weight:850}.report-form label{display:grid;gap:.4rem;font-weight:850}.report-form input,.report-form select,.report-form textarea{width:100%;padding:.8rem;border:1px solid var(--sv-color-line);border-radius:.65rem;background:white}.report-form input[type=checkbox]{width:auto}.form-actions,.contact-options{display:flex;justify-content:space-between;gap:1rem;margin-top:2rem}.form-error{color:#9c251d;font-weight:850}.report-form dl{display:grid;grid-template-columns:minmax(8rem,.4fr) 1fr}.report-form dt,.report-form dd{margin:0;padding:.65rem;border-bottom:1px solid var(--sv-color-line)}.report-form dt{font-weight:850}@media(max-width:52rem){.report-layout{grid-template-columns:1fr}.report-layout aside{position:static}.report-layout aside ol{grid-template-columns:repeat(4,1fr)}.report-layout aside li{display:grid;font-size:.7rem}}@media(max-width:35rem){.report-layout aside ol{grid-template-columns:repeat(2,1fr)}.form-actions,.contact-options{flex-direction:column}}</style>
+
+<style>
+  .report-grid{display:grid;grid-template-columns:minmax(16rem,.7fr) minmax(0,1.3fr);gap:2rem}
+  .info-card,.form-card{padding:clamp(1.4rem,3vw,2.2rem)}
+  .info-card ul{padding-left:1.2rem}
+  .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem}
+  .form-grid .full{grid-column:1/-1}
+  label{display:grid;gap:.42rem;font-weight:800}
+  input,select,textarea{width:100%;padding:.8rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:white}
+  .check{display:flex;align-items:flex-start;gap:.6rem;font-weight:700}
+  .check input{width:auto;margin-top:.2rem}
+  .status{padding:.85rem 1rem;border-radius:.6rem;font-weight:700}
+  .status.success{background:#e7f7ef;border:1px solid #6db58d;color:#174f31}
+  .status.error{background:#fbe9e9;border:1px solid #cc7e7e;color:#6d1f1f}
+  .hp-field{position:absolute;left:-100vw;width:1px;height:1px;opacity:0}
+  @media (max-width:58rem){.report-grid,.form-grid{grid-template-columns:1fr}}
+</style>

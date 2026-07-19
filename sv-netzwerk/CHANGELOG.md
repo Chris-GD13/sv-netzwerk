@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.3.0 – 2026-07-19
+- Recovery-Basis auf v7.05 abgeglichen und dokumentiert (`docs/recovery/analysis-v7.05-vs-current.md`)
+- Serverseitige Formular-Architektur konsolidiert: `anfrage.php`, `anfrage-versicherer.php`, `anfrage-gutachter-plattform.php`, `schadenmeldung.php` plus gemeinsamer Core-Handler mit Honeypot, Validierung, Logging und Eingangsbestätigung
+- Schadenmeldung auf produktives Formular mit Dateiupload umgestellt (browser-only Wizard entfernt)
+- Kontakt- und Terminstrecke auf serverseitige Verarbeitung umgestellt
+- Versicherer-Bereich für Groß- und Kumulschäden mit direktem Beauftragungsformular ausgebaut
+- Gutachter-Plattform mit eigenem Hauptmenüpunkt, Landingpage, Anfrage- und Demo-Seiten sowie zielgruppenspezifischen Einstiegen ergänzt
+- Fehlende Legacy-Kernrouten wiederhergestellt: `/termin-vereinbaren/`, `/kompetenzzentrum/`, `/medienbibliothek/`, `/recht-compliance/`, `/seminare/`, `/versicherungen/`, `/wissen/`
+- Eigene 404-Seite im Astro-Build ergänzt
+- Interne tote Links in Bibliotheks- und Fachwissensverlinkungen korrigiert
+- Build-Blocker in der Fachwissensvalidierung beseitigt (doppelter Pflichtbeitrag am 2026-07-17 aufgelöst)
+
 ## 3.2.0 – 2026-07-17
 - weiteren Fachbeitrag im Bereich Fachwissen veröffentlicht: „Sturmschaden: Windwirkung, Vorschaden und Bauteilversagen technisch abgrenzen“
 - Fachwissensübersicht um neuen Eintrag (Kategorie/Tags/Filter) ergänzt
