@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.3.1 – 2026-07-19
+- Post-Merge-Validierung ergänzt: Build/Deploy auf `main` erfolgreich nachgewiesen
+- Fachbeitrags-Preflight für Nicht-Cadence-Tage stabilisiert
+- Produktiv-E2E-HTTP-Tests für Kontakt- und Schadenmeldung dokumentiert (aktuell `?fehler=mail`, Mailkonfiguration in Zielumgebung als Restblocker)
+
 ## 3.3.0 – 2026-07-19
 - Recovery-Basis auf v7.05 abgeglichen und dokumentiert (`docs/recovery/analysis-v7.05-vs-current.md`)
 - Serverseitige Formular-Architektur konsolidiert: `anfrage.php`, `anfrage-versicherer.php`, `anfrage-gutachter-plattform.php`, `schadenmeldung.php` plus gemeinsamer Core-Handler mit Honeypot, Validierung, Logging und Eingangsbestätigung
