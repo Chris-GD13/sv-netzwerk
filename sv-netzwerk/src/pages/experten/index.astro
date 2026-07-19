@@ -1,40 +1,30 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
-import FeatureCard from '../../components/FeatureCard.astro';
 import ExpertCard from '../../components/platform/ExpertCard.astro';
-import CallToAction from '../../components/CallToAction.astro';
-import { experts, expertDisciplines } from '../../data/experts';
-
-const qualificationPrinciples = [
-  'Fachgebiet und tatsächlicher Einsatzbereich',
-  'Regionale Verfügbarkeit und Reaktionsweg',
-  'Nachvollziehbare Qualifikationen und Zertifizierungen',
-  'Klare Verantwortung für Feststellung und Bewertung',
-];
+import { experts } from '../../data/experts';
 const specialists = experts.filter((expert) => expert.status === 'active' && expert.group === 'expert');
 const backoffice = experts.filter((expert) => expert.status === 'active' && expert.group === 'backoffice');
 const regions = [...new Set(specialists.flatMap((expert) => expert.regions))].sort((a, b) => a.localeCompare(b, 'de'));
 const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].sort((a, b) => a.localeCompare(b, 'de'));
 ---
-<BaseLayout title="Experten | Menschen im SV-Netzwerk" description="Sachverständige, Regulierer, Fachpartner und vernetzte Zusammenarbeit im SV-Netzwerk." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Experten' }]}>
+<BaseLayout title="Experten | SV-Netzwerk" description="Experten direkt nach Region und Fachgebiet filtern und anfragen." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Experten' }]}>
 
-  <section class="sv-section" id="sachverstaendige">
+  <section class="sv-section">
     <div class="sv-container">
-      <h1 class="page-headline">Unsere Sachverständigen und Regulierer</h1>
-      <div class="experts-grid" data-filter-grid>
-        {specialists.map((expert) => (
-          <div data-filter-item data-name={expert.name} data-regions={expert.regions.join('|')} data-fields={expert.expertise.join('|')}>
-            <ExpertCard expert={expert} />
-          </div>
-        ))}
+      <p class="sv-eyebrow">Expertenübersicht</p>
+      <h1 class="page-headline">Experten direkt finden</h1>
+      <p class="page-lead">Region und Fachgebiet wählen, passenden Experten öffnen und direkt anfragen.</p>
+      <div class="entry-actions">
+        <a class="sv-button sv-button-primary" href="/kontakt/">Experten anfragen</a>
+        <a class="sv-button sv-button-secondary" href="/schaden-melden/">Schaden melden</a>
       </div>
     </div>
   </section>
 
-  <section class="sv-section sv-section-alt" id="interaktive-filter">
+  <section class="sv-section" id="interaktive-filter">
     <div class="sv-container">
-      <SectionHeader eyebrow="Interaktive Filter" title="Experten nach Region und Fachgebiet filtern" text="Die Filter kombinieren Regionen, Fachgebiete und Freitext für eine schnelle, passgenaue Expertenauswahl." />
+      <SectionHeader eyebrow="Filter" title="Experten nach Region und Fachgebiet filtern" text="Filter setzen und direkt passende Experten anzeigen." />
       <div class="filter-panel">
         <label>Region
           <select data-filter-region>
@@ -56,67 +46,24 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
     </div>
   </section>
 
+  <section class="sv-section" id="sachverstaendige">
+    <div class="sv-container">
+      <div class="experts-grid" data-filter-grid>
+        {specialists.map((expert) => (
+          <div data-filter-item data-name={expert.name} data-regions={expert.regions.join('|')} data-fields={expert.expertise.join('|')}>
+            <ExpertCard expert={expert} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
   <section class="sv-section sv-section-alt" id="backoffice">
     <div class="sv-container">
       <SectionHeader eyebrow="Backoffice" title="Organisation, Koordination und kaufmännische Begleitung" text="Das Backoffice hält Termine, Unterlagen, Kommunikation und kaufmännische Abläufe zusammen und sorgt für verlässliche Übergaben an die fachlich Verantwortlichen." />
       <div class="experts-grid experts-grid--backoffice">{backoffice.map((expert) => <ExpertCard expert={expert} />)}</div>
     </div>
   </section>
-
-  <section class="sv-section sv-section-alt" id="fachgebiete">
-    <div class="sv-container">
-      <SectionHeader eyebrow="Fachgebiete" title="Rollen mit klaren Aufgaben" text="Die Plattform trennt Rollen, ohne die Zusammenarbeit zu trennen." />
-      <div class="sv-grid sv-grid-3">{expertDisciplines.map((item, index) => <FeatureCard index={String(index + 1).padStart(2, '0')} title={item.title} text={item.text} tone="soft" />)}</div>
-    </div>
-  </section>
-
-  <section class="sv-section" id="regionen">
-    <div class="sv-container split">
-      <div>
-        <p class="sv-eyebrow">Regionen</p>
-        <h2>Regional erreichbar, fachlich passend zugeordnet.</h2>
-        <p>Die Einsatzgebiete am Profil erleichtern die Zuordnung nach Schadenort, Aufgabenstellung und erforderlicher Reaktionszeit.</p>
-      </div>
-      <div>
-        <p class="sv-eyebrow">Qualifikationen und Zertifizierungen</p>
-        <ul>{qualificationPrinciples.map((item) => <li>{item}</li>)}</ul>
-      </div>
-    </div>
-  </section>
-
-  <section class="sv-section sv-section-alt" id="veroeffentlichungen">
-    <div class="sv-container publications-grid">
-      <article class="sv-card">
-        <h2>Veröffentlichungen</h2>
-        <p>Fachartikel aus Schadenpraxis und Regulierung werden zentral im Fachartikel-Bereich gepflegt.</p>
-        <a class="sv-button sv-button-secondary" href="/fachwissen/">Fachartikel ansehen</a>
-      </article>
-      <article class="sv-card" id="praxisfaelle">
-        <h2>Praxisfälle</h2>
-        <p>Praxisfälle zeigen konkrete Schadenlagen, technische Bewertungen und nachvollziehbare Entscheidungen.</p>
-        <a class="sv-button sv-button-secondary" href="/praxisfaelle/">Praxisfälle ansehen</a>
-      </article>
-    </div>
-  </section>
-
-  <section class="sv-section" id="zusammenarbeit">
-    <div class="sv-container split">
-      <div>
-        <p class="sv-eyebrow">Zusammenarbeit</p>
-        <h2>Zentrale Zuordnung statt ungerichteter Weiterleitung.</h2>
-        <p>Anfragen werden nach Schadenart, Objekt, Region, Dringlichkeit und Prüfziel eingeordnet.</p>
-        <a class="sv-button sv-button-secondary" href="/kontakt/">Ansprechpartner kontaktieren</a>
-      </div>
-      <div id="mitglied-werden">
-        <p class="sv-eyebrow">Mitglied werden</p>
-        <h2>Fachgebiet und Verantwortung sichtbar machen.</h2>
-        <p>Für die Aufnahme werden Tätigkeitsschwerpunkt, Regionen, Qualifikationen, Zertifizierungen und belastbare Arbeitsproben geprüft.</p>
-        <a class="sv-button sv-button-primary" href="/kontakt/">Aufnahme anfragen</a>
-      </div>
-    </div>
-  </section>
-
-  <CallToAction title="Gutachter-Plattform für die Zusammenarbeit" text="Klare Auftragsdaten, persönliche Verantwortung und fachliche Beiträge bilden eine gemeinsame Arbeitsgrundlage." href="/gutachter-plattform/" label="Gutachter-Plattform öffnen" />
 </BaseLayout>
 
 <script is:inline>
@@ -161,19 +108,14 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
 
 <style>
   .page-headline{margin:0 0 1.5rem;font-family:var(--sv-font-sans);font-size:clamp(1.5rem,4vw,2.25rem);font-weight:900;color:var(--sv-color-ink)}
+  .page-lead{margin:0 0 1rem;color:var(--sv-color-muted);max-width:45rem}
+  .entry-actions{display:flex;flex-wrap:wrap;gap:.75rem}
   .filter-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-lg);background:rgba(255,255,255,.72)}
   .filter-panel label{display:grid;gap:.4rem;font-weight:800}
   .filter-panel input,.filter-panel select{padding:.78rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:#fff;font:inherit}
   .filter-result{margin:.7rem 0 0;color:var(--sv-color-muted);font-weight:700}
-  .intro,.split{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(2rem,7vw,7rem)}
   .experts-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem}
   .experts-grid--backoffice{grid-template-columns:repeat(2,minmax(0,1fr));max-width:58rem}
-  .split>div{padding:1.6rem;border-top:1px solid var(--sv-color-line)}
-  .split ul{display:grid;gap:.7rem;padding-left:1.2rem}
-  .publications-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
-  .publications-grid article{display:grid;gap:.8rem;padding:1.3rem}
-  .publications-grid h2{margin:0;font-family:var(--sv-font-sans);font-size:1.25rem}
-  .publications-grid p{margin:0;color:var(--sv-color-muted)}
   @media(max-width:64rem){.experts-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media(max-width:48rem){.intro,.split,.experts-grid,.experts-grid--backoffice,.filter-panel,.publications-grid{grid-template-columns:1fr}}
+  @media(max-width:48rem){.experts-grid,.experts-grid--backoffice,.filter-panel{grid-template-columns:1fr}}
 </style>

@@ -5,31 +5,12 @@ const sent = Astro.url.searchParams.get('gesendet') === '1';
 const error = Astro.url.searchParams.get('fehler');
 ---
 <BaseLayout title="Kumulschadenmanagement | Auftrag direkt erteilen" description="Kumulschaden und Unwetterschäden direkt melden: Formular sofort öffnen und Auftrag übermitteln." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Kumulschadenmanagement'}]}>
-  <section class="sv-section">
-    <div class="sv-container entry-header">
-      <p class="sv-eyebrow">Kumulschaden</p>
-      <h1>Kumulschadenformular direkt ausfüllen</h1>
-      <p class="sv-lead">Für Kumul- und Unwetterschäden steht das Formular als sofortiger Einstieg zur Auftragserteilung bereit.</p>
-      <div class="entry-actions">
-        <a class="sv-button sv-button-primary" href="#kumulschaden-formular">Zum Kumulschaden-Formular</a>
-        <a class="sv-button sv-button-secondary" href="/grossschadenregulierung/#grossschaden-formular">Großschaden melden</a>
-      </div>
-    </div>
-  </section>
-
   <section class="sv-section" id="kumulschaden-formular">
     <div class="sv-container kumul-grid">
-      <article class="sv-card">
-        <h2>Benötigte Angaben</h2>
-        <ul>
-          <li>Region und Schadenlage</li>
-          <li>Geschätzte Fallzahl</li>
-          <li>Zeitraum und Prioritäten</li>
-          <li>Ansprechpartner für die Einsatzsteuerung</li>
-        </ul>
-      </article>
-
-      <article class="sv-card">
+      <article class="sv-card form-card">
+        <p class="sv-eyebrow">Kumulschaden</p>
+        <h1>Kumulschadenformular direkt ausfüllen</h1>
+        <p class="sv-lead">Formular ohne Zwischenseite ausfüllen und Auftrag direkt übermitteln.</p>
         <h2>Kumulschaden-Formular</h2>
         {sent && <p class="status success">Der Auftrag wurde übermittelt. Sie erhalten eine Eingangsbestätigung per E-Mail.</p>}
         {error && <p class="status error">Die Übermittlung konnte nicht verarbeitet werden. Bitte Eingaben prüfen.</p>}
@@ -71,16 +52,25 @@ const error = Astro.url.searchParams.get('fehler');
           <button class="sv-button sv-button-primary" type="submit">Kumulschaden melden</button>
         </form>
       </article>
+
+      <article class="sv-card">
+        <h2>Benötigte Angaben</h2>
+        <ul>
+          <li>Region und Schadenlage</li>
+          <li>Geschätzte Fallzahl</li>
+          <li>Zeitraum und Prioritäten</li>
+          <li>Ansprechpartner für die Einsatzsteuerung</li>
+        </ul>
+        <a class="sv-button sv-button-secondary" href="/grossschadenregulierung/#grossschaden-formular">Großschaden melden</a>
+      </article>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .entry-header{display:grid;gap:1rem}
-  .entry-header h1{margin:0}
-  .entry-header .sv-lead{margin:0}
-  .entry-actions{display:flex;flex-wrap:wrap;gap:.75rem}
-  .kumul-grid{display:grid;grid-template-columns:minmax(16rem,.8fr) minmax(0,1.2fr);gap:1.2rem}
+  .form-card h1{margin:0}
+  .form-card .sv-lead{margin:0 0 .2rem}
+  .kumul-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(16rem,.75fr);gap:1.2rem}
   .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}
   ul{margin:0;padding-left:1.2rem;display:grid;gap:.5rem}
   form{display:grid;gap:.8rem}
@@ -90,5 +80,5 @@ const error = Astro.url.searchParams.get('fehler');
   .status.success{background:#e7f7ef;border:1px solid #6db58d;color:#174f31}
   .status.error{background:#fbe9e9;border:1px solid #cc7e7e;color:#6d1f1f}
   .hp-field{position:absolute;left:-100vw;width:1px;height:1px;opacity:0}
-  @media(max-width:58rem){.entry-actions,.kumul-grid{grid-template-columns:1fr;display:grid}}
+  @media(max-width:58rem){.kumul-grid{grid-template-columns:1fr;display:grid}}
 </style>

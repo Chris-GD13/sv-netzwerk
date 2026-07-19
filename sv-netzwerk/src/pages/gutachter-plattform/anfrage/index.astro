@@ -11,27 +11,15 @@ const error = Astro.url.searchParams.get('fehler');
   breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Gutachter-Plattform', href: '/gutachter-plattform/' }, { label: 'Anfrage' }]}
 >
   <section class="sv-section">
-    <div class="sv-container entry-header">
-      <p class="sv-eyebrow">Gutachter-Plattform Anfrage</p>
-      <h1>Kontakt zur Plattform direkt aufnehmen</h1>
-      <p class="sv-lead">Anfragen zu Zugang, Demo oder Zusammenarbeit werden direkt an den Plattformbetrieb weitergeleitet.</p>
-    </div>
-  </section>
-
-  <section class="sv-section">
     <div class="sv-container grid">
       <article class="sv-card">
-        <h2>Empfänger</h2>
-        <p><strong>GASD GmbH</strong><br />vertreten durch den Geschäftsführer Goran Krstic<br />Hauptstr. 7, 76571 Gaggenau</p>
-        <p>E-Mail: <a href="mailto:info@gutachter-plattform.de">info@gutachter-plattform.de</a></p>
-      </article>
-      <article class="sv-card">
+        <p class="sv-eyebrow">Gutachter-Plattform Anfrage</p>
+        <h1>Plattformzugang direkt anfragen</h1>
+        <p class="sv-lead">Formular ausfüllen und Zugang, Demo oder Zusammenarbeit direkt anfragen.</p>
         <h2>Plattformformular</h2>
         {sent && <p class="status success">Ihre Anfrage wurde übermittelt. Eine Eingangsbestätigung wurde versendet.</p>}
         {error && <p class="status error">Die Anfrage konnte nicht verarbeitet werden. Bitte prüfen Sie Ihre Eingaben.</p>}
-        <a class="access-cta" href="#formular">Jetzt unverbindlich Zugang anfragen</a>
         <form action="/anfrage-gutachter-plattform.php" method="post" accept-charset="UTF-8">
-          <span id="formular" class="sr-anchor" aria-hidden="true"></span>
           <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
           <input type="hidden" name="Formular" value="Gutachter-Plattform Anfrage" />
           <input type="hidden" name="Herkunft" value="SV-Netzwerk.eu / Provisionshinweis" />
@@ -72,16 +60,20 @@ const error = Astro.url.searchParams.get('fehler');
           <button class="sv-button sv-button-primary" type="submit">Anfrage an die Plattform senden</button>
         </form>
       </article>
+      <article class="sv-card">
+        <h2>Empfänger</h2>
+        <p><strong>GASD GmbH</strong><br />vertreten durch den Geschäftsführer Goran Krstic<br />Hauptstr. 7, 76571 Gaggenau</p>
+        <p>E-Mail: <a href="mailto:info@gutachter-plattform.de">info@gutachter-plattform.de</a></p>
+      </article>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .entry-header{display:grid;gap:1rem}
-  .entry-header h1{margin:0}
-  .entry-header .sv-lead{margin:0}
-  .grid{display:grid;grid-template-columns:minmax(16rem,.8fr) minmax(0,1.2fr);gap:2rem}
+  .grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(16rem,.75fr);gap:2rem}
   .sv-card{padding:clamp(1.4rem,3vw,2.2rem)}
+  .sv-card h1{margin:0}
+  .sv-card .sv-lead{margin:0 0 .2rem}
   form{display:grid;gap:.85rem}
   label{display:grid;gap:.45rem;font-weight:800}
   input,select,textarea{width:100%;padding:.8rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:white}
@@ -90,10 +82,6 @@ const error = Astro.url.searchParams.get('fehler');
   .status{padding:.85rem 1rem;border-radius:.6rem;font-weight:700}
   .status.success{background:#e7f7ef;border:1px solid #6db58d;color:#174f31}
   .status.error{background:#fbe9e9;border:1px solid #cc7e7e;color:#6d1f1f}
-  .access-cta{display:flex;justify-content:center;align-items:center;min-height:3.2rem;margin-bottom:.9rem;padding:.8rem 1rem;border-radius:.72rem;background:#f08c00;color:#fff;font-weight:950;text-decoration:none;box-shadow:0 10px 24px rgba(240,140,0,.24)}
-  .access-cta:hover{background:#cf7600;color:#fff}
-  .access-cta:focus-visible{outline:3px solid #123f5a;outline-offset:2px}
-  .sr-anchor{position:relative;top:-6rem}
   .hp-field{position:absolute;left:-100vw;width:1px;height:1px;opacity:0}
   @media (max-width:54rem){.grid{grid-template-columns:1fr}}
 </style>
