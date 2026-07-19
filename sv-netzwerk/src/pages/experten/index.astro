@@ -9,19 +9,6 @@ const regions = [...new Set(specialists.flatMap((expert) => expert.regions))].so
 const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].sort((a, b) => a.localeCompare(b, 'de'));
 ---
 <BaseLayout title="Experten | SV-Netzwerk" description="Experten direkt nach Region und Fachgebiet filtern und anfragen." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Experten' }]}>
-
-  <section class="sv-section">
-    <div class="sv-container">
-      <p class="sv-eyebrow">Expertenübersicht</p>
-      <h1 class="page-headline">Experten direkt finden</h1>
-      <p class="page-lead">Region und Fachgebiet wählen, passenden Experten öffnen und direkt anfragen.</p>
-      <div class="entry-actions">
-        <a class="sv-button sv-button-primary" href="/kontakt/">Experten anfragen</a>
-        <a class="sv-button sv-button-secondary" href="/schaden-melden/">Schaden melden</a>
-      </div>
-    </div>
-  </section>
-
   <section class="sv-section" id="interaktive-filter">
     <div class="sv-container">
       <SectionHeader eyebrow="Filter" title="Experten nach Region und Fachgebiet filtern" text="Filter setzen und direkt passende Experten anzeigen." />
@@ -107,9 +94,6 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
 </script>
 
 <style>
-  .page-headline{margin:0 0 1.5rem;font-family:var(--sv-font-sans);font-size:clamp(1.5rem,4vw,2.25rem);font-weight:900;color:var(--sv-color-ink)}
-  .page-lead{margin:0 0 1rem;color:var(--sv-color-muted);max-width:45rem}
-  .entry-actions{display:flex;flex-wrap:wrap;gap:.75rem}
   .filter-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-lg);background:rgba(255,255,255,.72)}
   .filter-panel label{display:grid;gap:.4rem;font-weight:800}
   .filter-panel input,.filter-panel select{padding:.78rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:#fff;font:inherit}
