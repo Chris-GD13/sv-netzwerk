@@ -36,6 +36,7 @@ const files = (await readdir(knowledgeDir)).filter((file) => /\.mdx?$/.test(file
 const entries = [];
 const errors = [];
 const titleMap = new Map();
+const cadenceDays = new Set([1, 5]); // Montag, Freitag
 
 for (const file of files) {
   const source = await readFile(path.join(knowledgeDir, file), 'utf8');
@@ -69,11 +70,17 @@ if (publishedDaily.length === 0) {
   publishedDaily.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
   const latest = publishedDaily[0];
   const latestDay = new Date(`${latest.publishedAt}T12:00:00Z`).getUTCDay();
-  if (![1, 5].includes(latestDay)) {
+  if (!cadenceDays.has(latestDay)) {
     errors.push(`${latest.file}: letzter veröffentlichter Pflichtbeitrag liegt nicht auf Montag/Freitag (${latest.publishedAt}).`);
   }
-  if (latest.publishedAt !== berlinDate) {
-    errors.push(`Letzter veröffentlichter Pflichtbeitrag ist nicht aktuell für ${berlinDate}, gefunden: ${latest.publishedAt}.`);
+  const berlinDay = new Date(`${berlinDate}T12:00:00Z`).getUTCDay();
+  const expectedDate = cadenceDays.has(berlinDay)
+    ? berlinDate
+    : publishedDaily.find((entry) => entry.publishedAt <= berlinDate)?.publishedAt;
+  if (!expectedDate) {
+    errors.push(`Kein Pflichtbeitrag vor oder am Referenzdatum ${berlinDate} gefunden.`);
+  } else if (latest.publishedAt !== expectedDate) {
+    errors.push(`Letzter veröffentlichter Pflichtbeitrag ist nicht aktuell für ${berlinDate}, erwartet: ${expectedDate}, gefunden: ${latest.publishedAt}.`);
   }
   const dateDuplicates = publishedDaily.filter((entry) => entry.publishedAt === latest.publishedAt);
   if (dateDuplicates.length > 1) {

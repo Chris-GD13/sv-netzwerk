@@ -4,7 +4,7 @@ description: "Welche Sofortmaßnahmen nach einem Leitungswasserschaden entscheid
 category: "Leitungswasser"
 tags: ["Leitungswasser", "Sofortmaßnahmen", "Schadenminderung", "Dokumentation"]
 author: "christian-waechter"
-dailyStandard: true
+dailyStandard: false
 contentLevel: "C"
 teaser: "Die ersten Stunden nach einem Leitungswasserschaden prägen, wie belastbar die spätere Regulierung wird."
 linkedinSummary: "Nach einem Leitungswasserschaden entscheiden die ersten Stunden über die Qualität der gesamten Regulierung. Wer Ursache, Zustand und Maßnahmen von Beginn an dokumentiert, vermeidet spätere Lücken und Rückfragen."
