@@ -9,8 +9,8 @@ const entries = await getPublishedKnowledge();
 const categories = getKnowledgeCategories(entries);
 const tags = getKnowledgeTags(entries);
 ---
-<BaseLayout title="SVOS Knowledge Engine | SV-Netzwerk" description="Automatisch erzeugte Fachartikel-Uebersicht mit Kategorien, Tags und validierten Metadaten." breadcrumbs={[{label:'Start',href:'/'},{label:'SVOS',href:'/svos/'},{label:'Fachartikel'}]}>
-  <Hero eyebrow="SVOS Knowledge Engine" title="Fachartikel aus strukturierten Inhalten" text="Veroeffentlichte Beitraege sind nach Kategorien und Schlagwoertern geordnet und mit passenden Fachinhalten verknuepft." />
+<BaseLayout title="SVOS Fachartikel | SV-Netzwerk" description="Automatisch erstellte Fachartikel-Übersicht mit Kategorien, Schlagwörtern und geprüften Metadaten." breadcrumbs={[{label:'Start',href:'/'},{label:'SVOS',href:'/svos/'},{label:'Fachartikel'}]}>
+  <Hero eyebrow="SVOS Fachartikel" title="Fachartikel aus strukturierten Inhalten" text="Veröffentlichte Beiträge sind nach Kategorien und Schlagwörtern geordnet und mit passenden Fachinhalten verknüpft." />
   <section class="sv-section"><div class="sv-container">
     <div class="taxonomy-grid"><KnowledgeTaxonomy title="Kategorien" terms={categories} basePath="/svos/fachwissen/kategorie"/><KnowledgeTaxonomy title="Schlagwörter" terms={tags} basePath="/svos/fachwissen/tag"/></div>
     <div class="knowledge-grid">{entries.map((entry) => <KnowledgeCard entry={entry}/>)}</div>

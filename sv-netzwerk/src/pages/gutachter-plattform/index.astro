@@ -7,38 +7,38 @@ import CallToAction from '../../components/CallToAction.astro';
 
 const roleBenefits = [
   {
-    title: 'Vorteile fuer Versicherer',
-    text: 'Skalierbare Steuerung mit klaren Statusübersichten, bundeseinheitlichen Qualitätskriterien und nachvollziehbarer Entscheidungsgrundlage.',
+    title: 'Vorteile für Versicherer',
+    text: 'Skalierbare Steuerung mit klaren Statusübersichten, bundeseinheitlichen Qualitätskriterien und nachvollziehbarer Entscheidungsgrundlage.',
   },
   {
-    title: 'Vorteile fuer Regulierer',
-    text: 'Prueffaehige Unterlagen, transparente Freigaben und strukturierte Rueckfragenfuehrung ohne Medienbrueche.',
+    title: 'Vorteile für Regulierer',
+    text: 'Prüffähige Unterlagen, transparente Freigaben und strukturierte Rückfragenführung ohne Umwege.',
   },
   {
-    title: 'Vorteile fuer Sachverstaendige',
-    text: 'Saubere Aktenstruktur, standardisierte Prozesse und digitale Zusammenarbeit mit klaren Schnittstellen.',
+    title: 'Vorteile für Sachverständige',
+    text: 'Saubere Aktenstruktur, einheitliche Abläufe und digitale Zusammenarbeit mit klaren Übergaben.',
   },
 ];
 
 const platformPillars = [
-  { title: 'Bundesweite Verfuegbarkeit', text: 'Regionale Einsatzfaehigkeit mit zentraler Koordination und schneller Vermittlung passender Experten.' },
-  { title: 'Qualitaetsstandards', text: 'Einheitliche Vorgangsstruktur, eindeutige Verantwortlichkeiten und dokumentierte Bewertungswege.' },
+  { title: 'Bundesweite Verfügbarkeit', text: 'Regionale Einsatzfähigkeit mit zentraler Koordination und schneller Vermittlung passender Experten.' },
+  { title: 'Qualitätsstandards', text: 'Einheitliche Vorgangsstruktur, eindeutige Verantwortlichkeiten und dokumentierte Bewertungswege.' },
   { title: 'Digitale Zusammenarbeit', text: 'Alle Beteiligten arbeiten auf einer gemeinsamen Datenbasis mit transparenten Prozessschritten.' },
   { title: 'Schnelle Vermittlung', text: 'Auftragsklarheit, Fachgebiet und Region werden strukturiert abgeglichen und priorisiert zugeordnet.' },
-  { title: 'Transparente Prozesse', text: 'Status, offene Punkte und Entscheidungsstaende bleiben fuer alle berechtigten Rollen nachvollziehbar.' },
+  { title: 'Transparente Prozesse', text: 'Status, offene Punkte und Entscheidungsstände bleiben für alle berechtigten Rollen nachvollziehbar.' },
 ];
 ---
 
 <BaseLayout
-  title="Gutachter-Plattform | Herzstueck der Zusammenarbeit"
-  description="Die Gutachter-Plattform ist das Herzstueck des SV-Netzwerks fuer Versicherer, Regulierer und Sachverstaendige."
+  title="Gutachter-Plattform | Herzstück der Zusammenarbeit"
+  description="Die Gutachter-Plattform ist das Herzstück des SV-Netzwerks für Versicherer, Regulierer und Sachverständige."
   breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Gutachter-Plattform' }]}
 >
   <Hero
     compact
     eyebrow="Gutachter-Plattform"
-    title="Das Herzstueck des SV-Netzwerks."
-    text="Die Plattform verbindet Versicherer, Regulierer und Sachverstaendige in einem digitalen Arbeitsmodell mit klaren Qualitaetsstandards."
+    title="Das Herzstück des SV-Netzwerks."
+    text="Die Plattform verbindet Versicherer, Regulierer und Sachverständige in einem klaren digitalen Arbeitsmodell mit verbindlichen Qualitätsstandards."
     primaryLabel="Jetzt unverbindlich Zugang anfragen"
     primaryHref="/gutachter-plattform/anfrage/"
     secondaryLabel="Demo buchen"
@@ -47,7 +47,7 @@ const platformPillars = [
 
   <section class="sv-section">
     <div class="sv-container">
-      <SectionHeader eyebrow="Rollenbezogene Vorteile" title="Klarer Nutzen fuer alle Beteiligten" />
+      <SectionHeader eyebrow="Rollenbezogene Vorteile" title="Klarer Nutzen für alle Beteiligten" />
       <div class="sv-grid sv-grid-3">
         {roleBenefits.map((item, index) => (
           <FeatureCard index={`0${index + 1}`} title={item.title} text={item.text} />
@@ -74,14 +74,14 @@ const platformPillars = [
     <div class="sv-container cta-form-block">
       <p class="sv-eyebrow">Direkter Einstieg</p>
       <h2>Jetzt unverbindlich Zugang anfragen</h2>
-      <p>Oberhalb des Formulars steht der direkte Einstieg fuer Zugang, Pilotprojekt oder Demo zur Verfuegung.</p>
+      <p>Oberhalb des Formulars steht der direkte Einstieg für Zugang, Pilotprojekt oder Demo zur Verfügung.</p>
       <a class="sv-button sv-button-primary" href="/gutachter-plattform/anfrage/">Jetzt unverbindlich Zugang anfragen</a>
     </div>
   </section>
 
   <CallToAction
     title="Plattformzugang oder Pilotprojekt abstimmen"
-    text="Fuer Zugang, Demo und Integrationsfragen steht ein dediziertes Anfrageformular bereit."
+    text="Für Zugang, Demo und Integrationsfragen steht ein eigenes Anfrageformular bereit."
     href="/gutachter-plattform/anfrage/"
     label="Zur Plattform-Anfrage"
   />

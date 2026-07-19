@@ -8,33 +8,33 @@ const sent = Astro.url.searchParams.get('gesendet') === '1';
 const error = Astro.url.searchParams.get('fehler');
 const modules = [
   {
-    title: 'Grossschaeden',
-    text: 'Soforteinstieg fuer Grossschaeden mit priorisierter Terminierung, klarer Rollenverteilung und belastbarer Schadenreserve.'
+    title: 'Großschäden',
+    text: 'Soforteinstieg für Großschäden mit priorisierter Terminierung, klarer Rollenverteilung und belastbarer Schadenreserve.'
   },
   {
     title: 'Kumulmanagement',
-    text: 'Skalierbare Bearbeitung gleichartiger Ereignisse mit zentralem Lagebild, Segmentierung und standardisierten Rueckmeldungen.'
+    text: 'Skalierbare Bearbeitung gleichartiger Ereignisse mit zentralem Lagebild, Segmentierung und standardisierten Rückmeldungen.'
   },
   {
     title: 'Beauftragungen',
-    text: 'Klare Beauftragungsdaten, einheitliche Unterlagenanforderung und nachvollziehbare Bearbeitungsstaende.'
+    text: 'Klare Beauftragungsdaten, einheitliche Unterlagenanforderung und nachvollziehbare Bearbeitungsstände.'
   }
 ];
 ---
 
 <BaseLayout
-  title="Fuer Versicherer"
-  description="Schadenservice fuer Versicherer mit direktem Einstieg fuer Gross- und Kumulschadenlagen."
-  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Fuer Versicherer' }]}
+  title="Für Versicherer"
+  description="Schadenservice für Versicherer mit direktem Einstieg für Groß- und Kumulschadenlagen."
+  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Für Versicherer' }]}
 >
   <Hero
     compact
     eyebrow="Versicherer"
-    title="Schnelle, belastbare Steuerung komplexer Schaeden."
-    text="Direkte Einstiege fuer Grossschaeden und Kumulereignisse, klare Ansprechpartner und serverseitige Beauftragungsuebermittlung."
+    title="Schnelle, belastbare Steuerung komplexer Schäden."
+    text="Direkte Einstiege für Großschäden und Kumulereignisse, klare Ansprechpartner und eine schnelle Beauftragungsübermittlung."
     primaryLabel="Anfrage / Beauftragung"
     primaryHref="#anfrage"
-    secondaryLabel="Grossschadenregulierung"
+    secondaryLabel="Großschadenregulierung"
     secondaryHref="/grossschadenregulierung/"
   />
 
@@ -45,7 +45,7 @@ const modules = [
         {modules.map((module, index) => <FeatureCard index={`0${index + 1}`} title={module.title} text={module.text} />)}
       </div>
       <div class="quick-links">
-        <a class="sv-button sv-button-primary" href="/grossschadenregulierung/">Direkteinstieg Grossschaden</a>
+        <a class="sv-button sv-button-primary" href="/grossschadenregulierung/">Direkteinstieg Großschaden</a>
         <a class="sv-button sv-button-secondary" href="/leistungen/kumulschadenmanagement/">Direkteinstieg Kumulschaden</a>
       </div>
     </div>
@@ -55,14 +55,14 @@ const modules = [
     <div class="sv-container form-layout">
       <article class="sv-card contacts">
         <h2>Ansprechpartner</h2>
-        <p><strong>SV-Netzwerk Bau & Schaden</strong><br />Nordstrasse 17, 73432 Aalen</p>
+        <p><strong>SV-Netzwerk Bau & Schaden</strong><br />Nordstraße 17, 73432 Aalen</p>
         <p>E-Mail: <a href="mailto:info@sv-netzwerk.eu">info@sv-netzwerk.eu</a><br />Telefon: <a href="tel:+4973673939783">07367 / 393 97 83</a></p>
-        <p>Bitte Schadennummer, Schadenort, Schadenart und den gewuenschten Leistungsumfang direkt mit uebermitteln.</p>
+        <p>Bitte Schadennummer, Schadenort, Schadenart und den gewünschten Leistungsumfang direkt mit übermitteln.</p>
       </article>
       <article class="sv-card form-card">
         <h2>Anfrage oder Beauftragung senden</h2>
-        {sent && <p class="status success">Die Anfrage wurde erfolgreich uebermittelt. Eine Eingangsbestaetigung wurde versendet.</p>}
-        {error && <p class="status error">Die Anfrage konnte nicht verarbeitet werden. Bitte Eingaben pruefen.</p>}
+        {sent && <p class="status success">Die Anfrage wurde erfolgreich übermittelt. Eine Eingangsbestätigung wurde versendet.</p>}
+        {error && <p class="status error">Die Anfrage konnte nicht verarbeitet werden. Bitte Eingaben prüfen.</p>}
         <form action="/anfrage-versicherer.php" method="post" accept-charset="UTF-8">
           <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
@@ -101,7 +101,7 @@ const modules = [
             <h3>Schadenbereich</h3>
             <div class="check-grid">
               <label><input type="checkbox" name="Schadenbereich[]" value="Hausrat" /> Hausrat</label>
-              <label><input type="checkbox" name="Schadenbereich[]" value="Gebaeude" /> Gebaeude</label>
+              <label><input type="checkbox" name="Schadenbereich[]" value="Gebäude" /> Gebäude</label>
               <label><input type="checkbox" name="Schadenbereich[]" value="Haftpflicht" /> Haftpflicht</label>
               <label><input type="checkbox" name="Schadenbereich[]" value="Mietsachschaden" /> Mietsachschaden</label>
               <label><input type="checkbox" name="Schadenbereich[]" value="Betriebsunterbrechung" /> Betriebsunterbrechung</label>

@@ -8,26 +8,26 @@ import CallToAction from '../../components/CallToAction.astro';
 import { experts, expertDisciplines } from '../../data/experts';
 
 const qualificationPrinciples = [
-  'Fachgebiet und tatsaechlicher Einsatzbereich',
-  'Regionale Verfuegbarkeit und Reaktionsweg',
+  'Fachgebiet und tatsächlicher Einsatzbereich',
+  'Regionale Verfügbarkeit und Reaktionsweg',
   'Nachvollziehbare Qualifikationen und Zertifizierungen',
-  'Klare Verantwortung fuer Feststellung und Bewertung',
+  'Klare Verantwortung für Feststellung und Bewertung',
 ];
 const specialists = experts.filter((expert) => expert.status === 'active' && expert.group === 'expert');
 const backoffice = experts.filter((expert) => expert.status === 'active' && expert.group === 'backoffice');
 const regions = [...new Set(specialists.flatMap((expert) => expert.regions))].sort((a, b) => a.localeCompare(b, 'de'));
 const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].sort((a, b) => a.localeCompare(b, 'de'));
 ---
-<BaseLayout title="Experten | Menschen im SV-Netzwerk" description="Sachverstaendige, Regulierer, Fachpartner und vernetzte Zusammenarbeit im SV-Netzwerk." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Experten' }]}>
-  <Hero compact eyebrow="Die Menschen im Netzwerk" title="Unsere Experten im SV-Netzwerk." text="Fachgebiete, Regionen, Qualifikationen und persoenliche Verantwortung auf einen Blick." />
+<BaseLayout title="Experten | Menschen im SV-Netzwerk" description="Sachverständige, Regulierer, Fachpartner und vernetzte Zusammenarbeit im SV-Netzwerk." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Experten' }]}>
+  <Hero compact eyebrow="Die Menschen im Netzwerk" title="Unsere Experten im SV-Netzwerk." text="Fachgebiete, Regionen, Qualifikationen und persönliche Verantwortung auf einen Blick." />
 
   <section class="sv-section" id="netzwerkuebersicht">
     <div class="sv-container">
-      <SectionHeader eyebrow="Netzwerkuebersicht" title="Netzwerk, Fachpartner und Zusammenarbeit integriert" text="Der Expertenbereich verbindet Profilinformationen mit Netzwerkstrukturen, Fachpartnern, Regionen und der digitalen Zusammenarbeit ueber SVOS und Gutachter-Plattform." />
+      <SectionHeader eyebrow="Netzwerkübersicht" title="Netzwerk, Fachpartner und Zusammenarbeit integriert" text="Der Expertenbereich verbindet Profilinformationen mit Netzwerkstrukturen, Fachpartnern, Regionen und der digitalen Zusammenarbeit über SVOS und Gutachter-Plattform." />
       <div class="network-grid">
-        <a class="sv-card network-link" href="/netzwerk/"><h3>Netzwerk</h3><p>Organisation, Rollen und fachliche Zustaendigkeiten im Gesamtverbund.</p></a>
-        <a class="sv-card network-link" href="/partner/"><h3>Fachpartner</h3><p>Spezialisierte Partner fuer ergaenzende Gewerke und Sonderthemen.</p></a>
-        <a class="sv-card network-link" href="/ueber-uns/"><h3>Ueber uns</h3><p>Selbstverstaendnis, Qualitaetsanspruch und Verantwortung des SV-Netzwerks.</p></a>
+        <a class="sv-card network-link" href="/netzwerk/"><h3>Netzwerk</h3><p>Organisation, Rollen und fachliche Zuständigkeiten im Gesamtverbund.</p></a>
+        <a class="sv-card network-link" href="/partner/"><h3>Fachpartner</h3><p>Spezialisierte Partner für ergänzende Gewerke und Sonderthemen.</p></a>
+        <a class="sv-card network-link" href="/ueber-uns/"><h3>Über uns</h3><p>Selbstverständnis, Qualitätsanspruch und Verantwortung des SV-Netzwerks.</p></a>
         <a class="sv-card network-link" href="/svos/"><h3>SVOS</h3><p>Gemeinsame Daten-, Fachartikel- und Prozessstruktur als Grundlage der Zusammenarbeit.</p></a>
       </div>
     </div>
@@ -35,7 +35,7 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
 
   <section class="sv-section sv-section-alt" id="interaktive-filter">
     <div class="sv-container">
-      <SectionHeader eyebrow="Interaktive Filter" title="Experten nach Region und Fachgebiet filtern" text="Die Filter kombinieren Regionen, Fachgebiete und Freitext fuer eine schnelle, passgenaue Expertenauswahl." />
+      <SectionHeader eyebrow="Interaktive Filter" title="Experten nach Region und Fachgebiet filtern" text="Die Filter kombinieren Regionen, Fachgebiete und Freitext für eine schnelle, passgenaue Expertenauswahl." />
       <div class="filter-panel">
         <label>Region
           <select data-filter-region>
@@ -59,7 +59,7 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
 
   <section class="sv-section" id="sachverstaendige">
     <div class="sv-container">
-      <SectionHeader eyebrow="Sachverstaendige und Regulierer" title="Alle fachlichen Experten im Netzwerk" text="Profile mit Fachgebieten, Qualifikationen, Einsatzregionen und persoenlichen Ansprechpartnern." />
+      <SectionHeader eyebrow="Sachverständige und Regulierer" title="Alle fachlichen Experten im Netzwerk" text="Profile mit Fachgebieten, Qualifikationen, Einsatzregionen und persönlichen Ansprechpartnern." />
       <div class="experts-grid" data-filter-grid>
         {specialists.map((expert) => (
           <div data-filter-item data-name={expert.name} data-regions={expert.regions.join('|')} data-fields={expert.expertise.join('|')}>
@@ -72,7 +72,7 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
 
   <section class="sv-section sv-section-alt" id="backoffice">
     <div class="sv-container">
-      <SectionHeader eyebrow="Backoffice" title="Organisation, Koordination und kaufmaennische Begleitung" text="Das Backoffice haelt Termine, Unterlagen, Kommunikation und kaufmaennische Ablaeufe zusammen und sorgt fuer verlaessliche Uebergaben an die fachlich Verantwortlichen." />
+      <SectionHeader eyebrow="Backoffice" title="Organisation, Koordination und kaufmännische Begleitung" text="Das Backoffice hält Termine, Unterlagen, Kommunikation und kaufmännische Abläufe zusammen und sorgt für verlässliche Übergaben an die fachlich Verantwortlichen." />
       <div class="experts-grid experts-grid--backoffice">{backoffice.map((expert) => <ExpertCard expert={expert} />)}</div>
     </div>
   </section>
@@ -101,14 +101,14 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
   <section class="sv-section sv-section-alt" id="veroeffentlichungen">
     <div class="sv-container publications-grid">
       <article class="sv-card">
-        <h2>Veroeffentlichungen</h2>
+        <h2>Veröffentlichungen</h2>
         <p>Fachartikel aus Schadenpraxis und Regulierung werden zentral im Fachartikel-Bereich gepflegt.</p>
         <a class="sv-button sv-button-secondary" href="/fachwissen/">Fachartikel ansehen</a>
       </article>
       <article class="sv-card" id="praxisfaelle">
-        <h2>Praxisfaelle</h2>
-        <p>Praxisfaelle zeigen konkrete Schadenlagen, technische Bewertungen und nachvollziehbare Entscheidungen.</p>
-        <a class="sv-button sv-button-secondary" href="/praxisfaelle/">Praxisfaelle ansehen</a>
+        <h2>Praxisfälle</h2>
+        <p>Praxisfälle zeigen konkrete Schadenlagen, technische Bewertungen und nachvollziehbare Entscheidungen.</p>
+        <a class="sv-button sv-button-secondary" href="/praxisfaelle/">Praxisfälle ansehen</a>
       </article>
     </div>
   </section>
@@ -118,19 +118,19 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
       <div>
         <p class="sv-eyebrow">Zusammenarbeit</p>
         <h2>Zentrale Zuordnung statt ungerichteter Weiterleitung.</h2>
-        <p>Anfragen werden nach Schadenart, Objekt, Region, Dringlichkeit und Pruefziel eingeordnet.</p>
+        <p>Anfragen werden nach Schadenart, Objekt, Region, Dringlichkeit und Prüfziel eingeordnet.</p>
         <a class="sv-button sv-button-secondary" href="/kontakt/">Ansprechpartner kontaktieren</a>
       </div>
       <div id="mitglied-werden">
         <p class="sv-eyebrow">Mitglied werden</p>
         <h2>Fachgebiet und Verantwortung sichtbar machen.</h2>
-        <p>Fuer die Aufnahme werden Taetigkeitsschwerpunkt, Regionen, Qualifikationen, Zertifizierungen und belastbare Arbeitsproben geprueft.</p>
+        <p>Für die Aufnahme werden Tätigkeitsschwerpunkt, Regionen, Qualifikationen, Zertifizierungen und belastbare Arbeitsproben geprüft.</p>
         <a class="sv-button sv-button-primary" href="/kontakt/">Aufnahme anfragen</a>
       </div>
     </div>
   </section>
 
-  <CallToAction title="Gutachter-Plattform fuer die Zusammenarbeit" text="Klare Auftragsdaten, persoenliche Verantwortung und fachliche Beitraege bilden eine gemeinsame Arbeitsgrundlage." href="/gutachter-plattform/" label="Gutachter-Plattform oeffnen" />
+  <CallToAction title="Gutachter-Plattform für die Zusammenarbeit" text="Klare Auftragsdaten, persönliche Verantwortung und fachliche Beiträge bilden eine gemeinsame Arbeitsgrundlage." href="/gutachter-plattform/" label="Gutachter-Plattform öffnen" />
 </BaseLayout>
 
 <script is:inline>

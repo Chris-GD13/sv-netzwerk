@@ -8,27 +8,27 @@ const error = Astro.url.searchParams.get('fehler');
 
 <BaseLayout
   title="Plattform-Anfrage"
-  description="Anfrageformular fuer Demo, Zugang und Kooperation zur Gutachter-Plattform."
+  description="Anfrageformular für Demo, Zugang und Zusammenarbeit auf der Gutachter-Plattform."
   breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Gutachter-Plattform', href: '/gutachter-plattform/' }, { label: 'Anfrage' }]}
 >
   <Hero
     compact
     eyebrow="Gutachter-Plattform Anfrage"
     title="Kontakt zur Plattform aufnehmen."
-    text="Anfragen zu Demo, Zugang oder Kooperation werden serverseitig verarbeitet und an den Plattformbetrieb weitergeleitet."
+    text="Anfragen zu Demo, Zugang oder Zusammenarbeit werden geprüft und direkt an den Plattformbetrieb weitergeleitet."
   />
 
   <section class="sv-section">
     <div class="sv-container grid">
       <article class="sv-card">
-        <h2>Empfaenger</h2>
-        <p><strong>GASD GmbH</strong><br />vertreten durch den Geschaeftsfuehrer Goran Krstic<br />Hauptstr. 7, 76571 Gaggenau</p>
+        <h2>Empfänger</h2>
+        <p><strong>GASD GmbH</strong><br />vertreten durch den Geschäftsführer Goran Krstic<br />Hauptstr. 7, 76571 Gaggenau</p>
         <p>E-Mail: <a href="mailto:info@gutachter-plattform.de">info@gutachter-plattform.de</a></p>
       </article>
       <article class="sv-card">
         <h2>Plattformformular</h2>
-        {sent && <p class="status success">Ihre Anfrage wurde uebermittelt. Eine Eingangsbestätigung wurde versendet.</p>}
-        {error && <p class="status error">Die Anfrage konnte nicht verarbeitet werden. Bitte pruefen Sie Ihre Eingaben.</p>}
+        {sent && <p class="status success">Ihre Anfrage wurde übermittelt. Eine Eingangsbestätigung wurde versendet.</p>}
+        {error && <p class="status error">Die Anfrage konnte nicht verarbeitet werden. Bitte prüfen Sie Ihre Eingaben.</p>}
         <a class="access-cta" href="#formular">Jetzt unverbindlich Zugang anfragen</a>
         <form action="/anfrage-gutachter-plattform.php" method="post" accept-charset="UTF-8">
           <span id="formular" class="sr-anchor" aria-hidden="true"></span>
@@ -44,10 +44,10 @@ const error = Astro.url.searchParams.get('fehler');
           </label>
           <label>Rolle / Zielgruppe
             <select name="Rolle" required>
-              <option value="">Bitte auswaehlen</option>
+              <option value="">Bitte auswählen</option>
               <option value="Versicherer">Versicherer</option>
               <option value="Regulierer">Regulierer</option>
-              <option value="Sachverstaendiger">Sachverstaendiger</option>
+              <option value="Sachverständiger">Sachverständiger</option>
               <option value="Sanierer / Dienstleister">Sanierer / Dienstleister</option>
               <option value="Sonstige Anfrage">Sonstige Anfrage</option>
             </select>

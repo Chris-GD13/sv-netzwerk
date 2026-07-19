@@ -8,14 +8,14 @@ const error = Astro.url.searchParams.get('fehler');
 
 <BaseLayout
   title="Schaden melden"
-  description="Serverseitige Schadenmeldung mit Dateiupload fuer eine schnelle Erstbearbeitung."
+  description="Schaden online melden und Unterlagen direkt beifügen – für eine schnelle Erstbearbeitung."
   breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Schaden melden' }]}
 >
   <Hero
     compact
     eyebrow="Schadenmeldung"
-    title="Schadenfall direkt serverseitig einreichen."
-    text="Die Meldung wird serverseitig validiert, protiokolliert und per E-Mail verarbeitet. Datei-Uploads sind fuer Erstunterlagen moeglich."
+    title="Schadenfall direkt online einreichen."
+    text="Ihre Meldung wird geprüft und bearbeitet. Unterlagen können Sie direkt mit senden."
   />
 
   <section class="sv-section">
@@ -23,17 +23,17 @@ const error = Astro.url.searchParams.get('fehler');
       <article class="sv-card info-card">
         <h2>Hinweise zur Einreichung</h2>
         <ul>
-          <li>Moegliche Uploads: JPG, PNG, WEBP, HEIC, PDF (je Datei bis 10 MB)</li>
-          <li>Bitte Schadendatum und Schadenort moeglichst exakt angeben</li>
+          <li>Mögliche Dateiformate: JPG, PNG, WEBP, HEIC, PDF (je Datei bis 10 MB)</li>
+          <li>Bitte Schadendatum und Schadenort möglichst exakt angeben</li>
           <li>Sie erhalten automatisch eine Eingangsbestätigung per E-Mail</li>
-          <li>Das Team meldet sich mit dem weiteren Vorgehen zurueck</li>
+          <li>Das Team meldet sich mit dem weiteren Vorgehen zurück</li>
         </ul>
       </article>
 
       <article class="sv-card form-card">
         <h2>Schadenformular</h2>
-        {sent && <p class="status success">Die Schadenmeldung wurde erfolgreich uebermittelt.</p>}
-        {error && <p class="status error">Die Schadenmeldung konnte nicht verarbeitet werden. Bitte Eingaben pruefen.</p>}
+        {sent && <p class="status success">Die Schadenmeldung wurde erfolgreich übermittelt.</p>}
+        {error && <p class="status error">Die Schadenmeldung konnte nicht verarbeitet werden. Bitte Eingaben prüfen.</p>}
 
         <form action="/schadenmeldung.php" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
           <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
@@ -41,7 +41,7 @@ const error = Astro.url.searchParams.get('fehler');
           <div class="form-grid">
             <label>Schadenart
               <select name="Schadenart" required>
-                <option value="">Bitte auswaehlen</option>
+                <option value="">Bitte auswählen</option>
                 <option>Leitungswasser</option>
                 <option>Brand</option>
                 <option>Sturm / Hagel</option>
@@ -52,8 +52,8 @@ const error = Astro.url.searchParams.get('fehler');
             </label>
             <label>Objektart
               <select name="Objektart" required>
-                <option value="">Bitte auswaehlen</option>
-                <option>Wohngebaeude</option>
+                <option value="">Bitte auswählen</option>
+                <option>Wohngebäude</option>
                 <option>Gewerbe</option>
                 <option>Industrie</option>
                 <option>Hausrat</option>
@@ -83,8 +83,8 @@ const error = Astro.url.searchParams.get('fehler');
             </label>
             <label>Dringlichkeit
               <select name="Dringlichkeit" required>
-                <option value="">Bitte auswaehlen</option>
-                <option>Akut (Sofortmassnahmen noetig)</option>
+                <option value="">Bitte auswählen</option>
+                <option>Akut (Sofortmaßnahmen nötig)</option>
                 <option>Hoch (Bearbeitung innerhalb 24h)</option>
                 <option>Normal</option>
               </select>
@@ -97,7 +97,7 @@ const error = Astro.url.searchParams.get('fehler');
             </label>
             <label class="full check">
               <input type="checkbox" name="Datenschutz" value="akzeptiert" required />
-              Ich bestaetige die datenschutzkonforme Verarbeitung zur Bearbeitung meiner Schadenmeldung.
+              Ich bestätige die datenschutzkonforme Verarbeitung zur Bearbeitung meiner Schadenmeldung.
             </label>
           </div>
 
