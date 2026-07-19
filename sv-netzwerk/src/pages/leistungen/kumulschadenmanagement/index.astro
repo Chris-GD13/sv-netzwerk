@@ -1,36 +1,81 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Hero from '../../../components/Hero.astro';
-import SectionHeader from '../../../components/SectionHeader.astro';
-import CallToAction from '../../../components/CallToAction.astro';
 
-const services = [
-  'Kurzfristige Bereitstellung zusätzlicher Regulierungskapazitäten',
-  'Priorisierte Erstaufnahme bei regionalen und überregionalen Unwetterlagen',
-  'Strukturierte Bearbeitung einer Vielzahl gleichartiger Schadenfälle',
-  'Einheitliche digitale Schadenaufnahme und Dokumentation',
-  'Schnelle Ersteinschätzung und Reservenbildung',
-  'Zentrale Status-, Kosten- und Bearbeitungsübersichten',
-  'Koordinierte Kommunikation mit Versicherern und Beteiligten',
-  'Bearbeitung von Sturm-, Hagel-, Starkregen- und Überschwemmungsschäden',
-];
+const sent = Astro.url.searchParams.get('gesendet') === '1';
+const error = Astro.url.searchParams.get('fehler');
 ---
-<BaseLayout title="Kumulschadenmanagement | SV-Netzwerk" description="Kumulschadenmanagement für Unwetterlagen mit priorisierter Erstaufnahme, skalierbarer Fallbearbeitung und zentraler Transparenz für Versicherer." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Kumulschadenmanagement'}]}>
-  <Hero compact eyebrow="Kumulschadenmanagement" title="Schadenwellen strukturiert und priorisiert steuern." text="Das SV-Netzwerk stellt bei Kumulereignissen kurzfristig zusätzliche Kapazitäten bereit und sichert eine einheitliche, digitale und nachvollziehbare Bearbeitung." primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Kontakt aufnehmen" secondaryHref="/kontakt/" />
-  <section class="sv-section">
-    <div class="sv-container">
-      <SectionHeader eyebrow="Leistungsumfang" title="Operative Stabilität bei hoher Fallzahl" text="Wir kombinieren schnelle Erstaufnahme, einheitliche Prozesse und zentrale Steuerung für belastbare Entscheidungen bei Großlagen." />
-      <ul class="kumul-list">
-        {services.map((item) => <li>{item}</li>)}
-      </ul>
+<BaseLayout title="Kumulschadenmanagement | Auftrag direkt erteilen" description="Kumulschaden und Unwetterschäden direkt melden: Formular sofort öffnen und Auftrag übermitteln." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Kumulschadenmanagement'}]}>
+  <Hero compact eyebrow="Kumulschaden" title="Kumulschaden / Unwetter sofort melden." text="Das Formular ist der direkte Einstieg zur Auftragserteilung bei Schadenwellen." primaryLabel="Zum Kumulschaden-Formular" primaryHref="#kumulschaden-formular" secondaryLabel="Großschaden melden" secondaryHref="/grossschadenregulierung/#grossschaden-formular" />
+
+  <section class="sv-section" id="kumulschaden-formular">
+    <div class="sv-container kumul-grid">
+      <article class="sv-card">
+        <h2>Benötigte Angaben</h2>
+        <ul>
+          <li>Region und Schadenlage</li>
+          <li>Geschätzte Fallzahl</li>
+          <li>Zeitraum und Prioritäten</li>
+          <li>Ansprechpartner für die Einsatzsteuerung</li>
+        </ul>
+      </article>
+
+      <article class="sv-card">
+        <h2>Kumulschaden-Formular</h2>
+        {sent && <p class="status success">Der Auftrag wurde übermittelt. Sie erhalten eine Eingangsbestätigung per E-Mail.</p>}
+        {error && <p class="status error">Die Übermittlung konnte nicht verarbeitet werden. Bitte Eingaben prüfen.</p>}
+        <form action="/anfrage.php" method="post" accept-charset="UTF-8">
+          <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <input type="hidden" name="Formular" value="Kumulschadenmanagement" />
+
+          <label>Versicherung / Auftraggeber
+            <input name="Name" required />
+          </label>
+          <label>E-Mail
+            <input name="E-Mail" type="email" required />
+          </label>
+          <label>Telefon
+            <input name="Telefon" type="tel" />
+          </label>
+          <label>Region
+            <input name="Region" required />
+          </label>
+          <label>Voraussichtliche Fallzahl
+            <input name="Fallzahl" required />
+          </label>
+          <label>Startdatum
+            <input name="Startdatum" type="date" required />
+          </label>
+          <label>Schadenlage
+            <select name="Schadenlage" required>
+              <option value="">Bitte auswählen</option>
+              <option>Sturm / Hagel</option>
+              <option>Starkregen / Überschwemmung</option>
+              <option>Leitungswasser</option>
+              <option>Gemischte Schadenlage</option>
+            </select>
+          </label>
+          <label>Kurzbeschreibung
+            <textarea name="Nachricht" rows="8" required></textarea>
+          </label>
+
+          <button class="sv-button sv-button-primary" type="submit">Kumulschaden melden</button>
+        </form>
+      </article>
     </div>
   </section>
-  <CallToAction title="Kumulfalllage abstimmen" text="Für den Start genügen Region, Schadenlage, erwartetes Volumen und vorhandene Steuerungsanforderungen." href="/kontakt/" label="Kontakt aufnehmen" />
 </BaseLayout>
 
 <style>
-  .kumul-list{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sv-space-4)}
-  .kumul-list li{position:relative;padding:1.15rem 1.25rem 1.15rem 2.2rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-md);background:var(--sv-color-surface)}
-  .kumul-list li::before{content:"";position:absolute;left:1rem;top:1.55rem;width:.6rem;aspect-ratio:1;border-radius:50%;background:var(--sv-color-accent)}
-  @media(max-width:58rem){.kumul-list{grid-template-columns:1fr}}
+  .kumul-grid{display:grid;grid-template-columns:minmax(16rem,.8fr) minmax(0,1.2fr);gap:1.2rem}
+  .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}
+  ul{margin:0;padding-left:1.2rem;display:grid;gap:.5rem}
+  form{display:grid;gap:.8rem}
+  label{display:grid;gap:.4rem;font-weight:800}
+  input,select,textarea{width:100%;padding:.78rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:#fff}
+  .status{padding:.85rem 1rem;border-radius:.6rem;font-weight:700}
+  .status.success{background:#e7f7ef;border:1px solid #6db58d;color:#174f31}
+  .status.error{background:#fbe9e9;border:1px solid #cc7e7e;color:#6d1f1f}
+  .hp-field{position:absolute;left:-100vw;width:1px;height:1px;opacity:0}
+  @media(max-width:58rem){.kumul-grid{grid-template-columns:1fr}}
 </style>

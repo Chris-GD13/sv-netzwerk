@@ -1,17 +1,87 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Hero from '../../components/Hero.astro';
-import SectionHeader from '../../components/SectionHeader.astro';
-import FeatureCard from '../../components/FeatureCard.astro';
-import CallToAction from '../../components/CallToAction.astro';
-const phases=[
-  {title:'Erstaufnahme und Struktur',text:'Schadenumfang, Beteiligte, Sofortmaßnahmen und Informationsbedarf werden in einer belastbaren Ausgangslage zusammengeführt.'},
-  {title:'Reserve und Maßnahmen',text:'Kostenstände, technische Erfordernisse und Freigaben werden fortlaufend geprüft und dokumentiert.'},
-  {title:'Steuerung und Abschluss',text:'Termine, Schnittstellen, Restpunkte und Abschlussunterlagen werden bis zur nachvollziehbaren Entscheidung koordiniert.'},
-];
+
+const sent = Astro.url.searchParams.get('gesendet') === '1';
+const error = Astro.url.searchParams.get('fehler');
 ---
-<BaseLayout title="Großschaden- und Komplexschadenregulierung" description="Strukturierte Großschaden- und Komplexschadenregulierung mit technischer Bewertung, transparenter Reserve und dokumentierter Steuerung." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Großschaden- und Komplexschadenregulierung'}]}>
-  <Hero compact eyebrow="Großschaden- und Komplexschadenregulierung" title="Umfangreiche Schäden kontrolliert bearbeiten." text="Das SV-Netzwerk verbindet technische Schadenbewertung, koordinierte Kommunikation und dokumentierte Entscheidungsstände vom ersten Ortstermin bis zum Abschluss." primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Experten" secondaryHref="/experten/" />
-  <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Ablauf" title="Drei Phasen mit klarer Verantwortung"/><div class="sv-grid sv-grid-3">{phases.map((item,index)=><FeatureCard index={`0${index+1}`} title={item.title} text={item.text}/>)}</div></div></section>
-  <CallToAction title="Groß- oder Komplexschaden abstimmen" text="Für die Erstzuordnung genügen Schadenart, Objekt, Schadendatum und die vorhandenen Unterlagen." href="/kontakt/" label="Kontakt aufnehmen" />
+<BaseLayout title="Großschadenregulierung | Auftrag direkt erteilen" description="Großschaden sofort beauftragen: Formular direkt ausfüllen und Auftrag ohne Umwege erteilen." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Großschadenregulierung'}]}>
+  <Hero compact eyebrow="Großschaden" title="Großschaden sofort beauftragen." text="Das Formular ist der direkte Einstieg zur Auftragserteilung." primaryLabel="Zum Großschaden-Formular" primaryHref="#grossschaden-formular" secondaryLabel="Kumulschaden melden" secondaryHref="/leistungen/kumulschadenmanagement/#kumulschaden-formular" />
+
+  <section class="sv-section" id="grossschaden-formular">
+    <div class="sv-container gross-grid">
+      <article class="sv-card">
+        <h2>Benötigte Angaben</h2>
+        <ul>
+          <li>Schadenort und Schadenart</li>
+          <li>Schadendatum und Dringlichkeit</li>
+          <li>Ansprechpartner und Erreichbarkeit</li>
+          <li>Vorhandene Unterlagen</li>
+        </ul>
+      </article>
+
+      <article class="sv-card">
+        <h2>Großschaden-Formular</h2>
+        {sent && <p class="status success">Der Auftrag wurde übermittelt. Sie erhalten eine Eingangsbestätigung per E-Mail.</p>}
+        {error && <p class="status error">Die Übermittlung konnte nicht verarbeitet werden. Bitte Eingaben prüfen.</p>}
+        <form action="/anfrage.php" method="post" accept-charset="UTF-8">
+          <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <input type="hidden" name="Formular" value="Großschadenregulierung" />
+
+          <label>Versicherung / Auftraggeber
+            <input name="Name" required />
+          </label>
+          <label>E-Mail
+            <input name="E-Mail" type="email" required />
+          </label>
+          <label>Telefon
+            <input name="Telefon" type="tel" />
+          </label>
+          <label>Schadenort
+            <input name="Schadenort" required />
+          </label>
+          <label>Schadendatum
+            <input name="Schadendatum" type="date" required />
+          </label>
+          <label>Dringlichkeit
+            <select name="Dringlichkeit" required>
+              <option value="">Bitte auswählen</option>
+              <option>Akut</option>
+              <option>Hoch</option>
+              <option>Normal</option>
+            </select>
+          </label>
+          <label>Schadenart
+            <select name="Schadenart" required>
+              <option value="">Bitte auswählen</option>
+              <option>Brand</option>
+              <option>Leitungswasser</option>
+              <option>Sturm / Hagel</option>
+              <option>Elementar</option>
+              <option>Sonstiges</option>
+            </select>
+          </label>
+          <label>Kurzbeschreibung
+            <textarea name="Nachricht" rows="8" required></textarea>
+          </label>
+
+          <button class="sv-button sv-button-primary" type="submit">Großschaden melden</button>
+        </form>
+      </article>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .gross-grid{display:grid;grid-template-columns:minmax(16rem,.8fr) minmax(0,1.2fr);gap:1.2rem}
+  .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}
+  ul{margin:0;padding-left:1.2rem;display:grid;gap:.5rem}
+  form{display:grid;gap:.8rem}
+  label{display:grid;gap:.4rem;font-weight:800}
+  input,select,textarea{width:100%;padding:.78rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:#fff}
+  .status{padding:.85rem 1rem;border-radius:.6rem;font-weight:700}
+  .status.success{background:#e7f7ef;border:1px solid #6db58d;color:#174f31}
+  .status.error{background:#fbe9e9;border:1px solid #cc7e7e;color:#6d1f1f}
+  .hp-field{position:absolute;left:-100vw;width:1px;height:1px;opacity:0}
+  @media(max-width:58rem){.gross-grid{grid-template-columns:1fr}}
+</style>
