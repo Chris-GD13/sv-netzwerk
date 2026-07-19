@@ -35,16 +35,30 @@ Stand: 2026-07-19
 - `fcb6e14` – produktive Recovery-Implementierung (Formulare, Routen, Navigation, Doku)
 - `bfb01db` – Stabilisierung Fachbeitrags-Preflight fuer Nicht-Cadence-Tage
 
-## Offene Punkte / Rest-Risiken
+## Deployment- und Produktivnachweis
 
-- **Deployment live (main)**: Workflow `SV-Netzwerk bereitstellen` wird nur fuer `main`/manual produktiv relevant; dieser Nachweis folgt nach Merge.
-- **Produktivnachweis Mail/Upload**: technisch implementiert und lokal gebaut, aber abschließender End-to-End-Nachweis muss auf Zielumgebung erfolgen.
+- PR #11 wurde auf `main` gemerged (Merge-Commit `5e3610eb267c64c7db082f7e8983520560ecebda`).
+- Workflows auf `main` erfolgreich:
+  - Build Check (Run `29685401460`)
+  - SV-Netzwerk bereitstellen (Run `29685401502`)
+- IONOS-Liveabgleich:
+  - `https://sv-netzwerk.eu/deploy-version.txt` zeigt den Merge-Commit
+  - zentrale Recovery-Routen liefern HTTP 200
+  - PHP-Form-Endpunkte sind live erreichbar
+- Produktions-E2E (HTTP) ausgefuehrt:
+  - Kontaktformular POST -> `?fehler=mail`
+  - Schadenmeldung mit Datei-Upload POST -> `?fehler=mail`
+  - Interpretation: serverseitige Formularpfade sind aktiv; produktiver Mailversand ist in der Zielumgebung derzeit nicht funktionsfaehig.
 
 ## Abnahmekriterien-Status (Bereich 14)
 
-- Alle Formulare produktiv funktionsfaehig: **technisch umgesetzt**, Live-E2E-Nachweis offen
-- Tests erfolgreich: **ja (lokal + PR-Checks)**
-- GitHub Actions erfolgreich: **ja (PR-Checks)** / **Deploy auf main noch offen**
-- Deployment fehlerfrei: **offen bis main-Deployment**
+- Alle Formulare produktiv funktionsfaehig: **teilweise**, Mailversand aktuell mit `?fehler=mail`
+- Tests erfolgreich: **ja (lokal + PR-Checks + main-Checks)**
+- GitHub Actions erfolgreich: **ja (PR + main)**
+- Deployment fehlerfrei: **ja (Deploy-Workflow + Live-Commitnachweis)**
 - VALIDATION.md und CHANGELOG.md vorhanden: **ja**
-- Keine Regressionen: **kritische Regressionen behoben**, finaler Live-Deploy-Check offen
+- Keine Regressionen: **kritische Regressionen behoben**
+
+## Verbleibender Restblocker
+
+- **Mailzustellung in Zielumgebung** (SMTP/mail()-Konfiguration) muss serverseitig korrigiert werden; danach erneuter End-to-End-Formtest bis `?gesendet=1` und Postfacheingang.
