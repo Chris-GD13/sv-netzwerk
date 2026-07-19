@@ -62,7 +62,7 @@ export const experts: ExpertProfile[] = [
     function: 'Leitung Backoffice Aalen',
     expertise: ['Projektkoordination', 'Unternehmensmanagement', 'Mandantenbetreuung', 'Dokumentenmanagement', 'Qualitätssicherung', 'Prozesssteuerung'],
     regions: ['Aalen'], qualifications: [], certifications: [],
-    shortProfile: 'Susanne Wächter leitet das Backoffice Aalen und verantwortet dort die organisatorischen und kaufmännischen Abläufe, die Mandantenbetreuung sowie verlässliche interne Prozesse.',
+    shortProfile: 'Susanne Wächter leitet das Backoffice Aalen und ist zentrale Ansprechpartnerin für Versicherer, Geschädigte, Verwaltungen und Partnerfirmen bei ersten Fachfragen, Terminvereinbarungen, Koordination und Beauftragungen sowie bei der Abstimmung mit den Sachverständigen und Regulierern.',
     contact: centralContact, image: '/assets/images/team/susanne-waechter.jpeg', status: 'active', tags: ['Organisation', 'Unternehmensmanagement', 'Qualitätssicherung'], publications: [], practiceCases: [], articles: [],
   },
   {
