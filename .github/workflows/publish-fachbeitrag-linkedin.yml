@@ -32,7 +32,9 @@ jobs:
           cache-dependency-path: 'sv-netzwerk/package-lock.json'
       
       - name: Install dependencies
-        run: npm ci
+        run: |
+          cd sv-netzwerk
+          npm ci
       
       - name: Get latest Fachbeitrag metadata
         id: latest_fachbeitrag
@@ -141,6 +143,8 @@ jobs:
       
       - name: Validate build
         run: |
+          cd sv-netzwerk
+          npm run build
           if [ ! -d "dist" ]; then
             echo "Build failed: dist directory not found"
             exit 1
