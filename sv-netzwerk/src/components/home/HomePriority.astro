@@ -1,0 +1,86 @@
+---
+const priorities = [
+  {
+    index: '01',
+    title: 'Schaden melden',
+    text: 'Schadenfall mit allen Basisdaten und Unterlagen direkt einreichen.',
+    href: '/schaden-melden/',
+    cta: 'Schaden melden',
+  },
+  {
+    index: '02',
+    title: 'Großschaden',
+    text: 'Großschadenformular direkt öffnen und Auftrag ohne Umwege erteilen.',
+    href: '/grossschadenregulierung/#grossschaden-formular',
+    cta: 'Großschadenformular öffnen',
+  },
+  {
+    index: '03',
+    title: 'Kumulschaden',
+    text: 'Kumul- und Unwetterschäden im passenden Formular strukturiert melden.',
+    href: '/leistungen/kumulschadenmanagement/#kumulschaden-formular',
+    cta: 'Kumulschadenformular öffnen',
+  },
+  {
+    index: '04',
+    title: 'Was wir leisten',
+    text: 'Leistungen mit direktem Zugang zu passenden Formularen und Kontaktwegen.',
+    href: '/leistungen/',
+    cta: 'Leistungen öffnen',
+  },
+  {
+    index: '05',
+    title: 'Gutachter-Plattform',
+    text: 'Plattformzugang oder Zusammenarbeit direkt über das Anfrageformular klären.',
+    href: '/gutachter-plattform/anfrage/',
+    cta: 'Plattform anfragen',
+  },
+  {
+    index: '06',
+    title: 'Experten',
+    text: 'Experten nach Region und Fachgebiet finden und direkt anfragen.',
+    href: '/experten/',
+    cta: 'Experten finden',
+  },
+  {
+    index: '07',
+    title: 'Fachartikel',
+    text: 'Fachartikel für schnelle Einordnung in der Schadenregulierung nutzen.',
+    href: '/fachwissen/',
+    cta: 'Fachartikel öffnen',
+  },
+];
+---
+
+<section class="v4-section priority-start" aria-labelledby="prioritaeten">
+  <div class="v4-shell">
+    <div class="v4-section-head">
+      <div>
+        <p class="v4-kicker"><span></span>Startseite Prioritäten</p>
+        <h2 id="prioritaeten">Direkter Einstieg in sieben Schritten</h2>
+      </div>
+    </div>
+    <div class="priority-grid">
+      {priorities.map((item) => (
+        <article class="priority-card">
+          <small>{item.index}</small>
+          <h3>{item.title}</h3>
+          <p>{item.text}</p>
+          <a href={item.href}>{item.cta} <span aria-hidden="true">→</span></a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .priority-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+  .priority-card{display:grid;gap:.55rem;padding:1rem;border:1px solid var(--v4-line);border-radius:.9rem;background:rgba(255,255,255,.86)}
+  .priority-card small{color:#0d4f73;font-size:.72rem;font-weight:900;letter-spacing:.1em}
+  .priority-card h3{margin:0;font-size:1.08rem;line-height:1.2}
+  .priority-card p{margin:0;color:#3f5c6f;font-size:.9rem}
+  .priority-card a{display:inline-flex;align-items:center;gap:.4rem;margin-top:.2rem;font-weight:850;color:#0d4f73;text-decoration:none}
+  @media(max-width:74rem){.priority-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media(max-width:58rem){.priority-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:38rem){.priority-grid{grid-template-columns:1fr}}
+</style>

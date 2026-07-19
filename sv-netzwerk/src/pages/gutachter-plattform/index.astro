@@ -1,100 +1,43 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Hero from '../../components/Hero.astro';
-import SectionHeader from '../../components/SectionHeader.astro';
 import FeatureCard from '../../components/FeatureCard.astro';
-import CallToAction from '../../components/CallToAction.astro';
 
-const roleBenefits = [
-  {
-    title: 'Vorteile für Versicherer',
-    text: 'Skalierbare Steuerung mit klaren Statusübersichten, bundeseinheitlichen Qualitätskriterien und nachvollziehbarer Entscheidungsgrundlage.',
-  },
-  {
-    title: 'Vorteile für Regulierer',
-    text: 'Prüffähige Unterlagen, transparente Freigaben und strukturierte Rückfragenführung ohne Umwege.',
-  },
-  {
-    title: 'Vorteile für Sachverständige',
-    text: 'Saubere Aktenstruktur, einheitliche Abläufe und digitale Zusammenarbeit mit klaren Übergaben.',
-  },
-];
-
-const platformPillars = [
-  { title: 'Bundesweite Verfügbarkeit', text: 'Regionale Einsatzfähigkeit mit zentraler Koordination und schneller Vermittlung passender Experten.' },
-  { title: 'Qualitätsstandards', text: 'Einheitliche Vorgangsstruktur, eindeutige Verantwortlichkeiten und dokumentierte Bewertungswege.' },
-  { title: 'Digitale Zusammenarbeit', text: 'Alle Beteiligten arbeiten auf einer gemeinsamen Datenbasis mit transparenten Prozessschritten.' },
-  { title: 'Schnelle Vermittlung', text: 'Auftragsklarheit, Fachgebiet und Region werden strukturiert abgeglichen und priorisiert zugeordnet.' },
-  { title: 'Transparente Prozesse', text: 'Status, offene Punkte und Entscheidungsstände bleiben für alle berechtigten Rollen nachvollziehbar.' },
+const roles = [
+  { title: 'Für Versicherer', text: 'Plattformzugang, Pilotprojekte und Zusammenarbeit direkt anfragen.', href: '/gutachter-plattform/fuer-versicherungen/' },
+  { title: 'Für Regulierer', text: 'Arbeitsprozesse, Übergaben und Bearbeitungsstände strukturiert abstimmen.', href: '/gutachter-plattform/fuer-regulierer/' },
+  { title: 'Für Sachverständige', text: 'Rollen, Zuständigkeiten und digitale Zusammenarbeit verbindlich einbinden.', href: '/gutachter-plattform/fuer-sachverstaendige/' },
 ];
 ---
 
 <BaseLayout
-  title="Gutachter-Plattform | Herzstück der Zusammenarbeit"
-  description="Die Gutachter-Plattform ist das Herzstück des SV-Netzwerks für Versicherer, Regulierer und Sachverständige."
+  title="Gutachter-Plattform | Direkter Einstieg"
+  description="Direkter Einstieg in die Gutachter-Plattform mit Anfrageformular für Zugang und Zusammenarbeit."
   breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Gutachter-Plattform' }]}
 >
-  <Hero
-    compact
-    eyebrow="Gutachter-Plattform"
-    title="Das Herzstück des SV-Netzwerks."
-    text="Die Plattform verbindet Versicherer, Regulierer und Sachverständige in einem klaren digitalen Arbeitsmodell mit verbindlichen Qualitätsstandards."
-    primaryLabel="Jetzt unverbindlich Zugang anfragen"
-    primaryHref="/gutachter-plattform/anfrage/"
-    secondaryLabel="Demo buchen"
-    secondaryHref="/gutachter-plattform/demo-buchen/"
-  />
-
   <section class="sv-section">
-    <div class="sv-container">
-      <SectionHeader eyebrow="Rollenbezogene Vorteile" title="Klarer Nutzen für alle Beteiligten" />
-      <div class="sv-grid sv-grid-3">
-        {roleBenefits.map((item, index) => (
-          <FeatureCard index={`0${index + 1}`} title={item.title} text={item.text} />
-        ))}
+    <div class="sv-container entry-header">
+      <p class="sv-eyebrow">Gutachter-Plattform</p>
+      <h1>Plattformzugang direkt anfragen</h1>
+      <p class="sv-lead">Der direkte Einstieg führt ohne vorgeschaltete Marketingseite zum Anfrageformular für Zugang, Pilotprojekt oder Zusammenarbeit.</p>
+      <div class="entry-actions">
+        <a class="sv-button sv-button-primary" href="/gutachter-plattform/anfrage/">Zur Plattform-Anfrage</a>
+        <a class="sv-button sv-button-secondary" href="/schaden-melden/">Schaden melden</a>
       </div>
     </div>
   </section>
 
-  <section class="sv-section sv-section-alt" id="plattform-funktionen">
-    <div class="sv-container">
-      <SectionHeader eyebrow="Plattformmerkmale" title="Digital, transparent und bundesweit einsetzbar" />
-      <div class="pillars-grid">
-        {platformPillars.map((item) => (
-          <article class="sv-card pillar">
-            <h3>{item.title}</h3>
-            <p>{item.text}</p>
-          </article>
-        ))}
-      </div>
+  <section class="sv-section sv-section-alt">
+    <div class="sv-container role-grid">
+      {roles.map((role, index) => <FeatureCard index={String(index + 1).padStart(2, '0')} title={role.title} text={role.text} href={role.href} />)}
     </div>
   </section>
-
-  <section class="sv-section">
-    <div class="sv-container cta-form-block">
-      <p class="sv-eyebrow">Direkter Einstieg</p>
-      <h2>Jetzt unverbindlich Zugang anfragen</h2>
-      <p>Oberhalb des Formulars steht der direkte Einstieg für Zugang, Pilotprojekt oder Demo zur Verfügung.</p>
-      <a class="sv-button sv-button-primary" href="/gutachter-plattform/anfrage/">Jetzt unverbindlich Zugang anfragen</a>
-    </div>
-  </section>
-
-  <CallToAction
-    title="Plattformzugang oder Pilotprojekt abstimmen"
-    text="Für Zugang, Demo und Integrationsfragen steht ein eigenes Anfrageformular bereit."
-    href="/gutachter-plattform/anfrage/"
-    label="Zur Plattform-Anfrage"
-  />
 </BaseLayout>
 
 <style>
-  .pillars-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
-  .pillar{padding:1.35rem}
-  .pillar h3{margin:.2rem 0 .5rem;font-family:var(--sv-font-sans);font-size:1.12rem}
-  .pillar p{margin:0;color:var(--sv-color-muted)}
-  .cta-form-block{display:grid;justify-items:start;gap:.9rem;padding:clamp(1.5rem,3vw,2.2rem);border:1px solid color-mix(in srgb,var(--sv-color-accent) 45%,var(--sv-color-line));border-radius:var(--sv-radius-xl);background:linear-gradient(145deg,rgba(255,255,255,.9),rgba(255,248,236,.95))}
-  .cta-form-block h2{margin:0}
-  .cta-form-block p{margin:0;color:var(--sv-color-muted)}
-  @media(max-width:64rem){.pillars-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media(max-width:48rem){.pillars-grid{grid-template-columns:1fr}}
+  .entry-header{display:grid;gap:1rem}
+  .entry-header h1{margin:0}
+  .entry-header .sv-lead{margin:0}
+  .entry-actions{display:flex;flex-wrap:wrap;gap:.75rem}
+  .role-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sv-space-5)}
+  @media(max-width:58rem){.entry-actions,.role-grid{display:grid;grid-template-columns:1fr}}
 </style>
