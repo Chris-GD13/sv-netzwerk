@@ -11,27 +11,11 @@ const error = Astro.url.searchParams.get('fehler');
   breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Schaden melden' }]}
 >
   <section class="sv-section">
-    <div class="sv-container entry-header">
-      <p class="sv-eyebrow">Schadenmeldung</p>
-      <h1>Schadenfall direkt einreichen</h1>
-      <p class="sv-lead">Schadenart, Schadendatum und Objekt direkt übermitteln. Datei-Uploads für Erstunterlagen sind möglich.</p>
-    </div>
-  </section>
-
-  <section class="sv-section">
     <div class="sv-container report-grid">
-      <article class="sv-card info-card">
-        <h2>Hinweise zur Einreichung</h2>
-        <ul>
-          <li>Mögliche Dateiformate: JPG, PNG, WEBP, HEIC, PDF (je Datei bis 10 MB)</li>
-          <li>Bitte Schadendatum und Schadenort möglichst exakt angeben</li>
-          <li>Sie erhalten automatisch eine Eingangsbestätigung per E-Mail</li>
-          <li>Das Team meldet sich mit dem weiteren Vorgehen zurück</li>
-        </ul>
-      </article>
-
       <article class="sv-card form-card">
-        <h2>Schadenformular</h2>
+        <p class="sv-eyebrow">Schadenmeldung</p>
+        <h1>Schadenfall direkt einreichen</h1>
+        <p class="sv-lead">Formular ausfüllen, Unterlagen hochladen, absenden.</p>
         {sent && <p class="status success">Die Schadenmeldung wurde erfolgreich übermittelt.</p>}
         {error && <p class="status error">Die Schadenmeldung konnte nicht verarbeitet werden. Bitte Eingaben prüfen.</p>}
 
@@ -104,17 +88,30 @@ const error = Astro.url.searchParams.get('fehler');
           <button class="sv-button sv-button-primary" type="submit">Schadenmeldung senden</button>
         </form>
       </article>
+
+      <article class="sv-card info-card">
+        <h2>Hinweise zur Einreichung</h2>
+        <ul>
+          <li>Dateiformate: JPG, PNG, WEBP, HEIC, PDF (je Datei bis 10 MB)</li>
+          <li>Schadendatum und Schadenort möglichst genau angeben</li>
+          <li>Eingangsbestätigung erfolgt automatisch per E-Mail</li>
+          <li>Für Groß- oder Kumulschäden passende Spezialformulare nutzen</li>
+        </ul>
+        <div class="entry-actions">
+          <a class="sv-button sv-button-secondary" href="/grossschadenregulierung/#grossschaden-formular">Großschaden melden</a>
+          <a class="sv-button sv-button-secondary" href="/leistungen/kumulschadenmanagement/#kumulschaden-formular">Kumulschaden melden</a>
+        </div>
+      </article>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .entry-header{display:grid;gap:1rem}
-  .entry-header h1{margin:0}
-  .entry-header .sv-lead{margin:0}
-  .report-grid{display:grid;grid-template-columns:minmax(16rem,.7fr) minmax(0,1.3fr);gap:2rem}
+  .form-card h1{margin:0}
+  .form-card .sv-lead{margin:0 0 .2rem}
+  .report-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(16rem,.75fr);gap:2rem}
   .info-card,.form-card{padding:clamp(1.4rem,3vw,2.2rem)}
-  .focus-note{margin:0 0 1rem;padding:.85rem 1rem;border:1px solid #d9e4ea;border-left:4px solid var(--sv-color-accent);border-radius:.75rem;background:#f8fcff}
+  .entry-actions{display:grid;gap:.6rem;margin-top:1rem}
   .info-card ul{padding-left:1.2rem}
   .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem}
   .form-grid .full{grid-column:1/-1}

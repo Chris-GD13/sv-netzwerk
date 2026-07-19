@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Hero from '../../components/Hero.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import DamageCard from '../../components/platform/DamageCard.astro';
 import ProcessFlow from '../../components/platform/ProcessFlow.astro';
@@ -9,8 +8,27 @@ import { damageTypes } from '../../data/damage-types';
 const steps=[{title:'Schadenbild',text:'Sichtbare und verdeckte Betroffenheit erfassen.'},{title:'Einwirkungsweg',text:'Ursache und Ausbreitung nachvollziehen.'},{title:'Konstruktion',text:'Bauteile, Materialien und Schnittstellen prüfen.'},{title:'Abgrenzung',text:'Ereignisschaden von Vorschäden trennen.'},{title:'Maßnahmen',text:'Erforderliche Schritte fachlich herleiten.'},{title:'Kosten',text:'Mengen und Leistungen prüffähig zuordnen.'},{title:'Entscheidung',text:'Bewertung und Grenzen dokumentieren.'}];
 ---
 <BaseLayout title="Digitales Kompetenzzentrum | Schadenarten" description="Elf datengetriebene Kompetenzbereiche für Bau-, Sach- und Versicherungsschäden." breadcrumbs={[{label:'Start',href:'/'},{label:'Schadenarten'}]}>
-  <Hero compact eyebrow="Digitales Kompetenzzentrum" title="Schadenarten mit einer belastbaren Prüflogik verbinden." text="Jeder Kompetenzbereich fuehrt typische Schadenbilder, Pruefgegenstaende, Fachartikel, Praxisfaelle und zustaendige Experten aus einer gemeinsamen Datenquelle zusammen." primaryLabel="Schaden melden" primaryHref="/schaden-melden/" />
+  <section class="sv-section">
+    <div class="sv-container entry-header">
+      <p class="sv-eyebrow">Weitere Schadenarten</p>
+      <h1>Passende Schadenart direkt öffnen</h1>
+      <p class="sv-lead">Schadenart auswählen und direkt in den passenden Bearbeitungsweg wechseln.</p>
+      <div class="entry-actions">
+        <a class="sv-button sv-button-primary" href="/schaden-melden/">Schaden melden</a>
+        <a class="sv-button sv-button-secondary" href="/grossschadenregulierung/#grossschaden-formular">Großschaden melden</a>
+        <a class="sv-button sv-button-secondary" href="/leistungen/kumulschadenmanagement/#kumulschaden-formular">Kumulschaden melden</a>
+      </div>
+    </div>
+  </section>
   <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Kompetenzbereiche" title="Elf Einstiege in die technische Schadenbewertung" text="Die Detailseiten verbinden typische Pruefgegenstaende mit Fachartikeln, Praxisfaellen und zustaendigen Experten."/><div class="sv-grid sv-grid-3">{damageTypes.map((item,index)=><DamageCard item={item} index={index+1}/>)}</div></div></section>
   <section class="sv-section sv-section-alt"><div class="sv-container"><SectionHeader eyebrow="Gemeinsamer Standard" title="Vom Schadenbild zur dokumentierten Entscheidung"/><ProcessFlow steps={steps}/></div></section>
   <CallToAction title="Schadenart noch nicht eindeutig?" text="Die Erstklassifizierung wird anhand von Schadenbild, Objekt, Einwirkungsweg und verfügbaren Unterlagen geprüft." href="/schaden-melden/" label="Schaden strukturiert erfassen" />
 </BaseLayout>
+
+<style>
+  .entry-header{display:grid;gap:1rem}
+  .entry-header h1{margin:0}
+  .entry-header .sv-lead{margin:0}
+  .entry-actions{display:flex;flex-wrap:wrap;gap:.75rem}
+  @media(max-width:58rem){.entry-actions{display:grid;grid-template-columns:1fr}}
+</style>
