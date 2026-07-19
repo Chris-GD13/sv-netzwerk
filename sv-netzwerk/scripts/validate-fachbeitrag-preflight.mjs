@@ -13,6 +13,14 @@ const berlinDate = berlinDateArg ?? new Intl.DateTimeFormat('en-CA', {
   day: '2-digit',
 }).format(new Date());
 
+const normalize = (value) => value
+  .toLocaleLowerCase('de-DE')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/ß/g, 'ss')
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/(^-|-$)/g, '');
+
 const parse = (source) => {
   const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) return null;
@@ -24,19 +32,10 @@ const parse = (source) => {
   return { front, body: match[2], value };
 };
 
-const normalize = (value) => value
-  .toLocaleLowerCase('de-DE')
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')
-  .replace(/ß/g, 'ss')
-  .replace(/[^a-z0-9]+/g, '-')
-  .replace(/(^-|-$)/g, '');
-
 const files = (await readdir(knowledgeDir)).filter((file) => /\.mdx?$/.test(file));
 const entries = [];
 const errors = [];
 const titleMap = new Map();
-const cadenceDays = new Set([1, 5]); // Montag, Freitag
 
 for (const file of files) {
   const source = await readFile(path.join(knowledgeDir, file), 'utf8');
@@ -56,7 +55,7 @@ for (const file of files) {
     list.push(file);
     titleMap.set(titleKey, list);
   }
-  entries.push({ file, slug, publishedAt, title, daily, status, parsed });
+  entries.push({ file, slug, publishedAt, title, daily, status });
 }
 
 for (const [key, names] of titleMap) {
@@ -64,29 +63,17 @@ for (const [key, names] of titleMap) {
 }
 
 const publishedDaily = entries.filter((entry) => entry.daily && entry.status === 'published' && entry.publishedAt);
-if (publishedDaily.length === 0) {
-  errors.push('Keine veröffentlichten Pflichtbeiträge gefunden.');
-} else {
-  publishedDaily.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
-  const latest = publishedDaily[0];
-  const latestDay = new Date(`${latest.publishedAt}T12:00:00Z`).getUTCDay();
-  if (!cadenceDays.has(latestDay)) {
-    errors.push(`${latest.file}: letzter veröffentlichter Pflichtbeitrag liegt nicht auf Montag/Freitag (${latest.publishedAt}).`);
-  }
-  const berlinDay = new Date(`${berlinDate}T12:00:00Z`).getUTCDay();
-  const expectedDate = cadenceDays.has(berlinDay)
-    ? berlinDate
-    : publishedDaily.find((entry) => entry.publishedAt <= berlinDate)?.publishedAt;
-  if (!expectedDate) {
-    errors.push(`Kein Pflichtbeitrag vor oder am Referenzdatum ${berlinDate} gefunden.`);
-  } else if (latest.publishedAt !== expectedDate) {
-    errors.push(`Letzter veröffentlichter Pflichtbeitrag ist nicht aktuell für ${berlinDate}, erwartet: ${expectedDate}, gefunden: ${latest.publishedAt}.`);
-  }
-  const dateDuplicates = publishedDaily.filter((entry) => entry.publishedAt === latest.publishedAt);
-  if (dateDuplicates.length > 1) {
-    errors.push(`Datums-Dublette für ${latest.publishedAt}: ${dateDuplicates.map((entry) => entry.file).join(', ')}`);
-  }
+const todayDaily = publishedDaily.filter((entry) => entry.publishedAt === berlinDate);
+if (todayDaily.length > 2) {
+  errors.push(`Zu viele veröffentlichte Pflichtbeiträge am ${berlinDate}: ${todayDaily.map((item) => item.file).join(', ')}`);
+}
 
+if (publishedDaily.length > 0) {
+  publishedDaily.sort((a, b) => {
+    if (a.publishedAt === b.publishedAt) return a.file.localeCompare(b.file);
+    return b.publishedAt.localeCompare(a.publishedAt);
+  });
+  const latest = publishedDaily[0];
   const expectedHref = `/fachwissen/${latest.slug}/`;
   const librarySource = await readFile(libraryFile, 'utf8');
   const firstDate = librarySource.match(/date:\s*'([^']+)'/)?.[1] ?? '';

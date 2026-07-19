@@ -1,167 +1,29 @@
 {
-  "version": "8.0",
+  "version": "8.1",
   "date": "2026-07-19",
   "focusWindow": {
     "from": "2026-07-22",
     "to": "2026-08-22",
     "theme": "Kumul- und Unwetterschäden in Deutschland",
     "tone": "Sachlich, fachlich, glaubwürdig ohne Sensationssprache",
-    "audiences": [
-      "Versicherer",
-      "Regulierer",
-      "Geschädigte"
-    ],
+    "audiences": ["Versicherer", "Regulierer", "Geschädigte"],
     "fieldNotice": "Ab dem 22.07.2026 unterstützen wir gemeinsam mit unserem langjährigen Partner DIE REGULIERER Versicherungen und Geschädigte bei der Bearbeitung der aktuellen Unwetter- und Kumulschäden in den betroffenen Regionen."
   },
-  "cadence": {
-    "Monday": "Fachbeitrag zur aktuellen Unwetterlage und Regulierungspraxis",
-    "Tuesday": "LinkedIn-Lagebeitrag mit Einordnung für Versicherer und Regulierer",
-    "Wednesday": "LinkedIn-Lagebeitrag mit Schwerpunkt Schadenaufnahme und Priorisierung",
-    "Thursday": "LinkedIn-Lagebeitrag zu offenen Praxisfragen aus laufenden Einsätzen",
-    "Friday": "Praxisbericht oder Fachbeitrag zu typischen Unwetterschäden"
+  "automationCadence": {
+    "morning": "Täglich 05:15-06:40 Europe/Berlin: eigenständiger Fachbeitrag",
+    "afternoon": "Täglich 16:15-17:30 Europe/Berlin: zweiter eigenständiger Fachbeitrag"
   },
-  "series": [
-    {
-      "weekLabel": "Woche 1 (22.07.-26.07.2026)",
-      "items": [
-        {
-          "date": "2026-07-24",
-          "type": "Fachbeitrag",
-          "title": "Starkregen-Schadenmanagement: Priorisierung, Erstaufnahme und Reserveansatz",
-          "focus": "Starkregen-Schadenmanagement",
-          "audience": "Versicherer"
-        },
-        {
-          "date": "2026-07-25",
-          "type": "LinkedIn-Lagebeitrag",
-          "title": "Lagebild Starkregen: Welche Angaben in den ersten 24 Stunden entscheidend sind",
-          "focus": "Schadenaufnahme nach Elementarereignissen",
-          "audience": "Regulierer"
-        }
-      ]
-    },
-    {
-      "weekLabel": "Woche 2 (27.07.-02.08.2026)",
-      "items": [
-        {
-          "date": "2026-07-27",
-          "type": "Fachbeitrag",
-          "title": "Groß- und Kumulschäden in der Praxis: Steuerung paralleler Vorgänge",
-          "focus": "Groß-/Kumulschäden in der Praxis",
-          "audience": "Versicherer"
-        },
-        {
-          "date": "2026-07-29",
-          "type": "LinkedIn-Lagebeitrag",
-          "title": "Zusammenarbeit im Ereignisfall: Versicherer, Regulierer und Sachverständige",
-          "focus": "Zusammenarbeit Versicherer/Regulierer/Sachverständige",
-          "audience": "Regulierer"
-        },
-        {
-          "date": "2026-07-31",
-          "type": "Praxisbeitrag",
-          "title": "Hagel- und Sturmschäden: technische Besonderheiten aktueller Schadenbilder",
-          "focus": "Technische Besonderheiten aktueller Schadenbilder",
-          "audience": "Versicherer"
-        }
-      ]
-    },
-    {
-      "weekLabel": "Woche 3 (03.08.-09.08.2026)",
-      "items": [
-        {
-          "date": "2026-08-03",
-          "type": "Fachbeitrag",
-          "title": "Schadenaufnahme nach Überschwemmung und Rückstau: belastbare Abgrenzung",
-          "focus": "Schadenaufnahme nach Elementarereignissen",
-          "audience": "Regulierer"
-        },
-        {
-          "date": "2026-08-05",
-          "type": "LinkedIn-Lagebeitrag",
-          "title": "Aus laufenden Einsätzen: typische Fehler in der Erstkommunikation vermeiden",
-          "focus": "Erfahrungen aus laufenden Einsätzen",
-          "audience": "Geschädigte"
-        },
-        {
-          "date": "2026-08-07",
-          "type": "Praxisbeitrag",
-          "title": "Blitz- und Überspannungsschäden: Dokumentation, Abgrenzung und Prioritäten",
-          "focus": "Blitz/Überspannung",
-          "audience": "Versicherer"
-        }
-      ]
-    },
-    {
-      "weekLabel": "Woche 4 (10.08.-16.08.2026)",
-      "items": [
-        {
-          "date": "2026-08-10",
-          "type": "Fachbeitrag",
-          "title": "Gebäudetrocknung in Großlagen: Kapazitätsplanung und Qualitätskontrolle",
-          "focus": "Gebäudetrocknung",
-          "audience": "Regulierer"
-        },
-        {
-          "date": "2026-08-12",
-          "type": "LinkedIn-Lagebeitrag",
-          "title": "Koordination großer Schadenlagen: welche Statusdaten täglich gebraucht werden",
-          "focus": "Koordination großer Schadenlagen",
-          "audience": "Versicherer"
-        },
-        {
-          "date": "2026-08-14",
-          "type": "Praxisbeitrag",
-          "title": "Kumulschäden mit gemischten Ursachen: Leitfaden für belastbare Entscheidungen",
-          "focus": "Groß-/Kumulschäden in der Praxis",
-          "audience": "Versicherer"
-        }
-      ]
-    },
-    {
-      "weekLabel": "Abschlusswoche (17.08.-22.08.2026)",
-      "items": [
-        {
-          "date": "2026-08-17",
-          "type": "Fachbeitrag",
-          "title": "Zusammenarbeit in der Schlussphase: Übergabe, Restpunkte und Nachsteuerung",
-          "focus": "Zusammenarbeit Versicherer/Regulierer/Sachverständige",
-          "audience": "Regulierer"
-        },
-        {
-          "date": "2026-08-19",
-          "type": "LinkedIn-Lagebeitrag",
-          "title": "Regionale Lageeinordnung ohne Dramatisierung: Kriterien und Quellen",
-          "focus": "Reale Einordnung tatsächlicher Unwetterlagen",
-          "audience": "Geschädigte"
-        },
-        {
-          "date": "2026-08-21",
-          "type": "Praxisbeitrag",
-          "title": "Rückblick Unwetterschwerpunkt: bewährte Abläufe für kommende Lagen",
-          "focus": "Erfahrungen aus laufenden Einsätzen",
-          "audience": "Versicherer"
-        }
-      ]
-    }
-  ],
-  "imageGuideline": {
-    "requiredFor": [
-      "Fachbeitrag",
-      "Praxisbeitrag",
-      "LinkedIn-Lagebeitrag"
-    ],
-    "style": "Realistische Einsatzsituationen, hochwertige Dokumentation, klare technische Motive",
-    "motifs": [
-      "überflutete Gebäude in realen Wohn- oder Gewerbeumfeldern",
-      "Hagel- und Sturmschäden an Dach, Fassade und Gebäudehülle",
-      "technische Schadenaufnahme vor Ort",
-      "Außeneinsatz und Teamarbeit in der Schadenkoordination"
-    ],
-    "exclude": [
-      "übertriebene Katastrophenszenen",
-      "offensichtlich künstliche oder unrealistische KI-Motive",
-      "bildsprachliche Dramatisierung ohne fachlichen Bezug"
-    ]
-  }
+  "weekdayRule": "Regionaler Anlass im Suchraum um Aalen bevorzugt; bei fehlender belastbarer Meldung allgemeiner Fachbeitrag.",
+  "weekendRule": "Nur allgemeine Fachbeiträge ohne Vor-Ort-Suggestivformulierungen.",
+  "linkedinRule": "Zap-Auslösung erst nach erfolgreicher Live-URL-Prüfung.",
+  "seriesTopics": [
+    "Starkregen-Schadenmanagement",
+    "Groß- und Kumulschäden in der Praxis",
+    "Zusammenarbeit Versicherer/Regulierer/Sachverständige",
+    "Schadenaufnahme nach Elementarereignissen",
+    "Hagel, Überschwemmung, Rückstau, Sturm",
+    "Blitz- und Überspannungsschäden",
+    "Gebäudetrocknung",
+    "Koordination großer Schadenlagen"
+  ]
 }

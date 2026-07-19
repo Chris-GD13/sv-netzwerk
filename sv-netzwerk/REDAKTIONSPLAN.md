@@ -8,15 +8,13 @@ Kernaussage im Schwerpunktfenster:
 
 > Ab dem 22.07.2026 unterstützen wir gemeinsam mit unserem langjährigen Partner DIE REGULIERER Versicherungen und Geschädigte bei der Bearbeitung der aktuellen Unwetter- und Kumulschäden in den betroffenen Regionen.
 
-## Veröffentlichungsrhythmus im Schwerpunkt
+## Veröffentlichungsrhythmus (aktive Automation)
 
-| Tag | Aktion | Kanal | Ziel |
-|---|---|---|---|
-| Montag | Fachbeitrag zur aktuellen Unwetterlage und Regulierung | sv-netzwerk.eu | Einordnung für Versicherer und Regulierer |
-| Dienstag | LinkedIn-Lagebeitrag mit Verweis auf Website | LinkedIn | Laufende Lagekommunikation |
-| Mittwoch | LinkedIn-Lagebeitrag mit Fokus Schadenaufnahme/Priorisierung | LinkedIn | Operative Orientierung |
-| Donnerstag | LinkedIn-Lagebeitrag zu Praxisfragen aus Einsätzen | LinkedIn | Erwartungsmanagement und Transparenz |
-| Freitag | Praxisbericht oder Fachbeitrag zu typischen Unwetterschäden | sv-netzwerk.eu | Anwendungsorientierte Vertiefung |
+- Täglich (Mo-So) 05:15-06:40 Uhr: Fachbeitrag (Schwerpunkt Kumul-/Großschadenregulierung)
+- Täglich (Mo-So) 16:15-17:30 Uhr: zweiter, eigenständiger Fachbeitrag mit separatem Thema
+- Montag-Freitag: möglichst regionaler Aufhänger aus öffentlichen Meldungen im Suchraum um Aalen
+- Samstag-Sonntag: ausschließlich allgemeine Fachbeiträge ohne Vor-Ort-Suggestivformulierung
+- Zu jedem Beitrag: LinkedIn-Begleittext, Bilddatei, Zap-kompatible Übergabe nach erfolgreichem Live-Check
 
 ## Serienlogik und Themenabdeckung
 
@@ -57,11 +55,5 @@ Jeder Beitrag bleibt fachlich belastbar und enthält:
 - konsistente Struktur mit SEO-Titel und Meta-Description,
 - prüffähige Aussagen statt Marketingformulierungen,
 - interne Verlinkungen auf passende Leistungen, Schadenarten und Fachartikel.
-
-## Technische Verankerung und Automationen
-
-- Fachbeitrags-Takt Montag/Freitag bleibt mit bestehenden Workflows kompatibel.
-- LinkedIn-Begleittexte werden weiterhin dateibasiert in `src/content/linkedin/` geführt.
-- Bildauswahl für den LinkedIn-Flow nutzt eine präzisere, einsatzbezogene Suchlogik.
 
 Stand: 19.07.2026

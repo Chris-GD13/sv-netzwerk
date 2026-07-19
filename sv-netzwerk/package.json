@@ -10,7 +10,9 @@
     "preview": "astro preview",
     "check": "astro check",
     "validate:knowledge": "node scripts/validate-knowledge.mjs",
-    "validate:public-copy": "node scripts/validate-public-copy.mjs"
+    "validate:public-copy": "node scripts/validate-public-copy.mjs",
+    "fachbeitrag:run": "node scripts/run-fachbeitrag-automation.mjs",
+    "fachbeitrag:log": "node scripts/update-fachbeitrag-log.mjs"
   },
   "dependencies": {
     "@astrojs/check": "latest",

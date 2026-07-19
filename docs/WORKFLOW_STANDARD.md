@@ -8,9 +8,14 @@
 
 Änderungen erfolgen direkt im Repository. Gemeinsame Typen und Datenquellen werden bevorzugt. Unveröffentlichte Backendfunktionen werden als technischer Status klar ausgewiesen.
 
-## 3. Fachwissen prüfen
+## 3. Fachbeitrag automatisieren
 
-Der 06:00-Uhr-Lauf prüft, ob der Tagesbeitrag vollständig geplant und im Repository vorhanden ist. Der 14:00-Uhr-Lauf prüft erneut den veröffentlichungsfähigen Stand. GitHub-Zeitpläne laufen in UTC; die fachlich maßgebliche Zone ist Europe/Berlin. Die Automatisierung erzeugt und veröffentlicht keine Inhalte.
+Die produktive Automation erzeugt täglich zwei Fachbeiträge im Master-Repository:
+
+1. 05:15-06:40 Uhr Europe/Berlin
+2. 16:15-17:30 Uhr Europe/Berlin
+
+GitHub-Crons laufen in UTC; Sommer-/Winterzeit wird über duale UTC-Zeitpläne plus Laufzeitprüfung in `Europe/Berlin` abgesichert. LinkedIn wird erst nach erfolgreicher Live-URL-Prüfung ausgelöst.
 
 ## 4. Lokal validieren
 
@@ -23,4 +28,4 @@ Der 06:00-Uhr-Lauf prüft, ob der Tagesbeitrag vollständig geplant und im Repos
 
 ## 5. Veröffentlichen
 
-Nach dem vorgegebenen Commit wird nach `origin/main` gepusht. Build Check und Deployment werden vollständig abgewartet. Abschluss erfolgt erst, wenn `https://sv-netzwerk.eu/deploy-version.txt` exakt die neue Commit-ID ausweist und zentrale Routen erreichbar sind.
+Nach Commit erfolgt Push nach `origin/main`. Der Workflow prüft Build, Link- und Integrationsstatus, validiert die Live-URL des neuen Beitrags und übergibt erst danach den Zap-kompatiblen LinkedIn-Datensatz.

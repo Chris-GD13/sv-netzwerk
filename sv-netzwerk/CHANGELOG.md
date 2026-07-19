@@ -5,6 +5,14 @@
 - Fachbeitrags-Preflight für Nicht-Cadence-Tage stabilisiert
 - Produktiv-E2E-HTTP-Tests für Kontakt- und Schadenmeldung dokumentiert (aktuell `?fehler=mail`, Mailkonfiguration in Zielumgebung als Restblocker)
 
+## 3.4.0 – 2026-07-19
+- Fachbeitrags-Automation auf zwei tägliche Berlin-Zeitfenster umgestellt (05:15-06:40 und 16:15-17:30, DST-sicher über duale UTC-Crons plus Laufzeitprüfung)
+- konkurrierenden alten Fachbeitrags-Workflow entfernt und auf eine aktive Automation konsolidiert
+- neuer Generator für Fachbeiträge, Bilddatei, LinkedIn-Begleittext, Video-Skript, Library-Integration und Veröffentlichungsprotokoll ergänzt
+- Doppelausführungsschutz über Concurrency, Slot-ID, publication_id und Protokollprüfung ergänzt
+- LinkedIn-/Zap-Auslösung hinter Live-URL-Prüfung geschaltet
+- Redaktions-/Workflow-Dokumentation und Veröffentlichungsprotokoll ergänzt
+
 ## 3.3.0 – 2026-07-19
 - Recovery-Basis auf v7.05 abgeglichen und dokumentiert (`docs/recovery/analysis-v7.05-vs-current.md`)
 - Serverseitige Formular-Architektur konsolidiert: `anfrage.php`, `anfrage-versicherer.php`, `anfrage-gutachter-plattform.php`, `schadenmeldung.php` plus gemeinsamer Core-Handler mit Honeypot, Validierung, Logging und Eingangsbestätigung

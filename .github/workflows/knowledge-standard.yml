@@ -2,20 +2,26 @@ name: Fachbeitrags-Automation
 
 on:
   schedule:
-    # Europe/Berlin 06:00 bei Sommerzeit (UTC+2)
-    - cron: "0 4 * * 1,5"
-    # Europe/Berlin 06:00 bei Winterzeit (UTC+1)
-    - cron: "0 5 * * 1,5"
+    # Morgenslot 05:15-06:40 Europe/Berlin (DST-sicher via duale UTC-Crons)
+    - cron: "20 3 * * *"  # Sommerzeit (CEST, UTC+2)
+    - cron: "20 4 * * *"  # Winterzeit (CET, UTC+1)
+    # Nachmittagsslot 16:15-17:30 Europe/Berlin (DST-sicher via duale UTC-Crons)
+    - cron: "20 14 * * *" # Sommerzeit (CEST, UTC+2)
+    - cron: "20 15 * * *" # Winterzeit (CET, UTC+1)
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "sv-netzwerk/src/content/knowledge/**"
-      - "sv-netzwerk/src/content/linkedin/**"
-      - "sv-netzwerk/src/content/videos/**"
-      - "sv-netzwerk/src/data/library.ts"
-      - "sv-netzwerk/src/data/redaktionsplan.json"
-      - "sv-netzwerk/scripts/validate-knowledge.mjs"
-      - "sv-netzwerk/scripts/validate-fachbeitrag-preflight.mjs"
+    inputs:
+      slot:
+        description: "Erzwingt Zeitfenster (morning|afternoon); leer = automatische Slot-Erkennung"
+        required: false
+        type: choice
+        options:
+          - morning
+          - afternoon
+      force:
+        description: "Zeitfenster-/Duplikatschutz für Notfalllauf übersteuern"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -25,11 +31,16 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  publish-and-validate:
+  publish-and-notify:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     defaults:
       run:
         working-directory: sv-netzwerk
+    env:
+      TZ: Europe/Berlin
+      FACHBEITRAG_AUTOMATION_ENABLED: ${{ vars.FACHBEITRAG_AUTOMATION_ENABLED || 'true' }}
+
     steps:
       - name: Repository auschecken
         uses: actions/checkout@v4
@@ -43,52 +54,113 @@ jobs:
           cache: npm
           cache-dependency-path: sv-netzwerk/package-lock.json
 
-      - name: Laufzeitfenster in Europe/Berlin prüfen
-        id: run-window
-        if: github.event_name == 'schedule'
+      - name: Automationsschalter prüfen
+        if: env.FACHBEITRAG_AUTOMATION_ENABLED != 'true'
         run: |
-          berlin_hour="$(TZ=Europe/Berlin date +%H)"
-          if [ "$berlin_hour" != "06" ]; then
-            echo "allowed=false" >> "$GITHUB_OUTPUT"
-            echo "Außerhalb des 06:00-Europe/Berlin-Zeitfensters. Lauf wird beendet."
-            exit 0
-          fi
-          echo "allowed=true" >> "$GITHUB_OUTPUT"
+          echo "Fachbeitrags-Automation ist deaktiviert (Repo-Variable FACHBEITRAG_AUTOMATION_ENABLED)."
+          exit 0
 
       - name: Abhängigkeiten installieren
-        if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
         run: npm ci --no-audit --no-fund
 
-      - name: Berlin-Datum ermitteln
-        if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
-        run: echo "BERLIN_DATE=$(TZ=Europe/Berlin date +%F)" >> "$GITHUB_ENV"
+      - name: Fachbeitrag erzeugen
+        id: generate
+        run: |
+          FORCE_ARG=""
+          SLOT_ARG=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force }}" = "true" ]; then
+            FORCE_ARG="--force"
+          fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.slot }}" ]; then
+            SLOT_ARG="--slot=${{ inputs.slot }}"
+          fi
+          node scripts/run-fachbeitrag-automation.mjs $SLOT_ARG $FORCE_ARG
+          STATUS="$(node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('.automation/latest-publication.json','utf8'));process.stdout.write(data.status||'')")"
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          if [ "$STATUS" = "generated" ]; then
+            node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('.automation/latest-publication.json','utf8'));console.log('BERLIN_DATE='+data.berlinDate);console.log('PUBLICATION_ID='+data.publicationId);console.log('PUBLICATION_URL='+data.articleUrl);console.log('PUBLICATION_TITLE='+data.title.replace(/\n/g,' '));console.log('PUBLICATION_IMAGE_URL='+data.imageUrl);console.log('PUBLICATION_SLUG='+data.slug);console.log('PUBLICATION_SLOT='+data.slot);" >> "$GITHUB_ENV"
+          fi
 
-      - name: "Preflight: letzter Beitrag, Slugs, Fokus, Integrationsstand"
-        if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
+      - name: Bei Slot-Skip sauber beenden
+        if: steps.generate.outputs.status != 'generated'
+        run: echo "Kein Beitrag erzeugt (außerhalb Zeitfenster oder Slot bereits veröffentlicht)."
+
+      - name: Vorprüfung
+        if: steps.generate.outputs.status == 'generated'
         run: node scripts/validate-fachbeitrag-preflight.mjs "$BERLIN_DATE"
 
-      - name: Fachbeitragsstandard prüfen
-        if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
+      - name: Fachbeiträge validieren
+        if: steps.generate.outputs.status == 'generated'
         run: npm run validate:knowledge -- "$BERLIN_DATE"
 
       - name: Build ausführen
-        if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
+        if: steps.generate.outputs.status == 'generated'
         run: npm run build
 
-      - name: Build-Integration prüfen (Suche/Sitemap/Links)
-        if: github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true'
+      - name: Build-Integration prüfen
+        if: steps.generate.outputs.status == 'generated'
         run: npm run validate:knowledge -- --dist "$BERLIN_DATE"
 
-      - name: Commit und Push nach main (nur Automation-Läufe)
-        if: github.event_name != 'pull_request' && (github.event_name != 'schedule' || steps.run-window.outputs.allowed == 'true')
+      - name: Commit und Push
+        if: steps.generate.outputs.status == 'generated'
         run: |
           if git diff --quiet; then
-            echo "Keine Änderungen seit Checkout; kein Commit und kein Push."
+            echo "Keine Änderungen erzeugt."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "chore: publish fachbeitrag ${BERLIN_DATE}"
+          git commit -m "chore: publish fachbeitrag ${BERLIN_DATE} ${PUBLICATION_SLOT}"
           git push origin HEAD:main
-          echo "Push auf main erfolgreich. Deployment wird durch push-trigger in deploy.yml ausgelöst."
+          echo "PUBLISHED_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Live-URL prüfen
+        if: steps.generate.outputs.status == 'generated'
+        run: |
+          echo "Prüfe Live-URL: $PUBLICATION_URL"
+          ok=0
+          for i in {1..24}; do
+            status="$(curl -L -s -o /tmp/page.html -w '%{http_code}' "$PUBLICATION_URL" || true)"
+            if [ "$status" = "200" ] && grep -qi "$PUBLICATION_SLUG" /tmp/page.html; then
+              ok=1
+              break
+            fi
+            sleep 20
+          done
+          if [ "$ok" != "1" ]; then
+            echo "::error::Live-URL nicht erreichbar oder Inhalt noch nicht aktuell: $PUBLICATION_URL"
+            exit 1
+          fi
+
+      - name: LinkedIn-Zap auslösen (nach erfolgreichem Live-Check)
+        if: steps.generate.outputs.status == 'generated'
+        env:
+          WEBHOOK_URL: ${{ secrets.ZAPIER_WEBHOOK_URL }}
+        run: |
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "::error::ZAPIER_WEBHOOK_URL fehlt."
+            exit 1
+          fi
+          LINKEDIN_TEXT_FILE="src/content/linkedin/${BERLIN_DATE}_${PUBLICATION_SLUG}.txt"
+          FIRST_PARAGRAPH="$(head -n 8 "$LINKEDIN_TEXT_FILE" | tr '\n' ' ' | sed 's/"/\\"/g' | cut -c1-280)"
+          HASHTAGS="$(grep -Eo '#[[:alnum:]ÄÖÜäöüß]+' "$LINKEDIN_TEXT_FILE" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g' | sed 's/[[:space:]]$//')"
+          DESCRIPTION="$(node -e "const fs=require('fs');const raw=fs.readFileSync('src/content/knowledge/${PUBLICATION_SLUG}.md','utf8');const d=(raw.match(/^description:\s*\"([^\"]+)\"/m)||[])[1]||'';process.stdout.write(d.replace(/\n/g,' '));")"
+          PAYLOAD="$(cat <<EOF
+          {
+            "title": "${PUBLICATION_TITLE}",
+            "description": "${DESCRIPTION}",
+            "first_paragraph": "${FIRST_PARAGRAPH}",
+            "hashtags": "${HASHTAGS}",
+            "image_url": "${PUBLICATION_IMAGE_URL}",
+            "url": "${PUBLICATION_URL}",
+            "date": "${BERLIN_DATE}",
+            "slug": "${PUBLICATION_SLUG}",
+            "publication_id": "${PUBLICATION_ID}"
+          }
+          EOF
+          )"
+          curl --fail --show-error --silent -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            --retry 5 --retry-delay 5 --retry-all-errors
