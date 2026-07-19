@@ -1,7 +1,7 @@
 ---
 import { site } from '../data/site';
-interface Props { title: string; description: string; canonical?: string; image?: string; type?: 'website'|'article'; noindex?: boolean; }
-const { title, description, canonical = new URL(Astro.url.pathname, site.url).toString(), image = `${site.url}/og-default.svg`, type = 'website', noindex = false } = Astro.props;
+interface Props { title: string; description: string; canonical?: string; image?: string; imageAlt?: string; type?: 'website'|'article'; noindex?: boolean; }
+const { title, description, canonical = new URL(Astro.url.pathname, site.url).toString(), image = `${site.url}/og-default.svg`, imageAlt = 'SV-Netzwerk Fachbeitrag', type = 'website', noindex = false } = Astro.props;
 const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
 ---
 <title>{fullTitle}</title>
@@ -13,4 +13,7 @@ const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
 <meta property="og:type" content={type} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={image} />
+<meta property="og:image:alt" content={imageAlt} />
 <meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content={image} />
+<meta name="twitter:image:alt" content={imageAlt} />

@@ -8,6 +8,7 @@ const seoSchema = z.object({
   canonical: z.url().optional(),
   noindex: z.boolean().default(false),
   image: z.string().optional(),
+  imageAlt: z.string().max(180).optional(),
 });
 
 const publicationSchema = z.object({

@@ -105,8 +105,8 @@ jobs:
         if: steps.generate.outputs.status == 'generated'
         run: |
           if git diff --quiet; then
-            echo "Keine Änderungen erzeugt."
-            exit 0
+            echo "::error::Es wurden keine Änderungen erzeugt, obwohl der Generator einen Beitrag gemeldet hat."
+            exit 1
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -114,6 +114,10 @@ jobs:
           git commit -m "chore: publish fachbeitrag ${BERLIN_DATE} ${PUBLICATION_SLOT}"
           git push origin HEAD:main
           echo "PUBLISHED_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Veröffentlichungsprotokoll nach Push aktualisieren
+        if: steps.generate.outputs.status == 'generated'
+        run: node scripts/update-fachbeitrag-log.mjs --commit="$PUBLISHED_COMMIT" --deploy=triggered
 
       - name: Live-URL prüfen
         if: steps.generate.outputs.status == 'generated'
@@ -132,6 +136,10 @@ jobs:
             echo "::error::Live-URL nicht erreichbar oder Inhalt noch nicht aktuell: $PUBLICATION_URL"
             exit 1
           fi
+
+      - name: Veröffentlichungsprotokoll nach Live-Check aktualisieren
+        if: steps.generate.outputs.status == 'generated'
+        run: node scripts/update-fachbeitrag-log.mjs --deploy=success --live=success
 
       - name: LinkedIn-Zap auslösen (nach erfolgreichem Live-Check)
         if: steps.generate.outputs.status == 'generated'
@@ -164,3 +172,24 @@ jobs:
             -H "Content-Type: application/json" \
             -d "$PAYLOAD" \
             --retry 5 --retry-delay 5 --retry-all-errors
+
+      - name: Veröffentlichungsprotokoll nach LinkedIn aktualisieren
+        if: steps.generate.outputs.status == 'generated'
+        run: node scripts/update-fachbeitrag-log.mjs --linkedin=success
+
+      - name: Veröffentlichungsprotokoll committen
+        if: steps.generate.outputs.status == 'generated'
+        run: |
+          if git diff --quiet -- docs/fachbeitrag-veroeffentlichungsprotokoll.csv; then
+            echo "Keine Protokolländerungen zu committen."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/fachbeitrag-veroeffentlichungsprotokoll.csv
+          git commit -m "chore: update fachbeitrag protocol ${BERLIN_DATE} ${PUBLICATION_SLOT}"
+          git push origin HEAD:main
+
+      - name: Fehlstatus ins Veröffentlichungsprotokoll schreiben
+        if: failure() && steps.generate.outputs.status == 'generated'
+        run: node scripts/update-fachbeitrag-log.mjs --deploy=failed --live=failed --linkedin=failed

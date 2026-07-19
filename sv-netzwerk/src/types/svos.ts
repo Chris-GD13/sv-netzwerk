@@ -6,6 +6,7 @@ export interface SeoMetadata {
   canonical?: string;
   noindex?: boolean;
   image?: string;
+  imageAlt?: string;
 }
 
 export interface PublicationMetadata {

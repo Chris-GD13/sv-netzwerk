@@ -24,6 +24,11 @@ const REGION_HINTS = [
   'Aalen', 'Ostalbkreis', 'Schwäbisch Gmünd', 'Heidenheim', 'Ulm', 'Göppingen', 'Stuttgart',
   'Ludwigsburg', 'Esslingen', 'Ansbach', 'Nördlingen', 'Ellwangen', 'Backnang', 'Rems-Murr',
 ];
+const EVENT_HINTS = [
+  'starkregen', 'hochwasser', 'überflutung', 'ueberflutung', 'rückstau', 'rueckstau',
+  'hagel', 'sturm', 'tornado', 'schneedruck', 'unwetter', 'gebäudebrand', 'gebaeudebrand',
+  'brand', 'feuerwehreinsatz', 'evakuierung', 'katastrophe',
+];
 
 const TOPICS = [
   {
@@ -106,7 +111,8 @@ const detectSlot = () => {
   return null;
 };
 
-const selectedSlot = argValue('slot') ?? detectSlot();
+const selectedSlotInput = argValue('slot');
+const selectedSlot = selectedSlotInput ?? detectSlot();
 const force = hasArg('force');
 if (!selectedSlot) {
   if (!force) {
@@ -125,6 +131,18 @@ if (!selectedSlot) {
 const slot = selectedSlot ?? 'morning';
 if (!['morning', 'afternoon'].includes(slot)) {
   throw new Error(`Ungültiger Slot: ${slot}`);
+}
+if (!force && !inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].to)) {
+  await mkdir(automationDir, { recursive: true });
+  await writeFile(runtimeFile, JSON.stringify({
+    status: 'skipped',
+    reason: `outside-window:${slot}:${berlinTime}`,
+    berlinDate,
+    berlinTime,
+    berlinTimeZone: BERLIN,
+    slot,
+  }, null, 2));
+  process.exit(0);
 }
 
 const isWeekend = berlinWeekday === 0 || berlinWeekday === 6;
@@ -150,6 +168,13 @@ const fileExists = async (file) => {
 };
 
 const csvEscape = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`;
+const normalizeText = (value) => value
+  .toLocaleLowerCase('de-DE')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/ß/g, 'ss')
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/(^-|-$)/g, '');
 
 const readPublicationRows = async () => {
   const source = await readText(publicationLogFile);
@@ -229,14 +254,29 @@ const makeImageSvg = (title, subtitle) => `<?xml version="1.0" encoding="UTF-8"?
 
 await mkdir(automationDir, { recursive: true });
 const publicationRows = await readPublicationRows();
-const alreadySuccessful = publicationRows.some((row) => row.date === berlinDate && row.slot === SLOT_WINDOWS[slot].label && row.deploy_status === 'success' && row.live_pruefung === 'success');
-if (alreadySuccessful && !force) {
+const slotLabel = SLOT_WINDOWS[slot].label;
+const existingSlotRows = publicationRows.filter((row) => row.date === berlinDate && row.slot === slotLabel);
+const alreadySuccessful = existingSlotRows.some((row) => row.deploy_status === 'success' && row.live_pruefung === 'success');
+if (alreadySuccessful) {
   await writeFile(runtimeFile, JSON.stringify({
     status: 'skipped',
     reason: 'slot-already-published',
     berlinDate,
     slot,
     publicationId,
+  }, null, 2));
+  process.exit(0);
+}
+if (existingSlotRows.length > 0 && !force) {
+  await writeFile(runtimeFile, JSON.stringify({
+    status: 'skipped',
+    reason: 'slot-already-recorded',
+    berlinDate,
+    berlinTime,
+    berlinTimeZone: BERLIN,
+    slot,
+    publicationId,
+    existingPublicationId: existingSlotRows[0].publication_id || '',
   }, null, 2));
   process.exit(0);
 }
@@ -253,7 +293,9 @@ if (weekdayRegional) {
       const nowTs = Date.now();
       const candidates = extractRssItems(xml)
         .filter((item) => Number.isFinite(item.pubDate.getTime()) && Math.abs(nowTs - item.pubDate.getTime()) <= 1000 * 60 * 60 * 72)
-        .filter((item) => REGION_HINTS.some((hint) => item.title.toLowerCase().includes(hint.toLowerCase())));
+        .filter((item) => REGION_HINTS.some((hint) => item.title.toLowerCase().includes(hint.toLowerCase())))
+        .filter((item) => EVENT_HINTS.some((hint) => item.title.toLowerCase().includes(hint)))
+        .sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
       if (candidates.length > 0) regionalSignal = candidates[0];
     }
   } catch {
@@ -268,6 +310,7 @@ const articleUrl = `https://www.sv-netzwerk.eu/fachwissen/${slug}/`;
 const imageFileName = `${slug}.svg`;
 const imageWebPath = `/assets/images/linkedin/${imageFileName}`;
 const imageUrl = `https://www.sv-netzwerk.eu${imageWebPath}`;
+const imageAlt = `Symbolbild: ${topic.category} im Kontext der Schadenregulierung und Kumulschadensteuerung`;
 const metaDescription = `${topic.category}: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.`;
 const teaser = regionalSignal
   ? `Öffentlich berichtete Lagemeldungen aus der Region zeigen erhöhten Handlungsdruck. Entscheidend bleibt die fachlich saubere Trennung von Feststellung, Bewertung und Empfehlung.`
@@ -363,6 +406,7 @@ const frontmatter = [
   `  description: "${metaDescription}"`,
   `  canonical: "${articleUrl}"`,
   `  image: "${imageUrl}"`,
+  `  imageAlt: "${imageAlt}"`,
   '---',
   '',
 ].join('\n');
@@ -370,6 +414,15 @@ const frontmatter = [
 const knowledgePath = path.join(knowledgeDir, `${slug}.md`);
 if (await fileExists(knowledgePath)) {
   throw new Error(`Beitrag existiert bereits: ${knowledgePath}`);
+}
+const titleKey = normalizeText(title);
+const knowledgeFiles = (await readdir(knowledgeDir)).filter((file) => /\.mdx?$/.test(file));
+for (const file of knowledgeFiles) {
+  const source = await readText(path.join(knowledgeDir, file));
+  const existingTitle = source.match(/^title:\s*"([^"]+)"/m)?.[1] ?? '';
+  if (existingTitle && normalizeText(existingTitle) === titleKey) {
+    throw new Error(`Titel bereits vorhanden: ${existingTitle} (${file})`);
+  }
 }
 
 await mkdir(imageDir, { recursive: true });
@@ -433,7 +486,7 @@ if (!changelogSource.includes(logLine)) {
   await writeFile(changelogFile, updated);
 }
 
-const headers = ['date', 'slot', 'title', 'url', 'category', 'anlass', 'quellen', 'bilddatei', 'linkedin_status', 'commit', 'deploy_status', 'live_pruefung', 'topic_id', 'publication_id'];
+const headers = ['date', 'slot', 'title', 'url', 'category', 'anlass', 'quellen', 'bilddatei', 'bild_alt_text', 'linkedin_status', 'commit', 'deploy_status', 'live_pruefung', 'topic_id', 'publication_id'];
 if (!(await fileExists(publicationLogFile))) {
   await mkdir(path.dirname(publicationLogFile), { recursive: true });
   await writeFile(publicationLogFile, `${headers.map(csvEscape).join(',')}\n`);
@@ -449,6 +502,7 @@ const csvRow = [
   anlass,
   sources.join(' | '),
   imageWebPath,
+  imageAlt,
   'pending',
   'pending',
   'pending',
@@ -474,6 +528,7 @@ const runtime = {
   articleUrl,
   imageWebPath,
   imageUrl,
+  imageAlt,
   knowledgePath: path.relative(root, knowledgePath).replaceAll('\\', '/'),
   linkedinPath: `src/content/linkedin/${berlinDate}_${slug}.txt`,
   videoPath: `src/content/videos/${berlinDate}_wissen-in-180-sekunden_${slug}.txt`,
