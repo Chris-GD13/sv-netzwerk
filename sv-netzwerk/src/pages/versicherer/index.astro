@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Hero from '../../components/Hero.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import FeatureCard from '../../components/FeatureCard.astro';
 
@@ -27,26 +26,15 @@ const modules = [
   description="Schadenservice für Versicherer mit direktem Einstieg für Groß- und Kumulschadenlagen."
   breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Für Versicherer' }]}
 >
-  <Hero
-    compact
-    eyebrow="Versicherer"
-    title="Schnelle, belastbare Steuerung komplexer Schäden."
-    text="Direkte Einstiege für Großschäden und Kumulereignisse, klare Ansprechpartner und eine schnelle Beauftragungsübermittlung."
-    primaryLabel="Anfrage / Beauftragung"
-    primaryHref="#anfrage"
-    secondaryLabel="Großschadenregulierung"
-    secondaryHref="/grossschadenregulierung/"
-  />
-
   <section class="sv-section">
-    <div class="sv-container">
-      <SectionHeader eyebrow="Direkteinstiege" title="Sofort in die passende Bearbeitung wechseln" />
-      <div class="sv-grid sv-grid-3">
-        {modules.map((module, index) => <FeatureCard index={`0${index + 1}`} title={module.title} text={module.text} />)}
-      </div>
+    <div class="sv-container entry-header">
+      <p class="sv-eyebrow">Versicherer</p>
+      <h1>Anfrage oder Beauftragung direkt erfassen</h1>
+      <p class="sv-lead">Schadenart, Vorgangsdaten und Leistungsumfang werden direkt im Formular übermittelt.</p>
       <div class="quick-links">
-        <a class="sv-button sv-button-primary" href="/grossschadenregulierung/">Direkteinstieg Großschaden</a>
-        <a class="sv-button sv-button-secondary" href="/leistungen/kumulschadenmanagement/">Direkteinstieg Kumulschaden</a>
+        <a class="sv-button sv-button-primary" href="#anfrage">Anfrage / Beauftragung</a>
+        <a class="sv-button sv-button-secondary" href="/grossschadenregulierung/#grossschaden-formular">Direkteinstieg Großschaden</a>
+        <a class="sv-button sv-button-secondary" href="/leistungen/kumulschadenmanagement/#kumulschaden-formular">Direkteinstieg Kumulschaden</a>
       </div>
     </div>
   </section>
@@ -128,9 +116,21 @@ const modules = [
       </article>
     </div>
   </section>
+
+  <section class="sv-section">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Direkteinstiege" title="Sofort in die passende Bearbeitung wechseln" />
+      <div class="sv-grid sv-grid-3">
+        {modules.map((module, index) => <FeatureCard index={`0${index + 1}`} title={module.title} text={module.text} />)}
+      </div>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
+  .entry-header{display:grid;gap:1rem}
+  .entry-header h1{margin:0}
+  .entry-header .sv-lead{margin:0}
   .quick-links{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1.25rem}
   .form-layout{display:grid;grid-template-columns:minmax(16rem,.75fr) minmax(0,1.25fr);gap:2rem}
   .contacts,.form-card{padding:clamp(1.4rem,3vw,2.2rem)}
@@ -146,5 +146,5 @@ const modules = [
   .status.success{background:#e7f7ef;border:1px solid #6db58d;color:#174f31}
   .status.error{background:#fbe9e9;border:1px solid #cc7e7e;color:#6d1f1f}
   .hp-field{position:absolute;left:-100vw;width:1px;height:1px;opacity:0}
-  @media (max-width:58rem){.form-layout{grid-template-columns:1fr}.form-grid,.check-grid{grid-template-columns:1fr}}
+  @media (max-width:58rem){.quick-links,.form-layout{display:grid;grid-template-columns:1fr}.form-grid,.check-grid{grid-template-columns:1fr}}
 </style>

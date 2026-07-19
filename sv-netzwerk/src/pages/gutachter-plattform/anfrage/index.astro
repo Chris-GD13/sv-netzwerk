@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import Hero from '../../../components/Hero.astro';
 
 const sent = Astro.url.searchParams.get('gesendet') === '1';
 const error = Astro.url.searchParams.get('fehler');
@@ -11,12 +10,13 @@ const error = Astro.url.searchParams.get('fehler');
   description="Anfrageformular für Demo, Zugang und Zusammenarbeit auf der Gutachter-Plattform."
   breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Gutachter-Plattform', href: '/gutachter-plattform/' }, { label: 'Anfrage' }]}
 >
-  <Hero
-    compact
-    eyebrow="Gutachter-Plattform Anfrage"
-    title="Kontakt zur Plattform aufnehmen."
-    text="Anfragen zu Demo, Zugang oder Zusammenarbeit werden geprüft und direkt an den Plattformbetrieb weitergeleitet."
-  />
+  <section class="sv-section">
+    <div class="sv-container entry-header">
+      <p class="sv-eyebrow">Gutachter-Plattform Anfrage</p>
+      <h1>Kontakt zur Plattform direkt aufnehmen</h1>
+      <p class="sv-lead">Anfragen zu Zugang, Demo oder Zusammenarbeit werden direkt an den Plattformbetrieb weitergeleitet.</p>
+    </div>
+  </section>
 
   <section class="sv-section">
     <div class="sv-container grid">
@@ -77,6 +77,9 @@ const error = Astro.url.searchParams.get('fehler');
 </BaseLayout>
 
 <style>
+  .entry-header{display:grid;gap:1rem}
+  .entry-header h1{margin:0}
+  .entry-header .sv-lead{margin:0}
   .grid{display:grid;grid-template-columns:minmax(16rem,.8fr) minmax(0,1.2fr);gap:2rem}
   .sv-card{padding:clamp(1.4rem,3vw,2.2rem)}
   form{display:grid;gap:.85rem}
