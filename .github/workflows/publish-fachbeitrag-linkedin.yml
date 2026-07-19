@@ -7,6 +7,11 @@ on:
     # Wir verwenden 04:30 UTC als Kompromiß (näher am gewünschten 05:30 Berlin)
     - cron: '30 4 * * 1,5'  # Montag (1) und Freitag (5) um 04:30 UTC
   workflow_dispatch:  # Manuelle Auslösung erlaubt
+    inputs:
+      article_slug:
+        description: "Optionaler Slug für gezielte Veröffentlichung (z. B. kumulschaeden-in-der-region-priorisierung-koordination-dokumentation)"
+        required: false
+        type: string
 
 jobs:
   publish_and_notify:
@@ -32,9 +37,27 @@ jobs:
         id: latest_fachbeitrag
         run: |
           cd sv-netzwerk
-          
-          # Finde die neueste Fachbeitrag-Datei
-          LATEST_FILE=$(find src/content/knowledge -maxdepth 1 -name '*.md' -type f ! -name 'svos-foundation.md' | sort | tail -1)
+
+          SELECTED_SLUG="${{ github.event.inputs.article_slug }}"
+
+          if [ -n "$SELECTED_SLUG" ]; then
+            # Harte Validierung: bei gesetztem Input muss die Datei exakt existieren
+            if ! echo "$SELECTED_SLUG" | grep -Eq '^[a-z0-9]+(-[a-z0-9]+)*$'; then
+              echo "error=invalid_article_slug" >> $GITHUB_OUTPUT
+              echo "Invalid article_slug: $SELECTED_SLUG"
+              exit 1
+            fi
+
+            LATEST_FILE="src/content/knowledge/${SELECTED_SLUG}.md"
+            if [ ! -f "$LATEST_FILE" ]; then
+              echo "error=article_slug_not_found" >> $GITHUB_OUTPUT
+              echo "Article not found for slug: $SELECTED_SLUG"
+              exit 1
+            fi
+          else
+            # Finde die neueste Fachbeitrag-Datei (bestehendes Verhalten)
+            LATEST_FILE=$(find src/content/knowledge -maxdepth 1 -name '*.md' -type f ! -name 'svos-foundation.md' | sort | tail -1)
+          fi
           
           if [ -z "$LATEST_FILE" ]; then
             echo "error=no_fachbeitrag_found" >> $GITHUB_OUTPUT
@@ -46,7 +69,10 @@ jobs:
           DESCRIPTION=$(grep -m 1 '^description:' "$LATEST_FILE" | sed 's/^description: *"//' | sed 's/"$//')
           SLUG=$(basename "$LATEST_FILE" .md)
           TAGS=$(grep '^tags:' "$LATEST_FILE" | sed 's/^tags: *\[//' | sed 's/\]$//' | sed 's/"//g' | sed 's/, /|/g')
-          DATE=$(grep -m 1 '^pubDate:' "$LATEST_FILE" | sed 's/^pubDate: *\[//' | sed 's/\].*//' | sed 's/"//g')
+          DATE=$(grep -m 1 '^  publishedAt:' "$LATEST_FILE" | sed 's/^  publishedAt: *//')
+          if [ -z "$DATE" ]; then
+            DATE=$(grep -m 1 '^pubDate:' "$LATEST_FILE" | sed 's/^pubDate: *\[//' | sed 's/\].*//' | sed 's/"//g')
+          fi
           
           # Extrahiere den ersten Absatz (erste ~300 Zeichen nach dem Frontmatter)
           FIRST_PARAGRAPH=$(tail -n +26 "$LATEST_FILE" | head -20 | grep -v '^$' | head -1 | cut -c1-280)
@@ -67,6 +93,7 @@ jobs:
           echo "first_paragraph=$FIRST_PARAGRAPH" >> $GITHUB_OUTPUT
           echo "hashtags=$HASHTAGS" >> $GITHUB_OUTPUT
           echo "file=$LATEST_FILE" >> $GITHUB_OUTPUT
+          echo "Using article file: $LATEST_FILE"
       
       - name: Fetch realistic field image from Unsplash
         id: unsplash_image
