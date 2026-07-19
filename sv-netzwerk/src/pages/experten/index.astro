@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Hero from '../../components/Hero.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import FeatureCard from '../../components/FeatureCard.astro';
 import ExpertCard from '../../components/platform/ExpertCard.astro';
@@ -19,16 +18,16 @@ const regions = [...new Set(specialists.flatMap((expert) => expert.regions))].so
 const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].sort((a, b) => a.localeCompare(b, 'de'));
 ---
 <BaseLayout title="Experten | Menschen im SV-Netzwerk" description="Sachverständige, Regulierer, Fachpartner und vernetzte Zusammenarbeit im SV-Netzwerk." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Experten' }]}>
-  <Hero compact eyebrow="Die Menschen im Netzwerk" title="Unsere Experten im SV-Netzwerk." text="Fachgebiete, Regionen, Qualifikationen und persönliche Verantwortung auf einen Blick." />
 
-  <section class="sv-section" id="netzwerkuebersicht">
+  <section class="sv-section" id="sachverstaendige">
     <div class="sv-container">
-      <SectionHeader eyebrow="Netzwerkübersicht" title="Netzwerk, Fachpartner und Zusammenarbeit integriert" text="Der Expertenbereich verbindet Profilinformationen mit Netzwerkstrukturen, Fachpartnern, Regionen und der digitalen Zusammenarbeit über SVOS und Gutachter-Plattform." />
-      <div class="network-grid">
-        <a class="sv-card network-link" href="/netzwerk/"><h3>Netzwerk</h3><p>Organisation, Rollen und fachliche Zuständigkeiten im Gesamtverbund.</p></a>
-        <a class="sv-card network-link" href="/partner/"><h3>Fachpartner</h3><p>Spezialisierte Partner für ergänzende Gewerke und Sonderthemen.</p></a>
-        <a class="sv-card network-link" href="/ueber-uns/"><h3>Über uns</h3><p>Selbstverständnis, Qualitätsanspruch und Verantwortung des SV-Netzwerks.</p></a>
-        <a class="sv-card network-link" href="/svos/"><h3>SVOS</h3><p>Gemeinsame Daten-, Fachartikel- und Prozessstruktur als Grundlage der Zusammenarbeit.</p></a>
+      <h1 class="page-headline">Unsere Sachverständigen und Regulierer</h1>
+      <div class="experts-grid" data-filter-grid>
+        {specialists.map((expert) => (
+          <div data-filter-item data-name={expert.name} data-regions={expert.regions.join('|')} data-fields={expert.expertise.join('|')}>
+            <ExpertCard expert={expert} />
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -54,19 +53,6 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
         </label>
       </div>
       <p class="filter-result" data-filter-count></p>
-    </div>
-  </section>
-
-  <section class="sv-section" id="sachverstaendige">
-    <div class="sv-container">
-      <SectionHeader eyebrow="Sachverständige und Regulierer" title="Alle fachlichen Experten im Netzwerk" text="Profile mit Fachgebieten, Qualifikationen, Einsatzregionen und persönlichen Ansprechpartnern." />
-      <div class="experts-grid" data-filter-grid>
-        {specialists.map((expert) => (
-          <div data-filter-item data-name={expert.name} data-regions={expert.regions.join('|')} data-fields={expert.expertise.join('|')}>
-            <ExpertCard expert={expert} />
-          </div>
-        ))}
-      </div>
     </div>
   </section>
 
@@ -174,10 +160,7 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
 </script>
 
 <style>
-  .network-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
-  .network-link{display:grid;gap:.5rem;padding:1.25rem;text-decoration:none}
-  .network-link h3{margin:0;font-family:var(--sv-font-sans);font-size:1.1rem}
-  .network-link p{margin:0;color:var(--sv-color-muted)}
+  .page-headline{margin:0 0 1.5rem;font-family:var(--sv-font-sans);font-size:clamp(1.5rem,4vw,2.25rem);font-weight:900;color:var(--sv-color-ink)}
   .filter-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-lg);background:rgba(255,255,255,.72)}
   .filter-panel label{display:grid;gap:.4rem;font-weight:800}
   .filter-panel input,.filter-panel select{padding:.78rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:#fff;font:inherit}
@@ -191,6 +174,6 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
   .publications-grid article{display:grid;gap:.8rem;padding:1.3rem}
   .publications-grid h2{margin:0;font-family:var(--sv-font-sans);font-size:1.25rem}
   .publications-grid p{margin:0;color:var(--sv-color-muted)}
-  @media(max-width:64rem){.network-grid,.experts-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media(max-width:48rem){.network-grid,.intro,.split,.experts-grid,.experts-grid--backoffice,.filter-panel,.publications-grid{grid-template-columns:1fr}}
+  @media(max-width:64rem){.experts-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:48rem){.intro,.split,.experts-grid,.experts-grid--backoffice,.filter-panel,.publications-grid{grid-template-columns:1fr}}
 </style>
