@@ -3,9 +3,10 @@ import type { NavItem } from '../data/navigation';
 
 interface Props { item: NavItem; id: string; currentPath: string }
 const { item, id, currentPath } = Astro.props;
+const normalizeHref = (href: string) => href.split('#')[0] || href;
 const active = (href: string) => {
-  if (href.includes('#')) return false;
-  return href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+  const normalizedHref = normalizeHref(href);
+  return normalizedHref === '/' ? currentPath === '/' : currentPath.startsWith(normalizedHref);
 };
 ---
 
@@ -13,6 +14,10 @@ const active = (href: string) => {
   <div class="mega-menu__overview">
     <span>{item.label}</span>
     <h2>{item.description}</h2>
+    <a href={item.href} aria-current={active(item.href) ? 'page' : undefined}>
+      Allgemeine Schadenmeldung
+      <b>direkt aufrufen</b>
+    </a>
   </div>
   <div class="mega-menu__links">
     {item.children?.map((child, index) => (
