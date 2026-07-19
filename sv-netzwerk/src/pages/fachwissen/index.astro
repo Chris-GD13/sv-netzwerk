@@ -7,46 +7,17 @@ import AlphabeticalNavigation from '../../components/AlphabeticalNavigation.astr
 import SectionHeader from '../../components/SectionHeader.astro';
 import FeatureCard from '../../components/FeatureCard.astro';
 import { PAGE_SIZE, sortedLibrary } from '../../data/library';
-import redaktionsplan from '../../data/redaktionsplan.json';
 
 const pageItems = sortedLibrary.slice(0, PAGE_SIZE);
 const totalPages = Math.ceil(sortedLibrary.length / PAGE_SIZE);
-const weeklySeries = redaktionsplan.series.slice(0, 4);
 ---
 <BaseLayout title="Fachartikel | SV-Netzwerk" description="Technische und regulierungsrelevante Fachartikel zu Leitungswasser-, Brand-, Feuchte-, Gebaeude- und Komplexschaeden.">
-  <section class="sv-section sv-section-alt focus-strip">
-    <div class="sv-container">
-      <p class="sv-eyebrow">4-Wochen-Schwerpunkt {redaktionsplan.focusWindow.from} bis {redaktionsplan.focusWindow.to}</p>
-      <h2>Kumul- und Unwetterschaeden: Serie fuer Versicherer, Regulierer und Geschaedigte</h2>
-      <p>{redaktionsplan.focusWindow.fieldNotice}</p>
-      <div class="focus-links">
-        <a class="sv-button sv-button-secondary" href="/versicherer/">Fuer Versicherer</a>
-        <a class="sv-button sv-button-secondary" href="/gutachter-plattform/fuer-regulierer/">Fuer Regulierer</a>
-        <a class="sv-button sv-button-primary" href="/schaden-melden/">Fuer Geschaedigte</a>
-      </div>
-    </div>
-  </section>
   <section class="sv-section knowledge-index">
     <div class="sv-container">
       <LibraryFilters />
       <AlphabeticalNavigation items={sortedLibrary} />
       <LibraryGrid items={pageItems} />
       <Pagination currentPage={1} totalPages={totalPages} />
-    </div>
-  </section>
-  <section class="sv-section" id="serienlogik" aria-labelledby="serienlogik-title">
-    <div class="sv-container">
-      <SectionHeader id="serienlogik-title" eyebrow="Serienlogik" title="Wochenstruktur fuer den Schwerpunktzeitraum" text="Montag und Freitag erscheinen Fach- und Praxisbeitraege. Dazwischen informieren LinkedIn-Lagebeitraege regelmaessig ueber Einordnung, Priorisierung und offene Praxisfragen." />
-      <div class="series-grid">
-        {weeklySeries.map((week) => (
-          <article class="sv-card">
-            <h3>{week.weekLabel}</h3>
-            <ul>
-              {week.items.map((item) => <li><strong>{item.date} · {item.type}:</strong> {item.title}</li>)}
-            </ul>
-          </article>
-        ))}
-      </div>
     </div>
   </section>
   <section class="sv-section sv-section-alt" id="normen-rechtsprechung" aria-labelledby="normen-title">
@@ -62,14 +33,5 @@ const weeklySeries = redaktionsplan.series.slice(0, 4);
 </BaseLayout>
 
 <style>
-  .focus-strip h2{margin:.2rem 0 .6rem}
-  .focus-strip p{margin:0;max-width:82ch;color:var(--sv-color-muted)}
-  .focus-links{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1rem}
   .knowledge-index{padding-top:clamp(1.5rem,4vw,3rem)}
-  .series-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
-  .series-grid .sv-card{padding:1.1rem 1.2rem}
-  .series-grid h3{margin:.2rem 0 .6rem;font-size:1.02rem}
-  .series-grid ul{margin:0;padding-left:1rem;display:grid;gap:.45rem}
-  .series-grid li{color:var(--sv-color-muted)}
-  @media(max-width:58rem){.series-grid{grid-template-columns:1fr}}
 </style>
