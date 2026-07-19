@@ -5,36 +5,41 @@ import SectionHeader from '../../components/SectionHeader.astro';
 import FeatureCard from '../../components/FeatureCard.astro';
 import CallToAction from '../../components/CallToAction.astro';
 
-const items = [
+const roleBenefits = [
   {
-    title: 'Fuer Versicherer',
-    text: 'Transparente Auftragsteuerung mit klarer Zuordnung, Statussicht und dokumentierten Entscheidungen.',
-    href: '/gutachter-plattform/fuer-versicherungen/'
+    title: 'Vorteile fuer Versicherer',
+    text: 'Skalierbare Steuerung mit klaren Statusübersichten, bundeseinheitlichen Qualitätskriterien und nachvollziehbarer Entscheidungsgrundlage.',
   },
   {
-    title: 'Fuer Regulierer',
-    text: 'Strukturierte Unterlagenpruefung, Rueckfragenfuehrung und belastbare Freigabegrundlagen.',
-    href: '/gutachter-plattform/fuer-regulierer/'
+    title: 'Vorteile fuer Regulierer',
+    text: 'Prueffaehige Unterlagen, transparente Freigaben und strukturierte Rueckfragenfuehrung ohne Medienbrueche.',
   },
   {
-    title: 'Fuer Sachverstaendige',
-    text: 'Saubere Aktenstruktur, standardisierte Berichtspfade und konsistente Qualitaetsanforderungen.',
-    href: '/gutachter-plattform/fuer-sachverstaendige/'
-  }
+    title: 'Vorteile fuer Sachverstaendige',
+    text: 'Saubere Aktenstruktur, standardisierte Prozesse und digitale Zusammenarbeit mit klaren Schnittstellen.',
+  },
+];
+
+const platformPillars = [
+  { title: 'Bundesweite Verfuegbarkeit', text: 'Regionale Einsatzfaehigkeit mit zentraler Koordination und schneller Vermittlung passender Experten.' },
+  { title: 'Qualitaetsstandards', text: 'Einheitliche Vorgangsstruktur, eindeutige Verantwortlichkeiten und dokumentierte Bewertungswege.' },
+  { title: 'Digitale Zusammenarbeit', text: 'Alle Beteiligten arbeiten auf einer gemeinsamen Datenbasis mit transparenten Prozessschritten.' },
+  { title: 'Schnelle Vermittlung', text: 'Auftragsklarheit, Fachgebiet und Region werden strukturiert abgeglichen und priorisiert zugeordnet.' },
+  { title: 'Transparente Prozesse', text: 'Status, offene Punkte und Entscheidungsstaende bleiben fuer alle berechtigten Rollen nachvollziehbar.' },
 ];
 ---
 
 <BaseLayout
-  title="Gutachter-Plattform"
-  description="Digitale Plattform fuer strukturierte Zusammenarbeit zwischen Versicherern, Regulierern und Sachverstaendigen."
+  title="Gutachter-Plattform | Herzstueck der Zusammenarbeit"
+  description="Die Gutachter-Plattform ist das Herzstueck des SV-Netzwerks fuer Versicherer, Regulierer und Sachverstaendige."
   breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Gutachter-Plattform' }]}
 >
   <Hero
     compact
     eyebrow="Gutachter-Plattform"
-    title="Digitale Zusammenarbeit ohne Medienbrueche."
-    text="Die Plattform verbindet Beauftragungen, Dokumentation und fachliche Qualitaet in einem klaren Prozessmodell."
-    primaryLabel="Plattform-Anfrage senden"
+    title="Das Herzstueck des SV-Netzwerks."
+    text="Die Plattform verbindet Versicherer, Regulierer und Sachverstaendige in einem digitalen Arbeitsmodell mit klaren Qualitaetsstandards."
+    primaryLabel="Jetzt unverbindlich Zugang anfragen"
     primaryHref="/gutachter-plattform/anfrage/"
     secondaryLabel="Demo buchen"
     secondaryHref="/gutachter-plattform/demo-buchen/"
@@ -42,14 +47,35 @@ const items = [
 
   <section class="sv-section">
     <div class="sv-container">
-      <SectionHeader eyebrow="Zielgruppen" title="Direkter Einstieg nach Rolle" />
+      <SectionHeader eyebrow="Rollenbezogene Vorteile" title="Klarer Nutzen fuer alle Beteiligten" />
       <div class="sv-grid sv-grid-3">
-        {items.map((item, index) => (
-          <a class="entry-card" href={item.href}>
-            <FeatureCard index={`0${index + 1}`} title={item.title} text={item.text} />
-          </a>
+        {roleBenefits.map((item, index) => (
+          <FeatureCard index={`0${index + 1}`} title={item.title} text={item.text} />
         ))}
       </div>
+    </div>
+  </section>
+
+  <section class="sv-section sv-section-alt" id="plattform-funktionen">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Plattformmerkmale" title="Digital, transparent und bundesweit einsetzbar" />
+      <div class="pillars-grid">
+        {platformPillars.map((item) => (
+          <article class="sv-card pillar">
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="sv-section">
+    <div class="sv-container cta-form-block">
+      <p class="sv-eyebrow">Direkter Einstieg</p>
+      <h2>Jetzt unverbindlich Zugang anfragen</h2>
+      <p>Oberhalb des Formulars steht der direkte Einstieg fuer Zugang, Pilotprojekt oder Demo zur Verfuegung.</p>
+      <a class="sv-button sv-button-primary" href="/gutachter-plattform/anfrage/">Jetzt unverbindlich Zugang anfragen</a>
     </div>
   </section>
 
@@ -62,5 +88,13 @@ const items = [
 </BaseLayout>
 
 <style>
-  .entry-card{text-decoration:none;color:inherit}
+  .pillars-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+  .pillar{padding:1.35rem}
+  .pillar h3{margin:.2rem 0 .5rem;font-family:var(--sv-font-sans);font-size:1.12rem}
+  .pillar p{margin:0;color:var(--sv-color-muted)}
+  .cta-form-block{display:grid;justify-items:start;gap:.9rem;padding:clamp(1.5rem,3vw,2.2rem);border:1px solid color-mix(in srgb,var(--sv-color-accent) 45%,var(--sv-color-line));border-radius:var(--sv-radius-xl);background:linear-gradient(145deg,rgba(255,255,255,.9),rgba(255,248,236,.95))}
+  .cta-form-block h2{margin:0}
+  .cta-form-block p{margin:0;color:var(--sv-color-muted)}
+  @media(max-width:64rem){.pillars-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:48rem){.pillars-grid{grid-template-columns:1fr}}
 </style>

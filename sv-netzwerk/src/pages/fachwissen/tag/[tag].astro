@@ -13,11 +13,11 @@ export function getStaticPaths() {
 const { tag } = Astro.props;
 const items = sortedLibrary.filter((item) => item.tags.includes(tag));
 ---
-<BaseLayout title={`#${tag} – Fachwissen | SV-Netzwerk`} description={`Fachbeiträge und Praxishinweise des SV-Netzwerks zum Schlagwort ${tag}.`}>
-  <Hero eyebrow="Fachwissen nach Schlagwort" title={`#${tag}`} text={`${items.length} ${items.length === 1 ? 'Beitrag' : 'Beiträge'} mit diesem Schlagwort.`} />
+<BaseLayout title={`#${tag} – Fachartikel | SV-Netzwerk`} description={`Fachbeiträge und Praxishinweise des SV-Netzwerks zum Schlagwort ${tag}.`}>
+  <Hero eyebrow="Fachartikel nach Schlagwort" title={`#${tag}`} text={`${items.length} ${items.length === 1 ? 'Beitrag' : 'Beiträge'} mit diesem Schlagwort.`} />
   <section class="sv-section">
     <div class="sv-container">
-      <Breadcrumbs items={[{ label: 'Start', href: '/' }, { label: 'Fachwissen', href: '/fachwissen/' }, { label: `#${tag}` }]} />
+      <Breadcrumbs items={[{ label: 'Start', href: '/' }, { label: 'Fachartikel', href: '/fachwissen/' }, { label: `#${tag}` }]} />
       <LibraryFilters activeTag={tag} />
       <LibraryGrid items={items} />
     </div>

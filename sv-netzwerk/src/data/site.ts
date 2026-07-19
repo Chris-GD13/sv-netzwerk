@@ -13,11 +13,12 @@ export const site = {
   },
   version: '5.1.12',
   navigation: [
+    { label: 'Start', href: '/' },
     { label: 'Leistungen', href: '/leistungen/' },
-    { label: 'Schadenarten', href: '/schadenarten/' },
-    { label: 'Wissen', href: '/fachwissen/' },
     { label: 'Experten', href: '/experten/' },
-    { label: 'Netzwerk', href: '/netzwerk/' },
+    { label: 'Fachartikel', href: '/fachwissen/' },
+    { label: 'Schadenarten', href: '/schadenarten/' },
+    { label: 'Versicherer', href: '/versicherer/' },
     { label: 'Kontakt', href: '/kontakt/' }
   ]
 } as const;

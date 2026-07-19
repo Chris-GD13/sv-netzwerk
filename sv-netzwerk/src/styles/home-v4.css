@@ -797,6 +797,55 @@
 .v4-section {
   padding-block: clamp(3.5rem, 6.5vw, 5.5rem);
 }
+.v4-audience {
+  padding-top: clamp(2.25rem, 4.2vw, 3.35rem);
+  background: linear-gradient(135deg, rgba(11, 79, 122, 0.08), rgba(255, 255, 255, 0.3) 56%, rgba(255, 157, 18, 0.14));
+}
+.v4-audience .v4-section-head {
+  margin-bottom: 1.25rem;
+}
+.v4-audience__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+.v4-audience__card {
+  display: flex;
+  min-height: 16.75rem;
+  flex-direction: column;
+  padding: 1.35rem;
+  border: 1px solid rgba(181, 204, 216, 0.92);
+  border-radius: 1.1rem;
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 14px 38px rgba(8, 29, 48, 0.07);
+}
+.v4-audience__card small {
+  color: var(--v4-accent);
+  font-size: 0.67rem;
+  font-weight: 950;
+}
+.v4-audience__card h3 {
+  margin: 0.95rem 0 0.75rem;
+  font-size: 1.32rem;
+  line-height: 1.15;
+}
+.v4-audience__card p {
+  margin: 0;
+  color: var(--v4-muted);
+}
+.v4-audience__card a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: auto;
+  color: var(--v4-ink);
+  font-size: 0.84rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+.v4-audience__card a span {
+  color: var(--v4-accent);
+}
 .v4-section-head {
   display: flex;
   align-items: end;
@@ -1359,6 +1408,9 @@
   .v4-services__grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  .v4-audience__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
   .v4-cases__grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1429,6 +1481,7 @@
     flex-direction: column;
   }
   .v4-services__grid,
+  .v4-audience__grid,
   .v4-cases__grid,
   .v4-knowledge__grid {
     grid-template-columns: 1fr;

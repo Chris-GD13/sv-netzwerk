@@ -1,0 +1,43 @@
+---
+const entries = [
+  {
+    title: 'Fuer Versicherer',
+    text: 'Schaeden effizient steuern und qualifizierte Sachverstaendige bundesweit beauftragen.',
+    href: '/versicherer/',
+    cta: 'Mehr erfahren',
+  },
+  {
+    title: 'Fuer Sachverstaendige',
+    text: 'Teil des bundesweiten Expertennetzwerks werden.',
+    href: '/experten/#mitglied-werden',
+    cta: 'Experte werden',
+  },
+  {
+    title: 'Fuer Geschaedigte',
+    text: 'Schnelle Hilfe bei Gebaeude- und Grossschaeden.',
+    href: '/schaden-melden/',
+    cta: 'Schaden melden',
+  },
+];
+---
+
+<section class="v4-section v4-audience" aria-labelledby="zielgruppen">
+  <div class="v4-shell">
+    <div class="v4-section-head">
+      <div>
+        <p class="v4-kicker"><span></span>Direkte Einstiege</p>
+        <h2 id="zielgruppen">Schneller Einstieg nach Zielgruppe</h2>
+      </div>
+    </div>
+    <div class="v4-audience__grid">
+      {entries.map((entry, index) => (
+        <article class="v4-audience__card">
+          <small>{`0${index + 1}`}</small>
+          <h3>{entry.title}</h3>
+          <p>{entry.text}</p>
+          <a href={entry.href}>{entry.cta} <span aria-hidden="true">→</span></a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

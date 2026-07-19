@@ -3,7 +3,7 @@ import { categories, tags, slugify } from '../data/library';
 interface Props { activeCategory?: string; activeTag?: string; }
 const { activeCategory, activeTag } = Astro.props;
 ---
-<section class="library-tools" aria-label="Fachwissen filtern und navigieren">
+<section class="library-tools" aria-label="Fachartikel filtern und navigieren">
   <div class="search-row">
     <label for="library-search">Beiträge durchsuchen</label>
     <input id="library-search" type="search" placeholder="Suchbegriff eingeben …" autocomplete="off" />

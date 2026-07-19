@@ -29,7 +29,9 @@ const error = Astro.url.searchParams.get('fehler');
         <h2>Plattformformular</h2>
         {sent && <p class="status success">Ihre Anfrage wurde uebermittelt. Eine Eingangsbestätigung wurde versendet.</p>}
         {error && <p class="status error">Die Anfrage konnte nicht verarbeitet werden. Bitte pruefen Sie Ihre Eingaben.</p>}
+        <a class="access-cta" href="#formular">Jetzt unverbindlich Zugang anfragen</a>
         <form action="/anfrage-gutachter-plattform.php" method="post" accept-charset="UTF-8">
+          <span id="formular" class="sr-anchor" aria-hidden="true"></span>
           <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
           <input type="hidden" name="Formular" value="Gutachter-Plattform Anfrage" />
           <input type="hidden" name="Herkunft" value="SV-Netzwerk.eu / Provisionshinweis" />
@@ -85,6 +87,10 @@ const error = Astro.url.searchParams.get('fehler');
   .status{padding:.85rem 1rem;border-radius:.6rem;font-weight:700}
   .status.success{background:#e7f7ef;border:1px solid #6db58d;color:#174f31}
   .status.error{background:#fbe9e9;border:1px solid #cc7e7e;color:#6d1f1f}
+  .access-cta{display:flex;justify-content:center;align-items:center;min-height:3.2rem;margin-bottom:.9rem;padding:.8rem 1rem;border-radius:.72rem;background:#f08c00;color:#fff;font-weight:950;text-decoration:none;box-shadow:0 10px 24px rgba(240,140,0,.24)}
+  .access-cta:hover{background:#cf7600;color:#fff}
+  .access-cta:focus-visible{outline:3px solid #123f5a;outline-offset:2px}
+  .sr-anchor{position:relative;top:-6rem}
   .hp-field{position:absolute;left:-100vw;width:1px;height:1px;opacity:0}
   @media (max-width:54rem){.grid{grid-template-columns:1fr}}
 </style>

@@ -3,6 +3,6 @@ import { library, formatDate } from '../../data/library';
 const articles = library.filter((item) => item.type === 'article').slice(0,3);
 ---
 <section class="v4-section v4-knowledge">
-  <div class="v4-shell"><div class="v4-section-head"><div><p class="v4-kicker"><span></span>Fachwissen</p><h2>Wissen, das Entscheidungen besser macht.</h2></div><a class="v4-text-link" href="/fachwissen/">Zur Bibliothek <span>→</span></a></div>
+  <div class="v4-shell"><div class="v4-section-head"><div><p class="v4-kicker"><span></span>Fachartikel</p><h2>Fachartikel, die Entscheidungen besser machen.</h2></div><a class="v4-text-link" href="/fachwissen/">Zu den Fachartikeln <span>→</span></a></div>
   <div class="v4-knowledge__grid">{articles.map((article,index) => <article class={index===0?'is-featured':''}><div class="v4-knowledge__meta"><span>{article.category}</span><time datetime={article.date}>{formatDate(article.date)}</time></div><h3><a href={article.href}>{article.title}</a></h3><p>{article.description}</p><ul>{article.tags.slice(0,3).map(tag => <li>#{tag}</li>)}</ul><a class="v4-knowledge__read" href={article.href}>Beitrag lesen <span>→</span></a></article>)}</div></div>
 </section>

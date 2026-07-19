@@ -22,11 +22,11 @@ const currentPath = Astro.url.pathname;
     <Navigation items={navigation} currentPath={currentPath} />
 
     <div class="site-header__actions">
-      <SearchButton />
-      <a class="header-cta" href="/schaden-melden/">
-        Schaden melden
+      <a class="header-platform-cta" href="/gutachter-plattform/">
+        Gutachter-Plattform
         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" /></svg>
       </a>
+      <SearchButton />
       <HamburgerButton />
     </div>
   </div>

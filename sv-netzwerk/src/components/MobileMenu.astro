@@ -23,7 +23,6 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
 
   <div class="mobile-menu__scroll">
     <nav aria-label="Mobile Hauptnavigation">
-      <a class:list={["mobile-menu__direct", { "is-active": currentPath === '/' }]} href="/" aria-current={currentPath === '/' ? 'page' : undefined}>Startseite</a>
       {items.map((item) => item.children ? (
         <details class="mobile-menu__group" open={isItemActive(item)}>
           <summary>
@@ -44,7 +43,8 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
 
   <div class="mobile-menu__footer">
     <SearchButton />
-    <a class="mobile-menu__cta" href="/schaden-melden/">Schaden melden <span aria-hidden="true">→</span></a>
+    <a class="mobile-menu__cta mobile-menu__cta--platform" href="/gutachter-plattform/">Gutachter-Plattform <span aria-hidden="true">→</span></a>
+    <a class="mobile-menu__cta mobile-menu__cta--secondary" href="/schaden-melden/">Schaden melden <span aria-hidden="true">→</span></a>
     <div><a href="tel:+4973673939783">07367 / 393 97 83</a><span>Persönlich erreichbar</span></div>
   </div>
 </aside>
