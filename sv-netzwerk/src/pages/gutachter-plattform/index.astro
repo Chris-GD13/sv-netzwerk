@@ -4,14 +4,63 @@ import Hero from '../../components/Hero.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import FeatureCard from '../../components/FeatureCard.astro';
 import CallToAction from '../../components/CallToAction.astro';
-const modules=[
-  {title:'Klare Auftragsdaten',text:'Fragestellung, Beteiligte, Objekt und Unterlagen werden vor der fachlichen Bearbeitung strukturiert erfasst.'},
-  {title:'Passende Fachkompetenz',text:'Fachgebiet, Region, Qualifikation und Verfügbarkeit bilden die Grundlage der Expertenzuordnung.'},
-  {title:'Nachvollziehbare Zusammenarbeit',text:'Bearbeitungsstände, Rückfragen und Ergebnisse werden entlang eines gemeinsamen Vorgangsmodells geführt.'},
+
+const items = [
+  {
+    title: 'Fuer Versicherer',
+    text: 'Transparente Auftragsteuerung mit klarer Zuordnung, Statussicht und dokumentierten Entscheidungen.',
+    href: '/gutachter-plattform/fuer-versicherungen/'
+  },
+  {
+    title: 'Fuer Regulierer',
+    text: 'Strukturierte Unterlagenpruefung, Rueckfragenfuehrung und belastbare Freigabegrundlagen.',
+    href: '/gutachter-plattform/fuer-regulierer/'
+  },
+  {
+    title: 'Fuer Sachverstaendige',
+    text: 'Saubere Aktenstruktur, standardisierte Berichtspfade und konsistente Qualitaetsanforderungen.',
+    href: '/gutachter-plattform/fuer-sachverstaendige/'
+  }
 ];
 ---
-<BaseLayout title="Gutachter-Plattform" description="Die Gutachter-Plattform verbindet strukturierte Aufträge, passende Experten und nachvollziehbare Schadenbearbeitung." breadcrumbs={[{label:'Start',href:'/'},{label:'SVOS',href:'/svos/'},{label:'Gutachter-Plattform'}]}>
-  <Hero compact eyebrow="SVOS · Gutachter-Plattform" title="Menschen, Aufträge und Fachwissen sinnvoll verbinden." text="Die Gutachter-Plattform bündelt die Grundsätze für strukturierte Sachverständigen- und Schadenprozesse. Fachliche Verantwortung bleibt dabei einer konkret benannten Person zugeordnet." primaryLabel="SVOS ansehen" primaryHref="/svos/" secondaryLabel="Experten entdecken" secondaryHref="/experten/" />
-  <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Plattformprinzip" title="Technik unterstützt fachliche Verantwortung"/><div class="sv-grid sv-grid-3">{modules.map((item,index)=><FeatureCard index={`0${index+1}`} title={item.title} text={item.text}/>)}</div></div></section>
-  <CallToAction title="Anwendungsfall besprechen" text="Wir ordnen Anforderungen von Versicherern, Regulierern, Sachverständigen und Dienstleistern fachlich ein." href="/kontakt/" label="Kontakt aufnehmen" />
+
+<BaseLayout
+  title="Gutachter-Plattform"
+  description="Digitale Plattform fuer strukturierte Zusammenarbeit zwischen Versicherern, Regulierern und Sachverstaendigen."
+  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Gutachter-Plattform' }]}
+>
+  <Hero
+    compact
+    eyebrow="Gutachter-Plattform"
+    title="Digitale Zusammenarbeit ohne Medienbrueche."
+    text="Die Plattform verbindet Beauftragungen, Dokumentation und fachliche Qualitaet in einem klaren Prozessmodell."
+    primaryLabel="Plattform-Anfrage senden"
+    primaryHref="/gutachter-plattform/anfrage/"
+    secondaryLabel="Demo buchen"
+    secondaryHref="/gutachter-plattform/demo-buchen/"
+  />
+
+  <section class="sv-section">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Zielgruppen" title="Direkter Einstieg nach Rolle" />
+      <div class="sv-grid sv-grid-3">
+        {items.map((item, index) => (
+          <a class="entry-card" href={item.href}>
+            <FeatureCard index={`0${index + 1}`} title={item.title} text={item.text} />
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CallToAction
+    title="Plattformzugang oder Pilotprojekt abstimmen"
+    text="Fuer Zugang, Demo und Integrationsfragen steht ein dediziertes Anfrageformular bereit."
+    href="/gutachter-plattform/anfrage/"
+    label="Zur Plattform-Anfrage"
+  />
 </BaseLayout>
+
+<style>
+  .entry-card{text-decoration:none;color:inherit}
+</style>

@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Hero from '../../../components/Hero.astro';
+import CallToAction from '../../../components/CallToAction.astro';
+---
+
+<BaseLayout
+  title="Gutachter-Plattform fuer Regulierer"
+  description="Strukturierte Dokumentation und klare Freigabepfade fuer Regulierer."
+  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Gutachter-Plattform', href: '/gutachter-plattform/' }, { label: 'Fuer Regulierer' }]}
+>
+  <Hero
+    compact
+    eyebrow="Fuer Regulierer"
+    title="Prueffähige Unterlagen schneller bewerten."
+    text="Die Plattform unterstuetzt eine nachvollziehbare Vorpruefung mit klaren Rueckfragen und verbindlichen Bearbeitungsstaenden."
+    primaryLabel="Plattform-Anfrage"
+    primaryHref="/gutachter-plattform/anfrage/"
+    secondaryLabel="Fachwissen"
+    secondaryHref="/fachwissen/"
+  />
+  <CallToAction
+    title="Regulierungsprozess aufsetzen"
+    text="Wir stimmen Rollen, Unterlagenstandard und Freigabe-Logik gemeinsam ab."
+    href="/gutachter-plattform/anfrage/"
+    label="Anfrage senden"
+  />
+</BaseLayout>

@@ -4,7 +4,7 @@ description: "Wie eine einheitliche Aktenstruktur Entscheidungen beschleunigt, R
 category: "Prozessqualität"
 tags: ["Schadenakte", "Dokumentation", "Prozessqualität", "Schadenregulierung"]
 author: "christian-waechter"
-dailyStandard: true
+dailyStandard: false
 contentLevel: "B"
 teaser: "Eine gute Schadenakte ordnet Informationen so, dass jede Entscheidung mit Quelle, Zeitpunkt und Verantwortlichkeit nachvollziehbar bleibt."
 linkedinSummary: "Schadenakten werden belastbar, wenn Eingang, Prüfung, Entscheidung und Nachverfolgung klar getrennt dokumentiert sind. Einheitliche Benennung, feste Ablagelogik und kurze Entscheidungsvermerke reduzieren Rückfragen und verbessern Übergaben."

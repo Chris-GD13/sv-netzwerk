@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import CallToAction from '../../components/CallToAction.astro';
+---
+
+<BaseLayout title="Kompetenzzentrum" description="Fachliche Schwerpunkte und Leistungen im Kompetenzzentrum des SV-Netzwerks.">
+  <Hero compact eyebrow="Kompetenzzentrum" title="Fachkompetenz fuer komplexe Schadenbilder." text="Das Kompetenzzentrum buendelt Sachverstaendigenleistung, Regulierungserfahrung und dokumentierte Entscheidungsgrundlagen." primaryLabel="Leistungen ansehen" primaryHref="/leistungen/" secondaryLabel="Experten" secondaryHref="/experten/" />
+  <CallToAction title="Direkte Fachanfrage stellen" text="Nutzen Sie den Kontaktweg fuer die passende Zuordnung des Anwendungsfalls." href="/kontakt/" label="Kontakt" />
+</BaseLayout>

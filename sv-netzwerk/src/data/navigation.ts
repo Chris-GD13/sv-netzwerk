@@ -23,7 +23,29 @@ export const navigation: NavItem[] = [
       { label: 'Großschaden- und Komplexschadenregulierung', href: '/grossschadenregulierung/', description: 'Steuerung komplexer Vorgänge mit klaren Entscheidungsständen.' },
       { label: 'Technische Schadenbewertung', href: '/leistungen/#technische-schadenbewertung', description: 'Ursache, Umfang und Wiederherstellung fachlich einordnen.' },
       { label: 'Beweissicherung', href: '/leistungen/#beweissicherung', description: 'Zustände, Spuren und technische Zusammenhänge dokumentieren.' },
-      { label: 'Gutachter-Plattform', href: '/gutachter-plattform/', description: 'Digitale Zusammenarbeit im Sachverständigennetzwerk.' },
+    ],
+  },
+  {
+    label: 'Versicherer',
+    href: '/versicherer/',
+    description: 'Direkteinstiege fuer Versicherer, Regulierer und Schadenabteilungen.',
+    children: [
+      { label: 'Anfrage / Beauftragung', href: '/versicherer/#anfrage', description: 'Vorgangsdaten und Leistungsumfang serverseitig uebermitteln.' },
+      { label: 'Grossschadenregulierung', href: '/grossschadenregulierung/', description: 'Komplexe Grossschaeden strukturiert steuern.' },
+      { label: 'Kumulschadenmanagement', href: '/leistungen/kumulschadenmanagement/', description: 'Skalierbare Bearbeitung von Serien- und Ereignislagen.' },
+      { label: 'Schaden melden', href: '/schaden-melden/', description: 'Schadenfall inkl. Unterlagen serverseitig einreichen.' },
+    ],
+  },
+  {
+    label: 'Gutachter-Plattform',
+    href: '/gutachter-plattform/',
+    description: 'Digitale Zusammenarbeit fuer Versicherer, Regulierer und Sachverstaendige.',
+    children: [
+      { label: 'Plattform-Anfrage', href: '/gutachter-plattform/anfrage/', description: 'Kontakt zu Zugang, Demo und Kooperation.' },
+      { label: 'Demo buchen', href: '/gutachter-plattform/demo-buchen/', description: 'Demo-Termin fuer den Plattformeinsatz abstimmen.' },
+      { label: 'Fuer Versicherungen', href: '/gutachter-plattform/fuer-versicherungen/', description: 'Steuerungs- und Qualitaetsnutzen fuer Versicherer.' },
+      { label: 'Fuer Regulierer', href: '/gutachter-plattform/fuer-regulierer/', description: 'Prueffähige Unterlagen und transparente Freigaben.' },
+      { label: 'Fuer Sachverstaendige', href: '/gutachter-plattform/fuer-sachverstaendige/', description: 'Strukturierte Bearbeitung und sauberes Onboarding.' },
     ],
   },
   {
@@ -48,6 +70,7 @@ export const navigation: NavItem[] = [
     children: [
       { label: 'Fachartikel', href: '/fachwissen/', description: 'Technische Beiträge aus Schadenpraxis und Regulierung.' },
       { label: 'Normen und Rechtsprechung', href: '/fachwissen/#normen-rechtsprechung', description: 'Regelwerke und Entscheidungen praxisnah eingeordnet.' },
+      { label: 'Wissensuebersicht', href: '/wissen/', description: 'Zentraler Einstieg in den Wissensbereich.' },
     ],
   },
   { label: 'Experten', href: '/experten/' },

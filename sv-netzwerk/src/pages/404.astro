@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Seite nicht gefunden" description="Die angeforderte Seite existiert nicht oder wurde verschoben." noindex={true}>
+  <section class="sv-section">
+    <div class="sv-container card">
+      <p class="sv-eyebrow">404</p>
+      <h1>Diese Seite wurde nicht gefunden.</h1>
+      <p>Bitte nutzen Sie die Hauptnavigation oder starten Sie auf der Startseite.</p>
+      <p class="actions">
+        <a class="sv-button sv-button-primary" href="/">Zur Startseite</a>
+        <a class="sv-button sv-button-secondary" href="/kontakt/">Kontakt</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .card{max-width:46rem;padding:clamp(1.5rem,3vw,2.4rem);background:white;border:1px solid var(--sv-color-line);border-radius:1rem}
+  .actions{display:flex;gap:1rem;flex-wrap:wrap}
+</style>

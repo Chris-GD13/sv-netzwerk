@@ -3,7 +3,7 @@ export const site = {
   legalName: 'SV-Netzwerk Bau & Schaden',
   description: 'Sachverständige, Großschaden- und Komplexschadenregulierung und vernetzte Fachkompetenz für komplexe Bau- und Versicherungsschäden.',
   url: 'https://www.sv-netzwerk.eu',
-  email: 'cw@sv-schuett.eu',
+  email: 'info@sv-netzwerk.eu',
   phone: '07367 / 393 97 83',
   address: ['Nordstraße 17', '73432 Aalen'],
   author: {

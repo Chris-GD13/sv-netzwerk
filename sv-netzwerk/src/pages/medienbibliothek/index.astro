@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import CallToAction from '../../components/CallToAction.astro';
+---
+
+<BaseLayout title="Medienbibliothek" description="Medien und Fachunterlagen des SV-Netzwerks.">
+  <Hero compact eyebrow="Medienbibliothek" title="Materialien und Unterlagen im Zugriff." text="Die Medienbibliothek wird in die aktuelle Wissens- und Wissensstruktur ueberfuehrt." primaryLabel="Fachwissen" primaryHref="/fachwissen/" secondaryLabel="A-Z Navigation" secondaryHref="/fachwissen/az" />
+  <CallToAction title="Unterlagen oder Medien anfragen" text="Fehlende Dateien stellen wir auf Anfrage zur Verfuegung." href="/kontakt/" label="Anfrage senden" />
+</BaseLayout>
