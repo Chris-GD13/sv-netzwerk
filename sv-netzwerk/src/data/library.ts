@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Unwetterlage im Kreis Ludwigsburg: Schadensteuerung bei Starkregen, Hagel und Sturm',
+    description: 'Wie lokale Unwetterlagen mit hoher Einsatzdichte durch Erstmaßnahmen, Priorisierung und belastbare Dokumentation gesteuert werden.',
+    href: '/fachwissen/unwetter-ludwigsburg-starkregen-hagel-sturm-schadensteuerung/',
+    category: 'Sturm- und Hagelschäden',
+    tags: ['Starkregen', 'Hagelschaden', 'Sturmschaden'],
+    date: '2026-07-19',
+    type: 'article',
+    featured: true,
+  },
+  {
     title: 'Kumulschäden in der Region: Priorisierung, Koordination und belastbare Dokumentation',
     description: 'Wie bei regional gehäuften Schadenlagen Prioritäten gesetzt, Rollen geklärt und die Schadenaufnahme unter Zeitdruck belastbar gehalten wird.',
     href: '/fachwissen/kumulschaeden-in-der-region-priorisierung-koordination-dokumentation/',
