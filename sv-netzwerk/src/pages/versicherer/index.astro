@@ -51,6 +51,19 @@ const modules = [
     </div>
   </section>
 
+  <section class="sv-section sv-section-alt">
+    <div class="sv-container campaign-note">
+      <p class="sv-eyebrow">Schwerpunkt 22.07.-22.08.2026</p>
+      <h2>Kumul- und Unwetterschaeden im laufenden Einsatz</h2>
+      <p>Im Schwerpunktzeitraum erhalten Versicherer, Regulierer und Geschaedigte einen direkten Zugang zu priorisierter Schadenaufnahme, abgestimmter Bearbeitung und klaren Rueckmeldungen.</p>
+      <div class="campaign-links">
+        <a class="sv-button sv-button-secondary" href="/versicherer/#anfrage">Einstieg fuer Versicherer</a>
+        <a class="sv-button sv-button-secondary" href="/gutachter-plattform/fuer-regulierer/">Einstieg fuer Regulierer</a>
+        <a class="sv-button sv-button-primary" href="/schaden-melden/">Einstieg fuer Geschaedigte</a>
+      </div>
+    </div>
+  </section>
+
   <section class="sv-section" id="anfrage">
     <div class="sv-container form-layout">
       <article class="sv-card contacts">
@@ -132,6 +145,10 @@ const modules = [
 
 <style>
   .quick-links{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1.25rem}
+  .campaign-note{display:grid;gap:.9rem}
+  .campaign-note h2,.campaign-note p{margin:0}
+  .campaign-note p{max-width:75ch;color:var(--sv-color-muted)}
+  .campaign-links{display:flex;flex-wrap:wrap;gap:.75rem}
   .form-layout{display:grid;grid-template-columns:minmax(16rem,.75fr) minmax(0,1.25fr);gap:2rem}
   .contacts,.form-card{padding:clamp(1.4rem,3vw,2.2rem)}
   .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem}

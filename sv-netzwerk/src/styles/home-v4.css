@@ -570,6 +570,18 @@
   align-items: center;
   gap: 1.25rem;
 }
+.v4-hero__notice {
+  max-width: 46rem;
+  margin: 1.1rem 0 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d9e4ea;
+  border-left: 4px solid var(--v4-accent);
+  border-radius: 0.8rem;
+  background: #f8fcff;
+  color: #365667;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
 .v4-hero__trust {
   display: flex;
   margin-top: 2.8rem;
@@ -1459,6 +1471,10 @@
   .v4-hero__actions {
     align-items: stretch;
     flex-direction: column;
+  }
+  .v4-hero__notice {
+    margin-top: 1rem;
+    font-size: 0.88rem;
   }
   .v4-hero__trust {
     display: grid;

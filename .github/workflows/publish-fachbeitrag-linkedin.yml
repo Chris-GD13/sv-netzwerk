@@ -68,24 +68,47 @@ jobs:
           echo "hashtags=$HASHTAGS" >> $GITHUB_OUTPUT
           echo "file=$LATEST_FILE" >> $GITHUB_OUTPUT
       
-      - name: Fetch image from Unsplash
+      - name: Fetch realistic field image from Unsplash
         id: unsplash_image
         run: |
           UNSPLASH_KEY="${{ secrets.UNSPLASH_ACCESS_KEY }}"
-          SEARCH_TERM="${{ steps.latest_fachbeitrag.outputs.title }}"
+          TITLE="${{ steps.latest_fachbeitrag.outputs.title }}"
+          TAGS="${{ steps.latest_fachbeitrag.outputs.tags }}"
+          TAG_QUERY="$(echo "$TAGS" | tr '|' ' ' | sed 's/[^[:alnum:]äöüÄÖÜß -]//g')"
+          SEARCH_TERM="Deutschland Unwetterschaden Schadenaufnahme Ausseneinsatz ${TAG_QUERY} ${TITLE}"
+          IMAGE_BRIEF="Realistische Einsatzsituation in Deutschland: ueberflutete Gebaeude, Hagel- oder Sturmschaeden, technische Aufnahme vor Ort oder Teamarbeit in der Schadenkoordination."
+          IMAGE_EXCLUSIONS="Keine uebertriebenen Katastrophenszenen, keine unrealistischen KI-Motive, keine sensationale Bildsprache."
           
-          # Suche Bild bei Unsplash
-          RESPONSE=$(curl -s "https://api.unsplash.com/search/photos?query=$SEARCH_TERM&per_page=1&client_id=$UNSPLASH_KEY")
+          # Suche Bild bei Unsplash mit fokusbezogenen Kriterien
+          RESPONSE=$(curl -sG "https://api.unsplash.com/search/photos" \
+            --data-urlencode "query=$SEARCH_TERM" \
+            --data "per_page=8" \
+            --data "orientation=landscape" \
+            --data "content_filter=high" \
+            --data "client_id=$UNSPLASH_KEY")
           
-          # Extrahiere die beste passende Bild-URL
-          IMAGE_URL=$(echo "$RESPONSE" | jq -r '.results[0].urls.regular // empty')
+          # Priorisiere realistische Einsatzmotive
+          IMAGE_URL=$(echo "$RESPONSE" | jq -r '
+            .results[]
+            | select(
+                ((.alt_description // "") | test("flood|storm|hail|wind|building|inspection|damage|water"; "i"))
+                or
+                ((.description // "") | test("flood|storm|hail|wind|building|inspection|damage|water"; "i"))
+              )
+            | .urls.regular
+          ' | head -1)
+          if [ -z "$IMAGE_URL" ] || [ "$IMAGE_URL" = "null" ]; then
+            IMAGE_URL=$(echo "$RESPONSE" | jq -r '.results[0].urls.regular // empty')
+          fi
           
           if [ -z "$IMAGE_URL" ] || [ "$IMAGE_URL" = "null" ]; then
-            echo "warning=no_unsplash_image_found, using generic image" >> $GITHUB_OUTPUT
-            IMAGE_URL="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=630&fit=crop"
+            echo "warning=no_unsplash_image_found, using fallback image" >> $GITHUB_OUTPUT
+            IMAGE_URL="https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=1200&h=630&fit=crop"
           fi
           
           echo "image_url=$IMAGE_URL" >> $GITHUB_OUTPUT
+          echo "image_brief=$IMAGE_BRIEF" >> $GITHUB_OUTPUT
+          echo "image_exclusions=$IMAGE_EXCLUSIONS" >> $GITHUB_OUTPUT
           echo "✅ Image URL: $IMAGE_URL"
       
       - name: Validate build
@@ -112,6 +135,8 @@ jobs:
             "first_paragraph": "${{ steps.latest_fachbeitrag.outputs.first_paragraph }}",
             "hashtags": "${{ steps.latest_fachbeitrag.outputs.hashtags }}",
             "image_url": "${{ steps.unsplash_image.outputs.image_url }}",
+            "image_brief": "${{ steps.unsplash_image.outputs.image_brief }}",
+            "image_exclusions": "${{ steps.unsplash_image.outputs.image_exclusions }}",
             "url": "${{ steps.latest_fachbeitrag.outputs.url }}",
             "date": "${{ steps.latest_fachbeitrag.outputs.date }}",
             "slug": "${{ steps.latest_fachbeitrag.outputs.slug }}"
