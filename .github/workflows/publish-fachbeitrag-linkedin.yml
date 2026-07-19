@@ -154,33 +154,93 @@ jobs:
         if: success()
         run: |
           WEBHOOK_URL="${{ secrets.ZAPIER_WEBHOOK_URL }}"
+          TITLE="${{ steps.latest_fachbeitrag.outputs.title }}"
+          DESCRIPTION="${{ steps.latest_fachbeitrag.outputs.description }}"
+          FIRST_PARAGRAPH="${{ steps.latest_fachbeitrag.outputs.first_paragraph }}"
+          URL="${{ steps.latest_fachbeitrag.outputs.url }}"
+          DATE="${{ steps.latest_fachbeitrag.outputs.date }}"
+          SLUG="${{ steps.latest_fachbeitrag.outputs.slug }}"
+          HASHTAGS="${{ steps.latest_fachbeitrag.outputs.hashtags }}"
+          IMAGE_URL="${{ steps.unsplash_image.outputs.image_url }}"
+          IMAGE_BRIEF="${{ steps.unsplash_image.outputs.image_brief }}"
+          IMAGE_EXCLUSIONS="${{ steps.unsplash_image.outputs.image_exclusions }}"
           
           if [ -z "$WEBHOOK_URL" ]; then
             echo "WARNING: ZAPIER_WEBHOOK_URL secret not set"
             exit 0
           fi
+
+          SUMMARY="$DESCRIPTION"
+          if [ -z "$SUMMARY" ]; then
+            SUMMARY="$FIRST_PARAGRAPH"
+          fi
+          if [ -z "$SUMMARY" ]; then
+            SUMMARY="$TITLE"
+          fi
+
+          LINKEDIN_COMMENT="${TITLE}\n\n${SUMMARY}\n\nJetzt lesen: ${URL}\n\n${HASHTAGS}"
           
-          PAYLOAD=$(cat <<'EOF'
-          {
-            "title": "${{ steps.latest_fachbeitrag.outputs.title }}",
-            "description": "${{ steps.latest_fachbeitrag.outputs.description }}",
-            "first_paragraph": "${{ steps.latest_fachbeitrag.outputs.first_paragraph }}",
-            "hashtags": "${{ steps.latest_fachbeitrag.outputs.hashtags }}",
-            "image_url": "${{ steps.unsplash_image.outputs.image_url }}",
-            "image_brief": "${{ steps.unsplash_image.outputs.image_brief }}",
-            "image_exclusions": "${{ steps.unsplash_image.outputs.image_exclusions }}",
-            "url": "${{ steps.latest_fachbeitrag.outputs.url }}",
-            "date": "${{ steps.latest_fachbeitrag.outputs.date }}",
-            "slug": "${{ steps.latest_fachbeitrag.outputs.slug }}"
-          }
-          EOF
-          )
-          
-          curl -X POST "$WEBHOOK_URL" \
+          PAYLOAD=$(jq -n \
+            --arg title "$TITLE" \
+            --arg description "$DESCRIPTION" \
+            --arg first_paragraph "$FIRST_PARAGRAPH" \
+            --arg hashtags "$HASHTAGS" \
+            --arg image_url "$IMAGE_URL" \
+            --arg image_brief "$IMAGE_BRIEF" \
+            --arg image_exclusions "$IMAGE_EXCLUSIONS" \
+            --arg url "$URL" \
+            --arg date "$DATE" \
+            --arg slug "$SLUG" \
+            --arg linkedin_comment "$LINKEDIN_COMMENT" \
+            '{
+              title: $title,
+              description: $description,
+              first_paragraph: $first_paragraph,
+              hashtags: $hashtags,
+              image_url: $image_url,
+              image_brief: $image_brief,
+              image_exclusions: $image_exclusions,
+              url: $url,
+              date: $date,
+              slug: $slug,
+              linkedin_comment: $linkedin_comment,
+              comment_text: $linkedin_comment,
+              Title: $title,
+              Description: $description,
+              Url: $url,
+              Hashtags: $hashtags,
+              "Image Url": $image_url,
+              LinkedInComment: $linkedin_comment,
+              CommentText: $linkedin_comment
+            }')
+
+          echo "Payload preview (non-secret fields):"
+          echo "$PAYLOAD" | jq '{
+            slug,
+            title,
+            description,
+            url,
+            hashtags,
+            linkedin_comment,
+            comment_text,
+            Title,
+            Description,
+            Url,
+            Hashtags,
+            "Image Url"
+          }'
+
+          RESPONSE=$(curl --silent --show-error --fail-with-body -X POST "$WEBHOOK_URL" \
             -H "Content-Type: application/json" \
             -d "$PAYLOAD" \
             --retry 3 \
-            --retry-delay 2
+            --retry-delay 2 \
+            --write-out "\n%{http_code}")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
+          RESPONSE_BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "Webhook HTTP status: $HTTP_CODE"
+          echo "Webhook response body: $RESPONSE_BODY"
           
           echo "✅ LinkedIn webhook triggered with image"
       
