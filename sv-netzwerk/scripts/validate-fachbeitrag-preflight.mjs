@@ -55,6 +55,14 @@ for (const file of files) {
     list.push(file);
     titleMap.set(titleKey, list);
   }
+  const seoTitle = parsed.front.match(/^\s+title:\s*["']?([^"'\r\n]+?)["']?\s*$/m)?.[1]?.trim() ?? '';
+  const seoDescription = parsed.front.match(/^\s+description:\s*["']?([^"'\r\n]+?)["']?\s*$/m)?.[1]?.trim() ?? '';
+  if (seoTitle.length > 70) {
+    errors.push(`${file}: seo.title zu lang (${seoTitle.length} Zeichen, max. 70): "${seoTitle.slice(0, 40)}…"`);
+  }
+  if (seoDescription.length > 180) {
+    errors.push(`${file}: seo.description zu lang (${seoDescription.length} Zeichen, max. 180)`);
+  }
   entries.push({ file, slug, publishedAt, title, daily, status });
 }
 
