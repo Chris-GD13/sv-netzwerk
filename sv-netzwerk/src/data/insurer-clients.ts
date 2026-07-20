@@ -5,7 +5,7 @@ export type InsurerClient = {
 };
 
 export const insurerClients: InsurerClient[] = [
-  { name: 'Sparkassenversicherung', logo: '/assets/images/insurers/sparkassenversicherung.svg', logoAlt: 'Logo Sparkassenversicherung' },
+  { name: 'Sparkassenversicherung', logo: '/assets/images/insurers/sparkassenversicherung.png', logoAlt: 'Logo Sparkassenversicherung' },
   { name: 'R+V Versicherung', logo: '/assets/images/insurers/ruv-versicherung.svg', logoAlt: 'Logo R+V Versicherung' },
   { name: 'ERGO', logo: '/assets/images/insurers/ergo.svg', logoAlt: 'Logo ERGO' },
   { name: 'Württembergische', logo: '/assets/images/insurers/wuerttembergische.svg', logoAlt: 'Logo Württembergische' },
