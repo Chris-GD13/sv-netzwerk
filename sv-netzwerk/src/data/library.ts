@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Starkregen und Rückstau: Schadenaufnahme und Regulierung im Kumulereignis',
+    description: 'Starkregen und Rückstau: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/',
+    category: 'Starkregen und Rückstau',
+    tags: ['Starkregen', 'Rückstau', 'Schadenregulierung', 'Beweissicherung'],
+    date: '2026-07-20',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Brandschaden nach Erstmaßnahmen: Übergang zur Wiederherstellung sauber steuern',
     description: 'Wie nach Löschung und Sicherung die technische Trennung von Gefahrenabwehr, Wiederherstellung und Instandhaltung gelingt.',
     href: '/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/',
