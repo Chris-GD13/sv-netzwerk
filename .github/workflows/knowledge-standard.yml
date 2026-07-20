@@ -34,12 +34,13 @@ jobs:
   publish-and-notify:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    # Deaktivierung: Repo-Variable FACHBEITRAG_AUTOMATION_ENABLED auf 'false' setzen
+    if: ${{ vars.FACHBEITRAG_AUTOMATION_ENABLED != 'false' }}
     defaults:
       run:
         working-directory: sv-netzwerk
     env:
       TZ: Europe/Berlin
-      FACHBEITRAG_AUTOMATION_ENABLED: ${{ vars.FACHBEITRAG_AUTOMATION_ENABLED || 'true' }}
 
     steps:
       - name: Repository auschecken
@@ -53,12 +54,6 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: sv-netzwerk/package-lock.json
-
-      - name: Automationsschalter prüfen
-        if: env.FACHBEITRAG_AUTOMATION_ENABLED != 'true'
-        run: |
-          echo "Fachbeitrags-Automation ist deaktiviert (Repo-Variable FACHBEITRAG_AUTOMATION_ENABLED)."
-          exit 0
 
       - name: Abhängigkeiten installieren
         run: npm ci --no-audit --no-fund
