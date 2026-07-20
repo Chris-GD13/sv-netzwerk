@@ -323,7 +323,7 @@ if (!force && !inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].
 
 const isWeekend = berlinWeekday === 0 || berlinWeekday === 6;
 const runId = `${berlinDate}-${slot}`;
-// publicationId is computed after topic selection (below) to include topic.id for uniqueness
+const publicationId = `${runId}-${crypto.createHash('sha256').update(runId).digest('hex').slice(0, 10)}`;
 
 const safeSlug = (value) => value
   .toLocaleLowerCase('de-DE')
@@ -463,6 +463,19 @@ if (existingSlotRows.length > 0 && !force) {
   }, null, 2));
   process.exit(0);
 }
+if (existingSlotRows.length > 0) {
+  await writeFile(runtimeFile, JSON.stringify({
+    status: 'skipped',
+    reason: 'slot-already-recorded-force-blocked',
+    berlinDate,
+    berlinTime,
+    berlinTimeZone: BERLIN,
+    slot,
+    publicationId,
+    existingPublicationId: existingSlotRows[0].publication_id || '',
+  }, null, 2));
+  process.exit(0);
+}
 
 const weekdayRegional = !isWeekend;
 let regionalSignal = null;
@@ -489,8 +502,6 @@ if (weekdayRegional) {
 const topic = pickTopic(publicationRows);
 const title = createHeadline(topic, regionalSignal);
 const slug = safeSlug(`${topic.slugBase}-${berlinDate}-${slot}`);
-// Include topic.id so each article has a unique publicationId even if run twice on same date+slot
-const publicationId = `${runId}-${crypto.createHash('sha256').update(`${runId}-${topic.id}`).digest('hex').slice(0, 10)}`;
 const articleUrl = `https://www.sv-netzwerk.eu/fachwissen/${slug}/`;
 const imageFileName = `${slug}.svg`;
 const imageWebPath = `/assets/images/linkedin/${imageFileName}`;
@@ -694,7 +705,7 @@ if (!changelogSource.includes(logLine)) {
   await writeFile(changelogFile, updated);
 }
 
-const headers = ['date', 'slot', 'title', 'url', 'category', 'anlass', 'quellen', 'bilddatei', 'bild_alt_text', 'linkedin_status', 'commit', 'deploy_status', 'live_pruefung', 'topic_id', 'publication_id'];
+const headers = ['date', 'zeit_berlin', 'slot', 'title', 'url', 'category', 'anlass', 'quellen', 'bilddatei', 'bild_alt_text', 'linkedin_status', 'commit', 'deploy_status', 'live_pruefung', 'topic_id', 'publication_id'];
 if (!(await fileExists(publicationLogFile))) {
   await mkdir(path.dirname(publicationLogFile), { recursive: true });
   await writeFile(publicationLogFile, `${headers.map(csvEscape).join(',')}\n`);
@@ -703,6 +714,7 @@ if (!(await fileExists(publicationLogFile))) {
 const anlass = regionalSignal ? `regionaler Anlass: ${regionalSignal.title}` : 'allgemeines Fachthema (kein belastbarer Regionalanlass)';
 const csvRow = [
   berlinDate,
+  berlinTime,
   SLOT_WINDOWS[slot].label,
   title,
   articleUrl,

@@ -86,7 +86,7 @@ Der Generator erstellt pro Lauf:
 |---|---|
 | Außerhalb Zeitfenster | Lauf beendet mit Status `skipped`; kein Fehler |
 | Slot bereits erfolgreich veröffentlicht | Lauf beendet mit Status `skipped` |
-| Slot bereits protokolliert (Retry ohne `force`) | Lauf beendet mit Status `skipped` |
+| Slot bereits protokolliert (auch bei `force`) | Lauf beendet mit Status `skipped` |
 | Build fehlgeschlagen | Kein LinkedIn-Post; kein Commit |
 | Live-Check fehlgeschlagen | Kein LinkedIn-Post; Protokoll auf `failed` gesetzt |
 | Zapier-Webhook fehlgeschlagen | Protokoll auf `linkedin=failed` gesetzt; Workflow schlägt fehl |
@@ -98,8 +98,8 @@ Der Generator erstellt pro Lauf:
 
 - **GitHub Actions Concurrency:** Gruppe `fachbeitrag-automation-main`, `cancel-in-progress: false` – kein Abbruch laufender Jobs, aber keine simultane Ausführung.
 - **Slot-ID:** `{YYYY-MM-DD}-{slot}` als eindeutige Identifikation pro Zeitfenster und Tag.
-- **publication_id:** SHA256-basierter Hash über Slot-ID für globale Eindeutigkeit.
-- **Protokollprüfung:** Vor der Erzeugung wird das CSV-Protokoll auf bereits erfolgreiche oder protokollierte Einträge für Datum+Slot geprüft.
+- **publication_id:** SHA256-basierter Hash über die Slot-ID `{YYYY-MM-DD}-{slot}`; damit ist die ID pro Zeitfenster deterministisch und retry-stabil.
+- **Protokollprüfung:** Vor der Erzeugung wird das CSV-Protokoll auf bereits protokollierte Einträge für Datum+Slot geprüft. Existiert ein Slot-Eintrag, wird kein zweiter Beitrag erzeugt (auch nicht mit `force`).
 - **Slug-/Titel-Duplikatprüfung:** Bereits vorhandene Knowledge-Dateien mit gleichem Slug oder gleichem Titel werden erkannt und abgelehnt.
 
 ## Manueller Notfallstart und Deaktivierung
@@ -108,7 +108,7 @@ Der Generator erstellt pro Lauf:
 1. GitHub Actions → `Fachbeitrags-Automation` → `Run workflow`
 2. Optionale Inputs:
    - `slot`: `morning` oder `afternoon` (erzwingt Slot; leer = automatische Erkennung)
-   - `force`: `true` übersteuert Zeitfenster- und Retry-Schutz (aber **nicht** den Schutz vor bereits erfolgreich publiziertem Slot)
+   - `force`: `true` übersteuert nur die Zeitfensterprüfung; der Schutz vor bereits protokolliertem/publiziertem Slot bleibt aktiv
 
 ### Vorübergehende Deaktivierung
 - Repository Variable `FACHBEITRAG_AUTOMATION_ENABLED` auf `false` setzen (Settings → Secrets and variables → Actions → Variables).
@@ -125,6 +125,7 @@ Spalten:
 | Spalte | Inhalt |
 |---|---|
 | `date` | Berliner Datum (YYYY-MM-DD) |
+| `zeit_berlin` | Berliner Veröffentlichungszeit (HH:MM) |
 | `slot` | `morgens` oder `nachmittags` |
 | `title` | Vollständiger Beitragstitel |
 | `url` | Live-URL des Beitrags |
