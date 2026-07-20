@@ -13,6 +13,8 @@ import { insurerClients } from '../../../data/insurer-clients';
       <p class="sv-eyebrow">Versichererübersicht</p>
       <h1>Für wen wir tätig sind</h1>
       <p class="sv-lead">Wir unterstützen Versicherer in der operativen Schadenregulierung.</p>
+      <p class="intro-partner-label">Direkt und über:</p>
+      <img class="intro-partner-logo" src="/assets/images/partners/die-regulierer.png" alt="Logo Die Regulierer" loading="lazy" />
     </div>
   </section>
 
@@ -57,6 +59,8 @@ import { insurerClients } from '../../../data/insurer-clients';
 <style>
   .intro h1{margin:0}
   .intro .sv-lead{max-width:72ch}
+  .intro-partner-label{margin:.85rem 0 .45rem;font-weight:850;color:var(--sv-color-text)}
+  .intro-partner-logo{display:block;max-width:min(100%,15rem);max-height:4rem;width:auto;height:auto;object-fit:contain}
   .logo-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sv-space-4)}
   .logo-card{display:grid;place-items:center;min-height:6rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-lg);background:rgba(255,255,255,.78);text-align:center}
   .logo-card span{font-weight:850;font-size:.9rem}
