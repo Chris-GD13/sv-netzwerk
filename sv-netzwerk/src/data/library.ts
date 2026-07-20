@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Hochwasser und Überflutung: Koordination im Großschadenbestand',
+    description: 'Hochwasser und Überflutung: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/',
+    category: 'Hochwasser und Überflutung',
+    tags: ['Hochwasser', 'Überflutung', 'Großschaden', 'Einsatzplanung'],
+    date: '2026-07-20',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Starkregen und Rückstau: Schadenaufnahme und Regulierung im Kumulereignis',
     description: 'Starkregen und Rückstau: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/',

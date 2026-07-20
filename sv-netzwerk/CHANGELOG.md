@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.2 – 2026-07-20
+- automatischer morgens Fachbeitrag veröffentlicht: „Hochwasser und Überflutung: Koordination im Großschadenbestand“
+- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt
+- Beitragsbild unter /assets/images/linkedin/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning.svg erzeugt
+
 ## 3.4.1 – 2026-07-20
 - automatischer morgens Fachbeitrag veröffentlicht: „Starkregen und Rückstau: Schadenaufnahme und Regulierung im Kumulereignis“
 - LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt
