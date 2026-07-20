@@ -3,14 +3,27 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
 const sent = Astro.url.searchParams.get('gesendet') === '1';
 const error = Astro.url.searchParams.get('fehler');
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Kumulschadenmanagement für Versicherer',
+  serviceType: 'Kumulschadenmanagement und Unwetterlagen-Steuerung',
+  areaServed: 'DE',
+  provider: {
+    '@type': 'Organization',
+    name: 'SV-Netzwerk Bau & Schaden',
+    url: 'https://www.sv-netzwerk.eu/',
+  },
+  url: 'https://www.sv-netzwerk.eu/leistungen/kumulschadenmanagement/',
+};
 ---
-<BaseLayout title="Kumulschadenmanagement | Auftrag direkt erteilen" description="Kumulschaden und Unwetterschäden direkt melden: Formular sofort öffnen und Auftrag übermitteln." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Kumulschadenmanagement'}]}>
+<BaseLayout title="Kumulschadenmanagement für Versicherer | Auftrag direkt erteilen" description="Kumulschadenmanagement für Versicherer: Unwetterschäden direkt melden, priorisieren und strukturiert beauftragen." structuredData={serviceSchema} breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Kumulschadenmanagement'}]}>
   <section class="sv-section" id="kumulschaden-formular">
     <div class="sv-container kumul-grid">
       <article class="sv-card form-card">
         <p class="sv-eyebrow">Kumulschaden</p>
-        <h1>Kumulschadenformular direkt ausfüllen</h1>
-        <p class="sv-lead">Formular ohne Zwischenseite ausfüllen und Auftrag direkt übermitteln.</p>
+        <h1>Kumulschadenmanagement direkt beauftragen</h1>
+        <p class="sv-lead">Formular ohne Zwischenschritt ausfüllen und die Steuerung regionaler Schadenlagen priorisiert starten.</p>
         <h2>Kumulschaden-Formular</h2>
         {sent && <p class="status success">Der Auftrag wurde übermittelt. Sie erhalten eine Eingangsbestätigung per E-Mail.</p>}
         {error && <p class="status error">Die Übermittlung konnte nicht verarbeitet werden. Bitte Eingaben prüfen.</p>}

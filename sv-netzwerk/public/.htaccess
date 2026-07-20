@@ -1,0 +1,13 @@
+RewriteEngine On
+
+# Canonical host and protocol
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} !^www\.sv-netzwerk\.eu$ [NC]
+RewriteRule ^ https://www.sv-netzwerk.eu%{REQUEST_URI} [R=301,L]
+
+# Consolidated insurer landing page
+RewriteRule ^versicherungen/?$ /versicherer/ [R=301,L,NC]
+
+# Consolidated knowledge base paths
+RewriteRule ^svos/fachwissen/?$ /fachwissen/ [R=301,L,NC]
+RewriteRule ^svos/fachwissen/(.*)$ /fachwissen/$1 [R=301,L,NC]

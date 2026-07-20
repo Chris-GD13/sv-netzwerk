@@ -6,7 +6,15 @@ export default defineConfig({
   integrations: [
     sitemap({
       filter: (page) =>
-        !page.includes('/wissen-in-180-sekunden') && !page.includes('/komponenten') && !page.includes('/praxisfaelle')
+        !page.includes('/wissen-in-180-sekunden') &&
+        !page.includes('/komponenten') &&
+        !page.includes('/praxisfaelle') &&
+        !page.includes('/fachwissen/tag/') &&
+        !page.includes('/fachwissen/kategorie/') &&
+        !page.includes('/fachwissen/seite/') &&
+        !page.endsWith('/fachwissen/az/') &&
+        !page.includes('/svos/fachwissen') &&
+        !page.endsWith('/versicherungen/')
     })
   ],
   prefetch: true,

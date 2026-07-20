@@ -18,8 +18,9 @@ const related = findRelatedKnowledge(entry, allEntries);
 const readingMinutes = estimateReadingMinutes(entry.body ?? '', entry.data.readingMinutes);
 const seoTitle = entry.data.seo.title ?? `${entry.data.title} | SV-Netzwerk`;
 const seoDescription = entry.data.seo.description ?? entry.data.description;
+const canonical = `/fachwissen/${entry.id}/`;
 ---
-<BaseLayout title={seoTitle} description={seoDescription} canonical={entry.data.seo.canonical} image={entry.data.seo.image} imageAlt={entry.data.seo.imageAlt} type="article" breadcrumbs={[{label:'Start',href:'/'},{label:'SVOS',href:'/svos/'},{label:'Fachartikel',href:'/svos/fachwissen/'},{label:entry.data.title}]}>
+<BaseLayout title={seoTitle} description={seoDescription} canonical={canonical} noindex image={entry.data.seo.image} imageAlt={entry.data.seo.imageAlt} type="article" breadcrumbs={[{label:'Start',href:'/'},{label:'SVOS',href:'/svos/'},{label:'Fachartikel',href:'/svos/fachwissen/'},{label:entry.data.title}]}>
   <article class="sv-section"><div class="sv-container article-shell">
     <header><p class="eyebrow"><a href={`/svos/fachwissen/kategorie/${slugify(entry.data.category)}/`}>{entry.data.category}</a></p><h1>{entry.data.title}</h1><p class="lead">{entry.data.description}</p><KnowledgeMeta author={entry.data.author} publishedAt={entry.data.publication.publishedAt} updatedAt={entry.data.publication.updatedAt} readingMinutes={readingMinutes}/></header>
     <div class="prose"><Content /></div>

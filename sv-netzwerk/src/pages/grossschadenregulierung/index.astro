@@ -3,14 +3,27 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const sent = Astro.url.searchParams.get('gesendet') === '1';
 const error = Astro.url.searchParams.get('fehler');
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Großschadenregulierung für Versicherer',
+  serviceType: 'Großschadenregulierung und Komplexschadensteuerung',
+  areaServed: 'DE',
+  provider: {
+    '@type': 'Organization',
+    name: 'SV-Netzwerk Bau & Schaden',
+    url: 'https://www.sv-netzwerk.eu/',
+  },
+  url: 'https://www.sv-netzwerk.eu/grossschadenregulierung/',
+};
 ---
-<BaseLayout title="Großschadenregulierung | Auftrag direkt erteilen" description="Großschaden sofort beauftragen: Formular direkt ausfüllen und Auftrag ohne Umwege erteilen." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Großschadenregulierung'}]}>
+<BaseLayout title="Großschadenregulierung für Versicherer | Auftrag direkt erteilen" description="Großschadenregulierung für Versicherer: Formular direkt ausfüllen und Auftrag ohne Umwege übermitteln." structuredData={serviceSchema} breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Großschadenregulierung'}]}>
   <section class="sv-section" id="grossschaden-formular">
     <div class="sv-container gross-grid">
       <article class="sv-card form-card">
         <p class="sv-eyebrow">Großschaden</p>
-        <h1>Großschadenformular direkt ausfüllen</h1>
-        <p class="sv-lead">Formular ohne Zwischenseite ausfüllen und Auftrag direkt übermitteln.</p>
+        <h1>Großschadenregulierung direkt beauftragen</h1>
+        <p class="sv-lead">Formular ohne Zwischenschritt ausfüllen und die Großschadenbearbeitung mit klarer Priorisierung starten.</p>
         <h2>Großschaden-Formular</h2>
         {sent && <p class="status success">Der Auftrag wurde übermittelt. Sie erhalten eine Eingangsbestätigung per E-Mail.</p>}
         {error && <p class="status error">Die Übermittlung konnte nicht verarbeitet werden. Bitte Eingaben prüfen.</p>}

@@ -22,10 +22,43 @@ interface Props {
   noindex?: boolean;
   preloadImage?: string;
   breadcrumbs?: BreadcrumbItem[];
+  structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
 }
 
 const props = Astro.props;
-const schema = {
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.legalName,
+  url: site.url,
+  email: site.email,
+  telephone: site.phone,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address[0],
+    postalCode: '73432',
+    addressLocality: 'Aalen',
+    addressCountry: 'DE',
+  },
+};
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: site.legalName,
+  url: site.url,
+  email: site.email,
+  telephone: site.phone,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address[0],
+    postalCode: '73432',
+    addressLocality: 'Aalen',
+    addressCountry: 'DE',
+  },
+};
+
+const professionalServiceSchema = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
   name: site.legalName,
@@ -40,6 +73,38 @@ const schema = {
     addressCountry: 'DE',
   },
 };
+
+const breadcrumbItems = (props.breadcrumbs ?? []).map((item, index) => {
+  const node: Record<string, unknown> = {
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.label,
+  };
+  if (item.href) node.item = new URL(item.href, site.url).toString();
+  return node;
+});
+
+const breadcrumbSchema = breadcrumbItems.length > 0
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbItems,
+    }
+  : null;
+
+const pageSchemas = Array.isArray(props.structuredData)
+  ? props.structuredData
+  : props.structuredData
+    ? [props.structuredData]
+    : [];
+
+const schemas = [
+  organizationSchema,
+  localBusinessSchema,
+  professionalServiceSchema,
+  ...(breadcrumbSchema ? [breadcrumbSchema] : []),
+  ...pageSchemas,
+];
 ---
 
 <!doctype html>
@@ -51,7 +116,7 @@ const schema = {
     <meta name="color-scheme" content="light" />
     <PerformanceHints preloadImage={props.preloadImage} />
     <SEO {...props} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+    {schemas.map((schema) => <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />)}
   </head>
   <body>
     <a class="skip-link" href="#main-content">Zum Inhalt springen</a>

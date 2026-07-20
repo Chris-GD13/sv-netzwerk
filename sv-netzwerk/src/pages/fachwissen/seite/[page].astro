@@ -18,7 +18,7 @@ const { page, totalPages } = Astro.props;
 const start = (page - 1) * PAGE_SIZE;
 const pageItems = sortedLibrary.slice(start, start + PAGE_SIZE);
 ---
-<BaseLayout title={`Fachartikel – Seite ${page} | SV-Netzwerk`} description={`Weitere Fachbeiträge aus dem SV-Netzwerk Fachartikel-Bereich, Seite ${page}.`}>
+<BaseLayout title={`Fachartikel – Seite ${page} | SV-Netzwerk`} description={`Weitere Fachbeiträge aus dem SV-Netzwerk Fachartikel-Bereich, Seite ${page}.`} noindex>
   <Hero eyebrow="SVOS Fachartikel" title={`Fachartikel – Seite ${page}`} text="Weitere technische und regulierungsrelevante Fachbeiträge." />
   <section class="sv-section">
     <div class="sv-container">

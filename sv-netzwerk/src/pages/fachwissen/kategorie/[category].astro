@@ -13,7 +13,7 @@ export function getStaticPaths() {
 const { category } = Astro.props;
 const items = sortedLibrary.filter((item) => item.category === category);
 ---
-<BaseLayout title={`${category} – Fachartikel | SV-Netzwerk`} description={`Fachartikel, Praxishinweise und technische Bewertungen aus der Kategorie ${category}.`}>
+<BaseLayout title={`${category} – Fachartikel | SV-Netzwerk`} description={`Fachartikel, Praxishinweise und technische Bewertungen aus der Kategorie ${category}.`} noindex>
   <Hero eyebrow="Fachartikel nach Kategorie" title={category} text={`${items.length} ${items.length === 1 ? 'Beitrag' : 'Beiträge'} zu ${category}.`} />
   <section class="sv-section">
     <div class="sv-container">

@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import CallToAction from '../../../components/CallToAction.astro';
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Schadenregulierung für Versicherer',
+  serviceType: 'Schadenregulierung, Großschaden- und Kumulschadensteuerung',
+  areaServed: 'DE',
+  provider: {
+    '@type': 'Organization',
+    name: 'SV-Netzwerk Bau & Schaden',
+    url: 'https://www.sv-netzwerk.eu/',
+  },
+  url: 'https://www.sv-netzwerk.eu/leistungen/schadenregulierung-fuer-versicherer/',
+};
+---
+
+<BaseLayout
+  title="Schadenregulierung für Versicherer | SV-Netzwerk"
+  description="Schadenregulierung für Versicherer mit klarer Prozessführung, technischer Prüfung und belastbaren Entscheidungsvorlagen."
+  breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Schadenregulierung für Versicherer'}]}
+  structuredData={serviceSchema}
+>
+  <section class="sv-section">
+    <div class="sv-container intro">
+      <p class="sv-eyebrow">Versicherer-Leistung</p>
+      <h1>Schadenregulierung für Versicherer mit klarer Prozessverantwortung</h1>
+      <p class="sv-lead">Wir strukturieren Schadenaufnahme, technische Einordnung, Kostenprüfung und Dokumentation so, dass Entscheidungen belastbar und revisionssicher getroffen werden können.</p>
+    </div>
+  </section>
+
+  <section class="sv-section">
+    <div class="sv-container grid">
+      <article class="sv-card">
+        <h2>Leistungsmodule</h2>
+        <ul>
+          <li>Technische Schadenabgrenzung und Ursacheneinordnung</li>
+          <li>KVA- und Rechnungsprüfung inklusive Nachträgen und Regiekosten</li>
+          <li>Steuerung von Großschaden- und Kumulschadenlagen</li>
+          <li>Laufende Reservefortschreibung mit dokumentierten Annahmen</li>
+        </ul>
+      </article>
+      <article class="sv-card">
+        <h2>Prozess & SLA</h2>
+        <ul>
+          <li>Erstreaktion und Priorisierung nach vereinbartem SLA</li>
+          <li>Transparente Übergaben zwischen Regulierer, Sachverständigen und Dienstleistern</li>
+          <li>Einheitliche Aktenstruktur für nachvollziehbare Entscheidungen</li>
+          <li>Regelmäßige Status- und Risikoberichte je Schadenlage</li>
+        </ul>
+      </article>
+      <article class="sv-card">
+        <h2>Einsatzgebiet</h2>
+        <ul>
+          <li>Standort Aalen, bundesweite Koordination</li>
+          <li>Einzelschäden, Großschäden und regionale Kumulereignisse</li>
+          <li>Wohngebäude, Gewerbe, Industrie und gemischte Portfolios</li>
+          <li>Skalierbare Steuerung bei hoher Schadenfrequenz</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <CallToAction
+    title="Schadenregulierung für Ihr Portfolio abstimmen"
+    text="Übermitteln Sie Schadenart, Region, Volumen und gewünschte Bearbeitungstiefe direkt über das Versicherer-Formular."
+    href="/versicherer/#anfrage"
+    label="Anfrage / Beauftragung starten"
+  />
+</BaseLayout>
+
+<style>
+  .intro h1{margin:0}
+  .intro .sv-lead{max-width:68ch}
+  .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sv-space-5)}
+  .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}
+  ul{display:grid;gap:.55rem;margin:0;padding-left:1.2rem}
+  @media(max-width:62rem){.grid{grid-template-columns:1fr}}
+</style>

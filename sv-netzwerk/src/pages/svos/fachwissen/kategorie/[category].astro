@@ -12,5 +12,5 @@ const { category } = Astro.params;
 const { label } = Astro.props;
 const entries = filterByCategory(await getPublishedKnowledge(), category!);
 ---
-<BaseLayout title={`${label} | SVOS Fachartikel`} description={`Fachbeiträge der Kategorie ${label}.`} breadcrumbs={[{label:'Start',href:'/'},{label:'SVOS',href:'/svos/'},{label:'Fachartikel',href:'/svos/fachwissen/'},{label}]}><Hero eyebrow="Kategorie" title={label} text={`${entries.length} veröffentlichte Fachbeiträge`}/><section class="sv-section"><div class="sv-container grid">{entries.map((entry)=><KnowledgeCard entry={entry}/>)}</div></section></BaseLayout>
+<BaseLayout title={`${label} | SVOS Fachartikel`} description={`Fachbeiträge der Kategorie ${label}.`} canonical={`/fachwissen/kategorie/${category}/`} noindex breadcrumbs={[{label:'Start',href:'/'},{label:'SVOS',href:'/svos/'},{label:'Fachartikel',href:'/svos/fachwissen/'},{label}]}><Hero eyebrow="Kategorie" title={label} text={`${entries.length} veröffentlichte Fachbeiträge`}/><section class="sv-section"><div class="sv-container grid">{entries.map((entry)=><KnowledgeCard entry={entry}/>)}</div></section></BaseLayout>
 <style>.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:var(--sv-space-5)}</style>
