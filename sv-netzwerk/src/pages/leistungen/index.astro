@@ -3,13 +3,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import FeatureCard from '../../components/FeatureCard.astro';
 
 const services = [
-  { id: 'sachverstaendigenleistungen', title: 'Sachverständigenleistungen', text: 'Schadenaufnahme, technische Feststellungen, Ursacheneinordnung, Bewertung und verständliche Empfehlung für den konkreten Prüfauftrag.', href: '/schaden-melden/' },
-  { id: 'kumulschadenmanagement', title: 'Kumulschadenmanagement', text: 'Skalierbare Bearbeitung gleichartiger Schadenlagen mit priorisierter Erstaufnahme und strukturierter Rückmeldung.', href: '/leistungen/kumulschadenmanagement/' },
-  { id: 'versicherer', title: 'Leistungen für Versicherer', text: 'Prüffähige Entscheidungsvorlagen, KVA- und Rechnungsprüfung sowie klare Kommunikation zu offenen Punkten.', href: '/versicherer/' },
-  { id: 'grossschaden-und-komplexschadenregulierung', title: 'Großschaden- und Komplexschadenregulierung', text: 'Koordination umfangreicher Vorgänge mit belastbaren Berichten, Reserven und dokumentierten Entscheidungen.', href: '/grossschadenregulierung/' },
-  { id: 'technische-schadenbewertung', title: 'Technische Schadenbewertung', text: 'Abgrenzung von Schaden, Vorschaden, Mangel und Instandhaltung mit nachvollziehbarer Herleitung.', href: '/schaden-melden/' },
-  { id: 'beweissicherung', title: 'Beweissicherung', text: 'Dokumentation von Zuständen, Spuren, Messwerten und Öffnungen als belastbare Grundlage für die Bearbeitung.', href: '/schaden-melden/' },
-  { id: 'gutachter-plattform', title: 'Gutachter-Plattform', text: 'Digitale Zusammenarbeit mit klarer Vorgangsstruktur, Aufgabensteuerung und nachvollziehbaren Bearbeitungsständen.', href: '/gutachter-plattform/' },
+  { id: 'sachverstaendigenleistungen', title: 'Sachverständigenleistungen', text: 'Schadenaufnahme, technische Feststellungen, Ursacheneinordnung, Bewertung und verständliche Empfehlung für den konkreten Prüfauftrag.', href: '/schaden-melden/', linkLabel: 'Anfrage stellen' },
+  { id: 'kumulschadenmanagement', title: 'Kumulschadenmanagement', text: 'Skalierbare Bearbeitung gleichartiger Schadenlagen mit priorisierter Erstaufnahme und strukturierter Rückmeldung.', href: '/schaden-melden/', linkLabel: 'Anfrage stellen' },
+  { id: 'versicherer', title: 'Leistungen für Versicherer', text: 'Prüffähige Entscheidungsvorlagen, KVA- und Rechnungsprüfung sowie klare Kommunikation zu offenen Punkten.', href: '/schaden-melden/', linkLabel: 'Anfrage stellen' },
+  { id: 'grossschaden-und-komplexschadenregulierung', title: 'Großschaden- und Komplexschadenregulierung', text: 'Koordination umfangreicher Vorgänge mit belastbaren Berichten, Reserven und dokumentierten Entscheidungen.', href: '/schaden-melden/', linkLabel: 'Anfrage stellen' },
+  { id: 'technische-schadenbewertung', title: 'Technische Schadenbewertung', text: 'Abgrenzung von Schaden, Vorschaden, Mangel und Instandhaltung mit nachvollziehbarer Herleitung.' },
+  { id: 'beweissicherung', title: 'Beweissicherung', text: 'Dokumentation von Zuständen, Spuren, Messwerten und Öffnungen als belastbare Grundlage für die Bearbeitung.' },
+  { id: 'gutachter-plattform', title: 'Gutachter-Plattform', text: 'Digitale Zusammenarbeit mit klarer Vorgangsstruktur, Aufgabensteuerung und nachvollziehbaren Bearbeitungsständen.', href: '/gutachter-plattform/anfrage/', linkLabel: 'Zur Plattform-Anfrage' },
 ];
 ---
 
@@ -25,7 +25,7 @@ const services = [
     <div class="sv-container">
       <div class="service-grid">
         {services.map((service, index) => (
-          <div id={service.id} class="service-anchor"><FeatureCard index={String(index + 1).padStart(2, '0')} title={service.title} text={service.text} href={service.href} /></div>
+          <div id={service.id} class="service-anchor"><FeatureCard index={String(index + 1).padStart(2, '0')} title={service.title} text={service.text} href={service.href} linkLabel={service.linkLabel} /></div>
         ))}
       </div>
     </div>
