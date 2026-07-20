@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 $to = 'info@sv-netzwerk.eu';
 $from = 'info@sv-netzwerk.eu';
-$subject = 'SV-Netzwerk: Anfrage / Beauftragung fuer Versicherer';
+$subject = 'SV-Netzwerk: Anfrage / Beauftragung für Versicherer';
 
 function field(string $key): string {
     $value = $_POST[$key] ?? '';
@@ -81,7 +81,7 @@ if ($errors) {
     exit;
 }
 
-$body = "Neue Anfrage / Beauftragung ueber sv-netzwerk.eu\n\n";
+$body = "Neue Anfrage / Beauftragung über sv-netzwerk.eu\n\n";
 $body .= "Vorgangsart: {$vorgangsart}\n";
 $body .= "Auftraggeber: {$auftraggeber}\n";
 $body .= "Ansprechpartner: {$ansprechpartner}\n";

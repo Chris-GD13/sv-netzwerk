@@ -20,7 +20,7 @@ publication:
   updatedAt: 2026-07-17
   status: published
 seo:
-  title: "Brandschaden: Übergang von Notmaßnahme zur Wiederherstellung"
+  title: "Brandschaden: Notmaßnahme und Wiederherstellung trennen"
   description: "Praxisleitfaden zur Abgrenzung von Erstmaßnahmen, schadenbedingter Wiederherstellung und Instandhaltung nach Brandschäden."
 ---
 

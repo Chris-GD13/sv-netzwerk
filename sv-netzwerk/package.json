@@ -6,11 +6,12 @@
   "scripts": {
     "dev": "astro dev",
     "prebuild": "npm run validate:knowledge && node scripts/write-deploy-version.mjs",
-    "build": "astro check && astro build && npm run validate:public-copy",
+    "build": "astro check && astro build && npm run validate:public-copy && npm run validate:visible-umlauts",
     "preview": "astro preview",
     "check": "astro check",
     "validate:knowledge": "node scripts/validate-knowledge.mjs",
     "validate:public-copy": "node scripts/validate-public-copy.mjs",
+    "validate:visible-umlauts": "node scripts/validate-visible-umlauts.mjs",
     "fachbeitrag:run": "node scripts/run-fachbeitrag-automation.mjs",
     "fachbeitrag:log": "node scripts/update-fachbeitrag-log.mjs"
   },

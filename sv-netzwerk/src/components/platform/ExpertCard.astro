@@ -12,7 +12,7 @@ const { expert } = Astro.props;
     <h2><a href={`/experten/${expert.slug}/`}>{expert.name}</a></h2>
     <strong>{expert.function}</strong>
     <p>{expert.shortProfile}</p>
-    <ul aria-label={`Fachgebiete von ${expert.name}`}>{expert.expertise.slice(0,4).map((item)=><li>{item}</li>)}</ul>
+    <ul>{expert.expertise.slice(0,4).map((item)=><li>{item}</li>)}</ul>
     <div class="expert-card__links">
       <a class="expert-card__link" href={`/experten/${expert.slug}/`}>Profil und Beschreibung <span aria-hidden="true">→</span></a>
       {expert.linkedin && <a class="expert-card__linkedin" href={expert.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${expert.name} auf LinkedIn`}>LinkedIn <span aria-hidden="true">↗</span></a>}

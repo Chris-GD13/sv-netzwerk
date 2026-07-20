@@ -13,7 +13,7 @@ const typeLabel = type === 'video' ? 'Video' : 'Fachbeitrag';
   </div>
   <h2><a href={href}>{title}</a></h2>
   <p>{description}</p>
-  <ul class="tag-list" aria-label="Schlagwörter">
+  <ul class="tag-list">
     {tags.map((tag) => <li><a href={`/fachwissen/tag/${slugify(tag)}/`}>#{tag}</a></li>)}
   </ul>
   <div class="article-footer">

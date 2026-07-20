@@ -55,7 +55,7 @@ if ($errors) {
 }
 
 $subject = 'SV-Netzwerk: ' . ($formular !== '' ? $formular : 'Kontaktanfrage');
-$body = "Neue Anfrage ueber sv-netzwerk.eu\n\n";
+$body = "Neue Anfrage über sv-netzwerk.eu\n\n";
 $body .= "Formular: " . ($formular !== '' ? $formular : 'Kontaktformular') . "\n";
 $body .= "Name / Auftraggeber: {$name}\n";
 $body .= "E-Mail: {$email}\n";

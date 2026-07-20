@@ -1,7 +1,0 @@
----
-import type { PlatformModule } from '../../types/platform';
-interface Props { module: PlatformModule }
-const { module } = Astro.props;
----
-<article class="module-card sv-card"><span class:list={['module-card__status',{'is-live':module.status==='verfügbar'}]}>{module.status}</span><h3>{module.title}</h3><p>{module.description}</p><div>{module.audience.map((item)=><small>{item}</small>)}</div><a href={module.href}>Modul öffnen <span aria-hidden="true">→</span></a></article>
-<style>.module-card{display:flex;min-height:19rem;flex-direction:column;padding:1.45rem}.module-card__status{align-self:flex-start;padding:.25rem .5rem;border-radius:999px;background:var(--sv-color-surface-alt);color:var(--sv-color-muted);font-size:.7rem;font-weight:900;text-transform:uppercase}.module-card__status.is-live{background:#ddf4e7;color:#185c38}.module-card h3{margin-top:1.5rem}.module-card p{color:var(--sv-color-muted)}.module-card>div{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1rem}.module-card small{padding:.2rem .4rem;border:1px solid var(--sv-color-line);border-radius:.4rem}.module-card a{margin-top:auto;font-weight:850;text-decoration:none}</style>

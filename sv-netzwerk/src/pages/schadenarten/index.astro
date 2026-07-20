@@ -20,7 +20,7 @@ const steps=[{title:'Schadenbild',text:'Sichtbare und verdeckte Betroffenheit er
       </div>
     </div>
   </section>
-  <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Kompetenzbereiche" title="Elf Einstiege in die technische Schadenbewertung" text="Die Detailseiten verbinden typische Pruefgegenstaende mit Fachartikeln, Praxisfaellen und zustaendigen Experten."/><div class="sv-grid sv-grid-3">{damageTypes.map((item,index)=><DamageCard item={item} index={index+1}/>)}</div></div></section>
+  <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Kompetenzbereiche" title="Elf Einstiege in die technische Schadenbewertung" text="Die Detailseiten verbinden typische Prüfgegenstände mit Fachartikeln, Praxisfällen und zuständigen Experten."/><div class="sv-grid sv-grid-3">{damageTypes.map((item,index)=><DamageCard item={item} index={index+1}/>)}</div></div></section>
   <section class="sv-section sv-section-alt"><div class="sv-container"><SectionHeader eyebrow="Gemeinsamer Standard" title="Vom Schadenbild zur dokumentierten Entscheidung"/><ProcessFlow steps={steps}/></div></section>
   <CallToAction title="Schadenart noch nicht eindeutig?" text="Die Erstklassifizierung wird anhand von Schadenbild, Objekt, Einwirkungsweg und verfügbaren Unterlagen geprüft." href="/schaden-melden/" label="Schaden strukturiert erfassen" />
 </BaseLayout>

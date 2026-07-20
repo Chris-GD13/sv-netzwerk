@@ -13,7 +13,7 @@ const { entry, compact = false } = Astro.props;
   </div>
   <h2><a href={knowledgePath(entry)}>{entry.data.title}</a></h2>
   <p>{entry.data.description}</p>
-  {!compact && <ul aria-label="Schlagwörter">{entry.data.tags.map((tag) => <li><a href={`/svos/fachwissen/tag/${slugify(tag)}/`}>#{tag}</a></li>)}</ul>}
+  {!compact && <ul>{entry.data.tags.map((tag) => <li><a href={`/svos/fachwissen/tag/${slugify(tag)}/`}>#{tag}</a></li>)}</ul>}
   <a class="read" href={knowledgePath(entry)}>Fachbeitrag lesen <span aria-hidden="true">→</span></a>
 </article>
 <style>

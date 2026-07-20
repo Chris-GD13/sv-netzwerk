@@ -34,7 +34,7 @@ Bei einem Einheitspreisangebot ist der geschuldete Leistungsumfang grundsätzlic
 
 Fehlt diese Dokumentation, lässt sich später oft nicht mehr trennen zwischen schadenbedingter Tätigkeit, allgemeiner Baustellenorganisation, Sowieso-Kosten, Nachbesserung eigener Leistungen und zusätzlichen Arbeiten auf Wunsch des Auftraggebers. Eine nachträgliche pauschale Beschreibung wie „Demontage und Trocknung vorbereitet“ genügt hierfür nicht.
 
-## 1. Auftrag und Freigaberahmen feststellen
+## Auftrag und Freigaberahmen feststellen
 
 Am Anfang steht die Frage, auf welcher Grundlage die Regiearbeit ausgeführt wurde. Zu prüfen sind insbesondere:
 
@@ -48,7 +48,7 @@ Eine Notmaßnahme kann auch ohne vollständig ausgearbeitetes Leistungsverzeichn
 
 Die Beauftragung eines Dienstleisters bedeutet deshalb nicht automatisch, dass jede später auf einem Regiezettel aufgeführte Tätigkeit freigegeben ist. Entscheidend ist der dokumentierte Auftragsrahmen.
 
-## 2. Schadenbezug für jede Tätigkeit herstellen
+## Schadenbezug für jede Tätigkeit herstellen
 
 Jede abgerechnete Leistung benötigt einen konkreten Bezug zum Schaden. Dieser Bezug muss aus der Beschreibung oder den ergänzenden Unterlagen hervorgehen. Allgemeine Formulierungen wie „Baustelle eingerichtet“, „Material transportiert“ oder „Arbeiten durchgeführt“ sind ohne nähere Zuordnung nicht ausreichend.
 
@@ -63,7 +63,7 @@ Prüffähige Beschreibungen benennen beispielsweise:
 
 Bei einem Leitungswasserschaden wäre etwa zu unterscheiden, ob Möbel zur Freilegung einer betroffenen Wand versetzt wurden oder ob eine vollständige Räumung aus organisatorischen Gründen erfolgte. Ebenso ist relevant, ob eine Decke zur Leckageortung geöffnet oder im Zuge einer ohnehin vorgesehenen Modernisierung demontiert wurde.
 
-## 3. Stundenlohnnachweise inhaltlich prüfen
+## Stundenlohnnachweise inhaltlich prüfen
 
 Ein belastbarer Stundenlohnnachweis enthält mindestens Datum, Namen oder eindeutige Funktion der eingesetzten Personen, Beginn und Ende der Arbeitszeit, Pausen, konkrete Tätigkeit und Leistungsort. Werden mehrere Tätigkeiten ausgeführt, sollten die Zeiten nachvollziehbar aufgeteilt sein.
 
@@ -79,7 +79,7 @@ Besondere Aufmerksamkeit verdienen:
 
 Eine Unterschrift des Versicherungsnehmers oder eines Mieters bestätigt häufig nur die Anwesenheit oder Entgegennahme des Nachweises. Sie ersetzt nicht die fachliche und wirtschaftliche Prüfung durch den Auftraggeber oder Versicherer.
 
-## 4. Personalansatz und Qualifikation bewerten
+## Personalansatz und Qualifikation bewerten
 
 Nicht jede Tätigkeit erfordert denselben Qualifikationsgrad. Für eine fachgerechte Demontage technischer Anlagen kann qualifiziertes Personal erforderlich sein. Reine Transport-, Reinigungs- oder Hilfstätigkeiten sind dagegen entsprechend einzuordnen.
 
@@ -87,7 +87,7 @@ Abgerechnet werden sollte die tatsächlich erforderliche Personalstruktur. Wenn 
 
 Die Bewertung muss die konkrete Ausführungssituation berücksichtigen: Gefährdung, Gewicht, Zugänglichkeit, Zeitdruck, notwendige Sicherung und technische Verantwortung können einen höheren Personalbedarf rechtfertigen. Diese Umstände müssen jedoch dokumentiert sein.
 
-## 5. Material und Verbrauchsstoffe nachvollziehen
+## Material und Verbrauchsstoffe nachvollziehen
 
 Materialpositionen benötigen Bezeichnung, Menge, Einzelpreis und Verwendung. Bei Kleinteilen oder Verbrauchsmaterial kann eine angemessene Pauschale vertretbar sein, sofern sie transparent ausgewiesen und nicht zusätzlich einzeln berechnet wird.
 
@@ -102,7 +102,7 @@ Zu unterscheiden sind:
 
 Bei betriebseigenen Geräten muss erkennbar sein, welche Leistung mit dem Gerätesatz abgegolten wird. Eine parallele Berechnung von Gerätesatz, Maschinenstunde, Personal und zusätzlicher Grundpauschale kann zu Überschneidungen führen. Bei Mietgeräten sind Mietdauer, Lieferschein und tatsächlicher Einsatzzeitraum abzugleichen.
 
-## 6. Fremdleistungen und Nachunternehmer trennen
+## Fremdleistungen und Nachunternehmer trennen
 
 Werden Nachunternehmer oder externe Dienstleister eingesetzt, sind deren Leistungen gesondert nachzuweisen. Die bloße Weiterberechnung eines Gesamtbetrags ohne Ursprungsbeleg verhindert die Prüfung von Leistungsumfang, Preis und möglicher Doppelberechnung.
 
@@ -115,7 +115,7 @@ Erforderlich sind regelmäßig:
 
 Koordinationsaufwand kann vergütungsfähig sein, wenn er tatsächlich angefallen, beauftragt und angemessen ist. Ein pauschaler Aufschlag ohne vertragliche oder nachvollziehbare Grundlage ist jedoch gesondert zu bewerten.
 
-## 7. Überschneidungen mit Angeboten und Pauschalen vermeiden
+## Überschneidungen mit Angeboten und Pauschalen vermeiden
 
 In komplexen Schadenfällen werden Sofortmaßnahmen häufig zunächst nach Aufwand abgerechnet, während die Wiederherstellung später auf Grundlage eines Angebots erfolgt. Dadurch entsteht ein besonderes Risiko doppelter Vergütung.
 

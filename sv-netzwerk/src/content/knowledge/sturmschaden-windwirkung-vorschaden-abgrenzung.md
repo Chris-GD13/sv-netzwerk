@@ -20,7 +20,7 @@ publication:
   updatedAt: 2026-07-17
   status: published
 seo:
-  title: "Sturmschaden: Windwirkung und Vorschaden technisch trennen"
+  title: "Sturmschaden: Windwirkung und Vorschäden sauber trennen"
   description: "Praxisleitfaden zur technischen Abgrenzung von Windwirkung, Bauteilversagen, Vorschaden und Instandhaltung nach Sturm- und Hagelereignissen."
 ---
 

@@ -62,18 +62,18 @@ if ($errors) {
     exit;
 }
 
-$subject = 'Gutachter-Plattform Anfrage ueber SV-Netzwerk - ' . ($unternehmen !== '' ? $unternehmen : $name);
+$subject = 'Gutachter-Plattform Anfrage über SV-Netzwerk - ' . ($unternehmen !== '' ? $unternehmen : $name);
 $body = "Neue Anfrage zur Gutachter-Plattform
 
 ";
 $body .= "WICHTIGER HERKUNFTS- UND PROVISIONSHINWEIS:
 ";
-$body .= "Diese Kontaktanfrage wurde ueber sv-netzwerk.eu / SV-Netzwerk vermittelt. Bitte bei der weiteren Bearbeitung und Zuordnung entsprechend beruecksichtigen.
+$body .= "Diese Kontaktanfrage wurde über sv-netzwerk.eu / SV-Netzwerk vermittelt. Bitte bei der weiteren Bearbeitung und Zuordnung entsprechend berücksichtigen.
 
 ";
-$body .= "Empfaenger / Plattformbetreiber:
+$body .= "Empfänger / Plattformbetreiber:
 ";
-$body .= "GASD GmbH, vertreten durch den Geschaeftsfuehrer Goran Krstic
+$body .= "GASD GmbH, vertreten durch den Geschäftsführer Goran Krstic
 ";
 $body .= "Hauptstr. 7, 76571 Gaggenau, Deutschland
 ";
@@ -103,7 +103,7 @@ $body .= "Nachricht:
 ";
 $body .= "---
 ";
-$body .= "Gesendet ueber: https://www.sv-netzwerk.eu/gutachter-plattform/anfrage/
+$body .= "Gesendet über: https://www.sv-netzwerk.eu/gutachter-plattform/anfrage/
 ";
 $body .= "Gesendet am: " . date('d.m.Y H:i:s') . "
 ";

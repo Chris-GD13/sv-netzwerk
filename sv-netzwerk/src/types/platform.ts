@@ -39,11 +39,3 @@ export interface DamageType {
   seoTitle: string;
   seoDescription: string;
 }
-
-export interface PlatformModule {
-  title: string;
-  description: string;
-  href: string;
-  status: 'verfügbar' | 'im Ausbau';
-  audience: string[];
-}

@@ -4,7 +4,7 @@ export const site = {
   description: 'Sachverständige, Großschaden- und Komplexschadenregulierung und vernetzte Fachkompetenz für komplexe Bau- und Versicherungsschäden.',
   url: 'https://www.sv-netzwerk.eu',
   email: 'info@sv-netzwerk.eu',
-  phone: '07367 / 393 97 83',
+  phone: '07367 / 393 97 83',
   address: ['Nordstraße 17', '73432 Aalen'],
   author: {
     name: 'Christian Wächter',

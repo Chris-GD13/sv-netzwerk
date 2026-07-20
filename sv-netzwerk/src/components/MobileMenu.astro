@@ -1,6 +1,7 @@
 ---
 import SearchButton from './SearchButton.astro';
 import LogoMark from './LogoMark.astro';
+import { site } from '../data/site';
 import type { NavItem } from '../data/navigation';
 
 interface Props { items: NavItem[]; currentPath: string }
@@ -14,7 +15,7 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
 ---
 
 <div class="mobile-menu__backdrop" data-menu-backdrop hidden></div>
-<aside class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true" aria-label="Mobile Navigation">
+<aside class="mobile-menu" id="mobile-menu" data-mobile-menu aria-label="Mobile Navigation" hidden inert>
   <div class="mobile-menu__top">
     <a class="site-brand site-brand--mobile" href="/" aria-label="SV-Netzwerk – Startseite">
       <span class="site-brand__symbol" aria-hidden="true"><LogoMark /></span>
@@ -49,7 +50,7 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
     <SearchButton />
     <a class="mobile-menu__cta mobile-menu__cta--platform" href="/gutachter-plattform/anfrage/">Gutachter-Plattform <span aria-hidden="true">→</span></a>
     <a class="mobile-menu__cta mobile-menu__cta--secondary" href="/schaden-melden/">Schaden melden <span aria-hidden="true">→</span></a>
-    <div><a href="tel:+4973673939783">07367 / 393 97 83</a><span>Persönlich erreichbar</span></div>
+    <div><a href="tel:+4973673939783">{site.phone}</a><span>Persönlich erreichbar</span></div>
   </div>
 </aside>
 
@@ -65,7 +66,8 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
     const setOpen = (open) => {
       if (!menu || !backdrop || !openButton) return;
       if (open) previousFocus = document.activeElement;
-      menu.setAttribute('aria-hidden', String(!open));
+      menu.hidden = !open;
+      menu.toggleAttribute('inert', !open);
       openButton.setAttribute('aria-expanded', String(open));
       openButton.setAttribute('aria-label', open ? 'Menü schließen' : 'Menü öffnen');
       menu.classList.toggle('is-open', open);

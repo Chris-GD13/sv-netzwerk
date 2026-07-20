@@ -1,6 +1,6 @@
 import type { ExpertProfile } from '../types/platform';
 
-const centralContact = { email: 'cw@sv-schuett.eu', phone: '07367 / 393 97 83' };
+const centralContact = { email: 'cw@sv-schuett.eu', phone: '07367 / 393 97 83' };
 
 export const experts: ExpertProfile[] = [
   {
@@ -22,7 +22,7 @@ export const experts: ExpertProfile[] = [
     regions: ['bundesweit nach Aufgabenstellung'], qualifications: ['Sachverständiger im Tischlerhandwerk'],
     certifications: ['Öffentlich bestellt und vereidigt', 'Vorstandsmitglied im BVS'],
     shortProfile: 'Öffentlich bestellter und vereidigter Sachverständiger im Tischlerhandwerk. Schwerpunkte sind Fenster, Türen, Fassaden, Wertermittlung, Schlagregen- und Luftdichtheitsprüfung sowie Gebäudeanalytik mittels Wärmebildtechnik.',
-    contact: { ...centralContact, phone: '02392-6592751' }, linkedin: 'https://www.linkedin.com/in/marc-schuett-tischlersv/', image: '/assets/images/team/marc-schuett.jpg', status: 'active', tags: ['Tischlerhandwerk', 'Fenster', 'Fassade'], publications: [], practiceCases: [], articles: [],
+    contact: { ...centralContact, phone: '02392‑6592751' }, linkedin: 'https://www.linkedin.com/in/marc-schuett-tischlersv/', image: '/assets/images/team/marc-schuett.jpg', status: 'active', tags: ['Tischlerhandwerk', 'Fenster', 'Fassade'], publications: [], practiceCases: [], articles: [],
   },
   {
     id: 'expert-carmen-gohl', slug: 'carmen-gohl', name: 'Carmen Gohl', role: 'Sachverständiger', group: 'expert',
