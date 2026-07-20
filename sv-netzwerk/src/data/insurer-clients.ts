@@ -12,6 +12,6 @@ export const insurerClients: InsurerClient[] = [
   { name: 'Concordia' },
   { name: 'Alte Leipziger' },
   { name: 'Helvetia' },
-  { name: 'Proventiale' },
+  { name: 'Provinzial' },
   { name: 'Eglesias' },
 ];
