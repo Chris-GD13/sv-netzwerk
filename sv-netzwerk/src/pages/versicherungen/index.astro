@@ -4,7 +4,7 @@ import Hero from '../../components/Hero.astro';
 import CallToAction from '../../components/CallToAction.astro';
 ---
 
-<BaseLayout title="Versicherungen" description="Leistungsübersicht für Versicherungen und Schadenabteilungen.">
-  <Hero compact eyebrow="Versicherungen" title="Leistungswege für Versicherungen." text="Für Versicherungsunternehmen steht die spezialisierte Einstiegsseite mit Beauftragungsformular bereit." primaryLabel="Zur Versicherer-Seite" primaryHref="/versicherer/" secondaryLabel="Schaden melden" secondaryHref="/schaden-melden/" />
+<BaseLayout title="Versicherungen" description="Leistungsübersicht für Versicherungen und Schadenabteilungen." canonical="/versicherer/" noindex>
+  <Hero compact eyebrow="Weiterleitung" title="Diese Seite wurde konsolidiert." text="Die primäre Einstiegsseite für Versicherer ist jetzt unter /versicherer/ erreichbar." primaryLabel="Zur Versicherer-Seite" primaryHref="/versicherer/" secondaryLabel="Schaden melden" secondaryHref="/schaden-melden/" />
   <CallToAction title="Direkt zur Beauftragung" text="Nutzen Sie das Versicherer-Formular für Anfrage oder Beauftragung." href="/versicherer/#anfrage" label="Beauftragung starten" />
 </BaseLayout>

@@ -4,18 +4,20 @@ import FeatureCard from '../../components/FeatureCard.astro';
 
 const services = [
   { id: 'sachverstaendigenleistungen', title: 'Sachverständigenleistungen', text: 'Schadenaufnahme, technische Feststellungen, Ursacheneinordnung, Bewertung und verständliche Empfehlung für den konkreten Prüfauftrag.', href: '/schaden-melden/', linkLabel: 'Anfrage stellen' },
-  { id: 'versicherer', title: 'Leistungen für Versicherer', text: 'Prüffähige Entscheidungsvorlagen, KVA- und Rechnungsprüfung, Kumulschadenmanagement, Großschaden- und Komplexschadenregulierung sowie klare Kommunikation zu offenen Punkten.', href: '/schaden-melden/', linkLabel: 'Anfrage stellen' },
+  { id: 'versicherer', title: 'Schadenregulierung für Versicherer', text: 'Prüffähige Entscheidungsvorlagen, KVA- und Rechnungsprüfung, Kumulschadenmanagement sowie Großschaden- und Komplexschadenregulierung aus einer abgestimmten Prozessführung.', href: '/leistungen/schadenregulierung-fuer-versicherer/', linkLabel: 'Leistungsseite öffnen' },
+  { id: 'rechnungspruefung', title: 'Rechnungs- und KVA-Prüfung', text: 'Technische und kaufmännische Prüfung von Kostenvoranschlägen, Rechnungen, Nachträgen und Regiekosten für belastbare Regulierungsentscheidungen.', href: '/leistungen/rechnungs-und-kva-pruefung/', linkLabel: 'Leistungsseite öffnen' },
   { id: 'technische-schadenbewertung', title: 'Technische Schadenbewertung', text: 'Abgrenzung von Schaden, Vorschaden, Mangel und Instandhaltung mit nachvollziehbarer Herleitung.' },
   { id: 'beweissicherung', title: 'Beweissicherung', text: 'Dokumentation von Zuständen, Spuren, Messwerten und Öffnungen als belastbare Grundlage für die Bearbeitung.' },
   { id: 'gutachter-plattform', title: 'Gutachter-Plattform', text: 'Digitale Zusammenarbeit mit klarer Vorgangsstruktur, Aufgabensteuerung und nachvollziehbaren Bearbeitungsständen.', href: '/gutachter-plattform/anfrage/', linkLabel: 'Zur Plattform-Anfrage' },
 ];
 ---
 
-<BaseLayout title="Leistungen | SV-Netzwerk" description="Leistungen mit direktem Einstieg in Schadenformular, Großschadenformular, Kumulschadenformular und Plattform-Anfrage." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen'}]}>
+<BaseLayout title="Leistungen für Schadenregulierung und Versicherer | SV-Netzwerk" description="Leistungen für Schadenregulierung, Großschaden, Kumulschaden, Rechnungs- und KVA-Prüfung mit direktem Einstieg in Anfrage und Beauftragung." breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen'}]}>
   <section class="sv-section">
     <div class="sv-container entry-header">
       <p class="sv-eyebrow">Leistungen</p>
-      <h1>Leistungsübersicht</h1>
+      <h1>Leistungen für Schadenregulierung, Groß- und Kumulschäden</h1>
+      <p class="sv-lead">Fachlich belastbare Bearbeitung für Versicherer, Regulierer und Auftraggeber – von der Erstaufnahme bis zur prüffähigen Entscheidung.</p>
     </div>
   </section>
 

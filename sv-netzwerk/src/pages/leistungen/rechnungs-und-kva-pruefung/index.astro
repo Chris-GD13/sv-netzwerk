@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import CallToAction from '../../../components/CallToAction.astro';
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Rechnungs- und KVA-Prüfung im Schadenfall',
+  serviceType: 'KVA-Prüfung, Rechnungsprüfung und Nachtragsprüfung',
+  areaServed: 'DE',
+  provider: {
+    '@type': 'Organization',
+    name: 'SV-Netzwerk Bau & Schaden',
+    url: 'https://www.sv-netzwerk.eu/',
+  },
+  url: 'https://www.sv-netzwerk.eu/leistungen/rechnungs-und-kva-pruefung/',
+};
+---
+
+<BaseLayout
+  title="Rechnungs- und KVA-Prüfung | SV-Netzwerk"
+  description="Technische und kaufmännische Rechnungs- und KVA-Prüfung für Versicherer mit prüffähiger Dokumentation und klarer Kostenabgrenzung."
+  breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Rechnungs- und KVA-Prüfung'}]}
+  structuredData={serviceSchema}
+>
+  <section class="sv-section">
+    <div class="sv-container intro">
+      <p class="sv-eyebrow">Leistung für Versicherer und Regulierer</p>
+      <h1>Rechnungs- und KVA-Prüfung mit technischer Kostenabgrenzung</h1>
+      <p class="sv-lead">Wir prüfen Leistungsverzeichnisse, Kostenvoranschläge, Rechnungen und Nachträge auf technische Erforderlichkeit, Plausibilität und prüffähige Herleitung.</p>
+    </div>
+  </section>
+
+  <section class="sv-section">
+    <div class="sv-container cols">
+      <article class="sv-card">
+        <h2>Prüfumfang</h2>
+        <ul>
+          <li>Abgleich von Schadenbild, Maßnahmen und Mengenansatz</li>
+          <li>Trennung von Schadenleistung, Vorschaden und Instandhaltung</li>
+          <li>Prüfung von Nachträgen, Regiekosten und Nebenkostenpositionen</li>
+          <li>Bewertung von Wiederherstellungsvarianten und Alternativen</li>
+        </ul>
+      </article>
+      <article class="sv-card">
+        <h2>Ergebnisdokumentation</h2>
+        <ul>
+          <li>Prüffähige Stellungnahmen mit offener Punkte-Liste</li>
+          <li>Klar ausgewiesene Annahmen, Abzüge und Begründungen</li>
+          <li>Struktur für Reservefortschreibung und Entscheidungsvorlagen</li>
+          <li>Nachvollziehbare Grundlage für interne und externe Abstimmung</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <CallToAction
+    title="KVA oder Rechnung prüfen lassen"
+    text="Senden Sie Schadenakte, KVA/Rechnung und Fragestellung gebündelt über den Versicherer-Einstieg."
+    href="/versicherer/#anfrage"
+    label="Prüfung anfragen"
+  />
+</BaseLayout>
+
+<style>
+  .intro h1{margin:0}
+  .intro .sv-lead{max-width:68ch}
+  .cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sv-space-5)}
+  .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}
+  ul{display:grid;gap:.55rem;margin:0;padding-left:1.2rem}
+  @media(max-width:62rem){.cols{grid-template-columns:1fr}}
+</style>

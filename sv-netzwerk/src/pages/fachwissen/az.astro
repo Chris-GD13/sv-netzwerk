@@ -6,7 +6,7 @@ import { sortedLibrary } from '../../data/library';
 const alphabetical = [...sortedLibrary].sort((a,b)=>a.title.localeCompare(b.title,'de'));
 const groups = alphabetical.reduce<Record<string, typeof alphabetical>>((acc,item)=>{const letter=item.title.charAt(0).toLocaleUpperCase('de-DE');(acc[letter]??=[]).push(item);return acc;},{});
 ---
-<BaseLayout title="Fachartikel von A bis Z | SV-Netzwerk" description="Alphabetisches Verzeichnis der Fachartikel und Praxishinweise des SV-Netzwerks.">
+<BaseLayout title="Fachartikel von A bis Z | SV-Netzwerk" description="Alphabetisches Verzeichnis der Fachartikel und Praxishinweise des SV-Netzwerks." noindex>
   <Hero eyebrow="Fachartikel-Bibliothek" title="Fachartikel von A bis Z" text="Alle Fachartikel alphabetisch und direkt erreichbar." />
   <section class="sv-section"><div class="sv-container"><AlphabeticalNavigation items={alphabetical}/><div class="az-list">{Object.entries(groups).map(([letter,items])=><section id={`letter-${letter}`}><h2>{letter}</h2><ul>{items.map(item=><li><a href={item.href}>{item.title}</a><span>{item.category}</span></li>)}</ul></section>)}</div></div></section>
 </BaseLayout>
