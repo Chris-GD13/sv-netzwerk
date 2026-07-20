@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import SectionHeader from '../../../components/SectionHeader.astro';
 import { insurerClients } from '../../../data/insurer-clients';
 ---
 
@@ -13,13 +12,12 @@ import { insurerClients } from '../../../data/insurer-clients';
     <div class="sv-container intro">
       <p class="sv-eyebrow">Versichererübersicht</p>
       <h1>Für wen wir tätig sind</h1>
-      <p class="sv-lead">Wir unterstützen Versicherer in der operativen Schadenregulierung sowie in der Begleitung von Vorgängen in 1. und 2. Instanz.</p>
+      <p class="sv-lead">Wir unterstützen Versicherer in der operativen Schadenregulierung.</p>
     </div>
   </section>
 
   <section class="sv-section">
     <div class="sv-container">
-      <SectionHeader eyebrow="Versicherer" title="Aktuelle Zusammenarbeit" text="Die folgenden Versicherer werden als Referenz geführt. Sofern ein Logo vorliegt, wird es direkt angezeigt." />
       <div class="logo-grid">
         {insurerClients.map((insurer) => (
           <article class="logo-card">
