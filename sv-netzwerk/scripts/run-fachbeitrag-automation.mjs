@@ -323,7 +323,7 @@ if (!force && !inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].
 
 const isWeekend = berlinWeekday === 0 || berlinWeekday === 6;
 const runId = `${berlinDate}-${slot}`;
-const publicationId = `${runId}-${crypto.createHash('sha256').update(runId).digest('hex').slice(0, 10)}`;
+// publicationId is computed after topic selection (below) to include topic.id for uniqueness
 
 const safeSlug = (value) => value
   .toLocaleLowerCase('de-DE')
@@ -489,6 +489,8 @@ if (weekdayRegional) {
 const topic = pickTopic(publicationRows);
 const title = createHeadline(topic, regionalSignal);
 const slug = safeSlug(`${topic.slugBase}-${berlinDate}-${slot}`);
+// Include topic.id so each article has a unique publicationId even if run twice on same date+slot
+const publicationId = `${runId}-${crypto.createHash('sha256').update(`${runId}-${topic.id}`).digest('hex').slice(0, 10)}`;
 const articleUrl = `https://www.sv-netzwerk.eu/fachwissen/${slug}/`;
 const imageFileName = `${slug}.svg`;
 const imageWebPath = `/assets/images/linkedin/${imageFileName}`;
