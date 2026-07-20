@@ -19,11 +19,15 @@ import { insurerClients } from '../../../data/insurer-clients';
 
   <section class="sv-section">
     <div class="sv-container">
-      <SectionHeader eyebrow="Versicherer" title="Aktuelle Zusammenarbeit" text="Die folgenden Namen werden als Referenzliste geführt. Auf Wunsch können offizielle Logos eingebunden werden, sobald die Freigabe bzw. die Dateivorlagen vorliegen." />
+      <SectionHeader eyebrow="Versicherer" title="Aktuelle Zusammenarbeit" text="Die folgenden Versicherer werden als Referenz geführt. Sofern ein Logo vorliegt, wird es direkt angezeigt." />
       <div class="logo-grid">
         {insurerClients.map((insurer) => (
           <article class="logo-card">
-            <span>{insurer.name}</span>
+            {insurer.logo ? (
+              <img src={insurer.logo} alt={insurer.logoAlt ?? `Logo ${insurer.name}`} loading="lazy" />
+            ) : (
+              <span>{insurer.name}</span>
+            )}
           </article>
         ))}
       </div>
@@ -58,6 +62,7 @@ import { insurerClients } from '../../../data/insurer-clients';
   .logo-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sv-space-4)}
   .logo-card{display:grid;place-items:center;min-height:5.1rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-lg);background:rgba(255,255,255,.78);text-align:center}
   .logo-card span{font-weight:850;font-size:.9rem}
+  .logo-card img{max-width:100%;max-height:2.2rem;width:auto;height:auto;object-fit:contain}
   .instance-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sv-space-5)}
   .instance-grid .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}
   .instance-grid ul{display:grid;gap:.6rem;margin:0;padding-left:1.2rem}
