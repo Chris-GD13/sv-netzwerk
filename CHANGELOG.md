@@ -1,6 +1,12 @@
 # Changelog
 
-## 5.1.13 – 2026-07-16
+## 5.1.14 – 2026-07-20
+
+- Fachbeitrags-Automation: `readdir`-Import in `run-fachbeitrag-automation.mjs` ergänzt (kritischer Bugfix)
+- Fachbeitrags-Automation: CHANGELOG-Versionserkennung auf dynamische Versionsnummer umgestellt (war hartkodiert auf `3.3.0`)
+- Fachbeitrags-Automation: Themenpool von 5 auf 20 Einträge erweitert (alle Kumulschaden-Bereiche laut Redaktionsstandard abgedeckt)
+- Redaktionsdokumentation `sv-netzwerk/docs/FACHBEITRAG_AUTOMATION.md` vollständig überarbeitet und erweitert (Spaltenreferenz, Secrets, Deaktivierung, Bildgenerierung, detaillierte Wochenendregel)
+
 
 - Nachmittagsbeitrag „Regiekosten im Schadenfall prüffähig bewerten“ als Fachbeitrag der Stufe A veröffentlicht
 - SEO-Daten, Kategorie, Tags, interne Verlinkungen, LinkedIn-Kurzfassung und Video-Skript im Content-Modell integriert

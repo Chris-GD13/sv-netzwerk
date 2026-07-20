@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile, appendFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, writeFile, appendFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
@@ -85,6 +85,182 @@ const TOPICS = [
     intro: 'Bei Brandereignissen mit mehreren betroffenen Einheiten steigt das Risiko für Dokumentationslücken und unklare Leistungsgrenzen.',
     tech: 'Erforderlich sind getrennte Objektakten, nachvollziehbare Schadenzonen, klare Trennung von Gefahrenabwehr und Wiederherstellung sowie abgestimmte Reservierung je Objekt.',
     practice: ['objektübergreifende Sammelpositionen', 'fehlende Trennung von Ruß-/Rauch- und Löschwasserschäden', 'unzureichende Zuordnung von Sofortmaßnahmen zu konkreten Einheiten'],
+  },
+  {
+    id: 'schneedruck-winterschaeden',
+    category: 'Schneedruck und Winterschäden',
+    tags: ['Schneedruck', 'Winterschaden', 'Dach', 'Statik', 'Kumulschaden'],
+    damageTypes: ['schneedruck', 'gebaeude'],
+    slugBase: 'schneedruck-winterschaeden-bewertung-regulierung',
+    titleBase: 'Schneedruck und Winterschäden: Statische Bewertung und Regulierung im Kumulereignis',
+    intro: 'Bei regional auftretendem Schneedruck mit Dach- und Tragewerkschäden müssen statische Risiken, Beweissicherung und Regulierung parallel gesteuert werden.',
+    tech: 'Relevante Parameter sind Schneelastzonen, Dachneigungs- und Dachkonstruktionstypen, Materialalterung und vorhandene Baumängel. Statische Überprüfungen durch Fachplaner sind zu koordinieren und Ergebnisse in die Akte zu integrieren.',
+    practice: ['fehlende statische Einschätzung vor Rückbau', 'Schneelast als alleinige Ursache ohne Prüfung auf Vorzustand', 'zu früher vollständiger Rückbau ohne Beweissicherung'],
+  },
+  {
+    id: 'tornado-lokale-sturmereignisse',
+    category: 'Tornadoereignisse und lokale Sturmschäden',
+    tags: ['Tornado', 'Sturm', 'Schadenzone', 'Plausibilitätsprüfung', 'Kumulschaden'],
+    damageTypes: ['sturm', 'gebaeude'],
+    slugBase: 'tornado-lokale-sturmereignisse-schadenaufnahme',
+    titleBase: 'Tornadoereignisse und lokale Sturmereignisse: Schadenaufnahme und technische Einordnung',
+    intro: 'Lokale Sturmereignisse mit Tornadobewegungen erzeugen konzentrierte Schadenzonen, die technisch und regulatorisch eine besonders saubere Abgrenzung erfordern.',
+    tech: 'Windgeschwindigkeit, Druckverteilung und Schadenbilder variieren stark über kurze Distanzen. Spur, Breite und Schweregrad des Ereignisses sind mit Wetterdaten, Fotos und Fremdauskünften zu belegen, bevor Ursache und Umfang regulatorisch festgestellt werden.',
+    practice: ['fehlender Abgleich mit Wetterstationsdaten', 'pauschale Übernahme von Schadenmeldungen ohne Plausibilitätsprüfung', 'keine Abgrenzung zwischen Winddruckschäden und vorhandenen Baumängeln'],
+  },
+  {
+    id: 'erstbesichtigung-sofortmassnahmen',
+    category: 'Erstbesichtigung und Sofortmaßnahmen',
+    tags: ['Erstbesichtigung', 'Sofortmaßnahmen', 'Schadenaufnahme', 'Sicherung', 'Dokumentation'],
+    damageTypes: ['gebaeude', 'leitungswasser', 'brand', 'sturm'],
+    slugBase: 'erstbesichtigung-sofortmassnahmen-struktur-vorgehen',
+    titleBase: 'Erstbesichtigung und Sofortmaßnahmen: Strukturiertes Vorgehen im Schadenerstereignis',
+    intro: 'Die Erstbesichtigung legt die Grundlage für alle nachfolgenden Regulierungsschritte – Qualität und Vollständigkeit der Erstaufnahme bestimmen den späteren Prüfhorizont.',
+    tech: 'Zur Erstbesichtigung gehören Sicherheitsbeurteilung, Fotodokumentation nach einheitlicher Logik, Schadenabgrenzung je Bauteil und Gewerk, Erfassung von Eintrittswegen und Vorzustandshinweisen sowie erste Einschätzung zu notwendigen Sofortmaßnahmen.',
+    practice: ['fehlende Zeitstempel und Georeferenz in Fotos', 'keine Trennung von Sofortmaßnahme und vorläufiger Wiederherstellung', 'Sofortmaßnahmen ohne schriftliche Beauftragung oder Protokoll'],
+  },
+  {
+    id: 'plausibilitaetspruefung-schadenbild',
+    category: 'Plausibilitätsprüfung und Schadenbild',
+    tags: ['Plausibilitätsprüfung', 'Schadenbild', 'Kausalität', 'Vorzustand', 'Dokumentation'],
+    damageTypes: ['gebaeude', 'leitungswasser', 'sturm', 'brand'],
+    slugBase: 'plausibilitaetspruefung-schadenbild-kausalitaet',
+    titleBase: 'Plausibilitätsprüfung im Schadenfall: Schadenbild, Kausalität und Vorzustand belastbar bewerten',
+    intro: 'Eine belastbare Plausibilitätsprüfung unterscheidet dokumentierte Feststellung von Vermutung – und schützt sowohl Versicherer als auch Geschädigte vor unbegründeten Entscheidungen.',
+    tech: 'Schadenzeitpunkt, Ereignisart, physikalische Einwirkung, Bauteilaufbau und Spurenlage sind gemeinsam zu betrachten. Wo Messwerte, Bauteilöffnungen oder ergänzende Unterlagen fehlen, bleiben Ursachenaussagen ausdrücklich vorläufig.',
+    practice: ['voreilige Kausalitätsfeststellung ohne vollständige Spurenauswertung', 'fehlender Abgleich mit bekannten Vorschäden oder Mängelberichten', 'keine Unterscheidung zwischen gesicherter und vermuteter Schadenursache'],
+  },
+  {
+    id: 'beweissicherung-fotodokumentation',
+    category: 'Beweissicherung und Fotodokumentation',
+    tags: ['Beweissicherung', 'Fotodokumentation', 'Schadenakte', 'Archivierung'],
+    damageTypes: ['gebaeude', 'leitungswasser', 'brand', 'sturm'],
+    slugBase: 'beweissicherung-fotodokumentation-standards',
+    titleBase: 'Beweissicherung und Fotodokumentation: Standards für belastbare Schadenakten',
+    intro: 'Eine lückenhafte Beweissicherung gefährdet nicht nur die Regulierung, sondern kann im Streitfall die gesamte Sachverhaltsrekonstruktion unmöglich machen.',
+    tech: 'Beweissichernde Fotodokumentation umfasst Übersichts-, Detail- und Messaufnahmen mit Zeitstempel, Georeferenz und eindeutiger Zuordnung zu Bauteil, Gewerk und Schadensphase. Rückbauöffnungen sind vor Verschluss vollständig zu dokumentieren.',
+    practice: ['Fotos ohne Zeitstempel oder Ortsreferenz', 'fehlende Maßstabsangaben bei Detailfotos', 'unzureichende Dokumentation vor und nach Sofortmaßnahmen'],
+  },
+  {
+    id: 'sanierungsplanung-rueckbau-trocknung',
+    category: 'Sanierungsplanung und Trocknung',
+    tags: ['Sanierungsplanung', 'Rückbau', 'Trocknung', 'Gebäudetrocknung', 'Schadenminderung'],
+    damageTypes: ['leitungswasser', 'hochwasser', 'gebaeude'],
+    slugBase: 'sanierungsplanung-rueckbau-trocknung-strategie',
+    titleBase: 'Sanierungsplanung, Rückbau und Trocknung: Strategie für nachvollziehbare Wiederherstellung',
+    intro: 'Eine vorschnelle oder zu weitgehende Sanierungsentscheidung erzeugt unnötige Kosten und verhindert belastbare Schadenabgrenzung – strukturierte Planung ist der entscheidende Hebel.',
+    tech: 'Rückbau und Trocknung sind stufenweise zu planen: Erst Schadenbegrenzung und Messung, dann Trocknungskonzept auf Basis von Feuchtemessungen, anschließend Freigabe von Rückbau- und Wiederherstellungsschritten. Trocknungsstrategie und Messprotokolle sind Bestandteil der Akte.',
+    practice: ['Gesamtrückbau ohne vorherige Messungen und Konzept', 'Trocknungsgeräte ohne qualifiziertes Monitoring und Protokoll', 'fehlende Abnahme und Schlusskontrolle nach Trocknung'],
+  },
+  {
+    id: 'koordination-mehrere-sachverstaendige',
+    category: 'Koordination im Sachverständigen-Netzwerk',
+    tags: ['Koordination', 'Sachverständiger', 'Kumulschaden', 'Einsatzplanung', 'Qualitätssicherung'],
+    damageTypes: ['gebaeude', 'kumulschaden'],
+    slugBase: 'koordination-sachverstaendige-kumulereignis-einsatz',
+    titleBase: 'Koordination mehrerer Sachverständiger im Kumulereignis: Rollen, Standards und Qualitätssicherung',
+    intro: 'Wenn mehrere Sachverständige bei einem regionalen Kumulereignis parallel eingesetzt werden, entscheidet die Koordinationsstruktur über Konsistenz und Prüffähigkeit der Ergebnisse.',
+    tech: 'Einheitliche Dokumentationsstandards, klare Eskalationskriterien und ein zentrales Änderungsprotokoll sind Voraussetzung für belastbare Ergebnisse. Regelmäßige Lageabstimmungen verhindern divergierende Einschätzungen und nicht abgestimmte Reservierungen.',
+    practice: ['widersprüchliche Einschätzungen mangels Abstimmung', 'keine Einigung auf gemeinsame Fotologik und Mindestdaten', 'fehlende zentrale Übersicht über Bearbeitungsstand und Priorisierung'],
+  },
+  {
+    id: 'rechnungs-kva-pruefung',
+    category: 'Rechnungs- und KVA-Prüfung',
+    tags: ['Rechnungsprüfung', 'KVA', 'Kostenvoranschlag', 'Freigabe', 'Schadenregulierung'],
+    damageTypes: ['gebaeude', 'leitungswasser', 'brand'],
+    slugBase: 'rechnungs-kva-pruefung-freigabe-schadenfall',
+    titleBase: 'Rechnungs- und KVA-Prüfung im Schadenfall: Freigabe auf belastbarer Grundlage',
+    intro: 'Kostenpositionen sind nur dann erstattungsfähig, wenn sie dem dokumentierten Schadenumfang entsprechen, erforderlich waren und nachvollziehbar kalkuliert wurden.',
+    tech: 'Prüfkriterien umfassen Auftragsbezug, Leistungsnachweis, Materialmengenbezug, Schadenbezug je Position und marktübliche Preisansätze. KVAs sind auf die festgestellte Schadenzone und das notwendige Wiederherstellungsziel hin zu prüfen.',
+    practice: ['Freigabe von Pauschalpositionen ohne Einzelnachweis', 'KVA enthält Leistungen außerhalb der dokumentierten Schadenfläche', 'fehlende Trennung von Schadenminderungs- und Wiederherstellungskosten'],
+  },
+  {
+    id: 'reservierung-grosser-schadenbestand',
+    category: 'Reservierung im Schadenbestand',
+    tags: ['Reservierung', 'Schadenbestand', 'Regulierung', 'Mengengerüst', 'Prognose'],
+    damageTypes: ['gebaeude', 'kumulschaden'],
+    slugBase: 'reservierung-grosser-schadenbestand-methodik',
+    titleBase: 'Reservierung bei größeren Schadenbeständen: Methodik für belastbare Prognosen',
+    intro: 'Fehlerhafte Reserven belasten Versicherungsbilanzen und führen zu Nachregulierungen – methodisch belastbare Reservierungsansätze reduzieren dieses Risiko erheblich.',
+    tech: 'Reservierungen im Großschadenbestand stützen sich auf belastbare Mengengerüste je Objektkategorie, Schadenschwere-Einschätzung, Sanierungsdauer und Erfahrungswerte aus vergleichbaren Ereignissen. Einzelreserven sind von Pauschalzuschlägen zu trennen.',
+    practice: ['zu frühe Gesamtreserve ohne belastbare Einzelobjektdaten', 'Reserven ohne Bezug zu dokumentierten Schadenmengen', 'keine Aktualisierung der Reserve nach Fortschritt der Regulierung'],
+  },
+  {
+    id: 'kommunikation-beteiligte-schadenfall',
+    category: 'Kommunikation im Schadenfall',
+    tags: ['Kommunikation', 'Versicherer', 'Versicherungsnehmer', 'Schadenmanagement', 'Transparenz'],
+    damageTypes: ['gebaeude', 'kumulschaden'],
+    slugBase: 'kommunikation-beteiligte-schadenfall-struktur',
+    titleBase: 'Kommunikation mit Versicherern, Regulierern und Versicherungsnehmern: Struktur für klare Verfahren',
+    intro: 'Strukturierte Kommunikation im Schadenfall verhindert Missverständnisse, spart Eskalationen und sichert nachvollziehbare Entscheidungsgrundlagen für alle Beteiligten.',
+    tech: 'Jede kommunizierte Einschätzung zu Ursache, Umfang oder Kosten muss auf dokumentierten Feststellungen beruhen. Vorläufige Aussagen sind als solche zu kennzeichnen. Protokollierte Abstimmungen ersetzen mündliche Absprachen im Streitfall.',
+    practice: ['mündliche Zusagen ohne schriftliche Grundlage', 'fehlende Abgrenzung zwischen vorläufiger Einschätzung und abschließender Regulierungsentscheidung', 'keine einheitliche Informationsbasis zwischen Versicherer, Regulierer und Sachverständigem'],
+  },
+  {
+    id: 'schadenminderung-pflicht-praxis',
+    category: 'Schadenminderung und Sofortmaßnahmenpflicht',
+    tags: ['Schadenminderung', 'Sofortmaßnahmen', 'Obliegenheiten', 'Versicherungsnehmer'],
+    damageTypes: ['gebaeude', 'leitungswasser', 'sturm'],
+    slugBase: 'schadenminderung-obliegenheit-sofortmassnahmen-praxis',
+    titleBase: 'Schadenminderungspflicht und Sofortmaßnahmen: Was Versicherungsnehmer und Regulierer wissen müssen',
+    intro: 'Die Schadenminderungspflicht ist eine versicherungsrechtliche Obliegenheit – ihre Verletzung kann zur Leistungskürzung führen, ihre Erfüllung muss dokumentiert sein.',
+    tech: 'Sofortmaßnahmen zur Schadenminderung sind von Wiederherstellungsmaßnahmen zu trennen. Erstattungsfähig sind nur Maßnahmen, die objektiv erforderlich, verhältnismäßig und nachvollziehbar durchgeführt wurden. Der Zeitpunkt der Beauftragung und Ausführung ist zu belegen.',
+    practice: ['fehlende Dokumentation des Zeitpunkts der Schadenminderungsmaßnahme', 'Sammelrechnungen ohne Zuordnung zu Schadenminderung oder Wiederherstellung', 'keine Rückfrage beim Versicherer bei unklarer Maßnahmenerforderlichkeit'],
+  },
+  {
+    id: 'massenanfall-schadenfrequenz',
+    category: 'Massenanfall von Einzelschäden',
+    tags: ['Massenanfall', 'Schadenfrequenz', 'Kumulschaden', 'Priorisierung', 'Einsatzsteuerung'],
+    damageTypes: ['kumulschaden', 'gebaeude'],
+    slugBase: 'massenanfall-einzelschaeden-einsatzsteuerung',
+    titleBase: 'Massenanfall von Einzelschäden: Einsatzsteuerung bei außergewöhnlich hoher Schadenfrequenz',
+    intro: 'Wenn in kurzer Zeit eine große Anzahl von Schadenmeldungen eingeht, entscheiden Einsatzplanung und Priorisierung über Qualität und Geschwindigkeit der Regulierung.',
+    tech: 'Klassifizierung nach Dringlichkeit (Sicherheitsrisiko, Substanzgefährdung, Nutzungsausfall) und Komplexität (Standardschaden, Sonderfall, statisches/hygienisches Risiko) bildet die Grundlage. Ressourcensteuerung für Sachverständige, Regulierer und Dienstleister muss zentral koordiniert werden.',
+    practice: ['keine Priorisierung – alle Schäden werden in Meldereihenfolge bearbeitet', 'fehlende Kapazitätsplanung für Sanierungsdienstleister', 'mangelhafte Übergabe zwischen Sachverständigen und Regulierern'],
+  },
+  {
+    id: 'gutachter-plattform-regional',
+    category: 'Gutachter-Plattform und regionale Netzwerke',
+    tags: ['Gutachter-Plattform', 'Sachverständiger', 'Netzwerk', 'Kumulschaden', 'Regulierung'],
+    damageTypes: ['gebaeude', 'kumulschaden'],
+    slugBase: 'gutachter-plattform-regional-kumulschaden',
+    titleBase: 'Gutachter-Plattform und regionale Sachverständigennetzwerke: Mehrwert bei Kumulereignissen',
+    intro: 'Eine regional verankerte Gutachter-Plattform ermöglicht schnelle Verfügbarkeit qualifizierter Sachverständiger – entscheidend für belastbare Erst- und Nachbesichtigungen bei großen Schadenlagen.',
+    tech: 'Qualitätssicherung über einheitliche Dokumentationsstandards, zertifizierte Sachverständige und strukturierte Abstimmungsprozesse ermöglicht konsistente Regulierungsqualität auch bei gleichzeitigem Einsatz vieler Beteiligter in einer Region.',
+    practice: ['keine belastbaren Qualitätsnachweise für eingesetzte Sachverständige', 'fehlende Abstimmung zwischen Plattform und Auftraggeber bei Kapazitätsengpässen', 'uneinheitliche Dokumentationsqualität bei verschiedenen Gutachtern'],
+  },
+  {
+    id: 'abgrenzung-versichert-nichtversichert',
+    category: 'Abgrenzung versicherter Schadteile',
+    tags: ['Schadenabgrenzung', 'Versicherungsdeckung', 'Vorzustand', 'Instandhaltung', 'Regulierung'],
+    damageTypes: ['gebaeude', 'leitungswasser', 'sturm', 'brand'],
+    slugBase: 'abgrenzung-versicherter-nichtversicherter-schadteil',
+    titleBase: 'Abgrenzung versicherter und nicht versicherter Schadteile: Methodik für belastbare Freigaben',
+    intro: 'Die Abgrenzung zwischen versichertem Schaden und nicht versichertem Vorzustand, Instandhaltungsrückstand oder Modernisierungsbedarf ist eine der anspruchsvollsten Aufgaben in der technischen Schadenregulierung.',
+    tech: 'Maßgebliche Kriterien sind: zeitlicher Zusammenhang mit dem Schadenereignis, technische Kausalität, Nachweis des Vorzustands, Unterscheidung von Schadenminderung und Instandsetzung sowie schadenbedingter und nicht schadenbedingter Maßnahmenanteil.',
+    practice: ['fehlende Vorzustandsdokumentation macht spätere Abgrenzung unmöglich', 'pauschale Anerkennung ohne Prüfung auf Instandhaltungsdefizite', 'keine Trennung zwischen schadenbedingtem und altersgemäß erforderlichem Sanierungsanteil'],
+  },
+  {
+    id: 'katastrophenschaden-ueberflutung-region',
+    category: 'Katastrophenschäden in der Region',
+    tags: ['Katastrophenschaden', 'Unwetter', 'Überflutung', 'Großschaden', 'Koordination'],
+    damageTypes: ['hochwasser', 'ueberflutung', 'gebaeude', 'kumulschaden'],
+    slugBase: 'katastrophenschaeden-region-management-koordination',
+    titleBase: 'Katastrophenschäden in der Region: Management, Koordination und fachliche Einordnung',
+    intro: 'Bei Katastrophenschäden mit regionaler Ausdehnung sind Schadenmanagement, Behördenkoordination und fachliche Einordnung besonders komplex – strukturiertes Vorgehen ist entscheidend.',
+    tech: 'Technische Einordnung umfasst Schadenart, Schwere, Betroffenheitsdichte und Priorität. Koordination mit Katastrophenschutzbehörden, Feuerwehr und Kommunen liefert Lagebilder, die regulierungsrelevante Einschätzungen fundieren, ohne diese zu ersetzen.',
+    practice: ['Übernahme von Lageberichten ohne eigene fachliche Plausibilisierung', 'keine klare Trennung zwischen behördlichen Meldungen und versicherungsrechtlichen Feststellungen', 'Verzögerung bei Priorisierung kritischer Objekte durch unklare Zuständigkeiten'],
+  },
+  {
+    id: 'zusammenarbeit-fachplaner-sanierer',
+    category: 'Zusammenarbeit mit Fachplanern und Sanierern',
+    tags: ['Fachplaner', 'Statik', 'Sanierung', 'Trocknung', 'Koordination', 'Schadenregulierung'],
+    damageTypes: ['gebaeude', 'leitungswasser', 'brand'],
+    slugBase: 'zusammenarbeit-fachplaner-sanierer-schadenfall',
+    titleBase: 'Zusammenarbeit mit Fachplanern, Statikern und Sanierern im Schadenfall: Rollen und Schnittstellen',
+    intro: 'Im komplexen Schadenfall sind mehrere Fachbeteiligte eingebunden – klare Rollenverteilung und dokumentierte Schnittstellen verhindern Informationsverluste und divergierende Einschätzungen.',
+    tech: 'Statiker, Trocknungsunternehmen und Sanierer liefern Fachbeiträge zur Bewertung des Schadenbilds. Sachverständige und Regulierer müssen diese Beiträge in die Gesamtakte integrieren, gewichten und daraus Regulierungsentscheidungen ableiten.',
+    practice: ['Fachplaner-Gutachten werden nicht in die Regulierungsakte integriert', 'fehlende Abgrenzung zwischen Sanierungsplanung und Schadenregulierung', 'widersprüchliche Empfehlungen mangels Abstimmung zwischen Fachbeteiligten'],
   },
 ];
 
@@ -479,9 +655,20 @@ const changelogSource = await readText(changelogFile);
 const marker = '# Changelog\n\n';
 const logLine = `- automatischer ${SLOT_WINDOWS[slot].label} Fachbeitrag veröffentlicht: „${title}“`;
 if (!changelogSource.includes(logLine)) {
-  const stampHeader = `## 3.3.0 – ${berlinDate}\n${logLine}\n- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt\n- Beitragsbild unter ${imageWebPath} erzeugt\n\n`;
-  const updated = changelogSource.includes(`## 3.3.0 – ${berlinDate}`)
-    ? changelogSource.replace(`## 3.3.0 – ${berlinDate}\n`, `## 3.3.0 – ${berlinDate}\n${logLine}\n`)
+  // Detect current highest version and increment patch for automation entry
+  const versionMatches = [...changelogSource.matchAll(/^## (\d+)\.(\d+)\.(\d+)/gm)];
+  const nextVersion = versionMatches.length > 0
+    ? (() => {
+        const versions = versionMatches.map((m) => [parseInt(m[1], 10), parseInt(m[2], 10), parseInt(m[3], 10)]);
+        versions.sort((a, b) => (a[0] !== b[0] ? b[0] - a[0] : a[1] !== b[1] ? b[1] - a[1] : b[2] - a[2]));
+        const [maj, min, patch] = versions[0];
+        return `${maj}.${min}.${patch + 1}`;
+      })()
+    : '1.0.0';
+  const dateSection = `## ${nextVersion} – ${berlinDate}`;
+  const stampHeader = `${dateSection}\n${logLine}\n- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt\n- Beitragsbild unter ${imageWebPath} erzeugt\n\n`;
+  const updated = changelogSource.includes(dateSection)
+    ? changelogSource.replace(`${dateSection}\n`, `${dateSection}\n${logLine}\n`)
     : changelogSource.replace(marker, `${marker}${stampHeader}`);
   await writeFile(changelogFile, updated);
 }
