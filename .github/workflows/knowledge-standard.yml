@@ -105,7 +105,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add src/content/ public/assets/images/linkedin/ src/data/library.ts CHANGELOG.md docs/fachbeitrag-veroeffentlichungsprotokoll.csv
           git commit -m "chore: publish fachbeitrag ${BERLIN_DATE} ${PUBLICATION_SLOT}"
           git push origin HEAD:main
           echo "PUBLISHED_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
@@ -114,18 +114,41 @@ jobs:
         if: steps.generate.outputs.status == 'generated'
         run: node scripts/update-fachbeitrag-log.mjs --commit="$PUBLISHED_COMMIT" --deploy=triggered
 
+      # GitHub Actions GITHUB_TOKEN-Pushes lösen keine anderen Workflows aus.
+      # Daher wird das Deployment direkt in diesem Workflow via SFTP durchgeführt.
+      - name: deploy-version.txt nach Commit aktualisieren
+        if: steps.generate.outputs.status == 'generated'
+        run: |
+          node scripts/write-deploy-version.mjs
+          cp public/deploy-version.txt dist/deploy-version.txt
+
+      - name: SFTP-Werkzeug installieren
+        if: steps.generate.outputs.status == 'generated'
+        run: sudo apt-get install --yes lftp
+
+      - name: Dist nach IONOS via SFTP übertragen
+        if: steps.generate.outputs.status == 'generated'
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" \
+            -e "set sftp:auto-confirm yes; mirror --reverse --verbose --parallel=4 --delete dist/ /sv-netzwerk/; bye"
+
       - name: Live-URL prüfen
         if: steps.generate.outputs.status == 'generated'
         run: |
           echo "Prüfe Live-URL: $PUBLICATION_URL"
           ok=0
-          for i in {1..24}; do
+          for i in {1..6}; do
             status="$(curl -L -s -o /tmp/page.html -w '%{http_code}' "$PUBLICATION_URL" || true)"
             if [ "$status" = "200" ] && grep -qi "$PUBLICATION_SLUG" /tmp/page.html; then
               ok=1
               break
             fi
-            sleep 20
+            sleep 10
           done
           if [ "$ok" != "1" ]; then
             echo "::error::Live-URL nicht erreichbar oder Inhalt noch nicht aktuell: $PUBLICATION_URL"
