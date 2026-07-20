@@ -409,6 +409,13 @@ const createHeadline = (topic, regionalSignal) => {
   return `${topic.titleBase} – fachliche Einordnung zur aktuellen Lage`;
 };
 
+const truncate = (text, maxLen) => {
+  if (!text || text.length <= maxLen) return text;
+  const cut = text.slice(0, maxLen - 1).trimEnd();
+  const lastSpace = cut.lastIndexOf(' ');
+  return lastSpace > maxLen - 25 ? cut.slice(0, lastSpace) : cut;
+};
+
 const makeImageSvg = (title, subtitle) => `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">${title}</title>
@@ -590,8 +597,8 @@ const frontmatter = [
   `  updatedAt: ${berlinDate}`,
   '  status: published',
   'seo:',
-  `  title: "${title}"`,
-  `  description: "${metaDescription}"`,
+  `  title: "${truncate(title, 70)}"`,
+  `  description: "${truncate(metaDescription, 180)}"`,
   `  canonical: "${articleUrl}"`,
   `  image: "${imageUrl}"`,
   `  imageAlt: "${imageAlt}"`,
