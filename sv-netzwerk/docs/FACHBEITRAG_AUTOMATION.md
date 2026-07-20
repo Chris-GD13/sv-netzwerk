@@ -112,8 +112,9 @@ Der Generator erstellt pro Lauf:
 
 ### Vorübergehende Deaktivierung
 - Repository Variable `FACHBEITRAG_AUTOMATION_ENABLED` auf `false` setzen (Settings → Secrets and variables → Actions → Variables).
-- Bei `false` beendet der Workflow sich sofort; kein Beitrag wird erstellt.
-- Zum Reaktivieren: Variable auf `true` zurücksetzen oder löschen (Default ist `true`).
+- Bei `false` wird der gesamte Job übersprungen (Status: `skipped`, kein Fehler, kein Beitrag).
+- Die Prüfung erfolgt via Job-Level-Bedingung (`if: vars.FACHBEITRAG_AUTOMATION_ENABLED != 'false'`), sodass auch scheduled Runs vollständig deaktiviert werden.
+- Zum Reaktivieren: Variable auf `true` setzen, auf leer setzen oder ganz löschen (Default ist `enabled`).
 
 ## Veröffentlichungsprotokoll
 

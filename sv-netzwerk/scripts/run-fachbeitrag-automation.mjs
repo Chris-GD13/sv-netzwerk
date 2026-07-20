@@ -323,7 +323,7 @@ if (!force && !inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].
 
 const isWeekend = berlinWeekday === 0 || berlinWeekday === 6;
 const runId = `${berlinDate}-${slot}`;
-const publicationId = `${runId}-${crypto.createHash('sha256').update(runId).digest('hex').slice(0, 10)}`;
+// publicationId is computed after topic selection (below) to include topic.id for uniqueness
 
 const safeSlug = (value) => value
   .toLocaleLowerCase('de-DE')
@@ -409,6 +409,13 @@ const createHeadline = (topic, regionalSignal) => {
   return `${topic.titleBase} – fachliche Einordnung zur aktuellen Lage`;
 };
 
+const truncate = (text, maxLen) => {
+  if (!text || text.length <= maxLen) return text;
+  const cut = text.slice(0, maxLen - 1).trimEnd();
+  const lastSpace = cut.lastIndexOf(' ');
+  return lastSpace > maxLen - 25 ? cut.slice(0, lastSpace) : cut;
+};
+
 const makeImageSvg = (title, subtitle) => `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">${title}</title>
@@ -482,6 +489,8 @@ if (weekdayRegional) {
 const topic = pickTopic(publicationRows);
 const title = createHeadline(topic, regionalSignal);
 const slug = safeSlug(`${topic.slugBase}-${berlinDate}-${slot}`);
+// Include topic.id so each article has a unique publicationId even if run twice on same date+slot
+const publicationId = `${runId}-${crypto.createHash('sha256').update(`${runId}-${topic.id}`).digest('hex').slice(0, 10)}`;
 const articleUrl = `https://www.sv-netzwerk.eu/fachwissen/${slug}/`;
 const imageFileName = `${slug}.svg`;
 const imageWebPath = `/assets/images/linkedin/${imageFileName}`;
@@ -503,6 +512,13 @@ const body = [
   regionalSignal
     ? `Als fachlicher Aufhänger dienen aktuell öffentlich zugängliche Meldungen aus dem regionalen Umfeld (Suchraum um Aalen). Nach derzeit öffentlich berichteter Lage geht es vor allem um **${topic.category.toLowerCase()}**. Unabhängig von Einzelmeldungen bleibt für die Regulierung entscheidend, dass nur dokumentierte und plausibilisierte Feststellungen in Freigaben überführt werden.`
     : `Dieser Beitrag ordnet ein typisches Kumulschaden-Szenario ohne konkreten Einzelfallbezug ein. Damit werden keine Vor-Ort-Aussagen zu laufenden Ereignissen getroffen, sondern belastbare Vorgehensstandards für Sachverständige und Großschadenregulierer dargestellt.`,
+  '',
+  `## Fachlicher Rahmen: Sachverständige und Großschadenregulierer`,
+  `Sachverständige in der technischen Gebäudeschadensregulierung nehmen bei Kumulereignissen eine Schlüsselrolle ein. Sie liefern technisch belastbare Feststellungen, die als Grundlage für versicherungsrechtliche Entscheidungen dienen. Ihre Arbeit endet nicht bei der Erstbesichtigung: Die strukturierte Begleitung von Sanierung, Rückbau und Trocknungsprozessen sowie die Prüfung von Kostenvoranschlägen und Rechnungen sind gleichwertige Aufgaben.`,
+  '',
+  `Großschadenregulierer koordinieren bei regionalen Kumullagen das Zusammenspiel zwischen Versicherer, Sachverständigen, Dienstleistern und Betroffenen. Sie steuern Bearbeitungsreihenfolgen, setzen Priorisierungen um und sichern durch strukturierte Kommunikation, dass Entscheidungen nachvollziehbar und revisionssicher dokumentiert werden. Ohne klare Koordination entstehen bei hoher Fallzahl zwangsläufig inkonsistente Bewertungen, Doppelarbeit und regulatorische Unsicherheit.`,
+  '',
+  `Das SV-Netzwerk verbindet regional verankerte Sachverständige und erfahrene Großschadenregulierer in einem gemeinsamen Qualitätsstandard. Die [Gutachter-Plattform](/gutachter-plattform/) ermöglicht eine gezielte Zuordnung qualifizierter Experten auch bei größeren regionalen Schadenlagen.`,
   '',
   `## Technische und regulatorische Einordnung`,
   topic.tech,
@@ -549,6 +565,11 @@ const body = [
   '- Vorläufige Maßnahmen kenntlich machen und spätere Endentscheidungen separat dokumentieren.',
   '- Bei Serienereignissen Priorisierung nach Sicherheits- und Substanzrisiko vornehmen.',
   '',
+  `## Qualitätssicherung und Nachprüfung`,
+  `Die Qualitätssicherung in der Kumulschadenbearbeitung ist kein optionaler Schritt, sondern Voraussetzung für revisionssichere Regulierungsergebnisse. Einheitliche Dokumentationsstandards, systematische Rückprüfungen nach Trocknungsabschluss und strukturierte Abnahmen nach Sanierung sichern die Entscheidungsgrundlage für alle Beteiligten.`,
+  '',
+  `Für Versicherer bedeutet das: Freigaben sind nur auf Basis dokumentierter Befunde erteilt, nicht pauschal auf Basis des gemeldeten Schadenereignisses. Für Sachverständige heißt es: Die Aussage zur Ursache bleibt vorläufig, solange nicht alle relevanten Unterlagen vorliegen und ausgewertet sind. Für Regulierer gilt: Protokollierte Abstimmungen ersetzen mündliche Absprachen, besonders wenn mehrere Beteiligte an einer Schadenlage mitwirken.`,
+  '',
   `## Fachliches Fazit`,
   `Bei ${topic.category.toLowerCase()} ist nicht die Geschwindigkeit allein entscheidend, sondern die Prüffähigkeit jeder Einzelentscheidung. Wer Feststellung, Bewertung und Empfehlung konsequent trennt, reduziert Nachträge, Konflikte und regulatorische Unsicherheit.`,
   '',
@@ -578,8 +599,8 @@ const frontmatter = [
   `  updatedAt: ${berlinDate}`,
   '  status: published',
   'seo:',
-  `  title: "${title}"`,
-  `  description: "${metaDescription}"`,
+  `  title: "${truncate(title, 70)}"`,
+  `  description: "${truncate(metaDescription, 180)}"`,
   `  canonical: "${articleUrl}"`,
   `  image: "${imageUrl}"`,
   `  imageAlt: "${imageAlt}"`,
