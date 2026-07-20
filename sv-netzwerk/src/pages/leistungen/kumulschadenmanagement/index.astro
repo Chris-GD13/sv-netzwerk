@@ -9,21 +9,17 @@ const serviceSchema = {
   name: 'Kumulschadenmanagement für Versicherer',
   serviceType: 'Kumulschadenmanagement und Unwetterlagen-Steuerung',
   areaServed: 'DE',
-  provider: {
-    '@type': 'Organization',
-    name: 'SV-Netzwerk Bau & Schaden',
-    url: 'https://www.sv-netzwerk.eu/',
-  },
+  provider: { '@id': 'https://www.sv-netzwerk.eu/#organization' },
   url: 'https://www.sv-netzwerk.eu/leistungen/kumulschadenmanagement/',
 };
 ---
-<BaseLayout title="Kumulschadenmanagement für Versicherer | Auftrag direkt erteilen" description="Kumulschadenmanagement für Versicherer: Unwetterschäden direkt melden, priorisieren und strukturiert beauftragen." structuredData={serviceSchema} breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Kumulschadenmanagement'}]}>
+<BaseLayout title="Kumulschadenmanagement für Versicherer | Kumulschaden beauftragen" description="Kumulschadenmanagement für Versicherer mit priorisierter Steuerung, klaren SLA-Stufen und prüffähigen Entscheidungsvorlagen." structuredData={serviceSchema} breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Kumulschadenmanagement'}]}>
   <section class="sv-section" id="kumulschaden-formular">
     <div class="sv-container kumul-grid">
       <article class="sv-card form-card">
         <p class="sv-eyebrow">Kumulschaden</p>
-        <h1>Kumulschadenmanagement direkt beauftragen</h1>
-        <p class="sv-lead">Formular ohne Zwischenschritt ausfüllen und die Steuerung regionaler Schadenlagen priorisiert starten.</p>
+        <h1>Kumulschadenmanagement für Versicherer direkt beauftragen</h1>
+        <p class="sv-lead">Region, Volumen und Priorität strukturiert übermitteln und die Steuerung regionaler Schadenlagen ohne Umweg starten.</p>
         <h2>Kumulschaden-Formular</h2>
         {sent && <p class="status success">Der Auftrag wurde übermittelt. Sie erhalten eine Eingangsbestätigung per E-Mail.</p>}
         {error && <p class="status error">Die Übermittlung konnte nicht verarbeitet werden. Bitte Eingaben prüfen.</p>}
@@ -67,14 +63,47 @@ const serviceSchema = {
       </article>
 
       <article class="sv-card">
-        <h2>Benötigte Angaben</h2>
+        <h2>Einsatzrahmen</h2>
         <ul>
-          <li>Region und Schadenlage</li>
-          <li>Geschätzte Fallzahl</li>
-          <li>Zeitraum und Prioritäten</li>
-          <li>Ansprechpartner für die Einsatzsteuerung</li>
+          <li>SLA-Stufen (z. B. 2 / 4 / 8 Stunden) je Prioritätsklasse</li>
+          <li>Region, geschätzte Fallzahl und Startfenster</li>
+          <li>Verantwortliche Stelle für Freigaben und Eskalationen</li>
+          <li>Berichtstakt für Lagebild, Reserve und offene Punkte</li>
         </ul>
         <a class="sv-button sv-button-secondary" href="/grossschadenregulierung/#grossschaden-formular">Großschaden melden</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="sv-section sv-section-alt">
+    <div class="sv-container detail-grid">
+      <article class="sv-card">
+        <h2>Ablauf in 5 Schritten</h2>
+        <ol>
+          <li>Fallcluster und Priorisierungskriterien festlegen.</li>
+          <li>Erstaufnahme nach einheitlicher Mindeststruktur starten.</li>
+          <li>Technische Feststellung und Schadenabgrenzung absichern.</li>
+          <li>Kosten und Reserven je Cluster fortschreiben.</li>
+          <li>Freigaben, Ableitungen und offene Punkte dokumentieren.</li>
+        </ol>
+      </article>
+      <article class="sv-card">
+        <h2>Ergebnis für Versicherer</h2>
+        <ul>
+          <li>Belastbares Lagebild pro Region und Prioritätsstufe</li>
+          <li>Prüffähige Aktenstruktur für Entscheidungen und Nachprüfung</li>
+          <li>Nachvollziehbare Reserve- und Fortschreibungslogik</li>
+          <li>Klare Übergaben zwischen Regulierung, SV und Dienstleistern</li>
+        </ul>
+      </article>
+      <article class="sv-card">
+        <h2>Verantwortung und Methodik</h2>
+        <ul>
+          <li><a href="/experten/christian-waechter/">Christian Wächter</a> verantwortet Groß- und Kumulschadensteuerung.</li>
+          <li><a href="/experten/carmen-gohl/">Carmen Gohl</a> prüft komplexe Gebäudeschäden und Schadenabgrenzung.</li>
+          <li><a href="/experten/holger-roth/">Holger Roth</a> sichert die operative Regulierungsabstimmung.</li>
+          <li><a href="/fachwissen/kumulschaeden-in-der-region-priorisierung-koordination-dokumentation/">Fachstandard Kumulsteuerung</a> und <a href="/praxisfaelle/">Praxisfälle</a> sind direkt verknüpft.</li>
+        </ul>
       </article>
     </div>
   </section>
@@ -85,7 +114,9 @@ const serviceSchema = {
   .form-card .sv-lead{margin:0 0 .2rem}
   .kumul-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(16rem,.75fr);gap:1.2rem}
   .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}
+  .detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sv-space-5)}
   ul{margin:0;padding-left:1.2rem;display:grid;gap:.5rem}
+  ol{margin:0;padding-left:1.2rem;display:grid;gap:.5rem}
   form{display:grid;gap:.8rem}
   label{display:grid;gap:.4rem;font-weight:800}
   input,select,textarea{width:100%;padding:.78rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:#fff}
@@ -93,5 +124,6 @@ const serviceSchema = {
   .status.success{background:#e7f7ef;border:1px solid #6db58d;color:#174f31}
   .status.error{background:#fbe9e9;border:1px solid #cc7e7e;color:#6d1f1f}
   .hp-field{position:absolute;left:-100vw;width:1px;height:1px;opacity:0}
+  @media(max-width:62rem){.detail-grid{grid-template-columns:1fr}}
   @media(max-width:58rem){.kumul-grid{grid-template-columns:1fr;display:grid}}
 </style>

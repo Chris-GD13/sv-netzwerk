@@ -1,10 +1,3 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Hero from '../../components/Hero.astro';
-import CallToAction from '../../components/CallToAction.astro';
+return Astro.redirect('/fachwissen/', 301);
 ---
-
-<BaseLayout title="Fachartikel" description="Fachartikel zu Schadenpraxis und Regulierung im SV-Netzwerk." canonical="https://www.sv-netzwerk.eu/fachwissen/">
-  <Hero compact eyebrow="Fachartikel" title="Fachartikel für belastbare Schadenentscheidungen." text="Der bisherige Bereich ist als Fachartikel-Bereich unter gleicher URL-Struktur verfügbar." primaryLabel="Fachartikel öffnen" primaryHref="/fachwissen/" secondaryLabel="A-Z Navigation" secondaryHref="/fachwissen/az" />
-  <CallToAction title="Zum Fachartikel-Bereich wechseln" text="Alle Artikel, Kategorien und Tags finden Sie zentral im Fachartikel-Bereich." href="/fachwissen/" label="Fachartikel" />
-</BaseLayout>

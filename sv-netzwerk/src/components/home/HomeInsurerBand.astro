@@ -13,7 +13,7 @@ import { insurerClients } from '../../data/insurer-clients';
       {insurerClients.map((insurer) => (
         <span class="v4-insurer-band__chip">
           {insurer.logo ? (
-            <img src={insurer.logo} alt={insurer.logoAlt ?? `Logo ${insurer.name}`} loading="lazy" />
+            <img src={insurer.logo} alt={insurer.logoAlt ?? `Logo ${insurer.name}`} width="160" height="48" loading="lazy" />
           ) : (
             insurer.name
           )}

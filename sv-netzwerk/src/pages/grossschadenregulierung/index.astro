@@ -9,21 +9,17 @@ const serviceSchema = {
   name: 'Großschadenregulierung für Versicherer',
   serviceType: 'Großschadenregulierung und Komplexschadensteuerung',
   areaServed: 'DE',
-  provider: {
-    '@type': 'Organization',
-    name: 'SV-Netzwerk Bau & Schaden',
-    url: 'https://www.sv-netzwerk.eu/',
-  },
+  provider: { '@id': 'https://www.sv-netzwerk.eu/#organization' },
   url: 'https://www.sv-netzwerk.eu/grossschadenregulierung/',
 };
 ---
-<BaseLayout title="Großschadenregulierung für Versicherer | Auftrag direkt erteilen" description="Großschadenregulierung für Versicherer: Formular direkt ausfüllen und Auftrag ohne Umwege übermitteln." structuredData={serviceSchema} breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Großschadenregulierung'}]}>
+<BaseLayout title="Großschadenregulierung für Versicherer | Großschaden beauftragen" description="Großschadenregulierung für Versicherer mit klaren Eskalationsstufen, strukturierter Kostenprüfung und belastbarer Entscheidungsvorlage." structuredData={serviceSchema} breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Großschadenregulierung'}]}>
   <section class="sv-section" id="grossschaden-formular">
     <div class="sv-container gross-grid">
       <article class="sv-card form-card">
         <p class="sv-eyebrow">Großschaden</p>
-        <h1>Großschadenregulierung direkt beauftragen</h1>
-        <p class="sv-lead">Formular ohne Zwischenschritt ausfüllen und die Großschadenbearbeitung mit klarer Priorisierung starten.</p>
+        <h1>Großschadenregulierung für Versicherer direkt beauftragen</h1>
+        <p class="sv-lead">Schadenlage, Dringlichkeit und Prüfziel übermitteln und die Bearbeitung mit klarem Eskalationsrahmen starten.</p>
         <h2>Großschaden-Formular</h2>
         {sent && <p class="status success">Der Auftrag wurde übermittelt. Sie erhalten eine Eingangsbestätigung per E-Mail.</p>}
         {error && <p class="status error">Die Übermittlung konnte nicht verarbeitet werden. Bitte Eingaben prüfen.</p>}
@@ -73,14 +69,47 @@ const serviceSchema = {
       </article>
 
       <article class="sv-card">
-        <h2>Benötigte Angaben</h2>
+        <h2>Einsatzrahmen</h2>
         <ul>
-          <li>Schadenort und Schadenart</li>
-          <li>Schadendatum und Dringlichkeit</li>
-          <li>Ansprechpartner und Erreichbarkeit</li>
-          <li>Vorhandene Unterlagen</li>
+          <li>Eskalationsstufe und Erstreaktion nach SLA-Vereinbarung</li>
+          <li>Schadenort, Schadenart und belastbare Dringlichkeitsbegründung</li>
+          <li>Ansprechpartner für Freigaben, Reserve und Berichtstakt</li>
+          <li>Unterlagenstand für Erstbewertung und Nachprüfung</li>
         </ul>
         <a class="sv-button sv-button-secondary" href="/leistungen/kumulschadenmanagement/#kumulschaden-formular">Kumulschaden melden</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="sv-section sv-section-alt">
+    <div class="sv-container detail-grid">
+      <article class="sv-card">
+        <h2>Ablauf in 5 Schritten</h2>
+        <ol>
+          <li>Erstklassifizierung nach Schadenhöhe, Risiko und Komplexität.</li>
+          <li>Technische Feststellung mit priorisiertem Vor-Ort-Umfang.</li>
+          <li>Abgrenzung von Schadenanteil, Vorschaden und Instandhaltung.</li>
+          <li>Kostenprüfung von KVA, Nachträgen und Rechnungen.</li>
+          <li>Entscheidungsvorlage mit Reserve- und Maßnahmenstand.</li>
+        </ol>
+      </article>
+      <article class="sv-card">
+        <h2>Ergebnis für Versicherer</h2>
+        <ul>
+          <li>Strukturierte Großschadenakte mit klaren Entscheidungspunkten</li>
+          <li>Belastbare Herleitung für Freigaben, Kürzungen und Rückfragen</li>
+          <li>Fortlaufende Reserveeinschätzung mit dokumentierten Annahmen</li>
+          <li>Einheitliche Kommunikation zwischen allen beteiligten Rollen</li>
+        </ul>
+      </article>
+      <article class="sv-card">
+        <h2>Verantwortung und Methodik</h2>
+        <ul>
+          <li><a href="/experten/christian-waechter/">Christian Wächter</a> führt Großschadenkoordination und technische Abgrenzung.</li>
+          <li><a href="/experten/holger-roth/">Holger Roth</a> steuert Regulierungsabstimmung und Eskalation.</li>
+          <li><a href="/experten/carmen-gohl/">Carmen Gohl</a> ergänzt komplexe Gebäudeschäden und Schadenzuordnung.</li>
+          <li><a href="/praxisfaelle/">Praxisfälle</a> und <a href="/fachwissen/schadenabgrenzung/">Fachstandard Schadenabgrenzung</a> sind direkt eingebunden.</li>
+        </ul>
       </article>
     </div>
   </section>
@@ -91,7 +120,9 @@ const serviceSchema = {
   .form-card .sv-lead{margin:0 0 .2rem}
   .gross-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(16rem,.75fr);gap:1.2rem}
   .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}
+  .detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sv-space-5)}
   ul{margin:0;padding-left:1.2rem;display:grid;gap:.5rem}
+  ol{margin:0;padding-left:1.2rem;display:grid;gap:.5rem}
   form{display:grid;gap:.8rem}
   label{display:grid;gap:.4rem;font-weight:800}
   input,select,textarea{width:100%;padding:.78rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:#fff}
@@ -99,5 +130,6 @@ const serviceSchema = {
   .status.success{background:#e7f7ef;border:1px solid #6db58d;color:#174f31}
   .status.error{background:#fbe9e9;border:1px solid #cc7e7e;color:#6d1f1f}
   .hp-field{position:absolute;left:-100vw;width:1px;height:1px;opacity:0}
+  @media(max-width:62rem){.detail-grid{grid-template-columns:1fr}}
   @media(max-width:58rem){.gross-grid{grid-template-columns:1fr;display:grid}}
 </style>

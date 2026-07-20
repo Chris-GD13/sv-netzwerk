@@ -26,41 +26,11 @@ interface Props {
 }
 
 const props = Astro.props;
+const organizationId = `${site.url.replace(/\/$/, '')}#organization`;
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: site.legalName,
-  url: site.url,
-  email: site.email,
-  telephone: site.phone,
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: site.address[0],
-    postalCode: '73432',
-    addressLocality: 'Aalen',
-    addressCountry: 'DE',
-  },
-};
-
-const localBusinessSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
-  name: site.legalName,
-  url: site.url,
-  email: site.email,
-  telephone: site.phone,
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: site.address[0],
-    postalCode: '73432',
-    addressLocality: 'Aalen',
-    addressCountry: 'DE',
-  },
-};
-
-const professionalServiceSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'ProfessionalService',
+  '@id': organizationId,
   name: site.legalName,
   url: site.url,
   email: site.email,
@@ -100,8 +70,6 @@ const pageSchemas = Array.isArray(props.structuredData)
 
 const schemas = [
   organizationSchema,
-  localBusinessSchema,
-  professionalServiceSchema,
   ...(breadcrumbSchema ? [breadcrumbSchema] : []),
   ...pageSchemas,
 ];
