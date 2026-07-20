@@ -35,7 +35,6 @@ export const navigation: NavItem[] = [
       },
     ],
   },
-  { label: 'Leistungen', href: '/leistungen/' },
   { label: 'Experten', href: '/experten/' },
   { label: 'Fachartikel', href: '/fachwissen/' },
   { label: 'Kontakt', href: '/kontakt/' },
