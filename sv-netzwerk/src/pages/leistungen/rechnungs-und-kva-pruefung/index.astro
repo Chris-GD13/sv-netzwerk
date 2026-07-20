@@ -8,11 +8,7 @@ const serviceSchema = {
   name: 'Rechnungs- und KVA-Prüfung im Schadenfall',
   serviceType: 'KVA-Prüfung, Rechnungsprüfung und Nachtragsprüfung',
   areaServed: 'DE',
-  provider: {
-    '@type': 'Organization',
-    name: 'SV-Netzwerk Bau & Schaden',
-    url: 'https://www.sv-netzwerk.eu/',
-  },
+  provider: { '@id': 'https://www.sv-netzwerk.eu/#organization' },
   url: 'https://www.sv-netzwerk.eu/leistungen/rechnungs-und-kva-pruefung/',
 };
 ---
@@ -54,6 +50,29 @@ const serviceSchema = {
     </div>
   </section>
 
+  <section class="sv-section sv-section-alt">
+    <div class="sv-container cols">
+      <article class="sv-card">
+        <h2>Ablauf in 4 Schritten</h2>
+        <ol>
+          <li>Unterlagenstand und Prüfziel je Vorgang festlegen.</li>
+          <li>Mengen, Positionen und Schadenbezug technisch abgleichen.</li>
+          <li>Nachträge, Regie- und Nebenkosten plausibilisieren.</li>
+          <li>Entscheidungsvorlage mit Abzügen und offenen Punkten erstellen.</li>
+        </ol>
+      </article>
+      <article class="sv-card">
+        <h2>Verantwortung und Methodik</h2>
+        <ul>
+          <li><a href="/experten/christian-waechter/">Christian Wächter</a> verantwortet technische Schadenabgrenzung.</li>
+          <li><a href="/experten/lenna-maria-walczok/">Lenna Maria Walczok</a> verantwortet Nachtrags- und Mengenprüfung.</li>
+          <li><a href="/experten/carmen-gohl/">Carmen Gohl</a> ergänzt Gebäudeschäden und Zeitwertfragen.</li>
+          <li><a href="/fachwissen/regiekosten-im-schadenfall-pruefen/">Fachbeitrag Regiekostenprüfung</a> und <a href="/praxisfaelle/">Praxisfälle</a> sind direkt nutzbar.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
   <CallToAction
     title="KVA oder Rechnung prüfen lassen"
     text="Senden Sie Schadenakte, KVA/Rechnung und Fragestellung gebündelt über den Versicherer-Einstieg."
@@ -68,5 +87,6 @@ const serviceSchema = {
   .cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sv-space-5)}
   .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}
   ul{display:grid;gap:.55rem;margin:0;padding-left:1.2rem}
+  ol{display:grid;gap:.55rem;margin:0;padding-left:1.2rem}
   @media(max-width:62rem){.cols{grid-template-columns:1fr}}
 </style>

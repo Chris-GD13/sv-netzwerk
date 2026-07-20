@@ -13,7 +13,7 @@ import { insurerClients } from '../../../data/insurer-clients';
       <h1>Versichererübersicht</h1>
       <p class="sv-lead">Wir unterstützen Versicherer in der operativen Schadenregulierung.</p>
       <p class="intro-partner-label">Direkt und über:</p>
-      <img class="intro-partner-logo" src="/assets/images/partners/die-regulierer.png" alt="Logo Die Regulierer" loading="lazy" />
+      <img class="intro-partner-logo" src="/assets/images/partners/die-regulierer.png" alt="Logo Die Regulierer" width="240" height="80" loading="lazy" />
     </div>
   </section>
 
@@ -23,7 +23,7 @@ import { insurerClients } from '../../../data/insurer-clients';
         {insurerClients.map((insurer) => (
           <article class="logo-card">
             {insurer.logo ? (
-              <img src={insurer.logo} alt={insurer.logoAlt ?? `Logo ${insurer.name}`} loading="lazy" />
+              <img src={insurer.logo} alt={insurer.logoAlt ?? `Logo ${insurer.name}`} width="160" height="48" loading="lazy" />
             ) : (
               <span>{insurer.name}</span>
             )}

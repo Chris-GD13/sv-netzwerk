@@ -14,7 +14,13 @@ export default defineConfig({
         !page.includes('/fachwissen/seite/') &&
         !page.endsWith('/fachwissen/az/') &&
         !page.includes('/svos/fachwissen') &&
-        !page.endsWith('/versicherungen/')
+        !page.endsWith('/versicherungen/') &&
+        !page.endsWith('/wissen/') &&
+        !page.endsWith('/schadenarten/photovoltaik/') &&
+        !page.endsWith('/netzwerk/') &&
+        !page.endsWith('/kompetenzzentrum/') &&
+        !page.endsWith('/gutachter-plattform/fuer-versicherungen/') &&
+        !page.endsWith('/gutachter-plattform/fuer-regulierer/')
     })
   ],
   prefetch: true,

@@ -9,6 +9,11 @@ const regions = [...new Set(specialists.flatMap((expert) => expert.regions))].so
 const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].sort((a, b) => a.localeCompare(b, 'de'));
 ---
 <BaseLayout title="Experten | SV-Netzwerk" description="Experten direkt nach Region und Fachgebiet filtern und anfragen." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Experten' }]}>
+  <section class="sv-section experts-intro">
+    <div class="sv-container">
+      <h1>Sachverständige und Schadenregulierer im SV-Netzwerk</h1>
+    </div>
+  </section>
   <section class="sv-section" id="interaktive-filter">
     <div class="sv-container">
       <SectionHeader eyebrow="Filter" title="Experten nach Region und Fachgebiet filtern" text="Filter setzen und direkt passende Experten anzeigen." />
@@ -94,6 +99,8 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
 </script>
 
 <style>
+  .experts-intro{padding-bottom:0}
+  .experts-intro h1{margin:0}
   .filter-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-lg);background:rgba(255,255,255,.72)}
   .filter-panel label{display:grid;gap:.4rem;font-weight:800}
   .filter-panel input,.filter-panel select{padding:.78rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:#fff;font:inherit}

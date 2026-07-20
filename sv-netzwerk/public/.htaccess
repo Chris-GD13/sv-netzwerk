@@ -7,7 +7,16 @@ RewriteRule ^ https://www.sv-netzwerk.eu%{REQUEST_URI} [R=301,L]
 
 # Consolidated insurer landing page
 RewriteRule ^versicherungen/?$ /versicherer/ [R=301,L,NC]
+RewriteRule ^versicherungsleistungen/?$ /versicherer/ [R=301,L,NC]
 
 # Consolidated knowledge base paths
+RewriteRule ^wissen/?$ /fachwissen/ [R=301,L,NC]
 RewriteRule ^svos/fachwissen/?$ /fachwissen/ [R=301,L,NC]
 RewriteRule ^svos/fachwissen/(.*)$ /fachwissen/$1 [R=301,L,NC]
+
+# Consolidated legacy service paths
+RewriteRule ^schadenarten/photovoltaik/?$ /schadenarten/ [R=301,L,NC]
+RewriteRule ^netzwerk/?$ /experten/ [R=301,L,NC]
+RewriteRule ^kompetenzzentrum/?$ /leistungen/ [R=301,L,NC]
+RewriteRule ^gutachter-plattform/fuer-versicherungen/?$ /versicherer/ [R=301,L,NC]
+RewriteRule ^gutachter-plattform/fuer-regulierer/?$ /versicherer/ [R=301,L,NC]
