@@ -13,11 +13,11 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
-    title: 'Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz – fachliche Einordnung zur aktuellen Lage',
-    description: 'Leitungswasser und Kumulmanagement: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    title: 'Leitungswasserschaden im Mehrfamilienhaus: Erstmaßnahmen und Sanierungssteuerung',
+    description: 'Anonymisierte Fallauswertung aus dem Einsatzkalender: Wie Erstmaßnahmen, Trocknung, Rückbau und Kostenfreigaben fachlich sauber gesteuert werden.',
     href: '/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2026-07-21-afternoon/',
-    category: 'Leitungswasser und Kumulmanagement',
-    tags: ['Leitungswasser', 'Schadenmanagement', 'Sanierungsplanung', 'Kostenprüfung'],
+    category: 'Leitungswasserschäden',
+    tags: ['Leitungswasser', 'Erstmaßnahmen', 'Trocknung', 'Schadenregulierung'],
     date: '2026-07-21',
     type: 'article',
     featured: false,
