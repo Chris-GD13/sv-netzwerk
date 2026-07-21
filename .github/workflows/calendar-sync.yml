@@ -1,0 +1,62 @@
+name: Outlook-Kalenderslots synchronisieren
+
+on:
+  schedule:
+    - cron: "12 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: calendar-sync-main
+  cancel-in-progress: true
+
+jobs:
+  sync-calendar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: ${{ vars.CALENDAR_SYNC_ENABLED != 'false' }}
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    env:
+      M365_TENANT_ID: ${{ secrets.M365_TENANT_ID }}
+      M365_CLIENT_ID: ${{ secrets.M365_CLIENT_ID }}
+      M365_CLIENT_SECRET: ${{ secrets.M365_CLIENT_SECRET }}
+      M365_CALENDAR_USER_ID: ${{ secrets.M365_CALENDAR_USER_ID }}
+      CALENDAR_TIMEZONE: ${{ vars.CALENDAR_TIMEZONE }}
+      CALENDAR_HORIZON_DAYS: ${{ vars.CALENDAR_HORIZON_DAYS }}
+      CALENDAR_BACKFILL_DAYS: ${{ vars.CALENDAR_BACKFILL_DAYS }}
+      CALENDAR_INCLUDE_SUBJECTS: ${{ vars.CALENDAR_INCLUDE_SUBJECTS }}
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Node.js 22 LTS einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+
+      - name: Abhaengigkeiten installieren
+        run: npm ci --no-audit --no-fund
+
+      - name: Kalenderslots aus Outlook laden
+        run: npm run calendar:sync
+
+      - name: Aenderungen committen und pushen
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/calendar-slots.json
+          if git diff --cached --quiet; then
+            echo "Keine Aenderungen an calendar-slots.json."
+            exit 0
+          fi
+          git commit -m "chore: sync outlook calendar slots"
+          git push origin HEAD:main

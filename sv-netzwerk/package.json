@@ -13,7 +13,8 @@
     "validate:public-copy": "node scripts/validate-public-copy.mjs",
     "validate:visible-umlauts": "node scripts/validate-visible-umlauts.mjs",
     "fachbeitrag:run": "node scripts/run-fachbeitrag-automation.mjs",
-    "fachbeitrag:log": "node scripts/update-fachbeitrag-log.mjs"
+    "fachbeitrag:log": "node scripts/update-fachbeitrag-log.mjs",
+    "calendar:sync": "node scripts/sync-calendar-slots.mjs"
   },
   "dependencies": {
     "@astrojs/check": "latest",
