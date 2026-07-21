@@ -5,9 +5,20 @@ RewriteCond %{HTTPS} !=on [OR]
 RewriteCond %{HTTP_HOST} !^www\.sv-netzwerk\.eu$ [NC]
 RewriteRule ^ https://www.sv-netzwerk.eu%{REQUEST_URI} [R=301,L]
 
+# 410 Gone: entfernte automatisch erzeugte Fachbeiträge (keine inhaltliche Entsprechung)
+RewriteRule ^fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/?$ - [G,L]
+RewriteRule ^fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/?$ - [G,L]
+RewriteRule ^fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/?$ - [G,L]
+
+# 410 Gone: Anonymisierungsverstoß (konkreter Ortsbezug)
+RewriteRule ^fachwissen/unwetter-ludwigsburg-starkregen-hagel-sturm-schadensteuerung/?$ - [G,L]
+
 # Consolidated insurer landing page
 RewriteRule ^versicherungen/?$ /versicherer/ [R=301,L,NC]
 RewriteRule ^versicherungsleistungen/?$ /versicherer/ [R=301,L,NC]
+
+# Legacy regional page
+RewriteRule ^niederlassungen/?$ /experten/ [R=301,L,NC]
 
 # Consolidated knowledge base paths
 RewriteRule ^wissen/?$ /fachwissen/ [R=301,L,NC]
