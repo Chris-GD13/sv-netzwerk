@@ -68,7 +68,7 @@ Der Generator erstellt pro Lauf:
 ## LinkedIn-/Zap-Übergabe
 
 - Zapier-Webhook bleibt unverändert (`secrets.ZAPIER_WEBHOOK_URL`).
-- Auslösung erfolgt **ausschließlich nach erfolgreicher Live-URL-Prüfung** (HTTP 200 + Slug im Seiteninhalt).
+- Auslösung erfolgt **nur im Morgenslot** und ausschließlich nach erfolgreicher Live-URL-Prüfung (HTTP 200 + Slug im Seiteninhalt).
 - Vor LinkedIn werden im Lauf verpflichtend Vorprüfung, Fachwissensvalidierung, Typprüfung (`astro check`), Build, HTML-Validierung und Link-/Build-Integration ausgeführt.
 - Payload-Format (Zap-kompatibel):
   ```json
@@ -157,7 +157,7 @@ Spalten:
 | `quellen` | Anonymisierte interne Fall-/Unterlagenauswertung oder externe/Fallback-Quelle |
 | `bilddatei` | Pfad zur Bilddatei (relativ zu Webroot) |
 | `bild_alt_text` | Alt-Text des Bildes |
-| `linkedin_status` | `pending` → `success` / `failed` |
+| `linkedin_status` | `pending` → `success` / `failed` / `skipped` (Nachmittag) |
 | `commit` | Git-Commit-Hash nach Push |
 | `deploy_status` | `pending` → `triggered` → `success` / `failed` |
 | `live_pruefung` | `pending` → `success` / `failed` |
