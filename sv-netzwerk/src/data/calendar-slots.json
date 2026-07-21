@@ -1,18 +1,420 @@
 {
-  "generatedAt": "2026-07-21T13:12:26.224Z",
+  "generatedAt": "2026-07-21T13:15:04.894Z",
   "timezone": "Europe/Berlin",
   "source": "microsoft-graph",
   "calendarUserId": "cw@sv-schuett.eu",
   "range": {
-    "startIso": "2026-07-21T13:12:26.224Z",
-    "endIso": "2026-08-11T13:12:26.224Z",
+    "startIso": "2026-07-21T13:15:04.894Z",
+    "endIso": "2026-08-11T13:15:04.894Z",
     "horizonDays": 21,
     "backfillDays": 0
   },
   "summary": {
-    "totalEvents": 0,
-    "busyEvents": 0,
-    "freeEvents": 0
+    "totalEvents": 37,
+    "busyEvents": 36,
+    "freeEvents": 1
   },
-  "slots": []
+  "calendars": [
+    {
+      "id": "AQMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAD8TQqHn_uJU6KYZbg0vU5EgcAciekqparBk6SVtsczrw1sAAAAgEGAAAAciekqparBk6SVtsczrw1sAABdmsvAQAAAA==",
+      "name": "Calender Christian",
+      "isDefaultCalendar": false
+    },
+    {
+      "id": "AQMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAD8TQqHn_uJU6KYZbg0vU5EgcAciekqparBk6SVtsczrw1sAAAAgEGAAAAciekqparBk6SVtsczrw1sAAAAmckAAAA",
+      "name": "Kalender",
+      "isDefaultCalendar": true
+    },
+    {
+      "id": "AQMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAD8TQqHn_uJU6KYZbg0vU5EgcAciekqparBk6SVtsczrw1sAAAAgEGAAAAciekqparBk6SVtsczrw1sAABh9abqwAAAA==",
+      "name": "Holger Roth",
+      "isDefaultCalendar": false
+    },
+    {
+      "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAAAAAEGAAByJ6SqlqsGTpJW2xzOvDWwAAC3MFKZAAA=",
+      "name": "claimsforce - Die Regulierer",
+      "isDefaultCalendar": false
+    }
+  ],
+  "slots": [
+    {
+      "date": "2026-07-22",
+      "busy": [
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaIqfBGAAA=",
+          "startIso": "2026-07-22T08:00:00.000Z",
+          "endIso": "2026-07-22T08:30:00.000Z",
+          "startLocal": "2026-07-22 10:00",
+          "endLocal": "2026-07-22 10:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAJusHBbAAByJ6SqlqsGTpJW2xzOvDWwAAap6oUDAAA=",
+          "startIso": "2026-07-22T08:00:00.000Z",
+          "endIso": "2026-07-22T08:30:00.000Z",
+          "startLocal": "2026-07-22 10:00",
+          "endLocal": "2026-07-22 10:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaNQzQ5AAA=",
+          "startIso": "2026-07-22T09:30:00.000Z",
+          "endIso": "2026-07-22T10:00:00.000Z",
+          "startLocal": "2026-07-22 11:30",
+          "endLocal": "2026-07-22 12:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAJusHBbAAByJ6SqlqsGTpJW2xzOvDWwAAap6oUFAAA=",
+          "startIso": "2026-07-22T09:30:00.000Z",
+          "endIso": "2026-07-22T10:00:00.000Z",
+          "startLocal": "2026-07-22 11:30",
+          "endLocal": "2026-07-22 12:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-23",
+      "busy": [
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAC3MKKOAAA=",
+          "startIso": "2026-07-23T06:00:00.000Z",
+          "endIso": "2026-07-23T07:00:00.000Z",
+          "startLocal": "2026-07-23 08:00",
+          "endLocal": "2026-07-23 09:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAZx0qU0AAA=",
+          "startIso": "2026-07-23T07:00:00.000Z",
+          "endIso": "2026-07-23T07:30:00.000Z",
+          "startLocal": "2026-07-23 09:00",
+          "endLocal": "2026-07-23 09:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaIqfBFAAA=",
+          "startIso": "2026-07-23T08:00:00.000Z",
+          "endIso": "2026-07-23T08:30:00.000Z",
+          "startLocal": "2026-07-23 10:00",
+          "endLocal": "2026-07-23 10:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAJusHBbAAByJ6SqlqsGTpJW2xzOvDWwAAap6oUCAAA=",
+          "startIso": "2026-07-23T08:00:00.000Z",
+          "endIso": "2026-07-23T08:30:00.000Z",
+          "startLocal": "2026-07-23 10:00",
+          "endLocal": "2026-07-23 10:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaprXe8AAA=",
+          "startIso": "2026-07-23T09:00:00.000Z",
+          "endIso": "2026-07-23T09:30:00.000Z",
+          "startLocal": "2026-07-23 11:00",
+          "endLocal": "2026-07-23 11:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAJusHBbAAByJ6SqlqsGTpJW2xzOvDWwAAap6oUQAAA=",
+          "startIso": "2026-07-23T09:00:00.000Z",
+          "endIso": "2026-07-23T09:30:00.000Z",
+          "startLocal": "2026-07-23 11:00",
+          "endLocal": "2026-07-23 11:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-24",
+      "busy": [
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwFRAAgI3ukWgT0AAEYAAAAA8TQqHn_uJU6KYZbg0vU5EgcAciekqparBk6SVtsczrw1sAABdmqKOgAAciekqparBk6SVtsczrw1sAADV6OZDAAAEA==",
+          "startIso": "2026-07-24T00:00:00.000Z",
+          "endIso": "2026-07-25T00:00:00.000Z",
+          "startLocal": "2026-07-24 02:00",
+          "endLocal": "2026-07-25 02:00",
+          "isAllDay": true,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAZVNumxAAA=",
+          "startIso": "2026-07-24T07:30:00.000Z",
+          "endIso": "2026-07-24T08:00:00.000Z",
+          "startLocal": "2026-07-24 09:30",
+          "endLocal": "2026-07-24 10:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-27",
+      "busy": [
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaS1xa8AAA=",
+          "startIso": "2026-07-27T07:00:00.000Z",
+          "endIso": "2026-07-27T07:30:00.000Z",
+          "startLocal": "2026-07-27 09:00",
+          "endLocal": "2026-07-27 09:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAJusHBbAAByJ6SqlqsGTpJW2xzOvDWwAAap6oUIAAA=",
+          "startIso": "2026-07-27T07:00:00.000Z",
+          "endIso": "2026-07-27T07:30:00.000Z",
+          "startLocal": "2026-07-27 09:00",
+          "endLocal": "2026-07-27 09:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAJusHBbAAByJ6SqlqsGTpJW2xzOvDWwAAap6oUJAAA=",
+          "startIso": "2026-07-27T07:00:00.000Z",
+          "endIso": "2026-07-27T07:30:00.000Z",
+          "startLocal": "2026-07-27 09:00",
+          "endLocal": "2026-07-27 09:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaS1xa7AAA=",
+          "startIso": "2026-07-27T08:00:00.000Z",
+          "endIso": "2026-07-27T08:30:00.000Z",
+          "startLocal": "2026-07-27 10:00",
+          "endLocal": "2026-07-27 10:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAJusHBbAAByJ6SqlqsGTpJW2xzOvDWwAAap6oUHAAA=",
+          "startIso": "2026-07-27T08:30:00.000Z",
+          "endIso": "2026-07-27T09:00:00.000Z",
+          "startLocal": "2026-07-27 10:30",
+          "endLocal": "2026-07-27 11:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaprXe6AAA=",
+          "startIso": "2026-07-27T09:00:00.000Z",
+          "endIso": "2026-07-27T09:30:00.000Z",
+          "startLocal": "2026-07-27 11:00",
+          "endLocal": "2026-07-27 11:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAJusHBbAAByJ6SqlqsGTpJW2xzOvDWwAAap6oUOAAA=",
+          "startIso": "2026-07-27T09:00:00.000Z",
+          "endIso": "2026-07-27T09:30:00.000Z",
+          "startLocal": "2026-07-27 11:00",
+          "endLocal": "2026-07-27 11:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaprXe7AAA=",
+          "startIso": "2026-07-27T10:00:00.000Z",
+          "endIso": "2026-07-27T10:30:00.000Z",
+          "startLocal": "2026-07-27 12:00",
+          "endLocal": "2026-07-27 12:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAJusHBbAAByJ6SqlqsGTpJW2xzOvDWwAAap6oUPAAA=",
+          "startIso": "2026-07-27T10:00:00.000Z",
+          "endIso": "2026-07-27T10:30:00.000Z",
+          "startLocal": "2026-07-27 12:00",
+          "endLocal": "2026-07-27 12:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-28",
+      "busy": [
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaS1xa6AAA=",
+          "startIso": "2026-07-28T07:30:00.000Z",
+          "endIso": "2026-07-28T08:00:00.000Z",
+          "startLocal": "2026-07-28 09:30",
+          "endLocal": "2026-07-28 10:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAJusHBbAAByJ6SqlqsGTpJW2xzOvDWwAAap6oUGAAA=",
+          "startIso": "2026-07-28T07:30:00.000Z",
+          "endIso": "2026-07-28T08:00:00.000Z",
+          "startLocal": "2026-07-28 09:30",
+          "endLocal": "2026-07-28 10:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaprXe_AAA=",
+          "startIso": "2026-07-28T08:30:00.000Z",
+          "endIso": "2026-07-28T09:00:00.000Z",
+          "startLocal": "2026-07-28 10:30",
+          "endLocal": "2026-07-28 11:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAJusHBbAAByJ6SqlqsGTpJW2xzOvDWwAAap6oUUAAA=",
+          "startIso": "2026-07-28T08:30:00.000Z",
+          "endIso": "2026-07-28T09:00:00.000Z",
+          "startLocal": "2026-07-28 10:30",
+          "endLocal": "2026-07-28 11:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaprXe-AAA=",
+          "startIso": "2026-07-28T09:30:00.000Z",
+          "endIso": "2026-07-28T10:00:00.000Z",
+          "startLocal": "2026-07-28 11:30",
+          "endLocal": "2026-07-28 12:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaprXfAAAA=",
+          "startIso": "2026-07-28T10:30:00.000Z",
+          "endIso": "2026-07-28T11:00:00.000Z",
+          "startLocal": "2026-07-28 12:30",
+          "endLocal": "2026-07-28 13:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-29",
+      "busy": [
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAC3MKKPAAA=",
+          "startIso": "2026-07-29T06:00:00.000Z",
+          "endIso": "2026-07-29T07:00:00.000Z",
+          "startLocal": "2026-07-29 08:00",
+          "endLocal": "2026-07-29 09:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-31",
+      "busy": [
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwFRAAgI3u6WqiFAAEYAAAAA8TQqHn_uJU6KYZbg0vU5EgcAciekqparBk6SVtsczrw1sAABdmqKOgAAciekqparBk6SVtsczrw1sAADV6OZDAAAEA==",
+          "startIso": "2026-07-31T00:00:00.000Z",
+          "endIso": "2026-08-01T00:00:00.000Z",
+          "startLocal": "2026-07-31 02:00",
+          "endLocal": "2026-08-01 02:00",
+          "isAllDay": true,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-03",
+      "busy": [
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaprXfEAAA=",
+          "startIso": "2026-08-03T07:30:00.000Z",
+          "endIso": "2026-08-03T08:00:00.000Z",
+          "startLocal": "2026-08-03 09:30",
+          "endLocal": "2026-08-03 10:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-04",
+      "busy": [
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaprXfBAAA=",
+          "startIso": "2026-08-04T07:30:00.000Z",
+          "endIso": "2026-08-04T08:00:00.000Z",
+          "startLocal": "2026-08-04 09:30",
+          "endLocal": "2026-08-04 10:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaprXfCAAA=",
+          "startIso": "2026-08-04T08:30:00.000Z",
+          "endIso": "2026-08-04T09:00:00.000Z",
+          "startLocal": "2026-08-04 10:30",
+          "endLocal": "2026-08-04 11:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaprXfDAAA=",
+          "startIso": "2026-08-04T09:00:00.000Z",
+          "endIso": "2026-08-04T09:30:00.000Z",
+          "startLocal": "2026-08-04 11:00",
+          "endLocal": "2026-08-04 11:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-05",
+      "busy": [
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAaS1xa9AAA=",
+          "startIso": "2026-08-05T06:00:00.000Z",
+          "endIso": "2026-08-05T07:00:00.000Z",
+          "startLocal": "2026-08-05 08:00",
+          "endLocal": "2026-08-05 09:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwBGAAAAAADxNCoef64lTophluDS9TkSBwByJ6SqlqsGTpJW2xzOvDWwAAF2aoo6AAByJ6SqlqsGTpJW2xzOvDWwAAC3MKKQAAA=",
+          "startIso": "2026-08-05T07:30:00.000Z",
+          "endIso": "2026-08-05T08:30:00.000Z",
+          "startLocal": "2026-08-05 09:30",
+          "endLocal": "2026-08-05 10:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-07",
+      "busy": [
+        {
+          "id": "AAMkAGMwZTI1ZTM0LTkzMTMtNDNhZC1hNGI3LTVmNTZjMTcyODBmNwFRAAgI3vQW0wWAAEYAAAAA8TQqHn_uJU6KYZbg0vU5EgcAciekqparBk6SVtsczrw1sAABdmqKOgAAciekqparBk6SVtsczrw1sAADV6OZDAAAEA==",
+          "startIso": "2026-08-07T00:00:00.000Z",
+          "endIso": "2026-08-08T00:00:00.000Z",
+          "startLocal": "2026-08-07 02:00",
+          "endLocal": "2026-08-08 02:00",
+          "isAllDay": true,
+          "showAs": "busy"
+        }
+      ]
+    }
+  ]
 }
