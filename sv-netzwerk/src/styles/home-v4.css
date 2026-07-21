@@ -1574,6 +1574,15 @@
     flex-wrap: wrap;
   }
 }
+@media (max-width: 54rem) {
+  .home-v4 #main-content {
+    display: flex;
+    flex-direction: column;
+  }
+  .home-v4 #main-content > .v4-insurer-band {
+    order: 100;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .v4-hero__marquee div {
     animation: none;
