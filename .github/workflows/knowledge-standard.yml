@@ -24,6 +24,7 @@ on:
         type: boolean
 
 permissions:
+  actions: write
   contents: write
 
 concurrency:
@@ -100,9 +101,20 @@ jobs:
         if: steps.generate.outputs.status == 'generated'
         run: npm run validate:knowledge -- "$BERLIN_DATE"
 
+      - name: Typprüfung ausführen
+        if: steps.generate.outputs.status == 'generated'
+        run: npm run check
+
       - name: Build ausführen
         if: steps.generate.outputs.status == 'generated'
         run: npm run build
+
+      - name: HTML-Struktur validieren
+        if: steps.generate.outputs.status == 'generated'
+        run: |
+          npx --yes html-validate@9 --rule "long-title:off" \
+            "dist/fachwissen/${PUBLICATION_SLUG}/index.html" \
+            "dist/svos/fachwissen/${PUBLICATION_SLUG}/index.html"
 
       - name: Build-Integration prüfen
         if: steps.generate.outputs.status == 'generated'
@@ -126,28 +138,22 @@ jobs:
         if: steps.generate.outputs.status == 'generated'
         run: node scripts/update-fachbeitrag-log.mjs --commit="$PUBLISHED_COMMIT" --deploy=triggered
 
-      # GitHub Actions GITHUB_TOKEN-Pushes lösen keine anderen Workflows aus.
-      # Daher wird das Deployment direkt in diesem Workflow via SFTP durchgeführt.
-      - name: deploy-version.txt nach Commit aktualisieren
-        if: steps.generate.outputs.status == 'generated'
-        run: |
-          node scripts/write-deploy-version.mjs
-          cp public/deploy-version.txt dist/deploy-version.txt
-
-      - name: SFTP-Werkzeug installieren
-        if: steps.generate.outputs.status == 'generated'
-        run: sudo apt-get install --yes lftp
-
-      - name: Dist nach IONOS via SFTP übertragen
+      - name: Deploy-Workflow auslösen und abwarten
         if: steps.generate.outputs.status == 'generated'
         env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
-          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" \
-            -e "set sftp:auto-confirm yes; mirror --reverse --verbose --parallel=4 --delete dist/ /sv-netzwerk/; bye"
+          node scripts/trigger-and-await-workflow.mjs \
+            --repo="${{ github.repository }}" \
+            --workflow="deploy.yml" \
+            --ref="main" \
+            --head-sha="$PUBLISHED_COMMIT" \
+            --timeout-seconds=2700
+          echo "DEPLOY_OK=true" >> "$GITHUB_ENV"
+
+      - name: Veröffentlichungsprotokoll nach Deploy-Check aktualisieren
+        if: steps.generate.outputs.status == 'generated'
+        run: node scripts/update-fachbeitrag-log.mjs --deploy=success
 
       - name: Live-URL prüfen
         if: steps.generate.outputs.status == 'generated'
@@ -166,6 +172,7 @@ jobs:
             echo "::error::Live-URL nicht erreichbar oder Inhalt noch nicht aktuell: $PUBLICATION_URL"
             exit 1
           fi
+          echo "LIVE_OK=true" >> "$GITHUB_ENV"
 
       - name: Veröffentlichungsprotokoll nach Live-Check aktualisieren
         if: steps.generate.outputs.status == 'generated'
@@ -202,13 +209,25 @@ jobs:
             -H "Content-Type: application/json" \
             -d "$PAYLOAD" \
             --retry 5 --retry-delay 5 --retry-all-errors
+          echo "LINKEDIN_OK=true" >> "$GITHUB_ENV"
 
       - name: Veröffentlichungsprotokoll nach LinkedIn aktualisieren
         if: steps.generate.outputs.status == 'generated'
         run: node scripts/update-fachbeitrag-log.mjs --linkedin=success
 
-      - name: Veröffentlichungsprotokoll committen
-        if: steps.generate.outputs.status == 'generated'
+      - name: Fehlstatus ins Veröffentlichungsprotokoll schreiben
+        if: failure() && steps.generate.outputs.status == 'generated'
+        run: |
+          DEPLOY_STATUS="failed"
+          LIVE_STATUS="failed"
+          LINKEDIN_STATUS="failed"
+          if [ "${DEPLOY_OK}" = "true" ]; then DEPLOY_STATUS="success"; fi
+          if [ "${LIVE_OK}" = "true" ]; then LIVE_STATUS="success"; fi
+          if [ "${LINKEDIN_OK}" = "true" ]; then LINKEDIN_STATUS="success"; fi
+          node scripts/update-fachbeitrag-log.mjs --deploy="$DEPLOY_STATUS" --live="$LIVE_STATUS" --linkedin="$LINKEDIN_STATUS"
+
+      - name: Veröffentlichungsprotokoll committen (final)
+        if: always() && steps.generate.outputs.status == 'generated'
         run: |
           if git diff --quiet -- docs/fachbeitrag-veroeffentlichungsprotokoll.csv; then
             echo "Keine Protokolländerungen zu committen."
@@ -219,7 +238,3 @@ jobs:
           git add docs/fachbeitrag-veroeffentlichungsprotokoll.csv
           git commit -m "chore: update fachbeitrag protocol ${BERLIN_DATE} ${PUBLICATION_SLOT}"
           git push origin HEAD:main
-
-      - name: Fehlstatus ins Veröffentlichungsprotokoll schreiben
-        if: failure() && steps.generate.outputs.status == 'generated'
-        run: node scripts/update-fachbeitrag-log.mjs --deploy=failed --live=failed --linkedin=failed

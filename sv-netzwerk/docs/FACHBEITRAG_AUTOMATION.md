@@ -57,6 +57,7 @@ Der Generator erstellt pro Lauf:
 
 - Zapier-Webhook bleibt unverändert (`secrets.ZAPIER_WEBHOOK_URL`).
 - Auslösung erfolgt **ausschließlich nach erfolgreicher Live-URL-Prüfung** (HTTP 200 + Slug im Seiteninhalt).
+- Vor LinkedIn werden im Lauf verpflichtend Vorprüfung, Fachwissensvalidierung, Typprüfung (`astro check`), Build, HTML-Validierung und Link-/Build-Integration ausgeführt.
 - Payload-Format (Zap-kompatibel):
   ```json
   {
@@ -88,8 +89,10 @@ Der Generator erstellt pro Lauf:
 | Slot bereits erfolgreich veröffentlicht | Lauf beendet mit Status `skipped` |
 | Slot bereits protokolliert (auch bei `force`) | Lauf beendet mit Status `skipped` |
 | Build fehlgeschlagen | Kein LinkedIn-Post; kein Commit |
+| Typ-/HTML-/Link-Prüfung fehlgeschlagen | Kein Commit; kein Deployment; kein LinkedIn |
 | Live-Check fehlgeschlagen | Kein LinkedIn-Post; Protokoll auf `failed` gesetzt |
 | Zapier-Webhook fehlgeschlagen | Protokoll auf `linkedin=failed` gesetzt; Workflow schlägt fehl |
+| Deploy-Workflow (`deploy.yml`) fehlgeschlagen/Timeout | Kein LinkedIn-Post; Protokoll auf `deploy=failed` gesetzt |
 | Kein Regionalanlass gefunden | Fallback auf allgemeines Fachthema |
 | Bildgenerierung fehlgeschlagen | Keine Veröffentlichung; Workflow schlägt fehl |
 | Slug/Titel bereits vorhanden | Lauf schlägt mit Fehlermeldung ab |
@@ -101,6 +104,13 @@ Der Generator erstellt pro Lauf:
 - **publication_id:** SHA256-basierter Hash über die Slot-ID `{YYYY-MM-DD}-{slot}`; damit ist die ID pro Zeitfenster deterministisch und retry-stabil.
 - **Protokollprüfung:** Vor der Erzeugung wird das CSV-Protokoll auf bereits protokollierte Einträge für Datum+Slot geprüft. Existiert ein Slot-Eintrag, wird kein zweiter Beitrag erzeugt (auch nicht mit `force`).
 - **Slug-/Titel-Duplikatprüfung:** Bereits vorhandene Knowledge-Dateien mit gleichem Slug oder gleichem Titel werden erkannt und abgelehnt.
+
+## Deployment- und Live-Gating
+
+- Nach dem Content-Commit auf `main` wird **der bestehende Deploy-Workflow** `.github/workflows/deploy.yml` per `workflow_dispatch` ausgelöst.
+- Der Automationslauf wartet aktiv auf den Abschluss genau dieses Deploy-Runs für den veröffentlichten Commit (`head_sha`-Abgleich).
+- Erst nach `deploy=success` folgt die Live-URL-Prüfung, erst danach die LinkedIn-/Zap-Übergabe.
+- Deploy-, Live- und LinkedIn-Status werden in `docs/fachbeitrag-veroeffentlichungsprotokoll.csv` fortlaufend aktualisiert und am Laufende auf `main` committed (auch bei Fehlerfällen).
 
 ## Manueller Notfallstart und Deaktivierung
 
@@ -158,6 +168,7 @@ Spalten:
 |---|---|
 | `.github/workflows/knowledge-standard.yml` | Hauptworkflow (Zeitplanung, Orchestrierung) |
 | `.github/workflows/deploy.yml` | Deploy-Workflow (Push → IONOS via SFTP) |
+| `scripts/trigger-and-await-workflow.mjs` | Dispatch und Polling für Deploy-Workflow bis Abschluss |
 | `scripts/run-fachbeitrag-automation.mjs` | Generator für Beitrag, Bild, LinkedIn, Library, Changelog |
 | `scripts/validate-fachbeitrag-preflight.mjs` | Preflight-Prüfung vor Build |
 | `scripts/update-fachbeitrag-log.mjs` | Protokollaktualisierung nach Push, Live-Check und LinkedIn |
