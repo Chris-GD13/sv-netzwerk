@@ -1,0 +1,18 @@
+{
+  "generatedAt": null,
+  "timezone": "Europe/Berlin",
+  "source": "microsoft-graph",
+  "calendarUserId": null,
+  "range": {
+    "startIso": null,
+    "endIso": null,
+    "horizonDays": 21,
+    "backfillDays": 0
+  },
+  "summary": {
+    "totalEvents": 0,
+    "busyEvents": 0,
+    "freeEvents": 0
+  },
+  "slots": []
+}
