@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.3 – 2026-07-21
+- automatischer morgens Fachbeitrag veröffentlicht: „Sturm- und Hagel-Serienschäden: Prüffolge für belastbare Freigaben – fachliche Einordnung zur aktuellen Lage“
+- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt
+- Beitragsbild unter /assets/images/linkedin/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning.svg erzeugt
+
 ## 3.4.2 – 2026-07-20
 - automatischer morgens Fachbeitrag veröffentlicht: „Hochwasser und Überflutung: Koordination im Großschadenbestand“
 - LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt

@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Sturm- und Hagel-Serienschäden: Prüffolge für belastbare Freigaben – fachliche Einordnung zur aktuellen Lage',
+    description: 'Sturm- und Hagelschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/',
+    category: 'Sturm- und Hagelschäden',
+    tags: ['Sturm', 'Hagel', 'Kumulschaden', 'Plausibilitätsprüfung'],
+    date: '2026-07-21',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Hochwasser und Überflutung: Koordination im Großschadenbestand',
     description: 'Hochwasser und Überflutung: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/',
