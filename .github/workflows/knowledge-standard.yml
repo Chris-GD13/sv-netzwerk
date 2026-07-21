@@ -30,8 +30,9 @@ jobs:
   publish-and-notify:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    # Deaktivierung: Repo-Variable FACHBEITRAG_AUTOMATION_ENABLED auf 'false' setzen
-    if: ${{ vars.FACHBEITRAG_AUTOMATION_ENABLED != 'false' }}
+    # DEAKTIVIERT: Veröffentlichungssperre aktiv – keine automatischen Fachbeiträge bis zur Freigabe.
+    # Ursprüngliche Bedingung: vars.FACHBEITRAG_AUTOMATION_ENABLED != 'false'
+    if: ${{ false }}
     defaults:
       run:
         working-directory: sv-netzwerk
