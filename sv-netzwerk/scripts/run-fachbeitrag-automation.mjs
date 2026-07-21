@@ -20,6 +20,214 @@ const SLOT_WINDOWS = {
   afternoon: { from: '16:15', to: '17:30', label: 'nachmittags' },
 };
 
+const damageTypeLabels = {
+  leitungswasser: 'Leitungswasser',
+  hochwasser: 'Hochwasser',
+  ueberflutung: 'Überflutung',
+  rueckstau: 'Rückstau',
+  sturm: 'Sturm',
+  hagel: 'Hagel',
+  brand: 'Brandschaden',
+  schneedruck: 'Schneedruck',
+  kumulschaden: 'Kumulschaden',
+  gebaeude: 'Gebäudeschaden',
+};
+
+const docSignalLabels = {
+  foto: 'Foto-/Bilddokumentation',
+  gutachten: 'Gutachten/technische Stellungnahme',
+  kva: 'Kostenvoranschlag',
+  rechnung: 'Rechnung',
+  protokoll: 'Protokoll',
+  aufmass: 'Aufmaß/Mengenbasis',
+  messung: 'Messprotokoll',
+  angebot: 'Angebot',
+  plan: 'Planungs-/Sanierungsunterlagen',
+};
+
+const asIso = (graphDateTime) => {
+  if (!graphDateTime?.dateTime) return null;
+  const raw = graphDateTime.dateTime;
+  if (/[zZ]$|[+-]\d{2}:\d{2}$/.test(raw)) return new Date(raw).toISOString();
+  if (graphDateTime.timeZone === 'UTC') return new Date(`${raw}Z`).toISOString();
+  return new Date(raw).toISOString();
+};
+
+const normalize = (value) => String(value || '')
+  .toLocaleLowerCase('de-DE')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/ß/g, 'ss');
+
+const detectDamageTypes = (text) => {
+  const t = normalize(text);
+  const out = new Set(['gebaeude']);
+  if (/(leitungswasser|wasserrohr|rohrbruch|leck|nass|feuchte)/.test(t)) out.add('leitungswasser');
+  if (/(hochwasser|uberflutung|ueberflutung|flutung)/.test(t)) out.add('hochwasser');
+  if (/(ruckstau|rueckstau)/.test(t)) out.add('rueckstau');
+  if (/(sturm|wind|orkan|boe)/.test(t)) out.add('sturm');
+  if (/(hagel)/.test(t)) out.add('hagel');
+  if (/(brand|feuer|rauch|schmor)/.test(t)) out.add('brand');
+  if (/(schnee|schneedruck)/.test(t)) out.add('schneedruck');
+  if (/(kumul|serien|massen|lage)/.test(t)) out.add('kumulschaden');
+  if (out.has('hochwasser')) out.add('ueberflutung');
+  return [...out];
+};
+
+const detectDocSignals = (text) => {
+  const t = normalize(text);
+  const out = new Set();
+  if (/(foto|bild|doku|dokumentation|anhang)/.test(t)) out.add('foto');
+  if (/(gutachten|stellungnahme|expertise)/.test(t)) out.add('gutachten');
+  if (/(kva|kostenvoranschlag)/.test(t)) out.add('kva');
+  if (/(rechnung|rechnungspruf|rechnungspruef)/.test(t)) out.add('rechnung');
+  if (/(protokoll|begehung|begehungsbericht)/.test(t)) out.add('protokoll');
+  if (/(aufmass|mengengerust|mengengeruest|mengen)/.test(t)) out.add('aufmass');
+  if (/(messung|feuchtemess|messprotokoll)/.test(t)) out.add('messung');
+  if (/(angebot|offerte)/.test(t)) out.add('angebot');
+  if (/(plan|sanierungskonzept|trocknungskonzept)/.test(t)) out.add('plan');
+  return [...out];
+};
+
+const inferFocus = (damageTypes, docSignals) => {
+  if (docSignals.includes('kva') || docSignals.includes('rechnung')) return 'Abgleich von Schadenbild und Kostenpositionen';
+  if (damageTypes.includes('brand')) return 'Trennung von Sofortmaßnahmen und Wiederherstellung';
+  if (damageTypes.includes('leitungswasser') || damageTypes.includes('rueckstau')) return 'Abgrenzung von Rückbau, Trocknung und Folgeschaden';
+  if (damageTypes.includes('sturm') || damageTypes.includes('hagel')) return 'Plausibilitätsprüfung von Bauteil- und Spurenlage';
+  if (damageTypes.includes('hochwasser') || damageTypes.includes('ueberflutung')) return 'Priorisierung und Cluster-Steuerung bei hoher Fallzahl';
+  return 'Dokumentationsqualität und prüffähige Feststellungen';
+};
+
+const toBerlinDate = (iso) => {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: BERLIN, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date(iso));
+  const p = (type) => parts.find((item) => item.type === type)?.value ?? '';
+  return `${p('year')}-${p('month')}-${p('day')}`;
+};
+
+const loadCalendarCaseContext = async () => {
+  const tenantId = process.env.M365_TENANT_ID;
+  const clientId = process.env.M365_CLIENT_ID;
+  const clientSecret = process.env.M365_CLIENT_SECRET;
+  const calendarUserId = process.env.M365_CALENDAR_USER_ID;
+  if (!tenantId || !clientId || !clientSecret || !calendarUserId) return null;
+
+  const lookbackDays = Number.parseInt(process.env.CALENDAR_CASE_LOOKBACK_DAYS || '1095', 10);
+  const lookbackMs = (Number.isNaN(lookbackDays) ? 1095 : Math.max(30, lookbackDays)) * 24 * 60 * 60 * 1000;
+  const nowTs = Date.now();
+  const fromIso = new Date(nowTs - lookbackMs).toISOString();
+  const toIso = new Date(nowTs + 24 * 60 * 60 * 1000).toISOString();
+
+  const tokenBody = new URLSearchParams({
+    client_id: clientId,
+    client_secret: clientSecret,
+    scope: 'https://graph.microsoft.com/.default',
+    grant_type: 'client_credentials',
+  });
+  const tokenResponse = await fetch(`https://login.microsoftonline.com/${encodeURIComponent(tenantId)}/oauth2/v2.0/token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: tokenBody.toString(),
+  });
+  if (!tokenResponse.ok) {
+    throw new Error(`Kalender-Token fehlgeschlagen (${tokenResponse.status}).`);
+  }
+  const tokenPayload = await tokenResponse.json();
+  const accessToken = tokenPayload.access_token;
+  if (!accessToken) throw new Error('Kalender-Token ohne access_token.');
+
+  const graphGetJson = async (url) => {
+    const response = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(`Graph-Abruf fehlgeschlagen (${response.status}): ${errorBody}`);
+    }
+    return response.json();
+  };
+
+  const calendarsPayload = await graphGetJson(
+    `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(calendarUserId)}/calendars?$select=id,name`,
+  );
+  const calendars = calendarsPayload.value || [];
+  if (calendars.length === 0) return null;
+
+  const recentEvents = [];
+  for (const calendar of calendars.slice(0, 12)) {
+    const calendarId = String(calendar.id || '').trim();
+    if (!calendarId) continue;
+    const eventsUrl = new URL(`https://graph.microsoft.com/v1.0/users/${encodeURIComponent(calendarUserId)}/calendars/${encodeURIComponent(calendarId)}/calendarView`);
+    eventsUrl.searchParams.set('startDateTime', fromIso);
+    eventsUrl.searchParams.set('endDateTime', toIso);
+    eventsUrl.searchParams.set('$select', 'id,subject,bodyPreview,start,end,showAs,hasAttachments');
+    eventsUrl.searchParams.set('$top', '120');
+
+    let nextUrl = eventsUrl.toString();
+    let pageCount = 0;
+    while (nextUrl && pageCount < 6) {
+      const payload = await graphGetJson(nextUrl);
+      const items = payload.value || [];
+      recentEvents.push(...items.map((item) => ({ ...item, _calendarId: calendarId })));
+      nextUrl = payload['@odata.nextLink'] || '';
+      pageCount += 1;
+    }
+  }
+
+  const dedupe = new Map();
+  for (const event of recentEvents) {
+    const id = String(event.id || '').trim();
+    if (!id || dedupe.has(id)) continue;
+    dedupe.set(id, event);
+  }
+  const events = [...dedupe.values()]
+    .map((event) => ({ ...event, startIso: asIso(event.start) }))
+    .filter((event) => event.startIso && new Date(event.startIso).getTime() <= nowTs)
+    .filter((event) => normalize(event.showAs || '') !== 'free')
+    .sort((a, b) => b.startIso.localeCompare(a.startIso))
+    .slice(0, 40);
+
+  const caseSignals = [];
+  for (const event of events) {
+    const id = String(event.id || '').trim();
+    if (!id) continue;
+    let attachmentNames = [];
+    if (event.hasAttachments) {
+      try {
+        const attPayload = await graphGetJson(
+          `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(calendarUserId)}/events/${encodeURIComponent(id)}/attachments?$select=name,contentType,size`,
+        );
+        attachmentNames = (attPayload.value || []).map((item) => item.name || '').filter(Boolean);
+      } catch {
+        attachmentNames = [];
+      }
+    }
+    const joined = [event.subject || '', event.bodyPreview || '', attachmentNames.join(' ')].join(' ');
+    const damageTypes = detectDamageTypes(joined);
+    const docSignals = detectDocSignals(joined);
+    if (docSignals.length === 0 && !event.hasAttachments) continue;
+    const caseId = crypto.createHash('sha256').update(id).digest('hex').slice(0, 12);
+    caseSignals.push({
+      caseId,
+      date: toBerlinDate(event.startIso),
+      damageTypes,
+      docSignals,
+      focus: inferFocus(damageTypes, docSignals),
+      hasAttachments: Boolean(event.hasAttachments),
+    });
+  }
+
+  if (caseSignals.length === 0) return null;
+
+  const todayCases = caseSignals.filter((item) => item.date === berlinDate);
+  const selected = (todayCases.length > 0 ? todayCases : caseSignals).slice(0, 2);
+  const preferredDamageTypes = [...new Set(selected.flatMap((item) => item.damageTypes))];
+  const allDocSignals = [...new Set(selected.flatMap((item) => item.docSignals))];
+  return {
+    selectedCases: selected,
+    preferredDamageTypes,
+    allDocSignals,
+    sourceCount: caseSignals.length,
+  };
+};
+
 const REGION_HINTS = [
   'Aalen', 'Ostalbkreis', 'Schwäbisch Gmünd', 'Heidenheim', 'Ulm', 'Göppingen', 'Stuttgart',
   'Ludwigsburg', 'Esslingen', 'Ansbach', 'Nördlingen', 'Ellwangen', 'Backnang', 'Rems-Murr',
@@ -392,11 +600,19 @@ const extractRssItems = (xml) => {
   })).filter((item) => item.title && item.link);
 };
 
-const pickTopic = (rows) => {
+const pickTopic = (rows, preferredDamageTypes = []) => {
   const recentTopicIds = rows.slice(-10).map((r) => r.topic_id).filter(Boolean);
   const usedToday = rows.filter((r) => r.date === berlinDate).map((r) => r.topic_id);
   const available = TOPICS.filter((topic) => !usedToday.includes(topic.id) && !recentTopicIds.includes(topic.id));
+  const preferredAvailable = preferredDamageTypes.length > 0
+    ? available.filter((topic) => preferredDamageTypes.some((damageType) => topic.damageTypes.includes(damageType)))
+    : [];
+  if (preferredAvailable.length > 0) return preferredAvailable[0];
   if (available.length > 0) return available[0];
+  const fallbackPreferred = preferredDamageTypes.length > 0
+    ? TOPICS.filter((topic) => !usedToday.includes(topic.id) && preferredDamageTypes.some((damageType) => topic.damageTypes.includes(damageType)))
+    : [];
+  if (fallbackPreferred.length > 0) return fallbackPreferred[0];
   return TOPICS.find((topic) => !usedToday.includes(topic.id)) ?? TOPICS[0];
 };
 
@@ -475,7 +691,8 @@ if (existingSlotRows.length > 0) {
   process.exit(0);
 }
 
-const weekdayRegional = !isWeekend;
+const caseContext = await loadCalendarCaseContext();
+const weekdayRegional = !isWeekend && !caseContext;
 let regionalSignal = null;
 if (weekdayRegional) {
   const query = encodeURIComponent('(Starkregen OR Hochwasser OR Überflutung OR Rückstau OR Hagel OR Sturm OR Gebäudebrand) (Aalen OR Ostalbkreis OR Heidenheim OR Ulm OR Göppingen OR Stuttgart) when:1d');
@@ -497,20 +714,32 @@ if (weekdayRegional) {
   }
 }
 
-const topic = pickTopic(publicationRows);
-const title = createHeadline(topic, regionalSignal);
-const slug = safeSlug(`${topic.slugBase}-${berlinDate}-${slot}`);
+const topic = pickTopic(publicationRows, caseContext?.preferredDamageTypes ?? []);
+const title = caseContext
+  ? `${topic.titleBase}: anonymisierte Fallauswertung aus der Praxis`
+  : createHeadline(topic, regionalSignal);
+const slugBase = caseContext ? `${topic.slugBase}-anonymisierte-fallauswertung` : topic.slugBase;
+const slug = safeSlug(`${slugBase}-${berlinDate}-${slot}`);
 const articleUrl = `https://www.sv-netzwerk.eu/fachwissen/${slug}/`;
 const imageFileName = `${slug}.svg`;
 const imageWebPath = `/assets/images/linkedin/${imageFileName}`;
 const imageUrl = `https://www.sv-netzwerk.eu${imageWebPath}`;
 const imageAlt = `Symbolbild: ${topic.category} im Kontext der Schadenregulierung und Kumulschadensteuerung`;
-const metaDescription = `${topic.category}: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.`;
-const teaser = regionalSignal
+const caseDocSummary = caseContext?.allDocSignals?.length
+  ? caseContext.allDocSignals.map((signal) => docSignalLabels[signal] || signal).join(', ')
+  : '';
+const metaDescription = caseContext
+  ? `${topic.category}: Anonymisierte Fallauswertung aus realen Kalenderfällen mit dokumentenbasierter Einordnung für Schadenregulierung und Großschadensteuerung.`
+  : `${topic.category}: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.`;
+const teaser = caseContext
+  ? `Grundlage dieses Beitrags sind tagesaktuelle bzw. historische Realfälle aus dem Einsatzkalender (bis zu 3 Jahre Rückblick), inklusive ausgewerteter Unterlagenhinweise. Alle Angaben sind vollständig anonymisiert; Personen-, Orts- und Objektdaten werden nicht veröffentlicht.`
+  : regionalSignal
   ? `Öffentlich berichtete Lagemeldungen aus der Region zeigen erhöhten Handlungsdruck. Entscheidend bleibt die fachlich saubere Trennung von Feststellung, Bewertung und Empfehlung.`
   : `${topic.intro} Die Qualität der Dokumentation entscheidet über belastbare Entscheidungen bei hoher Schadenfrequenz.`;
 
-const sources = regionalSignal
+const sources = caseContext
+  ? [`Interne Einsatz- und Unterlagenauswertung (anonymisiert), ausgewertete Fälle: ${caseContext.sourceCount}, Dokumententypen: ${caseDocSummary || 'ohne dokumentierbare Dateihinweise'}.`]
+  : regionalSignal
   ? [`${regionalSignal.source}: ${regionalSignal.title} (${regionalSignal.link})`]
   : ['Kein belastbarer aktueller Regionalanlass im Suchraum; daher allgemeiner Fachbeitrag gemäß Wochenend-/Fallback-Regel.'];
 
@@ -518,9 +747,29 @@ const body = [
   `${teaser}`,
   '',
   `## Anlass und Einordnung`,
-  regionalSignal
+  caseContext
+    ? `Dieser Beitrag basiert auf ${caseContext.selectedCases.length} anonymisierten Realfällen aus dem Einsatzkalender. Für die fachliche Ableitung wurden verfügbare Unterlagenhinweise (z. B. Foto-/Dokumentationsstände, KVA-/Rechnungsbezug, Protokoll-/Gutachtenhinweise) ausgewertet. Namen, konkrete Adressen, Orte, Aktenzeichen und personenbezogene Daten wurden nicht übernommen.`
+    : regionalSignal
     ? `Als fachlicher Aufhänger dienen aktuell öffentlich zugängliche Meldungen aus dem regionalen Umfeld (Suchraum um Aalen). Nach derzeit öffentlich berichteter Lage geht es vor allem um **${topic.category.toLowerCase()}**. Unabhängig von Einzelmeldungen bleibt für die Regulierung entscheidend, dass nur dokumentierte und plausibilisierte Feststellungen in Freigaben überführt werden.`
     : `Dieser Beitrag ordnet ein typisches Kumulschaden-Szenario ohne konkreten Einzelfallbezug ein. Damit werden keine Vor-Ort-Aussagen zu laufenden Ereignissen getroffen, sondern belastbare Vorgehensstandards für Sachverständige und Großschadenregulierer dargestellt.`,
+  ...(caseContext ? [
+    '',
+    '## Fallbasis (anonymisiert)',
+    ...caseContext.selectedCases.map((item, index) => {
+      const damageLabel = item.damageTypes
+        .map((type) => damageTypeLabels[type])
+        .filter(Boolean)
+        .slice(0, 3)
+        .join(', ');
+      const docLabel = item.docSignals
+        .map((signal) => docSignalLabels[signal] || signal)
+        .slice(0, 3)
+        .join(', ');
+      return `${index + 1}. **Fall ${index + 1}** (${item.date}): Schadencluster ${damageLabel || 'Gebäudeschaden'}, Unterlagenhinweise ${docLabel || 'nicht spezifiziert'}, fachlicher Fokus: ${item.focus}.`;
+    }),
+    '',
+    'Die Fallbasis dient ausschließlich der fachlichen Musterableitung. Es werden keine personenbezogenen oder standortbezogenen Originalinformationen veröffentlicht.',
+  ] : []),
   '',
   `## Fachlicher Rahmen: Sachverständige und Großschadenregulierer`,
   `Sachverständige in der technischen Gebäudeschadensregulierung nehmen bei Kumulereignissen eine Schlüsselrolle ein. Sie liefern technisch belastbare Feststellungen, die als Grundlage für versicherungsrechtliche Entscheidungen dienen. Ihre Arbeit endet nicht bei der Erstbesichtigung: Die strukturierte Begleitung von Sanierung, Rückbau und Trocknungsprozessen sowie die Prüfung von Kostenvoranschlägen und Rechnungen sind gleichwertige Aufgaben.`,
@@ -598,8 +847,8 @@ const frontmatter = [
   'dailyStandard: true',
   'contentLevel: "B"',
   `teaser: "${teaser}"`,
-  `linkedinSummary: "${topic.intro}"`,
-  `videoScript: "Wissen in 180 Sekunden: ${topic.intro} Entscheidend sind dokumentierte Feststellungen, klare Abgrenzung von Sofortmaßnahme und Wiederherstellung sowie eine nachvollziehbare Kostenprüfung."`,
+  `linkedinSummary: "${caseContext ? 'Anonymisierte Fallauswertung aus realen Kalenderfällen mit dokumentenbasierter Einordnung.' : topic.intro}"`,
+  `videoScript: "Wissen in 180 Sekunden: ${caseContext ? 'Anonymisierte Praxisfälle aus dem Einsatzkalender zeigen, wie aus Unterlagen belastbare Regulierungsentscheidungen abgeleitet werden.' : `${topic.intro} Entscheidend sind dokumentierte Feststellungen, klare Abgrenzung von Sofortmaßnahme und Wiederherstellung sowie eine nachvollziehbare Kostenprüfung.`}"`,
   'cta:',
   '  label: "Schaden strukturiert melden"',
   '  href: "/schaden-melden/"',
@@ -648,9 +897,11 @@ const hashtags = [...new Set(hashtagTokens)]
   .map((token) => `#${token.charAt(0).toUpperCase()}${token.slice(1)}`);
 
 const linkedinText = [
-  `${topic.intro}`,
+  `${caseContext ? 'Heute kein Standardpost: Dieser Beitrag basiert auf anonymisierten Realfällen aus unserem Einsatzkalender.' : topic.intro}`,
   '',
-  regionalSignal
+  caseContext
+    ? 'Ausgewertet wurden Unterlagenhinweise aus echten Fallakten (z. B. Dokumentation, KVA/Rechnung, Protokolle) – vollständig anonymisiert ohne Namen, Orte oder Objektdetails.'
+    : regionalSignal
     ? 'Öffentlich gemeldete regionale Lagen zeigen: Bei hoher Schadenfrequenz müssen Feststellung, Plausibilitätsprüfung und Freigabe sauber getrennt bleiben.'
     : 'Gerade ohne konkreten Einzelfallbezug hilft ein klarer Fachstandard, um im nächsten Ereignis strukturiert und prüffähig zu arbeiten.',
   '',
@@ -662,7 +913,9 @@ const linkedinText = [
 ].join('\n');
 await writeFile(path.join(linkedinDir, `${berlinDate}_${slug}.txt`), `${linkedinText}\n`);
 
-const videoText = `Wissen in 180 Sekunden: ${topic.intro} Heute im Fokus: ${topic.category}. Erst Feststellung und Plausibilität sichern, dann Maßnahmen und Kosten freigeben. Mehr dazu: ${articleUrl}`;
+const videoText = caseContext
+  ? `Wissen in 180 Sekunden: Heute mit anonymisierten Realfällen aus unserem Einsatzkalender. Fokus: ${topic.category}. Aus Unterlagenhinweisen werden belastbare Feststellungen, klare Maßnahmenpfade und prüffähige Entscheidungen abgeleitet. Mehr dazu: ${articleUrl}`
+  : `Wissen in 180 Sekunden: ${topic.intro} Heute im Fokus: ${topic.category}. Erst Feststellung und Plausibilität sichern, dann Maßnahmen und Kosten freigeben. Mehr dazu: ${articleUrl}`;
 await writeFile(path.join(videosDir, `${berlinDate}_wissen-in-180-sekunden_${slug}.txt`), `${videoText}\n`);
 
 const librarySource = await readText(libraryFile);
@@ -711,7 +964,11 @@ if (!(await fileExists(publicationLogFile))) {
   await writeFile(publicationLogFile, `${headers.map(csvEscape).join(',')}\n`);
 }
 
-const anlass = regionalSignal ? `regionaler Anlass: ${regionalSignal.title}` : 'allgemeines Fachthema (kein belastbarer Regionalanlass)';
+const anlass = caseContext
+  ? `anonymisierte Realfälle aus Kalender und Unterlagen (${caseContext.selectedCases.length} Fälle)`
+  : regionalSignal
+    ? `regionaler Anlass: ${regionalSignal.title}`
+    : 'allgemeines Fachthema (kein belastbarer Regionalanlass)';
 const csvRow = [
   berlinDate,
   berlinTime,
@@ -741,6 +998,7 @@ const runtime = {
   slot,
   slotLabel: SLOT_WINDOWS[slot].label,
   isWeekend,
+  caseMode: Boolean(caseContext),
   regionalSignal,
   topicId: topic.id,
   title,

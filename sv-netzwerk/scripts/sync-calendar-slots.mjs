@@ -179,7 +179,6 @@ for (const event of uniqueEvents) {
   if (!slotMap.has(startLocal.date)) slotMap.set(startLocal.date, []);
   if (isBusy) {
     const slotItem = {
-      id: event.id,
       startIso,
       endIso,
       startLocal: startLocal.dateTime,
@@ -215,11 +214,10 @@ const payload = {
     busyEvents: busyCount,
     freeEvents: Math.max(uniqueEvents.length - busyCount, 0),
   },
-  calendars: selectedCalendars.map((item) => ({
-    id: item.id,
-    name: item.name,
-    isDefaultCalendar: Boolean(item.isDefaultCalendar),
-  })),
+  calendarStats: {
+    selectedCalendarCount: selectedCalendars.length,
+    defaultCalendarCount: selectedCalendars.filter((item) => Boolean(item.isDefaultCalendar)).length,
+  },
   slots,
 };
 

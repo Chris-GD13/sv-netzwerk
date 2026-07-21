@@ -37,6 +37,11 @@ jobs:
         working-directory: sv-netzwerk
     env:
       TZ: Europe/Berlin
+      M365_TENANT_ID: ${{ secrets.M365_TENANT_ID }}
+      M365_CLIENT_ID: ${{ secrets.M365_CLIENT_ID }}
+      M365_CLIENT_SECRET: ${{ secrets.M365_CLIENT_SECRET }}
+      M365_CALENDAR_USER_ID: ${{ secrets.M365_CALENDAR_USER_ID }}
+      CALENDAR_CASE_LOOKBACK_DAYS: 1095
 
     steps:
       - name: Repository auschecken
