@@ -274,8 +274,8 @@ const TOPICS = [
   },
   {
     id: 'grossflaechig-leitungswasser',
-    category: 'Leitungswasser und Kumulmanagement',
-    tags: ['Leitungswasser', 'Schadenmanagement', 'Sanierungsplanung', 'Kostenprüfung'],
+    category: 'Leitungswasserschäden',
+    tags: ['Leitungswasser', 'Schadenregulierung', 'Sanierungsplanung', 'Kostenprüfung'],
     damageTypes: ['leitungswasser', 'gebaeude'],
     slugBase: 'grossflaechige-leitungswasserschaeden-sanierungssteuerung',
     titleBase: 'Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz',
@@ -751,7 +751,7 @@ const body = [
   caseContext
     ? `Dieser Beitrag basiert auf ${caseContext.selectedCases.length} anonymisierten Realfällen aus dem Einsatzkalender. Für die fachliche Ableitung wurden verfügbare Unterlagenhinweise (z. B. Foto-/Dokumentationsstände, KVA-/Rechnungsbezug, Protokoll-/Gutachtenhinweise) ausgewertet. Namen, konkrete Adressen, Orte, Aktenzeichen und personenbezogene Daten wurden nicht übernommen.`
     : regionalSignal
-    ? `Als fachlicher Aufhänger dienen aktuell öffentlich zugängliche Meldungen aus dem regionalen Umfeld (Suchraum um Aalen). Nach derzeit öffentlich berichteter Lage geht es vor allem um **${topic.category.toLowerCase()}**. Unabhängig von Einzelmeldungen bleibt für die Regulierung entscheidend, dass nur dokumentierte und plausibilisierte Feststellungen in Freigaben überführt werden.`
+    ? `Öffentlich zugängliche Meldungen können einen zeitlichen Aufhänger bilden. Die fachliche Aussage dieses Beitrags stützt sich jedoch auf methodische Standards der Schadenaufnahme, Plausibilitätsprüfung und Freigabeentscheidung – nicht auf ungesicherte Detailaussagen zu einzelnen Meldungen.`
     : `Dieser Beitrag ordnet ein typisches Kumulschaden-Szenario ohne konkreten Einzelfallbezug ein. Damit werden keine Vor-Ort-Aussagen zu laufenden Ereignissen getroffen, sondern belastbare Vorgehensstandards für Sachverständige und Großschadenregulierer dargestellt.`,
   ...(caseContext ? [
     '',
