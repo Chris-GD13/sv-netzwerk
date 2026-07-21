@@ -477,6 +477,7 @@ const argValue = (name) => {
   const token = args.find((item) => item.startsWith(`--${name}=`));
   return token ? token.slice(name.length + 3) : undefined;
 };
+const forceOutsideWindow = args.includes('--force-outside-window') || argValue('force-outside-window') === 'true';
 
 const now = new Date();
 const berlinParts = new Intl.DateTimeFormat('en-CA', {
@@ -512,7 +513,7 @@ if (!selectedSlot) {
 }
 
 const slot = selectedSlot;
-if (!inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].to)) {
+if (!forceOutsideWindow && !inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].to)) {
   await mkdir(automationDir, { recursive: true });
   await writeFile(runtimeFile, JSON.stringify({
     status: 'skipped',
@@ -844,7 +845,7 @@ const frontmatter = [
   `tags: [${topic.tags.map((tag) => `"${tag}"`).join(', ')}]`,
   'author: "christian-waechter"',
   'featured: false',
-  'dailyStandard: true',
+  `dailyStandard: ${slot === 'morning' ? 'true' : 'false'}`,
   'contentLevel: "B"',
   `teaser: "${teaser}"`,
   `linkedinSummary: "${caseContext ? 'Anonymisierte Fallauswertung aus realen Kalenderfällen mit dokumentenbasierter Einordnung.' : topic.intro}"`,
