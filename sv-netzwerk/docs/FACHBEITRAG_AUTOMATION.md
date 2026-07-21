@@ -10,7 +10,16 @@
 - Der Generator prüft zusätzlich im Skript die aktuelle Berliner Ortszeit über `Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin' })`. Runs außerhalb des Zeitfensters enden sauber mit Status `skipped`.
 - Sommer-/Winterzeitumstellungen werden damit automatisch korrekt behandelt: in der Sommerzeit trifft der 3:20-UTC-Cron, in der Winterzeit der 4:20-UTC-Cron das jeweilige Zeitfenster. Der jeweils andere Cron fällt außerhalb des Fensters und wird vom Skript sauber ignoriert.
 
-## Themenlogik und regionale Recherche
+## Themenlogik und Quellenpriorität
+
+### Primärquelle: Anonymisierte Realfälle aus Outlook-Kalender
+- Der Generator nutzt (wenn konfiguriert) echte Kalenderfälle aus dem verknüpften Outlook-Postfach als primäre Fallbasis.
+- Dafür werden Ereignisse im Rückblick bis zu **3 Jahren** technisch ausgewertet (`CALENDAR_CASE_LOOKBACK_DAYS`, Standard 1095).
+- Ausgewertet werden strukturierte Hinweise aus Terminmetadaten und Anhängen (z. B. Dokumentations-, KVA-, Rechnungs-, Protokoll- oder Gutachtenhinweise).
+- Veröffentlichung erfolgt ausschließlich **anonymisiert**: keine Namen, keine Orte/Adressen, keine Aktenzeichen, keine personenbezogenen Daten.
+- Pro Beitrag werden 1–2 Fälle als fachliche Musterbasis ausgewählt.
+
+### Sekundärquelle: Themenpool und regionale Recherche (Fallback)
 
 ### Themenpool
 Der Generator verfügt über einen Themenpool von 20 vordefinierten Fachthemen aus den Bereichen:
@@ -21,7 +30,7 @@ Starkregen/Rückstau, Hochwasser/Überflutung, Sturm/Hagel, Leitungswasser, Bran
 - Am gleichen Tag wird dasselbe Thema nicht zweimal verwendet.
 - Wenn keine freien Themen verfügbar sind, fällt der Generator auf das zuletzt verwendete freie Thema zurück.
 
-### Regionale Recherche (Mo–Fr)
+### Regionale Recherche (Mo–Fr, nur wenn keine Kalenderfallbasis verfügbar ist)
 - Montag bis Freitag wird zuerst ein regionaler Aufhänger gesucht.
 - Quelle: Google News RSS mit kombinierten Schaden-/Unwetterbegriffen (Starkregen, Hochwasser, Sturm, Brand, Katastrophe usw.) und Regionsbezug (Aalen, Ostalbkreis, Schwäbisch Gmünd, Heidenheim, Ulm, Göppingen, Stuttgart, Ludwigsburg, Esslingen, Ansbach, Nördlingen, Ellwangen, Backnang, Rems-Murr).
 - Kandidaten werden nur berücksichtigt, wenn **sowohl** ein Regionsname als auch ein Ereignisbegriff im Titel enthalten ist und die Meldung nicht älter als 72 Stunden ist.
@@ -45,6 +54,7 @@ Der Generator erstellt pro Lauf:
 5. **Library-Eintrag** am Anfang von `src/data/library.ts` (damit der neue Beitrag als aktuellster erscheint)
 6. **Protokollzeile** in `docs/fachbeitrag-veroeffentlichungsprotokoll.csv`
 7. **Changelog-Eintrag** in `CHANGELOG.md` (dynamische Versionsnummer)
+8. **Anonymisierte Fallhinweise** im Beitragstext (wenn Kalenderfallbasis verfügbar)
 
 ## SEO und interne Verlinkung
 
@@ -94,6 +104,7 @@ Der Generator erstellt pro Lauf:
 | Zapier-Webhook fehlgeschlagen | Protokoll auf `linkedin=failed` gesetzt; Workflow schlägt fehl |
 | Deploy-Workflow (`deploy.yml`) fehlgeschlagen/Timeout | Kein LinkedIn-Post; Protokoll auf `deploy=failed` gesetzt |
 | Kein Regionalanlass gefunden | Fallback auf allgemeines Fachthema |
+| Keine verwertbaren Kalenderfallhinweise | Fallback auf regionale Recherche/Themenpool |
 | Bildgenerierung fehlgeschlagen | Keine Veröffentlichung; Workflow schlägt fehl |
 | Slug/Titel bereits vorhanden | Lauf schlägt mit Fehlermeldung ab |
 
@@ -140,8 +151,8 @@ Spalten:
 | `title` | Vollständiger Beitragstitel |
 | `url` | Live-URL des Beitrags |
 | `category` | Fachkategorie |
-| `anlass` | Regionaler Anlass oder `allgemeines Fachthema` |
-| `quellen` | Verwendete Quellen (URL + Titel) oder Fallback-Hinweis |
+| `anlass` | Anonymisierte Realfälle, regionaler Anlass oder `allgemeines Fachthema` |
+| `quellen` | Anonymisierte interne Fall-/Unterlagenauswertung oder externe/Fallback-Quelle |
 | `bilddatei` | Pfad zur Bilddatei (relativ zu Webroot) |
 | `bild_alt_text` | Alt-Text des Bildes |
 | `linkedin_status` | `pending` → `success` / `failed` |
@@ -160,7 +171,12 @@ Spalten:
 | `SFTP_PASSWORD` | Secret | SFTP-Passwort |
 | `SFTP_PORT` | Secret | SFTP-Port |
 | `ZAPIER_WEBHOOK_URL` | Secret | Zapier-Webhook-URL für LinkedIn-Post |
+| `M365_TENANT_ID` | Secret | Azure/Entra Mandanten-ID für Graph-Zugriff |
+| `M365_CLIENT_ID` | Secret | App-Registrierung Client-ID |
+| `M365_CLIENT_SECRET` | Secret | App-Registrierung Client Secret (Wert, nicht Secret-ID) |
+| `M365_CALENDAR_USER_ID` | Secret | Postfach/Kalender-Benutzer (z. B. `cw@sv-schuett.eu`) |
 | `FACHBEITRAG_AUTOMATION_ENABLED` | Variable | `true` (Standard) / `false` zum Deaktivieren |
+| `CALENDAR_CASE_LOOKBACK_DAYS` | Variable | Rückblickfenster für Fallauswahl (Standard `1095`) |
 
 ## Relevante Dateien
 
