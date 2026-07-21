@@ -269,7 +269,6 @@ const argValue = (name) => {
   const token = args.find((item) => item.startsWith(`--${name}=`));
   return token ? token.slice(name.length + 3) : undefined;
 };
-const hasArg = (name) => args.includes(`--${name}`);
 
 const now = new Date();
 const berlinParts = new Intl.DateTimeFormat('en-CA', {
@@ -288,27 +287,24 @@ const detectSlot = () => {
 };
 
 const selectedSlotInput = argValue('slot');
+if (selectedSlotInput && !['morning', 'afternoon'].includes(selectedSlotInput)) {
+  throw new Error(`Ungültiger Slot: ${selectedSlotInput}`);
+}
 const selectedSlot = selectedSlotInput ?? detectSlot();
-const force = hasArg('force');
 if (!selectedSlot) {
-  if (!force) {
-    await mkdir(automationDir, { recursive: true });
-    await writeFile(runtimeFile, JSON.stringify({
-      status: 'skipped',
-      reason: `outside-window:${berlinTime}`,
-      berlinDate,
-      berlinTime,
-      berlinTimeZone: BERLIN,
-    }, null, 2));
-    process.exit(0);
-  }
+  await mkdir(automationDir, { recursive: true });
+  await writeFile(runtimeFile, JSON.stringify({
+    status: 'skipped',
+    reason: `outside-window:${berlinTime}`,
+    berlinDate,
+    berlinTime,
+    berlinTimeZone: BERLIN,
+  }, null, 2));
+  process.exit(0);
 }
 
-const slot = selectedSlot ?? 'morning';
-if (!['morning', 'afternoon'].includes(slot)) {
-  throw new Error(`Ungültiger Slot: ${slot}`);
-}
-if (!force && !inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].to)) {
+const slot = selectedSlot;
+if (!inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].to)) {
   await mkdir(automationDir, { recursive: true });
   await writeFile(runtimeFile, JSON.stringify({
     status: 'skipped',
@@ -438,6 +434,19 @@ const makeImageSvg = (title, subtitle) => `<?xml version="1.0" encoding="UTF-8"?
 await mkdir(automationDir, { recursive: true });
 const publicationRows = await readPublicationRows();
 const slotLabel = SLOT_WINDOWS[slot].label;
+const publicationIdExists = publicationRows.some((row) => row.publication_id === publicationId);
+if (publicationIdExists) {
+  await writeFile(runtimeFile, JSON.stringify({
+    status: 'skipped',
+    reason: 'publication-id-exists',
+    berlinDate,
+    berlinTime,
+    berlinTimeZone: BERLIN,
+    slot,
+    publicationId,
+  }, null, 2));
+  process.exit(0);
+}
 const existingSlotRows = publicationRows.filter((row) => row.date === berlinDate && row.slot === slotLabel);
 const alreadySuccessful = existingSlotRows.some((row) => row.deploy_status === 'success' && row.live_pruefung === 'success');
 if (alreadySuccessful) {
@@ -445,28 +454,17 @@ if (alreadySuccessful) {
     status: 'skipped',
     reason: 'slot-already-published',
     berlinDate,
-    slot,
-    publicationId,
-  }, null, 2));
-  process.exit(0);
-}
-if (existingSlotRows.length > 0 && !force) {
-  await writeFile(runtimeFile, JSON.stringify({
-    status: 'skipped',
-    reason: 'slot-already-recorded',
-    berlinDate,
     berlinTime,
     berlinTimeZone: BERLIN,
     slot,
     publicationId,
-    existingPublicationId: existingSlotRows[0].publication_id || '',
   }, null, 2));
   process.exit(0);
 }
 if (existingSlotRows.length > 0) {
   await writeFile(runtimeFile, JSON.stringify({
     status: 'skipped',
-    reason: 'slot-already-recorded-force-blocked',
+    reason: 'slot-already-recorded',
     berlinDate,
     berlinTime,
     berlinTimeZone: BERLIN,
@@ -530,6 +528,8 @@ const body = [
   `Großschadenregulierer koordinieren bei regionalen Kumullagen das Zusammenspiel zwischen Versicherer, Sachverständigen, Dienstleistern und Betroffenen. Sie steuern Bearbeitungsreihenfolgen, setzen Priorisierungen um und sichern durch strukturierte Kommunikation, dass Entscheidungen nachvollziehbar und revisionssicher dokumentiert werden. Ohne klare Koordination entstehen bei hoher Fallzahl zwangsläufig inkonsistente Bewertungen, Doppelarbeit und regulatorische Unsicherheit.`,
   '',
   `Das SV-Netzwerk verbindet regional verankerte Sachverständige und erfahrene Großschadenregulierer in einem gemeinsamen Qualitätsstandard. Die [Gutachter-Plattform](/gutachter-plattform/) ermöglicht eine gezielte Zuordnung qualifizierter Experten auch bei größeren regionalen Schadenlagen.`,
+  '',
+  `Für die operative Verzahnung werden Leistungen, Schadenarten, Expertenprofile und weiterführende Fachbeiträge gemeinsam genutzt: [Leistungen](/leistungen/), [Schadenarten für Komplexschäden](/komplexschaeden/), [Experten im Netzwerk](/experten/), [Gutachter-Plattform](/gutachter-plattform/) sowie der Fachbeitrag [Kumulschäden in der Region: Priorisierung, Koordination und Dokumentation](/fachwissen/kumulschaeden-in-der-region-priorisierung-koordination-dokumentation/).`,
   '',
   `## Technische und regulatorische Einordnung`,
   topic.tech,
@@ -603,7 +603,7 @@ const frontmatter = [
   'cta:',
   '  label: "Schaden strukturiert melden"',
   '  href: "/schaden-melden/"',
-  'relatedLinks: ["/schaden-melden/", "/fachwissen/schadenabgrenzung/", "/fachwissen/prueffaehige-dokumentation/", "/gutachter-plattform/"]',
+  'relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/experten/", "/gutachter-plattform/", "/fachwissen/schadenabgrenzung/", "/fachwissen/prueffaehige-dokumentation/", "/fachwissen/kumulschaeden-in-der-region-priorisierung-koordination-dokumentation/"]',
   `damageTypes: [${topic.damageTypes.map((item) => `"${item}"`).join(', ')}]`,
   'publication:',
   `  publishedAt: ${berlinDate}`,

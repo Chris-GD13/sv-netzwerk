@@ -8,6 +8,7 @@
   - Sommerzeit (CEST, UTC+2): `3:20 UTC` / `14:20 UTC`
   - Winterzeit (CET, UTC+1): `4:20 UTC` / `15:20 UTC`
 - Der Generator prüft zusätzlich im Skript die aktuelle Berliner Ortszeit über `Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin' })`. Runs außerhalb des Zeitfensters enden sauber mit Status `skipped`.
+- **Kein Force-Bypass:** Veröffentlichungen außerhalb der beiden Zeitfenster sind technisch ausgeschlossen.
 - Sommer-/Winterzeitumstellungen werden damit automatisch korrekt behandelt: in der Sommerzeit trifft der 3:20-UTC-Cron, in der Winterzeit der 4:20-UTC-Cron das jeweilige Zeitfenster. Der jeweils andere Cron fällt außerhalb des Fensters und wird vom Skript sauber ignoriert.
 
 ## Themenlogik und regionale Recherche
@@ -26,6 +27,7 @@ Starkregen/Rückstau, Hochwasser/Überflutung, Sturm/Hagel, Leitungswasser, Bran
 - Quelle: Google News RSS mit kombinierten Schaden-/Unwetterbegriffen (Starkregen, Hochwasser, Sturm, Brand, Katastrophe usw.) und Regionsbezug (Aalen, Ostalbkreis, Schwäbisch Gmünd, Heidenheim, Ulm, Göppingen, Stuttgart, Ludwigsburg, Esslingen, Ansbach, Nördlingen, Ellwangen, Backnang, Rems-Murr).
 - Kandidaten werden nur berücksichtigt, wenn **sowohl** ein Regionsname als auch ein Ereignisbegriff im Titel enthalten ist und die Meldung nicht älter als 72 Stunden ist.
 - Es werden ausschließlich öffentlich verfügbare Informationen genutzt. Keine erfundenen Tatsachen, keine unbelegten Schadenhöhen, Opferzahlen oder Ursachenbehauptungen.
+- Die regionale Themenableitung bleibt auf den definierten Suchraum um Aalen begrenzt; unklare Sachstände werden im Beitrag als vorläufig gekennzeichnet.
 - Wenn kein belastbarer Regionalanlass gefunden wird: automatischer Wechsel auf allgemeines Fachthema.
 
 ## Wochenendregel
@@ -87,7 +89,7 @@ Der Generator erstellt pro Lauf:
 |---|---|
 | Außerhalb Zeitfenster | Lauf beendet mit Status `skipped`; kein Fehler |
 | Slot bereits erfolgreich veröffentlicht | Lauf beendet mit Status `skipped` |
-| Slot bereits protokolliert (auch bei `force`) | Lauf beendet mit Status `skipped` |
+| Slot bereits protokolliert | Lauf beendet mit Status `skipped` |
 | Build fehlgeschlagen | Kein LinkedIn-Post; kein Commit |
 | Typ-/HTML-/Link-Prüfung fehlgeschlagen | Kein Commit; kein Deployment; kein LinkedIn |
 | Live-Check fehlgeschlagen | Kein LinkedIn-Post; Protokoll auf `failed` gesetzt |
@@ -102,12 +104,13 @@ Der Generator erstellt pro Lauf:
 - **GitHub Actions Concurrency:** Gruppe `fachbeitrag-automation-main`, `cancel-in-progress: false` – kein Abbruch laufender Jobs, aber keine simultane Ausführung.
 - **Slot-ID:** `{YYYY-MM-DD}-{slot}` als eindeutige Identifikation pro Zeitfenster und Tag.
 - **publication_id:** SHA256-basierter Hash über die Slot-ID `{YYYY-MM-DD}-{slot}`; damit ist die ID pro Zeitfenster deterministisch und retry-stabil.
-- **Protokollprüfung:** Vor der Erzeugung wird das CSV-Protokoll auf bereits protokollierte Einträge für Datum+Slot geprüft. Existiert ein Slot-Eintrag, wird kein zweiter Beitrag erzeugt (auch nicht mit `force`).
+- **Protokollprüfung:** Vor der Erzeugung wird das CSV-Protokoll auf bereits protokollierte Einträge für Datum+Slot geprüft. Existiert ein Slot-Eintrag, wird kein zweiter Beitrag erzeugt.
+- **publication_id-Duplikatschutz:** Vor der Erzeugung wird das Protokoll zusätzlich auf bereits vorhandene `publication_id` geprüft.
 - **Slug-/Titel-Duplikatprüfung:** Bereits vorhandene Knowledge-Dateien mit gleichem Slug oder gleichem Titel werden erkannt und abgelehnt.
 
 ## Deployment- und Live-Gating
 
-- Nach dem Content-Commit auf `main` wird **der bestehende Deploy-Workflow** `.github/workflows/deploy.yml` per `workflow_dispatch` ausgelöst.
+- Nach dem Content-Commit auf `main` wartet der Automationslauf auf den **bestehenden push-basierten Deploy-Workflow** `.github/workflows/deploy.yml`.
 - Der Automationslauf wartet aktiv auf den Abschluss genau dieses Deploy-Runs für den veröffentlichten Commit (`head_sha`-Abgleich).
 - Erst nach `deploy=success` folgt die Live-URL-Prüfung, erst danach die LinkedIn-/Zap-Übergabe.
 - Deploy-, Live- und LinkedIn-Status werden in `docs/fachbeitrag-veroeffentlichungsprotokoll.csv` fortlaufend aktualisiert und am Laufende auf `main` committed (auch bei Fehlerfällen).
@@ -116,9 +119,8 @@ Der Generator erstellt pro Lauf:
 
 ### Manueller Start über `workflow_dispatch`
 1. GitHub Actions → `Fachbeitrags-Automation` → `Run workflow`
-2. Optionale Inputs:
-   - `slot`: `morning` oder `afternoon` (erzwingt Slot; leer = automatische Erkennung)
-   - `force`: `true` übersteuert nur die Zeitfensterprüfung; der Schutz vor bereits protokolliertem/publiziertem Slot bleibt aktiv
+2. Optionaler Input:
+   - `slot`: `morning` oder `afternoon` (erzwingt Slot-Erkennung innerhalb des gültigen Zeitfensters; leer = automatische Erkennung)
 
 ### Vorübergehende Deaktivierung
 - Repository Variable `FACHBEITRAG_AUTOMATION_ENABLED` auf `false` setzen (Settings → Secrets and variables → Actions → Variables).

@@ -13,6 +13,7 @@ const headSha = argValue('head-sha');
 const timeoutSeconds = Number(argValue('timeout-seconds', '2400'));
 const pollSeconds = Number(argValue('poll-seconds', '10'));
 const event = argValue('event', 'workflow_dispatch');
+const dispatch = argValue('dispatch', 'true') !== 'false';
 const token = process.env.GITHUB_TOKEN;
 
 if (!token) throw new Error('GITHUB_TOKEN fehlt.');
@@ -41,9 +42,15 @@ const api = async (method, endpoint, body) => {
   return response.json();
 };
 
-const dispatchAt = Date.now();
-await api('POST', `/repos/${repo}/actions/workflows/${encodeURIComponent(workflow)}/dispatches`, { ref });
-console.log(`Workflow ausgelöst: ${workflow} auf ${ref}`);
+let createdAfterTs = Date.now() - 30 * 60 * 1000;
+if (dispatch) {
+  const dispatchAt = Date.now();
+  await api('POST', `/repos/${repo}/actions/workflows/${encodeURIComponent(workflow)}/dispatches`, { ref });
+  createdAfterTs = dispatchAt - 120000;
+  console.log(`Workflow ausgelöst: ${workflow} auf ${ref}`);
+} else {
+  console.log(`Warte auf bestehenden Workflow-Run: ${workflow} (${event}) auf ${ref}`);
+}
 
 const timeoutAt = Date.now() + timeoutSeconds * 1000;
 let runId = '';
@@ -60,7 +67,7 @@ while (Date.now() < timeoutAt) {
   const workflowRuns = payload?.workflow_runs ?? [];
   const selected = workflowRuns
     .filter((run) => run.head_sha === headSha)
-    .filter((run) => new Date(run.created_at).getTime() >= dispatchAt - 120000)
+    .filter((run) => new Date(run.created_at).getTime() >= createdAfterTs)
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
 
   if (!selected) {

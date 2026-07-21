@@ -17,11 +17,6 @@ on:
         options:
           - morning
           - afternoon
-      force:
-        description: "Zeitfenster-/Duplikatschutz für Notfalllauf übersteuern"
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   actions: write
@@ -62,27 +57,21 @@ jobs:
       - name: Fachbeitrag erzeugen
         id: generate
         run: |
-          FORCE_ARG=""
           SLOT_ARG=""
           if [ "${{ github.event_name }}" = "schedule" ]; then
             case "${{ github.event.schedule }}" in
               "20 3 * * *"|"20 4 * * *")
                 SLOT_ARG="--slot=morning"
-                FORCE_ARG="--force"
                 ;;
               "20 14 * * *"|"20 15 * * *")
                 SLOT_ARG="--slot=afternoon"
-                FORCE_ARG="--force"
                 ;;
             esac
-          fi
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force }}" = "true" ]; then
-            FORCE_ARG="--force"
           fi
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.slot }}" ]; then
             SLOT_ARG="--slot=${{ inputs.slot }}"
           fi
-          node scripts/run-fachbeitrag-automation.mjs $SLOT_ARG $FORCE_ARG
+          node scripts/run-fachbeitrag-automation.mjs $SLOT_ARG
           STATUS="$(node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('.automation/latest-publication.json','utf8'));process.stdout.write(data.status||'')")"
           echo "status=$STATUS" >> "$GITHUB_OUTPUT"
           if [ "$STATUS" = "generated" ]; then
@@ -138,7 +127,7 @@ jobs:
         if: steps.generate.outputs.status == 'generated'
         run: node scripts/update-fachbeitrag-log.mjs --commit="$PUBLISHED_COMMIT" --deploy=triggered
 
-      - name: Deploy-Workflow auslösen und abwarten
+      - name: Bestehenden Deploy-Workflow (push) abwarten
         if: steps.generate.outputs.status == 'generated'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -147,6 +136,8 @@ jobs:
             --repo="${{ github.repository }}" \
             --workflow="deploy.yml" \
             --ref="main" \
+            --event="push" \
+            --dispatch=false \
             --head-sha="$PUBLISHED_COMMIT" \
             --timeout-seconds=2700
           echo "DEPLOY_OK=true" >> "$GITHUB_ENV"
