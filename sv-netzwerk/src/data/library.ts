@@ -13,16 +13,6 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
-    title: 'Leitungswasserschaden im Mehrfamilienhaus: Erstmaßnahmen und Sanierungssteuerung',
-    description: 'Anonymisierte Fallauswertung aus dem Einsatzkalender: Wie Erstmaßnahmen, Trocknung, Rückbau und Kostenfreigaben fachlich sauber gesteuert werden.',
-    href: '/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2026-07-21-afternoon/',
-    category: 'Leitungswasserschäden',
-    tags: ['Leitungswasser', 'Erstmaßnahmen', 'Trocknung', 'Schadenregulierung'],
-    date: '2026-07-21',
-    type: 'article',
-    featured: false,
-  },
-  {
     title: 'Sturm- und Hagel-Serienschäden: Prüffolge für belastbare Freigaben',
     description: 'Leitfaden für Sachverständige und Regulierer: von Erstaufnahme über Plausibilitätsprüfung bis zur wirtschaftlich belastbaren Freigabe bei regionalen Sturm- und Hagelereignissen.',
     href: '/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/',
