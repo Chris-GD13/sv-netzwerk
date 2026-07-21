@@ -63,6 +63,18 @@ jobs:
         run: |
           FORCE_ARG=""
           SLOT_ARG=""
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            case "${{ github.event.schedule }}" in
+              "20 3 * * *"|"20 4 * * *")
+                SLOT_ARG="--slot=morning"
+                FORCE_ARG="--force"
+                ;;
+              "20 14 * * *"|"20 15 * * *")
+                SLOT_ARG="--slot=afternoon"
+                FORCE_ARG="--force"
+                ;;
+            esac
+          fi
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force }}" = "true" ]; then
             FORCE_ARG="--force"
           fi

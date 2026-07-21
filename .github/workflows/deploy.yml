@@ -128,8 +128,8 @@ jobs:
         env:
           EXPECTED_SHA: ${{ github.sha }}
         run: |
-          response="$(curl --fail --silent --show-error --retry 5 --retry-delay 10 --retry-all-errors \
-            https://sv-netzwerk.eu/deploy-version.txt)"
+          response="$(curl --location --fail --silent --show-error --retry 5 --retry-delay 10 --retry-all-errors \
+            https://www.sv-netzwerk.eu/deploy-version.txt)"
           test -n "$response"
           printf '%s\n' "$response"
 
