@@ -26,6 +26,7 @@ const timeZone = process.env.CALENDAR_TIMEZONE || 'Europe/Berlin';
 const horizonDays = parseNonNegativeInt(process.env.CALENDAR_HORIZON_DAYS || '21', 'CALENDAR_HORIZON_DAYS');
 const backfillDays = parseNonNegativeInt(process.env.CALENDAR_BACKFILL_DAYS || '0', 'CALENDAR_BACKFILL_DAYS');
 const includeSubject = process.env.CALENDAR_INCLUDE_SUBJECTS === 'true';
+const preferredCalendarName = (process.env.CALENDAR_NAME || '').trim().toLowerCase();
 
 const formatParts = (date, tz) => {
   const formatter = new Intl.DateTimeFormat('en-CA', {
@@ -81,36 +82,88 @@ const now = new Date();
 const rangeStart = new Date(now.getTime() - (backfillDays * 24 * 60 * 60 * 1000));
 const rangeEnd = new Date(now.getTime() + (horizonDays * 24 * 60 * 60 * 1000));
 
-const initialUrl = new URL(`https://graph.microsoft.com/v1.0/users/${encodeURIComponent(calendarUserId)}/calendarView`);
-initialUrl.searchParams.set('startDateTime', rangeStart.toISOString());
-initialUrl.searchParams.set('endDateTime', rangeEnd.toISOString());
-initialUrl.searchParams.set('$orderby', 'start/dateTime');
-initialUrl.searchParams.set('$select', 'id,subject,start,end,isAllDay,showAs,location,webLink,organizer,sensitivity');
-initialUrl.searchParams.set('$top', '200');
-
-const allEvents = [];
-let nextUrl = initialUrl.toString();
-
-while (nextUrl) {
-  const eventsResponse = await fetch(nextUrl, {
+const graphGetJson = async (url) => {
+  const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       Prefer: 'outlook.timezone="UTC"',
     },
   });
-  if (!eventsResponse.ok) {
-    const errorBody = await eventsResponse.text();
-    throw new Error(`Kalender-Abruf fehlgeschlagen (${eventsResponse.status}): ${errorBody}`);
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Graph-Abruf fehlgeschlagen (${response.status}): ${errorBody}`);
   }
-  const eventsPayload = await eventsResponse.json();
-  allEvents.push(...(eventsPayload.value || []));
-  nextUrl = eventsPayload['@odata.nextLink'] || '';
+  return response.json();
+};
+
+const fetchCalendarView = async (calendarPathSegment) => {
+  const baseUrl = `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(calendarUserId)}/${calendarPathSegment}/calendarView`;
+  const initialUrl = new URL(baseUrl);
+  initialUrl.searchParams.set('startDateTime', rangeStart.toISOString());
+  initialUrl.searchParams.set('endDateTime', rangeEnd.toISOString());
+  initialUrl.searchParams.set('$orderby', 'start/dateTime');
+  initialUrl.searchParams.set('$select', 'id,subject,start,end,isAllDay,showAs,location,webLink,organizer,sensitivity');
+  initialUrl.searchParams.set('$top', '200');
+
+  const events = [];
+  let nextUrl = initialUrl.toString();
+  while (nextUrl) {
+    const eventsPayload = await graphGetJson(nextUrl);
+    events.push(...(eventsPayload.value || []));
+    nextUrl = eventsPayload['@odata.nextLink'] || '';
+  }
+  return events;
+};
+
+const calendarsPayload = await graphGetJson(
+  `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(calendarUserId)}/calendars?$select=id,name,canEdit,isDefaultCalendar`,
+);
+const availableCalendars = (calendarsPayload.value || []);
+
+let selectedCalendars = availableCalendars;
+if (preferredCalendarName) {
+  selectedCalendars = availableCalendars.filter((item) =>
+    String(item.name || '').toLowerCase().includes(preferredCalendarName),
+  );
+  if (selectedCalendars.length === 0) {
+    throw new Error(`Kein Kalender passend zu CALENDAR_NAME='${process.env.CALENDAR_NAME}' gefunden.`);
+  }
+}
+
+const allEvents = [];
+for (const calendar of selectedCalendars) {
+  const calendarId = String(calendar.id || '').trim();
+  if (!calendarId) continue;
+  const scopedEvents = await fetchCalendarView(`calendars/${encodeURIComponent(calendarId)}`);
+  allEvents.push(...scopedEvents.map((event) => ({
+    ...event,
+    _calendarId: calendarId,
+    _calendarName: calendar.name || '',
+  })));
+}
+
+if (allEvents.length === 0 && !preferredCalendarName) {
+  const defaultEvents = await fetchCalendarView('calendar');
+  allEvents.push(...defaultEvents.map((event) => ({
+    ...event,
+    _calendarId: 'default',
+    _calendarName: 'default',
+  })));
+}
+
+const seenEventIds = new Set();
+const uniqueEvents = [];
+for (const event of allEvents) {
+  const id = String(event.id || '').trim();
+  if (!id || seenEventIds.has(id)) continue;
+  seenEventIds.add(id);
+  uniqueEvents.push(event);
 }
 
 const slotMap = new Map();
 let busyCount = 0;
 
-for (const event of allEvents) {
+for (const event of uniqueEvents) {
   const startIso = toIsoUtc(event.start);
   const endIso = toIsoUtc(event.end);
   if (!startIso || !endIso) continue;
@@ -158,10 +211,15 @@ const payload = {
     backfillDays,
   },
   summary: {
-    totalEvents: allEvents.length,
+    totalEvents: uniqueEvents.length,
     busyEvents: busyCount,
-    freeEvents: Math.max(allEvents.length - busyCount, 0),
+    freeEvents: Math.max(uniqueEvents.length - busyCount, 0),
   },
+  calendars: selectedCalendars.map((item) => ({
+    id: item.id,
+    name: item.name,
+    isDefaultCalendar: Boolean(item.isDefaultCalendar),
+  })),
   slots,
 };
 
@@ -169,4 +227,4 @@ await mkdir(path.dirname(outputFile), { recursive: true });
 await writeFile(outputFile, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
 
 console.log(`Kalenderslots geschrieben: ${outputFile}`);
-console.log(`Events: total=${allEvents.length}, busy=${busyCount}, days=${slots.length}`);
+console.log(`Events: total=${uniqueEvents.length}, busy=${busyCount}, days=${slots.length}, calendars=${selectedCalendars.length}`);
