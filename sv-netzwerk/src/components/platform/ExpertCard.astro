@@ -8,7 +8,7 @@ const { expert } = Astro.props;
     {expert.image ? <img src={expert.image} alt={`Portrait von ${expert.name}`} width="720" height="720" loading="lazy" /> : <span aria-hidden="true">{expert.name.split(' ').map((part)=>part[0]).join('').slice(0,2)}</span>}
   </a>
   <div class="expert-card__body">
-    <p class="sv-eyebrow">{expert.group === 'backoffice' ? 'Backoffice' : expert.role}</p>
+    <p class="sv-eyebrow">{expert.group === 'backoffice' ? 'Backoffice' : (expert.roleLabel ?? expert.role)}</p>
     <h2><a href={`/experten/${expert.slug}/`}>{expert.name}</a></h2>
     <strong>{expert.function}</strong>
     <p>{expert.shortProfile}</p>

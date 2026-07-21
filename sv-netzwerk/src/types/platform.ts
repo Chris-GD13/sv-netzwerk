@@ -5,6 +5,7 @@ export interface ExpertProfile {
   slug: string;
   name: string;
   role: ExpertRole;
+  roleLabel?: string;
   group: 'expert' | 'backoffice';
   function: string;
   expertise: string[];
