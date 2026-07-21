@@ -33,16 +33,6 @@ export const library: LibraryItem[] = [
     featured: true,
   },
   {
-    title: 'Unwetterlage im Kreis Ludwigsburg: Schadensteuerung bei Starkregen, Hagel und Sturm',
-    description: 'Wie lokale Unwetterlagen mit hoher Einsatzdichte durch Erstmaßnahmen, Priorisierung und belastbare Dokumentation gesteuert werden.',
-    href: '/fachwissen/unwetter-ludwigsburg-starkregen-hagel-sturm-schadensteuerung/',
-    category: 'Sturm- und Hagelschäden',
-    tags: ['Starkregen', 'Hagelschaden', 'Sturmschaden'],
-    date: '2026-07-19',
-    type: 'article',
-    featured: true,
-  },
-  {
     title: 'Sturmschaden: Windwirkung, Vorschaden und Bauteilversagen technisch abgrenzen',
     description: 'Wie Windangriffsfläche, Befestigungszustand, Alterung und zeitliche Plausibilität nach Sturm- und Hagelereignissen methodisch getrennt werden.',
     href: '/fachwissen/sturmschaden-windwirkung-vorschaden-abgrenzung/',
