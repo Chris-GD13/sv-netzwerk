@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Leitungswasser und Kumulmanagement</title>
+  <desc id="desc">Nachmittägliche Facheinordnung</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a3c53"/>
+      <stop offset="100%" stop-color="#0f5f4f"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="70" y="90" width="1060" height="450" rx="24" fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.28)"/>
+  <text x="120" y="190" fill="#d9f4ff" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700">SV-Netzwerk · Fachbeitrag</text>
+  <text x="120" y="255" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="50" font-weight="700">Leitungswasser und Kumulmanagement</text>
+  <text x="120" y="325" fill="#e8f7f2" font-family="Arial, Helvetica, sans-serif" font-size="31">Nachmittägliche Facheinordnung</text>
+  <text x="120" y="490" fill="#d5efe8" font-family="Arial, Helvetica, sans-serif" font-size="27">Kumulschaden · Schadenregulierung · Beweissicherung</text>
+</svg>
