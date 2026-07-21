@@ -13,8 +13,8 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
-    title: 'Sturm- und Hagel-Serienschäden: Prüffolge für belastbare Freigaben – fachliche Einordnung zur aktuellen Lage',
-    description: 'Sturm- und Hagelschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    title: 'Sturm- und Hagel-Serienschäden: Prüffolge für belastbare Freigaben',
+    description: 'Leitfaden für Sachverständige und Regulierer: von Erstaufnahme über Plausibilitätsprüfung bis zur wirtschaftlich belastbaren Freigabe bei regionalen Sturm- und Hagelereignissen.',
     href: '/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/',
     category: 'Sturm- und Hagelschäden',
     tags: ['Sturm', 'Hagel', 'Kumulschaden', 'Plausibilitätsprüfung'],
