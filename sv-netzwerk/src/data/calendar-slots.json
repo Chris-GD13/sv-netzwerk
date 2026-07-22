@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-07-22T00:10:15.990Z",
+  "generatedAt": "2026-07-22T03:50:28.323Z",
   "timezone": "Europe/Berlin",
   "source": "microsoft-graph",
   "calendarUserId": "cw@sv-schuett.eu",
   "range": {
-    "startIso": "2026-07-22T00:10:15.990Z",
-    "endIso": "2026-08-12T00:10:15.990Z",
+    "startIso": "2026-07-22T03:50:28.323Z",
+    "endIso": "2026-08-12T03:50:28.323Z",
     "horizonDays": 21,
     "backfillDays": 0
   },
