@@ -1,17 +1,17 @@
 {
-  "generatedAt": "2026-07-22T06:42:34.412Z",
+  "generatedAt": "2026-07-22T09:38:53.777Z",
   "timezone": "Europe/Berlin",
   "source": "microsoft-graph",
   "calendarUserId": "cw@sv-schuett.eu",
   "range": {
-    "startIso": "2026-07-22T06:42:34.412Z",
-    "endIso": "2026-08-12T06:42:34.412Z",
+    "startIso": "2026-07-22T09:38:53.777Z",
+    "endIso": "2026-08-12T09:38:53.777Z",
     "horizonDays": 21,
     "backfillDays": 0
   },
   "summary": {
-    "totalEvents": 44,
-    "busyEvents": 43,
+    "totalEvents": 47,
+    "busyEvents": 46,
     "freeEvents": 1
   },
   "calendarStats": {
@@ -22,22 +22,6 @@
     {
       "date": "2026-07-22",
       "busy": [
-        {
-          "startIso": "2026-07-22T08:00:00.000Z",
-          "endIso": "2026-07-22T08:30:00.000Z",
-          "startLocal": "2026-07-22 10:00",
-          "endLocal": "2026-07-22 10:30",
-          "isAllDay": false,
-          "showAs": "busy"
-        },
-        {
-          "startIso": "2026-07-22T08:00:00.000Z",
-          "endIso": "2026-07-22T08:30:00.000Z",
-          "startLocal": "2026-07-22 10:00",
-          "endLocal": "2026-07-22 10:30",
-          "isAllDay": false,
-          "showAs": "busy"
-        },
         {
           "startIso": "2026-07-22T09:30:00.000Z",
           "endIso": "2026-07-22T10:00:00.000Z",
@@ -280,10 +264,31 @@
       "date": "2026-07-29",
       "busy": [
         {
-          "startIso": "2026-07-29T06:00:00.000Z",
-          "endIso": "2026-07-29T07:00:00.000Z",
-          "startLocal": "2026-07-29 08:00",
-          "endLocal": "2026-07-29 09:00",
+          "startIso": "2026-07-29T07:15:00.000Z",
+          "endIso": "2026-07-29T08:15:00.000Z",
+          "startLocal": "2026-07-29 09:15",
+          "endLocal": "2026-07-29 10:15",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "startIso": "2026-07-29T08:30:00.000Z",
+          "endIso": "2026-07-29T10:30:00.000Z",
+          "startLocal": "2026-07-29 10:30",
+          "endLocal": "2026-07-29 12:30",
+          "isAllDay": false,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-30",
+      "busy": [
+        {
+          "startIso": "2026-07-30T06:00:00.000Z",
+          "endIso": "2026-07-30T07:00:00.000Z",
+          "startLocal": "2026-07-30 08:00",
+          "endLocal": "2026-07-30 09:00",
           "isAllDay": false,
           "showAs": "busy"
         }
@@ -394,6 +399,22 @@
           "endLocal": "2026-08-05 10:30",
           "isAllDay": false,
           "showAs": "busy"
+        },
+        {
+          "startIso": "2026-08-05T09:30:00.000Z",
+          "endIso": "2026-08-05T10:00:00.000Z",
+          "startLocal": "2026-08-05 11:30",
+          "endLocal": "2026-08-05 12:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "startIso": "2026-08-05T10:15:00.000Z",
+          "endIso": "2026-08-05T10:45:00.000Z",
+          "startLocal": "2026-08-05 12:15",
+          "endLocal": "2026-08-05 12:45",
+          "isAllDay": false,
+          "showAs": "busy"
         }
       ]
     },
@@ -418,6 +439,14 @@
           "endIso": "2026-08-12T07:00:00.000Z",
           "startLocal": "2026-08-12 08:00",
           "endLocal": "2026-08-12 09:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "startIso": "2026-08-12T09:00:00.000Z",
+          "endIso": "2026-08-12T10:30:00.000Z",
+          "startLocal": "2026-08-12 11:00",
+          "endLocal": "2026-08-12 12:30",
           "isAllDay": false,
           "showAs": "busy"
         }
