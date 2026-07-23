@@ -1,5 +1,11 @@
 # Fachbeitrags-Automation (täglich, zwei Slots)
 
+## Bestandsschutz veröffentlichter Inhalte (verbindlich)
+
+- Bereits veröffentlichte Beiträge dürfen nur nach **ausdrücklicher Anweisung** gelöscht, umbenannt, ersetzt, zusammengeführt oder aus Übersichten, Sitemaps, Navigation und Routing entfernt werden.
+- Änderungen an Layout, Navigation, SEO, Redirects oder Beitragsautomation dürfen keine bestehenden Inhalte unbeabsichtigt unpublizieren.
+- Jede Änderung mit möglicher Auswirkung auf bestehende Fachwissen-URLs muss vor dem Merge auf Erreichbarkeit (200/301), Sitemap-Präsenz und Übersichtseinbindung geprüft werden.
+
 ## Zeitfenster und Zeitzone
 
 - **Morgenslot:** 05:15–06:40 Uhr (Europe/Berlin)
