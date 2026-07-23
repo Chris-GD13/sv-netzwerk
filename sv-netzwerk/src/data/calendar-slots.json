@@ -1,17 +1,17 @@
 {
-  "generatedAt": "2026-07-23T10:34:57.950Z",
+  "generatedAt": "2026-07-23T12:48:57.624Z",
   "timezone": "Europe/Berlin",
   "source": "microsoft-graph",
   "calendarUserId": "cw@sv-schuett.eu",
   "range": {
-    "startIso": "2026-07-23T10:34:57.950Z",
-    "endIso": "2026-08-13T10:34:57.950Z",
+    "startIso": "2026-07-23T12:48:57.624Z",
+    "endIso": "2026-08-13T12:48:57.624Z",
     "horizonDays": 21,
     "backfillDays": 0
   },
   "summary": {
-    "totalEvents": 56,
-    "busyEvents": 55,
+    "totalEvents": 59,
+    "busyEvents": 58,
     "freeEvents": 1
   },
   "calendarStats": {
@@ -23,18 +23,26 @@
       "date": "2026-07-24",
       "busy": [
         {
-          "startIso": "2026-07-24T00:00:00.000Z",
-          "endIso": "2026-07-25T00:00:00.000Z",
-          "startLocal": "2026-07-24 02:00",
-          "endLocal": "2026-07-25 02:00",
-          "isAllDay": true,
-          "showAs": "busy"
-        },
-        {
           "startIso": "2026-07-24T07:30:00.000Z",
           "endIso": "2026-07-24T08:00:00.000Z",
           "startLocal": "2026-07-24 09:30",
           "endLocal": "2026-07-24 10:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "startIso": "2026-07-24T11:00:00.000Z",
+          "endIso": "2026-07-24T12:00:00.000Z",
+          "startLocal": "2026-07-24 13:00",
+          "endLocal": "2026-07-24 14:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "startIso": "2026-07-24T12:00:00.000Z",
+          "endIso": "2026-07-24T13:00:00.000Z",
+          "startLocal": "2026-07-24 14:00",
+          "endLocal": "2026-07-24 15:00",
           "isAllDay": false,
           "showAs": "busy"
         }
@@ -470,6 +478,27 @@
           "startLocal": "2026-08-07 02:00",
           "endLocal": "2026-08-08 02:00",
           "isAllDay": true,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-10",
+      "busy": [
+        {
+          "startIso": "2026-08-10T07:30:00.000Z",
+          "endIso": "2026-08-10T08:00:00.000Z",
+          "startLocal": "2026-08-10 09:30",
+          "endLocal": "2026-08-10 10:00",
+          "isAllDay": false,
+          "showAs": "busy"
+        },
+        {
+          "startIso": "2026-08-10T08:00:00.000Z",
+          "endIso": "2026-08-10T08:30:00.000Z",
+          "startLocal": "2026-08-10 10:00",
+          "endLocal": "2026-08-10 10:30",
+          "isAllDay": false,
           "showAs": "busy"
         }
       ]
