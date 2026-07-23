@@ -2,9 +2,10 @@
 import { formatKnowledgeDate } from '../../utils/knowledge';
 interface Props { author: string; publishedAt: Date; updatedAt?: Date; readingMinutes: number; }
 const { author, publishedAt, updatedAt, readingMinutes } = Astro.props;
+const authorLabel = author === 'christian-waechter' ? 'Christian Wächter' : author;
 ---
 <div class="knowledge-meta" role="group" aria-label="Beitragsinformationen">
-  <span>Von {author}</span>
+  <span>Von {authorLabel}</span>
   <span><time datetime={publishedAt.toISOString()}>{formatKnowledgeDate(publishedAt)}</time></span>
   {updatedAt && <span>Aktualisiert: <time datetime={updatedAt.toISOString()}>{formatKnowledgeDate(updatedAt)}</time></span>}
   <span>{readingMinutes} Min. Lesezeit</span>

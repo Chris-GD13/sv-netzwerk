@@ -6,6 +6,26 @@
 - Änderungen an Layout, Navigation, SEO, Redirects oder Beitragsautomation dürfen keine bestehenden Inhalte unbeabsichtigt unpublizieren.
 - Jede Änderung mit möglicher Auswirkung auf bestehende Fachwissen-URLs muss vor dem Merge auf Erreichbarkeit (200/301), Sitemap-Präsenz und Übersichtseinbindung geprüft werden.
 
+## Verbindliche Begriffsnutzung (Redaktionsstandard)
+
+- **Kumulschaden:** Vielzahl einzelner Schäden infolge derselben Unwetterlage in einem räumlich-zeitlich zusammenhängenden Bereich.
+- **Komplexschaden:** einzelner Schadenfall mit erhöhter technischer, organisatorischer, wirtschaftlicher oder regulierungsbezogener Komplexität.
+- **Großschaden:** nur verwenden, wenn ein einzelner Schaden außergewöhnlich umfangreich oder schadenhöhenmäßig besonders bedeutend ist.
+- Begriffe wie „Großschadenkoordination“ oder „Großschadenregulierung“ dürfen nicht pauschal als Synonym für Kumullagen verwendet werden.
+- In Kumullagen bleibt jeder Einzelfall separat hinsichtlich Ursache, Deckung, Vorschadenanteil, Schadenumfang und Maßnahmenbedarf zu bewerten.
+
+## Verbindliche Zielgruppenformulierung
+
+- Standardformulierung für Fachbeiträge: **„Versicherer, Sachverständige und Schadenregulierer“**.
+- Diese Formulierung ist in Beiträgen, Meta-Descriptions, strukturierten Daten, CTAs, LinkedIn-Texten und Automationsvorlagen zu verwenden.
+- Die persönliche Berufsbezeichnung von Christian Wächter bleibt unverändert: **„Sachverständiger & Großschadenregulierer“**.
+
+## Slug-Standard für neue Fachbeiträge
+
+- Neue Slugs müssen dauerhaft verständlich und thematisch sein.
+- Nicht zulässig sind Datums-, Uhrzeit- oder Slot-Zusätze in Slugs (z. B. `YYYY-MM-DD`, `morning`, `afternoon`).
+- Bestehende veröffentlichte URLs bleiben unverändert erreichbar; kürzere Nachfolge-Slugs werden nur zusätzlich mit permanenter 301-Weiterleitung eingeführt.
+
 ## Zeitfenster und Zeitzone
 
 - **Morgenslot:** 05:15–06:40 Uhr (Europe/Berlin)

@@ -251,12 +251,12 @@ const TOPICS = [
     practice: ['fehlende Höhenbezüge und Zeitachsen', 'Vermischung aus Sofortmaßnahme und Wiederherstellung', 'ungeklärte Rückstausicherung als Vorzustandsthema'],
   },
   {
-    id: 'hochwasser-grossschadenkoordination',
+    id: 'hochwasser-kumulschadenmanagement',
     category: 'Hochwasser und Überflutung',
-    tags: ['Hochwasser', 'Überflutung', 'Großschaden', 'Einsatzplanung'],
+    tags: ['Kumulschaden', 'Hochwasser', 'Überflutung', 'Kumulschadenmanagement'],
     damageTypes: ['hochwasser', 'ueberflutung', 'gebaeude'],
-    slugBase: 'hochwasser-ueberflutung-grossschadenkoordination',
-    titleBase: 'Hochwasser und Überflutung: Koordination im Großschadenbestand',
+    slugBase: 'kumulschaeden-hochwasser-ueberflutung-priorisierung-regulierung',
+    titleBase: 'Kumulschäden nach Hochwasser und Überflutung: Priorisierung und strukturierte Regulierung',
     intro: 'Bei regionalen Hochwasserlagen laufen Besichtigungen, Sofortmaßnahmen und Reservierung parallel und erfordern belastbare Einsatzsteuerung.',
     tech: 'Für die technische Einordnung sind Wasserstandsentwicklung, Einwirkdauer, betroffene Konstruktionen und Trocknungspfad maßgeblich. Regulatorisch bleibt die saubere Trennung zwischen versichertem Schadenanteil und nicht versicherten Vorzuständen zentral.',
     practice: ['zu späte Priorisierung kritischer Objekte', 'fehlende Synchronisierung zwischen Sachverständigen und Sanierern', 'Reserveschätzungen ohne belastbaren Mengengerüstbezug'],
@@ -266,9 +266,9 @@ const TOPICS = [
     category: 'Sturm- und Hagelschäden',
     tags: ['Sturm', 'Hagel', 'Kumulschaden', 'Plausibilitätsprüfung'],
     damageTypes: ['sturm', 'hagel', 'gebaeude'],
-    slugBase: 'sturm-hagel-serienschaeden-prueffolge',
-    titleBase: 'Sturm- und Hagel-Serienschäden: Prüffolge für belastbare Freigaben',
-    intro: 'Bei großflächigen Sturm- und Hagellagen führt nur eine bauteilbezogene Prüffolge zu nachvollziehbaren Entscheidungen.',
+    slugBase: 'kumulschaeden-sturm-hagel-prueffolge-regulierung',
+    titleBase: 'Kumulschäden nach Sturm und Hagel: Belastbare Prüffolge für die Regulierungspraxis',
+    intro: 'Bei regionalen Sturm- und Hagelkumulagen führt nur eine bauteilbezogene Prüffolge zu nachvollziehbaren Entscheidungen.',
     tech: 'Windwirkung, Befestigungszustand, Materialalterung und Schadenzeitpunkt sind gemeinsam zu prüfen. Nur dokumentierte Feststellungen dürfen in Freigaben und Reserven überführt werden.',
     practice: ['Pauschalanerkennung ohne Bauteilprüfung', 'Vorschäden werden nicht getrennt geführt', 'Notabdichtung und Endinstandsetzung werden in einer Position vermischt'],
   },
@@ -399,10 +399,10 @@ const TOPICS = [
     tags: ['Kommunikation', 'Versicherer', 'Versicherungsnehmer', 'Schadenmanagement', 'Transparenz'],
     damageTypes: ['gebaeude', 'kumulschaden'],
     slugBase: 'kommunikation-beteiligte-schadenfall-struktur',
-    titleBase: 'Kommunikation mit Versicherern, Regulierern und Versicherungsnehmern: Struktur für klare Verfahren',
+    titleBase: 'Kommunikation mit Versicherern, Schadenregulierern und Versicherungsnehmern: Struktur für klare Verfahren',
     intro: 'Strukturierte Kommunikation im Schadenfall verhindert Missverständnisse, spart Eskalationen und sichert nachvollziehbare Entscheidungsgrundlagen für alle Beteiligten.',
     tech: 'Jede kommunizierte Einschätzung zu Ursache, Umfang oder Kosten muss auf dokumentierten Feststellungen beruhen. Vorläufige Aussagen sind als solche zu kennzeichnen. Protokollierte Abstimmungen ersetzen mündliche Absprachen im Streitfall.',
-    practice: ['mündliche Zusagen ohne schriftliche Grundlage', 'fehlende Abgrenzung zwischen vorläufiger Einschätzung und abschließender Regulierungsentscheidung', 'keine einheitliche Informationsbasis zwischen Versicherer, Regulierer und Sachverständigem'],
+    practice: ['mündliche Zusagen ohne schriftliche Grundlage', 'fehlende Abgrenzung zwischen vorläufiger Einschätzung und abschließender Regulierungsentscheidung', 'keine einheitliche Informationsbasis zwischen Versicherer, Schadenregulierer und Sachverständigem'],
   },
   {
     id: 'schadenminderung-pflicht-praxis',
@@ -423,8 +423,8 @@ const TOPICS = [
     slugBase: 'massenanfall-einzelschaeden-einsatzsteuerung',
     titleBase: 'Massenanfall von Einzelschäden: Einsatzsteuerung bei außergewöhnlich hoher Schadenfrequenz',
     intro: 'Wenn in kurzer Zeit eine große Anzahl von Schadenmeldungen eingeht, entscheiden Einsatzplanung und Priorisierung über Qualität und Geschwindigkeit der Regulierung.',
-    tech: 'Klassifizierung nach Dringlichkeit (Sicherheitsrisiko, Substanzgefährdung, Nutzungsausfall) und Komplexität (Standardschaden, Sonderfall, statisches/hygienisches Risiko) bildet die Grundlage. Ressourcensteuerung für Sachverständige, Regulierer und Dienstleister muss zentral koordiniert werden.',
-    practice: ['keine Priorisierung – alle Schäden werden in Meldereihenfolge bearbeitet', 'fehlende Kapazitätsplanung für Sanierungsdienstleister', 'mangelhafte Übergabe zwischen Sachverständigen und Regulierern'],
+    tech: 'Klassifizierung nach Dringlichkeit (Sicherheitsrisiko, Substanzgefährdung, Nutzungsausfall) und Komplexität (Standardschaden, Sonderfall, statisches/hygienisches Risiko) bildet die Grundlage. Ressourcensteuerung für Sachverständige, Schadenregulierer und Dienstleister muss zentral koordiniert werden.',
+    practice: ['keine Priorisierung – alle Schäden werden in Meldereihenfolge bearbeitet', 'fehlende Kapazitätsplanung für Sanierungsdienstleister', 'mangelhafte Übergabe zwischen Sachverständigen und Schadenregulierern'],
   },
   {
     id: 'gutachter-plattform-regional',
@@ -546,6 +546,17 @@ const fileExists = async (file) => {
   } catch {
     return false;
   }
+};
+
+const ensureUniqueSlug = async (base) => {
+  const normalized = safeSlug(base);
+  let candidate = normalized;
+  let counter = 2;
+  while (await fileExists(path.join(knowledgeDir, `${candidate}.md`))) {
+    candidate = `${normalized}-${counter}`;
+    counter += 1;
+  }
+  return candidate;
 };
 
 const csvEscape = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`;
@@ -720,7 +731,7 @@ const title = caseContext
   ? `${topic.titleBase}: anonymisierte Fallauswertung aus der Praxis`
   : createHeadline(topic, regionalSignal);
 const slugBase = caseContext ? `${topic.slugBase}-anonymisierte-fallauswertung` : topic.slugBase;
-const slug = safeSlug(`${slugBase}-${berlinDate}-${slot}`);
+const slug = await ensureUniqueSlug(slugBase);
 const articleUrl = `https://www.sv-netzwerk.eu/fachwissen/${slug}/`;
 const imageFileName = `${slug}.svg`;
 const imageWebPath = `/assets/images/linkedin/${imageFileName}`;
@@ -730,7 +741,7 @@ const caseDocSummary = caseContext?.allDocSignals?.length
   ? caseContext.allDocSignals.map((signal) => docSignalLabels[signal] || signal).join(', ')
   : '';
 const metaDescription = caseContext
-  ? `${topic.category}: Anonymisierte Fallauswertung aus realen Kalenderfällen mit dokumentenbasierter Einordnung für Schadenregulierung und Großschadensteuerung.`
+  ? `${topic.category}: Anonymisierte Fallauswertung aus realen Kalenderfällen mit dokumentenbasierter Einordnung für Kumulschadenmanagement und Schadenregulierung.`
   : `${topic.category}: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.`;
 const teaser = caseContext
   ? `Grundlage dieses Beitrags sind tagesaktuelle bzw. historische Realfälle aus dem Einsatzkalender (bis zu 3 Jahre Rückblick), inklusive ausgewerteter Unterlagenhinweise. Alle Angaben sind vollständig anonymisiert; Personen-, Orts- und Objektdaten werden nicht veröffentlicht.`
@@ -752,7 +763,7 @@ const body = [
     ? `Dieser Beitrag basiert auf ${caseContext.selectedCases.length} anonymisierten Realfällen aus dem Einsatzkalender. Für die fachliche Ableitung wurden verfügbare Unterlagenhinweise (z. B. Foto-/Dokumentationsstände, KVA-/Rechnungsbezug, Protokoll-/Gutachtenhinweise) ausgewertet. Namen, konkrete Adressen, Orte, Aktenzeichen und personenbezogene Daten wurden nicht übernommen.`
     : regionalSignal
     ? `Öffentlich zugängliche Meldungen können einen zeitlichen Aufhänger bilden. Die fachliche Aussage dieses Beitrags stützt sich jedoch auf methodische Standards der Schadenaufnahme, Plausibilitätsprüfung und Freigabeentscheidung – nicht auf ungesicherte Detailaussagen zu einzelnen Meldungen.`
-    : `Dieser Beitrag ordnet ein typisches Kumulschaden-Szenario ohne konkreten Einzelfallbezug ein. Damit werden keine Vor-Ort-Aussagen zu laufenden Ereignissen getroffen, sondern belastbare Vorgehensstandards für Sachverständige und Großschadenregulierer dargestellt.`,
+    : `Dieser Beitrag nutzt ein anonymisiertes typisches Praxisbeispiel aus der Regulierung. Damit werden keine identifizierbaren Einzelfalldaten veröffentlicht, aber belastbare Vorgehensstandards für Versicherer, Sachverständige und Schadenregulierer dargestellt.`,
   ...(caseContext ? [
     '',
     '## Fallbasis (anonymisiert)',
@@ -772,12 +783,12 @@ const body = [
     'Die Fallbasis dient ausschließlich der fachlichen Musterableitung. Es werden keine personenbezogenen oder standortbezogenen Originalinformationen veröffentlicht.',
   ] : []),
   '',
-  `## Fachlicher Rahmen: Sachverständige und Großschadenregulierer`,
+  `## Fachlicher Rahmen: Sachverständige und Schadenregulierer`,
   `Sachverständige in der technischen Gebäudeschadensregulierung nehmen bei Kumulereignissen eine Schlüsselrolle ein. Sie liefern technisch belastbare Feststellungen, die als Grundlage für versicherungsrechtliche Entscheidungen dienen. Ihre Arbeit endet nicht bei der Erstbesichtigung: Die strukturierte Begleitung von Sanierung, Rückbau und Trocknungsprozessen sowie die Prüfung von Kostenvoranschlägen und Rechnungen sind gleichwertige Aufgaben.`,
   '',
-  `Großschadenregulierer koordinieren bei regionalen Kumullagen das Zusammenspiel zwischen Versicherer, Sachverständigen, Dienstleistern und Betroffenen. Sie steuern Bearbeitungsreihenfolgen, setzen Priorisierungen um und sichern durch strukturierte Kommunikation, dass Entscheidungen nachvollziehbar und revisionssicher dokumentiert werden. Ohne klare Koordination entstehen bei hoher Fallzahl zwangsläufig inkonsistente Bewertungen, Doppelarbeit und regulatorische Unsicherheit.`,
+  `Schadenregulierer koordinieren bei regionalen Kumullagen das Zusammenspiel zwischen Versicherer, Sachverständigen, Dienstleistern und Betroffenen. Sie steuern Bearbeitungsreihenfolgen, setzen Priorisierungen um und sichern durch strukturierte Kommunikation, dass Entscheidungen nachvollziehbar und revisionssicher dokumentiert werden. Ohne klare Koordination entstehen bei hoher Fallzahl zwangsläufig inkonsistente Bewertungen, Doppelarbeit und Unsicherheit in der Schadenregulierung.`,
   '',
-  `Das SV-Netzwerk verbindet regional verankerte Sachverständige und erfahrene Großschadenregulierer in einem gemeinsamen Qualitätsstandard. Die [Gutachter-Plattform](/gutachter-plattform/) ermöglicht eine gezielte Zuordnung qualifizierter Experten auch bei größeren regionalen Schadenlagen.`,
+  `Das SV-Netzwerk verbindet regional verankerte Sachverständige und erfahrene Schadenregulierer in einem gemeinsamen Qualitätsstandard. Die [Gutachter-Plattform](/gutachter-plattform/) ermöglicht eine gezielte Zuordnung qualifizierter Experten auch bei größeren regionalen Schadenlagen.`,
   '',
   `Für die operative Verzahnung werden Leistungen, Schadenarten, Expertenprofile und weiterführende Fachbeiträge gemeinsam genutzt: [Leistungen](/leistungen/), [Schadenarten für Komplexschäden](/komplexschaeden/), [Experten im Netzwerk](/experten/), [Gutachter-Plattform](/gutachter-plattform/) sowie der Fachbeitrag [Kumulschäden in der Region: Priorisierung, Koordination und Dokumentation](/fachwissen/kumulschaeden-in-der-region-priorisierung-koordination-dokumentation/).`,
   '',
@@ -791,7 +802,7 @@ const body = [
   `## Koordination im Schadencluster`,
   `Bei hohen Schadenmengen braucht jede Region eine klare Einsatzlogik. Bewährt hat sich ein Dreiklang aus (1) zentraler Lageübersicht, (2) standardisierter Erstbesichtigung und (3) qualitätsgesicherter Nachprüfung. Nur so bleiben Reserven, Freigaben und spätere Rechnungsprüfungen konsistent.`,
   '',
-  `Für Sachverständige und Großschadenregulierer bedeutet das konkret:`,
+  `Für Versicherer, Sachverständige und Schadenregulierer bedeutet das konkret:`,
   '- einheitliche Fotologik mit Zeit-/Ortbezug pro Objekt,',
   '- abgestimmte Mindestdaten für Erstbesichtigung,',
   '- klare Eskalationskriterien bei statischen, hygienischen oder brandschutzrelevanten Risiken,',
@@ -819,7 +830,7 @@ const body = [
   '2. Schadenzonen je Bauteil/Gewerk trennen und mit Foto-, Mess- und Protokollkette belegen.',
   '3. Sofortmaßnahmen von Wiederherstellung und Instandhaltung klar abgrenzen.',
   '4. Kostenpositionen nur mit nachvollziehbarem Leistungs- und Mengenbezug reservieren oder freigeben.',
-  '5. Abstimmung zwischen Versicherer, Sachverständigen, Regulierern und Dienstleistern protokollieren.',
+  '5. Abstimmung zwischen Versicherer, Sachverständigen, Schadenregulierern und Dienstleistern protokollieren.',
   '',
   `## Hinweise für Versicherer, Eigentümer und Geschädigte`,
   '- Frühzeitig strukturierte Unterlagen (Fotos, Zeitpunkte, Rechnungen, KVA) bereitstellen.',
@@ -843,7 +854,7 @@ const frontmatter = [
   `description: "${metaDescription}"`,
   `category: "${topic.category}"`,
   `tags: [${topic.tags.map((tag) => `"${tag}"`).join(', ')}]`,
-  'author: "christian-waechter"',
+  'author: "Christian Wächter"',
   'featured: false',
   `dailyStandard: ${slot === 'morning' ? 'true' : 'false'}`,
   'contentLevel: "B"',
@@ -888,7 +899,7 @@ await mkdir(linkedinDir, { recursive: true });
 await mkdir(videosDir, { recursive: true });
 
 await writeFile(knowledgePath, `${frontmatter}${body}\n`);
-await writeFile(path.join(imageDir, imageFileName), makeImageSvg(topic.category, slot === 'morning' ? 'Morgendlicher Fachimpuls' : 'Nachmittägliche Facheinordnung'));
+await writeFile(path.join(imageDir, imageFileName), makeImageSvg(topic.category, 'Fachlicher Praxisimpuls'));
 
 const hashtagTokens = ['Kumulschaden', 'Schadenregulierung', ...topic.tags]
   .map((tag) => safeSlug(tag))
@@ -904,7 +915,7 @@ const linkedinText = [
     ? 'Ausgewertet wurden Unterlagenhinweise aus echten Fallakten (z. B. Dokumentation, KVA/Rechnung, Protokolle) – vollständig anonymisiert ohne Namen, Orte oder Objektdetails.'
     : regionalSignal
     ? 'Öffentlich gemeldete regionale Lagen zeigen: Bei hoher Schadenfrequenz müssen Feststellung, Plausibilitätsprüfung und Freigabe sauber getrennt bleiben.'
-    : 'Gerade ohne konkreten Einzelfallbezug hilft ein klarer Fachstandard, um im nächsten Ereignis strukturiert und prüffähig zu arbeiten.',
+    : 'Ein anonymisiertes typisches Praxisbeispiel hilft, Verfahren in der nächsten Kumullage strukturiert und prüffähig umzusetzen.',
   '',
   'Im Beitrag zeigen wir eine belastbare Vorgehensstruktur für Besichtigung, Dokumentation, Sanierungsplanung und Kostenprüfung.',
   '',

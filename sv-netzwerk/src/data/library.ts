@@ -13,21 +13,21 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
-    title: 'Sturm- und Hagel-Serienschäden: Prüffolge für belastbare Freigaben',
-    description: 'Leitfaden für Sachverständige und Regulierer: von Erstaufnahme über Plausibilitätsprüfung bis zur wirtschaftlich belastbaren Freigabe bei regionalen Sturm- und Hagelereignissen.',
+    title: 'Kumulschäden nach Sturm und Hagel – belastbare Prüffolge für die Regulierungspraxis',
+    description: 'Praxisorientierte Prüffolge für Versicherer, Sachverständige und Schadenregulierer zur einheitlichen, objektbezogenen Bearbeitung vieler Sturm- und Hagelschäden.',
     href: '/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/',
     category: 'Sturm- und Hagelschäden',
-    tags: ['Sturm', 'Hagel', 'Kumulschaden', 'Plausibilitätsprüfung'],
+    tags: ['Kumulschaden', 'Sturm', 'Hagel', 'Plausibilitätsprüfung'],
     date: '2026-07-21',
     type: 'article',
     featured: false,
   },
   {
-    title: 'Hochwasser und Überflutung: Koordination im Großschadenbestand',
-    description: 'Hochwasser und Überflutung: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    title: 'Kumulschäden nach Hochwasser und Überflutung – Priorisierung, Sofortmaßnahmen und strukturierte Regulierung',
+    description: 'Praxisleitfaden für Versicherer, Sachverständige und Schadenregulierer zur strukturierten Bearbeitung vieler Einzelschäden in einer regionalen Kumullage.',
     href: '/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/',
     category: 'Hochwasser und Überflutung',
-    tags: ['Hochwasser', 'Überflutung', 'Großschaden', 'Einsatzplanung'],
+    tags: ['Kumulschaden', 'Hochwasser', 'Überflutung', 'Kumulschadenmanagement'],
     date: '2026-07-20',
     type: 'article',
     featured: false,

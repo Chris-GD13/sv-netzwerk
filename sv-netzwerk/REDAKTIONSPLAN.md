@@ -2,7 +2,7 @@
 
 ## Schwerpunktfenster 22.07.2026 bis ca. 22.08.2026
 
-Für vier Wochen liegt der redaktionelle Fokus auf **Kumul- und Unwetterschäden in Deutschland**. Inhalte bleiben sachlich, fachlich und nachvollziehbar. Maßgeblich sind reale Unwetterlagen und der konkrete Nutzen für Versicherer, Regulierer und Geschädigte.
+Für vier Wochen liegt der redaktionelle Fokus auf **Kumul- und Unwetterschäden in Deutschland**. Inhalte bleiben sachlich, fachlich und nachvollziehbar. Maßgeblich sind reale Unwetterlagen und der konkrete Nutzen für Versicherer, Schadenregulierer, Sachverständige und Geschädigte.
 
 Kernaussage im Schwerpunktfenster:
 
@@ -10,7 +10,7 @@ Kernaussage im Schwerpunktfenster:
 
 ## Veröffentlichungsrhythmus (aktive Automation)
 
-- Täglich (Mo-So) 05:15-06:40 Uhr: Fachbeitrag (Schwerpunkt Kumul-/Großschadenregulierung)
+- Täglich (Mo-So) 05:15-06:40 Uhr: Fachbeitrag (Schwerpunkt Kumulschadenmanagement)
 - Täglich (Mo-So) 16:15-17:30 Uhr: zweiter, eigenständiger Fachbeitrag mit separatem Thema
 - Montag-Freitag: möglichst regionaler Aufhänger aus öffentlichen Meldungen im Suchraum um Aalen
 - Samstag-Sonntag: ausschließlich allgemeine Fachbeiträge ohne Vor-Ort-Suggestivformulierung
@@ -21,7 +21,7 @@ Kernaussage im Schwerpunktfenster:
 Die Themen werden als Reihe ohne Wiederholung aufgebaut und decken im Schwerpunktzeitraum insbesondere ab:
 
 - Starkregen-Schadenmanagement
-- Groß- und Kumulschäden in der Praxis
+- Kumulschäden in der Praxis und komplexe Einzelfälle
 - Zusammenarbeit Versicherer / Regulierer / Sachverständige
 - Schadenaufnahme nach Elementarereignissen
 - technische Besonderheiten aktueller Schadenbilder
