@@ -144,10 +144,20 @@ jobs:
         run: |
           set -euo pipefail
           lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; cls -1F .; bye"
-          set +e
-          listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" -e "$lftp_script")"
-          exit_code=$?
-          set -e
+          exit_code=1
+          listing=""
+          for attempt in 1 2 3; do
+            set +e
+            listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" -e "$lftp_script")"
+            exit_code=$?
+            set -e
+            if [ "$exit_code" -eq 0 ]; then
+              break
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep 5
+            fi
+          done
           if [ "$exit_code" -ne 0 ]; then
             if [ "$exit_code" -eq 124 ]; then
               echo "::error::Timeout bei Post-Upload-Document-Root-Prüfung nach ${SFTP_CHECK_TIMEOUT_SECONDS}s."
