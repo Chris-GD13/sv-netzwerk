@@ -22,6 +22,9 @@ jobs:
     timeout-minutes: 45
     env:
       SFTP_REMOTE_DIR: /sv-netzwerk
+      SFTP_CONNECT_TIMEOUT_SECONDS: 25
+      SFTP_CHECK_TIMEOUT_SECONDS: 45
+      SFTP_UPLOAD_TIMEOUT_SECONDS: 1200
 
     defaults:
       run:
@@ -65,11 +68,15 @@ jobs:
 
       - name: Build-Ausgabe prüfen
         run: |
+          set -euo pipefail
           test -d dist
           test -n "$(find dist -type f -print -quit)"
           test -f dist/deploy-version.txt
           grep -Fx "Commit: $GITHUB_SHA" dist/deploy-version.txt
           grep -Fx "Version: Homepage-v5" dist/deploy-version.txt
+          test -f dist/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/index.html
+          test -f dist/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/index.html
+          test -f dist/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/index.html
           echo "Build erfolgreich; erzeugte Dateien:"
           find dist -type f | sort | head -n 100
 
@@ -85,8 +92,17 @@ jobs:
           SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
-          listing="$(lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" \
-            -e "set sftp:auto-confirm yes; cls -1F $SFTP_REMOTE_DIR; bye")"
+          set -euo pipefail
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; cls -1F .; bye"
+          if ! listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" -e "$lftp_script")"; then
+            exit_code=$?
+            if [ "$exit_code" -eq 124 ]; then
+              echo "::error::Timeout bei Document-Root-Prüfung nach ${SFTP_CHECK_TIMEOUT_SECONDS}s."
+            else
+              echo "::error::Document Root $SFTP_REMOTE_DIR ist nicht erreichbar oder nicht nutzbar (Exit $exit_code)."
+            fi
+            exit 1
+          fi
           printf '%s\n' "$listing"
 
           if printf '%s\n' "$listing" | grep -Eq '(^|/)dist/$'; then
@@ -101,8 +117,17 @@ jobs:
           SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
-          lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" \
-            -e "set sftp:auto-confirm yes; mirror --reverse --verbose --parallel=4 --delete dist/ $SFTP_REMOTE_DIR/; bye"
+          set -euo pipefail
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; mirror --reverse --verbose --parallel=4 dist/ .; bye"
+          if ! timeout "${SFTP_UPLOAD_TIMEOUT_SECONDS}s" lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" -e "$lftp_script"; then
+            exit_code=$?
+            if [ "$exit_code" -eq 124 ]; then
+              echo "::error::Timeout beim Upload nach ${SFTP_UPLOAD_TIMEOUT_SECONDS}s."
+            else
+              echo "::error::Upload nach $SFTP_REMOTE_DIR fehlgeschlagen (Exit $exit_code)."
+            fi
+            exit 1
+          fi
 
       - name: Inhalt des Document Root prüfen
         env:
@@ -111,8 +136,17 @@ jobs:
           SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
-          listing="$(lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" \
-            -e "set sftp:auto-confirm yes; cls -1F $SFTP_REMOTE_DIR; bye")"
+          set -euo pipefail
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; cls -1F .; bye"
+          if ! listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" -e "$lftp_script")"; then
+            exit_code=$?
+            if [ "$exit_code" -eq 124 ]; then
+              echo "::error::Timeout bei Post-Upload-Document-Root-Prüfung nach ${SFTP_CHECK_TIMEOUT_SECONDS}s."
+            else
+              echo "::error::Post-Upload-Prüfung für $SFTP_REMOTE_DIR fehlgeschlagen (Exit $exit_code)."
+            fi
+            exit 1
+          fi
           printf '%s\n' "$listing"
 
           printf '%s\n' "$listing" | grep -Eq '(^|/)index\.html$'
