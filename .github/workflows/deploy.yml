@@ -24,6 +24,7 @@ jobs:
       SFTP_REMOTE_DIR: /sv-netzwerk
       SFTP_CONNECT_TIMEOUT_SECONDS: 25
       SFTP_CHECK_TIMEOUT_SECONDS: 45
+      SFTP_CHECK_ATTEMPTS: 10
       SFTP_UPLOAD_TIMEOUT_SECONDS: 1200
       SFTP_UPLOAD_ATTEMPTS: 10
 
@@ -97,7 +98,7 @@ jobs:
           lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; cls -1F .; bye"
           exit_code=1
           listing=""
-          for attempt in 1 2 3; do
+          for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
             set +e
             listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" -e "$lftp_script")"
             exit_code=$?
@@ -105,8 +106,8 @@ jobs:
             if [ "$exit_code" -eq 0 ]; then
               break
             fi
-            if [ "$attempt" -lt 3 ]; then
-              sleep 5
+            if [ "$attempt" -lt "$SFTP_CHECK_ATTEMPTS" ]; then
+              sleep 15
             fi
           done
           if [ "$exit_code" -ne 0 ]; then
@@ -170,7 +171,7 @@ jobs:
           lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; cls -1F .; bye"
           exit_code=1
           listing=""
-          for attempt in 1 2 3; do
+          for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
             set +e
             listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" -e "$lftp_script")"
             exit_code=$?
@@ -178,8 +179,8 @@ jobs:
             if [ "$exit_code" -eq 0 ]; then
               break
             fi
-            if [ "$attempt" -lt 3 ]; then
-              sleep 5
+            if [ "$attempt" -lt "$SFTP_CHECK_ATTEMPTS" ]; then
+              sleep 15
             fi
           done
           if [ "$exit_code" -ne 0 ]; then
