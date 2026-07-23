@@ -31,3 +31,6 @@ RewriteRule ^netzwerk/?$ /experten/ [R=301,L,NC]
 RewriteRule ^kompetenzzentrum/?$ /leistungen/ [R=301,L,NC]
 RewriteRule ^gutachter-plattform/fuer-versicherungen/?$ /versicherer/ [R=301,L,NC]
 RewriteRule ^gutachter-plattform/fuer-regulierer/?$ /versicherer/ [R=301,L,NC]
+
+# Internal protected record routes routed to static shell
+RewriteRule ^intern/fensterpruefung-bonn/fenster/([^/]+)/?$ /intern/fensterpruefung-bonn/fenster/record/?id=$1 [QSA,L,NC]

@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
+Disallow: /intern/
 Sitemap: https://www.sv-netzwerk.eu/sitemap-index.xml

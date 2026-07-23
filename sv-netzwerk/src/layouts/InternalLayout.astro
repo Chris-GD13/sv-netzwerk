@@ -1,0 +1,47 @@
+---
+import SEO from '../components/SEO.astro';
+import { portalProject } from '../lib/internal/schema';
+import '../styles/global.css';
+import '../styles/internal-portal.css';
+
+interface Props {
+  title: string;
+  description: string;
+  currentPath?: string;
+}
+
+const props = Astro.props;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071a2e" />
+    <meta name="color-scheme" content="light" />
+    <SEO {...props} noindex={true} robotsContent="noindex,nofollow" />
+  </head>
+  <body class="intern-body">
+    <a class="skip-link" href="#intern-main">Zum Inhalt springen</a>
+    <header class="intern-header">
+      <div class="sv-container intern-header__inner">
+        <div>
+          <p class="intern-header__eyebrow">Geschuetztes Pruefportal</p>
+          <strong>{portalProject.title}</strong>
+          <small>{portalProject.objectName}</small>
+        </div>
+        <nav aria-label="Interne Navigation" class="intern-header__nav">
+          <a href="/intern/">Start</a>
+          <a href="/intern/fensterpruefung-bonn/">Dashboard</a>
+          <a href="/intern/fensterpruefung-bonn/fenster/">Fenster</a>
+          <a href="/intern/fensterpruefung-bonn/auswertung/">Auswertung</a>
+          <a href="/intern/fensterpruefung-bonn/export/">Export</a>
+        </nav>
+      </div>
+    </header>
+    <main id="intern-main">
+      <slot />
+    </main>
+  </body>
+</html>

@@ -19,8 +19,9 @@
   "dependencies": {
     "@astrojs/check": "latest",
     "@astrojs/sitemap": "latest",
+    "@supabase/supabase-js": "^2.110.8",
     "astro": "latest",
+    "qrcode": "^1.5.4",
     "typescript": "latest"
-  },
-  "devDependencies": {}
+  }
 }

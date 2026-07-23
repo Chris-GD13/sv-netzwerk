@@ -1,0 +1,30 @@
+---
+import type { PortalRoute } from '../../lib/internal/types';
+
+interface Props {
+  route: PortalRoute;
+  recordId?: string;
+}
+
+const { route, recordId = '' } = Astro.props;
+---
+
+<section class="intern-shell sv-section">
+  <div class="sv-container">
+    <div class="intern-shell__surface">
+      <div data-internal-app data-route={route} data-record-id={recordId}>
+        <div class="intern-loading" aria-live="polite">
+          <p>Interner Bereich wird geladen.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { mountInternalPortal } from '../../lib/internal/client';
+
+  const section = document.currentScript?.previousElementSibling;
+  const root = section instanceof HTMLElement ? section.querySelector('[data-internal-app]') : null;
+  if (root instanceof HTMLElement) mountInternalPortal(root);
+</script>

@@ -19,6 +19,7 @@ export default defineConfig({
         !page.endsWith('/schadenarten/photovoltaik/') &&
         !page.endsWith('/netzwerk/') &&
         !page.endsWith('/kompetenzzentrum/') &&
+        !page.includes('/intern/') &&
         !page.endsWith('/gutachter-plattform/fuer-versicherungen/') &&
         !page.endsWith('/gutachter-plattform/fuer-regulierer/')
     })
