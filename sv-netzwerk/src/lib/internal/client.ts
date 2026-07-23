@@ -8,7 +8,6 @@ import {
   portalProject,
   requiredBeforeCompletion,
   roleLabels,
-  statusOptions,
   windowFormSections,
 } from './schema';
 import { getSupabaseBrowserClient, hasSupabaseConfig } from './supabase';
@@ -306,7 +305,7 @@ async function renderWindows(context: AppContext) {
       const matchFilters = selects.every((select) => {
         const key = select.dataset.filterKey;
         if (!key || !select.value) return true;
-        return String((record as Record<string, unknown>)[key] ?? '') === select.value;
+        return String((record as unknown as Record<string, unknown>)[key] ?? '') === select.value;
       });
       return matchQuery && matchFilters;
     });
@@ -458,7 +457,7 @@ async function renderRecord(context: AppContext) {
     if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement)) return;
     const name = target.name;
     workingCopy[name] = target instanceof HTMLInputElement && target.type === 'checkbox' ? target.checked : target.value;
-    if (name === 'manual_weight_override' && !target.checked) workingCopy.manual_override_reason = '';
+    if (name === 'manual_weight_override' && target instanceof HTMLInputElement && !target.checked) workingCopy.manual_override_reason = '';
     const recalculated = calculateWindowWeights(workingCopy, calculationParameters);
     record.calculated_data = { ...record.calculated_data, ...recalculated };
     scheduleSave();

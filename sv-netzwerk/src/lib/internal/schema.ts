@@ -2,7 +2,7 @@ import type { ExportDefinition, FieldSection, SelectOption, WindowSummary } from
 
 export const portalProject = {
   code: 'fensterpruefung-bonn',
-  title: 'Fensterbeschlagspruefung BMVg Bonn',
+  title: 'Fensterbeschlagsprüfung BMVg Bonn',
   objectName: '1. Dienstsitz des Bundesministeriums der Verteidigung',
   address: 'Fontainengraben 150, 53123 Bonn',
   plannedWindows: 450,
@@ -238,7 +238,7 @@ export const windowFormSections: FieldSection[] = [
     title: 'G. Weitere Beschlagkomponenten',
     fields: [
       ...componentFields.flatMap((component) => [
-        { id: `${component}_state`, label: `${component.replaceAll('_', ' ')} Bewertung`, type: 'select', options: componentStateOptions },
+        { id: `${component}_state`, label: `${component.replaceAll('_', ' ')} Bewertung`, type: 'select' as const, options: componentStateOptions },
       ]),
       { id: 'hardware_components_note', label: 'Freitextfeld weitere Beschlagkomponenten', type: 'textarea' },
     ],
@@ -368,7 +368,7 @@ export function getFieldDefinition(fieldId: string) {
 }
 
 export function getFilterValue(record: WindowSummary, key: string): string {
-  const value = (record as Record<string, unknown>)[key];
+  const value = (record as unknown as Record<string, unknown>)[key];
   if (typeof value === 'boolean') return value ? 'ja' : 'nein';
   return String(value ?? '');
 }
