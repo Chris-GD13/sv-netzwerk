@@ -1,17 +1,17 @@
 {
-  "generatedAt": "2026-07-23T21:28:41.602Z",
+  "generatedAt": "2026-07-23T23:11:16.991Z",
   "timezone": "Europe/Berlin",
   "source": "microsoft-graph",
   "calendarUserId": "cw@sv-schuett.eu",
   "range": {
-    "startIso": "2026-07-23T21:28:41.602Z",
-    "endIso": "2026-08-13T21:28:41.602Z",
+    "startIso": "2026-07-23T23:11:16.991Z",
+    "endIso": "2026-08-13T23:11:16.991Z",
     "horizonDays": 21,
     "backfillDays": 0
   },
   "summary": {
-    "totalEvents": 69,
-    "busyEvents": 68,
+    "totalEvents": 70,
+    "busyEvents": 69,
     "freeEvents": 1
   },
   "calendarStats": {
@@ -629,6 +629,19 @@
           "startLocal": "2026-08-12 11:00",
           "endLocal": "2026-08-12 11:30",
           "isAllDay": false,
+          "showAs": "busy"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-14",
+      "busy": [
+        {
+          "startIso": "2026-08-14T00:00:00.000Z",
+          "endIso": "2026-08-15T00:00:00.000Z",
+          "startLocal": "2026-08-14 02:00",
+          "endLocal": "2026-08-15 02:00",
+          "isAllDay": true,
           "showAs": "busy"
         }
       ]
