@@ -1,0 +1,3 @@
+inspection_number,window_number,object_label,building_label,section_label,floor_label,room_label,room_number,position_in_room,orientation,wing_count,inspected_wing,inspector_name,inspection_date,status
+1,F-001,,Hauptgebaeude,Bauteil A,Erdgeschoss,Besprechung,0.101,links,Nord,1,Fluegel 1,Pruefer 1,2026-07-23,vorbereitet
+2,F-002,,Hauptgebaeude,Bauteil A,Erdgeschoss,Besprechung,0.101,rechts,Nord,1,Fluegel 1,Pruefer 2,2026-07-23,vorbereitet

@@ -1,7 +1,7 @@
 ---
 import { site } from '../data/site';
-interface Props { title: string; description: string; canonical?: string; image?: string; imageAlt?: string; type?: 'website'|'article'; noindex?: boolean; }
-const { title, description, canonical = new URL(Astro.url.pathname, site.url).toString(), image = `${site.url}/og-default.svg`, imageAlt = 'SV-Netzwerk Fachbeitrag', type = 'website', noindex = false } = Astro.props;
+interface Props { title: string; description: string; canonical?: string; image?: string; imageAlt?: string; type?: 'website'|'article'; noindex?: boolean; robotsContent?: string; }
+const { title, description, canonical = new URL(Astro.url.pathname, site.url).toString(), image = `${site.url}/og-default.svg`, imageAlt = 'SV-Netzwerk Fachbeitrag', type = 'website', noindex = false, robotsContent = 'noindex,follow' } = Astro.props;
 const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
 ---
 <title>{fullTitle}</title>
@@ -11,7 +11,7 @@ const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
-{noindex && <meta name="robots" content="noindex,follow" />}
+{noindex && <meta name="robots" content={robotsContent} />}
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:type" content={type} />
