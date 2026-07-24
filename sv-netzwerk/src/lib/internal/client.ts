@@ -113,8 +113,6 @@ export async function mountInternalPortal(root: HTMLElement) {
   };
   window.addEventListener('pagehide', cleanup, { once: true });
   window.addEventListener('beforeunload', cleanup, { once: true });
-  disposers.push(() => window.removeEventListener('pagehide', cleanup));
-  disposers.push(() => window.removeEventListener('beforeunload', cleanup));
 
   await renderRoute(context);
   if (navigator.onLine) void syncDraftQueue(context);
