@@ -24,8 +24,48 @@ const { route, recordId = '' } = Astro.props;
 <script>
   import { mountInternalPortal } from '../../lib/internal/client';
 
+  const renderStartupError = (root: HTMLElement, detail?: string) => {
+    root.classList.add('intern-app');
+    root.innerHTML = `
+      <div class="intern-card intern-login">
+        <p class="sv-eyebrow">Technischer Hinweis</p>
+        <h1>Prüfportal konnte nicht gestartet werden</h1>
+        <p>Die Anwendung hat beim Laden nicht ordnungsgemäß geantwortet.</p>
+        <div class="intern-alert intern-alert--warn">
+          Bitte laden Sie die Seite erneut. Bleibt der Fehler bestehen, müssen Supabase-Konfiguration und Bereitstellung geprüft werden.
+        </div>
+        ${detail ? `<p class="intern-meta">Fehlerhinweis: ${detail.replace(/[<>&"']/g, '')}</p>` : ''}
+        <div class="intern-actions">
+          <button class="sv-button sv-button-primary" type="button" data-reload-portal>Seite neu laden</button>
+          <a class="sv-button sv-button-secondary" href="/intern/login/">Zur Anmeldung</a>
+        </div>
+      </div>
+    `;
+    root.querySelector('[data-reload-portal]')?.addEventListener('click', () => window.location.reload());
+  };
+
   const roots = document.querySelectorAll('[data-internal-app]');
   roots.forEach((root) => {
-    if (root instanceof HTMLElement) mountInternalPortal(root);
+    if (!(root instanceof HTMLElement)) return;
+
+    let settled = false;
+    const timeout = window.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      renderStartupError(root, 'Zeitüberschreitung beim Initialisieren');
+    }, 8000);
+
+    mountInternalPortal(root)
+      .then(() => {
+        settled = true;
+        window.clearTimeout(timeout);
+      })
+      .catch((error: unknown) => {
+        settled = true;
+        window.clearTimeout(timeout);
+        const message = error instanceof Error ? error.message : 'Unbekannter Initialisierungsfehler';
+        console.error('Interne Anwendung konnte nicht gestartet werden:', error);
+        renderStartupError(root, message);
+      });
   });
 </script>
