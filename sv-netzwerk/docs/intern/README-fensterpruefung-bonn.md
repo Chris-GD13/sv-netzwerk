@@ -12,9 +12,11 @@
 ## Umgebungsvariablen
 
 ```env
-PUBLIC_SUPABASE_URL=
+PUBLIC_SUPABASE_URL=https://<projekt-ref>.supabase.co
 PUBLIC_SUPABASE_ANON_KEY=
 ```
+
+Hinweis: Werte ohne Anfuehrungszeichen und ohne fuehrende/nachgestellte Leerzeichen setzen.
 
 ## Supabase-Einrichtung
 
