@@ -67,6 +67,46 @@ jobs:
           NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: "30000"
         run: npm ci --no-audit --no-fund --loglevel=notice
 
+      - name: Supabase-Umgebungsvariablen validieren
+        run: |
+          set -euo pipefail
+
+          normalize_env() {
+            local value="${1//$'\r'/}"
+            value="${value#"${value%%[![:space:]]*}"}"
+            value="${value%"${value##*[![:space:]]}"}"
+            if [[ "$value" =~ ^\".*\"$ ]] || [[ "$value" =~ ^\'.*\'$ ]]; then
+              value="${value:1:${#value}-2}"
+            fi
+            printf '%s' "$value"
+          }
+
+          public_supabase_url="$(normalize_env "${PUBLIC_SUPABASE_URL:-}")"
+          public_supabase_anon_key="$(normalize_env "${PUBLIC_SUPABASE_ANON_KEY:-}")"
+
+          if [ -z "$public_supabase_url" ] || [ -z "$public_supabase_anon_key" ]; then
+            echo "::error::PUBLIC_SUPABASE_URL und PUBLIC_SUPABASE_ANON_KEY muessen gesetzt sein."
+            exit 1
+          fi
+
+          if ! [[ "$public_supabase_url" =~ ^https?:// ]]; then
+            echo "::error::PUBLIC_SUPABASE_URL ist ungueltig: $public_supabase_url"
+            exit 1
+          fi
+
+          public_supabase_url="${public_supabase_url%/}"
+          required_supabase_url='https://rsyuqqddvupbkordzylo.supabase.co'
+          if [ "$public_supabase_url" != "$required_supabase_url" ]; then
+            echo "::error::PUBLIC_SUPABASE_URL muss auf $required_supabase_url zeigen."
+            exit 1
+          fi
+
+          printf 'PUBLIC_SUPABASE_URL=%s\n' "$public_supabase_url" >> "$GITHUB_ENV"
+          printf 'PUBLIC_SUPABASE_ANON_KEY=%s\n' "$public_supabase_anon_key" >> "$GITHUB_ENV"
+          echo "::add-mask::$public_supabase_anon_key"
+
+          printf 'PUBLIC_SUPABASE_URL=%s\nPUBLIC_SUPABASE_ANON_KEY=%s\n' "$public_supabase_url" "$public_supabase_anon_key" > .env.production
+
       - name: Astro-Projekt prüfen und bauen
         run: npm run build
 
