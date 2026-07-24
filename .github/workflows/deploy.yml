@@ -85,12 +85,12 @@ jobs:
           public_supabase_anon_key="$(normalize_env "${PUBLIC_SUPABASE_ANON_KEY:-}")"
 
           if [ -z "$public_supabase_url" ] || [ -z "$public_supabase_anon_key" ]; then
-            echo "::error::PUBLIC_SUPABASE_URL und PUBLIC_SUPABASE_ANON_KEY müssen gesetzt sein."
+            echo "::error::PUBLIC_SUPABASE_URL und PUBLIC_SUPABASE_ANON_KEY muessen gesetzt sein."
             exit 1
           fi
 
           if ! [[ "$public_supabase_url" =~ ^https?:// ]]; then
-            echo "::error::PUBLIC_SUPABASE_URL ist ungültig: $public_supabase_url"
+            echo "::error::PUBLIC_SUPABASE_URL ist ungueltig: $public_supabase_url"
             exit 1
           fi
 
