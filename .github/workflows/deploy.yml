@@ -67,6 +67,35 @@ jobs:
           NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: "30000"
         run: npm ci --no-audit --no-fund --loglevel=notice
 
+      - name: Supabase-Umgebungsvariablen validieren
+        run: |
+          set -euo pipefail
+
+          normalize_env() {
+            local value="${1//$'\r'/}"
+            value="${value#"${value%%[![:space:]]*}"}"
+            value="${value%"${value##*[![:space:]]}"}"
+            if [[ "$value" =~ ^\".*\"$ ]] || [[ "$value" =~ ^\'.*\'$ ]]; then
+              value="${value:1:${#value}-2}"
+            fi
+            printf '%s' "$value"
+          }
+
+          public_supabase_url="$(normalize_env "${PUBLIC_SUPABASE_URL:-}")"
+          public_supabase_anon_key="$(normalize_env "${PUBLIC_SUPABASE_ANON_KEY:-}")"
+
+          if [ -z "$public_supabase_url" ] || [ -z "$public_supabase_anon_key" ]; then
+            echo "::error::PUBLIC_SUPABASE_URL und PUBLIC_SUPABASE_ANON_KEY müssen gesetzt sein."
+            exit 1
+          fi
+
+          if ! [[ "$public_supabase_url" =~ ^https?:// ]]; then
+            echo "::error::PUBLIC_SUPABASE_URL ist ungültig: $public_supabase_url"
+            exit 1
+          fi
+
+          printf 'PUBLIC_SUPABASE_URL=%s\nPUBLIC_SUPABASE_ANON_KEY=%s\n' "$public_supabase_url" "$public_supabase_anon_key" > .env.production
+
       - name: Astro-Projekt prüfen und bauen
         run: npm run build
 
