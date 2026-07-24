@@ -97,7 +97,7 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; cls -1F .; bye"
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set net:prefer-family inet; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; cls -1F .; bye"
           exit_code=1
           listing=""
           for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
@@ -135,7 +135,7 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; mirror --reverse --verbose --parallel=4 dist/ .; bye"
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set net:prefer-family inet; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; mirror --reverse --verbose --parallel=4 dist/ .; bye"
           exit_code=1
           for attempt in $(seq 1 "$SFTP_UPLOAD_ATTEMPTS"); do
             echo "Upload-Versuch $attempt/$SFTP_UPLOAD_ATTEMPTS"
@@ -170,7 +170,7 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; cls -1F .; bye"
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set net:prefer-family inet; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; cls -1F .; bye"
           exit_code=1
           listing=""
           for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
