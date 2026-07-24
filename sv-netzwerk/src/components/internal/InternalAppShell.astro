@@ -24,7 +24,8 @@ const { route, recordId = '' } = Astro.props;
 <script>
   import { mountInternalPortal } from '../../lib/internal/client';
 
-  const section = document.currentScript?.previousElementSibling;
-  const root = section instanceof HTMLElement ? section.querySelector('[data-internal-app]') : null;
-  if (root instanceof HTMLElement) mountInternalPortal(root);
+  const roots = document.querySelectorAll('[data-internal-app]');
+  roots.forEach((root) => {
+    if (root instanceof HTMLElement) mountInternalPortal(root);
+  });
 </script>
