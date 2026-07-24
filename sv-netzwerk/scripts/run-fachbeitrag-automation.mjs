@@ -703,7 +703,8 @@ if (existingSlotRows.length > 0) {
   process.exit(0);
 }
 
-const caseContext = await loadCalendarCaseContext();
+const rawCaseContext = await loadCalendarCaseContext();
+const caseContext = isWeekend ? null : rawCaseContext;
 const weekdayRegional = !isWeekend && !caseContext;
 let regionalSignal = null;
 if (weekdayRegional) {

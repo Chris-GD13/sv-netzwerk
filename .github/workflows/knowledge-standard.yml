@@ -30,9 +30,7 @@ jobs:
   publish-and-notify:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    # DEAKTIVIERT: Veröffentlichungssperre aktiv – keine automatischen Fachbeiträge bis zur Freigabe.
-    # Ursprüngliche Bedingung: vars.FACHBEITRAG_AUTOMATION_ENABLED != 'false'
-    if: ${{ false }}
+    if: ${{ vars.FACHBEITRAG_AUTOMATION_ENABLED != 'false' }}
     defaults:
       run:
         working-directory: sv-netzwerk
@@ -176,7 +174,7 @@ jobs:
         run: node scripts/update-fachbeitrag-log.mjs --deploy=success --live=success
 
       - name: LinkedIn-Zap auslösen (nach erfolgreichem Live-Check)
-        if: steps.generate.outputs.status == 'generated' && env.PUBLICATION_SLOT == 'morning'
+        if: steps.generate.outputs.status == 'generated'
         env:
           WEBHOOK_URL: ${{ secrets.ZAPIER_WEBHOOK_URL }}
         run: |
@@ -209,20 +207,15 @@ jobs:
           echo "LINKEDIN_OK=true" >> "$GITHUB_ENV"
 
       - name: Veröffentlichungsprotokoll nach LinkedIn aktualisieren
-        if: steps.generate.outputs.status == 'generated' && env.PUBLICATION_SLOT == 'morning'
+        if: steps.generate.outputs.status == 'generated'
         run: node scripts/update-fachbeitrag-log.mjs --linkedin=success
-
-      - name: Veröffentlichungsprotokoll für Nachmittagslauf markieren
-        if: steps.generate.outputs.status == 'generated' && env.PUBLICATION_SLOT != 'morning'
-        run: node scripts/update-fachbeitrag-log.mjs --linkedin=skipped
 
       - name: Fehlstatus ins Veröffentlichungsprotokoll schreiben
         if: failure() && steps.generate.outputs.status == 'generated'
         run: |
           DEPLOY_STATUS="failed"
           LIVE_STATUS="failed"
-          LINKEDIN_STATUS="failed"
-          if [ "$PUBLICATION_SLOT" != "morning" ]; then LINKEDIN_STATUS="skipped"; fi
+          LINKEDIN_STATUS="skipped"
           if [ "${DEPLOY_OK}" = "true" ]; then DEPLOY_STATUS="success"; fi
           if [ "${LIVE_OK}" = "true" ]; then LIVE_STATUS="success"; fi
           if [ "${LINKEDIN_OK}" = "true" ]; then LINKEDIN_STATUS="success"; fi
