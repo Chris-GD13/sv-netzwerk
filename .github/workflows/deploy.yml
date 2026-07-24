@@ -94,6 +94,17 @@ jobs:
             exit 1
           fi
 
+          public_supabase_url="${public_supabase_url%/}"
+          required_supabase_url='https://rsyuqqddvupbkordzylo.supabase.co'
+          if [ "$public_supabase_url" != "$required_supabase_url" ]; then
+            echo "::error::PUBLIC_SUPABASE_URL muss auf $required_supabase_url zeigen."
+            exit 1
+          fi
+
+          printf 'PUBLIC_SUPABASE_URL=%s\n' "$public_supabase_url" >> "$GITHUB_ENV"
+          printf 'PUBLIC_SUPABASE_ANON_KEY=%s\n' "$public_supabase_anon_key" >> "$GITHUB_ENV"
+          echo "::add-mask::$public_supabase_anon_key"
+
           printf 'PUBLIC_SUPABASE_URL=%s\nPUBLIC_SUPABASE_ANON_KEY=%s\n' "$public_supabase_url" "$public_supabase_anon_key" > .env.production
 
       - name: Astro-Projekt prüfen und bauen
