@@ -1,6 +1,5 @@
 import QRCode from 'qrcode';
-import type { AuthChangeEvent, Session, SupabaseClient, User } from '@supabase/supabase-js';
-import { calculateWindowWeights, normalizeCalculationParameters } from './calculations';
+import { calculateWindowWeights } from './calculations';
 import { loadAllDrafts, loadDraft, removeDraft, saveDraft } from './offline';
 import {
   exportDefinitions,
@@ -10,10 +9,28 @@ import {
   roleLabels,
   windowFormSections,
 } from './schema';
-import { getSupabaseBrowserClient, hasSupabaseConfig } from './supabase';
+import {
+  apiLogin,
+  apiLogout,
+  apiResetPassword,
+  apiListWindows,
+  apiGetWindow,
+  apiCreateWindow,
+  apiSaveWindow,
+  apiAcquireLock,
+  apiReleaseLock,
+  apiGetActiveLocks,
+  apiGetAuditLog,
+  apiListPhotos,
+  apiUploadPhoto,
+  apiDeletePhoto,
+  apiGetCalculationParameters,
+  apiLogExport,
+  loadApiUser,
+  onAuthChange,
+} from './php-api';
 import type {
   AuditLogEntry,
-  CalculationParameterMap,
   DashboardStats,
   LockResult,
   PhotoItem,
@@ -28,68 +45,28 @@ interface AppContext {
   root: HTMLElement;
   route: PortalRoute;
   recordId: string | null;
-  supabase: SupabaseClient | null;
-  session: Session | null;
   user: PortalUser | null;
   draftDirty: boolean;
-}
-
-interface WindowPayload {
-  id: string;
-  project_id?: string;
-  record_id: string;
-  inspection_number: number | null;
-  window_number: string;
-  room_number: string | null;
-  room_label: string | null;
-  building_label: string | null;
-  section_label: string | null;
-  floor_label: string | null;
-  status: string;
-  overall_rating: string | null;
-  priority: string | null;
-  accessibility_status: string | null;
-  assigned_to: string | null;
-  assigned_name: string | null;
-  special_inspection_required: boolean | null;
-  urgent_action_required: boolean | null;
-  has_defect: boolean | null;
-  danger_immediate: boolean | null;
-  last_edited_at: string | null;
-  updated_at: string;
-  progress_percent: number | null;
-  form_data: Record<string, unknown> | null;
-  calculated_data: Record<string, unknown> | null;
-  completed_at?: string | null;
-  released_at?: string | null;
-  release_reason?: string | null;
-  version?: number | null;
 }
 
 const LOCK_TIMEOUT_MINUTES = 15;
 const SAVE_DEBOUNCE_MS = 1200;
 const SYNC_WARNING_MESSAGE = 'Es liegen noch nicht synchronisierte Aenderungen vor.';
-const DEFAULT_PROJECT_ID = '11111111-1111-4111-8111-111111111111';
 
-const authListeners = new Set<(event: AuthChangeEvent, session: Session | null) => void>();
-let authSubscription: { unsubscribe: () => void } | null = null;
-let authSupabaseClient: SupabaseClient | null = null;
+const authListeners = new Set<(user: PortalUser | null) => void>();
 
 export async function mountInternalPortal(root: HTMLElement) {
   if (root.dataset.internalPortalMounted === 'true') return;
   root.dataset.internalPortalMounted = 'true';
   const route = (root.dataset.route as PortalRoute | undefined) ?? 'landing';
   const recordId = root.dataset.recordId || new URLSearchParams(window.location.search).get('id');
-  const supabase = getSupabaseBrowserClient();
-  const session = supabase ? (await supabase.auth.getSession()).data.session : null;
-  const user = session && supabase ? await loadPortalUser(supabase, session.user) : null;
-  const context: AppContext = { root, route, recordId, supabase, session, user, draftDirty: false };
+  const user = await loadApiUser();
+  const context: AppContext = { root, route, recordId, user, draftDirty: false };
   const disposers: Array<() => void> = [];
 
   root.classList.add('intern-app');
   const unbindAuth = bindAuthListener(context);
   disposers.push(unbindAuth);
-
   const onlineHandler = () => void syncDraftQueue(context);
   window.addEventListener('online', onlineHandler);
   disposers.push(() => window.removeEventListener('online', onlineHandler));
@@ -119,52 +96,25 @@ export async function mountInternalPortal(root: HTMLElement) {
 }
 
 function bindAuthListener(context: AppContext) {
-  if (!context.supabase) return () => {};
-
-  const handleAuthEvent = async (event: AuthChangeEvent, session: Session | null) => {
-    if (!['INITIAL_SESSION', 'SIGNED_IN', 'SIGNED_OUT', 'TOKEN_REFRESHED', 'USER_UPDATED', 'PASSWORD_RECOVERY'].includes(event)) {
-      return;
-    }
-    context.session = session;
-    context.user = session ? await loadPortalUser(context.supabase!, session.user) : null;
-    if (event === 'SIGNED_OUT' && context.route !== 'login') {
+  const handleChange = async (user: PortalUser | null) => {
+    context.user = user;
+    if (!user && context.route !== 'login') {
       redirectTo('/intern/login/');
       return;
     }
     await renderRoute(context);
   };
 
-  const listener = (event: AuthChangeEvent, session: Session | null) => {
-    void handleAuthEvent(event, session);
-  };
-  authListeners.add(listener);
-
-  if (!authSubscription || authSupabaseClient !== context.supabase) {
-    authSubscription?.unsubscribe();
-    authSupabaseClient = context.supabase;
-    authSubscription = context.supabase.auth.onAuthStateChange((event, session) => {
-      for (const listener of Array.from(authListeners)) {
-        listener(event, session);
-      }
-    }).data.subscription;
-  }
+  authListeners.add(handleChange);
+  const unsubscribe = onAuthChange(handleChange);
 
   return () => {
-    authListeners.delete(listener);
-    if (!authListeners.size) {
-      authSubscription?.unsubscribe();
-      authSubscription = null;
-      authSupabaseClient = null;
-    }
+    authListeners.delete(handleChange);
+    unsubscribe();
   };
 }
 
 async function renderRoute(context: AppContext) {
-  if (!hasSupabaseConfig()) {
-    context.root.innerHTML = renderConfigMissing();
-    return;
-  }
-
   if (context.route !== 'login' && !context.user) {
     redirectTo('/intern/login/');
     return;
@@ -193,17 +143,6 @@ async function renderRoute(context: AppContext) {
       await renderExport(context);
       break;
   }
-}
-
-function renderConfigMissing() {
-  return `
-    <div class="intern-card intern-login">
-      <p class="sv-eyebrow">Einrichtung erforderlich</p>
-      <h1>Supabase-Konfiguration fehlt</h1>
-      <p>Setzen Sie <code>PUBLIC_SUPABASE_URL</code> und <code>PUBLIC_SUPABASE_ANON_KEY</code>, fuehren Sie die SQL-Migrationen aus und legen Sie Benutzerkonten an.</p>
-      <div class="intern-alert intern-alert--warn">Die interne Anwendung wird erst nach abgeschlossener Supabase-Einrichtung funktionsfaehig.</div>
-    </div>
-  `;
 }
 
 function renderLanding(context: AppContext) {
@@ -254,12 +193,12 @@ function renderLogin(context: AppContext) {
   const resetButton = context.root.querySelector<HTMLButtonElement>('#reset-password');
   form?.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!context.supabase || !message) return;
+    if (!message) return;
     const email = String(new FormData(form).get('email') ?? '');
     const password = String(new FormData(form).get('password') ?? '');
     message.innerHTML = infoAlert('Anmeldung wird geprueft.');
-    const { error } = await context.supabase.auth.signInWithPassword({ email, password });
-    if (error) {
+    const { user, error } = await apiLogin(email, password);
+    if (error || !user) {
       message.innerHTML = errorAlert('Anmeldung fehlgeschlagen. Bitte Zugangsdaten pruefen.');
       return;
     }
@@ -267,16 +206,14 @@ function renderLogin(context: AppContext) {
     redirectTo('/intern/fensterpruefung-bonn/');
   });
   resetButton?.addEventListener('click', async () => {
-    if (!context.supabase || !message || !form) return;
+    if (!message || !form) return;
     const email = String(new FormData(form).get('email') ?? '');
     if (!email) {
       message.innerHTML = warnAlert('Bitte zuerst die E-Mail-Adresse eingeben.');
       return;
     }
-    const { error } = await context.supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/intern/login/`,
-    });
-    message.innerHTML = error ? errorAlert('Passwort-Zuruecksetzung konnte nicht gestartet werden.') : successAlert('Passwort-Zuruecksetzung ausgelöst.');
+    const { error } = await apiResetPassword(email);
+    message.innerHTML = error ? errorAlert('Passwort-Zuruecksetzung konnte nicht gestartet werden.') : successAlert('Passwort-Zuruecksetzung ausgeloest.');
   });
 }
 
@@ -491,7 +428,7 @@ async function renderRecord(context: AppContext) {
   const scheduleSave = debounce(async () => {
     context.draftDirty = true;
     await persistDraft(id, workingCopy, record.calculated_data, form);
-    if (navigator.onLine && context.supabase && canEdit && (!lock || lock.ok)) {
+    if (navigator.onLine && context.user && canEdit && (!lock || lock.ok)) {
       await saveWindow(context, record, workingCopy, false);
     }
   }, SAVE_DEBOUNCE_MS);
@@ -509,7 +446,7 @@ async function renderRecord(context: AppContext) {
 
   saveButton?.addEventListener('click', async () => {
     await persistDraft(id, workingCopy, record.calculated_data, form);
-    if (navigator.onLine && context.supabase && canEdit && (!lock || lock.ok)) await saveWindow(context, record, workingCopy, true);
+    if (navigator.onLine && context.user && canEdit && (!lock || lock.ok)) await saveWindow(context, record, workingCopy, true);
   });
 
   completeButton?.addEventListener('click', async () => {
@@ -528,7 +465,7 @@ async function renderRecord(context: AppContext) {
   });
 
   logoutButton?.addEventListener('click', async () => {
-    if (context.supabase) await context.supabase.auth.signOut();
+    await apiLogout();
     redirectTo('/intern/login/');
   });
 
@@ -617,40 +554,15 @@ async function renderExport(context: AppContext) {
   });
 }
 
-async function fetchWindowSummaries(context: AppContext): Promise<WindowSummary[]> {
-  if (!context.supabase) return [];
-  const { data, error } = await context.supabase
-    .from('windows')
-    .select('id, record_id, inspection_number, window_number, room_number, room_label, building_label, section_label, floor_label, status, overall_rating, priority, accessibility_status, assigned_to, assigned_name, special_inspection_required, urgent_action_required, has_defect, danger_immediate, last_edited_at, updated_at, progress_percent')
-    .is('deleted_at', null)
-    .order('inspection_number', { ascending: true });
-  if (error || !data) return [];
-  const locks = await fetchActiveLocks(context);
-  return data.map((item) => {
-    const lock = locks.get(item.id as string);
+async function fetchWindowSummaries(_context: AppContext): Promise<WindowSummary[]> {
+  const records = await apiListWindows();
+  const locks = await apiGetActiveLocks();
+  return records.map((item) => {
+    const lock = locks.get(String(item.id));
     return {
+      ...item,
       id: String(item.id),
-      record_id: String(item.record_id ?? item.id),
-      inspection_number: toNumber(item.inspection_number),
-      window_number: String(item.window_number ?? ''),
-      room_number: item.room_number ? String(item.room_number) : null,
-      room_label: item.room_label ? String(item.room_label) : null,
-      building_label: item.building_label ? String(item.building_label) : null,
-      section_label: item.section_label ? String(item.section_label) : null,
-      floor_label: item.floor_label ? String(item.floor_label) : null,
-      status: String(item.status ?? 'nicht begonnen') as WindowRecord['status'],
-      overall_rating: item.overall_rating ? String(item.overall_rating) : null,
-      priority: item.priority ? String(item.priority) : null,
-      accessibility_status: item.accessibility_status ? String(item.accessibility_status) : null,
-      assigned_to: item.assigned_to ? String(item.assigned_to) : null,
-      assigned_name: item.assigned_name ? String(item.assigned_name) : null,
-      special_inspection_required: Boolean(item.special_inspection_required),
-      urgent_action_required: Boolean(item.urgent_action_required),
-      has_defect: Boolean(item.has_defect),
-      danger_immediate: Boolean(item.danger_immediate),
-      last_edited_at: item.last_edited_at ? String(item.last_edited_at) : null,
-      updated_at: String(item.updated_at),
-      progress_percent: toNumber(item.progress_percent) ?? 0,
+      record_id: String(item.record_id),
       lock_owner_id: lock?.owner_id ?? null,
       lock_owner_name: lock?.owner_name ?? null,
       lock_expires_at: lock?.expires_at ?? null,
@@ -658,66 +570,8 @@ async function fetchWindowSummaries(context: AppContext): Promise<WindowSummary[
   });
 }
 
-async function fetchActiveLocks(context: AppContext) {
-  const result = new Map<string, { owner_id: string | null; owner_name: string | null; expires_at: string | null }>();
-  if (!context.supabase) return result;
-  const { data } = await context.supabase
-    .from('record_locks')
-    .select('window_id, owner_id, owner_name, expires_at')
-    .gt('expires_at', new Date().toISOString());
-  data?.forEach((item) => {
-    result.set(String(item.window_id), {
-      owner_id: item.owner_id ? String(item.owner_id) : null,
-      owner_name: item.owner_name ? String(item.owner_name) : null,
-      expires_at: item.expires_at ? String(item.expires_at) : null,
-    });
-  });
-  return result;
-}
-
-async function fetchWindowRecord(context: AppContext, id: string): Promise<WindowRecord | null> {
-  if (!context.supabase) return null;
-  const { data, error } = await context.supabase
-    .from('windows')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
-  if (error || !data) return null;
-  return hydrateRecord(data as WindowPayload);
-}
-
-function hydrateRecord(data: WindowPayload): WindowRecord {
-  return {
-    id: data.id,
-    project_id: data.project_id ?? DEFAULT_PROJECT_ID,
-    record_id: data.record_id,
-    inspection_number: data.inspection_number,
-    window_number: data.window_number,
-    room_number: data.room_number,
-    room_label: data.room_label,
-    building_label: data.building_label,
-    section_label: data.section_label,
-    floor_label: data.floor_label,
-    status: data.status as WindowRecord['status'],
-    overall_rating: data.overall_rating,
-    priority: data.priority,
-    accessibility_status: data.accessibility_status,
-    assigned_to: data.assigned_to,
-    assigned_name: data.assigned_name,
-    special_inspection_required: Boolean(data.special_inspection_required),
-    urgent_action_required: Boolean(data.urgent_action_required),
-    has_defect: Boolean(data.has_defect),
-    danger_immediate: Boolean(data.danger_immediate),
-    last_edited_at: data.last_edited_at,
-    updated_at: data.updated_at,
-    progress_percent: data.progress_percent ?? 0,
-    form_data: data.form_data ?? {},
-    calculated_data: data.calculated_data ?? {},
-    completed_at: data.completed_at ?? null,
-    released_at: data.released_at ?? null,
-    release_reason: data.release_reason ?? null,
-    version: data.version ?? 1,
-  };
+async function fetchWindowRecord(_context: AppContext, id: string): Promise<WindowRecord | null> {
+  return apiGetWindow(id);
 }
 
 function mergeRecordWithDraft(record: WindowRecord, draft: Awaited<ReturnType<typeof loadDraft>>) {
@@ -730,79 +584,16 @@ function mergeRecordWithDraft(record: WindowRecord, draft: Awaited<ReturnType<ty
   };
 }
 
-async function fetchAuditLogs(context: AppContext, windowId: string): Promise<AuditLogEntry[]> {
-  if (!context.supabase) return [];
-  const { data } = await context.supabase
-    .from('audit_logs')
-    .select('id, action_type, field_name, old_value, new_value, reason, created_at, actor_name')
-    .eq('window_id', windowId)
-    .order('created_at', { ascending: false })
-    .limit(20);
-  return (data ?? []).map((item) => ({
-    id: String(item.id),
-    action_type: String(item.action_type ?? ''),
-    field_name: item.field_name ? String(item.field_name) : null,
-    old_value: item.old_value ? String(item.old_value) : null,
-    new_value: item.new_value ? String(item.new_value) : null,
-    reason: item.reason ? String(item.reason) : null,
-    created_at: String(item.created_at),
-    actor_name: item.actor_name ? String(item.actor_name) : null,
-  }));
+async function fetchAuditLogs(_context: AppContext, windowId: string): Promise<AuditLogEntry[]> {
+  return apiGetAuditLog(windowId);
 }
 
-async function fetchPhotos(context: AppContext, windowId: string): Promise<PhotoItem[]> {
-  if (!context.supabase) return [];
-  const { data } = await context.supabase
-    .from('photos')
-    .select('id, window_id, category, caption, file_name, taken_at, inspector_name, storage_path')
-    .eq('window_id', windowId)
-    .is('deleted_at', null)
-    .order('created_at', { ascending: false });
-  return (data ?? []).map((item) => ({
-    id: String(item.id),
-    window_id: String(item.window_id),
-    category: String(item.category ?? ''),
-    caption: item.caption ? String(item.caption) : null,
-    file_name: String(item.file_name ?? ''),
-    taken_at: item.taken_at ? String(item.taken_at) : null,
-    inspector_name: item.inspector_name ? String(item.inspector_name) : null,
-    storage_path: String(item.storage_path ?? ''),
-  }));
+async function fetchPhotos(_context: AppContext, windowId: string): Promise<PhotoItem[]> {
+  return apiListPhotos(windowId);
 }
 
-async function fetchCalculationParameters(context: AppContext): Promise<CalculationParameterMap> {
-  if (!context.supabase) return normalizeCalculationParameters(null);
-  const { data } = await context.supabase
-    .from('calculation_parameters')
-    .select('parameter_key, parameter_value')
-    .is('project_id', null);
-  const parameters: Partial<CalculationParameterMap> = {};
-  data?.forEach((item) => {
-    if (item.parameter_key === 'glassDensityKgPerM2Mm') parameters.glassDensityKgPerM2Mm = toNumber(item.parameter_value) ?? undefined;
-    if (item.parameter_key === 'frameWeightFactor') parameters.frameWeightFactor = toNumber(item.parameter_value) ?? undefined;
-    if (item.parameter_key === 'safetyFactor') parameters.safetyFactor = toNumber(item.parameter_value) ?? undefined;
-  });
-  return normalizeCalculationParameters(parameters);
-}
-
-async function loadPortalUser(supabase: SupabaseClient, user: User): Promise<PortalUser | null> {
-  const { data } = await supabase
-    .from('profiles')
-    .select('id, email, full_name, role, is_active')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!data) return null;
-  return {
-    id: user.id,
-    email: user.email ?? data.email ?? '',
-    profile: {
-      id: String(data.id),
-      email: data.email ? String(data.email) : null,
-      full_name: data.full_name ? String(data.full_name) : null,
-      role: String(data.role ?? 'pruefer') as PortalRole,
-      is_active: Boolean(data.is_active ?? true),
-    },
-  };
+async function fetchCalculationParameters(_context: AppContext) {
+  return apiGetCalculationParameters();
 }
 
 function createDashboardStats(records: WindowSummary[]): DashboardStats {
@@ -1019,39 +810,10 @@ async function persistDraft(windowId: string, data: Record<string, unknown>, cal
 }
 
 async function saveWindow(context: AppContext, record: WindowRecord, data: Record<string, unknown>, explicitSave: boolean) {
-  if (!context.supabase || !context.user) return;
-  const summary = deriveSummaryColumns(record.id, data, context.user);
-  const payload = {
-    id: record.id,
-    project_id: record.project_id,
-    record_id: record.record_id,
-    inspection_number: toNumber(data.inspection_number) ?? record.inspection_number,
-    window_number: String(data.window_number ?? record.window_number ?? ''),
-    room_number: stringOrNull(data.room_number),
-    room_label: stringOrNull(data.room_label),
-    building_label: stringOrNull(data.building_label),
-    section_label: stringOrNull(data.section_label),
-    floor_label: stringOrNull(data.floor_label),
-    accessibility_status: stringOrNull(data.accessibility_status),
-    status: String(data.status ?? record.status ?? 'in Bearbeitung'),
-    overall_rating: stringOrNull(data.overall_rating),
-    priority: stringOrNull(data.priority),
-    assigned_to: context.user.id,
-    assigned_name: context.user.profile.full_name ?? context.user.email,
-    special_inspection_required: Boolean(data.special_inspection_required || data.scissor_special_inspection),
-    urgent_action_required: Boolean(data.urgent_action_required),
-    has_defect: hasDefect(data),
-    danger_immediate: Boolean(data.danger_immediate),
-    progress_percent: summary.progressPercent,
-    form_data: data,
-    calculated_data: record.calculated_data,
-    last_edited_at: new Date().toISOString(),
-    completed_at: String(data.status ?? '') === 'Pruefung abgeschlossen' ? new Date().toISOString() : record.completed_at,
-    release_reason: stringOrNull(data.release_reason),
-  };
-  const { error } = await context.supabase.from('windows').upsert(payload).select('id').single();
+  if (!context.user) return;
+  const { error } = await apiSaveWindow(record.id, data, record.calculated_data);
   if (error) {
-    showInlineMessage(context.root, errorAlert('Datensatz konnte nicht gespeichert werden.')); 
+    showInlineMessage(context.root, errorAlert('Datensatz konnte nicht gespeichert werden.'));
     return;
   }
   await removeDraft(record.id);
@@ -1086,8 +848,7 @@ function hasDefect(data: Record<string, unknown>) {
 }
 
 async function createWindowRecord(context: AppContext, sourceId: string | null) {
-  if (!context.supabase || !context.user) return null;
-  const id = crypto.randomUUID();
+  if (!context.user) return null;
   let formData: Record<string, unknown> = {
     status: 'nicht begonnen',
     inspection_date: new Date().toISOString().slice(0, 10),
@@ -1100,47 +861,11 @@ async function createWindowRecord(context: AppContext, sourceId: string | null) 
       delete formData.release_reason;
     }
   }
-  const { error } = await context.supabase.from('windows').insert({
-    id,
-    project_id: DEFAULT_PROJECT_ID,
-    record_id: `BMVG-${id.slice(0, 8).toUpperCase()}`,
-    inspection_number: null,
-    window_number: String(formData.window_number ?? ''),
-    room_number: stringOrNull(formData.room_number),
-    room_label: stringOrNull(formData.room_label),
-    building_label: stringOrNull(formData.building_label),
-    section_label: stringOrNull(formData.section_label),
-    floor_label: stringOrNull(formData.floor_label),
-    status: String(formData.status ?? 'nicht begonnen'),
-    assigned_to: context.user.id,
-    assigned_name: context.user.profile.full_name ?? context.user.email,
-    form_data: formData,
-    calculated_data: {},
-    progress_percent: 0,
-  });
-  if (error) {
-    showInlineMessage(context.root, errorAlert('Neuer Datensatz konnte nicht angelegt werden.'));
-    return null;
-  }
-  return { id };
+  return apiCreateWindow(formData);
 }
 
 async function acquireLock(context: AppContext, windowId: string): Promise<LockResult | null> {
-  if (!context.supabase) return null;
-  const { data, error } = await context.supabase.rpc('acquire_record_lock', {
-    p_window_id: windowId,
-    p_timeout_minutes: LOCK_TIMEOUT_MINUTES,
-  });
-  if (error) return { ok: false, message: 'Datensatzsperre konnte nicht gesetzt werden.' };
-  const response = Array.isArray(data) ? data[0] : data;
-  return {
-    ok: Boolean(response?.ok),
-    lock_id: response?.lock_id ? String(response.lock_id) : undefined,
-    owner_id: response?.owner_id ? String(response.owner_id) : null,
-    owner_name: response?.owner_name ? String(response.owner_name) : null,
-    expires_at: response?.expires_at ? String(response.expires_at) : null,
-    message: response?.message ? String(response.message) : undefined,
-  };
+  return apiAcquireLock(windowId, LOCK_TIMEOUT_MINUTES);
 }
 
 function activateLockMaintenance(context: AppContext, windowId: string) {
@@ -1149,42 +874,25 @@ function activateLockMaintenance(context: AppContext, windowId: string) {
   document.addEventListener('pointerdown', markActivity, { passive: true });
   document.addEventListener('keydown', markActivity);
   const interval = window.setInterval(async () => {
-    if (!context.supabase) return;
     const inactiveMinutes = (Date.now() - lastActivity) / 1000 / 60;
     if (inactiveMinutes >= LOCK_TIMEOUT_MINUTES) {
       await releaseLock(context, windowId);
       window.clearInterval(interval);
       return;
     }
-    await context.supabase.rpc('acquire_record_lock', { p_window_id: windowId, p_timeout_minutes: LOCK_TIMEOUT_MINUTES });
+    await apiAcquireLock(windowId, LOCK_TIMEOUT_MINUTES);
   }, 60_000);
   window.addEventListener('beforeunload', () => void releaseLock(context, windowId), { once: true });
 }
 
 async function releaseLock(context: AppContext, windowId: string) {
-  if (!context.supabase) return;
-  await context.supabase.rpc('release_record_lock', { p_window_id: windowId });
+  await apiReleaseLock(windowId);
 }
 
 async function uploadPhotos(context: AppContext, windowId: string, files: File[], category: string, caption: string) {
-  if (!context.supabase || !context.user) return [];
   for (const file of files) {
     const resized = await resizeImageIfNeeded(file);
-    const fileName = `${windowId}/${crypto.randomUUID()}-${sanitizeFileName(file.name)}`;
-    const { error: uploadError } = await context.supabase.storage
-      .from('window-photos-private')
-      .upload(fileName, resized, { contentType: resized.type || file.type, upsert: false });
-    if (uploadError) continue;
-    await context.supabase.from('photos').insert({
-      window_id: windowId,
-      category,
-      caption: caption || null,
-      file_name: file.name,
-      storage_path: fileName,
-      inspector_id: context.user.id,
-      inspector_name: context.user.profile.full_name ?? context.user.email,
-      taken_at: new Date().toISOString(),
-    });
+    await apiUploadPhoto(windowId, resized, category, caption);
   }
   return fetchPhotos(context, windowId);
 }
@@ -1194,10 +902,8 @@ function bindPhotoDeletion(context: AppContext, windowId: string, scope?: Parent
     button.onclick = async () => {
       if (!window.confirm('Foto wirklich loeschen?')) return;
       const id = button.dataset.deletePhoto;
-      const path = button.dataset.storagePath;
-      if (!id || !path || !context.supabase) return;
-      await context.supabase.storage.from('window-photos-private').remove([path]);
-      await context.supabase.from('photos').update({ deleted_at: new Date().toISOString() }).eq('id', id);
+      if (!id) return;
+      await apiDeletePhoto(id);
       const gallery = context.root.querySelector<HTMLElement>('#photo-gallery');
       if (gallery) gallery.innerHTML = renderPhotos(await fetchPhotos(context, windowId));
       bindPhotoDeletion(context, windowId, gallery ?? undefined);
@@ -1234,7 +940,7 @@ async function resizeImageIfNeeded(file: File) {
 }
 
 async function syncDraftQueue(context: AppContext) {
-  if (!context.supabase || !context.user) return;
+  if (!context.user) return;
   const drafts = await loadAllDrafts();
   for (const draft of drafts) {
     const record = await fetchWindowRecord(context, draft.windowId);
@@ -1264,15 +970,7 @@ async function exportRecords(context: AppContext, exportId: string, records: Win
     record.updated_at,
   ].map((value) => quoteCsv(value, delimiter)).join(delimiter))].join('\n');
   downloadBlob(`${definition.id}-${new Date().toISOString().slice(0, 10)}.csv`, csv, 'text/csv;charset=utf-8');
-  if (context.supabase && context.user) {
-    await context.supabase.from('export_logs').insert({
-      project_id: DEFAULT_PROJECT_ID,
-      export_type: definition.title,
-      exported_by: context.user.id,
-      file_name: `${definition.id}.csv`,
-      filter_snapshot: { exportId, rowCount: rows.length },
-    });
-  }
+  void apiLogExport(definition.title, `${definition.id}.csv`, { exportId, rowCount: rows.length });
 }
 
 async function printSummary(records: WindowSummary[]) {
@@ -1349,22 +1047,12 @@ function successAlert(text: string) { return `<div class="intern-alert intern-al
 function warnAlert(text: string) { return `<div class="intern-alert intern-alert--warn">${escapeHtml(text)}</div>`; }
 function errorAlert(text: string) { return `<div class="intern-alert intern-alert--error">${escapeHtml(text)}</div>`; }
 
-function subscribeToWindowChanges(context: AppContext, handler: () => void) {
-  if (!context.supabase) return;
-  const channel = context.supabase
-    .channel(`windows-list-${context.route}`)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'windows' }, handler)
-    .subscribe();
-  window.addEventListener('beforeunload', () => void context.supabase?.removeChannel(channel), { once: true });
+function subscribeToWindowChanges(_context: AppContext, _handler: () => void) {
+  // Realtime via Polling ersetzt Supabase-Channels; nicht implementiert da Polling genügt.
 }
 
-function subscribeToSingleRecord(context: AppContext, id: string, handler: () => Promise<void>) {
-  if (!context.supabase) return;
-  const channel = context.supabase
-    .channel(`window-record-${id}`)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'windows', filter: `id=eq.${id}` }, () => { void handler(); })
-    .subscribe();
-  window.addEventListener('beforeunload', () => void context.supabase?.removeChannel(channel), { once: true });
+function subscribeToSingleRecord(_context: AppContext, _id: string, _handler: () => Promise<void>) {
+  // Realtime via Polling ersetzt Supabase-Channels; nicht implementiert da Polling genügt.
 }
 
 function showInlineMessage(root: HTMLElement, html: string) {

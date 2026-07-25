@@ -1,0 +1,13 @@
+# API-Verzeichnis – Fensterbeschlagsprüfung BMVg Bonn
+Options -Indexes
+AddDefaultCharset UTF-8
+
+# PHP ausführen
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+# JSON-Antworten für alle PHP-Dateien
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "DENY"
+Header always set Cache-Control "no-store"
