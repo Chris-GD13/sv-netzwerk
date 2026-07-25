@@ -178,10 +178,6 @@ jobs:
 
           sftp_host="$ionos_sftp_host"
 
-          if [ -z "$sftp_host" ]; then
-            echo "::error::SFTP_HOST ist nicht gesetzt."
-            exit 1
-          fi
           if [ -z "$sftp_port" ]; then
             echo "::error::SFTP_PORT ist nicht gesetzt."
             exit 1
