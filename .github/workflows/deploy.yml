@@ -76,8 +76,10 @@ jobs:
             local value="${1//$'\r'/}"
             value="${value#"${value%%[![:space:]]*}"}"
             value="${value%"${value##*[![:space:]]}"}"
-            if [[ "$value" =~ ^\".*\"$ ]] || [[ "$value" =~ ^\'.*\'$ ]]; then
-              value="${value:1:${#value}-2}"
+            if [[ "$value" =~ ^\"(.*)\"$ ]]; then
+              value="${BASH_REMATCH[1]}"
+            elif [[ "$value" =~ ^\'(.*)\'$ ]]; then
+              value="${BASH_REMATCH[1]}"
             fi
             printf '%s' "$value"
           }
@@ -133,17 +135,139 @@ jobs:
       - name: SFTP-Werkzeug installieren
         run: |
           sudo apt-get update
-          sudo apt-get install --yes lftp
+          sudo apt-get install --yes lftp openssh-client
 
-      - name: Document Root vor dem Upload prüfen
+      - name: SFTP- und SSH-Konfiguration validieren
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
           SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
           SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; ls -la $SFTP_REMOTE_DIR; quit"
+
+          normalize_env() {
+            local value="${1//$'\r'/}"
+            value="${value#"${value%%[![:space:]]*}"}"
+            value="${value%"${value##*[![:space:]]}"}"
+            if [[ "$value" =~ ^\".*\"$ ]] || [[ "$value" =~ ^\'.*\'$ ]]; then
+              value="${value:1:${#value}-2}"
+            fi
+            printf '%s' "$value"
+          }
+
+          sftp_host="$(normalize_env "${SFTP_HOST:-}")"
+          sftp_port="$(normalize_env "${SFTP_PORT:-}")"
+          sftp_username="$(normalize_env "${SFTP_USERNAME:-}")"
+          sftp_password="$(normalize_env "${SFTP_PASSWORD:-}")"
+          ssh_private_key="$(normalize_env "${SSH_PRIVATE_KEY:-}")"
+
+          if [ -z "$sftp_host" ]; then
+            echo "::error::SFTP_HOST ist nicht gesetzt."
+            exit 1
+          fi
+          if [ -z "$sftp_port" ]; then
+            echo "::error::SFTP_PORT ist nicht gesetzt."
+            exit 1
+          fi
+          if [ -z "$sftp_username" ]; then
+            echo "::error::SFTP_USERNAME ist nicht gesetzt."
+            exit 1
+          fi
+
+          if ! [[ "$sftp_port" =~ ^[0-9]+$ ]] || [ "$sftp_port" -lt 1 ] || [ "$sftp_port" -gt 65535 ]; then
+            echo "::error::SFTP_PORT ist ungültig: '$sftp_port'."
+            exit 1
+          fi
+
+          if [ -z "$sftp_password" ] && [ -z "$ssh_private_key" ]; then
+            echo "::error::Weder SFTP_PASSWORD noch SSH_PRIVATE_KEY ist gesetzt."
+            exit 1
+          fi
+
+          if [ -n "$sftp_password" ]; then
+            echo "::add-mask::$sftp_password"
+          fi
+
+          key_file=""
+          if [ -n "$ssh_private_key" ]; then
+            echo "::add-mask::$ssh_private_key"
+            key_file="$RUNNER_TEMP/sftp_id_key"
+            umask 077
+            printf '%s\n' "$ssh_private_key" > "$key_file"
+            chmod 600 "$key_file"
+          fi
+
+          printf 'SFTP_HOST=%s\n' "$sftp_host" >> "$GITHUB_ENV"
+          printf 'SFTP_PORT=%s\n' "$sftp_port" >> "$GITHUB_ENV"
+          printf 'SFTP_USERNAME=%s\n' "$sftp_username" >> "$GITHUB_ENV"
+          printf 'SFTP_PASSWORD=%s\n' "$sftp_password" >> "$GITHUB_ENV"
+          printf 'SFTP_SSH_KEY_FILE=%s\n' "$key_file" >> "$GITHUB_ENV"
+
+      - name: Known Hosts und Fingerprint verifizieren
+        env:
+          SFTP_HOST_FINGERPRINT: ${{ secrets.SFTP_HOST_FINGERPRINT }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+
+          known_hosts_file="$RUNNER_TEMP/sftp_known_hosts"
+          keyscan_stderr="$RUNNER_TEMP/sftp_keyscan_stderr.log"
+          if ! ssh-keyscan -p "$SFTP_PORT" -T "$SFTP_CONNECT_TIMEOUT_SECONDS" "$SFTP_HOST" > "$known_hosts_file" 2> "$keyscan_stderr"; then
+            echo "::warning::ssh-keyscan lieferte einen Exit-Code ungleich 0; prüfe Ausgabe."
+          fi
+          sed -i '/^[[:space:]]*$/d' "$known_hosts_file"
+
+          if [ ! -s "$known_hosts_file" ]; then
+            if [ -s "$keyscan_stderr" ]; then
+              cat "$keyscan_stderr"
+            fi
+            echo "::error::Es konnte kein Host-Key von $SFTP_HOST:$SFTP_PORT gelesen werden."
+            exit 1
+          fi
+
+          if ! fingerprints="$(ssh-keygen -lf "$known_hosts_file" | awk '{print $2}' | sort -u)"; then
+            echo "::error::Fingerprints konnten aus known_hosts nicht gelesen werden."
+            exit 1
+          fi
+          if [ -z "$fingerprints" ]; then
+            echo "::error::Es konnten keine Fingerprints aus known_hosts ermittelt werden."
+            exit 1
+          fi
+
+          echo "Ermittelte SFTP-Host-Fingerprints:"
+          printf '%s\n' "$fingerprints"
+
+          expected_fingerprint="$(printf '%s' "${SFTP_HOST_FINGERPRINT:-}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+          if [ -n "$expected_fingerprint" ]; then
+            if ! printf '%s\n' "$fingerprints" | grep -Fxq "$expected_fingerprint"; then
+              echo "::error::SFTP_HOST_FINGERPRINT stimmt nicht mit dem Server-Fingerprint überein."
+              echo "Erwartet: $expected_fingerprint"
+              echo "Erhalten:"
+              printf '%s\n' "$fingerprints"
+              exit 1
+            fi
+          else
+            echo "::warning::SFTP_HOST_FINGERPRINT ist nicht gesetzt; Host-Key wird ohne Referenz-Fingerprint übernommen."
+          fi
+
+          install -m 600 "$known_hosts_file" "$HOME/.ssh/known_hosts"
+          printf 'SFTP_KNOWN_HOSTS_FILE=%s\n' "$HOME/.ssh/known_hosts" >> "$GITHUB_ENV"
+
+      - name: Document Root vor dem Upload prüfen
+        run: |
+          set -euo pipefail
+          auth_value="$SFTP_USERNAME"
+          if [ -n "${SFTP_PASSWORD:-}" ]; then
+            auth_value="$SFTP_USERNAME,$SFTP_PASSWORD"
+          fi
+          ssh_opts="-a -x -p $SFTP_PORT -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$SFTP_KNOWN_HOSTS_FILE -o GlobalKnownHostsFile=/dev/null"
+          if [ -n "${SFTP_SSH_KEY_FILE:-}" ]; then
+            ssh_opts="$ssh_opts -i $SFTP_SSH_KEY_FILE"
+          fi
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; set sftp:connect-program \"ssh $ssh_opts\"; open -u $auth_value sftp://$SFTP_HOST:$SFTP_PORT; ls -la $SFTP_REMOTE_DIR; quit"
           exit_code=1
           listing=""
           for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
@@ -174,14 +298,17 @@ jobs:
           fi
 
       - name: Inhalt von dist nach IONOS übertragen
-        env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
-          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; mirror --reverse --delete --exclude-glob .git* --exclude-glob .env* dist $SFTP_REMOTE_DIR/dist; quit"
+          auth_value="$SFTP_USERNAME"
+          if [ -n "${SFTP_PASSWORD:-}" ]; then
+            auth_value="$SFTP_USERNAME,$SFTP_PASSWORD"
+          fi
+          ssh_opts="-a -x -p $SFTP_PORT -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$SFTP_KNOWN_HOSTS_FILE -o GlobalKnownHostsFile=/dev/null"
+          if [ -n "${SFTP_SSH_KEY_FILE:-}" ]; then
+            ssh_opts="$ssh_opts -i $SFTP_SSH_KEY_FILE"
+          fi
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; set sftp:connect-program \"ssh $ssh_opts\"; open -u $auth_value sftp://$SFTP_HOST:$SFTP_PORT; mirror --reverse --delete --exclude-glob .git* --exclude-glob .env* dist $SFTP_REMOTE_DIR/dist; quit"
           exit_code=1
           for attempt in $(seq 1 "$SFTP_UPLOAD_ATTEMPTS"); do
             echo "Upload-Versuch $attempt/$SFTP_UPLOAD_ATTEMPTS"
@@ -209,14 +336,17 @@ jobs:
           fi
 
       - name: Inhalt des Document Root prüfen
-        env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
-          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; ls -la $SFTP_REMOTE_DIR; quit"
+          auth_value="$SFTP_USERNAME"
+          if [ -n "${SFTP_PASSWORD:-}" ]; then
+            auth_value="$SFTP_USERNAME,$SFTP_PASSWORD"
+          fi
+          ssh_opts="-a -x -p $SFTP_PORT -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$SFTP_KNOWN_HOSTS_FILE -o GlobalKnownHostsFile=/dev/null"
+          if [ -n "${SFTP_SSH_KEY_FILE:-}" ]; then
+            ssh_opts="$ssh_opts -i $SFTP_SSH_KEY_FILE"
+          fi
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; set sftp:connect-program \"ssh $ssh_opts\"; open -u $auth_value sftp://$SFTP_HOST:$SFTP_PORT; ls -la $SFTP_REMOTE_DIR; quit"
           exit_code=1
           listing=""
           for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
