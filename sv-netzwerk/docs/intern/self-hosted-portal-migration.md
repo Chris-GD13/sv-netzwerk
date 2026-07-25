@@ -242,8 +242,9 @@ SESSION_ABSOLUTE_HOURS=12
 ### Mapping Supabase → MariaDB
 
 Supabase nutzt UUIDs als Primary Keys (PostgreSQL `gen_random_uuid()`).  
-MariaDB nutzt `CHAR(36)` mit `UUID()` oder `BIN(16)` mit `UUID_TO_BIN()`.  
-Für Einfachheit und Kompatibilität: `CHAR(36) NOT NULL DEFAULT (UUID())`.
+MariaDB kann `CHAR(36)` mit `UUID()` oder `BINARY(16)` mit `UUID_TO_BIN()` verwenden.  
+**Empfehlung für dieses Projekt:** `CHAR(36)` — einfacher zu debuggen, kein Unterschied bei ≤ 500 Fensterdatensätzen. Bei zukünftiger Skalierung auf `BINARY(16)` wechseln (36 % kleinere Indexgröße).  
+Formatierung bei `CHAR(36)`: `DEFAULT (UUID())`.
 
 | Supabase-Tabelle | MariaDB-Tabelle | Anmerkung |
 |-----------------|----------------|-----------|
@@ -440,7 +441,7 @@ Realtime-Abonnements (kein direktes Äquivalent):
 
 ### Authentifizierung
 
-- Passwörter ausschließlich mit `password_hash($pw, PASSWORD_BCRYPT, ['cost' => 12])` speichern
+- Passwörter ausschließlich mit `password_hash($pw, PASSWORD_ARGON2ID)` speichern (PHP 7.3+; bietet besseren Schutz gegen GPU-basierte Angriffe als bcrypt; Fallback: `PASSWORD_BCRYPT` mit `['cost' => 13]`)
 - Verifikation mit `password_verify()`
 - Session-ID nach erfolgreichem Login rotieren: `session_regenerate_id(true)`
 - Session-Cookie-Flags: `HttpOnly`, `Secure`, `SameSite=Lax`
@@ -457,9 +458,8 @@ Realtime-Abonnements (kein direktes Äquivalent):
 
 ### CSRF
 
-- Doppeltes Cookie-Submit-Pattern oder synchronisiertes Token im Session
-- Jedes POST/PUT/DELETE-Formular muss gültiges Token enthalten
-- Token wird bei Session-Start erzeugt und mit der Session invalidiert
+- CSRF-Schutz: **Synchronisiertes Token** (in PHP-Session gespeichert, nicht im Cookie) — sicherer als Double-Submit-Cookie-Pattern, das bei Subdomain-Angriffen anfällig sein kann
+- Token wird bei Session-Start erzeugt (`bin2hex(random_bytes(32))`) und mit der Session invalidiert
 
 ### Datei-Uploads
 
