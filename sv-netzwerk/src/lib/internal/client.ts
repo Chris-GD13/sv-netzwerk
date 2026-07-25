@@ -1571,8 +1571,8 @@ async function renderAdmin(context: AppContext) {
           </select>
         </div>
         <div class="intern-field">
-          <label for="new-password">Passwort (mind. 8 Zeichen)</label>
-          <input id="new-password" name="password" type="password" minlength="8" required autocomplete="new-password" />
+          <label for="new-password">Passwort (mind. 10 Zeichen)</label>
+          <input id="new-password" name="password" type="password" minlength="10" required autocomplete="new-password" />
         </div>
         <div class="intern-actions intern-field--full">
           <button class="sv-button sv-button-primary" type="submit">Benutzer anlegen</button>
@@ -1737,8 +1737,8 @@ function bindUserActions(
         <td colspan="6">
           <form class="intern-form-grid intern-edit-form" data-pw-form="${id}">
             <div class="intern-field">
-              <label>Neues Passwort (mind. 8 Zeichen)</label>
-              <input name="password" type="password" minlength="8" required autocomplete="new-password" />
+              <label>Neues Passwort (mind. 10 Zeichen)</label>
+              <input name="password" type="password" minlength="10" required autocomplete="new-password" />
             </div>
             <div class="intern-actions intern-field--full">
               <button class="sv-button sv-button-primary" type="submit">Passwort setzen</button>

@@ -139,7 +139,7 @@ function handleReset(): never
         $origin  = rtrim((string) ($_SERVER['HTTP_ORIGIN'] ?? 'https://sv-netzwerk.eu'), '/');
         $link    = "$origin/intern/login/?reset_token=" . urlencode($token);
         $name    = $user['full_name'];
-        $subject = 'Passwort zurücksetzen – ' . APP_NAME;
+        $subject = 'Passwort zurücksetzen – ' . appProjectName();
         $body    = "Hallo $name,\n\nbitte verwenden Sie folgenden Link, um Ihr Passwort zurückzusetzen:\n\n$link\n\nDer Link ist zwei Stunden gültig.\n\nFalls Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail.\n";
         $from    = env('MAIL_FROM', 'noreply@sv-netzwerk.eu');
         $headers = "From: $from\r\nContent-Type: text/plain; charset=utf-8\r\n";

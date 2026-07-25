@@ -66,8 +66,8 @@ function handleCreate(array $actor): never
     if (!in_array($role, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer', 'gast'], true)) {
         apiError(400, 'Ungültige Rolle.');
     }
-    if (strlen($password) < 8) {
-        apiError(400, 'Passwort muss mindestens 8 Zeichen lang sein.');
+    if (mb_strlen($password, 'UTF-8') < 10) {
+        apiError(400, 'Passwort muss mindestens 10 Zeichen lang sein.');
     }
 
     $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
@@ -171,8 +171,8 @@ function handleSetPassword(int $id, array $actor): never
     $body     = requestBody();
     $password = (string) ($body['password'] ?? '');
 
-    if (strlen($password) < 8) {
-        apiError(400, 'Passwort muss mindestens 8 Zeichen lang sein.');
+    if (mb_strlen($password, 'UTF-8') < 10) {
+        apiError(400, 'Passwort muss mindestens 10 Zeichen lang sein.');
     }
 
     $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
