@@ -200,7 +200,7 @@ function renderConfigMissing() {
     <div class="intern-card intern-login">
       <p class="sv-eyebrow">Einrichtung erforderlich</p>
       <h1>Supabase-Konfiguration fehlt</h1>
-      <p>Setzen Sie <code>PUBLIC_SUPABASE_URL</code> und <code>PUBLIC_SUPABASE_ANON_KEY</code>, fuehren Sie die SQL-Migrationen aus und legen Sie Benutzerkonten an.</p>
+      <p>Setzen Sie <code>PUBLIC_SUPABASE_URL</code> und <code>PUBLIC_SUPABASE_ANON_KEY</code> (alternativ <code>VITE_SUPABASE_URL</code> und <code>VITE_SUPABASE_ANON_KEY</code>), fuehren Sie die SQL-Migrationen aus und legen Sie Benutzerkonten an.</p>
       <div class="intern-alert intern-alert--warn">Die interne Anwendung wird erst nach abgeschlossener Supabase-Einrichtung funktionsfaehig.</div>
     </div>
   `;

@@ -14,8 +14,12 @@
 ```env
 PUBLIC_SUPABASE_URL=https://<projekt-ref>.supabase.co
 PUBLIC_SUPABASE_ANON_KEY=
+# Optionales Fallback fuer Vite-Setups:
+# VITE_SUPABASE_URL=
+# VITE_SUPABASE_ANON_KEY=
 ```
 
+> Fuer GitHub Actions muessen die Werte als Secrets hinterlegt werden (bevorzugt `PUBLIC_SUPABASE_URL` und `PUBLIC_SUPABASE_ANON_KEY`).
 Hinweis: Werte ohne Anfuehrungszeichen und ohne fuehrende/nachgestellte Leerzeichen setzen.
 
 ## Supabase-Einrichtung
