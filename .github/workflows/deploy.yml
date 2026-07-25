@@ -27,6 +27,7 @@ jobs:
       SFTP_CHECK_ATTEMPTS: 10
       SFTP_UPLOAD_TIMEOUT_SECONDS: 1200
       SFTP_UPLOAD_ATTEMPTS: 10
+      PUBLIC_SUPABASE_URL: https://rsyuqqddvupbkordzylo.supabase.co
 
     defaults:
       run:
@@ -67,7 +68,6 @@ jobs:
 
       - name: Supabase-Umgebungsvariablen validieren und exportieren
         env:
-          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
           PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
         run: |
           set -euo pipefail
@@ -82,23 +82,11 @@ jobs:
             printf '%s' "$value"
           }
 
-          public_supabase_url="$(normalize_env "${PUBLIC_SUPABASE_URL:-}")"
+          public_supabase_url="${PUBLIC_SUPABASE_URL}"
           public_supabase_anon_key="$(normalize_env "${PUBLIC_SUPABASE_ANON_KEY:-}")"
 
-          if [ -z "$public_supabase_url" ] || [ -z "$public_supabase_anon_key" ]; then
-            echo "::error::PUBLIC_SUPABASE_URL und PUBLIC_SUPABASE_ANON_KEY muessen gesetzt sein."
-            exit 1
-          fi
-
-          if ! [[ "$public_supabase_url" =~ ^https?:// ]]; then
-            echo "::error::PUBLIC_SUPABASE_URL ist ungueltig: $public_supabase_url"
-            exit 1
-          fi
-
-          public_supabase_url="${public_supabase_url%/}"
-          required_supabase_url='https://rsyuqqddvupbkordzylo.supabase.co'
-          if [ "$public_supabase_url" != "$required_supabase_url" ]; then
-            echo "::error::PUBLIC_SUPABASE_URL muss auf $required_supabase_url zeigen."
+          if [ -z "$public_supabase_anon_key" ]; then
+            echo "::error::PUBLIC_SUPABASE_ANON_KEY muss gesetzt sein."
             exit 1
           fi
 
