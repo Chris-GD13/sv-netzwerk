@@ -27,6 +27,7 @@ jobs:
       SFTP_CHECK_ATTEMPTS: 10
       SFTP_UPLOAD_TIMEOUT_SECONDS: 1200
       SFTP_UPLOAD_ATTEMPTS: 10
+      PUBLIC_SUPABASE_URL: https://rsyuqqddvupbkordzylo.supabase.co
 
     defaults:
       run:
@@ -81,7 +82,7 @@ jobs:
             printf '%s' "$value"
           }
 
-          public_supabase_url='https://rsyuqqddvupbkordzylo.supabase.co'
+          public_supabase_url="${PUBLIC_SUPABASE_URL}"
           public_supabase_anon_key="$(normalize_env "${PUBLIC_SUPABASE_ANON_KEY:-}")"
 
           if [ -z "$public_supabase_anon_key" ]; then
