@@ -215,10 +215,26 @@ jobs:
 
           known_hosts_file="$RUNNER_TEMP/sftp_known_hosts"
           keyscan_stderr="$RUNNER_TEMP/sftp_keyscan_stderr.log"
-          if ! ssh-keyscan -p "$SFTP_PORT" -T "$SFTP_CONNECT_TIMEOUT_SECONDS" "$SFTP_HOST" > "$known_hosts_file" 2> "$keyscan_stderr"; then
-            echo "::warning::ssh-keyscan lieferte einen Exit-Code ungleich 0; prüfe Ausgabe."
+          : > "$known_hosts_file"
+          : > "$keyscan_stderr"
+
+          scan_targets=("$SFTP_HOST")
+          if resolved_ips="$(getent ahosts "$SFTP_HOST" 2>/dev/null | awk '{print $1}' | sort -u)"; then
+            while IFS= read -r ip; do
+              if [ -n "$ip" ]; then
+                scan_targets+=("$ip")
+              fi
+            done <<< "$resolved_ips"
           fi
+
+          for target in "${scan_targets[@]}"; do
+            if ! ssh-keyscan -t rsa,ecdsa,ed25519 -p "$SFTP_PORT" -T "$SFTP_CONNECT_TIMEOUT_SECONDS" "$target" >> "$known_hosts_file" 2>> "$keyscan_stderr"; then
+              echo "::warning::ssh-keyscan für Target '$target' lieferte einen Exit-Code ungleich 0; prüfe Ausgabe."
+            fi
+          done
+
           sed -i '/^[[:space:]]*$/d' "$known_hosts_file"
+          sort -u -o "$known_hosts_file" "$known_hosts_file"
 
           if [ ! -s "$known_hosts_file" ]; then
             if [ -s "$keyscan_stderr" ]; then
