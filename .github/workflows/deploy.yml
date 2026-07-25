@@ -85,26 +85,28 @@ jobs:
           public_supabase_url="$(normalize_env "${PUBLIC_SUPABASE_URL:-}")"
           public_supabase_anon_key="$(normalize_env "${PUBLIC_SUPABASE_ANON_KEY:-}")"
 
+          if [ -n "$public_supabase_anon_key" ]; then
+            echo "::add-mask::$public_supabase_anon_key"
+          fi
+
           if [ -z "$public_supabase_url" ] || [ -z "$public_supabase_anon_key" ]; then
-            echo "::error::PUBLIC_SUPABASE_URL und PUBLIC_SUPABASE_ANON_KEY muessen gesetzt sein."
-            exit 1
-          fi
-
-          if ! [[ "$public_supabase_url" =~ ^https?:// ]]; then
-            echo "::error::PUBLIC_SUPABASE_URL ist ungueltig: $public_supabase_url"
-            exit 1
-          fi
-
-          public_supabase_url="${public_supabase_url%/}"
-          required_supabase_url='https://rsyuqqddvupbkordzylo.supabase.co'
-          if [ "$public_supabase_url" != "$required_supabase_url" ]; then
-            echo "::error::PUBLIC_SUPABASE_URL muss auf $required_supabase_url zeigen."
-            exit 1
+            echo "::warning::PUBLIC_SUPABASE_URL oder PUBLIC_SUPABASE_ANON_KEY ist nicht gesetzt; Supabase-Funktionen werden im Build deaktiviert."
+            public_supabase_url=""
+            public_supabase_anon_key=""
+          elif ! [[ "$public_supabase_url" =~ ^https?:// ]]; then
+            echo "::warning::PUBLIC_SUPABASE_URL ist kein gueltiger HTTP/HTTPS-URL; Supabase-Funktionen werden im Build deaktiviert."
+            public_supabase_url=""
+            public_supabase_anon_key=""
+          else
+            public_supabase_url="${public_supabase_url%/}"
+            required_supabase_url='https://rsyuqqddvupbkordzylo.supabase.co'
+            if [ "$public_supabase_url" != "$required_supabase_url" ]; then
+              echo "::warning::PUBLIC_SUPABASE_URL zeigt nicht auf $required_supabase_url."
+            fi
           fi
 
           printf 'PUBLIC_SUPABASE_URL=%s\n' "$public_supabase_url" >> "$GITHUB_ENV"
           printf 'PUBLIC_SUPABASE_ANON_KEY=%s\n' "$public_supabase_anon_key" >> "$GITHUB_ENV"
-          echo "::add-mask::$public_supabase_anon_key"
 
           printf 'PUBLIC_SUPABASE_URL=%s\nPUBLIC_SUPABASE_ANON_KEY=%s\n' "$public_supabase_url" "$public_supabase_anon_key" > .env.production
 
