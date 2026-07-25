@@ -8,12 +8,18 @@
 import type {
   AdminUser,
   AuditLogEntry,
+  Building,
   CalculationParameterMap,
+  Floor,
   LockResult,
   PhotoItem,
   PortalRole,
   PortalUser,
+  Room,
+  WindowInRoom,
   WindowRecord,
+  WindowSashRecord,
+  WindowSashSummary,
   WindowSummary,
 } from './types';
 import { normalizeCalculationParameters } from './calculations';
@@ -306,3 +312,129 @@ export async function apiDeactivateUser(id: number): Promise<{ error: Error | nu
   const { error } = await apiDelete(`/users.php?id=${id}`);
   return { error };
 }
+
+// ── Hierarchie ──────────────────────────────────────────────────────────────
+
+export async function apiListBuildings(): Promise<Building[]> {
+  const { data } = await apiGet<Building[]>('/hierarchy.php');
+  return data ?? [];
+}
+
+export async function apiListFloors(buildingId: number): Promise<Floor[]> {
+  const { data } = await apiGet<Floor[]>(`/hierarchy.php?building_id=${buildingId}`);
+  return data ?? [];
+}
+
+export async function apiListRooms(floorId: number): Promise<Room[]> {
+  const { data } = await apiGet<Room[]>(`/hierarchy.php?floor_id=${floorId}`);
+  return data ?? [];
+}
+
+export async function apiListWindowsInRoom(roomId: number): Promise<WindowInRoom[]> {
+  const { data } = await apiGet<WindowInRoom[]>(`/hierarchy.php?room_id=${roomId}`);
+  return data ?? [];
+}
+
+export async function apiCreateBuilding(name: string, code: string): Promise<{ id: number } | null> {
+  const { data } = await apiPost<{ id: number }>('/hierarchy.php?entity=building', { name, code });
+  return data;
+}
+
+export async function apiCreateFloor(buildingId: number, name: string, level: number): Promise<{ id: number } | null> {
+  const { data } = await apiPost<{ id: number }>('/hierarchy.php?entity=floor', { building_id: buildingId, name, level });
+  return data;
+}
+
+export async function apiCreateRoom(floorId: number, name: string, roomNumber: string): Promise<{ id: number } | null> {
+  const { data } = await apiPost<{ id: number }>('/hierarchy.php?entity=room', { floor_id: floorId, name, room_number: roomNumber });
+  return data;
+}
+
+export async function apiCreateWindowInRoom(roomId: number, windowNumber: string): Promise<{ id: number; record_id: string } | null> {
+  const { data } = await apiPost<{ id: number; record_id: string }>('/hierarchy.php?entity=window', { room_id: roomId, window_number: windowNumber });
+  return data;
+}
+
+// ── Flügel (Window Sashes) ──────────────────────────────────────────────────
+
+export async function apiListSashes(windowId: number): Promise<WindowSashSummary[]> {
+  const { data } = await apiGet<WindowSashSummary[]>(`/sashes.php?window_id=${windowId}`);
+  return data ?? [];
+}
+
+export async function apiGetSash(id: number): Promise<WindowSashRecord | null> {
+  const { data } = await apiGet<WindowSashRecord>(`/sashes.php?id=${id}`);
+  return data ?? null;
+}
+
+export async function apiCreateSash(
+  windowId: number,
+  sashLabel: string,
+  openingType: string,
+  position: string,
+): Promise<{ id: number; sash_number: number } | null> {
+  const { data } = await apiPost<{ id: number; sash_number: number }>('/sashes.php', {
+    window_id: windowId,
+    sash_label: sashLabel,
+    opening_type: openingType,
+    position,
+    form_data: { status: 'nicht begonnen', sash_label: sashLabel, opening_type: openingType, position },
+  });
+  return data;
+}
+
+export async function apiSaveSash(
+  id: number,
+  formData: Record<string, unknown>,
+): Promise<{ error: Error | null }> {
+  const { error } = await apiPut(`/sashes.php?id=${id}`, { form_data: formData });
+  return { error };
+}
+
+export async function apiDeleteSash(id: number): Promise<{ error: Error | null }> {
+  const { error } = await apiDelete(`/sashes.php?id=${id}`);
+  return { error };
+}
+
+// ── Flügel-Fotos ─────────────────────────────────────────────────────────────
+
+export async function apiListSashPhotos(sashId: number): Promise<PhotoItem[]> {
+  const { data } = await apiGet<PhotoItem[]>(`/photos.php?sash_id=${sashId}`);
+  return data ?? [];
+}
+
+export async function apiUploadSashPhoto(
+  windowId: string,
+  sashId: number,
+  file: File,
+  category: string,
+  caption: string,
+): Promise<boolean> {
+  const formData = new FormData();
+  formData.append('photo', file);
+  formData.append('category', category);
+  formData.append('caption', caption);
+  formData.append('sash_id', String(sashId));
+
+  const { error } = await apiFetch(
+    `/photos.php?window_id=${encodeURIComponent(windowId)}&sash_id=${sashId}`,
+    { method: 'POST', body: formData },
+  );
+  return error === null;
+}
+
+// ── Demo-Daten ───────────────────────────────────────────────────────────────
+
+export async function apiGetDemoStatus(): Promise<{ demo_data_exists: boolean; building_count: number; sash_count: number; user_count: number }> {
+  const { data } = await apiGet<{ demo_data_exists: boolean; building_count: number; sash_count: number; user_count: number }>('/demo.php');
+  return data ?? { demo_data_exists: false, building_count: 0, sash_count: 0, user_count: 0 };
+}
+
+export async function apiSeedDemoData(reset = false): Promise<{ ok: boolean; message: string; results: string[] }> {
+  const { data } = await apiPost<{ ok: boolean; message: string; results: string[] }>(
+    `/demo.php${reset ? '?reset=1' : ''}`,
+    {},
+  );
+  return data ?? { ok: false, message: 'Fehler beim Anlegen', results: [] };
+}
+

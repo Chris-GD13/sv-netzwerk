@@ -185,6 +185,103 @@ CREATE TABLE IF NOT EXISTS export_logs (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
+-- Gebäude
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS buildings (
+    id          INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+    project_id  INT UNSIGNED    NOT NULL DEFAULT 1,
+    name        VARCHAR(255)    NOT NULL,
+    code        VARCHAR(64)     NOT NULL DEFAULT '',
+    notes       TEXT            NULL,
+    sort_order  INT             NOT NULL DEFAULT 0,
+    created_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
+    updated_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE (UTC_TIMESTAMP()),
+    PRIMARY KEY (id),
+    KEY idx_buildings_project (project_id),
+    CONSTRAINT fk_building_project FOREIGN KEY (project_id) REFERENCES projects (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- Etagen
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS floors (
+    id          INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+    building_id INT UNSIGNED    NOT NULL,
+    name        VARCHAR(255)    NOT NULL,
+    level       INT             NOT NULL DEFAULT 0,
+    notes       TEXT            NULL,
+    sort_order  INT             NOT NULL DEFAULT 0,
+    created_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
+    updated_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE (UTC_TIMESTAMP()),
+    PRIMARY KEY (id),
+    KEY idx_floors_building (building_id),
+    CONSTRAINT fk_floor_building FOREIGN KEY (building_id) REFERENCES buildings (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- Räume
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS rooms (
+    id          INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+    floor_id    INT UNSIGNED    NOT NULL,
+    name        VARCHAR(255)    NOT NULL,
+    room_number VARCHAR(64)     NOT NULL DEFAULT '',
+    notes       TEXT            NULL,
+    sort_order  INT             NOT NULL DEFAULT 0,
+    created_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
+    updated_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE (UTC_TIMESTAMP()),
+    PRIMARY KEY (id),
+    KEY idx_rooms_floor (floor_id),
+    CONSTRAINT fk_room_floor FOREIGN KEY (floor_id) REFERENCES floors (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- Raumzuordnung zu Fenstern (optional, rückwärtskompatibel)
+-- ============================================================
+
+ALTER TABLE windows ADD COLUMN IF NOT EXISTS room_id INT UNSIGNED NULL AFTER project_id;
+
+-- ============================================================
+-- Flügel (Fensterflügel – das eigentliche Prüfobjekt)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS window_sashes (
+    id               INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+    window_id        INT UNSIGNED    NOT NULL,
+    sash_number      INT             NOT NULL DEFAULT 1,
+    sash_label       VARCHAR(64)     NOT NULL DEFAULT '',
+    opening_type     VARCHAR(64)     NULL COMMENT 'Dreh, Dreh-Kipp, Kipp, Festverglasung',
+    position         VARCHAR(64)     NULL COMMENT 'links, rechts, mitte, oben, unten',
+    status           VARCHAR(64)     NOT NULL DEFAULT 'nicht begonnen',
+    form_data        LONGTEXT        NULL COMMENT 'JSON Inspektionsdaten',
+    progress_percent TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    has_defect       TINYINT(1)      NOT NULL DEFAULT 0,
+    urgent_action    TINYINT(1)      NOT NULL DEFAULT 0,
+    overall_rating   VARCHAR(128)    NULL,
+    inspector_id     INT UNSIGNED    NULL,
+    inspector_name   VARCHAR(255)    NULL,
+    inspected_at     DATETIME        NULL,
+    completed_at     DATETIME        NULL,
+    created_at       DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
+    updated_at       DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE (UTC_TIMESTAMP()),
+    deleted_at       DATETIME        NULL,
+    PRIMARY KEY (id),
+    KEY idx_sashes_window  (window_id),
+    KEY idx_sashes_status  (status),
+    KEY idx_sashes_deleted (deleted_at),
+    CONSTRAINT fk_sash_window FOREIGN KEY (window_id) REFERENCES windows (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- Flügelzuordnung für Fotos (optional, rückwärtskompatibel)
+-- ============================================================
+
+ALTER TABLE photos ADD COLUMN IF NOT EXISTS sash_id INT UNSIGNED NULL AFTER window_id;
+
+-- ============================================================
 -- Standard-Projektdatensatz
 -- ============================================================
 

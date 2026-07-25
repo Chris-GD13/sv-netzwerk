@@ -1,6 +1,13 @@
 export type PortalRole = 'administrator' | 'pruefer' | 'auswertung';
 
-export type PortalRoute = 'landing' | 'login' | 'dashboard' | 'windows' | 'record' | 'analysis' | 'export' | 'admin';
+export type PortalRoute = 'landing' | 'login' | 'dashboard' | 'buildings' | 'floors' | 'rooms' | 'windows' | 'sashes' | 'sash' | 'record' | 'analysis' | 'export' | 'admin';
+
+export type SashStatus =
+  | 'nicht begonnen'
+  | 'in Bearbeitung'
+  | 'abgeschlossen'
+  | 'Nachpruefung erforderlich'
+  | 'freigegeben';
 
 export type WindowStatus =
   | 'vorbereitet'
@@ -162,6 +169,92 @@ export interface AdminUser {
   last_login_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface Building {
+  id: number;
+  name: string;
+  code: string;
+  sort_order: number;
+  window_count: number;
+  sash_count: number;
+  sash_completed: number;
+  sash_defect: number;
+  progress_pct: number;
+}
+
+export interface Floor {
+  id: number;
+  name: string;
+  level: number;
+  sort_order: number;
+  room_count: number;
+  window_count: number;
+  sash_count: number;
+  sash_completed: number;
+  progress_pct: number;
+}
+
+export interface Room {
+  id: number;
+  name: string;
+  room_number: string;
+  sort_order: number;
+  window_count: number;
+  sash_count: number;
+  sash_completed: number;
+  sash_defect: number;
+  progress_pct: number;
+}
+
+export interface WindowInRoom {
+  id: number;
+  window_number: string;
+  record_id: string;
+  status: WindowStatus;
+  updated_at: string;
+  sash_count: number;
+  sash_completed: number;
+  sash_defect: number;
+  room_name: string | null;
+  room_number: string | null;
+  floor_name: string | null;
+  building_name: string | null;
+  building_id: number | null;
+  floor_id: number | null;
+  progress_pct: number;
+}
+
+export interface WindowSashSummary {
+  id: number;
+  window_id: number;
+  sash_number: number;
+  sash_label: string;
+  opening_type: string | null;
+  position: string | null;
+  status: SashStatus;
+  progress_percent: number;
+  has_defect: boolean;
+  urgent_action: boolean;
+  overall_rating: string | null;
+  inspector_name: string | null;
+  inspected_at: string | null;
+  completed_at: string | null;
+  updated_at: string;
+  photo_count?: number;
+}
+
+export interface WindowSashRecord extends WindowSashSummary {
+  form_data: Record<string, unknown>;
+  window_number: string;
+  record_id: string;
+  room_id: number | null;
+  room_name: string | null;
+  room_number: string | null;
+  floor_name: string | null;
+  floor_id: number | null;
+  building_name: string | null;
+  building_id: number | null;
 }
 
 export interface CalculationParameterMap {

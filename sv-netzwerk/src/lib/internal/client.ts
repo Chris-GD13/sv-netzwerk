@@ -33,17 +33,43 @@ import {
   apiDeactivateUser,
   loadApiUser,
   onAuthChange,
+  // Hierarchie
+  apiListBuildings,
+  apiListFloors,
+  apiListRooms,
+  apiListWindowsInRoom,
+  apiCreateBuilding,
+  apiCreateFloor,
+  apiCreateRoom,
+  apiCreateWindowInRoom,
+  // Flügel
+  apiListSashes,
+  apiGetSash,
+  apiCreateSash,
+  apiSaveSash,
+  apiDeleteSash,
+  apiListSashPhotos,
+  apiUploadSashPhoto,
+  // Demo
+  apiGetDemoStatus,
+  apiSeedDemoData,
 } from './php-api';
 import type {
   AdminUser,
   AuditLogEntry,
+  Building,
   DashboardStats,
+  Floor,
   LockResult,
   PhotoItem,
   PortalRoute,
   PortalRole,
   PortalUser,
+  Room,
+  WindowInRoom,
   WindowRecord,
+  WindowSashRecord,
+  WindowSashSummary,
   WindowSummary,
 } from './types';
 
@@ -51,6 +77,11 @@ interface AppContext {
   root: HTMLElement;
   route: PortalRoute;
   recordId: string | null;
+  buildingId: number | null;
+  floorId: number | null;
+  roomId: number | null;
+  windowId: number | null;
+  sashId: number | null;
   user: PortalUser | null;
   draftDirty: boolean;
 }
@@ -65,9 +96,15 @@ export async function mountInternalPortal(root: HTMLElement) {
   if (root.dataset.internalPortalMounted === 'true') return;
   root.dataset.internalPortalMounted = 'true';
   const route = (root.dataset.route as PortalRoute | undefined) ?? 'landing';
-  const recordId = root.dataset.recordId || new URLSearchParams(window.location.search).get('id');
+  const searchParams = new URLSearchParams(window.location.search);
+  const recordId = root.dataset.recordId || searchParams.get('id');
+  const buildingId = searchParams.get('building_id') ? Number(searchParams.get('building_id')) : null;
+  const floorId = searchParams.get('floor_id') ? Number(searchParams.get('floor_id')) : null;
+  const roomId = searchParams.get('room_id') ? Number(searchParams.get('room_id')) : null;
+  const windowId = searchParams.get('window_id') ? Number(searchParams.get('window_id')) : null;
+  const sashId = searchParams.get('sash_id') ? Number(searchParams.get('sash_id')) : null;
   const user = await loadApiUser();
-  const context: AppContext = { root, route, recordId, user, draftDirty: false };
+  const context: AppContext = { root, route, recordId, buildingId, floorId, roomId, windowId, sashId, user, draftDirty: false };
   const disposers: Array<() => void> = [];
 
   root.classList.add('intern-app');
@@ -136,8 +173,23 @@ async function renderRoute(context: AppContext) {
     case 'dashboard':
       await renderDashboard(context);
       break;
+    case 'buildings':
+      await renderBuildings(context);
+      break;
+    case 'floors':
+      await renderFloors(context);
+      break;
+    case 'rooms':
+      await renderRooms(context);
+      break;
     case 'windows':
-      await renderWindows(context);
+      await renderWindowsInRoom(context);
+      break;
+    case 'sashes':
+      await renderSashes(context);
+      break;
+    case 'sash':
+      await renderSashInspection(context);
       break;
     case 'record':
       await renderRecord(context);
@@ -227,45 +279,785 @@ function renderLogin(context: AppContext) {
 }
 
 async function renderDashboard(context: AppContext) {
-  const records = await fetchWindowSummaries(context);
+  const [buildings, records] = await Promise.all([
+    apiListBuildings(),
+    fetchWindowSummaries(context),
+  ]);
   const stats = createDashboardStats(records);
+
+  const demoStatus = await apiGetDemoStatus();
+  const demoBanner = !demoStatus.demo_data_exists
+    ? `<div class="intern-alert intern-alert--info">
+        Noch keine Demo-Daten vorhanden.
+        <button class="sv-button sv-button-secondary" type="button" id="seed-demo-btn" style="margin-left:12px">Demo-Daten anlegen</button>
+       </div>`
+    : '';
+
   context.root.innerHTML = `
-    ${renderHeader(context, 'Projekt-Dashboard', 'Live-Status fuer die laufende Fensterpruefung.')}
+    ${renderHeader(context, 'Projekt-Dashboard', 'Bauwerkshierarchie – Prüffortschritt je Gebäude.')}
+    ${demoBanner}
     <div class="intern-statusbar">
       <div class="intern-card">${connectionBadge()}</div>
       <div class="intern-card">${roleBadge(context.user?.profile.role ?? 'pruefer')}<p class="intern-meta">${escapeHtml(context.user?.profile.full_name ?? context.user?.email ?? '')}</p></div>
-      <div class="intern-card"><strong>${records.length}</strong><p class="intern-meta">Datensaetze verfuegbar</p></div>
+      <div class="intern-card"><strong>${stats.total}</strong><p class="intern-meta">Fenster gesamt</p></div>
+      <div class="intern-card"><strong>${stats.completed}</strong><p class="intern-meta">Flügel geprüft</p></div>
     </div>
-    <div class="intern-stats">
-      ${renderStat('Gesamtzahl angelegter Fenster', stats.total)}
-      ${renderStat('Nicht begonnen', stats.notStarted)}
-      ${renderStat('In Bearbeitung', stats.inProgress)}
-      ${renderStat('Vollstaendig geprueft', stats.completed)}
-      ${renderStat('Mit Mangel', stats.withDefect)}
-      ${renderStat('Mit dringendem Handlungsbedarf', stats.urgent)}
-      ${renderStat('Spezialpruefung erforderlich', stats.specialInspection)}
-      ${renderStat('Nicht zugaenglich', stats.inaccessible)}
-      ${renderStat('Heute bearbeitet', stats.touchedToday)}
+
+    ${buildings.length > 0 ? `
+    <h2 style="margin:24px 0 12px">Gebäude</h2>
+    <div class="intern-building-grid">
+      ${buildings.map((b) => {
+        const pct = b.progress_pct;
+        const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+        return `
+          <a class="intern-building-card" href="/intern/fensterpruefung-bonn/etagen/?building_id=${b.id}">
+            <div class="intern-building-card__header">
+              <strong>${escapeHtml(b.name)}</strong>
+              ${b.code ? `<span class="intern-badge intern-badge--info">${escapeHtml(b.code)}</span>` : ''}
+            </div>
+            <div class="intern-building-stats">
+              <span>${b.window_count} Fenster</span>
+              <span>${b.sash_count} Flügel</span>
+              ${b.sash_defect > 0 ? `<span class="intern-badge intern-badge--danger">${b.sash_defect} Mängel</span>` : ''}
+            </div>
+            <div class="intern-progress-bar">
+              <div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div>
+            </div>
+            <p class="intern-meta">${pct}% Flügel geprüft (${b.sash_completed}/${b.sash_count})</p>
+          </a>
+        `;
+      }).join('')}
     </div>
-    <div class="intern-grid">
+    ` : `<div class="intern-empty">Noch keine Gebäude angelegt. Bitte Demo-Daten laden oder Gebäude hinzufügen.</div>`}
+
+    <div class="intern-grid" style="margin-top:24px">
       <section class="intern-panel">
-        <h2>Bearbeitungsstand je Pruefer</h2>
-        <div class="intern-list">
-          ${stats.byInspector.map((item) => `<div class="intern-card"><strong>${escapeHtml(item.name)}</strong><p class="intern-meta">${item.completed} abgeschlossen / ${item.total} zugewiesen</p></div>`).join('') || '<div class="intern-empty">Noch keine Zuordnungen.</div>'}
+        <h2>Gesamtstatistik</h2>
+        <div class="intern-stats">
+          ${renderStat('Fenster gesamt', stats.total)}
+          ${renderStat('Nicht begonnen', stats.notStarted)}
+          ${renderStat('In Bearbeitung', stats.inProgress)}
+          ${renderStat('Vollständig geprüft', stats.completed)}
+          ${renderStat('Mit Mangel', stats.withDefect)}
+          ${renderStat('Dringender Handlungsbedarf', stats.urgent)}
+          ${renderStat('Spezialpruefung', stats.specialInspection)}
         </div>
       </section>
       <section class="intern-panel">
-        <h2>Letzte Aenderungen</h2>
+        <h2>Letzte Änderungen</h2>
         <div class="intern-list">
-          ${stats.recentChanges.map((item) => `<a class="intern-card" href="/intern/fensterpruefung-bonn/fenster/${encodeURIComponent(item.id)}/"><strong>${escapeHtml(item.label)}</strong><p class="intern-meta">${formatDateTime(item.updatedAt)} · ${escapeHtml(item.status)}${item.user ? ` · ${escapeHtml(item.user)}` : ''}</p></a>`).join('') || '<div class="intern-empty">Noch keine Aenderungen protokolliert.</div>'}
+          ${stats.recentChanges.map((item) => `<a class="intern-card" href="/intern/fensterpruefung-bonn/fenster/record/?id=${encodeURIComponent(item.id)}"><strong>${escapeHtml(item.label)}</strong><p class="intern-meta">${formatDateTime(item.updatedAt)} · ${escapeHtml(item.status)}${item.user ? ` · ${escapeHtml(item.user)}` : ''}</p></a>`).join('') || '<div class="intern-empty">Noch keine Änderungen protokolliert.</div>'}
         </div>
       </section>
     </div>
   `;
-  subscribeToWindowChanges(context, () => void renderDashboard(context));
+
+  context.root.querySelector<HTMLButtonElement>('#seed-demo-btn')?.addEventListener('click', async () => {
+    const btn = context.root.querySelector<HTMLButtonElement>('#seed-demo-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Wird angelegt…'; }
+    const result = await apiSeedDemoData(false);
+    if (result.ok) {
+      await renderDashboard(context);
+    } else {
+      showInlineMessage(context.root, errorAlert('Demo-Daten konnten nicht angelegt werden.'));
+      if (btn) { btn.disabled = false; btn.textContent = 'Demo-Daten anlegen'; }
+    }
+  });
+  bindHeaderLogout(context);
 }
 
-async function renderWindows(context: AppContext) {
+// ── Gebäude-Übersicht ─────────────────────────────────────────────────────────
+
+async function renderBuildings(context: AppContext) {
+  const buildings = await apiListBuildings();
+  const isAdmin = context.user?.profile.role === 'administrator';
+
+  context.root.innerHTML = `
+    ${renderHeader(context, 'Gebäude', 'Alle Gebäude des Projekts mit Prüffortschritt.')}
+    ${isAdmin ? `
+    <div class="intern-card" style="margin-bottom:16px">
+      <h2>Gebäude hinzufügen</h2>
+      <form id="create-building-form" class="intern-form-grid" novalidate>
+        <div class="intern-field"><label for="bname">Bezeichnung</label><input id="bname" name="name" required /></div>
+        <div class="intern-field"><label for="bcode">Kürzel</label><input id="bcode" name="code" /></div>
+        <div class="intern-actions intern-field--full"><button class="sv-button sv-button-primary" type="submit">Hinzufügen</button></div>
+      </form>
+    </div>
+    ` : ''}
+    <div id="building-msg"></div>
+    <div class="intern-building-grid" id="building-list">
+      ${buildings.map((b) => renderBuildingCard(b)).join('') || '<div class="intern-empty">Noch keine Gebäude vorhanden.</div>'}
+    </div>
+  `;
+
+  if (isAdmin) {
+    context.root.querySelector<HTMLFormElement>('#create-building-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget as HTMLFormElement;
+      const fd = new FormData(form);
+      const result = await apiCreateBuilding(String(fd.get('name') ?? '').trim(), String(fd.get('code') ?? '').trim());
+      if (result) {
+        form.reset();
+        await renderBuildings(context);
+      } else {
+        const msg = context.root.querySelector<HTMLElement>('#building-msg');
+        if (msg) msg.innerHTML = errorAlert('Gebäude konnte nicht angelegt werden.');
+      }
+    });
+  }
+  bindHeaderLogout(context);
+}
+
+function renderBuildingCard(b: Building): string {
+  const pct = b.progress_pct;
+  const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+  return `
+    <a class="intern-building-card" href="/intern/fensterpruefung-bonn/etagen/?building_id=${b.id}">
+      <div class="intern-building-card__header">
+        <strong>${escapeHtml(b.name)}</strong>
+        ${b.code ? `<span class="intern-badge intern-badge--info">${escapeHtml(b.code)}</span>` : ''}
+      </div>
+      <div class="intern-building-stats">
+        <span>${b.window_count} Fenster · ${b.sash_count} Flügel</span>
+        ${b.sash_defect > 0 ? `<span class="intern-badge intern-badge--danger">${b.sash_defect} Mängel</span>` : ''}
+      </div>
+      <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
+      <p class="intern-meta">${pct}% geprüft · ${b.sash_completed}/${b.sash_count} Flügel</p>
+    </a>
+  `;
+}
+
+// ── Etagen ────────────────────────────────────────────────────────────────────
+
+async function renderFloors(context: AppContext) {
+  const buildingId = context.buildingId ?? Number(new URLSearchParams(window.location.search).get('building_id') ?? 0);
+  if (!buildingId) { context.root.innerHTML = warnAlert('Kein Gebäude ausgewählt.'); return; }
+
+  const floors = await apiListFloors(buildingId);
+  const isAdmin = context.user?.profile.role === 'administrator';
+
+  context.root.innerHTML = `
+    ${renderHeader(context, 'Etagen', 'Bitte Etage wählen.')}
+    <div class="intern-breadcrumb">
+      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> › Etagen
+    </div>
+    ${isAdmin ? `
+    <div class="intern-card" style="margin-bottom:16px">
+      <h2>Etage hinzufügen</h2>
+      <form id="create-floor-form" class="intern-form-grid" novalidate>
+        <div class="intern-field"><label for="fname">Bezeichnung</label><input id="fname" name="name" required /></div>
+        <div class="intern-field"><label for="flevel">Geschoss (Zahl)</label><input id="flevel" name="level" type="number" value="0" /></div>
+        <div class="intern-actions intern-field--full"><button class="sv-button sv-button-primary" type="submit">Hinzufügen</button></div>
+      </form>
+    </div>
+    ` : ''}
+    <div id="floor-msg"></div>
+    <div class="intern-list" id="floor-list">
+      ${floors.map((f) => renderFloorCard(f, buildingId)).join('') || '<div class="intern-empty">Noch keine Etagen vorhanden.</div>'}
+    </div>
+  `;
+
+  if (isAdmin) {
+    context.root.querySelector<HTMLFormElement>('#create-floor-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget as HTMLFormElement;
+      const fd = new FormData(form);
+      const result = await apiCreateFloor(buildingId, String(fd.get('name') ?? '').trim(), Number(fd.get('level') ?? 0));
+      if (result) { form.reset(); await renderFloors(context); }
+      else {
+        const msg = context.root.querySelector<HTMLElement>('#floor-msg');
+        if (msg) msg.innerHTML = errorAlert('Etage konnte nicht angelegt werden.');
+      }
+    });
+  }
+  bindHeaderLogout(context);
+}
+
+function renderFloorCard(f: Floor, buildingId: number): string {
+  const pct = f.progress_pct;
+  const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+  return `
+    <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/raeume/?floor_id=${f.id}&building_id=${buildingId}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>${escapeHtml(f.name)}</strong>
+        <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
+      </div>
+      <p class="intern-meta">${f.room_count} Räume · ${f.window_count} Fenster · ${f.sash_count} Flügel · ${f.sash_completed} geprüft</p>
+      <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
+    </a>
+  `;
+}
+
+// ── Räume ─────────────────────────────────────────────────────────────────────
+
+async function renderRooms(context: AppContext) {
+  const searchParams = new URLSearchParams(window.location.search);
+  const floorId = context.floorId ?? Number(searchParams.get('floor_id') ?? 0);
+  const buildingId = context.buildingId ?? Number(searchParams.get('building_id') ?? 0);
+  if (!floorId) { context.root.innerHTML = warnAlert('Keine Etage ausgewählt.'); return; }
+
+  const rooms = await apiListRooms(floorId);
+  const isAdmin = context.user?.profile.role === 'administrator';
+
+  context.root.innerHTML = `
+    ${renderHeader(context, 'Räume', 'Bitte Raum wählen.')}
+    <div class="intern-breadcrumb">
+      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
+      <a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> ›
+      Räume
+    </div>
+    ${isAdmin ? `
+    <div class="intern-card" style="margin-bottom:16px">
+      <h2>Raum hinzufügen</h2>
+      <form id="create-room-form" class="intern-form-grid" novalidate>
+        <div class="intern-field"><label for="rname">Bezeichnung</label><input id="rname" name="name" required /></div>
+        <div class="intern-field"><label for="rnumber">Raumnummer</label><input id="rnumber" name="room_number" /></div>
+        <div class="intern-actions intern-field--full"><button class="sv-button sv-button-primary" type="submit">Hinzufügen</button></div>
+      </form>
+    </div>
+    ` : ''}
+    <div id="room-msg"></div>
+    <div class="intern-list" id="room-list">
+      ${rooms.map((r) => renderRoomCard(r, floorId, buildingId)).join('') || '<div class="intern-empty">Noch keine Räume vorhanden.</div>'}
+    </div>
+  `;
+
+  if (isAdmin) {
+    context.root.querySelector<HTMLFormElement>('#create-room-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget as HTMLFormElement;
+      const fd = new FormData(form);
+      const result = await apiCreateRoom(floorId, String(fd.get('name') ?? '').trim(), String(fd.get('room_number') ?? '').trim());
+      if (result) { form.reset(); await renderRooms(context); }
+      else {
+        const msg = context.root.querySelector<HTMLElement>('#room-msg');
+        if (msg) msg.innerHTML = errorAlert('Raum konnte nicht angelegt werden.');
+      }
+    });
+  }
+  bindHeaderLogout(context);
+}
+
+function renderRoomCard(r: Room, floorId: number, buildingId: number): string {
+  const pct = r.progress_pct;
+  const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+  return `
+    <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fenster/?room_id=${r.id}&floor_id=${floorId}&building_id=${buildingId}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>${escapeHtml(r.room_number ? `${r.room_number} – ${r.name}` : r.name)}</strong>
+        <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
+      </div>
+      <p class="intern-meta">${r.window_count} Fenster · ${r.sash_count} Flügel · ${r.sash_completed} geprüft${r.sash_defect > 0 ? ` · <span style="color:#c0392b">${r.sash_defect} Mängel</span>` : ''}</p>
+      <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
+    </a>
+  `;
+}
+
+// ── Fenster in einem Raum ────────────────────────────────────────────────────
+
+async function renderWindowsInRoom(context: AppContext) {
+  const searchParams = new URLSearchParams(window.location.search);
+  const roomId = context.roomId ?? Number(searchParams.get('room_id') ?? 0);
+  const floorId = context.floorId ?? Number(searchParams.get('floor_id') ?? 0);
+  const buildingId = context.buildingId ?? Number(searchParams.get('building_id') ?? 0);
+
+  if (!roomId) {
+    // Fallback: Flat-Fensterliste (legacy)
+    await renderWindowsFlat(context);
+    return;
+  }
+
+  const windows = await apiListWindowsInRoom(roomId);
+  const isAdmin = context.user?.profile.role !== 'auswertung';
+  const firstWindow = windows[0];
+
+  context.root.innerHTML = `
+    ${renderHeader(context, 'Fenster', 'Bitte Fenster wählen.')}
+    <div class="intern-breadcrumb">
+      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
+      <a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> ›
+      <a href="/intern/fensterpruefung-bonn/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> ›
+      ${firstWindow ? escapeHtml(`${firstWindow.room_number ? firstWindow.room_number + ' – ' : ''}${firstWindow.room_name ?? 'Raum'}`) : 'Fenster'}
+    </div>
+    ${isAdmin ? `
+    <div class="intern-actions" style="margin-bottom:16px">
+      <button class="sv-button sv-button-primary" type="button" id="create-window-btn">Fenster hinzufügen</button>
+    </div>
+    ` : ''}
+    <div id="window-room-msg"></div>
+    <div class="intern-list" id="window-room-list">
+      ${windows.map((w) => renderWindowInRoomCard(w)).join('') || '<div class="intern-empty">Noch keine Fenster in diesem Raum.</div>'}
+    </div>
+  `;
+
+  context.root.querySelector<HTMLButtonElement>('#create-window-btn')?.addEventListener('click', async () => {
+    const wnum = window.prompt('Fensternummer (z.B. F-001):');
+    if (!wnum) return;
+    const result = await apiCreateWindowInRoom(roomId, wnum.trim());
+    if (result) {
+      redirectTo(`/intern/fensterpruefung-bonn/fluegel/?window_id=${result.id}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`);
+    } else {
+      const msg = context.root.querySelector<HTMLElement>('#window-room-msg');
+      if (msg) msg.innerHTML = errorAlert('Fenster konnte nicht angelegt werden.');
+    }
+  });
+  bindHeaderLogout(context);
+}
+
+function renderWindowInRoomCard(w: WindowInRoom): string {
+  const pct = w.progress_pct;
+  const badgeClass = w.sash_defect > 0 ? 'danger' : pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+  return `
+    <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fluegel/?window_id=${w.id}&room_id=0&floor_id=${w.floor_id ?? 0}&building_id=${w.building_id ?? 0}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>${escapeHtml(w.window_number || w.record_id)}</strong>
+        <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
+      </div>
+      <p class="intern-meta">${w.sash_count} Flügel · ${w.sash_completed} geprüft${w.sash_defect > 0 ? ` · ${w.sash_defect} Mängel` : ''} · ${escapeHtml(w.status)}</p>
+      <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
+    </a>
+  `;
+}
+
+// ── Flügelliste eines Fensters ────────────────────────────────────────────────
+
+async function renderSashes(context: AppContext) {
+  const searchParams = new URLSearchParams(window.location.search);
+  const windowId = context.windowId ?? Number(searchParams.get('window_id') ?? 0);
+  const roomId = context.roomId ?? Number(searchParams.get('room_id') ?? 0);
+  const floorId = context.floorId ?? Number(searchParams.get('floor_id') ?? 0);
+  const buildingId = context.buildingId ?? Number(searchParams.get('building_id') ?? 0);
+
+  if (!windowId) { context.root.innerHTML = warnAlert('Kein Fenster ausgewählt.'); return; }
+
+  const sashes = await apiListSashes(windowId);
+  const canEdit = context.user?.profile.role !== 'auswertung';
+
+  // Fenstertitel aus dem ersten Flügel ermitteln
+  const first = sashes[0];
+  const windowLabel = first?.window_number || `Fenster #${windowId}`;
+  const breadBuilding = buildingId > 0 ? `<a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> › ` : '';
+  const breadFloor = floorId > 0 ? `<a href="/intern/fensterpruefung-bonn/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> › ` : '';
+  const breadRoom = roomId > 0 ? `<a href="/intern/fensterpruefung-bonn/fenster/?room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">Fenster</a> › ` : '';
+
+  const overallPct = sashes.length > 0
+    ? Math.round(sashes.filter((s) => ['abgeschlossen', 'freigegeben'].includes(s.status)).length / sashes.length * 100)
+    : 0;
+
+  context.root.innerHTML = `
+    ${renderHeader(context, `Flügel – ${escapeHtml(windowLabel)}`, 'Bitte Flügel wählen für die Inspektion.')}
+    <div class="intern-breadcrumb">
+      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
+      ${breadBuilding}${breadFloor}${breadRoom}
+      ${escapeHtml(windowLabel)} – Flügel
+    </div>
+    <div class="intern-statusbar">
+      <div class="intern-card"><strong>${sashes.length}</strong><p class="intern-meta">Flügel gesamt</p></div>
+      <div class="intern-card"><strong>${sashes.filter((s) => ['abgeschlossen','freigegeben'].includes(s.status)).length}</strong><p class="intern-meta">Geprüft</p></div>
+      <div class="intern-card"><strong>${sashes.filter((s) => s.has_defect).length}</strong><p class="intern-meta">Mit Mangel</p></div>
+      <div class="intern-card">
+        <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${overallPct === 100 ? 'ok' : 'info'}" style="width:${overallPct}%"></div></div>
+        <p class="intern-meta">${overallPct}% abgeschlossen</p>
+      </div>
+    </div>
+    ${canEdit ? `<div class="intern-actions" style="margin:12px 0"><button class="sv-button sv-button-primary" type="button" id="add-sash-btn">Flügel hinzufügen</button></div>` : ''}
+    <div id="sash-msg"></div>
+    <div class="intern-list" id="sash-list">
+      ${sashes.map((s) => renderSashCard(s, windowId, roomId, floorId, buildingId)).join('') || '<div class="intern-empty">Noch keine Flügel vorhanden. Flügel hinzufügen.</div>'}
+    </div>
+  `;
+
+  context.root.querySelector<HTMLButtonElement>('#add-sash-btn')?.addEventListener('click', async () => {
+    const label = window.prompt('Flügelbezeichnung (z.B. Flügel Links):') ?? '';
+    if (!label) return;
+    const result = await apiCreateSash(windowId, label.trim(), 'Dreh-Kipp', '');
+    if (result) {
+      redirectTo(`/intern/fensterpruefung-bonn/fluegel-pruefung/?sash_id=${result.id}&window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`);
+    } else {
+      const msg = context.root.querySelector<HTMLElement>('#sash-msg');
+      if (msg) msg.innerHTML = errorAlert('Flügel konnte nicht angelegt werden.');
+    }
+  });
+  bindHeaderLogout(context);
+}
+
+function renderSashCard(s: WindowSashSummary, windowId: number, roomId: number, floorId: number, buildingId: number): string {
+  const isComplete = ['abgeschlossen', 'freigegeben'].includes(s.status);
+  const badgeClass = s.has_defect ? 'danger' : isComplete ? 'ok' : s.status === 'in Bearbeitung' ? 'info' : 'warn';
+  const statusLabel = sashStatusLabel(s.status);
+  return `
+    <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fluegel-pruefung/?sash_id=${s.id}&window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <strong>${escapeHtml(s.sash_label || `Flügel ${s.sash_number}`)}</strong>
+        <span class="intern-badge intern-badge--${badgeClass}">${escapeHtml(statusLabel)}</span>
+      </div>
+      <p class="intern-meta">
+        ${s.opening_type ? escapeHtml(s.opening_type) : ''}${s.position ? ` · ${escapeHtml(s.position)}` : ''}
+        ${s.overall_rating ? ` · ${escapeHtml(s.overall_rating)}` : ''}
+        ${s.inspector_name ? ` · ${escapeHtml(s.inspector_name)}` : ''}
+        ${s.photo_count ? ` · ${s.photo_count} Fotos` : ''}
+      </p>
+      <div class="intern-progress-bar">
+        <div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${s.progress_percent}%"></div>
+      </div>
+      <p class="intern-meta">${s.progress_percent}% ausgefüllt</p>
+    </a>
+  `;
+}
+
+function sashStatusLabel(status: string): string {
+  switch (status) {
+    case 'nicht begonnen': return 'Nicht begonnen';
+    case 'in Bearbeitung': return 'In Bearbeitung';
+    case 'abgeschlossen': return 'Abgeschlossen';
+    case 'Nachpruefung erforderlich': return 'Nachprüfung';
+    case 'freigegeben': return 'Freigegeben';
+    default: return status;
+  }
+}
+
+// ── Flügel-Inspektion ─────────────────────────────────────────────────────────
+
+async function renderSashInspection(context: AppContext) {
+  const searchParams = new URLSearchParams(window.location.search);
+  const sashId = context.sashId ?? Number(searchParams.get('sash_id') ?? 0);
+  const windowId = context.windowId ?? Number(searchParams.get('window_id') ?? 0);
+  const roomId = context.roomId ?? Number(searchParams.get('room_id') ?? 0);
+  const floorId = context.floorId ?? Number(searchParams.get('floor_id') ?? 0);
+  const buildingId = context.buildingId ?? Number(searchParams.get('building_id') ?? 0);
+
+  if (!sashId) { context.root.innerHTML = warnAlert('Kein Flügel ausgewählt.'); return; }
+
+  const sash = await apiGetSash(sashId);
+  if (!sash) { context.root.innerHTML = errorAlert('Flügel nicht gefunden.'); return; }
+
+  const photos = await apiListSashPhotos(sashId);
+  const canEdit = context.user?.profile.role !== 'auswertung';
+  const data = sash.form_data as Record<string, unknown>;
+
+  const backUrl = `/intern/fensterpruefung-bonn/fluegel/?window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`;
+
+  context.root.innerHTML = `
+    ${renderHeader(context, `${escapeHtml(sash.sash_label || `Flügel ${sash.sash_number}`)} – Inspektion`, `Fenster ${escapeHtml(sash.window_number)} · ${escapeHtml(sash.room_name ?? '')} · ${escapeHtml(sash.floor_name ?? '')} · ${escapeHtml(sash.building_name ?? '')}`)}
+    <div class="intern-breadcrumb">
+      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
+      ${buildingId > 0 ? `<a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> › ` : ''}
+      ${floorId > 0 ? `<a href="/intern/fensterpruefung-bonn/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> › ` : ''}
+      ${roomId > 0 ? `<a href="/intern/fensterpruefung-bonn/fenster/?room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">Fenster</a> › ` : ''}
+      <a href="${backUrl}">Flügel</a> › Inspektion
+    </div>
+    <div class="intern-statusbar">
+      <div class="intern-card"><strong>${sash.progress_percent}%</strong><p class="intern-meta">Fortschritt</p></div>
+      <div class="intern-card"><strong>${escapeHtml(sashStatusLabel(sash.status))}</strong><p class="intern-meta">Status</p></div>
+      ${sash.has_defect ? '<div class="intern-card"><span class="intern-badge intern-badge--danger">Mangel festgestellt</span></div>' : ''}
+      <div class="intern-card"><span id="save-status" class="intern-meta">Bereit</span></div>
+    </div>
+    <div class="intern-grid">
+      <div>
+        <form id="sash-form" class="intern-list" novalidate>
+          ${renderSashFormSections(data, !canEdit)}
+        </form>
+        <section class="intern-form-section">
+          <h2>Fotodokumentation</h2>
+          <div class="intern-upload">
+            <label for="sash-photo-category">Fotokategorie</label>
+            <select id="sash-photo-category">${sashPhotoCategories()}</select>
+            <label for="sash-photo-caption">Bildbeschreibung</label>
+            <input id="sash-photo-caption" type="text" placeholder="Optional" />
+            <label for="sash-photo-files">Foto aufnehmen oder auswählen</label>
+            <input id="sash-photo-files" type="file" accept="image/*" capture="environment" multiple ${!canEdit ? 'disabled' : ''} />
+            <div class="intern-actions">
+              <button class="sv-button sv-button-secondary" type="button" id="upload-sash-photos" ${!canEdit ? 'disabled' : ''}>Fotos hochladen</button>
+            </div>
+          </div>
+          <div id="sash-photo-gallery" class="intern-photo-grid">${renderPhotos(photos)}</div>
+        </section>
+      </div>
+      <aside class="intern-list">
+        <section class="intern-panel">
+          <h2>Navigationshilfe</h2>
+          <div class="intern-list">
+            <a class="intern-card" href="${backUrl}">← Zurück zur Flügelliste</a>
+          </div>
+        </section>
+        <section class="intern-panel">
+          <h2>Prüfergebnis</h2>
+          <div class="intern-list">
+            <div class="intern-card">
+              <strong>${escapeHtml(sash.overall_rating ?? '—')}</strong>
+              <p class="intern-meta">Gesamtbewertung</p>
+            </div>
+            <div class="intern-card">
+              ${sash.has_defect ? '<span class="intern-badge intern-badge--danger">Mangel</span>' : '<span class="intern-badge intern-badge--ok">Kein Mangel</span>'}
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+    <div class="intern-sticky-actions">
+      <div class="intern-progress">
+        <a class="sv-button sv-button-secondary" href="${backUrl}">Zurück</a>
+        <progress value="${sash.progress_percent}" max="100"></progress>
+        <span>${sash.progress_percent}% Pflichtfelder</span>
+      </div>
+      <div class="intern-actions">
+        ${canEdit ? `
+          <button class="sv-button sv-button-secondary" type="button" id="sash-save-btn">Zwischenspeichern</button>
+          <button class="sv-button sv-button-primary" type="button" id="sash-complete-btn">Prüfung abschließen</button>
+        ` : '<span class="intern-meta">Nur lesend</span>'}
+      </div>
+    </div>
+  `;
+
+  const form = context.root.querySelector<HTMLFormElement>('#sash-form');
+  const saveStatus = context.root.querySelector<HTMLElement>('#save-status');
+  const workingCopy = structuredClone(data);
+
+  const updateSaveStatus = (msg: string) => { if (saveStatus) saveStatus.textContent = msg; };
+
+  const scheduleSave = debounce(async () => {
+    if (!canEdit) return;
+    updateSaveStatus('Speichern…');
+    workingCopy['status'] ??= 'in Bearbeitung';
+    const { error } = await apiSaveSash(sashId, workingCopy);
+    if (error) {
+      updateSaveStatus('Speichern fehlgeschlagen');
+    } else {
+      updateSaveStatus('Gespeichert ✓');
+      context.draftDirty = false;
+    }
+  }, 1500);
+
+  form?.addEventListener('input', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement)) return;
+    workingCopy[target.name] = target instanceof HTMLInputElement && target.type === 'checkbox' ? target.checked : target.value;
+    if (!workingCopy['status'] || workingCopy['status'] === 'nicht begonnen') {
+      workingCopy['status'] = 'in Bearbeitung';
+    }
+    context.draftDirty = true;
+    updateSaveStatus('Ungespeichert…');
+    scheduleSave();
+  });
+
+  context.root.querySelector<HTMLButtonElement>('#sash-save-btn')?.addEventListener('click', async () => {
+    updateSaveStatus('Speichern…');
+    const { error } = await apiSaveSash(sashId, workingCopy);
+    if (error) {
+      updateSaveStatus('Fehler');
+      showInlineMessage(context.root, errorAlert('Speichern fehlgeschlagen.'));
+    } else {
+      updateSaveStatus('Gespeichert ✓');
+      context.draftDirty = false;
+    }
+  });
+
+  context.root.querySelector<HTMLButtonElement>('#sash-complete-btn')?.addEventListener('click', async () => {
+    if (!window.confirm(`Prüfung für "${sash.sash_label || `Flügel ${sash.sash_number}`}" wirklich abschließen?`)) return;
+    workingCopy['status'] = 'abgeschlossen';
+    workingCopy['completion_confirmed'] = true;
+    const { error } = await apiSaveSash(sashId, workingCopy);
+    if (error) {
+      showInlineMessage(context.root, errorAlert('Abschluss fehlgeschlagen.'));
+    } else {
+      showInlineMessage(context.root, successAlert('Prüfung abgeschlossen. Weiter zum nächsten Flügel.'));
+      // Auto-navigate to next sash or back to sash list
+      setTimeout(() => redirectTo(backUrl), 1500);
+    }
+  });
+
+  context.root.querySelector<HTMLButtonElement>('#upload-sash-photos')?.addEventListener('click', async () => {
+    const fileInput = context.root.querySelector<HTMLInputElement>('#sash-photo-files');
+    const categorySelect = context.root.querySelector<HTMLSelectElement>('#sash-photo-category');
+    const captionInput = context.root.querySelector<HTMLInputElement>('#sash-photo-caption');
+    const gallery = context.root.querySelector<HTMLElement>('#sash-photo-gallery');
+    if (!fileInput?.files?.length || !categorySelect || !gallery) return;
+
+    for (const file of Array.from(fileInput.files)) {
+      const resized = await resizeImageIfNeeded(file);
+      await apiUploadSashPhoto(String(sash.window_id), sashId, resized, categorySelect.value, captionInput?.value ?? '');
+    }
+
+    const updatedPhotos = await apiListSashPhotos(sashId);
+    gallery.innerHTML = renderPhotos(updatedPhotos);
+    bindSashPhotoDeletion(sashId, gallery);
+    fileInput.value = '';
+    if (captionInput) captionInput.value = '';
+  });
+
+  bindSashPhotoDeletion(sashId, context.root.querySelector<HTMLElement>('#sash-photo-gallery') ?? undefined);
+  bindHeaderLogout(context);
+}
+
+function renderSashFormSections(data: Record<string, unknown>, disabled: boolean): string {
+  const dis = disabled ? 'disabled' : '';
+  const val = (key: string, fallback = '') => escapeHtml(String(data[key] ?? fallback));
+  const checked = (key: string) => Boolean(data[key]) ? 'checked' : '';
+  const sel = (key: string, v: string) => String(data[key] ?? '') === v ? 'selected' : '';
+
+  const statusOptions = ['nicht begonnen', 'in Bearbeitung', 'abgeschlossen', 'Nachpruefung erforderlich', 'freigegeben'];
+  const ratingOptions = [
+    'ohne festgestellten Handlungsbedarf',
+    'geringfuegige Auffaelligkeit',
+    'Wartung oder Nachstellung erforderlich',
+    'Instandsetzung erforderlich',
+    'Beschlagkomponente austauschen',
+    'weiterfuehrende Pruefung erforderlich',
+    'Nutzung vorsorglich einschraenken',
+    'Nutzung bis zur Klaerung nicht empfohlen',
+    'nicht abschliessend pruefbar',
+  ];
+  const openingTypes = ['Dreh-Kipp', 'Dreh', 'Kipp', 'Festverglasung', 'sonstige'];
+  const positionOptions = ['links', 'rechts', 'mitte', 'oben', 'unten', 'Einzelflügel'];
+  const conditionOptions = ['einwandfrei', 'leichte Auffälligkeit', 'starke Auffälligkeit', 'Defekt'];
+
+  return `
+    <section class="intern-form-section">
+      <h2>A. Flügelidentifikation</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field"><label for="sash_label">Flügelbezeichnung *</label>
+          <input id="sash_label" name="sash_label" type="text" value="${val('sash_label')}" required ${dis} /></div>
+        <div class="intern-field"><label for="opening_type">Öffnungsart *</label>
+          <select id="opening_type" name="opening_type" required ${dis}>
+            <option value="">Bitte wählen</option>
+            ${openingTypes.map((o) => `<option value="${o}" ${sel('opening_type', o)}>${o}</option>`).join('')}
+          </select></div>
+        <div class="intern-field"><label for="position">Position am Fenster</label>
+          <select id="position" name="position" ${dis}>
+            <option value="">—</option>
+            ${positionOptions.map((p) => `<option value="${p}" ${sel('position', p)}>${p}</option>`).join('')}
+          </select></div>
+        <div class="intern-field"><label for="status">Status *</label>
+          <select id="status" name="status" required ${dis}>
+            ${statusOptions.map((s) => `<option value="${s}" ${sel('status', s)}>${sashStatusLabelStatic(s)}</option>`).join('')}
+          </select></div>
+      </div>
+    </section>
+
+    <section class="intern-form-section">
+      <h2>B. Prüfungsdaten</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field"><label for="inspection_date">Prüfdatum *</label>
+          <input id="inspection_date" name="inspection_date" type="date" value="${val('inspection_date', new Date().toISOString().slice(0, 10))}" required ${dis} /></div>
+        <div class="intern-field"><label for="inspector_name">Prüfer *</label>
+          <input id="inspector_name" name="inspector_name" type="text" value="${val('inspector_name')}" required ${dis} /></div>
+      </div>
+    </section>
+
+    <section class="intern-form-section">
+      <h2>C. Verglasung</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field"><label for="glass_structure">Glasaufbau *</label>
+          <input id="glass_structure" name="glass_structure" type="text" value="${val('glass_structure')}" placeholder="z.B. ESG 6mm, VSG 8.8mm" required ${dis} /></div>
+        <div class="intern-field"><label for="glazing_width_mm">Glasbreite (mm)</label>
+          <input id="glazing_width_mm" name="glazing_width_mm" type="number" value="${val('glazing_width_mm')}" min="0" step="1" ${dis} /></div>
+        <div class="intern-field"><label for="glazing_height_mm">Glashöhe (mm)</label>
+          <input id="glazing_height_mm" name="glazing_height_mm" type="number" value="${val('glazing_height_mm')}" min="0" step="1" ${dis} /></div>
+      </div>
+    </section>
+
+    <section class="intern-form-section">
+      <h2>D. Scharniere und Beschlag</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field"><label for="hinge_condition">Scharnierzustand</label>
+          <select id="hinge_condition" name="hinge_condition" ${dis}>
+            <option value="">—</option>
+            ${conditionOptions.map((c) => `<option value="${c}" ${sel('hinge_condition', c)}>${c}</option>`).join('')}
+          </select></div>
+        <div class="intern-field"><label for="fitting_condition">Beschlagzustand</label>
+          <select id="fitting_condition" name="fitting_condition" ${dis}>
+            <option value="">—</option>
+            ${conditionOptions.map((c) => `<option value="${c}" ${sel('fitting_condition', c)}>${c}</option>`).join('')}
+          </select></div>
+        <div class="intern-field">
+          <label class="intern-checkbox"><input type="checkbox" name="hinge_fastening_loose" ${checked('hinge_fastening_loose')} ${dis} /><span>Scharnierbefestigung lose</span></label>
+        </div>
+        <div class="intern-field">
+          <label class="intern-checkbox"><input type="checkbox" name="hinge_screws_missing" ${checked('hinge_screws_missing')} ${dis} /><span>Schrauben fehlen</span></label>
+        </div>
+        <div class="intern-field">
+          <label class="intern-checkbox"><input type="checkbox" name="hinge_deformation" ${checked('hinge_deformation')} ${dis} /><span>Verformung festgestellt</span></label>
+        </div>
+        <div class="intern-field">
+          <label class="intern-checkbox"><input type="checkbox" name="hinge_corrosion" ${checked('hinge_corrosion')} ${dis} /><span>Korrosion festgestellt</span></label>
+        </div>
+        <div class="intern-field">
+          <label class="intern-checkbox"><input type="checkbox" name="fitting_defect" ${checked('fitting_defect')} ${dis} /><span>Beschlagdefekt</span></label>
+        </div>
+        <div class="intern-field">
+          <label class="intern-checkbox"><input type="checkbox" name="unsafe_until_repair" ${checked('unsafe_until_repair')} ${dis} /><span>Sicherheitsrelevant – Sperre bis Instandsetzung</span></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="intern-form-section">
+      <h2>E. Gesamtbewertung</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field intern-field--full"><label for="overall_rating">Gesamtbewertung *</label>
+          <select id="overall_rating" name="overall_rating" required ${dis}>
+            <option value="">Bitte wählen</option>
+            ${ratingOptions.map((r) => `<option value="${r}" ${sel('overall_rating', r)}>${r}</option>`).join('')}
+          </select></div>
+        <div class="intern-field intern-field--full"><label for="recommended_action">Empfohlene Maßnahme</label>
+          <textarea id="recommended_action" name="recommended_action" ${dis}>${val('recommended_action')}</textarea></div>
+        <div class="intern-field intern-field--full"><label for="notes">Hinweise / Bemerkungen</label>
+          <textarea id="notes" name="notes" ${dis}>${val('notes')}</textarea></div>
+      </div>
+    </section>
+  `;
+}
+
+function sashStatusLabelStatic(status: string): string {
+  switch (status) {
+    case 'nicht begonnen': return 'Nicht begonnen';
+    case 'in Bearbeitung': return 'In Bearbeitung';
+    case 'abgeschlossen': return 'Abgeschlossen';
+    case 'Nachpruefung erforderlich': return 'Nachprüfung erforderlich';
+    case 'freigegeben': return 'Freigegeben';
+    default: return status;
+  }
+}
+
+function sashPhotoCategories(): string {
+  return [
+    ['Gesamtansicht', 'Gesamtansicht'],
+    ['Fensterkennzeichnung', 'Fensterkennzeichnung'],
+    ['Fluegellager', 'Flügellager'],
+    ['Ecklager', 'Ecklager'],
+    ['Beschlagschere', 'Beschlagschere'],
+    ['Scharnier', 'Scharnier'],
+    ['Mangel', 'Mangel/Defekt'],
+    ['sonstiges', 'Sonstiges'],
+  ].map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join('');
+}
+
+function bindSashPhotoDeletion(sashId: number, scope?: ParentNode) {
+  scope?.querySelectorAll<HTMLElement>('[data-delete-photo]').forEach((button) => {
+    button.onclick = async () => {
+      if (!window.confirm('Foto wirklich löschen?')) return;
+      const id = button.dataset.deletePhoto;
+      if (!id) return;
+      await apiDeletePhoto(id);
+      const gallery = button.closest('#sash-photo-gallery') as HTMLElement | null;
+      if (gallery) {
+        const updatedPhotos = await apiListSashPhotos(sashId);
+        gallery.innerHTML = renderPhotos(updatedPhotos);
+        bindSashPhotoDeletion(sashId, gallery);
+      }
+    };
+  });
+}
+
+function bindHeaderLogout(context: AppContext) {
+  context.root.querySelector<HTMLButtonElement>('#header-logout')?.addEventListener('click', async () => {
+    await apiLogout();
+    redirectTo('/intern/login/');
+  });
+}
+
+// ── Flat-Fensterliste (Legacy-Fallback) ──────────────────────────────────────
+
+async function renderWindowsFlat(context: AppContext) {
   const records = await fetchWindowSummaries(context);
   const filtersHtml = createFilterControls(records);
   context.root.innerHTML = `
@@ -312,7 +1104,8 @@ async function renderWindows(context: AppContext) {
     await downloadQrOverview(records);
   });
   bindWindowTableActions(context, records);
-  subscribeToWindowChanges(context, () => void renderWindows(context));
+  subscribeToWindowChanges(context, () => void renderWindowsFlat(context));
+  bindHeaderLogout(context);
 }
 
 function bindWindowTableActions(context: AppContext, records: WindowSummary[]) {
@@ -491,6 +1284,7 @@ async function renderRecord(context: AppContext) {
   });
 
   bindPhotoDeletion(context, id, gallery ?? undefined);
+  bindHeaderLogout(context);
   subscribeToSingleRecord(context, id, async () => {
     const note = context.root.querySelector<HTMLElement>('[data-record-refresh-note]');
     if (note) note.remove();
@@ -524,6 +1318,7 @@ async function renderAnalysis(context: AppContext) {
       <section class="intern-panel"><h2>Ergebnisse je Fenstersystem</h2>${renderGrouping(bySystem)}</section>
     </div>
   `;
+  bindHeaderLogout(context);
 }
 
 async function renderExport(context: AppContext) {
@@ -561,6 +1356,7 @@ async function renderExport(context: AppContext) {
   context.root.querySelector<HTMLButtonElement>('#print-summary')?.addEventListener('click', async () => {
     await printSummary(records);
   });
+  bindHeaderLogout(context);
 }
 
 async function renderAdmin(context: AppContext) {
@@ -636,6 +1432,7 @@ async function renderAdmin(context: AppContext) {
       await loadUsers();
     }
   });
+  bindHeaderLogout(context);
 }
 
 function renderUserList(users: AdminUser[], currentUser: PortalUser): string {
@@ -881,13 +1678,14 @@ function renderHeader(context: AppContext, title: string, text: string) {
       <p class="sv-eyebrow">${escapeHtml(portalProject.title)}</p>
       <h1>${escapeHtml(title)}</h1>
       <p>${escapeHtml(text)}</p>
-      <div class="intern-actions">
+      <nav class="intern-actions" aria-label="Hauptnavigation">
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/">Dashboard</a>
-        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/fenster/">Fenster</a>
+        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a>
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/auswertung/">Auswertung</a>
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/export/">Export</a>
         ${isAdmin ? '<a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/admin/">Benutzerverwaltung</a>' : ''}
-      </div>
+        <button class="sv-button sv-button-ghost" type="button" id="header-logout">Abmelden</button>
+      </nav>
     </div>
   `;
 }

@@ -480,3 +480,107 @@
     text-align: center;
   }
 }
+
+/* ── Gebäude-Hierarchie ────────────────────────────────────────────────────── */
+
+.intern-building-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.intern-building-card {
+  display: block;
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border, #d6e0e8);
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.intern-building-card:hover {
+  border-color: var(--color-primary, #0b4f7a);
+  box-shadow: 0 2px 12px rgba(11,79,122,0.10);
+}
+
+.intern-building-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.intern-building-stats {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #5a7a8a);
+  margin-bottom: 0.5rem;
+}
+
+.intern-progress-bar {
+  background: var(--color-border, #d6e0e8);
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.intern-progress-bar__fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.intern-progress-bar__fill--ok     { background: #27ae60; }
+.intern-progress-bar__fill--info   { background: #2980b9; }
+.intern-progress-bar__fill--warn   { background: #e67e22; }
+.intern-progress-bar__fill--danger { background: #c0392b; }
+
+/* ── Breadcrumb ──────────────────────────────────────────────────────────────── */
+
+.intern-breadcrumb {
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #5a7a8a);
+  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.intern-breadcrumb a {
+  color: var(--color-primary, #0b4f7a);
+  text-decoration: none;
+}
+
+.intern-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* ── Listenelemente in Hierarchie ────────────────────────────────────────────── */
+
+.intern-list-item {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.intern-list-item:hover {
+  border-color: var(--color-primary, #0b4f7a);
+  box-shadow: 0 2px 8px rgba(11,79,122,0.08);
+}
+
+/* ── Responsive für Gebäude-Grid ─────────────────────────────────────────────── */
+
+@media (max-width: 48rem) {
+  .intern-building-grid {
+    grid-template-columns: 1fr;
+  }
+}
