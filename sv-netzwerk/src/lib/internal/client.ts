@@ -1,6 +1,5 @@
 import QRCode from 'qrcode';
-import type { AuthChangeEvent, Session, SupabaseClient, User } from '@supabase/supabase-js';
-import { calculateWindowWeights, normalizeCalculationParameters } from './calculations';
+import { calculateWindowWeights } from './calculations';
 import { loadAllDrafts, loadDraft, removeDraft, saveDraft } from './offline';
 import {
   exportDefinitions,
@@ -10,17 +9,67 @@ import {
   roleLabels,
   windowFormSections,
 } from './schema';
-import { getSupabaseBrowserClient, hasSupabaseConfig } from './supabase';
+import {
+  apiLogin,
+  apiLogout,
+  apiResetPassword,
+  apiListWindows,
+  apiGetWindow,
+  apiCreateWindow,
+  apiSaveWindow,
+  apiAcquireLock,
+  apiReleaseLock,
+  apiGetActiveLocks,
+  apiGetAuditLog,
+  apiListPhotos,
+  apiUploadPhoto,
+  apiDeletePhoto,
+  apiGetCalculationParameters,
+  apiLogExport,
+  apiListUsers,
+  apiCreateUser,
+  apiUpdateUser,
+  apiSetUserPassword,
+  apiDeactivateUser,
+  loadApiUser,
+  onAuthChange,
+  // Hierarchie
+  apiListBuildings,
+  apiListFloors,
+  apiListRooms,
+  apiListWindowsInRoom,
+  apiCreateBuilding,
+  apiCreateFloor,
+  apiCreateRoom,
+  apiCreateWindowInRoom,
+  // Flügel
+  apiListSashes,
+  apiGetSash,
+  apiCreateSash,
+  apiSaveSash,
+  apiDeleteSash,
+  apiListSashPhotos,
+  apiUploadSashPhoto,
+  // Demo
+  apiGetDemoStatus,
+  apiSeedDemoData,
+} from './php-api';
 import type {
+  AdminUser,
   AuditLogEntry,
-  CalculationParameterMap,
+  Building,
   DashboardStats,
+  Floor,
   LockResult,
   PhotoItem,
   PortalRoute,
   PortalRole,
   PortalUser,
+  Room,
+  WindowInRoom,
   WindowRecord,
+  WindowSashRecord,
+  WindowSashSummary,
   WindowSummary,
 } from './types';
 
@@ -28,68 +77,39 @@ interface AppContext {
   root: HTMLElement;
   route: PortalRoute;
   recordId: string | null;
-  supabase: SupabaseClient | null;
-  session: Session | null;
+  buildingId: number | null;
+  floorId: number | null;
+  roomId: number | null;
+  windowId: number | null;
+  sashId: number | null;
   user: PortalUser | null;
   draftDirty: boolean;
-}
-
-interface WindowPayload {
-  id: string;
-  project_id?: string;
-  record_id: string;
-  inspection_number: number | null;
-  window_number: string;
-  room_number: string | null;
-  room_label: string | null;
-  building_label: string | null;
-  section_label: string | null;
-  floor_label: string | null;
-  status: string;
-  overall_rating: string | null;
-  priority: string | null;
-  accessibility_status: string | null;
-  assigned_to: string | null;
-  assigned_name: string | null;
-  special_inspection_required: boolean | null;
-  urgent_action_required: boolean | null;
-  has_defect: boolean | null;
-  danger_immediate: boolean | null;
-  last_edited_at: string | null;
-  updated_at: string;
-  progress_percent: number | null;
-  form_data: Record<string, unknown> | null;
-  calculated_data: Record<string, unknown> | null;
-  completed_at?: string | null;
-  released_at?: string | null;
-  release_reason?: string | null;
-  version?: number | null;
 }
 
 const LOCK_TIMEOUT_MINUTES = 15;
 const SAVE_DEBOUNCE_MS = 1200;
 const SYNC_WARNING_MESSAGE = 'Es liegen noch nicht synchronisierte Aenderungen vor.';
-const DEFAULT_PROJECT_ID = '11111111-1111-4111-8111-111111111111';
 
-const authListeners = new Set<(event: AuthChangeEvent, session: Session | null) => void>();
-let authSubscription: { unsubscribe: () => void } | null = null;
-let authSupabaseClient: SupabaseClient | null = null;
+const authListeners = new Set<(user: PortalUser | null) => void>();
 
 export async function mountInternalPortal(root: HTMLElement) {
   if (root.dataset.internalPortalMounted === 'true') return;
   root.dataset.internalPortalMounted = 'true';
   const route = (root.dataset.route as PortalRoute | undefined) ?? 'landing';
-  const recordId = root.dataset.recordId || new URLSearchParams(window.location.search).get('id');
-  const supabase = getSupabaseBrowserClient();
-  const session = supabase ? (await supabase.auth.getSession()).data.session : null;
-  const user = session && supabase ? await loadPortalUser(supabase, session.user) : null;
-  const context: AppContext = { root, route, recordId, supabase, session, user, draftDirty: false };
+  const searchParams = new URLSearchParams(window.location.search);
+  const recordId = root.dataset.recordId || searchParams.get('id');
+  const buildingId = searchParams.get('building_id') ? Number(searchParams.get('building_id')) : null;
+  const floorId = searchParams.get('floor_id') ? Number(searchParams.get('floor_id')) : null;
+  const roomId = searchParams.get('room_id') ? Number(searchParams.get('room_id')) : null;
+  const windowId = searchParams.get('window_id') ? Number(searchParams.get('window_id')) : null;
+  const sashId = searchParams.get('sash_id') ? Number(searchParams.get('sash_id')) : null;
+  const user = await loadApiUser();
+  const context: AppContext = { root, route, recordId, buildingId, floorId, roomId, windowId, sashId, user, draftDirty: false };
   const disposers: Array<() => void> = [];
 
   root.classList.add('intern-app');
   const unbindAuth = bindAuthListener(context);
   disposers.push(unbindAuth);
-
   const onlineHandler = () => void syncDraftQueue(context);
   window.addEventListener('online', onlineHandler);
   disposers.push(() => window.removeEventListener('online', onlineHandler));
@@ -119,52 +139,25 @@ export async function mountInternalPortal(root: HTMLElement) {
 }
 
 function bindAuthListener(context: AppContext) {
-  if (!context.supabase) return () => {};
-
-  const handleAuthEvent = async (event: AuthChangeEvent, session: Session | null) => {
-    if (!['INITIAL_SESSION', 'SIGNED_IN', 'SIGNED_OUT', 'TOKEN_REFRESHED', 'USER_UPDATED', 'PASSWORD_RECOVERY'].includes(event)) {
-      return;
-    }
-    context.session = session;
-    context.user = session ? await loadPortalUser(context.supabase!, session.user) : null;
-    if (event === 'SIGNED_OUT' && context.route !== 'login') {
+  const handleChange = async (user: PortalUser | null) => {
+    context.user = user;
+    if (!user && context.route !== 'login') {
       redirectTo('/intern/login/');
       return;
     }
     await renderRoute(context);
   };
 
-  const listener = (event: AuthChangeEvent, session: Session | null) => {
-    void handleAuthEvent(event, session);
-  };
-  authListeners.add(listener);
-
-  if (!authSubscription || authSupabaseClient !== context.supabase) {
-    authSubscription?.unsubscribe();
-    authSupabaseClient = context.supabase;
-    authSubscription = context.supabase.auth.onAuthStateChange((event, session) => {
-      for (const listener of Array.from(authListeners)) {
-        listener(event, session);
-      }
-    }).data.subscription;
-  }
+  authListeners.add(handleChange);
+  const unsubscribe = onAuthChange(handleChange);
 
   return () => {
-    authListeners.delete(listener);
-    if (!authListeners.size) {
-      authSubscription?.unsubscribe();
-      authSubscription = null;
-      authSupabaseClient = null;
-    }
+    authListeners.delete(handleChange);
+    unsubscribe();
   };
 }
 
 async function renderRoute(context: AppContext) {
-  if (!hasSupabaseConfig()) {
-    context.root.innerHTML = renderConfigMissing();
-    return;
-  }
-
   if (context.route !== 'login' && !context.user) {
     redirectTo('/intern/login/');
     return;
@@ -180,8 +173,23 @@ async function renderRoute(context: AppContext) {
     case 'dashboard':
       await renderDashboard(context);
       break;
+    case 'buildings':
+      await renderBuildings(context);
+      break;
+    case 'floors':
+      await renderFloors(context);
+      break;
+    case 'rooms':
+      await renderRooms(context);
+      break;
     case 'windows':
-      await renderWindows(context);
+      await renderWindowsInRoom(context);
+      break;
+    case 'sashes':
+      await renderSashes(context);
+      break;
+    case 'sash':
+      await renderSashInspection(context);
       break;
     case 'record':
       await renderRecord(context);
@@ -192,18 +200,10 @@ async function renderRoute(context: AppContext) {
     case 'export':
       await renderExport(context);
       break;
+    case 'admin':
+      await renderAdmin(context);
+      break;
   }
-}
-
-function renderConfigMissing() {
-  return `
-    <div class="intern-card intern-login">
-      <p class="sv-eyebrow">Einrichtung erforderlich</p>
-      <h1>Supabase-Konfiguration fehlt</h1>
-      <p>Setzen Sie <code>PUBLIC_SUPABASE_URL</code> und <code>PUBLIC_SUPABASE_ANON_KEY</code>, fuehren Sie die SQL-Migrationen aus und legen Sie Benutzerkonten an.</p>
-      <div class="intern-alert intern-alert--warn">Die interne Anwendung wird erst nach abgeschlossener Supabase-Einrichtung funktionsfaehig.</div>
-    </div>
-  `;
 }
 
 function renderLanding(context: AppContext) {
@@ -254,12 +254,12 @@ function renderLogin(context: AppContext) {
   const resetButton = context.root.querySelector<HTMLButtonElement>('#reset-password');
   form?.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!context.supabase || !message) return;
+    if (!message) return;
     const email = String(new FormData(form).get('email') ?? '');
     const password = String(new FormData(form).get('password') ?? '');
     message.innerHTML = infoAlert('Anmeldung wird geprueft.');
-    const { error } = await context.supabase.auth.signInWithPassword({ email, password });
-    if (error) {
+    const { user, error } = await apiLogin(email, password);
+    if (error || !user) {
       message.innerHTML = errorAlert('Anmeldung fehlgeschlagen. Bitte Zugangsdaten pruefen.');
       return;
     }
@@ -267,59 +267,978 @@ function renderLogin(context: AppContext) {
     redirectTo('/intern/fensterpruefung-bonn/');
   });
   resetButton?.addEventListener('click', async () => {
-    if (!context.supabase || !message || !form) return;
+    if (!message || !form) return;
     const email = String(new FormData(form).get('email') ?? '');
     if (!email) {
       message.innerHTML = warnAlert('Bitte zuerst die E-Mail-Adresse eingeben.');
       return;
     }
-    const { error } = await context.supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/intern/login/`,
-    });
-    message.innerHTML = error ? errorAlert('Passwort-Zuruecksetzung konnte nicht gestartet werden.') : successAlert('Passwort-Zuruecksetzung ausgelöst.');
+    const { error } = await apiResetPassword(email);
+    message.innerHTML = error ? errorAlert('Passwort-Zuruecksetzung konnte nicht gestartet werden.') : successAlert('Passwort-Zuruecksetzung ausgeloest.');
   });
 }
 
 async function renderDashboard(context: AppContext) {
-  const records = await fetchWindowSummaries(context);
+  const [buildings, records] = await Promise.all([
+    apiListBuildings(),
+    fetchWindowSummaries(context),
+  ]);
   const stats = createDashboardStats(records);
+
+  const demoStatus = await apiGetDemoStatus();
+  const isAdmin = context.user?.profile.role === 'administrator';
+  const setupBanner = !demoStatus.demo_data_exists && isAdmin
+    ? `<div class="intern-alert intern-alert--info">
+        Noch keine Musterdaten vorhanden. Gebäude, Etagen und Räume können über die Verwaltung angelegt werden.
+        <button class="sv-button sv-button-secondary" type="button" id="seed-demo-btn" style="margin-left:12px">Musterdaten anlegen</button>
+       </div>`
+    : '';
+
   context.root.innerHTML = `
-    ${renderHeader(context, 'Projekt-Dashboard', 'Live-Status fuer die laufende Fensterpruefung.')}
+    ${renderHeader(context, 'Projekt-Dashboard', 'Prüffortschritt – Fensterbeschlagsprüfung BMVg Bonn.')}
+    ${setupBanner}
     <div class="intern-statusbar">
       <div class="intern-card">${connectionBadge()}</div>
       <div class="intern-card">${roleBadge(context.user?.profile.role ?? 'pruefer')}<p class="intern-meta">${escapeHtml(context.user?.profile.full_name ?? context.user?.email ?? '')}</p></div>
-      <div class="intern-card"><strong>${records.length}</strong><p class="intern-meta">Datensaetze verfuegbar</p></div>
+      <div class="intern-card"><strong>${stats.total}</strong><p class="intern-meta">Fenster gesamt</p></div>
+      <div class="intern-card"><strong>${stats.completed}</strong><p class="intern-meta">Flügel geprüft</p></div>
     </div>
-    <div class="intern-stats">
-      ${renderStat('Gesamtzahl angelegter Fenster', stats.total)}
-      ${renderStat('Nicht begonnen', stats.notStarted)}
-      ${renderStat('In Bearbeitung', stats.inProgress)}
-      ${renderStat('Vollstaendig geprueft', stats.completed)}
-      ${renderStat('Mit Mangel', stats.withDefect)}
-      ${renderStat('Mit dringendem Handlungsbedarf', stats.urgent)}
-      ${renderStat('Spezialpruefung erforderlich', stats.specialInspection)}
-      ${renderStat('Nicht zugaenglich', stats.inaccessible)}
-      ${renderStat('Heute bearbeitet', stats.touchedToday)}
+
+    ${buildings.length > 0 ? `
+    <h2 style="margin:24px 0 12px">Gebäude</h2>
+    <div class="intern-building-grid">
+      ${buildings.map((b) => {
+        const pct = b.progress_pct;
+        const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+        return `
+          <a class="intern-building-card" href="/intern/fensterpruefung-bonn/etagen/?building_id=${b.id}">
+            <div class="intern-building-card__header">
+              <strong>${escapeHtml(b.name)}</strong>
+              ${b.code ? `<span class="intern-badge intern-badge--info">${escapeHtml(b.code)}</span>` : ''}
+            </div>
+            <div class="intern-building-stats">
+              <span>${b.window_count} Fenster</span>
+              <span>${b.sash_count} Flügel</span>
+              ${b.sash_defect > 0 ? `<span class="intern-badge intern-badge--danger">${b.sash_defect} Mängel</span>` : ''}
+            </div>
+            <div class="intern-progress-bar">
+              <div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div>
+            </div>
+            <p class="intern-meta">${pct}% Flügel geprüft (${b.sash_completed}/${b.sash_count})</p>
+          </a>
+        `;
+      }).join('')}
     </div>
-    <div class="intern-grid">
+    ` : `<div class="intern-empty">Noch keine Gebäude angelegt. Bitte zuerst ein Gebäude über die Verwaltung anlegen.</div>`}
+
+    <div class="intern-grid" style="margin-top:24px">
       <section class="intern-panel">
-        <h2>Bearbeitungsstand je Pruefer</h2>
-        <div class="intern-list">
-          ${stats.byInspector.map((item) => `<div class="intern-card"><strong>${escapeHtml(item.name)}</strong><p class="intern-meta">${item.completed} abgeschlossen / ${item.total} zugewiesen</p></div>`).join('') || '<div class="intern-empty">Noch keine Zuordnungen.</div>'}
+        <h2>Gesamtstatistik</h2>
+        <div class="intern-stats">
+          ${renderStat('Fenster gesamt', stats.total)}
+          ${renderStat('Nicht begonnen', stats.notStarted)}
+          ${renderStat('In Bearbeitung', stats.inProgress)}
+          ${renderStat('Vollständig geprüft', stats.completed)}
+          ${renderStat('Mit Mangel', stats.withDefect)}
+          ${renderStat('Dringender Handlungsbedarf', stats.urgent)}
+          ${renderStat('Spezialpruefung', stats.specialInspection)}
         </div>
       </section>
       <section class="intern-panel">
-        <h2>Letzte Aenderungen</h2>
+        <h2>Letzte Änderungen</h2>
         <div class="intern-list">
-          ${stats.recentChanges.map((item) => `<a class="intern-card" href="/intern/fensterpruefung-bonn/fenster/${encodeURIComponent(item.id)}/"><strong>${escapeHtml(item.label)}</strong><p class="intern-meta">${formatDateTime(item.updatedAt)} · ${escapeHtml(item.status)}${item.user ? ` · ${escapeHtml(item.user)}` : ''}</p></a>`).join('') || '<div class="intern-empty">Noch keine Aenderungen protokolliert.</div>'}
+          ${stats.recentChanges.map((item) => `<a class="intern-card" href="/intern/fensterpruefung-bonn/fenster/record/?id=${encodeURIComponent(item.id)}"><strong>${escapeHtml(item.label)}</strong><p class="intern-meta">${formatDateTime(item.updatedAt)} · ${escapeHtml(item.status)}${item.user ? ` · ${escapeHtml(item.user)}` : ''}</p></a>`).join('') || '<div class="intern-empty">Noch keine Änderungen protokolliert.</div>'}
         </div>
       </section>
     </div>
   `;
-  subscribeToWindowChanges(context, () => void renderDashboard(context));
+
+  context.root.querySelector<HTMLButtonElement>('#seed-demo-btn')?.addEventListener('click', async () => {
+    const btn = context.root.querySelector<HTMLButtonElement>('#seed-demo-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Wird angelegt…'; }
+    const result = await apiSeedDemoData(false);
+    if (result.ok) {
+      await renderDashboard(context);
+    } else {
+      showInlineMessage(context.root, errorAlert('Musterdaten konnten nicht angelegt werden.'));
+      if (btn) { btn.disabled = false; btn.textContent = 'Musterdaten anlegen'; }
+    }
+  });
+  bindHeaderLogout(context);
 }
 
-async function renderWindows(context: AppContext) {
+// ── Gebäude-Übersicht ─────────────────────────────────────────────────────────
+
+async function renderBuildings(context: AppContext) {
+  const buildings = await apiListBuildings();
+  const isAdmin = context.user?.profile.role === 'administrator';
+
+  context.root.innerHTML = `
+    ${renderHeader(context, 'Gebäude', 'Alle Gebäude des Projekts mit Prüffortschritt.')}
+    ${isAdmin ? `
+    <div class="intern-card" style="margin-bottom:16px">
+      <h2>Gebäude hinzufügen</h2>
+      <form id="create-building-form" class="intern-form-grid" novalidate>
+        <div class="intern-field"><label for="bname">Bezeichnung</label><input id="bname" name="name" required /></div>
+        <div class="intern-field"><label for="bcode">Kürzel</label><input id="bcode" name="code" /></div>
+        <div class="intern-actions intern-field--full"><button class="sv-button sv-button-primary" type="submit">Hinzufügen</button></div>
+      </form>
+    </div>
+    ` : ''}
+    <div id="building-msg"></div>
+    <div class="intern-building-grid" id="building-list">
+      ${buildings.map((b) => renderBuildingCard(b)).join('') || '<div class="intern-empty">Noch keine Gebäude vorhanden.</div>'}
+    </div>
+  `;
+
+  if (isAdmin) {
+    context.root.querySelector<HTMLFormElement>('#create-building-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget as HTMLFormElement;
+      const fd = new FormData(form);
+      const result = await apiCreateBuilding(String(fd.get('name') ?? '').trim(), String(fd.get('code') ?? '').trim());
+      if (result) {
+        form.reset();
+        await renderBuildings(context);
+      } else {
+        const msg = context.root.querySelector<HTMLElement>('#building-msg');
+        if (msg) msg.innerHTML = errorAlert('Gebäude konnte nicht angelegt werden.');
+      }
+    });
+  }
+  bindHeaderLogout(context);
+}
+
+function renderBuildingCard(b: Building): string {
+  const pct = b.progress_pct;
+  const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+  return `
+    <a class="intern-building-card" href="/intern/fensterpruefung-bonn/etagen/?building_id=${b.id}">
+      <div class="intern-building-card__header">
+        <strong>${escapeHtml(b.name)}</strong>
+        ${b.code ? `<span class="intern-badge intern-badge--info">${escapeHtml(b.code)}</span>` : ''}
+      </div>
+      <div class="intern-building-stats">
+        <span>${b.window_count} Fenster · ${b.sash_count} Flügel</span>
+        ${b.sash_defect > 0 ? `<span class="intern-badge intern-badge--danger">${b.sash_defect} Mängel</span>` : ''}
+      </div>
+      <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
+      <p class="intern-meta">${pct}% geprüft · ${b.sash_completed}/${b.sash_count} Flügel</p>
+    </a>
+  `;
+}
+
+// ── Etagen ────────────────────────────────────────────────────────────────────
+
+async function renderFloors(context: AppContext) {
+  const buildingId = context.buildingId ?? Number(new URLSearchParams(window.location.search).get('building_id') ?? 0);
+  if (!buildingId) { context.root.innerHTML = warnAlert('Kein Gebäude ausgewählt.'); return; }
+
+  const floors = await apiListFloors(buildingId);
+  const isAdmin = context.user?.profile.role === 'administrator';
+
+  context.root.innerHTML = `
+    ${renderHeader(context, 'Etagen', 'Bitte Etage wählen.')}
+    <div class="intern-breadcrumb">
+      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> › Etagen
+    </div>
+    ${isAdmin ? `
+    <div class="intern-card" style="margin-bottom:16px">
+      <h2>Etage hinzufügen</h2>
+      <form id="create-floor-form" class="intern-form-grid" novalidate>
+        <div class="intern-field"><label for="fname">Bezeichnung</label><input id="fname" name="name" required /></div>
+        <div class="intern-field"><label for="flevel">Geschoss (Zahl)</label><input id="flevel" name="level" type="number" value="0" /></div>
+        <div class="intern-actions intern-field--full"><button class="sv-button sv-button-primary" type="submit">Hinzufügen</button></div>
+      </form>
+    </div>
+    ` : ''}
+    <div id="floor-msg"></div>
+    <div class="intern-list" id="floor-list">
+      ${floors.map((f) => renderFloorCard(f, buildingId)).join('') || '<div class="intern-empty">Noch keine Etagen vorhanden.</div>'}
+    </div>
+  `;
+
+  if (isAdmin) {
+    context.root.querySelector<HTMLFormElement>('#create-floor-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget as HTMLFormElement;
+      const fd = new FormData(form);
+      const result = await apiCreateFloor(buildingId, String(fd.get('name') ?? '').trim(), Number(fd.get('level') ?? 0));
+      if (result) { form.reset(); await renderFloors(context); }
+      else {
+        const msg = context.root.querySelector<HTMLElement>('#floor-msg');
+        if (msg) msg.innerHTML = errorAlert('Etage konnte nicht angelegt werden.');
+      }
+    });
+  }
+  bindHeaderLogout(context);
+}
+
+function renderFloorCard(f: Floor, buildingId: number): string {
+  const pct = f.progress_pct;
+  const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+  return `
+    <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/raeume/?floor_id=${f.id}&building_id=${buildingId}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>${escapeHtml(f.name)}</strong>
+        <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
+      </div>
+      <p class="intern-meta">${f.room_count} Räume · ${f.window_count} Fenster · ${f.sash_count} Flügel · ${f.sash_completed} geprüft</p>
+      <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
+    </a>
+  `;
+}
+
+// ── Räume ─────────────────────────────────────────────────────────────────────
+
+async function renderRooms(context: AppContext) {
+  const searchParams = new URLSearchParams(window.location.search);
+  const floorId = context.floorId ?? Number(searchParams.get('floor_id') ?? 0);
+  const buildingId = context.buildingId ?? Number(searchParams.get('building_id') ?? 0);
+  if (!floorId) { context.root.innerHTML = warnAlert('Keine Etage ausgewählt.'); return; }
+
+  const rooms = await apiListRooms(floorId);
+  const isAdmin = context.user?.profile.role === 'administrator';
+
+  context.root.innerHTML = `
+    ${renderHeader(context, 'Räume', 'Bitte Raum wählen.')}
+    <div class="intern-breadcrumb">
+      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
+      <a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> ›
+      Räume
+    </div>
+    ${isAdmin ? `
+    <div class="intern-card" style="margin-bottom:16px">
+      <h2>Raum hinzufügen</h2>
+      <form id="create-room-form" class="intern-form-grid" novalidate>
+        <div class="intern-field"><label for="rname">Bezeichnung</label><input id="rname" name="name" required /></div>
+        <div class="intern-field"><label for="rnumber">Raumnummer</label><input id="rnumber" name="room_number" /></div>
+        <div class="intern-actions intern-field--full"><button class="sv-button sv-button-primary" type="submit">Hinzufügen</button></div>
+      </form>
+    </div>
+    ` : ''}
+    <div id="room-msg"></div>
+    <div class="intern-list" id="room-list">
+      ${rooms.map((r) => renderRoomCard(r, floorId, buildingId)).join('') || '<div class="intern-empty">Noch keine Räume vorhanden.</div>'}
+    </div>
+  `;
+
+  if (isAdmin) {
+    context.root.querySelector<HTMLFormElement>('#create-room-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget as HTMLFormElement;
+      const fd = new FormData(form);
+      const result = await apiCreateRoom(floorId, String(fd.get('name') ?? '').trim(), String(fd.get('room_number') ?? '').trim());
+      if (result) { form.reset(); await renderRooms(context); }
+      else {
+        const msg = context.root.querySelector<HTMLElement>('#room-msg');
+        if (msg) msg.innerHTML = errorAlert('Raum konnte nicht angelegt werden.');
+      }
+    });
+  }
+  bindHeaderLogout(context);
+}
+
+function renderRoomCard(r: Room, floorId: number, buildingId: number): string {
+  const pct = r.progress_pct;
+  const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+  return `
+    <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fenster/?room_id=${r.id}&floor_id=${floorId}&building_id=${buildingId}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>${escapeHtml(r.room_number ? `${r.room_number} – ${r.name}` : r.name)}</strong>
+        <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
+      </div>
+      <p class="intern-meta">${r.window_count} Fenster · ${r.sash_count} Flügel · ${r.sash_completed} geprüft${r.sash_defect > 0 ? ` · <span style="color:#c0392b">${r.sash_defect} Mängel</span>` : ''}</p>
+      <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
+    </a>
+  `;
+}
+
+// ── Fenster in einem Raum ────────────────────────────────────────────────────
+
+async function renderWindowsInRoom(context: AppContext) {
+  const searchParams = new URLSearchParams(window.location.search);
+  const roomId = context.roomId ?? Number(searchParams.get('room_id') ?? 0);
+  const floorId = context.floorId ?? Number(searchParams.get('floor_id') ?? 0);
+  const buildingId = context.buildingId ?? Number(searchParams.get('building_id') ?? 0);
+
+  if (!roomId) {
+    // Fallback: Flat-Fensterliste (legacy)
+    await renderWindowsFlat(context);
+    return;
+  }
+
+  const windows = await apiListWindowsInRoom(roomId);
+  const isAdmin = !(['gast','auswertung'] as string[]).includes(context.user?.profile.role ?? '');
+  const firstWindow = windows[0];
+
+  context.root.innerHTML = `
+    ${renderHeader(context, 'Fenster', 'Bitte Fenster wählen.')}
+    <div class="intern-breadcrumb">
+      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
+      <a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> ›
+      <a href="/intern/fensterpruefung-bonn/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> ›
+      ${firstWindow ? escapeHtml(`${firstWindow.room_number ? firstWindow.room_number + ' – ' : ''}${firstWindow.room_name ?? 'Raum'}`) : 'Fenster'}
+    </div>
+    ${isAdmin ? `
+    <div class="intern-actions" style="margin-bottom:16px">
+      <button class="sv-button sv-button-primary" type="button" id="create-window-btn">Fenster hinzufügen</button>
+    </div>
+    ` : ''}
+    <div id="window-room-msg"></div>
+    <div class="intern-list" id="window-room-list">
+      ${windows.map((w) => renderWindowInRoomCard(w)).join('') || '<div class="intern-empty">Noch keine Fenster in diesem Raum.</div>'}
+    </div>
+  `;
+
+  context.root.querySelector<HTMLButtonElement>('#create-window-btn')?.addEventListener('click', async () => {
+    const wnum = window.prompt('Fensternummer (z.B. F-001):');
+    if (!wnum) return;
+    const result = await apiCreateWindowInRoom(roomId, wnum.trim());
+    if (result) {
+      redirectTo(`/intern/fensterpruefung-bonn/fluegel/?window_id=${result.id}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`);
+    } else {
+      const msg = context.root.querySelector<HTMLElement>('#window-room-msg');
+      if (msg) msg.innerHTML = errorAlert('Fenster konnte nicht angelegt werden.');
+    }
+  });
+  bindHeaderLogout(context);
+}
+
+function renderWindowInRoomCard(w: WindowInRoom): string {
+  const pct = w.progress_pct;
+  const badgeClass = w.sash_defect > 0 ? 'danger' : pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+  return `
+    <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fluegel/?window_id=${w.id}&room_id=0&floor_id=${w.floor_id ?? 0}&building_id=${w.building_id ?? 0}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>${escapeHtml(w.window_number || w.record_id)}</strong>
+        <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
+      </div>
+      <p class="intern-meta">${w.sash_count} Flügel · ${w.sash_completed} geprüft${w.sash_defect > 0 ? ` · ${w.sash_defect} Mängel` : ''} · ${escapeHtml(w.status)}</p>
+      <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
+    </a>
+  `;
+}
+
+// ── Flügelliste eines Fensters ────────────────────────────────────────────────
+
+async function renderSashes(context: AppContext) {
+  const searchParams = new URLSearchParams(window.location.search);
+  const windowId = context.windowId ?? Number(searchParams.get('window_id') ?? 0);
+  const roomId = context.roomId ?? Number(searchParams.get('room_id') ?? 0);
+  const floorId = context.floorId ?? Number(searchParams.get('floor_id') ?? 0);
+  const buildingId = context.buildingId ?? Number(searchParams.get('building_id') ?? 0);
+
+  if (!windowId) { context.root.innerHTML = warnAlert('Kein Fenster ausgewählt.'); return; }
+
+  const sashes = await apiListSashes(windowId);
+  const canEdit = !(['gast','auswertung'] as string[]).includes(context.user?.profile.role ?? '');
+
+  // Fenstertitel ermitteln
+  const windowLabel = `Fenster #${windowId}`;
+  const breadBuilding = buildingId > 0 ? `<a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> › ` : '';
+  const breadFloor = floorId > 0 ? `<a href="/intern/fensterpruefung-bonn/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> › ` : '';
+  const breadRoom = roomId > 0 ? `<a href="/intern/fensterpruefung-bonn/fenster/?room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">Fenster</a> › ` : '';
+
+  const overallPct = sashes.length > 0
+    ? Math.round(sashes.filter((s) => ['abgeschlossen', 'freigegeben'].includes(s.status)).length / sashes.length * 100)
+    : 0;
+
+  context.root.innerHTML = `
+    ${renderHeader(context, `Flügel – ${escapeHtml(windowLabel)}`, 'Bitte Flügel wählen für die Inspektion.')}
+    <div class="intern-breadcrumb">
+      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
+      ${breadBuilding}${breadFloor}${breadRoom}
+      ${escapeHtml(windowLabel)} – Flügel
+    </div>
+    <div class="intern-statusbar">
+      <div class="intern-card"><strong>${sashes.length}</strong><p class="intern-meta">Flügel gesamt</p></div>
+      <div class="intern-card"><strong>${sashes.filter((s) => ['abgeschlossen','freigegeben'].includes(s.status)).length}</strong><p class="intern-meta">Geprüft</p></div>
+      <div class="intern-card"><strong>${sashes.filter((s) => s.has_defect).length}</strong><p class="intern-meta">Mit Mangel</p></div>
+      <div class="intern-card">
+        <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${overallPct === 100 ? 'ok' : 'info'}" style="width:${overallPct}%"></div></div>
+        <p class="intern-meta">${overallPct}% abgeschlossen</p>
+      </div>
+    </div>
+    ${canEdit ? `<div class="intern-actions" style="margin:12px 0"><button class="sv-button sv-button-primary" type="button" id="add-sash-btn">Flügel hinzufügen</button></div>` : ''}
+    <div id="sash-msg"></div>
+    <div class="intern-list" id="sash-list">
+      ${sashes.map((s) => renderSashCard(s, windowId, roomId, floorId, buildingId)).join('') || '<div class="intern-empty">Noch keine Flügel vorhanden. Flügel hinzufügen.</div>'}
+    </div>
+  `;
+
+  context.root.querySelector<HTMLButtonElement>('#add-sash-btn')?.addEventListener('click', async () => {
+    const label = window.prompt('Flügelbezeichnung (z.B. Flügel Links):') ?? '';
+    if (!label) return;
+    const result = await apiCreateSash(windowId, label.trim(), 'Dreh-Kipp', '');
+    if (result) {
+      redirectTo(`/intern/fensterpruefung-bonn/fluegel-pruefung/?sash_id=${result.id}&window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`);
+    } else {
+      const msg = context.root.querySelector<HTMLElement>('#sash-msg');
+      if (msg) msg.innerHTML = errorAlert('Flügel konnte nicht angelegt werden.');
+    }
+  });
+  bindHeaderLogout(context);
+}
+
+function renderSashCard(s: WindowSashSummary, windowId: number, roomId: number, floorId: number, buildingId: number): string {
+  const isComplete = ['abgeschlossen', 'freigegeben'].includes(s.status);
+  const badgeClass = s.has_defect ? 'danger' : isComplete ? 'ok' : s.status === 'in Bearbeitung' ? 'info' : 'warn';
+  const statusLabel = sashStatusLabel(s.status);
+  return `
+    <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fluegel-pruefung/?sash_id=${s.id}&window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <strong>${escapeHtml(s.sash_label || `Flügel ${s.sash_number}`)}</strong>
+        <span class="intern-badge intern-badge--${badgeClass}">${escapeHtml(statusLabel)}</span>
+      </div>
+      <p class="intern-meta">
+        ${s.opening_type ? escapeHtml(s.opening_type) : ''}${s.position ? ` · ${escapeHtml(s.position)}` : ''}
+        ${s.overall_rating ? ` · ${escapeHtml(s.overall_rating)}` : ''}
+        ${s.inspector_name ? ` · ${escapeHtml(s.inspector_name)}` : ''}
+        ${s.photo_count ? ` · ${s.photo_count} Fotos` : ''}
+      </p>
+      <div class="intern-progress-bar">
+        <div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${s.progress_percent}%"></div>
+      </div>
+      <p class="intern-meta">${s.progress_percent}% ausgefüllt</p>
+    </a>
+  `;
+}
+
+function sashStatusLabel(status: string): string {
+  switch (status) {
+    case 'nicht begonnen': return 'Nicht begonnen';
+    case 'in Bearbeitung': return 'In Bearbeitung';
+    case 'abgeschlossen': return 'Abgeschlossen';
+    case 'Nachpruefung erforderlich': return 'Nachprüfung';
+    case 'freigegeben': return 'Freigegeben';
+    default: return status;
+  }
+}
+
+// ── Flügel-Inspektion ─────────────────────────────────────────────────────────
+
+async function renderSashInspection(context: AppContext) {
+  const searchParams = new URLSearchParams(window.location.search);
+  const sashId = context.sashId ?? Number(searchParams.get('sash_id') ?? 0);
+  const windowId = context.windowId ?? Number(searchParams.get('window_id') ?? 0);
+  const roomId = context.roomId ?? Number(searchParams.get('room_id') ?? 0);
+  const floorId = context.floorId ?? Number(searchParams.get('floor_id') ?? 0);
+  const buildingId = context.buildingId ?? Number(searchParams.get('building_id') ?? 0);
+
+  if (!sashId) { context.root.innerHTML = warnAlert('Kein Flügel ausgewählt.'); return; }
+
+  const sash = await apiGetSash(sashId);
+  if (!sash) { context.root.innerHTML = errorAlert('Flügel nicht gefunden.'); return; }
+
+  const photos = await apiListSashPhotos(sashId);
+  const canEdit = !(['gast','auswertung'] as string[]).includes(context.user?.profile.role ?? '');
+  const data = sash.form_data as Record<string, unknown>;
+
+  const backUrl = `/intern/fensterpruefung-bonn/fluegel/?window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`;
+
+  context.root.innerHTML = `
+    ${renderHeader(context, `${escapeHtml(sash.sash_label || `Flügel ${sash.sash_number}`)} – Prüfung`, `Fenster ${escapeHtml(sash.window_number)} · ${escapeHtml(sash.room_name ?? '')} · ${escapeHtml(sash.floor_name ?? '')} · ${escapeHtml(sash.building_name ?? '')}`)}
+    <div class="intern-breadcrumb">
+      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
+      ${buildingId > 0 ? `<a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> › ` : ''}
+      ${floorId > 0 ? `<a href="/intern/fensterpruefung-bonn/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> › ` : ''}
+      ${roomId > 0 ? `<a href="/intern/fensterpruefung-bonn/fenster/?room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">Fenster</a> › ` : ''}
+      <a href="${backUrl}">Flügel</a> › Prüfung
+    </div>
+    <div class="intern-statusbar">
+      <div class="intern-card">${connectionBadge()}</div>
+      <div class="intern-card"><strong>${sash.progress_percent}%</strong><p class="intern-meta">Fortschritt</p></div>
+      <div class="intern-card"><strong>${escapeHtml(sashStatusLabel(sash.status))}</strong><p class="intern-meta">Status</p></div>
+      ${sash.has_defect ? '<div class="intern-card"><span class="intern-badge intern-badge--danger">Mangel festgestellt</span></div>' : ''}
+      <div class="intern-card"><span id="save-status" class="intern-meta">Bereit</span></div>
+    </div>
+    <div class="intern-grid">
+      <div>
+        <form id="sash-form" class="intern-list" novalidate>
+          ${renderSashFormSections(sash, data, !canEdit)}
+        </form>
+        <section class="intern-form-section">
+          <h2>Fotodokumentation</h2>
+          <div class="intern-upload">
+            <label for="sash-photo-category">Fotokategorie</label>
+            <select id="sash-photo-category">${sashPhotoCategories()}</select>
+            <label for="sash-photo-caption">Bildbeschreibung</label>
+            <input id="sash-photo-caption" type="text" placeholder="Optional" />
+            <label for="sash-photo-files">Foto aufnehmen oder auswählen</label>
+            <input id="sash-photo-files" type="file" accept="image/*" capture="environment" multiple ${!canEdit ? 'disabled' : ''} />
+            <div class="intern-actions">
+              <button class="sv-button sv-button-secondary" type="button" id="upload-sash-photos" ${!canEdit ? 'disabled' : ''}>Fotos hochladen</button>
+            </div>
+          </div>
+          <div id="sash-photo-gallery" class="intern-photo-grid">${renderPhotos(photos)}</div>
+        </section>
+      </div>
+      <aside class="intern-list">
+        <section class="intern-panel">
+          <h2>Navigationshilfe</h2>
+          <div class="intern-list">
+            <a class="intern-card" href="${backUrl}">← Zurück zur Flügelliste</a>
+          </div>
+        </section>
+        <section class="intern-panel">
+          <h2>Prüfergebnis</h2>
+          <div class="intern-list">
+            <div class="intern-card">
+              <strong>${escapeHtml(sash.overall_rating ?? '—')}</strong>
+              <p class="intern-meta">Gesamtbewertung</p>
+            </div>
+            <div class="intern-card">
+              ${sash.has_defect ? '<span class="intern-badge intern-badge--danger">Mangel</span>' : '<span class="intern-badge intern-badge--ok">Kein Mangel</span>'}
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+    <div class="intern-sticky-actions">
+      <div class="intern-progress">
+        <a class="sv-button sv-button-secondary" href="${backUrl}">Zurück</a>
+        <progress value="${sash.progress_percent}" max="100"></progress>
+        <span>${sash.progress_percent}% Pflichtfelder</span>
+      </div>
+      <div class="intern-actions">
+        ${canEdit ? `
+          <button class="sv-button sv-button-secondary" type="button" id="sash-save-btn">Zwischenspeichern</button>
+          <button class="sv-button sv-button-secondary" type="button" id="sash-print-btn">🖨 Bericht drucken</button>
+          <button class="sv-button sv-button-primary" type="button" id="sash-complete-btn">Prüfung abschließen</button>
+        ` : `
+          <button class="sv-button sv-button-secondary" type="button" id="sash-print-btn">🖨 Bericht drucken</button>
+          <span class="intern-meta">Nur lesend</span>
+        `}
+      </div>
+    </div>
+  `;
+
+  const form = context.root.querySelector<HTMLFormElement>('#sash-form');
+  const saveStatus = context.root.querySelector<HTMLElement>('#save-status');
+  const workingCopy = structuredClone(data);
+
+  const updateSaveStatus = (msg: string) => { if (saveStatus) saveStatus.textContent = msg; };
+
+  // ── Offline-Zwischenspeicherung ──────────────────────────────────────────
+  const offlineKey = `sash-draft-${sashId}`;
+
+  const saveSashOffline = (fd: Record<string, unknown>) => {
+    try { localStorage.setItem(offlineKey, JSON.stringify({ data: fd, savedAt: new Date().toISOString() })); } catch { /* ignore */ }
+  };
+
+  const clearSashOfflineDraft = () => {
+    try { localStorage.removeItem(offlineKey); } catch { /* ignore */ }
+  };
+
+  // Gespeicherten Offline-Entwurf wiederherstellen (falls vorhanden und neuer als Server-Daten)
+  const offlineRaw = localStorage.getItem(offlineKey);
+  if (offlineRaw) {
+    try {
+      const offlineDraft = JSON.parse(offlineRaw) as { data: Record<string, unknown>; savedAt: string };
+      const draftDate = new Date(offlineDraft.savedAt);
+      const serverDate = sash.updated_at ? new Date(sash.updated_at) : new Date(0);
+      if (draftDate > serverDate) {
+        Object.assign(workingCopy, offlineDraft.data);
+        updateSaveStatus('Offline-Entwurf wiederhergestellt');
+      }
+    } catch { /* ignore */ }
+  }
+
+  const persistSash = async (fd: Record<string, unknown>, showFeedback = true) => {
+    if (!canEdit) return;
+    if (showFeedback) updateSaveStatus('Speichern…');
+    saveSashOffline(fd);
+    if (!navigator.onLine) {
+      updateSaveStatus('Offline gespeichert ✓');
+      context.draftDirty = true;
+      return;
+    }
+    const { error } = await apiSaveSash(sashId, fd);
+    if (error) {
+      updateSaveStatus('Offline gespeichert ✓');
+      context.draftDirty = true;
+    } else {
+      clearSashOfflineDraft();
+      if (showFeedback) updateSaveStatus('Gespeichert ✓');
+      context.draftDirty = false;
+    }
+  };
+
+  // Bei Rückkehr in den Online-Modus automatisch synchronisieren
+  const handleOnline = () => void persistSash(workingCopy, true);
+  window.addEventListener('online', handleOnline);
+
+  const scheduleSave = debounce(() => void persistSash(workingCopy, false), 1500);
+
+  form?.addEventListener('input', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement)) return;
+    if (target.name) {
+      workingCopy[target.name] = target instanceof HTMLInputElement && target.type === 'checkbox' ? target.checked : target.value;
+    }
+    context.draftDirty = true;
+    updateSaveStatus('Ungespeichert…');
+    scheduleSave();
+  });
+
+  // GPS-Koordinaten erfassen
+  context.root.querySelector<HTMLButtonElement>('#gps-capture-btn')?.addEventListener('click', () => {
+    if (!navigator.geolocation) { alert('GPS nicht verfügbar.'); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const coords = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
+        const gpsInput = context.root.querySelector<HTMLInputElement>('#gps_position');
+        if (gpsInput) { gpsInput.value = coords; workingCopy['gps_position'] = coords; scheduleSave(); }
+      },
+      () => alert('GPS-Position konnte nicht ermittelt werden.'),
+    );
+  });
+
+  context.root.querySelector<HTMLButtonElement>('#sash-save-btn')?.addEventListener('click', () => void persistSash(workingCopy, true));
+
+  context.root.querySelector<HTMLButtonElement>('#sash-complete-btn')?.addEventListener('click', async () => {
+    if (!window.confirm(`Prüfung für „${sash.sash_label || `Flügel ${sash.sash_number}`}" wirklich abschließen?`)) return;
+    workingCopy['abschlussstatus'] = 'abgeschlossen';
+    workingCopy['completion_confirmed'] = true;
+    const { error } = await apiSaveSash(sashId, workingCopy);
+    if (error) {
+      showInlineMessage(context.root, errorAlert('Abschluss fehlgeschlagen. Bitte erneut versuchen.'));
+    } else {
+      clearSashOfflineDraft();
+      showInlineMessage(context.root, successAlert('Prüfung abgeschlossen. Weiter zum nächsten Flügel.'));
+      setTimeout(() => { window.removeEventListener('online', handleOnline); redirectTo(backUrl); }, 1500);
+    }
+  });
+
+  context.root.querySelector<HTMLButtonElement>('#sash-print-btn')?.addEventListener('click', () => {
+    printSashReport(sash, workingCopy, photos);
+  });
+
+  context.root.querySelector<HTMLButtonElement>('#upload-sash-photos')?.addEventListener('click', async () => {
+    const fileInput = context.root.querySelector<HTMLInputElement>('#sash-photo-files');
+    const categorySelect = context.root.querySelector<HTMLSelectElement>('#sash-photo-category');
+    const captionInput = context.root.querySelector<HTMLInputElement>('#sash-photo-caption');
+    const gallery = context.root.querySelector<HTMLElement>('#sash-photo-gallery');
+    if (!fileInput?.files?.length || !categorySelect || !gallery) return;
+
+    for (const file of Array.from(fileInput.files)) {
+      const resized = await resizeImageIfNeeded(file);
+      await apiUploadSashPhoto(String(sash.window_id), sashId, resized, categorySelect.value, captionInput?.value ?? '');
+    }
+
+    const updatedPhotos = await apiListSashPhotos(sashId);
+    gallery.innerHTML = renderPhotos(updatedPhotos);
+    bindSashPhotoDeletion(sashId, gallery);
+    fileInput.value = '';
+    if (captionInput) captionInput.value = '';
+  });
+
+  // Per-Komponente Foto-Upload binden
+  context.root.querySelectorAll<HTMLInputElement>('.intern-comp-photo-input').forEach((input) => {
+    input.addEventListener('change', async () => {
+      if (!input.files?.length) return;
+      const component = input.dataset.component ?? 'sonstiges';
+      const gallery = context.root.querySelector<HTMLElement>(`#comp-photos-${component}`);
+      for (const file of Array.from(input.files)) {
+        const resized = await resizeImageIfNeeded(file);
+        await apiUploadSashPhoto(String(sash.window_id), sashId, resized, component, '');
+      }
+      const updatedPhotos = await apiListSashPhotos(sashId);
+      // Alle Fotos dieser Komponente in der Mini-Galerie anzeigen
+      const compPhotos = updatedPhotos.filter((p) => p.category === component);
+      if (gallery) gallery.innerHTML = compPhotos.map((p) => `<img src="/intern/photos/${escapeHtml(p.storage_path)}" alt="${escapeHtml(p.caption ?? p.category)}" class="intern-comp-thumb" loading="lazy" />`).join('');
+      // Globale Galerie aktualisieren
+      const globalGallery = context.root.querySelector<HTMLElement>('#sash-photo-gallery');
+      if (globalGallery) {
+        globalGallery.innerHTML = renderPhotos(updatedPhotos);
+        bindSashPhotoDeletion(sashId, globalGallery);
+      }
+      input.value = '';
+    });
+  });
+
+  bindSashPhotoDeletion(sashId, context.root.querySelector<HTMLElement>('#sash-photo-gallery') ?? undefined);
+  bindHeaderLogout(context);
+}
+
+function renderSashFormSections(sash: WindowSashRecord, data: Record<string, unknown>, disabled: boolean): string {
+  const dis = disabled ? 'disabled' : '';
+  const val = (key: string, fallback = '') => escapeHtml(String(data[key] ?? fallback));
+  const checked = (key: string) => Boolean(data[key]) ? 'checked' : '';
+  const radio = (groupName: string, value: string, label: string) => {
+    const id = `rad_${groupName}_${value.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const isChecked = String(data[groupName] ?? '') === value ? 'checked' : '';
+    return `<label class="intern-radio"><input type="radio" id="${escapeHtml(id)}" name="${escapeHtml(groupName)}" value="${escapeHtml(value)}" ${isChecked} ${dis} /><span>${escapeHtml(label)}</span></label>`;
+  };
+
+  const componentStateOptions: [string, string][] = [
+    ['OK', 'OK'],
+    ['eingeschraenkt_funktionsfaehig', 'Funktionsfähig mit Einschränkungen'],
+    ['defekt', 'Defekt'],
+    ['fehlt', 'Fehlt'],
+    ['nicht_vorhanden', 'Nicht eingebaut'],
+  ];
+
+  const componentBlock = (key: string, label: string) => `
+    <div class="intern-component-block" id="comp-${escapeHtml(key)}">
+      <h3 class="intern-component-title">${escapeHtml(label)}</h3>
+      <div class="intern-form-grid">
+        <div class="intern-field intern-field--full">
+          <fieldset class="intern-radio-group">
+            <legend>Zustand</legend>
+            ${componentStateOptions.map(([v, l]) => radio(`${key}_status`, v, l)).join('')}
+          </fieldset>
+        </div>
+        <div class="intern-field intern-field--full">
+          <label for="${escapeHtml(key)}_bemerkung">Bemerkung / Feststellung</label>
+          <textarea id="${escapeHtml(key)}_bemerkung" name="${escapeHtml(key)}_bemerkung" rows="2" ${dis}>${val(`${key}_bemerkung`)}</textarea>
+        </div>
+        ${!disabled ? `<div class="intern-field intern-field--full">
+          <span class="intern-label-sm">Fotos zu diesem Bauteil</span>
+          <div class="intern-component-photo-area">
+            <label class="sv-button sv-button-ghost intern-photo-btn" style="cursor:pointer">
+              📷 Foto hinzufügen
+              <input type="file" class="intern-comp-photo-input" data-component="${escapeHtml(key)}" accept="image/*" capture="environment" multiple style="display:none" />
+            </label>
+            <div class="intern-comp-photo-gallery" id="comp-photos-${escapeHtml(key)}"></div>
+          </div>
+        </div>` : ''}
+      </div>
+    </div>
+  `;
+
+  const components: [string, string][] = [
+    ['fluegellager',     'Flügellager'],
+    ['scherenlager',     'Scherenlager'],
+    ['ecklager',         'Ecklager'],
+    ['schliessbleche',   'Schließbleche'],
+    ['verriegelungen',   'Verriegelungen'],
+    ['getriebe',         'Getriebe'],
+    ['griff',            'Griff'],
+    ['dichtungen',       'Dichtungen'],
+    ['rahmen',           'Rahmen'],
+    ['glas',             'Glas'],
+    ['oeffnungsbegrenzer','Öffnungsbegrenzer (falls vorhanden)'],
+  ];
+
+  const suitabilityOptions: [string, string][] = [
+    ['geeignet',                   'Geeignet'],
+    ['geeignet_nach_nachstellung',  'Geeignet nach Nachstellung'],
+    ['instandsetzung_erforderlich', 'Instandsetzung erforderlich'],
+    ['austausch_empfohlen',         'Austausch empfohlen'],
+  ];
+
+  const riskOptions: [string, string][] = [
+    ['niedrig', 'Niedrig'],
+    ['mittel',  'Mittel'],
+    ['hoch',    'Hoch'],
+  ];
+
+  const priorityOptions: [string, string][] = [
+    ['keine',   'Keine'],
+    ['niedrig', 'Niedrig'],
+    ['mittel',  'Mittel'],
+    ['hoch',    'Hoch'],
+    ['sofort',  'Sofort'],
+  ];
+
+  const finalStatusOptions: [string, string][] = [
+    ['entwurf',                   'Entwurf'],
+    ['abgeschlossen',             'Abgeschlossen'],
+    ['nachpruefung_erforderlich', 'Nachprüfung erforderlich'],
+    ['freigegeben',               'Freigegeben'],
+  ];
+
+  return `
+    <!-- ═══ I. Allgemein ═══════════════════════════════════════════════════ -->
+    <section class="intern-form-section">
+      <h2>I. Allgemein</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field">
+          <label>Gebäude</label>
+          <input type="text" value="${escapeHtml(sash.building_name ?? '')}" disabled class="intern-readonly" />
+        </div>
+        <div class="intern-field">
+          <label>Etage</label>
+          <input type="text" value="${escapeHtml(sash.floor_name ?? '')}" disabled class="intern-readonly" />
+        </div>
+        <div class="intern-field">
+          <label>Raum</label>
+          <input type="text" value="${escapeHtml(`${sash.room_name ?? ''} ${sash.room_number ? `(${sash.room_number})` : ''}`.trim())}" disabled class="intern-readonly" />
+        </div>
+        <div class="intern-field">
+          <label>Fenster-ID</label>
+          <input type="text" value="${escapeHtml(sash.window_number)}" disabled class="intern-readonly" />
+        </div>
+        <div class="intern-field">
+          <label>Flügel-ID</label>
+          <input type="text" value="${escapeHtml(sash.sash_label || `Flügel ${sash.sash_number}`)}" disabled class="intern-readonly" />
+        </div>
+        <div class="intern-field">
+          <label for="inspector_name">Prüfer *</label>
+          <input id="inspector_name" name="inspector_name" type="text" value="${val('inspector_name')}" required ${dis} />
+        </div>
+        <div class="intern-field">
+          <label for="inspection_date">Datum *</label>
+          <input id="inspection_date" name="inspection_date" type="date" value="${val('inspection_date', new Date().toISOString().slice(0, 10))}" required ${dis} />
+        </div>
+        <div class="intern-field">
+          <label for="inspection_time">Uhrzeit</label>
+          <input id="inspection_time" name="inspection_time" type="time" value="${val('inspection_time')}" ${dis} />
+        </div>
+        <div class="intern-field">
+          <label for="gps_position">GPS-Position (optional)</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="gps_position" name="gps_position" type="text" value="${val('gps_position')}" placeholder="z.B. 50.7374, 7.0982" ${dis} style="flex:1" />
+            ${!disabled ? `<button type="button" id="gps-capture-btn" class="sv-button sv-button-ghost" title="GPS ermitteln">📍</button>` : ''}
+          </div>
+        </div>
+        <div class="intern-field">
+          <label for="qr_barcode">QR/Barcode (optional)</label>
+          <input id="qr_barcode" name="qr_barcode" type="text" value="${val('qr_barcode')}" placeholder="Kennzeichnung scannen oder eingeben" ${dis} />
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ II. Beschlagprüfung ════════════════════════════════════════════ -->
+    <section class="intern-form-section">
+      <h2>II. Beschlagprüfung</h2>
+      <p class="intern-meta" style="margin-bottom:16px">Für jedes Bauteil Zustand wählen, Feststellungen notieren und bei Bedarf Fotos anhängen.</p>
+      ${components.map(([key, label]) => componentBlock(key, label)).join('')}
+    </section>
+
+    <!-- ═══ III. Fensterfunktion ═══════════════════════════════════════════ -->
+    <section class="intern-form-section">
+      <h2>III. Fensterfunktion</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field intern-field--full">
+          <fieldset class="intern-checkbox-group">
+            <legend>Funktionsprüfung</legend>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_oeffnet_vollstaendig" ${checked('fn_oeffnet_vollstaendig')} ${dis} /><span>Öffnet vollständig</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_schliesst_vollstaendig" ${checked('fn_schliesst_vollstaendig')} ${dis} /><span>Schließt vollständig</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_verriegelung_funktioniert" ${checked('fn_verriegelung_funktioniert')} ${dis} /><span>Verriegelung funktioniert</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_griff_leichtgaengig" ${checked('fn_griff_leichtgaengig')} ${dis} /><span>Griffbewegung leichtgängig</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_kein_widerstand" ${checked('fn_kein_widerstand')} ${dis} /><span>Kein abnormaler Widerstand</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_kein_spiel" ${checked('fn_kein_spiel')} ${dis} /><span>Kein übermäßiges Spiel</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_kein_schleifen" ${checked('fn_kein_schleifen')} ${dis} /><span>Kein Schleifen</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_fluchtweg_moeglich" ${checked('fn_fluchtweg_moeglich')} ${dis} /><span>Rettungsweg / Fluchtweg möglich</span></label>
+          </fieldset>
+        </div>
+        <div class="intern-field intern-field--full">
+          <label for="fn_bemerkung">Bemerkungen zur Fensterfunktion</label>
+          <textarea id="fn_bemerkung" name="fn_bemerkung" rows="3" ${dis}>${val('fn_bemerkung')}</textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ IV. Eignung ════════════════════════════════════════════════════ -->
+    <section class="intern-form-section">
+      <h2>IV. Eignung</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field intern-field--full">
+          <fieldset class="intern-radio-group">
+            <legend>Beurteilung *</legend>
+            ${suitabilityOptions.map(([v, l]) => radio('eignung_beurteilung', v, l)).join('')}
+          </fieldset>
+        </div>
+        <div class="intern-field intern-field--full">
+          <fieldset class="intern-radio-group">
+            <legend>Risikostufe</legend>
+            ${riskOptions.map(([v, l]) => radio('risikostufe', v, l)).join('')}
+          </fieldset>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ V. Maßnahmen ═══════════════════════════════════════════════════ -->
+    <section class="intern-form-section">
+      <h2>V. Maßnahmen</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field intern-field--full">
+          <label for="massnahme_empfehlung">Empfohlene Maßnahme *</label>
+          <textarea id="massnahme_empfehlung" name="massnahme_empfehlung" rows="3" ${dis}>${val('massnahme_empfehlung')}</textarea>
+        </div>
+        <div class="intern-field">
+          <label for="massnahme_aufwand">Geschätzter Aufwand</label>
+          <input id="massnahme_aufwand" name="massnahme_aufwand" type="text" value="${val('massnahme_aufwand')}" placeholder="z.B. 1 Std. Nachstellung" ${dis} />
+        </div>
+        <div class="intern-field">
+          <label>Priorität</label>
+          <div class="intern-radio-row">
+            ${priorityOptions.map(([v, l]) => radio('massnahme_prioritaet', v, l)).join('')}
+          </div>
+        </div>
+        <div class="intern-field">
+          <label for="massnahme_verantwortlich">Verantwortlich</label>
+          <input id="massnahme_verantwortlich" name="massnahme_verantwortlich" type="text" value="${val('massnahme_verantwortlich')}" ${dis} />
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ VI. Abschlussstatus ════════════════════════════════════════════ -->
+    <section class="intern-form-section">
+      <h2>VI. Abschlussstatus</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field intern-field--full">
+          <fieldset class="intern-radio-group">
+            <legend>Status der Prüfung</legend>
+            ${finalStatusOptions.map(([v, l]) => radio('abschlussstatus', v, l)).join('')}
+          </fieldset>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+
+function sashPhotoCategories(): string {
+  return [
+    ['Gesamtansicht',     'Gesamtansicht'],
+    ['Fensterkennzeichnung', 'Fensterkennzeichnung'],
+    ['fluegellager',      'Flügellager'],
+    ['scherenlager',      'Scherenlager'],
+    ['ecklager',          'Ecklager'],
+    ['schliessbleche',    'Schließbleche'],
+    ['verriegelungen',    'Verriegelungen'],
+    ['getriebe',          'Getriebe'],
+    ['griff',             'Griff'],
+    ['dichtungen',        'Dichtungen'],
+    ['rahmen',            'Rahmen'],
+    ['glas',              'Glas'],
+    ['oeffnungsbegrenzer','Öffnungsbegrenzer'],
+    ['Mangel',            'Mangel / Defekt'],
+    ['sonstiges',         'Sonstiges'],
+  ].map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join('');
+}
+
+function bindSashPhotoDeletion(sashId: number, scope?: ParentNode) {
+  scope?.querySelectorAll<HTMLElement>('[data-delete-photo]').forEach((button) => {
+    button.onclick = async () => {
+      if (!window.confirm('Foto wirklich löschen?')) return;
+      const id = button.dataset.deletePhoto;
+      if (!id) return;
+      await apiDeletePhoto(id);
+      const gallery = button.closest('#sash-photo-gallery') as HTMLElement | null;
+      if (gallery) {
+        const updatedPhotos = await apiListSashPhotos(sashId);
+        gallery.innerHTML = renderPhotos(updatedPhotos);
+        bindSashPhotoDeletion(sashId, gallery);
+      }
+    };
+  });
+}
+
+function bindHeaderLogout(context: AppContext) {
+  context.root.querySelector<HTMLButtonElement>('#header-logout')?.addEventListener('click', async () => {
+    await apiLogout();
+    redirectTo('/intern/login/');
+  });
+}
+
+// ── Flat-Fensterliste (Legacy-Fallback) ──────────────────────────────────────
+
+async function renderWindowsFlat(context: AppContext) {
   const records = await fetchWindowSummaries(context);
   const filtersHtml = createFilterControls(records);
   context.root.innerHTML = `
@@ -366,7 +1285,8 @@ async function renderWindows(context: AppContext) {
     await downloadQrOverview(records);
   });
   bindWindowTableActions(context, records);
-  subscribeToWindowChanges(context, () => void renderWindows(context));
+  subscribeToWindowChanges(context, () => void renderWindowsFlat(context));
+  bindHeaderLogout(context);
 }
 
 function bindWindowTableActions(context: AppContext, records: WindowSummary[]) {
@@ -491,7 +1411,7 @@ async function renderRecord(context: AppContext) {
   const scheduleSave = debounce(async () => {
     context.draftDirty = true;
     await persistDraft(id, workingCopy, record.calculated_data, form);
-    if (navigator.onLine && context.supabase && canEdit && (!lock || lock.ok)) {
+    if (navigator.onLine && context.user && canEdit && (!lock || lock.ok)) {
       await saveWindow(context, record, workingCopy, false);
     }
   }, SAVE_DEBOUNCE_MS);
@@ -509,7 +1429,7 @@ async function renderRecord(context: AppContext) {
 
   saveButton?.addEventListener('click', async () => {
     await persistDraft(id, workingCopy, record.calculated_data, form);
-    if (navigator.onLine && context.supabase && canEdit && (!lock || lock.ok)) await saveWindow(context, record, workingCopy, true);
+    if (navigator.onLine && context.user && canEdit && (!lock || lock.ok)) await saveWindow(context, record, workingCopy, true);
   });
 
   completeButton?.addEventListener('click', async () => {
@@ -528,7 +1448,7 @@ async function renderRecord(context: AppContext) {
   });
 
   logoutButton?.addEventListener('click', async () => {
-    if (context.supabase) await context.supabase.auth.signOut();
+    await apiLogout();
     redirectTo('/intern/login/');
   });
 
@@ -545,6 +1465,7 @@ async function renderRecord(context: AppContext) {
   });
 
   bindPhotoDeletion(context, id, gallery ?? undefined);
+  bindHeaderLogout(context);
   subscribeToSingleRecord(context, id, async () => {
     const note = context.root.querySelector<HTMLElement>('[data-record-refresh-note]');
     if (note) note.remove();
@@ -578,6 +1499,7 @@ async function renderAnalysis(context: AppContext) {
       <section class="intern-panel"><h2>Ergebnisse je Fenstersystem</h2>${renderGrouping(bySystem)}</section>
     </div>
   `;
+  bindHeaderLogout(context);
 }
 
 async function renderExport(context: AppContext) {
@@ -615,42 +1537,257 @@ async function renderExport(context: AppContext) {
   context.root.querySelector<HTMLButtonElement>('#print-summary')?.addEventListener('click', async () => {
     await printSummary(records);
   });
+  bindHeaderLogout(context);
 }
 
-async function fetchWindowSummaries(context: AppContext): Promise<WindowSummary[]> {
-  if (!context.supabase) return [];
-  const { data, error } = await context.supabase
-    .from('windows')
-    .select('id, record_id, inspection_number, window_number, room_number, room_label, building_label, section_label, floor_label, status, overall_rating, priority, accessibility_status, assigned_to, assigned_name, special_inspection_required, urgent_action_required, has_defect, danger_immediate, last_edited_at, updated_at, progress_percent')
-    .is('deleted_at', null)
-    .order('inspection_number', { ascending: true });
-  if (error || !data) return [];
-  const locks = await fetchActiveLocks(context);
-  return data.map((item) => {
-    const lock = locks.get(item.id as string);
+async function renderAdmin(context: AppContext) {
+  if (context.user?.profile.role !== 'administrator') {
+    context.root.innerHTML = errorAlert('Nur Administratoren können die Benutzerverwaltung aufrufen.');
+    return;
+  }
+
+  context.root.innerHTML = `
+    ${renderHeader(context, 'Benutzerverwaltung', 'Benutzerkonten anlegen, bearbeiten und deaktivieren.')}
+    <div id="admin-message"></div>
+    <div class="intern-card">
+      <h2>Neuen Benutzer anlegen</h2>
+      <form id="create-user-form" class="intern-form-grid" novalidate>
+        <div class="intern-field">
+          <label for="new-email">E-Mail</label>
+          <input id="new-email" name="email" type="email" required autocomplete="off" />
+        </div>
+        <div class="intern-field">
+          <label for="new-name">Vollständiger Name</label>
+          <input id="new-name" name="full_name" type="text" required autocomplete="off" />
+        </div>
+        <div class="intern-field">
+          <label for="new-role">Rolle</label>
+          <select id="new-role" name="role">
+            <option value="pruefer">Prüfer</option>
+            <option value="sachverstaendiger">Sachverständiger</option>
+            <option value="projektleiter">Projektleiter</option>
+            <option value="gast">Gast (nur lesen)</option>
+            <option value="administrator">Administrator</option>
+          </select>
+        </div>
+        <div class="intern-field">
+          <label for="new-password">Passwort (mind. 10 Zeichen)</label>
+          <input id="new-password" name="password" type="password" minlength="10" required autocomplete="new-password" />
+        </div>
+        <div class="intern-actions intern-field--full">
+          <button class="sv-button sv-button-primary" type="submit">Benutzer anlegen</button>
+        </div>
+      </form>
+    </div>
+    <div class="intern-card">
+      <h2>Bestehende Benutzer</h2>
+      <div id="user-list">Lade Benutzerliste…</div>
+    </div>
+  `;
+
+  const msgEl = context.root.querySelector<HTMLElement>('#admin-message');
+  const listEl = context.root.querySelector<HTMLElement>('#user-list');
+
+  const loadUsers = async () => {
+    if (listEl) listEl.innerHTML = 'Lade…';
+    const users = await apiListUsers();
+    if (listEl) listEl.innerHTML = renderUserList(users, context.user!);
+    bindUserActions(context, users, loadUsers, msgEl);
+  };
+
+  await loadUsers();
+
+  const createForm = context.root.querySelector<HTMLFormElement>('#create-user-form');
+  createForm?.addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+    const data = new FormData(createForm);
+    const email = String(data.get('email') ?? '').trim();
+    const fullName = String(data.get('full_name') ?? '').trim();
+    const role = String(data.get('role') ?? 'pruefer') as PortalRole;
+    const password = String(data.get('password') ?? '');
+    if (msgEl) msgEl.innerHTML = infoAlert('Benutzer wird angelegt…');
+    const { error } = await apiCreateUser({ email, full_name: fullName, role, password });
+    if (error) {
+      if (msgEl) msgEl.innerHTML = errorAlert(`Fehler: ${error.message}`);
+    } else {
+      if (msgEl) msgEl.innerHTML = successAlert(`Benutzer ${email} erfolgreich angelegt.`);
+      createForm.reset();
+      await loadUsers();
+    }
+  });
+  bindHeaderLogout(context);
+}
+
+function renderUserList(users: AdminUser[], currentUser: PortalUser): string {
+  if (!users.length) return '<div class="intern-empty">Keine Benutzer vorhanden.</div>';
+  return `
+    <table class="intern-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>E-Mail</th>
+          <th>Rolle</th>
+          <th>Status</th>
+          <th>Letzter Login</th>
+          <th>Aktionen</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${users.map((u) => {
+          const isSelf = String(u.id) === currentUser.id;
+          const statusBadge = u.is_active
+            ? '<span class="intern-badge intern-badge--ok">Aktiv</span>'
+            : '<span class="intern-badge intern-badge--warn">Deaktiviert</span>';
+          return `
+            <tr data-user-id="${u.id}">
+              <td><strong>${escapeHtml(u.full_name)}</strong></td>
+              <td>${escapeHtml(u.email)}</td>
+              <td>${escapeHtml(u.role)}</td>
+              <td>${statusBadge}</td>
+              <td class="intern-meta">${u.last_login_at ? formatDateTime(u.last_login_at) : '—'}</td>
+              <td class="intern-actions intern-actions--inline">
+                <button class="sv-button sv-button-secondary" type="button" data-edit-user="${u.id}">Bearbeiten</button>
+                <button class="sv-button sv-button-secondary" type="button" data-pw-user="${u.id}">Passwort</button>
+                ${!isSelf && u.is_active ? `<button class="sv-button sv-button-secondary" type="button" data-deactivate-user="${u.id}">Deaktivieren</button>` : ''}
+              </td>
+            </tr>
+            <tr id="edit-row-${u.id}" class="intern-edit-row" hidden></tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function bindUserActions(
+  context: AppContext,
+  users: AdminUser[],
+  reload: () => Promise<void>,
+  msgEl: HTMLElement | null,
+) {
+  // Edit user
+  context.root.querySelectorAll<HTMLElement>('[data-edit-user]').forEach((btn) => {
+    btn.onclick = () => {
+      const id = Number(btn.dataset.editUser);
+      const user = users.find((u) => u.id === id);
+      if (!user) return;
+      const row = context.root.querySelector<HTMLTableRowElement>(`#edit-row-${id}`);
+      if (!row) return;
+      if (!row.hidden) { row.hidden = true; return; }
+      row.hidden = false;
+      row.innerHTML = `
+        <td colspan="6">
+          <form class="intern-form-grid intern-edit-form" data-save-user="${id}">
+            <div class="intern-field">
+              <label>Name</label>
+              <input name="full_name" value="${escapeHtml(user.full_name)}" required />
+            </div>
+            <div class="intern-field">
+              <label>Rolle</label>
+              <select name="role">
+                <option value="pruefer"          ${user.role === 'pruefer'          ? 'selected' : ''}>Prüfer</option>
+                <option value="sachverstaendiger" ${user.role === 'sachverstaendiger'? 'selected' : ''}>Sachverständiger</option>
+                <option value="projektleiter"    ${user.role === 'projektleiter'    ? 'selected' : ''}>Projektleiter</option>
+                <option value="gast"             ${user.role === 'gast' || user.role === 'auswertung' ? 'selected' : ''}>Gast (nur lesen)</option>
+                <option value="administrator"    ${user.role === 'administrator'    ? 'selected' : ''}>Administrator</option>
+              </select>
+            </div>
+            <div class="intern-field">
+              <label>Status</label>
+              <select name="is_active">
+                <option value="1" ${user.is_active ? 'selected' : ''}>Aktiv</option>
+                <option value="0" ${!user.is_active ? 'selected' : ''}>Deaktiviert</option>
+              </select>
+            </div>
+            <div class="intern-actions intern-field--full">
+              <button class="sv-button sv-button-primary" type="submit">Speichern</button>
+            </div>
+          </form>
+        </td>
+      `;
+      row.querySelector<HTMLFormElement>(`[data-save-user="${id}"]`)?.addEventListener('submit', async (evt) => {
+        evt.preventDefault();
+        const form = evt.currentTarget as HTMLFormElement;
+        const fd = new FormData(form);
+        const payload = {
+          full_name: String(fd.get('full_name') ?? '').trim(),
+          role: String(fd.get('role') ?? 'pruefer') as PortalRole,
+          is_active: fd.get('is_active') === '1',
+        };
+        const { error } = await apiUpdateUser(id, payload);
+        if (error) {
+          if (msgEl) msgEl.innerHTML = errorAlert(`Fehler: ${error.message}`);
+        } else {
+          if (msgEl) msgEl.innerHTML = successAlert('Benutzer aktualisiert.');
+          await reload();
+        }
+      });
+    };
+  });
+
+  // Set password
+  context.root.querySelectorAll<HTMLElement>('[data-pw-user]').forEach((btn) => {
+    btn.onclick = () => {
+      const id = Number(btn.dataset.pwUser);
+      const row = context.root.querySelector<HTMLTableRowElement>(`#edit-row-${id}`);
+      if (!row) return;
+      if (!row.hidden && row.querySelector('[data-pw-form]')) { row.hidden = true; return; }
+      row.hidden = false;
+      row.innerHTML = `
+        <td colspan="6">
+          <form class="intern-form-grid intern-edit-form" data-pw-form="${id}">
+            <div class="intern-field">
+              <label>Neues Passwort (mind. 10 Zeichen)</label>
+              <input name="password" type="password" minlength="10" required autocomplete="new-password" />
+            </div>
+            <div class="intern-actions intern-field--full">
+              <button class="sv-button sv-button-primary" type="submit">Passwort setzen</button>
+            </div>
+          </form>
+        </td>
+      `;
+      row.querySelector<HTMLFormElement>(`[data-pw-form="${id}"]`)?.addEventListener('submit', async (evt) => {
+        evt.preventDefault();
+        const form = evt.currentTarget as HTMLFormElement;
+        const password = String(new FormData(form).get('password') ?? '');
+        const { error } = await apiSetUserPassword(id, password);
+        if (error) {
+          if (msgEl) msgEl.innerHTML = errorAlert(`Fehler: ${error.message}`);
+        } else {
+          if (msgEl) msgEl.innerHTML = successAlert('Passwort wurde geändert.');
+          row.hidden = true;
+        }
+      });
+    };
+  });
+
+  // Deactivate
+  context.root.querySelectorAll<HTMLElement>('[data-deactivate-user]').forEach((btn) => {
+    btn.onclick = async () => {
+      const id = Number(btn.dataset.deactivateUser);
+      const user = users.find((u) => u.id === id);
+      if (!user) return;
+      if (!window.confirm(`Benutzer „${user.full_name}" (${user.email}) wirklich deaktivieren?`)) return;
+      const { error } = await apiDeactivateUser(id);
+      if (error) {
+        if (msgEl) msgEl.innerHTML = errorAlert(`Fehler: ${error.message}`);
+      } else {
+        if (msgEl) msgEl.innerHTML = successAlert('Benutzer deaktiviert.');
+        await reload();
+      }
+    };
+  });
+}
+
+async function fetchWindowSummaries(_context: AppContext): Promise<WindowSummary[]> {
+  const records = await apiListWindows();
+  const locks = await apiGetActiveLocks();
+  return records.map((item) => {
+    const lock = locks.get(String(item.id));
     return {
+      ...item,
       id: String(item.id),
-      record_id: String(item.record_id ?? item.id),
-      inspection_number: toNumber(item.inspection_number),
-      window_number: String(item.window_number ?? ''),
-      room_number: item.room_number ? String(item.room_number) : null,
-      room_label: item.room_label ? String(item.room_label) : null,
-      building_label: item.building_label ? String(item.building_label) : null,
-      section_label: item.section_label ? String(item.section_label) : null,
-      floor_label: item.floor_label ? String(item.floor_label) : null,
-      status: String(item.status ?? 'nicht begonnen') as WindowRecord['status'],
-      overall_rating: item.overall_rating ? String(item.overall_rating) : null,
-      priority: item.priority ? String(item.priority) : null,
-      accessibility_status: item.accessibility_status ? String(item.accessibility_status) : null,
-      assigned_to: item.assigned_to ? String(item.assigned_to) : null,
-      assigned_name: item.assigned_name ? String(item.assigned_name) : null,
-      special_inspection_required: Boolean(item.special_inspection_required),
-      urgent_action_required: Boolean(item.urgent_action_required),
-      has_defect: Boolean(item.has_defect),
-      danger_immediate: Boolean(item.danger_immediate),
-      last_edited_at: item.last_edited_at ? String(item.last_edited_at) : null,
-      updated_at: String(item.updated_at),
-      progress_percent: toNumber(item.progress_percent) ?? 0,
+      record_id: String(item.record_id),
       lock_owner_id: lock?.owner_id ?? null,
       lock_owner_name: lock?.owner_name ?? null,
       lock_expires_at: lock?.expires_at ?? null,
@@ -658,66 +1795,8 @@ async function fetchWindowSummaries(context: AppContext): Promise<WindowSummary[
   });
 }
 
-async function fetchActiveLocks(context: AppContext) {
-  const result = new Map<string, { owner_id: string | null; owner_name: string | null; expires_at: string | null }>();
-  if (!context.supabase) return result;
-  const { data } = await context.supabase
-    .from('record_locks')
-    .select('window_id, owner_id, owner_name, expires_at')
-    .gt('expires_at', new Date().toISOString());
-  data?.forEach((item) => {
-    result.set(String(item.window_id), {
-      owner_id: item.owner_id ? String(item.owner_id) : null,
-      owner_name: item.owner_name ? String(item.owner_name) : null,
-      expires_at: item.expires_at ? String(item.expires_at) : null,
-    });
-  });
-  return result;
-}
-
-async function fetchWindowRecord(context: AppContext, id: string): Promise<WindowRecord | null> {
-  if (!context.supabase) return null;
-  const { data, error } = await context.supabase
-    .from('windows')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
-  if (error || !data) return null;
-  return hydrateRecord(data as WindowPayload);
-}
-
-function hydrateRecord(data: WindowPayload): WindowRecord {
-  return {
-    id: data.id,
-    project_id: data.project_id ?? DEFAULT_PROJECT_ID,
-    record_id: data.record_id,
-    inspection_number: data.inspection_number,
-    window_number: data.window_number,
-    room_number: data.room_number,
-    room_label: data.room_label,
-    building_label: data.building_label,
-    section_label: data.section_label,
-    floor_label: data.floor_label,
-    status: data.status as WindowRecord['status'],
-    overall_rating: data.overall_rating,
-    priority: data.priority,
-    accessibility_status: data.accessibility_status,
-    assigned_to: data.assigned_to,
-    assigned_name: data.assigned_name,
-    special_inspection_required: Boolean(data.special_inspection_required),
-    urgent_action_required: Boolean(data.urgent_action_required),
-    has_defect: Boolean(data.has_defect),
-    danger_immediate: Boolean(data.danger_immediate),
-    last_edited_at: data.last_edited_at,
-    updated_at: data.updated_at,
-    progress_percent: data.progress_percent ?? 0,
-    form_data: data.form_data ?? {},
-    calculated_data: data.calculated_data ?? {},
-    completed_at: data.completed_at ?? null,
-    released_at: data.released_at ?? null,
-    release_reason: data.release_reason ?? null,
-    version: data.version ?? 1,
-  };
+async function fetchWindowRecord(_context: AppContext, id: string): Promise<WindowRecord | null> {
+  return apiGetWindow(id);
 }
 
 function mergeRecordWithDraft(record: WindowRecord, draft: Awaited<ReturnType<typeof loadDraft>>) {
@@ -730,79 +1809,16 @@ function mergeRecordWithDraft(record: WindowRecord, draft: Awaited<ReturnType<ty
   };
 }
 
-async function fetchAuditLogs(context: AppContext, windowId: string): Promise<AuditLogEntry[]> {
-  if (!context.supabase) return [];
-  const { data } = await context.supabase
-    .from('audit_logs')
-    .select('id, action_type, field_name, old_value, new_value, reason, created_at, actor_name')
-    .eq('window_id', windowId)
-    .order('created_at', { ascending: false })
-    .limit(20);
-  return (data ?? []).map((item) => ({
-    id: String(item.id),
-    action_type: String(item.action_type ?? ''),
-    field_name: item.field_name ? String(item.field_name) : null,
-    old_value: item.old_value ? String(item.old_value) : null,
-    new_value: item.new_value ? String(item.new_value) : null,
-    reason: item.reason ? String(item.reason) : null,
-    created_at: String(item.created_at),
-    actor_name: item.actor_name ? String(item.actor_name) : null,
-  }));
+async function fetchAuditLogs(_context: AppContext, windowId: string): Promise<AuditLogEntry[]> {
+  return apiGetAuditLog(windowId);
 }
 
-async function fetchPhotos(context: AppContext, windowId: string): Promise<PhotoItem[]> {
-  if (!context.supabase) return [];
-  const { data } = await context.supabase
-    .from('photos')
-    .select('id, window_id, category, caption, file_name, taken_at, inspector_name, storage_path')
-    .eq('window_id', windowId)
-    .is('deleted_at', null)
-    .order('created_at', { ascending: false });
-  return (data ?? []).map((item) => ({
-    id: String(item.id),
-    window_id: String(item.window_id),
-    category: String(item.category ?? ''),
-    caption: item.caption ? String(item.caption) : null,
-    file_name: String(item.file_name ?? ''),
-    taken_at: item.taken_at ? String(item.taken_at) : null,
-    inspector_name: item.inspector_name ? String(item.inspector_name) : null,
-    storage_path: String(item.storage_path ?? ''),
-  }));
+async function fetchPhotos(_context: AppContext, windowId: string): Promise<PhotoItem[]> {
+  return apiListPhotos(windowId);
 }
 
-async function fetchCalculationParameters(context: AppContext): Promise<CalculationParameterMap> {
-  if (!context.supabase) return normalizeCalculationParameters(null);
-  const { data } = await context.supabase
-    .from('calculation_parameters')
-    .select('parameter_key, parameter_value')
-    .is('project_id', null);
-  const parameters: Partial<CalculationParameterMap> = {};
-  data?.forEach((item) => {
-    if (item.parameter_key === 'glassDensityKgPerM2Mm') parameters.glassDensityKgPerM2Mm = toNumber(item.parameter_value) ?? undefined;
-    if (item.parameter_key === 'frameWeightFactor') parameters.frameWeightFactor = toNumber(item.parameter_value) ?? undefined;
-    if (item.parameter_key === 'safetyFactor') parameters.safetyFactor = toNumber(item.parameter_value) ?? undefined;
-  });
-  return normalizeCalculationParameters(parameters);
-}
-
-async function loadPortalUser(supabase: SupabaseClient, user: User): Promise<PortalUser | null> {
-  const { data } = await supabase
-    .from('profiles')
-    .select('id, email, full_name, role, is_active')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!data) return null;
-  return {
-    id: user.id,
-    email: user.email ?? data.email ?? '',
-    profile: {
-      id: String(data.id),
-      email: data.email ? String(data.email) : null,
-      full_name: data.full_name ? String(data.full_name) : null,
-      role: String(data.role ?? 'pruefer') as PortalRole,
-      is_active: Boolean(data.is_active ?? true),
-    },
-  };
+async function fetchCalculationParameters(_context: AppContext) {
+  return apiGetCalculationParameters();
 }
 
 function createDashboardStats(records: WindowSummary[]): DashboardStats {
@@ -841,18 +1857,20 @@ function createDashboardStats(records: WindowSummary[]): DashboardStats {
 }
 
 function renderHeader(context: AppContext, title: string, text: string) {
+  const isAdmin = context.user?.profile.role === 'administrator';
   return `
     <div class="intern-card intern-hero">
       <p class="sv-eyebrow">${escapeHtml(portalProject.title)}</p>
       <h1>${escapeHtml(title)}</h1>
       <p>${escapeHtml(text)}</p>
-      <div class="intern-actions">
+      <nav class="intern-actions" aria-label="Hauptnavigation">
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/">Dashboard</a>
-        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/fenster/">Fenster</a>
+        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a>
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/auswertung/">Auswertung</a>
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/export/">Export</a>
-        ${context.user?.profile.role === 'administrator' ? '<span class="intern-badge intern-badge--info">Administrator kann Sperren aufheben und Freigaben aendern.</span>' : ''}
-      </div>
+        ${isAdmin ? '<a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/admin/">Benutzerverwaltung</a>' : ''}
+        <button class="sv-button sv-button-ghost" type="button" id="header-logout">Abmelden</button>
+      </nav>
     </div>
   `;
 }
@@ -1019,39 +2037,10 @@ async function persistDraft(windowId: string, data: Record<string, unknown>, cal
 }
 
 async function saveWindow(context: AppContext, record: WindowRecord, data: Record<string, unknown>, explicitSave: boolean) {
-  if (!context.supabase || !context.user) return;
-  const summary = deriveSummaryColumns(record.id, data, context.user);
-  const payload = {
-    id: record.id,
-    project_id: record.project_id,
-    record_id: record.record_id,
-    inspection_number: toNumber(data.inspection_number) ?? record.inspection_number,
-    window_number: String(data.window_number ?? record.window_number ?? ''),
-    room_number: stringOrNull(data.room_number),
-    room_label: stringOrNull(data.room_label),
-    building_label: stringOrNull(data.building_label),
-    section_label: stringOrNull(data.section_label),
-    floor_label: stringOrNull(data.floor_label),
-    accessibility_status: stringOrNull(data.accessibility_status),
-    status: String(data.status ?? record.status ?? 'in Bearbeitung'),
-    overall_rating: stringOrNull(data.overall_rating),
-    priority: stringOrNull(data.priority),
-    assigned_to: context.user.id,
-    assigned_name: context.user.profile.full_name ?? context.user.email,
-    special_inspection_required: Boolean(data.special_inspection_required || data.scissor_special_inspection),
-    urgent_action_required: Boolean(data.urgent_action_required),
-    has_defect: hasDefect(data),
-    danger_immediate: Boolean(data.danger_immediate),
-    progress_percent: summary.progressPercent,
-    form_data: data,
-    calculated_data: record.calculated_data,
-    last_edited_at: new Date().toISOString(),
-    completed_at: String(data.status ?? '') === 'Pruefung abgeschlossen' ? new Date().toISOString() : record.completed_at,
-    release_reason: stringOrNull(data.release_reason),
-  };
-  const { error } = await context.supabase.from('windows').upsert(payload).select('id').single();
+  if (!context.user) return;
+  const { error } = await apiSaveWindow(record.id, data, record.calculated_data);
   if (error) {
-    showInlineMessage(context.root, errorAlert('Datensatz konnte nicht gespeichert werden.')); 
+    showInlineMessage(context.root, errorAlert('Datensatz konnte nicht gespeichert werden.'));
     return;
   }
   await removeDraft(record.id);
@@ -1086,8 +2075,7 @@ function hasDefect(data: Record<string, unknown>) {
 }
 
 async function createWindowRecord(context: AppContext, sourceId: string | null) {
-  if (!context.supabase || !context.user) return null;
-  const id = crypto.randomUUID();
+  if (!context.user) return null;
   let formData: Record<string, unknown> = {
     status: 'nicht begonnen',
     inspection_date: new Date().toISOString().slice(0, 10),
@@ -1100,47 +2088,11 @@ async function createWindowRecord(context: AppContext, sourceId: string | null) 
       delete formData.release_reason;
     }
   }
-  const { error } = await context.supabase.from('windows').insert({
-    id,
-    project_id: DEFAULT_PROJECT_ID,
-    record_id: `BMVG-${id.slice(0, 8).toUpperCase()}`,
-    inspection_number: null,
-    window_number: String(formData.window_number ?? ''),
-    room_number: stringOrNull(formData.room_number),
-    room_label: stringOrNull(formData.room_label),
-    building_label: stringOrNull(formData.building_label),
-    section_label: stringOrNull(formData.section_label),
-    floor_label: stringOrNull(formData.floor_label),
-    status: String(formData.status ?? 'nicht begonnen'),
-    assigned_to: context.user.id,
-    assigned_name: context.user.profile.full_name ?? context.user.email,
-    form_data: formData,
-    calculated_data: {},
-    progress_percent: 0,
-  });
-  if (error) {
-    showInlineMessage(context.root, errorAlert('Neuer Datensatz konnte nicht angelegt werden.'));
-    return null;
-  }
-  return { id };
+  return apiCreateWindow(formData);
 }
 
 async function acquireLock(context: AppContext, windowId: string): Promise<LockResult | null> {
-  if (!context.supabase) return null;
-  const { data, error } = await context.supabase.rpc('acquire_record_lock', {
-    p_window_id: windowId,
-    p_timeout_minutes: LOCK_TIMEOUT_MINUTES,
-  });
-  if (error) return { ok: false, message: 'Datensatzsperre konnte nicht gesetzt werden.' };
-  const response = Array.isArray(data) ? data[0] : data;
-  return {
-    ok: Boolean(response?.ok),
-    lock_id: response?.lock_id ? String(response.lock_id) : undefined,
-    owner_id: response?.owner_id ? String(response.owner_id) : null,
-    owner_name: response?.owner_name ? String(response.owner_name) : null,
-    expires_at: response?.expires_at ? String(response.expires_at) : null,
-    message: response?.message ? String(response.message) : undefined,
-  };
+  return apiAcquireLock(windowId, LOCK_TIMEOUT_MINUTES);
 }
 
 function activateLockMaintenance(context: AppContext, windowId: string) {
@@ -1149,42 +2101,25 @@ function activateLockMaintenance(context: AppContext, windowId: string) {
   document.addEventListener('pointerdown', markActivity, { passive: true });
   document.addEventListener('keydown', markActivity);
   const interval = window.setInterval(async () => {
-    if (!context.supabase) return;
     const inactiveMinutes = (Date.now() - lastActivity) / 1000 / 60;
     if (inactiveMinutes >= LOCK_TIMEOUT_MINUTES) {
       await releaseLock(context, windowId);
       window.clearInterval(interval);
       return;
     }
-    await context.supabase.rpc('acquire_record_lock', { p_window_id: windowId, p_timeout_minutes: LOCK_TIMEOUT_MINUTES });
+    await apiAcquireLock(windowId, LOCK_TIMEOUT_MINUTES);
   }, 60_000);
   window.addEventListener('beforeunload', () => void releaseLock(context, windowId), { once: true });
 }
 
 async function releaseLock(context: AppContext, windowId: string) {
-  if (!context.supabase) return;
-  await context.supabase.rpc('release_record_lock', { p_window_id: windowId });
+  await apiReleaseLock(windowId);
 }
 
 async function uploadPhotos(context: AppContext, windowId: string, files: File[], category: string, caption: string) {
-  if (!context.supabase || !context.user) return [];
   for (const file of files) {
     const resized = await resizeImageIfNeeded(file);
-    const fileName = `${windowId}/${crypto.randomUUID()}-${sanitizeFileName(file.name)}`;
-    const { error: uploadError } = await context.supabase.storage
-      .from('window-photos-private')
-      .upload(fileName, resized, { contentType: resized.type || file.type, upsert: false });
-    if (uploadError) continue;
-    await context.supabase.from('photos').insert({
-      window_id: windowId,
-      category,
-      caption: caption || null,
-      file_name: file.name,
-      storage_path: fileName,
-      inspector_id: context.user.id,
-      inspector_name: context.user.profile.full_name ?? context.user.email,
-      taken_at: new Date().toISOString(),
-    });
+    await apiUploadPhoto(windowId, resized, category, caption);
   }
   return fetchPhotos(context, windowId);
 }
@@ -1194,10 +2129,8 @@ function bindPhotoDeletion(context: AppContext, windowId: string, scope?: Parent
     button.onclick = async () => {
       if (!window.confirm('Foto wirklich loeschen?')) return;
       const id = button.dataset.deletePhoto;
-      const path = button.dataset.storagePath;
-      if (!id || !path || !context.supabase) return;
-      await context.supabase.storage.from('window-photos-private').remove([path]);
-      await context.supabase.from('photos').update({ deleted_at: new Date().toISOString() }).eq('id', id);
+      if (!id) return;
+      await apiDeletePhoto(id);
       const gallery = context.root.querySelector<HTMLElement>('#photo-gallery');
       if (gallery) gallery.innerHTML = renderPhotos(await fetchPhotos(context, windowId));
       bindPhotoDeletion(context, windowId, gallery ?? undefined);
@@ -1234,7 +2167,7 @@ async function resizeImageIfNeeded(file: File) {
 }
 
 async function syncDraftQueue(context: AppContext) {
-  if (!context.supabase || !context.user) return;
+  if (!context.user) return;
   const drafts = await loadAllDrafts();
   for (const draft of drafts) {
     const record = await fetchWindowRecord(context, draft.windowId);
@@ -1264,22 +2197,14 @@ async function exportRecords(context: AppContext, exportId: string, records: Win
     record.updated_at,
   ].map((value) => quoteCsv(value, delimiter)).join(delimiter))].join('\n');
   downloadBlob(`${definition.id}-${new Date().toISOString().slice(0, 10)}.csv`, csv, 'text/csv;charset=utf-8');
-  if (context.supabase && context.user) {
-    await context.supabase.from('export_logs').insert({
-      project_id: DEFAULT_PROJECT_ID,
-      export_type: definition.title,
-      exported_by: context.user.id,
-      file_name: `${definition.id}.csv`,
-      filter_snapshot: { exportId, rowCount: rows.length },
-    });
-  }
+  void apiLogExport(definition.title, `${definition.id}.csv`, { exportId, rowCount: rows.length });
 }
 
 async function printSummary(records: WindowSummary[]) {
   const popup = window.open('', '_blank', 'noopener,noreferrer,width=1200,height=900');
   if (!popup) return;
   popup.document.write(`
-    <html lang="de"><head><title>Fensterpruefung BMVg Bonn – Sammelprotokoll</title><style>
+    <html lang="de"><head><title>Fensterbeschlagsprüfung BMVg Bonn – Sammelprotokoll</title><style>
       body{font-family:Arial,sans-serif;padding:24px;color:#071a2e}table{width:100%;border-collapse:collapse}th,td{border:1px solid #d6e0e8;padding:8px;text-align:left}h1{margin-top:0}
     </style></head><body>
     <h1>${escapeHtml(portalProject.title)} – Sammelprotokoll</h1>
@@ -1292,6 +2217,140 @@ async function printSummary(records: WindowSummary[]) {
   popup.focus();
   popup.print();
 }
+
+function printSashReport(sash: WindowSashRecord, data: Record<string, unknown>, photos: PhotoItem[]): void {
+  const popup = window.open('', '_blank', 'noopener,noreferrer,width=900,height=1200');
+  if (!popup) { alert('Bitte Pop-ups für diese Seite erlauben.'); return; }
+
+  const d = (key: string, fallback = '—') => escapeHtml(String(data[key] ?? '') || fallback);
+  const chk = (key: string) => Boolean(data[key]) ? '☑' : '☐';
+  const compLabel: Record<string, string> = {
+    fluegellager:'Flügellager', scherenlager:'Scherenlager', ecklager:'Ecklager',
+    schliessbleche:'Schließbleche', verriegelungen:'Verriegelungen', getriebe:'Getriebe',
+    griff:'Griff', dichtungen:'Dichtungen', rahmen:'Rahmen', glas:'Glas',
+    oeffnungsbegrenzer:'Öffnungsbegrenzer',
+  };
+  const stateLabel: Record<string, string> = {
+    OK:'OK', eingeschraenkt_funktionsfaehig:'Eingeschränkt', defekt:'Defekt', fehlt:'Fehlt', nicht_vorhanden:'Nicht eingebaut',
+  };
+  const suitLabel: Record<string, string> = {
+    geeignet:'Geeignet', geeignet_nach_nachstellung:'Nach Nachstellung geeignet',
+    instandsetzung_erforderlich:'Instandsetzung erforderlich', austausch_empfohlen:'Austausch empfohlen',
+  };
+
+  const compRows = Object.entries(compLabel).map(([key, label]) => {
+    const status = stateLabel[String(data[`${key}_status`] ?? '')] ?? (data[`${key}_status`] ? d(`${key}_status`) : '—');
+    const bem = d(`${key}_bemerkung`, '');
+    return `<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(status)}</td><td>${escapeHtml(bem)}</td></tr>`;
+  }).join('');
+
+  const fnChecks = [
+    ['fn_oeffnet_vollstaendig',      'Öffnet vollständig'],
+    ['fn_schliesst_vollstaendig',    'Schließt vollständig'],
+    ['fn_verriegelung_funktioniert', 'Verriegelung funktioniert'],
+    ['fn_griff_leichtgaengig',       'Griffbewegung leichtgängig'],
+    ['fn_kein_widerstand',           'Kein abnormaler Widerstand'],
+    ['fn_kein_spiel',                'Kein übermäßiges Spiel'],
+    ['fn_kein_schleifen',            'Kein Schleifen'],
+    ['fn_fluchtweg_moeglich',        'Rettungsweg möglich'],
+  ].map(([key, label]) => `<tr><td>${escapeHtml(label)}</td><td>${chk(key)}</td></tr>`).join('');
+
+  const photoHtml = photos.length > 0
+    ? photos.slice(0, 12).map((p) => `<div class="photo-item"><img src="/intern/photos/${escapeHtml(p.storage_path)}" alt="${escapeHtml(p.caption ?? p.category)}" /><p>${escapeHtml(p.caption ?? p.category)}</p></div>`).join('')
+    : '<p>Keine Fotos vorhanden.</p>';
+
+  popup.document.write(`<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="utf-8" />
+<title>Prüfbericht – ${escapeHtml(sash.sash_label || `Flügel ${sash.sash_number}`)}</title>
+<style>
+  @page{margin:20mm 15mm;size:A4}
+  *{box-sizing:border-box}
+  body{font-family:'Arial',sans-serif;font-size:11pt;color:#1a1a1a;margin:0;padding:0}
+  .header{border-bottom:3px solid #071a2e;padding-bottom:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-end}
+  .header h1{margin:0;font-size:14pt;color:#071a2e}
+  .header .company{font-size:9pt;text-align:right;color:#555}
+  .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;margin-bottom:16px;border:1px solid #ccc;padding:10px;border-radius:4px}
+  .meta-item{display:flex;flex-direction:column}
+  .meta-item .label{font-size:8pt;color:#666;text-transform:uppercase;letter-spacing:.05em}
+  .meta-item .value{font-weight:bold}
+  h2{font-size:11pt;background:#071a2e;color:#fff;padding:5px 10px;margin:16px 0 6px}
+  table{width:100%;border-collapse:collapse;font-size:10pt}
+  th,td{border:1px solid #ccc;padding:5px 8px;text-align:left;vertical-align:top}
+  th{background:#f0f0f0;font-weight:bold}
+  .verdict-box{border:2px solid #071a2e;padding:12px;border-radius:4px;margin:12px 0}
+  .verdict-box .label{font-size:8pt;text-transform:uppercase;color:#666}
+  .verdict-box .value{font-size:13pt;font-weight:bold;color:#071a2e}
+  .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .photo-item img{width:100%;height:120px;object-fit:cover;border:1px solid #ccc}
+  .photo-item p{font-size:8pt;text-align:center;margin:2px 0}
+  .footer{border-top:1px solid #ccc;margin-top:16px;padding-top:8px;font-size:8pt;color:#666;display:flex;justify-content:space-between}
+  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head><body>
+
+<div class="header">
+  <div>
+    <h1>Prüfbericht – Fensterflügel-Inspektion</h1>
+    <p style="margin:4px 0 0;font-size:10pt;color:#555">Fensterbeschlagsprüfung BMVg Bonn</p>
+  </div>
+  <div class="company">
+    SV-Büro Marc Schütt e.K.<br/>
+    Sachverständigen- und Prüfsystem
+  </div>
+</div>
+
+<div class="meta-grid">
+  <div class="meta-item"><span class="label">Gebäude</span><span class="value">${escapeHtml(sash.building_name ?? '—')}</span></div>
+  <div class="meta-item"><span class="label">Etage</span><span class="value">${escapeHtml(sash.floor_name ?? '—')}</span></div>
+  <div class="meta-item"><span class="label">Raum</span><span class="value">${escapeHtml(`${sash.room_name ?? ''} ${sash.room_number ? `(${sash.room_number})` : ''}`.trim() || '—')}</span></div>
+  <div class="meta-item"><span class="label">Fenster-ID</span><span class="value">${escapeHtml(sash.window_number)}</span></div>
+  <div class="meta-item"><span class="label">Flügel</span><span class="value">${escapeHtml(sash.sash_label || `Flügel ${sash.sash_number}`)}</span></div>
+  <div class="meta-item"><span class="label">Prüfer</span><span class="value">${d('inspector_name')}</span></div>
+  <div class="meta-item"><span class="label">Prüfdatum</span><span class="value">${d('inspection_date')}</span></div>
+  <div class="meta-item"><span class="label">Uhrzeit</span><span class="value">${d('inspection_time', '—')}</span></div>
+</div>
+
+<h2>I. Beschlagprüfung</h2>
+<table>
+  <thead><tr><th>Bauteil</th><th>Zustand</th><th>Bemerkung</th></tr></thead>
+  <tbody>${compRows}</tbody>
+</table>
+
+<h2>II. Fensterfunktion</h2>
+<table>
+  <thead><tr><th>Kriterium</th><th>Ergebnis</th></tr></thead>
+  <tbody>${fnChecks}</tbody>
+</table>
+
+<div class="verdict-box">
+  <div class="label">Eignung</div>
+  <div class="value">${escapeHtml(suitLabel[d('eignung_beurteilung', '')] ?? d('eignung_beurteilung', '—'))}</div>
+  <div style="margin-top:8px"><span class="label">Risikostufe: </span><strong>${d('risikostufe', '—')}</strong></div>
+</div>
+
+<h2>III. Maßnahmen</h2>
+<table>
+  <tr><th style="width:30%">Empfohlene Maßnahme</th><td>${d('massnahme_empfehlung')}</td></tr>
+  <tr><th>Geschätzter Aufwand</th><td>${d('massnahme_aufwand', '—')}</td></tr>
+  <tr><th>Priorität</th><td>${d('massnahme_prioritaet', '—')}</td></tr>
+  <tr><th>Verantwortlich</th><td>${d('massnahme_verantwortlich', '—')}</td></tr>
+</table>
+
+<h2>IV. Fotodokumentation</h2>
+<div class="photo-grid">${photoHtml}</div>
+
+<div class="footer">
+  <span>SV-Büro Marc Schütt e.K. – Sachverständigen- und Prüfsystem</span>
+  <span>Gedruckt: ${new Date().toLocaleString('de-DE')}</span>
+</div>
+
+</body></html>`);
+  popup.document.close();
+  popup.focus();
+  setTimeout(() => popup.print(), 300);
+}
+
 
 async function downloadQrOverview(records: WindowSummary[]) {
   const popup = window.open('', '_blank', 'noopener,noreferrer,width=1200,height=900');
@@ -1340,8 +2399,8 @@ function roleBadge(role: PortalRole) {
 
 function connectionBadge() {
   return navigator.onLine
-    ? '<span class="intern-badge intern-badge--ok">Verbunden · Realtime aktiv</span>'
-    : '<span class="intern-badge intern-badge--warn">Offline · lokale Zwischenspeicherung aktiv</span>';
+    ? '<span class="intern-badge intern-badge--ok">Online · Verbunden</span>'
+    : '<span class="intern-badge intern-badge--warn">Offline · Lokale Speicherung aktiv</span>';
 }
 
 function infoAlert(text: string) { return `<div class="intern-alert intern-alert--info">${escapeHtml(text)}</div>`; }
@@ -1349,22 +2408,12 @@ function successAlert(text: string) { return `<div class="intern-alert intern-al
 function warnAlert(text: string) { return `<div class="intern-alert intern-alert--warn">${escapeHtml(text)}</div>`; }
 function errorAlert(text: string) { return `<div class="intern-alert intern-alert--error">${escapeHtml(text)}</div>`; }
 
-function subscribeToWindowChanges(context: AppContext, handler: () => void) {
-  if (!context.supabase) return;
-  const channel = context.supabase
-    .channel(`windows-list-${context.route}`)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'windows' }, handler)
-    .subscribe();
-  window.addEventListener('beforeunload', () => void context.supabase?.removeChannel(channel), { once: true });
+function subscribeToWindowChanges(_context: AppContext, _handler: () => void) {
+  // Statusaktualisierung erfolgt über Polling; kein separater Kanal erforderlich.
 }
 
-function subscribeToSingleRecord(context: AppContext, id: string, handler: () => Promise<void>) {
-  if (!context.supabase) return;
-  const channel = context.supabase
-    .channel(`window-record-${id}`)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'windows', filter: `id=eq.${id}` }, () => { void handler(); })
-    .subscribe();
-  window.addEventListener('beforeunload', () => void context.supabase?.removeChannel(channel), { once: true });
+function subscribeToSingleRecord(_context: AppContext, _id: string, _handler: () => Promise<void>) {
+  // Statusaktualisierung erfolgt über Polling; kein separater Kanal erforderlich.
 }
 
 function showInlineMessage(root: HTMLElement, html: string) {
@@ -1395,8 +2444,9 @@ function summarizeCompletion(data: Record<string, unknown>, calculated: Record<s
 }
 
 function canEditRecord(role: PortalRole, record: WindowRecord) {
-  if (role === 'administrator') return true;
-  if (role === 'auswertung') return false;
+  if (role === 'administrator' || role === 'projektleiter') return true;
+  if (role === 'gast' || role === 'auswertung') return false;
+  // sachverstaendiger und pruefer dürfen bearbeiten, solange nicht freigegeben
   return record.status !== 'freigegeben' && record.status !== 'fachlich geprueft';
 }
 

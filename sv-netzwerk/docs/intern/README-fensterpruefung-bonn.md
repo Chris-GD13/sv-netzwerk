@@ -1,42 +1,90 @@
-# Geschuetztes Pruefportal Fensterbeschlagspruefung BMVg Bonn
+# Geschütztes Prüfportal – Fensterbeschlagsprüfung BMVg Bonn
+
+## Technischer Stand
+
+Das interne Prüfportal ist vollständig auf PHP 8.4 + MySQL 8.0 umgestellt.
+Supabase wird nicht mehr verwendet.
 
 ## Enthaltene Bestandteile
 
-- geschuetzte Astro-Routen unter `/intern/`
-- clientseitige Supabase-Authentifizierung mit Session-Guard
+- geschützte Astro-Routen unter `/intern/`
+- PHP-Session-Authentifizierung (passwortbasiert)
 - Fensterliste, Dashboard, Datensatzeditor, Auswertung und Exportansicht
-- Realtime-Aktualisierung fuer Fensterdatensaetze, Sperren, Audit-Log und Fotos
-- lokale IndexedDB-Zwischenspeicherung mit Synchronisierung nach Wiederverbindung
-- Supabase-SQL-Migrationen, Seeds und Importvorlage
+- IndexedDB-Zwischenspeicherung mit Synchronisierung nach Wiederverbindung
+- MySQL-Schema (`public/intern/api/schema.sql`)
+- Foto-Upload über PHP-Multipart-API
+- Einrichtungsassistent unter `/intern/api/setup.php`
 
-## Umgebungsvariablen
+## Einrichtung
+
+### 1. `.env`-Datei anlegen
+
+Aus `.env.example` kopieren und ausfüllen:
 
 ```env
-PUBLIC_SUPABASE_URL=https://<projekt-ref>.supabase.co
-PUBLIC_SUPABASE_ANON_KEY=
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=fensterpruefung
+DB_USER=<datenbanknutzer>
+DB_PASS=<datenbankpasswort>
+PHOTOS_DIR=       # optional: absoluter Pfad außerhalb des Web-Roots
+SETUP_KEY=        # zufälliges Passwort für den Einrichtungsassistenten
 ```
 
-Hinweis: Werte ohne Anfuehrungszeichen und ohne fuehrende/nachgestellte Leerzeichen setzen.
+### 2. MySQL-Schema einrichten
 
-## Supabase-Einrichtung
+Entweder direkt via mysql-Client:
 
-1. Neues Supabase-Projekt erstellen.
-2. SQL-Migration `supabase/migrations/20260723220000_fensterpruefung_bonn.sql` ausfuehren.
-3. Seed `supabase/seed/fensterpruefung-bonn.sql` ausfuehren.
-4. Privaten Storage-Bucket `window-photos-private` anlegen.
-5. Realtime fuer `windows`, `record_locks`, `audit_logs` und `photos` aktivieren.
-6. Drei Benutzerkonten in Supabase Auth anlegen und den Profilen Rollen zuweisen.
-7. Passwort-Zuruecksetzung und Mail-Versand in Supabase konfigurieren.
+```bash
+mysql -u <user> -p <datenbank> < sv-netzwerk/public/intern/api/schema.sql
+```
 
-## Betrieb
+Oder per Einrichtungsassistenten:
 
-- interne Routen sind nicht in Navigation oder Sitemap sichtbar
-- `robots.txt` und `noindex,nofollow` sperren externe Indexierung
-- Datensatzseiten werden per Rewrite auf eine statische Shell aufgeloest
-- Benutzerverwaltung bleibt bis zu einer separaten Admin-API in der Supabase-Konsole
+```
+GET https://sv-netzwerk.eu/intern/api/setup.php?key=<SETUP_KEY>
+POST https://sv-netzwerk.eu/intern/api/setup.php?key=<SETUP_KEY>&action=install
+```
 
-## Bekannte Einschraenkungen
+### 3. Administratorkonto anlegen
 
-- PDF-Erstellung nutzt die Browser-Druckfunktion der geschuetzten Seiten
-- Foto-Vorschauen verwenden Platzhalter, wenn kein signierter Download angefordert wird
-- direkte Benutzeranlage im Frontend ist ohne geschuetzte Serverfunktion absichtlich nicht freigeschaltet
+```
+POST https://sv-netzwerk.eu/intern/api/setup.php?key=<SETUP_KEY>&action=create_admin
+Body: { "email": "admin@example.com", "full_name": "Name Vorname", "password": "sicheres-passwort" }
+```
+
+### 4. Foto-Verzeichnis absichern
+
+Das Verzeichnis `public/intern/photos/` ist durch `.htaccess` gegen direkten
+Browser-Zugriff gesperrt. Fotos werden ausschließlich über die PHP-API ausgeliefert
+(`/intern/api/photos.php?window_id=…`).
+
+## API-Endpunkte
+
+| Methode | Pfad                        | Funktion                          |
+|---------|-----------------------------|-----------------------------------|
+| POST    | `/intern/api/auth.php?action=login`   | Anmeldung                        |
+| POST    | `/intern/api/auth.php?action=logout`  | Abmeldung                        |
+| GET     | `/intern/api/auth.php?action=session` | Aktuelle Session                 |
+| POST    | `/intern/api/auth.php?action=reset`   | Passwort-Zurücksetzung           |
+| GET     | `/intern/api/windows.php`             | Fensterliste                     |
+| GET     | `/intern/api/windows.php?id={id}`     | Einzeldatensatz                  |
+| POST    | `/intern/api/windows.php`             | Neuen Datensatz anlegen          |
+| PUT     | `/intern/api/windows.php?id={id}`     | Datensatz aktualisieren          |
+| GET     | `/intern/api/windows.php?action=locks`| Aktive Sperren                   |
+| GET     | `/intern/api/windows.php?action=audit&id={id}` | Audit-Log              |
+| POST    | `/intern/api/locks.php?action=acquire&id={id}` | Sperre setzen         |
+| DELETE  | `/intern/api/locks.php?id={id}`       | Sperre freigeben                 |
+| GET     | `/intern/api/photos.php?window_id={id}`| Fotos eines Fensters            |
+| POST    | `/intern/api/photos.php?window_id={id}`| Foto hochladen (multipart)      |
+| DELETE  | `/intern/api/photos.php?id={id}`      | Foto löschen                     |
+| GET     | `/intern/api/parameters.php`          | Berechnungsparameter             |
+| POST    | `/intern/api/exports.php`             | Export-Eintrag protokollieren    |
+
+## Bekannte Einschränkungen
+
+- Realtime-Aktualisierung (Supabase Channels) wurde durch seitenbasiertes Laden ersetzt.
+- PDF-Erstellung nutzt die Browser-Druckfunktion der geschützten Seiten.
+- Foto-Vorschaubilder zeigen Platzhalter (signierte URLs werden nicht benötigt).
+- Benutzerverwaltung erfolgt über den Einrichtungsassistenten oder direkten MySQL-Zugriff.
+

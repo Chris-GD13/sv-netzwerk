@@ -13,12 +13,10 @@
     "validate:public-copy": "node scripts/validate-public-copy.mjs",
     "validate:visible-umlauts": "node scripts/validate-visible-umlauts.mjs",
     "fachbeitrag:run": "node scripts/run-fachbeitrag-automation.mjs",
-    "fachbeitrag:log": "node scripts/update-fachbeitrag-log.mjs",
-    "calendar:sync": "node scripts/sync-calendar-slots.mjs"
+    "fachbeitrag:log": "node scripts/update-fachbeitrag-log.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
-    "@supabase/supabase-js": "^2.110.8",
     "astro": "^7.1.3",
     "qrcode": "^1.5.4"
   },
