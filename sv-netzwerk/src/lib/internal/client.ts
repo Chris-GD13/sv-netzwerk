@@ -71,48 +71,92 @@ const SAVE_DEBOUNCE_MS = 1200;
 const SYNC_WARNING_MESSAGE = 'Es liegen noch nicht synchronisierte Aenderungen vor.';
 const DEFAULT_PROJECT_ID = '11111111-1111-4111-8111-111111111111';
 
-let authBound = false;
-let lastAuthEvent: { event: AuthChangeEvent; session: Session | null } | null = null;
+const authListeners = new Set<(event: AuthChangeEvent, session: Session | null) => void>();
+let authSubscription: { unsubscribe: () => void } | null = null;
+let authSupabaseClient: SupabaseClient | null = null;
 
 export async function mountInternalPortal(root: HTMLElement) {
+  if (root.dataset.internalPortalMounted === 'true') return;
+  root.dataset.internalPortalMounted = 'true';
   const route = (root.dataset.route as PortalRoute | undefined) ?? 'landing';
   const recordId = root.dataset.recordId || new URLSearchParams(window.location.search).get('id');
   const supabase = getSupabaseBrowserClient();
   const session = supabase ? (await supabase.auth.getSession()).data.session : null;
   const user = session && supabase ? await loadPortalUser(supabase, session.user) : null;
   const context: AppContext = { root, route, recordId, supabase, session, user, draftDirty: false };
+  const disposers: Array<() => void> = [];
 
   root.classList.add('intern-app');
-  bindAuthListener(context);
-  window.addEventListener('online', () => void syncDraftQueue(context));
-  window.addEventListener('beforeunload', (event) => {
+  const unbindAuth = bindAuthListener(context);
+  disposers.push(unbindAuth);
+
+  const onlineHandler = () => void syncDraftQueue(context);
+  window.addEventListener('online', onlineHandler);
+  disposers.push(() => window.removeEventListener('online', onlineHandler));
+
+  const beforeUnloadHandler = (event: BeforeUnloadEvent) => {
     if (!context.draftDirty) return;
     event.preventDefault();
     event.returnValue = SYNC_WARNING_MESSAGE;
-  });
+  };
+  window.addEventListener('beforeunload', beforeUnloadHandler);
+  disposers.push(() => window.removeEventListener('beforeunload', beforeUnloadHandler));
+
+  let cleanedUp = false;
+  const cleanup = () => {
+    if (cleanedUp) return;
+    cleanedUp = true;
+    while (disposers.length) {
+      disposers.pop()?.();
+    }
+    delete root.dataset.internalPortalMounted;
+  };
+  window.addEventListener('pagehide', cleanup, { once: true });
+  window.addEventListener('beforeunload', cleanup, { once: true });
 
   await renderRoute(context);
   if (navigator.onLine) void syncDraftQueue(context);
 }
 
 function bindAuthListener(context: AppContext) {
-  if (authBound || !context.supabase) return;
-  authBound = true;
-  context.supabase.auth.onAuthStateChange((event, session) => {
-    lastAuthEvent = { event, session };
-  });
-  setInterval(async () => {
-    if (!lastAuthEvent || !context.supabase) return;
-    const { event, session } = lastAuthEvent;
-    lastAuthEvent = null;
+  if (!context.supabase) return () => {};
+
+  const handleAuthEvent = async (event: AuthChangeEvent, session: Session | null) => {
+    if (!['INITIAL_SESSION', 'SIGNED_IN', 'SIGNED_OUT', 'TOKEN_REFRESHED', 'USER_UPDATED', 'PASSWORD_RECOVERY'].includes(event)) {
+      return;
+    }
     context.session = session;
-    context.user = session ? await loadPortalUser(context.supabase, session.user) : null;
+    context.user = session ? await loadPortalUser(context.supabase!, session.user) : null;
     if (event === 'SIGNED_OUT' && context.route !== 'login') {
       redirectTo('/intern/login/');
       return;
     }
     await renderRoute(context);
-  }, 500);
+  };
+
+  const listener = (event: AuthChangeEvent, session: Session | null) => {
+    void handleAuthEvent(event, session);
+  };
+  authListeners.add(listener);
+
+  if (!authSubscription || authSupabaseClient !== context.supabase) {
+    authSubscription?.unsubscribe();
+    authSupabaseClient = context.supabase;
+    authSubscription = context.supabase.auth.onAuthStateChange((event, session) => {
+      for (const listener of Array.from(authListeners)) {
+        listener(event, session);
+      }
+    }).data.subscription;
+  }
+
+  return () => {
+    authListeners.delete(listener);
+    if (!authListeners.size) {
+      authSubscription?.unsubscribe();
+      authSubscription = null;
+      authSupabaseClient = null;
+    }
+  };
 }
 
 async function renderRoute(context: AppContext) {

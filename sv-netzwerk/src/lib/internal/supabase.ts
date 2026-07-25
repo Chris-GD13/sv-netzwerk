@@ -2,6 +2,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 let cachedClient: SupabaseClient | null = null;
 let cachedConfig: { url: string; anonKey: string } | null | undefined;
+let configWarningShown = false;
 
 const SUPABASE_URL_ENV_NAMES = ['PUBLIC_SUPABASE_URL', 'VITE_SUPABASE_URL'] as const;
 const SUPABASE_ANON_KEY_ENV_NAMES = ['PUBLIC_SUPABASE_ANON_KEY', 'VITE_SUPABASE_ANON_KEY'] as const;
@@ -38,7 +39,15 @@ function resolveRuntimeConfig() {
   if (cachedConfig !== undefined) return cachedConfig;
   const url = readEnvValue(SUPABASE_URL_ENV_NAMES);
   const anonKey = readEnvValue(SUPABASE_ANON_KEY_ENV_NAMES);
-  if (!url || !anonKey || !isValidHttpUrl(url)) {
+  if (!url || !anonKey) {
+    cachedConfig = null;
+    return cachedConfig;
+  }
+  if (!isValidHttpUrl(url)) {
+    if (!configWarningShown) {
+      configWarningShown = true;
+      console.error('Invalid Supabase URL: Set PUBLIC_SUPABASE_URL or VITE_SUPABASE_URL to a valid HTTP or HTTPS URL.');
+    }
     cachedConfig = null;
     return cachedConfig;
   }
