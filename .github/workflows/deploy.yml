@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
+      IONOS_SFTP_HOST: access-5020813808.webspace-host.com
       SFTP_REMOTE_DIR: /sv-netzwerk
       SFTP_CONNECT_TIMEOUT_SECONDS: 25
       SFTP_CHECK_TIMEOUT_SECONDS: 45
@@ -158,10 +159,24 @@ jobs:
           }
 
           sftp_host="$(normalize_env "${SFTP_HOST:-}")"
+          ionos_sftp_host="$(normalize_env "${IONOS_SFTP_HOST:-}")"
           sftp_port="$(normalize_env "${SFTP_PORT:-}")"
           sftp_username="$(normalize_env "${SFTP_USERNAME:-}")"
           sftp_password="$(normalize_env "${SFTP_PASSWORD:-}")"
           ssh_private_key="$(normalize_env "${SSH_PRIVATE_KEY:-}")"
+
+          if [ -z "$ionos_sftp_host" ]; then
+            echo "::error::IONOS_SFTP_HOST ist nicht gesetzt."
+            exit 1
+          fi
+
+          if [ -n "$sftp_host" ] && [ "$sftp_host" != "$ionos_sftp_host" ]; then
+            echo "::error::SFTP_HOST ('$sftp_host') passt nicht zum aktuellen IONOS-Host ('$ionos_sftp_host')."
+            echo "::error::Bitte aktualisiere das Secret SFTP_HOST auf '$ionos_sftp_host'."
+            exit 1
+          fi
+
+          sftp_host="$ionos_sftp_host"
 
           if [ -z "$sftp_host" ]; then
             echo "::error::SFTP_HOST ist nicht gesetzt."
