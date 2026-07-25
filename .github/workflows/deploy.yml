@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "sv-netzwerk/**"
+      - "!sv-netzwerk/src/data/calendar-slots.json"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
@@ -65,6 +66,23 @@ jobs:
           NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: "30000"
         run: npm ci --no-audit --no-fund --loglevel=notice
 
+      - name: Supabase-Secrets prüfen
+        env:
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          set -euo pipefail
+          url_present=false
+          key_present=false
+          [ -n "${PUBLIC_SUPABASE_URL:-}" ] && url_present=true
+          [ -n "${PUBLIC_SUPABASE_ANON_KEY:-}" ] && key_present=true
+          echo "PUBLIC_SUPABASE_URL vorhanden:      $url_present"
+          echo "PUBLIC_SUPABASE_ANON_KEY vorhanden: $key_present"
+          if [ "$url_present" = false ] || [ "$key_present" = false ]; then
+            echo "::error::Pflicht-Secrets fehlen. Deployment wird abgebrochen."
+            exit 1
+          fi
+
       - name: Supabase-Umgebungsvariablen validieren und exportieren
         env:
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
@@ -89,20 +107,25 @@ jobs:
             echo "::add-mask::$public_supabase_anon_key"
           fi
 
-          if [ -z "$public_supabase_url" ] || [ -z "$public_supabase_anon_key" ]; then
-            echo "::warning::PUBLIC_SUPABASE_URL oder PUBLIC_SUPABASE_ANON_KEY ist nicht gesetzt; Supabase-Funktionen werden im Build deaktiviert."
-            public_supabase_url=""
-            public_supabase_anon_key=""
-          elif ! [[ "$public_supabase_url" =~ ^https?:// ]]; then
-            echo "::warning::PUBLIC_SUPABASE_URL ist kein gueltiger HTTP/HTTPS-URL; Supabase-Funktionen werden im Build deaktiviert."
-            public_supabase_url=""
-            public_supabase_anon_key=""
-          else
-            public_supabase_url="${public_supabase_url%/}"
-            required_supabase_url='https://rsyuqqddvupbkordzylo.supabase.co'
-            if [ "$public_supabase_url" != "$required_supabase_url" ]; then
-              echo "::warning::PUBLIC_SUPABASE_URL zeigt nicht auf $required_supabase_url."
-            fi
+          if [ -z "$public_supabase_url" ]; then
+            echo "::error::PUBLIC_SUPABASE_URL ist leer oder enthaelt nur Leerzeichen. Deployment wird abgebrochen."
+            exit 1
+          fi
+
+          if [ -z "$public_supabase_anon_key" ]; then
+            echo "::error::PUBLIC_SUPABASE_ANON_KEY ist leer oder enthaelt nur Leerzeichen. Deployment wird abgebrochen."
+            exit 1
+          fi
+
+          if ! [[ "$public_supabase_url" =~ ^https?:// ]]; then
+            echo "::error::PUBLIC_SUPABASE_URL ist kein gültiger HTTP/HTTPS-URL. Deployment wird abgebrochen."
+            exit 1
+          fi
+
+          public_supabase_url="${public_supabase_url%/}"
+          required_supabase_url='https://rsyuqqddvupbkordzylo.supabase.co'
+          if [ "$public_supabase_url" != "$required_supabase_url" ]; then
+            echo "::warning::PUBLIC_SUPABASE_URL zeigt nicht auf $required_supabase_url."
           fi
 
           printf 'PUBLIC_SUPABASE_URL=%s\n' "$public_supabase_url" >> "$GITHUB_ENV"
@@ -254,6 +277,9 @@ jobs:
         env:
           EXPECTED_SHA: ${{ github.sha }}
         run: |
+          set -euo pipefail
+
+          # 1. deploy-version.txt
           ok=0
           for i in {1..24}; do
             response="$(curl --location --fail --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
@@ -272,3 +298,31 @@ jobs:
             echo "::error::Online-Commit stimmt nach Wartezeit nicht mit $EXPECTED_SHA überein."
             exit 1
           fi
+          echo "deploy-version.txt: OK"
+
+          # 2. Homepage
+          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+            -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/ || true)"
+          if [ "$status" != "200" ]; then
+            echo "::error::Homepage liefert HTTP $status statt 200."
+            exit 1
+          fi
+          echo "Homepage: HTTP $status OK"
+
+          # 3. /intern/login/
+          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+            -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/login/ || true)"
+          if [ "$status" != "200" ]; then
+            echo "::error::/intern/login/ liefert HTTP $status statt 200."
+            exit 1
+          fi
+          echo "/intern/login/: HTTP $status OK"
+
+          # 4. /intern/fensterpruefung-bonn/
+          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+            -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/fensterpruefung-bonn/ || true)"
+          if [ "$status" != "200" ]; then
+            echo "::error::/intern/fensterpruefung-bonn/ liefert HTTP $status statt 200."
+            exit 1
+          fi
+          echo "/intern/fensterpruefung-bonn/: HTTP $status OK"
