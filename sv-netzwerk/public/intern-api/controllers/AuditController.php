@@ -7,11 +7,11 @@ use SvIntern\Models\AuditLog;
 
 final class AuditController
 {
-    /** GET /intern-api/windows/{windowId}/audit */
-    public static function list(array $session, \PDO $db, string $windowId): never
+    /** GET /intern-api/inspections/{inspectionId}/audit */
+    public static function list(array $session, \PDO $db, string $inspectionId): never
     {
         $model   = new AuditLog($db);
-        $entries = $model->listByWindow($windowId);
+        $entries = $model->listByInspection($inspectionId);
         \jsonResponse(['data' => $entries]);
     }
 }

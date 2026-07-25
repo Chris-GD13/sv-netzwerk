@@ -3,63 +3,56 @@ declare(strict_types=1);
 
 namespace SvIntern\Controllers;
 
-use SvIntern\Models\Window;
 use SvIntern\Models\AuditLog;
+use SvIntern\Modules\Windows\WindowModule;
+use SvIntern\Modules\Windows\WindowRecord;
 use SvIntern\Services\ExportService;
 
 final class ExportController
 {
-    private const DEFAULT_PROJECT_ID = '11111111-1111-4111-8111-111111111111';
-
     /**
-     * GET /intern-api/export/csv?export_id=...&delimiter=...
-     * Verfuegbare export_id: all, defects, urgent, special, completed
+     * GET /intern-api/export/csv?module=windows&export_id=...&delimiter=...
      */
     public static function csv(array $session, \PDO $db): never
     {
+        $module    = $_GET['module']    ?? 'windows';
         $exportId  = $_GET['export_id'] ?? 'all';
         $delimiter = ($_GET['delimiter'] ?? ',') === ';' ? ';' : ',';
 
-        $model   = new Window($db);
-        $records = $model->listSummaries(self::DEFAULT_PROJECT_ID);
-        $records = self::applyFilter($records, (string) $exportId);
+        [$records, $projectId] = self::loadRecords($module, $exportId, $db);
 
         $service  = new ExportService();
         $csv      = $service->buildCsv($records, $delimiter);
-        $fileName = $service->exportFileName(self::filterLabel($exportId), 'csv');
+        $fileName = $service->exportFileName(self::filterLabel((string) $exportId), 'csv');
 
-        // Log Export
         $auditLog = new AuditLog($db);
         $auditLog->log(
             actorId:    $session['user_id'],
             actorName:  $session['user_name'],
             actionType: 'export',
-            entityType: 'windows',
+            entityType: 'inspections',
             entityId:   null,
             fieldName:  'export_id',
-            newValue:   $exportId . ' (' . count($records) . ' Datensaetze)',
+            newValue:   $module . '/' . $exportId . ' (' . count($records) . ' Datensaetze)',
             ip:         \clientIp(),
         );
 
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $fileName . '"');
         header('Cache-Control: no-store');
-        // BOM fuer Excel-Kompatibilitaet
         echo "\xEF\xBB\xBF" . $csv;
         exit;
     }
 
     /**
-     * GET /intern-api/export/report?export_id=...
-     * Druckbarer HTML-Report (kann im Browser als PDF gespeichert werden).
+     * GET /intern-api/export/report?module=windows&export_id=...
      */
     public static function report(array $session, \PDO $db): never
     {
+        $module   = $_GET['module']    ?? 'windows';
         $exportId = $_GET['export_id'] ?? 'all';
 
-        $model   = new Window($db);
-        $records = $model->listSummaries(self::DEFAULT_PROJECT_ID);
-        $records = self::applyFilter($records, (string) $exportId);
+        [$records] = self::loadRecords($module, $exportId, $db);
 
         $service = new ExportService();
         $title   = self::filterLabel((string) $exportId);
@@ -69,6 +62,24 @@ final class ExportController
         header('Cache-Control: no-store');
         echo $html;
         exit;
+    }
+
+    /**
+     * @return array{list<array<string,mixed>>, string}  [records, projectId]
+     */
+    private static function loadRecords(string $module, string $exportId, \PDO $db): array
+    {
+        // Currently only the windows module is implemented.
+        // Future modules register themselves and are loaded here via ModuleRegistry.
+        if ($module !== 'windows') {
+            \jsonError('Unbekanntes Modul: ' . $module, 400);
+        }
+
+        $record  = new WindowRecord($db);
+        $records = $record->listSummaries(WindowModule::MODULE_ID, WindowModule::DEFAULT_PROJECT_ID);
+        $records = self::applyFilter($records, (string) $exportId);
+
+        return [$records, WindowModule::DEFAULT_PROJECT_ID];
     }
 
     /**

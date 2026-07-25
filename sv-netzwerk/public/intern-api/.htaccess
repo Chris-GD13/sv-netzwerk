@@ -1,0 +1,42 @@
+# Alle Anfragen werden an index.php weitergeleitet (Front-Controller-Muster)
+# Direkter Dateizugriff ist nicht erlaubt.
+
+Options -Indexes -ExecCGI
+DirectoryIndex index.php
+
+# PHP-Konfiguration fuer Sicherheit und Performance
+<IfModule mod_php.c>
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_value error_log ../../logs/php_errors.log
+    php_value session.cookie_httponly 1
+    php_value session.cookie_samesite Lax
+    php_value session.use_strict_mode 1
+    php_value session.gc_maxlifetime 86400
+    php_value upload_max_filesize 25M
+    php_value post_max_size 26M
+    php_value max_execution_time 60
+</IfModule>
+
+# Kein direkter Zugriff auf Konfigurationsdateien
+<FilesMatch "\.(env|env\.example|sql|md|gitkeep)$">
+    Require all denied
+</FilesMatch>
+
+# Kein direkter Zugriff auf PHP-Klassen (nur index.php wird direkt aufgerufen)
+<FilesMatch "^(?!index\.php$).*\.php$">
+    Require all denied
+</FilesMatch>
+
+# URL-Rewriting: alle Anfragen an index.php
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /intern-api/
+
+    # Statische Dateien durchlassen (falls je notwendig)
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Alles andere → index.php
+    RewriteRule ^ index.php [L]
+</IfModule>

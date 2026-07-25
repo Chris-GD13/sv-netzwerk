@@ -5,29 +5,28 @@ namespace SvIntern\Controllers;
 
 use SvIntern\Middleware\Role;
 use SvIntern\Models\Photo;
-use SvIntern\Models\Window;
 use SvIntern\Models\AuditLog;
 use SvIntern\Services\UploadService;
 
 final class PhotoController
 {
-    /** GET /intern-api/windows/{windowId}/photos */
-    public static function list(array $session, \PDO $db, string $windowId): never
+    /** GET /intern-api/inspections/{inspectionId}/photos */
+    public static function list(array $session, \PDO $db, string $inspectionId): never
     {
         $model  = new Photo($db);
-        $photos = $model->listByWindow($windowId);
+        $photos = $model->listByInspection($inspectionId);
         \jsonResponse(['data' => $photos]);
     }
 
-    /** POST /intern-api/windows/{windowId}/photos */
-    public static function upload(array $session, \PDO $db, string $windowId): never
+    /** POST /intern-api/inspections/{inspectionId}/photos */
+    public static function upload(array $session, \PDO $db, string $inspectionId): never
     {
         Role::require($session, Role::PRUEFER);
 
-        // Fenster muss existieren
-        $windowModel = new Window($db);
-        if ($windowModel->findById($windowId) === null) {
-            \jsonError('Fenster nicht gefunden.', 404);
+        // Inspektion muss existieren
+        $inspModel = new \SvIntern\Models\Inspection($db);
+        if ($inspModel->findById($inspectionId) === null) {
+            \jsonError('Inspektion nicht gefunden.', 404);
         }
 
         if (empty($_FILES['file'])) {
@@ -48,7 +47,7 @@ final class PhotoController
         $photoModel = new Photo($db);
         $photoModel->create(
             id:            $photoId,
-            windowId:      $windowId,
+            inspectionId:  $inspectionId,
             category:      $category,
             caption:       $caption,
             fileName:      $result['file_name'],
@@ -59,15 +58,15 @@ final class PhotoController
 
         $auditLog = new AuditLog($db);
         $auditLog->log(
-            actorId:    $session['user_id'],
-            actorName:  $session['user_name'],
-            actionType: 'upload',
-            entityType: 'photo',
-            entityId:   $photoId,
-            fieldName:  'category',
-            newValue:   $category,
-            windowId:   $windowId,
-            ip:         \clientIp(),
+            actorId:      $session['user_id'],
+            actorName:    $session['user_name'],
+            actionType:   'upload',
+            entityType:   'photo',
+            entityId:     $photoId,
+            fieldName:    'category',
+            newValue:     $category,
+            inspectionId: $inspectionId,
+            ip:           \clientIp(),
         );
 
         \jsonResponse(['data' => $photoModel->findById($photoId)], 201);
@@ -100,13 +99,13 @@ final class PhotoController
 
         $auditLog = new AuditLog($db);
         $auditLog->log(
-            actorId:    $session['user_id'],
-            actorName:  $session['user_name'],
-            actionType: 'delete',
-            entityType: 'photo',
-            entityId:   $id,
-            windowId:   (string) ($photo['window_id'] ?? ''),
-            ip:         \clientIp(),
+            actorId:      $session['user_id'],
+            actorName:    $session['user_name'],
+            actionType:   'delete',
+            entityType:   'photo',
+            entityId:     $id,
+            inspectionId: (string) ($photo['inspection_id'] ?? ''),
+            ip:           \clientIp(),
         );
 
         \jsonResponse(['ok' => true]);
