@@ -91,7 +91,7 @@ jobs:
           fi
 
           if ! [[ "$public_supabase_url" =~ ^https?:// ]]; then
-            echo "::notice::PUBLIC_SUPABASE_URL hat kein Protokoll-Praefix; 'https://' wird ergaenzt."
+            echo "::notice::PUBLIC_SUPABASE_URL hat kein Protokoll-Präfix; 'https://' wird ergänzt."
             public_supabase_url="https://$public_supabase_url"
           fi
 
