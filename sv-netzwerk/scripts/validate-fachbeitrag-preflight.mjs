@@ -73,26 +73,34 @@ if (publishedDaily.length > 0) {
     if (a.publishedAt === b.publishedAt) return a.file.localeCompare(b.file);
     return b.publishedAt.localeCompare(a.publishedAt);
   });
-  const latest = publishedDaily[0];
-  const expectedHref = `/fachwissen/${latest.slug}/`;
+  const latestDaily = publishedDaily[0];
+
+  const publishedAll = entries.filter((entry) => entry.status === 'published' && entry.publishedAt);
+  publishedAll.sort((a, b) => {
+    if (a.publishedAt === b.publishedAt) return a.file.localeCompare(b.file);
+    return b.publishedAt.localeCompare(a.publishedAt);
+  });
+  const latestOverall = publishedAll[0] ?? latestDaily;
+
+  const expectedHref = `/fachwissen/${latestOverall.slug}/`;
   const librarySource = await readFile(libraryFile, 'utf8');
   const firstDate = librarySource.match(/date:\s*'([^']+)'/)?.[1] ?? '';
   const firstHref = librarySource.match(/href:\s*'([^']+)'/)?.[1] ?? '';
-  if (firstDate !== latest.publishedAt || firstHref !== expectedHref) {
-    errors.push(`Fachwissensübersicht nicht auf aktuellstem Beitrag: erwartet ${latest.publishedAt} ${expectedHref}, gefunden ${firstDate} ${firstHref}.`);
+  if (firstDate !== latestOverall.publishedAt || firstHref !== expectedHref) {
+    errors.push(`Fachwissensübersicht nicht auf aktuellstem Beitrag: erwartet ${latestOverall.publishedAt} ${expectedHref}, gefunden ${firstDate} ${firstHref}.`);
   }
 
-  const linkedinPath = path.join(root, 'src', 'content', 'linkedin', `${latest.publishedAt}_${latest.slug}.txt`);
-  const videoPath = path.join(root, 'src', 'content', 'videos', `${latest.publishedAt}_wissen-in-180-sekunden_${latest.slug}.txt`);
+  const linkedinPath = path.join(root, 'src', 'content', 'linkedin', `${latestDaily.publishedAt}_${latestDaily.slug}.txt`);
+  const videoPath = path.join(root, 'src', 'content', 'videos', `${latestDaily.publishedAt}_wissen-in-180-sekunden_${latestDaily.slug}.txt`);
   try {
     await access(linkedinPath);
   } catch {
-    errors.push(`LinkedIn-Begleittext fehlt: src/content/linkedin/${latest.publishedAt}_${latest.slug}.txt`);
+    errors.push(`LinkedIn-Begleittext fehlt: src/content/linkedin/${latestDaily.publishedAt}_${latestDaily.slug}.txt`);
   }
   try {
     await access(videoPath);
   } catch {
-    errors.push(`Wissen-in-180-Sekunden-Skript fehlt: src/content/videos/${latest.publishedAt}_wissen-in-180-sekunden_${latest.slug}.txt`);
+    errors.push(`Wissen-in-180-Sekunden-Skript fehlt: src/content/videos/${latestDaily.publishedAt}_wissen-in-180-sekunden_${latestDaily.slug}.txt`);
   }
 }
 

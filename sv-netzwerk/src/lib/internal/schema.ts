@@ -9,9 +9,12 @@ export const portalProject = {
 };
 
 export const roleLabels: Record<string, string> = {
-  administrator: 'Administrator',
-  pruefer: 'Pruefer',
-  auswertung: 'Auswertung',
+  administrator:    'Administrator',
+  projektleiter:    'Projektleiter',
+  sachverstaendiger:'Sachverständiger',
+  pruefer:          'Prüfer',
+  auswertung:       'Auswertung',
+  gast:             'Gast',
 };
 
 export const statusOptions: SelectOption[] = [
