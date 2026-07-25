@@ -27,8 +27,6 @@ jobs:
       SFTP_CHECK_ATTEMPTS: 10
       SFTP_UPLOAD_TIMEOUT_SECONDS: 1200
       SFTP_UPLOAD_ATTEMPTS: 10
-      PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
-      PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
 
     defaults:
       run:
@@ -67,7 +65,10 @@ jobs:
           NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: "30000"
         run: npm ci --no-audit --no-fund --loglevel=notice
 
-      - name: Supabase-Umgebungsvariablen validieren
+      - name: Supabase-Umgebungsvariablen validieren und exportieren
+        env:
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
         run: |
           set -euo pipefail
 
@@ -108,6 +109,9 @@ jobs:
           printf 'PUBLIC_SUPABASE_URL=%s\nPUBLIC_SUPABASE_ANON_KEY=%s\n' "$public_supabase_url" "$public_supabase_anon_key" > .env.production
 
       - name: Astro-Projekt prüfen und bauen
+        env:
+          PUBLIC_SUPABASE_URL: ${{ env.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ env.PUBLIC_SUPABASE_ANON_KEY }}
         run: npm run build
 
       - name: Build-Ausgabe prüfen
@@ -137,12 +141,12 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; cls -1F .; bye"
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; ls -la $SFTP_REMOTE_DIR; quit"
           exit_code=1
           listing=""
           for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
             set +e
-            listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" -e "$lftp_script")"
+            listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$lftp_script")"
             exit_code=$?
             set -e
             if [ "$exit_code" -eq 0 ]; then
@@ -175,12 +179,12 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; mirror --reverse --verbose --parallel=4 dist/ .; bye"
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; mirror --reverse --delete --exclude-glob .git* --exclude-glob .env* dist $SFTP_REMOTE_DIR/dist; quit"
           exit_code=1
           for attempt in $(seq 1 "$SFTP_UPLOAD_ATTEMPTS"); do
             echo "Upload-Versuch $attempt/$SFTP_UPLOAD_ATTEMPTS"
             set +e
-            timeout "${SFTP_UPLOAD_TIMEOUT_SECONDS}s" lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" -e "$lftp_script"
+            timeout "${SFTP_UPLOAD_TIMEOUT_SECONDS}s" lftp -e "$lftp_script"
             exit_code=$?
             set -e
             if [ "$exit_code" -eq 0 ]; then
@@ -210,12 +214,12 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-max 5; set sftp:auto-confirm yes; cd $SFTP_REMOTE_DIR; cls -1F .; bye"
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; ls -la $SFTP_REMOTE_DIR; quit"
           exit_code=1
           listing=""
           for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
             set +e
-            listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -u "$SFTP_USERNAME,$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" -e "$lftp_script")"
+            listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$lftp_script")"
             exit_code=$?
             set -e
             if [ "$exit_code" -eq 0 ]; then
