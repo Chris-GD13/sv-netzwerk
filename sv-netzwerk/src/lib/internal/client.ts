@@ -286,16 +286,17 @@ async function renderDashboard(context: AppContext) {
   const stats = createDashboardStats(records);
 
   const demoStatus = await apiGetDemoStatus();
-  const demoBanner = !demoStatus.demo_data_exists
+  const isAdmin = context.user?.profile.role === 'administrator';
+  const setupBanner = !demoStatus.demo_data_exists && isAdmin
     ? `<div class="intern-alert intern-alert--info">
-        Noch keine Demo-Daten vorhanden.
-        <button class="sv-button sv-button-secondary" type="button" id="seed-demo-btn" style="margin-left:12px">Demo-Daten anlegen</button>
+        Noch keine Musterdaten vorhanden. Gebäude, Etagen und Räume können über die Verwaltung angelegt werden.
+        <button class="sv-button sv-button-secondary" type="button" id="seed-demo-btn" style="margin-left:12px">Musterdaten anlegen</button>
        </div>`
     : '';
 
   context.root.innerHTML = `
-    ${renderHeader(context, 'Projekt-Dashboard', 'Bauwerkshierarchie – Prüffortschritt je Gebäude.')}
-    ${demoBanner}
+    ${renderHeader(context, 'Projekt-Dashboard', 'Prüffortschritt – Fensterbeschlagsprüfung BMVg Bonn.')}
+    ${setupBanner}
     <div class="intern-statusbar">
       <div class="intern-card">${connectionBadge()}</div>
       <div class="intern-card">${roleBadge(context.user?.profile.role ?? 'pruefer')}<p class="intern-meta">${escapeHtml(context.user?.profile.full_name ?? context.user?.email ?? '')}</p></div>
@@ -328,7 +329,7 @@ async function renderDashboard(context: AppContext) {
         `;
       }).join('')}
     </div>
-    ` : `<div class="intern-empty">Noch keine Gebäude angelegt. Bitte Demo-Daten laden oder Gebäude hinzufügen.</div>`}
+    ` : `<div class="intern-empty">Noch keine Gebäude angelegt. Bitte zuerst ein Gebäude über die Verwaltung anlegen.</div>`}
 
     <div class="intern-grid" style="margin-top:24px">
       <section class="intern-panel">
@@ -359,8 +360,8 @@ async function renderDashboard(context: AppContext) {
     if (result.ok) {
       await renderDashboard(context);
     } else {
-      showInlineMessage(context.root, errorAlert('Demo-Daten konnten nicht angelegt werden.'));
-      if (btn) { btn.disabled = false; btn.textContent = 'Demo-Daten anlegen'; }
+      showInlineMessage(context.root, errorAlert('Musterdaten konnten nicht angelegt werden.'));
+      if (btn) { btn.disabled = false; btn.textContent = 'Musterdaten anlegen'; }
     }
   });
   bindHeaderLogout(context);
@@ -568,7 +569,7 @@ async function renderWindowsInRoom(context: AppContext) {
   }
 
   const windows = await apiListWindowsInRoom(roomId);
-  const isAdmin = context.user?.profile.role !== 'auswertung';
+  const isAdmin = !(['gast','auswertung'] as string[]).includes(context.user?.profile.role ?? '');
   const firstWindow = windows[0];
 
   context.root.innerHTML = `
@@ -631,11 +632,10 @@ async function renderSashes(context: AppContext) {
   if (!windowId) { context.root.innerHTML = warnAlert('Kein Fenster ausgewählt.'); return; }
 
   const sashes = await apiListSashes(windowId);
-  const canEdit = context.user?.profile.role !== 'auswertung';
+  const canEdit = !(['gast','auswertung'] as string[]).includes(context.user?.profile.role ?? '');
 
-  // Fenstertitel aus dem ersten Flügel ermitteln
-  const first = sashes[0];
-  const windowLabel = first?.window_number || `Fenster #${windowId}`;
+  // Fenstertitel ermitteln
+  const windowLabel = `Fenster #${windowId}`;
   const breadBuilding = buildingId > 0 ? `<a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> › ` : '';
   const breadFloor = floorId > 0 ? `<a href="/intern/fensterpruefung-bonn/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> › ` : '';
   const breadRoom = roomId > 0 ? `<a href="/intern/fensterpruefung-bonn/fenster/?room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">Fenster</a> › ` : '';
@@ -732,7 +732,7 @@ async function renderSashInspection(context: AppContext) {
   if (!sash) { context.root.innerHTML = errorAlert('Flügel nicht gefunden.'); return; }
 
   const photos = await apiListSashPhotos(sashId);
-  const canEdit = context.user?.profile.role !== 'auswertung';
+  const canEdit = !(['gast','auswertung'] as string[]).includes(context.user?.profile.role ?? '');
   const data = sash.form_data as Record<string, unknown>;
 
   const backUrl = `/intern/fensterpruefung-bonn/fluegel/?window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`;
@@ -1383,7 +1383,9 @@ async function renderAdmin(context: AppContext) {
           <label for="new-role">Rolle</label>
           <select id="new-role" name="role">
             <option value="pruefer">Prüfer</option>
-            <option value="auswertung">Auswertung</option>
+            <option value="sachverstaendiger">Sachverständiger</option>
+            <option value="projektleiter">Projektleiter</option>
+            <option value="gast">Gast (nur lesen)</option>
             <option value="administrator">Administrator</option>
           </select>
         </div>
@@ -1502,9 +1504,11 @@ function bindUserActions(
             <div class="intern-field">
               <label>Rolle</label>
               <select name="role">
-                <option value="pruefer" ${user.role === 'pruefer' ? 'selected' : ''}>Prüfer</option>
-                <option value="auswertung" ${user.role === 'auswertung' ? 'selected' : ''}>Auswertung</option>
-                <option value="administrator" ${user.role === 'administrator' ? 'selected' : ''}>Administrator</option>
+                <option value="pruefer"          ${user.role === 'pruefer'          ? 'selected' : ''}>Prüfer</option>
+                <option value="sachverstaendiger" ${user.role === 'sachverstaendiger'? 'selected' : ''}>Sachverständiger</option>
+                <option value="projektleiter"    ${user.role === 'projektleiter'    ? 'selected' : ''}>Projektleiter</option>
+                <option value="gast"             ${user.role === 'gast' || user.role === 'auswertung' ? 'selected' : ''}>Gast (nur lesen)</option>
+                <option value="administrator"    ${user.role === 'administrator'    ? 'selected' : ''}>Administrator</option>
               </select>
             </div>
             <div class="intern-field">
@@ -2080,8 +2084,8 @@ function roleBadge(role: PortalRole) {
 
 function connectionBadge() {
   return navigator.onLine
-    ? '<span class="intern-badge intern-badge--ok">Verbunden · Realtime aktiv</span>'
-    : '<span class="intern-badge intern-badge--warn">Offline · lokale Zwischenspeicherung aktiv</span>';
+    ? '<span class="intern-badge intern-badge--ok">Online · Verbunden</span>'
+    : '<span class="intern-badge intern-badge--warn">Offline · Lokale Speicherung aktiv</span>';
 }
 
 function infoAlert(text: string) { return `<div class="intern-alert intern-alert--info">${escapeHtml(text)}</div>`; }
@@ -2090,11 +2094,11 @@ function warnAlert(text: string) { return `<div class="intern-alert intern-alert
 function errorAlert(text: string) { return `<div class="intern-alert intern-alert--error">${escapeHtml(text)}</div>`; }
 
 function subscribeToWindowChanges(_context: AppContext, _handler: () => void) {
-  // Realtime via Polling ersetzt Supabase-Channels; nicht implementiert da Polling genügt.
+  // Statusaktualisierung erfolgt über Polling; kein separater Kanal erforderlich.
 }
 
 function subscribeToSingleRecord(_context: AppContext, _id: string, _handler: () => Promise<void>) {
-  // Realtime via Polling ersetzt Supabase-Channels; nicht implementiert da Polling genügt.
+  // Statusaktualisierung erfolgt über Polling; kein separater Kanal erforderlich.
 }
 
 function showInlineMessage(root: HTMLElement, html: string) {
@@ -2125,8 +2129,9 @@ function summarizeCompletion(data: Record<string, unknown>, calculated: Record<s
 }
 
 function canEditRecord(role: PortalRole, record: WindowRecord) {
-  if (role === 'administrator') return true;
-  if (role === 'auswertung') return false;
+  if (role === 'administrator' || role === 'projektleiter') return true;
+  if (role === 'gast' || role === 'auswertung') return false;
+  // sachverstaendiger und pruefer dürfen bearbeiten, solange nicht freigegeben
   return record.status !== 'freigegeben' && record.status !== 'fachlich geprueft';
 }
 

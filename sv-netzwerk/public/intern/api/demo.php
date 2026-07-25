@@ -66,12 +66,16 @@ function handleCreate(bool $reset): never
 
     // ── Benutzer ──────────────────────────────────────────────────────────────
     $users = [
-        ['admin@bmvg-bonn.de',    'Administrator BMVg',      'administrator', 'Admin@Bonn2026!'],
-        ['pruefer1@bmvg-bonn.de', 'Dipl.-Ing. Klaus Weber',  'pruefer',       'Pruefer1@2026!'],
-        ['pruefer2@bmvg-bonn.de', 'Ing. Sabine Kraft',       'pruefer',       'Pruefer2@2026!'],
+        [env('SEED_ADMIN_EMAIL',    'admin@sv-schuett.eu'),    env('SEED_ADMIN_NAME',    'Administrator'),   'administrator', env('SEED_ADMIN_PASSWORD',    '')],
+        [env('SEED_PRUEFER1_EMAIL', 'pruefer1@sv-schuett.eu'), env('SEED_PRUEFER1_NAME', 'Prüfer 1'),        'pruefer',       env('SEED_PRUEFER1_PASSWORD',  '')],
+        [env('SEED_PRUEFER2_EMAIL', 'pruefer2@sv-schuett.eu'), env('SEED_PRUEFER2_NAME', 'Prüfer 2'),        'pruefer',       env('SEED_PRUEFER2_PASSWORD',  '')],
     ];
     $createdUsers = [];
     foreach ($users as [$email, $name, $role, $pw]) {
+        if ($pw === '') {
+            $results[] = "Benutzer $email übersprungen: Kein Passwort in .env konfiguriert (SEED_*_PASSWORD).";
+            continue;
+        }
         try {
             $hash = password_hash($pw, PASSWORD_BCRYPT, ['cost' => 10]);
             db()->prepare(
@@ -79,7 +83,7 @@ function handleCreate(bool $reset): never
                  VALUES (:e,:n,:r,:h,1,:now,:now2)
                  ON DUPLICATE KEY UPDATE full_name=:n2, role=:r2, is_active=1, updated_at=:now3'
             )->execute([':e'=>$email,':n'=>$name,':r'=>$role,':h'=>$hash,':now'=>nowUtc(),':now2'=>nowUtc(),':n2'=>$name,':r2'=>$role,':now3'=>nowUtc()]);
-            $uid = db()->query("SELECT id FROM users WHERE email='$email'")->fetchColumn();
+            $uid = db()->query("SELECT id FROM users WHERE email='" . addslashes($email) . "'")->fetchColumn();
             $createdUsers[$email] = (int) $uid;
             $results[] = "Benutzer: $email";
         } catch (Throwable $e) {
@@ -87,10 +91,12 @@ function handleCreate(bool $reset): never
         }
     }
 
-    $pruefer1Id   = $createdUsers['pruefer1@bmvg-bonn.de'] ?? 1;
-    $pruefer2Id   = $createdUsers['pruefer2@bmvg-bonn.de'] ?? 1;
-    $pruefer1Name = 'Dipl.-Ing. Klaus Weber';
-    $pruefer2Name = 'Ing. Sabine Kraft';
+    $pruefer1Email = env('SEED_PRUEFER1_EMAIL', 'pruefer1@sv-schuett.eu');
+    $pruefer2Email = env('SEED_PRUEFER2_EMAIL', 'pruefer2@sv-schuett.eu');
+    $pruefer1Id   = $createdUsers[$pruefer1Email] ?? 1;
+    $pruefer2Id   = $createdUsers[$pruefer2Email] ?? 1;
+    $pruefer1Name = env('SEED_PRUEFER1_NAME', 'Prüfer 1');
+    $pruefer2Name = env('SEED_PRUEFER2_NAME', 'Prüfer 2');
 
     // ── Gebäude ───────────────────────────────────────────────────────────────
     try {

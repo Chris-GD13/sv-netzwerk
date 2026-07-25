@@ -1,6 +1,11 @@
 -- MySQL-Schema – Fensterbeschlagsprüfung BMVg Bonn
--- Version 1.0 – 2026-07-25
+-- SV-Büro Marc Schütt e.K. | Version 1.1 – 2026-07-25
 -- Ausführung: mysql -u <user> -p <datenbank> < schema.sql
+--
+-- Migration von Version 1.0 auf 1.1: Neue Benutzerrollen
+--   ALTER TABLE users MODIFY COLUMN role
+--     ENUM('administrator','projektleiter','sachverstaendiger','pruefer','auswertung','gast')
+--     NOT NULL DEFAULT 'pruefer';
 
 SET NAMES utf8mb4;
 SET time_zone = '+00:00';
@@ -13,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     id              INT UNSIGNED    NOT NULL AUTO_INCREMENT,
     email           VARCHAR(255)    NOT NULL UNIQUE,
     full_name       VARCHAR(255)    NOT NULL,
-    role            ENUM('administrator','pruefer','auswertung') NOT NULL DEFAULT 'pruefer',
+    role            ENUM('administrator','projektleiter','sachverstaendiger','pruefer','auswertung','gast') NOT NULL DEFAULT 'pruefer',
     password_hash   VARCHAR(255)    NOT NULL,
     is_active       TINYINT(1)      NOT NULL DEFAULT 1,
     last_login_at   DATETIME        NULL,

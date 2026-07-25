@@ -8,7 +8,6 @@
 
 declare(strict_types=1);
 
-define('APP_NAME', 'Fensterbeschlagsprüfung BMVg Bonn');
 define('APP_VERSION', '1.0.0');
 define('DEFAULT_PROJECT_ID', 1);
 
@@ -51,6 +50,17 @@ function env(string $key, string $default = ''): string
 {
     return $_ENV[$key] ?? getenv($key) ?: $default;
 }
+
+/** Gibt den konfigurierten Projektnamen zurück. */
+function appProjectName(): string   { return env('PROJECT_NAME', 'Fensterbeschlagsprüfung BMVg Bonn'); }
+/** Gibt den Auftraggeber zurück. */
+function appClientName(): string    { return env('CLIENT_NAME', 'Bundesministerium der Verteidigung'); }
+/** Gibt den Auftragnehmer zurück. */
+function appCompanyName(): string   { return env('COMPANY_NAME', 'SV-Büro Marc Schütt e.K.'); }
+/** Gibt die Absenderadresse für E-Mail-Benachrichtigungen zurück. */
+function appMailFrom(): string      { return env('MAIL_FROM', 'noreply@sv-schuett.eu'); }
+/** Gibt die Administratoren-E-Mail zurück. */
+function appMailAdmin(): string     { return env('MAIL_ADMIN', 'admin@sv-schuett.eu'); }
 
 /** Gibt eine PDO-Datenbankverbindung zurück (lazy singleton). */
 function db(): PDO

@@ -1,4 +1,4 @@
-export type PortalRole = 'administrator' | 'pruefer' | 'auswertung';
+export type PortalRole = 'administrator' | 'projektleiter' | 'sachverstaendiger' | 'pruefer' | 'auswertung' | 'gast';
 
 export type PortalRoute = 'landing' | 'login' | 'dashboard' | 'buildings' | 'floors' | 'rooms' | 'windows' | 'sashes' | 'sash' | 'record' | 'analysis' | 'export' | 'admin';
 

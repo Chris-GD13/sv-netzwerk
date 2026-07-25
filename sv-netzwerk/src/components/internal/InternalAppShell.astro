@@ -32,7 +32,7 @@ const { route, recordId = '' } = Astro.props;
         <h1>Prüfportal konnte nicht gestartet werden</h1>
         <p>Die Anwendung hat beim Laden nicht ordnungsgemäß geantwortet.</p>
         <div class="intern-alert intern-alert--warn">
-          Bitte laden Sie die Seite erneut. Bleibt der Fehler bestehen, müssen Supabase-Konfiguration und Bereitstellung geprüft werden.
+          Bitte laden Sie die Seite erneut. Bleibt der Fehler bestehen, wenden Sie sich an den Systemadministrator.
         </div>
         ${detail ? `<p class="intern-meta">Fehlerhinweis: ${detail.replace(/[<>&"']/g, '')}</p>` : ''}
         <div class="intern-actions">

@@ -63,7 +63,7 @@ function handleCreate(array $actor): never
     if ($fullName === '') {
         apiError(400, 'Name erforderlich.');
     }
-    if (!in_array($role, ['administrator', 'pruefer', 'auswertung'], true)) {
+    if (!in_array($role, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer', 'gast'], true)) {
         apiError(400, 'Ungültige Rolle.');
     }
     if (strlen($password) < 8) {
@@ -109,7 +109,7 @@ function handleUpdate(int $id, array $actor): never
     if ($fullName === '') {
         apiError(400, 'Name darf nicht leer sein.');
     }
-    if ($role !== '' && !in_array($role, ['administrator', 'pruefer', 'auswertung'], true)) {
+    if ($role !== '' && !in_array($role, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer', 'gast'], true)) {
         apiError(400, 'Ungültige Rolle.');
     }
 
