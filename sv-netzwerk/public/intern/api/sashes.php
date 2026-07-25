@@ -84,8 +84,6 @@ function handleCreate(array $user): never
 
     // Nächste Flügelnummer ermitteln
     try {
-        $maxNum = (int) db()->prepare('SELECT COALESCE(MAX(sash_number),0) FROM window_sashes WHERE window_id=:wid AND deleted_at IS NULL')
-            ->execute([':wid' => $windowId]);
         $stmt = db()->prepare('SELECT COALESCE(MAX(sash_number),0) AS mx FROM window_sashes WHERE window_id=:wid AND deleted_at IS NULL');
         $stmt->execute([':wid' => $windowId]);
         $maxNum = (int) $stmt->fetchColumn();
@@ -189,7 +187,6 @@ function handleUpdate(int $id, array $user): never
 
     // Parent-Fenster-Status aktualisieren
     try {
-        $row = db()->prepare('SELECT window_id FROM window_sashes WHERE id=:id')->execute([':id'=>$id]);
         $stmt2 = db()->prepare('SELECT window_id FROM window_sashes WHERE id=:id');
         $stmt2->execute([':id'=>$id]);
         $windowId = (int) ($stmt2->fetchColumn() ?: 0);

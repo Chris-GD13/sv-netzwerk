@@ -203,7 +203,6 @@ function handleCreate(string $entity, array $user): never
             $bid  = (int) ($body['building_id'] ?? 0);
             if ($name === '' || $bid === 0) apiError(400, 'Name und Gebäude sind erforderlich.');
             try {
-                $maxOrder = (int) db()->prepare('SELECT COALESCE(MAX(sort_order),0) FROM floors WHERE building_id=:bid')->execute([':bid'=>$bid]) + 0;
                 $stmt = db()->prepare('INSERT INTO floors (building_id,name,level,notes,sort_order,created_at,updated_at) VALUES (:bid,:n,:lv,:notes,COALESCE((SELECT MAX(sort_order) FROM floors f2 WHERE f2.building_id=:bid2),0)+10,:now,:now2)');
                 $stmt->execute([':bid'=>$bid,':bid2'=>$bid,':n'=>$name,':lv'=>(int)($body['level']??0),':notes'=>trim((string)($body['notes']??''))?:null,':now'=>nowUtc(),':now2'=>nowUtc()]);
                 apiJson(['id'=>(int)db()->lastInsertId(),'name'=>$name], 201);
