@@ -91,8 +91,7 @@ jobs:
           fi
 
           if ! [[ "$public_supabase_url" =~ ^https?:// ]]; then
-            echo "::error::PUBLIC_SUPABASE_URL ist ungueltig: $public_supabase_url"
-            exit 1
+            public_supabase_url="https://$public_supabase_url"
           fi
 
           public_supabase_url="${public_supabase_url%/}"
