@@ -171,8 +171,8 @@ jobs:
           fi
 
           if [ -n "$sftp_host" ] && [ "$sftp_host" != "$ionos_sftp_host" ]; then
-            echo "::error::SFTP_HOST ('$sftp_host') passt nicht zum aktuellen IONOS-Host ('$ionos_sftp_host')."
-            echo "::error::Bitte aktualisiere das Secret SFTP_HOST auf '$ionos_sftp_host'."
+            echo "::error::SFTP_HOST passt nicht zum aktuell erwarteten IONOS-Host."
+            echo "::error::Bitte aktualisiere das Secret SFTP_HOST auf den aktuellen IONOS-Host."
             exit 1
           fi
 
