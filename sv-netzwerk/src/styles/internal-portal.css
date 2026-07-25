@@ -584,3 +584,132 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Prüfungsformular – Radiogruppen ────────────────────────────────────────── */
+
+.intern-radio-group {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+}
+
+.intern-radio-group legend {
+  font-size: .8rem;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: .4rem;
+}
+
+.intern-radio {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  cursor: pointer;
+  padding: .3rem 0;
+}
+
+.intern-radio input[type='radio'] {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+  accent-color: #0b4f7a;
+}
+
+.intern-radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 1.5rem;
+}
+
+.intern-radio-row .intern-radio {
+  padding: .2rem 0;
+}
+
+/* ── Prüfungsformular – Komponentenblöcke ───────────────────────────────────── */
+
+.intern-component-block {
+  border: 1px solid #d6e0e8;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #fafcff;
+}
+
+.intern-component-title {
+  font-size: .95rem;
+  font-weight: 700;
+  color: #071a2e;
+  margin: 0 0 .75rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid #e5edf2;
+}
+
+/* ── Prüfungsformular – Readonly-Felder ─────────────────────────────────────── */
+
+.intern-readonly {
+  background: #f4f8fb !important;
+  color: #555 !important;
+  cursor: default !important;
+}
+
+/* ── Prüfungsformular – Checkbox-Gruppe ─────────────────────────────────────── */
+
+.intern-checkbox-group {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.intern-checkbox-group legend {
+  font-size: .8rem;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: .4rem;
+}
+
+/* ── Prüfungsformular – Komponenten-Foto-Upload ─────────────────────────────── */
+
+.intern-component-photo-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+  margin-top: .4rem;
+}
+
+.intern-photo-btn {
+  font-size: .85rem;
+  padding: .35rem .8rem;
+  white-space: nowrap;
+}
+
+.intern-comp-photo-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+
+.intern-comp-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #d6e0e8;
+}
+
+.intern-label-sm {
+  font-size: .8rem;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  display: block;
+  margin-bottom: .3rem;
+}

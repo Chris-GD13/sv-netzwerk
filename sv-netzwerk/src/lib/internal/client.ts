@@ -738,15 +738,16 @@ async function renderSashInspection(context: AppContext) {
   const backUrl = `/intern/fensterpruefung-bonn/fluegel/?window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`;
 
   context.root.innerHTML = `
-    ${renderHeader(context, `${escapeHtml(sash.sash_label || `Flügel ${sash.sash_number}`)} – Inspektion`, `Fenster ${escapeHtml(sash.window_number)} · ${escapeHtml(sash.room_name ?? '')} · ${escapeHtml(sash.floor_name ?? '')} · ${escapeHtml(sash.building_name ?? '')}`)}
+    ${renderHeader(context, `${escapeHtml(sash.sash_label || `Flügel ${sash.sash_number}`)} – Prüfung`, `Fenster ${escapeHtml(sash.window_number)} · ${escapeHtml(sash.room_name ?? '')} · ${escapeHtml(sash.floor_name ?? '')} · ${escapeHtml(sash.building_name ?? '')}`)}
     <div class="intern-breadcrumb">
       <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
       ${buildingId > 0 ? `<a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> › ` : ''}
       ${floorId > 0 ? `<a href="/intern/fensterpruefung-bonn/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> › ` : ''}
       ${roomId > 0 ? `<a href="/intern/fensterpruefung-bonn/fenster/?room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">Fenster</a> › ` : ''}
-      <a href="${backUrl}">Flügel</a> › Inspektion
+      <a href="${backUrl}">Flügel</a> › Prüfung
     </div>
     <div class="intern-statusbar">
+      <div class="intern-card">${connectionBadge()}</div>
       <div class="intern-card"><strong>${sash.progress_percent}%</strong><p class="intern-meta">Fortschritt</p></div>
       <div class="intern-card"><strong>${escapeHtml(sashStatusLabel(sash.status))}</strong><p class="intern-meta">Status</p></div>
       ${sash.has_defect ? '<div class="intern-card"><span class="intern-badge intern-badge--danger">Mangel festgestellt</span></div>' : ''}
@@ -755,7 +756,7 @@ async function renderSashInspection(context: AppContext) {
     <div class="intern-grid">
       <div>
         <form id="sash-form" class="intern-list" novalidate>
-          ${renderSashFormSections(data, !canEdit)}
+          ${renderSashFormSections(sash, data, !canEdit)}
         </form>
         <section class="intern-form-section">
           <h2>Fotodokumentation</h2>
@@ -803,8 +804,12 @@ async function renderSashInspection(context: AppContext) {
       <div class="intern-actions">
         ${canEdit ? `
           <button class="sv-button sv-button-secondary" type="button" id="sash-save-btn">Zwischenspeichern</button>
+          <button class="sv-button sv-button-secondary" type="button" id="sash-print-btn">🖨 Bericht drucken</button>
           <button class="sv-button sv-button-primary" type="button" id="sash-complete-btn">Prüfung abschließen</button>
-        ` : '<span class="intern-meta">Nur lesend</span>'}
+        ` : `
+          <button class="sv-button sv-button-secondary" type="button" id="sash-print-btn">🖨 Bericht drucken</button>
+          <span class="intern-meta">Nur lesend</span>
+        `}
       </div>
     </div>
   `;
@@ -815,55 +820,99 @@ async function renderSashInspection(context: AppContext) {
 
   const updateSaveStatus = (msg: string) => { if (saveStatus) saveStatus.textContent = msg; };
 
-  const scheduleSave = debounce(async () => {
+  // ── Offline-Zwischenspeicherung ──────────────────────────────────────────
+  const offlineKey = `sash-draft-${sashId}`;
+
+  const saveSashOffline = (fd: Record<string, unknown>) => {
+    try { localStorage.setItem(offlineKey, JSON.stringify({ data: fd, savedAt: new Date().toISOString() })); } catch { /* ignore */ }
+  };
+
+  const clearSashOfflineDraft = () => {
+    try { localStorage.removeItem(offlineKey); } catch { /* ignore */ }
+  };
+
+  // Gespeicherten Offline-Entwurf wiederherstellen (falls vorhanden und neuer als Server-Daten)
+  const offlineRaw = localStorage.getItem(offlineKey);
+  if (offlineRaw) {
+    try {
+      const offlineDraft = JSON.parse(offlineRaw) as { data: Record<string, unknown>; savedAt: string };
+      const draftDate = new Date(offlineDraft.savedAt);
+      const serverDate = sash.updated_at ? new Date(sash.updated_at) : new Date(0);
+      if (draftDate > serverDate) {
+        Object.assign(workingCopy, offlineDraft.data);
+        updateSaveStatus('Offline-Entwurf wiederhergestellt');
+      }
+    } catch { /* ignore */ }
+  }
+
+  const persistSash = async (fd: Record<string, unknown>, showFeedback = true) => {
     if (!canEdit) return;
-    updateSaveStatus('Speichern…');
-    workingCopy['status'] ??= 'in Bearbeitung';
-    const { error } = await apiSaveSash(sashId, workingCopy);
+    if (showFeedback) updateSaveStatus('Speichern…');
+    saveSashOffline(fd);
+    if (!navigator.onLine) {
+      updateSaveStatus('Offline gespeichert ✓');
+      context.draftDirty = true;
+      return;
+    }
+    const { error } = await apiSaveSash(sashId, fd);
     if (error) {
-      updateSaveStatus('Speichern fehlgeschlagen');
+      updateSaveStatus('Offline gespeichert ✓');
+      context.draftDirty = true;
     } else {
-      updateSaveStatus('Gespeichert ✓');
+      clearSashOfflineDraft();
+      if (showFeedback) updateSaveStatus('Gespeichert ✓');
       context.draftDirty = false;
     }
-  }, 1500);
+  };
+
+  // Bei Rückkehr in den Online-Modus automatisch synchronisieren
+  const handleOnline = () => void persistSash(workingCopy, true);
+  window.addEventListener('online', handleOnline);
+
+  const scheduleSave = debounce(() => void persistSash(workingCopy, false), 1500);
 
   form?.addEventListener('input', (event) => {
     const target = event.target;
     if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement)) return;
-    workingCopy[target.name] = target instanceof HTMLInputElement && target.type === 'checkbox' ? target.checked : target.value;
-    if (!workingCopy['status'] || workingCopy['status'] === 'nicht begonnen') {
-      workingCopy['status'] = 'in Bearbeitung';
+    if (target.name) {
+      workingCopy[target.name] = target instanceof HTMLInputElement && target.type === 'checkbox' ? target.checked : target.value;
     }
     context.draftDirty = true;
     updateSaveStatus('Ungespeichert…');
     scheduleSave();
   });
 
-  context.root.querySelector<HTMLButtonElement>('#sash-save-btn')?.addEventListener('click', async () => {
-    updateSaveStatus('Speichern…');
-    const { error } = await apiSaveSash(sashId, workingCopy);
-    if (error) {
-      updateSaveStatus('Fehler');
-      showInlineMessage(context.root, errorAlert('Speichern fehlgeschlagen.'));
-    } else {
-      updateSaveStatus('Gespeichert ✓');
-      context.draftDirty = false;
-    }
+  // GPS-Koordinaten erfassen
+  context.root.querySelector<HTMLButtonElement>('#gps-capture-btn')?.addEventListener('click', () => {
+    if (!navigator.geolocation) { alert('GPS nicht verfügbar.'); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const coords = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
+        const gpsInput = context.root.querySelector<HTMLInputElement>('#gps_position');
+        if (gpsInput) { gpsInput.value = coords; workingCopy['gps_position'] = coords; scheduleSave(); }
+      },
+      () => alert('GPS-Position konnte nicht ermittelt werden.'),
+    );
   });
 
+  context.root.querySelector<HTMLButtonElement>('#sash-save-btn')?.addEventListener('click', () => void persistSash(workingCopy, true));
+
   context.root.querySelector<HTMLButtonElement>('#sash-complete-btn')?.addEventListener('click', async () => {
-    if (!window.confirm(`Prüfung für "${sash.sash_label || `Flügel ${sash.sash_number}`}" wirklich abschließen?`)) return;
-    workingCopy['status'] = 'abgeschlossen';
+    if (!window.confirm(`Prüfung für „${sash.sash_label || `Flügel ${sash.sash_number}`}" wirklich abschließen?`)) return;
+    workingCopy['abschlussstatus'] = 'abgeschlossen';
     workingCopy['completion_confirmed'] = true;
     const { error } = await apiSaveSash(sashId, workingCopy);
     if (error) {
-      showInlineMessage(context.root, errorAlert('Abschluss fehlgeschlagen.'));
+      showInlineMessage(context.root, errorAlert('Abschluss fehlgeschlagen. Bitte erneut versuchen.'));
     } else {
+      clearSashOfflineDraft();
       showInlineMessage(context.root, successAlert('Prüfung abgeschlossen. Weiter zum nächsten Flügel.'));
-      // Auto-navigate to next sash or back to sash list
-      setTimeout(() => redirectTo(backUrl), 1500);
+      setTimeout(() => { window.removeEventListener('online', handleOnline); redirectTo(backUrl); }, 1500);
     }
+  });
+
+  context.root.querySelector<HTMLButtonElement>('#sash-print-btn')?.addEventListener('click', () => {
+    printSashReport(sash, workingCopy, photos);
   });
 
   context.root.querySelector<HTMLButtonElement>('#upload-sash-photos')?.addEventListener('click', async () => {
@@ -885,149 +934,281 @@ async function renderSashInspection(context: AppContext) {
     if (captionInput) captionInput.value = '';
   });
 
+  // Per-Komponente Foto-Upload binden
+  context.root.querySelectorAll<HTMLInputElement>('.intern-comp-photo-input').forEach((input) => {
+    input.addEventListener('change', async () => {
+      if (!input.files?.length) return;
+      const component = input.dataset.component ?? 'sonstiges';
+      const gallery = context.root.querySelector<HTMLElement>(`#comp-photos-${component}`);
+      for (const file of Array.from(input.files)) {
+        const resized = await resizeImageIfNeeded(file);
+        await apiUploadSashPhoto(String(sash.window_id), sashId, resized, component, '');
+      }
+      const updatedPhotos = await apiListSashPhotos(sashId);
+      // Alle Fotos dieser Komponente in der Mini-Galerie anzeigen
+      const compPhotos = updatedPhotos.filter((p) => p.category === component);
+      if (gallery) gallery.innerHTML = compPhotos.map((p) => `<img src="/intern/photos/${escapeHtml(p.storage_path)}" alt="${escapeHtml(p.caption ?? p.category)}" class="intern-comp-thumb" loading="lazy" />`).join('');
+      // Globale Galerie aktualisieren
+      const globalGallery = context.root.querySelector<HTMLElement>('#sash-photo-gallery');
+      if (globalGallery) {
+        globalGallery.innerHTML = renderPhotos(updatedPhotos);
+        bindSashPhotoDeletion(sashId, globalGallery);
+      }
+      input.value = '';
+    });
+  });
+
   bindSashPhotoDeletion(sashId, context.root.querySelector<HTMLElement>('#sash-photo-gallery') ?? undefined);
   bindHeaderLogout(context);
 }
 
-function renderSashFormSections(data: Record<string, unknown>, disabled: boolean): string {
+function renderSashFormSections(sash: WindowSashRecord, data: Record<string, unknown>, disabled: boolean): string {
   const dis = disabled ? 'disabled' : '';
   const val = (key: string, fallback = '') => escapeHtml(String(data[key] ?? fallback));
   const checked = (key: string) => Boolean(data[key]) ? 'checked' : '';
-  const sel = (key: string, v: string) => String(data[key] ?? '') === v ? 'selected' : '';
+  const radio = (groupName: string, value: string, label: string) => {
+    const id = `rad_${groupName}_${value.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const isChecked = String(data[groupName] ?? '') === value ? 'checked' : '';
+    return `<label class="intern-radio"><input type="radio" id="${escapeHtml(id)}" name="${escapeHtml(groupName)}" value="${escapeHtml(value)}" ${isChecked} ${dis} /><span>${escapeHtml(label)}</span></label>`;
+  };
 
-  const statusOptions = ['nicht begonnen', 'in Bearbeitung', 'abgeschlossen', 'Nachpruefung erforderlich', 'freigegeben'];
-  const ratingOptions = [
-    'ohne festgestellten Handlungsbedarf',
-    'geringfuegige Auffaelligkeit',
-    'Wartung oder Nachstellung erforderlich',
-    'Instandsetzung erforderlich',
-    'Beschlagkomponente austauschen',
-    'weiterfuehrende Pruefung erforderlich',
-    'Nutzung vorsorglich einschraenken',
-    'Nutzung bis zur Klaerung nicht empfohlen',
-    'nicht abschliessend pruefbar',
+  const componentStateOptions: [string, string][] = [
+    ['OK', 'OK'],
+    ['eingeschraenkt_funktionsfaehig', 'Funktionsfähig mit Einschränkungen'],
+    ['defekt', 'Defekt'],
+    ['fehlt', 'Fehlt'],
+    ['nicht_vorhanden', 'Nicht eingebaut'],
   ];
-  const openingTypes = ['Dreh-Kipp', 'Dreh', 'Kipp', 'Festverglasung', 'sonstige'];
-  const positionOptions = ['links', 'rechts', 'mitte', 'oben', 'unten', 'Einzelflügel'];
-  const conditionOptions = ['einwandfrei', 'leichte Auffälligkeit', 'starke Auffälligkeit', 'Defekt'];
+
+  const componentBlock = (key: string, label: string) => `
+    <div class="intern-component-block" id="comp-${escapeHtml(key)}">
+      <h3 class="intern-component-title">${escapeHtml(label)}</h3>
+      <div class="intern-form-grid">
+        <div class="intern-field intern-field--full">
+          <fieldset class="intern-radio-group">
+            <legend>Zustand</legend>
+            ${componentStateOptions.map(([v, l]) => radio(`${key}_status`, v, l)).join('')}
+          </fieldset>
+        </div>
+        <div class="intern-field intern-field--full">
+          <label for="${escapeHtml(key)}_bemerkung">Bemerkung / Feststellung</label>
+          <textarea id="${escapeHtml(key)}_bemerkung" name="${escapeHtml(key)}_bemerkung" rows="2" ${dis}>${val(`${key}_bemerkung`)}</textarea>
+        </div>
+        ${!disabled ? `<div class="intern-field intern-field--full">
+          <span class="intern-label-sm">Fotos zu diesem Bauteil</span>
+          <div class="intern-component-photo-area">
+            <label class="sv-button sv-button-ghost intern-photo-btn" style="cursor:pointer">
+              📷 Foto hinzufügen
+              <input type="file" class="intern-comp-photo-input" data-component="${escapeHtml(key)}" accept="image/*" capture="environment" multiple style="display:none" />
+            </label>
+            <div class="intern-comp-photo-gallery" id="comp-photos-${escapeHtml(key)}"></div>
+          </div>
+        </div>` : ''}
+      </div>
+    </div>
+  `;
+
+  const components: [string, string][] = [
+    ['fluegellager',     'Flügellager'],
+    ['scherenlager',     'Scherenlager'],
+    ['ecklager',         'Ecklager'],
+    ['schliessbleche',   'Schließbleche'],
+    ['verriegelungen',   'Verriegelungen'],
+    ['getriebe',         'Getriebe'],
+    ['griff',            'Griff'],
+    ['dichtungen',       'Dichtungen'],
+    ['rahmen',           'Rahmen'],
+    ['glas',             'Glas'],
+    ['oeffnungsbegrenzer','Öffnungsbegrenzer (falls vorhanden)'],
+  ];
+
+  const suitabilityOptions: [string, string][] = [
+    ['geeignet',                   'Geeignet'],
+    ['geeignet_nach_nachstellung',  'Geeignet nach Nachstellung'],
+    ['instandsetzung_erforderlich', 'Instandsetzung erforderlich'],
+    ['austausch_empfohlen',         'Austausch empfohlen'],
+  ];
+
+  const riskOptions: [string, string][] = [
+    ['niedrig', 'Niedrig'],
+    ['mittel',  'Mittel'],
+    ['hoch',    'Hoch'],
+  ];
+
+  const priorityOptions: [string, string][] = [
+    ['keine',   'Keine'],
+    ['niedrig', 'Niedrig'],
+    ['mittel',  'Mittel'],
+    ['hoch',    'Hoch'],
+    ['sofort',  'Sofort'],
+  ];
+
+  const finalStatusOptions: [string, string][] = [
+    ['entwurf',                   'Entwurf'],
+    ['abgeschlossen',             'Abgeschlossen'],
+    ['nachpruefung_erforderlich', 'Nachprüfung erforderlich'],
+    ['freigegeben',               'Freigegeben'],
+  ];
 
   return `
+    <!-- ═══ I. Allgemein ═══════════════════════════════════════════════════ -->
     <section class="intern-form-section">
-      <h2>A. Flügelidentifikation</h2>
+      <h2>I. Allgemein</h2>
       <div class="intern-form-grid">
-        <div class="intern-field"><label for="sash_label">Flügelbezeichnung *</label>
-          <input id="sash_label" name="sash_label" type="text" value="${val('sash_label')}" required ${dis} /></div>
-        <div class="intern-field"><label for="opening_type">Öffnungsart *</label>
-          <select id="opening_type" name="opening_type" required ${dis}>
-            <option value="">Bitte wählen</option>
-            ${openingTypes.map((o) => `<option value="${o}" ${sel('opening_type', o)}>${o}</option>`).join('')}
-          </select></div>
-        <div class="intern-field"><label for="position">Position am Fenster</label>
-          <select id="position" name="position" ${dis}>
-            <option value="">—</option>
-            ${positionOptions.map((p) => `<option value="${p}" ${sel('position', p)}>${p}</option>`).join('')}
-          </select></div>
-        <div class="intern-field"><label for="status">Status *</label>
-          <select id="status" name="status" required ${dis}>
-            ${statusOptions.map((s) => `<option value="${s}" ${sel('status', s)}>${sashStatusLabelStatic(s)}</option>`).join('')}
-          </select></div>
-      </div>
-    </section>
-
-    <section class="intern-form-section">
-      <h2>B. Prüfungsdaten</h2>
-      <div class="intern-form-grid">
-        <div class="intern-field"><label for="inspection_date">Prüfdatum *</label>
-          <input id="inspection_date" name="inspection_date" type="date" value="${val('inspection_date', new Date().toISOString().slice(0, 10))}" required ${dis} /></div>
-        <div class="intern-field"><label for="inspector_name">Prüfer *</label>
-          <input id="inspector_name" name="inspector_name" type="text" value="${val('inspector_name')}" required ${dis} /></div>
-      </div>
-    </section>
-
-    <section class="intern-form-section">
-      <h2>C. Verglasung</h2>
-      <div class="intern-form-grid">
-        <div class="intern-field"><label for="glass_structure">Glasaufbau *</label>
-          <input id="glass_structure" name="glass_structure" type="text" value="${val('glass_structure')}" placeholder="z.B. ESG 6mm, VSG 8.8mm" required ${dis} /></div>
-        <div class="intern-field"><label for="glazing_width_mm">Glasbreite (mm)</label>
-          <input id="glazing_width_mm" name="glazing_width_mm" type="number" value="${val('glazing_width_mm')}" min="0" step="1" ${dis} /></div>
-        <div class="intern-field"><label for="glazing_height_mm">Glashöhe (mm)</label>
-          <input id="glazing_height_mm" name="glazing_height_mm" type="number" value="${val('glazing_height_mm')}" min="0" step="1" ${dis} /></div>
-      </div>
-    </section>
-
-    <section class="intern-form-section">
-      <h2>D. Scharniere und Beschlag</h2>
-      <div class="intern-form-grid">
-        <div class="intern-field"><label for="hinge_condition">Scharnierzustand</label>
-          <select id="hinge_condition" name="hinge_condition" ${dis}>
-            <option value="">—</option>
-            ${conditionOptions.map((c) => `<option value="${c}" ${sel('hinge_condition', c)}>${c}</option>`).join('')}
-          </select></div>
-        <div class="intern-field"><label for="fitting_condition">Beschlagzustand</label>
-          <select id="fitting_condition" name="fitting_condition" ${dis}>
-            <option value="">—</option>
-            ${conditionOptions.map((c) => `<option value="${c}" ${sel('fitting_condition', c)}>${c}</option>`).join('')}
-          </select></div>
         <div class="intern-field">
-          <label class="intern-checkbox"><input type="checkbox" name="hinge_fastening_loose" ${checked('hinge_fastening_loose')} ${dis} /><span>Scharnierbefestigung lose</span></label>
+          <label>Gebäude</label>
+          <input type="text" value="${escapeHtml(sash.building_name ?? '')}" disabled class="intern-readonly" />
         </div>
         <div class="intern-field">
-          <label class="intern-checkbox"><input type="checkbox" name="hinge_screws_missing" ${checked('hinge_screws_missing')} ${dis} /><span>Schrauben fehlen</span></label>
+          <label>Etage</label>
+          <input type="text" value="${escapeHtml(sash.floor_name ?? '')}" disabled class="intern-readonly" />
         </div>
         <div class="intern-field">
-          <label class="intern-checkbox"><input type="checkbox" name="hinge_deformation" ${checked('hinge_deformation')} ${dis} /><span>Verformung festgestellt</span></label>
+          <label>Raum</label>
+          <input type="text" value="${escapeHtml(`${sash.room_name ?? ''} ${sash.room_number ? `(${sash.room_number})` : ''}`.trim())}" disabled class="intern-readonly" />
         </div>
         <div class="intern-field">
-          <label class="intern-checkbox"><input type="checkbox" name="hinge_corrosion" ${checked('hinge_corrosion')} ${dis} /><span>Korrosion festgestellt</span></label>
+          <label>Fenster-ID</label>
+          <input type="text" value="${escapeHtml(sash.window_number)}" disabled class="intern-readonly" />
         </div>
         <div class="intern-field">
-          <label class="intern-checkbox"><input type="checkbox" name="fitting_defect" ${checked('fitting_defect')} ${dis} /><span>Beschlagdefekt</span></label>
+          <label>Flügel-ID</label>
+          <input type="text" value="${escapeHtml(sash.sash_label || `Flügel ${sash.sash_number}`)}" disabled class="intern-readonly" />
         </div>
         <div class="intern-field">
-          <label class="intern-checkbox"><input type="checkbox" name="unsafe_until_repair" ${checked('unsafe_until_repair')} ${dis} /><span>Sicherheitsrelevant – Sperre bis Instandsetzung</span></label>
+          <label for="inspector_name">Prüfer *</label>
+          <input id="inspector_name" name="inspector_name" type="text" value="${val('inspector_name')}" required ${dis} />
+        </div>
+        <div class="intern-field">
+          <label for="inspection_date">Datum *</label>
+          <input id="inspection_date" name="inspection_date" type="date" value="${val('inspection_date', new Date().toISOString().slice(0, 10))}" required ${dis} />
+        </div>
+        <div class="intern-field">
+          <label for="inspection_time">Uhrzeit</label>
+          <input id="inspection_time" name="inspection_time" type="time" value="${val('inspection_time')}" ${dis} />
+        </div>
+        <div class="intern-field">
+          <label for="gps_position">GPS-Position (optional)</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="gps_position" name="gps_position" type="text" value="${val('gps_position')}" placeholder="z.B. 50.7374, 7.0982" ${dis} style="flex:1" />
+            ${!disabled ? `<button type="button" id="gps-capture-btn" class="sv-button sv-button-ghost" title="GPS ermitteln">📍</button>` : ''}
+          </div>
+        </div>
+        <div class="intern-field">
+          <label for="qr_barcode">QR/Barcode (optional)</label>
+          <input id="qr_barcode" name="qr_barcode" type="text" value="${val('qr_barcode')}" placeholder="Kennzeichnung scannen oder eingeben" ${dis} />
         </div>
       </div>
     </section>
 
+    <!-- ═══ II. Beschlagprüfung ════════════════════════════════════════════ -->
     <section class="intern-form-section">
-      <h2>E. Gesamtbewertung</h2>
+      <h2>II. Beschlagprüfung</h2>
+      <p class="intern-meta" style="margin-bottom:16px">Für jedes Bauteil Zustand wählen, Feststellungen notieren und bei Bedarf Fotos anhängen.</p>
+      ${components.map(([key, label]) => componentBlock(key, label)).join('')}
+    </section>
+
+    <!-- ═══ III. Fensterfunktion ═══════════════════════════════════════════ -->
+    <section class="intern-form-section">
+      <h2>III. Fensterfunktion</h2>
       <div class="intern-form-grid">
-        <div class="intern-field intern-field--full"><label for="overall_rating">Gesamtbewertung *</label>
-          <select id="overall_rating" name="overall_rating" required ${dis}>
-            <option value="">Bitte wählen</option>
-            ${ratingOptions.map((r) => `<option value="${r}" ${sel('overall_rating', r)}>${r}</option>`).join('')}
-          </select></div>
-        <div class="intern-field intern-field--full"><label for="recommended_action">Empfohlene Maßnahme</label>
-          <textarea id="recommended_action" name="recommended_action" ${dis}>${val('recommended_action')}</textarea></div>
-        <div class="intern-field intern-field--full"><label for="notes">Hinweise / Bemerkungen</label>
-          <textarea id="notes" name="notes" ${dis}>${val('notes')}</textarea></div>
+        <div class="intern-field intern-field--full">
+          <fieldset class="intern-checkbox-group">
+            <legend>Funktionsprüfung</legend>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_oeffnet_vollstaendig" ${checked('fn_oeffnet_vollstaendig')} ${dis} /><span>Öffnet vollständig</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_schliesst_vollstaendig" ${checked('fn_schliesst_vollstaendig')} ${dis} /><span>Schließt vollständig</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_verriegelung_funktioniert" ${checked('fn_verriegelung_funktioniert')} ${dis} /><span>Verriegelung funktioniert</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_griff_leichtgaengig" ${checked('fn_griff_leichtgaengig')} ${dis} /><span>Griffbewegung leichtgängig</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_kein_widerstand" ${checked('fn_kein_widerstand')} ${dis} /><span>Kein abnormaler Widerstand</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_kein_spiel" ${checked('fn_kein_spiel')} ${dis} /><span>Kein übermäßiges Spiel</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_kein_schleifen" ${checked('fn_kein_schleifen')} ${dis} /><span>Kein Schleifen</span></label>
+            <label class="intern-checkbox"><input type="checkbox" name="fn_fluchtweg_moeglich" ${checked('fn_fluchtweg_moeglich')} ${dis} /><span>Rettungsweg / Fluchtweg möglich</span></label>
+          </fieldset>
+        </div>
+        <div class="intern-field intern-field--full">
+          <label for="fn_bemerkung">Bemerkungen zur Fensterfunktion</label>
+          <textarea id="fn_bemerkung" name="fn_bemerkung" rows="3" ${dis}>${val('fn_bemerkung')}</textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ IV. Eignung ════════════════════════════════════════════════════ -->
+    <section class="intern-form-section">
+      <h2>IV. Eignung</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field intern-field--full">
+          <fieldset class="intern-radio-group">
+            <legend>Beurteilung *</legend>
+            ${suitabilityOptions.map(([v, l]) => radio('eignung_beurteilung', v, l)).join('')}
+          </fieldset>
+        </div>
+        <div class="intern-field intern-field--full">
+          <fieldset class="intern-radio-group">
+            <legend>Risikostufe</legend>
+            ${riskOptions.map(([v, l]) => radio('risikostufe', v, l)).join('')}
+          </fieldset>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ V. Maßnahmen ═══════════════════════════════════════════════════ -->
+    <section class="intern-form-section">
+      <h2>V. Maßnahmen</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field intern-field--full">
+          <label for="massnahme_empfehlung">Empfohlene Maßnahme *</label>
+          <textarea id="massnahme_empfehlung" name="massnahme_empfehlung" rows="3" ${dis}>${val('massnahme_empfehlung')}</textarea>
+        </div>
+        <div class="intern-field">
+          <label for="massnahme_aufwand">Geschätzter Aufwand</label>
+          <input id="massnahme_aufwand" name="massnahme_aufwand" type="text" value="${val('massnahme_aufwand')}" placeholder="z.B. 1 Std. Nachstellung" ${dis} />
+        </div>
+        <div class="intern-field">
+          <label>Priorität</label>
+          <div class="intern-radio-row">
+            ${priorityOptions.map(([v, l]) => radio('massnahme_prioritaet', v, l)).join('')}
+          </div>
+        </div>
+        <div class="intern-field">
+          <label for="massnahme_verantwortlich">Verantwortlich</label>
+          <input id="massnahme_verantwortlich" name="massnahme_verantwortlich" type="text" value="${val('massnahme_verantwortlich')}" ${dis} />
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ VI. Abschlussstatus ════════════════════════════════════════════ -->
+    <section class="intern-form-section">
+      <h2>VI. Abschlussstatus</h2>
+      <div class="intern-form-grid">
+        <div class="intern-field intern-field--full">
+          <fieldset class="intern-radio-group">
+            <legend>Status der Prüfung</legend>
+            ${finalStatusOptions.map(([v, l]) => radio('abschlussstatus', v, l)).join('')}
+          </fieldset>
+        </div>
       </div>
     </section>
   `;
 }
 
-function sashStatusLabelStatic(status: string): string {
-  switch (status) {
-    case 'nicht begonnen': return 'Nicht begonnen';
-    case 'in Bearbeitung': return 'In Bearbeitung';
-    case 'abgeschlossen': return 'Abgeschlossen';
-    case 'Nachpruefung erforderlich': return 'Nachprüfung erforderlich';
-    case 'freigegeben': return 'Freigegeben';
-    default: return status;
-  }
-}
 
 function sashPhotoCategories(): string {
   return [
-    ['Gesamtansicht', 'Gesamtansicht'],
+    ['Gesamtansicht',     'Gesamtansicht'],
     ['Fensterkennzeichnung', 'Fensterkennzeichnung'],
-    ['Fluegellager', 'Flügellager'],
-    ['Ecklager', 'Ecklager'],
-    ['Beschlagschere', 'Beschlagschere'],
-    ['Scharnier', 'Scharnier'],
-    ['Mangel', 'Mangel/Defekt'],
-    ['sonstiges', 'Sonstiges'],
+    ['fluegellager',      'Flügellager'],
+    ['scherenlager',      'Scherenlager'],
+    ['ecklager',          'Ecklager'],
+    ['schliessbleche',    'Schließbleche'],
+    ['verriegelungen',    'Verriegelungen'],
+    ['getriebe',          'Getriebe'],
+    ['griff',             'Griff'],
+    ['dichtungen',        'Dichtungen'],
+    ['rahmen',            'Rahmen'],
+    ['glas',              'Glas'],
+    ['oeffnungsbegrenzer','Öffnungsbegrenzer'],
+    ['Mangel',            'Mangel / Defekt'],
+    ['sonstiges',         'Sonstiges'],
   ].map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join('');
 }
 
@@ -2023,7 +2204,7 @@ async function printSummary(records: WindowSummary[]) {
   const popup = window.open('', '_blank', 'noopener,noreferrer,width=1200,height=900');
   if (!popup) return;
   popup.document.write(`
-    <html lang="de"><head><title>Fensterpruefung BMVg Bonn – Sammelprotokoll</title><style>
+    <html lang="de"><head><title>Fensterbeschlagsprüfung BMVg Bonn – Sammelprotokoll</title><style>
       body{font-family:Arial,sans-serif;padding:24px;color:#071a2e}table{width:100%;border-collapse:collapse}th,td{border:1px solid #d6e0e8;padding:8px;text-align:left}h1{margin-top:0}
     </style></head><body>
     <h1>${escapeHtml(portalProject.title)} – Sammelprotokoll</h1>
@@ -2036,6 +2217,140 @@ async function printSummary(records: WindowSummary[]) {
   popup.focus();
   popup.print();
 }
+
+function printSashReport(sash: WindowSashRecord, data: Record<string, unknown>, photos: PhotoItem[]): void {
+  const popup = window.open('', '_blank', 'noopener,noreferrer,width=900,height=1200');
+  if (!popup) { alert('Bitte Pop-ups für diese Seite erlauben.'); return; }
+
+  const d = (key: string, fallback = '—') => escapeHtml(String(data[key] ?? '') || fallback);
+  const chk = (key: string) => Boolean(data[key]) ? '☑' : '☐';
+  const compLabel: Record<string, string> = {
+    fluegellager:'Flügellager', scherenlager:'Scherenlager', ecklager:'Ecklager',
+    schliessbleche:'Schließbleche', verriegelungen:'Verriegelungen', getriebe:'Getriebe',
+    griff:'Griff', dichtungen:'Dichtungen', rahmen:'Rahmen', glas:'Glas',
+    oeffnungsbegrenzer:'Öffnungsbegrenzer',
+  };
+  const stateLabel: Record<string, string> = {
+    OK:'OK', eingeschraenkt_funktionsfaehig:'Eingeschränkt', defekt:'Defekt', fehlt:'Fehlt', nicht_vorhanden:'Nicht eingebaut',
+  };
+  const suitLabel: Record<string, string> = {
+    geeignet:'Geeignet', geeignet_nach_nachstellung:'Nach Nachstellung geeignet',
+    instandsetzung_erforderlich:'Instandsetzung erforderlich', austausch_empfohlen:'Austausch empfohlen',
+  };
+
+  const compRows = Object.entries(compLabel).map(([key, label]) => {
+    const status = stateLabel[String(data[`${key}_status`] ?? '')] ?? (data[`${key}_status`] ? d(`${key}_status`) : '—');
+    const bem = d(`${key}_bemerkung`, '');
+    return `<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(status)}</td><td>${escapeHtml(bem)}</td></tr>`;
+  }).join('');
+
+  const fnChecks = [
+    ['fn_oeffnet_vollstaendig',      'Öffnet vollständig'],
+    ['fn_schliesst_vollstaendig',    'Schließt vollständig'],
+    ['fn_verriegelung_funktioniert', 'Verriegelung funktioniert'],
+    ['fn_griff_leichtgaengig',       'Griffbewegung leichtgängig'],
+    ['fn_kein_widerstand',           'Kein abnormaler Widerstand'],
+    ['fn_kein_spiel',                'Kein übermäßiges Spiel'],
+    ['fn_kein_schleifen',            'Kein Schleifen'],
+    ['fn_fluchtweg_moeglich',        'Rettungsweg möglich'],
+  ].map(([key, label]) => `<tr><td>${escapeHtml(label)}</td><td>${chk(key)}</td></tr>`).join('');
+
+  const photoHtml = photos.length > 0
+    ? photos.slice(0, 12).map((p) => `<div class="photo-item"><img src="/intern/photos/${escapeHtml(p.storage_path)}" alt="${escapeHtml(p.caption ?? p.category)}" /><p>${escapeHtml(p.caption ?? p.category)}</p></div>`).join('')
+    : '<p>Keine Fotos vorhanden.</p>';
+
+  popup.document.write(`<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="utf-8" />
+<title>Prüfbericht – ${escapeHtml(sash.sash_label || `Flügel ${sash.sash_number}`)}</title>
+<style>
+  @page{margin:20mm 15mm;size:A4}
+  *{box-sizing:border-box}
+  body{font-family:'Arial',sans-serif;font-size:11pt;color:#1a1a1a;margin:0;padding:0}
+  .header{border-bottom:3px solid #071a2e;padding-bottom:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-end}
+  .header h1{margin:0;font-size:14pt;color:#071a2e}
+  .header .company{font-size:9pt;text-align:right;color:#555}
+  .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;margin-bottom:16px;border:1px solid #ccc;padding:10px;border-radius:4px}
+  .meta-item{display:flex;flex-direction:column}
+  .meta-item .label{font-size:8pt;color:#666;text-transform:uppercase;letter-spacing:.05em}
+  .meta-item .value{font-weight:bold}
+  h2{font-size:11pt;background:#071a2e;color:#fff;padding:5px 10px;margin:16px 0 6px}
+  table{width:100%;border-collapse:collapse;font-size:10pt}
+  th,td{border:1px solid #ccc;padding:5px 8px;text-align:left;vertical-align:top}
+  th{background:#f0f0f0;font-weight:bold}
+  .verdict-box{border:2px solid #071a2e;padding:12px;border-radius:4px;margin:12px 0}
+  .verdict-box .label{font-size:8pt;text-transform:uppercase;color:#666}
+  .verdict-box .value{font-size:13pt;font-weight:bold;color:#071a2e}
+  .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .photo-item img{width:100%;height:120px;object-fit:cover;border:1px solid #ccc}
+  .photo-item p{font-size:8pt;text-align:center;margin:2px 0}
+  .footer{border-top:1px solid #ccc;margin-top:16px;padding-top:8px;font-size:8pt;color:#666;display:flex;justify-content:space-between}
+  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head><body>
+
+<div class="header">
+  <div>
+    <h1>Prüfbericht – Fensterflügel-Inspektion</h1>
+    <p style="margin:4px 0 0;font-size:10pt;color:#555">Fensterbeschlagsprüfung BMVg Bonn</p>
+  </div>
+  <div class="company">
+    SV-Büro Marc Schütt e.K.<br/>
+    Sachverständigen- und Prüfsystem
+  </div>
+</div>
+
+<div class="meta-grid">
+  <div class="meta-item"><span class="label">Gebäude</span><span class="value">${escapeHtml(sash.building_name ?? '—')}</span></div>
+  <div class="meta-item"><span class="label">Etage</span><span class="value">${escapeHtml(sash.floor_name ?? '—')}</span></div>
+  <div class="meta-item"><span class="label">Raum</span><span class="value">${escapeHtml(`${sash.room_name ?? ''} ${sash.room_number ? `(${sash.room_number})` : ''}`.trim() || '—')}</span></div>
+  <div class="meta-item"><span class="label">Fenster-ID</span><span class="value">${escapeHtml(sash.window_number)}</span></div>
+  <div class="meta-item"><span class="label">Flügel</span><span class="value">${escapeHtml(sash.sash_label || `Flügel ${sash.sash_number}`)}</span></div>
+  <div class="meta-item"><span class="label">Prüfer</span><span class="value">${d('inspector_name')}</span></div>
+  <div class="meta-item"><span class="label">Prüfdatum</span><span class="value">${d('inspection_date')}</span></div>
+  <div class="meta-item"><span class="label">Uhrzeit</span><span class="value">${d('inspection_time', '—')}</span></div>
+</div>
+
+<h2>I. Beschlagprüfung</h2>
+<table>
+  <thead><tr><th>Bauteil</th><th>Zustand</th><th>Bemerkung</th></tr></thead>
+  <tbody>${compRows}</tbody>
+</table>
+
+<h2>II. Fensterfunktion</h2>
+<table>
+  <thead><tr><th>Kriterium</th><th>Ergebnis</th></tr></thead>
+  <tbody>${fnChecks}</tbody>
+</table>
+
+<div class="verdict-box">
+  <div class="label">Eignung</div>
+  <div class="value">${escapeHtml(suitLabel[d('eignung_beurteilung', '')] ?? d('eignung_beurteilung', '—'))}</div>
+  <div style="margin-top:8px"><span class="label">Risikostufe: </span><strong>${d('risikostufe', '—')}</strong></div>
+</div>
+
+<h2>III. Maßnahmen</h2>
+<table>
+  <tr><th style="width:30%">Empfohlene Maßnahme</th><td>${d('massnahme_empfehlung')}</td></tr>
+  <tr><th>Geschätzter Aufwand</th><td>${d('massnahme_aufwand', '—')}</td></tr>
+  <tr><th>Priorität</th><td>${d('massnahme_prioritaet', '—')}</td></tr>
+  <tr><th>Verantwortlich</th><td>${d('massnahme_verantwortlich', '—')}</td></tr>
+</table>
+
+<h2>IV. Fotodokumentation</h2>
+<div class="photo-grid">${photoHtml}</div>
+
+<div class="footer">
+  <span>SV-Büro Marc Schütt e.K. – Sachverständigen- und Prüfsystem</span>
+  <span>Gedruckt: ${new Date().toLocaleString('de-DE')}</span>
+</div>
+
+</body></html>`);
+  popup.document.close();
+  popup.focus();
+  setTimeout(() => popup.print(), 300);
+}
+
 
 async function downloadQrOverview(records: WindowSummary[]) {
   const popup = window.open('', '_blank', 'noopener,noreferrer,width=1200,height=900');
