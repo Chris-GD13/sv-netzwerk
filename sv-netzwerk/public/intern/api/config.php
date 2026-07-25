@@ -48,7 +48,11 @@ loadEnv();
 
 function env(string $key, string $default = ''): string
 {
-    return $_ENV[$key] ?? getenv($key) ?: $default;
+    if (isset($_ENV[$key])) {
+        return (string) $_ENV[$key];
+    }
+    $val = getenv($key);
+    return $val !== false ? $val : $default;
 }
 
 /** Gibt den konfigurierten Projektnamen zurück. */
@@ -61,6 +65,12 @@ function appCompanyName(): string   { return env('COMPANY_NAME', 'SV-Büro Marc 
 function appMailFrom(): string      { return env('MAIL_FROM', 'noreply@sv-schuett.eu'); }
 /** Gibt die Administratoren-E-Mail zurück. */
 function appMailAdmin(): string     { return env('MAIL_ADMIN', 'admin@sv-schuett.eu'); }
+
+/** Erstellt einen sicheren Passwort-Hash (Argon2ID). */
+function hashPassword(string $password): string
+{
+    return password_hash($password, PASSWORD_ARGON2ID);
+}
 
 /** Gibt eine PDO-Datenbankverbindung zurück (lazy singleton). */
 function db(): PDO

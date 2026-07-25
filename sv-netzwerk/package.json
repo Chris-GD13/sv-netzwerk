@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
-    "@supabase/supabase-js": "^2.110.8",
     "astro": "^7.1.3",
     "qrcode": "^1.5.4"
   },

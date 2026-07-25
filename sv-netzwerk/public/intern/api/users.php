@@ -63,14 +63,14 @@ function handleCreate(array $actor): never
     if ($fullName === '') {
         apiError(400, 'Name erforderlich.');
     }
-    if (!in_array($role, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer', 'gast'], true)) {
+    if (!in_array($role, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer', 'auswertung', 'gast'], true)) {
         apiError(400, 'Ungültige Rolle.');
     }
     if (mb_strlen($password, 'UTF-8') < 10) {
         apiError(400, 'Passwort muss mindestens 10 Zeichen lang sein.');
     }
 
-    $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+    $hash = hashPassword($password);
 
     try {
         $stmt = db()->prepare(
@@ -109,7 +109,7 @@ function handleUpdate(int $id, array $actor): never
     if ($fullName === '') {
         apiError(400, 'Name darf nicht leer sein.');
     }
-    if ($role !== '' && !in_array($role, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer', 'gast'], true)) {
+    if ($role !== '' && !in_array($role, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer', 'auswertung', 'gast'], true)) {
         apiError(400, 'Ungültige Rolle.');
     }
 
@@ -175,7 +175,7 @@ function handleSetPassword(int $id, array $actor): never
         apiError(400, 'Passwort muss mindestens 10 Zeichen lang sein.');
     }
 
-    $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+    $hash = hashPassword($password);
 
     try {
         db()->prepare('UPDATE users SET password_hash = :hash, updated_at = :now WHERE id = :id')

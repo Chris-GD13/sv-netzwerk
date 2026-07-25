@@ -77,7 +77,7 @@ function handleCreate(bool $reset): never
             continue;
         }
         try {
-            $hash = password_hash($pw, PASSWORD_BCRYPT, ['cost' => 10]);
+            $hash = hashPassword($pw);
             db()->prepare(
                 'INSERT INTO users (email,full_name,role,password_hash,is_active,created_at,updated_at)
                  VALUES (:e,:n,:r,:h,1,:now,:now2)

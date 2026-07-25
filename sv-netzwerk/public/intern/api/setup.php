@@ -17,8 +17,11 @@ commonHeaders();
 $setupKey = env('SETUP_KEY', '');
 $provided = $_GET['key'] ?? $_POST['key'] ?? '';
 
-// Einrichtungsschlüssel schützt den Assistenten
-if ($setupKey !== '' && $provided !== $setupKey) {
+// SETUP_KEY ist verpflichtend – ohne gültigen Schlüssel kein Zugriff
+if ($setupKey === '') {
+    apiError(503, 'SETUP_KEY ist nicht konfiguriert. Bitte .env einrichten.');
+}
+if (!hash_equals($setupKey, $provided)) {
     http_response_code(403);
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode(['error' => 'Ungültiger Einrichtungsschlüssel.'], JSON_UNESCAPED_UNICODE);
@@ -32,9 +35,9 @@ if ($method === 'GET') {
 } elseif ($method === 'POST') {
     $action = $_GET['action'] ?? requestBody()['action'] ?? '';
     match ($action) {
-        'install' => handleInstall(),
+        'install'      => handleInstall(),
         'create_admin' => handleCreateAdmin(),
-        default   => apiError(400, 'Unbekannte Aktion.'),
+        default        => apiError(400, 'Unbekannte Aktion.'),
     };
 } else {
     apiError(405, 'Methode nicht erlaubt.');
@@ -43,9 +46,9 @@ if ($method === 'GET') {
 function handleStatus(): never
 {
     $status = [
-        'app'      => APP_NAME,
-        'version'  => APP_VERSION,
-        'db_ok'    => false,
+        'app'       => appProjectName(),
+        'version'   => APP_VERSION,
+        'db_ok'     => false,
         'schema_ok' => false,
         'admin_ok'  => false,
     ];
@@ -54,7 +57,8 @@ function handleStatus(): never
         db()->query('SELECT 1');
         $status['db_ok'] = true;
     } catch (Throwable $e) {
-        $status['db_error'] = $e->getMessage();
+        error_log('[setup] DB-Verbindungsfehler: ' . $e->getMessage());
+        $status['db_error'] = 'Datenbankverbindung fehlgeschlagen.';
         apiJson($status);
     }
 
@@ -98,7 +102,8 @@ function handleInstall(): never
             if (str_contains($e->getMessage(), 'already exists') || str_contains($e->getMessage(), 'Duplicate entry')) {
                 continue;
             }
-            $errors[] = substr($statement, 0, 80) . ' → ' . $e->getMessage();
+            error_log('[setup] SQL-Fehler: ' . substr($statement, 0, 120) . ' → ' . $e->getMessage());
+            $errors[] = 'Fehler beim Ausführen eines SQL-Statements (Details im Server-Log).';
         }
     }
 
@@ -124,7 +129,7 @@ function handleCreateAdmin(): never
         apiError(400, 'Ungültige E-Mail-Adresse.');
     }
 
-    $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+    $hash = hashPassword($password);
 
     try {
         db()->prepare(
@@ -149,8 +154,10 @@ function handleCreateAdmin(): never
             ':now3'  => nowUtc(),
         ]);
     } catch (Throwable $e) {
-        apiError(503, 'Benutzer konnte nicht angelegt werden: ' . $e->getMessage());
+        error_log('[setup] Fehler beim Anlegen des Administrators: ' . $e->getMessage());
+        apiError(503, 'Administrator konnte nicht angelegt werden.');
     }
 
     apiJson(['ok' => true, 'message' => "Administrator '$email' wurde angelegt."]);
 }
+
