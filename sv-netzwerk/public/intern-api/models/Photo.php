@@ -5,10 +5,7 @@ namespace SvIntern\Models;
 
 /**
  * Foto-Modell fuer MySQL 8.0.
- *
- * Fotos sind generisch an eine Inspektion (inspection_id) geknuepft,
- * nicht an einen bestimmten Inspektionstyp. Dadurch koennen alle
- * Inspektionsmodule dasselbe Foto-System nutzen.
+ * Fotos sind einem Fenster-Datensatz (window_id) zugeordnet.
  */
 final class Photo
 {
@@ -17,16 +14,16 @@ final class Photo
     /**
      * @return list<array<string,mixed>>
      */
-    public function listByInspection(string $inspectionId): array
+    public function listByWindow(string $windowId): array
     {
         $stmt = $this->db->prepare(
-            'SELECT id, inspection_id, category, caption, file_name, storage_path,
+            'SELECT id, window_id, category, caption, file_name, storage_path,
                     taken_at, inspector_id, inspector_name, created_at
              FROM photos
-             WHERE inspection_id = :inspection_id AND deleted_at IS NULL
+             WHERE window_id = :window_id AND deleted_at IS NULL
              ORDER BY created_at DESC'
         );
-        $stmt->execute([':inspection_id' => $inspectionId]);
+        $stmt->execute([':window_id' => $windowId]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
@@ -36,7 +33,7 @@ final class Photo
     public function findById(string $id): ?array
     {
         $stmt = $this->db->prepare(
-            'SELECT id, inspection_id, category, caption, file_name, storage_path,
+            'SELECT id, window_id, category, caption, file_name, storage_path,
                     taken_at, inspector_id, inspector_name, created_at
              FROM photos
              WHERE id = :id AND deleted_at IS NULL LIMIT 1'
@@ -51,7 +48,7 @@ final class Photo
      */
     public function create(
         string $id,
-        string $inspectionId,
+        string $windowId,
         string $category,
         ?string $caption,
         string $fileName,
@@ -60,14 +57,14 @@ final class Photo
         string $inspectorName,
     ): void {
         $stmt = $this->db->prepare(
-            'INSERT INTO photos (id, inspection_id, category, caption, file_name, storage_path,
+            'INSERT INTO photos (id, window_id, category, caption, file_name, storage_path,
                                  inspector_id, inspector_name, taken_at)
-             VALUES (:id, :inspection_id, :category, :caption, :file_name, :storage_path,
+             VALUES (:id, :window_id, :category, :caption, :file_name, :storage_path,
                      :inspector_id, :inspector_name, NOW())'
         );
         $stmt->execute([
             ':id'             => $id,
-            ':inspection_id'  => $inspectionId,
+            ':window_id'      => $windowId,
             ':category'       => $category,
             ':caption'        => $caption,
             ':file_name'      => $fileName,

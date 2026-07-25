@@ -2,41 +2,52 @@
 declare(strict_types=1);
 
 /**
- * SVOS Inspection Platform – Front-Controller / Router
+ * Fensterbeschlagspruefung BMVg Bonn – API-Front-Controller
  *
- * Alle HTTP-Anfragen an intern-api/ werden hierher geleitet (.htaccess).
- * Dieser Router:
- *   1. Laedt Bootstrap und Config
- *   2. Setzt Security-Header
- *   3. Laedt die aktive Session
- *   4. Validiert CSRF bei state-aendernden Anfragen
- *   5. Leitet an den zustaendigen Controller oder ein Modul weiter
- *   6. Gibt 404 zurueck wenn kein Handler passt
+ * Alle HTTP-Anfragen an /intern-api/ werden hierher geleitet (.htaccess).
  *
  * URL-Schema:
- *   /intern-api/auth/{action}
- *   /intern-api/users/{id?}
- *   /intern-api/stats/dashboard
- *   /intern-api/modules/{slug}/{...}    ← von Modul-Instanz geroutet
- *   /intern-api/inspections/{id}/photos
- *   /intern-api/inspections/{id}/audit
- *   /intern-api/photos/{id}
- *   /intern-api/photos/{id}/file
- *   /intern-api/export/{type}
+ *   POST   /intern-api/auth/login
+ *   GET    /intern-api/auth/session
+ *   POST   /intern-api/auth/logout
+ *
+ *   GET    /intern-api/users
+ *   POST   /intern-api/users
+ *   PUT    /intern-api/users/{id}
+ *   DELETE /intern-api/users/{id}
+ *
+ *   GET    /intern-api/stats/dashboard
+ *
+ *   GET    /intern-api/windows
+ *   POST   /intern-api/windows
+ *   GET    /intern-api/windows/{id}
+ *   PUT    /intern-api/windows/{id}
+ *   DELETE /intern-api/windows/{id}
+ *   POST   /intern-api/windows/{id}/lock
+ *   DELETE /intern-api/windows/{id}/lock
+ *   GET    /intern-api/windows/{id}/photos
+ *   POST   /intern-api/windows/{id}/photos
+ *   GET    /intern-api/windows/{id}/audit
+ *
+ *   DELETE /intern-api/photos/{id}
+ *   GET    /intern-api/photos/{id}/file
+ *
+ *   GET    /intern-api/calculation-parameters
+ *
+ *   GET    /intern-api/export/csv
+ *   GET    /intern-api/export/report
  */
 
 require_once __DIR__ . '/bootstrap.php';
 
-use SvIntern\Config\Config;
 use SvIntern\Config\Database;
 use SvIntern\Middleware\Auth;
 use SvIntern\Middleware\Csrf;
-use SvIntern\Registry\ModuleRegistry;
-use SvIntern\Modules\Windows\WindowModule;
 use SvIntern\Controllers\AuthController;
-use SvIntern\Controllers\UserController;
+use SvIntern\Controllers\WindowController;
 use SvIntern\Controllers\PhotoController;
 use SvIntern\Controllers\ExportController;
+use SvIntern\Controllers\UserController;
 use SvIntern\Controllers\StatsController;
 use SvIntern\Controllers\AuditController;
 
@@ -46,51 +57,35 @@ header('X-Frame-Options: DENY');
 header('Referrer-Policy: strict-origin-when-cross-origin');
 header('Content-Security-Policy: default-src \'none\'');
 
-// ── CORS: nur Same-Origin (kein CORS-Wildcard) ───────────────────────────────
-// Keine Access-Control-Allow-Origin Header → Browser akzeptiert nur same-origin
-
 // ── Method + Path ────────────────────────────────────────────────────────────
 $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 
-// OPTIONS-Preflight (kein CORS, aber Browser sendet es trotzdem manchmal)
 if ($method === 'OPTIONS') {
     http_response_code(204);
     exit;
 }
 
-// Pfad aus REQUEST_URI extrahieren, Query-String entfernen
-$requestUri  = $_SERVER['REQUEST_URI'] ?? '/';
-$scriptPath  = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
-$path        = urldecode(parse_url($requestUri, PHP_URL_PATH) ?? '/');
-
-// Basis-Pfad entfernen (falls in Unterverzeichnis installiert)
-if ($scriptPath !== '' && str_starts_with($path, $scriptPath)) {
-    $path = substr($path, strlen($scriptPath));
-}
-
-$path     = '/' . ltrim($path, '/');
+$uri      = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+$uri      = urldecode($uri);
+$base     = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
+$path     = $base !== '' && str_starts_with($uri, $base) ? substr($uri, strlen($base)) : $uri;
 $segments = array_values(array_filter(explode('/', trim($path, '/'))));
 
-// ── Module registrieren ──────────────────────────────────────────────────────
-$registry = ModuleRegistry::getInstance();
-$registry->register(new WindowModule());
-
-// ── Session laden ────────────────────────────────────────────────────────────
+// ── Session ──────────────────────────────────────────────────────────────────
 Auth::startSession();
 $session = Auth::getSession();
 
-// ── Oeffentliche Endpunkte (kein Auth erforderlich) ──────────────────────────
-// POST /auth/login – CSRF nicht erforderlich (kein Session-Kontext)
+// ── Oeffentlicher Endpunkt: Login (kein Auth, kein CSRF erforderlich) ────────
 if ($segments === ['auth', 'login'] && $method === 'POST') {
     AuthController::login($session);
 }
 
-// Alle weiteren Endpunkte erfordern eine gueltigue Session
+// ── Ab hier: Session erforderlich ────────────────────────────────────────────
 if ($session === null) {
     jsonError('Nicht angemeldet.', 401);
 }
 
-// ── CSRF-Validierung fuer state-aendernde Methoden ───────────────────────────
+// ── CSRF-Validierung bei state-aendernden Methoden ───────────────────────────
 if (in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'], true)) {
     Csrf::validate($session);
 }
@@ -98,115 +93,91 @@ if (in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'], true)) {
 // ── Datenbankverbindung ──────────────────────────────────────────────────────
 $db = Database::getInstance();
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ROUTING
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Routing ──────────────────────────────────────────────────────────────────
+$s0 = $segments[0] ?? '';
+$s1 = $segments[1] ?? '';
+$s2 = $segments[2] ?? '';
+$s3 = $segments[3] ?? '';
 
-$first  = $segments[0] ?? '';
-$second = $segments[1] ?? '';
-$third  = $segments[2] ?? '';
-$fourth = $segments[3] ?? '';
+match (true) {
 
-switch ($first) {
+    // Auth
+    $s0 === 'auth' && $s1 === 'session' && $method === 'GET'
+        => AuthController::session($session),
 
-    // ── Auth ──────────────────────────────────────────────────────────────────
-    case 'auth':
-        match ([$method, $second]) {
-            ['GET',  'session'] => AuthController::session($session),
-            ['POST', 'logout']  => AuthController::logout($session),
-            default => jsonError('Endpunkt nicht gefunden.', 404),
-        };
-        break;
+    $s0 === 'auth' && $s1 === 'logout' && $method === 'POST'
+        => AuthController::logout($session),
 
-    // ── Users ─────────────────────────────────────────────────────────────────
-    case 'users':
-        match ([$method, $second]) {
-            ['GET',    '']  => UserController::list($session, $db),
-            ['POST',   '']  => UserController::create($session, $db),
-            ['PUT',   $second]  when $second !== '' => UserController::update($session, $db, $second),
-            ['DELETE', $second] when $second !== '' => UserController::delete($session, $db, $second),
-            default => jsonError('Endpunkt nicht gefunden.', 404),
-        };
-        break;
+    // Users
+    $s0 === 'users' && $s1 === '' && $method === 'GET'
+        => UserController::list($session, $db),
 
-    // ── Stats ─────────────────────────────────────────────────────────────────
-    case 'stats':
-        if ($second === 'dashboard' && $method === 'GET') {
-            StatsController::dashboard($session, $db);
-        }
-        jsonError('Endpunkt nicht gefunden.', 404);
+    $s0 === 'users' && $s1 === '' && $method === 'POST'
+        => UserController::create($session, $db),
 
-    // ── Module-Routing ────────────────────────────────────────────────────────
-    // /intern-api/modules/{slug}/...
-    case 'modules':
-        $slug = $second;
-        if ($slug === '') {
-            // GET /modules → Modulliste
-            if ($method === 'GET') {
-                jsonResponse(['data' => $registry->toApiList()]);
-            }
-            jsonError('Endpunkt nicht gefunden.', 404);
-        }
+    $s0 === 'users' && $s1 !== '' && $s2 === '' && $method === 'PUT'
+        => UserController::update($session, $db, $s1),
 
-        $module = $registry->findBySlug($slug);
-        if ($module === null) {
-            jsonError('Modul nicht gefunden: ' . $slug, 404);
-        }
+    $s0 === 'users' && $s1 !== '' && $s2 === '' && $method === 'DELETE'
+        => UserController::delete($session, $db, $s1),
 
-        $moduleSegments = array_slice($segments, 2); // Segmente nach /modules/{slug}/
-        $handler = $module->route($method, $moduleSegments, $session, $db);
-        if ($handler === null) {
-            jsonError('Endpunkt nicht gefunden.', 404);
-        }
-        $handler();
-        exit;
+    // Stats
+    $s0 === 'stats' && $s1 === 'dashboard' && $method === 'GET'
+        => StatsController::dashboard($session, $db),
 
-    // ── Generische Inspektions-Unterressourcen ────────────────────────────────
-    // /intern-api/inspections/{id}/photos
-    // /intern-api/inspections/{id}/audit
-    case 'inspections':
-        $inspectionId = $second;
-        if ($inspectionId === '') {
-            jsonError('Endpunkt nicht gefunden.', 404);
-        }
+    // Windows – Liste / Anlegen
+    $s0 === 'windows' && $s1 === '' && $method === 'GET'
+        => WindowController::list($session, $db),
 
-        match ([$method, $third]) {
-            ['GET',  'photos'] => PhotoController::list($session, $db, $inspectionId),
-            ['POST', 'photos'] => PhotoController::upload($session, $db, $inspectionId),
-            ['GET',  'audit']  => AuditController::list($session, $db, $inspectionId),
-            default => jsonError('Endpunkt nicht gefunden.', 404),
-        };
-        break;
+    $s0 === 'windows' && $s1 === '' && $method === 'POST'
+        => WindowController::create($session, $db),
 
-    // ── Fotos ─────────────────────────────────────────────────────────────────
-    // /intern-api/photos/{id}
-    // /intern-api/photos/{id}/file
-    case 'photos':
-        $photoId = $second;
-        if ($photoId === '') {
-            jsonError('Endpunkt nicht gefunden.', 404);
-        }
+    // Calculation parameters (before {id} route to avoid collision)
+    $s0 === 'calculation-parameters' && $method === 'GET'
+        => WindowController::calculationParameters($session, $db),
 
-        if ($third === 'file' && $method === 'GET') {
-            PhotoController::serve($session, $db, $photoId);
-        }
-        if ($third === '' && $method === 'DELETE') {
-            PhotoController::delete($session, $db, $photoId);
-        }
-        jsonError('Endpunkt nicht gefunden.', 404);
+    // Windows – Einzelzugriff
+    $s0 === 'windows' && $s1 !== '' && $s2 === '' && $method === 'GET'
+        => WindowController::get($session, $db, $s1),
 
-    // ── Export ────────────────────────────────────────────────────────────────
-    // /intern-api/export/csv
-    // /intern-api/export/report
-    case 'export':
-        match ([$method, $second]) {
-            ['GET', 'csv']    => ExportController::csv($session, $db),
-            ['GET', 'report'] => ExportController::report($session, $db),
-            default => jsonError('Endpunkt nicht gefunden.', 404),
-        };
-        break;
+    $s0 === 'windows' && $s1 !== '' && $s2 === '' && $method === 'PUT'
+        => WindowController::update($session, $db, $s1),
 
-    // ── Fallback ──────────────────────────────────────────────────────────────
-    default:
-        jsonError('Endpunkt nicht gefunden.', 404);
-}
+    $s0 === 'windows' && $s1 !== '' && $s2 === '' && $method === 'DELETE'
+        => WindowController::delete($session, $db, $s1),
+
+    // Windows – Sperren
+    $s0 === 'windows' && $s1 !== '' && $s2 === 'lock' && $method === 'POST'
+        => WindowController::acquireLock($session, $db, $s1),
+
+    $s0 === 'windows' && $s1 !== '' && $s2 === 'lock' && $method === 'DELETE'
+        => WindowController::releaseLock($session, $db, $s1),
+
+    // Windows – Fotos
+    $s0 === 'windows' && $s1 !== '' && $s2 === 'photos' && $method === 'GET'
+        => PhotoController::list($session, $db, $s1),
+
+    $s0 === 'windows' && $s1 !== '' && $s2 === 'photos' && $method === 'POST'
+        => PhotoController::upload($session, $db, $s1),
+
+    // Windows – Audit-Log
+    $s0 === 'windows' && $s1 !== '' && $s2 === 'audit' && $method === 'GET'
+        => AuditController::list($session, $db, $s1),
+
+    // Fotos – Einzelaktionen
+    $s0 === 'photos' && $s1 !== '' && $s2 === 'file' && $method === 'GET'
+        => PhotoController::serve($session, $db, $s1),
+
+    $s0 === 'photos' && $s1 !== '' && $s2 === '' && $method === 'DELETE'
+        => PhotoController::delete($session, $db, $s1),
+
+    // Export
+    $s0 === 'export' && $s1 === 'csv' && $method === 'GET'
+        => ExportController::csv($session, $db),
+
+    $s0 === 'export' && $s1 === 'report' && $method === 'GET'
+        => ExportController::report($session, $db),
+
+    // Fallback
+    default => jsonError('Endpunkt nicht gefunden.', 404),
+};

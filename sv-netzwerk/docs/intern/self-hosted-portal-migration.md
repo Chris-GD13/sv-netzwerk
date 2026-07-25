@@ -1,6 +1,7 @@
-# Migrationsdokumentation: Supabase → Self-hosted PHP/MariaDB
+# Migration: Supabase → Self-hosted PHP/MySQL
 
-**Status:** Planung abgeschlossen — Implementierung blockiert bis IONOS-Datenbankverbindung bestätigt ist  
+**Projekt:** Fensterbeschlagsprüfung BMVg Bonn  
+**Status:** Implementierung läuft – Backend vollständig, Frontend-Rewrite ausstehend  
 **Erstellt:** 2026-07-25  
 **Betrifft:** Internes Prüfportal `/intern/` auf sv-netzwerk.eu
 
@@ -8,580 +9,261 @@
 
 ## Inhaltsverzeichnis
 
-1. [Phase-1-Ergebnis: Hosting-Verifikation](#1-phase-1-ergebnis-hosting-verifikation)
+1. [Verifikation Hosting-Umgebung](#1-verifikation-hosting-umgebung)
 2. [Aktuelle Architektur (Supabase)](#2-aktuelle-architektur-supabase)
-3. [Zielarchitektur (Self-hosted)](#3-zielarchitektur-self-hosted)
-4. [Datenbankmodell-Mapping](#4-datenbankmodell-mapping)
-5. [Routen-Mapping](#5-routen-mapping)
-6. [Migrationsphasen](#6-migrationsphasen)
-7. [Sicherheitskontrollen](#7-sicherheitskontrollen)
+3. [Zielarchitektur](#3-zielarchitektur)
+4. [Datenbankschema](#4-datenbankschema)
+5. [API-Routen-Mapping](#5-api-routen-mapping)
+6. [Sicherheitskonzept](#6-sicherheitskonzept)
+7. [Migrationsphasen](#7-migrationsphasen)
 8. [Rollback-Verfahren](#8-rollback-verfahren)
-9. [Deployment-Verfahren](#9-deployment-verfahren)
-10. [Offene Risiken](#10-offene-risiken)
-11. [Ausstehende manuelle Schritte](#11-ausstehende-manuelle-schritte)
+9. [Offene Risiken](#9-offene-risiken)
+10. [Ausstehende manuelle Schritte](#10-ausstehende-manuelle-schritte)
 
 ---
 
-## 1 Phase-1-Ergebnis: Hosting-Verifikation
+## 1. Verifikation Hosting-Umgebung
 
-### Aus dem Repository bestätigt
-
-| Merkmal | Status | Quelle |
-|---------|--------|--------|
-| PHP vorhanden | ✅ Bestätigt | `public/form-handler-core.php`, `public/anfrage.php` sind live in Produktion |
-| HTTPS | ✅ Bestätigt | `.htaccess` erzwingt Redirect auf `https://www.sv-netzwerk.eu` |
-| `.htaccess`-Routing | ✅ Bestätigt | Komplexe RewriteRules inkl. `/intern/`-Pfade in `public/.htaccess` |
-| SFTP-Dateizugriff | ✅ Bestätigt | Deploy-Workflow lädt via `lftp` nach `/sv-netzwerk` |
-| PHP `mail()` | ✅ Bestätigt | Kontaktformular-Handler nutzen PHP-Mail-Versand aktiv |
-| Persistenter Dateispeicher | ✅ Bestätigt | SFTP-Inhalt verbleibt zwischen Deployments |
-
-### Nicht aus dem Repository bestätigbar
-
-| Merkmal | Status | Warum unklar | Erforderliche Aktion |
-|---------|--------|--------------|----------------------|
-| PHP-Version (≥ 8.2) | ❌ Unbekannt | Kein `.php-version`, kein phpinfo, keine CI-Ausgabe | IONOS Control Panel → PHP-Version prüfen |
-| MariaDB/MySQL | ❌ Unbekannt | Kein DB-Verbindungscode in keiner PHP-Datei | IONOS Control Panel → Datenbanken prüfen |
-| PHP Sessions | ❓ Wahrscheinlich | PHP vorhanden; bestehende Handler nutzen keine Sessions | Einfacher Test: `<?php session_start(); echo session_id();` |
-| Datei-Uploads via PHP | ❓ Wahrscheinlich | PHP-Upload-Handling ist Standard, aber `upload_max_filesize` unbekannt | `phpinfo()` im geschützten Bereich prüfen |
-| Cronjobs | ❌ Unbekannt | Nicht dokumentiert | IONOS Control Panel → Cronjob-Sektion |
-| Schreibbarer Upload-Pfad außerhalb Webroot | ❌ Unbekannt | Kein Hinweis auf Verzeichnisstruktur oberhalb `/sv-netzwerk` | SFTP: Elternverzeichnis erkunden |
-
-**⛔ Phase 3–10 sind blockiert, bis MariaDB/MySQL-Verfügbarkeit und PHP-Version ≥ 8.2 durch den IONOS-Control-Panel-Nachweis bestätigt wurden.**
-
-### Bestätigungsprozedur für den Administrator
-
-1. IONOS Control Panel öffnen: [my.ionos.de](https://my.ionos.de)
-2. Domain `sv-netzwerk.eu` → Hosting → PHP-Version ablesen
-3. Datenbanken → MySQL-Datenbanken → vorhanden ja/nein
-4. Wenn keine DB vorhanden: neue MySQL-Datenbank anlegen und Zugangsdaten notieren
-5. Ergebnis in `docs/intern/ionos-hosting-nachweis.md` dokumentieren (keine Passwörter)
+| Merkmal | Status | Nachweis |
+|---|---|---|
+| PHP 8.4 | ✅ Verifiziert | Direktes Hosting-Check durch Auftraggeber |
+| MySQL 8.0 | ✅ Verifiziert | Dedizierte Datenbank erstellt |
+| HTTPS | ✅ Bestätigt | `.htaccess` erzwingt HTTPS-Redirect |
+| `.htaccess`-Routing | ✅ Bestätigt | Komplexe RewriteRules in `public/.htaccess` |
+| PHP-Sessions | ✅ Bestätigt | `session.cookie_httponly`, `SameSite=Lax` konfiguriert |
+| SFTP / SSH | ✅ Verifiziert | Deployment via lftp SFTP |
+| Persistenter Upload-Speicher | ✅ Bestätigt | `uploads/photos/` wird von lftp-Mirror ausgeschlossen |
+| PHP `mail()` | ✅ Bestätigt | Kontaktformular-Handler nutzen PHP-Mail |
+| Cronjobs | ❓ Nicht erforderlich | Session-Cleanup übernimmt PHP-GC |
 
 ---
 
-## 2 Aktuelle Architektur (Supabase)
+## 2. Aktuelle Architektur (Supabase)
+
+### Komponenten
+
+- **Frontend:** Astro + TypeScript, vollständig client-seitig
+- **Backend-Logik:** `src/lib/internal/client.ts` (1513 Zeilen)
+- **Datenbank:** Supabase (PostgreSQL) mit Row Level Security
+- **Auth:** Supabase Auth (`supabase.auth.signInWithPassword`)
+- **Storage:** Supabase Storage für Foto-Uploads
+- **Realtime:** Supabase Realtime-Subscriptions für Sperrbenachrichtigungen
+
+### Probleme
+
+- Öffentlicher API-Key (`PUBLIC_SUPABASE_ANON_KEY`) im Browser-Code
+- Auth-Zustand nur im Browser; kein echtes Server-Session-Management
+- RLS-Regeln in PostgreSQL schwer zu testen und zu auditieren
+- Abhängigkeit von externem Drittanbieter (Supabase)
+- Keine serverseitige Validierung vor DB-Schreiboperationen
+
+---
+
+## 3. Zielarchitektur
 
 ### Übersicht
 
 ```
-Browser (Astro static + TypeScript)
-    │
-    ├── Supabase Auth (JWT via localStorage / svjs-auth-storage)
-    │       AUTH-Methoden: signInWithPassword, onAuthStateChange, signOut
-    │
-    ├── Supabase PostgREST (REST-API über anon key)
-    │       Tabellenzugriffe: windows, profiles, audit_logs, photos,
-    │                         record_locks, calculation_parameters,
-    │                         export_logs, projects, buildings
-    │
-    ├── Supabase Storage (privater Bucket: window-photos-private)
-    │       upload, remove, createSignedUrl
-    │
-    └── Supabase Realtime (WebSocket)
-            Abonnements: windows, record_locks, audit_logs, photos
+Browser (Astro/TypeScript)
+        │  fetch() – same-origin, Cookie-Session
+        ▼
+/intern-api/index.php         ← Front-Controller (Router)
+        │
+        ├─ Middleware: Auth, CSRF, Role
+        ├─ Controllers: Auth, Window, Photo, Export, User, Stats, Audit
+        ├─ Models: User, Window, Photo, AuditLog
+        └─ Services: AuthService, UploadService, ExportService
+                │
+                ▼
+        MySQL 8.0 (IONOS)
+        uploads/photos/ (SFTP-persistent)
 ```
 
-### Umgebungsvariablen (aktuell)
+### Backend-Verzeichnisstruktur
 
-| Variable | Zweck |
-|----------|-------|
-| `PUBLIC_SUPABASE_URL` | Supabase-Projekt-URL (im Browser sichtbar) |
-| `PUBLIC_SUPABASE_ANON_KEY` | Anon-Key (im Browser sichtbar, durch RLS gesichert) |
+```
+public/intern-api/
+  index.php               ← Einstiegspunkt (alle Anfragen)
+  bootstrap.php           ← Autoloader, Fehlerbehandlung, Helfer
+  .htaccess               ← Routing, Sicherheitsoptionen
+  env.example             ← Konfigurationsvorlage
+  config/
+    config.php            ← .env-Leser, Config-Singleton
+    database.php          ← PDO-Singleton (MySQL 8.0, UTC, utf8mb4)
+  middleware/
+    Auth.php              ← Session-Lifecycle, Timeouts, Cookie-Flags
+    Role.php              ← Rollenhierarchie (administrator > pruefer > auswertung)
+    Csrf.php              ← Synchronized-Token-Pattern
+  models/
+    User.php              ← Benutzerverwaltung, Rate-Limiting
+    Window.php            ← Fenster-CRUD, Sperren, Berechnungsparameter
+    Photo.php             ← Foto-Metadaten
+    AuditLog.php          ← Unveränderliches Audit-Log
+  services/
+    AuthService.php       ← Login-Logik, Argon2ID, Passwortvalidierung
+    UploadService.php     ← MIME-Prüfung, Pfad-Traversal-Schutz
+    ExportService.php     ← CSV, HTML-Report
+  controllers/
+    AuthController.php
+    WindowController.php
+    PhotoController.php
+    ExportController.php
+    UserController.php
+    StatsController.php
+    AuditController.php
+  migrations/
+    001_initial_schema.sql
+    install.php           ← CLI-Setup (Schema + erster Admin)
 
-### Authentifizierungsfluss (aktuell)
+public/uploads/photos/
+  .htaccess               ← Deny all (kein HTTP-Direktzugriff)
+```
 
-1. Nutzer öffnet `/intern/login/`
-2. `InternalAppShell.astro` lädt `client.ts` → `mountInternalPortal()`
-3. `getSupabaseBrowserClient()` erzeugt Supabase-Client mit anon key
-4. `supabase.auth.signInWithPassword({ email, password })` → JWT in localStorage
-5. `supabase.auth.onAuthStateChange()` steuert Routenwechsel
-6. Jede API-Anfrage trägt JWT als Bearer-Token; Supabase validiert via RLS
-7. Logout: `supabase.auth.signOut()` löscht JWT aus localStorage
+---
 
-### Rollen
+## 4. Datenbankschema
 
-| Rolle | Rechte |
-|-------|--------|
-| `administrator` | Vollzugriff, Benutzerverwaltung, Freigabe |
-| `pruefer` | Fenster lesen/schreiben, Fotos hochladen, eigene Datensätze |
-| `auswertung` | Lesen + Status-/Bewertungsfelder schreiben, kein Delete |
-
-### Supabase-Tabellen (vollständig)
+### Kernentitäten
 
 | Tabelle | Zweck |
-|---------|-------|
-| `auth.users` | Supabase-eigene Nutzertabelle (UUID, E-Mail, Password-Hash) |
-| `profiles` | Erweiterung von `auth.users`: Name, Rolle, is_active |
-| `projects` | Projektdaten (BMVg Bonn) |
-| `buildings` | Gebäude eines Projekts |
-| `building_sections` | Bauabschnitte/Trakte |
+|---|---|
+| `users` | Benutzer, Rollen (`administrator`, `pruefer`, `auswertung`) |
+| `login_attempts` | Rate-Limiting, Sperrschutz |
+| `password_reset_tokens` | Passwort-Reset-Workflow |
+| `projects` | Prüfprojekte (initialer Seed: BMVg Bonn) |
+| `buildings` | Gebäude |
+| `building_sections` | Gebäudeteile |
 | `floors` | Etagen |
-| `rooms` | Räume |
-| `windows` | Hauptdatensatz: Fensterdaten + `form_data` JSONB + `calculated_data` JSONB |
-| `window_wings` | Flügeldaten (Maße, Gewicht) |
-| `glazing_data` | Verglasungsdaten pro Fenster (1:1) |
-| `hardware_components` | Beschlag-Komponenten (n:1 Fenster) |
-| `functional_tests` | Funktionsprüfungsdaten pro Fenster (1:1) |
-| `findings` | Befunde/Mängel |
-| `recommendations` | Empfehlungen |
-| `photos` | Foto-Metadaten (Dateiname, Kategorie, Prüfer, Zeitstempel) |
-| `record_locks` | Optimistische Datensatzsperren (1:1 Fenster) |
-| `audit_logs` | Unveränderliche Änderungshistorie |
-| `calculation_parameters` | Globale Berechnungskonstanten |
-| `export_logs` | Export-Protokoll |
+| `windows` | **Kernentität**: Fensterdatensatz + Prüf-/Befunddaten |
+| `record_locks` | Exklusive Datensatzsperren (15-Min-TTL) |
+| `photos` | Fotodokumentation je Fenster |
+| `documents` | Sonstige Anhänge |
+| `audit_logs` | Unveränderliches Prüfprotokoll |
+| `export_logs` | Protokoll der Exporte |
+| `calculation_parameters` | Technische Grenzwerte und Kennwerte |
 
-### Supabase Storage
+### Supabase → MySQL Feldmapping (windows)
 
-| Bucket | Sichtbarkeit | Inhalt |
-|--------|-------------|--------|
-| `window-photos-private` | Privat (RLS) | Fotos zu Fensterdatensätzen |
-
-### Realtime-Abonnements
-
-- `windows` – Sperranzeige, Live-Statusupdates
-- `record_locks` – Sperrindikator in der Fensterliste
-- `audit_logs` – Live-Audit-Feed in der Detailansicht
-- `photos` – Live-Galerie-Aktualisierung
-
-### RPC-Funktionen (serverseitig in Supabase)
-
-| Funktion | Zweck |
-|---------|-------|
-| `acquire_record_lock(p_window_id, p_timeout_minutes)` | Datensatz sperren |
-| `release_record_lock(p_window_id)` | Sperre freigeben |
-| `is_admin()` | Rollenprüfung für RLS |
-| `is_project_member()` | Projektmitgliedschaft für RLS |
-| `log_window_changes()` | Trigger: Audit-Log-Eintrag bei Fenster-Update |
-| `set_updated_at()` | Trigger: `updated_at` automatisch setzen |
-
-### Export (aktuell)
-
-- CSV-Export: clientseitig im Browser, Download via `Blob`-URL
-- PDF: Browser-Druckfunktion (`window.print()`)
-- QR-Code-Übersicht: clientseitig via `qrcode`-npm-Paket
-
-### Bekannte Schwachstellen der aktuellen Architektur
-
-- Anon-Key und Supabase-URL sind im Browser-Build sichtbar
-- Auth-State liegt nur in localStorage (kein HttpOnly-Cookie)
-- Kein CSRF-Schutz (Supabase nutzt JWT-Bearer, kein Cookie)
-- Kein serverseitiges Rate-Limiting für Login-Versuche
-- Passwort-Reset via Supabase-E-Mail (externe Abhängigkeit)
-- Realtime erfordert WebSocket-Verbindung zu supabase.co
+| Supabase-Feld | MySQL-Spalte | Typ |
+|---|---|---|
+| `id` (uuid) | `id` | VARCHAR(36) |
+| `project_id` | `project_id` | VARCHAR(36) FK |
+| `record_id` | `record_id` | VARCHAR(50) |
+| `inspection_number` | `inspection_number` | INT UNSIGNED |
+| `window_number` | `window_number` | VARCHAR(50) |
+| `status` | `status` | VARCHAR(50) |
+| `form_data` (jsonb) | `form_data` | JSON |
+| `calculated_data` | `calculated_data` | JSON |
+| `has_defect` | `has_defect` | TINYINT(1) |
+| `danger_immediate` | `danger_immediate` | TINYINT(1) |
+| Supabase RLS | PHP-Middleware | Role::require() |
 
 ---
 
-## 3 Zielarchitektur (Self-hosted)
-
-### Übersicht
-
-```
-Browser (Astro static + TypeScript)
-    │
-    └── Same-Origin API: /intern-api/  (PHP 8.2+ auf IONOS)
-            │
-            ├── Authentifizierung: PHP Sessions (HttpOnly, Secure, SameSite=Lax)
-            ├── Autorisierung: Rollen-Middleware (administrator, pruefer, auswertung)
-            ├── Datenbank: MariaDB/MySQL (PDO, Prepared Statements)
-            ├── Datei-Uploads: Server-seitig, außerhalb Webroot
-            └── Exporte: CSV serverseitig, HTML/PDF über PHP-Bibliothek
-```
-
-### Verzeichnisstruktur (Ziel)
-
-```
-sv-netzwerk/public/intern-api/
-├── index.php                  # Router / Front-Controller
-├── .htaccess                  # Routing auf index.php, PHP-Direktiven
-├── config/
-│   ├── config.php             # Konfigurationsvalidierung und Konstanten
-│   └── database.php           # PDO-Datenbankverbindung
-├── middleware/
-│   ├── auth.php               # Session-Prüfung
-│   └── role.php               # Rollenprüfung
-├── controllers/
-│   ├── AuthController.php     # login, logout, session
-│   ├── WindowController.php   # CRUD Fensterdatensätze
-│   ├── PhotoController.php    # Upload, Download, Löschen
-│   ├── ExportController.php   # CSV, HTML-Report
-│   ├── UserController.php     # Benutzerverwaltung (admin only)
-│   ├── AuditController.php    # Audit-Log-Abfragen
-│   └── StatsController.php    # Dashboard-Statistiken
-├── models/
-│   ├── User.php
-│   ├── Window.php
-│   ├── Photo.php
-│   └── AuditLog.php
-├── services/
-│   ├── AuthService.php        # Login-Logik, Session-Rotation
-│   ├── UploadService.php      # MIME-Prüfung, Dateinamenerzeugung
-│   └── ExportService.php      # CSV-Erzeugung, HTML-Report
-├── migrations/
-│   └── 001_initial_schema.sql # Vollständiges MariaDB-Schema
-└── storage/                   # Konfigurationshinweis auf Upload-Pfad
-```
-
-### Neue Umgebungsvariablen (.env, nie committen)
-
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=sv_intern
-DB_USER=
-DB_PASSWORD=
-APP_SECRET=
-UPLOAD_PATH=/pfad/ausserhalb/webroot/uploads
-APP_ENV=production
-SESSION_LIFETIME_MINUTES=480
-SESSION_ABSOLUTE_HOURS=12
-```
-
----
-
-## 4 Datenbankmodell-Mapping
-
-### Mapping Supabase → MariaDB
-
-Supabase nutzt UUIDs als Primary Keys (PostgreSQL `gen_random_uuid()`).  
-MariaDB kann `CHAR(36)` mit `UUID()` oder `BINARY(16)` mit `UUID_TO_BIN()` verwenden.  
-**Empfehlung für dieses Projekt:** `CHAR(36)` — einfacher zu debuggen, kein Unterschied bei ≤ 500 Fensterdatensätzen. Bei zukünftiger Skalierung auf `BINARY(16)` wechseln (36 % kleinere Indexgröße).  
-Formatierung bei `CHAR(36)`: `DEFAULT (UUID())`.
-
-| Supabase-Tabelle | MariaDB-Tabelle | Anmerkung |
-|-----------------|----------------|-----------|
-| `auth.users` | `users` | Vollständig neu implementiert; kein externer Auth-Provider |
-| `profiles` | Felder in `users` integriert | `full_name`, `role`, `is_active`, `password_hash` |
-| `projects` | `projects` | Identisch |
-| `buildings` | `buildings` | Identisch |
-| `building_sections` | `building_sections` | Identisch |
-| `floors` | `floors` | Identisch |
-| `rooms` | `rooms` | Identisch |
-| `windows` | `windows` | `form_data` und `calculated_data` als `JSON`-Spalten |
-| `window_wings` | `window_wings` | Identisch |
-| `glazing_data` | `glazing_data` | Identisch |
-| `hardware_components` | `hardware_components` | Identisch |
-| `functional_tests` | `functional_tests` | Identisch |
-| `findings` | `findings` | Identisch |
-| `recommendations` | `recommendations` | Identisch |
-| `photos` | `photos` | `storage_path` → lokaler Dateipfad |
-| `record_locks` | `record_locks` | Identisch; RPC ersetzt durch PHP-Transaktion |
-| `audit_logs` | `audit_logs` | `ip_address` wird hinzugefügt |
-| `calculation_parameters` | `calculation_parameters` | Identisch |
-| `export_logs` | `export_logs` | Identisch |
-
-Zusätzliche Tabellen ohne Supabase-Äquivalent:
-
-| Neue Tabelle | Zweck |
-|-------------|-------|
-| `login_attempts` | Rate-Limiting für Login-Versuche |
-| `password_reset_tokens` | Passwort-Reset ohne externen Provider |
-| `sessions` | Optional: serverseitige Session-Tabelle |
-
-### Neue `users`-Tabelle (MariaDB)
-
-```sql
-CREATE TABLE users (
-  id           CHAR(36)     NOT NULL DEFAULT (UUID()) PRIMARY KEY,
-  email        VARCHAR(254) NOT NULL UNIQUE,
-  full_name    VARCHAR(200) NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  role         ENUM('administrator','pruefer','auswertung') NOT NULL DEFAULT 'pruefer',
-  is_active    TINYINT(1)   NOT NULL DEFAULT 1,
-  created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-```
-
----
-
-## 5 Routen-Mapping
-
-### Frontend-Routen (unverändert)
-
-| Route | Astro-Seite | Funktion |
-|-------|-------------|----------|
-| `/intern/` | `src/pages/intern/index.astro` | Weiterleitung Login/Dashboard |
-| `/intern/login/` | `src/pages/intern/login/index.astro` | Anmeldeformular |
-| `/intern/dashboard/` | `src/pages/intern/index.astro` | Dashboard-Shell |
-| `/intern/fensterpruefung-bonn/` | `src/pages/intern/fensterpruefung-bonn/index.astro` | Fensterliste |
-| `/intern/fensterpruefung-bonn/fenster/` | `src/pages/intern/fensterpruefung-bonn/fenster/index.astro` | Fensterdetails |
-| `/intern/fensterpruefung-bonn/auswertung/` | `src/pages/intern/fensterpruefung-bonn/auswertung/index.astro` | Auswertung |
-| `/intern/fensterpruefung-bonn/export/` | `src/pages/intern/fensterpruefung-bonn/export/index.astro` | Export |
-
-### Neue Backend-API-Endpunkte
-
-| Methode | Pfad | Zweck | Rolle |
-|---------|------|-------|-------|
-| POST | `/intern-api/auth/login` | Anmeldung | — |
-| POST | `/intern-api/auth/logout` | Abmeldung | alle |
-| GET | `/intern-api/auth/session` | Aktuelle Session | alle |
-| GET | `/intern-api/users` | Benutzerliste | administrator |
-| POST | `/intern-api/users` | Benutzer anlegen | administrator |
-| PUT | `/intern-api/users/{id}` | Benutzer ändern | administrator |
-| DELETE | `/intern-api/users/{id}` | Benutzer deaktivieren | administrator |
-| GET | `/intern-api/projects` | Projektliste | alle |
-| GET | `/intern-api/windows` | Fensterliste | alle |
-| POST | `/intern-api/windows` | Fenster anlegen | pruefer, administrator |
-| GET | `/intern-api/windows/{id}` | Fensterdetail | alle |
-| PUT | `/intern-api/windows/{id}` | Fenster speichern | pruefer, auswertung, administrator |
-| DELETE | `/intern-api/windows/{id}` | Fenster löschen | administrator |
-| POST | `/intern-api/windows/{id}/lock` | Datensatz sperren | alle |
-| DELETE | `/intern-api/windows/{id}/lock` | Sperre freigeben | alle |
-| GET | `/intern-api/windows/{id}/audit` | Audit-Log | alle |
-| GET | `/intern-api/windows/{id}/photos` | Fotoliste | alle |
-| POST | `/intern-api/windows/{id}/photos` | Foto hochladen | pruefer, administrator |
-| DELETE | `/intern-api/photos/{id}` | Foto löschen | pruefer, administrator |
-| GET | `/intern-api/photos/{id}/file` | Foto abrufen (autorisiert) | alle |
-| GET | `/intern-api/stats/dashboard` | Dashboard-Statistiken | alle |
-| GET | `/intern-api/export/csv` | CSV-Export | alle |
-| GET | `/intern-api/export/report` | HTML-Report | alle |
-| GET | `/intern-api/calculation-parameters` | Berechnungsparameter | alle |
-
-### Supabase-Aufrufe im Frontend (zu ersetzen)
-
-Alle Aufrufe befinden sich in `sv-netzwerk/src/lib/internal/client.ts`.
+## 5. API-Routen-Mapping
 
 | Supabase-Aufruf | Neuer API-Endpunkt |
-|-----------------|-------------------|
+|---|---|
 | `supabase.auth.signInWithPassword()` | `POST /intern-api/auth/login` |
 | `supabase.auth.signOut()` | `POST /intern-api/auth/logout` |
 | `supabase.auth.getSession()` | `GET /intern-api/auth/session` |
-| `supabase.auth.onAuthStateChange()` | Polling oder Session-Cookie-Prüfung |
 | `supabase.from('windows').select()` | `GET /intern-api/windows` |
-| `supabase.from('windows').upsert()` | `PUT /intern-api/windows/{id}` |
 | `supabase.from('windows').insert()` | `POST /intern-api/windows` |
-| `supabase.from('audit_logs').select()` | `GET /intern-api/windows/{id}/audit` |
-| `supabase.from('photos').select()` | `GET /intern-api/windows/{id}/photos` |
-| `supabase.from('photos').insert()` | Automatisch nach `POST /intern-api/windows/{id}/photos` |
-| `supabase.from('record_locks').select()` | Eingebettet in `GET /intern-api/windows` |
-| `supabase.from('calculation_parameters').select()` | `GET /intern-api/calculation-parameters` |
-| `supabase.from('export_logs').insert()` | Automatisch beim Export |
-| `supabase.storage.from('window-photos-private').upload()` | `POST /intern-api/windows/{id}/photos` |
-| `supabase.storage.from('window-photos-private').remove()` | `DELETE /intern-api/photos/{id}` |
+| `supabase.from('windows').upsert()` | `PUT /intern-api/windows/{id}` |
 | `supabase.rpc('acquire_record_lock')` | `POST /intern-api/windows/{id}/lock` |
 | `supabase.rpc('release_record_lock')` | `DELETE /intern-api/windows/{id}/lock` |
-| `supabase.from('profiles').select()` | Eingebettet in Session-Response |
-
-Realtime-Abonnements (kein direktes Äquivalent):
-
-| Supabase Realtime | Ersatz |
-|-------------------|--------|
-| `windows`-Channel | Polling alle 30 s via `GET /intern-api/windows` |
-| `record_locks`-Channel | Polling eingebettet in Fensterliste |
-| `audit_logs`-Channel | Polling alle 15 s im Detaildatensatz |
-| `photos`-Channel | Neu laden nach Upload/Löschen |
+| `supabase.from('photos').select()` | `GET /intern-api/windows/{id}/photos` |
+| `supabase.storage.upload()` | `POST /intern-api/windows/{id}/photos` |
+| `supabase.storage.remove()` | `DELETE /intern-api/photos/{id}` |
+| Foto-URL direkt | `GET /intern-api/photos/{id}/file` |
+| `supabase.from('audit_logs')` | `GET /intern-api/windows/{id}/audit` |
+| `supabase.from('calculation_parameters')` | `GET /intern-api/calculation-parameters` |
+| Dashboard-Stats | `GET /intern-api/stats/dashboard` |
+| Export | `GET /intern-api/export/csv` / `/report` |
 
 ---
 
-## 6 Migrationsphasen
-
-### Schritt 1: Hosting-Bestätigung (manuell, vor Implementierung)
-
-- PHP-Version ≥ 8.2 im IONOS Control Panel bestätigen
-- MariaDB/MySQL-Datenbank anlegen; Host, Port, Name, User, Passwort notieren
-- Schreibbaren Pfad außerhalb des Webroots für Foto-Uploads ermitteln
-- Ergebnis in `docs/intern/ionos-hosting-nachweis.md` dokumentieren
-
-### Schritt 2: Datenbankschema anlegen
-
-- SQL-Migration `intern-api/migrations/001_initial_schema.sql` auf der neuen Datenbank ausführen
-- Ersten Administrator-Nutzer anlegen (sicheres Verfahren, kein Passwort im Code)
-- Schema durch `SELECT TABLE_NAME FROM information_schema.TABLES` verifizieren
-
-### Schritt 3: PHP-Backend implementieren
-
-- Verzeichnisstruktur unter `sv-netzwerk/public/intern-api/` anlegen
-- `.env.example` bereitstellen; `.env` in `.gitignore` prüfen (bereits vorhanden)
-- Konfigurationsvalidierung implementieren
-- Session-Auth implementieren (Rotation nach Login, Timeout)
-- CSRF-Token in alle POST/PUT/DELETE-Formulare einbinden
-- JSON-API-Endpunkte implementieren (siehe Routen-Tabelle)
-- Upload-Service mit MIME-Prüfung, Pfad-Traversal-Schutz
-- Audit-Log-Trigger als PHP-Funktion (kein DB-Trigger erforderlich)
-
-### Schritt 4: Staged Deployment unter `/intern-next/`
-
-- PHP-Backend unter `/intern-next/intern-api/` bereitstellen
-- Funktionstest ohne Produktionsdaten
-- Alle Smoke-Tests durchführen (siehe Phase 9)
-
-### Schritt 5: Datenmigration aus Supabase
-
-- Aus Supabase-Konsole alle Tabellen als CSV/JSON exportieren
-- Import-Skript `intern-api/migrations/import_from_supabase.php` ausführen
-- Fotos aus Supabase Storage herunterladen und in IONOS-Pfad verschieben
-- Datenkonsistenz prüfen (Fensteranzahl, Foto-Metadaten, Audit-Einträge)
-
-### Schritt 6: Frontend-Umstellung
-
-- `src/lib/internal/supabase.ts` → Stubs oder Entfernung
-- `src/lib/internal/client.ts` → `fetch()`-Aufrufe auf `/intern-api/`
-- `PUBLIC_SUPABASE_URL` und `PUBLIC_SUPABASE_ANON_KEY` aus Build entfernen
-- `@supabase/supabase-js` aus `package.json` entfernen
-
-### Schritt 7: Tests
-
-- PHP-Syntax: `find public/intern-api -name '*.php' -exec php -l {} \;`
-- Authentifizierung: Login, Logout, ungültige Anmeldedaten, Session-Timeout
-- Autorisierung: Rolle `pruefer` kann nicht `/users` abrufen
-- CSRF: POST ohne Token wird mit 403 abgelehnt
-- Upload: ausführbare Datei (.php) wird abgelehnt
-- Pfad-Traversal: `../../../etc/passwd` wird abgelehnt
-- Unauthentifizierter Zugriff: alle API-Endpunkte liefern 401
-
-### Schritt 8: Produktion umschalten
-
-- Backup der aktuellen Supabase-Daten anlegen
-- `.htaccess` anpassen: `/intern/` → neues Backend
-- Deploy-Workflow aktualisieren: Supabase-Secrets entfernen
-- Produktions-Smoke-Tests durchführen
-
----
-
-## 7 Sicherheitskontrollen
+## 6. Sicherheitskonzept
 
 ### Authentifizierung
-
-- Passwörter ausschließlich mit `password_hash($pw, PASSWORD_ARGON2ID)` speichern (PHP 7.3+; bietet besseren Schutz gegen GPU-basierte Angriffe als bcrypt; Fallback: `PASSWORD_BCRYPT` mit `['cost' => 13]`)
-- Verifikation mit `password_verify()`
-- Session-ID nach erfolgreichem Login rotieren: `session_regenerate_id(true)`
-- Session-Cookie-Flags: `HttpOnly`, `Secure`, `SameSite=Lax`
+- PHP-Session-Cookies: `HttpOnly`, `Secure`, `SameSite=Lax`
+- Session-ID-Rotation nach Login
 - Inaktivitäts-Timeout: 480 Minuten (konfigurierbar)
-- Absolutes Timeout: 12 Stunden
-- Fehlermeldung generisch: „E-Mail oder Passwort ungültig" (kein Hinweis auf Existenz)
-- Login-Versuche: nach 5 Fehlversuchen in 15 Minuten → 15 Minuten Sperre
+- Absoluter Session-Timeout: 720 Minuten
+- Argon2ID-Passwort-Hashing (memory_cost=65536, time_cost=4)
+- Login-Fehlversuche: Rate-Limiting nach IP (5 Versuche / 15 Min)
+- Generische Fehlermeldungen (kein Hinweis auf E-Mail-Existenz)
 
-### Autorisierung
+### CSRF-Schutz
+- Synchronized-Token-Pattern
+- Token im `X-CSRF-Token`-Header oder `_csrf`-POST-Feld
+- Timing-sicherer Vergleich via `hash_equals()`
+- Login-Endpunkt ohne CSRF (kein Session-Kontext vor Login)
 
-- Jeder API-Endpunkt prüft Session und Rolle serverseitig
-- Keine Rolle oder Berechtigung aus clientseitigem Code
-- `administrator`-Endpunkte prüfen `role === 'administrator'` in der Middleware
+### Upload-Sicherheit
+- Allowlist-MIME-Typen (JPEG, PNG, WebP, GIF)
+- Serverseitige MIME-Verifikation via `finfo_file()` (nicht Content-Type-Header)
+- Zufällig generierte Speichernamen (kein Bezug zum Originalnamen)
+- `.htaccess: Require all denied` im Upload-Verzeichnis
+- Autorisierungsprüfung vor `readfile()`-Auslieferung
 
-### CSRF
-
-- CSRF-Schutz: **Synchronisiertes Token** (in PHP-Session gespeichert, nicht im Cookie) — sicherer als Double-Submit-Cookie-Pattern, das bei Subdomain-Angriffen anfällig sein kann
-- Token wird bei Session-Start erzeugt (`bin2hex(random_bytes(32))`) und mit der Session invalidiert
-
-### Datei-Uploads
-
-- Erlaubte MIME-Typen: `image/jpeg`, `image/png`, `image/webp`, `image/gif`
-- MIME-Prüfung serverseitig via `finfo_file()` (nicht nur Content-Type-Header)
-- Dateiname: `bin2hex(random_bytes(16)) . '.jpg'` (keine Original-Endung in Speicherung)
-- Originaldateiname wird nur als Metadatum in der Datenbank gespeichert
-- Maximale Dateigröße: 20 MB (konfigurierbar)
-- Speicherort: außerhalb des Webroots, nicht von PHP ausführbar
-- Download nur über autorisierten API-Endpunkt (`readfile()` + Access-Check)
-- Pfad-Traversal-Prüfung: `realpath()` gegen Basisverzeichnis prüfen
-
-### Datenbankzugriff
-
-- Ausschließlich PDO Prepared Statements; kein direktes String-Interpolieren
-- DB-Zugangsdaten nur in `.env` (serverseitig, nie im Build)
-- Datenbankverbindungsfehler werden geloggt, nicht an den Client weitergegeben
-
-### Audit-Log
-
-- Unveränderliche Einträge (kein UPDATE/DELETE auf `audit_logs`)
-- Gespeichert: Timestamp, User-ID, User-Name, Action, Entity-Typ, Entity-ID, IP-Adresse
-- Nicht gespeichert: Passwörter, Session-Tokens
+### Rollen
+| Rolle | Berechtigungen |
+|---|---|
+| `administrator` | Alle Aktionen + Freigabe + Benutzerverwaltung + Admin-Sperren |
+| `pruefer` | Fenster erstellen/bearbeiten, Fotos hochladen |
+| `auswertung` | Nur lesen + exportieren |
 
 ---
 
-## 8 Rollback-Verfahren
+## 7. Migrationsphasen
 
-### Sofortiger Rollback (innerhalb 24 Stunden nach Umstellung)
-
-1. Supabase-Secrets (`PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`) wieder in GitHub-Secrets aktivieren
-2. Deploy-Workflow auf den letzten Supabase-kompatiblen Commit zurücksetzen: `git revert <sha>`
-3. Deploy-Workflow starten; Verifikation über `https://sv-netzwerk.eu/intern/login/`
-4. Neues PHP-Backend deaktivieren: `.htaccess` entfernen oder umbenennen
-
-### Voraussetzungen für Rollback
-
-- Letzter Supabase-kompatibler Git-SHA muss bekannt und erreichbar sein
-- Supabase-Projekt muss während der Migrationsphase aktiv bleiben (nicht löschen)
-- `supabase/migrations/` und `supabase/seed/` bleiben im Repository erhalten
-
-### Datenverlust-Risiko
-
-- Zwischen Umstellung und Rollback erfasste Daten im neuen System gehen verloren
-- Bei mehr als 1 Stunde Produktionsbetrieb des neuen Systems: bidirektionale Datensynchronisation erforderlich
-- Risikomindierung: Migrationsfenster kurz halten, Rollback-Entscheidung innerhalb 2 Stunden treffen
+| Phase | Status | Beschreibung |
+|---|---|---|
+| 1 – Hosting-Verifikation | ✅ Abgeschlossen | PHP 8.4, MySQL 8.0, SSH/SFTP |
+| 2 – Migrationsplan | ✅ Abgeschlossen | Dieses Dokument |
+| 3 – Backend-Implementierung | ✅ Abgeschlossen | PHP-Backend vollständig (22 Dateien, alle Syntax-OK) |
+| 4 – Frontend-Rewrite | 🔄 Ausstehend | `client.ts` Supabase → fetch() |
+| 5 – Exports | 🔄 Ausstehend | CSV und HTML-Report implementiert; PDF via Browser-Druck |
+| 6 – Supabase-Entfernung | ⏳ Warten | Nach Frontend-Rewrite |
+| 7 – Sicherheitscheck | ⏳ Warten | PHP-Syntax ✅; API-Tests folgen |
+| 8 – DB-Installation | ⏳ Warten | Schema fertig, Credentials vom Auftraggeber |
+| 9 – Staged Deployment | ⏳ Warten | `/intern-next/` vor Produktivschaltung |
+| 10 – Produktivschaltung | ⏳ Warten | Nach erfolgreichem Staging |
 
 ---
 
-## 9 Deployment-Verfahren
+## 8. Rollback-Verfahren
 
-### Voraussetzungen
+Da das alte Supabase-Frontend nicht entfernt wird, bis das neue Backend verifiziert ist:
 
-1. IONOS-Hosting-Nachweis dokumentiert (PHP ≥ 8.2, MariaDB)
-2. Neue MariaDB-Datenbank angelegt
-3. `.env`-Datei auf dem Server bereitgestellt (nicht im Repository)
-4. Upload-Verzeichnis außerhalb Webroot angelegt und schreibbar
-5. Schritt 7 (Tests) vollständig bestanden
-
-### Deployment-Schritte
-
-```bash
-# 1. Build (ohne Supabase-Secrets, nach Phase 6)
-cd sv-netzwerk
-npm ci
-npm run build
-
-# 2. Upload via SFTP (wie bestehender Workflow)
-# dist/ nach /sv-netzwerk/ spiegeln
-
-# 3. PHP-Backend ist automatisch via dist/intern-api/ verfügbar
-
-# 4. Verifizieren
-curl -s https://www.sv-netzwerk.eu/intern-api/  # muss 401 zurückgeben
-curl -s https://www.sv-netzwerk.eu/intern/login/ # muss 200 zurückgeben
-```
-
-### deploy.yml-Änderungen
-
-- Schritte „Supabase-Secrets prüfen" und „Supabase-Umgebungsvariablen validieren" entfernen
-- `PUBLIC_SUPABASE_URL` und `PUBLIC_SUPABASE_ANON_KEY` aus `env:` entfernen
-- Harte Prüfung auf Supabase-URL `required_supabase_url` entfernen
-- Neue Prüfung: `/intern-api/auth/session` liefert 401 (kein Anonymous-Zugriff)
-
-### Neue Staging-Prüfung im Workflow
-
-```yaml
-- name: Intern-API verifizieren
-  run: |
-    status="$(curl -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern-api/)"
-    [ "$status" = "401" ] || (echo "::error::intern-api liefert $status statt 401"; exit 1)
-    echo "intern-api: HTTP $status OK"
-```
+1. `.htaccess`-Routing auf `/intern/` zurückstellen (auf Supabase-Frontend)
+2. Das neue `/intern-api/` bleibt unangetastet
+3. Supabase-Umgebungsvariablen sind noch gesetzt (bis Phase 6)
+4. Daten sind in Supabase noch vorhanden (kein Löschvorgang bis Phase 6)
 
 ---
 
-## 10 Offene Risiken
+## 9. Offene Risiken
 
-| Risiko | Wahrscheinlichkeit | Auswirkung | Maßnahme |
-|--------|--------------------|-----------|---------|
-| MariaDB nicht verfügbar im IONOS-Plan | Mittel | Hoch – Architektur-Wechsel nötig | Control Panel sofort prüfen |
-| PHP < 8.2 auf IONOS | Niedrig | Mittel – Code-Anpassungen | PHP-Version prüfen |
-| Kein schreibbarer Pfad außerhalb Webroot | Mittel | Mittel – Uploads im Webroot riskanter | Verzeichnisstruktur via SFTP erkunden |
-| Supabase-Realtime-Ersatz (Polling) unzureichend | Niedrig | Niedrig – Usability-Einschränkung | Polling-Intervall konfigurierbar machen |
-| Datenverlust bei Supabase-Export | Niedrig | Hoch | Vollständigen Export vor Abschaltung durchführen |
-| Parallelbetrieb > 3 Benutzer ohne Lock-Koordination | Niedrig | Mittel – Race Conditions | Record-Locking korrekt implementieren |
-
----
-
-## 11 Ausstehende manuelle Schritte
-
-Folgende Schritte können nicht automatisiert durch GitHub Copilot erfolgen und erfordern direkte Administrator-Handlung:
-
-1. **IONOS Control Panel:** PHP-Version und MariaDB-Verfügbarkeit bestätigen → Ergebnis in `docs/intern/ionos-hosting-nachweis.md` eintragen
-2. **IONOS Control Panel:** MySQL-Datenbank anlegen und Zugangsdaten sicher verwahren
-3. **Supabase-Konsole:** Alle Tabellen als CSV/SQL exportieren, bevor Supabase-Projekt gelöscht wird
-4. **Supabase Storage:** Alle Fotos aus `window-photos-private` herunterladen
-5. **IONOS SFTP:** Upload-Verzeichnis außerhalb des Webroots anlegen (`/uploads/` parallel zu `/sv-netzwerk/`)
-6. **Server:** `.env`-Datei im IONOS-Verzeichnis ablegen (niemals ins Repository committen)
-7. **Initiales Admin-Konto:** Erstes Benutzerkonto nach Inbetriebnahme über sicheres Setup-Script anlegen
+| Risiko | Wahrscheinlichkeit | Maßnahme |
+|---|---|---|
+| Daten-Export aus Supabase unvollständig | Mittel | Vollständigen CSV-Export vor Phase 6 durchführen |
+| Foto-Migration Supabase-Storage | Hoch | Manuelle SFTP-Übertragung erforderlich |
+| lftp-Mirror löscht Uploads | Hoch | `--exclude uploads` in deploy.yml (noch ausstehend) |
+| PHP `upload_max_filesize` zu niedrig | Niedrig | `.htaccess` setzt 25M; prüfen nach erstem Upload |
+| Session-Konflikte bei parallelen Prüfern | Niedrig | Record-Locking implementiert |
 
 ---
 
-*Dieses Dokument enthält keine Passwörter, API-Keys oder Datenbankzugangsdaten.*  
-*Erstellt auf Basis der Repository-Analyse vom 2026-07-25.*
+## 10. Ausstehende manuelle Schritte
+
+1. **Datenbankverbindung:** `.env`-Datei manuell via SFTP auf Server ablegen
+2. **Schema:** `php migrations/install.php --migrate` auf dem Server ausführen
+3. **Admin-Account:** `php migrations/install.php --create-admin` ausführen
+4. **Frontend-Rewrite:** `src/lib/internal/client.ts` von Supabase auf fetch() umschreiben
+5. **deploy.yml:** `--exclude uploads` zu lftp-Mirror hinzufügen
+6. **Supabase-Daten-Export:** Fensterdaten, Fotos und Audit-Log aus Supabase exportieren
+7. **Foto-Migration:** Foto-Dateien aus Supabase Storage nach `uploads/photos/` übertragen
+8. **Staging-Test:** Portal unter `/intern-next/` verifizieren vor Produktivschaltung
+

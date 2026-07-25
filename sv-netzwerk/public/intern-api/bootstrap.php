@@ -11,37 +11,29 @@ spl_autoload_register(static function (string $class): void {
     $baseDir  = __DIR__ . '/';
     $classMap = [
         // Config
-        'SvIntern\\Config\\Config'                       => 'config/config.php',
-        'SvIntern\\Config\\Database'                     => 'config/database.php',
-        // Contracts
-        'SvIntern\\Contracts\\InspectionModuleInterface' => 'contracts/InspectionModuleInterface.php',
-        // Registry
-        'SvIntern\\Registry\\ModuleRegistry'             => 'registry/ModuleRegistry.php',
+        'SvIntern\\Config\\Config'                => 'config/config.php',
+        'SvIntern\\Config\\Database'              => 'config/database.php',
         // Middleware
-        'SvIntern\\Middleware\\Auth'                     => 'middleware/Auth.php',
-        'SvIntern\\Middleware\\Role'                     => 'middleware/Role.php',
-        'SvIntern\\Middleware\\Csrf'                     => 'middleware/Csrf.php',
-        // Core models
-        'SvIntern\\Models\\User'                         => 'models/User.php',
-        'SvIntern\\Models\\Inspection'                   => 'models/Inspection.php',
-        'SvIntern\\Models\\Photo'                        => 'models/Photo.php',
-        'SvIntern\\Models\\AuditLog'                     => 'models/AuditLog.php',
-        // Legacy window model (kept for migration compatibility)
-        'SvIntern\\Models\\Window'                       => 'models/Window.php',
+        'SvIntern\\Middleware\\Auth'              => 'middleware/Auth.php',
+        'SvIntern\\Middleware\\Role'              => 'middleware/Role.php',
+        'SvIntern\\Middleware\\Csrf'              => 'middleware/Csrf.php',
+        // Models
+        'SvIntern\\Models\\User'                  => 'models/User.php',
+        'SvIntern\\Models\\Window'                => 'models/Window.php',
+        'SvIntern\\Models\\Photo'                 => 'models/Photo.php',
+        'SvIntern\\Models\\AuditLog'              => 'models/AuditLog.php',
         // Services
-        'SvIntern\\Services\\AuthService'                => 'services/AuthService.php',
-        'SvIntern\\Services\\UploadService'              => 'services/UploadService.php',
-        'SvIntern\\Services\\ExportService'              => 'services/ExportService.php',
-        // Core controllers
-        'SvIntern\\Controllers\\AuthController'          => 'controllers/AuthController.php',
-        'SvIntern\\Controllers\\PhotoController'         => 'controllers/PhotoController.php',
-        'SvIntern\\Controllers\\ExportController'        => 'controllers/ExportController.php',
-        'SvIntern\\Controllers\\UserController'          => 'controllers/UserController.php',
-        'SvIntern\\Controllers\\StatsController'         => 'controllers/StatsController.php',
-        'SvIntern\\Controllers\\AuditController'         => 'controllers/AuditController.php',
-        // Module: windows
-        'SvIntern\\Modules\\Windows\\WindowModule'       => 'modules/windows/WindowModule.php',
-        'SvIntern\\Modules\\Windows\\WindowRecord'       => 'modules/windows/WindowRecord.php',
+        'SvIntern\\Services\\AuthService'         => 'services/AuthService.php',
+        'SvIntern\\Services\\UploadService'       => 'services/UploadService.php',
+        'SvIntern\\Services\\ExportService'       => 'services/ExportService.php',
+        // Controllers
+        'SvIntern\\Controllers\\AuthController'   => 'controllers/AuthController.php',
+        'SvIntern\\Controllers\\WindowController' => 'controllers/WindowController.php',
+        'SvIntern\\Controllers\\PhotoController'  => 'controllers/PhotoController.php',
+        'SvIntern\\Controllers\\ExportController' => 'controllers/ExportController.php',
+        'SvIntern\\Controllers\\UserController'   => 'controllers/UserController.php',
+        'SvIntern\\Controllers\\StatsController'  => 'controllers/StatsController.php',
+        'SvIntern\\Controllers\\AuditController'  => 'controllers/AuditController.php',
     ];
 
     if (isset($classMap[$class])) {

@@ -1,5 +1,374 @@
 -- =============================================================================
--- SVOS Inspection Platform – Initiales Datenbankschema
+-- Fensterbeschlagspruefung BMVg Bonn – Datenbankschema
+-- Version: 001
+-- Ziel-DBMS: MySQL 8.0+
+-- Zeichensatz: utf8mb4, Kollation: utf8mb4_unicode_ci
+-- Zeitzone: UTC (Verbindung setzt time_zone = '+00:00')
+--
+-- Tabellen:
+--   users                Benutzer und Rollen
+--   login_attempts       Rate-Limiting fuer Login-Versuche
+--   password_reset_tokens Passwort-Reset-Workflow
+--   projects             Pruefprojekte
+--   buildings            Gebaeude innerhalb eines Projekts
+--   building_sections    Gebaeudeteile / Abschnitte
+--   floors               Etagen
+--   windows              Fenster-Datensaetze mit Pruef- und Befunddaten
+--   record_locks         Datensatz-Sperren (verhindert gleichzeitige Bearbeitung)
+--   photos               Foto-Dokumentation je Fenster
+--   documents            Sonstige Anhaenge (Messberichte, Skizzen)
+--   audit_logs           Unveraenderliches Pruefprotokoll aller Aktionen
+--   export_logs          Protokoll durchgefuehrter Datenexporte
+--   calculation_parameters Technische Berechnungsparameter
+-- =============================================================================
+
+SET NAMES utf8mb4;
+SET time_zone = '+00:00';
+SET foreign_key_checks = 0;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Benutzer
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS users (
+    id            VARCHAR(36)  NOT NULL,
+    email         VARCHAR(255) NOT NULL,
+    full_name     VARCHAR(255) NOT NULL,
+    role          VARCHAR(50)  NOT NULL DEFAULT 'pruefer'
+                  COMMENT 'administrator | pruefer | auswertung',
+    password_hash VARCHAR(255) NOT NULL,
+    is_active     TINYINT(1)   NOT NULL DEFAULT 1,
+    created_by    VARCHAR(36),
+    created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_users_email (email),
+    INDEX idx_users_role   (role),
+    INDEX idx_users_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Login-Versuche (Rate-Limiting / Sperrschutz)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS login_attempts (
+    id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    email      VARCHAR(255)    NOT NULL,
+    ip_address VARCHAR(45)     NOT NULL,
+    success    TINYINT(1)      NOT NULL DEFAULT 0,
+    created_at DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_login_ip_time (ip_address, created_at),
+    INDEX idx_login_email   (email, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Passwort-Reset-Tokens
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id         VARCHAR(36)  NOT NULL,
+    user_id    VARCHAR(36)  NOT NULL,
+    token_hash VARCHAR(255) NOT NULL COMMENT 'sha256 des Tokens, nie Klartext',
+    expires_at DATETIME     NOT NULL,
+    used_at    DATETIME,
+    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_prt_user    (user_id),
+    INDEX idx_prt_expires (expires_at),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Projekte
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS projects (
+    id          VARCHAR(36)  NOT NULL,
+    name        VARCHAR(255) NOT NULL,
+    description TEXT,
+    location    VARCHAR(255),
+    client_name VARCHAR(255),
+    is_active   TINYINT(1)   NOT NULL DEFAULT 1,
+    created_by  VARCHAR(36),
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_projects_active (is_active),
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Gebaeude
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS buildings (
+    id          VARCHAR(36)  NOT NULL,
+    project_id  VARCHAR(36)  NOT NULL,
+    label       VARCHAR(255) NOT NULL,
+    code        VARCHAR(50),
+    description TEXT,
+    sort_order  SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_buildings_project (project_id),
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Gebaeudeteile / Abschnitte
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS building_sections (
+    id          VARCHAR(36)  NOT NULL,
+    building_id VARCHAR(36)  NOT NULL,
+    label       VARCHAR(255) NOT NULL,
+    code        VARCHAR(50),
+    sort_order  SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_sections_building (building_id),
+    FOREIGN KEY (building_id) REFERENCES buildings(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Etagen
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS floors (
+    id           VARCHAR(36)  NOT NULL,
+    building_id  VARCHAR(36)  NOT NULL,
+    label        VARCHAR(255) NOT NULL,
+    floor_number INT,
+    sort_order   SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_floors_building (building_id),
+    FOREIGN KEY (building_id) REFERENCES buildings(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Fenster-Datensaetze (Kernentitaet)
+--
+-- Enthaelt sowohl Standortinformationen als auch Pruef- und Befunddaten.
+-- Freitext-Labels (building_label usw.) spiegeln den Gebaeudezustand
+-- zum Pruefzeitpunkt wider und sind unveraenderlich nach Abschluss.
+-- form_data: alle ausfuellbaren Formularfelder als JSON
+-- calculated_data: berechnete Werte (Fluegelmasse, Gewichte) als JSON
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS windows (
+    id                           VARCHAR(36)       NOT NULL,
+    project_id                   VARCHAR(36)       NOT NULL,
+    record_id                    VARCHAR(50)       NOT NULL COMMENT 'Anzeige-Kennung, z. B. BMVG-XXXXXXXX',
+    inspection_number            INT UNSIGNED               COMMENT 'Pruefnummer gemaess Bestandsliste',
+    window_number                VARCHAR(50)       NOT NULL COMMENT 'Fensternummer im Gebaeude',
+    building_label               VARCHAR(255),
+    section_label                VARCHAR(255)               COMMENT 'Gebaeudeteil',
+    floor_label                  VARCHAR(255),
+    room_number                  VARCHAR(50),
+    room_label                   VARCHAR(255),
+    accessibility_status         VARCHAR(50)       NOT NULL DEFAULT 'zugaenglich'
+                                 COMMENT 'zugaenglich | bedingt zugaenglich | nicht zugaenglich',
+    status                       VARCHAR(50)       NOT NULL DEFAULT 'nicht begonnen'
+                                 COMMENT 'nicht begonnen | in Bearbeitung | Pruefung unterbrochen | Pruefung abgeschlossen | fachlich geprueft | freigegeben',
+    overall_rating               VARCHAR(50)                COMMENT 'Gesamtbewertung: gut | maengelhaft | erheblich maengelhaft | unzulaessig',
+    priority                     VARCHAR(20)                COMMENT 'normal | hoch | dringend',
+    has_defect                   TINYINT(1)        NOT NULL DEFAULT 0,
+    danger_immediate             TINYINT(1)        NOT NULL DEFAULT 0 COMMENT 'Akute Gefahr – sofortiger Handlungsbedarf',
+    special_inspection_required  TINYINT(1)        NOT NULL DEFAULT 0,
+    urgent_action_required       TINYINT(1)        NOT NULL DEFAULT 0,
+    progress_percent             TINYINT UNSIGNED  NOT NULL DEFAULT 0,
+    assigned_to                  VARCHAR(36)                COMMENT 'Pruefer (users.id)',
+    assigned_name                VARCHAR(255)               COMMENT 'Pruefername (denormalisiert fuer Historizitaet)',
+    release_reason               TEXT                       COMMENT 'Begruendung fuer Freigabe / Abschluss',
+    form_data                    JSON                       COMMENT 'Alle Formularfelder (Beschlag, Verglasung, Befunde…)',
+    calculated_data              JSON                       COMMENT 'Berechnete Werte (Fluegelmasse, Gewicht, Zulassung…)',
+    inspection_date              DATE                       COMMENT 'Datum der Vor-Ort-Pruefung',
+    last_edited_at               DATETIME,
+    completed_at                 DATETIME,
+    version                      INT UNSIGNED      NOT NULL DEFAULT 0 COMMENT 'Optimistisches Locking',
+    created_by                   VARCHAR(36),
+    deleted_at                   DATETIME                   COMMENT 'Soft-Delete',
+    created_at                   DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at                   DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_windows_project    (project_id),
+    INDEX idx_windows_status     (status),
+    INDEX idx_windows_assigned   (assigned_to),
+    INDEX idx_windows_deleted    (deleted_at),
+    INDEX idx_windows_insp_num   (inspection_number),
+    INDEX idx_windows_win_num    (window_number),
+    FOREIGN KEY (project_id)   REFERENCES projects(id),
+    FOREIGN KEY (assigned_to)  REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Datensatz-Sperren (verhindert gleichzeitige Bearbeitung)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS record_locks (
+    id          VARCHAR(36)  NOT NULL,
+    window_id   VARCHAR(36)  NOT NULL,
+    owner_id    VARCHAR(36)  NOT NULL,
+    owner_name  VARCHAR(255) NOT NULL,
+    expires_at  DATETIME     NOT NULL,
+    released_at DATETIME,
+    released_by VARCHAR(36),
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_locks_window (window_id),
+    INDEX idx_locks_owner   (owner_id),
+    INDEX idx_locks_expires (expires_at),
+    FOREIGN KEY (window_id) REFERENCES windows(id) ON DELETE CASCADE,
+    FOREIGN KEY (owner_id)  REFERENCES users(id)   ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Foto-Dokumentation
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS photos (
+    id             VARCHAR(36)  NOT NULL,
+    window_id      VARCHAR(36)  NOT NULL,
+    category       VARCHAR(100) NOT NULL DEFAULT 'sonstiges'
+                   COMMENT 'Uebersicht | Detail | Befund | Typenschild | sonstiges',
+    caption        TEXT,
+    file_name      VARCHAR(255) NOT NULL COMMENT 'Original-Dateiname (nur Metadatum)',
+    storage_path   VARCHAR(255) NOT NULL COMMENT 'Interner Speicherpfad (zufaellig generiert)',
+    taken_at       DATETIME,
+    inspector_id   VARCHAR(36),
+    inspector_name VARCHAR(255),
+    deleted_at     DATETIME,
+    deleted_by     VARCHAR(36),
+    created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_photos_window  (window_id),
+    INDEX idx_photos_deleted (deleted_at),
+    FOREIGN KEY (window_id)    REFERENCES windows(id) ON DELETE CASCADE,
+    FOREIGN KEY (inspector_id) REFERENCES users(id)   ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Sonstige Dokumente / Anhaenge
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS documents (
+    id             VARCHAR(36)  NOT NULL,
+    window_id      VARCHAR(36)  NOT NULL,
+    category       VARCHAR(100) NOT NULL DEFAULT 'sonstiges',
+    description    TEXT,
+    file_name      VARCHAR(255) NOT NULL,
+    storage_path   VARCHAR(255) NOT NULL,
+    mime_type      VARCHAR(100) NOT NULL,
+    file_size      INT UNSIGNED NOT NULL DEFAULT 0,
+    uploader_id    VARCHAR(36),
+    uploader_name  VARCHAR(255),
+    deleted_at     DATETIME,
+    deleted_by     VARCHAR(36),
+    created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_docs_window (window_id),
+    FOREIGN KEY (window_id)   REFERENCES windows(id) ON DELETE CASCADE,
+    FOREIGN KEY (uploader_id) REFERENCES users(id)   ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Audit-Log (unveraenderlich – kein UPDATE oder DELETE erlaubt)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id          VARCHAR(36)  NOT NULL,
+    actor_id    VARCHAR(36),
+    actor_name  VARCHAR(255) NOT NULL,
+    action_type VARCHAR(100) NOT NULL
+                COMMENT 'login | logout | failed_login | create | update | delete | upload | export | …',
+    entity_type VARCHAR(100) NOT NULL,
+    entity_id   VARCHAR(36),
+    window_id   VARCHAR(36)           COMMENT 'Optionaler Bezug zu einem Fenster-Datensatz',
+    field_name  VARCHAR(100),
+    old_value   TEXT,
+    new_value   TEXT,
+    reason      TEXT,
+    ip_address  VARCHAR(45),
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_audit_actor   (actor_id),
+    INDEX idx_audit_window  (window_id),
+    INDEX idx_audit_type    (action_type),
+    INDEX idx_audit_created (created_at)
+    -- Kein FK auf windows: Log bleibt auch nach Soft-Delete erhalten
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Export-Log
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS export_logs (
+    id          VARCHAR(36)  NOT NULL,
+    project_id  VARCHAR(36),
+    export_type VARCHAR(50)  NOT NULL COMMENT 'csv | html_report | pdf',
+    filter_id   VARCHAR(100),
+    row_count   INT UNSIGNED NOT NULL DEFAULT 0,
+    created_by  VARCHAR(36),
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_exports_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Berechnungsparameter (technische Grenzwerte und Materialkennwerte)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS calculation_parameters (
+    id              VARCHAR(36)  NOT NULL,
+    project_id      VARCHAR(36)           COMMENT 'NULL = global, sonst projektspezifisch',
+    parameter_key   VARCHAR(100) NOT NULL,
+    parameter_value VARCHAR(255) NOT NULL,
+    unit            VARCHAR(50),
+    description     TEXT,
+    is_active       TINYINT(1)   NOT NULL DEFAULT 1,
+    created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_params_project_key (project_id, parameter_key),
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================================================
+-- SEED-DATEN
+-- =============================================================================
+
+-- Standardprojekt: Fensterbeschlagspruefung BMVg Bonn
+INSERT IGNORE INTO projects (id, name, description, location, client_name)
+VALUES (
+    '11111111-1111-4111-8111-111111111111',
+    'Fensterbeschlagspruefung BMVg Bonn',
+    '1. Dienstsitz des Bundesministeriums der Verteidigung',
+    'Fontainengraben 150, 53123 Bonn',
+    'Bundesministerium der Verteidigung'
+);
+
+-- Berechnungsparameter (Beispielwerte – vor Inbetriebnahme mit Auftraggeber pruefen)
+INSERT IGNORE INTO calculation_parameters
+    (id, project_id, parameter_key, parameter_value, unit, description)
+VALUES
+    ('cp000001-0000-4000-8000-000000000001', NULL,
+     'max_fluegel_gewicht_standard', '80', 'kg',
+     'Maximales Fluegelgewicht fuer Standardbeschlag'),
+    ('cp000002-0000-4000-8000-000000000001', NULL,
+     'max_fluegel_gewicht_schwer', '130', 'kg',
+     'Maximales Fluegelgewicht fuer Schwerbeschlag'),
+    ('cp000003-0000-4000-8000-000000000001', NULL,
+     'dichte_glas_standard', '2.5', 'kg/dm²',
+     'Spezifisches Gewicht Standardverglasung'),
+    ('cp000004-0000-4000-8000-000000000001', NULL,
+     'dichte_glas_dreischeibig', '3.0', 'kg/dm²',
+     'Spezifisches Gewicht Dreischeibenverglasung'),
+    ('cp000005-0000-4000-8000-000000000001', NULL,
+     'dichte_glas_esg', '2.5', 'kg/dm²',
+     'Spezifisches Gewicht ESG-Verglasung');
+
+SET foreign_key_checks = 1;
+
 -- Version: 001
 -- Ziel-DBMS: MySQL 8.0 / MariaDB 10.6+
 -- Zeichensatz: utf8mb4, Kollation: utf8mb4_unicode_ci

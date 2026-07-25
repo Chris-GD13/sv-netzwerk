@@ -3,44 +3,54 @@ declare(strict_types=1);
 
 namespace SvIntern\Controllers;
 
-use SvIntern\Registry\ModuleRegistry;
+use SvIntern\Models\Window;
 
 final class StatsController
 {
-    private const DEFAULT_PROJECT_ID = '11111111-1111-4111-8111-111111111111';
+    private const PROJECT_ID = '11111111-1111-4111-8111-111111111111';
 
-    /**
-     * GET /intern-api/stats/dashboard
-     * Aggregiert Statistiken aller registrierten Module.
-     */
+    /** GET /intern-api/stats/dashboard */
     public static function dashboard(array $session, \PDO $db): never
     {
-        $registry = ModuleRegistry::getInstance();
-        $modules  = $registry->all();
+        $model   = new Window($db);
+        $records = $model->listSummaries(self::PROJECT_ID);
+        $today   = date('Y-m-d');
 
-        $aggregated = [
-            'total'             => 0,
-            'notStarted'        => 0,
-            'inProgress'        => 0,
-            'completed'         => 0,
-            'withDefect'        => 0,
-            'urgent'            => 0,
-            'specialInspection' => 0,
-            'inaccessible'      => 0,
-            'touchedToday'      => 0,
-        ];
-
-        $byModule = [];
-
-        foreach ($modules as $module) {
-            $stats = $module->getDashboardStats(self::DEFAULT_PROJECT_ID, $db);
-            $byModule[$module->getSlug()] = array_merge(['name' => $module->getName()], $stats);
-
-            foreach (array_keys($aggregated) as $key) {
-                $aggregated[$key] += (int) ($stats[$key] ?? 0);
+        $byInspector = [];
+        foreach ($records as $r) {
+            $key  = (string) ($r['assigned_to'] ?? 'unassigned');
+            $name = (string) ($r['assigned_name'] ?? 'Nicht zugewiesen');
+            if (!isset($byInspector[$key])) {
+                $byInspector[$key] = ['id' => $key, 'name' => $name, 'total' => 0, 'completed' => 0];
+            }
+            $byInspector[$key]['total']++;
+            if (in_array($r['status'] ?? '', ['Pruefung abgeschlossen', 'fachlich geprueft', 'freigegeben'], true)) {
+                $byInspector[$key]['completed']++;
             }
         }
 
-        \jsonResponse(['data' => array_merge($aggregated, ['byModule' => $byModule])]);
+        $sorted = $records;
+        usort($sorted, fn($a, $b) => strcmp((string) ($b['updated_at'] ?? ''), (string) ($a['updated_at'] ?? '')));
+        $recent = array_slice($sorted, 0, 8);
+
+        \jsonResponse(['data' => [
+            'total'             => count($records),
+            'notStarted'        => count(array_filter($records, fn($r) => $r['status'] === 'nicht begonnen')),
+            'inProgress'        => count(array_filter($records, fn($r) => in_array($r['status'], ['in Bearbeitung', 'Pruefung unterbrochen'], true))),
+            'completed'         => count(array_filter($records, fn($r) => in_array($r['status'], ['Pruefung abgeschlossen', 'fachlich geprueft', 'freigegeben'], true))),
+            'withDefect'        => count(array_filter($records, fn($r) => (bool) $r['has_defect'])),
+            'urgent'            => count(array_filter($records, fn($r) => (bool) $r['urgent_action_required'])),
+            'specialInspection' => count(array_filter($records, fn($r) => (bool) $r['special_inspection_required'])),
+            'inaccessible'      => count(array_filter($records, fn($r) => $r['accessibility_status'] === 'nicht zugaenglich')),
+            'touchedToday'      => count(array_filter($records, fn($r) => str_starts_with((string) ($r['updated_at'] ?? ''), $today))),
+            'byInspector'       => array_values($byInspector),
+            'recentChanges'     => array_map(fn($r) => [
+                'id'        => $r['id'],
+                'label'     => $r['window_number'] ?: $r['record_id'],
+                'updatedAt' => $r['updated_at'],
+                'user'      => $r['assigned_name'],
+                'status'    => $r['status'],
+            ], $recent),
+        ]]);
     }
 }
