@@ -116,7 +116,7 @@ function handleCreateAdmin(): never
     $name     = trim((string) ($body['full_name'] ?? ''));
     $password = (string) ($body['password'] ?? '');
 
-    if ($email === '' || $name === '' || strlen($password) < 10) {
+    if ($email === '' || $name === '' || mb_strlen($password, 'UTF-8') < 10) {
         apiError(400, 'E-Mail, vollständiger Name und Passwort (min. 10 Zeichen) erforderlich.');
     }
 

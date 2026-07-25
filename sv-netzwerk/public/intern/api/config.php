@@ -120,10 +120,10 @@ function requestBody(): array
     return is_array($decoded) ? $decoded : [];
 }
 
-/** Gibt die aktuelle UTC-Zeit als ISO-8601-String zurück. */
+/** Gibt die aktuelle UTC-Zeit als MySQL-DATETIME-String zurück. */
 function nowUtc(): string
 {
-    return (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d\TH:i:s\Z');
+    return (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d H:i:s');
 }
 
 /** Setzt gemeinsame HTTP-Header (CORS nur für gleiche Herkunft, CSP). */

@@ -50,8 +50,8 @@ function handleLogin(): never
     }
 
     if (!$user || !$user['is_active'] || !password_verify($password, $user['password_hash'])) {
-        // Konstante Antwortzeit gegen Timing-Angriffe
-        password_verify('dummy', '$2y$10$invalidhashpadding000000000000000000000000000000000000000');
+        // Konstante Antwortzeit gegen Timing-Angriffe (gültiger bcrypt-Hash eines Dummy-Passworts)
+        password_verify('dummy', '$2y$12$invalidhashpadding000000000000000000000000000zAIlmfxXfhW');
         apiError(401, 'Anmeldung fehlgeschlagen.');
     }
 
@@ -141,7 +141,8 @@ function handleReset(): never
         $name    = $user['full_name'];
         $subject = 'Passwort zurücksetzen – ' . APP_NAME;
         $body    = "Hallo $name,\n\nbitte verwenden Sie folgenden Link, um Ihr Passwort zurückzusetzen:\n\n$link\n\nDer Link ist zwei Stunden gültig.\n\nFalls Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail.\n";
-        $headers = "From: noreply@sv-netzwerk.eu\r\nContent-Type: text/plain; charset=utf-8\r\n";
+        $from    = env('MAIL_FROM', 'noreply@sv-netzwerk.eu');
+        $headers = "From: $from\r\nContent-Type: text/plain; charset=utf-8\r\n";
 
         @mail($email, $subject, $body, $headers);
     }

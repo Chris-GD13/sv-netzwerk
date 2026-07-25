@@ -268,11 +268,3 @@ export function onAuthChange(callback: AuthCallback): () => void {
   startAuthPolling();
   return () => authCallbacks.delete(callback);
 }
-
-/** Gibt zurück, ob die PHP-API konfiguriert ist (DB_HOST + DB_NAME in .env). */
-export function hasApiConfig(): boolean {
-  // Die PHP-API liefert 503 wenn .env nicht konfiguriert ist.
-  // Wir nehmen an, dass die API vorhanden ist, und behandeln 503-Antworten
-  // als Konfigurationsfehler in den einzelnen Funktionen.
-  return true;
-}
