@@ -6,6 +6,7 @@
  */
 
 import type {
+  AdminUser,
   AuditLogEntry,
   CalculationParameterMap,
   LockResult,
@@ -267,4 +268,41 @@ export function onAuthChange(callback: AuthCallback): () => void {
   authCallbacks.add(callback);
   startAuthPolling();
   return () => authCallbacks.delete(callback);
+}
+
+// ── Benutzerverwaltung (nur Administratoren) ────────────────────────────────
+
+export async function apiListUsers(): Promise<AdminUser[]> {
+  const { data } = await apiGet<AdminUser[]>('/users.php');
+  return data ?? [];
+}
+
+export async function apiCreateUser(payload: {
+  email: string;
+  full_name: string;
+  role: PortalRole;
+  password: string;
+}): Promise<{ data: AdminUser | null; error: Error | null }> {
+  return apiPost<AdminUser>('/users.php', payload);
+}
+
+export async function apiUpdateUser(
+  id: number,
+  payload: { full_name: string; role: PortalRole; is_active: boolean },
+): Promise<{ error: Error | null }> {
+  const { error } = await apiPut(`/users.php?id=${id}`, payload);
+  return { error };
+}
+
+export async function apiSetUserPassword(
+  id: number,
+  password: string,
+): Promise<{ error: Error | null }> {
+  const { error } = await apiPost(`/users.php?action=set_password&id=${id}`, { password });
+  return { error };
+}
+
+export async function apiDeactivateUser(id: number): Promise<{ error: Error | null }> {
+  const { error } = await apiDelete(`/users.php?id=${id}`);
+  return { error };
 }

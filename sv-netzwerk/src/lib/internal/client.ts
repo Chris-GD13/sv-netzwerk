@@ -26,10 +26,16 @@ import {
   apiDeletePhoto,
   apiGetCalculationParameters,
   apiLogExport,
+  apiListUsers,
+  apiCreateUser,
+  apiUpdateUser,
+  apiSetUserPassword,
+  apiDeactivateUser,
   loadApiUser,
   onAuthChange,
 } from './php-api';
 import type {
+  AdminUser,
   AuditLogEntry,
   DashboardStats,
   LockResult,
@@ -141,6 +147,9 @@ async function renderRoute(context: AppContext) {
       break;
     case 'export':
       await renderExport(context);
+      break;
+    case 'admin':
+      await renderAdmin(context);
       break;
   }
 }
@@ -554,6 +563,240 @@ async function renderExport(context: AppContext) {
   });
 }
 
+async function renderAdmin(context: AppContext) {
+  if (context.user?.profile.role !== 'administrator') {
+    context.root.innerHTML = errorAlert('Nur Administratoren können die Benutzerverwaltung aufrufen.');
+    return;
+  }
+
+  context.root.innerHTML = `
+    ${renderHeader(context, 'Benutzerverwaltung', 'Benutzerkonten anlegen, bearbeiten und deaktivieren.')}
+    <div id="admin-message"></div>
+    <div class="intern-card">
+      <h2>Neuen Benutzer anlegen</h2>
+      <form id="create-user-form" class="intern-form-grid" novalidate>
+        <div class="intern-field">
+          <label for="new-email">E-Mail</label>
+          <input id="new-email" name="email" type="email" required autocomplete="off" />
+        </div>
+        <div class="intern-field">
+          <label for="new-name">Vollständiger Name</label>
+          <input id="new-name" name="full_name" type="text" required autocomplete="off" />
+        </div>
+        <div class="intern-field">
+          <label for="new-role">Rolle</label>
+          <select id="new-role" name="role">
+            <option value="pruefer">Prüfer</option>
+            <option value="auswertung">Auswertung</option>
+            <option value="administrator">Administrator</option>
+          </select>
+        </div>
+        <div class="intern-field">
+          <label for="new-password">Passwort (mind. 8 Zeichen)</label>
+          <input id="new-password" name="password" type="password" minlength="8" required autocomplete="new-password" />
+        </div>
+        <div class="intern-actions intern-field--full">
+          <button class="sv-button sv-button-primary" type="submit">Benutzer anlegen</button>
+        </div>
+      </form>
+    </div>
+    <div class="intern-card">
+      <h2>Bestehende Benutzer</h2>
+      <div id="user-list">Lade Benutzerliste…</div>
+    </div>
+  `;
+
+  const msgEl = context.root.querySelector<HTMLElement>('#admin-message');
+  const listEl = context.root.querySelector<HTMLElement>('#user-list');
+
+  const loadUsers = async () => {
+    if (listEl) listEl.innerHTML = 'Lade…';
+    const users = await apiListUsers();
+    if (listEl) listEl.innerHTML = renderUserList(users, context.user!);
+    bindUserActions(context, users, loadUsers, msgEl);
+  };
+
+  await loadUsers();
+
+  const createForm = context.root.querySelector<HTMLFormElement>('#create-user-form');
+  createForm?.addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+    const data = new FormData(createForm);
+    const email = String(data.get('email') ?? '').trim();
+    const fullName = String(data.get('full_name') ?? '').trim();
+    const role = String(data.get('role') ?? 'pruefer') as PortalRole;
+    const password = String(data.get('password') ?? '');
+    if (msgEl) msgEl.innerHTML = infoAlert('Benutzer wird angelegt…');
+    const { error } = await apiCreateUser({ email, full_name: fullName, role, password });
+    if (error) {
+      if (msgEl) msgEl.innerHTML = errorAlert(`Fehler: ${error.message}`);
+    } else {
+      if (msgEl) msgEl.innerHTML = successAlert(`Benutzer ${email} erfolgreich angelegt.`);
+      createForm.reset();
+      await loadUsers();
+    }
+  });
+}
+
+function renderUserList(users: AdminUser[], currentUser: PortalUser): string {
+  if (!users.length) return '<div class="intern-empty">Keine Benutzer vorhanden.</div>';
+  return `
+    <table class="intern-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>E-Mail</th>
+          <th>Rolle</th>
+          <th>Status</th>
+          <th>Letzter Login</th>
+          <th>Aktionen</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${users.map((u) => {
+          const isSelf = String(u.id) === currentUser.id;
+          const statusBadge = u.is_active
+            ? '<span class="intern-badge intern-badge--ok">Aktiv</span>'
+            : '<span class="intern-badge intern-badge--warn">Deaktiviert</span>';
+          return `
+            <tr data-user-id="${u.id}">
+              <td><strong>${escapeHtml(u.full_name)}</strong></td>
+              <td>${escapeHtml(u.email)}</td>
+              <td>${escapeHtml(u.role)}</td>
+              <td>${statusBadge}</td>
+              <td class="intern-meta">${u.last_login_at ? formatDateTime(u.last_login_at) : '—'}</td>
+              <td class="intern-actions intern-actions--inline">
+                <button class="sv-button sv-button-secondary" type="button" data-edit-user="${u.id}">Bearbeiten</button>
+                <button class="sv-button sv-button-secondary" type="button" data-pw-user="${u.id}">Passwort</button>
+                ${!isSelf && u.is_active ? `<button class="sv-button sv-button-secondary" type="button" data-deactivate-user="${u.id}">Deaktivieren</button>` : ''}
+              </td>
+            </tr>
+            <tr id="edit-row-${u.id}" class="intern-edit-row" hidden></tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function bindUserActions(
+  context: AppContext,
+  users: AdminUser[],
+  reload: () => Promise<void>,
+  msgEl: HTMLElement | null,
+) {
+  // Edit user
+  context.root.querySelectorAll<HTMLElement>('[data-edit-user]').forEach((btn) => {
+    btn.onclick = () => {
+      const id = Number(btn.dataset.editUser);
+      const user = users.find((u) => u.id === id);
+      if (!user) return;
+      const row = context.root.querySelector<HTMLTableRowElement>(`#edit-row-${id}`);
+      if (!row) return;
+      if (!row.hidden) { row.hidden = true; return; }
+      row.hidden = false;
+      row.innerHTML = `
+        <td colspan="6">
+          <form class="intern-form-grid intern-edit-form" data-save-user="${id}">
+            <div class="intern-field">
+              <label>Name</label>
+              <input name="full_name" value="${escapeHtml(user.full_name)}" required />
+            </div>
+            <div class="intern-field">
+              <label>Rolle</label>
+              <select name="role">
+                <option value="pruefer" ${user.role === 'pruefer' ? 'selected' : ''}>Prüfer</option>
+                <option value="auswertung" ${user.role === 'auswertung' ? 'selected' : ''}>Auswertung</option>
+                <option value="administrator" ${user.role === 'administrator' ? 'selected' : ''}>Administrator</option>
+              </select>
+            </div>
+            <div class="intern-field">
+              <label>Status</label>
+              <select name="is_active">
+                <option value="1" ${user.is_active ? 'selected' : ''}>Aktiv</option>
+                <option value="0" ${!user.is_active ? 'selected' : ''}>Deaktiviert</option>
+              </select>
+            </div>
+            <div class="intern-actions intern-field--full">
+              <button class="sv-button sv-button-primary" type="submit">Speichern</button>
+            </div>
+          </form>
+        </td>
+      `;
+      row.querySelector<HTMLFormElement>(`[data-save-user="${id}"]`)?.addEventListener('submit', async (evt) => {
+        evt.preventDefault();
+        const form = evt.currentTarget as HTMLFormElement;
+        const fd = new FormData(form);
+        const payload = {
+          full_name: String(fd.get('full_name') ?? '').trim(),
+          role: String(fd.get('role') ?? 'pruefer') as PortalRole,
+          is_active: fd.get('is_active') === '1',
+        };
+        const { error } = await apiUpdateUser(id, payload);
+        if (error) {
+          if (msgEl) msgEl.innerHTML = errorAlert(`Fehler: ${error.message}`);
+        } else {
+          if (msgEl) msgEl.innerHTML = successAlert('Benutzer aktualisiert.');
+          await reload();
+        }
+      });
+    };
+  });
+
+  // Set password
+  context.root.querySelectorAll<HTMLElement>('[data-pw-user]').forEach((btn) => {
+    btn.onclick = () => {
+      const id = Number(btn.dataset.pwUser);
+      const row = context.root.querySelector<HTMLTableRowElement>(`#edit-row-${id}`);
+      if (!row) return;
+      if (!row.hidden && row.querySelector('[data-pw-form]')) { row.hidden = true; return; }
+      row.hidden = false;
+      row.innerHTML = `
+        <td colspan="6">
+          <form class="intern-form-grid intern-edit-form" data-pw-form="${id}">
+            <div class="intern-field">
+              <label>Neues Passwort (mind. 8 Zeichen)</label>
+              <input name="password" type="password" minlength="8" required autocomplete="new-password" />
+            </div>
+            <div class="intern-actions intern-field--full">
+              <button class="sv-button sv-button-primary" type="submit">Passwort setzen</button>
+            </div>
+          </form>
+        </td>
+      `;
+      row.querySelector<HTMLFormElement>(`[data-pw-form="${id}"]`)?.addEventListener('submit', async (evt) => {
+        evt.preventDefault();
+        const form = evt.currentTarget as HTMLFormElement;
+        const password = String(new FormData(form).get('password') ?? '');
+        const { error } = await apiSetUserPassword(id, password);
+        if (error) {
+          if (msgEl) msgEl.innerHTML = errorAlert(`Fehler: ${error.message}`);
+        } else {
+          if (msgEl) msgEl.innerHTML = successAlert('Passwort wurde geändert.');
+          row.hidden = true;
+        }
+      });
+    };
+  });
+
+  // Deactivate
+  context.root.querySelectorAll<HTMLElement>('[data-deactivate-user]').forEach((btn) => {
+    btn.onclick = async () => {
+      const id = Number(btn.dataset.deactivateUser);
+      const user = users.find((u) => u.id === id);
+      if (!user) return;
+      if (!window.confirm(`Benutzer „${user.full_name}" (${user.email}) wirklich deaktivieren?`)) return;
+      const { error } = await apiDeactivateUser(id);
+      if (error) {
+        if (msgEl) msgEl.innerHTML = errorAlert(`Fehler: ${error.message}`);
+      } else {
+        if (msgEl) msgEl.innerHTML = successAlert('Benutzer deaktiviert.');
+        await reload();
+      }
+    };
+  });
+}
+
 async function fetchWindowSummaries(_context: AppContext): Promise<WindowSummary[]> {
   const records = await apiListWindows();
   const locks = await apiGetActiveLocks();
@@ -632,6 +875,7 @@ function createDashboardStats(records: WindowSummary[]): DashboardStats {
 }
 
 function renderHeader(context: AppContext, title: string, text: string) {
+  const isAdmin = context.user?.profile.role === 'administrator';
   return `
     <div class="intern-card intern-hero">
       <p class="sv-eyebrow">${escapeHtml(portalProject.title)}</p>
@@ -642,7 +886,7 @@ function renderHeader(context: AppContext, title: string, text: string) {
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/fenster/">Fenster</a>
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/auswertung/">Auswertung</a>
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/export/">Export</a>
-        ${context.user?.profile.role === 'administrator' ? '<span class="intern-badge intern-badge--info">Administrator kann Sperren aufheben und Freigaben aendern.</span>' : ''}
+        ${isAdmin ? '<a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/admin/">Benutzerverwaltung</a>' : ''}
       </div>
     </div>
   `;

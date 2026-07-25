@@ -346,3 +346,137 @@
     align-items: stretch;
   }
 }
+
+/* ── Benutzerverwaltungs-Tabelle ───────────────────────────────────────────── */
+
+.intern-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .92rem;
+}
+
+.intern-table th,
+.intern-table td {
+  padding: .6rem .75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--sv-color-border, #d6e0e8);
+  vertical-align: middle;
+}
+
+.intern-table th {
+  font-weight: 700;
+  background: rgba(7, 26, 46, 0.04);
+}
+
+.intern-table tbody tr:hover {
+  background: rgba(7, 26, 46, 0.02);
+}
+
+.intern-edit-row td {
+  padding: 1rem;
+  background: rgba(7, 26, 46, 0.03);
+}
+
+.intern-edit-form {
+  max-width: 40rem;
+}
+
+.intern-actions--inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+
+/* ── Responsive Tablet (≤ 900 px) ─────────────────────────────────────────── */
+
+@media (max-width: 56.25rem) {
+  .intern-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .intern-stats {
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  }
+
+  .intern-table thead {
+    display: none;
+  }
+
+  .intern-table tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid var(--sv-color-border, #d6e0e8);
+    border-radius: .5rem;
+    overflow: hidden;
+  }
+
+  .intern-table td {
+    display: flex;
+    justify-content: space-between;
+    gap: .5rem;
+    border-bottom: 1px solid var(--sv-color-border, #d6e0e8);
+  }
+
+  .intern-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    flex-shrink: 0;
+    min-width: 7rem;
+    color: rgba(7, 26, 46, 0.55);
+    font-size: .82rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    padding-top: .1rem;
+  }
+
+  .intern-edit-row td {
+    display: block;
+  }
+
+  .intern-edit-row td::before {
+    display: none;
+  }
+}
+
+/* ── Responsive Mobile (≤ 480 px) ─────────────────────────────────────────── */
+
+@media (max-width: 30rem) {
+  .intern-app {
+    padding: .75rem;
+    gap: 1rem;
+  }
+
+  .intern-card {
+    padding: 1rem;
+  }
+
+  .intern-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .intern-field--full {
+    grid-column: 1 / -1;
+  }
+
+  .intern-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .intern-export-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .intern-photo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .intern-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .intern-actions .sv-button {
+    width: 100%;
+    text-align: center;
+  }
+}

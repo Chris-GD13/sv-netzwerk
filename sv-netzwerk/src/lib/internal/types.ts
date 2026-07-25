@@ -1,6 +1,6 @@
 export type PortalRole = 'administrator' | 'pruefer' | 'auswertung';
 
-export type PortalRoute = 'landing' | 'login' | 'dashboard' | 'windows' | 'record' | 'analysis' | 'export';
+export type PortalRoute = 'landing' | 'login' | 'dashboard' | 'windows' | 'record' | 'analysis' | 'export' | 'admin';
 
 export type WindowStatus =
   | 'vorbereitet'
@@ -151,6 +151,17 @@ export interface LockResult {
   owner_name?: string | null;
   expires_at?: string | null;
   message?: string;
+}
+
+export interface AdminUser {
+  id: number;
+  email: string;
+  full_name: string;
+  role: PortalRole;
+  is_active: number;
+  last_login_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CalculationParameterMap {
