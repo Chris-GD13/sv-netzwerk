@@ -1,6 +1,6 @@
--- MySQL-Schema – Fensterbeschlagsprüfung BMVg Bonn
--- SV-Büro Marc Schütt e.K. | Version 1.1 – 2026-07-25
--- Ausführung: mysql -u <user> -p <datenbank> < schema.sql
+﻿-- MySQL-Schema â€“ FensterbeschlagsprÃ¼fung BMVg Bonn
+-- SV-BÃ¼ro Marc SchÃ¼tt e.K. | Version 1.1 â€“ 2026-07-25
+-- AusfÃ¼hrung: mysql -u <user> -p <datenbank> < schema.sql
 --
 -- Migration von Version 1.0 auf 1.1: Neue Benutzerrollen
 --   ALTER TABLE users MODIFY COLUMN role
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
     is_active       TINYINT(1)      NOT NULL DEFAULT 1,
     last_login_at   DATETIME        NULL,
     created_at      DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at      DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE (UTC_TIMESTAMP()),
+    updated_at      DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -49,13 +49,13 @@ CREATE TABLE IF NOT EXISTS projects (
     planned_window_count INT             NULL,
     is_active            TINYINT(1)      NOT NULL DEFAULT 1,
     created_at           DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at           DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE (UTC_TIMESTAMP()),
+    updated_at           DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
     archived_at          DATETIME        NULL,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- Fenster-Datensätze
+-- Fenster-DatensÃ¤tze
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS windows (
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS windows (
     release_reason              TEXT            NULL,
     version                     INT UNSIGNED    NOT NULL DEFAULT 1,
     created_at                  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at                  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE (UTC_TIMESTAMP()),
+    updated_at                  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
     deleted_at                  DATETIME        NULL,
     PRIMARY KEY (id),
     KEY idx_windows_project   (project_id),
@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS photos (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- Berechnungsparameter (global, projektspezifisch überschreibbar)
+-- Berechnungsparameter (global, projektspezifisch Ã¼berschreibbar)
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS calculation_parameters (
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS calculation_parameters (
     project_id      INT UNSIGNED    NULL COMMENT 'NULL = global',
     parameter_key   VARCHAR(64)     NOT NULL,
     parameter_value DECIMAL(15,6)   NOT NULL,
-    updated_at      DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE (UTC_TIMESTAMP()),
+    updated_at      DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY idx_params_key (project_id, parameter_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS export_logs (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- Gebäude
+-- GebÃ¤ude
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS buildings (
@@ -201,7 +201,7 @@ CREATE TABLE IF NOT EXISTS buildings (
     notes       TEXT            NULL,
     sort_order  INT             NOT NULL DEFAULT 0,
     created_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE (UTC_TIMESTAMP()),
+    updated_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_buildings_project (project_id),
     CONSTRAINT fk_building_project FOREIGN KEY (project_id) REFERENCES projects (id)
@@ -219,14 +219,14 @@ CREATE TABLE IF NOT EXISTS floors (
     notes       TEXT            NULL,
     sort_order  INT             NOT NULL DEFAULT 0,
     created_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE (UTC_TIMESTAMP()),
+    updated_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_floors_building (building_id),
     CONSTRAINT fk_floor_building FOREIGN KEY (building_id) REFERENCES buildings (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- Räume
+-- RÃ¤ume
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS rooms (
@@ -237,20 +237,20 @@ CREATE TABLE IF NOT EXISTS rooms (
     notes       TEXT            NULL,
     sort_order  INT             NOT NULL DEFAULT 0,
     created_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE (UTC_TIMESTAMP()),
+    updated_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_rooms_floor (floor_id),
     CONSTRAINT fk_room_floor FOREIGN KEY (floor_id) REFERENCES floors (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- Raumzuordnung zu Fenstern (optional, rückwärtskompatibel)
+-- Raumzuordnung zu Fenstern (optional, rÃ¼ckwÃ¤rtskompatibel)
 -- ============================================================
 
 ALTER TABLE windows ADD COLUMN IF NOT EXISTS room_id INT UNSIGNED NULL AFTER project_id;
 
 -- ============================================================
--- Flügel (Fensterflügel – das eigentliche Prüfobjekt)
+-- FlÃ¼gel (FensterflÃ¼gel â€“ das eigentliche PrÃ¼fobjekt)
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS window_sashes (
@@ -271,7 +271,7 @@ CREATE TABLE IF NOT EXISTS window_sashes (
     inspected_at     DATETIME        NULL,
     completed_at     DATETIME        NULL,
     created_at       DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at       DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE (UTC_TIMESTAMP()),
+    updated_at       DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
     deleted_at       DATETIME        NULL,
     PRIMARY KEY (id),
     KEY idx_sashes_window  (window_id),
@@ -281,7 +281,7 @@ CREATE TABLE IF NOT EXISTS window_sashes (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- Flügelzuordnung für Fotos (optional, rückwärtskompatibel)
+-- FlÃ¼gelzuordnung fÃ¼r Fotos (optional, rÃ¼ckwÃ¤rtskompatibel)
 -- ============================================================
 
 ALTER TABLE photos ADD COLUMN IF NOT EXISTS sash_id INT UNSIGNED NULL AFTER window_id;
@@ -294,7 +294,7 @@ INSERT IGNORE INTO projects (id, project_code, title, object_name, address, plan
 VALUES (
     1,
     'fensterpruefung-bonn',
-    'Fensterbeschlagsprüfung BMVg Bonn',
+    'FensterbeschlagsprÃ¼fung BMVg Bonn',
     '1. Dienstsitz des Bundesministeriums der Verteidigung',
     'Fontainengraben 150, 53123 Bonn',
     450,
