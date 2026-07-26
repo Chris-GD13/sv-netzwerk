@@ -103,7 +103,7 @@ function handleInstall(): never
                 continue;
             }
             error_log('[setup] SQL-Fehler: ' . substr($statement, 0, 120) . ' → ' . $e->getMessage());
-            $errors[] = 'Fehler beim Ausführen eines SQL-Statements (Details im Server-Log).';
+            $errors[] = substr($statement, 0, 80) . ' → ' . $e->getMessage();
         }
     }
 
