@@ -791,3 +791,45 @@
   display: block;
   margin-bottom: .3rem;
 }
+
+/* KI-Import Upload */
+.intern-ai-upload {
+  border: 2px dashed var(--color-border, #d6e0e8);
+  border-radius: 12px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.intern-ai-upload:hover,
+.intern-ai-upload--hover {
+  border-color: var(--color-primary, #0b4f7a);
+  background: rgba(11, 79, 122, 0.04);
+}
+.intern-ai-upload__icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.intern-ai-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+.intern-ai-item--new { background: rgba(16, 185, 129, 0.06); }
+.intern-ai-item--exists { background: rgba(100, 116, 139, 0.06); }
+.intern-ai-item input[type="checkbox"] { width: 16px; height: 16px; }
+
+.intern-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.intern-badge--ok { background: #d1fae5; color: #065f46; }
+.intern-badge--info { background: #e0e7ff; color: #3730a3; }

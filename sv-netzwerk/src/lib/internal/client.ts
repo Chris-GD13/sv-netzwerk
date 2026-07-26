@@ -33,6 +33,9 @@ import {
   apiDeactivateUser,
   loadApiUser,
   onAuthChange,
+  // KI-Import
+  apiAiAnalyze,
+  apiAiApply,
   // Hierarchie
   apiListBuildings,
   apiListFloors,
@@ -79,6 +82,7 @@ import type {
   WindowSashSummary,
   WindowSummary,
 } from './types';
+import type { AiAnalysisItem, AiAnalysisResult } from './php-api';
 
 interface AppContext {
   root: HTMLElement;
@@ -206,6 +210,9 @@ async function renderRoute(context: AppContext) {
       break;
     case 'export':
       await renderExport(context);
+      break;
+    case 'ai-import':
+      await renderAiImport(context);
       break;
     case 'admin':
       await renderAdmin(context);
@@ -1738,6 +1745,160 @@ async function renderExport(context: AppContext) {
   bindHeaderLogout(context);
 }
 
+// ── KI-Dokumentenimport ──────────────────────────────────────────────────────
+
+async function renderAiImport(context: AppContext) {
+  const role = context.user?.profile.role ?? 'gast';
+  if (!['administrator', 'pruefer'].includes(role)) {
+    context.root.innerHTML = errorAlert('KI-Import ist nur für Administratoren und Prüfer verfügbar.');
+    return;
+  }
+
+  context.root.innerHTML = `
+    ${renderHeader(context, 'KI-Dokumentenimport', 'Laden Sie Baupläne, Fensterlisten oder Raumlisten hoch. Die KI erkennt und erfasst die Daten automatisch.')}
+    <div class="intern-card" style="margin-bottom:16px">
+      <div class="intern-ai-upload" id="ai-drop-zone">
+        <div class="intern-ai-upload__icon">📄🤖</div>
+        <p><strong>Datei hierher ziehen</strong> oder klicken zum Auswählen</p>
+        <p class="intern-meta">Bilder (JPG/PNG), PDF, CSV, Excel · max. 20 MB</p>
+        <input type="file" id="ai-file-input" accept="image/*,.pdf,.csv,.xlsx,.xls" hidden />
+      </div>
+      <div id="ai-status" style="margin-top:12px"></div>
+    </div>
+    <div id="ai-results" style="display:none">
+      <div class="intern-card">
+        <h2 id="ai-doc-title">Analyseergebnis</h2>
+        <p id="ai-doc-summary" class="intern-meta"></p>
+        <div id="ai-items-list" style="margin-top:12px"></div>
+        <div class="intern-actions" style="margin-top:16px">
+          <button class="sv-button sv-button-primary" id="ai-apply-btn" disabled>Ausgewählte Einträge anlegen</button>
+          <button class="sv-button sv-button-secondary" id="ai-cancel-btn">Abbrechen</button>
+        </div>
+        <div id="ai-apply-result" style="margin-top:12px"></div>
+      </div>
+    </div>
+  `;
+
+  const dropZone = context.root.querySelector<HTMLElement>('#ai-drop-zone')!;
+  const fileInput = context.root.querySelector<HTMLInputElement>('#ai-file-input')!;
+  const statusEl = context.root.querySelector<HTMLElement>('#ai-status')!;
+  const resultsEl = context.root.querySelector<HTMLElement>('#ai-results')!;
+
+  // Drag & Drop
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('intern-ai-upload--hover'); });
+  dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('intern-ai-upload--hover'); });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('intern-ai-upload--hover');
+    const file = e.dataTransfer?.files[0];
+    if (file) processFile(file);
+  });
+
+  // Klick
+  dropZone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files?.[0];
+    if (file) processFile(file);
+  });
+
+  async function processFile(file: File) {
+    statusEl.innerHTML = `<div class="intern-alert intern-alert--info">⏳ KI analysiert „${escapeHtml(file.name)}"… Bitte warten.</div>`;
+    resultsEl.style.display = 'none';
+
+    const result = await apiAiAnalyze(file);
+    if (!result) {
+      statusEl.innerHTML = errorAlert('KI-Analyse fehlgeschlagen. Bitte erneut versuchen oder ein anderes Dateiformat wählen.');
+      return;
+    }
+
+    statusEl.innerHTML = successAlert(`Dokument analysiert: ${escapeHtml(result.analysis.summary)}`);
+    renderAnalysisResults(result.analysis);
+  }
+
+  function renderAnalysisResults(analysis: AiAnalysisResult) {
+    const docTitle = context.root.querySelector<HTMLElement>('#ai-doc-title')!;
+    const docSummary = context.root.querySelector<HTMLElement>('#ai-doc-summary')!;
+    const itemsList = context.root.querySelector<HTMLElement>('#ai-items-list')!;
+    const applyBtn = context.root.querySelector<HTMLButtonElement>('#ai-apply-btn')!;
+
+    const typeLabels: Record<string, string> = { bauplan: 'Bauplan', fensterliste: 'Fensterliste', raumliste: 'Raumliste', pruefbericht: 'Prüfbericht', sonstiges: 'Dokument' };
+    docTitle.textContent = typeLabels[analysis.document_type] || 'Analyseergebnis';
+    docSummary.textContent = analysis.summary;
+
+    const typeName: Record<string, string> = { building: 'Gebäude', floor: 'Etage', room: 'Raum', window: 'Fenster' };
+    const newItems = analysis.items.filter((i) => i.status === 'new');
+    const existingItems = analysis.items.filter((i) => i.status === 'exists');
+
+    itemsList.innerHTML = `
+      ${newItems.length > 0 ? `
+        <h3 style="margin-bottom:8px">📥 Neu anzulegen (${newItems.length})</h3>
+        ${newItems.map((item, i) => `
+          <label class="intern-ai-item intern-ai-item--new">
+            <input type="checkbox" data-idx="${i}" checked />
+            <span class="intern-badge intern-badge--ok">${typeName[item.type] || item.type}</span>
+            <span>${escapeHtml(itemLabel(item))}</span>
+            <span class="intern-meta" style="margin-left:auto">${Math.round(item.confidence * 100)}%</span>
+          </label>
+        `).join('')}
+      ` : ''}
+      ${existingItems.length > 0 ? `
+        <h3 style="margin:12px 0 8px">✅ Bereits vorhanden (${existingItems.length})</h3>
+        ${existingItems.map((item) => `
+          <div class="intern-ai-item intern-ai-item--exists">
+            <span class="intern-badge intern-badge--info">${typeName[item.type] || item.type}</span>
+            <span>${escapeHtml(itemLabel(item))}</span>
+            <span class="intern-meta" style="margin-left:auto">übersprungen</span>
+          </div>
+        `).join('')}
+      ` : ''}
+      ${analysis.items.length === 0 ? '<p class="intern-empty">Keine strukturierten Daten erkannt.</p>' : ''}
+    `;
+
+    applyBtn.disabled = newItems.length === 0;
+    resultsEl.style.display = 'block';
+
+    // Apply
+    applyBtn.onclick = async () => {
+      const checked = itemsList.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:checked');
+      const selectedItems = Array.from(checked).map((cb) => newItems[Number(cb.dataset.idx)]);
+      if (selectedItems.length === 0) return;
+
+      applyBtn.disabled = true;
+      applyBtn.textContent = '⏳ Wird angelegt…';
+
+      const result = await apiAiApply(selectedItems);
+      const resultEl = context.root.querySelector<HTMLElement>('#ai-apply-result')!;
+      if (result) {
+        resultEl.innerHTML = successAlert(result.summary);
+        applyBtn.textContent = '✓ Fertig';
+      } else {
+        resultEl.innerHTML = errorAlert('Fehler beim Anlegen der Daten.');
+        applyBtn.disabled = false;
+        applyBtn.textContent = 'Ausgewählte Einträge anlegen';
+      }
+    };
+
+    // Cancel
+    context.root.querySelector<HTMLButtonElement>('#ai-cancel-btn')!.onclick = () => {
+      resultsEl.style.display = 'none';
+      statusEl.innerHTML = '';
+    };
+  }
+
+  function itemLabel(item: { type: string; data: Record<string, unknown> }): string {
+    const d = item.data;
+    switch (item.type) {
+      case 'building': return String(d.name || '') + (d.code ? ` (${d.code})` : '');
+      case 'floor': return `${d.name || ''} → ${d.building_name || ''}`;
+      case 'room': return `${d.room_number || ''} ${d.name || ''} → ${d.floor_name || ''}/${d.building_name || ''}`;
+      case 'window': return `${d.window_number || ''} → ${d.room_name || ''}/${d.floor_name || ''}`;
+      default: return JSON.stringify(d);
+    }
+  }
+
+  bindHeaderLogout(context);
+}
+
 async function renderAdmin(context: AppContext) {
   if (context.user?.profile.role !== 'administrator') {
     context.root.innerHTML = errorAlert('Nur Administratoren können die Benutzerverwaltung aufrufen.');
@@ -2056,6 +2217,7 @@ function createDashboardStats(records: WindowSummary[]): DashboardStats {
 
 function renderHeader(context: AppContext, title: string, text: string) {
   const isAdmin = context.user?.profile.role === 'administrator';
+  const canImport = ['administrator', 'pruefer'].includes(context.user?.profile.role ?? '');
   return `
     <div class="intern-card intern-hero">
       <p class="sv-eyebrow">${escapeHtml(portalProject.title)}</p>
@@ -2066,6 +2228,7 @@ function renderHeader(context: AppContext, title: string, text: string) {
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a>
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/auswertung/">Auswertung</a>
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/export/">Export</a>
+        ${canImport ? '<a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/import/">📄 KI-Import</a>' : ''}
         ${isAdmin ? '<a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/admin/">Benutzerverwaltung</a>' : ''}
         <button class="sv-button sv-button-ghost" type="button" id="header-logout">Abmelden</button>
       </nav>

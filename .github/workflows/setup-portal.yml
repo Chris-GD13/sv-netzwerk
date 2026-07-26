@@ -25,6 +25,7 @@ jobs:
           SETUP_KEY: ${{ secrets.SETUP_KEY }}
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           set -euo pipefail
           sudo apt-get update && sudo apt-get install --yes lftp
@@ -40,6 +41,7 @@ jobs:
           SEED_ADMIN_PASSWORD=${ADMIN_PASSWORD}
           SEED_ADMIN_NAME=Administrator
           PROJECT_NAME=Fensterbeschlagsprüfung BMVg Bonn
+          OPENAI_API_KEY=${OPENAI_API_KEY}
           ENVFILE
 
           # Whitespace am Anfang entfernen (heredoc-Einrückung)

@@ -390,6 +390,43 @@ export async function apiCreateWindowInRoom(roomId: number, windowNumber: string
   return data;
 }
 
+// ── KI-Dokumentenimport ─────────────────────────────────────────────────────
+
+export interface AiAnalysisItem {
+  type: 'building' | 'floor' | 'room' | 'window';
+  status: 'new' | 'exists';
+  data: Record<string, unknown>;
+  confidence: number;
+}
+
+export interface AiAnalysisResult {
+  document_type: string;
+  summary: string;
+  items: AiAnalysisItem[];
+}
+
+export async function apiAiAnalyze(file: File): Promise<{ analysis: AiAnalysisResult; file_name: string } | null> {
+  const formData = new FormData();
+  formData.append('file', file);
+  try {
+    const response = await fetch(`${API_BASE}/ai-import.php?action=analyze`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      body: formData,
+    });
+    const json = await response.json().catch(() => null);
+    if (!response.ok || !json?.ok) return null;
+    return { analysis: json.analysis, file_name: json.file_name };
+  } catch {
+    return null;
+  }
+}
+
+export async function apiAiApply(items: AiAnalysisItem[]): Promise<{ created: unknown[]; skipped: unknown[]; errors: unknown[]; summary: string } | null> {
+  const { data } = await apiPost<{ created: unknown[]; skipped: unknown[]; errors: unknown[]; summary: string }>('/ai-import.php?action=apply', { items });
+  return data;
+}
+
 // ── Flügel (Window Sashes) ──────────────────────────────────────────────────
 
 export async function apiListSashes(windowId: number): Promise<WindowSashSummary[]> {
