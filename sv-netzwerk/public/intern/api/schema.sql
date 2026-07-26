@@ -1,4 +1,4 @@
-﻿-- MySQL-Schema â€“ FensterbeschlagsprÃ¼fung BMVg Bonn
+- MySQL-Schema â€“ FensterbeschlagsprÃ¼fung BMVg Bonn
 -- SV-BÃ¼ro Marc SchÃ¼tt e.K. | Version 1.1 â€“ 2026-07-25
 -- AusfÃ¼hrung: mysql -u <user> -p <datenbank> < schema.sql
 --
