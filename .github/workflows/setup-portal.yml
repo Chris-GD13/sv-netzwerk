@@ -57,11 +57,11 @@ jobs:
         run: |
           set -euo pipefail
           echo "Installiere Datenbankschema..."
-          response=$(curl -sf -X POST \
-            "https://sv-netzwerk.eu/intern/api/setup.php?key=${SETUP_KEY}&action=install" \
+          response=$(curl -sL -X POST \
+            "https://www.sv-netzwerk.eu/intern/api/setup.php?key=${SETUP_KEY}&action=install" \
             -H "Content-Type: application/json")
           echo "$response"
-          echo "$response" | grep -q '"ok":true' || { echo "::error::Schema-Installation fehlgeschlagen"; exit 1; }
+          echo "$response" | grep -q '"ok":true' || echo "$response" | grep -q '"ok": true' || { echo "::error::Schema-Installation fehlgeschlagen"; exit 1; }
           echo "Schema erfolgreich installiert."
 
       - name: Administrator anlegen
@@ -72,12 +72,12 @@ jobs:
         run: |
           set -euo pipefail
           echo "Lege Administrator an..."
-          response=$(curl -sf -X POST \
-            "https://sv-netzwerk.eu/intern/api/setup.php?key=${SETUP_KEY}" \
+          response=$(curl -sL -X POST \
+            "https://www.sv-netzwerk.eu/intern/api/setup.php?key=${SETUP_KEY}" \
             -H "Content-Type: application/json" \
             -d "{\"action\":\"create_admin\",\"email\":\"${ADMIN_EMAIL}\",\"full_name\":\"Administrator\",\"password\":\"${ADMIN_PASSWORD}\"}")
           echo "$response"
-          echo "$response" | grep -q '"ok":true' || { echo "::error::Admin-Anlage fehlgeschlagen"; exit 1; }
+          echo "$response" | grep -q '"ok":true' || echo "$response" | grep -q '"ok": true' || { echo "::error::Admin-Anlage fehlgeschlagen"; exit 1; }
           echo "Administrator erfolgreich angelegt."
 
       - name: Portal-Status prüfen
@@ -86,4 +86,4 @@ jobs:
         run: |
           set -euo pipefail
           echo "Prüfe Status..."
-          curl -sf "https://sv-netzwerk.eu/intern/api/setup.php?key=${SETUP_KEY}" | python3 -m json.tool
+          curl -sL "https://www.sv-netzwerk.eu/intern/api/setup.php?key=${SETUP_KEY}" | python3 -m json.tool
