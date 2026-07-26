@@ -228,15 +228,52 @@ const loadCalendarCaseContext = async () => {
   };
 };
 
+const AALEN_CENTER = { lat: 48.8378, lon: 10.0933 };
 const REGION_HINTS = [
-  'Aalen', 'Ostalbkreis', 'Schwäbisch Gmünd', 'Heidenheim', 'Ulm', 'Göppingen', 'Stuttgart',
-  'Ludwigsburg', 'Esslingen', 'Ansbach', 'Nördlingen', 'Ellwangen', 'Backnang', 'Rems-Murr',
+  { name: 'Aalen', lat: 48.8378, lon: 10.0933 },
+  { name: 'Ostalbkreis', lat: 48.8527, lon: 10.0933 },
+  { name: 'Schwäbisch Gmünd', lat: 48.7995, lon: 9.7987 },
+  { name: 'Heidenheim', lat: 48.6833, lon: 10.1500 },
+  { name: 'Ulm', lat: 48.3984, lon: 9.9916 },
+  { name: 'Göppingen', lat: 48.7054, lon: 9.6512 },
+  { name: 'Stuttgart', lat: 48.7758, lon: 9.1829 },
+  { name: 'Ludwigsburg', lat: 48.8973, lon: 9.1916 },
+  { name: 'Esslingen', lat: 48.7433, lon: 9.3201 },
+  { name: 'Ansbach', lat: 49.3039, lon: 10.5719 },
+  { name: 'Nördlingen', lat: 48.8512, lon: 10.4880 },
+  { name: 'Ellwangen', lat: 48.9612, lon: 10.1324 },
+  { name: 'Backnang', lat: 48.9471, lon: 9.4302 },
+  { name: 'Rems-Murr', lat: 48.9154, lon: 9.4302 },
 ];
 const EVENT_HINTS = [
   'starkregen', 'hochwasser', 'überflutung', 'ueberflutung', 'rückstau', 'rueckstau',
   'hagel', 'sturm', 'tornado', 'schneedruck', 'unwetter', 'gebäudebrand', 'gebaeudebrand',
   'brand', 'feuerwehreinsatz', 'evakuierung', 'katastrophe',
 ];
+
+const toRadians = (value) => (value * Math.PI) / 180;
+const haversineKm = (a, b) => {
+  const dLat = toRadians(b.lat - a.lat);
+  const dLon = toRadians(b.lon - a.lon);
+  const lat1 = toRadians(a.lat);
+  const lat2 = toRadians(b.lat);
+  const sinDLat = Math.sin(dLat / 2);
+  const sinDLon = Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(
+    Math.sqrt(sinDLat ** 2 + Math.cos(lat1) * Math.cos(lat2) * sinDLon ** 2),
+    Math.sqrt(1 - (sinDLat ** 2 + Math.cos(lat1) * Math.cos(lat2) * sinDLon ** 2)),
+  );
+  return 6371 * c;
+};
+
+const regionalHintsInRange = REGION_HINTS
+  .map((hint) => ({ ...hint, distanceKm: haversineKm(AALEN_CENTER, hint) }))
+  .filter((hint) => hint.distanceKm <= 150);
+
+const hasRegionalTitleMatch = (title) => {
+  const normalizedTitle = String(title || '').toLocaleLowerCase('de-DE');
+  return regionalHintsInRange.some((hint) => normalizedTitle.includes(hint.name.toLocaleLowerCase('de-DE')));
+};
 
 const TOPICS = [
   {
@@ -477,8 +514,6 @@ const argValue = (name) => {
   const token = args.find((item) => item.startsWith(`--${name}=`));
   return token ? token.slice(name.length + 3) : undefined;
 };
-const forceOutsideWindow = args.includes('--force-outside-window') || argValue('force-outside-window') === 'true';
-
 const now = new Date();
 const berlinParts = new Intl.DateTimeFormat('en-CA', {
   timeZone: BERLIN, year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
@@ -513,7 +548,7 @@ if (!selectedSlot) {
 }
 
 const slot = selectedSlot;
-if (!forceOutsideWindow && !inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].to)) {
+if (!inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].to)) {
   await mkdir(automationDir, { recursive: true });
   await writeFile(runtimeFile, JSON.stringify({
     status: 'skipped',
@@ -703,12 +738,11 @@ if (existingSlotRows.length > 0) {
   process.exit(0);
 }
 
-const rawCaseContext = await loadCalendarCaseContext();
-const caseContext = isWeekend ? null : rawCaseContext;
+const caseContext = isWeekend ? null : await loadCalendarCaseContext();
 const weekdayRegional = !isWeekend && !caseContext;
 let regionalSignal = null;
 if (weekdayRegional) {
-  const query = encodeURIComponent('(Starkregen OR Hochwasser OR Überflutung OR Rückstau OR Hagel OR Sturm OR Gebäudebrand) (Aalen OR Ostalbkreis OR Heidenheim OR Ulm OR Göppingen OR Stuttgart) when:1d');
+  const query = encodeURIComponent('(Starkregen OR Hochwasser OR Überflutung OR Rückstau OR Hagel OR Sturm OR Tornado OR Schneedruck OR Warnlage OR Unwetterwarnung OR Gebäudebrand) (Aalen OR Ostalbkreis OR Schwäbisch Gmünd OR Heidenheim OR Ulm OR Göppingen OR Stuttgart OR Ludwigsburg OR Esslingen OR Ansbach OR Nördlingen OR Ellwangen OR Backnang OR Rems-Murr) when:1d');
   const rssUrl = `https://news.google.com/rss/search?q=${query}&hl=de&gl=DE&ceid=DE:de`;
   try {
     const response = await fetch(rssUrl, { headers: { 'User-Agent': 'sv-netzwerk-automation/1.0' } });
@@ -717,12 +751,13 @@ if (weekdayRegional) {
       const nowTs = Date.now();
       const candidates = extractRssItems(xml)
         .filter((item) => Number.isFinite(item.pubDate.getTime()) && Math.abs(nowTs - item.pubDate.getTime()) <= 1000 * 60 * 60 * 72)
-        .filter((item) => REGION_HINTS.some((hint) => item.title.toLowerCase().includes(hint.toLowerCase())))
+        .filter((item) => hasRegionalTitleMatch(item.title))
         .filter((item) => EVENT_HINTS.some((hint) => item.title.toLowerCase().includes(hint)))
         .sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
       if (candidates.length > 0) regionalSignal = candidates[0];
     }
-  } catch {
+  } catch (error) {
+    console.warn(`Regionale Meldung konnte nicht geladen werden: ${error instanceof Error ? error.message : String(error)}`);
     regionalSignal = null;
   }
 }
@@ -857,7 +892,7 @@ const frontmatter = [
   `tags: [${topic.tags.map((tag) => `"${tag}"`).join(', ')}]`,
   'author: "Christian Wächter"',
   'featured: false',
-  `dailyStandard: ${slot === 'morning' ? 'true' : 'false'}`,
+  'dailyStandard: true',
   'contentLevel: "B"',
   `teaser: "${teaser}"`,
   `linkedinSummary: "${caseContext ? 'Anonymisierte Fallauswertung aus realen Kalenderfällen mit dokumentenbasierter Einordnung.' : topic.intro}"`,

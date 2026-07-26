@@ -62,7 +62,7 @@ Starkregen/Rückstau, Hochwasser/Überflutung, Sturm/Hagel, Leitungswasser, Bran
 - Quelle: Google News RSS mit kombinierten Schaden-/Unwetterbegriffen (Starkregen, Hochwasser, Sturm, Brand, Katastrophe usw.) und Regionsbezug (Aalen, Ostalbkreis, Schwäbisch Gmünd, Heidenheim, Ulm, Göppingen, Stuttgart, Ludwigsburg, Esslingen, Ansbach, Nördlingen, Ellwangen, Backnang, Rems-Murr).
 - Kandidaten werden nur berücksichtigt, wenn **sowohl** ein Regionsname als auch ein Ereignisbegriff im Titel enthalten ist und die Meldung nicht älter als 72 Stunden ist.
 - Es werden ausschließlich öffentlich verfügbare Informationen genutzt. Keine erfundenen Tatsachen, keine unbelegten Schadenhöhen, Opferzahlen oder Ursachenbehauptungen.
-- Die regionale Themenableitung bleibt auf den definierten Suchraum um Aalen begrenzt; unklare Sachstände werden im Beitrag als vorläufig gekennzeichnet.
+- Die regionale Themenableitung bleibt auf den definierten Suchraum um Aalen begrenzt; technisch werden nur Regionen berücksichtigt, die innerhalb von 150 km Luftlinie um Aalen liegen. Unklare Sachstände werden im Beitrag als vorläufig gekennzeichnet.
 - Wenn kein belastbarer Regionalanlass gefunden wird: automatischer Wechsel auf allgemeines Fachthema.
 
 ## Wochenendregel
@@ -94,7 +94,7 @@ Der Generator erstellt pro Lauf:
 ## LinkedIn-/Zap-Übergabe
 
 - Zapier-Webhook bleibt unverändert (`secrets.ZAPIER_WEBHOOK_URL`).
-- Auslösung erfolgt **nur im Morgenslot** und ausschließlich nach erfolgreicher Live-URL-Prüfung (HTTP 200 + Slug im Seiteninhalt).
+- Auslösung erfolgt in beiden Slots (**morgens** und **nachmittags**) ausschließlich nach erfolgreicher Live-URL-Prüfung (HTTP 200 + Slug im Seiteninhalt).
 - Vor LinkedIn werden im Lauf verpflichtend Vorprüfung, Fachwissensvalidierung, Typprüfung (`astro check`), Build, HTML-Validierung und Link-/Build-Integration ausgeführt.
 - Payload-Format (Zap-kompatibel):
   ```json

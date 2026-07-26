@@ -84,10 +84,11 @@ function handleInstall(): never
         apiError(500, 'schema.sql nicht gefunden.');
     }
 
-    // Statements aufteilen und ausführen
+    // Kommentarzeilen entfernen, dann Statements aufteilen
+    $sql = preg_replace('/^\s*--.*$/m', '', $sql);
     $statements = array_filter(
         array_map('trim', explode(';', $sql)),
-        static fn($s) => $s !== '' && !str_starts_with($s, '--')
+        static fn($s) => $s !== ''
     );
 
     $errors = [];
