@@ -398,7 +398,7 @@ async function renderBuildings(context: AppContext) {
     </div>
   `;
 
-  if (isAdmin) {
+  if (editable) {
     context.root.querySelector<HTMLFormElement>('#create-building-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = e.currentTarget as HTMLFormElement;
