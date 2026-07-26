@@ -1,6 +1,6 @@
-- MySQL-Schema â€“ FensterbeschlagsprÃ¼fung BMVg Bonn
--- SV-BÃ¼ro Marc SchÃ¼tt e.K. | Version 1.1 â€“ 2026-07-25
--- AusfÃ¼hrung: mysql -u <user> -p <datenbank> < schema.sql
+-- MySQL-Schema – Fensterbeschlagsprüfung BMVg Bonn
+-- SV-Büro Marc Schütt e.K. | Version 1.1 – 2026-07-25
+-- Ausführung: mysql -u <user> -p <datenbank> < schema.sql
 --
 -- Migration von Version 1.0 auf 1.1: Neue Benutzerrollen
 --   ALTER TABLE users MODIFY COLUMN role
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS projects (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- Fenster-DatensÃ¤tze
+-- Fenster-Datensätze
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS windows (
@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS photos (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- Berechnungsparameter (global, projektspezifisch Ã¼berschreibbar)
+-- Berechnungsparameter (global, projektspezifisch überschreibbar)
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS calculation_parameters (
@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS export_logs (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- GebÃ¤ude
+-- Gebäude
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS buildings (
@@ -226,7 +226,7 @@ CREATE TABLE IF NOT EXISTS floors (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- RÃ¤ume
+-- Räume
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS rooms (
@@ -244,13 +244,13 @@ CREATE TABLE IF NOT EXISTS rooms (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- Raumzuordnung zu Fenstern (optional, rÃ¼ckwÃ¤rtskompatibel)
+-- Raumzuordnung zu Fenstern (optional, rückwärtskompatibel)
 -- ============================================================
 
 ALTER TABLE windows ADD COLUMN IF NOT EXISTS room_id INT UNSIGNED NULL AFTER project_id;
 
 -- ============================================================
--- FlÃ¼gel (FensterflÃ¼gel â€“ das eigentliche PrÃ¼fobjekt)
+-- Flügel (Fensterflügel – das eigentliche Prüfobjekt)
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS window_sashes (
@@ -281,7 +281,7 @@ CREATE TABLE IF NOT EXISTS window_sashes (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- FlÃ¼gelzuordnung fÃ¼r Fotos (optional, rÃ¼ckwÃ¤rtskompatibel)
+-- Flügelzuordnung für Fotos (optional, rückwärtskompatibel)
 -- ============================================================
 
 ALTER TABLE photos ADD COLUMN IF NOT EXISTS sash_id INT UNSIGNED NULL AFTER window_id;
@@ -294,7 +294,7 @@ INSERT IGNORE INTO projects (id, project_code, title, object_name, address, plan
 VALUES (
     1,
     'fensterpruefung-bonn',
-    'FensterbeschlagsprÃ¼fung BMVg Bonn',
+    'Fensterbeschlagsprüfung BMVg Bonn',
     '1. Dienstsitz des Bundesministeriums der Verteidigung',
     'Fontainengraben 150, 53123 Bonn',
     450,
