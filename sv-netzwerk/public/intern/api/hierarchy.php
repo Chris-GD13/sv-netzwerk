@@ -184,7 +184,7 @@ function handleGetSashList(int $windowId): never
 
 function handleCreate(string $entity, array $user): never
 {
-    requireRole($user, ['administrator', 'pruefer']);
+    requireRole($user, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer']);
     $body = requestBody();
 
     switch ($entity) {
@@ -248,7 +248,7 @@ function handleCreate(string $entity, array $user): never
 
 function handleUpdate(string $entity, int $id, array $user): never
 {
-    requireRole($user, ['administrator', 'pruefer']);
+    requireRole($user, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer']);
     $body = requestBody();
 
     switch ($entity) {

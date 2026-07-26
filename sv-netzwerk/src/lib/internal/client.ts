@@ -378,11 +378,11 @@ async function renderDashboard(context: AppContext) {
 
 async function renderBuildings(context: AppContext) {
   const buildings = await apiListBuildings();
-  const isAdmin = context.user?.profile.role === 'administrator';
+  const editable = canEdit(context);
 
   context.root.innerHTML = `
     ${renderHeader(context, 'Gebäude', 'Alle Gebäude des Projekts mit Prüffortschritt.')}
-    ${isAdmin ? `
+    ${editable ? `
     <div class="intern-card" style="margin-bottom:16px">
       <h2>Gebäude hinzufügen</h2>
       <form id="create-building-form" class="intern-form-grid" novalidate>
@@ -394,7 +394,7 @@ async function renderBuildings(context: AppContext) {
     ` : ''}
     <div id="building-msg"></div>
     <div class="intern-building-grid" id="building-list">
-      ${buildings.map((b) => renderBuildingCard(b, isAdmin)).join('') || '<div class="intern-empty">Noch keine Gebäude vorhanden.</div>'}
+      ${buildings.map((b) => renderBuildingCard(b, editable)).join('') || '<div class="intern-empty">Noch keine Gebäude vorhanden.</div>'}
     </div>
   `;
 
@@ -2605,6 +2605,18 @@ function infoAlert(text: string) { return `<div class="intern-alert intern-alert
 function successAlert(text: string) { return `<div class="intern-alert intern-alert--success">${escapeHtml(text)}</div>`; }
 function warnAlert(text: string) { return `<div class="intern-alert intern-alert--warn">${escapeHtml(text)}</div>`; }
 function errorAlert(text: string) { return `<div class="intern-alert intern-alert--error">${escapeHtml(text)}</div>`; }
+
+/** Prüft ob der Benutzer Daten bearbeiten/anlegen/löschen darf (alles außer Gast/Auswertung). */
+function canEdit(context: AppContext): boolean {
+  const role = context.user?.profile.role ?? 'gast';
+  return !['gast', 'auswertung'].includes(role);
+}
+
+/** Prüft ob der Benutzer Admin-Funktionen nutzen darf (nur Admin/Projektleiter). */
+function isAdminRole(context: AppContext): boolean {
+  const role = context.user?.profile.role ?? 'gast';
+  return ['administrator', 'projektleiter'].includes(role);
+}
 
 function subscribeToWindowChanges(_context: AppContext, _handler: () => void) {
   // Statusaktualisierung erfolgt über Polling; kein separater Kanal erforderlich.
