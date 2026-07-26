@@ -121,7 +121,7 @@ jobs:
           fi
           printf '%s\n' "$listing"
 
-          if printf '%s\n' "$listing" | grep -Eq '(^|/)dist/$'; then
+          if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
             echo "::warning::$SFTP_REMOTE_DIR/dist/ existiert (wird beim Upload bereinigt)."
           fi
 
@@ -193,11 +193,11 @@ jobs:
           fi
           printf '%s\n' "$listing"
 
-          printf '%s\n' "$listing" | grep -Eq '(^|/)index\.html$'
-          printf '%s\n' "$listing" | grep -Eq '(^|/)assets/$'
-          printf '%s\n' "$listing" | grep -Eq '(^|/)deploy-version\.txt$'
+          printf '%s\n' "$listing" | grep -Eq ' index\.html$'
+          printf '%s\n' "$listing" | grep -Eq ' assets$'
+          printf '%s\n' "$listing" | grep -Eq ' deploy-version\.txt$'
 
-          if printf '%s\n' "$listing" | grep -Eq '(^|/)dist/$'; then
+          if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
             echo "::error::$SFTP_REMOTE_DIR/dist/ wurde unerwartet angelegt."
             exit 1
           fi
