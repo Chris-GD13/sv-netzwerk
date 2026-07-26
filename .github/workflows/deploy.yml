@@ -96,7 +96,7 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; ls $SFTP_REMOTE_DIR; quit"
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; cls -1F .; quit"
           exit_code=1
           listing=""
           for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
@@ -168,7 +168,7 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; ls $SFTP_REMOTE_DIR; quit"
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; cls -1F .; quit"
           exit_code=1
           listing=""
           for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
