@@ -394,9 +394,10 @@ export async function apiCreateWindowInRoom(roomId: number, windowNumber: string
 
 export interface AiAnalysisItem {
   type: 'building' | 'floor' | 'room' | 'window';
-  status: 'new' | 'exists';
+  status: 'new' | 'exists' | 'update' | 'conflict';
   data: Record<string, unknown>;
   confidence: number;
+  change_description?: string;
 }
 
 export interface AiAnalysisResult {

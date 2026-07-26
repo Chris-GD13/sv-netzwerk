@@ -833,3 +833,8 @@
 }
 .intern-badge--ok { background: #d1fae5; color: #065f46; }
 .intern-badge--info { background: #e0e7ff; color: #3730a3; }
+.intern-badge--warn { background: #fef3c7; color: #92400e; }
+.intern-badge--danger { background: #fee2e2; color: #991b1b; }
+
+.intern-ai-item--update { background: rgba(251, 191, 36, 0.06); }
+.intern-ai-item--conflict { background: rgba(239, 68, 68, 0.06); }

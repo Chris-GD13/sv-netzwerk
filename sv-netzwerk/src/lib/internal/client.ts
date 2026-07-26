@@ -1760,8 +1760,8 @@ async function renderAiImport(context: AppContext) {
       <div class="intern-ai-upload" id="ai-drop-zone">
         <div class="intern-ai-upload__icon">📄🤖</div>
         <p><strong>Datei hierher ziehen</strong> oder klicken zum Auswählen</p>
-        <p class="intern-meta">Bilder (JPG/PNG), PDF, CSV, Excel · max. 20 MB</p>
-        <input type="file" id="ai-file-input" accept="image/*,.pdf,.csv,.xlsx,.xls" hidden />
+        <p class="intern-meta">Bilder (JPG/PNG/TIFF), PDF, CSV, Excel, Word · max. 20 MB</p>
+        <input type="file" id="ai-file-input" accept="image/*,.pdf,.csv,.xlsx,.xls,.docx,.doc,.tiff,.tif" hidden />
       </div>
       <div id="ai-status" style="margin-top:12px"></div>
     </div>
@@ -1771,7 +1771,7 @@ async function renderAiImport(context: AppContext) {
         <p id="ai-doc-summary" class="intern-meta"></p>
         <div id="ai-items-list" style="margin-top:12px"></div>
         <div class="intern-actions" style="margin-top:16px">
-          <button class="sv-button sv-button-primary" id="ai-apply-btn" disabled>Ausgewählte Einträge anlegen</button>
+          <button class="sv-button sv-button-primary" id="ai-apply-btn" disabled>Ausgewählte übernehmen</button>
           <button class="sv-button sv-button-secondary" id="ai-cancel-btn">Abbrechen</button>
         </div>
         <div id="ai-apply-result" style="margin-top:12px"></div>
@@ -1784,7 +1784,6 @@ async function renderAiImport(context: AppContext) {
   const statusEl = context.root.querySelector<HTMLElement>('#ai-status')!;
   const resultsEl = context.root.querySelector<HTMLElement>('#ai-results')!;
 
-  // Drag & Drop
   dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('intern-ai-upload--hover'); });
   dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('intern-ai-upload--hover'); });
   dropZone.addEventListener('drop', (e) => {
@@ -1794,7 +1793,6 @@ async function renderAiImport(context: AppContext) {
     if (file) processFile(file);
   });
 
-  // Klick
   dropZone.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', () => {
     const file = fileInput.files?.[0];
@@ -1802,7 +1800,7 @@ async function renderAiImport(context: AppContext) {
   });
 
   async function processFile(file: File) {
-    statusEl.innerHTML = `<div class="intern-alert intern-alert--info">⏳ KI analysiert „${escapeHtml(file.name)}"… Bitte warten.</div>`;
+    statusEl.innerHTML = `<div class="intern-alert intern-alert--info">⏳ KI analysiert „${escapeHtml(file.name)}"… Bitte warten (bis zu 30 Sek.).</div>`;
     resultsEl.style.display = 'none';
 
     const result = await apiAiAnalyze(file);
@@ -1821,22 +1819,51 @@ async function renderAiImport(context: AppContext) {
     const itemsList = context.root.querySelector<HTMLElement>('#ai-items-list')!;
     const applyBtn = context.root.querySelector<HTMLButtonElement>('#ai-apply-btn')!;
 
-    const typeLabels: Record<string, string> = { bauplan: 'Bauplan', fensterliste: 'Fensterliste', raumliste: 'Raumliste', pruefbericht: 'Prüfbericht', sonstiges: 'Dokument' };
+    const typeLabels: Record<string, string> = { bauplan: 'Bauplan', fensterliste: 'Fensterliste', raumliste: 'Raumliste', pruefbericht: 'Prüfbericht', herstellerdaten: 'Herstellerdaten', sonstiges: 'Dokument' };
     docTitle.textContent = typeLabels[analysis.document_type] || 'Analyseergebnis';
     docSummary.textContent = analysis.summary;
 
     const typeName: Record<string, string> = { building: 'Gebäude', floor: 'Etage', room: 'Raum', window: 'Fenster' };
+
+    // Items nach Status gruppieren
     const newItems = analysis.items.filter((i) => i.status === 'new');
+    const updateItems = analysis.items.filter((i) => i.status === 'update');
+    const conflictItems = analysis.items.filter((i) => i.status === 'conflict');
     const existingItems = analysis.items.filter((i) => i.status === 'exists');
+    const actionableItems = [...newItems, ...updateItems];
 
     itemsList.innerHTML = `
       ${newItems.length > 0 ? `
-        <h3 style="margin-bottom:8px">📥 Neu anzulegen (${newItems.length})</h3>
+        <h3 style="margin-bottom:8px">📥 Neue Datensätze (${newItems.length})</h3>
         ${newItems.map((item, i) => `
           <label class="intern-ai-item intern-ai-item--new">
-            <input type="checkbox" data-idx="${i}" checked />
+            <input type="checkbox" data-idx="${i}" data-group="new" checked />
             <span class="intern-badge intern-badge--ok">${typeName[item.type] || item.type}</span>
             <span>${escapeHtml(itemLabel(item))}</span>
+            <span class="intern-meta" style="margin-left:auto">${Math.round(item.confidence * 100)}%</span>
+          </label>
+        `).join('')}
+      ` : ''}
+      ${updateItems.length > 0 ? `
+        <h3 style="margin:12px 0 8px">🔄 Ergänzungen (${updateItems.length})</h3>
+        ${updateItems.map((item, i) => `
+          <label class="intern-ai-item intern-ai-item--update">
+            <input type="checkbox" data-idx="${i}" data-group="update" checked />
+            <span class="intern-badge intern-badge--warn">${typeName[item.type] || item.type}</span>
+            <span>${escapeHtml(itemLabel(item))}</span>
+            ${(item as unknown as { change_description?: string }).change_description ? `<span class="intern-meta" style="margin-left:8px">${escapeHtml((item as unknown as { change_description: string }).change_description)}</span>` : ''}
+            <span class="intern-meta" style="margin-left:auto">${Math.round(item.confidence * 100)}%</span>
+          </label>
+        `).join('')}
+      ` : ''}
+      ${conflictItems.length > 0 ? `
+        <h3 style="margin:12px 0 8px">⚠️ Abweichungen / Konflikte (${conflictItems.length})</h3>
+        ${conflictItems.map((item, i) => `
+          <label class="intern-ai-item intern-ai-item--conflict">
+            <input type="checkbox" data-idx="${i}" data-group="conflict" />
+            <span class="intern-badge intern-badge--danger">${typeName[item.type] || item.type}</span>
+            <span>${escapeHtml(itemLabel(item))}</span>
+            ${(item as unknown as { change_description?: string }).change_description ? `<span class="intern-meta" style="margin-left:8px">${escapeHtml((item as unknown as { change_description: string }).change_description)}</span>` : ''}
             <span class="intern-meta" style="margin-left:auto">${Math.round(item.confidence * 100)}%</span>
           </label>
         `).join('')}
@@ -1847,20 +1874,28 @@ async function renderAiImport(context: AppContext) {
           <div class="intern-ai-item intern-ai-item--exists">
             <span class="intern-badge intern-badge--info">${typeName[item.type] || item.type}</span>
             <span>${escapeHtml(itemLabel(item))}</span>
-            <span class="intern-meta" style="margin-left:auto">übersprungen</span>
+            <span class="intern-meta" style="margin-left:auto">identisch</span>
           </div>
         `).join('')}
       ` : ''}
       ${analysis.items.length === 0 ? '<p class="intern-empty">Keine strukturierten Daten erkannt.</p>' : ''}
     `;
 
-    applyBtn.disabled = newItems.length === 0;
+    applyBtn.disabled = actionableItems.length === 0;
+    applyBtn.textContent = `Ausgewählte übernehmen`;
     resultsEl.style.display = 'block';
 
     // Apply
     applyBtn.onclick = async () => {
       const checked = itemsList.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:checked');
-      const selectedItems = Array.from(checked).map((cb) => newItems[Number(cb.dataset.idx)]);
+      const selectedItems: AiAnalysisItem[] = [];
+      checked.forEach((cb) => {
+        const group = cb.dataset.group;
+        const idx = Number(cb.dataset.idx);
+        if (group === 'new') selectedItems.push(newItems[idx]);
+        else if (group === 'update') selectedItems.push(updateItems[idx]);
+        else if (group === 'conflict') selectedItems.push(conflictItems[idx]);
+      });
       if (selectedItems.length === 0) return;
 
       applyBtn.disabled = true;
@@ -1874,7 +1909,7 @@ async function renderAiImport(context: AppContext) {
       } else {
         resultEl.innerHTML = errorAlert('Fehler beim Anlegen der Daten.');
         applyBtn.disabled = false;
-        applyBtn.textContent = 'Ausgewählte Einträge anlegen';
+        applyBtn.textContent = 'Ausgewählte übernehmen';
       }
     };
 
@@ -1891,7 +1926,13 @@ async function renderAiImport(context: AppContext) {
       case 'building': return String(d.name || '') + (d.code ? ` (${d.code})` : '');
       case 'floor': return `${d.name || ''} → ${d.building_name || ''}`;
       case 'room': return `${d.room_number || ''} ${d.name || ''} → ${d.floor_name || ''}/${d.building_name || ''}`;
-      case 'window': return `${d.window_number || ''} → ${d.room_name || ''}/${d.floor_name || ''}`;
+      case 'window': {
+        let lbl = `${d.window_number || ''}`;
+        if (d.manufacturer) lbl += ` [${d.manufacturer}]`;
+        if (d.width_mm && d.height_mm) lbl += ` ${d.width_mm}×${d.height_mm}mm`;
+        lbl += ` → ${d.room_name || ''}/${d.floor_name || ''}`;
+        return lbl;
+      }
       default: return JSON.stringify(d);
     }
   }
