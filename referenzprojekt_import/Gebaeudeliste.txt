@@ -1,0 +1,55 @@
+﻿GEBÄUDELISTE
+============
+Projekt: Fensterbeschlagsprüfung BMVg Dienstsitz Bonn
+Stand: März 2025
+
+Nr  Kürzel  Bezeichnung                  Baujahr  Etagen  Fenster(ca.)  Anmerkung
+--- ------- ---------------------------- -------- ------- ------------- --------------------------
+1   VGN     Verwaltungsgebäude Nord      2005     5       220           Hauptverwaltung
+2   VGS     Verwaltungsgebäude Süd       1998     4       160           Empfang, Großraum
+3   KON     Konferenzzentrum             2018     2       55            Modernster Bestand
+4   TZ      Technisches Zentrum          1985     6       250           Ältester Bestand!
+5   NGW     Nebengebäude West            1990     3       65            Teilw. Austausch geplant
+6   PW      Pforte und Wache             2010     2       25            Sicherheitsbereich
+7   KAS     Kantine und Sozialgebäude    2001     2       45            Kantinenbereich
+
+GESAMT:                                           25+     ~820
+
+Hinweise:
+- Gebäude VGN: 1. OG wurde 2012 komplett saniert (neue Beschläge Siegenia)
+- Gebäude TZ: Ältester Bestand, höchste erwartete Mängelquote
+- Gebäude KON: Neuester Bestand (2018), voraussichtlich wenige Mängel
+- Gebäude NGW: Austauschplanung für 2026 läuft bereits
+
+LAGEPLAN:
+
+                    N
+                    ↑
+         ┌─────────────────────┐
+         │                     │
+    ┌────┤    VGN              │
+    │ PW │    (5 Etagen)       │
+    └────┤                     │
+         └─────────┬───────────┘
+                   │
+         ┌─────────┴───────────┐
+         │                     │
+         │    VGS              │
+         │    (4 Etagen)       │
+         │                     │
+         └─────────┬───────────┘
+                   │
+    ┌──────┐      │      ┌──────────┐
+    │ NGW  │      │      │  KON     │
+    │(3 Et)│──────┼──────│  (2 Et)  │
+    └──────┘      │      └──────────┘
+                  │
+         ┌────────┴────────┐
+         │                 │
+         │   TZ            │     ┌──────┐
+         │   (6 Etagen)    │─────│ KAS  │
+         │                 │     │(2 Et)│
+         └─────────────────┘     └──────┘
+
+         Fontainengraben 150
+         ═══════════════════ (Straße)

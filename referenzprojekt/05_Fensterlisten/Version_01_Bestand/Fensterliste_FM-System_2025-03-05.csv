@@ -1,0 +1,46 @@
+﻿Fensterliste Bestandsaufnahme
+Objekt: BMVg Dienstsitz Bonn
+Erstellt durch: Gebäudemanagement (Hr. Feldmann)
+Datum: 05.03.2025
+Quelle: Facility-Management-Datenbank (teilweise unvollständig)
+
+HINWEIS: Diese Liste stammt aus dem FM-System und wurde seit 2018 nicht aktualisiert!
+
+Geb.;Etage;Raum-Nr;Raum;Fenster-Nr;Typ;Breite;Höhe;Hersteller;Beschlag;Bj;Bemerkung
+VGN;EG;VGN-101;Empfang;VGN-F-0001;Dreh-Kipp;1200;1600;Schüco;AvanTec;2005;
+VGN;EG;VGN-101;Empfang;VGN-F-0002;Dreh-Kipp;1200;1600;Schüco;AvanTec;2005;
+VGN;EG;VGN-102;Büro 1;VGN-F-0003;Dreh-Kipp;1000;1400;Roto;Roto NT;2005;
+VGN;EG;VGN-103;Büro 2;VGN-F-0004;Dreh-Kipp;1000;1400;Roto;Roto NT;2005;
+VGN;EG;VGN-103;Büro 2;VGN-F-0005;Kipp;600;400;Roto;Roto NT;2005;Oberlicht
+VGN;EG;VGN-104;Büro 3;VGN-F-0006;Dreh-Kipp;1000;1400;Roto;Roto NT;2005;
+VGN;EG;VGN-105;Büro 4;VGN-F-0007;Dreh-Kipp;1000;1400;Roto;Roto NT;2005;
+VGN;EG;VGN-106;Büro 5;VGN-F-0008;Dreh-Kipp;1000;1400;Roto;Roto NT;2005;
+VGN;EG;VGN-108;WC Herren;VGN-F-0009;Kipp;600;400;Roto;Roto NT;2005;Milchglas
+VGN;EG;VGN-109;WC Damen;VGN-F-0010;Kipp;600;400;Roto;Roto NT;2005;Milchglas
+VGN;1.OG;VGN-201;Büro 201;VGN-F-0015;Dreh-Kipp;1100;1500;Roto;Roto NT;2005;
+VGN;1.OG;VGN-202;Büro 202;VGN-F-0016;Dreh-Kipp;1100;1500;Roto;Roto NT;2005;
+VGN;1.OG;VGN-203;Besprechung;VGN-F-0017;Dreh-Kipp;1100;1500;Roto;Roto NT;2005;
+VGN;1.OG;VGN-203;Besprechung;VGN-F-0018;Dreh-Kipp;1100;1500;Roto;Roto NT;2005;
+VGN;1.OG;VGN-204;Büro 204;VGN-F-0019;Dreh-Kipp;1100;1500;Roto;Roto NT;2005;
+VGN;2.OG;VGN-301;Konferenz;VGN-F-0025;Dreh-Kipp;1400;1800;Winkhaus;activPilot;2005;Panorama
+VGN;2.OG;VGN-301;Konferenz;VGN-F-0026;Dreh-Kipp;1400;1800;Winkhaus;activPilot;2005;
+VGN;2.OG;VGN-301;Konferenz;VGN-F-0027;Fest;1400;1800;-;-;2005;Festverglasung
+VGN;2.OG;VGN-302;Büro 302;VGN-F-0028;Dreh-Kipp;1100;1500;Winkhaus;activPilot;2005;
+VGS;EG;VGS-101;Empfangshalle;VGS-F-0001;Dreh-Kipp;1400;2000;Roto;Roto NT;1998;2-flügelig
+VGS;EG;VGS-101;Empfangshalle;VGS-F-0002;Fest;1200;2000;-;-;1998;Festverglasung
+VGS;EG;VGS-102;Großraumbüro;VGS-F-0003;Dreh-Kipp;1100;1500;Siegenia;Titan AF;2005;
+VGS;EG;VGS-102;Großraumbüro;VGS-F-0004;Dreh-Kipp;1100;1500;Siegenia;Titan AF;2005;
+VGS;EG;VGS-102;Großraumbüro;VGS-F-0005;Dreh-Kipp;1100;1500;Siegenia;Titan AF;2005;FEHLT PILZKOPF!
+VGS;EG;VGS-102;Großraumbüro;VGS-F-0006;Dreh-Kipp;1100;1500;Siegenia;Titan AF;2005;
+TZ;EG;TZ-E01;Empfang;TZ-F-0101;Dreh-Kipp;1200;1600;Maco;Multi-Matic;1985;
+TZ;EG;TZ-E01;Empfang;TZ-F-0102;Dreh-Kipp;1200;1600;Maco;Multi-Matic;1985;
+TZ;EG;TZ-E02;Werkstatt Holz;TZ-F-0103;Dreh-Kipp;1400;1600;Maco;Multi-Matic;1985;schwergängig
+TZ;EG;TZ-E02;Werkstatt Holz;TZ-F-0104;Dreh-Kipp;1400;1600;Maco;Multi-Matic;1985;
+TZ;EG;TZ-E02;Werkstatt Holz;TZ-F-0105;Dreh-Kipp;1400;1600;Maco;Multi-Matic;1985;
+TZ;EG;TZ-E02;Werkstatt Holz;TZ-F-0106;Dreh-Kipp;1400;1600;GU;UNI-JET;2000;Nachrüstung
+KON;EG;KON-E01;Konferenz 1;KON-F-0001;Dreh-Kipp;1800;2200;Schüco;AvanTec;2018;
+KON;EG;KON-E01;Konferenz 1;KON-F-0002;Dreh-Kipp;1800;2200;Schüco;AvanTec;2018;
+KON;EG;KON-E01;Konferenz 1;KON-F-0003;Fest;1200;2200;Schüco;-;2018;
+KON;EG;KON-E02;Foyer;KON-F-0004;Schiebe;3000;2400;Schüco;AvanTec;2018;Hebeschiebe
+
+Gesamtzahl dieser Liste: 34 Fenster (ACHTUNG: UNVOLLSTÄNDIG! Nur Stichprobe aus FM-System)

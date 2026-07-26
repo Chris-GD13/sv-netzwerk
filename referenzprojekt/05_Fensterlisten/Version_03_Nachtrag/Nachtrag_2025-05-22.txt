@@ -1,0 +1,40 @@
+﻿NACHTRAG zur Fensterliste
+Datum: 22.05.2025
+Bearbeiter: Anna Müller
+
+Folgende Korrekturen und Ergänzungen:
+
+1. VGN-F-0004: Typ ist DREH (nicht Dreh-Kipp wie in V1 angegeben)
+   Maße korrigiert: 900x1200 (nicht 1000x1400)
+
+2. VGS-F-0005: MANGEL bestätigt - Pilzkopfzapfen Nr. 3 fehlt
+   Sicherheitsrelevant! Sofortige Nachrüstung beauftragt.
+   Maßnahme eingeleitet am 23.05.2025
+
+3. TZ-F-0103: MANGEL Ecklager - Austausch durchgeführt am 20.05.2025
+   Neues Teil: Maco Multi-Matic Ecklager (Art. 54321)
+   Status: saniert
+
+4. NEU ERFASST - Gebäude NGW (bisher komplett fehlend in Listen):
+   
+   Geb;Etage;Raum-Nr;Raum;Fenster-Nr;Typ;Breite;Höhe;Hersteller;Beschlag;Bj;Bemerkung
+   NGW;EG;NGW-E01;Hausverwaltung;NGW-F-0001;Dreh-Kipp;1000;1400;Weru;unbekannt;1990;sehr alt
+   NGW;EG;NGW-E01;Hausverwaltung;NGW-F-0002;Dreh-Kipp;1000;1400;Weru;unbekannt;1990;
+   NGW;EG;NGW-E02;Poststelle;NGW-F-0003;Dreh-Kipp;1000;1400;Weru;unbekannt;1990;
+   NGW;EG;NGW-E03;Lager;NGW-F-0004;Kipp;600;400;Weru;unbekannt;1990;Kellerfenster
+   NGW;1.OG;NGW-101;Büro;NGW-F-0005;Dreh-Kipp;1000;1400;Weru;unbekannt;1990;
+   NGW;1.OG;NGW-102;Büro;NGW-F-0006;Dreh-Kipp;1000;1400;Weru;unbekannt;1990;Riss im Rahmen
+   NGW;1.OG;NGW-103;Archiv;NGW-F-0007;Kipp;800;600;Weru;unbekannt;1990;
+
+5. WARNUNG: Gebäude NGW - Austausch aller Fenster für 2026 geplant!
+   Beschlagsystem "Weru" ist Eigenentwicklung und nicht mehr erhältlich.
+   Keine Ersatzteile verfügbar. Empfehlung: Komplett-Austausch.
+
+6. FEHLER in V1: VGN-F-0010 wurde als "WC Damen" geführt.
+   Korrekt: Raum VGN-109 ist NICHT "WC Damen" sondern "Teeküche"!
+   Raum wurde 2020 umgebaut. FM-System nicht aktualisiert.
+
+7. DOPPLUNG GEFUNDEN: VGN-F-0015 existiert sowohl in der FM-Liste
+   als Raum VGN-201 (Roto NT, 2005) als auch in unserer Begehung
+   als Raum VGN-201 (Siegenia Titan AF, 2012). 
+   KLÄRUNG: Beschlag wurde 2012 getauscht. FM-Daten veraltet!

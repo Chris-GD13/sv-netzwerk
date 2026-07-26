@@ -1,0 +1,73 @@
+﻿PRÜFPROTOKOLL Nr. PP-2025-VGS-001
+===================================
+
+Projekt:    BMVg Dienstsitz Bonn
+Gebäude:    Verwaltungsgebäude Süd (VGS)
+Etage:      Erdgeschoss
+Prüfer:     Klaus Schmidt
+Datum:      12.05.2025
+
+══════════════════════════════════════════════════════════════════
+
+Raum VGS-101 (Empfangshalle):
+──────────────────────────────
+
+Fenster VGS-F-0001 | Dreh-Kipp | 1400x2000 | 2-flügelig | Bj. 1998
+  Hersteller: Roto Frank | Beschlag: Roto NT Designo
+
+  Flügel 1:
+    Dreh-Funktion:        ⚠ eingeschränkt (schwergängig, erhöhter Kraftaufwand)
+    Kipp-Funktion:        ✓ funktioniert
+    Verriegelung:         ✓ OK
+    Dichtung:             ⚠ leichte Verhärtung (Alter!)
+    Ecklager:             ⚠ DEUTLICHE ABNUTZUNG, Spiel erkennbar
+    
+    ERGEBNIS:             KATEGORIE C
+    MANGEL: Ecklager verschlissen, Nachjustierung erforderlich
+    Dringlichkeit: MITTEL
+    Empfehlung: Austausch Ecklager innerhalb 6 Monaten
+    
+  Flügel 2:
+    Alle Funktionen einwandfrei.
+    Dichtung: leichte Verhärtung (wie Flügel 1)
+    ERGEBNIS: KATEGORIE B (Wartung empfohlen in 12 Monaten)
+
+──────────────────────────────────────────────────────────────────
+
+Raum VGS-102 (Großraumbüro):
+─────────────────────────────
+
+Fenster VGS-F-0003 | Dreh-Kipp | 1100x1500 | 1-flügelig | Bj. 2005
+  Hersteller: Siegenia-Aubi | Beschlag: Titan AF
+  ERGEBNIS: KATEGORIE A (ohne Beanstandung)
+
+Fenster VGS-F-0004 | Dreh-Kipp | 1100x1500 | 1-flügelig | Bj. 2005
+  ERGEBNIS: KATEGORIE A (ohne Beanstandung)
+
+Fenster VGS-F-0005 | Dreh-Kipp | 1100x1500 | 1-flügelig | Bj. 2005
+  
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  !!! SICHERHEITSRELEVANTER MANGEL !!!                       ║
+  ║                                                              ║
+  ║  PILZKOPFZAPFEN Nr. 3 (Bandseite oben) FEHLT!              ║
+  ║  Nur 3 von 4 Pilzkopfzapfen vorhanden.                     ║
+  ║  Einbruchhemmung NICHT gewährleistet!                       ║
+  ║                                                              ║
+  ║  ERGEBNIS: KATEGORIE D (sofortige Maßnahme!)               ║
+  ║  DRINGLICHKEIT: HOCH                                        ║
+  ║  MASSNAHME: Sofortige Nachrüstung des fehlenden Zapfens    ║
+  ║                                                              ║
+  ║  Auftraggeber informiert am: 12.05.2025, 14:30 Uhr         ║
+  ║  Ansprechpartner: Hr. Feldmann (per Telefon + E-Mail)       ║
+  ╚══════════════════════════════════════════════════════════════╝
+
+Fenster VGS-F-0006 | Dreh-Kipp | 1100x1500 | 1-flügelig | Bj. 2005
+  Dichtung unten: defekt (eingerissen), Zugluft spürbar
+  ERGEBNIS: KATEGORIE B (Austausch empfohlen, nicht dringend)
+
+══════════════════════════════════════════════════════════════════
+
+ZUSAMMENFASSUNG:
+  Kategorie A: 2     Kategorie B: 2     Kategorie C: 1     Kategorie D: 1 (!)
+
+  SOFORTMASSNAHME EINGELEITET für VGS-F-0005!

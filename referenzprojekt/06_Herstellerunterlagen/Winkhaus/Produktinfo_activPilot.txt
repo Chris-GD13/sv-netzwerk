@@ -1,0 +1,21 @@
+﻿Winkhaus - activPilot Produktinfo (Kurzfassung)
+================================================
+
+System:     activPilot / activPilot Select / activPilot Comfort
+Typ:        Dreh-Kipp-Beschlag für Kunststoff und Holzfenster
+Status:     Aktuelles Hauptprogramm
+
+Flügelgewicht:  bis 130 kg (Standard), 150 kg (Select)
+Flügelbreite:   bis 1.400 mm (Standard), 1.600 mm (Select)
+Flügelhöhe:     bis 2.400 mm
+
+Varianten im Objekt BMVg Bonn:
+  - activPilot Select (VGN 2.OG, Bj. 2005)
+  - activPilot (KAS, Bj. 2001, Küche erneuert 2015)
+
+Ersatzteile:
+  - Ecklager: Art. 4926.09 (links) / 4926.10 (rechts)
+  - Schere: Art. 4946.30
+  - Getriebe: Art. 4911.15 (FFH 401-600) / 4911.20 (FFH 601-800)
+
+Wartungsintervall: 12 Monate (Öl oder Fett auf alle beweglichen Teile)

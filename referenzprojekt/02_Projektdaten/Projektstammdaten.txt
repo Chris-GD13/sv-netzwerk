@@ -1,0 +1,66 @@
+﻿PROJEKTSTAMMDATEN
+=================
+
+Projekt-Nr.:        PRJ-2025-0089
+Projektname:        Fensterbeschlagsprüfung BMVg Dienstsitz Bonn
+Auftraggeber:       Bundesministerium der Verteidigung
+Auftrags-Nr. AG:    BMVg-IB/2025-0347
+Rahmenvertrag:      RV-2023/BW-456
+
+Objekt:
+  Bezeichnung:      BMVg Dienstsitz Bonn
+  Straße:           Fontainengraben 150
+  PLZ/Ort:          53123 Bonn
+  Bundesland:       Nordrhein-Westfalen
+  Baujahr Komplex:  1985-2018 (verschiedene Bauabschnitte)
+
+Auftragnehmer:
+  Firma:            SV-Netzwerk GmbH
+  Straße:           Musterstraße 42
+  PLZ/Ort:          50667 Köln
+  Tel.:             0221 / 98765-0
+  E-Mail:           info@sv-netzwerk.eu
+  USt-IdNr.:        DE123456789
+  Handelsregister:  HRB 98765, AG Köln
+
+Projektleitung AN:
+  Name:             Sandra Richter
+  Tel.:             0221 / 98765-10
+  Mobil:            0170 / 1234567
+  E-Mail:           s.richter@sv-netzwerk.eu
+
+Prüfteam:
+  1. Klaus Schmidt    (öbuv SV, Prüfer)     k.schmidt@sv-netzwerk.eu
+  2. Anna Müller      (Prüferin)            a.mueller@sv-netzwerk.eu
+  3. Dr. Michael Braun (SV, Reserve)        m.braun@sv-netzwerk.eu
+  4. Ing. Petra Hoffmann (SV, Spezial)      p.hoffmann@sv-netzwerk.eu
+
+Ansprechpartner AG:
+  Projektverantwortliche:  Dr. Claudia Westhoff
+                           Tel.: 0228 / 99-11000
+                           c.westhoff@bmvg-test.local
+
+  Gebäudemanagement:       Dipl.-Ing. Markus Feldmann
+                           Tel.: 0228 / 99-12345
+                           m.feldmann@bmvg-test.local
+
+  Hausverwaltung:          Thomas Krämer
+                           Tel.: 0228 / 99-12399
+                           t.kraemer@bmvg-test.local
+
+  Sicherheit:              Wolfgang Berger
+                           Tel.: 0228 / 99-12500
+                           w.berger@bmvg-test.local
+
+Zeitraum:
+  Auftragseingang:  12.02.2025
+  Projektstart:     01.04.2025
+  Zwischenbericht:  30.06.2025
+  Abschluss:        31.08.2025
+
+Volumen:
+  Geschätzt:        ~810 Fenster, ~1.200 Flügel
+  Auftragssumme:    ca. 38.000 EUR netto
+
+Status:             IN BEARBEITUNG (Stand: Juli 2025)
+Fortschritt:        ca. 45% (ca. 370 von 810 Fenstern geprüft)

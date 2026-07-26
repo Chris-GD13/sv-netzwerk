@@ -1,0 +1,62 @@
+﻿═══════════════════════════════════════════════════════
+ROTO FRANK AG - TECHNISCHES DATENBLATT
+═══════════════════════════════════════════════════════
+
+Produkt:         Roto NT Designo
+Produktgruppe:   Dreh-Kipp-Beschlag
+Anwendung:       Holz-, Kunststoff- und Aluminium-Fenster
+Einführung:      2001
+Status:          Auslaufmodell (Nachfolger: Roto NX ab 2020)
+
+TECHNISCHE DATEN:
+─────────────────
+  Max. Flügelgewicht:     130 kg
+  Max. Flügelbreite:      1.600 mm
+  Max. Flügelhöhe:        2.400 mm
+  Min. Flügelbreite:      370 mm
+  Min. Flügelhöhe:        500 mm
+  Falzluft:               12 mm (Standard), 16 mm (Sonder)
+  Überschlag:             18 mm
+
+VERRIEGELUNG:
+─────────────
+  Pilzkopfzapfen:         Standard 4 Stück
+                          RC1: 4 Stück
+                          RC2: 6 Stück
+                          RC3: 8 Stück (Sonderausführung)
+  Schließbleche:          SBS.K (Komfort) oder SBS.S (Standard)
+  Schließhub:             11 mm
+
+WARTUNGSHINWEISE:
+────────────────
+  Fettung:                alle 12 Monate (Beschlagfett Art. 820 058)
+  Funktionsprüfung:       alle 24 Monate
+  Nachjustierung:         bei Bedarf über Excenter-Verstellung
+  Lebensdauer:            ca. 50.000 Öffnungszyklen (DIN EN 1191)
+  Verschleißteile:        Ecklager (Art. 374 130), Schere (Art. 601 993)
+
+KOMPATIBILITÄT:
+──────────────
+  Nachfolger:             Roto NX (seit 2020)
+  Nachrüstung RC2:        möglich mit Set Art. 849 725
+  Ersatzteile:            lieferbar bis mindestens 2030
+  Austausch auf NX:       mit Adapterset Art. 852 111
+
+IDENTIFIKATION:
+──────────────
+  Typenschild:            auf Eckumlenkung (oben, Bandseite)
+  Aufdruck:               "Roto NT" + Fertigungscode
+  Fertigungscode:         JJ/WW-LLLLL (Jahr/Woche-Laufnummer)
+  Beispiel:               05/12-02847 = KW12/2005, Nr. 2847
+
+BEKANNTE PROBLEME (Service-Info SI-2019-003):
+────────────────────────────────────────────
+  - Ecklager bei Flügeln >100kg: Verschleiß nach ca. 30.000 Zyklen
+    → Empfehlung: Schwerlastrollen nachrüsten (Art. 862 003)
+  - Titan-Ausführung (vor 2008): Schraubenlockerung möglich
+    → Regelmäßige Kontrolle der Befestigungsschrauben
+
+═══════════════════════════════════════════════════════
+Roto Frank AG | Wilhelm-Frank-Platz 1 | 70771 Leinfelden
+www.roto-frank.com | Tel.: +49 711 7598-0
+═══════════════════════════════════════════════════════

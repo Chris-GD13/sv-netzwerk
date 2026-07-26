@@ -1,0 +1,34 @@
+﻿GRUNDRISS - Technisches Zentrum (TZ) - Erdgeschoss
+===================================================
+Maßstab: nicht maßstäblich
+Stand: Ursprungsplan 1985, diverse Umbauten
+
+                        NORD
+    ┌─────────────────────────────────────────────────────────────┐
+    │ F101 F102          F103 F104 F105 F106    F107 F108 F109    │
+    │  ↓    ↓            ↓    ↓    ↓    ↓       ↓    ↓    ↓     │
+    │┌──────────┐┌──────────────────────────┐┌────────────────┐  │
+    ││          ││                           ││                │  │
+    ││ Empfang  ││   Werkstatt Holz         ││  Werkstatt     │  │
+    ││ TZ-E01   ││   TZ-E02                 ││  Kunststoff    │  │
+    ││          ││   (4 Fenster)            ││  TZ-E03        │  │
+    ││ 2 Fenst. ││                           ││  (4 Fenster)   │  │
+    │└────┬─────┘└────────────┬──────────────┘└───────┬────────┘  │
+    │     │      FLUR         │                       │           │
+    │ ════╪═══════════════════╪═══════════════════════╪═══════    │
+    │     │                   │                       │           │
+    │┌────┴─────┐┌────────────┴──────┐┌──────────────┴────────┐  │
+    ││Material- ││ Büro               ││  WC / Umkleide        │  │
+    ││ausgabe   ││ Werkstattleiter    ││  TZ-E06               │  │
+    ││TZ-E04    ││ TZ-E05            ││  2 Fenster (Milchglas) │  │
+    ││2 Fenster ││ 2 Fenster         ││                        │  │
+    │└──────────┘└────────────────────┘└────────────────────────┘  │
+    │  F110 F111    F112 F113              F114 F115              │
+    └─────────────────────────────────────────────────────────────┘
+                        SÜD
+
+ACHTUNG: Gebäude TZ hat den ältesten Fensterbestand (1985)!
+Diverse Beschlagshersteller, teilweise nicht mehr lieferbar.
+Höchste erwartete Mängelquote im gesamten Projekt.
+
+Hersteller EG: überwiegend Maco Multi-Matic (1985), teilw. GU UNI-JET (Nachrüstung ca. 2000)

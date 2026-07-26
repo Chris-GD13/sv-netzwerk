@@ -1,0 +1,55 @@
+﻿═══════════════════════════════════════════════════════
+SIEGENIA-AUBI - PRODUKTINFORMATION
+═══════════════════════════════════════════════════════
+
+Produkt:         TITAN AF (axxent Fenster)
+Produktgruppe:   Dreh-Kipp-Beschlag
+Generation:      TITAN AF (seit 2005)
+Status:          Aktuelles Programm
+
+TECHNISCHE DATEN:
+─────────────────
+  Max. Flügelgewicht:     150 kg (mit Zusatzlager)
+  Max. Flügelbreite:      1.600 mm
+  Max. Flügelhöhe:        2.600 mm
+  Achsmaß:                13 mm
+  Falzluft:               12 mm
+
+SICHERHEIT:
+───────────
+  Einbruchhemmung:        bis RC2 (serienmäßig vorbereitet)
+  Pilzkopfverriegelung:   Standard an allen Schließstellen
+  i.S.-Pilzkopfzapfen:    6 Stück (RC2-Ausführung)
+  SoftClose:              optional (Art. SI-A 0160)
+
+BESONDERHEITEN:
+──────────────
+  - Verdeckt liegende Scheren (kein sichtbarer Beschlag)
+  - Stufenlose Spaltlüftung (4 Positionen)
+  - Werkzeuglose Flügelausbau
+  - Spielfreie Lagerung
+
+WARTUNG:
+────────
+  Schmierung:             jährlich (SIEGENIA Pflegeset Art. 428 060)
+  Einstellung:            über Comforteinstellschraube
+  Eckumlenkung:           wartungsfrei (Kunststoffgleitlager)
+  Prüfintervall:          alle 2 Jahre (Empfehlung)
+
+IDENTIFIKATION:
+──────────────
+  Typenschild:            auf Getriebe (Griffseite, verdeckt)
+  Aufdruck:               "TITAN AF" + Seriennummer
+  Baujahr-Code:           Punktmatrix auf Eckband
+
+WICHTIG FÜR PRÜFER:
+───────────────────
+  Bei Nachjustierung: Excenter-Verstellung mit 4mm Innensechskant
+  Anpressdruck erhöhen: Zapfen um 90° drehen (Markierung zur Dichtung)
+  ACHTUNG: Nicht mit Standard-Innensechskant! Nur Original-Werkzeug!
+  Drehmomment max. 2,5 Nm auf Befestigungsschrauben.
+
+═══════════════════════════════════════════════════════
+SIEGENIA-AUBI KG | Industriestraße 1-3 | 57234 Wilnsdorf
+www.siegenia.com | Service-Hotline: +49 2737 471-0
+═══════════════════════════════════════════════════════

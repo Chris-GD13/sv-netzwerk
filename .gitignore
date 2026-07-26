@@ -1,0 +1,7 @@
+tests/node_modules/
+tests/playwright-report/
+tests/test-results/
+analysis_export/screenshots/
+analysis_export.zip
+referenzprojekt_import.zip
+referenzprojekt_soll.zip

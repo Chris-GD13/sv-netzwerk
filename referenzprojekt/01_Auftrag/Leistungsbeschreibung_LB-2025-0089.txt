@@ -1,0 +1,80 @@
+﻿LEISTUNGSBESCHREIBUNG
+=====================
+Projekt:    Fensterbeschlagsprüfung BMVg Dienstsitz Bonn
+LB-Nr.:     LB-2025-0089
+Version:    1.0
+Datum:      17.02.2025
+Ersteller:  Sandra Richter
+
+1. GEGENSTAND
+
+Vollständige Prüfung aller Fensterbeschläge in 7 Gebäuden des BMVg
+Dienstsitzes Bonn gemäß DIN EN 13126 (Baubeschläge – Anforderungen und
+Prüfverfahren für Fenster und Fenstertüren) und DIN EN 1191 (Fenster und
+Türen – Dauerfunktionsprüfung).
+
+2. PRÜFUMFANG JE FENSTERFLÜGEL
+
+2.1 Sichtprüfung
+    - Beschlagszustand (Korrosion, Verschleiß, Beschädigung)
+    - Dichtungszustand
+    - Glashalterung
+    - Rahmenzustand
+
+2.2 Funktionsprüfung
+    - Öffnen/Schließen (Leichtgängigkeit)
+    - Kipp-Funktion
+    - Dreh-Funktion
+    - Verriegelung (alle Schließpunkte)
+    - Fehlbedienungssperre
+
+2.3 Sicherheitsprüfung
+    - Pilzkopfzapfen vorhanden und funktionsfähig
+    - Schließbleche korrekt montiert
+    - Absturzsicherung (ab 1. OG)
+    - Kindersicherung (wo gefordert)
+
+2.4 Maßaufnahme
+    - Flügelbreite und -höhe
+    - Falzluft
+    - Überschlag
+
+3. DOKUMENTATION
+
+Für jedes geprüfte Element:
+    - Eindeutige Fensternummer
+    - Raumzuordnung (Gebäude/Etage/Raum)
+    - Hersteller und Beschlagsystem
+    - Baujahr (soweit ermittelbar)
+    - Prüfergebnis (Ampelsystem: grün/gelb/rot)
+    - Maßnahmenempfehlung
+    - Fotodokumentation (mindestens 1 Übersicht + Details bei Mängeln)
+
+4. BEWERTUNGSMASSSTAB
+
+    Kategorie A (grün):  Ohne Beanstandung, nächste Prüfung in 5 Jahren
+    Kategorie B (gelb):  Leichte Mängel, Wartung empfohlen innerhalb 12 Monaten
+    Kategorie C (orange): Funktionseinschränkung, Reparatur innerhalb 6 Monaten
+    Kategorie D (rot):    Sicherheitsrelevant, sofortige Maßnahme erforderlich
+
+5. LIEFERGEGENSTÄNDE
+
+    - Prüfbericht je Gebäude (PDF)
+    - Gesamtbericht mit Zusammenfassung
+    - Mängelliste (Excel + PDF)
+    - Maßnahmenliste mit Prioritäten
+    - Fotodokumentation (digital, zugeordnet)
+    - Datenexport für Facility-Management-System (CSV)
+
+6. QUALIFIKATION
+
+    Prüfungen werden ausschließlich von öffentlich bestellten und
+    vereidigten Sachverständigen oder unter deren Aufsicht durchgeführt.
+
+7. NORMEN UND REGELWERKE
+
+    - DIN EN 13126-1 bis -8
+    - DIN EN 1191
+    - DIN EN 14351-1
+    - RAL-GZ 607 (Fenster mit Qualitätssiegel)
+    - VFF-Merkblatt KB.01

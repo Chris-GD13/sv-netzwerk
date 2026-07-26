@@ -1,0 +1,102 @@
+﻿PRÜFPROTOKOLL Nr. PP-2025-VGN-001
+===================================
+
+Projekt:    BMVg Dienstsitz Bonn (PRJ-2025-0089)
+Gebäude:    Verwaltungsgebäude Nord (VGN)
+Etage:      Erdgeschoss
+Prüfer:     Klaus Schmidt (öbuv SV für Fenstertechnik, IHK Köln)
+Datum:      15.04.2025
+Uhrzeit:    08:30 - 12:45
+Wetter:     bewölkt, 14°C, trocken
+
+══════════════════════════════════════════════════════════════════
+
+Raum VGN-101 (Empfang/Foyer):
+──────────────────────────────
+
+Fenster VGN-F-0001 | Dreh-Kipp | 1200x1600 | 2-flügelig | Bj. 2005
+  Hersteller: Schüco | Beschlag: AvanTec
+  
+  Flügel 1 (links):
+    Dreh-Funktion:        ✓ leichtgängig
+    Kipp-Funktion:        ✓ einwandfrei
+    Verriegelung:         ✓ alle 6 Schließpunkte greifen
+    Pilzkopfzapfen:       ✓ 6 Stück vorhanden, funktional
+    Dichtung:             ✓ elastisch, kein Verschleiß sichtbar
+    Ecklager:             ✓ spielfrei
+    Schere:               ✓ kein Spiel
+    Griff:                ✓ fest, Rastung einwandfrei
+    ERGEBNIS:             KATEGORIE A (ohne Beanstandung)
+    
+  Flügel 2 (rechts):
+    Dreh-Funktion:        ✓ leichtgängig
+    Kipp-Funktion:        ✓ einwandfrei
+    Verriegelung:         ✓ alle Schließpunkte OK
+    Pilzkopfzapfen:       ✓ vorhanden
+    Dichtung:             ✓ OK
+    Ecklager:             ✓ spielfrei
+    Schere:               ✓ OK
+    Griff:                ✓ OK
+    ERGEBNIS:             KATEGORIE A (ohne Beanstandung)
+
+  Glas:                   2-fach WSG, ohne Beschädigung
+  Rahmen:                 Kunststoff weiß, ohne Beschädigung
+  Gesamtergebnis:         ✓ OHNE BEANSTANDUNG
+  Nächste Prüfung:        2030
+
+──────────────────────────────────────────────────────────────────
+
+Fenster VGN-F-0002 | Dreh-Kipp | 1200x1600 | 2-flügelig | Bj. 2005
+  Hersteller: Schüco | Beschlag: AvanTec
+  [wie VGN-F-0001, ohne Beanstandung]
+  ERGEBNIS: KATEGORIE A
+
+──────────────────────────────────────────────────────────────────
+
+Raum VGN-102 (Büro 1):
+───────────────────────
+
+Fenster VGN-F-0003 | Dreh-Kipp | 1000x1400 | 1-flügelig | Bj. 2005
+  Hersteller: Roto Frank | Beschlag: Roto NT Designo
+  
+  Flügel 1:
+    Dreh-Funktion:        ⚠ SCHWERGÄNGIG (erhöhter Kraftaufwand)
+    Kipp-Funktion:        ✓ einwandfrei
+    Verriegelung:         ✓ greift
+    Pilzkopfzapfen:       ✓ 4 Stück
+    Dichtung:             ✗ DEFEKT! Untere Dichtung verhärtet und eingerissen
+    Ecklager:             ⚠ leichtes Spiel erkennbar
+    Schere:               ✓ OK
+    Griff:                ✓ OK
+    
+    ERGEBNIS:             KATEGORIE C (Funktionseinschränkung)
+    
+    MÄNGEL:
+    1. Dichtung unten defekt → Zugluft, Feuchteeintrag möglich
+       Maßnahme: Dichtung austauschen (innerhalb 6 Monate)
+       Dringlichkeit: MITTEL
+       
+    2. Dreh-Funktion schwergängig → Nachjustierung Ecklager
+       Maßnahme: Ecklager nachstellen, ggf. austauschen
+       Dringlichkeit: GERING
+       
+  Glas: ohne Beanstandung
+  Rahmen: Lack leicht verwittert (kosmetisch, keine Maßnahme)
+
+──────────────────────────────────────────────────────────────────
+
+ZUSAMMENFASSUNG EG (Teilprüfung 15.04.2025):
+─────────────────────────────────────────────
+  Geprüfte Fenster:       8 (von 14)
+  Kategorie A:            6
+  Kategorie B:            1 (VGN-F-0009, Dichtung leicht verhärtet)
+  Kategorie C:            1 (VGN-F-0003, Dichtung + Ecklager)
+  Kategorie D:            0
+  
+  Prüfung wird fortgesetzt am 16.04.2025
+
+══════════════════════════════════════════════════════════════════
+
+Unterschrift: ___________________
+              Klaus Schmidt, öbuv SV
+              IHK Köln Nr. 3847/2018

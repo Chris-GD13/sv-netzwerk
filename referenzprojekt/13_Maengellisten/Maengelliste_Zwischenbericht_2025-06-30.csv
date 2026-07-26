@@ -1,0 +1,34 @@
+﻿MÄNGELLISTE
+============
+Projekt: BMVg Dienstsitz Bonn (PRJ-2025-0089)
+Stand: 30.06.2025 (Zwischenbericht)
+Erstellt: Sandra Richter
+
+Nr;Gebäude;Etage;Raum;Fenster;Mangel;Kategorie;Dringlichkeit;Maßnahme;Status;Termin
+1;VGN;EG;VGN-102;VGN-F-0003;Dichtung unten defekt, verhärtet und eingerissen;C;mittel;Dichtung austauschen;offen;bis 10/2025
+2;VGN;EG;VGN-102;VGN-F-0003;Dreh-Funktion schwergängig, Ecklager Spiel;C;gering;Ecklager nachjustieren/austauschen;offen;bis 10/2025
+3;VGS;EG;VGS-101;VGS-F-0001;Ecklager Flügel 1 verschlissen;C;mittel;Ecklager austauschen;offen;bis 11/2025
+4;VGS;EG;VGS-102;VGS-F-0005;Pilzkopfzapfen Nr. 3 FEHLT - Sicherheitsmangel!;D;HOCH;Sofortige Nachrüstung;BEHOBEN;15.05.2025
+5;VGS;EG;VGS-102;VGS-F-0006;Dichtung unten defekt;B;gering;Dichtung austauschen;offen;bis 12/2025
+6;TZ;EG;TZ-E02;TZ-F-0103;Ecklager stark verschlissen, Schere hat Spiel;C;mittel;Ecklager + Schere austauschen;BEHOBEN;20.05.2025
+7;TZ;EG;TZ-E02;TZ-F-0104;Schwergängig, Dichtung verhärtet;B;gering;Nachjustierung + Wartung;offen;bis 12/2025
+8;TZ;EG;TZ-E01;TZ-F-0101;Beschlag stark verschlissen (40 Jahre!);C;mittel;Austausch empfohlen;offen;Gesamtplanung
+9;TZ;1.OG;TZ-103;TZ-F-0120;Schere gebrochen (Altschaden 2022);D;HOCH;Bereits repariert (2022);BEHOBEN;2022
+10;NGW;EG;NGW-E01;NGW-F-0001;Beschlag Weru - keine Ersatzteile;C;mittel;Komplett-Austausch;GEPLANT;2026
+11;NGW;EG;NGW-E01;NGW-F-0002;Wie Nr. 10;C;mittel;Komplett-Austausch;GEPLANT;2026
+12;NGW;1.OG;NGW-102;NGW-F-0006;Rahmenriss (ca. 15cm);D;hoch;Fenster austauschen;offen;bis 09/2025
+
+ZUSAMMENFASSUNG:
+  Kategorie A: -  (keine Mängel)
+  Kategorie B: 2  (Wartung empfohlen)
+  Kategorie C: 7  (Funktionseinschränkung)
+  Kategorie D: 3  (Sicherheitsrelevant)
+  
+  davon behoben:   3
+  davon geplant:   2
+  davon offen:     7
+  
+  SICHERHEITSRELEVANT (D):
+  - Nr. 4: BEHOBEN (15.05.2025)
+  - Nr. 9: BEHOBEN (2022, Altfall)
+  - Nr. 12: OFFEN! Rahmenriss NGW-F-0006, Austausch dringend!

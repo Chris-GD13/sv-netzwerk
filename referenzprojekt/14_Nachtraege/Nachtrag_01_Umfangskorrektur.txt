@@ -1,0 +1,38 @@
+﻿NACHTRAG Nr. 1
+==============
+Zum Auftrag BMVg-IB/2025-0347
+Datum: 03.06.2025
+
+Sehr geehrte Frau Dr. Westhoff,
+
+bei der laufenden Prüfung hat sich herausgestellt, dass der ursprünglich
+geschätzte Umfang von "ca. 800-900 Fensterelementen" nach unten korrigiert
+werden kann.
+
+Tatsächlicher Bestand nach vollständiger Erfassung:
+  - VGN: 218 Fenster (geschätzt: 220) → ✓
+  - VGS: 156 Fenster (geschätzt: 160) → ✓
+  - KON:  48 Fenster (geschätzt: 55)  → Abweichung: Foyer hat weniger als angenommen
+  - TZ:  245 Fenster (geschätzt: 250) → ✓
+  - NGW:  62 Fenster (geschätzt: 65)  → ✓
+  - PW:   22 Fenster (geschätzt: 25)  → Abweichung: 2 Räume fensterlos
+  - KAS:  42 Fenster (geschätzt: 45)  → ✓ (Küche hat weniger)
+  ──────────────────────────────────────
+  GESAMT: 793 Fenster (geschätzt: 820)
+
+Auswirkung auf Vergütung:
+  Einzelprüfungen: 793 × 1,5 Flügel (Ø) × 18,50 EUR = ca. 22.000 EUR
+  (statt geschätzt ca. 23.400 EUR)
+  Differenz: -1.400 EUR
+
+Zusätzlich angefallen (nicht im Auftrag):
+  - Bestandskorrektur FM-System: 12 Arbeitsstunden
+  - Sonderbericht Sicherheitsmangel VGS-F-0005
+  - Dringende Empfehlung NGW Komplett-Austausch
+
+Wir bitten um Freigabe der Zusatzleistungen gemäß Rahmenvertrag §7 Abs. 3.
+
+Mit freundlichen Grüßen
+Sandra Richter
+
+Anlage: Aktualisierte Bestandszahlen (s. oben)

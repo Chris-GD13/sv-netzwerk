@@ -1,0 +1,26 @@
+﻿[VERDREHTER SCAN - Dokument war beim Scannen schief eingelegt]
+[Originaltext rekonstruiert, Scan-Qualität: mangelhaft]
+
+FE NSTER LIS TE   -   Pf orte und Wa che  (PW)
+=== ========================== ==================
+
+Geb: PW
+Bau jahr: 20 10
+Alle Fe nster:  GU-BK S  UNI-JE T  B
+
+EG:
+  PW- E01  Pfört nerloge       3 Fe nster  (Pan orama,  Süd)
+  PW- E02  Wart eraum          2 Fen ster
+  PW- E03  Cont roll raum      2 Fen ster  (Si cherheits glas!)
+  PW- E04  WC                  1 Fen ster  (Milch glas)
+
+1.OG:
+  PW- 101  Bür o Lei ter       2 Fen ster
+  PW- 102  Bür o               2 Fen ster
+  PW- 103  Tee küche           1 Fen ster
+
+Gesa mt:  13 + 5 = 18 Fen ster ???
+
+[Anmerkung: Summe stimmt nicht! 3+2+2+1+2+2+1 = 13, nicht 18!]
+[Die Angabe "13 + 5" ist unklar. Fehlen Fenster in der Liste?]
+[MUSS VOR ORT VERIFIZIERT WERDEN]

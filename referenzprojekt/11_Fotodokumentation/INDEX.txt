@@ -1,0 +1,35 @@
+FOTODOKUMENTATION - INDEX
+=========================
+Projekt: BMVg Dienstsitz Bonn
+Stand: Juli 2025
+
+Nr.  Datei                                          Beschreibung
+---- ---------------------------------------------- ----------------------------------------
+1    VGN_EG\VGN-F-0001_Uebersicht.png               Empfangsfenster VGN links, Gesamtansicht, 2-fluegelig
+2    VGN_EG\VGN-F-0001_Beschlag_Detail.png          Schuco AvanTec Ecklager Nahaufnahme
+3    VGN_EG\VGN-F-0003_Mangel_Dichtung.png          Defekte Dichtung unten, eingerissen
+4    VGN_EG\VGN-F-0003_Mangel_Schwergaengig.png     Ecklager mit sichtbarem Spiel
+5    VGN_1OG\VGN-F-0015_Uebersicht.png              Buero 201, Siegenia Titan AF (2012 erneuert)
+6    VGN_1OG\VGN-F-0015_Typenschild.png             Typenschild Siegenia Titan AF auf Eckband
+7    VGS_EG\VGS-F-0001_Uebersicht.png               Empfangshalle VGS, grosses 2-fluegeliges Fenster
+8    VGS_EG\VGS-F-0001_Ecklager_Verschleiss.png     Deutliche Abnutzung am Ecklager
+9    VGS_EG\VGS-F-0005_MANGEL_Pilzkopf_fehlt.png    SICHERHEITSMANGEL! Leere Bohrung wo Pilzkopfzapfen Nr 3 sein sollte
+10   VGS_EG\VGS-F-0005_Schliessblech_Detail.png     Schliessblech ohne Gegenstueck
+11   VGS_EG\VGS-F-0005_BEHOBEN_Nachruest.png        Nach Nachruest: Pilzkopfzapfen montiert (15.05.2025)
+12   TZ_EG\TZ-F-0101_Uebersicht.png                 TZ Empfang, sehr alter Maco-Beschlag von 1985
+13   TZ_EG\TZ-F-0103_Mangel_Ecklager.png            Stark verschlissenes Ecklager, Maco Multi-Matic
+14   TZ_EG\TZ-F-0103_BEHOBEN_neues_Ecklager.png     Neues Maco Ecklager nach Austausch (20.05.2025)
+15   TZ_EG\TZ-F-0106_Typenschild.png                Typenschild zeigt MACO (nicht GU wie in FM-System!)
+16   Maengel\MANGEL_Dichtung_verhaertet_Beispiel.png Beispiel verhaertete Dichtung (VGS-F-0001)
+17   Maengel\MANGEL_Ecklager_Spiel_Beispiel.png     Beispiel Ecklager-Spiel, Licht sichtbar
+18   Maengel\MANGEL_Pilzkopf_fehlt_Beispiel.png     Beispiel fehlender Pilzkopfzapfen
+19   Maengel\MANGEL_Schere_gebrochen_TZ.png         Gebrochene Schere (Altschaden TZ 2022)
+20   Maengel\MANGEL_Rahmenriss_NGW.png              Rahmenriss ca 15cm, NGW-F-0006
+21   Typenschilder\Typenschild_Roto_NT_2005.png     Roto NT Designo, Fertigungscode 05/12-02847
+22   Typenschilder\Typenschild_Siegenia_TitanAF_2012.png TITAN AF Punktmatrix-Code
+23   Typenschilder\Typenschild_Maco_1985.png        Altes Maco-Schild, teilweise unleserlich
+24   Typenschilder\Typenschild_Schuco_AvanTec_2018.png Schuco AvanTec SimplySmart Seriennr.
+25   Typenschilder\Typenschild_Weru_1990_UNLESERLICH.png Weru Typenschild NGW - kaum noch lesbar!
+
+GESAMT: 25 Fotos in dieser Teillieferung
+Weitere Fotos folgen mit Prüfung der restlichen Gebäude.

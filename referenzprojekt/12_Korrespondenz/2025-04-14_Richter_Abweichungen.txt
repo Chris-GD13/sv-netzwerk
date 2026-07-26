@@ -1,0 +1,39 @@
+﻿Von: s.richter@sv-netzwerk.eu
+An: markus.feldmann@bmvg-test.local
+CC: k.schmidt@sv-netzwerk.eu
+Datum: 14.04.2025 16:22
+Betreff: Ergebnisse Erstbegehung + Abweichungen FM-Daten
+
+Sehr geehrter Herr Feldmann,
+
+die Erstbegehung ist abgeschlossen. Wie von Ihnen angedeutet,
+gibt es erhebliche Abweichungen zwischen FM-Daten und Realität:
+
+1. VGN 1.OG: ALLE Beschläge sind Siegenia Titan AF (Bj. 2012),
+   nicht Roto NT wie im System hinterlegt. Die Sanierung 2012
+   wurde offenbar nie ins FM-System übertragen.
+
+2. KAS (Kantine): Komplett fehlend! Wir haben ca. 18 Fenster erfasst.
+   Küche wurde 2015 teilsaniert (neue Winkhaus-Beschläge).
+
+3. NGW: Sehr alter Bestand (Weru, ca. 1990). 
+   Beschlagsystem ist eine Eigenentwicklung → keine Ersatzteile!
+   Dringender Handlungsbedarf!
+
+4. TZ: Zustand deutlich schlechter als erwartet.
+   Maco Multi-Matic von 1985, teilweise stark verschlissen.
+   Ein Fenster im EG (TZ-F-0106) hat NICHT den im FM-System
+   eingetragenen GU-Beschlag, sondern ist Maco.
+
+5. Raum VGN-109: Im FM als "WC Damen" geführt,
+   ist aber seit 2020 eine Teeküche (umgebaut!).
+
+Bitte aktualisieren Sie die FM-Daten entsprechend.
+Detaillierte Abweichungsliste folgt im Zwischenbericht.
+
+Nächste Schritte:
+- Ab 28.04. beginnen wir mit der eigentlichen Prüfung (VGN EG)
+- Bitte Termin für 3.OG VGN mit Hr. Berger koordinieren
+
+Mit freundlichen Grüßen
+Sandra Richter

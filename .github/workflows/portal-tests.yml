@@ -1,0 +1,101 @@
+﻿name: Portal Tests
+
+on:
+  push:
+    paths: ['sv-netzwerk/**']
+  pull_request:
+    paths: ['sv-netzwerk/**']
+  schedule:
+    - cron: '0 6 * * 1'  # Montags 6 Uhr
+
+jobs:
+  data-integrity:
+    name: Datenintegritäts-Test
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testpass
+          MYSQL_DATABASE: fensterpruefung
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, curl
+
+      - name: Import Schema
+        run: mysql -h 127.0.0.1 -u root -ptestpass fensterpruefung < sv-netzwerk/public/intern/api/schema.sql
+
+      - name: Import Referenzdaten
+        run: mysql -h 127.0.0.1 -u root -ptestpass fensterpruefung < analysis_export/testdata/referenz_seed.sql
+
+      - name: Datenintegrität prüfen
+        env:
+          DB_HOST: 127.0.0.1
+          DB_NAME: fensterpruefung
+          DB_USER: root
+          DB_PASS: testpass
+        run: php tests/data_integrity_test.php
+
+  integration:
+    name: API-Integrationstests
+    runs-on: ubuntu-latest
+    needs: data-integrity
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testpass
+          MYSQL_DATABASE: fensterpruefung
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, curl
+
+      - name: Import Schema + Daten
+        run: |
+          mysql -h 127.0.0.1 -u root -ptestpass fensterpruefung < sv-netzwerk/public/intern/api/schema.sql
+          mysql -h 127.0.0.1 -u root -ptestpass fensterpruefung < analysis_export/testdata/referenz_seed.sql
+
+      - name: Create .env
+        run: |
+          cat > sv-netzwerk/public/intern/api/.env << 'EOF'
+          DB_HOST=127.0.0.1
+          DB_NAME=fensterpruefung
+          DB_USER=root
+          DB_PASS=testpass
+          OPENAI_API_KEY=sk-test-dummy
+          EOF
+
+      - name: Start PHP Server
+        run: |
+          cd sv-netzwerk/public
+          php -S 127.0.0.1:8080 &
+          sleep 2
+
+      - name: API-Tests ausführen
+        run: php tests/integration_test.php http://127.0.0.1:8080/intern/api admin@testprojekt.local Test2026!

@@ -1,0 +1,69 @@
+﻿RAUMBUCH (Auszug)
+=================
+Objekt: BMVg Dienstsitz Bonn
+Stand: Facility Management, Export 2024-12
+
+Gebäude: Verwaltungsgebäude Nord (VGN)
+─────────────────────────────────────
+
+Etage   Raum-Nr    Bezeichnung          Nutzung         Fläche   Fenster  Bemerkung
+------- ---------- -------------------- --------------- -------- -------- ------------------
+EG      VGN-101    Empfang/Foyer        Empfang         85 m²    2        repräsentativ
+EG      VGN-102    Büro Sachbearbeitung Büro            18 m²    1        Einzelbüro
+EG      VGN-103    Büro Sachbearbeitung Büro            24 m²    2        Doppelbüro
+EG      VGN-104    Büro Sachbearbeitung Büro            18 m²    1        
+EG      VGN-105    Büro Sachbearbeitung Büro            18 m²    1        
+EG      VGN-106    Büro Sachbearbeitung Büro            18 m²    1        
+EG      VGN-107    Büro Sachbearbeitung Büro            18 m²    1        
+EG      VGN-108    WC Herren            Sanitär         12 m²    1        Milchglas
+EG      VGN-109    WC Damen             Sanitär         12 m²    1        ACHTUNG: umgebaut zu Teeküche 2020!
+EG      VGN-110    Teeküche             Sozialraum      8 m²     1        
+EG      VGN-111    Archiv               Lager           15 m²    1        Rollregale
+EG      VGN-112    Büro Sachbearbeitung Büro            18 m²    1        
+EG      VGN-113    Büro Sachbearbeitung Büro            18 m²    1        
+EG      VGN-114    Treppenhaus          Verkehr         20 m²    1        
+1.OG    VGN-201    Büro Abteilungsltr.  Büro            22 m²    1        
+1.OG    VGN-202    Büro Sachbearbeitung Büro            18 m²    1        
+1.OG    VGN-203    Besprechungsraum     Besprechung     35 m²    2        Beamer vorhanden
+1.OG    VGN-204    Büro Sachbearbeitung Büro            18 m²    1        
+1.OG    VGN-205    Büro Sachbearbeitung Büro            18 m²    1        NICHT in FM-System!
+1.OG    VGN-206    Büro Sachbearbeitung Büro            18 m²    1        
+1.OG    VGN-207    Büro Sachbearbeitung Büro            18 m²    1        
+1.OG    VGN-208    Büro Sachbearbeitung Büro            18 m²    1        
+1.OG    VGN-209    Büro Sachbearbeitung Büro            18 m²    1        
+1.OG    VGN-210    Büro Sachbearbeitung Büro            18 m²    1        
+1.OG    VGN-211    WC Herren            Sanitär         12 m²    1        
+1.OG    VGN-212    WC Damen             Sanitär         12 m²    1        
+1.OG    VGN-213    Serverraum           Technik         25 m²    0        Klimatisiert, kein Zutritt
+2.OG    VGN-301    Konferenzraum groß   Besprechung     65 m²    3        Videokonferenz
+2.OG    VGN-302    Büro Referatsleiter  Büro            28 m²    2        
+2.OG    VGN-303    Sekretariat          Büro            22 m²    1        
+2.OG    VGN-304    Büro Referent        Büro            18 m²    1        
+3.OG    VGN-401    Büro Abteilungsltr.  Büro            28 m²    2        SICHERHEITSBEREICH
+3.OG    VGN-402    Büro Referent        Büro            18 m²    1        SICHERHEITSBEREICH
+3.OG    VGN-403    Verschlusssache      Lager           20 m²    0        Fensterlos!
+
+Gebäude: Technisches Zentrum (TZ)
+──────────────────────────────────
+
+Etage   Raum-Nr    Bezeichnung          Nutzung         Fläche   Fenster  Bemerkung
+------- ---------- -------------------- --------------- -------- -------- ------------------
+UG      TZ-U01     Heizungsraum         Technik         45 m²    1        Kellerfenster
+UG      TZ-U02     Elektroverteilung    Technik         20 m²    0        fensterlos
+UG      TZ-U03     Lager Ersatzteile    Lager           30 m²    1        Kellerfenster
+UG      TZ-U04     Werkstatt Metall     Werkstatt       80 m²    3        
+UG      TZ-U05     Lager Beschläge      Lager           25 m²    0        fensterlos
+EG      TZ-E01     Empfang/Anmeldung    Empfang         30 m²    2        
+EG      TZ-E02     Werkstatt Holz       Werkstatt       120 m²   4        Staubabsaugung
+EG      TZ-E03     Werkstatt Kunststoff Werkstatt       100 m²   4        
+EG      TZ-E04     Materialausgabe      Lager           40 m²    2        Theke
+EG      TZ-E05     Büro Werkstattleiter Büro            22 m²    2        
+EG      TZ-E06     WC/Umkleide          Sanitär         30 m²    2        Milchglas
+EG      TZ-E07     Flur                 Verkehr         35 m²    1        Oberlicht
+1.OG    TZ-101     Büro Technik 1       Büro            18 m²    2        
+1.OG    TZ-102     Büro Technik 2       Büro            18 m²    2        
+1.OG    TZ-103     Prüflabor            Labor           45 m²    3        
+1.OG    TZ-104     Messraum             Labor           20 m²    1        verdunkelt
+1.OG    TZ-105     Serverraum           Technik         25 m²    0        fensterlos
+1.OG    TZ-106     Besprechung TZ       Besprechung     30 m²    3        
+1.OG    TZ-107     Teeküche             Sozial          10 m²    1        

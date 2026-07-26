@@ -1,0 +1,24 @@
+﻿BESCHLAGÜBERSICHT - Projekt BMVg Bonn
+=====================================
+Stand: April 2025 (nach Erstbegehung)
+
+Geb.  Etage       Hersteller       System              Bj.    Zustand     Ersatzteile
+----- ----------- ---------------- ------------------- ------ ----------- ----------------
+VGN   EG          Schüco           AvanTec             2005   gut         verfügbar
+VGN   EG (Büros)  Roto Frank       Roto NT Designo     2005   befriedigend lieferbar bis 2030
+VGN   1.OG        Siegenia-Aubi    Titan AF            2012   gut         aktuelles Programm
+VGN   2.OG        Winkhaus         activPilot Select   2005   befriedigend verfügbar
+VGN   3.OG        Winkhaus         activPilot Select   2005   befriedigend verfügbar
+VGS   EG-2.OG     Roto Frank       Roto NT Designo     1998   ausreichend lieferbar bis 2030
+VGS   EG (Büros)  Siegenia-Aubi    Titan AF            2005   gut         aktuelles Programm
+KON   komplett    Schüco           AvanTec SimplySmart 2018   sehr gut    aktuelles Programm
+TZ    komplett    Maco             Multi-Matic         1985   mangelhaft  EINGESCHRÄNKT!
+TZ    EG (F-0106) GU-BKS           UNI-JET            2000   befriedigend verfügbar
+NGW   komplett    Weru             Eigenentwicklung    1990   mangelhaft  NICHT MEHR LIEFERBAR!
+PW    komplett    GU-BKS           UNI-JET B          2010   gut         verfügbar
+KAS   EG          Winkhaus         activPilot          2001   befriedigend verfügbar
+KAS   Küche       Winkhaus         activPilot          2015   gut         verfügbar
+
+KRITISCH:
+- TZ (Maco Multi-Matic 1985): Ecklager häufig verschlissen, Ersatzteile nur noch als B-Ware
+- NGW (Weru 1990): KEINE Ersatzteile mehr! Komplett-Austausch zwingend erforderlich!

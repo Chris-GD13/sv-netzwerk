@@ -1,0 +1,21 @@
+﻿WARTUNGSPROTOKOLL
+=================
+Gebäude: Verwaltungsgebäude Nord (VGN)
+Datum letzte Wartung: 15.11.2024
+Durchgeführt von: Fa. Fenstertechnik Müller, Bonn
+Nächste Wartung fällig: November 2025
+
+Durchgeführte Arbeiten:
+- Alle Beschläge EG und 1.OG gefettet
+- Dichtungen auf Zustand geprüft
+- 3 Fenstergriffe nachgezogen
+- 1 Dichtung EG (VGN-F-0003) als defekt vermerkt → Austausch beauftragt
+
+NICHT durchgeführt (Zugangsprobleme):
+- 3.OG (Sicherheitsbereich, kein Zutritt ohne Begleitung)
+- UG (Heizung lief, Zugang eingeschränkt)
+
+Nächste empfohlene Maßnahmen:
+1. Dichtung VGN-F-0003 austauschen (DRINGEND)
+2. 3.OG nachholen (Termin mit Sicherheit koordinieren)
+3. UG nachholen (Sommer, wenn Heizung aus)

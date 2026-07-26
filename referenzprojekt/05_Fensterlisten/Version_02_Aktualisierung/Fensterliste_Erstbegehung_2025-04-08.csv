@@ -1,0 +1,44 @@
+﻿Fensterliste - Aktualisierung nach Erstbegehung
+Projekt: BMVg Dienstsitz Bonn (PRJ-2025-0089)
+Erstellt: Klaus Schmidt, 08.04.2025
+Status: Vorläufig, Abgleich mit FM-Daten steht noch aus
+
+WICHTIG: Abweichungen zur FM-Liste vom 05.03.2025 festgestellt!
+- VGN 1.OG: Beschläge wurden 2012 durch Siegenia Titan AF ersetzt (FM-System zeigt noch Roto NT!)
+- TZ EG: Fenster F-0106 ist NICHT GU UNI-JET sondern Maco Multi-Matic (Verwechslung FM)
+- KAS: komplett fehlend in FM-Liste
+
+Geb;Etage;Raum-Nr;Raum;Fenster-Nr;Typ;Breite;Höhe;Hersteller;Beschlag;Bj;Flügel;Bemerkung
+VGN;EG;VGN-101;Empfang;VGN-F-0001;Dreh-Kipp;1200;1600;Schüco;AvanTec;2005;2;
+VGN;EG;VGN-101;Empfang;VGN-F-0002;Dreh-Kipp;1200;1600;Schüco;AvanTec;2005;2;
+VGN;EG;VGN-102;Büro 1;VGN-F-0003;Dreh-Kipp;1000;1400;Roto Frank;Roto NT Designo;2005;1;schwergängig!
+VGN;EG;VGN-103;Büro 2;VGN-F-0004;Dreh;900;1200;Roto Frank;Roto NT Designo;2005;1;
+VGN;EG;VGN-103;Büro 2;VGN-F-0005;Kipp;600;400;Roto Frank;Roto NT;2005;1;Oberlicht
+VGN;1.OG;VGN-201;Büro 201;VGN-F-0015;Dreh-Kipp;1100;1500;Siegenia-Aubi;Titan AF;2012;1;KORREKTUR: nicht Roto!
+VGN;1.OG;VGN-202;Büro 202;VGN-F-0016;Dreh-Kipp;1100;1500;Siegenia-Aubi;Titan AF;2012;1;
+VGN;1.OG;VGN-203;Besprechung;VGN-F-0017;Dreh-Kipp;1100;1500;Siegenia-Aubi;Titan AF;2012;1;
+VGN;1.OG;VGN-203;Besprechung;VGN-F-0018;Dreh-Kipp;1100;1500;Siegenia-Aubi;Titan AF;2012;1;
+VGN;1.OG;VGN-204;Büro 204;VGN-F-0019;Dreh-Kipp;1100;1500;Siegenia-Aubi;Titan AF;2012;1;
+VGN;1.OG;VGN-205;Büro 205;VGN-F-0020;Dreh-Kipp;1100;1500;Siegenia-Aubi;Titan AF;2012;1;NICHT in FM-Liste!
+VGN;2.OG;VGN-301;Konferenz;VGN-F-0025;Dreh-Kipp;1400;1800;Winkhaus;activPilot Select;2005;2;
+VGN;2.OG;VGN-301;Konferenz;VGN-F-0026;Dreh-Kipp;1400;1800;Winkhaus;activPilot Select;2005;2;
+VGN;2.OG;VGN-301;Konferenz;VGN-F-0027;Fest;1400;1800;Winkhaus;-;2005;1;Festverglasung
+TZ;EG;TZ-E01;Empfang;TZ-F-0101;Dreh-Kipp;1200;1600;Maco;Multi-Matic;1985;1;stark verschlissen
+TZ;EG;TZ-E02;Werkstatt Holz;TZ-F-0103;Dreh-Kipp;1400;1600;Maco;Multi-Matic;1985;2;MANGEL: Ecklager!
+TZ;EG;TZ-E02;Werkstatt Holz;TZ-F-0104;Dreh-Kipp;1400;1600;Maco;Multi-Matic;1985;2;
+TZ;EG;TZ-E02;Werkstatt Holz;TZ-F-0105;Dreh-Kipp;1400;1600;Maco;Multi-Matic;1985;2;
+TZ;EG;TZ-E02;Werkstatt Holz;TZ-F-0106;Dreh-Kipp;1400;1600;Maco;Multi-Matic;1985;2;KORREKTUR: Maco, nicht GU!
+KAS;EG;KAS-E01;Kantine;KAS-F-0001;Dreh-Kipp;1400;1800;Winkhaus;activPilot;2001;1;NEU ERFASST
+KAS;EG;KAS-E01;Kantine;KAS-F-0002;Dreh-Kipp;1400;1800;Winkhaus;activPilot;2001;1;
+KAS;EG;KAS-E01;Kantine;KAS-F-0003;Dreh-Kipp;1400;1800;Winkhaus;activPilot;2001;1;
+KAS;EG;KAS-E01;Kantine;KAS-F-0004;Dreh-Kipp;1400;1800;Winkhaus;activPilot;2001;1;
+KAS;EG;KAS-E01;Kantine;KAS-F-0005;Dreh-Kipp;1400;1800;Winkhaus;activPilot;2001;1;
+KAS;EG;KAS-E01;Kantine;KAS-F-0006;Dreh-Kipp;1400;1800;Winkhaus;activPilot;2001;1;
+KAS;EG;KAS-E02;Küche;KAS-F-0007;Kipp;800;500;Winkhaus;activPilot;2015;1;erneuert 2015
+KAS;EG;KAS-E02;Küche;KAS-F-0008;Kipp;800;500;Winkhaus;activPilot;2015;1;erneuert 2015
+KAS;EG;KAS-E02;Küche;KAS-F-0009;Dreh-Kipp;1000;1400;Winkhaus;activPilot;2015;1;erneuert 2015
+KAS;EG;KAS-E02;Küche;KAS-F-0010;Dreh-Kipp;1000;1400;Winkhaus;activPilot;2015;1;erneuert 2015
+
+Summe diese Teilliste: 30 Fenster
+Gesamtschätzung nach Begehung: ca. 810-830 Fenster
+Nächste Aktualisierung: nach Prüfung Gebäude VGS und NGW

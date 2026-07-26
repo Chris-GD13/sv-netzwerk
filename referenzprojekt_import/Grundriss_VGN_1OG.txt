@@ -1,0 +1,31 @@
+﻿GRUNDRISS - Verwaltungsgebäude Nord (VGN) - 1. Obergeschoss
+============================================================
+Stand: nach Sanierung 2012
+
+                        NORD
+    ┌───────────────────────────────────────────────────────┐
+    │ F015  F016  F017      F018  F019  F020  F021  F022   │
+    │  ↓     ↓     ↓        ↓     ↓     ↓     ↓     ↓    │
+    │┌─────┐┌────┐┌────────────┐┌────┐┌────┐┌────┐┌─────┐│
+    ││     ││    ││ Bespre-    ││    ││    ││    ││     ││
+    ││Büro ││Büro││ chungs-    ││Büro││Büro││Büro││Büro ││
+    ││201  ││202 ││ raum 1     ││204 ││205 ││206 ││207  ││
+    ││     ││    ││ VGN-203    ││    ││    ││    ││     ││
+    │└──┬──┘└──┬─┘└─────┬─────┘└──┬─┘└──┬─┘└──┬─┘└──┬──┘│
+    │   │      │    FLUR │         │     │     │     │    │
+    │   │      │ ════════╪═════════╪═════╪═════╪═════╪    │
+    │┌──┴──┐┌──┴──┐┌────┐│┌──────┐│┌────┴─┐┌──┴──┐┌─┴──┐│
+    ││WC H ││WC D ││Trep│││Server│││Büro  ││Büro ││Büro ││
+    ││     ││     ││haus│││raum  │││208   ││209  ││210  ││
+    ││VGN- ││VGN- ││    │││(KEIN │││      ││     ││     ││
+    ││211  ││212  ││    │││FENST)│││      ││     ││     ││
+    │└─────┘└─────┘└────┘│└──────┘│└──────┘└─────┘└─────┘│
+    │  F023   F024                  F025    F026    F027   │
+    └───────────────────────────────────────────────────────┘
+                        SÜD
+
+HINWEIS: Alle Beschläge 1.OG wurden 2012 durch Siegenia Titan AF ersetzt!
+Serverraum VGN-213: KEIN Fenster, kein Zutritt für Prüfung.
+
+Fenster 1.OG: Siegenia Titan AF, Bj. 2012, alle Dreh-Kipp
+Ausnahme: F025 (Flur) = Festverglasung
