@@ -542,6 +542,84 @@
 .intern-progress-bar__fill--warn   { background: #e67e22; }
 .intern-progress-bar__fill--danger { background: #c0392b; }
 
+/* ── Card Actions (Drei-Punkte-Menü) ──────────────────────────────────────── */
+
+.intern-building-card-wrapper {
+  position: relative;
+}
+
+.intern-list-item-wrapper {
+  position: relative;
+}
+
+.intern-card-actions {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 10;
+}
+
+.intern-action-btn {
+  background: transparent;
+  border: 1px solid var(--color-border, #d6e0e8);
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted, #5a7a8a);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.intern-action-btn:hover {
+  background: var(--color-surface, #f0f4f8);
+  border-color: var(--color-primary, #0b4f7a);
+  color: var(--color-primary, #0b4f7a);
+}
+
+.intern-action-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border, #d6e0e8);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  min-width: 160px;
+  padding: 4px 0;
+  overflow: hidden;
+}
+
+.intern-action-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: var(--color-text, #1e2a35);
+  transition: background 0.1s;
+}
+
+.intern-action-menu button:hover {
+  background: var(--color-surface-alt, #f0f4f8);
+}
+
+.intern-action-menu button[data-action="delete"] {
+  color: #c0392b;
+}
+
+.intern-action-menu button[data-action="delete"]:hover {
+  background: #fef0ef;
+}
+
 /* ── Breadcrumb ──────────────────────────────────────────────────────────────── */
 
 .intern-breadcrumb {

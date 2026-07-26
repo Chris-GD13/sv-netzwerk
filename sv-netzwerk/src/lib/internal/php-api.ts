@@ -340,14 +340,49 @@ export async function apiCreateBuilding(name: string, code: string): Promise<{ i
   return data;
 }
 
+export async function apiUpdateBuilding(id: number, name: string, code: string): Promise<boolean> {
+  const { error } = await apiPut(`/hierarchy.php?entity=building&id=${id}`, { name, code });
+  return !error;
+}
+
+export async function apiDeleteBuilding(id: number): Promise<boolean> {
+  const { error } = await apiDelete(`/hierarchy.php?entity=building&id=${id}`);
+  return !error;
+}
+
 export async function apiCreateFloor(buildingId: number, name: string, level: number): Promise<{ id: number } | null> {
   const { data } = await apiPost<{ id: number }>('/hierarchy.php?entity=floor', { building_id: buildingId, name, level });
   return data;
 }
 
+export async function apiUpdateFloor(id: number, name: string, level: number): Promise<boolean> {
+  const { error } = await apiPut(`/hierarchy.php?entity=floor&id=${id}`, { name, level });
+  return !error;
+}
+
+export async function apiDeleteFloor(id: number): Promise<boolean> {
+  const { error } = await apiDelete(`/hierarchy.php?entity=floor&id=${id}`);
+  return !error;
+}
+
 export async function apiCreateRoom(floorId: number, name: string, roomNumber: string): Promise<{ id: number } | null> {
   const { data } = await apiPost<{ id: number }>('/hierarchy.php?entity=room', { floor_id: floorId, name, room_number: roomNumber });
   return data;
+}
+
+export async function apiUpdateRoom(id: number, name: string, roomNumber: string): Promise<boolean> {
+  const { error } = await apiPut(`/hierarchy.php?entity=room&id=${id}`, { name, room_number: roomNumber });
+  return !error;
+}
+
+export async function apiDeleteRoom(id: number): Promise<boolean> {
+  const { error } = await apiDelete(`/hierarchy.php?entity=room&id=${id}`);
+  return !error;
+}
+
+export async function apiDeleteWindow(id: number): Promise<boolean> {
+  const { error } = await apiDelete(`/hierarchy.php?entity=window&id=${id}`);
+  return !error;
 }
 
 export async function apiCreateWindowInRoom(roomId: number, windowNumber: string): Promise<{ id: number; record_id: string } | null> {

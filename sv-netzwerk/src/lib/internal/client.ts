@@ -39,8 +39,15 @@ import {
   apiListRooms,
   apiListWindowsInRoom,
   apiCreateBuilding,
+  apiUpdateBuilding,
+  apiDeleteBuilding,
   apiCreateFloor,
+  apiUpdateFloor,
+  apiDeleteFloor,
   apiCreateRoom,
+  apiUpdateRoom,
+  apiDeleteRoom,
+  apiDeleteWindow,
   apiCreateWindowInRoom,
   // Flügel
   apiListSashes,
@@ -387,7 +394,7 @@ async function renderBuildings(context: AppContext) {
     ` : ''}
     <div id="building-msg"></div>
     <div class="intern-building-grid" id="building-list">
-      ${buildings.map((b) => renderBuildingCard(b)).join('') || '<div class="intern-empty">Noch keine Gebäude vorhanden.</div>'}
+      ${buildings.map((b) => renderBuildingCard(b, isAdmin)).join('') || '<div class="intern-empty">Noch keine Gebäude vorhanden.</div>'}
     </div>
   `;
 
@@ -406,26 +413,182 @@ async function renderBuildings(context: AppContext) {
       }
     });
   }
+
+  // Aktionsmenü-Handler binden
+  bindBuildingActions(context);
   bindHeaderLogout(context);
 }
 
-function renderBuildingCard(b: Building): string {
+function renderBuildingCard(b: Building, isAdmin: boolean): string {
   const pct = b.progress_pct;
   const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
   return `
-    <a class="intern-building-card" href="/intern/fensterpruefung-bonn/etagen/?building_id=${b.id}">
-      <div class="intern-building-card__header">
-        <strong>${escapeHtml(b.name)}</strong>
-        ${b.code ? `<span class="intern-badge intern-badge--info">${escapeHtml(b.code)}</span>` : ''}
+    <div class="intern-building-card-wrapper" data-building-id="${b.id}" data-building-name="${escapeHtml(b.name)}" data-building-code="${escapeHtml(b.code ?? '')}">
+      <a class="intern-building-card" href="/intern/fensterpruefung-bonn/etagen/?building_id=${b.id}">
+        <div class="intern-building-card__header">
+          <strong>${escapeHtml(b.name)}</strong>
+          ${b.code ? `<span class="intern-badge intern-badge--info">${escapeHtml(b.code)}</span>` : ''}
+        </div>
+        <div class="intern-building-stats">
+          <span>${b.window_count} Fenster · ${b.sash_count} Flügel</span>
+          ${b.sash_defect > 0 ? `<span class="intern-badge intern-badge--danger">${b.sash_defect} Mängel</span>` : ''}
+        </div>
+        <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
+        <p class="intern-meta">${pct}% geprüft · ${b.sash_completed}/${b.sash_count} Flügel</p>
+      </a>
+      ${isAdmin ? `
+      <div class="intern-card-actions">
+        <button class="intern-action-btn" data-action="menu" title="Aktionen" aria-label="Aktionen">⋮</button>
+        <div class="intern-action-menu" hidden>
+          <button data-action="edit">✏️ Bearbeiten</button>
+          <button data-action="delete">🗑️ Löschen</button>
+        </div>
       </div>
-      <div class="intern-building-stats">
-        <span>${b.window_count} Fenster · ${b.sash_count} Flügel</span>
-        ${b.sash_defect > 0 ? `<span class="intern-badge intern-badge--danger">${b.sash_defect} Mängel</span>` : ''}
-      </div>
-      <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
-      <p class="intern-meta">${pct}% geprüft · ${b.sash_completed}/${b.sash_count} Flügel</p>
-    </a>
+      ` : ''}
+    </div>
   `;
+}
+
+function bindBuildingActions(context: AppContext) {
+  bindEntityActions(context, '[data-building-id]', {
+    async onEdit(wrapper) {
+      const id = Number(wrapper.dataset.buildingId);
+      const newName = prompt('Bezeichnung:', wrapper.dataset.buildingName ?? '');
+      if (newName === null || newName.trim() === '') return;
+      const newCode = prompt('Kürzel:', wrapper.dataset.buildingCode ?? '') ?? '';
+      if (await apiUpdateBuilding(id, newName.trim(), newCode.trim())) {
+        await renderBuildings(context);
+      } else {
+        showMsg(context, '#building-msg', 'Gebäude konnte nicht aktualisiert werden.');
+      }
+    },
+    async onDelete(wrapper) {
+      const id = Number(wrapper.dataset.buildingId);
+      const name = wrapper.dataset.buildingName ?? '';
+      if (!confirm(`Gebäude "${name}" wirklich löschen?\n\nAlle Etagen, Räume und Fenster werden ebenfalls gelöscht.`)) return;
+      if (await apiDeleteBuilding(id)) {
+        await renderBuildings(context);
+      } else {
+        showMsg(context, '#building-msg', 'Gebäude konnte nicht gelöscht werden.');
+      }
+    },
+  });
+}
+
+function bindFloorActions(context: AppContext) {
+  bindEntityActions(context, '[data-floor-id]', {
+    async onEdit(wrapper) {
+      const id = Number(wrapper.dataset.floorId);
+      const newName = prompt('Bezeichnung:', wrapper.dataset.entityName ?? '');
+      if (newName === null || newName.trim() === '') return;
+      const newLevel = Number(prompt('Geschoss (Zahl):', wrapper.dataset.entityLevel ?? '0') ?? '0');
+      if (await apiUpdateFloor(id, newName.trim(), newLevel)) {
+        await renderFloors(context);
+      } else {
+        showMsg(context, '#floor-msg', 'Etage konnte nicht aktualisiert werden.');
+      }
+    },
+    async onDelete(wrapper) {
+      const id = Number(wrapper.dataset.floorId);
+      const name = wrapper.dataset.entityName ?? '';
+      if (!confirm(`Etage "${name}" wirklich löschen?\n\nAlle Räume und Fenster in dieser Etage werden ebenfalls gelöscht.`)) return;
+      if (await apiDeleteFloor(id)) {
+        await renderFloors(context);
+      } else {
+        showMsg(context, '#floor-msg', 'Etage konnte nicht gelöscht werden.');
+      }
+    },
+  });
+}
+
+function bindRoomActions(context: AppContext) {
+  bindEntityActions(context, '[data-room-id]', {
+    async onEdit(wrapper) {
+      const id = Number(wrapper.dataset.roomId);
+      const newName = prompt('Bezeichnung:', wrapper.dataset.entityName ?? '');
+      if (newName === null || newName.trim() === '') return;
+      const newNumber = prompt('Raumnummer:', wrapper.dataset.entityNumber ?? '') ?? '';
+      if (await apiUpdateRoom(id, newName.trim(), newNumber.trim())) {
+        await renderRooms(context);
+      } else {
+        showMsg(context, '#room-msg', 'Raum konnte nicht aktualisiert werden.');
+      }
+    },
+    async onDelete(wrapper) {
+      const id = Number(wrapper.dataset.roomId);
+      const name = wrapper.dataset.entityName ?? '';
+      if (!confirm(`Raum "${name}" wirklich löschen?\n\nAlle Fenster in diesem Raum werden ebenfalls gelöscht.`)) return;
+      if (await apiDeleteRoom(id)) {
+        await renderRooms(context);
+      } else {
+        showMsg(context, '#room-msg', 'Raum konnte nicht gelöscht werden.');
+      }
+    },
+  });
+}
+
+function bindWindowActions(context: AppContext) {
+  bindEntityActions(context, '[data-window-id]', {
+    async onDelete(wrapper) {
+      const id = Number(wrapper.dataset.windowId);
+      const name = wrapper.dataset.entityName ?? '';
+      if (!confirm(`Fenster "${name}" wirklich löschen?`)) return;
+      if (await apiDeleteWindow(id)) {
+        await renderWindowsInRoom(context);
+      } else {
+        showMsg(context, '#window-room-msg', 'Fenster konnte nicht gelöscht werden.');
+      }
+    },
+  });
+}
+
+function showMsg(context: AppContext, selector: string, text: string) {
+  const el = context.root.querySelector<HTMLElement>(selector);
+  if (el) el.innerHTML = errorAlert(text);
+}
+
+function bindEntityActions(context: AppContext, wrapperSelector: string, handlers: { onEdit?: (w: HTMLElement) => void; onDelete?: (w: HTMLElement) => void }) {
+  // Toggle-Menü
+  context.root.querySelectorAll<HTMLElement>('.intern-card-actions [data-action="menu"]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const menu = btn.nextElementSibling as HTMLElement;
+      context.root.querySelectorAll<HTMLElement>('.intern-action-menu').forEach((m) => {
+        if (m !== menu) m.hidden = true;
+      });
+      menu.hidden = !menu.hidden;
+    });
+  });
+
+  // Klick außerhalb schließt Menüs
+  context.root.addEventListener('click', (e) => {
+    if (!(e.target as HTMLElement).closest('.intern-card-actions')) {
+      context.root.querySelectorAll<HTMLElement>('.intern-action-menu').forEach((m) => m.hidden = true);
+    }
+  });
+
+  if (handlers.onEdit) {
+    context.root.querySelectorAll<HTMLElement>(`${wrapperSelector} [data-action="edit"]`).forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const wrapper = btn.closest<HTMLElement>(wrapperSelector)!;
+        handlers.onEdit!(wrapper);
+      });
+    });
+  }
+
+  if (handlers.onDelete) {
+    context.root.querySelectorAll<HTMLElement>(`${wrapperSelector} [data-action="delete"]`).forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const wrapper = btn.closest<HTMLElement>(wrapperSelector)!;
+        handlers.onDelete!(wrapper);
+      });
+    });
+  }
 }
 
 // ── Etagen ────────────────────────────────────────────────────────────────────
@@ -454,7 +617,7 @@ async function renderFloors(context: AppContext) {
     ` : ''}
     <div id="floor-msg"></div>
     <div class="intern-list" id="floor-list">
-      ${floors.map((f) => renderFloorCard(f, buildingId)).join('') || '<div class="intern-empty">Noch keine Etagen vorhanden.</div>'}
+      ${floors.map((f) => renderFloorCard(f, buildingId, isAdmin)).join('') || '<div class="intern-empty">Noch keine Etagen vorhanden.</div>'}
     </div>
   `;
 
@@ -471,21 +634,33 @@ async function renderFloors(context: AppContext) {
       }
     });
   }
+  bindFloorActions(context);
   bindHeaderLogout(context);
 }
 
-function renderFloorCard(f: Floor, buildingId: number): string {
+function renderFloorCard(f: Floor, buildingId: number, isAdmin: boolean): string {
   const pct = f.progress_pct;
   const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
   return `
-    <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/raeume/?floor_id=${f.id}&building_id=${buildingId}">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <strong>${escapeHtml(f.name)}</strong>
-        <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
+    <div class="intern-list-item-wrapper" data-floor-id="${f.id}" data-entity-name="${escapeHtml(f.name)}" data-entity-level="${f.level ?? 0}">
+      <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/raeume/?floor_id=${f.id}&building_id=${buildingId}">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>${escapeHtml(f.name)}</strong>
+          <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
+        </div>
+        <p class="intern-meta">${f.room_count} Räume · ${f.window_count} Fenster · ${f.sash_count} Flügel · ${f.sash_completed} geprüft</p>
+        <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
+      </a>
+      ${isAdmin ? `
+      <div class="intern-card-actions">
+        <button class="intern-action-btn" data-action="menu" title="Aktionen">⋮</button>
+        <div class="intern-action-menu" hidden>
+          <button data-action="edit">✏️ Bearbeiten</button>
+          <button data-action="delete">🗑️ Löschen</button>
+        </div>
       </div>
-      <p class="intern-meta">${f.room_count} Räume · ${f.window_count} Fenster · ${f.sash_count} Flügel · ${f.sash_completed} geprüft</p>
-      <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
-    </a>
+      ` : ''}
+    </div>
   `;
 }
 
@@ -519,7 +694,7 @@ async function renderRooms(context: AppContext) {
     ` : ''}
     <div id="room-msg"></div>
     <div class="intern-list" id="room-list">
-      ${rooms.map((r) => renderRoomCard(r, floorId, buildingId)).join('') || '<div class="intern-empty">Noch keine Räume vorhanden.</div>'}
+      ${rooms.map((r) => renderRoomCard(r, floorId, buildingId, isAdmin)).join('') || '<div class="intern-empty">Noch keine Räume vorhanden.</div>'}
     </div>
   `;
 
@@ -536,21 +711,33 @@ async function renderRooms(context: AppContext) {
       }
     });
   }
+  bindRoomActions(context);
   bindHeaderLogout(context);
 }
 
-function renderRoomCard(r: Room, floorId: number, buildingId: number): string {
+function renderRoomCard(r: Room, floorId: number, buildingId: number, isAdmin: boolean): string {
   const pct = r.progress_pct;
   const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
   return `
-    <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fenster/?room_id=${r.id}&floor_id=${floorId}&building_id=${buildingId}">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <strong>${escapeHtml(r.room_number ? `${r.room_number} – ${r.name}` : r.name)}</strong>
-        <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
+    <div class="intern-list-item-wrapper" data-room-id="${r.id}" data-entity-name="${escapeHtml(r.name)}" data-entity-number="${escapeHtml(r.room_number ?? '')}">
+      <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fenster/?room_id=${r.id}&floor_id=${floorId}&building_id=${buildingId}">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>${escapeHtml(r.room_number ? `${r.room_number} – ${r.name}` : r.name)}</strong>
+          <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
+        </div>
+        <p class="intern-meta">${r.window_count} Fenster · ${r.sash_count} Flügel · ${r.sash_completed} geprüft${r.sash_defect > 0 ? ` · <span style="color:#c0392b">${r.sash_defect} Mängel</span>` : ''}</p>
+        <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
+      </a>
+      ${isAdmin ? `
+      <div class="intern-card-actions">
+        <button class="intern-action-btn" data-action="menu" title="Aktionen">⋮</button>
+        <div class="intern-action-menu" hidden>
+          <button data-action="edit">✏️ Bearbeiten</button>
+          <button data-action="delete">🗑️ Löschen</button>
+        </div>
       </div>
-      <p class="intern-meta">${r.window_count} Fenster · ${r.sash_count} Flügel · ${r.sash_completed} geprüft${r.sash_defect > 0 ? ` · <span style="color:#c0392b">${r.sash_defect} Mängel</span>` : ''}</p>
-      <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
-    </a>
+      ` : ''}
+    </div>
   `;
 }
 
@@ -587,7 +774,7 @@ async function renderWindowsInRoom(context: AppContext) {
     ` : ''}
     <div id="window-room-msg"></div>
     <div class="intern-list" id="window-room-list">
-      ${windows.map((w) => renderWindowInRoomCard(w)).join('') || '<div class="intern-empty">Noch keine Fenster in diesem Raum.</div>'}
+      ${windows.map((w) => renderWindowInRoomCard(w, isAdmin)).join('') || '<div class="intern-empty">Noch keine Fenster in diesem Raum.</div>'}
     </div>
   `;
 
@@ -602,21 +789,32 @@ async function renderWindowsInRoom(context: AppContext) {
       if (msg) msg.innerHTML = errorAlert('Fenster konnte nicht angelegt werden.');
     }
   });
+  bindWindowActions(context);
   bindHeaderLogout(context);
 }
 
-function renderWindowInRoomCard(w: WindowInRoom): string {
+function renderWindowInRoomCard(w: WindowInRoom, isAdmin: boolean): string {
   const pct = w.progress_pct;
   const badgeClass = w.sash_defect > 0 ? 'danger' : pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
   return `
-    <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fluegel/?window_id=${w.id}&room_id=0&floor_id=${w.floor_id ?? 0}&building_id=${w.building_id ?? 0}">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <strong>${escapeHtml(w.window_number || w.record_id)}</strong>
-        <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
+    <div class="intern-list-item-wrapper" data-window-id="${w.id}" data-entity-name="${escapeHtml(w.window_number || w.record_id)}">
+      <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fluegel/?window_id=${w.id}&room_id=0&floor_id=${w.floor_id ?? 0}&building_id=${w.building_id ?? 0}">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>${escapeHtml(w.window_number || w.record_id)}</strong>
+          <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
+        </div>
+        <p class="intern-meta">${w.sash_count} Flügel · ${w.sash_completed} geprüft${w.sash_defect > 0 ? ` · ${w.sash_defect} Mängel` : ''} · ${escapeHtml(w.status)}</p>
+        <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
+      </a>
+      ${isAdmin ? `
+      <div class="intern-card-actions">
+        <button class="intern-action-btn" data-action="menu" title="Aktionen">⋮</button>
+        <div class="intern-action-menu" hidden>
+          <button data-action="delete">🗑️ Löschen</button>
+        </div>
       </div>
-      <p class="intern-meta">${w.sash_count} Flügel · ${w.sash_completed} geprüft${w.sash_defect > 0 ? ` · ${w.sash_defect} Mängel` : ''} · ${escapeHtml(w.status)}</p>
-      <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
-    </a>
+      ` : ''}
+    </div>
   `;
 }
 
