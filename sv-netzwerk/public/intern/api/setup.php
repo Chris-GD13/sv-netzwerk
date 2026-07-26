@@ -112,6 +112,21 @@ function handleInstall(): never
         apiJson(['ok' => false, 'errors' => $errors], 207);
     }
 
+    // Migrations: Spalten nachrüsten (Fehler bei "Duplicate column" ignorieren)
+    $migrations = [
+        'ALTER TABLE windows ADD COLUMN room_id INT UNSIGNED NULL AFTER project_id',
+        'ALTER TABLE photos ADD COLUMN sash_id INT UNSIGNED NULL AFTER window_id',
+    ];
+    foreach ($migrations as $mig) {
+        try {
+            db()->exec($mig);
+        } catch (Throwable $e) {
+            if (!str_contains($e->getMessage(), 'Duplicate column')) {
+                error_log('[setup] Migration-Hinweis: ' . $e->getMessage());
+            }
+        }
+    }
+
     apiJson(['ok' => true, 'message' => 'Datenbankschema erfolgreich eingerichtet.']);
 }
 
