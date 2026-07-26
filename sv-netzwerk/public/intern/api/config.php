@@ -18,6 +18,7 @@ function loadEnv(): void
         dirname(__DIR__, 5) . '/.env',
         dirname(__DIR__, 4) . '/.env',
         dirname(__DIR__, 3) . '/.env',
+        dirname(__DIR__, 2) . '/.env',
     ];
     foreach ($paths as $path) {
         if (!is_file($path)) {
