@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash   VARCHAR(255)    NOT NULL,
     is_active       TINYINT(1)      NOT NULL DEFAULT 1,
     last_login_at   DATETIME        NULL,
-    created_at      DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at      DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
+    created_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS password_resets (
     user_id     INT UNSIGNED    NOT NULL,
     token       VARCHAR(64)     NOT NULL,
     expires_at  DATETIME        NOT NULL,
-    created_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
+    created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id),
     CONSTRAINT fk_pr_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -48,8 +48,8 @@ CREATE TABLE IF NOT EXISTS projects (
     address              VARCHAR(255)    NOT NULL,
     planned_window_count INT             NULL,
     is_active            TINYINT(1)      NOT NULL DEFAULT 1,
-    created_at           DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at           DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
+    created_at           DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at           DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     archived_at          DATETIME        NULL,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -89,8 +89,8 @@ CREATE TABLE IF NOT EXISTS windows (
     released_by                 INT UNSIGNED    NULL,
     release_reason              TEXT            NULL,
     version                     INT UNSIGNED    NOT NULL DEFAULT 1,
-    created_at                  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at                  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
+    created_at                  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at                  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at                  DATETIME        NULL,
     PRIMARY KEY (id),
     KEY idx_windows_project   (project_id),
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     old_value   TEXT            NULL,
     new_value   TEXT            NULL,
     reason      TEXT            NULL,
-    created_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
+    created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_audit_window  (window_id),
     KEY idx_audit_created (created_at),
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS photos (
     inspector_id    INT UNSIGNED    NULL,
     inspector_name  VARCHAR(255)    NULL,
     taken_at        DATETIME        NULL,
-    created_at      DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
+    created_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at      DATETIME        NULL,
     PRIMARY KEY (id),
     KEY idx_photos_window  (window_id),
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS calculation_parameters (
     project_id      INT UNSIGNED    NULL COMMENT 'NULL = global',
     parameter_key   VARCHAR(64)     NOT NULL,
     parameter_value DECIMAL(15,6)   NOT NULL,
-    updated_at      DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
+    updated_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY idx_params_key (project_id, parameter_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -184,7 +184,7 @@ CREATE TABLE IF NOT EXISTS export_logs (
     exported_by     INT UNSIGNED    NULL,
     file_name       VARCHAR(255)    NULL,
     filter_snapshot TEXT            NULL COMMENT 'JSON',
-    created_at      DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
+    created_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_export_project (project_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -200,8 +200,8 @@ CREATE TABLE IF NOT EXISTS buildings (
     code        VARCHAR(64)     NOT NULL DEFAULT '',
     notes       TEXT            NULL,
     sort_order  INT             NOT NULL DEFAULT 0,
-    created_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
+    created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_buildings_project (project_id),
     CONSTRAINT fk_building_project FOREIGN KEY (project_id) REFERENCES projects (id)
@@ -218,8 +218,8 @@ CREATE TABLE IF NOT EXISTS floors (
     level       INT             NOT NULL DEFAULT 0,
     notes       TEXT            NULL,
     sort_order  INT             NOT NULL DEFAULT 0,
-    created_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
+    created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_floors_building (building_id),
     CONSTRAINT fk_floor_building FOREIGN KEY (building_id) REFERENCES buildings (id) ON DELETE CASCADE
@@ -236,8 +236,8 @@ CREATE TABLE IF NOT EXISTS rooms (
     room_number VARCHAR(64)     NOT NULL DEFAULT '',
     notes       TEXT            NULL,
     sort_order  INT             NOT NULL DEFAULT 0,
-    created_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at  DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
+    created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_rooms_floor (floor_id),
     CONSTRAINT fk_room_floor FOREIGN KEY (floor_id) REFERENCES floors (id) ON DELETE CASCADE
@@ -270,8 +270,8 @@ CREATE TABLE IF NOT EXISTS window_sashes (
     inspector_name   VARCHAR(255)    NULL,
     inspected_at     DATETIME        NULL,
     completed_at     DATETIME        NULL,
-    created_at       DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()),
-    updated_at       DATETIME        NOT NULL DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
+    created_at       DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at       DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at       DATETIME        NULL,
     PRIMARY KEY (id),
     KEY idx_sashes_window  (window_id),
