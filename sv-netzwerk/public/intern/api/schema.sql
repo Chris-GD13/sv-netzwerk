@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS projects (
 CREATE TABLE IF NOT EXISTS windows (
     id                          INT UNSIGNED    NOT NULL AUTO_INCREMENT,
     project_id                  INT UNSIGNED    NOT NULL DEFAULT 1,
+    room_id                     INT UNSIGNED    NULL,
     record_id                   VARCHAR(64)     NOT NULL UNIQUE,
     inspection_number           INT             NULL,
     window_number               VARCHAR(64)     NOT NULL DEFAULT '',
@@ -144,6 +145,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 CREATE TABLE IF NOT EXISTS photos (
     id              INT UNSIGNED    NOT NULL AUTO_INCREMENT,
     window_id       INT UNSIGNED    NOT NULL,
+    sash_id         INT UNSIGNED    NULL,
     category        VARCHAR(64)     NOT NULL,
     caption         VARCHAR(512)    NULL,
     file_name       VARCHAR(255)    NOT NULL,
@@ -244,12 +246,6 @@ CREATE TABLE IF NOT EXISTS rooms (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- Raumzuordnung zu Fenstern (optional, rückwärtskompatibel)
--- ============================================================
-
-ALTER TABLE windows ADD COLUMN IF NOT EXISTS room_id INT UNSIGNED NULL AFTER project_id;
-
--- ============================================================
 -- Flügel (Fensterflügel – das eigentliche Prüfobjekt)
 -- ============================================================
 
@@ -279,12 +275,6 @@ CREATE TABLE IF NOT EXISTS window_sashes (
     KEY idx_sashes_deleted (deleted_at),
     CONSTRAINT fk_sash_window FOREIGN KEY (window_id) REFERENCES windows (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================
--- Flügelzuordnung für Fotos (optional, rückwärtskompatibel)
--- ============================================================
-
-ALTER TABLE photos ADD COLUMN IF NOT EXISTS sash_id INT UNSIGNED NULL AFTER window_id;
 
 -- ============================================================
 -- Standard-Projektdatensatz
