@@ -1,4 +1,4 @@
-import QRCode from 'qrcode';
+﻿import QRCode from 'qrcode';
 import { calculateWindowWeights } from './calculations';
 import { loadAllDrafts, loadDraft, removeDraft, saveDraft } from './offline';
 import {
@@ -103,7 +103,7 @@ interface AppContext {
 
 const LOCK_TIMEOUT_MINUTES = 15;
 const SAVE_DEBOUNCE_MS = 1200;
-const SYNC_WARNING_MESSAGE = 'Es liegen noch nicht synchronisierte Aenderungen vor.';
+const SYNC_WARNING_MESSAGE = 'Es liegen noch nicht synchronisierte Änderungen vor.';
 
 /** Basis-URL für das aktuelle Projekt (z.B. '/intern/fensterpruefung-bonn'). */
 function projectBase(): string {
@@ -447,10 +447,10 @@ function renderLogin(context: AppContext) {
     if (!message) return;
     const email = String(new FormData(form).get('email') ?? '');
     const password = String(new FormData(form).get('password') ?? '');
-    message.innerHTML = infoAlert('Anmeldung wird geprueft.');
+    message.innerHTML = infoAlert('Anmeldung wird geprüft.');
     const { user, error } = await apiLogin(email, password);
     if (error || !user) {
-      message.innerHTML = errorAlert('Anmeldung fehlgeschlagen. Bitte Zugangsdaten pruefen.');
+      message.innerHTML = errorAlert('Anmeldung fehlgeschlagen. Bitte Zugangsdaten prüfen.');
       return;
     }
     message.innerHTML = successAlert('Anmeldung erfolgreich. Weiterleitung laeuft.');
@@ -531,7 +531,7 @@ async function renderDashboard(context: AppContext) {
           ${renderStat('Vollständig geprüft', stats.completed)}
           ${renderStat('Mit Mangel', stats.withDefect)}
           ${renderStat('Dringender Handlungsbedarf', stats.urgent)}
-          ${renderStat('Spezialpruefung', stats.specialInspection)}
+          ${renderStat('Spezialprüfung', stats.specialInspection)}
         </div>
       </section>
       <section class="intern-panel">
@@ -1623,11 +1623,11 @@ async function renderWindowsFlat(context: AppContext) {
   const records = await fetchWindowSummaries(context);
   const filtersHtml = createFilterControls(records);
   context.root.innerHTML = `
-    ${renderHeader(context, 'Fensterdatensaetze', 'Suche, Filter, Datensatzsperren und Schnellzugriffe.')}
+    ${renderHeader(context, 'Fensterdatensätze', 'Suche, Filter, Datensatzsperren und Schnellzugriffe.')}
     <div class="intern-toolbar">
       <div class="intern-search">
         <label for="window-search">Suche</label>
-        <input id="window-search" type="search" placeholder="Fensternummer, Raum, Gebaeudeteil oder Kennzeichnung" />
+        <input id="window-search" type="search" placeholder="Fensternummer, Raum, Gebäudeteil oder Kennzeichnung" />
       </div>
       ${filtersHtml}
       <div class="intern-actions">
@@ -1671,14 +1671,17 @@ async function renderWindowsFlat(context: AppContext) {
 }
 
 function bindWindowTableActions(context: AppContext, records: WindowSummary[]) {
-  context.root.querySelectorAll<HTMLElement>('[data-open-window]').forEach((button) => {
-    button.onclick = () => {
-      const id = button.dataset.openWindow;
+  context.root.querySelectorAll<HTMLElement>('[data-open-window]').forEach((el) => {
+    el.onclick = (e) => {
+      // Don't open if clicking on a button inside the row
+      if ((e.target as HTMLElement).closest('button')) return;
+      const id = el.dataset.openWindow;
       if (id) redirectTo(`${projectBase()}/fenster/${encodeURIComponent(id)}/`);
     };
   });
   context.root.querySelectorAll<HTMLElement>('[data-duplicate-window]').forEach((button) => {
-    button.onclick = async () => {
+    button.onclick = async (e) => {
+      e.stopPropagation();
       const id = button.dataset.duplicateWindow;
       const source = records.find((record) => record.id === id);
       if (!source) return;
@@ -1719,7 +1722,7 @@ async function renderRecord(context: AppContext) {
           <div class="intern-card">${connectionBadge()}</div>
           <div class="intern-card"><strong>${Math.round(record.progress_percent)}%</strong><p class="intern-meta">Fortschritt</p></div>
           <div class="intern-card"><strong>${escapeHtml(record.status)}</strong><p class="intern-meta">Status</p></div>
-          <div class="intern-card"><strong>${formatDateTime(record.updated_at)}</strong><p class="intern-meta">Letzte Aenderung</p></div>
+          <div class="intern-card"><strong>${formatDateTime(record.updated_at)}</strong><p class="intern-meta">Letzte Änderung</p></div>
         </div>
         <form id="window-record-form" class="intern-list" novalidate>
           ${windowFormSections.map((section) => renderFormSection(section, record.form_data, record.calculated_data, !canEdit || Boolean(lock && !lock.ok))).join('')}
@@ -1745,7 +1748,7 @@ async function renderRecord(context: AppContext) {
             <div class="intern-card"><strong>${formatNumber(calculated.glassWeightKg)} kg</strong><p class="intern-meta">Rechnerisches Glasgewicht</p></div>
             <div class="intern-card"><strong>${formatNumber(calculated.frameWeightKg)} kg</strong><p class="intern-meta">Geschaetztes Rahmengewicht</p></div>
             <div class="intern-card"><strong>${formatNumber(calculated.totalWingWeightKg)} kg</strong><p class="intern-meta">Gesamtfluegelgewicht</p></div>
-            <div class="intern-card"><strong>${formatNumber(calculated.appliedTestWeightKg)} kg</strong><p class="intern-meta">Angesetztes Pruefgewicht</p></div>
+            <div class="intern-card"><strong>${formatNumber(calculated.appliedTestWeightKg)} kg</strong><p class="intern-meta">Angesetztes Prüfgewicht</p></div>
           </div>
         </section>
         <section class="intern-panel">
@@ -1767,7 +1770,7 @@ async function renderRecord(context: AppContext) {
       </div>
       <div class="intern-actions">
         <button class="sv-button sv-button-secondary" type="button" id="save-draft" ${!canEdit || Boolean(lock && !lock.ok) ? 'disabled' : ''}>Zwischenspeichern</button>
-        <button class="sv-button sv-button-primary" type="button" id="complete-record" ${!canEdit || Boolean(lock && !lock.ok) ? 'disabled' : ''}>Pruefung abschliessen</button>
+        <button class="sv-button sv-button-primary" type="button" id="complete-record" ${!canEdit || Boolean(lock && !lock.ok) ? 'disabled' : ''}>Prüfung abschließen</button>
         <button class="sv-button sv-button-ghost" type="button" id="logout-button">Abmelden</button>
       </div>
     </div>
@@ -1820,7 +1823,7 @@ async function renderRecord(context: AppContext) {
       return;
     }
     const summary = summarizeCompletion(workingCopy, record.calculated_data);
-    if (!window.confirm(`Pruefung abschliessen?\n\n${summary}`)) return;
+    if (!window.confirm(`Prüfung abschließen?\n\n${summary}`)) return;
     workingCopy.status = 'Pruefung abgeschlossen';
     workingCopy.completion_confirmed = true;
     await persistDraft(id, workingCopy, record.calculated_data, form);
@@ -1850,7 +1853,7 @@ async function renderRecord(context: AppContext) {
   subscribeToSingleRecord(context, id, async () => {
     const note = context.root.querySelector<HTMLElement>('[data-record-refresh-note]');
     if (note) note.remove();
-    context.root.prepend(createNotice('Der Datensatz wurde zwischenzeitlich geaendert. Bitte pruefen und neu laden.', 'warn', true));
+    context.root.prepend(createNotice('Der Datensatz wurde zwischenzeitlich geändert. Bitte prüfen und neu laden.', 'warn', true));
   });
 
   activateLockMaintenance(context, id);
@@ -2576,18 +2579,18 @@ function createFilterControls(records: WindowSummary[]) {
 
 function filterLabel(key: string) {
   switch (key) {
-    case 'building_label': return 'Gebaeude';
-    case 'section_label': return 'Gebaeudeteil';
+    case 'building_label': return 'Gebäude';
+    case 'section_label': return 'Gebäudeteil';
     case 'floor_label': return 'Etage';
-    case 'assigned_name': return 'Pruefer';
-    case 'status': return 'Pruefstatus';
+    case 'assigned_name': return 'Prüfer';
+    case 'status': return 'Prüfstatus';
     case 'overall_rating': return 'Bewertung';
     default: return key;
   }
 }
 
 function renderWindowTable(records: WindowSummary[]) {
-  if (!records.length) return '<div class="intern-empty">Keine Datensaetze gefunden.</div>';
+  if (!records.length) return '<div class="intern-empty">Keine Datensätze gefunden.</div>';
   return `
     <div class="intern-table-wrap">
       <table class="intern-table">
@@ -2596,24 +2599,23 @@ function renderWindowTable(records: WindowSummary[]) {
             <th>Fenster</th>
             <th>Standort</th>
             <th>Status</th>
-            <th>Pruefer</th>
-            <th>Letzte Aenderung</th>
+            <th>Prüfer</th>
+            <th>Letzte Änderung</th>
             <th>Sperre</th>
             <th>Aktionen</th>
           </tr>
         </thead>
         <tbody>
           ${records.map((record) => `
-            <tr>
+            <tr style="cursor:pointer" data-open-window="${escapeHtml(record.id)}">
               <td><strong>${escapeHtml(record.window_number || record.record_id)}</strong><br/><span class="intern-meta">${escapeHtml(record.record_id)}</span></td>
               <td>${escapeHtml([record.building_label, record.section_label, record.floor_label, record.room_number].filter(Boolean).join(' · '))}</td>
-              <td>${escapeHtml(record.status)}${record.special_inspection_required ? '<br/><span class="intern-badge intern-badge--warn">Spezialpruefung</span>' : ''}${record.urgent_action_required ? '<br/><span class="intern-badge intern-badge--danger">Sofort</span>' : ''}</td>
+              <td>${escapeHtml(record.status)}${record.special_inspection_required ? '<br/><span class="intern-badge intern-badge--warn">Spezialprüfung</span>' : ''}${record.urgent_action_required ? '<br/><span class="intern-badge intern-badge--danger">Sofort</span>' : ''}</td>
               <td>${escapeHtml(record.assigned_name ?? '—')}</td>
               <td>${formatDateTime(record.updated_at)}</td>
               <td>${record.lock_owner_name ? `<span class="intern-badge intern-badge--info">${escapeHtml(record.lock_owner_name)} bis ${formatTime(record.lock_expires_at)}</span>` : '<span class="intern-badge intern-badge--ok">frei</span>'}</td>
               <td>
                 <div class="intern-actions">
-                  <button type="button" class="intern-inline-button" data-open-window="${escapeHtml(record.id)}">Oeffnen</button>
                   <button type="button" class="intern-inline-button" data-duplicate-window="${escapeHtml(record.id)}">Duplizieren</button>
                 </div>
               </td>
@@ -2854,7 +2856,7 @@ async function exportRecords(context: AppContext, exportId: string, records: Win
   if (!definition) return;
   const rows = records.filter(definition.filter);
   const delimiter = exportId === 'excel-all' ? ';' : ',';
-  const header = ['Datensatz', 'Fensternummer', 'Gebaeude', 'Gebaeudeteil', 'Etage', 'Raumnummer', 'Status', 'Bewertung', 'Prioritaet', 'Pruefer', 'Letzte Aenderung'];
+  const header = ['Datensatz', 'Fensternummer', 'Gebäude', 'Gebäudeteil', 'Etage', 'Raumnummer', 'Status', 'Bewertung', 'Priorität', 'Prüfer', 'Letzte Änderung'];
   const csv = [header.join(delimiter), ...rows.map((record) => [
     record.record_id,
     record.window_number,

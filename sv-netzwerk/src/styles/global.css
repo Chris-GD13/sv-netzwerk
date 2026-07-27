@@ -197,6 +197,10 @@ p {
   border-color: var(--sv-brand, #1a73e8);
   transition: all 0.15s;
 }
+tr[data-open-window]:hover {
+  background: #f0f6ff;
+  transition: background 0.1s;
+}
 .sv-stack {
   display: flex;
   flex-wrap: wrap;
