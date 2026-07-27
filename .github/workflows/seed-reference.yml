@@ -15,11 +15,15 @@ jobs:
           RESPONSE=$(curl -s -w "\n%{http_code}" \
             -X POST \
             -H "Content-Type: application/json" \
+            --max-time 120 \
             "https://www.sv-netzwerk.eu/intern/api/setup.php?key=${SETUP_KEY}&action=seed_reference")
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-          BODY=$(echo "$RESPONSE" | head -n -1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
           echo "HTTP $HTTP_CODE"
-          echo "$BODY" | python3 -m json.tool || echo "$BODY"
+          echo "--- Response body ---"
+          echo "$BODY"
+          echo "--- End ---"
+          echo "$BODY" | python3 -m json.tool 2>/dev/null || true
           if [ "$HTTP_CODE" != "200" ]; then
             echo "::error::Seed failed with HTTP $HTTP_CODE"
             exit 1

@@ -180,13 +180,15 @@ function handleCreateAdmin(): never
 
 function handleSeedReference(): never
 {
-    require_once __DIR__ . '/seed_reference.php';
+    // Set longer execution time for large seed
+    set_time_limit(120);
     
     try {
+        require_once __DIR__ . '/seed_reference.php';
         $result = seedReferenceProject();
         apiJson($result);
     } catch (Throwable $e) {
-        error_log('[setup] Seed-Fehler: ' . $e->getMessage());
+        error_log('[setup] Seed-Fehler: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
         apiError(500, 'Referenzdaten konnten nicht angelegt werden: ' . $e->getMessage());
     }
 }
