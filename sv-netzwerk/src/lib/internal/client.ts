@@ -2541,15 +2541,19 @@ async function renderAiImport(context: AppContext) {
 }
 
 async function renderAdmin(context: AppContext) {
-  if (context.user?.profile.role !== 'administrator') {
-    context.root.innerHTML = errorAlert('Nur Administratoren können die Benutzerverwaltung aufrufen.');
+  const role = context.user?.profile.role ?? 'gast';
+  const canManageUsers = role === 'administrator';
+  const canViewUsers = role === 'administrator' || role === 'projektleiter';
+
+  if (!canViewUsers) {
+    context.root.innerHTML = errorAlert('Keine Berechtigung für das Benutzerverzeichnis.');
     return;
   }
 
   context.root.innerHTML = `
-    ${renderHeader(context, 'Benutzerverwaltung', 'Benutzerkonten anlegen, bearbeiten und deaktivieren.')}
+    ${renderHeader(context, canManageUsers ? 'Benutzerverwaltung' : 'Benutzerverzeichnis', canManageUsers ? 'Benutzerkonten anlegen, bearbeiten und deaktivieren.' : 'Alle Benutzerkonten im Überblick (nur Leserechte).')}
     <div id="admin-message"></div>
-    <div class="intern-card">
+    ${canManageUsers ? `<div class="intern-card">
       <h2>Neuen Benutzer anlegen</h2>
       <form id="create-user-form" class="intern-form-grid" novalidate>
         <div class="intern-field">
@@ -2578,7 +2582,7 @@ async function renderAdmin(context: AppContext) {
           <button class="sv-button sv-button-primary" type="submit">Benutzer anlegen</button>
         </div>
       </form>
-    </div>
+    </div>` : ''}
     <div class="intern-card">
       <h2>Bestehende Benutzer</h2>
       <div id="user-list">Lade Benutzerliste…</div>
@@ -2591,34 +2595,38 @@ async function renderAdmin(context: AppContext) {
   const loadUsers = async () => {
     if (listEl) listEl.innerHTML = 'Lade…';
     const users = await apiListUsers();
-    if (listEl) listEl.innerHTML = renderUserList(users, context.user!);
-    bindUserActions(context, users, loadUsers, msgEl);
+    if (listEl) listEl.innerHTML = renderUserList(users, context.user!, canManageUsers);
+    if (canManageUsers) {
+      bindUserActions(context, users, loadUsers, msgEl);
+    }
   };
 
   await loadUsers();
 
-  const createForm = context.root.querySelector<HTMLFormElement>('#create-user-form');
-  createForm?.addEventListener('submit', async (evt) => {
-    evt.preventDefault();
-    const data = new FormData(createForm);
-    const email = String(data.get('email') ?? '').trim();
-    const fullName = String(data.get('full_name') ?? '').trim();
-    const role = String(data.get('role') ?? 'pruefer') as PortalRole;
-    const password = String(data.get('password') ?? '');
-    if (msgEl) msgEl.innerHTML = infoAlert('Benutzer wird angelegt…');
-    const { error } = await apiCreateUser({ email, full_name: fullName, role, password });
-    if (error) {
-      if (msgEl) msgEl.innerHTML = errorAlert(`Fehler: ${error.message}`);
-    } else {
-      if (msgEl) msgEl.innerHTML = successAlert(`Benutzer ${email} erfolgreich angelegt.`);
-      createForm.reset();
-      await loadUsers();
-    }
-  });
+  if (canManageUsers) {
+    const createForm = context.root.querySelector<HTMLFormElement>('#create-user-form');
+    createForm?.addEventListener('submit', async (evt) => {
+      evt.preventDefault();
+      const data = new FormData(createForm);
+      const email = String(data.get('email') ?? '').trim();
+      const fullName = String(data.get('full_name') ?? '').trim();
+      const role = String(data.get('role') ?? 'pruefer') as PortalRole;
+      const password = String(data.get('password') ?? '');
+      if (msgEl) msgEl.innerHTML = infoAlert('Benutzer wird angelegt…');
+      const { error } = await apiCreateUser({ email, full_name: fullName, role, password });
+      if (error) {
+        if (msgEl) msgEl.innerHTML = errorAlert(`Fehler: ${error.message}`);
+      } else {
+        if (msgEl) msgEl.innerHTML = successAlert(`Benutzer ${email} erfolgreich angelegt.`);
+        createForm.reset();
+        await loadUsers();
+      }
+    });
+  }
   bindHeaderLogout(context);
 }
 
-function renderUserList(users: AdminUser[], currentUser: PortalUser): string {
+function renderUserList(users: AdminUser[], currentUser: PortalUser, canManageUsers = true): string {
   if (!users.length) return '<div class="intern-empty">Keine Benutzer vorhanden.</div>';
   return `
     <table class="intern-table">
@@ -2629,7 +2637,7 @@ function renderUserList(users: AdminUser[], currentUser: PortalUser): string {
           <th>Rolle</th>
           <th>Status</th>
           <th>Letzter Login</th>
-          <th>Aktionen</th>
+          ${canManageUsers ? '<th>Aktionen</th>' : ''}
         </tr>
       </thead>
       <tbody>
@@ -2645,14 +2653,14 @@ function renderUserList(users: AdminUser[], currentUser: PortalUser): string {
               <td>${escapeHtml(u.role)}</td>
               <td>${statusBadge}</td>
               <td class="intern-meta">${u.last_login_at ? formatDateTime(u.last_login_at) : '—'}</td>
-              <td class="intern-actions intern-actions--inline">
+              ${canManageUsers ? `<td class="intern-actions intern-actions--inline">
                 <button class="sv-button sv-button-secondary" type="button" data-edit-user="${u.id}">Bearbeiten</button>
                 <button class="sv-button sv-button-secondary" type="button" data-pw-user="${u.id}">Passwort</button>
                 ${!isSelf && u.is_active ? `<button class="sv-button sv-button-secondary" type="button" data-deactivate-user="${u.id}">Deaktivieren</button>` : ''}
                 ${!isSelf ? `<button class="sv-button sv-button-danger" type="button" data-delete-user="${u.id}" data-user-name="${escapeHtml(u.full_name)}">🗑 Löschen</button>` : ''}
-              </td>
+              </td>` : ''}
             </tr>
-            <tr id="edit-row-${u.id}" class="intern-edit-row" hidden></tr>
+            ${canManageUsers ? `<tr id="edit-row-${u.id}" class="intern-edit-row" hidden></tr>` : ''}
           `;
         }).join('')}
       </tbody>
