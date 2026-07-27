@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import Hero from '../../../components/Hero.astro';
 import LibraryFilters from '../../../components/LibraryFilters.astro';
 import LibraryGrid from '../../../components/LibraryGrid.astro';
 import Pagination from '../../../components/Pagination.astro';
@@ -19,7 +18,6 @@ const start = (page - 1) * PAGE_SIZE;
 const pageItems = sortedLibrary.slice(start, start + PAGE_SIZE);
 ---
 <BaseLayout title={`Fachartikel – Seite ${page} | SV-Netzwerk`} description={`Weitere Fachbeiträge aus dem SV-Netzwerk Fachartikel-Bereich, Seite ${page}.`} noindex>
-  <Hero eyebrow="SVOS Fachartikel" title={`Fachartikel – Seite ${page}`} text="Weitere technische und regulierungsrelevante Fachbeiträge." />
   <section class="sv-section">
     <div class="sv-container">
       <LibraryFilters />
