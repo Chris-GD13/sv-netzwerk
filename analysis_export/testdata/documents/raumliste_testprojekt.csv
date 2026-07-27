@@ -1,0 +1,21 @@
+﻿Raumnummer;Bezeichnung;Nutzung;Geschoss;Gebäude;Fläche_qm;Fenster_Anzahl;Bemerkungen
+VGN-001;Empfang;Publikumsverkehr;EG;Verwaltungsgebäude Nord;45;3;Haupteingang
+VGN-002;Poststelle;Logistik;EG;Verwaltungsgebäude Nord;20;1;
+VGN-101;Büro Abteilungsleitung;Büro;1.OG;Verwaltungsgebäude Nord;28;2;Einzelbüro
+VGN-102;Büro Sachbearbeitung;Büro;1.OG;Verwaltungsgebäude Nord;35;2;Doppelbüro
+VGN-103;Besprechungsraum 1;Besprechung;1.OG;Verwaltungsgebäude Nord;42;3;12 Plätze
+VGN-104;Flur Nord;Verkehrsfläche;1.OG;Verwaltungsgebäude Nord;65;5;
+VGN-105;Teeküche;Sozialraum;1.OG;Verwaltungsgebäude Nord;12;1;
+VGN-201;Büro IT;Büro;2.OG;Verwaltungsgebäude Nord;30;2;
+VGN-202;Büro Personal;Büro;2.OG;Verwaltungsgebäude Nord;25;2;
+VGN-203;Serverraum;Technik;2.OG;Verwaltungsgebäude Nord;18;1;klimatisiert
+VGS-001;Empfangshalle;Publikumsverkehr;EG;Verwaltungsgebäude Süd;80;6;repräsentativ
+VGS-002;Wartebereich;Aufenthalt;EG;Verwaltungsgebäude Süd;25;2;
+VGS-101;Großraumbüro;Büro;1.OG;Verwaltungsgebäude Süd;120;8;40 Arbeitsplätze
+KON-001;Konferenzraum A;Konferenz;EG;Konferenzzentrum;85;4;Panoramafenster
+KON-002;Konferenzraum B;Konferenz;EG;Konferenzzentrum;60;3;
+TZ-001;Werkstatt;Technik;EG;Technisches Zentrum;150;6;Hallenfenster
+TZ-002;Materialager;Lager;EG;Technisches Zentrum;80;2;
+NGW-001;Hausmeisterbüro;Büro;EG;Nebengebäude West;16;1;
+NGW-002;Fahrradraum;Lager;UG;Nebengebäude West;40;2;Kellerfenster
+NGW-003;Heizungsraum;Technik;UG;Nebengebäude West;25;1;Lüftungsklappe

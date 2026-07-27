@@ -1,12 +1,12 @@
 <?php
 /**
- * KI-gestützter Dokumentenimport – Fensterbeschlagsprüfung BMVg Bonn
+ * KI-gestützter Dokumentenimport – SV-Netzwerk Prüfportal
  *
  * POST /api/ai-import.php?action=analyze   – Datei hochladen und KI-Analyse starten
  * POST /api/ai-import.php?action=apply     – Analyseergebnis anwenden (Daten anlegen/ergänzen)
  *
  * Erlaubte Rollen: administrator, pruefer
- * Architektur: Nutzt den zentralen AiService für alle KI-Kommunikation.
+ * Unterstützt: Bilder, PDF, CSV, Excel, Word, E-Mail (.msg) · max. 200 MB
  */
 
 declare(strict_types=1);
@@ -47,14 +47,19 @@ function handleAnalyze(array $user): never
         apiError(400, 'Fehler beim Datei-Upload: Code ' . $file['error']);
     }
 
-    $maxSize = 20 * 1024 * 1024; // 20 MB
+    $maxSize = 200 * 1024 * 1024; // 200 MB
     if ($file['size'] > $maxSize) {
         apiError(400, 'Datei zu groß. Maximal 20 MB erlaubt.');
     }
 
     $mime = mime_content_type($file['tmp_name']) ?: '';
+    // .msg-Dateien werden oft als octet-stream erkannt – Endung prüfen
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if ($ext === 'msg' && $mime === 'application/octet-stream') {
+        $mime = 'application/vnd.ms-outlook';
+    }
     if (!in_array($mime, AiService::supportedMimeTypes(), true)) {
-        apiError(400, 'Dateityp nicht unterstützt (' . $mime . '). Erlaubt: Bilder (JPG/PNG/TIFF), PDF, CSV, Excel, Word.');
+        apiError(400, 'Dateityp nicht unterstützt (' . $mime . '). Erlaubt: Bilder, PDF, CSV, Excel, Word, E-Mail (.msg) · max. 200 MB.');
     }
 
     // Bestehende Projektdaten laden für Datenabgleich

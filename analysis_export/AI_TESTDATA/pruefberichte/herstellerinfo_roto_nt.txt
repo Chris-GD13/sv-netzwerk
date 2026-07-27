@@ -1,0 +1,27 @@
+﻿ROTO FRANK AG
+Produktdatenblatt
+
+Produkt:     Roto NT Designo
+Typ:         Dreh-Kipp-Beschlag
+Anwendung:   Holz- und Kunststofffenster
+
+Technische Daten:
+  Max. Flügelgewicht:  130 kg
+  Max. Flügelbreite:   1600 mm
+  Max. Flügelhöhe:     2400 mm
+  Falzluft:            12 mm Standard
+  Pilzkopfzapfen:      4-6 (je nach Größe)
+  RC-Klasse:           bis RC2
+
+Wartungsintervall:
+  Fetten der Beschlagteile: alle 12 Monate
+  Funktionsprüfung:         alle 24 Monate
+  Austausch Verschleißteile: nach 50.000 Zyklen
+
+Kompatibilität:
+  Nachfolger: Roto NX (ab 2020)
+  Ersatzteile: lieferbar bis mind. 2030
+  Nachrüstung RC2: möglich (Set Art.-Nr. 1234567)
+
+Hinweis: Bei Flügelgewicht > 100 kg empfehlen wir
+die Verwendung von Schwerlastrollen (Art.-Nr. 7654321).

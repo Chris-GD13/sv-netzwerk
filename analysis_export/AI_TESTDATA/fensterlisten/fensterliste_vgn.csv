@@ -1,0 +1,16 @@
+﻿Fensterliste - Verwaltungsgebäude Nord
+Projekt: BMVg Dienstsitz Bonn
+Erstellt: 15.03.2025
+Sachverständiger: Dr. M. Braun
+
+Nr.;Gebäude;Etage;Raum;Raum-Nr.;Fenster-Nr.;Typ;Breite;Höhe;Hersteller;Beschlag;Baujahr;Bemerkung
+1;VGN;EG;Empfang;VGN-101;VGN-F-0001;Dreh-Kipp;1200mm;1600mm;Schüco;AvanTec;2005;
+2;VGN;EG;Empfang;VGN-101;VGN-F-0002;Dreh-Kipp;1200mm;1600mm;Schüco;AvanTec;2005;
+3;VGN;EG;Büro 1;VGN-102;VGN-F-0003;Dreh-Kipp;1000mm;1400mm;Roto Frank;Roto NT;2005;schwergängig
+4;VGN;EG;Büro 2;VGN-103;VGN-F-0004;Dreh;900mm;1200mm;Roto Frank;Roto NT;2005;
+5;VGN;EG;Büro 2;VGN-103;VGN-F-0005;Kipp;600mm;400mm;Roto Frank;Roto NT;2005;Oberlicht
+6;VGN;1.OG;Büro 3;VGN-201;VGN-F-0010;Dreh-Kipp;1100mm;1500mm;Siegenia;Titan AF;2012;erneuert 2012
+7;VGN;1.OG;Büro 4;VGN-202;VGN-F-0011;Dreh-Kipp;1100mm;1500mm;Siegenia;Titan AF;2012;
+8;VGN;1.OG;Flur;VGN-203;VGN-F-0012;Fest;800mm;2000mm;Siegenia;-;2012;Festvergl.
+9;VGN;2.OG;Konferenz;VGN-301;VGN-F-0020;Dreh-Kipp;1400mm;1800mm;Winkhaus;activPilot;2005;Panorama
+10;VGN;2.OG;Konferenz;VGN-301;VGN-F-0021;Dreh-Kipp;1400mm;1800mm;Winkhaus;activPilot;2005;

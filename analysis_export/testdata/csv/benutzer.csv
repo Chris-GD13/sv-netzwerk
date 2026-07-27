@@ -1,0 +1,9 @@
+E-Mail;Name;Rolle;Aktiv
+admin@testprojekt.local;Thomas Weber;administrator;Ja
+pl@testprojekt.local;Sandra Richter;projektleiter;Ja
+sv1@testprojekt.local;Dr. Michael Braun;sachverstaendiger;Ja
+sv2@testprojekt.local;Ing. Petra Hoffmann;sachverstaendiger;Ja
+pruefer1@testprojekt.local;Klaus Schmidt;pruefer;Ja
+pruefer2@testprojekt.local;Anna Müller;pruefer;Ja
+auswertung@testprojekt.local;Lisa Neumann;auswertung;Ja
+gast@testprojekt.local;Max Beispiel;gast;Ja

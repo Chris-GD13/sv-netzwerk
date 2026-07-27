@@ -347,6 +347,11 @@ export async function apiDeactivateUser(id: number): Promise<{ error: Error | nu
   return { error };
 }
 
+export async function apiDeleteUserPermanent(id: number): Promise<{ error: Error | null }> {
+  const { error } = await apiDelete(`/users.php?action=permanent&id=${id}`);
+  return { error };
+}
+
 // ── Projekte ────────────────────────────────────────────────────────────────
 
 export interface ProjectInfo {
@@ -363,6 +368,11 @@ export interface ProjectInfo {
 export async function apiListProjects(): Promise<ProjectInfo[]> {
   const { data } = await apiGet<{ projects: ProjectInfo[] }>('/projects.php');
   return data?.projects ?? [];
+}
+
+export async function apiCreateProject(title: string, objectName: string, address: string, windowCount: number): Promise<{ id: number; project_code: string } | null> {
+  const { data } = await apiPost<{ id: number; project_code: string }>('/projects.php', { title, object_name: objectName, address, planned_window_count: windowCount });
+  return data;
 }
 
 // ── Hierarchie ──────────────────────────────────────────────────────────────

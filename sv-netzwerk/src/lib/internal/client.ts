@@ -4,7 +4,6 @@ import { loadAllDrafts, loadDraft, removeDraft, saveDraft } from './offline';
 import {
   exportDefinitions,
   getFieldDefinition,
-  portalProject,
   requiredBeforeCompletion,
   roleLabels,
   windowFormSections,
@@ -31,6 +30,7 @@ import {
   apiUpdateUser,
   apiSetUserPassword,
   apiDeactivateUser,
+  apiDeleteUserPermanent,
   loadApiUser,
   onAuthChange,
   // KI-Import
@@ -38,6 +38,7 @@ import {
   apiAiApply,
   // Projekte
   apiListProjects,
+  apiCreateProject,
   getProjectSlug,
   // Hierarchie
   apiListBuildings,
@@ -192,6 +193,9 @@ async function renderRoute(context: AppContext) {
     case 'projects':
       await renderProjects(context);
       break;
+    case 'new-project':
+      await renderNewProject(context);
+      break;
     case 'dashboard':
       await renderDashboard(context);
       break;
@@ -232,17 +236,147 @@ async function renderRoute(context: AppContext) {
 }
 
 function renderLanding(context: AppContext) {
-  context.root.innerHTML = `
+   context.root.innerHTML = `
     <div class="intern-card intern-hero">
-      <p class="sv-eyebrow">Geschuetzter Bereich</p>
-      <h1>${escapeHtml(portalProject.title)}</h1>
-      <p>${escapeHtml(portalProject.objectName)}<br/>${escapeHtml(portalProject.address)}</p>
+      <p class="sv-eyebrow">Geschützter Bereich</p>
+      <h1>SV-Netzwerk Prüfportal</h1>
+      <p>Fensterbeschlagsprüfung, Dokumentenanalyse und Prüfverwaltung</p>
       <div class="intern-actions">
         <a class="sv-button sv-button-primary" href="${context.user ? '/intern/projekte/' : '/intern/login/'}">${context.user ? 'Zu den Projekten' : 'Zur Anmeldung'}</a>
       </div>
     </div>
   `;
   if (context.user) redirectTo('/intern/projekte/');
+}
+
+async function renderNewProject(context: AppContext) {
+  if (!context.user) { redirectTo('/intern/login/'); return; }
+  const canCreate = ['administrator', 'projektleiter'].includes(context.user.profile.role);
+  if (!canCreate) { redirectTo('/intern/projekte/'); return; }
+
+  context.root.innerHTML = `
+    <div class="intern-app">
+      <div class="intern-card intern-hero">
+        <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
+        <h1>Neues Projekt anlegen</h1>
+        <p>Wählen Sie, wie Sie Ihr neues Prüfprojekt starten möchten.</p>
+        <nav class="intern-actions">
+          <a class="sv-button sv-button-secondary" href="/intern/projekte/">← Zurück</a>
+        </nav>
+      </div>
+
+      <div id="new-project-wizard" class="intern-content">
+        <div class="intern-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+          <button type="button" class="intern-card" id="wizard-manual" style="cursor:pointer; text-align:center; padding:2rem; border: 2px solid transparent; transition: border-color 0.2s;">
+            <div style="font-size:3rem; margin-bottom:0.5rem;">📝</div>
+            <h3 style="margin:0 0 0.5rem">Manuell anlegen</h3>
+            <p class="intern-meta" style="margin:0">Geben Sie Projektdaten Schritt für Schritt ein. Ideal, wenn Sie die Eckdaten bereits kennen.</p>
+          </button>
+          <button type="button" class="intern-card" id="wizard-ai" style="cursor:pointer; text-align:center; padding:2rem; border: 2px solid transparent; transition: border-color 0.2s;">
+            <div style="font-size:3rem; margin-bottom:0.5rem;">🤖</div>
+            <h3 style="margin:0 0 0.5rem">Per KI aus Dokumenten</h3>
+            <p class="intern-meta" style="margin:0">Laden Sie Auftragsschreiben, Fensterlisten oder Baupläne hoch – die KI legt das Projekt für Sie an.</p>
+          </button>
+        </div>
+
+        <!-- Step 2: Manual form -->
+        <div id="wizard-step-manual" style="display:none;">
+          <div class="intern-card">
+            <h2>Projekt-Stammdaten</h2>
+            <p class="intern-meta">Alle Felder mit * sind Pflichtfelder. Sie können weitere Details später ergänzen.</p>
+            <form id="new-project-form" class="intern-form-grid" novalidate>
+              <div class="intern-field intern-field--full">
+                <label for="np-title">Projektname *</label>
+                <input id="np-title" type="text" required placeholder="z.B. Fensterbeschlagsprüfung Rathaus Köln" />
+              </div>
+              <div class="intern-field">
+                <label for="np-object">Objekt / Auftraggeber</label>
+                <input id="np-object" type="text" placeholder="z.B. Stadtverwaltung Köln" />
+              </div>
+              <div class="intern-field">
+                <label for="np-address">Adresse</label>
+                <input id="np-address" type="text" placeholder="z.B. Rathausplatz 1, 50667 Köln" />
+              </div>
+              <div class="intern-field">
+                <label for="np-windows">Geplante Fensteranzahl</label>
+                <input id="np-windows" type="number" min="0" placeholder="0 = noch unbekannt" />
+              </div>
+              <div class="intern-actions intern-field--full">
+                <button type="submit" class="sv-button sv-button-primary">Projekt anlegen</button>
+                <button type="button" class="sv-button sv-button-secondary" id="wizard-back-manual">← Zurück</button>
+              </div>
+            </form>
+            <div id="np-message"></div>
+          </div>
+        </div>
+
+        <!-- Step 2: AI import -->
+        <div id="wizard-step-ai" style="display:none;">
+          <div class="intern-card">
+            <h2>Dokumente hochladen</h2>
+            <p>Laden Sie ein oder mehrere Dokumente hoch. Die KI analysiert diese und erstellt automatisch ein vollständiges Projekt mit Gebäuden, Etagen, Räumen und Fenstern.</p>
+            <div class="intern-alert intern-alert--info" style="margin: 1rem 0;">
+              <strong>Unterstützte Formate:</strong> PDF, Bilder (JPG/PNG/TIFF), Excel, CSV, Word, E-Mail (.msg) · bis 200 MB<br>
+              <strong>Beispiel-Dokumente:</strong> Auftragsschreiben, Fensterlisten, Raumlisten, Baupläne, Prüfprotokolle
+            </div>
+            <p class="intern-meta">Die KI überschreibt niemals vorhandene Daten. Vor der Übernahme werden alle erkannten Daten zur Prüfung angezeigt.</p>
+            <div class="intern-actions">
+              <a class="sv-button sv-button-primary" href="${projectBase()}/import/">📄 Zum KI-Import (bestehendes Projekt)</a>
+              <button type="button" class="sv-button sv-button-secondary" id="wizard-back-ai">← Zurück</button>
+            </div>
+            <div class="intern-alert intern-alert--warn" style="margin-top:1rem;">
+              <strong>Tipp:</strong> Legen Sie zuerst das Projekt manuell an (Name + Adresse genügt), wechseln Sie dann in den KI-Import und laden dort Ihre Dokumente hoch.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const manualBtn = context.root.querySelector('#wizard-manual') as HTMLElement;
+  const aiBtn = context.root.querySelector('#wizard-ai') as HTMLElement;
+  const stepManual = context.root.querySelector('#wizard-step-manual') as HTMLElement;
+  const stepAi = context.root.querySelector('#wizard-step-ai') as HTMLElement;
+  const grid = manualBtn.parentElement as HTMLElement;
+
+  manualBtn.addEventListener('click', () => {
+    grid.style.display = 'none';
+    stepManual.style.display = 'block';
+  });
+  aiBtn.addEventListener('click', () => {
+    grid.style.display = 'none';
+    stepAi.style.display = 'block';
+  });
+  context.root.querySelector('#wizard-back-manual')?.addEventListener('click', () => {
+    stepManual.style.display = 'none';
+    grid.style.display = 'grid';
+  });
+  context.root.querySelector('#wizard-back-ai')?.addEventListener('click', () => {
+    stepAi.style.display = 'none';
+    grid.style.display = 'grid';
+  });
+
+  // Form submission
+  const form = context.root.querySelector('#new-project-form') as HTMLFormElement;
+  const msg = context.root.querySelector('#np-message') as HTMLElement;
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = (context.root.querySelector('#np-title') as HTMLInputElement).value.trim();
+    const objectName = (context.root.querySelector('#np-object') as HTMLInputElement).value.trim();
+    const address = (context.root.querySelector('#np-address') as HTMLInputElement).value.trim();
+    const windows = parseInt((context.root.querySelector('#np-windows') as HTMLInputElement).value) || 0;
+
+    if (!title) { msg.innerHTML = errorAlert('Bitte Projektname eingeben.'); return; }
+    msg.innerHTML = infoAlert('Projekt wird angelegt…');
+
+    const result = await apiCreateProject(title, objectName, address, windows);
+    if (result) {
+      msg.innerHTML = successAlert('Projekt erfolgreich angelegt! Weiterleitung…');
+      setTimeout(() => redirectTo(`/intern/${result.project_code}/`), 1500);
+    } else {
+      msg.innerHTML = errorAlert('Fehler beim Anlegen des Projekts.');
+    }
+  });
 }
 
 async function renderProjects(context: AppContext) {
@@ -1802,8 +1936,8 @@ async function renderAiImport(context: AppContext) {
       <div class="intern-ai-upload" id="ai-drop-zone">
         <div class="intern-ai-upload__icon">📄🤖</div>
         <p><strong>Datei hierher ziehen</strong> oder klicken zum Auswählen</p>
-        <p class="intern-meta">Bilder (JPG/PNG/TIFF), PDF, CSV, Excel, Word · max. 20 MB</p>
-        <input type="file" id="ai-file-input" accept="image/*,.pdf,.csv,.xlsx,.xls,.docx,.doc,.tiff,.tif" hidden />
+        <p class="intern-meta">Bilder · PDF · CSV · Excel · Word · E-Mail (.msg) · max. 200 MB</p>
+        <input type="file" id="ai-file-input" accept="image/*,.pdf,.csv,.xlsx,.xls,.docx,.doc,.tiff,.tif,.msg" hidden />
       </div>
       <div id="ai-status" style="margin-top:12px"></div>
     </div>
@@ -2091,6 +2225,7 @@ function renderUserList(users: AdminUser[], currentUser: PortalUser): string {
                 <button class="sv-button sv-button-secondary" type="button" data-edit-user="${u.id}">Bearbeiten</button>
                 <button class="sv-button sv-button-secondary" type="button" data-pw-user="${u.id}">Passwort</button>
                 ${!isSelf && u.is_active ? `<button class="sv-button sv-button-secondary" type="button" data-deactivate-user="${u.id}">Deaktivieren</button>` : ''}
+                ${!isSelf ? `<button class="sv-button sv-button-danger" type="button" data-delete-user="${u.id}" data-user-name="${escapeHtml(u.full_name)}">🗑 Löschen</button>` : ''}
               </td>
             </tr>
             <tr id="edit-row-${u.id}" class="intern-edit-row" hidden></tr>
@@ -2219,6 +2354,23 @@ function bindUserActions(
       }
     };
   });
+
+  // Permanent delete
+  context.root.querySelectorAll<HTMLElement>('[data-delete-user]').forEach((btn) => {
+    btn.onclick = async () => {
+      const id = Number(btn.dataset.deleteUser);
+      const userName = btn.dataset.userName ?? '';
+      if (!window.confirm(`⚠️ ACHTUNG: Benutzer „${userName}" endgültig löschen?\n\nDiese Aktion kann NICHT rückgängig gemacht werden!\nAlle Zuweisungen werden entfernt.`)) return;
+      if (!window.confirm(`Sind Sie WIRKLICH sicher? Benutzer „${userName}" wird unwiderruflich gelöscht.`)) return;
+      const { error } = await apiDeleteUserPermanent(id);
+      if (error) {
+        if (msgEl) msgEl.innerHTML = errorAlert(`Fehler: ${error.message}`);
+      } else {
+        if (msgEl) msgEl.innerHTML = successAlert('Benutzer endgültig gelöscht.');
+        await reload();
+      }
+    };
+  });
 }
 
 async function fetchWindowSummaries(_context: AppContext): Promise<WindowSummary[]> {
@@ -2300,14 +2452,16 @@ function createDashboardStats(records: WindowSummary[]): DashboardStats {
 
 function renderHeader(context: AppContext, title: string, text: string) {
   const isAdmin = context.user?.profile.role === 'administrator';
+  const canManage = ['administrator', 'projektleiter'].includes(context.user?.profile.role ?? '');
   const canImport = ['administrator', 'pruefer'].includes(context.user?.profile.role ?? '');
   return `
     <div class="intern-card intern-hero">
-      <p class="sv-eyebrow">${escapeHtml(portalProject.title)}</p>
+      <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
       <h1>${escapeHtml(title)}</h1>
       <p>${escapeHtml(text)}</p>
       <nav class="intern-actions" aria-label="Hauptnavigation">
         <a class="sv-button sv-button-secondary" href="/intern/projekte/">Projekte</a>
+        ${canManage ? '<a class="sv-button sv-button-primary" href="/intern/projekte/neu/">＋ Neues Projekt</a>' : ''}
         <a class="sv-button sv-button-secondary" href="${projectBase()}/">Dashboard</a>
         <a class="sv-button sv-button-secondary" href="${projectBase()}/gebaeude/">Gebäude</a>
         <a class="sv-button sv-button-secondary" href="${projectBase()}/auswertung/">Auswertung</a>
@@ -2652,7 +2806,7 @@ async function printSummary(records: WindowSummary[]) {
     <html lang="de"><head><title>Fensterbeschlagsprüfung BMVg Bonn – Sammelprotokoll</title><style>
       body{font-family:Arial,sans-serif;padding:24px;color:#071a2e}table{width:100%;border-collapse:collapse}th,td{border:1px solid #d6e0e8;padding:8px;text-align:left}h1{margin-top:0}
     </style></head><body>
-    <h1>${escapeHtml(portalProject.title)} – Sammelprotokoll</h1>
+    <h1>SV-Netzwerk – Sammelprotokoll</h1>
     <p>Datenstand: ${escapeHtml(new Date().toLocaleString('de-DE'))}</p>
     <table><thead><tr><th>Fenster</th><th>Standort</th><th>Status</th><th>Bewertung</th><th>Prioritaet</th></tr></thead><tbody>
     ${records.map((record) => `<tr><td>${escapeHtml(record.window_number || record.record_id)}</td><td>${escapeHtml([record.building_label, record.section_label, record.floor_label, record.room_number].filter(Boolean).join(' · '))}</td><td>${escapeHtml(record.status)}</td><td>${escapeHtml(record.overall_rating ?? '')}</td><td>${escapeHtml(record.priority ?? '')}</td></tr>`).join('')}

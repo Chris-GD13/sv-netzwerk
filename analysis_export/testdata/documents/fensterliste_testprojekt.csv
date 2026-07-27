@@ -1,0 +1,11 @@
+﻿Fensternummer;Gebäude;Etage;Raum;Raumnummer;Typ;Breite;Höhe;Hersteller;Beschlag;Baujahr;Bemerkungen
+F-0501;Verwaltungsgebäude Nord;1. Obergeschoss;Büro;VGN-101;Dreh-Kipp;1200;1400;Roto Frank;Roto NT;2005;
+F-0502;Verwaltungsgebäude Nord;1. Obergeschoss;Büro;VGN-102;Dreh-Kipp;1200;1400;Roto Frank;Roto NT;2005;
+F-0503;Verwaltungsgebäude Nord;1. Obergeschoss;Besprechungsraum;VGN-103;Dreh-Kipp;2400;1800;Siegenia-Aubi;Siegenia Titan AF;2005;2-flügelig
+F-0504;Verwaltungsgebäude Nord;1. Obergeschoss;Flur;VGN-104;Festverglasung;800;2200;Schüco;-;2005;nicht öffenbar
+F-0505;Verwaltungsgebäude Nord;2. Obergeschoss;Büro;VGN-201;Dreh-Kipp;1200;1400;Roto Frank;Roto NX;2012;erneuert 2012
+F-0506;Verwaltungsgebäude Nord;2. Obergeschoss;Büro;VGN-202;Dreh;1000;1200;Winkhaus;Winkhaus activPilot;2012;
+F-0507;Verwaltungsgebäude Nord;2. Obergeschoss;Teeküche;VGN-203;Kipp;600;400;Maco;Maco Multi-Matic;2005;Oberlicht
+F-0508;Verwaltungsgebäude Süd;Erdgeschoss;Empfang;VGS-001;Dreh-Kipp;1800;2000;GU (Gretsch-Unitas);GU UNI-JET;1998;
+F-0509;Verwaltungsgebäude Süd;Erdgeschoss;Empfang;VGS-001;Dreh-Kipp;1800;2000;GU (Gretsch-Unitas);GU UNI-JET;1998;2. Fenster
+F-0510;Konferenzzentrum;Erdgeschoss;Konferenzraum A;KON-001;Parallel-Schiebe-Kipp;3000;2200;Schüco;Schüco AvanTec;2018;Panoramafenster

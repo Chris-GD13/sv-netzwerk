@@ -1,0 +1,32 @@
+{
+  "name": "sv-netzwerk",
+  "version": "5.1.12",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "prebuild": "npm run validate:knowledge && node scripts/write-deploy-version.mjs",
+    "build": "astro check && astro build && npm run validate:public-copy && npm run validate:visible-umlauts",
+    "preview": "astro preview",
+    "check": "astro check",
+    "validate:knowledge": "node scripts/validate-knowledge.mjs",
+    "validate:public-copy": "node scripts/validate-public-copy.mjs",
+    "validate:visible-umlauts": "node scripts/validate-visible-umlauts.mjs",
+    "fachbeitrag:run": "node scripts/run-fachbeitrag-automation.mjs",
+    "fachbeitrag:log": "node scripts/update-fachbeitrag-log.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.1.3",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@types/qrcode": "^1.5.6",
+    "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "chokidar": "5.0.0",
+    "fast-uri": "4.1.1"
+  }
+}

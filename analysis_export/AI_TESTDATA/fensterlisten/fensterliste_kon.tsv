@@ -1,0 +1,9 @@
+Gebaeude	Etage	Raum	Raum-Nr	Fenster-Nr	Typ	Breite_mm	Hoehe_mm	Hersteller	Beschlag	Baujahr	Status	Mangel
+KON	EG	Konferenz 1	KON-E01	KON-F-001	Dreh-Kipp	1800	2200	Schüco	AvanTec	2018	abgeschlossen	
+KON	EG	Konferenz 1	KON-E01	KON-F-002	Dreh-Kipp	1800	2200	Schüco	AvanTec	2018	abgeschlossen	
+KON	EG	Konferenz 1	KON-E01	KON-F-003	Fest	1200	2200	Schüco	-	2018	abgeschlossen	
+KON	EG	Foyer	KON-E02	KON-F-004	Schiebe	3000	2400	Schüco	AvanTec	2018	in_bearbeitung	
+KON	1.OG	Seminar 1	KON-101	KON-F-010	Dreh-Kipp	1400	1800	Schüco	AvanTec	2018	nicht_begonnen	
+KON	1.OG	Seminar 1	KON-101	KON-F-011	Dreh-Kipp	1400	1800	Schüco	AvanTec	2018	nicht_begonnen	
+KON	1.OG	Seminar 2	KON-102	KON-F-012	Dreh-Kipp	1400	1800	Schüco	AvanTec	2018	mangel	Dichtung defekt
+KON	1.OG	Seminar 2	KON-102	KON-F-013	Kipp	800	500	Schüco	AvanTec	2018	abgeschlossen	

@@ -1,0 +1,91 @@
+name: Portal-Setup (einmalig)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: .env-Datei auf Server ablegen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          SETUP_KEY: ${{ secrets.SETUP_KEY }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update && sudo apt-get install --yes lftp
+
+          cat > /tmp/.env <<ENVFILE
+          DB_HOST=${DB_HOST}
+          DB_PORT=3306
+          DB_NAME=${DB_NAME}
+          DB_USER=${DB_USER}
+          DB_PASS=${DB_PASS}
+          SETUP_KEY=${SETUP_KEY}
+          SEED_ADMIN_EMAIL=${ADMIN_EMAIL}
+          SEED_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+          SEED_ADMIN_NAME=Administrator
+          PROJECT_NAME=Fensterbeschlagsprüfung BMVg Bonn
+          OPENAI_API_KEY=${OPENAI_API_KEY}
+          ENVFILE
+
+          # Whitespace am Anfang entfernen (heredoc-Einrückung)
+          sed -i 's/^[[:space:]]*//' /tmp/.env
+
+          echo "=== .env Inhalt (Keys only) ==="
+          grep -oP '^[^=]+' /tmp/.env
+
+          lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; put /tmp/.env -o /sv-netzwerk/.env; quit"
+          echo ".env erfolgreich hochgeladen."
+
+      - name: Schema installieren
+        env:
+          SETUP_KEY: ${{ secrets.SETUP_KEY }}
+        run: |
+          set -euo pipefail
+          echo "Installiere Datenbankschema..."
+          response=$(curl -sL -X POST \
+            "https://www.sv-netzwerk.eu/intern/api/setup.php?key=${SETUP_KEY}&action=install" \
+            -H "Content-Type: application/json")
+          echo "$response"
+          echo "$response" | grep -q '"ok":true' || echo "$response" | grep -q '"ok": true' || { echo "::error::Schema-Installation fehlgeschlagen"; exit 1; }
+          echo "Schema erfolgreich installiert."
+
+      - name: Administrator anlegen
+        env:
+          SETUP_KEY: ${{ secrets.SETUP_KEY }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          echo "Lege Administrator an..."
+          response=$(curl -sL -X POST \
+            "https://www.sv-netzwerk.eu/intern/api/setup.php?key=${SETUP_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"action\":\"create_admin\",\"email\":\"${ADMIN_EMAIL}\",\"full_name\":\"Administrator\",\"password\":\"${ADMIN_PASSWORD}\"}")
+          echo "$response"
+          echo "$response" | grep -q '"ok":true' || echo "$response" | grep -q '"ok": true' || { echo "::error::Admin-Anlage fehlgeschlagen"; exit 1; }
+          echo "Administrator erfolgreich angelegt."
+
+      - name: Portal-Status prüfen
+        env:
+          SETUP_KEY: ${{ secrets.SETUP_KEY }}
+        run: |
+          set -euo pipefail
+          echo "Prüfe Status..."
+          curl -sL "https://www.sv-netzwerk.eu/intern/api/setup.php?key=${SETUP_KEY}" | python3 -m json.tool

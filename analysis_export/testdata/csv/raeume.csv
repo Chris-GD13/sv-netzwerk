@@ -1,0 +1,201 @@
+Raumnummer;Bezeichnung;Etage;Gebäude
+VGN-001;Teeküche;Untergeschoss;Verwaltungsgebäude Nord
+VGN-002;Besprechungsraum;Untergeschoss;Verwaltungsgebäude Nord
+VGN-003;Büro;Untergeschoss;Verwaltungsgebäude Nord
+VGN-004;Flur;Untergeschoss;Verwaltungsgebäude Nord
+VGN-005;Empfang;Untergeschoss;Verwaltungsgebäude Nord
+VGN-006;Archiv;Untergeschoss;Verwaltungsgebäude Nord
+VGN-007;Flur;Untergeschoss;Verwaltungsgebäude Nord
+VGN-008;Sanitär;Untergeschoss;Verwaltungsgebäude Nord
+VGN-009;Flur;Untergeschoss;Verwaltungsgebäude Nord
+VGN-010;Lager;Untergeschoss;Verwaltungsgebäude Nord
+VGN-011;Lager;Untergeschoss;Verwaltungsgebäude Nord
+VGN-101;Archiv;Erdgeschoss;Verwaltungsgebäude Nord
+VGN-102;Bibliothek;Erdgeschoss;Verwaltungsgebäude Nord
+VGN-103;Sanitär;Erdgeschoss;Verwaltungsgebäude Nord
+VGN-104;Büro;Erdgeschoss;Verwaltungsgebäude Nord
+VGN-105;Druckerraum;Erdgeschoss;Verwaltungsgebäude Nord
+VGN-106;Sanitär;Erdgeschoss;Verwaltungsgebäude Nord
+VGN-107;Sanitär;Erdgeschoss;Verwaltungsgebäude Nord
+VGN-108;Bibliothek;Erdgeschoss;Verwaltungsgebäude Nord
+VGN-201;Besprechungsraum;1. Obergeschoss;Verwaltungsgebäude Nord
+VGN-202;Büro;1. Obergeschoss;Verwaltungsgebäude Nord
+VGN-203;Büro;1. Obergeschoss;Verwaltungsgebäude Nord
+VGN-204;Poststelle;1. Obergeschoss;Verwaltungsgebäude Nord
+VGN-205;Poststelle;1. Obergeschoss;Verwaltungsgebäude Nord
+VGN-206;Archiv;1. Obergeschoss;Verwaltungsgebäude Nord
+VGN-207;Empfang;1. Obergeschoss;Verwaltungsgebäude Nord
+VGN-208;Sanitär;1. Obergeschoss;Verwaltungsgebäude Nord
+VGN-301;Bibliothek;2. Obergeschoss;Verwaltungsgebäude Nord
+VGN-302;Sanitär;2. Obergeschoss;Verwaltungsgebäude Nord
+VGN-303;Lager;2. Obergeschoss;Verwaltungsgebäude Nord
+VGN-304;Lager;2. Obergeschoss;Verwaltungsgebäude Nord
+VGN-305;Serverraum;2. Obergeschoss;Verwaltungsgebäude Nord
+VGN-306;Druckerraum;2. Obergeschoss;Verwaltungsgebäude Nord
+VGN-307;Poststelle;2. Obergeschoss;Verwaltungsgebäude Nord
+VGN-308;Archiv;2. Obergeschoss;Verwaltungsgebäude Nord
+VGN-309;Archiv;2. Obergeschoss;Verwaltungsgebäude Nord
+VGN-310;Serverraum;2. Obergeschoss;Verwaltungsgebäude Nord
+VGN-311;Serverraum;2. Obergeschoss;Verwaltungsgebäude Nord
+VGN-401;Besprechungsraum;3. Obergeschoss;Verwaltungsgebäude Nord
+VGN-402;Teeküche;3. Obergeschoss;Verwaltungsgebäude Nord
+VGN-403;Büro;3. Obergeschoss;Verwaltungsgebäude Nord
+VGN-404;Empfang;3. Obergeschoss;Verwaltungsgebäude Nord
+VGN-405;Lager;3. Obergeschoss;Verwaltungsgebäude Nord
+VGN-406;Archiv;3. Obergeschoss;Verwaltungsgebäude Nord
+VGN-407;Bibliothek;3. Obergeschoss;Verwaltungsgebäude Nord
+VGS-001;Empfang;Untergeschoss;Verwaltungsgebäude Süd
+VGS-002;Teeküche;Untergeschoss;Verwaltungsgebäude Süd
+VGS-003;Poststelle;Untergeschoss;Verwaltungsgebäude Süd
+VGS-004;Bibliothek;Untergeschoss;Verwaltungsgebäude Süd
+VGS-005;Druckerraum;Untergeschoss;Verwaltungsgebäude Süd
+VGS-006;Besprechungsraum;Untergeschoss;Verwaltungsgebäude Süd
+VGS-007;Büro;Untergeschoss;Verwaltungsgebäude Süd
+VGS-008;Archiv;Untergeschoss;Verwaltungsgebäude Süd
+VGS-009;Empfang;Untergeschoss;Verwaltungsgebäude Süd
+VGS-010;Büro;Untergeschoss;Verwaltungsgebäude Süd
+VGS-011;Flur;Untergeschoss;Verwaltungsgebäude Süd
+VGS-012;Büro;Untergeschoss;Verwaltungsgebäude Süd
+VGS-101;Teeküche;Erdgeschoss;Verwaltungsgebäude Süd
+VGS-102;Serverraum;Erdgeschoss;Verwaltungsgebäude Süd
+VGS-103;Serverraum;Erdgeschoss;Verwaltungsgebäude Süd
+VGS-104;Flur;Erdgeschoss;Verwaltungsgebäude Süd
+VGS-105;Sanitär;Erdgeschoss;Verwaltungsgebäude Süd
+VGS-106;Serverraum;Erdgeschoss;Verwaltungsgebäude Süd
+VGS-107;Besprechungsraum;Erdgeschoss;Verwaltungsgebäude Süd
+VGS-108;Serverraum;Erdgeschoss;Verwaltungsgebäude Süd
+VGS-109;Sanitär;Erdgeschoss;Verwaltungsgebäude Süd
+VGS-110;Lager;Erdgeschoss;Verwaltungsgebäude Süd
+VGS-111;Druckerraum;Erdgeschoss;Verwaltungsgebäude Süd
+VGS-201;Sanitär;1. Obergeschoss;Verwaltungsgebäude Süd
+VGS-202;Poststelle;1. Obergeschoss;Verwaltungsgebäude Süd
+VGS-203;Serverraum;1. Obergeschoss;Verwaltungsgebäude Süd
+VGS-204;Empfang;1. Obergeschoss;Verwaltungsgebäude Süd
+VGS-205;Archiv;1. Obergeschoss;Verwaltungsgebäude Süd
+VGS-206;Sanitär;1. Obergeschoss;Verwaltungsgebäude Süd
+VGS-207;Druckerraum;1. Obergeschoss;Verwaltungsgebäude Süd
+VGS-208;Lager;1. Obergeschoss;Verwaltungsgebäude Süd
+VGS-209;Besprechungsraum;1. Obergeschoss;Verwaltungsgebäude Süd
+VGS-210;Serverraum;1. Obergeschoss;Verwaltungsgebäude Süd
+VGS-211;Lager;1. Obergeschoss;Verwaltungsgebäude Süd
+VGS-212;Archiv;1. Obergeschoss;Verwaltungsgebäude Süd
+VGS-301;Büro;2. Obergeschoss;Verwaltungsgebäude Süd
+VGS-302;Teeküche;2. Obergeschoss;Verwaltungsgebäude Süd
+VGS-303;Flur;2. Obergeschoss;Verwaltungsgebäude Süd
+VGS-304;Serverraum;2. Obergeschoss;Verwaltungsgebäude Süd
+VGS-305;Archiv;2. Obergeschoss;Verwaltungsgebäude Süd
+VGS-306;Poststelle;2. Obergeschoss;Verwaltungsgebäude Süd
+VGS-307;Archiv;2. Obergeschoss;Verwaltungsgebäude Süd
+VGS-308;Bibliothek;2. Obergeschoss;Verwaltungsgebäude Süd
+VGS-309;Lager;2. Obergeschoss;Verwaltungsgebäude Süd
+VGS-310;Archiv;2. Obergeschoss;Verwaltungsgebäude Süd
+KON-001;Empfang;Untergeschoss;Konferenzzentrum
+KON-002;Büro;Untergeschoss;Konferenzzentrum
+KON-003;Archiv;Untergeschoss;Konferenzzentrum
+KON-004;Flur;Untergeschoss;Konferenzzentrum
+KON-005;Bibliothek;Untergeschoss;Konferenzzentrum
+KON-006;Druckerraum;Untergeschoss;Konferenzzentrum
+KON-101;Besprechungsraum;Erdgeschoss;Konferenzzentrum
+KON-102;Flur;Erdgeschoss;Konferenzzentrum
+KON-103;Flur;Erdgeschoss;Konferenzzentrum
+KON-104;Lager;Erdgeschoss;Konferenzzentrum
+KON-105;Archiv;Erdgeschoss;Konferenzzentrum
+KON-106;Teeküche;Erdgeschoss;Konferenzzentrum
+KON-107;Besprechungsraum;Erdgeschoss;Konferenzzentrum
+KON-108;Besprechungsraum;Erdgeschoss;Konferenzzentrum
+KON-109;Empfang;Erdgeschoss;Konferenzzentrum
+KON-110;Poststelle;Erdgeschoss;Konferenzzentrum
+KON-111;Empfang;Erdgeschoss;Konferenzzentrum
+KON-112;Teeküche;Erdgeschoss;Konferenzzentrum
+KON-201;Sanitär;1. Obergeschoss;Konferenzzentrum
+KON-202;Flur;1. Obergeschoss;Konferenzzentrum
+KON-203;Empfang;1. Obergeschoss;Konferenzzentrum
+KON-204;Flur;1. Obergeschoss;Konferenzzentrum
+KON-205;Archiv;1. Obergeschoss;Konferenzzentrum
+KON-206;Flur;1. Obergeschoss;Konferenzzentrum
+KON-207;Sanitär;1. Obergeschoss;Konferenzzentrum
+KON-208;Flur;1. Obergeschoss;Konferenzzentrum
+KON-209;Archiv;1. Obergeschoss;Konferenzzentrum
+KON-210;Teeküche;1. Obergeschoss;Konferenzzentrum
+KON-211;Serverraum;1. Obergeschoss;Konferenzzentrum
+KON-212;Serverraum;1. Obergeschoss;Konferenzzentrum
+TZ-001;Bibliothek;Untergeschoss;Technisches Zentrum
+TZ-002;Lager;Untergeschoss;Technisches Zentrum
+TZ-003;Flur;Untergeschoss;Technisches Zentrum
+TZ-004;Serverraum;Untergeschoss;Technisches Zentrum
+TZ-005;Poststelle;Untergeschoss;Technisches Zentrum
+TZ-101;Poststelle;Erdgeschoss;Technisches Zentrum
+TZ-102;Serverraum;Erdgeschoss;Technisches Zentrum
+TZ-103;Lager;Erdgeschoss;Technisches Zentrum
+TZ-104;Archiv;Erdgeschoss;Technisches Zentrum
+TZ-105;Druckerraum;Erdgeschoss;Technisches Zentrum
+TZ-106;Poststelle;Erdgeschoss;Technisches Zentrum
+TZ-107;Serverraum;Erdgeschoss;Technisches Zentrum
+TZ-108;Poststelle;Erdgeschoss;Technisches Zentrum
+TZ-109;Serverraum;Erdgeschoss;Technisches Zentrum
+TZ-110;Büro;Erdgeschoss;Technisches Zentrum
+TZ-111;Empfang;Erdgeschoss;Technisches Zentrum
+TZ-201;Sanitär;1. Obergeschoss;Technisches Zentrum
+TZ-202;Teeküche;1. Obergeschoss;Technisches Zentrum
+TZ-203;Serverraum;1. Obergeschoss;Technisches Zentrum
+TZ-204;Teeküche;1. Obergeschoss;Technisches Zentrum
+TZ-205;Besprechungsraum;1. Obergeschoss;Technisches Zentrum
+TZ-206;Lager;1. Obergeschoss;Technisches Zentrum
+TZ-207;Lager;1. Obergeschoss;Technisches Zentrum
+TZ-208;Druckerraum;1. Obergeschoss;Technisches Zentrum
+TZ-209;Archiv;1. Obergeschoss;Technisches Zentrum
+TZ-210;Archiv;1. Obergeschoss;Technisches Zentrum
+TZ-211;Poststelle;1. Obergeschoss;Technisches Zentrum
+TZ-301;Lager;2. Obergeschoss;Technisches Zentrum
+TZ-302;Flur;2. Obergeschoss;Technisches Zentrum
+TZ-303;Druckerraum;2. Obergeschoss;Technisches Zentrum
+TZ-304;Sanitär;2. Obergeschoss;Technisches Zentrum
+TZ-305;Flur;2. Obergeschoss;Technisches Zentrum
+TZ-306;Archiv;2. Obergeschoss;Technisches Zentrum
+TZ-307;Empfang;2. Obergeschoss;Technisches Zentrum
+TZ-308;Poststelle;2. Obergeschoss;Technisches Zentrum
+TZ-309;Besprechungsraum;2. Obergeschoss;Technisches Zentrum
+TZ-310;Lager;2. Obergeschoss;Technisches Zentrum
+TZ-311;Archiv;2. Obergeschoss;Technisches Zentrum
+TZ-312;Serverraum;2. Obergeschoss;Technisches Zentrum
+TZ-401;Serverraum;3. Obergeschoss;Technisches Zentrum
+TZ-402;Druckerraum;3. Obergeschoss;Technisches Zentrum
+TZ-403;Empfang;3. Obergeschoss;Technisches Zentrum
+TZ-404;Flur;3. Obergeschoss;Technisches Zentrum
+TZ-405;Büro;3. Obergeschoss;Technisches Zentrum
+TZ-406;Sanitär;3. Obergeschoss;Technisches Zentrum
+TZ-407;Lager;3. Obergeschoss;Technisches Zentrum
+TZ-408;Besprechungsraum;3. Obergeschoss;Technisches Zentrum
+TZ-409;Serverraum;3. Obergeschoss;Technisches Zentrum
+TZ-501;Besprechungsraum;4. Obergeschoss;Technisches Zentrum
+TZ-502;Druckerraum;4. Obergeschoss;Technisches Zentrum
+TZ-503;Poststelle;4. Obergeschoss;Technisches Zentrum
+TZ-504;Flur;4. Obergeschoss;Technisches Zentrum
+TZ-505;Lager;4. Obergeschoss;Technisches Zentrum
+TZ-506;Druckerraum;4. Obergeschoss;Technisches Zentrum
+TZ-507;Serverraum;4. Obergeschoss;Technisches Zentrum
+TZ-508;Büro;4. Obergeschoss;Technisches Zentrum
+NGW-001;Bibliothek;Untergeschoss;Nebengebäude West
+NGW-002;Bibliothek;Untergeschoss;Nebengebäude West
+NGW-003;Besprechungsraum;Untergeschoss;Nebengebäude West
+NGW-004;Teeküche;Untergeschoss;Nebengebäude West
+NGW-005;Flur;Untergeschoss;Nebengebäude West
+NGW-006;Büro;Untergeschoss;Nebengebäude West
+NGW-101;Teeküche;Erdgeschoss;Nebengebäude West
+NGW-102;Serverraum;Erdgeschoss;Nebengebäude West
+NGW-103;Büro;Erdgeschoss;Nebengebäude West
+NGW-104;Teeküche;Erdgeschoss;Nebengebäude West
+NGW-105;Sanitär;Erdgeschoss;Nebengebäude West
+NGW-106;Empfang;Erdgeschoss;Nebengebäude West
+NGW-107;Sanitär;Erdgeschoss;Nebengebäude West
+NGW-108;Poststelle;Erdgeschoss;Nebengebäude West
+NGW-109;Sanitär;Erdgeschoss;Nebengebäude West
+NGW-110;Druckerraum;Erdgeschoss;Nebengebäude West
+NGW-201;Teeküche;1. Obergeschoss;Nebengebäude West
+NGW-202;Empfang;1. Obergeschoss;Nebengebäude West
+NGW-203;Poststelle;1. Obergeschoss;Nebengebäude West
+NGW-204;Büro;1. Obergeschoss;Nebengebäude West
+NGW-205;Poststelle;1. Obergeschoss;Nebengebäude West
+NGW-206;Bibliothek;1. Obergeschoss;Nebengebäude West
+NGW-207;Büro;1. Obergeschoss;Nebengebäude West
+NGW-208;Poststelle;1. Obergeschoss;Nebengebäude West

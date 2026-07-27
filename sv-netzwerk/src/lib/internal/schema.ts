@@ -1,11 +1,11 @@
 import type { ExportDefinition, FieldSection, SelectOption, WindowSummary } from './types';
 
 export const portalProject = {
-  code: 'fensterpruefung-bonn',
-  title: 'Fensterbeschlagsprüfung BMVg Bonn',
-  objectName: '1. Dienstsitz des Bundesministeriums der Verteidigung',
-  address: 'Fontainengraben 150, 53123 Bonn',
-  plannedWindows: 450,
+  code: 'sv-netzwerk',
+  title: 'SV-Netzwerk Prüfportal',
+  objectName: 'Sachverständigen-Netzwerk',
+  address: '',
+  plannedWindows: 0,
 };
 
 export const roleLabels: Record<string, string> = {

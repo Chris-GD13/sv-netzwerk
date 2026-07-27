@@ -1,9 +1,14 @@
-# API-Verzeichnis – Fensterbeschlagsprüfung BMVg Bonn
+# API-Verzeichnis – SV-Netzwerk Prüfportal
 Options -Indexes
 AddDefaultCharset UTF-8
 
-# PHP wird über die globale IONOS-Konfiguration (PHP-FPM) verarbeitet.
-# Kein SetHandler nötig – das würde PHP-FPM überschreiben und Source-Leak verursachen.
+# PHP Upload-Limits für KI-Import (bis 200 MB)
+<IfModule mod_php.c>
+    php_value upload_max_filesize 200M
+    php_value post_max_size 210M
+    php_value max_execution_time 300
+    php_value memory_limit 512M
+</IfModule>
 
 # Sicherheitsheader für API-Antworten
 <IfModule mod_headers.c>

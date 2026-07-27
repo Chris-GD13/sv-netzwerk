@@ -1,0 +1,13 @@
+# API-Verzeichnis – Fensterbeschlagsprüfung BMVg Bonn
+Options -Indexes
+AddDefaultCharset UTF-8
+
+# PHP wird über die globale IONOS-Konfiguration (PHP-FPM) verarbeitet.
+# Kein SetHandler nötig – das würde PHP-FPM überschreiben und Source-Leak verursachen.
+
+# Sicherheitsheader für API-Antworten
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Cache-Control "no-store"
+</IfModule>

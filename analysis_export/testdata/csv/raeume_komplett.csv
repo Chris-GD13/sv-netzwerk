@@ -1,0 +1,206 @@
+Gebäude;Etage;Raumnummer;Name;Nutzung;Bemerkung
+Verwaltungsgebäude Nord;Untergeschoss;VGN-001;Technikraum;Technik;
+Verwaltungsgebäude Nord;Untergeschoss;VGN-002;Flur 2;Verkehrsfläche;
+Verwaltungsgebäude Nord;Untergeschoss;VGN-003;Serverraum 3;Technik;
+Verwaltungsgebäude Nord;Untergeschoss;VGN-004;Lager 4;Lager;
+Verwaltungsgebäude Nord;Untergeschoss;VGN-005;Treppenhaus 5;Verkehrsfläche;
+Verwaltungsgebäude Nord;Untergeschoss;VGN-006;Technikraum 6;Technik;
+Verwaltungsgebäude Nord;Untergeschoss;VGN-007;Flur 7;Verkehrsfläche;
+Verwaltungsgebäude Nord;Untergeschoss;VGN-008;Serverraum 8;Technik;Denkmalgeschützt
+Verwaltungsgebäude Nord;Erdgeschoss;VGN-101;Treppenhaus;Verkehrsfläche;
+Verwaltungsgebäude Nord;Erdgeschoss;VGN-102;Poststelle 2;Verwaltung;
+Verwaltungsgebäude Nord;Erdgeschoss;VGN-103;Besprechungsraum 3;Besprechung;
+Verwaltungsgebäude Nord;Erdgeschoss;VGN-104;WC Damen 4;Sanitär;
+Verwaltungsgebäude Nord;Erdgeschoss;VGN-105;Großraumbüro 5;Büro;
+Verwaltungsgebäude Nord;Erdgeschoss;VGN-106;Aufenthaltsraum 6;Sozial;
+Verwaltungsgebäude Nord;Erdgeschoss;VGN-107;Konferenzraum 7;Besprechung;Zutritt nur mit Begleitung
+Verwaltungsgebäude Nord;Erdgeschoss;VGN-108;Empfang 8;Empfang;
+Verwaltungsgebäude Nord;Erdgeschoss;VGN-109;Treppenhaus 9;Verkehrsfläche;
+Verwaltungsgebäude Nord;Erdgeschoss;VGN-110;Poststelle 10;Verwaltung;
+Verwaltungsgebäude Nord;Erdgeschoss;VGN-106;Besprechungsraum 11;Besprechung;
+Verwaltungsgebäude Nord;Erdgeschoss;VGN-112;WC Damen 12;Sanitär;
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-201;Küche;Versorgung;
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-202;Flur 2;Verkehrsfläche;
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-203;Kantine 3;Sozial;Schlüssel beim Hausmeister
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-204;Großraumbüro 4;Büro;
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-205;Büro (Doppel) 5;Büro;Renovierung geplant Q3/2026
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-206;Werkstatt 6;Technik;Denkmalgeschützt
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-207;Aufenthaltsraum 7;Sozial;
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-208;Technikraum 8;Technik;
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-209;Küche 9;Versorgung;
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-210;Flur 10;Verkehrsfläche;
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-211;Kantine 11;Sozial;
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-212;Großraumbüro 12;Büro;Zutritt nur mit Begleitung
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-213;Büro (Doppel) 13;Büro;
+Verwaltungsgebäude Nord;1. Obergeschoss;VGN-214;Werkstatt 14;Technik;Schlüssel beim Hausmeister
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-301;Werkstatt;Technik;
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-302;Flur 2;Verkehrsfläche;
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-303;Treppenhaus 3;Verkehrsfläche;
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-304;Technikraum 4;Technik;
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-305;Konferenzraum 5;Besprechung;
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-306;Poststelle 6;Verwaltung;
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-307;Besprechungsraum 7;Besprechung;
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-308;Großraumbüro 8;Büro;
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-309;Werkstatt 9;Technik;
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-310;Flur 10;Verkehrsfläche;Denkmalgeschützt
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-311;Treppenhaus 11;Verkehrsfläche;
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-312;Technikraum 12;Technik;
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-313;Konferenzraum 13;Besprechung;
+Verwaltungsgebäude Nord;2. Obergeschoss;VGN-314;Poststelle 14;Verwaltung;
+Verwaltungsgebäude Nord;3. Obergeschoss;VGN-401;Großraumbüro;Büro;
+Verwaltungsgebäude Nord;3. Obergeschoss;VGN-402;Konferenzraum 2;Besprechung;
+Verwaltungsgebäude Nord;3. Obergeschoss;VGN-403;Empfang 3;Empfang;
+Verwaltungsgebäude Nord;3. Obergeschoss;VGN-404;Küche 4;Versorgung;
+Verwaltungsgebäude Nord;3. Obergeschoss;VGN-405;Poststelle 5;Verwaltung;
+Verwaltungsgebäude Nord;3. Obergeschoss;VGN-406;Serverraum 6;Technik;
+Verwaltungsgebäude Nord;3. Obergeschoss;VGN-407;Flur 7;Verkehrsfläche;
+Verwaltungsgebäude Nord;3. Obergeschoss;VGN-408;Teeküche 8;Sozial;
+Verwaltungsgebäude Nord;3. Obergeschoss;VGN-409;Großraumbüro 9;Büro;
+Verwaltungsgebäude Nord;3. Obergeschoss;VGN-410;Konferenzraum 10;Besprechung;
+Verwaltungsgebäude Süd;Untergeschoss;VGS-001;Lager;Lager;
+Verwaltungsgebäude Süd;Untergeschoss;VGS-002;Serverraum 2;Technik;
+Verwaltungsgebäude Süd;Untergeschoss;VGS-003;Werkstatt 3;Technik;
+Verwaltungsgebäude Süd;Untergeschoss;VGS-004;Technikraum 4;Technik;
+Verwaltungsgebäude Süd;Untergeschoss;VGS-005;Treppenhaus 5;Verkehrsfläche;
+Verwaltungsgebäude Süd;Untergeschoss;VGS-006;Lager 6;Lager;Zutritt nur mit Begleitung
+Verwaltungsgebäude Süd;Erdgeschoss;VGS-101;Kantine;Sozial;
+Verwaltungsgebäude Süd;Erdgeschoss;VGS-102;Technikraum 2;Technik;
+Verwaltungsgebäude Süd;Erdgeschoss;VGS-103;Empfang 3;Empfang;
+Verwaltungsgebäude Süd;Erdgeschoss;VGS-104;Poststelle 4;Verwaltung;
+Verwaltungsgebäude Süd;Erdgeschoss;VGS-105;Büro (Doppel) 5;Büro;
+Verwaltungsgebäude Süd;Erdgeschoss;VGS-106;Treppenhaus 6;Verkehrsfläche;
+Verwaltungsgebäude Süd;Erdgeschoss;VGS-107;Besprechungsraum 7;Besprechung;
+Verwaltungsgebäude Süd;Erdgeschoss;VGS-108;Archiv 8;Lager;
+Verwaltungsgebäude Süd;Erdgeschoss;VGS-109;Kantine 9;Sozial;Denkmalgeschützt
+Verwaltungsgebäude Süd;Erdgeschoss;VGS-110;Technikraum 10;Technik;
+Verwaltungsgebäude Süd;1. Obergeschoss;VGS-110;Treppenhaus;Verkehrsfläche;
+Verwaltungsgebäude Süd;1. Obergeschoss;VGS-202;Flur 2;Verkehrsfläche;
+Verwaltungsgebäude Süd;1. Obergeschoss;VGS-203;Archiv 3;Lager;
+Verwaltungsgebäude Süd;1. Obergeschoss;VGS-204;Kantine 4;Sozial;
+Verwaltungsgebäude Süd;1. Obergeschoss;VGS-205;Serverraum 5;Technik;
+Verwaltungsgebäude Süd;1. Obergeschoss;VGS-206;Werkstatt 6;Technik;
+Verwaltungsgebäude Süd;1. Obergeschoss;VGS-207;Konferenzraum 7;Besprechung;
+Verwaltungsgebäude Süd;1. Obergeschoss;VGS-208;Besprechungsraum 8;Besprechung;
+Verwaltungsgebäude Süd;1. Obergeschoss;VGS-209;Treppenhaus 9;Verkehrsfläche;
+Verwaltungsgebäude Süd;1. Obergeschoss;VGS-210;Flur 10;Verkehrsfläche;
+Verwaltungsgebäude Süd;1. Obergeschoss;VGS-211;Archiv 11;Lager;
+Verwaltungsgebäude Süd;1. Obergeschoss;VGS-212;Kantine 12;Sozial;
+Verwaltungsgebäude Süd;2. Obergeschoss;VGS-301;Büro (Einzel);Büro;
+Verwaltungsgebäude Süd;2. Obergeschoss;VGS-302;Archiv 2;Lager;
+Verwaltungsgebäude Süd;2. Obergeschoss;VGS-303;Treppenhaus 3;Verkehrsfläche;Renovierung geplant Q3/2026
+Verwaltungsgebäude Süd;2. Obergeschoss;VGS-304;Technikraum 4;Technik;
+Verwaltungsgebäude Süd;2. Obergeschoss;VGS-305;Aufenthaltsraum 5;Sozial;
+Verwaltungsgebäude Süd;2. Obergeschoss;VGS-306;Küche 6;Versorgung;
+Verwaltungsgebäude Süd;2. Obergeschoss;VGS-307;Büro (Doppel) 7;Büro;
+Verwaltungsgebäude Süd;2. Obergeschoss;VGS-308;Großraumbüro 8;Büro;
+Verwaltungsgebäude Süd;2. Obergeschoss;VGS-309;Büro (Einzel) 9;Büro;
+Verwaltungsgebäude Süd;2. Obergeschoss;VGS-310;Archiv 10;Lager;Denkmalgeschützt
+Verwaltungsgebäude Süd;2. Obergeschoss;VGS-311;Treppenhaus 11;Verkehrsfläche;
+Verwaltungsgebäude Süd;2. Obergeschoss;VGS-312;Technikraum 12;Technik;
+Konferenzzentrum;Erdgeschoss;KON-101;Großraumbüro;Büro;
+Konferenzzentrum;Erdgeschoss;KON-102;Büro (Doppel) 2;Büro;
+Konferenzzentrum;Erdgeschoss;KON-103;Flur 3;Verkehrsfläche;
+Konferenzzentrum;Erdgeschoss;KON-104;Büro (Einzel) 4;Büro;
+Konferenzzentrum;Erdgeschoss;KON-105;Besprechungsraum 5;Besprechung;
+Konferenzzentrum;Erdgeschoss;KON-106;Konferenzraum 6;Besprechung;
+Konferenzzentrum;Erdgeschoss;KON-107;Großraumbüro 7;Büro;
+Konferenzzentrum;Erdgeschoss;KON-108;Büro (Doppel) 8;Büro;
+Konferenzzentrum;1. Obergeschoss;KON-201;WC Damen;Sanitär;
+Konferenzzentrum;1. Obergeschoss;KON-202;Büro (Einzel) 2;Büro;
+Konferenzzentrum;1. Obergeschoss;KON-203;Flur 3;Verkehrsfläche;
+Konferenzzentrum;1. Obergeschoss;KON-204;Büro (Doppel) 4;Büro;
+Konferenzzentrum;1. Obergeschoss;KON-205;Großraumbüro 5;Büro;
+Konferenzzentrum;1. Obergeschoss;KON-206;Besprechungsraum 6;Besprechung;
+Konferenzzentrum;1. Obergeschoss;KON-207;WC Damen 7;Sanitär;
+Konferenzzentrum;1. Obergeschoss;KON-208;Büro (Einzel) 8;Büro;
+Technisches Zentrum;Untergeschoss;TZ-001;Flur;Verkehrsfläche;
+Technisches Zentrum;Untergeschoss;TZ-002;Büro (Doppel) 2;Büro;
+Technisches Zentrum;Untergeschoss;TZ-003;Lager 3;Lager;
+Technisches Zentrum;Untergeschoss;TZ-004;Treppenhaus 4;Verkehrsfläche;
+Technisches Zentrum;Untergeschoss;TZ-005;Büro (Einzel) 5;Büro;
+Technisches Zentrum;Untergeschoss;TZ-006;Archiv 6;Lager;
+Technisches Zentrum;Untergeschoss;TZ-007;Großraumbüro 7;Büro;
+Technisches Zentrum;Untergeschoss;TZ-008;Technikraum 8;Technik;
+Technisches Zentrum;Untergeschoss;TZ-009;Flur 9;Verkehrsfläche;
+Technisches Zentrum;Untergeschoss;TZ-010;Büro (Doppel) 10;Büro;
+Technisches Zentrum;Erdgeschoss;TZ-101;Archiv;Lager;
+Technisches Zentrum;Erdgeschoss;TZ-102;Technikraum 2;Technik;Denkmalgeschützt
+Technisches Zentrum;Erdgeschoss;TZ-103;Werkstatt 3;Technik;
+Technisches Zentrum;Erdgeschoss;TZ-104;Büro (Einzel) 4;Büro;
+Technisches Zentrum;Erdgeschoss;TZ-105;Büro (Doppel) 5;Büro;
+Technisches Zentrum;Erdgeschoss;TZ-106;Großraumbüro 6;Büro;
+Technisches Zentrum;Erdgeschoss;TZ-107;Flur 7;Verkehrsfläche;
+Technisches Zentrum;Erdgeschoss;TZ-108;Lager 8;Lager;
+Technisches Zentrum;Erdgeschoss;TZ-109;Archiv 9;Lager;
+Technisches Zentrum;Erdgeschoss;TZ-110;Technikraum 10;Technik;
+Technisches Zentrum;Erdgeschoss;TZ-111;Werkstatt 11;Technik;
+Technisches Zentrum;Erdgeschoss;TZ-112;Büro (Einzel) 12;Büro;
+Technisches Zentrum;1. Obergeschoss;TZ-201;Büro (Doppel);Büro;
+Technisches Zentrum;1. Obergeschoss;TZ-202;Treppenhaus 2;Verkehrsfläche;
+Technisches Zentrum;1. Obergeschoss;TZ-203;Lager 3;Lager;
+Technisches Zentrum;1. Obergeschoss;TZ-204;Werkstatt 4;Technik;
+Technisches Zentrum;1. Obergeschoss;TZ-205;Serverraum 5;Technik;
+Technisches Zentrum;1. Obergeschoss;TZ-206;Archiv 6;Lager;
+Technisches Zentrum;1. Obergeschoss;TZ-207;Großraumbüro 7;Büro;
+Technisches Zentrum;1. Obergeschoss;TZ-208;Flur 8;Verkehrsfläche;Schlüssel beim Hausmeister
+Technisches Zentrum;1. Obergeschoss;TZ-204;Büro (Doppel) 9;Büro;
+Technisches Zentrum;1. Obergeschoss;TZ-210;Treppenhaus 10;Verkehrsfläche;
+Technisches Zentrum;1. Obergeschoss;TZ-211;Lager 11;Lager;
+Technisches Zentrum;1. Obergeschoss;TZ-212;Werkstatt 12;Technik;
+Technisches Zentrum;2. Obergeschoss;TZ-301;Flur;Verkehrsfläche;
+Technisches Zentrum;2. Obergeschoss;TZ-302;Archiv 2;Lager;
+Technisches Zentrum;2. Obergeschoss;TZ-303;Büro (Doppel) 3;Büro;
+Technisches Zentrum;2. Obergeschoss;TZ-304;Treppenhaus 4;Verkehrsfläche;
+Technisches Zentrum;2. Obergeschoss;TZ-305;Werkstatt 5;Technik;
+Technisches Zentrum;2. Obergeschoss;TZ-306;Technikraum 6;Technik;
+Technisches Zentrum;2. Obergeschoss;TZ-307;Büro (Einzel) 7;Büro;
+Technisches Zentrum;2. Obergeschoss;TZ-308;Großraumbüro 8;Büro;
+Technisches Zentrum;2. Obergeschoss;TZ-309;Flur 9;Verkehrsfläche;
+Technisches Zentrum;2. Obergeschoss;TZ-310;Archiv 10;Lager;
+Technisches Zentrum;3. Obergeschoss;TZ-401;Büro (Einzel);Büro;
+Technisches Zentrum;3. Obergeschoss;TZ-402;Büro (Doppel) 2;Büro;
+Technisches Zentrum;3. Obergeschoss;TZ-403;Technikraum 3;Technik;Denkmalgeschützt
+Technisches Zentrum;3. Obergeschoss;TZ-404;Werkstatt 4;Technik;
+Technisches Zentrum;3. Obergeschoss;TZ-405;Flur 5;Verkehrsfläche;
+Technisches Zentrum;3. Obergeschoss;TZ-406;Lager 6;Lager;
+Technisches Zentrum;3. Obergeschoss;TZ-407;Serverraum 7;Technik;
+Technisches Zentrum;3. Obergeschoss;TZ-408;Archiv 8;Lager;
+Technisches Zentrum;4. Obergeschoss;TZ-501;Flur;Verkehrsfläche;Schlüssel beim Hausmeister
+Technisches Zentrum;4. Obergeschoss;TZ-502;Lager 2;Lager;
+Technisches Zentrum;4. Obergeschoss;TZ-503;Technikraum 3;Technik;
+Technisches Zentrum;4. Obergeschoss;TZ-504;Büro (Einzel) 4;Büro;Renovierung geplant Q3/2026
+Technisches Zentrum;4. Obergeschoss;TZ-505;Archiv 5;Lager;
+Technisches Zentrum;4. Obergeschoss;TZ-506;Werkstatt 6;Technik;
+Nebengebäude West;Untergeschoss;NGW-001;Lager;Lager;
+Nebengebäude West;Untergeschoss;NGW-002;Treppenhaus 2;Verkehrsfläche;
+Nebengebäude West;Untergeschoss;NGW-003;Archiv 3;Lager;Zutritt nur mit Begleitung
+Nebengebäude West;Untergeschoss;NGW-004;Technikraum 4;Technik;
+Nebengebäude West;Erdgeschoss;NGW-101;Büro (Einzel);Büro;
+Nebengebäude West;Erdgeschoss;NGW-102;Büro (Doppel) 2;Büro;
+Nebengebäude West;Erdgeschoss;NGW-103;Besprechungsraum 3;Besprechung;
+Nebengebäude West;Erdgeschoss;NGW-104;Werkstatt 4;Technik;
+Nebengebäude West;Erdgeschoss;NGW-105;WC Herren 5;Sanitär;Zutritt nur mit Begleitung
+Nebengebäude West;Erdgeschoss;NGW-106;Poststelle 6;Verwaltung;
+Nebengebäude West;1. Obergeschoss;NGW-201;WC Herren;Sanitär;
+Nebengebäude West;1. Obergeschoss;NGW-202;Poststelle 2;Verwaltung;
+Nebengebäude West;1. Obergeschoss;NGW-203;Flur 3;Verkehrsfläche;
+Nebengebäude West;1. Obergeschoss;NGW-204;Werkstatt 4;Technik;
+Nebengebäude West;1. Obergeschoss;NGW-205;Serverraum 5;Technik;Zutritt nur mit Begleitung
+Nebengebäude West;1. Obergeschoss;NGW-206;Küche 6;Versorgung;Schlüssel beim Hausmeister
+Pforte und Wache;Erdgeschoss;NGW-202;Treppenhaus;Verkehrsfläche;
+Pforte und Wache;Erdgeschoss;PW-102;Besprechungsraum 2;Besprechung;
+Pforte und Wache;Erdgeschoss;PW-103;Großraumbüro 3;Büro;
+Pforte und Wache;Erdgeschoss;PW-103;Empfang 4;Empfang;
+Pforte und Wache;1. Obergeschoss;PW-201;Büro (Einzel);Büro;Zutritt nur mit Begleitung
+Pforte und Wache;1. Obergeschoss;PW-202;Treppenhaus 2;Verkehrsfläche;
+Pforte und Wache;1. Obergeschoss;PW-203;Kantine 3;Sozial;
+Kantine und Sozialgebäude;Erdgeschoss;KAS-101;WC Herren;Sanitär;Zutritt nur mit Begleitung
+Kantine und Sozialgebäude;Erdgeschoss;KAS-102;Treppenhaus 2;Verkehrsfläche;
+Kantine und Sozialgebäude;Erdgeschoss;KAS-103;Küche 3;Versorgung;
+Kantine und Sozialgebäude;Erdgeschoss;KAS-104;Aufenthaltsraum 4;Sozial;
+Kantine und Sozialgebäude;Erdgeschoss;KAS-105;Flur 5;Verkehrsfläche;
+Kantine und Sozialgebäude;Erdgeschoss;KAS-106;WC Damen 6;Sanitär;
+Kantine und Sozialgebäude;1. Obergeschoss;KAS-201;Flur;Verkehrsfläche;Schlüssel beim Hausmeister
+Kantine und Sozialgebäude;1. Obergeschoss;KAS-202;WC Herren 2;Sanitär;
+Kantine und Sozialgebäude;1. Obergeschoss;KAS-203;Kantine 3;Sozial;Zutritt nur mit Begleitung
+Kantine und Sozialgebäude;1. Obergeschoss;KAS-204;Teeküche 4;Sozial;Zutritt nur mit Begleitung

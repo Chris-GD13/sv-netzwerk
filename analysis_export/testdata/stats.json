@@ -1,0 +1,14 @@
+{
+  "buildings": 7,
+  "floors": 24,
+  "rooms": 205,
+  "windows": 454,
+  "sashes": 673,
+  "photos": 333,
+  "inspections": 306,
+  "auditLogs": 500,
+  "errors": {
+    "duplicateWindowNums": 10,
+    "missingRooms": 1
+  }
+}

@@ -1,0 +1,243 @@
+name: Fachbeitrags-Automation
+
+on:
+  schedule:
+    # Morgenslot 05:15-06:40 Europe/Berlin (DST-sicher via duale UTC-Crons)
+    - cron: "20 3 * * *"  # Sommerzeit (CEST, UTC+2)
+    - cron: "20 4 * * *"  # Winterzeit (CET, UTC+1)
+    # Nachmittagsslot 16:15-17:30 Europe/Berlin (DST-sicher via duale UTC-Crons)
+    - cron: "20 14 * * *" # Sommerzeit (CEST, UTC+2)
+    - cron: "20 15 * * *" # Winterzeit (CET, UTC+1)
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "Erzwingt Zeitfenster (morning|afternoon); leer = automatische Slot-Erkennung"
+        required: false
+        type: choice
+        options:
+          - morning
+          - afternoon
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: fachbeitrag-automation-main
+  cancel-in-progress: false
+
+jobs:
+  publish-and-notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    if: ${{ vars.FACHBEITRAG_AUTOMATION_ENABLED != 'false' }}
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    env:
+      TZ: Europe/Berlin
+      M365_TENANT_ID: ${{ secrets.M365_TENANT_ID }}
+      M365_CLIENT_ID: ${{ secrets.M365_CLIENT_ID }}
+      M365_CLIENT_SECRET: ${{ secrets.M365_CLIENT_SECRET }}
+      M365_CALENDAR_USER_ID: ${{ secrets.M365_CALENDAR_USER_ID }}
+      CALENDAR_CASE_LOOKBACK_DAYS: 1095
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Node.js 22 LTS einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+
+      - name: Abhängigkeiten installieren
+        run: npm ci --no-audit --no-fund
+
+      - name: Fachbeitrag erzeugen
+        id: generate
+        run: |
+          SLOT_ARG=""
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            case "${{ github.event.schedule }}" in
+              "20 3 * * *"|"20 4 * * *")
+                SLOT_ARG="--slot=morning"
+                ;;
+              "20 14 * * *"|"20 15 * * *")
+                SLOT_ARG="--slot=afternoon"
+                ;;
+            esac
+          fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.slot }}" ]; then
+            SLOT_ARG="--slot=${{ inputs.slot }}"
+          fi
+          node scripts/run-fachbeitrag-automation.mjs $SLOT_ARG
+          STATUS="$(node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('.automation/latest-publication.json','utf8'));process.stdout.write(data.status||'')")"
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          if [ "$STATUS" = "generated" ]; then
+            node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('.automation/latest-publication.json','utf8'));console.log('BERLIN_DATE='+data.berlinDate);console.log('PUBLICATION_ID='+data.publicationId);console.log('PUBLICATION_URL='+data.articleUrl);console.log('PUBLICATION_TITLE='+data.title.replace(/\n/g,' '));console.log('PUBLICATION_IMAGE_URL='+data.imageUrl);console.log('PUBLICATION_SLUG='+data.slug);console.log('PUBLICATION_SLOT='+data.slot);" >> "$GITHUB_ENV"
+          fi
+
+      - name: Bei Slot-Skip sauber beenden
+        if: steps.generate.outputs.status != 'generated'
+        run: echo "Kein Beitrag erzeugt (außerhalb Zeitfenster oder Slot bereits veröffentlicht)."
+
+      - name: Vorprüfung
+        if: steps.generate.outputs.status == 'generated'
+        run: node scripts/validate-fachbeitrag-preflight.mjs "$BERLIN_DATE"
+
+      - name: Lint-/Fachbeitragsstandard prüfen
+        if: steps.generate.outputs.status == 'generated'
+        run: npm run validate:knowledge -- "$BERLIN_DATE"
+
+      - name: Typprüfung ausführen
+        if: steps.generate.outputs.status == 'generated'
+        run: npm run check
+
+      - name: Build ausführen
+        if: steps.generate.outputs.status == 'generated'
+        run: npm run build
+
+      - name: HTML-Struktur validieren
+        if: steps.generate.outputs.status == 'generated'
+        run: |
+          npx --yes html-validate@9 --rule "long-title:off" \
+            "dist/fachwissen/${PUBLICATION_SLUG}/index.html" \
+            "dist/svos/fachwissen/${PUBLICATION_SLUG}/index.html"
+
+      - name: Link- und Build-Integration prüfen
+        if: steps.generate.outputs.status == 'generated'
+        run: npm run validate:knowledge -- --dist "$BERLIN_DATE"
+
+      - name: Commit und Push
+        if: steps.generate.outputs.status == 'generated'
+        run: |
+          if git diff --quiet; then
+            echo "::error::Es wurden keine Änderungen erzeugt, obwohl der Generator einen Beitrag gemeldet hat."
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/content/ public/assets/images/linkedin/ src/data/library.ts CHANGELOG.md docs/fachbeitrag-veroeffentlichungsprotokoll.csv
+          git commit -m "chore: publish fachbeitrag ${BERLIN_DATE} ${PUBLICATION_SLOT}"
+          git push origin HEAD:main
+          echo "PUBLISHED_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Veröffentlichungsprotokoll nach Push aktualisieren
+        if: steps.generate.outputs.status == 'generated'
+        run: node scripts/update-fachbeitrag-log.mjs --commit="$PUBLISHED_COMMIT" --deploy=triggered
+
+      - name: Bestehenden Deploy-Workflow (push) abwarten
+        if: steps.generate.outputs.status == 'generated'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node scripts/trigger-and-await-workflow.mjs \
+            --repo="${{ github.repository }}" \
+            --workflow="deploy.yml" \
+            --ref="main" \
+            --event="push" \
+            --dispatch=false \
+            --head-sha="$PUBLISHED_COMMIT" \
+            --timeout-seconds=2700
+          echo "DEPLOY_OK=true" >> "$GITHUB_ENV"
+
+      - name: Veröffentlichungsprotokoll nach Deploy-Check aktualisieren
+        if: steps.generate.outputs.status == 'generated'
+        run: node scripts/update-fachbeitrag-log.mjs --deploy=success
+
+      - name: Live-URL prüfen
+        if: steps.generate.outputs.status == 'generated'
+        run: |
+          echo "Prüfe Live-URL: $PUBLICATION_URL"
+          ok=0
+          for i in {1..6}; do
+            status="$(curl -L -s -o /tmp/page.html -w '%{http_code}' "$PUBLICATION_URL" || true)"
+            if [ "$status" = "200" ] && grep -qi "$PUBLICATION_SLUG" /tmp/page.html; then
+              ok=1
+              break
+            fi
+            sleep 10
+          done
+          if [ "$ok" != "1" ]; then
+            echo "::error::Live-URL nicht erreichbar oder Inhalt noch nicht aktuell: $PUBLICATION_URL"
+            exit 1
+          fi
+          echo "LIVE_OK=true" >> "$GITHUB_ENV"
+
+      - name: Veröffentlichungsprotokoll nach Live-Check aktualisieren
+        if: steps.generate.outputs.status == 'generated'
+        run: node scripts/update-fachbeitrag-log.mjs --deploy=success --live=success
+
+      - name: LinkedIn-Zap auslösen (nach erfolgreichem Live-Check)
+        if: steps.generate.outputs.status == 'generated'
+        env:
+          WEBHOOK_URL: ${{ secrets.ZAPIER_WEBHOOK_URL }}
+        run: |
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "::error::ZAPIER_WEBHOOK_URL fehlt."
+            exit 1
+          fi
+          LINKEDIN_TEXT_FILE="src/content/linkedin/${BERLIN_DATE}_${PUBLICATION_SLUG}.txt"
+          if [ ! -s "$LINKEDIN_TEXT_FILE" ]; then
+            echo "::error::LinkedIn-Begleittext fehlt: $LINKEDIN_TEXT_FILE"
+            exit 1
+          fi
+          if [ ! -s "public/assets/images/linkedin/${PUBLICATION_SLUG}.svg" ]; then
+            echo "::error::Beitragsbild fehlt: public/assets/images/linkedin/${PUBLICATION_SLUG}.svg"
+            exit 1
+          fi
+          FIRST_PARAGRAPH="$(head -n 8 "$LINKEDIN_TEXT_FILE" | tr '\n' ' ' | sed 's/"/\\"/g' | cut -c1-280)"
+          HASHTAGS="$(grep -Eo '#[[:alnum:]ÄÖÜäöüß]+' "$LINKEDIN_TEXT_FILE" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g' | sed 's/[[:space:]]$//')"
+          DESCRIPTION="$(node -e "const fs=require('fs');const raw=fs.readFileSync('src/content/knowledge/${PUBLICATION_SLUG}.md','utf8');const d=(raw.match(/^description:\s*\"([^\"]+)\"/m)||[])[1]||'';process.stdout.write(d.replace(/\n/g,' '));")"
+          PAYLOAD="$(cat <<EOF
+          {
+            "title": "${PUBLICATION_TITLE}",
+            "description": "${DESCRIPTION}",
+            "first_paragraph": "${FIRST_PARAGRAPH}",
+            "hashtags": "${HASHTAGS}",
+            "image_url": "${PUBLICATION_IMAGE_URL}",
+            "url": "${PUBLICATION_URL}",
+            "date": "${BERLIN_DATE}",
+            "slug": "${PUBLICATION_SLUG}",
+            "publication_id": "${PUBLICATION_ID}"
+          }
+          EOF
+          )"
+          curl --fail --show-error --silent -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            --retry 5 --retry-delay 5 --retry-all-errors
+          echo "LINKEDIN_OK=true" >> "$GITHUB_ENV"
+
+      - name: Veröffentlichungsprotokoll nach LinkedIn aktualisieren
+        if: steps.generate.outputs.status == 'generated'
+        run: node scripts/update-fachbeitrag-log.mjs --linkedin=success
+
+      - name: Fehlstatus ins Veröffentlichungsprotokoll schreiben
+        if: failure() && steps.generate.outputs.status == 'generated'
+        run: |
+          DEPLOY_STATUS="failed"
+          LIVE_STATUS="failed"
+          LINKEDIN_STATUS="skipped"
+          if [ "${DEPLOY_OK}" = "true" ]; then DEPLOY_STATUS="success"; fi
+          if [ "${LIVE_OK}" = "true" ]; then LIVE_STATUS="success"; fi
+          if [ "${LINKEDIN_OK}" = "true" ]; then LINKEDIN_STATUS="success"; fi
+          node scripts/update-fachbeitrag-log.mjs --deploy="$DEPLOY_STATUS" --live="$LIVE_STATUS" --linkedin="$LINKEDIN_STATUS"
+
+      - name: Veröffentlichungsprotokoll committen (final)
+        if: always() && steps.generate.outputs.status == 'generated'
+        run: |
+          if git diff --quiet -- docs/fachbeitrag-veroeffentlichungsprotokoll.csv; then
+            echo "Keine Protokolländerungen zu committen."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/fachbeitrag-veroeffentlichungsprotokoll.csv
+          git commit -m "chore: update fachbeitrag protocol ${BERLIN_DATE} ${PUBLICATION_SLOT}"
+          git push origin HEAD:main

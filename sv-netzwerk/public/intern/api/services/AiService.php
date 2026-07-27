@@ -1,6 +1,6 @@
 <?php
 /**
- * Zentraler KI-Service – Fensterbeschlagsprüfung BMVg Bonn
+ * Zentraler KI-Service – SV-Netzwerk Prüfportal
  *
  * Kapselung der OpenAI-API-Kommunikation. Alle KI-Funktionen der Anwendung
  * laufen über diese Klasse. Zukunftssichere Architektur für:
@@ -330,6 +330,9 @@ PROMPT;
             // Word
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'application/msword',
+            // E-Mail (.msg)
+            'application/vnd.ms-outlook',
+            'application/octet-stream', // .msg files often detected as generic binary
         ];
     }
 
@@ -338,6 +341,6 @@ PROMPT;
      */
     public static function acceptedExtensions(): string
     {
-        return 'image/*,.pdf,.csv,.xlsx,.xls,.docx,.doc,.tiff,.tif';
+        return 'image/*,.pdf,.csv,.xlsx,.xls,.docx,.doc,.tiff,.tif,.msg';
     }
 }

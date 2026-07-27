@@ -1,0 +1,60 @@
+﻿PRÜFBERICHT
+Fensterbeschlagsprüfung – Testprojekt Dienstsitz Bonn
+
+═══════════════════════════════════════════════════════════════════
+
+Auftraggeber:    Muster-Ministerium (Testdaten)
+Objekt:          Dienstsitz, Musterstraße 150, 53123 Bonn
+Prüfzeitraum:    01.03.2026 – 30.06.2026
+Sachverständiger: Dr. Michael Braun (fiktiv)
+Prüfer:          Klaus Schmidt, Anna Müller (fiktiv)
+
+═══════════════════════════════════════════════════════════════════
+
+1. ZUSAMMENFASSUNG
+
+Geprüfte Fenster:       495
+Geprüfte Flügel:      1.028
+Ohne Beanstandung:       380 (76,8%)
+Geringfügiger Mangel:     72 (14,5%)
+Erheblicher Mangel:       28 (5,7%)
+Austausch empfohlen:      12 (2,4%)
+Gefahr im Verzug:          3 (0,6%)
+
+2. BEWERTUNG
+
+Die Fensterbeschläge im Verwaltungsgebäude Nord befinden sich
+überwiegend in einem guten Zustand. Die 2012 erneuerten Fenster
+im 2. Obergeschoss zeigen keine Auffälligkeiten.
+
+Im Technischen Zentrum sind mehrere Fenster aus dem Baujahr 1985
+mit erheblichen Verschleißerscheinungen aufgefallen. Ein Austausch
+der Beschläge wird innerhalb der nächsten 12 Monate empfohlen.
+
+3. DRINGENDE MASSNAHMEN
+
+- F-0127 (TZ, 3.OG, Raum TZ-301): Beschlagbruch, Fenster nicht
+  mehr sicher zu öffnen. SOFORTIGE SPERRUNG EMPFOHLEN.
+- F-0245 (VGS, EG, Empfangshalle): Scherenarm gebrochen,
+  Flügel hängt. Absturzgefahr bei Windlast.
+- F-0389 (NGW, UG, Heizungsraum): Rost an Tragschiene,
+  Flügel könnte sich lösen.
+
+4. EMPFEHLUNGEN
+
+4.1 Kurzfristig (< 3 Monate):
+    - Austausch der 3 als "Gefahr im Verzug" bewerteten Beschläge
+    - Nachjustierung der 72 Fenster mit geringfügigen Mängeln
+
+4.2 Mittelfristig (6-12 Monate):
+    - Erneuerung aller Beschläge Baujahr < 1995 im Technischen Zentrum
+    - Prüfung der Wartungsintervalle für Fenster > 20 Jahre
+
+4.3 Langfristig (1-3 Jahre):
+    - Kompletterneuerung Nebengebäude West (Baujahr 1985)
+    - Umstellung auf einheitliches Beschlagsystem
+
+═══════════════════════════════════════════════════════════════════
+Dieser Bericht dient ausschließlich als TESTDOKUMENT.
+Alle Daten, Personen und Orte sind fiktiv.
+═══════════════════════════════════════════════════════════════════

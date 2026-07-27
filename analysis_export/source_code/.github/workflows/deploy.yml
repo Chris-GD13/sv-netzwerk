@@ -1,0 +1,257 @@
+name: SV-Netzwerk bereitstellen
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "sv-netzwerk/**"
+      - "!sv-netzwerk/src/data/calendar-slots.json"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-sv-netzwerk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      SFTP_REMOTE_DIR: /sv-netzwerk
+      SFTP_CONNECT_TIMEOUT_SECONDS: 25
+      SFTP_CHECK_TIMEOUT_SECONDS: 45
+      SFTP_CHECK_ATTEMPTS: 10
+      SFTP_UPLOAD_TIMEOUT_SECONDS: 1200
+      SFTP_UPLOAD_ATTEMPTS: 10
+
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Node.js 22 LTS einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+          registry-url: https://registry.npmjs.org
+
+      - name: Laufzeitumgebung prüfen
+        run: |
+          echo "Runner: $RUNNER_OS"
+          echo "Arbeitsverzeichnis: $(pwd)"
+          node --version
+          npm --version
+          npm config get registry
+          test -f package.json
+          test -f package-lock.json
+
+      - name: Abhängigkeiten reproduzierbar installieren
+        env:
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+          NPM_CONFIG_AUDIT: "false"
+          NPM_CONFIG_FUND: "false"
+          NPM_CONFIG_PROGRESS: "false"
+          NPM_CONFIG_FETCH_RETRIES: "2"
+          NPM_CONFIG_FETCH_RETRY_MINTIMEOUT: "10000"
+          NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: "30000"
+        run: npm ci --no-audit --no-fund --loglevel=notice
+
+      - name: Astro-Projekt prüfen und bauen
+        run: npm run build
+
+      - name: Build-Ausgabe prüfen
+        run: |
+          set -euo pipefail
+          test -d dist
+          test -n "$(find dist -type f -print -quit)"
+          test -f dist/deploy-version.txt
+          grep -Fx "Commit: $GITHUB_SHA" dist/deploy-version.txt
+          grep -Fx "Version: Homepage-v5" dist/deploy-version.txt
+          test -f dist/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/index.html
+          test -f dist/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/index.html
+          test -f dist/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/index.html
+          echo "Build erfolgreich; erzeugte Dateien:"
+          find dist -type f | sort | head -n 100
+
+      - name: SFTP-Werkzeug installieren
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes lftp
+
+      - name: Document Root vor dem Upload prüfen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; ls $SFTP_REMOTE_DIR; quit"
+          exit_code=1
+          listing=""
+          for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
+            set +e
+            listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$lftp_script")"
+            exit_code=$?
+            set -e
+            if [ "$exit_code" -eq 0 ]; then
+              break
+            fi
+            if [ "$attempt" -lt "$SFTP_CHECK_ATTEMPTS" ]; then
+              sleep 15
+            fi
+          done
+          if [ "$exit_code" -ne 0 ]; then
+            if [ "$exit_code" -eq 124 ]; then
+              echo "::error::Timeout bei Document-Root-Prüfung nach ${SFTP_CHECK_TIMEOUT_SECONDS}s."
+            else
+              echo "::error::Document Root $SFTP_REMOTE_DIR ist nicht erreichbar oder nicht nutzbar (Exit $exit_code)."
+            fi
+            exit 1
+          fi
+          printf '%s\n' "$listing"
+
+          if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
+            echo "::warning::$SFTP_REMOTE_DIR/dist/ existiert (wird beim Upload bereinigt)."
+          fi
+
+      - name: Inhalt von dist nach IONOS übertragen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --delete --parallel=4 --exclude-glob .git* --exclude-glob .env* --exclude-glob *.log dist/ .; quit"
+          exit_code=1
+          for attempt in $(seq 1 "$SFTP_UPLOAD_ATTEMPTS"); do
+            echo "Upload-Versuch $attempt/$SFTP_UPLOAD_ATTEMPTS"
+            set +e
+            timeout "${SFTP_UPLOAD_TIMEOUT_SECONDS}s" lftp -e "$lftp_script"
+            exit_code=$?
+            set -e
+            if [ "$exit_code" -eq 0 ]; then
+              break
+            fi
+            if [ "$exit_code" -eq 124 ]; then
+              break
+            fi
+            if [ "$attempt" -lt "$SFTP_UPLOAD_ATTEMPTS" ]; then
+              sleep 15
+            fi
+          done
+          if [ "$exit_code" -ne 0 ]; then
+            if [ "$exit_code" -eq 124 ]; then
+              echo "::error::Timeout beim Upload nach ${SFTP_UPLOAD_TIMEOUT_SECONDS}s."
+            else
+              echo "::error::Upload nach $SFTP_REMOTE_DIR fehlgeschlagen nach ${SFTP_UPLOAD_ATTEMPTS} Versuch(en) (Exit $exit_code)."
+            fi
+            exit 1
+          fi
+
+      - name: Inhalt des Document Root prüfen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; ls $SFTP_REMOTE_DIR; quit"
+          exit_code=1
+          listing=""
+          for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
+            set +e
+            listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$lftp_script")"
+            exit_code=$?
+            set -e
+            if [ "$exit_code" -eq 0 ]; then
+              break
+            fi
+            if [ "$attempt" -lt "$SFTP_CHECK_ATTEMPTS" ]; then
+              sleep 15
+            fi
+          done
+          if [ "$exit_code" -ne 0 ]; then
+            if [ "$exit_code" -eq 124 ]; then
+              echo "::error::Timeout bei Post-Upload-Document-Root-Prüfung nach ${SFTP_CHECK_TIMEOUT_SECONDS}s."
+            else
+              echo "::error::Post-Upload-Prüfung für $SFTP_REMOTE_DIR fehlgeschlagen (Exit $exit_code)."
+            fi
+            exit 1
+          fi
+          printf '%s\n' "$listing"
+
+          printf '%s\n' "$listing" | grep -Eq ' index\.html$'
+          printf '%s\n' "$listing" | grep -Eq ' assets$'
+          printf '%s\n' "$listing" | grep -Eq ' deploy-version\.txt$'
+
+          if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
+            echo "::error::$SFTP_REMOTE_DIR/dist/ wurde unerwartet angelegt."
+            exit 1
+          fi
+
+      - name: Deployment online verifizieren
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          # 1. deploy-version.txt
+          ok=0
+          for i in {1..24}; do
+            response="$(curl --location --fail --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+              https://www.sv-netzwerk.eu/deploy-version.txt || true)"
+            if [ -n "$response" ]; then
+              printf '%s\n' "$response"
+              actual_sha="$(printf '%s\n' "$response" | sed -n 's/^Commit:[[:space:]]*//p' | head -n 1)"
+              if [ "$actual_sha" = "$EXPECTED_SHA" ]; then
+                ok=1
+                break
+              fi
+            fi
+            sleep 15
+          done
+          if [ "$ok" != "1" ]; then
+            echo "::error::Online-Commit stimmt nach Wartezeit nicht mit $EXPECTED_SHA überein."
+            exit 1
+          fi
+          echo "deploy-version.txt: OK"
+
+          # 2. Homepage
+          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+            -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/ || true)"
+          if [ "$status" != "200" ]; then
+            echo "::error::Homepage liefert HTTP $status statt 200."
+            exit 1
+          fi
+          echo "Homepage: HTTP $status OK"
+
+          # 3. /intern/login/
+          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+            -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/login/ || true)"
+          if [ "$status" != "200" ]; then
+            echo "::error::/intern/login/ liefert HTTP $status statt 200."
+            exit 1
+          fi
+          echo "/intern/login/: HTTP $status OK"
+
+          # 4. /intern/fensterpruefung-bonn/
+          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+            -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/fensterpruefung-bonn/ || true)"
+          if [ "$status" != "200" ]; then
+            echo "::error::/intern/fensterpruefung-bonn/ liefert HTTP $status statt 200."
+            exit 1
+          fi
+          echo "/intern/fensterpruefung-bonn/: HTTP $status OK"

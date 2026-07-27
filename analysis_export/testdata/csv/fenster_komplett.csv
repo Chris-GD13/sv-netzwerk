@@ -1,0 +1,455 @@
+Gebäude;Etage;Raum;Raumnummer;Fensternummer;Typ;Hersteller;Beschlag;Baujahr;Breite_mm;Höhe_mm;Glas;Lage;Status
+Verwaltungsgebäude Nord;Untergeschoss;Flur 2;VGN-002;VGN-F-0001;Dreh-Kipp;Roto Frank;Roto NT;2009;1420;2070;Ornamentglas;Nord;in_bearbeitung
+Verwaltungsgebäude Nord;Untergeschoss;Flur 2;VGN-002;VGN-F-0002;Oberlicht;Winkhaus;activPilot;2020;710;380;2-fach WSG;Nordost;in_bearbeitung
+Verwaltungsgebäude Nord;Untergeschoss;Lager 4;VGN-004;VGN-F-0003;Kipp;Roto Frank;Roto NT;2007;1050;1470;3-fach WSG;Südost;abgeschlossen
+Verwaltungsgebäude Nord;Untergeschoss;Treppenhaus 5;VGN-005;VGN-F-0004;Oberlicht;Roto Frank;Roto NX;2014;960;370;ESG;Südost;abgeschlossen
+Verwaltungsgebäude Nord;Untergeschoss;Flur 7;VGN-007;VGN-F-0005;Kipp;GU-BKS;UNI-JET;2018;1810;2080;2-fach VSG;Nord;saniert
+Verwaltungsgebäude Nord;Erdgeschoss;Treppenhaus;VGN-101;VGN-F-0006;Dreh;Schüco;AvanTec;2009;1080;2200;3-fach WSG;Nordwest;ausser_betrieb
+Verwaltungsgebäude Nord;Erdgeschoss;Poststelle 2;VGN-102;VGN-F-0007;Fest;Roto Frank;Roto NX;2017;1420;2070;2-fach WSG;West;abgeschlossen
+Verwaltungsgebäude Nord;Erdgeschoss;Poststelle 2;VGN-102;VGN-F-0008;Oberlicht;Roto Frank;Roto NX;2014;1080;480;2-fach VSG;Südwest;nicht_begonnen
+Verwaltungsgebäude Nord;Erdgeschoss;Besprechungsraum 3;VGN-103;VGN-F-0009;Fest;GU-BKS;UNI-JET;2009;1590;2010;2-fach VSG;Südost;ausser_betrieb
+Verwaltungsgebäude Nord;Erdgeschoss;Besprechungsraum 3;VGN-103;VGN-F-0010;Kipp;Siegenia-Aubi;Titan AF;2011;1220;1930;2-fach WSG;West;abgeschlossen
+Verwaltungsgebäude Nord;Erdgeschoss;Besprechungsraum 3;VGN-103;VGN-F-0011;Oberlicht;Roto Frank;Roto NX;2012;1140;360;2-fach VSG;Nordost;nicht_zugaenglich
+Verwaltungsgebäude Nord;Erdgeschoss;WC Damen 4;VGN-104;VGN-F-0012;Dreh;Winkhaus;activPilot;2007;1710;1020;2-fach WSG;Nordost;abgeschlossen
+Verwaltungsgebäude Nord;Erdgeschoss;WC Damen 4;VGN-104;VGN-F-0013;Dreh;GU-BKS;UNI-JET;2017;1340;1110;3-fach WSG;West;nicht_zugaenglich
+Verwaltungsgebäude Nord;Erdgeschoss;Großraumbüro 5;VGN-105;VGN-F-0014;Dreh;Roto Frank;Roto NX;2008;920;1570;3-fach WSG;West;nachpruefung
+Verwaltungsgebäude Nord;Erdgeschoss;Großraumbüro 5;VGN-105;VGN-F-0015;Kipp;Winkhaus;activPilot;2013;1830;1720;2-fach VSG;Nordost;nachpruefung
+Verwaltungsgebäude Nord;Erdgeschoss;Großraumbüro 5;VGN-105;VGN-F-0016;Dreh-Kipp;Schüco;AvanTec;2009;930;1170;2-fach WSG;Südwest;nicht_begonnen
+Verwaltungsgebäude Nord;Erdgeschoss;Großraumbüro 5;VGN-105;VGN-F-0017;Fest;GU-BKS;UNI-JET;2018;1000;2160;2-fach WSG;Nordwest;austausch_empfohlen
+Verwaltungsgebäude Nord;Erdgeschoss;Großraumbüro 5;VGN-105;VGN-F-0018;Kipp;Maco;Multi-Matic;2019;1710;1840;ESG;Südost;austausch_empfohlen
+Verwaltungsgebäude Nord;Erdgeschoss;Aufenthaltsraum 6;VGN-106;VGN-F-0019;Dreh-Kipp;GU-BKS;UNI-JET;2012;1380;1200;3-fach WSG;West;nicht_begonnen
+Verwaltungsgebäude Nord;Erdgeschoss;Aufenthaltsraum 6;VGN-106;VGN-F-0020;Kipp;Winkhaus;activPilot;2017;1110;1540;Ornamentglas;Ost;ausser_betrieb
+Verwaltungsgebäude Nord;Erdgeschoss;Aufenthaltsraum 6;VGN-106;VGN-F-0021;Dreh;GU-BKS;UNI-JET;2004;1730;2130;Ornamentglas;Nordost;nicht_begonnen
+Verwaltungsgebäude Nord;Erdgeschoss;Konferenzraum 7;VGN-107;VGN-F-0022;Fest;Maco;Multi-Matic;2016;1370;1000;2-fach VSG;Ost;austausch_empfohlen
+Verwaltungsgebäude Nord;Erdgeschoss;Konferenzraum 7;VGN-107;VGN-F-0023;Oberlicht;Maco;Multi-Matic;2008;680;300;Ornamentglas;Südost;nicht_zugaenglich
+Verwaltungsgebäude Nord;Erdgeschoss;Konferenzraum 7;VGN-107;VGN-F-0024;Oberlicht;Maco;Multi-Matic;2006;1070;470;3-fach WSG;West;nicht_begonnen
+Verwaltungsgebäude Nord;Erdgeschoss;Konferenzraum 7;VGN-107;VGN-F-0018;Fest;Roto Frank;Roto NT;2017;1250;1930;2-fach WSG;Nordost;abgeschlossen
+Verwaltungsgebäude Nord;Erdgeschoss;Konferenzraum 7;VGN-107;VGN-F-0026;Dreh;Winkhaus;activPilot;2007;1590;1520;Ornamentglas;West;saniert
+Verwaltungsgebäude Nord;Erdgeschoss;Konferenzraum 7;VGN-107;VGN-F-0027;Dreh-Kipp;GU-BKS;UNI-JET;2019;1970;1130;ESG;West;nachpruefung
+Verwaltungsgebäude Nord;Erdgeschoss;Empfang 8;VGN-108;VGN-F-0028;Kipp;GU-BKS;UNI-JET;2008;1440;1820;2-fach VSG;Nordost;abgeschlossen
+Verwaltungsgebäude Nord;Erdgeschoss;Empfang 8;VGN-108;VGN-F-0029;Fest;Maco;Multi-Matic;2016;1500;1920;2-fach WSG;Süd;in_bearbeitung
+Verwaltungsgebäude Nord;Erdgeschoss;Empfang 8;VGN-108;VGN-F-0030;Kipp;Maco;Multi-Matic;2004;1630;2190;2-fach VSG;Südwest;in_bearbeitung
+Verwaltungsgebäude Nord;Erdgeschoss;Empfang 8;VGN-108;VGN-F-0031;Fest;Roto Frank;Roto NT;2007;1090;1180;Ornamentglas;Ost;in_bearbeitung
+Verwaltungsgebäude Nord;Erdgeschoss;Treppenhaus 9;VGN-109;VGN-F-0032;Kipp;Roto Frank;Roto NX;2004;1540;1580;2-fach VSG;Nordost;in_bearbeitung
+Verwaltungsgebäude Nord;Erdgeschoss;Poststelle 10;VGN-110;VGN-F-0033;Oberlicht;Roto Frank;Roto NT;2004;1190;500;2-fach VSG;Nordost;abgeschlossen
+Verwaltungsgebäude Nord;Erdgeschoss;Poststelle 10;VGN-110;VGN-F-0034;Fest;Roto Frank;Roto NT;2018;1620;2160;Ornamentglas;West;in_bearbeitung
+Verwaltungsgebäude Nord;Erdgeschoss;Besprechungsraum 11;VGN-106;VGN-F-0035;Schiebe;Roto Frank;Roto NT;2006;1660;1950;ESG;Nordost;nicht_begonnen
+Verwaltungsgebäude Nord;Erdgeschoss;Besprechungsraum 11;VGN-106;VGN-F-0036;Kipp;Schüco;AvanTec;2018;1760;1240;Ornamentglas;Nordwest;abgeschlossen
+Verwaltungsgebäude Nord;Erdgeschoss;Besprechungsraum 11;VGN-106;VGN-F-0037;Oberlicht;Roto Frank;Roto NX;2004;750;420;ESG;Südost;nicht_begonnen
+Verwaltungsgebäude Nord;Erdgeschoss;Besprechungsraum 11;VGN-106;VGN-F-0038;Dreh;Winkhaus;activPilot;2015;1850;1890;Ornamentglas;Nord;nicht_begonnen
+Verwaltungsgebäude Nord;Erdgeschoss;WC Damen 12;VGN-112;VGN-F-0039;Schiebe;GU-BKS;UNI-JET;2015;1260;1870;ESG;Ost;ausser_betrieb
+Verwaltungsgebäude Nord;Erdgeschoss;WC Damen 12;VGN-112;VGN-F-0040;Fest;Schüco;AvanTec;2009;1350;1080;3-fach WSG;Ost;saniert
+Verwaltungsgebäude Nord;1. Obergeschoss;Küche;VGN-201;VGN-F-0041;Dreh-Kipp;Roto Frank;Roto NX;2019;1060;1210;Ornamentglas;Nordwest;ausser_betrieb
+Verwaltungsgebäude Nord;1. Obergeschoss;Küche;VGN-201;VGN-F-0042;Kipp;Siegenia-Aubi;Titan AF;2015;1910;1050;Ornamentglas;West;nicht_zugaenglich
+Verwaltungsgebäude Nord;1. Obergeschoss;Flur 2;VGN-202;VGN-F-0043;Oberlicht;Maco;Multi-Matic;2016;700;500;Ornamentglas;Nordost;saniert
+Verwaltungsgebäude Nord;1. Obergeschoss;Flur 2;VGN-202;VGN-F-0044;Oberlicht;Schüco;AvanTec;2019;1150;360;2-fach VSG;Ost;saniert
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 3;VGN-203;VGN-F-0045;Dreh;Maco;Multi-Matic;2003;1510;1450;2-fach WSG;Süd;ausser_betrieb
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 3;VGN-203;VGN-F-0041;Oberlicht;GU-BKS;UNI-JET;2018;1000;320;2-fach VSG;Nord;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 3;VGN-203;VGN-F-0047;Oberlicht;Roto Frank;Roto NT;2004;800;460;2-fach WSG;Südwest;nicht_begonnen
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 3;VGN-203;VGN-F-0048;Kipp;Winkhaus;activPilot;2013;1060;1820;2-fach VSG;Nordwest;in_bearbeitung
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 3;VGN-203;VGN-F-0049;Kipp;Roto Frank;Roto NT;2004;1390;1440;2-fach VSG;Südost;ausser_betrieb
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 3;VGN-203;VGN-F-0050;Fest;Siegenia-Aubi;Titan AF;2010;1060;1450;Ornamentglas;Südost;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 3;VGN-203;VGN-F-0051;Schiebe;Maco;Multi-Matic;2019;1370;1330;3-fach WSG;Ost;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 3;VGN-203;VGN-F-0052;Dreh;GU-BKS;UNI-JET;2018;1790;1340;3-fach WSG;Südwest;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 3;VGN-203;VGN-F-0053;Schiebe;GU-BKS;UNI-JET;2006;1690;1070;2-fach WSG;Südwest;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Großraumbüro 4;VGN-204;VGN-F-0054;Schiebe;Schüco;AvanTec;2009;1270;1210;2-fach WSG;Südwest;saniert
+Verwaltungsgebäude Nord;1. Obergeschoss;Großraumbüro 4;VGN-204;VGN-F-0055;Fest;Winkhaus;activPilot;2012;1530;1870;Ornamentglas;Nord;austausch_empfohlen
+Verwaltungsgebäude Nord;1. Obergeschoss;Großraumbüro 4;VGN-204;VGN-F-0056;Schiebe;Roto Frank;Roto NT;2005;1100;2060;2-fach WSG;Nordwest;nachpruefung
+Verwaltungsgebäude Nord;1. Obergeschoss;Großraumbüro 4;VGN-204;VGN-F-0057;Dreh-Kipp;Winkhaus;activPilot;2019;1880;1240;Ornamentglas;Süd;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Großraumbüro 4;VGN-204;VGN-F-0058;Kipp;Schüco;AvanTec;2018;1450;1480;3-fach WSG;Nordost;in_bearbeitung
+Verwaltungsgebäude Nord;1. Obergeschoss;Großraumbüro 4;VGN-204;VGN-F-0059;Dreh-Kipp;GU-BKS;UNI-JET;2013;1150;1670;ESG;Nordost;ausser_betrieb
+Verwaltungsgebäude Nord;1. Obergeschoss;Großraumbüro 4;VGN-204;VGN-F-0060;Oberlicht;Winkhaus;activPilot;2006;1160;480;ESG;Ost;austausch_empfohlen
+Verwaltungsgebäude Nord;1. Obergeschoss;Büro (Doppel) 5;VGN-205;VGN-F-0061;Kipp;Winkhaus;activPilot;2003;1240;1080;2-fach VSG;Nordost;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Büro (Doppel) 5;VGN-205;VGN-F-0062;Kipp;Schüco;AvanTec;2018;830;1260;2-fach WSG;Ost;in_bearbeitung
+Verwaltungsgebäude Nord;1. Obergeschoss;Büro (Doppel) 5;VGN-205;VGN-F-0063;Kipp;Siegenia-Aubi;Titan AF;2007;1350;1490;2-fach WSG;Nordost;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Werkstatt 6;VGN-206;VGN-F-0064;Oberlicht;Winkhaus;activPilot;2003;1040;310;Ornamentglas;Ost;mangel
+Verwaltungsgebäude Nord;1. Obergeschoss;Werkstatt 6;VGN-206;VGN-F-0065;Schiebe;Maco;Multi-Matic;2006;1120;1380;2-fach WSG;Nord;nicht_begonnen
+Verwaltungsgebäude Nord;1. Obergeschoss;Werkstatt 6;VGN-206;VGN-F-0066;Fest;Roto Frank;Roto NT;2004;1960;1640;3-fach WSG;Südwest;in_bearbeitung
+Verwaltungsgebäude Nord;1. Obergeschoss;Aufenthaltsraum 7;VGN-207;VGN-F-0067;Dreh-Kipp;Roto Frank;Roto NT;2019;1230;1500;2-fach VSG;Ost;in_bearbeitung
+Verwaltungsgebäude Nord;1. Obergeschoss;Aufenthaltsraum 7;VGN-207;VGN-F-0068;Oberlicht;Siegenia-Aubi;Titan AF;2012;900;410;ESG;Südost;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Aufenthaltsraum 7;VGN-207;VGN-F-0069;Fest;Winkhaus;activPilot;2010;1210;1550;ESG;Nord;nicht_zugaenglich
+Verwaltungsgebäude Nord;1. Obergeschoss;Küche 9;VGN-209;VGN-F-0070;Schiebe;Siegenia-Aubi;Titan AF;2012;1760;2140;ESG;Nord;nicht_begonnen
+Verwaltungsgebäude Nord;1. Obergeschoss;Küche 9;VGN-209;VGN-F-0071;Oberlicht;Siegenia-Aubi;Titan AF;2006;880;370;2-fach WSG;West;in_bearbeitung
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 11;VGN-211;VGN-F-0072;Schiebe;Roto Frank;Roto NT;2008;1200;1290;ESG;Nordost;nicht_begonnen
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 11;VGN-211;VGN-F-0073;Fest;Schüco;AvanTec;2015;1120;1520;2-fach VSG;Nordost;nicht_zugaenglich
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 11;VGN-211;VGN-F-0074;Dreh;GU-BKS;UNI-JET;2005;1230;1060;3-fach WSG;Nordwest;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 11;VGN-211;VGN-F-0075;Dreh-Kipp;Siegenia-Aubi;Titan AF;2009;1390;1410;ESG;Nordost;nicht_begonnen
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 11;VGN-211;VGN-F-0076;Schiebe;GU-BKS;UNI-JET;2017;860;1780;3-fach WSG;Süd;mangel
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 11;VGN-211;VGN-F-0077;Dreh-Kipp;Siegenia-Aubi;Titan AF;2009;1980;1860;Ornamentglas;Ost;nachpruefung
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 11;VGN-211;VGN-F-0078;Oberlicht;Winkhaus;activPilot;2005;820;340;Ornamentglas;Nordost;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 11;VGN-211;VGN-F-0079;Oberlicht;Schüco;AvanTec;2011;680;460;3-fach WSG;Ost;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 11;VGN-211;VGN-F-0077;Kipp;GU-BKS;UNI-JET;2005;1040;1100;ESG;West;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 11;VGN-211;VGN-F-0081;Oberlicht;Roto Frank;Roto NT;2019;790;500;2-fach VSG;Ost;austausch_empfohlen
+Verwaltungsgebäude Nord;1. Obergeschoss;Kantine 11;VGN-211;VGN-F-0082;Dreh;GU-BKS;UNI-JET;2003;1890;1110;Ornamentglas;West;ausser_betrieb
+Verwaltungsgebäude Nord;1. Obergeschoss;Großraumbüro 12;VGN-212;VGN-F-0083;Dreh;Maco;Multi-Matic;2008;1320;1270;3-fach WSG;Nordost;nicht_zugaenglich
+Verwaltungsgebäude Nord;1. Obergeschoss;Großraumbüro 12;VGN-212;VGN-F-0084;Oberlicht;Schüco;AvanTec;2015;850;400;3-fach WSG;Südost;mangel
+Verwaltungsgebäude Nord;1. Obergeschoss;Großraumbüro 12;VGN-212;VGN-F-0085;Schiebe;Maco;Multi-Matic;2017;1020;1470;3-fach WSG;Ost;nicht_zugaenglich
+Verwaltungsgebäude Nord;1. Obergeschoss;Großraumbüro 12;VGN-212;VGN-F-0086;Dreh;Roto Frank;Roto NX;2019;1110;1720;2-fach VSG;Süd;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Großraumbüro 12;VGN-212;VGN-F-0087;Kipp;GU-BKS;UNI-JET;2009;1070;1650;3-fach WSG;Nordwest;nachpruefung
+Verwaltungsgebäude Nord;1. Obergeschoss;Büro (Doppel) 13;VGN-213;VGN-F-0088;Schiebe;Siegenia-Aubi;Titan AF;2017;1120;1380;Ornamentglas;Südost;abgeschlossen
+Verwaltungsgebäude Nord;1. Obergeschoss;Büro (Doppel) 13;VGN-213;VGN-F-0089;Schiebe;Roto Frank;Roto NX;2019;1130;1040;ESG;Südost;nicht_begonnen
+Verwaltungsgebäude Nord;1. Obergeschoss;Büro (Doppel) 13;VGN-213;VGN-F-0090;Oberlicht;GU-BKS;UNI-JET;2019;1070;340;3-fach WSG;West;austausch_empfohlen
+Verwaltungsgebäude Nord;1. Obergeschoss;Werkstatt 14;VGN-214;VGN-F-0091;Fest;Roto Frank;Roto NT;2012;1100;1240;2-fach VSG;Nord;nicht_begonnen
+Verwaltungsgebäude Nord;1. Obergeschoss;Werkstatt 14;VGN-214;VGN-F-0092;Kipp;Winkhaus;activPilot;2009;1260;1080;2-fach WSG;Südwest;in_bearbeitung
+Verwaltungsgebäude Nord;1. Obergeschoss;Werkstatt 14;VGN-214;VGN-F-0093;Oberlicht;Maco;Multi-Matic;2006;1130;490;2-fach VSG;Nord;ausser_betrieb
+Verwaltungsgebäude Nord;2. Obergeschoss;Werkstatt;VGN-301;VGN-F-0094;Kipp;Siegenia-Aubi;Titan AF;2013;1870;1050;3-fach WSG;Südwest;abgeschlossen
+Verwaltungsgebäude Nord;2. Obergeschoss;Werkstatt;VGN-301;VGN-F-0095;Schiebe;Schüco;AvanTec;2004;1600;1230;Ornamentglas;Nordost;abgeschlossen
+Verwaltungsgebäude Nord;2. Obergeschoss;Treppenhaus 3;VGN-303;VGN-F-0096;Kipp;Siegenia-Aubi;Titan AF;2005;960;1780;Ornamentglas;Süd;austausch_empfohlen
+Verwaltungsgebäude Nord;2. Obergeschoss;Technikraum 4;VGN-304;VGN-F-0097;Schiebe;Roto Frank;Roto NX;2011;1050;1990;3-fach WSG;Nordwest;in_bearbeitung
+Verwaltungsgebäude Nord;2. Obergeschoss;Konferenzraum 5;VGN-305;VGN-F-0098;Fest;GU-BKS;UNI-JET;2006;1400;1390;ESG;West;saniert
+Verwaltungsgebäude Nord;2. Obergeschoss;Konferenzraum 5;VGN-305;VGN-F-0099;Kipp;Schüco;AvanTec;2006;1590;1650;3-fach WSG;West;nachpruefung
+Verwaltungsgebäude Nord;2. Obergeschoss;Konferenzraum 5;VGN-305;VGN-F-0100;Dreh;Winkhaus;activPilot;2004;1770;1760;2-fach VSG;Südost;abgeschlossen
+Verwaltungsgebäude Nord;2. Obergeschoss;Konferenzraum 5;VGN-305;VGN-F-0101;Dreh-Kipp;Winkhaus;activPilot;2003;1100;1580;Ornamentglas;Südost;abgeschlossen
+Verwaltungsgebäude Nord;2. Obergeschoss;Poststelle 6;VGN-306;VGN-F-0102;Kipp;GU-BKS;UNI-JET;2015;1770;2200;3-fach WSG;Nordost;in_bearbeitung
+Verwaltungsgebäude Nord;2. Obergeschoss;Besprechungsraum 7;VGN-307;VGN-F-0103;Fest;Winkhaus;activPilot;2009;1140;2160;ESG;Südwest;abgeschlossen
+Verwaltungsgebäude Nord;2. Obergeschoss;Besprechungsraum 7;VGN-307;VGN-F-0104;Kipp;Winkhaus;activPilot;2011;1590;1710;2-fach VSG;Südwest;nicht_begonnen
+Verwaltungsgebäude Nord;2. Obergeschoss;Besprechungsraum 7;VGN-307;VGN-F-0105;Dreh-Kipp;Roto Frank;Roto NT;2013;890;1170;3-fach WSG;Nordost;nicht_zugaenglich
+Verwaltungsgebäude Nord;2. Obergeschoss;Großraumbüro 8;VGN-308;VGN-F-0106;Schiebe;Roto Frank;Roto NX;2005;900;1280;2-fach VSG;Südost;abgeschlossen
+Verwaltungsgebäude Nord;2. Obergeschoss;Großraumbüro 8;VGN-308;VGN-F-0107;Dreh;Roto Frank;Roto NX;2015;1960;1350;2-fach WSG;Südost;abgeschlossen
+Verwaltungsgebäude Nord;2. Obergeschoss;Großraumbüro 8;VGN-308;VGN-F-0108;Oberlicht;GU-BKS;UNI-JET;2008;720;480;2-fach WSG;Süd;mangel
+Verwaltungsgebäude Nord;2. Obergeschoss;Großraumbüro 8;VGN-308;VGN-F-0109;Fest;Siegenia-Aubi;Titan AF;2003;1420;2030;3-fach WSG;Nord;abgeschlossen
+Verwaltungsgebäude Nord;2. Obergeschoss;Werkstatt 9;VGN-309;VGN-F-0110;Oberlicht;Schüco;AvanTec;2019;930;500;3-fach WSG;Nordwest;nicht_begonnen
+Verwaltungsgebäude Nord;2. Obergeschoss;Werkstatt 9;VGN-309;VGN-F-0111;Kipp;Maco;Multi-Matic;2019;1910;2150;ESG;Süd;in_bearbeitung
+Verwaltungsgebäude Nord;2. Obergeschoss;Werkstatt 9;VGN-309;VGN-F-0112;Dreh;Roto Frank;Roto NT;2015;840;1450;2-fach VSG;Süd;nicht_zugaenglich
+Verwaltungsgebäude Nord;2. Obergeschoss;Treppenhaus 11;VGN-311;VGN-F-0113;Dreh;GU-BKS;UNI-JET;2018;1880;1220;Ornamentglas;Ost;in_bearbeitung
+Verwaltungsgebäude Nord;2. Obergeschoss;Konferenzraum 13;VGN-313;VGN-F-0114;Kipp;Winkhaus;activPilot;2004;840;1260;3-fach WSG;Ost;ausser_betrieb
+Verwaltungsgebäude Nord;2. Obergeschoss;Konferenzraum 13;VGN-313;VGN-F-0115;Schiebe;Roto Frank;Roto NX;2007;1400;1200;2-fach VSG;Ost;mangel
+Verwaltungsgebäude Nord;2. Obergeschoss;Konferenzraum 13;VGN-313;VGN-F-0116;Fest;Roto Frank;Roto NT;2006;1780;1640;3-fach WSG;Nordwest;abgeschlossen
+Verwaltungsgebäude Nord;2. Obergeschoss;Konferenzraum 13;VGN-313;VGN-F-0117;Kipp;GU-BKS;UNI-JET;2009;1130;1590;Ornamentglas;Ost;nicht_zugaenglich
+Verwaltungsgebäude Nord;2. Obergeschoss;Konferenzraum 13;VGN-313;VGN-F-0118;Schiebe;Roto Frank;Roto NX;2006;830;1880;ESG;Ost;nicht_begonnen
+Verwaltungsgebäude Nord;2. Obergeschoss;Poststelle 14;VGN-314;VGN-F-0119;Kipp;Winkhaus;activPilot;2019;970;1510;2-fach WSG;West;mangel
+Verwaltungsgebäude Nord;3. Obergeschoss;Großraumbüro;VGN-401;VGN-F-0120;Schiebe;GU-BKS;UNI-JET;2004;1740;1420;3-fach WSG;Ost;mangel
+Verwaltungsgebäude Nord;3. Obergeschoss;Großraumbüro;VGN-401;VGN-F-0121;Dreh;Roto Frank;Roto NX;2011;1620;1080;ESG;West;nicht_begonnen
+Verwaltungsgebäude Nord;3. Obergeschoss;Großraumbüro;VGN-401;VGN-F-0122;Schiebe;Schüco;AvanTec;2010;1090;2000;3-fach WSG;West;nicht_begonnen
+Verwaltungsgebäude Nord;3. Obergeschoss;Großraumbüro;VGN-401;VGN-F-0123;Fest;Roto Frank;Roto NT;2009;1600;1980;Ornamentglas;Ost;saniert
+Verwaltungsgebäude Nord;3. Obergeschoss;Großraumbüro;VGN-401;VGN-F-0124;Fest;GU-BKS;UNI-JET;2019;1150;2170;3-fach WSG;Süd;nachpruefung
+Verwaltungsgebäude Nord;3. Obergeschoss;Konferenzraum 2;VGN-402;VGN-F-0125;Oberlicht;GU-BKS;UNI-JET;2016;1070;390;Ornamentglas;Nordost;nachpruefung
+Verwaltungsgebäude Nord;3. Obergeschoss;Konferenzraum 2;VGN-402;VGN-F-0126;Schiebe;Siegenia-Aubi;Titan AF;2005;820;1720;3-fach WSG;Nord;saniert
+Verwaltungsgebäude Nord;3. Obergeschoss;Konferenzraum 2;VGN-402;VGN-F-0127;Schiebe;Maco;Multi-Matic;2005;1300;1840;2-fach WSG;Nord;abgeschlossen
+Verwaltungsgebäude Nord;3. Obergeschoss;Konferenzraum 2;VGN-402;VGN-F-0128;Dreh-Kipp;Schüco;AvanTec;2004;1770;2180;3-fach WSG;West;nicht_zugaenglich
+Verwaltungsgebäude Nord;3. Obergeschoss;Empfang 3;VGN-403;VGN-F-0129;Schiebe;GU-BKS;UNI-JET;2011;1670;1820;3-fach WSG;Ost;nachpruefung
+Verwaltungsgebäude Nord;3. Obergeschoss;Empfang 3;VGN-403;VGN-F-0130;Kipp;Siegenia-Aubi;Titan AF;2004;1360;1640;2-fach WSG;Nordost;mangel
+Verwaltungsgebäude Nord;3. Obergeschoss;Empfang 3;VGN-403;VGN-F-0131;Kipp;Maco;Multi-Matic;2011;1010;1670;2-fach WSG;West;mangel
+Verwaltungsgebäude Nord;3. Obergeschoss;Empfang 3;VGN-403;VGN-F-0132;Oberlicht;Maco;Multi-Matic;2007;1190;390;2-fach VSG;Südost;mangel
+Verwaltungsgebäude Nord;3. Obergeschoss;Küche 4;VGN-404;VGN-F-0133;Dreh;Roto Frank;Roto NT;2014;1570;1670;3-fach WSG;Südwest;nicht_begonnen
+Verwaltungsgebäude Nord;3. Obergeschoss;Küche 4;VGN-404;VGN-F-0134;Fest;Winkhaus;activPilot;2020;890;2160;3-fach WSG;Süd;in_bearbeitung
+Verwaltungsgebäude Nord;3. Obergeschoss;Poststelle 5;VGN-405;VGN-F-0135;Dreh;GU-BKS;UNI-JET;2020;980;1410;3-fach WSG;Nordwest;abgeschlossen
+Verwaltungsgebäude Nord;3. Obergeschoss;Poststelle 5;VGN-405;VGN-F-0136;Dreh;Winkhaus;activPilot;2015;980;1500;2-fach VSG;Ost;nicht_zugaenglich
+Verwaltungsgebäude Nord;3. Obergeschoss;Flur 7;VGN-407;VGN-F-0137;Kipp;Siegenia-Aubi;Titan AF;2007;1780;2010;3-fach WSG;Südwest;in_bearbeitung
+Verwaltungsgebäude Nord;3. Obergeschoss;Flur 7;VGN-407;VGN-F-0138;Schiebe;Winkhaus;activPilot;2017;1110;1000;Ornamentglas;Nordwest;mangel
+Verwaltungsgebäude Nord;3. Obergeschoss;Teeküche 8;VGN-408;VGN-F-0139;Kipp;Maco;Multi-Matic;2003;870;1670;3-fach WSG;West;nicht_begonnen
+Verwaltungsgebäude Nord;3. Obergeschoss;Großraumbüro 9;VGN-409;VGN-F-0140;Schiebe;GU-BKS;UNI-JET;2016;1130;1110;ESG;Nordost;nicht_begonnen
+Verwaltungsgebäude Nord;3. Obergeschoss;Großraumbüro 9;VGN-409;VGN-F-0141;Fest;GU-BKS;UNI-JET;2008;1530;2090;ESG;Ost;nachpruefung
+Verwaltungsgebäude Nord;3. Obergeschoss;Großraumbüro 9;VGN-409;VGN-F-0142;Oberlicht;Winkhaus;activPilot;2006;1120;420;3-fach WSG;Südwest;ausser_betrieb
+Verwaltungsgebäude Nord;3. Obergeschoss;Großraumbüro 9;VGN-409;VGN-F-0143;Schiebe;Maco;Multi-Matic;2006;970;2160;Ornamentglas;Nordwest;nicht_begonnen
+Verwaltungsgebäude Nord;3. Obergeschoss;Großraumbüro 9;VGN-409;VGN-F-0144;Oberlicht;Winkhaus;activPilot;2019;810;500;3-fach WSG;Ost;nicht_begonnen
+Verwaltungsgebäude Nord;3. Obergeschoss;Großraumbüro 9;VGN-409;VGN-F-0145;Fest;Roto Frank;Roto NX;2011;960;1540;Ornamentglas;Nordwest;austausch_empfohlen
+Verwaltungsgebäude Nord;3. Obergeschoss;Großraumbüro 9;VGN-409;VGN-F-0146;Dreh;Roto Frank;Roto NT;2017;1480;1230;Ornamentglas;Südost;abgeschlossen
+Verwaltungsgebäude Nord;3. Obergeschoss;Konferenzraum 10;VGN-410;VGN-F-0147;Dreh;Schüco;AvanTec;2019;1490;1320;2-fach VSG;Südost;saniert
+Verwaltungsgebäude Nord;3. Obergeschoss;Konferenzraum 10;VGN-410;VGN-F-0148;Kipp;GU-BKS;UNI-JET;2018;1110;1690;Ornamentglas;Südwest;in_bearbeitung
+Verwaltungsgebäude Nord;3. Obergeschoss;Konferenzraum 10;VGN-410;VGN-F-0149;Schiebe;Schüco;AvanTec;2007;1420;1250;3-fach WSG;Nord;abgeschlossen
+Verwaltungsgebäude Nord;3. Obergeschoss;Konferenzraum 10;VGN-410;VGN-F-0150;Oberlicht;Roto Frank;Roto NT;2013;790;420;ESG;Nordwest;mangel
+Verwaltungsgebäude Nord;3. Obergeschoss;Konferenzraum 10;VGN-410;VGN-F-0151;Fest;Siegenia-Aubi;Titan AF;2018;1370;1150;ESG;West;nicht_begonnen
+Verwaltungsgebäude Nord;3. Obergeschoss;Konferenzraum 10;VGN-410;VGN-F-0152;Kipp;Maco;Multi-Matic;2004;890;2000;2-fach WSG;Nordwest;abgeschlossen
+Verwaltungsgebäude Süd;Untergeschoss;Werkstatt 3;VGS-003;VGS-F-0153;Oberlicht;Winkhaus;activPilot;2008;650;390;ESG;Nordost;nicht_begonnen
+Verwaltungsgebäude Süd;Untergeschoss;Werkstatt 3;VGS-003;VGS-F-0154;Oberlicht;Schüco;AvanTec;2008;1170;340;2-fach VSG;Ost;abgeschlossen
+Verwaltungsgebäude Süd;Untergeschoss;Werkstatt 3;VGS-003;VGS-F-0155;Dreh;GU-BKS;UNI-JET;1996;1800;1280;Ornamentglas;West;abgeschlossen
+Verwaltungsgebäude Süd;Untergeschoss;Werkstatt 3;VGS-003;VGS-F-0156;Oberlicht;Roto Frank;Roto NX;2002;760;350;ESG;Südost;saniert
+Verwaltungsgebäude Süd;Untergeschoss;Technikraum 4;VGS-004;VGS-F-0157;Fest;Siegenia-Aubi;Titan AF;2010;1360;1770;Ornamentglas;Südost;nicht_begonnen
+Verwaltungsgebäude Süd;Untergeschoss;Treppenhaus 5;VGS-005;VGS-F-0158;Fest;Maco;Multi-Matic;2009;2000;2070;2-fach VSG;Nordost;ausser_betrieb
+Verwaltungsgebäude Süd;Untergeschoss;Lager 6;VGS-006;VGS-F-0159;Kipp;Roto Frank;Roto NX;2006;1670;1470;2-fach WSG;Südwest;abgeschlossen
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine;VGS-101;VGS-F-0160;Schiebe;Roto Frank;Roto NX;2007;1810;1240;2-fach WSG;West;nicht_begonnen
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine;VGS-101;VGS-F-0161;Fest;Roto Frank;Roto NT;2011;1710;2100;3-fach WSG;Südost;ausser_betrieb
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine;VGS-101;VGS-F-0162;Fest;Schüco;AvanTec;2011;1450;1820;ESG;Südwest;in_bearbeitung
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine;VGS-101;VGS-F-0163;Kipp;Maco;Multi-Matic;2004;1040;1640;2-fach WSG;Nord;saniert
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine;VGS-101;VGS-F-0164;Dreh-Kipp;Schüco;AvanTec;2012;1210;2150;2-fach WSG;Südost;in_bearbeitung
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine;VGS-101;VGS-F-0165;Schiebe;Maco;Multi-Matic;2003;1980;1930;ESG;Südost;austausch_empfohlen
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine;VGS-101;VGS-F-0166;Dreh-Kipp;Winkhaus;activPilot;2010;1970;2170;3-fach WSG;West;nachpruefung
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine;VGS-101;VGS-F-0167;Oberlicht;GU-BKS;UNI-JET;2002;1120;330;ESG;Süd;nicht_begonnen
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine;VGS-101;VGS-F-0168;Oberlicht;Winkhaus;activPilot;1998;1130;480;2-fach VSG;Nordost;nicht_zugaenglich
+Verwaltungsgebäude Süd;Erdgeschoss;Empfang 3;VGS-103;VGS-F-0169;Schiebe;Maco;Multi-Matic;2005;1300;1230;ESG;Nordwest;in_bearbeitung
+Verwaltungsgebäude Süd;Erdgeschoss;Empfang 3;VGS-103;VGS-F-0170;Schiebe;Siegenia-Aubi;Titan AF;2012;1040;1750;Ornamentglas;Süd;mangel
+Verwaltungsgebäude Süd;Erdgeschoss;Empfang 3;VGS-103;VGS-F-0171;Dreh-Kipp;GU-BKS;UNI-JET;1996;1320;2140;Ornamentglas;Nordwest;abgeschlossen
+Verwaltungsgebäude Süd;Erdgeschoss;Empfang 3;VGS-103;VGS-F-0172;Fest;Roto Frank;Roto NX;2009;850;2010;Ornamentglas;Südwest;saniert
+Verwaltungsgebäude Süd;Erdgeschoss;Empfang 3;VGS-103;VGS-F-0173;Schiebe;Winkhaus;activPilot;1999;1240;1700;2-fach VSG;Südwest;nicht_zugaenglich
+Verwaltungsgebäude Süd;Erdgeschoss;Empfang 3;VGS-103;VGS-F-0174;Fest;Roto Frank;Roto NT;1999;1600;1500;2-fach WSG;Südwest;nicht_begonnen
+Verwaltungsgebäude Süd;Erdgeschoss;Poststelle 4;VGS-104;VGS-F-0175;Kipp;Maco;Multi-Matic;2000;1480;1890;Ornamentglas;Südost;austausch_empfohlen
+Verwaltungsgebäude Süd;Erdgeschoss;Büro (Doppel) 5;VGS-105;VGS-F-0176;Dreh-Kipp;GU-BKS;UNI-JET;2005;940;1590;Ornamentglas;West;nachpruefung
+Verwaltungsgebäude Süd;Erdgeschoss;Büro (Doppel) 5;VGS-105;VGS-F-0177;Schiebe;Roto Frank;Roto NX;2007;1820;1170;2-fach WSG;Nordost;in_bearbeitung
+Verwaltungsgebäude Süd;Erdgeschoss;Büro (Doppel) 5;VGS-105;VGS-F-0178;Fest;Winkhaus;activPilot;2004;920;2090;Ornamentglas;Südost;nicht_begonnen
+Verwaltungsgebäude Süd;Erdgeschoss;Treppenhaus 6;VGS-106;VGS-F-0179;Schiebe;Roto Frank;Roto NT;2003;1670;1500;3-fach WSG;Nordost;abgeschlossen
+Verwaltungsgebäude Süd;Erdgeschoss;Besprechungsraum 7;VGS-107;VGS-F-0180;Oberlicht;Roto Frank;Roto NT;2006;980;500;Ornamentglas;West;mangel
+Verwaltungsgebäude Süd;Erdgeschoss;Besprechungsraum 7;VGS-107;VGS-F-0181;Schiebe;Maco;Multi-Matic;2013;1970;1040;Ornamentglas;Nordwest;ausser_betrieb
+Verwaltungsgebäude Süd;Erdgeschoss;Besprechungsraum 7;VGS-107;VGS-F-0182;Dreh-Kipp;Winkhaus;activPilot;2001;1000;1940;ESG;Südwest;in_bearbeitung
+Verwaltungsgebäude Süd;Erdgeschoss;Archiv 8;VGS-108;VGS-F-0183;Oberlicht;Siegenia-Aubi;Titan AF;2010;1010;440;2-fach WSG;West;saniert
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine 9;VGS-109;VGS-F-0184;Oberlicht;GU-BKS;UNI-JET;2004;1020;460;2-fach VSG;Nordwest;ausser_betrieb
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine 9;VGS-109;VGS-F-0185;Kipp;Roto Frank;Roto NX;2003;840;1070;ESG;Südwest;nicht_begonnen
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine 9;VGS-109;VGS-F-0186;Oberlicht;Maco;Multi-Matic;2002;730;400;Ornamentglas;Nordost;nicht_begonnen
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine 9;VGS-109;VGS-F-0187;Schiebe;Maco;Multi-Matic;2009;1220;1570;2-fach VSG;Nord;nachpruefung
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine 9;VGS-109;VGS-F-0188;Dreh;Schüco;AvanTec;1996;1980;2050;2-fach WSG;Nord;abgeschlossen
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine 9;VGS-109;VGS-F-0189;Schiebe;Roto Frank;Roto NX;1998;1610;2070;2-fach WSG;Südwest;saniert
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine 9;VGS-109;VGS-F-0190;Oberlicht;Roto Frank;Roto NT;1998;960;490;3-fach WSG;West;abgeschlossen
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine 9;VGS-109;VGS-F-0191;Dreh-Kipp;Roto Frank;Roto NX;2009;1400;1860;3-fach WSG;Südwest;saniert
+Verwaltungsgebäude Süd;Erdgeschoss;Kantine 9;VGS-109;VGS-F-0192;Fest;GU-BKS;UNI-JET;2011;1610;1250;Ornamentglas;Südwest;saniert
+Verwaltungsgebäude Süd;Erdgeschoss;Technikraum 10;VGS-110;VGS-F-0193;Kipp;Siegenia-Aubi;Titan AF;2007;1800;1910;Ornamentglas;Südost;saniert
+Verwaltungsgebäude Süd;1. Obergeschoss;Treppenhaus;VGS-110;VGS-F-0194;Dreh;Maco;Multi-Matic;2012;1620;1650;2-fach VSG;Nord;saniert
+Verwaltungsgebäude Süd;1. Obergeschoss;Flur 2;VGS-202;VGS-F-0195;Schiebe;GU-BKS;UNI-JET;2009;1630;1130;2-fach WSG;Südost;abgeschlossen
+Verwaltungsgebäude Süd;1. Obergeschoss;Flur 2;VGS-202;VGS-F-0196;Kipp;GU-BKS;UNI-JET;2011;2000;1530;2-fach WSG;Nordwest;abgeschlossen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 4;VGS-204;VGS-F-0197;Schiebe;Roto Frank;Roto NT;2007;1130;1810;Ornamentglas;Nord;ausser_betrieb
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 4;VGS-204;VGS-F-0198;Dreh;Maco;Multi-Matic;1997;840;1500;Ornamentglas;Nordost;abgeschlossen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 4;VGS-204;VGS-F-0199;Dreh;GU-BKS;UNI-JET;2012;1280;1480;2-fach WSG;Nord;nicht_begonnen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 4;VGS-204;VGS-F-0200;Dreh;GU-BKS;UNI-JET;2004;1600;1360;2-fach WSG;Nordwest;nicht_begonnen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 4;VGS-204;VGS-F-0201;Fest;Siegenia-Aubi;Titan AF;2012;1340;1770;2-fach WSG;Nordost;abgeschlossen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 4;VGS-204;VGS-F-0202;Dreh-Kipp;Roto Frank;Roto NT;2003;1960;1580;ESG;Nordost;nicht_zugaenglich
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 4;VGS-204;VGS-F-0203;Oberlicht;Roto Frank;Roto NT;2008;1000;430;2-fach WSG;Nordwest;austausch_empfohlen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 4;VGS-204;VGS-F-0204;Oberlicht;Schüco;AvanTec;2002;710;490;2-fach VSG;Ost;abgeschlossen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 4;VGS-204;VGS-F-0205;Dreh;Siegenia-Aubi;Titan AF;2012;1180;1860;2-fach VSG;Südwest;nicht_begonnen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 4;VGS-204;VGS-F-0206;Dreh;Roto Frank;Roto NT;2013;1230;1530;3-fach WSG;Nordost;nicht_zugaenglich
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 4;VGS-204;VGS-F-0207;Kipp;Roto Frank;Roto NX;2003;1560;1930;ESG;Süd;nicht_begonnen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 4;VGS-204;VGS-F-0208;Schiebe;Siegenia-Aubi;Titan AF;1998;1210;1910;2-fach WSG;Südost;mangel
+Verwaltungsgebäude Süd;1. Obergeschoss;Werkstatt 6;VGS-206;VGS-F-0209;Oberlicht;Roto Frank;Roto NX;2006;1180;300;2-fach WSG;West;abgeschlossen
+Verwaltungsgebäude Süd;1. Obergeschoss;Werkstatt 6;VGS-206;VGS-F-0210;Oberlicht;Maco;Multi-Matic;1998;800;500;2-fach WSG;West;abgeschlossen
+Verwaltungsgebäude Süd;1. Obergeschoss;Konferenzraum 7;VGS-207;VGS-F-0211;Kipp;Winkhaus;activPilot;2003;1330;2160;2-fach VSG;Nordost;in_bearbeitung
+Verwaltungsgebäude Süd;1. Obergeschoss;Konferenzraum 7;VGS-207;VGS-F-0212;Kipp;Roto Frank;Roto NX;2012;1520;1740;3-fach WSG;Südost;saniert
+Verwaltungsgebäude Süd;1. Obergeschoss;Konferenzraum 7;VGS-207;VGS-F-0213;Dreh;Winkhaus;activPilot;2012;1840;1750;2-fach WSG;Ost;nicht_begonnen
+Verwaltungsgebäude Süd;1. Obergeschoss;Konferenzraum 7;VGS-207;VGS-F-0214;Fest;GU-BKS;UNI-JET;2002;1280;1170;2-fach VSG;Nordwest;mangel
+Verwaltungsgebäude Süd;1. Obergeschoss;Besprechungsraum 8;VGS-208;VGS-F-0215;Oberlicht;Siegenia-Aubi;Titan AF;2002;620;360;2-fach WSG;Nordost;nicht_begonnen
+Verwaltungsgebäude Süd;1. Obergeschoss;Besprechungsraum 8;VGS-208;VGS-F-0216;Dreh-Kipp;GU-BKS;UNI-JET;2010;1780;1830;Ornamentglas;Süd;nicht_begonnen
+Verwaltungsgebäude Süd;1. Obergeschoss;Besprechungsraum 8;VGS-208;VGS-F-0217;Oberlicht;Roto Frank;Roto NX;1998;860;400;2-fach VSG;Süd;abgeschlossen
+Verwaltungsgebäude Süd;1. Obergeschoss;Treppenhaus 9;VGS-209;VGS-F-0218;Fest;Maco;Multi-Matic;2012;1400;1390;3-fach WSG;Südost;in_bearbeitung
+Verwaltungsgebäude Süd;1. Obergeschoss;Flur 10;VGS-210;VGS-F-0219;Oberlicht;GU-BKS;UNI-JET;2011;680;470;3-fach WSG;West;abgeschlossen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 12;VGS-212;VGS-F-0220;Kipp;Siegenia-Aubi;Titan AF;2011;1650;1410;2-fach WSG;Süd;nicht_begonnen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 12;VGS-212;VGS-F-0221;Dreh;Winkhaus;activPilot;2003;1790;1150;2-fach WSG;Südost;nicht_begonnen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 12;VGS-212;VGS-F-0222;Oberlicht;Roto Frank;Roto NT;2006;750;490;3-fach WSG;Süd;nicht_zugaenglich
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 12;VGS-212;VGS-F-0223;Dreh-Kipp;Roto Frank;Roto NT;1998;1460;1590;Ornamentglas;Nordost;abgeschlossen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 12;VGS-212;VGS-F-0224;Fest;GU-BKS;UNI-JET;1998;1180;1260;2-fach WSG;West;nicht_begonnen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 12;VGS-212;VGS-F-0225;Dreh-Kipp;Siegenia-Aubi;Titan AF;2004;1040;2040;3-fach WSG;Südwest;nicht_begonnen
+Verwaltungsgebäude Süd;1. Obergeschoss;Kantine 12;VGS-212;VGS-F-0226;Dreh-Kipp;GU-BKS;UNI-JET;2000;1930;2060;3-fach WSG;West;nicht_begonnen
+Verwaltungsgebäude Süd;2. Obergeschoss;Büro (Einzel);VGS-301;VGS-F-0227;Schiebe;Siegenia-Aubi;Titan AF;1998;1960;1840;ESG;Ost;austausch_empfohlen
+Verwaltungsgebäude Süd;2. Obergeschoss;Archiv 2;VGS-302;VGS-F-0228;Dreh;Siegenia-Aubi;Titan AF;1997;1030;1220;3-fach WSG;Südwest;saniert
+Verwaltungsgebäude Süd;2. Obergeschoss;Treppenhaus 3;VGS-303;VGS-F-0229;Fest;Schüco;AvanTec;2007;1740;1010;2-fach WSG;Nord;nicht_zugaenglich
+Verwaltungsgebäude Süd;2. Obergeschoss;Aufenthaltsraum 5;VGS-305;VGS-F-0230;Oberlicht;Schüco;AvanTec;1996;650;300;Ornamentglas;Südost;abgeschlossen
+Verwaltungsgebäude Süd;2. Obergeschoss;Aufenthaltsraum 5;VGS-305;VGS-F-0231;Dreh-Kipp;Siegenia-Aubi;Titan AF;2011;1310;2010;2-fach VSG;Ost;nicht_begonnen
+Verwaltungsgebäude Süd;2. Obergeschoss;Küche 6;VGS-306;VGS-F-0232;Oberlicht;Schüco;AvanTec;1997;830;320;3-fach WSG;Süd;in_bearbeitung
+Verwaltungsgebäude Süd;2. Obergeschoss;Küche 6;VGS-306;VGS-F-0233;Kipp;Roto Frank;Roto NX;2008;1690;1640;2-fach VSG;Nordwest;ausser_betrieb
+Verwaltungsgebäude Süd;2. Obergeschoss;Küche 6;VGS-306;VGS-F-0234;Dreh-Kipp;Schüco;AvanTec;2005;1280;1870;ESG;Nordwest;austausch_empfohlen
+Verwaltungsgebäude Süd;2. Obergeschoss;Küche 6;VGS-306;VGS-F-0235;Dreh-Kipp;Roto Frank;Roto NX;2004;1080;1600;Ornamentglas;Ost;ausser_betrieb
+Verwaltungsgebäude Süd;2. Obergeschoss;Büro (Doppel) 7;VGS-307;VGS-F-0236;Fest;Schüco;AvanTec;2007;1430;1270;3-fach WSG;Süd;nachpruefung
+Verwaltungsgebäude Süd;2. Obergeschoss;Büro (Doppel) 7;VGS-307;VGS-F-0237;Dreh;GU-BKS;UNI-JET;1996;1140;1440;2-fach VSG;Ost;abgeschlossen
+Verwaltungsgebäude Süd;2. Obergeschoss;Büro (Doppel) 7;VGS-307;VGS-F-0228;Schiebe;Siegenia-Aubi;Titan AF;2002;800;2050;2-fach VSG;Ost;mangel
+Verwaltungsgebäude Süd;2. Obergeschoss;Großraumbüro 8;VGS-308;VGS-F-0239;Kipp;Roto Frank;Roto NT;1999;850;2100;3-fach WSG;Südost;austausch_empfohlen
+Verwaltungsgebäude Süd;2. Obergeschoss;Großraumbüro 8;VGS-308;VGS-F-0240;Schiebe;Schüco;AvanTec;1997;1530;1040;2-fach WSG;Nordost;nachpruefung
+Verwaltungsgebäude Süd;2. Obergeschoss;Großraumbüro 8;VGS-308;VGS-F-0241;Fest;Roto Frank;Roto NX;2002;880;1840;2-fach WSG;Nordost;nicht_zugaenglich
+Verwaltungsgebäude Süd;2. Obergeschoss;Großraumbüro 8;VGS-308;VGS-F-0235;Schiebe;GU-BKS;UNI-JET;1996;1530;1970;Ornamentglas;Südwest;austausch_empfohlen
+Verwaltungsgebäude Süd;2. Obergeschoss;Großraumbüro 8;VGS-308;VGS-F-0243;Fest;Roto Frank;Roto NX;1998;1790;2030;2-fach WSG;Südwest;nachpruefung
+Verwaltungsgebäude Süd;2. Obergeschoss;Großraumbüro 8;VGS-308;VGS-F-0244;Dreh;GU-BKS;UNI-JET;1996;1420;1540;Ornamentglas;Südost;nachpruefung
+Verwaltungsgebäude Süd;2. Obergeschoss;Großraumbüro 8;VGS-308;VGS-F-0245;Kipp;Schüco;AvanTec;2006;1670;2060;2-fach WSG;Nordost;nicht_zugaenglich
+Verwaltungsgebäude Süd;2. Obergeschoss;Büro (Einzel) 9;VGS-309;VGS-F-0246;Dreh;Maco;Multi-Matic;1998;1970;2040;Ornamentglas;Ost;nicht_begonnen
+Verwaltungsgebäude Süd;2. Obergeschoss;Treppenhaus 11;VGS-311;VGS-F-0247;Fest;Schüco;AvanTec;2011;1580;1610;2-fach WSG;Südost;mangel
+Konferenzzentrum;Erdgeschoss;Großraumbüro;KON-101;KON-F-0248;Dreh-Kipp;Maco;Multi-Matic;2024;1870;2040;ESG;Südwest;abgeschlossen
+Konferenzzentrum;Erdgeschoss;Großraumbüro;KON-101;KON-F-0249;Schiebe;Roto Frank;Roto NT;2033;1160;1080;Ornamentglas;Ost;mangel
+Konferenzzentrum;Erdgeschoss;Großraumbüro;KON-101;KON-F-0250;Fest;Roto Frank;Roto NT;2029;1970;1510;ESG;Ost;abgeschlossen
+Konferenzzentrum;Erdgeschoss;Großraumbüro;KON-101;KON-F-0251;Schiebe;Siegenia-Aubi;Titan AF;2031;1510;1530;ESG;Süd;austausch_empfohlen
+Konferenzzentrum;Erdgeschoss;Großraumbüro;KON-101;KON-F-0252;Dreh-Kipp;GU-BKS;UNI-JET;2019;1590;1950;3-fach WSG;Nordwest;ausser_betrieb
+Konferenzzentrum;Erdgeschoss;Büro (Doppel) 2;KON-102;KON-F-0253;Schiebe;Roto Frank;Roto NX;2023;1890;1340;3-fach WSG;Nordwest;in_bearbeitung
+Konferenzzentrum;Erdgeschoss;Büro (Doppel) 2;KON-102;KON-F-0254;Schiebe;Maco;Multi-Matic;2031;1530;1260;3-fach WSG;Südwest;mangel
+Konferenzzentrum;Erdgeschoss;Büro (Doppel) 2;KON-102;KON-F-0255;Oberlicht;Roto Frank;Roto NX;2032;720;300;ESG;Nordwest;saniert
+Konferenzzentrum;Erdgeschoss;Flur 3;KON-103;KON-F-0256;Oberlicht;Schüco;AvanTec;2023;1170;490;Ornamentglas;Nord;nicht_zugaenglich
+Konferenzzentrum;Erdgeschoss;Flur 3;KON-103;KON-F-0257;Dreh;Winkhaus;activPilot;2016;990;1930;ESG;Nord;in_bearbeitung
+Konferenzzentrum;Erdgeschoss;Büro (Einzel) 4;KON-104;KON-F-0258;Dreh-Kipp;GU-BKS;UNI-JET;2026;1870;1340;2-fach VSG;West;in_bearbeitung
+Konferenzzentrum;Erdgeschoss;Büro (Einzel) 4;KON-104;KON-F-0259;Kipp;GU-BKS;UNI-JET;2018;1670;1680;Ornamentglas;Nord;austausch_empfohlen
+Konferenzzentrum;Erdgeschoss;Besprechungsraum 5;KON-105;KON-F-0260;Kipp;Siegenia-Aubi;Titan AF;2031;1000;1270;3-fach WSG;West;austausch_empfohlen
+Konferenzzentrum;Erdgeschoss;Besprechungsraum 5;KON-105;KON-F-0261;Fest;Roto Frank;Roto NX;2028;1600;1340;Ornamentglas;Südwest;in_bearbeitung
+Konferenzzentrum;Erdgeschoss;Besprechungsraum 5;KON-105;KON-F-0262;Dreh;GU-BKS;UNI-JET;2020;1550;1220;Ornamentglas;Nord;nicht_begonnen
+Konferenzzentrum;Erdgeschoss;Besprechungsraum 5;KON-105;KON-F-0263;Oberlicht;Siegenia-Aubi;Titan AF;2032;600;330;ESG;Nordost;nicht_begonnen
+Konferenzzentrum;Erdgeschoss;Konferenzraum 6;KON-106;KON-F-0264;Kipp;Winkhaus;activPilot;2031;1640;1140;3-fach WSG;Ost;abgeschlossen
+Konferenzzentrum;Erdgeschoss;Konferenzraum 6;KON-106;KON-F-0265;Schiebe;Siegenia-Aubi;Titan AF;2017;1900;1460;2-fach VSG;Nord;ausser_betrieb
+Konferenzzentrum;Erdgeschoss;Konferenzraum 6;KON-106;KON-F-0266;Oberlicht;Winkhaus;activPilot;2020;600;380;2-fach WSG;Südost;saniert
+Konferenzzentrum;Erdgeschoss;Konferenzraum 6;KON-106;KON-F-0267;Fest;Siegenia-Aubi;Titan AF;2021;1670;1580;3-fach WSG;Nordost;austausch_empfohlen
+Konferenzzentrum;Erdgeschoss;Konferenzraum 6;KON-106;KON-F-0268;Schiebe;Maco;Multi-Matic;2020;1540;1670;ESG;Süd;saniert
+Konferenzzentrum;Erdgeschoss;Großraumbüro 7;KON-107;KON-F-0269;Kipp;Roto Frank;Roto NT;2020;1150;1240;2-fach WSG;Nord;abgeschlossen
+Konferenzzentrum;Erdgeschoss;Großraumbüro 7;KON-107;KON-F-0270;Fest;Siegenia-Aubi;Titan AF;2018;1430;1690;ESG;Nordost;mangel
+Konferenzzentrum;Erdgeschoss;Großraumbüro 7;KON-107;KON-F-0271;Schiebe;Schüco;AvanTec;2020;1000;1450;Ornamentglas;West;nicht_begonnen
+Konferenzzentrum;Erdgeschoss;Großraumbüro 7;KON-107;KON-F-0272;Schiebe;Schüco;AvanTec;2020;1980;1500;2-fach VSG;Südwest;abgeschlossen
+Konferenzzentrum;Erdgeschoss;Großraumbüro 7;KON-107;KON-F-0273;Oberlicht;Maco;Multi-Matic;2027;790;490;Ornamentglas;Ost;nicht_begonnen
+Konferenzzentrum;Erdgeschoss;Büro (Doppel) 8;KON-108;KON-F-0274;Fest;GU-BKS;UNI-JET;2016;1520;1650;2-fach WSG;Süd;abgeschlossen
+Konferenzzentrum;Erdgeschoss;Büro (Doppel) 8;KON-108;KON-F-0275;Oberlicht;Siegenia-Aubi;Titan AF;2017;760;320;2-fach WSG;Nord;austausch_empfohlen
+Konferenzzentrum;Erdgeschoss;Büro (Doppel) 8;KON-108;KON-F-0276;Kipp;Roto Frank;Roto NX;2017;1900;1820;2-fach VSG;Süd;nicht_begonnen
+Konferenzzentrum;1. Obergeschoss;WC Damen;KON-201;KON-F-0277;Fest;Schüco;AvanTec;2020;810;1880;2-fach WSG;Nordwest;saniert
+Konferenzzentrum;1. Obergeschoss;WC Damen;KON-201;KON-F-0278;Oberlicht;Maco;Multi-Matic;2031;910;400;2-fach VSG;Süd;austausch_empfohlen
+Konferenzzentrum;1. Obergeschoss;Büro (Einzel) 2;KON-202;KON-F-0274;Dreh;Maco;Multi-Matic;2018;960;1480;ESG;West;in_bearbeitung
+Konferenzzentrum;1. Obergeschoss;Büro (Einzel) 2;KON-202;KON-F-0280;Kipp;Siegenia-Aubi;Titan AF;2028;1210;1290;Ornamentglas;Nordwest;in_bearbeitung
+Konferenzzentrum;1. Obergeschoss;Flur 3;KON-203;KON-F-0281;Kipp;Maco;Multi-Matic;2023;1990;1690;2-fach WSG;Nord;abgeschlossen
+Konferenzzentrum;1. Obergeschoss;Büro (Doppel) 4;KON-204;KON-F-0282;Kipp;Roto Frank;Roto NX;2028;1290;1650;Ornamentglas;Nord;abgeschlossen
+Konferenzzentrum;1. Obergeschoss;Büro (Doppel) 4;KON-204;KON-F-0283;Dreh-Kipp;Siegenia-Aubi;Titan AF;2020;870;2010;ESG;Nord;nicht_begonnen
+Konferenzzentrum;1. Obergeschoss;Büro (Doppel) 4;KON-204;KON-F-0284;Dreh-Kipp;GU-BKS;UNI-JET;2019;1690;1410;2-fach WSG;Ost;in_bearbeitung
+Konferenzzentrum;1. Obergeschoss;Großraumbüro 5;KON-205;KON-F-0285;Fest;Schüco;AvanTec;2021;1710;1540;2-fach WSG;Nordost;abgeschlossen
+Konferenzzentrum;1. Obergeschoss;Großraumbüro 5;KON-205;KON-F-0286;Kipp;Winkhaus;activPilot;2022;1020;2000;Ornamentglas;West;nicht_begonnen
+Konferenzzentrum;1. Obergeschoss;Großraumbüro 5;KON-205;KON-F-0287;Fest;Roto Frank;Roto NX;2029;1970;1920;2-fach WSG;Süd;ausser_betrieb
+Konferenzzentrum;1. Obergeschoss;Großraumbüro 5;KON-205;KON-F-0288;Dreh;Schüco;AvanTec;2021;890;2060;2-fach VSG;Ost;nicht_zugaenglich
+Konferenzzentrum;1. Obergeschoss;Großraumbüro 5;KON-205;KON-F-0289;Kipp;GU-BKS;UNI-JET;2025;1250;1960;3-fach WSG;Südost;austausch_empfohlen
+Konferenzzentrum;1. Obergeschoss;Besprechungsraum 6;KON-206;KON-F-0290;Kipp;Siegenia-Aubi;Titan AF;2023;970;1290;ESG;Südost;austausch_empfohlen
+Konferenzzentrum;1. Obergeschoss;Besprechungsraum 6;KON-206;KON-F-0291;Kipp;GU-BKS;UNI-JET;2030;840;1990;2-fach VSG;West;nicht_zugaenglich
+Konferenzzentrum;1. Obergeschoss;Besprechungsraum 6;KON-206;KON-F-0292;Dreh-Kipp;Maco;Multi-Matic;2022;1480;1280;Ornamentglas;Ost;abgeschlossen
+Konferenzzentrum;1. Obergeschoss;Besprechungsraum 6;KON-206;KON-F-0293;Dreh-Kipp;Siegenia-Aubi;Titan AF;2028;1190;1130;3-fach WSG;Südwest;nicht_begonnen
+Konferenzzentrum;1. Obergeschoss;WC Damen 7;KON-207;KON-F-0294;Schiebe;Schüco;AvanTec;2026;1700;1000;2-fach VSG;West;nicht_begonnen
+Konferenzzentrum;1. Obergeschoss;WC Damen 7;KON-207;KON-F-0295;Oberlicht;Roto Frank;Roto NT;2025;1180;360;2-fach VSG;Nordwest;abgeschlossen
+Konferenzzentrum;1. Obergeschoss;Büro (Einzel) 8;KON-208;KON-F-0296;Fest;Maco;Multi-Matic;2026;1050;2150;2-fach WSG;Südost;abgeschlossen
+Technisches Zentrum;Untergeschoss;Flur;TZ-001;KON-F-0295;Dreh;Siegenia-Aubi;Titan AF;1989;1310;1410;Ornamentglas;West;nicht_begonnen
+Technisches Zentrum;Untergeschoss;Büro (Doppel) 2;TZ-002;TZ-F-0298;Dreh;Schüco;AvanTec;2000;1800;1550;2-fach VSG;Südost;abgeschlossen
+Technisches Zentrum;Untergeschoss;Büro (Doppel) 2;TZ-002;TZ-F-0299;Dreh;Siegenia-Aubi;Titan AF;1989;1790;1060;2-fach WSG;Nord;abgeschlossen
+Technisches Zentrum;Untergeschoss;Büro (Doppel) 2;TZ-002;TZ-F-0300;Schiebe;Schüco;AvanTec;1984;1840;1260;2-fach VSG;Nordwest;nachpruefung
+Technisches Zentrum;Untergeschoss;Lager 3;TZ-003;TZ-F-0301;Dreh;Roto Frank;Roto NT;1987;1550;1270;Ornamentglas;Nordwest;nachpruefung
+Technisches Zentrum;Untergeschoss;Treppenhaus 4;TZ-004;TZ-F-0302;Kipp;Schüco;AvanTec;1986;1050;1450;ESG;Nordost;mangel
+Technisches Zentrum;Untergeschoss;Büro (Einzel) 5;TZ-005;TZ-F-0303;Dreh-Kipp;Maco;Multi-Matic;1994;1680;1810;ESG;Nordost;abgeschlossen
+Technisches Zentrum;Untergeschoss;Büro (Einzel) 5;TZ-005;TZ-F-0304;Dreh;Maco;Multi-Matic;1988;1620;1820;2-fach VSG;Südwest;nicht_begonnen
+Technisches Zentrum;Untergeschoss;Großraumbüro 7;TZ-007;TZ-F-0305;Dreh;Roto Frank;Roto NX;1989;1970;1240;2-fach VSG;Südost;nachpruefung
+Technisches Zentrum;Untergeschoss;Großraumbüro 7;TZ-007;TZ-F-0306;Oberlicht;Schüco;AvanTec;1991;1050;440;ESG;Nordwest;in_bearbeitung
+Technisches Zentrum;Untergeschoss;Großraumbüro 7;TZ-007;TZ-F-0307;Dreh;Winkhaus;activPilot;1999;970;2090;3-fach WSG;Südost;ausser_betrieb
+Technisches Zentrum;Untergeschoss;Großraumbüro 7;TZ-007;TZ-F-0308;Fest;Roto Frank;Roto NT;1991;1600;1580;2-fach VSG;Ost;ausser_betrieb
+Technisches Zentrum;Untergeschoss;Technikraum 8;TZ-008;TZ-F-0309;Fest;Siegenia-Aubi;Titan AF;2000;1530;1680;2-fach WSG;West;abgeschlossen
+Technisches Zentrum;Untergeschoss;Büro (Doppel) 10;TZ-010;TZ-F-0310;Oberlicht;GU-BKS;UNI-JET;1985;1020;320;ESG;Nordost;abgeschlossen
+Technisches Zentrum;Untergeschoss;Büro (Doppel) 10;TZ-010;TZ-F-0311;Kipp;GU-BKS;UNI-JET;1983;860;2060;2-fach VSG;Süd;nicht_begonnen
+Technisches Zentrum;Untergeschoss;Büro (Doppel) 10;TZ-010;TZ-F-0312;Oberlicht;Roto Frank;Roto NT;1985;1120;470;3-fach WSG;Nordost;nicht_zugaenglich
+Technisches Zentrum;Erdgeschoss;Archiv;TZ-101;TZ-F-0313;Fest;Schüco;AvanTec;1985;1240;1880;3-fach WSG;Ost;abgeschlossen
+Technisches Zentrum;Erdgeschoss;Technikraum 2;TZ-102;TZ-F-0314;Dreh-Kipp;Winkhaus;activPilot;1988;1220;1180;ESG;Nordost;austausch_empfohlen
+Technisches Zentrum;Erdgeschoss;Werkstatt 3;TZ-103;TZ-F-0315;Dreh-Kipp;GU-BKS;UNI-JET;1991;1010;1990;3-fach WSG;Süd;abgeschlossen
+Technisches Zentrum;Erdgeschoss;Werkstatt 3;TZ-103;TZ-F-0316;Dreh-Kipp;Roto Frank;Roto NT;1998;1870;1580;3-fach WSG;Nordwest;saniert
+Technisches Zentrum;Erdgeschoss;Büro (Einzel) 4;TZ-104;TZ-F-0317;Fest;Winkhaus;activPilot;1996;1260;1780;3-fach WSG;Ost;nicht_begonnen
+Technisches Zentrum;Erdgeschoss;Büro (Doppel) 5;TZ-105;TZ-F-0318;Schiebe;Schüco;AvanTec;1996;860;1240;ESG;Südost;nicht_begonnen
+Technisches Zentrum;Erdgeschoss;Büro (Doppel) 5;TZ-105;TZ-F-0319;Dreh-Kipp;GU-BKS;UNI-JET;1996;960;1140;2-fach WSG;Nordost;abgeschlossen
+Technisches Zentrum;Erdgeschoss;Großraumbüro 6;TZ-106;TZ-F-0320;Dreh;GU-BKS;UNI-JET;1991;1750;1390;Ornamentglas;Süd;in_bearbeitung
+Technisches Zentrum;Erdgeschoss;Großraumbüro 6;TZ-106;TZ-F-0321;Dreh;Schüco;AvanTec;2000;1390;1930;ESG;West;in_bearbeitung
+Technisches Zentrum;Erdgeschoss;Großraumbüro 6;TZ-106;TZ-F-0322;Dreh-Kipp;Maco;Multi-Matic;1983;930;1500;3-fach WSG;Nordwest;austausch_empfohlen
+Technisches Zentrum;Erdgeschoss;Großraumbüro 6;TZ-106;TZ-F-0323;Kipp;Siegenia-Aubi;Titan AF;1995;930;2030;3-fach WSG;Ost;saniert
+Technisches Zentrum;Erdgeschoss;Großraumbüro 6;TZ-106;TZ-F-0324;Dreh;Maco;Multi-Matic;1987;1230;1490;ESG;Süd;nachpruefung
+Technisches Zentrum;Erdgeschoss;Lager 8;TZ-108;TZ-F-0325;Fest;Maco;Multi-Matic;1993;1910;1780;ESG;Nordost;abgeschlossen
+Technisches Zentrum;Erdgeschoss;Technikraum 10;TZ-110;TZ-F-0326;Kipp;Winkhaus;activPilot;1997;990;1990;ESG;West;nicht_zugaenglich
+Technisches Zentrum;Erdgeschoss;Werkstatt 11;TZ-111;TZ-F-0327;Oberlicht;Roto Frank;Roto NX;1983;800;350;Ornamentglas;Nordwest;austausch_empfohlen
+Technisches Zentrum;Erdgeschoss;Werkstatt 11;TZ-111;TZ-F-0328;Dreh-Kipp;Winkhaus;activPilot;1984;1750;1680;2-fach VSG;Nordwest;nachpruefung
+Technisches Zentrum;Erdgeschoss;Werkstatt 11;TZ-111;TZ-F-0329;Schiebe;Schüco;AvanTec;1983;870;1020;Ornamentglas;West;saniert
+Technisches Zentrum;Erdgeschoss;Büro (Einzel) 12;TZ-112;TZ-F-0330;Oberlicht;Winkhaus;activPilot;1990;880;440;Ornamentglas;West;saniert
+Technisches Zentrum;1. Obergeschoss;Büro (Doppel);TZ-201;TZ-F-0331;Kipp;Roto Frank;Roto NX;1988;1120;1580;2-fach VSG;Süd;nicht_begonnen
+Technisches Zentrum;1. Obergeschoss;Büro (Doppel);TZ-201;TZ-F-0332;Oberlicht;GU-BKS;UNI-JET;1992;610;310;2-fach VSG;Nord;abgeschlossen
+Technisches Zentrum;1. Obergeschoss;Treppenhaus 2;TZ-202;TZ-F-0333;Oberlicht;Maco;Multi-Matic;1994;1090;430;Ornamentglas;Südwest;in_bearbeitung
+Technisches Zentrum;1. Obergeschoss;Lager 3;TZ-203;TZ-F-0334;Kipp;Winkhaus;activPilot;1994;1520;2010;Ornamentglas;Südwest;nicht_begonnen
+Technisches Zentrum;1. Obergeschoss;Werkstatt 4;TZ-204;TZ-F-0335;Dreh;GU-BKS;UNI-JET;1993;830;1220;Ornamentglas;Nordwest;saniert
+Technisches Zentrum;1. Obergeschoss;Werkstatt 4;TZ-204;TZ-F-0336;Kipp;Siegenia-Aubi;Titan AF;1989;1850;1760;3-fach WSG;West;nicht_begonnen
+Technisches Zentrum;1. Obergeschoss;Großraumbüro 7;TZ-207;TZ-F-0337;Fest;Roto Frank;Roto NT;2000;1720;2200;ESG;Ost;nicht_begonnen
+Technisches Zentrum;1. Obergeschoss;Großraumbüro 7;TZ-207;TZ-F-0338;Oberlicht;GU-BKS;UNI-JET;1988;1070;440;ESG;West;nicht_begonnen
+Technisches Zentrum;1. Obergeschoss;Großraumbüro 7;TZ-207;TZ-F-0339;Dreh;Schüco;AvanTec;1996;1670;1060;ESG;Ost;abgeschlossen
+Technisches Zentrum;1. Obergeschoss;Großraumbüro 7;TZ-207;TZ-F-0340;Oberlicht;Roto Frank;Roto NT;2000;930;360;2-fach VSG;West;mangel
+Technisches Zentrum;1. Obergeschoss;Großraumbüro 7;TZ-207;TZ-F-0341;Dreh;Schüco;AvanTec;1983;1170;2110;2-fach VSG;Süd;abgeschlossen
+Technisches Zentrum;1. Obergeschoss;Großraumbüro 7;TZ-207;TZ-F-0342;Dreh;Roto Frank;Roto NX;1999;1210;1000;ESG;Süd;austausch_empfohlen
+Technisches Zentrum;1. Obergeschoss;Großraumbüro 7;TZ-207;TZ-F-0343;Schiebe;Siegenia-Aubi;Titan AF;1983;1780;1820;3-fach WSG;Ost;nachpruefung
+Technisches Zentrum;1. Obergeschoss;Großraumbüro 7;TZ-207;TZ-F-0344;Fest;Siegenia-Aubi;Titan AF;1998;1540;1260;Ornamentglas;Ost;ausser_betrieb
+Technisches Zentrum;1. Obergeschoss;Büro (Doppel) 9;TZ-204;TZ-F-0345;Oberlicht;Roto Frank;Roto NX;1998;1090;410;3-fach WSG;Nord;nachpruefung
+Technisches Zentrum;1. Obergeschoss;Büro (Doppel) 9;TZ-204;TZ-F-0346;Kipp;Maco;Multi-Matic;1993;1920;1270;Ornamentglas;Süd;austausch_empfohlen
+Technisches Zentrum;1. Obergeschoss;Treppenhaus 10;TZ-210;TZ-F-0338;Dreh;Roto Frank;Roto NX;1995;1500;1910;2-fach VSG;Ost;abgeschlossen
+Technisches Zentrum;1. Obergeschoss;Werkstatt 12;TZ-212;TZ-F-0348;Oberlicht;Winkhaus;activPilot;1990;970;410;3-fach WSG;Nordwest;in_bearbeitung
+Technisches Zentrum;1. Obergeschoss;Werkstatt 12;TZ-212;TZ-F-0349;Fest;Maco;Multi-Matic;1984;1610;1110;2-fach WSG;Südwest;mangel
+Technisches Zentrum;1. Obergeschoss;Werkstatt 12;TZ-212;TZ-F-0350;Schiebe;Roto Frank;Roto NX;1992;1720;2100;2-fach VSG;Ost;abgeschlossen
+Technisches Zentrum;1. Obergeschoss;Werkstatt 12;TZ-212;TZ-F-0351;Schiebe;GU-BKS;UNI-JET;1991;1500;1780;3-fach WSG;West;austausch_empfohlen
+Technisches Zentrum;2. Obergeschoss;Büro (Doppel) 3;TZ-303;TZ-F-0352;Schiebe;GU-BKS;UNI-JET;1990;1910;1740;ESG;Nordwest;mangel
+Technisches Zentrum;2. Obergeschoss;Büro (Doppel) 3;TZ-303;TZ-F-0353;Oberlicht;Winkhaus;activPilot;1989;1040;400;2-fach VSG;Südwest;abgeschlossen
+Technisches Zentrum;2. Obergeschoss;Büro (Doppel) 3;TZ-303;TZ-F-0354;Oberlicht;Maco;Multi-Matic;1988;1200;320;Ornamentglas;Nordost;austausch_empfohlen
+Technisches Zentrum;2. Obergeschoss;Treppenhaus 4;TZ-304;TZ-F-0355;Kipp;Roto Frank;Roto NX;2000;1160;2030;ESG;Nord;ausser_betrieb
+Technisches Zentrum;2. Obergeschoss;Technikraum 6;TZ-306;TZ-F-0356;Dreh-Kipp;Winkhaus;activPilot;1991;1970;2000;ESG;West;abgeschlossen
+Technisches Zentrum;2. Obergeschoss;Büro (Einzel) 7;TZ-307;TZ-F-0357;Oberlicht;Maco;Multi-Matic;1993;720;460;2-fach WSG;West;ausser_betrieb
+Technisches Zentrum;2. Obergeschoss;Großraumbüro 8;TZ-308;TZ-F-0358;Dreh;Roto Frank;Roto NT;1986;1770;1450;3-fach WSG;Nord;in_bearbeitung
+Technisches Zentrum;2. Obergeschoss;Großraumbüro 8;TZ-308;TZ-F-0359;Dreh;Roto Frank;Roto NX;1985;1120;1260;2-fach WSG;West;nicht_begonnen
+Technisches Zentrum;2. Obergeschoss;Großraumbüro 8;TZ-308;TZ-F-0360;Kipp;Winkhaus;activPilot;1987;1290;1650;3-fach WSG;Nord;in_bearbeitung
+Technisches Zentrum;2. Obergeschoss;Großraumbüro 8;TZ-308;TZ-F-0361;Dreh;Schüco;AvanTec;1983;830;2120;2-fach WSG;Nord;saniert
+Technisches Zentrum;2. Obergeschoss;Großraumbüro 8;TZ-308;TZ-F-0362;Dreh-Kipp;Schüco;AvanTec;1993;1750;1950;2-fach VSG;Südwest;austausch_empfohlen
+Technisches Zentrum;2. Obergeschoss;Großraumbüro 8;TZ-308;TZ-F-0363;Oberlicht;Roto Frank;Roto NT;1991;750;370;Ornamentglas;Südost;saniert
+Technisches Zentrum;2. Obergeschoss;Flur 9;TZ-309;TZ-F-0364;Fest;Roto Frank;Roto NT;1990;1010;2010;2-fach WSG;Nordost;in_bearbeitung
+Technisches Zentrum;2. Obergeschoss;Flur 9;TZ-309;TZ-F-0365;Fest;Siegenia-Aubi;Titan AF;1992;1540;1820;2-fach VSG;Ost;ausser_betrieb
+Technisches Zentrum;2. Obergeschoss;Archiv 10;TZ-310;TZ-F-0366;Dreh-Kipp;Winkhaus;activPilot;1997;1050;1340;ESG;West;in_bearbeitung
+Technisches Zentrum;3. Obergeschoss;Büro (Einzel);TZ-401;TZ-F-0362;Kipp;Siegenia-Aubi;Titan AF;1984;1250;2010;2-fach WSG;Südwest;nicht_begonnen
+Technisches Zentrum;3. Obergeschoss;Büro (Doppel) 2;TZ-402;TZ-F-0368;Fest;Siegenia-Aubi;Titan AF;1999;1530;1500;2-fach WSG;Ost;abgeschlossen
+Technisches Zentrum;3. Obergeschoss;Büro (Doppel) 2;TZ-402;TZ-F-0369;Fest;Winkhaus;activPilot;1984;860;2080;2-fach WSG;Südwest;nicht_begonnen
+Technisches Zentrum;3. Obergeschoss;Werkstatt 4;TZ-404;TZ-F-0370;Schiebe;Roto Frank;Roto NX;1990;1430;1410;2-fach WSG;Nordost;in_bearbeitung
+Technisches Zentrum;3. Obergeschoss;Werkstatt 4;TZ-404;TZ-F-0371;Kipp;Roto Frank;Roto NX;1993;1990;1670;ESG;Nordwest;ausser_betrieb
+Technisches Zentrum;3. Obergeschoss;Werkstatt 4;TZ-404;TZ-F-0372;Dreh-Kipp;Winkhaus;activPilot;1985;1090;1890;Ornamentglas;Süd;nicht_begonnen
+Technisches Zentrum;3. Obergeschoss;Werkstatt 4;TZ-404;TZ-F-0373;Dreh;Winkhaus;activPilot;1988;1540;1610;2-fach WSG;Süd;nicht_begonnen
+Technisches Zentrum;3. Obergeschoss;Flur 5;TZ-405;TZ-F-0374;Dreh;Maco;Multi-Matic;1995;1840;1440;2-fach WSG;Ost;in_bearbeitung
+Technisches Zentrum;3. Obergeschoss;Flur 5;TZ-405;TZ-F-0375;Dreh-Kipp;Roto Frank;Roto NX;1987;1780;1000;ESG;Ost;austausch_empfohlen
+Technisches Zentrum;3. Obergeschoss;Archiv 8;TZ-408;TZ-F-0376;Kipp;Roto Frank;Roto NT;1989;1090;1300;3-fach WSG;Südost;nicht_begonnen
+Technisches Zentrum;4. Obergeschoss;Flur;TZ-501;TZ-F-0377;Dreh-Kipp;GU-BKS;UNI-JET;1996;1730;1470;2-fach WSG;Süd;in_bearbeitung
+Technisches Zentrum;4. Obergeschoss;Lager 2;TZ-502;TZ-F-0378;Fest;Winkhaus;activPilot;1987;1630;1570;3-fach WSG;Ost;mangel
+Technisches Zentrum;4. Obergeschoss;Technikraum 3;TZ-503;TZ-F-0379;Dreh-Kipp;Schüco;AvanTec;2000;2000;1220;2-fach VSG;Südwest;in_bearbeitung
+Technisches Zentrum;4. Obergeschoss;Büro (Einzel) 4;TZ-504;TZ-F-0380;Kipp;Siegenia-Aubi;Titan AF;1997;1750;1140;ESG;Nordwest;in_bearbeitung
+Technisches Zentrum;4. Obergeschoss;Werkstatt 6;TZ-506;TZ-F-0381;Schiebe;Schüco;AvanTec;1989;1720;1360;2-fach WSG;Südwest;austausch_empfohlen
+Technisches Zentrum;4. Obergeschoss;Werkstatt 6;TZ-506;TZ-F-0382;Dreh;Roto Frank;Roto NT;1989;1270;1200;ESG;Süd;nicht_zugaenglich
+Technisches Zentrum;4. Obergeschoss;Werkstatt 6;TZ-506;TZ-F-0383;Schiebe;Roto Frank;Roto NT;1983;1960;1970;Ornamentglas;Südost;nicht_zugaenglich
+Nebengebäude West;Untergeschoss;Treppenhaus 2;NGW-002;NGW-F-0384;Oberlicht;Maco;Multi-Matic;1998;1160;330;2-fach WSG;Nordost;nicht_zugaenglich
+Nebengebäude West;Erdgeschoss;Büro (Einzel);NGW-101;NGW-F-0385;Dreh-Kipp;Schüco;AvanTec;2005;1720;1840;ESG;Süd;in_bearbeitung
+Nebengebäude West;Erdgeschoss;Büro (Einzel);NGW-101;NGW-F-0386;Schiebe;Maco;Multi-Matic;2002;950;1320;2-fach VSG;Nordwest;abgeschlossen
+Nebengebäude West;Erdgeschoss;Büro (Doppel) 2;NGW-102;NGW-F-0387;Kipp;Winkhaus;activPilot;1996;1520;1750;3-fach WSG;Nord;abgeschlossen
+Nebengebäude West;Erdgeschoss;Büro (Doppel) 2;NGW-102;NGW-F-0388;Oberlicht;Winkhaus;activPilot;2001;920;320;ESG;Nordost;ausser_betrieb
+Nebengebäude West;Erdgeschoss;Besprechungsraum 3;NGW-103;NGW-F-0389;Schiebe;Winkhaus;activPilot;1990;1590;1390;Ornamentglas;Nordost;nicht_zugaenglich
+Nebengebäude West;Erdgeschoss;Besprechungsraum 3;NGW-103;NGW-F-0390;Fest;GU-BKS;UNI-JET;1996;1670;1300;2-fach VSG;Nordwest;abgeschlossen
+Nebengebäude West;Erdgeschoss;Werkstatt 4;NGW-104;NGW-F-0391;Fest;Schüco;AvanTec;1999;1880;1220;ESG;Süd;nachpruefung
+Nebengebäude West;Erdgeschoss;Werkstatt 4;NGW-104;NGW-F-0392;Fest;Maco;Multi-Matic;1995;1510;1410;2-fach VSG;West;nicht_begonnen
+Nebengebäude West;Erdgeschoss;Werkstatt 4;NGW-104;NGW-F-0393;Fest;GU-BKS;UNI-JET;2002;1110;1160;Ornamentglas;Südost;abgeschlossen
+Nebengebäude West;Erdgeschoss;WC Herren 5;NGW-105;NGW-F-0394;Dreh;GU-BKS;UNI-JET;1995;1480;1640;3-fach WSG;Ost;in_bearbeitung
+Nebengebäude West;Erdgeschoss;Poststelle 6;NGW-106;NGW-F-0395;Schiebe;Roto Frank;Roto NT;2002;1650;1260;ESG;Ost;nicht_begonnen
+Nebengebäude West;Erdgeschoss;Poststelle 6;NGW-106;NGW-F-0396;Oberlicht;Maco;Multi-Matic;2005;1010;460;2-fach VSG;Nordost;nicht_begonnen
+Nebengebäude West;1. Obergeschoss;WC Herren;NGW-201;NGW-F-0397;Dreh-Kipp;Winkhaus;activPilot;1990;890;1960;2-fach VSG;West;in_bearbeitung
+Nebengebäude West;1. Obergeschoss;Poststelle 2;NGW-202;NGW-F-0398;Dreh;Roto Frank;Roto NX;1998;1220;1350;2-fach VSG;Süd;nicht_begonnen
+Nebengebäude West;1. Obergeschoss;Flur 3;NGW-203;NGW-F-0399;Fest;Winkhaus;activPilot;2004;1680;1250;2-fach VSG;Südwest;abgeschlossen
+Nebengebäude West;1. Obergeschoss;Werkstatt 4;NGW-204;NGW-F-0400;Dreh;Roto Frank;Roto NX;1997;1330;1000;ESG;Nordwest;abgeschlossen
+Nebengebäude West;1. Obergeschoss;Werkstatt 4;NGW-204;NGW-F-0401;Schiebe;Schüco;AvanTec;1991;1220;1950;Ornamentglas;Nordwest;nicht_begonnen
+Nebengebäude West;1. Obergeschoss;Küche 6;NGW-206;NGW-F-0402;Fest;Roto Frank;Roto NT;2005;800;1420;3-fach WSG;Nordwest;saniert
+Nebengebäude West;1. Obergeschoss;Küche 6;NGW-206;NGW-F-0403;Dreh-Kipp;Winkhaus;activPilot;1993;1560;1680;ESG;Nordwest;abgeschlossen
+Nebengebäude West;1. Obergeschoss;Küche 6;NGW-206;NGW-F-0404;Schiebe;Winkhaus;activPilot;1998;1270;1820;2-fach VSG;West;saniert
+Pforte und Wache;Erdgeschoss;Treppenhaus;NGW-202;PW-F-0405;Fest;Siegenia-Aubi;Titan AF;2021;850;1940;2-fach WSG;Südwest;nicht_begonnen
+Pforte und Wache;Erdgeschoss;Besprechungsraum 2;PW-102;PW-F-0406;Oberlicht;Schüco;AvanTec;2010;880;440;Ornamentglas;Südost;saniert
+Pforte und Wache;Erdgeschoss;Besprechungsraum 2;PW-102;PW-F-0407;Oberlicht;Schüco;AvanTec;2022;700;500;3-fach WSG;Südwest;ausser_betrieb
+Pforte und Wache;Erdgeschoss;Besprechungsraum 2;PW-102;PW-F-0408;Dreh-Kipp;Siegenia-Aubi;Titan AF;2011;850;1330;2-fach WSG;Nord;mangel
+Pforte und Wache;Erdgeschoss;Großraumbüro 3;PW-103;PW-F-0409;Schiebe;Siegenia-Aubi;Titan AF;2025;1180;1990;ESG;Süd;nachpruefung
+Pforte und Wache;Erdgeschoss;Großraumbüro 3;PW-103;PW-F-0410;Fest;Schüco;AvanTec;2008;1060;1340;3-fach WSG;Nordost;ausser_betrieb
+Pforte und Wache;Erdgeschoss;Großraumbüro 3;PW-103;PW-F-0411;Dreh;Roto Frank;Roto NT;2008;1280;2150;3-fach WSG;Nord;nicht_begonnen
+Pforte und Wache;Erdgeschoss;Großraumbüro 3;PW-103;PW-F-0412;Fest;Winkhaus;activPilot;2009;1530;2070;Ornamentglas;Südwest;in_bearbeitung
+Pforte und Wache;Erdgeschoss;Großraumbüro 3;PW-103;PW-F-0413;Dreh-Kipp;Roto Frank;Roto NT;2024;1990;1330;ESG;Südwest;austausch_empfohlen
+Pforte und Wache;Erdgeschoss;Großraumbüro 3;PW-103;PW-F-0414;Schiebe;Maco;Multi-Matic;2012;1210;2140;3-fach WSG;West;nachpruefung
+Pforte und Wache;Erdgeschoss;Großraumbüro 3;PW-103;PW-F-0415;Kipp;Siegenia-Aubi;Titan AF;2021;1540;1140;3-fach WSG;Nordost;mangel
+Pforte und Wache;Erdgeschoss;Empfang 4;PW-103;PW-F-0416;Kipp;Schüco;AvanTec;2014;1280;1870;ESG;Nordwest;abgeschlossen
+Pforte und Wache;Erdgeschoss;Empfang 4;PW-103;PW-F-0417;Schiebe;Siegenia-Aubi;Titan AF;2014;1680;1350;2-fach VSG;Nordost;nicht_zugaenglich
+Pforte und Wache;Erdgeschoss;Empfang 4;PW-103;PW-F-0418;Schiebe;Maco;Multi-Matic;2015;860;1190;Ornamentglas;Südwest;mangel
+Pforte und Wache;1. Obergeschoss;Büro (Einzel);PW-201;PW-F-0419;Dreh;Winkhaus;activPilot;2012;1570;1630;Ornamentglas;Süd;in_bearbeitung
+Pforte und Wache;1. Obergeschoss;Büro (Einzel);PW-201;PW-F-0420;Fest;Roto Frank;Roto NT;2022;1420;2150;2-fach WSG;Nordost;austausch_empfohlen
+Pforte und Wache;1. Obergeschoss;Treppenhaus 2;PW-202;PW-F-0421;Dreh;Maco;Multi-Matic;2019;1900;1600;Ornamentglas;Südost;nicht_begonnen
+Pforte und Wache;1. Obergeschoss;Kantine 3;PW-203;PW-F-0422;Fest;Schüco;AvanTec;2013;1720;2180;2-fach WSG;Nordost;in_bearbeitung
+Pforte und Wache;1. Obergeschoss;Kantine 3;PW-203;PW-F-0423;Fest;GU-BKS;UNI-JET;2020;1010;1670;Ornamentglas;Ost;nachpruefung
+Pforte und Wache;1. Obergeschoss;Kantine 3;PW-203;PW-F-0424;Schiebe;Maco;Multi-Matic;2019;1120;1740;Ornamentglas;Nord;austausch_empfohlen
+Pforte und Wache;1. Obergeschoss;Kantine 3;PW-203;PW-F-0425;Kipp;Roto Frank;Roto NX;2015;1360;2080;2-fach WSG;Nord;nachpruefung
+Pforte und Wache;1. Obergeschoss;Kantine 3;PW-203;PW-F-0426;Dreh;Maco;Multi-Matic;2009;1900;1980;Ornamentglas;Nord;abgeschlossen
+Pforte und Wache;1. Obergeschoss;Kantine 3;PW-203;PW-F-0427;Fest;Roto Frank;Roto NX;2011;1210;1780;ESG;Nordost;saniert
+Pforte und Wache;1. Obergeschoss;Kantine 3;PW-203;PW-F-0428;Dreh-Kipp;Winkhaus;activPilot;2013;1720;2190;ESG;Nord;abgeschlossen
+Pforte und Wache;1. Obergeschoss;Kantine 3;PW-203;PW-F-0429;Oberlicht;Maco;Multi-Matic;2023;990;460;3-fach WSG;Nordwest;mangel
+Kantine und Sozialgebäude;Erdgeschoss;WC Herren;KAS-101;KAS-F-0430;Dreh;Roto Frank;Roto NX;2016;1270;2080;Ornamentglas;Südwest;abgeschlossen
+Kantine und Sozialgebäude;Erdgeschoss;Treppenhaus 2;KAS-102;KAS-F-0431;Dreh;Winkhaus;activPilot;2011;1690;1070;2-fach WSG;Südost;ausser_betrieb
+Kantine und Sozialgebäude;Erdgeschoss;Küche 3;KAS-103;KAS-F-0432;Schiebe;Roto Frank;Roto NT;2014;1550;1040;3-fach WSG;Süd;ausser_betrieb
+Kantine und Sozialgebäude;Erdgeschoss;Küche 3;KAS-103;KAS-F-0433;Schiebe;Schüco;AvanTec;2011;1310;1430;2-fach VSG;Nord;nicht_zugaenglich
+Kantine und Sozialgebäude;Erdgeschoss;Küche 3;KAS-103;KAS-F-0434;Oberlicht;Roto Frank;Roto NX;2001;710;390;ESG;Südost;ausser_betrieb
+Kantine und Sozialgebäude;Erdgeschoss;Aufenthaltsraum 4;KAS-104;KAS-F-0435;Schiebe;Schüco;AvanTec;2011;1230;1390;2-fach WSG;Ost;nicht_begonnen
+Kantine und Sozialgebäude;Erdgeschoss;Aufenthaltsraum 4;KAS-104;KAS-F-0436;Dreh;Roto Frank;Roto NT;2016;940;1370;2-fach WSG;Südost;nachpruefung
+Kantine und Sozialgebäude;Erdgeschoss;Flur 5;KAS-105;KAS-F-0437;Dreh;Maco;Multi-Matic;2010;1090;1550;3-fach WSG;Nord;saniert
+Kantine und Sozialgebäude;Erdgeschoss;WC Damen 6;KAS-106;KAS-F-0438;Kipp;Schüco;AvanTec;2009;1190;1890;ESG;Nordwest;in_bearbeitung
+Kantine und Sozialgebäude;1. Obergeschoss;Flur;KAS-201;KAS-F-0439;Dreh;Roto Frank;Roto NX;2014;1480;1780;2-fach WSG;Nord;abgeschlossen
+Kantine und Sozialgebäude;1. Obergeschoss;WC Herren 2;KAS-202;KAS-F-0440;Oberlicht;Roto Frank;Roto NX;2004;670;440;Ornamentglas;Südwest;abgeschlossen
+Kantine und Sozialgebäude;1. Obergeschoss;WC Herren 2;KAS-202;KAS-F-0441;Oberlicht;GU-BKS;UNI-JET;2016;800;500;2-fach VSG;Nordost;ausser_betrieb
+Kantine und Sozialgebäude;1. Obergeschoss;Kantine 3;KAS-203;KAS-F-0442;Oberlicht;Roto Frank;Roto NT;1999;830;500;3-fach WSG;Nord;in_bearbeitung
+Kantine und Sozialgebäude;1. Obergeschoss;Kantine 3;KAS-203;KAS-F-0443;Oberlicht;Schüco;AvanTec;2007;820;440;2-fach WSG;Nordost;abgeschlossen
+Kantine und Sozialgebäude;1. Obergeschoss;Kantine 3;KAS-203;KAS-F-0444;Schiebe;Roto Frank;Roto NX;2006;880;1030;3-fach WSG;Ost;nicht_begonnen
+Kantine und Sozialgebäude;1. Obergeschoss;Kantine 3;KAS-203;KAS-F-0445;Oberlicht;Roto Frank;Roto NX;2009;770;470;2-fach VSG;Nordwest;nicht_begonnen
+Kantine und Sozialgebäude;1. Obergeschoss;Kantine 3;KAS-203;KAS-F-0446;Schiebe;Schüco;AvanTec;2004;1150;2180;2-fach VSG;Nord;saniert
+Kantine und Sozialgebäude;1. Obergeschoss;Kantine 3;KAS-203;KAS-F-0447;Dreh;Roto Frank;Roto NX;2005;1480;1280;Ornamentglas;Süd;nicht_begonnen
+Kantine und Sozialgebäude;1. Obergeschoss;Kantine 3;KAS-203;KAS-F-0448;Kipp;Roto Frank;Roto NX;2010;1530;1490;2-fach VSG;Ost;nachpruefung
+Kantine und Sozialgebäude;1. Obergeschoss;Kantine 3;KAS-203;KAS-F-0449;Fest;Winkhaus;activPilot;2016;1970;1820;2-fach WSG;Ost;abgeschlossen
+Kantine und Sozialgebäude;1. Obergeschoss;Kantine 3;KAS-203;KAS-F-0450;Fest;Roto Frank;Roto NT;1999;1620;2070;ESG;Nordost;nicht_begonnen
+Kantine und Sozialgebäude;1. Obergeschoss;Kantine 3;KAS-203;KAS-F-0451;Kipp;Maco;Multi-Matic;2015;1240;1750;2-fach VSG;Ost;abgeschlossen
+Kantine und Sozialgebäude;1. Obergeschoss;Kantine 3;KAS-203;KAS-F-0452;Kipp;Roto Frank;Roto NX;2007;2000;1380;2-fach VSG;West;saniert
+Kantine und Sozialgebäude;1. Obergeschoss;Kantine 3;KAS-203;KAS-F-0453;Fest;Winkhaus;activPilot;2004;1550;1130;3-fach WSG;Süd;in_bearbeitung
+Kantine und Sozialgebäude;1. Obergeschoss;Teeküche 4;KAS-204;KAS-F-0448;Kipp;Maco;Multi-Matic;2014;1330;1590;ESG;Nord;austausch_empfohlen

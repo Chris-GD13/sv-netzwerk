@@ -1,6 +1,6 @@
 <?php
 /**
- * Benutzerverwaltungs-API – Fensterbeschlagsprüfung BMVg Bonn
+ * Benutzerverwaltungs-API – SV-Netzwerk Prüfportal
  *
  * Nur für Administratoren zugänglich.
  *
@@ -8,6 +8,7 @@
  * POST   /api/users.php              – Neuen Benutzer anlegen
  * PUT    /api/users.php?id={id}      – Benutzer aktualisieren (Name, Rolle, Status)
  * DELETE /api/users.php?id={id}      – Benutzer deaktivieren
+ * DELETE /api/users.php?action=permanent&id={id} – Benutzer endgültig löschen
  * POST   /api/users.php?action=set_password&id={id} – Passwort setzen
  */
 
@@ -31,6 +32,7 @@ match (true) {
     $method === 'POST' && $action === 'set_password' && $id       => handleSetPassword($id, $actor),
     $method === 'POST'                                             => handleCreate($actor),
     $method === 'PUT'  && $id !== null                            => handleUpdate($id, $actor),
+    $method === 'DELETE' && $action === 'permanent' && $id !== null => handleDeletePermanent($id, $actor),
     $method === 'DELETE' && $id !== null                          => handleDeactivate($id, $actor),
     default                                                        => apiError(404, 'Unbekannter Endpunkt.'),
 };
@@ -162,6 +164,32 @@ function handleDeactivate(int $id, array $actor): never
     }
 
     logAuditUser($id, $actor, 'benutzer_deaktiviert', '1', '0');
+
+    apiJson(['ok' => true]);
+}
+
+function handleDeletePermanent(int $id, array $actor): never
+{
+    if ($id === (int) $actor['id']) {
+        apiError(400, 'Sie können Ihr eigenes Konto nicht löschen.');
+    }
+
+    try {
+        // Setze Fenster-Zuweisungen auf NULL (kein Kaskaden-Löschen)
+        $upd = db()->prepare('UPDATE windows SET assigned_to = NULL WHERE assigned_to = :id');
+        $upd->execute([':id' => $id]);
+
+        $stmt = db()->prepare('DELETE FROM users WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+
+        if ($stmt->rowCount() === 0) {
+            apiError(404, 'Benutzer nicht gefunden.');
+        }
+    } catch (Throwable $e) {
+        apiError(503, 'Benutzer konnte nicht gelöscht werden: ' . $e->getMessage());
+    }
+
+    logAuditUser($id, $actor, 'benutzer_geloescht', 'vorhanden', 'geloescht');
 
     apiJson(['ok' => true]);
 }

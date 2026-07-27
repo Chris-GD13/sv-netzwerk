@@ -1,0 +1,46 @@
+﻿PRÜFBERICHT - Fensterbeschlagsprüfung
+=====================================
+
+Auftraggeber:    BMVg Dienstsitz Bonn
+Objekt:          Verwaltungsgebäude Süd (VGS)
+Prüfer:          Klaus Schmidt (öbuv SV)
+Datum:           12.05.2025
+Prüfnorm:        DIN EN 13126, DIN EN 1191
+
+ERGEBNISSE:
+
+Raum VGS-101 (Empfangshalle, EG):
+  Fenster VGS-F-001: Dreh-Kipp, 2-flügelig
+    Flügel 1: Beschlag Roto NT Designo, Bj. 1998
+              Funktion: eingeschränkt (schwergängig)
+              Verschleiß: Ecklager zeigt deutliche Abnutzung
+              MANGEL: Nachjustierung erforderlich
+              Dringlichkeit: mittel
+    Flügel 2: Beschlag Roto NT Designo, Bj. 1998
+              Funktion: in Ordnung
+              Dichtung: leichte Verhärtung
+              Empfehlung: Wartung in 12 Monaten
+
+  Fenster VGS-F-002: Festvergl., 1-flügelig
+    Keine Beschlagsprüfung erforderlich (Festverglasung)
+    Glas: ohne Beanstandung
+    Rahmen: Lack abgeplatzt (kosmetisch)
+
+Raum VGS-102 (Großraumbüro, EG):
+  Fenster VGS-F-003 bis VGS-F-006: Dreh-Kipp, je 1-flügelig
+    Alle: Siegenia Titan AF, Bj. 2005
+    VGS-F-003: ohne Beanstandung
+    VGS-F-004: ohne Beanstandung
+    VGS-F-005: MANGEL - Pilzkopfzapfen Nr. 3 fehlt
+              Sicherheitsrelevant! Sofortige Nachrüstung!
+              Dringlichkeit: HOCH
+    VGS-F-006: Dichtung unten defekt, Zugluft spürbar
+              Dringlichkeit: gering
+
+ZUSAMMENFASSUNG:
+  Geprüfte Fenster: 6
+  Ohne Beanstandung: 3
+  Mängel: 2 (davon 1 sicherheitsrelevant)
+  Empfehlung: 1
+
+Nächste Prüfung empfohlen: Mai 2026

@@ -1,0 +1,29 @@
+﻿RAUMLISTE
+=========
+Objekt: Technisches Zentrum (TZ)
+Stand: März 2025
+
+Untergeschoss (UG):
+  TZ-U01  Heizungsraum         (Technik)     - 1 Fenster (Kellerfenster)
+  TZ-U02  Elektroverteilung    (Technik)     - kein Fenster
+  TZ-U03  Lager Ersatzteile    (Lager)       - 1 Fenster
+  TZ-U04  Werkstatt Metall     (Werkstatt)   - 3 Fenster
+  TZ-U05  Lager Beschläge      (Lager)       - kein Fenster
+
+Erdgeschoss (EG):
+  TZ-E01  Empfang/Anmeldung    (Empfang)     - 2 Fenster (Panorama)
+  TZ-E02  Werkstatt Holz       (Werkstatt)   - 4 Fenster
+  TZ-E03  Werkstatt Kunststoff (Werkstatt)   - 4 Fenster
+  TZ-E04  Materialausgabe      (Lager)       - 2 Fenster
+  TZ-E05  Büro Werkstattleiter (Büro)        - 2 Fenster
+  TZ-E06  WC/Umkleide          (Sanitär)     - 2 Fenster (Milchglas)
+  TZ-E07  Flur                 (Verkehr)     - 1 Fenster (Oberlicht)
+
+1. Obergeschoss (1.OG):
+  TZ-101  Büro Technik 1       (Büro)        - 2 Fenster
+  TZ-102  Büro Technik 2       (Büro)        - 2 Fenster
+  TZ-103  Prüflabor            (Labor)       - 3 Fenster
+  TZ-104  Messraum             (Labor)       - 1 Fenster (verdunkelt)
+  TZ-105  Serverraum           (Technik)     - kein Fenster
+  TZ-106  Besprechung TZ       (Besprechung) - 3 Fenster
+  TZ-107  Teeküche             (Sozial)      - 1 Fenster

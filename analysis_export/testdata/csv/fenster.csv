@@ -1,0 +1,496 @@
+Fensternummer;Gebäude;Etage;Raum;Raumnummer;Status;Hersteller;Beschlagsystem;Baujahr;Breite_mm;Höhe_mm;Mangel;Dringend;Fortschritt;Bewertung
+F-0001;Verwaltungsgebäude Nord;Untergeschoss;Teeküche;VGN-001;nicht zugaenglich;Schüco;Schüco AvanTec;1985;1921;2183;Nein;Nein;0%;
+F-0002;Verwaltungsgebäude Nord;Untergeschoss;Teeküche;VGN-001;in Bearbeitung;Maco;Schüco AvanTec;1985;1598;1554;Nein;Nein;50%;
+F-0003;Verwaltungsgebäude Nord;Untergeschoss;Teeküche;VGN-001;nicht begonnen;Winkhaus;Roto NT;1992;2269;1663;Ja;Ja;0%;
+F-0004;Verwaltungsgebäude Nord;Untergeschoss;Teeküche;VGN-001;fachlich geprueft;GU (Gretsch-Unitas);GU UNI-JET;2000;1739;1103;Nein;Nein;100%;
+F-0005;Verwaltungsgebäude Nord;Untergeschoss;Besprechungsraum;VGN-002;nicht zugaenglich;Maco;Winkhaus activPilot;2015;1685;1431;Nein;Nein;0%;
+F-0006;Verwaltungsgebäude Nord;Untergeschoss;Besprechungsraum;VGN-002;nicht begonnen;Winkhaus;GU UNI-JET;2008;2026;1426;Nein;Nein;0%;
+F-0007;Verwaltungsgebäude Nord;Untergeschoss;Besprechungsraum;VGN-002;nicht begonnen;Roto Frank;Maco Multi-Matic;2012;1434;1885;Nein;Nein;0%;
+F-0008;Verwaltungsgebäude Nord;Untergeschoss;Besprechungsraum;VGN-002;nicht zugaenglich;GU (Gretsch-Unitas);Roto NX;2018;660;1470;Nein;Nein;0%;
+F-0009;Verwaltungsgebäude Nord;Untergeschoss;Büro;VGN-003;freigegeben;Winkhaus;GU UNI-JET;1995;1781;857;Nein;Nein;100%;Austausch empfohlen
+F-0010;Verwaltungsgebäude Nord;Untergeschoss;Büro;VGN-003;Spezialpruefung erforderlich;Winkhaus;Maco Multi-Matic;2000;1541;2031;Nein;Nein;0%;
+F-0011;Verwaltungsgebäude Nord;Untergeschoss;Büro;VGN-003;nicht zugaenglich;Winkhaus;Winkhaus activPilot;2005;1207;1114;Nein;Nein;0%;
+F-0012;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-004;nicht begonnen;Siegenia-Aubi;Roto NT;2018;716;1923;Nein;Nein;0%;
+F-0013;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-004;in Bearbeitung;Maco;GU UNI-JET;1995;852;1739;Nein;Nein;20%;
+F-0014;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-004;Pruefung abgeschlossen;Maco;Winkhaus activPilot;1998;1472;1223;Nein;Nein;100%;
+F-0015;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-004;in Bearbeitung;Siegenia-Aubi;Schüco AvanTec;1998;1592;2146;Nein;Nein;48%;
+F-0016;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-004;freigegeben;Siegenia-Aubi;Siegenia Titan AF;2003;1005;1583;Nein;Nein;100%;ohne Beanstandung
+F-0017;Verwaltungsgebäude Nord;Untergeschoss;Empfang;VGN-005;in Bearbeitung;Schüco;Siegenia Titan AF;2020;1038;1188;Nein;Nein;72%;
+F-0018;Verwaltungsgebäude Nord;Untergeschoss;Empfang;VGN-005;Pruefung abgeschlossen;Winkhaus;Schüco AvanTec;1990;910;2151;Nein;Nein;100%;Austausch empfohlen
+F-0019;Verwaltungsgebäude Nord;Untergeschoss;Empfang;VGN-005;in Bearbeitung;Siegenia-Aubi;Roto NT;2008;1233;2016;Nein;Nein;35%;
+F-0020;Verwaltungsgebäude Nord;Untergeschoss;Archiv;VGN-006;in Bearbeitung;Roto Frank;GU UNI-JET;2020;2317;1000;Nein;Nein;59%;
+F-0021;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-007;nicht begonnen;Weru;Siegenia Titan AF;1985;1438;1175;Nein;Nein;0%;
+F-0022;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-007;in Bearbeitung;Weru;Roto NT;1998;609;955;Nein;Nein;33%;
+F-0023;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-007;in Bearbeitung;Schüco;Roto NT;1985;2126;1978;Nein;Nein;62%;
+F-0024;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-007;nicht begonnen;Roto Frank;Winkhaus activPilot;2003;1125;1672;Nein;Nein;0%;
+F-0025;Verwaltungsgebäude Nord;Untergeschoss;Sanitär;VGN-008;fachlich geprueft;Siegenia-Aubi;Roto NX;2008;622;1831;Nein;Nein;100%;ohne Beanstandung
+F-0026;Verwaltungsgebäude Nord;Untergeschoss;Sanitär;VGN-008;nicht zugaenglich;Roto Frank;Winkhaus activPilot;1990;1721;1411;Nein;Nein;0%;
+F-0027;Verwaltungsgebäude Nord;Untergeschoss;Sanitär;VGN-008;in Bearbeitung;Winkhaus;Maco Multi-Matic;2015;2258;1381;Nein;Nein;22%;
+F-0028;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-009;in Bearbeitung;Schüco;GU UNI-JET;2000;1287;1364;Nein;Nein;69%;
+F-0029;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-009;nicht begonnen;Schüco;Schüco AvanTec;1992;1376;922;Nein;Nein;0%;
+F-0030;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-009;freigegeben;Schüco;Siegenia Titan AF;2012;1659;996;Nein;Nein;100%;ohne Beanstandung
+F-0031;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-009;nicht begonnen;Winkhaus;Schüco AvanTec;2010;1778;1923;Nein;Nein;0%;
+F-0032;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-009;Pruefung abgeschlossen;Siegenia-Aubi;Maco Multi-Matic;1990;1428;1540;Nein;Nein;100%;Austausch empfohlen
+F-0033;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-009;freigegeben;Weru;Siegenia Titan AF;2008;1867;1511;Nein;Nein;100%;ohne Beanstandung
+F-0034;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-009;Pruefung abgeschlossen;Weru;Siegenia Titan AF;2012;669;1055;Ja;Ja;100%;ohne Beanstandung
+F-0035;Verwaltungsgebäude Nord;Untergeschoss;Flur;VGN-009;Spezialpruefung erforderlich;Maco;Winkhaus activPilot;2018;2004;1803;Ja;Nein;0%;
+F-0036;Verwaltungsgebäude Nord;Untergeschoss;Lager;VGN-010;fachlich geprueft;Siegenia-Aubi;Maco Multi-Matic;1995;600;1077;Nein;Nein;100%;Austausch empfohlen
+F-0037;Verwaltungsgebäude Nord;Untergeschoss;Lager;VGN-011;freigegeben;GU (Gretsch-Unitas);Winkhaus activPilot;2008;720;2085;Nein;Nein;100%;ohne Beanstandung
+F-0038;Verwaltungsgebäude Nord;Erdgeschoss;Archiv;VGN-101;nicht zugaenglich;GU (Gretsch-Unitas);Siegenia Titan AF;2018;2173;1529;Nein;Nein;0%;
+F-0039;Verwaltungsgebäude Nord;Erdgeschoss;Archiv;VGN-101;nicht zugaenglich;Winkhaus;Maco Multi-Matic;2015;1773;2030;Nein;Nein;0%;
+F-0040;Verwaltungsgebäude Nord;Erdgeschoss;Archiv;VGN-101;freigegeben;GU (Gretsch-Unitas);Roto NX;1998;2199;1002;Nein;Nein;100%;Austausch empfohlen
+F-0041;Verwaltungsgebäude Nord;Erdgeschoss;Bibliothek;VGN-102;freigegeben;Schüco;Winkhaus activPilot;2008;1902;1898;Nein;Nein;100%;erheblicher Mangel
+F-0042;Verwaltungsgebäude Nord;Erdgeschoss;Bibliothek;VGN-102;Pruefung abgeschlossen;Maco;Schüco AvanTec;1990;2092;962;Ja;Nein;100%;Austausch empfohlen
+F-0043;Verwaltungsgebäude Nord;Erdgeschoss;Sanitär;VGN-103;Pruefung abgeschlossen;Schüco;Maco Multi-Matic;1985;2227;2187;Nein;Nein;100%;geringfügiger Mangel
+F-0044;Verwaltungsgebäude Nord;Erdgeschoss;Büro;VGN-104;in Bearbeitung;Weru;Siegenia Titan AF;2018;2321;1955;Nein;Nein;52%;
+F-0045;Verwaltungsgebäude Nord;Erdgeschoss;Büro;VGN-104;Spezialpruefung erforderlich;Roto Frank;Roto NT;2015;1529;1006;Nein;Nein;0%;
+F-0046;Verwaltungsgebäude Nord;Erdgeschoss;Büro;VGN-104;fachlich geprueft;Weru;Siegenia Titan AF;2008;1936;1084;Nein;Nein;100%;ohne Beanstandung
+F-0047;Verwaltungsgebäude Nord;Erdgeschoss;Druckerraum;VGN-105;Spezialpruefung erforderlich;Maco;Roto NT;2018;654;2043;Ja;Ja;0%;
+F-0048;Verwaltungsgebäude Nord;Erdgeschoss;Druckerraum;VGN-105;in Bearbeitung;Weru;Roto NT;1992;881;844;Ja;Nein;32%;
+F-0049;Verwaltungsgebäude Nord;Erdgeschoss;Sanitär;VGN-106;Spezialpruefung erforderlich;Siegenia-Aubi;Siegenia Titan AF;2008;930;2162;Nein;Nein;0%;
+F-0050;Verwaltungsgebäude Nord;Erdgeschoss;Sanitär;VGN-106;nicht zugaenglich;Roto Frank;GU UNI-JET;2018;2168;1711;Nein;Nein;0%;
+F-0051;Verwaltungsgebäude Nord;Erdgeschoss;Sanitär;VGN-106;fachlich geprueft;Roto Frank;Schüco AvanTec;2003;1450;1574;Nein;Nein;100%;erheblicher Mangel
+F-0052;Verwaltungsgebäude Nord;Erdgeschoss;Sanitär;VGN-107;fachlich geprueft;GU (Gretsch-Unitas);Maco Multi-Matic;1998;1647;1039;Nein;Nein;100%;Gefahr im Verzug
+F-0053;Verwaltungsgebäude Nord;Erdgeschoss;Bibliothek;VGN-108;nicht begonnen;Schüco;Siegenia Titan AF;1995;2002;1507;Nein;Nein;0%;
+F-0054;Verwaltungsgebäude Nord;Erdgeschoss;Bibliothek;VGN-108;nicht begonnen;Maco;GU UNI-JET;1992;2369;1478;Nein;Nein;0%;
+F-0055;Verwaltungsgebäude Nord;Erdgeschoss;Bibliothek;VGN-108;in Bearbeitung;Winkhaus;Winkhaus activPilot;2018;1571;1672;Nein;Nein;38%;
+F-0056;Verwaltungsgebäude Nord;1. Obergeschoss;Besprechungsraum;VGN-201;nicht zugaenglich;Siegenia-Aubi;Winkhaus activPilot;2020;1971;1131;Ja;Nein;0%;
+F-0057;Verwaltungsgebäude Nord;1. Obergeschoss;Büro;VGN-202;nicht begonnen;Roto Frank;Roto NX;2000;701;1022;Nein;Nein;0%;
+F-0058;Verwaltungsgebäude Nord;1. Obergeschoss;Büro;VGN-202;Pruefung abgeschlossen;Siegenia-Aubi;Winkhaus activPilot;1995;1437;1512;Nein;Nein;100%;erheblicher Mangel
+F-0059;Verwaltungsgebäude Nord;1. Obergeschoss;Büro;VGN-203;Spezialpruefung erforderlich;GU (Gretsch-Unitas);Siegenia Titan AF;2003;1391;1639;Nein;Nein;0%;
+F-0060;Verwaltungsgebäude Nord;1. Obergeschoss;Büro;VGN-203;nicht zugaenglich;Maco;Winkhaus activPilot;2012;1146;1293;Nein;Nein;0%;
+F-0061;Verwaltungsgebäude Nord;1. Obergeschoss;Büro;VGN-203;nicht begonnen;Schüco;Winkhaus activPilot;1985;991;1884;Nein;Nein;0%;
+F-0062;Verwaltungsgebäude Nord;1. Obergeschoss;Büro;VGN-203;Pruefung abgeschlossen;GU (Gretsch-Unitas);Roto NX;2018;2199;1122;Nein;Nein;100%;Austausch empfohlen
+F-0063;Verwaltungsgebäude Nord;1. Obergeschoss;Poststelle;VGN-204;freigegeben;Winkhaus;Roto NT;1998;1288;1430;Nein;Nein;100%;
+F-0064;Verwaltungsgebäude Nord;1. Obergeschoss;Poststelle;VGN-204;freigegeben;Roto Frank;Schüco AvanTec;2008;932;2015;Nein;Nein;100%;geringfügiger Mangel
+F-0065;Verwaltungsgebäude Nord;1. Obergeschoss;Poststelle;VGN-204;Spezialpruefung erforderlich;Schüco;Roto NT;2000;757;1248;Ja;Ja;0%;
+F-0066;Verwaltungsgebäude Nord;1. Obergeschoss;Poststelle;VGN-204;fachlich geprueft;Winkhaus;Siegenia Titan AF;2005;1305;876;Nein;Nein;100%;erheblicher Mangel
+F-0067;Verwaltungsgebäude Nord;1. Obergeschoss;Poststelle;VGN-205;fachlich geprueft;Siegenia-Aubi;Maco Multi-Matic;1992;2212;1989;Nein;Nein;100%;Gefahr im Verzug
+F-0068;Verwaltungsgebäude Nord;1. Obergeschoss;Poststelle;VGN-205;Pruefung abgeschlossen;Schüco;Roto NX;2010;1531;1389;Nein;Nein;100%;Gefahr im Verzug
+F-0069;Verwaltungsgebäude Nord;1. Obergeschoss;Archiv;VGN-206;fachlich geprueft;Winkhaus;Schüco AvanTec;2018;2230;1232;Nein;Nein;100%;
+F-0070;Verwaltungsgebäude Nord;1. Obergeschoss;Archiv;VGN-206;nicht zugaenglich;Roto Frank;Winkhaus activPilot;2012;1408;1597;Nein;Nein;0%;
+F-0071;Verwaltungsgebäude Nord;1. Obergeschoss;Archiv;VGN-206;nicht begonnen;Schüco;Siegenia Titan AF;1990;1472;1187;Nein;Nein;0%;
+F-0072;Verwaltungsgebäude Nord;1. Obergeschoss;Empfang;VGN-207;freigegeben;Weru;Schüco AvanTec;1995;1597;1293;Nein;Nein;100%;geringfügiger Mangel
+F-0073;Verwaltungsgebäude Nord;1. Obergeschoss;Empfang;VGN-207;freigegeben;Weru;Winkhaus activPilot;1992;2361;1041;Nein;Nein;100%;geringfügiger Mangel
+F-0074;Verwaltungsgebäude Nord;1. Obergeschoss;Empfang;VGN-207;fachlich geprueft;Weru;Roto NT;2020;1906;1087;Nein;Nein;100%;ohne Beanstandung
+F-0075;Verwaltungsgebäude Nord;1. Obergeschoss;Sanitär;VGN-208;freigegeben;Siegenia-Aubi;Schüco AvanTec;1995;1504;1928;Nein;Nein;100%;ohne Beanstandung
+F-0076;Verwaltungsgebäude Nord;1. Obergeschoss;Sanitär;VGN-208;Pruefung abgeschlossen;Maco;Winkhaus activPilot;1985;2350;839;Nein;Nein;100%;Gefahr im Verzug
+F-0077;Verwaltungsgebäude Nord;2. Obergeschoss;Bibliothek;VGN-301;in Bearbeitung;Maco;Winkhaus activPilot;2005;1609;1190;Nein;Nein;40%;
+F-0078;Verwaltungsgebäude Nord;2. Obergeschoss;Bibliothek;VGN-301;Spezialpruefung erforderlich;Winkhaus;Roto NX;2012;1875;1483;Nein;Nein;0%;
+F-0079;Verwaltungsgebäude Nord;2. Obergeschoss;Bibliothek;VGN-301;nicht zugaenglich;GU (Gretsch-Unitas);Maco Multi-Matic;1992;1290;1371;Nein;Nein;0%;
+F-0080;Verwaltungsgebäude Nord;2. Obergeschoss;Sanitär;VGN-302;Spezialpruefung erforderlich;GU (Gretsch-Unitas);GU UNI-JET;2000;1939;1913;Nein;Nein;0%;
+F-0081;Verwaltungsgebäude Nord;2. Obergeschoss;Sanitär;VGN-302;Spezialpruefung erforderlich;Maco;Roto NT;2005;1748;1497;Nein;Nein;0%;
+F-0082;Verwaltungsgebäude Nord;2. Obergeschoss;Sanitär;VGN-302;in Bearbeitung;Schüco;Maco Multi-Matic;1998;1433;1279;Ja;Nein;70%;
+F-0083;Verwaltungsgebäude Nord;2. Obergeschoss;Sanitär;VGN-302;Spezialpruefung erforderlich;Siegenia-Aubi;Siegenia Titan AF;1992;1357;1823;Nein;Nein;0%;
+F-0084;Verwaltungsgebäude Nord;2. Obergeschoss;Lager;VGN-303;fachlich geprueft;Weru;Maco Multi-Matic;2018;2011;1251;Nein;Nein;100%;geringfügiger Mangel
+F-0085;Verwaltungsgebäude Nord;2. Obergeschoss;Lager;VGN-304;fachlich geprueft;Winkhaus;Roto NX;2020;1272;1736;Ja;Nein;100%;erheblicher Mangel
+F-0086;Verwaltungsgebäude Nord;2. Obergeschoss;Lager;VGN-304;Spezialpruefung erforderlich;Siegenia-Aubi;Schüco AvanTec;1992;1602;1277;Nein;Nein;0%;
+F-0087;Verwaltungsgebäude Nord;2. Obergeschoss;Lager;VGN-304;fachlich geprueft;Siegenia-Aubi;Schüco AvanTec;2003;1337;1349;Ja;Ja;100%;Gefahr im Verzug
+F-0088;Verwaltungsgebäude Nord;2. Obergeschoss;Serverraum;VGN-305;in Bearbeitung;GU (Gretsch-Unitas);Roto NT;2008;809;1271;Nein;Nein;76%;
+F-0089;Verwaltungsgebäude Nord;2. Obergeschoss;Druckerraum;VGN-306;freigegeben;Roto Frank;Maco Multi-Matic;2005;947;1253;Nein;Nein;100%;erheblicher Mangel
+F-0090;Verwaltungsgebäude Nord;2. Obergeschoss;Poststelle;VGN-307;Spezialpruefung erforderlich;Winkhaus;Winkhaus activPilot;1992;950;845;Nein;Nein;0%;
+F-0091;Verwaltungsgebäude Nord;2. Obergeschoss;Poststelle;VGN-307;in Bearbeitung;Roto Frank;Roto NX;2008;2060;1279;Nein;Nein;37%;
+F-0092;Verwaltungsgebäude Nord;2. Obergeschoss;Poststelle;VGN-307;Spezialpruefung erforderlich;Weru;Roto NT;1992;704;1158;Nein;Nein;0%;
+F-0093;Verwaltungsgebäude Nord;2. Obergeschoss;Poststelle;VGN-307;Pruefung abgeschlossen;Schüco;GU UNI-JET;2018;1415;876;Nein;Nein;100%;
+F-0094;Verwaltungsgebäude Nord;2. Obergeschoss;Archiv;VGN-308;in Bearbeitung;Schüco;Siegenia Titan AF;2020;1528;1440;Nein;Nein;80%;
+F-0095;Verwaltungsgebäude Nord;2. Obergeschoss;Archiv;VGN-309;Pruefung abgeschlossen;GU (Gretsch-Unitas);Roto NX;2012;1432;934;Nein;Nein;100%;ohne Beanstandung
+F-0096;Verwaltungsgebäude Nord;2. Obergeschoss;Archiv;VGN-309;Spezialpruefung erforderlich;Maco;Winkhaus activPilot;2012;1770;989;Nein;Nein;0%;
+F-0097;Verwaltungsgebäude Nord;2. Obergeschoss;Archiv;VGN-309;nicht zugaenglich;Weru;Maco Multi-Matic;1992;1782;2073;Nein;Nein;0%;
+F-0098;Verwaltungsgebäude Nord;2. Obergeschoss;Serverraum;VGN-310;nicht zugaenglich;Weru;Winkhaus activPilot;2010;1960;1307;Nein;Nein;0%;
+F-0099;Verwaltungsgebäude Nord;2. Obergeschoss;Serverraum;VGN-311;freigegeben;Winkhaus;Siegenia Titan AF;2018;1604;1020;Nein;Nein;100%;ohne Beanstandung
+F-0100;Verwaltungsgebäude Nord;3. Obergeschoss;Besprechungsraum;VGN-401;Pruefung abgeschlossen;Maco;Siegenia Titan AF;1998;1657;1283;Nein;Nein;100%;ohne Beanstandung
+F-0101;Verwaltungsgebäude Nord;3. Obergeschoss;Besprechungsraum;VGN-401;fachlich geprueft;Weru;Roto NT;1990;1459;1311;Nein;Nein;100%;geringfügiger Mangel
+F-0102;Verwaltungsgebäude Nord;3. Obergeschoss;Besprechungsraum;VGN-401;Pruefung abgeschlossen;Schüco;Maco Multi-Matic;2000;899;2013;Nein;Nein;100%;ohne Beanstandung
+F-0103;Verwaltungsgebäude Nord;3. Obergeschoss;Teeküche;VGN-402;nicht zugaenglich;Maco;Winkhaus activPilot;1995;1594;1300;Nein;Nein;0%;
+F-0104;Verwaltungsgebäude Nord;3. Obergeschoss;Büro;VGN-403;in Bearbeitung;Roto Frank;Roto NT;2020;930;2140;Nein;Nein;70%;
+F-0105;Verwaltungsgebäude Nord;3. Obergeschoss;Empfang;VGN-404;Spezialpruefung erforderlich;Siegenia-Aubi;GU UNI-JET;2000;849;1102;Nein;Nein;0%;
+F-0106;Verwaltungsgebäude Nord;3. Obergeschoss;Empfang;VGN-404;Spezialpruefung erforderlich;Roto Frank;Maco Multi-Matic;2010;1547;2090;Nein;Nein;0%;
+F-0107;Verwaltungsgebäude Nord;3. Obergeschoss;Lager;VGN-405;fachlich geprueft;Siegenia-Aubi;GU UNI-JET;1995;2343;1002;Nein;Nein;100%;erheblicher Mangel
+F-0108;Verwaltungsgebäude Nord;3. Obergeschoss;Archiv;VGN-406;nicht begonnen;Weru;Maco Multi-Matic;1992;1454;1214;Nein;Nein;0%;
+F-0109;Verwaltungsgebäude Nord;3. Obergeschoss;Archiv;VGN-406;fachlich geprueft;Schüco;Roto NX;2003;1777;1620;Ja;Ja;100%;
+F-0110;Verwaltungsgebäude Nord;3. Obergeschoss;Bibliothek;VGN-407;Spezialpruefung erforderlich;Siegenia-Aubi;Roto NT;2003;1985;1637;Nein;Nein;0%;
+F-0111;Verwaltungsgebäude Nord;3. Obergeschoss;Bibliothek;VGN-407;freigegeben;GU (Gretsch-Unitas);Winkhaus activPilot;2005;2139;1886;Nein;Nein;100%;
+F-0112;Verwaltungsgebäude Süd;Untergeschoss;Empfang;VGS-001;Pruefung abgeschlossen;Maco;Maco Multi-Matic;1985;901;1917;Nein;Nein;100%;ohne Beanstandung
+F-0113;Verwaltungsgebäude Süd;Untergeschoss;Empfang;VGS-001;in Bearbeitung;Roto Frank;GU UNI-JET;2018;1778;2142;Nein;Nein;53%;
+F-0114;Verwaltungsgebäude Süd;Untergeschoss;Empfang;VGS-001;Pruefung abgeschlossen;Roto Frank;Maco Multi-Matic;2008;820;975;Nein;Nein;100%;geringfügiger Mangel
+F-0115;Verwaltungsgebäude Süd;Untergeschoss;Empfang;VGS-001;Pruefung abgeschlossen;Siegenia-Aubi;Maco Multi-Matic;2012;2084;870;Nein;Nein;100%;
+F-0116;Verwaltungsgebäude Süd;Untergeschoss;Teeküche;VGS-002;fachlich geprueft;Siegenia-Aubi;Roto NX;1998;1290;1331;Nein;Nein;100%;erheblicher Mangel
+F-0117;Verwaltungsgebäude Süd;Untergeschoss;Poststelle;VGS-003;fachlich geprueft;Winkhaus;Maco Multi-Matic;2003;1563;1685;Ja;Nein;100%;erheblicher Mangel
+F-0118;Verwaltungsgebäude Süd;Untergeschoss;Poststelle;VGS-003;nicht begonnen;Schüco;Roto NX;2015;2397;1158;Ja;Ja;0%;
+F-0119;Verwaltungsgebäude Süd;Untergeschoss;Poststelle;VGS-003;freigegeben;Roto Frank;Schüco AvanTec;1995;1539;2157;Ja;Nein;100%;erheblicher Mangel
+F-0120;Verwaltungsgebäude Süd;Untergeschoss;Poststelle;VGS-003;nicht begonnen;Weru;Roto NX;2005;1877;1041;Nein;Nein;0%;
+F-0121;Verwaltungsgebäude Süd;Untergeschoss;Bibliothek;VGS-004;Spezialpruefung erforderlich;Weru;Roto NT;2003;860;1174;Nein;Nein;0%;
+F-0122;Verwaltungsgebäude Süd;Untergeschoss;Bibliothek;VGS-004;Pruefung abgeschlossen;Winkhaus;Maco Multi-Matic;1995;1024;2017;Nein;Nein;100%;erheblicher Mangel
+F-0123;Verwaltungsgebäude Süd;Untergeschoss;Bibliothek;VGS-004;freigegeben;Siegenia-Aubi;Roto NT;2015;739;1886;Nein;Nein;100%;
+F-0124;Verwaltungsgebäude Süd;Untergeschoss;Druckerraum;VGS-005;nicht begonnen;Winkhaus;Maco Multi-Matic;2005;789;1332;Nein;Nein;0%;
+F-0125;Verwaltungsgebäude Süd;Untergeschoss;Druckerraum;VGS-005;Spezialpruefung erforderlich;Weru;Schüco AvanTec;2015;896;809;Nein;Nein;0%;
+F-0126;Verwaltungsgebäude Süd;Untergeschoss;Besprechungsraum;VGS-006;in Bearbeitung;Maco;Maco Multi-Matic;2010;1846;861;Nein;Nein;71%;
+F-0127;Verwaltungsgebäude Süd;Untergeschoss;Besprechungsraum;VGS-006;nicht begonnen;Weru;Schüco AvanTec;1985;1345;1496;Ja;Nein;0%;
+F-0128;Verwaltungsgebäude Süd;Untergeschoss;Büro;VGS-007;freigegeben;Maco;Roto NT;2000;2070;1387;Nein;Nein;100%;
+F-0129;Verwaltungsgebäude Süd;Untergeschoss;Archiv;VGS-008;nicht zugaenglich;Weru;Maco Multi-Matic;1990;1852;868;Nein;Nein;0%;
+F-0130;Verwaltungsgebäude Süd;Untergeschoss;Archiv;VGS-008;nicht begonnen;Weru;Siegenia Titan AF;2000;2243;868;Nein;Nein;0%;
+F-0131;Verwaltungsgebäude Süd;Untergeschoss;Archiv;VGS-008;Spezialpruefung erforderlich;Maco;Siegenia Titan AF;2008;2273;1083;Nein;Nein;0%;
+F-0132;Verwaltungsgebäude Süd;Untergeschoss;Empfang;VGS-009;freigegeben;GU (Gretsch-Unitas);Winkhaus activPilot;2020;1944;1638;Nein;Nein;100%;Austausch empfohlen
+F-0133;Verwaltungsgebäude Süd;Untergeschoss;Büro;VGS-010;Spezialpruefung erforderlich;Maco;Winkhaus activPilot;1985;1141;1684;Nein;Nein;0%;
+F-0134;Verwaltungsgebäude Süd;Untergeschoss;Büro;VGS-010;Spezialpruefung erforderlich;Winkhaus;Maco Multi-Matic;2000;614;1928;Nein;Nein;0%;
+F-0135;Verwaltungsgebäude Süd;Untergeschoss;Büro;VGS-010;Spezialpruefung erforderlich;Roto Frank;Roto NT;2012;2133;1755;Nein;Nein;0%;
+F-0136;Verwaltungsgebäude Süd;Untergeschoss;Flur;VGS-011;nicht zugaenglich;Siegenia-Aubi;Roto NT;1998;1481;1936;Nein;Nein;0%;
+F-0137;Verwaltungsgebäude Süd;Untergeschoss;Flur;VGS-011;in Bearbeitung;Winkhaus;Siegenia Titan AF;2018;1153;2162;Nein;Nein;66%;
+F-0138;Verwaltungsgebäude Süd;Untergeschoss;Flur;VGS-011;Spezialpruefung erforderlich;Schüco;Maco Multi-Matic;1985;1280;890;Nein;Nein;0%;
+F-0139;Verwaltungsgebäude Süd;Untergeschoss;Büro;VGS-012;Spezialpruefung erforderlich;Siegenia-Aubi;Roto NX;1990;1856;1238;Nein;Nein;0%;
+F-0140;Verwaltungsgebäude Süd;Untergeschoss;Büro;VGS-012;in Bearbeitung;Siegenia-Aubi;GU UNI-JET;2015;877;1851;Nein;Nein;25%;
+F-0141;Verwaltungsgebäude Süd;Erdgeschoss;Teeküche;VGS-101;freigegeben;GU (Gretsch-Unitas);Roto NX;2008;2196;1528;Nein;Nein;100%;erheblicher Mangel
+F-0142;Verwaltungsgebäude Süd;Erdgeschoss;Teeküche;VGS-101;freigegeben;Weru;Roto NT;1990;1506;1932;Nein;Nein;100%;geringfügiger Mangel
+F-0143;Verwaltungsgebäude Süd;Erdgeschoss;Teeküche;VGS-101;Spezialpruefung erforderlich;Winkhaus;Roto NX;1992;1695;1061;Nein;Nein;0%;
+F-0144;Verwaltungsgebäude Süd;Erdgeschoss;Teeküche;VGS-101;nicht begonnen;GU (Gretsch-Unitas);Roto NT;1985;1726;864;Nein;Nein;0%;
+F-0145;Verwaltungsgebäude Süd;Erdgeschoss;Serverraum;VGS-102;fachlich geprueft;Maco;Siegenia Titan AF;1995;2177;1339;Nein;Nein;100%;geringfügiger Mangel
+F-0146;Verwaltungsgebäude Süd;Erdgeschoss;Flur;VGS-104;in Bearbeitung;Roto Frank;Roto NX;2003;1206;1056;Nein;Nein;48%;
+F-0147;Verwaltungsgebäude Süd;Erdgeschoss;Flur;VGS-104;Spezialpruefung erforderlich;Weru;Maco Multi-Matic;2008;967;1676;Nein;Nein;0%;
+F-0148;Verwaltungsgebäude Süd;Erdgeschoss;Flur;VGS-104;fachlich geprueft;Siegenia-Aubi;Roto NX;2005;831;802;Nein;Nein;100%;ohne Beanstandung
+F-0149;Verwaltungsgebäude Süd;Erdgeschoss;Flur;VGS-104;nicht zugaenglich;Maco;Schüco AvanTec;2008;705;1905;Ja;Nein;0%;
+F-0150;Verwaltungsgebäude Süd;Erdgeschoss;Flur;VGS-104;fachlich geprueft;GU (Gretsch-Unitas);Roto NX;2008;1978;1656;Nein;Nein;100%;Gefahr im Verzug
+F-0151;Verwaltungsgebäude Süd;Erdgeschoss;Flur;VGS-104;Spezialpruefung erforderlich;Roto Frank;Siegenia Titan AF;2010;1984;1700;Nein;Nein;0%;
+F-0152;Verwaltungsgebäude Süd;Erdgeschoss;Flur;VGS-104;Pruefung abgeschlossen;Roto Frank;Siegenia Titan AF;2020;1302;1312;Nein;Nein;100%;geringfügiger Mangel
+F-0153;Verwaltungsgebäude Süd;Erdgeschoss;Flur;VGS-104;in Bearbeitung;GU (Gretsch-Unitas);Roto NT;1998;1676;1334;Nein;Nein;68%;
+F-0154;Verwaltungsgebäude Süd;Erdgeschoss;Sanitär;VGS-105;nicht begonnen;Weru;GU UNI-JET;2000;1599;1421;Nein;Nein;0%;
+F-0155;Verwaltungsgebäude Süd;Erdgeschoss;Sanitär;VGS-105;Pruefung abgeschlossen;Schüco;Schüco AvanTec;2020;1017;1768;Nein;Nein;100%;erheblicher Mangel
+F-0156;Verwaltungsgebäude Süd;Erdgeschoss;Besprechungsraum;VGS-107;nicht zugaenglich;Maco;Maco Multi-Matic;2012;1423;959;Nein;Nein;0%;
+F-0157;Verwaltungsgebäude Süd;Erdgeschoss;Sanitär;VGS-109;nicht begonnen;Weru;Winkhaus activPilot;1985;1738;890;Nein;Nein;0%;
+F-0158;Verwaltungsgebäude Süd;Erdgeschoss;Lager;VGS-110;freigegeben;Weru;Roto NT;1995;2006;1357;Nein;Nein;100%;erheblicher Mangel
+F-0159;Verwaltungsgebäude Süd;Erdgeschoss;Lager;VGS-110;in Bearbeitung;Winkhaus;Maco Multi-Matic;1990;2140;1457;Ja;Nein;21%;
+F-0160;Verwaltungsgebäude Süd;Erdgeschoss;Druckerraum;VGS-111;nicht begonnen;GU (Gretsch-Unitas);GU UNI-JET;1985;982;885;Nein;Nein;0%;
+F-0161;Verwaltungsgebäude Süd;Erdgeschoss;Druckerraum;VGS-111;freigegeben;GU (Gretsch-Unitas);Schüco AvanTec;1985;1573;1235;Nein;Nein;100%;ohne Beanstandung
+F-0162;Verwaltungsgebäude Süd;Erdgeschoss;Druckerraum;VGS-111;freigegeben;GU (Gretsch-Unitas);Schüco AvanTec;2018;776;1969;Nein;Nein;100%;Gefahr im Verzug
+F-0163;Verwaltungsgebäude Süd;1. Obergeschoss;Sanitär;VGS-201;nicht zugaenglich;GU (Gretsch-Unitas);Winkhaus activPilot;2015;940;859;Nein;Nein;0%;
+F-0164;Verwaltungsgebäude Süd;1. Obergeschoss;Sanitär;VGS-201;Spezialpruefung erforderlich;Roto Frank;Winkhaus activPilot;1990;2374;1456;Ja;Nein;0%;
+F-0165;Verwaltungsgebäude Süd;1. Obergeschoss;Sanitär;VGS-201;fachlich geprueft;Maco;Winkhaus activPilot;1985;1315;1309;Ja;Nein;100%;Gefahr im Verzug
+F-0166;Verwaltungsgebäude Süd;1. Obergeschoss;Sanitär;VGS-201;in Bearbeitung;Maco;Winkhaus activPilot;2018;1076;1530;Ja;Ja;31%;
+F-0167;Verwaltungsgebäude Süd;1. Obergeschoss;Poststelle;VGS-202;fachlich geprueft;Maco;GU UNI-JET;2015;963;2020;Nein;Nein;100%;Gefahr im Verzug
+F-0168;Verwaltungsgebäude Süd;1. Obergeschoss;Poststelle;VGS-202;Spezialpruefung erforderlich;Winkhaus;Roto NX;2020;1038;2016;Nein;Nein;0%;
+F-0169;Verwaltungsgebäude Süd;1. Obergeschoss;Poststelle;VGS-202;freigegeben;Weru;Maco Multi-Matic;1992;744;1682;Nein;Nein;100%;erheblicher Mangel
+F-0170;Verwaltungsgebäude Süd;1. Obergeschoss;Poststelle;VGS-202;in Bearbeitung;Winkhaus;Maco Multi-Matic;2020;772;1730;Nein;Nein;36%;
+F-0171;Verwaltungsgebäude Süd;1. Obergeschoss;Serverraum;VGS-203;Pruefung abgeschlossen;Winkhaus;Schüco AvanTec;2015;1852;1800;Nein;Nein;100%;geringfügiger Mangel
+F-0172;Verwaltungsgebäude Süd;1. Obergeschoss;Empfang;VGS-204;nicht begonnen;Schüco;Maco Multi-Matic;1992;1251;1087;Nein;Nein;0%;
+F-0173;Verwaltungsgebäude Süd;1. Obergeschoss;Empfang;VGS-204;freigegeben;Siegenia-Aubi;GU UNI-JET;2010;1521;2198;Nein;Nein;100%;
+F-0174;Verwaltungsgebäude Süd;1. Obergeschoss;Empfang;VGS-204;Pruefung abgeschlossen;Siegenia-Aubi;Winkhaus activPilot;2018;2038;1036;Nein;Nein;100%;Austausch empfohlen
+F-0175;Verwaltungsgebäude Süd;1. Obergeschoss;Empfang;VGS-204;freigegeben;Schüco;Schüco AvanTec;1992;2276;2145;Nein;Nein;100%;
+F-0176;Verwaltungsgebäude Süd;1. Obergeschoss;Archiv;VGS-205;nicht begonnen;GU (Gretsch-Unitas);GU UNI-JET;1995;2113;2093;Nein;Nein;0%;
+F-0177;Verwaltungsgebäude Süd;1. Obergeschoss;Sanitär;VGS-206;in Bearbeitung;Schüco;Winkhaus activPilot;2000;1602;1877;Nein;Nein;55%;
+F-0178;Verwaltungsgebäude Süd;1. Obergeschoss;Druckerraum;VGS-207;freigegeben;Winkhaus;Winkhaus activPilot;1995;2284;1151;Nein;Nein;100%;Gefahr im Verzug
+F-0179;Verwaltungsgebäude Süd;1. Obergeschoss;Lager;VGS-208;nicht zugaenglich;Roto Frank;Schüco AvanTec;1990;1033;1318;Nein;Nein;0%;
+F-0180;Verwaltungsgebäude Süd;1. Obergeschoss;Lager;VGS-208;freigegeben;Winkhaus;Roto NT;2003;602;1589;Ja;Ja;100%;geringfügiger Mangel
+F-0181;Verwaltungsgebäude Süd;1. Obergeschoss;Besprechungsraum;VGS-209;Spezialpruefung erforderlich;Siegenia-Aubi;Winkhaus activPilot;1990;1216;1510;Nein;Nein;0%;
+F-0182;Verwaltungsgebäude Süd;1. Obergeschoss;Besprechungsraum;VGS-209;in Bearbeitung;Maco;Winkhaus activPilot;2003;845;1357;Nein;Nein;41%;
+F-0183;Verwaltungsgebäude Süd;1. Obergeschoss;Lager;VGS-211;nicht begonnen;Schüco;Maco Multi-Matic;2000;2127;1580;Nein;Nein;0%;
+F-0184;Verwaltungsgebäude Süd;1. Obergeschoss;Lager;VGS-211;nicht begonnen;Maco;Maco Multi-Matic;2012;1303;1582;Nein;Nein;0%;
+F-0185;Verwaltungsgebäude Süd;1. Obergeschoss;Archiv;VGS-212;nicht begonnen;Roto Frank;Maco Multi-Matic;1985;1872;1487;Nein;Nein;0%;
+F-0186;Verwaltungsgebäude Süd;1. Obergeschoss;Archiv;VGS-212;Spezialpruefung erforderlich;Schüco;Maco Multi-Matic;2015;1983;1862;Nein;Nein;0%;
+F-0187;Verwaltungsgebäude Süd;2. Obergeschoss;Büro;VGS-301;freigegeben;GU (Gretsch-Unitas);Winkhaus activPilot;1992;1015;1365;Nein;Nein;100%;Gefahr im Verzug
+F-0188;Verwaltungsgebäude Süd;2. Obergeschoss;Büro;VGS-301;Pruefung abgeschlossen;Winkhaus;Siegenia Titan AF;2003;2094;1471;Nein;Nein;100%;erheblicher Mangel
+F-0189;Verwaltungsgebäude Süd;2. Obergeschoss;Teeküche;VGS-302;freigegeben;Roto Frank;Siegenia Titan AF;1990;1013;2044;Nein;Nein;100%;ohne Beanstandung
+F-0190;Verwaltungsgebäude Süd;2. Obergeschoss;Teeküche;VGS-302;freigegeben;Schüco;Siegenia Titan AF;1990;2116;1510;Nein;Nein;100%;
+F-0191;Verwaltungsgebäude Süd;2. Obergeschoss;Teeküche;VGS-302;nicht zugaenglich;Weru;Schüco AvanTec;2018;979;1805;Nein;Nein;0%;
+F-0192;Verwaltungsgebäude Süd;2. Obergeschoss;Flur;VGS-303;nicht zugaenglich;Schüco;GU UNI-JET;1998;1576;1396;Nein;Nein;0%;
+F-0193;Verwaltungsgebäude Süd;2. Obergeschoss;Flur;VGS-303;Spezialpruefung erforderlich;GU (Gretsch-Unitas);Roto NT;2018;1797;1326;Nein;Nein;0%;
+F-0194;Verwaltungsgebäude Süd;2. Obergeschoss;Flur;VGS-303;in Bearbeitung;Weru;Roto NX;2015;1621;1135;Nein;Nein;73%;
+F-0195;Verwaltungsgebäude Süd;2. Obergeschoss;Flur;VGS-303;freigegeben;Schüco;Roto NX;2000;1606;1903;Nein;Nein;100%;Austausch empfohlen
+F-0196;Verwaltungsgebäude Süd;2. Obergeschoss;Flur;VGS-303;freigegeben;Roto Frank;Winkhaus activPilot;2015;2393;879;Ja;Nein;100%;Gefahr im Verzug
+F-0197;Verwaltungsgebäude Süd;2. Obergeschoss;Flur;VGS-303;nicht zugaenglich;Maco;Maco Multi-Matic;1992;2313;2109;Nein;Nein;0%;
+F-0198;Verwaltungsgebäude Süd;2. Obergeschoss;Serverraum;VGS-304;fachlich geprueft;Winkhaus;Siegenia Titan AF;1998;1598;1656;Ja;Nein;100%;geringfügiger Mangel
+F-0199;Verwaltungsgebäude Süd;2. Obergeschoss;Archiv;VGS-305;Spezialpruefung erforderlich;Weru;Roto NX;2005;1540;1217;Nein;Nein;0%;
+F-0200;Verwaltungsgebäude Süd;2. Obergeschoss;Archiv;VGS-305;nicht begonnen;GU (Gretsch-Unitas);Winkhaus activPilot;2008;2009;1206;Nein;Nein;0%;
+F-0201;Verwaltungsgebäude Süd;2. Obergeschoss;Archiv;VGS-305;nicht zugaenglich;Weru;Roto NX;2012;1817;1253;Nein;Nein;0%;
+F-0202;Verwaltungsgebäude Süd;2. Obergeschoss;Archiv;VGS-305;nicht begonnen;Siegenia-Aubi;GU UNI-JET;2010;1970;1263;Nein;Nein;0%;
+F-0203;Verwaltungsgebäude Süd;2. Obergeschoss;Poststelle;VGS-306;freigegeben;Schüco;Maco Multi-Matic;2012;1195;866;Nein;Nein;100%;geringfügiger Mangel
+F-0204;Verwaltungsgebäude Süd;2. Obergeschoss;Archiv;VGS-307;in Bearbeitung;Winkhaus;GU UNI-JET;1985;2038;1989;Nein;Nein;67%;
+F-0205;Verwaltungsgebäude Süd;2. Obergeschoss;Bibliothek;VGS-308;freigegeben;Roto Frank;Roto NT;2010;2046;1535;Nein;Nein;100%;Austausch empfohlen
+F-0206;Verwaltungsgebäude Süd;2. Obergeschoss;Bibliothek;VGS-308;nicht begonnen;GU (Gretsch-Unitas);Siegenia Titan AF;2010;1545;1543;Nein;Nein;0%;
+F-0207;Verwaltungsgebäude Süd;2. Obergeschoss;Lager;VGS-309;nicht begonnen;Schüco;GU UNI-JET;2015;1288;864;Ja;Nein;0%;
+F-0208;Verwaltungsgebäude Süd;2. Obergeschoss;Lager;VGS-309;nicht zugaenglich;Siegenia-Aubi;Roto NT;2008;890;2112;Nein;Nein;0%;
+F-0209;Verwaltungsgebäude Süd;2. Obergeschoss;Lager;VGS-309;freigegeben;Roto Frank;GU UNI-JET;1990;1738;1614;Ja;Nein;100%;erheblicher Mangel
+F-0210;Verwaltungsgebäude Süd;2. Obergeschoss;Lager;VGS-309;Pruefung abgeschlossen;Siegenia-Aubi;Siegenia Titan AF;2003;1695;1614;Ja;Nein;100%;Austausch empfohlen
+F-0211;Verwaltungsgebäude Süd;2. Obergeschoss;Archiv;VGS-310;fachlich geprueft;Schüco;Schüco AvanTec;2010;1887;1451;Nein;Nein;100%;Gefahr im Verzug
+F-0212;Verwaltungsgebäude Süd;2. Obergeschoss;Archiv;VGS-310;fachlich geprueft;Roto Frank;Roto NT;1992;1453;1717;Nein;Nein;100%;ohne Beanstandung
+F-0213;Konferenzzentrum;Untergeschoss;Empfang;KON-001;in Bearbeitung;Siegenia-Aubi;Roto NT;1995;660;855;Nein;Nein;68%;
+F-0214;Konferenzzentrum;Untergeschoss;Empfang;KON-001;Pruefung abgeschlossen;Maco;GU UNI-JET;2010;1987;1566;Nein;Nein;100%;Gefahr im Verzug
+F-0215;Konferenzzentrum;Untergeschoss;Büro;KON-002;in Bearbeitung;Roto Frank;Roto NX;2008;2289;2180;Nein;Nein;53%;
+F-0216;Konferenzzentrum;Untergeschoss;Büro;KON-002;nicht begonnen;Roto Frank;Roto NX;2018;859;996;Nein;Nein;0%;
+F-0217;Konferenzzentrum;Untergeschoss;Büro;KON-002;fachlich geprueft;GU (Gretsch-Unitas);Siegenia Titan AF;1998;1196;1966;Nein;Nein;100%;ohne Beanstandung
+F-0218;Konferenzzentrum;Untergeschoss;Büro;KON-002;fachlich geprueft;Weru;Winkhaus activPilot;2012;978;1054;Nein;Nein;100%;
+F-0219;Konferenzzentrum;Untergeschoss;Archiv;KON-003;nicht begonnen;Siegenia-Aubi;Schüco AvanTec;2020;1322;1236;Nein;Nein;0%;
+F-0220;Konferenzzentrum;Untergeschoss;Archiv;KON-003;Pruefung abgeschlossen;Roto Frank;Roto NX;2012;2031;1162;Nein;Nein;100%;ohne Beanstandung
+F-0221;Konferenzzentrum;Untergeschoss;Archiv;KON-003;nicht zugaenglich;Siegenia-Aubi;Roto NT;1998;1023;1258;Nein;Nein;0%;
+F-0222;Konferenzzentrum;Untergeschoss;Flur;KON-004;in Bearbeitung;Siegenia-Aubi;Schüco AvanTec;2008;2110;1138;Nein;Nein;54%;
+F-0223;Konferenzzentrum;Untergeschoss;Flur;KON-004;Pruefung abgeschlossen;Siegenia-Aubi;Roto NX;2018;2054;2136;Ja;Nein;100%;Gefahr im Verzug
+F-0224;Konferenzzentrum;Untergeschoss;Flur;KON-004;in Bearbeitung;Roto Frank;Roto NX;2015;2383;881;Ja;Nein;33%;
+F-0225;Konferenzzentrum;Untergeschoss;Flur;KON-004;Spezialpruefung erforderlich;Maco;Winkhaus activPilot;1990;1103;2151;Nein;Nein;0%;
+F-0226;Konferenzzentrum;Untergeschoss;Flur;KON-004;Spezialpruefung erforderlich;Winkhaus;Siegenia Titan AF;2010;1081;1658;Nein;Nein;0%;
+F-0227;Konferenzzentrum;Untergeschoss;Flur;KON-004;freigegeben;Siegenia-Aubi;Roto NT;2005;2038;1266;Nein;Nein;100%;Gefahr im Verzug
+F-0228;Konferenzzentrum;Untergeschoss;Flur;KON-004;freigegeben;Weru;Roto NT;2010;1119;1340;Nein;Nein;100%;geringfügiger Mangel
+F-0229;Konferenzzentrum;Untergeschoss;Bibliothek;KON-005;Pruefung abgeschlossen;Weru;Winkhaus activPilot;2000;735;1748;Ja;Nein;100%;ohne Beanstandung
+F-0230;Konferenzzentrum;Untergeschoss;Bibliothek;KON-005;nicht begonnen;Siegenia-Aubi;GU UNI-JET;2012;1785;1680;Nein;Nein;0%;
+F-0231;Konferenzzentrum;Untergeschoss;Bibliothek;KON-005;nicht begonnen;Weru;Siegenia Titan AF;1990;784;1714;Nein;Nein;0%;
+F-0232;Konferenzzentrum;Untergeschoss;Druckerraum;KON-006;Spezialpruefung erforderlich;GU (Gretsch-Unitas);Maco Multi-Matic;2003;623;980;Nein;Nein;0%;
+F-0233;Konferenzzentrum;Untergeschoss;Druckerraum;KON-006;freigegeben;Weru;Siegenia Titan AF;2015;723;2053;Nein;Nein;100%;
+F-0234;Konferenzzentrum;Erdgeschoss;Besprechungsraum;KON-101;nicht begonnen;Maco;Roto NT;2008;1027;1135;Nein;Nein;0%;
+F-0235;Konferenzzentrum;Erdgeschoss;Besprechungsraum;KON-101;nicht begonnen;Schüco;Schüco AvanTec;1985;1483;1852;Nein;Nein;0%;
+F-0236;Konferenzzentrum;Erdgeschoss;Flur;KON-102;Pruefung abgeschlossen;Siegenia-Aubi;Schüco AvanTec;1998;708;1645;Nein;Nein;100%;erheblicher Mangel
+F-0237;Konferenzzentrum;Erdgeschoss;Flur;KON-102;nicht begonnen;Siegenia-Aubi;Roto NX;1985;2031;1822;Nein;Nein;0%;
+F-0238;Konferenzzentrum;Erdgeschoss;Flur;KON-102;in Bearbeitung;Weru;Roto NX;1992;736;1145;Nein;Nein;26%;
+F-0239;Konferenzzentrum;Erdgeschoss;Flur;KON-102;fachlich geprueft;Maco;Winkhaus activPilot;2005;2308;1697;Ja;Nein;100%;geringfügiger Mangel
+F-0240;Konferenzzentrum;Erdgeschoss;Flur;KON-102;Spezialpruefung erforderlich;Winkhaus;GU UNI-JET;1990;913;1868;Nein;Nein;0%;
+F-0241;Konferenzzentrum;Erdgeschoss;Flur;KON-103;freigegeben;GU (Gretsch-Unitas);GU UNI-JET;2008;1645;1031;Ja;Nein;100%;
+F-0242;Konferenzzentrum;Erdgeschoss;Flur;KON-103;fachlich geprueft;Schüco;GU UNI-JET;2015;1286;802;Nein;Nein;100%;
+F-0243;Konferenzzentrum;Erdgeschoss;Flur;KON-103;in Bearbeitung;Roto Frank;Roto NX;2010;1907;1243;Nein;Nein;25%;
+F-0244;Konferenzzentrum;Erdgeschoss;Flur;KON-103;in Bearbeitung;Weru;Siegenia Titan AF;2008;1298;1076;Ja;Ja;71%;
+F-0245;Konferenzzentrum;Erdgeschoss;Flur;KON-103;nicht begonnen;GU (Gretsch-Unitas);GU UNI-JET;2005;885;1112;Nein;Nein;0%;
+F-0246;Konferenzzentrum;Erdgeschoss;Flur;KON-103;nicht zugaenglich;Maco;Maco Multi-Matic;2020;884;1110;Ja;Nein;0%;
+F-0247;Konferenzzentrum;Erdgeschoss;Flur;KON-103;freigegeben;Maco;Siegenia Titan AF;2012;1839;1934;Nein;Nein;100%;geringfügiger Mangel
+F-0248;Konferenzzentrum;Erdgeschoss;Flur;KON-103;in Bearbeitung;Maco;Roto NT;2008;2264;968;Nein;Nein;69%;
+F-0249;Konferenzzentrum;Erdgeschoss;Lager;KON-104;Spezialpruefung erforderlich;Schüco;GU UNI-JET;1998;1898;1006;Nein;Nein;0%;
+F-0250;Konferenzzentrum;Erdgeschoss;Lager;KON-104;in Bearbeitung;Winkhaus;Winkhaus activPilot;2015;1134;1599;Nein;Nein;32%;
+F-0251;Konferenzzentrum;Erdgeschoss;Lager;KON-104;fachlich geprueft;GU (Gretsch-Unitas);Schüco AvanTec;2020;703;1683;Nein;Nein;100%;Gefahr im Verzug
+F-0252;Konferenzzentrum;Erdgeschoss;Archiv;KON-105;nicht begonnen;Roto Frank;Maco Multi-Matic;2003;2313;888;Ja;Ja;0%;
+F-0253;Konferenzzentrum;Erdgeschoss;Archiv;KON-105;Spezialpruefung erforderlich;Schüco;Maco Multi-Matic;1985;1492;1130;Nein;Nein;0%;
+F-0254;Konferenzzentrum;Erdgeschoss;Archiv;KON-105;in Bearbeitung;Maco;Winkhaus activPilot;2010;1841;2189;Nein;Nein;70%;
+F-0255;Konferenzzentrum;Erdgeschoss;Archiv;KON-105;nicht zugaenglich;Roto Frank;Maco Multi-Matic;2000;2172;862;Nein;Nein;0%;
+F-0256;Konferenzzentrum;Erdgeschoss;Teeküche;KON-106;freigegeben;GU (Gretsch-Unitas);Roto NT;2003;689;1504;Ja;Ja;100%;Gefahr im Verzug
+F-0257;Konferenzzentrum;Erdgeschoss;Teeküche;KON-106;fachlich geprueft;GU (Gretsch-Unitas);Winkhaus activPilot;2000;1306;1445;Nein;Nein;100%;ohne Beanstandung
+F-0258;Konferenzzentrum;Erdgeschoss;Teeküche;KON-106;fachlich geprueft;Roto Frank;Roto NX;2020;851;1052;Nein;Nein;100%;
+F-0259;Konferenzzentrum;Erdgeschoss;Besprechungsraum;KON-107;freigegeben;Schüco;Roto NT;2000;1765;1998;Nein;Nein;100%;
+F-0260;Konferenzzentrum;Erdgeschoss;Besprechungsraum;KON-107;nicht begonnen;Roto Frank;Winkhaus activPilot;2015;1985;1751;Nein;Nein;0%;
+F-0261;Konferenzzentrum;Erdgeschoss;Besprechungsraum;KON-107;fachlich geprueft;GU (Gretsch-Unitas);Winkhaus activPilot;2010;1950;1913;Nein;Nein;100%;erheblicher Mangel
+F-0262;Konferenzzentrum;Erdgeschoss;Besprechungsraum;KON-108;freigegeben;Winkhaus;GU UNI-JET;2003;993;1473;Ja;Ja;100%;ohne Beanstandung
+F-0263;Konferenzzentrum;Erdgeschoss;Besprechungsraum;KON-108;freigegeben;GU (Gretsch-Unitas);Schüco AvanTec;2020;1467;1487;Nein;Nein;100%;geringfügiger Mangel
+F-0264;Konferenzzentrum;Erdgeschoss;Besprechungsraum;KON-108;freigegeben;Weru;Maco Multi-Matic;2008;1568;1843;Nein;Nein;100%;ohne Beanstandung
+F-0265;Konferenzzentrum;Erdgeschoss;Empfang;KON-109;fachlich geprueft;Maco;Maco Multi-Matic;2008;2348;1615;Nein;Nein;100%;geringfügiger Mangel
+F-0266;Konferenzzentrum;Erdgeschoss;Empfang;KON-109;nicht begonnen;Winkhaus;GU UNI-JET;1998;1830;1519;Nein;Nein;0%;
+F-0267;Konferenzzentrum;Erdgeschoss;Poststelle;KON-110;Spezialpruefung erforderlich;Schüco;Roto NX;2008;786;2044;Nein;Nein;0%;
+F-0268;Konferenzzentrum;Erdgeschoss;Empfang;KON-111;Pruefung abgeschlossen;Winkhaus;Siegenia Titan AF;2003;935;1163;Nein;Nein;100%;erheblicher Mangel
+F-0269;Konferenzzentrum;Erdgeschoss;Teeküche;KON-112;freigegeben;Roto Frank;Schüco AvanTec;2012;773;1013;Nein;Nein;100%;Austausch empfohlen
+F-0270;Konferenzzentrum;1. Obergeschoss;Sanitär;KON-201;in Bearbeitung;Winkhaus;Roto NT;2000;2390;811;Nein;Nein;20%;
+F-0271;Konferenzzentrum;1. Obergeschoss;Sanitär;KON-201;freigegeben;Siegenia-Aubi;Maco Multi-Matic;1998;1315;1241;Nein;Nein;100%;ohne Beanstandung
+F-0272;Konferenzzentrum;1. Obergeschoss;Sanitär;KON-201;nicht zugaenglich;Schüco;Roto NT;1995;2167;1287;Nein;Nein;0%;
+F-0273;Konferenzzentrum;1. Obergeschoss;Flur;KON-202;freigegeben;Schüco;Schüco AvanTec;1995;2151;1293;Nein;Nein;100%;
+F-0274;Konferenzzentrum;1. Obergeschoss;Flur;KON-202;fachlich geprueft;Winkhaus;Schüco AvanTec;2018;2013;1383;Nein;Nein;100%;
+F-0275;Konferenzzentrum;1. Obergeschoss;Flur;KON-202;Pruefung abgeschlossen;Siegenia-Aubi;Siegenia Titan AF;2020;1528;921;Nein;Nein;100%;ohne Beanstandung
+F-0276;Konferenzzentrum;1. Obergeschoss;Flur;KON-202;fachlich geprueft;Roto Frank;Roto NX;1985;1095;1332;Nein;Nein;100%;geringfügiger Mangel
+F-0277;Konferenzzentrum;1. Obergeschoss;Flur;KON-202;nicht begonnen;GU (Gretsch-Unitas);Roto NT;2005;898;1112;Nein;Nein;0%;
+F-0278;Konferenzzentrum;1. Obergeschoss;Flur;KON-202;in Bearbeitung;Winkhaus;Winkhaus activPilot;2003;2325;1099;Nein;Nein;66%;
+F-0279;Konferenzzentrum;1. Obergeschoss;Empfang;KON-203;nicht zugaenglich;Roto Frank;Siegenia Titan AF;2015;872;1202;Nein;Nein;0%;
+F-0280;Konferenzzentrum;1. Obergeschoss;Empfang;KON-203;Pruefung abgeschlossen;Roto Frank;GU UNI-JET;2018;963;1915;Nein;Nein;100%;Gefahr im Verzug
+F-0281;Konferenzzentrum;1. Obergeschoss;Empfang;KON-203;Spezialpruefung erforderlich;Winkhaus;Schüco AvanTec;1998;1824;1279;Nein;Nein;0%;
+F-0282;Konferenzzentrum;1. Obergeschoss;Empfang;KON-203;fachlich geprueft;GU (Gretsch-Unitas);Roto NT;2000;2376;1356;Nein;Nein;100%;ohne Beanstandung
+F-0283;Konferenzzentrum;1. Obergeschoss;Flur;KON-204;Pruefung abgeschlossen;Siegenia-Aubi;Siegenia Titan AF;2003;2244;1365;Nein;Nein;100%;geringfügiger Mangel
+F-0284;Konferenzzentrum;1. Obergeschoss;Flur;KON-204;fachlich geprueft;Weru;Maco Multi-Matic;1998;2172;1854;Nein;Nein;100%;erheblicher Mangel
+F-0285;Konferenzzentrum;1. Obergeschoss;Flur;KON-204;in Bearbeitung;Siegenia-Aubi;Maco Multi-Matic;1992;947;2082;Nein;Nein;41%;
+F-0286;Konferenzzentrum;1. Obergeschoss;Flur;KON-204;in Bearbeitung;Schüco;Schüco AvanTec;2020;704;1878;Nein;Nein;27%;
+F-0287;Konferenzzentrum;1. Obergeschoss;Flur;KON-204;fachlich geprueft;GU (Gretsch-Unitas);Siegenia Titan AF;1992;1193;1490;Nein;Nein;100%;geringfügiger Mangel
+F-0288;Konferenzzentrum;1. Obergeschoss;Flur;KON-204;fachlich geprueft;GU (Gretsch-Unitas);GU UNI-JET;2020;1584;1174;Nein;Nein;100%;Austausch empfohlen
+F-0289;Konferenzzentrum;1. Obergeschoss;Archiv;KON-205;nicht zugaenglich;Winkhaus;Maco Multi-Matic;2012;1856;1537;Nein;Nein;0%;
+F-0290;Konferenzzentrum;1. Obergeschoss;Archiv;KON-205;fachlich geprueft;Roto Frank;Maco Multi-Matic;2020;1992;1186;Nein;Nein;100%;geringfügiger Mangel
+F-0291;Konferenzzentrum;1. Obergeschoss;Archiv;KON-205;nicht begonnen;Weru;Roto NX;2012;1106;1061;Nein;Nein;0%;
+F-0292;Konferenzzentrum;1. Obergeschoss;Archiv;KON-205;nicht zugaenglich;Schüco;Roto NX;2000;2290;2058;Nein;Nein;0%;
+F-0293;Konferenzzentrum;1. Obergeschoss;Flur;KON-206;Spezialpruefung erforderlich;Schüco;Roto NT;2010;2332;1016;Nein;Nein;0%;
+F-0294;Konferenzzentrum;1. Obergeschoss;Flur;KON-206;fachlich geprueft;Roto Frank;Winkhaus activPilot;2008;1850;1607;Nein;Nein;100%;geringfügiger Mangel
+F-0295;Konferenzzentrum;1. Obergeschoss;Flur;KON-206;in Bearbeitung;Schüco;Winkhaus activPilot;1990;1412;834;Nein;Nein;32%;
+F-0296;Konferenzzentrum;1. Obergeschoss;Flur;KON-206;nicht begonnen;Winkhaus;Schüco AvanTec;1998;1641;1541;Nein;Nein;0%;
+F-0297;Konferenzzentrum;1. Obergeschoss;Flur;KON-206;nicht begonnen;Weru;Siegenia Titan AF;1985;2009;1957;Nein;Nein;0%;
+F-0298;Konferenzzentrum;1. Obergeschoss;Flur;KON-206;nicht zugaenglich;Maco;GU UNI-JET;1998;1011;1149;Nein;Nein;0%;
+F-0299;Konferenzzentrum;1. Obergeschoss;Sanitär;KON-207;Spezialpruefung erforderlich;Winkhaus;Winkhaus activPilot;2010;1653;1410;Nein;Nein;0%;
+F-0300;Konferenzzentrum;1. Obergeschoss;Flur;KON-208;Spezialpruefung erforderlich;Maco;Maco Multi-Matic;2018;1312;1483;Nein;Nein;0%;
+F-0301;Konferenzzentrum;1. Obergeschoss;Flur;KON-208;in Bearbeitung;Weru;Siegenia Titan AF;2003;1293;1551;Nein;Nein;36%;
+F-0302;Konferenzzentrum;1. Obergeschoss;Flur;KON-208;Spezialpruefung erforderlich;Maco;Schüco AvanTec;2008;605;1759;Nein;Nein;0%;
+F-0303;Konferenzzentrum;1. Obergeschoss;Flur;KON-208;Spezialpruefung erforderlich;Weru;Siegenia Titan AF;1992;1388;1949;Nein;Nein;0%;
+F-0304;Konferenzzentrum;1. Obergeschoss;Archiv;KON-209;fachlich geprueft;Siegenia-Aubi;Winkhaus activPilot;2010;1525;2060;Nein;Nein;100%;
+F-0305;Konferenzzentrum;1. Obergeschoss;Teeküche;KON-210;nicht begonnen;GU (Gretsch-Unitas);Schüco AvanTec;1992;1167;965;Nein;Nein;0%;
+F-0306;Konferenzzentrum;1. Obergeschoss;Teeküche;KON-210;Pruefung abgeschlossen;Roto Frank;Maco Multi-Matic;1985;1579;1524;Nein;Nein;100%;
+F-0307;Konferenzzentrum;1. Obergeschoss;Teeküche;KON-210;fachlich geprueft;Weru;Winkhaus activPilot;2005;1292;1326;Nein;Nein;100%;Austausch empfohlen
+F-0308;Konferenzzentrum;1. Obergeschoss;Serverraum;KON-211;nicht begonnen;Siegenia-Aubi;Maco Multi-Matic;2020;791;1223;Nein;Nein;0%;
+F-0309;Konferenzzentrum;1. Obergeschoss;Serverraum;KON-212;fachlich geprueft;Schüco;Maco Multi-Matic;2005;1040;2115;Nein;Nein;100%;ohne Beanstandung
+F-0310;Technisches Zentrum;Untergeschoss;Bibliothek;TZ-001;Spezialpruefung erforderlich;Winkhaus;Roto NT;1998;1691;1817;Nein;Nein;0%;
+F-0311;Technisches Zentrum;Untergeschoss;Bibliothek;TZ-001;Spezialpruefung erforderlich;Winkhaus;Roto NX;2000;2117;855;Nein;Nein;0%;
+F-0312;Technisches Zentrum;Untergeschoss;Bibliothek;TZ-001;nicht zugaenglich;GU (Gretsch-Unitas);Maco Multi-Matic;1992;2379;1456;Nein;Nein;0%;
+F-0313;Technisches Zentrum;Untergeschoss;Lager;TZ-002;nicht begonnen;Roto Frank;Siegenia Titan AF;2003;716;1197;Nein;Nein;0%;
+F-0314;Technisches Zentrum;Untergeschoss;Flur;TZ-003;Spezialpruefung erforderlich;Schüco;Roto NT;2003;1390;1585;Nein;Nein;0%;
+F-0315;Technisches Zentrum;Untergeschoss;Flur;TZ-003;Spezialpruefung erforderlich;Winkhaus;Roto NX;2008;1421;1934;Nein;Nein;0%;
+F-0316;Technisches Zentrum;Untergeschoss;Flur;TZ-003;Spezialpruefung erforderlich;Roto Frank;Maco Multi-Matic;2018;1609;2106;Nein;Nein;0%;
+F-0317;Technisches Zentrum;Untergeschoss;Poststelle;TZ-005;nicht zugaenglich;Maco;Maco Multi-Matic;2020;695;1945;Nein;Nein;0%;
+F-0318;Technisches Zentrum;Erdgeschoss;Poststelle;TZ-101;in Bearbeitung;Siegenia-Aubi;Roto NX;2005;861;1023;Nein;Nein;74%;
+F-0319;Technisches Zentrum;Erdgeschoss;Poststelle;TZ-101;freigegeben;GU (Gretsch-Unitas);Schüco AvanTec;1998;2323;1540;Nein;Nein;100%;ohne Beanstandung
+F-0320;Technisches Zentrum;Erdgeschoss;Poststelle;TZ-101;fachlich geprueft;Siegenia-Aubi;GU UNI-JET;1998;1815;1802;Nein;Nein;100%;Austausch empfohlen
+F-0321;Technisches Zentrum;Erdgeschoss;Serverraum;TZ-102;Spezialpruefung erforderlich;Maco;Schüco AvanTec;2020;1965;1248;Nein;Nein;0%;
+F-0322;Technisches Zentrum;Erdgeschoss;Lager;TZ-103;in Bearbeitung;Schüco;GU UNI-JET;2008;2046;1111;Nein;Nein;71%;
+F-0323;Technisches Zentrum;Erdgeschoss;Lager;TZ-103;freigegeben;Maco;Roto NT;1990;1215;822;Ja;Nein;100%;Gefahr im Verzug
+F-0324;Technisches Zentrum;Erdgeschoss;Lager;TZ-103;nicht zugaenglich;Siegenia-Aubi;GU UNI-JET;2005;2258;1062;Nein;Nein;0%;
+F-0325;Technisches Zentrum;Erdgeschoss;Lager;TZ-103;nicht begonnen;Maco;Siegenia Titan AF;1995;1431;1157;Ja;Nein;0%;
+F-0326;Technisches Zentrum;Erdgeschoss;Archiv;TZ-104;Pruefung abgeschlossen;Schüco;Roto NT;2005;881;1931;Nein;Nein;100%;geringfügiger Mangel
+F-0327;Technisches Zentrum;Erdgeschoss;Druckerraum;TZ-105;freigegeben;Roto Frank;Maco Multi-Matic;2000;2282;1136;Nein;Nein;100%;erheblicher Mangel
+F-0328;Technisches Zentrum;Erdgeschoss;Druckerraum;TZ-105;Spezialpruefung erforderlich;Schüco;Roto NT;2018;1984;2092;Nein;Nein;0%;
+F-0329;Technisches Zentrum;Erdgeschoss;Poststelle;TZ-106;Spezialpruefung erforderlich;Roto Frank;Roto NT;1990;2347;2147;Nein;Nein;0%;
+F-0330;Technisches Zentrum;Erdgeschoss;Poststelle;TZ-106;Spezialpruefung erforderlich;Winkhaus;Siegenia Titan AF;2012;1692;997;Nein;Nein;0%;
+F-0331;Technisches Zentrum;Erdgeschoss;Poststelle;TZ-106;freigegeben;Maco;Roto NX;1992;1492;1751;Nein;Nein;100%;ohne Beanstandung
+F-0332;Technisches Zentrum;Erdgeschoss;Poststelle;TZ-108;freigegeben;Maco;Schüco AvanTec;1998;1700;1839;Nein;Nein;100%;erheblicher Mangel
+F-0333;Technisches Zentrum;Erdgeschoss;Poststelle;TZ-108;nicht zugaenglich;Weru;Roto NT;1998;711;2041;Nein;Nein;0%;
+F-0334;Technisches Zentrum;Erdgeschoss;Poststelle;TZ-108;nicht begonnen;Roto Frank;Siegenia Titan AF;2018;1651;1058;Ja;Nein;0%;
+F-0335;Technisches Zentrum;Erdgeschoss;Poststelle;TZ-108;in Bearbeitung;Weru;Schüco AvanTec;2008;1617;876;Nein;Nein;75%;
+F-0336;Technisches Zentrum;Erdgeschoss;Büro;TZ-110;Pruefung abgeschlossen;Weru;Siegenia Titan AF;2012;2329;1824;Nein;Nein;100%;Austausch empfohlen
+F-0337;Technisches Zentrum;Erdgeschoss;Empfang;TZ-111;nicht begonnen;Siegenia-Aubi;Maco Multi-Matic;2003;1680;1654;Ja;Nein;0%;
+F-0338;Technisches Zentrum;1. Obergeschoss;Sanitär;TZ-201;Spezialpruefung erforderlich;Weru;GU UNI-JET;2012;1421;1297;Nein;Nein;0%;
+F-0339;Technisches Zentrum;1. Obergeschoss;Sanitär;TZ-201;fachlich geprueft;Maco;Roto NX;2008;2201;1051;Nein;Nein;100%;
+F-0340;Technisches Zentrum;1. Obergeschoss;Teeküche;TZ-202;in Bearbeitung;Schüco;Winkhaus activPilot;1995;2243;1566;Nein;Nein;70%;
+F-0341;Technisches Zentrum;1. Obergeschoss;Teeküche;TZ-202;Pruefung abgeschlossen;GU (Gretsch-Unitas);Maco Multi-Matic;2012;1353;1872;Nein;Nein;100%;
+F-0342;Technisches Zentrum;1. Obergeschoss;Teeküche;TZ-202;Spezialpruefung erforderlich;Maco;Roto NT;1995;853;1662;Ja;Nein;0%;
+F-0343;Technisches Zentrum;1. Obergeschoss;Teeküche;TZ-202;in Bearbeitung;Weru;Roto NT;1985;1095;2079;Nein;Nein;72%;
+F-0344;Technisches Zentrum;1. Obergeschoss;Teeküche;TZ-204;nicht zugaenglich;GU (Gretsch-Unitas);Roto NT;2008;1620;1235;Nein;Nein;0%;
+F-0345;Technisches Zentrum;1. Obergeschoss;Besprechungsraum;TZ-205;Pruefung abgeschlossen;Weru;Maco Multi-Matic;2018;2043;874;Nein;Nein;100%;Austausch empfohlen
+F-0346;Technisches Zentrum;1. Obergeschoss;Besprechungsraum;TZ-205;fachlich geprueft;Weru;Siegenia Titan AF;2015;708;2029;Nein;Nein;100%;
+F-0347;Technisches Zentrum;1. Obergeschoss;Besprechungsraum;TZ-205;fachlich geprueft;Maco;Siegenia Titan AF;1985;1875;1735;Nein;Nein;100%;Austausch empfohlen
+F-0348;Technisches Zentrum;1. Obergeschoss;Besprechungsraum;TZ-205;Spezialpruefung erforderlich;Maco;Maco Multi-Matic;2008;1680;1429;Nein;Nein;0%;
+F-0349;Technisches Zentrum;1. Obergeschoss;Lager;TZ-206;freigegeben;GU (Gretsch-Unitas);Siegenia Titan AF;2000;1978;1251;Nein;Nein;100%;ohne Beanstandung
+F-0350;Technisches Zentrum;1. Obergeschoss;Lager;TZ-206;fachlich geprueft;Roto Frank;Schüco AvanTec;2010;1449;877;Nein;Nein;100%;ohne Beanstandung
+F-0351;Technisches Zentrum;1. Obergeschoss;Lager;TZ-207;freigegeben;Siegenia-Aubi;Schüco AvanTec;2012;1269;1458;Nein;Nein;100%;
+F-0352;Technisches Zentrum;1. Obergeschoss;Lager;TZ-207;fachlich geprueft;Schüco;Roto NT;1985;1233;1213;Nein;Nein;100%;
+F-0353;Technisches Zentrum;1. Obergeschoss;Druckerraum;TZ-208;freigegeben;Winkhaus;Winkhaus activPilot;2012;1523;1293;Nein;Nein;100%;geringfügiger Mangel
+F-0354;Technisches Zentrum;1. Obergeschoss;Archiv;TZ-209;freigegeben;Maco;Winkhaus activPilot;1995;1245;1669;Nein;Nein;100%;geringfügiger Mangel
+F-0355;Technisches Zentrum;1. Obergeschoss;Archiv;TZ-209;in Bearbeitung;Schüco;Maco Multi-Matic;1998;2390;1351;Nein;Nein;21%;
+F-0356;Technisches Zentrum;1. Obergeschoss;Archiv;TZ-210;nicht begonnen;GU (Gretsch-Unitas);Siegenia Titan AF;2008;1488;1878;Nein;Nein;0%;
+F-0357;Technisches Zentrum;1. Obergeschoss;Archiv;TZ-210;nicht begonnen;Maco;Winkhaus activPilot;2012;1890;1329;Nein;Nein;0%;
+F-0358;Technisches Zentrum;1. Obergeschoss;Archiv;TZ-210;freigegeben;Siegenia-Aubi;Schüco AvanTec;1992;1852;1412;Nein;Nein;100%;geringfügiger Mangel
+F-0359;Technisches Zentrum;1. Obergeschoss;Poststelle;TZ-211;Pruefung abgeschlossen;Winkhaus;Maco Multi-Matic;2008;1332;1173;Nein;Nein;100%;erheblicher Mangel
+F-0360;Technisches Zentrum;1. Obergeschoss;Poststelle;TZ-211;in Bearbeitung;Roto Frank;Maco Multi-Matic;2018;1810;1648;Nein;Nein;50%;
+F-0361;Technisches Zentrum;1. Obergeschoss;Poststelle;TZ-211;Pruefung abgeschlossen;Siegenia-Aubi;Maco Multi-Matic;2010;1798;2188;Ja;Ja;100%;
+F-0362;Technisches Zentrum;2. Obergeschoss;Lager;TZ-301;Spezialpruefung erforderlich;Maco;Roto NT;2005;1641;1340;Nein;Nein;0%;
+F-0363;Technisches Zentrum;2. Obergeschoss;Flur;TZ-302;nicht begonnen;Roto Frank;Siegenia Titan AF;2018;805;1499;Nein;Nein;0%;
+F-0364;Technisches Zentrum;2. Obergeschoss;Flur;TZ-302;in Bearbeitung;Siegenia-Aubi;Roto NX;2000;2339;1419;Nein;Nein;58%;
+F-0365;Technisches Zentrum;2. Obergeschoss;Flur;TZ-302;freigegeben;Schüco;Maco Multi-Matic;2018;914;2179;Nein;Nein;100%;geringfügiger Mangel
+F-0366;Technisches Zentrum;2. Obergeschoss;Flur;TZ-302;in Bearbeitung;Roto Frank;Siegenia Titan AF;2018;703;1400;Nein;Nein;20%;
+F-0367;Technisches Zentrum;2. Obergeschoss;Flur;TZ-302;Spezialpruefung erforderlich;Winkhaus;Schüco AvanTec;2015;1567;2080;Nein;Nein;0%;
+F-0368;Technisches Zentrum;2. Obergeschoss;Druckerraum;TZ-303;nicht begonnen;Winkhaus;Siegenia Titan AF;2003;803;1456;Nein;Nein;0%;
+F-0369;Technisches Zentrum;2. Obergeschoss;Sanitär;TZ-304;nicht begonnen;GU (Gretsch-Unitas);Siegenia Titan AF;2018;901;1422;Nein;Nein;0%;
+F-0370;Technisches Zentrum;2. Obergeschoss;Sanitär;TZ-304;freigegeben;Roto Frank;Maco Multi-Matic;2010;1906;1909;Nein;Nein;100%;erheblicher Mangel
+F-0371;Technisches Zentrum;2. Obergeschoss;Flur;TZ-305;freigegeben;Maco;Siegenia Titan AF;2008;1262;1668;Nein;Nein;100%;ohne Beanstandung
+F-0372;Technisches Zentrum;2. Obergeschoss;Flur;TZ-305;freigegeben;Siegenia-Aubi;Schüco AvanTec;2003;1778;1220;Nein;Nein;100%;Austausch empfohlen
+F-0373;Technisches Zentrum;2. Obergeschoss;Flur;TZ-305;nicht begonnen;GU (Gretsch-Unitas);Siegenia Titan AF;1985;698;1049;Nein;Nein;0%;
+F-0374;Technisches Zentrum;2. Obergeschoss;Flur;TZ-305;Spezialpruefung erforderlich;Schüco;Schüco AvanTec;2003;934;1388;Nein;Nein;0%;
+F-0375;Technisches Zentrum;2. Obergeschoss;Flur;TZ-305;nicht zugaenglich;GU (Gretsch-Unitas);GU UNI-JET;1992;2285;2132;Nein;Nein;0%;
+F-0376;Technisches Zentrum;2. Obergeschoss;Flur;TZ-305;nicht begonnen;Schüco;Winkhaus activPilot;2018;1891;1049;Nein;Nein;0%;
+F-0377;Technisches Zentrum;2. Obergeschoss;Archiv;TZ-306;in Bearbeitung;Roto Frank;Siegenia Titan AF;1995;1457;2067;Nein;Nein;59%;
+F-0378;Technisches Zentrum;2. Obergeschoss;Archiv;TZ-306;nicht begonnen;Maco;Siegenia Titan AF;1995;1612;1476;Nein;Nein;0%;
+F-0379;Technisches Zentrum;2. Obergeschoss;Archiv;TZ-306;freigegeben;Maco;Roto NT;2020;1195;2066;Ja;Nein;100%;Gefahr im Verzug
+F-0380;Technisches Zentrum;2. Obergeschoss;Archiv;TZ-306;nicht zugaenglich;Siegenia-Aubi;Winkhaus activPilot;2010;1272;1921;Nein;Nein;0%;
+F-0381;Technisches Zentrum;2. Obergeschoss;Empfang;TZ-307;fachlich geprueft;Siegenia-Aubi;Roto NT;1985;2230;813;Nein;Nein;100%;erheblicher Mangel
+F-0382;Technisches Zentrum;2. Obergeschoss;Poststelle;TZ-308;freigegeben;Siegenia-Aubi;GU UNI-JET;1995;803;2182;Nein;Nein;100%;Gefahr im Verzug
+F-0383;Technisches Zentrum;2. Obergeschoss;Poststelle;TZ-308;nicht zugaenglich;GU (Gretsch-Unitas);Siegenia Titan AF;1985;1988;1307;Nein;Nein;0%;
+F-0384;Technisches Zentrum;2. Obergeschoss;Poststelle;TZ-308;in Bearbeitung;Weru;Siegenia Titan AF;2010;1262;2116;Nein;Nein;42%;
+F-0385;Technisches Zentrum;2. Obergeschoss;Poststelle;TZ-308;nicht begonnen;GU (Gretsch-Unitas);Maco Multi-Matic;1992;1907;1746;Nein;Nein;0%;
+F-0386;Technisches Zentrum;2. Obergeschoss;Besprechungsraum;TZ-309;freigegeben;Siegenia-Aubi;GU UNI-JET;1990;1407;1744;Nein;Nein;100%;Gefahr im Verzug
+F-0387;Technisches Zentrum;2. Obergeschoss;Besprechungsraum;TZ-309;nicht begonnen;Winkhaus;Siegenia Titan AF;2010;614;1885;Nein;Nein;0%;
+F-0388;Technisches Zentrum;2. Obergeschoss;Besprechungsraum;TZ-309;fachlich geprueft;Weru;Schüco AvanTec;1995;1959;1203;Ja;Nein;100%;geringfügiger Mangel
+F-0389;Technisches Zentrum;2. Obergeschoss;Lager;TZ-310;in Bearbeitung;Siegenia-Aubi;Roto NX;1995;2349;2141;Nein;Nein;63%;
+F-0390;Technisches Zentrum;2. Obergeschoss;Lager;TZ-310;in Bearbeitung;Roto Frank;Winkhaus activPilot;2012;1809;829;Nein;Nein;41%;
+F-0391;Technisches Zentrum;2. Obergeschoss;Lager;TZ-310;nicht zugaenglich;Roto Frank;Siegenia Titan AF;2012;1424;859;Nein;Nein;0%;
+F-0392;Technisches Zentrum;2. Obergeschoss;Archiv;TZ-311;freigegeben;Weru;Winkhaus activPilot;2012;1665;824;Nein;Nein;100%;erheblicher Mangel
+F-0393;Technisches Zentrum;2. Obergeschoss;Archiv;TZ-311;in Bearbeitung;Siegenia-Aubi;GU UNI-JET;2000;991;2189;Ja;Nein;39%;
+F-0394;Technisches Zentrum;2. Obergeschoss;Archiv;TZ-311;fachlich geprueft;Weru;Maco Multi-Matic;2008;2124;2032;Nein;Nein;100%;geringfügiger Mangel
+F-0395;Technisches Zentrum;3. Obergeschoss;Druckerraum;TZ-402;Pruefung abgeschlossen;Winkhaus;Maco Multi-Matic;1998;1492;1928;Nein;Nein;100%;
+F-0396;Technisches Zentrum;3. Obergeschoss;Empfang;TZ-403;Pruefung abgeschlossen;Winkhaus;Schüco AvanTec;2010;2074;2027;Nein;Nein;100%;Gefahr im Verzug
+F-0397;Technisches Zentrum;3. Obergeschoss;Flur;TZ-404;fachlich geprueft;Maco;Siegenia Titan AF;2003;1903;1155;Nein;Nein;100%;geringfügiger Mangel
+F-0398;Technisches Zentrum;3. Obergeschoss;Flur;TZ-404;freigegeben;GU (Gretsch-Unitas);Winkhaus activPilot;2010;1234;1299;Ja;Ja;100%;ohne Beanstandung
+F-0399;Technisches Zentrum;3. Obergeschoss;Flur;TZ-404;Pruefung abgeschlossen;Weru;Maco Multi-Matic;2020;1435;903;Nein;Nein;100%;ohne Beanstandung
+F-0400;Technisches Zentrum;3. Obergeschoss;Flur;TZ-404;Pruefung abgeschlossen;Winkhaus;Schüco AvanTec;1992;765;1158;Nein;Nein;100%;
+F-0401;Technisches Zentrum;3. Obergeschoss;Flur;TZ-404;Spezialpruefung erforderlich;Roto Frank;Maco Multi-Matic;2018;842;1080;Ja;Nein;0%;
+F-0402;Technisches Zentrum;3. Obergeschoss;Flur;TZ-404;in Bearbeitung;Schüco;Maco Multi-Matic;1992;1107;1306;Nein;Nein;71%;
+F-0403;Technisches Zentrum;3. Obergeschoss;Büro;TZ-405;freigegeben;GU (Gretsch-Unitas);Roto NX;1990;2321;922;Nein;Nein;100%;geringfügiger Mangel
+F-0404;Technisches Zentrum;3. Obergeschoss;Sanitär;TZ-406;freigegeben;GU (Gretsch-Unitas);GU UNI-JET;2005;2170;1015;Ja;Nein;100%;Austausch empfohlen
+F-0405;Technisches Zentrum;3. Obergeschoss;Sanitär;TZ-406;Spezialpruefung erforderlich;GU (Gretsch-Unitas);GU UNI-JET;2012;2345;1779;Nein;Nein;0%;
+F-0406;Technisches Zentrum;3. Obergeschoss;Sanitär;TZ-406;Spezialpruefung erforderlich;Roto Frank;Winkhaus activPilot;2003;951;1453;Nein;Nein;0%;
+F-0407;Technisches Zentrum;3. Obergeschoss;Sanitär;TZ-406;nicht begonnen;Weru;GU UNI-JET;1990;1541;1402;Nein;Nein;0%;
+F-0408;Technisches Zentrum;3. Obergeschoss;Lager;TZ-407;fachlich geprueft;Schüco;GU UNI-JET;1985;780;1526;Nein;Nein;100%;erheblicher Mangel
+F-0409;Technisches Zentrum;3. Obergeschoss;Lager;TZ-407;in Bearbeitung;GU (Gretsch-Unitas);GU UNI-JET;2015;1332;1383;Nein;Nein;29%;
+F-0410;Technisches Zentrum;3. Obergeschoss;Lager;TZ-407;fachlich geprueft;GU (Gretsch-Unitas);Roto NX;2015;2319;1500;Nein;Nein;100%;Gefahr im Verzug
+F-0411;Technisches Zentrum;3. Obergeschoss;Lager;TZ-407;fachlich geprueft;Maco;GU UNI-JET;2015;2339;932;Nein;Nein;100%;
+F-0412;Technisches Zentrum;3. Obergeschoss;Besprechungsraum;TZ-408;nicht zugaenglich;Maco;Winkhaus activPilot;2008;1120;1688;Nein;Nein;0%;
+F-0413;Technisches Zentrum;3. Obergeschoss;Besprechungsraum;TZ-408;Spezialpruefung erforderlich;GU (Gretsch-Unitas);Roto NX;2000;865;1727;Nein;Nein;0%;
+F-0414;Technisches Zentrum;3. Obergeschoss;Besprechungsraum;TZ-408;nicht begonnen;GU (Gretsch-Unitas);Roto NX;2015;2227;813;Nein;Nein;0%;
+F-0415;Technisches Zentrum;4. Obergeschoss;Besprechungsraum;TZ-501;fachlich geprueft;GU (Gretsch-Unitas);Maco Multi-Matic;2010;1708;1784;Nein;Nein;100%;
+F-0416;Technisches Zentrum;4. Obergeschoss;Besprechungsraum;TZ-501;fachlich geprueft;Maco;Maco Multi-Matic;2020;780;1851;Nein;Nein;100%;
+F-0417;Technisches Zentrum;4. Obergeschoss;Besprechungsraum;TZ-501;nicht begonnen;Weru;Winkhaus activPilot;2005;695;1792;Nein;Nein;0%;
+F-0418;Technisches Zentrum;4. Obergeschoss;Besprechungsraum;TZ-501;nicht zugaenglich;Winkhaus;Siegenia Titan AF;2010;1542;1389;Ja;Nein;0%;
+F-0419;Technisches Zentrum;4. Obergeschoss;Druckerraum;TZ-502;nicht begonnen;Winkhaus;GU UNI-JET;1998;654;1057;Ja;Nein;0%;
+F-0420;Technisches Zentrum;4. Obergeschoss;Poststelle;TZ-503;nicht begonnen;Roto Frank;Roto NT;2018;1782;861;Nein;Nein;0%;
+F-0421;Technisches Zentrum;4. Obergeschoss;Poststelle;TZ-503;Pruefung abgeschlossen;Roto Frank;Siegenia Titan AF;2000;2166;1249;Nein;Nein;100%;ohne Beanstandung
+F-0422;Technisches Zentrum;4. Obergeschoss;Poststelle;TZ-503;Pruefung abgeschlossen;GU (Gretsch-Unitas);GU UNI-JET;1995;1054;831;Nein;Nein;100%;
+F-0423;Technisches Zentrum;4. Obergeschoss;Flur;TZ-504;nicht begonnen;Siegenia-Aubi;Schüco AvanTec;1990;1679;1908;Nein;Nein;0%;
+F-0424;Technisches Zentrum;4. Obergeschoss;Flur;TZ-504;Pruefung abgeschlossen;Siegenia-Aubi;Roto NX;2010;909;923;Nein;Nein;100%;ohne Beanstandung
+F-0425;Technisches Zentrum;4. Obergeschoss;Flur;TZ-504;Spezialpruefung erforderlich;Weru;Roto NT;1995;1977;1388;Ja;Ja;0%;
+F-0426;Technisches Zentrum;4. Obergeschoss;Flur;TZ-504;in Bearbeitung;Maco;Roto NT;2012;814;1202;Nein;Nein;49%;
+F-0427;Technisches Zentrum;4. Obergeschoss;Flur;TZ-504;freigegeben;GU (Gretsch-Unitas);GU UNI-JET;2010;2164;843;Nein;Nein;100%;geringfügiger Mangel
+F-0428;Technisches Zentrum;4. Obergeschoss;Flur;TZ-504;Spezialpruefung erforderlich;Weru;Maco Multi-Matic;1995;827;1742;Nein;Nein;0%;
+F-0429;Technisches Zentrum;4. Obergeschoss;Flur;TZ-504;in Bearbeitung;Weru;GU UNI-JET;2018;2126;1637;Nein;Nein;30%;
+F-0430;Technisches Zentrum;4. Obergeschoss;Lager;TZ-505;fachlich geprueft;GU (Gretsch-Unitas);Roto NT;1992;764;1913;Nein;Nein;100%;geringfügiger Mangel
+F-0431;Technisches Zentrum;4. Obergeschoss;Lager;TZ-505;Spezialpruefung erforderlich;Winkhaus;Winkhaus activPilot;2015;1747;1437;Nein;Nein;0%;
+F-0432;Technisches Zentrum;4. Obergeschoss;Druckerraum;TZ-506;in Bearbeitung;Schüco;GU UNI-JET;2003;1018;974;Nein;Nein;79%;
+F-0433;Technisches Zentrum;4. Obergeschoss;Druckerraum;TZ-506;in Bearbeitung;GU (Gretsch-Unitas);Maco Multi-Matic;2020;2036;1335;Nein;Nein;33%;
+F-0434;Technisches Zentrum;4. Obergeschoss;Druckerraum;TZ-506;nicht begonnen;Roto Frank;GU UNI-JET;2018;1647;1802;Nein;Nein;0%;
+F-0435;Technisches Zentrum;4. Obergeschoss;Serverraum;TZ-507;in Bearbeitung;Roto Frank;GU UNI-JET;2012;1348;1966;Nein;Nein;36%;
+F-0436;Technisches Zentrum;4. Obergeschoss;Büro;TZ-508;Spezialpruefung erforderlich;Siegenia-Aubi;Roto NX;2010;1570;1443;Nein;Nein;0%;
+F-0437;Technisches Zentrum;4. Obergeschoss;Büro;TZ-508;nicht begonnen;Winkhaus;Roto NX;2005;1813;1716;Nein;Nein;0%;
+F-0438;Nebengebäude West;Untergeschoss;Bibliothek;NGW-001;nicht zugaenglich;Schüco;Winkhaus activPilot;1990;1323;1049;Nein;Nein;0%;
+F-0439;Nebengebäude West;Untergeschoss;Bibliothek;NGW-001;Pruefung abgeschlossen;Schüco;GU UNI-JET;1990;1152;1320;Nein;Nein;100%;Austausch empfohlen
+F-0440;Nebengebäude West;Untergeschoss;Bibliothek;NGW-001;nicht begonnen;Roto Frank;Siegenia Titan AF;2012;1814;1859;Nein;Nein;0%;
+F-0441;Nebengebäude West;Untergeschoss;Bibliothek;NGW-002;in Bearbeitung;Schüco;Roto NT;2003;2038;1990;Nein;Nein;47%;
+F-0442;Nebengebäude West;Untergeschoss;Bibliothek;NGW-002;nicht zugaenglich;Siegenia-Aubi;Roto NX;2008;1991;1167;Nein;Nein;0%;
+F-0443;Nebengebäude West;Untergeschoss;Bibliothek;NGW-002;Pruefung abgeschlossen;Maco;Roto NX;1992;2059;2184;Nein;Nein;100%;
+F-0444;Nebengebäude West;Untergeschoss;Bibliothek;NGW-002;Spezialpruefung erforderlich;Winkhaus;GU UNI-JET;1985;1876;1623;Nein;Nein;0%;
+F-0445;Nebengebäude West;Untergeschoss;Besprechungsraum;NGW-003;Pruefung abgeschlossen;Siegenia-Aubi;Roto NX;2020;1896;1018;Ja;Nein;100%;geringfügiger Mangel
+F-0446;Nebengebäude West;Untergeschoss;Besprechungsraum;NGW-003;Pruefung abgeschlossen;Winkhaus;Siegenia Titan AF;2020;1671;2091;Nein;Nein;100%;
+F-0447;Nebengebäude West;Untergeschoss;Besprechungsraum;NGW-003;freigegeben;Maco;Roto NT;2020;1009;1514;Nein;Nein;100%;Austausch empfohlen
+F-0448;Nebengebäude West;Untergeschoss;Teeküche;NGW-004;Spezialpruefung erforderlich;Maco;Roto NT;2003;1753;941;Nein;Nein;0%;
+F-0449;Nebengebäude West;Untergeschoss;Teeküche;NGW-004;Spezialpruefung erforderlich;Maco;GU UNI-JET;1998;2389;1247;Nein;Nein;0%;
+F-0450;Nebengebäude West;Untergeschoss;Teeküche;NGW-004;in Bearbeitung;Maco;Roto NX;2020;1950;1816;Nein;Nein;33%;
+F-0451;Nebengebäude West;Untergeschoss;Teeküche;NGW-004;nicht zugaenglich;Weru;Siegenia Titan AF;2010;2124;1132;Nein;Nein;0%;
+F-0452;Nebengebäude West;Untergeschoss;Flur;NGW-005;nicht begonnen;GU (Gretsch-Unitas);Roto NT;2018;1938;1843;Nein;Nein;0%;
+F-0453;Nebengebäude West;Untergeschoss;Flur;NGW-005;nicht zugaenglich;GU (Gretsch-Unitas);Siegenia Titan AF;2020;602;1050;Nein;Nein;0%;
+F-0454;Nebengebäude West;Untergeschoss;Flur;NGW-005;freigegeben;Siegenia-Aubi;Maco Multi-Matic;1998;733;1030;Ja;Nein;100%;geringfügiger Mangel
+F-0455;Nebengebäude West;Untergeschoss;Büro;NGW-006;nicht begonnen;Maco;GU UNI-JET;2018;1078;1121;Nein;Nein;0%;
+F-0456;Nebengebäude West;Untergeschoss;Büro;NGW-006;in Bearbeitung;Schüco;Roto NT;2018;2335;1170;Nein;Nein;51%;
+F-0457;Nebengebäude West;Untergeschoss;Büro;NGW-006;in Bearbeitung;Maco;Roto NT;2020;1711;1285;Nein;Nein;24%;
+F-0458;Nebengebäude West;Erdgeschoss;Teeküche;NGW-101;fachlich geprueft;Schüco;Winkhaus activPilot;1990;730;1886;Nein;Nein;100%;
+F-0459;Nebengebäude West;Erdgeschoss;Teeküche;NGW-101;nicht begonnen;Schüco;Roto NT;2005;713;1239;Nein;Nein;0%;
+F-0460;Nebengebäude West;Erdgeschoss;Serverraum;NGW-102;freigegeben;Maco;Roto NX;2010;1268;2120;Ja;Nein;100%;erheblicher Mangel
+F-0461;Nebengebäude West;Erdgeschoss;Büro;NGW-103;in Bearbeitung;Winkhaus;Schüco AvanTec;2018;641;1152;Nein;Nein;57%;
+F-0462;Nebengebäude West;Erdgeschoss;Büro;NGW-103;Spezialpruefung erforderlich;Siegenia-Aubi;Schüco AvanTec;1985;2348;918;Nein;Nein;0%;
+F-0463;Nebengebäude West;Erdgeschoss;Teeküche;NGW-104;in Bearbeitung;Siegenia-Aubi;Winkhaus activPilot;2015;1823;1075;Ja;Nein;58%;
+F-0464;Nebengebäude West;Erdgeschoss;Sanitär;NGW-105;Spezialpruefung erforderlich;Maco;Winkhaus activPilot;1985;993;1271;Nein;Nein;0%;
+F-0465;Nebengebäude West;Erdgeschoss;Empfang;NGW-106;freigegeben;GU (Gretsch-Unitas);Siegenia Titan AF;1985;2000;1118;Nein;Nein;100%;
+F-0466;Nebengebäude West;Erdgeschoss;Sanitär;NGW-107;Spezialpruefung erforderlich;Siegenia-Aubi;Roto NX;2005;2175;1397;Nein;Nein;0%;
+F-0467;Nebengebäude West;Erdgeschoss;Poststelle;NGW-108;freigegeben;GU (Gretsch-Unitas);Winkhaus activPilot;2020;1723;2078;Nein;Nein;100%;
+F-0468;Nebengebäude West;Erdgeschoss;Poststelle;NGW-108;nicht zugaenglich;Schüco;Roto NX;2000;1007;1803;Ja;Nein;0%;
+F-0469;Nebengebäude West;Erdgeschoss;Poststelle;NGW-108;nicht zugaenglich;GU (Gretsch-Unitas);GU UNI-JET;1998;2301;2104;Nein;Nein;0%;
+F-0470;Nebengebäude West;Erdgeschoss;Sanitär;NGW-109;nicht zugaenglich;Maco;Roto NX;1998;841;1586;Nein;Nein;0%;
+F-0471;Nebengebäude West;Erdgeschoss;Sanitär;NGW-109;Spezialpruefung erforderlich;Maco;Schüco AvanTec;2000;1963;1218;Nein;Nein;0%;
+F-0472;Nebengebäude West;Erdgeschoss;Sanitär;NGW-109;Spezialpruefung erforderlich;Roto Frank;Winkhaus activPilot;1992;1196;1938;Nein;Nein;0%;
+F-0473;Nebengebäude West;Erdgeschoss;Druckerraum;NGW-110;in Bearbeitung;Winkhaus;Winkhaus activPilot;2018;1491;1957;Nein;Nein;58%;
+F-0474;Nebengebäude West;Erdgeschoss;Druckerraum;NGW-110;nicht begonnen;Roto Frank;Winkhaus activPilot;2000;1603;937;Nein;Nein;0%;
+F-0475;Nebengebäude West;Erdgeschoss;Druckerraum;NGW-110;Spezialpruefung erforderlich;Maco;Winkhaus activPilot;2003;1674;1386;Nein;Nein;0%;
+F-0476;Nebengebäude West;1. Obergeschoss;Teeküche;NGW-201;nicht zugaenglich;Roto Frank;Roto NX;2005;1337;1561;Nein;Nein;0%;
+F-0477;Nebengebäude West;1. Obergeschoss;Empfang;NGW-202;nicht begonnen;Weru;Winkhaus activPilot;2010;1789;1618;Nein;Nein;0%;
+F-0478;Nebengebäude West;1. Obergeschoss;Empfang;NGW-202;fachlich geprueft;GU (Gretsch-Unitas);Roto NX;1998;2110;814;Nein;Nein;100%;
+F-0479;Nebengebäude West;1. Obergeschoss;Poststelle;NGW-203;nicht zugaenglich;Weru;GU UNI-JET;1985;1119;967;Nein;Nein;0%;
+F-0480;Nebengebäude West;1. Obergeschoss;Poststelle;NGW-203;nicht zugaenglich;Winkhaus;Winkhaus activPilot;1992;2335;2089;Ja;Nein;0%;
+F-0481;Nebengebäude West;1. Obergeschoss;Poststelle;NGW-203;fachlich geprueft;Siegenia-Aubi;Winkhaus activPilot;2020;1807;1851;Nein;Nein;100%;erheblicher Mangel
+F-0482;Nebengebäude West;1. Obergeschoss;Büro;NGW-204;freigegeben;GU (Gretsch-Unitas);GU UNI-JET;1985;1140;2009;Nein;Nein;100%;erheblicher Mangel
+F-0483;Nebengebäude West;1. Obergeschoss;Büro;NGW-204;in Bearbeitung;Weru;Roto NT;1985;854;2073;Nein;Nein;64%;
+F-0484;Nebengebäude West;1. Obergeschoss;Büro;NGW-204;nicht zugaenglich;Schüco;Roto NT;2003;1651;1195;Nein;Nein;0%;
+F-0485;Nebengebäude West;1. Obergeschoss;Poststelle;NGW-205;in Bearbeitung;Roto Frank;Roto NT;1995;1181;1183;Nein;Nein;36%;
+F-0486;Nebengebäude West;1. Obergeschoss;Poststelle;NGW-205;Pruefung abgeschlossen;Siegenia-Aubi;Roto NT;2018;851;1562;Nein;Nein;100%;
+F-0487;Nebengebäude West;1. Obergeschoss;Poststelle;NGW-205;Spezialpruefung erforderlich;Siegenia-Aubi;Roto NX;2020;685;1573;Nein;Nein;0%;
+F-0488;Nebengebäude West;1. Obergeschoss;Bibliothek;NGW-206;fachlich geprueft;GU (Gretsch-Unitas);Roto NT;1995;1104;820;Nein;Nein;100%;ohne Beanstandung
+F-0489;Nebengebäude West;1. Obergeschoss;Bibliothek;NGW-206;nicht begonnen;Winkhaus;Maco Multi-Matic;2000;1498;802;Nein;Nein;0%;
+F-0490;Nebengebäude West;1. Obergeschoss;Bibliothek;NGW-206;Spezialpruefung erforderlich;Schüco;Maco Multi-Matic;1998;1213;2010;Ja;Nein;0%;
+F-0491;Nebengebäude West;1. Obergeschoss;Bibliothek;NGW-206;nicht zugaenglich;Siegenia-Aubi;Winkhaus activPilot;2008;1945;1893;Nein;Nein;0%;
+F-0492;Nebengebäude West;1. Obergeschoss;Büro;NGW-207;Pruefung abgeschlossen;Siegenia-Aubi;GU UNI-JET;1998;711;1587;Nein;Nein;100%;Austausch empfohlen
+F-0493;Nebengebäude West;1. Obergeschoss;Büro;NGW-207;nicht zugaenglich;Weru;Schüco AvanTec;1990;1428;2006;Ja;Nein;0%;
+F-0494;Nebengebäude West;1. Obergeschoss;Büro;NGW-207;Pruefung abgeschlossen;Maco;Maco Multi-Matic;2018;2258;1434;Ja;Ja;100%;erheblicher Mangel
+F-0495;Nebengebäude West;1. Obergeschoss;Poststelle;NGW-208;nicht begonnen;Weru;GU UNI-JET;2010;1369;1148;Nein;Nein;0%;
