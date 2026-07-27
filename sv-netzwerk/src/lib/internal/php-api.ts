@@ -28,18 +28,26 @@ const API_BASE = '/intern/api';
 
 // ── Projekt-Kontext aus URL ableiten ────────────────────────────────────────
 
-/** Map von URL-Slug auf project_id. */
-const PROJECT_SLUG_MAP: Record<string, number> = {
-  'fensterpruefung-bonn': 1,
-  'referenz-testprojekt': 2,
-};
+/** Dynamische Map von URL-Slug auf project_id (wird beim ersten Aufruf gefüllt). */
+let projectSlugMap: Record<string, number> | null = null;
+
+async function ensureProjectMap(): Promise<Record<string, number>> {
+  if (projectSlugMap) return projectSlugMap;
+  try {
+    const { data } = await apiGet<{ projects: Array<{ id: number; project_code: string }> }>('/projects.php');
+    projectSlugMap = {};
+    data?.projects?.forEach(p => { projectSlugMap![p.project_code] = Number(p.id); });
+  } catch {
+    projectSlugMap = { 'fensterpruefung-bonn': 1, 'referenz-testprojekt': 2 };
+  }
+  return projectSlugMap;
+}
 
 /** Aktuelle project_id aus der URL ableiten (Default: 1). */
 function getProjectId(): number {
-  const path = window.location.pathname;
-  const match = path.match(/\/intern\/([^/]+)\//);
-  if (match && PROJECT_SLUG_MAP[match[1]] !== undefined) {
-    return PROJECT_SLUG_MAP[match[1]];
+  const slug = getProjectSlugRaw();
+  if (projectSlugMap && projectSlugMap[slug] !== undefined) {
+    return projectSlugMap[slug];
   }
   return 1;
 }
@@ -50,14 +58,16 @@ function pidParam(prefix: '?' | '&' = '&'): string {
   return pid === 1 ? '' : `${prefix}project_id=${pid}`;
 }
 
-/** Aktuellen Projekt-URL-Slug ermitteln. */
-export function getProjectSlug(): string {
+/** Rohwert des URL-Slugs extrahieren. */
+function getProjectSlugRaw(): string {
   const path = window.location.pathname;
   const match = path.match(/\/intern\/([^/]+)\//);
-  if (match && PROJECT_SLUG_MAP[match[1]] !== undefined) {
-    return match[1];
-  }
-  return 'fensterpruefung-bonn';
+  return match?.[1] ?? 'fensterpruefung-bonn';
+}
+
+/** Aktuellen Projekt-URL-Slug ermitteln. */
+export function getProjectSlug(): string {
+  return getProjectSlugRaw();
 }
 
 // ── HTTP-Hilfsfunktionen ────────────────────────────────────────────────────
@@ -144,6 +154,7 @@ export async function apiResetPassword(email: string): Promise<{ error: Error | 
 export async function loadApiUser(): Promise<PortalUser | null> {
   const sessionUser = await apiGetSession();
   if (!sessionUser) return null;
+  await ensureProjectMap();
   return {
     id: String(sessionUser.id),
     email: sessionUser.email,
@@ -372,6 +383,26 @@ export async function apiListProjects(): Promise<ProjectInfo[]> {
 
 export async function apiCreateProject(title: string, objectName: string, address: string, windowCount: number): Promise<{ id: number; project_code: string } | null> {
   const { data } = await apiPost<{ id: number; project_code: string }>('/projects.php', { title, object_name: objectName, address, planned_window_count: windowCount });
+  projectSlugMap = null; // invalidate cache
+  return data;
+}
+
+export async function apiUpdateProject(id: number, title: string, objectName: string, address: string, windowCount: number): Promise<boolean> {
+  const { data } = await apiPut<{ ok: boolean }>(`/projects.php?id=${id}`, { title, object_name: objectName, address, planned_window_count: windowCount });
+  projectSlugMap = null;
+  return !!data?.ok;
+}
+
+export async function apiDeleteProject(id: number, permanent = false): Promise<boolean> {
+  const suffix = permanent ? '&action=permanent' : '';
+  const { data } = await apiDelete<{ ok: boolean }>(`/projects.php?id=${id}${suffix}`);
+  projectSlugMap = null;
+  return !!data?.ok;
+}
+
+export async function apiDuplicateProject(id: number): Promise<{ id: number; project_code: string } | null> {
+  const { data } = await apiPost<{ id: number; project_code: string }>(`/projects.php?action=duplicate&id=${id}`, {});
+  projectSlugMap = null;
   return data;
 }
 

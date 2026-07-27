@@ -201,6 +201,20 @@ tr[data-open-window]:hover {
   background: #f0f6ff;
   transition: background 0.1s;
 }
+.intern-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999;
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+}
+.intern-modal {
+  background: #fff; border-radius: 12px; padding: 24px; width: 100%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.intern-modal h3 { margin: 0 0 16px; }
+.intern-modal input, .intern-modal textarea, .intern-modal select {
+  width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95rem;
+}
+.intern-modal .intern-field { margin-bottom: 10px; }
+.intern-modal .intern-field label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.85rem; }
 .sv-stack {
   display: flex;
   flex-wrap: wrap;

@@ -39,6 +39,9 @@ import {
   // Projekte
   apiListProjects,
   apiCreateProject,
+  apiUpdateProject,
+  apiDeleteProject,
+  apiDuplicateProject,
   getProjectSlug,
   // Hierarchie
   apiListBuildings,
@@ -384,6 +387,7 @@ async function renderProjects(context: AppContext) {
   context.root.innerHTML = `<div class="intern-loading">Projekte werden geladen…</div>`;
   
   const projects = await apiListProjects();
+  const isAdmin = context.user.profile.role === 'administrator' || context.user.profile.role === 'projektleiter';
   
   context.root.innerHTML = `
     <div class="intern-app">
@@ -392,22 +396,116 @@ async function renderProjects(context: AppContext) {
         ${projects.length === 0 ? '<div class="intern-empty">Keine Projekte vorhanden.</div>' : ''}
         <div class="intern-grid">
           ${projects.map(p => `
-            <a class="intern-building-card" href="/intern/${escapeHtml(p.project_code)}/">
-              <div class="intern-building-card__head">
-                <span class="intern-building-card__name">${escapeHtml(p.title)}</span>
-              </div>
-              <p class="intern-meta">${escapeHtml(p.object_name)}</p>
-              <p class="intern-meta">${escapeHtml(p.address)}</p>
-              <div class="intern-building-card__stats">
-                <span>${p.building_count} Gebäude</span>
-                <span>${p.window_count} / ${p.planned_window_count} Fenster</span>
-              </div>
-            </a>
+            <div class="intern-building-card" style="position:relative">
+              <a href="/intern/${escapeHtml(p.project_code)}/" style="text-decoration:none;color:inherit;display:block">
+                <div class="intern-building-card__head">
+                  <span class="intern-building-card__name">${escapeHtml(p.title)}</span>
+                </div>
+                <p class="intern-meta">${escapeHtml(p.object_name)}</p>
+                <p class="intern-meta">${escapeHtml(p.address)}</p>
+                <div class="intern-building-card__stats">
+                  <span>${p.building_count} Gebäude</span>
+                  <span>${p.window_count} / ${p.planned_window_count} Fenster</span>
+                </div>
+              </a>
+              ${isAdmin ? `<div class="intern-card-actions" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+                <button class="sv-button sv-button-secondary" style="font-size:0.75rem;padding:3px 8px" data-proj-edit="${p.id}" data-title="${escapeAttr(p.title)}" data-obj="${escapeAttr(p.object_name)}" data-addr="${escapeAttr(p.address)}" data-wc="${p.planned_window_count}">✏️ Bearbeiten</button>
+                <button class="sv-button sv-button-secondary" style="font-size:0.75rem;padding:3px 8px" data-proj-dup="${p.id}">📋 Duplizieren</button>
+                <button class="sv-button sv-button-secondary" style="font-size:0.75rem;padding:3px 8px" data-proj-archive="${p.id}">📦 Archivieren</button>
+                <button class="sv-button sv-button-danger" style="font-size:0.75rem;padding:3px 8px" data-proj-delete="${p.id}" data-title="${escapeAttr(p.title)}">🗑️ Löschen</button>
+              </div>` : ''}
+            </div>
           `).join('')}
         </div>
       </div>
     </div>
   `;
+
+  // Project edit handler
+  context.root.querySelectorAll<HTMLButtonElement>('[data-proj-edit]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const id = Number(btn.dataset.projEdit);
+      const oldTitle = btn.dataset.title ?? '';
+      const oldObj = btn.dataset.obj ?? '';
+      const oldAddr = btn.dataset.addr ?? '';
+      const oldWc = btn.dataset.wc ?? '0';
+      showProjectEditDialog(context, id, oldTitle, oldObj, oldAddr, Number(oldWc));
+    });
+  });
+
+  // Project duplicate handler
+  context.root.querySelectorAll<HTMLButtonElement>('[data-proj-dup]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!confirm('Projekt mit allen Gebäuden, Etagen und Räumen duplizieren?')) return;
+      const id = Number(btn.dataset.projDup);
+      const result = await apiDuplicateProject(id);
+      if (result) {
+        alert('Projekt wurde dupliziert.');
+        renderProjects(context);
+      } else {
+        alert('Fehler beim Duplizieren.');
+      }
+    });
+  });
+
+  // Project archive handler
+  context.root.querySelectorAll<HTMLButtonElement>('[data-proj-archive]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!confirm('Projekt archivieren? Es wird nicht mehr in der Übersicht angezeigt.')) return;
+      const ok = await apiDeleteProject(Number(btn.dataset.projArchive), false);
+      if (ok) { renderProjects(context); }
+    });
+  });
+
+  // Project permanent delete handler
+  context.root.querySelectorAll<HTMLButtonElement>('[data-proj-delete]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const title = btn.dataset.title ?? '';
+      if (!confirm(`Projekt "${title}" UNWIDERRUFLICH löschen? Alle Gebäude, Fenster und Daten werden gelöscht!`)) return;
+      if (!confirm('Sind Sie sicher? Dieser Vorgang kann nicht rückgängig gemacht werden!')) return;
+      const ok = await apiDeleteProject(Number(btn.dataset.projDelete), true);
+      if (ok) { renderProjects(context); }
+      else { alert('Fehler beim Löschen.'); }
+    });
+  });
+}
+
+function showProjectEditDialog(context: AppContext, id: number, title: string, objectName: string, address: string, windowCount: number) {
+  const overlay = document.createElement('div');
+  overlay.className = 'intern-modal-overlay';
+  overlay.innerHTML = `
+    <div class="intern-modal" style="max-width:480px">
+      <h3>Projekt bearbeiten</h3>
+      <form id="proj-edit-form" class="intern-form-grid" style="gap:12px">
+        <div class="intern-field intern-field--full"><label>Projektname</label><input name="title" value="${escapeAttr(title)}" required /></div>
+        <div class="intern-field intern-field--full"><label>Objekt</label><input name="object_name" value="${escapeAttr(objectName)}" /></div>
+        <div class="intern-field intern-field--full"><label>Adresse</label><input name="address" value="${escapeAttr(address)}" /></div>
+        <div class="intern-field intern-field--full"><label>Geplante Fenster</label><input name="wc" type="number" min="0" value="${windowCount}" /></div>
+        <div class="intern-actions intern-field--full">
+          <button class="sv-button sv-button-primary" type="submit">Speichern</button>
+          <button class="sv-button sv-button-secondary" type="button" id="proj-edit-cancel">Abbrechen</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#proj-edit-cancel')?.addEventListener('click', () => overlay.remove());
+  overlay.querySelector<HTMLFormElement>('#proj-edit-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target as HTMLFormElement);
+    const ok = await apiUpdateProject(id, String(fd.get('title') ?? ''), String(fd.get('object_name') ?? ''), String(fd.get('address') ?? ''), Number(fd.get('wc') ?? 0));
+    overlay.remove();
+    if (ok) renderProjects(context);
+    else alert('Fehler beim Speichern.');
+  });
 }
 
 function renderLogin(context: AppContext) {
@@ -3259,4 +3357,8 @@ function escapeHtml(value: string) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
+}
+
+function escapeAttr(value: string) {
+  return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll("'", '&#39;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 }
