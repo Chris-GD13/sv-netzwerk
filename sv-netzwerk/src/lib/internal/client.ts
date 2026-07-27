@@ -495,27 +495,37 @@ async function renderDashboard(context: AppContext) {
     </div>
 
     ${buildings.length > 0 ? `
-    <h2 style="margin:24px 0 12px">Gebäude</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:24px 0 12px">
+      <h2 style="margin:0">Gebäude</h2>
+      <a class="sv-button sv-button-secondary" href="${projectBase()}/auswertung/">📊 Gesamtbericht</a>
+    </div>
     <div class="intern-building-grid">
       ${buildings.map((b) => {
         const pct = b.progress_pct;
         const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
         return `
-          <a class="intern-building-card" href="${projectBase()}/etagen/?building_id=${b.id}">
-            <div class="intern-building-card__header">
-              <strong>${escapeHtml(b.name)}</strong>
-              ${b.code ? `<span class="intern-badge intern-badge--info">${escapeHtml(b.code)}</span>` : ''}
+          <div class="intern-building-card">
+            <a href="${projectBase()}/etagen/?building_id=${b.id}" style="text-decoration:none;color:inherit;display:block;">
+              <div class="intern-building-card__header">
+                <strong>${escapeHtml(b.name)}</strong>
+                ${b.code ? `<span class="intern-badge intern-badge--info">${escapeHtml(b.code)}</span>` : ''}
+              </div>
+              <div class="intern-building-stats">
+                <span>${b.window_count} Fenster</span>
+                <span>${b.sash_count} Flügel</span>
+                ${b.sash_defect > 0 ? `<span class="intern-badge intern-badge--danger">${b.sash_defect} Mängel</span>` : ''}
+              </div>
+              <div class="intern-progress-bar">
+                <div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div>
+              </div>
+              <p class="intern-meta">${pct}% Flügel geprüft (${b.sash_completed}/${b.sash_count})</p>
+            </a>
+            <div class="intern-actions" style="margin-top:8px;padding-top:8px;border-top:1px solid #e8eef3;">
+              <a class="intern-inline-button" href="${projectBase()}/etagen/?building_id=${b.id}">Etagen</a>
+              <a class="intern-inline-button" href="${projectBase()}/fenster/?filter_building=${encodeURIComponent(b.name)}">Fenster</a>
+              <a class="intern-inline-button" href="${projectBase()}/auswertung/?building=${encodeURIComponent(b.name)}">Auswertung</a>
             </div>
-            <div class="intern-building-stats">
-              <span>${b.window_count} Fenster</span>
-              <span>${b.sash_count} Flügel</span>
-              ${b.sash_defect > 0 ? `<span class="intern-badge intern-badge--danger">${b.sash_defect} Mängel</span>` : ''}
-            </div>
-            <div class="intern-progress-bar">
-              <div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div>
-            </div>
-            <p class="intern-meta">${pct}% Flügel geprüft (${b.sash_completed}/${b.sash_count})</p>
-          </a>
+          </div>
         `;
       }).join('')}
     </div>
@@ -525,13 +535,13 @@ async function renderDashboard(context: AppContext) {
       <section class="intern-panel">
         <h2>Gesamtstatistik</h2>
         <div class="intern-stats">
-          ${renderStat('Fenster gesamt', stats.total)}
-          ${renderStat('Nicht begonnen', stats.notStarted)}
-          ${renderStat('In Bearbeitung', stats.inProgress)}
-          ${renderStat('Vollständig geprüft', stats.completed)}
-          ${renderStat('Mit Mangel', stats.withDefect)}
-          ${renderStat('Dringender Handlungsbedarf', stats.urgent)}
-          ${renderStat('Spezialprüfung', stats.specialInspection)}
+          ${renderStat('Fenster gesamt', stats.total, `${projectBase()}/fenster/`)}
+          ${renderStat('Nicht begonnen', stats.notStarted, `${projectBase()}/fenster/?filter_status=nicht+begonnen`)}
+          ${renderStat('In Bearbeitung', stats.inProgress, `${projectBase()}/fenster/?filter_status=in+Bearbeitung`)}
+          ${renderStat('Vollständig geprüft', stats.completed, `${projectBase()}/fenster/?filter_status=Pruefung+abgeschlossen`)}
+          ${renderStat('Mit Mangel', stats.withDefect, `${projectBase()}/auswertung/`)}
+          ${renderStat('Dringender Handlungsbedarf', stats.urgent, `${projectBase()}/auswertung/`)}
+          ${renderStat('Spezialprüfung', stats.specialInspection, `${projectBase()}/auswertung/`)}
         </div>
       </section>
       <section class="intern-panel">
@@ -2550,7 +2560,10 @@ function renderHeader(context: AppContext, title: string, text: string) {
   `;
 }
 
-function renderStat(label: string, value: number) {
+function renderStat(label: string, value: number, href?: string) {
+  if (href) {
+    return `<a class="intern-stat intern-stat--clickable" href="${escapeHtml(href)}" style="text-decoration:none;color:inherit;"><span>${escapeHtml(label)}</span><strong>${value}</strong></a>`;
+  }
   return `<article class="intern-stat"><span>${escapeHtml(label)}</span><strong>${value}</strong></article>`;
 }
 
