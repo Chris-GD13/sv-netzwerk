@@ -47,6 +47,7 @@ match (true) {
     $method === 'GET'                           => handleGetBuildings($projectId),
     $method === 'POST' && $entity !== ''        => handleCreate($entity, $user, $projectId),
     $method === 'PUT'  && $entity !== '' && $id => handleUpdate($entity, $id, $user),
+    $method === 'PATCH' && $entity !== '' && $id => handleAction($entity, $id, $user, $projectId),
     $method === 'DELETE' && $entity !== '' && $id => handleDelete($entity, $id, $user),
     default                                     => apiError(404, 'Unbekannter Endpunkt.'),
 };
@@ -316,6 +317,155 @@ function handleDelete(string $entity, int $id, array $user): never
             catch (Throwable $e) { apiError(503, 'Fenster konnte nicht gelöscht werden: '.$e->getMessage()); }
         default:
             apiError(400, 'Unbekannte Entität.');
+    }
+}
+
+// ─── PATCH (Duplizieren / Archivieren / Verschieben) ──────────────────────────
+
+function handleAction(string $entity, int $id, array $user, int $projectId): never
+{
+    requireRole($user, ['administrator', 'projektleiter']);
+    $body   = requestBody();
+    $action = $body['action'] ?? '';
+
+    switch ($action) {
+        case 'duplicate':
+            handleDuplicate($entity, $id, $projectId);
+        case 'archive':
+            handleArchive($entity, $id);
+        case 'move':
+            handleMove($entity, $id, $body);
+        default:
+            apiError(400, 'Unbekannte Aktion: ' . $action);
+    }
+}
+
+function handleDuplicate(string $entity, int $id, int $projectId): never
+{
+    $pdo = db();
+    try {
+        $pdo->beginTransaction();
+        switch ($entity) {
+            case 'building':
+                $src = $pdo->prepare('SELECT * FROM buildings WHERE id=:id');
+                $src->execute([':id' => $id]);
+                $b = $src->fetch();
+                if (!$b) { $pdo->rollBack(); apiError(404, 'Gebäude nicht gefunden.'); }
+                $newName = $b['name'] . ' (Kopie)';
+                $ins = $pdo->prepare('INSERT INTO buildings (project_id,name,code,notes,sort_order,created_at,updated_at) VALUES (:pid,:n,:c,:notes,:so,:now,:now2)');
+                $ins->execute([':pid'=>$b['project_id'],':n'=>$newName,':c'=>$b['code'],':notes'=>$b['notes'],':so'=>(int)$b['sort_order']+1,':now'=>nowUtc(),':now2'=>nowUtc()]);
+                $newBuildingId = (int)$pdo->lastInsertId();
+                // Copy floors → rooms
+                $floors = $pdo->prepare('SELECT * FROM floors WHERE building_id=:bid');
+                $floors->execute([':bid'=>$id]);
+                foreach ($floors->fetchAll() as $fl) {
+                    $fIns = $pdo->prepare('INSERT INTO floors (building_id,name,level,notes,sort_order,created_at,updated_at) VALUES (:bid,:n,:lv,:notes,:so,:now,:now2)');
+                    $fIns->execute([':bid'=>$newBuildingId,':n'=>$fl['name'],':lv'=>$fl['level'],':notes'=>$fl['notes'],':so'=>$fl['sort_order'],':now'=>nowUtc(),':now2'=>nowUtc()]);
+                    $newFloorId = (int)$pdo->lastInsertId();
+                    $rooms = $pdo->prepare('SELECT * FROM rooms WHERE floor_id=:fid');
+                    $rooms->execute([':fid'=>$fl['id']]);
+                    foreach ($rooms->fetchAll() as $ro) {
+                        $rIns = $pdo->prepare('INSERT INTO rooms (floor_id,name,room_number,notes,sort_order,created_at,updated_at) VALUES (:fid,:n,:rn,:notes,:so,:now,:now2)');
+                        $rIns->execute([':fid'=>$newFloorId,':n'=>$ro['name'],':rn'=>$ro['room_number'],':notes'=>$ro['notes'],':so'=>$ro['sort_order'],':now'=>nowUtc(),':now2'=>nowUtc()]);
+                    }
+                }
+                $pdo->commit();
+                apiJson(['id'=>$newBuildingId,'name'=>$newName], 201);
+
+            case 'floor':
+                $src = $pdo->prepare('SELECT * FROM floors WHERE id=:id');
+                $src->execute([':id' => $id]);
+                $fl = $src->fetch();
+                if (!$fl) { $pdo->rollBack(); apiError(404, 'Etage nicht gefunden.'); }
+                $newName = $fl['name'] . ' (Kopie)';
+                $ins = $pdo->prepare('INSERT INTO floors (building_id,name,level,notes,sort_order,created_at,updated_at) VALUES (:bid,:n,:lv,:notes,:so,:now,:now2)');
+                $ins->execute([':bid'=>$fl['building_id'],':n'=>$newName,':lv'=>$fl['level'],':notes'=>$fl['notes'],':so'=>(int)$fl['sort_order']+1,':now'=>nowUtc(),':now2'=>nowUtc()]);
+                $newFloorId = (int)$pdo->lastInsertId();
+                $rooms = $pdo->prepare('SELECT * FROM rooms WHERE floor_id=:fid');
+                $rooms->execute([':fid'=>$id]);
+                foreach ($rooms->fetchAll() as $ro) {
+                    $rIns = $pdo->prepare('INSERT INTO rooms (floor_id,name,room_number,notes,sort_order,created_at,updated_at) VALUES (:fid,:n,:rn,:notes,:so,:now,:now2)');
+                    $rIns->execute([':fid'=>$newFloorId,':n'=>$ro['name'],':rn'=>$ro['room_number'],':notes'=>$ro['notes'],':so'=>$ro['sort_order'],':now'=>nowUtc(),':now2'=>nowUtc()]);
+                }
+                $pdo->commit();
+                apiJson(['id'=>$newFloorId,'name'=>$newName], 201);
+
+            case 'room':
+                $src = $pdo->prepare('SELECT * FROM rooms WHERE id=:id');
+                $src->execute([':id' => $id]);
+                $ro = $src->fetch();
+                if (!$ro) { $pdo->rollBack(); apiError(404, 'Raum nicht gefunden.'); }
+                $newName = $ro['name'] . ' (Kopie)';
+                $ins = $pdo->prepare('INSERT INTO rooms (floor_id,name,room_number,notes,sort_order,created_at,updated_at) VALUES (:fid,:n,:rn,:notes,:so,:now,:now2)');
+                $ins->execute([':fid'=>$ro['floor_id'],':n'=>$newName,':rn'=>$ro['room_number'],':notes'=>$ro['notes'],':so'=>(int)$ro['sort_order']+1,':now'=>nowUtc(),':now2'=>nowUtc()]);
+                $pdo->commit();
+                apiJson(['id'=>(int)$pdo->lastInsertId(),'name'=>$newName], 201);
+
+            default:
+                $pdo->rollBack();
+                apiError(400, 'Duplizieren nicht unterstützt für: ' . $entity);
+        }
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        apiError(503, 'Duplizieren fehlgeschlagen: ' . $e->getMessage());
+    }
+}
+
+function handleArchive(string $entity, int $id): never
+{
+    // Soft-delete via deleted_at timestamp (reversible)
+    $table = match($entity) {
+        'building' => 'buildings',
+        'floor'    => 'floors',
+        'room'     => 'rooms',
+        default    => '',
+    };
+    if ($table === '') apiError(400, 'Archivieren nicht unterstützt für: ' . $entity);
+
+    // Check if column exists - we use a notes prefix "[ARCHIVIERT]" as archive marker
+    try {
+        $stmt = db()->prepare("UPDATE $table SET name = CONCAT('[Archiviert] ', name), updated_at=:now WHERE id=:id AND name NOT LIKE '[Archiviert]%'");
+        $stmt->execute([':now'=>nowUtc(), ':id'=>$id]);
+        if ($stmt->rowCount() === 0) {
+            // Already archived? Unarchive
+            $stmt2 = db()->prepare("UPDATE $table SET name = REPLACE(name, '[Archiviert] ', ''), updated_at=:now WHERE id=:id");
+            $stmt2->execute([':now'=>nowUtc(), ':id'=>$id]);
+            apiJson(['ok'=>true, 'archived'=>false]);
+        }
+        apiJson(['ok'=>true, 'archived'=>true]);
+    } catch (Throwable $e) {
+        apiError(503, 'Archivieren fehlgeschlagen: ' . $e->getMessage());
+    }
+}
+
+function handleMove(string $entity, int $id, array $body): never
+{
+    $targetId = (int)($body['target_id'] ?? 0);
+    if ($targetId === 0) apiError(400, 'Ziel-ID ist erforderlich.');
+
+    try {
+        switch ($entity) {
+            case 'floor':
+                // Move floor to another building
+                db()->prepare('UPDATE floors SET building_id=:bid, updated_at=:now WHERE id=:id')
+                    ->execute([':bid'=>$targetId, ':now'=>nowUtc(), ':id'=>$id]);
+                break;
+            case 'room':
+                // Move room to another floor
+                db()->prepare('UPDATE rooms SET floor_id=:fid, updated_at=:now WHERE id=:id')
+                    ->execute([':fid'=>$targetId, ':now'=>nowUtc(), ':id'=>$id]);
+                break;
+            case 'window':
+                // Move window to another room
+                db()->prepare('UPDATE windows SET room_id=:rid, updated_at=:now WHERE id=:id AND deleted_at IS NULL')
+                    ->execute([':rid'=>$targetId, ':now'=>nowUtc(), ':id'=>$id]);
+                break;
+            default:
+                apiError(400, 'Verschieben nicht unterstützt für: ' . $entity);
+        }
+        apiJson(['ok'=>true]);
+    } catch (Throwable $e) {
+        apiError(503, 'Verschieben fehlgeschlagen: ' . $e->getMessage());
     }
 }
 

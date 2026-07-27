@@ -51,14 +51,23 @@ import {
   apiCreateBuilding,
   apiUpdateBuilding,
   apiDeleteBuilding,
+  apiDuplicateBuilding,
+  apiArchiveBuilding,
   apiCreateFloor,
   apiUpdateFloor,
   apiDeleteFloor,
+  apiDuplicateFloor,
+  apiArchiveFloor,
+  apiMoveFloor,
   apiCreateRoom,
   apiUpdateRoom,
   apiDeleteRoom,
+  apiDuplicateRoom,
+  apiArchiveRoom,
+  apiMoveRoom,
   apiDeleteWindow,
   apiCreateWindowInRoom,
+  apiMoveWindow,
   // Flügel
   apiListSashes,
   apiGetSash,
@@ -741,7 +750,10 @@ function renderBuildingCard(b: Building, isAdmin: boolean): string {
         <button class="intern-action-btn" data-action="menu" title="Aktionen" aria-label="Aktionen">⋮</button>
         <div class="intern-action-menu" hidden>
           <button data-action="edit">✏️ Bearbeiten</button>
-          <button data-action="delete">🗑️ Löschen</button>
+          <button data-action="duplicate">📋 Duplizieren</button>
+          <button data-action="archive">📦 Archivieren</button>
+          <hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0">
+          <button data-action="delete" style="color:#e53e3e">🗑️ Löschen</button>
         </div>
       </div>
       ` : ''}
@@ -760,6 +772,24 @@ function bindBuildingActions(context: AppContext) {
         await renderBuildings(context);
       } else {
         showMsg(context, '#building-msg', 'Gebäude konnte nicht aktualisiert werden.');
+      }
+    },
+    async onDuplicate(wrapper) {
+      const id = Number(wrapper.dataset.buildingId);
+      const name = wrapper.dataset.buildingName ?? '';
+      if (!confirm(`Gebäude "${name}" duplizieren?\n\nAlle Etagen und Räume werden mitkopiert.`)) return;
+      if (await apiDuplicateBuilding(id)) {
+        await renderBuildings(context);
+      } else {
+        showMsg(context, '#building-msg', 'Gebäude konnte nicht dupliziert werden.');
+      }
+    },
+    async onArchive(wrapper) {
+      const id = Number(wrapper.dataset.buildingId);
+      if (await apiArchiveBuilding(id)) {
+        await renderBuildings(context);
+      } else {
+        showMsg(context, '#building-msg', 'Gebäude konnte nicht archiviert werden.');
       }
     },
     async onDelete(wrapper) {
@@ -788,6 +818,34 @@ function bindFloorActions(context: AppContext) {
         showMsg(context, '#floor-msg', 'Etage konnte nicht aktualisiert werden.');
       }
     },
+    async onDuplicate(wrapper) {
+      const id = Number(wrapper.dataset.floorId);
+      const name = wrapper.dataset.entityName ?? '';
+      if (!confirm(`Etage "${name}" duplizieren?\n\nAlle Räume werden mitkopiert.`)) return;
+      if (await apiDuplicateFloor(id)) {
+        await renderFloors(context);
+      } else {
+        showMsg(context, '#floor-msg', 'Etage konnte nicht dupliziert werden.');
+      }
+    },
+    async onArchive(wrapper) {
+      const id = Number(wrapper.dataset.floorId);
+      if (await apiArchiveFloor(id)) {
+        await renderFloors(context);
+      } else {
+        showMsg(context, '#floor-msg', 'Etage konnte nicht archiviert werden.');
+      }
+    },
+    async onMove(wrapper) {
+      const id = Number(wrapper.dataset.floorId);
+      const targetId = prompt('In welches Gebäude verschieben? (Gebäude-ID eingeben)');
+      if (!targetId) return;
+      if (await apiMoveFloor(id, Number(targetId))) {
+        await renderFloors(context);
+      } else {
+        showMsg(context, '#floor-msg', 'Etage konnte nicht verschoben werden.');
+      }
+    },
     async onDelete(wrapper) {
       const id = Number(wrapper.dataset.floorId);
       const name = wrapper.dataset.entityName ?? '';
@@ -812,6 +870,34 @@ function bindRoomActions(context: AppContext) {
         await renderRooms(context);
       } else {
         showMsg(context, '#room-msg', 'Raum konnte nicht aktualisiert werden.');
+      }
+    },
+    async onDuplicate(wrapper) {
+      const id = Number(wrapper.dataset.roomId);
+      const name = wrapper.dataset.entityName ?? '';
+      if (!confirm(`Raum "${name}" duplizieren?`)) return;
+      if (await apiDuplicateRoom(id)) {
+        await renderRooms(context);
+      } else {
+        showMsg(context, '#room-msg', 'Raum konnte nicht dupliziert werden.');
+      }
+    },
+    async onArchive(wrapper) {
+      const id = Number(wrapper.dataset.roomId);
+      if (await apiArchiveRoom(id)) {
+        await renderRooms(context);
+      } else {
+        showMsg(context, '#room-msg', 'Raum konnte nicht archiviert werden.');
+      }
+    },
+    async onMove(wrapper) {
+      const id = Number(wrapper.dataset.roomId);
+      const targetId = prompt('In welche Etage verschieben? (Etagen-ID eingeben)');
+      if (!targetId) return;
+      if (await apiMoveRoom(id, Number(targetId))) {
+        await renderRooms(context);
+      } else {
+        showMsg(context, '#room-msg', 'Raum konnte nicht verschoben werden.');
       }
     },
     async onDelete(wrapper) {
@@ -847,7 +933,7 @@ function showMsg(context: AppContext, selector: string, text: string) {
   if (el) el.innerHTML = errorAlert(text);
 }
 
-function bindEntityActions(context: AppContext, wrapperSelector: string, handlers: { onEdit?: (w: HTMLElement) => void; onDelete?: (w: HTMLElement) => void }) {
+function bindEntityActions(context: AppContext, wrapperSelector: string, handlers: { onEdit?: (w: HTMLElement) => void; onDelete?: (w: HTMLElement) => void; onDuplicate?: (w: HTMLElement) => void; onArchive?: (w: HTMLElement) => void; onMove?: (w: HTMLElement) => void }) {
   // Toggle-Menü
   context.root.querySelectorAll<HTMLElement>('.intern-card-actions [data-action="menu"]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
@@ -868,24 +954,22 @@ function bindEntityActions(context: AppContext, wrapperSelector: string, handler
     }
   });
 
-  if (handlers.onEdit) {
-    context.root.querySelectorAll<HTMLElement>(`${wrapperSelector} [data-action="edit"]`).forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const wrapper = btn.closest<HTMLElement>(wrapperSelector)!;
-        handlers.onEdit!(wrapper);
-      });
-    });
-  }
+  const actions: Array<{ key: string; handler?: (w: HTMLElement) => void }> = [
+    { key: 'edit', handler: handlers.onEdit },
+    { key: 'delete', handler: handlers.onDelete },
+    { key: 'duplicate', handler: handlers.onDuplicate },
+    { key: 'archive', handler: handlers.onArchive },
+    { key: 'move', handler: handlers.onMove },
+  ];
 
-  if (handlers.onDelete) {
-    context.root.querySelectorAll<HTMLElement>(`${wrapperSelector} [data-action="delete"]`).forEach((btn) => {
+  for (const { key, handler } of actions) {
+    if (!handler) continue;
+    context.root.querySelectorAll<HTMLElement>(`${wrapperSelector} [data-action="${key}"]`).forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         const wrapper = btn.closest<HTMLElement>(wrapperSelector)!;
-        handlers.onDelete!(wrapper);
+        handler(wrapper);
       });
     });
   }
@@ -956,7 +1040,11 @@ function renderFloorCard(f: Floor, buildingId: number, isAdmin: boolean): string
         <button class="intern-action-btn" data-action="menu" title="Aktionen">⋮</button>
         <div class="intern-action-menu" hidden>
           <button data-action="edit">✏️ Bearbeiten</button>
-          <button data-action="delete">🗑️ Löschen</button>
+          <button data-action="duplicate">📋 Duplizieren</button>
+          <button data-action="move">↗️ Verschieben</button>
+          <button data-action="archive">📦 Archivieren</button>
+          <hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0">
+          <button data-action="delete" style="color:#e53e3e">🗑️ Löschen</button>
         </div>
       </div>
       ` : ''}
@@ -1033,7 +1121,11 @@ function renderRoomCard(r: Room, floorId: number, buildingId: number, isAdmin: b
         <button class="intern-action-btn" data-action="menu" title="Aktionen">⋮</button>
         <div class="intern-action-menu" hidden>
           <button data-action="edit">✏️ Bearbeiten</button>
-          <button data-action="delete">🗑️ Löschen</button>
+          <button data-action="duplicate">📋 Duplizieren</button>
+          <button data-action="move">↗️ Verschieben</button>
+          <button data-action="archive">📦 Archivieren</button>
+          <hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0">
+          <button data-action="delete" style="color:#e53e3e">🗑️ Löschen</button>
         </div>
       </div>
       ` : ''}

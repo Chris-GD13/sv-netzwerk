@@ -119,6 +119,14 @@ async function apiDelete<T>(path: string): Promise<{ data: T | null; error: Erro
   return apiFetch<T>(path, { method: 'DELETE' });
 }
 
+async function apiPatch<T>(path: string, body: unknown): Promise<{ data: T | null; error: Error | null }> {
+  return apiFetch<T>(path, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
 // ── Auth ────────────────────────────────────────────────────────────────────
 
 export interface ApiSessionUser {
@@ -481,6 +489,53 @@ export async function apiDeleteWindow(id: number): Promise<boolean> {
 export async function apiCreateWindowInRoom(roomId: number, windowNumber: string): Promise<{ id: number; record_id: string } | null> {
   const { data } = await apiPost<{ id: number; record_id: string }>(`/hierarchy.php?entity=window${pidParam()}`, { room_id: roomId, window_number: windowNumber });
   return data;
+}
+
+// ── Duplizieren / Archivieren / Verschieben ──────────────────────────────────
+
+export async function apiDuplicateBuilding(id: number): Promise<{ id: number; name: string } | null> {
+  const { data } = await apiPatch<{ id: number; name: string }>(`/hierarchy.php?entity=building&id=${id}${pidParam()}`, { action: 'duplicate' });
+  return data;
+}
+
+export async function apiDuplicateFloor(id: number): Promise<{ id: number; name: string } | null> {
+  const { data } = await apiPatch<{ id: number; name: string }>(`/hierarchy.php?entity=floor&id=${id}${pidParam()}`, { action: 'duplicate' });
+  return data;
+}
+
+export async function apiDuplicateRoom(id: number): Promise<{ id: number; name: string } | null> {
+  const { data } = await apiPatch<{ id: number; name: string }>(`/hierarchy.php?entity=room&id=${id}${pidParam()}`, { action: 'duplicate' });
+  return data;
+}
+
+export async function apiArchiveBuilding(id: number): Promise<boolean> {
+  const { error } = await apiPatch(`/hierarchy.php?entity=building&id=${id}${pidParam()}`, { action: 'archive' });
+  return !error;
+}
+
+export async function apiArchiveFloor(id: number): Promise<boolean> {
+  const { error } = await apiPatch(`/hierarchy.php?entity=floor&id=${id}${pidParam()}`, { action: 'archive' });
+  return !error;
+}
+
+export async function apiArchiveRoom(id: number): Promise<boolean> {
+  const { error } = await apiPatch(`/hierarchy.php?entity=room&id=${id}${pidParam()}`, { action: 'archive' });
+  return !error;
+}
+
+export async function apiMoveFloor(id: number, targetBuildingId: number): Promise<boolean> {
+  const { error } = await apiPatch(`/hierarchy.php?entity=floor&id=${id}${pidParam()}`, { action: 'move', target_id: targetBuildingId });
+  return !error;
+}
+
+export async function apiMoveRoom(id: number, targetFloorId: number): Promise<boolean> {
+  const { error } = await apiPatch(`/hierarchy.php?entity=room&id=${id}${pidParam()}`, { action: 'move', target_id: targetFloorId });
+  return !error;
+}
+
+export async function apiMoveWindow(id: number, targetRoomId: number): Promise<boolean> {
+  const { error } = await apiPatch(`/hierarchy.php?entity=window&id=${id}${pidParam()}`, { action: 'move', target_id: targetRoomId });
+  return !error;
 }
 
 // ── KI-Dokumentenimport ─────────────────────────────────────────────────────
