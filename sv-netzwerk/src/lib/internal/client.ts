@@ -408,11 +408,15 @@ async function renderProjects(context: AppContext) {
                   <span>${p.window_count} / ${p.planned_window_count} Fenster</span>
                 </div>
               </a>
-              ${isAdmin ? `<div class="intern-card-actions" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-                <button class="sv-button sv-button-secondary" style="font-size:0.75rem;padding:3px 8px" data-proj-edit="${p.id}" data-title="${escapeAttr(p.title)}" data-obj="${escapeAttr(p.object_name)}" data-addr="${escapeAttr(p.address)}" data-wc="${p.planned_window_count}">✏️ Bearbeiten</button>
-                <button class="sv-button sv-button-secondary" style="font-size:0.75rem;padding:3px 8px" data-proj-dup="${p.id}">📋 Duplizieren</button>
-                <button class="sv-button sv-button-secondary" style="font-size:0.75rem;padding:3px 8px" data-proj-archive="${p.id}">📦 Archivieren</button>
-                <button class="sv-button sv-button-danger" style="font-size:0.75rem;padding:3px 8px" data-proj-delete="${p.id}" data-title="${escapeAttr(p.title)}">🗑️ Löschen</button>
+              ${isAdmin ? `<div class="intern-card-actions" style="position:absolute;top:8px;right:8px">
+                <button class="intern-action-btn" data-action="proj-menu" data-proj-id="${p.id}" title="Aktionen" aria-label="Aktionen" style="background:#fff;border:1px solid #ccc;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:1.1rem">⋮</button>
+                <div class="intern-action-menu" hidden style="position:absolute;right:0;top:100%;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:100;min-width:180px;padding:4px 0">
+                  <button data-action="edit" data-proj-id="${p.id}" data-title="${escapeAttr(p.title)}" data-obj="${escapeAttr(p.object_name)}" data-addr="${escapeAttr(p.address)}" data-wc="${p.planned_window_count}" style="display:block;width:100%;text-align:left;padding:8px 16px;border:none;background:none;cursor:pointer;font-size:0.9rem">✏️ Bearbeiten</button>
+                  <button data-action="duplicate" data-proj-id="${p.id}" style="display:block;width:100%;text-align:left;padding:8px 16px;border:none;background:none;cursor:pointer;font-size:0.9rem">📋 Duplizieren</button>
+                  <button data-action="archive" data-proj-id="${p.id}" style="display:block;width:100%;text-align:left;padding:8px 16px;border:none;background:none;cursor:pointer;font-size:0.9rem">📦 Archivieren</button>
+                  <hr style="margin:4px 8px;border:none;border-top:1px solid #eee">
+                  <button data-action="delete" data-proj-id="${p.id}" data-title="${escapeAttr(p.title)}" style="display:block;width:100%;text-align:left;padding:8px 16px;border:none;background:none;cursor:pointer;font-size:0.9rem;color:#c62828">🗑️ Löschen</button>
+                </div>
               </div>` : ''}
             </div>
           `).join('')}
@@ -421,59 +425,64 @@ async function renderProjects(context: AppContext) {
     </div>
   `;
 
-  // Project edit handler
-  context.root.querySelectorAll<HTMLButtonElement>('[data-proj-edit]').forEach(btn => {
+  // Toggle project action menus
+  context.root.querySelectorAll<HTMLButtonElement>('[data-action="proj-menu"]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const id = Number(btn.dataset.projEdit);
-      const oldTitle = btn.dataset.title ?? '';
-      const oldObj = btn.dataset.obj ?? '';
-      const oldAddr = btn.dataset.addr ?? '';
-      const oldWc = btn.dataset.wc ?? '0';
-      showProjectEditDialog(context, id, oldTitle, oldObj, oldAddr, Number(oldWc));
+      const menu = btn.nextElementSibling as HTMLElement;
+      // Close all other menus
+      context.root.querySelectorAll<HTMLElement>('.intern-action-menu').forEach(m => {
+        if (m !== menu) m.hidden = true;
+      });
+      menu.hidden = !menu.hidden;
     });
   });
 
-  // Project duplicate handler
-  context.root.querySelectorAll<HTMLButtonElement>('[data-proj-dup]').forEach(btn => {
+  // Close menus on outside click
+  document.addEventListener('click', () => {
+    context.root.querySelectorAll<HTMLElement>('.intern-action-menu').forEach(m => m.hidden = true);
+  }, { once: true });
+
+  // Project action handlers
+  context.root.querySelectorAll<HTMLButtonElement>('[data-action="edit"][data-proj-id]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const id = Number(btn.dataset.projId);
+      showProjectEditDialog(context, id, btn.dataset.title ?? '', btn.dataset.obj ?? '', btn.dataset.addr ?? '', Number(btn.dataset.wc ?? '0'));
+    });
+  });
+
+  context.root.querySelectorAll<HTMLButtonElement>('[data-action="duplicate"][data-proj-id]').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
       if (!confirm('Projekt mit allen Gebäuden, Etagen und Räumen duplizieren?')) return;
-      const id = Number(btn.dataset.projDup);
-      const result = await apiDuplicateProject(id);
-      if (result) {
-        alert('Projekt wurde dupliziert.');
-        renderProjects(context);
-      } else {
-        alert('Fehler beim Duplizieren.');
-      }
+      const result = await apiDuplicateProject(Number(btn.dataset.projId));
+      if (result) { alert('Projekt wurde dupliziert.'); renderProjects(context); }
+      else { alert('Fehler beim Duplizieren.'); }
     });
   });
 
-  // Project archive handler
-  context.root.querySelectorAll<HTMLButtonElement>('[data-proj-archive]').forEach(btn => {
+  context.root.querySelectorAll<HTMLButtonElement>('[data-action="archive"][data-proj-id]').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
       if (!confirm('Projekt archivieren? Es wird nicht mehr in der Übersicht angezeigt.')) return;
-      const ok = await apiDeleteProject(Number(btn.dataset.projArchive), false);
-      if (ok) { renderProjects(context); }
+      if (await apiDeleteProject(Number(btn.dataset.projId), false)) renderProjects(context);
     });
   });
 
-  // Project permanent delete handler
-  context.root.querySelectorAll<HTMLButtonElement>('[data-proj-delete]').forEach(btn => {
+  context.root.querySelectorAll<HTMLButtonElement>('[data-action="delete"][data-proj-id]').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
       const title = btn.dataset.title ?? '';
       if (!confirm(`Projekt "${title}" UNWIDERRUFLICH löschen? Alle Gebäude, Fenster und Daten werden gelöscht!`)) return;
       if (!confirm('Sind Sie sicher? Dieser Vorgang kann nicht rückgängig gemacht werden!')) return;
-      const ok = await apiDeleteProject(Number(btn.dataset.projDelete), true);
-      if (ok) { renderProjects(context); }
-      else { alert('Fehler beim Löschen.'); }
+      if (await apiDeleteProject(Number(btn.dataset.projId), true)) renderProjects(context);
+      else alert('Fehler beim Löschen.');
     });
   });
 }

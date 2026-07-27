@@ -215,6 +215,7 @@ tr[data-open-window]:hover {
 }
 .intern-modal .intern-field { margin-bottom: 10px; }
 .intern-modal .intern-field label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.85rem; }
+.intern-action-menu button:hover { background: #f0f6ff !important; }
 .sv-stack {
   display: flex;
   flex-wrap: wrap;
