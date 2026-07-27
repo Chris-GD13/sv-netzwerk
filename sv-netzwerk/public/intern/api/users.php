@@ -23,8 +23,12 @@ $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 $id     = isset($_GET['id']) ? (int) $_GET['id'] : null;
 
-if ($actor['role'] !== 'administrator') {
-    apiError(403, 'Nur Administratoren dürfen die Benutzerverwaltung nutzen.');
+if ($method === 'GET') {
+    if (!in_array($actor['role'], ['administrator', 'projektleiter'], true)) {
+        apiError(403, 'Keine Berechtigung für das Benutzerverzeichnis.');
+    }
+} elseif ($actor['role'] !== 'administrator') {
+    apiError(403, 'Nur Administratoren dürfen Benutzer verwalten.');
 }
 
 match (true) {
