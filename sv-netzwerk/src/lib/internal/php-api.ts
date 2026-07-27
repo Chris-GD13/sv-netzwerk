@@ -414,6 +414,21 @@ export async function apiDuplicateProject(id: number): Promise<{ id: number; pro
   return data;
 }
 
+export async function apiArchiveProject(id: number): Promise<boolean> {
+  const { data } = await apiPatch<{ ok: boolean }>(`/projects.php?id=${id}`, { action: 'archive' });
+  return !!data?.ok;
+}
+
+export async function apiCompleteProject(id: number): Promise<boolean> {
+  const { data } = await apiPatch<{ ok: boolean }>(`/projects.php?id=${id}`, { action: 'complete' });
+  return !!data?.ok;
+}
+
+export async function apiReopenProject(id: number): Promise<boolean> {
+  const { data } = await apiPatch<{ ok: boolean }>(`/projects.php?id=${id}`, { action: 'reopen' });
+  return !!data?.ok;
+}
+
 // ── Hierarchie ──────────────────────────────────────────────────────────────
 
 export async function apiListBuildings(): Promise<Building[]> {

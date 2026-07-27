@@ -160,6 +160,41 @@ if ($method === 'GET') {
     } catch (Throwable $e) {
         apiError(503, 'Projekt konnte nicht gelöscht werden: ' . $e->getMessage());
     }
+} elseif ($method === 'PATCH' && $id) {
+    requireProjectRole($user, ['administrator', 'projektleiter']);
+    $body = requestBody();
+    $patchAction = trim((string)($body['action'] ?? ''));
+
+    $stmt = db()->prepare('SELECT title FROM projects WHERE id = :id');
+    $stmt->execute([':id' => $id]);
+    $project = $stmt->fetch();
+    if (!$project) apiError(404, 'Projekt nicht gefunden.');
+
+    $title = $project['title'];
+
+    switch ($patchAction) {
+        case 'archive':
+            if (str_starts_with($title, '[Archiviert] ')) {
+                $title = substr($title, 13);
+            } else {
+                $title = '[Archiviert] ' . $title;
+            }
+            break;
+        case 'complete':
+            $title = '✅ ' . $title;
+            break;
+        case 'reopen':
+            if (str_starts_with($title, '✅ ')) {
+                $title = substr($title, strlen('✅ '));
+            }
+            break;
+        default:
+            apiError(400, 'Unbekannte Aktion: ' . $patchAction);
+    }
+
+    $upd = db()->prepare('UPDATE projects SET title = :t WHERE id = :id');
+    $upd->execute([':t' => $title, ':id' => $id]);
+    apiJson(['ok' => true, 'title' => $title]);
 } else {
     apiError(405, 'Methode nicht erlaubt.');
 }

@@ -42,6 +42,9 @@ import {
   apiUpdateProject,
   apiDeleteProject,
   apiDuplicateProject,
+  apiArchiveProject,
+  apiCompleteProject,
+  apiReopenProject,
   getProjectSlug,
   // Hierarchie
   apiListBuildings,
@@ -406,7 +409,10 @@ async function renderProjects(context: AppContext) {
       <div class="intern-content">
         ${projects.length === 0 ? '<div class="intern-empty">Keine Projekte vorhanden.</div>' : ''}
         <div class="intern-grid">
-          ${projects.map(p => `
+          ${projects.map(p => {
+            const isCompleted = p.title.startsWith('✅ ');
+            const isArchived = p.title.startsWith('[Archiviert]');
+            return `
             <div class="intern-building-card" style="position:relative">
               <a href="/intern/${escapeHtml(p.project_code)}/" style="text-decoration:none;color:inherit;display:block">
                 <div class="intern-building-card__head">
@@ -424,13 +430,14 @@ async function renderProjects(context: AppContext) {
                 <div class="intern-action-menu" hidden style="position:absolute;right:0;top:100%;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:100;min-width:180px;padding:4px 0">
                   <button data-action="edit" data-proj-id="${p.id}" data-title="${escapeAttr(p.title)}" data-obj="${escapeAttr(p.object_name)}" data-addr="${escapeAttr(p.address)}" data-wc="${p.planned_window_count}" style="display:block;width:100%;text-align:left;padding:8px 16px;border:none;background:none;cursor:pointer;font-size:0.9rem">✏️ Bearbeiten</button>
                   <button data-action="duplicate" data-proj-id="${p.id}" style="display:block;width:100%;text-align:left;padding:8px 16px;border:none;background:none;cursor:pointer;font-size:0.9rem">📋 Duplizieren</button>
-                  <button data-action="archive" data-proj-id="${p.id}" style="display:block;width:100%;text-align:left;padding:8px 16px;border:none;background:none;cursor:pointer;font-size:0.9rem">📦 Archivieren</button>
+                  <button data-action="archive" data-proj-id="${p.id}" style="display:block;width:100%;text-align:left;padding:8px 16px;border:none;background:none;cursor:pointer;font-size:0.9rem">📦 ${isArchived ? 'Wiederherstellen' : 'Archivieren'}</button>
+                  <button data-action="${isCompleted ? 'reopen' : 'complete'}" data-proj-id="${p.id}" style="display:block;width:100%;text-align:left;padding:8px 16px;border:none;background:none;cursor:pointer;font-size:0.9rem">${isCompleted ? '🔄 Wiederaufnahme' : '✅ Abgeschlossen'}</button>
                   <hr style="margin:4px 8px;border:none;border-top:1px solid #eee">
                   <button data-action="delete" data-proj-id="${p.id}" data-title="${escapeAttr(p.title)}" style="display:block;width:100%;text-align:left;padding:8px 16px;border:none;background:none;cursor:pointer;font-size:0.9rem;color:#c62828">🗑️ Löschen</button>
                 </div>
               </div>` : ''}
             </div>
-          `).join('')}
+          `}).join('')}
         </div>
       </div>
     </div>
@@ -480,8 +487,26 @@ async function renderProjects(context: AppContext) {
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      if (!confirm('Projekt archivieren? Es wird nicht mehr in der Übersicht angezeigt.')) return;
-      if (await apiDeleteProject(Number(btn.dataset.projId), false)) renderProjects(context);
+      if (await apiArchiveProject(Number(btn.dataset.projId))) renderProjects(context);
+      else alert('Fehler beim Archivieren.');
+    });
+  });
+
+  context.root.querySelectorAll<HTMLButtonElement>('[data-action="complete"][data-proj-id]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (await apiCompleteProject(Number(btn.dataset.projId))) renderProjects(context);
+      else alert('Fehler beim Abschließen.');
+    });
+  });
+
+  context.root.querySelectorAll<HTMLButtonElement>('[data-action="reopen"][data-proj-id]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (await apiReopenProject(Number(btn.dataset.projId))) renderProjects(context);
+      else alert('Fehler bei der Wiederaufnahme.');
     });
   });
 
