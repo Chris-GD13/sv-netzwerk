@@ -36,6 +36,25 @@ CREATE TABLE IF NOT EXISTS password_resets (
     CONSTRAINT fk_pr_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS login_attempts (
+    id            INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+    ip            VARCHAR(45)     NOT NULL,
+    email         VARCHAR(255)    NOT NULL DEFAULT '',
+    attempt_type  ENUM('email_not_found','wrong_password') NOT NULL,
+    attempted_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_ip_time (ip, attempted_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS login_blocks (
+    ip            VARCHAR(45)     NOT NULL,
+    blocked_until DATETIME        NOT NULL,
+    block_reason  VARCHAR(100)    NOT NULL DEFAULT '',
+    email         VARCHAR(255)    NOT NULL DEFAULT '',
+    blocked_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (ip)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ============================================================
 -- Projekte (Bundeswehr-Auftrag)
 -- ============================================================

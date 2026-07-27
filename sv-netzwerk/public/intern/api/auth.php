@@ -27,11 +27,132 @@ match (true) {
     default                                     => apiError(404, 'Unbekannter Endpunkt.'),
 };
 
+function getClientIp(): string
+{
+    foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR'] as $key) {
+        $val = trim((string) ($_SERVER[$key] ?? ''));
+        if ($val !== '') {
+            return trim(explode(',', $val)[0]);
+        }
+    }
+    return '0.0.0.0';
+}
+
+function notifyAdminLoginBlock(string $ip, string $email, string $reason): void
+{
+    $to      = appMailAdmin();
+    $subject = '[Prüfportal] Login-Sperrung: ' . $reason;
+    $time    = (new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin')))->format('d.m.Y H:i:s');
+    $body    = "Login-Sperrung ausgelöst\n\n"
+             . "Zeitpunkt:      $time Uhr\n"
+             . "IP-Adresse:     $ip\n"
+             . "E-Mail-Adresse: $email\n"
+             . "Grund:          $reason\n"
+             . "Sperrdauer:     15 Minuten\n\n"
+             . "Das Prüfportal hat diese IP automatisch gesperrt.\n";
+    $from    = appMailFrom();
+    $headers = "From: $from\r\nContent-Type: text/plain; charset=utf-8\r\n";
+    @mail($to, $subject, $body, $headers);
+}
+
+function isIpBlocked(string $ip): bool
+{
+    try {
+        $stmt = db()->prepare(
+            'SELECT 1
+             FROM login_blocks
+             WHERE ip = :ip AND blocked_until > UTC_TIMESTAMP()
+             LIMIT 1'
+        );
+        $stmt->execute([':ip' => $ip]);
+        return (bool) $stmt->fetchColumn();
+    } catch (Throwable $e) {
+        error_log('[auth] login_blocks-Prüfung fehlgeschlagen: ' . $e->getMessage());
+        return false;
+    }
+}
+
+function recordLoginAttempt(string $ip, string $email, string $attemptType): void
+{
+    try {
+        db()->prepare(
+            'INSERT INTO login_attempts (ip, email, attempt_type, attempted_at)
+             VALUES (:ip, :email, :attempt_type, UTC_TIMESTAMP())'
+        )->execute([
+            ':ip'           => $ip,
+            ':email'        => $email,
+            ':attempt_type' => $attemptType,
+        ]);
+    } catch (Throwable $e) {
+        error_log('[auth] login_attempts-Eintrag fehlgeschlagen: ' . $e->getMessage());
+    }
+}
+
+function countRecentLoginAttempts(string $ip, string $attemptType): int
+{
+    try {
+        $stmt = db()->prepare(
+            'SELECT COUNT(*)
+             FROM login_attempts
+             WHERE ip = :ip
+               AND attempt_type = :attempt_type
+               AND attempted_at >= (UTC_TIMESTAMP() - INTERVAL 15 MINUTE)'
+        );
+        $stmt->execute([
+            ':ip'           => $ip,
+            ':attempt_type' => $attemptType,
+        ]);
+        return (int) $stmt->fetchColumn();
+    } catch (Throwable $e) {
+        error_log('[auth] login_attempts-Zählung fehlgeschlagen: ' . $e->getMessage());
+        return 0;
+    }
+}
+
+function blockLoginIp(string $ip, string $email, string $reason): void
+{
+    try {
+        db()->prepare(
+            'INSERT INTO login_blocks (ip, blocked_until, block_reason, email, blocked_at)
+             VALUES (:ip, UTC_TIMESTAMP() + INTERVAL 15 MINUTE, :block_reason, :email, UTC_TIMESTAMP())
+             ON DUPLICATE KEY UPDATE
+               blocked_until = VALUES(blocked_until),
+               block_reason  = VALUES(block_reason),
+               email         = VALUES(email),
+               blocked_at    = VALUES(blocked_at)'
+        )->execute([
+            ':ip'           => $ip,
+            ':block_reason' => $reason,
+            ':email'        => $email,
+        ]);
+    } catch (Throwable $e) {
+        error_log('[auth] login_blocks-Sperre fehlgeschlagen: ' . $e->getMessage());
+    }
+
+    notifyAdminLoginBlock($ip, $email, $reason);
+}
+
+function clearLoginProtectionState(string $ip): void
+{
+    try {
+        db()->prepare('DELETE FROM login_blocks WHERE ip = :ip')->execute([':ip' => $ip]);
+        db()->prepare('DELETE FROM login_attempts WHERE ip = :ip')->execute([':ip' => $ip]);
+    } catch (Throwable $e) {
+        error_log('[auth] Login-Schutzdaten konnten nicht bereinigt werden: ' . $e->getMessage());
+    }
+}
+
 function handleLogin(): never
 {
     $body     = requestBody();
     $email    = trim((string) ($body['email'] ?? ''));
     $password = (string) ($body['password'] ?? '');
+    $ip       = getClientIp();
+    $blockedMessage = 'Zu viele Anmeldeversuche. Bitte in 15 Minuten erneut versuchen.';
+
+    if (isIpBlocked($ip)) {
+        apiError(429, $blockedMessage);
+    }
 
     if ($email === '' || $password === '') {
         apiError(400, 'E-Mail und Passwort sind erforderlich.');
@@ -49,11 +170,35 @@ function handleLogin(): never
         apiError(503, 'Datenbankfehler beim Anmelden.');
     }
 
-    if (!$user || !$user['is_active'] || !password_verify($password, $user['password_hash'])) {
+    if (!$user) {
+        // Konstante Antwortzeit gegen Timing-Angriffe (gültiger bcrypt-Hash eines Dummy-Passworts)
+        password_verify('dummy', '$2y$12$invalidhashpadding000000000000000000000000000zAIlmfxXfhW');
+        recordLoginAttempt($ip, $email, 'email_not_found');
+        if (countRecentLoginAttempts($ip, 'email_not_found') >= 2) {
+            blockLoginIp($ip, $email, 'E-Mail nicht gefunden');
+            apiError(429, $blockedMessage);
+        }
+        apiError(401, 'Anmeldung fehlgeschlagen.');
+    }
+
+    if (!(bool) $user['is_active']) {
         // Konstante Antwortzeit gegen Timing-Angriffe (gültiger bcrypt-Hash eines Dummy-Passworts)
         password_verify('dummy', '$2y$12$invalidhashpadding000000000000000000000000000zAIlmfxXfhW');
         apiError(401, 'Anmeldung fehlgeschlagen.');
     }
+
+    if (!password_verify($password, (string) $user['password_hash'])) {
+        // Konstante Antwortzeit gegen Timing-Angriffe (gültiger bcrypt-Hash eines Dummy-Passworts)
+        password_verify('dummy', '$2y$12$invalidhashpadding000000000000000000000000000zAIlmfxXfhW');
+        recordLoginAttempt($ip, $email, 'wrong_password');
+        if (countRecentLoginAttempts($ip, 'wrong_password') >= 3) {
+            blockLoginIp($ip, $email, 'falsches Passwort');
+            apiError(429, $blockedMessage);
+        }
+        apiError(401, 'Anmeldung fehlgeschlagen.');
+    }
+
+    clearLoginProtectionState($ip);
 
     session_regenerate_id(true);
     $_SESSION['user_id']  = $user['id'];
