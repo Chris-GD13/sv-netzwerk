@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.4 – 2026-07-27
+- Fachbeitrags-Automation auf regionale öffentliche Meldungen (Mo–Fr) als Standardquelle priorisiert; anonymisierte Kalenderfälle nur noch optional per `ALLOW_CALENDAR_CASE_CONTEXT=true`
+- LinkedIn-/Zap-Payload-Erstellung in eigenes Skript ausgelagert und als JSON-Datei unter `.automation/linkedin-payloads/{publication_id}.json` versioniert erzeugt
+- Workflow um explizite Linkprüfung des veröffentlichten Beitrags (`lychee`) erweitert
+- Slot-abhängige Pflichtbeitragsvalidierung ergänzt (`--expected-daily-count=1` morgens, `=2` nachmittags)
+
 ## 3.4.3 – 2026-07-21
 - automatischer morgens Fachbeitrag veröffentlicht: „Sturm- und Hagel-Serienschäden: Prüffolge für belastbare Freigaben – fachliche Einordnung zur aktuellen Lage“
 - LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt

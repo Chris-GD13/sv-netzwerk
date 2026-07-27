@@ -92,7 +92,12 @@ jobs:
 
       - name: Lint-/Fachbeitragsstandard prüfen
         if: steps.generate.outputs.status == 'generated'
-        run: npm run validate:knowledge -- "$BERLIN_DATE"
+        run: |
+          EXPECTED_DAILY_COUNT=1
+          if [ "$PUBLICATION_SLOT" = "afternoon" ]; then
+            EXPECTED_DAILY_COUNT=2
+          fi
+          npm run validate:knowledge -- "$BERLIN_DATE" "--expected-daily-count=${EXPECTED_DAILY_COUNT}"
 
       - name: Typprüfung ausführen
         if: steps.generate.outputs.status == 'generated'
@@ -106,6 +111,17 @@ jobs:
         if: steps.generate.outputs.status == 'generated'
         run: |
           npx --yes html-validate@9 --rule "long-title:off" \
+            "dist/fachwissen/${PUBLICATION_SLUG}/index.html" \
+            "dist/svos/fachwissen/${PUBLICATION_SLUG}/index.html"
+
+      - name: Linkprüfung des veröffentlichten Beitrags
+        if: steps.generate.outputs.status == 'generated'
+        run: |
+          npx --yes lychee@0.16.1 \
+            --no-progress \
+            --exclude-mail \
+            --max-retries 2 \
+            --accept 200,204,206,301,302,307,308,429 \
             "dist/fachwissen/${PUBLICATION_SLUG}/index.html" \
             "dist/svos/fachwissen/${PUBLICATION_SLUG}/index.html"
 
@@ -182,35 +198,14 @@ jobs:
             echo "::error::ZAPIER_WEBHOOK_URL fehlt."
             exit 1
           fi
-          LINKEDIN_TEXT_FILE="src/content/linkedin/${BERLIN_DATE}_${PUBLICATION_SLUG}.txt"
-          if [ ! -s "$LINKEDIN_TEXT_FILE" ]; then
-            echo "::error::LinkedIn-Begleittext fehlt: $LINKEDIN_TEXT_FILE"
+          PAYLOAD_FILE="$(node scripts/create-linkedin-zap-payload.mjs)"
+          if [ ! -s "$PAYLOAD_FILE" ]; then
+            echo "::error::Zap-Payload fehlt: $PAYLOAD_FILE"
             exit 1
           fi
-          if [ ! -s "public/assets/images/linkedin/${PUBLICATION_SLUG}.svg" ]; then
-            echo "::error::Beitragsbild fehlt: public/assets/images/linkedin/${PUBLICATION_SLUG}.svg"
-            exit 1
-          fi
-          FIRST_PARAGRAPH="$(head -n 8 "$LINKEDIN_TEXT_FILE" | tr '\n' ' ' | sed 's/"/\\"/g' | cut -c1-280)"
-          HASHTAGS="$(grep -Eo '#[[:alnum:]ÄÖÜäöüß]+' "$LINKEDIN_TEXT_FILE" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g' | sed 's/[[:space:]]$//')"
-          DESCRIPTION="$(node -e "const fs=require('fs');const raw=fs.readFileSync('src/content/knowledge/${PUBLICATION_SLUG}.md','utf8');const d=(raw.match(/^description:\s*\"([^\"]+)\"/m)||[])[1]||'';process.stdout.write(d.replace(/\n/g,' '));")"
-          PAYLOAD="$(cat <<EOF
-          {
-            "title": "${PUBLICATION_TITLE}",
-            "description": "${DESCRIPTION}",
-            "first_paragraph": "${FIRST_PARAGRAPH}",
-            "hashtags": "${HASHTAGS}",
-            "image_url": "${PUBLICATION_IMAGE_URL}",
-            "url": "${PUBLICATION_URL}",
-            "date": "${BERLIN_DATE}",
-            "slug": "${PUBLICATION_SLUG}",
-            "publication_id": "${PUBLICATION_ID}"
-          }
-          EOF
-          )"
           curl --fail --show-error --silent -X POST "$WEBHOOK_URL" \
             -H "Content-Type: application/json" \
-            -d "$PAYLOAD" \
+            --data-binary "@${PAYLOAD_FILE}" \
             --retry 5 --retry-delay 5 --retry-all-errors
           echo "LINKEDIN_OK=true" >> "$GITHUB_ENV"
 

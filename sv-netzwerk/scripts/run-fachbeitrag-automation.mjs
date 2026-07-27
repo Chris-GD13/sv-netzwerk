@@ -562,6 +562,7 @@ if (!inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].to)) {
 }
 
 const isWeekend = berlinWeekday === 0 || berlinWeekday === 6;
+const allowCalendarCaseContext = process.env.ALLOW_CALENDAR_CASE_CONTEXT === 'true';
 const runId = `${berlinDate}-${slot}`;
 const publicationId = `${runId}-${crypto.createHash('sha256').update(runId).digest('hex').slice(0, 10)}`;
 
@@ -738,10 +739,8 @@ if (existingSlotRows.length > 0) {
   process.exit(0);
 }
 
-const caseContext = isWeekend ? null : await loadCalendarCaseContext();
-const weekdayRegional = !isWeekend && !caseContext;
 let regionalSignal = null;
-if (weekdayRegional) {
+if (!isWeekend) {
   const query = encodeURIComponent('(Starkregen OR Hochwasser OR Überflutung OR Rückstau OR Hagel OR Sturm OR Tornado OR Schneedruck OR Warnlage OR Unwetterwarnung OR Gebäudebrand) (Aalen OR Ostalbkreis OR Schwäbisch Gmünd OR Heidenheim OR Ulm OR Göppingen OR Stuttgart OR Ludwigsburg OR Esslingen OR Ansbach OR Nördlingen OR Ellwangen OR Backnang OR Rems-Murr) when:1d');
   const rssUrl = `https://news.google.com/rss/search?q=${query}&hl=de&gl=DE&ceid=DE:de`;
   try {
@@ -761,6 +760,7 @@ if (weekdayRegional) {
     regionalSignal = null;
   }
 }
+const caseContext = (!isWeekend && !regionalSignal && allowCalendarCaseContext) ? await loadCalendarCaseContext() : null;
 
 const topic = pickTopic(publicationRows, caseContext?.preferredDamageTypes ?? []);
 const title = caseContext

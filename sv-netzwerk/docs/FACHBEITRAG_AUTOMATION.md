@@ -39,12 +39,13 @@
 
 ## Themenlogik und Quellenpriorität
 
-### Primärquelle: Anonymisierte Realfälle aus Outlook-Kalender
-- Der Generator nutzt (wenn konfiguriert) echte Kalenderfälle aus dem verknüpften Outlook-Postfach als primäre Fallbasis.
+### Optionale Fallquelle: Anonymisierte Realfälle aus Outlook-Kalender
+- Der Generator nutzt (nur wenn explizit aktiviert) echte Kalenderfälle aus dem verknüpften Outlook-Postfach als ergänzende Fallbasis.
 - Dafür werden Ereignisse im Rückblick bis zu **3 Jahren** technisch ausgewertet (`CALENDAR_CASE_LOOKBACK_DAYS`, Standard 1095).
 - Ausgewertet werden strukturierte Hinweise aus Terminmetadaten und Anhängen (z. B. Dokumentations-, KVA-, Rechnungs-, Protokoll- oder Gutachtenhinweise).
 - Veröffentlichung erfolgt ausschließlich **anonymisiert**: keine Namen, keine Orte/Adressen, keine Aktenzeichen, keine personenbezogenen Daten.
 - Pro Beitrag werden 1–2 Fälle als fachliche Musterbasis ausgewählt.
+- Aktivierung nur über `ALLOW_CALENDAR_CASE_CONTEXT=true`. Ohne diese Variable bleibt die Quellenlogik vollständig öffentlich/recherchebasiert.
 
 ### Sekundärquelle: Themenpool und regionale Recherche (Fallback)
 
@@ -57,7 +58,7 @@ Starkregen/Rückstau, Hochwasser/Überflutung, Sturm/Hagel, Leitungswasser, Bran
 - Am gleichen Tag wird dasselbe Thema nicht zweimal verwendet.
 - Wenn keine freien Themen verfügbar sind, fällt der Generator auf das zuletzt verwendete freie Thema zurück.
 
-### Regionale Recherche (Mo–Fr, nur wenn keine Kalenderfallbasis verfügbar ist)
+### Regionale Recherche (Mo–Fr, Standard und Priorität 1)
 - Montag bis Freitag wird zuerst ein regionaler Aufhänger gesucht.
 - Quelle: Google News RSS mit kombinierten Schaden-/Unwetterbegriffen (Starkregen, Hochwasser, Sturm, Brand, Katastrophe usw.) und Regionsbezug (Aalen, Ostalbkreis, Schwäbisch Gmünd, Heidenheim, Ulm, Göppingen, Stuttgart, Ludwigsburg, Esslingen, Ansbach, Nördlingen, Ellwangen, Backnang, Rems-Murr).
 - Kandidaten werden nur berücksichtigt, wenn **sowohl** ein Regionsname als auch ein Ereignisbegriff im Titel enthalten ist und die Meldung nicht älter als 72 Stunden ist.
@@ -95,7 +96,8 @@ Der Generator erstellt pro Lauf:
 
 - Zapier-Webhook bleibt unverändert (`secrets.ZAPIER_WEBHOOK_URL`).
 - Auslösung erfolgt in beiden Slots (**morgens** und **nachmittags**) ausschließlich nach erfolgreicher Live-URL-Prüfung (HTTP 200 + Slug im Seiteninhalt).
-- Vor LinkedIn werden im Lauf verpflichtend Vorprüfung, Fachwissensvalidierung, Typprüfung (`astro check`), Build, HTML-Validierung und Link-/Build-Integration ausgeführt.
+- Vor LinkedIn werden im Lauf verpflichtend Vorprüfung, Fachwissensvalidierung, Typprüfung (`astro check`), Build, HTML-Validierung, Linkprüfung (`lychee`) und Link-/Build-Integration ausgeführt.
+- Das Zap-Payload wird vor dem Versand als Datei unter `.automation/linkedin-payloads/{publication_id}.json` erzeugt.
 - Payload-Format (Zap-kompatibel):
   ```json
   {
@@ -205,6 +207,7 @@ Spalten:
 | `M365_CALENDAR_USER_ID` | Secret | Postfach/Kalender-Benutzer (z. B. `cw@sv-schuett.eu`) |
 | `FACHBEITRAG_AUTOMATION_ENABLED` | Variable | `true` (Standard) / `false` zum Deaktivieren |
 | `CALENDAR_CASE_LOOKBACK_DAYS` | Variable | Rückblickfenster für Fallauswahl (Standard `1095`) |
+| `ALLOW_CALENDAR_CASE_CONTEXT` | Variable | Optional: `true`, um anonymisierte Kalenderfälle als Fallback ohne belastbaren Regionalanlass zu erlauben |
 
 ## Relevante Dateien
 
@@ -216,6 +219,7 @@ Spalten:
 | `scripts/run-fachbeitrag-automation.mjs` | Generator für Beitrag, Bild, LinkedIn, Library, Changelog |
 | `scripts/validate-fachbeitrag-preflight.mjs` | Preflight-Prüfung vor Build |
 | `scripts/update-fachbeitrag-log.mjs` | Protokollaktualisierung nach Push, Live-Check und LinkedIn |
+| `scripts/create-linkedin-zap-payload.mjs` | Erzeugt Zap-kompatibles LinkedIn-Payload als JSON-Datei |
 | `scripts/validate-knowledge.mjs` | Frontmatter- und Build-Integrationsvalidierung |
 | `src/content/knowledge/` | Veröffentlichte Fachbeiträge (Markdown) |
 | `src/content/linkedin/` | LinkedIn-Begleittexte |
