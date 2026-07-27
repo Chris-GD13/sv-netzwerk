@@ -20,7 +20,7 @@ publication:
   updatedAt: 2026-07-23
   status: published
 seo:
-  title: "Kumulschäden nach Hochwasser und Überflutung strukturiert regulieren"
+  title: "Hochwasser-Kumulschäden: Priorisieren und strukturiert regulieren"
   description: "Fachliche Prüffolge für Kumullagen: Priorisierung, Beweissicherung, Kontaminationsbewertung, Reservebildung und dokumentierte Teilfreigaben."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/"
   image: "https://www.sv-netzwerk.eu/assets/images/linkedin/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning.svg"

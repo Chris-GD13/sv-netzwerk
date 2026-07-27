@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-07-14
   status: published
 seo:
-  title: "Technische Dokumentation bei Gebäudeschäden"
+  title: "Prüffähige Dokumentation bei komplexen Gebäudeschäden"
   description: "Komplexe Gebäudeschäden mit Feststellungen, Maßnahmen, Kosten und Entscheidungen prüffähig dokumentieren."
 ---
 

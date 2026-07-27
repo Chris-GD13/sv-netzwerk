@@ -20,7 +20,7 @@ publication:
   publishedAt: 2026-07-16
   status: published
 seo:
-  title: "Regiekosten im Schadenfall richtig prüfen"
+  title: "Regiekosten im Schadenfall: Nachweise korrekt prüfen"
   description: "Praxisleitfaden zur Prüfung von Stundenlohnarbeiten, Material, Fremdleistungen und Leistungsnachweisen bei Versicherungs- und Gebäudeschäden."
 ---
 

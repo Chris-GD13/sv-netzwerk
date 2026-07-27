@@ -20,7 +20,7 @@ publication:
   updatedAt: 2026-07-19
   status: published
 seo:
-  title: "Kumulschäden in der Region fachlich steuern"
+  title: "Kumulschäden regional: Priorisierung und Dokumentation steuern"
   description: "Praxisleitfaden für Priorisierung, koordinierte Schadenaufnahme und belastbare Dokumentation bei regional gehäuften Schadenfällen."
 ---
 

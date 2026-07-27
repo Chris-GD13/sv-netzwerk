@@ -20,7 +20,7 @@ publication:
   updatedAt: 2026-07-14
   status: published
 seo:
-  title: "Technische Schadenabgrenzung in der Regulierung"
+  title: "Schadenabgrenzung: Ursache, Vorschaden und Kosten sauber trennen"
   description: "Ereignisschaden, Vorschaden, Folgeschaden und Wiederherstellung technisch nachvollziehbar abgrenzen."
 ---
 

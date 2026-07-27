@@ -18,7 +18,7 @@ publication:
   publishedAt: 2026-07-17
   status: published
 seo:
-  title: "Schadenakte im Versicherungsfall richtig strukturieren"
+  title: "Schadenakte strukturieren: Entscheidungen prüffähig dokumentieren"
   description: "Praxisleitfaden für eine nachvollziehbare Aktenstruktur mit klaren Entscheidungen, Quellenbezug und sauberer Übergabedokumentation."
 ---
 

@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-07-14
   status: published
 seo:
-  title: "Kontrollierter Rückbau bei Wasserschäden"
+  title: "Leitungswasserschäden: Rückbau kontrolliert und gezielt steuern"
   description: "Schadenminderung, Kontrollöffnungen und Trocknung bei Leitungswasserschäden fachlich abgrenzen."
 ---
 
