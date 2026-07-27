@@ -2647,21 +2647,41 @@ function renderHeader(context: AppContext, title: string, text: string) {
   const isAdmin = context.user?.profile.role === 'administrator';
   const canManage = ['administrator', 'projektleiter'].includes(context.user?.profile.role ?? '');
   const canImport = ['administrator', 'pruefer'].includes(context.user?.profile.role ?? '');
+  const slug = getProjectSlug();
+  const inProject = context.route !== 'projects' && context.route !== 'new-project' && context.route !== 'login' && context.route !== 'landing';
+  const pb = `/intern/${slug}`;
+  
+  // Alphabetically: Auswertung, Dashboard, Export, Fenster, Gebäude, KI-Import, Projekte
+  const projectNav = inProject ? `
+    <a class="sv-button sv-button-secondary" href="${pb}/auswertung/">Auswertung</a>
+    <a class="sv-button sv-button-secondary" href="${pb}/">Dashboard</a>
+    <a class="sv-button sv-button-secondary" href="${pb}/export/">Export</a>
+    <a class="sv-button sv-button-secondary" href="${pb}/fenster/">Fenster</a>
+    <a class="sv-button sv-button-secondary" href="${pb}/gebaeude/">Gebäude</a>
+    ${canImport ? `<a class="sv-button sv-button-secondary" href="${pb}/import/">📄 KI-Import</a>` : ''}
+    ${canManage ? `<a class="sv-button sv-button-secondary" href="/intern/projekte/neu/">＋ Neues Projekt</a>` : ''}
+    <a class="sv-button sv-button-secondary" href="/intern/projekte/">Projekte</a>
+  ` : `
+    ${canManage ? `<a class="sv-button sv-button-primary" href="/intern/projekte/neu/">＋ Neues Projekt</a>` : ''}
+    <a class="sv-button sv-button-secondary" href="/intern/projekte/">Projekte</a>
+  `;
+
+  // Top-right: Benutzerverwaltung + Abmelden
+  const topRight = `
+    <div style="display:flex;gap:8px;align-items:center;position:absolute;top:12px;right:16px">
+      ${isAdmin ? `<a class="sv-button sv-button-secondary" href="${inProject ? pb : '/intern/fensterpruefung-bonn'}/admin/" style="font-size:0.8rem;padding:4px 10px">👤 Benutzerverwaltung</a>` : ''}
+      <button class="sv-button sv-button-ghost" type="button" id="header-logout" style="font-size:0.8rem;padding:4px 10px">Abmelden</button>
+    </div>
+  `;
+
   return `
-    <div class="intern-card intern-hero">
+    <div class="intern-card intern-hero" style="position:relative">
+      ${topRight}
       <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
       <h1>${escapeHtml(title)}</h1>
       <p>${escapeHtml(text)}</p>
       <nav class="intern-actions" aria-label="Hauptnavigation">
-        <a class="sv-button sv-button-secondary" href="/intern/projekte/">Projekte</a>
-        ${canManage ? '<a class="sv-button sv-button-primary" href="/intern/projekte/neu/">＋ Neues Projekt</a>' : ''}
-        <a class="sv-button sv-button-secondary" href="${projectBase()}/">Dashboard</a>
-        <a class="sv-button sv-button-secondary" href="${projectBase()}/gebaeude/">Gebäude</a>
-        <a class="sv-button sv-button-secondary" href="${projectBase()}/auswertung/">Auswertung</a>
-        <a class="sv-button sv-button-secondary" href="${projectBase()}/export/">Export</a>
-        ${canImport ? `<a class="sv-button sv-button-secondary" href="${projectBase()}/import/">📄 KI-Import</a>` : ''}
-        ${isAdmin ? `<a class="sv-button sv-button-secondary" href="${projectBase()}/admin/">Benutzerverwaltung</a>` : ''}
-        <button class="sv-button sv-button-ghost" type="button" id="header-logout">Abmelden</button>
+        ${projectNav}
       </nav>
     </div>
   `;
