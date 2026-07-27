@@ -15,9 +15,18 @@
 | Etagen (NGW) | 3 | Nachtrag V3 |
 | Etagen (PW) | 2 | Verdrehter Scan |
 | Etagen (KAS) | 2 | Fensterliste V2 |
+| **Etagen (gesamt)** | **24** | Summe: 5+4+2+6+3+2+2 |
 | Räume (gesamt) | mindestens 45 (aus Dokumenten erkennbar) | Raumbuch + Listen |
-| Fenster (aus Listen) | mindestens 64 (explizit in Fensterlisten) | V1+V2+V3 |
-| Fenster (Gesamtschätzung) | 793 | Nachtrag Nr. 1 |
+| Fenster (explizit identifizierbar) | mindestens 64 | Einzeln in V1+V2+V3 aufgelistete Fenster |
+| Fenster (Gesamtzahl laut Nachtrag) | 793 (nur als Zahl genannt, KEINE vollständigen Datensätze ableitbar) | Nachtrag Nr. 1, Seite 1 |
+
+### Hinweis zur Fensteranzahl
+
+Die Zahl 793 stammt ausschließlich aus dem Nachtrag Nr. 1 als Gesamtzahl des Objekts.
+Aus dieser Zahl dürfen KEINE künstlichen vollständigen Fensterdatensätze erzeugt werden.
+Nur die 64 in den Fensterlisten V1, V2 und V3 explizit aufgeführten Fenster
+(mit Nummer, Typ, Maßen und/oder Hersteller) gelten als identifizierbare Datensätze.
+Die KI-Erkennung wird ausschließlich an diesen 64 Fenstern gemessen.
 
 ## Erwartete Gebäude
 

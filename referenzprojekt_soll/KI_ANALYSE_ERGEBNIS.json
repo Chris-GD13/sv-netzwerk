@@ -1,0 +1,171 @@
+{
+    "windows_identified":  64,
+    "total_mentioned":  793,
+    "metadata":  {
+                     "method":  "Deterministische Dokumentenanalyse (OpenAI API auf Server nicht erreichbar)",
+                     "documents_processed":  19,
+                     "analysis_date":  "2026-07-27T08:30:00Z",
+                     "note":  "Die OpenAI API gibt HTTP-Fehler zurück. Analyse basiert auf exakter Textextraktion."
+                 },
+    "buildings":  [
+                      {
+                          "code":  "VGN",
+                          "name":  "Verwaltungsgebäude Nord",
+                          "source":  "Gebaeudeliste.txt",
+                          "year":  2005
+                      },
+                      {
+                          "code":  "VGS",
+                          "name":  "Verwaltungsgebäude Süd",
+                          "source":  "Gebaeudeliste.txt",
+                          "year":  1998
+                      },
+                      {
+                          "code":  "KON",
+                          "name":  "Konferenzzentrum",
+                          "source":  "Gebaeudeliste.txt",
+                          "year":  2018
+                      },
+                      {
+                          "code":  "TZ",
+                          "name":  "Technisches Zentrum",
+                          "source":  "Gebaeudeliste.txt",
+                          "year":  1985
+                      },
+                      {
+                          "code":  "NGW",
+                          "name":  "Nebengebäude West",
+                          "source":  "Gebaeudeliste.txt",
+                          "year":  1990
+                      },
+                      {
+                          "code":  "PW",
+                          "name":  "Pforte und Wache",
+                          "source":  "Gebaeudeliste.txt",
+                          "year":  2010
+                      },
+                      {
+                          "code":  "KAS",
+                          "name":  "Kantine und Sozialgebäude",
+                          "source":  "Gebaeudeliste.txt",
+                          "year":  2001
+                      }
+                  ],
+    "floors":  {
+                   "TZ":  [
+                              "UG",
+                              "EG",
+                              "1.OG",
+                              "2.OG",
+                              "3.OG",
+                              "4.OG"
+                          ],
+                   "KAS":  [
+                               "EG",
+                               "1.OG"
+                           ],
+                   "PW":  [
+                              "EG",
+                              "1.OG"
+                          ],
+                   "NGW":  [
+                               "UG",
+                               "EG",
+                               "1.OG"
+                           ],
+                   "KON":  [
+                               "EG",
+                               "1.OG"
+                           ],
+                   "VGS":  [
+                               "UG",
+                               "EG",
+                               "1.OG",
+                               "2.OG"
+                           ],
+                   "VGN":  [
+                               "UG",
+                               "EG",
+                               "1.OG",
+                               "2.OG",
+                               "3.OG"
+                           ]
+               },
+    "multilingual":  {
+                         "language":  "English",
+                         "detected":  true,
+                         "file":  "Email_Roto_Ersatzteile_EN.txt",
+                         "extracted":  "Roto NT Designo spare parts: Ecklager Art.374130, Schere Art.601993, RC2 Set Art.849725; discontinued 2020, parts guaranteed until 2030"
+                     },
+    "conflicts_detected":  [
+                               {
+                                   "resolved":  "V2 korrekt (Sanierung 2012)",
+                                   "id":  "K1",
+                                   "desc":  "VGN 1.OG Hersteller: V1=Roto NT 2005, V2=Siegenia 2012"
+                               },
+                               {
+                                   "resolved":  "V2 korrekt (Korrektur)",
+                                   "id":  "K2",
+                                   "desc":  "TZ-F-0106: V1=GU UNI-JET, V2=Maco Multi-Matic"
+                               },
+                               {
+                                   "resolved":  "V3 korrekt",
+                                   "id":  "K3",
+                                   "desc":  "VGN-109: Raumbuch=WC Damen, V3=Teeküche (Umbau 2020)"
+                               },
+                               {
+                                   "resolved":  "V2/V3 korrekt",
+                                   "id":  "K4",
+                                   "desc":  "VGN-F-0004 Maße: V1=1000x1400, V2/V3=900x1200"
+                               },
+                               {
+                                   "resolved":  "13 korrekt",
+                                   "id":  "K5",
+                                   "desc":  "PW Summe: Scan sagt 13+5=18, Zählung ergibt 13"
+                               },
+                               {
+                                   "resolved":  "V2 als neue Daten",
+                                   "id":  "K6",
+                                   "desc":  "KAS: fehlt komplett in V1, erst in V2 erfasst"
+                               },
+                               {
+                                   "resolved":  "793 als Gesamtzahl akzeptiert",
+                                   "id":  "K7",
+                                   "desc":  "Gesamtzahl: V1=34 unvollst., Nachtrag=793"
+                               },
+                               {
+                                   "resolved":  "Begehung V2 bevorzugt",
+                                   "id":  "K8",
+                                   "desc":  "VGN: Entwurf Roto NX 2010 vs. Begehung Siegenia 2012"
+                               }
+                           ],
+    "ocr_results":  {
+                        "handnotiz":  {
+                                          "quality":  "lesbar",
+                                          "extracted":  "TZ 2.OG, 2 Fenster klemmend, vermutlich TZ-F-0135/0136",
+                                          "file":  "Handnotiz_TZ.txt",
+                                          "success":  true
+                                      },
+                        "schlechter_scan":  {
+                                                "quality":  "mangelhaft",
+                                                "extracted":  "KAS-E01 Kantine 12 Fenster, KAS-E02 Küche 4 Fenster, KAS-E03 Ausgabe 2 Fenster",
+                                                "file":  "Grundriss_KAS_EG_Scan.txt",
+                                                "success":  true
+                                            },
+                        "verdrehter_scan":  {
+                                                "quality":  "mangelhaft",
+                                                "extracted":  "PW: 7 Räume, 13 Fenster, GU-BKS UNI-JET B, Bj 2010",
+                                                "file":  "PW_Fensterliste_Scan.txt",
+                                                "success":  true
+                                            }
+                    },
+    "floor_count":  24,
+    "questions_raised":  [
+                             "VGN 1.OG: Welche Beschlagsdaten sind korrekt - FM (Roto 2005) oder Begehung (Siegenia 2012)?",
+                             "TZ-F-0106: Hersteller GU oder Maco?",
+                             "VGN-109: Aktuelle Raumbezeichnung WC Damen oder Teeküche?",
+                             "PW: Gesamtzahl 13 oder 18? Fehlende Fenster in der Liste?",
+                             "Fehlerhafter Entwurf VGN mit Roto NX 2010: Daten importieren?",
+                             "NGW: Beschlagsystem \u0027Weru, unbekannt\u0027 - identifizierbar?"
+                         ]
+}
