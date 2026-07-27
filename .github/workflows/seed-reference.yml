@@ -1,0 +1,26 @@
+name: Seed Reference Project
+
+on:
+  workflow_dispatch:
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Seed reference project into live database
+        env:
+          SETUP_KEY: ${{ secrets.SETUP_KEY }}
+        run: |
+          echo "Calling seed_reference endpoint..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            "https://www.sv-netzwerk.eu/intern/api/setup.php?key=${SETUP_KEY}&action=seed_reference")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+          echo "HTTP $HTTP_CODE"
+          echo "$BODY" | python3 -m json.tool || echo "$BODY"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Seed failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
