@@ -38,6 +38,7 @@ if ($method === 'GET') {
         'install'         => handleInstall(),
         'create_admin'    => handleCreateAdmin(),
         'seed_reference'  => handleSeedReference(),
+        'fix_titles'      => handleFixTitles(),
         default           => apiError(400, 'Unbekannte Aktion.'),
     };
 } else {
@@ -193,3 +194,10 @@ function handleSeedReference(): never
     }
 }
 
+function handleFixTitles(): never
+{
+    $pdo = db();
+    // Update Referenzprojekt title if it exists
+    $pdo->exec("UPDATE projects SET title = 'REFERENZ: Testprojekt (Demodaten)', object_name = 'Demonstrationsprojekt für Entwicklung und Schulung', address = 'Musterstraße 1, 53123 Musterstadt (fiktiv)' WHERE id = 2");
+    apiJson(['ok' => true, 'message' => 'Titel aktualisiert.']);
+}
