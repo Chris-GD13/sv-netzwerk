@@ -19,7 +19,7 @@ publication:
   publishedAt: 2026-07-27
   status: published
 seo:
-  title: "Schadenregulierer für Versicherungen – Technische Prüfung und Schadensteuerung"
+  title: "Schadenregulierer für Versicherungen – Technische Prüfung, Steuerung"
   description: "Schadenregulierer für Versicherungen: technische Prüfung, Kostenfreigaben, Reserveermittlung und strukturierte Dokumentation von der Erstbesichtigung bis zur Schlussrechnung."
 ---
 
