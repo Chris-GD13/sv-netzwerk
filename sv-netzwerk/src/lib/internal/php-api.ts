@@ -26,6 +26,40 @@ import { normalizeCalculationParameters } from './calculations';
 
 const API_BASE = '/intern/api';
 
+// ── Projekt-Kontext aus URL ableiten ────────────────────────────────────────
+
+/** Map von URL-Slug auf project_id. */
+const PROJECT_SLUG_MAP: Record<string, number> = {
+  'fensterpruefung-bonn': 1,
+  'referenz-testprojekt': 2,
+};
+
+/** Aktuelle project_id aus der URL ableiten (Default: 1). */
+function getProjectId(): number {
+  const path = window.location.pathname;
+  const match = path.match(/\/intern\/([^/]+)\//);
+  if (match && PROJECT_SLUG_MAP[match[1]] !== undefined) {
+    return PROJECT_SLUG_MAP[match[1]];
+  }
+  return 1;
+}
+
+/** Aktuelle project_id als Query-Parameter-String. */
+function pidParam(prefix: '?' | '&' = '&'): string {
+  const pid = getProjectId();
+  return pid === 1 ? '' : `${prefix}project_id=${pid}`;
+}
+
+/** Aktuellen Projekt-URL-Slug ermitteln. */
+export function getProjectSlug(): string {
+  const path = window.location.pathname;
+  const match = path.match(/\/intern\/([^/]+)\//);
+  if (match && PROJECT_SLUG_MAP[match[1]] !== undefined) {
+    return match[1];
+  }
+  return 'fensterpruefung-bonn';
+}
+
 // ── HTTP-Hilfsfunktionen ────────────────────────────────────────────────────
 
 async function apiFetch<T>(
@@ -313,10 +347,28 @@ export async function apiDeactivateUser(id: number): Promise<{ error: Error | nu
   return { error };
 }
 
+// ── Projekte ────────────────────────────────────────────────────────────────
+
+export interface ProjectInfo {
+  id: number;
+  project_code: string;
+  title: string;
+  object_name: string;
+  address: string;
+  planned_window_count: number;
+  window_count: number;
+  building_count: number;
+}
+
+export async function apiListProjects(): Promise<ProjectInfo[]> {
+  const { data } = await apiGet<{ projects: ProjectInfo[] }>('/projects.php');
+  return data?.projects ?? [];
+}
+
 // ── Hierarchie ──────────────────────────────────────────────────────────────
 
 export async function apiListBuildings(): Promise<Building[]> {
-  const { data } = await apiGet<Building[]>('/hierarchy.php');
+  const { data } = await apiGet<Building[]>(`/hierarchy.php?_=1${pidParam()}`);
   return data ?? [];
 }
 
@@ -336,7 +388,7 @@ export async function apiListWindowsInRoom(roomId: number): Promise<WindowInRoom
 }
 
 export async function apiCreateBuilding(name: string, code: string): Promise<{ id: number } | null> {
-  const { data } = await apiPost<{ id: number }>('/hierarchy.php?entity=building', { name, code });
+  const { data } = await apiPost<{ id: number }>(`/hierarchy.php?entity=building${pidParam()}`, { name, code });
   return data;
 }
 
@@ -386,7 +438,7 @@ export async function apiDeleteWindow(id: number): Promise<boolean> {
 }
 
 export async function apiCreateWindowInRoom(roomId: number, windowNumber: string): Promise<{ id: number; record_id: string } | null> {
-  const { data } = await apiPost<{ id: number; record_id: string }>('/hierarchy.php?entity=window', { room_id: roomId, window_number: windowNumber });
+  const { data } = await apiPost<{ id: number; record_id: string }>(`/hierarchy.php?entity=window${pidParam()}`, { room_id: roomId, window_number: windowNumber });
   return data;
 }
 

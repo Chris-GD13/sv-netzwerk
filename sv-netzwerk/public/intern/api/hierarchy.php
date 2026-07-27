@@ -32,6 +32,7 @@ commonHeaders();
 $user       = requireAuth();
 $method     = $_SERVER['REQUEST_METHOD'];
 $entity     = $_GET['entity']      ?? '';
+$projectId  = isset($_GET['project_id']) ? (int) $_GET['project_id'] : 1;
 $buildingId = isset($_GET['building_id']) ? (int) $_GET['building_id'] : null;
 $floorId    = isset($_GET['floor_id'])    ? (int) $_GET['floor_id']    : null;
 $roomId     = isset($_GET['room_id'])     ? (int) $_GET['room_id']     : null;
@@ -43,8 +44,8 @@ match (true) {
     $method === 'GET'  && $roomId !== null      => handleGetWindowsInRoom($roomId),
     $method === 'GET'  && $floorId !== null     => handleGetRoomsInFloor($floorId),
     $method === 'GET'  && $buildingId !== null  => handleGetFloorsInBuilding($buildingId),
-    $method === 'GET'                           => handleGetBuildings(),
-    $method === 'POST' && $entity !== ''        => handleCreate($entity, $user),
+    $method === 'GET'                           => handleGetBuildings($projectId),
+    $method === 'POST' && $entity !== ''        => handleCreate($entity, $user, $projectId),
     $method === 'PUT'  && $entity !== '' && $id => handleUpdate($entity, $id, $user),
     $method === 'DELETE' && $entity !== '' && $id => handleDelete($entity, $id, $user),
     default                                     => apiError(404, 'Unbekannter Endpunkt.'),
@@ -52,10 +53,10 @@ match (true) {
 
 // ─── GET ────────────────────────────────────────────────────────────────────
 
-function handleGetBuildings(): never
+function handleGetBuildings(int $projectId = 1): never
 {
     try {
-        $rows = db()->query(
+        $stmt = db()->prepare(
             'SELECT b.id, b.name, b.code, b.sort_order,
                     COUNT(DISTINCT w.id)  AS window_count,
                     COUNT(DISTINCT ws.id) AS sash_count,
@@ -66,10 +67,12 @@ function handleGetBuildings(): never
              LEFT JOIN rooms ro  ON ro.floor_id    = fl.id
              LEFT JOIN windows w ON w.room_id      = ro.id AND w.deleted_at IS NULL
              LEFT JOIN window_sashes ws ON ws.window_id = w.id AND ws.deleted_at IS NULL
-             WHERE b.project_id = 1
+             WHERE b.project_id = :pid
              GROUP BY b.id
              ORDER BY b.sort_order ASC, b.name ASC'
-        )->fetchAll();
+        );
+        $stmt->execute([':pid' => $projectId]);
+        $rows = $stmt->fetchAll();
     } catch (Throwable $e) {
         apiError(503, 'Gebäudeliste konnte nicht geladen werden: ' . $e->getMessage());
     }
@@ -182,7 +185,7 @@ function handleGetSashList(int $windowId): never
 
 // ─── POST ───────────────────────────────────────────────────────────────────
 
-function handleCreate(string $entity, array $user): never
+function handleCreate(string $entity, array $user, int $projectId = 1): never
 {
     requireRole($user, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer']);
     $body = requestBody();
@@ -192,9 +195,11 @@ function handleCreate(string $entity, array $user): never
             $name = trim((string) ($body['name'] ?? ''));
             if ($name === '') apiError(400, 'Name ist erforderlich.');
             try {
-                $maxOrder = (int) db()->query('SELECT COALESCE(MAX(sort_order),0) FROM buildings WHERE project_id=1')->fetchColumn();
-                $stmt = db()->prepare('INSERT INTO buildings (project_id,name,code,notes,sort_order,created_at,updated_at) VALUES (1,:n,:c,:notes,:so,:now,:now2)');
-                $stmt->execute([':n'=>$name,':c'=>trim((string)($body['code']??'')),':notes'=>trim((string)($body['notes']??''))?:null,':so'=>$maxOrder+10,':now'=>nowUtc(),':now2'=>nowUtc()]);
+                $soStmt = db()->prepare('SELECT COALESCE(MAX(sort_order),0) FROM buildings WHERE project_id=:pid');
+                $soStmt->execute([':pid'=>$projectId]);
+                $maxOrder = (int) $soStmt->fetchColumn();
+                $stmt = db()->prepare('INSERT INTO buildings (project_id,name,code,notes,sort_order,created_at,updated_at) VALUES (:pid,:n,:c,:notes,:so,:now,:now2)');
+                $stmt->execute([':pid'=>$projectId,':n'=>$name,':c'=>trim((string)($body['code']??'')),':notes'=>trim((string)($body['notes']??''))?:null,':so'=>$maxOrder+10,':now'=>nowUtc(),':now2'=>nowUtc()]);
                 apiJson(['id'=>(int)db()->lastInsertId(),'name'=>$name], 201);
             } catch (Throwable $e) { apiError(503, 'Gebäude konnte nicht angelegt werden: '.$e->getMessage()); }
 
@@ -228,9 +233,9 @@ function handleCreate(string $entity, array $user): never
                 $loc->execute([':rid'=>$rid]);
                 $location = $loc->fetch() ?: [];
                 $recordId = 'BMVG-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 8));
-                $stmt = db()->prepare('INSERT INTO windows (project_id,room_id,record_id,window_number,room_label,room_number,building_label,floor_label,status,created_at,updated_at) VALUES (1,:rid,:recid,:wnum,:rlabel,:rnum,:blabel,:flabel,\'nicht begonnen\',:now,:now2)');
+                $stmt = db()->prepare('INSERT INTO windows (project_id,room_id,record_id,window_number,room_label,room_number,building_label,floor_label,status,created_at,updated_at) VALUES (:pid,:rid,:recid,:wnum,:rlabel,:rnum,:blabel,:flabel,\'nicht begonnen\',:now,:now2)');
                 $stmt->execute([
-                    ':rid'=>$rid,':recid'=>$recordId,':wnum'=>$wnum,
+                    ':pid'=>$projectId,':rid'=>$rid,':recid'=>$recordId,':wnum'=>$wnum,
                     ':rlabel'=>$location['room_name']??null,':rnum'=>$location['room_number']??null,
                     ':blabel'=>$location['building_name']??null,':flabel'=>$location['floor_name']??null,
                     ':now'=>nowUtc(),':now2'=>nowUtc(),

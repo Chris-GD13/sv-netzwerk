@@ -1,6 +1,6 @@
 export type PortalRole = 'administrator' | 'projektleiter' | 'sachverstaendiger' | 'pruefer' | 'auswertung' | 'gast';
 
-export type PortalRoute = 'landing' | 'login' | 'dashboard' | 'buildings' | 'floors' | 'rooms' | 'windows' | 'sashes' | 'sash' | 'record' | 'analysis' | 'export' | 'admin' | 'ai-import';
+export type PortalRoute = 'landing' | 'login' | 'projects' | 'dashboard' | 'buildings' | 'floors' | 'rooms' | 'windows' | 'sashes' | 'sash' | 'record' | 'analysis' | 'export' | 'admin' | 'ai-import';
 
 export type SashStatus =
   | 'nicht begonnen'

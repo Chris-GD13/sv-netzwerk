@@ -36,6 +36,9 @@ import {
   // KI-Import
   apiAiAnalyze,
   apiAiApply,
+  // Projekte
+  apiListProjects,
+  getProjectSlug,
   // Hierarchie
   apiListBuildings,
   apiListFloors,
@@ -100,6 +103,11 @@ interface AppContext {
 const LOCK_TIMEOUT_MINUTES = 15;
 const SAVE_DEBOUNCE_MS = 1200;
 const SYNC_WARNING_MESSAGE = 'Es liegen noch nicht synchronisierte Aenderungen vor.';
+
+/** Basis-URL für das aktuelle Projekt (z.B. '/intern/fensterpruefung-bonn'). */
+function projectBase(): string {
+  return `/intern/${getProjectSlug()}`;
+}
 
 const authListeners = new Set<(user: PortalUser | null) => void>();
 
@@ -181,6 +189,9 @@ async function renderRoute(context: AppContext) {
     case 'login':
       renderLogin(context);
       break;
+    case 'projects':
+      await renderProjects(context);
+      break;
     case 'dashboard':
       await renderDashboard(context);
       break;
@@ -227,16 +238,47 @@ function renderLanding(context: AppContext) {
       <h1>${escapeHtml(portalProject.title)}</h1>
       <p>${escapeHtml(portalProject.objectName)}<br/>${escapeHtml(portalProject.address)}</p>
       <div class="intern-actions">
-        <a class="sv-button sv-button-primary" href="${context.user ? '/intern/fensterpruefung-bonn/' : '/intern/login/'}">${context.user ? 'Zum Dashboard' : 'Zur Anmeldung'}</a>
+        <a class="sv-button sv-button-primary" href="${context.user ? '/intern/projekte/' : '/intern/login/'}">${context.user ? 'Zu den Projekten' : 'Zur Anmeldung'}</a>
       </div>
     </div>
   `;
-  if (context.user) redirectTo('/intern/fensterpruefung-bonn/');
+  if (context.user) redirectTo('/intern/projekte/');
+}
+
+async function renderProjects(context: AppContext) {
+  if (!context.user) { redirectTo('/intern/login/'); return; }
+  context.root.innerHTML = `<div class="intern-loading">Projekte werden geladen…</div>`;
+  
+  const projects = await apiListProjects();
+  
+  context.root.innerHTML = `
+    <div class="intern-app">
+      ${renderHeader(context, 'Projekte', 'Wählen Sie ein Projekt aus.')}
+      <div class="intern-content">
+        ${projects.length === 0 ? '<div class="intern-empty">Keine Projekte vorhanden.</div>' : ''}
+        <div class="intern-grid">
+          ${projects.map(p => `
+            <a class="intern-building-card" href="/intern/${escapeHtml(p.project_code)}/">
+              <div class="intern-building-card__head">
+                <span class="intern-building-card__name">${escapeHtml(p.title)}</span>
+              </div>
+              <p class="intern-meta">${escapeHtml(p.object_name)}</p>
+              <p class="intern-meta">${escapeHtml(p.address)}</p>
+              <div class="intern-building-card__stats">
+                <span>${p.building_count} Gebäude</span>
+                <span>${p.window_count} / ${p.planned_window_count} Fenster</span>
+              </div>
+            </a>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderLogin(context: AppContext) {
   if (context.user) {
-    redirectTo('/intern/fensterpruefung-bonn/');
+    redirectTo('/intern/projekte/');
     return;
   }
 
@@ -278,7 +320,7 @@ function renderLogin(context: AppContext) {
       return;
     }
     message.innerHTML = successAlert('Anmeldung erfolgreich. Weiterleitung laeuft.');
-    redirectTo('/intern/fensterpruefung-bonn/');
+    redirectTo('/intern/projekte/');
   });
   resetButton?.addEventListener('click', async () => {
     if (!message || !form) return;
@@ -325,7 +367,7 @@ async function renderDashboard(context: AppContext) {
         const pct = b.progress_pct;
         const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
         return `
-          <a class="intern-building-card" href="/intern/fensterpruefung-bonn/etagen/?building_id=${b.id}">
+          <a class="intern-building-card" href="${projectBase()}/etagen/?building_id=${b.id}">
             <div class="intern-building-card__header">
               <strong>${escapeHtml(b.name)}</strong>
               ${b.code ? `<span class="intern-badge intern-badge--info">${escapeHtml(b.code)}</span>` : ''}
@@ -361,7 +403,7 @@ async function renderDashboard(context: AppContext) {
       <section class="intern-panel">
         <h2>Letzte Änderungen</h2>
         <div class="intern-list">
-          ${stats.recentChanges.map((item) => `<a class="intern-card" href="/intern/fensterpruefung-bonn/fenster/record/?id=${encodeURIComponent(item.id)}"><strong>${escapeHtml(item.label)}</strong><p class="intern-meta">${formatDateTime(item.updatedAt)} · ${escapeHtml(item.status)}${item.user ? ` · ${escapeHtml(item.user)}` : ''}</p></a>`).join('') || '<div class="intern-empty">Noch keine Änderungen protokolliert.</div>'}
+          ${stats.recentChanges.map((item) => `<a class="intern-card" href="${projectBase()}/fenster/record/?id=${encodeURIComponent(item.id)}"><strong>${escapeHtml(item.label)}</strong><p class="intern-meta">${formatDateTime(item.updatedAt)} · ${escapeHtml(item.status)}${item.user ? ` · ${escapeHtml(item.user)}` : ''}</p></a>`).join('') || '<div class="intern-empty">Noch keine Änderungen protokolliert.</div>'}
         </div>
       </section>
     </div>
@@ -431,7 +473,7 @@ function renderBuildingCard(b: Building, isAdmin: boolean): string {
   const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
   return `
     <div class="intern-building-card-wrapper" data-building-id="${b.id}" data-building-name="${escapeHtml(b.name)}" data-building-code="${escapeHtml(b.code ?? '')}">
-      <a class="intern-building-card" href="/intern/fensterpruefung-bonn/etagen/?building_id=${b.id}">
+      <a class="intern-building-card" href="${projectBase()}/etagen/?building_id=${b.id}">
         <div class="intern-building-card__header">
           <strong>${escapeHtml(b.name)}</strong>
           ${b.code ? `<span class="intern-badge intern-badge--info">${escapeHtml(b.code)}</span>` : ''}
@@ -610,7 +652,7 @@ async function renderFloors(context: AppContext) {
   context.root.innerHTML = `
     ${renderHeader(context, 'Etagen', 'Bitte Etage wählen.')}
     <div class="intern-breadcrumb">
-      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> › Etagen
+      <a href="${projectBase()}/gebaeude/">Gebäude</a> › Etagen
     </div>
     ${isAdmin ? `
     <div class="intern-card" style="margin-bottom:16px">
@@ -650,7 +692,7 @@ function renderFloorCard(f: Floor, buildingId: number, isAdmin: boolean): string
   const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
   return `
     <div class="intern-list-item-wrapper" data-floor-id="${f.id}" data-entity-name="${escapeHtml(f.name)}" data-entity-level="${f.level ?? 0}">
-      <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/raeume/?floor_id=${f.id}&building_id=${buildingId}">
+      <a class="intern-card intern-list-item" href="${projectBase()}/raeume/?floor_id=${f.id}&building_id=${buildingId}">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <strong>${escapeHtml(f.name)}</strong>
           <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
@@ -685,8 +727,8 @@ async function renderRooms(context: AppContext) {
   context.root.innerHTML = `
     ${renderHeader(context, 'Räume', 'Bitte Raum wählen.')}
     <div class="intern-breadcrumb">
-      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
-      <a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> ›
+      <a href="${projectBase()}/gebaeude/">Gebäude</a> ›
+      <a href="${projectBase()}/etagen/?building_id=${buildingId}">Etagen</a> ›
       Räume
     </div>
     ${isAdmin ? `
@@ -727,7 +769,7 @@ function renderRoomCard(r: Room, floorId: number, buildingId: number, isAdmin: b
   const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
   return `
     <div class="intern-list-item-wrapper" data-room-id="${r.id}" data-entity-name="${escapeHtml(r.name)}" data-entity-number="${escapeHtml(r.room_number ?? '')}">
-      <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fenster/?room_id=${r.id}&floor_id=${floorId}&building_id=${buildingId}">
+      <a class="intern-card intern-list-item" href="${projectBase()}/fenster/?room_id=${r.id}&floor_id=${floorId}&building_id=${buildingId}">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <strong>${escapeHtml(r.room_number ? `${r.room_number} – ${r.name}` : r.name)}</strong>
           <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
@@ -769,9 +811,9 @@ async function renderWindowsInRoom(context: AppContext) {
   context.root.innerHTML = `
     ${renderHeader(context, 'Fenster', 'Bitte Fenster wählen.')}
     <div class="intern-breadcrumb">
-      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
-      <a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> ›
-      <a href="/intern/fensterpruefung-bonn/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> ›
+      <a href="${projectBase()}/gebaeude/">Gebäude</a> ›
+      <a href="${projectBase()}/etagen/?building_id=${buildingId}">Etagen</a> ›
+      <a href="${projectBase()}/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> ›
       ${firstWindow ? escapeHtml(`${firstWindow.room_number ? firstWindow.room_number + ' – ' : ''}${firstWindow.room_name ?? 'Raum'}`) : 'Fenster'}
     </div>
     ${isAdmin ? `
@@ -790,7 +832,7 @@ async function renderWindowsInRoom(context: AppContext) {
     if (!wnum) return;
     const result = await apiCreateWindowInRoom(roomId, wnum.trim());
     if (result) {
-      redirectTo(`/intern/fensterpruefung-bonn/fluegel/?window_id=${result.id}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`);
+      redirectTo(`${projectBase()}/fluegel/?window_id=${result.id}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`);
     } else {
       const msg = context.root.querySelector<HTMLElement>('#window-room-msg');
       if (msg) msg.innerHTML = errorAlert('Fenster konnte nicht angelegt werden.');
@@ -805,7 +847,7 @@ function renderWindowInRoomCard(w: WindowInRoom, isAdmin: boolean): string {
   const badgeClass = w.sash_defect > 0 ? 'danger' : pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
   return `
     <div class="intern-list-item-wrapper" data-window-id="${w.id}" data-entity-name="${escapeHtml(w.window_number || w.record_id)}">
-      <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fluegel/?window_id=${w.id}&room_id=0&floor_id=${w.floor_id ?? 0}&building_id=${w.building_id ?? 0}">
+      <a class="intern-card intern-list-item" href="${projectBase()}/fluegel/?window_id=${w.id}&room_id=0&floor_id=${w.floor_id ?? 0}&building_id=${w.building_id ?? 0}">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <strong>${escapeHtml(w.window_number || w.record_id)}</strong>
           <span class="intern-badge intern-badge--${badgeClass}">${pct}%</span>
@@ -841,9 +883,9 @@ async function renderSashes(context: AppContext) {
 
   // Fenstertitel ermitteln
   const windowLabel = `Fenster #${windowId}`;
-  const breadBuilding = buildingId > 0 ? `<a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> › ` : '';
-  const breadFloor = floorId > 0 ? `<a href="/intern/fensterpruefung-bonn/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> › ` : '';
-  const breadRoom = roomId > 0 ? `<a href="/intern/fensterpruefung-bonn/fenster/?room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">Fenster</a> › ` : '';
+  const breadBuilding = buildingId > 0 ? `<a href="${projectBase()}/etagen/?building_id=${buildingId}">Etagen</a> › ` : '';
+  const breadFloor = floorId > 0 ? `<a href="${projectBase()}/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> › ` : '';
+  const breadRoom = roomId > 0 ? `<a href="${projectBase()}/fenster/?room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">Fenster</a> › ` : '';
 
   const overallPct = sashes.length > 0
     ? Math.round(sashes.filter((s) => ['abgeschlossen', 'freigegeben'].includes(s.status)).length / sashes.length * 100)
@@ -852,7 +894,7 @@ async function renderSashes(context: AppContext) {
   context.root.innerHTML = `
     ${renderHeader(context, `Flügel – ${escapeHtml(windowLabel)}`, 'Bitte Flügel wählen für die Inspektion.')}
     <div class="intern-breadcrumb">
-      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
+      <a href="${projectBase()}/gebaeude/">Gebäude</a> ›
       ${breadBuilding}${breadFloor}${breadRoom}
       ${escapeHtml(windowLabel)} – Flügel
     </div>
@@ -877,7 +919,7 @@ async function renderSashes(context: AppContext) {
     if (!label) return;
     const result = await apiCreateSash(windowId, label.trim(), 'Dreh-Kipp', '');
     if (result) {
-      redirectTo(`/intern/fensterpruefung-bonn/fluegel-pruefung/?sash_id=${result.id}&window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`);
+      redirectTo(`${projectBase()}/fluegel-pruefung/?sash_id=${result.id}&window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`);
     } else {
       const msg = context.root.querySelector<HTMLElement>('#sash-msg');
       if (msg) msg.innerHTML = errorAlert('Flügel konnte nicht angelegt werden.');
@@ -891,7 +933,7 @@ function renderSashCard(s: WindowSashSummary, windowId: number, roomId: number, 
   const badgeClass = s.has_defect ? 'danger' : isComplete ? 'ok' : s.status === 'in Bearbeitung' ? 'info' : 'warn';
   const statusLabel = sashStatusLabel(s.status);
   return `
-    <a class="intern-card intern-list-item" href="/intern/fensterpruefung-bonn/fluegel-pruefung/?sash_id=${s.id}&window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">
+    <a class="intern-card intern-list-item" href="${projectBase()}/fluegel-pruefung/?sash_id=${s.id}&window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
         <strong>${escapeHtml(s.sash_label || `Flügel ${s.sash_number}`)}</strong>
         <span class="intern-badge intern-badge--${badgeClass}">${escapeHtml(statusLabel)}</span>
@@ -940,15 +982,15 @@ async function renderSashInspection(context: AppContext) {
   const canEdit = !(['gast','auswertung'] as string[]).includes(context.user?.profile.role ?? '');
   const data = sash.form_data as Record<string, unknown>;
 
-  const backUrl = `/intern/fensterpruefung-bonn/fluegel/?window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`;
+  const backUrl = `${projectBase()}/fluegel/?window_id=${windowId}&room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}`;
 
   context.root.innerHTML = `
     ${renderHeader(context, `${escapeHtml(sash.sash_label || `Flügel ${sash.sash_number}`)} – Prüfung`, `Fenster ${escapeHtml(sash.window_number)} · ${escapeHtml(sash.room_name ?? '')} · ${escapeHtml(sash.floor_name ?? '')} · ${escapeHtml(sash.building_name ?? '')}`)}
     <div class="intern-breadcrumb">
-      <a href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a> ›
-      ${buildingId > 0 ? `<a href="/intern/fensterpruefung-bonn/etagen/?building_id=${buildingId}">Etagen</a> › ` : ''}
-      ${floorId > 0 ? `<a href="/intern/fensterpruefung-bonn/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> › ` : ''}
-      ${roomId > 0 ? `<a href="/intern/fensterpruefung-bonn/fenster/?room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">Fenster</a> › ` : ''}
+      <a href="${projectBase()}/gebaeude/">Gebäude</a> ›
+      ${buildingId > 0 ? `<a href="${projectBase()}/etagen/?building_id=${buildingId}">Etagen</a> › ` : ''}
+      ${floorId > 0 ? `<a href="${projectBase()}/raeume/?floor_id=${floorId}&building_id=${buildingId}">Räume</a> › ` : ''}
+      ${roomId > 0 ? `<a href="${projectBase()}/fenster/?room_id=${roomId}&floor_id=${floorId}&building_id=${buildingId}">Fenster</a> › ` : ''}
       <a href="${backUrl}">Flügel</a> › Prüfung
     </div>
     <div class="intern-statusbar">
@@ -1484,7 +1526,7 @@ async function renderWindowsFlat(context: AppContext) {
   selects.forEach((select) => select.addEventListener('change', applyFilters));
   context.root.querySelector<HTMLButtonElement>('#create-window')?.addEventListener('click', async () => {
     const created = await createWindowRecord(context, null);
-    if (created) redirectTo(`/intern/fensterpruefung-bonn/fenster/${encodeURIComponent(created.id)}/`);
+    if (created) redirectTo(`${projectBase()}/fenster/${encodeURIComponent(created.id)}/`);
   });
   context.root.querySelector<HTMLButtonElement>('#download-qr-list')?.addEventListener('click', async () => {
     await downloadQrOverview(records);
@@ -1498,7 +1540,7 @@ function bindWindowTableActions(context: AppContext, records: WindowSummary[]) {
   context.root.querySelectorAll<HTMLElement>('[data-open-window]').forEach((button) => {
     button.onclick = () => {
       const id = button.dataset.openWindow;
-      if (id) redirectTo(`/intern/fensterpruefung-bonn/fenster/${encodeURIComponent(id)}/`);
+      if (id) redirectTo(`${projectBase()}/fenster/${encodeURIComponent(id)}/`);
     };
   });
   context.root.querySelectorAll<HTMLElement>('[data-duplicate-window]').forEach((button) => {
@@ -1507,7 +1549,7 @@ function bindWindowTableActions(context: AppContext, records: WindowSummary[]) {
       const source = records.find((record) => record.id === id);
       if (!source) return;
       const created = await createWindowRecord(context, source.id);
-      if (created) redirectTo(`/intern/fensterpruefung-bonn/fenster/${encodeURIComponent(created.id)}/`);
+      if (created) redirectTo(`${projectBase()}/fenster/${encodeURIComponent(created.id)}/`);
     };
   });
 }
@@ -1585,7 +1627,7 @@ async function renderRecord(context: AppContext) {
     </div>
     <div class="intern-sticky-actions">
       <div class="intern-progress">
-        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/fenster/">Zurueck</a>
+        <a class="sv-button sv-button-secondary" href="${projectBase()}/fenster/">Zurueck</a>
         <progress value="${Math.round(record.progress_percent)}" max="100"></progress>
         <span>${Math.round(record.progress_percent)}% Pflichtfelder</span>
       </div>
@@ -1605,7 +1647,7 @@ async function renderRecord(context: AppContext) {
   const gallery = context.root.querySelector<HTMLElement>('#photo-gallery');
   const qrCanvas = context.root.querySelector<HTMLCanvasElement>('#record-qr');
   if (qrCanvas) {
-    await QRCode.toCanvas(qrCanvas, `${window.location.origin}/intern/fensterpruefung-bonn/fenster/${encodeURIComponent(id)}/`, {
+    await QRCode.toCanvas(qrCanvas, `${window.location.origin}${projectBase()}/fenster/${encodeURIComponent(id)}/`, {
       width: 220,
       color: { dark: '#071a2e', light: '#ffffff' },
       margin: 1,
@@ -2265,12 +2307,13 @@ function renderHeader(context: AppContext, title: string, text: string) {
       <h1>${escapeHtml(title)}</h1>
       <p>${escapeHtml(text)}</p>
       <nav class="intern-actions" aria-label="Hauptnavigation">
-        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/">Dashboard</a>
-        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/gebaeude/">Gebäude</a>
-        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/auswertung/">Auswertung</a>
-        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/export/">Export</a>
-        ${canImport ? '<a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/import/">📄 KI-Import</a>' : ''}
-        ${isAdmin ? '<a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/admin/">Benutzerverwaltung</a>' : ''}
+        <a class="sv-button sv-button-secondary" href="/intern/projekte/">Projekte</a>
+        <a class="sv-button sv-button-secondary" href="${projectBase()}/">Dashboard</a>
+        <a class="sv-button sv-button-secondary" href="${projectBase()}/gebaeude/">Gebäude</a>
+        <a class="sv-button sv-button-secondary" href="${projectBase()}/auswertung/">Auswertung</a>
+        <a class="sv-button sv-button-secondary" href="${projectBase()}/export/">Export</a>
+        ${canImport ? `<a class="sv-button sv-button-secondary" href="${projectBase()}/import/">📄 KI-Import</a>` : ''}
+        ${isAdmin ? `<a class="sv-button sv-button-secondary" href="${projectBase()}/admin/">Benutzerverwaltung</a>` : ''}
         <button class="sv-button sv-button-ghost" type="button" id="header-logout">Abmelden</button>
       </nav>
     </div>
@@ -2765,7 +2808,7 @@ async function downloadQrOverview(records: WindowSummary[]) {
     const card = popup.document.createElement('div');
     card.className = 'card';
     const canvas = popup.document.createElement('canvas');
-    await QRCode.toCanvas(canvas, `${window.location.origin}/intern/fensterpruefung-bonn/fenster/${encodeURIComponent(record.id)}/`, { width: 160, margin: 1 });
+    await QRCode.toCanvas(canvas, `${window.location.origin}${projectBase()}/fenster/${encodeURIComponent(record.id)}/`, { width: 160, margin: 1 });
     card.innerHTML = `<strong>${escapeHtml(record.window_number || record.record_id)}</strong><p>${escapeHtml([record.room_number, record.floor_label, record.section_label].filter(Boolean).join(' · '))}</p>`;
     card.append(canvas);
     grid.append(card);
