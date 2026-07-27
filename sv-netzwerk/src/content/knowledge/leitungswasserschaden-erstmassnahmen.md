@@ -18,7 +18,7 @@ publication:
   publishedAt: 2026-07-18
   status: published
 seo:
-  title: "Leitungswasserschaden: Sofortmaßnahmen richtig dokumentieren"
+  title: "Leitungswasserschaden: Erste Maßnahmen sicher dokumentieren"
   description: "Welche Sofortmaßnahmen nach einem Leitungswasserschaden sofort ergriffen werden müssen und was von Beginn an zu dokumentieren ist."
 ---
 

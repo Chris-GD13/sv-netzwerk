@@ -18,7 +18,7 @@ publication:
   publishedAt: 2026-07-15
   status: published
 seo:
-  title: "Experten im Schadenfall fachlich zuordnen"
+  title: "Fachliche Zuständigkeit im Schadenfall eindeutig zuordnen"
   description: "Prüfziel, Fachgebiet, Region und Verantwortung für eine belastbare Expertenzuordnung im Schadenfall verbinden."
   image: "https://www.sv-netzwerk.eu/assets/images/linkedin/fachliche-zustaendigkeit-schadenfall.png"
 ---
