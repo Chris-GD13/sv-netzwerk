@@ -173,6 +173,33 @@ export async function mountInternalPortal(root: HTMLElement) {
 
   await renderRoute(context);
   if (navigator.onLine) void syncDraftQueue(context);
+
+  // Inaktivitäts-Logout nach 10 Minuten
+  const INACTIVITY_MS = 10 * 60 * 1000;
+  let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const resetInactivityTimer = () => {
+    if (!context.user) return;
+    if (inactivityTimer !== null) clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(async () => {
+      await apiLogout();
+      redirectTo('/intern/login/?reason=inactivity');
+    }, INACTIVITY_MS);
+  };
+
+  const activityEvents = ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'] as const;
+  activityEvents.forEach(ev =>
+    document.addEventListener(ev, resetInactivityTimer, { passive: true })
+  );
+  disposers.push(() => {
+    if (inactivityTimer !== null) clearTimeout(inactivityTimer);
+    activityEvents.forEach(ev =>
+      document.removeEventListener(ev, resetInactivityTimer)
+    );
+  });
+
+  // Starte Timer sofort
+  resetInactivityTimer();
 }
 
 function bindAuthListener(context: AppContext) {
@@ -521,6 +548,8 @@ async function renderProjects(context: AppContext) {
       else alert('Fehler beim Löschen.');
     });
   });
+
+  bindHeaderLogout(context);
 }
 
 function showProjectEditDialog(context: AppContext, id: number, title: string, objectName: string, address: string, windowCount: number) {
@@ -624,6 +653,14 @@ function renderLogin(context: AppContext) {
       <div id="intern-login-message"></div>
     </div>
   `;
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('reason') === 'inactivity') {
+    const msg = context.root.querySelector<HTMLElement>('#intern-login-message');
+    if (msg) {
+      msg.innerHTML = '<div class="intern-alert intern-alert--warn">Sie wurden nach 10 Minuten Inaktivät automatisch abgemeldet.</div>';
+    }
+  }
 
   const form = context.root.querySelector<HTMLFormElement>('#intern-login-form');
   const message = context.root.querySelector<HTMLElement>('#intern-login-message');
