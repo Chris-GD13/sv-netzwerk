@@ -1863,23 +1863,96 @@ async function renderAnalysis(context: AppContext) {
   const byInspector = groupBy(records, (item) => item.assigned_name || 'Nicht zugewiesen');
   const bySystem = groupBy(records, (item) => String((item as unknown as { form_data?: Record<string, unknown> }).form_data?.window_system ?? 'Nicht erfasst'));
   context.root.innerHTML = `
-    ${renderHeader(context, 'Auswertung', 'Interne Uebersichten fuer Status, Eignung und Prioritaeten.')}
+    ${renderHeader(context, 'Auswertung', 'Interne Übersichten für Status, Eignung und Prioritäten. Klicken Sie auf eine Kachel oder Gruppierung für Details.')}
     <div class="intern-analysis-grid">
-      ${renderAnalysisCard('Gepruefte Fenster', records.filter((record) => record.status === 'Pruefung abgeschlossen' || record.status === 'freigegeben').length)}
-      ${renderAnalysisCard('Ungepruefte Fenster', records.filter((record) => record.status === 'nicht begonnen').length)}
-      ${renderAnalysisCard('Nicht zugaengliche Fenster', records.filter((record) => record.accessibility_status === 'nicht zugaenglich').length)}
-      ${renderAnalysisCard('Geeignete Beschlaege', records.filter((record) => record.overall_rating === 'ohne festgestellten Handlungsbedarf').length)}
-      ${renderAnalysisCard('Nicht geeignete Beschlaege', records.filter((record) => record.has_defect).length)}
-      ${renderAnalysisCard('Spezialpruefungen', records.filter((record) => record.special_inspection_required).length)}
-      ${renderAnalysisCard('Dringende Sicherungsmassnahmen', records.filter((record) => record.urgent_action_required || record.danger_immediate).length)}
+      ${renderAnalysisCard('Geprüfte Fenster', records.filter((record) => record.status === 'Pruefung abgeschlossen' || record.status === 'freigegeben').length, 'geprueft')}
+      ${renderAnalysisCard('Ungeprüfte Fenster', records.filter((record) => record.status === 'nicht begonnen').length, 'ungeprueft')}
+      ${renderAnalysisCard('Nicht zugängliche Fenster', records.filter((record) => record.accessibility_status === 'nicht zugaenglich').length, 'nicht_zugaenglich')}
+      ${renderAnalysisCard('Geeignete Beschläge', records.filter((record) => record.overall_rating === 'ohne festgestellten Handlungsbedarf').length, 'geeignet')}
+      ${renderAnalysisCard('Nicht geeignete Beschläge', records.filter((record) => record.has_defect).length, 'mangel')}
+      ${renderAnalysisCard('Spezialprüfungen', records.filter((record) => record.special_inspection_required).length, 'spezial')}
+      ${renderAnalysisCard('Dringende Sicherungsmaßnahmen', records.filter((record) => record.urgent_action_required || record.danger_immediate).length, 'dringend')}
     </div>
     <div class="intern-grid">
-      <section class="intern-panel"><h2>Ergebnisse je Gebaeude</h2>${renderGrouping(groupings)}</section>
-      <section class="intern-panel"><h2>Ergebnisse je Etage</h2>${renderGrouping(byFloor)}</section>
-      <section class="intern-panel"><h2>Ergebnisse je Pruefer</h2>${renderGrouping(byInspector)}</section>
-      <section class="intern-panel"><h2>Ergebnisse je Fenstersystem</h2>${renderGrouping(bySystem)}</section>
+      <section class="intern-panel"><h2>Ergebnisse je Gebäude</h2>${renderGrouping(groupings, 'building')}</section>
+      <section class="intern-panel"><h2>Ergebnisse je Etage</h2>${renderGrouping(byFloor, 'floor')}</section>
+      <section class="intern-panel"><h2>Ergebnisse je Prüfer</h2>${renderGrouping(byInspector, 'inspector')}</section>
+      <section class="intern-panel"><h2>Ergebnisse je Fenstersystem</h2>${renderGrouping(bySystem, 'system')}</section>
+    </div>
+    <div id="analysis-detail" style="display:none; margin-top:1.5rem;">
+      <div class="intern-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h2 id="detail-title">Details</h2>
+          <button class="sv-button sv-button-secondary" id="detail-close">✕ Schließen</button>
+        </div>
+        <div id="detail-content" style="margin-top:1rem;overflow-x:auto;"></div>
+      </div>
     </div>
   `;
+
+  const detailPanel = context.root.querySelector<HTMLElement>('#analysis-detail')!;
+  const detailTitle = context.root.querySelector<HTMLElement>('#detail-title')!;
+  const detailContent = context.root.querySelector<HTMLElement>('#detail-content')!;
+
+  function showDetail(title: string, items: WindowSummary[]) {
+    detailTitle.textContent = title + ` (${items.length})`;
+    detailContent.innerHTML = items.length === 0
+      ? '<p class="intern-meta">Keine Ergebnisse.</p>'
+      : `<table class="intern-table"><thead><tr><th>Fenster</th><th>Gebäude</th><th>Etage</th><th>Raum</th><th>Status</th><th>Bewertung</th></tr></thead><tbody>${items.map(r => `<tr style="cursor:pointer" data-window-id="${r.id}"><td>${escapeHtml(r.window_number || r.record_id)}</td><td>${escapeHtml(r.building_label || '-')}</td><td>${escapeHtml(r.floor_label || '-')}</td><td>${escapeHtml(r.room_number || '-')}</td><td>${escapeHtml(r.status)}</td><td>${escapeHtml(r.overall_rating || '-')}</td></tr>`).join('')}</tbody></table>`;
+    detailPanel.style.display = 'block';
+    detailPanel.scrollIntoView({ behavior: 'smooth' });
+    // Click on row → open window record
+    detailContent.querySelectorAll<HTMLElement>('[data-window-id]').forEach(row => {
+      row.onclick = () => { window.location.href = projectBase() + '/fenster/?id=' + row.dataset.windowId; };
+    });
+  }
+
+  // Card click handlers
+  const filterMap: Record<string, (r: WindowSummary) => boolean> = {
+    'geprueft': r => r.status === 'Pruefung abgeschlossen' || r.status === 'freigegeben',
+    'ungeprueft': r => r.status === 'nicht begonnen',
+    'nicht_zugaenglich': r => r.accessibility_status === 'nicht zugaenglich',
+    'geeignet': r => r.overall_rating === 'ohne festgestellten Handlungsbedarf',
+    'mangel': r => Boolean(r.has_defect),
+    'spezial': r => Boolean(r.special_inspection_required),
+    'dringend': r => Boolean(r.urgent_action_required || r.danger_immediate),
+  };
+  const filterLabels: Record<string, string> = {
+    'geprueft': 'Geprüfte Fenster',
+    'ungeprueft': 'Ungeprüfte Fenster',
+    'nicht_zugaenglich': 'Nicht zugängliche Fenster',
+    'geeignet': 'Geeignete Beschläge',
+    'mangel': 'Nicht geeignete Beschläge / Mängel',
+    'spezial': 'Spezialprüfungen erforderlich',
+    'dringend': 'Dringende Sicherungsmaßnahmen',
+  };
+
+  context.root.querySelectorAll<HTMLElement>('[data-filter]').forEach(card => {
+    card.onclick = () => {
+      const key = card.dataset.filter!;
+      const fn = filterMap[key];
+      if (fn) showDetail(filterLabels[key] || key, records.filter(fn));
+    };
+  });
+
+  // Group click handlers
+  context.root.querySelectorAll<HTMLElement>('[data-group-type]').forEach(card => {
+    card.onclick = () => {
+      const type = card.dataset.groupType!;
+      const value = card.dataset.groupValue!;
+      let filtered: WindowSummary[] = [];
+      if (type === 'building') filtered = records.filter(r => (r.building_label || 'Unbekannt') === value);
+      else if (type === 'floor') filtered = records.filter(r => (r.floor_label || 'Unbekannt') === value);
+      else if (type === 'inspector') filtered = records.filter(r => (r.assigned_name || 'Nicht zugewiesen') === value);
+      else if (type === 'system') filtered = records.filter(r => String((r as unknown as { form_data?: Record<string, unknown> }).form_data?.window_system ?? 'Nicht erfasst') === value);
+      showDetail(value, filtered);
+    };
+  });
+
+  context.root.querySelector('#detail-close')?.addEventListener('click', () => {
+    detailPanel.style.display = 'none';
+  });
+
   bindHeaderLogout(context);
 }
 
@@ -2983,13 +3056,13 @@ function renderAuditLogs(entries: AuditLogEntry[]) {
   `).join('');
 }
 
-function renderAnalysisCard(label: string, value: number) {
-  return `<article class="intern-stat"><span>${escapeHtml(label)}</span><strong>${value}</strong></article>`;
+function renderAnalysisCard(label: string, value: number, filterKey: string) {
+  return `<article class="intern-stat intern-stat--clickable" data-filter="${escapeHtml(filterKey)}" style="cursor:pointer"><span>${escapeHtml(label)}</span><strong>${value}</strong></article>`;
 }
 
-function renderGrouping(groups: Map<string, WindowSummary[]>) {
+function renderGrouping(groups: Map<string, WindowSummary[]>, groupType: string) {
   if (!groups.size) return '<div class="intern-empty">Keine Daten vorhanden.</div>';
-  return `<div class="intern-list">${Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([label, items]) => `<div class="intern-card"><strong>${escapeHtml(label)}</strong><p class="intern-meta">${items.length} Fenster · ${items.filter((item) => item.has_defect).length} mit Mangel · ${items.filter((item) => item.special_inspection_required).length} Spezialpruefungen</p></div>`).join('')}</div>`;
+  return `<div class="intern-list">${Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([label, items]) => `<div class="intern-card intern-card--clickable" data-group-type="${escapeHtml(groupType)}" data-group-value="${escapeHtml(label)}" style="cursor:pointer"><strong>${escapeHtml(label)}</strong><p class="intern-meta">${items.length} Fenster · ${items.filter((item) => item.has_defect).length} mit Mangel · ${items.filter((item) => item.special_inspection_required).length} Spezialpruefungen</p></div>`).join('')}</div>`;
 }
 
 function roleBadge(role: PortalRole) {

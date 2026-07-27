@@ -187,6 +187,16 @@ p {
   background: #b71c1c;
   border-color: #b71c1c;
 }
+.intern-stat--clickable:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+  transition: all 0.15s;
+}
+.intern-card--clickable:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  border-color: var(--sv-brand, #1a73e8);
+  transition: all 0.15s;
+}
 .sv-stack {
   display: flex;
   flex-wrap: wrap;
