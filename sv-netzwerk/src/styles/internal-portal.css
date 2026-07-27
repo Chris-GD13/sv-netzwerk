@@ -21,6 +21,27 @@
   color: #fff;
 }
 
+.intern-header__brand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(.9rem, 1.8vw, 1.8rem);
+}
+
+.intern-header .site-brand,
+.intern-header .site-brand:hover {
+  color: #fff;
+}
+
+.intern-header .site-brand__copy small {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.intern-header__meta strong,
+.intern-header__meta small {
+  display: block;
+}
+
 .intern-header__inner strong,
 .intern-header__inner small,
 .intern-header__nav a {
