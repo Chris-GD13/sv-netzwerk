@@ -2503,24 +2503,51 @@ function bindUserActions(
       if (!row) return;
       if (!row.hidden && row.querySelector('[data-pw-form]')) { row.hidden = true; return; }
       row.hidden = false;
+      // Generate a random password
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*';
+      let generated = '';
+      for (let i = 0; i < 14; i++) generated += chars[Math.floor(Math.random() * chars.length)];
       row.innerHTML = `
         <td colspan="6">
-          <form class="intern-form-grid intern-edit-form" data-pw-form="${id}">
-            <div class="intern-field">
-              <label>Neues Passwort (mind. 10 Zeichen)</label>
-              <input name="password" type="password" minlength="10" required autocomplete="new-password" />
+          <div style="padding:12px;background:#f8fafc;border-radius:8px">
+            <h4 style="margin:0 0 12px">Passwort verwalten</h4>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+              <div style="flex:1;min-width:200px">
+                <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:4px">Neues Passwort</label>
+                <div style="display:flex;gap:6px">
+                  <input id="pw-input-${id}" name="password" type="password" minlength="10" required autocomplete="new-password" value="${generated}" style="flex:1;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-family:monospace" />
+                  <button type="button" class="sv-button sv-button-secondary" id="pw-toggle-${id}" style="padding:4px 10px;font-size:0.85rem" title="Passwort anzeigen/verbergen">👁️</button>
+                </div>
+              </div>
+              <button type="button" class="sv-button sv-button-secondary" id="pw-gen-${id}" style="padding:6px 12px;font-size:0.85rem">🔄 Generieren</button>
+              <button type="button" class="sv-button sv-button-secondary" id="pw-copy-${id}" style="padding:6px 12px;font-size:0.85rem">📋 Kopieren</button>
+              <button type="button" class="sv-button sv-button-primary" id="pw-save-${id}" style="padding:6px 12px;font-size:0.85rem">💾 Speichern</button>
             </div>
-            <div class="intern-actions intern-field--full">
-              <button class="sv-button sv-button-primary" type="submit">Passwort setzen</button>
-            </div>
-          </form>
+            <p style="margin:8px 0 0;font-size:0.8rem;color:#666">Generiertes Passwort: <code id="pw-preview-${id}" style="user-select:all;background:#e8eef3;padding:2px 6px;border-radius:4px">${generated}</code></p>
+          </div>
         </td>
       `;
-      row.querySelector<HTMLFormElement>(`[data-pw-form="${id}"]`)?.addEventListener('submit', async (evt) => {
-        evt.preventDefault();
-        const form = evt.currentTarget as HTMLFormElement;
-        const password = String(new FormData(form).get('password') ?? '');
-        const { error } = await apiSetUserPassword(id, password);
+      const input = row.querySelector<HTMLInputElement>(`#pw-input-${id}`);
+      // Toggle visibility
+      row.querySelector(`#pw-toggle-${id}`)?.addEventListener('click', () => {
+        if (input) { input.type = input.type === 'password' ? 'text' : 'password'; }
+      });
+      // Generate new
+      row.querySelector(`#pw-gen-${id}`)?.addEventListener('click', () => {
+        let np = '';
+        for (let i = 0; i < 14; i++) np += chars[Math.floor(Math.random() * chars.length)];
+        if (input) input.value = np;
+        const preview = row.querySelector(`#pw-preview-${id}`);
+        if (preview) preview.textContent = np;
+      });
+      // Copy
+      row.querySelector(`#pw-copy-${id}`)?.addEventListener('click', () => {
+        if (input) { navigator.clipboard.writeText(input.value); if (msgEl) msgEl.innerHTML = successAlert('Passwort in Zwischenablage kopiert.'); }
+      });
+      // Save
+      row.querySelector(`#pw-save-${id}`)?.addEventListener('click', async () => {
+        if (!input || input.value.length < 10) { if (msgEl) msgEl.innerHTML = errorAlert('Passwort muss mindestens 10 Zeichen lang sein.'); return; }
+        const { error } = await apiSetUserPassword(id, input.value);
         if (error) {
           if (msgEl) msgEl.innerHTML = errorAlert(`Fehler: ${error.message}`);
         } else {
