@@ -118,6 +118,23 @@ function handleInstall(): never
     $migrations = [
         'ALTER TABLE windows ADD COLUMN room_id INT UNSIGNED NULL AFTER project_id',
         'ALTER TABLE photos ADD COLUMN sash_id INT UNSIGNED NULL AFTER window_id',
+        "CREATE TABLE IF NOT EXISTS login_attempts (
+            id            INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+            ip            VARCHAR(45)     NOT NULL,
+            email         VARCHAR(255)    NOT NULL DEFAULT '',
+            attempt_type  ENUM('email_not_found','wrong_password') NOT NULL,
+            attempted_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            INDEX idx_ip_time (ip, attempted_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS login_blocks (
+            ip            VARCHAR(45)     NOT NULL,
+            blocked_until DATETIME        NOT NULL,
+            block_reason  VARCHAR(100)    NOT NULL DEFAULT '',
+            email         VARCHAR(255)    NOT NULL DEFAULT '',
+            blocked_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (ip)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
     ];
     foreach ($migrations as $mig) {
         try {
