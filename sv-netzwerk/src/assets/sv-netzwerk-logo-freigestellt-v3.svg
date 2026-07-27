@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="460" viewBox="0 0 2400 460" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="2600" height="460" viewBox="0 0 2600 460" role="img" aria-labelledby="title desc">
   <title id="title">SV-Netzwerk Logo</title>
   <desc id="desc">Freigestelltes Vektorlogo mit SV-Zeichen in Orange und Wortmarke in Blau.</desc>
 
@@ -17,20 +17,20 @@
   </g>
 
   <text
-    x="760"
+    x="710"
     y="200"
     fill="#071a2e"
     font-family="Inter, 'Segoe UI', Arial, sans-serif"
-    font-size="185"
+    font-size="230"
     font-weight="700"
-    letter-spacing="-3">sv-netzwerk.eu</text>
+    letter-spacing="-4">sv-netzwerk.eu</text>
 
   <text
-    x="760"
-    y="365"
+    x="710"
+    y="375"
     fill="#5a7185"
     font-family="Inter, 'Segoe UI', Arial, sans-serif"
-    font-size="92"
+    font-size="112"
     font-weight="850"
-    letter-spacing="1.5">BAU · SCHADEN · REGULIERUNG</text>
+    letter-spacing="0.3">BAU · SCHADEN · REGULIERUNG</text>
 </svg>
