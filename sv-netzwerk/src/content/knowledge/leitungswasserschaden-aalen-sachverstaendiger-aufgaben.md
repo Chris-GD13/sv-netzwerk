@@ -19,7 +19,7 @@ publication:
   publishedAt: 2026-07-27
   status: published
 seo:
-  title: "Leitungswasserschaden Aalen – Sachverständiger für Versicherungsschäden"
+  title: "Leitungswasserschaden Aalen: Sachverständiger Schadenfeststellung"
   description: "Sachverständige für Leitungswasserschäden in Aalen: Schadenursache, Rückbauumfang und Kostenabgrenzung technisch geprüft und nachvollziehbar dokumentiert."
 ---
 
