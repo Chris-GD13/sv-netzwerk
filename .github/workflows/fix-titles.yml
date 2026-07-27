@@ -1,0 +1,27 @@
+name: Fix Project Titles
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update project titles in live DB
+        env:
+          SETUP_KEY: ${{ secrets.SETUP_KEY }}
+        run: |
+          echo "Calling fix_titles endpoint..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            --max-time 30 \
+            "https://www.sv-netzwerk.eu/intern/api/setup.php?key=${SETUP_KEY}&action=fix_titles")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "HTTP $HTTP_CODE"
+          echo "$BODY"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Fix failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
