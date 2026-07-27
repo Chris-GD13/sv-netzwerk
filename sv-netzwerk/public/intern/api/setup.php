@@ -35,9 +35,10 @@ if ($method === 'GET') {
 } elseif ($method === 'POST') {
     $action = $_GET['action'] ?? requestBody()['action'] ?? '';
     match ($action) {
-        'install'      => handleInstall(),
-        'create_admin' => handleCreateAdmin(),
-        default        => apiError(400, 'Unbekannte Aktion.'),
+        'install'         => handleInstall(),
+        'create_admin'    => handleCreateAdmin(),
+        'seed_reference'  => handleSeedReference(),
+        default           => apiError(400, 'Unbekannte Aktion.'),
     };
 } else {
     apiError(405, 'Methode nicht erlaubt.');
@@ -175,5 +176,18 @@ function handleCreateAdmin(): never
     }
 
     apiJson(['ok' => true, 'message' => "Administrator '$email' wurde angelegt."]);
+}
+
+function handleSeedReference(): never
+{
+    require_once __DIR__ . '/seed_reference.php';
+    
+    try {
+        $result = seedReferenceProject();
+        apiJson($result);
+    } catch (Throwable $e) {
+        error_log('[setup] Seed-Fehler: ' . $e->getMessage());
+        apiError(500, 'Referenzdaten konnten nicht angelegt werden: ' . $e->getMessage());
+    }
 }
 
