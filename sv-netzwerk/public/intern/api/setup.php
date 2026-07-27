@@ -197,7 +197,7 @@ function handleSeedReference(): never
 function handleFixTitles(): never
 {
     $pdo = db();
-    // Update Referenzprojekt title if it exists
-    $pdo->exec("UPDATE projects SET title = 'REFERENZ: Testprojekt (Demodaten)', object_name = 'Demonstrationsprojekt für Entwicklung und Schulung', address = 'Musterstraße 1, 53123 Musterstadt (fiktiv)' WHERE id = 2");
+    // Update Referenzprojekt title
+    $pdo->exec("UPDATE projects SET title = 'Testumgebung', object_name = 'Demonstrationsprojekt für Entwicklung und Schulung', address = 'Musterstraße 1, 53123 Musterstadt (fiktiv)' WHERE id = 2");
     apiJson(['ok' => true, 'message' => 'Titel aktualisiert.']);
 }

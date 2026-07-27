@@ -23,7 +23,7 @@ function seedReferenceProject(): array
     
     // 1. Create project
     $pdo->exec("INSERT INTO projects (id, project_code, title, object_name, address, planned_window_count, is_active)
-        VALUES (2, 'referenz-testprojekt', 'REFERENZ: Testprojekt (Demodaten)',
+        VALUES (2, 'referenz-testprojekt', 'Testumgebung',
                 'Demonstrationsprojekt für Entwicklung und Schulung', 'Musterstraße 1, 53123 Musterstadt (fiktiv)', 810, 1)");
     
     // 2. Buildings
