@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "sv-netzwerk/**"
+      - "!sv-netzwerk/docs/fachbeitrag-veroeffentlichungsprotokoll.csv"
       - "!sv-netzwerk/src/data/calendar-slots.json"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:

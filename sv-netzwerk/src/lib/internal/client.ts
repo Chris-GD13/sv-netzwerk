@@ -2660,7 +2660,7 @@ function renderHeader(context: AppContext, title: string, text: string) {
 
 function renderStat(label: string, value: number, href?: string) {
   if (href) {
-    return `<a class="intern-stat intern-stat--clickable" href="${escapeHtml(href)}" style="text-decoration:none;color:inherit;"><span>${escapeHtml(label)}</span><strong>${value}</strong></a>`;
+    return `<a class="intern-stat intern-stat--clickable" href="${escapeHtml(href)}"><span>${escapeHtml(label)}</span><strong>${value}</strong></a>`;
   }
   return `<article class="intern-stat"><span>${escapeHtml(label)}</span><strong>${value}</strong></article>`;
 }

@@ -603,6 +603,14 @@ const normalizeText = (value) => value
   .replace(/ß/g, 'ss')
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/(^-|-$)/g, '');
+const normalizeSlotValue = (value) => {
+  const normalized = normalizeText(value);
+  if (normalized === 'morning' || normalized === 'morgens') return 'morning';
+  if (normalized === 'afternoon' || normalized === 'nachmittags') return 'afternoon';
+  return '';
+};
+const deriveSlugFromUrl = (value) => String(value || '').match(/\/fachwissen\/([^/]+)\/?$/)?.[1] ?? '';
+const isSuccess = (value) => String(value || '').trim() === 'success';
 
 const readPublicationRows = async () => {
   const source = await readText(publicationLogFile);
@@ -636,6 +644,71 @@ const readPublicationRows = async () => {
     headers.forEach((header, idx) => { entry[header] = cols[idx] ?? ''; });
     return entry;
   });
+};
+
+const buildResumeRuntime = async (row) => {
+  const resumedPublicationId = String(row.publication_id || '').trim() || publicationId;
+  const articleUrl = String(row.url || '').trim();
+  const slug = deriveSlugFromUrl(articleUrl);
+  if (!slug) {
+    throw new Error(`Slot ${runId} ist protokolliert, aber die URL ist nicht auswertbar: ${articleUrl || 'leer'}`);
+  }
+
+  const knowledgePath = path.join(knowledgeDir, `${slug}.md`);
+  const linkedinPath = path.join(linkedinDir, `${berlinDate}_${slug}.txt`);
+  const videoPath = path.join(videosDir, `${berlinDate}_wissen-in-180-sekunden_${slug}.txt`);
+  const imageWebPath = String(row.bilddatei || '').trim() || `/assets/images/linkedin/${slug}.svg`;
+  const imageFileName = path.basename(imageWebPath);
+  const imagePath = path.join(imageDir, imageFileName);
+  const missingFiles = [];
+
+  if (!(await fileExists(knowledgePath))) missingFiles.push(path.relative(root, knowledgePath).replaceAll('\\', '/'));
+  if (!(await fileExists(linkedinPath))) missingFiles.push(path.relative(root, linkedinPath).replaceAll('\\', '/'));
+  if (!(await fileExists(videoPath))) missingFiles.push(path.relative(root, videoPath).replaceAll('\\', '/'));
+  if (!(await fileExists(imagePath))) missingFiles.push(path.relative(root, imagePath).replaceAll('\\', '/'));
+
+  if (missingFiles.length > 0) {
+    throw new Error(`Slot ${runId} ist protokolliert, aber folgende Dateien fehlen für einen Retry: ${missingFiles.join(', ')}`);
+  }
+
+  const existingStatuses = {
+    commit: String(row.commit || '').trim(),
+    deployStatus: String(row.deploy_status || '').trim() || 'pending',
+    liveStatus: String(row.live_pruefung || '').trim() || 'pending',
+    linkedinStatus: String(row.linkedin_status || '').trim() || 'pending',
+  };
+  const resumeReason = [
+    !isSuccess(existingStatuses.deployStatus) ? `deploy-${existingStatuses.deployStatus}` : null,
+    !isSuccess(existingStatuses.liveStatus) ? `live-${existingStatuses.liveStatus}` : null,
+    !isSuccess(existingStatuses.linkedinStatus) ? `linkedin-${existingStatuses.linkedinStatus}` : null,
+  ].filter(Boolean).join('__') || 'incomplete-publication';
+
+  return {
+    status: 'resumed',
+    reason: resumeReason,
+    publicationId: resumedPublicationId,
+    berlinDate,
+    berlinTime,
+    berlinTimeZone: BERLIN,
+    slot,
+    slotLabel: SLOT_WINDOWS[slot].label,
+    isWeekend,
+    caseMode: /^anonymisierte Realfälle/i.test(String(row.anlass || '').trim()),
+    topicId: String(row.topic_id || '').trim(),
+    title: String(row.title || '').trim(),
+    slug,
+    articleUrl,
+    imageWebPath,
+    imageUrl: imageWebPath.startsWith('http') ? imageWebPath : `https://www.sv-netzwerk.eu${imageWebPath}`,
+    imageAlt: String(row.bild_alt_text || '').trim(),
+    knowledgePath: path.relative(root, knowledgePath).replaceAll('\\', '/'),
+    linkedinPath: path.relative(root, linkedinPath).replaceAll('\\', '/'),
+    videoPath: path.relative(root, videoPath).replaceAll('\\', '/'),
+    sources: String(row.quellen || '').trim() ? [String(row.quellen || '').trim()] : [],
+    publicationLogFile: path.relative(root, publicationLogFile).replaceAll('\\', '/'),
+    existingStatuses,
+    commit: existingStatuses.commit,
+  };
 };
 
 const extractRssItems = (xml) => {
@@ -697,7 +770,28 @@ const makeImageSvg = (title, subtitle) => `<?xml version="1.0" encoding="UTF-8"?
 
 await mkdir(automationDir, { recursive: true });
 const publicationRows = await readPublicationRows();
-const slotLabel = SLOT_WINDOWS[slot].label;
+const existingSlotRows = publicationRows.filter((row) => row.date === berlinDate && normalizeSlotValue(row.slot) === slot);
+const completedRow = existingSlotRows.find((row) => isSuccess(row.deploy_status) && isSuccess(row.live_pruefung) && isSuccess(row.linkedin_status));
+if (completedRow) {
+  await writeFile(runtimeFile, JSON.stringify({
+    status: 'skipped',
+    reason: 'slot-already-completed',
+    berlinDate,
+    berlinTime,
+    berlinTimeZone: BERLIN,
+    slot,
+    publicationId: String(completedRow.publication_id || '').trim() || publicationId,
+  }, null, 2));
+  process.exit(0);
+}
+if (existingSlotRows.length > 1) {
+  throw new Error(`Mehrere Protokolleinträge für ${runId} gefunden: ${existingSlotRows.map((row) => row.publication_id || 'ohne-publication-id').join(', ')}`);
+}
+if (existingSlotRows.length === 1) {
+  const runtime = await buildResumeRuntime(existingSlotRows[0]);
+  await writeFile(runtimeFile, JSON.stringify(runtime, null, 2));
+  process.exit(0);
+}
 const publicationIdExists = publicationRows.some((row) => row.publication_id === publicationId);
 if (publicationIdExists) {
   await writeFile(runtimeFile, JSON.stringify({
@@ -708,33 +802,6 @@ if (publicationIdExists) {
     berlinTimeZone: BERLIN,
     slot,
     publicationId,
-  }, null, 2));
-  process.exit(0);
-}
-const existingSlotRows = publicationRows.filter((row) => row.date === berlinDate && row.slot === slotLabel);
-const alreadySuccessful = existingSlotRows.some((row) => row.deploy_status === 'success' && row.live_pruefung === 'success');
-if (alreadySuccessful) {
-  await writeFile(runtimeFile, JSON.stringify({
-    status: 'skipped',
-    reason: 'slot-already-published',
-    berlinDate,
-    berlinTime,
-    berlinTimeZone: BERLIN,
-    slot,
-    publicationId,
-  }, null, 2));
-  process.exit(0);
-}
-if (existingSlotRows.length > 0) {
-  await writeFile(runtimeFile, JSON.stringify({
-    status: 'skipped',
-    reason: 'slot-already-recorded',
-    berlinDate,
-    berlinTime,
-    berlinTimeZone: BERLIN,
-    slot,
-    publicationId,
-    existingPublicationId: existingSlotRows[0].publication_id || '',
   }, null, 2));
   process.exit(0);
 }

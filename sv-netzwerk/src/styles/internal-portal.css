@@ -134,9 +134,16 @@
   color: #fff;
 }
 
+.intern-stat,
+a.intern-stat {
+  color: #fff !important;
+  text-decoration: none;
+}
+
 .intern-stat strong {
   display: block;
   font-size: 1.8rem;
+  color: #fff;
 }
 
 .intern-card h2,

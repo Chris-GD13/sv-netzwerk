@@ -15,7 +15,7 @@ Die produktive Automation erzeugt täglich zwei Fachbeiträge im Master-Reposito
 1. 05:15-06:40 Uhr Europe/Berlin
 2. 16:15-17:30 Uhr Europe/Berlin
 
-GitHub-Crons laufen in UTC; Sommer-/Winterzeit wird über duale UTC-Zeitpläne plus Laufzeitprüfung in `Europe/Berlin` abgesichert. LinkedIn wird erst nach erfolgreicher Live-URL-Prüfung ausgelöst.
+GitHub-Crons laufen in UTC; Sommer-/Winterzeit wird über duale UTC-Zeitpläne plus Laufzeitprüfung in `Europe/Berlin` abgesichert. Bereits vollständig veröffentlichte Slots werden übersprungen; unvollständige Slots werden mit derselben `publication_id` fortgesetzt. LinkedIn wird erst nach erfolgreicher Live-URL-Prüfung ausgelöst.
 
 ## 4. Lokal validieren
 

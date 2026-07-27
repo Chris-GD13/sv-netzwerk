@@ -78,20 +78,20 @@ jobs:
           node scripts/run-fachbeitrag-automation.mjs $SLOT_ARG
           STATUS="$(node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('.automation/latest-publication.json','utf8'));process.stdout.write(data.status||'')")"
           echo "status=$STATUS" >> "$GITHUB_OUTPUT"
-          if [ "$STATUS" = "generated" ]; then
-            node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('.automation/latest-publication.json','utf8'));console.log('BERLIN_DATE='+data.berlinDate);console.log('PUBLICATION_ID='+data.publicationId);console.log('PUBLICATION_URL='+data.articleUrl);console.log('PUBLICATION_TITLE='+data.title.replace(/\n/g,' '));console.log('PUBLICATION_IMAGE_URL='+data.imageUrl);console.log('PUBLICATION_SLUG='+data.slug);console.log('PUBLICATION_SLOT='+data.slot);" >> "$GITHUB_ENV"
+          if [ "$STATUS" != "skipped" ]; then
+            node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('.automation/latest-publication.json','utf8'));const existing=data.existingStatuses||{};const values={BERLIN_DATE:data.berlinDate||'',PUBLICATION_ID:data.publicationId||'',PUBLICATION_URL:data.articleUrl||'',PUBLICATION_TITLE:String(data.title||'').replace(/\n/g,' '),PUBLICATION_IMAGE_URL:data.imageUrl||'',PUBLICATION_SLUG:data.slug||'',PUBLICATION_SLOT:data.slot||'',PUBLICATION_RUNTIME_STATUS:data.status||'',PUBLICATION_COMMIT_HINT:data.commit||existing.commit||'',PUBLICATION_DEPLOY_STATUS:existing.deployStatus||'pending',PUBLICATION_LIVE_STATUS:existing.liveStatus||'pending',PUBLICATION_LINKEDIN_STATUS:existing.linkedinStatus||'pending'};for (const [key,value] of Object.entries(values)) console.log(key+'='+String(value));" >> "$GITHUB_ENV"
           fi
 
       - name: Bei Slot-Skip sauber beenden
-        if: steps.generate.outputs.status != 'generated'
+        if: steps.generate.outputs.status == 'skipped'
         run: echo "Kein Beitrag erzeugt (außerhalb Zeitfenster oder Slot bereits veröffentlicht)."
 
       - name: Vorprüfung
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped'
         run: node scripts/validate-fachbeitrag-preflight.mjs "$BERLIN_DATE"
 
       - name: Lint-/Fachbeitragsstandard prüfen
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped'
         run: |
           EXPECTED_DAILY_COUNT=1
           if [ "$PUBLICATION_SLOT" = "afternoon" ]; then
@@ -100,22 +100,22 @@ jobs:
           npm run validate:knowledge -- "$BERLIN_DATE" "--expected-daily-count=${EXPECTED_DAILY_COUNT}"
 
       - name: Typprüfung ausführen
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped'
         run: npm run check
 
       - name: Build ausführen
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped'
         run: npm run build
 
       - name: HTML-Struktur validieren
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped'
         run: |
           npx --yes html-validate@9 --rule "long-title:off" \
             "dist/fachwissen/${PUBLICATION_SLUG}/index.html" \
             "dist/svos/fachwissen/${PUBLICATION_SLUG}/index.html"
 
       - name: Linkprüfung des veröffentlichten Beitrags
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped'
         run: |
           npx --yes lychee@0.16.1 \
             --no-progress \
@@ -126,48 +126,75 @@ jobs:
             "dist/svos/fachwissen/${PUBLICATION_SLUG}/index.html"
 
       - name: Link- und Build-Integration prüfen
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped'
         run: npm run validate:knowledge -- --dist "$BERLIN_DATE"
 
       - name: Commit und Push
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped'
         run: |
-          if git diff --quiet; then
-            echo "::error::Es wurden keine Änderungen erzeugt, obwohl der Generator einen Beitrag gemeldet hat."
-            exit 1
+          if [ "$PUBLICATION_RUNTIME_STATUS" = "generated" ]; then
+            if git diff --quiet; then
+              echo "::error::Es wurden keine Änderungen erzeugt, obwohl der Generator einen Beitrag gemeldet hat."
+              exit 1
+            fi
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add src/content/ public/assets/images/linkedin/ src/data/library.ts CHANGELOG.md docs/fachbeitrag-veroeffentlichungsprotokoll.csv
+            git commit -m "chore: publish fachbeitrag ${BERLIN_DATE} ${PUBLICATION_SLOT}"
+            git push origin HEAD:main
+            echo "PUBLISHED_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+            echo "DEPLOY_HEAD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          else
+            if [ -n "$PUBLICATION_COMMIT_HINT" ] && [ "$PUBLICATION_COMMIT_HINT" != "pending" ]; then
+              echo "PUBLISHED_COMMIT=$PUBLICATION_COMMIT_HINT" >> "$GITHUB_ENV"
+            else
+              echo "PUBLISHED_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+            fi
+            echo "DEPLOY_HEAD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/content/ public/assets/images/linkedin/ src/data/library.ts CHANGELOG.md docs/fachbeitrag-veroeffentlichungsprotokoll.csv
-          git commit -m "chore: publish fachbeitrag ${BERLIN_DATE} ${PUBLICATION_SLOT}"
-          git push origin HEAD:main
-          echo "PUBLISHED_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Veröffentlichungsprotokoll nach Push aktualisieren
-        if: steps.generate.outputs.status == 'generated'
-        run: node scripts/update-fachbeitrag-log.mjs --commit="$PUBLISHED_COMMIT" --deploy=triggered
+        if: steps.generate.outputs.status != 'skipped'
+        run: |
+          if [ -n "$PUBLISHED_COMMIT" ] && [ "$PUBLISHED_COMMIT" != "pending" ]; then
+            node scripts/update-fachbeitrag-log.mjs --commit="$PUBLISHED_COMMIT"
+          fi
+          if [ "$PUBLICATION_DEPLOY_STATUS" != "success" ]; then
+            node scripts/update-fachbeitrag-log.mjs --deploy=triggered
+          fi
 
       - name: Bestehenden Deploy-Workflow (push) abwarten
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node scripts/trigger-and-await-workflow.mjs \
-            --repo="${{ github.repository }}" \
-            --workflow="deploy.yml" \
-            --ref="main" \
-            --event="push" \
-            --dispatch=false \
-            --head-sha="$PUBLISHED_COMMIT" \
-            --timeout-seconds=2700
+          if [ "$PUBLICATION_RUNTIME_STATUS" = "generated" ]; then
+            node scripts/trigger-and-await-workflow.mjs \
+              --repo="${{ github.repository }}" \
+              --workflow="deploy.yml" \
+              --ref="main" \
+              --event="push" \
+              --dispatch=false \
+              --head-sha="$DEPLOY_HEAD_SHA" \
+              --timeout-seconds=2700
+          elif [ "$PUBLICATION_DEPLOY_STATUS" != "success" ]; then
+            node scripts/trigger-and-await-workflow.mjs \
+              --repo="${{ github.repository }}" \
+              --workflow="deploy.yml" \
+              --ref="main" \
+              --event="workflow_dispatch" \
+              --dispatch=true \
+              --head-sha="$DEPLOY_HEAD_SHA" \
+              --timeout-seconds=2700
+          fi
           echo "DEPLOY_OK=true" >> "$GITHUB_ENV"
 
       - name: Veröffentlichungsprotokoll nach Deploy-Check aktualisieren
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped'
         run: node scripts/update-fachbeitrag-log.mjs --deploy=success
 
       - name: Live-URL prüfen
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped'
         run: |
           echo "Prüfe Live-URL: $PUBLICATION_URL"
           ok=0
@@ -186,11 +213,11 @@ jobs:
           echo "LIVE_OK=true" >> "$GITHUB_ENV"
 
       - name: Veröffentlichungsprotokoll nach Live-Check aktualisieren
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped'
         run: node scripts/update-fachbeitrag-log.mjs --deploy=success --live=success
 
       - name: LinkedIn-Zap auslösen (nach erfolgreichem Live-Check)
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped' && env.PUBLICATION_LINKEDIN_STATUS != 'success'
         env:
           WEBHOOK_URL: ${{ secrets.ZAPIER_WEBHOOK_URL }}
         run: |
@@ -210,22 +237,26 @@ jobs:
           echo "LINKEDIN_OK=true" >> "$GITHUB_ENV"
 
       - name: Veröffentlichungsprotokoll nach LinkedIn aktualisieren
-        if: steps.generate.outputs.status == 'generated'
+        if: steps.generate.outputs.status != 'skipped' && env.PUBLICATION_LINKEDIN_STATUS != 'success'
         run: node scripts/update-fachbeitrag-log.mjs --linkedin=success
 
       - name: Fehlstatus ins Veröffentlichungsprotokoll schreiben
-        if: failure() && steps.generate.outputs.status == 'generated'
+        if: failure() && steps.generate.outputs.status != 'skipped'
         run: |
-          DEPLOY_STATUS="failed"
-          LIVE_STATUS="failed"
-          LINKEDIN_STATUS="skipped"
+          DEPLOY_STATUS="${PUBLICATION_DEPLOY_STATUS:-pending}"
+          LIVE_STATUS="${PUBLICATION_LIVE_STATUS:-pending}"
+          LINKEDIN_STATUS="${PUBLICATION_LINKEDIN_STATUS:-pending}"
           if [ "${DEPLOY_OK}" = "true" ]; then DEPLOY_STATUS="success"; fi
+          if [ "$DEPLOY_STATUS" != "success" ]; then DEPLOY_STATUS="failed"; fi
           if [ "${LIVE_OK}" = "true" ]; then LIVE_STATUS="success"; fi
+          if [ "$LIVE_STATUS" != "success" ]; then LIVE_STATUS="failed"; fi
           if [ "${LINKEDIN_OK}" = "true" ]; then LINKEDIN_STATUS="success"; fi
+          if [ "$LINKEDIN_STATUS" != "success" ] && [ "${LIVE_OK}" = "true" -o "${PUBLICATION_LIVE_STATUS}" = "success" ]; then LINKEDIN_STATUS="failed"; fi
+          if [ "$LINKEDIN_STATUS" != "success" ] && [ "${LIVE_OK}" != "true" ] && [ "${PUBLICATION_LIVE_STATUS}" != "success" ]; then LINKEDIN_STATUS="skipped"; fi
           node scripts/update-fachbeitrag-log.mjs --deploy="$DEPLOY_STATUS" --live="$LIVE_STATUS" --linkedin="$LINKEDIN_STATUS"
 
       - name: Veröffentlichungsprotokoll committen (final)
-        if: always() && steps.generate.outputs.status == 'generated'
+        if: always() && steps.generate.outputs.status != 'skipped'
         run: |
           if git diff --quiet -- docs/fachbeitrag-veroeffentlichungsprotokoll.csv; then
             echo "Keine Protokolländerungen zu committen."

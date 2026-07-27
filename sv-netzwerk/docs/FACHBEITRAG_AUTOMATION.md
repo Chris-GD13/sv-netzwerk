@@ -126,8 +126,8 @@ Der Generator erstellt pro Lauf:
 | Szenario | Verhalten |
 |---|---|
 | Außerhalb Zeitfenster | Lauf beendet mit Status `skipped`; kein Fehler |
-| Slot bereits erfolgreich veröffentlicht | Lauf beendet mit Status `skipped` |
-| Slot bereits protokolliert | Lauf beendet mit Status `skipped` |
+| Slot bereits vollständig veröffentlicht | Lauf beendet mit Status `skipped` |
+| Slot protokolliert, aber Deploy/Live/LinkedIn noch offen oder fehlgeschlagen | Lauf wechselt in `resumed` und setzt denselben Beitrag ohne Neugenerierung fort |
 | Build fehlgeschlagen | Kein LinkedIn-Post; kein Commit |
 | Typ-/HTML-/Link-Prüfung fehlgeschlagen | Kein Commit; kein Deployment; kein LinkedIn |
 | Live-Check fehlgeschlagen | Kein LinkedIn-Post; Protokoll auf `failed` gesetzt |
@@ -143,7 +143,7 @@ Der Generator erstellt pro Lauf:
 - **GitHub Actions Concurrency:** Gruppe `fachbeitrag-automation-main`, `cancel-in-progress: false` – kein Abbruch laufender Jobs, aber keine simultane Ausführung.
 - **Slot-ID:** `{YYYY-MM-DD}-{slot}` als eindeutige Identifikation pro Zeitfenster und Tag.
 - **publication_id:** SHA256-basierter Hash über die Slot-ID `{YYYY-MM-DD}-{slot}`; damit ist die ID pro Zeitfenster deterministisch und retry-stabil.
-- **Protokollprüfung:** Vor der Erzeugung wird das CSV-Protokoll auf bereits protokollierte Einträge für Datum+Slot geprüft. Existiert ein Slot-Eintrag, wird kein zweiter Beitrag erzeugt.
+- **Protokollprüfung:** Vor der Erzeugung wird das CSV-Protokoll auf bereits protokollierte Einträge für Datum+Slot geprüft. Vollständig erfolgreiche Slots werden übersprungen; unvollständige Slots werden mit derselben `publication_id` fortgesetzt.
 - **publication_id-Duplikatschutz:** Vor der Erzeugung wird das Protokoll zusätzlich auf bereits vorhandene `publication_id` geprüft.
 - **Slug-/Titel-Duplikatprüfung:** Bereits vorhandene Knowledge-Dateien mit gleichem Slug oder gleichem Titel werden erkannt und abgelehnt.
 
@@ -151,8 +151,9 @@ Der Generator erstellt pro Lauf:
 
 - Nach dem Content-Commit auf `main` wartet der Automationslauf auf den **bestehenden push-basierten Deploy-Workflow** `.github/workflows/deploy.yml`.
 - Der Automationslauf wartet aktiv auf den Abschluss genau dieses Deploy-Runs für den veröffentlichten Commit (`head_sha`-Abgleich).
+- Wird ein unvollständiger Slot erneut gestartet, triggert der Workflow bei Bedarf einen **manuellen Recovery-Deploy** für den aktuellen `main`-Stand und wartet ebenfalls bis zum erfolgreichen Abschluss.
 - Erst nach `deploy=success` folgt die Live-URL-Prüfung, erst danach die LinkedIn-/Zap-Übergabe.
-- Deploy-, Live- und LinkedIn-Status werden in `docs/fachbeitrag-veroeffentlichungsprotokoll.csv` fortlaufend aktualisiert und am Laufende auf `main` committed (auch bei Fehlerfällen).
+- Deploy-, Live- und LinkedIn-Status werden in `docs/fachbeitrag-veroeffentlichungsprotokoll.csv` fortlaufend aktualisiert und am Laufende auf `main` committed (auch bei Fehlerfällen). Diese Protokoll-Commits lösen bewusst **keinen** zusätzlichen Website-Deploy aus.
 
 ## Manueller Notfallstart und Deaktivierung
 

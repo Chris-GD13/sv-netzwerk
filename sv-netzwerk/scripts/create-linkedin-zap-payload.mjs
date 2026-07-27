@@ -22,7 +22,7 @@ const extractHashtags = (text) => {
 
 const runtimeRaw = await readText(runtimeFile);
 const runtime = JSON.parse(runtimeRaw);
-if (runtime.status !== 'generated') {
+if (!['generated', 'resumed'].includes(runtime.status)) {
   throw new Error(`Unerwarteter Runtime-Status: ${runtime.status || 'unbekannt'}`);
 }
 
