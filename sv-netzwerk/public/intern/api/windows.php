@@ -33,8 +33,9 @@ match (true) {
 
 function handleGetList(): never
 {
+    $projectId = isset($_GET['project_id']) ? (int) $_GET['project_id'] : DEFAULT_PROJECT_ID;
     try {
-        $rows = db()->query(
+        $stmt = db()->prepare(
             'SELECT w.id, w.record_id, w.inspection_number, w.window_number,
                     w.room_number, w.room_label, w.building_label, w.section_label, w.floor_label,
                     w.status, w.overall_rating, w.priority, w.accessibility_status,
@@ -42,9 +43,11 @@ function handleGetList(): never
                     w.special_inspection_required, w.urgent_action_required,
                     w.has_defect, w.danger_immediate, w.last_edited_at, w.updated_at, w.progress_percent
              FROM windows w
-             WHERE w.deleted_at IS NULL
+             WHERE w.deleted_at IS NULL AND w.project_id = :pid
              ORDER BY ISNULL(w.inspection_number), w.inspection_number ASC'
-        )->fetchAll();
+        );
+        $stmt->execute([':pid' => $projectId]);
+        $rows = $stmt->fetchAll();
     } catch (Throwable $e) {
         apiError(503, 'Fensterliste konnte nicht geladen werden.');
     }
@@ -73,8 +76,9 @@ function handleGetOne(int $id): never
 
 function handleCreate(array $user): never
 {
+    $projectId = isset($_GET['project_id']) ? (int) $_GET['project_id'] : DEFAULT_PROJECT_ID;
     $body     = requestBody();
-    $recordId = 'BMVG-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 8));
+    $recordId = 'SV-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 8));
     $formData = $body['form_data'] ?? ['status' => 'nicht begonnen'];
 
     try {
@@ -89,7 +93,7 @@ function handleCreate(array $user): never
               :fd, :cd, 0, :now, :now2)'
         );
         $stmt->execute([
-            ':pid'    => DEFAULT_PROJECT_ID,
+            ':pid'    => $projectId,
             ':rid'    => $recordId,
             ':wnum'   => (string) ($formData['window_number'] ?? ''),
             ':rnum'   => nonEmpty($formData['room_number'] ?? ''),
@@ -200,12 +204,16 @@ function handleUpdate(int $id, array $user): never
 
 function handleGetLocks(): never
 {
+    $projectId = isset($_GET['project_id']) ? (int) $_GET['project_id'] : DEFAULT_PROJECT_ID;
     try {
-        $rows = db()->query(
-            'SELECT window_id, owner_id, owner_name, expires_at
-             FROM record_locks
-             WHERE expires_at > UTC_TIMESTAMP()'
-        )->fetchAll();
+        $stmt = db()->prepare(
+            'SELECT rl.window_id, rl.owner_id, rl.owner_name, rl.expires_at
+             FROM record_locks rl
+             INNER JOIN windows w ON w.id = rl.window_id
+             WHERE rl.expires_at > UTC_TIMESTAMP() AND w.project_id = :pid'
+        );
+        $stmt->execute([':pid' => $projectId]);
+        $rows = $stmt->fetchAll();
     } catch (Throwable) {
         apiError(503, 'Sperren konnten nicht geladen werden.');
     }

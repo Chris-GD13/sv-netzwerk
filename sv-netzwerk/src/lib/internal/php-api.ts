@@ -160,7 +160,7 @@ export async function loadApiUser(): Promise<PortalUser | null> {
 // ── Fenster-Datensätze ──────────────────────────────────────────────────────
 
 export async function apiListWindows(): Promise<WindowSummary[]> {
-  const { data } = await apiGet<WindowSummary[]>('/windows.php');
+  const { data } = await apiGet<WindowSummary[]>(`/windows.php?_=1${pidParam()}`);
   return data ?? [];
 }
 
@@ -219,7 +219,7 @@ export async function apiGetActiveLocks(): Promise<
 > {
   const result = new Map<string, { owner_id: string | null; owner_name: string | null; expires_at: string | null }>();
   const { data } = await apiGet<Array<{ window_id: number; owner_id: number; owner_name: string; expires_at: string }>>(
-    '/windows.php?action=locks',
+    `/windows.php?action=locks${pidParam()}`,
   );
   data?.forEach((item) => {
     result.set(String(item.window_id), {
