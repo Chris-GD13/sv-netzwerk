@@ -538,6 +538,16 @@ export async function apiMoveWindow(id: number, targetRoomId: number): Promise<b
   return !error;
 }
 
+export async function apiCompleteEntity(entity: string, id: number): Promise<boolean> {
+  const { error } = await apiPatch(`/hierarchy.php?entity=${entity}&id=${id}${pidParam()}`, { action: 'complete' });
+  return !error;
+}
+
+export async function apiReopenEntity(entity: string, id: number): Promise<boolean> {
+  const { error } = await apiPatch(`/hierarchy.php?entity=${entity}&id=${id}${pidParam()}`, { action: 'reopen' });
+  return !error;
+}
+
 // ── KI-Dokumentenimport ─────────────────────────────────────────────────────
 
 export interface AiAnalysisItem {

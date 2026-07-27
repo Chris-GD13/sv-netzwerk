@@ -333,6 +333,10 @@ function handleAction(string $entity, int $id, array $user, int $projectId): nev
             handleDuplicate($entity, $id, $projectId);
         case 'archive':
             handleArchive($entity, $id);
+        case 'complete':
+            handleComplete($entity, $id);
+        case 'reopen':
+            handleReopen($entity, $id);
         case 'move':
             handleMove($entity, $id, $body);
         default:
@@ -466,6 +470,42 @@ function handleMove(string $entity, int $id, array $body): never
         apiJson(['ok'=>true]);
     } catch (Throwable $e) {
         apiError(503, 'Verschieben fehlgeschlagen: ' . $e->getMessage());
+    }
+}
+
+function handleComplete(string $entity, int $id): never
+{
+    $table = match($entity) {
+        'building' => 'buildings',
+        'floor'    => 'floors',
+        'room'     => 'rooms',
+        default    => '',
+    };
+    if ($table === '') apiError(400, 'Abschließen nicht unterstützt für: ' . $entity);
+    try {
+        $stmt = db()->prepare("UPDATE $table SET name = CONCAT('✅ ', REPLACE(name, '✅ ', '')), updated_at=:now WHERE id=:id");
+        $stmt->execute([':now'=>nowUtc(), ':id'=>$id]);
+        apiJson(['ok'=>true, 'completed'=>true]);
+    } catch (Throwable $e) {
+        apiError(503, 'Abschließen fehlgeschlagen: ' . $e->getMessage());
+    }
+}
+
+function handleReopen(string $entity, int $id): never
+{
+    $table = match($entity) {
+        'building' => 'buildings',
+        'floor'    => 'floors',
+        'room'     => 'rooms',
+        default    => '',
+    };
+    if ($table === '') apiError(400, 'Wiederaufnahme nicht unterstützt für: ' . $entity);
+    try {
+        $stmt = db()->prepare("UPDATE $table SET name = REPLACE(name, '✅ ', ''), updated_at=:now WHERE id=:id");
+        $stmt->execute([':now'=>nowUtc(), ':id'=>$id]);
+        apiJson(['ok'=>true, 'completed'=>false]);
+    } catch (Throwable $e) {
+        apiError(503, 'Wiederaufnahme fehlgeschlagen: ' . $e->getMessage());
     }
 }
 

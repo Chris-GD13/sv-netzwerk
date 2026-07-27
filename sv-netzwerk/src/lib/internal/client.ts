@@ -68,6 +68,8 @@ import {
   apiDeleteWindow,
   apiCreateWindowInRoom,
   apiMoveWindow,
+  apiCompleteEntity,
+  apiReopenEntity,
   // Flügel
   apiListSashes,
   apiGetSash,
@@ -526,6 +528,49 @@ function showProjectEditDialog(context: AppContext, id: number, title: string, o
   });
 }
 
+async function showMoveDialog(
+  entityLabel: string,
+  entityName: string,
+  targets: Array<{ id: number; name: string }>,
+  onMove: (targetId: number) => Promise<boolean>,
+  onSuccess: () => void,
+) {
+  const options = targets.map((t) => `<option value="${t.id}">${escapeHtml(t.name)} (ID ${t.id})</option>`).join('');
+  const overlay = document.createElement('div');
+  overlay.className = 'intern-modal-overlay';
+  overlay.innerHTML = `
+    <div class="intern-modal" style="max-width:420px">
+      <h3>${escapeHtml(entityLabel)} verschieben</h3>
+      <p style="margin-bottom:12px;color:#5a7185">"${escapeHtml(entityName)}" verschieben nach:</p>
+      <form id="move-form" class="intern-form-grid" style="gap:12px">
+        <div class="intern-field intern-field--full">
+          <label>Ziel auswählen</label>
+          <select name="target_id" required style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:14px">
+            <option value="">— Bitte wählen —</option>
+            ${options}
+          </select>
+        </div>
+        <div class="intern-actions intern-field--full">
+          <button class="sv-button sv-button-primary" type="submit">Verschieben</button>
+          <button class="sv-button sv-button-secondary" type="button" id="move-cancel">Abbrechen</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#move-cancel')?.addEventListener('click', () => overlay.remove());
+  overlay.querySelector<HTMLFormElement>('#move-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target as HTMLFormElement);
+    const targetId = Number(fd.get('target_id') ?? 0);
+    if (!targetId) return;
+    const ok = await onMove(targetId);
+    overlay.remove();
+    if (ok) onSuccess();
+    else alert('Verschieben fehlgeschlagen.');
+  });
+}
+
 function renderLogin(context: AppContext) {
   if (context.user) {
     redirectTo('/intern/projekte/');
@@ -731,6 +776,8 @@ async function renderBuildings(context: AppContext) {
 function renderBuildingCard(b: Building, isAdmin: boolean): string {
   const pct = b.progress_pct;
   const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+  const isCompleted = b.name.startsWith('✅ ');
+  const isArchived = b.name.startsWith('[Archiviert]');
   return `
     <div class="intern-building-card-wrapper" data-building-id="${b.id}" data-building-name="${escapeHtml(b.name)}" data-building-code="${escapeHtml(b.code ?? '')}">
       <a class="intern-building-card" href="${projectBase()}/etagen/?building_id=${b.id}">
@@ -751,7 +798,8 @@ function renderBuildingCard(b: Building, isAdmin: boolean): string {
         <div class="intern-action-menu" hidden>
           <button data-action="edit">✏️ Bearbeiten</button>
           <button data-action="duplicate">📋 Duplizieren</button>
-          <button data-action="archive">📦 Archivieren</button>
+          <button data-action="archive">📦 ${isArchived ? 'Wiederherstellen' : 'Archivieren'}</button>
+          <button data-action="${isCompleted ? 'reopen' : 'complete'}">${isCompleted ? '🔄 Wiederaufnahme' : '✅ Abgeschlossen'}</button>
           <hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0">
           <button data-action="delete" style="color:#e53e3e">🗑️ Löschen</button>
         </div>
@@ -790,6 +838,18 @@ function bindBuildingActions(context: AppContext) {
         await renderBuildings(context);
       } else {
         showMsg(context, '#building-msg', 'Gebäude konnte nicht archiviert werden.');
+      }
+    },
+    async onComplete(wrapper) {
+      const id = Number(wrapper.dataset.buildingId);
+      if (await apiCompleteEntity('building', id)) {
+        await renderBuildings(context);
+      }
+    },
+    async onReopen(wrapper) {
+      const id = Number(wrapper.dataset.buildingId);
+      if (await apiReopenEntity('building', id)) {
+        await renderBuildings(context);
       }
     },
     async onDelete(wrapper) {
@@ -836,15 +896,19 @@ function bindFloorActions(context: AppContext) {
         showMsg(context, '#floor-msg', 'Etage konnte nicht archiviert werden.');
       }
     },
+    async onComplete(wrapper) {
+      const id = Number(wrapper.dataset.floorId);
+      if (await apiCompleteEntity('floor', id)) await renderFloors(context);
+    },
+    async onReopen(wrapper) {
+      const id = Number(wrapper.dataset.floorId);
+      if (await apiReopenEntity('floor', id)) await renderFloors(context);
+    },
     async onMove(wrapper) {
       const id = Number(wrapper.dataset.floorId);
-      const targetId = prompt('In welches Gebäude verschieben? (Gebäude-ID eingeben)');
-      if (!targetId) return;
-      if (await apiMoveFloor(id, Number(targetId))) {
-        await renderFloors(context);
-      } else {
-        showMsg(context, '#floor-msg', 'Etage konnte nicht verschoben werden.');
-      }
+      const name = wrapper.dataset.entityName ?? '';
+      const buildings = await apiListBuildings();
+      await showMoveDialog('Etage', name, buildings.map((b) => ({ id: b.id, name: b.name })), (tid) => apiMoveFloor(id, tid), () => renderFloors(context));
     },
     async onDelete(wrapper) {
       const id = Number(wrapper.dataset.floorId);
@@ -890,15 +954,20 @@ function bindRoomActions(context: AppContext) {
         showMsg(context, '#room-msg', 'Raum konnte nicht archiviert werden.');
       }
     },
+    async onComplete(wrapper) {
+      const id = Number(wrapper.dataset.roomId);
+      if (await apiCompleteEntity('room', id)) await renderRooms(context);
+    },
+    async onReopen(wrapper) {
+      const id = Number(wrapper.dataset.roomId);
+      if (await apiReopenEntity('room', id)) await renderRooms(context);
+    },
     async onMove(wrapper) {
       const id = Number(wrapper.dataset.roomId);
-      const targetId = prompt('In welche Etage verschieben? (Etagen-ID eingeben)');
-      if (!targetId) return;
-      if (await apiMoveRoom(id, Number(targetId))) {
-        await renderRooms(context);
-      } else {
-        showMsg(context, '#room-msg', 'Raum konnte nicht verschoben werden.');
-      }
+      const name = wrapper.dataset.entityName ?? '';
+      const buildingId = context.buildingId ?? Number(new URLSearchParams(window.location.search).get('building_id') ?? 0);
+      const floors = buildingId ? await apiListFloors(buildingId) : [];
+      await showMoveDialog('Raum', name, floors.map((f) => ({ id: f.id, name: f.name })), (tid) => apiMoveRoom(id, tid), () => renderRooms(context));
     },
     async onDelete(wrapper) {
       const id = Number(wrapper.dataset.roomId);
@@ -933,7 +1002,7 @@ function showMsg(context: AppContext, selector: string, text: string) {
   if (el) el.innerHTML = errorAlert(text);
 }
 
-function bindEntityActions(context: AppContext, wrapperSelector: string, handlers: { onEdit?: (w: HTMLElement) => void; onDelete?: (w: HTMLElement) => void; onDuplicate?: (w: HTMLElement) => void; onArchive?: (w: HTMLElement) => void; onMove?: (w: HTMLElement) => void }) {
+function bindEntityActions(context: AppContext, wrapperSelector: string, handlers: { onEdit?: (w: HTMLElement) => void; onDelete?: (w: HTMLElement) => void; onDuplicate?: (w: HTMLElement) => void; onArchive?: (w: HTMLElement) => void; onMove?: (w: HTMLElement) => void; onComplete?: (w: HTMLElement) => void; onReopen?: (w: HTMLElement) => void }) {
   // Toggle-Menü
   context.root.querySelectorAll<HTMLElement>('.intern-card-actions [data-action="menu"]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
@@ -960,6 +1029,8 @@ function bindEntityActions(context: AppContext, wrapperSelector: string, handler
     { key: 'duplicate', handler: handlers.onDuplicate },
     { key: 'archive', handler: handlers.onArchive },
     { key: 'move', handler: handlers.onMove },
+    { key: 'complete', handler: handlers.onComplete },
+    { key: 'reopen', handler: handlers.onReopen },
   ];
 
   for (const { key, handler } of actions) {
@@ -1025,6 +1096,8 @@ async function renderFloors(context: AppContext) {
 function renderFloorCard(f: Floor, buildingId: number, isAdmin: boolean): string {
   const pct = f.progress_pct;
   const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+  const isCompleted = f.name.startsWith('✅ ');
+  const isArchived = f.name.startsWith('[Archiviert]');
   return `
     <div class="intern-list-item-wrapper" data-floor-id="${f.id}" data-entity-name="${escapeHtml(f.name)}" data-entity-level="${f.level ?? 0}">
       <a class="intern-card intern-list-item" href="${projectBase()}/raeume/?floor_id=${f.id}&building_id=${buildingId}">
@@ -1042,7 +1115,8 @@ function renderFloorCard(f: Floor, buildingId: number, isAdmin: boolean): string
           <button data-action="edit">✏️ Bearbeiten</button>
           <button data-action="duplicate">📋 Duplizieren</button>
           <button data-action="move">↗️ Verschieben</button>
-          <button data-action="archive">📦 Archivieren</button>
+          <button data-action="archive">📦 ${isArchived ? 'Wiederherstellen' : 'Archivieren'}</button>
+          <button data-action="${isCompleted ? 'reopen' : 'complete'}">${isCompleted ? '🔄 Wiederaufnahme' : '✅ Abgeschlossen'}</button>
           <hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0">
           <button data-action="delete" style="color:#e53e3e">🗑️ Löschen</button>
         </div>
@@ -1106,6 +1180,8 @@ async function renderRooms(context: AppContext) {
 function renderRoomCard(r: Room, floorId: number, buildingId: number, isAdmin: boolean): string {
   const pct = r.progress_pct;
   const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
+  const isCompleted = r.name.startsWith('✅ ');
+  const isArchived = r.name.startsWith('[Archiviert]');
   return `
     <div class="intern-list-item-wrapper" data-room-id="${r.id}" data-entity-name="${escapeHtml(r.name)}" data-entity-number="${escapeHtml(r.room_number ?? '')}">
       <a class="intern-card intern-list-item" href="${projectBase()}/fenster/?room_id=${r.id}&floor_id=${floorId}&building_id=${buildingId}">
@@ -1123,7 +1199,8 @@ function renderRoomCard(r: Room, floorId: number, buildingId: number, isAdmin: b
           <button data-action="edit">✏️ Bearbeiten</button>
           <button data-action="duplicate">📋 Duplizieren</button>
           <button data-action="move">↗️ Verschieben</button>
-          <button data-action="archive">📦 Archivieren</button>
+          <button data-action="archive">📦 ${isArchived ? 'Wiederherstellen' : 'Archivieren'}</button>
+          <button data-action="${isCompleted ? 'reopen' : 'complete'}">${isCompleted ? '🔄 Wiederaufnahme' : '✅ Abgeschlossen'}</button>
           <hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0">
           <button data-action="delete" style="color:#e53e3e">🗑️ Löschen</button>
         </div>
