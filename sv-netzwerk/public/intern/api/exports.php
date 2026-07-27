@@ -1,6 +1,6 @@
 <?php
 /**
- * Export-Log API – Fensterbeschlagsprüfung BMVg Bonn
+ * Export-Log API – SV-Netzwerk Prüfportal
  *
  * POST /api/exports.php – Export-Eintrag protokollieren
  */

@@ -1,6 +1,6 @@
 <?php
 /**
- * Konfiguration – Fensterbeschlagsprüfung BMVg Bonn
+ * Konfiguration – SV-Netzwerk Prüfportal
  *
  * Lädt Datenbankverbindung und Anwendungseinstellungen aus der .env-Datei
  * oder Umgebungsvariablen. Keine Zugangsdaten im Quellcode.
@@ -57,7 +57,7 @@ function env(string $key, string $default = ''): string
 }
 
 /** Gibt den konfigurierten Projektnamen zurück. */
-function appProjectName(): string   { return env('PROJECT_NAME', 'Fensterbeschlagsprüfung BMVg Bonn'); }
+function appProjectName(): string   { return env('PROJECT_NAME', 'SV-Netzwerk Prüfportal'); }
 /** Gibt den Auftraggeber zurück. */
 function appClientName(): string    { return env('CLIENT_NAME', 'Bundesministerium der Verteidigung'); }
 /** Gibt den Auftragnehmer zurück. */

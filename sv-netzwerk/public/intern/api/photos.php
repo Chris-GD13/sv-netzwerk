@@ -1,6 +1,6 @@
 <?php
 /**
- * Fotos API – Fensterbeschlagsprüfung BMVg Bonn
+ * Fotos API – SV-Netzwerk Prüfportal
  *
  * GET    ?window_id={id}                        – Fotos eines Fensters auflisten
  * GET    ?sash_id={id}                          – Fotos eines Flügels auflisten

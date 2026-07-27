@@ -1,6 +1,6 @@
 <?php
 /**
- * Einrichtungsassistent – Fensterbeschlagsprüfung BMVg Bonn
+ * Einrichtungsassistent – SV-Netzwerk Prüfportal
  *
  * Erreichbar unter: /intern/api/setup.php
  * Führt Datenbankinitialisierung und Administratoranlage durch.

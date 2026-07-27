@@ -23,8 +23,8 @@ function seedReferenceProject(): array
     
     // 1. Create project
     $pdo->exec("INSERT INTO projects (id, project_code, title, object_name, address, planned_window_count, is_active)
-        VALUES (2, 'referenz-testprojekt', 'REFERENZ: Fensterbeschlagsprüfung (Testdaten)',
-                'Testprojekt – BMVg Dienstsitz Bonn (Demo)', 'Fontainengraben 150, 53123 Bonn (fiktiv)', 810, 1)");
+        VALUES (2, 'referenz-testprojekt', 'REFERENZ: Testprojekt (Demodaten)',
+                'Demonstrationsprojekt für Entwicklung und Schulung', 'Musterstraße 1, 53123 Musterstadt (fiktiv)', 810, 1)");
     
     // 2. Buildings
     $buildings = [

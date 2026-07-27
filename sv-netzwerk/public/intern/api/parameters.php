@@ -1,6 +1,6 @@
 <?php
 /**
- * Berechnungsparameter API – Fensterbeschlagsprüfung BMVg Bonn
+ * Berechnungsparameter API – SV-Netzwerk Prüfportal
  *
  * GET /api/parameters.php – Globale Berechnungsparameter
  */

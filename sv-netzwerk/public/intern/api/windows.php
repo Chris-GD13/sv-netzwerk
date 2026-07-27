@@ -1,6 +1,6 @@
 <?php
 /**
- * Fenster-Datensätze API – Fensterbeschlagsprüfung BMVg Bonn
+ * Fenster-Datensätze API – SV-Netzwerk Prüfportal
  *
  * GET    /api/windows.php            – Alle Fenster (Übersicht)
  * GET    /api/windows.php?id={id}    – Einzeldatensatz

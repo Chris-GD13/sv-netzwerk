@@ -419,7 +419,7 @@ function renderLogin(context: AppContext) {
   context.root.innerHTML = `
     <div class="intern-card intern-login">
       <p class="sv-eyebrow">Anmeldung</p>
-      <h1>Fensterpruefung BMVg Bonn</h1>
+      <h1>SV-Netzwerk Prüfportal</h1>
       <p>Der interne Bereich ist nur nach Anmeldung verfuegbar. Benutzerkonten werden ausschliesslich administrativ angelegt.</p>
       <form id="intern-login-form" class="intern-form-grid" novalidate>
         <div class="intern-field intern-field--full">
@@ -485,7 +485,7 @@ async function renderDashboard(context: AppContext) {
     : '';
 
   context.root.innerHTML = `
-    ${renderHeader(context, 'Projekt-Dashboard', 'Prüffortschritt – Fensterbeschlagsprüfung BMVg Bonn.')}
+    ${renderHeader(context, 'Projekt-Dashboard', 'Prüffortschritt und Übersicht.')}
     ${setupBanner}
     <div class="intern-statusbar">
       <div class="intern-card">${connectionBadge()}</div>
@@ -2803,7 +2803,7 @@ async function printSummary(records: WindowSummary[]) {
   const popup = window.open('', '_blank', 'noopener,noreferrer,width=1200,height=900');
   if (!popup) return;
   popup.document.write(`
-    <html lang="de"><head><title>Fensterbeschlagsprüfung BMVg Bonn – Sammelprotokoll</title><style>
+    <html lang="de"><head><title>SV-Netzwerk – Sammelprotokoll</title><style>
       body{font-family:Arial,sans-serif;padding:24px;color:#071a2e}table{width:100%;border-collapse:collapse}th,td{border:1px solid #d6e0e8;padding:8px;text-align:left}h1{margin-top:0}
     </style></head><body>
     <h1>SV-Netzwerk – Sammelprotokoll</h1>
@@ -2891,7 +2891,7 @@ function printSashReport(sash: WindowSashRecord, data: Record<string, unknown>, 
 <div class="header">
   <div>
     <h1>Prüfbericht – Fensterflügel-Inspektion</h1>
-    <p style="margin:4px 0 0;font-size:10pt;color:#555">Fensterbeschlagsprüfung BMVg Bonn</p>
+    <p style="margin:4px 0 0;font-size:10pt;color:#555">SV-Netzwerk Prüfportal</p>
   </div>
   <div class="company">
     SV-Büro Marc Schütt e.K.<br/>

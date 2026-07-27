@@ -258,7 +258,7 @@ class AiService
         $windowsSummary = $context['windows_summary'] ?? '';
 
         return <<<PROMPT
-Du bist ein Experte für Fensterbeschlagsprüfung (BMVg Bonn). Du analysierst Dokumente und extrahierst ALLE strukturierten Daten zu Gebäuden, Etagen, Räumen und Fenstern.
+Du bist ein Experte für Fensterbeschlagsprüfung und Gebäudeinspektion. Du analysierst Dokumente und extrahierst ALLE strukturierten Daten zu Gebäuden, Etagen, Räumen und Fenstern.
 
 ═══ BESTEHENDE PROJEKTDATEN (zum Abgleich) ═══
 - Gebäude: {$buildingsSummary}

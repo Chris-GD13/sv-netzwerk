@@ -1,6 +1,6 @@
 <?php
 /**
- * Hierarchie-API – Fensterbeschlagsprüfung BMVg Bonn
+ * Hierarchie-API – SV-Netzwerk Prüfportal
  *
  * GET /api/hierarchy.php                   – Alle Gebäude mit Statistik
  * GET /api/hierarchy.php?building_id={id}  – Etagen eines Gebäudes

@@ -1,4 +1,4 @@
--- MySQL-Schema – Fensterbeschlagsprüfung BMVg Bonn
+-- MySQL-Schema – SV-Netzwerk Prüfportal
 -- SV-Büro Marc Schütt e.K. | Version 1.1 – 2026-07-25
 -- Ausführung: mysql -u <user> -p <datenbank> < schema.sql
 --

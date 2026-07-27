@@ -1,6 +1,6 @@
 <?php
 /**
- * Flügel-API – Fensterbeschlagsprüfung BMVg Bonn
+ * Flügel-API – SV-Netzwerk Prüfportal
  *
  * GET    /api/sashes.php?window_id={id}  – Alle Flügel eines Fensters
  * GET    /api/sashes.php?id={id}         – Einzelner Flügel (inkl. form_data)

@@ -1,6 +1,6 @@
 <?php
 /**
- * Datensatzsperren API – Fensterbeschlagsprüfung BMVg Bonn
+ * Datensatzsperren API – SV-Netzwerk Prüfportal
  *
  * POST   ?action=acquire&id={windowId} – Sperre setzen/erneuern
  * DELETE ?id={windowId}               – Sperre freigeben

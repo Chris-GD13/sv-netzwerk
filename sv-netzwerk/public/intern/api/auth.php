@@ -1,6 +1,6 @@
 <?php
 /**
- * Authentifizierungs-API – Fensterbeschlagsprüfung BMVg Bonn
+ * Authentifizierungs-API – SV-Netzwerk Prüfportal
  *
  * Endpunkte:
  *   POST ?action=login   – E-Mail + Passwort → Session

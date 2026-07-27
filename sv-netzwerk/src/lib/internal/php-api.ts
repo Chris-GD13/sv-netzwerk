@@ -1,5 +1,5 @@
 /**
- * PHP-API-Client – Fensterbeschlagsprüfung BMVg Bonn
+ * PHP-API-Client – SV-Netzwerk Prüfportal
  *
  * Ersetzt den Supabase-Client durch direkte fetch()-Aufrufe an die PHP-Backend-API.
  * Alle Endpunkte liegen unter /intern/api/*.php.

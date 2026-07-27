@@ -1,6 +1,6 @@
 <?php
 /**
- * Demo-Daten – Fensterbeschlagsprüfung BMVg Bonn
+ * Demo-Daten – SV-Netzwerk Prüfportal
  *
  * GET  /api/demo.php           – Prüft ob Demo-Daten vorhanden sind
  * POST /api/demo.php           – Legt realistische Demo-Daten an
