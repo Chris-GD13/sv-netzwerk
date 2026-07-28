@@ -1,5 +1,16 @@
 export type ExpertRole = 'Sachverständiger' | 'Großschadenregulierer' | 'Regulierer' | 'Fachberater' | 'Dienstleister' | 'Restaurator' | 'Spezialunternehmen' | 'Backoffice';
 
+export interface ExpertCompany {
+  /** Überschrift des Unternehmensabschnitts, z.B. "Sachverständigenbüro Marc Schütt e.K." */
+  name: string;
+  /** Beschreibungstext, 1–3 Sätze */
+  description: string;
+  /** Verlinkungstext, z.B. "Zur Website des Sachverständigenbüros" */
+  linkLabel: string;
+  /** Vollständige URL der Unternehmenswebsite */
+  url: string;
+}
+
 export interface ExpertProfile {
   id: string;
   slug: string;
@@ -14,6 +25,8 @@ export interface ExpertProfile {
   certifications: string[];
   shortProfile: string;
   contact: { email: string; phone?: string };
+  /** Eigenständiges Unternehmen des Experten – wird unterhalb des Profiltexts angezeigt */
+  company?: ExpertCompany;
   linkedin?: string;
   image?: string;
   status: 'active' | 'onboarding';

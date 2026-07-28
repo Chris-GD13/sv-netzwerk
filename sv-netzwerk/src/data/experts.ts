@@ -23,6 +23,12 @@ export const experts: ExpertProfile[] = [
     certifications: ['Öffentlich bestellt und vereidigt', 'Vorstandsmitglied im BVS'],
     shortProfile: 'Öffentlich bestellter und vereidigter Sachverständiger im Tischlerhandwerk. Schwerpunkte sind Fenster, Türen, Fassaden, Wertermittlung, Schlagregen- und Luftdichtheitsprüfung sowie Gebäudeanalytik mittels Wärmebildtechnik.',
     contact: { ...centralContact, phone: '02392‑6592751' }, linkedin: 'https://www.linkedin.com/in/marc-schuett-tischlersv/', image: '/assets/images/team/marc-schuett.jpg', status: 'active', tags: ['Tischlerhandwerk', 'Fenster', 'Fassade'], publications: [], practiceCases: [], articles: [],
+    company: {
+      name: 'Sachverständigenbüro Marc Schütt e.K.',
+      description: 'Marc Schütt ist Inhaber des Sachverständigenbüros Marc Schütt e.K. mit Sitz in Werdohl. Das Büro ist insbesondere auf Fenster, Türen, Fassaden, Wintergärten, Tischlerhandwerk sowie private und gerichtliche Gutachten spezialisiert.',
+      linkLabel: 'Zur Website des Sachverständigenbüros',
+      url: 'https://sv-schuett.de',
+    },
   },
   {
     id: 'expert-carmen-gohl', slug: 'carmen-gohl', name: 'Carmen Gohl', role: 'Sachverständiger', roleLabel: 'Sachverständige', group: 'expert',
@@ -32,6 +38,12 @@ export const experts: ExpertProfile[] = [
     certifications: ['Personenzertifizierung nach DIN EN ISO/IEC 17024', 'Vorstandsmitglied im BSS'],
     shortProfile: 'Sachverständige für Sachschadenbewertungen von Immobilien. Ihre Schwerpunkte sind Schadenregulierung, Sachschadenermittlung, Schimmelpilze, Feuchteprobleme, Innenraumschadstoffe und Ölschäden.',
     contact: centralContact, linkedin: 'https://www.linkedin.com/in/carmen-gohl-34364324a/', image: '/assets/images/team/carmen-gohl.jpg', status: 'active', tags: ['Sachschadenbewertung', 'Schimmelpilze', 'Innenraumschadstoffe'], publications: [], practiceCases: ['/praxisfaelle/schimmel-dachbereich-ursachenabgrenzung/'], articles: [],
+    company: {
+      name: 'Sachverständigenbüro Carmen Gohl',
+      description: 'Carmen Gohl betreibt ein eigenständiges Sachverständigenbüro mit den Schwerpunkten Sachschadenbewertungen von Immobilien, Versicherungswertermittlungen, Schimmelpilze, Innenraumschadstoffe sowie Ölschäden.',
+      linkLabel: 'Zur Website des Sachverständigenbüros',
+      url: 'https://sv-gohl.de',
+    },
   },
   {
     id: 'expert-claudius-freiberg', slug: 'claudius-freiberg', name: 'Claudius Freiberg', role: 'Sachverständiger', group: 'expert',
@@ -40,6 +52,12 @@ export const experts: ExpertProfile[] = [
     regions: ['Bundesweit nach Aufgabenstellung'], qualifications: ['Sachverständiger im Tischlerhandwerk'], certifications: ['Öffentlich bestellt und vereidigt'],
     shortProfile: 'Öffentlich bestellter und vereidigter Sachverständiger im Tischlerhandwerk mit Schwerpunkt Oberflächenschäden sowie Material- und Beschichtungsbewertung an Holz, Aluminium, Kunststoff und weiteren Werkstoffen.',
     contact: centralContact, linkedin: 'https://www.linkedin.com/in/claudius-freiberg/', image: '/assets/images/team/claudius-freiberg.jpg', status: 'active', tags: ['Oberflächenschäden', 'Materialbewertung', 'Beschichtungen'], publications: [], practiceCases: [], articles: [],
+    company: {
+      name: 'Sachverständigenbüro Claudius Freiberg',
+      description: 'Claudius Freiberg führt ein eigenständiges Sachverständigenbüro mit Spezialisierung auf Oberflächen, Material- und Beschichtungsschäden an Holz, Aluminium und Kunststoff sowie auf das Tischler- und Schreinerhandwerk.',
+      linkLabel: 'Zur Website des Sachverständigenbüros',
+      url: 'https://sv-freiberg.de',
+    },
   },
   {
     id: 'expert-lenna-maria-walczok', slug: 'lenna-maria-walczok', name: 'Lenna Maria Walczok, M.Eng.', role: 'Sachverständiger', roleLabel: 'Sachverständige', group: 'expert',
