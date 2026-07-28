@@ -33,16 +33,6 @@
   color: #fff;
 }
 
-.intern-header__logo-shell {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: .6rem .85rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-}
-
 .intern-header__logo {
   display: block;
   width: clamp(10rem, 18vw, 13.75rem);

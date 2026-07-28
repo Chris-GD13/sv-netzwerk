@@ -1,7 +1,7 @@
 ---
 import SEO from '../components/SEO.astro';
 import { portalProject } from '../lib/internal/schema';
-import logoSrc from '../assets/sv-netzwerk-logo-freigestellt-v3.svg';
+import logoSrc from '../assets/sv-netzwerk-logo-portal.svg';
 import '../styles/global.css';
 import '../styles/header.css';
 import '../styles/internal-portal.css';
@@ -30,9 +30,7 @@ const props = Astro.props;
       <div class="sv-container intern-header__inner">
         <div class="intern-header__brand">
           <a class="site-brand" href="/" aria-label="SV-Netzwerk – Startseite">
-            <span class="intern-header__logo-shell">
-              <img class="intern-header__logo" src={logoSrc.src} alt="SV-Netzwerk" width="220" height="46" />
-            </span>
+            <img class="intern-header__logo" src={logoSrc.src} alt="SV-Netzwerk" width="220" height="46" />
           </a>
           <div class="intern-header__meta">
             <p class="intern-header__eyebrow">Geschütztes Prüfportal</p>

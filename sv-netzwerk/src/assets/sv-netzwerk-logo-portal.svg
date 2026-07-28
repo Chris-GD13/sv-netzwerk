@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2600" height="460" viewBox="0 0 2600 460" role="img" aria-labelledby="pltitle pldesc">
+  <title id="pltitle">SV-Netzwerk Logo</title>
+  <desc id="pldesc">Freigestelltes Vektorlogo für dunklen Hintergrund – SV in Orange, Wortmarke und Tagline in Weiß.</desc>
+
+  <g>
+    <text
+      x="300"
+      y="230"
+      fill="#ff9d12"
+      font-family="Inter, 'Segoe UI', Arial, sans-serif"
+      font-size="476"
+      font-weight="900"
+      letter-spacing="-36"
+      text-anchor="middle"
+      dominant-baseline="middle">SV</text>
+  </g>
+
+  <text
+    x="710"
+    y="200"
+    fill="#ffffff"
+    font-family="Inter, 'Segoe UI', Arial, sans-serif"
+    font-size="230"
+    font-weight="700"
+    letter-spacing="-4">sv-netzwerk.eu</text>
+
+  <text
+    x="710"
+    y="375"
+    fill="rgba(255,255,255,0.72)"
+    font-family="Inter, 'Segoe UI', Arial, sans-serif"
+    font-size="112"
+    font-weight="850"
+    letter-spacing="0.3">BAU · SCHADEN · REGULIERUNG</text>
+</svg>
