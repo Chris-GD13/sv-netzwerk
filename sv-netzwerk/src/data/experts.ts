@@ -56,7 +56,7 @@ export const experts: ExpertProfile[] = [
       name: 'Sachverständigenbüro Claudius Freiberg',
       description: 'Claudius Freiberg führt ein eigenständiges Sachverständigenbüro mit Spezialisierung auf Oberflächen, Material- und Beschichtungsschäden an Holz, Aluminium und Kunststoff sowie auf das Tischler- und Schreinerhandwerk.',
       linkLabel: 'Zur Website des Sachverständigenbüros',
-      url: 'https://sv-freiberg.de',
+      url: 'https://claudius-freiberg.de/',
     },
   },
   {
@@ -66,6 +66,12 @@ export const experts: ExpertProfile[] = [
     regions: ['Bundesweit nach Aufgabenstellung'], qualifications: ['Master of Engineering', 'Bauingenieurin', 'Bauschadenbewertung'], certifications: ['DEKRA-zertifizierte Sachverständige'],
     shortProfile: 'Spezialistin für Baucontrolling, Gebäudeschäden, Sanierungsberatung, Nachtragsprüfung, Terminmanagement, SiGeKo und zerstörungsfreie Messtechnik.',
     contact: centralContact, linkedin: 'https://www.linkedin.com/in/lenna-maria-walczok-6bb468291/', image: '/assets/images/team/lenna-maria-walczok.jpg', status: 'active', tags: ['Baucontrolling', 'Gebäudeschäden', 'Nachtragsprüfung'], publications: [], practiceCases: [], articles: [],
+    company: {
+      name: 'Netzwerkprofil Lenna Maria Walczok',
+      description: 'Weiterführendes Profil von Lenna Maria Walczok im BNI Chapter Weisser Turm Bad Homburg.',
+      linkLabel: 'Zum Profil im BNI-Netzwerk',
+      url: 'https://bni-wiesbaden.de/chapter-weisser-turm-bad-homburg/de/memberdetails?encryptedMemberId=XHIUKtc11FtzjBHVs%2BmVlA%3D%3D&name=Lenna+Walczok',
+    },
   },
   {
     id: 'expert-holger-roth', slug: 'holger-roth', name: 'Holger Roth', role: 'Regulierer', group: 'expert',
