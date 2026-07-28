@@ -25,6 +25,7 @@ import {
   apiDeletePhoto,
   apiGetCalculationParameters,
   apiLogExport,
+  apiListOnlineUsers,
   apiListUsers,
   apiCreateUser,
   apiUpdateUser,
@@ -92,6 +93,7 @@ import type {
   DashboardStats,
   Floor,
   LockResult,
+  OnlinePortalUser,
   PhotoItem,
   PortalRoute,
   PortalRole,
@@ -121,6 +123,7 @@ interface AppContext {
 const LOCK_TIMEOUT_MINUTES = 15;
 const SAVE_DEBOUNCE_MS = 1200;
 const SYNC_WARNING_MESSAGE = 'Es liegen noch nicht synchronisierte Änderungen vor.';
+const ONLINE_WINDOW_MINUTES = 10;
 
 /** Basis-URL für das aktuelle Projekt (z.B. '/intern/fensterpruefung-bonn'). */
 function projectBase(): string {
@@ -692,9 +695,10 @@ function renderLogin(context: AppContext) {
 }
 
 async function renderDashboard(context: AppContext) {
-  const [buildings, records] = await Promise.all([
+  const [buildings, records, onlineUsers] = await Promise.all([
     apiListBuildings(),
     fetchWindowSummaries(context),
+    apiListOnlineUsers(),
   ]);
   const stats = createDashboardStats(records);
 
@@ -713,6 +717,7 @@ async function renderDashboard(context: AppContext) {
     <div class="intern-statusbar">
       <div class="intern-card">${connectionBadge()}</div>
       <div class="intern-card">${roleBadge(context.user?.profile.role ?? 'pruefer')}<p class="intern-meta">${escapeHtml(context.user?.profile.full_name ?? context.user?.email ?? '')}</p></div>
+      <div class="intern-card">${renderOnlineUsersCard(onlineUsers, context.user?.id ?? null)}</div>
       <div class="intern-card"><strong>${stats.total}</strong><p class="intern-meta">Fenster gesamt</p></div>
       <div class="intern-card"><strong>${stats.completed}</strong><p class="intern-meta">Flügel geprüft</p></div>
     </div>
@@ -2636,6 +2641,7 @@ function renderUserList(users: AdminUser[], currentUser: PortalUser, canManageUs
           <th>E-Mail</th>
           <th>Rolle</th>
           <th>Status</th>
+          <th>Online</th>
           <th>Letzter Login</th>
           ${canManageUsers ? '<th>Aktionen</th>' : ''}
         </tr>
@@ -2646,14 +2652,18 @@ function renderUserList(users: AdminUser[], currentUser: PortalUser, canManageUs
           const statusBadge = u.is_active
             ? '<span class="intern-badge intern-badge--ok">Aktiv</span>'
             : '<span class="intern-badge intern-badge--warn">Deaktiviert</span>';
+          const onlineBadge = isUserOnline(u.last_seen_at)
+            ? `<span class="intern-badge intern-badge--info">Online · ${escapeHtml(formatPresenceTime(u.last_seen_at))}</span>`
+            : '<span class="intern-badge intern-badge--warn">Offline</span>';
           return `
             <tr data-user-id="${u.id}">
-              <td><strong>${escapeHtml(u.full_name)}</strong></td>
-              <td>${escapeHtml(u.email)}</td>
-              <td>${escapeHtml(u.role)}</td>
-              <td>${statusBadge}</td>
-              <td class="intern-meta">${u.last_login_at ? formatDateTime(u.last_login_at) : '—'}</td>
-              ${canManageUsers ? `<td class="intern-actions intern-actions--inline">
+              <td data-label="Name"><strong>${escapeHtml(u.full_name)}</strong></td>
+              <td data-label="E-Mail">${escapeHtml(u.email)}</td>
+              <td data-label="Rolle">${escapeHtml(u.role)}</td>
+              <td data-label="Status">${statusBadge}</td>
+              <td data-label="Online">${onlineBadge}</td>
+              <td data-label="Letzter Login" class="intern-meta">${u.last_login_at ? formatDateTime(u.last_login_at) : '—'}</td>
+              ${canManageUsers ? `<td data-label="Aktionen" class="intern-actions intern-actions--inline">
                 <button class="sv-button sv-button-secondary" type="button" data-edit-user="${u.id}">Bearbeiten</button>
                 <button class="sv-button sv-button-secondary" type="button" data-pw-user="${u.id}">Passwort</button>
                 ${!isSelf && u.is_active ? `<button class="sv-button sv-button-secondary" type="button" data-deactivate-user="${u.id}">Deaktivieren</button>` : ''}
@@ -2932,23 +2942,22 @@ function renderHeader(context: AppContext, title: string, text: string) {
     <a class="sv-button sv-button-secondary" href="/intern/projekte/">Projekte</a>
   `;
 
-  // Top-right: Benutzerverwaltung + Abmelden
-  const topRight = `
-    <div style="display:flex;gap:8px;align-items:center;position:absolute;top:12px;right:16px">
-      ${isAdmin ? `<a class="sv-button sv-button-secondary" href="${inProject ? pb : '/intern/fensterpruefung-bonn'}/admin/" style="font-size:0.8rem;padding:4px 10px">👤 Benutzerverwaltung</a>` : ''}
-      <button class="sv-button sv-button-ghost" type="button" id="header-logout" style="font-size:0.8rem;padding:4px 10px">Abmelden</button>
+  const utilityActions = `
+    <div class="intern-hero__utility">
+      ${isAdmin ? `<a class="sv-button sv-button-secondary intern-hero__utility-link" href="${inProject ? pb : '/intern/fensterpruefung-bonn'}/admin/">👤 Benutzerverwaltung</a>` : ''}
+      <button class="sv-button sv-button-ghost intern-hero__utility-link" type="button" id="header-logout">Abmelden</button>
     </div>
   `;
 
   return `
-    <div class="intern-card intern-hero" style="position:relative">
-      ${topRight}
+    <div class="intern-card intern-hero">
       <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
       <h1>${escapeHtml(title)}</h1>
       <p>${escapeHtml(text)}</p>
       <nav class="intern-actions" aria-label="Hauptnavigation">
         ${projectNav}
       </nav>
+      ${utilityActions}
     </div>
   `;
 }
@@ -3483,6 +3492,25 @@ function connectionBadge() {
     : '<span class="intern-badge intern-badge--warn">Offline · Lokale Speicherung aktiv</span>';
 }
 
+function renderOnlineUsersCard(users: OnlinePortalUser[], currentUserId: string | null) {
+  const visibleUsers = users.slice(0, 5);
+  const countLabel = users.length === 1 ? '1 Benutzer online' : `${users.length} Benutzer online`;
+  return `
+    <strong>${countLabel}</strong>
+    <p class="intern-meta">Aktiv in den letzten ${ONLINE_WINDOW_MINUTES} Minuten</p>
+    <div class="intern-online-users">
+      ${visibleUsers.map((user) => `
+        <span class="intern-online-users__item">
+          <span class="intern-online-users__dot" aria-hidden="true"></span>
+          ${escapeHtml(user.full_name)}${currentUserId === String(user.id) ? ' (Sie)' : ''}
+        </span>
+      `).join('')}
+      ${users.length > visibleUsers.length ? `<span class="intern-online-users__more">+${users.length - visibleUsers.length} weitere</span>` : ''}
+      ${users.length === 0 ? '<span class="intern-online-users__empty">Derzeit niemand aktiv.</span>' : ''}
+    </div>
+  `;
+}
+
 function infoAlert(text: string) { return `<div class="intern-alert intern-alert--info">${escapeHtml(text)}</div>`; }
 function successAlert(text: string) { return `<div class="intern-alert intern-alert--success">${escapeHtml(text)}</div>`; }
 function warnAlert(text: string) { return `<div class="intern-alert intern-alert--warn">${escapeHtml(text)}</div>`; }
@@ -3601,12 +3629,33 @@ function readRecordIdFromPath() {
 
 function formatDateTime(value: string | null) {
   if (!value) return '—';
-  return new Intl.DateTimeFormat('de-DE', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value));
+  return new Intl.DateTimeFormat('de-DE', { dateStyle: 'short', timeStyle: 'short' }).format(parsePortalDate(value));
 }
 
 function formatTime(value: string | null | undefined) {
   if (!value) return '—';
-  return new Intl.DateTimeFormat('de-DE', { timeStyle: 'short' }).format(new Date(value));
+  return new Intl.DateTimeFormat('de-DE', { timeStyle: 'short' }).format(parsePortalDate(value));
+}
+
+function formatPresenceTime(value: string | null) {
+  const date = value ? parsePortalDate(value) : null;
+  if (!date) return 'gerade eben';
+  const diffMinutes = Math.max(0, Math.round((Date.now() - date.getTime()) / 60000));
+  if (diffMinutes <= 1) return 'gerade eben';
+  return `vor ${diffMinutes} Min.`;
+}
+
+function isUserOnline(value: string | null) {
+  if (!value) return false;
+  const date = parsePortalDate(value);
+  return (Date.now() - date.getTime()) <= ONLINE_WINDOW_MINUTES * 60 * 1000;
+}
+
+function parsePortalDate(value: string) {
+  if (value.includes('T')) {
+    return new Date(value);
+  }
+  return new Date(value.replace(' ', 'T') + 'Z');
 }
 
 function formatNumber(value: number) {

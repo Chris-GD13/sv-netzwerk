@@ -33,6 +33,22 @@
   color: #fff;
 }
 
+.intern-header__logo-shell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .6rem .85rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.intern-header__logo {
+  display: block;
+  width: clamp(10rem, 18vw, 13.75rem);
+  height: auto;
+}
+
 .intern-header .site-brand__copy small {
   color: rgba(255, 255, 255, 0.78);
 }
@@ -353,6 +369,47 @@ a.intern-stat {
   gap: 1rem;
 }
 
+.intern-hero__utility {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: .75rem;
+  margin-top: .25rem;
+}
+
+.intern-hero__utility-link {
+  font-size: .9rem;
+}
+
+.intern-online-users {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: .65rem;
+}
+
+.intern-online-users__item,
+.intern-online-users__more,
+.intern-online-users__empty {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .28rem .6rem;
+  border-radius: 999px;
+  background: #edf5fb;
+  color: #0b4f7a;
+  font-size: .85rem;
+  font-weight: 700;
+}
+
+.intern-online-users__dot {
+  width: .55rem;
+  height: .55rem;
+  border-radius: 999px;
+  background: #1f9d55;
+  box-shadow: 0 0 0 2px rgba(31, 157, 85, 0.15);
+}
+
 .intern-search {
   display: grid;
   gap: .5rem;
@@ -367,6 +424,10 @@ a.intern-stat {
 @media (max-width: 42rem) {
   .intern-header__inner {
     align-items: flex-start;
+  }
+
+  .intern-hero__utility {
+    justify-content: flex-start;
   }
 
   .intern-sticky-actions {
@@ -504,6 +565,16 @@ a.intern-stat {
   }
 
   .intern-actions .sv-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .intern-hero__utility {
+    order: 99;
+    margin-top: .5rem;
+  }
+
+  .intern-hero__utility .sv-button {
     width: 100%;
     text-align: center;
   }

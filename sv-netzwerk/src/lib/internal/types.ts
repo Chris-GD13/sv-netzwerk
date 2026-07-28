@@ -167,8 +167,17 @@ export interface AdminUser {
   role: PortalRole;
   is_active: number;
   last_login_at: string | null;
+   last_seen_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface OnlinePortalUser {
+  id: number;
+  email: string;
+  full_name: string;
+  role: PortalRole;
+  last_seen_at: string | null;
 }
 
 export interface Building {

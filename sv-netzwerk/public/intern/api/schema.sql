@@ -22,9 +22,11 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash   VARCHAR(255)    NOT NULL,
     is_active       TINYINT(1)      NOT NULL DEFAULT 1,
     last_login_at   DATETIME        NULL,
+    last_seen_at    DATETIME        NULL,
     created_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    KEY idx_users_last_seen (last_seen_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS password_resets (

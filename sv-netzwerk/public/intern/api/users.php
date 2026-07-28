@@ -2,9 +2,10 @@
 /**
  * Benutzerverwaltungs-API – SV-Netzwerk Prüfportal
  *
- * Nur für Administratoren zugänglich.
+ * Benutzerliste für Projektleiter/Administratoren, Präsenzanzeige für alle angemeldeten Benutzer.
  *
  * GET    /api/users.php              – Alle Benutzer auflisten
+ * GET    /api/users.php?action=presence – Aktive Benutzer mit letzter Aktivität
  * POST   /api/users.php              – Neuen Benutzer anlegen
  * PUT    /api/users.php?id={id}      – Benutzer aktualisieren (Name, Rolle, Status)
  * DELETE /api/users.php?id={id}      – Benutzer deaktivieren
@@ -23,7 +24,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 $id     = isset($_GET['id']) ? (int) $_GET['id'] : null;
 
-if ($method === 'GET') {
+if ($method === 'GET' && $action !== 'presence') {
     if (!in_array($actor['role'], ['administrator', 'projektleiter'], true)) {
         apiError(403, 'Keine Berechtigung für das Benutzerverzeichnis.');
     }
@@ -32,6 +33,7 @@ if ($method === 'GET') {
 }
 
 match (true) {
+    $method === 'GET' && $action === 'presence'                    => handlePresence(),
     $method === 'GET'                                              => handleList(),
     $method === 'POST' && $action === 'set_password' && $id       => handleSetPassword($id, $actor),
     $method === 'POST'                                             => handleCreate($actor),
@@ -45,7 +47,7 @@ function handleList(): never
 {
     try {
         $rows = db()->query(
-            'SELECT id, email, full_name, role, is_active, last_login_at, created_at, updated_at
+            'SELECT id, email, full_name, role, is_active, last_login_at, last_seen_at, created_at, updated_at
              FROM users
              ORDER BY full_name ASC'
         )->fetchAll();
@@ -53,6 +55,30 @@ function handleList(): never
         apiError(503, 'Benutzerliste konnte nicht geladen werden.');
     }
     apiJson($rows);
+}
+
+function handlePresence(): never
+{
+    try {
+        $stmt = db()->prepare(
+            'SELECT id, email, full_name, role, last_seen_at
+             FROM users
+             WHERE is_active = 1
+               AND last_seen_at IS NOT NULL
+               AND last_seen_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 10 MINUTE)
+             ORDER BY last_seen_at DESC, full_name ASC'
+        );
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+    } catch (Throwable) {
+        apiError(503, 'Online-Status konnte nicht geladen werden.');
+    }
+
+    apiJson([
+        'users' => $rows,
+        'active_window_minutes' => 10,
+        'server_time' => nowUtc(),
+    ]);
 }
 
 function handleCreate(array $actor): never

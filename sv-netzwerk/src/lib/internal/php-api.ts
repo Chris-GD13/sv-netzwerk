@@ -15,6 +15,7 @@ import type {
   PhotoItem,
   PortalRole,
   PortalUser,
+  OnlinePortalUser,
   Room,
   WindowInRoom,
   WindowRecord,
@@ -334,6 +335,11 @@ export function onAuthChange(callback: AuthCallback): () => void {
 export async function apiListUsers(): Promise<AdminUser[]> {
   const { data } = await apiGet<AdminUser[]>('/users.php');
   return data ?? [];
+}
+
+export async function apiListOnlineUsers(): Promise<OnlinePortalUser[]> {
+  const { data } = await apiGet<{ users: OnlinePortalUser[] }>('/users.php?action=presence');
+  return data?.users ?? [];
 }
 
 export async function apiCreateUser(payload: {
@@ -683,4 +689,3 @@ export async function apiSeedDemoData(reset = false): Promise<{ ok: boolean; mes
   );
   return data ?? { ok: false, message: 'Fehler beim Anlegen', results: [] };
 }
-
