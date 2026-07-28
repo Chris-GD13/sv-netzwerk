@@ -11,6 +11,34 @@ declare(strict_types=1);
 define('APP_VERSION', '1.0.0');
 define('DEFAULT_PROJECT_ID', 1);
 
+function ensureRuntimeSchema(PDO $pdo): void
+{
+    static $done = false;
+    if ($done) {
+        return;
+    }
+    $done = true;
+
+    try {
+        $stmt = $pdo->prepare(
+            'SELECT COUNT(*)
+             FROM information_schema.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = :table
+               AND COLUMN_NAME = :column'
+        );
+        $stmt->execute([':table' => 'users', ':column' => 'last_seen_at']);
+        $hasLastSeen = (int) $stmt->fetchColumn() > 0;
+
+        if (!$hasLastSeen) {
+            $pdo->exec('ALTER TABLE users ADD COLUMN last_seen_at DATETIME NULL AFTER last_login_at');
+            $pdo->exec('ALTER TABLE users ADD INDEX idx_users_last_seen (last_seen_at)');
+        }
+    } catch (Throwable $e) {
+        error_log('[config] Runtime-Migration fehlgeschlagen: ' . $e->getMessage());
+    }
+}
+
 /** Lädt Schlüssel-Wert-Paare aus der .env-Datei im Stammverzeichnis. */
 function loadEnv(): void
 {
@@ -99,6 +127,7 @@ function db(): PDO
         PDO::ATTR_EMULATE_PREPARES   => false,
     ]);
     $pdo->exec("SET time_zone='+00:00'");
+    ensureRuntimeSchema($pdo);
     return $pdo;
 }
 
@@ -171,6 +200,25 @@ function startSession(): void
     session_start();
 }
 
+function touchCurrentUserPresence(int $userId): void
+{
+    startSession();
+    $now = time();
+    $lastTouched = (int) ($_SESSION['presence_touched_at'] ?? 0);
+    if ($lastTouched > 0 && ($now - $lastTouched) < 60) {
+        return;
+    }
+
+    $_SESSION['presence_touched_at'] = $now;
+
+    try {
+        db()->prepare('UPDATE users SET last_seen_at = :now WHERE id = :id')
+            ->execute([':now' => nowUtc(), ':id' => $userId]);
+    } catch (Throwable $e) {
+        error_log('[config] last_seen_at konnte nicht aktualisiert werden: ' . $e->getMessage());
+    }
+}
+
 /** Gibt den aktuell angemeldeten Benutzer zurück oder null. */
 function currentUser(): ?array
 {
@@ -186,6 +234,9 @@ function currentUser(): ?array
         );
         $stmt->execute([':id' => $_SESSION['user_id']]);
         $user = $stmt->fetch();
+        if ($user) {
+            touchCurrentUserPresence((int) $user['id']);
+        }
         return $user ?: null;
     } catch (Throwable) {
         return null;

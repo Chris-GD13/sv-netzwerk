@@ -1,7 +1,7 @@
 ---
 import SEO from '../components/SEO.astro';
-import LogoMark from '../components/LogoMark.astro';
 import { portalProject } from '../lib/internal/schema';
+import logoSrc from '../assets/sv-netzwerk-logo-freigestellt-v3.svg';
 import '../styles/global.css';
 import '../styles/header.css';
 import '../styles/internal-portal.css';
@@ -30,10 +30,8 @@ const props = Astro.props;
       <div class="sv-container intern-header__inner">
         <div class="intern-header__brand">
           <a class="site-brand" href="/" aria-label="SV-Netzwerk – Startseite">
-            <span class="site-brand__symbol" aria-hidden="true"><LogoMark /></span>
-            <span class="site-brand__copy">
-              <strong>SV-Netzwerk</strong>
-              <small>Bau · Schaden · Regulierung</small>
+            <span class="intern-header__logo-shell">
+              <img class="intern-header__logo" src={logoSrc.src} alt="SV-Netzwerk" width="220" height="46" />
             </span>
           </a>
           <div class="intern-header__meta">

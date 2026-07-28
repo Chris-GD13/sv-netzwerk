@@ -205,8 +205,8 @@ function handleLogin(): never
     $_SESSION['user_role'] = $user['role'];
 
     try {
-        db()->prepare('UPDATE users SET last_login_at = :now WHERE id = :id')
-            ->execute([':now' => nowUtc(), ':id' => $user['id']]);
+        db()->prepare('UPDATE users SET last_login_at = :now, last_seen_at = :now2 WHERE id = :id')
+            ->execute([':now' => nowUtc(), ':now2' => nowUtc(), ':id' => $user['id']]);
     } catch (Throwable) {
         // nicht kritisch
     }
