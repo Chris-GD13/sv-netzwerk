@@ -81,6 +81,12 @@ jobs:
           mysql -h 127.0.0.1 -u root -ptestpass fensterpruefung < sv-netzwerk/public/intern/api/schema.sql
           mysql -h 127.0.0.1 -u root -ptestpass fensterpruefung < analysis_export/testdata/referenz_seed.sql
 
+      - name: Testpasswörter setzen
+        run: |
+          HASH=$(php -r "echo password_hash('Test2026!', PASSWORD_ARGON2ID);")
+          mysql -h 127.0.0.1 -u root -ptestpass fensterpruefung \
+            -e "UPDATE users SET password_hash = '${HASH}' WHERE email IN ('admin@testprojekt.local','cw@sv-schuett.eu','hr@sv-schuett.eu','ms@sv-schuett.eu','gast@testprojekt.local')"
+
       - name: Create .env
         run: |
           cat > sv-netzwerk/public/intern/api/.env << 'EOF'
