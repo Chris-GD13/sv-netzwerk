@@ -43,10 +43,12 @@ function ensureRuntimeSchema(PDO $pdo): void
 function loadEnv(): void
 {
     $paths = [
-        dirname(__DIR__, 5) . '/.env',
-        dirname(__DIR__, 4) . '/.env',
-        dirname(__DIR__, 3) . '/.env',
+        __DIR__ . '/.env',
+        dirname(__DIR__, 1) . '/.env',
         dirname(__DIR__, 2) . '/.env',
+        dirname(__DIR__, 3) . '/.env',
+        dirname(__DIR__, 4) . '/.env',
+        dirname(__DIR__, 5) . '/.env',
     ];
     foreach ($paths as $path) {
         if (!is_file($path)) {
