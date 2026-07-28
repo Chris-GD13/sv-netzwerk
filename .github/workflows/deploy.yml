@@ -81,6 +81,7 @@ jobs:
           test -f dist/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/index.html
           test -f dist/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/index.html
           test -f dist/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/index.html
+          test -f dist/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/index.html
           echo "Build erfolgreich; erzeugte Dateien:"
           find dist -type f | sort | head -n 100
 

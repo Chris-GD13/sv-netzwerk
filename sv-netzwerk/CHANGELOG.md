@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.4.5 – 2026-07-28
+- automatischer nachmittags Fachbeitrag veröffentlicht: „Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz"
+- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt
+- Beitragsbild unter /assets/images/linkedin/grossflaechige-leitungswasserschaeden-sanierungssteuerung.svg erzeugt
+- Bugfix: author-Feld im Automation-Script auf Slug `christian-waechter` korrigiert
+- Bugfix: CRLF-Zeilenenden bei CHANGELOG.md und library.ts im Automation-Script korrekt behandelt
+- Neues Hilfsskript `count-daily-articles.mjs` für dynamische Pflichtbeitragszählung im Workflow
+- knowledge-standard.yml: Tageszählung dynamisch statt hart codierter `--expected-daily-count=2`
+- deploy.yml: Build-Prüfung um `grossflaechige-leitungswasserschaeden-sanierungssteuerung` erweitert
+
 ## 3.4.4 – 2026-07-27
 - Fachbeitrags-Automation auf regionale öffentliche Meldungen (Mo–Fr) als Standardquelle priorisiert; anonymisierte Kalenderfälle nur noch optional per `ALLOW_CALENDAR_CASE_CONTEXT=true`
 - LinkedIn-/Zap-Payload-Erstellung in eigenes Skript ausgelagert und als JSON-Datei unter `.automation/linkedin-payloads/{publication_id}.json` versioniert erzeugt

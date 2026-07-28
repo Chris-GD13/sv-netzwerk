@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz',
+    description: 'Leitungswasserschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/',
+    category: 'Leitungswasserschäden',
+    tags: ['Leitungswasser', 'Schadenregulierung', 'Sanierungsplanung', 'Kostenprüfung'],
+    date: '2026-07-28',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Kumulschäden nach Sturm und Hagel – belastbare Prüffolge für die Regulierungspraxis',
     description: 'Praxisorientierte Prüffolge für Versicherer, Sachverständige und Schadenregulierer zur einheitlichen, objektbezogenen Bearbeitung vieler Sturm- und Hagelschäden.',
     href: '/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/',
