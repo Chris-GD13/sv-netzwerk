@@ -289,11 +289,11 @@ function renderLanding(context: AppContext) {
       <h1>SV-Netzwerk Prüfportal</h1>
       <p>Fensterbeschlagsprüfung, Dokumentenanalyse und Prüfverwaltung</p>
       <div class="intern-actions">
-        <a class="sv-button sv-button-primary" href="${context.user ? '/intern/projekte/' : '/intern/login/'}">${context.user ? 'Zu den Projekten' : 'Zur Anmeldung'}</a>
+        <a class="sv-button sv-button-primary" href="${context.user ? '/intern/projekte/' : '/intern/login/'}">${context.user ? 'Zum Dashboard' : 'Zur Anmeldung'}</a>
       </div>
     </div>
   `;
-  if (context.user) redirectTo('/intern/projekte/');
+  if (context.user) void redirectAfterLogin();
 }
 
 async function renderNewProject(context: AppContext) {
@@ -628,9 +628,22 @@ async function showMoveDialog(
   });
 }
 
+async function redirectAfterLogin() {
+  try {
+    const projects = await apiListProjects();
+    if (projects.length > 0) {
+      redirectTo(`/intern/${projects[0].project_code}/`);
+      return;
+    }
+  } catch {
+    // Fallback
+  }
+  redirectTo('/intern/projekte/');
+}
+
 function renderLogin(context: AppContext) {
   if (context.user) {
-    redirectTo('/intern/projekte/');
+    void redirectAfterLogin();
     return;
   }
 
@@ -680,7 +693,7 @@ function renderLogin(context: AppContext) {
       return;
     }
     message.innerHTML = successAlert('Anmeldung erfolgreich. Weiterleitung laeuft.');
-    redirectTo('/intern/projekte/');
+    await redirectAfterLogin();
   });
   resetButton?.addEventListener('click', async () => {
     if (!message || !form) return;
