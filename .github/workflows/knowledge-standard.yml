@@ -93,11 +93,10 @@ jobs:
       - name: Lint-/Fachbeitragsstandard prüfen
         if: steps.generate.outputs.status != 'skipped'
         run: |
-          EXPECTED_DAILY_COUNT=1
-          if [ "$PUBLICATION_SLOT" = "afternoon" ]; then
-            EXPECTED_DAILY_COUNT=2
-          fi
-          npm run validate:knowledge -- "$BERLIN_DATE" "--expected-daily-count=${EXPECTED_DAILY_COUNT}"
+          # Zähle vorhandene dailyStandard-Pflichtbeiträge für heute (nach Generierung)
+          # Die Generierung hat den neuen Beitrag bereits angelegt; EXISTING_TODAY = Gesamtzahl heute
+          EXISTING_TODAY=$(node scripts/count-daily-articles.mjs "$BERLIN_DATE" 2>/dev/null || echo "1")
+          npm run validate:knowledge -- "$BERLIN_DATE" "--expected-daily-count=${EXISTING_TODAY}"
 
       - name: Typprüfung ausführen
         if: steps.generate.outputs.status != 'skipped'

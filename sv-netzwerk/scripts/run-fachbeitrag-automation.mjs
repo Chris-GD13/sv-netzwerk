@@ -957,7 +957,7 @@ const frontmatter = [
   `description: "${metaDescription}"`,
   `category: "${topic.category}"`,
   `tags: [${topic.tags.map((tag) => `"${tag}"`).join(', ')}]`,
-  'author: "Christian Wächter"',
+  'author: "christian-waechter"',
   'featured: false',
   'dailyStandard: true',
   'contentLevel: "B"',
@@ -1034,7 +1034,9 @@ const videoText = caseContext
 await writeFile(path.join(videosDir, `${berlinDate}_wissen-in-180-sekunden_${slug}.txt`), `${videoText}\n`);
 
 const librarySource = await readText(libraryFile);
-if (!librarySource.includes(`href: '/fachwissen/${slug}/'`)) {
+// Normalisiere Zeilenenden für plattformübergreifende Kompatibilität
+const libraryNormalized = librarySource.replace(/\r\n/g, '\n');
+if (!libraryNormalized.includes(`href: '/fachwissen/${slug}/'`)) {
   const entry = [
     '  {',
     `    title: '${title.replaceAll("'", "\\'")}',`,
@@ -1047,16 +1049,18 @@ if (!librarySource.includes(`href: '/fachwissen/${slug}/'`)) {
     "    featured: false,",
     '  },',
   ].join('\n');
-  const updatedLibrary = librarySource.replace('export const library: LibraryItem[] = [', `export const library: LibraryItem[] = [\n${entry}`);
+  const updatedLibrary = libraryNormalized.replace('export const library: LibraryItem[] = [', `export const library: LibraryItem[] = [\n${entry}`);
   await writeFile(libraryFile, updatedLibrary);
 }
 
 const changelogSource = await readText(changelogFile);
+// Normalisiere Zeilenenden für plattformübergreifende Kompatibilität
+const changelogNormalized = changelogSource.replace(/\r\n/g, '\n');
 const marker = '# Changelog\n\n';
-const logLine = `- automatischer ${SLOT_WINDOWS[slot].label} Fachbeitrag veröffentlicht: „${title}“`;
-if (!changelogSource.includes(logLine)) {
+const logLine = `- automatischer ${SLOT_WINDOWS[slot].label} Fachbeitrag veröffentlicht: „${title}"`;
+if (!changelogNormalized.includes(logLine)) {
   // Detect current highest version and increment patch for automation entry
-  const versionMatches = [...changelogSource.matchAll(/^## (\d+)\.(\d+)\.(\d+)/gm)];
+  const versionMatches = [...changelogNormalized.matchAll(/^## (\d+)\.(\d+)\.(\d+)/gm)];
   const nextVersion = versionMatches.length > 0
     ? (() => {
         const versions = versionMatches.map((m) => [parseInt(m[1], 10), parseInt(m[2], 10), parseInt(m[3], 10)]);
@@ -1067,9 +1071,9 @@ if (!changelogSource.includes(logLine)) {
     : '1.0.0';
   const dateSection = `## ${nextVersion} – ${berlinDate}`;
   const stampHeader = `${dateSection}\n${logLine}\n- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt\n- Beitragsbild unter ${imageWebPath} erzeugt\n\n`;
-  const updated = changelogSource.includes(dateSection)
-    ? changelogSource.replace(`${dateSection}\n`, `${dateSection}\n${logLine}\n`)
-    : changelogSource.replace(marker, `${marker}${stampHeader}`);
+  const updated = changelogNormalized.includes(dateSection)
+    ? changelogNormalized.replace(`${dateSection}\n`, `${dateSection}\n${logLine}\n`)
+    : changelogNormalized.replace(marker, `${marker}${stampHeader}`);
   await writeFile(changelogFile, updated);
 }
 
