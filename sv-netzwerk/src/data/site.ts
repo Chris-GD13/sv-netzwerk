@@ -6,6 +6,9 @@ export const site = {
   email: 'info@sv-netzwerk.eu',
   phone: '07367 / 393 97 83',
   address: ['Nordstraße 17', '73432 Aalen'],
+  sameAs: [
+    'https://github.com/Chris-GD13',
+  ],
   author: {
     name: 'Christian Wächter',
     role: 'Sachverständiger & Großschadenregulierer',

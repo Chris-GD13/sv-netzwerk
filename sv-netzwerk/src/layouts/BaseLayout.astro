@@ -34,8 +34,10 @@ const organizationSchema = {
   '@id': organizationId,
   name: site.legalName,
   url: site.url,
+  logo: `${site.url}/apple-touch-icon.png`,
   email: site.email,
   telephone: site.phone,
+  sameAs: site.sameAs,
   address: {
     '@type': 'PostalAddress',
     streetAddress: site.address[0],
