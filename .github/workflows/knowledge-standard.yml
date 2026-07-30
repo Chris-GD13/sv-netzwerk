@@ -4,10 +4,10 @@ on:
   schedule:
     # Morgenslot 05:15-06:40 Europe/Berlin (DST-sicher via duale UTC-Crons)
     - cron: "20 3 * * *"  # Sommerzeit (CEST, UTC+2)
-    - cron: "20 4 * * *"  # Winterzeit (CET, UTC+1)
+    - cron: "20 5 * * *"  # Winterzeit (CET, UTC+1)
     # Nachmittagsslot 16:15-17:30 Europe/Berlin (DST-sicher via duale UTC-Crons)
     - cron: "20 14 * * *" # Sommerzeit (CEST, UTC+2)
-    - cron: "20 15 * * *" # Winterzeit (CET, UTC+1)
+    - cron: "20 16 * * *" # Winterzeit (CET, UTC+1)
   workflow_dispatch:
     inputs:
       slot:
@@ -64,10 +64,10 @@ jobs:
           SLOT_ARG=""
           if [ "${{ github.event_name }}" = "schedule" ]; then
             case "${{ github.event.schedule }}" in
-              "20 3 * * *"|"20 4 * * *")
+              "20 3 * * *"|"20 5 * * *")
                 SLOT_ARG="--slot=morning"
                 ;;
-              "20 14 * * *"|"20 15 * * *")
+              "20 14 * * *"|"20 16 * * *")
                 SLOT_ARG="--slot=afternoon"
                 ;;
             esac

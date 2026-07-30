@@ -74,6 +74,21 @@ for (const entry of today) {
   }
   if (!/^cta:\s*$/m.test(entry.parsed.front)) errors.push(`${entry.file}: CTA fehlt`);
   if (!/^relatedLinks:\s*\[/m.test(entry.parsed.front)) errors.push(`${entry.file}: interne Verlinkungen fehlen`);
+  const requiredSections = [
+    /^##\s+Einleitung\b/m,
+    /^##\s+Hauptteil\b/m,
+    /^##\s+Praxisbeispiel\b/m,
+    /^##\s+Fazit\b/m,
+    /^##\s+Call-to-Action\b/m,
+  ];
+  for (const sectionPattern of requiredSections) {
+    if (!sectionPattern.test(entry.parsed.body)) {
+      errors.push(`${entry.file}: Pflichtabschnitt fehlt (${sectionPattern.source})`);
+    }
+  }
+  if (!/^###\s+/m.test(entry.parsed.body)) {
+    errors.push(`${entry.file}: H3-Struktur fehlt`);
+  }
 }
 
 const duplicateDates = entries
