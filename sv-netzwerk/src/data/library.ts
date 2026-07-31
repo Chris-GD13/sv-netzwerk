@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Rückstauschaden im Fitnessstudio: Gebäude- und Inhaltschaden trennen',
+    description: 'Warum bei Rückstauschäden im Fitnessstudio die klare Trennung von Gebäude- und Inhaltschaden den Regulierungserfolg bestimmt.',
+    href: '/fachwissen/rueckstauschaden-im-fitnessstudio-gebaeude-und-inhaltsschaden-trennen/',
+    category: 'Starkregen und Rückstau',
+    tags: ['Rückstau', 'Schwarzwasser', 'Fitnessstudio', 'Gebäudeversicherung', 'Inhaltsversicherung'],
+    date: '2026-07-31',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz',
     description: 'Leitungswasserschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/',
