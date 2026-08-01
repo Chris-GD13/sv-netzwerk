@@ -4,10 +4,10 @@ on:
   schedule:
     # Morgenslot 05:15-06:40 Europe/Berlin (DST-sicher via duale UTC-Crons)
     - cron: "20 3 * * *"  # Sommerzeit (CEST, UTC+2)
-    - cron: "20 5 * * *"  # Winterzeit (CET, UTC+1)
+    - cron: "20 4 * * *"  # Winterzeit (CET, UTC+1)
     # Nachmittagsslot 16:15-17:30 Europe/Berlin (DST-sicher via duale UTC-Crons)
     - cron: "20 14 * * *" # Sommerzeit (CEST, UTC+2)
-    - cron: "20 16 * * *" # Winterzeit (CET, UTC+1)
+    - cron: "20 15 * * *" # Winterzeit (CET, UTC+1)
   workflow_dispatch:
     inputs:
       slot:
@@ -64,10 +64,10 @@ jobs:
           SLOT_ARG=""
           if [ "${{ github.event_name }}" = "schedule" ]; then
             case "${{ github.event.schedule }}" in
-              "20 3 * * *"|"20 5 * * *")
+              "20 3 * * *"|"20 4 * * *")
                 SLOT_ARG="--slot=morning"
                 ;;
-              "20 14 * * *"|"20 16 * * *")
+              "20 14 * * *"|"20 15 * * *")
                 SLOT_ARG="--slot=afternoon"
                 ;;
             esac
@@ -127,6 +127,11 @@ jobs:
       - name: Link- und Build-Integration prüfen
         if: steps.generate.outputs.status != 'skipped'
         run: npm run validate:knowledge -- --dist "$BERLIN_DATE"
+
+      - name: Zeitfenster vor Commit erneut prüfen
+        if: steps.generate.outputs.status != 'skipped'
+        run: |
+          node -e "const slot=process.env.PUBLICATION_SLOT;const now=new Date();const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Berlin',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(now);const p=(t)=>parts.find((x)=>x.type===t)?.value||'';const time=p('hour')+':'+p('minute');const windows={morning:['05:15','06:40'],afternoon:['16:15','17:30']};if(!windows[slot]){throw new Error('Unbekannter Slot: '+slot);}const [from,to]=windows[slot];if(time<from||time>to){throw new Error('Veröffentlichung außerhalb Zeitfenster blockiert: '+slot+' '+time+' Europe/Berlin (erlaubt '+from+'-'+to+')');}console.log('Zeitfenster OK: '+slot+' '+time+' Europe/Berlin');"
 
       - name: Commit und Push
         if: steps.generate.outputs.status != 'skipped'

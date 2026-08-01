@@ -35,7 +35,8 @@
   - Winterzeit (CET, UTC+1): `4:20 UTC` / `15:20 UTC`
 - Der Generator prüft zusätzlich im Skript die aktuelle Berliner Ortszeit über `Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin' })`. Runs außerhalb des Zeitfensters enden sauber mit Status `skipped`.
 - **Kein Force-Bypass:** Veröffentlichungen außerhalb der beiden Zeitfenster sind technisch ausgeschlossen.
-- Sommer-/Winterzeitumstellungen werden damit automatisch korrekt behandelt: in der Sommerzeit trifft der 3:20-UTC-Cron, in der Winterzeit der 4:20-UTC-Cron das jeweilige Zeitfenster. Der jeweils andere Cron fällt außerhalb des Fensters und wird vom Skript sauber ignoriert.
+- Sommer-/Winterzeitumstellungen werden damit automatisch korrekt behandelt. In der Winterzeit trifft jeweils genau ein Cron pro Slot das Zeitfenster (04:20/15:20 UTC). In der Sommerzeit liegen beide Cron-Zeitpunkte je Slot innerhalb des Fensters; der Doppelausführungsschutz (Slot-ID, publication_id, Protokoll- und Concurrency-Prüfung) verhindert dabei zuverlässig eine zweite Veröffentlichung.
+- Zusätzlich prüft der Workflow das Berliner Zeitfenster unmittelbar vor dem Commit erneut. Wird das Fenster bis dahin überschritten, wird die Veröffentlichung technisch blockiert.
 
 ## Themenlogik und Quellenpriorität
 
