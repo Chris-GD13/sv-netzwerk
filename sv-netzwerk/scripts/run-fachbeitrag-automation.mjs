@@ -548,18 +548,7 @@ if (!selectedSlot) {
 }
 
 const slot = selectedSlot;
-if (!inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].to)) {
-  await mkdir(automationDir, { recursive: true });
-  await writeFile(runtimeFile, JSON.stringify({
-    status: 'skipped',
-    reason: `outside-window:${slot}:${berlinTime}`,
-    berlinDate,
-    berlinTime,
-    berlinTimeZone: BERLIN,
-    slot,
-  }, null, 2));
-  process.exit(0);
-}
+const slotWithinWindow = inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].to);
 
 const isWeekend = berlinWeekday === 0 || berlinWeekday === 6;
 const allowCalendarCaseContext = process.env.ALLOW_CALENDAR_CASE_CONTEXT === 'true';
@@ -771,6 +760,25 @@ const makeImageSvg = (title, subtitle) => `<?xml version="1.0" encoding="UTF-8"?
 await mkdir(automationDir, { recursive: true });
 const publicationRows = await readPublicationRows();
 const existingSlotRows = publicationRows.filter((row) => row.date === berlinDate && normalizeSlotValue(row.slot) === slot);
+if (existingSlotRows.length > 1) {
+  throw new Error(`Mehrere Protokolleinträge für ${runId} gefunden: ${existingSlotRows.map((row) => row.publication_id || 'ohne-publication-id').join(', ')}`);
+}
+if (!slotWithinWindow) {
+  if (existingSlotRows.length === 1) {
+    const runtime = await buildResumeRuntime(existingSlotRows[0]);
+    await writeFile(runtimeFile, JSON.stringify(runtime, null, 2));
+    process.exit(0);
+  }
+  await writeFile(runtimeFile, JSON.stringify({
+    status: 'skipped',
+    reason: `outside-window:${slot}:${berlinTime}`,
+    berlinDate,
+    berlinTime,
+    berlinTimeZone: BERLIN,
+    slot,
+  }, null, 2));
+  process.exit(0);
+}
 const completedRow = existingSlotRows.find((row) => isSuccess(row.deploy_status) && isSuccess(row.live_pruefung) && isSuccess(row.linkedin_status));
 if (completedRow) {
   await writeFile(runtimeFile, JSON.stringify({
@@ -783,9 +791,6 @@ if (completedRow) {
     publicationId: String(completedRow.publication_id || '').trim() || publicationId,
   }, null, 2));
   process.exit(0);
-}
-if (existingSlotRows.length > 1) {
-  throw new Error(`Mehrere Protokolleinträge für ${runId} gefunden: ${existingSlotRows.map((row) => row.publication_id || 'ohne-publication-id').join(', ')}`);
 }
 if (existingSlotRows.length === 1) {
   const runtime = await buildResumeRuntime(existingSlotRows[0]);
@@ -828,6 +833,7 @@ if (!isWeekend) {
   }
 }
 const caseContext = (!isWeekend && !regionalSignal && allowCalendarCaseContext) ? await loadCalendarCaseContext() : null;
+const shouldUseRegionalNarrative = !isWeekend && Boolean(regionalSignal);
 
 const topic = pickTopic(publicationRows, caseContext?.preferredDamageTypes ?? []);
 const title = caseContext
@@ -848,13 +854,13 @@ const metaDescription = caseContext
   : `${topic.category}: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.`;
 const teaser = caseContext
   ? `Grundlage dieses Beitrags sind tagesaktuelle bzw. historische Realfälle aus dem Einsatzkalender (bis zu 3 Jahre Rückblick), inklusive ausgewerteter Unterlagenhinweise. Alle Angaben sind vollständig anonymisiert; Personen-, Orts- und Objektdaten werden nicht veröffentlicht.`
-  : regionalSignal
+  : shouldUseRegionalNarrative
   ? `Öffentlich berichtete Lagemeldungen aus der Region zeigen erhöhten Handlungsdruck. Entscheidend bleibt die fachlich saubere Trennung von Feststellung, Bewertung und Empfehlung.`
   : `${topic.intro} Die Qualität der Dokumentation entscheidet über belastbare Entscheidungen bei hoher Schadenfrequenz.`;
 
 const sources = caseContext
   ? [`Interne Einsatz- und Unterlagenauswertung (anonymisiert), ausgewertete Fälle: ${caseContext.sourceCount}, Dokumententypen: ${caseDocSummary || 'ohne dokumentierbare Dateihinweise'}.`]
-  : regionalSignal
+  : shouldUseRegionalNarrative
   ? [`${regionalSignal.source}: ${regionalSignal.title} (${regionalSignal.link})`]
   : ['Kein belastbarer aktueller Regionalanlass im Suchraum; daher allgemeiner Fachbeitrag gemäß Wochenend-/Fallback-Regel.'];
 
@@ -865,7 +871,7 @@ const body = [
   `## Anlass und Einordnung`,
   caseContext
     ? `Dieser Beitrag basiert auf ${caseContext.selectedCases.length} anonymisierten Realfällen aus dem Einsatzkalender. Für die fachliche Ableitung wurden verfügbare Unterlagenhinweise (z. B. Foto-/Dokumentationsstände, KVA-/Rechnungsbezug, Protokoll-/Gutachtenhinweise) ausgewertet. Namen, konkrete Adressen, Orte, Aktenzeichen und personenbezogene Daten wurden nicht übernommen.`
-    : regionalSignal
+    : shouldUseRegionalNarrative
     ? `Öffentlich zugängliche Meldungen können einen zeitlichen Aufhänger bilden. Die fachliche Aussage dieses Beitrags stützt sich jedoch auf methodische Standards der Schadenaufnahme, Plausibilitätsprüfung und Freigabeentscheidung – nicht auf ungesicherte Detailaussagen zu einzelnen Meldungen.`
     : `Dieser Beitrag nutzt ein anonymisiertes typisches Praxisbeispiel aus der Regulierung. Damit werden keine identifizierbaren Einzelfalldaten veröffentlicht, aber belastbare Vorgehensstandards für Versicherer, Sachverständige und Schadenregulierer dargestellt.`,
   ...(caseContext ? [
@@ -934,7 +940,9 @@ const body = [
   `## Praxisbeispiel`,
   caseContext
     ? 'Beispielhafte Fallableitung: Aus einem Schadencluster mit mehreren anonymisierten Realfällen werden zuerst die sicherheitskritischen Objekte priorisiert. Danach werden je Objekt Schadenzone, vorläufige Kausalität und Unterlagenlage getrennt dokumentiert. Erst wenn Mess- und Nachweislage vollständig ist, werden Rückbau- und Kostenfreigaben finalisiert.'
-    : 'Beispielhafte Lageeinordnung: Nach einer regionalen Starkregen- und Rückstaulage werden Meldungen zunächst nach Sicherheitsrisiko und Substanzgefährdung priorisiert. In der Erstbesichtigung werden nur belegbare Feststellungen dokumentiert; unklare Ursachen bleiben ausdrücklich vorläufig. Erst im zweiten Schritt folgen belastbare Freigaben für Sanierung und Kosten.',
+    : shouldUseRegionalNarrative
+    ? 'Beispielhafte Lageeinordnung: Nach einer regional berichteten Unwetter- oder Starkregenlage werden Meldungen zunächst nach Sicherheitsrisiko und Substanzgefährdung priorisiert. In der Erstbesichtigung werden nur belegbare Feststellungen dokumentiert; unklare Ursachen bleiben ausdrücklich vorläufig. Erst im zweiten Schritt folgen belastbare Freigaben für Sanierung und Kosten.'
+    : 'Beispielhafte Einordnung ohne Regionalbezug: Bei einem typischen Kumulereignis werden Meldungen zunächst nach Sicherheitsrisiko und Substanzgefährdung priorisiert. In der Erstbesichtigung werden ausschließlich belegbare Feststellungen dokumentiert; unklare Ursachen bleiben ausdrücklich vorläufig. Erst danach folgen belastbare Freigaben für Sanierung und Kosten.',
   '',
   `### Vorgehen bei Besichtigung, Dokumentation und Regulierung`,
   '1. Lage und Schadenhergang mit Zeitachse dokumentieren; offene Punkte als vorläufig kennzeichnen.',
@@ -1025,9 +1033,9 @@ const linkedinText = [
   '',
   caseContext
     ? 'Ausgewertet wurden Unterlagenhinweise aus echten Fallakten (z. B. Dokumentation, KVA/Rechnung, Protokolle) – vollständig anonymisiert ohne Namen, Orte oder Objektdetails.'
-    : regionalSignal
+    : shouldUseRegionalNarrative
     ? 'Öffentlich gemeldete regionale Lagen zeigen: Bei hoher Schadenfrequenz müssen Feststellung, Plausibilitätsprüfung und Freigabe sauber getrennt bleiben.'
-    : 'Ein anonymisiertes typisches Praxisbeispiel hilft, Verfahren in der nächsten Kumullage strukturiert und prüffähig umzusetzen.',
+    : 'Ein anonymisiertes fachliches Praxisbeispiel ohne Regional- oder Vor-Ort-Behauptung zeigt, wie Verfahren bei hoher Schadenfrequenz strukturiert und prüffähig umgesetzt werden.',
   '',
   'Im Beitrag zeigen wir eine belastbare Vorgehensstruktur für Besichtigung, Dokumentation, Sanierungsplanung und Kostenprüfung.',
   '',
