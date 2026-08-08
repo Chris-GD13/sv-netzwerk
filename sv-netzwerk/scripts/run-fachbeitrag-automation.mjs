@@ -734,7 +734,11 @@ const extractRssItems = (xml) => {
 
 const pickTopic = (rows, preferredDamageTypes = []) => {
   const recentTopicIds = rows.slice(-10).map((r) => r.topic_id).filter(Boolean);
-  const usedToday = rows.filter((r) => r.date === berlinDate).map((r) => r.topic_id);
+  const usedToday = rows
+    .filter((r) => r.date === berlinDate)
+    .filter((r) => isSuccess(r.deploy_status) && isSuccess(r.live_pruefung) && isSuccess(r.linkedin_status))
+    .map((r) => r.topic_id)
+    .filter(Boolean);
   const available = TOPICS.filter((topic) => !usedToday.includes(topic.id) && !recentTopicIds.includes(topic.id));
   const preferredAvailable = preferredDamageTypes.length > 0
     ? available.filter((topic) => preferredDamageTypes.some((damageType) => topic.damageTypes.includes(damageType)))
@@ -792,6 +796,12 @@ const sortedExistingSlotRows = existingSlotRows.sort((a, b) => {
   };
   return score(b) - score(a);
 });
+const incompleteExistingSlotRow = sortedExistingSlotRows.find((row) => {
+  const deployOk = isSuccess(row.deploy_status);
+  const liveOk = isSuccess(row.live_pruefung);
+  const linkedinOk = isSuccess(row.linkedin_status);
+  return !(deployOk && liveOk && linkedinOk);
+}) ?? null;
 const resumableSlotRows = [];
 for (const row of sortedExistingSlotRows) {
   const runtime = await buildResumeRuntime(row);
@@ -833,16 +843,23 @@ if (resumableSlotRows.length >= 1) {
 }
 const publicationIdExists = publicationRows.some((row) => row.publication_id === publicationId);
 if (publicationIdExists) {
-  await writeFile(runtimeFile, JSON.stringify({
-    status: 'skipped',
-    reason: 'publication-id-exists',
-    berlinDate,
-    berlinTime,
-    berlinTimeZone: BERLIN,
-    slot,
-    publicationId,
-  }, null, 2));
-  process.exit(0);
+  const matchingPublicationRow = publicationRows.find((row) => row.publication_id === publicationId);
+  const publicationRowComplete = matchingPublicationRow
+    && isSuccess(matchingPublicationRow.deploy_status)
+    && isSuccess(matchingPublicationRow.live_pruefung)
+    && isSuccess(matchingPublicationRow.linkedin_status);
+  if (publicationRowComplete) {
+    await writeFile(runtimeFile, JSON.stringify({
+      status: 'skipped',
+      reason: 'publication-id-exists',
+      berlinDate,
+      berlinTime,
+      berlinTimeZone: BERLIN,
+      slot,
+      publicationId,
+    }, null, 2));
+    process.exit(0);
+  }
 }
 
 let regionalSignal = null;
@@ -869,11 +886,18 @@ if (!isWeekend) {
 const caseContext = (!isWeekend && !regionalSignal && allowCalendarCaseContext) ? await loadCalendarCaseContext() : null;
 const shouldUseRegionalNarrative = !isWeekend && Boolean(regionalSignal);
 
-const topic = pickTopic(publicationRows, caseContext?.preferredDamageTypes ?? []);
-const title = caseContext
+const topicFromIncompleteRow = incompleteExistingSlotRow
+  ? TOPICS.find((item) => item.id === String(incompleteExistingSlotRow.topic_id || '').trim()) ?? null
+  : null;
+const topic = topicFromIncompleteRow ?? pickTopic(publicationRows, caseContext?.preferredDamageTypes ?? []);
+const fallbackTitle = caseContext
   ? `${topic.titleBase}: anonymisierte Fallauswertung aus der Praxis`
   : createHeadline(topic, regionalSignal);
-const slugBase = caseContext ? `${topic.slugBase}-anonymisierte-fallauswertung` : topic.slugBase;
+const title = String(incompleteExistingSlotRow?.title || '').trim() || fallbackTitle;
+const baseSlug = String(incompleteExistingSlotRow?.url || '').trim()
+  ? deriveSlugFromUrl(String(incompleteExistingSlotRow.url || '').trim())
+  : '';
+const slugBase = baseSlug || (caseContext ? `${topic.slugBase}-anonymisierte-fallauswertung` : topic.slugBase);
 const slug = await ensureUniqueSlug(slugBase);
 const articleUrl = `https://www.sv-netzwerk.eu/fachwissen/${slug}/`;
 const imageFileName = `${slug}.svg`;
