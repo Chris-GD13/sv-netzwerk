@@ -8,8 +8,8 @@ export const isPublished = <C extends CollectionKey>(entry: CollectionEntry<C>) 
 
 export const sortByPublicationDate = <C extends CollectionKey>(entries: CollectionEntry<C>[]) =>
   [...entries].sort((a, b) => {
-    const aDate = 'publication' in a.data ? a.data.publication.publishedAt.getTime() : 0;
-    const bDate = 'publication' in b.data ? b.data.publication.publishedAt.getTime() : 0;
+    const aDate = 'publication' in a.data ? a.data.publication.publishedAt?.getTime() ?? 0 : 0;
+    const bDate = 'publication' in b.data ? b.data.publication.publishedAt?.getTime() ?? 0 : 0;
     return bDate - aDate;
   });
 

@@ -13,16 +13,6 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
-    title: 'Schneedruck und Winterschäden: Statische Bewertung und Regulierung im Kumulereignis',
-    description: 'Schneedruck und Winterschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
-    href: '/fachwissen/schneedruck-winterschaeden-bewertung-regulierung/',
-    category: 'Schneedruck und Winterschäden',
-    tags: ['Schneedruck', 'Winterschaden', 'Dach', 'Statik', 'Kumulschaden'],
-    date: '2026-08-02',
-    type: 'article',
-    featured: false,
-  },
-  {
     title: 'Brandschaden mit mehreren betroffenen Gebäuden: Struktur für Erstaufnahme und Regulierung',
     description: 'Brandschaden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/brandschaden-mehrere-gebaeude-koordination/',

@@ -5,11 +5,12 @@ import { slugify } from '../../utils/content';
 
 interface Props { entry: KnowledgeEntry; compact?: boolean; }
 const { entry, compact = false } = Astro.props;
+const publishedAt = entry.data.publication.publishedAt!;
 ---
 <article class:list={['knowledge-card', 'sv-card', 'sv-card-lift', { compact, featured: entry.data.featured }]}>
   <div class="meta">
     <a href={`/svos/fachwissen/kategorie/${slugify(entry.data.category)}/`}>{entry.data.category}</a>
-    <time datetime={entry.data.publication.publishedAt.toISOString()}>{formatKnowledgeDate(entry.data.publication.publishedAt)}</time>
+    <time datetime={publishedAt.toISOString()}>{formatKnowledgeDate(publishedAt)}</time>
   </div>
   <h2><a href={knowledgePath(entry)}>{entry.data.title}</a></h2>
   <p>{entry.data.description}</p>
