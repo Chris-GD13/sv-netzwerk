@@ -10,6 +10,10 @@ on:
     - cron: "20 15 * * *" # Winterzeit (CET, UTC+1)
   workflow_dispatch:
     inputs:
+      date:
+        description: "Optionales Veröffentlichungsdatum im Format YYYY-MM-DD für Backfill"
+        required: false
+        type: string
       slot:
         description: "Erzwingt Zeitfenster (morning|afternoon); leer = automatische Slot-Erkennung"
         required: false
@@ -62,6 +66,8 @@ jobs:
         id: generate
         run: |
           SLOT_ARG=""
+          DATE_ARG=""
+          EXTRA_ARGS=""
           if [ "${{ github.event_name }}" = "schedule" ]; then
             case "${{ github.event.schedule }}" in
               "20 3 * * *"|"20 4 * * *")
@@ -75,7 +81,11 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.slot }}" ]; then
             SLOT_ARG="--slot=${{ inputs.slot }}"
           fi
-          node scripts/run-fachbeitrag-automation.mjs $SLOT_ARG
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.date }}" ]; then
+            DATE_ARG="--date=${{ inputs.date }}"
+            EXTRA_ARGS="--allow-outside-window"
+          fi
+          node scripts/run-fachbeitrag-automation.mjs $SLOT_ARG $DATE_ARG $EXTRA_ARGS
           STATUS="$(node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('.automation/latest-publication.json','utf8'));process.stdout.write(data.status||'')")"
           echo "status=$STATUS" >> "$GITHUB_OUTPUT"
           if [ "$STATUS" != "skipped" ]; then

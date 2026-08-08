@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Brandschaden mit mehreren betroffenen Gebäuden: Struktur für Erstaufnahme und Regulierung',
+    description: 'Brandschaden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/brandschaden-mehrere-gebaeude-koordination/',
+    category: 'Brandschaden',
+    tags: ['Brandschaden', 'Mehrere Gebäude', 'Schadenaufnahme', 'Regulierung'],
+    date: '2026-08-01',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Rückstauschaden im Fitnessstudio: Gebäude- und Inhaltschaden trennen',
     description: 'Warum bei Rückstauschäden im Fitnessstudio die klare Trennung von Gebäude- und Inhaltschaden den Regulierungserfolg bestimmt.',
     href: '/fachwissen/rueckstauschaden-im-fitnessstudio-gebaeude-und-inhaltsschaden-trennen/',

@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.6 – 2026-08-01
+- automatischer morgens Fachbeitrag veröffentlicht: „Brandschaden mit mehreren betroffenen Gebäuden: Struktur für Erstaufnahme und Regulierung"
+- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt
+- Beitragsbild unter /assets/images/linkedin/brandschaden-mehrere-gebaeude-koordination.svg erzeugt
+
 ## 3.4.5 – 2026-07-28
 - automatischer nachmittags Fachbeitrag veröffentlicht: „Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz"
 - LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt

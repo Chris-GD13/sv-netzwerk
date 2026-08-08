@@ -514,14 +514,24 @@ const argValue = (name) => {
   const token = args.find((item) => item.startsWith(`--${name}=`));
   return token ? token.slice(name.length + 3) : undefined;
 };
+const argFlag = (name) => args.includes(`--${name}`);
 const now = new Date();
 const berlinParts = new Intl.DateTimeFormat('en-CA', {
   timeZone: BERLIN, year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
 }).formatToParts(now);
 const part = (type) => berlinParts.find((p) => p.type === type)?.value ?? '';
-const berlinDate = `${part('year')}-${part('month')}-${part('day')}`;
+const derivedBerlinDate = `${part('year')}-${part('month')}-${part('day')}`;
 const berlinTime = `${part('hour')}:${part('minute')}`;
-const berlinWeekday = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].indexOf((part('weekday') ?? '').toLowerCase().slice(0, 3));
+const derivedBerlinWeekday = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].indexOf((part('weekday') ?? '').toLowerCase().slice(0, 3));
+const selectedDateInput = argValue('date');
+if (selectedDateInput && !/^\d{4}-\d{2}-\d{2}$/.test(selectedDateInput)) {
+  throw new Error(`Ungültiges Datum: ${selectedDateInput}`);
+}
+const berlinDate = selectedDateInput ?? derivedBerlinDate;
+const berlinWeekday = selectedDateInput
+  ? new Date(`${selectedDateInput}T12:00:00+02:00`).getDay()
+  : derivedBerlinWeekday;
+const allowOutsideWindow = argFlag('allow-outside-window');
 
 const inWindow = (time, from, to) => time >= from && time <= to;
 const detectSlot = () => {
@@ -549,6 +559,18 @@ if (!selectedSlot) {
 
 const slot = selectedSlot;
 const slotWithinWindow = inWindow(berlinTime, SLOT_WINDOWS[slot].from, SLOT_WINDOWS[slot].to);
+if (!allowOutsideWindow && !slotWithinWindow) {
+  await mkdir(automationDir, { recursive: true });
+  await writeFile(runtimeFile, JSON.stringify({
+    status: 'skipped',
+    reason: `outside-window:${slot}:${berlinTime}`,
+    berlinDate,
+    berlinTime,
+    berlinTimeZone: BERLIN,
+    slot,
+  }, null, 2));
+  process.exit(0);
+}
 
 const isWeekend = berlinWeekday === 0 || berlinWeekday === 6;
 const allowCalendarCaseContext = process.env.ALLOW_CALENDAR_CASE_CONTEXT === 'true';
