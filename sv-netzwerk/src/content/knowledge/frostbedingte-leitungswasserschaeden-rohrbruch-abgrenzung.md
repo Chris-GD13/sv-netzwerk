@@ -5,7 +5,7 @@ category: "Leitungswasser"
 tags: ["Leitungswasser", "Frostschaden", "Rohrbruch", "Schadenabgrenzung", "Dokumentation"]
 author: "christian-waechter"
 featured: false
-dailyStandard: true
+dailyStandard: false
 contentLevel: "B"
 teaser: "Frost gilt bei Leitungswasserschäden nicht automatisch als bewiesene Ursache. Erst Schadenbild, Auftauphase, Leitungsaufbau, Nutzung und Vorzustand ermöglichen eine belastbare Einordnung."
 linkedinSummary: "Frostbedingte Leitungswasserschäden brauchen eine saubere Trennung von vermuteter Ursache, technischem Befund, Schadenminderung und prüffähiger Kostenfolge."
@@ -41,7 +41,7 @@ Vor dem Auftauen zeigen sich oft nur mittelbare Hinweise:
 - vereiste oder stark ausgekühlte Teilbereiche,
 - lokale Temperaturunterschiede,
 - Feuchteanhäufungen ohne sofort sichtbaren freien Wasseraustritt,
-- Spannungs- oder Verformungsspuren an Armaturen, Boegen oder Verbindern.
+- Spannungs- oder Verformungsspuren an Armaturen, Bögen oder Verbindern.
 
 Nach dem Auftauen ändert sich das Bild häufig deutlich. Dann treten Wasseraustritt, nachlaufende Durchfeuchtung, gelöste Oberflächen, durchnässte Dämmstoffe oder Feuchteverteilung über mehrere Bauteilschichten in den Vordergrund. Gerade diese Phasenverschiebung macht eine zeitgenaue Dokumentation wichtig: Was vor dem Auftauen sichtbar war, darf nicht mit späteren Folgezuständen vermischt werden.
 
@@ -75,7 +75,7 @@ Für eine später belastbare Bewertung genügt eine allgemeine Schadenschilderun
 - Dämmung, Schachtführung und Nähe zu Außenbauteilen,
 - Heiz- und Nutzungszustand im relevanten Zeitraum,
 - Zeitpunkt der Erstfeststellung und Zeitpunkt des Wasseraustritts,
-- Absperr- und Druckentlastungsmassnahmen,
+- Absperr- und Druckentlastungsmaßnahmen,
 - Zustand benachbarter Armaturen, Verbinder und Halterungen,
 - Vorzustand, frühere Reparaturen und bekannte Vorschäden,
 - Schadenbild an Oberflächen, Dämmschichten und Folgebauteilen.
@@ -88,8 +88,8 @@ Nach Feststellung eines möglichen Frostschadens stehen Schadenminderung und Sic
 
 1. betroffene Leitungsabschnitte absperren;
 2. Druck kontrolliert abbauen oder Anlage entleeren, soweit technisch geboten;
-3. freien Wasseraustritt begrenzen und gefaehrdete Bereiche sichern;
-4. elektrische Risiken, Rutschgefahren und Sekundaerschaeden beachten;
+3. freien Wasseraustritt begrenzen und gefährdete Bereiche sichern;
+4. elektrische Risiken, Rutschgefahren und Sekundärschäden beachten;
 5. Ausgangszustand vor weiterem Rückbau fotografisch und schriftlich sichern.
 
 Eine Wiederinbetriebnahme darf nicht improvisiert erfolgen. Nach Reparatur oder Freigabe einzelner Leitungsabschnitte braucht es eine kontrollierte Befüllung und Beobachtung, damit weitere Schwachstellen, Nachleckagen oder Folgeaustritte nicht übersehen werden. Welche Schritte im Einzelnen erforderlich sind, ist Sache des zuständigen Installationsfachbetriebs.
@@ -186,7 +186,7 @@ Die fachliche Bewertung trennt deshalb sauber zwischen möglicher Frostexpositio
 
 Frostbedingte Leitungswasserschäden sind fachlich nur dann belastbar zu beurteilen, wenn das Schadenbild vor und nach dem Auftauen, die Leitungsführung, der Vorzustand und mögliche Alternativursachen getrennt erfasst werden. Frost ist ein möglicher Auslöser, aber keine automatische Beweisformel. Für die Regulierungspraxis zählt deshalb nicht die schnelle Etikettierung, sondern die prüffähige Trennung von Befund, Ursache, Maßnahme und Kostenfolge.
 
-## Quellen und weiterfuehrende Hinweise
+## Quellen und weiterführende Hinweise
 
 - VVG § 82, Abwendung und Minderung des Schadens: https://www.gesetze-im-internet.de/vvg_2008/__82.html
 - Trinkwasserverordnung, § 13 Wasserversorgungsanlagen: https://www.gesetze-im-internet.de/trinkwv_2023/__13.html

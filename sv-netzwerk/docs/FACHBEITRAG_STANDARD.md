@@ -69,7 +69,7 @@ Jeder Beitrag vermittelt eine prüffähige Denk- und Dokumentationsstruktur. Daz
 Zu jedem Beitrag gehören:
 
 - Content-Datei;
-- vollstaendige Frontmatter;
+- vollständige Frontmatter;
 - eindeutiger Slug;
 - Eintrag in `src/data/library.ts`;
 - Detailroute;
