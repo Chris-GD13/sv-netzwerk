@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Hagelschäden an Dach und Fassade: Schadenspuren, Vorschäden und Reparaturfähigkeit sauber bewerten',
+    description: 'Wie frische Hagelschäden an Dach- und Fassadenbauteilen von Alterung, Korrosion, Materialversprödung und Vorschäden getrennt sowie Reparaturfähigkeit und Sanierungsumfang fachlich sauber bewertet werden.',
+    href: '/fachwissen/hagelschaden-dach-fassade-schadenspuren-vorschaden-reparaturfaehigkeit/',
+    category: 'Hagel und Sturm',
+    tags: ['Hagelschaden', 'Dach', 'Fassade', 'Schadenabgrenzung', 'Reparaturfähigkeit', 'Dokumentation'],
+    date: '2026-08-05',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Technische Trocknung nach Leitungswasserschäden: Messkonzept, Rückbau und Erfolgskontrolle',
     description: 'Wie nach Leitungswasserschäden Messkonzept, Rückbauumfang, Trocknungsführung und Erfolgskontrolle fachlich sauber aufgebaut und kostenrelevant abgegrenzt werden.',
     href: '/fachwissen/technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle/',
