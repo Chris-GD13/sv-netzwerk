@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Brandschäden durch Rauch und Ruß: Kontamination, Schadenbereiche und Sanierungsumfang fachlich abgrenzen',
+    description: 'Wie bei Rauch- und Rußschäden Primärbrandbereich, Kontamination, Schadenzonen, technische Anlagen und Sanierungsumfang fachlich sauber getrennt und kostenrelevant bewertet werden.',
+    href: '/fachwissen/brandschaden-rauch-russ-kontamination-schadenbereiche-sanierungsumfang/',
+    category: 'Brand und Kontamination',
+    tags: ['Brandschaden', 'Rauchschaden', 'Ruß', 'Kontamination', 'Sanierungsumfang', 'Kostenprüfung'],
+    date: '2026-08-06',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Hagelschäden an Dach und Fassade: Schadenspuren, Vorschäden und Reparaturfähigkeit sauber bewerten',
     description: 'Wie frische Hagelschäden an Dach- und Fassadenbauteilen von Alterung, Korrosion, Materialversprödung und Vorschäden getrennt sowie Reparaturfähigkeit und Sanierungsumfang fachlich sauber bewertet werden.',
     href: '/fachwissen/hagelschaden-dach-fassade-schadenspuren-vorschaden-reparaturfaehigkeit/',

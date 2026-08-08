@@ -6,6 +6,11 @@
 - ohne öffentliches Beitragsbild veröffentlicht
 - verbindlichen Fachbeitragsstandard unter `docs/FACHBEITRAG_STANDARD.md` hinterlegt
 
+## 3.4.12 – 2026-08-06
+- historischer Fach-Backfill veröffentlicht: „Brandschäden durch Rauch und Ruß: Kontamination, Schadenbereiche und Sanierungsumfang fachlich abgrenzen“
+- Fachbeitrag als eigenständige Detailroute, Suchindex- und Sitemap-Eintrag ergänzt
+- Fachwissenübersicht um genau einen neuen Library-Eintrag erweitert
+
 ## 3.4.11 – 2026-08-05
 - historischer Fach-Backfill veröffentlicht: „Hagelschäden an Dach und Fassade: Schadenspuren, Vorschäden und Reparaturfähigkeit sauber bewerten“
 - Fachbeitrag als eigenständige Detailroute, Suchindex- und Sitemap-Eintrag ergänzt
