@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.7 – 2026-08-02
+- automatischer nachmittags Fachbeitrag veröffentlicht: „Schneedruck und Winterschäden: Statische Bewertung und Regulierung im Kumulereignis"
+- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt
+- Beitragsbild unter /assets/images/linkedin/schneedruck-winterschaeden-bewertung-regulierung.svg erzeugt
+
 ## 3.4.6 – 2026-08-01
 - automatischer morgens Fachbeitrag veröffentlicht: „Brandschaden mit mehreren betroffenen Gebäuden: Struktur für Erstaufnahme und Regulierung"
 - LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt
