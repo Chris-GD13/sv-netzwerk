@@ -3,6 +3,8 @@
 Stand: 11.07.2026
 Status: verbindlich
 
+Hinweis für Fachbeiträge: Alle neuen oder überarbeiteten Fachbeiträge müssen zusätzlich verbindlich dem Standard in `docs/FACHBEITRAG_STANDARD.md` entsprechen.
+
 ## 1. Pflichtlektüre vor jeder Aufgabe
 
 Vor jeder SV-Netzwerk-, Website-, Google-Drive-, Upload- oder Projektaufgabe sind die aktuelle MASTER-Datei und die Projektstandards aus Google Drive zu suchen und zu lesen. Dies erfolgt ohne gesonderten Hinweis des Nutzers.

@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Frostbedingte Leitungswasserschäden: Rohrbruch, Auftauen und Vorschäden fachlich abgrenzen',
+    description: 'Wie frostbedingte Leitungswasserschäden von Korrosion, Materialermüdung, Montagefehlern und Vorschäden getrennt und ohne vorschnelle Deckungsannahmen bewertet werden.',
+    href: '/fachwissen/frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung/',
+    category: 'Leitungswasser',
+    tags: ['Leitungswasser', 'Frostschaden', 'Rohrbruch', 'Schadenabgrenzung', 'Dokumentation'],
+    date: '2026-08-02',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Brandschaden mit mehreren betroffenen Gebäuden: Struktur für Erstaufnahme und Regulierung',
     description: 'Brandschaden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/brandschaden-mehrere-gebaeude-koordination/',
