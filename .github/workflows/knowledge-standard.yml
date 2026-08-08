@@ -141,6 +141,10 @@ jobs:
       - name: Zeitfenster vor Commit erneut prüfen
         if: steps.generate.outputs.status != 'skipped'
         run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.date }}" ]; then
+            echo "Backfill-Lauf erkannt; Zeitfensterprüfung vor Commit wird übersprungen."
+            exit 0
+          fi
           node -e "const slot=process.env.PUBLICATION_SLOT;const now=new Date();const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Berlin',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(now);const p=(t)=>parts.find((x)=>x.type===t)?.value||'';const time=p('hour')+':'+p('minute');const windows={morning:['05:15','06:40'],afternoon:['16:15','17:30']};if(!windows[slot]){throw new Error('Unbekannter Slot: '+slot);}const [from,to]=windows[slot];if(time<from||time>to){throw new Error('Veröffentlichung außerhalb Zeitfenster blockiert: '+slot+' '+time+' Europe/Berlin (erlaubt '+from+'-'+to+')');}console.log('Zeitfenster OK: '+slot+' '+time+' Europe/Berlin');"
 
       - name: Commit und Push
