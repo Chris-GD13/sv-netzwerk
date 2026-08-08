@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Technische Trocknung nach Leitungswasserschäden: Messkonzept, Rückbau und Erfolgskontrolle',
+    description: 'Wie nach Leitungswasserschäden Messkonzept, Rückbauumfang, Trocknungsführung und Erfolgskontrolle fachlich sauber aufgebaut und kostenrelevant abgegrenzt werden.',
+    href: '/fachwissen/technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle/',
+    category: 'Leitungswasser',
+    tags: ['Leitungswasser', 'Technische Trocknung', 'Messkonzept', 'Rückbau', 'Erfolgskontrolle'],
+    date: '2026-08-04',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Starkregen und Rückstau: Eintrittswege, Rückstauebene und Schadenbereiche sauber trennen',
     description: 'Wie bei Starkregen- und Rückstauschäden Eintrittswege, Rückstauebene, Gebäude- und Inhaltsschäden sowie die technisch erforderlichen Maßnahmen sauber abgegrenzt werden.',
     href: '/fachwissen/starkregen-rueckstau-eintrittswege-rueckstauebene-schadenbereiche/',

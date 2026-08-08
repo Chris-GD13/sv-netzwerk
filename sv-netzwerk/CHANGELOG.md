@@ -6,6 +6,11 @@
 - ohne öffentliches Beitragsbild veröffentlicht
 - verbindlichen Fachbeitragsstandard unter `docs/FACHBEITRAG_STANDARD.md` hinterlegt
 
+## 3.4.9 – 2026-08-04
+- historischer Fach-Backfill veröffentlicht: „Technische Trocknung nach Leitungswasserschäden: Messkonzept, Rückbau und Erfolgskontrolle“
+- Fachbeitrag als eigenständige Detailroute, Suchindex- und Sitemap-Eintrag ergänzt
+- Fachwissenübersicht um genau einen neuen Library-Eintrag erweitert
+
 ## 3.4.8 – 2026-08-03
 - historischer Fach-Backfill veröffentlicht: „Starkregen und Rückstau: Eintrittswege, Rückstauebene und Schadenbereiche sauber trennen“
 - Fachbeitrag als eigenständige Detailroute, Suchindex- und Sitemap-Eintrag ergänzt
