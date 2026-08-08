@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Tornadoereignisse und lokale Sturmereignisse: Schadenaufnahme und technische Einordnung',
+    description: 'Wie bei Tornadoereignissen und lokalen Sturmereignissen Schadenbild, Windwirkung, Trümmeranprall, Vorschäden und der technisch erforderliche Maßnahmenumfang sauber getrennt bewertet werden.',
+    href: '/fachwissen/tornado-lokale-sturmereignisse-schadenaufnahme/',
+    category: 'Tornadoereignisse und lokale Sturmschäden',
+    tags: ['Tornado', 'Sturmschaden', 'Windwirkung', 'Schadenaufnahme', 'Dokumentation', 'Schadenabgrenzung'],
+    date: '2026-08-07',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Brandschäden durch Rauch und Ruß: Kontamination, Schadenbereiche und Sanierungsumfang fachlich abgrenzen',
     description: 'Wie bei Rauch- und Rußschäden Primärbrandbereich, Kontamination, Schadenzonen, technische Anlagen und Sanierungsumfang fachlich sauber getrennt und kostenrelevant bewertet werden.',
     href: '/fachwissen/brandschaden-rauch-russ-kontamination-schadenbereiche-sanierungsumfang/',
