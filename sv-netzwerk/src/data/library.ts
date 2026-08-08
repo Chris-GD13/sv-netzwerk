@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Starkregen und Rückstau: Eintrittswege, Rückstauebene und Schadenbereiche sauber trennen',
+    description: 'Wie bei Starkregen- und Rückstauschäden Eintrittswege, Rückstauebene, Gebäude- und Inhaltsschäden sowie die technisch erforderlichen Maßnahmen sauber abgegrenzt werden.',
+    href: '/fachwissen/starkregen-rueckstau-eintrittswege-rueckstauebene-schadenbereiche/',
+    category: 'Starkregen und Rückstau',
+    tags: ['Starkregen', 'Rückstau', 'Rückstauebene', 'Schadenabgrenzung', 'Dokumentation'],
+    date: '2026-08-03',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Frostbedingte Leitungswasserschäden: Rohrbruch, Auftauen und Vorschäden fachlich abgrenzen',
     description: 'Wie frostbedingte Leitungswasserschäden von Korrosion, Materialermüdung, Montagefehlern und Vorschäden getrennt und ohne vorschnelle Deckungsannahmen bewertet werden.',
     href: '/fachwissen/frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung/',
