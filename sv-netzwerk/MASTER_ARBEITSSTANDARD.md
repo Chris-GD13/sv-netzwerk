@@ -1,6 +1,6 @@
 # MASTER-Arbeitsstandard SV-Netzwerk
 
-Stand: 11.07.2026
+Stand: 08.08.2026
 Status: verbindlich
 
 Hinweis für Fachbeiträge: Alle neuen oder überarbeiteten Fachbeiträge müssen zusätzlich verbindlich dem Standard in `docs/FACHBEITRAG_STANDARD.md` entsprechen.
