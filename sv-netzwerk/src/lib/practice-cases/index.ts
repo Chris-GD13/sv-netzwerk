@@ -2,10 +2,12 @@ import type { CollectionEntry } from 'astro:content';
 import type { PracticeCaseFilter } from '../../types/practice-cases';
 
 export type PracticeCaseEntry = CollectionEntry<'practiceCases'>;
+type PublishedPracticeCaseEntry = PracticeCaseEntry & { data: PracticeCaseEntry['data'] & { publication: PracticeCaseEntry['data']['publication'] & { status: 'published'; publishedAt: Date } } };
+const isPublishedPracticeCaseEntry = (entry: PracticeCaseEntry): entry is PublishedPracticeCaseEntry => entry.data.publication.status === 'published' && Boolean(entry.data.publication.publishedAt);
 
 export function publishedPracticeCases(entries: PracticeCaseEntry[]) {
   return entries
-    .filter((entry) => entry.data.publication.status === 'published')
+    .filter(isPublishedPracticeCaseEntry)
     .sort((a, b) => b.data.publication.publishedAt.getTime() - a.data.publication.publishedAt.getTime());
 }
 

@@ -2,11 +2,13 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { buildTaxonomy, slugify } from './content';
 
 export type KnowledgeEntry = CollectionEntry<'knowledge'>;
+type PublishedKnowledgeEntry = KnowledgeEntry & { data: KnowledgeEntry['data'] & { publication: KnowledgeEntry['data']['publication'] & { status: 'published'; publishedAt: Date } } };
+const isPublishedKnowledgeEntry = (entry: KnowledgeEntry): entry is PublishedKnowledgeEntry => entry.data.publication.status === 'published' && Boolean(entry.data.publication.publishedAt);
 
 export const knowledgePath = (entry: KnowledgeEntry) => `/svos/fachwissen/${entry.id}/`;
 
 export const getPublishedKnowledge = async (): Promise<KnowledgeEntry[]> => {
-  const entries = await getCollection('knowledge', ({ data }) => data.publication.status === 'published');
+  const entries = (await getCollection('knowledge')).filter(isPublishedKnowledgeEntry);
   return entries.sort((a, b) => b.data.publication.publishedAt.getTime() - a.data.publication.publishedAt.getTime());
 };
 
@@ -39,6 +41,7 @@ export const findRelatedKnowledge = (
     const sameCategory = entry.data.category === current.data.category ? 3 : 0;
     return { entry, score: sharedTags + sameCategory };
   })
+  .filter((item): item is { entry: PublishedKnowledgeEntry; score: number } => isPublishedKnowledgeEntry(item.entry))
   .filter(({ score }) => score > 0)
   .sort((a, b) => b.score - a.score || b.entry.data.publication.publishedAt.getTime() - a.entry.data.publication.publishedAt.getTime())
   .slice(0, limit)

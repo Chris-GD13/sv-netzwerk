@@ -5,8 +5,9 @@ import KnowledgeMeta from '../../components/knowledge/KnowledgeMeta.astro';
 import RelatedKnowledge from '../../components/knowledge/RelatedKnowledge.astro';
 import CallToAction from '../../components/CallToAction.astro';
 import { getPublishedKnowledge, estimateReadingMinutes, findRelatedKnowledge } from '../../utils/knowledge';
-export async function getStaticPaths(){const entries=await getCollection('knowledge',({data})=>data.publication.status==='published');return entries.map((entry)=>({params:{id:entry.id},props:{entry}}));}
-interface Props { entry: CollectionEntry<'knowledge'> }
+type PublishedKnowledgeEntry = CollectionEntry<'knowledge'> & { data: CollectionEntry<'knowledge'>['data'] & { publication: CollectionEntry<'knowledge'>['data']['publication'] & { status: 'published'; publishedAt: Date } } };
+export async function getStaticPaths(){const entries=await getPublishedKnowledge();return entries.map((entry)=>({params:{id:entry.id},props:{entry}}));}
+interface Props { entry: PublishedKnowledgeEntry }
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const allEntries=await getPublishedKnowledge();

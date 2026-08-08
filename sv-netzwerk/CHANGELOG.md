@@ -1,9 +1,14 @@
 # Changelog
 
+## 3.4.8 – 2026-08-03
+- redaktioneller Entwurf für Fachbeitrag „Starkregen und Rückstau: Schadenaufnahme und Regulierung im Kumulereignis (2026-08-03)" vorbereitet, nicht veröffentlicht
+
 ## 3.4.7 – 2026-08-02
-- automatischer nachmittags Fachbeitrag veröffentlicht: „Schneedruck und Winterschäden: Statische Bewertung und Regulierung im Kumulereignis"
-- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt
-- Beitragsbild unter /assets/images/linkedin/schneedruck-winterschaeden-bewertung-regulierung.svg erzeugt
+- Pilotbeitrag „Schneedruck und Winterschäden“ in redaktioneller und fachlicher Prüfung, nicht final veröffentlicht
+
+## 3.4.9 – 2026-08-08
+- Pilotbeitrag „Schneedruck und Winterschäden: Dächer fachlich prüfen, Risiken sauber abgrenzen“ veröffentlicht
+- Veröffentlichung ohne Beitragsbild; typografische Platzhaltergrafik bleibt unveröffentlicht im Entwurfsbereich
 
 ## 3.4.6 – 2026-08-01
 - automatischer morgens Fachbeitrag veröffentlicht: „Brandschaden mit mehreren betroffenen Gebäuden: Struktur für Erstaufnahme und Regulierung"
