@@ -757,6 +757,8 @@ const createHeadline = (topic, regionalSignal) => {
   return `${topic.titleBase} – fachliche Einordnung zur aktuellen Lage`;
 };
 
+const makeBackfillHeadline = (topic, date) => `${topic.titleBase} (${date})`;
+
 const truncate = (text, maxLen) => {
   if (!text || text.length <= maxLen) return text;
   const cut = text.slice(0, maxLen - 1).trimEnd();
@@ -892,6 +894,8 @@ const topicFromIncompleteRow = incompleteExistingSlotRow
 const topic = topicFromIncompleteRow ?? pickTopic(publicationRows, caseContext?.preferredDamageTypes ?? []);
 const fallbackTitle = caseContext
   ? `${topic.titleBase}: anonymisierte Fallauswertung aus der Praxis`
+  : selectedDateInput
+  ? makeBackfillHeadline(topic, berlinDate)
   : createHeadline(topic, regionalSignal);
 const title = String(incompleteExistingSlotRow?.title || '').trim() || fallbackTitle;
 const baseSlug = String(incompleteExistingSlotRow?.url || '').trim()
