@@ -792,13 +792,17 @@ const sortedExistingSlotRows = existingSlotRows.sort((a, b) => {
   };
   return score(b) - score(a);
 });
+const resumableSlotRows = [];
+for (const row of sortedExistingSlotRows) {
+  const runtime = await buildResumeRuntime(row);
+  if (runtime) {
+    resumableSlotRows.push(runtime);
+  }
+}
 if (!slotWithinWindow) {
-  if (sortedExistingSlotRows.length >= 1) {
-    const runtime = await buildResumeRuntime(sortedExistingSlotRows[0]);
-    if (runtime) {
-      await writeFile(runtimeFile, JSON.stringify(runtime, null, 2));
-      process.exit(0);
-    }
+  if (resumableSlotRows.length >= 1) {
+    await writeFile(runtimeFile, JSON.stringify(resumableSlotRows[0], null, 2));
+    process.exit(0);
   }
   await writeFile(runtimeFile, JSON.stringify({
     status: 'skipped',
@@ -823,12 +827,9 @@ if (completedRow) {
   }, null, 2));
   process.exit(0);
 }
-if (sortedExistingSlotRows.length >= 1) {
-  const runtime = await buildResumeRuntime(sortedExistingSlotRows[0]);
-  if (runtime) {
-    await writeFile(runtimeFile, JSON.stringify(runtime, null, 2));
-    process.exit(0);
-  }
+if (resumableSlotRows.length >= 1) {
+  await writeFile(runtimeFile, JSON.stringify(resumableSlotRows[0], null, 2));
+  process.exit(0);
 }
 const publicationIdExists = publicationRows.some((row) => row.publication_id === publicationId);
 if (publicationIdExists) {
