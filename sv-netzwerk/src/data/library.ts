@@ -23,6 +23,16 @@ export const library: LibraryItem[] = [
     featured: false,
   },
   {
+    title: 'Schneedruck und Winterschäden: Dächer fachlich prüfen, Risiken sauber abgrenzen',
+    description: 'Wie Schneedruck-, Eis- und Frostschäden an Dächern fachlich eingeordnet, dokumentiert und ohne vorschnelle Deckungsannahmen geprüft werden.',
+    href: '/fachwissen/schneedruck-winterschaeden-bewertung-regulierung/',
+    category: 'Schneedruck und Winterschäden',
+    tags: ['Schneedruck', 'Winterschaden', 'Dach', 'Statik', 'Schadenprüfung'],
+    date: '2026-08-08',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Rückstauschaden im Fitnessstudio: Gebäude- und Inhaltschaden trennen',
     description: 'Warum bei Rückstauschäden im Fitnessstudio die klare Trennung von Gebäude- und Inhaltschaden den Regulierungserfolg bestimmt.',
     href: '/fachwissen/rueckstauschaden-im-fitnessstudio-gebaeude-und-inhaltsschaden-trennen/',
