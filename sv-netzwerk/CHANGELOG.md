@@ -7,6 +7,9 @@
 - verbindlichen Fachbeitragsstandard unter `docs/FACHBEITRAG_STANDARD.md` hinterlegt
 
 ## 3.4.8 – 2026-08-03
+- historischer Fach-Backfill veröffentlicht: „Starkregen und Rückstau: Eintrittswege, Rückstauebene und Schadenbereiche sauber trennen“
+- Fachbeitrag als eigenständige Detailroute, Suchindex- und Sitemap-Eintrag ergänzt
+- Fachwissenübersicht um genau einen neuen Library-Eintrag erweitert
 - redaktioneller Entwurf für Fachbeitrag „Starkregen und Rückstau: Schadenaufnahme und Regulierung im Kumulereignis (2026-08-03)" vorbereitet, nicht veröffentlicht
 
 ## 3.4.7 – 2026-08-02
