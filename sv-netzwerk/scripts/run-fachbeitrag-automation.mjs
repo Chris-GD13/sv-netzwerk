@@ -657,7 +657,22 @@ const buildResumeRuntime = async (row) => {
   if (!(await fileExists(imagePath))) missingFiles.push(path.relative(root, imagePath).replaceAll('\\', '/'));
 
   if (missingFiles.length > 0) {
-    throw new Error(`Slot ${runId} ist protokolliert, aber folgende Dateien fehlen für einen Retry: ${missingFiles.join(', ')}`);
+    return {
+      status: 'skipped',
+      reason: `resume-files-missing:${runId}`,
+      publicationId: resumedPublicationId,
+      berlinDate,
+      berlinTime,
+      berlinTimeZone: BERLIN,
+      slot,
+      existingStatuses: {
+        commit: String(row.commit || '').trim(),
+        deployStatus: String(row.deploy_status || '').trim() || 'pending',
+        liveStatus: String(row.live_pruefung || '').trim() || 'pending',
+        linkedinStatus: String(row.linkedin_status || '').trim() || 'pending',
+      },
+      missingFiles,
+    };
   }
 
   const existingStatuses = {
