@@ -1,0 +1,198 @@
+---
+const GA_MEASUREMENT_ID = 'G-TEDM214L86';
+---
+
+<div class="consent-banner" data-consent-banner hidden>
+  <div class="consent-banner__inner sv-container">
+    <div class="consent-banner__copy">
+      <strong>Datenschutzeinstellungen</strong>
+      <p>Wir verwenden Statistik-Cookies nur nach Ihrer Einwilligung, um die Website datenschutzkonform weiterzuentwickeln.</p>
+    </div>
+    <div class="consent-banner__actions">
+      <button type="button" class="consent-btn consent-btn--ghost" data-consent-action="deny">Nur notwendige</button>
+      <button type="button" class="consent-btn consent-btn--primary" data-consent-action="accept">Statistik akzeptieren</button>
+      <button type="button" class="consent-btn consent-btn--link" data-consent-open>Datenschutzeinstellungen</button>
+    </div>
+  </div>
+</div>
+
+<dialog class="consent-dialog" data-consent-dialog aria-labelledby="consent-dialog-title">
+  <form method="dialog" class="consent-dialog__card">
+    <div class="consent-dialog__header">
+      <h2 id="consent-dialog-title">Datenschutzeinstellungen</h2>
+      <button type="button" class="consent-dialog__close" data-consent-close aria-label="Dialog schließen">×</button>
+    </div>
+    <div class="consent-dialog__body">
+      <div class="consent-option">
+        <div>
+          <strong>Notwendige Cookies</strong>
+          <p>Erforderlich für Grundfunktionen der Website. Diese Kategorie ist immer aktiv.</p>
+        </div>
+        <span class="consent-option__status">Immer aktiv</span>
+      </div>
+      <label class="consent-option consent-option--toggle">
+        <div>
+          <strong>Statistik</strong>
+          <p>Google Analytics 4 zur anonymisierten Reichweitenmessung und Verbesserung der Website.</p>
+        </div>
+        <input type="checkbox" data-consent-statistics />
+      </label>
+      <p class="consent-dialog__hint">Sie können Ihre Auswahl jederzeit widerrufen oder ändern. Mehr Informationen finden Sie in der <a href="/datenschutzerklaerung/">Datenschutzerklärung</a>.</p>
+    </div>
+    <div class="consent-dialog__actions">
+      <button type="button" class="consent-btn consent-btn--ghost" data-consent-save="deny">Ablehnen</button>
+      <button type="button" class="consent-btn consent-btn--primary" data-consent-save="accept">Auswahl speichern</button>
+    </div>
+  </form>
+</dialog>
+
+<script is:inline define:vars={{ GA_MEASUREMENT_ID }}>
+  (() => {
+    const CONSENT_KEY = 'sv-cookie-consent';
+    const GA_SCRIPT_ID = 'sv-ga4-script';
+    const DEFAULT_CONSENT = { necessary: true, statistics: false, updatedAt: null };
+    const banner = document.querySelector('[data-consent-banner]');
+    const dialog = document.querySelector('[data-consent-dialog]');
+    const statisticsToggle = dialog?.querySelector('[data-consent-statistics]');
+    const openButtons = document.querySelectorAll('[data-consent-open]');
+
+    const readConsent = () => {
+      try {
+        const raw = window.localStorage.getItem(CONSENT_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return {
+          necessary: true,
+          statistics: parsed?.statistics === true,
+          updatedAt: typeof parsed?.updatedAt === 'string' ? parsed.updatedAt : null,
+        };
+      } catch {
+        return null;
+      }
+    };
+
+    const writeConsent = (statistics) => {
+      const value = { ...DEFAULT_CONSENT, statistics, updatedAt: new Date().toISOString() };
+      window.localStorage.setItem(CONSENT_KEY, JSON.stringify(value));
+      window.dispatchEvent(new CustomEvent('sv:consent-changed', { detail: value }));
+      return value;
+    };
+
+    const getConsent = () => readConsent() ?? DEFAULT_CONSENT;
+
+    const removeGa = () => {
+      document.getElementById(GA_SCRIPT_ID)?.remove();
+      document.querySelectorAll('script[data-ga4-inline]').forEach((node) => node.remove());
+      window['ga-disable-' + GA_MEASUREMENT_ID] = true;
+    };
+
+    const trackPageView = () => {
+      if (typeof window.gtag !== 'function') return;
+      window.gtag('config', GA_MEASUREMENT_ID, {
+        anonymize_ip: true,
+        send_page_view: true,
+        page_location: window.location.href,
+        page_path: window.location.pathname + window.location.search,
+        page_title: document.title,
+      });
+    };
+
+    const ensureGa = () => {
+      if (document.getElementById(GA_SCRIPT_ID)) return;
+      window['ga-disable-' + GA_MEASUREMENT_ID] = false;
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ window.dataLayer.push(arguments); }
+      window.gtag = window.gtag || gtag;
+
+      const external = document.createElement('script');
+      external.id = GA_SCRIPT_ID;
+      external.async = true;
+      external.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+      document.head.appendChild(external);
+
+      const inline = document.createElement('script');
+      inline.dataset.ga4Inline = 'true';
+      inline.textContent = `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', '${GA_MEASUREMENT_ID}', {
+          anonymize_ip: true,
+          send_page_view: true
+        });
+      `;
+      document.head.appendChild(inline);
+    };
+
+    const applyConsent = (consent) => {
+      if (statisticsToggle instanceof HTMLInputElement) statisticsToggle.checked = consent.statistics;
+      if (consent.updatedAt) {
+        banner?.setAttribute('hidden', '');
+      } else {
+        banner?.removeAttribute('hidden');
+      }
+      if (consent.statistics) {
+        ensureGa();
+      } else {
+        removeGa();
+      }
+    };
+
+    const closeDialog = () => {
+      if (dialog instanceof HTMLDialogElement && dialog.open) dialog.close();
+    };
+
+    const openDialog = () => {
+      if (!(dialog instanceof HTMLDialogElement)) return;
+      const consent = getConsent();
+      if (statisticsToggle instanceof HTMLInputElement) statisticsToggle.checked = consent.statistics;
+      if (!dialog.open) dialog.showModal();
+    };
+
+    const saveConsent = (statistics) => {
+      const consent = writeConsent(statistics);
+      applyConsent(consent);
+      closeDialog();
+    };
+
+    banner?.querySelector('[data-consent-action="accept"]')?.addEventListener('click', () => saveConsent(true));
+    banner?.querySelector('[data-consent-action="deny"]')?.addEventListener('click', () => saveConsent(false));
+    banner?.querySelector('[data-consent-open]')?.addEventListener('click', openDialog);
+    openButtons.forEach((button) => button.addEventListener('click', openDialog));
+    dialog?.querySelector('[data-consent-close]')?.addEventListener('click', closeDialog);
+    dialog?.querySelector('[data-consent-save="deny"]')?.addEventListener('click', () => saveConsent(false));
+    dialog?.querySelector('[data-consent-save="accept"]')?.addEventListener('click', () => {
+      saveConsent(Boolean(statisticsToggle instanceof HTMLInputElement && statisticsToggle.checked));
+    });
+
+    document.addEventListener('astro:page-load', () => {
+      if (getConsent().statistics) trackPageView();
+    });
+
+    applyConsent(getConsent());
+  })();
+</script>
+
+<style>
+  .consent-banner{position:fixed;left:0;right:0;bottom:0;z-index:250;background:rgba(5,20,36,.97);color:#e8f0f5;box-shadow:0 -10px 30px rgba(0,0,0,.24)}
+  .consent-banner__inner{display:flex;gap:1rem;align-items:center;justify-content:space-between;padding:1rem 0}
+  .consent-banner__copy p{margin:.35rem 0 0;font-size:.92rem;max-width:52rem}
+  .consent-banner__actions{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;justify-content:flex-end}
+  .consent-btn{border:1px solid transparent;border-radius:999px;padding:.75rem 1rem;font:inherit;font-weight:800;cursor:pointer}
+  .consent-btn--primary{background:#0f766e;color:#fff}
+  .consent-btn--ghost{background:transparent;border-color:rgba(255,255,255,.28);color:#fff}
+  .consent-btn--link{background:transparent;color:#fff;text-decoration:underline;padding:.3rem .1rem}
+  .consent-dialog{border:none;border-radius:1rem;padding:0;max-width:42rem;width:min(100% - 2rem,42rem)}
+  .consent-dialog::backdrop{background:rgba(7,26,46,.55)}
+  .consent-dialog__card{padding:0;margin:0}
+  .consent-dialog__header,.consent-dialog__actions{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.25rem 1.4rem}
+  .consent-dialog__body{padding:0 1.4rem 1.4rem}
+  .consent-dialog__close{border:none;background:transparent;font-size:1.8rem;line-height:1;cursor:pointer}
+  .consent-option{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1rem 0;border-top:1px solid #dde7ee}
+  .consent-option:first-child{border-top:none}
+  .consent-option p,.consent-dialog__hint{margin:.3rem 0 0;color:#506477}
+  .consent-option__status{font-weight:700;color:#0f766e;white-space:nowrap}
+  .consent-option--toggle input{width:1.2rem;height:1.2rem;margin-top:.25rem}
+  @media (max-width: 48rem){.consent-banner__inner,.consent-dialog__header,.consent-dialog__actions,.consent-option{flex-direction:column;align-items:flex-start}.consent-banner__actions{justify-content:flex-start}}
+</style>
