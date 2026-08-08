@@ -12,9 +12,17 @@ const seoSchema = z.object({
 });
 
 const publicationSchema = z.object({
-  publishedAt: z.coerce.date(),
+  publishedAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   status: z.enum(['draft', 'review', 'published', 'archived']).default('draft'),
+}).superRefine((value, ctx) => {
+  if (value.status === 'published' && !value.publishedAt) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'publication.publishedAt ist für veröffentlichte Inhalte erforderlich.',
+      path: ['publishedAt'],
+    });
+  }
 });
 
 const knowledge = defineCollection({
