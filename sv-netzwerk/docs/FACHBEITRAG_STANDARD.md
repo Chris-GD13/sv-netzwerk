@@ -78,7 +78,6 @@ Zu jedem Beitrag gehören:
 - Suchindex;
 - Sitemap;
 - LinkedIn-Begleittext als vorbereitete Datei;
-- Video-Skript "Wissen in 180 Sekunden" als vorbereitete Datei;
 - Protokolleintrag;
 - Changelog;
 - `npm run check`;
@@ -89,7 +88,7 @@ Zu jedem Beitrag gehören:
 - Deployment;
 - Live-Prüfung.
 
-Die LinkedIn- und Video-Dateien werden vorbereitet, aber nicht extern veröffentlicht. Im Protokoll ist deshalb ein wahrheitsgemäßer Status wie `prepared-not-posted` zu verwenden.
+Begleittexte werden vorbereitet, aber nicht extern veröffentlicht. Im Protokoll ist deshalb ein wahrheitsgemäßer Status wie `prepared-not-posted` zu verwenden.
 
 ## 6. Bildstandard
 
