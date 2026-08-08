@@ -782,12 +782,19 @@ const makeImageSvg = (title, subtitle) => `<?xml version="1.0" encoding="UTF-8"?
 await mkdir(automationDir, { recursive: true });
 const publicationRows = await readPublicationRows();
 const existingSlotRows = publicationRows.filter((row) => row.date === berlinDate && normalizeSlotValue(row.slot) === slot);
-if (existingSlotRows.length > 1) {
-  throw new Error(`Mehrere Protokolleinträge für ${runId} gefunden: ${existingSlotRows.map((row) => row.publication_id || 'ohne-publication-id').join(', ')}`);
-}
+const sortedExistingSlotRows = existingSlotRows.sort((a, b) => {
+  const score = (row) => {
+    let value = 0;
+    if (isSuccess(row.deploy_status)) value += 4;
+    if (isSuccess(row.live_pruefung)) value += 2;
+    if (isSuccess(row.linkedin_status)) value += 1;
+    return value;
+  };
+  return score(b) - score(a);
+});
 if (!slotWithinWindow) {
-  if (existingSlotRows.length === 1) {
-    const runtime = await buildResumeRuntime(existingSlotRows[0]);
+  if (sortedExistingSlotRows.length >= 1) {
+    const runtime = await buildResumeRuntime(sortedExistingSlotRows[0]);
     await writeFile(runtimeFile, JSON.stringify(runtime, null, 2));
     process.exit(0);
   }
@@ -801,7 +808,7 @@ if (!slotWithinWindow) {
   }, null, 2));
   process.exit(0);
 }
-const completedRow = existingSlotRows.find((row) => isSuccess(row.deploy_status) && isSuccess(row.live_pruefung) && isSuccess(row.linkedin_status));
+const completedRow = sortedExistingSlotRows.find((row) => isSuccess(row.deploy_status) && isSuccess(row.live_pruefung) && isSuccess(row.linkedin_status));
 if (completedRow) {
   await writeFile(runtimeFile, JSON.stringify({
     status: 'skipped',
@@ -814,8 +821,8 @@ if (completedRow) {
   }, null, 2));
   process.exit(0);
 }
-if (existingSlotRows.length === 1) {
-  const runtime = await buildResumeRuntime(existingSlotRows[0]);
+if (sortedExistingSlotRows.length >= 1) {
+  const runtime = await buildResumeRuntime(sortedExistingSlotRows[0]);
   await writeFile(runtimeFile, JSON.stringify(runtime, null, 2));
   process.exit(0);
 }
