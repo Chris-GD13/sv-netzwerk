@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.10 – 2026-08-08
+- historischer Fach-Backfill für 02.08.2026 veröffentlicht: "Frostbedingte Leitungswasserschäden: Rohrbruch, Auftauen und Vorschäden fachlich abgrenzen"
+- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien vorbereitet, nicht extern veröffentlicht
+- ohne öffentliches Beitragsbild veröffentlicht
+- verbindlichen Fachbeitragsstandard unter `docs/FACHBEITRAG_STANDARD.md` hinterlegt
+
 ## 3.4.8 – 2026-08-03
 - redaktioneller Entwurf für Fachbeitrag „Starkregen und Rückstau: Schadenaufnahme und Regulierung im Kumulereignis (2026-08-03)" vorbereitet, nicht veröffentlicht
 
