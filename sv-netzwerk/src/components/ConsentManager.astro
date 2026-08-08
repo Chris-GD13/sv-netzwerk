@@ -51,6 +51,7 @@ const GA_MEASUREMENT_ID = 'G-TEDM214L86';
     const CONSENT_KEY = 'sv-cookie-consent';
     const GA_SCRIPT_ID = 'sv-ga4-script';
     const DEFAULT_CONSENT = { necessary: true, statistics: false, updatedAt: null };
+    const PAGELOAD_LISTENER_KEY = '__svConsentPageLoadListenerBound';
     const banner = document.querySelector('[data-consent-banner]');
     const dialog = document.querySelector('[data-consent-dialog]');
     const statisticsToggle = dialog?.querySelector('[data-consent-statistics]');
@@ -88,9 +89,7 @@ const GA_MEASUREMENT_ID = 'G-TEDM214L86';
 
     const trackPageView = () => {
       if (typeof window.gtag !== 'function') return;
-      window.gtag('config', GA_MEASUREMENT_ID, {
-        anonymize_ip: true,
-        send_page_view: true,
+      window.gtag('event', 'page_view', {
         page_location: window.location.href,
         page_path: window.location.pathname + window.location.search,
         page_title: document.title,
@@ -119,7 +118,7 @@ const GA_MEASUREMENT_ID = 'G-TEDM214L86';
         gtag('js', new Date());
         gtag('config', '${GA_MEASUREMENT_ID}', {
           anonymize_ip: true,
-          send_page_view: true
+          send_page_view: false
         });
       `;
       document.head.appendChild(inline);
@@ -153,6 +152,7 @@ const GA_MEASUREMENT_ID = 'G-TEDM214L86';
     const saveConsent = (statistics) => {
       const consent = writeConsent(statistics);
       applyConsent(consent);
+      if (statistics) trackPageView();
       closeDialog();
     };
 
@@ -166,9 +166,12 @@ const GA_MEASUREMENT_ID = 'G-TEDM214L86';
       saveConsent(Boolean(statisticsToggle instanceof HTMLInputElement && statisticsToggle.checked));
     });
 
-    document.addEventListener('astro:page-load', () => {
-      if (getConsent().statistics) trackPageView();
-    });
+    if (!window[PAGELOAD_LISTENER_KEY]) {
+      document.addEventListener('astro:page-load', () => {
+        if (getConsent().statistics) trackPageView();
+      });
+      window[PAGELOAD_LISTENER_KEY] = true;
+    }
 
     applyConsent(getConsent());
   })();
