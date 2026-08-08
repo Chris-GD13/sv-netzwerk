@@ -659,7 +659,8 @@ const buildResumeRuntime = async (row) => {
   if (missingFiles.length > 0) {
     return {
       status: 'skipped',
-      reason: `resume-files-missing:${runId}`,
+      reason: 'resume-files-missing',
+      runId,
       publicationId: resumedPublicationId,
       berlinDate,
       berlinTime,
