@@ -679,7 +679,7 @@ const buildResumeRuntime = async (row) => {
   if (!(await fileExists(imagePath))) missingFiles.push(path.relative(root, imagePath).replaceAll('\\', '/'));
 
   if (missingFiles.length > 0) {
-    throw new Error(`Slot ${runId} ist protokolliert, aber folgende Dateien fehlen für einen Retry: ${missingFiles.join(', ')}`);
+    return null;
   }
 
   const existingStatuses = {
@@ -795,8 +795,10 @@ const sortedExistingSlotRows = existingSlotRows.sort((a, b) => {
 if (!slotWithinWindow) {
   if (sortedExistingSlotRows.length >= 1) {
     const runtime = await buildResumeRuntime(sortedExistingSlotRows[0]);
-    await writeFile(runtimeFile, JSON.stringify(runtime, null, 2));
-    process.exit(0);
+    if (runtime) {
+      await writeFile(runtimeFile, JSON.stringify(runtime, null, 2));
+      process.exit(0);
+    }
   }
   await writeFile(runtimeFile, JSON.stringify({
     status: 'skipped',
@@ -823,8 +825,10 @@ if (completedRow) {
 }
 if (sortedExistingSlotRows.length >= 1) {
   const runtime = await buildResumeRuntime(sortedExistingSlotRows[0]);
-  await writeFile(runtimeFile, JSON.stringify(runtime, null, 2));
-  process.exit(0);
+  if (runtime) {
+    await writeFile(runtimeFile, JSON.stringify(runtime, null, 2));
+    process.exit(0);
+  }
 }
 const publicationIdExists = publicationRows.some((row) => row.publication_id === publicationId);
 if (publicationIdExists) {
