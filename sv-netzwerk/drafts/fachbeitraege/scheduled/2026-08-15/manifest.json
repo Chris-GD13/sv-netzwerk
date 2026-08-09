@@ -1,0 +1,38 @@
+{
+  "publicationDate": "2026-08-15",
+  "title": "Schadentrocknung und Bautrocknung fachlich voneinander abgrenzen",
+  "slug": "schadentrocknung-bautrocknung-schadenziel-messkonzept-erfolgskontrolle",
+  "category": "Leitungswasser",
+  "tags": [
+    "Schadentrocknung",
+    "Bautrocknung",
+    "Messkonzept",
+    "Erfolgskontrolle",
+    "Feuchteschaden",
+    "Schadenabgrenzung"
+  ],
+  "contentFile": "schadentrocknung-bautrocknung-schadenziel-messkonzept-erfolgskontrolle.md",
+  "linkedinFile": "2026-08-15_schadentrocknung-bautrocknung-schadenziel-messkonzept-erfolgskontrolle.txt",
+  "libraryItem": {
+    "title": "Schadentrocknung und Bautrocknung fachlich voneinander abgrenzen",
+    "description": "Schadentrocknung und Bautrocknung dürfen nur dann belastbar bewertet werden, wenn Schadenziel, Messkonzept, Ausgangsfeuchte und Erfolgskontrolle technisch sauber getrennt dokumentiert werden.",
+    "href": "/fachwissen/schadentrocknung-bautrocknung-schadenziel-messkonzept-erfolgskontrolle/",
+    "category": "Leitungswasser",
+    "tags": [
+      "Schadentrocknung",
+      "Bautrocknung",
+      "Messkonzept",
+      "Erfolgskontrolle",
+      "Feuchteschaden",
+      "Schadenabgrenzung"
+    ],
+    "date": "2026-08-15",
+    "type": "article",
+    "featured": false
+  },
+  "protocol": {
+    "linkedin_status": "prepared-not-posted",
+    "deploy_status": "pending",
+    "live_pruefung": "pending"
+  }
+}
