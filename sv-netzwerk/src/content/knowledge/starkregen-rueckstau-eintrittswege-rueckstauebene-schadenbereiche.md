@@ -276,8 +276,8 @@ Starkregen- und Rückstauschäden werden erst dann prüffähig, wenn Eintrittswe
 ## Quellen und weiterführende Hinweise
 
 1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-2. DIN EN 12056-1:2001-01, Schwerkraftentwässerungsanlagen innerhalb von Gebäuden - Teil 1: Allgemeine und Ausführungsanforderungen, DIN Media GmbH, https://www.dinmedia.de/de/norm/din-en-12056-1/29110238
-3. DIN EN 12056-4:2001-01, Schwerkraftentwässerungsanlagen innerhalb von Gebäuden - Teil 4: Abwasserhebeanlagen - Planung und Berechnung, DIN Media GmbH, https://www.dinmedia.de/de/norm/din-en-12056-4/29110241
-4. DIN 1986-100:2016-12, Entwässerungsanlagen für Gebäude und Grundstücke - Bestimmungen in Verbindung mit DIN EN 752 und DIN EN 12056, DIN Media GmbH, https://www.dinmedia.de/de/norm/din-1986-100/250858928
-5. Bundesinstitut für Bau-, Stadt- und Raumforschung (BBSR), Starkregen und urbane Sturzfluten, https://www.bbsr.bund.de/BBSR/DE/startseite/topmeldungen/starkregen-und-urbane-sturzfluten.html
-6. Umweltbundesamt, Überflutungen und Starkregen, https://www.umweltbundesamt.de/themen/klima-energie/klimafolgen-anpassung/folgen-des-klimawandels/ueberflutungen-starkregen
+2. DIN EN 12056-1:2001-01, Schwerkraftentwässerungsanlagen innerhalb von Gebäuden - Teil 1: Allgemeine und Ausführungsanforderungen, DIN Media GmbH, https://www.dinmedia.de/de/norm/din-en-12056-1/23912115
+3. DIN EN 12056-4:2001-01, Schwerkraftentwässerungsanlagen innerhalb von Gebäuden - Teil 4: Abwasserhebeanlagen - Planung und Berechnung, DIN Media GmbH, https://www.dinmedia.de/de/norm/din-en-12056-4/23912386
+4. DIN 1986-100:2016-12, Entwässerungsanlagen für Gebäude und Grundstücke - Bestimmungen in Verbindung mit DIN EN 752 und DIN EN 12056, DIN Media GmbH, https://www.dinmedia.de/de/norm/din-1986-100/264064948
+5. Bundesinstitut für Bau-, Stadt- und Raumforschung (BBSR), Leitfaden Starkregen – Objektschutz und bauliche Vorsorge, https://www.bbsr.bund.de/BBSR/DE/veroeffentlichungen/sonderveroeffentlichungen/2018/leitfaden-starkregen.html
+6. Umweltbundesamt, Starkregen, https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen

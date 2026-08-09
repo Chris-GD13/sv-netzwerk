@@ -252,5 +252,5 @@ Technische Trocknung nach Leitungswasserschäden ist keine Standardroutine, sond
 1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
 2. WTA-Merkblatt 6-15, Technische Trocknung von durchfeuchteten Bauteilen, Wissenschaftlich-Technische Arbeitsgemeinschaft für Bauwerkserhaltung und Denkmalpflege e. V., bibliografischer Hinweis: nur als fachlicher Regelwerksverweis, ohne Wiedergabe nicht frei zugänglicher Detailinhalte.
 3. DIN EN 13183-2:2002-07, Feuchtegehalt eines Stückes Schnittholz - Teil 2: Schätzung durch elektrisches Widerstands-Messverfahren, DIN Media GmbH, bibliografischer Hinweis als Beispiel für normgebundene Messverfahren; objektspezifische Eignung ist im Einzelfall zu prüfen.
-4. Umweltbundesamt, Schimmel im Haus, https://www.umweltbundesamt.de/publikationen/schimmel-im-haus
-5. UBA-Innenraumlufthygiene-Kommission, Leitfaden zur Ursachensuche und Sanierung bei Schimmelpilzwachstum in Innenräumen, Umweltbundesamt, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-ursachensuche-und-sanierung-bei
+4. Umweltbundesamt, Ratgeber: Schimmel im Haus, https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus
+5. Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von

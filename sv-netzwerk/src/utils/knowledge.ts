@@ -5,7 +5,7 @@ export type KnowledgeEntry = CollectionEntry<'knowledge'>;
 type PublishedKnowledgeEntry = KnowledgeEntry & { data: KnowledgeEntry['data'] & { publication: KnowledgeEntry['data']['publication'] & { status: 'published'; publishedAt: Date } } };
 const isPublishedKnowledgeEntry = (entry: KnowledgeEntry): entry is PublishedKnowledgeEntry => entry.data.publication.status === 'published' && Boolean(entry.data.publication.publishedAt);
 
-export const knowledgePath = (entry: KnowledgeEntry) => `/svos/fachwissen/${entry.id}/`;
+export const knowledgePath = (entry: KnowledgeEntry) => `/fachwissen/${entry.id}/`;
 
 export const getPublishedKnowledge = async (): Promise<KnowledgeEntry[]> => {
   const entries = (await getCollection('knowledge')).filter(isPublishedKnowledgeEntry);
