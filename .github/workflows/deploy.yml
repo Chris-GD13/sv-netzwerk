@@ -83,7 +83,7 @@ jobs:
           test -f dist/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/index.html
           test -f dist/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/index.html
           echo "Build erfolgreich; erzeugte Dateien:"
-          find dist -type f | sort | head -n 100
+          find dist -type f | sort | sed -n '1,100p'
 
       - name: SFTP-Werkzeug installieren
         run: |
