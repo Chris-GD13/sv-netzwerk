@@ -254,10 +254,10 @@ export const library: LibraryItem[] = [
   },
   {
     title: 'Kumulschäden nach Sturm und Hagel – belastbare Prüffolge für die Regulierungspraxis',
-    description: 'Praxisorientierte Prüffolge für Versicherer, Sachverständige und Schadenregulierer zur einheitlichen, objektbezogenen Bearbeitung vieler Sturm- und Hagelschäden.',
+    description: 'Praxisorientierte Prüffolge für Versicherer, Sachverständige und Schadenregulierer zur einheitlichen, objektbezogenen Bearbeitung vieler Sturm- und Hagelschäden: Kausalitätsprüfung, Sofortmaßnahmen, Freigaben und Nachtragskontrolle.',
     href: '/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/',
     category: 'Sturm- und Hagelschäden',
-    tags: ['Kumulschaden', 'Sturm', 'Hagel', 'Plausibilitätsprüfung'],
+    tags: ['Kumulschaden', 'Sturm', 'Hagel', 'Plausibilitätsprüfung', 'Schadenregulierung'],
     date: '2026-07-21',
     type: 'article',
     featured: false,
