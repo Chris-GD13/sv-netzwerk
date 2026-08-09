@@ -35,6 +35,28 @@ export const navigation: NavItem[] = [
       },
     ],
   },
+  {
+    label: 'Für Versicherer',
+    href: '/versicherer-schadensteuerung/',
+    description: 'Schadensteuerung für Versicherer, Schadenabteilungen und Maklergesellschaften.',
+    children: [
+      {
+        label: 'Schadensteuerung für Versicherer',
+        href: '/versicherer-schadensteuerung/',
+        description: 'Zentrale Erstaufnahme, Triage, Koordination und prüffähige Dokumentation außerhalb Kfz.',
+      },
+      {
+        label: 'Beauftragung und Anfrage',
+        href: '/versicherer/',
+        description: 'Direkte Beauftragung oder Anfrage für Versicherer und Regulierer.',
+      },
+      {
+        label: 'Großschadenregulierung',
+        href: '/grossschadenregulierung/',
+        description: 'Priorisierte Steuerung umfangreicher Schadenfälle.',
+      },
+    ],
+  },
   { label: 'Experten', href: '/experten/' },
   { label: 'Fachartikel', href: '/fachwissen/' },
   { label: 'Kontakt', href: '/kontakt/' },
