@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.27 – 2026-08-09
+- Migration Fachbeitrag 2026-07-16: „Regiekosten im Schadenfall prüffähig bewerten" auf Fachbeitragsstandard gehoben
+- videoScript entfernt; canonical, noindex, updatedAt ergänzt
+- 5 Primärquellen-Abschnitt ergänzt; vorhandene 12 Abschnitte beibehalten
+- library.ts Tags erweitert; date 2026-07-27→2026-07-16 korrigiert; 46 Einträge unverändert
+
 ## 3.4.26 – 2026-08-09
 - Migration Fachbeitrag 2026-07-17: „Sturmschaden: Windwirkung, Vorschaden und Bauteilversagen" auf Fachbeitragsstandard gehoben
 - videoScript entfernt; canonical, noindex ergänzt; updatedAt aktualisiert

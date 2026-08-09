@@ -393,8 +393,8 @@ export const library: LibraryItem[] = [
     description: 'Wie Stundenlohnarbeiten, Materialnachweise und Fremdleistungen im Schadenfall nachvollziehbar geprüft und freigegeben werden.',
     href: '/fachwissen/regiekosten-im-schadenfall-pruefen/',
     category: 'Schadenregulierung',
-    tags: ['Regiekosten', 'Rechnungsprüfung', 'Leistungsnachweis'],
-    date: '2026-07-27',
+    tags: ['Regiekosten', 'Rechnungsprüfung', 'Leistungsnachweis', 'Dokumentation'],
+    date: '2026-07-16',
     type: 'article',
   },
   {
