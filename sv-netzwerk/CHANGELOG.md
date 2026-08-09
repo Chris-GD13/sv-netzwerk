@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.4.17 – 2026-08-09
+- Migration Fachbeitrag 2026-07-27: „Sachverständiger für Versicherungsschäden in Aalen" auf Fachbeitragsstandard gehoben
+- videoScript entfernt; canonical und updatedAt ergänzt; contentLevel C→B
+- 15 Abschnitte ausgebaut (~2000 Wörter); regionale Tiefe (Aalen/Ostalbkreis) beibehalten; Praxisbeispiel und Handlungsempfehlungen ergänzt
+- 5 geprüfte Primärquellen (BGB §631, §254; VVG §82, §86; UBA Starkregen) eingetragen
+- library.ts Beschreibung und Tags aktualisiert; 46 Einträge unverändert
+
 ## 3.4.16 – 2026-08-09
 - Migration Fachbeitrag 2026-07-27: „Schadenregulierer für Versicherungen: Technische Prüfung und strukturierte Schadensteuerung" auf Fachbeitragsstandard gehoben
 - videoScript entfernt; canonical und updatedAt ergänzt; contentLevel C→B

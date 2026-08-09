@@ -381,10 +381,10 @@ export const library: LibraryItem[] = [
   },
   {
     title: 'Sachverständiger für Versicherungsschäden in Aalen: Warum die erste Schadenaufnahme entscheidend ist',
-    description: 'Warum die erste Schadenaufnahme bei Gebäude- und Sachschäden in Aalen und der Region Ostwürttemberg über die Qualität der gesamten Regulierung entscheidet.',
+    description: 'Warum die erste Schadenaufnahme bei Gebäude- und Sachschäden in Aalen und der Region Ostwürttemberg über die Qualität der gesamten Regulierung entscheidet: Ursache, Schadenbereiche, Sofortmaßnahmen und Dokumentation strukturiert erfassen.',
     href: '/fachwissen/sachverstaendiger-versicherungsschaeden-aalen-schadenaufnahme/',
     category: 'Schadenregulierung',
-    tags: ['Aalen', 'Versicherungsschäden', 'Schadenaufnahme'],
+    tags: ['Aalen', 'Versicherungsschäden', 'Schadenaufnahme', 'Ostalbkreis'],
     date: '2026-07-27',
     type: 'article',
   },
