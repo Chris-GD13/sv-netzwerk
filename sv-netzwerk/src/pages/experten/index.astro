@@ -3,7 +3,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import ExpertCard from '../../components/platform/ExpertCard.astro';
 import { experts } from '../../data/experts';
-const specialists = experts.filter((expert) => expert.status === 'active' && expert.group === 'expert');
+const preferredOrder = ['christian-waechter', 'marc-schuett', 'carmen-gohl', 'holger-roth'];
+const specialists = experts
+  .filter((expert) => expert.status === 'active' && expert.group === 'expert')
+  .sort((a, b) => {
+    const aIndex = preferredOrder.indexOf(a.slug);
+    const bIndex = preferredOrder.indexOf(b.slug);
+    return (aIndex === -1 ? preferredOrder.length : aIndex) - (bIndex === -1 ? preferredOrder.length : bIndex);
+  });
 const backoffice = experts.filter((expert) => expert.status === 'active' && expert.group === 'backoffice');
 const regions = [...new Set(specialists.flatMap((expert) => expert.regions))].sort((a, b) => a.localeCompare(b, 'de'));
 const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].sort((a, b) => a.localeCompare(b, 'de'));
@@ -12,7 +19,7 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
   <section class="sv-section experts-intro">
     <div class="sv-container">
       <h1>Sachverständige und Fachkompetenz im SV-Netzwerk</h1>
-      <p class="sv-lead">Lernen Sie zuerst die aktiven Fachleute im Netzwerk kennen. Bei Bedarf können Sie die Übersicht anschließend gezielt nach Region, Fachgebiet oder Name filtern.</p>
+      <p class="sv-lead">Lernen Sie die aktiven Fachleute und das organisatorische Team im Netzwerk kennen. Bei Bedarf können Sie die Übersicht anschließend gezielt nach Region, Fachgebiet oder Name filtern.</p>
     </div>
   </section>
 
@@ -21,10 +28,17 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
       <div class="experts-grid" data-filter-grid>
         {specialists.map((expert) => (
           <div data-filter-item data-name={expert.name} data-regions={expert.regions.join('|')} data-fields={expert.expertise.join('|')}>
-            <ExpertCard expert={expert} />
+            <ExpertCard expert={expert} compact />
           </div>
         ))}
       </div>
+    </div>
+  </section>
+
+  <section class="sv-section backoffice-section" id="backoffice">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Backoffice" title="Organisation und Koordination" text="Susanne Wächter und Katja Schäfer sichern Terminabstimmung, Kommunikation, Unterlagen und verlässliche Übergaben an die fachlich Verantwortlichen." />
+      <div class="experts-grid experts-grid--backoffice">{backoffice.map((expert) => <ExpertCard expert={expert} compact />)}</div>
     </div>
   </section>
 
@@ -50,13 +64,6 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
       </div>
       <p class="filter-result" data-filter-count></p>
       <p class="filter-jump"><a href="#sachverstaendige">Zu den gefilterten Expertenprofilen ↑</a></p>
-    </div>
-  </section>
-
-  <section class="sv-section sv-section-alt" id="backoffice">
-    <div class="sv-container">
-      <SectionHeader eyebrow="Backoffice" title="Organisation, Koordination und kaufmännische Begleitung" text="Das Backoffice hält Termine, Unterlagen, Kommunikation und kaufmännische Abläufe zusammen und sorgt für verlässliche Übergaben an die fachlich Verantwortlichen." />
-      <div class="experts-grid experts-grid--backoffice">{backoffice.map((expert) => <ExpertCard expert={expert} />)}</div>
     </div>
   </section>
 </BaseLayout>
@@ -104,15 +111,17 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
 <style>
   .experts-intro{padding-bottom:0}
   .experts-intro h1{margin:0}
-  .experts-intro .sv-lead{max-width:72ch}
+  .experts-intro .sv-lead{max-width:76ch}
+  .backoffice-section{padding-top:0}
   .filter-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-lg);background:rgba(255,255,255,.72)}
   .filter-panel label{display:grid;gap:.4rem;font-weight:800}
   .filter-panel input,.filter-panel select{padding:.78rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:#fff;font:inherit}
   .filter-result{margin:.7rem 0 0;color:var(--sv-color-muted);font-weight:700}
   .filter-jump{margin:.35rem 0 0}
   .filter-jump a{font-weight:800;text-decoration:none}
-  .experts-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem}
-  .experts-grid--backoffice{grid-template-columns:repeat(2,minmax(0,1fr));max-width:58rem}
-  @media(max-width:64rem){.experts-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media(max-width:48rem){.experts-grid,.experts-grid--backoffice,.filter-panel{grid-template-columns:1fr}}
+  .experts-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+  .experts-grid--backoffice{max-width:calc(50% - .5rem);grid-template-columns:repeat(2,minmax(0,1fr))}
+  @media(max-width:72rem){.experts-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.experts-grid--backoffice{max-width:66.66%;grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:56rem){.experts-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.experts-grid--backoffice{max-width:none}}
+  @media(max-width:38rem){.experts-grid,.experts-grid--backoffice,.filter-panel{grid-template-columns:1fr}.experts-grid--backoffice{max-width:none}}
 </style>
