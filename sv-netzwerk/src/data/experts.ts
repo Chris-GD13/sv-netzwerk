@@ -87,7 +87,7 @@ export const experts: ExpertProfile[] = [
     expertise: ['Projektkoordination', 'Unternehmensmanagement', 'Mandantenbetreuung', 'Dokumentenmanagement', 'Qualitätssicherung', 'Prozesssteuerung'],
     regions: ['Aalen'], qualifications: [], certifications: [],
     shortProfile: 'Susanne Wächter leitet das Backoffice Aalen und ist zentrale Ansprechpartnerin für Versicherer, Geschädigte, Verwaltungen und Partnerfirmen bei organisatorischen Fragen sowie zur Koordination und Weiterleitung an den zuständigen Sachverständigen oder Regulierer, bei Terminvereinbarungen, Beauftragungen und der Abstimmung mit den Sachverständigen und Regulierern.',
-    contact: centralContact, image: '/assets/images/team/susanne-waechter.jpeg', status: 'active', tags: ['Organisation', 'Unternehmensmanagement', 'Qualitätssicherung'], publications: [], practiceCases: [], articles: [],
+    contact: centralContact, image: '/assets/images/team/susanne-waechter-buero.webp', status: 'active', tags: ['Organisation', 'Unternehmensmanagement', 'Qualitätssicherung'], publications: [], practiceCases: [], articles: [],
   },
   {
     id: 'backoffice-katja-schaefer', slug: 'katja-schaefer', name: 'Katja Schäfer', role: 'Backoffice', group: 'backoffice',
