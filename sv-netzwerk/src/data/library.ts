@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Leckageortung bei Leitungswasserschäden: Messverfahren, Suchöffnungen und Ursachenbeweis richtig dokumentieren',
+    description: 'Leckageortung bei Leitungswasserschäden ist nur belastbar, wenn Messverfahren, Suchöffnungen, Austrittsstelle und Schadenbereich technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/leckageortung-leitungswasserschaden-messverfahren-suchoeffnungen-ursachenbeweis/',
+    category: 'Leitungswasser',
+    tags: ['Leitungswasser', 'Leckageortung', 'Messverfahren', 'Suchöffnung', 'Ursachenbeweis', 'Dokumentation'],
+    date: '2026-08-12',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Photovoltaikanlagen nach Sturm, Hagel und Brand: Module, Unterkonstruktion und elektrische Risiken prüfen',
     description: 'Photovoltaikanlagen lassen sich nach Sturm-, Hagel- und Brandereignissen nur belastbar bewerten, wenn Module, Unterkonstruktion, Dachanbindung und elektrische Risiken getrennt dokumentiert werden.',
     href: '/fachwissen/photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken/',
