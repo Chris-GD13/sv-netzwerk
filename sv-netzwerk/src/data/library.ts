@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Schwarzwasserschäden: Kontamination, Hygiene, Rückbau und Entsorgung fachlich bewerten',
+    description: 'Schwarzwasserschäden sind nur belastbar zu bewerten, wenn Kontamination, hygienische Gefährdung, Rückbaugrenzen und Entsorgungswege technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung/',
+    category: 'Starkregen und Rückstau',
+    tags: ['Schwarzwasser', 'Kontamination', 'Hygiene', 'Rückbau', 'Entsorgung', 'Schadenabgrenzung'],
+    date: '2026-08-13',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Leckageortung bei Leitungswasserschäden: Messverfahren, Suchöffnungen und Ursachenbeweis richtig dokumentieren',
     description: 'Leckageortung bei Leitungswasserschäden ist nur belastbar, wenn Messverfahren, Suchöffnungen, Austrittsstelle und Schadenbereich technisch sauber getrennt dokumentiert werden.',
     href: '/fachwissen/leckageortung-leitungswasserschaden-messverfahren-suchoeffnungen-ursachenbeweis/',
