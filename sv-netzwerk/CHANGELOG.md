@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.14 – 2026-08-09
+- Migration Fachbeitrag 2026-07-31: „Rückstauschaden im Fitnessstudio: Gebäude- und Inhaltsschaden fachlich trennen" auf Fachbeitragsstandard gehoben
+- videoScript entfernt; canonical und updatedAt ergänzt; 15+ Abschnitte ausgebaut (~2200 Wörter)
+- 5 geprüfte Primärquellen (VVG §82, §86; UBA Schimmel-Leitfaden, Ratgeber Schimmel, Starkregen) eingetragen
+- library.ts-Eintrag (Titel und Beschreibung) auf neue Fassung abgestimmt; Eintragsanzahl 46 unverändert
+
 ## 3.4.10 – 2026-08-08
 - historischer Fach-Backfill für 02.08.2026 veröffentlicht: "Frostbedingte Leitungswasserschäden: Rohrbruch, Auftauen und Vorschäden fachlich abgrenzen"
 - LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien vorbereitet, nicht extern veröffentlicht
