@@ -1,0 +1,38 @@
+{
+  "publicationDate": "2026-08-20",
+  "title": "Notmaßnahmen und Wiederherstellung: Schadenminderung, Freigabe und Dokumentation fachlich trennen",
+  "slug": "notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation",
+  "category": "Schadenregulierung",
+  "tags": [
+    "Notmaßnahmen",
+    "Wiederherstellung",
+    "Schadenminderung",
+    "Freigabe",
+    "Dokumentation",
+    "Schadenabgrenzung"
+  ],
+  "contentFile": "notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation.md",
+  "linkedinFile": "2026-08-20_notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation.txt",
+  "libraryItem": {
+    "title": "Notmaßnahmen und Wiederherstellung: Schadenminderung, Freigabe und Dokumentation fachlich trennen",
+    "description": "Notmaßnahmen und Wiederherstellung sind nur belastbar zu bewerten, wenn Schadenminderung, Sofortsicherung, Freigabeentscheidungen und spätere Wiederherstellung technisch sauber getrennt dokumentiert werden.",
+    "href": "/fachwissen/notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation/",
+    "category": "Schadenregulierung",
+    "tags": [
+      "Notmaßnahmen",
+      "Wiederherstellung",
+      "Schadenminderung",
+      "Freigabe",
+      "Dokumentation",
+      "Schadenabgrenzung"
+    ],
+    "date": "2026-08-20",
+    "type": "article",
+    "featured": false
+  },
+  "protocol": {
+    "linkedin_status": "prepared-not-posted",
+    "deploy_status": "pending",
+    "live_pruefung": "pending"
+  }
+}

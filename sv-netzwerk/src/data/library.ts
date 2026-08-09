@@ -13,6 +13,146 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Interdisziplinäres Sachverständigennetzwerk und Gutachter-Plattform für komplexe Schadenfälle',
+    description: 'Komplexe Schadenfälle lassen sich belastbar steuern, wenn Fachgewerke, Sachverständige, Regulierer und digitale Plattformprozesse klar strukturiert zusammengeführt werden.',
+    href: '/fachwissen/interdisziplinaeres-sachverstaendigennetzwerk-gutachter-plattform-schadenregulierung/',
+    category: 'Gutachter-Plattform',
+    tags: ['Sachverständigennetzwerk', 'Gutachter-Plattform', 'Schadenregulierung', 'Koordination', 'Interdisziplinär', 'Prozessqualität'],
+    date: '2026-08-22',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Rechnungs- und Nachtragsprüfung: Mengen, Leistungen, Kosten und Schadenbezug fachlich trennen',
+    description: 'Rechnungs- und Nachtragsprüfungen sind nur belastbar, wenn Mengen, Leistungen, Schadenbezug, Zusatzaufwand und Abrechnungslogik technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug/',
+    category: 'Schadenregulierung',
+    tags: ['Rechnungsprüfung', 'Nachtragsprüfung', 'Mengenprüfung', 'Kostenprüfung', 'Schadenbezug', 'Schadenabgrenzung'],
+    date: '2026-08-21',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Notmaßnahmen und Wiederherstellung: Schadenminderung, Freigabe und Dokumentation fachlich trennen',
+    description: 'Notmaßnahmen und Wiederherstellung sind nur belastbar zu bewerten, wenn Schadenminderung, Sofortsicherung, Freigabeentscheidungen und spätere Wiederherstellung technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation/',
+    category: 'Schadenregulierung',
+    tags: ['Notmaßnahmen', 'Wiederherstellung', 'Schadenminderung', 'Freigabe', 'Dokumentation', 'Schadenabgrenzung'],
+    date: '2026-08-20',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Schlagregeneintritt an Fassaden und Fenstern: Anschlüsse, Dichtheit und Schadenabgrenzung fachlich prüfen',
+    description: 'Schlagregeneintritte an Fassaden und Fenstern sind nur belastbar zu bewerten, wenn Anschlüsse, Dichtebenen, Eintrittspfade und Folgeschäden technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/schlagregeneintritt-fassade-fenster-anschluesse-dichtheit-schadenabgrenzung/',
+    category: 'Gebäudehülle',
+    tags: ['Schlagregen', 'Fassade', 'Fenster', 'Anschlüsse', 'Dichtheit', 'Schadenabgrenzung'],
+    date: '2026-08-19',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Glasbruch an Fenster und Fassade: Schadenbild, Ursache und Reparaturfähigkeit fachlich trennen',
+    description: 'Glasbruchschäden an Fenstern und Fassaden sind nur belastbar zu bewerten, wenn Schadenbild, Bruchursache, Einbausituation und Reparaturfähigkeit technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit/',
+    category: 'Gebäudehülle',
+    tags: ['Glasbruch', 'Fenster', 'Fassade', 'Schadenbild', 'Ursache', 'Reparaturfähigkeit'],
+    date: '2026-08-18',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Baumsturz und Astbruch: Sturm, Schadenaufnahme, Standfestigkeit und Vorschaden fachlich trennen',
+    description: 'Baumsturz- und Astbruchschäden sind nur belastbar zu bewerten, wenn Sturmereignis, Standfestigkeit, Vorschäden, Aufprallbild und Folgeschäden technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/baumsturz-astbruch-sturm-schadenaufnahme-standfestigkeit-vorschaden/',
+    category: 'Hagel und Sturm',
+    tags: ['Baumsturz', 'Astbruch', 'Sturmschaden', 'Standfestigkeit', 'Vorschaden', 'Schadenabgrenzung'],
+    date: '2026-08-17',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Löschwasserschäden: Kontamination, Korrosion, Trocknung und Sanierungsumfang fachlich abgrenzen',
+    description: 'Löschwasserschäden lassen sich nur belastbar bewerten, wenn Kontamination, Korrosionsrisiko, Trocknungsbedarf und Sanierungsumfang technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/loeschwasserschaden-kontamination-korrosion-trocknung-sanierungsumfang/',
+    category: 'Brand und Kontamination',
+    tags: ['Löschwasserschaden', 'Kontamination', 'Korrosion', 'Trocknung', 'Sanierungsumfang', 'Schadenabgrenzung'],
+    date: '2026-08-16',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Schadentrocknung und Bautrocknung fachlich voneinander abgrenzen',
+    description: 'Schadentrocknung und Bautrocknung dürfen nur dann belastbar bewertet werden, wenn Schadenziel, Messkonzept, Ausgangsfeuchte und Erfolgskontrolle technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/schadentrocknung-bautrocknung-schadenziel-messkonzept-erfolgskontrolle/',
+    category: 'Leitungswasser',
+    tags: ['Schadentrocknung', 'Bautrocknung', 'Messkonzept', 'Erfolgskontrolle', 'Feuchteschaden', 'Schadenabgrenzung'],
+    date: '2026-08-15',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Flachdachschäden nach Sturm und Starkregen: Windsog, Abdichtung und Entwässerung getrennt prüfen',
+    description: 'Flachdachschäden nach Sturm und Starkregen sind nur belastbar zu bewerten, wenn Windsog, Abdichtung, Entwässerung, stehendes Wasser und Vorschäden technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/flachdachschaden-sturm-starkregen-windsog-abdichtung-entwaesserung/',
+    category: 'Gebäudehülle',
+    tags: ['Flachdach', 'Sturmschaden', 'Starkregen', 'Abdichtung', 'Entwässerung', 'Schadenabgrenzung'],
+    date: '2026-08-14',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Schwarzwasserschäden: Kontamination, Hygiene, Rückbau und Entsorgung fachlich bewerten',
+    description: 'Schwarzwasserschäden sind nur belastbar zu bewerten, wenn Kontamination, hygienische Gefährdung, Rückbaugrenzen und Entsorgungswege technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung/',
+    category: 'Starkregen und Rückstau',
+    tags: ['Schwarzwasser', 'Kontamination', 'Hygiene', 'Rückbau', 'Entsorgung', 'Schadenabgrenzung'],
+    date: '2026-08-13',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Leckageortung bei Leitungswasserschäden: Messverfahren, Suchöffnungen und Ursachenbeweis richtig dokumentieren',
+    description: 'Leckageortung bei Leitungswasserschäden ist nur belastbar, wenn Messverfahren, Suchöffnungen, Austrittsstelle und Schadenbereich technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/leckageortung-leitungswasserschaden-messverfahren-suchoeffnungen-ursachenbeweis/',
+    category: 'Leitungswasser',
+    tags: ['Leitungswasser', 'Leckageortung', 'Messverfahren', 'Suchöffnung', 'Ursachenbeweis', 'Dokumentation'],
+    date: '2026-08-12',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Photovoltaikanlagen nach Sturm, Hagel und Brand: Module, Unterkonstruktion und elektrische Risiken prüfen',
+    description: 'Photovoltaikanlagen lassen sich nach Sturm-, Hagel- und Brandereignissen nur belastbar bewerten, wenn Module, Unterkonstruktion, Dachanbindung und elektrische Risiken getrennt dokumentiert werden.',
+    href: '/fachwissen/photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken/',
+    category: 'Hagel und Sturm',
+    tags: ['Photovoltaik', 'Hagelschaden', 'Sturmschaden', 'Dach', 'Elektrotechnik', 'Schadenabgrenzung'],
+    date: '2026-08-11',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Elektrische Brandursachen: Lichtbogen, Kurzschluss und thermische Überlastung beweissicher unterscheiden',
+    description: 'Elektrische Brandursachen lassen sich nur dann belastbar bewerten, wenn Primärbefund, Sekundärschäden, Sicherung der Bauteile und elektrotechnische Fachgrenzen konsequent getrennt werden.',
+    href: '/fachwissen/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung/',
+    category: 'Brand und Kontamination',
+    tags: ['Brandursache', 'Lichtbogen', 'Kurzschluss', 'Beweissicherung', 'Elektrotechnik', 'Regress'],
+    date: '2026-08-10',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Überflutungsschäden am Gebäude: Oberflächenwasser, Grundwasser und Rückstau fachlich trennen',
+    description: 'Überflutungsschäden werden nur dann belastbar bewertet, wenn Oberflächenwasser, Grundwasser und Rückstau als eigenständige Wasserwege technisch und versicherungstechnisch getrennt dokumentiert werden.',
+    href: '/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/',
+    category: 'Hochwasser und Überflutung',
+    tags: ['Überflutungsschaden', 'Oberflächenwasser', 'Grundwasser', 'Rückstau', 'Schadenabgrenzung', 'Dokumentation'],
+    date: '2026-08-09',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Schneedruck und Winterschäden: Dächer fachlich prüfen, Risiken sauber abgrenzen',
     description: 'Wie Schneedruck-, Eis- und Frostschäden an Dächern fachlich eingeordnet, dokumentiert und ohne vorschnelle Deckungsannahmen geprüft werden.',
     href: '/fachwissen/schneedruck-winterschaeden-bewertung-regulierung/',
@@ -313,12 +453,6 @@ export const library: LibraryItem[] = [
   },
 ];
 
-export const categories = [...new Set(library.map((item) => item.category))]
-  .sort((a, b) => a.localeCompare(b, 'de'));
-
-export const tags = [...new Set(library.flatMap((item) => item.tags))]
-  .sort((a, b) => a.localeCompare(b, 'de'));
-
 export const PAGE_SIZE = 6;
 
 export const slugify = (value: string) => value
@@ -335,4 +469,11 @@ export const formatDate = (value: string) => new Intl.DateTimeFormat('de-DE', {
   year: 'numeric',
 }).format(new Date(`${value}T12:00:00`));
 
-export const sortedLibrary = [...library].sort((a, b) => b.date.localeCompare(a.date));
+import { filterPublishedLibraryItems } from '../utils/publication';
+
+export const sortedLibrary = filterPublishedLibraryItems([...library]).sort((a, b) => b.date.localeCompare(a.date));
+export const categories = [...new Set(sortedLibrary.map((item) => item.category))]
+  .sort((a, b) => a.localeCompare(b, 'de'));
+
+export const tags = [...new Set(sortedLibrary.flatMap((item) => item.tags))]
+  .sort((a, b) => a.localeCompare(b, 'de'));

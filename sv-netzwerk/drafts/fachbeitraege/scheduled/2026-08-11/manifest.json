@@ -1,0 +1,38 @@
+{
+  "publicationDate": "2026-08-11",
+  "title": "Photovoltaikanlagen nach Sturm, Hagel und Brand: Module, Unterkonstruktion und elektrische Risiken prüfen",
+  "slug": "photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken",
+  "category": "Hagel und Sturm",
+  "tags": [
+    "Photovoltaik",
+    "Hagelschaden",
+    "Sturmschaden",
+    "Dach",
+    "Elektrotechnik",
+    "Schadenabgrenzung"
+  ],
+  "contentFile": "photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken.md",
+  "linkedinFile": "2026-08-11_photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken.txt",
+  "libraryItem": {
+    "title": "Photovoltaikanlagen nach Sturm, Hagel und Brand: Module, Unterkonstruktion und elektrische Risiken prüfen",
+    "description": "Photovoltaikanlagen lassen sich nach Sturm-, Hagel- und Brandereignissen nur belastbar bewerten, wenn Module, Unterkonstruktion, Dachanbindung und elektrische Risiken getrennt dokumentiert werden.",
+    "href": "/fachwissen/photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken/",
+    "category": "Hagel und Sturm",
+    "tags": [
+      "Photovoltaik",
+      "Hagelschaden",
+      "Sturmschaden",
+      "Dach",
+      "Elektrotechnik",
+      "Schadenabgrenzung"
+    ],
+    "date": "2026-08-11",
+    "type": "article",
+    "featured": false
+  },
+  "protocol": {
+    "linkedin_status": "prepared-not-posted",
+    "deploy_status": "pending",
+    "live_pruefung": "pending"
+  }
+}

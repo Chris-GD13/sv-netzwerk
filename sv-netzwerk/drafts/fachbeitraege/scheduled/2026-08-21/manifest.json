@@ -1,0 +1,38 @@
+{
+  "publicationDate": "2026-08-21",
+  "title": "Rechnungs- und Nachtragsprüfung: Mengen, Leistungen, Kosten und Schadenbezug fachlich trennen",
+  "slug": "rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug",
+  "category": "Schadenregulierung",
+  "tags": [
+    "Rechnungsprüfung",
+    "Nachtragsprüfung",
+    "Mengenprüfung",
+    "Kostenprüfung",
+    "Schadenbezug",
+    "Schadenabgrenzung"
+  ],
+  "contentFile": "rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug.md",
+  "linkedinFile": "2026-08-21_rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug.txt",
+  "libraryItem": {
+    "title": "Rechnungs- und Nachtragsprüfung: Mengen, Leistungen, Kosten und Schadenbezug fachlich trennen",
+    "description": "Rechnungs- und Nachtragsprüfungen sind nur belastbar, wenn Mengen, Leistungen, Schadenbezug, Zusatzaufwand und Abrechnungslogik technisch sauber getrennt dokumentiert werden.",
+    "href": "/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug/",
+    "category": "Schadenregulierung",
+    "tags": [
+      "Rechnungsprüfung",
+      "Nachtragsprüfung",
+      "Mengenprüfung",
+      "Kostenprüfung",
+      "Schadenbezug",
+      "Schadenabgrenzung"
+    ],
+    "date": "2026-08-21",
+    "type": "article",
+    "featured": false
+  },
+  "protocol": {
+    "linkedin_status": "prepared-not-posted",
+    "deploy_status": "pending",
+    "live_pruefung": "pending"
+  }
+}

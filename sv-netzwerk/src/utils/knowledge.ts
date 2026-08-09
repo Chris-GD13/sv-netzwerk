@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { buildTaxonomy, slugify } from './content';
+import { filterPublishedKnowledgeItems } from './publication';
 
 export type KnowledgeEntry = CollectionEntry<'knowledge'>;
 type PublishedKnowledgeEntry = KnowledgeEntry & { data: KnowledgeEntry['data'] & { publication: KnowledgeEntry['data']['publication'] & { status: 'published'; publishedAt: Date } } };
@@ -8,8 +9,8 @@ const isPublishedKnowledgeEntry = (entry: KnowledgeEntry): entry is PublishedKno
 export const knowledgePath = (entry: KnowledgeEntry) => `/fachwissen/${entry.id}/`;
 
 export const getPublishedKnowledge = async (): Promise<KnowledgeEntry[]> => {
-  const entries = (await getCollection('knowledge')).filter(isPublishedKnowledgeEntry);
-  return entries.sort((a, b) => b.data.publication.publishedAt.getTime() - a.data.publication.publishedAt.getTime());
+  const entries = filterPublishedKnowledgeItems((await getCollection('knowledge')).filter(isPublishedKnowledgeEntry));
+  return [...entries].sort((a, b) => b.data.publication.publishedAt.getTime() - a.data.publication.publishedAt.getTime());
 };
 
 export const getKnowledgeCategories = (entries: KnowledgeEntry[]) =>

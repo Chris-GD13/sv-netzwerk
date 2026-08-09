@@ -1,0 +1,46 @@
+name: Daily knowledge publish
+
+on:
+  schedule:
+    - cron: '0,15 3 * * *'
+  workflow_dispatch:
+    inputs:
+      publication_date:
+        description: "Optionales Test- oder Nachholdatum YYYY-MM-DD"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Node einrichten
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+
+      - name: Installieren
+        run: npm ci --no-audit --no-fund
+
+      - name: Geplante Inhalte prüfen
+        run: node scripts/validate-scheduled-content.mjs
+
+      - name: Veröffentlichungsgating testen
+        run: node scripts/test-publication-gating.mjs
+
+      - name: Typprüfung
+        run: npm run check
+
+      - name: Build
+        run: npm run build

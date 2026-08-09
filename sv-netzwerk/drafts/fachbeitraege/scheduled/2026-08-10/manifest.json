@@ -1,0 +1,38 @@
+{
+  "publicationDate": "2026-08-10",
+  "title": "Elektrische Brandursachen: Lichtbogen, Kurzschluss und thermische ?berlastung beweissicher unterscheiden",
+  "slug": "elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung",
+  "category": "Brand und Kontamination",
+  "tags": [
+    "Brandursache",
+    "Lichtbogen",
+    "Kurzschluss",
+    "Beweissicherung",
+    "Elektrotechnik",
+    "Regress"
+  ],
+  "contentFile": "elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung.md",
+  "linkedinFile": "2026-08-10_elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung.txt",
+  "libraryItem": {
+    "title": "Elektrische Brandursachen: Lichtbogen, Kurzschluss und thermische ?berlastung beweissicher unterscheiden",
+    "description": "Elektrische Brandursachen lassen sich nur dann belastbar bewerten, wenn Prim?rbefund, Sekund?rsch?den, Sicherung der Bauteile und elektrotechnische Fachgrenzen konsequent getrennt werden.",
+    "href": "/fachwissen/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung/",
+    "category": "Brand und Kontamination",
+    "tags": [
+      "Brandursache",
+      "Lichtbogen",
+      "Kurzschluss",
+      "Beweissicherung",
+      "Elektrotechnik",
+      "Regress"
+    ],
+    "date": "2026-08-10",
+    "type": "article",
+    "featured": false
+  },
+  "protocol": {
+    "linkedin_status": "prepared-not-posted",
+    "deploy_status": "pending",
+    "live_pruefung": "pending"
+  }
+}
