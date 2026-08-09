@@ -5,12 +5,12 @@ const centralContact = { email: 'cw@sv-schuett.eu', phone: '07367 / 393 97 8
 export const experts: ExpertProfile[] = [
   {
     id: 'expert-christian-waechter', slug: 'christian-waechter', name: 'Christian Wächter', role: 'Sachverständiger', group: 'expert',
-    function: 'Sachverständiger und Großschadenregulierer mit DIN EN ISO/IEC 17024-Zertifizierung',
+    function: 'Sachverständiger sowie Regulierung im Komplex- und Großschaden mit DIN EN ISO/IEC 17024-Zertifizierung',
     expertise: ['Komplexschäden', 'Großschadenregulierung', 'Bauforensik', 'Thermografie', 'Drohnen', 'Fenster · Türen · Fassaden'],
     regions: ['Aalen', 'Baden-Württemberg', 'Bundesweit nach Aufgabenstellung'],
-    qualifications: ['EU-Bausachverständiger', 'Sachverständiger für Bau- und Versicherungsschäden', 'Großschadenregulierer', 'Industriemeister Holzverarbeitung', 'Fenster- und Systemtechniker', 'Montageleiter Fenster und Fassade', 'Fachkraft für Thermografie', 'Drohnenführerschein A1/A2/A3'],
+    qualifications: ['EU-Bausachverständiger', 'Sachverständiger für Bau- und Versicherungsschäden', 'Regulierung im Komplex- und Großschaden', 'Industriemeister Holzverarbeitung', 'Fenster- und Systemtechniker', 'Montageleiter Fenster und Fassade', 'Fachkraft für Thermografie', 'Drohnenführerschein A1/A2/A3'],
     certifications: ['Personenzertifizierung nach DIN EN ISO/IEC 17024 – Fenster, Türen und Fassaden', 'Sachverständiger Fenster · Türen · Fassaden (DGU/SV)', 'Bauforensik und optische Bauforensik', 'Fachgerechte Planung und Montage von Fenstern und Außentüren (ift Rosenheim)', 'Mechanische Sicherungstechnik an Fenstern und Türen nach DIN 18104'],
-    shortProfile: 'Sachverständiger und Großschadenregulierer mit DIN EN ISO/IEC 17024-Zertifizierung. Schwerpunkt: komplexe Gebäude-, Hausrat- und Großschäden, gerichtsfeste Gutachten sowie regulierungssichere Schadenbearbeitung.',
+    shortProfile: 'Sachverständiger mit DIN EN ISO/IEC 17024-Zertifizierung. Schwerpunkte: komplexe Gebäude-, Hausrat- und Großschäden, gerichtsfeste Gutachten sowie Regulierung im Komplex- und Großschaden.',
     contact: centralContact, linkedin: 'https://www.linkedin.com/in/christian-w-156408204/', image: '/assets/images/team/christian-waechter-bw.webp', status: 'active',
     tags: ['Komplexschäden', 'Großschadenregulierung', 'Bauforensik'], publications: ['/fachwissen/'],
     practiceCases: ['/praxisfaelle/leitungswasser-technische-abgrenzung/'], articles: ['/fachwissen/schadenabgrenzung/'],
@@ -101,7 +101,7 @@ export const experts: ExpertProfile[] = [
 
 export const expertDisciplines = [
   { title: 'Sachverständige', text: 'Technische Feststellung, Ursachenbewertung und nachvollziehbare Abgrenzung.' },
-  { title: 'Großschadenregulierer', text: 'Koordination, Reserveentwicklung und Entscheidungsvorbereitung bei komplexen Vorgängen.' },
+  { title: 'Regulierung im Komplex- und Großschaden', text: 'Koordination, Reserveentwicklung und Entscheidungsvorbereitung bei komplexen Vorgängen.' },
   { title: 'Regulierer', text: 'Strukturierte Bearbeitung zwischen Deckung, Technik, Beteiligten und Kosten.' },
   { title: 'Fachberater', text: 'Spezialwissen für klar abgegrenzte technische oder organisatorische Fragestellungen.' },
   { title: 'Dienstleister', text: 'Dokumentierte Ausführung mit definierten Schnittstellen zum verantwortlichen Prüfer.' },

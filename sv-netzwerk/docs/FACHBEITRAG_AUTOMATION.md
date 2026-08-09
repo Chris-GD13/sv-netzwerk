@@ -18,7 +18,7 @@
 
 - Standardformulierung für Fachbeiträge: **„Versicherer, Sachverständige und Schadenregulierer“**.
 - Diese Formulierung ist in Beiträgen, Meta-Descriptions, strukturierten Daten, CTAs, LinkedIn-Texten und Automationsvorlagen zu verwenden.
-- Die persönliche Berufsbezeichnung von Christian Wächter bleibt unverändert: **„Sachverständiger & Großschadenregulierer“**.
+- Die öffentliche Rollenbezeichnung von Christian Wächter lautet verbindlich: **„Sachverständiger | Regulierung im Komplex- und Großschaden“**. Die Bezeichnung „Großschadenregulierer“ darf in neuen oder aktualisierten öffentlichen Inhalten nicht verwendet werden.
 
 ## Slug-Standard für neue Fachbeiträge
 

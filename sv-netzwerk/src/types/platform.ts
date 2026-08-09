@@ -1,4 +1,4 @@
-export type ExpertRole = 'Sachverständiger' | 'Großschadenregulierer' | 'Regulierer' | 'Fachberater' | 'Dienstleister' | 'Restaurator' | 'Spezialunternehmen' | 'Backoffice';
+export type ExpertRole = 'Sachverständiger' | 'Regulierer' | 'Fachberater' | 'Dienstleister' | 'Restaurator' | 'Spezialunternehmen' | 'Backoffice';
 
 export interface ExpertCompany {
   /** Überschrift des Unternehmensabschnitts, z.B. "Sachverständigenbüro Marc Schütt e.K." */
