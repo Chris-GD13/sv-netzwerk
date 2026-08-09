@@ -399,10 +399,10 @@ export const library: LibraryItem[] = [
   },
   {
     title: 'Leitungswasserschaden in Aalen: Aufgaben eines Sachverständigen für Versicherungsschäden',
-    description: 'Was ein Sachverständiger für Versicherungsschäden bei Leitungswasserschäden in Aalen prüft: Schadenursache, Rückbauumfang, Kostenabgrenzung und Regulierungsbegleitung.',
+    description: 'Was ein Sachverständiger für Versicherungsschäden bei Leitungswasserschäden in Aalen prüft: Schadenursache, Rückbauumfang, Kostenabgrenzung und Regulierungsbegleitung von der Erstbesichtigung bis zur Schlussrechnungsprüfung.',
     href: '/fachwissen/leitungswasserschaden-aalen-sachverstaendiger-aufgaben/',
     category: 'Leitungswasser',
-    tags: ['Leitungswasser', 'Aalen', 'Sachverständiger'],
+    tags: ['Leitungswasser', 'Aalen', 'Sachverständiger', 'Ostalbkreis', 'Rückbau'],
     date: '2026-07-27',
     type: 'article',
   },
