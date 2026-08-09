@@ -277,7 +277,7 @@ export const library: LibraryItem[] = [
     description: 'Starkregen und Rückstau: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/',
     category: 'Starkregen und Rückstau',
-    tags: ['Starkregen', 'Rückstau', 'Schadenregulierung', 'Beweissicherung'],
+    tags: ['Starkregen', 'Rückstau', 'Schadenregulierung', 'Beweissicherung', 'Kumulschäden'],
     date: '2026-07-20',
     type: 'article',
     featured: false,
