@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.24 – 2026-08-09
+- Migration Fachbeitrag 2026-07-17: „Brandschaden nach Erstmaßnahmen" auf Fachbeitragsstandard gehoben
+- videoScript entfernt; canonical, noindex ergänzt; updatedAt aktualisiert
+- 5 Primärquellen-Abschnitt ergänzt; vorhandene 8 Abschnitte beibehalten
+- library.ts Zeile 288: Beschreibung/Tags aktualisiert; Zeile 375 (Duplikat) unangetastet; 46 Einträge unverändert
+
 ## 3.4.23 – 2026-08-09
 - Migration Fachbeitrag 2026-07-18: „Leitungswasserschaden: Die ersten Schritte richtig setzen" auf Fachbeitragsstandard gehoben
 - videoScript entfernt; canonical, updatedAt und noindex ergänzt; contentLevel C→B; featured ergänzt

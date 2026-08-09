@@ -284,10 +284,10 @@ export const library: LibraryItem[] = [
   },
   {
     title: 'Brandschaden nach Erstmaßnahmen: Übergang zur Wiederherstellung sauber steuern',
-    description: 'Wie nach Löschung und Sicherung die technische Trennung von Gefahrenabwehr, Wiederherstellung und Instandhaltung gelingt.',
+    description: 'Wie nach Löschung und Sicherung die technische Trennung von akuter Gefahrenabwehr, schadenbedingter Wiederherstellung und Instandhaltung gelingt.',
     href: '/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/',
     category: 'Brandschaden',
-    tags: ['Brandschaden', 'Notmaßnahmen', 'Schadenabgrenzung'],
+    tags: ['Brandschaden', 'Notmaßnahmen', 'Schadenabgrenzung', 'Dokumentation'],
     date: '2026-07-17',
     type: 'article',
     featured: true,
