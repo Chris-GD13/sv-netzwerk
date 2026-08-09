@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Photovoltaikanlagen nach Sturm, Hagel und Brand: Module, Unterkonstruktion und elektrische Risiken prüfen',
+    description: 'Photovoltaikanlagen lassen sich nach Sturm-, Hagel- und Brandereignissen nur belastbar bewerten, wenn Module, Unterkonstruktion, Dachanbindung und elektrische Risiken getrennt dokumentiert werden.',
+    href: '/fachwissen/photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken/',
+    category: 'Hagel und Sturm',
+    tags: ['Photovoltaik', 'Hagelschaden', 'Sturmschaden', 'Dach', 'Elektrotechnik', 'Schadenabgrenzung'],
+    date: '2026-08-11',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Elektrische Brandursachen: Lichtbogen, Kurzschluss und thermische Überlastung beweissicher unterscheiden',
     description: 'Elektrische Brandursachen lassen sich nur dann belastbar bewerten, wenn Primärbefund, Sekundärschäden, Sicherung der Bauteile und elektrotechnische Fachgrenzen konsequent getrennt werden.',
     href: '/fachwissen/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung/',
