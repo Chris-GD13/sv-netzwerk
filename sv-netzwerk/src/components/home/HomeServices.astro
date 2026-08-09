@@ -1,12 +1,38 @@
 ---
 const services = [
-  { number: '01', title: 'Sachverständigenleistungen', text: 'Belastbare Feststellungen, technische Bewertungen und klare Empfehlungen für Auftraggeber und Versicherer.', href: '/leistungen/#sachverstaendigenleistungen', icon: 'M5 19V5h14v14H5Zm4-9h6M9 14h4' },
-  { number: '02', title: 'Kumulschadenmanagement', text: 'Strukturierte Steuerung zahlreicher Schäden aus einem gemeinsamen Unwetterereignis – mit priorisierter Erstaufnahme, einheitlicher Dokumentation und fortlaufender Statusübersicht.', href: '/leistungen/#kumulschadenmanagement', icon: 'M4 17h16M6 13h12M9 9h6M12 4v5m-5 8v3m10-3v3' },
-  { number: '03', title: 'Leistungen für Versicherer', text: 'Prüffähige Entscheidungsgrundlagen, KVA- und Rechnungsprüfung sowie klare Kommunikation zu offenen Punkten, Reserven und Handlungsbedarf.', href: '/leistungen/#versicherer', icon: 'M12 3 4 7v4c0 4.5 3.2 8.4 8 9.6 4.8-1.2 8-5.1 8-9.6V10l-8-7Zm-3 9 2 2 4-4' },
-  { number: '04', title: 'Großschaden- und Komplexschadenregulierung', text: 'Nachvollziehbare Steuerung umfangreicher und komplexer Schadenfälle – von der Erstaufnahme über die Reservenbildung bis zur dokumentierten Schlusserklärung.', href: '/leistungen/#grossschaden-und-komplexschadenregulierung', icon: 'M4 19V9l8-5 8 5v10H4Zm4 0v-5h8v5' },
+  { number: '01', title: 'Sachverständigenleistungen', text: 'Belastbare Feststellungen, technische Bewertungen und klare Empfehlungen für Versicherer und weitere Auftraggeber.', href: '/leistungen/#sachverstaendigenleistungen' },
+  { number: '02', title: 'Kosten- und Leistungsprüfung', text: 'Plausibilisierung von Kostenvoranschlägen, Nachträgen und Rechnungen mit nachvollziehbarer Zuordnung zum festgestellten Schadenumfang.', href: '/leistungen/schadenregulierung-fuer-versicherer/' },
+  { number: '03', title: 'Kumulschadenmanagement', text: 'Strukturierte Steuerung zahlreicher Schäden aus einem gemeinsamen Ereignis – mit priorisierter Erstaufnahme, einheitlicher Dokumentation und fortlaufender Statusübersicht.', href: '/leistungen/kumulschadenmanagement/' },
+  { number: '04', title: 'Regulierung im Komplex- und Großschaden', text: 'Koordinierte Bearbeitung umfangreicher Schadenfälle – von der Erstaufnahme über Reserven, Maßnahmen und Freigaben bis zur dokumentierten Schlusserklärung.', href: '/grossschadenregulierung/' },
 ];
 ---
-<section class="v4-section v4-services" id="leistungen">
-  <div class="v4-shell"><div class="v4-section-head"><div><p class="v4-kicker"><span></span>Was wir leisten</p><h2>Ein Netzwerk.<br/>Klare Verantwortung.</h2></div><p>Wir verbinden spezialisierte Fachkompetenz mit einem durchgängigen Arbeitsmodell. So entstehen Entscheidungen, die fachlich tragen und praktisch umsetzbar sind.</p></div>
-  <div class="v4-services__grid">{services.map((service) => <a href={service.href}><div class="v4-services__top"><span>{service.number}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d={service.icon}/></svg></div><h3>{service.title}</h3><p>{service.text}</p><b>Mehr erfahren <span>→</span></b></a>)}</div></div>
+<section class="v4-section home-service-overview" id="leistungen">
+  <div class="v4-shell">
+    <div class="v4-section-head">
+      <div><p class="v4-kicker"><span></span>Leistungen für Versicherer</p><h2>Technischer Befund.<br/>Prüffähige Entscheidung.</h2></div>
+      <p>Das SV-Netzwerk verbindet technische Feststellung, Kostenprüfung und koordinierte Schadenbearbeitung. Befund, Ursache, Maßnahmenbedarf, Deckungsprüfung und Kostenfolge bleiben dabei nachvollziehbar getrennt.</p>
+    </div>
+    <div class="service-list">
+      {services.map((service) => (
+        <article class="service-item">
+          <span>{service.number}</span>
+          <div>
+            <h3>{service.title}</h3>
+            <p>{service.text}</p>
+          </div>
+          <a href={service.href} aria-label={`${service.title}: Mehr erfahren`}>Mehr erfahren <span aria-hidden="true">→</span></a>
+        </article>
+      ))}
+    </div>
+  </div>
 </section>
+
+<style>
+  .service-list{border-top:1px solid var(--v4-line)}
+  .service-item{display:grid;grid-template-columns:3rem minmax(0,1fr) auto;align-items:start;gap:1.25rem;padding:1.35rem 0;border-bottom:1px solid var(--v4-line)}
+  .service-item>span{color:#0d4f73;font-size:.75rem;font-weight:900;letter-spacing:.1em}
+  .service-item h3{margin:0 0 .35rem;font-size:clamp(1.05rem,1.8vw,1.35rem)}
+  .service-item p{max-width:72ch;margin:0;color:#3f5c6f}
+  .service-item a{align-self:center;font-weight:850;color:#0d4f73;text-decoration:none;white-space:nowrap}
+  @media(max-width:48rem){.service-item{grid-template-columns:2.25rem minmax(0,1fr)}.service-item a{grid-column:2;justify-self:start;white-space:normal}}
+</style>

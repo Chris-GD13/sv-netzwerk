@@ -2,7 +2,6 @@
 import HomeLayout from '../layouts/HomeLayout.astro';
 import HomeInsurerBand from '../components/home/HomeInsurerBand.astro';
 import HomeHero from '../components/home/HomeHero.astro';
-import HomePriority from '../components/home/HomePriority.astro';
 import HomeServices from '../components/home/HomeServices.astro';
 import HomeCases from '../components/home/HomeCases.astro';
 import HomeKnowledge from '../components/home/HomeKnowledge.astro';
@@ -11,15 +10,14 @@ import HomeCta from '../components/home/HomeCta.astro';
 ---
 
 <HomeLayout
-  title="SV-Netzwerk – Arbeitsplattform für Schadenmanagement"
-  description="Direkter Einstieg in Schadenmeldung, Großschaden, Kumulschaden, Gutachter-Plattform, Experten und Fachartikel."
+  title="Sachverständige und Schadenregulierung für Versicherer | SV-Netzwerk"
+  description="Technische Feststellung, Kostenprüfung und koordinierte Regulierung von Sach-, Kumul-, Komplex- und Großschäden für Versicherer – bundesweit und prüffähig dokumentiert."
 >
-  <HomeInsurerBand />
-  <HomeServices />
   <HomeHero />
-  <HomePriority />
+  <HomeServices />
   <HomeTeam />
   <HomeCases />
   <HomeKnowledge />
+  <HomeInsurerBand />
   <HomeCta />
 </HomeLayout>
