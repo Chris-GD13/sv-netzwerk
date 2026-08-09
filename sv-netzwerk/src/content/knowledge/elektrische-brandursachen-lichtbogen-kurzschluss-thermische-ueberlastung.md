@@ -9,7 +9,6 @@ dailyStandard: false
 contentLevel: "B"
 teaser: "Elektrische Brandursachen lassen sich nur dann belastbar bewerten, wenn Primärbefund, Sekundärschäden, Sicherung der Bauteile und elektrotechnische Fachgrenzen konsequent getrennt werden."
 linkedinSummary: "Lichtbogen, Kurzschluss und thermische Überlastung sehen ähnlich aus, verlangen aber unterschiedliche Prüffragen und eine saubere Beweiskette."
-videoScript: "Elektrische Brandursachen müssen nach Primärspuren, Sekundärschäden und gesicherter Beweiskette unterschieden werden."
 cta:
   label: "Schaden strukturiert melden"
   href: "/schaden-melden/"
@@ -105,7 +104,7 @@ Ein Sachverständiger für Gebäudeschäden kann das Brandbild aufnehmen, dokume
 
 Die Einbindung eines Elektrofachmanns ist insbesondere dann erforderlich, wenn:
 - die Brandursache unklar oder streitig ist,
-- Regressa oder Haftungsfragen geprüft werden,
+- Regress- oder Haftungsfragen geprüft werden,
 - die Sicherheit der verbleibenden Installation beurteilt werden muss,
 - die Wiederherstellung der Elektroinstallation geplant wird.
 
@@ -164,7 +163,7 @@ Elektrische Brandursachen lassen sich nur dann belastbar einordnen, wenn Primär
 ## Quellen und weiterführende Hinweise
 
 1. DIN VDE 0100-430:2010-10, Errichten von Niederspannungsanlagen – Schutz von Kabeln und Leitungen bei Überstrom, VDE Verlag, https://www.vde-verlag.de/
-2. DIN EN 60079-14, Explosionsgefährdete Bereiche – Elektrische Anlagen, Beuth Verlag, https://www.beuth.de/
+2. DIN EN 60079-14 (VDE 0165-1):2020-12, Explosionsgefährdete Bereiche – Teil 14: Projektierung, Auswahl und Errichtung elektrischer Anlagen, DIN Media, https://www.dinmedia.de/de/norm/din-en-60079-14-vde-0165-1/303132206
 3. VdS 3457, Brandursachenermittlung – Leitfaden für die Praxis, VdS Schadenverhütung, https://www.vds.de/
 4. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
 5. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html

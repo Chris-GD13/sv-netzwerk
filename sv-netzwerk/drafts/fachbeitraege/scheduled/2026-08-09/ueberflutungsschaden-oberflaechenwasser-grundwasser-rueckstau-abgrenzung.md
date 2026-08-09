@@ -9,7 +9,6 @@ dailyStandard: false
 contentLevel: "B"
 teaser: "Überflutungsschäden werden nur dann belastbar bewertet, wenn Oberflächenwasser, Grundwasser und Rückstau als eigenständige Wasserwege technisch und versicherungstechnisch getrennt dokumentiert werden."
 linkedinSummary: "Überflutungsschäden am Gebäude verlangen eine saubere Trennung von Wasserweg, Vorzustand, Eintrittsweg und Schadenbereich."
-videoScript: "Überflutungsschäden müssen nach Wasserweg, Eintrittswegen, Wasserstand und konkurrierender Ursache getrennt dokumentiert werden."
 cta:
   label: "Schaden strukturiert melden"
   href: "/schaden-melden/"
@@ -202,7 +201,7 @@ Die Dokumentation trennt deshalb drei Schadenebenen: aktuell ereignisbedingte Sc
 ## Quellen und weiterführende Hinweise
 
 1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-2. DIN 18533:2017-07, Abdichtung von erdberührten Bauteilen bei Bauwerken, Beuth Verlag, https://www.beuth.de/de/norm/din-18533-1/270192249
+2. DIN 18533-1:2017-07, Abdichtung von erdberührten Bauteilen – Teil 1: Anforderungen, Planungs- und Ausführungsgrundsätze, DIN Media, https://www.dinmedia.de/de/norm/din-18533-1/270192249
 3. DWA-M 382, Kleinkläranlagen und Grundstücksentwässerung – Rückstausicherung, Deutsche Vereinigung für Wasserwirtschaft, Abwasser und Abfall, https://www.dwa.de/dwa/
-4. GDV, Elementarschadenfibel für Gebäudeversicherungen, Gesamtverband der Deutschen Versicherungswirtschaft, https://www.gdv.de/gdv/themen/naturgefahren/elementarschaeden
+4. GDV, Naturgefahren und Elementarschäden (Themenbereich), Gesamtverband der Deutschen Versicherungswirtschaft, https://www.gdv.de/gdv/themen/naturgefahren
 5. BBK, Hochwasserschutzfibel, Bundesamt für Bevölkerungsschutz und Katastrophenhilfe, https://www.bbk.bund.de/DE/Themen/Risikomanagement/Baulicher-Bevoelkerungsschutz/Objektschutz-und-bauliche-Vorsorge/Hochwasserschutzfibel/hochwasserschutzfibel_node.html
