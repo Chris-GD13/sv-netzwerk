@@ -86,8 +86,8 @@ Komplexe Schadenfälle profitieren dann von einem interdisziplinären Sachverst�
 
 ## Quellen und weiterführende Hinweise
 
-1. DGUV Fachbereich Bauwesen, Sachgebiet Hochbau, Deutsche Gesetzliche Unfallversicherung, https://www.dguv.de/fb-bauwesen/sachgebiete/hochbau/index.jsp
-2. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-3. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
-4. Verordnung über Arbeitsstätten (ArbStättV), § 4 Instandhaltung und Reinigung von Arbeitsstätten, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/arbst_ttv_2004/__4.html
-5. Umweltbundesamt, Starkregen, https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen
+1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+2. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
+3. Zivilprozessordnung (ZPO), § 402 Anwendung der Vorschriften für Zeugen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/zpo/__402.html
+4. Zivilprozessordnung (ZPO), § 404 Auswahl der Sachverständigen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/zpo/__404.html
+5. Versicherungsvertragsgesetz (VVG), § 81 Herbeiführung des Versicherungsfalles, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__81.html
