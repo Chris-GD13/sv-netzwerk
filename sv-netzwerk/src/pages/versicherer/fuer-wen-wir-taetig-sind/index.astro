@@ -4,21 +4,28 @@ import { insurerClients } from '../../../data/insurer-clients';
 ---
 
 <BaseLayout
-  title="Versichererübersicht | SV-Netzwerk"
-  description="Übersicht der Versicherer, die bei der operativen Schadenregulierung auf das SV-Netzwerk setzen."
-  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Für Versicherer', href: '/versicherer/' }, { label: 'Versichererübersicht' }]}
+  title="Sachverständige und Schadenregulierung für Versicherer | SV-Netzwerk"
+  description="Das SV-Netzwerk unterstützt Versicherer bundesweit bei Gebäude-, Sach-, Groß- und Komplexschäden – von der Erstaufnahme bis zur KVA-, Nachtrags- und Rechnungsprüfung."
+  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Für Versicherer', href: '/versicherer/' }, { label: 'Für wen wir tätig sind' }]}
 >
   <section class="sv-section">
     <div class="sv-container intro">
-      <h1>Versichererübersicht</h1>
-      <p class="sv-lead">Wir unterstützen Versicherer in der operativen Schadenregulierung.</p>
-      <p class="intro-partner-label">Direkt und über:</p>
+      <p class="sv-eyebrow">Für Versicherer und Regulierungsorganisationen</p>
+      <h1>Sachverständige und Schadenregulierung für Versicherer</h1>
+      <p class="sv-lead">Das SV-Netzwerk unterstützt Versicherer bei der technischen und wirtschaftlichen Bearbeitung von Gebäude-, Sach-, Groß- und Komplexschäden. Im Mittelpunkt stehen belastbare Feststellungen, nachvollziehbare Entscheidungen und eine durchgehend prüffähige Dokumentation.</p>
+      <p>Die Tätigkeit erfolgt je nach Beauftragung unmittelbar für Versicherer oder mittelbar über Regulierungsunternehmen, Sachverständigenorganisationen und weitere beauftragte Partner. Der konkrete Leistungsumfang richtet sich nach Schadenart, Auftragsziel und erforderlicher Bearbeitungstiefe.</p>
+      <p class="intro-partner-label">Direkte und mittelbare Beauftragungswege bestehen unter anderem über:</p>
       <img class="intro-partner-logo" src="/assets/images/partners/die-regulierer.png" alt="Logo Die Regulierer" width="240" height="80" loading="lazy" />
     </div>
   </section>
 
-  <section class="sv-section">
+  <section class="sv-section sv-section-alt" aria-labelledby="versicherungsumfeld-title">
     <div class="sv-container">
+      <div class="section-copy">
+        <p class="sv-eyebrow">Erfahrung im Versicherungsumfeld</p>
+        <h2 id="versicherungsumfeld-title">Unterschiedliche Auftraggeber, einheitlicher Qualitätsanspruch</h2>
+        <p>Die nachfolgend dargestellten Marken zeigen Versicherungsunternehmen und Organisationen, in deren Schadenumfeld Aufträge bearbeitet wurden. Beauftragungen können unmittelbar oder über zwischengeschaltete Regulierungs- und Partnerunternehmen erfolgen. Die Darstellung begründet keine Aussage über Exklusivität, laufende Rahmenverträge oder eine Empfehlung durch das jeweilige Unternehmen.</p>
+      </div>
       <div class="logo-grid">
         {insurerClients.map((insurer) => (
           <article class="logo-card">
@@ -33,40 +40,90 @@ import { insurerClients } from '../../../data/insurer-clients';
     </div>
   </section>
 
-  <section class="sv-section sv-section-alt">
-    <div class="sv-container instance-grid">
-      <article class="sv-card">
-        <h2>1. Instanz</h2>
-        <ul>
-          <li>Erstaufnahme und technische Schadenabgrenzung</li>
-          <li>Prüffähige Dokumentation und Entscheidungsvorlagen</li>
-          <li>Reserveeinschätzung und priorisierte Fallsteuerung</li>
-        </ul>
+  <section class="sv-section" aria-labelledby="leistungsweg-title">
+    <div class="sv-container">
+      <div class="section-copy">
+        <p class="sv-eyebrow">Bearbeitungstiefe nach Auftrag</p>
+        <h2 id="leistungsweg-title">Von der Erstaufnahme bis zur fachlichen Nachprüfung</h2>
+        <p>Versicherer benötigen nicht in jedem Schadenfall dieselbe Bearbeitungstiefe. Das SV-Netzwerk übernimmt klar abgegrenzte Einzelprüfungen ebenso wie die koordinierte Regulierung im Komplex- und Großschaden. Befund, Ursache, Deckungsprüfung, Maßnahmenbedarf und Kostenfolge werden dabei getrennt dokumentiert.</p>
+      </div>
+      <div class="instance-grid">
+        <article class="sv-card">
+          <h3>Bearbeitung in erster Instanz</h3>
+          <ul>
+            <li>Erstaufnahme und technische Schadenabgrenzung</li>
+            <li>Erfassung von Schadenbild, Ursache, Vorschäden und offenen Prüfpunkten</li>
+            <li>Prüffähige Dokumentation und belastbare Entscheidungsvorlagen</li>
+            <li>Reserveeinschätzung, Maßnahmensteuerung und dokumentierte Freigaben</li>
+            <li>Begleitung von Rückbau, Trocknung, Sanierung und Wiederherstellung</li>
+          </ul>
+        </article>
+        <article class="sv-card">
+          <h3>Fachliche Prüfung in zweiter Instanz</h3>
+          <ul>
+            <li>Nachprüfung bestehender Vorgänge, Befunde und Bewertungen</li>
+            <li>Plausibilisierung von Kostenvoranschlägen, Rechnungen und Nachträgen</li>
+            <li>Abgleich von Mengen, Leistungen, Schadenbezug und Freigabestand</li>
+            <li>Fachliche Stellungnahmen bei strittigen Schadenpositionen</li>
+            <li>Nachvollziehbare Empfehlung zum weiteren Regulierungsweg</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sv-section sv-section-alt" aria-labelledby="schadenarten-title">
+    <div class="sv-container content-grid">
+      <article>
+        <p class="sv-eyebrow">Schadenarten</p>
+        <h2 id="schadenarten-title">Gebäude-, Sach-, Kumul- und Komplexschäden fachübergreifend bearbeiten</h2>
+        <p>Typische Aufträge betreffen Leitungswasser-, Brand-, Sturm-, Hagel-, Starkregen-, Rückstau- und Kontaminationsschäden sowie technisch oder wirtschaftlich komplexe Schadenlagen. Je nach Aufgabenstellung werden spezialisierte Sachverständige, Fachplaner und weitere Prüfer gezielt eingebunden.</p>
+        <p>Bei Kumulereignissen stehen Priorisierung, einheitliche Erstaufnahme und konsistente Entscheidungskriterien im Vordergrund. In umfangreichen Einzelfällen sichert die Regulierung im Komplex- und Großschaden klare Zuständigkeiten, fortgeschriebene Reserven und dokumentierte Übergaben zwischen allen Beteiligten.</p>
       </article>
-      <article class="sv-card">
-        <h2>2. Instanz</h2>
-        <ul>
-          <li>Nachprüfung bestehender Vorgänge und Bewertungen</li>
-          <li>Plausibilisierung von KVA, Rechnungen und Nachträgen</li>
-          <li>Fachliche Stellungnahmen bei strittigen Schadenpositionen</li>
-        </ul>
+      <article>
+        <p class="sv-eyebrow">Prüffähigkeit</p>
+        <h2>Technische Feststellung und Kostenprüfung zusammenführen</h2>
+        <p>Eine belastbare Regulierung endet nicht mit der Besichtigung. Angebote, Nachträge und Rechnungen müssen auf den festgestellten Schadenbereich, die erforderliche Wiederherstellung und bereits erteilte Freigaben zurückgeführt werden können. Deshalb verbindet das SV-Netzwerk technische Befunde mit Mengen-, Leistungs- und Kostenprüfung.</p>
+        <p>Entscheidungen bleiben damit auch zu einem späteren Zeitpunkt nachvollziehbar. Offene Punkte, Vorbehalte, Teilfreigaben und Reserveänderungen werden erkennbar dokumentiert, ohne technische Feststellung und versicherungsrechtliche Entscheidung miteinander zu vermischen.</p>
       </article>
+    </div>
+  </section>
+
+  <section class="sv-section" aria-labelledby="zusammenarbeit-title">
+    <div class="sv-container cooperation sv-card">
+      <div>
+        <p class="sv-eyebrow">Zusammenarbeit</p>
+        <h2 id="zusammenarbeit-title">Strukturierte Bearbeitung mit einem klaren Ansprechpartner</h2>
+        <p>Versicherer erhalten eine zentrale Koordination und zugleich Zugriff auf die jeweils erforderliche Fachkompetenz. Umfang, Berichtstiefe, Kommunikationsweg und Freigabegrenzen werden auftragsbezogen festgelegt. So bleibt die Bearbeitung auch bei mehreren Gewerken, Beteiligten oder Schadenorten steuerbar.</p>
+      </div>
+      <div class="actions">
+        <a class="sv-button sv-button-primary" href="/kontakt/">Zusammenarbeit anfragen</a>
+        <a class="sv-button sv-button-secondary" href="/leistungen/schadenregulierung-fuer-versicherer/">Leistungen für Versicherer</a>
+        <a class="sv-button sv-button-secondary" href="/schaden-melden/">Schaden strukturiert melden</a>
+      </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .intro h1{margin:0}
-  .intro .sv-lead{max-width:72ch}
-  .intro-partner-label{margin:.85rem 0 .45rem;font-weight:850;color:var(--sv-color-text)}
+  .intro{max-width:70rem}
+  .intro h1{margin:0 0 var(--sv-space-4)}
+  .intro .sv-lead{max-width:68ch}
+  .intro>p:not(.sv-eyebrow):not(.sv-lead):not(.intro-partner-label){max-width:78ch}
+  .intro-partner-label{margin:1.15rem 0 .45rem;font-weight:850;color:var(--sv-color-text)}
   .intro-partner-logo{display:block;max-width:min(100%,15rem);max-height:4rem;width:auto;height:auto;object-fit:contain}
+  .section-copy{max-width:76ch;margin-bottom:var(--sv-space-6)}
   .logo-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sv-space-4)}
   .logo-card{display:grid;place-items:center;min-height:6rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-lg);background:rgba(255,255,255,.78);text-align:center}
   .logo-card span{font-weight:850;font-size:.9rem}
   .logo-card img{max-width:min(100%,15rem);max-height:3.1rem;width:auto;height:auto;object-fit:contain}
-  .instance-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sv-space-5)}
+  .instance-grid,.content-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sv-space-5)}
   .instance-grid .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}
   .instance-grid ul{display:grid;gap:.6rem;margin:0;padding-left:1.2rem}
-  @media(max-width:72rem){.logo-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-  @media(max-width:50rem){.logo-grid,.instance-grid{grid-template-columns:1fr}}
+  .content-grid article{min-width:0}
+  .cooperation{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(18rem,.65fr);align-items:center;gap:var(--sv-space-6);padding:clamp(1.4rem,3vw,2.5rem)}
+  .cooperation p{max-width:68ch}
+  .actions{display:grid;gap:.75rem}
+  @media(max-width:72rem){.logo-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.cooperation{grid-template-columns:1fr}}
+  @media(max-width:50rem){.logo-grid,.instance-grid,.content-grid{grid-template-columns:1fr}}
 </style>
