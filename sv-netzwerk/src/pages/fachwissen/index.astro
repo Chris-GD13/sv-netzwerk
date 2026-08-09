@@ -15,10 +15,16 @@ const totalPages = Math.ceil(sortedLibrary.length / PAGE_SIZE);
   <section class="sv-section knowledge-index">
     <div class="sv-container">
       <h1>Fachwissen zu Bau-, Versicherungs- und Großschäden</h1>
-      <LibraryFilters />
-      <AlphabeticalNavigation items={sortedLibrary} />
-      <LibraryGrid items={pageItems} />
-      <Pagination currentPage={1} totalPages={totalPages} />
+      <div class="knowledge-layout">
+        <div class="knowledge-tools">
+          <LibraryFilters />
+          <AlphabeticalNavigation items={sortedLibrary} />
+        </div>
+        <div class="knowledge-results">
+          <LibraryGrid items={pageItems} />
+          <Pagination currentPage={1} totalPages={totalPages} />
+        </div>
+      </div>
     </div>
   </section>
   <section class="sv-section sv-section-alt" id="normen-rechtsprechung" aria-labelledby="normen-title">
@@ -35,5 +41,11 @@ const totalPages = Math.ceil(sortedLibrary.length / PAGE_SIZE);
 
 <style>
   .knowledge-index{padding-top:clamp(1.5rem,4vw,3rem)}
-  .knowledge-index h1{margin:0 0 .9rem}
+  .knowledge-index h1{margin:0 0 .9rem;overflow-wrap:anywhere}
+  .knowledge-layout,.knowledge-tools,.knowledge-results{min-width:0}
+  @media(max-width:42rem){
+    .knowledge-layout{display:flex;flex-direction:column}
+    .knowledge-results{order:1}
+    .knowledge-tools{order:2;margin-top:2rem}
+  }
 </style>
