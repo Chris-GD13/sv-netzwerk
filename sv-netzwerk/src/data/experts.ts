@@ -22,7 +22,7 @@ export const experts: ExpertProfile[] = [
     regions: ['Bundesweit nach Aufgabenstellung'], qualifications: ['Sachverständiger im Tischlerhandwerk'],
     certifications: ['Öffentlich bestellt und vereidigt', 'Vorstandsmitglied im BVS'],
     shortProfile: 'Öffentlich bestellter und vereidigter Sachverständiger im Tischlerhandwerk. Schwerpunkte sind Fenster, Türen, Fassaden, Wertermittlung, Schlagregen- und Luftdichtheitsprüfung sowie Gebäudeanalytik mittels Wärmebildtechnik.',
-    contact: { ...centralContact, phone: '02392‑6592751' }, linkedin: 'https://www.linkedin.com/in/marc-schuett-tischlersv/', image: '/assets/images/team/marc-schuett.jpg', status: 'active', tags: ['Tischlerhandwerk', 'Fenster', 'Fassade'], publications: [], practiceCases: [], articles: [],
+    contact: { ...centralContact, phone: '02392‑6592751' }, linkedin: 'https://www.linkedin.com/in/marc-schuett-tischlersv/', image: '/assets/images/team/marc-schuett-aktuell-bw.webp', status: 'active', tags: ['Tischlerhandwerk', 'Fenster', 'Fassade'], publications: [], practiceCases: [], articles: [],
     company: {
       name: 'Sachverständigenbüro Marc Schütt e.K.',
       description: 'Marc Schütt ist Inhaber des Sachverständigenbüros Marc Schütt e.K. mit Sitz in Werdohl. Das Büro ist insbesondere auf Fenster, Türen, Fassaden, Wintergärten, Tischlerhandwerk sowie private und gerichtliche Gutachten spezialisiert.',
