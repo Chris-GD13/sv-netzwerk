@@ -264,10 +264,10 @@ export const library: LibraryItem[] = [
   },
   {
     title: 'Kumulschäden nach Hochwasser und Überflutung – Priorisierung, Sofortmaßnahmen und strukturierte Regulierung',
-    description: 'Praxisleitfaden für Versicherer, Sachverständige und Schadenregulierer zur strukturierten Bearbeitung vieler Einzelschäden in einer regionalen Kumullage.',
+    description: 'Praxisleitfaden für Versicherer, Sachverständige und Schadenregulierer zur strukturierten Bearbeitung vieler Einzelschäden in einer regionalen Kumullage: Priorisierung, Beweissicherung, Kontaminationsbewertung und Teilfreigaben.',
     href: '/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/',
     category: 'Hochwasser und Überflutung',
-    tags: ['Kumulschaden', 'Hochwasser', 'Überflutung', 'Kumulschadenmanagement'],
+    tags: ['Kumulschaden', 'Hochwasser', 'Überflutung', 'Kumulschadenmanagement', 'Schadenregulierung'],
     date: '2026-07-20',
     type: 'article',
     featured: false,
