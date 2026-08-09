@@ -1,0 +1,28 @@
+---
+const audiences = [
+  { title: 'Versicherer und Versicherungsmakler', text: 'Technische Schadenfeststellung, Kostenprüfung und koordinierte Regulierung mit prüffähiger Dokumentation.', href: '/versicherer/fuer-wen-wir-taetig-sind/' },
+  { title: 'Unternehmen und Immobilienwirtschaft', text: 'Unabhängige Bearbeitung von Gebäude-, Betriebs- und komplexen Sachschäden – einschließlich Prüfung abweichender Versichererbewertungen.', href: '/auftraggeber/unternehmen-immobilienwirtschaft/' },
+  { title: 'Kommunen und öffentliche Auftraggeber', text: 'Beweissicherung und belastbare Entscheidungsgrundlagen für kommunale Gebäude, Einrichtungen und Infrastruktur.', href: '/auftraggeber/kommunen-oeffentliche-hand/' },
+  { title: 'Private Eigentümer und Bauherren', text: 'Unabhängige Ursachen-, Maßnahmen- und Kostenprüfung – auch wenn die Regulierung nicht dem dokumentierten Schadenbild entspricht.', href: '/auftraggeber/private-eigentuemer/' },
+];
+---
+<section class="v4-section audience-section" aria-labelledby="audience-title">
+  <div class="v4-shell">
+    <div class="v4-section-head">
+      <div><p class="v4-kicker"><span></span>Für wen wir tätig sind</p><h2 id="audience-title">Vier Auftraggebergruppen.<br/>Ein unabhängiger Qualitätsanspruch.</h2></div>
+      <p>Leistungsumfang, Bearbeitungstiefe und Dokumentation richten sich nach dem konkreten Prüfauftrag – nicht nach einer pauschalen Standardlösung.</p>
+    </div>
+    <div class="audience-grid">
+      {audiences.map((audience, index) => (
+        <article class="audience-card"><span>{String(index + 1).padStart(2, '0')}</span><h3>{audience.title}</h3><p>{audience.text}</p><a href={audience.href}>Leistungen ansehen <span aria-hidden="true">→</span></a></article>
+      ))}
+    </div>
+  </div>
+</section>
+<style>
+  .audience-section{background:rgba(255,255,255,.36)}
+  .audience-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+  .audience-card{display:flex;min-width:0;flex-direction:column;padding:clamp(1.15rem,2.2vw,1.7rem);border:1px solid var(--v4-line);border-radius:1.1rem;background:rgba(255,255,255,.76)}
+  .audience-card>span{color:#0d4f73;font-size:.72rem;font-weight:900;letter-spacing:.12em}.audience-card h3{margin:.8rem 0 .55rem;font-size:clamp(1.05rem,1.6vw,1.3rem)}.audience-card p{margin:0 0 1rem;color:#3f5c6f}.audience-card a{margin-top:auto;color:#0d4f73;font-weight:850;text-decoration:none}
+  @media(max-width:68rem){.audience-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:40rem){.audience-grid{grid-template-columns:1fr}}
+</style>
