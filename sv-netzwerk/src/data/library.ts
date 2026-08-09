@@ -435,10 +435,10 @@ export const library: LibraryItem[] = [
   },
   {
     title: 'Schadenregulierer für Versicherungen: Technische Prüfung und strukturierte Schadensteuerung',
-    description: 'Welche Aufgaben ein Schadenregulierer für Versicherungen übernimmt: von der Erstbesichtigung über Kostenfreigaben bis zur Schlussrechnungsprüfung.',
+    description: 'Welche Aufgaben ein Schadenregulierer für Versicherungen übernimmt, wie technische Prüfung, Kostenfreigaben und Dokumentation strukturiert ablaufen und wo die Fachgrenzen zur versicherungsrechtlichen Deckungsentscheidung liegen.',
     href: '/fachwissen/schadenregulierer-versicherungen-technische-pruefung-schadensteuerung/',
     category: 'Schadenregulierung',
-    tags: ['Schadenregulierung', 'Schadenregulierer', 'Kostenfreigabe'],
+    tags: ['Schadenregulierung', 'Schadenregulierer', 'Kostenfreigabe', 'Prüffähige Dokumentation'],
     date: '2026-07-27',
     type: 'article',
   },
