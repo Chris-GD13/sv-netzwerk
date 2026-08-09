@@ -13,6 +13,26 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Elektrische Brandursachen: Lichtbogen, Kurzschluss und thermische Überlastung beweissicher unterscheiden',
+    description: 'Elektrische Brandursachen lassen sich nur dann belastbar bewerten, wenn Primärbefund, Sekundärschäden, Sicherung der Bauteile und elektrotechnische Fachgrenzen konsequent getrennt werden.',
+    href: '/fachwissen/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung/',
+    category: 'Brand und Kontamination',
+    tags: ['Brandursache', 'Lichtbogen', 'Kurzschluss', 'Beweissicherung', 'Elektrotechnik', 'Regress'],
+    date: '2026-08-10',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Überflutungsschäden am Gebäude: Oberflächenwasser, Grundwasser und Rückstau fachlich trennen',
+    description: 'Überflutungsschäden werden nur dann belastbar bewertet, wenn Oberflächenwasser, Grundwasser und Rückstau als eigenständige Wasserwege technisch und versicherungstechnisch getrennt dokumentiert werden.',
+    href: '/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/',
+    category: 'Hochwasser und Überflutung',
+    tags: ['Überflutungsschaden', 'Oberflächenwasser', 'Grundwasser', 'Rückstau', 'Schadenabgrenzung', 'Dokumentation'],
+    date: '2026-08-09',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Schneedruck und Winterschäden: Dächer fachlich prüfen, Risiken sauber abgrenzen',
     description: 'Wie Schneedruck-, Eis- und Frostschäden an Dächern fachlich eingeordnet, dokumentiert und ohne vorschnelle Deckungsannahmen geprüft werden.',
     href: '/fachwissen/schneedruck-winterschaeden-bewertung-regulierung/',
@@ -313,12 +333,6 @@ export const library: LibraryItem[] = [
   },
 ];
 
-export const categories = [...new Set(library.map((item) => item.category))]
-  .sort((a, b) => a.localeCompare(b, 'de'));
-
-export const tags = [...new Set(library.flatMap((item) => item.tags))]
-  .sort((a, b) => a.localeCompare(b, 'de'));
-
 export const PAGE_SIZE = 6;
 
 export const slugify = (value: string) => value
@@ -335,4 +349,11 @@ export const formatDate = (value: string) => new Intl.DateTimeFormat('de-DE', {
   year: 'numeric',
 }).format(new Date(`${value}T12:00:00`));
 
-export const sortedLibrary = [...library].sort((a, b) => b.date.localeCompare(a.date));
+import { filterPublishedLibraryItems } from '../utils/publication';
+
+export const sortedLibrary = filterPublishedLibraryItems([...library]).sort((a, b) => b.date.localeCompare(a.date));
+export const categories = [...new Set(sortedLibrary.map((item) => item.category))]
+  .sort((a, b) => a.localeCompare(b, 'de'));
+
+export const tags = [...new Set(sortedLibrary.flatMap((item) => item.tags))]
+  .sort((a, b) => a.localeCompare(b, 'de'));
