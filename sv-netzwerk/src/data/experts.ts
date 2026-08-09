@@ -22,7 +22,7 @@ export const experts: ExpertProfile[] = [
     regions: ['Bundesweit nach Aufgabenstellung'], qualifications: ['Sachverständiger im Tischlerhandwerk'],
     certifications: ['Öffentlich bestellt und vereidigt', 'Vorstandsmitglied im BVS'],
     shortProfile: 'Öffentlich bestellter und vereidigter Sachverständiger im Tischlerhandwerk. Schwerpunkte sind Fenster, Türen, Fassaden, Wertermittlung, Schlagregen- und Luftdichtheitsprüfung sowie Gebäudeanalytik mittels Wärmebildtechnik.',
-    contact: { ...centralContact, phone: '02392‑6592751' }, linkedin: 'https://www.linkedin.com/in/marc-schuett-tischlersv/', image: '/assets/images/team/marc-schuett.jpg', status: 'active', tags: ['Tischlerhandwerk', 'Fenster', 'Fassade'], publications: [], practiceCases: [], articles: [],
+    contact: { ...centralContact, phone: '02392‑6592751' }, linkedin: 'https://www.linkedin.com/in/marc-schuett-tischlersv/', image: '/assets/images/team/marc-schuett-aktuell-bw.webp', status: 'active', tags: ['Tischlerhandwerk', 'Fenster', 'Fassade'], publications: [], practiceCases: [], articles: [],
     company: {
       name: 'Sachverständigenbüro Marc Schütt e.K.',
       description: 'Marc Schütt ist Inhaber des Sachverständigenbüros Marc Schütt e.K. mit Sitz in Werdohl. Das Büro ist insbesondere auf Fenster, Türen, Fassaden, Wintergärten, Tischlerhandwerk sowie private und gerichtliche Gutachten spezialisiert.',
@@ -37,7 +37,7 @@ export const experts: ExpertProfile[] = [
     regions: ['Bundesweit nach Aufgabenstellung'], qualifications: ['Sachschadenbewertung von Immobilien'],
     certifications: ['Personenzertifizierung nach DIN EN ISO/IEC 17024', 'Vorstandsmitglied im BSS'],
     shortProfile: 'Sachverständige für Sachschadenbewertungen von Immobilien. Ihre Schwerpunkte sind Schadenregulierung, Sachschadenermittlung, Schimmelpilze, Feuchteprobleme, Innenraumschadstoffe und Ölschäden.',
-    contact: centralContact, linkedin: 'https://www.linkedin.com/in/carmen-gohl-34364324a/', image: '/assets/images/team/carmen-gohl.jpg', status: 'active', tags: ['Sachschadenbewertung', 'Schimmelpilze', 'Innenraumschadstoffe'], publications: [], practiceCases: ['/praxisfaelle/schimmel-dachbereich-ursachenabgrenzung/'], articles: [],
+    contact: centralContact, linkedin: 'https://www.linkedin.com/in/carmen-gohl-34364324a/', image: '/assets/images/team/carmen-gohl-aktuell-bw.webp', status: 'active', tags: ['Sachschadenbewertung', 'Schimmelpilze', 'Innenraumschadstoffe'], publications: [], practiceCases: ['/praxisfaelle/schimmel-dachbereich-ursachenabgrenzung/'], articles: [],
     company: {
       name: 'Sachverständigenbüro Carmen Gohl',
       description: 'Carmen Gohl betreibt ein eigenständiges Sachverständigenbüro mit den Schwerpunkten Sachschadenbewertungen von Immobilien, Versicherungswertermittlungen, Schimmelpilze, Innenraumschadstoffe sowie Ölschäden.',
@@ -65,7 +65,7 @@ export const experts: ExpertProfile[] = [
     expertise: ['Baucontrolling', 'Gebäudeschäden', 'Nachtragsprüfung', 'Terminmanagement', 'SiGeKo', 'Sanierungsberatung'],
     regions: ['Bundesweit nach Aufgabenstellung'], qualifications: ['Master of Engineering', 'Bauingenieurin', 'Bauschadenbewertung'], certifications: ['DEKRA-zertifizierte Sachverständige'],
     shortProfile: 'Spezialistin für Baucontrolling, Gebäudeschäden, Sanierungsberatung, Nachtragsprüfung, Terminmanagement, SiGeKo und zerstörungsfreie Messtechnik.',
-    contact: centralContact, linkedin: 'https://www.linkedin.com/in/lenna-maria-walczok-6bb468291/', image: '/assets/images/team/lenna-maria-walczok.jpg', status: 'active', tags: ['Baucontrolling', 'Gebäudeschäden', 'Nachtragsprüfung'], publications: [], practiceCases: [], articles: [],
+    contact: centralContact, linkedin: 'https://www.linkedin.com/in/lenna-maria-walczok-6bb468291/', image: '/assets/images/team/lenna-maria-walczok-aktuell-bw.webp', status: 'active', tags: ['Baucontrolling', 'Gebäudeschäden', 'Nachtragsprüfung'], publications: [], practiceCases: [], articles: [],
     company: {
       name: 'Netzwerkprofil Lenna Maria Walczok',
       description: 'Weiterführendes Profil von Lenna Maria Walczok im BNI Chapter Weisser Turm Bad Homburg.',
@@ -87,7 +87,7 @@ export const experts: ExpertProfile[] = [
     expertise: ['Projektkoordination', 'Unternehmensmanagement', 'Mandantenbetreuung', 'Dokumentenmanagement', 'Qualitätssicherung', 'Prozesssteuerung'],
     regions: ['Aalen'], qualifications: [], certifications: [],
     shortProfile: 'Susanne Wächter leitet das Backoffice Aalen und ist zentrale Ansprechpartnerin für Versicherer, Geschädigte, Verwaltungen und Partnerfirmen bei organisatorischen Fragen sowie zur Koordination und Weiterleitung an den zuständigen Sachverständigen oder Regulierer, bei Terminvereinbarungen, Beauftragungen und der Abstimmung mit den Sachverständigen und Regulierern.',
-    contact: centralContact, image: '/assets/images/team/susanne-waechter.jpeg', status: 'active', tags: ['Organisation', 'Unternehmensmanagement', 'Qualitätssicherung'], publications: [], practiceCases: [], articles: [],
+    contact: centralContact, image: '/assets/images/team/susanne-waechter-buero.webp', status: 'active', tags: ['Organisation', 'Unternehmensmanagement', 'Qualitätssicherung'], publications: [], practiceCases: [], articles: [],
   },
   {
     id: 'backoffice-katja-schaefer', slug: 'katja-schaefer', name: 'Katja Schäfer', role: 'Backoffice', group: 'backoffice',
@@ -95,7 +95,7 @@ export const experts: ExpertProfile[] = [
     expertise: ['Buchhaltung', 'Terminkoordination', 'Nachkalkulationen', 'Administrative Projektbegleitung', 'Strukturierte Abläufe', 'Interne Unterstützung'],
     regions: ['Werdohl'], qualifications: [], certifications: [],
     shortProfile: 'Katja Schäfer leitet das Backoffice Werdohl und verantwortet dort Buchhaltung, Terminkoordination, Nachkalkulationen und die administrative Begleitung laufender Projekte.',
-    contact: centralContact, image: '/assets/images/team/katja-schaefer.jpeg', status: 'active', tags: ['Buchhaltung', 'Terminkoordination', 'Projektassistenz'], publications: [], practiceCases: [], articles: [],
+    contact: centralContact, image: '/assets/images/team/katja-schaefer-buero.webp', status: 'active', tags: ['Buchhaltung', 'Terminkoordination', 'Projektassistenz'], publications: [], practiceCases: [], articles: [],
   },
 ];
 
