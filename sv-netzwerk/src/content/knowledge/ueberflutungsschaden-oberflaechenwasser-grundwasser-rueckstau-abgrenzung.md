@@ -1,15 +1,15 @@
 ---
-title: "?berflutungssch?den am Geb?ude: Oberfl?chenwasser, Grundwasser und R?ckstau fachlich trennen"
-description: "?berflutungssch?den werden nur dann belastbar bewertet, wenn Oberfl?chenwasser, Grundwasser und R?ckstau als eigenst?ndige Wasserwege technisch und versicherungstechnisch getrennt dokumentiert werden."
-category: "Hochwasser und ?berflutung"
-tags: ["?berflutungsschaden", "Oberfl?chenwasser", "Grundwasser", "R?ckstau", "Schadenabgrenzung", "Dokumentation"]
+title: "Überflutungsschäden am Gebäude: Oberflächenwasser, Grundwasser und Rückstau fachlich trennen"
+description: "Überflutungsschäden werden nur dann belastbar bewertet, wenn Oberflächenwasser, Grundwasser und Rückstau als eigenständige Wasserwege technisch und versicherungstechnisch getrennt dokumentiert werden."
+category: "Hochwasser und Überflutung"
+tags: ["Überflutungsschaden", "Oberflächenwasser", "Grundwasser", "Rückstau", "Schadenabgrenzung", "Dokumentation"]
 author: "christian-waechter"
 featured: false
 dailyStandard: false
 contentLevel: "B"
-teaser: "?berflutungssch?den werden nur dann belastbar bewertet, wenn Oberfl?chenwasser, Grundwasser und R?ckstau als eigenst?ndige Wasserwege technisch und versicherungstechnisch getrennt dokumentiert werden."
-linkedinSummary: "?berflutungssch?den am Geb?ude verlangen eine saubere Trennung von Wasserweg, Vorzustand, Eintrittsweg und Schadenbereich."
-videoScript: "?berflutungssch?den m?ssen nach Wasserweg, Eintritts?ffnung, Wasserstand und konkurrierender Ursache getrennt dokumentiert werden."
+teaser: "Überflutungsschäden werden nur dann belastbar bewertet, wenn Oberflächenwasser, Grundwasser und Rückstau als eigenständige Wasserwege technisch und versicherungstechnisch getrennt dokumentiert werden."
+linkedinSummary: "Überflutungsschäden am Gebäude verlangen eine saubere Trennung von Wasserweg, Vorzustand, Eintrittsweg und Schadenbereich."
+videoScript: "Überflutungsschäden müssen nach Wasserweg, Eintrittswegen, Wasserstand und konkurrierender Ursache getrennt dokumentiert werden."
 cta:
   label: "Schaden strukturiert melden"
   href: "/schaden-melden/"
@@ -19,59 +19,190 @@ publication:
   publishedAt: 2026-08-09
   status: published
 seo:
-  title: "Überflutungsschäden fachlich sauber abgrenzen | SV-Netzwerk"
-  description: "So werden Oberflächenwasser, Grundwasser und Rückstau technisch sauber getrennt und belastbar dokumentiert."
+  title: "Überflutungsschäden am Gebäude fachlich prüfen und abgrenzen"
+  description: "Oberflächenwasser, Grundwasser und Rückstau als Ursachen von Überflutungsschäden technisch und versicherungstechnisch sauber trennen."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/"
   noindex: false
 ---
 
-?berflutungssch?den an Geb?uden wirken auf den ersten Blick oft gleichf?rmig: Wasser steht im Keller, Bodenaufbauten sind durchfeuchtet und Wandfl?chen zeigen Feuchte- oder Schmutzlinien. F?r die fachliche Pr?fung reicht dieses Oberfl?chenbild jedoch nicht aus. Die belastbare Einordnung beginnt erst dort, wo Wasserweg, Eintrittsstelle, Einwirkdauer und baulicher Vorzustand getrennt erfasst werden.
+Überflutungsschäden an Gebäuden wirken auf den ersten Blick oft eindeutig: Wasser ist eingedrungen, Böden sind durchnässt, Wände zeigen Feuchteflecken. Für die fachliche Prüfung reicht dieses Bild jedoch nicht aus. Belastbar wird die Einordnung erst dann, wenn der tatsächliche Wasserweg — Oberflächenwasser, Grundwasser, Sickerwasser oder Rückstau — technisch und versicherungstechnisch sauber getrennt dokumentiert ist.
 
-Gerade bei gemischten Schadenlagen k?nnen Oberfl?chenwasser, aufstauendes Sickerwasser, dr?ckendes Grundwasser und R?ckstau aus der Geb?udeentw?sserung ?hnliche Durchfeuchtungsbilder erzeugen. Wer diese Einwirkungsarten vorschnell gleichsetzt, vermischt technische Ursache, versicherungsrechtliche Einordnung und erforderliche Sanierungsma?nahmen.
+## Fachliche Einordnung des Schadenbilds
 
-## Fachliche Einordnung
+Überflutungsschäden entstehen, wenn Wasser aus einer äußeren Quelle unkontrolliert in das Gebäude eindringt. Die häufigsten Ursachen sind Starkregen mit oberirdischem Zufluss, Grundwasseranstieg, Sickerwasserdruck gegen erdberührte Bauteile und Rückstau aus überlasteten öffentlichen Entwässerungsanlagen.
 
-?berflutungssch?den im versicherungstechnischen Alltag verlangen eine strikte Trennung zwischen dem naturbedingten Wassereintrag von au?en und wassertechnischen Vorg?ngen innerhalb oder unterhalb des Geb?udes. Oberfl?chenwasser gelangt typischerweise ?ber Lichtsch?chte, T?ren, bodentiefe Fenster, Kellerabg?nge oder tiefliegende L?ftungs?ffnungen in das Objekt. Grundwasserbezogene Sch?den zeigen sich dagegen h?ufiger als fl?chige Feuchtebelastung von Bodenplatten, Arbeitsfugen und erdber?hrten W?nden, ohne dass eine punktf?rmige Eintritts?ffnung im aufgehenden Mauerwerk nachweisbar sein muss. R?ckstau ist wiederum an Entw?sserungseinrichtungen wie Bodenabl?ufen, Hebeanlagen, Sanit?robjekten oder Revisions?ffnungen zu pr?fen.
+Diese Wasserwege folgen unterschiedlichen physikalischen Gesetzmäßigkeiten und hinterlassen unterschiedliche Schadenspuren. Deshalb ist die Frage nach dem Wasserweg nicht nur technisch, sondern auch für die versicherungsrechtliche Einordnung grundlegend: Verschiedene Klauseln einer Gebäudeversicherung können unterschiedliche Deckungsregelungen für Hochwasser, Rückstau oder aufsteigendes Grundwasser enthalten.
 
-F?r die technische Erstbewertung ist deshalb nicht nur ma?geblich, wo Wasser sichtbar wurde, sondern auf welchem Weg es in das Geb?ude gelangt ist. Dazu geh?ren Gel?ndeverlauf, H?henlage der ?ffnungen, Zustand der Entw?sserung, R?ckstausicherung, Schacht- und Kanalanschl?sse sowie zeitliche Abl?ufe w?hrend des Ereignisses.
+## Klare Trennung: Oberflächenwasser, Grundwasser, Sickerwasser und Rückstau
 
-## Typische Schadenbilder und konkurrierende Ursachen
+### Oberflächenwasser
 
-Frische Schlammspuren, Treibgut, eingedr?ckte Lichtschachtabdeckungen oder umlagerte Au?enfl?chen sprechen eher f?r Oberfl?chenwasser. Dunkle Feuchtezonen ohne klaren Eintragspfad, fl?chige Durchfeuchtung unter Estrich oder Wasserandrang an Fugen und Wandanschl?ssen k?nnen auf Grund- oder Schichtenwasser hindeuten. R?ckstausch?den sind h?ufig mit austretendem Abwasser an tiefliegenden Entw?sserungspunkten, belasteten Geruchsverschl?ssen oder ?bertritten ?ber Sanit?robjekte verbunden.
+Oberflächenwasser fließt bei Starkregen oder Hochwasser oberirdisch über befestigte und unbefestigte Flächen und tritt durch Türen, Fenster, Lichtschächte, Kellertreppen oder nicht ausreichend abgedichtete Wanddurchführungen in das Gebäude ein. Es hinterlässt typischerweise Eintrittslinien auf Höhe der Geländeoberkante oder des Wasserpegelstands.
 
-Konkurrierende Ursachen d?rfen nicht ?bergangen werden. Fehlende Wartung von R?ckstauverschl?ssen, mangelhafte Lichtschachtentw?sserung, offene Durchdringungen, bekannte Feuchtevorbelastungen oder l?nger bestehende Abdichtungsm?ngel k?nnen den Schadenumfang beeinflussen, ohne den Ereignisbezug zwingend auszuschlie?en. Technische und versicherungsrechtliche Bewertung bleiben deshalb getrennte Arbeitsschritte.
+### Grundwasser
 
-## Pr?ffragen und beweissichere Dokumentation
+Grundwasser steigt bei lang anhaltendem Niederschlag oder Hochwasser in der Fläche an und baut einen hydrostatischen Druck gegen erdberührte Bauteile auf. Kellerwände und Bodenflächen können bei nicht ausreichend bemessener Kellerabdichtung von innen druckbelastet werden. Schadenspuren zeigen sich oft flächig und symmetrisch, unabhängig von Eintrittswegen auf Geländeniveau.
 
-Pr?ff?hig wird der Fall erst, wenn Gel?ndegef?lle, Wasserstandsspuren, Einlaufh?hen, ?ffnungsma?e und betroffene Bauteile mit Lagebezug dokumentiert sind. Ben?tigt werden ?bersichtsaufnahmen vom Au?enbereich, Detailaufnahmen der Eintrittsstellen, Innenaufnahmen mit Feuchte- und Schmutzgrenzen sowie eine Zeitschiene zu Erstfeststellung, Wasseranstieg, Sicherungsma?nahmen und Abpumpen.
+### Sickerwasser
 
-Zus?tzlich sind R?ckstauebene, Entw?sserungsplan, Zustand vorhandener Hebeanlagen oder R?ckstauverschl?sse, bekannte Dr?n- oder Abdichtungssysteme und der Vorzustand der betroffenen R?ume festzuhalten. Ohne diese Trennung bleibt offen, ob Folgesch?den technisch schadenbedingt oder durch Vorzustand und Nutzungsausfall mitgepr?gt wurden.
+Sickerwasser entsteht aus Niederschlag, der im Erdreich versickert und seitlich gegen Kellerwände drückt, ohne dass der Grundwasserspiegel insgesamt angestiegen ist. Es tritt oft konzentriert an Fugen, Wandanschlüssen oder nicht abgedichteten Rohrdurchführungen auf.
 
-## Sofortma?nahmen, Fachgrenzen und Kostenpr?fung
+### Rückstau
 
-Sofortma?nahmen dienen zun?chst der Gefahrenabwehr, dem Schutz technischer Anlagen und der Begrenzung mikrobieller Folgeprobleme. Dazu z?hlen das Abschalten gef?hrdeter Stromkreise, das Sichern von Heizungs- und Aufzugstechnik, das Entfernen freistehenden Wassers und die schnelle Trennung kontaminierter von nicht kontaminierten Bereichen. Die fachliche Beurteilung von dr?ckendem Wasser, Abdichtungskonzepten oder R?ckstausicherungen kann jedoch die Einbindung von TGA-Fachplanung, Entw?sserungsfachbetrieb, Abdichtungssachverstand oder Bauphysik erforderlich machen.
+Rückstau entsteht, wenn öffentliche oder private Entwässerungsanlagen bei Starkregen überlastet sind und das Wasser drucklos oder druckbehaftet in das Gebäude zurückfließt. Eintrittspunkte sind vor allem Bodenabläufe, Waschmaschinenanschlüsse, Toiletten und andere Anschlüsse unterhalb der Rückstauebene. Rückstau hat in der Regel eine klare Zeitabhängigkeit vom Regenereignis und führt zu charakteristischen Schadenspuren in Kellerräumen, die keinen direkten Wandkontakt mit dem Erdreich haben.
 
-In der Kostenpr?fung sind Notma?nahmen, Wasserentnahme, ?ffnungen, Ausbau, Trocknung und Wiederherstellung sauber zu trennen. Eine vollst?ndige Abdichtungssanierung oder Erneuerung der Geb?udeentw?sserung darf nicht pauschal aus dem Schadenbild abgeleitet werden, wenn zun?chst nur die schadenbedingte Ursache und der lokal erforderliche Sanierungsumfang belegbar sind.
+## Eintrittswege und Rückstauebene
 
-## Praxisbeispiel
+Die Rückstauebene entspricht in der Regel der Höhe der Straßenoberkante oder der Einmündung des Anschlusses in den öffentlichen Kanal. Anschlüsse unterhalb dieser Ebene sind ohne funktionsfähige Rückstausicherung bei Starkregen schutzlos.
 
-Ein fiktives Beispiel: Nach einem Starkregen steht Wasser im Untergeschoss eines Mehrfamilienhauses. Au?en zeigen sich ?bergelaufene Hoffl?chen und eine teilweise verschlammte Kellerau?entreppe. Gleichzeitig wird Wasser aus einem Bodenablauf im Waschkeller gemeldet. In der Erstbewertung w?re es fachlich falsch, daraus sofort nur einen R?ckstauschaden oder nur eine Oberfl?chenwasserlage abzuleiten. Erst die getrennte Dokumentation von Au?ensituation, Schmutz- und Wasserlinien, Ablaufspuren, Zustand des R?ckstauverschlusses und der H?henlage der Keller?ffnungen zeigt, dass sowohl Oberfl?chenwasser ?ber den Kellerabgang als auch r?ckstauender Zulauf ?ber den Bodenablauf zum Gesamtschaden beigetragen haben k?nnen. F?r die Regulierung bedeutet das: Schadenbereiche, Kausalbeitr?ge und erforderliche Ma?nahmen m?ssen getrennt bewertet werden; eine pauschale Deckungs- oder Ablehnungszusage w?re verfr?ht.
+Häufige Eintrittswege bei Überflutungen:
+
+- Kellertüren und -fenster bei Wasserstand über Geländeniveau,
+- Lichtschächte ohne Überflutungsschutz,
+- Kellertreppen ohne Wasserabweisung,
+- undichte Wanddurchführungen für Leitungen,
+- Bodenabläufe und Toiletten unterhalb der Rückstauebene,
+- Fugen zwischen Wand und Bodenplatte bei Grundwasserdruck.
+
+## Typische Befunde und konkurrierende Ursachen
+
+Bei der Erstbesichtigung sind folgende Befunde für die Wasserwegtrennung hilfreich:
+
+- Höhenlage der Feuchte- oder Schadenspuren an Wänden,
+- Gleichmäßigkeit der Durchnässung (flächig bei Grundwasser, punktuell bei Sickerwasser),
+- Eintrittspunkte an Bodenabläufen, Türen oder Lichtschächten,
+- Zeitverlauf des Wassereintritts in Relation zum Niederschlagsereignis,
+- Vorhandensein und Funktionszustand einer Rückstausicherung,
+- Zustand der Kellerabdichtung und bekannte Vorschäden.
+
+Konkurrierende Ursachen, die das Schadensbild mitprägen können, sind insbesondere:
+
+- mangelnde oder veraltete Kellerabdichtung,
+- fehlende oder defekte Rückstausicherung,
+- Eindringen von Oberflächenwasser durch nicht ausreichend gesicherte Zugänge,
+- gleichzeitiges Auftreten mehrerer Wasserwege bei großen Ereignissen.
+
+## Prüffragen für die Erstbewertung
+
+Für eine strukturierte Erstbewertung helfen diese Prüffragen:
+
+### 1. Auf welchem Weg ist das Wasser eingedrungen?
+
+Wo liegen die Eintrittspunkte? Entsprechen die Schadenspuren dem Pegel eines Oberflächenwasserstands, dem Druckbild von Grundwasser oder den Austrittslinien von Rückstau?
+
+### 2. Liegt die Schädigung oberhalb oder unterhalb der Rückstauebene?
+
+Sind die Anschlüsse, an denen Wasser ausgetreten ist, unterhalb des straßenseitigen Niveaus angeordnet? Ist eine Rückstausicherung vorhanden und war sie im Schadensfall funktionsfähig?
+
+### 3. Gibt es Hinweise auf Grundwasserdruckbelastung?
+
+Zeigen Bodenfläche und Kellerwände gleichmäßige Druckfeuchte von außen? Gibt es Hinweise auf einen allgemeinen Grundwasseranstieg im Umfeld?
+
+### 4. War die Kellerabdichtung dem Wasserweg gewachsen?
+
+Entspricht die vorhandene Abdichtung dem für das Gebäude maßgeblichen Wasserangriff? Gibt es Hinweise auf ältere Feuchteschäden oder bekannte Abdichtungsmängel?
+
+### 5. Welche Maßnahmen zur Schadenminderung wurden getroffen?
+
+Wurde das Wasser schnellstmöglich beseitigt? Wurden feuchteempfindliche Güter geborgen? Wurde die Pumpe oder Absaugung eingesetzt?
+
+## Beweissichere Dokumentation
+
+Die Dokumentation bei Überflutungsschäden muss mindestens folgende Punkte abbilden:
+
+- Lage und Zeitpunkt des Ereignisses in Bezug auf das Niederschlagsgeschehen,
+- Wasserstand im Gebäude und im Außenbereich mit Höhenangaben,
+- Eintrittswege mit Fotos und Lageskizzen,
+- Festgestellter Zustand von Rückstausicherung und Kellerabdichtung,
+- Schadenspuren an Wänden, Boden und betroffenen Einbauten,
+- Bereits getroffene Sofortmaßnahmen.
+
+Werden diese Grundlagen nicht dokumentiert, bleiben Fragen nach der Ursache, dem Wasserweg und der Notwendigkeit von Maßnahmen später unnötig angreifbar.
+
+## Sofort- und Schadenminderungsmaßnahmen
+
+Unmittelbar nach dem Ereignis sind folgende Sofortmaßnahmen relevant:
+
+- Beseitigung des eingedrungenen Wassers durch Pumpen oder Absaugen,
+- Bergung feuchteempfindlicher Einrichtungen und Güter,
+- Belüftung und erste Belüftungsmaßnahmen zur Verhinderung von Schimmelbildung,
+- Trockenschutz für empfindliche Bauteile,
+- Prüfung, ob das Gebäude weiterhin sicher nutzbar ist,
+- Sofortdokumentation des Wasserstands und der Eintrittswege.
+
+Nach § 82 VVG ist der Versicherungsnehmer verpflichtet, nach Möglichkeit zur Schadenminderung beizutragen. Welche Maßnahmen im Einzelfall zumutbar und möglich waren, hängt von der konkreten Situation ab.
+
+## Fachgrenzen und notwendige Fachplaner
+
+Ein Sachverständiger kann Schadenspuren aufnehmen, dokumentieren und den Wasserweg eingrenzen. Er ersetzt jedoch nicht automatisch die bautechnische Beurteilung der Kellerabdichtung oder die hydraulische Nachrechnung der Entwässerungsanlage.
+
+Die Einbindung weiterer Fachplaner ist insbesondere dann erforderlich, wenn:
+
+- Ertüchtigung oder Erneuerung der Kellerabdichtung geplant ist,
+- Kapazität und Funktion der Entwässerungsanlage zu beurteilen sind,
+- Schäden an der Gebäudestatik in Verbindung mit Grundwasserdruckbelastung festgestellt wurden,
+- Rückstausicherungen zu prüfen oder neu zu planen sind.
+
+## Versicherungstechnische Einordnung ohne pauschale Deckungsaussage
+
+Technische Feststellung und versicherungsrechtliche Deckungsprüfung sind zu trennen. Aus fachlicher Sicht stellen sich bei Überflutungsschäden häufig diese Fragen:
+
+- Welcher Wasserweg ist technisch belegbar die Hauptursache?
+- Liegt der Schaden innerhalb oder außerhalb versicherter Gebäudebestandteile?
+- War eine funktionsfähige Rückstausicherung vorhanden und dokumentiert?
+- Welche Maßnahmen dienten der unmittelbaren Schadenminderung und welche bereits der Wiederherstellung?
+- Welche Teile der Kosten beruhen auf Vorschäden oder unzureichender Ausführung?
+
+Dieser Beitrag gibt keine pauschale Aussage zur Eintrittspflicht. Sie hängt vom konkreten Vertrag, dem festgestellten Wasserweg und dem Vorzustand ab.
+
+## Kosten- und Sanierungsabgrenzung
+
+Die Kostenprüfung muss sich an dem festgestellten Schadenumfang und dem technisch erforderlichen Sanierungsziel orientieren. Prüffähig sind Positionen nur, wenn erkennbar ist:
+
+- welches Bauteil betroffen ist,
+- warum die Maßnahme technisch erforderlich ist,
+- ob sie der Schadenminderung, Trocknung, Instandsetzung oder Erneuerung dient,
+- welche Teilmengen schadenbedingt und welche nicht schadenbedingt sind.
+
+Gerade bei Sanierungen nach Überflutungen besteht sonst das Risiko, dass Gesamterneuerungen von Bodenbelägen oder Wandverkleidungen mit punktuell schadenbedingten Maßnahmen vermischt werden.
+
+## Praxisbeispiel: Rückstau und Oberflächenwasser im Einfamilienhaus
+
+Ein fiktives, aber realistisches Beispiel: Nach einem sommerlichen Starkregenereignis meldet der Eigentümer eines Einfamilienhauses Wasserschäden im Kellergeschoss. Der Keller ist als Hobbyraum ausgebaut. An der straßenseitigen Kellerwand stehen Feuchteflecken bis in eine Höhe von etwa 30 Zentimetern. Gleichzeitig ist aus dem Bodenablauf Wasser ausgetreten.
+
+Bei der Erstbesichtigung zeigt sich, dass der Bodenablauf unterhalb der Rückstauebene liegt und keine Rückstausicherung vorhanden ist. Die Kellertür ist nicht überflutungssicher ausgeführt. Die feuchten Wandbereiche entsprechen in ihrer Höhenlage dem Wasserstand, der sich aus den Rückstau- und Einströmmengen erklären lässt. Gleichzeitig zeigen sich an der gartenseitigen Kellerwand ältere Feuchteflecken, die nicht auf das aktuelle Ereignis zurückzuführen sind.
+
+Die Dokumentation trennt deshalb drei Schadenebenen: aktuell ereignisbedingte Schäden durch Rückstau und Wassereinströmung über die Kellertür, ältere Feuchteschäden an der Gartenwand ohne Ereignisbezug sowie Kosten für eine Rückstausicherung, die der Wiederherstellung eines ordnungsgemäßen Schutzniveaus dienen, aber nicht zwangsläufig Folge eines einzelnen Schadensereignisses sind.
 
 ## Handlungsempfehlungen
 
-- Gel?nde, ?ffnungen und Entw?sserung stets gemeinsam dokumentieren.
-- Wasserst?nde, Schmutzlinien und zeitliche Abl?ufe mit Lagebezug sichern.
-- R?ckstausicherung, Abdichtung und Vorzustand getrennt pr?fen lassen, bevor der gesamte Sanierungsumfang freigegeben wird.
+### Für Versicherungsnehmer
+
+- Wasserstand und Eintrittspunkte sofort nach dem Ereignis dokumentieren.
+- Wasser schnellstmöglich beseitigen und mit Trocknung beginnen.
+- Feuchteempfindliche Güter aus dem betroffenen Bereich entfernen.
+- Vorhandensein und Funktion einer Rückstausicherung dokumentieren lassen.
+
+### Für Versicherer
+
+- Wasserweg und Eintrittspunkt von Beginn an technisch klären lassen.
+- Vorschäden und bekannte Abdichtungsmängel in der Kostenprüfung trennen.
+- Rückstausicherung und Kellerabdichtung als eigene Prüfpositionen aufnehmen.
+
+### Für Sachverständige
+
+- Eintrittswege, Wasserstände und Schadenspuren lagegenau dokumentieren.
+- Wasserwege (Rückstau, Grundwasser, Oberflächenwasser) technisch einordnen und trennen.
+- Aussagen zur Ursache nur insoweit treffen, wie sie durch Befund und Unterlagen getragen sind.
 
 ## Fazit
 
-?berflutungssch?den an Geb?uden sind nur dann belastbar zu beurteilen, wenn Oberfl?chenwasser, Grundwasser und R?ckstau nicht als Sammelbegriff behandelt werden. Erst die saubere Trennung von Wasserweg, Eintrittsstelle, Vorzustand, Schadenbereich und Kostenfolge schafft eine tragf?hige Grundlage f?r technische Bewertung und Regulierung.
+Überflutungsschäden am Gebäude sind keine einheitliche Schadenkategorie. Die fachlich belastbare Einordnung setzt voraus, dass Wasserweg, Eintrittspunkte, Rückstauebene, Kellerabdichtung und Vorzustand sauber dokumentiert und getrennt bewertet werden. Nur dann können Ursache, Schadenumfang und erforderliche Maßnahmen nachvollziehbar abgegrenzt und die Kostenprüfung prüffähig gestaltet werden.
 
-## Quellen und weiterf?hrende Hinweise
+## Quellen und weiterführende Hinweise
 
-1. Versicherungsvertragsgesetz (VVG), ? 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-2. DIN EN 12056-1:2001-01, Schwerkraftentw?sserungsanlagen innerhalb von Geb?uden - Teil 1: Allgemeine und Ausf?hrungsanforderungen, DIN Media GmbH, https://www.dinmedia.de/de/norm/din-en-12056-1/23912115
-3. DIN EN 12056-4:2001-01, Schwerkraftentw?sserungsanlagen innerhalb von Geb?uden - Teil 4: Abwasserhebeanlagen - Planung und Berechnung, DIN Media GmbH, https://www.dinmedia.de/de/norm/din-en-12056-4/23912386
-4. DIN 1986-100:2016-12, Entw?sserungsanlagen f?r Geb?ude und Grundst?cke - Bestimmungen in Verbindung mit DIN EN 752 und DIN EN 12056, DIN Media GmbH, https://www.dinmedia.de/de/norm/din-1986-100/264064948
-5. Umweltbundesamt, Starkregen, https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen
-6. Bundesinstitut f?r Bau-, Stadt- und Raumforschung (BBSR), Leitfaden Starkregen ? Objektschutz und bauliche Vorsorge, https://www.bbsr.bund.de/BBSR/DE/veroeffentlichungen/sonderveroeffentlichungen/2018/leitfaden-starkregen.html
+1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+2. DIN 18533:2017-07, Abdichtung von erdberührten Bauteilen bei Bauwerken, Beuth Verlag, https://www.beuth.de/de/norm/din-18533-1/270192249
+3. DWA-M 382, Kleinkläranlagen und Grundstücksentwässerung – Rückstausicherung, Deutsche Vereinigung für Wasserwirtschaft, Abwasser und Abfall, https://www.dwa.de/dwa/
+4. GDV, Elementarschadenfibel für Gebäudeversicherungen, Gesamtverband der Deutschen Versicherungswirtschaft, https://www.gdv.de/gdv/themen/naturgefahren/elementarschaeden
+5. BBK, Hochwasserschutzfibel, Bundesamt für Bevölkerungsschutz und Katastrophenhilfe, https://www.bbk.bund.de/DE/Themen/Risikomanagement/Baulicher-Bevoelkerungsschutz/Objektschutz-und-bauliche-Vorsorge/Hochwasserschutzfibel/hochwasserschutzfibel_node.html

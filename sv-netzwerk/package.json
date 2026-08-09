@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "npm run validate:knowledge && node scripts/write-deploy-version.mjs",
+    "prebuild": "npm run validate:encoding && npm run validate:knowledge && node scripts/write-deploy-version.mjs",
     "build": "astro check && astro build && npm run validate:public-copy && npm run validate:visible-umlauts",
     "preview": "astro preview",
     "check": "astro check",
@@ -15,7 +15,8 @@
     "fachbeitrag:run": "node scripts/run-fachbeitrag-automation.mjs",
     "fachbeitrag:log": "node scripts/update-fachbeitrag-log.mjs",
     "test:publication-gating": "node scripts/test-publication-gating.mjs",
-    "validate:scheduled-content": "node scripts/validate-scheduled-content.mjs"
+    "validate:scheduled-content": "node scripts/validate-scheduled-content.mjs",
+    "validate:encoding": "node scripts/validate-encoding.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
