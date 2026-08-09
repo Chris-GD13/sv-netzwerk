@@ -317,7 +317,7 @@ export const library: LibraryItem[] = [
     description: 'Wie Windangriffsfläche, Befestigungszustand, Alterung und zeitliche Plausibilität nach Sturm- und Hagelereignissen methodisch getrennt werden.',
     href: '/fachwissen/sturmschaden-windwirkung-vorschaden-abgrenzung/',
     category: 'Sturm- und Hagelschäden',
-    tags: ['Sturmschaden', 'Hagelschaden', 'Schadenabgrenzung'],
+    tags: ['Sturmschaden', 'Hagelschaden', 'Schadenabgrenzung', 'Vorschaden'],
     date: '2026-07-17',
     type: 'article',
   },

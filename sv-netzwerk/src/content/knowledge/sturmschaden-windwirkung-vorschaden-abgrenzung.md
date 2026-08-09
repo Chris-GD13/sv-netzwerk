@@ -9,7 +9,6 @@ dailyStandard: false
 contentLevel: "B"
 teaser: "Nicht jede Dachöffnung nach einem Sturmereignis ist automatisch wetterbedingt. Erst die technische Trennung von Windwirkung, Befestigungszustand und Alterung schafft eine belastbare Grundlage für die Regulierung."
 linkedinSummary: "Nach Sturm- und Hagelereignissen entscheidet die technische Abgrenzung von Windwirkung, Vorschaden und Bauteilversagen über eine prüffähige Regulierung. Windstärke allein ersetzt keine Einzelfeststellung am Bauteil."
-videoScript: "Wissen in 180 Sekunden: Nach einem Sturmereignis zunächst Windstärke und Wetterdaten am Schadenort dokumentieren. Dann jedes betroffene Bauteil einzeln prüfen: Windangriffsfläche, Befestigungszustand, Alterungsgrad. Zeitliche Plausibilität zwischen Ereignis und Schadenbild herstellen. Nur technisch begründete, sturmbedingte Positionen freigeben, Vorschaden und Instandhaltung sauber trennen."
 cta:
   label: "Sturmschaden strukturiert einordnen"
   href: "/schaden-melden/"
@@ -17,11 +16,13 @@ relatedLinks: ["/fachwissen/schadenabgrenzung/", "/fachwissen/prueffaehige-dokum
 damageTypes: ["sturm", "gebaeude"]
 publication:
   publishedAt: 2026-07-17
-  updatedAt: 2026-07-17
+  updatedAt: 2026-08-09
   status: published
 seo:
   title: "Sturmschaden: Windwirkung und Vorschäden sauber trennen"
   description: "Praxisleitfaden zur technischen Abgrenzung von Windwirkung, Bauteilversagen, Vorschaden und Instandhaltung nach Sturm- und Hagelereignissen."
+  canonical: "https://www.sv-netzwerk.eu/fachwissen/sturmschaden-windwirkung-vorschaden-abgrenzung/"
+  noindex: false
 ---
 
 Sturm- und Hagelereignisse führen häufig zu einer Vielzahl gemeldeter Schäden in kurzer Zeit. Gerade deshalb entsteht Druck, Schadenbilder pauschal dem Wetterereignis zuzuordnen. Fachlich reicht die bloße Feststellung einer ausreichenden Windstärke am Schadenort jedoch nicht aus. Erst die Bauteilprüfung zeigt, ob eine Beschädigung tatsächlich sturmbedingt ist oder ob Alterung, Befestigungsmängel oder bereits vorhandene Schäden die eigentliche Ursache sind.
@@ -115,3 +116,11 @@ Diese Routine ersetzt keine technische Einzelfallprüfung, stabilisiert aber die
 Nach Sturm- und Hagelereignissen entscheidet nicht die gemeldete Windstärke allein über die Anerkennung eines Schadens, sondern die bauteilbezogene technische Abgrenzung von Windwirkung, Vorschaden, Mangel und Instandhaltung. Die durchgängige Trennung von Feststellung, Bewertung und Empfehlung schafft dafür die notwendige Grundlage.
 
 Für die fachliche Einordnung eines konkreten Vorgangs helfen die [Schadenmeldung](/schaden-melden/) sowie die vertiefenden Beiträge zur [technischen Schadenabgrenzung](/fachwissen/schadenabgrenzung/) und [prüffähigen Dokumentation](/fachwissen/prueffaehige-dokumentation/).
+
+## Quellen und weiterführende Hinweise
+
+1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+2. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
+3. Bürgerliches Gesetzbuch (BGB), § 631 Vertragstypische Pflichten beim Werkvertrag, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__631.html
+4. Bürgerliches Gesetzbuch (BGB), § 254 Mitverschulden, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__254.html
+5. Umweltbundesamt, Starkregen, https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen

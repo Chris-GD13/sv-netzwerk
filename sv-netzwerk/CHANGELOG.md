@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.26 – 2026-08-09
+- Migration Fachbeitrag 2026-07-17: „Sturmschaden: Windwirkung, Vorschaden und Bauteilversagen" auf Fachbeitragsstandard gehoben
+- videoScript entfernt; canonical, noindex ergänzt; updatedAt aktualisiert
+- 5 Primärquellen-Abschnitt ergänzt; vorhandene 9 Abschnitte beibehalten
+- library.ts Tags erweitert; 46 Einträge unverändert
+
 ## 3.4.25 – 2026-08-09
 - Migration Fachbeitrag 2026-07-17: „Schadenakte nachvollziehbar strukturieren" auf Fachbeitragsstandard gehoben
 - videoScript entfernt; canonical, noindex, updatedAt, featured ergänzt
