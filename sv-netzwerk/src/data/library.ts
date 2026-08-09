@@ -411,8 +411,8 @@ export const library: LibraryItem[] = [
     description: 'Wie eine einheitliche Aktenstruktur Entscheidungen beschleunigt, Rückfragen reduziert und Übergaben im Schadenfall absichert.',
     href: '/fachwissen/schadenakte-nachvollziehbar-strukturieren/',
     category: 'Prozessqualität',
-    tags: ['Schadenakte', 'Dokumentation', 'Prozessqualität'],
-    date: '2026-07-27',
+    tags: ['Schadenakte', 'Dokumentation', 'Prozessqualität', 'Schadenregulierung'],
+    date: '2026-07-17',
     type: 'article',
   },
   {
