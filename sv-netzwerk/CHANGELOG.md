@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.4.16 – 2026-08-09
+- Migration Fachbeitrag 2026-07-27: „Schadenregulierer für Versicherungen: Technische Prüfung und strukturierte Schadensteuerung" auf Fachbeitragsstandard gehoben
+- videoScript entfernt; canonical und updatedAt ergänzt; contentLevel C→B
+- 15 Abschnitte ausgebaut (~2400 Wörter); Praxisbeispiel, Sofortmaßnahmen, Messverfahren, Handlungsempfehlungen ergänzt
+- 5 geprüfte Primärquellen (BGB §631, §634, §254; VVG §82, §86) eingetragen
+- library.ts Beschreibung und Tags aktualisiert; 46 Einträge unverändert
+
 ## 3.4.15 – 2026-08-09
 - Migration Fachbeitrag 2026-07-28: „Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz" auf Fachbeitragsstandard gehoben
 - videoScript entfernt; updatedAt aktualisiert; seo.title korrigiert (war abgeschnitten); noindex ergänzt
