@@ -1,6 +1,6 @@
 ---
-import { library, formatDate } from '../../data/library';
-const articles = library.filter((item) => item.type === 'article').slice(0,3);
+import { sortedLibrary, formatDate } from '../../data/library';
+const articles = sortedLibrary.filter((item) => item.type === 'article').slice(0,3);
 ---
 <section class="v4-section v4-knowledge">
   <div class="v4-shell"><div class="v4-section-head"><div><p class="v4-kicker"><span></span>Fachartikel</p><h2>Fachartikel, die Entscheidungen besser machen.</h2></div><a class="v4-text-link" href="/fachwissen/">Zu den Fachartikeln <span>→</span></a></div>

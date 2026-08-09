@@ -4,15 +4,22 @@ type PublicationCarrierAlt = { publication: PublicationRecord };
 
 const BERLIN_TIME_ZONE = 'Europe/Berlin';
 const PUBLICATION_HOUR = 5;
+const PUBLICATION_OFFSET = '+02:00';
+const OVERRIDE_NOW = 'SV_NETZWERK_PUBLICATION_NOW';
 
-const publicationStartIso = (publishedAt: Date | string) => {
-  const date = typeof publishedAt === 'string'
-    ? publishedAt
-    : `${publishedAt.getUTCFullYear()}-${String(publishedAt.getUTCMonth() + 1).padStart(2, '0')}-${String(publishedAt.getUTCDate()).padStart(2, '0')}`;
-  return `${date}T${String(PUBLICATION_HOUR).padStart(2, '0')}:00:00+02:00`;
+const toDateString = (publishedAt: Date | string) => {
+  if (typeof publishedAt === 'string') return publishedAt;
+  return `${publishedAt.getUTCFullYear()}-${String(publishedAt.getUTCMonth() + 1).padStart(2, '0')}-${String(publishedAt.getUTCDate()).padStart(2, '0')}`;
 };
 
+export const publicationStartIso = (publishedAt: Date | string) =>
+  `${toDateString(publishedAt)}T${String(PUBLICATION_HOUR).padStart(2, '0')}:00:00${PUBLICATION_OFFSET}`;
+
 export const getPublicationTimeZone = () => BERLIN_TIME_ZONE;
+export const getPublicationNow = () => {
+  const override = import.meta.env[OVERRIDE_NOW];
+  return override ? new Date(override) : new Date();
+};
 
 const hasDataPublication = (item: PublicationCarrier | PublicationCarrierAlt | PublicationRecord): item is PublicationCarrier =>
   typeof item === 'object' && item !== null && 'data' in item;
@@ -21,7 +28,7 @@ const hasDirectPublication = (item: PublicationCarrier | PublicationCarrierAlt |
 
 export const isKnowledgeItemPublished = (
   item: PublicationCarrier | PublicationCarrierAlt | PublicationRecord,
-  now = new Date(),
+  now = getPublicationNow(),
 ) => {
   const publication = hasDataPublication(item)
     ? item.data.publication
@@ -34,17 +41,17 @@ export const isKnowledgeItemPublished = (
 
 export const filterPublishedKnowledgeItems = <T extends PublicationCarrier>(
   entries: T[],
-  now = new Date(),
+  now = getPublicationNow(),
 ) => entries.filter((entry) => isKnowledgeItemPublished(entry, now));
 
 export const isLibraryItemPublished = (
   item: { date: string; type: string },
-  now = new Date(),
+  now = getPublicationNow(),
 ) => item.type === 'article'
   ? now.getTime() >= new Date(publicationStartIso(item.date)).getTime()
   : true;
 
 export const filterPublishedLibraryItems = <T extends { date: string; type: string }>(
   entries: T[],
-  now = new Date(),
+  now = getPublicationNow(),
 ) => entries.filter((entry) => isLibraryItemPublished(entry, now));

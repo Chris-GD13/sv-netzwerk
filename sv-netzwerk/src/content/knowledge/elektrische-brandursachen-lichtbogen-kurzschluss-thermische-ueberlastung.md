@@ -19,8 +19,8 @@ publication:
   publishedAt: 2026-08-10
   status: published
 seo:
-  title: "Elektrische Brandursachen: Lichtbogen, Kurzschluss und thermische ?berlastung beweissicher unterscheiden"
-  description: "Elektrische Brandursachen lassen sich nur dann belastbar bewerten, wenn Prim?rbefund, Sekund?rsch?den, Sicherung der Bauteile und elektrotechnische Fachgrenzen konsequent getrennt werden."
+  title: "Elektrische Brandursachen beweissicher unterscheiden | SV-Netzwerk"
+  description: "So werden Lichtbogen, Kurzschluss und thermische Überlastung technisch sauber getrennt und belastbar bewertet."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung/"
   noindex: false
 ---
