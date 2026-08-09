@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Rechnungs- und Nachtragsprüfung: Mengen, Leistungen, Kosten und Schadenbezug fachlich trennen',
+    description: 'Rechnungs- und Nachtragsprüfungen sind nur belastbar, wenn Mengen, Leistungen, Schadenbezug, Zusatzaufwand und Abrechnungslogik technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug/',
+    category: 'Schadenregulierung',
+    tags: ['Rechnungsprüfung', 'Nachtragsprüfung', 'Mengenprüfung', 'Kostenprüfung', 'Schadenbezug', 'Schadenabgrenzung'],
+    date: '2026-08-21',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Notmaßnahmen und Wiederherstellung: Schadenminderung, Freigabe und Dokumentation fachlich trennen',
     description: 'Notmaßnahmen und Wiederherstellung sind nur belastbar zu bewerten, wenn Schadenminderung, Sofortsicherung, Freigabeentscheidungen und spätere Wiederherstellung technisch sauber getrennt dokumentiert werden.',
     href: '/fachwissen/notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation/',
