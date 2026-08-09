@@ -9,12 +9,12 @@ const publishedAt = entry.data.publication.publishedAt!;
 ---
 <article class:list={['knowledge-card', 'sv-card', 'sv-card-lift', { compact, featured: entry.data.featured }]}>
   <div class="meta">
-    <a href={`/svos/fachwissen/kategorie/${slugify(entry.data.category)}/`}>{entry.data.category}</a>
+    <a href={`/fachwissen/kategorie/${slugify(entry.data.category)}/`}>{entry.data.category}</a>
     <time datetime={publishedAt.toISOString()}>{formatKnowledgeDate(publishedAt)}</time>
   </div>
   <h2><a href={knowledgePath(entry)}>{entry.data.title}</a></h2>
   <p>{entry.data.description}</p>
-  {!compact && <ul>{entry.data.tags.map((tag) => <li><a href={`/svos/fachwissen/tag/${slugify(tag)}/`}>#{tag}</a></li>)}</ul>}
+  {!compact && <ul>{entry.data.tags.map((tag) => <li><a href={`/fachwissen/tag/${slugify(tag)}/`}>#{tag}</a></li>)}</ul>}
   <a class="read" href={knowledgePath(entry)}>Fachbeitrag lesen <span aria-hidden="true">→</span></a>
 </article>
 <style>
