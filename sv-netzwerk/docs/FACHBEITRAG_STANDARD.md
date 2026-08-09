@@ -1,9 +1,13 @@
 # Fachbeitragsstandard SV-Netzwerk
 
-Stand: 08.08.2026
+Stand: 09.08.2026
 Status: verbindlich
 
 Dieser Standard gilt ausnahmslos für alle neuen oder überarbeiteten Fachbeiträge im SV-Netzwerk. Jeder Beitrag muss fachlich belastbar, redaktionell konsistent und technisch vollständig veröffentlichbar sein.
+
+**Qualitätsmaßstab:** `src/content/knowledge/schneedruck-winterschaeden-bewertung-regulierung.md` (primäre Referenz) und `src/content/knowledge/frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung.md` (zweite Referenz). Fachliche Systematik, Bearbeitungstiefe, Dokumentationsstruktur und Quellenqualität sind themengerecht zu übertragen; keine fachfremden Inhalte oder Formulierungen kopieren.
+
+**Hinweis:** Wissen in 180 Sekunden gehört nicht zur Produktionspflicht. Keine neuen separaten Video-Skripte/-Dateien, Video-Routen, Video-Menüs oder Video-Automatiken erstellen. Keine typografischen Platzhalterbilder veröffentlichen. `src/data/library.ts` ist die Datenquelle der Übersicht und darf niemals geleert oder vollständig ersetzt werden.
 
 ## 1. Fachliche Struktur
 
