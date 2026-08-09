@@ -26,19 +26,12 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
   <section class="sv-section" id="sachverstaendige">
     <div class="sv-container">
       <div class="experts-grid" data-filter-grid>
-        {specialists.map((expert) => (
+        {[...specialists, ...backoffice].map((expert) => (
           <div data-filter-item data-name={expert.name} data-regions={expert.regions.join('|')} data-fields={expert.expertise.join('|')}>
             <ExpertCard expert={expert} compact />
           </div>
         ))}
       </div>
-    </div>
-  </section>
-
-  <section class="sv-section backoffice-section" id="backoffice">
-    <div class="sv-container">
-      <SectionHeader eyebrow="Backoffice" title="Organisation und Koordination" text="Susanne Wächter und Katja Schäfer sichern Terminabstimmung, Kommunikation, Unterlagen und verlässliche Übergaben an die fachlich Verantwortlichen." />
-      <div class="experts-grid experts-grid--backoffice">{backoffice.map((expert) => <ExpertCard expert={expert} compact />)}</div>
     </div>
   </section>
 
@@ -112,7 +105,6 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
   .experts-intro{padding-bottom:0}
   .experts-intro h1{margin:0}
   .experts-intro .sv-lead{max-width:76ch}
-  .backoffice-section{padding-top:0}
   .filter-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-lg);background:rgba(255,255,255,.72)}
   .filter-panel label{display:grid;gap:.4rem;font-weight:800}
   .filter-panel input,.filter-panel select{padding:.78rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:#fff;font:inherit}
@@ -120,8 +112,7 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
   .filter-jump{margin:.35rem 0 0}
   .filter-jump a{font-weight:800;text-decoration:none}
   .experts-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
-  .experts-grid--backoffice{max-width:calc(50% - .5rem);grid-template-columns:repeat(2,minmax(0,1fr))}
-  @media(max-width:72rem){.experts-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.experts-grid--backoffice{max-width:66.66%;grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media(max-width:56rem){.experts-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.experts-grid--backoffice{max-width:none}}
-  @media(max-width:38rem){.experts-grid,.experts-grid--backoffice,.filter-panel{grid-template-columns:1fr}.experts-grid--backoffice{max-width:none}}
+  @media(max-width:72rem){.experts-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media(max-width:56rem){.experts-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:38rem){.experts-grid,.filter-panel{grid-template-columns:1fr}}
 </style>
