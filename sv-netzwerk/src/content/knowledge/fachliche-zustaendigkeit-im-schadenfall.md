@@ -4,11 +4,11 @@ description: "Wie Prüfziel, Fachgebiet, Region und Verantwortung zu einer belas
 category: "Prozessqualität"
 tags: ["Experten", "Zuständigkeit", "Schadenregulierung", "Dokumentation"]
 author: "christian-waechter"
+featured: false
 dailyStandard: true
 contentLevel: "B"
 teaser: "Die richtige Person ist nicht die mit dem allgemeinsten Profil, sondern die mit der passenden Verantwortung für die konkrete Frage."
 linkedinSummary: "Eine belastbare Expertenzuordnung beginnt nicht beim Namen, sondern beim Prüfziel. Fachgebiet, Region, Verfügbarkeit und Verantwortung müssen gemeinsam betrachtet und nachvollziehbar dokumentiert werden."
-videoScript: "Wissen kompakt: Erst die konkrete Fachfrage und das erwartete Ergebnis definieren. Danach Fachgebiet, Qualifikation, Region und Verfügbarkeit abgleichen. Die Verantwortung bleibt einer benannten Person zugeordnet; weitere Disziplinen erhalten klar abgegrenzte Teilfragen."
 cta:
   label: "Passenden Experten anfragen"
   href: "/experten/"
@@ -16,11 +16,14 @@ relatedLinks: ["/experten/", "/netzwerk/", "/kontakt/"]
 damageTypes: ["gebaeude", "gewerbe-industrie", "brand", "leitungswasser"]
 publication:
   publishedAt: 2026-07-15
+  updatedAt: 2026-08-09
   status: published
 seo:
   title: "Fachliche Zuständigkeit im Schadenfall eindeutig zuordnen"
   description: "Prüfziel, Fachgebiet, Region und Verantwortung für eine belastbare Expertenzuordnung im Schadenfall verbinden."
   image: "https://www.sv-netzwerk.eu/assets/images/linkedin/fachliche-zustaendigkeit-schadenfall.png"
+  canonical: "https://www.sv-netzwerk.eu/fachwissen/fachliche-zustaendigkeit-im-schadenfall/"
+  noindex: false
 ---
 
 Bei komplexen Bau- und Versicherungsschäden entscheidet die fachliche Zuständigkeit wesentlich über Qualität, Geschwindigkeit und Nachvollziehbarkeit der Bearbeitung. Ein großes Kontaktverzeichnis allein löst diese Aufgabe nicht. Entscheidend ist, welche konkrete Frage beantwortet werden muss, welches Ergebnis der Auftraggeber benötigt und wer die Verantwortung für die fachliche Aussage übernimmt.
@@ -80,3 +83,11 @@ Eine Anpassung ist dagegen erforderlich, wenn die ursprüngliche Qualifikation n
 Expertenzuordnung ist eine fachliche Entscheidung und keine reine Kontaktsuche. Sie beginnt mit einem klaren Prüfziel und verbindet Fachgebiet, Qualifikation, Region, Verfügbarkeit und persönliche Verantwortung. Ergänzende Disziplinen erhalten abgegrenzte Aufgaben; Ergebnisse werden nachvollziehbar in die Gesamtbearbeitung integriert.
 
 Das [Expertenverzeichnis](/experten/) zeigt Fachgebiete, Qualifikationen und Einsatzregionen der Ansprechpartner. Für eine konkrete Zuordnung können Schadenart, Objekt, Schadenort und Prüfziel über den [Kontakt](/kontakt/) übermittelt werden.
+
+## Quellen und weiterführende Hinweise
+
+1. Bürgerliches Gesetzbuch (BGB), § 631 Vertragstypische Pflichten beim Werkvertrag, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__631.html
+2. Bürgerliches Gesetzbuch (BGB), § 634 Rechte des Bestellers bei Mängeln, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__634.html
+3. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+4. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
+5. Zivilprozessordnung (ZPO), § 402 Anwendbarkeit der Vorschriften für Zeugen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/zpo/__402.html

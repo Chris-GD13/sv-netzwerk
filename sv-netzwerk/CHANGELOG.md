@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.28 – 2026-08-09
+- Migration Fachbeitrag 2026-07-15: „Fachliche Zuständigkeit im Schadenfall" auf Fachbeitragsstandard gehoben
+- videoScript entfernt; canonical, noindex, updatedAt, featured ergänzt
+- 5 Primärquellen-Abschnitt ergänzt; vorhandene 9 Abschnitte beibehalten
+- library.ts Tags/date/featured aktualisiert; 46 Einträge unverändert
+
 ## 3.4.27 – 2026-08-09
 - Migration Fachbeitrag 2026-07-16: „Regiekosten im Schadenfall prüffähig bewerten" auf Fachbeitragsstandard gehoben
 - videoScript entfernt; canonical, noindex, updatedAt ergänzt

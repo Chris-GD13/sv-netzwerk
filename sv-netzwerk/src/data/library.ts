@@ -326,10 +326,10 @@ export const library: LibraryItem[] = [
     description: 'Wie Prüfziel, Fachgebiet, Region und Verantwortung zu einer belastbaren Expertenzuordnung zusammengeführt werden.',
     href: '/fachwissen/fachliche-zustaendigkeit-im-schadenfall/',
     category: 'Prozessqualität',
-    tags: ['Experten', 'Zuständigkeit', 'Schadenregulierung'],
-    date: '2026-07-27',
+    tags: ['Experten', 'Zuständigkeit', 'Schadenregulierung', 'Dokumentation'],
+    date: '2026-07-15',
     type: 'article',
-    featured: true,
+    featured: false,
   },
   {
     title: 'Technische Schadenabgrenzung als Grundlage der Regulierung',
