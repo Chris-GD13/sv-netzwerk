@@ -8,7 +8,7 @@ html {
 }
 body {
   margin: 0;
-  min-width: 20rem;
+  min-width: 0;
   background:
     radial-gradient(circle at 8% 4%, rgba(11, 79, 122, 0.18), transparent 34rem),
     radial-gradient(circle at 92% 16%, rgba(255, 157, 18, 0.17), transparent 36rem),
@@ -69,6 +69,7 @@ p {
   margin: 0 0 var(--sv-space-4);
 }
 .sv-container {
+  min-width: 0;
   width: min(calc(100% - 2rem), var(--sv-container));
   margin-inline: auto;
 }
@@ -264,6 +265,21 @@ tr[data-open-window]:hover {
   }
 }
 @media (max-width: 42rem) {
+  main,
+  section,
+  .sv-container,
+  .sv-grid > *,
+  .sv-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+  h1,
+  h2,
+  h3,
+  p,
+  a {
+    overflow-wrap: anywhere;
+  }
   .sv-grid-2,
   .sv-grid-3,
   .sv-grid-4 {
