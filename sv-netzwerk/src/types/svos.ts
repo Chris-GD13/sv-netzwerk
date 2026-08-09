@@ -23,7 +23,7 @@ export interface TaxonomyTerm {
 
 export interface SearchDocument {
   id: string;
-  collection: 'knowledge' | 'downloads' | 'practiceCases' | 'authors';
+  collection: 'knowledge' | 'downloads' | 'authors';
   title: string;
   description: string;
   href: string;

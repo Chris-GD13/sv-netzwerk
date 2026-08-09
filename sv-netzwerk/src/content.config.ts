@@ -67,35 +67,6 @@ const downloads = defineCollection({
   }),
 });
 
-const practiceCases = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/practice-cases' }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    lossType: z.string(),
-    objectType: z.string(),
-    segment: z.enum(['Gebäude', 'Hausrat', 'Gewerbe', 'Industrie']).default('Gebäude'),
-    region: z.string().optional(),
-    lossRange: z.enum(['unter-25k', '25k-100k', '100k-500k', 'ueber-500k']).optional(),
-    tags: z.array(z.string()).default([]),
-    relatedKnowledge: z.array(z.string()).default([]),
-    relatedDownloads: z.array(z.string()).default([]),
-    insuranceLine: z.string().optional(),
-    cause: z.string().optional(),
-    finding: z.string().optional(),
-    assessment: z.string().optional(),
-    recommendation: z.string().optional(),
-    measures: z.array(z.string()).default([]),
-    result: z.string().optional(),
-    reserve: z.string().optional(),
-    duration: z.string().optional(),
-    featured: z.boolean().default(false),
-    images: z.array(z.object({ src: z.string(), alt: z.string(), caption: z.string().optional() })).default([]),
-    publication: publicationSchema,
-    seo: seoSchema.default({ noindex: false }),
-  }),
-});
-
 const authors = defineCollection({
   loader: glob({ pattern: '**/*.{json,yaml,yml}', base: './src/content/authors' }),
   schema: z.object({
@@ -128,4 +99,4 @@ const videos = defineCollection({
   }),
 });
 
-export const collections = { knowledge, downloads, practiceCases, authors, videos };
+export const collections = { knowledge, downloads, authors, videos };

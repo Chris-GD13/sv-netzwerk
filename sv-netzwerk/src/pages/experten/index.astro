@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import ExpertCard from '../../components/platform/ExpertCard.astro';
 import { experts } from '../../data/experts';
-const preferredOrder = ['christian-waechter', 'marc-schuett', 'carmen-gohl', 'holger-roth'];
+const preferredOrder = ['christian-waechter', 'marc-schuett', 'carmen-gohl', 'holger-roth', 'claudius-freiberg', 'lenna-maria-walczok'];
 const specialists = experts
   .filter((expert) => expert.status === 'active' && expert.group === 'expert')
   .sort((a, b) => {

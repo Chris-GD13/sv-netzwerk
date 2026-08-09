@@ -4,8 +4,7 @@ import { experts } from '../data/experts';
 import LogoMark from './LogoMark.astro';
 const year = new Date().getFullYear();
 const expertProfiles = experts
-  .filter((expert) => expert.status === 'active')
-  .sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  .filter((expert) => expert.status === 'active');
 ---
 
 <footer class="site-footer">
