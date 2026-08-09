@@ -3,7 +3,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import ExpertCard from '../../components/platform/ExpertCard.astro';
 import { experts } from '../../data/experts';
-const specialists = experts.filter((expert) => expert.status === 'active' && expert.group === 'expert');
+const preferredOrder = ['christian-waechter', 'marc-schuett', 'carmen-gohl', 'holger-roth'];
+const specialists = experts
+  .filter((expert) => expert.status === 'active' && expert.group === 'expert')
+  .sort((a, b) => {
+    const aIndex = preferredOrder.indexOf(a.slug);
+    const bIndex = preferredOrder.indexOf(b.slug);
+    return (aIndex === -1 ? preferredOrder.length : aIndex) - (bIndex === -1 ? preferredOrder.length : bIndex);
+  });
 const backoffice = experts.filter((expert) => expert.status === 'active' && expert.group === 'backoffice');
 const regions = [...new Set(specialists.flatMap((expert) => expert.regions))].sort((a, b) => a.localeCompare(b, 'de'));
 const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].sort((a, b) => a.localeCompare(b, 'de'));
