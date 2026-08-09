@@ -9,7 +9,6 @@ dailyStandard: false
 contentLevel: "B"
 teaser: "Nach Feuchteschäden ist genau zu trennen, welche Trocknungsleistung der Schadenbeseitigung dient und welche Maßnahmen auf baubedingte Restfeuchte oder allgemeine Bautrocknung entfallen."
 linkedinSummary: "Schadentrocknung und Bautrocknung werden in der Praxis oft vermischt. Im neuen Fachbeitrag zeige ich, warum Schadenziel, Ausgangsfeuchte, Messkonzept und Erfolgskontrolle getrennt dokumentiert werden müssen."
-videoScript: "Schadentrocknung und Bautrocknung müssen nach Schadenziel und Messkonzept getrennt geprüft werden."
 cta:
   label: "Schaden strukturiert melden"
   href: "/schaden-melden/"
@@ -93,4 +92,4 @@ Schadentrocknung und Bautrocknung lassen sich nur dann belastbar voneinander abg
 2. Umweltbundesamt, Ratgeber: Schimmel im Haus, https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus
 3. Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
 4. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-5. Bundesanstalt für Arbeitsschutz und Arbeitsmedizin (BAuA), ASR A1.8 „Verkehrswege“, https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-8
+5. WTA-Merkblatt 6-16:2019-01 „Technische Trocknung durchfeuchteter Bauteile – Planung, Ausführung und Kontrolle“, https://www.dinmedia.de/de/technische-regel/wta-merkblatt-6-16/305869554
