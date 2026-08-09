@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.4.23 – 2026-08-09
+- Migration Fachbeitrag 2026-07-18: „Leitungswasserschaden: Die ersten Schritte richtig setzen" auf Fachbeitragsstandard gehoben
+- videoScript entfernt; canonical, updatedAt und noindex ergänzt; contentLevel C→B; featured ergänzt
+- 15 Abschnitte ausgebaut (~2000 Wörter); Praxisbeispiel, Sofortmaßnahmen-Reihenfolge, Handlungsempfehlungen
+- 5 geprüfte Primärquellen (VVG §82, §86; BGB §631, §254; UBA Schimmel-Leitfaden)
+- library.ts Beschreibung/Tags aktualisiert; date 2026-07-27→2026-07-18 korrigiert; 46 Einträge unverändert
+
 ## 3.4.22 – 2026-08-09
 - Migration Fachbeitrag 2026-07-19: „Kumulschäden in der Region" auf Fachbeitragsstandard gehoben
 - videoScript entfernt; canonical und noindex ergänzt; updatedAt aktualisiert

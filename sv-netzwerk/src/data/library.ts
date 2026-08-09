@@ -417,11 +417,11 @@ export const library: LibraryItem[] = [
   },
   {
     title: 'Leitungswasserschaden: Die ersten Schritte richtig setzen',
-    description: 'Welche Sofortmaßnahmen nach einem Leitungswasserschaden entscheidend sind und welche Dokumentation von Beginn an fehlen darf.',
+    description: 'Welche Sofortmaßnahmen nach einem Leitungswasserschaden entscheidend sind, wie Eintrittspfad und Schadenumfang von Beginn an dokumentiert werden und wo Fachgrenzen zur weitergehenden Sanierung liegen.',
     href: '/fachwissen/leitungswasserschaden-erstmassnahmen/',
     category: 'Leitungswasser',
-    tags: ['Leitungswasser', 'Sofortmaßnahmen', 'Schadenminderung'],
-    date: '2026-07-27',
+    tags: ['Leitungswasser', 'Sofortmaßnahmen', 'Schadenminderung', 'Dokumentation'],
+    date: '2026-07-18',
     type: 'article',
   },
   {
