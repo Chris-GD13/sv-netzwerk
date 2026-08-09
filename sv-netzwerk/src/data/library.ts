@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Schlagregeneintritt an Fassaden und Fenstern: Anschlüsse, Dichtheit und Schadenabgrenzung fachlich prüfen',
+    description: 'Schlagregeneintritte an Fassaden und Fenstern sind nur belastbar zu bewerten, wenn Anschlüsse, Dichtebenen, Eintrittspfade und Folgeschäden technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/schlagregeneintritt-fassade-fenster-anschluesse-dichtheit-schadenabgrenzung/',
+    category: 'Gebäudehülle',
+    tags: ['Schlagregen', 'Fassade', 'Fenster', 'Anschlüsse', 'Dichtheit', 'Schadenabgrenzung'],
+    date: '2026-08-19',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Glasbruch an Fenster und Fassade: Schadenbild, Ursache und Reparaturfähigkeit fachlich trennen',
     description: 'Glasbruchschäden an Fenstern und Fassaden sind nur belastbar zu bewerten, wenn Schadenbild, Bruchursache, Einbausituation und Reparaturfähigkeit technisch sauber getrennt dokumentiert werden.',
     href: '/fachwissen/glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit/',
