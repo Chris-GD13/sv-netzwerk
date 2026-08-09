@@ -2,7 +2,7 @@ name: Daily knowledge publish
 
 on:
   schedule:
-    - cron: '0,15 5 * * *'
+    - cron: '0,15 3 * * *'
   workflow_dispatch:
     inputs:
       publication_date:
