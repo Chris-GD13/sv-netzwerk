@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.4.18 – 2026-08-09
+- Migration Fachbeitrag 2026-07-27: „Leitungswasserschaden in Aalen: Aufgaben eines Sachverständigen" auf Fachbeitragsstandard gehoben
+- videoScript entfernt; canonical und updatedAt ergänzt; contentLevel C→B
+- 15 Abschnitte ausgebaut (~2200 Wörter); regionale Tiefe Aalen/Ostalbkreis beibehalten; Praxisbeispiel ergänzt
+- 5 geprüfte Primärquellen (BGB §631, §254; VVG §82, §86; UBA Schimmel-Leitfaden) eingetragen
+- library.ts Beschreibung und Tags aktualisiert; 46 Einträge unverändert
+
 ## 3.4.17 – 2026-08-09
 - Migration Fachbeitrag 2026-07-27: „Sachverständiger für Versicherungsschäden in Aalen" auf Fachbeitragsstandard gehoben
 - videoScript entfernt; canonical und updatedAt ergänzt; contentLevel C→B
