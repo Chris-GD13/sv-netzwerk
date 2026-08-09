@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Item { title: string; text: string }
+interface Props {
+  title: string;
+  description: string;
+  eyebrow: string;
+  lead: string;
+  intro: string;
+  services: Item[];
+  objects: string[];
+  insuranceText: string;
+  evidence: string[];
+}
+const { title, description, eyebrow, lead, intro, services, objects, insuranceText, evidence } = Astro.props;
+---
+<BaseLayout title={`${title} | SV-Netzwerk`} description={description} breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Auftraggeber', href: '/auftraggeber/' }, { label: title }]}>
+  <section class="sv-section"><div class="sv-container intro"><p class="sv-eyebrow">{eyebrow}</p><h1>{title}</h1><p class="sv-lead">{lead}</p><p>{intro}</p><div class="actions"><a class="sv-button sv-button-primary" href="/schaden-melden/">Prüfauftrag einreichen</a><a class="sv-button sv-button-secondary" href="/kontakt/">Auftrag abstimmen</a></div></div></section>
+  <section class="sv-section sv-section-alt"><div class="sv-container"><div class="section-copy"><p class="sv-eyebrow">Leistungsumfang</p><h2>Technisch klären, dokumentieren und prüfbar bewerten</h2></div><div class="service-grid">{services.map((item) => <article class="sv-card"><h3>{item.title}</h3><p>{item.text}</p></article>)}</div></div></section>
+  <section class="sv-section"><div class="sv-container split"><article><p class="sv-eyebrow">Typische Objekte und Anlässe</p><h2>Projektbezogene Bearbeitung</h2><ul>{objects.map((item) => <li>{item}</li>)}</ul></article><article class="sv-card insurance"><p class="sv-eyebrow">Abweichende Versichererbewertung</p><h2>Wenn Schadenumfang oder Regulierung anders bewertet werden</h2><p>{insuranceText}</p><p>Wir prüfen technische Befunde, Kausalität, erforderliche Maßnahmen und Kostenansätze unabhängig. Eine Rechtsberatung oder verbindliche Entscheidung über den Versicherungsschutz ist damit nicht verbunden.</p><a class="sv-button sv-button-secondary" href="/kontakt/">Technische Bewertung prüfen lassen</a></article></div></section>
+  <section class="sv-section sv-section-alt"><div class="sv-container split"><article><p class="sv-eyebrow">Prüfgrundlage</p><h2>Diese Unterlagen helfen beim Einstieg</h2><ul>{evidence.map((item) => <li>{item}</li>)}</ul></article><article><p class="sv-eyebrow">Ergebnis</p><h2>Nachvollziehbare Entscheidungsgrundlage</h2><p>Der Bearbeitungsumfang wird vorab abgegrenzt. Feststellungen, offene Punkte, Annahmen, erforderliche Fachdisziplinen und Kostenfolgen werden transparent dokumentiert. So bleibt erkennbar, was technisch festgestellt wurde und welche Fragen gesondert rechtlich oder versicherungsvertraglich zu klären sind.</p></article></div></section>
+</BaseLayout>
+<style>
+  .intro{max-width:72rem}.intro h1{margin-bottom:1rem}.intro>p{max-width:75ch}.actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}.section-copy{max-width:72ch;margin-bottom:1.5rem}.service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.service-grid .sv-card,.insurance{padding:clamp(1.2rem,2.5vw,1.8rem)}.service-grid p{margin-bottom:0}.split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(1.5rem,4vw,3.5rem);align-items:start}.split ul{display:grid;gap:.55rem;padding-left:1.2rem}.insurance h2{font-size:clamp(1.35rem,2vw,1.8rem)}
+  @media(max-width:58rem){.service-grid{grid-template-columns:1fr}.split{grid-template-columns:1fr}}
+</style>
