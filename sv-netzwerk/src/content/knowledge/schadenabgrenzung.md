@@ -13,7 +13,7 @@ videoScript: "Wissen in 180 Sekunden: Erst das Ereignis und den Einwirkungsweg k
 cta:
   label: "Schaden fachlich einordnen"
   href: "/schaden-melden/"
-relatedLinks: ["/schadenarten/", "/praxisfaelle/leitungswasser-technische-abgrenzung/", "/experten/"]
+relatedLinks: ["/schadenarten/", "/fachwissen/schadenabgrenzung/", "/experten/"]
 damageTypes: ["leitungswasser", "gebaeude", "haftpflicht"]
 publication:
   publishedAt: 2026-07-14
@@ -78,7 +78,7 @@ Sofortmaßnahmen, Untersuchung, Schadenbeseitigung, Trocknung, Reinigung und Wie
 
 ## Praxisbeispiel aus der Fallbibliothek
 
-Der veröffentlichte und anonymisierte [Praxisfall zur technischen Abgrenzung eines Leitungswasserschadens](/praxisfaelle/leitungswasser-technische-abgrenzung/) zeigt die Methodik an einem Wohngebäude. Im Badezimmer lag ein Feuchtebefund vor. Für die Bewertung wurden schadenbedingte Maßnahmen von einem vorsorglichen Komplettausbau getrennt. Entscheidend waren nicht pauschale Annahmen, sondern Bauteilaufbau, Feuchteverteilung und die Frage, welche Bereiche technisch untersucht beziehungsweise getrocknet werden konnten.
+Das folgende Beispiel zeigt die Methodik an einem Wohngebäude. Im Badezimmer lag ein Feuchtebefund vor. Für die Bewertung wurden schadenbedingte Maßnahmen von einem vorsorglichen Komplettausbau getrennt. Entscheidend waren nicht pauschale Annahmen, sondern Bauteilaufbau, Feuchteverteilung und die Frage, welche Bereiche technisch untersucht beziehungsweise getrocknet werden konnten.
 
 Der Praxisfall verdeutlicht, dass eine Begrenzung des Rückbaus nicht mit einer Begrenzung der Sorgfalt gleichzusetzen ist. Kontrollierte Untersuchung und dokumentierte Messung können einen kleineren Umfang begründen. Bestätigen neue Feststellungen eine weitergehende Betroffenheit, wird der Umfang erweitert. Die Entscheidung bleibt damit an überprüfbare Erkenntnisse gebunden.
 

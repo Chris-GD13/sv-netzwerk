@@ -32,7 +32,6 @@ export interface ExpertProfile {
   status: 'active' | 'onboarding';
   tags: string[];
   publications: string[];
-  practiceCases: string[];
   articles: string[];
 }
 

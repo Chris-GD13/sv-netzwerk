@@ -12,7 +12,7 @@ videoScript: "Wissen in 180 Sekunden: Erst Wasser stoppen und Konstruktion erfas
 cta:
   label: "Leitungswasserschaden einordnen"
   href: "/schadenarten/leitungswasser/"
-relatedLinks: ["/schadenarten/leitungswasser/", "/praxisfaelle/leitungswasser-technische-abgrenzung/"]
+relatedLinks: ["/schadenarten/leitungswasser/", "/fachwissen/schadenabgrenzung/"]
 damageTypes: ["leitungswasser", "schimmel"]
 publication:
   publishedAt: 2026-07-12
@@ -41,7 +41,7 @@ Ein kontrollierter Rückbau verbindet Schadenminderung und Verhältnismäßigkei
 
 ## Fazit
 
-Der Rückbau folgt der nachgewiesenen Betroffenheit und der Trocknungsfähigkeit der Konstruktion. Dokumentierte Kontrollpunkte ermöglichen, den Umfang während der Bearbeitung zu erweitern oder zu begrenzen. Weitere Prüfpunkte stehen im [Kompetenzbereich Leitungswasser](/schadenarten/leitungswasser/) und im [anonymisierten Praxisfall](/praxisfaelle/leitungswasser-technische-abgrenzung/).
+Der Rückbau folgt der nachgewiesenen Betroffenheit und der Trocknungsfähigkeit der Konstruktion. Dokumentierte Kontrollpunkte ermöglichen, den Umfang während der Bearbeitung zu erweitern oder zu begrenzen. Weitere Prüfpunkte stehen im [Kompetenzbereich Leitungswasser](/schadenarten/leitungswasser/) und im [Fachbeitrag zur Schadenabgrenzung](/fachwissen/schadenabgrenzung/).
 
 **CTA:** [Leitungswasserschaden strukturiert einordnen](/schadenarten/leitungswasser/)
 
