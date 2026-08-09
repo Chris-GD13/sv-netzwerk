@@ -244,10 +244,10 @@ export const library: LibraryItem[] = [
   },
   {
     title: 'Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz',
-    description: 'Leitungswasserschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    description: 'Wie bei regional gehäuften Leitungswasserschäden Erstmaßnahmen, Plausibilitätsprüfung, Trocknung, Rückbau und Kostenprüfung strukturiert gesteuert werden – für belastbare Regulierungsergebnisse bei hoher Fallzahl.',
     href: '/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/',
     category: 'Leitungswasserschäden',
-    tags: ['Leitungswasser', 'Schadenregulierung', 'Sanierungsplanung', 'Kostenprüfung'],
+    tags: ['Leitungswasser', 'Schadenregulierung', 'Sanierungsplanung', 'Kostenprüfung', 'Kumulschäden'],
     date: '2026-07-28',
     type: 'article',
     featured: false,
