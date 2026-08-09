@@ -9,7 +9,6 @@ dailyStandard: false
 contentLevel: "B"
 teaser: "Bei Schlagregenschäden müssen Eintrittspfad, Fensteranschluss, Fassadendetail, Dichtebenen und sekundäre Feuchtefolgen getrennt dokumentiert werden."
 linkedinSummary: "Wasser am Fenster bedeutet nicht automatisch ein defektes Fenster. Im neuen Fachbeitrag geht es um Schlagregeneintritt, Anschlussdetails, Dichtebenen und die saubere technische Schadenabgrenzung."
-videoScript: "Schlagregeneintritte müssen nach Eintrittspfad, Anschlussdetail und Dichtheit getrennt geprüft werden."
 cta:
   label: "Schaden strukturiert melden"
   href: "/schaden-melden/"
@@ -88,7 +87,7 @@ Schlagregeneintritte an Fassaden und Fenstern lassen sich nur belastbar bewerten
 ## Quellen und weiterführende Hinweise
 
 1. Umweltbundesamt, Starkregen, https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen
-2. DGUV Fachbereich Bauwesen, Sachgebiet Hochbau, Deutsche Gesetzliche Unfallversicherung, https://www.dguv.de/fb-bauwesen/sachgebiete/hochbau/index.jsp
-3. Verordnung über Arbeitsstätten (ArbStättV), § 4 Instandhaltung und Reinigung von Arbeitsstätten, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/arbst_ttv_2004/__4.html
+2. Deutscher Wetterdienst, Glossar Wetter- und Klimalexikon, https://www.dwd.de/DE/service/lexikon/lexikon_node.html
+3. Bürgerliches Gesetzbuch (BGB), § 634 Rechte des Bestellers bei Mängeln, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__634.html
 4. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
 5. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html

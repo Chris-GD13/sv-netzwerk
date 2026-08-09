@@ -9,7 +9,6 @@ dailyStandard: false
 contentLevel: "B"
 teaser: "Bei Rechnungs- und Nachtragsprüfungen müssen Leistungsinhalt, Mengengerüst, Zusatzaufwand und schadenbedingter Anteil getrennt geprüft werden."
 linkedinSummary: "Nicht jede hohe Rechnung ist falsch – und nicht jede formal saubere Rechnung ist fachlich schlüssig. Im neuen Fachbeitrag geht es um Mengen, Nachträge, Schadenbezug und die technische Struktur der Rechnungsprüfung."
-videoScript: "Rechnungs- und Nachtragsprüfung müssen nach Leistung, Menge und Schadenbezug getrennt erfolgen."
 cta:
   label: "Schaden strukturiert melden"
   href: "/schaden-melden/"
@@ -95,6 +94,6 @@ Rechnungs- und Nachtragsprüfungen sind nur dann belastbar, wenn Leistungsinhalt
 
 1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
 2. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
-3. Verordnung über Arbeitsstätten (ArbStättV), § 4 Instandhaltung und Reinigung von Arbeitsstätten, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/arbst_ttv_2004/__4.html
-4. Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
-5. Umweltbundesamt, Ratgeber: Schimmel im Haus, https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus
+3. Bürgerliches Gesetzbuch (BGB), § 650b Änderung des Vertrags; Anordnungsrecht des Bestellers, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__650b.html
+4. Bürgerliches Gesetzbuch (BGB), § 650c Vergütungsanpassung bei Anordnungen nach § 650b, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__650c.html
+5. Bürgerliches Gesetzbuch (BGB), § 631 Vertragstypische Pflichten beim Werkvertrag, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__631.html

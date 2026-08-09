@@ -9,7 +9,6 @@ dailyStandard: false
 contentLevel: "B"
 teaser: "Im Schadenfall müssen Sofortsicherung, Notmaßnahmen, Freigaben und Wiederherstellungsleistungen als getrennte Prüffelder behandelt werden."
 linkedinSummary: "Notmaßnahmen retten oft den Schadenfall – sorgen aber später auch für Prüfkonflikte. Im neuen Fachbeitrag geht es darum, wie Schadenminderung, Freigabe und Wiederherstellung sauber voneinander getrennt werden."
-videoScript: "Notmaßnahmen und Wiederherstellung müssen nach Zweck, Freigabe und Dokumentation getrennt geprüft werden."
 cta:
   label: "Schaden strukturiert melden"
   href: "/schaden-melden/"
@@ -91,6 +90,6 @@ Notmaßnahmen und Wiederherstellung lassen sich nur belastbar bewerten, wenn Sch
 
 1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
 2. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
-3. Verordnung über Arbeitsstätten (ArbStättV), § 4 Instandhaltung und Reinigung von Arbeitsstätten, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/arbst_ttv_2004/__4.html
+3. Bürgerliches Gesetzbuch (BGB), § 254 Mitverschulden, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__254.html
 4. Umweltbundesamt, Ratgeber: Schimmel im Haus, https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus
 5. Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von

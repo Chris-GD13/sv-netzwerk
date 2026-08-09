@@ -9,7 +9,6 @@ dailyStandard: false
 contentLevel: "B"
 teaser: "Nach dem Löscheinsatz müssen Wassereintrag, Brandrückstände, Korrosionsrisiko, technische Anlagen und Trocknungsbedarf als getrennte Prüffelder behandelt werden."
 linkedinSummary: "Löschwasserschäden sind mehr als nasse Oberflächen nach einem Brand. Im neuen Fachbeitrag zeige ich, warum Kontamination, Korrosion, Trocknung und Wiederherstellung getrennt bewertet werden müssen."
-videoScript: "Löschwasserschäden müssen nach Kontamination, Korrosion und Trocknungsbedarf getrennt bewertet werden."
 cta:
   label: "Schaden strukturiert melden"
   href: "/schaden-melden/"
@@ -92,5 +91,5 @@ Löschwasserschäden lassen sich nur belastbar bewerten, wenn Kontamination, Kor
 1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
 2. Umweltbundesamt, Ratgeber: Schimmel im Haus, https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus
 3. Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
-4. Bundesanstalt für Arbeitsschutz und Arbeitsmedizin (BAuA), ASR A2.2 „Maßnahmen gegen Brände“, https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A2-2
-5. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
+4. VdS 2357 „Richtlinien zur Brandschadensanierung“, https://vds.de/fileadmin/Website_Content_Images/VdS_Publikationen/vds_2357_web.pdf
+5. TRGS 524 „Schutzmaßnahmen bei Tätigkeiten in kontaminierten Bereichen“, https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524

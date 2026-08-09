@@ -97,6 +97,6 @@ Photovoltaikanlagen nach Sturm, Hagel und Brand lassen sich nur belastbar bewert
 
 1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
 2. DGUV Fachbereich Bauwesen, Sachgebiet Hochbau, Deutsche Gesetzliche Unfallversicherung, https://www.dguv.de/fb-bauwesen/sachgebiete/hochbau/index.jsp
-3. Bundesanstalt für Arbeitsschutz und Arbeitsmedizin (BAuA), ASR A1.7 „Türen und Tore“, https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-7
-4. Bundesanstalt für Arbeitsschutz und Arbeitsmedizin (BAuA), ASR A1.8 „Verkehrswege“, https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-8
-5. Bundesanstalt für Arbeitsschutz und Arbeitsmedizin (BAuA), ASR A2.3 „Fluchtwege und Notausgänge“, https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A2-3
+3. DIN VDE 0100-712 (VDE 0100-712):2016-10, Errichten von Niederspannungsanlagen - Teil 7-712: Anforderungen für Betriebsstätten, Räume und Anlagen besonderer Art - Photovoltaik-(PV)-Stromversorgungssysteme, VDE VERLAG, https://www.vde-verlag.de/p/normen/din-vde-0100-712-vde-0100-712-2016-10/0100340-DE-PR
+4. DIN EN 62446-1:2019-04 (VDE 0126-23-1), Photovoltaik(PV)-Systeme - Anforderungen an Prüfung, Dokumentation und Instandhaltung - Teil 1: Netzgekoppelte Systeme - Dokumentation, Inbetriebnahmeprüfungen und Inspektion, DIN Media, https://www.dinmedia.de/de/norm/din-en-62446-1/299821500
+5. DGUV Information 203-080, Montage und Instandhaltung von Photovoltaik-Anlagen, Deutsche Gesetzliche Unfallversicherung, https://publikationen.dguv.de/regelwerk/dguv-informationen/2896/montage-und-instandhaltung-von-photovoltaik-anlagen
