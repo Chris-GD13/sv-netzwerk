@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.4.19 – 2026-08-09
+- Migration Fachbeitrag 2026-07-21: „Kumulschäden nach Sturm und Hagel – belastbare Prüffolge" auf Fachbeitragsstandard gehoben
+- videoScript entfernt; updatedAt aktualisiert; noindex ergänzt
+- 15 Abschnitte ausgebaut (~1900 Wörter); Praxisbeispiel, Sofortmaßnahmen, Handlungsempfehlungen ergänzt
+- 5 geprüfte Primärquellen (BGB §634, §254; VVG §82, §86; UBA Starkregen) eingetragen
+- library.ts Beschreibung und Tags aktualisiert; 46 Einträge unverändert
+
 ## 3.4.18 – 2026-08-09
 - Migration Fachbeitrag 2026-07-27: „Leitungswasserschaden in Aalen: Aufgaben eines Sachverständigen" auf Fachbeitragsstandard gehoben
 - videoScript entfernt; canonical und updatedAt ergänzt; contentLevel C→B
