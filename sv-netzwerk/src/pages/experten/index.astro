@@ -8,15 +8,29 @@ const backoffice = experts.filter((expert) => expert.status === 'active' && expe
 const regions = [...new Set(specialists.flatMap((expert) => expert.regions))].sort((a, b) => a.localeCompare(b, 'de'));
 const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].sort((a, b) => a.localeCompare(b, 'de'));
 ---
-<BaseLayout title="Experten | SV-Netzwerk" description="Experten direkt nach Region und Fachgebiet filtern und anfragen." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Experten' }]}>
+<BaseLayout title="Experten | SV-Netzwerk" description="Sachverständige und Fachkompetenz im SV-Netzwerk nach Aufgabenstellung, Region und Fachgebiet auswählen." breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Experten' }]}>
   <section class="sv-section experts-intro">
     <div class="sv-container">
-      <h1>Sachverständige und Schadenregulierer im SV-Netzwerk</h1>
+      <h1>Sachverständige und Fachkompetenz im SV-Netzwerk</h1>
+      <p class="sv-lead">Lernen Sie zuerst die aktiven Fachleute im Netzwerk kennen. Bei Bedarf können Sie die Übersicht anschließend gezielt nach Region, Fachgebiet oder Name filtern.</p>
     </div>
   </section>
-  <section class="sv-section" id="interaktive-filter">
+
+  <section class="sv-section" id="sachverstaendige">
     <div class="sv-container">
-      <SectionHeader eyebrow="Filter" title="Experten nach Region und Fachgebiet filtern" text="Filter setzen und direkt passende Experten anzeigen." />
+      <div class="experts-grid" data-filter-grid>
+        {specialists.map((expert) => (
+          <div data-filter-item data-name={expert.name} data-regions={expert.regions.join('|')} data-fields={expert.expertise.join('|')}>
+            <ExpertCard expert={expert} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="sv-section sv-section-alt" id="interaktive-filter">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Gezielte Auswahl" title="Experten nach Region und Fachgebiet filtern" text="Wenn Sie eine bestimmte Fachkompetenz oder regionale Verfügbarkeit suchen, grenzen Sie die sichtbaren Profile hier ein." />
       <div class="filter-panel">
         <label>Region
           <select data-filter-region>
@@ -35,18 +49,7 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
         </label>
       </div>
       <p class="filter-result" data-filter-count></p>
-    </div>
-  </section>
-
-  <section class="sv-section" id="sachverstaendige">
-    <div class="sv-container">
-      <div class="experts-grid" data-filter-grid>
-        {specialists.map((expert) => (
-          <div data-filter-item data-name={expert.name} data-regions={expert.regions.join('|')} data-fields={expert.expertise.join('|')}>
-            <ExpertCard expert={expert} />
-          </div>
-        ))}
-      </div>
+      <p class="filter-jump"><a href="#sachverstaendige">Zu den gefilterten Expertenprofilen ↑</a></p>
     </div>
   </section>
 
@@ -101,10 +104,13 @@ const fields = [...new Set(specialists.flatMap((expert) => expert.expertise))].s
 <style>
   .experts-intro{padding-bottom:0}
   .experts-intro h1{margin:0}
+  .experts-intro .sv-lead{max-width:72ch}
   .filter-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-lg);background:rgba(255,255,255,.72)}
   .filter-panel label{display:grid;gap:.4rem;font-weight:800}
   .filter-panel input,.filter-panel select{padding:.78rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:#fff;font:inherit}
   .filter-result{margin:.7rem 0 0;color:var(--sv-color-muted);font-weight:700}
+  .filter-jump{margin:.35rem 0 0}
+  .filter-jump a{font-weight:800;text-decoration:none}
   .experts-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem}
   .experts-grid--backoffice{grid-template-columns:repeat(2,minmax(0,1fr));max-width:58rem}
   @media(max-width:64rem){.experts-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
