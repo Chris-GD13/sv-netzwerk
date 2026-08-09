@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Flachdachschäden nach Sturm und Starkregen: Windsog, Abdichtung und Entwässerung getrennt prüfen',
+    description: 'Flachdachschäden nach Sturm und Starkregen sind nur belastbar zu bewerten, wenn Windsog, Abdichtung, Entwässerung, stehendes Wasser und Vorschäden technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/flachdachschaden-sturm-starkregen-windsog-abdichtung-entwaesserung/',
+    category: 'Gebäudehülle',
+    tags: ['Flachdach', 'Sturmschaden', 'Starkregen', 'Abdichtung', 'Entwässerung', 'Schadenabgrenzung'],
+    date: '2026-08-14',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Schwarzwasserschäden: Kontamination, Hygiene, Rückbau und Entsorgung fachlich bewerten',
     description: 'Schwarzwasserschäden sind nur belastbar zu bewerten, wenn Kontamination, hygienische Gefährdung, Rückbaugrenzen und Entsorgungswege technisch sauber getrennt dokumentiert werden.',
     href: '/fachwissen/schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung/',
