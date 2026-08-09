@@ -74,7 +74,7 @@ if (publishedDaily.length > 0) {
     if (a.publishedAt === b.publishedAt) return a.file.localeCompare(b.file);
     return b.publishedAt.localeCompare(a.publishedAt);
   });
-  const latestOverall = publishedAll[0] ?? latestDaily;
+  const latestOverall = publishedAll[0];
 
   const expectedHref = `/fachwissen/${latestOverall.slug}/`;
   const librarySource = await readFile(libraryFile, 'utf8');
