@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Interdisziplinäres Sachverständigennetzwerk und Gutachter-Plattform für komplexe Schadenfälle',
+    description: 'Komplexe Schadenfälle lassen sich belastbar steuern, wenn Fachgewerke, Sachverständige, Regulierer und digitale Plattformprozesse klar strukturiert zusammengeführt werden.',
+    href: '/fachwissen/interdisziplinaeres-sachverstaendigennetzwerk-gutachter-plattform-schadenregulierung/',
+    category: 'Gutachter-Plattform',
+    tags: ['Sachverständigennetzwerk', 'Gutachter-Plattform', 'Schadenregulierung', 'Koordination', 'Interdisziplinär', 'Prozessqualität'],
+    date: '2026-08-22',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Rechnungs- und Nachtragsprüfung: Mengen, Leistungen, Kosten und Schadenbezug fachlich trennen',
     description: 'Rechnungs- und Nachtragsprüfungen sind nur belastbar, wenn Mengen, Leistungen, Schadenbezug, Zusatzaufwand und Abrechnungslogik technisch sauber getrennt dokumentiert werden.',
     href: '/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug/',
