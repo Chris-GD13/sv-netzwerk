@@ -8,4 +8,10 @@ const letters = [...new Set(items.map((item) => item.title.trim().charAt(0).toLo
   <span>Alphabetisch:</span>
   {letters.map((letter) => <a href={`#letter-${encodeURIComponent(letter)}`}>{letter}</a>)}
 </nav>
-<style>.alphabet{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin:1.25rem 0}.alphabet span{margin-right:.35rem;font-weight:800}.alphabet a{display:grid;width:2rem;height:2rem;place-items:center;border:1px solid var(--sv-color-border);border-radius:50%;text-decoration:none}.alphabet a:hover{background:var(--sv-color-primary);color:white}</style>
+<style>
+.alphabet{display:flex;min-width:0;align-items:center;gap:.3rem;margin:.55rem 0 1.1rem;padding-inline:.15rem;overflow-x:auto;scrollbar-width:thin}
+.alphabet span{flex:none;margin-right:.25rem;font-size:.85rem;font-weight:800}
+.alphabet a{display:grid;flex:none;width:1.65rem;height:1.65rem;place-items:center;border:1px solid var(--sv-color-border);border-radius:50%;font-size:.78rem;text-decoration:none}
+.alphabet a:hover{background:var(--sv-color-primary);color:white}
+@media(max-width:42rem){.alphabet{flex-wrap:wrap;overflow:visible;margin:.8rem 0 0}.alphabet a{width:2rem;height:2rem}}
+</style>
