@@ -595,11 +595,11 @@ const fileExists = async (file) => {
   }
 };
 
-const ensureUniqueSlug = async (base) => {
+const ensureUniqueSlug = async (base, skipExisting = false) => {
   const normalized = safeSlug(base);
   let candidate = normalized;
   let counter = 2;
-  while (await fileExists(path.join(knowledgeDir, `${candidate}.md`))) {
+  while (!skipExisting && await fileExists(path.join(knowledgeDir, `${candidate}.md`))) {
     candidate = `${normalized}-${counter}`;
     counter += 1;
   }
@@ -898,7 +898,7 @@ const baseSlug = String(incompleteExistingSlotRow?.url || '').trim()
   ? deriveSlugFromUrl(String(incompleteExistingSlotRow.url || '').trim())
   : '';
 const slugBase = baseSlug || (caseContext ? `${topic.slugBase}-anonymisierte-fallauswertung` : topic.slugBase);
-const slug = await ensureUniqueSlug(slugBase);
+const slug = await ensureUniqueSlug(slugBase, Boolean(baseSlug));
 const articleUrl = `https://www.sv-netzwerk.eu/fachwissen/${slug}/`;
 const imageFileName = `${slug}.svg`;
 const imageWebPath = `/assets/images/linkedin/${imageFileName}`;

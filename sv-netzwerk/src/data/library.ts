@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Schneedruck und Winterschäden: Dächer fachlich prüfen, Risiken sauber abgrenzen',
+    description: 'Wie Schneedruck-, Eis- und Frostschäden an Dächern fachlich eingeordnet, dokumentiert und ohne vorschnelle Deckungsannahmen geprüft werden.',
+    href: '/fachwissen/schneedruck-winterschaeden-bewertung-regulierung/',
+    category: 'Schneedruck und Winterschäden',
+    tags: ['Schneedruck', 'Winterschaden', 'Dach', 'Statik', 'Schadenprüfung'],
+    date: '2026-08-08',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Tornadoereignisse und lokale Sturmereignisse: Schadenaufnahme und technische Einordnung',
     description: 'Wie bei Tornadoereignissen und lokalen Sturmereignissen Schadenbild, Windwirkung, Trümmeranprall, Vorschäden und der technisch erforderliche Maßnahmenumfang sauber getrennt bewertet werden.',
     href: '/fachwissen/tornado-lokale-sturmereignisse-schadenaufnahme/',
@@ -79,16 +89,6 @@ export const library: LibraryItem[] = [
     category: 'Brandschaden',
     tags: ['Brandschaden', 'Mehrere Gebäude', 'Schadenaufnahme', 'Regulierung'],
     date: '2026-08-01',
-    type: 'article',
-    featured: false,
-  },
-  {
-    title: 'Schneedruck und Winterschäden: Dächer fachlich prüfen, Risiken sauber abgrenzen',
-    description: 'Wie Schneedruck-, Eis- und Frostschäden an Dächern fachlich eingeordnet, dokumentiert und ohne vorschnelle Deckungsannahmen geprüft werden.',
-    href: '/fachwissen/schneedruck-winterschaeden-bewertung-regulierung/',
-    category: 'Schneedruck und Winterschäden',
-    tags: ['Schneedruck', 'Winterschaden', 'Dach', 'Statik', 'Schadenprüfung'],
-    date: '2026-08-08',
     type: 'article',
     featured: false,
   },

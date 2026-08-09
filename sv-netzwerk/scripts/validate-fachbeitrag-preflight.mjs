@@ -69,12 +69,6 @@ if (todayDaily.length > 2) {
 }
 
 if (publishedDaily.length > 0) {
-  publishedDaily.sort((a, b) => {
-    if (a.publishedAt === b.publishedAt) return a.file.localeCompare(b.file);
-    return b.publishedAt.localeCompare(a.publishedAt);
-  });
-  const latestDaily = publishedDaily[0];
-
   const publishedAll = entries.filter((entry) => entry.status === 'published' && entry.publishedAt);
   publishedAll.sort((a, b) => {
     if (a.publishedAt === b.publishedAt) return a.file.localeCompare(b.file);
@@ -89,18 +83,20 @@ if (publishedDaily.length > 0) {
   if (firstDate !== latestOverall.publishedAt || firstHref !== expectedHref) {
     errors.push(`Fachwissensübersicht nicht auf aktuellstem Beitrag: erwartet ${latestOverall.publishedAt} ${expectedHref}, gefunden ${firstDate} ${firstHref}.`);
   }
+}
 
-  const linkedinPath = path.join(root, 'src', 'content', 'linkedin', `${latestDaily.publishedAt}_${latestDaily.slug}.txt`);
-  const videoPath = path.join(root, 'src', 'content', 'videos', `${latestDaily.publishedAt}_wissen-in-180-sekunden_${latestDaily.slug}.txt`);
+for (const entry of todayDaily) {
+  const linkedinPath = path.join(root, 'src', 'content', 'linkedin', `${entry.publishedAt}_${entry.slug}.txt`);
+  const videoPath = path.join(root, 'src', 'content', 'videos', `${entry.publishedAt}_wissen-in-180-sekunden_${entry.slug}.txt`);
   try {
     await access(linkedinPath);
   } catch {
-    errors.push(`LinkedIn-Begleittext fehlt: src/content/linkedin/${latestDaily.publishedAt}_${latestDaily.slug}.txt`);
+    errors.push(`LinkedIn-Begleittext fehlt: src/content/linkedin/${entry.publishedAt}_${entry.slug}.txt`);
   }
   try {
     await access(videoPath);
   } catch {
-    errors.push(`Wissen-in-180-Sekunden-Skript fehlt: src/content/videos/${latestDaily.publishedAt}_wissen-in-180-sekunden_${latestDaily.slug}.txt`);
+    errors.push(`Wissen-in-180-Sekunden-Skript fehlt: src/content/videos/${entry.publishedAt}_wissen-in-180-sekunden_${entry.slug}.txt`);
   }
 }
 

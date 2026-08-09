@@ -1,6 +1,6 @@
 /**
  * Zählt veröffentlichte dailyStandard-Pflichtbeiträge für ein gegebenes Berliner Datum.
- * Ausgabe: Anzahl (ganzzahlig) auf stdout; mindestens 1 als Fallback.
+ * Ausgabe: Anzahl (ganzzahlig) auf stdout; mindestens 0.
  *
  * Verwendung: node scripts/count-daily-articles.mjs [YYYY-MM-DD]
  */
@@ -33,4 +33,4 @@ for (const file of files) {
   if (dateMatch && dateMatch[1] === berlinDate) count += 1;
 }
 
-process.stdout.write(String(Math.max(1, count)));
+process.stdout.write(String(count));

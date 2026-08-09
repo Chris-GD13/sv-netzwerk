@@ -45,6 +45,7 @@ jobs:
       M365_CLIENT_SECRET: ${{ secrets.M365_CLIENT_SECRET }}
       M365_CALENDAR_USER_ID: ${{ secrets.M365_CALENDAR_USER_ID }}
       CALENDAR_CASE_LOOKBACK_DAYS: 1095
+      ALLOW_CALENDAR_CASE_CONTEXT: ${{ vars.ALLOW_CALENDAR_CASE_CONTEXT }}
 
     steps:
       - name: Repository auschecken
@@ -105,7 +106,7 @@ jobs:
         run: |
           # Zähle vorhandene dailyStandard-Pflichtbeiträge für heute (nach Generierung)
           # Die Generierung hat den neuen Beitrag bereits angelegt; EXISTING_TODAY = Gesamtzahl heute
-          EXISTING_TODAY=$(node scripts/count-daily-articles.mjs "$BERLIN_DATE" 2>/dev/null || echo "1")
+          EXISTING_TODAY=$(node scripts/count-daily-articles.mjs "$BERLIN_DATE" 2>/dev/null || echo "0")
           npm run validate:knowledge -- "$BERLIN_DATE" "--expected-daily-count=${EXISTING_TODAY}"
 
       - name: Typprüfung ausführen
@@ -256,6 +257,10 @@ jobs:
 
       - name: Veröffentlichungsprotokoll nach LinkedIn aktualisieren
         if: steps.generate.outputs.status != 'skipped' && env.PUBLICATION_LINKEDIN_STATUS != 'success'
+        run: node scripts/update-fachbeitrag-log.mjs --linkedin=success
+
+      - name: Veröffentlichungsprotokoll bei bereits erfolgreichem LinkedIn abgleichen
+        if: steps.generate.outputs.status != 'skipped' && env.PUBLICATION_LINKEDIN_STATUS == 'success'
         run: node scripts/update-fachbeitrag-log.mjs --linkedin=success
 
       - name: Fehlstatus ins Veröffentlichungsprotokoll schreiben
