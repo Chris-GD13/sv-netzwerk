@@ -10,7 +10,6 @@ dailyStandard: true
 contentLevel: "A"
 teaser: "Regiekosten sind nicht schon deshalb erstattungsfähig, weil sie angefallen sind. Entscheidend sind Auftrag, Erforderlichkeit, Nachweis und eine prüffähige Zuordnung zum Schaden."
 linkedinSummary: "Regieabrechnungen werden belastbar, wenn Auftrag, Tätigkeit, Zeit, Personal, Material und Schadenbezug lückenlos zusammenpassen. Pauschale Stundenlisten oder nachträglich ergänzte Sammelnachweise reichen für eine sachgerechte Freigabe regelmäßig nicht aus."
-videoScript: "Wissen kompakt: Bei Regiekosten zuerst den Auftrag und den versicherten Schadenbezug prüfen. Danach müssen Datum, Mitarbeiter, Tätigkeit, Stunden, Material und Leistungsort zusammenpassen. Drittleistungen sind gesondert zu belegen. Nur der nachvollziehbar erforderliche und schadenbedingte Aufwand ist freigabefähig."
 cta:
   label: "Prüfung eines Schadenaufwands anfragen"
   href: "/kontakt/"
@@ -18,10 +17,13 @@ relatedLinks: ["/leistungen/", "/fachwissen/", "/kontakt/"]
 damageTypes: ["leitungswasser", "brand", "sturm-hagel", "gewerbe-industrie"]
 publication:
   publishedAt: 2026-07-16
+  updatedAt: 2026-08-09
   status: published
 seo:
   title: "Regiekosten im Schadenfall: Nachweise korrekt prüfen"
   description: "Praxisleitfaden zur Prüfung von Stundenlohnarbeiten, Material, Fremdleistungen und Leistungsnachweisen bei Versicherungs- und Gebäudeschäden."
+  canonical: "https://www.sv-netzwerk.eu/fachwissen/regiekosten-im-schadenfall-pruefen/"
+  noindex: false
 ---
 
 Regiearbeiten sind bei Schadenfällen häufig unvermeidbar. Gerade in der Sofortphase lässt sich der tatsächliche Aufwand nicht immer im Voraus vollständig bestimmen. Bauteile müssen geöffnet, Wasser muss aufgenommen, Inventar muss bewegt oder eine Gefahrenstelle muss gesichert werden. Aus dieser praktischen Notwendigkeit folgt jedoch keine pauschale Freigabe sämtlicher abgerechneter Stunden und Materialien.
@@ -186,3 +188,11 @@ Regiekosten sind ein geeignetes Abrechnungsmodell für tatsächlich nicht vorab 
 Eine sachgerechte Prüfung würdigt den notwendigen Aufwand, ohne unklare oder doppelte Ansätze ungeprüft zu übernehmen. Entscheidend ist nicht, ob eine Leistung als „Regie“ bezeichnet wurde, sondern ob sie erforderlich, beauftragt, schadenbedingt und nachvollziehbar belegt ist.
 
 Weitere Informationen zur fachlichen Begleitung komplexer Schadenfälle finden sich unter [Leistungen](/leistungen/) und in der [Fachwissensbibliothek](/fachwissen/). Eine konkrete Prüfungsanfrage kann über den [Kontakt](/kontakt/) übermittelt werden.
+
+## Quellen und weiterführende Hinweise
+
+1. Bürgerliches Gesetzbuch (BGB), § 631 Vertragstypische Pflichten beim Werkvertrag, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__631.html
+2. Bürgerliches Gesetzbuch (BGB), § 634 Rechte des Bestellers bei Mängeln, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__634.html
+3. Bürgerliches Gesetzbuch (BGB), § 650b Änderung des Vertrags; Anordnungsrecht des Bestellers, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__650b.html
+4. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+5. Bürgerliches Gesetzbuch (BGB), § 254 Mitverschulden, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__254.html
