@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.21 – 2026-08-09
+- Migration Fachbeitrag 2026-07-20: „Kumulschäden nach Hochwasser und Überflutung" auf Fachbeitragsstandard gehoben
+- videoScript entfernt; updatedAt aktualisiert; description erweitert; noindex ergänzt
+- Handlungsempfehlungen und 5 Quellen ergänzt; vorhandene 11 Abschnitte beibehalten
+- library.ts Beschreibung und Tags aktualisiert; 46 Einträge unverändert
+
 ## 3.4.20 – 2026-08-09
 - Migration Fachbeitrag 2026-07-20: „Starkregen und Rückstau: Schadenaufnahme und Regulierung im Kumulereignis" auf Fachbeitragsstandard gehoben
 - videoScript entfernt; updatedAt aktualisiert; seo.title korrigiert; noindex ergänzt
