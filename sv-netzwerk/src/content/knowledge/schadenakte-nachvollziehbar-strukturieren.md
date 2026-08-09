@@ -4,11 +4,11 @@ description: "Wie eine einheitliche Aktenstruktur Entscheidungen beschleunigt, R
 category: "Prozessqualität"
 tags: ["Schadenakte", "Dokumentation", "Prozessqualität", "Schadenregulierung"]
 author: "christian-waechter"
+featured: false
 dailyStandard: false
 contentLevel: "B"
 teaser: "Eine gute Schadenakte ordnet Informationen so, dass jede Entscheidung mit Quelle, Zeitpunkt und Verantwortlichkeit nachvollziehbar bleibt."
 linkedinSummary: "Schadenakten werden belastbar, wenn Eingang, Prüfung, Entscheidung und Nachverfolgung klar getrennt dokumentiert sind. Einheitliche Benennung, feste Ablagelogik und kurze Entscheidungsvermerke reduzieren Rückfragen und verbessern Übergaben."
-videoScript: "Wissen kompakt: Eine prüffähige Schadenakte braucht klare Ordnerlogik, eindeutige Dateinamen und dokumentierte Entscheidungen. Jede Maßnahme wird mit Datum, Anlass, Quelle und verantwortlicher Person festgehalten. So bleiben Übergaben und spätere Prüfungen belastbar."
 cta:
   label: "Strukturierte Schadenbearbeitung anfragen"
   href: "/kontakt/"
@@ -16,10 +16,13 @@ relatedLinks: ["/leistungen/", "/fachwissen/", "/kontakt/"]
 damageTypes: ["leitungswasser", "brand", "sturm-hagel", "gewerbe-industrie"]
 publication:
   publishedAt: 2026-07-17
+  updatedAt: 2026-08-09
   status: published
 seo:
   title: "Schadenakte strukturieren: Entscheidungen prüffähig dokumentieren"
   description: "Praxisleitfaden für eine nachvollziehbare Aktenstruktur mit klaren Entscheidungen, Quellenbezug und sauberer Übergabedokumentation."
+  canonical: "https://www.sv-netzwerk.eu/fachwissen/schadenakte-nachvollziehbar-strukturieren/"
+  noindex: false
 ---
 
 In vielen Schadenfällen liegt das Problem nicht in fehlenden Informationen, sondern in deren unklarer Ordnung. Fotos sind vorhanden, Protokolle ebenfalls, dazu E-Mails, Kostenvoranschläge, Rechnungen und Telefonnotizen. Wenn diese Unterlagen ohne feste Struktur abgelegt werden, steigt der Zeitaufwand bei jeder Rückfrage. Entscheidungen verzögern sich, weil Zusammenhänge erst rekonstruiert werden müssen.
@@ -118,3 +121,11 @@ Eine prüffähige Schadenakte entsteht nicht durch Dokumentmenge, sondern durch 
 
 Für eine strukturierte Begleitung komplexer Schadenfälle stehen die Informationen unter [Leistungen](/leistungen/) und in der [Fachwissensbibliothek](/fachwissen/) bereit. Eine konkrete Anfrage kann über den [Kontakt](/kontakt/) gestellt werden.
 Zusätzlich empfiehlt sich, die Aktenlogik vor jedem größeren Übergabetermin noch einmal gemeinsam abzugleichen.
+
+## Quellen und weiterführende Hinweise
+
+1. Bürgerliches Gesetzbuch (BGB), § 631 Vertragstypische Pflichten beim Werkvertrag, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__631.html
+2. Bürgerliches Gesetzbuch (BGB), § 634 Rechte des Bestellers bei Mängeln, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__634.html
+3. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+4. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
+5. Bürgerliches Gesetzbuch (BGB), § 254 Mitverschulden, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__254.html
