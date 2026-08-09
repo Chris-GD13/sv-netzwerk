@@ -9,7 +9,6 @@ dailyStandard: false
 contentLevel: "B"
 teaser: "Bei Baumsturz- und Astbruchschäden müssen Wetterereignis, Vorschädigung, Standfestigkeit, Aufprallbereich und Folgegewerke als getrennte Prüffelder behandelt werden."
 linkedinSummary: "Baumsturz und Astbruch wirken oft wie eindeutige Sturmschäden. Technisch entscheidend ist aber, ob Wetterlage, Vorschäden, Standfestigkeit und Aufprallbild sauber getrennt dokumentiert sind."
-videoScript: "Baumsturz und Astbruch müssen nach Sturmereignis, Standfestigkeit und Vorschaden getrennt geprüft werden."
 cta:
   label: "Schaden strukturiert melden"
   href: "/schaden-melden/"
@@ -78,7 +77,7 @@ Baumsturz- und Astbruchschäden lassen sich nur belastbar bewerten, wenn Sturmer
 ## Quellen und weiterführende Hinweise
 
 1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-2. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
-3. DGUV Fachbereich Bauwesen, Sachgebiet Hochbau, Deutsche Gesetzliche Unfallversicherung, https://www.dguv.de/fb-bauwesen/sachgebiete/hochbau/index.jsp
-4. Bundesanstalt für Arbeitsschutz und Arbeitsmedizin (BAuA), ASR A1.7 „Türen und Tore“, https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-7
-5. Bundesanstalt für Arbeitsschutz und Arbeitsmedizin (BAuA), ASR A1.8 „Verkehrswege“, https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-8
+2. FLL-Baumuntersuchungsrichtlinien – Richtlinien für eingehende Untersuchungen zur Überprüfung der Verkehrssicherheit von Bäumen, https://shop.fll.de/de/baeume-und-gehoelze/fll-baumuntersuchung.html
+3. Deutscher Wetterdienst – Wetterinformationen für Schadensfälle, https://www.dwd.de/DE/leistungen/wetterinfo/wetterinfo_schadensfall.html
+4. FLL ZTV-Baumpflege 2017 – Zusätzliche Technische Vertragsbedingungen und Richtlinien für Baumpflege, https://shop.fll.de/de/ztv-baumpflege-zusaetzliche-technische-vertragsbedingungen-und-richtlinien-fuer-baumpflege-2017-broschuere.html
+5. FLL-Baumkontrollrichtlinien 2020 – Richtlinien für Baumkontrollen zur Überprüfung der Verkehrssicherheit von Bäumen, https://shop.fll.de/de/baumkontrollrichtlinien-richtlinien-fuer-baumkontrollen-zur-ueberpruefung-der-verkehrssicherheit.html

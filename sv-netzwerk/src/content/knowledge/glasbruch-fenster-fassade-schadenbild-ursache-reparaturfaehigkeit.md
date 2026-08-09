@@ -9,7 +9,6 @@ dailyStandard: false
 contentLevel: "B"
 teaser: "Bei Glasbruchschäden müssen Bruchbild, Einbausituation, Anprall, Spannungsursachen und Reparaturfähigkeit getrennt dokumentiert werden."
 linkedinSummary: "Glasbruch wirkt oft eindeutig – ist technisch aber differenziert zu prüfen. Im neuen Fachbeitrag geht es um Bruchbild, Ursache, Einbausituation und die Frage, wann Reparatur oder Austausch wirklich erforderlich sind."
-videoScript: "Glasbruchschäden müssen nach Bruchbild, Ursache und Reparaturfähigkeit getrennt geprüft werden."
 cta:
   label: "Schaden strukturiert melden"
   href: "/schaden-melden/"
@@ -81,8 +80,8 @@ Glasbruchschäden an Fenstern und Fassaden lassen sich nur belastbar bewerten, w
 
 ## Quellen und weiterführende Hinweise
 
-1. DGUV Fachbereich Bauwesen, Sachgebiet Hochbau, Deutsche Gesetzliche Unfallversicherung, https://www.dguv.de/fb-bauwesen/sachgebiete/hochbau/index.jsp
-2. Bundesanstalt für Arbeitsschutz und Arbeitsmedizin (BAuA), ASR A1.7 „Türen und Tore“, https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-7
-3. Bundesanstalt für Arbeitsschutz und Arbeitsmedizin (BAuA), ASR A1.8 „Verkehrswege“, https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-8
+1. DIN 18008-1:2020-05 – Glas im Bauwesen, Bemessungs- und Konstruktionsregeln, Teil 1: Begriffe und allgemeine Grundlagen, https://www.dinmedia.de/de/norm/din-18008-1/312359991
+2. DIN 18008-2:2020-05 – Glas im Bauwesen, Bemessungs- und Konstruktionsregeln, Teil 2: Linienförmig gelagerte Verglasungen, https://www.dinmedia.de/de/norm/din-18008-2/312360009
+3. DIN EN 12150-1:2020-07 – Thermisch vorgespanntes Kalknatron-Einscheiben-Sicherheitsglas, https://www.dinmedia.de/de/norm/din-en-12150-1/323111198
 4. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-5. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
+5. DIN EN 1279-1:2018-10 – Glas im Bauwesen, Mehrscheiben-Isolierglas, Teil 1: Allgemeines, Systembeschreibung, Austauschregeln, Toleranzen und visuelle Qualität, https://www.dinmedia.de/de/norm/din-en-1279-1/281205722
