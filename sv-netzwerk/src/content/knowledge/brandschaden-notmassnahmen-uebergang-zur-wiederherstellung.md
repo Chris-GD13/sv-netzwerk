@@ -9,7 +9,6 @@ dailyStandard: true
 contentLevel: "B"
 teaser: "Nach der Erstmaßnahme beginnt die eigentliche Qualitätsarbeit: Was bleibt akute Sicherung, was ist schadenbedingte Wiederherstellung und was gehört nicht in den Schadenumfang?"
 linkedinSummary: "Nach einem Brandschaden entscheidet der Übergang von Notmaßnahme zur Wiederherstellung über Zeit, Kosten und Prüffähigkeit. Wer Feststellung, Bewertung und Empfehlung trennt, vermeidet Doppelansätze und Fehlfreigaben."
-videoScript: "Wissen in 180 Sekunden: Nach dem Brand zuerst Gefahrenlage und Erstmaßnahmen dokumentieren. Dann den Sachstand für jeden Bereich trennen: Feststellung, Bewertung, Empfehlung. Ruß- und Löschwasserschäden, Vorschäden und Instandhaltung klar abgrenzen. Nur schadenbedingte, technisch begründete Maßnahmen freigeben."
 cta:
   label: "Brandschaden strukturiert einordnen"
   href: "/schaden-melden/"
@@ -17,11 +16,13 @@ relatedLinks: ["/fachwissen/schadenabgrenzung/", "/fachwissen/prueffaehige-dokum
 damageTypes: ["brand", "gebaeude", "gewerbe-industrie"]
 publication:
   publishedAt: 2026-07-17
-  updatedAt: 2026-07-17
+  updatedAt: 2026-08-09
   status: published
 seo:
   title: "Brandschaden: Notmaßnahme und Wiederherstellung trennen"
   description: "Praxisleitfaden zur Abgrenzung von Erstmaßnahmen, schadenbedingter Wiederherstellung und Instandhaltung nach Brandschäden."
+  canonical: "https://www.sv-netzwerk.eu/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/"
+  noindex: false
 ---
 
 Nach einem Brandschaden laufen in kurzer Zeit viele Schritte parallel: Feuerwehr, erste Sicherungen, Notabdichtungen, Reinigungs- und Räummaßnahmen, Abstimmung mit Versicherer, Eigentümer und Dienstleistern. In dieser Phase entstehen die meisten späteren Reibungsverluste nicht durch fehlenden Einsatz, sondern durch unklare Abgrenzung. Wird die Übergangsphase von akuter Gefahrenabwehr zur geordneten Wiederherstellung nicht sauber dokumentiert, sind Kosten, Maßnahmen und Verantwortlichkeiten später nur schwer prüfbar.
@@ -113,3 +114,11 @@ Diese Checkliste ersetzt keine Einzelfallprüfung, sie stabilisiert jedoch die Q
 Nach Brandschäden entscheidet die Qualität der Übergangsphase über die spätere Prüffähigkeit. Die Trennung von Feststellung, Bewertung und Empfehlung ist dabei der zentrale Standard. Zusätzlich müssen schadenbedingte Maßnahmen von Vorschäden, Mängeln und Instandhaltung klar abgegrenzt werden.
 
 Wer diese Struktur konsequent anwendet, schafft verlässliche Entscheidungsgrundlagen statt nachträglicher Korrekturen. Für die fachliche Einordnung eines konkreten Vorgangs helfen die [Schadenmeldung](/schaden-melden/) sowie die vertiefenden Beiträge zur [technischen Schadenabgrenzung](/fachwissen/schadenabgrenzung/) und [prüffähigen Dokumentation](/fachwissen/prueffaehige-dokumentation/).
+
+## Quellen und weiterführende Hinweise
+
+1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+2. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
+3. Bürgerliches Gesetzbuch (BGB), § 631 Vertragstypische Pflichten beim Werkvertrag, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__631.html
+4. Bürgerliches Gesetzbuch (BGB), § 254 Mitverschulden, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__254.html
+5. Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
