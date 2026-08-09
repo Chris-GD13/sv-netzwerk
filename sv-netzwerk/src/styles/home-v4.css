@@ -545,6 +545,7 @@
 .v4-hero__copy {
   position: relative;
   z-index: 1;
+  padding-top: clamp(1.5rem, 3vw, 2.5rem);
 }
 .v4-hero h1 {
   max-width: 50rem;
