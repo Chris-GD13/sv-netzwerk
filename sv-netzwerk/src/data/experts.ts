@@ -37,7 +37,7 @@ export const experts: ExpertProfile[] = [
     regions: ['Bundesweit nach Aufgabenstellung'], qualifications: ['Sachschadenbewertung von Immobilien'],
     certifications: ['Personenzertifizierung nach DIN EN ISO/IEC 17024', 'Vorstandsmitglied im BSS'],
     shortProfile: 'Sachverständige für Sachschadenbewertungen von Immobilien. Ihre Schwerpunkte sind Schadenregulierung, Sachschadenermittlung, Schimmelpilze, Feuchteprobleme, Innenraumschadstoffe und Ölschäden.',
-    contact: centralContact, linkedin: 'https://www.linkedin.com/in/carmen-gohl-34364324a/', image: '/assets/images/team/carmen-gohl.jpg', status: 'active', tags: ['Sachschadenbewertung', 'Schimmelpilze', 'Innenraumschadstoffe'], publications: [], practiceCases: ['/praxisfaelle/schimmel-dachbereich-ursachenabgrenzung/'], articles: [],
+    contact: centralContact, linkedin: 'https://www.linkedin.com/in/carmen-gohl-34364324a/', image: '/assets/images/team/carmen-gohl-aktuell-bw.webp', status: 'active', tags: ['Sachschadenbewertung', 'Schimmelpilze', 'Innenraumschadstoffe'], publications: [], practiceCases: ['/praxisfaelle/schimmel-dachbereich-ursachenabgrenzung/'], articles: [],
     company: {
       name: 'Sachverständigenbüro Carmen Gohl',
       description: 'Carmen Gohl betreibt ein eigenständiges Sachverständigenbüro mit den Schwerpunkten Sachschadenbewertungen von Immobilien, Versicherungswertermittlungen, Schimmelpilze, Innenraumschadstoffe sowie Ölschäden.',
