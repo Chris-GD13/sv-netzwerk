@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Notmaßnahmen und Wiederherstellung: Schadenminderung, Freigabe und Dokumentation fachlich trennen',
+    description: 'Notmaßnahmen und Wiederherstellung sind nur belastbar zu bewerten, wenn Schadenminderung, Sofortsicherung, Freigabeentscheidungen und spätere Wiederherstellung technisch sauber getrennt dokumentiert werden.',
+    href: '/fachwissen/notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation/',
+    category: 'Schadenregulierung',
+    tags: ['Notmaßnahmen', 'Wiederherstellung', 'Schadenminderung', 'Freigabe', 'Dokumentation', 'Schadenabgrenzung'],
+    date: '2026-08-20',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Schlagregeneintritt an Fassaden und Fenstern: Anschlüsse, Dichtheit und Schadenabgrenzung fachlich prüfen',
     description: 'Schlagregeneintritte an Fassaden und Fenstern sind nur belastbar zu bewerten, wenn Anschlüsse, Dichtebenen, Eintrittspfade und Folgeschäden technisch sauber getrennt dokumentiert werden.',
     href: '/fachwissen/schlagregeneintritt-fassade-fenster-anschluesse-dichtheit-schadenabgrenzung/',
