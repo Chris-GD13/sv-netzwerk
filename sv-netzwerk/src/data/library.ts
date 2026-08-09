@@ -233,8 +233,8 @@ export const library: LibraryItem[] = [
     featured: false,
   },
   {
-    title: 'Rückstauschaden im Fitnessstudio: Gebäude- und Inhaltschaden trennen',
-    description: 'Warum bei Rückstauschäden im Fitnessstudio die klare Trennung von Gebäude- und Inhaltschaden den Regulierungserfolg bestimmt.',
+    title: 'Rückstauschaden im Fitnessstudio: Gebäude- und Inhaltsschaden fachlich trennen',
+    description: 'Wie Rückstauschäden mit Schwarzwasserkontamination in gewerblich genutzten Fitnessstudios technisch eingeordnet, Gebäude- und Inhaltsschäden abgegrenzt und Maßnahmen prüffähig dokumentiert werden.',
     href: '/fachwissen/rueckstauschaden-im-fitnessstudio-gebaeude-und-inhaltsschaden-trennen/',
     category: 'Starkregen und Rückstau',
     tags: ['Rückstau', 'Schwarzwasser', 'Fitnessstudio', 'Gebäudeversicherung', 'Inhaltsversicherung'],
