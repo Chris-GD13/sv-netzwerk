@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.22 – 2026-08-09
+- Migration Fachbeitrag 2026-07-19: „Kumulschäden in der Region" auf Fachbeitragsstandard gehoben
+- videoScript entfernt; canonical und noindex ergänzt; updatedAt aktualisiert
+- 5 Primärquellen-Abschnitt ergänzt; vorhandene 9 Abschnitte beibehalten
+- library.ts Tags erweitert; date von 2026-07-27 auf 2026-07-19 korrigiert; 46 Einträge unverändert
+
 ## 3.4.21 – 2026-08-09
 - Migration Fachbeitrag 2026-07-20: „Kumulschäden nach Hochwasser und Überflutung" auf Fachbeitragsstandard gehoben
 - videoScript entfernt; updatedAt aktualisiert; description erweitert; noindex ergänzt
