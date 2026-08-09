@@ -65,7 +65,7 @@ export const experts: ExpertProfile[] = [
     expertise: ['Baucontrolling', 'Gebäudeschäden', 'Nachtragsprüfung', 'Terminmanagement', 'SiGeKo', 'Sanierungsberatung'],
     regions: ['Bundesweit nach Aufgabenstellung'], qualifications: ['Master of Engineering', 'Bauingenieurin', 'Bauschadenbewertung'], certifications: ['DEKRA-zertifizierte Sachverständige'],
     shortProfile: 'Spezialistin für Baucontrolling, Gebäudeschäden, Sanierungsberatung, Nachtragsprüfung, Terminmanagement, SiGeKo und zerstörungsfreie Messtechnik.',
-    contact: centralContact, linkedin: 'https://www.linkedin.com/in/lenna-maria-walczok-6bb468291/', image: '/assets/images/team/lenna-maria-walczok.jpg', status: 'active', tags: ['Baucontrolling', 'Gebäudeschäden', 'Nachtragsprüfung'], publications: [], practiceCases: [], articles: [],
+    contact: centralContact, linkedin: 'https://www.linkedin.com/in/lenna-maria-walczok-6bb468291/', image: '/assets/images/team/lenna-maria-walczok-aktuell-bw.webp', status: 'active', tags: ['Baucontrolling', 'Gebäudeschäden', 'Nachtragsprüfung'], publications: [], practiceCases: [], articles: [],
     company: {
       name: 'Netzwerkprofil Lenna Maria Walczok',
       description: 'Weiterführendes Profil von Lenna Maria Walczok im BNI Chapter Weisser Turm Bad Homburg.',
