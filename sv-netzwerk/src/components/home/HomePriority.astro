@@ -2,59 +2,24 @@
 const priorities = [
   {
     index: '01',
-    title: 'Schaden melden',
-    text: 'Schadenfall mit allen Basisdaten und Unterlagen direkt einreichen.',
+    title: 'Schaden beauftragen',
+    text: 'Allgemeine Sachschäden sowie Kumul-, Komplex- und Großschäden mit den erforderlichen Basisdaten und Unterlagen strukturiert einreichen.',
     href: '/schaden-melden/',
-    cta: 'Schaden melden',
+    cta: 'Schadenmeldung öffnen',
   },
   {
     index: '02',
-    title: 'Großschaden melden',
-    text: 'Großschadenformular direkt öffnen und Auftrag ohne Umwege erteilen.',
-    href: '/grossschadenregulierung/#grossschaden-formular',
-    cta: 'Großschadenformular öffnen',
+    title: 'Leistungen für Versicherer',
+    text: 'Technische Feststellung, Kostenprüfung, Entscheidungsvorbereitung und Regulierung im Komplex- und Großschaden kennenlernen.',
+    href: '/versicherer/fuer-wen-wir-taetig-sind/',
+    cta: 'Versicherer-Leistungen öffnen',
   },
   {
     index: '03',
-    title: 'Kumulschaden melden',
-    text: 'Kumul- und Unwetterschäden im passenden Formular strukturiert melden.',
-    href: '/leistungen/kumulschadenmanagement/#kumulschaden-formular',
-    cta: 'Kumulschadenformular öffnen',
-  },
-  {
-    index: '04',
-    title: 'Weitere Schadenarten',
-    text: 'Schadenarten direkt auswählen und den passenden Bearbeitungsweg öffnen.',
-    href: '/schadenarten/',
-    cta: 'Schadenarten öffnen',
-  },
-  {
-    index: '05',
-    title: 'Versicherer',
-    text: 'Leistungswege, prüffähige Grundlagen und Direkteinstiege für Schadenlagen im Versicherungsumfeld.',
-    href: '/versicherer/',
-    cta: 'Versicherer öffnen',
-  },
-  {
-    index: '06',
-    title: 'Gutachter-Plattform',
-    text: 'Plattformzugang oder Zusammenarbeit direkt über das Anfrageformular klären.',
-    href: '/gutachter-plattform/anfrage/',
-    cta: 'Plattform anfragen',
-  },
-  {
-    index: '07',
-    title: 'Experten',
-    text: 'Experten nach Region und Fachgebiet finden und direkt anfragen.',
+    title: 'Experten und Fachkompetenz',
+    text: 'Sachverständige und Fachplaner nach Fachgebiet, Aufgabenstellung und Region finden und gezielt einbinden.',
     href: '/experten/',
     cta: 'Experten finden',
-  },
-  {
-    index: '08',
-    title: 'Aktuelle Fachartikel',
-    text: 'Aktuelle Fachartikel für die Einordnung von Schadenfällen direkt nutzen.',
-    href: '/fachwissen/',
-    cta: 'Fachartikel öffnen',
   },
 ];
 ---
@@ -63,9 +28,10 @@ const priorities = [
   <div class="v4-shell">
     <div class="v4-section-head">
       <div>
-        <p class="v4-kicker"><span></span>Startseite Prioritäten</p>
-        <h2 id="prioritaeten">Direkter Einstieg in acht Arbeitsaufgaben</h2>
+        <p class="v4-kicker"><span></span>Direkter Einstieg</p>
+        <h2 id="prioritaeten">Drei Wege zur passenden Bearbeitung.</h2>
       </div>
+      <p>Der Auftrag beginnt mit einer klaren Aufgabenstellung. Wir ordnen Schadenart und Bearbeitungstiefe ein und binden die erforderliche Fachkompetenz ein.</p>
     </div>
     <div class="priority-grid">
       {priorities.map((item) => (
@@ -81,13 +47,11 @@ const priorities = [
 </section>
 
 <style>
-  .priority-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
-  .priority-card{display:grid;gap:.55rem;padding:1rem;border:1px solid var(--v4-line);border-radius:.9rem;background:rgba(255,255,255,.86)}
+  .priority-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+  .priority-card{display:grid;gap:.65rem;padding:clamp(1.1rem,2.4vw,1.5rem);border:1px solid var(--v4-line);border-radius:.9rem;background:rgba(255,255,255,.86)}
   .priority-card small{color:#0d4f73;font-size:.72rem;font-weight:900;letter-spacing:.1em}
-  .priority-card h3{margin:0;font-size:1.08rem;line-height:1.2}
-  .priority-card p{margin:0;color:#3f5c6f;font-size:.9rem}
-  .priority-card a{display:inline-flex;align-items:center;gap:.4rem;margin-top:.2rem;font-weight:850;color:#0d4f73;text-decoration:none}
-  @media(max-width:74rem){.priority-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-  @media(max-width:58rem){.priority-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media(max-width:38rem){.priority-grid{grid-template-columns:1fr}}
+  .priority-card h3{margin:0;font-size:1.18rem;line-height:1.2}
+  .priority-card p{margin:0;color:#3f5c6f;font-size:.94rem}
+  .priority-card a{display:inline-flex;align-items:center;gap:.4rem;margin-top:.3rem;font-weight:850;color:#0d4f73;text-decoration:none}
+  @media(max-width:58rem){.priority-grid{grid-template-columns:1fr}}
 </style>
