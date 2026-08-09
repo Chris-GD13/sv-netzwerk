@@ -5,13 +5,16 @@ import { insurerClients } from '../../data/insurer-clients';
 <section class="v4-insurer-band" aria-labelledby="versicherer-band-title">
   <div class="v4-shell">
     <div class="v4-insurer-band__head">
-      <p class="v4-kicker"><span></span>Versicherer-Netzwerk</p>
-      <h2 id="versicherer-band-title">Diese Versicherer vertrauen bereits auf uns...</h2>
-      <a href="/versicherer/fuer-wen-wir-taetig-sind/">Zur Übersicht <span aria-hidden="true">→</span></a>
+      <div>
+        <p class="v4-kicker"><span></span>Erfahrung im Versicherungsumfeld</p>
+        <h2 id="versicherer-band-title">Schadenbearbeitung für unterschiedliche Versicherungsunternehmen und Organisationen</h2>
+        <p>Die dargestellten Marken zeigen Unternehmen und Organisationen, in deren Schadenumfeld Aufträge unmittelbar oder über beauftragte Regulierungs- und Partnerunternehmen bearbeitet wurden. Die Darstellung enthält keine Aussage über Exklusivität, laufende Rahmenverträge oder eine Empfehlung.</p>
+      </div>
+      <a href="/versicherer/fuer-wen-wir-taetig-sind/">Versicherer-Erfahrung und Leistungen <span aria-hidden="true">→</span></a>
     </div>
     <div class="v4-insurer-band__logos">
       {insurerClients.map((insurer) => (
-        <span class="v4-insurer-band__chip">
+        <span class="v4-insurer-band__logo">
           {insurer.logo ? (
             <img src={insurer.logo} alt={insurer.logoAlt ?? `Logo ${insurer.name}`} width="160" height="48" loading="lazy" />
           ) : (
@@ -24,13 +27,15 @@ import { insurerClients } from '../../data/insurer-clients';
 </section>
 
 <style>
-  .v4-insurer-band{padding:1rem 0 0}
-  .v4-insurer-band__head{display:flex;align-items:end;justify-content:space-between;gap:1rem}
-  .v4-insurer-band__head h2{margin:.25rem 0 0;font-size:clamp(1.1rem,1.8vw,1.45rem)}
+  .v4-insurer-band{padding:clamp(2.5rem,6vw,5rem) 0}
+  .v4-insurer-band__head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:2rem}
+  .v4-insurer-band__head>div{max-width:76ch}
+  .v4-insurer-band__head h2{margin:.25rem 0 .75rem;font-size:clamp(1.35rem,2.4vw,2rem)}
+  .v4-insurer-band__head p:not(.v4-kicker){margin:0;color:#3f5c6f}
   .v4-insurer-band__head a{font-weight:850;text-decoration:none;white-space:nowrap}
-  .v4-insurer-band__logos{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.55rem;margin-top:.95rem}
-  .v4-insurer-band__chip{display:grid;place-items:center;min-height:3rem;padding:.65rem .8rem;border:1px solid #c9d7df;border-radius:.65rem;background:rgba(255,255,255,.86);font-size:.82rem;font-weight:850;text-align:center}
-  .v4-insurer-band__chip img{max-width:100%;max-height:1.75rem;width:auto;height:auto;object-fit:contain}
-  @media(max-width:70rem){.v4-insurer-band__logos{grid-template-columns:repeat(4,minmax(0,1fr))}}
-  @media(max-width:54rem){.v4-insurer-band__head{align-items:start;flex-direction:column}.v4-insurer-band__logos{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .v4-insurer-band__logos{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:1.5rem 2.25rem;margin-top:2rem;padding:1.5rem 0;border-top:1px solid #c9d7df;border-bottom:1px solid #c9d7df}
+  .v4-insurer-band__logo{display:grid;place-items:center;min-width:7rem;min-height:2.5rem;font-size:.82rem;font-weight:850;text-align:center}
+  .v4-insurer-band__logo img{max-width:9rem;max-height:2rem;width:auto;height:auto;object-fit:contain}
+  @media(max-width:70rem){.v4-insurer-band__head{grid-template-columns:1fr;align-items:start;gap:1rem}}
+  @media(max-width:54rem){.v4-insurer-band__head a{white-space:normal}.v4-insurer-band__logos{justify-content:flex-start;gap:1.25rem}.v4-insurer-band__logo{min-width:6rem}}
 </style>
