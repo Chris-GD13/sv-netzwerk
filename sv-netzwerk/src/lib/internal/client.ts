@@ -1,6 +1,7 @@
 ﻿import QRCode from 'qrcode';
 import { calculateWindowWeights } from './calculations';
 import { loadAllDrafts, loadDraft, removeDraft, saveDraft } from './offline';
+import { loadTemplates, saveTemplate, markTemplateUsed, deleteTemplate, updateTemplate } from './templates';
 import {
   exportDefinitions,
   getFieldDefinition,
@@ -102,6 +103,7 @@ import type {
   WindowSashRecord,
   WindowSashSummary,
   WindowSummary,
+  WindowTemplate,
 } from './types';
 import type { AiAnalysisItem, AiAnalysisResult } from './php-api';
 
@@ -2072,6 +2074,19 @@ async function renderRecord(context: AppContext) {
           <div class="intern-card"><strong>${escapeHtml(record.status)}</strong><p class="intern-meta">Status</p></div>
           <div class="intern-card"><strong>${formatDateTime(record.updated_at)}</strong><p class="intern-meta">Letzte Änderung</p></div>
         </div>
+        <section class="intern-card" id="template-section" style="margin-bottom: 1.5rem; ${!canEdit || Boolean(lock && !lock.ok) ? 'display:none' : ''}">
+          <h3 style="margin: 0 0 1rem; font-size: 1rem;">Fenster-Vorlagen</h3>
+          <div style="display: grid; gap: 0.5rem;">
+            <label for="template-selector">Vorlage laden:</label>
+            <select id="template-selector" style="padding: 0.65rem; border: 1px solid #c6d8e3; border-radius: 0.85rem; background: #fff;">
+              <option value="">— Vorlage auswählen (Hersteller, Beschlag, etc.) —</option>
+            </select>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" id="load-template-btn" class="sv-button sv-button-secondary" style="flex: 1;">Laden</button>
+              <button type="button" id="delete-template-btn" class="sv-button sv-button-secondary" style="flex: 1; display: none;">Löschen</button>
+            </div>
+          </div>
+        </section>
         <form id="window-record-form" class="intern-list" novalidate>
           ${windowFormSections.map((section) => renderFormSection(section, record.form_data, record.calculated_data, !canEdit || Boolean(lock && !lock.ok))).join('')}
         </form>
@@ -2117,6 +2132,7 @@ async function renderRecord(context: AppContext) {
         <span>${Math.round(record.progress_percent)}% Pflichtfelder</span>
       </div>
       <div class="intern-actions">
+        <button class="sv-button sv-button-secondary" type="button" id="save-as-template" ${!canEdit || Boolean(lock && !lock.ok) ? 'disabled' : ''}>💾 Als Vorlage speichern</button>
         <button class="sv-button sv-button-secondary" type="button" id="save-draft" ${!canEdit || Boolean(lock && !lock.ok) ? 'disabled' : ''}>Zwischenspeichern</button>
         <button class="sv-button sv-button-primary" type="button" id="complete-record" ${!canEdit || Boolean(lock && !lock.ok) ? 'disabled' : ''}>Prüfung abschließen</button>
         <button class="sv-button sv-button-ghost" type="button" id="logout-button">Abmelden</button>
@@ -2178,6 +2194,122 @@ async function renderRecord(context: AppContext) {
     await saveWindow(context, record, workingCopy, true);
     await renderRecord(context);
   });
+
+  // Template Management
+  const templateSection = context.root.querySelector<HTMLElement>('#template-section');
+  const templateSelector = context.root.querySelector<HTMLSelectElement>('#template-selector');
+  const loadTemplateBtn = context.root.querySelector<HTMLButtonElement>('#load-template-btn');
+  const deleteTemplateBtn = context.root.querySelector<HTMLButtonElement>('#delete-template-btn');
+  const saveAsTemplateBtn = context.root.querySelector<HTMLButtonElement>('#save-as-template');
+
+  if (templateSelector && loadTemplateBtn && deleteTemplateBtn && saveAsTemplateBtn) {
+   // Load and populate templates
+   const loadTemplateList = async () => {
+     try {
+       const templates = await loadTemplates(record.project_id);
+       templateSelector.innerHTML = '<option value="">— Vorlage auswählen —</option>';
+       templates.forEach((t) => {
+         const option = document.createElement('option');
+         option.value = t.id;
+         option.textContent = `${t.name} (${t.usageCount}x verwendet)`;
+         templateSelector.appendChild(option);
+       });
+     } catch (err) {
+       console.error('Failed to load templates:', err);
+     }
+   };
+
+   await loadTemplateList();
+
+   templateSelector.addEventListener('change', () => {
+     deleteTemplateBtn.style.display = templateSelector.value ? 'block' : 'none';
+   });
+
+   loadTemplateBtn.addEventListener('click', async () => {
+     const templateId = templateSelector.value;
+     if (!templateId) return;
+
+     try {
+       const templates = await loadTemplates(record.project_id);
+       const template = templates.find((t) => t.id === templateId);
+       if (!template) return;
+
+       // Apply template properties to form
+       Object.entries(template.properties).forEach(([key, value]) => {
+         if (value !== undefined && value !== null) {
+           workingCopy[key] = value;
+           const input = form?.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(`[name="${key}"]`);
+           if (input) {
+             if (input instanceof HTMLInputElement && input.type === 'checkbox') {
+               input.checked = Boolean(value);
+             } else {
+               input.value = String(value);
+             }
+             input.dispatchEvent(new Event('input', { bubbles: true }));
+           }
+         }
+       });
+
+       await markTemplateUsed(templateId);
+       alert(`Vorlage "${template.name}" geladen!`);
+     } catch (err) {
+       alert('Fehler beim Laden der Vorlage');
+       console.error('Failed to load template:', err);
+     }
+   });
+
+   deleteTemplateBtn.addEventListener('click', async () => {
+     const templateId = templateSelector.value;
+     if (!templateId || !window.confirm('Vorlage wirklich löschen?')) return;
+
+     try {
+       await deleteTemplate(templateId);
+       alert('Vorlage gelöscht');
+       await loadTemplateList();
+       templateSelector.value = '';
+       deleteTemplateBtn.style.display = 'none';
+     } catch (err) {
+       alert('Fehler beim Löschen der Vorlage');
+       console.error('Failed to delete template:', err);
+     }
+   });
+
+   saveAsTemplateBtn.addEventListener('click', async () => {
+     const templateName = prompt(
+       'Name für die Vorlage:',
+       `${workingCopy.manufacturer || 'Hersteller'} – ${workingCopy.opening_type || 'Fensterart'}`
+     );
+     if (!templateName) return;
+
+     try {
+       const templateData = {
+         projectId: record.project_id,
+         name: templateName,
+         lastUsed: null,
+         usageCount: 0,
+         properties: {
+           manufacturer: String(workingCopy.manufacturer || ''),
+           opening_type: String(workingCopy.opening_type || ''),
+           frame_material: String(workingCopy.frame_material || ''),
+           hinge_system: String(workingCopy.hinge_system || ''),
+           hinge_manufacturer: String(workingCopy.hinge_manufacturer || ''),
+           scissor_system: String(workingCopy.scissor_system || ''),
+           scissor_manufacturer: String(workingCopy.scissor_manufacturer || ''),
+           glass_structure: String(workingCopy.glass_structure || ''),
+           glazing_type: String(workingCopy.glazing_type || ''),
+           window_system: String(workingCopy.window_system || ''),
+         },
+       };
+
+       await saveTemplate(templateData);
+       alert(`Vorlage "${templateName}" gespeichert!`);
+       await loadTemplateList();
+     } catch (err) {
+       alert('Fehler beim Speichern der Vorlage');
+       console.error('Failed to save template:', err);
+     }
+   });
+  }
 
   logoutButton?.addEventListener('click', async () => {
     await apiLogout();
