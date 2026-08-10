@@ -95,7 +95,7 @@ export const experts: ExpertProfile[] = [
     expertise: ['Buchhaltung', 'Terminkoordination', 'Nachkalkulationen', 'Administrative Projektbegleitung', 'Strukturierte Abläufe', 'Interne Unterstützung'],
     regions: ['Werdohl'], qualifications: [], certifications: [],
     shortProfile: 'Katja Schäfer leitet das Backoffice Werdohl und verantwortet dort Buchhaltung, Terminkoordination, Nachkalkulationen und die administrative Begleitung laufender Projekte.',
-    contact: centralContact, image: '/assets/images/team/katja-schaefer.jpeg', status: 'active', tags: ['Buchhaltung', 'Terminkoordination', 'Projektassistenz'], publications: [], articles: [],
+    contact: centralContact, image: '/assets/images/team/katja-schaefer.jpeg', imagePosition: 'center 14%', status: 'active', tags: ['Buchhaltung', 'Terminkoordination', 'Projektassistenz'], publications: [], articles: [],
   },
 ];
 

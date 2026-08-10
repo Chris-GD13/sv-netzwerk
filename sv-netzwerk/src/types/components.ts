@@ -35,6 +35,7 @@ export interface TeamCardProps {
   initials?: string;
   image?: string;
   imageAlt?: string;
+  imagePosition?: string;
 }
 
 export interface StatCardProps {

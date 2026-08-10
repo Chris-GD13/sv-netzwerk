@@ -29,6 +29,7 @@ export interface ExpertProfile {
   company?: ExpertCompany;
   linkedin?: string;
   image?: string;
+  imagePosition?: string;
   status: 'active' | 'onboarding';
   tags: string[];
   publications: string[];

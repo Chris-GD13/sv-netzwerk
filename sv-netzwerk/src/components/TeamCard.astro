@@ -1,11 +1,11 @@
 ---
 import type { TeamCardProps } from '../types/components';
 const props = Astro.props as TeamCardProps;
-const { name, role, qualification, href, image, imageAlt = name } = props;
+const { name, role, qualification, href, image, imageAlt = name, imagePosition = 'center 24%' } = props;
 const initials = props.initials ?? name.split(' ').map((part)=>part[0]).join('').slice(0,2);
 ---
 <article class="team-card sv-card">
-  {image ? <img class="avatar-image" src={image} alt={imageAlt} loading="lazy" decoding="async" /> : <div class="avatar" aria-hidden="true">{initials}</div>}
+  {image ? <img class="avatar-image" src={image} alt={imageAlt} loading="lazy" decoding="async" style={`object-position: ${imagePosition};`} /> : <div class="avatar" aria-hidden="true">{initials}</div>}
   <div class="team-content"><h3>{name}</h3><p>{role}</p>{qualification&&<small>{qualification}</small>}{href&&<a href={href}>Profil ansehen <span aria-hidden="true">→</span></a>}</div>
 </article>
 <style>
