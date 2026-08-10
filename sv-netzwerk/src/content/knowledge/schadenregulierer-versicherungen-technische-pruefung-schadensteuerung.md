@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-08-09
   status: published
 seo:
-  title: "Schadenregulierer Versicherungen: Technische Prüfung"
+  title: "Schadenregulierer: Technische Prüfung & Schadensteuerung"
   description: "Schadenregulierer für Versicherungen: technische Prüfung, Kostenfreigaben, Reserveermittlung und strukturierte Dokumentation von der Erstbesichtigung bis zur Schlussrechnung."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/schadenregulierer-versicherungen-technische-pruefung-schadensteuerung/"
   noindex: false
