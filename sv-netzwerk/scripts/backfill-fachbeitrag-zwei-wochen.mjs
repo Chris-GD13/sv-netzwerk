@@ -108,10 +108,10 @@ async function findNewRun(dispatchedAt, timeoutMs = 120_000) {
     const data = await ghFetch(
       `/repos/${REPO}/actions/workflows/${WORKFLOW}/runs?per_page=10&event=workflow_dispatch`
     );
-    const run = data?.workflow_runs?.find(
-      (r) => new Date(r.created_at) >= new Date(dispatchedAt)
-    );
-    if (run) return run;
+    const sorted = (data?.workflow_runs ?? [])
+      .filter((r) => new Date(r.created_at) >= new Date(dispatchedAt))
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    if (sorted.length > 0) return sorted[0];
   }
   throw new Error(`Kein neuer Workflow-Run nach Dispatch um ${dispatchedAt} gefunden.`);
 }
@@ -122,7 +122,10 @@ async function awaitRunCompletion(runId) {
   while (Date.now() < deadline) {
     await sleep(POLL_MS);
     const run = await ghFetch(`/repos/${REPO}/actions/runs/${runId}`);
-    if (run.status === 'completed') return run;
+    if (run.status === 'completed') {
+      process.stdout.write('\n');
+      return run;
+    }
     process.stdout.write('.');
   }
   throw new Error(
