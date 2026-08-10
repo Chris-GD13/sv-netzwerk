@@ -1,4 +1,4 @@
-# Fachbeitrags-Automation (täglich, zwei Slots)
+﻿# Fachbeitrags-Automation (täglich, zwei Slots)
 
 ## Bestandsschutz veröffentlichter Inhalte (verbindlich)
 
@@ -47,7 +47,7 @@
 - Ausgewertet werden strukturierte Hinweise aus Terminmetadaten und Anhängen (z. B. Dokumentations-, KVA-, Rechnungs-, Protokoll- oder Gutachtenhinweise).
 - Veröffentlichung erfolgt ausschließlich **anonymisiert**: keine Namen, keine Orte/Adressen, keine Aktenzeichen, keine personenbezogenen Daten.
 - Pro Beitrag werden 1–2 Fälle als fachliche Musterbasis ausgewählt.
-- Aktivierung nur über `ALLOW_CALENDAR_CASE_CONTEXT=true`. Ohne diese Variable bleibt die Quellenlogik vollständig öffentlich/recherchebasiert.
+- Aktivierung nur über die Repository-Variable `ALLOW_CALENDAR_CASE_CONTEXT=true`. Ohne diese Variable bleibt die Quellenlogik vollständig öffentlich/recherchebasiert.
 
 ### Sekundärquelle: Themenpool und regionale Recherche (Fallback)
 
@@ -56,7 +56,7 @@ Der Generator verfügt über einen Themenpool von 20 vordefinierten Fachthemen a
 Starkregen/Rückstau, Hochwasser/Überflutung, Sturm/Hagel, Leitungswasser, Brandschaden, Schneedruck, Tornadoereignisse, Erstbesichtigung, Plausibilitätsprüfung, Beweissicherung, Sanierungsplanung/Trocknung, Koordination Sachverständige, Rechnungs-/KVA-Prüfung, Reservierung, Kommunikation, Schadenminderung, Massenanfall, Gutachter-Plattform, Abgrenzung versichert/nicht versichert, Katastrophenschäden, Zusammenarbeit mit Fachplanern.
 
 ### Themenrotation
-- Die letzten 10 verwendeten Themen (aus dem Protokoll) werden nicht erneut ausgewählt.
+- Die letzten 10 erfolgreich oder unvollständig protokollierten Themen (aus dem Veröffentlichungsprotokoll) werden nicht erneut ausgewählt.
 - Am gleichen Tag wird dasselbe Thema nicht zweimal verwendet.
 - Wenn keine freien Themen verfügbar sind, fällt der Generator auf das zuletzt verwendete freie Thema zurück.
 
@@ -76,16 +76,15 @@ Starkregen/Rückstau, Hochwasser/Überflutung, Sturm/Hagel, Leitungswasser, Bran
 
 ## Inhaltserzeugung und Struktur
 
-Der Generator erstellt pro Lauf:
+Der laufende Produktionsstandard erzeugt pro Slot:
 
-1. **Fachbeitrag** in `src/content/knowledge/{slug}.md` mit vollständigem Frontmatter (Titel, Description, Kategorie, Tags, Autor, CTA, interne Links, Canonical-URL, OG-Bild, Alt-Text, Publication-Status)
+1. **Fachbeitrag** in `src/content/knowledge/{slug}.md` mit vollständigem Frontmatter (Titel, Description, Kategorie, Tags, Autor, CTA, interne Links, Canonical-URL, SEO-Daten, Publication-Status)
 2. **LinkedIn-Begleittext** in `src/content/linkedin/{datum}_{slug}.txt` (mit URL und thematisch passenden Hashtags)
-3. **Wissen-in-180-Sekunden-Skript** in `src/content/videos/{datum}_wissen-in-180-sekunden_{slug}.txt`
-4. **Beitragsbild** in `public/assets/images/linkedin/{slug}.svg` (SVG, 1200×630, professionelles Design in SV-Netzwerk-Farben)
-5. **Library-Eintrag** am Anfang von `src/data/library.ts` (damit der neue Beitrag als aktuellster erscheint)
-6. **Protokollzeile** in `docs/fachbeitrag-veroeffentlichungsprotokoll.csv`
-7. **Changelog-Eintrag** in `CHANGELOG.md` (dynamische Versionsnummer)
-8. **Anonymisierte Fallhinweise** im Beitragstext (wenn Kalenderfallbasis verfügbar)
+3. **Beitragsbild** in `public/assets/images/linkedin/{slug}.svg` (SVG, 1200×630, professionelles Design in SV-Netzwerk-Farben)
+4. **Library-Eintrag** am Anfang von `src/data/library.ts` (damit der neue Beitrag als aktuellster erscheint)
+5. **Protokollzeile** in `docs/fachbeitrag-veroeffentlichungsprotokoll.csv`
+6. **Changelog-Eintrag** in `CHANGELOG.md` (dynamische Versionsnummer)
+7. **Anonymisierte Fallhinweise** im Beitragstext (wenn Kalenderfallbasis verfügbar)
 
 ## SEO und interne Verlinkung
 
@@ -156,6 +155,7 @@ Der Generator erstellt pro Lauf:
 - Wird ein unvollständiger Slot erneut gestartet, triggert der Workflow bei Bedarf einen **manuellen Recovery-Deploy** für den aktuellen `main`-Stand und wartet ebenfalls bis zum erfolgreichen Abschluss.
 - Erst nach `deploy=success` folgt die Live-URL-Prüfung, erst danach die LinkedIn-/Zap-Übergabe.
 - Deploy-, Live- und LinkedIn-Status werden in `docs/fachbeitrag-veroeffentlichungsprotokoll.csv` fortlaufend aktualisiert und am Laufende auf `main` committed (auch bei Fehlerfällen). Diese Protokoll-Commits lösen bewusst **keinen** zusätzlichen Website-Deploy aus.
+- Der Workflow spiegelt Statusübergänge zusätzlich in `.automation/latest-publication.json`, damit Retry-/Resume-Läufe denselben Slot deterministisch fortsetzen und LinkedIn nach einem bereits erfolgreichen Livegang nicht doppelt vorbereitet oder ausgelöst wird.
 
 ## Manueller Notfallstart und Deaktivierung
 
@@ -224,9 +224,8 @@ Spalten:
 | `scripts/update-fachbeitrag-log.mjs` | Protokollaktualisierung nach Push, Live-Check und LinkedIn |
 | `scripts/create-linkedin-zap-payload.mjs` | Erzeugt Zap-kompatibles LinkedIn-Payload als JSON-Datei |
 | `scripts/validate-knowledge.mjs` | Frontmatter- und Build-Integrationsvalidierung |
-| `src/content/knowledge/` | Veröffentlichte Fachbeiträge (Markdown) |
+| `src/content/knowledge/` | Veröffentlichten Fachbeiträge (Markdown) |
 | `src/content/linkedin/` | LinkedIn-Begleittexte |
-| `src/content/videos/` | Wissen-in-180-Sekunden-Skripte |
 | `public/assets/images/linkedin/` | Beitragsbilder (SVG) |
 | `src/data/library.ts` | Fachwissens-Übersichtsdaten |
 | `docs/fachbeitrag-veroeffentlichungsprotokoll.csv` | Veröffentlichungsprotokoll |

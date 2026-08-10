@@ -181,6 +181,7 @@ jobs:
           if [ "$PUBLICATION_DEPLOY_STATUS" != "success" ]; then
             node scripts/update-fachbeitrag-log.mjs --deploy=triggered
           fi
+          node -e "const fs=require('fs');const file='.automation/latest-publication.json';const data=JSON.parse(fs.readFileSync(file,'utf8'));data.commit=process.env.PUBLISHED_COMMIT||data.commit||'';data.existingStatuses={...(data.existingStatuses||{}),commit:data.commit||'',deployStatus:process.env.PUBLICATION_DEPLOY_STATUS==='success'?'success':'triggered',liveStatus:process.env.PUBLICATION_LIVE_STATUS||data.existingStatuses?.liveStatus||'pending',linkedinStatus:process.env.PUBLICATION_LINKEDIN_STATUS||data.existingStatuses?.linkedinStatus||'pending'};fs.writeFileSync(file,JSON.stringify(data,null,2)+'\n');"
 
       - name: Bestehenden Deploy-Workflow (push) abwarten
         if: steps.generate.outputs.status != 'skipped'
@@ -210,7 +211,9 @@ jobs:
 
       - name: Veröffentlichungsprotokoll nach Deploy-Check aktualisieren
         if: steps.generate.outputs.status != 'skipped'
-        run: node scripts/update-fachbeitrag-log.mjs --deploy=success
+        run: |
+          node scripts/update-fachbeitrag-log.mjs --deploy=success
+          node -e "const fs=require('fs');const file='.automation/latest-publication.json';const data=JSON.parse(fs.readFileSync(file,'utf8'));data.existingStatuses={...(data.existingStatuses||{}),deployStatus:'success',liveStatus:process.env.PUBLICATION_LIVE_STATUS||data.existingStatuses?.liveStatus||'pending',linkedinStatus:process.env.PUBLICATION_LINKEDIN_STATUS||data.existingStatuses?.linkedinStatus||'pending'};fs.writeFileSync(file,JSON.stringify(data,null,2)+'\n');"
 
       - name: Live-URL prüfen
         if: steps.generate.outputs.status != 'skipped'
@@ -233,7 +236,9 @@ jobs:
 
       - name: Veröffentlichungsprotokoll nach Live-Check aktualisieren
         if: steps.generate.outputs.status != 'skipped'
-        run: node scripts/update-fachbeitrag-log.mjs --deploy=success --live=success
+        run: |
+          node scripts/update-fachbeitrag-log.mjs --deploy=success --live=success
+          node -e "const fs=require('fs');const file='.automation/latest-publication.json';const data=JSON.parse(fs.readFileSync(file,'utf8'));data.existingStatuses={...(data.existingStatuses||{}),deployStatus:'success',liveStatus:'success',linkedinStatus:process.env.PUBLICATION_LINKEDIN_STATUS||data.existingStatuses?.linkedinStatus||'pending'};fs.writeFileSync(file,JSON.stringify(data,null,2)+'\n');"
 
       - name: LinkedIn-Zap auslösen (nach erfolgreichem Live-Check)
         if: steps.generate.outputs.status != 'skipped' && env.PUBLICATION_LINKEDIN_STATUS != 'success'
@@ -256,12 +261,10 @@ jobs:
           echo "LINKEDIN_OK=true" >> "$GITHUB_ENV"
 
       - name: Veröffentlichungsprotokoll nach LinkedIn aktualisieren
-        if: steps.generate.outputs.status != 'skipped' && env.PUBLICATION_LINKEDIN_STATUS != 'success'
-        run: node scripts/update-fachbeitrag-log.mjs --linkedin=success
-
-      - name: Veröffentlichungsprotokoll bei bereits erfolgreichem LinkedIn abgleichen
-        if: steps.generate.outputs.status != 'skipped' && env.PUBLICATION_LINKEDIN_STATUS == 'success'
-        run: node scripts/update-fachbeitrag-log.mjs --linkedin=success
+        if: steps.generate.outputs.status != 'skipped'
+        run: |
+          node scripts/update-fachbeitrag-log.mjs --linkedin=success
+          node -e "const fs=require('fs');const file='.automation/latest-publication.json';const data=JSON.parse(fs.readFileSync(file,'utf8'));data.existingStatuses={...(data.existingStatuses||{}),deployStatus:'success',liveStatus:'success',linkedinStatus:'success'};fs.writeFileSync(file,JSON.stringify(data,null,2)+'\n');"
 
       - name: Fehlstatus ins Veröffentlichungsprotokoll schreiben
         if: failure() && steps.generate.outputs.status != 'skipped'
@@ -277,6 +280,8 @@ jobs:
           if [ "$LINKEDIN_STATUS" != "success" ] && [ "${LIVE_OK}" = "true" -o "${PUBLICATION_LIVE_STATUS}" = "success" ]; then LINKEDIN_STATUS="failed"; fi
           if [ "$LINKEDIN_STATUS" != "success" ] && [ "${LIVE_OK}" != "true" ] && [ "${PUBLICATION_LIVE_STATUS}" != "success" ]; then LINKEDIN_STATUS="skipped"; fi
           node scripts/update-fachbeitrag-log.mjs --deploy="$DEPLOY_STATUS" --live="$LIVE_STATUS" --linkedin="$LINKEDIN_STATUS"
+          node -e "const fs=require('fs');const file='.automation/latest-publication.json';const data=JSON.parse(fs.readFileSync(file,'utf8'));data.existingStatuses={...(data.existingStatuses||{}),commit:process.env.PUBLISHED_COMMIT||data.commit||data.existingStatuses?.commit||'',deployStatus:process.env.DEPLOY_STATUS||data.existingStatuses?.deployStatus||'pending',liveStatus:process.env.LIVE_STATUS||data.existingStatuses?.liveStatus||'pending',linkedinStatus:process.env.LINKEDIN_STATUS||data.existingStatuses?.linkedinStatus||'pending'};fs.writeFileSync(file,JSON.stringify(data,null,2)+'\n');" \
+            DEPLOY_STATUS="$DEPLOY_STATUS" LIVE_STATUS="$LIVE_STATUS" LINKEDIN_STATUS="$LINKEDIN_STATUS"
 
       - name: Veröffentlichungsprotokoll committen (final)
         if: always() && steps.generate.outputs.status != 'skipped'
