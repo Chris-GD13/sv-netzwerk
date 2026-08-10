@@ -2,6 +2,7 @@
 import { calculateWindowWeights } from './calculations';
 import { loadAllDrafts, loadDraft, removeDraft, saveDraft } from './offline';
 import { loadTemplates, saveTemplate, markTemplateUsed, deleteTemplate, updateTemplate } from './templates';
+import { analyzePhoto, prefillFormFromAnalysis, type PhotoAnalysisResult } from './photo-analysis';
 import {
   exportDefinitions,
   getFieldDefinition,
@@ -2074,7 +2075,32 @@ async function renderRecord(context: AppContext) {
           <div class="intern-card"><strong>${escapeHtml(record.status)}</strong><p class="intern-meta">Status</p></div>
           <div class="intern-card"><strong>${formatDateTime(record.updated_at)}</strong><p class="intern-meta">Letzte Änderung</p></div>
         </div>
-        <section class="intern-card" id="template-section" style="margin-bottom: 1.5rem; ${!canEdit || Boolean(lock && !lock.ok) ? 'display:none' : ''}">
+        <section class="intern-card" id="ai-photo-section" style="margin-bottom: 1.5rem; ${!canEdit || Boolean(lock && !lock.ok) ? 'display:none' : ''}">
+          <h3 style="margin: 0 0 1rem; font-size: 1rem;">📸 KI-Formular-Vorausfüllung</h3>
+          <div style="display: grid; gap: 0.5rem;">
+            <p style="margin: 0; font-size: 0.9rem; color: #666;">
+              Fotografieren Sie ein Schild mit der Zimmernummer und die Fenster.
+              Die KI erkennt automatisch: Zimmernummer, Flügelanzahl, Griffrichtung.
+            </p>
+            <div style="display: grid; gap: 0.5rem;">
+              <label style="font-weight: 600;">1️⃣ Schild mit Zimmernummer</label>
+              <button type="button" id="capture-room-sign" class="sv-button sv-button-secondary">📷 Zimmer-Schild fotografieren</button>
+              <div id="room-sign-preview" style="display: none; margin-top: 0.5rem;">
+                <img id="room-sign-img" style="max-width: 150px; border: 1px solid #ddd; border-radius: 0.5rem;" />
+                <p id="room-sign-result" style="margin: 0.5rem 0; font-size: 0.9rem;"></p>
+              </div>
+            </div>
+            <div style="display: grid; gap: 0.5rem;">
+              <label style="font-weight: 600;">2️⃣ Fenster fotografieren</label>
+              <button type="button" id="capture-window-photo" class="sv-button sv-button-secondary" disabled>📷 Fenster fotografieren</button>
+              <div id="window-photo-preview" style="display: none; margin-top: 0.5rem;">
+                <img id="window-photo-img" style="max-width: 150px; border: 1px solid #ddd; border-radius: 0.5rem;" />
+                <p id="window-photo-result" style="margin: 0.5rem 0; font-size: 0.9rem;"></p>
+              </div>
+            </div>
+            <button type="button" id="apply-photo-prefill" class="sv-button sv-button-secondary" disabled style="margin-top: 0.5rem;">✅ Erkannte Daten übernehmen</button>
+          </div>
+        </section>
           <h3 style="margin: 0 0 1rem; font-size: 1rem;">Fenster-Vorlagen</h3>
           <div style="display: grid; gap: 0.5rem;">
             <label for="template-selector">Vorlage laden:</label>
@@ -2308,6 +2334,160 @@ async function renderRecord(context: AppContext) {
        alert('Fehler beim Speichern der Vorlage');
        console.error('Failed to save template:', err);
      }
+   });
+  }
+
+  // AI Photo Analysis Handlers
+  let roomSignPhoto: PhotoAnalysisResult | null = null;
+  let windowPhoto: PhotoAnalysisResult | null = null;
+
+  const captureRoomSignBtn = context.root.querySelector<HTMLButtonElement>('#capture-room-sign');
+  const captureWindowBtn = context.root.querySelector<HTMLButtonElement>('#capture-window-photo');
+  const applyPrefillBtn = context.root.querySelector<HTMLButtonElement>('#apply-photo-prefill');
+
+  if (captureRoomSignBtn) {
+   captureRoomSignBtn.addEventListener('click', async () => {
+     const input = document.createElement('input');
+     input.type = 'file';
+     input.accept = 'image/*';
+     input.capture = 'environment'; // Use rear camera on mobile
+
+     input.addEventListener('change', async (e: any) => {
+       const file = e.target.files?.[0];
+       if (!file) return;
+
+       captureRoomSignBtn.disabled = true;
+       captureRoomSignBtn.textContent = '⏳ Analysiere...';
+
+       try {
+         roomSignPhoto = await analyzePhoto({
+           type: 'room-sign',
+           image: file,
+           projectId: record.project_id,
+         });
+
+         const previewDiv = context.root.querySelector<HTMLDivElement>('#room-sign-preview');
+         const imgEl = context.root.querySelector<HTMLImageElement>('#room-sign-img');
+         const resultEl = context.root.querySelector<HTMLParagraphElement>('#room-sign-result');
+
+         if (previewDiv && imgEl && resultEl) {
+           const reader = new FileReader();
+           reader.onload = (e: any) => {
+             imgEl.src = e.target.result;
+           };
+           reader.readAsDataURL(file);
+
+           previewDiv.style.display = 'block';
+
+           if (roomSignPhoto.error) {
+             resultEl.style.color = '#d32f2f';
+             resultEl.textContent = `❌ ${roomSignPhoto.error}`;
+           } else if (roomSignPhoto.roomNumber) {
+             resultEl.style.color = '#388e3c';
+             resultEl.textContent = `✅ Zimmernummer erkannt: ${roomSignPhoto.roomNumber} (${Math.round((roomSignPhoto.roomNumberConfidence || 0) * 100)}% sicher)`;
+             captureWindowBtn.disabled = false;
+           } else {
+             resultEl.style.color = '#f57f17';
+             resultEl.textContent = '⚠️ Keine Zimmernummer erkannt. Bitte erneut versuchen.';
+           }
+
+           applyPrefillBtn.disabled = !roomSignPhoto.roomNumber && !windowPhoto?.windowFluegelCount;
+         }
+       } catch (err) {
+         alert(`Fehler bei der Bildanalyse: ${err}`);
+         roomSignPhoto = { type: 'room-sign', error: String(err) };
+       } finally {
+         captureRoomSignBtn.disabled = false;
+         captureRoomSignBtn.textContent = '📷 Zimmer-Schild fotografieren';
+       }
+     });
+
+     input.click();
+   });
+  }
+
+  if (captureWindowBtn) {
+   captureWindowBtn.addEventListener('click', async () => {
+     const input = document.createElement('input');
+     input.type = 'file';
+     input.accept = 'image/*';
+     input.capture = 'environment';
+
+     input.addEventListener('change', async (e: any) => {
+       const file = e.target.files?.[0];
+       if (!file) return;
+
+       captureWindowBtn.disabled = true;
+       captureWindowBtn.textContent = '⏳ Analysiere Fenster...';
+
+       try {
+         windowPhoto = await analyzePhoto({
+           type: 'window',
+           image: file,
+           projectId: record.project_id,
+         });
+
+         const previewDiv = context.root.querySelector<HTMLDivElement>('#window-photo-preview');
+         const imgEl = context.root.querySelector<HTMLImageElement>('#window-photo-img');
+         const resultEl = context.root.querySelector<HTMLParagraphElement>('#window-photo-result');
+
+         if (previewDiv && imgEl && resultEl) {
+           const reader = new FileReader();
+           reader.onload = (e: any) => {
+             imgEl.src = e.target.result;
+           };
+           reader.readAsDataURL(file);
+
+           previewDiv.style.display = 'block';
+
+           if (windowPhoto.error) {
+             resultEl.style.color = '#d32f2f';
+             resultEl.textContent = `❌ ${windowPhoto.error}`;
+           } else {
+             const parts: string[] = [];
+             if (windowPhoto.windowFluegelCount) {
+               parts.push(`${windowPhoto.windowFluegelCount} Flügel`);
+             }
+             if (windowPhoto.windowSwingDirection) {
+               const dirLabel = windowPhoto.windowSwingDirection === 'left' ? 'Links angeschlagen' : windowPhoto.windowSwingDirection === 'right' ? 'Rechts angeschlagen' : 'Zentrisches Fenster';
+               parts.push(dirLabel);
+             }
+
+             if (parts.length > 0) {
+               resultEl.style.color = '#388e3c';
+               resultEl.textContent = `✅ ${parts.join(', ')} (${Math.round((windowPhoto.swingDirectionConfidence || 0.6) * 100)}% sicher)`;
+             } else {
+               resultEl.style.color = '#f57f17';
+               resultEl.textContent = '⚠️ Fenster erkannt, aber Details unklar. Manuell nachtragen empfohlen.';
+             }
+           }
+
+           applyPrefillBtn.disabled = !roomSignPhoto?.roomNumber && !windowPhoto?.windowFluegelCount;
+         }
+       } catch (err) {
+         alert(`Fehler bei der Fensteranalyse: ${err}`);
+         windowPhoto = { type: 'window', error: String(err) };
+       } finally {
+         captureWindowBtn.disabled = false;
+         captureWindowBtn.textContent = '📷 Fenster fotografieren';
+       }
+     });
+
+     input.click();
+   });
+  }
+
+  if (applyPrefillBtn) {
+   applyPrefillBtn.addEventListener('click', () => {
+     if (roomSignPhoto && !roomSignPhoto.error) {
+       prefillFormFromAnalysis(roomSignPhoto, workingCopy, form!);
+     }
+     if (windowPhoto && !windowPhoto.error) {
+       prefillFormFromAnalysis(windowPhoto, workingCopy, form!);
+     }
+
+     alert('✅ Erkannte Daten ins Formular übernommen!');
+     applyPrefillBtn.disabled = true;
    });
   }
 
