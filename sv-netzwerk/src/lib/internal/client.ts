@@ -2403,13 +2403,13 @@ async function renderRecord(context: AppContext) {
            } else if (roomSignPhoto.roomNumber) {
              resultEl.style.color = '#388e3c';
              resultEl.textContent = `✅ Zimmernummer erkannt: ${roomSignPhoto.roomNumber} (${Math.round((roomSignPhoto.roomNumberConfidence || 0) * 100)}% sicher)`;
-             captureWindowBtn.disabled = false;
+             if (captureWindowBtn) captureWindowBtn.disabled = false;
            } else {
              resultEl.style.color = '#f57f17';
              resultEl.textContent = '⚠️ Keine Zimmernummer erkannt. Bitte erneut versuchen.';
            }
 
-           applyPrefillBtn.disabled = !roomSignPhoto.roomNumber && !windowPhoto?.windowFluegelCount;
+           if (applyPrefillBtn) applyPrefillBtn.disabled = !roomSignPhoto.roomNumber && !windowPhoto?.windowFluegelCount;
          }
        } catch (err) {
          alert(`Fehler bei der Bildanalyse: ${err}`);
@@ -2480,7 +2480,7 @@ async function renderRecord(context: AppContext) {
              }
            }
 
-           applyPrefillBtn.disabled = !roomSignPhoto?.roomNumber && !windowPhoto?.windowFluegelCount;
+           if (applyPrefillBtn) applyPrefillBtn.disabled = !roomSignPhoto?.roomNumber && !windowPhoto?.windowFluegelCount;
          }
        } catch (err) {
          alert(`Fehler bei der Fensteranalyse: ${err}`);

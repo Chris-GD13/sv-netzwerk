@@ -120,7 +120,7 @@ function analyzeWindowGeometry(
 
   return {
     windowFluegelCount: fluegelCount,
-    swingDirection,
+    windowSwingDirection: swingDirection,
     swingDirectionConfidence: 0.6, // Conservative estimate
     rawAnalysis: { window, imageWidth, imageHeight },
   };
@@ -240,9 +240,9 @@ export async function analyzePhoto(options: PhotoAnalysisOptions): Promise<Photo
       await new Promise((resolve) => {
         image.onload = resolve;
       });
-    } else if (options.image instanceof Blob || options.image instanceof File) {
+    } else if (typeof (options.image as any).stream === 'function' || (options.image as any).constructor?.name === 'File' || (options.image as any).constructor?.name === 'Blob') {
       // Blob/File
-      const url = URL.createObjectURL(options.image);
+      const url = URL.createObjectURL(options.image as any);
       image = new Image();
       image.src = url;
       await new Promise((resolve) => {
@@ -289,7 +289,7 @@ export async function analyzePhoto(options: PhotoAnalysisOptions): Promise<Photo
  */
 async function analyzePhotoWithCloudAPI(options: PhotoAnalysisOptions): Promise<PhotoAnalysisResult> {
   try {
-    const apiKey = (import.meta.env as any).PUBLIC_GOOGLE_VISION_API_KEY;
+    const apiKey = (import.meta as any).env?.PUBLIC_GOOGLE_VISION_API_KEY || (globalThis as any).PUBLIC_GOOGLE_VISION_API_KEY;
 
     if (!apiKey) {
       return {
