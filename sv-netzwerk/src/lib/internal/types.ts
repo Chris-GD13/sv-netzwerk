@@ -271,3 +271,24 @@ export interface CalculationParameterMap {
   frameWeightFactor: number;
   safetyFactor: number;
 }
+
+export interface WindowTemplate {
+  id: string;
+  projectId: string;
+  name: string;
+  createdAt: string;
+  lastUsed: string | null;
+  usageCount: number;
+  properties: {
+    manufacturer?: string;
+    opening_type?: string;
+    frame_material?: string;
+    hinge_system?: string;
+    hinge_manufacturer?: string;
+    scissor_system?: string;
+    scissor_manufacturer?: string;
+    glass_structure?: string;
+    glazing_type?: string;
+    window_system?: string;
+  };
+}
