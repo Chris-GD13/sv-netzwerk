@@ -2,10 +2,11 @@
 import type { ExpertProfile } from '../../types/platform';
 interface Props { expert: ExpertProfile; compact?: boolean; }
 const { expert, compact = false } = Astro.props;
+const imagePosition = expert.imagePosition ?? 'center 24%';
 ---
 <article class:list={['expert-card', 'sv-card', 'sv-card-lift', { 'expert-card--compact': compact }]}>
   <a class="expert-card__portrait" href={`/experten/${expert.slug}/`} aria-label={`Profil von ${expert.name} öffnen`}>
-    {expert.image ? <img src={expert.image} alt={`Portrait von ${expert.name}`} width="720" height="720" loading="lazy" /> : <span aria-hidden="true">{expert.name.split(' ').map((part)=>part[0]).join('').slice(0,2)}</span>}
+    {expert.image ? <img src={expert.image} alt={`Portrait von ${expert.name}`} width="720" height="720" loading="lazy" style={`object-position: ${imagePosition};`} /> : <span aria-hidden="true">{expert.name.split(' ').map((part)=>part[0]).join('').slice(0,2)}</span>}
   </a>
   <div class="expert-card__body">
     <p class="sv-eyebrow">{expert.group === 'backoffice' ? 'Backoffice' : (expert.roleLabel ?? expert.role)}</p>
