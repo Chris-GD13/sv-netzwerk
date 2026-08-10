@@ -3,6 +3,8 @@ import { calculateWindowWeights } from './calculations';
 import { loadAllDrafts, loadDraft, removeDraft, saveDraft } from './offline';
 import { loadTemplates, saveTemplate, markTemplateUsed, deleteTemplate, updateTemplate } from './templates';
 import { analyzePhoto, prefillFormFromAnalysis, type PhotoAnalysisResult } from './photo-analysis';
+import { initializeSyncWorker, performSync } from './sync-worker';
+import { initOfflineStatusUI } from './sync-ui';
 import {
   exportDefinitions,
   getFieldDefinition,
