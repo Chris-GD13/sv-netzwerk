@@ -127,7 +127,7 @@ Der laufende Produktionsstandard erzeugt pro Slot:
 | Szenario | Verhalten |
 |---|---|
 | Außerhalb Zeitfenster | Lauf beendet mit Status `skipped`; kein Fehler |
-| Slot bereits vollständig veröffentlicht | Lauf beendet mit Status `skipped` |
+| Für den Kalendertag ist bereits ein täglicher Beitrag vollständig live | Lauf beendet mit Status `skipped` |
 | Slot protokolliert, aber Deploy/Live/LinkedIn noch offen oder fehlgeschlagen | Lauf wechselt in `resumed` und setzt denselben Beitrag ohne Neugenerierung fort |
 | Build fehlgeschlagen | Kein LinkedIn-Post; kein Commit |
 | Typ-/HTML-/Link-Prüfung fehlgeschlagen | Kein Commit; kein Deployment; kein LinkedIn |

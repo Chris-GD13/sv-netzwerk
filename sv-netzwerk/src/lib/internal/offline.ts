@@ -1,11 +1,12 @@
 import type { OfflineDraft } from './types';
+import { enqueueSync } from './sync';
 
 const DB_NAME = 'sv-intern-offline';
 const STORE_NAME = 'window-drafts';
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
+    const request = indexedDB.open(DB_NAME, 2);
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'windowId' });
@@ -24,6 +25,16 @@ export async function saveDraft(draft: OfflineDraft) {
     tx.onerror = () => reject(tx.error);
   });
   db.close();
+
+  // Queue for sync
+  if (navigator.onLine) {
+    await enqueueSync({
+      windowId: draft.windowId,
+      action: 'save',
+      data: draft.data,
+      calculatedData: draft.calculatedData,
+    });
+  }
 }
 
 export async function loadDraft(windowId: string) {
@@ -59,4 +70,14 @@ export async function removeDraft(windowId: string) {
     tx.onerror = () => reject(tx.error);
   });
   db.close();
+
+  // Queue deletion for sync
+  if (navigator.onLine) {
+    await enqueueSync({
+      windowId,
+      action: 'delete',
+      data: {},
+      calculatedData: {},
+    });
+  }
 }

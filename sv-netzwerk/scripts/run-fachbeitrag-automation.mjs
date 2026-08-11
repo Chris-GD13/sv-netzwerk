@@ -785,7 +785,9 @@ const makeImageSvg = (title, subtitle) => `<?xml version="1.0" encoding="UTF-8"?
 
 await mkdir(automationDir, { recursive: true });
 const publicationRows = await readPublicationRows();
+const isDailyPublishRow = (row) => row.date === berlinDate && normalizeSlotValue(row.slot) !== 'backfill';
 const existingSlotRows = publicationRows.filter((row) => row.date === berlinDate && normalizeSlotValue(row.slot) === slot);
+const existingDailyRows = publicationRows.filter(isDailyPublishRow);
 const sortedExistingSlotRows = existingSlotRows.sort((a, b) => {
   const score = (row) => {
     let value = 0;
@@ -809,7 +811,7 @@ for (const row of sortedExistingSlotRows) {
     resumableSlotRows.push(runtime);
   }
 }
-if (!slotWithinWindow) {
+if (!allowOutsideWindow && !slotWithinWindow) {
   if (resumableSlotRows.length >= 1) {
     await writeFile(runtimeFile, JSON.stringify(resumableSlotRows[0], null, 2));
     process.exit(0);
@@ -824,16 +826,16 @@ if (!slotWithinWindow) {
   }, null, 2));
   process.exit(0);
 }
-const completedRow = sortedExistingSlotRows.find((row) => isSuccess(row.deploy_status) && isSuccess(row.live_pruefung) && isSuccess(row.linkedin_status));
-if (completedRow) {
+const completedDailyRow = existingDailyRows.find((row) => isSuccess(row.deploy_status) && isSuccess(row.live_pruefung));
+if (completedDailyRow) {
   await writeFile(runtimeFile, JSON.stringify({
     status: 'skipped',
-    reason: 'slot-already-completed',
+    reason: 'daily-publication-already-completed',
     berlinDate,
     berlinTime,
     berlinTimeZone: BERLIN,
     slot,
-    publicationId: String(completedRow.publication_id || '').trim() || publicationId,
+    publicationId: String(completedDailyRow.publication_id || '').trim() || publicationId,
   }, null, 2));
   process.exit(0);
 }
