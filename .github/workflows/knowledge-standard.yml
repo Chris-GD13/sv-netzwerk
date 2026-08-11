@@ -93,9 +93,11 @@ jobs:
             node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('.automation/latest-publication.json','utf8'));const existing=data.existingStatuses||{};const values={BERLIN_DATE:data.berlinDate||'',PUBLICATION_ID:data.publicationId||'',PUBLICATION_URL:data.articleUrl||'',PUBLICATION_TITLE:String(data.title||'').replace(/\n/g,' '),PUBLICATION_IMAGE_URL:data.imageUrl||'',PUBLICATION_SLUG:data.slug||'',PUBLICATION_SLOT:data.slot||'',PUBLICATION_RUNTIME_STATUS:data.status||'',PUBLICATION_COMMIT_HINT:data.commit||existing.commit||'',PUBLICATION_DEPLOY_STATUS:existing.deployStatus||'pending',PUBLICATION_LIVE_STATUS:existing.liveStatus||'pending',PUBLICATION_LINKEDIN_STATUS:existing.linkedinStatus||'pending'};for (const [key,value] of Object.entries(values)) console.log(key+'='+String(value));" >> "$GITHUB_ENV"
           fi
 
-      - name: Bei Slot-Skip sauber beenden
+      - name: Bei Skip sauber beenden
         if: steps.generate.outputs.status == 'skipped'
-        run: echo "Kein Beitrag erzeugt (außerhalb Zeitfenster oder Slot bereits veröffentlicht)."
+        run: |
+          REASON="$(node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('sv-netzwerk/.automation/latest-publication.json','utf8'));process.stdout.write(data.reason||'unbekannt')")"
+          echo "Kein Beitrag erzeugt: ${REASON}"
 
       - name: Vorprüfung
         if: steps.generate.outputs.status != 'skipped'
