@@ -129,11 +129,12 @@ jobs:
       - name: Linkprüfung des veröffentlichten Beitrags
         if: steps.generate.outputs.status != 'skipped'
         run: |
-          npx --yes lychee@0.2.12 \
+          python -m pip install --disable-pip-version-check --quiet linkchecker
+          python -m linkchecker \
             --no-progress \
-            --exclude-mail \
-            --max-retries 2 \
-            --accept 200,204,206,301,302,307,308,429 \
+            --check-extern \
+            --ignore-mailto \
+            --timeout 30 \
             "dist/fachwissen/${PUBLICATION_SLUG}/index.html" \
             "dist/svos/fachwissen/${PUBLICATION_SLUG}/index.html"
 
