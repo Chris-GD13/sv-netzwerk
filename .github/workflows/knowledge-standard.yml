@@ -129,7 +129,7 @@ jobs:
       - name: Linkprüfung des veröffentlichten Beitrags
         if: steps.generate.outputs.status != 'skipped'
         run: |
-          npx --yes lychee@0.20.1 \
+          npx --yes lychee@0.2.12 \
             --no-progress \
             --exclude-mail \
             --max-retries 2 \
