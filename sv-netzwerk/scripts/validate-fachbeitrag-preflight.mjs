@@ -12,6 +12,7 @@ const berlinDate = berlinDateArg ?? new Intl.DateTimeFormat('en-CA', {
   month: '2-digit',
   day: '2-digit',
 }).format(new Date());
+const explicitBackfillRun = process.env.GITHUB_EVENT_NAME === 'workflow_dispatch' && process.env.PUBLICATION_RUNTIME_STATUS === 'generated';
 
 const normalize = (value) => value
   .toLocaleLowerCase('de-DE')
@@ -80,7 +81,7 @@ if (publishedDaily.length > 0) {
   const librarySource = await readFile(libraryFile, 'utf8');
   const firstDate = librarySource.match(/date:\s*'([^']+)'/)?.[1] ?? '';
   const firstHref = librarySource.match(/href:\s*'([^']+)'/)?.[1] ?? '';
-  if (firstDate !== latestOverall.publishedAt || firstHref !== expectedHref) {
+  if (!explicitBackfillRun && (firstDate !== latestOverall.publishedAt || firstHref !== expectedHref)) {
     errors.push(`Fachwissensübersicht nicht auf aktuellstem Beitrag: erwartet ${latestOverall.publishedAt} ${expectedHref}, gefunden ${firstDate} ${firstHref}.`);
   }
 }
