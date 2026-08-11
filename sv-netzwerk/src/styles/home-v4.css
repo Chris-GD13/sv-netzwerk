@@ -1404,6 +1404,7 @@
   .v4-hero__actions {
     align-items: stretch;
     flex-direction: column;
+    gap: 0.8rem;
   }
   .v4-hero__notice {
     margin-top: 1rem;
@@ -1412,6 +1413,7 @@
   .v4-hero__trust {
     display: grid;
     gap: 0.7rem;
+    margin-top: 2rem;
   }
   .v4-hero__trust div,
   .v4-hero__trust div:first-child {
@@ -1430,15 +1432,14 @@
     flex-direction: column;
   }
   .v4-services__grid,
-  .v4-audience__grid,
-  .v4-knowledge__grid {
+  .v4-audience__grid {
     grid-template-columns: 1fr;
   }
-  .v4-knowledge article:first-child {
-    grid-column: auto;
-  }
   .v4-services__grid > a {
-    min-height: 16.5rem;
+    min-height: 15rem;
+  }
+  .v4-audience__card {
+    min-height: 14rem;
   }
   .v4-downloads__list > a {
     grid-template-columns: auto 1fr;
