@@ -282,8 +282,10 @@ jobs:
           if [ "$LINKEDIN_STATUS" != "success" ] && [ "${LIVE_OK}" = "true" -o "${PUBLICATION_LIVE_STATUS}" = "success" ]; then LINKEDIN_STATUS="failed"; fi
           if [ "$LINKEDIN_STATUS" != "success" ] && [ "${LIVE_OK}" != "true" ] && [ "${PUBLICATION_LIVE_STATUS}" != "success" ]; then LINKEDIN_STATUS="skipped"; fi
           node scripts/update-fachbeitrag-log.mjs --deploy="$DEPLOY_STATUS" --live="$LIVE_STATUS" --linkedin="$LINKEDIN_STATUS"
-          node -e "const fs=require('fs');const file='.automation/latest-publication.json';const data=JSON.parse(fs.readFileSync(file,'utf8'));data.existingStatuses={...(data.existingStatuses||{}),commit:process.env.PUBLISHED_COMMIT||data.commit||data.existingStatuses?.commit||'',deployStatus:process.env.DEPLOY_STATUS||data.existingStatuses?.deployStatus||'pending',liveStatus:process.env.LIVE_STATUS||data.existingStatuses?.liveStatus||'pending',linkedinStatus:process.env.LINKEDIN_STATUS||data.existingStatuses?.linkedinStatus||'pending'};fs.writeFileSync(file,JSON.stringify(data,null,2)+'\n');" \
-            DEPLOY_STATUS="$DEPLOY_STATUS" LIVE_STATUS="$LIVE_STATUS" LINKEDIN_STATUS="$LINKEDIN_STATUS"
+          if [ -f ".automation/latest-publication.json" ]; then
+            node -e "const fs=require('fs');const file='.automation/latest-publication.json';const data=JSON.parse(fs.readFileSync(file,'utf8'));data.existingStatuses={...(data.existingStatuses||{}),commit:process.env.PUBLISHED_COMMIT||data.commit||data.existingStatuses?.commit||'',deployStatus:process.env.DEPLOY_STATUS||data.existingStatuses?.deployStatus||'pending',liveStatus:process.env.LIVE_STATUS||data.existingStatuses?.liveStatus||'pending',linkedinStatus:process.env.LINKEDIN_STATUS||data.existingStatuses?.linkedinStatus||'pending'};fs.writeFileSync(file,JSON.stringify(data,null,2)+'\n');" \
+              DEPLOY_STATUS="$DEPLOY_STATUS" LIVE_STATUS="$LIVE_STATUS" LINKEDIN_STATUS="$LINKEDIN_STATUS"
+          fi
 
       - name: Veröffentlichungsprotokoll committen (final)
         if: always() && steps.generate.outputs.status != 'skipped'

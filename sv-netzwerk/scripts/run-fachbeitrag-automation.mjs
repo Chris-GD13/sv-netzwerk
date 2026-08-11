@@ -605,6 +605,22 @@ const ensureUniqueSlug = async (base, skipExisting = false) => {
   }
   return candidate;
 };
+const ensureUniqueTitle = async (baseTitle, skipExisting = false) => {
+  if (skipExisting) return baseTitle;
+  const knowledgeFiles = (await readdir(knowledgeDir)).filter((file) => /\.mdx?$/.test(file));
+  const seen = new Set();
+  for (const file of knowledgeFiles) {
+    const source = await readText(path.join(knowledgeDir, file));
+    const existingTitle = source.match(/^title:\s*"([^"]+)"/m)?.[1] ?? '';
+    if (existingTitle) seen.add(normalizeText(existingTitle));
+  }
+  if (!seen.has(normalizeText(baseTitle))) return baseTitle;
+  let counter = 2;
+  while (seen.has(normalizeText(`${baseTitle} (${counter})`))) {
+    counter += 1;
+  }
+  return `${baseTitle} (${counter})`;
+};
 
 const csvEscape = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`;
 const normalizeText = (value) => value
@@ -895,7 +911,7 @@ const topic = topicFromIncompleteRow ?? pickTopic(publicationRows, caseContext?.
 const fallbackTitle = caseContext
   ? `${topic.titleBase}: anonymisierte Fallauswertung aus der Praxis`
   : createHeadline(topic, regionalSignal);
-const title = String(incompleteExistingSlotRow?.title || '').trim() || fallbackTitle;
+const title = String(incompleteExistingSlotRow?.title || '').trim() || await ensureUniqueTitle(fallbackTitle, Boolean(incompleteExistingSlotRow?.title));
 const baseSlug = String(incompleteExistingSlotRow?.url || '').trim()
   ? deriveSlugFromUrl(String(incompleteExistingSlotRow.url || '').trim())
   : '';
