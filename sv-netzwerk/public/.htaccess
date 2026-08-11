@@ -1,29 +1,37 @@
 RewriteEngine On
 
+
 # Canonical host and protocol
 RewriteCond %{HTTPS} !=on [OR]
 RewriteCond %{HTTP_HOST} !^www\.sv-netzwerk\.eu$ [NC]
 RewriteRule ^ https://www.sv-netzwerk.eu%{REQUEST_URI} [R=301,L]
 
+
 # 410 Gone: Anonymisierungsverstoß (konkreter Ortsbezug)
 RewriteRule ^fachwissen/unwetter-ludwigsburg-starkregen-hagel-sturm-schadensteuerung/?$ - [G,L]
+
 
 # Consolidated insurer landing page
 RewriteRule ^versicherungen/?$ /versicherer/ [R=301,L,NC]
 RewriteRule ^versicherungsleistungen/?$ /versicherer/ [R=301,L,NC]
 
-# Legacy regional page
+
+# Legacy team and regional pages
+RewriteRule ^uber-uns/team/?$ /experten/ [R=301,L,NC]
 RewriteRule ^niederlassungen/?$ /experten/ [R=301,L,NC]
+
 
 # Consolidated knowledge base paths
 RewriteRule ^wissen/?$ /fachwissen/ [R=301,L,NC]
 RewriteRule ^svos/fachwissen/?$ /fachwissen/ [R=301,L,NC]
 RewriteRule ^svos/fachwissen/(.*)$ /fachwissen/$1 [R=301,L,NC]
 
+
 # Legacy Fachwissen URLs with clear successor pages
 RewriteRule ^fachwissen/komplexschaeden-regulierung/?$ /fachwissen/schadenabgrenzung/ [R=301,L,NC]
 RewriteRule ^fachwissen/komplexschaeden-strukturiert-regulieren/?$ /fachwissen/schadenabgrenzung/ [R=301,L,NC]
 RewriteRule ^fachwissen/lichtbogen-an-einer-led-lichtleiste/?$ /fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/ [R=301,L,NC]
+
 
 # Consolidated legacy service paths
 RewriteRule ^schadenarten/photovoltaik/?$ /schadenarten/ [R=301,L,NC]
@@ -32,7 +40,9 @@ RewriteRule ^kompetenzzentrum/?$ /leistungen/ [R=301,L,NC]
 RewriteRule ^gutachter-plattform/fuer-versicherungen/?$ /versicherer/ [R=301,L,NC]
 RewriteRule ^gutachter-plattform/fuer-regulierer/?$ /versicherer/ [R=301,L,NC]
 
+
 # Internal protected record routes routed to static shell
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^intern/fensterpruefung-bonn/fenster/([^/]+)/?$ /intern/fensterpruefung-bonn/fenster/record/?id=$1 [QSA,L,NC]
+
