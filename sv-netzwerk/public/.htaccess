@@ -12,7 +12,8 @@ RewriteRule ^fachwissen/unwetter-ludwigsburg-starkregen-hagel-sturm-schadensteue
 RewriteRule ^versicherungen/?$ /versicherer/ [R=301,L,NC]
 RewriteRule ^versicherungsleistungen/?$ /versicherer/ [R=301,L,NC]
 
-# Legacy regional page
+# Legacy team and regional pages
+RewriteRule ^uber-uns/team/?$ /experten/ [R=301,L,NC]
 RewriteRule ^niederlassungen/?$ /experten/ [R=301,L,NC]
 
 # Consolidated knowledge base paths
