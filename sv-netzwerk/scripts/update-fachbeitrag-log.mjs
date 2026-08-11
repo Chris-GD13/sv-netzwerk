@@ -17,12 +17,6 @@ const deployStatus = argValue('deploy');
 const liveStatus = argValue('live');
 const linkedinStatus = argValue('linkedin');
 
-const runtime = JSON.parse(await readFile(runtimeFile, 'utf8'));
-const publicationId = runtime.publicationId;
-if (!publicationId) {
-  throw new Error('publicationId in latest-publication.json fehlt.');
-}
-
 const source = await readFile(publicationLogFile, 'utf8');
 const lines = source.trim().split(/\r?\n/);
 if (lines.length <= 1) {
@@ -59,6 +53,27 @@ const rows = lines.slice(1).map((line) => {
   });
   return entry;
 });
+
+let publicationId = '';
+try {
+  const runtime = JSON.parse(await readFile(runtimeFile, 'utf8'));
+  publicationId = String(runtime.publicationId || '').trim();
+} catch {
+  publicationId = '';
+}
+
+if (!publicationId) {
+  publicationId = [...rows].reverse().find((row) => {
+    const deploy = String(row.deploy_status || '').trim();
+    const live = String(row.live_pruefung || '').trim();
+    const linkedin = String(row.linkedin_status || '').trim();
+    return deploy === 'pending' || live === 'pending' || linkedin === 'pending';
+  })?.publication_id || '';
+}
+
+if (!publicationId) {
+  throw new Error('publicationId konnte weder aus latest-publication.json noch aus dem Veröffentlichungsprotokoll ermittelt werden.');
+}
 
 const target = rows.find((row) => row.publication_id === publicationId);
 if (!target) {
