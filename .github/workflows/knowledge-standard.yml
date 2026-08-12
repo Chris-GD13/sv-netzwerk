@@ -96,7 +96,7 @@ jobs:
       - name: Bei Skip sauber beenden
         if: steps.generate.outputs.status == 'skipped'
         run: |
-          REASON="$(node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('sv-netzwerk/.automation/latest-publication.json','utf8'));process.stdout.write(data.reason||'unbekannt')")"
+          REASON="$(node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('.automation/latest-publication.json','utf8'));process.stdout.write(data.reason||'unbekannt')")"
           echo "Kein Beitrag erzeugt: ${REASON}"
 
       - name: Vorprüfung
