@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.30 – 2026-08-12
+- automatischer morgens Fachbeitrag veröffentlicht: „Kumulschäden nach Sturm und Hagel: Belastbare Prüffolge für die Regulierungspraxis (2)"
+- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt
+- Beitragsbild unter /assets/images/linkedin/kumulschaeden-sturm-hagel-prueffolge-regulierung.svg erzeugt
+
 ## 3.4.29 – 2026-08-11
 - automatischer morgens Fachbeitrag veröffentlicht: „Starkregen und Rückstau: Schadenaufnahme und Regulierung im Kumulereignis – fachliche Einordnung zur aktuellen Lage"
 - LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt

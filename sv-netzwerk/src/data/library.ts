@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Kumulschäden nach Sturm und Hagel: Belastbare Prüffolge für die Regulierungspraxis (2)',
+    description: 'Sturm- und Hagelschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/kumulschaeden-sturm-hagel-prueffolge-regulierung/',
+    category: 'Sturm- und Hagelschäden',
+    tags: ['Sturm', 'Hagel', 'Kumulschaden', 'Plausibilitätsprüfung'],
+    date: '2026-08-12',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Starkregen und Rückstau: Schadenaufnahme und Regulierung im Kumulereignis – fachliche Einordnung zur aktuellen Lage',
     description: 'Starkregen und Rückstau: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung/',
