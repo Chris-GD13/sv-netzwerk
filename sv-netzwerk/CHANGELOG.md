@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.29 – 2026-08-11
+- automatischer morgens Fachbeitrag veröffentlicht: „Starkregen und Rückstau: Schadenaufnahme und Regulierung im Kumulereignis – fachliche Einordnung zur aktuellen Lage"
+- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt
+- Beitragsbild unter /assets/images/linkedin/starkregen-rueckstau-schadenaufnahme-regulierung.svg erzeugt
+
 ## 3.4.28 – 2026-08-09
 - Migration Fachbeitrag 2026-07-15: „Fachliche Zuständigkeit im Schadenfall" auf Fachbeitragsstandard gehoben
 - videoScript entfernt; canonical, noindex, updatedAt, featured ergänzt

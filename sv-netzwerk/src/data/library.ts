@@ -13,6 +13,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Starkregen und Rückstau: Schadenaufnahme und Regulierung im Kumulereignis – fachliche Einordnung zur aktuellen Lage',
+    description: 'Starkregen und Rückstau: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung/',
+    category: 'Starkregen und Rückstau',
+    tags: ['Starkregen', 'Rückstau', 'Schadenregulierung', 'Beweissicherung'],
+    date: '2026-08-11',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Interdisziplinäres Sachverständigennetzwerk und Gutachter-Plattform für komplexe Schadenfälle',
     description: 'Komplexe Schadenfälle lassen sich belastbar steuern, wenn Fachgewerke, Sachverständige, Regulierer und digitale Plattformprozesse klar strukturiert zusammengeführt werden.',
     href: '/fachwissen/interdisziplinaeres-sachverstaendigennetzwerk-gutachter-plattform-schadenregulierung/',
