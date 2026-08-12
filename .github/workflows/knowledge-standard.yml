@@ -124,16 +124,15 @@ jobs:
             "dist/fachwissen/${PUBLICATION_SLUG}/index.html" \
             "dist/svos/fachwissen/${PUBLICATION_SLUG}/index.html"
 
-      - name: LinkprÃ¼fung des verÃ¶ffentlichten Beitrags
+      - name: Linkprüfung des veröffentlichten Beitrags
         if: steps.generate.outputs.status != 'skipped'
         run: |
-          python -m pip install --disable-pip-version-check --quiet linkchecker
-          python -m linkchecker \
-            --no-progress \
-            --check-extern \
-            --ignore-mailto \
-            --timeout 30 \
-            "dist/fachwissen/${PUBLICATION_SLUG}/index.html" \
+          npx --yes linkchecker \\
+            --no-progress \\
+            --check-extern \\
+            --ignore-mailto \\
+            --timeout 30 \\
+            "dist/fachwissen/${PUBLICATION_SLUG}/index.html" \\
             "dist/svos/fachwissen/${PUBLICATION_SLUG}/index.html"
 
       - name: Link- und Build-Integration prÃ¼fen
