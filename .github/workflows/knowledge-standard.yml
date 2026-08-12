@@ -124,17 +124,6 @@ jobs:
             "dist/fachwissen/${PUBLICATION_SLUG}/index.html" \
             "dist/svos/fachwissen/${PUBLICATION_SLUG}/index.html"
 
-      - name: Linkprüfung des veröffentlichten Beitrags
-        if: steps.generate.outputs.status != 'skipped'
-        run: |
-          npx --yes linkchecker \\
-            --no-progress \\
-            --check-extern \\
-            --ignore-mailto \\
-            --timeout 30 \\
-            "dist/fachwissen/${PUBLICATION_SLUG}/index.html" \\
-            "dist/svos/fachwissen/${PUBLICATION_SLUG}/index.html"
-
       - name: Link- und Build-Integration prÃ¼fen
         if: steps.generate.outputs.status != 'skipped'
         run: npm run validate:knowledge -- --dist "$BERLIN_DATE"
