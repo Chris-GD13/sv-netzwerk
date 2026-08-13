@@ -229,18 +229,54 @@ a.intern-stat {
 
 .intern-field input,
 .intern-field select,
-.intern-field textarea {
+.intern-field textarea,
+.intern-input {
+  box-sizing: border-box;
   width: 100%;
   min-height: 3rem;
   padding: .75rem .9rem;
   border: 1px solid #c6d8e3;
   border-radius: .85rem;
   background: #fff;
+  font: inherit;
 }
 
-.intern-field textarea {
+.intern-field textarea,
+textarea.intern-input {
   min-height: 7rem;
   resize: vertical;
+}
+
+.sharepoint-url-row,
+.sharepoint-ai-row {
+  display: grid;
+  gap: .75rem;
+  align-items: end;
+}
+
+.sharepoint-url-row {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.sharepoint-ai-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.sharepoint-ai-row textarea {
+  min-height: 7.5rem;
+}
+
+.sharepoint-ai-row .sv-button,
+.sharepoint-url-row .sv-button {
+  min-height: 3rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 42rem) {
+  .sharepoint-url-row,
+  .sharepoint-ai-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .intern-field input[type='checkbox'] {

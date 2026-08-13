@@ -2730,15 +2730,17 @@ async function renderSharePointImport(context: AppContext) {
       <div class="intern-card" style="margin-bottom:16px">
         <h2>📂 SharePoint-Verknüpfung</h2>
         <p class="intern-meta">Hinterlegter SharePoint-Ordner für automatischen Abgleich (Gebäude ${buildingId}).</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-          <input type="url" id="sp-url-input" class="intern-input" style="flex:1;min-width:200px"
-            placeholder="https://sv1schuett.sharepoint.com/..." />
+        <div class="sharepoint-url-row" style="margin-top:8px">
+          <input type="url" id="sp-url-input" class="intern-input" placeholder="https://sv1schuett.sharepoint.com/..." />
           <button class="sv-button sv-button-secondary" id="sp-save-url">💾 URL speichern</button>
           <button class="sv-button sv-button-primary" id="sp-refresh-btn">🔄 Aktualisieren</button>
         </div>
         <div style="margin-top:12px">
           <label for="sp-ai-prompt" style="display:block;margin-bottom:6px;font-weight:600">KI-Befehl / Anweisung</label>
-          <textarea id="sp-ai-prompt" class="intern-input" rows="3" placeholder="z.B. Lies die Excel-Tabelle ein, lege ein neues Gebäude mit dem Namen 800-2 an, erstelle alle Fenster mit den beschriebenen Feldern und ordne die Fotos nach Schlagzahl zu."></textarea>
+          <div class="sharepoint-ai-row">
+            <textarea id="sp-ai-prompt" class="intern-input" rows="3" placeholder="z.B. Lies die Excel-Tabelle ein, lege ein neues Gebäude mit dem Namen 800-2 an, erstelle alle Fenster mit den beschriebenen Feldern und ordne die Fotos nach Schlagzahl zu."></textarea>
+            <button id="sp-ai-run-btn" class="sv-button sv-button-primary" type="button">Ausführen</button>
+          </div>
         </div>
         <div id="sp-url-status" style="margin-top:8px"></div>
         <div class="intern-alert intern-alert--info" style="margin-top:12px">
@@ -2834,6 +2836,46 @@ async function renderSharePointImport(context: AppContext) {
       `SharePoint-Ordner wird in einem neuen Tab geöffnet. Laden Sie neue Dateien herunter und importieren Sie sie über die Import-Felder unten.<br>
        <a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" class="sv-button sv-button-secondary" style="margin-top:8px;display:inline-block">SharePoint öffnen ↗</a>`,
     );
+  });
+
+  const aiPromptInput = context.root.querySelector<HTMLTextAreaElement>('#sp-ai-prompt')!;
+  const aiRunBtn = context.root.querySelector<HTMLButtonElement>('#sp-ai-run-btn')!;
+  const runAiPrompt = () => {
+    const prompt = aiPromptInput.value.trim();
+    if (!prompt) {
+      urlStatus.innerHTML = infoAlert('Bitte erst eine KI-Anweisung eingeben.');
+      return;
+    }
+
+    const excelApplyBtn = context.root.querySelector<HTMLButtonElement>('#excel-apply-btn');
+    if (!excelRows.length) {
+      urlStatus.innerHTML = infoAlert('Bitte zuerst eine Excel-Datei einlesen, damit die KI-Anweisung auf Daten angewendet werden kann.');
+      return;
+    }
+
+    const colSelect = context.root.querySelector<HTMLSelectElement>('#schlagzahl-col');
+    if (colSelect && !colSelect.value) {
+      urlStatus.innerHTML = infoAlert('Bitte zuerst die Spalte mit der Schlagzahl im Excel-Preview auswählen.');
+      return;
+    }
+
+    const normalizedPrompt = prompt.length > 180 ? `${prompt.slice(0, 177)}...` : prompt;
+    appendImportLog(`KI-Befehl: ${normalizedPrompt}`);
+    urlStatus.innerHTML = successAlert('KI-Anweisung übernommen. Die Excel-Datei wird mit der ausgewählten Schlagzahlspalte verarbeitet.');
+    excelApplyBtn?.click();
+  };
+
+  aiRunBtn.addEventListener('click', runAiPrompt);
+  aiPromptInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      runAiPrompt();
+      return;
+    }
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      event.preventDefault();
+      runAiPrompt();
+    }
   });
 
   // ── Excel-Import ──────────────────────────────────────────────────────────
