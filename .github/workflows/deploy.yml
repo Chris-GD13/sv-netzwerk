@@ -90,6 +90,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes lftp
 
+      - name: SSH-Hostschlüssel registrieren
+        env:
+          # Inhalt erzeugen mit: ssh-keyscan -H -p PORT HOST
+          SFTP_KNOWN_HOST: ${{ secrets.SFTP_KNOWN_HOST }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SFTP_KNOWN_HOST" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
       - name: Document Root vor dem Upload prüfen
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
