@@ -267,11 +267,18 @@ textarea.intern-input {
   grid-template-columns: minmax(0, 1fr) auto;
 }
 
+.sharepoint-ai-actions {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
 .sharepoint-ai-row textarea {
   min-height: 7.5rem;
 }
 
 .sharepoint-building-row select,
+.sharepoint-ai-actions .sv-button,
 .sharepoint-ai-row .sv-button,
 .sharepoint-url-row .sv-button {
   min-height: 3rem;
@@ -281,7 +288,8 @@ textarea.intern-input {
 @media (max-width: 42rem) {
   .sharepoint-building-row,
   .sharepoint-url-row,
-  .sharepoint-ai-row {
+  .sharepoint-ai-row,
+  .sharepoint-ai-actions {
     grid-template-columns: 1fr;
   }
 }

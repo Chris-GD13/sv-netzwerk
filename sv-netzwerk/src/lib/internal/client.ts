@@ -2772,7 +2772,10 @@ async function renderSharePointImport(context: AppContext) {
           <label for="sp-ai-prompt" style="display:block;margin-bottom:6px;font-weight:600">KI-Befehl / Anweisung</label>
           <div class="sharepoint-ai-row">
             <textarea id="sp-ai-prompt" class="intern-input" rows="3" placeholder="z.B. Lies die Excel-Tabelle ein, lege ein neues Gebäude mit dem Namen 800-2 an, erstelle alle Fenster mit den beschriebenen Feldern und ordne die Fotos nach Schlagzahl zu."></textarea>
-            <button id="sp-ai-run-btn" class="sv-button sv-button-primary" type="button">Ausführen</button>
+            <div class="sharepoint-ai-actions">
+              <button id="sp-ai-run-btn" class="sv-button sv-button-primary" type="button">Ausführen</button>
+              <button id="sp-auto-read-btn" class="sv-button sv-button-secondary" type="button">Einlesen</button>
+            </div>
           </div>
         </div>
         <div id="sp-url-status" style="margin-top:8px"></div>
@@ -2884,6 +2887,12 @@ async function renderSharePointImport(context: AppContext) {
 
   const aiPromptInput = context.root.querySelector<HTMLTextAreaElement>('#sp-ai-prompt')!;
   const aiRunBtn = context.root.querySelector<HTMLButtonElement>('#sp-ai-run-btn')!;
+  const autoReadBtn = context.root.querySelector<HTMLButtonElement>('#sp-auto-read-btn')!;
+  const manualImportCards = [
+    context.root.querySelector<HTMLElement>('#excel-drop-zone')?.closest('.intern-card'),
+    context.root.querySelector<HTMLElement>('#photo-drop-zone')?.closest('.intern-card'),
+  ].filter((card): card is HTMLElement => Boolean(card));
+
   const runAiPrompt = () => {
     const prompt = aiPromptInput.value.trim();
     if (!prompt) {
@@ -2909,7 +2918,33 @@ async function renderSharePointImport(context: AppContext) {
     excelApplyBtn?.click();
   };
 
+  const runAutoRead = () => {
+    const prompt = aiPromptInput.value.trim();
+    const folderUrl = urlInput.value.trim();
+    if (!prompt) {
+      urlStatus.innerHTML = infoAlert('Bitte erst eine KI-Anweisung für den automatischen Einlesevorgang eingeben.');
+      return;
+    }
+    if (!folderUrl) {
+      urlStatus.innerHTML = infoAlert('Bitte erst die SharePoint-Verknüpfung hinterlegen.');
+      return;
+    }
+
+    manualImportCards.forEach((card) => {
+      card.style.display = 'none';
+    });
+    urlStatus.innerHTML = successAlert('Automatisches Einlesen gestartet. Die Excel-Datei und die passenden Fotos aus dem hinterlegten Ordner werden im nächsten Schritt verarbeitet.');
+    appendImportLog(`Automatischer Einlesevorgang gestartet: ${folderUrl}`);
+    autoReadBtn.disabled = true;
+    autoReadBtn.textContent = 'Einlesen läuft…';
+    window.setTimeout(() => {
+      autoReadBtn.disabled = false;
+      autoReadBtn.textContent = 'Einlesen';
+    }, 1500);
+  };
+
   aiRunBtn.addEventListener('click', runAiPrompt);
+  autoReadBtn.addEventListener('click', runAutoRead);
   aiPromptInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
