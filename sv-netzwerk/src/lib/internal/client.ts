@@ -2063,10 +2063,32 @@ function bindWindowTableActions(context: AppContext, records: WindowSummary[]) {
     button.onclick = async (e) => {
       e.stopPropagation();
       const id = button.dataset.duplicateWindow;
-      const source = records.find((record) => record.id === id);
+      const source = records.find((record) => String(record.id) === String(id));
       if (!source) return;
       const created = await createWindowRecord(context, source.id);
       if (created) redirectTo(`${projectBase()}/fenster/${encodeURIComponent(created.id)}/`);
+    };
+  });
+
+  context.root.querySelectorAll<HTMLElement>('[data-delete-window]').forEach((button) => {
+    button.onclick = async (e) => {
+      e.stopPropagation();
+      const id = Number(button.dataset.deleteWindow ?? 0);
+      if (!id) return;
+      const record = records.find((item) => String(item.id) === String(id));
+      const label = record ? (record.window_number || record.record_id || 'Fenster') : 'Fenster';
+      if (!window.confirm(`Fenster "${label}" wirklich löschen?`)) return;
+      const ok = await apiDeleteWindow(id);
+      if (ok) {
+        const refreshed = await fetchWindowSummaries(context);
+        const listContainer = context.root.querySelector<HTMLElement>('#window-list-container');
+        if (listContainer) {
+          listContainer.innerHTML = renderWindowTable(refreshed);
+          bindWindowTableActions(context, refreshed);
+        }
+      } else {
+        alert('Fenster konnte nicht gelöscht werden.');
+      }
     };
   });
 }
@@ -2713,6 +2735,10 @@ async function renderSharePointImport(context: AppContext) {
             placeholder="https://sv1schuett.sharepoint.com/..." />
           <button class="sv-button sv-button-secondary" id="sp-save-url">💾 URL speichern</button>
           <button class="sv-button sv-button-primary" id="sp-refresh-btn">🔄 Aktualisieren</button>
+        </div>
+        <div style="margin-top:12px">
+          <label for="sp-ai-prompt" style="display:block;margin-bottom:6px;font-weight:600">KI-Befehl / Anweisung</label>
+          <textarea id="sp-ai-prompt" class="intern-input" rows="3" placeholder="z.B. Lies die Excel-Tabelle ein, lege ein neues Gebäude mit dem Namen 800-2 an, erstelle alle Fenster mit den beschriebenen Feldern und ordne die Fotos nach Schlagzahl zu."></textarea>
         </div>
         <div id="sp-url-status" style="margin-top:8px"></div>
         <div class="intern-alert intern-alert--info" style="margin-top:12px">
@@ -3824,6 +3850,7 @@ function renderWindowTable(records: WindowSummary[]) {
               <td>
                 <div class="intern-actions">
                   <button type="button" class="intern-inline-button" data-duplicate-window="${escapeHtml(record.id)}">Duplizieren</button>
+                  <button type="button" class="intern-inline-button intern-inline-button--danger" data-delete-window="${escapeHtml(record.id)}">Löschen</button>
                 </div>
               </td>
             </tr>
