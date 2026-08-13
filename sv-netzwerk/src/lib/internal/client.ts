@@ -2732,8 +2732,8 @@ async function renderSharePointImport(context: AppContext) {
         <div class="intern-ai-upload" id="excel-drop-zone" style="margin-top:12px">
           <div class="intern-ai-upload__icon">📊</div>
           <p><strong>Excel-Datei hierher ziehen</strong> oder klicken zum Auswählen</p>
-          <p class="intern-meta">.xlsx, .xls · max. 50 MB</p>
-          <input type="file" id="excel-file-input" accept=".xlsx,.xls" hidden />
+          <p class="intern-meta">.xlsx, .xls, .xlsm, .xlsb, .csv · max. 50 MB</p>
+          <input type="file" id="excel-file-input" accept=".xlsx,.xls,.xlsm,.xlsb,.csv" hidden />
         </div>
         <div id="excel-status" style="margin-top:8px"></div>
         <div id="excel-preview" style="display:none;margin-top:12px">
@@ -2757,8 +2757,8 @@ async function renderSharePointImport(context: AppContext) {
       <div class="intern-card" style="margin-bottom:16px">
         <h2>📷 Fotos einlesen</h2>
         <p class="intern-meta">
-          Fotos mit Schlagzahl im Dateinamen hochladen (z.B. <code>Schlagzahl_0042_Gesamtansicht.jpg</code>).
-          Die Schlagzahl wird erkannt und das Foto automatisch dem passenden Fenster zugeordnet.
+          Fotos mit sichtbarer Schlagzahl im Bild hochladen. Die KI erkennt die Zahl direkt aus dem Foto (z.B. auf dem Fensteretikett bzw. auf der Fotografie).
+          Die Fotos werden dann automatisch dem passenden Fenster zugeordnet.
         </p>
         <div class="intern-ai-upload" id="photo-drop-zone" style="margin-top:12px">
           <div class="intern-ai-upload__icon">📷</div>
@@ -2833,6 +2833,23 @@ async function renderSharePointImport(context: AppContext) {
   });
 
   async function processExcel(file: File) {
+    const fileName = file.name.toLowerCase();
+    const mime = (file.type || '').toLowerCase();
+    const isSpreadsheet = /\.(xlsx|xlsm|xlsb|xls|csv)$/i.test(fileName)
+      || mime.includes('excel')
+      || mime.includes('spreadsheet')
+      || mime.includes('csv')
+      || mime.includes('tab-separated')
+      || mime === 'application/octet-stream' && /\.(xlsx|xlsm|xlsb|xls|csv)$/i.test(fileName);
+
+    if (!isSpreadsheet) {
+      excelStatus.innerHTML = errorAlert('Bitte nur echte Excel-Dateien einlesen (.xlsx, .xls, .xlsm, .xlsb, .csv). Ein Bild oder Screenshot wurde erkannt.');
+      excelPreview.style.display = 'none';
+      excelRows = [];
+      excelColumns = [];
+      return;
+    }
+
     excelStatus.innerHTML = infoAlert(`⏳ „${escapeHtml(file.name)}" wird eingelesen…`);
     excelPreview.style.display = 'none';
     const result = await apiImportExcel(buildingId, file);
@@ -2914,6 +2931,38 @@ async function renderSharePointImport(context: AppContext) {
   const photoActions = context.root.querySelector<HTMLElement>('#photo-actions')!;
   let selectedPhotos: File[] = [];
 
+  function normalizeSchlagzahlValue(value: string): string {
+    const digits = value.match(/\d{1,6}/g)?.map((match) => match.replace(/^0+/, '') || '0') ?? [];
+    if (!digits.length) return '';
+    const preferred = digits.filter((digit) => digit.length >= 1 && digit.length <= 6);
+    return preferred[0] ?? '';
+  }
+
+  function extractSchlagzahlFromText(text: string): string {
+    const normalized = text.replace(/\s+/g, ' ').trim();
+    if (!normalized) return '';
+
+    const keywordPatterns = [
+      /(?:schlagzahl|schlag[-\s]?zahl|sz|fenster(?:nummer|nr)?|fensternr|nummer)[^\d]{0,8}(\d{1,6})/gi,
+      /(?:nr|nummer)[^\d]{0,4}(\d{1,6})/gi,
+    ];
+
+    for (const pattern of keywordPatterns) {
+      const match = normalized.match(pattern);
+      const candidate = match?.[0]?.match(/\d{1,6}/)?.[0];
+      if (candidate) return normalizeSchlagzahlValue(candidate);
+    }
+
+    const allMatches = Array.from(normalized.matchAll(/\d{1,6}/g)).map((match) => match[0]);
+    const candidates = allMatches
+      .map((value) => value.replace(/^0+/, '') || '0')
+      .filter((value) => value !== '0' || normalized.includes('0'))
+      .filter((value) => value.length <= 6)
+      .filter((value) => !(value.length === 4 && Number(value) >= 1900 && Number(value) <= 2099));
+
+    return candidates.length ? candidates.sort((a, b) => b.length - a.length || b.localeCompare(a))[0] : '';
+  }
+
   function extractSchlagzahl(filename: string): string {
     // Patterns: "0042", "Schlagzahl_0042", "SZ0042", "Fenster-42"
     const clean = filename.replace(/\.[^/.]+$/, '');
@@ -2931,6 +2980,44 @@ async function renderSharePointImport(context: AppContext) {
       if (m?.[1]) return m[1].replace(/^0+/, '') || '0';
     }
     return '';
+  }
+
+  async function detectSchlagzahlFromImage(file: File): Promise<string> {
+    if (!file.type.startsWith('image/')) return extractSchlagzahl(file.name);
+
+    const globalWindow = window as typeof window & { Tesseract?: { recognize: (source: Blob | File | string, lang: string, options?: Record<string, unknown>) => Promise<{ data: { text?: string } }> } };
+    if (!globalWindow.Tesseract) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+      await new Promise<void>((resolve, reject) => {
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Tesseract konnte nicht geladen werden.'));
+        document.head.appendChild(script);
+      });
+    }
+
+    try {
+      const result = await globalWindow.Tesseract!.recognize(file, 'deu+eng', { logger: () => undefined });
+      const detected = extractSchlagzahlFromText(result.data.text ?? '');
+      return detected || extractSchlagzahl(file.name);
+    } catch {
+      return extractSchlagzahl(file.name);
+    }
+  }
+
+  async function autoDetectPhotoSchlagzahl(file: File, idx: number) {
+    const input = context.root.querySelector<HTMLInputElement>(`.photo-schlagzahl[data-photo-idx="${idx}"]`);
+    if (!input || input.value.trim()) return;
+
+    const detected = await detectSchlagzahlFromImage(file);
+    if (!detected) return;
+
+    input.value = detected;
+    const status = input.parentElement?.querySelector<HTMLElement>('[data-photo-status]');
+    if (status) {
+      status.textContent = 'KI erkannt';
+      status.style.color = '#2e7d32';
+    }
   }
 
   function renderPhotoQueue() {
@@ -2959,7 +3046,7 @@ async function renderSharePointImport(context: AppContext) {
                   class="intern-input photo-schlagzahl"
                   style="width:80px;padding:3px 6px;font-size:0.85rem"
                   placeholder="z.B. 42" />
-                ${!sz ? '<span style="color:#e53935;font-size:0.8rem">⚠ nicht erkannt</span>' : ''}
+                <span data-photo-status style="color:${!sz ? '#e53935' : '#2e7d32'};font-size:0.8rem;display:block;margin-top:4px;">${sz ? 'Dateiname' : 'KI prüft…'}</span>
               </td>
               <td style="padding:5px 8px;border:1px solid #e5eaf0">
                 <select data-photo-cat-idx="${i}" class="intern-input photo-category" style="padding:3px 6px;font-size:0.85rem">
@@ -2975,6 +3062,10 @@ async function renderSharePointImport(context: AppContext) {
         </tbody>
       </table>
     `;
+
+    selectedPhotos.forEach((file, index) => {
+      void autoDetectPhotoSchlagzahl(file, index);
+    });
   }
 
   function addToPhotoQueue(files: FileList | File[]) {
