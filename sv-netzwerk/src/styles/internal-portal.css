@@ -247,11 +247,16 @@ textarea.intern-input {
   resize: vertical;
 }
 
+.sharepoint-building-row,
 .sharepoint-url-row,
 .sharepoint-ai-row {
   display: grid;
   gap: .75rem;
   align-items: end;
+}
+
+.sharepoint-building-row {
+  grid-template-columns: minmax(0, 16rem);
 }
 
 .sharepoint-url-row {
@@ -266,6 +271,7 @@ textarea.intern-input {
   min-height: 7.5rem;
 }
 
+.sharepoint-building-row select,
 .sharepoint-ai-row .sv-button,
 .sharepoint-url-row .sv-button {
   min-height: 3rem;
@@ -273,6 +279,7 @@ textarea.intern-input {
 }
 
 @media (max-width: 42rem) {
+  .sharepoint-building-row,
   .sharepoint-url-row,
   .sharepoint-ai-row {
     grid-template-columns: 1fr;
