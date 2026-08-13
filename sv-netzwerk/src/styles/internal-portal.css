@@ -300,6 +300,11 @@ a.intern-stat {
   font-weight: 700;
 }
 
+.intern-inline-button--danger {
+  background: #fde8e6;
+  color: #b42318;
+}
+
 .intern-photo-grid {
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
 }
