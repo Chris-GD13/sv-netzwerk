@@ -35,8 +35,17 @@
 
 .intern-header__logo {
   display: block;
-  width: clamp(10rem, 18vw, 13.75rem);
+  width: clamp(10.5rem, 15vw, 13.75rem);
   height: auto;
+  max-height: 3.25rem;
+  filter: brightness(0) invert(1);
+}
+
+@media (max-width: 46rem) {
+  .intern-header__logo {
+    width: min(12rem, 100%);
+    max-height: 2.75rem;
+  }
 }
 
 .intern-header .site-brand__copy small {
