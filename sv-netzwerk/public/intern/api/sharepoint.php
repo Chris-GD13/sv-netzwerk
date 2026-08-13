@@ -48,6 +48,94 @@ function normalizeSchlagzahl(mixed $value): string
     return '';
 }
 
+function excelRowLookup(array $row, array $keys): string
+{
+    foreach ($keys as $key) {
+        $value = $row[$key] ?? null;
+        if ($value === null || $value === '') {
+            continue;
+        }
+        $text = trim((string) $value);
+        if ($text !== '') {
+            return $text;
+        }
+    }
+
+    foreach ($row as $key => $value) {
+        $candidate = trim((string) $value);
+        if ($candidate === '') {
+            continue;
+        }
+        $normalizedKey = strtolower((string) $key);
+        foreach ($keys as $needle) {
+            if (str_contains($normalizedKey, strtolower((string) $needle))) {
+                return $candidate;
+            }
+        }
+    }
+
+    return '';
+}
+
+function ensureBuildingFloor(PDO $pdo, int $buildingId): int
+{
+    $row = $pdo->prepare('SELECT id FROM floors WHERE building_id = :bid ORDER BY level ASC, sort_order ASC, id ASC LIMIT 1');
+    $row->execute([':bid' => $buildingId]);
+    $floor = $row->fetch(PDO::FETCH_ASSOC);
+    if ($floor) {
+        return (int) $floor['id'];
+    }
+
+    $stmt = $pdo->prepare('INSERT INTO floors (building_id, name, level, sort_order, created_at, updated_at) VALUES (:bid, :name, 0, 10, :now, :now)');
+    $stmt->execute([
+        ':bid' => $buildingId,
+        ':name' => 'EG / Erdgeschoss',
+        ':now' => nowUtc(),
+    ]);
+
+    return (int) $pdo->lastInsertId();
+}
+
+function ensureBuildingRoom(PDO $pdo, int $buildingId, array $row): int
+{
+    $floorId = ensureBuildingFloor($pdo, $buildingId);
+    $roomRef = excelRowLookup($row, ['Zimmer', 'Zimmernummer', 'Zimmer Nr', 'Raum', 'Raumnummer', 'Raumnummer', 'room', 'room_number', 'A', 'Zimmer-Nr']);
+    $roomNumber = trim((string) preg_replace('/\s+/', ' ', $roomRef));
+    $roomName = $roomNumber !== '' ? 'Raum ' . $roomNumber : 'Import Raum';
+
+    $lookup = $pdo->prepare(
+        'SELECT id FROM rooms WHERE floor_id = :fid AND (room_number = :rn OR name = :name) LIMIT 1'
+    );
+    $lookup->execute([':fid' => $floorId, ':rn' => $roomNumber, ':name' => $roomName]);
+    $existing = $lookup->fetch(PDO::FETCH_ASSOC);
+    if ($existing) {
+        return (int) $existing['id'];
+    }
+
+    $stmt = $pdo->prepare(
+        'INSERT INTO rooms (floor_id, name, room_number, sort_order, created_at, updated_at) VALUES (:fid, :name, :rn, COALESCE((SELECT MAX(sort_order) FROM rooms WHERE floor_id = :fid2), 0) + 10, :now, :now)'
+    );
+    $stmt->execute([
+        ':fid' => $floorId,
+        ':fid2' => $floorId,
+        ':name' => $roomName,
+        ':rn' => $roomNumber,
+        ':now' => nowUtc(),
+    ]);
+
+    return (int) $pdo->lastInsertId();
+}
+
+function excelWindowNumber(array $row, string $fallback): string
+{
+    $value = excelRowLookup($row, ['Fensternummer', 'Fenster Nr', 'Fenster-Nr', 'window_number', 'window number', 'Fenster', 'Nr', 'C', 'Fenster-Nr.', 'Nummer']);
+    $trimmed = trim((string) $value);
+    if ($trimmed !== '') {
+        return $trimmed;
+    }
+    return $fallback !== '' ? $fallback : 'Import';
+}
+
 function handleGetUrl(): never
 {
     $buildingId = isset($_GET['building_id']) ? (int) $_GET['building_id'] : 0;
@@ -160,13 +248,26 @@ function handleApplyExcel(): never
         apiError(400, 'building_id und schlagzahl_column sind erforderlich.');
     }
 
+    $added = 0;
     $updated = 0;
     $skipped = 0;
     $errors = [];
 
     try {
-        $existing = db()->prepare(
-            'SELECT id, window_number FROM windows WHERE building_id = :bid AND deleted_at IS NULL'
+        $pdo = db();
+        $buildingStmt = $pdo->prepare('SELECT id, name, project_id FROM buildings WHERE id = :bid LIMIT 1');
+        $buildingStmt->execute([':bid' => $buildingId]);
+        $building = $buildingStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$building) {
+            apiError(404, 'Gebäude nicht gefunden.');
+        }
+
+        $existing = $pdo->prepare(
+            'SELECT w.id, w.window_number, w.room_id, ro.room_number, ro.name AS room_name
+             FROM windows w
+             LEFT JOIN rooms ro ON ro.id = w.room_id
+             LEFT JOIN floors fl ON fl.id = ro.floor_id
+             WHERE fl.building_id = :bid AND w.deleted_at IS NULL'
         );
         $existing->execute([':bid' => $buildingId]);
         $windowMap = [];
@@ -178,24 +279,65 @@ function handleApplyExcel(): never
             if (!is_array($row)) {
                 $skipped++; continue;
             }
+
             $schlagzahl = normalizeSchlagzahl($row[$schlagzahlColumn] ?? '');
             if ($schlagzahl === '') {
-                $skipped++; continue;
+                $candidate = normalizeSchlagzahl(excelRowLookup($row, ['Schlagzahl', 'Schlag-Zahl', 'SZ', 'Fensternummer', 'Fenster Nr', 'Fenster-Nr', 'Nr']));
+                if ($candidate === '') {
+                    $skipped++; continue;
+                }
+                $schlagzahl = $candidate;
             }
 
-            if (isset($windowMap[$schlagzahl])) {
-                $updated++;
-            } else {
-                $skipped++;
-                $errors[] = "Schlagzahl {$schlagzahl} wurde keinem Fenster zugeordnet.";
+            $roomId = ensureBuildingRoom($pdo, $buildingId, $row);
+            $windowNumber = excelWindowNumber($row, $schlagzahl);
+            $windowExists = $pdo->prepare('SELECT id FROM windows WHERE room_id = :rid AND window_number = :wn AND deleted_at IS NULL LIMIT 1');
+            $windowExists->execute([':rid' => $roomId, ':wn' => $windowNumber]);
+            $existingWindow = $windowExists->fetch(PDO::FETCH_ASSOC);
+
+            $formData = ['import_source' => 'sharepoint_excel', 'schlagzahl' => $schlagzahl, 'room_reference' => excelRowLookup($row, ['Zimmer', 'Zimmernummer', 'Zimmer Nr', 'Raum', 'Raumnummer', 'room_number', 'A'])];
+            foreach ($row as $key => $value) {
+                $formData[(string) $key] = $value;
             }
+
+            if ($existingWindow) {
+                $pdo->prepare(
+                    'UPDATE windows SET form_data = :fd, updated_at = :now WHERE id = :id'
+                )->execute([
+                    ':fd' => json_encode($formData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    ':now' => nowUtc(),
+                    ':id' => (int) $existingWindow['id'],
+                ]);
+                $updated++;
+                continue;
+            }
+
+            $recordId = 'SP-' . strtoupper(bin2hex(random_bytes(6)));
+            $stmt = $pdo->prepare(
+                'INSERT INTO windows (project_id, room_id, record_id, window_number, room_label, room_number, building_label, floor_label, status, form_data, created_at, updated_at)
+                 VALUES (:pid, :rid, :record_id, :wn, :room_label, :room_number, :building_label, :floor_label, :status, :form_data, :now, :now)'
+            );
+            $stmt->execute([
+                ':pid' => (int) $building['project_id'],
+                ':rid' => $roomId,
+                ':record_id' => $recordId,
+                ':wn' => $windowNumber,
+                ':room_label' => trim((string) ($row['Zimmer'] ?? $row['Raum'] ?? '')) ?: 'Import',
+                ':room_number' => trim((string) (excelRowLookup($row, ['Zimmer', 'Zimmernummer', 'Zimmer Nr', 'Raum', 'Raumnummer', 'room_number', 'A']) ?: '')),
+                ':building_label' => (string) $building['name'],
+                ':floor_label' => 'EG / Erdgeschoss',
+                ':status' => 'nicht begonnen',
+                ':form_data' => json_encode($formData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                ':now' => nowUtc(),
+            ]);
+            $added++;
         }
     } catch (Throwable $e) {
         apiError(503, 'Excel-Zeilen konnten nicht verarbeitet werden: ' . $e->getMessage());
     }
 
     apiJson([
-        'added' => 0,
+        'added' => $added,
         'updated' => $updated,
         'skipped' => $skipped,
         'errors' => array_slice($errors, 0, 10),
@@ -228,7 +370,12 @@ function handleUploadPhoto(array $user): never
     }
 
     $windowStmt = db()->prepare(
-        'SELECT id FROM windows WHERE building_id = :bid AND deleted_at IS NULL AND window_number = :wn LIMIT 1'
+        'SELECT w.id
+         FROM windows w
+         JOIN rooms ro ON ro.id = w.room_id
+         JOIN floors fl ON fl.id = ro.floor_id
+         WHERE fl.building_id = :bid AND w.deleted_at IS NULL AND w.window_number = :wn
+         LIMIT 1'
     );
     $windowStmt->execute([':bid' => $buildingId, ':wn' => $schlagzahl]);
     $window = $windowStmt->fetch();
