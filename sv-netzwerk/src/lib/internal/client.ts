@@ -188,13 +188,24 @@ export async function mountInternalPortal(root: HTMLElement) {
   await renderRoute(context);
   if (navigator.onLine) void syncDraftQueue(context);
 
-  // Inaktivitäts-Logout nach 10 Minuten
-  const INACTIVITY_MS = 10 * 60 * 1000;
+  // Inaktivitäts-Logout nach 60 Minuten; während aktiver Eingaben wird der Timer pausiert.
+  const INACTIVITY_MS = 60 * 60 * 1000;
   let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const isEditingActive = () => {
+    const activeElement = document.activeElement;
+    return !!activeElement && (
+      activeElement instanceof HTMLInputElement ||
+      activeElement instanceof HTMLTextAreaElement ||
+      activeElement instanceof HTMLSelectElement ||
+      activeElement instanceof HTMLElement && activeElement.isContentEditable
+    );
+  };
 
   const resetInactivityTimer = () => {
     if (!context.user) return;
     if (inactivityTimer !== null) clearTimeout(inactivityTimer);
+    if (isEditingActive()) return;
     inactivityTimer = setTimeout(async () => {
       await apiLogout();
       redirectTo('/intern/login/?reason=inactivity');
@@ -202,14 +213,26 @@ export async function mountInternalPortal(root: HTMLElement) {
   };
 
   const activityEvents = ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'] as const;
+  const handleFocusIn = () => {
+    if (inactivityTimer !== null) clearTimeout(inactivityTimer);
+    inactivityTimer = null;
+  };
+  const handleFocusOut = () => {
+    if (!isEditingActive()) resetInactivityTimer();
+  };
+
   activityEvents.forEach(ev =>
     document.addEventListener(ev, resetInactivityTimer, { passive: true })
   );
+  document.addEventListener('focusin', handleFocusIn);
+  document.addEventListener('focusout', handleFocusOut);
   disposers.push(() => {
     if (inactivityTimer !== null) clearTimeout(inactivityTimer);
     activityEvents.forEach(ev =>
       document.removeEventListener(ev, resetInactivityTimer)
     );
+    document.removeEventListener('focusin', handleFocusIn);
+    document.removeEventListener('focusout', handleFocusOut);
   });
 
   // Starte Timer sofort
@@ -2710,8 +2733,6 @@ async function renderExport(context: AppContext) {
 
 // ── SharePoint-Import ────────────────────────────────────────────────────────
 
-const SHAREPOINT_BUILDING_ID = 1; // Gebäude "800" (erste DB-ID)
-
 async function renderSharePointImport(context: AppContext) {
   if (!context.user) { redirectTo('/intern/login/'); return; }
   const role = context.user.profile.role;
@@ -2720,7 +2741,9 @@ async function renderSharePointImport(context: AppContext) {
     return;
   }
 
-  const buildingId = context.buildingId ?? SHAREPOINT_BUILDING_ID;
+  const availableBuildings = await apiListBuildings();
+  const preferredBuildingId = context.buildingId ?? availableBuildings.find((building) => /800/i.test(building.name ?? ''))?.id ?? availableBuildings[0]?.id ?? 1;
+  let activeBuildingId = Number(preferredBuildingId) || 1;
 
   context.root.innerHTML = `
     ${renderHeader(context, 'SharePoint-Import', 'Excel-Liste und Fotos aus SharePoint einlesen und Fenstern zuordnen.')}
@@ -2729,7 +2752,17 @@ async function renderSharePointImport(context: AppContext) {
       <!-- SharePoint-URL -->
       <div class="intern-card" style="margin-bottom:16px">
         <h2>📂 SharePoint-Verknüpfung</h2>
-        <p class="intern-meta">Hinterlegter SharePoint-Ordner für automatischen Abgleich (Gebäude ${buildingId}).</p>
+        <div class="sharepoint-building-row" style="margin-bottom:12px">
+          <label for="sp-building-select" class="intern-meta" style="font-weight:700;display:block;margin-bottom:6px">Gebäude</label>
+          <select id="sp-building-select" class="intern-input">
+            ${availableBuildings.length
+              ? availableBuildings.map((building) => `
+                  <option value="${building.id}" ${Number(building.id) === activeBuildingId ? 'selected' : ''}>${escapeHtml(building.name || `Gebäude ${building.id}`)}</option>
+                `).join('')
+              : `<option value="${activeBuildingId}">Gebäude ${activeBuildingId}</option>`}
+          </select>
+        </div>
+        <p class="intern-meta">Hinterlegter SharePoint-Ordner für automatischen Abgleich (Gebäude ${activeBuildingId}).</p>
         <div class="sharepoint-url-row" style="margin-top:8px">
           <input type="url" id="sp-url-input" class="intern-input" placeholder="https://sv1schuett.sharepoint.com/..." />
           <button class="sv-button sv-button-secondary" id="sp-save-url">💾 URL speichern</button>
@@ -2815,14 +2848,25 @@ async function renderSharePointImport(context: AppContext) {
   // ── URL laden ──────────────────────────────────────────────────────────────
   const urlInput = context.root.querySelector<HTMLInputElement>('#sp-url-input')!;
   const urlStatus = context.root.querySelector<HTMLElement>('#sp-url-status')!;
+  const buildingSelect = context.root.querySelector<HTMLSelectElement>('#sp-building-select')!;
 
-  const savedUrl = await apiGetSharePointUrl(buildingId);
-  if (savedUrl) urlInput.value = savedUrl;
+  const loadSharePointUrlForActiveBuilding = async () => {
+    const savedUrl = await apiGetSharePointUrl(activeBuildingId);
+    urlInput.value = savedUrl ?? '';
+    urlStatus.innerHTML = '';
+  };
+
+  buildingSelect.addEventListener('change', () => {
+    activeBuildingId = Number(buildingSelect.value) || 1;
+    void loadSharePointUrlForActiveBuilding();
+  });
+
+  await loadSharePointUrlForActiveBuilding();
 
   context.root.querySelector<HTMLButtonElement>('#sp-save-url')?.addEventListener('click', async () => {
     const url = urlInput.value.trim();
     if (!url) { urlStatus.innerHTML = errorAlert('Bitte URL eingeben.'); return; }
-    const ok = await apiSetSharePointUrl(buildingId, url);
+    const ok = await apiSetSharePointUrl(activeBuildingId, url);
     urlStatus.innerHTML = ok ? successAlert('URL gespeichert.') : errorAlert('Fehler beim Speichern.');
   });
 
@@ -2920,7 +2964,7 @@ async function renderSharePointImport(context: AppContext) {
 
     excelStatus.innerHTML = infoAlert(`⏳ „${escapeHtml(file.name)}" wird eingelesen…`);
     excelPreview.style.display = 'none';
-    const result = await apiImportExcel(buildingId, file);
+    const result = await apiImportExcel(activeBuildingId, file);
     if (!result) {
       excelStatus.innerHTML = errorAlert('Fehler beim Einlesen der Excel-Datei. Bitte XLSX/XLS prüfen.');
       return;
@@ -2970,7 +3014,7 @@ async function renderSharePointImport(context: AppContext) {
     const applyStatus = context.root.querySelector<HTMLElement>('#excel-apply-status')!;
     applyBtn.disabled = true;
     applyBtn.textContent = '⏳ Wird übernommen…';
-    const result = await apiApplyExcelRows(buildingId, excelRows, schlagzahlCol);
+    const result = await apiApplyExcelRows(activeBuildingId, excelRows, schlagzahlCol);
     if (!result) {
       applyStatus.innerHTML = errorAlert('Fehler beim Übernehmen der Daten.');
       applyBtn.disabled = false;
@@ -3177,7 +3221,7 @@ async function renderSharePointImport(context: AppContext) {
 
       if (!sz) { fail++; continue; }
 
-      const result = await apiUploadSharePointPhoto(buildingId, sz, file, cat);
+      const result = await apiUploadSharePointPhoto(activeBuildingId, sz, file, cat);
       const row = context.root.querySelector<HTMLElement>(`#photo-row-${i}`);
       if (row) {
         row.style.background = result.ok ? '#e8f5e9' : '#ffebee';
