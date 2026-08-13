@@ -41,6 +41,12 @@ import {
   // KI-Import
   apiAiAnalyze,
   apiAiApply,
+  // SharePoint-Import
+  apiGetSharePointUrl,
+  apiSetSharePointUrl,
+  apiImportExcel,
+  apiApplyExcelRows,
+  apiUploadSharePointPhoto,
   // Projekte
   apiListProjects,
   apiCreateProject,
@@ -110,7 +116,7 @@ import type {
   WindowSummary,
   WindowTemplate,
 } from './types';
-import type { AiAnalysisItem, AiAnalysisResult } from './php-api';
+import type { AiAnalysisItem, AiAnalysisResult, SharePointImportRow } from './php-api';
 
 interface AppContext {
   root: HTMLElement;
@@ -280,6 +286,9 @@ async function renderRoute(context: AppContext) {
       break;
     case 'ai-import':
       await renderAiImport(context);
+      break;
+    case 'sharepoint-import':
+      await renderSharePointImport(context);
       break;
     case 'admin':
       await renderAdmin(context);
@@ -2677,6 +2686,369 @@ async function renderExport(context: AppContext) {
   bindHeaderLogout(context);
 }
 
+// ── SharePoint-Import ────────────────────────────────────────────────────────
+
+const SHAREPOINT_BUILDING_ID = 1; // Gebäude "800" (erste DB-ID)
+
+async function renderSharePointImport(context: AppContext) {
+  if (!context.user) { redirectTo('/intern/login/'); return; }
+  const role = context.user.profile.role;
+  if (!['administrator', 'projektleiter', 'pruefer'].includes(role)) {
+    context.root.innerHTML = errorAlert('SharePoint-Import ist nur für Administratoren, Projektleiter und Prüfer verfügbar.');
+    return;
+  }
+
+  const buildingId = context.buildingId ?? SHAREPOINT_BUILDING_ID;
+
+  context.root.innerHTML = `
+    ${renderHeader(context, 'SharePoint-Import', 'Excel-Liste und Fotos aus SharePoint einlesen und Fenstern zuordnen.')}
+    <div class="intern-content">
+
+      <!-- SharePoint-URL -->
+      <div class="intern-card" style="margin-bottom:16px">
+        <h2>📂 SharePoint-Verknüpfung</h2>
+        <p class="intern-meta">Hinterlegter SharePoint-Ordner für automatischen Abgleich (Gebäude ${buildingId}).</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <input type="url" id="sp-url-input" class="intern-input" style="flex:1;min-width:200px"
+            placeholder="https://sv1schuett.sharepoint.com/..." />
+          <button class="sv-button sv-button-secondary" id="sp-save-url">💾 URL speichern</button>
+          <button class="sv-button sv-button-primary" id="sp-refresh-btn">🔄 Aktualisieren</button>
+        </div>
+        <div id="sp-url-status" style="margin-top:8px"></div>
+        <div class="intern-alert intern-alert--info" style="margin-top:12px">
+          <strong>Hinweis:</strong> Öffnen Sie den SharePoint-Ordner im Browser und kopieren Sie die URL hierher.
+          Der Aktualisieren-Button prüft auf neue Dateien und liest diese automatisch ein.<br>
+          <strong>Link:</strong> <a href="https://sv1schuett.sharepoint.com/:f:/s/SVBroSchtt/IgAkOUzaj1TYR7DezeHu5ILjAQ0F3b7OZWgPEcgz94oiHaU?e=87Mg1j"
+            target="_blank" rel="noopener noreferrer" style="word-break:break-all">
+            SharePoint-Ordner öffnen ↗
+          </a>
+        </div>
+      </div>
+
+      <!-- Excel-Import -->
+      <div class="intern-card" style="margin-bottom:16px">
+        <h2>📊 Excel-Liste einlesen</h2>
+        <p class="intern-meta">Fensterliste als Excel-Datei hochladen. Die Schlagzahl wird automatisch erkannt und mit vorhandenen Fenstern verknüpft.</p>
+        <div class="intern-ai-upload" id="excel-drop-zone" style="margin-top:12px">
+          <div class="intern-ai-upload__icon">📊</div>
+          <p><strong>Excel-Datei hierher ziehen</strong> oder klicken zum Auswählen</p>
+          <p class="intern-meta">.xlsx, .xls · max. 50 MB</p>
+          <input type="file" id="excel-file-input" accept=".xlsx,.xls" hidden />
+        </div>
+        <div id="excel-status" style="margin-top:8px"></div>
+        <div id="excel-preview" style="display:none;margin-top:12px">
+          <div class="intern-card" style="background:#f8fafc">
+            <h3>Vorschau: erkannte Spalten</h3>
+            <p class="intern-meta">Wählen Sie die Spalte, die die <strong>Schlagzahl</strong> enthält:</p>
+            <select id="schlagzahl-col" class="intern-input" style="margin-bottom:12px;max-width:320px">
+              <option value="">— Spalte wählen —</option>
+            </select>
+            <div id="excel-table-preview" style="overflow-x:auto;max-height:300px;overflow-y:auto"></div>
+            <div class="intern-actions" style="margin-top:12px">
+              <button class="sv-button sv-button-primary" id="excel-apply-btn" disabled>✅ Daten übernehmen</button>
+              <button class="sv-button sv-button-secondary" id="excel-cancel-btn">Abbrechen</button>
+            </div>
+            <div id="excel-apply-status" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Foto-Import -->
+      <div class="intern-card" style="margin-bottom:16px">
+        <h2>📷 Fotos einlesen</h2>
+        <p class="intern-meta">
+          Fotos mit Schlagzahl im Dateinamen hochladen (z.B. <code>Schlagzahl_0042_Gesamtansicht.jpg</code>).
+          Die Schlagzahl wird erkannt und das Foto automatisch dem passenden Fenster zugeordnet.
+        </p>
+        <div class="intern-ai-upload" id="photo-drop-zone" style="margin-top:12px">
+          <div class="intern-ai-upload__icon">📷</div>
+          <p><strong>Fotos hierher ziehen</strong> oder klicken zum Auswählen</p>
+          <p class="intern-meta">JPG, PNG, TIFF · mehrere Dateien gleichzeitig möglich</p>
+          <input type="file" id="photo-file-input" accept="image/*,.tiff,.tif" multiple hidden />
+        </div>
+        <div id="photo-status" style="margin-top:8px"></div>
+        <div id="photo-queue" style="margin-top:12px"></div>
+        <div class="intern-actions" id="photo-actions" style="display:none;margin-top:12px">
+          <button class="sv-button sv-button-primary" id="photo-upload-btn">📤 Fotos hochladen</button>
+          <button class="sv-button sv-button-secondary" id="photo-clear-btn">Auswahl löschen</button>
+        </div>
+        <div id="photo-upload-status" style="margin-top:8px"></div>
+      </div>
+
+      <!-- Import-Log -->
+      <div class="intern-card" id="import-log-card" style="display:none">
+        <h2>📋 Import-Protokoll</h2>
+        <div id="import-log"></div>
+      </div>
+
+    </div>
+  `;
+
+  // ── URL laden ──────────────────────────────────────────────────────────────
+  const urlInput = context.root.querySelector<HTMLInputElement>('#sp-url-input')!;
+  const urlStatus = context.root.querySelector<HTMLElement>('#sp-url-status')!;
+
+  const savedUrl = await apiGetSharePointUrl(buildingId);
+  if (savedUrl) urlInput.value = savedUrl;
+
+  context.root.querySelector<HTMLButtonElement>('#sp-save-url')?.addEventListener('click', async () => {
+    const url = urlInput.value.trim();
+    if (!url) { urlStatus.innerHTML = errorAlert('Bitte URL eingeben.'); return; }
+    const ok = await apiSetSharePointUrl(buildingId, url);
+    urlStatus.innerHTML = ok ? successAlert('URL gespeichert.') : errorAlert('Fehler beim Speichern.');
+  });
+
+  context.root.querySelector<HTMLButtonElement>('#sp-refresh-btn')?.addEventListener('click', () => {
+    const url = urlInput.value.trim();
+    if (!url) {
+      urlStatus.innerHTML = infoAlert('Bitte zuerst die SharePoint-URL hinterlegen, dann Aktualisieren klicken.');
+      return;
+    }
+    urlStatus.innerHTML = infoAlert(
+      `SharePoint-Ordner wird in einem neuen Tab geöffnet. Laden Sie neue Dateien herunter und importieren Sie sie über die Import-Felder unten.<br>
+       <a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" class="sv-button sv-button-secondary" style="margin-top:8px;display:inline-block">SharePoint öffnen ↗</a>`,
+    );
+  });
+
+  // ── Excel-Import ──────────────────────────────────────────────────────────
+  const excelDropZone = context.root.querySelector<HTMLElement>('#excel-drop-zone')!;
+  const excelFileInput = context.root.querySelector<HTMLInputElement>('#excel-file-input')!;
+  const excelStatus = context.root.querySelector<HTMLElement>('#excel-status')!;
+  const excelPreview = context.root.querySelector<HTMLElement>('#excel-preview')!;
+  let excelRows: SharePointImportRow[] = [];
+  let excelColumns: string[] = [];
+
+  excelDropZone.addEventListener('dragover', (e) => { e.preventDefault(); excelDropZone.classList.add('intern-ai-upload--hover'); });
+  excelDropZone.addEventListener('dragleave', () => excelDropZone.classList.remove('intern-ai-upload--hover'));
+  excelDropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    excelDropZone.classList.remove('intern-ai-upload--hover');
+    const file = e.dataTransfer?.files[0];
+    if (file) processExcel(file);
+  });
+  excelDropZone.addEventListener('click', () => excelFileInput.click());
+  excelFileInput.addEventListener('change', () => {
+    const file = excelFileInput.files?.[0];
+    if (file) processExcel(file);
+  });
+
+  async function processExcel(file: File) {
+    excelStatus.innerHTML = infoAlert(`⏳ „${escapeHtml(file.name)}" wird eingelesen…`);
+    excelPreview.style.display = 'none';
+    const result = await apiImportExcel(buildingId, file);
+    if (!result) {
+      excelStatus.innerHTML = errorAlert('Fehler beim Einlesen der Excel-Datei. Bitte XLSX/XLS prüfen.');
+      return;
+    }
+    excelRows = result.rows;
+    excelColumns = result.columns;
+    excelStatus.innerHTML = successAlert(`${result.rows.length} Zeilen erkannt, ${result.columns.length} Spalten.`);
+    renderExcelPreview(result.rows, result.columns);
+  }
+
+  function renderExcelPreview(rows: SharePointImportRow[], columns: string[]) {
+    const colSelect = context.root.querySelector<HTMLSelectElement>('#schlagzahl-col')!;
+    colSelect.innerHTML = '<option value="">— Spalte wählen —</option>' +
+      columns.map(c => {
+        const isSchlagzahl = /schlagzahl|schlagnr|fenster.?nr|window.?no/i.test(c);
+        return `<option value="${escapeAttr(c)}" ${isSchlagzahl ? 'selected' : ''}>${escapeHtml(c)}</option>`;
+      }).join('');
+
+    const tableEl = context.root.querySelector<HTMLElement>('#excel-table-preview')!;
+    const preview = rows.slice(0, 10);
+    tableEl.innerHTML = `
+      <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+        <thead>
+          <tr style="background:#e8f0f8">${columns.map(c => `<th style="padding:6px 8px;text-align:left;border:1px solid #d0dae3;white-space:nowrap">${escapeHtml(c)}</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+          ${preview.map(row => `<tr>${columns.map(c => `<td style="padding:5px 8px;border:1px solid #e5eaf0">${escapeHtml(String(row[c] ?? ''))}</td>`).join('')}</tr>`).join('')}
+        </tbody>
+      </table>
+      ${rows.length > 10 ? `<p class="intern-meta" style="margin-top:4px">… und ${rows.length - 10} weitere Zeilen</p>` : ''}
+    `;
+
+    const applyBtn = context.root.querySelector<HTMLButtonElement>('#excel-apply-btn')!;
+    applyBtn.disabled = false;
+    excelPreview.style.display = 'block';
+
+    colSelect.addEventListener('change', () => {
+      applyBtn.disabled = !colSelect.value;
+    });
+  }
+
+  context.root.querySelector<HTMLButtonElement>('#excel-apply-btn')?.addEventListener('click', async () => {
+    const colSelect = context.root.querySelector<HTMLSelectElement>('#schlagzahl-col')!;
+    const schlagzahlCol = colSelect.value;
+    if (!schlagzahlCol) return;
+    const applyBtn = context.root.querySelector<HTMLButtonElement>('#excel-apply-btn')!;
+    const applyStatus = context.root.querySelector<HTMLElement>('#excel-apply-status')!;
+    applyBtn.disabled = true;
+    applyBtn.textContent = '⏳ Wird übernommen…';
+    const result = await apiApplyExcelRows(buildingId, excelRows, schlagzahlCol);
+    if (!result) {
+      applyStatus.innerHTML = errorAlert('Fehler beim Übernehmen der Daten.');
+      applyBtn.disabled = false;
+      applyBtn.textContent = '✅ Daten übernehmen';
+      return;
+    }
+    applyStatus.innerHTML = successAlert(
+      `Übernommen: ${result.added} neu, ${result.updated} aktualisiert, ${result.skipped} übersprungen.` +
+      (result.errors.length > 0 ? `<br>⚠️ ${result.errors.join(', ')}` : '')
+    );
+    applyBtn.textContent = '✓ Fertig';
+    appendImportLog(`Excel: ${result.added} neu, ${result.updated} aktualisiert, ${result.skipped} übersprungen`);
+  });
+
+  context.root.querySelector<HTMLButtonElement>('#excel-cancel-btn')?.addEventListener('click', () => {
+    excelPreview.style.display = 'none';
+    excelRows = [];
+    excelColumns = [];
+    excelStatus.innerHTML = '';
+  });
+
+  // ── Foto-Import ───────────────────────────────────────────────────────────
+  const photoDropZone = context.root.querySelector<HTMLElement>('#photo-drop-zone')!;
+  const photoFileInput = context.root.querySelector<HTMLInputElement>('#photo-file-input')!;
+  const photoQueue = context.root.querySelector<HTMLElement>('#photo-queue')!;
+  const photoActions = context.root.querySelector<HTMLElement>('#photo-actions')!;
+  let selectedPhotos: File[] = [];
+
+  function extractSchlagzahl(filename: string): string {
+    // Patterns: "0042", "Schlagzahl_0042", "SZ0042", "Fenster-42"
+    const clean = filename.replace(/\.[^/.]+$/, '');
+    const patterns = [
+      /schlagzahl[_\s-]?(\d+)/i,
+      /sz[_\s-]?(\d+)/i,
+      /fenster[_\s-]?(\d+)/i,
+      /nr[._\s-]?(\d+)/i,
+      /_(\d{3,6})_/,
+      /^(\d{3,6})[_\s-]/,
+      /[_\s-](\d{3,6})$/,
+    ];
+    for (const re of patterns) {
+      const m = clean.match(re);
+      if (m?.[1]) return m[1].replace(/^0+/, '') || '0';
+    }
+    return '';
+  }
+
+  function renderPhotoQueue() {
+    if (selectedPhotos.length === 0) {
+      photoQueue.innerHTML = '';
+      photoActions.style.display = 'none';
+      return;
+    }
+    photoActions.style.display = 'flex';
+    photoQueue.innerHTML = `
+      <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+        <thead>
+          <tr style="background:#e8f0f8">
+            <th style="padding:6px 8px;text-align:left;border:1px solid #d0dae3">Dateiname</th>
+            <th style="padding:6px 8px;text-align:left;border:1px solid #d0dae3">Erkannte Schlagzahl</th>
+            <th style="padding:6px 8px;text-align:left;border:1px solid #d0dae3">Kategorie</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${selectedPhotos.map((f, i) => {
+            const sz = extractSchlagzahl(f.name);
+            return `<tr id="photo-row-${i}">
+              <td style="padding:5px 8px;border:1px solid #e5eaf0">${escapeHtml(f.name)}</td>
+              <td style="padding:5px 8px;border:1px solid #e5eaf0">
+                <input type="text" value="${escapeAttr(sz)}" data-photo-idx="${i}"
+                  class="intern-input photo-schlagzahl"
+                  style="width:80px;padding:3px 6px;font-size:0.85rem"
+                  placeholder="z.B. 42" />
+                ${!sz ? '<span style="color:#e53935;font-size:0.8rem">⚠ nicht erkannt</span>' : ''}
+              </td>
+              <td style="padding:5px 8px;border:1px solid #e5eaf0">
+                <select data-photo-cat-idx="${i}" class="intern-input photo-category" style="padding:3px 6px;font-size:0.85rem">
+                  <option value="Fensterkennzeichnung">Fensterkennzeichnung</option>
+                  <option value="Gesamtansicht">Gesamtansicht</option>
+                  <option value="Beschlagkennzeichnung">Beschlagkennzeichnung</option>
+                  <option value="Mangel">Mangel</option>
+                  <option value="sonstiges">Sonstiges</option>
+                </select>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function addToPhotoQueue(files: FileList | File[]) {
+    const arr = Array.from(files).filter(f => f.type.startsWith('image/') || /\.(tiff?|jpe?g|png|webp)$/i.test(f.name));
+    selectedPhotos = [...selectedPhotos, ...arr];
+    renderPhotoQueue();
+  }
+
+  photoDropZone.addEventListener('dragover', (e) => { e.preventDefault(); photoDropZone.classList.add('intern-ai-upload--hover'); });
+  photoDropZone.addEventListener('dragleave', () => photoDropZone.classList.remove('intern-ai-upload--hover'));
+  photoDropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    photoDropZone.classList.remove('intern-ai-upload--hover');
+    if (e.dataTransfer?.files.length) addToPhotoQueue(e.dataTransfer.files);
+  });
+  photoDropZone.addEventListener('click', () => photoFileInput.click());
+  photoFileInput.addEventListener('change', () => {
+    if (photoFileInput.files?.length) addToPhotoQueue(photoFileInput.files);
+    photoFileInput.value = '';
+  });
+
+  context.root.querySelector<HTMLButtonElement>('#photo-clear-btn')?.addEventListener('click', () => {
+    selectedPhotos = [];
+    renderPhotoQueue();
+  });
+
+  context.root.querySelector<HTMLButtonElement>('#photo-upload-btn')?.addEventListener('click', async () => {
+    if (selectedPhotos.length === 0) return;
+    const uploadBtn = context.root.querySelector<HTMLButtonElement>('#photo-upload-btn')!;
+    const uploadStatus = context.root.querySelector<HTMLElement>('#photo-upload-status')!;
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = '⏳ Wird hochgeladen…';
+
+    let ok = 0, fail = 0;
+    for (let i = 0; i < selectedPhotos.length; i++) {
+      const file = selectedPhotos[i];
+      const szInput = context.root.querySelector<HTMLInputElement>(`.photo-schlagzahl[data-photo-idx="${i}"]`);
+      const catSelect = context.root.querySelector<HTMLSelectElement>(`.photo-category[data-photo-cat-idx="${i}"]`);
+      const sz = szInput?.value.trim() ?? extractSchlagzahl(file.name);
+      const cat = catSelect?.value ?? 'Fensterkennzeichnung';
+
+      if (!sz) { fail++; continue; }
+
+      const result = await apiUploadSharePointPhoto(buildingId, sz, file, cat);
+      const row = context.root.querySelector<HTMLElement>(`#photo-row-${i}`);
+      if (row) {
+        row.style.background = result.ok ? '#e8f5e9' : '#ffebee';
+      }
+      if (result.ok) ok++; else fail++;
+
+      uploadStatus.innerHTML = infoAlert(`${ok + fail} / ${selectedPhotos.length} hochgeladen…`);
+    }
+
+    uploadStatus.innerHTML = ok > 0
+      ? successAlert(`${ok} Foto(s) erfolgreich hochgeladen.${fail > 0 ? ` ${fail} fehlgeschlagen (Schlagzahl nicht gefunden oder fehlt).` : ''}`)
+      : errorAlert(`${fail} Foto(s) konnten nicht hochgeladen werden. Bitte Schlagzahl prüfen.`);
+    uploadBtn.textContent = '✓ Fertig';
+    appendImportLog(`Fotos: ${ok} erfolgreich, ${fail} fehlgeschlagen`);
+  });
+
+  // ── Import-Log ─────────────────────────────────────────────────────────────
+  function appendImportLog(message: string) {
+    const card = context.root.querySelector<HTMLElement>('#import-log-card')!;
+    const log = context.root.querySelector<HTMLElement>('#import-log')!;
+    card.style.display = 'block';
+    const entry = document.createElement('p');
+    entry.className = 'intern-meta';
+    entry.textContent = `[${new Date().toLocaleTimeString('de-DE')}] ${message}`;
+    log.prepend(entry);
+  }
+
+  bindHeaderLogout(context);
+}
+
 // ── KI-Dokumentenimport ──────────────────────────────────────────────────────
 
 async function renderAiImport(context: AppContext) {
@@ -3250,6 +3622,7 @@ function renderHeader(context: AppContext, title: string, text: string) {
   const isAdmin = context.user?.profile.role === 'administrator';
   const canManage = ['administrator', 'projektleiter'].includes(context.user?.profile.role ?? '');
   const canImport = ['administrator', 'pruefer'].includes(context.user?.profile.role ?? '');
+  const canSharePoint = ['administrator', 'projektleiter', 'pruefer'].includes(context.user?.profile.role ?? '');
   const slug = getProjectSlug();
   const inProject = context.route !== 'projects' && context.route !== 'new-project' && context.route !== 'login' && context.route !== 'landing';
   const pb = `/intern/${slug}`;
@@ -3262,6 +3635,7 @@ function renderHeader(context: AppContext, title: string, text: string) {
     <a class="sv-button sv-button-secondary" href="${pb}/fenster/">Fenster</a>
     <a class="sv-button sv-button-secondary" href="${pb}/gebaeude/">Gebäude</a>
     ${canImport ? `<a class="sv-button sv-button-secondary" href="${pb}/import/">📄 KI-Import</a>` : ''}
+    ${canSharePoint ? `<a class="sv-button sv-button-secondary" href="${pb}/sharepoint-import/">📂 SharePoint-Import</a>` : ''}
     ${canManage ? `<a class="sv-button sv-button-secondary" href="/intern/projekte/neu/">＋ Neues Projekt</a>` : ''}
     <a class="sv-button sv-button-secondary" href="/intern/projekte/">Projekte</a>
   ` : `

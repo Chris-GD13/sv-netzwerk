@@ -675,6 +675,101 @@ export async function apiUploadSashPhoto(
   return error === null;
 }
 
+// ── SharePoint-Import ────────────────────────────────────────────────────────
+
+export interface SharePointImportRow {
+  schlagzahl: string;
+  [key: string]: unknown;
+}
+
+export interface SharePointSyncResult {
+  added: number;
+  updated: number;
+  skipped: number;
+  errors: string[];
+}
+
+export interface SharePointPhoto {
+  fileName: string;
+  schlagzahl: string;
+  url: string;
+  size: number;
+}
+
+/** Lädt gespeicherte SharePoint-URL aus dem Backend (pro Projekt). */
+export async function apiGetSharePointUrl(buildingId: number): Promise<string | null> {
+  const { data } = await apiGet<{ url: string | null }>(`/sharepoint.php?action=get_url&building_id=${buildingId}`);
+  return data?.url ?? null;
+}
+
+/** Speichert die SharePoint-URL für ein Gebäude. */
+export async function apiSetSharePointUrl(buildingId: number, url: string): Promise<boolean> {
+  const { data } = await apiPost<{ ok: boolean }>('/sharepoint.php?action=set_url', { building_id: buildingId, url });
+  return !!data?.ok;
+}
+
+/** Liest Excel-Datei ein und speichert Zeilen als Fensterdaten (Schlagzahl als Schlüssel). */
+export async function apiImportExcel(
+  buildingId: number,
+  file: File,
+): Promise<{ rows: SharePointImportRow[]; columns: string[] } | null> {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('building_id', String(buildingId));
+  try {
+    const response = await fetch(`${API_BASE}/sharepoint.php?action=import_excel`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      body: formData,
+    });
+    const json = await response.json().catch(() => null);
+    if (!response.ok || !json?.ok) return null;
+    return { rows: json.rows ?? [], columns: json.columns ?? [] };
+  } catch {
+    return null;
+  }
+}
+
+/** Übernahme: verknüpft Excel-Zeilen mit vorhandenen Fenstern (Schlagzahl-Match). */
+export async function apiApplyExcelRows(
+  buildingId: number,
+  rows: SharePointImportRow[],
+  schlagzahlColumn: string,
+): Promise<SharePointSyncResult | null> {
+  const { data } = await apiPost<SharePointSyncResult>('/sharepoint.php?action=apply_excel', {
+    building_id: buildingId,
+    rows,
+    schlagzahl_column: schlagzahlColumn,
+  });
+  return data;
+}
+
+/** Lädt ein Foto und ordnet es dem Fenster mit passender Schlagzahl zu. */
+export async function apiUploadSharePointPhoto(
+  buildingId: number,
+  schlagzahl: string,
+  file: File,
+  category = 'Fensterkennzeichnung',
+): Promise<{ ok: boolean; window_id?: number; message?: string }> {
+  const formData = new FormData();
+  formData.append('photo', file);
+  formData.append('building_id', String(buildingId));
+  formData.append('schlagzahl', schlagzahl);
+  formData.append('category', category);
+  try {
+    const response = await fetch(`${API_BASE}/sharepoint.php?action=upload_photo`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      body: formData,
+    });
+    const json = await response.json().catch(() => null);
+    if (!response.ok) return { ok: false, message: json?.error ?? `HTTP ${response.status}` };
+    return { ok: !!json?.ok, window_id: json?.window_id, message: json?.message };
+  } catch (err) {
+    return { ok: false, message: err instanceof Error ? err.message : 'Netzwerkfehler' };
+  }
+}
+
 // ── Demo-Daten ───────────────────────────────────────────────────────────────
 
 export async function apiGetDemoStatus(): Promise<{ demo_data_exists: boolean; building_count: number; sash_count: number; user_count: number }> {
