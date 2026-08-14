@@ -794,8 +794,13 @@ function parseXlsxRows(string $path): array
         if ($xml !== false) {
             foreach ($xml->si as $si) {
                 $parts = [];
-                foreach ($si->xpath('.//t') ?: [] as $t) {
-                    $parts[] = (string) $t;
+                if (isset($si->t)) {
+                    $parts[] = (string) $si->t;
+                }
+                foreach ($si->r as $run) {
+                    if (isset($run->t)) {
+                        $parts[] = (string) $run->t;
+                    }
                 }
                 $sharedStrings[] = implode('', $parts);
             }
