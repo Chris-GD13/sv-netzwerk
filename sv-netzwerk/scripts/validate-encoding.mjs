@@ -17,10 +17,12 @@ const CORRUPT_PATTERNS = [
   { regex: /(?:^|[\s\-])(\?[a-zäöüA-ZÄÖÜ])/gmu, label: 'Fragezeichen am Wortanfang' },
   // Unicode Replacement Character U+FFFD
   { regex: /\uFFFD/g, label: 'Unicode Replacement Character (U+FFFD)' },
-  // Mojibake patterns: Ã followed by extended chars (typical UTF-8 double-decode)
-  { regex: /Ã[\u00C0-\u00FF]/g, label: 'Mojibake-Sequenz (Ã + Erweiterungszeichen)' },
-  // Â followed by non-breaking space or soft hyphen (typical win-1252 mis-read)
-  { regex: /Â[\u00A0\u00AD]/g, label: 'Mojibake-Sequenz (Â + NBSP/SHY)' },
+  // Mojibake patterns: typical UTF-8 bytes decoded as Windows-1252/Latin-1.
+  // The second character is often below U+00C0 (e.g. "Ã¤" contains U+00A4),
+  // therefore the former narrower range did not catch published articles.
+  { regex: /Ã[\u0080-\u00FF]/g, label: 'Mojibake-Sequenz (Ã + Bytezeichen)' },
+  { regex: /Â[\u0080-\u00FF]/g, label: 'Mojibake-Sequenz (Â + Bytezeichen)' },
+  { regex: /â[\u0080-\u00FF]{1,2}/g, label: 'Mojibake-Sequenz (â + Bytezeichen)' },
 ];
 
 const EXTENSIONS_TO_CHECK = new Set(['.md', '.txt', '.json', '.ts']);
