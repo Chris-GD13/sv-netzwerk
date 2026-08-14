@@ -95,7 +95,19 @@ function graphRequest(string $url, bool $binary = false): array|string
     $error = curl_error($curl);
     curl_close($curl);
     if ($status < 200 || $status >= 300 || !is_string($response)) {
-        apiError(503, 'SharePoint konnte nicht gelesen werden (HTTP ' . $status . ').' . ($error !== '' ? ' ' . $error : ''));
+        $detail = '';
+        if (is_string($response) && $response !== '') {
+            $errorBody = json_decode($response, true);
+            $graphError = is_array($errorBody) ? ($errorBody['error'] ?? null) : null;
+            if (is_array($graphError)) {
+                $code = trim((string) ($graphError['code'] ?? ''));
+                $message = trim((string) ($graphError['message'] ?? ''));
+                $detail = trim($code . ($code !== '' && $message !== '' ? ': ' : '') . $message);
+            }
+        }
+        apiError(503, 'SharePoint konnte nicht gelesen werden (HTTP ' . $status . ').'
+            . ($detail !== '' ? ' ' . $detail : '')
+            . ($error !== '' ? ' ' . $error : ''));
     }
     if ($binary) {
         return ['body' => $response, 'content_type' => $contentType];
@@ -147,9 +159,37 @@ function graphDriveId(): string
 
 function graphItemByPath(string $path): array
 {
-    $segments = array_map('rawurlencode', array_values(array_filter(explode('/', trim($path, '/')), static fn($part) => $part !== '')));
-    $encodedPath = implode('/', $segments);
-    return graphRequest('https://graph.microsoft.com/v1.0/drives/' . rawurlencode(graphDriveId()) . '/root:/' . $encodedPath . '?$select=id,name,size,file,folder');
+    $segments = array_values(array_filter(explode('/', trim($path, '/')), static fn($part) => $part !== ''));
+    if ($segments === []) {
+        return graphRequest('https://graph.microsoft.com/v1.0/drives/' . rawurlencode(graphDriveId()) . '/root?$select=id,name,size,file,folder');
+    }
+
+    // Resolve each component through the children collection. This avoids
+    // Graph path-addressing problems with umlauts and spaces in SharePoint.
+    $parentId = '';
+    $matched = null;
+    foreach ($segments as $segment) {
+        $url = 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode(graphDriveId())
+            . ($parentId === '' ? '/root/children' : '/items/' . rawurlencode($parentId) . '/children')
+            . '?$select=id,name,size,file,folder&$top=200';
+        $matched = null;
+        while ($url !== '') {
+            $page = graphRequest($url);
+            foreach (($page['value'] ?? []) as $item) {
+                if (is_array($item) && strcasecmp((string) ($item['name'] ?? ''), $segment) === 0) {
+                    $matched = $item;
+                    break 2;
+                }
+            }
+            $url = (string) ($page['@odata.nextLink'] ?? '');
+        }
+        if (!is_array($matched) || empty($matched['id'])) {
+            apiError(404, 'SharePoint-Pfad nicht gefunden: ' . $segment);
+        }
+        $parentId = (string) $matched['id'];
+    }
+
+    return $matched;
 }
 
 function graphDownloadItem(string $itemId): array
