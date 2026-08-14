@@ -118,7 +118,7 @@ jobs:
             printf 'MS_SHAREPOINT_SITE_ID=%s\\n' "$MS_SHAREPOINT_SITE_ID"
           } >> "$updated_env"
           test -s "$updated_env"
-          upload_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; put $current_env -o $SFTP_REMOTE_DIR/.env.pre-sharepoint; put $updated_env -o $SFTP_REMOTE_DIR/.env.sharepoint-new; chmod 600 $SFTP_REMOTE_DIR/.env.sharepoint-new; mv $SFTP_REMOTE_DIR/.env.sharepoint-new $SFTP_REMOTE_DIR/.env; chmod 600 $SFTP_REMOTE_DIR/.env; quit"
+          upload_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; put $current_env -o $SFTP_REMOTE_DIR/.env.pre-sharepoint; put $updated_env -o $SFTP_REMOTE_DIR/.env; chmod 600 $SFTP_REMOTE_DIR/.env; rm -f $SFTP_REMOTE_DIR/.env.sharepoint-new; quit"
           timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$upload_script"
           echo "SharePoint-Konfiguration wurde sicher aktualisiert; die vorherige Fassung liegt als .env.pre-sharepoint vor."
 
