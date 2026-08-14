@@ -699,10 +699,10 @@ export interface SharePointImportTarget {
 }
 
 export interface SharePointPhoto {
-  fileName: string;
-  schlagzahl: string;
-  url: string;
+  id: string;
+  name: string;
   size: number;
+  mime_type: string;
 }
 
 /** Lädt gespeicherte SharePoint-URL aus dem Backend (pro Projekt). */
@@ -737,6 +737,54 @@ export async function apiImportExcel(
   } catch {
     return null;
   }
+}
+
+/** Liest die konfigurierte Excel-Datei direkt aus SharePoint. */
+export async function apiImportSharePointExcel(): Promise<{ rows: SharePointImportRow[]; columns: string[]; file_name: string } | null> {
+  const { data } = await apiPost<{ rows: SharePointImportRow[]; columns: string[]; file_name: string }>(
+    '/sharepoint.php?action=import_sharepoint_excel',
+    {},
+  );
+  return data ?? null;
+}
+
+/** Listet die Fotos im konfigurierten SharePoint-Ordner in natürlicher Reihenfolge. */
+export async function apiListSharePointPhotos(): Promise<SharePointPhoto[]> {
+  const { data } = await apiGet<{ photos: SharePointPhoto[] }>('/sharepoint.php?action=list_sharepoint_photos');
+  return data?.photos ?? [];
+}
+
+/** Lädt ein SharePoint-Foto zur lokalen OCR-Analyse, ohne Dateiauswahl. */
+export async function apiFetchSharePointPhoto(item: SharePointPhoto): Promise<File | null> {
+  try {
+    const response = await fetch(`${API_BASE}/sharepoint.php?action=sharepoint_photo&id=${encodeURIComponent(item.id)}`, {
+      credentials: 'same-origin',
+    });
+    if (!response.ok) return null;
+    const blob = await response.blob();
+    return new File([blob], item.name, { type: item.mime_type || blob.type || 'application/octet-stream' });
+  } catch {
+    return null;
+  }
+}
+
+/** Übernimmt ein Foto serverseitig direkt aus SharePoint in den zugeordneten Flügel. */
+export async function apiImportSharePointPhoto(
+  buildingId: number,
+  schlagzahl: string,
+  item: SharePointPhoto,
+  category: string,
+  sashId: number,
+): Promise<{ ok: boolean; message?: string }> {
+  const { data, error } = await apiPost<{ ok: boolean; message?: string }>('/sharepoint.php?action=import_sharepoint_photo', {
+    building_id: buildingId,
+    schlagzahl,
+    item_id: item.id,
+    file_name: item.name,
+    category,
+    sash_id: sashId,
+  });
+  return data ?? { ok: false, message: error?.message ?? 'Netzwerkfehler' };
 }
 
 /** Übernahme: verknüpft Excel-Zeilen mit vorhandenen Fenstern (Schlagzahl-Match). */
