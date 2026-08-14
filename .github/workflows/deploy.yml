@@ -105,6 +105,7 @@ jobs:
           current_env="$(mktemp)"
           updated_env="$(mktemp)"
           trap 'rm -f "$current_env" "$updated_env"' EXIT
+          rm -f "$current_env"
           download_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; get $SFTP_REMOTE_DIR/.env -o $current_env; quit"
           timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$download_script"
           test -s "$current_env"
