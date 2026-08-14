@@ -90,6 +90,37 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes lftp
 
+      - name: SharePoint-Konfiguration sicher aktualisieren
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
+          MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
+          MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
+          MS_SHAREPOINT_SITE_ID: ${{ secrets.MS_SHAREPOINT_SITE_ID }}
+        run: |
+          set -euo pipefail
+          current_env="$(mktemp)"
+          updated_env="$(mktemp)"
+          trap 'rm -f "$current_env" "$updated_env"' EXIT
+          download_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; get $SFTP_REMOTE_DIR/.env -o $current_env; quit"
+          timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$download_script"
+          test -s "$current_env"
+          cp "$current_env" "$updated_env"
+          sed -i '/^MS_TENANT_ID=/d; /^MS_CLIENT_ID=/d; /^MS_CLIENT_SECRET=/d; /^MS_SHAREPOINT_SITE_ID=/d' "$updated_env"
+          {
+            printf 'MS_TENANT_ID=%s\\n' "$MS_TENANT_ID"
+            printf 'MS_CLIENT_ID=%s\\n' "$MS_CLIENT_ID"
+            printf 'MS_CLIENT_SECRET=%s\\n' "$MS_CLIENT_SECRET"
+            printf 'MS_SHAREPOINT_SITE_ID=%s\\n' "$MS_SHAREPOINT_SITE_ID"
+          } >> "$updated_env"
+          test -s "$updated_env"
+          upload_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; put $current_env -o $SFTP_REMOTE_DIR/.env.pre-sharepoint; put $updated_env -o $SFTP_REMOTE_DIR/.env.sharepoint-new; chmod 600 $SFTP_REMOTE_DIR/.env.sharepoint-new; mv $SFTP_REMOTE_DIR/.env.sharepoint-new $SFTP_REMOTE_DIR/.env; chmod 600 $SFTP_REMOTE_DIR/.env; quit"
+          timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$upload_script"
+          echo "SharePoint-Konfiguration wurde sicher aktualisiert; die vorherige Fassung liegt als .env.pre-sharepoint vor."
+
       - name: Document Root vor dem Upload prüfen
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
