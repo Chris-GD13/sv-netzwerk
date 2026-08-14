@@ -203,6 +203,13 @@ function startSession(): void
     if (session_status() === PHP_SESSION_ACTIVE) {
         return;
     }
+    // Fotoimporte können bei mehreren hundert Bildern deutlich länger als
+    // die PHP-Standardlaufzeit von häufig 24 Minuten dauern. Der Auth-Poll
+    // erneuert die Aktivität jede Minute; eine aktive Prüfung bleibt dadurch
+    // angemeldet, ohne eine dauerhafte Browser-Cookie-Sitzung zu erzeugen.
+    $sessionLifetime = (int) env('PORTAL_SESSION_LIFETIME_SECONDS', '28800');
+    $sessionLifetime = max(1800, min(86400, $sessionLifetime));
+    ini_set('session.gc_maxlifetime', (string) $sessionLifetime);
     session_set_cookie_params([
         'lifetime' => 0,
         'path'     => '/',
@@ -211,6 +218,11 @@ function startSession(): void
         'samesite' => 'Strict',
     ]);
     session_start();
+    if (!empty($_SESSION['user_id'])) {
+        // Eine echte Änderung verhindert, dass session.lazy_write den
+        // Sitzungszeitstempel trotz erfolgreichem Keepalive unverändert lässt.
+        $_SESSION['last_activity_at'] = time();
+    }
 }
 
 function touchCurrentUserPresence(int $userId): void

@@ -120,7 +120,7 @@ import type {
   WindowSummary,
   WindowTemplate,
 } from './types';
-import type { AiAnalysisItem, AiAnalysisResult, SharePointImportRow, SharePointImportTarget, SharePointPhoto } from './php-api';
+import type { AiAnalysisItem, AiAnalysisResult, SharePointImportRow, SharePointImportTarget, SharePointPhoto, SharePointSyncResult } from './php-api';
 
 interface AppContext {
   root: HTMLElement;
@@ -2606,7 +2606,7 @@ async function renderAnalysis(context: AppContext) {
   context.root.innerHTML = `
     ${renderHeader(context, 'Auswertung', 'Interne Übersichten für Status, Eignung und Prioritäten. Klicken Sie auf eine Kachel oder Gruppierung für Details.')}
     <div class="intern-analysis-grid">
-      ${renderAnalysisCard('Geprüfte Fenster', records.filter((record) => record.status === 'Pruefung abgeschlossen' || record.status === 'freigegeben').length, 'geprueft')}
+      ${renderAnalysisCard('Geprüfte Fenster', records.filter((record) => record.status === 'Pruefung abgeschlossen' || record.status === 'fachlich geprueft' || record.status === 'freigegeben').length, 'geprueft')}
       ${renderAnalysisCard('Ungeprüfte Fenster', records.filter((record) => record.status === 'nicht begonnen').length, 'ungeprueft')}
       ${renderAnalysisCard('Nicht zugängliche Fenster', records.filter((record) => record.accessibility_status === 'nicht zugaenglich').length, 'nicht_zugaenglich')}
       ${renderAnalysisCard('Geeignete Beschläge', records.filter((record) => record.overall_rating === 'ohne festgestellten Handlungsbedarf').length, 'geeignet')}
@@ -2650,7 +2650,7 @@ async function renderAnalysis(context: AppContext) {
 
   // Card click handlers
   const filterMap: Record<string, (r: WindowSummary) => boolean> = {
-    'geprueft': r => r.status === 'Pruefung abgeschlossen' || r.status === 'freigegeben',
+    'geprueft': r => r.status === 'Pruefung abgeschlossen' || r.status === 'fachlich geprueft' || r.status === 'freigegeben',
     'ungeprueft': r => r.status === 'nicht begonnen',
     'nicht_zugaenglich': r => r.accessibility_status === 'nicht zugaenglich',
     'geeignet': r => r.overall_rating === 'ohne festgestellten Handlungsbedarf',
@@ -2937,7 +2937,7 @@ async function renderSharePointImport(context: AppContext) {
       if (!result) throw error ?? new Error('Excel-Daten konnten nicht übernommen werden.');
       importTargets = result.targets ?? [];
       const applyStatus = context.root.querySelector<HTMLElement>('#excel-apply-status');
-      if (applyStatus) applyStatus.innerHTML = successAlert(`Übernommen: ${result.added} neu, ${result.updated} aktualisiert, ${result.skipped} übersprungen.`);
+      if (applyStatus) applyStatus.innerHTML = renderExcelApplyResult(result);
       appendImportLog(`SharePoint-Excel: ${result.added} neu, ${result.updated} aktualisiert, ${result.skipped} übersprungen`);
 
       urlStatus.innerHTML = infoAlert('Fotoordner wird direkt aus SharePoint geladen…');
@@ -3052,6 +3052,30 @@ async function renderSharePointImport(context: AppContext) {
     });
   }
 
+  function renderExcelApplyResult(result: SharePointSyncResult): string {
+    const skippedRows = result.skipped_rows ?? [];
+    const detail = skippedRows.length > 0 ? `
+      <details style="margin-top:12px">
+        <summary style="cursor:pointer;font-weight:700">${skippedRows.length} übersprungene Excel-Zeilen mit Begründung anzeigen</summary>
+        <div style="overflow:auto;max-height:360px;margin-top:10px">
+          <table class="intern-table" style="font-size:.84rem">
+            <thead><tr><th>Datenzeile</th><th>Grund</th><th>Schlagzahl</th><th>Raum</th><th>Lage</th><th>Beschreibung</th></tr></thead>
+            <tbody>${skippedRows.map((row) => `<tr>
+              <td>${row.row_number}</td>
+              <td>${escapeHtml(row.reason)}</td>
+              <td>${escapeHtml(row.schlagzahl || '—')}</td>
+              <td>${escapeHtml(row.room_reference || '—')}</td>
+              <td>${escapeHtml(row.position || '—')}</td>
+              <td>${escapeHtml(row.description || '—')}</td>
+            </tr>`).join('')}</tbody>
+          </table>
+        </div>
+      </details>` : '';
+    return successAlert(
+      `Übernommen: ${result.added} neu, ${result.updated} aktualisiert, ${result.skipped} übersprungen.${detail}`,
+    );
+  }
+
   context.root.querySelector<HTMLButtonElement>('#excel-apply-btn')?.addEventListener('click', async () => {
     const colSelect = context.root.querySelector<HTMLSelectElement>('#schlagzahl-col')!;
     const schlagzahlCol = colSelect.value;
@@ -3068,10 +3092,7 @@ async function renderSharePointImport(context: AppContext) {
       applyBtn.textContent = '✅ Daten übernehmen';
       return;
     }
-    applyStatus.innerHTML = successAlert(
-      `Übernommen: ${result.added} neu, ${result.updated} aktualisiert, ${result.skipped} übersprungen.` +
-      (result.errors.length > 0 ? `<br>⚠️ ${result.errors.map(escapeHtml).join(', ')}` : '')
-    );
+    applyStatus.innerHTML = renderExcelApplyResult(result);
     importTargets = result.targets ?? [];
     applyBtn.textContent = '✓ Fertig';
     appendImportLog(`Excel: ${result.added} neu, ${result.updated} aktualisiert, ${result.skipped} übersprungen`);
@@ -4270,7 +4291,7 @@ function renderPhotos(photos: PhotoItem[]) {
   if (!photos.length) return '<div class="intern-empty">Noch keine Fotos gespeichert.</div>';
   return photos.map((photo) => `
     <article class="intern-photo-item">
-      <img alt="${escapeHtml(photo.category)}" src="${escapeHtml(createPhotoPlaceholder(photo.category))}" />
+      <img alt="${escapeHtml(photo.category)}" src="/intern/photos/${escapeAttr(photo.storage_path)}" loading="lazy" />
       <strong>${escapeHtml(photo.category)}</strong>
       <p class="intern-meta">${escapeHtml(photo.caption ?? photo.file_name)}</p>
       <p class="intern-meta">${photo.inspector_name ? escapeHtml(photo.inspector_name) : '—'} · ${photo.taken_at ? formatDateTime(photo.taken_at) : '—'}</p>
