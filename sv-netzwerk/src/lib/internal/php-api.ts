@@ -324,7 +324,13 @@ export function startAuthPolling(): void {
 }
 
 /** Registriert einen Auth-Zustands-Listener und gibt eine Abmeldefunktion zurück. */
-export function onAuthChange(callback: AuthCallback): () => void {
+export function onAuthChange(callback: AuthCallback, initialUserId?: string | null): () => void {
+  // The portal already loaded the current user before registering this
+  // listener. Seed the polling state with that ID so the first 60-second poll
+  // does not look like an auth change and re-render a long-running import.
+  if (initialUserId !== undefined && lastKnownUserId === null) {
+    lastKnownUserId = initialUserId;
+  }
   authCallbacks.add(callback);
   startAuthPolling();
   return () => authCallbacks.delete(callback);
