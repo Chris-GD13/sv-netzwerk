@@ -3049,9 +3049,10 @@ async function renderSharePointImport(context: AppContext) {
     const applyStatus = context.root.querySelector<HTMLElement>('#excel-apply-status')!;
     applyBtn.disabled = true;
     applyBtn.textContent = '⏳ Wird übernommen…';
-    const result = await apiApplyExcelRows(activeBuildingId, excelRows, schlagzahlCol);
+    const { result, error: applyError } = await apiApplyExcelRows(activeBuildingId, excelRows, schlagzahlCol);
     if (!result) {
-      applyStatus.innerHTML = errorAlert('Fehler beim Übernehmen der Daten.');
+      const msg = applyError?.message ?? 'Unbekannter Fehler';
+      applyStatus.innerHTML = errorAlert(`Fehler beim Übernehmen der Daten: ${escapeHtml(msg)}`);
       applyBtn.disabled = false;
       applyBtn.textContent = '✅ Daten übernehmen';
       return;

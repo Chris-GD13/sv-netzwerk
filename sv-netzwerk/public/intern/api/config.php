@@ -27,12 +27,23 @@ function ensureRuntimeSchema(PDO $pdo): void
                AND TABLE_NAME = :table
                AND COLUMN_NAME = :column'
         );
-        $stmt->execute([':table' => 'users', ':column' => 'last_seen_at']);
-        $hasLastSeen = (int) $stmt->fetchColumn() > 0;
 
-        if (!$hasLastSeen) {
+        $stmt->execute([':table' => 'users', ':column' => 'last_seen_at']);
+        if ((int) $stmt->fetchColumn() === 0) {
             $pdo->exec('ALTER TABLE users ADD COLUMN last_seen_at DATETIME NULL AFTER last_login_at');
             $pdo->exec('ALTER TABLE users ADD INDEX idx_users_last_seen (last_seen_at)');
+        }
+
+        // windows.room_id – added after initial deployment; required for building-hierarchy queries and Excel import
+        $stmt->execute([':table' => 'windows', ':column' => 'room_id']);
+        if ((int) $stmt->fetchColumn() === 0) {
+            $pdo->exec('ALTER TABLE windows ADD COLUMN room_id INT UNSIGNED NULL AFTER project_id');
+        }
+
+        // photos.sash_id – added after initial deployment; required for sash-level photo assignment
+        $stmt->execute([':table' => 'photos', ':column' => 'sash_id']);
+        if ((int) $stmt->fetchColumn() === 0) {
+            $pdo->exec('ALTER TABLE photos ADD COLUMN sash_id INT UNSIGNED NULL AFTER window_id');
         }
     } catch (Throwable $e) {
         error_log('[config] Runtime-Migration fehlgeschlagen: ' . $e->getMessage());

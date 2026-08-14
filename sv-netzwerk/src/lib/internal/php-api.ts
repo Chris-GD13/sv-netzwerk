@@ -735,13 +735,13 @@ export async function apiApplyExcelRows(
   buildingId: number,
   rows: SharePointImportRow[],
   schlagzahlColumn: string,
-): Promise<SharePointSyncResult | null> {
-  const { data } = await apiPost<SharePointSyncResult>('/sharepoint.php?action=apply_excel', {
+): Promise<{ result: SharePointSyncResult | null; error: Error | null }> {
+  const { data, error } = await apiPost<SharePointSyncResult>('/sharepoint.php?action=apply_excel', {
     building_id: buildingId,
     rows,
     schlagzahl_column: schlagzahlColumn,
   });
-  return data;
+  return { result: data, error };
 }
 
 /** Lädt ein Foto und ordnet es dem Fenster mit passender Schlagzahl zu. */
