@@ -122,8 +122,8 @@ jobs:
             exit 1
           fi
           for key in MS_TENANT_ID MS_CLIENT_ID MS_CLIENT_SECRET MS_SHAREPOINT_SITE_ID; do
-            if [ "$(grep -c "^\${key}=" "$updated_env")" -ne 1 ]; then
-              echo "::error::Konfigurationsschlüssel \${key} fehlt oder ist mehrfach vorhanden."
+            if [ "$(grep -c "^${key}=" "$updated_env")" -ne 1 ]; then
+              echo "::error::Konfigurationsschlüssel ${key} fehlt oder ist mehrfach vorhanden."
               exit 1
             fi
           done
