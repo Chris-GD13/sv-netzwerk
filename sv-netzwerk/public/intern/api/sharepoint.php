@@ -557,6 +557,129 @@ function mergeImportDescriptions(array $rows): string
     return implode(' | ', $descriptions);
 }
 
+function importGroupValue(array $rows, array $needles): string
+{
+    foreach ($rows as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $value = importRowValue($row, $needles);
+        if ($value !== '') {
+            return $value;
+        }
+    }
+    return '';
+}
+
+function importNumber(string $value): int|float|string
+{
+    $normalized = trim($value);
+    // German Excel exports use a comma as decimal separator and may include
+    // dots as thousands separators. A plain dot, however, is already a valid
+    // decimal separator and must not be removed (e.g. "12.5").
+    if (str_contains($normalized, ',')) {
+        $normalized = str_replace('.', '', $normalized);
+        $normalized = str_replace(',', '.', $normalized);
+    }
+    if ($normalized === '' || !is_numeric($normalized)) {
+        return $value;
+    }
+    $number = (float) $normalized;
+    return floor($number) === $number ? (int) $number : $number;
+}
+
+function importGlassDetails(string $structure): array
+{
+    $parts = preg_split('/\s*\/\s*/', trim($structure)) ?: [];
+    $numbers = array_values(array_filter(array_map(
+        static fn(string $part): ?float => preg_match('/\d+(?:[.,]\d+)?/', $part, $match)
+            ? (float) str_replace(',', '.', $match[0])
+            : null,
+        $parts
+    ), static fn(?float $value): bool => $value !== null));
+    $glass = [];
+    $cavities = [];
+    foreach ($numbers as $index => $number) {
+        if ($index % 2 === 0) {
+            $glass[] = $number;
+        } else {
+            $cavities[] = $number;
+        }
+    }
+    return [
+        'panes' => count($glass),
+        'thickness' => array_sum($glass),
+        'cavities' => implode('/', array_map(static fn(float $value): string => (string) (int) $value, $cavities)),
+    ];
+}
+
+function importOpeningType(array $rows): string
+{
+    $values = [];
+    foreach ($rows as $row) {
+        $value = strtolower(importRowValue($row, ['Beschlag', 'Öffnungsart', 'Oeffnungsart', 'DIN R']));
+        if ($value !== '') {
+            $values[] = $value;
+        }
+    }
+    $joined = implode(' ', $values);
+    if ((str_contains($joined, 'dreh') || preg_match('/\bdk\b/', $joined)) && str_contains($joined, 'kipp')) {
+        return 'Dreh-Kipp';
+    }
+    if (preg_match('/\bdk\b/', $joined)) return 'Dreh-Kipp';
+    if (str_contains($joined, 'kipp')) return 'Kipp';
+    if (str_contains($joined, 'dreh')) return 'Dreh';
+    if (str_contains($joined, 'fest')) return 'Festverglasung';
+    return $joined !== '' ? 'sonstige' : '';
+}
+
+function importRating(string $description, bool $hasDefect): string
+{
+    $text = strtolower($description);
+    if (preg_match('/wartung|nachstell|eingestellt|schleif|schwergängig/u', $text)) {
+        return 'Wartung oder Nachstellung erforderlich';
+    }
+    if (preg_match('/defekt|gebrochen|beschädigt|fehlt|tausch|instandsetz/u', $text)) {
+        return 'Instandsetzung erforderlich';
+    }
+    return $hasDefect ? 'geringfuegige Auffaelligkeit' : 'ohne festgestellten Handlungsbedarf';
+}
+
+/**
+ * Aktualisiert weiterhin automatisch verwaltete Importwerte, schützt aber
+ * jeden Wert, der später im Fensterformular manuell oder per KI geändert wurde.
+ */
+function mergeImportedFormData(array $existing, array $imported): array
+{
+    $previousImport = is_array($existing['import_values'] ?? null) ? $existing['import_values'] : [];
+    foreach ($imported as $field => $value) {
+        $currentExists = array_key_exists($field, $existing) && $existing[$field] !== '' && $existing[$field] !== null;
+        $wasManaged = array_key_exists($field, $previousImport) && ($existing[$field] ?? null) === $previousImport[$field];
+        if (!$currentExists || $wasManaged) {
+            $existing[$field] = $value;
+        }
+    }
+    $existing['import_values'] = $imported;
+    $existing['import_source'] = 'sharepoint_excel';
+    return $existing;
+}
+
+function importFormProgress(array $data): int
+{
+    $required = [
+        'inspection_number', 'window_number', 'building_label', 'section_label', 'floor_label',
+        'room_number', 'wing_count', 'inspected_wing', 'inspector_name', 'inspection_date',
+        'accessibility_status', 'glass_structure', 'glazing_width_mm', 'glazing_height_mm',
+        'applied_test_weight_kg', 'weight_method', 'overall_rating', 'recommended_action',
+        'priority', 'status',
+    ];
+    $filled = count(array_filter($required, static function (string $field) use ($data): bool {
+        $value = $data[$field] ?? null;
+        return $value !== null && $value !== '' && $value !== false;
+    }));
+    return (int) round($filled / count($required) * 100);
+}
+
 function handleApplyExcel(array $user): never
 {
     $body = requestBody();
@@ -647,39 +770,134 @@ function handleApplyExcel(array $user): never
 
             $roomId = ensureBuildingRoom($pdo, $buildingId, $primaryRow);
             $windowNumber = $schlagzahl;
-            $windowExists = $pdo->prepare('SELECT id FROM windows WHERE room_id = :rid AND window_number = :wn AND deleted_at IS NULL LIMIT 1');
+            $windowExists = $pdo->prepare('SELECT id, form_data FROM windows WHERE room_id = :rid AND window_number = :wn AND deleted_at IS NULL LIMIT 1');
             $windowExists->execute([':rid' => $roomId, ':wn' => $windowNumber]);
             $existingWindow = $windowExists->fetch(PDO::FETCH_ASSOC);
 
             $description = mergeImportDescriptions($groupRows);
             $hasDefect = importHasDefect($description);
-            $openingTypes = [];
-            foreach ($groupRows as $groupRow) {
-                $openingType = importRowValue($groupRow, ['Beschlag', 'Öffnungsart', 'Oeffnungsart']);
-                if ($openingType !== '' && !in_array(strtoupper($openingType), $openingTypes, true)) {
-                    $openingTypes[] = strtoupper($openingType);
-                }
-            }
-            $openingType = implode(' + ', $openingTypes);
+            $glassWidth = importGroupValue($groupRows, ['Glas Breite', 'Glasbreite', 'Verglasung Breite']);
+            $glassHeight = importGroupValue($groupRows, ['Glas Höhe', 'Glas Hoehe', 'Glashöhe', 'Verglasung Höhe']);
+            $frameWidth = importGroupValue($groupRows, ['Rahmen Breite', 'Rahmenbreite']);
+            $frameHeight = importGroupValue($groupRows, ['Rahmen Höhe', 'Rahmen Hoehe', 'Rahmenhöhe']);
+            $glassStructure = importGroupValue($groupRows, ['Glasaufbau', 'Glas Aufbau']);
+            $glassDetails = importGlassDetails($glassStructure);
+            $openingType = importOpeningType($groupRows);
+            $hardwareSystem = importGroupValue($groupRows, ['Beschlagsystem', 'System', 'Profilserie', 'spalte_6']);
+            $sectionLabel = importGroupValue($groupRows, ['Gebäudeteil', 'Gebaeudeteil', 'Bauteil']);
+            $floorLabel = importGroupValue($groupRows, ['Etage', 'Geschoss']);
+            $orientation = importGroupValue($groupRows, ['Himmelsrichtung', 'Orientierung']);
+            $objectLabel = importGroupValue($groupRows, ['Objektkennzeichnung', 'Kennzeichnung']);
+            $manufacturer = importGroupValue($groupRows, ['Hersteller', 'Fensterhersteller']);
+            $constructionYear = importGroupValue($groupRows, ['Baujahr']);
+            $frameMaterial = importGroupValue($groupRows, ['Rahmenmaterial', 'Material']);
+            $rating = importRating($description, $hasDefect);
+            $priority = $hasDefect ? 'mittel' : 'keine';
+            $roomLabel = 'Raum ' . $group['room_reference'];
+            $inspectionDate = date('Y-m-d');
+            $inspectorName = $user['full_name'] ?: $user['email'];
+            $glassWidthNumber = is_numeric(importNumber($glassWidth)) ? (float) importNumber($glassWidth) : 0.0;
+            $glassHeightNumber = is_numeric(importNumber($glassHeight)) ? (float) importNumber($glassHeight) : 0.0;
+            $glassThickness = (float) ($glassDetails['thickness'] ?? 0);
+            $glassWeight = $glassWidthNumber > 0 && $glassHeightNumber > 0 && $glassThickness > 0
+                ? round(($glassWidthNumber / 1000) * ($glassHeightNumber / 1000) * $glassThickness * 2.5, 1)
+                : 0.0;
+            $frameWeight = $glassWeight > 0 ? round($glassWeight * 0.18, 1) : 0.0;
+            $totalWeight = $glassWeight > 0 ? round($glassWeight + $frameWeight, 1) : 0.0;
+            $testWeight = $totalWeight > 0 ? round($totalWeight * 1.1, 1) : 0.0;
 
-            $windowFormData = [
-                'import_source' => 'sharepoint_excel',
+            $importedWindowData = [
+                'inspection_number' => (int) $schlagzahl,
+                'window_number' => $windowNumber,
+                'object_label' => $objectLabel,
+                'building_label' => (string) $building['name'],
+                'section_label' => $sectionLabel !== '' ? $sectionLabel : (string) $building['name'],
+                'floor_label' => $floorLabel !== '' ? $floorLabel : 'EG / Erdgeschoss',
+                'room_label' => $roomLabel,
+                'room_number' => $group['room_reference'],
+                'position_in_room' => $position,
+                'orientation' => $orientation,
+                'wing_count' => 1,
+                'inspected_wing' => $position !== '' ? $position : $schlagzahl,
+                'inspector_name' => $inspectorName,
+                'inspection_date' => $inspectionDate,
+                'manufacturer' => $manufacturer,
+                'window_system' => $hardwareSystem,
+                'construction_year' => $constructionYear !== '' ? importNumber($constructionYear) : '',
+                'frame_material' => $frameMaterial,
+                'opening_type' => $openingType,
+                'wing_width_mm' => $frameWidth !== '' ? importNumber($frameWidth) : '',
+                'wing_height_mm' => $frameHeight !== '' ? importNumber($frameHeight) : '',
+                'hinge_system' => $hardwareSystem,
+                'scissor_system' => $hardwareSystem,
+                'glass_structure' => $glassStructure,
+                'glass_panes' => $glassDetails['panes'] ?: '',
+                'glass_thickness_mm' => $glassDetails['thickness'] ?: '',
+                'glass_cavity_mm' => $glassDetails['cavities'],
+                'glazing_width_mm' => $glassWidth !== '' ? importNumber($glassWidth) : '',
+                'glazing_height_mm' => $glassHeight !== '' ? importNumber($glassHeight) : '',
+                'glass_weight_kg' => $glassWeight ?: '',
+                'estimated_frame_weight_kg' => $frameWeight ?: '',
+                'total_wing_weight_kg' => $totalWeight ?: '',
+                'applied_test_weight_kg' => $testWeight ?: '',
+                'weight_method' => $glassWidth !== '' && $glassHeight !== '' && $glassStructure !== '' ? 'Berechnung aus Excel-Maßen und Glasaufbau' : '',
+                'visible_special_features' => $description,
+                'expert_note' => $description,
+                'recommended_action' => $description !== '' ? $description : 'Kein Handlungsbedarf aus der Importliste abgeleitet.',
+                'opening_possible' => preg_match('/öffnen\s+nicht|nicht\s+zu\s+öffnen/u', strtolower($description)) !== 1,
+                'closing_possible' => preg_match('/schließen\s+nicht|nicht\s+zu\s+schließen/u', strtolower($description)) !== 1,
+                'tilt_possible' => preg_match('/kipp(?:en|funktion)?\s+nicht\s+möglich/u', strtolower($description)) !== 1,
+                'wing_scrapes' => preg_match('/schleif/u', strtolower($description)) === 1,
+                'wing_hangs' => preg_match('/häng/u', strtolower($description)) === 1,
+                'hardware_heavy' => preg_match('/schwergängig/u', strtolower($description)) === 1,
+                'readjustment_required' => preg_match('/einstell|nachstell|schleif/u', strtolower($description)) === 1,
+                'overall_rating' => $rating,
+                'priority' => $priority,
+                'status' => 'in Bearbeitung',
                 'schlagzahl' => $schlagzahl,
                 'room_reference' => $group['room_reference'],
                 'position' => $position,
                 'import_rows' => $groupRows,
             ];
+            $existingFormData = $existingWindow
+                ? (json_decode((string) ($existingWindow['form_data'] ?? ''), true) ?: [])
+                : [];
+            $windowFormData = mergeImportedFormData($existingFormData, $importedWindowData);
+            $progressPercent = importFormProgress($windowFormData);
+            $calculatedData = [
+                'glassWeightKg' => $glassWeight,
+                'frameWeightKg' => $frameWeight,
+                'totalWingWeightKg' => $totalWeight,
+                'appliedTestWeightKg' => $testWeight,
+            ];
 
             if ($existingWindow) {
                 $pdo->prepare(
-                    'UPDATE windows SET room_label = :room_label, room_number = :room_number,
-                     has_defect = :has_defect, status = :status, form_data = :fd, updated_at = :now WHERE id = :id'
+                    'UPDATE windows SET inspection_number = :inspection_number, window_number = :window_number,
+                     object_label = :object_label, building_label = :building_label, section_label = :section_label,
+                     floor_label = :floor_label, room_label = :room_label, room_number = :room_number,
+                     overall_rating = :overall_rating, priority = :priority, assigned_to = :assigned_to,
+                     assigned_name = :assigned_name, has_defect = :has_defect, status = :status,
+                     progress_percent = :progress_percent, form_data = :fd, calculated_data = :calculated_data,
+                     updated_at = :now WHERE id = :id'
                 )->execute([
-                    ':room_label' => 'Raum ' . $group['room_reference'],
+                    ':inspection_number' => (int) $schlagzahl,
+                    ':window_number' => $windowNumber,
+                    ':object_label' => $objectLabel !== '' ? $objectLabel : null,
+                    ':building_label' => (string) $building['name'],
+                    ':section_label' => $importedWindowData['section_label'],
+                    ':floor_label' => $importedWindowData['floor_label'],
+                    ':room_label' => $roomLabel,
                     ':room_number' => $group['room_reference'],
+                    ':overall_rating' => $rating,
+                    ':priority' => $priority,
+                    ':assigned_to' => (int) $user['id'],
+                    ':assigned_name' => $inspectorName,
                     ':has_defect' => $hasDefect ? 1 : 0,
                     ':status' => 'in Bearbeitung',
+                    ':progress_percent' => $progressPercent,
                     ':fd' => json_encode($windowFormData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    ':calculated_data' => json_encode($calculatedData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     ':now' => nowUtc(),
                     ':id' => (int) $existingWindow['id'],
                 ]);
@@ -688,21 +906,35 @@ function handleApplyExcel(array $user): never
             } else {
                 $recordId = 'SP-' . strtoupper(bin2hex(random_bytes(6)));
                 $stmt = $pdo->prepare(
-                    'INSERT INTO windows (project_id, room_id, record_id, window_number, room_label, room_number, building_label, floor_label, status, has_defect, form_data, created_at, updated_at)
-                     VALUES (:pid, :rid, :record_id, :wn, :room_label, :room_number, :building_label, :floor_label, :status, :has_defect, :form_data, :created_at, :updated_at)'
+                    'INSERT INTO windows (project_id, room_id, record_id, inspection_number, window_number, object_label,
+                     room_label, room_number, building_label, section_label, floor_label, status, overall_rating,
+                     priority, assigned_to, assigned_name, has_defect, progress_percent, form_data, calculated_data,
+                     created_at, updated_at)
+                     VALUES (:pid, :rid, :record_id, :inspection_number, :wn, :object_label, :room_label, :room_number,
+                     :building_label, :section_label, :floor_label, :status, :overall_rating, :priority, :assigned_to,
+                     :assigned_name, :has_defect, :progress_percent, :form_data, :calculated_data, :created_at, :updated_at)'
                 );
                 $stmt->execute([
                     ':pid' => (int) $building['project_id'],
                     ':rid' => $roomId,
                     ':record_id' => $recordId,
+                    ':inspection_number' => (int) $schlagzahl,
                     ':wn' => $windowNumber,
-                    ':room_label' => 'Raum ' . $group['room_reference'],
+                    ':object_label' => $objectLabel !== '' ? $objectLabel : null,
+                    ':room_label' => $roomLabel,
                     ':room_number' => $group['room_reference'],
                     ':building_label' => (string) $building['name'],
-                    ':floor_label' => 'EG / Erdgeschoss',
+                    ':section_label' => $importedWindowData['section_label'],
+                    ':floor_label' => $importedWindowData['floor_label'],
                     ':status' => 'in Bearbeitung',
+                    ':overall_rating' => $rating,
+                    ':priority' => $priority,
+                    ':assigned_to' => (int) $user['id'],
+                    ':assigned_name' => $inspectorName,
                     ':has_defect' => $hasDefect ? 1 : 0,
+                    ':progress_percent' => $progressPercent,
                     ':form_data' => json_encode($windowFormData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    ':calculated_data' => json_encode($calculatedData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     ':created_at' => nowUtc(),
                     ':updated_at' => nowUtc(),
                 ]);
@@ -710,11 +942,6 @@ function handleApplyExcel(array $user): never
                 $added++;
             }
 
-            $glassWidth = importRowValue($primaryRow, ['Glas Breite']);
-            $glassHeight = importRowValue($primaryRow, ['Glas Höhe', 'Glas Hoehe']);
-            $frameWidth = importRowValue($primaryRow, ['Rahmen Breite']);
-            $frameHeight = importRowValue($primaryRow, ['Rahmen Höhe', 'Rahmen Hoehe']);
-            $glassStructure = importRowValue($primaryRow, ['Glasaufbau']);
             $sashLabel = trim('Flügel ' . $position);
             if ($sashLabel === 'Flügel') {
                 $sashLabel = 'Flügel ' . $schlagzahl;
@@ -735,16 +962,21 @@ function handleApplyExcel(array $user): never
                 'fn_bemerkung' => $description,
                 'massnahme_empfehlung' => $description,
                 'eignung_beurteilung' => $hasDefect ? 'instandsetzung_erforderlich' : 'geeignet',
-                'overall_rating' => $hasDefect ? 'Instandsetzung erforderlich' : 'ohne festgestellten Handlungsbedarf',
+                'overall_rating' => $rating,
                 'import_source' => 'sharepoint_excel',
                 'import_rows' => $groupRows,
             ];
 
             $sashLookup = $pdo->prepare(
-                'SELECT id FROM window_sashes WHERE window_id = :wid AND deleted_at IS NULL ORDER BY sash_number ASC LIMIT 1'
+                'SELECT id, form_data FROM window_sashes WHERE window_id = :wid AND deleted_at IS NULL ORDER BY sash_number ASC LIMIT 1'
             );
             $sashLookup->execute([':wid' => $windowId]);
-            $sashId = (int) ($sashLookup->fetchColumn() ?: 0);
+            $existingSash = $sashLookup->fetch(PDO::FETCH_ASSOC) ?: null;
+            $sashId = (int) ($existingSash['id'] ?? 0);
+            $existingSashFormData = $existingSash
+                ? (json_decode((string) ($existingSash['form_data'] ?? ''), true) ?: [])
+                : [];
+            $sashFormData = mergeImportedFormData($existingSashFormData, $sashFormData);
             if ($sashId > 0) {
                 $pdo->prepare(
                     'UPDATE window_sashes SET sash_label = :label, opening_type = :opening_type, position = :position,

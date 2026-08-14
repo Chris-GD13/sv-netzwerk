@@ -2942,7 +2942,9 @@ async function renderSharePointImport(context: AppContext) {
 
       urlStatus.innerHTML = infoAlert('Fotoordner wird direkt aus SharePoint geladen…');
       await loadPhotosFromSharePoint();
-      urlStatus.innerHTML = successAlert('Excel-Liste und Fotoordner wurden direkt aus SharePoint eingelesen. Bitte die Fotozuordnung prüfen und anschließend „Fotos übernehmen“ wählen.');
+      urlStatus.innerHTML = infoAlert('Fotozuordnung abgeschlossen; zugeordnete Fotos werden in die Fensterdatensätze übernommen…');
+      await uploadAssignedPhotos();
+      urlStatus.innerHTML = successAlert('Excel-Daten, Fensterformulare und zugeordnete Fotos wurden vollständig aus SharePoint übernommen.');
     } catch (error) {
       urlStatus.innerHTML = errorAlert(error instanceof Error ? error.message : 'SharePoint konnte nicht eingelesen werden.');
     } finally {
@@ -3114,7 +3116,7 @@ async function renderSharePointImport(context: AppContext) {
     await Promise.all(Array.from({ length: Math.min(4, items.length) }, () => loadNext()));
     selectedPhotos = loaded.filter((file): file is File => file !== null);
     if (!selectedPhotos.length) throw new Error('Die SharePoint-Fotos konnten nicht geladen werden.');
-    renderPhotoQueue();
+    await renderPhotoQueue();
   }
 
   function normalizeSchlagzahlValue(value: string): string {
@@ -3191,7 +3193,7 @@ async function renderSharePointImport(context: AppContext) {
     }
   }
 
-  function renderPhotoQueue() {
+  async function renderPhotoQueue() {
     if (selectedPhotos.length === 0) {
       photoQueue.innerHTML = '';
       photoActions.style.display = 'none';
@@ -3227,7 +3229,7 @@ async function renderSharePointImport(context: AppContext) {
       </table>
     `;
 
-    void analyzePhotoSequence();
+    await analyzePhotoSequence();
   }
 
   async function analyzePhotoSequence() {
@@ -3299,7 +3301,7 @@ async function renderSharePointImport(context: AppContext) {
       const pathB = (b as File & { webkitRelativePath?: string }).webkitRelativePath || b.name;
       return pathA.localeCompare(pathB, 'de', { numeric: true, sensitivity: 'base' });
     });
-    renderPhotoQueue();
+    void renderPhotoQueue();
   }
 
   photoDropZone.addEventListener('dragover', (e) => { e.preventDefault(); photoDropZone.classList.add('intern-ai-upload--hover'); });
@@ -3318,10 +3320,10 @@ async function renderSharePointImport(context: AppContext) {
   context.root.querySelector<HTMLButtonElement>('#photo-clear-btn')?.addEventListener('click', () => {
     selectedPhotos = [];
     photoAssignments = [];
-    renderPhotoQueue();
+    void renderPhotoQueue();
   });
 
-  context.root.querySelector<HTMLButtonElement>('#photo-upload-btn')?.addEventListener('click', async () => {
+  async function uploadAssignedPhotos() {
     if (selectedPhotos.length === 0) return;
     const uploadBtn = context.root.querySelector<HTMLButtonElement>('#photo-upload-btn')!;
     const uploadStatus = context.root.querySelector<HTMLElement>('#photo-upload-status')!;
@@ -3356,6 +3358,18 @@ async function renderSharePointImport(context: AppContext) {
       : errorAlert(`${fail} Foto(s) konnten nicht übernommen werden. Bitte Schlagzahl prüfen.`);
     uploadBtn.textContent = '✓ Fertig';
     appendImportLog(`Fotos: ${ok} erfolgreich, ${fail} fehlgeschlagen`);
+    if (ok === 0 && fail > 0) {
+      throw new Error('Die Fotos konnten keinem Fensterdatensatz zugeordnet werden. Bitte Schlagzahlerkennung prüfen.');
+    }
+  }
+
+  context.root.querySelector<HTMLButtonElement>('#photo-upload-btn')?.addEventListener('click', async () => {
+    try {
+      await uploadAssignedPhotos();
+    } catch (error) {
+      const uploadStatus = context.root.querySelector<HTMLElement>('#photo-upload-status');
+      if (uploadStatus) uploadStatus.innerHTML = errorAlert(error instanceof Error ? error.message : 'Fotos konnten nicht übernommen werden.');
+    }
   });
 
   // ── Import-Log ─────────────────────────────────────────────────────────────
