@@ -693,7 +693,17 @@ export interface SharePointSyncResult {
   updated: number;
   skipped: number;
   errors: string[];
+  skipped_rows: SharePointSkippedRow[];
   targets: SharePointImportTarget[];
+}
+
+export interface SharePointSkippedRow {
+  row_number: number;
+  reason: string;
+  schlagzahl: string;
+  room_reference: string;
+  position: string;
+  description: string;
 }
 
 export interface SharePointImportTarget {
