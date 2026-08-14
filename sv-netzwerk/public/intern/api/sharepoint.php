@@ -112,14 +112,22 @@ function ensureBuildingRoom(PDO $pdo, int $buildingId, array $row): int
         return (int) $existing['id'];
     }
 
+    // MySQL error 1093: do not read from rooms in a subquery while inserting
+    // into rooms. Resolve the next sort order in a separate statement first.
+    $sortOrderStmt = $pdo->prepare(
+        'SELECT COALESCE(MAX(sort_order), 0) + 10 FROM rooms WHERE floor_id = :fid'
+    );
+    $sortOrderStmt->execute([':fid' => $floorId]);
+    $sortOrder = (int) $sortOrderStmt->fetchColumn();
+
     $stmt = $pdo->prepare(
-        'INSERT INTO rooms (floor_id, name, room_number, sort_order, created_at, updated_at) VALUES (:fid, :name, :rn, COALESCE((SELECT MAX(sort_order) FROM rooms WHERE floor_id = :fid2), 0) + 10, :now, :now)'
+        'INSERT INTO rooms (floor_id, name, room_number, sort_order, created_at, updated_at) VALUES (:fid, :name, :rn, :sort_order, :now, :now)'
     );
     $stmt->execute([
         ':fid' => $floorId,
-        ':fid2' => $floorId,
         ':name' => $roomName,
         ':rn' => $roomNumber,
+        ':sort_order' => $sortOrder,
         ':now' => nowUtc(),
     ]);
 
