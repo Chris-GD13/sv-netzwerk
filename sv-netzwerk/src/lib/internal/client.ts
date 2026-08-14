@@ -254,7 +254,7 @@ function bindAuthListener(context: AppContext) {
   };
 
   authListeners.add(handleChange);
-  const unsubscribe = onAuthChange(handleChange);
+  const unsubscribe = onAuthChange(handleChange, context.user?.id ?? null);
 
   return () => {
     authListeners.delete(handleChange);
