@@ -22,7 +22,7 @@ match ($action) {
     'get_url' => handleGetUrl(),
     'set_url' => handleSetUrl(),
     'import_excel' => handleImportExcel(),
-    'apply_excel' => handleApplyExcel(),
+    'apply_excel' => handleApplyExcel($user),
     'upload_photo' => handleUploadPhoto($user),
     default => apiError(404, 'Unbekannter SharePoint-Endpunkt.'),
 };
@@ -246,7 +246,46 @@ function handleImportExcel(): never
     apiJson(['ok' => true, 'rows' => $normalizedRows, 'columns' => $headers]);
 }
 
-function handleApplyExcel(): never
+function importRowValue(array $row, array $needles): string
+{
+    foreach ($row as $key => $value) {
+        $normalizedKey = strtolower((string) preg_replace('/[^a-z0-9äöüß]+/u', ' ', (string) $key));
+        foreach ($needles as $needle) {
+            $normalizedNeedle = strtolower((string) preg_replace('/[^a-z0-9äöüß]+/u', ' ', $needle));
+            if ($normalizedKey === $normalizedNeedle || str_contains($normalizedKey, $normalizedNeedle)) {
+                $candidate = trim((string) $value);
+                if ($candidate !== '') {
+                    return $candidate;
+                }
+            }
+        }
+    }
+    return '';
+}
+
+function importHasDefect(string $description): bool
+{
+    $normalized = strtolower(trim($description));
+    if ($normalized === '') {
+        return false;
+    }
+    return preg_match('/\b(ok|i\.?\s*o\.?|sonst\s+ok|ohne\s+mangel)\b/u', $normalized) !== 1
+        || preg_match('/\b(meg|wa|wartung|defekt|fehlt|gesperrt|schleif|häng|gebrochen|schwergängig|nicht\s+möglich|beschädigt|tauschen|klemmt)\b/u', $normalized) === 1;
+}
+
+function mergeImportDescriptions(array $rows): string
+{
+    $descriptions = [];
+    foreach ($rows as $row) {
+        $description = importRowValue($row, ['Beschreibungen', 'Beschreibung', 'Mangel', 'Feststellung']);
+        if ($description !== '' && !in_array($description, $descriptions, true)) {
+            $descriptions[] = $description;
+        }
+    }
+    return implode(' | ', $descriptions);
+}
+
+function handleApplyExcel(array $user): never
 {
     $body = requestBody();
     $buildingId = isset($body['building_id']) ? (int) $body['building_id'] : 0;
@@ -260,9 +299,11 @@ function handleApplyExcel(): never
     $updated = 0;
     $skipped = 0;
     $errors = [];
+    $targets = [];
 
     try {
         $pdo = db();
+        $pdo->beginTransaction();
         $buildingStmt = $pdo->prepare('SELECT id, name, project_id FROM buildings WHERE id = :bid LIMIT 1');
         $buildingStmt->execute([':bid' => $buildingId]);
         $building = $buildingStmt->fetch(PDO::FETCH_ASSOC);
@@ -270,20 +311,13 @@ function handleApplyExcel(): never
             apiError(404, 'Gebäude nicht gefunden.');
         }
 
-        $existing = $pdo->prepare(
-            'SELECT w.id, w.window_number, w.room_id, ro.room_number, ro.name AS room_name
-             FROM windows w
-             LEFT JOIN rooms ro ON ro.id = w.room_id
-             LEFT JOIN floors fl ON fl.id = ro.floor_id
-             WHERE fl.building_id = :bid AND w.deleted_at IS NULL'
-        );
-        $existing->execute([':bid' => $buildingId]);
-        $windowMap = [];
-        foreach ($existing->fetchAll() as $row) {
-            $windowMap[normalizeSchlagzahl($row['window_number'])] = (int) $row['id'];
-        }
-
-        foreach ($rows as $row) {
+        $groups = [];
+        $groupOrder = [];
+        $lastRoomReference = '';
+        $lastGroupKey = '';
+        $lastSchlagzahl = '';
+        $lastPosition = '';
+        foreach ($rows as $sourceIndex => $row) {
             if (!is_array($row)) {
                 $skipped++; continue;
             }
@@ -297,50 +331,203 @@ function handleApplyExcel(): never
                 $schlagzahl = $candidate;
             }
 
-            $roomId = ensureBuildingRoom($pdo, $buildingId, $row);
-            $windowNumber = excelWindowNumber($row, $schlagzahl);
+            $roomReference = importRowValue($row, ['Zimmer', 'Zimmernummer', 'Zimmer Nr', 'Raum', 'Raumnummer']);
+            $position = importRowValue($row, ['Lage', 'Position']);
+            if ($roomReference !== '') {
+                $lastRoomReference = $roomReference;
+            } elseif ($lastRoomReference !== '') {
+                $roomReference = $lastRoomReference;
+            }
+            if ($roomReference === '') {
+                $skipped++;
+                $errors[] = 'Zeile ' . ($sourceIndex + 1) . ': Raum/Zimmer fehlt.';
+                continue;
+            }
+
+            $normalizedPosition = strtolower(trim($position));
+            $groupKey = strtolower($roomReference . '|' . $position . '|' . $schlagzahl);
+            if ($lastGroupKey !== '' && $lastSchlagzahl === $schlagzahl && $lastPosition === $normalizedPosition) {
+                // The source list stores DK and Kipp as consecutive detail rows.
+                // Keep them together even when the second row contains a room typo.
+                $groupKey = $lastGroupKey;
+            }
+            if (!isset($groups[$groupKey])) {
+                $groups[$groupKey] = [
+                    'schlagzahl' => $schlagzahl,
+                    'room_reference' => $roomReference,
+                    'position' => $position,
+                    'rows' => [],
+                ];
+                $groupOrder[] = $groupKey;
+            }
+            $groups[$groupKey]['rows'][] = $row;
+            $lastGroupKey = $groupKey;
+            $lastSchlagzahl = $schlagzahl;
+            $lastPosition = $normalizedPosition;
+        }
+
+        foreach ($groupOrder as $groupKey) {
+            $group = $groups[$groupKey];
+            $groupRows = $group['rows'];
+            $primaryRow = $groupRows[0];
+            $schlagzahl = $group['schlagzahl'];
+            $position = trim((string) $group['position']);
+
+            $roomId = ensureBuildingRoom($pdo, $buildingId, $primaryRow);
+            $windowNumber = $schlagzahl;
             $windowExists = $pdo->prepare('SELECT id FROM windows WHERE room_id = :rid AND window_number = :wn AND deleted_at IS NULL LIMIT 1');
             $windowExists->execute([':rid' => $roomId, ':wn' => $windowNumber]);
             $existingWindow = $windowExists->fetch(PDO::FETCH_ASSOC);
 
-            $formData = ['import_source' => 'sharepoint_excel', 'schlagzahl' => $schlagzahl, 'room_reference' => excelRowLookup($row, ['Zimmer', 'Zimmernummer', 'Zimmer Nr', 'Raum', 'Raumnummer', 'room_number', 'A'])];
-            foreach ($row as $key => $value) {
-                $formData[(string) $key] = $value;
+            $description = mergeImportDescriptions($groupRows);
+            $hasDefect = importHasDefect($description);
+            $openingTypes = [];
+            foreach ($groupRows as $groupRow) {
+                $openingType = importRowValue($groupRow, ['Beschlag', 'Öffnungsart', 'Oeffnungsart']);
+                if ($openingType !== '' && !in_array(strtoupper($openingType), $openingTypes, true)) {
+                    $openingTypes[] = strtoupper($openingType);
+                }
             }
+            $openingType = implode(' + ', $openingTypes);
+
+            $windowFormData = [
+                'import_source' => 'sharepoint_excel',
+                'schlagzahl' => $schlagzahl,
+                'room_reference' => $group['room_reference'],
+                'position' => $position,
+                'import_rows' => $groupRows,
+            ];
 
             if ($existingWindow) {
                 $pdo->prepare(
-                    'UPDATE windows SET form_data = :fd, updated_at = :now WHERE id = :id'
+                    'UPDATE windows SET room_label = :room_label, room_number = :room_number,
+                     has_defect = :has_defect, status = :status, form_data = :fd, updated_at = :now WHERE id = :id'
                 )->execute([
-                    ':fd' => json_encode($formData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    ':room_label' => 'Raum ' . $group['room_reference'],
+                    ':room_number' => $group['room_reference'],
+                    ':has_defect' => $hasDefect ? 1 : 0,
+                    ':status' => 'in Bearbeitung',
+                    ':fd' => json_encode($windowFormData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     ':now' => nowUtc(),
                     ':id' => (int) $existingWindow['id'],
                 ]);
+                $windowId = (int) $existingWindow['id'];
                 $updated++;
-                continue;
+            } else {
+                $recordId = 'SP-' . strtoupper(bin2hex(random_bytes(6)));
+                $stmt = $pdo->prepare(
+                    'INSERT INTO windows (project_id, room_id, record_id, window_number, room_label, room_number, building_label, floor_label, status, has_defect, form_data, created_at, updated_at)
+                     VALUES (:pid, :rid, :record_id, :wn, :room_label, :room_number, :building_label, :floor_label, :status, :has_defect, :form_data, :now, :now)'
+                );
+                $stmt->execute([
+                    ':pid' => (int) $building['project_id'],
+                    ':rid' => $roomId,
+                    ':record_id' => $recordId,
+                    ':wn' => $windowNumber,
+                    ':room_label' => 'Raum ' . $group['room_reference'],
+                    ':room_number' => $group['room_reference'],
+                    ':building_label' => (string) $building['name'],
+                    ':floor_label' => 'EG / Erdgeschoss',
+                    ':status' => 'in Bearbeitung',
+                    ':has_defect' => $hasDefect ? 1 : 0,
+                    ':form_data' => json_encode($windowFormData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    ':now' => nowUtc(),
+                ]);
+                $windowId = (int) $pdo->lastInsertId();
+                $added++;
             }
 
-            $recordId = 'SP-' . strtoupper(bin2hex(random_bytes(6)));
-            $stmt = $pdo->prepare(
-                'INSERT INTO windows (project_id, room_id, record_id, window_number, room_label, room_number, building_label, floor_label, status, form_data, created_at, updated_at)
-                 VALUES (:pid, :rid, :record_id, :wn, :room_label, :room_number, :building_label, :floor_label, :status, :form_data, :now, :now)'
+            $glassWidth = importRowValue($primaryRow, ['Glas Breite']);
+            $glassHeight = importRowValue($primaryRow, ['Glas Höhe', 'Glas Hoehe']);
+            $frameWidth = importRowValue($primaryRow, ['Rahmen Breite']);
+            $frameHeight = importRowValue($primaryRow, ['Rahmen Höhe', 'Rahmen Hoehe']);
+            $glassStructure = importRowValue($primaryRow, ['Glasaufbau']);
+            $sashLabel = trim('Flügel ' . $position);
+            if ($sashLabel === 'Flügel') {
+                $sashLabel = 'Flügel ' . $schlagzahl;
+            }
+            $sashFormData = [
+                'status' => 'in Bearbeitung',
+                'sash_label' => $sashLabel,
+                'opening_type' => $openingType,
+                'position' => $position,
+                'qr_barcode' => $schlagzahl,
+                'inspection_date' => date('Y-m-d'),
+                'inspector_name' => $user['full_name'] ?: $user['email'],
+                'glass_structure' => $glassStructure,
+                'glazing_width_mm' => $glassWidth,
+                'glazing_height_mm' => $glassHeight,
+                'frame_width_mm' => $frameWidth,
+                'frame_height_mm' => $frameHeight,
+                'fn_bemerkung' => $description,
+                'massnahme_empfehlung' => $description,
+                'eignung_beurteilung' => $hasDefect ? 'instandsetzung_erforderlich' : 'geeignet',
+                'overall_rating' => $hasDefect ? 'Instandsetzung erforderlich' : 'ohne festgestellten Handlungsbedarf',
+                'import_source' => 'sharepoint_excel',
+                'import_rows' => $groupRows,
+            ];
+
+            $sashLookup = $pdo->prepare(
+                'SELECT id FROM window_sashes WHERE window_id = :wid AND deleted_at IS NULL ORDER BY sash_number ASC LIMIT 1'
             );
-            $stmt->execute([
-                ':pid' => (int) $building['project_id'],
-                ':rid' => $roomId,
-                ':record_id' => $recordId,
-                ':wn' => $windowNumber,
-                ':room_label' => trim((string) ($row['Zimmer'] ?? $row['Raum'] ?? '')) ?: 'Import',
-                ':room_number' => trim((string) (excelRowLookup($row, ['Zimmer', 'Zimmernummer', 'Zimmer Nr', 'Raum', 'Raumnummer', 'room_number', 'A']) ?: '')),
-                ':building_label' => (string) $building['name'],
-                ':floor_label' => 'EG / Erdgeschoss',
-                ':status' => 'nicht begonnen',
-                ':form_data' => json_encode($formData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                ':now' => nowUtc(),
-            ]);
-            $added++;
+            $sashLookup->execute([':wid' => $windowId]);
+            $sashId = (int) ($sashLookup->fetchColumn() ?: 0);
+            if ($sashId > 0) {
+                $pdo->prepare(
+                    'UPDATE window_sashes SET sash_label = :label, opening_type = :opening_type, position = :position,
+                     status = :status, form_data = :form_data, progress_percent = :progress, has_defect = :has_defect,
+                     overall_rating = :rating, inspector_id = :inspector_id, inspector_name = :inspector_name,
+                     inspected_at = :now, updated_at = :now WHERE id = :id'
+                )->execute([
+                    ':label' => $sashLabel,
+                    ':opening_type' => $openingType !== '' ? $openingType : null,
+                    ':position' => $position !== '' ? $position : null,
+                    ':status' => 'in Bearbeitung',
+                    ':form_data' => json_encode($sashFormData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    ':progress' => 73,
+                    ':has_defect' => $hasDefect ? 1 : 0,
+                    ':rating' => $sashFormData['overall_rating'],
+                    ':inspector_id' => (int) $user['id'],
+                    ':inspector_name' => $sashFormData['inspector_name'],
+                    ':now' => nowUtc(),
+                    ':id' => $sashId,
+                ]);
+            } else {
+                $pdo->prepare(
+                    'INSERT INTO window_sashes (window_id, sash_number, sash_label, opening_type, position, status,
+                     form_data, progress_percent, has_defect, overall_rating, inspector_id, inspector_name, inspected_at, created_at, updated_at)
+                     VALUES (:wid, 1, :label, :opening_type, :position, :status, :form_data, :progress, :has_defect,
+                     :rating, :inspector_id, :inspector_name, :now, :now, :now)'
+                )->execute([
+                    ':wid' => $windowId,
+                    ':label' => $sashLabel,
+                    ':opening_type' => $openingType !== '' ? $openingType : null,
+                    ':position' => $position !== '' ? $position : null,
+                    ':status' => 'in Bearbeitung',
+                    ':form_data' => json_encode($sashFormData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    ':progress' => 73,
+                    ':has_defect' => $hasDefect ? 1 : 0,
+                    ':rating' => $sashFormData['overall_rating'],
+                    ':inspector_id' => (int) $user['id'],
+                    ':inspector_name' => $sashFormData['inspector_name'],
+                    ':now' => nowUtc(),
+                ]);
+                $sashId = (int) $pdo->lastInsertId();
+            }
+
+            $targets[] = [
+                'schlagzahl' => $schlagzahl,
+                'room_reference' => $group['room_reference'],
+                'position' => $position,
+                'window_id' => $windowId,
+                'sash_id' => $sashId,
+            ];
         }
+        $pdo->commit();
     } catch (Throwable $e) {
+        if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         apiError(503, 'Excel-Zeilen konnten nicht verarbeitet werden: ' . $e->getMessage());
     }
 
@@ -349,6 +536,7 @@ function handleApplyExcel(): never
         'updated' => $updated,
         'skipped' => $skipped,
         'errors' => array_slice($errors, 0, 10),
+        'targets' => $targets,
     ]);
 }
 
@@ -359,6 +547,7 @@ function handleUploadPhoto(array $user): never
     }
 
     $buildingId = isset($_POST['building_id']) ? (int) $_POST['building_id'] : 0;
+    $sashId = isset($_POST['sash_id']) ? (int) $_POST['sash_id'] : 0;
     $schlagzahl = normalizeSchlagzahl($_POST['schlagzahl'] ?? '');
     $category = trim((string) ($_POST['category'] ?? 'Fensterkennzeichnung'));
     if ($buildingId <= 0 || $schlagzahl === '') {
@@ -377,20 +566,35 @@ function handleUploadPhoto(array $user): never
         apiError(400, 'Nur Bildtypen JPG, PNG, WEBP, TIFF, HEIC sind erlaubt.');
     }
 
-    $windowStmt = db()->prepare(
-        'SELECT w.id
-         FROM windows w
-         JOIN rooms ro ON ro.id = w.room_id
-         JOIN floors fl ON fl.id = ro.floor_id
-         WHERE fl.building_id = :bid AND w.deleted_at IS NULL AND w.window_number = :wn
-         LIMIT 1'
-    );
-    $windowStmt->execute([':bid' => $buildingId, ':wn' => $schlagzahl]);
+    if ($sashId > 0) {
+        $windowStmt = db()->prepare(
+            'SELECT w.id, ws.id AS sash_id
+             FROM window_sashes ws
+             JOIN windows w ON w.id = ws.window_id
+             JOIN rooms ro ON ro.id = w.room_id
+             JOIN floors fl ON fl.id = ro.floor_id
+             WHERE ws.id = :sid AND fl.building_id = :bid
+               AND ws.deleted_at IS NULL AND w.deleted_at IS NULL
+             LIMIT 1'
+        );
+        $windowStmt->execute([':sid' => $sashId, ':bid' => $buildingId]);
+    } else {
+        $windowStmt = db()->prepare(
+            'SELECT w.id, NULL AS sash_id
+             FROM windows w
+             JOIN rooms ro ON ro.id = w.room_id
+             JOIN floors fl ON fl.id = ro.floor_id
+             WHERE fl.building_id = :bid AND w.deleted_at IS NULL AND w.window_number = :wn
+             LIMIT 1'
+        );
+        $windowStmt->execute([':bid' => $buildingId, ':wn' => $schlagzahl]);
+    }
     $window = $windowStmt->fetch();
     if (!$window) {
         apiError(404, 'Keine passende Schlagzahl im Gebäude gefunden.');
     }
     $windowId = (int) $window['id'];
+    $sashId = (int) ($window['sash_id'] ?? 0);
 
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     $ext = preg_replace('/[^a-z0-9]/', '', $ext) ?: 'jpg';
@@ -408,9 +612,10 @@ function handleUploadPhoto(array $user): never
     try {
         db()->prepare(
             'INSERT INTO photos (window_id, sash_id, category, caption, file_name, storage_path, inspector_id, inspector_name, taken_at, created_at)
-             VALUES (:wid, NULL, :cat, :cap, :fn, :sp, :uid, :uname, :now, :now)'
+             VALUES (:wid, :sid, :cat, :cap, :fn, :sp, :uid, :uname, :now, :now)'
         )->execute([
             ':wid' => $windowId,
+            ':sid' => $sashId > 0 ? $sashId : null,
             ':cat' => $category,
             ':cap' => null,
             ':fn' => $file['name'],
@@ -424,7 +629,7 @@ function handleUploadPhoto(array $user): never
         apiError(503, 'Foto konnte nicht in der Datenbank gespeichert werden: ' . $e->getMessage());
     }
 
-    apiJson(['ok' => true, 'window_id' => $windowId, 'message' => 'Foto zu Schlagzahl ' . $schlagzahl . ' zugeordnet.']);
+    apiJson(['ok' => true, 'window_id' => $windowId, 'sash_id' => $sashId ?: null, 'message' => 'Foto zu Schlagzahl ' . $schlagzahl . ' zugeordnet.']);
 }
 
 function detectCsvDelimiter(string $path): string
@@ -476,6 +681,44 @@ function combineHeaderParts(array $parts): string
     return implode(' ', $unique);
 }
 
+function buildSpreadsheetHeaders(array $rows, int $headerRowCount, int $maxColumns): array
+{
+    $headers = [];
+    $used = [];
+    $activeSection = '';
+    for ($col = 0; $col < $maxColumns; $col++) {
+        $topValue = trim((string) ($rows[0][$col] ?? ''));
+        if ($topValue !== '') {
+            $activeSection = preg_match('/^(Glas|Rahmen)$/iu', $topValue) === 1 ? $topValue : '';
+        }
+
+        $parts = [];
+        for ($rowIndex = 0; $rowIndex < $headerRowCount; $rowIndex++) {
+            $value = trim((string) ($rows[$rowIndex][$col] ?? ''));
+            if ($value !== '') {
+                $parts[] = $value;
+            }
+        }
+        $subHeader = trim((string) ($rows[1][$col] ?? ''));
+        if ($topValue === '' && $activeSection !== '' && preg_match('/^(Breite|Höhe|Hoehe)$/iu', $subHeader) === 1) {
+            array_unshift($parts, $activeSection);
+        }
+
+        $name = combineHeaderParts($parts);
+        if ($name === '') {
+            $name = 'spalte_' . ($col + 1);
+        }
+        $baseName = $name;
+        $suffix = 2;
+        while (isset($used[strtolower($name)])) {
+            $name = $baseName . ' ' . $suffix++;
+        }
+        $used[strtolower($name)] = true;
+        $headers[$col] = $name;
+    }
+    return $headers;
+}
+
 function detectHeaderRowCount(array $rows): int
 {
     $count = 0;
@@ -515,25 +758,12 @@ function parseCsvRows(string $path): array
     $headerStart = $headerRowCount > 0 ? 0 : 0;
     $dataStart = max(1, $headerRowCount);
 
-    $header = [];
     $maxColumns = 0;
     for ($i = 0; $i < $headerRowCount; $i++) {
         $maxColumns = max($maxColumns, count($rows[$i]));
     }
 
-    for ($col = 0; $col < $maxColumns; $col++) {
-        $parts = [];
-        for ($rowIndex = 0; $rowIndex < $headerRowCount; $rowIndex++) {
-            $current = $rows[$rowIndex][$col] ?? '';
-            if ($current !== '') {
-                $parts[] = $current;
-            }
-        }
-        $header[$col] = combineHeaderParts($parts);
-        if ($header[$col] === '') {
-            $header[$col] = 'spalte_' . ($col + 1);
-        }
-    }
+    $header = buildSpreadsheetHeaders($rows, $headerRowCount, $maxColumns);
 
     $data = [];
     for ($i = $dataStart; $i < count($rows); $i++) {
@@ -564,7 +794,7 @@ function parseXlsxRows(string $path): array
         if ($xml !== false) {
             foreach ($xml->si as $si) {
                 $parts = [];
-                foreach ($si->t as $t) {
+                foreach ($si->xpath('.//t') ?: [] as $t) {
                     $parts[] = (string) $t;
                 }
                 $sharedStrings[] = implode('', $parts);
@@ -636,7 +866,12 @@ function parseXlsxRows(string $path): array
         }
 
         ksort($valueMap);
-        $rows[] = array_values($valueMap);
+        $lastColumn = max(array_keys($valueMap));
+        $denseRow = [];
+        for ($column = 1; $column <= $lastColumn; $column++) {
+            $denseRow[] = $valueMap[$column] ?? '';
+        }
+        $rows[] = $denseRow;
     }
 
     if ($rows === []) {
@@ -650,20 +885,7 @@ function parseXlsxRows(string $path): array
         $maxColumns = max($maxColumns, count($rows[$i]));
     }
 
-    $header = [];
-    for ($col = 0; $col < $maxColumns; $col++) {
-        $parts = [];
-        for ($rowIndex = 0; $rowIndex < $headerRowCount; $rowIndex++) {
-            $value = $rows[$rowIndex][$col] ?? '';
-            if ($value !== '') {
-                $parts[] = $value;
-            }
-        }
-        $header[$col] = combineHeaderParts($parts);
-        if ($header[$col] === '') {
-            $header[$col] = 'spalte_' . ($col + 1);
-        }
-    }
+    $header = buildSpreadsheetHeaders($rows, $headerRowCount, $maxColumns);
 
     $data = [];
     for ($i = $dataStart; $i < count($rows); $i++) {

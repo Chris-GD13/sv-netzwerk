@@ -116,7 +116,7 @@ import type {
   WindowSummary,
   WindowTemplate,
 } from './types';
-import type { AiAnalysisItem, AiAnalysisResult, SharePointImportRow } from './php-api';
+import type { AiAnalysisItem, AiAnalysisResult, SharePointImportRow, SharePointImportTarget } from './php-api';
 
 interface AppContext {
   root: HTMLElement;
@@ -2780,9 +2780,8 @@ async function renderSharePointImport(context: AppContext) {
         </div>
         <div id="sp-url-status" style="margin-top:8px"></div>
         <div class="intern-alert intern-alert--info" style="margin-top:12px">
-          <strong>Hinweis:</strong> Öffnen Sie den SharePoint-Ordner im Browser und kopieren Sie die URL hierher.
-          Der Aktualisieren-Button prüft auf neue Dateien und liest diese automatisch ein.<br>
-          <strong>Link:</strong> <a href="https://sv1schuett.sharepoint.com/:f:/s/SVBroSchtt/IgAkOUzaj1TYR7DezeHu5ILjAQ0F3b7OZWgPEcgz94oiHaU?e=87Mg1j"
+          <strong>Ablauf:</strong> SharePoint-Ordner öffnen, Excel-Datei und Fotoordner lokal auswählen. Das Prüfportal übernimmt danach Fenster, Mängel und die fortlaufende Fotozuordnung.<br>
+          <strong>Link:</strong> <a href="https://sv1schuett.sharepoint.com/:f:/s/SVBroSchtt/IgAkOUzaj1TYR7DezeHu5ILjAQ0F3b7OZWgPEcgz94oiHaU?e=iOyZ6e"
             target="_blank" rel="noopener noreferrer" style="word-break:break-all">
             SharePoint-Ordner öffnen ↗
           </a>
@@ -2821,14 +2820,14 @@ async function renderSharePointImport(context: AppContext) {
       <div class="intern-card" style="margin-bottom:16px">
         <h2>📷 Fotos einlesen</h2>
         <p class="intern-meta">
-          Fotos mit sichtbarer Schlagzahl im Bild hochladen. Die KI erkennt die Zahl direkt aus dem Foto (z.B. auf dem Fensteretikett bzw. auf der Fotografie).
-          Die Fotos werden dann automatisch dem passenden Fenster zugeordnet.
+          Zuerst die Excel-Liste übernehmen, danach den vollständigen Fotoordner auswählen. Die Dateien werden natürlich sortiert:
+          Ein Foto mit Schlagzahl startet einen Flügel; alle folgenden Fotos gehören zu diesem Flügel, bis die nächste Schlagzahl erkannt wird.
         </p>
         <div class="intern-ai-upload" id="photo-drop-zone" style="margin-top:12px">
           <div class="intern-ai-upload__icon">📷</div>
-          <p><strong>Fotos hierher ziehen</strong> oder klicken zum Auswählen</p>
-          <p class="intern-meta">JPG, PNG, TIFF · mehrere Dateien gleichzeitig möglich</p>
-          <input type="file" id="photo-file-input" accept="image/*,.tiff,.tif" multiple hidden />
+          <p><strong>Fotoordner hierher ziehen</strong> oder klicken zum Auswählen</p>
+          <p class="intern-meta">JPG, PNG, TIFF · der Dateiname bestimmt die Reihenfolge</p>
+          <input type="file" id="photo-file-input" accept="image/*,.tiff,.tif" multiple webkitdirectory directory hidden />
         </div>
         <div id="photo-status" style="margin-top:8px"></div>
         <div id="photo-queue" style="margin-top:12px"></div>
@@ -2930,17 +2929,9 @@ async function renderSharePointImport(context: AppContext) {
       return;
     }
 
-    manualImportCards.forEach((card) => {
-      card.style.display = 'none';
-    });
-    urlStatus.innerHTML = successAlert('Automatisches Einlesen gestartet. Die Excel-Datei und die passenden Fotos aus dem hinterlegten Ordner werden im nächsten Schritt verarbeitet.');
-    appendImportLog(`Automatischer Einlesevorgang gestartet: ${folderUrl}`);
-    autoReadBtn.disabled = true;
-    autoReadBtn.textContent = 'Einlesen läuft…';
-    window.setTimeout(() => {
-      autoReadBtn.disabled = false;
-      autoReadBtn.textContent = 'Einlesen';
-    }, 1500);
+    manualImportCards.forEach((card) => { card.style.display = ''; });
+    urlStatus.innerHTML = infoAlert('Bitte jetzt die Excel-Datei und anschließend den Fotoordner auswählen. Nach der Excel-Übernahme wird die Fotosequenz automatisch den angelegten Flügeln zugeordnet.');
+    context.root.querySelector<HTMLInputElement>('#excel-file-input')?.click();
   };
 
   aiRunBtn.addEventListener('click', runAiPrompt);
@@ -2964,6 +2955,7 @@ async function renderSharePointImport(context: AppContext) {
   const excelPreview = context.root.querySelector<HTMLElement>('#excel-preview')!;
   let excelRows: SharePointImportRow[] = [];
   let excelColumns: string[] = [];
+  let importTargets: SharePointImportTarget[] = [];
 
   excelDropZone.addEventListener('dragover', (e) => { e.preventDefault(); excelDropZone.classList.add('intern-ai-upload--hover'); });
   excelDropZone.addEventListener('dragleave', () => excelDropZone.classList.remove('intern-ai-upload--hover'));
@@ -3059,8 +3051,9 @@ async function renderSharePointImport(context: AppContext) {
     }
     applyStatus.innerHTML = successAlert(
       `Übernommen: ${result.added} neu, ${result.updated} aktualisiert, ${result.skipped} übersprungen.` +
-      (result.errors.length > 0 ? `<br>⚠️ ${result.errors.join(', ')}` : '')
+      (result.errors.length > 0 ? `<br>⚠️ ${result.errors.map(escapeHtml).join(', ')}` : '')
     );
+    importTargets = result.targets ?? [];
     applyBtn.textContent = '✓ Fertig';
     appendImportLog(`Excel: ${result.added} neu, ${result.updated} aktualisiert, ${result.skipped} übersprungen`);
   });
@@ -3069,6 +3062,7 @@ async function renderSharePointImport(context: AppContext) {
     excelPreview.style.display = 'none';
     excelRows = [];
     excelColumns = [];
+    importTargets = [];
     excelStatus.innerHTML = '';
   });
 
@@ -3078,6 +3072,7 @@ async function renderSharePointImport(context: AppContext) {
   const photoQueue = context.root.querySelector<HTMLElement>('#photo-queue')!;
   const photoActions = context.root.querySelector<HTMLElement>('#photo-actions')!;
   let selectedPhotos: File[] = [];
+  let photoAssignments: Array<{ target: SharePointImportTarget; category: string } | null> = [];
 
   function normalizeSchlagzahlValue(value: string): string {
     const digits = value.match(/\d{1,6}/g)?.map((match) => match.replace(/^0+/, '') || '0') ?? [];
@@ -3153,21 +3148,6 @@ async function renderSharePointImport(context: AppContext) {
     }
   }
 
-  async function autoDetectPhotoSchlagzahl(file: File, idx: number) {
-    const input = context.root.querySelector<HTMLInputElement>(`.photo-schlagzahl[data-photo-idx="${idx}"]`);
-    if (!input || input.value.trim()) return;
-
-    const detected = await detectSchlagzahlFromImage(file);
-    if (!detected) return;
-
-    input.value = detected;
-    const status = input.parentElement?.querySelector<HTMLElement>('[data-photo-status]');
-    if (status) {
-      status.textContent = 'KI erkannt';
-      status.style.color = '#2e7d32';
-    }
-  }
-
   function renderPhotoQueue() {
     if (selectedPhotos.length === 0) {
       photoQueue.innerHTML = '';
@@ -3180,21 +3160,15 @@ async function renderSharePointImport(context: AppContext) {
         <thead>
           <tr style="background:#e8f0f8">
             <th style="padding:6px 8px;text-align:left;border:1px solid #d0dae3">Dateiname</th>
-            <th style="padding:6px 8px;text-align:left;border:1px solid #d0dae3">Erkannte Schlagzahl</th>
+            <th style="padding:6px 8px;text-align:left;border:1px solid #d0dae3">Zuordnung</th>
             <th style="padding:6px 8px;text-align:left;border:1px solid #d0dae3">Kategorie</th>
           </tr>
         </thead>
         <tbody>
-          ${selectedPhotos.map((f, i) => {
-            const sz = extractSchlagzahl(f.name);
-            return `<tr id="photo-row-${i}">
-              <td style="padding:5px 8px;border:1px solid #e5eaf0">${escapeHtml(f.name)}</td>
+          ${selectedPhotos.map((f, i) => `<tr id="photo-row-${i}">
+              <td style="padding:5px 8px;border:1px solid #e5eaf0">${escapeHtml((f as File & { webkitRelativePath?: string }).webkitRelativePath || f.name)}</td>
               <td style="padding:5px 8px;border:1px solid #e5eaf0">
-                <input type="text" value="${escapeAttr(sz)}" data-photo-idx="${i}"
-                  class="intern-input photo-schlagzahl"
-                  style="width:80px;padding:3px 6px;font-size:0.85rem"
-                  placeholder="z.B. 42" />
-                <span data-photo-status style="color:${!sz ? '#e53935' : '#2e7d32'};font-size:0.8rem;display:block;margin-top:4px;">${sz ? 'Dateiname' : 'KI prüft…'}</span>
+                <span data-photo-target>Wird analysiert…</span>
               </td>
               <td style="padding:5px 8px;border:1px solid #e5eaf0">
                 <select data-photo-cat-idx="${i}" class="intern-input photo-category" style="padding:3px 6px;font-size:0.85rem">
@@ -3205,20 +3179,83 @@ async function renderSharePointImport(context: AppContext) {
                   <option value="sonstiges">Sonstiges</option>
                 </select>
               </td>
-            </tr>`;
-          }).join('')}
+            </tr>`).join('')}
         </tbody>
       </table>
     `;
 
-    selectedPhotos.forEach((file, index) => {
-      void autoDetectPhotoSchlagzahl(file, index);
+    void analyzePhotoSequence();
+  }
+
+  async function analyzePhotoSequence() {
+    const photoStatus = context.root.querySelector<HTMLElement>('#photo-status')!;
+    const uploadButton = context.root.querySelector<HTMLButtonElement>('#photo-upload-btn');
+    if (uploadButton) uploadButton.disabled = true;
+    if (!importTargets.length) {
+      photoStatus.innerHTML = infoAlert('Bitte zuerst die Excel-Daten übernehmen. Dadurch entstehen die eindeutigen Flügel-Zuordnungen für die Fotos.');
+      return;
+    }
+
+    const targetsByNumber = new Map<string, SharePointImportTarget[]>();
+    importTargets.forEach((target) => {
+      const key = normalizeSchlagzahlValue(target.schlagzahl);
+      targetsByNumber.set(key, [...(targetsByNumber.get(key) ?? []), target]);
     });
+    const usedTargets = new Map<string, number>();
+    photoAssignments = Array(selectedPhotos.length).fill(null);
+    let currentTarget: SharePointImportTarget | null = null;
+    let markers = 0;
+
+    const detections = Array<string>(selectedPhotos.length).fill('');
+    let nextPhoto = 0;
+    const recognizeNext = async () => {
+      while (nextPhoto < selectedPhotos.length) {
+        const index = nextPhoto++;
+        detections[index] = normalizeSchlagzahlValue(await detectSchlagzahlFromImage(selectedPhotos[index]));
+        photoStatus.innerHTML = infoAlert(`${Math.min(nextPhoto, selectedPhotos.length)} / ${selectedPhotos.length} Fotos analysiert…`);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(3, selectedPhotos.length) }, () => recognizeNext()));
+
+    for (let index = 0; index < selectedPhotos.length; index++) {
+      const detected = detections[index];
+      const candidates = targetsByNumber.get(detected) ?? [];
+      let category = 'Mangel';
+
+      if (detected && candidates.length) {
+        const occurrence = usedTargets.get(detected) ?? 0;
+        currentTarget = candidates[Math.min(occurrence, candidates.length - 1)];
+        if (occurrence < candidates.length) usedTargets.set(detected, occurrence + 1);
+        category = 'Fensterkennzeichnung';
+        markers++;
+      }
+
+      if (currentTarget) photoAssignments[index] = { target: currentTarget, category };
+      const targetCell = context.root.querySelector<HTMLElement>(`#photo-row-${index} [data-photo-target]`);
+      const categorySelect = context.root.querySelector<HTMLSelectElement>(`.photo-category[data-photo-cat-idx="${index}"]`);
+      if (categorySelect) categorySelect.value = category;
+      if (targetCell) {
+        targetCell.textContent = currentTarget
+          ? `${currentTarget.schlagzahl} · Raum ${currentTarget.room_reference} · ${currentTarget.position || 'Flügel'}`
+          : 'Nicht zugeordnet (noch keine Schlagzahl erkannt)';
+        targetCell.style.color = currentTarget ? '#2e7d32' : '#c62828';
+      }
+    }
+
+    const assigned = photoAssignments.filter(Boolean).length;
+    photoStatus.innerHTML = assigned
+      ? successAlert(`${markers} Schlagzahl-Marker erkannt; ${assigned} von ${selectedPhotos.length} Fotos fortlaufend zugeordnet.`)
+      : errorAlert('Keine Schlagzahl aus der übernommenen Excel-Liste wurde in den Fotos erkannt.');
+    if (uploadButton) uploadButton.disabled = assigned === 0;
   }
 
   function addToPhotoQueue(files: FileList | File[]) {
     const arr = Array.from(files).filter(f => f.type.startsWith('image/') || /\.(tiff?|jpe?g|png|webp)$/i.test(f.name));
-    selectedPhotos = [...selectedPhotos, ...arr];
+    selectedPhotos = [...selectedPhotos, ...arr].sort((a, b) => {
+      const pathA = (a as File & { webkitRelativePath?: string }).webkitRelativePath || a.name;
+      const pathB = (b as File & { webkitRelativePath?: string }).webkitRelativePath || b.name;
+      return pathA.localeCompare(pathB, 'de', { numeric: true, sensitivity: 'base' });
+    });
     renderPhotoQueue();
   }
 
@@ -3237,6 +3274,7 @@ async function renderSharePointImport(context: AppContext) {
 
   context.root.querySelector<HTMLButtonElement>('#photo-clear-btn')?.addEventListener('click', () => {
     selectedPhotos = [];
+    photoAssignments = [];
     renderPhotoQueue();
   });
 
@@ -3250,14 +3288,14 @@ async function renderSharePointImport(context: AppContext) {
     let ok = 0, fail = 0;
     for (let i = 0; i < selectedPhotos.length; i++) {
       const file = selectedPhotos[i];
-      const szInput = context.root.querySelector<HTMLInputElement>(`.photo-schlagzahl[data-photo-idx="${i}"]`);
       const catSelect = context.root.querySelector<HTMLSelectElement>(`.photo-category[data-photo-cat-idx="${i}"]`);
-      const sz = szInput?.value.trim() ?? extractSchlagzahl(file.name);
-      const cat = catSelect?.value ?? 'Fensterkennzeichnung';
+      const assignment = photoAssignments[i];
+      const sz = assignment?.target.schlagzahl ?? '';
+      const cat = catSelect?.value ?? assignment?.category ?? 'Mangel';
 
-      if (!sz) { fail++; continue; }
+      if (!assignment || !sz) { fail++; continue; }
 
-      const result = await apiUploadSharePointPhoto(activeBuildingId, sz, file, cat);
+      const result = await apiUploadSharePointPhoto(activeBuildingId, sz, file, cat, assignment.target.sash_id);
       const row = context.root.querySelector<HTMLElement>(`#photo-row-${i}`);
       if (row) {
         row.style.background = result.ok ? '#e8f5e9' : '#ffebee';

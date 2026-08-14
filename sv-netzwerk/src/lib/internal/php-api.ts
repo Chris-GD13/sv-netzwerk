@@ -687,6 +687,15 @@ export interface SharePointSyncResult {
   updated: number;
   skipped: number;
   errors: string[];
+  targets: SharePointImportTarget[];
+}
+
+export interface SharePointImportTarget {
+  schlagzahl: string;
+  room_reference: string;
+  position: string;
+  window_id: number;
+  sash_id: number;
 }
 
 export interface SharePointPhoto {
@@ -750,12 +759,14 @@ export async function apiUploadSharePointPhoto(
   schlagzahl: string,
   file: File,
   category = 'Fensterkennzeichnung',
-): Promise<{ ok: boolean; window_id?: number; message?: string }> {
+  sashId?: number,
+): Promise<{ ok: boolean; window_id?: number; sash_id?: number; message?: string }> {
   const formData = new FormData();
   formData.append('photo', file);
   formData.append('building_id', String(buildingId));
   formData.append('schlagzahl', schlagzahl);
   formData.append('category', category);
+  if (sashId) formData.append('sash_id', String(sashId));
   try {
     const response = await fetch(`${API_BASE}/sharepoint.php?action=upload_photo`, {
       method: 'POST',
@@ -764,7 +775,7 @@ export async function apiUploadSharePointPhoto(
     });
     const json = await response.json().catch(() => null);
     if (!response.ok) return { ok: false, message: json?.error ?? `HTTP ${response.status}` };
-    return { ok: !!json?.ok, window_id: json?.window_id, message: json?.message };
+    return { ok: !!json?.ok, window_id: json?.window_id, sash_id: json?.sash_id, message: json?.message };
   } catch (err) {
     return { ok: false, message: err instanceof Error ? err.message : 'Netzwerkfehler' };
   }
