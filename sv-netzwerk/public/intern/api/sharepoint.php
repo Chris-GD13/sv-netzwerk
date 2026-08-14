@@ -86,11 +86,12 @@ function ensureBuildingFloor(PDO $pdo, int $buildingId): int
         return (int) $floor['id'];
     }
 
-    $stmt = $pdo->prepare('INSERT INTO floors (building_id, name, level, sort_order, created_at, updated_at) VALUES (:bid, :name, 0, 10, :now, :now)');
+    $stmt = $pdo->prepare('INSERT INTO floors (building_id, name, level, sort_order, created_at, updated_at) VALUES (:bid, :name, 0, 10, :created_at, :updated_at)');
     $stmt->execute([
         ':bid' => $buildingId,
         ':name' => 'EG / Erdgeschoss',
-        ':now' => nowUtc(),
+        ':created_at' => nowUtc(),
+        ':updated_at' => nowUtc(),
     ]);
 
     return (int) $pdo->lastInsertId();
@@ -121,14 +122,15 @@ function ensureBuildingRoom(PDO $pdo, int $buildingId, array $row): int
     $sortOrder = (int) $sortOrderStmt->fetchColumn();
 
     $stmt = $pdo->prepare(
-        'INSERT INTO rooms (floor_id, name, room_number, sort_order, created_at, updated_at) VALUES (:fid, :name, :rn, :sort_order, :now, :now)'
+        'INSERT INTO rooms (floor_id, name, room_number, sort_order, created_at, updated_at) VALUES (:fid, :name, :rn, :sort_order, :created_at, :updated_at)'
     );
     $stmt->execute([
         ':fid' => $floorId,
         ':name' => $roomName,
         ':rn' => $roomNumber,
         ':sort_order' => $sortOrder,
-        ':now' => nowUtc(),
+        ':created_at' => nowUtc(),
+        ':updated_at' => nowUtc(),
     ]);
 
     return (int) $pdo->lastInsertId();
@@ -417,7 +419,7 @@ function handleApplyExcel(array $user): never
                 $recordId = 'SP-' . strtoupper(bin2hex(random_bytes(6)));
                 $stmt = $pdo->prepare(
                     'INSERT INTO windows (project_id, room_id, record_id, window_number, room_label, room_number, building_label, floor_label, status, has_defect, form_data, created_at, updated_at)
-                     VALUES (:pid, :rid, :record_id, :wn, :room_label, :room_number, :building_label, :floor_label, :status, :has_defect, :form_data, :now, :now)'
+                     VALUES (:pid, :rid, :record_id, :wn, :room_label, :room_number, :building_label, :floor_label, :status, :has_defect, :form_data, :created_at, :updated_at)'
                 );
                 $stmt->execute([
                     ':pid' => (int) $building['project_id'],
@@ -431,7 +433,8 @@ function handleApplyExcel(array $user): never
                     ':status' => 'in Bearbeitung',
                     ':has_defect' => $hasDefect ? 1 : 0,
                     ':form_data' => json_encode($windowFormData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    ':now' => nowUtc(),
+                    ':created_at' => nowUtc(),
+                    ':updated_at' => nowUtc(),
                 ]);
                 $windowId = (int) $pdo->lastInsertId();
                 $added++;
@@ -477,7 +480,7 @@ function handleApplyExcel(array $user): never
                     'UPDATE window_sashes SET sash_label = :label, opening_type = :opening_type, position = :position,
                      status = :status, form_data = :form_data, progress_percent = :progress, has_defect = :has_defect,
                      overall_rating = :rating, inspector_id = :inspector_id, inspector_name = :inspector_name,
-                     inspected_at = :now, updated_at = :now WHERE id = :id'
+                     inspected_at = :inspected_at, updated_at = :updated_at WHERE id = :id'
                 )->execute([
                     ':label' => $sashLabel,
                     ':opening_type' => $openingType !== '' ? $openingType : null,
@@ -489,7 +492,8 @@ function handleApplyExcel(array $user): never
                     ':rating' => $sashFormData['overall_rating'],
                     ':inspector_id' => (int) $user['id'],
                     ':inspector_name' => $sashFormData['inspector_name'],
-                    ':now' => nowUtc(),
+                    ':inspected_at' => nowUtc(),
+                    ':updated_at' => nowUtc(),
                     ':id' => $sashId,
                 ]);
             } else {
@@ -497,7 +501,7 @@ function handleApplyExcel(array $user): never
                     'INSERT INTO window_sashes (window_id, sash_number, sash_label, opening_type, position, status,
                      form_data, progress_percent, has_defect, overall_rating, inspector_id, inspector_name, inspected_at, created_at, updated_at)
                      VALUES (:wid, 1, :label, :opening_type, :position, :status, :form_data, :progress, :has_defect,
-                     :rating, :inspector_id, :inspector_name, :now, :now, :now)'
+                     :rating, :inspector_id, :inspector_name, :inspected_at, :created_at, :updated_at)'
                 )->execute([
                     ':wid' => $windowId,
                     ':label' => $sashLabel,
@@ -510,7 +514,9 @@ function handleApplyExcel(array $user): never
                     ':rating' => $sashFormData['overall_rating'],
                     ':inspector_id' => (int) $user['id'],
                     ':inspector_name' => $sashFormData['inspector_name'],
-                    ':now' => nowUtc(),
+                    ':inspected_at' => nowUtc(),
+                    ':created_at' => nowUtc(),
+                    ':updated_at' => nowUtc(),
                 ]);
                 $sashId = (int) $pdo->lastInsertId();
             }
@@ -612,7 +618,7 @@ function handleUploadPhoto(array $user): never
     try {
         db()->prepare(
             'INSERT INTO photos (window_id, sash_id, category, caption, file_name, storage_path, inspector_id, inspector_name, taken_at, created_at)
-             VALUES (:wid, :sid, :cat, :cap, :fn, :sp, :uid, :uname, :now, :now)'
+             VALUES (:wid, :sid, :cat, :cap, :fn, :sp, :uid, :uname, :taken_at, :created_at)'
         )->execute([
             ':wid' => $windowId,
             ':sid' => $sashId > 0 ? $sashId : null,
@@ -622,7 +628,8 @@ function handleUploadPhoto(array $user): never
             ':sp' => (string) $windowId . '/' . $safeName,
             ':uid' => (int) $user['id'],
             ':uname' => $user['full_name'] ?: $user['email'],
-            ':now' => nowUtc(),
+            ':taken_at' => nowUtc(),
+            ':created_at' => nowUtc(),
         ]);
     } catch (Throwable $e) {
         @unlink($target);
