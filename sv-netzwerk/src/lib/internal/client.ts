@@ -854,6 +854,7 @@ async function renderDashboard(context: AppContext) {
 async function renderBuildings(context: AppContext) {
   const buildings = await apiListBuildings();
   const editable = canEdit(context);
+  const canDelete = context.user?.profile.role === 'administrator';
 
   context.root.innerHTML = `
     ${renderHeader(context, 'Gebäude', 'Alle Gebäude des Projekts mit Prüffortschritt.')}
@@ -869,7 +870,7 @@ async function renderBuildings(context: AppContext) {
     ` : ''}
     <div id="building-msg"></div>
     <div class="intern-building-grid" id="building-list">
-      ${buildings.map((b) => renderBuildingCard(b, editable)).join('') || '<div class="intern-empty">Noch keine Gebäude vorhanden.</div>'}
+      ${buildings.map((b) => renderBuildingCard(b, editable, canDelete)).join('') || '<div class="intern-empty">Noch keine Gebäude vorhanden.</div>'}
     </div>
   `;
 
@@ -894,7 +895,7 @@ async function renderBuildings(context: AppContext) {
   bindHeaderLogout(context);
 }
 
-function renderBuildingCard(b: Building, isAdmin: boolean): string {
+function renderBuildingCard(b: Building, editable: boolean, canDelete: boolean): string {
   const pct = b.progress_pct;
   const badgeClass = pct === 100 ? 'ok' : pct > 0 ? 'info' : 'warn';
   const isCompleted = b.name.startsWith('✅ ');
@@ -913,7 +914,7 @@ function renderBuildingCard(b: Building, isAdmin: boolean): string {
         <div class="intern-progress-bar"><div class="intern-progress-bar__fill intern-progress-bar__fill--${badgeClass}" style="width:${pct}%"></div></div>
         <p class="intern-meta">${pct}% geprüft · ${b.sash_completed}/${b.sash_count} Flügel</p>
       </a>
-      ${isAdmin ? `
+      ${editable ? `
       <div class="intern-card-actions">
         <button class="intern-action-btn" data-action="menu" title="Aktionen" aria-label="Aktionen">⋮</button>
         <div class="intern-action-menu" hidden>
@@ -921,11 +922,12 @@ function renderBuildingCard(b: Building, isAdmin: boolean): string {
           <button data-action="duplicate">📋 Duplizieren</button>
           <button data-action="archive">📦 ${isArchived ? 'Wiederherstellen' : 'Archivieren'}</button>
           <button data-action="${isCompleted ? 'reopen' : 'complete'}">${isCompleted ? '🔄 Wiederaufnahme' : '✅ Abgeschlossen'}</button>
-          <hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0">
-          <button data-action="delete" style="color:#e53e3e">🗑️ Löschen</button>
+          ${canDelete ? `<hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0">
+          <button data-action="delete" style="color:#e53e3e">🗑️ Löschen</button>` : ''}
         </div>
       </div>
       ` : ''}
+      ${canDelete ? `<button type="button" class="intern-inline-button" data-action="delete" style="margin:10px 14px 14px;color:#c62828;border-color:#ef9a9a">Gebäude löschen</button>` : ''}
     </div>
   `;
 }
