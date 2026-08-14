@@ -1737,7 +1737,7 @@ async function renderSashInspection(context: AppContext) {
       const updatedPhotos = await apiListSashPhotos(sashId);
       // Alle Fotos dieser Komponente in der Mini-Galerie anzeigen
       const compPhotos = updatedPhotos.filter((p) => p.category === component);
-      if (gallery) gallery.innerHTML = compPhotos.map((p) => `<img src="/intern/photos/${escapeHtml(p.storage_path)}" alt="${escapeHtml(p.caption ?? p.category)}" class="intern-comp-thumb" loading="lazy" />`).join('');
+      if (gallery) gallery.innerHTML = compPhotos.map((p) => `<img src="/intern/api/photos.php?id=${encodeURIComponent(p.id)}" alt="${escapeHtml(p.caption ?? p.category)}" class="intern-comp-thumb" loading="lazy" />`).join('');
       // Globale Galerie aktualisieren
       const globalGallery = context.root.querySelector<HTMLElement>('#sash-photo-gallery');
       if (globalGallery) {
@@ -4293,7 +4293,7 @@ function renderPhotos(photos: PhotoItem[]) {
   if (!photos.length) return '<div class="intern-empty">Noch keine Fotos gespeichert.</div>';
   return photos.map((photo) => `
     <article class="intern-photo-item">
-      <img alt="${escapeHtml(photo.category)}" src="/intern/photos/${escapeAttr(photo.storage_path)}" loading="lazy" />
+      <img alt="${escapeHtml(photo.category)}" src="/intern/api/photos.php?id=${encodeURIComponent(photo.id)}" loading="lazy" />
       <strong>${escapeHtml(photo.category)}</strong>
       <p class="intern-meta">${escapeHtml(photo.caption ?? photo.file_name)}</p>
       <p class="intern-meta">${photo.inspector_name ? escapeHtml(photo.inspector_name) : '—'} · ${photo.taken_at ? formatDateTime(photo.taken_at) : '—'}</p>
@@ -4407,7 +4407,7 @@ function printSashReport(sash: WindowSashRecord, data: Record<string, unknown>, 
   ].map(([key, label]) => `<tr><td>${escapeHtml(label)}</td><td>${chk(key)}</td></tr>`).join('');
 
   const photoHtml = photos.length > 0
-    ? photos.slice(0, 12).map((p) => `<div class="photo-item"><img src="/intern/photos/${escapeHtml(p.storage_path)}" alt="${escapeHtml(p.caption ?? p.category)}" /><p>${escapeHtml(p.caption ?? p.category)}</p></div>`).join('')
+    ? photos.slice(0, 12).map((p) => `<div class="photo-item"><img src="/intern/api/photos.php?id=${encodeURIComponent(p.id)}" alt="${escapeHtml(p.caption ?? p.category)}" /><p>${escapeHtml(p.caption ?? p.category)}</p></div>`).join('')
     : '<p>Keine Fotos vorhanden.</p>';
 
   popup.document.write(`<!DOCTYPE html>
