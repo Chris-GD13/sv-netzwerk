@@ -741,10 +741,11 @@ export async function apiImportExcel(
 
 /** Liest die konfigurierte Excel-Datei direkt aus SharePoint. */
 export async function apiImportSharePointExcel(): Promise<{ rows: SharePointImportRow[]; columns: string[]; file_name: string } | null> {
-  const { data } = await apiPost<{ rows: SharePointImportRow[]; columns: string[]; file_name: string }>(
+  const { data, error } = await apiPost<{ rows: SharePointImportRow[]; columns: string[]; file_name: string }>(
     '/sharepoint.php?action=import_sharepoint_excel',
     {},
   );
+  if (error) throw error;
   return data ?? null;
 }
 
