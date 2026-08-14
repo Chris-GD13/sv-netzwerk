@@ -45,6 +45,10 @@ import {
   apiGetSharePointUrl,
   apiSetSharePointUrl,
   apiImportExcel,
+  apiImportSharePointExcel,
+  apiListSharePointPhotos,
+  apiFetchSharePointPhoto,
+  apiImportSharePointPhoto,
   apiApplyExcelRows,
   apiUploadSharePointPhoto,
   // Projekte
@@ -116,7 +120,7 @@ import type {
   WindowSummary,
   WindowTemplate,
 } from './types';
-import type { AiAnalysisItem, AiAnalysisResult, SharePointImportRow, SharePointImportTarget } from './php-api';
+import type { AiAnalysisItem, AiAnalysisResult, SharePointImportRow, SharePointImportTarget, SharePointPhoto } from './php-api';
 
 interface AppContext {
   root: HTMLElement;
@@ -2774,13 +2778,13 @@ async function renderSharePointImport(context: AppContext) {
             <textarea id="sp-ai-prompt" class="intern-input" rows="3" placeholder="z.B. Lies die Excel-Tabelle ein, lege ein neues Gebäude mit dem Namen 800-2 an, erstelle alle Fenster mit den beschriebenen Feldern und ordne die Fotos nach Schlagzahl zu."></textarea>
             <div class="sharepoint-ai-actions">
               <button id="sp-ai-run-btn" class="sv-button sv-button-primary" type="button">Ausführen</button>
-              <button id="sp-auto-read-btn" class="sv-button sv-button-secondary" type="button">Einlesen</button>
+              <button id="sp-auto-read-btn" class="sv-button sv-button-secondary" type="button">Direkt aus SharePoint einlesen</button>
             </div>
           </div>
         </div>
         <div id="sp-url-status" style="margin-top:8px"></div>
         <div class="intern-alert intern-alert--info" style="margin-top:12px">
-          <strong>Ablauf:</strong> SharePoint-Ordner öffnen, Excel-Datei und Fotoordner lokal auswählen. Das Prüfportal übernimmt danach Fenster, Mängel und die fortlaufende Fotozuordnung.<br>
+          <strong>Ablauf:</strong> „Direkt aus SharePoint einlesen“ lädt die Excel-Liste und den Fotoordner automatisch. Eine lokale Dateiauswahl ist nicht erforderlich. Das Prüfportal übernimmt Fenster, Mängel und die fortlaufende Fotozuordnung.<br>
           <strong>Link:</strong> <a href="https://sv1schuett.sharepoint.com/:f:/s/SVBroSchtt/IgAkOUzaj1TYR7DezeHu5ILjAQ0F3b7OZWgPEcgz94oiHaU?e=iOyZ6e"
             target="_blank" rel="noopener noreferrer" style="word-break:break-all">
             SharePoint-Ordner öffnen ↗
@@ -2791,7 +2795,7 @@ async function renderSharePointImport(context: AppContext) {
       <!-- Excel-Import -->
       <div class="intern-card" style="margin-bottom:16px">
         <h2>📊 Excel-Liste einlesen</h2>
-        <p class="intern-meta">Fensterliste als Excel-Datei hochladen. Die Schlagzahl wird automatisch erkannt und mit vorhandenen Fenstern verknüpft.</p>
+        <p class="intern-meta">Die Excel-Liste wird automatisch aus SharePoint geladen. Die lokale Auswahl bleibt nur als Ausweichmöglichkeit verfügbar.</p>
         <div class="intern-ai-upload" id="excel-drop-zone" style="margin-top:12px">
           <div class="intern-ai-upload__icon">📊</div>
           <p><strong>Excel-Datei hierher ziehen</strong> oder klicken zum Auswählen</p>
@@ -2820,19 +2824,19 @@ async function renderSharePointImport(context: AppContext) {
       <div class="intern-card" style="margin-bottom:16px">
         <h2>📷 Fotos einlesen</h2>
         <p class="intern-meta">
-          Zuerst die Excel-Liste übernehmen, danach den vollständigen Fotoordner auswählen. Die Dateien werden natürlich sortiert:
+          Die Fotos werden direkt aus dem hinterlegten SharePoint-Ordner geladen und natürlich sortiert:
           Ein Foto mit Schlagzahl startet einen Flügel; alle folgenden Fotos gehören zu diesem Flügel, bis die nächste Schlagzahl erkannt wird.
         </p>
         <div class="intern-ai-upload" id="photo-drop-zone" style="margin-top:12px">
           <div class="intern-ai-upload__icon">📷</div>
-          <p><strong>Fotoordner hierher ziehen</strong> oder klicken zum Auswählen</p>
-          <p class="intern-meta">JPG, PNG, TIFF · der Dateiname bestimmt die Reihenfolge</p>
+          <p><strong>SharePoint-Fotos automatisch einlesen</strong></p>
+          <p class="intern-meta">Die lokale Ordnerauswahl ist nur eine optionale Ausweichmöglichkeit.</p>
           <input type="file" id="photo-file-input" accept="image/*,.tiff,.tif" multiple webkitdirectory directory hidden />
         </div>
         <div id="photo-status" style="margin-top:8px"></div>
         <div id="photo-queue" style="margin-top:12px"></div>
         <div class="intern-actions" id="photo-actions" style="display:none;margin-top:12px">
-          <button class="sv-button sv-button-primary" id="photo-upload-btn">📤 Fotos hochladen</button>
+          <button class="sv-button sv-button-primary" id="photo-upload-btn">Fotos übernehmen</button>
           <button class="sv-button sv-button-secondary" id="photo-clear-btn">Auswahl löschen</button>
         </div>
         <div id="photo-upload-status" style="margin-top:8px"></div>
@@ -2887,11 +2891,6 @@ async function renderSharePointImport(context: AppContext) {
   const aiPromptInput = context.root.querySelector<HTMLTextAreaElement>('#sp-ai-prompt')!;
   const aiRunBtn = context.root.querySelector<HTMLButtonElement>('#sp-ai-run-btn')!;
   const autoReadBtn = context.root.querySelector<HTMLButtonElement>('#sp-auto-read-btn')!;
-  const manualImportCards = [
-    context.root.querySelector<HTMLElement>('#excel-drop-zone')?.closest('.intern-card'),
-    context.root.querySelector<HTMLElement>('#photo-drop-zone')?.closest('.intern-card'),
-  ].filter((card): card is HTMLElement => Boolean(card));
-
   const runAiPrompt = () => {
     const prompt = aiPromptInput.value.trim();
     if (!prompt) {
@@ -2917,21 +2916,39 @@ async function renderSharePointImport(context: AppContext) {
     excelApplyBtn?.click();
   };
 
-  const runAutoRead = () => {
-    const prompt = aiPromptInput.value.trim();
-    const folderUrl = urlInput.value.trim();
-    if (!prompt) {
-      urlStatus.innerHTML = infoAlert('Bitte erst eine KI-Anweisung für den automatischen Einlesevorgang eingeben.');
-      return;
-    }
-    if (!folderUrl) {
-      urlStatus.innerHTML = infoAlert('Bitte erst die SharePoint-Verknüpfung hinterlegen.');
-      return;
-    }
+  const runAutoRead = async () => {
+    autoReadBtn.disabled = true;
+    autoReadBtn.textContent = 'SharePoint wird gelesen…';
+    urlStatus.innerHTML = infoAlert('Excel-Liste wird direkt aus SharePoint geladen…');
+    try {
+      const excel = await apiImportSharePointExcel();
+      if (!excel) throw new Error('Excel-Datei konnte nicht aus SharePoint gelesen werden.');
+      excelRows = excel.rows;
+      excelColumns = excel.columns;
+      excelStatus.innerHTML = successAlert(`„${escapeHtml(excel.file_name)}“: ${excel.rows.length} Zeilen erkannt.`);
+      renderExcelPreview(excel.rows, excel.columns);
+      const schlagzahlCol = excel.columns.find((column) => /schlagzahl|schlagnr|fenster.?nr|window.?no/i.test(column)) ?? '';
+      if (!schlagzahlCol) throw new Error('Die Spalte mit der Schlagzahl wurde nicht erkannt.');
+      const colSelect = context.root.querySelector<HTMLSelectElement>('#schlagzahl-col');
+      if (colSelect) colSelect.value = schlagzahlCol;
 
-    manualImportCards.forEach((card) => { card.style.display = ''; });
-    urlStatus.innerHTML = infoAlert('Bitte jetzt die Excel-Datei und anschließend den Fotoordner auswählen. Nach der Excel-Übernahme wird die Fotosequenz automatisch den angelegten Flügeln zugeordnet.');
-    context.root.querySelector<HTMLInputElement>('#excel-file-input')?.click();
+      urlStatus.innerHTML = infoAlert('Fenster und Mängel werden angelegt bzw. aktualisiert…');
+      const { result, error } = await apiApplyExcelRows(activeBuildingId, excel.rows, schlagzahlCol);
+      if (!result) throw error ?? new Error('Excel-Daten konnten nicht übernommen werden.');
+      importTargets = result.targets ?? [];
+      const applyStatus = context.root.querySelector<HTMLElement>('#excel-apply-status');
+      if (applyStatus) applyStatus.innerHTML = successAlert(`Übernommen: ${result.added} neu, ${result.updated} aktualisiert, ${result.skipped} übersprungen.`);
+      appendImportLog(`SharePoint-Excel: ${result.added} neu, ${result.updated} aktualisiert, ${result.skipped} übersprungen`);
+
+      urlStatus.innerHTML = infoAlert('Fotoordner wird direkt aus SharePoint geladen…');
+      await loadPhotosFromSharePoint();
+      urlStatus.innerHTML = successAlert('Excel-Liste und Fotoordner wurden direkt aus SharePoint eingelesen. Bitte die Fotozuordnung prüfen und anschließend „Fotos übernehmen“ wählen.');
+    } catch (error) {
+      urlStatus.innerHTML = errorAlert(error instanceof Error ? error.message : 'SharePoint konnte nicht eingelesen werden.');
+    } finally {
+      autoReadBtn.disabled = false;
+      autoReadBtn.textContent = 'Direkt aus SharePoint einlesen';
+    }
   };
 
   aiRunBtn.addEventListener('click', runAiPrompt);
@@ -3073,6 +3090,32 @@ async function renderSharePointImport(context: AppContext) {
   const photoActions = context.root.querySelector<HTMLElement>('#photo-actions')!;
   let selectedPhotos: File[] = [];
   let photoAssignments: Array<{ target: SharePointImportTarget; category: string } | null> = [];
+  const sharePointPhotoByFile = new WeakMap<File, SharePointPhoto>();
+
+  async function loadPhotosFromSharePoint() {
+    const photoStatus = context.root.querySelector<HTMLElement>('#photo-status')!;
+    const items = await apiListSharePointPhotos();
+    if (!items.length) throw new Error('Im konfigurierten SharePoint-Fotoordner wurden keine Bilder gefunden.');
+    photoStatus.innerHTML = infoAlert(`${items.length} SharePoint-Fotos gefunden; Vorschaudaten werden für die Schlagzahlerkennung geladen…`);
+
+    const loaded: Array<File | null> = Array(items.length).fill(null);
+    let cursor = 0;
+    let completed = 0;
+    const loadNext = async () => {
+      while (cursor < items.length) {
+        const index = cursor++;
+        const file = await apiFetchSharePointPhoto(items[index]);
+        loaded[index] = file;
+        if (file) sharePointPhotoByFile.set(file, items[index]);
+        completed++;
+        photoStatus.innerHTML = infoAlert(`${completed} / ${items.length} SharePoint-Fotos geladen…`);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(4, items.length) }, () => loadNext()));
+    selectedPhotos = loaded.filter((file): file is File => file !== null);
+    if (!selectedPhotos.length) throw new Error('Die SharePoint-Fotos konnten nicht geladen werden.');
+    renderPhotoQueue();
+  }
 
   function normalizeSchlagzahlValue(value: string): string {
     const digits = value.match(/\d{1,6}/g)?.map((match) => match.replace(/^0+/, '') || '0') ?? [];
@@ -3295,19 +3338,22 @@ async function renderSharePointImport(context: AppContext) {
 
       if (!assignment || !sz) { fail++; continue; }
 
-      const result = await apiUploadSharePointPhoto(activeBuildingId, sz, file, cat, assignment.target.sash_id);
+      const sharePointItem = sharePointPhotoByFile.get(file);
+      const result = sharePointItem
+        ? await apiImportSharePointPhoto(activeBuildingId, sz, sharePointItem, cat, assignment.target.sash_id)
+        : await apiUploadSharePointPhoto(activeBuildingId, sz, file, cat, assignment.target.sash_id);
       const row = context.root.querySelector<HTMLElement>(`#photo-row-${i}`);
       if (row) {
         row.style.background = result.ok ? '#e8f5e9' : '#ffebee';
       }
       if (result.ok) ok++; else fail++;
 
-      uploadStatus.innerHTML = infoAlert(`${ok + fail} / ${selectedPhotos.length} hochgeladen…`);
+      uploadStatus.innerHTML = infoAlert(`${ok + fail} / ${selectedPhotos.length} übernommen…`);
     }
 
     uploadStatus.innerHTML = ok > 0
-      ? successAlert(`${ok} Foto(s) erfolgreich hochgeladen.${fail > 0 ? ` ${fail} fehlgeschlagen (Schlagzahl nicht gefunden oder fehlt).` : ''}`)
-      : errorAlert(`${fail} Foto(s) konnten nicht hochgeladen werden. Bitte Schlagzahl prüfen.`);
+      ? successAlert(`${ok} Foto(s) erfolgreich übernommen.${fail > 0 ? ` ${fail} fehlgeschlagen (Schlagzahl nicht gefunden oder fehlt).` : ''}`)
+      : errorAlert(`${fail} Foto(s) konnten nicht übernommen werden. Bitte Schlagzahl prüfen.`);
     uploadBtn.textContent = '✓ Fertig';
     appendImportLog(`Fotos: ${ok} erfolgreich, ${fail} fehlgeschlagen`);
   });

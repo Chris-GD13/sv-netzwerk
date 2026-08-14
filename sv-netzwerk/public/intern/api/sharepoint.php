@@ -6,6 +6,10 @@
  * - GET  ?action=get_url&building_id={id}
  * - POST ?action=set_url
  * - POST ?action=import_excel (multipart file)
+ * - POST ?action=import_sharepoint_excel
+ * - GET  ?action=list_sharepoint_photos
+ * - GET  ?action=sharepoint_photo&id={driveItemId}
+ * - POST ?action=import_sharepoint_photo
  * - POST ?action=apply_excel
  * - POST ?action=upload_photo (multipart file)
  */
@@ -22,10 +26,136 @@ match ($action) {
     'get_url' => handleGetUrl(),
     'set_url' => handleSetUrl(),
     'import_excel' => handleImportExcel(),
+    'import_sharepoint_excel' => handleImportSharePointExcel(),
+    'list_sharepoint_photos' => handleListSharePointPhotos(),
+    'sharepoint_photo' => handleSharePointPhoto(),
+    'import_sharepoint_photo' => handleImportSharePointPhoto($user),
     'apply_excel' => handleApplyExcel($user),
     'upload_photo' => handleUploadPhoto($user),
     default => apiError(404, 'Unbekannter SharePoint-Endpunkt.'),
 };
+
+function graphConfig(string $key, string $default = ''): string
+{
+    $value = getenv($key);
+    return $value === false || trim($value) === '' ? $default : trim($value);
+}
+
+function graphAccessToken(): string
+{
+    static $token = null;
+    if (is_string($token) && $token !== '') {
+        return $token;
+    }
+
+    $tenantId = graphConfig('MS_TENANT_ID');
+    $clientId = graphConfig('MS_CLIENT_ID');
+    $clientSecret = graphConfig('MS_CLIENT_SECRET');
+    if ($tenantId === '' || $clientId === '' || $clientSecret === '') {
+        apiError(503, 'Die SharePoint-Verbindung ist auf dem Server noch nicht vollständig eingerichtet.');
+    }
+
+    $curl = curl_init('https://login.microsoftonline.com/' . rawurlencode($tenantId) . '/oauth2/v2.0/token');
+    curl_setopt_array($curl, [
+        CURLOPT_POST => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
+        CURLOPT_POSTFIELDS => http_build_query([
+            'client_id' => $clientId,
+            'client_secret' => $clientSecret,
+            'scope' => 'https://graph.microsoft.com/.default',
+            'grant_type' => 'client_credentials',
+        ]),
+    ]);
+    $response = curl_exec($curl);
+    $status = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $error = curl_error($curl);
+    curl_close($curl);
+    $decoded = is_string($response) ? json_decode($response, true) : null;
+    if ($status < 200 || $status >= 300 || !is_array($decoded) || empty($decoded['access_token'])) {
+        apiError(503, 'Microsoft-Anmeldung für den SharePoint-Import fehlgeschlagen.' . ($error !== '' ? ' ' . $error : ''));
+    }
+    $token = (string) $decoded['access_token'];
+    return $token;
+}
+
+function graphRequest(string $url, bool $binary = false): array|string
+{
+    $curl = curl_init($url);
+    curl_setopt_array($curl, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_TIMEOUT => $binary ? 120 : 45,
+        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . graphAccessToken()],
+    ]);
+    $response = curl_exec($curl);
+    $status = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $contentType = (string) curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
+    $error = curl_error($curl);
+    curl_close($curl);
+    if ($status < 200 || $status >= 300 || !is_string($response)) {
+        apiError(503, 'SharePoint konnte nicht gelesen werden (HTTP ' . $status . ').' . ($error !== '' ? ' ' . $error : ''));
+    }
+    if ($binary) {
+        return ['body' => $response, 'content_type' => $contentType];
+    }
+    $decoded = json_decode($response, true);
+    if (!is_array($decoded)) {
+        apiError(503, 'SharePoint hat eine ungültige Antwort geliefert.');
+    }
+    return $decoded;
+}
+
+function graphSiteId(): string
+{
+    static $siteId = null;
+    if (is_string($siteId) && $siteId !== '') {
+        return $siteId;
+    }
+    $configured = graphConfig('MS_SHAREPOINT_SITE_ID');
+    if ($configured !== '') {
+        return $siteId = $configured;
+    }
+    $host = graphConfig('MS_SHAREPOINT_HOST', 'sv1schuett.sharepoint.com');
+    $path = graphConfig('MS_SHAREPOINT_SITE_PATH', '/sites/SVBroSchtt');
+    $site = graphRequest('https://graph.microsoft.com/v1.0/sites/' . rawurlencode($host) . ':' . str_replace('%2F', '/', rawurlencode($path)) . '?$select=id');
+    $siteId = (string) ($site['id'] ?? '');
+    if ($siteId === '') {
+        apiError(503, 'Die konfigurierte SharePoint-Site wurde nicht gefunden.');
+    }
+    return $siteId;
+}
+
+function graphDriveId(): string
+{
+    static $driveId = null;
+    if (is_string($driveId) && $driveId !== '') {
+        return $driveId;
+    }
+    $configured = graphConfig('MS_SHAREPOINT_DRIVE_ID');
+    if ($configured !== '') {
+        return $driveId = $configured;
+    }
+    $drive = graphRequest('https://graph.microsoft.com/v1.0/sites/' . rawurlencode(graphSiteId()) . '/drive?$select=id');
+    $driveId = (string) ($drive['id'] ?? '');
+    if ($driveId === '') {
+        apiError(503, 'Die SharePoint-Dokumentbibliothek wurde nicht gefunden.');
+    }
+    return $driveId;
+}
+
+function graphItemByPath(string $path): array
+{
+    $segments = array_map('rawurlencode', array_values(array_filter(explode('/', trim($path, '/')), static fn($part) => $part !== '')));
+    $encodedPath = implode('/', $segments);
+    return graphRequest('https://graph.microsoft.com/v1.0/drives/' . rawurlencode(graphDriveId()) . '/root:/' . $encodedPath . '?$select=id,name,size,file,folder');
+}
+
+function graphDownloadItem(string $itemId): array
+{
+    return graphRequest('https://graph.microsoft.com/v1.0/drives/' . rawurlencode(graphDriveId()) . '/items/' . rawurlencode($itemId) . '/content', true);
+}
 
 function sharePointStatePath(): string
 {
@@ -246,6 +376,106 @@ function handleImportExcel(): never
     }
 
     apiJson(['ok' => true, 'rows' => $normalizedRows, 'columns' => $headers]);
+}
+
+function spreadsheetResult(string $path, string $name): array
+{
+    $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+    if ($ext === 'csv') {
+        $rows = parseCsvRows($path);
+    } elseif (in_array($ext, ['xls', 'xlsx', 'xlsm', 'xlsb'], true)) {
+        $rows = parseXlsxRows($path);
+    } else {
+        apiError(400, 'Die SharePoint-Datei ist keine unterstützte Excel- oder CSV-Datei.');
+    }
+    if ($rows === []) {
+        apiError(422, 'Die Excel-Datei aus SharePoint enthielt keine lesbaren Daten.');
+    }
+    return [
+        'rows' => array_map(static function (array $row): array {
+            $normalized = [];
+            foreach ($row as $key => $value) {
+                $normalized[(string) $key] = $value;
+            }
+            return $normalized;
+        }, $rows),
+        'columns' => array_values(array_map('trim', array_keys($rows[0]))),
+    ];
+}
+
+function handleImportSharePointExcel(): never
+{
+    $path = graphConfig(
+        'MS_SHAREPOINT_EXCEL_PATH',
+        'VS Schäden/Marc/Privatgutachten/2026/Bundesministerium Verteidigung_Bonn/BW fesnterprüfung.xlsx'
+    );
+    $item = graphItemByPath($path);
+    $itemId = (string) ($item['id'] ?? '');
+    if ($itemId === '') {
+        apiError(404, 'Die konfigurierte Excel-Datei wurde in SharePoint nicht gefunden.');
+    }
+    $download = graphDownloadItem($itemId);
+    $tmp = tempnam(sys_get_temp_dir(), 'sp-excel-');
+    if ($tmp === false || file_put_contents($tmp, $download['body']) === false) {
+        apiError(503, 'Die Excel-Datei konnte nicht zwischengespeichert werden.');
+    }
+    try {
+        $result = spreadsheetResult($tmp, (string) ($item['name'] ?? basename($path)));
+    } finally {
+        @unlink($tmp);
+    }
+    apiJson(['ok' => true, 'file_name' => (string) ($item['name'] ?? basename($path))] + $result);
+}
+
+function handleListSharePointPhotos(): never
+{
+    $path = graphConfig(
+        'MS_SHAREPOINT_PHOTO_PATH',
+        'VS Schäden/Marc/Privatgutachten/2026/Bundesministerium Verteidigung_Bonn/Bilder Gebäude 800/EG'
+    );
+    $folder = graphItemByPath($path);
+    $folderId = (string) ($folder['id'] ?? '');
+    if ($folderId === '') {
+        apiError(404, 'Der konfigurierte Fotoordner wurde in SharePoint nicht gefunden.');
+    }
+
+    $url = 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode(graphDriveId()) . '/items/' . rawurlencode($folderId)
+        . '/children?$select=id,name,size,file,createdDateTime,lastModifiedDateTime&$top=200';
+    $photos = [];
+    while ($url !== '') {
+        $page = graphRequest($url);
+        foreach (($page['value'] ?? []) as $item) {
+            if (!is_array($item) || empty($item['file'])) {
+                continue;
+            }
+            $name = (string) ($item['name'] ?? '');
+            if (!preg_match('/\.(jpe?g|png|webp|tiff?|heic|heif)$/i', $name)) {
+                continue;
+            }
+            $photos[] = [
+                'id' => (string) ($item['id'] ?? ''),
+                'name' => $name,
+                'size' => (int) ($item['size'] ?? 0),
+                'mime_type' => (string) ($item['file']['mimeType'] ?? 'application/octet-stream'),
+            ];
+        }
+        $url = (string) ($page['@odata.nextLink'] ?? '');
+    }
+    usort($photos, static fn(array $a, array $b): int => strnatcasecmp($a['name'], $b['name']));
+    apiJson(['ok' => true, 'folder_name' => (string) ($folder['name'] ?? basename($path)), 'photos' => $photos]);
+}
+
+function handleSharePointPhoto(): never
+{
+    $itemId = trim((string) ($_GET['id'] ?? ''));
+    if ($itemId === '') {
+        apiError(400, 'SharePoint-Datei-ID fehlt.');
+    }
+    $download = graphDownloadItem($itemId);
+    header('Content-Type: ' . ($download['content_type'] !== '' ? $download['content_type'] : 'application/octet-stream'));
+    header('Cache-Control: private, max-age=300');
+    echo $download['body'];
+    exit;
 }
 
 function importRowValue(array $row, array $needles): string
@@ -637,6 +867,81 @@ function handleUploadPhoto(array $user): never
     }
 
     apiJson(['ok' => true, 'window_id' => $windowId, 'sash_id' => $sashId ?: null, 'message' => 'Foto zu Schlagzahl ' . $schlagzahl . ' zugeordnet.']);
+}
+
+function handleImportSharePointPhoto(array $user): never
+{
+    $body = requestBody();
+    $buildingId = (int) ($body['building_id'] ?? 0);
+    $sashId = (int) ($body['sash_id'] ?? 0);
+    $schlagzahl = normalizeSchlagzahl($body['schlagzahl'] ?? '');
+    $itemId = trim((string) ($body['item_id'] ?? ''));
+    $fileName = basename(trim((string) ($body['file_name'] ?? 'SharePoint-Foto.jpg')));
+    $category = trim((string) ($body['category'] ?? 'Fensterkennzeichnung'));
+    if ($buildingId <= 0 || $sashId <= 0 || $schlagzahl === '' || $itemId === '') {
+        apiError(400, 'Gebäude, Flügel, Schlagzahl und SharePoint-Datei-ID sind erforderlich.');
+    }
+
+    $targetStmt = db()->prepare(
+        'SELECT w.id, ws.id AS sash_id
+         FROM window_sashes ws
+         JOIN windows w ON w.id = ws.window_id
+         JOIN rooms ro ON ro.id = w.room_id
+         JOIN floors fl ON fl.id = ro.floor_id
+         WHERE ws.id = :sid AND fl.building_id = :bid AND w.window_number = :wn
+           AND ws.deleted_at IS NULL AND w.deleted_at IS NULL LIMIT 1'
+    );
+    $targetStmt->execute([':sid' => $sashId, ':bid' => $buildingId, ':wn' => $schlagzahl]);
+    $target = $targetStmt->fetch(PDO::FETCH_ASSOC);
+    if (!$target) {
+        apiError(404, 'Der zugeordnete Flügel wurde nicht gefunden.');
+    }
+    $windowId = (int) $target['id'];
+
+    $duplicate = db()->prepare('SELECT id FROM photos WHERE sash_id = :sid AND file_name = :fn LIMIT 1');
+    $duplicate->execute([':sid' => $sashId, ':fn' => $fileName]);
+    if ($duplicate->fetchColumn()) {
+        apiJson(['ok' => true, 'window_id' => $windowId, 'sash_id' => $sashId, 'message' => 'Foto war bereits vorhanden.']);
+    }
+
+    $download = graphDownloadItem($itemId);
+    $mimeType = strtolower(trim(explode(';', (string) $download['content_type'])[0]));
+    $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'image/tiff'];
+    if (!in_array($mimeType, $allowed, true)) {
+        apiError(400, 'Die SharePoint-Datei ist kein unterstütztes Bildformat.');
+    }
+    $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+    $ext = preg_replace('/[^a-z0-9]/', '', $ext) ?: 'jpg';
+    $storageDir = photosDir() . '/' . $windowId;
+    if (!is_dir($storageDir) && !mkdir($storageDir, 0775, true) && !is_dir($storageDir)) {
+        apiError(503, 'Foto-Verzeichnis konnte nicht erstellt werden.');
+    }
+    $safeName = bin2hex(random_bytes(12)) . '.' . $ext;
+    $filePath = $storageDir . '/' . $safeName;
+    if (file_put_contents($filePath, $download['body']) === false) {
+        apiError(503, 'Das SharePoint-Foto konnte nicht gespeichert werden.');
+    }
+    try {
+        db()->prepare(
+            'INSERT INTO photos (window_id, sash_id, category, caption, file_name, storage_path, inspector_id, inspector_name, taken_at, created_at)
+             VALUES (:wid, :sid, :cat, :cap, :fn, :sp, :uid, :uname, :taken_at, :created_at)'
+        )->execute([
+            ':wid' => $windowId,
+            ':sid' => $sashId,
+            ':cat' => $category,
+            ':cap' => null,
+            ':fn' => $fileName,
+            ':sp' => (string) $windowId . '/' . $safeName,
+            ':uid' => (int) $user['id'],
+            ':uname' => $user['full_name'] ?: $user['email'],
+            ':taken_at' => nowUtc(),
+            ':created_at' => nowUtc(),
+        ]);
+    } catch (Throwable $e) {
+        @unlink($filePath);
+        apiError(503, 'Das SharePoint-Foto konnte nicht registriert werden: ' . $e->getMessage());
+    }
+    apiJson(['ok' => true, 'window_id' => $windowId, 'sash_id' => $sashId, 'message' => 'SharePoint-Foto wurde zugeordnet.']);
 }
 
 function detectCsvDelimiter(string $path): string
