@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.31 – 2026-08-15
+- automatischer morgens Fachbeitrag veröffentlicht: „Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz (2)"
+- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt
+- Beitragsbild unter /assets/images/linkedin/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2.svg erzeugt
+
 ## 3.4.30 – 2026-08-12
 - automatischer morgens Fachbeitrag veröffentlicht: „Kumulschäden nach Sturm und Hagel: Belastbare Prüffolge für die Regulierungspraxis (2)"
 - LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt
