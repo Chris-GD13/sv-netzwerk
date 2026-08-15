@@ -2,8 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { site } from '../../data/site';
 
-const feedUrl = 'https://e7azg7.podcaster.de/sv-netzwerk.rss';
-const podcastUrl = 'https://e7azg7.podcaster.de/';
+const feedUrl = 'https://e7azq7.podcaster.de/sv-netzwerk.rss';
 const pageUrl = `${site.url}/podcast/`;
 const podcastSchema = {
   '@context': 'https://schema.org',
@@ -21,7 +20,7 @@ const podcastSchema = {
     url: `${site.url}/experten/christian-waechter/`,
   },
   publisher: { '@id': `${site.url}#organization` },
-  sameAs: [podcastUrl, feedUrl],
+  sameAs: [feedUrl],
 };
 ---
 
@@ -38,8 +37,7 @@ const podcastSchema = {
       <h1>Fachwissen zu Bau, Schaden und Regulierung – zum Hören.</h1>
       <p class="podcast-lead">Christian Wächter ordnet technische Schadenbilder, Beweissicherung, Sanierungsmaßnahmen und versicherungsrelevante Abgrenzungsfragen nachvollziehbar ein. Die Folgen richten sich an Sachverständige, Versicherer, Regulierer, Handwerksbetriebe und Immobilienverantwortliche.</p>
       <div class="podcast-actions">
-        <a class="sv-button sv-button-primary" href={podcastUrl} rel="me noopener">Alle Folgen anhören</a>
-        <a class="sv-button sv-button-secondary" href={feedUrl} rel="alternate" type="application/rss+xml">RSS-Feed abonnieren</a>
+        <a class="sv-button sv-button-primary" href={feedUrl} rel="alternate" type="application/rss+xml">Podcast abonnieren</a>
       </div>
     </div>
   </section>

@@ -8,7 +8,6 @@ export const site = {
   address: ['Nordstraße 17', '73432 Aalen'],
   sameAs: [
     'https://github.com/Chris-GD13',
-    'https://e7azg7.podcaster.de/',
   ],
   author: {
     name: 'Christian Wächter',
