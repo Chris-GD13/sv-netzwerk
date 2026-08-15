@@ -7,6 +7,7 @@ export type LibraryItem = {
   category: string;
   tags: string[];
   date: string;
+  publishedAt?: string;
   type: LibraryType;
   featured?: boolean;
 };
@@ -29,6 +30,7 @@ export const library: LibraryItem[] = [
     category: 'Dach und Gebäudehülle',
     tags: ['Polycarbonat', 'Stegplatten', 'Hagelschaden', 'Spannungsrisse', 'Montagefehler', 'Schadenabgrenzung'],
     date: '2026-08-15',
+    publishedAt: '2026-08-15T19:32:25Z',
     type: 'article',
     featured: false,
   },
@@ -511,7 +513,13 @@ export const formatDate = (value: string) => new Intl.DateTimeFormat('de-DE', {
 
 import { filterPublishedLibraryItems } from '../utils/publication';
 
-export const sortedLibrary = filterPublishedLibraryItems([...library]).sort((a, b) => b.date.localeCompare(a.date));
+const publicationTime = (item: LibraryItem) => {
+  const value = item.publishedAt ?? `${item.date}T00:00:00Z`;
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+export const sortedLibrary = filterPublishedLibraryItems([...library]).sort((a, b) => publicationTime(b) - publicationTime(a));
 export const categories = [...new Set(sortedLibrary.map((item) => item.category))]
   .sort((a, b) => a.localeCompare(b, 'de'));
 
