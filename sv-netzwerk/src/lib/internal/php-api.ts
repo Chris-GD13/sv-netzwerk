@@ -71,6 +71,30 @@ export function getProjectSlug(): string {
   return getProjectSlugRaw();
 }
 
+export type AnalysisGroupType = 'building' | 'floor' | 'inspector' | 'system';
+export type AnalysisGroupAction = 'rename' | 'move' | 'archive' | 'delete';
+
+export async function apiManageAnalysisGroup(
+  groupType: AnalysisGroupType,
+  groupValue: string,
+  action: AnalysisGroupAction,
+  targetValue?: string,
+): Promise<{ ok: boolean; affected: number; value?: string } | null> {
+  const query = new URLSearchParams({ project_id: String(getProjectId()) });
+  const { data, error } = await apiFetch<{ ok: boolean; affected: number; value?: string }>(
+    `/analysis-groups.php?${query.toString()}`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ group_type: groupType, group_value: groupValue, action, target_value: targetValue }),
+    },
+  );
+  if (error) {
+    console.error('[analysis-groups]', error);
+    return null;
+  }
+  return data;
+}
+
 // ── HTTP-Hilfsfunktionen ────────────────────────────────────────────────────
 
 async function apiFetch<T>(
