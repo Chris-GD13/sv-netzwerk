@@ -189,6 +189,32 @@ function nowUtc(): string
     return (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d H:i:s');
 }
 
+/** Schreibt die in alten Excel-Listen verwendeten Prüfkuerzel verständlich aus. */
+function expandInspectionAbbreviations(string $text): string
+{
+    $labels = [
+        'MEG' => 'muss eingestellt werden',
+        'WA'  => 'Wartung notwendig',
+        'SOK' => 'sonst OK',
+        'SC'  => 'schleift',
+        'SB'  => 'Scheibe',
+        'BE'  => 'Beschlag defekt',
+    ];
+    return preg_replace_callback('/\b(MEG|WA|SOK|SC|SB|BE)\b/iu', static function (array $match) use ($labels): string {
+        return $labels[strtoupper($match[1])] ?? $match[0];
+    }, $text) ?? $text;
+}
+
+function normalizeInspectionFormRemarks(array $data): array
+{
+    foreach (['visible_special_features', 'expert_note', 'recommended_action', 'accessibility_note'] as $field) {
+        if (isset($data[$field]) && is_string($data[$field])) {
+            $data[$field] = expandInspectionAbbreviations($data[$field]);
+        }
+    }
+    return $data;
+}
+
 /** Setzt gemeinsame HTTP-Header (CORS nur für gleiche Herkunft, CSP). */
 function commonHeaders(): void
 {
