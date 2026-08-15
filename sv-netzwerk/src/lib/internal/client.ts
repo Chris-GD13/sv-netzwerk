@@ -2787,7 +2787,12 @@ async function renderExport(context: AppContext) {
       `).join('')}
       <article class="intern-export-card">
         <h2>PDF-Einzelprotokoll</h2>
-        <p>Direkt aus einem Fensterdatensatz per Browser-Druckansicht erzeugbar.</p>
+        <p>Erzeugt eine druckfähige Einzelansicht einschließlich der zugeordneten Fotos.</p>
+        <label class="intern-meta" for="single-pdf-window">Fenster auswählen</label>
+        <select class="intern-input" id="single-pdf-window">
+          ${records.map((record) => `<option value="${escapeHtml(record.id)}">${escapeHtml(record.window_number || record.record_id)} · ${escapeHtml(record.room_number || record.room_label || 'ohne Raum')}</option>`).join('')}
+        </select>
+        <div class="intern-actions"><button class="sv-button sv-button-secondary" type="button" id="print-single">Druckansicht öffnen</button></div>
       </article>
       <article class="intern-export-card">
         <h2>PDF-Sammelprotokoll</h2>
@@ -2805,6 +2810,14 @@ async function renderExport(context: AppContext) {
   });
   context.root.querySelector<HTMLButtonElement>('#print-summary')?.addEventListener('click', async () => {
     await printSummary(records);
+  });
+  context.root.querySelector<HTMLButtonElement>('#print-single')?.addEventListener('click', async () => {
+    const id = context.root.querySelector<HTMLSelectElement>('#single-pdf-window')?.value;
+    if (!id) { alert('Bitte zuerst ein Fenster auswählen.'); return; }
+    const record = await fetchWindowRecord(context, id);
+    if (!record) { alert('Der Fensterdatensatz konnte nicht geladen werden.'); return; }
+    const photos = await apiListPhotos(id);
+    printWindowReport(record, photos);
   });
   bindHeaderLogout(context);
 }
@@ -4404,8 +4417,28 @@ async function exportRecords(context: AppContext, exportId: string, records: Win
   const definition = exportDefinitions.find((item) => item.id === exportId);
   if (!definition) return;
   const rows = records.filter(definition.filter);
-  const delimiter = exportId === 'excel-all' ? ';' : ',';
   const header = ['Datensatz', 'Fensternummer', 'Gebäude', 'Gebäudeteil', 'Etage', 'Raumnummer', 'Status', 'Bewertung', 'Priorität', 'Prüfer', 'Letzte Änderung'];
+  const tableRows = rows.map((record) => [
+    record.record_id,
+    record.window_number,
+    record.building_label ?? '',
+    record.section_label ?? '',
+    record.floor_label ?? '',
+    record.room_number ?? '',
+    record.status,
+    record.overall_rating ?? '',
+    record.priority ?? '',
+    record.assigned_name ?? '',
+    record.updated_at,
+  ]);
+  if (exportId === 'excel-all') {
+    const workbook = createExcelCompatibleWorkbook(header, tableRows);
+    const fileName = `${definition.id}-${new Date().toISOString().slice(0, 10)}.xls`;
+    downloadBlob(fileName, workbook, 'application/vnd.ms-excel;charset=utf-8');
+    void apiLogExport(definition.title, fileName, { exportId, rowCount: rows.length, orientation: 'landscape', fitToWidth: 1 });
+    return;
+  }
+  const delimiter = ',';
   const csv = [header.join(delimiter), ...rows.map((record) => [
     record.record_id,
     record.window_number,
@@ -4423,13 +4456,23 @@ async function exportRecords(context: AppContext, exportId: string, records: Win
   void apiLogExport(definition.title, `${definition.id}.csv`, { exportId, rowCount: rows.length });
 }
 
+function createExcelCompatibleWorkbook(header: string[], rows: Array<Array<unknown>>): string {
+  const cell = (value: unknown, heading = false) => `<${heading ? 'th' : 'td'}>${escapeHtml(String(value ?? ''))}</${heading ? 'th' : 'td'}>`;
+  return `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>
+    @page{size:A4 landscape;margin:10mm;mso-page-orientation:landscape}table{border-collapse:collapse;table-layout:auto}th,td{border:1px solid #999;padding:4px;white-space:nowrap}th{font-weight:bold;background:#d9e7f5}
+  </style><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Fenster</x:Name><x:WorksheetOptions><x:Selected/><x:FitToPage/><x:Print><x:ValidPrinterInfo/><x:HorizontalResolution>600</x:HorizontalResolution><x:VerticalResolution>600</x:VerticalResolution><x:Landscape/><x:FitWidth>1</x:FitWidth><x:FitHeight>0</x:FitHeight></x:Print></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table><colgroup>${header.map(() => '<col style="mso-width-source:autofit">').join('')}</colgroup><thead><tr>${header.map((v) => cell(v, true)).join('')}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((v) => cell(v)).join('')}</tr>`).join('')}</tbody></table></body></html>`;
+}
+
 async function printSummary(records: WindowSummary[]) {
-  const popup = window.open('', '_blank', 'noopener,noreferrer,width=1200,height=900');
-  if (!popup) return;
+  if (!records.length) { alert('Für das Sammelprotokoll sind keine Datensätze vorhanden.'); return; }
+  const popup = window.open('', '_blank', 'width=1200,height=900');
+  if (!popup) { alert('Bitte Pop-ups für diese Seite erlauben.'); return; }
+  popup.opener = null;
   popup.document.write(`
-    <html lang="de"><head><title>SV-Netzwerk – Sammelprotokoll</title><style>
-      body{font-family:Arial,sans-serif;padding:24px;color:#071a2e}table{width:100%;border-collapse:collapse}th,td{border:1px solid #d6e0e8;padding:8px;text-align:left}h1{margin-top:0}
+    <!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>SV-Netzwerk – Sammelprotokoll</title><style>
+      @page{size:A4 landscape;margin:12mm}body{font-family:Arial,sans-serif;padding:0;color:#071a2e}table{width:100%;border-collapse:collapse;font-size:9pt}th,td{border:1px solid #d6e0e8;padding:5px;text-align:left;vertical-align:top}h1{margin-top:0}.no-print{margin:0 0 16px}@media print{.no-print{display:none}}
     </style></head><body>
+    <button class="no-print" onclick="window.print()">Als PDF drucken</button>
     <h1>SV-Netzwerk – Sammelprotokoll</h1>
     <p>Datenstand: ${escapeHtml(new Date().toLocaleString('de-DE'))}</p>
     <table><thead><tr><th>Fenster</th><th>Standort</th><th>Status</th><th>Bewertung</th><th>Prioritaet</th></tr></thead><tbody>
@@ -4438,12 +4481,30 @@ async function printSummary(records: WindowSummary[]) {
   `);
   popup.document.close();
   popup.focus();
-  popup.print();
+}
+
+function printWindowReport(record: WindowRecord, photos: PhotoItem[]): void {
+  const popup = window.open('', '_blank', 'width=1000,height=900');
+  if (!popup) { alert('Bitte Pop-ups für diese Seite erlauben.'); return; }
+  popup.opener = null;
+  const data = record.form_data ?? {};
+  const value = (key: string) => escapeHtml(String(data[key] ?? '—'));
+  const photoHtml = photos.length
+    ? photos.map((photo) => `<figure><img src="/intern/api/photos.php?id=${encodeURIComponent(photo.id)}" alt="${escapeHtml(photo.category)}"><figcaption>${escapeHtml(photo.category)} · ${escapeHtml(photo.file_name)}</figcaption></figure>`).join('')
+    : '<p>Keine Fotos zugeordnet.</p>';
+  popup.document.write(`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>Fenster ${escapeHtml(record.window_number || record.record_id)}</title><style>
+    @page{size:A4 portrait;margin:15mm}body{font-family:Arial,sans-serif;color:#071a2e;font-size:10pt}h1{margin:0 0 12px}h2{background:#071a2e;color:#fff;padding:6px 8px;font-size:11pt}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccd7e0;padding:6px;text-align:left;vertical-align:top}th{width:32%;background:#eef4f8}.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.photos img{width:100%;height:220px;object-fit:contain;border:1px solid #ccd7e0}.photos figure{margin:0;break-inside:avoid}.photos figcaption{font-size:8pt;margin-top:3px}.no-print{margin-bottom:12px}@media print{.no-print{display:none}}
+  </style></head><body><button class="no-print" onclick="window.print()">Als PDF drucken</button><h1>Fensterprotokoll ${escapeHtml(record.window_number || record.record_id)}</h1><table>
+    <tr><th>Gebäude</th><td>${escapeHtml(record.building_label ?? '—')}</td></tr><tr><th>Etage</th><td>${escapeHtml(record.floor_label ?? '—')}</td></tr><tr><th>Raum</th><td>${escapeHtml(record.room_number ?? record.room_label ?? '—')}</td></tr><tr><th>Status</th><td>${escapeHtml(record.status)}</td></tr><tr><th>Prüfer</th><td>${escapeHtml(record.assigned_name ?? '—')}</td></tr><tr><th>Sichtbare Besonderheiten</th><td>${value('visible_special_features')}</td></tr><tr><th>Empfohlene Maßnahme</th><td>${value('recommended_action')}</td></tr><tr><th>Sachverständige Bemerkung</th><td>${value('expert_note')}</td></tr>
+  </table><h2>Fotodokumentation</h2><div class="photos">${photoHtml}</div></body></html>`);
+  popup.document.close();
+  popup.focus();
 }
 
 function printSashReport(sash: WindowSashRecord, data: Record<string, unknown>, photos: PhotoItem[]): void {
-  const popup = window.open('', '_blank', 'noopener,noreferrer,width=900,height=1200');
+  const popup = window.open('', '_blank', 'width=900,height=1200');
   if (!popup) { alert('Bitte Pop-ups für diese Seite erlauben.'); return; }
+  popup.opener = null;
 
   const d = (key: string, fallback = '—') => escapeHtml(String(data[key] ?? '') || fallback);
   const chk = (key: string) => Boolean(data[key]) ? '☑' : '☐';
