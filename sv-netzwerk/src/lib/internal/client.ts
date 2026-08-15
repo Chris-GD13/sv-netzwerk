@@ -88,6 +88,7 @@ import {
   apiMoveWindow,
   apiCompleteEntity,
   apiReopenEntity,
+  apiManageAnalysisGroup,
   // Flügel
   apiListSashes,
   apiGetSash,
@@ -2617,10 +2618,10 @@ async function renderAnalysis(context: AppContext) {
       ${renderAnalysisCard('Dringende Sicherungsmaßnahmen', records.filter((record) => record.urgent_action_required || record.danger_immediate).length, 'dringend')}
     </div>
     <div class="intern-grid">
-      <section class="intern-panel"><h2>Ergebnisse je Gebäude</h2>${renderGrouping(groupings, 'building')}</section>
-      <section class="intern-panel"><h2>Ergebnisse je Etage</h2>${renderGrouping(byFloor, 'floor')}</section>
-      <section class="intern-panel"><h2>Ergebnisse je Prüfer</h2>${renderGrouping(byInspector, 'inspector')}</section>
-      <section class="intern-panel"><h2>Ergebnisse je Fenstersystem</h2>${renderGrouping(bySystem, 'system')}</section>
+      <section class="intern-panel"><h2>Ergebnisse je Gebäude</h2>${renderGrouping(groupings, 'building', canEdit(context))}</section>
+      <section class="intern-panel"><h2>Ergebnisse je Etage</h2>${renderGrouping(byFloor, 'floor', canEdit(context))}</section>
+      <section class="intern-panel"><h2>Ergebnisse je Prüfer</h2>${renderGrouping(byInspector, 'inspector', canEdit(context))}</section>
+      <section class="intern-panel"><h2>Ergebnisse je Fenstersystem</h2>${renderGrouping(bySystem, 'system', canEdit(context))}</section>
     </div>
     <div id="analysis-detail" style="display:none; margin-top:1.5rem;">
       <div class="intern-card">
@@ -2690,6 +2691,64 @@ async function renderAnalysis(context: AppContext) {
       else if (type === 'system') filtered = records.filter(r => String((r as unknown as { form_data?: Record<string, unknown> }).form_data?.window_system ?? 'Nicht erfasst') === value);
       showDetail(value, filtered);
     };
+  });
+
+  context.root.querySelectorAll<HTMLButtonElement>('[data-group-menu]').forEach(button => {
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const menu = button.nextElementSibling as HTMLElement | null;
+      context.root.querySelectorAll<HTMLElement>('.intern-action-menu').forEach(other => {
+        if (other !== menu) other.hidden = true;
+      });
+      if (menu) menu.hidden = !menu.hidden;
+    });
+  });
+
+  context.root.querySelectorAll<HTMLButtonElement>('[data-group-action]').forEach(button => {
+    button.addEventListener('click', async (event) => {
+      event.stopPropagation();
+      const card = button.closest<HTMLElement>('[data-group-type]');
+      if (!card) return;
+      const type = card.dataset.groupType as 'building' | 'floor' | 'inspector' | 'system';
+      const value = card.dataset.groupValue ?? '';
+      const action = button.dataset.groupAction as 'edit' | 'rename' | 'move' | 'archive' | 'delete';
+      const items = records.filter((record) => {
+        if (type === 'building') return (record.building_label || 'Unbekannt') === value;
+        if (type === 'floor') return (record.floor_label || 'Unbekannt') === value;
+        if (type === 'inspector') return (record.assigned_name || 'Nicht zugewiesen') === value;
+        return String(record.form_data?.window_system ?? 'Nicht erfasst') === value;
+      });
+
+      if (action === 'edit') {
+        showDetail(value, items);
+        return;
+      }
+
+      let target: string | undefined;
+      if (action === 'rename' || action === 'move') {
+        const wording = action === 'rename' ? 'Neue Bezeichnung' : 'Neues Ziel / neue Zuordnung';
+        target = prompt(`${wording} für „${value}“ (${items.length} Fenster):`, value)?.trim();
+        if (!target || target === value) return;
+      }
+      if (action === 'archive' && !confirm(`„${value}“ mit ${items.length} Fenstern archivieren?\n\nDie Gruppe bleibt wiederherstellbar und wird als archiviert gekennzeichnet.`)) return;
+      if (action === 'delete') {
+        if (context.user?.profile.role !== 'administrator') {
+          alert('Nur Administratoren dürfen Gruppen löschen.');
+          return;
+        }
+        const check = prompt(`ACHTUNG: ${items.length} Fenster werden aus der aktiven Auswertung entfernt.\nZum Bestätigen bitte LÖSCHEN eingeben:`);
+        if (check !== 'LÖSCHEN') return;
+      }
+
+      button.disabled = true;
+      const result = await apiManageAnalysisGroup(type, value, action, target);
+      if (!result?.ok) {
+        button.disabled = false;
+        alert('Die Aktion konnte nicht ausgeführt werden.');
+        return;
+      }
+      await renderAnalysis(context);
+    });
   });
 
   context.root.querySelector('#detail-close')?.addEventListener('click', () => {
@@ -4539,9 +4598,9 @@ function renderAnalysisCard(label: string, value: number, filterKey: string) {
   return `<article class="intern-stat intern-stat--clickable" data-filter="${escapeHtml(filterKey)}" style="cursor:pointer"><span>${escapeHtml(label)}</span><strong>${value}</strong></article>`;
 }
 
-function renderGrouping(groups: Map<string, WindowSummary[]>, groupType: string) {
+function renderGrouping(groups: Map<string, WindowSummary[]>, groupType: string, editable = false) {
   if (!groups.size) return '<div class="intern-empty">Keine Daten vorhanden.</div>';
-  return `<div class="intern-list">${Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([label, items]) => `<div class="intern-card intern-card--clickable" data-group-type="${escapeHtml(groupType)}" data-group-value="${escapeHtml(label)}" style="cursor:pointer"><strong>${escapeHtml(label)}</strong><p class="intern-meta">${items.length} Fenster · ${items.filter((item) => item.has_defect).length} mit Mangel · ${items.filter((item) => item.special_inspection_required).length} Spezialpruefungen</p></div>`).join('')}</div>`;
+  return `<div class="intern-list">${Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([label, items]) => `<div class="intern-card intern-card--clickable" data-group-type="${escapeHtml(groupType)}" data-group-value="${escapeHtml(label)}" style="cursor:pointer;position:relative"><strong>${escapeHtml(label)}</strong><p class="intern-meta">${items.length} Fenster · ${items.filter((item) => item.has_defect).length} mit Mangel · ${items.filter((item) => item.special_inspection_required).length} Spezialprüfungen</p>${editable ? `<div class="intern-card-actions"><button type="button" class="intern-action-btn" data-group-menu aria-label="Aktionen für ${escapeHtml(label)}" title="Aktionen">⋮</button><div class="intern-action-menu" hidden><button type="button" data-group-action="edit">✏️ Bearbeiten</button><button type="button" data-group-action="rename">🔤 Umbenennen</button><button type="button" data-group-action="move">↔️ Verschieben</button><button type="button" data-group-action="archive">📦 Archivieren</button><hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0"><button type="button" data-group-action="delete" style="color:#c62828">🗑️ Löschen</button></div></div>` : ''}</div>`).join('')}</div>`;
 }
 
 function roleBadge(role: PortalRole) {
