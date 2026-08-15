@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../data/site';
+
+const feedUrl = 'https://e7azg7.podcaster.de/sv-netzwerk.rss';
+const podcastUrl = 'https://e7azg7.podcaster.de/';
+const pageUrl = `${site.url}/podcast/`;
+const podcastSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'PodcastSeries',
+  '@id': `${pageUrl}#podcast`,
+  name: 'SV-Netzwerk Podcast',
+  description: 'Fachpodcast über Schadenbewertung, Beweissicherung, Schadenregulierung und technische Versicherungsfragen.',
+  url: pageUrl,
+  webFeed: feedUrl,
+  inLanguage: 'de-DE',
+  author: {
+    '@type': 'Person',
+    name: 'Christian Wächter',
+    jobTitle: 'Sachverständiger und Großschadenregulierer',
+    url: `${site.url}/experten/christian-waechter/`,
+  },
+  publisher: { '@id': `${site.url}#organization` },
+  sameAs: [podcastUrl, feedUrl],
+};
+---
+
+<BaseLayout
+  title="Podcast zu Schadenbewertung und Regulierung | SV-Netzwerk"
+  description="Der SV-Netzwerk Podcast mit Christian Wächter: technische Schadenbewertung, Beweissicherung, Großschadenregulierung und Versicherungsfragen für die Praxis."
+  canonical={pageUrl}
+  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Podcast' }]}
+  structuredData={podcastSchema}
+>
+  <section class="sv-section podcast-hero">
+    <div class="sv-container podcast-shell">
+      <p class="sv-eyebrow">SV-Netzwerk Podcast</p>
+      <h1>Fachwissen zu Bau, Schaden und Regulierung – zum Hören.</h1>
+      <p class="podcast-lead">Christian Wächter ordnet technische Schadenbilder, Beweissicherung, Sanierungsmaßnahmen und versicherungsrelevante Abgrenzungsfragen nachvollziehbar ein. Die Folgen richten sich an Sachverständige, Versicherer, Regulierer, Handwerksbetriebe und Immobilienverantwortliche.</p>
+      <div class="podcast-actions">
+        <a class="sv-button sv-button-primary" href={podcastUrl} rel="me noopener">Alle Folgen anhören</a>
+        <a class="sv-button sv-button-secondary" href={feedUrl} rel="alternate" type="application/rss+xml">RSS-Feed abonnieren</a>
+      </div>
+    </div>
+  </section>
+  <section class="sv-section podcast-topics">
+    <div class="sv-container podcast-shell">
+      <h2>Themen des Podcasts</h2>
+      <div class="podcast-grid">
+        <article><h3>Schadenbewertung</h3><p>Technische Befunde, Schadenursachen und vorhandene Vorschäden fachlich voneinander abgrenzen.</p></article>
+        <article><h3>Beweissicherung</h3><p>Feststellungen, Prüfmethoden und Dokumentation so strukturieren, dass Entscheidungen nachvollziehbar bleiben.</p></article>
+        <article><h3>Regulierungspraxis</h3><p>Notmaßnahmen, Wiederherstellung, Kostenprüfung und Sanierungssteuerung belastbar einordnen.</p></article>
+      </div>
+      <aside class="podcast-note"><strong>Neue Folgen</strong><p>Neue Episoden werden fortlaufend veröffentlicht. Über den RSS-Feed erscheinen sie automatisch in kompatiblen Podcast-Apps.</p></aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .podcast-shell{max-width:68rem}.podcast-hero{background:linear-gradient(135deg,#eaf3f7,#fff7eb)}.podcast-hero h1{max-width:19ch}.podcast-lead{max-width:68ch;color:var(--sv-color-muted);font-size:1.18rem}.podcast-actions{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.6rem}.podcast-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.podcast-grid article{padding:1.25rem;border:1px solid var(--sv-color-line);border-radius:1rem;background:#fff}.podcast-grid h3{margin-top:0}.podcast-note{margin-top:2rem;padding:1rem 1.2rem;border-left:4px solid var(--sv-color-accent);background:var(--sv-color-surface-alt)}.podcast-note p{margin:.3rem 0 0}@media(max-width:48rem){.podcast-grid{grid-template-columns:1fr}}
+</style>

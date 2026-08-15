@@ -1,0 +1,27 @@
+<section class="v4-section home-podcast" aria-labelledby="home-podcast-title">
+  <div class="v4-shell home-podcast__inner">
+    <div class="home-podcast__mark" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="home-podcast__copy">
+      <p class="v4-kicker"><span></span>SV-Netzwerk Podcast</p>
+      <h2 id="home-podcast-title">Fachwissen zum Hören.</h2>
+      <p>Schadenbewertung, Beweissicherung und Regulierung verständlich eingeordnet. Im SV-Netzwerk Podcast bespricht Christian Wächter technische Schadenbilder, typische Abgrenzungsfragen und belastbare Vorgehensweisen für die Praxis.</p>
+      <div class="home-podcast__links">
+        <a class="home-podcast__primary" href="/podcast/">Podcast und Folgen ansehen <span aria-hidden="true">→</span></a>
+        <a class="v4-text-link" href="https://e7azg7.podcaster.de/sv-netzwerk.rss" rel="alternate" type="application/rss+xml">RSS-Feed abonnieren <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-podcast{background:#071a2e;color:#fff}
+  .home-podcast__inner{display:grid;grid-template-columns:minmax(12rem,18rem) minmax(0,46rem);align-items:center;gap:clamp(2rem,7vw,7rem)}
+  .home-podcast__mark{display:flex;align-items:center;justify-content:center;gap:.65rem;min-height:15rem;border:1px solid rgba(255,255,255,.16);border-radius:1.25rem;background:radial-gradient(circle at 50% 45%,rgba(247,147,30,.18),transparent 58%)}
+  .home-podcast__mark span{display:block;width:.55rem;border-radius:999px;background:#f7931e}
+  .home-podcast__mark span:nth-child(1),.home-podcast__mark span:nth-child(5){height:3.5rem}.home-podcast__mark span:nth-child(2),.home-podcast__mark span:nth-child(4){height:7rem}.home-podcast__mark span:nth-child(3){height:10rem}
+  .home-podcast .v4-kicker,.home-podcast .v4-kicker span{color:#f7b45f}.home-podcast h2{margin:.35rem 0 1rem;color:#fff}.home-podcast__copy>p:not(.v4-kicker){max-width:65ch;color:#c5d6e2;font-size:1.05rem}
+  .home-podcast__links{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 1.5rem;margin-top:1.5rem}.home-podcast__primary{display:inline-flex;align-items:center;gap:.65rem;padding:.8rem 1rem;border-radius:.7rem;background:#f7931e;color:#071a2e;font-weight:900;text-decoration:none}.home-podcast .v4-text-link{color:#fff}
+  @media(max-width:48rem){.home-podcast__inner{grid-template-columns:1fr}.home-podcast__mark{min-height:10rem}.home-podcast__mark span:nth-child(2),.home-podcast__mark span:nth-child(4){height:5rem}.home-podcast__mark span:nth-child(3){height:7rem}}
+</style>

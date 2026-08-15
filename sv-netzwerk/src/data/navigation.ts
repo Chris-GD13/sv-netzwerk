@@ -37,5 +37,6 @@ export const navigation: NavItem[] = [
   },
   { label: 'Experten', href: '/experten/' },
   { label: 'Fachartikel', href: '/fachwissen/' },
+  { label: 'Podcast', href: '/podcast/' },
   { label: 'Kontakt', href: '/kontakt/' },
 ];
