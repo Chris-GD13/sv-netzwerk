@@ -200,9 +200,37 @@ function expandInspectionAbbreviations(string $text): string
         'SB'  => 'Scheibe',
         'BE'  => 'Beschlag defekt',
     ];
-    return preg_replace_callback('/\b(MEG|WA|SOK|SC|SB|BE)\b/iu', static function (array $match) use ($labels): string {
+    $expanded = preg_replace_callback('/\\b(MEG|WA|SOK|SC|SB|BE)\\b/iu', static function (array $match) use ($labels): string {
         return $labels[strtoupper($match[1])] ?? $match[0];
     }, $text) ?? $text;
+
+    return autoCorrectInspectionText($expanded);
+}
+
+/** Bereinigt typische Schreib- und Zeichensetzungsfehler aus Excel-Freitexten. */
+function autoCorrectInspectionText(string $text): string
+{
+    $corrected = trim($text);
+    $corrected = preg_replace('/\\s+/u', ' ', $corrected) ?? $corrected;
+    $corrected = preg_replace('/\\s+([,.;:!?])/u', '$1', $corrected) ?? $corrected;
+    $corrected = preg_replace('/([,.;:!?])(?!\\s|$)/u', '$1 ', $corrected) ?? $corrected;
+
+    $typos = [
+        '/\\beingestelt\\b/iu' => 'eingestellt',
+        '/\\beingestelllt\\b/iu' => 'eingestellt',
+        '/\\bschliest\\b/iu' => 'schließt',
+        '/\\bschliesst\\b/iu' => 'schließt',
+        '/\\bnicht\\s+zugaenglich\\b/iu' => 'nicht zugänglich',
+        '/\\bpruefung\\b/iu' => 'Prüfung',
+    ];
+    foreach ($typos as $pattern => $replacement) {
+        $corrected = preg_replace($pattern, $replacement, $corrected) ?? $corrected;
+    }
+
+    if ($corrected !== '') {
+        $corrected = mb_strtoupper(mb_substr($corrected, 0, 1), 'UTF-8') . mb_substr($corrected, 1, null, 'UTF-8');
+    }
+    return $corrected;
 }
 
 function normalizeInspectionFormRemarks(array $data): array
