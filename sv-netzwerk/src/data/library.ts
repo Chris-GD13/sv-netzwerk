@@ -14,6 +14,17 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Schadenregulierung mit klaren Grenzen: Vollmacht, Obliegenheiten, Mehrfachversicherung und Abgeltung',
+    description: 'Regulierungsvollmacht, Obliegenheiten, Mehrfachversicherung, Fahrlässigkeit, Schadenminderung und pauschale Abgeltung im Schadenfall fachlich und rechtlich sauber auseinanderhalten.',
+    href: '/fachwissen/schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung/',
+    category: 'Regulierung und Versicherungsrecht',
+    tags: ['Schadenregulierung', 'Regulierungsvollmacht', 'Obliegenheiten', 'Mehrfachversicherung', 'Fahrlässigkeit', 'Schadenminderung', 'Abgeltung'],
+    date: '2026-08-15',
+    publishedAt: '2026-08-15T22:06:00Z',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz',
     description: 'Leitungswasserschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2/',
