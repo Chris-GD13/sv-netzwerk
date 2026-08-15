@@ -59,6 +59,7 @@ export interface WindowSummary {
   last_edited_at: string | null;
   updated_at: string;
   progress_percent: number;
+  form_data?: Record<string, unknown>;
   lock_owner_id?: string | null;
   lock_owner_name?: string | null;
   lock_expires_at?: string | null;
