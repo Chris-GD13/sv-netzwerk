@@ -22,12 +22,52 @@ $wid    = isset($_GET['window_id']) ? (int) $_GET['window_id'] : null;
 $sid    = isset($_GET['sash_id'])   ? (int) $_GET['sash_id']   : null;
 
 match (true) {
+    $method === 'GET'    && $id !== null            => handleFile($id),
     $method === 'GET'    && $sid !== null           => handleListBySash($sid),
     $method === 'GET'    && $wid !== null            => handleList($wid),
     $method === 'POST'   && $wid !== null            => handleUpload($wid, $sid, $user),
     $method === 'DELETE' && $id !== null             => handleDelete($id, $user),
     default                                          => apiError(404, 'Unbekannter Endpunkt.'),
 };
+
+/** Liefert eine Fotodatei nur innerhalb einer angemeldeten Portal-Sitzung aus. */
+function handleFile(int $photoId): never
+{
+    try {
+        $stmt = db()->prepare(
+            'SELECT storage_path, file_name FROM photos WHERE id = :id AND deleted_at IS NULL LIMIT 1'
+        );
+        $stmt->execute([':id' => $photoId]);
+        $photo = $stmt->fetch();
+    } catch (Throwable) {
+        apiError(503, 'Foto konnte nicht geladen werden.');
+    }
+
+    if (!$photo) {
+        apiError(404, 'Foto nicht gefunden.');
+    }
+
+    $baseDir = realpath(photosDir());
+    $filePath = $baseDir !== false
+        ? realpath($baseDir . '/' . ltrim((string) $photo['storage_path'], '/'))
+        : false;
+    if ($baseDir === false || $filePath === false || !str_starts_with($filePath, $baseDir . DIRECTORY_SEPARATOR) || !is_file($filePath)) {
+        apiError(404, 'Fotodatei nicht gefunden.');
+    }
+
+    $mimeType = (new finfo(FILEINFO_MIME_TYPE))->file($filePath) ?: 'application/octet-stream';
+    if (!str_starts_with($mimeType, 'image/')) {
+        apiError(415, 'Die gespeicherte Datei ist kein Bild.');
+    }
+
+    header('Content-Type: ' . $mimeType);
+    header('Content-Length: ' . (string) filesize($filePath));
+    header('Content-Disposition: inline; filename="' . addcslashes(basename((string) $photo['file_name']), '"\\') . '"');
+    header('Cache-Control: private, max-age=3600');
+    header('X-Content-Type-Options: nosniff');
+    readfile($filePath);
+    exit;
+}
 
 function handleList(int $windowId): never
 {
