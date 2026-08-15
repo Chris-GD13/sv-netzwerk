@@ -265,7 +265,7 @@ function mapWindowSummary(array $row): array
         'last_edited_at'              => $row['last_edited_at'],
         'updated_at'                  => $row['updated_at'],
         'progress_percent'            => (int) ($row['progress_percent'] ?? 0),
-        'form_data'                   => isset($row['form_data']) ? json_decode($row['form_data'], true) ?? [] : [],
+        'form_data'                   => isset($row['form_data']) ? normalizeInspectionFormRemarks(json_decode($row['form_data'], true) ?? []) : [],
     ];
 }
 
@@ -273,7 +273,7 @@ function mapWindowRecord(array $row): array
 {
     $summary                  = mapWindowSummary($row);
     $summary['project_id']    = $row['project_id'] ?? DEFAULT_PROJECT_ID;
-    $summary['form_data']     = isset($row['form_data'])     ? json_decode($row['form_data'], true)     ?? [] : [];
+    $summary['form_data']     = isset($row['form_data'])     ? normalizeInspectionFormRemarks(json_decode($row['form_data'], true) ?? []) : [];
     $summary['calculated_data'] = isset($row['calculated_data']) ? json_decode($row['calculated_data'], true) ?? [] : [];
     $summary['completed_at']  = $row['completed_at'] ?? null;
     $summary['released_at']   = $row['released_at']  ?? null;
