@@ -5,11 +5,18 @@ declare(strict_types=1);
 require_once __DIR__ . '/config.php';
 commonHeaders();
 
+function requireAnalysisGroupRole(array $user, array $roles): void
+{
+    if (!in_array($user['role'] ?? '', $roles, true)) {
+        apiError(403, 'Keine Berechtigung für diese Aktion.');
+    }
+}
+
 $user = requireAuth();
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     apiError(405, 'Methode nicht erlaubt.');
 }
-requireRole($user, ['administrator', 'projektleiter']);
+requireAnalysisGroupRole($user, ['administrator', 'projektleiter']);
 
 $body = requestBody();
 $projectId = isset($_GET['project_id']) ? (int) $_GET['project_id'] : DEFAULT_PROJECT_ID;
@@ -28,7 +35,7 @@ if ($groupValue === '') {
     apiError(400, 'Gruppenwert fehlt.');
 }
 if ($action === 'delete') {
-    requireRole($user, ['administrator']);
+    requireAnalysisGroupRole($user, ['administrator']);
 }
 
 $fieldConfig = [

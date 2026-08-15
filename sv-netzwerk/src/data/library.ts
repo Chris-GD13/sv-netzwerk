@@ -13,7 +13,7 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
-    title: 'Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz (2)',
+    title: 'Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz',
     description: 'Leitungswasserschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2/',
     category: 'Leitungswasserschäden',
