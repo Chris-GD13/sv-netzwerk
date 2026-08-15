@@ -535,6 +535,13 @@ function importRowValue(array $row, array $needles): string
     return '';
 }
 
+/** Spalte K (Index 10) ist in der gelieferten Fensterliste die Bemerkung. */
+function importColumnKValue(array $row): string
+{
+    $values = array_values($row);
+    return isset($values[10]) ? trim((string) $values[10]) : '';
+}
+
 function importHasDefect(string $description): bool
 {
     $normalized = strtolower(trim($description));
@@ -550,11 +557,26 @@ function mergeImportDescriptions(array $rows): string
     $descriptions = [];
     foreach ($rows as $row) {
         $description = importRowValue($row, ['Beschreibungen', 'Beschreibung', 'Mangel', 'Feststellung']);
+        $columnK = importColumnKValue($row);
+        if ($columnK !== '' && ($description === '' || $description !== $columnK)) {
+            $description = $description === '' ? $columnK : $description . ' | ' . $columnK;
+        }
         if ($description !== '' && !in_array($description, $descriptions, true)) {
-            $descriptions[] = $description;
+            $descriptions[] = expandInspectionAbbreviations($description);
         }
     }
     return implode(' | ', $descriptions);
+}
+
+function mergeImportColumnK(array $rows): string
+{
+    $values = [];
+    foreach ($rows as $row) {
+        if (!is_array($row)) continue;
+        $value = expandInspectionAbbreviations(importColumnKValue($row));
+        if ($value !== '' && !in_array($value, $values, true)) $values[] = $value;
+    }
+    return implode(' | ', $values);
 }
 
 function importGroupValue(array $rows, array $needles): string
@@ -803,6 +825,7 @@ function handleApplyExcel(array $user): never
             $existingWindow = $windowExists->fetch(PDO::FETCH_ASSOC);
 
             $description = mergeImportDescriptions($groupRows);
+            $columnKDescription = mergeImportColumnK($groupRows);
             $hasDefect = importHasDefect($description);
             $glassWidth = importGroupValue($groupRows, ['Glas Breite', 'Glasbreite', 'Verglasung Breite']);
             $glassHeight = importGroupValue($groupRows, ['Glas Höhe', 'Glas Hoehe', 'Glashöhe', 'Verglasung Höhe']);
@@ -820,6 +843,10 @@ function handleApplyExcel(array $user): never
             $constructionYear = importGroupValue($groupRows, ['Baujahr']);
             $frameMaterial = importGroupValue($groupRows, ['Rahmenmaterial', 'Material']);
             $rating = importRating($description, $hasDefect);
+            $descriptionLower = strtolower($description);
+            $isInaccessible = preg_match('/nicht\s+zugänglich|nicht\s+zugaenglich|gesperrt|kein\s+zugang/u', $descriptionLower) === 1;
+            $isUrgent = preg_match('/beschlag\s+defekt|muss\s+eingestellt\s+werden/u', $descriptionLower) === 1;
+            $maintenanceDue = preg_match('/wartung\s+notwendig|muss\s+eingestellt\s+werden|schleift|scheibe/u', $descriptionLower) === 1;
             $priority = $hasDefect ? 'mittel' : 'keine';
             $roomLabel = 'Raum ' . $group['room_reference'];
             $inspectionDate = date('Y-m-d');
@@ -855,6 +882,8 @@ function handleApplyExcel(array $user): never
                 'inspected_wing' => $position !== '' ? $position : $schlagzahl,
                 'inspector_name' => $inspectorName,
                 'inspection_date' => $inspectionDate,
+                'accessibility_status' => $isInaccessible ? 'nicht zugaenglich' : 'zugaenglich',
+                'accessibility_note' => $isInaccessible ? $description : '',
                 'manufacturer' => $manufacturer,
                 'window_system' => $hardwareSystem,
                 'construction_year' => $constructionYear !== '' ? importNumber($constructionYear) : '',
@@ -876,6 +905,7 @@ function handleApplyExcel(array $user): never
                 'applied_test_weight_kg' => $testWeight ?: '',
                 'weight_method' => $glassWidth !== '' && $glassHeight !== '' && $glassStructure !== '' ? 'Berechnung aus Excel-Maßen und Glasaufbau' : '',
                 'visible_special_features' => $description,
+                'excel_column_k' => $columnKDescription,
                 'expert_note' => $description,
                 'recommended_action' => $description !== '' ? $description : 'Kein Handlungsbedarf aus der Importliste abgeleitet.',
                 'opening_possible' => preg_match('/öffnen\s+nicht|nicht\s+zu\s+öffnen/u', strtolower($description)) !== 1,
@@ -885,6 +915,8 @@ function handleApplyExcel(array $user): never
                 'wing_hangs' => preg_match('/häng/u', strtolower($description)) === 1,
                 'hardware_heavy' => preg_match('/schwergängig/u', strtolower($description)) === 1,
                 'readjustment_required' => preg_match('/einstell|nachstell|schleif/u', strtolower($description)) === 1,
+                'maintenance_or_repair_due' => $maintenanceDue,
+                'urgent_action_required' => $isUrgent,
                 'overall_rating' => $rating,
                 'priority' => $priority,
                 'status' => 'fachlich geprueft',
@@ -912,6 +944,7 @@ function handleApplyExcel(array $user): never
                      floor_label = :floor_label, room_label = :room_label, room_number = :room_number,
                      overall_rating = :overall_rating, priority = :priority, assigned_to = :assigned_to,
                      assigned_name = :assigned_name, has_defect = :has_defect, status = :status,
+                     accessibility_status = :accessibility_status, urgent_action_required = :urgent_action_required,
                      progress_percent = :progress_percent, form_data = :fd, calculated_data = :calculated_data,
                      updated_at = :now WHERE id = :id'
                 )->execute([
@@ -929,6 +962,8 @@ function handleApplyExcel(array $user): never
                     ':assigned_name' => $inspectorName,
                     ':has_defect' => $hasDefect ? 1 : 0,
                     ':status' => 'fachlich geprueft',
+                    ':accessibility_status' => $importedWindowData['accessibility_status'],
+                    ':urgent_action_required' => $isUrgent ? 1 : 0,
                     ':progress_percent' => $progressPercent,
                     ':fd' => json_encode($windowFormData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     ':calculated_data' => json_encode($calculatedData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
@@ -942,11 +977,13 @@ function handleApplyExcel(array $user): never
                 $stmt = $pdo->prepare(
                     'INSERT INTO windows (project_id, room_id, record_id, inspection_number, window_number, object_label,
                      room_label, room_number, building_label, section_label, floor_label, status, overall_rating,
-                     priority, assigned_to, assigned_name, has_defect, progress_percent, form_data, calculated_data,
+                     priority, assigned_to, assigned_name, has_defect, accessibility_status, urgent_action_required,
+                     progress_percent, form_data, calculated_data,
                      created_at, updated_at)
                      VALUES (:pid, :rid, :record_id, :inspection_number, :wn, :object_label, :room_label, :room_number,
                      :building_label, :section_label, :floor_label, :status, :overall_rating, :priority, :assigned_to,
-                     :assigned_name, :has_defect, :progress_percent, :form_data, :calculated_data, :created_at, :updated_at)'
+                     :assigned_name, :has_defect, :accessibility_status, :urgent_action_required,
+                     :progress_percent, :form_data, :calculated_data, :created_at, :updated_at)'
                 );
                 $stmt->execute([
                     ':pid' => (int) $building['project_id'],
@@ -966,6 +1003,8 @@ function handleApplyExcel(array $user): never
                     ':assigned_to' => (int) $user['id'],
                     ':assigned_name' => $inspectorName,
                     ':has_defect' => $hasDefect ? 1 : 0,
+                    ':accessibility_status' => $importedWindowData['accessibility_status'],
+                    ':urgent_action_required' => $isUrgent ? 1 : 0,
                     ':progress_percent' => $progressPercent,
                     ':form_data' => json_encode($windowFormData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     ':calculated_data' => json_encode($calculatedData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
@@ -1209,13 +1248,21 @@ function handleImportSharePointPhoto(array $user): never
         $photoInspectorName = env('SHAREPOINT_DEFAULT_INSPECTOR', 'Marc Schütt');
     }
 
-    $duplicate = db()->prepare('SELECT id FROM photos WHERE sash_id = :sid AND file_name = :fn LIMIT 1');
+    $duplicate = db()->prepare('SELECT id, storage_path FROM photos WHERE sash_id = :sid AND file_name = :fn AND deleted_at IS NULL LIMIT 1');
     $duplicate->execute([':sid' => $sashId, ':fn' => $fileName]);
-    $duplicateId = (int) ($duplicate->fetchColumn() ?: 0);
+    $duplicateRow = $duplicate->fetch(PDO::FETCH_ASSOC) ?: null;
+    $duplicateId = (int) ($duplicateRow['id'] ?? 0);
     if ($duplicateId > 0) {
-        db()->prepare('UPDATE photos SET inspector_name = :name WHERE id = :id')
-            ->execute([':name' => $photoInspectorName, ':id' => $duplicateId]);
-        apiJson(['ok' => true, 'window_id' => $windowId, 'sash_id' => $sashId, 'message' => 'Foto war bereits vorhanden.']);
+        $existingFile = photosDir() . '/' . ltrim((string) ($duplicateRow['storage_path'] ?? ''), '/');
+        if (is_file($existingFile)) {
+            db()->prepare('UPDATE photos SET inspector_name = :name WHERE id = :id')
+                ->execute([':name' => $photoInspectorName, ':id' => $duplicateId]);
+            apiJson(['ok' => true, 'window_id' => $windowId, 'sash_id' => $sashId, 'message' => 'Foto war bereits vorhanden.']);
+        }
+        // Der Datensatz ist vorhanden, die Datei wurde jedoch früher durch ein
+        // Deployment entfernt. Den defekten Eintrag ausblenden und neu laden.
+        db()->prepare('UPDATE photos SET deleted_at = :now WHERE id = :id')
+            ->execute([':now' => nowUtc(), ':id' => $duplicateId]);
     }
 
     $download = graphDownloadItem($itemId);
