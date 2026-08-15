@@ -2736,8 +2736,8 @@ async function renderAnalysis(context: AppContext) {
           alert('Nur Administratoren dürfen Gruppen löschen.');
           return;
         }
-        const check = prompt(`ACHTUNG: ${items.length} Fenster werden aus der aktiven Auswertung entfernt.\nZum Bestätigen bitte LÖSCHEN eingeben:`);
-        if (check !== 'LÖSCHEN') return;
+        const confirmed = confirm(`„${value}“ wirklich löschen?\n\n${items.length} Fenster werden aus der aktiven Auswertung entfernt. Diese Aktion kann nur administrativ rückgängig gemacht werden.`);
+        if (!confirmed) return;
       }
 
       button.disabled = true;
@@ -2746,6 +2746,9 @@ async function renderAnalysis(context: AppContext) {
         button.disabled = false;
         alert('Die Aktion konnte nicht ausgeführt werden.');
         return;
+      }
+      if (action === 'delete') {
+        alert(`${result.affected} Fenster wurden gelöscht.`);
       }
       await renderAnalysis(context);
     });
