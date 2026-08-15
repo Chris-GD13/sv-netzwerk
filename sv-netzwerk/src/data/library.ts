@@ -23,6 +23,16 @@ export const library: LibraryItem[] = [
     featured: false,
   },
   {
+    title: 'Stegplatten aus Polycarbonat: Hagelschaden, Spannungsriss oder Montagefehler?',
+    description: 'Schäden an Polycarbonat-Stegplatten fachlich einordnen: Hagelspuren, Spannungsrisse, thermische Zwängung, Befestigung, Chemikalien, Alterung und Reparaturumfang sauber trennen.',
+    href: '/fachwissen/polycarbonat-stegplatten-hagel-spannungsrisse-montagefehler/',
+    category: 'Dach und Gebäudehülle',
+    tags: ['Polycarbonat', 'Stegplatten', 'Hagelschaden', 'Spannungsrisse', 'Montagefehler', 'Schadenabgrenzung'],
+    date: '2026-08-15',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Kumulschäden nach Sturm und Hagel: Belastbare Prüffolge für die Regulierungspraxis (2)',
     description: 'Sturm- und Hagelschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/kumulschaeden-sturm-hagel-prueffolge-regulierung/',

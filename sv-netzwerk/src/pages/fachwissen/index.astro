@@ -27,6 +27,31 @@ const totalPages = Math.ceil(sortedLibrary.length / PAGE_SIZE);
       </div>
     </div>
   </section>
+  <section class="sv-section knowledge-podcast" aria-labelledby="knowledge-podcast-title">
+    <div class="sv-container knowledge-podcast__layout">
+      <div class="knowledge-podcast__copy">
+        <p class="sv-eyebrow">Fachwissen zum Hören</p>
+        <h2 id="knowledge-podcast-title">Der SV-Netzwerk Podcast</h2>
+        <p>Ausgewählte Fachbeiträge werden als vertiefende Gespräche aufbereitet. Die Folgen ordnen Schadenbilder, Beweissicherung, technische Prüfschritte und regulatorische Abgrenzungsfragen praxisnah ein.</p>
+        <div class="knowledge-podcast__actions">
+          <a class="sv-button sv-button-primary" href="/podcast/">Alle Podcast-Informationen</a>
+          <a class="sv-button sv-button-secondary" href="https://e7azq7.podcaster.de/sv-netzwerk.rss" rel="alternate" type="application/rss+xml">RSS-Feed abonnieren</a>
+        </div>
+      </div>
+      <div class="knowledge-podcast__player">
+        <iframe
+          src="https://player.pdcstrcdn.de?p=ea12d588-2075-4b0d-9d24-2309f85a9121"
+          title="SV-Netzwerk Podcast – aktueller Webplayer"
+          width="100%"
+          height="450"
+          loading="lazy"
+          allow="autoplay"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+      </div>
+    </div>
+  </section>
   <section class="sv-section sv-section-alt" id="normen-rechtsprechung" aria-labelledby="normen-title">
     <div class="sv-container">
       <SectionHeader id="normen-title" eyebrow="Regelwerke im Kontext" title="Normen und Rechtsprechung" text="Technische Regeln und gerichtliche Entscheidungen werden dort eingeordnet, wo sie die Schadenbewertung, Beweissicherung und Regulierung konkret beeinflussen." />
@@ -43,9 +68,19 @@ const totalPages = Math.ceil(sortedLibrary.length / PAGE_SIZE);
   .knowledge-index{padding-top:clamp(1.5rem,4vw,3rem)}
   .knowledge-index h1{margin:0 0 .9rem;overflow-wrap:anywhere}
   .knowledge-layout,.knowledge-tools,.knowledge-results{min-width:0}
+  .knowledge-podcast{background:#071a2e;color:#fff}
+  .knowledge-podcast__layout{display:grid;grid-template-columns:minmax(16rem,24rem) minmax(0,1fr);align-items:start;gap:clamp(1.5rem,4vw,4rem)}
+  .knowledge-podcast__copy h2{margin:.35rem 0 1rem;color:#fff}
+  .knowledge-podcast__copy>p:not(.sv-eyebrow){color:#c5d6e2}
+  .knowledge-podcast__actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.4rem}
+  .knowledge-podcast__player{min-width:0;overflow:hidden;border-radius:1rem;background:#fff}
+  .knowledge-podcast__player iframe{display:block;border:0;overflow:hidden}
+  .knowledge-podcast .sv-button-secondary{border-color:rgba(255,255,255,.45);color:#fff}
   @media(max-width:42rem){
     .knowledge-layout{display:flex;flex-direction:column}
     .knowledge-results{order:1}
     .knowledge-tools{order:2;margin-top:2rem}
+    .knowledge-podcast__layout{grid-template-columns:1fr}
+    .knowledge-podcast__player iframe{height:500px}
   }
 </style>
