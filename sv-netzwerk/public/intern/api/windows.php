@@ -40,7 +40,7 @@ function handleGetList(): never
                     w.room_number, w.room_label, w.building_label, w.section_label, w.floor_label,
                     w.status, w.overall_rating, w.priority, w.accessibility_status,
                     w.assigned_to, w.assigned_name,
-                    w.special_inspection_required, w.urgent_action_required,
+                    w.special_inspection_required, w.urgent_action_required, w.form_data,
                     w.has_defect, w.danger_immediate, w.last_edited_at, w.updated_at, w.progress_percent
              FROM windows w
              WHERE w.deleted_at IS NULL AND w.project_id = :pid
@@ -265,6 +265,7 @@ function mapWindowSummary(array $row): array
         'last_edited_at'              => $row['last_edited_at'],
         'updated_at'                  => $row['updated_at'],
         'progress_percent'            => (int) ($row['progress_percent'] ?? 0),
+        'form_data'                   => isset($row['form_data']) ? json_decode($row['form_data'], true) ?? [] : [],
     ];
 }
 
