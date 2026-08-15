@@ -8,6 +8,8 @@
  * - POST ?action=import_excel (multipart file)
  * - POST ?action=import_sharepoint_excel
  * - GET  ?action=list_sharepoint_photos
+ * - GET  ?action=list_sharepoint_documents
+ * - GET  ?action=sharepoint_document&id={driveItemId}
  * - GET  ?action=sharepoint_photo&id={driveItemId}
  * - POST ?action=import_sharepoint_photo
  * - POST ?action=apply_excel
@@ -28,6 +30,8 @@ match ($action) {
     'import_excel' => handleImportExcel(),
     'import_sharepoint_excel' => handleImportSharePointExcel(),
     'list_sharepoint_photos' => handleListSharePointPhotos(),
+    'list_sharepoint_documents' => handleListSharePointDocuments(),
+    'sharepoint_document' => handleSharePointDocument(),
     'sharepoint_photo' => handleSharePointPhoto(),
     'import_sharepoint_photo' => handleImportSharePointPhoto($user),
     'apply_excel' => handleApplyExcel($user),
@@ -513,6 +517,63 @@ function handleSharePointPhoto(): never
     }
     $download = graphDownloadItem($itemId);
     header('Content-Type: ' . ($download['content_type'] !== '' ? $download['content_type'] : 'application/octet-stream'));
+    header('Cache-Control: private, max-age=300');
+    echo $download['body'];
+    exit;
+}
+
+function handleListSharePointDocuments(): never
+{
+    $excelPath = graphConfig(
+        'MS_SHAREPOINT_EXCEL_PATH',
+        'VS Schäden/Marc/Privatgutachten/2026/Bundesministerium Verteidigung_Bonn/BW fesnterprüfung.xlsx'
+    );
+    $path = graphConfig('MS_SHAREPOINT_PROJECT_PATH', dirname($excelPath));
+    $folder = graphItemByPath($path);
+    $folderId = (string) ($folder['id'] ?? '');
+    if ($folderId === '') {
+        apiError(404, 'Der SharePoint-Projektordner wurde nicht gefunden.');
+    }
+
+    $documents = [];
+    $queue = [[$folderId, '', 0]];
+    while ($queue !== []) {
+        [$parentId, $relativePath, $depth] = array_shift($queue);
+        $url = 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode(graphDriveId()) . '/items/' . rawurlencode((string) $parentId)
+            . '/children?$select=id,name,size,file,folder,lastModifiedDateTime&$top=200';
+        while ($url !== '') {
+            $page = graphRequest($url);
+            foreach (($page['value'] ?? []) as $item) {
+                if (!is_array($item)) continue;
+                $name = (string) ($item['name'] ?? '');
+                $itemPath = ltrim($relativePath . '/' . $name, '/');
+                if (!empty($item['folder']) && $depth < 5) {
+                    $queue[] = [(string) ($item['id'] ?? ''), $itemPath, $depth + 1];
+                    continue;
+                }
+                if (empty($item['file']) || !preg_match('/\.pdf$/i', $name)) continue;
+                $documents[] = [
+                    'id' => (string) ($item['id'] ?? ''),
+                    'name' => $name,
+                    'path' => $itemPath,
+                    'size' => (int) ($item['size'] ?? 0),
+                    'modified_at' => (string) ($item['lastModifiedDateTime'] ?? ''),
+                ];
+            }
+            $url = (string) ($page['@odata.nextLink'] ?? '');
+        }
+    }
+    usort($documents, static fn(array $a, array $b): int => strnatcasecmp($a['path'], $b['path']));
+    apiJson(['ok' => true, 'folder_name' => (string) ($folder['name'] ?? basename($path)), 'documents' => $documents]);
+}
+
+function handleSharePointDocument(): never
+{
+    $itemId = trim((string) ($_GET['id'] ?? ''));
+    if ($itemId === '') apiError(400, 'SharePoint-Datei-ID fehlt.');
+    $download = graphDownloadItem($itemId);
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: inline');
     header('Cache-Control: private, max-age=300');
     echo $download['body'];
     exit;
