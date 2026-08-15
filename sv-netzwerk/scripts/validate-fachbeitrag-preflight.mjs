@@ -70,7 +70,14 @@ if (todayDaily.length > 2) {
 }
 
 if (publishedDaily.length > 0) {
-  const publishedAll = entries.filter((entry) => entry.status === 'published' && entry.publishedAt);
+  // Zukünftig terminierte Beiträge liegen bereits im Content-Verzeichnis, sind
+  // am Prüftag aber noch nicht öffentlich. Sie dürfen deshalb weder die
+  // Fachwissensübersicht noch den aktuellen Tageslauf blockieren.
+  const publishedAll = entries.filter((entry) => (
+    entry.status === 'published'
+    && entry.publishedAt
+    && entry.publishedAt <= berlinDate
+  ));
   publishedAll.sort((a, b) => {
     if (a.publishedAt === b.publishedAt) return a.file.localeCompare(b.file);
     return b.publishedAt.localeCompare(a.publishedAt);
