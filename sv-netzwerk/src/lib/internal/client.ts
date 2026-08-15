@@ -2602,6 +2602,22 @@ async function renderRecord(context: AppContext) {
 
 async function renderAnalysis(context: AppContext) {
   const records = await fetchWindowSummaries(context);
+  const remarksFor = (record: WindowSummary): string => {
+    const data = record.form_data ?? {};
+    return [data.excel_column_k, data.visible_special_features, data.expert_note]
+      .filter((value): value is string => typeof value === 'string' && value.trim() !== '')
+      .filter((value, index, values) => values.indexOf(value) === index)
+      .join(' | ');
+  };
+  const isInaccessible = (record: WindowSummary): boolean =>
+    record.accessibility_status === 'nicht zugaenglich'
+    || /nicht\s+zugänglich|nicht\s+zugaenglich|gesperrt|kein\s+zugang/i.test(remarksFor(record));
+  const isUrgent = (record: WindowSummary): boolean =>
+    Boolean(record.urgent_action_required || record.danger_immediate)
+    || /\bBE\b|\bMEG\b|beschlag\s+defekt|muss\s+eingestellt\s+werden/i.test(remarksFor(record));
+  const needsMaintenance = (record: WindowSummary): boolean =>
+    record.form_data?.maintenance_or_repair_due === true
+    || /\bWA\b|\bMEG\b|\bSC\b|\bSB\b|wartung\s+notwendig|muss\s+eingestellt\s+werden|schleift|scheibe/i.test(remarksFor(record));
   const groupings = groupBy(records, (item) => item.building_label || 'Unbekannt');
   const byFloor = groupBy(records, (item) => item.floor_label || 'Unbekannt');
   const byInspector = groupBy(records, (item) => item.assigned_name || 'Nicht zugewiesen');
@@ -2611,11 +2627,9 @@ async function renderAnalysis(context: AppContext) {
     <div class="intern-analysis-grid">
       ${renderAnalysisCard('Geprüfte Fenster', records.filter((record) => record.status === 'Pruefung abgeschlossen' || record.status === 'fachlich geprueft' || record.status === 'freigegeben').length, 'geprueft')}
       ${renderAnalysisCard('Ungeprüfte Fenster', records.filter((record) => record.status === 'nicht begonnen').length, 'ungeprueft')}
-      ${renderAnalysisCard('Nicht zugängliche Fenster', records.filter((record) => record.accessibility_status === 'nicht zugaenglich').length, 'nicht_zugaenglich')}
-      ${renderAnalysisCard('Geeignete Beschläge', records.filter((record) => record.overall_rating === 'ohne festgestellten Handlungsbedarf').length, 'geeignet')}
-      ${renderAnalysisCard('Nicht geeignete Beschläge', records.filter((record) => record.has_defect).length, 'mangel')}
-      ${renderAnalysisCard('Spezialprüfungen', records.filter((record) => record.special_inspection_required).length, 'spezial')}
-      ${renderAnalysisCard('Dringende Sicherungsmaßnahmen', records.filter((record) => record.urgent_action_required || record.danger_immediate).length, 'dringend')}
+      ${renderAnalysisCard('Nicht zugängliche Fenster', records.filter(isInaccessible).length, 'nicht_zugaenglich')}
+      ${renderAnalysisCard('Dringende Sicherungsmaßnahmen', records.filter(isUrgent).length, 'dringend')}
+      ${renderAnalysisCard('Wartung oder Reparatur fällig', records.filter(needsMaintenance).length, 'wartung_reparatur')}
     </div>
     <div class="intern-grid">
       <section class="intern-panel"><h2>Ergebnisse je Gebäude</h2>${renderGrouping(groupings, 'building', canEdit(context))}</section>
@@ -2642,12 +2656,12 @@ async function renderAnalysis(context: AppContext) {
     detailTitle.textContent = title + ` (${items.length})`;
     detailContent.innerHTML = items.length === 0
       ? '<p class="intern-meta">Keine Ergebnisse.</p>'
-      : `<table class="intern-table"><thead><tr><th>Fenster</th><th>Gebäude</th><th>Etage</th><th>Raum</th><th>Status</th><th>Bewertung</th></tr></thead><tbody>${items.map(r => `<tr style="cursor:pointer" data-window-id="${r.id}"><td>${escapeHtml(r.window_number || r.record_id)}</td><td>${escapeHtml(r.building_label || '-')}</td><td>${escapeHtml(r.floor_label || '-')}</td><td>${escapeHtml(r.room_number || '-')}</td><td>${escapeHtml(r.status)}</td><td>${escapeHtml(r.overall_rating || '-')}</td></tr>`).join('')}</tbody></table>`;
+      : `<table class="intern-table"><thead><tr><th>Fenster</th><th>Gebäude</th><th>Etage</th><th>Raum</th><th>Status</th><th>Sichtbare Besonderheiten / Spalte K</th></tr></thead><tbody>${items.map(r => `<tr style="cursor:pointer" data-window-id="${r.id}"><td>${escapeHtml(r.window_number || r.record_id)}</td><td>${escapeHtml(r.building_label || '-')}</td><td>${escapeHtml(r.floor_label || '-')}</td><td>${escapeHtml(r.room_number || '-')}</td><td>${escapeHtml(r.status)}</td><td>${escapeHtml(remarksFor(r) || '-')}</td></tr>`).join('')}</tbody></table>`;
     detailPanel.style.display = 'block';
     detailPanel.scrollIntoView({ behavior: 'smooth' });
     // Click on row → open window record
     detailContent.querySelectorAll<HTMLElement>('[data-window-id]').forEach(row => {
-      row.onclick = () => { window.location.href = projectBase() + '/fenster/?id=' + row.dataset.windowId; };
+      row.onclick = () => { window.location.href = projectBase() + '/fenster/' + row.dataset.windowId + '/'; };
     });
   }
 
@@ -2655,20 +2669,16 @@ async function renderAnalysis(context: AppContext) {
   const filterMap: Record<string, (r: WindowSummary) => boolean> = {
     'geprueft': r => r.status === 'Pruefung abgeschlossen' || r.status === 'fachlich geprueft' || r.status === 'freigegeben',
     'ungeprueft': r => r.status === 'nicht begonnen',
-    'nicht_zugaenglich': r => r.accessibility_status === 'nicht zugaenglich',
-    'geeignet': r => r.overall_rating === 'ohne festgestellten Handlungsbedarf',
-    'mangel': r => Boolean(r.has_defect),
-    'spezial': r => Boolean(r.special_inspection_required),
-    'dringend': r => Boolean(r.urgent_action_required || r.danger_immediate),
+    'nicht_zugaenglich': isInaccessible,
+    'dringend': isUrgent,
+    'wartung_reparatur': needsMaintenance,
   };
   const filterLabels: Record<string, string> = {
     'geprueft': 'Geprüfte Fenster',
     'ungeprueft': 'Ungeprüfte Fenster',
     'nicht_zugaenglich': 'Nicht zugängliche Fenster',
-    'geeignet': 'Geeignete Beschläge',
-    'mangel': 'Nicht geeignete Beschläge / Mängel',
-    'spezial': 'Spezialprüfungen erforderlich',
     'dringend': 'Dringende Sicherungsmaßnahmen',
+    'wartung_reparatur': 'Wartung oder Reparatur fällig',
   };
 
   context.root.querySelectorAll<HTMLElement>('[data-filter]').forEach(card => {
@@ -4603,7 +4613,7 @@ function renderAnalysisCard(label: string, value: number, filterKey: string) {
 
 function renderGrouping(groups: Map<string, WindowSummary[]>, groupType: string, editable = false) {
   if (!groups.size) return '<div class="intern-empty">Keine Daten vorhanden.</div>';
-  return `<div class="intern-list">${Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([label, items]) => `<div class="intern-card intern-card--clickable" data-group-type="${escapeHtml(groupType)}" data-group-value="${escapeHtml(label)}" style="cursor:pointer;position:relative"><strong>${escapeHtml(label)}</strong><p class="intern-meta">${items.length} Fenster · ${items.filter((item) => item.has_defect).length} mit Mangel · ${items.filter((item) => item.special_inspection_required).length} Spezialprüfungen</p>${editable ? `<div class="intern-card-actions"><button type="button" class="intern-action-btn" data-group-menu aria-label="Aktionen für ${escapeHtml(label)}" title="Aktionen">⋮</button><div class="intern-action-menu" hidden><button type="button" data-group-action="edit">✏️ Bearbeiten</button><button type="button" data-group-action="rename">🔤 Umbenennen</button><button type="button" data-group-action="move">↔️ Verschieben</button><button type="button" data-group-action="archive">📦 Archivieren</button><hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0"><button type="button" data-group-action="delete" style="color:#c62828">🗑️ Löschen</button></div></div>` : ''}</div>`).join('')}</div>`;
+  return `<div class="intern-list">${Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([label, items]) => `<div class="intern-card intern-card--clickable" data-group-type="${escapeHtml(groupType)}" data-group-value="${escapeHtml(label)}" style="cursor:pointer;position:relative"><strong>${escapeHtml(label)}</strong><p class="intern-meta">${items.length} Fenster · ${items.filter((item) => item.has_defect).length} mit Mangel · ${items.filter((item) => Boolean(item.form_data?.excel_column_k || item.form_data?.visible_special_features)).length} mit Besonderheiten</p>${editable ? `<div class="intern-card-actions"><button type="button" class="intern-action-btn" data-group-menu aria-label="Aktionen für ${escapeHtml(label)}" title="Aktionen">⋮</button><div class="intern-action-menu" hidden><button type="button" data-group-action="edit">✏️ Bearbeiten</button><button type="button" data-group-action="rename">🔤 Umbenennen</button><button type="button" data-group-action="move">↔️ Verschieben</button><button type="button" data-group-action="archive">📦 Archivieren</button><hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0"><button type="button" data-group-action="delete" style="color:#c62828">🗑️ Löschen</button></div></div>` : ''}</div>`).join('')}</div>`;
 }
 
 function roleBadge(role: PortalRole) {
