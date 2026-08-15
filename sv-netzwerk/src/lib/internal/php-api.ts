@@ -745,6 +745,14 @@ export interface SharePointPhoto {
   mime_type: string;
 }
 
+export interface SharePointDocument {
+  id: string;
+  name: string;
+  path: string;
+  size: number;
+  modified_at: string;
+}
+
 /** Lädt gespeicherte SharePoint-URL aus dem Backend (pro Projekt). */
 export async function apiGetSharePointUrl(buildingId: number): Promise<string | null> {
   const { data } = await apiGet<{ url: string | null }>(`/sharepoint.php?action=get_url&building_id=${buildingId}`);
@@ -793,6 +801,12 @@ export async function apiImportSharePointExcel(): Promise<{ rows: SharePointImpo
 export async function apiListSharePointPhotos(): Promise<SharePointPhoto[]> {
   const { data } = await apiGet<{ photos: SharePointPhoto[] }>('/sharepoint.php?action=list_sharepoint_photos');
   return data?.photos ?? [];
+}
+
+/** Listet PDF-Anlagen im SharePoint-Projektordner und seinen Unterordnern. */
+export async function apiListSharePointDocuments(): Promise<SharePointDocument[]> {
+  const { data } = await apiGet<{ documents: SharePointDocument[] }>('/sharepoint.php?action=list_sharepoint_documents');
+  return data?.documents ?? [];
 }
 
 /** Lädt ein SharePoint-Foto zur lokalen OCR-Analyse, ohne Dateiauswahl. */

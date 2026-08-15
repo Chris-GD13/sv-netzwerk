@@ -148,8 +148,12 @@ function db(): PDO
 function photosDir(): string
 {
     $configured = env('PHOTOS_DIR', '');
-    if ($configured !== '' && is_dir($configured)) {
-        return rtrim($configured, '/');
+    if ($configured !== '') {
+        $persistentDir = rtrim($configured, '/');
+        if ((is_dir($persistentDir) || @mkdir($persistentDir, 0775, true)) && is_writable($persistentDir)) {
+            return $persistentDir;
+        }
+        apiError(503, 'Das konfigurierte dauerhafte Foto-Verzeichnis ist nicht verfügbar oder nicht beschreibbar.');
     }
     return dirname(__DIR__) . '/photos';
 }

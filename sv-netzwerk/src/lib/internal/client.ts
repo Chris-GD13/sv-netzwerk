@@ -47,6 +47,7 @@ import {
   apiImportExcel,
   apiImportSharePointExcel,
   apiListSharePointPhotos,
+  apiListSharePointDocuments,
   apiFetchSharePointPhoto,
   apiImportSharePointPhoto,
   apiApplyExcelRows,
@@ -2774,51 +2775,34 @@ async function renderAnalysis(context: AppContext) {
 async function renderExport(context: AppContext) {
   const records = await fetchWindowSummaries(context);
   context.root.innerHTML = `
-    ${renderHeader(context, 'Export', 'CSV-, PDF- und Management-Ausgaben fuer Auswertung und Berichtswesen.')}
+    ${renderHeader(context, 'Export und Gutachten', 'Bearbeitbares Word-Gutachten mit Fensterdaten, Fotodokumentation und Anlagen erzeugen.')}
     <div class="intern-export-grid">
-      ${exportDefinitions.map((item) => `
-        <article class="intern-export-card">
-          <h2>${escapeHtml(item.title)}</h2>
-          <p>${escapeHtml(item.description)}</p>
-          <div class="intern-actions">
-            <button class="sv-button sv-button-primary" type="button" data-export-id="${escapeHtml(item.id)}">Export erzeugen</button>
-          </div>
-        </article>
-      `).join('')}
       <article class="intern-export-card">
-        <h2>PDF-Einzelprotokoll</h2>
-        <p>Erzeugt eine druckfähige Einzelansicht einschließlich der zugeordneten Fotos.</p>
-        <label class="intern-meta" for="single-pdf-window">Fenster auswählen</label>
-        <select class="intern-input" id="single-pdf-window">
-          ${records.map((record) => `<option value="${escapeHtml(record.id)}">${escapeHtml(record.window_number || record.record_id)} · ${escapeHtml(record.room_number || record.room_label || 'ohne Raum')}</option>`).join('')}
-        </select>
-        <div class="intern-actions"><button class="sv-button sv-button-secondary" type="button" id="print-single">Druckansicht öffnen</button></div>
+        <h2>Excel-kompatibler Export</h2>
+        <p>Alle Fenster als Excel-Datei: automatische Spaltenbreiten, Querformat und eine Seitenbreite.</p>
+        <div class="intern-actions"><button class="sv-button sv-button-secondary" type="button" id="export-excel">Excel erzeugen</button></div>
       </article>
       <article class="intern-export-card">
-        <h2>PDF-Sammelprotokoll</h2>
-        <p>Erzeugt eine druckfaehige Sammelansicht der gefilterten Datensaetze.</p>
-        <div class="intern-actions"><button class="sv-button sv-button-secondary" type="button" id="print-summary">Druckansicht oeffnen</button></div>
+        <h2>Gutachten erzeugen</h2>
+        <p>Erstellt ein bearbeitbares Word-Gutachten mit Überblick, sämtlichen Fenstern, konkreten Feststellungen, Fotos und PDF-Anlagenverzeichnis.</p>
+        <div class="intern-actions"><button class="sv-button sv-button-primary" type="button" id="create-report">Gutachten erzeugen</button></div>
       </article>
     </div>
+    <div id="report-progress" class="intern-alert intern-alert-info" hidden></div>
+    <section id="report-result" class="intern-card" hidden>
+      <h2>Gutachten ist fertig</h2>
+      <p id="report-result-info" class="intern-meta"></p>
+      <div class="intern-actions">
+        <button class="sv-button sv-button-secondary" type="button" id="edit-report">Ändern</button>
+        <button class="sv-button sv-button-secondary" type="button" id="print-report">Drucken</button>
+        <button class="sv-button sv-button-primary" type="button" id="download-report">Download</button>
+        <button class="sv-button sv-button-secondary" type="button" id="save-report-as">Speichern unter</button>
+      </div>
+      <div id="report-preview" style="margin-top:18px;max-height:70vh;overflow:auto;background:#fff;border:1px solid #ccd7e0;padding:24px"></div>
+    </section>
   `;
-  context.root.querySelectorAll<HTMLElement>('[data-export-id]').forEach((button) => {
-    button.onclick = async () => {
-      const exportId = button.dataset.exportId;
-      if (!exportId) return;
-      await exportRecords(context, exportId, records);
-    };
-  });
-  context.root.querySelector<HTMLButtonElement>('#print-summary')?.addEventListener('click', async () => {
-    await printSummary(records);
-  });
-  context.root.querySelector<HTMLButtonElement>('#print-single')?.addEventListener('click', async () => {
-    const id = context.root.querySelector<HTMLSelectElement>('#single-pdf-window')?.value;
-    if (!id) { alert('Bitte zuerst ein Fenster auswählen.'); return; }
-    const record = await fetchWindowRecord(context, id);
-    if (!record) { alert('Der Fensterdatensatz konnte nicht geladen werden.'); return; }
-    const photos = await apiListPhotos(id);
-    printWindowReport(record, photos);
-  });
+  context.root.querySelector<HTMLButtonElement>('#export-excel')?.addEventListener('click', () => exportRecords(context, 'excel-all', records));
+  context.root.querySelector<HTMLButtonElement>('#create-report')?.addEventListener('click', () => createEditableAssessmentReport(context, records));
   bindHeaderLogout(context);
 }
 
@@ -4411,6 +4395,156 @@ async function syncDraftQueue(context: AppContext) {
     record.calculated_data = draft.calculatedData;
     await saveWindow(context, record, draft.data, false);
   }
+}
+
+type GeneratedAssessmentReport = { bodyHtml: string; documentHtml: string; fileName: string };
+
+async function createEditableAssessmentReport(context: AppContext, summaries: WindowSummary[]): Promise<void> {
+  if (!summaries.length) { alert('Für das Gutachten sind keine Fenster vorhanden.'); return; }
+  const button = context.root.querySelector<HTMLButtonElement>('#create-report');
+  const progress = context.root.querySelector<HTMLElement>('#report-progress');
+  const result = context.root.querySelector<HTMLElement>('#report-result');
+  const preview = context.root.querySelector<HTMLElement>('#report-preview');
+  const info = context.root.querySelector<HTMLElement>('#report-result-info');
+  if (!button || !progress || !result || !preview || !info) return;
+  button.disabled = true;
+  progress.hidden = false;
+  progress.textContent = `Fensterdaten werden geladen (0/${summaries.length}) …`;
+  try {
+    const ordered = [...summaries].sort((a, b) => [a.building_label, a.floor_label, a.room_number, a.window_number].map(String).join('|').localeCompare([b.building_label, b.floor_label, b.room_number, b.window_number].map(String).join('|'), 'de', { numeric: true }));
+    const records: Array<{ record: WindowRecord; photos: PhotoItem[] }> = [];
+    for (let index = 0; index < ordered.length; index += 1) {
+      const record = await fetchWindowRecord(context, ordered[index].id);
+      if (record) records.push({ record, photos: await apiListPhotos(record.id) });
+      progress.textContent = `Fensterdaten werden geladen (${index + 1}/${ordered.length}) …`;
+    }
+    let photoCount = 0;
+    const totalPhotos = records.reduce((sum, item) => sum + item.photos.length, 0);
+    const photoSources = new Map<string, string>();
+    for (const item of records) {
+      for (const photo of item.photos) {
+        progress.textContent = `Fotos werden für Word aufbereitet (${photoCount}/${totalPhotos}) …`;
+        const source = await fetchReportPhoto(`/intern/api/photos.php?id=${encodeURIComponent(photo.id)}`);
+        if (source) photoSources.set(photo.id, source);
+        photoCount += 1;
+      }
+    }
+    progress.textContent = 'PDF-Anlagen aus SharePoint werden ermittelt …';
+    let documents: Awaited<ReturnType<typeof apiListSharePointDocuments>> = [];
+    try { documents = await apiListSharePointDocuments(); } catch { documents = []; }
+    const report = buildAssessmentReport(records, photoSources, documents);
+    preview.innerHTML = report.bodyHtml;
+    preview.contentEditable = 'false';
+    result.hidden = false;
+    info.textContent = `${records.length} Fenster, ${totalPhotos} Fotos und ${documents.length} PDF-Anlagen wurden aufgenommen.`;
+    result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const currentReport = () => ({ ...report, bodyHtml: preview.innerHTML, documentHtml: wrapWordDocument(preview.innerHTML) });
+    context.root.querySelector<HTMLButtonElement>('#edit-report')!.onclick = (event) => {
+      const editing = preview.contentEditable !== 'true';
+      preview.contentEditable = editing ? 'true' : 'false';
+      (event.currentTarget as HTMLButtonElement).textContent = editing ? 'Änderung beenden' : 'Ändern';
+      if (editing) preview.focus();
+    };
+    context.root.querySelector<HTMLButtonElement>('#print-report')!.onclick = () => printAssessmentReport(currentReport().bodyHtml);
+    context.root.querySelector<HTMLButtonElement>('#download-report')!.onclick = () => downloadAssessmentReport(currentReport());
+    context.root.querySelector<HTMLButtonElement>('#save-report-as')!.onclick = () => saveAssessmentReportAs(currentReport());
+    void apiLogExport('Word-Gutachten', report.fileName, { windowCount: records.length, photoCount: totalPhotos, pdfAttachments: documents.length });
+  } catch (error) {
+    alert(error instanceof Error ? `Das Gutachten konnte nicht erzeugt werden: ${error.message}` : 'Das Gutachten konnte nicht erzeugt werden.');
+  } finally {
+    button.disabled = false;
+    progress.hidden = true;
+  }
+}
+
+async function fetchReportPhoto(url: string): Promise<string | null> {
+  try {
+    const response = await fetch(url, { credentials: 'same-origin' });
+    if (!response.ok) return null;
+    const blob = await response.blob();
+    const bitmap = await createImageBitmap(blob);
+    const scale = Math.min(1, 1200 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    canvas.getContext('2d')?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    return canvas.toDataURL('image/jpeg', 0.72);
+  } catch { return null; }
+}
+
+function reportValue(value: unknown): string {
+  if (value === true) return 'Ja';
+  if (value === false) return 'Nein';
+  if (Array.isArray(value)) return value.map(String).join(', ');
+  return String(value ?? '').trim();
+}
+
+function buildAssessmentReport(
+  items: Array<{ record: WindowRecord; photos: PhotoItem[] }>,
+  photoSources: Map<string, string>,
+  documents: Array<{ id: string; name: string; path: string; size: number }>,
+): GeneratedAssessmentReport {
+  const records = items.map((item) => item.record);
+  const total = records.length;
+  const inspected = records.filter((r) => /geprueft|abgeschlossen|freigegeben/i.test(r.status)).length;
+  const inaccessible = records.filter((r) => r.accessibility_status === 'nicht zugaenglich').length;
+  const urgent = records.filter((r) => r.urgent_action_required || r.danger_immediate).length;
+  const defects = records.filter((r) => r.has_defect).length;
+  const building = [...new Set(records.map((r) => r.building_label).filter(Boolean))].join(', ') || 'Prüfobjekt';
+  const overview = `Im Objekt ${building} wurden zum Datenstand ${new Date().toLocaleDateString('de-DE')} insgesamt ${total} Fensterdatensätze erfasst. Davon sind ${inspected} Fenster fachlich geprüft, ${defects} Datensätze enthalten Feststellungen oder Handlungsbedarf, ${inaccessible} Fenster waren nicht zugänglich und bei ${urgent} Fenstern ist eine dringende Sicherungsmaßnahme vermerkt. Die nachfolgende Dokumentation gibt den derzeit im Prüfportal gespeicherten Arbeitsstand wieder. Die abschließende sachverständige Würdigung und ergänzende Erläuterungen können in diesem Word-Dokument fortgeschrieben werden.`;
+  const windowsHtml = items.map(({ record, photos }, index) => {
+    const data = record.form_data ?? {};
+    const sections = windowFormSections.map((section) => {
+      const rows = section.fields.map((field) => {
+        const value = reportValue(data[field.id]);
+        if (value === '' || (field.type === 'checkbox' && value === 'Nein')) return '';
+        const optionLabel = field.options?.find((option) => option.value === value)?.label ?? value;
+        return `<tr><th>${escapeHtml(field.label)}</th><td>${escapeHtml(optionLabel)}</td></tr>`;
+      }).filter(Boolean).join('');
+      return rows ? `<h3>${escapeHtml(section.title)}</h3><table>${rows}</table>` : '';
+    }).join('');
+    const photoHtml = photos.length ? photos.map((photo) => {
+      const source = photoSources.get(photo.id);
+      return `<figure>${source ? `<img src="${source}" alt="${escapeHtml(photo.category)}">` : '<div class="missing-photo">Bilddatei nicht lesbar</div>'}<figcaption><strong>${escapeHtml(photo.category)}</strong><br>${escapeHtml(photo.caption || photo.file_name)}</figcaption></figure>`;
+    }).join('') : '<p>Keine Fotos zugeordnet.</p>';
+    return `<section class="window-report"><h2>${index + 1}. Fenster ${escapeHtml(record.window_number || record.record_id)}</h2><p><strong>Standort:</strong> ${escapeHtml([record.building_label, record.section_label, record.floor_label, record.room_number || record.room_label].filter(Boolean).join(' · '))}</p>${sections}<h3>Fotodokumentation</h3><div class="photos">${photoHtml}</div></section>`;
+  }).join('');
+  const attachments = documents.length
+    ? `<ol>${documents.map((doc) => `<li><a href="https://www.sv-netzwerk.eu/intern/api/sharepoint.php?action=sharepoint_document&amp;id=${encodeURIComponent(doc.id)}">${escapeHtml(doc.path || doc.name)}</a> (${Math.max(1, Math.round(doc.size / 1024))} KB)</li>`).join('')}</ol>`
+    : '<p>Im SharePoint-Projektordner wurden keine PDF-Anlagen gefunden.</p>';
+  const bodyHtml = `<header><h1>Gutachten / Fensterprüfung</h1><p><strong>Objekt:</strong> ${escapeHtml(building)}<br><strong>Datenstand:</strong> ${escapeHtml(new Date().toLocaleString('de-DE'))}</p></header><section><h2>1. Zusammenfassung der Situation vor Ort</h2><p>${escapeHtml(overview)}</p><p><em>Dieser Überblick ist ein bearbeitbarer Entwurf und vor Fertigstellung sachverständig zu ergänzen und freizugeben.</em></p></section><section><h2>2. Einzeldokumentation der Fenster</h2>${windowsHtml}</section><section><h2>3. Anlagen aus dem Projektordner</h2>${attachments}</section>`;
+  const safeBuilding = building.replace(/[^a-z0-9äöüß_-]+/gi, '-').replace(/-+/g, '-');
+  return { bodyHtml, documentHtml: wrapWordDocument(bodyHtml), fileName: `Gutachten-Fensterpruefung-${safeBuilding}-${new Date().toISOString().slice(0, 10)}.doc` };
+}
+
+function wrapWordDocument(bodyHtml: string): string {
+  return `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" lang="de"><head><meta charset="utf-8"><title>Gutachten Fensterprüfung</title><style>@page{size:A4;margin:18mm}body{font-family:Arial,sans-serif;color:#071a2e;font-size:10pt;line-height:1.4}h1{font-size:20pt}h2{font-size:14pt;border-bottom:2px solid #f59b16;padding-bottom:4px}h3{font-size:11pt;background:#eaf1f6;padding:5px}table{width:100%;border-collapse:collapse;margin:0 0 10px}th,td{border:1px solid #bcc9d3;padding:5px;text-align:left;vertical-align:top}th{width:36%;background:#eef4f8}.window-report{page-break-before:always}.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.photos figure{margin:0;page-break-inside:avoid}.photos img{width:100%;max-height:240px;object-fit:contain;border:1px solid #ccd7e0}.photos figcaption{font-size:8pt}.missing-photo{height:100px;border:1px dashed #a00;color:#a00;padding:8px}</style></head><body>${bodyHtml}</body></html>`;
+}
+
+function downloadAssessmentReport(report: GeneratedAssessmentReport): void {
+  const blob = new Blob(['\ufeff', report.documentHtml], { type: 'application/msword' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob); link.download = report.fileName; link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+}
+
+async function saveAssessmentReportAs(report: GeneratedAssessmentReport): Promise<void> {
+  const pickerWindow = window as typeof window & { showSaveFilePicker?: (options: unknown) => Promise<{ createWritable: () => Promise<{ write: (data: Blob) => Promise<void>; close: () => Promise<void> }> }> };
+  if (!pickerWindow.showSaveFilePicker) { downloadAssessmentReport(report); return; }
+  try {
+    const handle = await pickerWindow.showSaveFilePicker({ suggestedName: report.fileName, types: [{ description: 'Microsoft Word', accept: { 'application/msword': ['.doc'] } }] });
+    const writable = await handle.createWritable();
+    await writable.write(new Blob(['\ufeff', report.documentHtml], { type: 'application/msword' }));
+    await writable.close();
+  } catch (error) { if ((error as DOMException)?.name !== 'AbortError') throw error; }
+}
+
+function printAssessmentReport(bodyHtml: string): void {
+  const popup = window.open('', '_blank', 'width=1100,height=900');
+  if (!popup) { alert('Bitte Pop-ups für diese Seite erlauben.'); return; }
+  popup.document.write(wrapWordDocument(`<button class="no-print" onclick="window.print()">Drucken</button>${bodyHtml}`).replace('</style>', '@media print{.no-print{display:none}}</style>'));
+  popup.document.close(); popup.focus();
 }
 
 async function exportRecords(context: AppContext, exportId: string, records: WindowSummary[]) {
