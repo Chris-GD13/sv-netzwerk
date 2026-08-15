@@ -64,7 +64,7 @@ Sie umfasst aber nicht automatisch,
 - die Anerkennung einer vollständigen Eintrittspflicht,
 - den Verzicht auf Einwendungen oder Rückforderungsrechte,
 - den Abschluss eines Vergleichs,
-- die endgültige Abgeltung unbekannter oder zukünftiger Schadenpositionen,
+- die endgültige Abgeltung unbekannter oder noch nicht bezifferter Schadenpositionen,
 - die Beauftragung beliebiger Leistungen zu Lasten eines Dritten.
 
 ### Praktische Mindestprüfung der Vollmacht
@@ -168,7 +168,7 @@ Der Vorteil liegt in schneller Klarheit und geringerem weiteren Prüfaufwand. Da
 - Sind Selbstbehalte, Zeitwertanteile, Restwerte oder Vorschäden berücksichtigt?
 - Sind Notmaßnahmen, Planungs-, Prüf- und Nebenkosten enthalten?
 - Wie werden noch nicht abgeschlossene Trocknung, Rückbau oder Ursachenprüfung behandelt?
-- Sind Folgeschäden, verdeckte Schäden und künftig hervortretende Schäden eingeschlossen oder ausdrücklich vorbehalten?
+- Sind Folgeschäden, verdeckte Schäden und erst nachträglich hervortretende Schäden eingeschlossen oder ausdrücklich vorbehalten?
 - Welche Zahlungen sind bereits erfolgt und welcher Restbetrag wird geschuldet?
 - Welche Rechte, Einwendungen oder Regressansprüche bleiben bestehen?
 - Besitzt die unterzeichnende Person eine ausreichende Vergleichs- und Abschlussvollmacht?
@@ -261,4 +261,3 @@ Wer diese Ebenen voneinander trennt und anschließend kontrolliert zusammenführ
 6. Versicherungsvertragsgesetz (VVG), § 83 – Aufwendungsersatz, https://www.gesetze-im-internet.de/vvg_2008/__83.html
 7. Bürgerliches Gesetzbuch (BGB), §§ 164 und 167 – Wirkung der Erklärung des Vertreters und Erteilung der Vollmacht, https://www.gesetze-im-internet.de/bgb/__164.html und https://www.gesetze-im-internet.de/bgb/__167.html
 8. Bürgerliches Gesetzbuch (BGB), § 779 – Begriff des Vergleichs und Irrtum über die Vergleichsgrundlage, https://www.gesetze-im-internet.de/bgb/__779.html
-
