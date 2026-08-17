@@ -14,6 +14,17 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Photovoltaikfragmente nach Gebäudebrand: Flächenverunreinigung, Haftung und Deckung bei Landwirtschaft und Gewerbe',
+    description: 'Wie Fragmentflug nach dem Brand von PV-Anlagen technisch dokumentiert und zwischen Sach-, Betreiber-, Gewerbe- und Umwelthaftpflicht eingeordnet wird.',
+    href: '/fachwissen/photovoltaikfragmente-brand-landwirtschaft-gewerbehaftpflicht-fremddach/',
+    category: 'Brand und Kontamination',
+    tags: ['Photovoltaik', 'Brandschaden', 'Landwirtschaft', 'Gewerbehaftpflicht', 'Betreiberhaftpflicht', 'Umwelthaftpflicht', 'Pachtdach'],
+    date: '2026-08-17',
+    publishedAt: '2026-08-17T19:30:00Z',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Schadenregulierung mit klaren Grenzen: Vollmacht, Obliegenheiten, Mehrfachversicherung und Abgeltung',
     description: 'Regulierungsvollmacht, Obliegenheiten, Mehrfachversicherung, Fahrlässigkeit, Schadenminderung und pauschale Abgeltung im Schadenfall fachlich und rechtlich sauber auseinanderhalten.',
     href: '/fachwissen/schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung/',
