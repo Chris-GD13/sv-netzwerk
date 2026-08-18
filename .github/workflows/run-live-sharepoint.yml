@@ -1,0 +1,181 @@
+name: Live SharePoint Vollimport und Gutachten
+
+on:
+  push:
+    paths:
+      - '.github/workflows/run-live-sharepoint.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-sharepoint-full-import
+  cancel-in-progress: false
+
+jobs:
+  run-live-import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      BASE_URL: https://www.sv-netzwerk.eu
+      EXPECTED_DEPLOY_SHA: 1644f14e25684b8ca2ec43941d43b3f0727e0301
+      ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+
+    steps:
+      - name: Auf Deployment des neuen Prüfportal-Codes warten
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 80); do
+            body="$(curl -fsSL --retry 2 --retry-delay 3 "$BASE_URL/deploy-version.txt" || true)"
+            actual="$(printf '%s\n' "$body" | sed -n 's/^Commit:[[:space:]]*//p' | head -n 1)"
+            if [ "$actual" = "$EXPECTED_DEPLOY_SHA" ]; then
+              echo "Deployment $actual ist live."
+              exit 0
+            fi
+            echo "Warte auf Deployment ($attempt/80), aktuell: ${actual:-unbekannt}"
+            sleep 15
+          done
+          echo "::error::Erwarteter Deployment-Commit $EXPECTED_DEPLOY_SHA wurde nicht rechtzeitig live gefunden."
+          exit 1
+
+      - name: Node.js einrichten
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Playwright installieren
+        run: |
+          mkdir -p /tmp/live-import
+          cd /tmp/live-import
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.55.0 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      - name: SharePoint vollständig einlesen, Datenbank aktualisieren und Gutachten erzeugen
+        working-directory: /tmp/live-import
+        run: |
+          cat > run.mjs <<'NODE'
+          import { chromium } from 'playwright';
+          import fs from 'node:fs/promises';
+
+          const baseUrl = process.env.BASE_URL;
+          const email = process.env.ADMIN_EMAIL;
+          const password = process.env.ADMIN_PASSWORD;
+          if (!email || !password) throw new Error('ADMIN_EMAIL oder ADMIN_PASSWORD fehlt als GitHub Secret.');
+
+          await fs.mkdir('artifacts', { recursive: true });
+          const browser = await chromium.launch({ headless: true });
+          const context = await browser.newContext({ acceptDownloads: true, viewport: { width: 1600, height: 1000 } });
+          const page = await context.newPage();
+          page.setDefaultTimeout(120_000);
+
+          const screenshot = async (name) => {
+            try { await page.screenshot({ path: `artifacts/${name}.png`, fullPage: true }); } catch {}
+          };
+
+          try {
+            console.log('1/5 Anmeldung im Prüfportal');
+            await page.goto(`${baseUrl}/intern/login/`, { waitUntil: 'domcontentloaded', timeout: 120_000 });
+            const emailInput = page.locator('input[type="email"]').first();
+            const passwordInput = page.locator('input[type="password"]').first();
+            await emailInput.waitFor({ state: 'visible' });
+            await emailInput.fill(email);
+            await passwordInput.fill(password);
+            await page.locator('button[type="submit"]').first().click();
+            await page.waitForFunction(() => !location.pathname.includes('/intern/login/'), null, { timeout: 120_000 });
+
+            console.log('2/5 SharePoint-Import öffnen');
+            await page.goto(`${baseUrl}/intern/fensterpruefung-bonn/sharepoint-import/`, { waitUntil: 'domcontentloaded', timeout: 120_000 });
+            const runButton = page.locator('#sp-auto-read-btn');
+            await runButton.waitFor({ state: 'visible', timeout: 120_000 });
+
+            console.log('3/5 Rekursiven Vollimport starten');
+            await runButton.click();
+
+            // Der Import umfasst SharePoint-Baum, alle Tabellen, Datenbank-Update,
+            // Foto-OCR/-Zuordnung und anschließend die Weiterleitung zum Export.
+            const start = Date.now();
+            const maxMs = 50 * 60 * 1000;
+            while (Date.now() - start < maxMs) {
+              if (page.url().includes('/export/')) break;
+              const status = await page.locator('#sp-url-status').textContent().catch(() => '') || '';
+              if (/Fehler|konnte nicht|fehlgeschlagen/i.test(status)) {
+                await screenshot('sharepoint-import-fehler');
+                throw new Error(`SharePoint-Import meldet Fehler: ${status.trim()}`);
+              }
+              if (/vollständig aus SharePoint übernommen/i.test(status)) {
+                await page.waitForTimeout(2000);
+                if (!page.url().includes('/export/')) {
+                  await page.goto(`${baseUrl}/intern/fensterpruefung-bonn/export/?autostart=gutachten`, { waitUntil: 'domcontentloaded', timeout: 120_000 });
+                }
+                break;
+              }
+              await page.waitForTimeout(5000);
+            }
+            if (!page.url().includes('/export/')) {
+              await screenshot('sharepoint-import-timeout');
+              throw new Error('Der SharePoint-Vollimport wurde innerhalb von 50 Minuten nicht abgeschlossen.');
+            }
+
+            console.log('4/5 Gutachten erzeugen');
+            await page.locator('#create-report').waitFor({ state: 'attached', timeout: 120_000 });
+            const reportResult = page.locator('#report-result');
+            try {
+              await reportResult.waitFor({ state: 'visible', timeout: 20 * 60 * 1000 });
+            } catch {
+              const createButton = page.locator('#create-report');
+              if (await createButton.isVisible().catch(() => false) && !(await createButton.isDisabled().catch(() => true))) {
+                await createButton.click();
+                await reportResult.waitFor({ state: 'visible', timeout: 20 * 60 * 1000 });
+              } else {
+                throw new Error('Gutachtenerzeugung wurde nicht erfolgreich abgeschlossen.');
+              }
+            }
+
+            console.log('5/5 Gutachten herunterladen und Nachweis sichern');
+            const downloadPromise = page.waitForEvent('download', { timeout: 120_000 });
+            await page.locator('#download-report').click();
+            const download = await downloadPromise;
+            const suggested = download.suggestedFilename() || 'Gutachten-Fensterpruefung.doc';
+            const safe = suggested.replace(/[^A-Za-z0-9ÄÖÜäöüß._-]+/g, '-');
+            await download.saveAs(`artifacts/${safe}`);
+            await screenshot('gutachten-fertig');
+
+            const info = await page.locator('#report-result-info').textContent().catch(() => '');
+            await fs.writeFile('artifacts/laufprotokoll.txt', [
+              `Zeitpunkt: ${new Date().toISOString()}`,
+              `Portal: ${baseUrl}`,
+              'Ablauf: SharePoint rekursiv -> Excel-Konsolidierung -> Datenbank -> Fotos -> Gutachten',
+              `Ergebnis: ${info || 'Gutachten erzeugt und heruntergeladen'}`,
+              `Datei: ${safe}`,
+            ].join('\n'));
+            console.log(`Erfolgreich: ${safe}`);
+          } catch (error) {
+            await screenshot('live-lauf-fehler');
+            throw error;
+          } finally {
+            await browser.close();
+          }
+          NODE
+
+          node run.mjs
+
+      - name: Ergebnisdateien prüfen
+        if: success()
+        working-directory: /tmp/live-import
+        run: |
+          set -euo pipefail
+          test -s artifacts/laufprotokoll.txt
+          find artifacts -maxdepth 1 -type f -size +1k | grep -Eq '\.(doc|docx)$'
+          cat artifacts/laufprotokoll.txt
+
+      - name: Gutachten und Laufprotokoll als Artefakt sichern
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sharepoint-vollimport-gutachten
+          path: /tmp/live-import/artifacts/
+          if-no-files-found: warn
+          retention-days: 30
