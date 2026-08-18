@@ -137,7 +137,10 @@ function db(): PDO
     $pdo = new PDO($dsn, $user, $pass, [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
+        // Der Import verwendet an mehreren Stellen denselben benannten Platzhalter
+        // mehrfach in einer Anweisung (z. B. :now für created_at und updated_at).
+        // Native MySQL-Prepares unterstützen das nicht zuverlässig und werfen HY093.
+        PDO::ATTR_EMULATE_PREPARES   => true,
     ]);
     $pdo->exec("SET time_zone='+00:00'");
     ensureRuntimeSchema($pdo);
