@@ -10,6 +10,13 @@ AddDefaultCharset UTF-8
     php_value memory_limit 512M
 </IfModule>
 
+# Rekursiver SharePoint-V2-Import: alle Tabellen und Unterordner konsolidieren.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{QUERY_STRING} (^|&)action=(import_sharepoint_excel|list_sharepoint_photos|list_sharepoint_documents|apply_excel)(&|$) [NC]
+    RewriteRule ^sharepoint\.php$ sharepoint-v2.php [L,QSA]
+</IfModule>
+
 # Sicherheitsheader für API-Antworten
 <IfModule mod_headers.c>
     Header always set X-Content-Type-Options "nosniff"
