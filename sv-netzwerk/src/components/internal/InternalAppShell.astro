@@ -44,6 +44,31 @@ const { route, recordId = '' } = Astro.props;
     root.querySelector('[data-reload-portal]')?.addEventListener('click', () => window.location.reload());
   };
 
+  /**
+   * Nach erfolgreichem Vollimport wird das Gutachten automatisch aus den nun
+   * konsolidierten Fenster-/Flügeldaten erzeugt. Die bestehende Exportansicht
+   * bleibt dabei die einzige Gutachten-Renderinglogik.
+   */
+  const installSharePointAutoReport = (root: HTMLElement) => {
+    if (root.dataset.route !== 'sharepoint') return;
+    let running = false;
+    const observer = new MutationObserver(() => {
+      if (running) return;
+      const status = root.querySelector<HTMLElement>('#sp-url-status');
+      const text = status?.textContent ?? '';
+      if (!/vollständig aus SharePoint übernommen/i.test(text)) return;
+      running = true;
+      observer.disconnect();
+      const path = window.location.pathname;
+      const slugMatch = path.match(/\/intern\/([^/]+)\//);
+      const slug = slugMatch?.[1] ?? 'fensterpruefung-bonn';
+      window.setTimeout(() => {
+        window.location.assign(`/intern/${encodeURIComponent(slug)}/export/?autostart=gutachten`);
+      }, 700);
+    });
+    observer.observe(root, { subtree: true, childList: true, characterData: true });
+  };
+
   const roots = document.querySelectorAll('[data-internal-app]');
   roots.forEach((root) => {
     if (!(root instanceof HTMLElement)) return;
@@ -59,6 +84,7 @@ const { route, recordId = '' } = Astro.props;
       .then(() => {
         settled = true;
         window.clearTimeout(timeout);
+        installSharePointAutoReport(root);
       })
       .catch((error: unknown) => {
         settled = true;
