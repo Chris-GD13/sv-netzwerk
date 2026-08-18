@@ -32,7 +32,7 @@
   },
   "protocol": {
     "linkedin_status": "prepared-not-posted",
-    "deploy_status": "pending",
+    "deploy_status": "triggered",
     "live_pruefung": "pending"
   }
 }
