@@ -45,12 +45,11 @@ const { route, recordId = '' } = Astro.props;
   };
 
   /**
-   * Nach erfolgreichem Vollimport wird das Gutachten automatisch aus den nun
-   * konsolidierten Fenster-/Flügeldaten erzeugt. Die bestehende Exportansicht
-   * bleibt dabei die einzige Gutachten-Renderinglogik.
+   * Nach erfolgreichem Vollimport wird die Exportansicht aufgerufen.
+   * Die eigentliche Gutachtenerzeugung bleibt in der bestehenden Exportlogik.
    */
   const installSharePointAutoReport = (root: HTMLElement) => {
-    if (root.dataset.route !== 'sharepoint') return;
+    if (root.dataset.route !== 'sharepoint-import') return;
     let running = false;
     const observer = new MutationObserver(() => {
       if (running) return;
@@ -69,6 +68,25 @@ const { route, recordId = '' } = Astro.props;
     observer.observe(root, { subtree: true, childList: true, characterData: true });
   };
 
+  /** Startet in der Exportansicht das Gutachten automatisch, wenn der Vollimport dies anfordert. */
+  const installExportAutostart = (root: HTMLElement) => {
+    if (root.dataset.route !== 'export') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('autostart') !== 'gutachten') return;
+
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      const button = root.querySelector<HTMLButtonElement>('#create-report');
+      if (button && !button.disabled) {
+        window.clearInterval(timer);
+        button.click();
+        return;
+      }
+      if (attempts >= 80) window.clearInterval(timer);
+    }, 250);
+  };
+
   const roots = document.querySelectorAll('[data-internal-app]');
   roots.forEach((root) => {
     if (!(root instanceof HTMLElement)) return;
@@ -85,6 +103,7 @@ const { route, recordId = '' } = Astro.props;
         settled = true;
         window.clearTimeout(timeout);
         installSharePointAutoReport(root);
+        installExportAutostart(root);
       })
       .catch((error: unknown) => {
         settled = true;
