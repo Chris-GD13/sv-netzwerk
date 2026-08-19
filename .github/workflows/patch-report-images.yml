@@ -1,0 +1,61 @@
+name: Gutachtenbilder kompakt aufbereiten
+
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-report-images.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Bildaufbereitung fuer Word anpassen
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('sv-netzwerk/src/lib/internal/client.ts')
+          s=p.read_text(encoding='utf-8-sig')
+          changes=0
+          old="const scale = Math.min(1, 1200 / Math.max(bitmap.width, bitmap.height));"
+          new="const scale = Math.min(1, 520 / Math.max(bitmap.width, bitmap.height));"
+          if old in s:
+              s=s.replace(old,new,1); changes+=1
+          old2="return canvas.toDataURL('image/jpeg', 0.72);"
+          new2="return canvas.toDataURL('image/jpeg', 0.55);"
+          if old2 in s:
+              s=s.replace(old2,new2,1); changes+=1
+          old3='.photos img{width:100%;max-height:240px;object-fit:contain;border:1px solid #ccd7e0}'
+          new3='.photos img{height:7cm;max-height:7cm;width:auto;max-width:100%;object-fit:contain;border:1px solid #ccd7e0}'
+          if old3 in s:
+              s=s.replace(old3,new3,1); changes+=1
+          if changes == 0 and '520 / Math.max(bitmap.width, bitmap.height)' not in s:
+              raise SystemExit('Erwartete Gutachten-Bildlogik nicht gefunden')
+          p.write_text(s,encoding='utf-8')
+          PY
+          grep -Fq "520 / Math.max(bitmap.width, bitmap.height)" sv-netzwerk/src/lib/internal/client.ts
+          grep -Fq "toDataURL('image/jpeg', 0.55)" sv-netzwerk/src/lib/internal/client.ts
+          grep -Fq "height:7cm;max-height:7cm" sv-netzwerk/src/lib/internal/client.ts
+      - name: Build pruefen
+        working-directory: sv-netzwerk
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+      - name: Aenderung committen
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sv-netzwerk/src/lib/internal/client.ts
+          git commit -m "fix: Gutachtenfotos auf 7 cm und kompakte JPEGs optimieren"
+          git push origin HEAD:main
