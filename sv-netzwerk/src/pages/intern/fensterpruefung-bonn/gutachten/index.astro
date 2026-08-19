@@ -1,22 +1,23 @@
 ---
 import InternalLayout from '../../../../layouts/InternalLayout.astro';
 ---
-<InternalLayout title="Gutachten" description="Erzeugte und zentral archivierte Gutachten im Prüfportal.">
+<InternalLayout title="Gutachten" description="Gutachten verwalten, Daten bearbeiten und zentral archivierte Fassungen abrufen.">
   <main class="intern-app" style="max-width:1200px;margin:0 auto;padding:24px">
     <section class="intern-card">
       <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
       <h1>Gutachten</h1>
-      <p>Hier finden Sie die zentral archivierten Gutachten. Neue Gutachten werden nach erfolgreicher Erzeugung automatisch in der geschützten Ablage gespeichert.</p>
-      <div class="intern-actions" style="margin-top:16px">
-        <a class="sv-button sv-button-primary" href="/intern/fensterpruefung-bonn/export/">Neues Gutachten erzeugen</a>
+      <p>Hier verwalten Sie den Gutachtenstand. Änderungen am zugrunde liegenden Fensterbestand werden über die Massenänderung oder die Bestandsprüfung vorgenommen; archivierte Gutachten bleiben als abgeschlossene Fassungen erhalten.</p>
+      <div class="intern-actions" style="margin-top:16px;gap:10px;flex-wrap:wrap">
+        <a class="sv-button sv-button-primary" href="/intern/fensterpruefung-bonn/massenaenderung/">Massenänderung</a>
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/bestand-pruefen/">Bestand prüfen</a>
-        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/massenaenderung/">Massenänderung</a>
+        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/export/">Neue Gutachtenfassung erzeugen</a>
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/">Dashboard</a>
       </div>
     </section>
 
     <section class="intern-card" style="margin-top:16px">
       <h2>Zentrale Gutachtenablage</h2>
+      <p class="intern-meta">Archivierte Gutachten sind abgeschlossene Fassungen. Für Änderungen zuerst die Daten bearbeiten und danach eine neue Gutachtenfassung erzeugen.</p>
       <div id="reports-status" class="intern-alert intern-alert-info">Archiv wird geladen …</div>
       <div id="reports-list" style="margin-top:12px"></div>
     </section>
@@ -54,7 +55,7 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
         statusEl.textContent = `${items.length} archivierte Gutachtendatei/-en gefunden.`;
         listEl.innerHTML = `<div class="intern-table-wrap"><table class="intern-table"><thead><tr><th>Erstellt</th><th>Dateiname</th><th>Umfang</th><th>Dateigröße</th><th>Erstellt von</th><th>Aktion</th></tr></thead><tbody>${items.map(item => {
           const extent = `${Number(item.window_count || 0)} Fenster · ${Number(item.photo_count || 0)} Fotos · ${Number(item.attachment_count || 0)} Anlagen`;
-          return `<tr><td>${esc(fmt(item.created_at))}</td><td><strong>${esc(item.file_name || 'Gutachten')}</strong></td><td>${esc(extent)}</td><td>${esc(size(item.file_size))}</td><td>${esc(item.created_by_name || '—')}</td><td><a class="sv-button sv-button-primary" href="${esc(item.download_url)}">Herunterladen</a></td></tr>`;
+          return `<tr><td>${esc(fmt(item.created_at))}</td><td><strong>${esc(item.file_name || 'Gutachten')}</strong></td><td>${esc(extent)}</td><td>${esc(size(item.file_size))}</td><td>${esc(item.created_by_name || '—')}</td><td><div class="intern-actions" style="gap:8px;flex-wrap:wrap"><a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/massenaenderung/">Daten bearbeiten</a><a class="sv-button sv-button-primary" href="${esc(item.download_url)}">Herunterladen</a></div></td></tr>`;
         }).join('')}</tbody></table></div>`;
       } catch (e) {
         statusEl.className = 'intern-alert intern-alert-error';
