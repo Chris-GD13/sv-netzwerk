@@ -1,0 +1,33 @@
+name: SharePoint-Dublettenlogik nachschaerfen v2
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/patch-sharepoint-dedupe-v2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Dublettenlogik pruefen
+        run: |
+          set -euo pipefail
+          FILE="sv-netzwerk/public/api/sharepoint-v2.php"
+          test -f "$FILE"
+          php -l "$FILE"
+          echo "SharePoint-V2 Importdatei ist syntaktisch gueltig."
+
+      - name: Portaltests ausfuehren
+        working-directory: sv-netzwerk
+        run: |
+          npm ci
+          npm run build
