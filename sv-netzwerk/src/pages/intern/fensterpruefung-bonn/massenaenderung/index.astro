@@ -1,6 +1,20 @@
 ---
 import InternalLayout from '../../../../layouts/InternalLayout.astro';
 import { windowFormSections } from '../../../../lib/internal/schema';
+const bulkSections = windowFormSections.map((section) => ({
+  id: section.id,
+  title: section.title,
+  fields: section.fields.map((field) => ({
+    id: field.id,
+    label: field.label,
+    type: field.type,
+    step: field.step ?? '',
+    min: field.min ?? null,
+    max: field.max ?? null,
+    options: field.options ?? [],
+  })),
+}));
+const bulkSectionsJson = JSON.stringify(bulkSections).replace(/</g, '\\u003c');
 ---
 <InternalLayout title="Massenänderung" description="Werte projektweit für alle Fenster ändern oder fehlende Felder vervollständigen.">
   <main class="intern-app" style="max-width:1280px;margin:0 auto;padding:24px">
@@ -12,6 +26,7 @@ import { windowFormSections } from '../../../../lib/internal/schema';
       <div class="intern-actions" style="margin-top:16px">
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/">Dashboard</a>
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/bestand-pruefen/">Bestand prüfen</a>
+        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/gutachten/">Gutachten</a>
       </div>
     </section>
 
@@ -27,69 +42,81 @@ import { windowFormSections } from '../../../../lib/internal/schema';
     </section>
 
     <section class="intern-card" style="margin-top:16px">
-      <div class="intern-actions" role="tablist" style="gap:8px;flex-wrap:wrap">
-        {windowFormSections.map((section, i) => <button type="button" class={`sv-button ${i===0?'sv-button-primary':'sv-button-secondary'}`} data-tab={section.id}>{section.title}</button>)}
-      </div>
+      <div id="bulk-tabs" class="intern-actions" role="tablist" style="gap:8px;flex-wrap:wrap"></div>
     </section>
 
-    {windowFormSections.map((section, sectionIndex) => (
-      <section class="intern-card bulk-section" data-panel={section.id} style={`margin-top:16px;${sectionIndex===0?'':'display:none'}`}>
-        <h2>{section.title}</h2>
-        <p class="intern-meta">Ein Feld auswählen, neuen Wert eintragen und gezielt auf den gesamten Projektbestand anwenden.</p>
-        <div class="intern-form-grid">
-          {section.fields.map((field) => (
-            <div class="intern-field" style="border-bottom:1px solid #e2e8f0;padding-bottom:14px">
-              <label for={`bulk-${field.id}`}><strong>{field.label}</strong></label>
-              {field.type === 'select' ? (
-                <select id={`bulk-${field.id}`} class="intern-input" data-bulk-input data-field={field.id} data-type={field.type}>
-                  <option value="">— Wert wählen —</option>
-                  {field.options?.map((o) => <option value={o.value}>{o.label}</option>)}
-                </select>
-              ) : field.type === 'checkbox' ? (
-                <select id={`bulk-${field.id}`} class="intern-input" data-bulk-input data-field={field.id} data-type="checkbox">
-                  <option value="">— Wert wählen —</option><option value="true">Ja</option><option value="false">Nein</option>
-                </select>
-              ) : field.type === 'textarea' ? (
-                <textarea id={`bulk-${field.id}`} class="intern-input" rows="3" data-bulk-input data-field={field.id} data-type="text"></textarea>
-              ) : (
-                <input id={`bulk-${field.id}`} class="intern-input" type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : field.type === 'time' ? 'time' : 'text'} step={field.step} min={field.min} max={field.max} data-bulk-input data-field={field.id} data-type={field.type} />
-              )}
-              <button type="button" class="sv-button sv-button-primary" style="margin-top:8px" data-apply={field.id} data-label={field.label}>Auf alle Fenster anwenden</button>
-            </div>
-          ))}
-        </div>
-      </section>
-    ))}
+    <div id="bulk-panels"></div>
+    <script type="application/json" id="bulk-sections" set:html={bulkSectionsJson}></script>
   </main>
 
   <script is:inline>
-    document.querySelectorAll('[data-tab]').forEach(btn => btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-tab');
-      document.querySelectorAll('.bulk-section').forEach(p => p.style.display = p.getAttribute('data-panel') === id ? '' : 'none');
-      document.querySelectorAll('[data-tab]').forEach(b => b.className = 'sv-button ' + (b === btn ? 'sv-button-primary' : 'sv-button-secondary'));
-    }));
-    const result = document.getElementById('bulk-result');
-    document.querySelectorAll('[data-apply]').forEach(btn => btn.addEventListener('click', async () => {
-      const field = btn.getAttribute('data-apply');
-      const label = btn.getAttribute('data-label') || field;
-      const input = document.querySelector(`[data-bulk-input][data-field="${field}"]`);
-      if (!input) return;
-      const value = input.value;
-      const type = input.getAttribute('data-type') || 'text';
-      if (value === '') { alert('Bitte zuerst einen Wert eingeben.'); return; }
-      const mode = document.getElementById('bulk-mode').value;
-      const wording = mode === 'overwrite' ? 'für ALLE Fenster überschreiben' : 'nur in leeren Feldern ergänzen';
-      if (!confirm(`„${label}“ = „${value}“ ${wording}?\n\nDiese Änderung wird im Audit-Log dokumentiert.`)) return;
-      btn.disabled = true;
-      if (result) { result.className='intern-alert intern-alert--info'; result.textContent='Massenänderung wird ausgeführt …'; }
-      try {
-        const r = await fetch('/intern/api/bulk-update.php', {method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_id:1,field,value,field_type:type,mode})});
-        const j = await r.json();
-        if (!r.ok) throw new Error(j.error || 'Massenänderung fehlgeschlagen.');
-        if (result) { result.className='intern-alert intern-alert--success'; result.textContent=`${j.changed} Fenster geändert, ${j.skipped} unverändert/übersprungen, ${j.total} geprüft.`; }
-      } catch (e) {
-        if (result) { result.className='intern-alert intern-alert--error'; result.textContent=e instanceof Error?e.message:'Massenänderung fehlgeschlagen.'; }
-      } finally { btn.disabled=false; }
-    }));
+    (() => {
+      const dataEl = document.getElementById('bulk-sections');
+      const tabsEl = document.getElementById('bulk-tabs');
+      const panelsEl = document.getElementById('bulk-panels');
+      const resultEl = document.getElementById('bulk-result');
+      const modeEl = document.getElementById('bulk-mode');
+      if (!dataEl || !tabsEl || !panelsEl || !modeEl) return;
+
+      let sections = [];
+      try { sections = JSON.parse(dataEl.textContent || '[]'); } catch { sections = []; }
+
+      const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
+      const attr = (value) => esc(value).replace(/`/g, '&#096;');
+
+      function inputHtml(field) {
+        if (field.type === 'select') {
+          return `<select class="intern-input" data-bulk-input data-field="${attr(field.id)}" data-type="select"><option value="">— Wert wählen —</option>${(field.options || []).map((o) => `<option value="${attr(o.value)}">${esc(o.label)}</option>`).join('')}</select>`;
+        }
+        if (field.type === 'checkbox') {
+          return `<select class="intern-input" data-bulk-input data-field="${attr(field.id)}" data-type="checkbox"><option value="">— Wert wählen —</option><option value="true">Ja</option><option value="false">Nein</option></select>`;
+        }
+        if (field.type === 'textarea') {
+          return `<textarea class="intern-input" rows="3" data-bulk-input data-field="${attr(field.id)}" data-type="text"></textarea>`;
+        }
+        const htmlType = ['number','date','time'].includes(field.type) ? field.type : 'text';
+        const step = field.step ? ` step="${attr(field.step)}"` : '';
+        const min = field.min !== null && field.min !== undefined ? ` min="${attr(field.min)}"` : '';
+        const max = field.max !== null && field.max !== undefined ? ` max="${attr(field.max)}"` : '';
+        return `<input class="intern-input" type="${htmlType}"${step}${min}${max} data-bulk-input data-field="${attr(field.id)}" data-type="${attr(field.type)}">`;
+      }
+
+      tabsEl.innerHTML = sections.map((section, index) => `<button type="button" class="sv-button ${index === 0 ? 'sv-button-primary' : 'sv-button-secondary'}" data-tab="${attr(section.id)}">${esc(section.title)}</button>`).join('');
+      panelsEl.innerHTML = sections.map((section, index) => `<section class="intern-card bulk-section" data-panel="${attr(section.id)}" style="margin-top:16px;${index === 0 ? '' : 'display:none'}"><h2>${esc(section.title)}</h2><p class="intern-meta">Ein Feld auswählen, neuen Wert eintragen und gezielt auf den gesamten Projektbestand anwenden.</p><div class="intern-form-grid">${(section.fields || []).map((field) => `<div class="intern-field" style="border-bottom:1px solid #e2e8f0;padding-bottom:14px"><label><strong>${esc(field.label)}</strong></label>${inputHtml(field)}<button type="button" class="sv-button sv-button-primary" style="margin-top:8px" data-apply="${attr(field.id)}" data-label="${attr(field.label)}">Auf alle Fenster anwenden</button></div>`).join('')}</div></section>`).join('');
+
+      tabsEl.querySelectorAll('[data-tab]').forEach((button) => button.addEventListener('click', () => {
+        const id = button.getAttribute('data-tab');
+        panelsEl.querySelectorAll('.bulk-section').forEach((panel) => {
+          panel.style.display = panel.getAttribute('data-panel') === id ? '' : 'none';
+        });
+        tabsEl.querySelectorAll('[data-tab]').forEach((tab) => {
+          tab.className = 'sv-button ' + (tab === button ? 'sv-button-primary' : 'sv-button-secondary');
+        });
+      }));
+
+      panelsEl.querySelectorAll('[data-apply]').forEach((button) => button.addEventListener('click', async () => {
+        const field = button.getAttribute('data-apply');
+        const label = button.getAttribute('data-label') || field || 'Feld';
+        if (!field) return;
+        const input = panelsEl.querySelector(`[data-bulk-input][data-field="${CSS.escape(field)}"]`);
+        if (!input || !('value' in input)) return;
+        const value = input.value;
+        const type = input.getAttribute('data-type') || 'text';
+        if (value === '') { alert('Bitte zuerst einen Wert eingeben.'); return; }
+        const mode = 'value' in modeEl ? modeEl.value : 'empty_only';
+        const wording = mode === 'overwrite' ? 'für ALLE Fenster überschreiben' : 'nur in leeren Feldern ergänzen';
+        if (!confirm(`„${label}“ = „${value}“ ${wording}?\n\nDiese Änderung wird im Audit-Log dokumentiert.`)) return;
+        button.disabled = true;
+        if (resultEl) { resultEl.className = 'intern-alert intern-alert--info'; resultEl.textContent = 'Massenänderung wird ausgeführt …'; }
+        try {
+          const response = await fetch('/intern/api/bulk-update.php', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({project_id:1, field, value, field_type:type, mode}) });
+          const json = await response.json();
+          if (!response.ok) throw new Error(json.error || 'Massenänderung fehlgeschlagen.');
+          if (resultEl) { resultEl.className = 'intern-alert intern-alert--success'; resultEl.textContent = `${json.changed} Fenster geändert, ${json.skipped} unverändert/übersprungen, ${json.total} geprüft.`; }
+        } catch (error) {
+          if (resultEl) { resultEl.className = 'intern-alert intern-alert--error'; resultEl.textContent = error && error.message ? error.message : 'Massenänderung fehlgeschlagen.'; }
+        } finally { button.disabled = false; }
+      }));
+    })();
   </script>
 </InternalLayout>
