@@ -18,6 +18,26 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 
     <section class="intern-card" style="margin-top:16px">
       <p class="sv-eyebrow">0 · Zentrale Google-Drive-Verbindung</p>
+      <h2>Google Drive verbinden</h2>
+      <p class="intern-meta">Die Verbindung gilt zentral für alle Versicherungsfälle. Zugangsdaten zum Google-Konto werden nicht im Portal gespeichert; die Anmeldung läuft über Google OAuth.</p>
+      <div id="vf-oauth-status" class="intern-alert intern-alert--info" style="margin-top:12px">Google-Verbindungsstatus wird geprüft.</div>
+      <div id="vf-oauth-actions" class="intern-actions" style="margin-top:12px;gap:10px;flex-wrap:wrap">
+        <a id="vf-google-connect" class="sv-button sv-button-primary" href="/intern/api/google-drive-oauth.php?action=start" hidden>Mit Google Drive verbinden</a>
+        <button id="vf-google-disconnect" class="sv-button sv-button-secondary" type="button" hidden>Google Drive trennen</button>
+      </div>
+      <div id="vf-oauth-setup" class="intern-card" style="margin-top:14px;border:1px solid rgba(15,45,70,.13);box-shadow:none" hidden>
+        <h3 style="margin-top:0">Einmalige Google-OAuth-Einrichtung</h3>
+        <p class="intern-meta">Nur erforderlich, wenn für das Portal noch kein Google-OAuth-Client hinterlegt ist. Als autorisierte Weiterleitungs-URI verwenden:</p>
+        <code id="vf-oauth-redirect" style="display:block;word-break:break-all;margin:8px 0 14px"></code>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px">
+          <label><strong>Google OAuth Client-ID</strong><input id="vf-google-client-id" class="vf-input" type="text" autocomplete="off" /></label>
+          <label><strong>Google OAuth Client-Secret</strong><input id="vf-google-client-secret" class="vf-input" type="password" autocomplete="new-password" /></label>
+        </div>
+        <div class="intern-actions" style="margin-top:12px"><button id="vf-google-save-client" class="sv-button sv-button-primary" type="button">OAuth-Zugang speichern</button></div>
+        <div id="vf-oauth-setup-status" class="intern-meta" style="margin-top:8px"></div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid rgba(15,45,70,.12);margin:22px 0" />
       <h2>Fallakte laden, suchen oder neu anlegen</h2>
       <p class="intern-meta">Zentrale Ablage: <strong>Meine Ablage / Schadenfälle Christian Wächter</strong>. Gesucht wird nach Schaden-Nr., Versicherungsschein-Nr., VN/Name, Ort oder Straße.</p>
       <div style="display:grid;grid-template-columns:minmax(280px,1fr) auto auto;gap:10px;align-items:end">
@@ -106,6 +126,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   <script is:inline>
     (() => {
       const API='/intern/api/google-drive-sync.php';
+      const OAUTH='/intern/api/google-drive-oauth.php';
       const el=(id)=>document.getElementById(id);
       let activeType='SV';
       const labels={
@@ -115,9 +136,24 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       };
       async function api(url,options={}){const r=await fetch(url,{credentials:'same-origin',...options});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||`HTTP ${r.status}`);return j;}
       const setDriveStatus=(text,type='info')=>{const n=el('vf-drive-status');if(!n)return;n.className=`intern-alert intern-alert--${type}`;n.textContent=text;};
-      const caseData=()=>({
-        schaden_nr:el('vf-schaden')?.value?.trim()||'',versicherungsschein_nr:el('vf-vsnr')?.value?.trim()||'',vn_objekt:el('vf-object')?.value?.trim()||'',ort:el('vf-ort')?.value?.trim()||'',strasse:el('vf-strasse')?.value?.trim()||'',schadenart:el('vf-type')?.value?.trim()||'',reserve:el('vf-reserve')?.value?.trim()||'',kontakt:el('vf-contact')?.value?.trim()||'',fallart:activeType
-      });
+      const setOauthStatus=(text,type='info')=>{const n=el('vf-oauth-status');if(!n)return;n.className=`intern-alert intern-alert--${type}`;n.textContent=text;};
+      async function refreshOauth(){
+        try{
+          const s=await api(`${OAUTH}?action=status`);
+          if(el('vf-oauth-redirect')) el('vf-oauth-redirect').textContent=s.redirect_uri||'';
+          if(el('vf-oauth-setup')) el('vf-oauth-setup').hidden=s.client_configured || !s.can_configure;
+          if(el('vf-google-connect')) el('vf-google-connect').hidden=!s.client_configured || s.connected;
+          if(el('vf-google-disconnect')) el('vf-google-disconnect').hidden=!s.connected;
+          if(s.connected) setOauthStatus('Google Drive ist verbunden. Die zentrale Fallablage und Synchronisation sind freigeschaltet.','success');
+          else if(s.client_configured) setOauthStatus('Google OAuth ist eingerichtet. Bitte einmal mit Google Drive verbinden.','warning');
+          else setOauthStatus('Google OAuth ist noch nicht eingerichtet. Client-ID und Client-Secret einmalig hinterlegen.','warning');
+          return s;
+        }catch(e){setOauthStatus(e.message,'warning');return null;}
+      }
+      el('vf-google-save-client')?.addEventListener('click',async()=>{const out=el('vf-oauth-setup-status');if(out)out.textContent='Speichern …';try{const d=await api(`${OAUTH}?action=save_client`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_id:el('vf-google-client-id')?.value?.trim()||'',client_secret:el('vf-google-client-secret')?.value?.trim()||''})});if(out)out.textContent='OAuth-Zugang gespeichert. Jetzt mit Google Drive verbinden.';await refreshOauth();}catch(e){if(out)out.textContent=e.message;}});
+      el('vf-google-disconnect')?.addEventListener('click',async()=>{try{await api(`${OAUTH}?action=disconnect`,{method:'POST'});setDriveStatus('Google Drive wurde getrennt.','warning');await refreshOauth();}catch(e){setOauthStatus(e.message,'warning');}});
+      const params=new URLSearchParams(location.search);if(params.get('google_drive')==='connected'){setOauthStatus('Google Drive wurde erfolgreich verbunden.','success');history.replaceState({},'',location.pathname);}else if(params.get('google_drive')==='denied'){setOauthStatus('Google-Drive-Zugriff wurde nicht bestätigt.','warning');history.replaceState({},'',location.pathname);}
+      const caseData=()=>({schaden_nr:el('vf-schaden')?.value?.trim()||'',versicherungsschein_nr:el('vf-vsnr')?.value?.trim()||'',vn_objekt:el('vf-object')?.value?.trim()||'',ort:el('vf-ort')?.value?.trim()||'',strasse:el('vf-strasse')?.value?.trim()||'',schadenart:el('vf-type')?.value?.trim()||'',reserve:el('vf-reserve')?.value?.trim()||'',kontakt:el('vf-contact')?.value?.trim()||'',fallart:activeType});
       const fillCase=(meta={})=>{const map={schaden_nr:'vf-schaden',versicherungsschein_nr:'vf-vsnr',vn_objekt:'vf-object',ort:'vf-ort',strasse:'vf-strasse',schadenart:'vf-type',reserve:'vf-reserve',kontakt:'vf-contact'};Object.entries(map).forEach(([k,id])=>{const n=el(id);if(n)n.value=meta[k]||'';});if(meta.fallart)activeType=meta.fallart;};
       async function syncSources(){setDriveStatus('Google Drive wird geprüft …');try{const status=await api(`${API}?action=status`);const src=await api(`${API}?action=sync_sources`);const k=Object.keys(src.sources?.knowledge||{}).length;const b=Object.keys(src.sources?.blanco||{}).length;setDriveStatus(`Google Drive verbunden · Fälle: ${status.folders?.cases?.items??0} · Wissensbasis: ${k} Kernquellen · Blanco: ${b} Vorlagen`,'success');}catch(e){setDriveStatus(e.message,'warning');}}
       async function searchCases(){const q=el('vf-case-search')?.value?.trim()||'';const box=el('vf-case-results');if(box)box.innerHTML='<span class="intern-meta">Suche läuft …</span>';try{const data=await api(`${API}?action=search_cases&q=${encodeURIComponent(q)}`);if(!box)return;if(!data.results?.length){box.innerHTML='<div class="intern-alert intern-alert--info">Kein passender Fall gefunden.</div>';return;}box.innerHTML=data.results.map(r=>`<div class="vf-result"><div><strong>${r.meta?.schaden_nr||r.name}</strong><br><span class="intern-meta">${[r.meta?.vn_objekt,r.meta?.strasse,r.meta?.ort,r.meta?.fallart].filter(Boolean).join(' · ')}</span></div><button class="sv-button sv-button-secondary vf-load" data-id="${r.id}">Fall laden</button></div>`).join('');box.querySelectorAll('.vf-load').forEach(btn=>btn.addEventListener('click',async()=>{const d=await api(`${API}?action=load_case&id=${encodeURIComponent(btn.dataset.id)}`);el('vf-folder-id').value=d.case.id;fillCase(d.case.meta||{});sessionStorage.setItem('svnet-case',JSON.stringify({folder_id:d.case.id,meta:d.case.meta||{}}));setDriveStatus(`Fall geladen: ${d.case.meta?.schaden_nr||d.case.id}`,'success');}));}catch(e){if(box)box.innerHTML=`<div class="intern-alert intern-alert--warning">${e.message}</div>`;}}
@@ -127,7 +163,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       document.querySelectorAll('.vf-upload').forEach(button=>button.addEventListener('click',()=>{const target=button.getAttribute('data-file-target');if(target)el(target)?.click();}));
       document.querySelectorAll('.vf-file').forEach(input=>input.addEventListener('change',()=>{const kind=input.getAttribute('data-kind');const status=kind?el(`status-${kind}`):null;const count=input.files?.length||0;if(status)status.textContent=count?`${count} Datei/-en ausgewählt`:'Noch keine Datei ausgewählt.';}));
       try{const saved=JSON.parse(sessionStorage.getItem('svnet-case')||'null');if(saved?.meta){el('vf-folder-id').value=saved.folder_id||'';fillCase(saved.meta);}}catch{}
-      syncSources();
+      refreshOauth().then(s=>{if(s?.connected)syncSources();else setDriveStatus('Google Drive ist noch nicht verbunden.','warning');});
     })();
   </script>
 </InternalLayout>
