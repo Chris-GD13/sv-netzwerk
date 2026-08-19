@@ -1,12 +1,12 @@
 ---
 import InternalLayout from '../../../../layouts/InternalLayout.astro';
 ---
-<InternalLayout title="Gutachten" description="Erzeugte Gutachten und Gutachtenhistorie im Prüfportal.">
+<InternalLayout title="Gutachten" description="Erzeugte und zentral archivierte Gutachten im Prüfportal.">
   <main class="intern-app" style="max-width:1200px;margin:0 auto;padding:24px">
     <section class="intern-card">
       <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
       <h1>Gutachten</h1>
-      <p>Hier finden Sie die bisher erzeugten Gutachtenläufe. Neue Gutachten werden über den Exportbereich erstellt.</p>
+      <p>Hier finden Sie die zentral archivierten Gutachten. Neue Gutachten werden nach erfolgreicher Erzeugung automatisch in der geschützten Ablage gespeichert.</p>
       <div class="intern-actions" style="margin-top:16px">
         <a class="sv-button sv-button-primary" href="/intern/fensterpruefung-bonn/export/">Neues Gutachten erzeugen</a>
         <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/bestand-pruefen/">Bestand prüfen</a>
@@ -15,8 +15,8 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
     </section>
 
     <section class="intern-card" style="margin-top:16px">
-      <h2>Gutachtenhistorie</h2>
-      <div id="reports-status" class="intern-alert intern-alert-info">Historie wird geladen …</div>
+      <h2>Zentrale Gutachtenablage</h2>
+      <div id="reports-status" class="intern-alert intern-alert-info">Archiv wird geladen …</div>
       <div id="reports-list" style="margin-top:12px"></div>
     </section>
   </main>
@@ -30,30 +30,34 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
       const d = new Date(String(value).replace(' ', 'T') + 'Z');
       return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleString('de-DE');
     };
+    const size = (bytes) => {
+      const n = Number(bytes || 0);
+      if (n < 1024) return `${n} B`;
+      if (n < 1024*1024) return `${(n/1024).toFixed(1)} KB`;
+      return `${(n/1024/1024).toFixed(1)} MB`;
+    };
     async function loadReports() {
       if (!statusEl || !listEl) return;
       try {
-        const r = await fetch('/intern/api/exports.php?project_id=1&export_type=Word-Gutachten', { credentials: 'same-origin' });
+        const r = await fetch('/intern/api/report-archive.php?project_id=1', { credentials: 'same-origin' });
         const j = await r.json();
-        if (!r.ok) throw new Error(j.error || 'Gutachtenhistorie konnte nicht geladen werden.');
+        if (!r.ok) throw new Error(j.error || 'Gutachtenarchiv konnte nicht geladen werden.');
         const items = Array.isArray(j.items) ? j.items : [];
         if (!items.length) {
           statusEl.className = 'intern-alert intern-alert-info';
-          statusEl.textContent = 'Noch keine protokollierten Gutachten vorhanden.';
+          statusEl.textContent = 'Noch kein Gutachten zentral archiviert.';
           listEl.innerHTML = '';
           return;
         }
         statusEl.className = 'intern-alert intern-alert-success';
-        statusEl.textContent = `${items.length} Gutachtenlauf/-läufe gefunden.`;
-        listEl.innerHTML = `<div class="intern-table-wrap"><table class="intern-table"><thead><tr><th>Erstellt</th><th>Dateiname</th><th>Umfang</th><th>Status</th><th>Aktion</th></tr></thead><tbody>${items.map(item => {
-          const snap = item.filter_snapshot || {};
-          const extent = `${Number(snap.windowCount || 0)} Fenster · ${Number(snap.photoCount || 0)} Fotos · ${Number(snap.pdfAttachments || 0)} Anlagen`;
-          const status = item.archived_file_available ? 'Archivdatei vorhanden' : 'Erzeugung protokolliert';
-          return `<tr><td>${esc(fmt(item.created_at))}</td><td><strong>${esc(item.file_name || 'Gutachten')}</strong></td><td>${esc(extent)}</td><td>${esc(status)}</td><td><a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/export/">Neu erzeugen / öffnen</a></td></tr>`;
+        statusEl.textContent = `${items.length} archivierte Gutachtendatei/-en gefunden.`;
+        listEl.innerHTML = `<div class="intern-table-wrap"><table class="intern-table"><thead><tr><th>Erstellt</th><th>Dateiname</th><th>Umfang</th><th>Dateigröße</th><th>Erstellt von</th><th>Aktion</th></tr></thead><tbody>${items.map(item => {
+          const extent = `${Number(item.window_count || 0)} Fenster · ${Number(item.photo_count || 0)} Fotos · ${Number(item.attachment_count || 0)} Anlagen`;
+          return `<tr><td>${esc(fmt(item.created_at))}</td><td><strong>${esc(item.file_name || 'Gutachten')}</strong></td><td>${esc(extent)}</td><td>${esc(size(item.file_size))}</td><td>${esc(item.created_by_name || '—')}</td><td><a class="sv-button sv-button-primary" href="${esc(item.download_url)}">Herunterladen</a></td></tr>`;
         }).join('')}</tbody></table></div>`;
       } catch (e) {
         statusEl.className = 'intern-alert intern-alert-error';
-        statusEl.textContent = e instanceof Error ? e.message : 'Gutachtenhistorie konnte nicht geladen werden.';
+        statusEl.textContent = e instanceof Error ? e.message : 'Gutachtenarchiv konnte nicht geladen werden.';
       }
     }
     loadReports();
