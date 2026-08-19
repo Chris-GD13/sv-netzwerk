@@ -2,7 +2,7 @@ name: Fachbeitrag Publication Watchdog
 
 on:
   schedule:
-    # Nach dem Morgenslot: Sommerzeit 07:05 CEST / Winterzeit 07:05 CET
+    # Duale UTC-Crons; nur der Lauf um 07:05 Europe/Berlin wird ausgeführt.
     - cron: "5 5 * * *"
     - cron: "5 6 * * *"
   workflow_dispatch:
@@ -25,13 +25,33 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
+      - name: Zeitfenster bestimmen
+        id: gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          HOUR="$(TZ=Europe/Berlin date +%H)"
+          MINUTE="$(TZ=Europe/Berlin date +%M)"
+          if [ "$HOUR" = "07" ] && [ "$MINUTE" -ge 0 ] && [ "$MINUTE" -le 15 ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "DST-Zweitlauf wird übersprungen: $(TZ=Europe/Berlin date '+%F %H:%M %Z')"
+          fi
+
       - name: Repository auschecken
+        if: steps.gate.outputs.run == 'true'
         uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
       - name: Heutigen Fachbeitrag aus Repository bestimmen
         id: article
+        if: steps.gate.outputs.run == 'true'
         working-directory: sv-netzwerk
         shell: bash
         run: |
@@ -49,9 +69,7 @@ jobs:
             const pub = src.match(/^\s*publishedAt:\s*["']?(\d{4}-\d{2}-\d{2})/m)?.[1] || '';
             const status = src.match(/^\s*status:\s*["']?([^"'\r\n]+)/m)?.[1]?.trim() || '';
             const title = src.match(/^title:\s*["']?([^"'\r\n]+)/m)?.[1]?.trim() || '';
-            if (pub === today && status === 'published') {
-              rows.push({file, slug:file.replace(/\.mdx?$/,''), title});
-            }
+            if (pub === today && status === 'published') rows.push({file, slug:file.replace(/\.mdx?$/,''), title});
           }
           if (!rows.length) {
             console.log('found=false');
@@ -66,14 +84,14 @@ jobs:
           NODE
 
       - name: Kein heutiger Beitrag im Repository
-        if: steps.article.outputs.found != 'true'
+        if: steps.gate.outputs.run == 'true' && steps.article.outputs.found != 'true'
         run: |
           echo "::error::Für heute ist im Repository kein veröffentlichter Fachbeitrag vorhanden."
           exit 1
 
       - name: Öffentliche Detailseite prüfen
         id: live
-        if: steps.article.outputs.found == 'true'
+        if: steps.gate.outputs.run == 'true' && steps.article.outputs.found == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -90,7 +108,7 @@ jobs:
           fi
 
       - name: Deployment automatisch nachholen
-        if: steps.article.outputs.found == 'true' && steps.live.outputs.live != 'true'
+        if: steps.gate.outputs.run == 'true' && steps.article.outputs.found == 'true' && steps.live.outputs.live != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
@@ -106,7 +124,7 @@ jobs:
           echo "Produktiv-Deployment von main wurde automatisch gestartet."
 
       - name: Auf öffentliche Veröffentlichung warten
-        if: steps.article.outputs.found == 'true' && steps.live.outputs.live != 'true'
+        if: steps.gate.outputs.run == 'true' && steps.article.outputs.found == 'true' && steps.live.outputs.live != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -126,7 +144,7 @@ jobs:
           exit 1
 
       - name: Fachbeitrags-Workflow zur Status-/LinkedIn-Fortsetzung anstoßen
-        if: steps.article.outputs.found == 'true'
+        if: steps.gate.outputs.run == 'true' && steps.article.outputs.found == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
