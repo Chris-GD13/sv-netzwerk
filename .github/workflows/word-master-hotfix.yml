@@ -1,0 +1,70 @@
+name: Word-Master Hotfix Deploy
+
+on:
+  push:
+    paths:
+      - '.github/workflows/word-master-hotfix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      - name: Zielartefakte prüfen
+        run: |
+          test -f dist/intern/fensterpruefung-bonn/word-master/index.html
+          test -f dist/intern/fensterpruefung-bonn/gutachten/index.html
+          test -f dist/intern/api/word-master-import.php
+          test -f dist/intern/api/photo-sequence-repair.php
+      - name: Python SFTP installieren
+        run: python3 -m pip install --disable-pip-version-check --quiet paramiko
+      - name: Nur Word-Master-Funktionen nach IONOS übertragen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          timeout 120s python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import paramiko
+          host=os.environ['SFTP_HOST']; user=os.environ['SFTP_USERNAME']; password=os.environ['SFTP_PASSWORD']; port=int(os.environ.get('SFTP_PORT') or '22')
+          files=[
+            (Path('dist/intern/fensterpruefung-bonn/word-master/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/word-master/index.html'),
+            (Path('dist/intern/fensterpruefung-bonn/gutachten/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/gutachten/index.html'),
+            (Path('dist/intern/api/word-master-import.php'),'/sv-netzwerk/intern/api/word-master-import.php'),
+            (Path('dist/intern/api/photo-sequence-repair.php'),'/sv-netzwerk/intern/api/photo-sequence-repair.php'),
+          ]
+          t=paramiko.Transport((host,port)); t.banner_timeout=15; t.auth_timeout=15; t.connect(username=user,password=password)
+          s=paramiko.SFTPClient.from_transport(t); s.get_channel().settimeout(20)
+          def mkdirs(path):
+            cur=''
+            for part in path.strip('/').split('/'):
+              if not part: continue
+              cur+='/'+part
+              try: s.stat(cur)
+              except FileNotFoundError: s.mkdir(cur)
+          for local,remote in files:
+            mkdirs(remote.rsplit('/',1)[0]); s.put(str(local),remote); s.stat(remote); print('OK',remote)
+          s.close(); t.close()
+          PY
+      - name: Online prüfen
+        run: |
+          test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/fensterpruefung-bonn/word-master/)" = "200"
+          test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/fensterpruefung-bonn/gutachten/)" = "200"
