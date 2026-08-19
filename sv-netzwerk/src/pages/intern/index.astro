@@ -1,8 +1,21 @@
-﻿---
+---
 import InternalLayout from '../../layouts/InternalLayout.astro';
 import InternalAppShell from '../../components/internal/InternalAppShell.astro';
 ---
 
-<InternalLayout title="Intern" description="Geschützter Projektbereich für die SV-Netzwerk Prüfung in Bonn.">
+<InternalLayout title="Intern" description="Geschützter Projektbereich für das SV-Netzwerk Prüfportal.">
   <InternalAppShell route="landing" />
+
+  <section class="sv-section" style="padding-top:0">
+    <div class="sv-container">
+      <div class="intern-card" style="max-width:1180px;margin:0 auto">
+        <p class="sv-eyebrow">Eigenständiges Unterportal</p>
+        <h2>Versicherungsfälle</h2>
+        <p>Separater Arbeitsbereich für SV Schäden, SV-GF Schäden und andere Versicherer. Der Bereich ist unabhängig von der Fensterprüfung aufgebaut.</p>
+        <div class="intern-actions" style="margin-top:14px">
+          <a class="sv-button sv-button-primary" href="/intern/versicherungsfaelle/">Versicherungsfälle öffnen</a>
+        </div>
+      </div>
+    </div>
+  </section>
 </InternalLayout>
