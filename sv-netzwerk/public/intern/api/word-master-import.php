@@ -8,9 +8,30 @@ if (!in_array($user['role'], ['administrator','projektleiter','pruefer','sachver
 $projectId = max(1, (int)($_GET['project_id'] ?? DEFAULT_PROJECT_ID));
 $action = (string)($_GET['action'] ?? 'preview');
 
-function wmReportsDir(): string {
-    $configured = env('REPORTS_DIR', '');
-    return $configured !== '' ? rtrim($configured, '/') : dirname(photosDir()) . '/reports';
+function wmReportsDirs(): array {
+    $dirs = [];
+    $configured = trim(env('REPORTS_DIR', ''));
+    if ($configured !== '') $dirs[] = rtrim($configured, '/');
+    $photos = rtrim(photosDir(), '/');
+    $dirs[] = dirname($photos) . '/reports';
+    $dirs[] = $photos . '/reports';
+    $dirs[] = __DIR__ . '/../reports';
+    $dirs[] = __DIR__ . '/../../reports';
+    return array_values(array_unique($dirs));
+}
+function wmResolveArchiveFile(array $row): string {
+    $names = array_values(array_unique(array_filter([
+        basename((string)($row['storage_name'] ?? '')),
+        basename((string)($row['file_name'] ?? '')),
+    ])));
+    foreach (wmReportsDirs() as $dir) {
+        foreach ($names as $name) {
+            $candidate = rtrim($dir, '/') . '/' . $name;
+            if (is_file($candidate) && is_readable($candidate)) return $candidate;
+        }
+    }
+    error_log('[word-master-import] archive file missing; id=' . ($row['id'] ?? '') . '; storage=' . ($row['storage_name'] ?? '') . '; file=' . ($row['file_name'] ?? '') . '; dirs=' . implode(',', wmReportsDirs()));
+    apiError(404, 'Archivierte Gutachtendatei nicht gefunden. Bitte das Gutachten in der Gutachtenablage erneut auswählen bzw. erzeugen.');
 }
 function wmNorm(mixed $v): string {
     $s = mb_strtolower(trim((string)$v), 'UTF-8');
@@ -37,13 +58,17 @@ function wmLabelMap(): array {
     ];
 }
 function wmLatestArchive(int $projectId): array {
-    $stmt = db()->prepare('SELECT id,file_name,storage_name,created_at FROM report_archive WHERE project_id=:pid ORDER BY created_at DESC,id DESC LIMIT 1');
-    $stmt->execute([':pid'=>$projectId]);
+    $requestedId = max(0, (int)($_GET['archive_id'] ?? 0));
+    if ($requestedId > 0) {
+        $stmt = db()->prepare('SELECT id,file_name,storage_name,created_at FROM report_archive WHERE project_id=:pid AND id=:id LIMIT 1');
+        $stmt->execute([':pid'=>$projectId, ':id'=>$requestedId]);
+    } else {
+        $stmt = db()->prepare('SELECT id,file_name,storage_name,created_at FROM report_archive WHERE project_id=:pid ORDER BY created_at DESC,id DESC LIMIT 1');
+        $stmt->execute([':pid'=>$projectId]);
+    }
     $row = $stmt->fetch();
     if (!$row) apiError(404, 'Kein archiviertes Gutachten vorhanden.');
-    $file = wmReportsDir() . '/' . basename((string)$row['storage_name']);
-    if (!is_file($file)) apiError(404, 'Archivierte Gutachtendatei nicht gefunden.');
-    $row['path'] = $file;
+    $row['path'] = wmResolveArchiveFile($row);
     return $row;
 }
 function wmParseReport(string $file): array {
@@ -69,7 +94,7 @@ function wmParseReport(string $file): array {
             $field = $map[$label];
             if (in_array($field, ['inspection_number','wing_count','construction_year','glass_panes'], true)) $data[$field] = (int)preg_replace('/[^0-9-]/','',$value);
             elseif (str_ends_with($field, '_kg') || str_ends_with($field, '_mm')) $data[$field] = (float)str_replace(',', '.', preg_replace('/[^0-9,.-]/','',$value));
-            elseif (in_array($field, ['safety_glass'], true)) $data[$field] = preg_match('/^(ja|true|1)$/iu',$value) === 1;
+            elseif ($field === 'safety_glass') $data[$field] = preg_match('/^(ja|true|1)$/iu',$value) === 1;
             else $data[$field] = $value;
         }
         if (!empty($data['window_number'])) $out[] = $data;
