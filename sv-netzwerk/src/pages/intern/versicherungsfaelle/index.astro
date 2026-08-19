@@ -23,8 +23,13 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       <div id="vf-oauth-status" class="intern-alert intern-alert--info" style="margin-top:12px">Google-Verbindungsstatus wird geprüft.</div>
       <div id="vf-oauth-actions" class="intern-actions" style="margin-top:12px;gap:10px;flex-wrap:wrap">
         <a id="vf-google-connect" class="sv-button sv-button-primary" href="/intern/api/google-drive-oauth.php?action=start" hidden>Mit Google Drive verbinden</a>
-        <button id="vf-google-disconnect" class="sv-button sv-button-secondary" type="button" hidden>Google Drive trennen</button>
       </div>
+      <details id="vf-google-admin" style="margin-top:10px" hidden>
+        <summary style="cursor:pointer;font-weight:700">Verbindung verwalten</summary>
+        <div class="intern-actions" style="margin-top:10px">
+          <button id="vf-google-disconnect" class="sv-button sv-button-secondary" type="button">Google Drive trennen</button>
+        </div>
+      </details>
       <div id="vf-oauth-setup" class="intern-card" style="margin-top:14px;border:1px solid rgba(15,45,70,.13);box-shadow:none" hidden>
         <h3 style="margin-top:0">Einmalige Google-OAuth-Einrichtung</h3>
         <p class="intern-meta">Nur erforderlich, wenn für das Portal noch kein Google-OAuth-Client hinterlegt ist. Als autorisierte Weiterleitungs-URI verwenden:</p>
@@ -76,35 +81,48 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
           <h2 id="vf-title" style="margin-top:0">SV Schäden</h2>
           <p id="vf-description" class="intern-meta">Eingang und strukturierte Erfassung eines SV-Schadenfalls.</p>
         </div>
-        <div class="intern-alert intern-alert--info" style="margin:0;max-width:470px">Diese sechs Eingänge sind für alle drei Fallarten identisch und werden immer derselben zentralen Fallakte zugeordnet.</div>
+        <div class="intern-alert intern-alert--info" style="margin:0;max-width:470px">Alle Unterlagen laufen in dieselbe zentrale Fallakte. Die Dokumentart wird beim Einlesen festgelegt.</div>
       </div>
 
-      <div class="vf-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px;margin-top:18px">
-        {[
-          ['fallakte','Fallakte einlesen','Vollständige Fallakte KI-gestützt analysieren und strukturieren.'],
-          ['kva','KVA einlesen','Kostenvoranschläge erkennen, Positionen strukturieren und für die spätere Prüfung bereitstellen.'],
-          ['rechnungen','Rechnungen einlesen','Rechnungen erfassen und für Beleg-, Mengen- und Kostenprüfung vorbereiten.'],
-          ['schriftverkehr','Schriftverkehr einlesen','Schreiben, Stellungnahmen und sonstige Korrespondenz fallbezogen erfassen.'],
-          ['mails','Mails einlesen','E-Mail-Verkehr übernehmen und der Fallchronologie zuordnen.'],
-          ['anweisungen','Anweisungen ausführen','Arbeits-, Regulierungs- und Auftraggeberanweisungen einlesen und fallbezogen ausführen.'],
-        ].map(([key,title,text]) => (
-          <article class="intern-card" style="margin:0;border:1px solid rgba(15,45,70,.13);box-shadow:none">
-            <h3 style="margin-top:0">{title}</h3>
-            <p class="intern-meta" style="min-height:44px">{text}</p>
-            <label style="display:block;font-weight:700;margin-top:12px" for={`mode-${key}`}>Verarbeitung</label>
-            <select id={`mode-${key}`} class="vf-select" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid #b8c8d6;border-radius:10px;background:#fff">
-              <option value="ki">KI-gestützt auswerten und zur Fallakte</option>
-              <option value="ablage">Nur in Fallakte ablegen</option>
-              <option value="nachtrag">Als Nachtrag / neue Fassung auswerten</option>
-              <option value="manuell">Manuell prüfen / zuordnen</option>
-            </select>
-            <input id={`file-${key}`} class="vf-file" data-kind={key} type="file" multiple hidden />
-            <div class="intern-actions" style="margin-top:12px;gap:8px;align-items:center;flex-wrap:wrap">
-              <button class="sv-button sv-button-primary vf-upload" type="button" data-file-target={`file-${key}`}>Hier hochladen</button>
-              <span id={`status-${key}`} class="intern-meta">Noch keine Datei ausgewählt.</span>
-            </div>
-          </article>
-        ))}
+      <div class="vf-ingest-layout">
+        <article class="vf-compact-card">
+          <h3>Dokumente einlesen</h3>
+          <div class="vf-two-col">
+            <label><strong>Dokumentart</strong>
+              <select id="vf-document-kind" class="vf-select">
+                <option value="fallakte">Fallakte / Sammelunterlagen</option>
+                <option value="kva">Kostenvoranschlag</option>
+                <option value="rechnungen">Rechnungen</option>
+                <option value="schriftverkehr">Schriftverkehr</option>
+                <option value="mails">Mails</option>
+              </select>
+            </label>
+            <label><strong>Verarbeitung</strong>
+              <select id="vf-document-mode" class="vf-select">
+                <option value="ki">KI-gestützt auswerten und zur Fallakte</option>
+                <option value="ablage">Nur in Fallakte ablegen</option>
+                <option value="nachtrag">Als Nachtrag / neue Fassung auswerten</option>
+                <option value="manuell">Manuell prüfen / zuordnen</option>
+              </select>
+            </label>
+          </div>
+          <input id="file-documents" class="vf-file" type="file" multiple hidden />
+          <div id="vf-document-drop" class="vf-dropzone" tabindex="0">
+            <strong>Dateien hier hineinziehen</strong>
+            <span>oder klicken und Dateien auswählen</span>
+          </div>
+          <div id="status-documents" class="intern-meta" style="margin-top:8px">Noch keine Datei ausgewählt.</div>
+        </article>
+
+        <article class="vf-compact-card vf-instruction-card">
+          <h3>Anweisungen</h3>
+          <p class="intern-meta">Hier direkt festlegen, was mit dem geladenen Fall gemacht, geprüft, ergänzt oder besonders berücksichtigt werden soll.</p>
+          <textarea id="vf-instructions" class="vf-textarea" rows="8" placeholder="z. B. Prüfe die Rechnungen gegen den KVA, berücksichtige den Schriftverkehr vom ..., ergänze die Reservebegründung und erstelle anschließend ..."></textarea>
+          <div class="intern-actions" style="margin-top:10px;gap:8px;flex-wrap:wrap">
+            <button id="vf-save-instructions" class="sv-button sv-button-primary" type="button">Anweisung zum Fall speichern</button>
+            <span id="vf-instruction-status" class="intern-meta"></span>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -121,6 +139,16 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   <style>
     .vf-input{width:100%;margin-top:6px;padding:11px 12px;border:1px solid #b8c8d6;border-radius:10px;background:#fff;box-sizing:border-box}
     .vf-result{border:1px solid rgba(15,45,70,.14);border-radius:10px;padding:12px;margin-top:8px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+    .vf-ingest-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);gap:14px;margin-top:16px}
+    .vf-compact-card{border:1px solid rgba(15,45,70,.13);border-radius:14px;padding:16px;background:#fff}
+    .vf-compact-card h3{margin:0 0 10px}
+    .vf-two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .vf-select{width:100%;margin-top:6px;padding:10px 11px;border:1px solid #b8c8d6;border-radius:10px;background:#fff}
+    .vf-dropzone{margin-top:12px;border:2px dashed #b8c8d6;border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;background:#f8fbfd;display:flex;flex-direction:column;gap:4px}
+    .vf-dropzone.is-dragging{border-color:#ff970f;background:#fff7eb}
+    .vf-dropzone span{font-size:.92rem;color:#63768a}
+    .vf-textarea{width:100%;box-sizing:border-box;resize:vertical;border:1px solid #b8c8d6;border-radius:10px;padding:12px;font:inherit;line-height:1.45;background:#fff}
+    @media(max-width:850px){.vf-ingest-layout,.vf-two-col{grid-template-columns:1fr}}
   </style>
 
   <script is:inline>
@@ -143,25 +171,28 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
           if(el('vf-oauth-redirect')) el('vf-oauth-redirect').textContent=s.redirect_uri||'';
           if(el('vf-oauth-setup')) el('vf-oauth-setup').hidden=s.client_configured || !s.can_configure;
           if(el('vf-google-connect')) el('vf-google-connect').hidden=!s.client_configured || s.connected;
-          if(el('vf-google-disconnect')) el('vf-google-disconnect').hidden=!s.connected;
+          if(el('vf-google-admin')) el('vf-google-admin').hidden=!s.connected;
           if(s.connected) setOauthStatus('Google Drive ist verbunden. Die zentrale Fallablage und Synchronisation sind freigeschaltet.','success');
           else if(s.client_configured) setOauthStatus('Google OAuth ist eingerichtet. Bitte einmal mit Google Drive verbinden.','warning');
           else setOauthStatus('Google OAuth ist noch nicht eingerichtet. Client-ID und Client-Secret einmalig hinterlegen.','warning');
           return s;
         }catch(e){setOauthStatus(e.message,'warning');return null;}
       }
-      el('vf-google-save-client')?.addEventListener('click',async()=>{const out=el('vf-oauth-setup-status');if(out)out.textContent='Speichern …';try{const d=await api(`${OAUTH}?action=save_client`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_id:el('vf-google-client-id')?.value?.trim()||'',client_secret:el('vf-google-client-secret')?.value?.trim()||''})});if(out)out.textContent='OAuth-Zugang gespeichert. Jetzt mit Google Drive verbinden.';await refreshOauth();}catch(e){if(out)out.textContent=e.message;}});
-      el('vf-google-disconnect')?.addEventListener('click',async()=>{try{await api(`${OAUTH}?action=disconnect`,{method:'POST'});setDriveStatus('Google Drive wurde getrennt.','warning');await refreshOauth();}catch(e){setOauthStatus(e.message,'warning');}});
+      el('vf-google-save-client')?.addEventListener('click',async()=>{const out=el('vf-oauth-setup-status');if(out)out.textContent='Speichern …';try{await api(`${OAUTH}?action=save_client`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_id:el('vf-google-client-id')?.value?.trim()||'',client_secret:el('vf-google-client-secret')?.value?.trim()||''})});if(out)out.textContent='OAuth-Zugang gespeichert. Jetzt mit Google Drive verbinden.';await refreshOauth();}catch(e){if(out)out.textContent=e.message;}});
+      el('vf-google-disconnect')?.addEventListener('click',async()=>{if(!confirm('Google-Drive-Verbindung wirklich trennen?'))return;try{await api(`${OAUTH}?action=disconnect`,{method:'POST'});setDriveStatus('Google Drive wurde getrennt.','warning');await refreshOauth();}catch(e){setOauthStatus(e.message,'warning');}});
       const params=new URLSearchParams(location.search);if(params.get('google_drive')==='connected'){setOauthStatus('Google Drive wurde erfolgreich verbunden.','success');history.replaceState({},'',location.pathname);}else if(params.get('google_drive')==='denied'){setOauthStatus('Google-Drive-Zugriff wurde nicht bestätigt.','warning');history.replaceState({},'',location.pathname);}
-      const caseData=()=>({schaden_nr:el('vf-schaden')?.value?.trim()||'',versicherungsschein_nr:el('vf-vsnr')?.value?.trim()||'',vn_objekt:el('vf-object')?.value?.trim()||'',ort:el('vf-ort')?.value?.trim()||'',strasse:el('vf-strasse')?.value?.trim()||'',schadenart:el('vf-type')?.value?.trim()||'',reserve:el('vf-reserve')?.value?.trim()||'',kontakt:el('vf-contact')?.value?.trim()||'',fallart:activeType});
-      const fillCase=(meta={})=>{const map={schaden_nr:'vf-schaden',versicherungsschein_nr:'vf-vsnr',vn_objekt:'vf-object',ort:'vf-ort',strasse:'vf-strasse',schadenart:'vf-type',reserve:'vf-reserve',kontakt:'vf-contact'};Object.entries(map).forEach(([k,id])=>{const n=el(id);if(n)n.value=meta[k]||'';});if(meta.fallart)activeType=meta.fallart;};
+      const caseData=()=>({schaden_nr:el('vf-schaden')?.value?.trim()||'',versicherungsschein_nr:el('vf-vsnr')?.value?.trim()||'',vn_objekt:el('vf-object')?.value?.trim()||'',ort:el('vf-ort')?.value?.trim()||'',strasse:el('vf-strasse')?.value?.trim()||'',schadenart:el('vf-type')?.value?.trim()||'',reserve:el('vf-reserve')?.value?.trim()||'',kontakt:el('vf-contact')?.value?.trim()||'',fallart:activeType,anweisung:el('vf-instructions')?.value?.trim()||''});
+      const fillCase=(meta={})=>{const map={schaden_nr:'vf-schaden',versicherungsschein_nr:'vf-vsnr',vn_objekt:'vf-object',ort:'vf-ort',strasse:'vf-strasse',schadenart:'vf-type',reserve:'vf-reserve',kontakt:'vf-contact',anweisung:'vf-instructions'};Object.entries(map).forEach(([k,id])=>{const n=el(id);if(n)n.value=meta[k]||'';});if(meta.fallart)activeType=meta.fallart;};
       async function syncSources(){setDriveStatus('Google Drive wird geprüft …');try{const status=await api(`${API}?action=status`);const src=await api(`${API}?action=sync_sources`);const k=Object.keys(src.sources?.knowledge||{}).length;const b=Object.keys(src.sources?.blanco||{}).length;setDriveStatus(`Google Drive verbunden · Fälle: ${status.folders?.cases?.items??0} · Wissensbasis: ${k} Kernquellen · Blanco: ${b} Vorlagen`,'success');}catch(e){setDriveStatus(e.message,'warning');}}
       async function searchCases(){const q=el('vf-case-search')?.value?.trim()||'';const box=el('vf-case-results');if(box)box.innerHTML='<span class="intern-meta">Suche läuft …</span>';try{const data=await api(`${API}?action=search_cases&q=${encodeURIComponent(q)}`);if(!box)return;if(!data.results?.length){box.innerHTML='<div class="intern-alert intern-alert--info">Kein passender Fall gefunden.</div>';return;}box.innerHTML=data.results.map(r=>`<div class="vf-result"><div><strong>${r.meta?.schaden_nr||r.name}</strong><br><span class="intern-meta">${[r.meta?.vn_objekt,r.meta?.strasse,r.meta?.ort,r.meta?.fallart].filter(Boolean).join(' · ')}</span></div><button class="sv-button sv-button-secondary vf-load" data-id="${r.id}">Fall laden</button></div>`).join('');box.querySelectorAll('.vf-load').forEach(btn=>btn.addEventListener('click',async()=>{const d=await api(`${API}?action=load_case&id=${encodeURIComponent(btn.dataset.id)}`);el('vf-folder-id').value=d.case.id;fillCase(d.case.meta||{});sessionStorage.setItem('svnet-case',JSON.stringify({folder_id:d.case.id,meta:d.case.meta||{}}));setDriveStatus(`Fall geladen: ${d.case.meta?.schaden_nr||d.case.id}`,'success');}));}catch(e){if(box)box.innerHTML=`<div class="intern-alert intern-alert--warning">${e.message}</div>`;}}
       el('vf-case-search-btn')?.addEventListener('click',searchCases);el('vf-case-search')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchCases();}});el('vf-drive-sync')?.addEventListener('click',syncSources);
       el('vf-save-case')?.addEventListener('click',async()=>{const s=el('vf-save-status');if(s)s.textContent='Speichern …';try{const body={folder_id:el('vf-folder-id')?.value||'',case:caseData()};const d=await api(`${API}?action=save_case`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});el('vf-folder-id').value=d.folder_id;sessionStorage.setItem('svnet-case',JSON.stringify({folder_id:d.folder_id,meta:caseData()}));if(s)s.textContent='In Google Drive gespeichert.';setDriveStatus(`Aktiver Fall: ${caseData().schaden_nr||d.name}`,'success');}catch(e){if(s)s.textContent=e.message;}});
+      el('vf-save-instructions')?.addEventListener('click',()=>{const text=el('vf-instructions')?.value?.trim()||'';const s=el('vf-instruction-status');try{const saved=JSON.parse(sessionStorage.getItem('svnet-case')||'{}');saved.meta={...(saved.meta||{}),anweisung:text};sessionStorage.setItem('svnet-case',JSON.stringify(saved));if(s)s.textContent=text?'Anweisung zum aktiven Fall vorgemerkt.':'Anweisung geleert.';}catch{if(s)s.textContent='Anweisung konnte nicht zwischengespeichert werden.';}});
       document.querySelectorAll('.vf-tab').forEach(button=>button.addEventListener('click',()=>{const key=button.getAttribute('data-vf-tab')||'sv';const item=labels[key]||labels.sv;activeType=item.fallart;document.querySelectorAll('.vf-tab').forEach(b=>{b.classList.remove('is-active','sv-button-primary');b.classList.add('sv-button-secondary');});button.classList.add('is-active','sv-button-primary');button.classList.remove('sv-button-secondary');if(el('vf-title'))el('vf-title').textContent=item.title;if(el('vf-description'))el('vf-description').textContent=item.description;if(el('gf-entry'))el('gf-entry').hidden=key!=='gf';if(el('vf-output-info'))el('vf-output-info').innerHTML=key==='gf'?'<strong>SV-GF:</strong> Gemeinsame Fallakte bleibt hier. Im nächsten Schritt werden ausschließlich die Engel-/QS-spezifischen Formulare und Ausgaben gewählt.':`<strong>${item.title}:</strong> Die spezifischen Prüf- und Ausgabeformulare werden separat ergänzt.`;}));
-      document.querySelectorAll('.vf-upload').forEach(button=>button.addEventListener('click',()=>{const target=button.getAttribute('data-file-target');if(target)el(target)?.click();}));
-      document.querySelectorAll('.vf-file').forEach(input=>input.addEventListener('change',()=>{const kind=input.getAttribute('data-kind');const status=kind?el(`status-${kind}`):null;const count=input.files?.length||0;if(status)status.textContent=count?`${count} Datei/-en ausgewählt`:'Noch keine Datei ausgewählt.';}));
+      const fileInput=el('file-documents');const drop=el('vf-document-drop');const status=el('status-documents');
+      const showFiles=(files)=>{const count=files?.length||0;if(status)status.textContent=count?`${count} Datei/-en ausgewählt · Dokumentart: ${el('vf-document-kind')?.selectedOptions?.[0]?.textContent||''}`:'Noch keine Datei ausgewählt.';};
+      drop?.addEventListener('click',()=>fileInput?.click());drop?.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fileInput?.click();}});fileInput?.addEventListener('change',()=>showFiles(fileInput.files));
+      ['dragenter','dragover'].forEach(type=>drop?.addEventListener(type,e=>{e.preventDefault();drop.classList.add('is-dragging');}));['dragleave','drop'].forEach(type=>drop?.addEventListener(type,e=>{e.preventDefault();drop.classList.remove('is-dragging');}));drop?.addEventListener('drop',e=>{if(!fileInput||!e.dataTransfer?.files?.length)return;fileInput.files=e.dataTransfer.files;showFiles(fileInput.files);});
       try{const saved=JSON.parse(sessionStorage.getItem('svnet-case')||'null');if(saved?.meta){el('vf-folder-id').value=saved.folder_id||'';fillCase(saved.meta);}}catch{}
       refreshOauth().then(s=>{if(s?.connected)syncSources();else setDriveStatus('Google Drive ist noch nicht verbunden.','warning');});
     })();
