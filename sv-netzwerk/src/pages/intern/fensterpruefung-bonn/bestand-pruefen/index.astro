@@ -1,0 +1,51 @@
+---
+import InternalLayout from '../../../../layouts/InternalLayout.astro';
+---
+<InternalLayout title="Bestand prüfen & Dubletten bereinigen" description="Fenster, Flügel und Fotos vor dem Gutachten prüfen und Dubletten konsolidieren.">
+  <main class="intern-app" style="max-width:1100px;margin:0 auto;padding:24px">
+    <section class="intern-card">
+      <p class="sv-eyebrow">Prüfportal · Datenqualität</p>
+      <h1>Bestand prüfen & Dubletten bereinigen</h1>
+      <p>Vor dem Gutachten werden Fenster, Flügel und Fotos auf Mehrfacheinträge geprüft. Vorhandene Informationen werden zusammengeführt; widersprüchliche Werte werden als Konflikt dokumentiert.</p>
+      <div id="audit" class="intern-alert intern-alert-info">Bestand wird geprüft …</div>
+      <div class="intern-actions" style="margin-top:16px">
+        <button id="refresh" class="sv-button sv-button-secondary" type="button">Bestand neu prüfen</button>
+        <button id="cleanup" class="sv-button sv-button-primary" type="button">Dubletten jetzt bereinigen</button>
+        <a href="/intern/fensterpruefung-bonn/export/" class="sv-button sv-button-secondary">Zum Gutachten</a>
+      </div>
+      <div id="result" style="margin-top:16px"></div>
+    </section>
+  </main>
+  <script>
+    const auditEl = document.querySelector('#audit');
+    const resultEl = document.querySelector('#result');
+    const cleanupBtn = document.querySelector('#cleanup');
+    function render(a) {
+      auditEl.innerHTML = `<strong>Aktueller Bestand</strong><br>
+        ${a.unique_windows} eindeutige Fenster · ${a.active_sashes} Flügel · ${a.active_photos} eindeutige/aktive Fotos<br>
+        <strong>Dubletten:</strong> ${a.duplicate_window_rows} Fensterzeilen · ${a.duplicate_sash_rows} Flügel · ${a.duplicate_photo_name_candidates} Foto-Kandidaten<br>
+        Referenzwert: ca. ${a.expected_sash_reference} Fensterflügel.`;
+    }
+    async function audit() {
+      auditEl.textContent = 'Bestand wird geprüft …';
+      const r = await fetch('/intern/api/data-cleanup.php?action=audit&project_id=1', {credentials:'same-origin'});
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || 'Bestandsprüfung fehlgeschlagen');
+      render(j.audit);
+    }
+    document.querySelector('#refresh').addEventListener('click', () => audit().catch(e => auditEl.textContent=e.message));
+    cleanupBtn.addEventListener('click', async () => {
+      if (!confirm('Dubletten jetzt zusammenführen? Die Originalinformationen werden in den verbleibenden Datensätzen zusammengeführt; Mehrfacheinträge werden nur logisch deaktiviert.')) return;
+      cleanupBtn.disabled = true; resultEl.innerHTML = '<div class="intern-alert intern-alert-info">Bereinigung läuft …</div>';
+      try {
+        const r = await fetch('/intern/api/data-cleanup.php?action=cleanup&project_id=1', {method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:'{}'});
+        const j = await r.json(); if(!r.ok) throw new Error(j.error || 'Bereinigung fehlgeschlagen');
+        render(j.after);
+        resultEl.innerHTML = `<div class="intern-alert intern-alert-success"><strong>Bereinigung abgeschlossen.</strong><br>
+          ${j.cleanup.windows_merged} Fenster-Dubletten zusammengeführt · ${j.cleanup.sashes_merged} Flügel-Dubletten zusammengeführt · ${j.cleanup.photos_merged} identische Fotos deaktiviert · ${j.cleanup.photo_conflicts} Foto-Zuordnungskonflikte nicht automatisch gelöscht · ${j.cleanup.field_conflicts} Feldkonflikte dokumentiert.</div>`;
+      } catch(e) { resultEl.innerHTML = `<div class="intern-alert intern-alert-error">${e.message}</div>`; }
+      finally { cleanupBtn.disabled=false; }
+    });
+    audit().catch(e => auditEl.textContent=e.message);
+  </script>
+</InternalLayout>
