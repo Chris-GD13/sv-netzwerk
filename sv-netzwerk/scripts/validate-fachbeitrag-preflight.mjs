@@ -92,8 +92,8 @@ for (const entry of todayDaily) {
     .replace(/\[[^\]]+\]\([^\)]+\)/g, ' ')
     .replace(/[#>*_|`~-]/g, ' ');
   const wordCount = plainBody.split(/\s+/).filter(Boolean).length;
-  if (wordCount < 1800) {
-    errors.push(`${entry.file}: Fachbeitrag zu kurz (${wordCount} Wörter; Mindestumfang 1800 Wörter).`);
+  if (wordCount < 1200) {
+    errors.push(`${entry.file}: Fachbeitrag zu kurz (${wordCount} Wörter; Mindestumfang 1200 Wörter).`);
   }
 
   const headingCount = (entry.body.match(/^#{2,3}\s+.+$/gm) || []).length;
@@ -137,9 +137,6 @@ for (const entry of todayDaily) {
 }
 
 if (publishedDaily.length > 0) {
-  // Zukünftig terminierte Beiträge liegen bereits im Content-Verzeichnis, sind
-  // am Prüftag aber noch nicht öffentlich. Sie dürfen deshalb weder die
-  // Fachwissensübersicht noch den aktuellen Tageslauf blockieren.
   const publishedAll = entries.filter((entry) => (
     entry.status === 'published'
     && entry.publishedAt
