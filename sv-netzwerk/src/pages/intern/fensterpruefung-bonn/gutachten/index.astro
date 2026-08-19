@@ -42,7 +42,7 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
         statusEl.textContent = `${items.length} archivierte Gutachtendatei/-en gefunden.`;
         listEl.innerHTML = `<div class="intern-table-wrap"><table class="intern-table"><thead><tr><th>Erstellt</th><th>Dateiname</th><th>Umfang</th><th>Dateigröße</th><th>Erstellt von</th><th>Aktion</th></tr></thead><tbody>${items.map(item => {
           const extent = `${Number(item.window_count || 0)} Fenster · ${Number(item.photo_count || 0)} Fotos · ${Number(item.attachment_count || 0)} Anlagen`;
-          const masterUrl = `/intern/fensterpruefung-bonn/word-master/?archive_id=${encodeURIComponent(String(item.id))}`;
+          const masterUrl = `/intern/fensterpruefung-bonn/word-master/?archive_id=${encodeURIComponent(String(item.id))}&file_name=${encodeURIComponent(String(item.file_name || ''))}`;
           return `<tr><td>${esc(fmt(item.created_at))}</td><td><strong>${esc(item.file_name || 'Gutachten')}</strong></td><td>${esc(extent)}</td><td>${esc(size(item.file_size))}</td><td>${esc(item.created_by_name || '—')}</td><td><div class="intern-actions" style="gap:8px;flex-wrap:wrap"><a class="sv-button sv-button-secondary" href="${masterUrl}">Als Master prüfen</a><a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/massenaenderung/">Daten bearbeiten</a><a class="sv-button sv-button-primary" href="${esc(item.download_url)}">Herunterladen</a></div></td></tr>`;
         }).join('')}</tbody></table></div>`;
       } catch (e) { statusEl.className = 'intern-alert intern-alert-error'; statusEl.textContent = e instanceof Error ? e.message : 'Gutachtenarchiv konnte nicht geladen werden.'; }
