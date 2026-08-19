@@ -8,31 +8,6 @@ if (!in_array($user['role'], ['administrator','projektleiter','pruefer','sachver
 $projectId = max(1, (int)($_GET['project_id'] ?? DEFAULT_PROJECT_ID));
 $action = (string)($_GET['action'] ?? 'preview');
 
-function wmReportsDirs(): array {
-    $dirs = [];
-    $configured = trim(env('REPORTS_DIR', ''));
-    if ($configured !== '') $dirs[] = rtrim($configured, '/');
-    $photos = rtrim(photosDir(), '/');
-    $dirs[] = dirname($photos) . '/reports';
-    $dirs[] = $photos . '/reports';
-    $dirs[] = __DIR__ . '/../reports';
-    $dirs[] = __DIR__ . '/../../reports';
-    return array_values(array_unique($dirs));
-}
-function wmResolveArchiveFile(array $row): string {
-    $names = array_values(array_unique(array_filter([
-        basename((string)($row['storage_name'] ?? '')),
-        basename((string)($row['file_name'] ?? '')),
-    ])));
-    foreach (wmReportsDirs() as $dir) {
-        foreach ($names as $name) {
-            $candidate = rtrim($dir, '/') . '/' . $name;
-            if (is_file($candidate) && is_readable($candidate)) return $candidate;
-        }
-    }
-    error_log('[word-master-import] archive file missing; id=' . ($row['id'] ?? '') . '; storage=' . ($row['storage_name'] ?? '') . '; file=' . ($row['file_name'] ?? '') . '; dirs=' . implode(',', wmReportsDirs()));
-    apiError(404, 'Archivierte Gutachtendatei nicht gefunden. Bitte das Gutachten in der Gutachtenablage erneut auswählen bzw. erzeugen.');
-}
 function wmNorm(mixed $v): string {
     $s = mb_strtolower(trim((string)$v), 'UTF-8');
     $s = strtr($s, ['ä'=>'ae','ö'=>'oe','ü'=>'ue','ß'=>'ss']);
@@ -57,23 +32,46 @@ function wmLabelMap(): array {
         'prioritaet'=>'priority','status'=>'status','sachverstaendigenhinweis'=>'expert_note'
     ];
 }
-function wmLatestArchive(int $projectId): array {
+function wmArchive(int $projectId): array {
     $requestedId = max(0, (int)($_GET['archive_id'] ?? 0));
-    if ($requestedId > 0) {
-        $stmt = db()->prepare('SELECT id,file_name,storage_name,created_at FROM report_archive WHERE project_id=:pid AND id=:id LIMIT 1');
-        $stmt->execute([':pid'=>$projectId, ':id'=>$requestedId]);
-    } else {
-        $stmt = db()->prepare('SELECT id,file_name,storage_name,created_at FROM report_archive WHERE project_id=:pid ORDER BY created_at DESC,id DESC LIMIT 1');
-        $stmt->execute([':pid'=>$projectId]);
-    }
+    if ($requestedId <= 0) apiError(400, 'Bitte zuerst in der Gutachtenablage eine konkrete Fassung über „Als Master prüfen“ auswählen.');
+    $stmt = db()->prepare('SELECT id,file_name,storage_name,created_at FROM report_archive WHERE project_id=:pid AND id=:id LIMIT 1');
+    $stmt->execute([':pid'=>$projectId, ':id'=>$requestedId]);
     $row = $stmt->fetch();
-    if (!$row) apiError(404, 'Kein archiviertes Gutachten vorhanden.');
-    $row['path'] = wmResolveArchiveFile($row);
+    if (!$row) apiError(404, 'Die ausgewählte Gutachtenfassung wurde im Archiv nicht gefunden.');
     return $row;
 }
-function wmParseReport(string $file): array {
-    $html = file_get_contents($file);
-    if ($html === false || trim($html) === '') apiError(422, 'Gutachten ist leer oder nicht lesbar.');
+function wmFetchArchiveContent(int $archiveId): string {
+    $scheme = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
+    $host = (string)($_SERVER['HTTP_HOST'] ?? 'www.sv-netzwerk.eu');
+    $url = $scheme . '://' . $host . '/intern/api/report-archive.php?download=' . $archiveId;
+    $cookie = (string)($_SERVER['HTTP_COOKIE'] ?? '');
+    $headers = ['Accept: application/octet-stream'];
+    if ($cookie !== '') $headers[] = 'Cookie: ' . $cookie;
+
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true, CURLOPT_FOLLOWLOCATION=>false, CURLOPT_CONNECTTIMEOUT=>10, CURLOPT_TIMEOUT=>30, CURLOPT_HTTPHEADER=>$headers]);
+        $body = curl_exec($ch);
+        $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        $err = curl_error($ch);
+        curl_close($ch);
+        if ($body === false || $status !== 200) {
+            error_log('[word-master-import] Archiv-Download fehlgeschlagen HTTP '.$status.' '.$err);
+            apiError(502, 'Die ausgewählte Gutachtenfassung konnte über die zentrale Gutachtenablage nicht gelesen werden.');
+        }
+        return (string)$body;
+    }
+
+    $ctx = stream_context_create(['http'=>['method'=>'GET','header'=>implode("\r\n",$headers),'timeout'=>30,'ignore_errors'=>true]]);
+    $body = @file_get_contents($url, false, $ctx);
+    $status = 0;
+    foreach (($http_response_header ?? []) as $line) if (preg_match('/^HTTP\/\S+\s+(\d+)/',$line,$m)) $status=(int)$m[1];
+    if ($body === false || $status !== 200) apiError(502, 'Die ausgewählte Gutachtenfassung konnte über die zentrale Gutachtenablage nicht gelesen werden.');
+    return (string)$body;
+}
+function wmParseReportContent(string $html): array {
+    if (trim($html) === '') apiError(422, 'Gutachten ist leer oder nicht lesbar.');
     libxml_use_internal_errors(true);
     $dom = new DOMDocument();
     if (!$dom->loadHTML($html, LIBXML_NOWARNING|LIBXML_NOERROR|LIBXML_NONET)) apiError(422, 'Gutachten konnte nicht als Word-/HTML-Dokument gelesen werden.');
@@ -99,7 +97,7 @@ function wmParseReport(string $file): array {
         }
         if (!empty($data['window_number'])) $out[] = $data;
     }
-    if (!$out) apiError(422, 'Im archivierten Gutachten wurden keine Fensterpositionen erkannt.');
+    if (!$out) apiError(422, 'Im ausgewählten Gutachten wurden keine Fensterpositionen erkannt.');
     return $out;
 }
 function wmExisting(int $projectId): array {
@@ -131,8 +129,8 @@ function wmCompare(array $parsed, array $existing): array {
     return ['counts'=>$counts,'items'=>$items];
 }
 
-$archive = wmLatestArchive($projectId);
-$parsed = wmParseReport((string)$archive['path']);
+$archive = wmArchive($projectId);
+$parsed = wmParseReportContent(wmFetchArchiveContent((int)$archive['id']));
 $existing = wmExisting($projectId);
 $comparison = wmCompare($parsed,$existing);
 
