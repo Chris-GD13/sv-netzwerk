@@ -1,0 +1,210 @@
+name: Fachbeitrag aus Redaktionsplan veröffentlichen
+
+on:
+  schedule:
+    # 05:20 Europe/Berlin, DST-sicher. Gate verhindert den doppelten UTC-Lauf.
+    - cron: "20 3 * * *"
+    - cron: "20 4 * * *"
+  workflow_dispatch:
+    inputs:
+      publication_date:
+        description: "Optionales Veröffentlichungsdatum YYYY-MM-DD"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: scheduled-fachbeitrag-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    steps:
+      - name: Zeitfenster bestimmen
+        id: gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          HOUR="$(TZ=Europe/Berlin date +%H)"
+          if [ "$HOUR" = "05" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "DST-Zweitlauf übersprungen: $(TZ=Europe/Berlin date '+%F %H:%M %Z')"
+          fi
+
+      - name: Repository auschecken
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Node.js einrichten
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+
+      - name: Abhängigkeiten installieren
+        if: steps.gate.outputs.run == 'true'
+        run: npm ci --no-audit --no-fund
+
+      - name: Geplanten Fachbeitrag übernehmen
+        if: steps.gate.outputs.run == 'true'
+        id: promote
+        shell: bash
+        run: |
+          set -euo pipefail
+          DATE_INPUT='${{ inputs.publication_date }}'
+          if [ -n "$DATE_INPUT" ]; then
+            DATE="$DATE_INPUT"
+          else
+            DATE="$(TZ=Europe/Berlin date +%F)"
+          fi
+          if ! printf '%s' "$DATE" | grep -Eq '^20[0-9]{2}-[0-9]{2}-[0-9]{2}$'; then
+            echo "::error::Ungültiges Veröffentlichungsdatum: $DATE"
+            exit 1
+          fi
+          DIR="drafts/fachbeitraege/scheduled/$DATE"
+          if [ ! -d "$DIR" ]; then
+            echo "::error::Kein Redaktionsordner für $DATE vorhanden. Es wird ausdrücklich kein generischer Ersatzbeitrag erzeugt."
+            exit 1
+          fi
+          ARTICLE="$(find "$DIR" -maxdepth 1 -type f -name '*.md' ! -name 'manifest.md' | sort | head -n 1)"
+          if [ -z "$ARTICLE" ]; then
+            echo "::error::Kein redaktionell vorbereiteter Markdown-Fachbeitrag für $DATE vorhanden."
+            exit 1
+          fi
+          SLUG="$(basename "$ARTICLE" .md)"
+          TARGET="src/content/knowledge/$SLUG.md"
+          if [ -e "$TARGET" ]; then
+            echo "Fachbeitrag $SLUG ist bereits im Content. Veröffentlichung wird idempotent fortgesetzt."
+          else
+            cp "$ARTICLE" "$TARGET"
+          fi
+          python3 - "$TARGET" "$DATE" <<'PY'
+          import re,sys
+          p,date=sys.argv[1:]
+          s=open(p,encoding='utf-8').read()
+          s=re.sub(r'^dailyStandard:\s*false\s*$', 'dailyStandard: true', s, flags=re.M)
+          if not re.search(r'^dailyStandard:\s*true\s*$', s, flags=re.M):
+              raise SystemExit('dailyStandard konnte nicht auf true gesetzt werden')
+          s=re.sub(r'(^\s*publishedAt:\s*)\d{4}-\d{2}-\d{2}\s*$', r'\g<1>'+date, s, flags=re.M)
+          s=re.sub(r'^\s*image:\s*.*\.svg\s*$', '', s, flags=re.M)
+          s=re.sub(r'^\s*imageAlt:\s*.*$', '', s, flags=re.M)
+          open(p,'w',encoding='utf-8').write(s)
+          PY
+          TITLE="$(sed -n 's/^title:[[:space:]]*["'"']\(.*\)["'"'][[:space:]]*$/\1/p' "$TARGET" | head -n 1)"
+          if printf '%s' "$TITLE" | grep -Eq '\([0-9]+\)[[:space:]]*$'; then
+            echo "::error::Technisches Dubletten-Suffix im Titel ist unzulässig: $TITLE"
+            exit 1
+          fi
+          COMPANION="$(find "$DIR" -maxdepth 1 -type f -name "${DATE}_*.txt" | sort | head -n 1 || true)"
+          LINKEDIN="src/content/linkedin/${DATE}_${SLUG}.txt"
+          if [ -n "$COMPANION" ]; then
+            {
+              echo "Status: prepared-not-posted"
+              echo
+              cat "$COMPANION"
+            } > "$LINKEDIN"
+          elif [ ! -f "$LINKEDIN" ]; then
+            {
+              echo "Status: prepared-not-posted"
+              echo
+              echo "$TITLE"
+              echo
+              echo "Begleittext wird redaktionell vorbereitet; keine externe Veröffentlichung durch die Automatik."
+              echo
+              echo "https://www.sv-netzwerk.eu/fachwissen/${SLUG}/"
+            } > "$LINKEDIN"
+          fi
+          node scripts/sync-library-from-article.mjs "$SLUG"
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          echo "title=$TITLE" >> "$GITHUB_OUTPUT"
+
+      - name: Redaktionelle Vorprüfung
+        if: steps.gate.outputs.run == 'true'
+        run: node scripts/validate-fachbeitrag-preflight.mjs "${{ steps.promote.outputs.date }}"
+
+      - name: Typprüfung
+        if: steps.gate.outputs.run == 'true'
+        run: npm run check
+
+      - name: Build
+        if: steps.gate.outputs.run == 'true'
+        run: npm run build
+
+      - name: Dist-Nachweis
+        if: steps.gate.outputs.run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE="dist/fachwissen/${{ steps.promote.outputs.slug }}/index.html"
+          test -f "$FILE"
+          grep -Fq '${{ steps.promote.outputs.title }}' "$FILE"
+          grep -Eqi 'Quellen|weiterführende Hinweise|Regelwerke' "$FILE"
+
+      - name: Veröffentlichen
+        if: steps.gate.outputs.run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "Keine neuen Änderungen; Beitrag war bereits vorbereitet."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add src/content/knowledge src/content/linkedin src/data/library.ts CHANGELOG.md
+            git commit -m "chore: publish quality fachbeitrag ${{ steps.promote.outputs.date }}"
+            git push origin HEAD:main
+          fi
+
+      - name: Produktiv-Deployment starten
+        if: steps.gate.outputs.run == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body -sS -X POST \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${REPO}/actions/workflows/deploy.yml/dispatches" \
+            -d '{"ref":"main"}'
+
+      - name: Öffentliche Veröffentlichung verifizieren
+        if: steps.gate.outputs.run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="https://www.sv-netzwerk.eu/fachwissen/${{ steps.promote.outputs.slug }}/"
+          TITLE='${{ steps.promote.outputs.title }}'
+          for i in $(seq 1 50); do
+            BODY="$(mktemp)"
+            STATUS="$(curl -L -sS -o "$BODY" -w '%{http_code}' --max-time 30 "$URL" || true)"
+            if [ "$STATUS" = "200" ] && grep -Fq "$TITLE" "$BODY"; then
+              echo "Öffentliche Veröffentlichung bestätigt: $URL"
+              exit 0
+            fi
+            echo "Warte auf Produktivstand ($i/50), HTTP $STATUS"
+            sleep 30
+          done
+          echo "::error::Fachbeitrag wurde nicht innerhalb von 25 Minuten öffentlich bestätigt."
+          exit 1
