@@ -36,6 +36,7 @@ const parse = (source) => {
 const files = (await readdir(knowledgeDir)).filter((file) => /\.mdx?$/.test(file));
 const entries = [];
 const errors = [];
+const warnings = [];
 const titleMap = new Map();
 
 for (const file of files) {
@@ -53,14 +54,21 @@ for (const file of files) {
   const titleKey = normalize(title);
   if (titleKey) {
     const list = titleMap.get(titleKey) ?? [];
-    list.push(file);
+    list.push({ file, publishedAt, status, daily });
     titleMap.set(titleKey, list);
   }
   entries.push({ file, slug, publishedAt, title, daily, status });
 }
 
-for (const [key, names] of titleMap) {
-  if (key && names.length > 1) errors.push(`Themen-Dublette (Titel): ${names.join(', ')}`);
+for (const [key, items] of titleMap) {
+  if (!key || items.length <= 1) continue;
+  const names = items.map((item) => item.file);
+  const affectsToday = items.some((item) => item.daily && item.status === 'published' && item.publishedAt === berlinDate);
+  if (affectsToday) {
+    errors.push(`Themen-Dublette des heutigen Beitrags (Titel): ${names.join(', ')}`);
+  } else {
+    warnings.push(`Historische Themen-Dublette (blockiert Tageslauf nicht): ${names.join(', ')}`);
+  }
 }
 
 const publishedDaily = entries.filter((entry) => entry.daily && entry.status === 'published' && entry.publishedAt);
@@ -106,6 +114,11 @@ for (const entry of todayDaily) {
   } catch {
     errors.push(`Wissen-in-180-Sekunden-Skript fehlt: src/content/videos/${entry.publishedAt}_wissen-in-180-sekunden_${entry.slug}.txt`);
   }
+}
+
+if (warnings.length) {
+  console.warn('\nFachbeitrags-Preflight Hinweise:');
+  warnings.forEach((warning) => console.warn(`- ${warning}`));
 }
 
 if (errors.length) {
