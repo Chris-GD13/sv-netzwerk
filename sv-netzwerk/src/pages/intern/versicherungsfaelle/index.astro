@@ -1,0 +1,109 @@
+---
+import InternalLayout from '../../../layouts/InternalLayout.astro';
+---
+
+<InternalLayout title="Versicherungsfälle" description="Eigenständiges Unterportal für die Bearbeitung von Versicherungsfällen.">
+  <main class="intern-app" style="max-width:1280px;margin:0 auto;padding:24px">
+    <section class="intern-card">
+      <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
+      <h1>Versicherungsfälle</h1>
+      <p>Eigenständiger Arbeitsbereich für Versicherungsfälle. Dieser Bereich ist fachlich und technisch von der Fensterprüfung getrennt.</p>
+      <div class="intern-alert intern-alert--info" style="margin-top:14px">
+        Grundgerüst: Die gemeinsamen Eingangsprozesse sind vorbereitet. Die fallartspezifischen Bearbeitungsschritte werden anschließend je Bereich ergänzt.
+      </div>
+      <div class="intern-actions" style="margin-top:16px;gap:10px;flex-wrap:wrap">
+        <button class="sv-button sv-button-primary vf-tab is-active" type="button" data-vf-tab="sv">SV Schäden</button>
+        <button class="sv-button sv-button-secondary vf-tab" type="button" data-vf-tab="gf">SV-GF Schäden</button>
+        <button class="sv-button sv-button-secondary vf-tab" type="button" data-vf-tab="andere">Andere Versicherer</button>
+        <a class="sv-button sv-button-secondary" href="/intern/">Zur Prüfportal-Übersicht</a>
+      </div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap">
+        <div>
+          <p class="sv-eyebrow">Aktiver Bereich</p>
+          <h2 id="vf-title" style="margin-top:0">SV Schäden</h2>
+          <p id="vf-description" class="intern-meta">Eingang und strukturierte Erfassung eines SV-Schadenfalls.</p>
+        </div>
+        <div class="intern-alert intern-alert--info" style="margin:0;max-width:430px">Alle nachfolgenden Eingänge werden später fallbezogen zusammengeführt und bilden die Arbeitsakte des Versicherungsfalls.</div>
+      </div>
+
+      <div class="vf-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px;margin-top:18px">
+        {[
+          ['fallakte','Fallakte einlesen','Vollständige Fallakte KI-gestützt analysieren und strukturieren.'],
+          ['kva','KVA einlesen','Kostenvoranschläge erkennen, Positionen strukturieren und für die spätere Prüfung bereitstellen.'],
+          ['rechnungen','Rechnungen einlesen','Rechnungen erfassen und für Beleg-, Mengen- und Kostenprüfung vorbereiten.'],
+          ['schriftverkehr','Schriftverkehr einlesen','Schreiben, Stellungnahmen und sonstige Korrespondenz fallbezogen erfassen.'],
+          ['mails','Mails einlesen','E-Mail-Verkehr übernehmen und der Fallchronologie zuordnen.'],
+          ['anweisungen','Anweisungen ausführen','Arbeits-, Regulierungs- und Auftraggeberanweisungen einlesen und später fallbezogen ausführen.'],
+        ].map(([key,title,text]) => (
+          <article class="intern-card" style="margin:0;border:1px solid rgba(15,45,70,.13);box-shadow:none">
+            <h3 style="margin-top:0">{title}</h3>
+            <p class="intern-meta" style="min-height:44px">{text}</p>
+            <label style="display:block;font-weight:700;margin-top:12px" for={`mode-${key}`}>Verarbeitung</label>
+            <select id={`mode-${key}`} class="vf-select" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid #b8c8d6;border-radius:10px;background:#fff">
+              <option value="ki">KI-gestützt einlesen</option>
+              <option value="ablage">Nur in Fallakte ablegen</option>
+              <option value="manuell">Manuell prüfen / zuordnen</option>
+            </select>
+            <input id={`file-${key}`} class="vf-file" data-kind={key} type="file" multiple hidden />
+            <div class="intern-actions" style="margin-top:12px;gap:8px;align-items:center;flex-wrap:wrap">
+              <button class="sv-button sv-button-primary vf-upload" type="button" data-file-target={`file-${key}`}>Hier hochladen</button>
+              <span id={`status-${key}`} class="intern-meta">Noch keine Datei ausgewählt.</span>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <h2>Nächste Ausbaustufe</h2>
+      <p>Unterhalb der gemeinsamen Eingänge erhält jede Fallart eigene Bearbeitungs- und Prüfschritte. Diese werden separat ergänzt, ohne die anderen Fallarten oder die Fensterprüfung zu beeinflussen.</p>
+      <div id="vf-next" class="intern-alert intern-alert--info"><strong>SV Schäden:</strong> weitere Bearbeitungsschritte folgen nach Vorgabe.</div>
+    </section>
+  </main>
+
+  <script is:inline>
+    (() => {
+      const labels = {
+        sv: { title: 'SV Schäden', description: 'Eingang und strukturierte Erfassung eines SV-Schadenfalls.' },
+        gf: { title: 'SV-GF Schäden', description: 'Eingang und strukturierte Erfassung eines SV-GF-Schadenfalls.' },
+        andere: { title: 'Andere Versicherer', description: 'Eingang und strukturierte Erfassung von Schadenfällen anderer Versicherer.' },
+      };
+      const title = document.getElementById('vf-title');
+      const description = document.getElementById('vf-description');
+      const next = document.getElementById('vf-next');
+      document.querySelectorAll('.vf-tab').forEach((button) => {
+        button.addEventListener('click', () => {
+          const key = button.getAttribute('data-vf-tab') || 'sv';
+          const item = labels[key] || labels.sv;
+          document.querySelectorAll('.vf-tab').forEach((b) => {
+            b.classList.remove('is-active','sv-button-primary');
+            b.classList.add('sv-button-secondary');
+          });
+          button.classList.add('is-active','sv-button-primary');
+          button.classList.remove('sv-button-secondary');
+          if (title) title.textContent = item.title;
+          if (description) description.textContent = item.description;
+          if (next) next.innerHTML = `<strong>${item.title}:</strong> weitere Bearbeitungsschritte folgen nach Vorgabe.`;
+        });
+      });
+      document.querySelectorAll('.vf-upload').forEach((button) => {
+        button.addEventListener('click', () => {
+          const target = button.getAttribute('data-file-target');
+          if (!target) return;
+          document.getElementById(target)?.click();
+        });
+      });
+      document.querySelectorAll('.vf-file').forEach((input) => {
+        input.addEventListener('change', () => {
+          const kind = input.getAttribute('data-kind');
+          const status = kind ? document.getElementById(`status-${kind}`) : null;
+          const count = input.files?.length || 0;
+          if (status) status.textContent = count ? `${count} Datei/-en ausgewählt – Upload-Anbindung folgt.` : 'Noch keine Datei ausgewählt.';
+        });
+      });
+    })();
+  </script>
+</InternalLayout>
