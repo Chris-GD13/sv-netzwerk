@@ -4,6 +4,10 @@ on:
   push:
     paths:
       - '.github/workflows/word-master-hotfix.yml'
+      - 'sv-netzwerk/src/pages/intern/fensterpruefung-bonn/word-master/index.astro'
+      - 'sv-netzwerk/src/pages/intern/fensterpruefung-bonn/gutachten/index.astro'
+      - 'sv-netzwerk/public/intern/api/word-master-import.php'
+      - 'sv-netzwerk/public/intern/api/photo-sequence-repair.php'
   workflow_dispatch:
 
 permissions:
