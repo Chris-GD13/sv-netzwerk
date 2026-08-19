@@ -1,0 +1,101 @@
+name: Prüfportal Recovery Deploy v2
+
+on:
+  push:
+    paths:
+      - '.github/workflows/emergency-portal-recovery-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portal-recovery-deploy-v2
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Node.js 22 LTS einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+
+      - name: Abhängigkeiten installieren
+        run: npm ci --no-audit --no-fund
+
+      - name: Portal bauen
+        run: npm run build
+
+      - name: Python SFTP-Client installieren
+        run: python3 -m pip install --disable-pip-version-check --quiet paramiko
+
+      - name: Stabilen Stand direkt nach IONOS übertragen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          python3 - <<'PY'
+          import os, stat
+          from pathlib import Path
+          import paramiko
+
+          host = os.environ['SFTP_HOST']
+          user = os.environ['SFTP_USERNAME']
+          password = os.environ['SFTP_PASSWORD']
+          port = int(os.environ.get('SFTP_PORT') or '22')
+          local_root = Path('dist')
+          remote_root = '/sv-netzwerk'
+          if not local_root.is_dir():
+              raise SystemExit('dist fehlt')
+
+          transport = paramiko.Transport((host, port))
+          transport.banner_timeout = 20
+          transport.auth_timeout = 20
+          transport.connect(username=user, password=password)
+          sftp = paramiko.SFTPClient.from_transport(transport)
+
+          def ensure_dir(path):
+              parts = path.strip('/').split('/') if path.strip('/') else []
+              cur = ''
+              for part in parts:
+                  cur += '/' + part
+                  try:
+                      sftp.stat(cur)
+                  except FileNotFoundError:
+                      sftp.mkdir(cur)
+
+          ensure_dir(remote_root)
+          uploaded = 0
+          for src in local_root.rglob('*'):
+              if not src.is_file():
+                  continue
+              rel = src.relative_to(local_root).as_posix()
+              if rel == '.env' or rel.startswith('intern/photos/'):
+                  continue
+              remote = remote_root + '/' + rel
+              ensure_dir(remote.rsplit('/', 1)[0])
+              sftp.put(str(src), remote)
+              uploaded += 1
+
+          try:
+              sftp.stat(remote_root + '/intern/index.html')
+          except FileNotFoundError:
+              raise SystemExit('Recovery-Prüfung fehlgeschlagen: /intern/index.html fehlt')
+
+          print(f'Recovery erfolgreich: {uploaded} Dateien nach {remote_root} übertragen.')
+          sftp.close()
+          transport.close()
+          PY
