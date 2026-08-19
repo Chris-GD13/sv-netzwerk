@@ -57,7 +57,7 @@ jobs:
         run: |
           set -euo pipefail
           TODAY="$(TZ=Europe/Berlin date +%F)"
-          node <<'NODE' "$TODAY" >> "$GITHUB_OUTPUT"
+          node - "$TODAY" <<'NODE' >> "$GITHUB_OUTPUT"
           const fs = require('fs');
           const path = require('path');
           const today = process.argv[2];
