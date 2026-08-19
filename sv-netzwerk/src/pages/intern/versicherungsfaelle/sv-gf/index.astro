@@ -1,0 +1,146 @@
+---
+import InternalLayout from '../../../../layouts/InternalLayout.astro';
+---
+
+<InternalLayout title="SV-GF Schäden" description="Arbeitsbereich für Sparkassen-GF- und Großschäden nach den verbindlichen Engel/QS-Vorgaben.">
+  <main class="intern-app" style="max-width:1320px;margin:0 auto;padding:24px">
+    <section class="intern-card">
+      <p class="sv-eyebrow">Versicherungsfälle · SV-GF Schäden</p>
+      <h1>Sparkassenversicherung – GF / Großschäden</h1>
+      <p>Fallbezogener Arbeitsbereich für Sparkassen-GF-, TaskForce- und Großschäden. Berichte und Formulare werden auf Basis der verbindlichen QS-/Engel-Vorgaben und der hinterlegten Originalvorlagen vorbereitet.</p>
+      <div class="intern-alert intern-alert--info" style="margin-top:14px">
+        <strong>Masterquellen:</strong> Google Drive <code>Meine Ablage/00_KI-Wissensbasis</code> für Regeln und Arbeitsstandards sowie <code>Meine Ablage/Blanco</code> für Originalformulare und Berichtsvorlagen.
+      </div>
+      <div class="intern-actions" style="margin-top:16px;gap:10px;flex-wrap:wrap">
+        <a class="sv-button sv-button-secondary" href="/intern/versicherungsfaelle/">Versicherungsfälle</a>
+        <a class="sv-button sv-button-secondary" href="/intern/">Prüfportal</a>
+      </div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <p class="sv-eyebrow">1 · Fall anlegen</p>
+      <h2>Falldaten</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+        <label><strong>Schaden-Nr.</strong><input class="vf-input" id="gf-schaden" type="text" placeholder="z. B. 26-123456-7" /></label>
+        <label><strong>Versicherungsschein-Nr.</strong><input class="vf-input" id="gf-vsnr" type="text" /></label>
+        <label><strong>VN / Objekt</strong><input class="vf-input" id="gf-object" type="text" /></label>
+        <label><strong>Schadenart</strong><input class="vf-input" id="gf-type" type="text" placeholder="Leitungswasser, Sturm, Feuer ..." /></label>
+        <label><strong>Aktuelle Schadenhöhe / Reserve</strong><input class="vf-input" id="gf-reserve" type="text" placeholder="EUR" /></label>
+        <label><strong>Auftrag / Ansprechpartner</strong><input class="vf-input" id="gf-contact" type="text" /></label>
+      </div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <p class="sv-eyebrow">2 · Unterlagen einlesen</p>
+      <h2>Fallakte und Nachträge</h2>
+      <p class="intern-meta">Alle Eingänge werden fallbezogen zusammengeführt. Die KI-Auswertung soll Fakten, Beträge, Fristen, Deckungs-/Haftungshinweise, Regressansätze, Zahlungsstände und offene Punkte extrahieren.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;margin-top:16px">
+        {[
+          ['fallakte','Fallakte einlesen','Komplette Erstakte, Auftrag, Police, Schadenmeldung, Besichtigungsunterlagen.'],
+          ['kva','KVA einlesen','Kostenvoranschläge und Nachträge; Positionen und Summen strukturiert übernehmen.'],
+          ['rechnungen','Rechnungen einlesen','Rechnungen, Abschläge und Belege für Kosten-/Zahlungsprüfung.'],
+          ['schriftverkehr','Schriftverkehr einlesen','Schreiben, Stellungnahmen, Freigaben und Rückfragen.'],
+          ['mails','Mails einlesen','E-Mail-Verkehr chronologisch und sachbezogen auswerten.'],
+          ['anweisungen','Anweisungen ausführen','Auftraggeber-, QS- und fallbezogene Arbeitsanweisungen berücksichtigen.'],
+        ].map(([key,title,text]) => (
+          <article class="intern-card" style="margin:0;border:1px solid rgba(15,45,70,.13);box-shadow:none">
+            <h3 style="margin-top:0">{title}</h3>
+            <p class="intern-meta" style="min-height:42px">{text}</p>
+            <select class="vf-select" style="width:100%;margin-top:6px;padding:11px;border:1px solid #b8c8d6;border-radius:10px;background:#fff">
+              <option>KI-gestützt auswerten und zur Fallakte</option>
+              <option>Nur zur Fallakte hinzufügen</option>
+              <option>Als Nachtrag / neue Fassung auswerten</option>
+            </select>
+            <input id={`gf-file-${key}`} class="gf-file" data-kind={key} type="file" multiple hidden />
+            <div class="intern-actions" style="margin-top:12px;gap:8px;flex-wrap:wrap;align-items:center">
+              <button class="sv-button sv-button-primary gf-upload" data-target={`gf-file-${key}`} type="button">Hier hochladen</button>
+              <span id={`gf-status-${key}`} class="intern-meta">Noch keine Datei ausgewählt.</span>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <p class="sv-eyebrow">3 · Dokumentpaket</p>
+      <h2>Benötigte Ausgaben auswählen</h2>
+      <p>Die Auswahl steuert später die automatische Erzeugung aus derselben geprüften Falldatenbasis. Vorlagenlayout und Pflichtinhalte bleiben dokumentabhängig erhalten.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:14px">
+        {[
+          ['erstbericht','Erstbericht','Engel/QS-Erstberichtsvorlage; Eintrittspflicht, Ursache, Umfang, Reserve, Teilzahlung und Regress vollständig abarbeiten.'],
+          ['schadenprotokoll','Schadenprotokoll','Je nach Risiko Gewerbe / Privat / Frost; möglichst vollständig und unterschriftsfähig.'],
+          ['schlusserklaerung','Schlusserklärung','Schadenermittlung mit Einzelmengen, nachvollziehbarer Entschädigung und Unterschriftsbereich.'],
+          ['zahlungsbefuerwortung','Zahlungsbefürwortung','Betrag, Empfänger, Grundlage, bereits geleistete Zahlungen und Restreserve dokumentieren.'],
+          ['zwischenbericht','Zwischenbericht','Für Nachträge, Belegprüfung und relevante neue Erkenntnisse.'],
+          ['schlussbericht','Schlussbericht','Abschlussdarstellung mit finalem Schadenstand und Regressergebnis.'],
+          ['vorauszahlung','Vorauszahlung / Freigabe','Konkrete EUR-Beträge, Begründung und Empfänger; keine unbestimmten Freigaben.'],
+          ['rueckfrage','Rückfrageformular','Gezielte Rückfrage an Auftraggeber/QS bei fachlich oder deckungsseitig offenen Punkten.'],
+        ].map(([key,title,text], index) => (
+          <label class="intern-card" style="margin:0;border:1px solid rgba(15,45,70,.13);box-shadow:none;display:flex;gap:12px;align-items:flex-start;cursor:pointer">
+            <input class="gf-output" type="checkbox" value={key} checked={index < 3} style="margin-top:4px;transform:scale(1.2)" />
+            <span><strong>{title}</strong><br /><span class="intern-meta">{text}</span></span>
+          </label>
+        ))}
+      </div>
+      <div class="intern-actions" style="margin-top:16px;gap:10px;flex-wrap:wrap">
+        <button id="gf-prepare" class="sv-button sv-button-primary" type="button">Auswahl vorbereiten</button>
+        <button id="gf-generate" class="sv-button sv-button-secondary" type="button" disabled>Ausgewählte Dokumente erzeugen</button>
+      </div>
+      <div id="gf-manifest" class="intern-alert intern-alert--info" style="margin-top:14px" hidden></div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <p class="sv-eyebrow">4 · Verbindliche Quellen</p>
+      <h2>QS-/Engel-Regelwerk und Originalvorlagen</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px">
+        <article class="intern-card" style="margin:0;box-shadow:none;border:1px solid rgba(15,45,70,.13)">
+          <h3>00_KI-Wissensbasis</h3>
+          <p class="intern-meta">Verbindlicher Wissens- und Regelbestand. Prioritär: MASTER-Arbeitsstandard V4 QS-Engel, GF-Erstbericht-Vorlage QS Engel, GF-/Großschadenprompt und Richtlinien.</p>
+          <a class="sv-button sv-button-secondary" href="https://drive.google.com/drive/folders/1QeJ4Dz6Upg_W5rahWmKE_7KbC4MMgSGe" target="_blank" rel="noreferrer">Wissensbasis öffnen</a>
+        </article>
+        <article class="intern-card" style="margin:0;box-shadow:none;border:1px solid rgba(15,45,70,.13)">
+          <h3>Blanco</h3>
+          <p class="intern-meta">Originalformulare: Erstbericht, Zwischenbericht, Schlussbericht sowie Schadenprotokoll Gewerbe / Privat / Frost. Diese Vorlagen dürfen beim späteren Generator nicht durch generische Formulare ersetzt werden.</p>
+          <a class="sv-button sv-button-secondary" href="https://drive.google.com/drive/folders/1_3p6moLBt3cD5Gzy9jvPw3BXpqnAvl2k" target="_blank" rel="noreferrer">Blanco öffnen</a>
+        </article>
+      </div>
+      <div class="intern-alert intern-alert--warning" style="margin-top:14px">
+        <strong>Automatik-Gate:</strong> Die Dokumenterzeugung wird erst freigeschaltet, wenn die serverseitige Google-Drive-Synchronisation und die fallbezogene KI-Akte aktiv sind. Bis dahin ist dieser Bereich das fachliche und technische Grundgerüst; es werden keine scheinbar fertigen Berichte aus unvollständigen Daten erzeugt.
+      </div>
+    </section>
+  </main>
+
+  <style>
+    .vf-input{width:100%;margin-top:6px;padding:11px 12px;border:1px solid #b8c8d6;border-radius:10px;background:#fff;box-sizing:border-box}
+  </style>
+
+  <script is:inline>
+    (() => {
+      document.querySelectorAll('.gf-upload').forEach((button) => {
+        button.addEventListener('click', () => {
+          const id = button.getAttribute('data-target');
+          if (id) document.getElementById(id)?.click();
+        });
+      });
+      document.querySelectorAll('.gf-file').forEach((input) => {
+        input.addEventListener('change', () => {
+          const kind = input.getAttribute('data-kind');
+          const target = kind ? document.getElementById(`gf-status-${kind}`) : null;
+          const count = input.files?.length || 0;
+          if (target) target.textContent = count ? `${count} Datei/-en ausgewählt` : 'Noch keine Datei ausgewählt.';
+        });
+      });
+      const prepare = document.getElementById('gf-prepare');
+      const manifest = document.getElementById('gf-manifest');
+      prepare?.addEventListener('click', () => {
+        const selected = [...document.querySelectorAll('.gf-output:checked')].map((el) => el.closest('label')?.querySelector('strong')?.textContent || el.value);
+        const schaden = document.getElementById('gf-schaden')?.value?.trim() || 'noch nicht angegeben';
+        const object = document.getElementById('gf-object')?.value?.trim() || 'noch nicht angegeben';
+        if (manifest) {
+          manifest.hidden = false;
+          manifest.innerHTML = `<strong>Dokumentpaket vorbereitet.</strong><br>Schaden-Nr.: ${schaden}<br>VN/Objekt: ${object}<br>Ausgaben: ${selected.length ? selected.join(', ') : 'keine ausgewählt'}<br><br><strong>Nächster technischer Schritt:</strong> Google-Drive-Quellen synchronisieren, Fallakte KI-strukturiert speichern und Generator freischalten.`;
+        }
+      });
+    })();
+  </script>
+</InternalLayout>
