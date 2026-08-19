@@ -7,66 +7,36 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
     <section class="intern-card">
       <p class="sv-eyebrow">Versicherungsfälle · SV-GF Schäden</p>
       <h1>Sparkassenversicherung – GF / Großschäden</h1>
-      <p>Dieser Bereich enthält nur die <strong>fallartspezifische Bearbeitung und Dokumentausgabe</strong>. Fallanlage, Google-Drive-Suche, Speicherung und Dokumenteingang erfolgen zentral im Versicherungsportal.</p>
-      <div id="gf-current-case" class="intern-alert intern-alert--info" style="margin-top:14px">Aktiver Fall wird aus der zentralen Fallakte übernommen.</div>
-      <div class="intern-actions" style="margin-top:16px;gap:10px;flex-wrap:wrap">
-        <a class="sv-button sv-button-primary" href="/intern/versicherungsfaelle/">Zur zentralen Fallakte</a>
-        <a class="sv-button sv-button-secondary" href="/intern/">Prüfportal</a>
-      </div>
+      <div id="gf-current-case" class="intern-alert intern-alert--info" style="margin-top:14px">Aktiver Fall wird übernommen.</div>
+      <div class="intern-actions" style="margin-top:16px;gap:10px;flex-wrap:wrap"><a class="sv-button sv-button-primary" href="/intern/versicherungsfaelle/">Zur Fallakte</a></div>
     </section>
 
     <section class="intern-card" style="margin-top:16px">
-      <p class="sv-eyebrow">1 · Verbindliche Grundlagen</p>
+      <p class="sv-eyebrow">1 · Arbeitsauftrag</p>
+      <h2>Was soll die KI mit diesem Fall tun?</h2>
+      <textarea id="gf-instructions" style="width:100%;min-height:180px;box-sizing:border-box;margin-top:10px;padding:14px;border:1px solid #b8c8d6;border-radius:10px;resize:vertical" placeholder="Beispiel: Prüfe die vollständige Fallakte. Berücksichtige besonders die offene Regressfrage, prüfe die Rechnung gegen den KVA und schlage eine angemessene Vorauszahlung vor. Fehlende Angaben nicht erfinden, sondern als offene Punkte ausweisen."></textarea>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:12px">
+        <label><strong>Bearbeitungsart</strong><select id="gf-work-mode" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid #b8c8d6;border-radius:10px;background:#fff"><option value="vollpruefung">Vollständige Fallprüfung</option><option value="nachtrag">Nachtrag / neue Unterlagen prüfen</option><option value="belegpruefung">Beleg- / Rechnungsprüfung</option><option value="abschluss">Abschluss / Schlussbearbeitung</option><option value="rueckfrage">Nur Rückfrage / offene Punkte</option></select></label>
+        <label><strong>Umgang mit offenen Punkten</strong><select id="gf-open-points" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid #b8c8d6;border-radius:10px;background:#fff"><option value="kennzeichnen">Offene Punkte klar kennzeichnen</option><option value="rueckfrage">Rückfragen formulieren</option><option value="beides">Kennzeichnen und Rückfragen formulieren</option></select></label>
+      </div>
+      <div class="intern-actions" style="margin-top:12px;gap:10px;flex-wrap:wrap"><button id="gf-save-instructions" class="sv-button sv-button-secondary" type="button">Arbeitsauftrag speichern</button><span id="gf-instruction-status" class="intern-meta"></span></div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <p class="sv-eyebrow">2 · Formulare und Ausgaben</p>
       <h2>QS-/Engel-Regelwerk und Originalvorlagen</h2>
-      <p>Für SV-GF-, TaskForce- und Großschäden werden ausschließlich die verbindlichen Regeln aus <strong>00_KI-Wissensbasis</strong> und die Originalvorlagen aus <strong>Blanco</strong> verwendet.</p>
+      <p>Für SV-GF-, TaskForce- und Großschäden werden die verbindlichen Regeln aus <strong>00_KI-Wissensbasis</strong> und die Originalvorlagen aus <strong>Blanco</strong> verwendet.</p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;margin-top:14px">
-        <article class="intern-card" style="margin:0;box-shadow:none;border:1px solid rgba(15,45,70,.13)">
-          <h3>00_KI-Wissensbasis</h3>
-          <p class="intern-meta">MASTER-Arbeitsstandard V4 QS-Engel, GF-/Großschadenprompt, GF-Richtlinien und Erstbericht-Anforderungen.</p>
-          <a class="sv-button sv-button-secondary" href="https://drive.google.com/drive/folders/1QeJ4Dz6Upg_W5rahWmKE_7KbC4MMgSGe" target="_blank" rel="noreferrer">Wissensbasis öffnen</a>
-        </article>
-        <article class="intern-card" style="margin:0;box-shadow:none;border:1px solid rgba(15,45,70,.13)">
-          <h3>Blanco</h3>
-          <p class="intern-meta">Originalvorlagen für Erstbericht, Zwischenbericht, Schlussbericht sowie Schadenprotokoll Gewerbe / Privat / Frost.</p>
-          <a class="sv-button sv-button-secondary" href="https://drive.google.com/drive/folders/1_3p6moLBt3cD5Gzy9jvPw3BXpqnAvl2k" target="_blank" rel="noreferrer">Blanco öffnen</a>
-        </article>
+        <article class="intern-card" style="margin:0;box-shadow:none;border:1px solid rgba(15,45,70,.13)"><h3>00_KI-Wissensbasis</h3><p class="intern-meta">MASTER-Arbeitsstandard V4 QS-Engel, GF-/Großschadenprompt, GF-Richtlinien und Erstbericht-Anforderungen.</p><a class="sv-button sv-button-secondary" href="https://drive.google.com/drive/folders/1QeJ4Dz6Upg_W5rahWmKE_7KbC4MMgSGe" target="_blank" rel="noreferrer">Wissensbasis öffnen</a></article>
+        <article class="intern-card" style="margin:0;box-shadow:none;border:1px solid rgba(15,45,70,.13)"><h3>Blanco</h3><p class="intern-meta">Originalvorlagen für Erstbericht, Zwischenbericht, Schlussbericht sowie Schadenprotokoll Gewerbe / Privat / Frost.</p><a class="sv-button sv-button-secondary" href="https://drive.google.com/drive/folders/1_3p6moLBt3cD5Gzy9jvPw3BXpqnAvl2k" target="_blank" rel="noreferrer">Blanco öffnen</a></article>
       </div>
       <div id="gf-source-state" class="intern-alert intern-alert--warning" style="margin-top:14px">Google-Drive-Masterquellen werden geprüft.</div>
     </section>
 
     <section class="intern-card" style="margin-top:16px">
-      <p class="sv-eyebrow">2 · Arbeitsauftrag</p>
-      <h2>Was soll die KI mit diesem Fall tun?</h2>
-      <p>Hier können freie Arbeitsanweisungen, Ergänzungen, besondere Prüfschwerpunkte und Hinweise für die Dokumenterstellung eingegeben werden. Der Text gehört zum aktuellen Fall und wird zusammen mit der Dokumentauswahl als Arbeitsauftrag verwendet.</p>
-      <textarea id="gf-instructions" style="width:100%;min-height:180px;box-sizing:border-box;margin-top:10px;padding:14px;border:1px solid #b8c8d6;border-radius:10px;resize:vertical" placeholder="Beispiel: Prüfe die vollständige Fallakte. Erstelle einen Erstbericht und eine Schlusserklärung. Berücksichtige besonders die offene Regressfrage, prüfe die Rechnung Müller gegen den KVA und schlage eine angemessene Vorauszahlung vor. Fehlende Angaben nicht erfinden, sondern als offene Punkte ausweisen."></textarea>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:12px">
-        <label><strong>Bearbeitungsart</strong>
-          <select id="gf-work-mode" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid #b8c8d6;border-radius:10px;background:#fff">
-            <option value="vollpruefung">Vollständige Fallprüfung</option>
-            <option value="nachtrag">Nachtrag / neue Unterlagen prüfen</option>
-            <option value="belegpruefung">Beleg- / Rechnungsprüfung</option>
-            <option value="abschluss">Abschluss / Schlussbearbeitung</option>
-            <option value="rueckfrage">Nur Rückfrage / offene Punkte</option>
-          </select>
-        </label>
-        <label><strong>Umgang mit offenen Punkten</strong>
-          <select id="gf-open-points" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid #b8c8d6;border-radius:10px;background:#fff">
-            <option value="kennzeichnen">Offene Punkte klar kennzeichnen</option>
-            <option value="rueckfrage">Rückfragen formulieren</option>
-            <option value="beides">Kennzeichnen und Rückfragen formulieren</option>
-          </select>
-        </label>
-      </div>
-      <div class="intern-actions" style="margin-top:12px;gap:10px;flex-wrap:wrap">
-        <button id="gf-save-instructions" class="sv-button sv-button-secondary" type="button">Arbeitsauftrag speichern</button>
-        <span id="gf-instruction-status" class="intern-meta"></span>
-      </div>
-    </section>
-
-    <section class="intern-card" style="margin-top:16px">
       <p class="sv-eyebrow">3 · Dokumentpaket</p>
       <h2>Was soll erstellt werden?</h2>
-      <p>Alle Dokumente greifen auf dieselbe zentrale Fallakte zu. Mehrere Ausgaben können gleichzeitig ausgewählt werden. Die erzeugten Word-Dokumente werden direkt im aktiven Google-Drive-Fallordner gespeichert.</p>
+      <p>Mehrere Ausgaben können gleichzeitig ausgewählt werden. Die erzeugten Word-Dokumente werden direkt im aktiven Google-Drive-Fallordner gespeichert.</p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:14px">
         {[
           ['erstbericht','Erstbericht','Engel/QS-Erstberichtsvorlage; Versicherungsverhältnisse, Risikoverhältnisse, Schadenhergang/-ursache, Ermittlungen, Ersatzpflicht, Schadenumfang, Reserve, Abwicklung, Teilzahlung und Regress.'],
@@ -78,48 +48,30 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
           ['vorauszahlung','Vorauszahlung / Freigabe','Konkrete Eurobeträge, Begründung und Empfänger.'],
           ['query_form','Rückfrageformular','Gezielte Rückfrage an Auftraggeber/QS bei fachlich oder deckungsseitig offenen Punkten.'],
         ].map(([key,title,text], index) => (
-          <label class="intern-card" style="margin:0;border:1px solid rgba(15,45,70,.13);box-shadow:none;display:flex;gap:12px;align-items:flex-start;cursor:pointer">
-            <input class="gf-output" type="checkbox" value={key} checked={index < 3} style="margin-top:4px;transform:scale(1.2)" />
-            <span><strong>{title}</strong><br /><span class="intern-meta">{text}</span></span>
-          </label>
+          <label class="intern-card" style="margin:0;border:1px solid rgba(15,45,70,.13);box-shadow:none;display:flex;gap:12px;align-items:flex-start;cursor:pointer"><input class="gf-output" type="checkbox" value={key} checked={index < 3} style="margin-top:4px;transform:scale(1.2)" /><span><strong>{title}</strong><br /><span class="intern-meta">{text}</span></span></label>
         ))}
       </div>
-      <div class="intern-actions" style="margin-top:16px;gap:10px;flex-wrap:wrap">
-        <button id="gf-prepare" class="sv-button sv-button-primary" type="button">Arbeitsauftrag prüfen</button>
-        <button id="gf-generate" class="sv-button sv-button-secondary" type="button" disabled>Ausgewählte Dokumente erzeugen</button>
-      </div>
+      <div class="intern-actions" style="margin-top:16px;gap:10px;flex-wrap:wrap"><button id="gf-prepare" class="sv-button sv-button-primary" type="button">Arbeitsauftrag prüfen</button><button id="gf-generate" class="sv-button sv-button-secondary" type="button" disabled>Ausgewählte Dokumente erzeugen</button></div>
       <div id="gf-manifest" class="intern-alert intern-alert--info" style="margin-top:14px" hidden></div>
     </section>
   </main>
 
   <script is:inline>
     (()=>{
-      const API='/intern/api/google-drive-sync.php';
-      const current=document.getElementById('gf-current-case');
-      const state=document.getElementById('gf-source-state');
-      const generate=document.getElementById('gf-generate');
-      const instructions=document.getElementById('gf-instructions');
-      const workMode=document.getElementById('gf-work-mode');
-      const openPoints=document.getElementById('gf-open-points');
-      const instructionStatus=document.getElementById('gf-instruction-status');
-      let caseData=null;
-      try{caseData=JSON.parse(sessionStorage.getItem('svnet-case')||'null');}catch{}
+      const API='/intern/api/google-drive-sync.php', current=document.getElementById('gf-current-case'), state=document.getElementById('gf-source-state'), generate=document.getElementById('gf-generate'), instructions=document.getElementById('gf-instructions'), workMode=document.getElementById('gf-work-mode'), openPoints=document.getElementById('gf-open-points'), instructionStatus=document.getElementById('gf-instruction-status');
+      let caseData=null;for(const store of [sessionStorage,localStorage]){try{const d=JSON.parse(store.getItem('svnet-case')||'null');if(d?.folder_id){caseData=d;break;}}catch{}}
+      if(caseData){sessionStorage.setItem('svnet-case',JSON.stringify(caseData));localStorage.setItem('svnet-case',JSON.stringify(caseData));}
       const orderKey=()=>`svnet-gf-order:${caseData?.folder_id||caseData?.meta?.schaden_nr||'draft'}`;
       function readOrder(){try{return JSON.parse(localStorage.getItem(orderKey())||'null');}catch{return null;}}
       function collectOrder(){return {instructions:instructions?.value?.trim()||'',work_mode:workMode?.value||'vollpruefung',open_points:openPoints?.value||'kennzeichnen',outputs:[...document.querySelectorAll('.gf-output:checked')].map(el=>el.value),saved_at:new Date().toISOString(),case_folder_id:caseData?.folder_id||'',schaden_nr:caseData?.meta?.schaden_nr||''};}
       function saveOrder(show=true){const order=collectOrder();localStorage.setItem(orderKey(),JSON.stringify(order));sessionStorage.setItem('svnet-gf-order',JSON.stringify(order));if(show&&instructionStatus)instructionStatus.textContent='Arbeitsauftrag gespeichert.';return order;}
-      const stored=readOrder();if(stored){if(instructions)instructions.value=stored.instructions||'';if(workMode&&stored.work_mode)workMode.value=stored.work_mode;if(openPoints&&stored.open_points)openPoints.value=stored.open_points;document.querySelectorAll('.gf-output').forEach(el=>{if(Array.isArray(stored.outputs))el.checked=stored.outputs.includes(el.value);});}
-      if(current){
-        if(caseData?.meta){const m=caseData.meta;current.className='intern-alert intern-alert--success';current.innerHTML=`<strong>Aktiver Fall:</strong> ${m.schaden_nr||'ohne Schaden-Nr.'} · ${m.vn_objekt||''} ${m.ort?`· ${m.ort}`:''}`;}
-        else{current.className='intern-alert intern-alert--warning';current.innerHTML='<strong>Kein aktiver Fall.</strong> Bitte zuerst in der zentralen Versicherungsfallakte einen Fall laden oder anlegen.';}
-      }
+      const stored=readOrder();if(stored){if(instructions)instructions.value=stored.instructions||'';if(workMode&&stored.work_mode)workMode.value=stored.work_mode;if(openPoints&&stored.open_points)openPoints.value=stored.open_points;document.querySelectorAll('.gf-output').forEach(el=>{if(Array.isArray(stored.outputs))el.checked=stored.outputs.includes(el.value);});}else if(caseData?.meta?.anweisung&&instructions){instructions.value=caseData.meta.anweisung;}
+      if(current){if(caseData?.folder_id){const m=caseData.meta||{};current.className='intern-alert intern-alert--success';current.innerHTML=`<strong>Aktiver Fall:</strong> ${m.schaden_nr||'ohne Schaden-Nr.'}${m.vn_objekt?` · ${m.vn_objekt}`:''}${m.ort?` · ${m.ort}`:''}`;}else{current.className='intern-alert intern-alert--warning';current.innerHTML='<strong>Kein aktiver Fall.</strong> Bitte zuerst in der zentralen Fallakte einen Fall öffnen oder anlegen.';}}
       async function api(url,options={}){const r=await fetch(url,{credentials:'same-origin',...options});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||`HTTP ${r.status}`);return j;}
-      (async()=>{try{await api(`${API}?action=status`);const src=await api(`${API}?action=sync_sources`);const k=Object.keys(src.sources?.knowledge||{}).length;const b=Object.keys(src.sources?.blanco||{}).length;if(state){state.className='intern-alert intern-alert--success';state.textContent=`Google Drive verbunden · Wissensbasis: ${k} Kernquellen · Blanco: ${b} Vorlagen erkannt.`;}if(generate&&caseData?.folder_id)generate.disabled=false;}catch(e){if(state){state.className='intern-alert intern-alert--warning';state.textContent=e.message;}}})();
-      document.getElementById('gf-save-instructions')?.addEventListener('click',()=>saveOrder(true));
-      document.querySelectorAll('.gf-output').forEach(el=>el.addEventListener('change',()=>saveOrder(false)));
-      workMode?.addEventListener('change',()=>saveOrder(false));openPoints?.addEventListener('change',()=>saveOrder(false));
-      document.getElementById('gf-prepare')?.addEventListener('click',()=>{const order=saveOrder(false);const names=[...document.querySelectorAll('.gf-output:checked')].map(el=>el.closest('label')?.querySelector('strong')?.textContent||el.value);const box=document.getElementById('gf-manifest');if(box){box.hidden=false;box.className='intern-alert intern-alert--info';box.innerHTML=`<strong>Arbeitsauftrag vorbereitet.</strong><br>Fall: ${caseData?.meta?.schaden_nr||'kein aktiver Fall'}<br>Bearbeitung: ${workMode?.selectedOptions?.[0]?.textContent||''}<br>Ausgaben: ${names.length?names.join(', '):'keine ausgewählt'}<br>Freie Anweisung: ${order.instructions?order.instructions.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])):'keine zusätzliche Anweisung'}`;}});
-      generate?.addEventListener('click',async()=>{const order=saveOrder(false);const box=document.getElementById('gf-manifest');if(!caseData?.folder_id){if(box){box.hidden=false;box.className='intern-alert intern-alert--warning';box.textContent='Bitte zuerst einen Fall in der zentralen Fallakte laden.';}return;}if(!order.outputs.length){if(box){box.hidden=false;box.className='intern-alert intern-alert--warning';box.textContent='Bitte mindestens ein Dokument auswählen.';}return;}generate.disabled=true;generate.textContent='Dokumente werden erzeugt …';if(box){box.hidden=false;box.className='intern-alert intern-alert--info';box.textContent='Dokumente werden erstellt und im Google-Drive-Fallordner gespeichert …';}try{const result=await api(`${API}?action=generate_documents`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({folder_id:caseData.folder_id,order})});const links=(result.created||[]).map(f=>`<li><a href="${f.webViewLink||'#'}" target="_blank" rel="noreferrer"><strong>${String(f.name||'Dokument').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</strong></a></li>`).join('');if(box){box.className='intern-alert intern-alert--success';box.innerHTML=`<strong>${result.count||0} Dokument(e) erzeugt und im aktiven Google-Drive-Fallordner gespeichert.</strong>${links?`<ul style="margin:8px 0 0 18px">${links}</ul>`:''}`;}}catch(e){if(box){box.className='intern-alert intern-alert--warning';box.textContent=e.message;}}finally{generate.disabled=false;generate.textContent='Ausgewählte Dokumente erzeugen';}});
+      (async()=>{try{await api(`${API}?action=status`);const src=await api(`${API}?action=sync_sources`);const k=Object.keys(src.sources?.knowledge||{}).length,b=Object.keys(src.sources?.blanco||{}).length;if(state){state.className='intern-alert intern-alert--success';state.textContent=`Google Drive verbunden · Wissensbasis: ${k} Kernquellen · Blanco: ${b} Vorlagen erkannt.`;}if(generate&&caseData?.folder_id)generate.disabled=false;}catch(e){if(state){state.className='intern-alert intern-alert--warning';state.textContent=e.message;}}})();
+      document.getElementById('gf-save-instructions')?.addEventListener('click',()=>saveOrder(true));document.querySelectorAll('.gf-output').forEach(el=>el.addEventListener('change',()=>saveOrder(false)));workMode?.addEventListener('change',()=>saveOrder(false));openPoints?.addEventListener('change',()=>saveOrder(false));
+      document.getElementById('gf-prepare')?.addEventListener('click',()=>{const order=saveOrder(false),names=[...document.querySelectorAll('.gf-output:checked')].map(el=>el.closest('label')?.querySelector('strong')?.textContent||el.value),box=document.getElementById('gf-manifest');if(box){box.hidden=false;box.className='intern-alert intern-alert--info';box.innerHTML=`<strong>Arbeitsauftrag vorbereitet.</strong><br>Fall: ${caseData?.meta?.schaden_nr||'kein aktiver Fall'}<br>Ausgaben: ${names.length?names.join(', '):'keine ausgewählt'}`;}});
+      generate?.addEventListener('click',async()=>{const order=saveOrder(false),box=document.getElementById('gf-manifest');if(!caseData?.folder_id){if(box){box.hidden=false;box.className='intern-alert intern-alert--warning';box.textContent='Bitte zuerst einen Fall in der zentralen Fallakte öffnen oder anlegen.';}return;}if(!order.outputs.length){if(box){box.hidden=false;box.className='intern-alert intern-alert--warning';box.textContent='Bitte mindestens ein Dokument auswählen.';}return;}generate.disabled=true;generate.textContent='Dokumente werden erzeugt …';try{const result=await api(`${API}?action=generate_documents`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({folder_id:caseData.folder_id,order})});const links=(result.created||[]).map(f=>`<li><a href="${f.webViewLink||'#'}" target="_blank" rel="noreferrer"><strong>${String(f.name||'Dokument').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</strong></a></li>`).join('');if(box){box.hidden=false;box.className='intern-alert intern-alert--success';box.innerHTML=`<strong>${result.count||0} Dokument(e) erzeugt und im aktiven Fallordner gespeichert.</strong>${links?`<ul style="margin:8px 0 0 18px">${links}</ul>`:''}`;}}catch(e){if(box){box.hidden=false;box.className='intern-alert intern-alert--warning';box.textContent=e.message;}}finally{generate.disabled=false;generate.textContent='Ausgewählte Dokumente erzeugen';}});
     })();
   </script>
 </InternalLayout>
