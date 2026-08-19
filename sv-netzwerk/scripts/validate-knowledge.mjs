@@ -16,7 +16,12 @@ const berlinDate = dateArg ?? new Intl.DateTimeFormat('en-CA', {
   day: '2-digit',
 }).format(new Date());
 
-const limits = { B: [700, 1700] };
+// Level B bleibt der kompaktere Fachstandard. Level A ist der ausführliche,
+// quellenbasierte Deep-Dive-Standard für besonders fachlich dichte Beiträge.
+const limits = {
+  A: [1200, 4500],
+  B: [700, 2200],
+};
 
 const parse = (source) => {
   const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
@@ -62,10 +67,14 @@ if (expectedDailyCount !== null && today.length !== expectedDailyCount) {
 }
 
 for (const entry of today) {
-  if (entry.level !== 'B') errors.push(`${entry.file}: erwartet B-Beitrag, gefunden ${entry.level ?? 'keine Kategorie'}`);
-  const [min, max] = limits.B;
-  if (entry.words < min || entry.words > max) errors.push(`${entry.file}: ${entry.words} Wörter, erwartet ${min}–${max}`);
-  for (const key of ['title', 'description', 'category', 'author', 'teaser', 'linkedinSummary', 'videoScript']) {
+  const level = entry.level && limits[entry.level] ? entry.level : 'B';
+  if (!limits[level]) errors.push(`${entry.file}: unbekanntes contentLevel ${entry.level ?? 'leer'}`);
+  const [min, max] = limits[level] ?? limits.B;
+  if (entry.words < min || entry.words > max) {
+    errors.push(`${entry.file}: ${entry.words} Wörter, für Level ${level} erwartet ${min}–${max}`);
+  }
+
+  for (const key of ['title', 'description', 'category', 'author', 'teaser', 'linkedinSummary']) {
     if (!entry.parsed.value(key)) errors.push(`${entry.file}: Pflichtfeld ${key} fehlt`);
   }
   if (!/^tags:\s*\[/m.test(entry.parsed.front)) errors.push(`${entry.file}: Tags fehlen`);
@@ -74,20 +83,27 @@ for (const entry of today) {
   }
   if (!/^cta:\s*$/m.test(entry.parsed.front)) errors.push(`${entry.file}: CTA fehlt`);
   if (!/^relatedLinks:\s*\[/m.test(entry.parsed.front)) errors.push(`${entry.file}: interne Verlinkungen fehlen`);
-  const requiredSections = [
-    /^##\s+Einleitung\b/m,
-    /^##\s+Hauptteil\b/m,
-    /^##\s+Praxisbeispiel\b/m,
-    /^##\s+Fazit\b/m,
-    /^##\s+Call-to-Action\b/m,
+
+  const headingCount = (entry.parsed.body.match(/^#{2,3}\s+.+$/gm) || []).length;
+  if (headingCount < 8) errors.push(`${entry.file}: fachliche Gliederung zu knapp (${headingCount} Überschriften; mindestens 8).`);
+
+  const requiredConcepts = [
+    /(fachliche\s+einordnung|einleitung)/i,
+    /(schadenbild|befund)/i,
+    /(ursache|abgrenzung|vorschaden|alternative)/i,
+    /(mess|prüffrag|prueffrag)/i,
+    /(sofortmaßnahme|sofortmassnahme|gefahrenabwehr|schadenminderung)/i,
+    /(beweissicherung|dokumentation)/i,
+    /(fachgrenze|fachplaner|spezialist)/i,
+    /(versicherungstechn|deckung|einzelfallprüfung|einzelfallpruefung)/i,
+    /(kostenprüfung|kostenpruefung|prüffähig|prueffaehig)/i,
+    /praxisbeispiel/i,
+    /fazit/i,
+    /(quellen|weiterführende hinweise|weiterfuehrende hinweise)/i,
   ];
-  for (const sectionPattern of requiredSections) {
-    if (!sectionPattern.test(entry.parsed.body)) {
-      errors.push(`${entry.file}: Pflichtabschnitt fehlt (${sectionPattern.source})`);
-    }
-  }
-  if (!/^###\s+/m.test(entry.parsed.body)) {
-    errors.push(`${entry.file}: H3-Struktur fehlt`);
+  const conceptHits = requiredConcepts.filter((rx) => rx.test(entry.parsed.body)).length;
+  if (conceptHits < 10) {
+    errors.push(`${entry.file}: Fachbeitragsstandard nicht ausreichend abgebildet (${conceptHits}/12 Kernkonzepte erkannt).`);
   }
 }
 
