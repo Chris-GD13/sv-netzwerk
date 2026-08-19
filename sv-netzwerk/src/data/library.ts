@@ -14,11 +14,11 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
-    title: 'Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz (2)',
-    description: 'Leitungswasserschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    title: 'Leitungswasserschäden in Estrich-Dämmschichten: Trocknung, Hygiene und Rückbau fachlich bewerten',
+    description: 'Wie Leitungswasserschäden in schwimmenden Estrichkonstruktionen technisch untersucht, hygienisch eingeordnet, getrocknet und gegenüber unnötigem Rückbau belastbar abgegrenzt werden.',
     href: '/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-3/',
     category: 'Leitungswasserschäden',
-    tags: ['Leitungswasser', 'Schadenregulierung', 'Sanierungsplanung', 'Kostenprüfung'],
+    tags: ['Leitungswasser', 'Estrich', 'Dämmschichttrocknung', 'Schimmel', 'Kostenprüfung', 'Schadenregulierung'],
     date: '2026-08-19',
     type: 'article',
     featured: false,
