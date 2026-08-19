@@ -1,0 +1,82 @@
+name: Prüfportal Recovery Deploy
+
+on:
+  push:
+    paths:
+      - '.github/workflows/emergency-portal-recovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portal-recovery-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Node.js 22 LTS einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+
+      - name: Abhängigkeiten installieren
+        run: npm ci --no-audit --no-fund
+
+      - name: Portal bauen
+        run: npm run build
+
+      - name: SFTP-Werkzeug mit Timeout bereitstellen
+        shell: bash
+        run: |
+          set -euo pipefail
+          if command -v lftp >/dev/null 2>&1; then
+            lftp --version | head -1
+            exit 0
+          fi
+          timeout 120s sudo apt-get \
+            -o Acquire::ForceIPv4=true \
+            -o Acquire::Retries=1 \
+            -o Acquire::http::Timeout=15 \
+            -o Acquire::https::Timeout=15 \
+            update
+          timeout 120s sudo apt-get \
+            -o Acquire::ForceIPv4=true \
+            -o Acquire::Retries=1 \
+            install --yes --no-install-recommends lftp
+          lftp --version | head -1
+
+      - name: Stabilen Stand direkt nach IONOS übertragen
+        shell: bash
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          test -d dist
+          timeout 600s lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd /sv-netzwerk; mirror --reverse --delete --parallel=4 --exclude-glob .git* --exclude-glob .env* --exclude-glob *.log --exclude-glob intern/photos --exclude-glob intern/photos/** dist/ .; quit"
+
+      - name: Recovery prüfen
+        shell: bash
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          timeout 60s lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 20; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cls -l /sv-netzwerk/intern; quit"
+          echo 'Prüfportal-Recovery wurde auf IONOS übertragen.'
