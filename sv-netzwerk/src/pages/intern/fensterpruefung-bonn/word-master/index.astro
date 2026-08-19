@@ -6,7 +6,7 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
     <section class="intern-card">
       <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
       <h1>Word-Master & Fotozuordnung</h1>
-      <p>Die ausgewählte archivierte Gutachtenfassung wird als fachliche Masterquelle gelesen. Die Datei wird über die bestehende Gutachten-Downloadroute im Browser geladen und anschließend zur Prüfung an den Word-Master übergeben.</p>
+      <p>Die ausgewählte Gutachtenfassung wird als fachliche Masterquelle gelesen. Ist die lokale Archivdatei nicht mehr vorhanden, wird automatisch im zugehörigen SharePoint-Projektordner nach einer passenden Word-/HTML-Gutachtendatei gesucht.</p>
       <div id="source-info" class="intern-alert intern-alert--info" style="margin-top:12px"></div>
       <div class="intern-actions" style="gap:10px;flex-wrap:wrap;margin-top:14px">
         <button id="preview-word" class="sv-button sv-button-secondary" type="button">Word-Master prüfen</button>
@@ -32,11 +32,12 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
     (() => {
       const qs = new URLSearchParams(location.search);
       const archiveId = Number(qs.get('archive_id') || 0);
+      const archiveName = qs.get('file_name') || '';
       const wr=document.getElementById('word-result'), pr=document.getElementById('photo-result'), si=document.getElementById('source-info');
       const wp=document.getElementById('preview-word'), wa=document.getElementById('apply-word');
       const pp=document.getElementById('preview-photos'), pa=document.getElementById('apply-photos');
       const esc=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-      if (si) si.innerHTML = archiveId > 0 ? `<strong>Ausgewählte Archivfassung: #${archiveId}</strong>` : 'Keine Archivfassung ausgewählt. Bitte über „Gutachten → Als Master prüfen“ öffnen.';
+      if (si) si.innerHTML = archiveId > 0 ? `<strong>Ausgewählte Archivfassung: #${archiveId}</strong>${archiveName ? ` · ${esc(archiveName)}` : ''}` : 'Keine Archivfassung ausgewählt. Bitte über „Gutachten → Als Master prüfen“ öffnen.';
       if (!archiveId) { if (wp) wp.disabled=true; if (wa) wa.disabled=true; }
 
       async function json(url, init){
@@ -46,22 +47,31 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
         if(!r.ok) throw new Error(j.error||text||`HTTP ${r.status}`);
         return j;
       }
-      async function getArchiveFile(){
-        if (!archiveId) throw new Error('Keine konkrete Gutachtenfassung ausgewählt.');
-        const r = await fetch(`/intern/api/report-archive.php?download=${archiveId}`, {credentials:'same-origin', cache:'no-store'});
-        if (!r.ok) {
-          let msg=`Archivdatei konnte nicht geladen werden (HTTP ${r.status}).`;
-          try{const j=await r.json(); if(j.error) msg=j.error;}catch{}
-          throw new Error(msg);
-        }
-        const blob = await r.blob();
-        if (!blob.size) throw new Error('Die Archivdatei ist leer.');
+      function fileFromResponse(r, blob, fallbackName){
         const disposition = r.headers.get('content-disposition') || '';
         const match = disposition.match(/filename="?([^";]+)"?/i);
-        return {blob, name: match?.[1] || `Gutachten-${archiveId}.doc`};
+        return {blob, name: match?.[1] || fallbackName, source: r.headers.get('x-sharepoint-source') ? 'SharePoint' : 'Archiv'};
+      }
+      async function getArchiveFile(){
+        if (!archiveId) throw new Error('Keine konkrete Gutachtenfassung ausgewählt.');
+        const local = await fetch(`/intern/api/report-archive.php?download=${archiveId}`, {credentials:'same-origin', cache:'no-store'});
+        if (local.ok) {
+          const blob = await local.blob();
+          if (blob.size) return fileFromResponse(local, blob, archiveName || `Gutachten-${archiveId}.doc`);
+        }
+        const fallback = await fetch(`/intern/api/sharepoint-report-source.php?name=${encodeURIComponent(archiveName)}`, {credentials:'same-origin', cache:'no-store'});
+        if (!fallback.ok) {
+          let msg=`Weder Archiv noch SharePoint konnten eine Gutachtendatei liefern (HTTP ${fallback.status}).`;
+          try{const j=await fallback.json(); if(j.error) msg=j.error;}catch{}
+          throw new Error(msg);
+        }
+        const blob = await fallback.blob();
+        if (!blob.size) throw new Error('Die aus SharePoint geladene Gutachtendatei ist leer.');
+        return fileFromResponse(fallback, blob, archiveName || `Gutachten-${archiveId}.doc`);
       }
       async function runWord(action){
         const file = await getArchiveFile();
+        if (si) si.innerHTML = `<strong>Quelle: ${esc(file.source)}</strong> · ${esc(file.name)} · Archiv-ID #${archiveId}`;
         const fd = new FormData();
         fd.append('report', file.blob, file.name);
         return json(`/intern/api/word-master-import.php?action=${action}&project_id=1&archive_id=${archiveId}`, {method:'POST', body:fd});
@@ -69,7 +79,7 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
 
       wp?.addEventListener('click', async()=>{
         wp.disabled=true; wa.disabled=true;
-        wr.innerHTML='<div class="intern-alert intern-alert--info">Archiviertes Gutachten wird über die Downloadroute geladen, gelesen und abgeglichen …</div>';
+        wr.innerHTML='<div class="intern-alert intern-alert--info">Gutachten wird geladen; falls die Archivdatei fehlt, wird automatisch SharePoint verwendet …</div>';
         try{
           const j=await runWord('preview'); const c=j.counts||{};
           wr.innerHTML=`<div class="intern-alert intern-alert--success"><strong>${esc(j.source?.file_name)}</strong><br>Archiv-ID ${esc(j.source?.id)} · ${c.recognized||0} Positionen erkannt · ${c.exact||0} exakt zugeordnet · ${c.fallback||0} eindeutig über Etage/Raum/Fenster zugeordnet · ${c.new||0} neu · ${c.conflicts||0} Konflikte.</div><div class="intern-table-wrap"><table class="intern-table"><thead><tr><th>Fenster</th><th>Etage</th><th>Raum</th><th>Flügel</th><th>Status</th></tr></thead><tbody>${(j.items||[]).slice(0,500).map(x=>`<tr><td>${esc(x.window_number)}</td><td>${esc(x.floor)}</td><td>${esc(x.room)}</td><td>${esc(x.wing)}</td><td>${esc(x.status)}</td></tr>`).join('')}</tbody></table></div>`;
@@ -79,7 +89,7 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
       });
       wa?.addEventListener('click', async()=>{
         if(!confirm('Word-Master jetzt übernehmen? Bestehende Positionen werden aktualisiert; eindeutig neue Positionen werden ergänzt.'))return;
-        wa.disabled=true; wr.innerHTML='<div class="intern-alert intern-alert--info">Gutachten wird erneut aus dem Archiv geladen und der Word-Master wird übernommen …</div>';
+        wa.disabled=true; wr.innerHTML='<div class="intern-alert intern-alert--info">Gutachten wird geladen und der Word-Master übernommen …</div>';
         try{const j=await runWord('apply'); wr.innerHTML=`<div class="intern-alert intern-alert--success"><strong>Übernahme abgeschlossen.</strong><br>${j.updated} aktualisiert · ${j.created} neu · ${j.conflicts} Konflikte · ${j.recognized} erkannt.</div>`;}
         catch(e){wr.innerHTML=`<div class="intern-alert intern-alert--error">${esc(e.message)}</div>`;}
         finally{wa.disabled=false;}
