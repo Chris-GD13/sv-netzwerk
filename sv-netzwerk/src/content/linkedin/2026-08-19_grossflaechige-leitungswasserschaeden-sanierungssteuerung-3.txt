@@ -1,9 +1,19 @@
-Bei regional gehäuften Leitungswasserschäden müssen Erstmaßnahmen, Trocknung und Rückbau eng gesteuert werden, um Folgekosten zu begrenzen.
+Status: prepared-not-posted
 
-Ein anonymisiertes fachliches Praxisbeispiel ohne Regional- oder Vor-Ort-Behauptung zeigt, wie Verfahren bei hoher Schadenfrequenz strukturiert und prüffähig umgesetzt werden.
+Leitungswasserschaden unter schwimmendem Estrich: Reicht eine Dämmschichttrocknung – oder ist Rückbau erforderlich?
 
-Im Beitrag zeigen wir eine belastbare Vorgehensstruktur für Besichtigung, Dokumentation, Sanierungsplanung und Kostenprüfung.
+Die Entscheidung lässt sich nicht aus der Schadenart allein ableiten. Maßgeblich sind Bodenaufbau, Feuchteverteilung, Wasserart, Einwirkdauer, Materialzustand, hygienisches Risiko und die Frage, ob ein kontrollierbarer Trocknungs- und Sanierungserfolg nachgewiesen werden kann.
+
+Der neue Fachbeitrag zeigt die Prüfkette aus:
+• bauteilbezogener Feuchteermittlung und Messkonzept,
+• Abgrenzung von Trocknung, Teilöffnung und Rückbau,
+• hygienischer Bewertung und Fachgrenzen,
+• Beweissicherung vor Eingriffen,
+• prüffähiger Kosten- und Mengenprüfung,
+• fiktivem Praxisbeispiel mit regulierungsnaher Einordnung.
+
+Mit Quellen und weiterführenden Regelwerken von Umweltbundesamt, VdS Schadenverhütung, DIN Media, DVGW und BAuA.
 
 https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-3/
 
-#Kumulschaden #Schadenregulierung #Leitungswasser #Sanierungsplanung #Kostenprufung
+#Leitungswasser #Estrich #Dämmschichttrocknung #Schadenregulierung #Kostenprüfung #Sachverständige
