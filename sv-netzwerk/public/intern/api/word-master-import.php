@@ -41,34 +41,15 @@ function wmArchive(int $projectId): array {
     if (!$row) apiError(404, 'Die ausgewählte Gutachtenfassung wurde im Archiv nicht gefunden.');
     return $row;
 }
-function wmFetchArchiveContent(int $archiveId): string {
-    $scheme = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
-    $host = (string)($_SERVER['HTTP_HOST'] ?? 'www.sv-netzwerk.eu');
-    $url = $scheme . '://' . $host . '/intern/api/report-archive.php?download=' . $archiveId;
-    $cookie = (string)($_SERVER['HTTP_COOKIE'] ?? '');
-    $headers = ['Accept: application/octet-stream'];
-    if ($cookie !== '') $headers[] = 'Cookie: ' . $cookie;
-
-    if (function_exists('curl_init')) {
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true, CURLOPT_FOLLOWLOCATION=>false, CURLOPT_CONNECTTIMEOUT=>10, CURLOPT_TIMEOUT=>30, CURLOPT_HTTPHEADER=>$headers]);
-        $body = curl_exec($ch);
-        $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        $err = curl_error($ch);
-        curl_close($ch);
-        if ($body === false || $status !== 200) {
-            error_log('[word-master-import] Archiv-Download fehlgeschlagen HTTP '.$status.' '.$err);
-            apiError(502, 'Die ausgewählte Gutachtenfassung konnte über die zentrale Gutachtenablage nicht gelesen werden.');
-        }
-        return (string)$body;
-    }
-
-    $ctx = stream_context_create(['http'=>['method'=>'GET','header'=>implode("\r\n",$headers),'timeout'=>30,'ignore_errors'=>true]]);
-    $body = @file_get_contents($url, false, $ctx);
-    $status = 0;
-    foreach (($http_response_header ?? []) as $line) if (preg_match('/^HTTP\/\S+\s+(\d+)/',$line,$m)) $status=(int)$m[1];
-    if ($body === false || $status !== 200) apiError(502, 'Die ausgewählte Gutachtenfassung konnte über die zentrale Gutachtenablage nicht gelesen werden.');
-    return (string)$body;
+function wmUploadedReportContent(): string {
+    if (empty($_FILES['report'])) apiError(400, 'Gutachtendatei wurde nicht an den Word-Master übergeben.');
+    $file = $_FILES['report'];
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) apiError(400, 'Gutachtendatei konnte nicht gelesen werden. Upload-Fehlercode: ' . (int)($file['error'] ?? -1));
+    if ((int)($file['size'] ?? 0) <= 0) apiError(400, 'Gutachtendatei ist leer.');
+    if ((int)$file['size'] > 200 * 1024 * 1024) apiError(413, 'Gutachtendatei ist größer als 200 MB.');
+    $body = file_get_contents((string)$file['tmp_name']);
+    if ($body === false || $body === '') apiError(422, 'Gutachtendatei konnte nicht eingelesen werden.');
+    return $body;
 }
 function wmParseReportContent(string $html): array {
     if (trim($html) === '') apiError(422, 'Gutachten ist leer oder nicht lesbar.');
@@ -129,15 +110,16 @@ function wmCompare(array $parsed, array $existing): array {
     return ['counts'=>$counts,'items'=>$items];
 }
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'Word-Master-Prüfung muss über die Portaloberfläche gestartet werden.');
 $archive = wmArchive($projectId);
-$parsed = wmParseReportContent(wmFetchArchiveContent((int)$archive['id']));
+$parsed = wmParseReportContent(wmUploadedReportContent());
 $existing = wmExisting($projectId);
 $comparison = wmCompare($parsed,$existing);
 
-if ($_SERVER['REQUEST_METHOD']==='GET' || $action==='preview') {
+if ($action === 'preview') {
     apiJson(['source'=>['id'=>(int)$archive['id'],'file_name'=>$archive['file_name'],'created_at'=>$archive['created_at']], 'counts'=>$comparison['counts'], 'items'=>array_slice($comparison['items'],0,600)]);
 }
-if ($_SERVER['REQUEST_METHOD']!=='POST' || $action!=='apply') apiError(405, 'Methode nicht erlaubt.');
+if ($action!=='apply') apiError(405, 'Methode nicht erlaubt.');
 
 $pdo=db();$pdo->beginTransaction();$updated=0;$created=0;$conflicts=0;
 try {
