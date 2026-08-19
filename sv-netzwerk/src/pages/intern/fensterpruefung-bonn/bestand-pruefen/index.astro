@@ -6,16 +6,35 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
     <section class="intern-card">
       <p class="sv-eyebrow">Prüfportal · Datenqualität</p>
       <h1>Bestand prüfen & Dubletten bereinigen</h1>
-      <p>Vor dem Gutachten werden Fenster, Flügel und Fotos auf Mehrfacheinträge geprüft. Die Zimmernummer ist dabei der maßgebliche Geschossschlüssel: <strong>0xxx = EG, 1xxx = 1. OG, 2xxx = 2. OG, 3xxx = 3. OG.</strong> Vorhandene Informationen werden zusammengeführt; widersprüchliche Werte werden als Konflikt dokumentiert.</p>
+      <p>Vor dem Gutachten werden Fenster, Flügel und Fotos auf Mehrfacheinträge geprüft. Vorhandene Informationen werden zusammengeführt; widersprüchliche Werte werden als Konflikt dokumentiert.</p>
       <div id="audit" class="intern-alert intern-alert-info">Bestand wird geprüft …</div>
       <div class="intern-actions" style="margin-top:16px;flex-wrap:wrap">
         <button id="refresh" class="sv-button sv-button-secondary" type="button">Bestand neu prüfen</button>
-        <button id="cleanup" class="sv-button sv-button-primary" type="button">Bestand korrigieren & Dubletten bereinigen</button>
+        <button id="cleanup" class="sv-button sv-button-primary" type="button">Dubletten jetzt bereinigen</button>
         <a href="/intern/fensterpruefung-bonn/massenaenderung/" class="sv-button sv-button-secondary">Massenänderung</a>
         <a href="/intern/fensterpruefung-bonn/gutachten/" class="sv-button sv-button-secondary">Zur Gutachtenverwaltung</a>
         <a href="/intern/fensterpruefung-bonn/" class="sv-button sv-button-secondary">Dashboard</a>
       </div>
       <div id="result" style="margin-top:16px"></div>
+    </section>
+
+    <section class="intern-card" style="margin-top:20px;border:1px solid #efcaca">
+      <p class="sv-eyebrow">Neuimport · kontrollierter Reset</p>
+      <h2>Fallbestand eines Gebäudes vollständig zurücksetzen</h2>
+      <p>Diese Funktion entfernt gezielt alle Fenster, Flügel, Foto-Datensätze und die Etagen-/Raumstruktur des ausgewählten Gebäudes. Das Gebäude selbst bleibt bestehen. Danach kann der Bestand vollständig neu aus SharePoint eingelesen werden.</p>
+      <div class="intern-alert intern-alert-warning"><strong>Achtung:</strong> Dies ist ein harter Reset des ausgewählten Gebäudebestands. Archivierte Gutachten bleiben davon unberührt.</div>
+      <div style="display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:12px;align-items:end;margin-top:16px">
+        <label>
+          <strong>Gebäude</strong><br>
+          <select id="reset-building" class="intern-input" style="width:100%;margin-top:6px"></select>
+        </label>
+        <button id="reset-preview" class="sv-button sv-button-secondary" type="button">Reset prüfen</button>
+      </div>
+      <div id="reset-preview-result" style="margin-top:14px"></div>
+      <div class="intern-actions" style="margin-top:14px">
+        <button id="reset-building-btn" class="sv-button sv-button-primary" type="button" disabled>Fallbestand jetzt vollständig zurücksetzen</button>
+      </div>
+      <div id="reset-result" style="margin-top:14px"></div>
     </section>
   </main>
   <script is:inline>
@@ -24,7 +43,14 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
       const resultEl = document.getElementById('result');
       const cleanupBtn = document.getElementById('cleanup');
       const refreshBtn = document.getElementById('refresh');
-      if (!auditEl || !resultEl || !cleanupBtn || !refreshBtn) return;
+      const buildingSelect = document.getElementById('reset-building');
+      const resetPreviewBtn = document.getElementById('reset-preview');
+      const resetBtn = document.getElementById('reset-building-btn');
+      const resetPreviewResult = document.getElementById('reset-preview-result');
+      const resetResult = document.getElementById('reset-result');
+      if (!auditEl || !resultEl || !cleanupBtn || !refreshBtn || !buildingSelect || !resetPreviewBtn || !resetBtn || !resetPreviewResult || !resetResult) return;
+
+      let selectedReset = null;
 
       function errorMessage(error) {
         return error && typeof error === 'object' && 'message' in error ? String(error.message) : String(error || 'Unbekannter Fehler');
@@ -32,10 +58,9 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
 
       function render(a) {
         auditEl.innerHTML = `<strong>Aktueller Bestand</strong><br>
-          ${a.unique_windows} eindeutige Fenster · ${a.active_sashes} aktive Flügel · ${a.active_photos} aktive Fotos<br>
+          ${a.unique_windows} eindeutige Fenster · ${a.active_sashes} Flügel · ${a.active_photos} eindeutige/aktive Fotos<br>
           <strong>Dubletten:</strong> ${a.duplicate_window_rows} Fensterzeilen · ${a.duplicate_sash_rows} Flügel · ${a.duplicate_photo_name_candidates} Foto-Kandidaten<br>
-          <strong>Falsche Geschosszuordnungen:</strong> ${a.floor_mismatches || 0}<br>
-          <strong>Sollbereich:</strong> ${a.expected_window_reference || 'ca. 425'} Fenster · ${a.expected_sash_reference || 'ca. 450'} Fensterflügel.`;
+          Referenzwert: ca. ${a.expected_sash_reference} Fensterflügel.`;
       }
 
       async function audit() {
@@ -46,11 +71,34 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
         render(j.audit);
       }
 
+      async function loadBuildings() {
+        const r = await fetch('/intern/api/hierarchy.php?project_id=1', { credentials: 'same-origin' });
+        const j = await r.json();
+        if (!r.ok || !Array.isArray(j)) throw new Error(j.error || 'Gebäude konnten nicht geladen werden');
+        buildingSelect.innerHTML = j.map((b) => `<option value="${b.id}">${b.name} · ${b.window_count || 0} Fenster · ${b.sash_count || 0} Flügel</option>`).join('');
+      }
+
+      async function previewReset() {
+        selectedReset = null;
+        resetBtn.disabled = true;
+        resetPreviewResult.innerHTML = '<div class="intern-alert intern-alert-info">Reset-Bestand wird ermittelt …</div>';
+        const buildingId = Number(buildingSelect.value || 0);
+        if (!buildingId) throw new Error('Bitte Gebäude auswählen.');
+        const r = await fetch(`/intern/api/reset-building.php?building_id=${buildingId}`, { credentials: 'same-origin' });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error || 'Reset-Prüfung fehlgeschlagen');
+        selectedReset = j;
+        resetPreviewResult.innerHTML = `<div class="intern-alert intern-alert-warning"><strong>${j.building.name}</strong><br>
+          Zum Löschen vorgemerkt: ${j.counts.windows} Fenster · ${j.counts.sashes} Flügel · ${j.counts.photos} Fotos · ${j.counts.rooms} Räume · ${j.counts.floors} Etagen.<br>
+          Das Gebäude selbst bleibt bestehen.</div>`;
+        resetBtn.disabled = false;
+      }
+
       refreshBtn.addEventListener('click', () => audit().catch((e) => { auditEl.textContent = errorMessage(e); }));
       cleanupBtn.addEventListener('click', async () => {
-        if (!confirm('Bestand jetzt korrigieren? Geschosse werden aus der Zimmernummer abgeleitet, Dubletten werden zusammengeführt und nur identische Fotodateien logisch deaktiviert.')) return;
+        if (!confirm('Dubletten jetzt zusammenführen? Die Originalinformationen werden in den verbleibenden Datensätzen zusammengeführt; Mehrfacheinträge werden nur logisch deaktiviert.')) return;
         cleanupBtn.disabled = true;
-        resultEl.innerHTML = '<div class="intern-alert intern-alert-info">Bestandskorrektur läuft …</div>';
+        resultEl.innerHTML = '<div class="intern-alert intern-alert-info">Bereinigung läuft …</div>';
         try {
           const r = await fetch('/intern/api/data-cleanup.php?action=cleanup&project_id=1', {
             method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: '{}'
@@ -58,9 +106,8 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
           const j = await r.json();
           if (!r.ok) throw new Error(j.error || 'Bereinigung fehlgeschlagen');
           render(j.after);
-          resultEl.innerHTML = `<div class="intern-alert intern-alert-success"><strong>Bestandskorrektur abgeschlossen.</strong><br>
-            ${j.cleanup.floors_repaired || 0} Geschoss-/Raumzuordnungen korrigiert · ${j.cleanup.windows_merged} Fenster-Dubletten zusammengeführt · ${j.cleanup.sashes_merged} Flügel-Dubletten zusammengeführt · ${j.cleanup.photos_merged} binär identische Fotos deaktiviert · ${j.cleanup.field_conflicts} Feldkonflikte dokumentiert.<br><br>
-            <strong>Neuer Bestand:</strong> ${j.after.unique_windows} eindeutige Fenster · ${j.after.active_sashes} Flügel · ${j.after.active_photos} aktive Fotos.</div>`;
+          resultEl.innerHTML = `<div class="intern-alert intern-alert-success"><strong>Bereinigung abgeschlossen.</strong><br>
+            ${j.cleanup.windows_merged} Fenster-Dubletten zusammengeführt · ${j.cleanup.sashes_merged} Flügel-Dubletten zusammengeführt · ${j.cleanup.photos_merged} identische Fotos deaktiviert · ${j.cleanup.photo_conflicts} Foto-Zuordnungskonflikte nicht automatisch gelöscht · ${j.cleanup.field_conflicts} Feldkonflikte dokumentiert.</div>`;
         } catch (e) {
           resultEl.innerHTML = `<div class="intern-alert intern-alert-error">${errorMessage(e)}</div>`;
         } finally {
@@ -68,7 +115,47 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
         }
       });
 
-      audit().catch((e) => { auditEl.textContent = errorMessage(e); });
+      resetPreviewBtn.addEventListener('click', () => previewReset().catch((e) => {
+        resetPreviewResult.innerHTML = `<div class="intern-alert intern-alert-error">${errorMessage(e)}</div>`;
+      }));
+
+      buildingSelect.addEventListener('change', () => {
+        selectedReset = null;
+        resetBtn.disabled = true;
+        resetPreviewResult.innerHTML = '';
+      });
+
+      resetBtn.addEventListener('click', async () => {
+        if (!selectedReset?.building?.id) return;
+        const name = String(selectedReset.building.name || '');
+        const confirmation = prompt(`Harter Reset für „${name}“.\n\nZur endgültigen Bestätigung exakt eingeben:\nRESET ${name}`);
+        if (confirmation === null) return;
+        if (confirmation !== `RESET ${name}`) {
+          resetResult.innerHTML = '<div class="intern-alert intern-alert-error">Bestätigung stimmt nicht. Reset wurde nicht ausgeführt.</div>';
+          return;
+        }
+        resetBtn.disabled = true;
+        resetResult.innerHTML = '<div class="intern-alert intern-alert-info">Fallbestand wird vollständig zurückgesetzt …</div>';
+        try {
+          const r = await fetch(`/intern/api/reset-building.php?building_id=${selectedReset.building.id}`, {
+            method: 'POST', credentials: 'same-origin', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ confirmation })
+          });
+          const j = await r.json();
+          if (!r.ok) throw new Error(j.error || 'Reset fehlgeschlagen');
+          resetResult.innerHTML = `<div class="intern-alert intern-alert-success"><strong>Fallbestand vollständig zurückgesetzt.</strong><br>
+            Gelöscht: ${j.deleted.windows} Fenster · ${j.deleted.sashes} Flügel · ${j.deleted.photos} Foto-Datensätze · ${j.deleted.rooms} Räume · ${j.deleted.floors} Etagen.<br>
+            ${j.physical_photo_files_deleted} lokale Fotodateien entfernt. Das Gebäude bleibt bestehen und ist bereit für den Neuimport.</div>`;
+          selectedReset = null;
+          resetPreviewResult.innerHTML = '';
+          await Promise.all([audit(), loadBuildings()]);
+        } catch (e) {
+          resetResult.innerHTML = `<div class="intern-alert intern-alert-error">${errorMessage(e)}</div>`;
+          resetBtn.disabled = false;
+        }
+      });
+
+      Promise.all([audit(), loadBuildings()]).catch((e) => { auditEl.textContent = errorMessage(e); });
     })();
   </script>
 </InternalLayout>
