@@ -1,0 +1,125 @@
+name: SharePoint-Dublettenlogik nachschärfen
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/patch-sharepoint-dedupe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Dublettenlogik in SharePoint-V2 korrigieren
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+
+          p = Path('sv-netzwerk/public/intern/api/sharepoint-v2.php')
+          s = p.read_text(encoding='utf-8')
+
+          marker = "function handleApplyExcelV2(array $user): never\n{"
+          helper = r'''function v2MergeDuplicateRows(array $rows): array
+{
+    // Ein physisches Fenster darf aus mehreren Excel-Dateien/Arbeitsblättern stammen.
+    // Pro Flügeltyp bleibt genau ein Datensatz bestehen; leere Werte werden aus
+    // Dubletten ergänzt, widersprüchliche Werte werden nicht blind überschrieben.
+    $bySash = [];
+    foreach ($rows as $row) {
+        $opening = v2DetectOpeningType($row);
+        $position = trim((string) ($row['__position'] ?? ''));
+        $sashKey = v2NormalizeKey($opening !== '' ? $opening : $position);
+        if ($sashKey === '') {
+            $sashKey = 'unbekannt';
+        }
+
+        if (!isset($bySash[$sashKey])) {
+            $row['__merge_conflicts'] = [];
+            $row['__merge_sources'] = array_values(array_filter([
+                (string) ($row['__source_file'] ?? ''),
+                (string) ($row['__sheet_name'] ?? ''),
+            ]));
+            $bySash[$sashKey] = $row;
+            continue;
+        }
+
+        $base = $bySash[$sashKey];
+        foreach ($row as $field => $value) {
+            if (str_starts_with((string) $field, '__') && !in_array($field, ['__imputed_fields'], true)) {
+                continue;
+            }
+            $incoming = trim((string) $value);
+            $current = trim((string) ($base[$field] ?? ''));
+            if ($current === '' && $incoming !== '') {
+                $base[$field] = $value;
+            } elseif ($current !== '' && $incoming !== '' && v2NormalizeKey($current) !== v2NormalizeKey($incoming)) {
+                $base['__merge_conflicts'][$field] = array_values(array_unique(array_filter([
+                    ...(array) ($base['__merge_conflicts'][$field] ?? []),
+                    $current,
+                    $incoming,
+                ])));
+            }
+        }
+        foreach ([(string) ($row['__source_file'] ?? ''), (string) ($row['__sheet_name'] ?? '')] as $src) {
+            if ($src !== '' && !in_array($src, $base['__merge_sources'], true)) $base['__merge_sources'][] = $src;
+        }
+        $bySash[$sashKey] = $base;
+    }
+
+    $merged = array_values($bySash);
+    usort($merged, static fn($a, $b) => v2OpeningPriority($a) <=> v2OpeningPriority($b));
+    return $merged;
+}
+
+'''
+          if 'function v2MergeDuplicateRows' not in s:
+              if marker not in s:
+                  raise SystemExit('handleApplyExcelV2-Marker nicht gefunden')
+              s = s.replace(marker, helper + marker, 1)
+
+          old_group = """        $key = v2NormalizeKey($room) . '|' . v2NormalizeKey($windowNumber);\n        if (!isset($groups[$key])) $groups[$key] = ['room' => $room, 'window' => $windowNumber, 'rows' => []];\n        $groups[$key]['rows'][] = $row;"""
+          new_group = """        $floor = trim((string) ($row['__floor_label'] ?? '')) ?: 'EG / Erdgeschoss';\n        $key = v2NormalizeKey($floor) . '|' . v2NormalizeKey($room) . '|' . v2NormalizeKey($windowNumber);\n        if (!isset($groups[$key])) $groups[$key] = ['floor' => $floor, 'room' => $room, 'window' => $windowNumber, 'rows' => []];\n        $groups[$key]['rows'][] = $row;"""
+          if old_group in s:
+              s = s.replace(old_group, new_group, 1)
+          elif "v2NormalizeKey($floor) . '|' . v2NormalizeKey($room)" not in s:
+              raise SystemExit('Gruppierung konnte nicht sicher aktualisiert werden')
+
+          old_rows = """            $groupRows = $group['rows'];\n            usort($groupRows, static fn($a, $b) => v2OpeningPriority($a) <=> v2OpeningPriority($b));\n            $roomNumber = (string) $group['room'];\n            $windowNumber = (string) $group['window'];\n            $floorLabel = trim((string) ($groupRows[0]['__floor_label'] ?? '')) ?: 'EG / Erdgeschoss';"""
+          new_rows = """            $groupRows = v2MergeDuplicateRows($group['rows']);\n            $roomNumber = (string) $group['room'];\n            $windowNumber = (string) $group['window'];\n            $floorLabel = (string) ($group['floor'] ?? (trim((string) ($groupRows[0]['__floor_label'] ?? '')) ?: 'EG / Erdgeschoss'));"""
+          if old_rows in s:
+              s = s.replace(old_rows, new_rows, 1)
+          elif "v2MergeDuplicateRows($group['rows'])" not in s:
+              raise SystemExit('Gruppen-Deduplizierung konnte nicht sicher aktualisiert werden')
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: PHP-Syntax und Schutzlogik prüfen
+        run: |
+          php -l sv-netzwerk/public/intern/api/sharepoint-v2.php
+          grep -Fq "function v2MergeDuplicateRows" sv-netzwerk/public/intern/api/sharepoint-v2.php
+          grep -Fq "v2NormalizeKey($floor) . '|' . v2NormalizeKey($room) . '|' . v2NormalizeKey($windowNumber)" sv-netzwerk/public/intern/api/sharepoint-v2.php
+          grep -Fq "v2MergeDuplicateRows($group['rows'])" sv-netzwerk/public/intern/api/sharepoint-v2.php
+
+      - name: Commit und Push
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "Dublettenlogik war bereits aktuell."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sv-netzwerk/public/intern/api/sharepoint-v2.php
+          git commit -m "fix: Excel-Dubletten je Etage Raum Fenster und Flügel konsolidieren"
+          git push origin HEAD:main
