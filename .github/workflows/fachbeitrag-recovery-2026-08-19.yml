@@ -1,0 +1,30 @@
+name: Fachbeitrag Recovery 2026-08-19
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/fachbeitrag-recovery-2026-08-19.yml
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Heutigen Fachbeitragslauf erneut starten
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          curl --fail-with-body -sS -X POST \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${REPO}/actions/workflows/knowledge-standard.yml/dispatches" \
+            -d '{"ref":"main","inputs":{"date":"2026-08-19","slot":"morning"}}'
+          echo "Fachbeitrags-Automation fuer 2026-08-19 / morning wurde erneut gestartet."
