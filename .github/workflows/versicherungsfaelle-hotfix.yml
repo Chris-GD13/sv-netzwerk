@@ -6,6 +6,7 @@ on:
       - '.github/workflows/versicherungsfaelle-hotfix.yml'
       - 'sv-netzwerk/src/pages/intern/versicherungsfaelle/**'
       - 'sv-netzwerk/src/pages/intern/index.astro'
+      - 'sv-netzwerk/src/layouts/InternalLayout.astro'
   workflow_dispatch:
 
 permissions:
@@ -31,10 +32,12 @@ jobs:
       - name: Zielartefakte pruefen
         run: |
           test -f dist/intern/versicherungsfaelle/index.html
+          test -f dist/intern/versicherungsfaelle/sv-gf/index.html
           test -f dist/intern/index.html
+          test -f dist/intern/fensterpruefung-bonn/index.html
       - name: Python SFTP installieren
         run: python3 -m pip install --disable-pip-version-check --quiet paramiko
-      - name: Versicherungsfaelle nach IONOS uebertragen
+      - name: Versicherungsportal und Navigation nach IONOS uebertragen
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
           SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
@@ -46,9 +49,15 @@ jobs:
           from pathlib import Path
           import paramiko
           host=os.environ['SFTP_HOST']; user=os.environ['SFTP_USERNAME']; password=os.environ['SFTP_PASSWORD']; port=int(os.environ.get('SFTP_PORT') or '22')
+          roots=[
+            (Path('dist/intern/versicherungsfaelle'),'/sv-netzwerk/intern/versicherungsfaelle'),
+          ]
           files=[
-            (Path('dist/intern/versicherungsfaelle/index.html'),'/sv-netzwerk/intern/versicherungsfaelle/index.html'),
             (Path('dist/intern/index.html'),'/sv-netzwerk/intern/index.html'),
+            (Path('dist/intern/fensterpruefung-bonn/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/index.html'),
+            (Path('dist/intern/fensterpruefung-bonn/fenster/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/fenster/index.html'),
+            (Path('dist/intern/fensterpruefung-bonn/auswertung/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/auswertung/index.html'),
+            (Path('dist/intern/fensterpruefung-bonn/export/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/export/index.html'),
           ]
           t=paramiko.Transport((host,port)); t.banner_timeout=15; t.auth_timeout=15; t.connect(username=user,password=password)
           s=paramiko.SFTPClient.from_transport(t); s.get_channel().settimeout(20)
@@ -59,11 +68,19 @@ jobs:
               cur += '/' + part
               try: s.stat(cur)
               except FileNotFoundError: s.mkdir(cur)
+          for local_root,remote_root in roots:
+            for local in local_root.rglob('*'):
+              if not local.is_file(): continue
+              rel=local.relative_to(local_root).as_posix()
+              remote=remote_root.rstrip('/')+'/'+rel
+              mkdirs(remote.rsplit('/',1)[0]); s.put(str(local),remote); s.stat(remote); print('OK',remote)
           for local,remote in files:
+            if not local.is_file(): continue
             mkdirs(remote.rsplit('/',1)[0]); s.put(str(local),remote); s.stat(remote); print('OK',remote)
           s.close(); t.close()
           PY
       - name: Online pruefen
         run: |
           test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/versicherungsfaelle/)" = "200"
+          test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/versicherungsfaelle/sv-gf/)" = "200"
           test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/)" = "200"
