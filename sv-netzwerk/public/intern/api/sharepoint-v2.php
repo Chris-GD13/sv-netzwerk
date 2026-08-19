@@ -469,12 +469,37 @@ function v2CanonicalFieldMap(): array
     ];
 }
 
+function v2FloorFromRoomReference(string $room): string
+{
+    $digits = preg_replace('/\D+/', '', trim($room)) ?? '';
+    if ($digits === '') return '';
+    $first = $digits[0] ?? '';
+    return match ($first) {
+        '0' => 'EG',
+        '1' => '1. OG',
+        '2' => '2. OG',
+        '3' => '3. OG',
+        default => '',
+    };
+}
+
+function v2ResolveFloorLabel(array $row): string
+{
+    $room = trim((string) ($row['__room_reference'] ?? v2RowValue($row, ['Zimmer', 'Zimmernummer', 'Zimmer Nr', 'Zimmer-Nr', 'Raum', 'Raumnummer', 'room_number'])));
+    $roomFloor = v2FloorFromRoomReference($room);
+    $sheetFloor = trim((string) ($row['__floor_label'] ?? v2RowValue($row, ['Etage', 'Geschoss'])));
+    if ($roomFloor !== '') return $roomFloor;
+    return $sheetFloor;
+}
+
 function v2CanonicalizeRow(array $row): array
 {
     $canonical = $row;
     foreach (v2CanonicalFieldMap() as $field => $needles) $canonical['__' . $field] = v2RowValue($row, $needles);
     $canonical['__window_number'] = v2NormalizeWindowNumber($canonical['__window_number']);
     $canonical['__opening_type'] = v2DetectOpeningType($row);
+    $canonical['__floor_label_original'] = (string) ($canonical['__floor_label'] ?? '');
+    $canonical['__floor_label'] = v2ResolveFloorLabel($canonical);
     return $canonical;
 }
 
