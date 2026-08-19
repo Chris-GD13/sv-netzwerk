@@ -1,0 +1,69 @@
+name: Versicherungsfaelle Unterportal Deploy
+
+on:
+  push:
+    paths:
+      - '.github/workflows/versicherungsfaelle-hotfix.yml'
+      - 'sv-netzwerk/src/pages/intern/versicherungsfaelle/**'
+      - 'sv-netzwerk/src/pages/intern/index.astro'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Portal bauen
+        run: npm run build
+      - name: Zielartefakte pruefen
+        run: |
+          test -f dist/intern/versicherungsfaelle/index.html
+          test -f dist/intern/index.html
+      - name: Python SFTP installieren
+        run: python3 -m pip install --disable-pip-version-check --quiet paramiko
+      - name: Versicherungsfaelle nach IONOS uebertragen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          timeout 120s python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import paramiko
+          host=os.environ['SFTP_HOST']; user=os.environ['SFTP_USERNAME']; password=os.environ['SFTP_PASSWORD']; port=int(os.environ.get('SFTP_PORT') or '22')
+          files=[
+            (Path('dist/intern/versicherungsfaelle/index.html'),'/sv-netzwerk/intern/versicherungsfaelle/index.html'),
+            (Path('dist/intern/index.html'),'/sv-netzwerk/intern/index.html'),
+          ]
+          t=paramiko.Transport((host,port)); t.banner_timeout=15; t.auth_timeout=15; t.connect(username=user,password=password)
+          s=paramiko.SFTPClient.from_transport(t); s.get_channel().settimeout(20)
+          def mkdirs(path):
+            cur=''
+            for part in path.strip('/').split('/'):
+              if not part: continue
+              cur += '/' + part
+              try: s.stat(cur)
+              except FileNotFoundError: s.mkdir(cur)
+          for local,remote in files:
+            mkdirs(remote.rsplit('/',1)[0]); s.put(str(local),remote); s.stat(remote); print('OK',remote)
+          s.close(); t.close()
+          PY
+      - name: Online pruefen
+        run: |
+          test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/versicherungsfaelle/)" = "200"
+          test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/)" = "200"
