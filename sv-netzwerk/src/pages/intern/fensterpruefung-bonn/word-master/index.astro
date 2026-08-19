@@ -6,7 +6,8 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
     <section class="intern-card">
       <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
       <h1>Word-Master & Fotozuordnung</h1>
-      <p id="master-source-note">Die ausgewählte archivierte Gutachtenfassung wird als fachliche Masterquelle gelesen. Vor jeder Übernahme erfolgt ein Abgleich mit dem vorhandenen Fensterbestand.</p>
+      <p>Die ausgewählte archivierte Gutachtenfassung wird als fachliche Masterquelle gelesen. Die Datei wird über die bestehende Gutachten-Downloadroute im Browser geladen und anschließend zur Prüfung an den Word-Master übergeben.</p>
+      <div id="source-info" class="intern-alert intern-alert--info" style="margin-top:12px"></div>
       <div class="intern-actions" style="gap:10px;flex-wrap:wrap;margin-top:14px">
         <button id="preview-word" class="sv-button sv-button-secondary" type="button">Word-Master prüfen</button>
         <button id="apply-word" class="sv-button sv-button-primary" type="button" disabled>Word-Master übernehmen</button>
@@ -29,18 +30,60 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
   </main>
   <script is:inline>
     (() => {
-      const wr=document.getElementById('word-result'), pr=document.getElementById('photo-result');
+      const qs = new URLSearchParams(location.search);
+      const archiveId = Number(qs.get('archive_id') || 0);
+      const wr=document.getElementById('word-result'), pr=document.getElementById('photo-result'), si=document.getElementById('source-info');
       const wp=document.getElementById('preview-word'), wa=document.getElementById('apply-word');
       const pp=document.getElementById('preview-photos'), pa=document.getElementById('apply-photos');
-      const note=document.getElementById('master-source-note');
-      const params=new URLSearchParams(window.location.search);
-      const archiveId=params.get('archive_id');
-      const archiveQuery=archiveId ? `&archive_id=${encodeURIComponent(archiveId)}` : '';
-      if (!archiveId && note) note.textContent='Keine konkrete Archivfassung ausgewählt. Bitte über Gutachten → „Als Master prüfen“ eine Fassung auswählen.';
       const esc=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-      async function json(url, init){ const r=await fetch(url,{credentials:'same-origin',...(init||{})}); const j=await r.json(); if(!r.ok) throw new Error(j.error||`HTTP ${r.status}`); return j; }
-      wp?.addEventListener('click', async()=>{ wp.disabled=true; wr.innerHTML='<div class="intern-alert intern-alert--info">Archiviertes Gutachten wird gelesen und abgeglichen …</div>'; try{const j=await json(`/intern/api/word-master-import.php?action=preview&project_id=1${archiveQuery}`); const c=j.counts||{}; wr.innerHTML=`<div class="intern-alert intern-alert--success"><strong>${esc(j.source?.file_name)}</strong><br>Archiv-ID ${esc(j.source?.id)} · ${c.recognized||0} Positionen erkannt · ${c.exact||0} exakt zugeordnet · ${c.fallback||0} eindeutig über Etage/Raum/Fenster zugeordnet · ${c.new||0} neu · ${c.conflicts||0} Konflikte.</div><div class="intern-table-wrap"><table class="intern-table"><thead><tr><th>Fenster</th><th>Etage</th><th>Raum</th><th>Flügel</th><th>Status</th></tr></thead><tbody>${(j.items||[]).slice(0,500).map(x=>`<tr><td>${esc(x.window_number)}</td><td>${esc(x.floor)}</td><td>${esc(x.room)}</td><td>${esc(x.wing)}</td><td>${esc(x.status)}</td></tr>`).join('')}</tbody></table></div>`; wa.disabled=(c.conflicts||0)>0;}catch(e){wr.innerHTML=`<div class="intern-alert intern-alert--error">${esc(e.message)}</div>`;}finally{wp.disabled=false;}});
-      wa?.addEventListener('click', async()=>{ if(!confirm('Word-Master jetzt übernehmen? Bestehende Positionen werden aktualisiert; eindeutig neue Positionen werden ergänzt.'))return; wa.disabled=true; wr.innerHTML='<div class="intern-alert intern-alert--info">Word-Master wird übernommen …</div>'; try{const j=await json(`/intern/api/word-master-import.php?action=apply&project_id=1${archiveQuery}`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}); wr.innerHTML=`<div class="intern-alert intern-alert--success"><strong>Übernahme abgeschlossen.</strong><br>${j.updated} aktualisiert · ${j.created} neu · ${j.conflicts} Konflikte · ${j.recognized} erkannt.</div>`;}catch(e){wr.innerHTML=`<div class="intern-alert intern-alert--error">${esc(e.message)}</div>`;}finally{wa.disabled=false;}});
+      if (si) si.innerHTML = archiveId > 0 ? `<strong>Ausgewählte Archivfassung: #${archiveId}</strong>` : 'Keine Archivfassung ausgewählt. Bitte über „Gutachten → Als Master prüfen“ öffnen.';
+      if (!archiveId) { if (wp) wp.disabled=true; if (wa) wa.disabled=true; }
+
+      async function json(url, init){
+        const r=await fetch(url,{credentials:'same-origin',...(init||{})});
+        const text=await r.text();
+        let j={}; try{j=JSON.parse(text);}catch{}
+        if(!r.ok) throw new Error(j.error||text||`HTTP ${r.status}`);
+        return j;
+      }
+      async function getArchiveFile(){
+        if (!archiveId) throw new Error('Keine konkrete Gutachtenfassung ausgewählt.');
+        const r = await fetch(`/intern/api/report-archive.php?download=${archiveId}`, {credentials:'same-origin', cache:'no-store'});
+        if (!r.ok) {
+          let msg=`Archivdatei konnte nicht geladen werden (HTTP ${r.status}).`;
+          try{const j=await r.json(); if(j.error) msg=j.error;}catch{}
+          throw new Error(msg);
+        }
+        const blob = await r.blob();
+        if (!blob.size) throw new Error('Die Archivdatei ist leer.');
+        const disposition = r.headers.get('content-disposition') || '';
+        const match = disposition.match(/filename="?([^";]+)"?/i);
+        return {blob, name: match?.[1] || `Gutachten-${archiveId}.doc`};
+      }
+      async function runWord(action){
+        const file = await getArchiveFile();
+        const fd = new FormData();
+        fd.append('report', file.blob, file.name);
+        return json(`/intern/api/word-master-import.php?action=${action}&project_id=1&archive_id=${archiveId}`, {method:'POST', body:fd});
+      }
+
+      wp?.addEventListener('click', async()=>{
+        wp.disabled=true; wa.disabled=true;
+        wr.innerHTML='<div class="intern-alert intern-alert--info">Archiviertes Gutachten wird über die Downloadroute geladen, gelesen und abgeglichen …</div>';
+        try{
+          const j=await runWord('preview'); const c=j.counts||{};
+          wr.innerHTML=`<div class="intern-alert intern-alert--success"><strong>${esc(j.source?.file_name)}</strong><br>Archiv-ID ${esc(j.source?.id)} · ${c.recognized||0} Positionen erkannt · ${c.exact||0} exakt zugeordnet · ${c.fallback||0} eindeutig über Etage/Raum/Fenster zugeordnet · ${c.new||0} neu · ${c.conflicts||0} Konflikte.</div><div class="intern-table-wrap"><table class="intern-table"><thead><tr><th>Fenster</th><th>Etage</th><th>Raum</th><th>Flügel</th><th>Status</th></tr></thead><tbody>${(j.items||[]).slice(0,500).map(x=>`<tr><td>${esc(x.window_number)}</td><td>${esc(x.floor)}</td><td>${esc(x.room)}</td><td>${esc(x.wing)}</td><td>${esc(x.status)}</td></tr>`).join('')}</tbody></table></div>`;
+          wa.disabled=(c.conflicts||0)>0;
+        }catch(e){wr.innerHTML=`<div class="intern-alert intern-alert--error">${esc(e.message)}</div>`;}
+        finally{wp.disabled=false;}
+      });
+      wa?.addEventListener('click', async()=>{
+        if(!confirm('Word-Master jetzt übernehmen? Bestehende Positionen werden aktualisiert; eindeutig neue Positionen werden ergänzt.'))return;
+        wa.disabled=true; wr.innerHTML='<div class="intern-alert intern-alert--info">Gutachten wird erneut aus dem Archiv geladen und der Word-Master wird übernommen …</div>';
+        try{const j=await runWord('apply'); wr.innerHTML=`<div class="intern-alert intern-alert--success"><strong>Übernahme abgeschlossen.</strong><br>${j.updated} aktualisiert · ${j.created} neu · ${j.conflicts} Konflikte · ${j.recognized} erkannt.</div>`;}
+        catch(e){wr.innerHTML=`<div class="intern-alert intern-alert--error">${esc(e.message)}</div>`;}
+        finally{wa.disabled=false;}
+      });
       pp?.addEventListener('click', async()=>{ pp.disabled=true; pr.innerHTML='<div class="intern-alert intern-alert--info">Fotoabfolge wird geprüft …</div>'; try{const j=await json('/intern/api/photo-sequence-repair.php?action=preview&project_id=1'); pr.innerHTML=`<div class="intern-alert ${j.ambiguous_markers?'intern-alert--warn':'intern-alert--success'}"><strong>${j.photos} Fotos geprüft</strong><br>${j.markers} Schlagzahl-Gruppen erkannt · ${j.moves} Fotos derzeit falsch zugeordnet · ${j.before_first_marker} Fotos vor der ersten erkannten Schlagzahl · ${j.ambiguous_markers} uneindeutige Schlagzahlen.</div><div class="intern-table-wrap"><table class="intern-table"><thead><tr><th>Schlagzahl</th><th>Fotos</th><th>Zielstatus</th></tr></thead><tbody>${(j.groups||[]).map(g=>`<tr><td>${esc(g.marker)}</td><td>${g.photos}</td><td>${esc(g.status)}</td></tr>`).join('')}</tbody></table></div>`; pa.disabled=!!j.ambiguous_markers;}catch(e){pr.innerHTML=`<div class="intern-alert intern-alert--error">${esc(e.message)}</div>`;}finally{pp.disabled=false;}});
       pa?.addEventListener('click', async()=>{ if(!confirm('Fotozuordnung jetzt strikt nach Schlagzahlfolge korrigieren?'))return; pa.disabled=true; pr.innerHTML='<div class="intern-alert intern-alert--info">Fotozuordnung wird korrigiert …</div>'; try{const j=await json('/intern/api/photo-sequence-repair.php?action=apply&project_id=1',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}); pr.innerHTML=`<div class="intern-alert intern-alert--success"><strong>Fotozuordnung korrigiert.</strong><br>${j.changed} Fotos wurden auf die richtige Schlagzahl-Position verschoben.</div>`;}catch(e){pr.innerHTML=`<div class="intern-alert intern-alert--error">${esc(e.message)}</div>`;}finally{pa.disabled=false;}});
     })();
