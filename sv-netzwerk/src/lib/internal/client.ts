@@ -4434,10 +4434,19 @@ async function createEditableAssessmentReport(context: AppContext, summaries: Wi
     let documents: Awaited<ReturnType<typeof apiListSharePointDocuments>> = [];
     try { documents = await apiListSharePointDocuments(); } catch { documents = []; }
     const report = buildAssessmentReport(records, photoSources, documents);
+    progress.textContent = 'Gutachten wird in der zentralen Ablage archiviert …';
+    let archiveInfo = '';
+    try {
+      const archived = await archiveAssessmentReport(report, records.length, totalPhotos, documents.length);
+      archiveInfo = archived ? ' · zentral archiviert' : ' · Archivierung nicht bestätigt';
+    } catch (archiveError) {
+      console.error('Gutachtenarchivierung fehlgeschlagen', archiveError);
+      archiveInfo = ' · zentrale Archivierung fehlgeschlagen';
+    }
     preview.innerHTML = report.bodyHtml;
     preview.contentEditable = 'false';
     result.hidden = false;
-    info.textContent = `${records.length} Fenster, ${totalPhotos} Fotos und ${documents.length} PDF-Anlagen wurden aufgenommen.`;
+    info.textContent = `${records.length} Fenster, ${totalPhotos} Fotos und ${documents.length} PDF-Anlagen wurden aufgenommen${archiveInfo}.`;
     result.scrollIntoView({ behavior: 'smooth', block: 'start' });
     const currentReport = () => ({ ...report, bodyHtml: preview.innerHTML, documentHtml: wrapWordDocument(preview.innerHTML) });
     context.root.querySelector<HTMLButtonElement>('#edit-report')!.onclick = (event) => {
@@ -4464,13 +4473,13 @@ async function fetchReportPhoto(url: string): Promise<string | null> {
     if (!response.ok) return null;
     const blob = await response.blob();
     const bitmap = await createImageBitmap(blob);
-    const scale = Math.min(1, 1200 / Math.max(bitmap.width, bitmap.height));
+    const scale = Math.min(1, 360 / Math.max(bitmap.width, bitmap.height));
     const canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.round(bitmap.width * scale));
     canvas.height = Math.max(1, Math.round(bitmap.height * scale));
     canvas.getContext('2d')?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
     bitmap.close();
-    return canvas.toDataURL('image/jpeg', 0.72);
+    return canvas.toDataURL('image/jpeg', 0.45);
   } catch { return null; }
 }
 
@@ -4520,7 +4529,34 @@ function buildAssessmentReport(
 }
 
 function wrapWordDocument(bodyHtml: string): string {
-  return `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" lang="de"><head><meta charset="utf-8"><title>Gutachten Fensterprüfung</title><style>@page{size:A4;margin:18mm}body{font-family:Arial,sans-serif;color:#071a2e;font-size:10pt;line-height:1.4}h1{font-size:20pt}h2{font-size:14pt;border-bottom:2px solid #f59b16;padding-bottom:4px}h3{font-size:11pt;background:#eaf1f6;padding:5px}table{width:100%;border-collapse:collapse;margin:0 0 10px}th,td{border:1px solid #bcc9d3;padding:5px;text-align:left;vertical-align:top}th{width:36%;background:#eef4f8}.window-report{page-break-before:always}.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.photos figure{margin:0;page-break-inside:avoid}.photos img{width:100%;max-height:240px;object-fit:contain;border:1px solid #ccd7e0}.photos figcaption{font-size:8pt}.missing-photo{height:100px;border:1px dashed #a00;color:#a00;padding:8px}</style></head><body>${bodyHtml}</body></html>`;
+  return `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" lang="de"><head><meta charset="utf-8"><title>Gutachten Fensterprüfung</title><style>@page{size:A4;margin:18mm}body{font-family:Arial,sans-serif;color:#071a2e;font-size:10pt;line-height:1.4}h1{font-size:20pt}h2{font-size:14pt;border-bottom:2px solid #f59b16;padding-bottom:4px}h3{font-size:11pt;background:#eaf1f6;padding:5px}table{width:100%;border-collapse:collapse;margin:0 0 10px}th,td{border:1px solid #bcc9d3;padding:5px;text-align:left;vertical-align:top}th{width:36%;background:#eef4f8}.window-report{page-break-before:always}.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.photos figure{margin:0;page-break-inside:avoid}.photos img{height:7cm;max-height:7cm;width:auto;max-width:100%;object-fit:contain;border:1px solid #ccd7e0}.photos figcaption{font-size:8pt}.missing-photo{height:100px;border:1px dashed #a00;color:#a00;padding:8px}</style></head><body>${bodyHtml}</body></html>`;
+}
+
+async function archiveAssessmentReport(
+  report: GeneratedAssessmentReport,
+  windowCount: number,
+  photoCount: number,
+  attachmentCount: number,
+): Promise<boolean> {
+  const blob = new Blob(['\ufeff', report.documentHtml], { type: 'application/msword' });
+  if (blob.size > 200 * 1024 * 1024) {
+    throw new Error(`Gutachtendatei ist trotz Komprimierung zu groß (${Math.round(blob.size / 1024 / 1024)} MB).`);
+  }
+  const form = new FormData();
+  form.append('report', blob, report.fileName);
+  form.append('file_name', report.fileName);
+  form.append('project_id', '1');
+  form.append('window_count', String(windowCount));
+  form.append('photo_count', String(photoCount));
+  form.append('attachment_count', String(attachmentCount));
+  const response = await fetch('/intern/api/report-archive.php', {
+    method: 'POST',
+    credentials: 'same-origin',
+    body: form,
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload?.error || 'Gutachten konnte nicht zentral archiviert werden.');
+  return payload?.ok === true;
 }
 
 function downloadAssessmentReport(report: GeneratedAssessmentReport): void {
