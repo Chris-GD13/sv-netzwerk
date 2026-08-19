@@ -885,6 +885,40 @@ function v2Progress(array $data): int
     return (int) round($filled / count($required) * 100);
 }
 
+function v2DedupeGroupRows(array $rows): array
+{
+    $merged = [];
+    $order = [];
+    foreach ($rows as $index => $row) {
+        $opening = v2NormalizeKey((string) ($row['__opening_type'] ?? v2DetectOpeningType($row)));
+        $position = v2NormalizeKey((string) ($row['__position'] ?? ''));
+        $key = $opening !== '' ? 'opening:' . $opening : ($position !== '' ? 'position:' . $position : 'row:' . $index);
+        if (!isset($merged[$key])) {
+            $row['__merge_conflicts'] = is_array($row['__merge_conflicts'] ?? null) ? $row['__merge_conflicts'] : [];
+            $merged[$key] = $row;
+            $order[] = $key;
+            continue;
+        }
+        foreach ($row as $field => $value) {
+            if ($field === '__merge_conflicts') continue;
+            $incoming = trim((string) $value);
+            if ($incoming === '') continue;
+            $current = trim((string) ($merged[$key][$field] ?? ''));
+            if ($current === '') {
+                $merged[$key][$field] = $value;
+                continue;
+            }
+            if ($current !== $incoming && !str_starts_with((string) $field, '__')) {
+                $merged[$key]['__merge_conflicts'][$field] = array_values(array_unique(array_merge(
+                    (array) ($merged[$key]['__merge_conflicts'][$field] ?? []),
+                    [$current, $incoming]
+                )));
+            }
+        }
+    }
+    return array_values(array_map(static fn($key) => $merged[$key], $order));
+}
+
 function handleApplyExcelV2(array $user): never
 {
     $body = requestBody();
@@ -904,11 +938,16 @@ function handleApplyExcelV2(array $user): never
     foreach ($canonicalRows as $row) {
         $windowNumber = v2NormalizeWindowNumber($row['__window_number'] ?? ($row['schlagzahl'] ?? ''));
         $room = trim((string) ($row['__room_reference'] ?? ''));
+        $floor = trim((string) ($row['__floor_label'] ?? '')) ?: 'EG / Erdgeschoss';
         if ($windowNumber === '' || $room === '') continue;
-        $key = v2NormalizeKey($room) . '|' . v2NormalizeKey($windowNumber);
-        if (!isset($groups[$key])) $groups[$key] = ['room' => $room, 'window' => $windowNumber, 'rows' => []];
+        $key = v2NormalizeKey($floor) . '|' . v2NormalizeKey($room) . '|' . v2NormalizeKey($windowNumber);
+        if (!isset($groups[$key])) $groups[$key] = ['floor' => $floor, 'room' => $room, 'window' => $windowNumber, 'rows' => []];
         $groups[$key]['rows'][] = $row;
     }
+    foreach ($groups as &$group) {
+        $group['rows'] = v2DedupeGroupRows($group['rows']);
+    }
+    unset($group);
     if ($groups === []) apiError(422, 'Keine verwertbaren Fenster mit Raum- und Pruefnummer gefunden.');
 
     $added = 0;
@@ -932,7 +971,7 @@ function handleApplyExcelV2(array $user): never
             usort($groupRows, static fn($a, $b) => v2OpeningPriority($a) <=> v2OpeningPriority($b));
             $roomNumber = (string) $group['room'];
             $windowNumber = (string) $group['window'];
-            $floorLabel = trim((string) ($groupRows[0]['__floor_label'] ?? '')) ?: 'EG / Erdgeschoss';
+            $floorLabel = trim((string) ($group['floor'] ?? ($groupRows[0]['__floor_label'] ?? ''))) ?: 'EG / Erdgeschoss';
             $roomId = v2EnsureRoom($pdo, $buildingId, $floorLabel, $roomNumber);
 
             $windowPayload = v2WindowData($groupRows, $building, $roomNumber, $windowNumber, $floorLabel, $inspectorName);
