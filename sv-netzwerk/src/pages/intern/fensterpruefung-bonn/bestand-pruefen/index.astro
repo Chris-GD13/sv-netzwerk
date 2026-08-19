@@ -8,10 +8,13 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
       <h1>Bestand prüfen & Dubletten bereinigen</h1>
       <p>Vor dem Gutachten werden Fenster, Flügel und Fotos auf Mehrfacheinträge geprüft. Vorhandene Informationen werden zusammengeführt; widersprüchliche Werte werden als Konflikt dokumentiert.</p>
       <div id="audit" class="intern-alert intern-alert-info">Bestand wird geprüft …</div>
-      <div class="intern-actions" style="margin-top:16px">
+      <div class="intern-actions" style="margin-top:16px;flex-wrap:wrap">
         <button id="refresh" class="sv-button sv-button-secondary" type="button">Bestand neu prüfen</button>
         <button id="cleanup" class="sv-button sv-button-primary" type="button">Dubletten jetzt bereinigen</button>
-        <a href="/intern/fensterpruefung-bonn/export/" class="sv-button sv-button-secondary">Zum Gutachten</a>
+        <a href="/intern/fensterpruefung-bonn/massenaenderung/" class="sv-button sv-button-secondary">Massenänderung</a>
+        <a href="/intern/fensterpruefung-bonn/gutachten/" class="sv-button sv-button-secondary">Gutachtenablage</a>
+        <a href="/intern/fensterpruefung-bonn/export/" class="sv-button sv-button-secondary">Neues Gutachten</a>
+        <a href="/intern/fensterpruefung-bonn/" class="sv-button sv-button-secondary">Dashboard</a>
       </div>
       <div id="result" style="margin-top:16px"></div>
     </section>
