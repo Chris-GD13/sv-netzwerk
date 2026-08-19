@@ -18,24 +18,30 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
       <div id="result" style="margin-top:16px"></div>
     </section>
 
-    <section class="intern-card" style="margin-top:20px;border:1px solid #efcaca">
-      <p class="sv-eyebrow">Neuimport · kontrollierter Reset</p>
-      <h2>Fallbestand eines Gebäudes vollständig zurücksetzen</h2>
-      <p>Diese Funktion entfernt gezielt alle Fenster, Flügel, Foto-Datensätze und die Etagen-/Raumstruktur des ausgewählten Gebäudes. Das Gebäude selbst bleibt bestehen. Danach kann der Bestand vollständig neu aus SharePoint eingelesen werden.</p>
-      <div class="intern-alert intern-alert-warning"><strong>Achtung:</strong> Dies ist ein harter Reset des ausgewählten Gebäudebestands. Archivierte Gutachten bleiben davon unberührt.</div>
-      <div style="display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:12px;align-items:end;margin-top:16px">
-        <label>
-          <strong>Gebäude</strong><br>
-          <select id="reset-building" class="intern-input" style="width:100%;margin-top:6px"></select>
-        </label>
-        <button id="reset-preview" class="sv-button sv-button-secondary" type="button">Reset prüfen</button>
+    <details class="intern-card" style="margin-top:20px;border:1px solid rgba(15,45,70,.13)">
+      <summary style="cursor:pointer;font-weight:800;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <span>Erweiterte Datenverwaltung</span>
+        <span class="intern-meta">selten benötigte Funktionen</span>
+      </summary>
+      <div style="margin-top:18px;border-top:1px solid rgba(15,45,70,.12);padding-top:18px">
+        <p class="sv-eyebrow">Neuimport · kontrollierter Reset</p>
+        <h2>Fallbestand eines Gebäudes vollständig zurücksetzen</h2>
+        <p>Diese Funktion entfernt gezielt alle Fenster, Flügel, Foto-Datensätze und die Etagen-/Raumstruktur des ausgewählten Gebäudes. Das Gebäude selbst bleibt bestehen. Danach kann der Bestand vollständig neu aus SharePoint eingelesen werden.</p>
+        <div class="intern-alert intern-alert-warning"><strong>Achtung:</strong> Dies ist ein harter Reset des ausgewählten Gebäudebestands. Archivierte Gutachten bleiben davon unberührt.</div>
+        <div style="display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:12px;align-items:end;margin-top:16px">
+          <label>
+            <strong>Gebäude</strong><br>
+            <select id="reset-building" class="intern-input" style="width:100%;margin-top:6px"></select>
+          </label>
+          <button id="reset-preview" class="sv-button sv-button-secondary" type="button">Reset prüfen</button>
+        </div>
+        <div id="reset-preview-result" style="margin-top:14px"></div>
+        <div class="intern-actions" style="margin-top:14px">
+          <button id="reset-building-btn" class="sv-button sv-button-primary" type="button" disabled>Fallbestand jetzt vollständig zurücksetzen</button>
+        </div>
+        <div id="reset-result" style="margin-top:14px"></div>
       </div>
-      <div id="reset-preview-result" style="margin-top:14px"></div>
-      <div class="intern-actions" style="margin-top:14px">
-        <button id="reset-building-btn" class="sv-button sv-button-primary" type="button" disabled>Fallbestand jetzt vollständig zurücksetzen</button>
-      </div>
-      <div id="reset-result" style="margin-top:14px"></div>
-    </section>
+    </details>
   </main>
   <script is:inline>
     (() => {
