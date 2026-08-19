@@ -1,10 +1,11 @@
 ---
 import InternalLayout from '../../../../layouts/InternalLayout.astro';
 import { windowFormSections } from '../../../../lib/internal/schema';
+const hiddenBulkFields = new Set(['inspection_date','time_started','time_finished']);
 const bulkSections = windowFormSections.map((section) => ({
   id: section.id,
   title: section.title,
-  fields: section.fields.map((field) => ({
+  fields: section.fields.filter((field) => !hiddenBulkFields.has(field.id)).map((field) => ({
     id: field.id,
     label: field.label,
     type: field.type,
@@ -42,6 +43,17 @@ const bulkSectionsJson = JSON.stringify(bulkSections).replace(/</g, '\\u003c');
     </section>
 
     <section class="intern-card" style="margin-top:16px">
+      <h2>Prüftermine / Ortstermine</h2>
+      <p class="intern-meta">Mehrere Prüftage mit eigener Beginn- und Endzeit erfassen und gemeinsam auf alle Fenster übertragen.</p>
+      <div id="period-rows" style="display:grid;gap:10px;margin-top:12px"></div>
+      <div class="intern-actions" style="margin-top:12px;flex-wrap:wrap">
+        <button id="add-period" type="button" class="sv-button sv-button-secondary">+ Weiteren Tag hinzufügen</button>
+        <button id="apply-periods" type="button" class="sv-button sv-button-primary">Prüftermine auf alle Fenster anwenden</button>
+      </div>
+      <div class="intern-alert intern-alert--info" style="margin-top:12px">Voreingetragen: 12.08.2026 und 13.08.2026 jeweils 08:00–15:30 Uhr sowie 17.08.2026 von 08:00–14:45 Uhr.</div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
       <div id="bulk-tabs" class="intern-actions" role="tablist" style="gap:8px;flex-wrap:wrap"></div>
     </section>
 
@@ -56,7 +68,10 @@ const bulkSectionsJson = JSON.stringify(bulkSections).replace(/</g, '\\u003c');
       const panelsEl = document.getElementById('bulk-panels');
       const resultEl = document.getElementById('bulk-result');
       const modeEl = document.getElementById('bulk-mode');
-      if (!dataEl || !tabsEl || !panelsEl || !modeEl) return;
+      const periodRowsEl = document.getElementById('period-rows');
+      const addPeriodBtn = document.getElementById('add-period');
+      const applyPeriodsBtn = document.getElementById('apply-periods');
+      if (!dataEl || !tabsEl || !panelsEl || !modeEl || !periodRowsEl || !addPeriodBtn || !applyPeriodsBtn) return;
 
       let sections = [];
       try { sections = JSON.parse(dataEl.textContent || '[]'); } catch { sections = []; }
@@ -64,16 +79,50 @@ const bulkSectionsJson = JSON.stringify(bulkSections).replace(/</g, '\\u003c');
       const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
       const attr = (value) => esc(value).replace(/`/g, '&#096;');
 
+      let periods = [
+        { date:'2026-08-12', start:'08:00', end:'15:30' },
+        { date:'2026-08-13', start:'08:00', end:'15:30' },
+        { date:'2026-08-17', start:'08:00', end:'14:45' },
+      ];
+
+      function renderPeriods() {
+        periodRowsEl.innerHTML = periods.map((period, index) => `
+          <div style="display:grid;grid-template-columns:minmax(180px,1fr) minmax(150px,1fr) minmax(150px,1fr) auto;gap:10px;align-items:end;border-bottom:1px solid #e2e8f0;padding-bottom:10px">
+            <div class="intern-field"><label>Prüfdatum</label><input class="intern-input" type="date" data-period-date="${index}" value="${attr(period.date)}"></div>
+            <div class="intern-field"><label>Beginn</label><input class="intern-input" type="time" data-period-start="${index}" value="${attr(period.start)}"></div>
+            <div class="intern-field"><label>Abschluss</label><input class="intern-input" type="time" data-period-end="${index}" value="${attr(period.end)}"></div>
+            <button type="button" class="sv-button sv-button-secondary" data-remove-period="${index}" ${periods.length <= 1 ? 'disabled' : ''}>Entfernen</button>
+          </div>`).join('');
+        periodRowsEl.querySelectorAll('[data-period-date]').forEach((el) => el.addEventListener('change', () => { periods[Number(el.getAttribute('data-period-date'))].date = el.value; }));
+        periodRowsEl.querySelectorAll('[data-period-start]').forEach((el) => el.addEventListener('change', () => { periods[Number(el.getAttribute('data-period-start'))].start = el.value; }));
+        periodRowsEl.querySelectorAll('[data-period-end]').forEach((el) => el.addEventListener('change', () => { periods[Number(el.getAttribute('data-period-end'))].end = el.value; }));
+        periodRowsEl.querySelectorAll('[data-remove-period]').forEach((el) => el.addEventListener('click', () => { periods.splice(Number(el.getAttribute('data-remove-period')), 1); renderPeriods(); }));
+      }
+
+      addPeriodBtn.addEventListener('click', () => { periods.push({date:'',start:'08:00',end:'15:30'}); renderPeriods(); });
+      applyPeriodsBtn.addEventListener('click', async () => {
+        const valid = periods.filter((p) => p.date);
+        if (!valid.length) { alert('Bitte mindestens einen Prüftag auswählen.'); return; }
+        const mode = 'value' in modeEl ? modeEl.value : 'empty_only';
+        const summary = valid.map((p) => `${p.date.split('-').reverse().join('.')} ${p.start || '—'}–${p.end || '—'} Uhr`).join('\n');
+        if (!confirm(`Folgende Prüftermine auf alle Fenster anwenden?\n\n${summary}\n\n${mode === 'overwrite' ? 'Vorhandene Werte werden überschrieben.' : 'Nur leere Werte werden ergänzt.'}`)) return;
+        applyPeriodsBtn.disabled = true;
+        if (resultEl) { resultEl.className = 'intern-alert intern-alert--info'; resultEl.textContent = 'Prüftermine werden übernommen …'; }
+        try {
+          const response = await fetch('/intern/api/bulk-update.php', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({project_id:1, field:'inspection_periods', value:valid, field_type:'json', mode}) });
+          const json = await response.json();
+          if (!response.ok) throw new Error(json.error || 'Prüftermine konnten nicht gespeichert werden.');
+          if (resultEl) { resultEl.className = 'intern-alert intern-alert--success'; resultEl.textContent = `${json.changed} Fenster mit den Prüfterminen aktualisiert, ${json.skipped} unverändert/übersprungen.`; }
+        } catch (error) {
+          if (resultEl) { resultEl.className = 'intern-alert intern-alert--error'; resultEl.textContent = error && error.message ? error.message : 'Prüftermine konnten nicht gespeichert werden.'; }
+        } finally { applyPeriodsBtn.disabled = false; }
+      });
+      renderPeriods();
+
       function inputHtml(field) {
-        if (field.type === 'select') {
-          return `<select class="intern-input" data-bulk-input data-field="${attr(field.id)}" data-type="select"><option value="">— Wert wählen —</option>${(field.options || []).map((o) => `<option value="${attr(o.value)}">${esc(o.label)}</option>`).join('')}</select>`;
-        }
-        if (field.type === 'checkbox') {
-          return `<select class="intern-input" data-bulk-input data-field="${attr(field.id)}" data-type="checkbox"><option value="">— Wert wählen —</option><option value="true">Ja</option><option value="false">Nein</option></select>`;
-        }
-        if (field.type === 'textarea') {
-          return `<textarea class="intern-input" rows="3" data-bulk-input data-field="${attr(field.id)}" data-type="text"></textarea>`;
-        }
+        if (field.type === 'select') return `<select class="intern-input" data-bulk-input data-field="${attr(field.id)}" data-type="select"><option value="">— Wert wählen —</option>${(field.options || []).map((o) => `<option value="${attr(o.value)}">${esc(o.label)}</option>`).join('')}</select>`;
+        if (field.type === 'checkbox') return `<select class="intern-input" data-bulk-input data-field="${attr(field.id)}" data-type="checkbox"><option value="">— Wert wählen —</option><option value="true">Ja</option><option value="false">Nein</option></select>`;
+        if (field.type === 'textarea') return `<textarea class="intern-input" rows="3" data-bulk-input data-field="${attr(field.id)}" data-type="text"></textarea>`;
         const htmlType = ['number','date','time'].includes(field.type) ? field.type : 'text';
         const step = field.step ? ` step="${attr(field.step)}"` : '';
         const min = field.min !== null && field.min !== undefined ? ` min="${attr(field.min)}"` : '';
@@ -86,12 +135,8 @@ const bulkSectionsJson = JSON.stringify(bulkSections).replace(/</g, '\\u003c');
 
       tabsEl.querySelectorAll('[data-tab]').forEach((button) => button.addEventListener('click', () => {
         const id = button.getAttribute('data-tab');
-        panelsEl.querySelectorAll('.bulk-section').forEach((panel) => {
-          panel.style.display = panel.getAttribute('data-panel') === id ? '' : 'none';
-        });
-        tabsEl.querySelectorAll('[data-tab]').forEach((tab) => {
-          tab.className = 'sv-button ' + (tab === button ? 'sv-button-primary' : 'sv-button-secondary');
-        });
+        panelsEl.querySelectorAll('.bulk-section').forEach((panel) => { panel.style.display = panel.getAttribute('data-panel') === id ? '' : 'none'; });
+        tabsEl.querySelectorAll('[data-tab]').forEach((tab) => { tab.className = 'sv-button ' + (tab === button ? 'sv-button-primary' : 'sv-button-secondary'); });
       }));
 
       panelsEl.querySelectorAll('[data-apply]').forEach((button) => button.addEventListener('click', async () => {
