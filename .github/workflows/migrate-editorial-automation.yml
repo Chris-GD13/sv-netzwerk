@@ -1,0 +1,117 @@
+name: Fachbeitragsautomation auf Redaktionsplan migrieren
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/migrate-editorial-automation.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Alte automatische Generierung entschärfen und Qualitätsgate justieren
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          workflow = Path('.github/workflows/knowledge-standard.yml')
+          s = workflow.read_text(encoding='utf-8')
+          s2 = re.sub(
+              r'on:\n  schedule:\n(?:    .*\n)+?  workflow_dispatch:',
+              'on:\n  workflow_dispatch:',
+              s,
+              count=1,
+          )
+          if s2 == s:
+              print('Hinweis: schedule-Block in knowledge-standard.yml war bereits entfernt oder hatte ein anderes Format.')
+          workflow.write_text(s2, encoding='utf-8')
+
+          preflight = Path('sv-netzwerk/scripts/validate-fachbeitrag-preflight.mjs')
+          p = preflight.read_text(encoding='utf-8')
+          p = p.replace('wordCount < 1800', 'wordCount < 1200')
+          p = p.replace('Mindestumfang 1800 Wörter', 'Mindestumfang 1200 Wörter')
+          preflight.write_text(p, encoding='utf-8')
+
+          generator = Path('sv-netzwerk/scripts/run-fachbeitrag-automation.mjs')
+          g = generator.read_text(encoding='utf-8')
+          old_pick = '''const pickTopic = (rows, preferredDamageTypes = []) => {
+            const recentTopicIds = rows.slice(-10).map((r) => r.topic_id).filter(Boolean);
+            const usedToday = rows
+              .filter((r) => r.date === berlinDate)
+              .filter((r) => isSuccess(r.deploy_status) && isSuccess(r.live_pruefung) && isSuccess(r.linkedin_status))
+              .map((r) => r.topic_id)
+              .filter(Boolean);
+            const available = TOPICS.filter((topic) => !usedToday.includes(topic.id) && !recentTopicIds.includes(topic.id));
+            const preferredAvailable = preferredDamageTypes.length > 0
+              ? available.filter((topic) => preferredDamageTypes.some((damageType) => topic.damageTypes.includes(damageType)))
+              : [];
+            if (preferredAvailable.length > 0) return preferredAvailable[0];
+            if (available.length > 0) return available[0];
+            const fallbackPreferred = preferredDamageTypes.length > 0
+              ? TOPICS.filter((topic) => !usedToday.includes(topic.id) && preferredDamageTypes.some((damageType) => topic.damageTypes.includes(damageType)))
+              : [];
+            if (fallbackPreferred.length > 0) return fallbackPreferred[0];
+            return TOPICS.find((topic) => !usedToday.includes(topic.id)) ?? TOPICS[0];
+          };'''.replace('          ', '')
+          new_pick = '''const pickTopic = (rows, preferredDamageTypes = []) => {
+            const usedTopicIds = new Set(rows.map((r) => String(r.topic_id || '').trim()).filter(Boolean));
+            const available = TOPICS.filter((topic) => !usedTopicIds.has(topic.id));
+            const preferredAvailable = preferredDamageTypes.length > 0
+              ? available.filter((topic) => preferredDamageTypes.some((damageType) => topic.damageTypes.includes(damageType)))
+              : [];
+            if (preferredAvailable.length > 0) return preferredAvailable[0];
+            if (available.length > 0) return available[0];
+            throw new Error('Redaktioneller Themenpool erschöpft. Es wird kein bereits veröffentlichtes Thema mit Suffix erneut erzeugt.');
+          };'''.replace('          ', '')
+          if old_pick in g:
+              g = g.replace(old_pick, new_pick)
+          else:
+              print('Hinweis: pickTopic war bereits verändert; keine Überschreibung.')
+
+          g = g.replace(
+              "  while (!skipExisting && await fileExists(path.join(knowledgeDir, `${candidate}.md`))) {\n    candidate = `${normalized}-${counter}`;\n    counter += 1;\n  }\n  return candidate;",
+              "  if (!skipExisting && await fileExists(path.join(knowledgeDir, `${candidate}.md`))) {\n    throw new Error(`Slug-Dublette erkannt: ${candidate}. Ein neuer Fachbeitrag muss ein eigenständiges Thema erhalten.`);\n  }\n  return candidate;",
+          )
+          g = re.sub(
+              r"  if \(!seen\.has\(normalizeText\(baseTitle\)\)\) return baseTitle;\n  let counter = 2;\n  while \(seen\.has\(normalizeText\(`\$\{baseTitle\} \(\$\{counter\}\)`\)\)\) \{\n    counter \+= 1;\n  \}\n  return `\$\{baseTitle\} \(\$\{counter\}\)`;",
+              "  if (!seen.has(normalizeText(baseTitle))) return baseTitle;\n  throw new Error(`Themen-Dublette erkannt: ${baseTitle}. Ein technisches Suffix wie (2) ist als öffentlicher Titel unzulässig.`);",
+              g,
+              count=1,
+          )
+          generator.write_text(g, encoding='utf-8')
+          PY
+
+      - name: Änderungen prüfen
+        run: |
+          set -euo pipefail
+          grep -A4 '^on:' .github/workflows/knowledge-standard.yml
+          grep -Fq 'wordCount < 1200' sv-netzwerk/scripts/validate-fachbeitrag-preflight.mjs
+          if grep -Fq 'return `${baseTitle} (${counter})`' sv-netzwerk/scripts/run-fachbeitrag-automation.mjs; then
+            echo "::error::Alte Titel-Suffixlogik ist noch vorhanden."
+            exit 1
+          fi
+
+      - name: Commit und Push
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "Migration war bereits vollständig angewendet."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/knowledge-standard.yml sv-netzwerk/scripts/validate-fachbeitrag-preflight.mjs sv-netzwerk/scripts/run-fachbeitrag-automation.mjs
+          git commit -m "fix: tägliche Fachbeiträge nur noch aus qualitätsgesichertem Redaktionsplan"
+          git push origin HEAD:main
