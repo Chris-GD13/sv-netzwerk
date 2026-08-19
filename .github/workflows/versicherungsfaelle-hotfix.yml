@@ -7,6 +7,7 @@ on:
       - 'sv-netzwerk/src/pages/intern/versicherungsfaelle/**'
       - 'sv-netzwerk/src/pages/intern/index.astro'
       - 'sv-netzwerk/src/layouts/InternalLayout.astro'
+      - 'sv-netzwerk/public/intern/api/google-drive-sync.php'
   workflow_dispatch:
 
 permissions:
@@ -33,6 +34,7 @@ jobs:
         run: |
           test -f dist/intern/versicherungsfaelle/index.html
           test -f dist/intern/versicherungsfaelle/sv-gf/index.html
+          test -f dist/intern/api/google-drive-sync.php
           test -f dist/intern/index.html
           test -f dist/intern/fensterpruefung-bonn/index.html
       - name: Python SFTP installieren
@@ -53,6 +55,7 @@ jobs:
             (Path('dist/intern/versicherungsfaelle'),'/sv-netzwerk/intern/versicherungsfaelle'),
           ]
           files=[
+            (Path('dist/intern/api/google-drive-sync.php'),'/sv-netzwerk/intern/api/google-drive-sync.php'),
             (Path('dist/intern/index.html'),'/sv-netzwerk/intern/index.html'),
             (Path('dist/intern/fensterpruefung-bonn/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/index.html'),
             (Path('dist/intern/fensterpruefung-bonn/fenster/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/fenster/index.html'),
@@ -84,3 +87,5 @@ jobs:
           test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/versicherungsfaelle/)" = "200"
           test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/versicherungsfaelle/sv-gf/)" = "200"
           test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/)" = "200"
+          code="$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/api/google-drive-sync.php?action=status)"
+          test "$code" = "200" -o "$code" = "401" -o "$code" = "403" -o "$code" = "503"
