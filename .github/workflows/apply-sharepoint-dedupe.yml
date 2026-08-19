@@ -1,0 +1,35 @@
+name: Apply SharePoint dedupe patch
+
+on:
+  push:
+    paths:
+      - 'sv-netzwerk/scripts/patch-sharepoint-dedupe.py'
+      - '.github/workflows/apply-sharepoint-dedupe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply patch
+        working-directory: sv-netzwerk
+        run: python3 scripts/patch-sharepoint-dedupe.py
+      - name: Validate PHP
+        run: php -l sv-netzwerk/public/intern/api/sharepoint-v2.php
+      - name: Commit result
+        run: |
+          if git diff --quiet; then
+            echo "No changes required"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sv-netzwerk/public/intern/api/sharepoint-v2.php
+          git commit -m "fix: Excel-Dubletten nach Etage Raum Fenster und Fluegel konsolidieren"
+          git push origin HEAD:main
