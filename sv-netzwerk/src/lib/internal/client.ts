@@ -1,4 +1,4 @@
-﻿import QRCode from 'qrcode';
+import QRCode from 'qrcode';
 import { calculateWindowWeights } from './calculations';
 import { loadAllDrafts, loadDraft, removeDraft, saveDraft } from './offline';
 import { loadTemplates, saveTemplate, markTemplateUsed, deleteTemplate, updateTemplate } from './templates';
@@ -4063,6 +4063,7 @@ function renderHeader(context: AppContext, title: string, text: string) {
     <a class="sv-button sv-button-secondary" href="${pb}/export/">Export</a>
     <a class="sv-button sv-button-secondary" href="${pb}/fenster/">Fenster</a>
     <a class="sv-button sv-button-secondary" href="${pb}/gebaeude/">Gebäude</a>
+    <a class="sv-button sv-button-secondary" href="${pb}/gutachten/">Gutachten</a>
     ${canImport ? `<a class="sv-button sv-button-secondary" href="${pb}/import/">📄 KI-Import</a>` : ''}
     ${canSharePoint ? `<a class="sv-button sv-button-secondary" href="${pb}/sharepoint-import/">📂 SharePoint-Import</a>` : ''}
     ${canManage ? `<a class="sv-button sv-button-secondary" href="/intern/projekte/neu/">＋ Neues Projekt</a>` : ''}
