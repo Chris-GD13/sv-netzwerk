@@ -1,0 +1,48 @@
+name: Gutachten-Menuepunkt ergaenzen
+
+on:
+  push:
+    paths:
+      - '.github/workflows/add-gutachten-menu.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Menuepunkt Gutachten einbauen
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('sv-netzwerk/src/lib/internal/client.ts')
+          s = p.read_text(encoding='utf-8-sig')
+          needle = '    <a class="sv-button sv-button-secondary" href="${pb}/gebaeude/">Gebäude</a>\n'
+          insert = needle + '    <a class="sv-button sv-button-secondary" href="${pb}/gutachten/">Gutachten</a>\n'
+          if '${pb}/gutachten/' not in s:
+              if needle not in s:
+                  raise SystemExit('Navigationsanker nicht gefunden')
+              s = s.replace(needle, insert, 1)
+              p.write_text(s, encoding='utf-8')
+          PY
+          grep -Fq '${pb}/gutachten/' sv-netzwerk/src/lib/internal/client.ts
+      - name: Build pruefen
+        working-directory: sv-netzwerk
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+      - name: Aenderung committen
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sv-netzwerk/src/lib/internal/client.ts
+          git commit -m "feat: Gutachten als eigenen Menuepunkt anzeigen"
+          git push origin HEAD:main
