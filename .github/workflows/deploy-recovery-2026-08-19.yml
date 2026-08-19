@@ -21,6 +21,7 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
+          echo "Starte Produktiv-Deployment fuer den heutigen Fachbeitrag."
           curl --fail-with-body -sS -X POST \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
