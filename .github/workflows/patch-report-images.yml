@@ -1,4 +1,4 @@
-name: Gutachtenbilder kompakt aufbereiten
+name: Gutachtenexport kompakt und zentral archivieren
 
 on:
   push:
@@ -16,40 +16,71 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Bildaufbereitung fuer Word anpassen
+
+      - name: Gutachtenexport patchen
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          p=Path('sv-netzwerk/src/lib/internal/client.ts')
-          s=p.read_text(encoding='utf-8-sig')
-          changes=0
-          old="const scale = Math.min(1, 1200 / Math.max(bitmap.width, bitmap.height));"
-          new="const scale = Math.min(1, 520 / Math.max(bitmap.width, bitmap.height));"
+          p = Path('sv-netzwerk/src/lib/internal/client.ts')
+          s = p.read_text(encoding='utf-8-sig')
+          original = s
+
+          # Bilder für 7-cm-Darstellung ausreichend, aber deutlich kompakter halten.
+          s = s.replace(
+              "const scale = Math.min(1, 1200 / Math.max(bitmap.width, bitmap.height));",
+              "const scale = Math.min(1, 360 / Math.max(bitmap.width, bitmap.height));",
+              1,
+          )
+          s = s.replace(
+              "return canvas.toDataURL('image/jpeg', 0.72);",
+              "return canvas.toDataURL('image/jpeg', 0.45);",
+              1,
+          )
+          s = s.replace(
+              '.photos img{width:100%;max-height:240px;object-fit:contain;border:1px solid #ccd7e0}',
+              '.photos img{height:7cm;max-height:7cm;width:auto;max-width:100%;object-fit:contain;border:1px solid #ccd7e0}',
+              1,
+          )
+
+          # Nach erfolgreicher Erzeugung automatisch in der zentralen Gutachtenablage archivieren.
+          old = """    const report = buildAssessmentReport(records, photoSources, documents);\n    preview.innerHTML = report.bodyHtml;"""
+          new = """    const report = buildAssessmentReport(records, photoSources, documents);\n    progress.textContent = 'Gutachten wird in der zentralen Ablage archiviert …';\n    let archiveInfo = '';\n    try {\n      const archived = await archiveAssessmentReport(report, records.length, totalPhotos, documents.length);\n      archiveInfo = archived ? ' · zentral archiviert' : ' · Archivierung nicht bestätigt';\n    } catch (archiveError) {\n      console.error('Gutachtenarchivierung fehlgeschlagen', archiveError);\n      archiveInfo = ' · zentrale Archivierung fehlgeschlagen';\n    }\n    preview.innerHTML = report.bodyHtml;"""
           if old in s:
-              s=s.replace(old,new,1); changes+=1
-          old2="return canvas.toDataURL('image/jpeg', 0.72);"
-          new2="return canvas.toDataURL('image/jpeg', 0.55);"
-          if old2 in s:
-              s=s.replace(old2,new2,1); changes+=1
-          old3='.photos img{width:100%;max-height:240px;object-fit:contain;border:1px solid #ccd7e0}'
-          new3='.photos img{height:7cm;max-height:7cm;width:auto;max-width:100%;object-fit:contain;border:1px solid #ccd7e0}'
-          if old3 in s:
-              s=s.replace(old3,new3,1); changes+=1
-          if changes == 0 and '520 / Math.max(bitmap.width, bitmap.height)' not in s:
-              raise SystemExit('Erwartete Gutachten-Bildlogik nicht gefunden')
-          p.write_text(s,encoding='utf-8')
+              s = s.replace(old, new, 1)
+
+          s = s.replace(
+              "info.textContent = `${records.length} Fenster, ${totalPhotos} Fotos und ${documents.length} PDF-Anlagen wurden aufgenommen.`;",
+              "info.textContent = `${records.length} Fenster, ${totalPhotos} Fotos und ${documents.length} PDF-Anlagen wurden aufgenommen${archiveInfo}.`;",
+              1,
+          )
+
+          marker = "function downloadAssessmentReport(report: GeneratedAssessmentReport): void {"
+          helper = """async function archiveAssessmentReport(\n  report: GeneratedAssessmentReport,\n  windowCount: number,\n  photoCount: number,\n  attachmentCount: number,\n): Promise<boolean> {\n  const blob = new Blob(['\\ufeff', report.documentHtml], { type: 'application/msword' });\n  if (blob.size > 200 * 1024 * 1024) {\n    throw new Error(`Gutachtendatei ist trotz Komprimierung zu groß (${Math.round(blob.size / 1024 / 1024)} MB).`);\n  }\n  const form = new FormData();\n  form.append('report', blob, report.fileName);\n  form.append('file_name', report.fileName);\n  form.append('project_id', '1');\n  form.append('window_count', String(windowCount));\n  form.append('photo_count', String(photoCount));\n  form.append('attachment_count', String(attachmentCount));\n  const response = await fetch('/intern/api/report-archive.php', {\n    method: 'POST',\n    credentials: 'same-origin',\n    body: form,\n  });\n  const payload = await response.json().catch(() => ({}));\n  if (!response.ok) throw new Error(payload?.error || 'Gutachten konnte nicht zentral archiviert werden.');\n  return payload?.ok === true;\n}\n\n"""
+          if 'async function archiveAssessmentReport(' not in s:
+              if marker not in s:
+                  raise SystemExit('Download-Funktion als Einfügemarke nicht gefunden')
+              s = s.replace(marker, helper + marker, 1)
+
+          if s == original:
+              raise SystemExit('Keine Änderung am Gutachtenexport vorgenommen')
+
+          p.write_text(s, encoding='utf-8')
           PY
-          grep -Fq "520 / Math.max(bitmap.width, bitmap.height)" sv-netzwerk/src/lib/internal/client.ts
-          grep -Fq "toDataURL('image/jpeg', 0.55)" sv-netzwerk/src/lib/internal/client.ts
+
+          grep -Fq "360 / Math.max(bitmap.width, bitmap.height)" sv-netzwerk/src/lib/internal/client.ts
+          grep -Fq "toDataURL('image/jpeg', 0.45)" sv-netzwerk/src/lib/internal/client.ts
           grep -Fq "height:7cm;max-height:7cm" sv-netzwerk/src/lib/internal/client.ts
-      - name: Build pruefen
+          grep -Fq "archiveAssessmentReport" sv-netzwerk/src/lib/internal/client.ts
+
+      - name: Build prüfen
         working-directory: sv-netzwerk
         run: |
           npm ci --no-audit --no-fund
           npm run build
-      - name: Aenderung committen
+
+      - name: Änderungen committen
         shell: bash
         run: |
           set -euo pipefail
@@ -57,5 +88,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add sv-netzwerk/src/lib/internal/client.ts
-          git commit -m "fix: Gutachtenfotos auf 7 cm und kompakte JPEGs optimieren"
+          git commit -m "fix: Gutachtenbilder komprimieren und Gutachten zentral archivieren"
           git push origin HEAD:main
