@@ -10,10 +10,14 @@ AddDefaultCharset UTF-8
     php_value memory_limit 512M
 </IfModule>
 
-# Rekursiver SharePoint-V2-Import: alle Tabellen und Unterordner konsolidieren.
+# SharePoint-Excel: alle Arbeitsblätter jeder Arbeitsmappe einlesen.
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteCond %{QUERY_STRING} (^|&)action=(import_sharepoint_excel|list_sharepoint_photos|list_sharepoint_documents|apply_excel)(&|$) [NC]
+    RewriteCond %{QUERY_STRING} (^|&)action=import_sharepoint_excel(&|$) [NC]
+    RewriteRule ^sharepoint\.php$ sharepoint-excel-multisheet.php [L,QSA]
+
+    # Rekursiver SharePoint-V2-Import für Fotos, Dokumente und Datenübernahme.
+    RewriteCond %{QUERY_STRING} (^|&)action=(list_sharepoint_photos|list_sharepoint_documents|apply_excel)(&|$) [NC]
     RewriteRule ^sharepoint\.php$ sharepoint-v2.php [L,QSA]
 </IfModule>
 
