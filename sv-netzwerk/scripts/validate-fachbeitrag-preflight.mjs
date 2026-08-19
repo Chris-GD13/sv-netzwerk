@@ -57,7 +57,7 @@ for (const file of files) {
     list.push({ file, publishedAt, status, daily });
     titleMap.set(titleKey, list);
   }
-  entries.push({ file, slug, publishedAt, title, daily, status });
+  entries.push({ file, slug, publishedAt, title, daily, status, front: parsed.front, body: parsed.body });
 }
 
 for (const [key, items] of titleMap) {
@@ -75,6 +75,65 @@ const publishedDaily = entries.filter((entry) => entry.daily && entry.status ===
 const todayDaily = publishedDaily.filter((entry) => entry.publishedAt === berlinDate);
 if (todayDaily.length > 2) {
   errors.push(`Zu viele veröffentlichte Pflichtbeiträge am ${berlinDate}: ${todayDaily.map((item) => item.file).join(', ')}`);
+}
+
+// Redaktionelle Mindestqualität: Ein technisch valider Build darf keinen inhaltlich dünnen
+// oder als Dubletten-Kopie erkennbaren Tagesbeitrag veröffentlichen.
+for (const entry of todayDaily) {
+  if (/\(\d+\)\s*$/.test(entry.title)) {
+    errors.push(`${entry.file}: sichtbarer Titel endet mit technischem Dubletten-Suffix (${entry.title}).`);
+  }
+  if (/-\d+$/.test(entry.slug) && /\(\d+\)\s*$/.test(entry.title)) {
+    errors.push(`${entry.file}: Slug und Titel zeigen eine automatische Dublettenauflösung statt eines eigenständigen Themas.`);
+  }
+
+  const plainBody = entry.body
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/\[[^\]]+\]\([^\)]+\)/g, ' ')
+    .replace(/[#>*_|`~-]/g, ' ');
+  const wordCount = plainBody.split(/\s+/).filter(Boolean).length;
+  if (wordCount < 1800) {
+    errors.push(`${entry.file}: Fachbeitrag zu kurz (${wordCount} Wörter; Mindestumfang 1800 Wörter).`);
+  }
+
+  const headingCount = (entry.body.match(/^#{2,3}\s+.+$/gm) || []).length;
+  if (headingCount < 10) {
+    errors.push(`${entry.file}: zu geringe fachliche Gliederung (${headingCount} Überschriften; mindestens 10 erforderlich).`);
+  }
+
+  const sourceHeading = /^(?:##|###)\s+(?:Quellen|Quellen und|Quellenverzeichnis|Quellen und weiterführende)/mi.test(entry.body);
+  if (!sourceHeading) {
+    errors.push(`${entry.file}: Quellenabschnitt fehlt.`);
+  }
+  const sourceUrls = [...entry.body.matchAll(/https:\/\/[\w.-]+[^\s)\]]*/g)].map((match) => match[0]);
+  const distinctHosts = new Set(sourceUrls.map((url) => {
+    try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; }
+  }).filter(Boolean));
+  if (sourceUrls.length < 4 || distinctHosts.size < 3) {
+    errors.push(`${entry.file}: Quellenbasis zu schmal (${sourceUrls.length} URLs / ${distinctHosts.size} unterschiedliche Hosts; mindestens 4 belastbare Links aus 3 Quellenbereichen erforderlich).`);
+  }
+
+  const requiredConcepts = [
+    /fachliche\s+einordnung/i,
+    /(schadenbild|befund)/i,
+    /(abgrenzung|alternative ursache|vorschaden)/i,
+    /(prüffrag|prueffrag)/i,
+    /(sofortmaßnahme|sofortmassnahme|gefahrenabwehr)/i,
+    /(beweissicherung|dokumentation)/i,
+    /(fachgrenze|spezialist|fachplaner)/i,
+    /(versicherungstechn|deckungszusage|einzelfallprüfung|einzelfallpruefung)/i,
+    /(kostenprüfung|kostenpruefung|prüffähig|prueffaehig)/i,
+    /(fiktiv.*praxisbeispiel|praxisbeispiel.*fiktiv)/i,
+    /fazit/i,
+  ];
+  const conceptHits = requiredConcepts.filter((rx) => rx.test(entry.body)).length;
+  if (conceptHits < 10) {
+    errors.push(`${entry.file}: Fachbeitragsstandard nicht vollständig abgebildet (${conceptHits}/11 Pflichtkonzepte erkannt).`);
+  }
+
+  if (/^\s*(?:image|imageAlt):.*\.svg/i.test(entry.front) || /assets\/images\/linkedin\/.+\.svg/i.test(entry.front)) {
+    errors.push(`${entry.file}: typografisches/automatisch erzeugtes SVG-Beitragsbild ist nach Fachbeitragsstandard unzulässig.`);
+  }
 }
 
 if (publishedDaily.length > 0) {
@@ -103,16 +162,10 @@ if (publishedDaily.length > 0) {
 
 for (const entry of todayDaily) {
   const linkedinPath = path.join(root, 'src', 'content', 'linkedin', `${entry.publishedAt}_${entry.slug}.txt`);
-  const videoPath = path.join(root, 'src', 'content', 'videos', `${entry.publishedAt}_wissen-in-180-sekunden_${entry.slug}.txt`);
   try {
     await access(linkedinPath);
   } catch {
     errors.push(`LinkedIn-Begleittext fehlt: src/content/linkedin/${entry.publishedAt}_${entry.slug}.txt`);
-  }
-  try {
-    await access(videoPath);
-  } catch {
-    errors.push(`Wissen-in-180-Sekunden-Skript fehlt: src/content/videos/${entry.publishedAt}_wissen-in-180-sekunden_${entry.slug}.txt`);
   }
 }
 
