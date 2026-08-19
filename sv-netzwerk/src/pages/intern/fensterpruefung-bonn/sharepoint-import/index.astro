@@ -4,5 +4,203 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
 ---
 
 <InternalLayout title="SharePoint-Import" description="Excel und Fotos aus SharePoint einlesen und Fenstern zuordnen.">
+  <section class="intern-card" id="sharepoint-import-mode" style="margin-bottom:1rem;">
+    <p class="sv-eyebrow">Importmodus</p>
+    <h2 style="margin-top:0;">Umfang des SharePoint-Imports festlegen</h2>
+    <p class="intern-meta">Bei Nachträgen werden bereits vorhandene Fenster und Fotozuordnungen wiederverwendet. Ein vollständiger Neuaufbau ist nur erforderlich, wenn die bestehende Zuordnung bewusst verworfen werden soll.</p>
+    <div class="intern-actions" role="group" aria-label="Importmodus" style="gap:.65rem;flex-wrap:wrap;">
+      <button type="button" class="sv-button sv-button-secondary" data-sp-mode="new">Nur neu</button>
+      <button type="button" class="sv-button sv-button-primary" data-sp-mode="complete">Vervollständigen / Aktualisieren</button>
+      <button type="button" class="sv-button sv-button-secondary" data-sp-mode="full">Vollständig neu einlesen</button>
+    </div>
+    <label style="display:flex;align-items:center;gap:.55rem;margin-top:1rem;font-weight:600;">
+      <input type="checkbox" id="sp-preserve-photo-assignments" checked />
+      Bestehende Fotozuordnungen beibehalten
+    </label>
+    <div id="sp-delta-info" class="intern-alert intern-alert--info" style="margin-top:1rem;">
+      Standard: vorhandene Daten vervollständigen, nur neue bzw. noch nicht zugeordnete Fotos laden und analysieren.
+    </div>
+  </section>
+
+  <script is:inline>
+    (() => {
+      const STORAGE_KEY = 'sv-sharepoint-import-mode';
+      const PRESERVE_KEY = 'sv-sharepoint-preserve-photo-assignments';
+      const originalFetch = window.fetch.bind(window);
+      let mode = localStorage.getItem(STORAGE_KEY) || 'complete';
+      let preserveAssignments = localStorage.getItem(PRESERVE_KEY) !== 'false';
+
+      const buildingId = () => {
+        const params = new URLSearchParams(window.location.search);
+        const fromUrl = Number(params.get('building_id') || 0);
+        if (fromUrl > 0) return fromUrl;
+        const root = document.querySelector('[data-building-id]');
+        return Number(root?.getAttribute('data-building-id') || 0);
+      };
+
+      const normalizeNumber = (value) => {
+        const match = String(value ?? '').match(/\d+/);
+        if (!match) return String(value ?? '').trim().toLowerCase();
+        return String(Number(match[0]));
+      };
+
+      const rowNumber = (row) => {
+        if (!row || typeof row !== 'object') return '';
+        for (const key of ['__window_number', 'schlagzahl', 'Schlagzahl', 'Fensternummer', 'Fenster-Nr', 'Fenster-Nr.', 'window_number', 'Nummer', 'Nr']) {
+          if (row[key] !== undefined && String(row[key]).trim() !== '') return normalizeNumber(row[key]);
+        }
+        for (const [key, value] of Object.entries(row)) {
+          const k = String(key).toLowerCase();
+          if ((k.includes('schlag') || k.includes('fenster')) && String(value ?? '').trim() !== '') return normalizeNumber(value);
+        }
+        return '';
+      };
+
+      const extractItemId = (value) => {
+        if (!value || typeof value !== 'object') return '';
+        for (const key of ['item_id', 'sharepoint_id', 'drive_item_id', 'photo_id', 'id']) {
+          if (value[key] !== undefined && value[key] !== null && String(value[key]).trim()) return String(value[key]).trim();
+        }
+        for (const child of Object.values(value)) {
+          if (child && typeof child === 'object') {
+            const found = extractItemId(child);
+            if (found) return found;
+          }
+        }
+        return '';
+      };
+
+      const info = (message, kind = 'info') => {
+        const el = document.getElementById('sp-delta-info');
+        if (!el) return;
+        el.className = `intern-alert intern-alert--${kind}`;
+        el.textContent = message;
+      };
+
+      window.fetch = async (input, init = {}) => {
+        const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
+        const method = String(init.method || (input instanceof Request ? input.method : 'GET')).toUpperCase();
+
+        // "Nur neu": bereits vorhandene Fensternummern vor dem Apply-Schritt aus dem Nachtrag entfernen.
+        if (mode === 'new' && method === 'POST' && url.includes('sharepoint.php?action=apply_excel') && typeof init.body === 'string') {
+          try {
+            const payload = JSON.parse(init.body);
+            if (Array.isArray(payload?.rows)) {
+              const response = await originalFetch('/intern/api/windows.php?_=1', { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+              const existing = response.ok ? await response.json() : [];
+              const existingNumbers = new Set((Array.isArray(existing) ? existing : []).map((item) => normalizeNumber(item?.window_number ?? item?.inspection_number ?? item?.schlagzahl ?? '')).filter(Boolean));
+              const before = payload.rows.length;
+              payload.rows = payload.rows.filter((row) => {
+                const number = rowNumber(row);
+                return !number || !existingNumbers.has(number);
+              });
+              init = { ...init, body: JSON.stringify(payload) };
+              info(`Modus „Nur neu“: ${before - payload.rows.length} bereits vorhandene Excel-Zeilen übersprungen, ${payload.rows.length} neue Zeilen werden verarbeitet.`);
+            }
+          } catch (error) {
+            console.warn('[SharePoint-Delta] Excel-Filter konnte nicht angewendet werden:', error);
+          }
+        }
+
+        const response = await originalFetch(input, init);
+
+        // Fotoliste nur als Metadaten laden und danach serverseitig gegen bereits importierte Fotos abgleichen.
+        if (response.ok && method === 'GET' && url.includes('sharepoint.php?action=list_sharepoint_photos') && mode !== 'full' && preserveAssignments) {
+          try {
+            const json = await response.clone().json();
+            const photos = Array.isArray(json?.photos) ? json.photos : [];
+            const deltaResponse = await originalFetch('/intern/api/sharepoint-delta.php?action=filter', {
+              method: 'POST',
+              credentials: 'same-origin',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({ building_id: buildingId(), mode, photos }),
+            });
+            if (deltaResponse.ok) {
+              const delta = await deltaResponse.json();
+              const remaining = Array.isArray(delta?.photos) ? delta.photos : photos;
+              const skipped = Number(delta?.skipped || 0);
+              info(`Delta-Import: ${skipped} bereits vorhandene Fotos werden wiederverwendet; nur ${remaining.length} von ${photos.length} Fotos müssen neu geladen und ausgewertet werden.`, 'success');
+              return new Response(JSON.stringify({ ...json, photos: remaining, delta: { total: photos.length, skipped, remaining: remaining.length, mode } }), {
+                status: response.status,
+                statusText: response.statusText,
+                headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
+              });
+            }
+          } catch (error) {
+            console.warn('[SharePoint-Delta] Foto-Delta konnte nicht ermittelt werden:', error);
+          }
+        }
+
+        // Erfolgreich importierte SharePoint-Fotos dauerhaft als verarbeitet merken.
+        if (response.ok && method === 'POST' && url.includes('sharepoint.php?action=import_sharepoint_photo')) {
+          try {
+            let payload = {};
+            if (typeof init.body === 'string') payload = JSON.parse(init.body);
+            const itemId = extractItemId(payload);
+            if (itemId) {
+              void originalFetch('/intern/api/sharepoint-delta.php?action=mark', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({ building_id: buildingId(), item_id: itemId, payload }),
+              });
+            }
+          } catch (error) {
+            console.warn('[SharePoint-Delta] Importstatus konnte nicht gespeichert werden:', error);
+          }
+        }
+
+        return response;
+      };
+
+      const applyUi = () => {
+        const buttons = [...document.querySelectorAll('[data-sp-mode]')];
+        const preserve = document.getElementById('sp-preserve-photo-assignments');
+        if (preserve instanceof HTMLInputElement) preserve.checked = preserveAssignments;
+
+        const render = () => {
+          for (const button of buttons) {
+            const active = button.getAttribute('data-sp-mode') === mode;
+            button.classList.toggle('sv-button-primary', active);
+            button.classList.toggle('sv-button-secondary', !active);
+          }
+          if (mode === 'full') {
+            info('Vollständiger Neuimport: alle Excel-Daten und alle SharePoint-Fotos werden erneut verarbeitet. Dieser Modus kann bei großen Fotobeständen lange dauern.', 'warning');
+          } else if (mode === 'new') {
+            info('Nur neu: vorhandene Fensternummern und bereits zugeordnete Fotos werden übersprungen.');
+          } else {
+            info('Vervollständigen / Aktualisieren: Excel-Daten werden zusammengeführt; bestehende Fotozuordnungen bleiben erhalten und nur neue Fotos werden analysiert.');
+          }
+        };
+
+        for (const button of buttons) {
+          button.addEventListener('click', () => {
+            mode = button.getAttribute('data-sp-mode') || 'complete';
+            localStorage.setItem(STORAGE_KEY, mode);
+            if (mode === 'full' && preserve instanceof HTMLInputElement) {
+              preserve.checked = false;
+              preserveAssignments = false;
+              localStorage.setItem(PRESERVE_KEY, 'false');
+            }
+            render();
+          });
+        }
+        preserve?.addEventListener('change', () => {
+          preserveAssignments = preserve instanceof HTMLInputElement ? preserve.checked : true;
+          localStorage.setItem(PRESERVE_KEY, String(preserveAssignments));
+          if (!preserveAssignments && mode !== 'full') {
+            info('Bestehende Fotozuordnungen werden nicht geschützt; beim nächsten Start können Fotos erneut verarbeitet werden.', 'warning');
+          } else {
+            render();
+          }
+        });
+        render();
+      };
+
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', applyUi, { once: true });
+      else applyUi();
+    })();
+  </script>
+
   <InternalAppShell route="sharepoint-import" />
 </InternalLayout>
