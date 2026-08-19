@@ -1,0 +1,68 @@
+name: Massenänderung Prüftermine Hotfix
+
+on:
+  push:
+    paths:
+      - '.github/workflows/hotfix-massenaenderung-termine.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+      - name: Node.js 22 LTS einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+      - name: Abhängigkeiten installieren
+        run: npm ci --no-audit --no-fund
+      - name: Portal bauen
+        run: npm run build
+      - name: Zielartefakte prüfen
+        run: |
+          test -f dist/intern/fensterpruefung-bonn/massenaenderung/index.html
+          test -f public/intern/api/bulk-update.php
+      - name: Python SFTP-Client installieren
+        run: python3 -m pip install --disable-pip-version-check --quiet paramiko
+      - name: Nur Massenänderung und API nach IONOS übertragen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          timeout 90s python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import paramiko
+          host=os.environ['SFTP_HOST']; user=os.environ['SFTP_USERNAME']; password=os.environ['SFTP_PASSWORD']; port=int(os.environ.get('SFTP_PORT') or '22')
+          files=[
+            (Path('dist/intern/fensterpruefung-bonn/massenaenderung/index.html'), '/sv-netzwerk/intern/fensterpruefung-bonn/massenaenderung/index.html'),
+            (Path('public/intern/api/bulk-update.php'), '/sv-netzwerk/intern/api/bulk-update.php'),
+          ]
+          t=paramiko.Transport((host,port)); t.banner_timeout=15; t.auth_timeout=15; t.connect(username=user,password=password)
+          s=paramiko.SFTPClient.from_transport(t); s.get_channel().settimeout(20)
+          def ensure(path):
+            cur=''
+            for part in path.strip('/').split('/'):
+              if not part: continue
+              cur += '/' + part
+              try: s.stat(cur)
+              except FileNotFoundError: s.mkdir(cur)
+          for local,remote in files:
+            ensure(remote.rsplit('/',1)[0]); s.put(str(local),remote); s.stat(remote); print('OK',remote)
+          s.close(); t.close()
+          PY
+      - name: Online prüfen
+        run: test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/fensterpruefung-bonn/massenaenderung/)" = "200"
