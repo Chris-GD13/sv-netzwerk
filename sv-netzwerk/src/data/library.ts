@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz (2)',
+    description: 'Leitungswasserschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-3/',
+    category: 'Leitungswasserschäden',
+    tags: ['Leitungswasser', 'Schadenregulierung', 'Sanierungsplanung', 'Kostenprüfung'],
+    date: '2026-08-19',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Photovoltaikfragmente nach Gebäudebrand: Flächenverunreinigung, Haftung und Deckung bei Landwirtschaft und Gewerbe',
     description: 'Wie Fragmentflug nach dem Brand von PV-Anlagen technisch dokumentiert und zwischen Sach-, Betreiber-, Gewerbe- und Umwelthaftpflicht eingeordnet wird.',
     href: '/fachwissen/photovoltaikfragmente-brand-landwirtschaft-gewerbehaftpflicht-fremddach/',
