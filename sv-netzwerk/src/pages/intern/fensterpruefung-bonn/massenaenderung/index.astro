@@ -1,0 +1,95 @@
+---
+import InternalLayout from '../../../../layouts/InternalLayout.astro';
+import { windowFormSections } from '../../../../lib/internal/schema';
+---
+<InternalLayout title="Massenänderung" description="Werte projektweit für alle Fenster ändern oder fehlende Felder vervollständigen.">
+  <main class="intern-app" style="max-width:1280px;margin:0 auto;padding:24px">
+    <section class="intern-card">
+      <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
+      <h1>Massenänderung</h1>
+      <p>Hier können Werte aus den Prüf-Abfragen projektweit gesetzt werden, z. B. Prüfer, Glasstärke, Gewichte, Hersteller oder Bewertungsfelder.</p>
+      <div class="intern-alert intern-alert--info" style="margin-top:12px"><strong>Sicherheitslogik:</strong> Standardmäßig werden nur leere Felder vervollständigt. „Vorhandene Werte überschreiben“ muss ausdrücklich gewählt und bestätigt werden.</div>
+      <div class="intern-actions" style="margin-top:16px">
+        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/">Dashboard</a>
+        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/bestand-pruefen/">Bestand prüfen</a>
+      </div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <div class="intern-field" style="max-width:460px">
+        <label for="bulk-mode">Änderungsmodus</label>
+        <select id="bulk-mode" class="intern-input">
+          <option value="empty_only" selected>Nur leere Felder vervollständigen</option>
+          <option value="overwrite">Vorhandene Werte für alle Fenster überschreiben</option>
+        </select>
+      </div>
+      <div id="bulk-result" style="margin-top:12px"></div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <div class="intern-actions" role="tablist" style="gap:8px;flex-wrap:wrap">
+        {windowFormSections.map((section, i) => <button type="button" class={`sv-button ${i===0?'sv-button-primary':'sv-button-secondary'}`} data-tab={section.id}>{section.title}</button>)}
+      </div>
+    </section>
+
+    {windowFormSections.map((section, sectionIndex) => (
+      <section class="intern-card bulk-section" data-panel={section.id} style={`margin-top:16px;${sectionIndex===0?'':'display:none'}`}>
+        <h2>{section.title}</h2>
+        <p class="intern-meta">Ein Feld auswählen, neuen Wert eintragen und gezielt auf den gesamten Projektbestand anwenden.</p>
+        <div class="intern-form-grid">
+          {section.fields.map((field) => (
+            <div class="intern-field" style="border-bottom:1px solid #e2e8f0;padding-bottom:14px">
+              <label for={`bulk-${field.id}`}><strong>{field.label}</strong></label>
+              {field.type === 'select' ? (
+                <select id={`bulk-${field.id}`} class="intern-input" data-bulk-input data-field={field.id} data-type={field.type}>
+                  <option value="">— Wert wählen —</option>
+                  {field.options?.map((o) => <option value={o.value}>{o.label}</option>)}
+                </select>
+              ) : field.type === 'checkbox' ? (
+                <select id={`bulk-${field.id}`} class="intern-input" data-bulk-input data-field={field.id} data-type="checkbox">
+                  <option value="">— Wert wählen —</option><option value="true">Ja</option><option value="false">Nein</option>
+                </select>
+              ) : field.type === 'textarea' ? (
+                <textarea id={`bulk-${field.id}`} class="intern-input" rows="3" data-bulk-input data-field={field.id} data-type="text"></textarea>
+              ) : (
+                <input id={`bulk-${field.id}`} class="intern-input" type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : field.type === 'time' ? 'time' : 'text'} step={field.step} min={field.min} max={field.max} data-bulk-input data-field={field.id} data-type={field.type} />
+              )}
+              <button type="button" class="sv-button sv-button-primary" style="margin-top:8px" data-apply={field.id} data-label={field.label}>Auf alle Fenster anwenden</button>
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
+  </main>
+
+  <script is:inline>
+    document.querySelectorAll('[data-tab]').forEach(btn => btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-tab');
+      document.querySelectorAll('.bulk-section').forEach(p => p.style.display = p.getAttribute('data-panel') === id ? '' : 'none');
+      document.querySelectorAll('[data-tab]').forEach(b => b.className = 'sv-button ' + (b === btn ? 'sv-button-primary' : 'sv-button-secondary'));
+    }));
+    const result = document.getElementById('bulk-result');
+    document.querySelectorAll('[data-apply]').forEach(btn => btn.addEventListener('click', async () => {
+      const field = btn.getAttribute('data-apply');
+      const label = btn.getAttribute('data-label') || field;
+      const input = document.querySelector(`[data-bulk-input][data-field="${field}"]`);
+      if (!input) return;
+      const value = input.value;
+      const type = input.getAttribute('data-type') || 'text';
+      if (value === '') { alert('Bitte zuerst einen Wert eingeben.'); return; }
+      const mode = document.getElementById('bulk-mode').value;
+      const wording = mode === 'overwrite' ? 'für ALLE Fenster überschreiben' : 'nur in leeren Feldern ergänzen';
+      if (!confirm(`„${label}“ = „${value}“ ${wording}?\n\nDiese Änderung wird im Audit-Log dokumentiert.`)) return;
+      btn.disabled = true;
+      if (result) { result.className='intern-alert intern-alert--info'; result.textContent='Massenänderung wird ausgeführt …'; }
+      try {
+        const r = await fetch('/intern/api/bulk-update.php', {method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_id:1,field,value,field_type:type,mode})});
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error || 'Massenänderung fehlgeschlagen.');
+        if (result) { result.className='intern-alert intern-alert--success'; result.textContent=`${j.changed} Fenster geändert, ${j.skipped} unverändert/übersprungen, ${j.total} geprüft.`; }
+      } catch (e) {
+        if (result) { result.className='intern-alert intern-alert--error'; result.textContent=e instanceof Error?e.message:'Massenänderung fehlgeschlagen.'; }
+      } finally { btn.disabled=false; }
+    }));
+  </script>
+</InternalLayout>
