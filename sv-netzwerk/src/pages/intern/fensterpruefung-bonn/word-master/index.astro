@@ -1,0 +1,43 @@
+---
+import InternalLayout from '../../../../layouts/InternalLayout.astro';
+---
+<InternalLayout title="Word-Master & Fotozuordnung" description="Archiviertes Gutachten als Masterbestand übernehmen und Fotos nach Schlagzahlfolge korrigieren.">
+  <main class="intern-app" style="max-width:1200px;margin:0 auto;padding:24px">
+    <section class="intern-card">
+      <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
+      <h1>Word-Master & Fotozuordnung</h1>
+      <p>Das zuletzt archivierte Gutachten wird als fachliche Masterquelle gelesen. Vor jeder Übernahme erfolgt ein Abgleich mit dem vorhandenen Fensterbestand.</p>
+      <div class="intern-actions" style="gap:10px;flex-wrap:wrap;margin-top:14px">
+        <button id="preview-word" class="sv-button sv-button-secondary" type="button">Word-Master prüfen</button>
+        <button id="apply-word" class="sv-button sv-button-primary" type="button" disabled>Word-Master übernehmen</button>
+        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/gutachten/">Gutachten</a>
+        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/">Dashboard</a>
+      </div>
+      <div id="word-result" style="margin-top:14px"></div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <h2>Fotos strikt nach Schlagzahlfolge</h2>
+      <p>Regel: Das Foto mit der erkannten Schlagzahl startet die Position. Alle folgenden Fotos gehören zu dieser Schlagzahl, bis die nächste Schlagzahl erkannt wird. Bereits falsche Fensterzuordnungen werden dabei nicht als maßgeblich verwendet.</p>
+      <div class="intern-alert intern-alert--info">Die Korrektur wird nur ausgeführt, wenn die erkannte Schlagzahl im Fensterbestand eindeutig ist. Unklare Gruppen bleiben unverändert.</div>
+      <div class="intern-actions" style="gap:10px;flex-wrap:wrap;margin-top:14px">
+        <button id="preview-photos" class="sv-button sv-button-secondary" type="button">Fotozuordnung prüfen</button>
+        <button id="apply-photos" class="sv-button sv-button-primary" type="button" disabled>Fotozuordnung korrigieren</button>
+      </div>
+      <div id="photo-result" style="margin-top:14px"></div>
+    </section>
+  </main>
+  <script is:inline>
+    (() => {
+      const wr=document.getElementById('word-result'), pr=document.getElementById('photo-result');
+      const wp=document.getElementById('preview-word'), wa=document.getElementById('apply-word');
+      const pp=document.getElementById('preview-photos'), pa=document.getElementById('apply-photos');
+      const esc=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+      async function json(url, init){ const r=await fetch(url,{credentials:'same-origin',...(init||{})}); const j=await r.json(); if(!r.ok) throw new Error(j.error||`HTTP ${r.status}`); return j; }
+      wp?.addEventListener('click', async()=>{ wp.disabled=true; wr.innerHTML='<div class="intern-alert intern-alert--info">Archiviertes Gutachten wird gelesen und abgeglichen …</div>'; try{const j=await json('/intern/api/word-master-import.php?action=preview&project_id=1'); const c=j.counts||{}; wr.innerHTML=`<div class="intern-alert intern-alert--success"><strong>${esc(j.source?.file_name)}</strong><br>${c.recognized||0} Positionen erkannt · ${c.exact||0} exakt zugeordnet · ${c.fallback||0} eindeutig über Etage/Raum/Fenster zugeordnet · ${c.new||0} neu · ${c.conflicts||0} Konflikte.</div><div class="intern-table-wrap"><table class="intern-table"><thead><tr><th>Fenster</th><th>Etage</th><th>Raum</th><th>Flügel</th><th>Status</th></tr></thead><tbody>${(j.items||[]).slice(0,500).map(x=>`<tr><td>${esc(x.window_number)}</td><td>${esc(x.floor)}</td><td>${esc(x.room)}</td><td>${esc(x.wing)}</td><td>${esc(x.status)}</td></tr>`).join('')}</tbody></table></div>`; wa.disabled=(c.conflicts||0)>0;}catch(e){wr.innerHTML=`<div class="intern-alert intern-alert--error">${esc(e.message)}</div>`;}finally{wp.disabled=false;}});
+      wa?.addEventListener('click', async()=>{ if(!confirm('Word-Master jetzt übernehmen? Bestehende Positionen werden aktualisiert; eindeutig neue Positionen werden ergänzt.'))return; wa.disabled=true; wr.innerHTML='<div class="intern-alert intern-alert--info">Word-Master wird übernommen …</div>'; try{const j=await json('/intern/api/word-master-import.php?action=apply&project_id=1',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}); wr.innerHTML=`<div class="intern-alert intern-alert--success"><strong>Übernahme abgeschlossen.</strong><br>${j.updated} aktualisiert · ${j.created} neu · ${j.conflicts} Konflikte · ${j.recognized} erkannt.</div>`;}catch(e){wr.innerHTML=`<div class="intern-alert intern-alert--error">${esc(e.message)}</div>`;}finally{wa.disabled=false;}});
+      pp?.addEventListener('click', async()=>{ pp.disabled=true; pr.innerHTML='<div class="intern-alert intern-alert--info">Fotoabfolge wird geprüft …</div>'; try{const j=await json('/intern/api/photo-sequence-repair.php?action=preview&project_id=1'); pr.innerHTML=`<div class="intern-alert ${j.ambiguous_markers?'intern-alert--warn':'intern-alert--success'}"><strong>${j.photos} Fotos geprüft</strong><br>${j.markers} Schlagzahl-Gruppen erkannt · ${j.moves} Fotos derzeit falsch zugeordnet · ${j.before_first_marker} Fotos vor der ersten erkannten Schlagzahl · ${j.ambiguous_markers} uneindeutige Schlagzahlen.</div><div class="intern-table-wrap"><table class="intern-table"><thead><tr><th>Schlagzahl</th><th>Fotos</th><th>Zielstatus</th></tr></thead><tbody>${(j.groups||[]).map(g=>`<tr><td>${esc(g.marker)}</td><td>${g.photos}</td><td>${esc(g.status)}</td></tr>`).join('')}</tbody></table></div>`; pa.disabled=!!j.ambiguous_markers;}catch(e){pr.innerHTML=`<div class="intern-alert intern-alert--error">${esc(e.message)}</div>`;}finally{pp.disabled=false;}});
+      pa?.addEventListener('click', async()=>{ if(!confirm('Fotozuordnung jetzt strikt nach Schlagzahlfolge korrigieren?'))return; pa.disabled=true; pr.innerHTML='<div class="intern-alert intern-alert--info">Fotozuordnung wird korrigiert …</div>'; try{const j=await json('/intern/api/photo-sequence-repair.php?action=apply&project_id=1',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}); pr.innerHTML=`<div class="intern-alert intern-alert--success"><strong>Fotozuordnung korrigiert.</strong><br>${j.changed} Fotos wurden auf die richtige Schlagzahl-Position verschoben.</div>`;}catch(e){pr.innerHTML=`<div class="intern-alert intern-alert--error">${esc(e.message)}</div>`;}finally{pa.disabled=false;}});
+    })();
+  </script>
+</InternalLayout>
