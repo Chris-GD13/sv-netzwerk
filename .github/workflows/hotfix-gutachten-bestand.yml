@@ -1,0 +1,96 @@
+name: Gutachten und Bestand Hotfix Deploy
+
+on:
+  push:
+    paths:
+      - '.github/workflows/hotfix-gutachten-bestand.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Node.js 22 LTS einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+
+      - name: Abhängigkeiten installieren
+        run: npm ci --no-audit --no-fund
+
+      - name: Portal bauen
+        run: npm run build
+
+      - name: Zielseiten prüfen
+        run: |
+          test -f dist/intern/fensterpruefung-bonn/gutachten/index.html
+          test -f dist/intern/fensterpruefung-bonn/bestand-pruefen/index.html
+
+      - name: Python SFTP-Client installieren
+        run: python3 -m pip install --disable-pip-version-check --quiet paramiko
+
+      - name: Nur Gutachten und Bestand nach IONOS übertragen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          timeout 90s python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import paramiko
+
+          host = os.environ['SFTP_HOST']
+          user = os.environ['SFTP_USERNAME']
+          password = os.environ['SFTP_PASSWORD']
+          port = int(os.environ.get('SFTP_PORT') or '22')
+          files = [
+              (Path('dist/intern/fensterpruefung-bonn/gutachten/index.html'), '/sv-netzwerk/intern/fensterpruefung-bonn/gutachten/index.html'),
+              (Path('dist/intern/fensterpruefung-bonn/bestand-pruefen/index.html'), '/sv-netzwerk/intern/fensterpruefung-bonn/bestand-pruefen/index.html'),
+          ]
+
+          transport = paramiko.Transport((host, port))
+          transport.banner_timeout = 15
+          transport.auth_timeout = 15
+          transport.connect(username=user, password=password)
+          sftp = paramiko.SFTPClient.from_transport(transport)
+          sftp.get_channel().settimeout(20)
+
+          def ensure_dir(path):
+              cur = ''
+              for part in path.strip('/').split('/'):
+                  if not part:
+                      continue
+                  cur += '/' + part
+                  try:
+                      sftp.stat(cur)
+                  except FileNotFoundError:
+                      sftp.mkdir(cur)
+
+          for local, remote in files:
+              ensure_dir(remote.rsplit('/', 1)[0])
+              sftp.put(str(local), remote)
+              sftp.stat(remote)
+              print(f'OK: {remote}')
+
+          sftp.close()
+          transport.close()
+          PY
+
+      - name: Online prüfen
+        run: |
+          test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/fensterpruefung-bonn/gutachten/)" = "200"
+          test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/fensterpruefung-bonn/bestand-pruefen/)" = "200"
