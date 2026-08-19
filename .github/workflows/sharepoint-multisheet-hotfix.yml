@@ -1,0 +1,66 @@
+name: SharePoint Multi-Sheet Hotfix Deploy
+
+on:
+  push:
+    paths:
+      - '.github/workflows/sharepoint-multisheet-hotfix.yml'
+      - 'sv-netzwerk/public/intern/api/sharepoint-excel-multisheet.php'
+      - 'sv-netzwerk/public/intern/api/sharepoint-v2.php'
+      - 'sv-netzwerk/public/intern/api/.htaccess'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      - name: Zielartefakte pruefen
+        run: |
+          test -f dist/intern/api/sharepoint-excel-multisheet.php
+          test -f dist/intern/api/sharepoint-v2.php
+          test -f dist/intern/api/.htaccess
+          php -l dist/intern/api/sharepoint-excel-multisheet.php
+          php -l dist/intern/api/sharepoint-v2.php
+      - name: Python SFTP installieren
+        run: python3 -m pip install --disable-pip-version-check --quiet paramiko
+      - name: Nur SharePoint-Importdateien nach IONOS uebertragen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          timeout 120s python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import paramiko
+          host=os.environ['SFTP_HOST']; user=os.environ['SFTP_USERNAME']; password=os.environ['SFTP_PASSWORD']; port=int(os.environ.get('SFTP_PORT') or '22')
+          files=[
+            (Path('dist/intern/api/sharepoint-excel-multisheet.php'),'/sv-netzwerk/intern/api/sharepoint-excel-multisheet.php'),
+            (Path('dist/intern/api/sharepoint-v2.php'),'/sv-netzwerk/intern/api/sharepoint-v2.php'),
+            (Path('dist/intern/api/.htaccess'),'/sv-netzwerk/intern/api/.htaccess'),
+          ]
+          t=paramiko.Transport((host,port)); t.banner_timeout=15; t.auth_timeout=15; t.connect(username=user,password=password)
+          s=paramiko.SFTPClient.from_transport(t); s.get_channel().settimeout(20)
+          for local,remote in files:
+            s.put(str(local),remote); s.stat(remote); print('OK',remote)
+          s.close(); t.close()
+          PY
+      - name: Online-Endpunkt pruefen
+        run: |
+          code=$(curl -L -s -o /dev/null -w '%{http_code}' 'https://www.sv-netzwerk.eu/intern/api/sharepoint.php?action=import_sharepoint_excel')
+          test "$code" = "401" -o "$code" = "403" -o "$code" = "200"
