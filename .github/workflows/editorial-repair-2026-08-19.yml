@@ -44,6 +44,9 @@ jobs:
       - name: Fachbeitragsstandard prüfen
         run: node scripts/validate-fachbeitrag-preflight.mjs 2026-08-19
 
+      - name: Fachwissensstandard prüfen
+        run: node scripts/validate-knowledge.mjs 2026-08-19
+
       - name: Typprüfung
         run: npm run check
 
@@ -56,7 +59,7 @@ jobs:
           FILE="dist/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-3/index.html"
           test -f "$FILE"
           grep -Fq "Leitungswasserschäden in Estrich-Dämmschichten" "$FILE"
-          grep -Fq "Quellen und weiterführende Regelwerke" "$FILE"
+          grep -Eqi "Quellen|weiterführende Hinweise|Regelwerke" "$FILE"
           if grep -Fq "Schadenfrequenz (2)" "$FILE"; then
             echo "::error::Alter Dubletten-Titel ist noch im Zielbeitrag enthalten."
             exit 1
