@@ -47,7 +47,7 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
           ['zwischenbericht','Zwischenbericht','Bei Nachträgen, Belegprüfung oder relevanten neuen Erkenntnissen.'],
           ['schlussbericht','Schlussbericht','Abschlussdarstellung mit finalem Schadenstand und Regressergebnis.'],
           ['vorauszahlung','Vorauszahlung / Freigabe','Konkrete Eurobeträge, Begründung und Empfänger.'],
-          ['rueckfrage','Rückfrageformular','Gezielte Rückfrage an Auftraggeber/QS bei fachlich oder deckungsseitig offenen Punkten.'],
+          ['query_form','Rückfrageformular','Gezielte Rückfrage an Auftraggeber/QS bei fachlich oder deckungsseitig offenen Punkten.'],
         ].map(([key,title,text], index) => (
           <label class="intern-card" style="margin:0;border:1px solid rgba(15,45,70,.13);box-shadow:none;display:flex;gap:12px;align-items:flex-start;cursor:pointer">
             <input class="gf-output" type="checkbox" value={key} checked={index < 3} style="margin-top:4px;transform:scale(1.2)" />
