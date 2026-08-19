@@ -19,7 +19,27 @@ if (!in_array($mode, ['empty_only','overwrite'], true)) apiError(400, 'Ungültig
 
 if ($type === 'checkbox') $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
 elseif ($type === 'number') $value = ($value === '' || $value === null) ? null : (float)$value;
-elseif ($value !== null) $value = trim((string)$value);
+elseif ($type === 'json') {
+    if (!is_array($value)) apiError(400, 'Ungültiger JSON-Wert.');
+} elseif ($value !== null) $value = trim((string)$value);
+
+if ($field === 'inspection_periods') {
+    if (!is_array($value) || count($value) < 1) apiError(400, 'Mindestens ein Prüfzeitraum ist erforderlich.');
+    $normalized = [];
+    foreach ($value as $row) {
+        if (!is_array($row)) continue;
+        $date = trim((string)($row['date'] ?? ''));
+        $start = trim((string)($row['start'] ?? ''));
+        $end = trim((string)($row['end'] ?? ''));
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) continue;
+        if ($start !== '' && !preg_match('/^\d{2}:\d{2}$/', $start)) continue;
+        if ($end !== '' && !preg_match('/^\d{2}:\d{2}$/', $end)) continue;
+        $normalized[] = ['date'=>$date,'start'=>$start,'end'=>$end];
+    }
+    if (!$normalized) apiError(400, 'Keine gültigen Prüfzeiträume übergeben.');
+    usort($normalized, fn($a,$b)=>strcmp($a['date'].' '.$a['start'], $b['date'].' '.$b['start']));
+    $value = $normalized;
+}
 
 try {
     $pdo = db();
@@ -31,10 +51,26 @@ try {
     foreach ($rows as $row) {
         $data = json_decode((string)($row['form_data'] ?? '{}'), true) ?: [];
         $old = $data[$field] ?? null;
-        $oldEmpty = $old === null || $old === '' || $old === false;
+        $oldEmpty = $old === null || $old === '' || $old === false || (is_array($old) && count($old) === 0);
         if ($mode === 'empty_only' && !$oldEmpty) { $skipped++; continue; }
         if ($old === $value) { $skipped++; continue; }
+
         $data[$field] = $value;
+        if ($field === 'inspection_periods' && is_array($value) && count($value) > 0) {
+            $first = $value[0];
+            $last = $value[count($value)-1];
+            $data['inspection_date'] = $first['date'];
+            $data['time_started'] = $first['start'];
+            $data['time_finished'] = $last['end'];
+            $labels = [];
+            foreach ($value as $period) {
+                $dateLabel = date('d.m.Y', strtotime($period['date']));
+                $timeLabel = trim(($period['start'] ?: '') . (($period['start'] || $period['end']) ? '–' : '') . ($period['end'] ?: ''));
+                $labels[] = trim($dateLabel . ($timeLabel !== '' ? ' ' . $timeLabel . ' Uhr' : ''));
+            }
+            $data['inspection_periods_text'] = implode('; ', $labels);
+        }
+
         $sets = ['form_data=:fd','updated_at=:now','last_edited_at=:now2'];
         $params = [':fd'=>json_encode($data, JSON_UNESCAPED_UNICODE), ':now'=>nowUtc(), ':now2'=>nowUtc(), ':id'=>(int)$row['id']];
         $mirror = [
