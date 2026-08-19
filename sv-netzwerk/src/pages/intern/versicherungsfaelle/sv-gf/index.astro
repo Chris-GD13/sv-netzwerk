@@ -9,7 +9,7 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
       <h1>Sparkassenversicherung – GF / Großschäden</h1>
       <p>Fallbezogener Arbeitsbereich für Sparkassen-GF-, TaskForce- und Großschäden. Berichte und Formulare werden auf Basis der verbindlichen QS-/Engel-Vorgaben und der hinterlegten Originalvorlagen vorbereitet.</p>
       <div class="intern-alert intern-alert--info" style="margin-top:14px">
-        <strong>Masterquellen:</strong> Google Drive <code>Meine Ablage/00_KI-Wissensbasis</code> für Regeln und Arbeitsstandards sowie <code>Meine Ablage/Blanco</code> für Originalformulare und Berichtsvorlagen.
+        <strong>Google-Drive-Master:</strong> Fälle in <code>Meine Ablage/Schadenfälle Christian Wächter</code>, Regeln in <code>Meine Ablage/00_KI-Wissensbasis</code>, Originalvorlagen in <code>Meine Ablage/Blanco</code>.
       </div>
       <div class="intern-actions" style="margin-top:16px;gap:10px;flex-wrap:wrap">
         <a class="sv-button sv-button-secondary" href="/intern/versicherungsfaelle/">Versicherungsfälle</a>
@@ -18,15 +18,35 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
     </section>
 
     <section class="intern-card" style="margin-top:16px">
-      <p class="sv-eyebrow">1 · Fall anlegen</p>
-      <h2>Falldaten</h2>
+      <p class="sv-eyebrow">0 · Google Drive</p>
+      <h2>Fall suchen, laden oder neu anlegen</h2>
+      <p class="intern-meta">Gesucht wird innerhalb von <strong>Schadenfälle Christian Wächter</strong> nach Schaden-Nr., VN/Name, Ort, Straße oder Versicherungsschein-Nr.</p>
+      <div style="display:grid;grid-template-columns:minmax(260px,1fr) auto auto;gap:10px;align-items:end">
+        <label><strong>Fallsuche</strong><input id="gf-case-search" class="vf-input" type="search" placeholder="Schaden-Nr., Name, Ort oder Straße" /></label>
+        <button id="gf-case-search-btn" class="sv-button sv-button-primary" type="button">Suchen</button>
+        <button id="gf-drive-sync" class="sv-button sv-button-secondary" type="button">Google Drive synchronisieren</button>
+      </div>
+      <div id="gf-drive-status" class="intern-alert intern-alert--info" style="margin-top:12px">Google-Drive-Verbindung wird beim ersten Zugriff geprüft.</div>
+      <div id="gf-case-results" style="margin-top:12px"></div>
+      <input id="gf-folder-id" type="hidden" value="" />
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <p class="sv-eyebrow">1 · Falldaten</p>
+      <h2>Fall anlegen / bearbeiten</h2>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
         <label><strong>Schaden-Nr.</strong><input class="vf-input" id="gf-schaden" type="text" placeholder="z. B. 26-123456-7" /></label>
         <label><strong>Versicherungsschein-Nr.</strong><input class="vf-input" id="gf-vsnr" type="text" /></label>
         <label><strong>VN / Objekt</strong><input class="vf-input" id="gf-object" type="text" /></label>
+        <label><strong>Ort</strong><input class="vf-input" id="gf-ort" type="text" /></label>
+        <label><strong>Straße</strong><input class="vf-input" id="gf-strasse" type="text" /></label>
         <label><strong>Schadenart</strong><input class="vf-input" id="gf-type" type="text" placeholder="Leitungswasser, Sturm, Feuer ..." /></label>
         <label><strong>Aktuelle Schadenhöhe / Reserve</strong><input class="vf-input" id="gf-reserve" type="text" placeholder="EUR" /></label>
         <label><strong>Auftrag / Ansprechpartner</strong><input class="vf-input" id="gf-contact" type="text" /></label>
+      </div>
+      <div class="intern-actions" style="margin-top:14px;gap:10px;flex-wrap:wrap">
+        <button id="gf-save-case" class="sv-button sv-button-primary" type="button">Fall in Google Drive speichern</button>
+        <span id="gf-save-status" class="intern-meta"></span>
       </div>
     </section>
 
@@ -64,7 +84,7 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
     <section class="intern-card" style="margin-top:16px">
       <p class="sv-eyebrow">3 · Dokumentpaket</p>
       <h2>Benötigte Ausgaben auswählen</h2>
-      <p>Die Auswahl steuert später die automatische Erzeugung aus derselben geprüften Falldatenbasis. Vorlagenlayout und Pflichtinhalte bleiben dokumentabhängig erhalten.</p>
+      <p>Die Auswahl steuert die spätere automatische Erzeugung aus derselben geprüften Falldatenbasis. Vorlagenlayout und Pflichtinhalte bleiben dokumentabhängig erhalten.</p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:14px">
         {[
           ['erstbericht','Erstbericht','Engel/QS-Erstberichtsvorlage; Eintrittspflicht, Ursache, Umfang, Reserve, Teilzahlung und Regress vollständig abarbeiten.'],
@@ -100,47 +120,111 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
         </article>
         <article class="intern-card" style="margin:0;box-shadow:none;border:1px solid rgba(15,45,70,.13)">
           <h3>Blanco</h3>
-          <p class="intern-meta">Originalformulare: Erstbericht, Zwischenbericht, Schlussbericht sowie Schadenprotokoll Gewerbe / Privat / Frost. Diese Vorlagen dürfen beim späteren Generator nicht durch generische Formulare ersetzt werden.</p>
+          <p class="intern-meta">Originalformulare: Erstbericht, Zwischenbericht, Schlussbericht sowie Schadenprotokoll Gewerbe / Privat / Frost. Diese Vorlagen dürfen beim Generator nicht durch generische Formulare ersetzt werden.</p>
           <a class="sv-button sv-button-secondary" href="https://drive.google.com/drive/folders/1_3p6moLBt3cD5Gzy9jvPw3BXpqnAvl2k" target="_blank" rel="noreferrer">Blanco öffnen</a>
         </article>
       </div>
-      <div class="intern-alert intern-alert--warning" style="margin-top:14px">
-        <strong>Automatik-Gate:</strong> Die Dokumenterzeugung wird erst freigeschaltet, wenn die serverseitige Google-Drive-Synchronisation und die fallbezogene KI-Akte aktiv sind. Bis dahin ist dieser Bereich das fachliche und technische Grundgerüst; es werden keine scheinbar fertigen Berichte aus unvollständigen Daten erzeugt.
+      <div id="gf-source-state" class="intern-alert intern-alert--warning" style="margin-top:14px">
+        <strong>Automatik-Gate:</strong> Google-Drive-Verbindung und verbindliche Masterquellen müssen erfolgreich geprüft sein, bevor die Dokumenterzeugung freigegeben wird.
       </div>
     </section>
   </main>
 
   <style>
     .vf-input{width:100%;margin-top:6px;padding:11px 12px;border:1px solid #b8c8d6;border-radius:10px;background:#fff;box-sizing:border-box}
+    .gf-result{border:1px solid rgba(15,45,70,.14);border-radius:10px;padding:12px;margin-top:8px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
   </style>
 
   <script is:inline>
     (() => {
-      document.querySelectorAll('.gf-upload').forEach((button) => {
-        button.addEventListener('click', () => {
-          const id = button.getAttribute('data-target');
-          if (id) document.getElementById(id)?.click();
-        });
+      const API = '/intern/api/google-drive-sync.php';
+      const el = (id) => document.getElementById(id);
+      const setDriveStatus = (text, type='info') => {
+        const node=el('gf-drive-status'); if(!node) return;
+        node.className=`intern-alert intern-alert--${type}`; node.textContent=text;
+      };
+      const caseData = () => ({
+        schaden_nr: el('gf-schaden')?.value?.trim() || '',
+        versicherungsschein_nr: el('gf-vsnr')?.value?.trim() || '',
+        vn_objekt: el('gf-object')?.value?.trim() || '',
+        ort: el('gf-ort')?.value?.trim() || '',
+        strasse: el('gf-strasse')?.value?.trim() || '',
+        schadenart: el('gf-type')?.value?.trim() || '',
+        reserve: el('gf-reserve')?.value?.trim() || '',
+        kontakt: el('gf-contact')?.value?.trim() || '',
+        fallart: 'SV-GF',
       });
-      document.querySelectorAll('.gf-file').forEach((input) => {
-        input.addEventListener('change', () => {
-          const kind = input.getAttribute('data-kind');
-          const target = kind ? document.getElementById(`gf-status-${kind}`) : null;
-          const count = input.files?.length || 0;
-          if (target) target.textContent = count ? `${count} Datei/-en ausgewählt` : 'Noch keine Datei ausgewählt.';
-        });
-      });
-      const prepare = document.getElementById('gf-prepare');
-      const manifest = document.getElementById('gf-manifest');
-      prepare?.addEventListener('click', () => {
-        const selected = [...document.querySelectorAll('.gf-output:checked')].map((el) => el.closest('label')?.querySelector('strong')?.textContent || el.value);
-        const schaden = document.getElementById('gf-schaden')?.value?.trim() || 'noch nicht angegeben';
-        const object = document.getElementById('gf-object')?.value?.trim() || 'noch nicht angegeben';
-        if (manifest) {
-          manifest.hidden = false;
-          manifest.innerHTML = `<strong>Dokumentpaket vorbereitet.</strong><br>Schaden-Nr.: ${schaden}<br>VN/Objekt: ${object}<br>Ausgaben: ${selected.length ? selected.join(', ') : 'keine ausgewählt'}<br><br><strong>Nächster technischer Schritt:</strong> Google-Drive-Quellen synchronisieren, Fallakte KI-strukturiert speichern und Generator freischalten.`;
+      const fillCase = (meta={}) => {
+        const map={schaden_nr:'gf-schaden',versicherungsschein_nr:'gf-vsnr',vn_objekt:'gf-object',ort:'gf-ort',strasse:'gf-strasse',schadenart:'gf-type',reserve:'gf-reserve',kontakt:'gf-contact'};
+        Object.entries(map).forEach(([k,id])=>{ const n=el(id); if(n) n.value=meta[k]||''; });
+      };
+      async function api(url, options={}) {
+        const r=await fetch(url,{credentials:'same-origin',...options});
+        const j=await r.json().catch(()=>({}));
+        if(!r.ok) throw new Error(j.error||`HTTP ${r.status}`);
+        return j;
+      }
+      async function syncSources() {
+        setDriveStatus('Google Drive wird geprüft …','info');
+        try {
+          const status=await api(`${API}?action=status`);
+          const src=await api(`${API}?action=sync_sources`);
+          const k=Object.keys(src.sources?.knowledge||{}).length;
+          const b=Object.keys(src.sources?.blanco||{}).length;
+          setDriveStatus(`Google Drive verbunden · Fälle: ${status.folders?.cases?.items ?? 0} · Wissensbasis erkannt: ${k} Kernquellen · Blanco erkannt: ${b} Vorlagen`,'success');
+          const gate=el('gf-source-state'); if(gate){gate.className='intern-alert intern-alert--success';gate.innerHTML='<strong>Google-Drive-Synchronisation aktiv.</strong> Wissensbasis, Blanco und Fallablage sind erreichbar. Die Fallakte kann geladen und fortgeschrieben werden.';}
+        } catch(e) {
+          setDriveStatus(`Google Drive noch nicht aktiv: ${e.message}`,'warning');
         }
+      }
+      async function searchCases() {
+        const q=el('gf-case-search')?.value?.trim()||'';
+        const box=el('gf-case-results'); if(box) box.innerHTML='<span class="intern-meta">Suche läuft …</span>';
+        try {
+          const data=await api(`${API}?action=search_cases&q=${encodeURIComponent(q)}`);
+          if(!box) return;
+          if(!(data.results||[]).length){box.innerHTML='<div class="intern-alert intern-alert--info">Kein passender Fall gefunden.</div>';return;}
+          box.innerHTML=(data.results||[]).map((r)=>{
+            const m=r.meta||{};
+            const sub=[m.schaden_nr,m.vn_objekt,[m.strasse,m.ort].filter(Boolean).join(', ')].filter(Boolean).join(' · ');
+            return `<div class="gf-result"><div><strong>${r.name}</strong><br><span class="intern-meta">${sub||'Falldaten noch nicht indexiert'}</span></div><button class="sv-button sv-button-secondary gf-load-case" type="button" data-id="${r.id}">Fall laden</button></div>`;
+          }).join('');
+          box.querySelectorAll('.gf-load-case').forEach(btn=>btn.addEventListener('click',()=>loadCase(btn.getAttribute('data-id'))));
+        } catch(e) { if(box) box.innerHTML=`<div class="intern-alert intern-alert--warning">${e.message}</div>`; }
+      }
+      async function loadCase(id) {
+        if(!id) return;
+        setDriveStatus('Fall wird aus Google Drive geladen …','info');
+        try {
+          const data=await api(`${API}?action=load_case&id=${encodeURIComponent(id)}`);
+          el('gf-folder-id').value=id;
+          fillCase(data.case?.meta||{});
+          setDriveStatus(`Fall geladen · ${(data.case?.files||[]).length} Datei/-en im Fallordner`,'success');
+          window.scrollTo({top:el('gf-schaden')?.getBoundingClientRect().top + window.scrollY - 140,behavior:'smooth'});
+        } catch(e) { setDriveStatus(e.message,'warning'); }
+      }
+      async function saveCase() {
+        const status=el('gf-save-status'); if(status) status.textContent='Speichern …';
+        try {
+          const data=await api(`${API}?action=save_case`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({folder_id:el('gf-folder-id')?.value||'',case:caseData()})});
+          el('gf-folder-id').value=data.folder_id||'';
+          if(status) status.textContent='In Google Drive gespeichert.';
+          setDriveStatus(`Fallordner aktiv: ${data.name||data.folder_id}`,'success');
+        } catch(e) { if(status) status.textContent=e.message; }
+      }
+
+      el('gf-case-search-btn')?.addEventListener('click',searchCases);
+      el('gf-case-search')?.addEventListener('keydown',(e)=>{if(e.key==='Enter'){e.preventDefault();searchCases();}});
+      el('gf-drive-sync')?.addEventListener('click',syncSources);
+      el('gf-save-case')?.addEventListener('click',saveCase);
+
+      document.querySelectorAll('.gf-upload').forEach((button) => button.addEventListener('click', () => { const id=button.getAttribute('data-target'); if(id) el(id)?.click(); }));
+      document.querySelectorAll('.gf-file').forEach((input) => input.addEventListener('change', () => { const kind=input.getAttribute('data-kind'); const target=kind?el(`gf-status-${kind}`):null; const count=input.files?.length||0; if(target) target.textContent=count?`${count} Datei/-en ausgewählt`:'Noch keine Datei ausgewählt.'; }));
+      el('gf-prepare')?.addEventListener('click', () => {
+        const selected=[...document.querySelectorAll('.gf-output:checked')].map((node)=>node.closest('label')?.querySelector('strong')?.textContent||node.value);
+        const manifest=el('gf-manifest'); if(manifest){manifest.hidden=false;manifest.innerHTML=`<strong>Dokumentpaket vorbereitet.</strong><br>Schaden-Nr.: ${caseData().schaden_nr||'noch nicht angegeben'}<br>VN/Objekt: ${caseData().vn_objekt||'noch nicht angegeben'}<br>Ausgaben: ${selected.length?selected.join(', '):'keine ausgewählt'}`;}
       });
+      syncSources();
     })();
   </script>
 </InternalLayout>
