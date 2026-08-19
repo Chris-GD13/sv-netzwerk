@@ -3,6 +3,62 @@ from pathlib import Path
 path = Path('public/intern/api/sharepoint-v2.php')
 source = path.read_text(encoding='utf-8')
 
+floor_helper = '''function v2FloorFromRoomReference(string $room): string
+{
+    $digits = preg_replace('/\\D+/', '', trim($room)) ?? '';
+    if ($digits === '') return '';
+    $first = $digits[0] ?? '';
+    return match ($first) {
+        '0' => 'EG',
+        '1' => '1. OG',
+        '2' => '2. OG',
+        '3' => '3. OG',
+        default => '',
+    };
+}
+
+function v2ResolveFloorLabel(array $row): string
+{
+    $room = trim((string) ($row['__room_reference'] ?? v2RowValue($row, ['Zimmer', 'Zimmernummer', 'Zimmer Nr', 'Zimmer-Nr', 'Raum', 'Raumnummer', 'room_number'])));
+    $roomFloor = v2FloorFromRoomReference($room);
+    $sheetFloor = trim((string) ($row['__floor_label'] ?? v2RowValue($row, ['Etage', 'Geschoss'])));
+    if ($roomFloor !== '') return $roomFloor;
+    return $sheetFloor;
+}
+
+'''
+
+if 'function v2FloorFromRoomReference(string $room): string' not in source:
+    marker = 'function v2CanonicalizeRow(array $row): array\n{'
+    if marker not in source:
+        raise SystemExit('v2CanonicalizeRow anchor not found')
+    source = source.replace(marker, floor_helper + marker, 1)
+
+old_canonical = '''function v2CanonicalizeRow(array $row): array
+{
+    $canonical = $row;
+    foreach (v2CanonicalFieldMap() as $field => $needles) $canonical['__' . $field] = v2RowValue($row, $needles);
+    $canonical['__window_number'] = v2NormalizeWindowNumber($canonical['__window_number']);
+    $canonical['__opening_type'] = v2DetectOpeningType($row);
+    return $canonical;
+}
+'''
+new_canonical = '''function v2CanonicalizeRow(array $row): array
+{
+    $canonical = $row;
+    foreach (v2CanonicalFieldMap() as $field => $needles) $canonical['__' . $field] = v2RowValue($row, $needles);
+    $canonical['__window_number'] = v2NormalizeWindowNumber($canonical['__window_number']);
+    $canonical['__opening_type'] = v2DetectOpeningType($row);
+    $canonical['__floor_label_original'] = (string) ($canonical['__floor_label'] ?? '');
+    $canonical['__floor_label'] = v2ResolveFloorLabel($canonical);
+    return $canonical;
+}
+'''
+if old_canonical in source:
+    source = source.replace(old_canonical, new_canonical, 1)
+elif "['__floor_label_original']" not in source:
+    raise SystemExit('canonicalize block not found')
+
 helper = '''function v2DedupeGroupRows(array $rows): array
 {
     $merged = [];
@@ -60,7 +116,8 @@ new_group = '''    $groups = [];
     foreach ($canonicalRows as $row) {
         $windowNumber = v2NormalizeWindowNumber($row['__window_number'] ?? ($row['schlagzahl'] ?? ''));
         $room = trim((string) ($row['__room_reference'] ?? ''));
-        $floor = trim((string) ($row['__floor_label'] ?? '')) ?: 'EG / Erdgeschoss';
+        $floor = trim((string) ($row['__floor_label'] ?? '')) ?: v2FloorFromRoomReference($room);
+        if ($floor === '') $floor = 'EG';
         if ($windowNumber === '' || $room === '') continue;
         $key = v2NormalizeKey($floor) . '|' . v2NormalizeKey($room) . '|' . v2NormalizeKey($windowNumber);
         if (!isset($groups[$key])) $groups[$key] = ['floor' => $floor, 'room' => $room, 'window' => $windowNumber, 'rows' => []];
@@ -78,7 +135,7 @@ elif "v2NormalizeKey($floor) . '|' . v2NormalizeKey($room) . '|' . v2NormalizeKe
     raise SystemExit('group block not found')
 
 old_floor = "$floorLabel = trim((string) ($groupRows[0]['__floor_label'] ?? '')) ?: 'EG / Erdgeschoss';"
-new_floor = "$floorLabel = trim((string) ($group['floor'] ?? ($groupRows[0]['__floor_label'] ?? ''))) ?: 'EG / Erdgeschoss';"
+new_floor = "$floorLabel = trim((string) ($group['floor'] ?? ($groupRows[0]['__floor_label'] ?? ''))) ?: v2FloorFromRoomReference($roomNumber);\n        if ($floorLabel === '') $floorLabel = 'EG';"
 if old_floor in source:
     source = source.replace(old_floor, new_floor, 1)
 
