@@ -11,6 +11,7 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
     <div class="intern-actions" role="group" aria-label="Importmodus" style="gap:.65rem;flex-wrap:wrap;">
       <button type="button" class="sv-button sv-button-secondary" data-sp-mode="new">Nur neu</button>
       <button type="button" class="sv-button sv-button-primary" data-sp-mode="complete">Vervollständigen / Aktualisieren</button>
+      <button type="button" class="sv-button sv-button-secondary" data-sp-mode="photos">Nur Fotos neu zuordnen</button>
       <button type="button" class="sv-button sv-button-secondary" data-sp-mode="full">Vollständig neu einlesen</button>
     </div>
     <label style="display:flex;align-items:center;gap:.55rem;margin-top:1rem;font-weight:600;">
@@ -27,15 +28,21 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
       const STORAGE_KEY = 'sv-sharepoint-import-mode';
       const PRESERVE_KEY = 'sv-sharepoint-preserve-photo-assignments';
       const originalFetch = window.fetch.bind(window);
-      let mode = localStorage.getItem(STORAGE_KEY) || 'complete';
-      let preserveAssignments = localStorage.getItem(PRESERVE_KEY) !== 'false';
+      const query = new URLSearchParams(window.location.search);
+      const photoOnlyRequested = query.get('photo_only') === '1';
+      let mode = photoOnlyRequested ? 'photos' : (localStorage.getItem(STORAGE_KEY) || 'complete');
+      let preserveAssignments = photoOnlyRequested ? false : localStorage.getItem(PRESERVE_KEY) !== 'false';
+      if (photoOnlyRequested) {
+        localStorage.setItem(STORAGE_KEY, 'photos');
+        localStorage.setItem(PRESERVE_KEY, 'false');
+      }
 
       const buildingId = () => {
         const params = new URLSearchParams(window.location.search);
         const fromUrl = Number(params.get('building_id') || 0);
         if (fromUrl > 0) return fromUrl;
         const root = document.querySelector('[data-building-id]');
-        return Number(root?.getAttribute('data-building-id') || 0);
+        return Number(root?.getAttribute('data-building-id') || 1);
       };
 
       const normalizeNumber = (value) => {
@@ -81,6 +88,26 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
         const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
         const method = String(init.method || (input instanceof Request ? input.method : 'GET')).toUpperCase();
 
+        // Foto-only: Excel bewusst NICHT anwenden. Stattdessen werden die bereits
+        // vorhandenen Fenster und Flügel als Zielmatrix für die Fotoanalyse geliefert.
+        if (mode === 'photos' && method === 'POST' && url.includes('sharepoint.php?action=apply_excel')) {
+          const targetResponse = await originalFetch(`/intern/api/sharepoint-photo-targets.php?building_id=${encodeURIComponent(buildingId())}`, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json' },
+            cache: 'no-store',
+          });
+          const body = await targetResponse.text();
+          if (!targetResponse.ok) {
+            return new Response(body, { status: targetResponse.status, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+          }
+          try {
+            const parsed = JSON.parse(body);
+            info(`Nur Fotos: ${parsed.targets_found || 0} vorhandene Fenster-/Flügelziele werden verwendet. Excel-, Raum- und Fensterdaten bleiben unverändert.`, 'success');
+          } catch {}
+          return new Response(body, { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' } });
+        }
+
         // "Nur neu": bereits vorhandene Fensternummern vor dem Apply-Schritt aus dem Nachtrag entfernen.
         if (mode === 'new' && method === 'POST' && url.includes('sharepoint.php?action=apply_excel') && typeof init.body === 'string') {
           try {
@@ -105,7 +132,9 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
         const response = await originalFetch(input, init);
 
         // Fotoliste nur als Metadaten laden und danach serverseitig gegen bereits importierte Fotos abgleichen.
-        if (response.ok && method === 'GET' && url.includes('sharepoint.php?action=list_sharepoint_photos') && mode !== 'full' && preserveAssignments) {
+        // Im Foto-only-Modus wird absichtlich NICHT gefiltert: dort sollen alle SharePoint-Fotos erneut
+        // gegen den aktuellen Fensterbestand verarbeitet werden.
+        if (response.ok && method === 'GET' && url.includes('sharepoint.php?action=list_sharepoint_photos') && mode !== 'full' && mode !== 'photos' && preserveAssignments) {
           try {
             const json = await response.clone().json();
             const photos = Array.isArray(json?.photos) ? json.photos : [];
@@ -156,7 +185,10 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
       const applyUi = () => {
         const buttons = [...document.querySelectorAll('[data-sp-mode]')];
         const preserve = document.getElementById('sp-preserve-photo-assignments');
-        if (preserve instanceof HTMLInputElement) preserve.checked = preserveAssignments;
+        if (preserve instanceof HTMLInputElement) {
+          preserve.checked = preserveAssignments;
+          preserve.disabled = mode === 'photos';
+        }
 
         const render = () => {
           for (const button of buttons) {
@@ -164,8 +196,14 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
             button.classList.toggle('sv-button-primary', active);
             button.classList.toggle('sv-button-secondary', !active);
           }
+          if (preserve instanceof HTMLInputElement) {
+            preserve.disabled = mode === 'photos';
+            if (mode === 'photos') preserve.checked = false;
+          }
           if (mode === 'full') {
             info('Vollständiger Neuimport: alle Excel-Daten und alle SharePoint-Fotos werden erneut verarbeitet. Dieser Modus kann bei großen Fotobeständen lange dauern.', 'warning');
+          } else if (mode === 'photos') {
+            info('Nur Fotos neu zuordnen: vorhandene Fenster, Räume, Etagen und Excel-Daten bleiben unverändert. Alle SharePoint-Fotos werden erneut gegen den bestehenden Fenster-/Flügelbestand analysiert und registriert.', 'warning');
           } else if (mode === 'new') {
             info('Nur neu: vorhandene Fensternummern und bereits zugeordnete Fotos werden übersprungen.');
           } else {
@@ -177,8 +215,7 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
           button.addEventListener('click', () => {
             mode = button.getAttribute('data-sp-mode') || 'complete';
             localStorage.setItem(STORAGE_KEY, mode);
-            if (mode === 'full' && preserve instanceof HTMLInputElement) {
-              preserve.checked = false;
+            if (mode === 'full' || mode === 'photos') {
               preserveAssignments = false;
               localStorage.setItem(PRESERVE_KEY, 'false');
             }
@@ -186,6 +223,7 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
           });
         }
         preserve?.addEventListener('change', () => {
+          if (mode === 'photos') return;
           preserveAssignments = preserve instanceof HTMLInputElement ? preserve.checked : true;
           localStorage.setItem(PRESERVE_KEY, String(preserveAssignments));
           if (!preserveAssignments && mode !== 'full') {
