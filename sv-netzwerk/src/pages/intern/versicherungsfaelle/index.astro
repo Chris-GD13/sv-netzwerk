@@ -4,148 +4,73 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 
 <InternalLayout title="Versicherungsfälle" description="Zentrale Fallakte und Bearbeitung für Versicherungsfälle.">
   <main class="intern-app" style="max-width:1320px;margin:0 auto;padding:24px">
-    <section class="intern-card">
-      <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
-      <h1>Versicherungsfälle</h1>
-      <p>Zentrale Fallakte für alle Versicherungsfälle. Fallanlage, Google-Drive-Ablage, Suche und Dokumenteingang sind für alle Fallarten identisch; nur die fachlichen Prüf- und Ausgabeformulare unterscheiden sich.</p>
-      <div class="intern-actions" style="margin-top:16px;gap:10px;flex-wrap:wrap">
-        <button class="sv-button sv-button-primary vf-tab is-active" type="button" data-vf-tab="sv">SV Schäden</button>
+    <section class="intern-card vf-head-card">
+      <div><p class="sv-eyebrow">SV-Netzwerk Prüfportal</p><h1 style="margin-bottom:6px">Versicherungsfälle</h1></div>
+      <div class="intern-actions vf-tabs" style="gap:8px;flex-wrap:wrap">
+        <button class="sv-button sv-button-secondary vf-tab" type="button" data-vf-tab="sv">SV Schäden</button>
         <button class="sv-button sv-button-secondary vf-tab" type="button" data-vf-tab="gf">SV-GF Schäden</button>
         <button class="sv-button sv-button-secondary vf-tab" type="button" data-vf-tab="andere">Andere Versicherer</button>
       </div>
     </section>
 
     <section class="intern-card" style="margin-top:16px">
-      <p class="sv-eyebrow">1 · Fall suchen</p>
-      <div class="vf-search-line">
-        <input id="vf-case-search" class="vf-input" type="search" placeholder="Schaden-Nr., Versicherungsschein-Nr., Name, Ort oder Straße" />
-        <button id="vf-case-search-btn" class="sv-button sv-button-primary" type="button">Suchen</button>
-        <button id="vf-new-case-toggle" class="sv-button sv-button-secondary" type="button">Fall anlegen</button>
-      </div>
-      <div id="vf-active-case" class="intern-alert intern-alert--info" style="margin-top:12px">Aktiver Fall: keiner geladen.</div>
-      <div id="vf-case-results" style="margin-top:12px"></div>
-      <input id="vf-folder-id" type="hidden" value="" />
+      <p class="sv-eyebrow">1 · Fall</p>
+      <div class="vf-search-line"><input id="vf-case-search" class="vf-input" type="search" placeholder="Schaden-Nr., Versicherungsschein-Nr., Name, Ort oder Straße" /><button id="vf-case-search-btn" class="sv-button sv-button-primary" type="button">Suchen</button><button id="vf-new-case-toggle" class="sv-button sv-button-secondary" type="button">Fall anlegen</button></div>
+      <div id="vf-active-case" class="intern-alert intern-alert--info" style="margin-top:10px">Aktiver Fall: keiner geladen.</div><div id="vf-case-results" style="margin-top:10px"></div><input id="vf-folder-id" type="hidden" value="" />
     </section>
 
     <section id="vf-new-case" class="intern-card" style="margin-top:16px" hidden>
-      <p class="sv-eyebrow">2 · Fall anlegen / bearbeiten</p>
-      <h2>Falldaten</h2>
+      <p class="sv-eyebrow">2 · Fall anlegen / bearbeiten</p><h2>Falldaten</h2>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
-        <label><strong>Schaden-Nr.</strong><input class="vf-input" id="vf-schaden" type="text" placeholder="z. B. 26-123456-7" /></label>
-        <label><strong>Versicherungsschein-Nr.</strong><input class="vf-input" id="vf-vsnr" type="text" /></label>
-        <label><strong>VN / Objekt</strong><input class="vf-input" id="vf-object" type="text" /></label>
-        <label><strong>Ort</strong><input class="vf-input" id="vf-ort" type="text" /></label>
-        <label><strong>Straße</strong><input class="vf-input" id="vf-strasse" type="text" /></label>
-        <label><strong>Schadenart</strong><input class="vf-input" id="vf-type" type="text" placeholder="Leitungswasser, Sturm, Feuer ..." /></label>
-        <label><strong>Aktuelle Schadenhöhe / Reserve</strong><input class="vf-input" id="vf-reserve" type="text" placeholder="EUR" /></label>
-        <label><strong>Auftrag / Ansprechpartner</strong><input class="vf-input" id="vf-contact" type="text" /></label>
+        <label><strong>Schaden-Nr.</strong><input class="vf-input" id="vf-schaden" type="text" placeholder="z. B. 26-123456-7" /></label><label><strong>Versicherungsschein-Nr.</strong><input class="vf-input" id="vf-vsnr" type="text" /></label><label><strong>VN / Objekt</strong><input class="vf-input" id="vf-object" type="text" /></label><label><strong>Ort</strong><input class="vf-input" id="vf-ort" type="text" /></label><label><strong>Straße</strong><input class="vf-input" id="vf-strasse" type="text" /></label><label><strong>Schadenart</strong><input class="vf-input" id="vf-type" type="text" /></label><label><strong>Aktuelle Schadenhöhe / Reserve</strong><input class="vf-input" id="vf-reserve" type="text" placeholder="EUR" /></label><label><strong>Auftrag / Ansprechpartner</strong><input class="vf-input" id="vf-contact" type="text" /></label>
       </div>
-      <div class="intern-actions" style="margin-top:14px;gap:10px;flex-wrap:wrap">
-        <button id="vf-save-case" class="sv-button sv-button-primary" type="button">Fall speichern und aktivieren</button>
-        <span id="vf-save-status" class="intern-meta"></span>
-      </div>
+      <div class="intern-actions" style="margin-top:12px"><button id="vf-save-case" class="sv-button sv-button-primary" type="button">Speichern</button><span id="vf-save-status" class="intern-meta"></span></div>
     </section>
 
     <section class="intern-card" style="margin-top:16px">
       <p class="sv-eyebrow">3 · Dokumenteneingang</p>
-      <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap">
-        <div><h2 id="vf-title" style="margin-top:0">SV Schäden</h2><p id="vf-description" class="intern-meta">Eingang und strukturierte Erfassung eines SV-Schadenfalls.</p></div>
-        <div class="intern-alert intern-alert--info" style="margin:0;max-width:470px">Alle Unterlagen werden dem aktiven Fall zugeordnet.</div>
-      </div>
-      <div class="vf-compact-card" style="margin-top:14px">
-        <div class="vf-two-col">
-          <label><strong>Dokumentart</strong>
-            <select id="vf-document-kind" class="vf-select">
-              <option value="fallakte">Fallakte / Sammelunterlagen</option>
-              <option value="kva">Kostenvoranschlag</option>
-              <option value="rechnungen">Rechnungen</option>
-              <option value="schriftverkehr">Schriftverkehr</option>
-              <option value="mails">Mails</option>
-            </select>
-          </label>
-          <label><strong>Verarbeitung</strong>
-            <select id="vf-document-mode" class="vf-select">
-              <option value="ki">KI-gestützt auswerten und zur Fallakte</option>
-              <option value="ablage">Nur in Fallakte ablegen</option>
-              <option value="nachtrag">Als Nachtrag / neue Fassung auswerten</option>
-              <option value="manuell">Manuell prüfen / zuordnen</option>
-            </select>
-          </label>
-        </div>
-        <input id="file-documents" class="vf-file" type="file" multiple hidden />
-        <div id="vf-document-drop" class="vf-dropzone" tabindex="0"><strong>Dateien hier hineinziehen</strong><span>oder klicken und Dateien auswählen</span></div>
-        <div id="status-documents" class="intern-meta" style="margin-top:8px">Noch keine Datei ausgewählt.</div>
-      </div>
+      <div class="vf-two-col"><label><strong>Dokumentart</strong><select id="vf-document-kind" class="vf-select"><option value="fallakte">Fallakte / Sammelunterlagen</option><option value="gutachten">Gutachten</option><option value="kva">Kostenvoranschlag</option><option value="rechnungen">Rechnungen</option><option value="schriftverkehr">Schriftverkehr</option><option value="mails">Mails</option></select></label><label><strong>Verarbeitung</strong><select id="vf-document-mode" class="vf-select"><option value="ki">KI-gestützt auswerten und zur Fallakte</option><option value="nachtrag">Als Nachtrag / neue Unterlage berücksichtigen</option><option value="ablage">Nur in Fallakte ablegen</option></select></label></div>
+      <input id="file-documents" type="file" multiple hidden /><div id="vf-document-drop" class="vf-dropzone" tabindex="0"><strong>Dateien hier hineinziehen</strong><span>oder klicken · Speicherung direkt im aktiven Google-Drive-Fall</span></div><div id="status-documents" class="intern-meta" style="margin-top:8px">Noch keine Datei ausgewählt.</div>
     </section>
 
     <section class="intern-card" style="margin-top:16px">
-      <p class="sv-eyebrow">4 · Arbeitsauftrag</p>
-      <h2>Was soll mit dem Fall gemacht werden?</h2>
-      <textarea id="vf-instructions" class="vf-textarea" rows="7" placeholder="z. B. Prüfe die Rechnungen gegen den KVA, berücksichtige den Schriftverkehr, ergänze die Reservebegründung und erstelle anschließend ..."></textarea>
-      <div class="intern-actions" style="margin-top:10px;gap:8px;flex-wrap:wrap"><button id="vf-save-instructions" class="sv-button sv-button-primary" type="button">Arbeitsauftrag speichern</button><span id="vf-instruction-status" class="intern-meta"></span></div>
+      <p class="sv-eyebrow">4 · Arbeitsauftrag</p><h2>Was soll mit dem Fall gemacht werden?</h2>
+      <textarea id="vf-instructions" class="vf-textarea" rows="6" placeholder="z. B. Das neue Gutachten auswerten, den bereits angezweifelten KVA fachlich bewerten und einen Nachtrag mit klarer Empfehlung erstellen."></textarea>
+      <div class="intern-actions" style="margin-top:10px"><button id="vf-save-instructions" class="sv-button sv-button-secondary" type="button">Arbeitsauftrag speichern</button><span id="vf-instruction-status" class="intern-meta"></span></div>
     </section>
 
     <section class="intern-card" style="margin-top:16px">
-      <p class="sv-eyebrow">5 · Formulare und Ausgaben</p>
-      <h2>Fallartspezifische Bearbeitung</h2>
-      <div id="vf-output-info" class="intern-alert intern-alert--info"><strong>SV Schäden:</strong> Die spezifischen Prüf- und Ausgabeformulare werden hier ergänzt.</div>
-      <div id="gf-entry" class="intern-actions" style="margin-top:14px" hidden><a class="sv-button sv-button-primary" href="/intern/versicherungsfaelle/sv-gf/">SV-GF Formulare und Ausgaben öffnen</a></div>
+      <p class="sv-eyebrow">5 · Dokumentpaket</p><h2 id="vf-title">SV Schäden</h2><p id="vf-description" class="intern-meta">Fallartspezifische Ausgabe auswählen.</p>
+      <div id="vf-package-actions" class="intern-actions" style="margin-top:12px;gap:10px;flex-wrap:wrap"></div>
     </section>
 
-    <section class="intern-card" style="margin-top:16px">
-      <p class="sv-eyebrow">6 · Dokumentpaket</p>
-      <h2>Dokumente erstellen</h2>
-      <div id="vf-package-info" class="intern-alert intern-alert--info">Wähle oben die Fallart. Das Dokumentpaket verwendet immer den aktuell geladenen Fall und den gespeicherten Arbeitsauftrag.</div>
-      <div id="vf-package-actions" class="intern-actions" style="margin-top:14px;gap:10px;flex-wrap:wrap"></div>
-    </section>
-
-    <details class="intern-card" style="margin-top:16px">
-      <summary style="cursor:pointer;font-weight:800">System · Google-Drive-Verbindung</summary>
-      <div style="margin-top:14px">
-        <div id="vf-oauth-status" class="intern-alert intern-alert--info">Google-Verbindungsstatus wird geprüft.</div>
-        <div id="vf-oauth-actions" class="intern-actions" style="margin-top:12px;gap:10px;flex-wrap:wrap"><a id="vf-google-connect" class="sv-button sv-button-primary" href="/intern/api/google-drive-oauth.php?action=start" hidden>Mit Google Drive verbinden</a><button id="vf-drive-sync" class="sv-button sv-button-secondary" type="button">Google Drive synchronisieren</button></div>
-        <details id="vf-google-admin" style="margin-top:10px" hidden><summary style="cursor:pointer;font-weight:700">Verbindung verwalten</summary><div class="intern-actions" style="margin-top:10px"><button id="vf-google-disconnect" class="sv-button sv-button-secondary" type="button">Google Drive trennen</button></div></details>
-        <div id="vf-oauth-setup" class="intern-card" style="margin-top:14px;border:1px solid rgba(15,45,70,.13);box-shadow:none" hidden>
-          <h3 style="margin-top:0">Einmalige Google-OAuth-Einrichtung</h3><code id="vf-oauth-redirect" style="display:block;word-break:break-all;margin:8px 0 14px"></code>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px"><label><strong>Google OAuth Client-ID</strong><input id="vf-google-client-id" class="vf-input" type="text" autocomplete="off" /></label><label><strong>Google OAuth Client-Secret</strong><input id="vf-google-client-secret" class="vf-input" type="password" autocomplete="new-password" /></label></div>
-          <div class="intern-actions" style="margin-top:12px"><button id="vf-google-save-client" class="sv-button sv-button-primary" type="button">OAuth-Zugang speichern</button></div><div id="vf-oauth-setup-status" class="intern-meta" style="margin-top:8px"></div>
-        </div>
-        <div id="vf-drive-status" class="intern-alert intern-alert--info" style="margin-top:12px">Google-Drive-Verbindung wird geprüft.</div>
-      </div>
-    </details>
+    <details class="intern-card" style="margin-top:16px"><summary style="cursor:pointer;font-weight:800">System · Google Drive</summary><div style="margin-top:12px"><div id="vf-oauth-status" class="intern-alert intern-alert--info">Google-Verbindungsstatus wird geprüft.</div><div id="vf-oauth-actions" class="intern-actions" style="margin-top:10px;gap:10px;flex-wrap:wrap"><a id="vf-google-connect" class="sv-button sv-button-primary" href="/intern/api/google-drive-oauth.php?action=start" hidden>Mit Google Drive verbinden</a><button id="vf-drive-sync" class="sv-button sv-button-secondary" type="button">Google Drive synchronisieren</button></div><details id="vf-google-admin" style="margin-top:10px" hidden><summary style="cursor:pointer;font-weight:700">Verbindung verwalten</summary><div class="intern-actions" style="margin-top:10px"><button id="vf-google-disconnect" class="sv-button sv-button-secondary" type="button">Google Drive trennen</button></div></details><div id="vf-oauth-setup" class="intern-card" style="margin-top:14px;border:1px solid rgba(15,45,70,.13);box-shadow:none" hidden><h3 style="margin-top:0">Einmalige Google-OAuth-Einrichtung</h3><code id="vf-oauth-redirect" style="display:block;word-break:break-all;margin:8px 0 14px"></code><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px"><label><strong>Google OAuth Client-ID</strong><input id="vf-google-client-id" class="vf-input" type="text" autocomplete="off" /></label><label><strong>Google OAuth Client-Secret</strong><input id="vf-google-client-secret" class="vf-input" type="password" autocomplete="new-password" /></label></div><div class="intern-actions" style="margin-top:12px"><button id="vf-google-save-client" class="sv-button sv-button-primary" type="button">OAuth-Zugang speichern</button></div><div id="vf-oauth-setup-status" class="intern-meta" style="margin-top:8px"></div></div><div id="vf-drive-status" class="intern-alert intern-alert--info" style="margin-top:12px">Google-Drive-Verbindung wird geprüft.</div></div></details>
   </main>
 
   <style>
-    .vf-input{width:100%;padding:11px 12px;border:1px solid #b8c8d6;border-radius:10px;background:#fff;box-sizing:border-box}
-    label .vf-input{margin-top:6px}.vf-search-line{display:grid;grid-template-columns:minmax(300px,1fr) auto auto;gap:10px;align-items:center}
-    .vf-result{border:1px solid rgba(15,45,70,.14);border-radius:10px;padding:12px;margin-top:8px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
-    .vf-compact-card{border:1px solid rgba(15,45,70,.13);border-radius:14px;padding:16px;background:#fff}.vf-two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .vf-select{width:100%;margin-top:6px;padding:10px 11px;border:1px solid #b8c8d6;border-radius:10px;background:#fff}
-    .vf-dropzone{margin-top:12px;border:2px dashed #b8c8d6;border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;background:#f8fbfd;display:flex;flex-direction:column;gap:4px}.vf-dropzone.is-dragging{border-color:#ff970f;background:#fff7eb}.vf-dropzone span{font-size:.92rem;color:#63768a}
-    .vf-textarea{width:100%;box-sizing:border-box;resize:vertical;border:1px solid #b8c8d6;border-radius:10px;padding:12px;font:inherit;line-height:1.45;background:#fff}
-    @media(max-width:850px){.vf-search-line,.vf-two-col{grid-template-columns:1fr}}
+    .vf-head-card{display:flex;justify-content:space-between;align-items:center;gap:16px}.vf-input{width:100%;padding:11px 12px;border:1px solid #b8c8d6;border-radius:10px;background:#fff;box-sizing:border-box}label .vf-input{margin-top:6px}.vf-search-line{display:grid;grid-template-columns:minmax(300px,1fr) auto auto;gap:10px;align-items:center}.vf-result{border:1px solid rgba(15,45,70,.14);border-radius:10px;padding:12px;margin-top:8px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.vf-two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.vf-select{width:100%;margin-top:6px;padding:10px 11px;border:1px solid #b8c8d6;border-radius:10px;background:#fff}.vf-dropzone{margin-top:12px;border:2px dashed #b8c8d6;border-radius:12px;padding:18px;text-align:center;cursor:pointer;background:#f8fbfd;display:flex;flex-direction:column;gap:4px}.vf-dropzone.is-dragging{border-color:#ff970f;background:#fff7eb}.vf-dropzone span{font-size:.92rem;color:#63768a}.vf-textarea{width:100%;box-sizing:border-box;resize:vertical;border:1px solid #b8c8d6;border-radius:10px;padding:12px;font:inherit;line-height:1.45;background:#fff}@media(max-width:850px){.vf-head-card{display:block}.vf-tabs{margin-top:10px}.vf-search-line,.vf-two-col{grid-template-columns:1fr}}
   </style>
 
   <script is:inline>
     (()=>{
-      const API='/intern/api/google-drive-sync.php', OAUTH='/intern/api/google-drive-oauth.php', el=id=>document.getElementById(id); let activeType='SV';
-      const labels={sv:{title:'SV Schäden',description:'Eingang und strukturierte Erfassung eines SV-Schadenfalls.',fallart:'SV'},gf:{title:'SV-GF Schäden',description:'Sparkassenversicherung GF / Großschäden nach QS-/Engel-Vorgaben.',fallart:'SV-GF'},andere:{title:'Andere Versicherer',description:'Eingang und strukturierte Erfassung von Schadenfällen anderer Versicherer.',fallart:'Andere Versicherer'}};
+      const API='/intern/api/google-drive-sync.php',OAUTH='/intern/api/google-drive-oauth.php',el=id=>document.getElementById(id);let activeType='SV';
+      const labels={sv:{title:'SV Schäden',description:'SV-spezifisches Dokumentpaket.',fallart:'SV'},gf:{title:'SV-GF Schäden',description:'Sparkassenversicherung GF / Großschäden nach QS-/Engel-Vorgaben.',fallart:'SV-GF'},andere:{title:'Andere Versicherer',description:'Dokumentpaket für andere Versicherer.',fallart:'Andere Versicherer'}};
       async function api(url,options={}){const r=await fetch(url,{credentials:'same-origin',...options});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||`HTTP ${r.status}`);return j;}
-      const persistActive=(folder_id,meta)=>{const data={folder_id,meta};sessionStorage.setItem('svnet-case',JSON.stringify(data));localStorage.setItem('svnet-case',JSON.stringify(data));showActive(data);};
-      const readActive=()=>{for(const s of [sessionStorage,localStorage]){try{const d=JSON.parse(s.getItem('svnet-case')||'null');if(d?.folder_id)return d;}catch{}}return null;};
+      const persistActive=(folder_id,meta)=>{const data={folder_id,meta};sessionStorage.setItem('svnet-case',JSON.stringify(data));localStorage.setItem('svnet-case',JSON.stringify(data));showActive(data);};const readActive=()=>{for(const s of[sessionStorage,localStorage]){try{const d=JSON.parse(s.getItem('svnet-case')||'null');if(d?.folder_id)return d;}catch{}}return null;};
       const showActive=d=>{const n=el('vf-active-case');if(!n)return;if(d?.folder_id){const m=d.meta||{};n.className='intern-alert intern-alert--success';n.innerHTML=`<strong>Aktiver Fall:</strong> ${m.schaden_nr||'ohne Schaden-Nr.'}${m.vn_objekt?` · ${m.vn_objekt}`:''}${m.ort?` · ${m.ort}`:''}`;}else{n.className='intern-alert intern-alert--info';n.textContent='Aktiver Fall: keiner geladen.';}};
       const caseData=()=>({schaden_nr:el('vf-schaden')?.value?.trim()||'',versicherungsschein_nr:el('vf-vsnr')?.value?.trim()||'',vn_objekt:el('vf-object')?.value?.trim()||'',ort:el('vf-ort')?.value?.trim()||'',strasse:el('vf-strasse')?.value?.trim()||'',schadenart:el('vf-type')?.value?.trim()||'',reserve:el('vf-reserve')?.value?.trim()||'',kontakt:el('vf-contact')?.value?.trim()||'',fallart:activeType,anweisung:el('vf-instructions')?.value?.trim()||''});
-      const fillCase=(meta={})=>{const map={schaden_nr:'vf-schaden',versicherungsschein_nr:'vf-vsnr',vn_objekt:'vf-object',ort:'vf-ort',strasse:'vf-strasse',schadenart:'vf-type',reserve:'vf-reserve',kontakt:'vf-contact',anweisung:'vf-instructions'};Object.entries(map).forEach(([k,id])=>{const n=el(id);if(n)n.value=meta[k]||'';});if(meta.fallart)activeType=meta.fallart;};
-      el('vf-new-case-toggle')?.addEventListener('click',()=>{const s=el('vf-new-case');if(s)s.hidden=!s.hidden;});
-      async function searchCases(){const q=el('vf-case-search')?.value?.trim()||'', box=el('vf-case-results');if(box)box.innerHTML='<span class="intern-meta">Suche läuft …</span>';try{const data=await api(`${API}?action=search_cases&q=${encodeURIComponent(q)}`);if(!box)return;if(!data.results?.length){box.innerHTML='<div class="intern-alert intern-alert--info">Kein passender Fall gefunden.</div>';return;}box.innerHTML=data.results.map(r=>`<div class="vf-result"><div><strong>${r.meta?.schaden_nr||r.name}</strong><br><span class="intern-meta">${[r.meta?.vn_objekt,r.meta?.strasse,r.meta?.ort,r.meta?.fallart].filter(Boolean).join(' · ')}</span></div><div class="intern-actions"><button class="sv-button sv-button-primary vf-open" data-id="${r.id}" data-url="${r.webViewLink||''}">Fall öffnen</button></div></div>`).join('');box.querySelectorAll('.vf-open').forEach(btn=>btn.addEventListener('click',async()=>{const d=await api(`${API}?action=load_case&id=${encodeURIComponent(btn.dataset.id)}`);el('vf-folder-id').value=d.case.id;fillCase(d.case.meta||{});persistActive(d.case.id,d.case.meta||{});if(btn.dataset.url)window.open(btn.dataset.url,'_blank','noopener,noreferrer');box.innerHTML='';}));}catch(e){if(box)box.innerHTML=`<div class="intern-alert intern-alert--warning">${e.message}</div>`;}};
+      const fillCase=(meta={})=>{const map={schaden_nr:'vf-schaden',versicherungsschein_nr:'vf-vsnr',vn_objekt:'vf-object',ort:'vf-ort',strasse:'vf-strasse',schadenart:'vf-type',reserve:'vf-reserve',kontakt:'vf-contact',anweisung:'vf-instructions'};Object.entries(map).forEach(([k,id])=>{const n=el(id);if(n)n.value=meta[k]||'';});};
+      function setTab(key,save=true){const item=labels[key]||labels.sv;activeType=item.fallart;if(save)localStorage.setItem('svnet-vf-tab',key);document.querySelectorAll('.vf-tab').forEach(b=>{const on=b.dataset.vfTab===key;b.classList.toggle('sv-button-primary',on);b.classList.toggle('sv-button-secondary',!on);b.classList.toggle('is-active',on);});el('vf-title').textContent=item.title;el('vf-description').textContent=item.description;el('vf-package-actions').innerHTML=key==='gf'?'<a class="sv-button sv-button-primary" href="/intern/versicherungsfaelle/sv-gf/">SV-GF Dokumentpaket öffnen</a>':'<span class="intern-meta">Dokumentpaket für diese Fallart wird ergänzt.</span>';}
+      document.querySelectorAll('.vf-tab').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.vfTab||'sv')));el('vf-new-case-toggle')?.addEventListener('click',()=>{const s=el('vf-new-case');if(s)s.hidden=!s.hidden;});
+      async function searchCases(){const q=el('vf-case-search')?.value?.trim()||'',box=el('vf-case-results');box.innerHTML='<span class="intern-meta">Suche läuft …</span>';try{const data=await api(`${API}?action=search_cases&q=${encodeURIComponent(q)}`);if(!data.results?.length){box.innerHTML='<div class="intern-alert intern-alert--info">Kein passender Fall gefunden.</div>';return;}box.innerHTML=data.results.map(r=>`<div class="vf-result"><div><strong>${r.meta?.schaden_nr||r.name}</strong><br><span class="intern-meta">${[r.meta?.vn_objekt,r.meta?.strasse,r.meta?.ort,r.meta?.fallart].filter(Boolean).join(' · ')}</span></div><button class="sv-button sv-button-primary vf-open" data-id="${r.id}" data-url="${r.webViewLink||''}">Fall öffnen</button></div>`).join('');box.querySelectorAll('.vf-open').forEach(btn=>btn.addEventListener('click',async()=>{const d=await api(`${API}?action=load_case&id=${encodeURIComponent(btn.dataset.id)}`);el('vf-folder-id').value=d.case.id;fillCase(d.case.meta||{});persistActive(d.case.id,d.case.meta||{});const ft=d.case.meta?.fallart;if(ft==='SV-GF')setTab('gf');else if(ft==='Andere Versicherer')setTab('andere');else setTab('sv');if(btn.dataset.url)window.open(btn.dataset.url,'_blank','noopener,noreferrer');box.innerHTML='';}));}catch(e){box.innerHTML=`<div class="intern-alert intern-alert--warning">${e.message}</div>`;}}
       el('vf-case-search-btn')?.addEventListener('click',searchCases);el('vf-case-search')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchCases();}});
-      el('vf-save-case')?.addEventListener('click',async()=>{const s=el('vf-save-status');if(s)s.textContent='Speichern …';try{const d=await api(`${API}?action=save_case`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({folder_id:el('vf-folder-id')?.value||'',case:caseData()})});el('vf-folder-id').value=d.folder_id;persistActive(d.folder_id,caseData());if(s)s.textContent='Fall gespeichert und aktiviert.';if(el('vf-new-case'))el('vf-new-case').hidden=true;}catch(e){if(s)s.textContent=e.message;}});
-      el('vf-save-instructions')?.addEventListener('click',()=>{const d=readActive();const s=el('vf-instruction-status');if(!d?.folder_id){if(s)s.textContent='Bitte zuerst einen Fall öffnen oder anlegen.';return;}d.meta={...(d.meta||{}),anweisung:el('vf-instructions')?.value?.trim()||''};persistActive(d.folder_id,d.meta);if(s)s.textContent='Arbeitsauftrag zum aktiven Fall gespeichert.';});
-      document.querySelectorAll('.vf-tab').forEach(button=>button.addEventListener('click',()=>{const key=button.dataset.vfTab||'sv',item=labels[key]||labels.sv;activeType=item.fallart;document.querySelectorAll('.vf-tab').forEach(b=>{b.classList.remove('is-active','sv-button-primary');b.classList.add('sv-button-secondary');});button.classList.add('is-active','sv-button-primary');button.classList.remove('sv-button-secondary');if(el('vf-title'))el('vf-title').textContent=item.title;if(el('vf-description'))el('vf-description').textContent=item.description;if(el('gf-entry'))el('gf-entry').hidden=key!=='gf';if(el('vf-output-info'))el('vf-output-info').innerHTML=key==='gf'?'<strong>SV-GF:</strong> Engel-/QS-spezifische Formulare und Ausgaben stehen im SV-GF-Bereich bereit.':`<strong>${item.title}:</strong> Die spezifischen Prüf- und Ausgabeformulare werden hier ergänzt.`;if(el('vf-package-actions'))el('vf-package-actions').innerHTML=key==='gf'?'<a class="sv-button sv-button-primary" href="/intern/versicherungsfaelle/sv-gf/">Dokumentpaket öffnen</a>':'<span class="intern-meta">Dokumentpaket für diese Fallart wird ergänzt.</span>';}));
-      const fileInput=el('file-documents'),drop=el('vf-document-drop'),status=el('status-documents');const showFiles=files=>{const c=files?.length||0;if(status)status.textContent=c?`${c} Datei/-en ausgewählt · ${el('vf-document-kind')?.selectedOptions?.[0]?.textContent||''}`:'Noch keine Datei ausgewählt.';};drop?.addEventListener('click',()=>fileInput?.click());fileInput?.addEventListener('change',()=>showFiles(fileInput.files));['dragenter','dragover'].forEach(t=>drop?.addEventListener(t,e=>{e.preventDefault();drop.classList.add('is-dragging');}));['dragleave','drop'].forEach(t=>drop?.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('is-dragging');}));drop?.addEventListener('drop',e=>{if(fileInput&&e.dataTransfer?.files?.length){fileInput.files=e.dataTransfer.files;showFiles(fileInput.files);}});
-      const setOauthStatus=(text,type='info')=>{const n=el('vf-oauth-status');if(n){n.className=`intern-alert intern-alert--${type}`;n.textContent=text;}};async function refreshOauth(){try{const s=await api(`${OAUTH}?action=status`);if(el('vf-oauth-redirect'))el('vf-oauth-redirect').textContent=s.redirect_uri||'';if(el('vf-oauth-setup'))el('vf-oauth-setup').hidden=s.client_configured||!s.can_configure;if(el('vf-google-connect'))el('vf-google-connect').hidden=!s.client_configured||s.connected;if(el('vf-google-admin'))el('vf-google-admin').hidden=!s.connected;setOauthStatus(s.connected?'Google Drive ist verbunden.':s.client_configured?'Google OAuth ist eingerichtet. Bitte einmal verbinden.':'Google OAuth ist noch nicht eingerichtet.',s.connected?'success':'warning');return s;}catch(e){setOauthStatus(e.message,'warning');return null;}};
-      el('vf-google-save-client')?.addEventListener('click',async()=>{const out=el('vf-oauth-setup-status');try{await api(`${OAUTH}?action=save_client`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_id:el('vf-google-client-id')?.value?.trim()||'',client_secret:el('vf-google-client-secret')?.value?.trim()||''})});if(out)out.textContent='OAuth-Zugang gespeichert.';await refreshOauth();}catch(e){if(out)out.textContent=e.message;}});el('vf-google-disconnect')?.addEventListener('click',async()=>{if(!confirm('Google-Drive-Verbindung wirklich trennen?'))return;await api(`${OAUTH}?action=disconnect`,{method:'POST'});await refreshOauth();});el('vf-drive-sync')?.addEventListener('click',async()=>{const n=el('vf-drive-status');try{const s=await api(`${API}?action=status`);if(n){n.className='intern-alert intern-alert--success';n.textContent=`Google Drive verbunden · ${s.folders?.cases?.items??0} Fälle gefunden.`;}}catch(e){if(n){n.className='intern-alert intern-alert--warning';n.textContent=e.message;}}});
-      const active=readActive();if(active){el('vf-folder-id').value=active.folder_id;fillCase(active.meta||{});showActive(active);}else showActive(null);refreshOauth();
+      el('vf-save-case')?.addEventListener('click',async()=>{const s=el('vf-save-status');s.textContent='Speichern …';try{const d=await api(`${API}?action=save_case`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({folder_id:el('vf-folder-id')?.value||'',case:caseData()})});el('vf-folder-id').value=d.folder_id;persistActive(d.folder_id,caseData());s.textContent='Gespeichert.';el('vf-new-case').hidden=true;}catch(e){s.textContent=e.message;}});
+      el('vf-save-instructions')?.addEventListener('click',()=>{const d=readActive(),s=el('vf-instruction-status');if(!d?.folder_id){s.textContent='Bitte zuerst einen Fall öffnen oder anlegen.';return;}d.meta={...(d.meta||{}),anweisung:el('vf-instructions')?.value?.trim()||''};persistActive(d.folder_id,d.meta);s.textContent='Arbeitsauftrag gespeichert.';});
+      async function uploadFiles(files){const status=el('status-documents'),d=readActive();if(!d?.folder_id){status.textContent='Bitte zuerst einen Fall öffnen oder anlegen.';return;}if(!files?.length)return;let done=0;for(const file of files){status.textContent=`${done+1}/${files.length} wird gespeichert: ${file.name}`;const fd=new FormData();fd.append('folder_id',d.folder_id);fd.append('kind',el('vf-document-kind')?.value||'fallakte');fd.append('mode',el('vf-document-mode')?.value||'ki');fd.append('file',file);try{await api(`${API}?action=upload_case_document`,{method:'POST',body:fd});done++;}catch(e){status.textContent=`Upload fehlgeschlagen: ${e.message}`;return;}}status.textContent=`${done} Datei/-en im aktiven Fall gespeichert.`;}
+      const fileInput=el('file-documents'),drop=el('vf-document-drop');drop?.addEventListener('click',()=>fileInput?.click());fileInput?.addEventListener('change',()=>uploadFiles(fileInput.files));['dragenter','dragover'].forEach(t=>drop?.addEventListener(t,e=>{e.preventDefault();drop.classList.add('is-dragging');}));['dragleave','drop'].forEach(t=>drop?.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('is-dragging');}));drop?.addEventListener('drop',e=>uploadFiles(e.dataTransfer?.files));
+      const setOauthStatus=(text,type='info')=>{const n=el('vf-oauth-status');n.className=`intern-alert intern-alert--${type}`;n.textContent=text;};async function refreshOauth(){try{const s=await api(`${OAUTH}?action=status`);el('vf-oauth-redirect').textContent=s.redirect_uri||'';el('vf-oauth-setup').hidden=s.client_configured||!s.can_configure;el('vf-google-connect').hidden=!s.client_configured||s.connected;el('vf-google-admin').hidden=!s.connected;setOauthStatus(s.connected?'Google Drive ist verbunden.':s.client_configured?'Google OAuth ist eingerichtet. Bitte einmal verbinden.':'Google OAuth ist noch nicht eingerichtet.',s.connected?'success':'warning');}catch(e){setOauthStatus(e.message,'warning');}}
+      el('vf-google-save-client')?.addEventListener('click',async()=>{const out=el('vf-oauth-setup-status');try{await api(`${OAUTH}?action=save_client`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_id:el('vf-google-client-id')?.value?.trim()||'',client_secret:el('vf-google-client-secret')?.value?.trim()||''})});out.textContent='OAuth-Zugang gespeichert.';await refreshOauth();}catch(e){out.textContent=e.message;}});el('vf-google-disconnect')?.addEventListener('click',async()=>{if(!confirm('Google-Drive-Verbindung wirklich trennen?'))return;await api(`${OAUTH}?action=disconnect`,{method:'POST'});await refreshOauth();});el('vf-drive-sync')?.addEventListener('click',async()=>{const n=el('vf-drive-status');try{const s=await api(`${API}?action=status`);n.className='intern-alert intern-alert--success';n.textContent=`Google Drive verbunden · ${s.folders?.cases?.items??0} Fälle gefunden.`;}catch(e){n.className='intern-alert intern-alert--warning';n.textContent=e.message;}});
+      const active=readActive();if(active){el('vf-folder-id').value=active.folder_id;fillCase(active.meta||{});showActive(active);}else showActive(null);const queryTab=new URLSearchParams(location.search).get('tab'),storedTab=localStorage.getItem('svnet-vf-tab'),caseTab=active?.meta?.fallart==='SV-GF'?'gf':active?.meta?.fallart==='Andere Versicherer'?'andere':active?.meta?.fallart==='SV'?'sv':null;setTab(queryTab||storedTab||caseTab||'sv',false);refreshOauth();
     })();
   </script>
 </InternalLayout>
