@@ -4,9 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/config.php';
 commonHeaders();
 $user = requireAuth();
-if (!in_array($user['role'] ?? '', ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) {
-    apiError(403, 'Keine Berechtigung.');
-}
+if (!in_array($user['role'] ?? '', ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) apiError(403, 'Keine Berechtigung.');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
 if (empty($_FILES['file'])) apiError(400, 'Keine Datei hochgeladen.');
 
@@ -28,29 +26,7 @@ $system = <<<'PROMPT'
 Du analysierst Unterlagen zu deutschen Versicherungs-Schadenfällen und extrahierst ausschließlich eindeutig erkennbare Falldaten. Nichts erfinden. Unklare oder nicht vorhandene Werte als leeren String zurückgeben. Telefonnummern und E-Mail-Adressen exakt übernehmen. Schaden-Nr. und Versicherungsschein-Nr. nicht verwechseln.
 
 Antworte ausschließlich als JSON mit genau diesen Feldern:
-{
-  "schaden_nr":"",
-  "versicherungsschein_nr":"",
-  "vn_objekt":"",
-  "strasse":"",
-  "plz":"",
-  "ort":"",
-  "telefon":"",
-  "mobil":"",
-  "email":"",
-  "vorsteuer":"",
-  "schadenart":"",
-  "schadentag":"",
-  "meldedatum":"",
-  "reserve":"",
-  "kontakt":"",
-  "vermittler_firma":"",
-  "vermittler_ansprechpartner":"",
-  "vermittler_telefon":"",
-  "vermittler_mobil":"",
-  "vermittler_fax":"",
-  "vermittler_email":""
-}
+{"schaden_nr":"","versicherungsschein_nr":"","vn_objekt":"","strasse":"","plz":"","ort":"","telefon":"","mobil":"","email":"","vorsteuer":"","schadenart":"","schadentag":"","meldedatum":"","reserve":"","kontakt":"","vermittler_firma":"","vermittler_ansprechpartner":"","vermittler_telefon":"","vermittler_mobil":"","vermittler_fax":"","vermittler_email":""}
 
 Hinweise:
 - vn_objekt = Versicherungsnehmer / Firmenname / versichertes Objekt, soweit klar erkennbar.
@@ -60,27 +36,27 @@ Hinweise:
 - reserve nur mit Betrag/Währung, wenn ausdrücklich genannt.
 PROMPT;
 
-$content = [];
+$content = [['type'=>'input_text','text'=>'Extrahiere die Falldaten aus dieser Unterlage.']];
 if (str_starts_with($mime, 'image/')) {
-    $content[] = ['type'=>'image_url','image_url'=>['url'=>'data:'.$mime.';base64,'.$base64,'detail'=>'high']];
+    array_unshift($content, ['type'=>'input_image','image_url'=>'data:'.$mime.';base64,'.$base64,'detail'=>'high']);
 } elseif (str_starts_with($mime, 'text/') || $mime === 'application/csv') {
     $text = mb_substr((string)$bytes, 0, 180000, 'UTF-8');
-    $content[] = ['type'=>'text','text'=>'Datei: '.$name."\n\n".$text];
+    array_unshift($content, ['type'=>'input_text','text'=>'Datei: '.$name."\n\n".$text]);
 } else {
-    $content[] = ['type'=>'file','file'=>['filename'=>$name,'file_data'=>'data:'.$mime.';base64,'.$base64]];
+    array_unshift($content, ['type'=>'input_file','filename'=>$name,'file_data'=>$base64]);
 }
-$content[] = ['type'=>'text','text'=>'Extrahiere die Falldaten aus dieser Unterlage.'];
 
 $payload = [
-    'model'=>env('OPENAI_MODEL','gpt-4o'),
-    'messages'=>[
-        ['role'=>'system','content'=>$system],
-        ['role'=>'user','content'=>$content],
-    ],
-    'temperature'=>0.0,
-    'max_tokens'=>2200,
+    'model'=>env('OPENAI_MODEL','gpt-5.4-mini'),
+    'instructions'=>$system,
+    'input'=>[[
+        'role'=>'user',
+        'content'=>$content,
+    ]],
+    'max_output_tokens'=>2200,
 ];
-$ch = curl_init('https://api.openai.com/v1/chat/completions');
+
+$ch = curl_init('https://api.openai.com/v1/responses');
 curl_setopt_array($ch,[
     CURLOPT_RETURNTRANSFER=>true,
     CURLOPT_POST=>true,
@@ -95,11 +71,24 @@ $error = curl_error($ch);
 curl_close($ch);
 if ($response === false || $error !== '') apiError(503, 'KI-Verbindung fehlgeschlagen.');
 if ($status < 200 || $status >= 300) {
-    error_log('[insurance-case-extract] OpenAI '.$status.' '.substr((string)$response,0,1200));
-    apiError(503, 'Falldaten konnten nicht automatisch ausgelesen werden.');
+    error_log('[insurance-case-extract] OpenAI '.$status.' '.substr((string)$response,0,1600));
+    $decodedError = json_decode((string)$response,true);
+    $msg = trim((string)($decodedError['error']['message'] ?? ''));
+    apiError(503, $msg !== '' ? 'Falldaten konnten nicht automatisch ausgelesen werden: '.$msg : 'Falldaten konnten nicht automatisch ausgelesen werden.');
 }
+
 $decoded = json_decode((string)$response,true);
-$text = trim((string)($decoded['choices'][0]['message']['content'] ?? ''));
+$text = '';
+if (isset($decoded['output_text']) && is_string($decoded['output_text'])) $text = trim($decoded['output_text']);
+if ($text === '') {
+    foreach (($decoded['output'] ?? []) as $item) {
+        if (($item['type'] ?? '') !== 'message') continue;
+        foreach (($item['content'] ?? []) as $part) {
+            if (($part['type'] ?? '') === 'output_text' && isset($part['text'])) $text .= (string)$part['text'];
+        }
+    }
+    $text = trim($text);
+}
 if (preg_match('/```(?:json)?\s*(\{.*\})\s*```/s',$text,$m)) $text=$m[1];
 $data = json_decode($text,true);
 if (!is_array($data)) {
