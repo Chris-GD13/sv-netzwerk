@@ -46,10 +46,14 @@ const { route, recordId = '' } = Astro.props;
 
   /**
    * Nach erfolgreichem Vollimport wird die Exportansicht aufgerufen.
-   * Die eigentliche Gutachtenerzeugung bleibt in der bestehenden Exportlogik.
+   * Im Foto-only-Modus bleiben wir bewusst auf der Importseite, damit zuerst
+   * die Anzahl der wiederhergestellten Fotos geprüft werden kann.
    */
   const installSharePointAutoReport = (root: HTMLElement) => {
     if (root.dataset.route !== 'sharepoint-import') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('photo_only') === '1') return;
+
     let running = false;
     const observer = new MutationObserver(() => {
       if (running) return;
@@ -66,6 +70,29 @@ const { route, recordId = '' } = Astro.props;
       }, 700);
     });
     observer.observe(root, { subtree: true, childList: true, characterData: true });
+  };
+
+  /**
+   * Direkter Schnellweg fuer "Nur Fotos aus SharePoint neu zuordnen".
+   * Nach dem Aufruf aus Word-Master wird nicht nur die Importseite geöffnet,
+   * sondern der vorhandene SharePoint-Einleselauf automatisch gestartet.
+   */
+  const installPhotoOnlyAutostart = (root: HTMLElement) => {
+    if (root.dataset.route !== 'sharepoint-import') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('photo_only') !== '1') return;
+
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      const button = root.querySelector<HTMLButtonElement>('#sp-auto-read-btn');
+      if (button && !button.disabled) {
+        window.clearInterval(timer);
+        button.click();
+        return;
+      }
+      if (attempts >= 120) window.clearInterval(timer);
+    }, 250);
   };
 
   /** Startet in der Exportansicht das Gutachten automatisch, wenn der Vollimport dies anfordert. */
@@ -109,8 +136,6 @@ const { route, recordId = '' } = Astro.props;
       running = next;
       if (running) {
         localStorage.setItem('svnet-report-running', JSON.stringify({ started_at: new Date().toISOString(), path: location.pathname }));
-        // Der Portal-Inaktivitaetstimer lauscht auf Benutzeraktivitaetsereignisse.
-        // Ein periodisches Ereignis verhindert waehrend eines aktiven Exports den 60-Minuten-Logout.
         keepAliveTimer = window.setInterval(() => {
           document.dispatchEvent(new Event('mousemove'));
         }, 5 * 60 * 1000);
@@ -162,6 +187,7 @@ const { route, recordId = '' } = Astro.props;
         settled = true;
         window.clearTimeout(timeout);
         installSharePointAutoReport(root);
+        installPhotoOnlyAutostart(root);
         installExportAutostart(root);
         installLongExportGuard(root);
       })
