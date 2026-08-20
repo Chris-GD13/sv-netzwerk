@@ -28,11 +28,16 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
       const STORAGE_KEY = 'sv-sharepoint-import-mode';
       const PRESERVE_KEY = 'sv-sharepoint-preserve-photo-assignments';
       const PHOTO_SOURCE = 'VS Schäden/Marc/Privatgutachten/2026/Bundesministerium Verteidigung_Bonn';
+      const OCR_DB = 'sv-netzwerk-photo-index';
+      const OCR_STORE = 'ocr-checkpoints';
       const originalFetch = window.fetch.bind(window);
       const query = new URLSearchParams(window.location.search);
       const photoOnlyRequested = query.get('photo_only') === '1';
       let mode = photoOnlyRequested ? 'photos' : (localStorage.getItem(STORAGE_KEY) || 'complete');
       let preserveAssignments = photoOnlyRequested ? false : localStorage.getItem(PRESERVE_KEY) !== 'false';
+      const photoById = new Map();
+      const photoByName = new Map();
+
       if (photoOnlyRequested) {
         localStorage.setItem(STORAGE_KEY, 'photos');
         localStorage.setItem(PRESERVE_KEY, 'false');
@@ -45,6 +50,93 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
         const root = document.querySelector('[data-building-id]');
         return Number(root?.getAttribute('data-building-id') || 1);
       };
+
+      const projectKey = () => `${location.pathname.split('/').filter(Boolean)[1] || 'fensterpruefung-bonn'}:${buildingId()}`;
+      const ocrKey = (photo) => `${projectKey()}|${String(photo?.id || '')}|${String(photo?.name || '')}|${Number(photo?.size || 0)}`;
+
+      const openOcrDb = () => new Promise((resolve, reject) => {
+        const request = indexedDB.open(OCR_DB, 2);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains(OCR_STORE)) db.createObjectStore(OCR_STORE, { keyPath: 'key' });
+        };
+      });
+
+      const getOcrCheckpoint = async (photo) => {
+        if (!photo?.name) return null;
+        try {
+          const db = await openOcrDb();
+          return await new Promise((resolve) => {
+            const tx = db.transaction(OCR_STORE, 'readonly');
+            const request = tx.objectStore(OCR_STORE).get(ocrKey(photo));
+            request.onsuccess = () => resolve(request.result || null);
+            request.onerror = () => resolve(null);
+            tx.oncomplete = () => db.close();
+          });
+        } catch {
+          return null;
+        }
+      };
+
+      const putOcrCheckpoint = async (photo, text) => {
+        if (!photo?.name) return;
+        try {
+          const db = await openOcrDb();
+          await new Promise((resolve) => {
+            const tx = db.transaction(OCR_STORE, 'readwrite');
+            tx.objectStore(OCR_STORE).put({
+              key: ocrKey(photo),
+              project: projectKey(),
+              item_id: String(photo.id || ''),
+              name: String(photo.name || ''),
+              size: Number(photo.size || 0),
+              text: String(text || ''),
+              analyzed_at: new Date().toISOString(),
+            });
+            tx.oncomplete = resolve;
+            tx.onerror = resolve;
+          });
+          db.close();
+        } catch {}
+      };
+
+      const tinyPng = Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='), c => c.charCodeAt(0));
+
+      // Tesseract wird im bestehenden Client dynamisch geladen. Wir kapseln die
+      // recognize-Funktion, sobald sie gesetzt wird. Vorhandene OCR-Ergebnisse
+      // werden sofort aus IndexedDB geliefert; neue Ergebnisse werden unmittelbar
+      // nach jedem einzelnen Foto gespeichert. Ein Abbruch verliert daher nicht
+      // mehr die bereits analysierten Bilder.
+      let tesseractValue = window.Tesseract;
+      const wrapTesseract = (value) => {
+        if (!value || typeof value.recognize !== 'function' || value.__svCheckpointWrapped) return value;
+        const originalRecognize = value.recognize.bind(value);
+        value.recognize = async (source, lang, options) => {
+          const name = source && typeof source === 'object' && 'name' in source ? String(source.name || '') : '';
+          const photo = photoByName.get(name);
+          if (photo) {
+            const cached = await getOcrCheckpoint(photo);
+            if (cached && typeof cached.text === 'string') {
+              return { data: { text: cached.text } };
+            }
+          }
+          const result = await originalRecognize(source, lang, options);
+          if (photo) await putOcrCheckpoint(photo, result?.data?.text || '');
+          return result;
+        };
+        Object.defineProperty(value, '__svCheckpointWrapped', { value: true });
+        return value;
+      };
+      if (tesseractValue) tesseractValue = wrapTesseract(tesseractValue);
+      try {
+        Object.defineProperty(window, 'Tesseract', {
+          configurable: true,
+          get: () => tesseractValue,
+          set: (value) => { tesseractValue = wrapTesseract(value); },
+        });
+      } catch {}
 
       const normalizeNumber = (value) => {
         const match = String(value ?? '').match(/\d+/);
@@ -85,23 +177,56 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
         el.textContent = message;
       };
 
+      const isAlreadyImported = async (payload) => {
+        const itemId = String(payload?.item_id || '');
+        const fileName = String(payload?.file_name || '');
+        if (!itemId && !fileName) return false;
+        try {
+          const response = await originalFetch('/intern/api/sharepoint-delta.php?action=filter', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              building_id: buildingId(),
+              mode: 'complete',
+              photos: [{ id: itemId, name: fileName }],
+            }),
+          });
+          if (!response.ok) return false;
+          const json = await response.json();
+          return Number(json?.skipped || 0) > 0;
+        } catch {
+          return false;
+        }
+      };
+
       window.fetch = async (input, init = {}) => {
         let requestInput = input;
         const rawUrl = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
         const method = String(init.method || (input instanceof Request ? input.method : 'GET')).toUpperCase();
 
-        // Foto-only: Die komplette Projektablage rekursiv als Fotoquelle verwenden.
-        // Das entspricht dem lokal synchronisierten OneDrive-Pfad des Anwenders,
-        // wird serverseitig aber stabil über Microsoft Graph/SharePoint gelesen.
         if (mode === 'photos' && method === 'GET' && rawUrl.includes('sharepoint.php?action=list_sharepoint_photos')) {
           requestInput = '/intern/api/sharepoint-project-photos.php';
           info(`Nur Fotos: Projektordner „${PHOTO_SOURCE}“ wird rekursiv eingelesen. Fenster, Räume, Etagen und Excel-Daten bleiben unverändert.`, 'warning');
         }
 
-        const url = typeof requestInput === 'string' ? requestInput : requestInput instanceof Request ? requestInput.url : String(requestInput);
+        // Bereits OCR-analysierte SharePoint-Dateien werden nicht erneut vollständig
+        // heruntergeladen. Die Reihenfolge bleibt erhalten, der Client erhält nur ein
+        // minimales Platzhalterbild; die gepufferte OCR-Antwort liefert anschließend
+        // das gespeicherte Ergebnis.
+        if (method === 'GET' && rawUrl.includes('sharepoint.php?action=sharepoint_photo')) {
+          try {
+            const id = new URL(rawUrl, location.origin).searchParams.get('id') || '';
+            const photo = photoById.get(id);
+            if (photo && await getOcrCheckpoint(photo)) {
+              return new Response(tinyPng, {
+                status: 200,
+                headers: { 'Content-Type': photo.mime_type || 'image/png', 'Cache-Control': 'no-store', 'X-SV-OCR-Checkpoint': 'hit' },
+              });
+            }
+          } catch {}
+        }
 
-        // Foto-only: Excel bewusst NICHT anwenden. Stattdessen werden die bereits
-        // vorhandenen Fenster und Flügel als Zielmatrix für die Fotoanalyse geliefert.
         if (mode === 'photos' && method === 'POST' && rawUrl.includes('sharepoint.php?action=apply_excel')) {
           const targetResponse = await originalFetch(`/intern/api/sharepoint-photo-targets.php?building_id=${encodeURIComponent(buildingId())}`, {
             method: 'GET',
@@ -110,9 +235,7 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
             cache: 'no-store',
           });
           const body = await targetResponse.text();
-          if (!targetResponse.ok) {
-            return new Response(body, { status: targetResponse.status, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
-          }
+          if (!targetResponse.ok) return new Response(body, { status: targetResponse.status, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
           try {
             const parsed = JSON.parse(body);
             info(`Nur Fotos: ${parsed.targets_found || 0} vorhandene Fenster-/Flügelziele werden verwendet. Quelle: ${PHOTO_SOURCE}.`, 'success');
@@ -140,15 +263,38 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
           }
         }
 
+        // Bereits erfolgreich übernommene Fotos werden nicht nochmals an das Backend
+        // übertragen. So bleiben Wiederanläufe idempotent und erzeugen keine Dubletten.
+        if (method === 'POST' && rawUrl.includes('sharepoint.php?action=import_sharepoint_photo') && typeof init.body === 'string') {
+          try {
+            const payload = JSON.parse(init.body);
+            if (await isAlreadyImported(payload)) {
+              return new Response(JSON.stringify({ ok: true, skipped: true, message: 'Bereits übernommen; vorhandene Zuordnung wird wiederverwendet.' }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
+              });
+            }
+          } catch {}
+        }
+
         const response = await originalFetch(requestInput, init);
 
-        if (response.ok && method === 'GET' && rawUrl.includes('sharepoint.php?action=list_sharepoint_photos') && mode === 'photos') {
+        if (response.ok && method === 'GET' && rawUrl.includes('sharepoint.php?action=list_sharepoint_photos')) {
           try {
             const json = await response.clone().json();
             const photos = Array.isArray(json?.photos) ? json.photos : [];
-            info(`Nur Fotos: ${photos.length} Bilder aus „${json?.source_path || PHOTO_SOURCE}“ gefunden. Zuordnung zum vorhandenen Fensterbestand läuft.`, 'success');
+            photoById.clear();
+            photoByName.clear();
+            for (const photo of photos) {
+              if (photo?.id) photoById.set(String(photo.id), photo);
+              if (photo?.name) photoByName.set(String(photo.name), photo);
+            }
+            let cached = 0;
+            for (const photo of photos) if (await getOcrCheckpoint(photo)) cached++;
+            if (mode === 'photos') {
+              info(`Nur Fotos: ${photos.length} Bilder gefunden. ${cached} OCR-Ergebnisse sind bereits als Checkpoint vorhanden und werden ohne erneute Bildanalyse wiederverwendet.`, 'success');
+            }
           } catch {}
-          return response;
         }
 
         if (response.ok && method === 'GET' && rawUrl.includes('sharepoint.php?action=list_sharepoint_photos') && mode !== 'full' && mode !== 'photos' && preserveAssignments) {
@@ -187,7 +333,7 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                body: JSON.stringify({ building_id: buildingId(), item_id: itemId, payload }),
+                body: JSON.stringify({ building_id: buildingId(), item_id: itemId, name: payload?.file_name || '', payload }),
               });
             }
           } catch (error) {
@@ -219,7 +365,7 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
           if (mode === 'full') {
             info('Vollständiger Neuimport: alle Excel-Daten und alle SharePoint-Fotos werden erneut verarbeitet. Dieser Modus kann bei großen Fotobeständen lange dauern.', 'warning');
           } else if (mode === 'photos') {
-            info(`Nur Fotos neu zuordnen: Quelle „${PHOTO_SOURCE}“ wird rekursiv geladen. Vorhandene Fenster, Räume, Etagen und Excel-Daten bleiben unverändert.`, 'warning');
+            info(`Nur Fotos neu zuordnen: Quelle „${PHOTO_SOURCE}“ wird rekursiv gelesen. OCR-Checkpoints und bereits übernommene Fotozuordnungen werden wiederverwendet; nur neue oder geänderte Bilder müssen tatsächlich analysiert werden.`, 'warning');
           } else if (mode === 'new') {
             info('Nur neu: vorhandene Fensternummern und bereits zugeordnete Fotos werden übersprungen.');
           } else {
