@@ -87,6 +87,65 @@ const { route, recordId = '' } = Astro.props;
     }, 250);
   };
 
+  /**
+   * Schutz fuer lange Gutachtenlaeufe: Der Client-Logout nach 60 Minuten darf einen
+   * aktiven Export nicht mehr beenden. Zusaetzlich wird vor versehentlichem Schliessen
+   * oder Aktualisieren des Tabs gewarnt, solange der Export laeuft.
+   */
+  const installLongExportGuard = (root: HTMLElement) => {
+    if (root.dataset.route !== 'export') return;
+    let running = false;
+    let keepAliveTimer: number | null = null;
+
+    const beforeUnload = (event: BeforeUnloadEvent) => {
+      if (!running) return;
+      event.preventDefault();
+      event.returnValue = 'Das Gutachten wird noch erzeugt.';
+    };
+    window.addEventListener('beforeunload', beforeUnload);
+
+    const setRunning = (next: boolean) => {
+      if (running === next) return;
+      running = next;
+      if (running) {
+        localStorage.setItem('svnet-report-running', JSON.stringify({ started_at: new Date().toISOString(), path: location.pathname }));
+        // Der Portal-Inaktivitaetstimer lauscht auf Benutzeraktivitaetsereignisse.
+        // Ein periodisches Ereignis verhindert waehrend eines aktiven Exports den 60-Minuten-Logout.
+        keepAliveTimer = window.setInterval(() => {
+          document.dispatchEvent(new Event('mousemove'));
+        }, 5 * 60 * 1000);
+      } else {
+        localStorage.removeItem('svnet-report-running');
+        if (keepAliveTimer !== null) window.clearInterval(keepAliveTimer);
+        keepAliveTimer = null;
+      }
+    };
+
+    let attempts = 0;
+    const install = window.setInterval(() => {
+      attempts += 1;
+      const button = root.querySelector<HTMLButtonElement>('#create-report');
+      const progress = root.querySelector<HTMLElement>('#report-progress');
+      if (!button || !progress) {
+        if (attempts >= 80) window.clearInterval(install);
+        return;
+      }
+      window.clearInterval(install);
+      const sync = () => {
+        const text = progress.textContent ?? '';
+        const active = button.disabled && !progress.hidden && /geladen|aufbereitet|ermittelt|archiviert|Gutachten|Fotos|Fensterdaten/i.test(text);
+        setRunning(active);
+      };
+      new MutationObserver(sync).observe(progress, { subtree: true, childList: true, characterData: true, attributes: true });
+      new MutationObserver(sync).observe(button, { attributes: true, attributeFilter: ['disabled'] });
+      sync();
+    }, 250);
+
+    window.addEventListener('pagehide', () => {
+      if (keepAliveTimer !== null) window.clearInterval(keepAliveTimer);
+    }, { once: true });
+  };
+
   const roots = document.querySelectorAll('[data-internal-app]');
   roots.forEach((root) => {
     if (!(root instanceof HTMLElement)) return;
@@ -104,6 +163,7 @@ const { route, recordId = '' } = Astro.props;
         window.clearTimeout(timeout);
         installSharePointAutoReport(root);
         installExportAutostart(root);
+        installLongExportGuard(root);
       })
       .catch((error: unknown) => {
         settled = true;
