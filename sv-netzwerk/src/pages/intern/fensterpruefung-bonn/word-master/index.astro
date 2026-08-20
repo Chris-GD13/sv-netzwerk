@@ -24,6 +24,7 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
       <div class="intern-actions" style="gap:10px;flex-wrap:wrap;margin-top:14px">
         <button id="preview-photos" class="sv-button sv-button-secondary" type="button">Fotozuordnung prüfen</button>
         <button id="apply-photos" class="sv-button sv-button-primary" type="button" disabled>Fotozuordnung korrigieren</button>
+        <a class="sv-button sv-button-primary" href="/intern/fensterpruefung-bonn/sharepoint-import/?photo_only=1&building_id=1">Nur Fotos aus SharePoint neu zuordnen</a>
       </div>
       <div id="photo-result" style="margin-top:14px"></div>
     </section>
@@ -36,7 +37,7 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
       const wr=document.getElementById('word-result'), pr=document.getElementById('photo-result'), si=document.getElementById('source-info');
       const wp=document.getElementById('preview-word'), wa=document.getElementById('apply-word');
       const pp=document.getElementById('preview-photos'), pa=document.getElementById('apply-photos');
-      const esc=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+      const esc=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
       if (si) si.innerHTML = archiveId > 0 ? `<strong>Ausgewählte Archivfassung: #${archiveId}</strong>${archiveName ? ` · ${esc(archiveName)}` : ''}` : 'Keine Archivfassung ausgewählt. Bitte über „Gutachten → Als Master prüfen“ öffnen.';
       if (!archiveId) { if (wp) wp.disabled=true; if (wa) wa.disabled=true; }
 
