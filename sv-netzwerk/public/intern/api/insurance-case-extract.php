@@ -43,7 +43,8 @@ if (str_starts_with($mime, 'image/')) {
     $text = mb_substr((string)$bytes, 0, 180000, 'UTF-8');
     array_unshift($content, ['type'=>'input_text','text'=>'Datei: '.$name."\n\n".$text]);
 } else {
-    array_unshift($content, ['type'=>'input_file','filename'=>$name,'file_data'=>$base64]);
+    // Responses API erwartet file_data als Data-URL, nicht als nackten Base64-String.
+    array_unshift($content, ['type'=>'input_file','filename'=>$name,'file_data'=>'data:'.$mime.';base64,'.$base64]);
 }
 
 $payload = [
