@@ -44,11 +44,6 @@ const { route, recordId = '' } = Astro.props;
     root.querySelector('[data-reload-portal]')?.addEventListener('click', () => window.location.reload());
   };
 
-  /**
-   * Nach erfolgreichem Vollimport wird die Exportansicht aufgerufen.
-   * Im Foto-only-Modus bleiben wir bewusst auf der Importseite, damit zuerst
-   * die Anzahl der wiederhergestellten Fotos geprüft werden kann.
-   */
   const installSharePointAutoReport = (root: HTMLElement) => {
     if (root.dataset.route !== 'sharepoint-import') return;
     const params = new URLSearchParams(window.location.search);
@@ -72,11 +67,6 @@ const { route, recordId = '' } = Astro.props;
     observer.observe(root, { subtree: true, childList: true, characterData: true });
   };
 
-  /**
-   * Direkter Schnellweg fuer "Nur Fotos aus SharePoint neu zuordnen".
-   * Nach dem Aufruf aus Word-Master wird nicht nur die Importseite geöffnet,
-   * sondern der vorhandene SharePoint-Einleselauf automatisch gestartet.
-   */
   const installPhotoOnlyAutostart = (root: HTMLElement) => {
     if (root.dataset.route !== 'sharepoint-import') return;
     const params = new URLSearchParams(window.location.search);
@@ -95,7 +85,59 @@ const { route, recordId = '' } = Astro.props;
     }, 250);
   };
 
-  /** Startet in der Exportansicht das Gutachten automatisch, wenn der Vollimport dies anfordert. */
+  /**
+   * Fotoanalyse kann bei mehreren tausend Bildern deutlich laenger als die normale
+   * Inaktivitaetsfrist dauern. Solange der Foto-only-Lauf laeuft, halten wir deshalb
+   * die Portalsitzung aktiv und warnen vor versehentlichem Schliessen/Aktualisieren.
+   */
+  const installLongPhotoImportGuard = (root: HTMLElement) => {
+    if (root.dataset.route !== 'sharepoint-import') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('photo_only') !== '1') return;
+
+    let running = true;
+    const startedAt = new Date().toISOString();
+    localStorage.setItem('svnet-photo-import-running', JSON.stringify({ started_at: startedAt, path: location.pathname + location.search }));
+
+    const keepAlive = () => {
+      // Der bestehende Client-Inaktivitaetszaehler reagiert auf Benutzeraktivitaet.
+      document.dispatchEvent(new Event('mousemove', { bubbles: true }));
+      document.dispatchEvent(new Event('keydown', { bubbles: true }));
+    };
+    keepAlive();
+    const keepAliveTimer = window.setInterval(keepAlive, 2 * 60 * 1000);
+
+    const beforeUnload = (event: BeforeUnloadEvent) => {
+      if (!running) return;
+      event.preventDefault();
+      event.returnValue = 'Die Fotoanalyse läuft noch. Seite nicht schließen oder aktualisieren.';
+    };
+    window.addEventListener('beforeunload', beforeUnload);
+
+    const finish = () => {
+      if (!running) return;
+      running = false;
+      localStorage.removeItem('svnet-photo-import-running');
+      window.clearInterval(keepAliveTimer);
+      window.removeEventListener('beforeunload', beforeUnload);
+    };
+
+    // Erst beenden, wenn die Analyse/Übernahme nachweislich fertig ist. Ein bloßer
+    // Seitenwechsel oder ein leerer Zwischenstatus beendet den Schutz nicht.
+    const observer = new MutationObserver(() => {
+      const photoStatus = root.querySelector<HTMLElement>('#photo-status')?.textContent ?? '';
+      const uploadStatus = root.querySelector<HTMLElement>('#photo-upload-status')?.textContent ?? '';
+      const combined = `${photoStatus} ${uploadStatus}`;
+      if (/vollständig aus SharePoint übernommen|Fotos? (?:wurden )?übernommen|Fotos? erfolgreich übernommen/i.test(combined)) {
+        finish();
+        observer.disconnect();
+      }
+    });
+    observer.observe(root, { subtree: true, childList: true, characterData: true });
+
+    window.addEventListener('pagehide', () => window.clearInterval(keepAliveTimer), { once: true });
+  };
+
   const installExportAutostart = (root: HTMLElement) => {
     if (root.dataset.route !== 'export') return;
     const params = new URLSearchParams(window.location.search);
@@ -114,11 +156,6 @@ const { route, recordId = '' } = Astro.props;
     }, 250);
   };
 
-  /**
-   * Schutz fuer lange Gutachtenlaeufe: Der Client-Logout nach 60 Minuten darf einen
-   * aktiven Export nicht mehr beenden. Zusaetzlich wird vor versehentlichem Schliessen
-   * oder Aktualisieren des Tabs gewarnt, solange der Export laeuft.
-   */
   const installLongExportGuard = (root: HTMLElement) => {
     if (root.dataset.route !== 'export') return;
     let running = false;
@@ -188,6 +225,7 @@ const { route, recordId = '' } = Astro.props;
         window.clearTimeout(timeout);
         installSharePointAutoReport(root);
         installPhotoOnlyAutostart(root);
+        installLongPhotoImportGuard(root);
         installExportAutostart(root);
         installLongExportGuard(root);
       })
