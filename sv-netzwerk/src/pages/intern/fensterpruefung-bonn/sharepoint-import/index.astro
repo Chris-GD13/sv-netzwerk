@@ -27,6 +27,7 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
     (() => {
       const STORAGE_KEY = 'sv-sharepoint-import-mode';
       const PRESERVE_KEY = 'sv-sharepoint-preserve-photo-assignments';
+      const PHOTO_SOURCE = 'VS Schäden/Marc/Privatgutachten/2026/Bundesministerium Verteidigung_Bonn';
       const originalFetch = window.fetch.bind(window);
       const query = new URLSearchParams(window.location.search);
       const photoOnlyRequested = query.get('photo_only') === '1';
@@ -85,12 +86,23 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
       };
 
       window.fetch = async (input, init = {}) => {
-        const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
+        let requestInput = input;
+        const rawUrl = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
         const method = String(init.method || (input instanceof Request ? input.method : 'GET')).toUpperCase();
+
+        // Foto-only: Die komplette Projektablage rekursiv als Fotoquelle verwenden.
+        // Das entspricht dem lokal synchronisierten OneDrive-Pfad des Anwenders,
+        // wird serverseitig aber stabil über Microsoft Graph/SharePoint gelesen.
+        if (mode === 'photos' && method === 'GET' && rawUrl.includes('sharepoint.php?action=list_sharepoint_photos')) {
+          requestInput = '/intern/api/sharepoint-project-photos.php';
+          info(`Nur Fotos: Projektordner „${PHOTO_SOURCE}“ wird rekursiv eingelesen. Fenster, Räume, Etagen und Excel-Daten bleiben unverändert.`, 'warning');
+        }
+
+        const url = typeof requestInput === 'string' ? requestInput : requestInput instanceof Request ? requestInput.url : String(requestInput);
 
         // Foto-only: Excel bewusst NICHT anwenden. Stattdessen werden die bereits
         // vorhandenen Fenster und Flügel als Zielmatrix für die Fotoanalyse geliefert.
-        if (mode === 'photos' && method === 'POST' && url.includes('sharepoint.php?action=apply_excel')) {
+        if (mode === 'photos' && method === 'POST' && rawUrl.includes('sharepoint.php?action=apply_excel')) {
           const targetResponse = await originalFetch(`/intern/api/sharepoint-photo-targets.php?building_id=${encodeURIComponent(buildingId())}`, {
             method: 'GET',
             credentials: 'same-origin',
@@ -103,13 +115,12 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
           }
           try {
             const parsed = JSON.parse(body);
-            info(`Nur Fotos: ${parsed.targets_found || 0} vorhandene Fenster-/Flügelziele werden verwendet. Excel-, Raum- und Fensterdaten bleiben unverändert.`, 'success');
+            info(`Nur Fotos: ${parsed.targets_found || 0} vorhandene Fenster-/Flügelziele werden verwendet. Quelle: ${PHOTO_SOURCE}.`, 'success');
           } catch {}
           return new Response(body, { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' } });
         }
 
-        // "Nur neu": bereits vorhandene Fensternummern vor dem Apply-Schritt aus dem Nachtrag entfernen.
-        if (mode === 'new' && method === 'POST' && url.includes('sharepoint.php?action=apply_excel') && typeof init.body === 'string') {
+        if (mode === 'new' && method === 'POST' && rawUrl.includes('sharepoint.php?action=apply_excel') && typeof init.body === 'string') {
           try {
             const payload = JSON.parse(init.body);
             if (Array.isArray(payload?.rows)) {
@@ -129,12 +140,18 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
           }
         }
 
-        const response = await originalFetch(input, init);
+        const response = await originalFetch(requestInput, init);
 
-        // Fotoliste nur als Metadaten laden und danach serverseitig gegen bereits importierte Fotos abgleichen.
-        // Im Foto-only-Modus wird absichtlich NICHT gefiltert: dort sollen alle SharePoint-Fotos erneut
-        // gegen den aktuellen Fensterbestand verarbeitet werden.
-        if (response.ok && method === 'GET' && url.includes('sharepoint.php?action=list_sharepoint_photos') && mode !== 'full' && mode !== 'photos' && preserveAssignments) {
+        if (response.ok && method === 'GET' && rawUrl.includes('sharepoint.php?action=list_sharepoint_photos') && mode === 'photos') {
+          try {
+            const json = await response.clone().json();
+            const photos = Array.isArray(json?.photos) ? json.photos : [];
+            info(`Nur Fotos: ${photos.length} Bilder aus „${json?.source_path || PHOTO_SOURCE}“ gefunden. Zuordnung zum vorhandenen Fensterbestand läuft.`, 'success');
+          } catch {}
+          return response;
+        }
+
+        if (response.ok && method === 'GET' && rawUrl.includes('sharepoint.php?action=list_sharepoint_photos') && mode !== 'full' && mode !== 'photos' && preserveAssignments) {
           try {
             const json = await response.clone().json();
             const photos = Array.isArray(json?.photos) ? json.photos : [];
@@ -160,8 +177,7 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
           }
         }
 
-        // Erfolgreich importierte SharePoint-Fotos dauerhaft als verarbeitet merken.
-        if (response.ok && method === 'POST' && url.includes('sharepoint.php?action=import_sharepoint_photo')) {
+        if (response.ok && method === 'POST' && rawUrl.includes('sharepoint.php?action=import_sharepoint_photo')) {
           try {
             let payload = {};
             if (typeof init.body === 'string') payload = JSON.parse(init.body);
@@ -203,7 +219,7 @@ import InternalAppShell from '../../../../components/internal/InternalAppShell.a
           if (mode === 'full') {
             info('Vollständiger Neuimport: alle Excel-Daten und alle SharePoint-Fotos werden erneut verarbeitet. Dieser Modus kann bei großen Fotobeständen lange dauern.', 'warning');
           } else if (mode === 'photos') {
-            info('Nur Fotos neu zuordnen: vorhandene Fenster, Räume, Etagen und Excel-Daten bleiben unverändert. Alle SharePoint-Fotos werden erneut gegen den bestehenden Fenster-/Flügelbestand analysiert und registriert.', 'warning');
+            info(`Nur Fotos neu zuordnen: Quelle „${PHOTO_SOURCE}“ wird rekursiv geladen. Vorhandene Fenster, Räume, Etagen und Excel-Daten bleiben unverändert.`, 'warning');
           } else if (mode === 'new') {
             info('Nur neu: vorhandene Fensternummern und bereits zugeordnete Fotos werden übersprungen.');
           } else {
