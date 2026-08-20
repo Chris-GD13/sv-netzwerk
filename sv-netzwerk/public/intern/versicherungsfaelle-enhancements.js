@@ -47,6 +47,7 @@
   const save=el('vf-save-case');
   const saveStatus=el('vf-save-status');
   if(save){
+    save.textContent='Speichern';
     const wrap=document.createElement('div');wrap.className='vf-save-inline';wrap.appendChild(save);if(saveStatus) wrap.appendChild(saveStatus);originalGrid.appendChild(wrap);if(actionWrap && !actionWrap.children.length) actionWrap.remove();
   }
 
