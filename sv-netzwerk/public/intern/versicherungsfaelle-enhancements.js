@@ -14,6 +14,9 @@
     #vf-new-case .vf-case-row .vf-save-inline{display:flex;align-items:flex-end;gap:8px;min-width:0}
     #vf-new-case .vf-case-row .vf-input{height:44px;min-width:0;width:100%}
     #vf-new-case .vf-save-inline .sv-button{white-space:nowrap}
+    #vf-active-case-wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;margin-top:10px}
+    #vf-active-case-wrap #vf-active-case{margin-top:0!important;min-width:0}
+    #vf-close-active-case{white-space:nowrap}
     #vf-case-autofill-drop{margin:10px 0 14px;border:2px dashed #b8c8d6;border-radius:12px;padding:14px 16px;background:#f8fbfd;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:48px;max-width:100%;box-sizing:border-box}
     #vf-case-autofill-drop.is-dragging{border-color:#ff970f;background:#fff7eb}
     #vf-case-autofill-drop strong{display:block}
@@ -21,10 +24,35 @@
     #vf-case-autofill-status{margin-top:-6px;margin-bottom:10px}
     @media(max-width:1350px){#vf-new-case .vf-case-row{grid-template-columns:repeat(5,minmax(0,1fr))}}
     @media(max-width:1100px){#vf-new-case .vf-case-row{grid-template-columns:repeat(4,minmax(0,1fr))}}
-    @media(max-width:850px){#vf-new-case .vf-case-row{grid-template-columns:repeat(2,minmax(0,1fr))}#vf-new-case .vf-case-row>label.vf-wide{grid-column:span 1}#vf-case-autofill-drop{align-items:flex-start;flex-direction:column}}
+    @media(max-width:850px){#vf-new-case .vf-case-row{grid-template-columns:repeat(2,minmax(0,1fr))}#vf-new-case .vf-case-row>label.vf-wide{grid-column:span 1}#vf-case-autofill-drop{align-items:flex-start;flex-direction:column}#vf-active-case-wrap{grid-template-columns:1fr}#vf-close-active-case{justify-self:start}}
     @media(max-width:560px){#vf-new-case .vf-case-row{grid-template-columns:1fr}}
   `;
   document.head.appendChild(style);
+
+  function readActive(){for(const storage of [sessionStorage,localStorage]){try{const d=JSON.parse(storage.getItem('svnet-case')||'null');if(d?.folder_id)return d;}catch{}}return null;}
+
+  const active=el('vf-active-case');
+  let closeCaseButton=null;
+  if(active && !el('vf-close-active-case')){
+    const wrap=document.createElement('div');wrap.id='vf-active-case-wrap';active.parentNode?.insertBefore(wrap,active);wrap.appendChild(active);
+    closeCaseButton=document.createElement('button');closeCaseButton.id='vf-close-active-case';closeCaseButton.type='button';closeCaseButton.className='sv-button sv-button-secondary';closeCaseButton.textContent='Fall verlassen';wrap.appendChild(closeCaseButton);
+    const syncCloseVisibility=()=>{if(closeCaseButton)closeCaseButton.hidden=!readActive()?.folder_id;};
+    syncCloseVisibility();
+    new MutationObserver(syncCloseVisibility).observe(active,{childList:true,subtree:true,characterData:true});
+    closeCaseButton.addEventListener('click',()=>{
+      sessionStorage.removeItem('svnet-case');localStorage.removeItem('svnet-case');sessionStorage.removeItem('svnet-gf-order');
+      const folder=el('vf-folder-id');if(folder)folder.value='';
+      const clearIds=['vf-schaden','vf-vsnr','vf-object','vf-ort','vf-strasse','vf-type','vf-reserve','vf-contact','vf-instructions','vf-plz','vf-phone','vf-mobile','vf-email','vf-vorsteuer','vf-loss-date','vf-report-date','vf-broker','vf-broker-contact','vf-broker-phone','vf-broker-mobile','vf-broker-fax','vf-broker-email'];
+      clearIds.forEach(id=>{const n=el(id);if(n && 'value' in n)n.value='';});
+      const results=el('vf-case-results');if(results)results.innerHTML='';
+      const saveStatus=el('vf-save-status');if(saveStatus)saveStatus.textContent='';
+      const instructionStatus=el('vf-instruction-status');if(instructionStatus)instructionStatus.textContent='';
+      const docStatus=el('status-documents');if(docStatus)docStatus.textContent='Noch keine Datei ausgewählt.';
+      const newCase=el('vf-new-case');if(newCase)newCase.hidden=true;
+      active.className='intern-alert intern-alert--info';active.textContent='Aktiver Fall: keiner geladen.';
+      syncCloseVisibility();
+    });
+  }
 
   const heading=section.querySelector('h2');
   const originalGrid=heading?.nextElementSibling;
@@ -60,9 +88,8 @@
   const extraKeys=Object.fromEntries(fields.map(([id,,key])=>[key,id]));
   function fillExtra(meta={}){Object.entries(extraKeys).forEach(([key,id])=>{const n=el(id);if(n && !n.value && meta[key]) n.value=String(meta[key]);});}
   function currentExtras(){const out={};Object.entries(extraKeys).forEach(([key,id])=>{out[key]=el(id)?.value?.trim()||'';});return out;}
-  function readActive(){for(const storage of [sessionStorage,localStorage]){try{const d=JSON.parse(storage.getItem('svnet-case')||'null');if(d?.folder_id)return d;}catch{}}return null;}
   fillExtra(readActive()?.meta||{});
-  const active=el('vf-active-case');if(active) new MutationObserver(()=>fillExtra(readActive()?.meta||{})).observe(active,{childList:true,subtree:true,characterData:true});
+  if(active) new MutationObserver(()=>fillExtra(readActive()?.meta||{})).observe(active,{childList:true,subtree:true,characterData:true});
 
   async function analyze(files){
     if(!files?.length) return;section.hidden=false;let filled=0;status.textContent=`${files.length} Unterlage/-n werden ausgelesen …`;
