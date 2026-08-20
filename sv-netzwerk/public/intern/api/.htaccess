@@ -10,9 +10,16 @@ AddDefaultCharset UTF-8
     php_value memory_limit 512M
 </IfModule>
 
-# SharePoint-Excel: alle Arbeitsblätter jeder Arbeitsmappe einlesen.
+# SharePoint-Excel und intelligente API-Routen.
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # GF-KI: Reine Text-/Formularaufträge werden ohne Fallakten-Dateien verarbeitet.
+    # Datei-/Belegprüfungen werden vom Smart-Router per 307 mit legacy=1 an den
+    # bestehenden vollständigen Generator zurückgegeben.
+    RewriteCond %{QUERY_STRING} !(^|&)legacy=1(&|$) [NC]
+    RewriteRule ^gf-ai-generate\.php$ gf-ai-smart.php [L,QSA]
+
     RewriteCond %{QUERY_STRING} (^|&)action=import_sharepoint_excel(&|$) [NC]
     RewriteRule ^sharepoint\.php$ sharepoint-excel-multisheet.php [L,QSA]
 
