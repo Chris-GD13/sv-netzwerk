@@ -30,6 +30,17 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
     const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
     const fmt = (value) => { if (!value) return '—'; const d = new Date(String(value).replace(' ', 'T') + 'Z'); return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleString('de-DE'); };
     const size = (bytes) => { const n = Number(bytes || 0); if (n < 1024) return `${n} B`; if (n < 1024*1024) return `${(n/1024).toFixed(1)} KB`; return `${(n/1024/1024).toFixed(1)} MB`; };
+    async function deleteReport(id, fileName) {
+      if (!window.confirm(`Gutachten „${fileName || 'Gutachten'}“ wirklich dauerhaft löschen?\n\nDie Archivdatei wird auch aus Google Drive entfernt.`)) return;
+      try {
+        const r = await fetch(`/intern/api/report-archive-delete.php?id=${encodeURIComponent(String(id))}`, { method: 'DELETE', credentials: 'same-origin' });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(j.error || 'Gutachten konnte nicht gelöscht werden.');
+        await loadReports();
+      } catch (e) {
+        window.alert(e instanceof Error ? e.message : 'Gutachten konnte nicht gelöscht werden.');
+      }
+    }
     async function loadReports() {
       if (!statusEl || !listEl) return;
       try {
@@ -48,8 +59,11 @@ import InternalLayout from '../../../../layouts/InternalLayout.astro';
           const storage = item.persistent ? 'Google Drive · dauerhaft' : (item.available ? 'Altbestand · lokal' : 'Altbestand · Datei fehlt');
           const download = item.download_url ? `<a class="sv-button sv-button-primary" href="${esc(item.download_url)}">Herunterladen</a>` : `<span class="intern-meta"><strong>Datei nicht verfügbar</strong></span>`;
           const driveLink = item.drive_web_view_link ? `<a class="sv-button sv-button-secondary" href="${esc(item.drive_web_view_link)}" target="_blank" rel="noreferrer">In Google Drive öffnen</a>` : '';
-          return `<tr><td>${esc(fmt(item.created_at))}</td><td><strong>${esc(item.file_name || 'Gutachten')}</strong></td><td>${esc(extent)}</td><td>${esc(size(item.file_size))}</td><td>${esc(storage)}</td><td>${esc(item.created_by_name || '—')}</td><td><div class="intern-actions" style="gap:8px;flex-wrap:wrap">${item.available ? `<a class="sv-button sv-button-secondary" href="${masterUrl}">Als Master prüfen</a>` : ''}<a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/massenaenderung/">Daten bearbeiten</a>${driveLink}${download}</div></td></tr>`;
+          return `<tr><td>${esc(fmt(item.created_at))}</td><td><strong>${esc(item.file_name || 'Gutachten')}</strong></td><td>${esc(extent)}</td><td>${esc(size(item.file_size))}</td><td>${esc(storage)}</td><td>${esc(item.created_by_name || '—')}</td><td><div class="intern-actions" style="gap:8px;flex-wrap:wrap">${item.available ? `<a class="sv-button sv-button-secondary" href="${masterUrl}">Als Master prüfen</a>` : ''}<a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/massenaenderung/">Daten bearbeiten</a>${driveLink}${download}<button class="sv-button sv-button-danger" type="button" data-delete-report="${Number(item.id)}" data-report-name="${esc(item.file_name || 'Gutachten')}">Löschen</button></div></td></tr>`;
         }).join('')}</tbody></table></div>`;
+        listEl.querySelectorAll('[data-delete-report]').forEach((button) => {
+          button.addEventListener('click', () => deleteReport(button.getAttribute('data-delete-report'), button.getAttribute('data-report-name')));
+        });
       } catch (e) { statusEl.className = 'intern-alert intern-alert-error'; statusEl.textContent = e instanceof Error ? e.message : 'Gutachtenarchiv konnte nicht geladen werden.'; }
     }
     loadReports();
