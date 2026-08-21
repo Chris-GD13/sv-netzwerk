@@ -1,0 +1,3 @@
+Portal-Release: Versicherungsfall-UI und Fall-E-Mail
+Zeitpunkt: 2026-08-21 23:17 Europe/Berlin
+Enthaelt: kompakte Uploadflaeche, E-Mail-Programm im aktiven Fall, automatische Betreffzeile aus Schaden-Nr. und Schadenart, Standardempfaenger-Schnellauswahl, reduzierte Bearbeitungsdarstellung.
