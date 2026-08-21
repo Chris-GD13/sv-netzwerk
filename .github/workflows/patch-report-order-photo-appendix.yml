@@ -58,9 +58,6 @@ jobs:
           new = """    return `<section class=\"window-report\"><h2>${index + 1}. Fenster ${escapeHtml(record.window_number || record.record_id)}</h2><p><strong>Standort:</strong> ${escapeHtml([record.building_label, record.section_label, record.floor_label, record.room_number || record.room_label].filter(Boolean).join(' · '))}</p>${sections}</section>`;
   }).join('');
 
-  // Fotos bewusst nicht mehr einzelnen Fenstern zuordnen: Die aktuelle historische
-  // Fotozuordnung ist nicht belastbar genug. Alle Bilder werden daher neutral und
-  // ohne Beschriftung als gemeinsamer Anhang am Ende des Gutachtens ausgegeben.
   const appendixPhotos = sortedItems.flatMap(({ photos }) => photos.map((photo) => ({
     photo,
     source: photoSources.get(photo.id),
@@ -115,3 +112,5 @@ jobs:
           git add sv-netzwerk/src/lib/internal/client.ts
           git commit -m "fix: Gutachten nach Raumnummer sortieren und Fotos als Anhang ausgeben"
           git push origin HEAD:main
+
+# trigger 2026-08-21
