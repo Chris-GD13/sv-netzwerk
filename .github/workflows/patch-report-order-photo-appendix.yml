@@ -1,10 +1,11 @@
 name: Gutachten Reihenfolge und Fotoanhang korrigieren
 
 on:
+  workflow_dispatch:
   push:
     paths:
+      - '.github/scripts/patch_report_photo_appendix.py'
       - '.github/workflows/patch-report-order-photo-appendix.yml'
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,125 +17,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Gutachtenexport robust ersetzen
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path('sv-netzwerk/src/lib/internal/client.ts')
-          s = p.read_text(encoding='utf-8-sig')
-
-          start = s.find('function buildAssessmentReport(')
-          end = s.find('function wrapWordDocument(', start)
-          if start < 0 or end < 0:
-              raise SystemExit('buildAssessmentReport/wrapWordDocument nicht gefunden')
-
-          new_build = r'''function buildAssessmentReport(
-  items: Array<{ record: WindowRecord; photos: PhotoItem[] }>,
-  photoSources: Map<string, string>,
-  documents: Array<{ id: string; name: string; path: string; size: number }>,
-): GeneratedAssessmentReport {
-  const roomSortKey = (record: WindowRecord): number => {
-    const raw = String(record.room_number || record.room_label || '').trim();
-    const match = raw.match(/\d+/);
-    return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
-  };
-  const windowSortKey = (record: WindowRecord): number => {
-    const raw = String(record.window_number || record.record_id || '').trim();
-    const match = raw.match(/\d+/);
-    return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
-  };
-  const sortedItems = [...items].sort((a, b) =>
-    roomSortKey(a.record) - roomSortKey(b.record)
-    || windowSortKey(a.record) - windowSortKey(b.record)
-    || String(a.record.window_number || a.record.record_id).localeCompare(
-      String(b.record.window_number || b.record.record_id),
-      'de',
-      { numeric: true, sensitivity: 'base' },
-    )
-  );
-
-  const records = sortedItems.map((item) => item.record);
-  const total = records.length;
-  const inspected = records.filter((r) => /geprueft|abgeschlossen|freigegeben/i.test(r.status)).length;
-  const inaccessible = records.filter((r) => r.accessibility_status === 'nicht zugaenglich').length;
-  const urgent = records.filter((r) => r.urgent_action_required || r.danger_immediate).length;
-  const defects = records.filter((r) => r.has_defect).length;
-  const building = [...new Set(records.map((r) => r.building_label).filter(Boolean))].join(', ') || 'Prüfobjekt';
-  const overview = `Im Objekt ${building} wurden zum Datenstand ${new Date().toLocaleDateString('de-DE')} insgesamt ${total} Fensterdatensätze erfasst. Davon sind ${inspected} Fenster fachlich geprüft, ${defects} Datensätze enthalten Feststellungen oder Handlungsbedarf, ${inaccessible} Fenster waren nicht zugänglich und bei ${urgent} Fenstern ist eine dringende Sicherungsmaßnahme vermerkt. Die nachfolgende Dokumentation gibt den derzeit im Prüfportal gespeicherten Arbeitsstand wieder. Die abschließende sachverständige Würdigung und ergänzende Erläuterungen können in diesem Word-Dokument fortgeschrieben werden.`;
-
-  const windowsHtml = sortedItems.map(({ record }, index) => {
-    const data = record.form_data ?? {};
-    const sections = windowFormSections.map((section) => {
-      const rows = section.fields.map((field) => {
-        const value = reportValue(data[field.id]);
-        if (value === '' || (field.type === 'checkbox' && value === 'Nein')) return '';
-        const optionLabel = field.options?.find((option) => option.value === value)?.label ?? value;
-        return `<tr><th>${escapeHtml(field.label)}</th><td>${escapeHtml(optionLabel)}</td></tr>`;
-      }).filter(Boolean).join('');
-      return rows ? `<h3>${escapeHtml(section.title)}</h3><table>${rows}</table>` : '';
-    }).join('');
-    return `<section class="window-report"><h2>${index + 1}. Fenster ${escapeHtml(record.window_number || record.record_id)}</h2><p><strong>Standort:</strong> ${escapeHtml([record.building_label, record.section_label, record.floor_label, record.room_number || record.room_label].filter(Boolean).join(' · '))}</p>${sections}</section>`;
-  }).join('');
-
-  const attachments = documents.length
-    ? `<ol>${documents.map((doc) => `<li><a href="https://www.sv-netzwerk.eu/intern/api/sharepoint.php?action=sharepoint_document&amp;id=${encodeURIComponent(doc.id)}">${escapeHtml(doc.path || doc.name)}</a> (${Math.max(1, Math.round(doc.size / 1024))} KB)</li>`).join('')}</ol>`
-    : '<p>Im SharePoint-Projektordner wurden keine PDF-Anlagen gefunden.</p>';
-
-  const appendixPhotos = sortedItems.flatMap(({ photos }) => photos.map((photo) => ({
-    photo,
-    source: photoSources.get(photo.id),
-  })));
-  const photoAppendix = appendixPhotos.length
-    ? `<div class="photo-appendix">${appendixPhotos.map(({ source }) => `<figure>${source ? `<img src="${source}" alt="">` : '<div class="missing-photo">Bilddatei nicht lesbar</div>'}</figure>`).join('')}</div>`
-    : '<p>Keine Fotos vorhanden.</p>';
-
-  const bodyHtml = `<header><h1>Gutachten / Fensterprüfung</h1><p><strong>Objekt:</strong> ${escapeHtml(building)}<br><strong>Datenstand:</strong> ${escapeHtml(new Date().toLocaleString('de-DE'))}</p></header><section><h2>1. Zusammenfassung der Situation vor Ort</h2><p>${escapeHtml(overview)}</p><p><em>Dieser Überblick ist ein bearbeitbarer Entwurf und vor Fertigstellung sachverständig zu ergänzen und freizugeben.</em></p></section><section><h2>2. Einzeldokumentation der Fenster</h2>${windowsHtml}</section><section><h2>3. Anlagen aus dem Projektordner</h2>${attachments}</section><section class="photo-appendix-section"><h2>4. Anlage Fotodokumentation</h2>${photoAppendix}</section>`;
-  const safeBuilding = building.replace(/[^a-z0-9äöüß_-]+/gi, '-').replace(/-+/g, '-');
-  return { bodyHtml, documentHtml: wrapWordDocument(bodyHtml), fileName: `Gutachten-Fensterpruefung-${safeBuilding}-${new Date().toISOString().slice(0, 10)}.doc` };
-}
-
-'''
-
-          s = s[:start] + new_build + s[end:]
-
-          wrap_start = s.find('function wrapWordDocument(')
-          wrap_end = s.find('async function archiveAssessmentReport(', wrap_start)
-          if wrap_start < 0 or wrap_end < 0:
-              raise SystemExit('wrapWordDocument/archiveAssessmentReport nicht gefunden')
-
-          new_wrap = r'''function wrapWordDocument(bodyHtml: string): string {
-  return `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" lang="de"><head><meta charset="utf-8"><title>Gutachten Fensterprüfung</title><style>@page{size:A4;margin:18mm}body{font-family:Arial,sans-serif;color:#071a2e;font-size:10pt;line-height:1.4}h1{font-size:20pt}h2{font-size:14pt;border-bottom:2px solid #f59b16;padding-bottom:4px}h3{font-size:11pt;background:#eaf1f6;padding:5px}table{width:100%;border-collapse:collapse;margin:0 0 10px}th,td{border:1px solid #bcc9d3;padding:5px;text-align:left;vertical-align:top}th{width:36%;background:#eef4f8}.window-report{page-break-before:always}.photo-appendix-section{page-break-before:always}.photo-appendix{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.photo-appendix figure{margin:0;page-break-inside:avoid;text-align:center}.photo-appendix img{height:4.5cm;max-height:4.5cm;width:auto;max-width:100%;object-fit:contain;border:0}.missing-photo{height:70px;border:1px dashed #a00;color:#a00;padding:6px}</style></head><body>${bodyHtml}</body></html>`;
-}
-
-'''
-          s = s[:wrap_start] + new_wrap + s[wrap_end:]
-
-          if '<h3>Fotodokumentation</h3><div class="photos">' in s[s.find('function buildAssessmentReport('):s.find('function wrapWordDocument(')]:
-              raise SystemExit('Alte fensterbezogene Fotodokumentation noch vorhanden')
-          if '4. Anlage Fotodokumentation' not in s:
-              raise SystemExit('Fotoanhang fehlt')
-          if 'const sortedItems = [...items].sort' not in s:
-              raise SystemExit('Raumsortierung fehlt')
-
-          p.write_text(s, encoding='utf-8')
-          PY
-
-      - name: Build prüfen
+      - name: Gutachtenexport patchen
+        run: python3 .github/scripts/patch_report_photo_appendix.py
+      - name: Build pruefen
         working-directory: sv-netzwerk
         run: |
           npm ci --no-audit --no-fund
           npm run build
-
-      - name: Änderungen committen
-        shell: bash
+      - name: Aenderungen committen
         run: |
-          set -euo pipefail
           if git diff --quiet; then exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add sv-netzwerk/src/lib/internal/client.ts
-          git commit -m "fix: Gutachtenfotos nur noch als unbeschrifteten Anhang ausgeben"
+          git commit -m "fix: Gutachten nach Raum sortieren und Fotos als Anhang ausgeben"
           git push origin HEAD:main
