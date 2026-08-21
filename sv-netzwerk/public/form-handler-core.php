@@ -155,7 +155,7 @@ function sv_process_form(array $config): void
 {
     $returnUrl = $config['return_url'];
     $successUrl = $config['success_url'];
-    $from = 'info@sv-netzwerk.eu';
+    $from = 'ws@sv-schuett.eu';
 
     if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
         sv_redirect($returnUrl);

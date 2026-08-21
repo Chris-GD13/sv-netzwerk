@@ -104,7 +104,7 @@ function appClientName(): string    { return env('CLIENT_NAME', 'Bundesministeri
 /** Gibt den Auftragnehmer zurück. */
 function appCompanyName(): string   { return env('COMPANY_NAME', 'SV-Büro Marc Schütt e.K.'); }
 /** Gibt die Absenderadresse für E-Mail-Benachrichtigungen zurück. */
-function appMailFrom(): string      { return env('MAIL_FROM', 'noreply@sv-schuett.eu'); }
+function appMailFrom(): string      { return env('MAIL_FROM', 'ws@sv-schuett.eu'); }
 /** Gibt die Administratoren-E-Mail zurück. */
 function appMailAdmin(): string     { return env('MAIL_ADMIN', 'admin@sv-schuett.eu'); }
 
