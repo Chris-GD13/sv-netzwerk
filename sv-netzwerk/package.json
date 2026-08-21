@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "npm run validate:encoding && npm run validate:knowledge && node scripts/write-deploy-version.mjs",
+    "prebuild": "python3 scripts/patch-window-report-rules.py && npm run validate:encoding && npm run validate:knowledge && node scripts/write-deploy-version.mjs",
     "build": "astro check && astro build && npm run validate:public-copy && npm run validate:visible-umlauts",
     "preview": "astro preview",
     "check": "astro check",
