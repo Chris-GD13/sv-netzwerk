@@ -1,4 +1,4 @@
-name: Gutachtenexport kompakt und zentral archivieren
+name: Gutachtenexport final korrigieren
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Gutachtenexport patchen
+      - name: Gutachtenexport final patchen
         shell: bash
         run: |
           set -euo pipefail
@@ -27,41 +27,83 @@ jobs:
           s = p.read_text(encoding='utf-8-sig')
           original = s
 
-          # Bilder für 7-cm-Darstellung ausreichend, aber deutlich kompakter halten.
-          s = s.replace(
-              "const scale = Math.min(1, 1200 / Math.max(bitmap.width, bitmap.height));",
-              "const scale = Math.min(1, 360 / Math.max(bitmap.width, bitmap.height));",
-              1,
-          )
-          s = s.replace(
-              "return canvas.toDataURL('image/jpeg', 0.72);",
-              "return canvas.toDataURL('image/jpeg', 0.45);",
-              1,
-          )
-          s = s.replace(
-              '.photos img{width:100%;max-height:240px;object-fit:contain;border:1px solid #ccd7e0}',
-              '.photos img{height:7cm;max-height:7cm;width:auto;max-width:100%;object-fit:contain;border:1px solid #ccd7e0}',
-              1,
-          )
+          # 1) Fenster zwingend nach numerischer Raumnummer, danach Fensternummer sortieren.
+          old_map = "  const windowsHtml = items.map(({ record, photos }, index) => {"
+          if old_map in s:
+              new_map = """  const roomSortKey = (record: WindowRecord): number => {
+    const raw = String(record.room_number || record.room_label || '').trim();
+    const match = raw.match(/\\d+/);
+    return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
+  };
+  const windowSortKey = (record: WindowRecord): number => {
+    const raw = String(record.window_number || record.record_id || '').trim();
+    const match = raw.match(/\\d+/);
+    return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
+  };
+  const sortedItems = [...items].sort((a, b) =>
+    roomSortKey(a.record) - roomSortKey(b.record)
+    || windowSortKey(a.record) - windowSortKey(b.record)
+    || String(a.record.window_number || a.record.record_id).localeCompare(String(b.record.window_number || b.record.record_id), 'de', { numeric: true, sensitivity: 'base' })
+  );
+  const windowsHtml = sortedItems.map(({ record }, index) => {"""
+              s = s.replace(old_map, new_map, 1)
 
-          # Nach erfolgreicher Erzeugung automatisch in der zentralen Gutachtenablage archivieren.
-          old = """    const report = buildAssessmentReport(records, photoSources, documents);\n    preview.innerHTML = report.bodyHtml;"""
-          new = """    const report = buildAssessmentReport(records, photoSources, documents);\n    progress.textContent = 'Gutachten wird in der zentralen Ablage archiviert …';\n    let archiveInfo = '';\n    try {\n      const archived = await archiveAssessmentReport(report, records.length, totalPhotos, documents.length);\n      archiveInfo = archived ? ' · zentral archiviert' : ' · Archivierung nicht bestätigt';\n    } catch (archiveError) {\n      console.error('Gutachtenarchivierung fehlgeschlagen', archiveError);\n      archiveInfo = ' · zentrale Archivierung fehlgeschlagen';\n    }\n    preview.innerHTML = report.bodyHtml;"""
-          if old in s:
-              s = s.replace(old, new, 1)
+          # 2) Fensterbezogene Fotos komplett entfernen.
+          old_photo = """    const photoHtml = photos.length ? photos.map((photo) => {
+      const source = photoSources.get(photo.id);
+      return `<figure>${source ? `<img src=\"${source}\" alt=\"${escapeHtml(photo.category)}\">` : '<div class=\"missing-photo\">Bilddatei nicht lesbar</div>'}<figcaption><strong>${escapeHtml(photo.category)}</strong><br>${escapeHtml(photo.caption || photo.file_name)}</figcaption></figure>`;
+    }).join('') : '<p>Keine Fotos zugeordnet.</p>';
+    return `<section class=\"window-report\"><h2>${index + 1}. Fenster ${escapeHtml(record.window_number || record.record_id)}</h2><p><strong>Standort:</strong> ${escapeHtml([record.building_label, record.section_label, record.floor_label, record.room_number || record.room_label].filter(Boolean).join(' · '))}</p>${sections}<h3>Fotodokumentation</h3><div class=\"photos\">${photoHtml}</div></section>`;
+  }).join('');
+  const attachments = documents.length"""
+          if old_photo in s:
+              new_photo = """    return `<section class=\"window-report\"><h2>${index + 1}. Fenster ${escapeHtml(record.window_number || record.record_id)}</h2><p><strong>Standort:</strong> ${escapeHtml([record.building_label, record.section_label, record.floor_label, record.room_number || record.room_label].filter(Boolean).join(' · '))}</p>${sections}</section>`;
+  }).join('');
 
-          s = s.replace(
-              "info.textContent = `${records.length} Fenster, ${totalPhotos} Fotos und ${documents.length} PDF-Anlagen wurden aufgenommen.`;",
-              "info.textContent = `${records.length} Fenster, ${totalPhotos} Fotos und ${documents.length} PDF-Anlagen wurden aufgenommen${archiveInfo}.`;",
-              1,
-          )
+  const appendixPhotos = sortedItems.flatMap(({ photos }) => photos.map((photo) => ({ source: photoSources.get(photo.id) })));
+  const photoAppendix = appendixPhotos.length
+    ? `<div class=\"photo-appendix\">${appendixPhotos.map(({ source }) => `<figure>${source ? `<img src=\"${source}\" alt=\"\">` : '<div class=\"missing-photo\">Bilddatei nicht lesbar</div>'}</figure>`).join('')}</div>`
+    : '<p>Keine Fotos vorhanden.</p>';
 
-          marker = "function downloadAssessmentReport(report: GeneratedAssessmentReport): void {"
-          helper = """async function archiveAssessmentReport(\n  report: GeneratedAssessmentReport,\n  windowCount: number,\n  photoCount: number,\n  attachmentCount: number,\n): Promise<boolean> {\n  const blob = new Blob(['\\ufeff', report.documentHtml], { type: 'application/msword' });\n  if (blob.size > 200 * 1024 * 1024) {\n    throw new Error(`Gutachtendatei ist trotz Komprimierung zu groß (${Math.round(blob.size / 1024 / 1024)} MB).`);\n  }\n  const form = new FormData();\n  form.append('report', blob, report.fileName);\n  form.append('file_name', report.fileName);\n  form.append('project_id', '1');\n  form.append('window_count', String(windowCount));\n  form.append('photo_count', String(photoCount));\n  form.append('attachment_count', String(attachmentCount));\n  const response = await fetch('/intern/api/report-archive.php', {\n    method: 'POST',\n    credentials: 'same-origin',\n    body: form,\n  });\n  const payload = await response.json().catch(() => ({}));\n  if (!response.ok) throw new Error(payload?.error || 'Gutachten konnte nicht zentral archiviert werden.');\n  return payload?.ok === true;\n}\n\n"""
-          if 'async function archiveAssessmentReport(' not in s:
-              if marker not in s:
-                  raise SystemExit('Download-Funktion als Einfügemarke nicht gefunden')
-              s = s.replace(marker, helper + marker, 1)
+  const attachments = documents.length"""
+              s = s.replace(old_photo, new_photo, 1)
+
+          # Falls Sortierung bereits eingespielt ist, aber alter Fotoblock noch existiert.
+          old_photo_sorted = """    const photoHtml = photos.length ? photos.map((photo) => {
+      const source = photoSources.get(photo.id);
+      return `<figure>${source ? `<img src=\"${source}\" alt=\"${escapeHtml(photo.category)}\">` : '<div class=\"missing-photo\">Bilddatei nicht lesbar</div>'}<figcaption><strong>${escapeHtml(photo.category)}</strong><br>${escapeHtml(photo.caption || photo.file_name)}</figcaption></figure>`;
+    }).join('') : '<p>Keine Fotos zugeordnet.</p>';
+    return `<section class=\"window-report\"><h2>${index + 1}. Fenster ${escapeHtml(record.window_number || record.record_id)}</h2><p><strong>Standort:</strong> ${escapeHtml([record.building_label, record.section_label, record.floor_label, record.room_number || record.room_label].filter(Boolean).join(' · '))}</p>${sections}<h3>Fotodokumentation</h3><div class=\"photos\">${photoHtml}</div></section>`;
+  }).join('');
+  const attachments = documents.length"""
+          if old_photo_sorted in s:
+              new_photo_sorted = """    return `<section class=\"window-report\"><h2>${index + 1}. Fenster ${escapeHtml(record.window_number || record.record_id)}</h2><p><strong>Standort:</strong> ${escapeHtml([record.building_label, record.section_label, record.floor_label, record.room_number || record.room_label].filter(Boolean).join(' · '))}</p>${sections}</section>`;
+  }).join('');
+
+  const appendixPhotos = sortedItems.flatMap(({ photos }) => photos.map((photo) => ({ source: photoSources.get(photo.id) })));
+  const photoAppendix = appendixPhotos.length
+    ? `<div class=\"photo-appendix\">${appendixPhotos.map(({ source }) => `<figure>${source ? `<img src=\"${source}\" alt=\"\">` : '<div class=\"missing-photo\">Bilddatei nicht lesbar</div>'}</figure>`).join('')}</div>`
+    : '<p>Keine Fotos vorhanden.</p>';
+
+  const attachments = documents.length"""
+              s = s.replace(old_photo_sorted, new_photo_sorted, 1)
+
+          # 3) Gemeinsamen Fotoanhang am Dokumentende einfügen.
+          old_body = """  const bodyHtml = `<header><h1>Gutachten / Fensterprüfung</h1><p><strong>Objekt:</strong> ${escapeHtml(building)}<br><strong>Datenstand:</strong> ${escapeHtml(new Date().toLocaleString('de-DE'))}</p></header><section><h2>1. Zusammenfassung der Situation vor Ort</h2><p>${escapeHtml(overview)}</p><p><em>Dieser Überblick ist ein bearbeitbarer Entwurf und vor Fertigstellung sachverständig zu ergänzen und freizugeben.</em></p></section><section><h2>2. Einzeldokumentation der Fenster</h2>${windowsHtml}</section><section><h2>3. Anlagen aus dem Projektordner</h2>${attachments}</section>`;"""
+          new_body = """  const bodyHtml = `<header><h1>Gutachten / Fensterprüfung</h1><p><strong>Objekt:</strong> ${escapeHtml(building)}<br><strong>Datenstand:</strong> ${escapeHtml(new Date().toLocaleString('de-DE'))}</p></header><section><h2>1. Zusammenfassung der Situation vor Ort</h2><p>${escapeHtml(overview)}</p><p><em>Dieser Überblick ist ein bearbeitbarer Entwurf und vor Fertigstellung sachverständig zu ergänzen und freizugeben.</em></p></section><section><h2>2. Einzeldokumentation der Fenster</h2>${windowsHtml}</section><section><h2>3. Anlagen aus dem Projektordner</h2>${attachments}</section><section class=\"photo-appendix-section\"><h2>4. Anlage Fotodokumentation</h2>${photoAppendix}</section>`;"""
+          if old_body in s:
+              s = s.replace(old_body, new_body, 1)
+
+          # 4) Fotos kleiner, ohne Bildunterschrift, drei nebeneinander.
+          old_css = ".window-report{page-break-before:always}.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.photos figure{margin:0;page-break-inside:avoid}.photos img{height:7cm;max-height:7cm;width:auto;max-width:100%;object-fit:contain;border:1px solid #ccd7e0}.photos figcaption{font-size:8pt}.missing-photo{height:100px;border:1px dashed #a00;color:#a00;padding:8px}"
+          new_css = ".window-report{page-break-before:always}.photo-appendix-section{page-break-before:always}.photo-appendix{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.photo-appendix figure{margin:0;page-break-inside:avoid;text-align:center}.photo-appendix img{height:4.5cm;max-height:4.5cm;width:auto;max-width:100%;object-fit:contain;border:0}.missing-photo{height:70px;border:1px dashed #a00;color:#a00;padding:6px}"
+          if old_css in s:
+              s = s.replace(old_css, new_css, 1)
+
+          # Bestehende 7-cm-CSS-Variante ebenfalls ersetzen.
+          old_css2 = ".window-report{page-break-before:always}.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.photos figure{margin:0;page-break-inside:avoid}.photos img{height:7cm;max-height:7cm;width:auto;max-width:100%;object-fit:contain;border:1px solid #ccd7e0}.photos figcaption{font-size:8pt}.missing-photo{height:100px;border:1px dashed #a00;color:#a00;padding:8px}"
+          if old_css2 in s:
+              s = s.replace(old_css2, new_css, 1)
 
           if s == original:
               raise SystemExit('Keine Änderung am Gutachtenexport vorgenommen')
@@ -69,10 +111,17 @@ jobs:
           p.write_text(s, encoding='utf-8')
           PY
 
-          grep -Fq "360 / Math.max(bitmap.width, bitmap.height)" sv-netzwerk/src/lib/internal/client.ts
-          grep -Fq "toDataURL('image/jpeg', 0.45)" sv-netzwerk/src/lib/internal/client.ts
-          grep -Fq "height:7cm;max-height:7cm" sv-netzwerk/src/lib/internal/client.ts
-          grep -Fq "archiveAssessmentReport" sv-netzwerk/src/lib/internal/client.ts
+          grep -Fq "const sortedItems = [...items].sort" sv-netzwerk/src/lib/internal/client.ts
+          grep -Fq "4. Anlage Fotodokumentation" sv-netzwerk/src/lib/internal/client.ts
+          grep -Fq "height:4.5cm" sv-netzwerk/src/lib/internal/client.ts
+          if grep -Fq "<h3>Fotodokumentation</h3><div class=\"photos\">" sv-netzwerk/src/lib/internal/client.ts; then
+            echo 'Alte fensterbezogene Fotodokumentation noch vorhanden' >&2
+            exit 1
+          fi
+          if grep -Fq "<figcaption><strong>${escapeHtml(photo.category)}" sv-netzwerk/src/lib/internal/client.ts; then
+            echo 'Alte Bildbeschriftung noch vorhanden' >&2
+            exit 1
+          fi
 
       - name: Build prüfen
         working-directory: sv-netzwerk
@@ -88,5 +137,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add sv-netzwerk/src/lib/internal/client.ts
-          git commit -m "fix: Gutachtenbilder komprimieren und Gutachten zentral archivieren"
+          git commit -m "fix: Gutachtenbilder nur noch unbeschriftet als Anhang ausgeben"
           git push origin HEAD:main
