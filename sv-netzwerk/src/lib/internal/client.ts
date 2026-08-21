@@ -2615,10 +2615,8 @@ async function renderAnalysis(context: AppContext) {
     || /nicht\s+zugänglich|nicht\s+zugaenglich|gesperrt|kein\s+zugang/i.test(remarksFor(record));
   const isUrgent = (record: WindowSummary): boolean =>
     Boolean(record.urgent_action_required || record.danger_immediate)
-    || /\bBE\b|\bMEG\b|beschlag\s+defekt|muss\s+eingestellt\s+werden/i.test(remarksFor(record));
-  const needsMaintenance = (record: WindowSummary): boolean =>
-    record.form_data?.maintenance_or_repair_due === true
-    || /\bWA\b|\bMEG\b|\bSC\b|\bSB\b|wartung\s+notwendig|muss\s+eingestellt\s+werden|schleift|scheibe/i.test(remarksFor(record));
+    || /sofort|sperre|absturzgefahr|fenster\s+(?:faellt|fällt)\s+raus/i.test(remarksFor(record));
+  const needsMaintenance = (_record: WindowSummary): boolean => true;
   const groupings = groupBy(records, (item) => item.building_label || 'Unbekannt');
   const byFloor = groupBy(records, (item) => item.floor_label || 'Unbekannt');
   const byInspector = groupBy(records, (item) => item.assigned_name || 'Nicht zugewiesen');
@@ -4497,41 +4495,114 @@ function buildAssessmentReport(
 ): GeneratedAssessmentReport {
   const records = items.map((item) => item.record);
   const total = records.length;
-  const inspected = records.filter((r) => /geprueft|abgeschlossen|freigegeben/i.test(r.status)).length;
-  const inaccessible = records.filter((r) => r.accessibility_status === 'nicht zugaenglich').length;
-  const urgent = records.filter((r) => r.urgent_action_required || r.danger_immediate).length;
-  const defects = records.filter((r) => r.has_defect).length;
-  const building = [...new Set(records.map((r) => r.building_label).filter(Boolean))].join(', ') || 'Prüfobjekt';
-  const overview = `Im Objekt ${building} wurden zum Datenstand ${new Date().toLocaleDateString('de-DE')} insgesamt ${total} Fensterdatensätze erfasst. Davon sind ${inspected} Fenster fachlich geprüft, ${defects} Datensätze enthalten Feststellungen oder Handlungsbedarf, ${inaccessible} Fenster waren nicht zugänglich und bei ${urgent} Fenstern ist eine dringende Sicherungsmaßnahme vermerkt. Die nachfolgende Dokumentation gibt den derzeit im Prüfportal gespeicherten Arbeitsstand wieder. Die abschließende sachverständige Würdigung und ergänzende Erläuterungen können in diesem Word-Dokument fortgeschrieben werden.`;
-  const roomSortKey = (record: WindowRecord): number => { const m = String(record.room_number || record.room_label || '').match(/\d+/); return m ? Number(m[0]) : Number.MAX_SAFE_INTEGER; };
-  const windowSortKey = (record: WindowRecord): number => { const m = String(record.window_number || record.record_id || '').match(/\d+/); return m ? Number(m[0]) : Number.MAX_SAFE_INTEGER; };
-  const sortedItems = [...items].sort((a, b) => roomSortKey(a.record) - roomSortKey(b.record) || windowSortKey(a.record) - windowSortKey(b.record));
+  const normalize = (value: unknown) => String(value ?? '')
+    .toLocaleLowerCase('de-DE')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ß/g, 'ss')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+  const valueOf = (record: WindowRecord, key: string): string => String(record.form_data?.[key] ?? '').trim();
+  const inaccessibleRecord = (record: WindowRecord): boolean => {
+    const values = [record.accessibility_status, valueOf(record, 'accessibility_status'), valueOf(record, 'accessibility')].map(normalize);
+    return values.some((value) => value.includes('nicht zuganglich') || value.includes('nicht zugaenglich') || value.includes('gesperrt'));
+  };
+  const urgentRecord = (record: WindowRecord): boolean => {
+    const values = [record.urgent_action_required, record.danger_immediate, valueOf(record, 'urgent_action_required'), valueOf(record, 'danger_immediate')];
+    return values.some((value) => value === true || ['1', 'ja', 'true'].includes(normalize(value)));
+  };
+  const repairRecord = (record: WindowRecord): boolean => {
+    const explicit = normalize([record.overall_rating, valueOf(record, 'overall_rating'), valueOf(record, 'recommended_action'), valueOf(record, 'recommended_measure')].filter(Boolean).join(' '));
+    if (/instandsetz|reparatur|ersetzen|austausch/.test(explicit)) return true;
+    const note = normalize([valueOf(record, 'visible_special_features'), valueOf(record, 'excel_column_k'), valueOf(record, 'expert_note')].filter(Boolean).join(' '));
+    return /beschlag defekt|dichtung defekt|griff fehlt|bolzen fehlt|kipplager fehlt|band fehlt|band ist gebrochen|band ist geborchen|blendrahmen.*gebroch|schliessstuck fehlt|schliessstueck fehlt/.test(note);
+  };
+
+  const inaccessible = records.filter(inaccessibleRecord).length;
+  const urgent = records.filter(urgentRecord).length;
+  const repair = records.filter(repairRecord).length;
+  const building = [...new Set(records.map((record) => record.building_label).filter(Boolean))].join(', ') || 'Prüfobjekt';
+  const isBonn800 = /(^|\D)800(\D|$)/.test(building) || /fensterpruefung-bonn/i.test(getProjectSlug());
+
+  const floorSortKey = (record: WindowRecord): number => {
+    const value = normalize(record.floor_label);
+    if (/\beg\b|erdgeschoss/.test(value)) return 0;
+    const match = value.match(/\d+/);
+    return match ? Number(match[0]) + 1 : Number.MAX_SAFE_INTEGER;
+  };
+  const roomSortKey = (record: WindowRecord): number => {
+    const match = String(record.room_number || record.room_label || '').match(/\d+/);
+    return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
+  };
+  const windowSortKey = (record: WindowRecord): number => {
+    const match = String(record.window_number || record.record_id || '').match(/\d+/);
+    return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
+  };
+  const sortedItems = [...items].sort((left, right) =>
+    floorSortKey(left.record) - floorSortKey(right.record)
+    || roomSortKey(left.record) - roomSortKey(right.record)
+    || windowSortKey(left.record) - windowSortKey(right.record)
+  );
+
+  const assessmentText = (record: WindowRecord): string => {
+    const inaccessible = inaccessibleRecord(record);
+    const repair = repairRecord(record);
+    const urgent = urgentRecord(record);
+    const parts: string[] = [];
+    if (inaccessible) {
+      parts.push('Das Fenster war zum Prüfzeitpunkt nicht zugänglich bzw. gesperrt. Eine abschließende Funktions- und Zustandsprüfung war daher nicht möglich. Nach Herstellung der Zugänglichkeit ist eine Nachprüfung erforderlich.');
+    } else {
+      parts.push('Für dieses Fenster sind Wartung und fachgerechte Einstellung erforderlich.');
+    }
+    if (repair) parts.push('Darüber hinaus ist aufgrund der dokumentierten Feststellung eine weitergehende Instandsetzung erforderlich.');
+    if (urgent) parts.push('Bis zur fachgerechten Instandsetzung ist das Fenster gegen eine gefahrbringende Benutzung zu sichern.');
+    if (inaccessible) parts.push('Die grundsätzliche Wartung und fachgerechte Einstellung ist im Zuge der Gesamtmaßnahme dennoch vorzusehen.');
+    return parts.join(' ');
+  };
+
   const windowsHtml = sortedItems.map(({ record }, index) => {
     const data = record.form_data ?? {};
-    const sections = windowFormSections.map((section) => {
-      const rows = section.fields.map((field) => {
-        const value = reportValue(data[field.id]);
-        if (value === '' || (field.type === 'checkbox' && value === 'Nein')) return '';
-        const optionLabel = field.options?.find((option) => option.value === value)?.label ?? value;
-        return `<tr><th>${escapeHtml(field.label)}</th><td>${escapeHtml(optionLabel)}</td></tr>`;
-      }).filter(Boolean).join('');
-      return rows ? `<h3>${escapeHtml(section.title)}</h3><table>${rows}</table>` : '';
-    }).join('');
-    return `<section class="window-report"><h2>${index + 1}. Fenster ${escapeHtml(record.window_number || record.record_id)}</h2><p><strong>Standort:</strong> ${escapeHtml([record.building_label, record.section_label, record.floor_label, record.room_number || record.room_label].filter(Boolean).join(' · '))}</p>${sections}</section>`;
+    const visibleSpecial = valueOf(record, 'visible_special_features') || valueOf(record, 'excel_column_k') || valueOf(record, 'expert_note') || '';
+    const rows: Array<[string, unknown]> = [
+      ['Laufende Prüfnummer', record.record_id || '—'],
+      ['Fensternummer', record.window_number || 'n/a'],
+      ['Etage', record.floor_label || '—'],
+      ['Raum', record.room_number || record.room_label || '—'],
+      ['Fensterposition im Raum', data.window_position_in_room ?? data.window_position ?? '—'],
+      ['Anzahl der Fensterflügel', data.number_of_sashes ?? data.number_of_window_sashes ?? '—'],
+      ['Öffnungsart', data.opening_type ?? '—'],
+      ['Zugänglichkeit', inaccessibleRecord(record) ? 'Nicht zugänglich' : 'zugänglich'],
+      ['Sichtbare Besonderheiten', visibleSpecial || 'Wartung / Einstellung erforderlich'],
+      ['Bewertungsstufe', `Wartung und Einstellung erforderlich${repairRecord(record) ? '; weitergehende Instandsetzung erforderlich' : ''}`],
+      ['Sofortige Sicherungsmaßnahme erforderlich', urgentRecord(record) ? 'Ja' : 'Nein / nicht vermerkt'],
+      ['Bearbeitungsstatus', record.status || '—'],
+    ];
+    const table = `<table>${rows.map(([label, value]) => `<tr><th>${escapeHtml(String(label))}</th><td>${escapeHtml(String(value ?? '—'))}</td></tr>`).join('')}</table>`;
+    return `<section class="window-report"><h2>${index + 1}. Fenster ${escapeHtml(record.window_number || 'n/a')} – Raum ${escapeHtml(record.room_number || record.room_label || '—')}</h2><p><strong>Standort:</strong> ${escapeHtml([record.building_label, record.section_label, record.floor_label, record.room_number || record.room_label].filter(Boolean).join(' · '))}</p><h3>A. Identifikation und dokumentierter Prüfstatus</h3>${table}<h3>B. Sachverständige Einordnung</h3><p>${escapeHtml(assessmentText(record))}</p></section>`;
   }).join('');
 
-  const appendixPhotos = sortedItems.flatMap(({ photos }) => photos.map((photo) => photoSources.get(photo.id))).filter(Boolean);
-  const photoAppendix = appendixPhotos.length
-    ? `<div class="photo-appendix">${appendixPhotos.map((source) => `<figure><img src="${source}" alt=""></figure>`).join('')}</div>`
-    : '<p>Keine Fotos vorhanden.</p>';
+  const photoAppendix = sortedItems.map(({ record, photos }, index) => {
+    const sources = photos.map((photo) => photoSources.get(photo.id)).filter((source): source is string => Boolean(source));
+    if (!sources.length) return '';
+    return `<section class="photo-window-group"><h3>${index + 1}. Fenster ${escapeHtml(record.window_number || 'n/a')} – Raum ${escapeHtml(record.room_number || record.room_label || '—')}</h3><div class="photo-appendix">${sources.map((source) => `<figure><img src="${source}" alt=""></figure>`).join('')}</div></section>`;
+  }).filter(Boolean).join('') || '<p>Keine Fotos vorhanden.</p>';
+
   const attachments = documents.length
     ? `<ol>${documents.map((doc) => `<li><a href="https://www.sv-netzwerk.eu/intern/api/sharepoint.php?action=sharepoint_document&amp;id=${encodeURIComponent(doc.id)}">${escapeHtml(doc.path || doc.name)}</a> (${Math.max(1, Math.round(doc.size / 1024))} KB)</li>`).join('')}</ol>`
     : '<p>Im SharePoint-Projektordner wurden keine PDF-Anlagen gefunden.</p>';
-  const bodyHtml = `<header><h1>Gutachten / Fensterprüfung</h1><p><strong>Objekt:</strong> ${escapeHtml(building)}<br><strong>Datenstand:</strong> ${escapeHtml(new Date().toLocaleString('de-DE'))}</p></header><section><h2>1. Zusammenfassung der Situation vor Ort</h2><p>${escapeHtml(overview)}</p><p><em>Dieser Überblick ist ein bearbeitbarer Entwurf und vor Fertigstellung sachverständig zu ergänzen und freizugeben.</em></p></section><section><h2>2. Einzeldokumentation der Fenster</h2>${windowsHtml}</section><section><h2>3. Anlagen aus dem Projektordner</h2>${attachments}</section><section class="photo-appendix-section"><h2>4. Anlage Fotodokumentation</h2>${photoAppendix}</section>`;
+
+  const orderSection = isBonn800
+    ? `<section><h2>1. Auftrag und Aufgabenstellung</h2><p>Mit Auftrag vom 16.07.2026, Auftrags-Nr. 4541862491, wurde das Sachverständigenbüro Marc Schütt e.K. durch die Bundesrepublik Deutschland, vertreten durch das Bundesministerium der Verteidigung, mit der Überprüfung der Fensterbeschläge im Gebäude 800 der Liegenschaft Hardthöhe in Bonn beauftragt.</p><p>Gegenstand des Auftrags war die Überprüfung von 450 Fenstern hinsichtlich der Tragfähigkeit und Gebrauchstauglichkeit der vorhandenen Beschlagkomponenten. Der Schwerpunkt lag auf der Prüfung der Flügelecklager sowie der Flügel- bzw. Beschlagscheren hinsichtlich ihrer Eignung für das jeweilige Flügelgewicht sowie auf der Erstellung eines Protokolls mit Prüfergebnis und Hinweisen auf gegebenenfalls erforderliche Maßnahmen.</p><p>Ergänzend umfasst der Auftrag Recherche, technische Auswertung, Dokumentation und Berichterstellung.</p></section>`
+    : `<section><h2>1. Auftrag und Aufgabenstellung</h2><p>Gegenstand der Untersuchung war die technische Überprüfung des erfassten Fensterbestands einschließlich Beschlagzustand, Funktionsfähigkeit, Wartungsbedarf und gegebenenfalls erforderlicher weitergehender Maßnahmen.</p></section>`;
+
+  const summarySection = `<section><h2>2. Durchführung und zusammenfassende Feststellungen</h2><p>Im Prüfbestand wurden ${total} Fensterdatensätze dokumentiert. Davon waren ${total - inaccessible} Fenster zugänglich; ${inaccessible} Fenster waren nicht zugänglich bzw. gesperrt und sind nach Herstellung der Zugänglichkeit nachzuprüfen.</p><p>Für sämtliche ${total} erfassten Fenster ist eine fachgerechte Wartung und Einstellung erforderlich. Dieser Grundbedarf gilt unabhängig davon, ob zusätzlich ein konkreter Bauteil- oder Beschlagschaden dokumentiert wurde. Bei ${repair} Fenstern besteht nach dem gespeicherten Prüfstand darüber hinaus ein weitergehender Instandsetzungsbedarf. Bei ${urgent} Fenster${urgent === 1 ? '' : 'n'} ist eine sofortige Sicherungsmaßnahme vermerkt.</p><p>Die Wartung umfasst insbesondere die Kontrolle und gegebenenfalls Wiederherstellung der Beschlagbefestigungen, die fachgerechte Einstellung der Flügel, die Prüfung des vollständigen Schließ- und Kippvorgangs sowie eine abschließende Funktionskontrolle. Fehlende, beschädigte oder nicht mehr sicher funktionsfähige Beschlagteile sind im Rahmen der Instandsetzung fachgerecht zu ersetzen.</p>${isBonn800 ? `<p>Die Differenz zwischen den beauftragten 450 Fenstern und den ${total} tatsächlich dokumentierten Fensterdatensätzen ergibt sich aus dem bei der Untersuchung vorgefundenen bzw. erfassbaren Bestand. Eine belastbare Einzelbewertung nicht im Prüfbestand enthaltener Fenster erfolgt nicht.</p>` : ''}</section>`;
+
+  const technicalSection = `<section><h2>3. Sachverständige Gesamtbewertung</h2><p>Der untersuchte Fensterbestand weist einen flächendeckenden Wartungs- und Einstellbedarf auf. Eine Einstufung einzelner erfasster Fenster als wartungsfrei oder ohne erforderliche Maßnahme ist deshalb nicht sachgerecht.</p><p>Die besondere Prüfaufgabe hinsichtlich der Eignung von Flügelecklagern und Flügel- bzw. Beschlagscheren ist unter Berücksichtigung des jeweiligen Flügelgewichts, des vorhandenen Beschlagsystems, der Lager- und Befestigungssituation sowie des tatsächlichen Erhaltungszustands zu bewerten. Soweit keine belastbare fensterindividuelle Hersteller- oder Bestandszuordnung vorliegt, werden keine lediglich schematisch erzeugten Traglast- oder Gewichtswerte als gesicherte Einzelbefunde ausgegeben.</p><p>Prioritär sind zunächst sicherheitsrelevante Fenster zu sichern, anschließend dokumentierte Bauteil- und Beschlagschäden instand zu setzen. Danach ist der gesamte erfasste Fensterbestand systematisch zu warten und fachgerecht einzustellen. Nicht zugängliche Fenster sind nach Herstellung der Zugänglichkeit nachzuprüfen.</p></section>`;
+
+  const bodyHtml = `<header><h1>Gutachten / Fensterprüfung</h1><p><strong>Objekt:</strong> ${escapeHtml(building)}<br><strong>Datenstand:</strong> ${escapeHtml(new Date().toLocaleString('de-DE'))}</p></header>${orderSection}${summarySection}${technicalSection}<section><h2>4. Einzeldokumentation der Fenster</h2>${windowsHtml}</section><section><h2>5. Anlagen aus dem Projektordner</h2>${attachments}</section><section class="photo-appendix-section"><h2>6. Fotoanhang</h2><p>Die Fotodokumentation ist nach Fenstern und Räumen gruppiert.</p>${photoAppendix}</section>`;
   const safeBuilding = building.replace(/[^a-z0-9äöüß_-]+/gi, '-').replace(/-+/g, '-');
   return { bodyHtml, documentHtml: wrapWordDocument(bodyHtml), fileName: `Gutachten-Fensterpruefung-${safeBuilding}-${new Date().toISOString().slice(0, 10)}.doc` };
 }
-
 function wrapWordDocument(bodyHtml: string): string {
   return `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" lang="de"><head><meta charset="utf-8"><title>Gutachten Fensterprüfung</title><style>@page{size:A4;margin:18mm}body{font-family:Arial,sans-serif;color:#071a2e;font-size:10pt;line-height:1.4}h1{font-size:20pt}h2{font-size:14pt;border-bottom:2px solid #f59b16;padding-bottom:4px}h3{font-size:11pt;background:#eaf1f6;padding:5px}table{width:100%;border-collapse:collapse;margin:0 0 10px}th,td{border:1px solid #bcc9d3;padding:5px;text-align:left;vertical-align:top}th{width:36%;background:#eef4f8}.window-report{page-break-before:always}.photo-appendix-section{page-break-before:always}.photo-appendix{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.photo-appendix figure{margin:0;page-break-inside:avoid;text-align:center}.photo-appendix img{height:4.5cm;max-height:4.5cm;width:auto;max-width:100%;object-fit:contain;border:0}</style></head><body>${bodyHtml}</body></html>`;
 }
