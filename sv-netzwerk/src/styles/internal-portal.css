@@ -89,6 +89,16 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+.intern-header__nav .intern-header__nav-highlight {
+  background: var(--sv-color-accent, #f59a23);
+  color: #071a2e;
+  font-weight: 800;
+}
+
+.intern-header__nav .intern-header__nav-highlight:hover {
+  background: #ffad3d;
+}
+
 .intern-shell__surface {
   border-radius: 1.5rem;
   background: #f6f9fc;
