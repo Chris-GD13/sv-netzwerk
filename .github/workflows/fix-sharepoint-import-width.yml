@@ -1,0 +1,45 @@
+name: SharePoint Importbreite korrigieren
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-sharepoint-import-width.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Importmodus auf Inhaltsbreite begrenzen
+        run: |
+          set -euo pipefail
+          FILE='sv-netzwerk/src/pages/intern/fensterpruefung-bonn/sharepoint-import/index.astro'
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('sv-netzwerk/src/pages/intern/fensterpruefung-bonn/sharepoint-import/index.astro')
+          s = p.read_text(encoding='utf-8')
+          old = '<section class="intern-card" id="sharepoint-import-mode" style="margin-bottom:1rem;">'
+          new = '<section class="intern-card sv-container" id="sharepoint-import-mode" style="margin-bottom:1rem;">'
+          if old not in s and new not in s:
+              raise SystemExit('Zielzeile nicht gefunden')
+          if old in s:
+              p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+
+          if git diff --quiet -- "$FILE"; then
+            echo 'Breite ist bereits korrekt.'
+            exit 0
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$FILE"
+          git commit -m 'fix: SharePoint-Importmodus auf Inhaltsbreite begrenzen'
+          git push origin HEAD:main
