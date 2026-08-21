@@ -5,11 +5,19 @@ source = path.read_text(encoding='utf-8')
 updated = source
 
 old_to = '<label>An<input id="vf-mail-to" type="email" placeholder="Empfänger"></label>'
-new_to = '''<label>An<div class="vf-mail-recipient-row"><input id="vf-mail-to" type="email" placeholder="Empfänger"><select id="vf-mail-preset" aria-label="Standardempfänger auswählen"><option value="">Standardempfänger</option><option value="service.schaden@sparkassenversicherung.de">Sparkassenversicherung – Schadenservice</option></select></div></label>'''
+new_to = '''<label>An<div class="vf-mail-recipient-row"><input id="vf-mail-to" type="email" placeholder="Empfänger"><select id="vf-mail-preset" aria-label="Standardempfänger auswählen"><option value="">Standardempfänger</option><option value="service.schaden@sparkassenversicherung.de">Sparkassenversicherung – Schadenservice</option><option value="archiv@sparkassenversicherung.de">Sparkassenversicherung – Archiv</option></select></div></label>'''
 if old_to in updated:
     updated = updated.replace(old_to, new_to, 1)
 elif 'id="vf-mail-preset"' not in updated:
     raise SystemExit('E-Mail-Empfängerfeld nicht gefunden')
+
+# Bestehende Auswahl um das Archiv ergänzen, falls der Mailbereich schon gepatcht ist.
+existing_service = '<option value="service.schaden@sparkassenversicherung.de">Sparkassenversicherung – Schadenservice</option>'
+archive_option = '<option value="archiv@sparkassenversicherung.de">Sparkassenversicherung – Archiv</option>'
+if 'id="vf-mail-preset"' in updated and archive_option not in updated:
+    if existing_service not in updated:
+        raise SystemExit('Standardempfänger-Auswahl gefunden, Schadenservice-Option fehlt jedoch')
+    updated = updated.replace(existing_service, existing_service + archive_option, 1)
 
 css_anchor = '.vf-mail-grid input,.vf-mail-grid textarea{width:100%;box-sizing:border-box;border:1px solid #bdcbd6;border-radius:9px;padding:10px 11px;font:inherit;margin-top:4px}'
 css_add = '.vf-mail-recipient-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:end}.vf-mail-recipient-row select{box-sizing:border-box;border:1px solid #bdcbd6;border-radius:9px;padding:10px 11px;font:inherit;margin-top:4px;background:#fff;color:#17324a;max-width:260px}'
