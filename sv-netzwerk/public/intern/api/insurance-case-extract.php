@@ -25,8 +25,14 @@ $base64 = base64_encode($bytes);
 $system = <<<'PROMPT'
 Du analysierst Unterlagen zu deutschen Versicherungs-Schadenfällen und extrahierst ausschließlich eindeutig erkennbare Falldaten. Nichts erfinden. Unklare oder nicht vorhandene Werte als leeren String zurückgeben. Telefonnummern und E-Mail-Adressen exakt übernehmen. Schaden-Nr. und Versicherungsschein-Nr. nicht verwechseln.
 
+Bestimme zusätzlich den Versicherer und die Fallart. Zulässige Werte für fallart sind ausschließlich "SV", "SV-GF" oder "Andere Versicherer".
+- "SV-GF" nur bei Sparkassenversicherung und erkennbarem GF-, Großschaden- oder Groß-TF-Bezug beziehungsweise entsprechenden GF-Berichtsformularen.
+- "SV" bei Sparkassenversicherung ohne belegten GF-/Großschadenbezug.
+- "Andere Versicherer" bei allen anderen Versicherern.
+- Ist die Einordnung nicht belastbar, fallart leer lassen und die Gründe in fallart_hinweis nennen.
+
 Antworte ausschließlich als JSON mit genau diesen Feldern:
-{"schaden_nr":"","versicherungsschein_nr":"","vn_objekt":"","strasse":"","plz":"","ort":"","telefon":"","mobil":"","email":"","vorsteuer":"","schadenart":"","schadentag":"","meldedatum":"","reserve":"","kontakt":"","vermittler_firma":"","vermittler_ansprechpartner":"","vermittler_telefon":"","vermittler_mobil":"","vermittler_fax":"","vermittler_email":""}
+{"schaden_nr":"","versicherungsschein_nr":"","vn_objekt":"","strasse":"","plz":"","ort":"","telefon":"","mobil":"","email":"","vorsteuer":"","schadenart":"","schadentag":"","meldedatum":"","reserve":"","kontakt":"","vermittler_firma":"","vermittler_ansprechpartner":"","vermittler_telefon":"","vermittler_mobil":"","vermittler_fax":"","vermittler_email":"","versicherer":"","fallart":"","fallart_hinweis":""}
 
 Hinweise:
 - vn_objekt = Versicherungsnehmer / Firmenname / versichertes Objekt, soweit klar erkennbar.
@@ -98,7 +104,7 @@ if (!is_array($data)) {
 }
 if (!is_array($data)) apiError(503, 'KI-Antwort konnte nicht als Falldaten gelesen werden.');
 
-$allowed=['schaden_nr','versicherungsschein_nr','vn_objekt','strasse','plz','ort','telefon','mobil','email','vorsteuer','schadenart','schadentag','meldedatum','reserve','kontakt','vermittler_firma','vermittler_ansprechpartner','vermittler_telefon','vermittler_mobil','vermittler_fax','vermittler_email'];
+$allowed=['schaden_nr','versicherungsschein_nr','vn_objekt','strasse','plz','ort','telefon','mobil','email','vorsteuer','schadenart','schadentag','meldedatum','reserve','kontakt','vermittler_firma','vermittler_ansprechpartner','vermittler_telefon','vermittler_mobil','vermittler_fax','vermittler_email','versicherer','fallart','fallart_hinweis'];
 $out=[];
 foreach($allowed as $key) $out[$key]=trim((string)($data[$key]??''));
 apiJson(['ok'=>true,'file_name'=>$name,'fields'=>$out]);
