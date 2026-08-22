@@ -7,6 +7,8 @@ on:
       - 'sv-netzwerk/public/intern/bki-offline.js'
       - 'sv-netzwerk/public/intern/case-document-browser.js'
       - 'sv-netzwerk/public/intern/api/case-file-browser.php'
+      - 'sv-netzwerk/public/intern/api/bki-calculator.php'
+      - 'sv-netzwerk/scripts/patch-bki-file-search.py'
   workflow_dispatch:
 
 permissions:
@@ -15,22 +17,52 @@ permissions:
 jobs:
   deploy-runtime:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - name: Alte BKI-Navigation clientseitig sicher entfernen
+
+      - name: BKI-Suche auf indexierte File Search umstellen
+        working-directory: sv-netzwerk
+        run: python3 scripts/patch-bki-file-search.py
+
+      - name: Runtime-Navigation und Zurueck-Button vorbereiten
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p=Path('sv-netzwerk/public/intern/bki-offline.js')
           s=p.read_text(encoding='utf-8')
-          marker='/* SVNET_NAV_CLEANUP */'
+          marker='/* SVNET_RUNTIME_UI */'
           if marker not in s:
-              cleanup="""/* SVNET_NAV_CLEANUP */\n(()=>{\n  const clean=()=>document.querySelectorAll('.intern-header__nav a').forEach(a=>{\n    const t=(a.textContent||'').trim().toLowerCase();\n    if(t==='bki'||t==='kalkulation')a.remove();\n  });\n  clean();\n  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean,{once:true});\n  new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true});\n})();\n"""
-              p.write_text(cleanup+s,encoding='utf-8')
+              runtime="""/* SVNET_RUNTIME_UI */
+(()=>{
+  const enhance=()=>{
+    document.querySelectorAll('.intern-header__nav a').forEach(a=>{
+      const t=(a.textContent||'').trim().toLowerCase();
+      if(t==='bki')a.remove();
+    });
+    if(location.pathname.startsWith('/intern/kalkulation')&&!document.getElementById('bk-back-case')){
+      const app=document.querySelector('.bk-app');
+      if(app){
+        const row=document.createElement('div');
+        row.style.cssText='max-width:1450px;margin:0 auto 10px;padding:0 24px;box-sizing:border-box';
+        const a=document.createElement('a');
+        a.id='bk-back-case';a.href='/intern/versicherungsfaelle/';a.textContent='← Zurück zu Versicherungsfällen';
+        a.style.cssText='display:inline-flex;align-items:center;text-decoration:none;border:1px solid #b8c7d2;background:#fff;color:#17324a;border-radius:9px;padding:9px 13px;font-weight:800';
+        row.appendChild(a);app.parentNode.insertBefore(row,app);
+      }
+    }
+  };
+  enhance();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',enhance,{once:true});
+  new MutationObserver(enhance).observe(document.documentElement,{childList:true,subtree:true});
+})();
+"""
+              p.write_text(runtime+s,encoding='utf-8')
           PY
+
       - name: Python SFTP installieren
         run: python3 -m pip install --disable-pip-version-check --quiet paramiko
+
       - name: Runtime-Dateien direkt nach IONOS uebertragen
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
@@ -46,6 +78,7 @@ jobs:
             (Path('sv-netzwerk/public/intern/bki-offline.js'),'/sv-netzwerk/intern/bki-offline.js'),
             (Path('sv-netzwerk/public/intern/case-document-browser.js'),'/sv-netzwerk/intern/case-document-browser.js'),
             (Path('sv-netzwerk/public/intern/api/case-file-browser.php'),'/sv-netzwerk/intern/api/case-file-browser.php'),
+            (Path('sv-netzwerk/public/intern/api/bki-calculator.php'),'/sv-netzwerk/intern/api/bki-calculator.php'),
           ]
           host=os.environ['SFTP_HOST']; user=os.environ['SFTP_USERNAME']; password=os.environ['SFTP_PASSWORD']; port=int(os.environ.get('SFTP_PORT') or '22')
           t=paramiko.Transport((host,port)); t.banner_timeout=15; t.auth_timeout=15; t.connect(username=user,password=password)
@@ -62,9 +95,12 @@ jobs:
             mkdirs(remote.rsplit('/',1)[0]); s.put(str(local),remote); s.stat(remote); print('OK',remote)
           s.close(); t.close()
           PY
+
       - name: Online-Dateien pruefen
         run: |
           test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/bki-offline.js)" = "200"
           test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/case-document-browser.js)" = "200"
-          code="$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/api/case-file-browser.php)"
-          test "$code" = "200" -o "$code" = "400" -o "$code" = "401" -o "$code" = "403"
+          bki_code="$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/api/bki-calculator.php?action=status)"
+          test "$bki_code" = "200" -o "$bki_code" = "401" -o "$bki_code" = "403" -o "$bki_code" = "503"
+          case_code="$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/api/case-file-browser.php)"
+          test "$case_code" = "200" -o "$case_code" = "400" -o "$case_code" = "401" -o "$case_code" = "403"
