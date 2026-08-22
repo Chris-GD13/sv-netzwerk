@@ -1,4 +1,4 @@
-<?php
+if(false&&is_string($workbook))foreach(gfDriveWalk($caseFolder)as$f)<?php
 declare(strict_types=1);
 require_once __DIR__ . '/config.php';
 commonHeaders();
