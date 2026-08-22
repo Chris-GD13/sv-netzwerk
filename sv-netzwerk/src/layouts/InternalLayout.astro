@@ -51,5 +51,11 @@ const props = Astro.props;
       <slot />
     </main>
     <script src="/intern/versicherungsfaelle-enhancements.js" defer></script>
+    <script src="/intern/bki-offline.js" defer></script>
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js', { scope: '/intern/' }).catch(() => {}));
+      }
+    </script>
   </body>
 </html>
