@@ -220,5 +220,15 @@ try{
     $folder=trim((string)($_GET['folder_id']??''));if($folder!=='')requireCaseFolderAccess($folder,$user);if($folder!=='' ){$s=db()->prepare('SELECT id,case_no,damage_type,object_name,gross_total,created_at FROM bki_calculations WHERE folder_id=:f ORDER BY id DESC LIMIT 30');$s->execute([':f'=>$folder]);}else{$s=db()->query('SELECT id,case_no,damage_type,object_name,gross_total,created_at FROM bki_calculations WHERE folder_id IS NULL OR folder_id="" ORDER BY id DESC LIMIT 30');}$out=[];foreach($s->fetchAll()as$r)$out[]=['id'=>(int)$r['id'],'case_no'=>(string)($r['case_no']??''),'gross_total'=>(float)$r['gross_total'],'created_at'=>(string)$r['created_at'],'title'=>trim(((string)($r['damage_type']??'')).' '.((string)($r['object_name']??'')))?:'BKI-Kalkulation'];apiJson(['ok'=>true,'items'=>$out]);
   }
   if($action==='get'){$id=(int)($_GET['id']??0);if($id<=0)apiError(400,'ID fehlt.');$s=db()->prepare('SELECT * FROM bki_calculations WHERE id=:id AND created_by=:u LIMIT 1');$s->execute([':id'=>$id,':u'=>(string)($user['email']??$user['full_name']??'')]);$r=$s->fetch();if(!$r)apiError(404,'Kalkulation nicht gefunden.');$r['items']=json_decode((string)$r['items_json'],true)?:[];unset($r['items_json']);apiJson(['ok'=>true,'item'=>$r]);}
+  if($action==='delete'){
+    if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
+    $in=requestBody();$id=(int)($in['id']??0);if($id<=0)apiError(400,'ID fehlt.');
+    $who=(string)($user['email']??$user['full_name']??'');
+    $s=db()->prepare('SELECT folder_id FROM bki_calculations WHERE id=:id AND created_by=:u LIMIT 1');$s->execute([':id'=>$id,':u'=>$who]);$row=$s->fetch();
+    if(!$row)apiError(404,'Kalkulation nicht gefunden oder keine Löschberechtigung.');
+    $folder=trim((string)($row['folder_id']??''));if($folder!=='')requireCaseFolderAccess($folder,$user);
+    $del=db()->prepare('DELETE FROM bki_calculations WHERE id=:id AND created_by=:u');$del->execute([':id'=>$id,':u'=>$who]);
+    apiJson(['ok'=>true,'deleted_id'=>$id]);
+  }
   apiError(404,'Unbekannte Aktion.');
 }catch(Throwable $e){error_log('[bki-calculator] '.$e->getMessage());apiError(500,$e->getMessage());}
