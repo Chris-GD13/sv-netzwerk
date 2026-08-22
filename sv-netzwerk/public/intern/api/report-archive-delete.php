@@ -112,6 +112,7 @@ $stmt = db()->prepare('SELECT * FROM report_archive WHERE id=:id LIMIT 1');
 $stmt->execute([':id'=>$id]);
 $row = $stmt->fetch();
 if (!$row) apiError(404, 'Gutachten nicht gefunden.');
+requireProjectDeleteAccess($user, (int)($row['project_id'] ?? 0));
 
 $driveId = trim((string)($row['drive_file_id'] ?? ''));
 if ($driveId !== '') {

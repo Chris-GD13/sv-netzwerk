@@ -378,7 +378,7 @@ if ($method === 'GET' && isset($_GET['download'])) {
 
 if ($method === 'GET') {
     $projectId = max(1, (int)($_GET['project_id'] ?? DEFAULT_PROJECT_ID));
-    $stmt = db()->prepare('SELECT id,project_id,file_name,storage_name,drive_file_id,drive_web_view_link,storage_backend,mime_type,file_size,sha256,window_count,photo_count,attachment_count,created_by_name,created_at FROM report_archive WHERE project_id=:pid ORDER BY created_at DESC,id DESC LIMIT 200');
+    $stmt = db()->prepare('SELECT id,project_id,file_name,storage_name,drive_file_id,drive_web_view_link,storage_backend,mime_type,file_size,sha256,window_count,photo_count,attachment_count,created_by,created_by_name,created_at FROM report_archive WHERE project_id=:pid ORDER BY created_at DESC,id DESC LIMIT 200');
     $stmt->execute([':pid'=>$projectId]);
     $items = $stmt->fetchAll();
     foreach ($items as &$item) {
@@ -388,6 +388,8 @@ if ($method === 'GET') {
         $item['window_count'] = (int)$item['window_count'];
         $item['photo_count'] = (int)$item['photo_count'];
         $item['attachment_count'] = (int)$item['attachment_count'];
+        $item['can_delete'] = canDeleteProject($user, (int)$item['project_id']);
+        unset($item['created_by']);
         $driveId = trim((string)($item['drive_file_id'] ?? ''));
         $available = $driveId !== '';
         if (!$available) {

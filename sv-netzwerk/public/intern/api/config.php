@@ -45,8 +45,59 @@ function ensureRuntimeSchema(PDO $pdo): void
         if ((int) $stmt->fetchColumn() === 0) {
             $pdo->exec('ALTER TABLE photos ADD COLUMN sash_id INT UNSIGNED NULL AFTER window_id');
         }
+
+        // projects.created_by_user_id – ownership controls destructive project actions.
+        $stmt->execute([':table' => 'projects', ':column' => 'created_by_user_id']);
+        if ((int) $stmt->fetchColumn() === 0) {
+            $pdo->exec('ALTER TABLE projects ADD COLUMN created_by_user_id INT UNSIGNED NULL AFTER is_active');
+            $pdo->exec('ALTER TABLE projects ADD INDEX idx_projects_created_by (created_by_user_id)');
+        }
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS case_folder_owners (
+            folder_id VARCHAR(190) PRIMARY KEY,
+            user_id INT UNSIGNED NOT NULL,
+            user_email VARCHAR(255) NOT NULL,
+            registered_at DATETIME NOT NULL,
+            KEY idx_case_owner_user (user_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     } catch (Throwable $e) {
         error_log('[config] Runtime-Migration fehlgeschlagen: ' . $e->getMessage());
+    }
+}
+
+/** Shared projects remain visible, but only administrators or their creator may delete them. */
+function canDeleteProject(array $user, int $projectId): bool
+{
+    if (($user['role'] ?? '') === 'administrator') return true;
+    if ($projectId <= 0 || empty($user['id'])) return false;
+    $stmt = db()->prepare('SELECT created_by_user_id FROM projects WHERE id = :id LIMIT 1');
+    $stmt->execute([':id' => $projectId]);
+    $owner = $stmt->fetchColumn();
+    return $owner !== false && $owner !== null && (int)$owner === (int)$user['id'];
+}
+
+function requireProjectDeleteAccess(array $user, int $projectId): void
+{
+    if (!canDeleteProject($user, $projectId)) {
+        apiError(403, 'Dieses gemeinsame Projekt darf nur angesehen und bearbeitet, aber nicht gelöscht werden.');
+    }
+}
+
+function registerCaseFolderOwner(string $folderId, array $user): void
+{
+    if ($folderId === '' || empty($user['id'])) return;
+    $stmt = db()->prepare('INSERT INTO case_folder_owners(folder_id,user_id,user_email,registered_at) VALUES(:f,:u,:e,NOW()) ON DUPLICATE KEY UPDATE user_id=VALUES(user_id),user_email=VALUES(user_email),registered_at=NOW()');
+    $stmt->execute([':f'=>$folderId, ':u'=>(int)$user['id'], ':e'=>(string)($user['email']??'')]);
+}
+
+function requireCaseFolderAccess(string $folderId, array $user): void
+{
+    if ($folderId === '') apiError(400, 'Kein aktiver Fallordner.');
+    $stmt = db()->prepare('SELECT user_id FROM case_folder_owners WHERE folder_id=:f LIMIT 1');
+    $stmt->execute([':f'=>$folderId]);
+    $owner = $stmt->fetchColumn();
+    if ($owner === false || (int)$owner !== (int)($user['id']??0)) {
+        apiError(403, 'Dieser Schadenfall gehört zu einem anderen Benutzer und darf nicht geöffnet oder verändert werden.');
     }
 }
 

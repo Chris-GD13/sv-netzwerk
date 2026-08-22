@@ -69,10 +69,12 @@ CREATE TABLE IF NOT EXISTS projects (
     address              VARCHAR(255)    NOT NULL,
     planned_window_count INT             NULL,
     is_active            TINYINT(1)      NOT NULL DEFAULT 1,
+    created_by_user_id   INT UNSIGNED    NULL,
     created_at           DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at           DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     archived_at          DATETIME        NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    KEY idx_projects_created_by (created_by_user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================

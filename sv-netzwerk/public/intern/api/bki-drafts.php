@@ -34,7 +34,7 @@ try{
   if($action==='save'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
     $in=requestBody();$key=trim((string)($in['draft_key']??''));if($key==='')throw new RuntimeException('Entwurfskennung fehlt.');
-    $state=is_array($in['state']??null)?$in['state']:[];$case=is_array($in['case_meta']??null)?$in['case_meta']:[];$folder=trim((string)($in['folder_id']??''));$who=bdUser();
+    $state=is_array($in['state']??null)?$in['state']:[];$case=is_array($in['case_meta']??null)?$in['case_meta']:[];$folder=trim((string)($in['folder_id']??''));if($folder!=='')requireCaseFolderAccess($folder,$user);$who=bdUser();
     $title=trim((string)($in['title']??''));if($title==='')$title=trim(((string)($case['schaden_nr']??'')).' '.((string)($case['schadenart']??'')))?:'BKI-Kalkulationsentwurf';
     $sql='INSERT INTO bki_calculation_drafts(draft_key,folder_id,case_no,damage_type,object_name,title,state_json,updated_by,created_at,updated_at) VALUES(:k,:f,:c,:d,:o,:t,:s,:u,NOW(),NOW()) ON DUPLICATE KEY UPDATE folder_id=VALUES(folder_id),case_no=VALUES(case_no),damage_type=VALUES(damage_type),object_name=VALUES(object_name),title=VALUES(title),state_json=VALUES(state_json),updated_at=NOW()';
     $s=db()->prepare($sql);$s->execute([':k'=>$key,':f'=>$folder!==''?$folder:null,':c'=>trim((string)($case['schaden_nr']??''))?:null,':d'=>trim((string)($case['schadenart']??''))?:null,':o'=>trim((string)($case['vn_objekt']??''))?:null,':t'=>$title,':s'=>json_encode($state,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':u'=>$who]);
@@ -44,7 +44,7 @@ try{
     $key=trim((string)($_GET['draft_key']??''));if($key==='')apiError(400,'Entwurfskennung fehlt.');$s=db()->prepare('SELECT * FROM bki_calculation_drafts WHERE updated_by=:u AND draft_key=:k LIMIT 1');$s->execute([':u'=>bdUser(),':k'=>$key]);$r=$s->fetch();if(!$r)apiError(404,'Entwurf nicht gefunden.');$out=bdRow($r);$out['state']=json_decode((string)$r['state_json'],true)?:[];apiJson(['ok'=>true,'item'=>$out]);
   }
   if($action==='list'){
-    $folder=trim((string)($_GET['folder_id']??''));if($folder!==''){$s=db()->prepare('SELECT * FROM bki_calculation_drafts WHERE updated_by=:u AND folder_id=:f ORDER BY updated_at DESC LIMIT 30');$s->execute([':u'=>bdUser(),':f'=>$folder]);}else{$s=db()->prepare('SELECT * FROM bki_calculation_drafts WHERE updated_by=:u AND (folder_id IS NULL OR folder_id="") ORDER BY updated_at DESC LIMIT 30');$s->execute([':u'=>bdUser()]);}$items=[];foreach($s->fetchAll()as$r)$items[]=bdRow($r);apiJson(['ok'=>true,'items'=>$items]);
+    $folder=trim((string)($_GET['folder_id']??''));if($folder!=='')requireCaseFolderAccess($folder,$user);if($folder!=='' ){$s=db()->prepare('SELECT * FROM bki_calculation_drafts WHERE updated_by=:u AND folder_id=:f ORDER BY updated_at DESC LIMIT 30');$s->execute([':u'=>bdUser(),':f'=>$folder]);}else{$s=db()->prepare('SELECT * FROM bki_calculation_drafts WHERE updated_by=:u AND (folder_id IS NULL OR folder_id="") ORDER BY updated_at DESC LIMIT 30');$s->execute([':u'=>bdUser()]);}$items=[];foreach($s->fetchAll()as$r)$items[]=bdRow($r);apiJson(['ok'=>true,'items'=>$items]);
   }
   if($action==='delete'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');$in=requestBody();$key=trim((string)($in['draft_key']??''));if($key==='')apiError(400,'Entwurfskennung fehlt.');$s=db()->prepare('DELETE FROM bki_calculation_drafts WHERE updated_by=:u AND draft_key=:k');$s->execute([':u'=>bdUser(),':k'=>$key]);apiJson(['ok'=>true]);

@@ -27,14 +27,19 @@ function requireProjectRole(array $user, array $roles): void {
 }
 
 if ($method === 'GET') {
-    $stmt = db()->query("SELECT id, project_code, title, object_name, address, planned_window_count, is_active,
+    $stmt = db()->query("SELECT id, project_code, title, object_name, address, planned_window_count, is_active, created_by_user_id,
         (SELECT COUNT(*) FROM windows WHERE windows.project_id = projects.id AND windows.deleted_at IS NULL) as window_count,
         (SELECT COUNT(*) FROM buildings WHERE buildings.project_id = projects.id) as building_count
         FROM projects WHERE is_active = 1 ORDER BY id ASC");
     $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($projects as &$project) {
+        $project['is_own'] = !empty($project['created_by_user_id']) && (int)$project['created_by_user_id'] === (int)$user['id'];
+        $project['can_delete'] = canDeleteProject($user, (int)$project['id']);
+        unset($project['created_by_user_id']);
+    }
     apiJson(['projects' => $projects]);
 } elseif ($method === 'POST' && $action === 'duplicate' && $id) {
-    requireProjectRole($user, ['administrator', 'projektleiter']);
+    requireProjectRole($user, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer']);
     
     $src = db()->prepare('SELECT * FROM projects WHERE id = :id');
     $src->execute([':id' => $id]);
@@ -48,8 +53,8 @@ if ($method === 'GET') {
         $pdo = db();
         $pdo->beginTransaction();
         
-        $stmt = $pdo->prepare('INSERT INTO projects (project_code, title, object_name, address, planned_window_count, is_active) VALUES (:code, :title, :obj, :addr, :wc, 1)');
-        $stmt->execute([':code' => $newCode, ':title' => $newTitle, ':obj' => $project['object_name'], ':addr' => $project['address'], ':wc' => $project['planned_window_count']]);
+        $stmt = $pdo->prepare('INSERT INTO projects (project_code, title, object_name, address, planned_window_count, is_active, created_by_user_id) VALUES (:code, :title, :obj, :addr, :wc, 1, :uid)');
+        $stmt->execute([':code' => $newCode, ':title' => $newTitle, ':obj' => $project['object_name'], ':addr' => $project['address'], ':wc' => $project['planned_window_count'], ':uid' => (int)$user['id']]);
         $newId = (int)$pdo->lastInsertId();
         
         // Copy buildings
@@ -85,7 +90,7 @@ if ($method === 'GET') {
         apiError(503, 'Projekt konnte nicht dupliziert werden: ' . $e->getMessage());
     }
 } elseif ($method === 'POST') {
-    requireProjectRole($user, ['administrator', 'projektleiter']);
+    requireProjectRole($user, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer']);
     $body = requestBody();
     
     $title = trim((string)($body['title'] ?? ''));
@@ -107,8 +112,8 @@ if ($method === 'GET') {
     }
     
     try {
-        $stmt = db()->prepare('INSERT INTO projects (project_code, title, object_name, address, planned_window_count, is_active) VALUES (:code, :title, :obj, :addr, :wc, 1)');
-        $stmt->execute([':code' => $code, ':title' => $title, ':obj' => $objectName, ':addr' => $address, ':wc' => $windowCount]);
+        $stmt = db()->prepare('INSERT INTO projects (project_code, title, object_name, address, planned_window_count, is_active, created_by_user_id) VALUES (:code, :title, :obj, :addr, :wc, 1, :uid)');
+        $stmt->execute([':code' => $code, ':title' => $title, ':obj' => $objectName, ':addr' => $address, ':wc' => $windowCount, ':uid' => (int)$user['id']]);
         $newId = (int)db()->lastInsertId();
         apiJson(['id' => $newId, 'project_code' => $code], 201);
     } catch (Throwable $e) {
@@ -135,12 +140,14 @@ if ($method === 'GET') {
         apiError(503, 'Projekt konnte nicht aktualisiert werden.');
     }
 } elseif ($method === 'DELETE' && $id) {
-    requireProjectRole($user, ['administrator']);
+    requireProjectRole($user, ['administrator', 'projektleiter', 'sachverstaendiger', 'pruefer']);
+    requireProjectDeleteAccess($user, $id);
     
     $permanent = ($action === 'permanent');
     
     try {
         if ($permanent) {
+            if (($user['role'] ?? '') !== 'administrator') apiError(403, 'Endgültiges Löschen ist nur für Administratoren möglich.');
             // Cascade delete: windows (sashes, photos), rooms, floors, buildings, project
             $pdo = db();
             $pdo->exec("DELETE FROM window_sashes WHERE window_id IN (SELECT id FROM windows WHERE project_id = {$id})");

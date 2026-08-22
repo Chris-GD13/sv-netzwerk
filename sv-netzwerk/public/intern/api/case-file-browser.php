@@ -43,6 +43,6 @@ function cbTree(string $folderId,int $depth=0): array {
     foreach(cbList($folderId) as $f){$isFolder=(($f['mimeType']??'')==='application/vnd.google-apps.folder');$item=['id'=>(string)$f['id'],'name'=>(string)$f['name'],'mimeType'=>(string)($f['mimeType']??''),'modifiedTime'=>(string)($f['modifiedTime']??''),'size'=>(int)($f['size']??0),'webViewLink'=>(string)($f['webViewLink']??''),'folder'=>$isFolder];if($isFolder)$item['children']=cbTree((string)$f['id'],$depth+1);$out[]=$item;}
     return $out;
 }
-$folderId=trim((string)($_GET['folder_id']??''));if($folderId==='')apiError(400,'Kein aktiver Fall übergeben.');
+$folderId=trim((string)($_GET['folder_id']??''));requireCaseFolderAccess($folderId,$user);
 $metaUrl='https://www.googleapis.com/drive/v3/files/'.rawurlencode($folderId).'?'.http_build_query(['fields'=>'id,name,webViewLink','supportsAllDrives'=>'true']);$mr=cbHttp('GET',$metaUrl);$meta=json_decode($mr['body'],true)?:[];
 echo json_encode(['ok'=>true,'folder'=>['id'=>$folderId,'name'=>(string)($meta['name']??'Fallakte'),'webViewLink'=>(string)($meta['webViewLink']??'')],'items'=>cbTree($folderId)],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);

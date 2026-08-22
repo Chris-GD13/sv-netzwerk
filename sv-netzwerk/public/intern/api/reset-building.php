@@ -54,6 +54,7 @@ if ($method === 'GET') {
 }
 
 if ($method !== 'POST') apiError(405, 'POST erforderlich.');
+requireProjectDeleteAccess($user, (int)$building['project_id']);
 $body = requestBody();
 $confirmation = trim((string)($body['confirmation'] ?? ''));
 $expected = 'RESET ' . (string)$building['name'];
