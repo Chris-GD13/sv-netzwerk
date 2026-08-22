@@ -25,41 +25,6 @@ jobs:
         working-directory: sv-netzwerk
         run: python3 scripts/patch-bki-file-search.py
 
-      - name: Runtime-Navigation und Zurueck-Button vorbereiten
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('sv-netzwerk/public/intern/bki-offline.js')
-          s=p.read_text(encoding='utf-8')
-          marker='/* SVNET_RUNTIME_UI */'
-          if marker not in s:
-              runtime="""/* SVNET_RUNTIME_UI */
-(()=>{
-  const enhance=()=>{
-    document.querySelectorAll('.intern-header__nav a').forEach(a=>{
-      const t=(a.textContent||'').trim().toLowerCase();
-      if(t==='bki')a.remove();
-    });
-    if(location.pathname.startsWith('/intern/kalkulation')&&!document.getElementById('bk-back-case')){
-      const app=document.querySelector('.bk-app');
-      if(app){
-        const row=document.createElement('div');
-        row.style.cssText='max-width:1450px;margin:0 auto 10px;padding:0 24px;box-sizing:border-box';
-        const a=document.createElement('a');
-        a.id='bk-back-case';a.href='/intern/versicherungsfaelle/';a.textContent='← Zurück zu Versicherungsfällen';
-        a.style.cssText='display:inline-flex;align-items:center;text-decoration:none;border:1px solid #b8c7d2;background:#fff;color:#17324a;border-radius:9px;padding:9px 13px;font-weight:800';
-        row.appendChild(a);app.parentNode.insertBefore(row,app);
-      }
-    }
-  };
-  enhance();
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',enhance,{once:true});
-  new MutationObserver(enhance).observe(document.documentElement,{childList:true,subtree:true});
-})();
-"""
-              p.write_text(runtime+s,encoding='utf-8')
-          PY
-
       - name: Python SFTP installieren
         run: python3 -m pip install --disable-pip-version-check --quiet paramiko
 
