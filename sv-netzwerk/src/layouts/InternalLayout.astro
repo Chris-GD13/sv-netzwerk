@@ -23,6 +23,22 @@ const props = Astro.props;
     <meta name="theme-color" content="#071a2e" />
     <meta name="color-scheme" content="light" />
     <SEO {...props} noindex={true} robotsContent="noindex,nofollow" />
+    <style is:global>
+      .intern-header__logout {
+        appearance: none;
+        padding: .55rem .8rem;
+        border: 1px solid rgba(255, 255, 255, .6);
+        border-radius: 999px;
+        background: transparent;
+        color: #fff;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .intern-header__logout:hover,
+      .intern-header__logout:focus-visible { background: rgba(255, 255, 255, .12); }
+      .intern-header__logout:disabled { cursor: wait; opacity: .7; }
+    </style>
   </head>
   <body class="intern-body">
     <a class="skip-link" href="#intern-main">Zum Inhalt springen</a>
@@ -43,6 +59,7 @@ const props = Astro.props;
           <a class="intern-header__nav-highlight" href="/intern/kalkulation/">Kalkulation</a>
           <a class="intern-header__nav-highlight" href="/intern/versicherungsfaelle/">Versicherungen</a>
           <a class="intern-header__nav-highlight" href="/intern/api/outlook-case-calendar.php?action=open" target="_blank" rel="noreferrer" title="Den anhand der Anmeldung zugeordneten Outlook-Kalender öffnen">Kalender</a>
+          <button class="intern-header__logout" id="intern-logout" type="button">Abmelden</button>
         </nav>
       </div>
     </header>
@@ -53,6 +70,25 @@ const props = Astro.props;
     <script src="/intern/case-document-browser.js" defer></script>
     <script src="/intern/bki-offline.js" defer></script>
     <script is:inline>
+      document.getElementById('intern-logout')?.addEventListener('click', async (event) => {
+        const button = event.currentTarget;
+        if (!(button instanceof HTMLButtonElement)) return;
+        button.disabled = true;
+        button.textContent = 'Wird abgemeldet …';
+        try {
+          await fetch('/intern/api/auth.php?action=logout', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: '{}',
+          });
+        } finally {
+          sessionStorage.removeItem('svnet-case');
+          localStorage.removeItem('svnet-case');
+          localStorage.removeItem('svnet-case-owner');
+          window.location.assign('/intern/login/');
+        }
+      });
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js', { scope: '/intern/' }).catch(() => {}));
       }
