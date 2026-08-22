@@ -1,0 +1,45 @@
+---
+import InternalLayout from '../../../layouts/InternalLayout.astro';
+import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.astro';
+
+const calculatorUrl = 'https://www.gothaer.de/app/Bedarfsrechner/web/index.html';
+const sourceUrl = 'https://www.barmeniagothaer.de/inhaltsversicherung/glas-erstattungspreise/';
+---
+<InternalLayout title="Glas-Erstattungspreise" description="Glas-Reparaturkosten mit dem offiziellen Preisrechner von BarmeniaGothaer ermitteln.">
+  <main class="glass-app">
+    <a class="glass-back" href="/intern/versicherungsfaelle/">← Zurück zum Versicherungsportal</a>
+    <CalculationTypeNav active="glass" />
+    <section class="glass-head">
+      <div>
+        <p class="glass-kicker">BarmeniaGothaer</p>
+        <h1>Glas-Erstattungspreise</h1>
+        <p>Glasreparaturen direkt im SV-Netzwerk mit dem jeweils aktuellen offiziellen Erstattungspreisrechner bearbeiten.</p>
+      </div>
+      <div class="glass-source">
+        <strong>Preisquelle</strong>
+        <a href={sourceUrl} target="_blank" rel="noreferrer">BarmeniaGothaer Glas-Erstattungspreise</a>
+        <small>Die Preisberechnung und Aktualisierung erfolgt durch BarmeniaGothaer.</small>
+      </div>
+    </section>
+    <section class="glass-card glass-notice">
+      <strong>Hinweis zur Berechnung</strong>
+      <span>Der eingebundene Rechner arbeitet nach den aktuellen Auftragsbedingungen der BarmeniaGothaer. Ergebnisse über 2.600 € sind vor der Ausführung mit dem Versicherer abzustimmen. Preise verstehen sich zuzüglich Umsatzsteuer.</span>
+    </section>
+    <section class="glass-card glass-frame-card">
+      <div class="glass-frame-head"><strong>Offizieller Glas-Erstattungspreisrechner</strong><a href={calculatorUrl} target="_blank" rel="noreferrer">Rechner in neuem Fenster öffnen ↗</a></div>
+      <iframe src={calculatorUrl} title="BarmeniaGothaer Glas-Erstattungspreisrechner" loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </section>
+  </main>
+</InternalLayout>
+<style is:global>
+  :root{--glass:#17324a;--glass-muted:#687b8c;--glass-orange:#ff970f;--glass-line:#dce5ec}
+  .glass-app{max-width:1450px;margin:auto;padding:18px 24px 56px;color:var(--glass)}
+  .glass-back{display:inline-flex;align-items:center;margin-bottom:12px;text-decoration:none;border:1px solid #b8c7d2;background:#fff;color:var(--glass);border-radius:9px;padding:9px 13px;font-weight:800}
+  .glass-head{display:flex;justify-content:space-between;gap:24px;margin-bottom:16px}.glass-head h1{margin:4px 0}.glass-head p{color:var(--glass-muted)}.glass-kicker{margin:0!important;color:var(--glass-orange)!important;font-weight:800}
+  .glass-source{display:flex;flex-direction:column;gap:5px;background:#eef4f7;border:1px solid var(--glass-line);border-radius:12px;padding:12px 14px;max-width:430px}.glass-source a{color:var(--glass);font-weight:800}.glass-source small{color:var(--glass-muted)}
+  .glass-card{background:#fff;border:1px solid var(--glass-line);border-radius:15px;padding:18px;margin-bottom:16px}.glass-notice{display:flex;gap:12px;align-items:flex-start}.glass-notice span{color:var(--glass-muted)}
+  .glass-frame-card{padding:0;overflow:hidden}.glass-frame-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--glass-line)}.glass-frame-head a{color:var(--glass);font-weight:800;text-decoration:none}
+  .glass-frame-card iframe{display:block;width:100%;height:1180px;border:0;background:#fff}
+  @media(max-width:760px){.glass-head{display:block}.glass-source{max-width:none}.glass-notice,.glass-frame-head{flex-direction:column}.glass-frame-card iframe{height:1350px}}
+  @media print{.intern-header,.glass-back,.calculation-type-nav,.glass-head,.glass-notice,.glass-frame-head,.skip-link{display:none!important}.glass-app{padding:0}.glass-card{border:0}.glass-frame-card iframe{height:1500px}}
+</style>

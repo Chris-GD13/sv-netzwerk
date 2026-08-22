@@ -2,11 +2,13 @@
 import InternalLayout from '../../../layouts/InternalLayout.astro';
 import logoSrc from '../../../assets/sv-netzwerk-logo-freigestellt-v3.svg';
 import positions from '../../../data/insurance-damage-prices.json';
+import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.astro';
 const groups = [...new Set(positions.map((p) => p.group))];
 ---
 <InternalLayout title="Kalkulation Versicherungsschäden" description="Kalkulation typischer Leistungen bei Versicherungsschäden mit fest hinterlegten Listenpreisen.">
   <main class="vs-app" data-positions={JSON.stringify(positions)}>
-    <nav class="vs-nav"><a href="/intern/kalkulation/">← BKI-Kalkulation</a><a href="/intern/versicherungsfaelle/">Versicherungsportal</a></nav>
+    <nav class="vs-nav"><a href="/intern/versicherungsfaelle/">← Zurück zum Versicherungsportal</a></nav>
+    <CalculationTypeNav active="insurance" />
     <section class="vs-head"><div><p class="vs-kicker">Versicherungsschäden</p><h1>Kalkulation Versicherungsschäden</h1><p>Leckageortung, Trocknung, Sanierung, Rückbau und weitere typische Schadenleistungen mit fest hinterlegten Netto-Einheitspreisen.</p></div><div id="vs-case" class="vs-case">Freie Kalkulation · keinem Fall zugeordnet</div></section>
     <section class="vs-card vs-catalog">
       <div class="vs-tools"><label>Position suchen<input id="vs-search" type="search" placeholder="z. B. Trocknung, Rückbau, Leckage …"></label><button id="vs-clear" class="secondary" type="button">Auswahl löschen</button></div>

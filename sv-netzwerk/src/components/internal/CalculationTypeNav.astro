@@ -1,0 +1,28 @@
+---
+interface Props {
+  active: 'bki' | 'insurance' | 'glass';
+}
+
+const { active } = Astro.props;
+const entries = [
+  { id: 'bki', label: 'BKI-Kalkulation', href: '/intern/kalkulation/' },
+  { id: 'insurance', label: 'Versicherungsschäden', href: '/intern/kalkulation/versicherungsschaeden/' },
+  { id: 'glass', label: 'Glas-Erstattungspreise', href: '/intern/kalkulation/glas-erstattungspreise/' },
+] as const;
+---
+<section class="calculation-type-nav" aria-label="Kalkulationsart">
+  <strong>Kalkulationsart</strong>
+  <nav>
+    {entries.map((entry) => active === entry.id
+      ? <span class="active" aria-current="page">{entry.label}</span>
+      : <a href={entry.href}>{entry.label}</a>)}
+  </nav>
+</section>
+<style is:global>
+  .calculation-type-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid #dce5ec;border-radius:15px;padding:18px;margin-bottom:16px;color:#17324a}
+  .calculation-type-nav nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+  .calculation-type-nav a,.calculation-type-nav span{border:1px solid #b8c7d2;border-radius:9px;padding:9px 13px;font-weight:800;text-decoration:none;color:#17324a;white-space:nowrap}
+  .calculation-type-nav .active{background:#17324a;color:#fff;border-color:#17324a}
+  @media(max-width:760px){.calculation-type-nav{align-items:flex-start;flex-direction:column}.calculation-type-nav nav{justify-content:flex-start}}
+  @media print{.calculation-type-nav{display:none!important}}
+</style>
