@@ -1002,3 +1002,16 @@ textarea.intern-input {
 
 .intern-ai-item--update { background: rgba(251, 191, 36, 0.06); }
 .intern-ai-item--conflict { background: rgba(239, 68, 68, 0.06); }
+
+
+@media (max-width: 42rem) {
+  .intern-header__inner { align-items:flex-start; padding:.7rem .8rem; gap:.7rem; }
+  .intern-header__brand { width:100%; flex-wrap:nowrap; gap:.65rem; }
+  .intern-header__logo { width:8.6rem; }
+  .intern-header__meta { min-width:0; }
+  .intern-header__eyebrow { font-size:.6rem; }
+  .intern-header__meta strong { font-size:.9rem; }
+  .intern-header__meta small { font-size:.72rem; }
+  .intern-header__nav { width:100%; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.45rem; }
+  .intern-header__nav a, .intern-header__logout { min-width:0; padding:.55rem .35rem; text-align:center; font-size:.8rem; }
+}
