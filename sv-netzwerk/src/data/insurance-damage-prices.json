@@ -1,0 +1,1143 @@
+[
+  {
+    "group": "Leckageortung / Reparatur",
+    "code": "01.01.000",
+    "description": "Ergebnisorientierte Leckageortungspauschale inklusive Kosten für den Einsatz aller gängigen",
+    "unit": "psch",
+    "price": 350.0
+  },
+  {
+    "group": "Leckageortung / Reparatur",
+    "code": "01.01.001",
+    "description": "Ausnahme: Wird vor Ort festgestellt, dass einer Ortung technische Gründe (beispielsweise",
+    "unit": "h",
+    "price": 65.0
+  },
+  {
+    "group": "Leckageortung / Reparatur",
+    "code": "01.02.001",
+    "description": "Für die Leckageortung erforderliche Vorarbeiten aus 01.01.001",
+    "unit": "h",
+    "price": 65.0
+  },
+  {
+    "group": "Leckageortung / Reparatur",
+    "code": "01.02.002",
+    "description": "Materialanteil zu 01.02.001",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Leckageortung / Reparatur",
+    "code": "01.03.001",
+    "description": "Notreparatur der Leckage",
+    "unit": "psch",
+    "price": 150.0
+  },
+  {
+    "group": "Leckageortung / Reparatur",
+    "code": "01.03.002",
+    "description": "Reparatur der Leckage",
+    "unit": "psch",
+    "price": 300.0
+  },
+  {
+    "group": "Leckageortung / Reparatur",
+    "code": "01.03.003",
+    "description": "Reparatur der Leckage durch Partnerfirma mit Rapporten und Dokumentation",
+    "unit": "h",
+    "price": 65.0
+  },
+  {
+    "group": "Leckageortung / Reparatur",
+    "code": "01.03.004",
+    "description": "Materialanteil zu 01.03.003 Bis 150 EUR ohne weitere Freigabe",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Leckageortung / Reparatur",
+    "code": "01.04.001",
+    "description": "Reparatur der Leckage durch Fremdunternehmen mit Rapporten und Dokumentation",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Leckageortung / Reparatur",
+    "code": "01.04.002",
+    "description": "Regiekosten für die Reparatur der Leckage durch Fremdunternehmen",
+    "unit": "psch",
+    "price": 0.15
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.00.000",
+    "description": "Abschottungen: Raumabteilungen mit und ohne Folientüren in Treppenhäusern und sehr großen",
+    "unit": "St",
+    "price": 45.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.01.000",
+    "description": "Grundpauschale je Nutzungseinheit (inkl. zugehöriger Nebenräume außerhalb der Nutzungseinheit): unabhängig von der Trocknungsart inkl. aller",
+    "unit": "St",
+    "price": 580.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.02.000",
+    "description": "Estrichdämmschichttrocknung mit Erhalt des Fußbodenbelages.",
+    "unit": "m²",
+    "price": 14.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.02.001",
+    "description": "0 bis 500 m²",
+    "unit": "m²",
+    "price": 12.7
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.02.002",
+    "description": "0 bis 1.000 m²",
+    "unit": "m²",
+    "price": 12.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.02.003",
+    "description": "0 bis größer 1.000 m²",
+    "unit": "m²",
+    "price": 11.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.03.000",
+    "description": "Eine Raumtrocknung ohne Estrichdämmschichttrocknung (z.B. allseits",
+    "unit": "St",
+    "price": 220.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.04.001",
+    "description": "Wandflächentrocknung zusätzlich zur Estrichdämmschichttrocknung.",
+    "unit": "m",
+    "price": 12.5
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.04.002",
+    "description": "Wandflächentrocknung zusätzlich zur Estrichdämmschichttrocknung.",
+    "unit": "m",
+    "price": 16.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.05.000",
+    "description": "Zulage bei Schüttungen in Holzbalkendecke",
+    "unit": "m²",
+    "price": 5.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.05.001",
+    "description": "Zulage pro Hohlraumtrocknung z.B. unter Bade- und Duschwanne, Hohlwände, Hohldecken",
+    "unit": "St",
+    "price": 65.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.05.002",
+    "description": "Zulage zur Steigschacht- oder Bodenkanaltrocknung (bis max. 10 m bzw. von Abschottung zu",
+    "unit": "St",
+    "price": 215.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.06.000",
+    "description": "Trocknung vom darunter liegenden Stockwerk aus: Baustelleneinrichtung je Raum für Bohrungen von unten zur Rettung des Oberbodenbelages",
+    "unit": "St",
+    "price": 54.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.06.001",
+    "description": "Bohrung durch Betondecke",
+    "unit": "St",
+    "price": 45.4
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.07.000",
+    "description": "Lokalisieren der Fußbodenheizung mit geeigneten technischen Methoden - soweit erforderlich - bis 50 m² zu trocknende Fläche",
+    "unit": "St",
+    "price": 120.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.07.001",
+    "description": "jede weitere 50 m²",
+    "unit": "St",
+    "price": 45.4
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.08.000",
+    "description": "Erstmaßnahmen bei Schimmelpilzbefall (bei ÜS auch zur Prävention)",
+    "unit": "psch",
+    "price": 38.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.08.001",
+    "description": "Erstmaßnahmen bei Schimmelpilzbefall (bei ÜS auch zur Prävention)",
+    "unit": "m²",
+    "price": 0.85
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.08.002",
+    "description": "Schimmelpilzbehandlung",
+    "unit": "psch",
+    "price": 35.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.08.003",
+    "description": "Schimmelpilzbehandlung",
+    "unit": "m²",
+    "price": 1.15
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.08.004",
+    "description": "Keimabtötende Spülung zur Desinfektion der Estrichdämmschicht inkl. aller erforderlichen",
+    "unit": "m²",
+    "price": 10.5
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.08.005",
+    "description": "Keimabtötender Schaum zur Desinfektion der Estrichdämmschicht inkl. aller erforderlichen",
+    "unit": "m²",
+    "price": 25.5
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.08.006",
+    "description": "Zulage zur Trocknung für Geruchsbehandlung pro Raum",
+    "unit": "psch",
+    "price": 76.5
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.10.000",
+    "description": "ÜS Grundzulage pro Auftrag (gebietsunabhängig) auch wenn keine Trocknung aufgebaut wird",
+    "unit": "psch",
+    "price": 250.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.10.001",
+    "description": "ÜS Fremdgebietszulage pro Auftrag zusätzlich zur ÜS Grundzulage, wenn Schäden im Fremdgebiet",
+    "unit": "psch",
+    "price": 250.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.10.002",
+    "description": "ÜS Intensiv- und Vorsorgezulage pro Auftrag im Eigengebiet",
+    "unit": "psch",
+    "price": 250.0
+  },
+  {
+    "group": "Trocknung",
+    "code": "02.11.000",
+    "description": "Stromverbrauch (nur Angabe kWh)",
+    "unit": "kWh",
+    "price": null
+  },
+  {
+    "group": "Sanierung",
+    "code": "03.01.000",
+    "description": "Grundsanierungspauschale: Diese Pauschale kann angesetzt werden, wenn",
+    "unit": "psch",
+    "price": 620.0
+  },
+  {
+    "group": "Sanierung",
+    "code": "03.02.000",
+    "description": "Kleinstmengenpauschale je Nutzungseinheit: Je Gewerk der Sanierungspreisliste 1 mal.",
+    "unit": "psch",
+    "price": 220.0
+  },
+  {
+    "group": "Sanierung",
+    "code": "03.03.000",
+    "description": "Abdeckarbeiten: Schutz- und Abdeckmaßnahmen (außerhalb der Arbeitsbereiche, in denen",
+    "unit": "psch",
+    "price": 35.0
+  },
+  {
+    "group": "Sanierung",
+    "code": "03.03.001",
+    "description": "Abdeckarbeiten: Schutz- und Abdeckmaßnahmen (außerhalb der Arbeitsbereiche, in denen",
+    "unit": "m²",
+    "price": 3.0
+  },
+  {
+    "group": "Sanierung",
+    "code": "03.04.000",
+    "description": "Estrich einbauen inkl. aller erforderlichen Nebenleistungen, 0 bis 3 m²",
+    "unit": "psch",
+    "price": 225.0
+  },
+  {
+    "group": "Sanierung",
+    "code": "03.04.002",
+    "description": "Estrich einbauen inkl . aller erforderlichen Nebenleistungen ab 3 m²",
+    "unit": "m²",
+    "price": 60.0
+  },
+  {
+    "group": "Sanierung",
+    "code": "03.04.004",
+    "description": "Abdichtung im Standard-Duschbereich neu herstellen",
+    "unit": "psch",
+    "price": 250.0
+  },
+  {
+    "group": "Sanierung",
+    "code": "03.04.005",
+    "description": "Mauerschlitze, -öffnungen schließen bis 2qm, inkl. aller Nebenleistungen",
+    "unit": "psch",
+    "price": 200.0
+  },
+  {
+    "group": "Sanierung",
+    "code": "03.99.002",
+    "description": "Freitextposition für außergewöhnlich Arbeiten außerhalb der Preisliste.",
+    "unit": "St",
+    "price": null
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.00.000",
+    "description": "Fliesenbeschaffung (je Anfrage): Interner Beschaffungsaufwand für Ersatzfliesen",
+    "unit": "St",
+    "price": 43.5
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.01.000",
+    "description": "Zerstörungsfreies Aufnehmen einzelner Fliesen (bis 10 Fliesen).",
+    "unit": "St",
+    "price": 37.8
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.01.001",
+    "description": "Bei nicht zerstörungsfreiem Ausbau einzelner Fliesen (bis 10 Fliesen). Darüber Abrechnung im Taglohn.",
+    "unit": "St",
+    "price": 18.5
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.01.002",
+    "description": "Wiedereinbringen einzelner Fliesen einschließlich Verfugung (bis 10 Fliesen). Darüber Abrechnung",
+    "unit": "St",
+    "price": 22.0
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.01.003",
+    "description": "Lieferantenrechnung",
+    "unit": "St",
+    "price": null
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.04.000",
+    "description": "Ausbau von Fliesen",
+    "unit": "m²",
+    "price": 14.5
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.05.000",
+    "description": "Wandfliesen liefern und verlegen inkl. Material",
+    "unit": "m²",
+    "price": 90.5
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.05.001",
+    "description": "Bodenfliesen liefern und verlegen inkl. Material",
+    "unit": "m²",
+    "price": 80.0
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.05.002",
+    "description": "Mehrpreis Diagonalverlegung",
+    "unit": "m²",
+    "price": 10.0
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.05.003",
+    "description": "Sockelfliesen ab und neu",
+    "unit": "m",
+    "price": 25.0
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.05.004",
+    "description": "Silikonfugen ab und neu",
+    "unit": "m",
+    "price": 12.5
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.05.010",
+    "description": "Wand- und Bodenfliesen manuell neutralisierend reinigen",
+    "unit": "m²",
+    "price": 7.1
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.05.011",
+    "description": "Sockelfliesen ab, reinigen und montieren",
+    "unit": "m",
+    "price": 17.0
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.06.000",
+    "description": "Zulage Fugennachbehandlung",
+    "unit": "m²",
+    "price": 5.2
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.07.000",
+    "description": "Duschwanne einmauern, Standard",
+    "unit": "St",
+    "price": 105.0
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.07.001",
+    "description": "Badewanne einmauern, Standard",
+    "unit": "St",
+    "price": 150.0
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.99.000",
+    "description": "Taglohnarbeiten: Für Arbeiten, die in den Preislisten nicht geregelt sind, bzw. bei besonders",
+    "unit": "h",
+    "price": 60.0
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.99.001",
+    "description": "Materialkosten zu den Taglohnarbeiten",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Fliesenarbeiten",
+    "code": "04.99.002",
+    "description": "Freitextposition: Für außergewöhnliche Arbeiten außerhalb der Preisliste.",
+    "unit": "St",
+    "price": null
+  },
+  {
+    "group": "Gerüstarbeiten",
+    "code": "05.00.000",
+    "description": "Fassadengerüst je qm",
+    "unit": "psch",
+    "price": 13.0
+  },
+  {
+    "group": "Gerüstarbeiten",
+    "code": "05.00.001",
+    "description": "Pauschale für fahrbahres Gerüst",
+    "unit": "psch",
+    "price": 320.0
+  },
+  {
+    "group": "Abbruch / Rückbau",
+    "code": "06.00.000",
+    "description": "Estrich abbrechen und Abtransport in Container",
+    "unit": "psch",
+    "price": 215.0
+  },
+  {
+    "group": "Abbruch / Rückbau",
+    "code": "06.00.001",
+    "description": "Estrich abbrechen und Abtransport in Container von 0 - 30 m².",
+    "unit": "m²",
+    "price": 33.5
+  },
+  {
+    "group": "Abbruch / Rückbau",
+    "code": "06.00.002",
+    "description": "Estrich abbrechen und Abtransport in Container von 0 bis über 30 m²",
+    "unit": "m²",
+    "price": 24.5
+  },
+  {
+    "group": "Abbruch / Rückbau",
+    "code": "06.01.000",
+    "description": "Türen mit Zarge ausbauen und Abtransport in Container",
+    "unit": "St",
+    "price": 28.0
+  },
+  {
+    "group": "Abbruch / Rückbau",
+    "code": "06.02.000",
+    "description": "Heizkörper, demontieren und montieren",
+    "unit": "St",
+    "price": 67.0
+  },
+  {
+    "group": "Abbruch / Rückbau",
+    "code": "06.99.002",
+    "description": "Freitextposition: Für außergewöhnliche Arbeiten außerhalb der Preisliste.",
+    "unit": "St",
+    "price": null
+  },
+  {
+    "group": "Entsorgung",
+    "code": "07.00.000",
+    "description": "Entsorgung von Kleinmengen (Müllsäcke) von der Schadenstelle.",
+    "unit": "psch",
+    "price": 91.5
+  },
+  {
+    "group": "Entsorgung",
+    "code": "07.00.001",
+    "description": "externe Belege wie z.B. Container Deponiegebühren werden auf Nachweis",
+    "unit": "psch",
+    "price": 0.15
+  },
+  {
+    "group": "Entsorgung",
+    "code": "07.00.002",
+    "description": "Fremdkostenbeleg",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Reinigung",
+    "code": "08.00.000",
+    "description": "Teppichboden im Sprühextraktionsverfahren",
+    "unit": "m²",
+    "price": 7.5
+  },
+  {
+    "group": "Reinigung",
+    "code": "08.00.001",
+    "description": "Verschmutzte Decken und Wände mit Reinigungsmittel neutralisierend reinigen",
+    "unit": "m²",
+    "price": 4.6
+  },
+  {
+    "group": "Reinigung",
+    "code": "08.00.002",
+    "description": "Wandflächen und Bodenflächen im Hochdruckwaschverfahren reinigen.",
+    "unit": "m²",
+    "price": 4.5
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.00.001",
+    "description": "Wand- und Deckenflächen mit Dispersionsfarbe deckend streichen",
+    "unit": "m²",
+    "price": 5.9
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.00.002",
+    "description": "Von Wand- und Deckenflächen den losen Anstrich abkratzen;",
+    "unit": "m²",
+    "price": 15.9
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.00.003",
+    "description": "Wand- und Deckenflächen mit Silikatfarbe deckend streichen",
+    "unit": "m²",
+    "price": 7.1
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.00.004",
+    "description": "Wand- und Deckenflächen grundieren mit Tiefgrund",
+    "unit": "m²",
+    "price": 2.4
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.00.005",
+    "description": "Wand- und Deckenflächen isolieren",
+    "unit": "m²",
+    "price": 7.0
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.01.000",
+    "description": "Holzverkleidung schleifen, säubern, grundieren und lasieren",
+    "unit": "m²",
+    "price": 28.5
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.02.000",
+    "description": "Stahltüren und Zargen reinigen, grundieren und lackieren",
+    "unit": "psch",
+    "price": 244.0
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.03.000",
+    "description": "Fassadenflächen grundieren und 2 x mit weißer Fassadenfarbe anlegen.",
+    "unit": "m²",
+    "price": 15.8
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.03.001",
+    "description": "Fassaden-, Wandflächen im Hochdruckwaschverfahren reinigen.",
+    "unit": "m²",
+    "price": 4.6
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.04.000",
+    "description": "Tapeten entfernen und verbringen",
+    "unit": "m²",
+    "price": 4.4
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.05.000",
+    "description": "Zulage für die Entfernung mehrerer Lagen Tapeten oder ähnliche Erschwernisse",
+    "unit": "m²",
+    "price": 1.1
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.05.001",
+    "description": "Untergrund vorbereiten, grundieren, kleinere Beschädigungen überspachteln",
+    "unit": "m²",
+    "price": 5.0
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.06.000",
+    "description": "Mustertapete liefern und auf Stoß verkleben inkl. Material",
+    "unit": "m²",
+    "price": 16.3
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.06.001",
+    "description": "Mustertapete, ab + neu Tapete entfernen, grundieren, liefern, tapezieren",
+    "unit": "m²",
+    "price": 28.1
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.06.002",
+    "description": "Raufasertapete liefern und verkleben",
+    "unit": "m²",
+    "price": 6.8
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.06.003",
+    "description": "Raufaser, ab + neu Tapete entfernen, grundieren, liefern, tapezieren",
+    "unit": "m²",
+    "price": 24.5
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.06.004",
+    "description": "Glasfaser, neu grundieren, liefern, tapezieren, streichen und verbringen",
+    "unit": "m²",
+    "price": 25.8
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.07.000",
+    "description": "Verschnitt: Bei allen Positionen ist Verschnitt bis 10 % im Preis enthalten.",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.99.000",
+    "description": "Taglohnarbeiten: Für Arbeiten, die in den Preislisten nicht geregelt sind, bzw. bei besonders",
+    "unit": "h",
+    "price": 51.0
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.99.001",
+    "description": "Materialkosten zu den Taglohnarbeiten",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Malerarbeiten",
+    "code": "09.99.002",
+    "description": "Freitextposition: Für außergewöhnliche Arbeiten außerhalb der Preisliste.",
+    "unit": "St",
+    "price": null
+  },
+  {
+    "group": "Putzarbeiten",
+    "code": "10.00.000",
+    "description": "Wand- und Deckenputz abstemmen und verbringen",
+    "unit": "m²",
+    "price": 15.5
+  },
+  {
+    "group": "Putzarbeiten",
+    "code": "10.00.001",
+    "description": "Wand- und Deckenflächen grundieren mit Haftgrund",
+    "unit": "m²",
+    "price": 3.6
+  },
+  {
+    "group": "Putzarbeiten",
+    "code": "10.00.002",
+    "description": "Wand-und Deckenflächen spachteln",
+    "unit": "m²",
+    "price": 24.0
+  },
+  {
+    "group": "Putzarbeiten",
+    "code": "10.01.000",
+    "description": "Größere Putzschäden an Wand- oder Deckenteilflächen ausbessern",
+    "unit": "m²",
+    "price": 24.1
+  },
+  {
+    "group": "Putzarbeiten",
+    "code": "10.02.000",
+    "description": "Inneneckwinkel liefern und mit Ansetzbinder setzen",
+    "unit": "m",
+    "price": 5.3
+  },
+  {
+    "group": "Putzarbeiten",
+    "code": "10.03.000",
+    "description": "Mineralischer Reibeputz oder Kunstharz verputzen",
+    "unit": "m²",
+    "price": 31.0
+  },
+  {
+    "group": "Putzarbeiten",
+    "code": "10.03.001",
+    "description": "Mineralischer Reibeputz oder Kunstharz reinigen grundieren, isolieren und überspachteln",
+    "unit": "m²",
+    "price": 28.3
+  },
+  {
+    "group": "Putzarbeiten",
+    "code": "10.99.000",
+    "description": "Taglohnarbeiten: Für Arbeiten, die in den Preislisten nicht geregelt sind, bzw. bei besonders",
+    "unit": "h",
+    "price": 54.0
+  },
+  {
+    "group": "Putzarbeiten",
+    "code": "10.99.001",
+    "description": "Materialkosten zu den Taglohnarbeiten",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Putzarbeiten",
+    "code": "10.99.002",
+    "description": "Freitextposition: Für außergewöhnliche Arbeiten außerhalb der Preisliste.",
+    "unit": "St",
+    "price": null
+  },
+  {
+    "group": "Trockenbau",
+    "code": "11.00.000",
+    "description": "Decken- oder Wandverkleidung, mit / ohne Unterkonstruktion demontieren und verbringen",
+    "unit": "m²",
+    "price": 11.0
+  },
+  {
+    "group": "Trockenbau",
+    "code": "11.01.000",
+    "description": "Nichttragende innere Trennwand nach DIN 41031 liefern, montieren und malerfertig spachteln",
+    "unit": "m²",
+    "price": 70.0
+  },
+  {
+    "group": "Trockenbau",
+    "code": "11.01.001",
+    "description": "Zulage für doppelte Beplankung, GK 12,5 mm (je Seite)",
+    "unit": "m²",
+    "price": 9.0
+  },
+  {
+    "group": "Trockenbau",
+    "code": "11.01.002",
+    "description": "Als Deckenbekleidung Gipskartondecken inkl. UK liefern, montieren und malerfertig spachteln",
+    "unit": "m²",
+    "price": 57.0
+  },
+  {
+    "group": "Trockenbau",
+    "code": "11.01.003",
+    "description": "Wandtrockenputz aus Gipskartonplatten, bis 12,5 mm stark, liefern und fachgerecht mit einem",
+    "unit": "m²",
+    "price": 34.0
+  },
+  {
+    "group": "Trockenbau",
+    "code": "11.02.000",
+    "description": "OWA-Decken System S3-Einlegesystem 15 mm liefern und in vorhandene UK montieren",
+    "unit": "m²",
+    "price": 23.0
+  },
+  {
+    "group": "Trockenbau",
+    "code": "11.03.000",
+    "description": "Styroporplatten, ab + neu inkl. aller erforderlichen Nebenleistungen",
+    "unit": "m²",
+    "price": 31.0
+  },
+  {
+    "group": "Trockenbau",
+    "code": "11.99.000",
+    "description": "Taglohnarbeiten: Für Arbeiten, die in den Preislisten nicht geregelt sind, bzw. bei besonders",
+    "unit": "h",
+    "price": 54.0
+  },
+  {
+    "group": "Trockenbau",
+    "code": "11.99.001",
+    "description": "Materialkosten zu den Taglohnarbeiten",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Trockenbau",
+    "code": "11.99.002",
+    "description": "Freitextposition: Für außergewöhnliche Arbeiten außerhalb der Preisliste.",
+    "unit": "St",
+    "price": null
+  },
+  {
+    "group": "Schreinerarbeiten",
+    "code": "12.00.000",
+    "description": "Decken- oder Wandverkleidung, mit / ohne Unterkonstruktion demontieren und verbringen",
+    "unit": "m²",
+    "price": 11.0
+  },
+  {
+    "group": "Schreinerarbeiten",
+    "code": "12.01.000",
+    "description": "Unterkonstruktion, liefern und montieren",
+    "unit": "m²",
+    "price": 25.0
+  },
+  {
+    "group": "Schreinerarbeiten",
+    "code": "12.02.000",
+    "description": "Nut- und Federverkleidung oder Paneelverkleidung liefern",
+    "unit": "m²",
+    "price": 65.0
+  },
+  {
+    "group": "Schreinerarbeiten",
+    "code": "12.03.000",
+    "description": "Abschlussleiste liefern und montieren, inkl. Schattenfuge",
+    "unit": "m",
+    "price": 15.0
+  },
+  {
+    "group": "Schreinerarbeiten",
+    "code": "12.04.000",
+    "description": "Wärmedämmung in Holzkonstruktion bis 100 mm 035 liefern und montieren, inkl. Dampfbremse",
+    "unit": "m²",
+    "price": 21.0
+  },
+  {
+    "group": "Schreinerarbeiten",
+    "code": "12.04.001",
+    "description": "Wärmedämmung in Holzkonstruktion bis 140 mm 035 liefern und montieren, inkl. Dampfbremse",
+    "unit": "m²",
+    "price": 26.0
+  },
+  {
+    "group": "Schreinerarbeiten",
+    "code": "12.04.002",
+    "description": "Wärmedämmung in Holzkonstruktion bis 160 mm 035 liefern und montieren, inkl. Dampfbremse",
+    "unit": "m²",
+    "price": 28.0
+  },
+  {
+    "group": "Schreinerarbeiten",
+    "code": "12.05.000",
+    "description": "Türinnenelement aus- und wieder einbauen",
+    "unit": "St",
+    "price": 130.0
+  },
+  {
+    "group": "Schreinerarbeiten",
+    "code": "12.99.000",
+    "description": "Taglohnarbeiten: Für Arbeiten, die in den Preislisten nicht geregelt sind, bzw. bei besonders",
+    "unit": "h",
+    "price": 60.0
+  },
+  {
+    "group": "Schreinerarbeiten",
+    "code": "12.99.001",
+    "description": "Materialkosten zu den Taglohnarbeiten",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Schreinerarbeiten",
+    "code": "12.99.002",
+    "description": "Freitextposition: Für außergewöhnliche Arbeiten außerhalb der Preisliste.",
+    "unit": "St",
+    "price": null
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.00.000",
+    "description": "Bodenflächen manuell neutralisierend reinigen",
+    "unit": "m²",
+    "price": 3.7
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.01.000",
+    "description": "Bodenflächen schleifen, spachteln und grundieren",
+    "unit": "m²",
+    "price": 15.5
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.02.000",
+    "description": "Bodenbeläge (Teppich, PVC o.ä.) entfernen - lose",
+    "unit": "m²",
+    "price": 4.0
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.02.001",
+    "description": "Bodenbeläge (Teppich, PVC o.ä.) entfernen - verklebt",
+    "unit": "m²",
+    "price": 8.0
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.02.002",
+    "description": "Bodenbeläge (Parkett, Spanplatten) entfernen",
+    "unit": "m²",
+    "price": 13.1
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.03.000",
+    "description": "Teppichboden liefern, verlegen inkl. Material",
+    "unit": "m²",
+    "price": 44.2
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.04.000",
+    "description": "Trennlage / Trittschalldämmung liefern und verlegen",
+    "unit": "m²",
+    "price": 6.5
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.05.001",
+    "description": "PVC- oder Lino-Belag liefern, verlegen inkl. Material",
+    "unit": "m²",
+    "price": 46.5
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.05.002",
+    "description": "Parkettbelag liefern und verlegen inkl. Material",
+    "unit": "m²",
+    "price": 110.0
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.05.003",
+    "description": "Fertigparkett liefern und verlegen inkl. Material",
+    "unit": "m²",
+    "price": 85.0
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.05.004",
+    "description": "Laminatboden liefern und verlegen inkl. Material",
+    "unit": "m²",
+    "price": 50.0
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.05.005",
+    "description": "Korkboden liefern und verlegen inkl. Material",
+    "unit": "m²",
+    "price": 54.0
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.05.006",
+    "description": "Vinylboden liefern und verlegen inkl. Material",
+    "unit": "m²",
+    "price": 56.0
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.05.007",
+    "description": "Spanplatten, OSB bis 25 mm lieferen und verlegen inkl. Material",
+    "unit": "m²",
+    "price": 33.0
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.06.000",
+    "description": "Kunststoff-Sockelleisten, ab und neu",
+    "unit": "m",
+    "price": 9.0
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.06.001",
+    "description": "Holz-/Teppichboden-Sockelleisten, ab und neu",
+    "unit": "m",
+    "price": 13.0
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.07.000",
+    "description": "Parkett abschleifen, neu versiegeln",
+    "unit": "m²",
+    "price": 37.9
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.08.000",
+    "description": "Wand oder Boden anschleifen",
+    "unit": "m²",
+    "price": 2.5
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.08.001",
+    "description": "Anstrich Epoxidharz (2- Komponenten) aufbringen",
+    "unit": "m²",
+    "price": 22.0
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.08.002",
+    "description": "Öldichter Anstrich im Tankraum aufbringen",
+    "unit": "m²",
+    "price": 15.4
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.08.003",
+    "description": "Klebereste oder Anstriche vom Untergrund abschleifen",
+    "unit": "m²",
+    "price": 8.1
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.09.000",
+    "description": "Verschnitt: Bei allen Positionen ist Verschnitt bis 10 % im Preis enthalten. Werden die 10 %",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.99.000",
+    "description": "Taglohnarbeiten: Für Arbeiten, die in den Preislisten nicht geregelt sind, bzw. bei besonders",
+    "unit": "h",
+    "price": 60.0
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.99.001",
+    "description": "Materialkosten zu den Taglohnarbeiten",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Bodenbelagsarbeiten",
+    "code": "13.99.002",
+    "description": "Freitextposition: Für außergewöhnliche Arbeiten außerhalb der Preisliste.",
+    "unit": "St",
+    "price": null
+  },
+  {
+    "group": "Sonstige Leistungen",
+    "code": "14.00.000",
+    "description": "Besichtigungspauschale: Erfolgt vom Leistungserbringer eine",
+    "unit": "St",
+    "price": 150.0
+  },
+  {
+    "group": "Sonstige Leistungen",
+    "code": "14.01.000",
+    "description": "Der Notdiensteinsatz außerhalb der Servicezeiten wird pauschal vergütet.",
+    "unit": "St",
+    "price": 325.0
+  },
+  {
+    "group": "Sonstige Leistungen",
+    "code": "14.02.000",
+    "description": "Spezielle Angebotserstellung im Auftrag eines Regulierers",
+    "unit": "h",
+    "price": 65.0
+  },
+  {
+    "group": "Sonstige Leistungen",
+    "code": "14.03.000",
+    "description": "Regiekosten: Für alle Gewerke die nicht in der Sanierungspreisliste enthalten sind können",
+    "unit": "psch",
+    "price": 0.15
+  },
+  {
+    "group": "Sonstige Leistungen",
+    "code": "14.99.000",
+    "description": "Taglohnarbeiten: Für Arbeiten, die in den Preislisten nicht geregelt sind, bzw. bei besonders",
+    "unit": "h",
+    "price": 51.0
+  },
+  {
+    "group": "Sonstige Leistungen",
+    "code": "14.99.001",
+    "description": "Materialkosten zu den Taglohnarbeiten",
+    "unit": "psch",
+    "price": null
+  },
+  {
+    "group": "Sonstige Leistungen",
+    "code": "14.99.002",
+    "description": "Freitextposition: Für außergewöhnliche Arbeiten außerhalb der Preisliste.",
+    "unit": "St",
+    "price": null
+  }
+]
