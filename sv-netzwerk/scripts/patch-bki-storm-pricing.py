@@ -44,12 +44,35 @@ old = """const fullQuery=`STURM-/HAGEL-SCHNELLKALKULATION. Gesucht ist eine Komp
           const ep=usable.reduce((s,x)=>s+choosePrice(x),0),rf=number(d.regional_factor)||number(usable.find(x=>number(x.regional_factor))?.regional_factor)||1,codes=usable.map(x=>x.position_code).filter(Boolean).join(' + ');
           bridge()?.addLine?.({position_code:codes||'BKI',description:`${p.l} – Wiederherstellung inkl. Demontage, Entsorgung und Neumontage`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;
         }catch(e){failed.push(p.l)}"""
-new = """try{
+new = r"""const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss');
+        const positionText=x=>norm([x.description,x.short_text,x.long_text,x.title,x.position_name,x.service_description].filter(Boolean).join(' '));
+        const unitNorm=u=>norm(u).replace(/²/g,'2').replace(/stuck|stück|stk\.?/g,'st').replace(/lfdm|lfd\. ?m/g,'m').replace(/std\.?|stunden?/g,'h').replace(/\s/g,'');
+        const termRules=[
+          [/photovoltaikmodul/i,/photovolta|pv.?modul|solarmodul/], [/markise/i,/markis|gelenkarm/], [/terrassenüberdachung/i,/terrassenuber|vordach|dachplatte/],
+          [/lichtkuppel/i,/lichtkuppel|oberlicht/], [/isolierverglasung 3/i,/isolierglas|3.?fach|dreifach/], [/isolierverglasung 2/i,/isolierglas|2.?fach|zweifach/],
+          [/fensterbank/i,/fensterbank/], [/raffstore/i,/raffstore|aussenjalous/], [/rollladenpanzer aluminium/i,/rollladenpanzer.*(alu|aluminium)/],
+          [/rollladenpanzer pvc/i,/rollladenpanzer.*(pvc|kunststoff)/], [/vorbaurollladen, panzer alu/i,/vorbaurollladen.*(alu|aluminium)/],
+          [/vorbaurollladen, panzer pvc/i,/vorbaurollladen.*(pvc|kunststoff)/], [/dachfensterrollladen/i,/dachfenster.*rollladen|rollladen.*dachfenster/],
+          [/eindeckrahmen/i,/eindeckrahmen/], [/dachfenster komplett/i,/dachfenster|dachflachenfenster|wohndachfenster/], [/sektionaltor|garagentor/i,/sektionaltor|garagentor|schwingtor/],
+          [/faserzement/i,/faserzement|eternit/], [/holzfassade|stulpschalung/i,/holzfassade|holzbekleidung|stulpschalung/], [/holzschindel/i,/holzschindel/],
+          [/metall-.wellblechfassade/i,/metallfassade|wellblechfassade|profilblechfassade/], [/aussenputz/i,/aussenputz|fassadenputz/], [/wdvs/i,/wdvs|warmedammverbund/],
+          [/holzfenster/i,/holzfenster/], [/holztur/i,/holztur|tur.*holz/], [/metalltur/i,/metalltur|stahltur/], [/fassade.*streichen|fassade reinigen/i,/fassadenfarbe|fassadenbeschichtung|fassadenflache/],
+          [/wellplatten/i,/wellplatte|faserzement/], [/doppelsteg/i,/doppelsteg|polycarbonat|hohlkammer/], [/dachziegel/i,/dachziegel|falzziegel/], [/biberschwanz/i,/biberschwanz/],
+          [/betondachstein/i,/betondachstein/], [/schiefer/i,/schiefer/], [/trapez/i,/trapez|profilblech/], [/first/i,/firstziegel|firstdeckung/], [/ortgang/i,/ortgang/],
+          [/attika/i,/attika|mauerabdeckung/], [/dachrinne/i,/dachrinne/], [/fallrohr/i,/fallrohr|regenfallrohr/], [/esg/i,/esg|einscheibensicherheitsglas/], [/vsg/i,/vsg|verbundsicherheitsglas/],
+          [/leuchte|lampe/i,/leuchte|lampe/], [/pv-unterkonstruktion/i,/pv.*unterkonstruktion|dachhaken|montageschiene/]
+        ];
+        const requestedRule=termRules.find(([label])=>label.test(norm(p.l)))?.[1];
+        const explicitCodes=[...String(p.q).matchAll(/\b\d{3}\.\d{3}\.\d{3}\b/g)].map(m=>m[0]);
+        const semanticMatch=x=>{const txt=positionText(x),code=String(x.position_code||'');return (explicitCodes.includes(code)||(!requestedRule||requestedRule.test(txt)))&&unitNorm(x.unit)===unitNorm(p.u)};
+        const phase=x=>{const txt=positionText(x);if(/abbruch|demont|ausbau|entfern|entsorg|aufnehmen/.test(txt))return'remove';if(/liefer|einbau|montage|erneu|herstell|einsetzen|beschicht|streichen|ausbessern/.test(txt))return'install';return'other'};
+        const best=a=>a.sort((x,y)=>((explicitCodes.includes(String(y.position_code||''))?20:0)+(requestedRule?.test(positionText(y))?5:0))-((explicitCodes.includes(String(x.position_code||''))?20:0)+(requestedRule?.test(positionText(x))?5:0)))[0];
+        try{
           if(p.mode==='material_labor'){
             const material=number(list.querySelector(`[data-mat=\"${idx}\"]`)?.value),hours=number(list.querySelector(`[data-hours=\"${idx}\"]`)?.value);
             if(material<=0||hours<=0){failed.push(`${p.l} (Materialpreis/Arbeitszeit fehlt)`);continue}
             const laborQuery=`BKI Altbau 2026: Ermittle ausschließlich den Netto-Stundensatz Facharbeiter für das fachlich passende Gewerk zur Montage von ${p.q}. Gib nur die eine Stundensatzposition zurück, keine Produkt-, Fenster-, Rollladen- oder Komplettposition.`;
-            const d=await api({query:laborQuery,quantity:String(hours),unit:'h',location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}}),positions=Array.isArray(d.positions)?d.positions:[],labor=positions.find(x=>/stundensatz|facharbeiter/i.test(String(x.description||'')))||positions[0];
+            const d=await api({query:laborQuery,quantity:String(hours),unit:'h',location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}}),positions=Array.isArray(d.positions)?d.positions:[],labor=positions.find(x=>/stundensatz|facharbeiter/i.test(positionText(x))&&unitNorm(x.unit)==='h');
             if(!labor||choosePrice(labor)<=0){failed.push(`${p.l} (BKI-Arbeitslohn fehlt)`);continue}
             const rf=number(d.regional_factor)||1,ep=material+(hours*choosePrice(labor));
             bridge()?.addLine?.({position_code:(labor.position_code?`Material + ${labor.position_code}`:'Material + BKI-Lohn'),description:`${p.l} – Material zzgl. ${hours} h Arbeitslohn; Demontage und Montage enthalten`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;continue
@@ -57,7 +80,10 @@ new = """try{
           const fullQuery=`STURM-/HAGEL-SCHNELLKALKULATION. Gesucht ist eine Komplett-Wiederherstellung für: ${p.q}. Gib NUR die notwendigen BKI-Teilleistungen für (1) Demontage/Ausbau und Entsorgung des beschädigten Altbauteils und (2) Lieferung/Einbau bzw. Montage der gleichartigen Wiederherstellung zurück. Keine Alternativpositionen, keine bloßen Varianten. Die Summe soll die vollständige Demontage + Entsorgung + Neumontage abbilden.`;
           const d=await api({query:fullQuery,quantity:String(qty),unit:p.u,location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}}),positions=Array.isArray(d.positions)?d.positions:[];
           if(!positions.length){failed.push(p.l);continue}
-          const usable=positions.filter(x=>x&&Number.isFinite(choosePrice(x))&&choosePrice(x)>0);
+          const matched=positions.filter(x=>x&&Number.isFinite(choosePrice(x))&&choosePrice(x)>0&&semanticMatch(x));
+          const complete=best(matched.filter(x=>/(abbruch|demont|ausbau|entfern|entsorg|aufnehmen)/.test(positionText(x))&&/(liefer|einbau|montage|erneu|herstell|einsetzen)/.test(positionText(x))));
+          const remove=best(matched.filter(x=>phase(x)==='remove')),install=best(matched.filter(x=>phase(x)==='install'));
+          const usable=remove&&install?[remove,install]:complete?[complete]:[];
           if(!usable.length){failed.push(p.l);continue}
           const ep=usable.reduce((s,x)=>s+choosePrice(x),0),rf=number(d.regional_factor)||number(usable.find(x=>number(x.regional_factor))?.regional_factor)||1,codes=usable.map(x=>x.position_code).filter(Boolean).join(' + ');
           bridge()?.addLine?.({position_code:codes||'BKI',description:`${p.l} – Wiederherstellung inkl. Demontage, Entsorgung und Neumontage`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;
