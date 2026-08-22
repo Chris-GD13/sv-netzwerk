@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "python3 scripts/patch-window-report-rules.py && python3 scripts/patch-insurance-case-ui.py && python3 scripts/patch-insurance-mail-presets.py && python3 scripts/patch-insurance-mobile-mail-ui.py && python3 scripts/patch-bki-drive-archive.py && python3 scripts/patch-bki-offline-bridge.py && npm run validate:encoding && npm run validate:knowledge && node scripts/write-deploy-version.mjs",
+    "prebuild": "python3 scripts/patch-window-report-rules.py && python3 scripts/patch-insurance-case-ui.py && python3 scripts/patch-insurance-mail-presets.py && python3 scripts/patch-insurance-mobile-mail-ui.py && python3 scripts/patch-bki-drive-archive.py && python3 scripts/patch-bki-file-search.py && python3 scripts/patch-bki-offline-bridge.py && npm run validate:encoding && npm run validate:knowledge && node scripts/write-deploy-version.mjs",
     "build": "astro check && astro build && npm run validate:public-copy && npm run validate:visible-umlauts",
     "preview": "astro preview",
     "check": "astro check",
