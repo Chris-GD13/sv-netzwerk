@@ -105,6 +105,16 @@ function gfDocumentHtml(string $key,array $meta,array $order,string $userName):s
 
 switch($action){
 case'status':gdAccessToken();gdEnsureKnownCasesRoots();$caseRoot=gdUserCasesRoot($user);$counts=['cases'=>count(gdListChildren($caseRoot['id'],null,1000)),'knowledge'=>count(gdListChildren(gdFolderId('knowledge'),null,1000)),'blanco'=>count(gdListChildren(gdFolderId('blanco'),null,1000))];apiJson(['ok'=>true,'connected'=>true,'user_scope'=>hash('sha256',gdUserKey($user)),'folders'=>['cases'=>['id'=>$caseRoot['id'],'name'=>$caseRoot['name'],'items'=>$counts['cases']],'knowledge'=>['id'=>gdFolderId('knowledge'),'name'=>'00_KI-Wissensbasis','items'=>$counts['knowledge']],'blanco'=>['id'=>gdFolderId('blanco'),'name'=>'Blanco','items'=>$counts['blanco']]]]);
+case'recent_cases':
+  $caseRoot=gdUserCasesRoot($user);
+  $folders=gdListChildren($caseRoot['id'],'application/vnd.google-apps.folder',1000);
+  usort($folders,static fn(array $a,array $b):int=>strcmp((string)($b['modifiedTime']??''),(string)($a['modifiedTime']??'')));
+  $results=[];
+  foreach(array_slice($folders,0,10)as$folder){
+    try{$meta=gdCaseMeta((string)$folder['id']);}catch(Throwable){$meta=[];}
+    $results[]=['id'=>$folder['id'],'name'=>$folder['name'],'modifiedTime'=>$folder['modifiedTime']??null,'webViewLink'=>$folder['webViewLink']??null,'meta'=>$meta];
+  }
+  apiJson(['ok'=>true,'results'=>$results]);
 case'search_cases':$term=trim((string)($_GET['q']??''));$norm=gdNormalize($term);$caseRoot=gdUserCasesRoot($user);$folders=gdListChildren($caseRoot['id'],'application/vnd.google-apps.folder',1000);$results=[];foreach($folders as$folder){$name=(string)($folder['name']??'');$meta=[];$nameMatch=$norm===''||str_contains(gdNormalize($name),$norm);if(!$nameMatch||$norm===''){try{$meta=gdCaseMeta((string)$folder['id']);}catch(Throwable $e){$meta=[];}}$hay=gdNormalize($name.' '.implode(' ',array_map('strval',[$meta['schaden_nr']??'',$meta['vn_objekt']??'',$meta['ort']??'',$meta['strasse']??'',$meta['versicherungsschein_nr']??''])));if($norm!==''&&!str_contains($hay,$norm))continue;$results[]=['id'=>$folder['id'],'name'=>$name,'modifiedTime'=>$folder['modifiedTime']??null,'webViewLink'=>$folder['webViewLink']??null,'meta'=>$meta];if(count($results)>=100)break;}apiJson(['ok'=>true,'query'=>$term,'results'=>$results]);
 case'load_case':$id=trim((string)($_GET['id']??''));gdAssertCaseAccess($id,$user);apiJson(['ok'=>true,'case'=>['id'=>$id,'meta'=>gdCaseMeta($id),'files'=>gdListChildren($id,null,1000)]]);
 case'case_excel_forms':if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');$body=requestBody();$folderId=trim((string)($body['folder_id']??''));gdAssertCaseAccess($folderId,$user);apiJson(['ok'=>true,'files'=>gdEnsureCaseExcelForms($folderId)]);
