@@ -1,6 +1,11 @@
 <?php
 declare(strict_types=1);
 
+// Der Rechner wird ausschließlich innerhalb des eigenen Portals gerahmt.
+header_remove('X-Frame-Options');
+header('X-Frame-Options: SAMEORIGIN');
+header("Content-Security-Policy: frame-ancestors 'self'");
+
 // Eng begrenzter Lesepunkt für den öffentlichen BarmeniaGothaer-Glasrechner.
 // Es werden ausschließlich index.html und statische Dateien aus dessen assets-Ordner ausgeliefert.
 $base = 'https://www.gothaer.de/app/Bedarfsrechner/web/';
