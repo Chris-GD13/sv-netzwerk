@@ -1,0 +1,70 @@
+name: Intern Runtime Hotfix
+
+on:
+  push:
+    paths:
+      - '.github/workflows/intern-runtime-hotfix.yml'
+      - 'sv-netzwerk/public/intern/bki-offline.js'
+      - 'sv-netzwerk/public/intern/case-document-browser.js'
+      - 'sv-netzwerk/public/intern/api/case-file-browser.php'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Alte BKI-Navigation clientseitig sicher entfernen
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('sv-netzwerk/public/intern/bki-offline.js')
+          s=p.read_text(encoding='utf-8')
+          marker='/* SVNET_NAV_CLEANUP */'
+          if marker not in s:
+              cleanup="""/* SVNET_NAV_CLEANUP */\n(()=>{\n  const clean=()=>document.querySelectorAll('.intern-header__nav a').forEach(a=>{\n    const t=(a.textContent||'').trim().toLowerCase();\n    if(t==='bki'||t==='kalkulation')a.remove();\n  });\n  clean();\n  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean,{once:true});\n  new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true});\n})();\n"""
+              p.write_text(cleanup+s,encoding='utf-8')
+          PY
+      - name: Python SFTP installieren
+        run: python3 -m pip install --disable-pip-version-check --quiet paramiko
+      - name: Runtime-Dateien direkt nach IONOS uebertragen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import paramiko
+          files=[
+            (Path('sv-netzwerk/public/intern/bki-offline.js'),'/sv-netzwerk/intern/bki-offline.js'),
+            (Path('sv-netzwerk/public/intern/case-document-browser.js'),'/sv-netzwerk/intern/case-document-browser.js'),
+            (Path('sv-netzwerk/public/intern/api/case-file-browser.php'),'/sv-netzwerk/intern/api/case-file-browser.php'),
+          ]
+          host=os.environ['SFTP_HOST']; user=os.environ['SFTP_USERNAME']; password=os.environ['SFTP_PASSWORD']; port=int(os.environ.get('SFTP_PORT') or '22')
+          t=paramiko.Transport((host,port)); t.banner_timeout=15; t.auth_timeout=15; t.connect(username=user,password=password)
+          s=paramiko.SFTPClient.from_transport(t); s.get_channel().settimeout(20)
+          def mkdirs(path):
+            cur=''
+            for part in path.strip('/').split('/'):
+              if not part: continue
+              cur += '/' + part
+              try:s.stat(cur)
+              except FileNotFoundError:s.mkdir(cur)
+          for local,remote in files:
+            if not local.is_file(): raise SystemExit(f'Fehlt: {local}')
+            mkdirs(remote.rsplit('/',1)[0]); s.put(str(local),remote); s.stat(remote); print('OK',remote)
+          s.close(); t.close()
+          PY
+      - name: Online-Dateien pruefen
+        run: |
+          test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/bki-offline.js)" = "200"
+          test "$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/case-document-browser.js)" = "200"
+          code="$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/api/case-file-browser.php)"
+          test "$code" = "200" -o "$code" = "400" -o "$code" = "401" -o "$code" = "403"
