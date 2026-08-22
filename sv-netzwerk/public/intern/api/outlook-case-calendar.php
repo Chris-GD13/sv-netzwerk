@@ -1,4 +1,4 @@
-<?php
+'calendar_name'=>null,'calendar_label'=>'Kalender Christian'<?php
 declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
