@@ -20,47 +20,12 @@ function bkOpenAIJson(string $method,string $path,?array $payload=null,int $time
   return is_array($j)?$j:[];
 }
 function bkVectorStore():string{
-  $pMeta=bkDriveMeta(BKI_POSITIONS_ID);
-  $gMeta=bkDriveMeta(BKI_BUILDINGS_ID);
-  $signature=hash('sha256',json_encode([
-    BKI_POSITIONS_ID,(string)($pMeta['modifiedTime']??''),
-    BKI_BUILDINGS_ID,(string)($gMeta['modifiedTime']??'')
-  ],JSON_UNESCAPED_SLASHES));
+  $configured=trim(env('OPENAI_BKI_VECTOR_STORE_ID',''));
   $cached=json_decode(bkSettingGet('openai_bki_vector_store','{}'),true);
-  if(is_array($cached)&&($cached['signature']??'')===$signature&&!empty($cached['vector_store_id'])){
-    try{
-      $existing=bkOpenAIJson('GET','vector_stores/'.rawurlencode((string)$cached['vector_store_id']),null,90);
-      if(!empty($existing['id'])&&($existing['status']??'completed')!=='expired')return (string)$existing['id'];
-    }catch(Throwable){}
-  }
-
-  $positionFile=bkOpenAIFile(BKI_POSITIONS_ID);
-  $buildingFile=bkOpenAIFile(BKI_BUILDINGS_ID);
-  $store=bkOpenAIJson('POST','vector_stores',[
-    'name'=>'SV-Netzwerk BKI Altbau 2026',
-    'expires_after'=>['anchor'=>'last_active_at','days'=>30]
-  ],120);
-  $storeId=(string)($store['id']??'');
-  if($storeId==='')throw new RuntimeException('BKI-Suchindex konnte nicht angelegt werden.');
-
-  $batch=bkOpenAIJson('POST','vector_stores/'.rawurlencode($storeId).'/file_batches',[
-    'file_ids'=>[(string)$positionFile['file_id'],(string)$buildingFile['file_id']]
-  ],180);
-  $batchId=(string)($batch['id']??'');
-  if($batchId==='')throw new RuntimeException('BKI-Dateien konnten dem Suchindex nicht zugeordnet werden.');
-  $deadline=time()+300;
-  do{
-    $state=bkOpenAIJson('GET','vector_stores/'.rawurlencode($storeId).'/file_batches/'.rawurlencode($batchId),null,90);
-    $status=(string)($state['status']??'');
-    if($status==='completed')break;
-    if(in_array($status,['failed','cancelled','expired'],true))throw new RuntimeException('BKI-Suchindex konnte nicht fertiggestellt werden.');
-    usleep(800000);
-  }while(time()<$deadline);
-  if(($status??'')!=='completed')throw new RuntimeException('BKI-Suchindex wird noch aufgebaut. Bitte Suche in wenigen Sekunden erneut starten.');
-
-  bkSettingSet('openai_bki_vector_store',json_encode([
-    'vector_store_id'=>$storeId,'signature'=>$signature,'created_at'=>date(DATE_ATOM)
-  ],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+  $storeId=$configured!==''?$configured:trim((string)($cached['vector_store_id']??''));
+  if($storeId==='')throw new RuntimeException('Der vorbereitete BKI-Suchindex ist nicht konfiguriert.');
+  $existing=bkOpenAIJson('GET','vector_stores/'.rawurlencode($storeId),null,90);
+  if(empty($existing['id'])||($existing['status']??'completed')==='expired')throw new RuntimeException('Der vorbereitete BKI-Suchindex ist nicht verfügbar.');
   return $storeId;
 }
 '''
@@ -74,9 +39,6 @@ if 'function bkVectorStore()' not in updated:
 start = updated.find('function bkSearch(array $in):array{')
 if start < 0:
     raise SystemExit('bkSearch nicht gefunden')
-end = updated.find('\n\nbkSchema();', start)
-if end < 0:
-    raise SystemExit('Ende von bkSearch nicht gefunden')
 
 new_search = r'''function bkSearch(array $in):array{
   $q=trim((string)($in['query']??''));
@@ -140,7 +102,12 @@ PROMPT;
   ];
 }'''
 
-updated = updated[:start] + new_search + updated[end:]
+if "'search_mode'=>'file_search'" not in updated[start:]:
+    end = updated.find('\n}\n', start)
+    if end < 0:
+        raise SystemExit('Ende von bkSearch nicht gefunden')
+    end += len('\n}')
+    updated = updated[:start] + new_search + updated[end:]
 
 if updated != source:
     path.write_text(updated, encoding='utf-8')

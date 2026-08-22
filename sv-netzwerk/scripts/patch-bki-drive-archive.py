@@ -122,11 +122,18 @@ else:
 
 page = page_path.read_text(encoding='utf-8')
 original_page = page
-old_ui = "$('bk-save-state').textContent=`Gespeichert · Kalkulation ${d.id}`;loadHistory()"
-new_ui = "if(d.drive_file?.webViewLink){$('bk-save-state').innerHTML=`Gespeichert · Kalkulation ${d.id} · <a href=\"${esc(d.drive_file.webViewLink)}\" target=\"_blank\" rel=\"noreferrer\">in Fallakte archiviert</a>`}else{$('bk-save-state').textContent=`Gespeichert · Kalkulation ${d.id}${active?.folder_id?' · in Fallakte archiviert':''}`}loadHistory()"
-if old_ui in page:
-    page = page.replace(old_ui, new_ui, 1)
-elif 'in Fallakte archiviert' not in page:
+old_ui_variants = [
+    ("$('bk-save-state').textContent=`Gespeichert · Kalkulation ${d.id}`;loadHistory()", 'loadHistory()'),
+    ("$('bk-save-state').textContent=`Gespeichert · Kalkulation ${d.id}`;history()", 'history()'),
+]
+ui_replaced = False
+for old_ui, history_call in old_ui_variants:
+    if old_ui in page:
+        new_ui = "if(d.drive_file?.webViewLink){$('bk-save-state').innerHTML=`Gespeichert · Kalkulation ${d.id} · <a href=\"${esc(d.drive_file.webViewLink)}\" target=\"_blank\" rel=\"noreferrer\">in Fallakte archiviert</a>`}else{$('bk-save-state').textContent=`Gespeichert · Kalkulation ${d.id}${active?.folder_id?' · in Fallakte archiviert':''}`}" + history_call
+        page = page.replace(old_ui, new_ui, 1)
+        ui_replaced = True
+        break
+if not ui_replaced and 'in Fallakte archiviert' not in page:
     raise SystemExit('Speicherrückmeldung der Kalkulationsseite nicht gefunden')
 
 if page != original_page:

@@ -6,6 +6,7 @@ on:
       - '.github/workflows/versicherungsfaelle-hotfix.yml'
       - 'sv-netzwerk/src/pages/intern/versicherungsfaelle/**'
       - 'sv-netzwerk/src/pages/intern/index.astro'
+      - 'sv-netzwerk/src/pages/intern/kalkulation/**'
       - 'sv-netzwerk/src/layouts/InternalLayout.astro'
       - 'sv-netzwerk/public/intern/api/google-drive-sync.php'
       - 'sv-netzwerk/public/intern/api/google-drive-oauth.php'
@@ -38,6 +39,7 @@ jobs:
           test -f dist/intern/api/google-drive-sync.php
           test -f dist/intern/api/google-drive-oauth.php
           test -f dist/intern/index.html
+          test -f dist/intern/kalkulation/index.html
           test -f dist/intern/fensterpruefung-bonn/index.html
       - name: Python SFTP installieren
         run: python3 -m pip install --disable-pip-version-check --quiet paramiko
@@ -55,6 +57,7 @@ jobs:
           host=os.environ['SFTP_HOST']; user=os.environ['SFTP_USERNAME']; password=os.environ['SFTP_PASSWORD']; port=int(os.environ.get('SFTP_PORT') or '22')
           roots=[
             (Path('dist/intern/versicherungsfaelle'),'/sv-netzwerk/intern/versicherungsfaelle'),
+            (Path('dist/intern/kalkulation'),'/sv-netzwerk/intern/kalkulation'),
           ]
           files=[
             (Path('dist/intern/api/google-drive-sync.php'),'/sv-netzwerk/intern/api/google-drive-sync.php'),

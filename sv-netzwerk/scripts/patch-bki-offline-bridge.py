@@ -9,6 +9,9 @@ needle = "  let active=null, lines=[];"
 bridge = """  let active=null, lines=[];\n  window.__bkiCalcBridge={\n    getLines:()=>JSON.parse(JSON.stringify(lines)),\n    setLines:(value)=>{lines=Array.isArray(value)?JSON.parse(JSON.stringify(value)):[];renderLines()},\n    addLine:(value)=>addLine(value||{}),\n    getMeta:()=>meta,\n    getActive:()=>active\n  };"""
 if needle in page and 'window.__bkiCalcBridge' not in page:
     page = page.replace(needle, bridge, 1)
+elif "let active=null,lines=[];" in page and 'window.__bkiCalcBridge' not in page:
+    compact_bridge = "let active=null,lines=[];window.__bkiCalcBridge={getLines:()=>JSON.parse(JSON.stringify(lines)),setLines:value=>{lines=Array.isArray(value)?JSON.parse(JSON.stringify(value)):[];render()},addLine:value=>add(value||{}),getMeta:()=>meta,getActive:()=>active};"
+    page = page.replace("let active=null,lines=[];", compact_bridge, 1)
 elif 'window.__bkiCalcBridge' not in page:
     raise SystemExit('BKI-Kalkulationszustand konnte nicht gefunden werden')
 

@@ -28,7 +28,8 @@ elif '<details class="vf-card vf-system vf-system-bottom">' in updated:
     pass
 
 # Systemblock am Seitenende bewusst deutlich schmaler als die Hauptarbeitsfläche.
-system_css = '.vf-system-bottom{width:min(100%,900px);margin:16px auto 0;box-sizing:border-box}'
+system_css = '.vf-system-bottom{width:min(100%,640px);margin:16px auto 0;box-sizing:border-box}'
+updated = updated.replace('.vf-system-bottom{width:min(100%,900px);margin:16px auto 0;box-sizing:border-box}', system_css)
 if system_css not in updated:
     updated = updated.replace('.vf-system summary,.vf-options summary{cursor:pointer;font-weight:750}', '.vf-system summary,.vf-options summary{cursor:pointer;font-weight:750}'+system_css, 1)
 
