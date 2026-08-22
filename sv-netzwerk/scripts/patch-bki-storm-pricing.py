@@ -28,7 +28,12 @@ pattern = re.compile(r"presets\.forEach\(\(p,i\)=>\{const e=document\.createElem
 replacement = """presets.forEach((p,i)=>{const e=document.createElement('div');e.className='bk-quick-item';e.dataset.cat=p.c;const extra=p.mode==='material_labor'?`<div class=\"bk-quick-extra\"><label>Material EP netto <input data-mat=\"${i}\" inputmode=\"decimal\" placeholder=\"0,00\"></label><label>Arbeitszeit h/St <input data-hours=\"${i}\" inputmode=\"decimal\" placeholder=\"z. B. 1,5\"></label><small>Materialpreis nach Beleg/Marktpreis; Arbeitslohn nach BKI-Facharbeiterstundensatz. Kein kompletter Dachfensterpreis.</small></div>`:'';e.innerHTML=`<label><input type=\"checkbox\" data-preset=\"${i}\"><span>${esc(p.l)}<small class=\"bk-quick-note\">inkl. Demontage, Entsorgung + Montage</small></span></label><span></span><input class=\"bk-quick-qty\" data-qty=\"${i}\" inputmode=\"decimal\" value=\"1\"><span class=\"bk-quick-unit\">${esc(p.u)}</span>${extra}`;const cb=e.querySelector('input[type=checkbox]');cb.onchange=()=>e.classList.toggle('checked',cb.checked);list.appendChild(e)});"""
 text, count = pattern.subn(replacement, text, count=1)
 if count == 0:
-    print('quick item renderer already changed or pattern not found')
+    old_render = '''presets.forEach((p,i)=>{const e=document.createElement('div');e.className='bk-quick-item';e.dataset.cat=p.c;e.innerHTML=`<label><input type="checkbox" data-preset="${i}"><span>${esc(p.l)}<small class="bk-quick-note">inkl. Demontage, Entsorgung + Montage</small></span></label><span></span><input class="bk-quick-qty" data-qty="${i}" inputmode="decimal" value="1"><span class="bk-quick-unit">${esc(p.u)}</span>`;const cb=e.querySelector('input[type=checkbox]');cb.onchange=()=>e.classList.toggle('checked',cb.checked);list.appendChild(e)});'''
+    if old_render in text:
+        text = text.replace(old_render, replacement, 1)
+        count = 1
+if count == 0 and 'data-mat="${i}"' not in text:
+    raise SystemExit('quick item renderer anchor not found')
 
 old = """const fullQuery=`STURM-/HAGEL-SCHNELLKALKULATION. Gesucht ist eine Komplett-Wiederherstellung für: ${p.q}. Gib NUR die notwendigen BKI-Teilleistungen für (1) Demontage/Ausbau und Entsorgung des beschädigten Altbauteils und (2) Lieferung/Einbau bzw. Montage der gleichartigen Wiederherstellung zurück. Keine Alternativpositionen, keine bloßen Varianten. Die Summe soll die vollständige Demontage + Entsorgung + Neumontage abbilden.`;
         try{
