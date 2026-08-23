@@ -6,20 +6,24 @@ import '../styles/global.css';
 import '../styles/header.css';
 import '../styles/internal-portal.css';
 
+
 interface Props {
   title: string;
   description: string;
   currentPath?: string;
 }
 
+
 const props = Astro.props;
 const currentPath = props.currentPath ?? Astro.url.pathname;
 const internalLinks = [
   { href: '/intern/versicherungsfaelle/', label: 'Startseite', icon: '⌂' },
+  { href: '/intern/fensterpruefung-bonn/', label: 'Fenster', icon: '▣' },
   { href: '/intern/kalkulation/', label: 'Kalkulation', icon: '▦' },
 ];
 const isActive = (href: string) => currentPath.startsWith(href);
 ---
+
 
 <!doctype html>
 <html lang="de">
@@ -59,68 +63,3 @@ const isActive = (href: string) => currentPath.startsWith(href);
       }
       .intern-header__logout:hover,
       .intern-header__logout:focus-visible { background: #e7e9eb; }
-      .intern-header__logout:disabled { cursor: wait; opacity: .7; }
-      @media (max-width: 900px) {
-        .intern-portal-shell { grid-template-columns: 1fr; }
-        .intern-sidebar { display: block; padding: 7px 10px; border-right: 0; border-bottom: 1px solid #d9dde1; overflow-x: auto; }
-        .intern-sidebar__nav { display: flex; min-width: max-content; }
-        .intern-sidebar__nav a { padding: 9px 11px; }
-        .intern-sidebar .intern-header__logout { display: none; }
-      }
-    </style>
-  </head>
-  <body class="intern-body">
-    <a class="skip-link" href="#intern-main">Zum Inhalt springen</a>
-    <header class="intern-header">
-      <div class="sv-container intern-header__inner">
-        <div class="intern-header__brand">
-          <a class="site-brand" href="/" aria-label="SV-Netzwerk – Startseite">
-            <img class="intern-header__logo" src={logoSrc.src} alt="SV-Netzwerk" width="220" height="46" />
-          </a>
-          <div class="intern-header__meta">
-            <p class="intern-header__eyebrow">Geschütztes Prüfportal</p>
-            <strong>{portalProject.title}</strong>
-            <small>{portalProject.objectName}</small>
-          </div>
-        </div>
-      </div>
-    </header>
-    <div class="intern-portal-shell">
-      <aside class="intern-sidebar">
-        <nav aria-label="Interne Navigation" class="intern-sidebar__nav">
-          {internalLinks.map((link) => <a class:list={{ active: isActive(link.href) }} href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
-          <a href="/intern/api/outlook-case-calendar.php?action=open" target="_blank" rel="noreferrer" title="Den anhand der Anmeldung zugeordneten Outlook-Kalender öffnen"><span>□</span>Kalender</a>
-        </nav>
-        <button class="intern-header__logout" id="intern-logout" type="button"><span>↪</span>Abmelden</button>
-      </aside>
-      <main id="intern-main"><slot /></main>
-    </div>
-    <script src="/intern/versicherungsfaelle-enhancements.js" defer></script>
-    <script src="/intern/case-document-browser.js" defer></script>
-    <script src="/intern/bki-offline.js" defer></script>
-    <script is:inline>
-      document.getElementById('intern-logout')?.addEventListener('click', async (event) => {
-        const button = event.currentTarget;
-        if (!(button instanceof HTMLButtonElement)) return;
-        button.disabled = true;
-        button.textContent = 'Wird abgemeldet …';
-        try {
-          await fetch('/intern/api/auth.php?action=logout', {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
-            body: '{}',
-          });
-        } finally {
-          sessionStorage.removeItem('svnet-case');
-          localStorage.removeItem('svnet-case');
-          localStorage.removeItem('svnet-case-owner');
-          window.location.assign('/intern/login/');
-        }
-      });
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js', { scope: '/intern/' }).catch(() => {}));
-      }
-    </script>
-  </body>
-</html>
