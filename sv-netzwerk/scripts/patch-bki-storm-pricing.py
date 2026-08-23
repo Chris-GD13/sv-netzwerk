@@ -46,6 +46,18 @@ replacement = """const indexDefaults=p=>{const label=String(p.l||'').toLowerCase
           [/sektionaltor manuell/,{material:1850,hours:6.0,labor:76}],
           [/garagentor|sektionaltor/,{material:1950,hours:6.0,labor:76}]
         ];return rules.find(([rx])=>rx.test(label))?.[1]||{material:100,hours:1,labor:72}};
+        const indexComplete=p=>{const label=String(p.l||'').toLowerCase();const rules=[
+          [/wellplatten|faserzement.*dach/ ,95],[/doppelsteg|polycarbonat/,120],[/dachziegel|falzziegel/,110],[/biberschwanz/,180],[/betondachstein/,95],[/schieferdeckung/,220],[/trapez|profilblech/,105],
+          [/firstdeckung|firstziegel/,95],[/ortgang/,85],[/dachfenster komplett/,1450],[/lichtkuppel/,1600],
+          [/attika/,110],[/dachrinne titanzink/,85],[/dachrinne kupfer/,145],[/fallrohr titanzink/,75],[/fallrohr kupfer/,120],
+          [/fensterbank/,70],[/isolierverglasung 2/,280],[/isolierverglasung 3/,360],[/esg/,300],[/vsg/,350],
+          [/raffstore|außenjalousie/,900],[/außenleuchte|lampe/,180],[/feuchtraum|wannenleuchte/,140],
+          [/photovoltaikmodul/,320],[/pv-unterkonstruktion|dachhaken/,115],[/markise/,1800],[/terrassenüberdachung|vordach/,450],
+          [/außenputz hagel/,65],[/außenputz größere/,125],[/wdvs.*oberputz|armierung/,95],[/wdvs.*komplett/,210],[/riss|schlagstelle/,45],
+          [/faserzement.*fassade/,190],[/holzfassade|stülpschalung/,210],[/holzschindel/,280],[/metall|wellblechfassade/,175],
+          [/fassade reinigen.*streichen/,38],[/fassade nur streichen/,29],[/holzfenster.*streichen/,220],[/holztür außen/,85],[/holztür innen/,75],[/metalltür|metallfläche/,70],[/holzfassade reinigen/,55]
+        ];const hit=rules.find(([rx])=>rx.test(label));if(hit)return hit[1];const unit=String(p.u||'').toLowerCase();return unit.includes('m²')?150:unit==='m'?85:unit==='st'?350:150};
+        const addIndex=(p,qty)=>{const ep=indexComplete(p);bridge()?.addLine?.({position_code:'INDEX 2026',description:`${p.l} – Index-Komplettpreis 2026 inkl. Demontage, Entsorgung und Neumontage; EP veränderbar`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:1});return ep};
         presets.forEach((p,i)=>{const e=document.createElement('div');e.className='bk-quick-item';e.dataset.cat=p.c;const estimate=indexDefaults(p),extra=p.mode==='material_labor'?`<div class=\"bk-quick-extra\"><label>Index-Material EP netto <input data-mat=\"${i}\" inputmode=\"decimal\" value=\"${estimate.material}\"></label><label>Arbeitszeit h/St <input data-hours=\"${i}\" inputmode=\"decimal\" value=\"${estimate.hours}\"></label><small>Indexansatz 2026, veränderbar; Arbeitslohn vorrangig nach BKI-Facharbeiterstundensatz.</small></div>`:'';e.innerHTML=`<label><input type=\"checkbox\" data-preset=\"${i}\"><span>${esc(p.l)}<small class=\"bk-quick-note\">inkl. Demontage, Entsorgung + Montage</small></span></label><span></span><input class=\"bk-quick-qty\" data-qty=\"${i}\" inputmode=\"decimal\" value=\"1\"><span class=\"bk-quick-unit\">${esc(p.u)}</span>${extra}`;const cb=e.querySelector('input[type=checkbox]');cb.onchange=()=>e.classList.toggle('checked',cb.checked);list.appendChild(e)});"""
 text, count = pattern.subn(replacement, text, count=1)
 if count == 0:
@@ -101,14 +113,14 @@ new = r"""const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[\
           const fullQuery=`STURM-/HAGEL-SCHNELLKALKULATION. Gesucht ist eine Komplett-Wiederherstellung für: ${p.q}. Gib NUR die notwendigen BKI-Teilleistungen für (1) Demontage/Ausbau und Entsorgung des beschädigten Altbauteils und (2) Lieferung/Einbau bzw. Montage der gleichartigen Wiederherstellung zurück. Keine Alternativpositionen, keine bloßen Varianten. Die Summe soll die vollständige Demontage + Entsorgung + Neumontage abbilden.`;
           let d=await api({query:fullQuery,quantity:String(qty),unit:p.u,location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}}),positions=Array.isArray(d.positions)?d.positions:[];
           if(!positions.length){d=await api({query:p.q,quantity:String(qty),unit:p.u,location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}});positions=Array.isArray(d.positions)?d.positions:[]}
-          if(!positions.length){failed.push(p.l);continue}
+          if(!positions.length){addIndex(p,qty);added++;continue}
           const label=norm(p.l),cap=/photovoltaikmodul/.test(label)?1500:/pv-unterkonstruktion|dachhaken/.test(label)?750:/leuchte|lampe/.test(label)?1500:unitNorm(p.u)==='st'?6000:unitNorm(p.u)==='m2'?1500:1000;
           const positive=positions.filter(x=>x&&Number.isFinite(choosePrice(x))&&choosePrice(x)>0),plausible=positive.filter(x=>unitNorm(x.unit)===unitNorm(p.u)&&choosePrice(x)<=cap),matched=plausible.filter(x=>semanticMatch(x));
           const explicit=best(matched.filter(x=>explicitCodes.includes(String(x.position_code||''))&&phase(x)==='install'));
           const complete=best(matched.filter(x=>/(abbruch|demont|ausbau|entfern|entsorg|aufnehmen)/.test(positionText(x))&&/(liefer|einbau|montage|erneu|herstell|einsetzen)/.test(positionText(x))));
           const remove=best(matched.filter(x=>phase(x)==='remove')),install=best(matched.filter(x=>phase(x)==='install'));
-          const usable=explicit?[explicit]:remove&&install?[remove,install]:complete?[complete]:matched.length?[best(matched)]:plausible.length?[best(plausible)]:[];
-          if(!usable.length){failed.push(p.l);continue}
+          const usable=explicit?[explicit]:remove&&install?[remove,install]:complete?[complete]:matched.length?[best(matched)]:[];
+          if(!usable.length){addIndex(p,qty);added++;continue}
           const ep=usable.reduce((s,x)=>s+choosePrice(x),0),rf=number(d.regional_factor)||number(usable.find(x=>number(x.regional_factor))?.regional_factor)||1,codes=usable.map(x=>x.position_code).filter(Boolean).join(' + ');
           bridge()?.addLine?.({position_code:codes||'BKI',description:`${p.l} – Wiederherstellung inkl. Demontage, Entsorgung und Neumontage`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;
         }catch(e){failed.push(p.l)}"""
