@@ -304,6 +304,131 @@ textarea.intern-input {
   }
 }
 
+/* ── Einheitliche Windows-11-Portaloptik für Fensterprüfung und Unterseiten ── */
+.intern-shell.sv-section {
+  padding-block: 1.25rem 2.5rem;
+  background: #f4f5f6;
+}
+
+.intern-shell .sv-container {
+  width: min(100% - 2rem, 92rem);
+}
+
+.intern-shell__surface {
+  overflow: visible;
+  border: 1px solid #d9dde1;
+  border-radius: 3px;
+  background: #f7f8f9;
+  box-shadow: 0 8px 24px rgba(7, 26, 46, .08);
+}
+
+.intern-app {
+  gap: 1rem;
+  padding: clamp(.9rem, 1.7vw, 1.5rem);
+}
+
+.intern-card,
+.intern-panel,
+.intern-form-section,
+.intern-stat,
+.intern-export-card,
+.intern-photo-item {
+  border-color: #d9dde1;
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(7, 26, 46, .05);
+}
+
+.intern-stat {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  color: #17324a;
+}
+
+.intern-stat::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #f59a23;
+}
+
+.intern-stat,
+a.intern-stat,
+.intern-stat strong {
+  color: #17324a !important;
+}
+
+.intern-field input,
+.intern-field select,
+.intern-field textarea,
+.intern-input,
+.intern-inline-button,
+.intern-alert,
+.intern-online-users__item,
+.intern-online-users__more,
+.intern-online-users__empty,
+.intern-photo-item img {
+  border-radius: 3px;
+}
+
+.intern-field input:focus,
+.intern-field select:focus,
+.intern-field textarea:focus,
+.intern-input:focus {
+  border-color: #f59a23;
+  outline: 2px solid rgba(245, 154, 35, .2);
+  outline-offset: 1px;
+}
+
+.intern-badge {
+  border-radius: 2px;
+}
+
+.intern-badge--info,
+.intern-online-users__item,
+.intern-online-users__more,
+.intern-online-users__empty,
+.intern-inline-button {
+  background: #eef0f2;
+  color: #17324a;
+}
+
+.intern-table th {
+  background: #17324a;
+  color: #fff;
+}
+
+.intern-table tbody tr:hover {
+  background: #fff7ed;
+}
+
+.intern-sticky-actions {
+  border-color: #d9dde1;
+  background: rgba(247, 248, 249, .97);
+  backdrop-filter: blur(10px);
+}
+
+@media (max-width: 56.25rem) {
+  .intern-table tr {
+    border-radius: 3px;
+  }
+}
+
+@media (max-width: 42rem) {
+  .intern-shell.sv-section {
+    padding-block: .65rem 1.5rem;
+  }
+
+  .intern-shell .sv-container {
+    width: min(100% - .75rem, 92rem);
+  }
+
+  .intern-app {
+    padding: .65rem;
+  }
+}
+
 @media (max-width: 700px) {
   .bk-app { width:100%; padding:10px 8px 36px; overflow-x:hidden; }
   .bk-card { padding:12px; border-radius:12px; }
