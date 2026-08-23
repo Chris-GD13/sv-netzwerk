@@ -129,5 +129,36 @@ if old in text:
 else:
     print('pricing block already changed or exact block not found')
 
+# Bereits gepatchte Seiten aus inkrementellen IONOS-Builds ebenfalls aktualisieren.
+# Dadurch wird nicht nur ein sauberer Checkout, sondern auch der vorhandene Build-Stand migriert.
+index_fallback_js = r"""const indexComplete=p=>{const label=String(p.l||'').toLowerCase();const rules=[
+          [/wellplatten|faserzement.*dach/ ,95],[/doppelsteg|polycarbonat/,120],[/dachziegel|falzziegel/,110],[/biberschwanz/,180],[/betondachstein/,95],[/schieferdeckung/,220],[/trapez|profilblech/,105],
+          [/firstdeckung|firstziegel/,95],[/ortgang/,85],[/dachfenster komplett/,1450],[/lichtkuppel/,1600],
+          [/attika/,110],[/dachrinne titanzink/,85],[/dachrinne kupfer/,145],[/fallrohr titanzink/,75],[/fallrohr kupfer/,120],
+          [/fensterbank/,70],[/isolierverglasung 2/,280],[/isolierverglasung 3/,360],[/esg/,300],[/vsg/,350],
+          [/raffstore|außenjalousie/,900],[/außenleuchte|lampe/,180],[/feuchtraum|wannenleuchte/,140],
+          [/photovoltaikmodul/,320],[/pv-unterkonstruktion|dachhaken/,115],[/markise/,1800],[/terrassenüberdachung|vordach/,450],
+          [/außenputz hagel/,65],[/außenputz größere/,125],[/wdvs.*oberputz|armierung/,95],[/wdvs.*komplett/,210],[/riss|schlagstelle/,45],
+          [/faserzement.*fassade/,190],[/holzfassade|stülpschalung/,210],[/holzschindel/,280],[/metall|wellblechfassade/,175],
+          [/fassade reinigen.*streichen/,38],[/fassade nur streichen/,29],[/holzfenster.*streichen/,220],[/holztür außen/,85],[/holztür innen/,75],[/metalltür|metallfläche/,70],[/holzfassade reinigen/,55]
+        ];const hit=rules.find(([rx])=>rx.test(label));if(hit)return hit[1];const unit=String(p.u||'').toLowerCase();return unit.includes('m²')?150:unit==='m'?85:unit==='st'?350:150};
+        const addIndex=(p,qty)=>{const ep=indexComplete(p);bridge()?.addLine?.({position_code:'INDEX 2026',description:`${p.l} – Index-Komplettpreis 2026 inkl. Demontage, Entsorgung und Neumontage; EP veränderbar`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:1});return ep};
+        """
+if 'const indexComplete=p=>' not in text:
+    text = text.replace('presets.forEach((p,i)=>{', index_fallback_js + 'presets.forEach((p,i)=>{', 1)
+
+text = text.replace(
+    "if(!positions.length){failed.push(p.l);continue}\n          const label=norm(p.l)",
+    "if(!positions.length){addIndex(p,qty);added++;continue}\n          const label=norm(p.l)"
+)
+text = text.replace(
+    "matched.length?[best(matched)]:plausible.length?[best(plausible)]:[];",
+    "matched.length?[best(matched)]:[];"
+)
+text = text.replace(
+    "if(!usable.length){failed.push(p.l);continue}",
+    "if(!usable.length){addIndex(p,qty);added++;continue}"
+)
+
 path.write_text(text, encoding='utf-8')
 print('BKI storm accessory pricing corrected')
