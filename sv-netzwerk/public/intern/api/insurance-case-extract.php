@@ -32,10 +32,10 @@ Bestimme zusätzlich den Versicherer und die Fallart. Zulässige Werte für fall
 - Ist die Einordnung nicht belastbar, fallart leer lassen und die Gründe in fallart_hinweis nennen.
 
 Antworte ausschließlich als JSON mit genau diesen Feldern:
-{"schaden_nr":"","versicherungsschein_nr":"","vn_objekt":"","strasse":"","plz":"","ort":"","telefon":"","mobil":"","email":"","vorsteuer":"","schadenart":"","schadentag":"","meldedatum":"","reserve":"","kontakt":"","vermittler_firma":"","vermittler_ansprechpartner":"","vermittler_telefon":"","vermittler_mobil":"","vermittler_fax":"","vermittler_email":"","versicherer":"","fallart":"","fallart_hinweis":""}
+{"schaden_nr":"","versicherungsschein_nr":"","vn_objekt":"","strasse":"","plz":"","ort":"","schaden_strasse":"","schaden_plz":"","schaden_ort":"","telefon":"","mobil":"","email":"","vorsteuer":"","schadenart":"","schadentag":"","meldedatum":"","reserve":"","kontakt":"","vermittler_firma":"","vermittler_ansprechpartner":"","vermittler_telefon":"","vermittler_mobil":"","vermittler_fax":"","vermittler_email":"","versicherer":"","fallart":"","fallart_hinweis":""}
 
 Hinweise:
-- vn_objekt = Versicherungsnehmer / Firmenname / versichertes Objekt, soweit klar erkennbar.
+- vn_objekt = Versicherungsnehmer / Firmenname / versichertes Objekt, soweit klar erkennbar.\n- strasse, plz und ort sind ausschließlich die Anschrift des Versicherungsnehmers.\n- schaden_strasse, schaden_plz und schaden_ort sind ausschließlich die Besichtigungs- bzw. Schadenortanschrift. Diese kann von der VN-Anschrift abweichen. Nicht gleichsetzen oder aus der VN-Anschrift ableiten, wenn der Schadenort nicht ausdrücklich belegt ist.
 - kontakt = zuständiger Ansprechpartner beim VN/Objekt, sofern separat genannt.
 - vorsteuer = z. B. "ja", "nein" oder leer.
 - schadentag und meldedatum möglichst im Format TT.MM.JJJJ.
@@ -104,7 +104,7 @@ if (!is_array($data)) {
 }
 if (!is_array($data)) apiError(503, 'KI-Antwort konnte nicht als Falldaten gelesen werden.');
 
-$allowed=['schaden_nr','versicherungsschein_nr','vn_objekt','strasse','plz','ort','telefon','mobil','email','vorsteuer','schadenart','schadentag','meldedatum','reserve','kontakt','vermittler_firma','vermittler_ansprechpartner','vermittler_telefon','vermittler_mobil','vermittler_fax','vermittler_email','versicherer','fallart','fallart_hinweis'];
+$allowed=['schaden_nr','versicherungsschein_nr','vn_objekt','strasse','plz','ort','schaden_strasse','schaden_plz','schaden_ort','telefon','mobil','email','vorsteuer','schadenart','schadentag','meldedatum','reserve','kontakt','vermittler_firma','vermittler_ansprechpartner','vermittler_telefon','vermittler_mobil','vermittler_fax','vermittler_email','versicherer','fallart','fallart_hinweis'];
 $out=[];
 foreach($allowed as $key) $out[$key]=trim((string)($data[$key]??''));
 apiJson(['ok'=>true,'file_name'=>$name,'fields'=>$out]);
