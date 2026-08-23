@@ -15,9 +15,8 @@ interface Props {
 const props = Astro.props;
 const currentPath = props.currentPath ?? Astro.url.pathname;
 const internalLinks = [
-  { href: '/intern/fensterpruefung-bonn/', label: 'Startseite', icon: '⌂' },
+  { href: '/intern/versicherungsfaelle/', label: 'Startseite', icon: '⌂' },
   { href: '/intern/kalkulation/', label: 'Kalkulation', icon: '▦' },
-  { href: '/intern/versicherungsfaelle/', label: 'Versicherungen', icon: '▤' },
 ];
 const isActive = (href: string) => currentPath.startsWith(href);
 ---
