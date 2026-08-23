@@ -78,13 +78,14 @@ new = r"""const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[\
             bridge()?.addLine?.({position_code:(labor.position_code?`Material + ${labor.position_code}`:'Material + BKI-Lohn'),description:`${p.l} – Material zzgl. ${hours} h Arbeitslohn; Demontage und Montage enthalten`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;continue
           }
           const fullQuery=`STURM-/HAGEL-SCHNELLKALKULATION. Gesucht ist eine Komplett-Wiederherstellung für: ${p.q}. Gib NUR die notwendigen BKI-Teilleistungen für (1) Demontage/Ausbau und Entsorgung des beschädigten Altbauteils und (2) Lieferung/Einbau bzw. Montage der gleichartigen Wiederherstellung zurück. Keine Alternativpositionen, keine bloßen Varianten. Die Summe soll die vollständige Demontage + Entsorgung + Neumontage abbilden.`;
-          const d=await api({query:fullQuery,quantity:String(qty),unit:p.u,location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}}),positions=Array.isArray(d.positions)?d.positions:[];
+          let d=await api({query:fullQuery,quantity:String(qty),unit:p.u,location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}}),positions=Array.isArray(d.positions)?d.positions:[];
+          if(!positions.length){d=await api({query:p.q,quantity:String(qty),unit:p.u,location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}});positions=Array.isArray(d.positions)?d.positions:[]}
           if(!positions.length){failed.push(p.l);continue}
-          const matched=positions.filter(x=>x&&Number.isFinite(choosePrice(x))&&choosePrice(x)>0&&semanticMatch(x));
+          const positive=positions.filter(x=>x&&Number.isFinite(choosePrice(x))&&choosePrice(x)>0),matched=positive.filter(x=>semanticMatch(x));
           const explicit=best(matched.filter(x=>explicitCodes.includes(String(x.position_code||''))&&phase(x)==='install'));
           const complete=best(matched.filter(x=>/(abbruch|demont|ausbau|entfern|entsorg|aufnehmen)/.test(positionText(x))&&/(liefer|einbau|montage|erneu|herstell|einsetzen)/.test(positionText(x))));
           const remove=best(matched.filter(x=>phase(x)==='remove')),install=best(matched.filter(x=>phase(x)==='install'));
-          const usable=explicit?[explicit]:remove&&install?[remove,install]:complete?[complete]:[];
+          const usable=explicit?[explicit]:remove&&install?[remove,install]:complete?[complete]:matched.length?[best(matched)]:positive.length?[best(positive)]:[];
           if(!usable.length){failed.push(p.l);continue}
           const ep=usable.reduce((s,x)=>s+choosePrice(x),0),rf=number(d.regional_factor)||number(usable.find(x=>number(x.regional_factor))?.regional_factor)||1,codes=usable.map(x=>x.position_code).filter(Boolean).join(' + ');
           bridge()?.addLine?.({position_code:codes||'BKI',description:`${p.l} – Wiederherstellung inkl. Demontage, Entsorgung und Neumontage`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;
