@@ -332,7 +332,7 @@ function renderLanding(context: AppContext) {
       <h1>SV-Netzwerk Prüfportal</h1>
       <p>Fensterbeschlagsprüfung, Dokumentenanalyse und Prüfverwaltung</p>
       <div class="intern-actions">
-        <a class="sv-button sv-button-primary" href="${context.user ? '/intern/projekte/' : '/intern/login/'}">${context.user ? 'Zum Dashboard' : 'Zur Anmeldung'}</a>
+        <a class="sv-button sv-button-primary" href="${context.user ? '/intern/versicherungsfaelle/' : '/intern/login/'}">${context.user ? 'Zur Fallbearbeitung' : 'Zur Anmeldung'}</a>
       </div>
     </div>
   `;
@@ -672,16 +672,7 @@ async function showMoveDialog(
 }
 
 async function redirectAfterLogin() {
-  try {
-    const projects = await apiListProjects();
-    if (projects.length > 0) {
-      redirectTo(`/intern/${projects[0].project_code}/`);
-      return;
-    }
-  } catch {
-    // Fallback
-  }
-  redirectTo('/intern/projekte/');
+  redirectTo('/intern/versicherungsfaelle/');
 }
 
 function renderLogin(context: AppContext) {
