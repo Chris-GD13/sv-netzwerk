@@ -1,0 +1,212 @@
+/* Öffentliche Website: bestehende Struktur mit kubischer Windows-11-Formensprache. */
+.public-site {
+  --sv-radius-sm: .2rem;
+  --sv-radius-md: .28rem;
+  --sv-radius-lg: .38rem;
+  --sv-radius-xl: .48rem;
+  --sv-shadow-sm: 0 2px 8px rgba(7, 26, 46, .06);
+  --sv-shadow-md: 0 8px 22px rgba(7, 26, 46, .09);
+  --sv-shadow-lg: 0 16px 38px rgba(7, 26, 46, .12);
+  background:
+    linear-gradient(90deg, rgba(7, 26, 46, .025) 1px, transparent 1px),
+    linear-gradient(rgba(7, 26, 46, .025) 1px, transparent 1px),
+    #f3f5f7;
+  background-attachment: fixed;
+  background-size: 48px 48px;
+}
+
+.public-site .site-header {
+  border-bottom-color: #cbd6dd;
+  background: rgba(248, 249, 250, .96);
+  backdrop-filter: blur(18px) saturate(125%);
+}
+
+.public-site .site-header.is-scrolled {
+  background: rgba(255, 255, 255, .98);
+  box-shadow: 0 4px 16px rgba(7, 26, 46, .08);
+}
+
+.public-site .sv-card,
+.public-site .search-panel,
+.public-site .search-field,
+.public-site .search-results a,
+.public-site .notice-box,
+.public-site .consent-dialog,
+.public-site .consent-btn,
+.public-site input,
+.public-site textarea,
+.public-site select,
+.public-site .sv-button,
+.public-site .header-platform-cta,
+.public-site .search-button,
+.public-site .hamburger,
+.public-site .mobile-menu__close,
+.public-site .mobile-menu__subnav a,
+.public-site .desktop-nav__trigger,
+.public-site .desktop-nav__link,
+.public-site .mega-menu,
+.public-site .mega-menu__overview,
+.public-site .mega-menu__links > a {
+  border-radius: var(--sv-radius-sm);
+}
+
+.public-site .sv-card {
+  border-color: #ccd7de;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: var(--sv-shadow-sm);
+  backdrop-filter: blur(8px);
+}
+
+.public-site .sv-card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sv-shadow-md);
+}
+
+.public-site .sv-button:hover,
+.public-site .header-platform-cta:hover {
+  transform: translateY(-1px);
+}
+
+.public-site .header-platform-cta,
+.public-site .sv-button-primary {
+  background: var(--sv-color-accent);
+  color: var(--sv-color-ink);
+  box-shadow: none;
+}
+
+.public-site .header-platform-cta:hover,
+.public-site .sv-button-primary:hover {
+  background: var(--sv-color-accent-hover);
+  color: var(--sv-color-ink);
+}
+
+.public-site .mega-menu {
+  padding: .55rem;
+  border-color: #c7d3da;
+  box-shadow: 0 16px 36px rgba(7, 26, 46, .14);
+}
+
+.public-site .mega-menu__overview {
+  background: #071a2e;
+}
+
+.public-site .desktop-nav__trigger.is-active::after,
+.public-site .desktop-nav__link.is-active::after {
+  height: 3px;
+  border-radius: 0;
+  background: var(--sv-color-accent);
+}
+
+.public-site .sv-pill {
+  border-radius: var(--sv-radius-sm);
+}
+
+.public-site.home-v4 {
+  --v4-ink: #071a2e;
+  --v4-blue: #0b4f7a;
+  --v4-soft: #f3f5f7;
+  --v4-line: #ccd7de;
+  --v4-accent: #ff9d12;
+  background:
+    linear-gradient(90deg, rgba(7, 26, 46, .025) 1px, transparent 1px),
+    linear-gradient(rgba(7, 26, 46, .025) 1px, transparent 1px),
+    #f3f5f7;
+  background-size: 48px 48px;
+}
+
+.public-site .v4-hero {
+  background: #f3f5f7;
+}
+
+.public-site .v4-hero::before,
+.public-site .v4-hero::after {
+  display: none;
+}
+
+.public-site .v4-button,
+.public-site .audience-card,
+.public-site .priority-card,
+.public-site .home-podcast__mark,
+.public-site .home-podcast__primary,
+.public-site .v4-knowledge__grid article,
+.public-site .v4-cta__inner,
+.public-site .v4-insurer-band__logo {
+  border-radius: var(--sv-radius-sm);
+}
+
+.public-site .audience-card,
+.public-site .priority-card,
+.public-site .v4-knowledge__grid article {
+  border-color: var(--v4-line);
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 2px 8px rgba(7, 26, 46, .05);
+}
+
+.public-site .audience-card:hover,
+.public-site .priority-card:hover,
+.public-site .v4-knowledge__grid article:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(7, 26, 46, .09);
+}
+
+.public-site .audience-card > span,
+.public-site .priority-card small,
+.public-site .service-item > span {
+  color: var(--v4-accent);
+}
+
+.public-site .v4-button--accent,
+.public-site .home-podcast__primary {
+  background: var(--v4-accent);
+  color: var(--v4-ink);
+  box-shadow: none;
+}
+
+.public-site .v4-button--dark {
+  background: var(--v4-ink);
+  box-shadow: none;
+}
+
+.public-site .home-network,
+.public-site .audience-section,
+.public-site .home-service-overview,
+.public-site .v4-insurer-band,
+.public-site .v4-cta {
+  background: transparent;
+}
+
+.public-site .home-network__inner,
+.public-site .v4-insurer-band__head,
+.public-site .v4-cta__inner {
+  border-color: var(--v4-line);
+}
+
+.public-site .home-network__inner,
+.public-site .v4-cta__inner {
+  background: rgba(255, 255, 255, .92);
+}
+
+.public-site .home-podcast {
+  background: var(--v4-ink);
+}
+
+.public-site .home-podcast__mark {
+  border-color: rgba(255, 255, 255, .2);
+  background: rgba(255, 157, 18, .08);
+}
+
+.public-site .v4-kicker,
+.public-site .v4-kicker span,
+.public-site .sv-eyebrow {
+  color: var(--sv-color-accent);
+}
+
+.public-site .site-footer {
+  background: #071a2e;
+}
+
+@media (max-width: 48rem) {
+  .public-site {
+    background-size: 32px 32px;
+  }
+}
