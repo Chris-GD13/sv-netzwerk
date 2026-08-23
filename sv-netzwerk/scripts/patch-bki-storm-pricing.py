@@ -28,7 +28,25 @@ if mobile_css not in text:
     text = text.replace('</style>', mobile_css + '</style>', 1)
 
 pattern = re.compile(r"presets\.forEach\(\(p,i\)=>\{const e=document\.createElement\('div'\);e\.className='bk-quick-item';e\.dataset\.cat=p\.c;e\.innerHTML=`<label><input type=\\\"checkbox\\\" data-preset=\\\"\$\{i\}\\\"><span>\$\{esc\(p\.l\)\}<small class=\\\"bk-quick-note\\\">inkl\. Demontage, Entsorgung \+ Montage</small></span></label><span></span><input class=\\\"bk-quick-qty\\\" data-qty=\\\"\$\{i\}\\\" inputmode=\\\"decimal\\\" value=\\\"1\\\"><span class=\\\"bk-quick-unit\\\">\$\{esc\(p\.u\)\}</span>`;const cb=e\.querySelector\('input\[type=checkbox\]'\);cb\.onchange=\(\)=>e\.classList\.toggle\('checked',cb\.checked\);list\.appendChild\(e\)\}\);")
-replacement = """presets.forEach((p,i)=>{const e=document.createElement('div');e.className='bk-quick-item';e.dataset.cat=p.c;const extra=p.mode==='material_labor'?`<div class=\"bk-quick-extra\"><label>Material EP netto <input data-mat=\"${i}\" inputmode=\"decimal\" placeholder=\"0,00\"></label><label>Arbeitszeit h/St <input data-hours=\"${i}\" inputmode=\"decimal\" placeholder=\"z. B. 1,5\"></label><small>Materialpreis nach Beleg/Marktpreis; Arbeitslohn nach BKI-Facharbeiterstundensatz. Kein kompletter Dachfensterpreis.</small></div>`:'';e.innerHTML=`<label><input type=\"checkbox\" data-preset=\"${i}\"><span>${esc(p.l)}<small class=\"bk-quick-note\">inkl. Demontage, Entsorgung + Montage</small></span></label><span></span><input class=\"bk-quick-qty\" data-qty=\"${i}\" inputmode=\"decimal\" value=\"1\"><span class=\"bk-quick-unit\">${esc(p.u)}</span>${extra}`;const cb=e.querySelector('input[type=checkbox]');cb.onchange=()=>e.classList.toggle('checked',cb.checked);list.appendChild(e)});"""
+replacement = """const indexDefaults=p=>{const label=String(p.l||'').toLowerCase();const rules=[
+          [/eindeckrahmen velux/,{material:240,hours:1.5,labor:72}],
+          [/eindeckrahmen roto/,{material:250,hours:1.5,labor:72}],
+          [/dachfensterrollladen manuell/,{material:620,hours:2.0,labor:72}],
+          [/dachfensterrollladen solar/,{material:980,hours:2.5,labor:72}],
+          [/rollladenpanzer aluminium/,{material:115,hours:1.0,labor:72}],
+          [/rollladenpanzer pvc/,{material:72,hours:1.0,labor:72}],
+          [/vorbaurollladen, panzer alu/,{material:690,hours:3.0,labor:72}],
+          [/vorbaurollladen, panzer pvc/,{material:520,hours:3.0,labor:72}],
+          [/pv-unterkonstruktion|dachhaken/,{material:75,hours:0.5,labor:78}],
+          [/photovoltaikmodul/,{material:160,hours:1.0,labor:78}],
+          [/außenleuchte|lampe/,{material:95,hours:1.0,labor:72}],
+          [/feuchtraum|wannenleuchte/,{material:65,hours:0.75,labor:72}],
+          [/paneel einzeln/,{material:480,hours:2.5,labor:76}],
+          [/sektionaltor elektrisch/,{material:2450,hours:7.0,labor:76}],
+          [/sektionaltor manuell/,{material:1850,hours:6.0,labor:76}],
+          [/garagentor|sektionaltor/,{material:1950,hours:6.0,labor:76}]
+        ];return rules.find(([rx])=>rx.test(label))?.[1]||{material:100,hours:1,labor:72}};
+        presets.forEach((p,i)=>{const e=document.createElement('div');e.className='bk-quick-item';e.dataset.cat=p.c;const estimate=indexDefaults(p),extra=p.mode==='material_labor'?`<div class=\"bk-quick-extra\"><label>Index-Material EP netto <input data-mat=\"${i}\" inputmode=\"decimal\" value=\"${estimate.material}\"></label><label>Arbeitszeit h/St <input data-hours=\"${i}\" inputmode=\"decimal\" value=\"${estimate.hours}\"></label><small>Indexansatz 2026, veränderbar; Arbeitslohn vorrangig nach BKI-Facharbeiterstundensatz.</small></div>`:'';e.innerHTML=`<label><input type=\"checkbox\" data-preset=\"${i}\"><span>${esc(p.l)}<small class=\"bk-quick-note\">inkl. Demontage, Entsorgung + Montage</small></span></label><span></span><input class=\"bk-quick-qty\" data-qty=\"${i}\" inputmode=\"decimal\" value=\"1\"><span class=\"bk-quick-unit\">${esc(p.u)}</span>${extra}`;const cb=e.querySelector('input[type=checkbox]');cb.onchange=()=>e.classList.toggle('checked',cb.checked);list.appendChild(e)});"""
 text, count = pattern.subn(replacement, text, count=1)
 if count == 0:
     old_render = '''presets.forEach((p,i)=>{const e=document.createElement('div');e.className='bk-quick-item';e.dataset.cat=p.c;e.innerHTML=`<label><input type="checkbox" data-preset="${i}"><span>${esc(p.l)}<small class="bk-quick-note">inkl. Demontage, Entsorgung + Montage</small></span></label><span></span><input class="bk-quick-qty" data-qty="${i}" inputmode="decimal" value="1"><span class="bk-quick-unit">${esc(p.u)}</span>`;const cb=e.querySelector('input[type=checkbox]');cb.onchange=()=>e.classList.toggle('checked',cb.checked);list.appendChild(e)});'''
@@ -75,10 +93,10 @@ new = r"""const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[\
             const material=number(list.querySelector(`[data-mat=\"${idx}\"]`)?.value),hours=number(list.querySelector(`[data-hours=\"${idx}\"]`)?.value);
             if(material<=0||hours<=0){failed.push(`${p.l} (Materialpreis/Arbeitszeit fehlt)`);continue}
             const laborQuery=`BKI Altbau 2026: Ermittle ausschließlich den Netto-Stundensatz Facharbeiter für das fachlich passende Gewerk zur Montage von ${p.q}. Gib nur die eine Stundensatzposition zurück, keine Produkt-, Fenster-, Rollladen- oder Komplettposition.`;
-            const d=await api({query:laborQuery,quantity:String(hours),unit:'h',location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}}),positions=Array.isArray(d.positions)?d.positions:[],labor=positions.find(x=>/stundensatz|facharbeiter/i.test(positionText(x))&&unitNorm(x.unit)==='h');
-            if(!labor||choosePrice(labor)<=0){failed.push(`${p.l} (BKI-Arbeitslohn fehlt)`);continue}
-            const rf=number(d.regional_factor)||1,ep=material+(hours*choosePrice(labor));
-            bridge()?.addLine?.({position_code:(labor.position_code?`Material + ${labor.position_code}`:'Material + BKI-Lohn'),description:`${p.l} – Material zzgl. ${hours} h Arbeitslohn; Demontage und Montage enthalten`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;continue
+            let d={positions:[]};try{d=await api({query:laborQuery,quantity:String(hours),unit:'h',location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}})}catch{}
+            const positions=Array.isArray(d.positions)?d.positions:[],labor=positions.find(x=>/stundensatz|facharbeiter/i.test(positionText(x))&&unitNorm(x.unit)==='h'),laborRate=labor&&choosePrice(labor)>0?choosePrice(labor):indexDefaults(p).labor;
+            const rf=number(d.regional_factor)||1,ep=material+(hours*laborRate),basis=labor?'Index-Material + BKI-Lohn':'Index 2026';
+            bridge()?.addLine?.({position_code:(labor?.position_code?`INDEX + ${labor.position_code}`:'INDEX 2026'),description:`${p.l} – ${basis}, Material ${material.toFixed(2)} EUR zzgl. ${hours} h × ${laborRate.toFixed(2)} EUR; veränderbar; Demontage und Montage enthalten`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;continue
           }
           const fullQuery=`STURM-/HAGEL-SCHNELLKALKULATION. Gesucht ist eine Komplett-Wiederherstellung für: ${p.q}. Gib NUR die notwendigen BKI-Teilleistungen für (1) Demontage/Ausbau und Entsorgung des beschädigten Altbauteils und (2) Lieferung/Einbau bzw. Montage der gleichartigen Wiederherstellung zurück. Keine Alternativpositionen, keine bloßen Varianten. Die Summe soll die vollständige Demontage + Entsorgung + Neumontage abbilden.`;
           let d=await api({query:fullQuery,quantity:String(qty),unit:p.u,location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}}),positions=Array.isArray(d.positions)?d.positions:[];
