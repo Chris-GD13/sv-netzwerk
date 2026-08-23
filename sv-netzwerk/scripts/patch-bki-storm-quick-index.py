@@ -22,9 +22,16 @@ text = text.replace(anchor, quick + anchor, 1)
 
 css_anchor = '@media print{.bk-back{display:none!important}}\n</style>'
 css = '''@media print{.bk-back{display:none!important}}\n.bk-quick-head{align-items:flex-start}.bk-quick-head h2{margin:.15rem 0}.bk-quick-head p{margin:.3rem 0 0;color:var(--bkm);max-width:920px}.bk-quick-cats{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}.bk-quick-cat{border:1px solid #bdcbd6;background:#f7fafc;color:var(--bki);border-radius:999px;padding:7px 11px;font-weight:800;cursor:pointer}.bk-quick-cat.on{background:var(--bki);color:#fff;border-color:var(--bki)}.bk-quick-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.bk-quick-item{display:grid;grid-template-columns:auto 1fr 88px 52px;align-items:center;gap:8px;border:1px solid var(--bkl);border-radius:11px;padding:9px 10px;background:#fbfdfe}.bk-quick-item.off{display:none}.bk-quick-item>label{display:flex;align-items:center;gap:8px;font-weight:750;min-width:0}.bk-quick-item input[type=checkbox]{width:18px;height:18px;flex:0 0 auto}.bk-quick-qty{width:100%;box-sizing:border-box;border:1px solid #bdcbd6;border-radius:8px;padding:7px;text-align:right}.bk-quick-unit{font-size:.82rem;font-weight:800;color:#5c7182}.bk-quick-item.checked{border-color:#ff970f;background:#fff8ee}.bk-quick-note{display:block;font-size:.72rem;color:#718493;font-weight:500;margin-top:2px}.bk-quick-state-error{color:#a82929}.bk-quick-state-ok{color:#236e50}@media(max-width:1050px){.bk-quick-list{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.bk-quick-list{grid-template-columns:1fr}.bk-quick-item{grid-template-columns:auto 1fr 76px 44px}}@media print{.bk-quick{display:none!important}}\n</style>'''
-if css_anchor not in text:
-    raise SystemExit('css anchor not found')
-text = text.replace(css_anchor, css, 1)
+if css_anchor in text:
+    text = text.replace(css_anchor, css, 1)
+elif '</style>' in text:
+    # Weitere Portal-Funktionen dürfen vor dem Style-Ende eigenes CSS ergänzen.
+    # In diesem Fall die Schnellkalkulationsregeln unmittelbar vor dem ersten
+    # Style-Ende einfügen, statt von der vorherigen letzten Regel abhängig zu sein.
+    quick_css = css.split('\n', 1)[1]
+    text = text.replace('</style>', quick_css, 1)
+else:
+    raise SystemExit('style closing tag not found')
 
 script = r'''
 <script is:inline>
