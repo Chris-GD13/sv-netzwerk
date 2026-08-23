@@ -11,6 +11,7 @@ import { site } from '../data/site';
 import '../styles/global.css';
 import '../styles/header.css';
 import '../styles/navigation.css';
+import '../styles/public-refresh.css';
 
 interface BreadcrumbItem { label: string; href?: string }
 interface Props {
@@ -90,7 +91,7 @@ const schemas = [
     <SEO {...props} />
     {schemas.map((schema) => <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />)}
   </head>
-  <body>
+  <body class="public-site">
     <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
     <AccessibilityStatus />
     <Header />
