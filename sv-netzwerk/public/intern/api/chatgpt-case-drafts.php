@@ -34,6 +34,15 @@ try{
     $stmt->execute([':folder'=>$folder,':user'=>(int)$user['id'],':title'=>$title?:'ChatGPT-Work-Entwurf',':task'=>$task!==''?$task:null,':content'=>$content]);
     apiJson(['ok'=>true,'draft_id'=>(int)db()->lastInsertId(),'status'=>'draft']);
   }
+  if($action==='delete'){
+    if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
+    $in=requestBody();$folder=trim((string)($in['folder_id']??''));requireCaseFolderAccess($folder,$user);
+    $draftId=(int)($in['draft_id']??0);if($draftId<=0)apiError(400,'Ungültiger Entwurf.');
+    $stmt=db()->prepare('DELETE FROM chatgpt_case_drafts WHERE id=:id AND folder_id=:folder AND user_id=:user LIMIT 1');
+    $stmt->execute([':id'=>$draftId,':folder'=>$folder,':user'=>(int)$user['id']]);
+    if($stmt->rowCount()!==1)apiError(404,'Entwurf nicht gefunden.');
+    apiJson(['ok'=>true,'deleted_id'=>$draftId]);
+  }
   if($action==='list'){
     $folder=trim((string)($_GET['folder_id']??''));requireCaseFolderAccess($folder,$user);
     $stmt=db()->prepare('SELECT id,title,task_text,content,source,created_at FROM chatgpt_case_drafts WHERE folder_id=:folder AND user_id=:user ORDER BY created_at DESC LIMIT 20');
