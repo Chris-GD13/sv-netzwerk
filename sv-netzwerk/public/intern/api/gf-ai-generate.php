@@ -59,6 +59,70 @@ $source = str_replace(
     $source
 );
 
+// Die aktuelle Gesamtreserve direkt aus dem Regulierungsauftrag lesen.
+function gfPortalCurrentReserve(array $caseFiles): ?string
+{
+    if (!class_exists('ZipArchive') || !class_exists('DOMDocument')) return null;
+    foreach ($caseFiles as $file) {
+        $name = (string)($file['name'] ?? '');
+        if (!preg_match('/regulierungsauftrag.*\.xls(?:x|m)$/ui', $name)) continue;
+        $download = gfDriveDownload($file);
+        $bytes = is_array($download) ? (string)($download['bytes'] ?? '') : '';
+        if ($bytes === '') continue;
+        $tmp = tempnam(sys_get_temp_dir(), 'svnet-reserve-');
+        if ($tmp === false) continue;
+        file_put_contents($tmp, $bytes);
+        $zip = new ZipArchive();
+        if ($zip->open($tmp) !== true) {@unlink($tmp);continue;}
+        $shared = [];
+        $sharedXml = $zip->getFromName('xl/sharedStrings.xml');
+        if (is_string($sharedXml) && $sharedXml !== '') {
+            $dom = new DOMDocument();
+            if (@$dom->loadXML($sharedXml)) {
+                $xp = new DOMXPath($dom);
+                $xp->registerNamespace('x', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+                foreach ($xp->query('//x:si') ?: [] as $si) {
+                    $value = '';
+                    foreach ($xp->query('.//x:t', $si) ?: [] as $textNode) $value .= $textNode->textContent;
+                    $shared[] = trim($value);
+                }
+            }
+        }
+        $sheetXml = $zip->getFromName('xl/worksheets/sheet1.xml');
+        $zip->close();
+        @unlink($tmp);
+        if (!is_string($sheetXml) || $sheetXml === '') continue;
+        $dom = new DOMDocument();
+        if (!@$dom->loadXML($sheetXml)) continue;
+        $xp = new DOMXPath($dom);
+        $xp->registerNamespace('x', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+        foreach ($xp->query('//x:row') ?: [] as $row) {
+            $values = [];
+            foreach ($xp->query('./x:c', $row) ?: [] as $cell) {
+                $type = (string)$cell->getAttribute('t');
+                $raw = trim((string)($xp->query('./x:v', $cell)?->item(0)?->textContent ?? ''));
+                if ($type === 's' && ctype_digit($raw)) $raw = (string)($shared[(int)$raw] ?? '');
+                elseif ($type === 'inlineStr') $raw = trim((string)($xp->query('./x:is/x:t', $cell)?->item(0)?->textContent ?? ''));
+                $values[] = trim($raw);
+            }
+            foreach ($values as $index => $value) {
+                if (gfNorm($value) !== 'gesamtreserveaktuell') continue;
+                $reserve = trim((string)($values[$index + 1] ?? ''));
+                if ($reserve !== '' && is_numeric(str_replace(',', '.', $reserve))) {
+                    return number_format((float)str_replace(',', '.', $reserve), 2, ',', '.').' EUR';
+                }
+            }
+        }
+    }
+    return null;
+}
+$caseFilesNeedle = '$caseFiles=gfCaseFiles($folderId);if(!$caseFiles)throw new RuntimeException(\'Im aktiven Fall wurden keine auswertbaren Unterlagen gefunden.\');';
+$caseFilesReplacement = $caseFilesNeedle."\n\$portalReserve=gfPortalCurrentReserve(\$caseFiles);if(\$portalReserve!==null)\$meta['reserve']=\$portalReserve;";
+if (!str_contains($source, 'gfPortalCurrentReserve($caseFiles)')) {
+    $source = str_replace($caseFilesNeedle, $caseFilesReplacement, $source, $countReserveBinding);
+    if ($countReserveBinding !== 1) throw new RuntimeException('Aktuelle Gesamtreserve konnte nicht sicher angebunden werden.');
+}
+
 // SV-GF-Template nur injizieren, wenn der Kern noch keine Sonderbehandlung kennt.
 if (!str_contains($source, "if(\$key==='erstbericht_sv_gf')")) {
     $sig = 'function gfTemplateFile(string $key,array $meta,string $instructions):?array{';
@@ -86,7 +150,7 @@ $source = str_replace($engelSignature, $engelReplacement, $source);
 // Inhalt und Reihenfolge bleiben erhalten; die Engel-Blanco-QS gilt nur für SV-GF.
 $resultNeedle = '$result=gfEngelPrepare($key,gfOpenAI($content,$system),$meta);$contentQs=gfEngelValidate($key,$result,$meta,$instructions);';
 $resultReplacement = <<<'PHP_CODE'
-$result=gfEngelPrepare($key,gfOpenAI($content,$system),$meta);if($key==='erstbericht'){$generalReview=$content;$generalReview[]=['type'=>'input_text','text'=>"REDAKTIONELLE SCHLUSS-QS: Überarbeite den folgenden Entwurf vollständig und gib wieder ausschließlich das verlangte JSON aus. Entferne ausnahmslos Wiederholungen zwischen den Kapiteln. Jeder Sachverhalt darf nur in seinem zuständigen Kapitel stehen. Das Aufmaß ist als sachverständige Feststellung mit Rechenansätzen darzustellen, jedoch vollständig quellenneutral: Im Aufmaßabsatz keine Firmen-, Dokument-, Angebots-, KVA-, Gutachten-, Prüfbericht- oder Produktnamen und keine Herkunftsformulierungen. Firmen- und Belegnamen sind nur im Kapitel Kalkulation zulässig. Externe Prüfberichte und deren Regulierungsempfehlungen sind nicht maßgeblich. Ohne ausdrückliche abweichende Vorgabe im aktuellen Arbeitsauftrag ist ausschließlich der vollständige Original-KVA als Bewertungs- und Freigabebetrag anzusetzen. Kürzungen aus PropertyExpert oder anderen Fremdprüfungen nicht übernehmen und nicht als eigenen Prüfstand darstellen. Reserve ausschließlich aus dem aktuellen Regulierungsauftrag, Feld Gesamtreserve aktuell beziehungsweise Erstreserve, übernehmen; niemals Selbstbehalt oder KVA als Reserve.\n\nZU ÜBERARBEITENDER ENTWURF:\n".json_encode($result,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)];$result=gfEngelPrepare($key,gfOpenAI($generalReview,$system),$meta);$generalHeadings=gfHeadings($key);$generalSections=is_array($result['sections']??null)?array_values($result['sections']):[];if(count($generalSections)!==count($generalHeadings))throw new RuntimeException('Allgemeiner Erstbericht unvollständig: Erwartet werden '.count($generalHeadings).' fachliche Fließtextabschnitte.');foreach($generalHeadings as$generalIndex=>$generalHeading)$generalSections[$generalIndex]['heading']=$generalHeading;$result['sections']=$generalSections;}$contentQs=gfEngelValidate($key,$result,$meta,$instructions);
+$result=gfEngelPrepare($key,gfOpenAI($content,$system),$meta);if($key==='erstbericht'){$generalReview=$content;$generalReview[]=['type'=>'input_text','text'=>"REDAKTIONELLE SCHLUSS-QS: Überarbeite den folgenden Entwurf vollständig und gib wieder ausschließlich das verlangte JSON aus. Entferne ausnahmslos Wiederholungen zwischen den Kapiteln. Jeder Sachverhalt darf nur in seinem zuständigen Kapitel stehen. Das Aufmaß ist als sachverständige Feststellung mit Rechenansätzen darzustellen, jedoch vollständig quellenneutral: Im Aufmaßabsatz keine Firmen-, Dokument-, Angebots-, KVA-, Gutachten-, Prüfbericht- oder Produktnamen und keine Herkunftsformulierungen. Firmen- und Belegnamen sind nur im Kapitel Kalkulation zulässig. Externe Prüfberichte und deren Regulierungsempfehlungen sind nicht maßgeblich. Ohne ausdrückliche abweichende Vorgabe im aktuellen Arbeitsauftrag ist ausschließlich der vollständige Original-KVA als Bewertungs- und Freigabebetrag anzusetzen. Kürzungen aus PropertyExpert oder anderen Fremdprüfungen nicht übernehmen und nicht als eigenen Prüfstand darstellen. Reserve ausschließlich aus dem aktuellen Regulierungsauftrag, Feld Gesamtreserve aktuell beziehungsweise Erstreserve, übernehmen; niemals Selbstbehalt oder KVA als Reserve.\n\nZU ÜBERARBEITENDER ENTWURF:\n".json_encode($result,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)];$result=gfEngelPrepare($key,gfOpenAI($generalReview,$system),$meta);$generalHeadings=gfHeadings($key);$generalSections=is_array($result['sections']??null)?array_values($result['sections']):[];if(count($generalSections)!==count($generalHeadings))throw new RuntimeException('Allgemeiner Erstbericht unvollständig: Erwartet werden '.count($generalHeadings).' fachliche Fließtextabschnitte.');foreach($generalHeadings as$generalIndex=>$generalHeading){$generalSections[$generalIndex]['heading']=$generalHeading;$generalSections[$generalIndex]['text']=str_ireplace(['schaden ursächlich','schaden ursächliche','schaden ursächlichen'],['schadenursächlich','schadenursächliche','schadenursächlichen'],(string)($generalSections[$generalIndex]['text']??''));}$result['sections']=$generalSections;}$contentQs=gfEngelValidate($key,$result,$meta,$instructions);
 PHP_CODE;
 if (!str_contains($source, 'Allgemeiner Erstbericht unvollständig:')) {
     $source = str_replace($resultNeedle, trim($resultReplacement), $source, $countGeneralPrepare);
