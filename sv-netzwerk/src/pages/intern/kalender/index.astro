@@ -1,0 +1,50 @@
+---
+import InternalLayout from '../../../layouts/InternalLayout.astro';
+---
+<InternalLayout title="Kalender" description="Der persönliche Outlook-Kalender direkt im SV-Netzwerk-Portal.">
+  <section class="cal-app">
+    <header class="cal-head">
+      <div><p class="cal-kicker">Outlook</p><h1 id="cal-title">Kalender</h1><p id="cal-mailbox">Termine werden geladen …</p></div>
+      <div class="cal-nav"><button id="cal-prev" type="button">← Vorherige Woche</button><button id="cal-today" type="button">Heute</button><button id="cal-next" type="button">Nächste Woche →</button></div>
+    </header>
+    <div id="cal-state" class="cal-state">Kalender wird geladen …</div>
+    <div id="cal-grid" class="cal-grid" aria-live="polite"></div>
+  </section>
+</InternalLayout>
+<style is:global>
+.cal-app{padding:24px;min-height:calc(100vh - 112px);box-sizing:border-box;color:#17324a}.cal-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:18px}.cal-kicker{margin:0;color:#f59a23;font-weight:800}.cal-head h1{margin:3px 0}.cal-head p{margin:0;color:#647789}.cal-nav{display:flex;gap:8px;flex-wrap:wrap}.cal-nav button{border:1px solid #bcc8d1;background:#fff;color:#17324a;border-radius:4px;padding:9px 12px;font-weight:800;cursor:pointer}.cal-state{padding:13px;background:#fff7e9;border:1px solid #f1d7ad;margin-bottom:12px}.cal-state.ok{display:none}.cal-state.bad{background:#fff0f0;border-color:#e4bcbc;color:#8b2525}.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(145px,1fr));border-top:1px solid #d5dde3;border-left:1px solid #d5dde3;background:#fff;overflow:auto}.cal-day{min-height:560px;border-right:1px solid #d5dde3;border-bottom:1px solid #d5dde3;background:#fff}.cal-day.today{background:#fffaf2}.cal-day-head{position:sticky;top:0;z-index:1;padding:11px;background:#edf2f5;border-bottom:1px solid #d5dde3}.cal-day.today .cal-day-head{background:#ffe4bc}.cal-day-head strong,.cal-day-head span{display:block}.cal-day-head span{font-size:.8rem;color:#647789}.cal-events{padding:8px;display:grid;gap:8px}.cal-event{display:block;padding:9px;border-left:4px solid #f59a23;background:#f2f6f8;color:#17324a;text-decoration:none}.cal-event:hover{background:#e7eef2}.cal-time{display:block;font-size:.75rem;font-weight:800;color:#5f7384}.cal-subject{display:block;margin-top:2px;font-weight:800}.cal-location{display:block;margin-top:4px;font-size:.75rem;color:#667887}.cal-empty{padding:12px;color:#8a99a5;font-size:.82rem}@media(max-width:1100px){.cal-grid{grid-template-columns:repeat(7,minmax(180px,1fr))}.cal-head{align-items:flex-start;flex-direction:column}}@media(max-width:700px){.cal-app{padding:14px}.cal-nav button{flex:1 1 auto}}
+</style>
+<script is:inline>
+(() => {
+  const API='/intern/api/outlook-case-calendar.php';
+  const grid=document.getElementById('cal-grid'),state=document.getElementById('cal-state'),title=document.getElementById('cal-title'),mailbox=document.getElementById('cal-mailbox');
+  const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const pad=value=>String(value).padStart(2,'0');
+  const iso=date=>date.getFullYear()+'-'+pad(date.getMonth()+1)+'-'+pad(date.getDate());
+  const monday=value=>{const date=new Date(value);date.setHours(12,0,0,0);const day=date.getDay()||7;date.setDate(date.getDate()-day+1);return date};
+  let week=monday(new Date());
+  const fmtDay=new Intl.DateTimeFormat('de-DE',{weekday:'long'});
+  const fmtDate=new Intl.DateTimeFormat('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const fmtTime=new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit'});
+  async function load(){
+    state.className='cal-state';state.textContent='Kalender wird geladen …';
+    try{
+      const response=await fetch(API+'?action=list&start='+encodeURIComponent(iso(week)),{credentials:'same-origin'});
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok)throw Error(data.error||('HTTP '+response.status));
+      title.textContent=data.calendar||'Kalender';mailbox.textContent=data.mailbox||'';
+      const events=data.events||[],today=iso(new Date());
+      grid.innerHTML=Array.from({length:7},(_,index)=>{
+        const day=new Date(week);day.setDate(day.getDate()+index);const key=iso(day);
+        const items=events.filter(event=>String(event.start||'').slice(0,10)===key);
+        return '<section class="cal-day '+(key===today?'today':'')+'"><header class="cal-day-head"><strong>'+esc(fmtDay.format(day))+'</strong><span>'+esc(fmtDate.format(day))+'</span></header><div class="cal-events">'+(items.length?items.map(event=>{const start=new Date(event.start),end=new Date(event.end);const time=event.all_day?'Ganztägig':fmtTime.format(start)+'–'+fmtTime.format(end);const body='<span class="cal-time">'+esc(time)+'</span><span class="cal-subject">'+esc(event.subject)+'</span>'+(event.location?'<span class="cal-location">'+esc(event.location)+'</span>':'');return event.web_link?'<a class="cal-event" href="'+esc(event.web_link)+'" target="_blank" rel="noreferrer">'+body+'</a>':'<div class="cal-event">'+body+'</div>'}).join(''):'<div class="cal-empty">Keine Termine</div>')+'</div></section>'
+      }).join('');
+      state.className='cal-state ok';
+    }catch(error){state.className='cal-state bad';state.textContent=error.message||'Kalender konnte nicht geladen werden.';grid.innerHTML=''}
+  }
+  document.getElementById('cal-prev').onclick=()=>{week.setDate(week.getDate()-7);load()};
+  document.getElementById('cal-next').onclick=()=>{week.setDate(week.getDate()+7);load()};
+  document.getElementById('cal-today').onclick=()=>{week=monday(new Date());load()};
+  load();
+})();
+</script>
