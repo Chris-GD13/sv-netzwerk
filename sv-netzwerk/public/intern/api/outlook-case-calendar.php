@@ -34,6 +34,39 @@ $profile=ocCalendarProfile($user);
 try{
 if($action==='open'){$calendar=ocCalendar($profile);$target='https://outlook.office.com/calendar/view/week';header('Location: '.$target,true,302);exit;}
 if($action==='status'){$calendar=ocCalendar($profile);apiJson(['ok'=>true,'mailbox'=>$profile['mailbox'],'mail_sender'=>$profile['sender'],'calendar'=>['id'=>$calendar['id']??'','name'=>$profile['calendar_label'],'actual_name'=>$calendar['name']??'']]);}
+if($action==='list'){
+    $startDate=trim((string)($_GET['start']??''));
+    if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$startDate))$startDate=(new DateTime('monday this week',new DateTimeZone('Europe/Berlin')))->format('Y-m-d');
+    $start=new DateTime($startDate.' 00:00:00',new DateTimeZone('Europe/Berlin'));
+    $end=(clone$start)->modify('+7 days');
+    $calendar=ocCalendar($profile);
+    $path='users/'.rawurlencode($profile['mailbox']).'/calendars/'.rawurlencode((string)$calendar['id']).'/calendarView?'.http_build_query([
+        'startDateTime'=>$start->format(DateTimeInterface::ATOM),
+        'endDateTime'=>$end->format(DateTimeInterface::ATOM),
+        '$select'=>'id,subject,start,end,location,isAllDay,isCancelled,webLink,showAs',
+        '$orderby'=>'start/dateTime',
+        '$top'=>250
+    ]);
+    $headers=['Authorization: Bearer '.ocGraphToken(),'Prefer: outlook.timezone="'.CALENDAR_TIMEZONE.'"'];
+    $response=ocHttp('GET','https://graph.microsoft.com/v1.0/'.$path,$headers);
+    $data=json_decode($response['body'],true);
+    if($response['status']<200||$response['status']>=300||!is_array($data))throw new RuntimeException('Kalendertermine konnten nicht geladen werden.');
+    $events=[];
+    foreach(($data['value']??[])as$event){
+        if(($event['isCancelled']??false)===true)continue;
+        $events[]=[
+            'id'=>$event['id']??'',
+            'subject'=>$event['subject']??'(Ohne Titel)',
+            'start'=>$event['start']['dateTime']??'',
+            'end'=>$event['end']['dateTime']??'',
+            'location'=>$event['location']['displayName']??'',
+            'all_day'=>(bool)($event['isAllDay']??false),
+            'web_link'=>$event['webLink']??null,
+            'show_as'=>$event['showAs']??''
+        ];
+    }
+    apiJson(['ok'=>true,'calendar'=>$profile['calendar_label'],'mailbox'=>$profile['mailbox'],'start'=>$start->format('Y-m-d'),'end'=>$end->format('Y-m-d'),'events'=>$events]);
+}
 if($action==='availability'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');$b=requestBody();$start=ocDate((string)($b['date']??''),(string)($b['time']??''));$minutes=max(15,min(480,(int)($b['duration']??30)));$end=(new DateTime($start,new DateTimeZone('Europe/Berlin')))->modify('+'.$minutes.' minutes')->format('Y-m-d\\TH:i:s');$calendar=ocCalendar($profile);$j=ocGraph('GET','users/'.rawurlencode($profile['mailbox']).'/calendars/'.rawurlencode((string)$calendar['id']).'/calendarView?'.http_build_query(['startDateTime'=>ocUtcIso($start),'endDateTime'=>ocUtcIso($end),'$select'=>'id,showAs,isCancelled']));$busy=array_values(array_filter($j['value']??[],fn($event)=>!($event['isCancelled']??false)&&strtolower((string)($event['showAs']??'busy'))!=='free'));apiJson(['ok'=>true,'available'=>count($busy)===0,'conflicts'=>count($busy),'calendar'=>$profile['calendar_label']]);}
 if($action==='create'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');$folderId=trim((string)($_POST['folder_id']??''));requireCaseFolderAccess($folderId,$user);$meta=ocMeta($folderId);if(!$meta)apiError(409,'Falldaten fehlen.');$date=(string)($_POST['date']??'');$time=(string)($_POST['time']??'');$start=ocDate($date,$time);$minutes=max(15,min(480,(int)($_POST['duration']??30)));$end=(new DateTime($start,new DateTimeZone('Europe/Berlin')))->modify('+'.$minutes.' minutes')->format('Y-m-d\TH:i:s');$address=trim(implode(' ',array_filter([(string)($meta['schaden_strasse']??''),(string)($meta['schaden_plz']??''),(string)($meta['schaden_ort']??'')])));if($address==='')throw new RuntimeException('Schadenort fehlt in den Falldaten. Bitte den tatsächlichen Schadenort eintragen; die VN-Anschrift wird nicht als Terminadresse verwendet.');$caseNo=trim((string)($meta['schaden_nr']??''));$vn=trim((string)($meta['vn_objekt']??$meta['versicherungsnehmer']??''));$notes=trim((string)($_POST['notes']??''));$subject='Ortstermin'.($caseNo!==''?' · '.$caseNo:'').($vn!==''?' · '.$vn:'');$body='<p><strong>Schaden-Nr.:</strong> '.ocSafeHtml($caseNo).'<br><strong>VN / Objekt:</strong> '.ocSafeHtml($vn).'<br><strong>Besichtigungsadresse:</strong> '.ocSafeHtml($address).'<br><strong>Telefon:</strong> '.ocSafeHtml((string)($meta['telefon']??'')).'</p>'.($notes!==''?'<p><strong>Bemerkungen / Notizen:</strong><br>'.nl2br(ocSafeHtml($notes)).'</p>':'').'<p>Fallordner: <a href="https://drive.google.com/drive/folders/'.rawurlencode($folderId).'">Dokumente öffnen</a></p>';$invite=($_POST['invite_vn']??'')==='1';$vnEmail=trim((string)($meta['email']??''));if($invite&&!filter_var($vnEmail,FILTER_VALIDATE_EMAIL))throw new RuntimeException('Für die Einladung fehlt eine gültige E-Mail-Adresse des VN.');$attachments=ocAttachments($folderId);$calendar=ocCalendar($profile);$event=ocGraph('POST','users/'.rawurlencode($profile['mailbox']).'/calendars/'.rawurlencode((string)$calendar['id']).'/events',['subject'=>$subject,'body'=>['contentType'=>'HTML','content'=>$body],'start'=>['dateTime'=>$start,'timeZone'=>CALENDAR_TIMEZONE],'end'=>['dateTime'=>$end,'timeZone'=>CALENDAR_TIMEZONE],'location'=>['displayName'=>$address],'attendees'=>[],'allowNewTimeProposals'=>true,'isReminderOn'=>true,'reminderMinutesBeforeStart'=>30]);$eventId=(string)($event['id']??'');if($eventId==='')throw new RuntimeException('Outlook-Termin wurde nicht bestätigt.');try{foreach($attachments as$a)ocGraph('POST','users/'.rawurlencode($profile['mailbox']).'/events/'.rawurlencode($eventId).'/attachments',['@odata.type'=>'#microsoft.graph.fileAttachment','name'=>$a['name'],'contentBytes'=>base64_encode($a['bytes'])]);if($invite)ocSendInvitation($vnEmail,$vn,$subject,$body,$start,$end,$address,$eventId,$attachments,$profile);}catch(Throwable$e){try{ocGraph('DELETE','users/'.rawurlencode($profile['mailbox']).'/events/'.rawurlencode($eventId));}catch(Throwable){}throw$e;}apiJson(['ok'=>true,'event'=>['id'=>$eventId,'subject'=>$subject,'webLink'=>$event['webLink']??null,'start'=>$start,'end'=>$end,'location'=>$address,'calendar'=>$profile['calendar_label'],'mail_sender'=>$profile['sender']]]);}
 apiError(400,'Unbekannte Kalenderaktion.');
