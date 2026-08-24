@@ -18,6 +18,7 @@ const internalLinks = [
   { href: '/intern/versicherungsfaelle/', label: 'Startseite', icon: '⌂' },
   { href: '/intern/kalkulation/', label: 'Kalkulation', icon: '▦' },
   { href: '/intern/fensterpruefung-bonn/', label: 'Fenster', icon: '▣' },
+  { href: '/intern/kalender/', label: 'Kalender', icon: '□' },
 ];
 const isActive = (href: string) => currentPath.startsWith(href);
 ---
@@ -91,7 +92,6 @@ const isActive = (href: string) => currentPath.startsWith(href);
       <aside class="intern-sidebar">
         <nav aria-label="Interne Navigation" class="intern-sidebar__nav">
           {internalLinks.map((link) => <a class:list={{ active: isActive(link.href) }} href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
-          <a href="/intern/api/outlook-case-calendar.php?action=open" title="Den anhand der Anmeldung zugeordneten Outlook-Kalender öffnen"><span>□</span>Kalender</a>
         </nav>
         <button class="intern-header__logout" id="intern-logout" type="button"><span>↪</span>Abmelden</button>
       </aside>
