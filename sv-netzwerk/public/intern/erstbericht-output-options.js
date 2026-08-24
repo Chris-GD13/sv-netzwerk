@@ -30,6 +30,20 @@
         general?.after(option);
       }
     }
+
+    // Der obere Ausführen-Button arbeitet mit einer beim Seitenaufbau erzeugten alten Checkbox-Liste.
+    // Für die nachgeladenen Erstbericht-Optionen den Klick deshalb vor dem alten Handler direkt an vf-start weiterreichen.
+    const quickRun = document.getElementById('vf-instruction-run');
+    if (quickRun && !quickRun.dataset.erstberichtBound) {
+      quickRun.dataset.erstberichtBound = '1';
+      quickRun.addEventListener('click', (event) => {
+        const selectedNew = document.querySelector('#vf-outputs input[value="erstbericht"]:checked, #vf-outputs input[value="erstbericht_sv_gf"]:checked');
+        if (!selectedNew) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        document.getElementById('vf-start')?.click();
+      }, true);
+    }
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply, { once: true });
