@@ -82,6 +82,19 @@ function gfEngelReport(string $key):bool{return in_array($key,['erstbericht_sv_g
 PHP_CODE;
 $source = str_replace($engelSignature, $engelReplacement, $source);
 
+// Beim allgemeinen Erstbericht die fachlichen Kapitel deterministisch benennen.
+// Inhalt und Reihenfolge bleiben erhalten; die Engel-Blanco-QS gilt nur für SV-GF.
+$resultNeedle = '$result=gfEngelPrepare($key,gfOpenAI($content,$system),$meta);$contentQs=gfEngelValidate($key,$result,$meta,$instructions);';
+$resultReplacement = <<<'PHP_CODE'
+$result=gfEngelPrepare($key,gfOpenAI($content,$system),$meta);if($key==='erstbericht'){$generalHeadings=gfHeadings($key);$generalSections=is_array($result['sections']??null)?array_values($result['sections']):[];if(count($generalSections)!==count($generalHeadings))throw new RuntimeException('Allgemeiner Erstbericht unvollständig: Erwartet werden '.count($generalHeadings).' fachliche Fließtextabschnitte.');foreach($generalHeadings as$generalIndex=>$generalHeading)$generalSections[$generalIndex]['heading']=$generalHeading;$result['sections']=$generalSections;}$contentQs=gfEngelValidate($key,$result,$meta,$instructions);
+PHP_CODE;
+if (!str_contains($source, 'Allgemeiner Erstbericht unvollständig:')) {
+    $source = str_replace($resultNeedle, trim($resultReplacement), $source, $countGeneralPrepare);
+    if ($countGeneralPrepare !== 1) {
+        throw new RuntimeException('Allgemeiner Erstbericht konnte nicht sicher an die QS angebunden werden.');
+    }
+}
+
 // Nachtragsausgabe ohne automatisch angehängte Quellen-/Regelwerkslisten.
 if (!str_contains($source, "<title>Nachtrag</title>")) {
     $sig = 'function gfDocumentHtml(string $title,array $meta,array $result,array $sources,array $rules,string $userName):string{';
