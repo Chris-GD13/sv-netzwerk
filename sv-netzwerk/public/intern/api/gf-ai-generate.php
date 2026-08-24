@@ -19,7 +19,9 @@ $source = str_replace(
 );
 
 // Zusätzliche Portalregeln direkt an den Arbeitsauftrag anhängen.
-$needle = "$instructions=trim((string)($order['instructions']??''));if($instructions==='')throw new RuntimeException('Arbeitsauftrag fehlt.');";
+$needle = <<<'PHP_CODE'
+$instructions=trim((string)($order['instructions']??''));if($instructions==='')throw new RuntimeException('Arbeitsauftrag fehlt.');
+PHP_CODE;
 $rules = <<<'PHP_CODE'
 $instructions=trim((string)($order['instructions']??''));if($instructions==='')throw new RuntimeException('Arbeitsauftrag fehlt.');
 if(in_array('nachtrag_stellungnahme',$outputs,true)){$instructions.="\n\nVERBINDLICHE PORTALREGEL NACHTRAG: Erstelle einen kurzen, unmittelbar verwendbaren Nachtrag in der Sprache eines Sachverständigen. Der konkrete Arbeitsauftrag ist führend. Keine allgemeine Fallzusammenfassung, keine Wiederholung historischer Schadenstände, keine Reservefortschreibung, keine Regressprüfung, keine Quellen-/Regelwerkslisten und keine künstlichen offenen Punkte, sofern dies nicht ausdrücklich verlangt ist. Beginne direkt mit dem neuen Vorgang bzw. Ortstermin. KVA oder Angebote grob analysieren und wesentliche Hauptpositionen bzw. Leistungsgruppen mit EUR-Beträgen sowie Gesamtbetrag aufnehmen. Netto und brutto eindeutig trennen.";}
@@ -28,8 +30,11 @@ if(in_array('erstbericht',$outputs,true)){$instructions.="\n\nVERBINDLICHE PORTA
 $hasErstbericht=false;foreach($outputs as$outputKey){$outputKey=(string)$outputKey;if(strpos($outputKey,'erstbericht')!==false||in_array($outputKey,['schadenbericht','sv_erstbericht','erstbericht_sv'],true)){$hasErstbericht=true;break;}}
 if($hasErstbericht){$instructions.="\n\nVERBINDLICHE QS-REGEL FLÄCHENBERECHNUNG FÜR ALLE ERSTBERICHTE: In jedem Erstbericht ist eine Flächen-/Aufmaßdarstellung aufzunehmen, sofern belastbare Maße oder Flächen vorhanden sind. Priorität 1: eigene Aufmaße des Sachverständigen, insbesondere Polycam. Priorität 2: ausdrücklich ausgewiesene Maße und Flächen aus technischen Unterlagen wie Leckortungsbericht, Trocknungsbericht, Handwerker-Erstbericht, KVA, Angebot oder Aufmaß. Werte als eigene sachverständige Feststellung ohne Herkunftshinweis übernehmen. Boden-, Wand- und Deckenflächen, Raumumfänge, Längen und sonstige relevante Aufmaßwerte nachvollziehbar darstellen. Bei belastbar angegebenen Längen/Breiten darf die Fläche rechnerisch ermittelt werden. Bei Widersprüchen gilt die höhere Quellenpriorität; keine Mittelwerte. Fehlen belastbare Maße, nichts schätzen oder erfinden. Diese Regel gilt für normalen Schaden-Erstbericht, SV-Erstbericht und SV-GF-Erstbericht nach Engel. WICHTIG: Die interne Quellenpriorität und insbesondere Hinweise auf Polycam oder spätere Aufmaße dürfen niemals im Berichtstext erscheinen.";}
 PHP_CODE;
-if (str_contains($source, $needle)) {
+if (!str_contains($source, 'VERBINDLICHE PORTALREGEL ALLGEMEINER ERSTBERICHT')) {
     $source = str_replace($needle, $rules, $source, $countInstructions);
+    if ($countInstructions !== 1) {
+        throw new RuntimeException('Portalregeln konnten nicht sicher an den Arbeitsauftrag angebunden werden.');
+    }
 }
 
 // Zwei getrennte Erstbericht-Typen sicherstellen, sofern der Kern sie noch nicht enthält.
@@ -44,22 +49,24 @@ if (!str_contains($source, "'erstbericht_sv_gf'=>['Versicherungsverhältnisse'")
     );
 }
 $source = str_replace(
-    "$allowed=['dokumentenindex','rechnungsregister','erstbericht','schadenprotokoll'",
-    "$allowed=['dokumentenindex','rechnungsregister','erstbericht','erstbericht_sv_gf','schadenprotokoll'",
+    '$allowed=[\'dokumentenindex\',\'rechnungsregister\',\'erstbericht\',\'schadenprotokoll\'',
+    '$allowed=[\'dokumentenindex\',\'rechnungsregister\',\'erstbericht\',\'erstbericht_sv_gf\',\'schadenprotokoll\'',
     $source
 );
 
 // SV-GF-Template nur injizieren, wenn der Kern noch keine Sonderbehandlung kennt.
-if (!str_contains($source, "if($key==='erstbericht_sv_gf')")) {
+if (!str_contains($source, "if(\$key==='erstbericht_sv_gf')")) {
     $sig = 'function gfTemplateFile(string $key,array $meta,string $instructions):?array{';
     $rep = "function gfTemplateFile(string \$key,array \$meta,string \$instructions):?array{if(\$key==='erstbericht_sv_gf'){foreach(gfDriveWalk(GF_KNOWLEDGE_FOLDER_ID,6,250)as\$f)if(strcasecmp((string)(\$f['name']??''),'2026-08-05_GF_Erstbericht_Vorlage_QS_Engel.docx')===0)return\$f;throw new RuntimeException('SV-GF-Erstbericht-Blanco nach QS Engel nicht gefunden.');}";
     $source = str_replace($sig, $rep, $source);
 }
-$source = str_replace(
-    "function gfEngelReport(string $key):bool{return in_array($key,['erstbericht','zwischenbericht','schlussbericht'],true);}",
-    "function gfEngelReport(string $key):bool{return in_array($key,['erstbericht_sv_gf','zwischenbericht','schlussbericht'],true);}",
-    $source
-);
+$engelSignature = <<<'PHP_CODE'
+function gfEngelReport(string $key):bool{return in_array($key,['erstbericht','zwischenbericht','schlussbericht'],true);}
+PHP_CODE;
+$engelReplacement = <<<'PHP_CODE'
+function gfEngelReport(string $key):bool{return in_array($key,['erstbericht_sv_gf','zwischenbericht','schlussbericht'],true);}
+PHP_CODE;
+$source = str_replace($engelSignature, $engelReplacement, $source);
 
 // Nachtragsausgabe ohne automatisch angehängte Quellen-/Regelwerkslisten.
 if (!str_contains($source, "<title>Nachtrag</title>")) {
