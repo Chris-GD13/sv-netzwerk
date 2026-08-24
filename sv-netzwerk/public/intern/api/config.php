@@ -60,6 +60,19 @@ function ensureRuntimeSchema(PDO $pdo): void
             registered_at DATETIME NOT NULL,
             KEY idx_case_owner_user (user_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        foreach ([
+            'case_no' => 'VARCHAR(190) NULL',
+            'policy_no' => 'VARCHAR(190) NULL',
+            'object_name' => 'VARCHAR(500) NULL',
+            'damage_type' => 'VARCHAR(500) NULL',
+            'case_type' => 'VARCHAR(190) NULL',
+        ] as $column => $definition) {
+            $stmt->execute([':table' => 'case_folder_owners', ':column' => $column]);
+            if ((int) $stmt->fetchColumn() === 0) {
+                $pdo->exec("ALTER TABLE case_folder_owners ADD COLUMN {$column} {$definition}");
+            }
+        }
     } catch (Throwable $e) {
         error_log('[config] Runtime-Migration fehlgeschlagen: ' . $e->getMessage());
     }
@@ -83,11 +96,23 @@ function requireProjectDeleteAccess(array $user, int $projectId): void
     }
 }
 
-function registerCaseFolderOwner(string $folderId, array $user): void
+function registerCaseFolderOwner(string $folderId, array $user, array $meta = []): void
 {
     if ($folderId === '' || empty($user['id'])) return;
-    $stmt = db()->prepare('INSERT INTO case_folder_owners(folder_id,user_id,user_email,registered_at) VALUES(:f,:u,:e,NOW()) ON DUPLICATE KEY UPDATE user_id=VALUES(user_id),user_email=VALUES(user_email),registered_at=NOW()');
-    $stmt->execute([':f'=>$folderId, ':u'=>(int)$user['id'], ':e'=>(string)($user['email']??'')]);
+    $stmt = db()->prepare('INSERT INTO case_folder_owners(folder_id,user_id,user_email,case_no,policy_no,object_name,damage_type,case_type,registered_at)
+        VALUES(:f,:u,:e,:case_no,:policy_no,:object_name,:damage_type,:case_type,NOW())
+        ON DUPLICATE KEY UPDATE user_id=VALUES(user_id),user_email=VALUES(user_email),
+        case_no=COALESCE(NULLIF(VALUES(case_no),\'\'),case_no),policy_no=COALESCE(NULLIF(VALUES(policy_no),\'\'),policy_no),
+        object_name=COALESCE(NULLIF(VALUES(object_name),\'\'),object_name),damage_type=COALESCE(NULLIF(VALUES(damage_type),\'\'),damage_type),
+        case_type=COALESCE(NULLIF(VALUES(case_type),\'\'),case_type),registered_at=NOW()');
+    $stmt->execute([
+        ':f'=>$folderId, ':u'=>(int)$user['id'], ':e'=>(string)($user['email']??''),
+        ':case_no'=>(string)($meta['schaden_nr']??''),
+        ':policy_no'=>(string)($meta['versicherungsschein_nr']??''),
+        ':object_name'=>(string)($meta['vn_objekt']??''),
+        ':damage_type'=>(string)($meta['schadenart']??''),
+        ':case_type'=>(string)($meta['fallart']??''),
+    ]);
 }
 
 function requireCaseFolderAccess(string $folderId, array $user): void
