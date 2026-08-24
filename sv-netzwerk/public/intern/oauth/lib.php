@@ -5,7 +5,7 @@ require_once dirname(__DIR__) . '/api/config.php';
 
 const SV_OAUTH_ISSUER = 'https://www.sv-netzwerk.eu';
 const SV_MCP_RESOURCE = 'https://www.sv-netzwerk.eu/intern/mcp/';
-const SV_OAUTH_SCOPES = ['cases:read'];
+const SV_OAUTH_SCOPES = ['cases:read', 'cases:drafts.write'];
 
 function oauthSchema(): void
 {
