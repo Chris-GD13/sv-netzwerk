@@ -15,6 +15,23 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
         <div class="vf-command-main">
           <section class="vf-card vf-upload-card"><header class="vf-step"><b>2</b><div><strong>Unterlagen hochladen</strong><small>PDF, Word, Excel, E-Mail, Bilder oder komplette Fallakte</small></div></header><input id="vf-files" type="file" multiple hidden accept=".pdf,.doc,.docx,.xls,.xlsx,.xlsm,.csv,.txt,.md,.rtf,.msg,.eml,.jpg,.jpeg,.png,.webp,.tif,.tiff,.zip"><div id="vf-drop" class="vf-drop" tabindex="0"><span>⇧</span><strong>Unterlagen hier hineinziehen</strong><small>oder zum Auswählen klicken</small><em>Die Bearbeitung startet nach dem Upload automatisch.</em></div><div id="vf-file-list"></div><div id="vf-progress" class="vf-progress" hidden><div><span></span></div><p>Unterlagen werden vorbereitet.</p></div></section>
           <section class="vf-card"><header class="vf-step"><b>3</b><div><strong>Arbeitsauftrag / Berichtswunsch</strong><small>Hier frei beschreiben, welcher Text oder welches Dokument aus der Fallakte erstellt werden soll.</small></div></header><textarea id="vf-instructions" rows="3" placeholder="z. B. Am 24.08.2026 fand ein weiterer Ortstermin gemeinsam mit … statt. Bitte erstelle daraus einen Nachtragstext für den Versicherer und gleiche die Angaben mit der Fallakte ab."></textarea><div class="vf-note"><span>Enter = Zeilenumbruch · Strg + Enter = Arbeitsauftrag ausführen. Der Text wird zusammen mit den Fallunterlagen ausgewertet.</span><span id="vf-instruction-state"></span></div><button id="vf-instruction-run" class="vf-primary vf-instruction-run" disabled>Ausgewählten Arbeitsauftrag ausführen</button></section>
+          <details class="vf-card vf-chatgpt-work">
+            <summary>ChatGPT Work – komplexe Bearbeitung</summary>
+            <p class="vf-meta">Der aktive Fall und der Arbeitsauftrag werden als Arbeitspaket vorbereitet. Originalunterlagen und Falldaten bleiben unverändert.</p>
+            <div class="vf-chatgpt-actions">
+              <button id="vf-chatgpt-package" class="vf-secondary" type="button">Arbeitspaket erstellen</button>
+              <button id="vf-chatgpt-copy" class="vf-secondary" type="button" disabled>Arbeitspaket kopieren</button>
+              <a id="vf-chatgpt-open" class="vf-primary" href="https://chatgpt.com/" target="_blank" rel="noreferrer">ChatGPT Work öffnen</a>
+            </div>
+            <label class="vf-chatgpt-label">Vorbereitetes Arbeitspaket<textarea id="vf-chatgpt-package-text" rows="8" readonly placeholder="Zuerst einen Fall öffnen und das Arbeitspaket erstellen."></textarea></label>
+            <label class="vf-chatgpt-label">Ergebnis aus ChatGPT Work<textarea id="vf-chatgpt-result" rows="8" placeholder="Den in ChatGPT Work erstellten Text hier einfügen. Alternativ kann ChatGPT den Entwurf über die App direkt an den Fall zurückgeben."></textarea></label>
+            <div class="vf-chatgpt-actions">
+              <button id="vf-chatgpt-save" class="vf-secondary" type="button">Als Fallentwurf speichern</button>
+              <button id="vf-chatgpt-transfer" class="vf-primary" type="button">An Portal-KI übergeben</button>
+            </div>
+            <div id="vf-chatgpt-state" class="vf-job" hidden></div>
+            <div id="vf-chatgpt-drafts" class="vf-chatgpt-drafts"></div>
+          </details>
         </div>
         <section class="vf-card vf-plaud">
           <header class="vf-plaud-head"><span>PLAUD</span><div><strong>Ortstermin einlesen</strong><small>Zusammenfassung dem aktiven Fall zuordnen</small></div></header>
@@ -60,6 +77,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 </style>
 <style is:global>
 .vf-polycam{border-top:4px solid #f59a23}.vf-measure-table{overflow:auto;margin-top:10px}.vf-measure-table table{width:100%;border-collapse:collapse;font-size:.78rem}.vf-measure-table th,.vf-measure-table td{border:1px solid #d6dce1;padding:5px;text-align:left}.vf-measure-table input,.vf-measure-table select{width:100%;min-width:72px;box-sizing:border-box;border:1px solid #bdcbd6;border-radius:2px;padding:6px;font:inherit}.vf-measure-table button{border:1px solid #d2a8a8;background:#fff5f5;border-radius:2px;padding:6px 8px;color:#8c2525}
+.vf-chatgpt-work{border-top:4px solid #f59a23}.vf-chatgpt-work>summary{cursor:pointer;font-weight:800;font-size:1rem}.vf-chatgpt-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.vf-chatgpt-actions a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;box-sizing:border-box}.vf-chatgpt-label{display:grid;gap:5px;margin-top:12px;color:#536a7d;font-size:.78rem;font-weight:750}.vf-chatgpt-label textarea{background:#fff}.vf-chatgpt-label textarea[readonly]{background:#f5f7f8}.vf-chatgpt-drafts{display:grid;gap:7px;margin-top:12px}.vf-chatgpt-draft{border:1px solid #d6dce1;padding:9px;background:#f8fafb}.vf-chatgpt-draft button{margin-top:6px}@media(max-width:760px){.vf-chatgpt-actions>*{width:100%}}
 </style>
 <script is:inline>
 (() => {
@@ -153,6 +171,44 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   read?.addEventListener('click',async()=>{const current=activeCase();state.hidden=false;if(!current?.folder_id){state.innerHTML='<strong>Bitte zuerst einen Fall öffnen oder anlegen.</strong>';return}if(!source)return;read.disabled=true;read.textContent='Aufmaß wird ausgewertet …';state.innerHTML='<strong>Das mit Polycam erstellte Aufmaß wird gelesen. Dies kann einige Minuten dauern.</strong>';try{await upload(source,current.folder_id);const body=new FormData();body.append('folder_id',current.folder_id);body.append('file',source);result=await request(EX,{method:'POST',body});rows.innerHTML=(result.measurements||[]).map(row).join('')||row();bind();review.hidden=false;state.innerHTML=`<strong>${esc(result.summary||'Aufmaß wurde ausgelesen.')}</strong>${(result.warnings||[]).map(w=>`<span>${esc(w)}</span>`).join('')}`}catch(error){state.innerHTML=`<strong>Auswertung fehlgeschlagen.</strong><span>${esc(error.message)}</span>`}finally{read.disabled=false;read.textContent='Aufmaß erneut auslesen'}});
   add?.addEventListener('click',()=>{rows.insertAdjacentHTML('beforeend',row());bind()});
   accept?.addEventListener('click',async()=>{const current=activeCase();if(!current?.folder_id||!result)return;accept.disabled=true;accept.textContent='Wird gespeichert …';try{const measurements=[...rows.querySelectorAll('tr')].map(tr=>Object.fromEntries([...tr.querySelectorAll('[data-k]')].map(el=>[el.dataset.k,el.value.trim()]))).filter(m=>m.label||m.value);const checked={document_type:'Polycam-Aufmaßdatensatz',source_file:source.name,wording:result.wording,reviewed:true,reviewed_at:new Date().toISOString(),measurements,warnings:result.warnings||[]};const file=new File([JSON.stringify(checked,null,2)],`Polycam_Aufmass_geprueft_${new Date().toISOString().slice(0,10)}.txt`,{type:'text/plain',lastModified:Date.now()});await upload(file,current.folder_id);const instructions=document.getElementById('vf-instructions'),addition=`Das mit Polycam erstellte digitale Aufmaß aus „${source.name}“ wurde fachlich geprüft. Den geprüften Datensatz „${file.name}“ in der weiteren Bearbeitung verwenden, die relevanten Maße im Bericht konkret nennen und keine ungeprüften oder unklaren Werte als Tatsache darstellen.`;instructions.value=[instructions.value.trim(),addition].filter(Boolean).join('\n\n');instructions.dispatchEvent(new Event('input',{bubbles:true}));state.innerHTML='<strong>Geprüfter Aufmaßdatensatz gespeichert.</strong><span>Er ist jetzt mit dem Arbeitsauftrag verbunden und kann für den gewählten Bericht verwendet werden.</span>';review.hidden=true}catch(error){state.innerHTML=`<strong>Übernahme fehlgeschlagen.</strong><span>${esc(error.message)}</span>`}finally{accept.disabled=false;accept.textContent='Geprüft übernehmen'}});
+})();
+</script>
+<script is:inline>
+(() => {
+  const API='/intern/api/chatgpt-case-drafts.php';
+  const packageButton=document.getElementById('vf-chatgpt-package'),copyButton=document.getElementById('vf-chatgpt-copy'),packageText=document.getElementById('vf-chatgpt-package-text'),result=document.getElementById('vf-chatgpt-result'),saveButton=document.getElementById('vf-chatgpt-save'),transferButton=document.getElementById('vf-chatgpt-transfer'),state=document.getElementById('vf-chatgpt-state'),drafts=document.getElementById('vf-chatgpt-drafts');
+  const activeCase=()=>{for(const store of[sessionStorage,localStorage])try{const value=JSON.parse(store.getItem('svnet-case')||'null');if(value?.folder_id)return value}catch{}return null};
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const request=async(url,options={})=>{const response=await fetch(url,{credentials:'same-origin',...options}),data=await response.json().catch(()=>({}));if(!response.ok)throw Error(data.error||`HTTP ${response.status}`);return data};
+  const message=(text,bad=false)=>{state.hidden=false;state.className='vf-job '+(bad?'bad':'ok');state.textContent=text};
+  const outputs=()=>[...document.querySelectorAll('#vf-outputs input:checked')].map(input=>input.parentElement?.textContent?.trim()||input.value);
+  function makePackage(){
+    const current=activeCase(),meta=current?.meta||{},task=document.getElementById('vf-instructions')?.value?.trim()||'';
+    if(!current?.folder_id){message('Bitte zuerst einen Fall öffnen oder anlegen.',true);return ''}
+    if(!task){message('Bitte zuerst den Arbeitsauftrag oder Berichtswunsch eingeben.',true);return ''}
+    const lines=[
+      'SV-NETZWERK – ARBEITSPAKET FÜR CHATGPT WORK',
+      '',
+      'Bitte bearbeite den folgenden Auftrag fachlich belastbar, regulierungssicher und ausschließlich anhand der über die App abrufbaren Unterlagen des genannten Falls. Suche den Fall zuerst mit der Schaden-Nr. und rufe ihn anschließend ab. Erfinde keine Tatsachen, Beträge, Maße oder Beteiligten. Trenne Feststellungen, Bewertung, Empfehlung und offene Punkte. Gib einen unmittelbar verwendbaren Entwurf aus. Übergib das fertige Ergebnis auf meinen ausdrücklichen Wunsch mit „save_case_draft“ als neuen Entwurf an denselben Fall; Originalunterlagen und Falldaten dürfen nicht verändert werden.',
+      '',
+      `Schaden-Nr.: ${meta.schaden_nr||'nicht eingetragen'}`,
+      `Versicherungsschein-Nr.: ${meta.versicherungsschein_nr||'nicht eingetragen'}`,
+      `VN / Objekt: ${meta.vn_objekt||'nicht eingetragen'}`,
+      `Schadenart: ${meta.schadenart||'nicht eingetragen'}`,
+      `Fallart: ${meta.fallart||'nicht eingetragen'}`,
+      `Gewünschte Ausgabe: ${outputs().join(', ')||'im Arbeitsauftrag beschrieben'}`,
+      '',
+      'ARBEITSAUFTRAG:',
+      task
+    ];
+    packageText.value=lines.join('\n');copyButton.disabled=false;message('Arbeitspaket ist vorbereitet. Jetzt kopieren und ChatGPT Work öffnen.');return packageText.value;
+  }
+  async function copyPackage(){const text=packageText.value||makePackage();if(!text)return;try{await navigator.clipboard.writeText(text);message('Arbeitspaket wurde kopiert. In ChatGPT Work einfügen und bearbeiten lassen.')}catch{packageText.focus();packageText.select();message('Automatisches Kopieren war nicht möglich. Der vollständige Text ist markiert und kann kopiert werden.',true)}}
+  async function saveDraft(){const current=activeCase(),content=result.value.trim(),task=document.getElementById('vf-instructions')?.value?.trim()||'';if(!current?.folder_id){message('Bitte zuerst einen Fall öffnen.',true);return null}if(!content){message('Bitte zuerst das Ergebnis aus ChatGPT Work einfügen.',true);return null}const title=`ChatGPT-Work-Entwurf · ${current.meta?.schaden_nr||'Fall'}`;const saved=await request(`${API}?action=save`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({folder_id:current.folder_id,title,task,content})});message('Der Text wurde als ungeprüfter Entwurf im aktiven Fall gespeichert.');await loadDrafts();return saved}
+  async function loadDrafts(){const current=activeCase();if(!current?.folder_id){drafts.innerHTML='';return}try{const data=await request(`${API}?action=list&folder_id=${encodeURIComponent(current.folder_id)}`);drafts.innerHTML=(data.items||[]).map(item=>`<div class="vf-chatgpt-draft"><strong>${esc(item.title)}</strong><div class="vf-meta">${esc(item.created_at)} · ${item.source==='chatgpt_work'?'direkt aus ChatGPT Work':'im Portal eingefügt'}</div><button class="vf-secondary" type="button" data-draft="${item.id}">Entwurf übernehmen</button><textarea hidden data-content="${item.id}">${esc(item.content)}</textarea></div>`).join('');drafts.querySelectorAll('[data-draft]').forEach(button=>button.addEventListener('click',()=>{const text=drafts.querySelector(`[data-content="${button.dataset.draft}"]`)?.value||'';result.value=text;message('Entwurf wurde in das Ergebnisfeld übernommen.')}))}catch(error){message(error.message,true)}}
+  packageButton?.addEventListener('click',makePackage);copyButton?.addEventListener('click',copyPackage);saveButton?.addEventListener('click',()=>saveDraft().catch(error=>message(error.message,true)));
+  transferButton?.addEventListener('click',async()=>{try{if(!result.value.trim()){message('Bitte zuerst das Ergebnis aus ChatGPT Work einfügen.',true);return}await saveDraft();const instructions=document.getElementById('vf-instructions');instructions.value=result.value.trim();instructions.dispatchEvent(new Event('input',{bubbles:true}));const processing=document.querySelector('.vf-processing');if(processing)processing.open=true;message('Der ChatGPT-Entwurf wurde gespeichert und in den Arbeitsauftrag der Portal-KI übernommen. Gewünschte Ausgabe auswählen und anschließend Arbeitsauftrag ausführen.');processing?.scrollIntoView({behavior:'smooth',block:'center'})}catch(error){message(error.message,true)}});
+  new MutationObserver(()=>loadDrafts()).observe(document.getElementById('vf-active'),{attributes:true,attributeFilter:['class'],childList:true,subtree:true});window.addEventListener('focus',loadDrafts);loadDrafts();
 })();
 </script>
 <script is:inline>
