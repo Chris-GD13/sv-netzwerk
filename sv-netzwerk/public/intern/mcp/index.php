@@ -2,10 +2,17 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/oauth/lib.php';
 commonHeaders();
-$user = oauthBearerUser('cases:read');
 
 function mcpResult(mixed $id, array $result): never { oauthJson(['jsonrpc'=>'2.0','id'=>$id,'result'=>$result]); }
 function mcpFailure(mixed $id, int $code, string $message): never { oauthJson(['jsonrpc'=>'2.0','id'=>$id,'error'=>['code'=>$code,'message'=>$message]], 200); }
+function mcpAuthFailure(mixed $id): never {
+    $challenge = 'Bearer resource_metadata="https://www.sv-netzwerk.eu/.well-known/oauth-protected-resource", scope="cases:read"';
+    mcpResult($id,[
+        'content'=>[['type'=>'text','text'=>'Bitte zuerst den persönlichen SV-Netzwerk-Zugang verbinden.']],
+        'isError'=>true,
+        '_meta'=>['mcp/www_authenticate'=>$challenge],
+    ]);
+}
 function caseUrl(string $folderId): string { return 'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/?folder_id='.rawurlencode($folderId); }
 function ownCases(array $user, string $query=''): array {
     $sql = "SELECT o.folder_id,o.registered_at,
@@ -33,6 +40,8 @@ if ($method==='tools/list') mcpResult($id,['tools'=>[
   ['name'=>'fetch','title'=>'Eigenen Versicherungsfall abrufen','description'=>'Use this when a case returned by search must be opened and its verified portal data reviewed.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string','description'=>'Fallordner-ID aus search']],'required'=>['id'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>true,'openWorldHint'=>false,'destructiveHint'=>false]]
 ]]);
 if ($method==='tools/call') {
+    $user = oauthBearerUserOrNull('cases:read');
+    if (!$user) mcpAuthFailure($id);
     $name=(string)($params['name']??'');$args=is_array($params['arguments']??null)?$params['arguments']:[];
     if ($name==='search') {
         $query=mb_substr(trim((string)($args['query']??'')),0,200);$results=[];
