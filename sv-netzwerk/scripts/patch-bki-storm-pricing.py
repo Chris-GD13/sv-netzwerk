@@ -22,7 +22,9 @@ for old, new in replacements.items():
 old_css = ".bk-quick-item{display:grid;grid-template-columns:auto 1fr 88px 52px;align-items:center;gap:8px;"
 new_css = ".bk-quick-item{display:grid;grid-template-columns:auto 1fr 88px 52px;align-items:center;gap:8px;"
 text = text.replace(old_css, new_css)
-text = text.replace(".bk-quick-note{display:block;font-size:.72rem;color:#718493;font-weight:500;margin-top:2px}", ".bk-quick-note{display:block;font-size:.72rem;color:#718493;font-weight:500;margin-top:2px}.bk-quick-extra{grid-column:1/-1;display:flex;gap:8px;align-items:center;padding-left:26px}.bk-quick-extra label{font-size:.72rem;color:#5c7182;font-weight:750}.bk-quick-extra input{width:100px;border:1px solid #bdcbd6;border-radius:7px;padding:6px;text-align:right}.bk-quick-extra small{color:#718493}")
+extra_css = ".bk-quick-extra{grid-column:1/-1;display:flex;gap:7px;align-items:center;padding-left:23px}.bk-quick-extra label{font-size:.7rem;color:#5c7182;font-weight:750}.bk-quick-extra input{width:92px;border:1px solid #bdcbd6;border-radius:3px;padding:5px;text-align:right}.bk-quick-extra small{color:#718493}"
+if extra_css not in text:
+    text = text.replace(".bk-quick-note{display:block;font-size:.68rem;color:#718493;font-weight:500;margin-top:1px}", ".bk-quick-note{display:block;font-size:.68rem;color:#718493;font-weight:500;margin-top:1px}" + extra_css)
 mobile_css = """@media(max-width:700px){.bk-quick{min-width:0;max-width:100%;overflow-x:hidden}.bk-quick-list,.bk-quick-item,.bk-quick-extra,.bk-quick-extra label{min-width:0;max-width:100%;box-sizing:border-box}.bk-quick-extra{display:grid;grid-template-columns:1fr;padding-left:0}.bk-quick-extra input,.bk-quick-qty{width:100%;max-width:100%;box-sizing:border-box;font-size:16px!important}.bk-quick input[inputmode],.bk-table input,.bk-summary input,.bk-grid input,.bk-grid textarea,.bk-grid select,.bk-note textarea{font-size:16px!important}}"""
 if mobile_css not in text:
     text = text.replace('</style>', mobile_css + '</style>', 1)
