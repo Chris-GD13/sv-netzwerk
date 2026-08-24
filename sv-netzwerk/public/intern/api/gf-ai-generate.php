@@ -161,6 +161,15 @@ if (!str_contains($source, 'Allgemeiner Erstbericht unvollständig:')) {
     }
 }
 
+// Kopfangaben des allgemeinen Erstberichts aus den Originalunterlagen verifizieren.
+// Die KI darf nur ausdrücklich belegte Werte liefern; leere Werte verändern die Falldaten nicht.
+$generalReviewCall = '$result=gfEngelPrepare($key,gfOpenAI($generalReview,$system),$meta);';
+$generalReviewCallWithHeader = <<<'PHP_CODE'
+$generalReview[]=['type'=>'input_text','text'=>'VERBINDLICHE KOPFPRÜFUNG: Gib zusätzlich case_header als JSON-Objekt mit den Schlüsseln versicherungsnehmer, vn_strasse, vn_plz, vn_ort, schaden_strasse, schaden_plz und schaden_ort aus. Ermittle jeden Wert ausschließlich aus eindeutigen Originalunterlagen. Versicherungsnehmer ist der Name beziehungsweise die Firma, nicht nur Straße oder Objektbezeichnung. VN-Anschrift und Schadenort strikt trennen. Gib bei fehlendem eindeutigen Nachweis für einen Einzelwert eine leere Zeichenfolge aus; nichts ergänzen oder kombinieren.'];$result=gfEngelPrepare($key,gfOpenAI($generalReview,$system),$meta);if(is_array($result['case_header']??null)){$verified=$result['case_header'];$headerMap=['versicherungsnehmer'=>'vn_objekt','vn_strasse'=>'strasse','vn_plz'=>'plz','vn_ort'=>'ort','schaden_strasse'=>'schaden_strasse','schaden_plz'=>'schaden_plz','schaden_ort'=>'schaden_ort'];foreach($headerMap as$from=>$to){$value=trim(preg_replace('/\s+/u',' ',(string)($verified[$from]??''))??'');if($value!==''&&mb_strlen($value,'UTF-8')<=160)$meta[$to]=$value;}}
+PHP_CODE;
+$source = str_replace($generalReviewCall, trim($generalReviewCallWithHeader), $source, $countGeneralHeader);
+if ($countGeneralHeader !== 1) throw new RuntimeException('Kopfprüfung des allgemeinen Erstberichts konnte nicht sicher angebunden werden.');
+
 // Nachtragsausgabe ohne automatisch angehängte Quellen-/Regelwerkslisten.
 if (!str_contains($source, "<title>Nachtrag</title>")) {
     $sig = 'function gfDocumentHtml(string $title,array $meta,array $result,array $sources,array $rules,string $userName):string{';
@@ -182,6 +191,19 @@ if($key==='erstbericht'){$generalFaults=[];$generalText=gfEngelText($result);if(
 $contentQs=gfEngelValidate($key,$result,$meta,$instructions);
 PHP_CODE;
 $source = str_replace($generalQsNeedle, trim($generalQsReplacement), $source);
+$generalFaultInit = "if(\$key==='erstbericht'){\$generalFaults=[];";
+$generalFaultInitExtended = <<<'PHP_CODE'
+if($key==='erstbericht'){$generalFaults=[];$generalHergang='';$generalUmfang='';foreach(($result['sections']??[])as$generalSection){$generalSectionHeading=gfNorm((string)($generalSection['heading']??''));if($generalSectionHeading==='schadenhergang')$generalHergang=(string)($generalSection['text']??'');if($generalSectionHeading==='schadenumfang')$generalUmfang=(string)($generalSection['text']??'');}if(preg_match('/\b(?:Makler|Agentur|Vermittler)\b/ui',$instructions)&&!preg_match('/\b(?:Makler|Agentur|Vermittler)\b/ui',$generalHergang))$generalFaults[]='der im aktuellen Ortstermin genannte Makler beziehungsweise Vermittler fehlt im Schadenhergang und muss mit belegtem Namen und Funktion aufgenommen werden';if(preg_match('/\b(?:nach\s+den\s+vorliegenden|laut|gemäß|anhand|aus\s+dem|im\s+(?:Angebot|KVA)|belegt|übernommen)\b[^.]{0,100}\b(?:m²|qm|lfm)\b/ui',$generalUmfang))$generalFaults[]='das Aufmaß enthält einen unzulässigen Herkunftshinweis und muss als unmittelbare sachverständige Flächenfeststellung formuliert werden';
+PHP_CODE;
+$source = str_replace($generalFaultInit, trim($generalFaultInitExtended), $source, $countGeneralFaultExtension);
+if ($countGeneralFaultExtension !== 1) throw new RuntimeException('Teilnehmer- und Aufmaß-QS konnte nicht sicher angebunden werden.');
+$generalContentQsNeedle = '$contentQs=gfEngelValidate($key,$result,$meta,$instructions);';
+$generalContentQsExtended = <<<'PHP_CODE'
+if($key==='erstbericht'){$checkedHergang='';$checkedUmfang='';foreach(($result['sections']??[])as$checkedSection){$checkedHeading=gfNorm((string)($checkedSection['heading']??''));if($checkedHeading==='schadenhergang')$checkedHergang=(string)($checkedSection['text']??'');if($checkedHeading==='schadenumfang')$checkedUmfang=(string)($checkedSection['text']??'');}if(preg_match('/\b(?:Makler|Agentur|Vermittler)\b/ui',$instructions)&&!preg_match('/\b(?:Makler|Agentur|Vermittler)\b/ui',$checkedHergang))throw new RuntimeException('Allgemeiner Erstbericht unvollständig: genannter Makler beziehungsweise Vermittler fehlt im Schadenhergang.');if(preg_match('/\b(?:nach\s+den\s+vorliegenden|laut|gemäß|anhand|aus\s+dem|im\s+(?:Angebot|KVA)|belegt|übernommen)\b[^.]{0,100}\b(?:m²|qm|lfm)\b/ui',$checkedUmfang))throw new RuntimeException('Allgemeiner Erstbericht redaktionell unzulässig: Herkunftshinweis im Aufmaß erkannt.');}
+$contentQs=gfEngelValidate($key,$result,$meta,$instructions);
+PHP_CODE;
+$source = str_replace($generalContentQsNeedle, trim($generalContentQsExtended), $source, $countGeneralFinalQs);
+if ($countGeneralFinalQs !== 1) throw new RuntimeException('Abschließende Teilnehmer- und Aufmaß-QS konnte nicht sicher angebunden werden.');
 
 // Kein harter Abbruch mehr bei bereits im Kern enthaltenen oder leicht geänderten Mustern.
 eval($source);
