@@ -6,6 +6,11 @@ $user=requireAuth();
 if(!in_array($user['role']??'', ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) apiError(403,'Keine Berechtigung.');
 if($_SERVER['REQUEST_METHOD']!=='POST') apiError(405,'POST erforderlich.');
 
+// Long-running AI generation must not block all other portal requests of the same user.
+if (session_status() === PHP_SESSION_ACTIVE) {
+    session_write_close();
+}
+
 const GF_KNOWLEDGE_FOLDER_ID='1QeJ4Dz6Upg_W5rahWmKE_7KbC4MMgSGe';
 const GF_BLANCO_FOLDER_ID='1_3p6moLBt3cD5Gzy9jvPw3BXpqnAvl2k';
 const GF_BKI_FOLDER_ID='1NQ3XO8qfHb92E6wqFU0kQjyIovsq98Ec';
