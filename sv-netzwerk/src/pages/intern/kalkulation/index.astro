@@ -53,8 +53,8 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
     window.__bkiCalcBridge?.setLines?.([]);
   });
   const cards = [
-    { selector: '.bk-input-card', title: 'BKI-Position suchen' },
-    { selector: '.bk-quick', title: 'Schnellkalkulation typische Schäden' },
+    { selector: '.bk-input-card', title: 'BKI-Position suchen', collapsed: true },
+    { selector: '.bk-quick', title: 'Schnellkalkulation typische Schäden', collapsed: true },
     { selector: '#bk-results-card', title: 'Gefundene BKI-Positionen' },
     { selector: '.bk-protocol', title: 'Kalkulation' },
     { selector: '.bk-history', title: 'Gespeicherte Kalkulationen' },
@@ -73,8 +73,9 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'bk-collapse-toggle';
-    button.setAttribute('aria-expanded', 'true');
-    button.innerHTML = '<span class="bk-chevron" aria-hidden="true">▼</span><span class="bk-collapse-label">Zuklappen</span>';
+    if (config.collapsed) card.classList.add('is-collapsed');
+    button.setAttribute('aria-expanded', String(!config.collapsed));
+    button.innerHTML = `<span class="bk-chevron" aria-hidden="true">▼</span><span class="bk-collapse-label">${config.collapsed ? 'Aufklappen' : 'Zuklappen'}</span>`;
     header.append(button);
     button.addEventListener('click', () => {
       const collapsed = card.classList.toggle('is-collapsed');
