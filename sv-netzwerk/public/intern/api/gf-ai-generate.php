@@ -205,5 +205,38 @@ PHP_CODE;
 $source = str_replace($generalContentQsNeedle, trim($generalContentQsExtended), $source, $countGeneralFinalQs);
 if ($countGeneralFinalQs !== 1) throw new RuntimeException('Abschließende Teilnehmer- und Aufmaß-QS konnte nicht sicher angebunden werden.');
 
+// Für den einfachen Portalablauf den fachlich erzeugten Text zuerst als
+// bearbeitbaren Entwurf zurückgeben. Erst nach ausdrücklichem Klick wird daraus
+// das eigentliche Word-/Excel-Dokument erzeugt.
+function gfPortalDraftText(string $title, array $result): string
+{
+    $parts = [];
+    $summary = trim((string)($result['summary'] ?? ''));
+    if ($summary !== '') $parts[] = $summary;
+    foreach (($result['sections'] ?? []) as $section) {
+        $heading = trim((string)($section['heading'] ?? ''));
+        $text = trim((string)($section['text'] ?? ''));
+        if ($text === '') continue;
+        $parts[] = ($heading !== '' && gfNorm($heading) !== gfNorm($title) ? $heading."\n" : '').$text;
+    }
+    if (!empty($result['open_points']) && is_array($result['open_points'])) {
+        $points = array_values(array_filter(array_map(static fn($value) => trim((string)$value), $result['open_points'])));
+        if ($points) $parts[] = "Offene Punkte\n- ".implode("\n- ", $points);
+    }
+    return trim(implode("\n\n", $parts));
+}
+
+$source = str_replace('$created=[];$staged=[];', '$created=[];$staged=[];$drafts=[];', $source, $countDraftInit);
+if ($countDraftInit !== 1) throw new RuntimeException('Entwurfsrückgabe konnte nicht initialisiert werden.');
+$draftNeedle = '$contentQs=gfEngelValidate($key,$result,$meta,$instructions);if(gfExcelOutput($key))';
+$draftReplacement = '$contentQs=gfEngelValidate($key,$result,$meta,$instructions);$drafts[]=[\'type\'=>$key,\'title\'=>$title,\'content\'=>gfPortalDraftText($title,$result)];if(!empty($order[\'draft_only\'])){gfJobUpdate($jobId,\'running\',min(94,$base+(int)floor(70/$total)),$title.\' wurde als bearbeitbarer Entwurf erstellt.\');continue;}if(gfExcelOutput($key))';
+$source = str_replace($draftNeedle, $draftReplacement, $source, $countDraftResult);
+if ($countDraftResult !== 1) throw new RuntimeException('Entwurfsrückgabe konnte nicht an die Dokumenterstellung angebunden werden.');
+$finalNeedle = '$result=[\'ok\'=>true,\'created\'=>$created,\'count\'=>count($created),';
+$finalReplacement = '$result=[\'ok\'=>true,\'created\'=>$created,\'drafts\'=>$drafts,\'count\'=>count($created),';
+$source = str_replace($finalNeedle, $finalReplacement, $source, $countDraftResponse);
+if ($countDraftResponse !== 1) throw new RuntimeException('Entwurf konnte nicht in die Antwort übernommen werden.');
+$source = str_replace("gfJobUpdate(\$jobId,'done',100,'Dokumentpaket vollständig erstellt.',\$result);", "gfJobUpdate(\$jobId,'done',100,!empty(\$order['draft_only'])?'Entwurf vollständig erstellt.':'Dokumentpaket vollständig erstellt.',\$result);", $source);
+
 // Kein harter Abbruch mehr bei bereits im Kern enthaltenen oder leicht geänderten Mustern.
 eval($source);
