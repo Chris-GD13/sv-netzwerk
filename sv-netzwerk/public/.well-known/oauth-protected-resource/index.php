@@ -5,6 +5,6 @@ header('Cache-Control: public, max-age=300');
 echo json_encode([
   'resource'=>'https://www.sv-netzwerk.eu/intern/mcp/',
   'authorization_servers'=>['https://www.sv-netzwerk.eu'],
-  'scopes_supported'=>['cases:read'],
+  'scopes_supported'=>['cases:read','cases:drafts.write'],
   'resource_documentation'=>'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/'
 ], JSON_UNESCAPED_SLASHES);
