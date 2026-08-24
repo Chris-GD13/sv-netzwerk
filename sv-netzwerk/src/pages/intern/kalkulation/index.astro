@@ -9,6 +9,12 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
     <CalculationTypeNav active="bki" />
     <section class="bk-head"><div><p class="bk-kicker">BKI Altbau 2026</p><h1>Schadenkalkulation</h1><p>Leistungen vor Ort erfassen, passende BKI-Positionen suchen und eine nachvollziehbare Kalkulation erstellen.</p></div><div id="bk-case" class="bk-case">Freie Kalkulation · keinem Fall zugeordnet</div></section>
     <section class="bk-card bk-input-card"><div class="bk-grid"><label class="wide">Leistung / Schadenbeschreibung<textarea id="bk-query" rows="3"></textarea></label><label>Ort / Region<input id="bk-location"></label><label>Menge optional<input id="bk-qty" inputmode="decimal"></label><label>Einheit optional<select id="bk-unit"><option value="">automatisch</option><option>m²</option><option>m</option><option>St</option><option>h</option><option>psch</option></select></label><label>Preisniveau<select id="bk-level"><option value="mid" selected>Mittelwert</option><option value="low">unterer Wert</option><option value="high">oberer Wert</option></select></label></div><div class="bk-actions"><button id="bk-search" class="bk-primary">BKI-Position suchen</button><span id="bk-state"></span></div></section>
+    <section class="bk-card bk-quick" data-bki-storm-index="1">
+      <div class="bk-title-row bk-quick-head"><div><p class="bk-kicker">Sturm / Hagel</p><h2>Schnellkalkulation typische Schäden</h2><p>Bauteile anhaken, Menge eintragen und gemeinsam kalkulieren. Die Schnellposition wird als Wiederherstellung inklusive Demontage, Entsorgung und Neumontage angesetzt.</p></div><button id="bk-quick-clear" class="bk-secondary" type="button">Auswahl löschen</button></div>
+      <div id="bk-quick-cats" class="bk-quick-cats"></div>
+      <div id="bk-quick-list" class="bk-quick-list"></div>
+      <div class="bk-actions"><button id="bk-quick-calc" class="bk-primary" type="button">Auswahl kalkulieren</button><span id="bk-quick-state"></span></div>
+    </section>
     <section id="bk-results-card" class="bk-card" hidden><h2>Gefundene BKI-Positionen</h2><div id="bk-results"></div></section>
     <section class="bk-card bk-protocol"><div class="bk-print-logo"><img src={logoSrc.src} alt="SV-Netzwerk" /></div><div class="bk-title-row"><h2>Kalkulation</h2><div class="bk-title-actions"><button id="bk-clear-lines" class="bk-secondary" type="button">Alle Zeilen löschen</button><button id="bk-add-manual" class="bk-secondary">Freie Position hinzufügen</button></div></div><div class="bk-table-wrap"><table class="bk-table"><thead><tr><th>Pos.</th><th>Leistung</th><th>Menge</th><th>Einheit</th><th>EP netto</th><th>Reg.-Faktor</th><th>Gesamt netto</th><th></th></tr></thead><tbody id="bk-lines"></tbody></table></div><div class="bk-summary"><label>USt. %<input id="bk-vat" type="number" value="19"></label><div><span>Netto</span><strong id="bk-net">0,00 €</strong></div><div><span>USt.</span><strong id="bk-tax">0,00 €</strong></div><div class="grand"><span>Brutto</span><strong id="bk-gross">0,00 €</strong></div></div>
       <div class="bk-notes"><strong>Hinweise / Vereinbarungen</strong><div class="bk-checks"><label><input type="checkbox" class="bk-note-choice" value="Kalkulation vor Ort mit dem VN besprochen; der VN stimmt der Kalkulation zu."> Kalkulation vor Ort mit VN besprochen; VN stimmt der Kalkulation zu.</label><label><input type="checkbox" class="bk-note-choice" value="Die Kalkulationsansätze wurden auf Grundlage der BKI-Baukostendaten ermittelt."> Kalkulationsansätze auf Grundlage der BKI-Baukostendaten ermittelt.</label><label><input type="checkbox" class="bk-note-choice" value="Der ausgewiesene Betrag wird als pauschale Abgeltung an den VN ausgezahlt."> Betrag wird als pauschale Abgeltung an den VN ausgezahlt.</label><label><input type="checkbox" class="bk-note-choice" value="Die Auszahlung bzw. Abgeltungsvereinbarung steht unter dem Vorbehalt der Zustimmung des Versicherers."> Auszahlung/Abgeltung vorbehaltlich der Zustimmung des Versicherers.</label><label><input type="checkbox" class="bk-note-choice" value="Mit der vereinbarten Zahlung ist der Schadenfall vollumfänglich abgegolten."> Schadenfall ist mit der vereinbarten Zahlung vollumfänglich abgegolten.</label></div><label class="bk-note">Zusätzlicher Hinweis / Abgeltungsvermerk<textarea id="bk-note" rows="3"></textarea></label></div>
@@ -21,7 +27,8 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
 .bk-back{display:inline-flex;align-items:center;margin-bottom:12px;text-decoration:none;border:1px solid #b8c7d2;background:#fff;color:var(--bki);border-radius:9px;padding:9px 13px;font-weight:800}
 @media print{.bk-back{display:none!important}}
 .bk-collapse-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.bk-title-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-left:auto}.bk-collapse-toggle{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;border:1px solid #b8c7d2;border-radius:3px;background:#f4f6f7;color:var(--bki);padding:8px 11px;font:inherit;font-size:.82rem;font-weight:800;cursor:pointer}.bk-collapse-toggle:hover{background:#e9edf0}.bk-collapse-toggle .bk-chevron{display:inline-block;transition:transform .18s ease}.bk-card.is-collapsed>.bk-collapse-header~*{display:none!important}.bk-card.is-collapsed>.bk-collapse-header .bk-chevron{transform:rotate(-90deg)}.bk-card.is-collapsed>.bk-collapse-header p:not(.bk-kicker){display:none}.bk-card.is-collapsed{padding-bottom:12px}.bk-card.is-collapsed>.bk-collapse-header{margin-bottom:0}@media(max-width:700px){.bk-collapse-header{flex-wrap:wrap}.bk-title-actions{width:100%;justify-content:flex-start;margin-left:0}.bk-title-actions .bk-secondary{flex:1 1 auto}}@media print{.bk-collapse-toggle,#bk-clear-lines{display:none!important}.bk-card.is-collapsed>.bk-collapse-header~*{display:initial!important}}
-</style>
+.bk-quick{border-radius:3px;padding:14px}.bk-quick-head{align-items:flex-start}.bk-quick-head h2{margin:.1rem 0}.bk-quick-head p{margin:.2rem 0 0;color:var(--bkm);max-width:920px}.bk-quick-cats{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0}.bk-quick-cat{min-height:32px;border:1px solid #bdcbd6;background:#f7fafc;color:var(--bki);border-radius:3px;padding:5px 9px;font-size:.78rem;line-height:1.1;font-weight:800;cursor:pointer}.bk-quick-cat:hover{border-color:var(--bko);background:#fff8ee}.bk-quick-cat.on{background:var(--bki);color:#fff;border-color:var(--bki);box-shadow:inset 3px 0 0 var(--bko)}.bk-quick-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.bk-quick-item{display:grid;grid-template-columns:auto 1fr 78px 44px;align-items:center;gap:7px;border:1px solid var(--bkl);border-radius:3px;padding:7px 8px;background:#fbfdfe}.bk-quick-item.off{display:none}.bk-quick-item>label{display:flex;align-items:center;gap:7px;font-size:.82rem;font-weight:750;min-width:0}.bk-quick-item input[type=checkbox]{width:16px;height:16px;flex:0 0 auto}.bk-quick-qty{width:100%;box-sizing:border-box;border:1px solid #bdcbd6;border-radius:3px;padding:5px;text-align:right}.bk-quick-unit{font-size:.78rem;font-weight:800;color:#5c7182}.bk-quick-item.checked{border-color:#ff970f;background:#fff8ee}.bk-quick-note{display:block;font-size:.68rem;color:#718493;font-weight:500;margin-top:1px}.bk-quick-extra{grid-column:1/-1;display:flex;gap:7px;align-items:center;padding-left:23px}.bk-quick-extra label{font-size:.7rem;color:#5c7182;font-weight:750}.bk-quick-extra input{width:92px;border:1px solid #bdcbd6;border-radius:3px;padding:5px;text-align:right}.bk-quick-extra small{color:#718493}.bk-quick-state-error{color:#a82929}.bk-quick-state-ok{color:#236e50}@media(max-width:1050px){.bk-quick-list{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.bk-quick{padding:10px}.bk-quick-list{grid-template-columns:1fr}.bk-quick-item{grid-template-columns:auto 1fr 70px 38px}}@media print{.bk-quick{display:none!important}}
+@media(max-width:700px){.bk-quick{min-width:0;max-width:100%;overflow-x:hidden}.bk-quick-list,.bk-quick-item,.bk-quick-extra,.bk-quick-extra label{min-width:0;max-width:100%;box-sizing:border-box}.bk-quick-extra{display:grid;grid-template-columns:1fr;padding-left:0}.bk-quick-extra input,.bk-quick-qty{width:100%;max-width:100%;box-sizing:border-box;font-size:16px!important}.bk-quick input[inputmode],.bk-table input,.bk-summary input,.bk-grid input,.bk-grid textarea,.bk-grid select,.bk-note textarea{font-size:16px!important}}</style>
 <script is:inline>
 (()=>{const $=id=>document.getElementById(id),API='/intern/api/bki-calculator.php',money=v=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(v)||0),num=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};let active=null,lines=[];window.__bkiCalcBridge={getLines:()=>JSON.parse(JSON.stringify(lines)),setLines:value=>{lines=Array.isArray(value)?JSON.parse(JSON.stringify(value)):[];render()},addLine:value=>add(value||{}),getMeta:()=>meta,getActive:()=>active};for(const s of[sessionStorage,localStorage])try{const d=JSON.parse(s.getItem('svnet-case')||'null');if(d?.folder_id){active=d;break}}catch{}const meta=active?.meta||{};if(active){$('bk-case').classList.add('on');$('bk-case').textContent=`Fall ${meta.schaden_nr||'ohne Schaden-Nr.'} · ${meta.schadenart||'Schaden'} · ${meta.vn_objekt||meta.ort||''}`;$('bk-location').value=[meta.plz,meta.ort].filter(Boolean).join(' ')}$('bk-date').value=new Date().toISOString().slice(0,10);try{const u=JSON.parse(localStorage.getItem('svnet-user')||sessionStorage.getItem('svnet-user')||'null');$('bk-regulator').value=u?.name||u?.display_name||u?.full_name||''}catch{}async function api(url,opt={}){const r=await fetch(url,{credentials:'same-origin',...opt}),j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||`HTTP ${r.status}`);return j}function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function price(p){return num($('bk-level').value==='low'?p.price_low:$('bk-level').value==='high'?p.price_high:p.price_mid)}function add(p={}){lines.push({position_code:p.position_code||'',description:p.description||'Freie Position',quantity:num(p.recommended_quantity||p.quantity||1)||1,unit:p.unit||'St',unit_price:p.unit_price??price(p),regional_factor:num(p.regional_factor)||1});render()}function totals(){const net=lines.reduce((s,l)=>s+l.quantity*l.unit_price*l.regional_factor,0),vat=num($('bk-vat').value),tax=net*vat/100;return{net,tax,gross:net+tax,vat}}function rt(){const t=totals();$('bk-net').textContent=money(t.net);$('bk-tax').textContent=money(t.tax);$('bk-gross').textContent=money(t.gross)}function render(){const b=$('bk-lines');b.innerHTML='';lines.forEach((l,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${esc(l.position_code||i+1)}</td><td><input class="desc" data-i="${i}" data-k="description" value="${esc(l.description)}"></td><td><input data-i="${i}" data-k="quantity" value="${l.quantity}"></td><td><input data-i="${i}" data-k="unit" value="${esc(l.unit)}"></td><td><input data-i="${i}" data-k="unit_price" value="${l.unit_price}"></td><td><input data-i="${i}" data-k="regional_factor" value="${l.regional_factor}"></td><td class="sum">${money(l.quantity*l.unit_price*l.regional_factor)}</td><td><button class="bk-remove" data-remove="${i}">×</button></td>`;b.appendChild(tr)});b.querySelectorAll('input').forEach(n=>n.oninput=()=>{const i=+n.dataset.i,k=n.dataset.k;lines[i][k]=['quantity','unit_price','regional_factor'].includes(k)?num(n.value):n.value;const row=n.closest('tr'),sum=row?.querySelector('.sum');if(sum)sum.textContent=money(lines[i].quantity*lines[i].unit_price*lines[i].regional_factor);rt()});b.querySelectorAll('[data-remove]').forEach(x=>x.onclick=()=>{lines.splice(+x.dataset.remove,1);render()});rt()}$('bk-vat').oninput=rt;$('bk-add-manual').onclick=()=>add();$('bk-print').onclick=()=>window.print();$('bk-search').onclick=async()=>{const q=$('bk-query').value.trim();if(!q)return;$('bk-state').textContent='BKI Altbau wird durchsucht …';try{const d=await api(API+'?action=search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,quantity:$('bk-qty').value,unit:$('bk-unit').value,location:$('bk-location').value,case_meta:meta})}),box=$('bk-results');box.innerHTML='';(d.positions||[]).forEach(p=>{const e=document.createElement('div');e.className='bk-result';e.innerHTML=`<div class="bk-result-top"><strong>${esc(p.position_code||'BKI')} · ${esc(p.description)}</strong><button class="bk-primary">Übernehmen</button></div><div class="bk-prices"><span>unten ${money(p.price_low)}</span><span>Mittel ${money(p.price_mid)}</span><span>oben ${money(p.price_high)}</span></div>`;e.querySelector('button').onclick=()=>add({...p,unit_price:price(p)});box.appendChild(e)});$('bk-results-card').hidden=false;$('bk-state').textContent=(d.positions||[]).length?'BKI-Treffer gefunden.':'Keine belastbare BKI-Position gefunden.'}catch(e){$('bk-state').textContent=e.message}};function note(){return[...[...document.querySelectorAll('.bk-note-choice:checked')].map(x=>x.value),$('bk-note').value.trim()].filter(Boolean).join('\n')}$('bk-save').onclick=async()=>{if(!lines.length)return;try{const d=await api(API+'?action=save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({folder_id:active?.folder_id||'',case_meta:meta,location:$('bk-location').value,note:note(),items:lines,totals:totals()})});if(d.drive_file?.webViewLink){$('bk-save-state').innerHTML=`Gespeichert · Kalkulation ${d.id} · <a href="${esc(d.drive_file.webViewLink)}" target="_blank" rel="noreferrer">in Fallakte archiviert</a>`}else{$('bk-save-state').textContent=`Gespeichert · Kalkulation ${d.id}${active?.folder_id?' · in Fallakte archiviert':''}`}history()}catch(e){$('bk-save-state').textContent=e.message}};async function history(){try{const d=await api(API+'?action=list&folder_id='+encodeURIComponent(active?.folder_id||'')),h=$('bk-history');h.innerHTML='';(d.calculations||[]).forEach(x=>{const e=document.createElement('div');e.className='bk-history-item';e.innerHTML=`<strong>${esc(x.case_no||'Freie Kalkulation')} · ${money(x.gross_total)}</strong><br><small>${esc(x.created_at||'')} · ${esc(x.object_name||'')}</small>`;h.appendChild(e)})}catch{}}history();rt()})();
 </script>
@@ -73,5 +80,171 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
       button.querySelector('.bk-collapse-label').textContent = collapsed ? 'Aufklappen' : 'Zuklappen';
     });
   }
+})();
+</script>
+
+
+<script is:inline>
+(()=>{
+  const root=document.querySelector('[data-bki-storm-index="1"]');
+  if(!root)return;
+  const bridge=()=>window.__bkiCalcBridge;
+  const API='/intern/api/bki-calculator.php';
+  const presets=[
+    {c:'Dachdeckung',l:'Wellplatten / Faserzement',u:'m²',q:'Dachdeckung Faserzement Wellplatten auf vorhandener Unterkonstruktion'},
+    {c:'Dachdeckung',l:'Doppelstegplatten / Polycarbonat',u:'m²',q:'Polycarbonat Doppelstegplatten Hohlkammerplatten Dachdeckung. Im BKI keine eigene PC-Stegplattenposition; als konstruktiven Vergleich für die Neumontage LB 320 Dachdeckung Wellplatte Pos. 86 / 320.001.189 prüfen.'},
+    {c:'Dachdeckung',l:'Dachziegel / Falzziegel',u:'m²',q:'Dachdeckung Falzziegel Ton auf vorhandener Lattung'},
+    {c:'Dachdeckung',l:'Biberschwanzziegel',u:'m²',q:'Dachdeckung Biberschwanz Flachziegel Ton Doppeldeckung auf vorhandener Lattung'},
+    {c:'Dachdeckung',l:'Betondachsteine',u:'m²',q:'Dachdeckung Betondachsteine auf vorhandener Lattung'},
+    {c:'Dachdeckung',l:'Schieferdeckung',u:'m²',q:'Dachdeckung Schiefer auf vorhandener Schalung'},
+    {c:'Dachdeckung',l:'Trapez-/Profilblech',u:'m²',q:'Dachdeckung Profilblech Trapezblech Metall auf vorhandener Unterkonstruktion'},
+    {c:'Dachdetails',l:'Firstdeckung / Firstziegel',u:'m',q:'Firstdeckung Firstanschluss Ziegel Formziegel'},
+    {c:'Dachdetails',l:'Ortgang / Ortgangziegel',u:'m',q:'Ortgang Dachdeckung Formziegel Dachsteine'},
+    {c:'Dachdetails',l:'Eindeckrahmen Velux',u:'St',q:'Eindeckrahmen Dachfenster VELUX passend zu vorhandener Ziegel Dachdeckung',mode:'material_labor'},
+    {c:'Dachdetails',l:'Eindeckrahmen Roto',u:'St',q:'Eindeckrahmen Dachfenster ROTO passend zu vorhandener Ziegel Dachdeckung',mode:'material_labor'},
+    {c:'Dachdetails',l:'Dachfenster komplett',u:'St',q:'Wohndachfenster Dachflächenfenster einschließlich Eindeckrahmen'},
+    {c:'Dachdetails',l:'Lichtkuppel',u:'St',q:'Lichtkuppel Dach Oberlicht Kunststoff inklusive Anschluss'},
+    {c:'Dachdetails',l:'Dachfensterrollladen manuell',u:'St',q:'Dachfenster Rollladen außen manuell mechanisch',mode:'material_labor'},
+    {c:'Dachdetails',l:'Dachfensterrollladen Solar',u:'St',q:'Dachfenster Rollladen außen solar elektrisch',mode:'material_labor'},
+    {c:'Klempner',l:'Attika-Abdeckung / Verblechung',u:'m',q:'Attika Abdeckung Mauerabdeckung Blech Titanzink Aluminium'},
+    {c:'Klempner',l:'Dachrinne Titanzink',u:'m',q:'Dachrinne halbrund Titanzink inklusive Rinnenhalter'},
+    {c:'Klempner',l:'Dachrinne Kupfer',u:'m',q:'Dachrinne halbrund Kupfer inklusive Rinnenhalter'},
+    {c:'Klempner',l:'Fallrohr Titanzink',u:'m',q:'Regenfallrohr Titanzink inklusive Rohrschellen'},
+    {c:'Klempner',l:'Fallrohr Kupfer',u:'m',q:'Regenfallrohr Kupfer inklusive Rohrschellen'},
+    {c:'Fenster',l:'Fensterbank Aluminium',u:'m',q:'Außenfensterbank Aluminium Leichtmetall inklusive Endstücke und Befestigung'},
+    {c:'Fenster',l:'Isolierverglasung 2-fach',u:'m²',q:'Isolierverglasung zweifach Fenster erneuern'},
+    {c:'Fenster',l:'Isolierverglasung 3-fach',u:'m²',q:'Isolierverglasung dreifach Fenster erneuern'},
+    {c:'Fenster',l:'ESG-Scheibe',u:'m²',q:'Verglasung Einscheibensicherheitsglas ESG erneuern'},
+    {c:'Fenster',l:'VSG-Scheibe',u:'m²',q:'Verglasung Verbundsicherheitsglas VSG erneuern'},
+    {c:'Rollladen',l:'Rollladenpanzer Aluminium',u:'m²',q:'Rollladenpanzer Aluminium erneuern vorhandener Rollladen',mode:'material_labor'},
+    {c:'Rollladen',l:'Rollladenpanzer PVC',u:'m²',q:'Rollladenpanzer Kunststoff PVC erneuern vorhandener Rollladen',mode:'material_labor'},
+    {c:'Rollladen',l:'Vorbaurollladen, Panzer Alu',u:'St',q:'Vorbaurollladen komplett Aluminium Rollladenpanzer Aluminium',mode:'material_labor'},
+    {c:'Rollladen',l:'Vorbaurollladen, Panzer PVC',u:'St',q:'Vorbaurollladen komplett Rollladenpanzer Kunststoff PVC',mode:'material_labor'},
+    {c:'Rollladen',l:'Raffstore / Außenjalousie',u:'St',q:'Außenjalousie Raffstore Lamellen Aluminium als Einzelanlage, BKI LB 330 Pos. 16 / 330.000.032'},
+    {c:'Elektro',l:'Außenleuchte / Lampe',u:'St',q:'Außenleuchte Leuchte komplett einschließlich Befestigung und elektrischem Anschluss'},
+    {c:'Elektro',l:'Feuchtraum-/Wannenleuchte',u:'St',q:'Wannenleuchte LED Feuchtraum Polycarbonat'},
+    {c:'PV',l:'Photovoltaikmodul',u:'St',q:'Photovoltaik Solarmodul PV Modul Dach austauschen'},
+    {c:'PV',l:'PV-Unterkonstruktion / Dachhaken',u:'St',q:'Photovoltaik Unterkonstruktion Dachhaken Schiene Dach'},
+    {c:'Sonstiges',l:'Markise',u:'St',q:'Markise außen Gelenkarmmarkise komplett'},
+    {c:'Sonstiges',l:'Terrassenüberdachung / Vordach',u:'m²',q:'Vordach Terrassenüberdachung Dachplatten Kunststoff Glas'},
+    {c:'Sonstiges',l:'Sektionaltor / Garagentor',u:'St',q:'Sektionaltor Garagentor außen komplett',mode:'material_labor'},
+    {c:'Fassade/Putz',l:'Fassade – Außenputz Hagelschäden ausbessern',u:'m²',q:'Außenputz in hagelgeschädigten Teilflächen entfernen, Unter- und Oberputz ausbessern, reinigen und Bauschutt entsorgen; BKI LB 323 Außenputz ausbessern Teilflächen 323.000.190'},
+    {c:'Fassade/Putz',l:'Fassade – Außenputz größere Fläche erneuern',u:'m²',q:'Außenputz zweilagig abschlagen und entsorgen sowie Unter- und Oberputz gleichartig neu herstellen; BKI LB 323'},
+    {c:'Fassade/Putz',l:'WDVS – Oberputz/Armierung Hagelschaden ausbessern',u:'m²',q:'Hagelschaden an Wärmedämmverbundsystem: geschädigte Putz- und Armierungsschichten lokal entfernen, Putzarmierung Glasfasergewebe und Oberputz systemgerecht wiederherstellen; Dämmplatten bleiben soweit unbeschädigt bestehen; BKI LB 323'},
+    {c:'Fassade/Putz',l:'WDVS – Teilfläche komplett erneuern',u:'m²',q:'Wärmedämmverbundsystem in geschädigter Teilfläche vollständig aufnehmen und entsorgen und gleichartiges WDVS einschließlich Dämmstoff, Armierung und Oberputz wiederherstellen; BKI LB 323 WDVS'},
+    {c:'Fassade/Putz',l:'Fassade – Riss/Schlagstelle schließen',u:'m',q:'Einzelriss oder lineare Schlagstelle im Außenputz fachgerecht schließen und Oberfläche angleichen; BKI LB 323 Außenputz Risssanierung'},
+    {c:'Fassadenbekleidung',l:'Faserzement-/Eternitplatten Fassade erneuern',u:'m²',q:'Nicht asbesthaltige Faserzement-Fassadenplatten demontieren und entsorgen, gleichartige Faserzement-Tafeln auf vorhandener Unterkonstruktion neu montieren; Rückbau 338.000.021 und Fassadenbekleidung Faserzement-Tafeln LB 338'},
+    {c:'Fassadenbekleidung',l:'Faserzement Stülpdeckung Fassade erneuern',u:'m²',q:'Nicht asbesthaltige Faserzement-Fassadenbekleidung in Stülpdeckung demontieren und entsorgen und gleichartige Stülpdeckung auf vorhandener Holz-Unterkonstruktion neu montieren; BKI LB 338'},
+    {c:'Fassadenbekleidung',l:'Holzfassade / Stülpschalung erneuern',u:'m²',q:'Holz-Außenwandbekleidung demontieren und entsorgen und gleichartige Holz-Stülpschalung auf vorhandener Unterkonstruktion neu herstellen; BKI LB 338 Fassadenbekleidung Holz Stülpschalung'},
+    {c:'Fassadenbekleidung',l:'Holzschindelfassade erneuern',u:'m²',q:'Holzschindel-Außenwandbekleidung demontieren und entsorgen und gleichartige Holzschindelbekleidung neu montieren; BKI LB 338'},
+    {c:'Fassadenbekleidung',l:'Metall-/Wellblechfassade erneuern',u:'m²',q:'Metallische Fassadenbekleidung Wellblech demontieren und entsorgen und gleichartige Metall-Wellblechbekleidung auf vorhandener Unterkonstruktion neu montieren; BKI LB 338'},
+    {c:'Maler',l:'Fassade reinigen + streichen',u:'m²',q:'Fassade reinigen, tragfähigen Untergrund vorbereiten und Fassadenbeschichtung vollständig erneuern; BKI LB 334 Maler- und Lackierarbeiten Beschichtungen'},
+    {c:'Maler',l:'Fassade nur streichen',u:'m²',q:'Außenfassade auf tragfähigem mineralischem Untergrund mit geeigneter Fassadenbeschichtung grundieren sowie Zwischen- und Schlussbeschichtung erneuern; BKI LB 334'},
+    {c:'Maler',l:'Holzfenster außen vorbereiten + streichen',u:'St',q:'Holzfenster außen: lose Beschichtung entfernen, anschleifen/spachteln soweit erforderlich, grundieren und vollständige Beschichtung erneuern; BKI 334.000.088 plus passende Holzfenster-Beschichtung'},
+    {c:'Maler',l:'Holztür außen vorbereiten + streichen',u:'m²',q:'Außentür aus Holz: Altbeschichtung vorbereiten, Schadstellen spachteln/schleifen, grundieren sowie Zwischen- und Schlussbeschichtung erneuern; BKI LB 334'},
+    {c:'Maler',l:'Holztür innen + Zarge streichen',u:'m²',q:'Holztür innen einschließlich Zarge/Futter/Bekleidung anschleifen und blätternde Teile entfernen, Grund-, Zwischen- und Schlussbeschichtung erneuern; BKI 334.000.166'},
+    {c:'Maler',l:'Metalltür / Metallfläche außen streichen',u:'m²',q:'Metallfläche außen reinigen, Schadstellen entrosten, vorbereiten/grundieren sowie Deckbeschichtung erneuern; BKI LB 334'},
+    {c:'Maler',l:'Holzfassade reinigen + streichen',u:'m²',q:'Holzfassade außen reinigen, anschleifen und grundieren sowie geeignete Beschichtung vollständig erneuern; BKI LB 334'},
+    {c:'Tore',l:'Garagentor Schwingtor',u:'St',q:'Garagentor Schwingtor komplett erneuern einschließlich Demontage und Montage',mode:'material_labor'},
+    {c:'Tore',l:'Sektionaltor manuell',u:'St',q:'Sektionaltor Garage manuell komplett erneuern einschließlich Demontage und Montage',mode:'material_labor'},
+    {c:'Tore',l:'Sektionaltor elektrisch',u:'St',q:'Sektionaltor Garage elektrisch mit Antrieb komplett erneuern einschließlich Demontage und Montage',mode:'material_labor'},
+    {c:'Tore',l:'Garagentor-/Sektionaltor Paneel einzeln',u:'St',q:'Einzelnes beschädigtes Paneel eines Garagen-Sektionaltores austauschen einschließlich Ausbau und Einbau',mode:'material_labor'}
+  ];
+  const cats=['Alle',...new Set(presets.map(x=>x.c))], catBox=document.getElementById('bk-quick-cats'),list=document.getElementById('bk-quick-list'),state=document.getElementById('bk-quick-state');
+  function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  cats.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.className='bk-quick-cat'+(i===0?' on':'');b.textContent=c;b.dataset.cat=c;b.onclick=()=>{catBox.querySelectorAll('.bk-quick-cat').forEach(x=>x.classList.toggle('on',x===b));list.querySelectorAll('.bk-quick-item').forEach(x=>x.classList.toggle('off',c!=='Alle'&&x.dataset.cat!==c));};catBox.appendChild(b)});
+  const indexDefaults=p=>{const label=String(p.l||'').toLowerCase();const rules=[
+          [/eindeckrahmen velux/,{material:240,hours:1.5,labor:72}],
+          [/eindeckrahmen roto/,{material:250,hours:1.5,labor:72}],
+          [/dachfensterrollladen manuell/,{material:620,hours:2.0,labor:72}],
+          [/dachfensterrollladen solar/,{material:980,hours:2.5,labor:72}],
+          [/rollladenpanzer aluminium/,{material:115,hours:1.0,labor:72}],
+          [/rollladenpanzer pvc/,{material:72,hours:1.0,labor:72}],
+          [/vorbaurollladen, panzer alu/,{material:690,hours:3.0,labor:72}],
+          [/vorbaurollladen, panzer pvc/,{material:520,hours:3.0,labor:72}],
+          [/pv-unterkonstruktion|dachhaken/,{material:75,hours:0.5,labor:78}],
+          [/photovoltaikmodul/,{material:160,hours:1.0,labor:78}],
+          [/außenleuchte|lampe/,{material:95,hours:1.0,labor:72}],
+          [/feuchtraum|wannenleuchte/,{material:65,hours:0.75,labor:72}],
+          [/paneel einzeln/,{material:480,hours:2.5,labor:76}],
+          [/sektionaltor elektrisch/,{material:2450,hours:7.0,labor:76}],
+          [/sektionaltor manuell/,{material:1850,hours:6.0,labor:76}],
+          [/garagentor|sektionaltor/,{material:1950,hours:6.0,labor:76}]
+        ];return rules.find(([rx])=>rx.test(label))?.[1]||{material:100,hours:1,labor:72}};
+        const indexComplete=p=>{const label=String(p.l||'').toLowerCase();const rules=[
+          [/wellplatten|faserzement.*dach/ ,95],[/doppelsteg|polycarbonat/,120],[/dachziegel|falzziegel/,110],[/biberschwanz/,180],[/betondachstein/,95],[/schieferdeckung/,220],[/trapez|profilblech/,105],
+          [/firstdeckung|firstziegel/,95],[/ortgang/,85],[/dachfenster komplett/,1450],[/lichtkuppel/,1600],
+          [/attika/,110],[/dachrinne titanzink/,85],[/dachrinne kupfer/,145],[/fallrohr titanzink/,75],[/fallrohr kupfer/,120],
+          [/fensterbank/,70],[/isolierverglasung 2/,280],[/isolierverglasung 3/,360],[/esg/,300],[/vsg/,350],
+          [/raffstore|außenjalousie/,900],[/außenleuchte|lampe/,180],[/feuchtraum|wannenleuchte/,140],
+          [/photovoltaikmodul/,320],[/pv-unterkonstruktion|dachhaken/,115],[/markise/,1800],[/terrassenüberdachung|vordach/,450],
+          [/außenputz hagel/,65],[/außenputz größere/,125],[/wdvs.*oberputz|armierung/,95],[/wdvs.*komplett/,210],[/riss|schlagstelle/,45],
+          [/faserzement.*fassade/,190],[/holzfassade|stülpschalung/,210],[/holzschindel/,280],[/metall|wellblechfassade/,175],
+          [/fassade reinigen.*streichen/,38],[/fassade nur streichen/,29],[/holzfenster.*streichen/,220],[/holztür außen/,85],[/holztür innen/,75],[/metalltür|metallfläche/,70],[/holzfassade reinigen/,55]
+        ];const hit=rules.find(([rx])=>rx.test(label));if(hit)return hit[1];const unit=String(p.u||'').toLowerCase();return unit.includes('m²')?150:unit==='m'?85:unit==='st'?350:150};
+        const addIndex=(p,qty)=>{const ep=indexComplete(p);bridge()?.addLine?.({position_code:'INDEX 2026',description:`${p.l} – Index-Komplettpreis 2026 inkl. Demontage, Entsorgung und Neumontage; EP veränderbar`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:1});return ep};
+        presets.forEach((p,i)=>{const e=document.createElement('div');e.className='bk-quick-item';e.dataset.cat=p.c;const estimate=indexDefaults(p),extra=p.mode==='material_labor'?`<div class="bk-quick-extra"><label>Index-Material EP netto <input data-mat="${i}" inputmode="decimal" value="${estimate.material}"></label><label>Arbeitszeit h/St <input data-hours="${i}" inputmode="decimal" value="${estimate.hours}"></label><small>Indexansatz 2026, veränderbar; Arbeitslohn vorrangig nach BKI-Facharbeiterstundensatz.</small></div>`:'';e.innerHTML=`<label><input type="checkbox" data-preset="${i}"><span>${esc(p.l)}<small class="bk-quick-note">inkl. Demontage, Entsorgung + Montage</small></span></label><span></span><input class="bk-quick-qty" data-qty="${i}" inputmode="decimal" value="1"><span class="bk-quick-unit">${esc(p.u)}</span>${extra}`;const cb=e.querySelector('input[type=checkbox]');cb.onchange=()=>e.classList.toggle('checked',cb.checked);list.appendChild(e)});
+  document.getElementById('bk-quick-clear').onclick=()=>{list.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=false);list.querySelectorAll('.bk-quick-item').forEach(x=>x.classList.remove('checked'));state.textContent='';};
+  const number=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
+  const choosePrice=p=>{const level=document.getElementById('bk-level')?.value||'mid';return number(level==='low'?p.price_low:level==='high'?p.price_high:p.price_mid)};
+  async function api(payload){const r=await fetch(API+'?action=search',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||`HTTP ${r.status}`);return j}
+  document.getElementById('bk-quick-calc').onclick=async()=>{
+    const selected=[...list.querySelectorAll('input[type=checkbox]:checked')];if(!selected.length){state.textContent='Bitte mindestens ein Bauteil anhaken.';state.className='bk-quick-state-error';return}
+    const btn=document.getElementById('bk-quick-calc');btn.disabled=true;let added=0,failed=[];state.className='';
+    try{
+      for(let n=0;n<selected.length;n++){
+        const idx=+selected[n].dataset.preset,p=presets[idx],qty=number(list.querySelector(`[data-qty="${idx}"]`)?.value)||1;
+        state.textContent=`${n+1}/${selected.length}: ${p.l} wird im BKI ermittelt …`;
+        const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss');
+        const positionText=x=>norm([x.description,x.short_text,x.long_text,x.title,x.position_name,x.service_description].filter(Boolean).join(' '));
+        const unitNorm=u=>norm(u).replace(/²/g,'2').replace(/stuck|stück|stk\.?/g,'st').replace(/lfdm|lfd\. ?m/g,'m').replace(/std\.?|stunden?/g,'h').replace(/\s/g,'');
+        const termRules=[
+          [/photovoltaikmodul/i,/photovolta|pv.?modul|solarmodul/], [/markise/i,/markis|gelenkarm/], [/terrassenüberdachung/i,/terrassenuber|vordach|dachplatte/],
+          [/lichtkuppel/i,/lichtkuppel|oberlicht/], [/isolierverglasung 3/i,/isolierglas|3.?fach|dreifach/], [/isolierverglasung 2/i,/isolierglas|2.?fach|zweifach/],
+          [/fensterbank/i,/fensterbank/], [/raffstore/i,/raffstore|aussenjalous/], [/rollladenpanzer aluminium/i,/rollladenpanzer.*(alu|aluminium)/],
+          [/rollladenpanzer pvc/i,/rollladenpanzer.*(pvc|kunststoff)/], [/vorbaurollladen, panzer alu/i,/vorbaurollladen.*(alu|aluminium)/],
+          [/vorbaurollladen, panzer pvc/i,/vorbaurollladen.*(pvc|kunststoff)/], [/dachfensterrollladen/i,/dachfenster.*rollladen|rollladen.*dachfenster/],
+          [/eindeckrahmen/i,/eindeckrahmen/], [/dachfenster komplett/i,/dachfenster|dachflachenfenster|wohndachfenster/], [/sektionaltor|garagentor/i,/sektionaltor|garagentor|schwingtor/],
+          [/faserzement/i,/faserzement|eternit/], [/holzfassade|stulpschalung/i,/holzfassade|holzbekleidung|stulpschalung/], [/holzschindel/i,/holzschindel/],
+          [/metall-.wellblechfassade/i,/metallfassade|wellblechfassade|profilblechfassade/], [/aussenputz/i,/aussenputz|fassadenputz/], [/wdvs/i,/wdvs|warmedammverbund/],
+          [/holzfenster/i,/holzfenster/], [/holztur/i,/holztur|tur.*holz/], [/metalltur/i,/metalltur|stahltur/], [/fassade.*streichen|fassade reinigen/i,/fassadenfarbe|fassadenbeschichtung|fassadenflache/],
+          [/wellplatten/i,/wellplatte|faserzement/], [/doppelsteg/i,/doppelsteg|polycarbonat|hohlkammer/], [/dachziegel/i,/dachziegel|falzziegel/], [/biberschwanz/i,/biberschwanz/],
+          [/betondachstein/i,/betondachstein/], [/schiefer/i,/schiefer/], [/trapez/i,/trapez|profilblech/], [/first/i,/firstziegel|firstdeckung/], [/ortgang/i,/ortgang/],
+          [/attika/i,/attika|mauerabdeckung/], [/dachrinne/i,/dachrinne/], [/fallrohr/i,/fallrohr|regenfallrohr/], [/esg/i,/esg|einscheibensicherheitsglas/], [/vsg/i,/vsg|verbundsicherheitsglas/],
+          [/leuchte|lampe/i,/leuchte|lampe/], [/pv-unterkonstruktion/i,/pv.*unterkonstruktion|dachhaken|montageschiene/]
+        ];
+        const requestedRule=termRules.find(([label])=>label.test(norm(p.l)))?.[1];
+        const explicitCodes=[...String(p.q).matchAll(/\b\d{3}\.\d{3}\.\d{3}\b/g)].map(m=>m[0]);
+        const semanticMatch=x=>{const txt=positionText(x),code=String(x.position_code||'');return (explicitCodes.includes(code)||(!requestedRule||requestedRule.test(txt)))&&unitNorm(x.unit)===unitNorm(p.u)};
+        const phase=x=>{const txt=positionText(x);if(/abbruch|demont|ausbau|entfern|entsorg|aufnehmen/.test(txt))return'remove';if(/liefer|einbau|montage|erneu|herstell|einsetzen|beschicht|streichen|ausbessern/.test(txt))return'install';return'other'};
+        const best=a=>a.sort((x,y)=>((explicitCodes.includes(String(y.position_code||''))?20:0)+(requestedRule?.test(positionText(y))?5:0))-((explicitCodes.includes(String(x.position_code||''))?20:0)+(requestedRule?.test(positionText(x))?5:0)))[0];
+        try{
+          if(p.mode==='material_labor'){
+            const material=number(list.querySelector(`[data-mat=\"${idx}\"]`)?.value),hours=number(list.querySelector(`[data-hours=\"${idx}\"]`)?.value);
+            if(material<=0||hours<=0){failed.push(`${p.l} (Materialpreis/Arbeitszeit fehlt)`);continue}
+            const laborQuery=`BKI Altbau 2026: Ermittle ausschließlich den Netto-Stundensatz Facharbeiter für das fachlich passende Gewerk zur Montage von ${p.q}. Gib nur die eine Stundensatzposition zurück, keine Produkt-, Fenster-, Rollladen- oder Komplettposition.`;
+            let d={positions:[]};try{d=await api({query:laborQuery,quantity:String(hours),unit:'h',location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}})}catch{}
+            const positions=Array.isArray(d.positions)?d.positions:[],labor=positions.find(x=>/stundensatz|facharbeiter/i.test(positionText(x))&&unitNorm(x.unit)==='h'),laborRate=labor&&choosePrice(labor)>0?choosePrice(labor):indexDefaults(p).labor;
+            const rf=number(d.regional_factor)||1,ep=material+(hours*laborRate),basis=labor?'Index-Material + BKI-Lohn':'Index 2026';
+            bridge()?.addLine?.({position_code:(labor?.position_code?`INDEX + ${labor.position_code}`:'INDEX 2026'),description:`${p.l} – ${basis}, Material ${material.toFixed(2)} EUR zzgl. ${hours} h × ${laborRate.toFixed(2)} EUR; veränderbar; Demontage und Montage enthalten`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;continue
+          }
+          const fullQuery=`STURM-/HAGEL-SCHNELLKALKULATION. Gesucht ist eine Komplett-Wiederherstellung für: ${p.q}. Gib NUR die notwendigen BKI-Teilleistungen für (1) Demontage/Ausbau und Entsorgung des beschädigten Altbauteils und (2) Lieferung/Einbau bzw. Montage der gleichartigen Wiederherstellung zurück. Keine Alternativpositionen, keine bloßen Varianten. Die Summe soll die vollständige Demontage + Entsorgung + Neumontage abbilden.`;
+          let d=await api({query:fullQuery,quantity:String(qty),unit:p.u,location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}}),positions=Array.isArray(d.positions)?d.positions:[];
+          if(!positions.length){d=await api({query:p.q,quantity:String(qty),unit:p.u,location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}});positions=Array.isArray(d.positions)?d.positions:[]}
+          if(!positions.length){addIndex(p,qty);added++;continue}
+          const label=norm(p.l),cap=/photovoltaikmodul/.test(label)?1500:/pv-unterkonstruktion|dachhaken/.test(label)?750:/leuchte|lampe/.test(label)?1500:unitNorm(p.u)==='st'?6000:unitNorm(p.u)==='m2'?1500:1000;
+          const positive=positions.filter(x=>x&&Number.isFinite(choosePrice(x))&&choosePrice(x)>0),plausible=positive.filter(x=>unitNorm(x.unit)===unitNorm(p.u)&&choosePrice(x)<=cap),matched=plausible.filter(x=>semanticMatch(x));
+          const explicit=best(matched.filter(x=>explicitCodes.includes(String(x.position_code||''))&&phase(x)==='install'));
+          const complete=best(matched.filter(x=>/(abbruch|demont|ausbau|entfern|entsorg|aufnehmen)/.test(positionText(x))&&/(liefer|einbau|montage|erneu|herstell|einsetzen)/.test(positionText(x))));
+          const remove=best(matched.filter(x=>phase(x)==='remove')),install=best(matched.filter(x=>phase(x)==='install'));
+          const usable=explicit?[explicit]:remove&&install?[remove,install]:complete?[complete]:matched.length?[best(matched)]:[];
+          if(!usable.length){addIndex(p,qty);added++;continue}
+          const ep=usable.reduce((s,x)=>s+choosePrice(x),0),rf=number(d.regional_factor)||number(usable.find(x=>number(x.regional_factor))?.regional_factor)||1,codes=usable.map(x=>x.position_code).filter(Boolean).join(' + ');
+          bridge()?.addLine?.({position_code:codes||'BKI',description:`${p.l} – Wiederherstellung inkl. Demontage, Entsorgung und Neumontage`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;
+        }catch(e){failed.push(p.l)}
+      }
+      state.className=added?'bk-quick-state-ok':'bk-quick-state-error';state.textContent=added?`${added} Schnellposition(en) übernommen.${failed.length?` Ohne belastbaren Treffer: ${failed.join(', ')}.`:''}`:`Keine belastbaren BKI-Treffer. ${failed.join(', ')}`;
+    }finally{btn.disabled=false}
+  };
 })();
 </script>
