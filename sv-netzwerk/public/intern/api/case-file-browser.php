@@ -52,7 +52,13 @@ function cbStreamFile(array $file):never{
     if(isset($export[$mime])){[$outMime,$ext]=$export[$mime];if(!str_ends_with(strtolower($name),$ext))$name.=$ext;$url='https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'/export?'.http_build_query(['mimeType'=>$outMime]);}
     else{$outMime=$mime;$url='https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'?alt=media&supportsAllDrives=true';}
     $r=cbHttp('GET',$url);if($r['status']!==200)apiError(503,'Datei konnte nicht aus der Fallakte geladen werden.');
-    $inline=preg_match('#^(?:application/pdf|image/|text/)#i',$outMime)===1;header('Content-Type: '.$outMime);header('Content-Length: '.strlen($r['body']));header('Content-Disposition: '.($inline?'inline':'attachment')."; filename*=UTF-8''".rawurlencode($name));echo$r['body'];exit;
+    // Allgemeine Portalberichte werden aus Kompatibilitätsgründen als .doc
+    // gespeichert, enthalten technisch aber HTML. Im Browser müssen sie daher
+    // als HTML angezeigt werden; application/msword erzwingt insbesondere auf
+    // iPhone/iPad einen unbrauchbaren Download.
+    $isHtmlDoc=$mime==='application/msword'&&preg_match('/^\s*(?:<!doctype\s+html|<html\b)/i',$r['body'])===1;
+    if($isHtmlDoc)$outMime='text/html; charset=utf-8';
+    $inline=$isHtmlDoc||preg_match('#^(?:application/pdf|image/|text/)#i',$outMime)===1;header('Content-Type: '.$outMime);header('Content-Length: '.strlen($r['body']));header('Content-Disposition: '.($inline?'inline':'attachment')."; filename*=UTF-8''".rawurlencode($name));echo$r['body'];exit;
 }
 $tree=cbTree($folderId);$action=(string)($_GET['action']??'list');
 if($action==='file'){$fileId=trim((string)($_GET['file_id']??''));$file=cbFindInTree($tree,$fileId);if(!$file)apiError(404,'Die Datei gehört nicht zu diesem Schadenfall.');cbStreamFile($file);}
