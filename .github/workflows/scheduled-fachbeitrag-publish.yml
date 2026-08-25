@@ -109,7 +109,7 @@ jobs:
           s=re.sub(r'^\s*imageAlt:\s*.*$', '', s, flags=re.M)
           open(p,'w',encoding='utf-8').write(s)
           PY
-          TITLE="$(sed -n 's/^title:[[:space:]]*["'"']\(.*\)["'"'][[:space:]]*$/\1/p' "$TARGET" | head -n 1)"
+          TITLE="$(sed -n 's/^title:[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' "$TARGET" | head -n 1)"
           if printf '%s' "$TITLE" | grep -Eq '\([0-9]+\)[[:space:]]*$'; then
             echo "::error::Technisches Dubletten-Suffix im Titel ist unzulässig: $TITLE"
             exit 1
