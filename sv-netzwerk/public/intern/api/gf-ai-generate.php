@@ -224,6 +224,34 @@ PHP_CODE;
 $source = str_replace($generalContentQsNeedle, trim($generalContentQsExtended), $source, $countGeneralFinalQs);
 if ($countGeneralFinalQs !== 1) throw new RuntimeException('Abschließende Teilnehmer- und Aufmaß-QS konnte nicht sicher angebunden werden.');
 
+// Reserveangaben außerhalb des vorgesehenen Reserveabschnitts automatisch
+// entfernen. Die QS bleibt als Kontrolle bestehen, blockiert aber keinen
+// ansonsten vollständigen Bericht wegen einer doppelten KI-Formulierung.
+$reserveQsNeedle = '$contentQs=gfEngelValidate($key,$result,$meta,$instructions);';
+$reserveQsCleanup = <<<'PHP_CODE'
+if(gfEngelReport($key)){
+    $removeReserveSentences=static function(string $text):string{
+        $clean=preg_replace('/(?:^|(?<=[.!?]))\s*[^.!?\n]*\breserve(?:n|betrag)?\b[^.!?\n]*(?:[.!?]+|$)/ui',' ',$text)??$text;
+        return trim(preg_replace('/\s{2,}/u',' ',$clean)??$clean);
+    };
+    $result['summary']=$removeReserveSentences((string)($result['summary']??''));
+    $cleanOpen=[];
+    foreach((is_array($result['open_points']??null)?$result['open_points']:[])as$openPoint){
+        $cleanPoint=$removeReserveSentences((string)$openPoint);
+        if($cleanPoint!=='')$cleanOpen[]=$cleanPoint;
+    }
+    $result['open_points']=$cleanOpen;
+    foreach((is_array($result['sections']??null)?$result['sections']:[])as$reserveSectionIndex=>$reserveSection){
+        if(str_contains(gfNorm((string)($reserveSection['heading']??'')),'reserve'))continue;
+        $result['sections'][$reserveSectionIndex]['text']=$removeReserveSentences((string)($reserveSection['text']??''));
+    }
+}
+$contentQs=gfEngelValidate($key,$result,$meta,$instructions);
+PHP_CODE;
+$source = str_replace($reserveQsNeedle, trim($reserveQsCleanup), $source, $countReserveCleanup);
+if ($countReserveCleanup !== 1) throw new RuntimeException('Automatische Reservebereinigung konnte nicht sicher angebunden werden.');
+
+
 // Für den einfachen Portalablauf den fachlich erzeugten Text zuerst als
 // bearbeitbaren Entwurf zurückgeben. Erst nach ausdrücklichem Klick wird daraus
 // das eigentliche Word-/Excel-Dokument erzeugt.
