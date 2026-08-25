@@ -35,6 +35,9 @@ jobs:
           php-version: '8.2'
           extensions: pdo_mysql, curl
 
+      - name: Falltrennung der KI-Berichte prüfen
+        run: php sv-netzwerk/tests/gf_case_isolation_test.php
+
       - name: Import Schema
         run: mysql -h 127.0.0.1 -u root -ptestpass fensterpruefung < sv-netzwerk/public/intern/api/schema.sql
 
