@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Kostenvoranschläge für Fenster und Türen prüfen: Schadenumfang und Nebenleistungen trennen',
+    description: 'Prüffähige Angebote für Fenster und Türen benötigen eindeutige Elemente, Maße, Ausstattung, Anschlussarbeiten und eine technische Begründung des Austauschs.',
+    href: '/fachwissen/fenster-tueren-kostenvoranschlag-pruefen/',
+    category: 'Rechnungsprüfung',
+    tags: ['Kostenvoranschlag', 'Fenster', 'Türen', 'Kostenprüfung', 'Reparatur', 'Wiederherstellung'],
+    date: '2026-08-25',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Wintergartenschäden prüfen: Tragwerk, Verglasung und Entwässerung getrennt bewerten',
     description: 'Bei Wintergartenschäden müssen Tragstruktur, Verglasung, Anschlüsse, Entwässerung und Nutzungseinflüsse als getrennte Prüffelder aufgenommen werden.',
     href: '/fachwissen/wintergarten-schaden-tragwerk-verglasung-entwaesserung/',
