@@ -46,12 +46,20 @@ function cbTree(string $folderId,int $depth=0): array {
 $folderId=trim((string)($_GET['folder_id']??''));requireCaseFolderAccess($folderId,$user);
 function cbFindInTree(array $items,string $fileId):?array{foreach($items as$item){if(!$item['folder']&&hash_equals((string)$item['id'],$fileId))return$item;if($item['folder']){$found=cbFindInTree((array)($item['children']??[]),$fileId);if($found)return$found;}}return null;}
 function cbSafeName(string $name):string{$name=preg_replace('/[\x00-\x1F\x7F"\\\\\/]+/u','_',basename($name))??'Datei';return trim($name)!==''?$name:'Datei';}
+function cbDocxPreview(string $bytes,string $name):string{
+    $tmp=tempnam(sys_get_temp_dir(),'svnet-docx-');if($tmp===false)return'';file_put_contents($tmp,$bytes);$zip=new ZipArchive();if($zip->open($tmp)!==true){@unlink($tmp);return'';}$xml=$zip->getFromName('word/document.xml');$zip->close();@unlink($tmp);if(!is_string($xml)||$xml==='')return'';
+    $dom=new DOMDocument('1.0','UTF-8');if(!@$dom->loadXML($xml))return'';$xp=new DOMXPath($dom);$xp->registerNamespace('w','http://schemas.openxmlformats.org/wordprocessingml/2006/main');$parts=[];
+    foreach($xp->query('//w:body/w:p|//w:body/w:tbl//w:tr')?:[]as$node){$text='';foreach($xp->query('.//w:t',$node)?:[]as$textNode)$text.=(string)$textNode->textContent;$text=trim($text);if($text!=='')$parts[]='<p>'.htmlspecialchars($text,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8').'</p>';}
+    if(!$parts)return'';$title=htmlspecialchars($name,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');return'<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'.$title.'</title><style>body{font-family:Arial,sans-serif;font-size:16px;line-height:1.55;margin:0;padding:20px;color:#172f45;background:#fff}h1{font-size:20px;line-height:1.3;margin:0 0 22px;overflow-wrap:anywhere}p{margin:0 0 12px;white-space:pre-wrap} @media(min-width:760px){body{max-width:850px;margin:auto;padding:40px}}</style></head><body><h1>'.$title.'</h1>'.implode('',$parts).'</body></html>';
+}
 function cbStreamFile(array $file):never{
     $id=(string)$file['id'];$mime=(string)($file['mimeType']??'application/octet-stream');$name=cbSafeName((string)($file['name']??'Datei'));
     $export=['application/vnd.google-apps.document'=>['application/vnd.openxmlformats-officedocument.wordprocessingml.document','.docx'],'application/vnd.google-apps.spreadsheet'=>['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','.xlsx'],'application/vnd.google-apps.presentation'=>['application/vnd.openxmlformats-officedocument.presentationml.presentation','.pptx']];
     if(isset($export[$mime])){[$outMime,$ext]=$export[$mime];if(!str_ends_with(strtolower($name),$ext))$name.=$ext;$url='https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'/export?'.http_build_query(['mimeType'=>$outMime]);}
     else{$outMime=$mime;$url='https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'?alt=media&supportsAllDrives=true';}
     $r=cbHttp('GET',$url);if($r['status']!==200)apiError(503,'Datei konnte nicht aus der Fallakte geladen werden.');
+    $isDocx=$outMime==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'||str_ends_with(strtolower($name),'.docx');
+    if($isDocx){$preview=cbDocxPreview($r['body'],$name);if($preview!==''){header('Content-Type: text/html; charset=utf-8');header('Content-Length: '.strlen($preview));header("Content-Disposition: inline; filename*=UTF-8''".rawurlencode($name.'.html'));echo$preview;exit;}}
     // Allgemeine Portalberichte werden aus Kompatibilitätsgründen als .doc
     // gespeichert, enthalten technisch aber HTML. Im Browser müssen sie daher
     // als HTML angezeigt werden; application/msword erzwingt insbesondere auf
