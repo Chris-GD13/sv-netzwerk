@@ -35,14 +35,26 @@ function cbToken(): string {
     apiError(503,'Google Drive ist nicht verbunden.');
 }
 function cbList(string $parentId): array {
-    $q="'".str_replace("'","\\'",$parentId)."' in parents and trashed=false";$url='https://www.googleapis.com/drive/v3/files?'.http_build_query(['q'=>$q,'fields'=>'files(id,name,mimeType,modifiedTime,size,webViewLink)','pageSize'=>1000,'orderBy'=>'folder,name_natural','supportsAllDrives'=>'true','includeItemsFromAllDrives'=>'true']);
+    $q="'".str_replace("'","\\'",$parentId)."' in parents and trashed=false";$url='https://www.googleapis.com/drive/v3/files?'.http_build_query(['q'=>$q,'fields'=>'files(id,name,mimeType,modifiedTime,size)','pageSize'=>1000,'orderBy'=>'folder,name_natural','supportsAllDrives'=>'true','includeItemsFromAllDrives'=>'true']);
     $r=cbHttp('GET',$url);if($r['status']!==200)apiError(503,'Fallunterlagen konnten nicht geladen werden.');$j=json_decode($r['body'],true);return is_array($j['files']??null)?$j['files']:[];
 }
 function cbTree(string $folderId,int $depth=0): array {
     if($depth>8)return [];$out=[];
-    foreach(cbList($folderId) as $f){$isFolder=(($f['mimeType']??'')==='application/vnd.google-apps.folder');$item=['id'=>(string)$f['id'],'name'=>(string)$f['name'],'mimeType'=>(string)($f['mimeType']??''),'modifiedTime'=>(string)($f['modifiedTime']??''),'size'=>(int)($f['size']??0),'webViewLink'=>(string)($f['webViewLink']??''),'folder'=>$isFolder];if($isFolder)$item['children']=cbTree((string)$f['id'],$depth+1);$out[]=$item;}
+    foreach(cbList($folderId) as $f){$isFolder=(($f['mimeType']??'')==='application/vnd.google-apps.folder');$item=['id'=>(string)$f['id'],'name'=>(string)$f['name'],'mimeType'=>(string)($f['mimeType']??''),'modifiedTime'=>(string)($f['modifiedTime']??''),'size'=>(int)($f['size']??0),'folder'=>$isFolder];if($isFolder)$item['children']=cbTree((string)$f['id'],$depth+1);$out[]=$item;}
     return $out;
 }
 $folderId=trim((string)($_GET['folder_id']??''));requireCaseFolderAccess($folderId,$user);
-$metaUrl='https://www.googleapis.com/drive/v3/files/'.rawurlencode($folderId).'?'.http_build_query(['fields'=>'id,name,webViewLink','supportsAllDrives'=>'true']);$mr=cbHttp('GET',$metaUrl);$meta=json_decode($mr['body'],true)?:[];
-echo json_encode(['ok'=>true,'folder'=>['id'=>$folderId,'name'=>(string)($meta['name']??'Fallakte'),'webViewLink'=>(string)($meta['webViewLink']??'')],'items'=>cbTree($folderId)],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+function cbFindInTree(array $items,string $fileId):?array{foreach($items as$item){if(!$item['folder']&&hash_equals((string)$item['id'],$fileId))return$item;if($item['folder']){$found=cbFindInTree((array)($item['children']??[]),$fileId);if($found)return$found;}}return null;}
+function cbSafeName(string $name):string{$name=preg_replace('/[\x00-\x1F\x7F"\\\\\/]+/u','_',basename($name))??'Datei';return trim($name)!==''?$name:'Datei';}
+function cbStreamFile(array $file):never{
+    $id=(string)$file['id'];$mime=(string)($file['mimeType']??'application/octet-stream');$name=cbSafeName((string)($file['name']??'Datei'));
+    $export=['application/vnd.google-apps.document'=>['application/vnd.openxmlformats-officedocument.wordprocessingml.document','.docx'],'application/vnd.google-apps.spreadsheet'=>['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','.xlsx'],'application/vnd.google-apps.presentation'=>['application/vnd.openxmlformats-officedocument.presentationml.presentation','.pptx']];
+    if(isset($export[$mime])){[$outMime,$ext]=$export[$mime];if(!str_ends_with(strtolower($name),$ext))$name.=$ext;$url='https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'/export?'.http_build_query(['mimeType'=>$outMime]);}
+    else{$outMime=$mime;$url='https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'?alt=media&supportsAllDrives=true';}
+    $r=cbHttp('GET',$url);if($r['status']!==200)apiError(503,'Datei konnte nicht aus der Fallakte geladen werden.');
+    $inline=preg_match('#^(?:application/pdf|image/|text/)#i',$outMime)===1;header('Content-Type: '.$outMime);header('Content-Length: '.strlen($r['body']));header('Content-Disposition: '.($inline?'inline':'attachment')."; filename*=UTF-8''".rawurlencode($name));echo$r['body'];exit;
+}
+$tree=cbTree($folderId);$action=(string)($_GET['action']??'list');
+if($action==='file'){$fileId=trim((string)($_GET['file_id']??''));$file=cbFindInTree($tree,$fileId);if(!$file)apiError(404,'Die Datei gehört nicht zu diesem Schadenfall.');cbStreamFile($file);}
+$metaUrl='https://www.googleapis.com/drive/v3/files/'.rawurlencode($folderId).'?'.http_build_query(['fields'=>'id,name','supportsAllDrives'=>'true']);$mr=cbHttp('GET',$metaUrl);$meta=json_decode($mr['body'],true)?:[];
+echo json_encode(['ok'=>true,'folder'=>['id'=>$folderId,'name'=>(string)($meta['name']??'Fallakte')],'items'=>$tree],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);

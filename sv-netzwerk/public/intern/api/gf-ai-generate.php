@@ -11,6 +11,17 @@ if (!is_string($source) || $source === '') {
 }
 $source = preg_replace('/^<\?php\s*/u', '', $source, 1) ?? $source;
 
+// Fertige Falldokumente ausschließlich über das angemeldete Portal ausliefern.
+// Direkte Drive-Links würden bei den Sachverständigen ein zusätzliches
+// privates Google-Login verlangen und die Portalberechtigung umgehen.
+$source = str_replace(
+    "'webViewLink'=>\$file['webViewLink']??null,'webContentLink'=>\$file['webContentLink']??null",
+    "'webViewLink'=>'/intern/api/case-file-browser.php?action=file&folder_id='.rawurlencode(\$folderId).'&file_id='.rawurlencode((string)(\$file['id']??'')),'webContentLink'=>null",
+    $source,
+    $portalLinkCount
+);
+if ($portalLinkCount !== 1) apiError(500, 'Portal-Dateizugriff konnte nicht initialisiert werden.');
+
 // Nachtrag kurz halten.
 $source = str_replace(
     "'nachtrag_stellungnahme'=>['Bezug / bisheriger Prüfstand','Neu vorliegende Unterlagen','Feststellungen','Fachliche und wirtschaftliche Bewertung','Entscheidung / Empfehlung','Auswirkungen auf Schadenhöhe / Reserve','Weiteres Vorgehen']",
