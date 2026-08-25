@@ -183,6 +183,14 @@ PHP_CODE;
 $source = str_replace('Widersprüche ausdrücklich benennen.','Widersprüche nur benennen, wenn sie für den konkreten Arbeitsauftrag oder die Entscheidung relevant sind.',$source);
 $source = str_replace('Bei Berichten Regressaussage nicht vergessen.','Regressaussagen nur in Erst-, Zwischen- und Schlussberichten oder bei ausdrücklichem Arbeitsauftrag aufnehmen.',$source);
 
+// Harte Falltrennung vor jeder fachlichen QS: Fremde Schaden-/Vertragsnummern
+// und eine zur Falldatei widersprüchliche Schadenart dürfen nicht ausgegeben
+// oder als Dokument gespeichert werden.
+$caseIsolationNeedle = '$result=gfEngelPrepare($key,gfOpenAI($content,$system),$meta);';
+$caseIsolationReplacement = '$result=gfEngelPrepare($key,gfOpenAI($content,$system),$meta);$caseIsolationQs=gfValidateCaseIsolation($result,$meta,$sourceNames,$instructions);';
+$source = str_replace($caseIsolationNeedle, $caseIsolationReplacement, $source, $caseIsolationCount);
+if ($caseIsolationCount !== 1) throw new RuntimeException('Falltrennungs-Sperre konnte nicht sicher an die Dokumenterstellung angebunden werden.');
+
 // Allgemeine Erstberichte mit redaktionellen Metaformulierungen oder erfundenen
 // Folgeaufgaben dürfen die QS nicht passieren.
 $generalQsNeedle = '$contentQs=gfEngelValidate($key,$result,$meta,$instructions);';
