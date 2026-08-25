@@ -90,6 +90,14 @@ Die Wiederherstellung endet nicht mit dem Einsetzen einer neuen Scheibe. Pressle
 
 Außen- oder Innenbeschattungen, Antriebe, Sensoren, Beleuchtung und Heizanschlüsse können durch das Ereignis oder den Rückbau mitbetroffen sein. Diese Technik ist separat zu prüfen. Ein defekter Motor beweist keinen Schaden am Tragprofil; ein notwendiger Ausbau der Beschattung kann jedoch eine berechtigte Nebenleistung der Glasreparatur sein. Nur die getrennte Beschreibung verhindert Doppelansätze und erleichtert die spätere Kostenprüfung.
 
+## Temperatur, Kondensat und nutzungsbedingte Feuchte
+
+Nicht jede Feuchtespur am Wintergarten ist auf Niederschlagseintritt zurückzuführen. Große Glasflächen, Metallprofile und räumlich wechselnde Temperaturen begünstigen zeitweise Kondensation. Für die Abgrenzung sind Außentemperatur, Innenklima, Beheizung, Lüftung und Nutzung zum Feststellungszeitpunkt zu dokumentieren. Kondensat tritt typischerweise an kalten Oberflächen oder Wärmebrücken auf; Schlagregen folgt dagegen eher Fugen, Deckleisten, Entwässerungswegen oder Anschlusszonen. Beide Erscheinungen können gleichzeitig vorliegen und dürfen deshalb nicht allein anhand eines einzelnen Fotos bewertet werden.
+
+Auch die Nutzungsgeschichte ist relevant. Nachträglich eingebrachte Pflanzen, Wäsche, Heizgeräte oder eine geänderte Lüftung können die Feuchtelast erhöhen. Umgekehrt kann ein länger unbeheizter Wintergarten nach einem Ereignis andere Oberflächentemperaturen zeigen als im üblichen Betrieb. Solche Angaben erklären Randbedingungen, ersetzen aber keine technische Prüfung der Konstruktion.
+
+Für eine belastbare Einordnung empfiehlt sich eine zeitlich begrenzte Beobachtung mit nachvollziehbaren Messpunkten. Temperatur und relative Luftfeuchte innen und außen, sichtbare Wasserwege sowie Witterung und Nutzung werden gemeinsam erfasst. Zeigt sich Feuchte wiederholt nur bei Wind und Niederschlag aus einer bestimmten Richtung, verdichtet dies den Hinweis auf eine Leckage. Tritt sie dagegen bei hoher Innenfeuchte unabhängig vom Regen an denselben kalten Profilzonen auf, ist Kondensation näher zu prüfen. Erst das Zusammenführen dieser Befunde erlaubt eine sachgerechte Reparaturentscheidung.
+
 ## Fazit
 
 Wintergartenschäden verlangen eine Systembetrachtung. Erst die getrennte Prüfung von Tragwerk, Verglasung, Anschlüssen, Entwässerung und Nutzungseinflüssen ermöglicht eine belastbare Ursache, angemessene Sofortmaßnahmen und eine nachvollziehbare Reparaturentscheidung.
