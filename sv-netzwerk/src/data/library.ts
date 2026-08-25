@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Fenster- und Türschäden fachlich bewerten: Funktion, Anschlüsse und Reparaturgrenzen',
+    description: 'Fenster- und Türschäden werden prüffähig, wenn Element, Beschlag, Verglasung, Baukörperanschluss und Ursache getrennt aufgenommen werden.',
+    href: '/fachwissen/fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen/',
+    category: 'Fenster und Türen',
+    tags: ['Fenster', 'Türen', 'Schadenaufnahme', 'Baukörperanschluss', 'Reparaturfähigkeit', 'Schadenabgrenzung'],
+    date: '2026-08-23',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Leitungswasserschäden in Estrich-Dämmschichten: Trocknung, Hygiene und Rückbau fachlich bewerten',
     description: 'Wie Leitungswasserschäden in schwimmenden Estrichkonstruktionen technisch untersucht, hygienisch eingeordnet, getrocknet und gegenüber unnötigem Rückbau belastbar abgegrenzt werden.',
     href: '/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-3/',
