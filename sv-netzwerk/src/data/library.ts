@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Wintergartenschäden prüfen: Tragwerk, Verglasung und Entwässerung getrennt bewerten',
+    description: 'Bei Wintergartenschäden müssen Tragstruktur, Verglasung, Anschlüsse, Entwässerung und Nutzungseinflüsse als getrennte Prüffelder aufgenommen werden.',
+    href: '/fachwissen/wintergarten-schaden-tragwerk-verglasung-entwaesserung/',
+    category: 'Fenster und Fassaden',
+    tags: ['Wintergarten', 'Verglasung', 'Tragwerk', 'Entwässerung', 'Schadenabgrenzung', 'Reparaturfähigkeit'],
+    date: '2026-08-24',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Fenster- und Türschäden fachlich bewerten: Funktion, Anschlüsse und Reparaturgrenzen',
     description: 'Fenster- und Türschäden werden prüffähig, wenn Element, Beschlag, Verglasung, Baukörperanschluss und Ursache getrennt aufgenommen werden.',
     href: '/fachwissen/fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen/',
