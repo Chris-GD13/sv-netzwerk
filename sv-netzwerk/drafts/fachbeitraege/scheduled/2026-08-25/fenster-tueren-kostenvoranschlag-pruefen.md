@@ -103,6 +103,12 @@ Lohnzeiten müssen zur Tätigkeit und Zugänglichkeit passen. Ein Ausbau im Erdg
 
 Auch Entsorgung und Transport sind mengenbezogen zu betrachten. Werden Altglas, Rahmen und Verpackungen gemeinsam pauschal berechnet, muss erkennbar sein, welche Menge zugrunde liegt. Die Prüfung soll keine Scheingenauigkeit erzeugen, aber eine nachvollziehbare Größenordnung sicherstellen. Ziel ist eine sachgerechte Entscheidung auf dokumentierter Grundlage, nicht die automatische Kürzung einzelner Preise.
 
+## Vergleichsangebote richtig einordnen
+
+Vergleichsangebote sind nur aussagekräftig, wenn sie denselben technischen Leistungsumfang abbilden. Unterschiedliche Profilsysteme, Verglasungen, Sicherheitsklassen, Beschläge oder Anschlussausbildungen können erhebliche Preisabweichungen erklären. Vor einem Preisvergleich werden deshalb Elementnummern, Maße, Ausstattungsmerkmale, Nebenleistungen und Randbedingungen vereinheitlicht. Fehlt diese Vergleichsbasis, entsteht lediglich ein scheinbar günstiger Gesamtpreis.
+
+Auch regionale Verfügbarkeit, Lieferzeit und Zugangssituation sind zu berücksichtigen. Ein alternatives Produkt kann preiswerter sein, aber zusätzliche Anpassungen an Fensterbank, Sonnenschutz oder Baukörperanschluss auslösen. Entscheidend bleibt deshalb nicht der niedrigste Einzelpreis, sondern die technisch gleichwertige und vollständig beschriebene Wiederherstellung. Abweichungen sollten positionsbezogen erläutert werden, damit eine spätere Entscheidung prüfbar bleibt.
+
 ## Fazit
 
 Ein prüffähiger Kostenvoranschlag für Fenster und Türen verbindet jeden Preis mit einem konkreten Schaden und einer technisch erforderlichen Leistung. Diese Trennung verbessert Nachvollziehbarkeit, verhindert Doppelansätze und ermöglicht eine sachgerechte Entscheidung über Reparatur, Teilersatz oder Komplettaustausch.
