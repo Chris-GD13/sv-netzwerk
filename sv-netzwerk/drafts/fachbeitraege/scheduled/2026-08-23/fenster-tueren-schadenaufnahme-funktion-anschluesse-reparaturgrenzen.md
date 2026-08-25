@@ -86,6 +86,14 @@ Die gewählte Reparatur muss alle festgestellten Funktionsverluste beheben, darf
 
 Bei einem Komplettaustausch ist zusätzlich zu prüfen, ob angrenzende Bauteile während Ausbau und Einbau geschützt werden und ob die neue Ausführung mit vorhandenen Rollläden, Fensterbänken, Alarmkontakten oder Lüftungseinrichtungen kompatibel ist. Solche Schnittstellen verursachen häufig Nachträge. Werden sie bereits im Prüfstadium erfasst, lassen sich technisch notwendige Leistungen von späteren Wunschänderungen sauberer trennen.
 
+## Referenzelemente und zerstörungsarme Vergleichsprüfung
+
+Bei mehreren baugleichen Fenstern oder Türen ist ein unbeschädigtes Referenzelement besonders wertvoll. Bedienkräfte, Spaltmaße, Verriegelungspunkte, Dichtungsauflage und Anschlussdetails lassen sich dann unter vergleichbaren Einbaubedingungen gegenüberstellen. Abweichungen sind dennoch nicht automatisch schadenbedingt: Fertigungs- und Montagetoleranzen, unterschiedliche Nutzung sowie frühere Nachstellungen müssen mitberücksichtigt werden. Die Vergleichsprüfung liefert deshalb einen Befundbaustein, keinen alleinigen Ursachennachweis.
+
+Zerstörungsarme Prüfungen sollten in einer sinnvollen Reihenfolge erfolgen. Zunächst werden Sichtbefund, Bedienung und einfache Messungen dokumentiert. Erst danach kommen weitergehende Prüfungen oder Öffnungen in Betracht. Bei Feuchtespuren sind Messstelle, Messverfahren, Untergrund und Zeitpunkt festzuhalten; ein einzelner Messwert ohne Referenz und Randbedingungen ist kaum belastbar. Auch Prüfungen der Luft- oder Schlagregendichtheit müssen zur konkreten Fragestellung und zum Elementzustand passen. Eine provisorische Abdichtung oder bereits veränderte Fuge kann das Ergebnis beeinflussen.
+
+Der Abgleich mit Referenzelementen hilft außerdem bei der Reparaturplanung. Zeigt sich eine Störung nur an einem Beschlagteil, während Rahmengeometrie und Anschluss unauffällig sind, spricht dies eher für eine gezielte Instandsetzung. Treten gleichartige Auffälligkeiten an mehreren, vom Ereignis nicht betroffenen Elementen auf, muss ein allgemeiner Montage-, Wartungs- oder Alterungseinfluss geprüft werden. Diese Trennung verhindert, dass ein zufällig entdeckter Bestandsmangel dem Schadenereignis zugerechnet wird.
+
 ## Fazit
 
 Fenster- und Türschäden werden belastbar, wenn Bauteilsystem, Ereignis, Schadenbild, Funktion und Reparaturgrenze getrennt dokumentiert werden. Diese Systematik schützt vor vorschnellen Komplettaustauschen ebenso wie vor technisch unzureichenden Kleinreparaturen.
