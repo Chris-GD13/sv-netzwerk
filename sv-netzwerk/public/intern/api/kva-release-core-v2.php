@@ -17,6 +17,23 @@ function krCaseInsurer(string $folder): string
     return '';
 }
 
+function krVerifiedKva(string $folder, string $bytes): array
+{
+    $hash = hash('sha256', $bytes);
+    foreach (krList($folder) as $file) {
+        $name = (string)($file['name'] ?? '');
+        if (!preg_match('/kva.*(?:pruef|prüf|verif).*\.json$/iu', $name)) continue;
+        try {
+            $raw = krDrive('https://www.googleapis.com/drive/v3/files/'.rawurlencode((string)$file['id']).'?alt=media&supportsAllDrives=true');
+            $data = json_decode($raw, true);
+            if (!is_array($data) || !hash_equals($hash, strtolower(trim((string)($data['sha256'] ?? ''))))) continue;
+            return $data;
+        } catch (Throwable) {
+        }
+    }
+    return [];
+}
+
 function krV2Handle(array $user): void
 {
     $action = (string)($_GET['action'] ?? 'status');
@@ -37,6 +54,12 @@ function krV2Handle(array $user): void
                 ['name'=>$name,'mime'=>$mime,'bytes'=>$bytes] = krSelected($folder, trim((string)($_POST['file_id'] ?? '')));
             }
             $result = krAnalyze($name, $mime, $bytes);
+            $verified = krVerifiedKva($folder, $bytes);
+            if ($verified !== []) {
+                $result = array_replace($result, $verified);
+                $result['totals_confident'] = true;
+                $result['warnings'] = [];
+            }
             $net = krMoney($result['net_total'] ?? null);
             $vat = krMoney($result['vat_total'] ?? null);
             $gross = krMoney($result['gross_total'] ?? null);
