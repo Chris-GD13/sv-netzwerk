@@ -31,6 +31,22 @@ if (!is_string($source) || $source === '') {
 }
 $source = preg_replace('/^<\?php\s*/u', '', $source, 1) ?? $source;
 
+// KI-Antworten koennen optionale JSON-Felder als null oder als strukturierte
+// Werte liefern. Regulare Pruefungen sollen daran nicht mit einem PHP-TypeError
+// abbrechen, sondern den normalisierten Text fachlich bewerten.
+function gfSafePregMatch(string $pattern, mixed $subject, ?array &$matches = null, int $flags = 0, int $offset = 0): int|false
+{
+    if (is_string($subject)) {
+        $text = $subject;
+    } elseif ($subject === null || is_scalar($subject)) {
+        $text = (string)$subject;
+    } else {
+        $encoded = json_encode($subject, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $text = is_string($encoded) ? $encoded : '';
+    }
+    return preg_match($pattern, $text, $matches, $flags, $offset);
+}
+
 // Ältere bzw. zwischengespeicherte Portaloberflächen haben die sichtbare
 // Einzelauswahl vereinzelt nicht als order.outputs übertragen. Für diesen
 // Fall den eindeutig im Arbeitsauftrag bezeichneten Berichtstyp übernehmen,
@@ -56,6 +72,18 @@ if ($explicitOutputCount !== 1) {
     throw new RuntimeException('Explizite Dokumentauswahl konnte nicht sicher angebunden werden.');
 }
 
+// Umfangreiche Schadenberichte benötigen neben dem sichtbaren JSON auch Raum
+// für interne Reasoning-Tokens. Der Grenzwert bleibt per Umgebung anpassbar.
+$source = str_replace(
+    "'max_output_tokens'=>9000",
+    "'max_output_tokens'=>(int)env('OPENAI_MAX_OUTPUT_TOKENS','20000')",
+    $source,
+    $outputTokenCount
+);
+if ($outputTokenCount !== 1) {
+    throw new RuntimeException('Ausgabereserve für KI-Berichte konnte nicht sicher gesetzt werden.');
+}
+
 
 // Start und Langläufer trennen: Der Browser erhält zuerst sicher die Job-ID.
 // Die eigentliche Verarbeitung wird anschließend über action=run angestoßen,
@@ -69,6 +97,15 @@ PHP_CODE;
 $source = str_replace($dispatcherNeedle, $dispatcherReplacement, $source, $dispatcherCount);
 if ($dispatcherCount !== 1) {
     throw new RuntimeException('KI-Hintergrundstarter konnte nicht sicher initialisiert werden.');
+}
+$source = str_replace(
+    "echo \$runResponse;if(function_exists('fastcgi_finish_request')){fastcgi_finish_request();}else{while(ob_get_level()>0){@ob_end_flush();}@flush();}gfRunJob(\$id,\$runPayload);exit;",
+    "echo \$runResponse;exit;",
+    $source,
+    $workerDispatchCount
+);
+if ($workerDispatchCount !== 1) {
+    throw new RuntimeException('Server-Worker konnte nicht sicher an den Dispatcher angebunden werden.');
 }
 $inlineRunNeedle = <<<'PHP_CODE'
 echo $response;if(function_exists('fastcgi_finish_request')){fastcgi_finish_request();}else{while(ob_get_level()>0){@ob_end_flush();}@flush();}gfRunJob($jobId,$payload);exit;
@@ -345,6 +382,54 @@ $finalReplacement = '$result=[\'ok\'=>true,\'created\'=>$created,\'drafts\'=>$dr
 $source = str_replace($finalNeedle, $finalReplacement, $source, $countDraftResponse);
 if ($countDraftResponse !== 1) throw new RuntimeException('Entwurf konnte nicht in die Antwort übernommen werden.');
 $source = str_replace("gfJobUpdate(\$jobId,'done',100,'Dokumentpaket vollständig erstellt.',\$result);", "gfJobUpdate(\$jobId,'done',100,!empty(\$order['draft_only'])?'Entwurf vollständig erstellt.':'Dokumentpaket vollständig erstellt.',\$result);", $source);
+$source = str_replace(
+    "error_log('[gf-ai-job '.\$jobId.'] '.\$e->getMessage());gfJobUpdate(\$jobId,'failed',100,'Verarbeitung fehlgeschlagen.',null,\$e->getMessage());",
+    "\$jobFrames=array_slice(\$e->getTrace(),0,4);\$jobTrace=implode(' > ',array_map(static fn(\$frame)=>(string)(\$frame['function']??'?').'@'.(int)(\$frame['line']??0),\$jobFrames));\$jobError=\$e->getMessage().' (Laufzeitzeile '.\$e->getLine().')'.(\$jobTrace!==''?' ['.\$jobTrace.']':'');error_log('[gf-ai-job '.\$jobId.'] '.\$jobError);gfJobUpdate(\$jobId,'failed',100,'Verarbeitung fehlgeschlagen.',null,\$jobError);",
+    $source,
+    $jobErrorDetailCount
+);
+if ($jobErrorDetailCount !== 1) throw new RuntimeException('Fehlerdiagnose konnte nicht sicher angebunden werden.');
+
+// IONOS beendet lange PHP-Webanfragen. Im CLI-Modus wird deshalb genau ein
+// bereits angelegter Auftrag unabhängig vom Browser bis zum Ende verarbeitet.
+$cliJobId = (int)(getenv('GF_AI_JOB_ID') ?: 0);
+$cliWorkerNext = getenv('GF_AI_WORKER_NEXT') === '1';
+if (PHP_SAPI === 'cli' && ($cliJobId > 0 || $cliWorkerNext)) {
+    $httpPrelude = <<<'PHP_CODE'
+commonHeaders();
+$user=requireAuth();
+if(!in_array($user['role']??'', ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) apiError(403,'Keine Berechtigung.');
+if($_SERVER['REQUEST_METHOD']!=='POST') apiError(405,'POST erforderlich.');
+PHP_CODE;
+    $source = str_replace(["\r\n", "\r"], "\n", $source);
+    $httpPrelude = str_replace(["\r\n", "\r"], "\n", $httpPrelude);
+    $source = str_replace($httpPrelude, '$user=[\'email\'=>\'server-worker\',\'role\'=>\'administrator\'];', $source, $cliPreludeCount);
+    if ($cliPreludeCount !== 1) throw new RuntimeException('CLI-Worker konnte nicht sicher initialisiert werden.');
+    $dispatcherPosition = strrpos($source, "\ntry{\n    \$body=requestBody();");
+    if ($dispatcherPosition === false) throw new RuntimeException('CLI-Worker konnte den HTTP-Dispatcher nicht abtrennen.');
+    $source = substr($source, 0, $dispatcherPosition) . <<<'PHP_CODE'
+
+$cliJobId=(int)(getenv('GF_AI_JOB_ID')?:0);
+$cliLock=(int)db()->query("SELECT GET_LOCK('svnet_gf_ai_worker',0)")->fetchColumn();
+if($cliLock!==1)exit(0);
+if($cliJobId>0){$cliStmt=db()->prepare('SELECT id,payload_json,status FROM gf_ai_jobs WHERE id=:id LIMIT 1');$cliStmt->execute([':id'=>$cliJobId]);}
+else{$cliStmt=db()->query("SELECT id,payload_json,status FROM gf_ai_jobs WHERE status='dispatching' ORDER BY id ASC LIMIT 1");}
+$cliRow=$cliStmt->fetch(PDO::FETCH_ASSOC);
+if(!$cliRow){db()->query("SELECT RELEASE_LOCK('svnet_gf_ai_worker')");exit(0);}
+$cliJobId=(int)($cliRow['id']??$cliJobId);
+$cliStatus=(string)($cliRow['status']??'');
+if(!in_array($cliStatus,['queued','dispatching','running'],true))exit(0);
+$cliPayload=json_decode((string)($cliRow['payload_json']??''),true);
+if(!is_array($cliPayload))throw new RuntimeException('KI-Auftrag ist unvollständig.');
+gfRunJob($cliJobId,$cliPayload);
+db()->query("SELECT RELEASE_LOCK('svnet_gf_ai_worker')");
+exit(0);
+PHP_CODE;
+}
+
+// Erst nach allen Laufzeit-Erweiterungen normalisieren, damit auch die spaeter
+// eingesetzten fachlichen Pruefregeln null-sicher arbeiten.
+$source = str_replace('preg_match(', 'gfSafePregMatch(', $source);
 
 // Kein harter Abbruch mehr bei bereits im Kern enthaltenen oder leicht geänderten Mustern.
 if (getenv('GF_AI_VALIDATE_ONLY') === '1') {
