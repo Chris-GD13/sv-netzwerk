@@ -37,8 +37,10 @@ function krVerifiedKva(string $folder, string $bytes): array
 function krV2Handle(array $user): void
 {
     $action = (string)($_GET['action'] ?? 'status');
+    $senderProfile = krSenderProfile($user);
+    $sender = (string)$senderProfile['email'];
     try {
-        if ($action === 'status') apiJson(['ok'=>true,'sender'=>KR_SENDER,'sparkassen_bcc'=>KR_ARCHIVE]);
+        if ($action === 'status') apiJson(['ok'=>true,'sender'=>$sender,'sender_name'=>$senderProfile['name'],'sparkassen_bcc'=>KR_ARCHIVE]);
         $folder = trim((string)($_REQUEST['folder_id'] ?? ''));
         requireCaseFolderAccess($folder, $user);
         if ($action === 'files') apiJson(['ok'=>true,'files'=>krKvas($folder)]);
@@ -101,6 +103,8 @@ function krV2Handle(array $user): void
                 'gross'=>$gross,
                 'insurer'=>$insurer,
                 'sparkasse'=>$sparkasse,
+                'sender'=>$sender,
+                'sender_name'=>(string)$senderProfile['name'],
                 'issued'=>time(),
             ];
             $missing = [];
@@ -110,7 +114,7 @@ function krV2Handle(array $user): void
             apiJson(['ok'=>true,'draft'=>$preview+[
                 'subject'=>'KVA-Freigabe · Schaden-Nr. '.$preview['case_no'],
                 'body'=>krDraftBody($preview),
-                'sender'=>KR_SENDER,
+                'sender'=>$sender,
                 'bcc'=>$sparkasse ? KR_ARCHIVE : '',
                 'warnings'=>$warnings,
                 'missing'=>$missing,
@@ -122,6 +126,7 @@ function krV2Handle(array $user): void
             $input = requestBody();
             $preview = krVerify((string)($input['token'] ?? ''));
             if (!hash_equals($folder, (string)$preview['folder']) || !hash_equals(krCaseNo($folder), (string)$preview['case_no'])) throw new RuntimeException('Aktiver Fall hat sich geändert.');
+            if (!hash_equals($sender, (string)($preview['sender'] ?? ''))) throw new RuntimeException('Der angemeldete Benutzer hat sich geändert. Bitte KVA erneut auslesen.');
             if ($preview['company'] === '' || !filter_var((string)$preview['email'], FILTER_VALIDATE_EMAIL) || $preview['quote_number'] === '' || $preview['insurer'] === '' || !is_numeric($preview['net']) || !is_numeric($preview['gross'])) throw new RuntimeException('Pflichtangaben fehlen.');
             $to = trim((string)($input['to'] ?? $preview['email']));
             $cc = [];
@@ -136,12 +141,17 @@ function krV2Handle(array $user): void
             $message = ['subject'=>$subject,'body'=>['contentType'=>'HTML','content'=>'<p>'.nl2br(htmlspecialchars($body,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8')).'</p>'],'toRecipients'=>[krRec($to)]];
             if ($cc !== []) $message['ccRecipients'] = array_values($cc);
             if ($preview['sparkasse']) $message['bccRecipients'] = [krRec(KR_ARCHIVE)];
-            $response = krHttp('POST','https://graph.microsoft.com/v1.0/users/'.rawurlencode(KR_SENDER).'/sendMail',['Authorization: Bearer '.krMs(),'Content-Type: application/json'],json_encode(['message'=>$message,'saveToSentItems'=>true],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
-            if ($response['status'] < 200 || $response['status'] >= 300) throw new RuntimeException('KVA-Freigabe konnte nicht versendet werden.');
+            $response = krHttp('POST','https://graph.microsoft.com/v1.0/users/'.rawurlencode($sender).'/sendMail',['Authorization: Bearer '.krMs(),'Content-Type: application/json'],json_encode(['message'=>$message,'saveToSentItems'=>true],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+            if ($response['status'] < 200 || $response['status'] >= 300) {
+                $graph = json_decode($response['body'], true);
+                $code = trim((string)($graph['error']['code'] ?? ''));
+                $detail = trim((string)($graph['error']['message'] ?? ''));
+                throw new RuntimeException('KVA-Freigabe konnte über '.$sender.' nicht versendet werden'.($code !== '' ? ' (Microsoft: '.$code.')' : '.').($detail !== '' ? ' '.$detail : ''));
+            }
             db()->exec('CREATE TABLE IF NOT EXISTS kva_send_log (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, folder_id VARCHAR(160) NOT NULL, case_no VARCHAR(100) NOT NULL, subject VARCHAR(500) NOT NULL, recipient VARCHAR(320) NOT NULL, cc_json TEXT NOT NULL, bcc VARCHAR(320) NOT NULL, sent_at DATETIME NOT NULL, INDEX idx_kva_send_folder (folder_id, sent_at))');
             $log = db()->prepare('INSERT INTO kva_send_log (folder_id, case_no, subject, recipient, cc_json, bcc, sent_at) VALUES (:folder,:case_no,:subject,:recipient,:cc,:bcc,NOW())');
             $log->execute([':folder'=>$folder,':case_no'=>$preview['case_no'],':subject'=>$subject,':recipient'=>$to,':cc'=>json_encode(array_keys($cc),JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':bcc'=>$preview['sparkasse']?KR_ARCHIVE:'']);
-            apiJson(['ok'=>true,'subject'=>$subject,'sender'=>KR_SENDER,'recipient'=>$to,'cc'=>array_keys($cc),'bcc'=>$preview['sparkasse']?KR_ARCHIVE:'']);
+            apiJson(['ok'=>true,'subject'=>$subject,'sender'=>$sender,'recipient'=>$to,'cc'=>array_keys($cc),'bcc'=>$preview['sparkasse']?KR_ARCHIVE:'']);
         }
         apiError(404, 'Unbekannte Aktion.');
     } catch (Throwable $error) {
