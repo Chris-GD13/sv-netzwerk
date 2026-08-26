@@ -64,7 +64,7 @@ $dispatcherNeedle = <<<'PHP_CODE'
 $body=requestBody();$action=(string)($body['action']??'start');gfJobsTable();
 PHP_CODE;
 $dispatcherReplacement = <<<'PHP_CODE'
-$body=requestBody();$action=(string)($body['action']??'start');gfJobsTable();if($action==='run'){$id=(int)($body['job_id']??0);if($id<=0)apiError(400,'job_id fehlt.');$stmt=db()->prepare('SELECT payload_json,status FROM gf_ai_jobs WHERE id=:id AND created_by=:u LIMIT 1');$stmt->execute([':id'=>$id,':u'=>(string)($user['email']??'')]);$runRow=$stmt->fetch(PDO::FETCH_ASSOC);if(!$runRow)apiError(404,'KI-Auftrag nicht gefunden.');$runStatus=(string)($runRow['status']??'');if($runStatus==='queued'){$runPayload=json_decode((string)($runRow['payload_json']??''),true);if(!is_array($runPayload))apiError(500,'KI-Auftrag ist unvollständig.');$runResponse=json_encode(['ok'=>true,'accepted'=>true,'job_id'=>$id],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);http_response_code(202);header('Content-Type: application/json; charset=utf-8');header('Content-Length: '.strlen($runResponse));header('Connection: close');echo $runResponse;if(function_exists('fastcgi_finish_request')){fastcgi_finish_request();}else{while(ob_get_level()>0){@ob_end_flush();}@flush();}gfRunJob($id,$runPayload);exit;}apiJson(['ok'=>true,'job_id'=>$id]);}
+$body=requestBody();$action=(string)($body['action']??'start');gfJobsTable();if($action==='run'){$id=(int)($body['job_id']??0);if($id<=0)apiError(400,'job_id fehlt.');$stmt=db()->prepare('SELECT payload_json,status FROM gf_ai_jobs WHERE id=:id AND created_by=:u LIMIT 1');$stmt->execute([':id'=>$id,':u'=>(string)($user['email']??'')]);$runRow=$stmt->fetch(PDO::FETCH_ASSOC);if(!$runRow)apiError(404,'KI-Auftrag nicht gefunden.');$runStatus=(string)($runRow['status']??'');if($runStatus==='queued'){$runPayload=json_decode((string)($runRow['payload_json']??''),true);if(!is_array($runPayload))apiError(500,'KI-Auftrag ist unvollständig.');gfRunJob($id,$runPayload);}apiJson(['ok'=>true,'job_id'=>$id]);}
 PHP_CODE;
 $source = str_replace($dispatcherNeedle, $dispatcherReplacement, $source, $dispatcherCount);
 if ($dispatcherCount !== 1) {
@@ -73,10 +73,7 @@ if ($dispatcherCount !== 1) {
 $inlineRunNeedle = <<<'PHP_CODE'
 echo $response;if(function_exists('fastcgi_finish_request')){fastcgi_finish_request();}else{while(ob_get_level()>0){@ob_end_flush();}@flush();}gfRunJob($jobId,$payload);exit;
 PHP_CODE;
-$inlineRunReplacement = <<<'PHP_CODE'
-echo $response;exit;
-PHP_CODE;
-$source = str_replace($inlineRunNeedle, $inlineRunReplacement, $source, $inlineRunCount);
+$source = str_replace($inlineRunNeedle, $inlineRunNeedle, $source, $inlineRunCount);
 if ($inlineRunCount !== 1) {
     throw new RuntimeException('KI-Hintergrundlauf konnte nicht sicher angebunden werden.');
 }
