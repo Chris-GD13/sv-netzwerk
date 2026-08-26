@@ -1,6 +1,26 @@
 <?php
 declare(strict_types=1);
 
+// Auch Fehler vor dem eigentlichen Jobstart immer als auswertbare JSON-Antwort
+// liefern. Das Portal darf bei einem Serverfehler nicht nur eine leere 500-Seite
+// erhalten; die Fehler-ID wird zugleich im Serverprotokoll hinterlegt.
+$gfFatalHandled = false;
+register_shutdown_function(static function () use (&$gfFatalHandled): void {
+    if ($gfFatalHandled) return;
+    $last = error_get_last();
+    if (!is_array($last) || !in_array((int)($last['type'] ?? 0), [E_ERROR,E_PARSE,E_CORE_ERROR,E_COMPILE_ERROR], true)) return;
+    $gfFatalHandled = true;
+    $errorId = bin2hex(random_bytes(4));
+    $message = trim((string)($last['message'] ?? 'Unbekannter PHP-Fehler'));
+    error_log('[gf-ai-fatal '.$errorId.'] '.$message);
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store');
+    }
+    echo json_encode(['error'=>'Entwurf konnte nicht gestartet werden (Fehler-ID '.$errorId.'): '.$message], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+});
+
 $core = __DIR__ . '/gf-ai-generate-core.php';
 $source = @file_get_contents($core);
 if (!is_string($source) || $source === '') {
@@ -277,4 +297,17 @@ if ($countDraftResponse !== 1) throw new RuntimeException('Entwurf konnte nicht 
 $source = str_replace("gfJobUpdate(\$jobId,'done',100,'Dokumentpaket vollständig erstellt.',\$result);", "gfJobUpdate(\$jobId,'done',100,!empty(\$order['draft_only'])?'Entwurf vollständig erstellt.':'Dokumentpaket vollständig erstellt.',\$result);", $source);
 
 // Kein harter Abbruch mehr bei bereits im Kern enthaltenen oder leicht geänderten Mustern.
-eval($source);
+try {
+    eval($source);
+} catch (Throwable $error) {
+    $gfFatalHandled = true;
+    $errorId = bin2hex(random_bytes(4));
+    error_log('[gf-ai-bootstrap '.$errorId.'] '.$error->getMessage());
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store');
+    }
+    echo json_encode(['error'=>'Entwurf konnte nicht gestartet werden (Fehler-ID '.$errorId.'): '.$error->getMessage()], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+    exit;
+}
