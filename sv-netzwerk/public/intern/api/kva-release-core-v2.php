@@ -115,14 +115,21 @@ function krV2Handle(array $user): void
             if (!hash_equals($folder, (string)$preview['folder']) || !hash_equals(krCaseNo($folder), (string)$preview['case_no'])) throw new RuntimeException('Aktiver Fall hat sich geändert.');
             if ($preview['company'] === '' || !filter_var((string)$preview['email'], FILTER_VALIDATE_EMAIL) || $preview['quote_number'] === '' || $preview['insurer'] === '' || !is_numeric($preview['net']) || !is_numeric($preview['gross'])) throw new RuntimeException('Pflichtangaben fehlen.');
             $to = trim((string)($input['to'] ?? $preview['email']));
+            $cc = [];
+            foreach (preg_split('/[;,\s]+/', trim((string)($input['cc'] ?? ''))) ?: [] as $address) {
+                if ($address === '') continue;
+                if (!filter_var($address, FILTER_VALIDATE_EMAIL)) throw new RuntimeException('Ungültige CC-E-Mail-Adresse: '.$address);
+                $cc[strtolower($address)] = krRec($address);
+            }
             $body = trim((string)($input['body'] ?? ''));
             if ($body === '') throw new RuntimeException('E-Mail-Text fehlt.');
             $subject = 'KVA-Freigabe · Schaden-Nr. '.$preview['case_no'];
             $message = ['subject'=>$subject,'body'=>['contentType'=>'HTML','content'=>'<p>'.nl2br(htmlspecialchars($body,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8')).'</p>'],'toRecipients'=>[krRec($to)]];
+            if ($cc !== []) $message['ccRecipients'] = array_values($cc);
             if ($preview['sparkasse']) $message['bccRecipients'] = [krRec(KR_ARCHIVE)];
             $response = krHttp('POST','https://graph.microsoft.com/v1.0/users/'.rawurlencode(KR_SENDER).'/sendMail',['Authorization: Bearer '.krMs(),'Content-Type: application/json'],json_encode(['message'=>$message,'saveToSentItems'=>true],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
             if ($response['status'] < 200 || $response['status'] >= 300) throw new RuntimeException('KVA-Freigabe konnte nicht versendet werden.');
-            apiJson(['ok'=>true,'subject'=>$subject,'sender'=>KR_SENDER,'recipient'=>$to,'bcc'=>$preview['sparkasse']?KR_ARCHIVE:'']);
+            apiJson(['ok'=>true,'subject'=>$subject,'sender'=>KR_SENDER,'recipient'=>$to,'cc'=>array_keys($cc),'bcc'=>$preview['sparkasse']?KR_ARCHIVE:'']);
         }
         apiError(404, 'Unbekannte Aktion.');
     } catch (Throwable $error) {
