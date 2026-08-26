@@ -56,26 +56,6 @@ if ($explicitOutputCount !== 1) {
     throw new RuntimeException('Explizite Dokumentauswahl konnte nicht sicher angebunden werden.');
 }
 
-// Start und Langläufer trennen: Der Browser erhält zuerst sicher die Job-ID.
-// Die eigentliche Verarbeitung wird anschließend über action=run angestoßen,
-// während die Statusabfragen unabhängig weiterlaufen können.
-$dispatcherNeedle = <<<'PHP_CODE'
-$body=requestBody();$action=(string)($body['action']??'start');gfJobsTable();
-PHP_CODE;
-$dispatcherReplacement = <<<'PHP_CODE'
-$body=requestBody();$action=(string)($body['action']??'start');gfJobsTable();if($action==='run'){$id=(int)($body['job_id']??0);if($id<=0)apiError(400,'job_id fehlt.');$stmt=db()->prepare('SELECT payload_json,status FROM gf_ai_jobs WHERE id=:id AND created_by=:u LIMIT 1');$stmt->execute([':id'=>$id,':u'=>(string)($user['email']??'')]);$runRow=$stmt->fetch(PDO::FETCH_ASSOC);if(!$runRow)apiError(404,'KI-Auftrag nicht gefunden.');$runStatus=(string)($runRow['status']??'');if($runStatus==='queued'){$runPayload=json_decode((string)($runRow['payload_json']??''),true);if(!is_array($runPayload))apiError(500,'KI-Auftrag ist unvollständig.');gfRunJob($id,$runPayload);}apiJson(['ok'=>true,'job_id'=>$id]);}
-PHP_CODE;
-$source = str_replace($dispatcherNeedle, $dispatcherReplacement, $source, $dispatcherCount);
-if ($dispatcherCount !== 1) {
-    throw new RuntimeException('KI-Hintergrundstarter konnte nicht sicher initialisiert werden.');
-}
-$inlineRunNeedle = <<<'PHP_CODE'
-echo $response;if(function_exists('fastcgi_finish_request')){fastcgi_finish_request();}else{while(ob_get_level()>0){@ob_end_flush();}@flush();}gfRunJob($jobId,$payload);exit;
-PHP_CODE;
-$source = str_replace($inlineRunNeedle, 'echo $response;exit;', $source, $inlineRunCount);
-if ($inlineRunCount !== 1) {
-    throw new RuntimeException('Synchroner KI-Langläufer konnte nicht sicher getrennt werden.');
-}
 
 // Fertige Falldokumente ausschließlich über das angemeldete Portal ausliefern.
 // Direkte Drive-Links würden bei den Sachverständigen ein zusätzliches
