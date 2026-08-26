@@ -26,9 +26,7 @@ jobs:
       SFTP_REMOTE_DIR: /sv-netzwerk
       SFTP_CONNECT_TIMEOUT_SECONDS: 25
       SFTP_CHECK_TIMEOUT_SECONDS: 45
-      SFTP_CHECK_ATTEMPTS: 1
       SFTP_UPLOAD_TIMEOUT_SECONDS: 1200
-      SFTP_UPLOAD_ATTEMPTS: 10
 
     defaults:
       run:
@@ -82,59 +80,47 @@ jobs:
           test -f dist/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/index.html
           test -f dist/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/index.html
           test -f dist/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/index.html
-          echo "Build erfolgreich; erzeugte Dateien:"
-          find dist -type f | sort | sed -n '1,100p'
+          test -f dist/intern/login/index.html
+          test -f dist/assets/style.css
+          echo "Build erfolgreich; erzeugte Dateien: $(find dist -type f | wc -l)"
 
       - name: SFTP-Werkzeug installieren
         run: |
           sudo apt-get update
-          sudo apt-get install --yes lftp
+          sudo apt-get install --yes openssh-client sshpass
 
-      - name: SharePoint-Konfiguration sicher aktualisieren
+      - name: Bestehende Server-Konfiguration unangetastet lassen
+        run: |
+          echo "Recovery-Upload verändert keine .env-, SharePoint-, Zugangskonfigurations- oder Logdateien."
+
+      - name: Document Root mit nativer SFTP-Verbindung prüfen
         continue-on-error: true
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
           SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
           SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
-          MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
-          MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
-          MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
-          MS_SHAREPOINT_SITE_ID: ${{ secrets.MS_SHAREPOINT_SITE_ID }}
         run: |
           set -euo pipefail
-          current_env="$(mktemp)"
-          updated_env="$(mktemp)"
-          trap 'rm -f "$current_env" "$updated_env"' EXIT
-          rm -f "$current_env"
-          download_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; get $SFTP_REMOTE_DIR/.env -o $current_env; quit"
-          timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$download_script"
-          test -s "$current_env"
-          cp "$current_env" "$updated_env"
-          sed -i '/^MS_TENANT_ID=/d; /^MS_CLIENT_ID=/d; /^MS_CLIENT_SECRET=/d; /^MS_SHAREPOINT_SITE_ID=/d' "$updated_env"
+          batch_file="$(mktemp)"
+          trap 'rm -f "$batch_file"' EXIT
           {
-            printf 'MS_TENANT_ID=%s\n' "$MS_TENANT_ID"
-            printf 'MS_CLIENT_ID=%s\n' "$MS_CLIENT_ID"
-            printf 'MS_CLIENT_SECRET=%s\n' "$MS_CLIENT_SECRET"
-            printf 'MS_SHAREPOINT_SITE_ID=%s\n' "$MS_SHAREPOINT_SITE_ID"
-          } >> "$updated_env"
-          if grep -Fq '\\nMS_' "$updated_env"; then
-            echo "::error::Microsoft-Konfiguration enthält literale \\n-Zeichen statt Zeilenumbrüchen."
-            exit 1
-          fi
-          for key in MS_TENANT_ID MS_CLIENT_ID MS_CLIENT_SECRET MS_SHAREPOINT_SITE_ID; do
-            if [ "$(grep -c "^${key}=" "$updated_env")" -ne 1 ]; then
-              echo "::error::Konfigurationsschlüssel ${key} fehlt oder ist mehrfach vorhanden."
-              exit 1
-            fi
-          done
-          test -s "$updated_env"
-          upload_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; put $current_env -o $SFTP_REMOTE_DIR/.env.pre-sharepoint; put $updated_env -o $SFTP_REMOTE_DIR/.env; chmod 600 $SFTP_REMOTE_DIR/.env; rm -f $SFTP_REMOTE_DIR/.env.sharepoint-new; quit"
-          timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$upload_script"
-          echo "SharePoint-Konfiguration wurde sicher aktualisiert; die vorherige Fassung liegt als .env.pre-sharepoint vor."
+            printf 'cd "%s"\n' "$SFTP_REMOTE_DIR"
+            printf 'pwd\n'
+            printf 'quit\n'
+          } > "$batch_file"
+          export SSHPASS="$SFTP_PASSWORD"
+          timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" sshpass -e sftp -4 \
+            -oBatchMode=no \
+            -oStrictHostKeyChecking=no \
+            -oUserKnownHostsFile=/dev/null \
+            -oConnectTimeout="$SFTP_CONNECT_TIMEOUT_SECONDS" \
+            -oConnectionAttempts=1 \
+            -P "$SFTP_PORT" \
+            -b "$batch_file" \
+            "$SFTP_USERNAME@$SFTP_HOST"
 
-      - name: Document Root vor dem Upload prüfen
-        continue-on-error: true
+      - name: Vollständigen Recovery-Build nach IONOS übertragen
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
           SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
@@ -142,111 +128,67 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; mkdir -p $SFTP_REMOTE_DIR; chmod 755 $SFTP_REMOTE_DIR; ls $SFTP_REMOTE_DIR; quit"
-          exit_code=1
-          listing=""
-          for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
-            set +e
-            listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$lftp_script")"
-            exit_code=$?
-            set -e
-            if [ "$exit_code" -eq 0 ]; then
-              break
-            fi
-            if [ "$attempt" -lt "$SFTP_CHECK_ATTEMPTS" ]; then
-              sleep 15
-            fi
-          done
-          if [ "$exit_code" -ne 0 ]; then
-            if [ "$exit_code" -eq 124 ]; then
-              echo "::error::Timeout bei Document-Root-Prüfung nach ${SFTP_CHECK_TIMEOUT_SECONDS}s."
-            else
-              echo "::error::Document Root $SFTP_REMOTE_DIR ist nicht erreichbar oder nicht nutzbar (Exit $exit_code)."
-            fi
-            exit 1
-          fi
-          printf '%s\n' "$listing"
+          batch_file="$(mktemp)"
+          trap 'rm -f "$batch_file"' EXIT
 
-          if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
-            echo "::warning::$SFTP_REMOTE_DIR/dist/ existiert (wird beim Upload bereinigt)."
-          fi
+          python3 - <<'PY' > "$batch_file"
+          from pathlib import Path
 
-      - name: Inhalt von dist nach IONOS übertragen
-        env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
-          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
-        run: |
-          set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --delete --parallel=4 --exclude-glob .git* --exclude-glob .env* --exclude-glob *.log --exclude-glob intern/photos --exclude-glob intern/photos/** dist/ .; quit"
-          exit_code=1
-          for attempt in $(seq 1 "$SFTP_UPLOAD_ATTEMPTS"); do
-            echo "Upload-Versuch $attempt/$SFTP_UPLOAD_ATTEMPTS"
-            set +e
-            timeout "${SFTP_UPLOAD_TIMEOUT_SECONDS}s" lftp -e "$lftp_script"
-            exit_code=$?
-            set -e
-            if [ "$exit_code" -eq 0 ]; then
-              break
-            fi
-            if [ "$exit_code" -eq 124 ]; then
-              break
-            fi
-            if [ "$attempt" -lt "$SFTP_UPLOAD_ATTEMPTS" ]; then
-              sleep 15
-            fi
-          done
-          if [ "$exit_code" -ne 0 ]; then
-            if [ "$exit_code" -eq 124 ]; then
-              echo "::error::Timeout beim Upload nach ${SFTP_UPLOAD_TIMEOUT_SECONDS}s."
-            else
-              echo "::error::Upload nach $SFTP_REMOTE_DIR fehlgeschlagen nach ${SFTP_UPLOAD_ATTEMPTS} Versuch(en) (Exit $exit_code)."
-            fi
-            exit 1
-          fi
+          root = Path("dist")
+          remote_root = "/sv-netzwerk"
 
-      - name: Inhalt des Document Root prüfen
-        env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
-          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
-        run: |
-          set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; ls $SFTP_REMOTE_DIR; quit"
-          exit_code=1
-          listing=""
-          for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
-            set +e
-            listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$lftp_script")"
-            exit_code=$?
-            set -e
-            if [ "$exit_code" -eq 0 ]; then
-              break
-            fi
-            if [ "$attempt" -lt "$SFTP_CHECK_ATTEMPTS" ]; then
-              sleep 15
-            fi
-          done
-          if [ "$exit_code" -ne 0 ]; then
-            if [ "$exit_code" -eq 124 ]; then
-              echo "::error::Timeout bei Post-Upload-Document-Root-Prüfung nach ${SFTP_CHECK_TIMEOUT_SECONDS}s."
-            else
-              echo "::error::Post-Upload-Prüfung für $SFTP_REMOTE_DIR fehlgeschlagen (Exit $exit_code)."
-            fi
-            exit 1
-          fi
-          printf '%s\n' "$listing"
+          def excluded(rel: str) -> bool:
+              return (
+                  rel.startswith(".env")
+                  or rel.endswith(".log")
+                  or rel == "intern/photos"
+                  or rel.startswith("intern/photos/")
+              )
 
-          printf '%s\n' "$listing" | grep -Eq ' index\.html$'
-          printf '%s\n' "$listing" | grep -Eq ' assets$'
-          printf '%s\n' "$listing" | grep -Eq ' deploy-version\.txt$'
+          def q(value: str) -> str:
+              return '"' + value.replace('\\', '\\\\').replace('"', '\\"') + '"'
 
-          if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
-            echo "::error::$SFTP_REMOTE_DIR/dist/ wurde unerwartet angelegt."
-            exit 1
-          fi
+          print(f"cd {q(remote_root)}")
+
+          dirs = []
+          for path in root.rglob("*"):
+              if not path.is_dir():
+                  continue
+              rel = path.relative_to(root).as_posix()
+              if not rel or excluded(rel):
+                  continue
+              dirs.append(rel)
+          dirs.sort(key=lambda p: (p.count('/'), p))
+          for rel in dirs:
+              print(f"-mkdir {q(rel)}")
+
+          files = []
+          for path in root.rglob("*"):
+              if not path.is_file():
+                  continue
+              rel = path.relative_to(root).as_posix()
+              if excluded(rel) or rel == "deploy-version.txt":
+                  continue
+              files.append((rel, path.as_posix()))
+          files.sort()
+          for rel, local in files:
+              print(f"put {q(local)} {q(rel)}")
+
+          print(f"put {q('dist/deploy-version.txt')} {q('deploy-version.txt')}")
+          print("quit")
+          PY
+
+          echo "Recovery-Batch enthält $(wc -l < "$batch_file") SFTP-Befehle."
+          export SSHPASS="$SFTP_PASSWORD"
+          timeout "${SFTP_UPLOAD_TIMEOUT_SECONDS}s" sshpass -e sftp -4 \
+            -oBatchMode=no \
+            -oStrictHostKeyChecking=no \
+            -oUserKnownHostsFile=/dev/null \
+            -oConnectTimeout="$SFTP_CONNECT_TIMEOUT_SECONDS" \
+            -oConnectionAttempts=1 \
+            -P "$SFTP_PORT" \
+            -b "$batch_file" \
+            "$SFTP_USERNAME@$SFTP_HOST"
 
       - name: Deployment online verifizieren
         env:
@@ -254,10 +196,9 @@ jobs:
         run: |
           set -euo pipefail
 
-          # 1. deploy-version.txt
           ok=0
           for i in {1..24}; do
-            response="$(curl --location --fail --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+            response="$(curl --location --fail --silent --show-error --retry 2 --retry-delay 3 --retry-all-errors \
               https://www.sv-netzwerk.eu/deploy-version.txt || true)"
             if [ -n "$response" ]; then
               printf '%s\n' "$response"
@@ -267,7 +208,7 @@ jobs:
                 break
               fi
             fi
-            sleep 15
+            sleep 10
           done
           if [ "$ok" != "1" ]; then
             echo "::error::Online-Commit stimmt nach Wartezeit nicht mit $EXPECTED_SHA überein."
@@ -275,29 +216,28 @@ jobs:
           fi
           echo "deploy-version.txt: OK"
 
-          # 2. Homepage
-          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
-            -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/ || true)"
-          if [ "$status" != "200" ]; then
-            echo "::error::Homepage liefert HTTP $status statt 200."
-            exit 1
-          fi
-          echo "Homepage: HTTP $status OK"
+          check_url() {
+            label="$1"
+            url="$2"
+            status="$(curl --location --silent --show-error --retry 2 --retry-delay 3 --retry-all-errors \
+              -o /dev/null -w '%{http_code}' "$url" || true)"
+            if [ "$status" != "200" ]; then
+              echo "::error::$label liefert HTTP $status statt 200: $url"
+              exit 1
+            fi
+            echo "$label: HTTP $status OK"
+          }
 
-          # 3. /intern/login/
-          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
-            -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/login/ || true)"
-          if [ "$status" != "200" ]; then
-            echo "::error::/intern/login/ liefert HTTP $status statt 200."
-            exit 1
-          fi
-          echo "/intern/login/: HTTP $status OK"
+          check_url "Homepage" "https://www.sv-netzwerk.eu/"
+          check_url "Fachbeitrag Hochwasser" "https://www.sv-netzwerk.eu/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/"
+          check_url "Fachbeitrag Starkregen" "https://www.sv-netzwerk.eu/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/"
+          check_url "Interner Login" "https://www.sv-netzwerk.eu/intern/login/"
+          check_url "Fachwissen Navigation" "https://www.sv-netzwerk.eu/fachwissen/"
+          check_url "CSS" "https://www.sv-netzwerk.eu/assets/style.css"
+          check_url "Team-Bild" "https://www.sv-netzwerk.eu/assets/images/team/christian-waechter-bw.webp"
 
-          # 4. /intern/fensterpruefung-bonn/
-          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
-            -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/fensterpruefung-bonn/ || true)"
-          if [ "$status" != "200" ]; then
-            echo "::error::/intern/fensterpruefung-bonn/ liefert HTTP $status statt 200."
-            exit 1
-          fi
-          echo "/intern/fensterpruefung-bonn/: HTTP $status OK"
+          home="$(curl --location --fail --silent --show-error https://www.sv-netzwerk.eu/)"
+          printf '%s' "$home" | grep -q '/fachwissen/'
+          printf '%s' "$home" | grep -q '/leistungen/'
+          printf '%s' "$home" | grep -Eq 'stylesheet|\.css'
+          echo "Homepage-Navigation und Stylesheet-Verweis: OK"
