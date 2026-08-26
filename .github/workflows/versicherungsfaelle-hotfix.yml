@@ -1,15 +1,6 @@
 name: Versicherungsfaelle Unterportal Deploy
 
 on:
-  push:
-    paths:
-      - '.github/workflows/versicherungsfaelle-hotfix.yml'
-      - 'sv-netzwerk/src/pages/intern/versicherungsfaelle/**'
-      - 'sv-netzwerk/src/pages/intern/index.astro'
-      - 'sv-netzwerk/src/pages/intern/kalkulation/**'
-      - 'sv-netzwerk/src/layouts/InternalLayout.astro'
-      - 'sv-netzwerk/public/intern/api/google-drive-sync.php'
-      - 'sv-netzwerk/public/intern/api/google-drive-oauth.php'
   workflow_dispatch:
 
 permissions:
