@@ -48,7 +48,7 @@ if ($outputRepairCount !== 1) {
 }
 $source = str_replace(
     '$order[\'outputs\']=$outputs;requireCaseFolderAccess($folderId,$user);',
-    '$explicitOutput=trim((string)($_GET[\'selected_output\']??\'\'));if($explicitOutput!==\'\')$outputs=[$explicitOutput];$order[\'outputs\']=$outputs;requireCaseFolderAccess($folderId,$user);',
+    '$explicitOutput=trim((string)($body[\'selected_output\']??($_GET[\'selected_output\']??\'\')));if($explicitOutput!==\'\')$outputs=[$explicitOutput];$order[\'outputs\']=$outputs;requireCaseFolderAccess($folderId,$user);',
     $source,
     $explicitOutputCount
 );
