@@ -44,20 +44,11 @@ function krV2Handle(array $user): void
         if ($action === 'files') apiJson(['ok'=>true,'files'=>krKvas($folder)]);
         if ($action === 'sent_status') {
             $caseNo = krCaseNo($folder);
-            $response = krHttp('GET', 'https://graph.microsoft.com/v1.0/users/'.rawurlencode(KR_SENDER).'/mailFolders/sentitems/messages?'.http_build_query([
-                '$select'=>'id,subject,sentDateTime,toRecipients,ccRecipients,bccRecipients',
-                '$orderby'=>'sentDateTime desc',
-                '$top'=>'50',
-            ]), ['Authorization: Bearer '.krMs()]);
-            if ($response['status'] < 200 || $response['status'] >= 300) throw new RuntimeException('Gesendete Elemente konnten nicht geprüft werden.');
-            $messages = json_decode($response['body'], true);
-            foreach (($messages['value'] ?? []) as $message) {
-                if ($caseNo === '' || !str_contains((string)($message['subject'] ?? ''), $caseNo)) continue;
-                $addresses = static function (array $items): array {
-                    return array_values(array_filter(array_map(static fn(array $item): string => trim((string)($item['emailAddress']['address'] ?? '')), $items)));
-                };
-                apiJson(['ok'=>true,'found'=>true,'subject'=>(string)($message['subject'] ?? ''),'sent_at'=>(string)($message['sentDateTime'] ?? ''),'to'=>$addresses((array)($message['toRecipients'] ?? [])),'cc'=>$addresses((array)($message['ccRecipients'] ?? [])),'bcc'=>$addresses((array)($message['bccRecipients'] ?? []))]);
-            }
+            db()->exec('CREATE TABLE IF NOT EXISTS kva_send_log (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, folder_id VARCHAR(160) NOT NULL, case_no VARCHAR(100) NOT NULL, subject VARCHAR(500) NOT NULL, recipient VARCHAR(320) NOT NULL, cc_json TEXT NOT NULL, bcc VARCHAR(320) NOT NULL, sent_at DATETIME NOT NULL, INDEX idx_kva_send_folder (folder_id, sent_at))');
+            $query = db()->prepare('SELECT subject, recipient, cc_json, bcc, sent_at FROM kva_send_log WHERE folder_id=:folder ORDER BY sent_at DESC LIMIT 1');
+            $query->execute([':folder'=>$folder]);
+            $message = $query->fetch();
+            if (is_array($message)) apiJson(['ok'=>true,'found'=>true,'subject'=>(string)$message['subject'],'sent_at'=>(string)$message['sent_at'],'to'=>[(string)$message['recipient']],'cc'=>json_decode((string)$message['cc_json'],true)?:[],'bcc'=>(string)$message['bcc']!==''?[(string)$message['bcc']]:[]]);
             apiJson(['ok'=>true,'found'=>false,'case_no'=>$caseNo]);
         }
         if ($action === 'analyze') {
@@ -147,6 +138,9 @@ function krV2Handle(array $user): void
             if ($preview['sparkasse']) $message['bccRecipients'] = [krRec(KR_ARCHIVE)];
             $response = krHttp('POST','https://graph.microsoft.com/v1.0/users/'.rawurlencode(KR_SENDER).'/sendMail',['Authorization: Bearer '.krMs(),'Content-Type: application/json'],json_encode(['message'=>$message,'saveToSentItems'=>true],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
             if ($response['status'] < 200 || $response['status'] >= 300) throw new RuntimeException('KVA-Freigabe konnte nicht versendet werden.');
+            db()->exec('CREATE TABLE IF NOT EXISTS kva_send_log (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, folder_id VARCHAR(160) NOT NULL, case_no VARCHAR(100) NOT NULL, subject VARCHAR(500) NOT NULL, recipient VARCHAR(320) NOT NULL, cc_json TEXT NOT NULL, bcc VARCHAR(320) NOT NULL, sent_at DATETIME NOT NULL, INDEX idx_kva_send_folder (folder_id, sent_at))');
+            $log = db()->prepare('INSERT INTO kva_send_log (folder_id, case_no, subject, recipient, cc_json, bcc, sent_at) VALUES (:folder,:case_no,:subject,:recipient,:cc,:bcc,NOW())');
+            $log->execute([':folder'=>$folder,':case_no'=>$preview['case_no'],':subject'=>$subject,':recipient'=>$to,':cc'=>json_encode(array_keys($cc),JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':bcc'=>$preview['sparkasse']?KR_ARCHIVE:'']);
             apiJson(['ok'=>true,'subject'=>$subject,'sender'=>KR_SENDER,'recipient'=>$to,'cc'=>array_keys($cc),'bcc'=>$preview['sparkasse']?KR_ARCHIVE:'']);
         }
         apiError(404, 'Unbekannte Aktion.');
