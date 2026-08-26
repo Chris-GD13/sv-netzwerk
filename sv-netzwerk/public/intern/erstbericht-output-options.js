@@ -1,5 +1,9 @@
 (() => {
   const apply = () => {
+    // Die neue Portaloberfläche führt Schadenbericht und TF-/GF-Schadenbericht
+    // bewusst als gegenseitig ausschließende Primärauswahl. Die alte
+    // Kompatibilitätsergänzung darf dort keine zusätzlichen Checkboxen erzeugen.
+    if (document.getElementById('vf-primary-outputs')) return;
     const outputs = document.getElementById('vf-outputs');
     if (outputs) {
       const firstExisting = outputs.querySelector('label');

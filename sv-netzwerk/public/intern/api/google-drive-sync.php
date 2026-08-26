@@ -15,6 +15,21 @@ const CASE_META_NAME = '00_Falldaten.json';
 
 $action = (string)($_GET['action'] ?? 'status');
 
+function gdIsSusanne(array $user):bool{$email=gdUserKey($user);$name=gdNormalize((string)($user['full_name']??''));return str_contains($email,'susanne')||str_contains($name,'susanne waechter');}
+function gdExpertIdentity(string $key,array $backoffice):array{return match($key){'holger'=>array_merge($backoffice,['email'=>'hr@sv-schuett.eu','full_name'=>'Holger Roth']),'marc'=>array_merge($backoffice,['email'=>'ms@sv-schuett.eu','full_name'=>'Marc Schütt']),default=>array_merge($backoffice,['email'=>'cw@sv-netzwerk.eu','full_name'=>'Christian Wächter'])};}
+
+$portalUser=$user;
+$isBackoffice=gdIsSusanne($portalUser);
+if($isBackoffice&&$action==='select_expert'){
+    if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
+    $body=requestBody();$expert=(string)($body['expert']??'christian');
+    if(!in_array($expert,['christian','holger','marc'],true))apiError(400,'Unbekannter Sachverständiger.');
+    $_SESSION['svnet_selected_expert']=$expert;
+    apiJson(['ok'=>true,'expert'=>$expert]);
+}
+$selectedExpert=$isBackoffice?(string)($_SESSION['svnet_selected_expert']??'christian'):'';
+if($isBackoffice)$user=gdExpertIdentity($selectedExpert,$portalUser);
+
 function gdSettingGet(string $key, string $default=''): string {
     try {
         db()->exec("CREATE TABLE IF NOT EXISTS app_settings (
@@ -125,7 +140,7 @@ function gfSections(string $key):array{return match($key){'erstbericht'=>['Versi
 function gfDocumentHtml(string $key,array $meta,array $order,string $userName):string{$title=gfOutputTitle($key);$schaden=(string)($meta['schaden_nr']??'');$vsnr=(string)($meta['versicherungsschein_nr']??'');$obj=(string)($meta['vn_objekt']??'');$ort=trim(((string)($meta['strasse']??'')).' '.((string)($meta['ort']??'')));$reserve=(string)($meta['reserve']??'');$instruction=(string)($order['instructions']??'');$work=(string)($order['work_mode']??'');$open=(string)($order['open_points']??'');$sections='';foreach(gfSections($key)as$s)$sections.='<h2>'.gdH($s).'</h2><p><em>Aus der Fallakte fachlich zu befüllen. Fehlende Angaben als offen kennzeichnen; keine Tatsachen erfinden.</em></p>';$generated=date('d.m.Y H:i');return'<!doctype html><html><head><meta charset="utf-8"><title>'.gdH($title).'</title><style>body{font-family:Arial,sans-serif;font-size:11pt;line-height:1.45;margin:2cm;color:#111}h1{font-size:18pt;margin-bottom:18px}h2{font-size:13pt;margin-top:22px;border-bottom:1px solid #bbb;padding-bottom:4px}table{border-collapse:collapse;width:100%;margin:12px 0 20px}td{border:1px solid #ccc;padding:6px;vertical-align:top}.label{font-weight:bold;width:30%}.note{background:#f3f6f8;padding:10px;border:1px solid #d6e0e7}.footer{margin-top:30px}</style></head><body><h1>'.gdH($title).'</h1><table><tr><td class="label">Schaden-Nr.</td><td>'.gdH($schaden).'</td></tr><tr><td class="label">Versicherungsschein-Nr.</td><td>'.gdH($vsnr).'</td></tr><tr><td class="label">VN / Objekt</td><td>'.gdH($obj).'</td></tr><tr><td class="label">Schadenort</td><td>'.gdH($ort).'</td></tr><tr><td class="label">Aktuelle Schadenhöhe / Reserve</td><td>'.gdH($reserve).'</td></tr></table><div class="note"><strong>Arbeitsauftrag</strong><br>'.nl2br(gdH($instruction?:'Kein zusätzlicher Freitext hinterlegt.')).'<br><br><strong>Bearbeitungsart:</strong> '.gdH($work).'<br><strong>Offene Punkte:</strong> '.gdH($open).'</div>'.$sections.'<div class="footer"><p>Erstellt am '.gdH($generated).' durch '.gdH($userName).'.</p><p>Christian Wächter<br>Sachverständiger &amp; Großschadenregulierer<br>DIN EN ISO/IEC 17024 zertifiziert<br>https://www.sv-netzwerk.eu/</p></div></body></html>';}
 
 switch($action){
-case'status':gdAccessToken();gdEnsureKnownCasesRoots();$caseRoot=gdUserCasesRoot($user);$counts=['cases'=>count(gdListChildren($caseRoot['id'],null,1000)),'knowledge'=>count(gdListChildren(gdFolderId('knowledge'),null,1000)),'blanco'=>count(gdListChildren(gdFolderId('blanco'),null,1000))];apiJson(['ok'=>true,'connected'=>true,'user_scope'=>hash('sha256',gdUserKey($user)),'folders'=>['cases'=>['id'=>$caseRoot['id'],'name'=>$caseRoot['name'],'items'=>$counts['cases']],'knowledge'=>['id'=>gdFolderId('knowledge'),'name'=>'00_KI-Wissensbasis','items'=>$counts['knowledge']],'blanco'=>['id'=>gdFolderId('blanco'),'name'=>'Blanco','items'=>$counts['blanco']]]]);
+case'status':gdAccessToken();gdEnsureKnownCasesRoots();$caseRoot=gdUserCasesRoot($user);$counts=['cases'=>count(gdListChildren($caseRoot['id'],null,1000)),'knowledge'=>count(gdListChildren(gdFolderId('knowledge'),null,1000)),'blanco'=>count(gdListChildren(gdFolderId('blanco'),null,1000))];apiJson(['ok'=>true,'connected'=>true,'user_scope'=>hash('sha256',gdUserKey($user)),'backoffice'=>$isBackoffice,'selected_expert'=>$selectedExpert,'folders'=>['cases'=>['id'=>$caseRoot['id'],'name'=>$caseRoot['name'],'items'=>$counts['cases']],'knowledge'=>['id'=>gdFolderId('knowledge'),'name'=>'00_KI-Wissensbasis','items'=>$counts['knowledge']],'blanco'=>['id'=>gdFolderId('blanco'),'name'=>'SV-GF Fälle','items'=>$counts['blanco']]]]);
 case'recent_cases':
   $caseRoot=gdUserCasesRoot($user);
   $folders=gdListChildren($caseRoot['id'],'application/vnd.google-apps.folder',1000);

@@ -22,7 +22,7 @@ function cbToken(): string {
         if(!str_starts_with($serviceJson,'{')){$decoded=base64_decode($serviceJson,true);if($decoded!==false)$serviceJson=$decoded;}
         $svc=json_decode($serviceJson,true);
         if(is_array($svc)&&!empty($svc['client_email'])&&!empty($svc['private_key'])){
-            $now=time();$header=cbB64url(json_encode(['alg'=>'RS256','typ'=>'JWT']));$claims=cbB64url(json_encode(['iss'=>$svc['client_email'],'scope'=>'https://www.googleapis.com/auth/drive.readonly','aud'=>'https://oauth2.googleapis.com/token','iat'=>$now,'exp'=>$now+3500]));$input=$header.'.'.$claims;$sig='';
+            $now=time();$header=cbB64url(json_encode(['alg'=>'RS256','typ'=>'JWT']));$claims=cbB64url(json_encode(['iss'=>$svc['client_email'],'scope'=>'https://www.googleapis.com/auth/drive','aud'=>'https://oauth2.googleapis.com/token','iat'=>$now,'exp'=>$now+3500]));$input=$header.'.'.$claims;$sig='';
             if(openssl_sign($input,$sig,$svc['private_key'],OPENSSL_ALGO_SHA256)){
                 $r=cbHttp('POST','https://oauth2.googleapis.com/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['grant_type'=>'urn:ietf:params:oauth:grant-type:jwt-bearer','assertion'=>$input.'.'.cbB64url($sig)]),false);$j=json_decode($r['body'],true);if($r['status']===200&&!empty($j['access_token']))return $token=(string)$j['access_token'];
             }
@@ -52,23 +52,33 @@ function cbDocxPreview(string $bytes,string $name):string{
     foreach($xp->query('//w:body/w:p|//w:body/w:tbl//w:tr')?:[]as$node){$text='';foreach($xp->query('.//w:t',$node)?:[]as$textNode)$text.=(string)$textNode->textContent;$text=trim($text);if($text!=='')$parts[]='<p>'.htmlspecialchars($text,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8').'</p>';}
     if(!$parts)return'';$title=htmlspecialchars($name,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');return'<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'.$title.'</title><style>body{font-family:Arial,sans-serif;font-size:16px;line-height:1.55;margin:0;padding:20px;color:#172f45;background:#fff}h1{font-size:20px;line-height:1.3;margin:0 0 22px;overflow-wrap:anywhere}p{margin:0 0 12px;white-space:pre-wrap} @media(min-width:760px){body{max-width:850px;margin:auto;padding:40px}}</style></head><body><h1>'.$title.'</h1>'.implode('',$parts).'</body></html>';
 }
-function cbStreamFile(array $file):never{
+function cbStreamFile(array $file,bool $forceDownload=false):never{
     $id=(string)$file['id'];$mime=(string)($file['mimeType']??'application/octet-stream');$name=cbSafeName((string)($file['name']??'Datei'));
     $export=['application/vnd.google-apps.document'=>['application/vnd.openxmlformats-officedocument.wordprocessingml.document','.docx'],'application/vnd.google-apps.spreadsheet'=>['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','.xlsx'],'application/vnd.google-apps.presentation'=>['application/vnd.openxmlformats-officedocument.presentationml.presentation','.pptx']];
     if(isset($export[$mime])){[$outMime,$ext]=$export[$mime];if(!str_ends_with(strtolower($name),$ext))$name.=$ext;$url='https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'/export?'.http_build_query(['mimeType'=>$outMime]);}
     else{$outMime=$mime;$url='https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'?alt=media&supportsAllDrives=true';}
     $r=cbHttp('GET',$url);if($r['status']!==200)apiError(503,'Datei konnte nicht aus der Fallakte geladen werden.');
     $isDocx=$outMime==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'||str_ends_with(strtolower($name),'.docx');
-    if($isDocx){$preview=cbDocxPreview($r['body'],$name);if($preview!==''){header('Content-Type: text/html; charset=utf-8');header('Content-Length: '.strlen($preview));header("Content-Disposition: inline; filename*=UTF-8''".rawurlencode($name.'.html'));echo$preview;exit;}}
+    if($isDocx&&!$forceDownload){$preview=cbDocxPreview($r['body'],$name);if($preview!==''){header('Content-Type: text/html; charset=utf-8');header('Content-Length: '.strlen($preview));header("Content-Disposition: inline; filename*=UTF-8''".rawurlencode($name.'.html'));echo$preview;exit;}}
     // Allgemeine Portalberichte werden aus Kompatibilitätsgründen als .doc
     // gespeichert, enthalten technisch aber HTML. Im Browser müssen sie daher
     // als HTML angezeigt werden; application/msword erzwingt insbesondere auf
     // iPhone/iPad einen unbrauchbaren Download.
     $isHtmlDoc=$mime==='application/msword'&&preg_match('/^\s*(?:<!doctype\s+html|<html\b)/i',$r['body'])===1;
     if($isHtmlDoc)$outMime='text/html; charset=utf-8';
-    $inline=$isHtmlDoc||preg_match('#^(?:application/pdf|image/|text/)#i',$outMime)===1;header('Content-Type: '.$outMime);header('Content-Length: '.strlen($r['body']));header('Content-Disposition: '.($inline?'inline':'attachment')."; filename*=UTF-8''".rawurlencode($name));echo$r['body'];exit;
+    $inline=!$forceDownload&&($isHtmlDoc||preg_match('#^(?:application/pdf|image/|text/)#i',$outMime)===1);header('Content-Type: '.$outMime);header('Content-Length: '.strlen($r['body']));header('Content-Disposition: '.($inline?'inline':'attachment')."; filename*=UTF-8''".rawurlencode($name));echo$r['body'];exit;
 }
 $tree=cbTree($folderId);$action=(string)($_GET['action']??'list');
-if($action==='file'){$fileId=trim((string)($_GET['file_id']??''));$file=cbFindInTree($tree,$fileId);if(!$file)apiError(404,'Die Datei gehört nicht zu diesem Schadenfall.');cbStreamFile($file);}
+if($action==='file'||$action==='download'){$fileId=trim((string)($_GET['file_id']??''));$file=cbFindInTree($tree,$fileId);if(!$file)apiError(404,'Die Datei gehört nicht zu diesem Schadenfall.');cbStreamFile($file,$action==='download');}
+if($action==='delete'){
+    if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
+    $body=requestBody();$fileId=trim((string)($body['file_id']??''));$file=cbFindInTree($tree,$fileId);
+    if(!$file)apiError(404,'Die Datei gehört nicht zu diesem Schadenfall.');
+    $name=(string)($file['name']??'');
+    if(!preg_match('/(?:Bericht|Erstbericht|Zwischenbericht|Schlussbericht|Schlusserkl|Nachtrag|Stellungnahme|Zahlungsbef|Rückfrage|Rueckfrage|Dokumentenindex|Rechnungsregister|Schadenprotokoll)/ui',$name)||!preg_match('/\d{4}-\d{2}-\d{2}_\d{6}/',$name))apiError(403,'Nur im Portal erzeugte Ausgabedokumente dürfen hier gelöscht werden.');
+    $r=cbHttp('DELETE','https://www.googleapis.com/drive/v3/files/'.rawurlencode($fileId).'?supportsAllDrives=true');
+    if($r['status']!==204)apiError(503,'Dokument konnte nicht gelöscht werden.');
+    apiJson(['ok'=>true,'deleted'=>$fileId]);
+}
 $metaUrl='https://www.googleapis.com/drive/v3/files/'.rawurlencode($folderId).'?'.http_build_query(['fields'=>'id,name','supportsAllDrives'=>'true']);$mr=cbHttp('GET',$metaUrl);$meta=json_decode($mr['body'],true)?:[];
 echo json_encode(['ok'=>true,'folder'=>['id'=>$folderId,'name'=>(string)($meta['name']??'Fallakte')],'items'=>$tree],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
