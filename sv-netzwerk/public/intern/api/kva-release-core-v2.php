@@ -48,17 +48,22 @@ function krV2Handle(array $user): void
                 $gross = null;
                 $warnings[] = 'Die endgültigen Gesamtbeträge konnten nicht zweifelsfrei und rechnerisch bestätigt werden.';
             }
-            $insurer = trim((string)($result['insurer'] ?? ''));
-            if ($insurer === '') $insurer = krCaseInsurer($folder);
+            $caseInsurer = krCaseInsurer($folder);
+            $insurer = $caseInsurer !== '' ? $caseInsurer : trim((string)($result['insurer'] ?? ''));
             $sparkasse = (bool)($result['sparkassenversicherung'] ?? false)
                 || preg_match('/sparkassen.?versicherung|SV SparkassenVersicherung/i', $insurer) === 1;
             if ($sparkasse && $insurer === '') $insurer = 'SV SparkassenVersicherung';
+            $email = trim((string)($result['email'] ?? ''));
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $email = '';
+                $warnings[] = 'Die geschäftliche E-Mail-Adresse des KVA-Absenders wurde nicht sicher erkannt.';
+            }
             $preview = [
                 'folder'=>$folder,
                 'case_no'=>krCaseNo($folder),
                 'source'=>$name,
                 'company'=>trim((string)($result['company'] ?? '')),
-                'email'=>trim((string)($result['email'] ?? '')),
+                'email'=>$email,
                 'quote_number'=>trim((string)($result['quote_number'] ?? '')),
                 'net'=>$net,
                 'gross'=>$gross,
@@ -85,7 +90,7 @@ function krV2Handle(array $user): void
             $input = requestBody();
             $preview = krVerify((string)($input['token'] ?? ''));
             if (!hash_equals($folder, (string)$preview['folder']) || !hash_equals(krCaseNo($folder), (string)$preview['case_no'])) throw new RuntimeException('Aktiver Fall hat sich geändert.');
-            if ($preview['company'] === '' || $preview['quote_number'] === '' || $preview['insurer'] === '' || !is_numeric($preview['net']) || !is_numeric($preview['gross'])) throw new RuntimeException('Pflichtangaben fehlen.');
+            if ($preview['company'] === '' || !filter_var((string)$preview['email'], FILTER_VALIDATE_EMAIL) || $preview['quote_number'] === '' || $preview['insurer'] === '' || !is_numeric($preview['net']) || !is_numeric($preview['gross'])) throw new RuntimeException('Pflichtangaben fehlen.');
             $to = trim((string)($input['to'] ?? $preview['email']));
             $body = trim((string)($input['body'] ?? ''));
             if ($body === '') throw new RuntimeException('E-Mail-Text fehlt.');
