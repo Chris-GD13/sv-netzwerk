@@ -42,6 +42,24 @@ function krV2Handle(array $user): void
         $folder = trim((string)($_REQUEST['folder_id'] ?? ''));
         requireCaseFolderAccess($folder, $user);
         if ($action === 'files') apiJson(['ok'=>true,'files'=>krKvas($folder)]);
+        if ($action === 'sent_status') {
+            $caseNo = krCaseNo($folder);
+            $response = krHttp('GET', 'https://graph.microsoft.com/v1.0/users/'.rawurlencode(KR_SENDER).'/mailFolders/sentitems/messages?'.http_build_query([
+                '$select'=>'id,subject,sentDateTime,toRecipients,ccRecipients,bccRecipients',
+                '$orderby'=>'sentDateTime desc',
+                '$top'=>'50',
+            ]), ['Authorization: Bearer '.krMs()]);
+            if ($response['status'] < 200 || $response['status'] >= 300) throw new RuntimeException('Gesendete Elemente konnten nicht geprüft werden.');
+            $messages = json_decode($response['body'], true);
+            foreach (($messages['value'] ?? []) as $message) {
+                if ($caseNo === '' || !str_contains((string)($message['subject'] ?? ''), $caseNo)) continue;
+                $addresses = static function (array $items): array {
+                    return array_values(array_filter(array_map(static fn(array $item): string => trim((string)($item['emailAddress']['address'] ?? '')), $items)));
+                };
+                apiJson(['ok'=>true,'found'=>true,'subject'=>(string)($message['subject'] ?? ''),'sent_at'=>(string)($message['sentDateTime'] ?? ''),'to'=>$addresses((array)($message['toRecipients'] ?? [])),'cc'=>$addresses((array)($message['ccRecipients'] ?? [])),'bcc'=>$addresses((array)($message['bccRecipients'] ?? []))]);
+            }
+            apiJson(['ok'=>true,'found'=>false,'case_no'=>$caseNo]);
+        }
         if ($action === 'analyze') {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
             if (isset($_FILES['file']) && is_uploaded_file((string)($_FILES['file']['tmp_name'] ?? ''))) {
