@@ -1,18 +1,6 @@
 name: Intern Runtime Hotfix
 
 on:
-  push:
-    paths:
-      - '.github/workflows/intern-runtime-hotfix.yml'
-      - 'sv-netzwerk/public/intern/bki-offline.js'
-      - 'sv-netzwerk/public/intern/case-document-browser.js'
-      - 'sv-netzwerk/public/intern/api/case-file-browser.php'
-      - 'sv-netzwerk/public/intern/api/outlook-case-calendar.php'
-      - 'sv-netzwerk/public/intern/api/bki-calculator.php'
-      - 'sv-netzwerk/public/intern/api/kva-release.php'
-      - 'sv-netzwerk/public/intern/api/gf-ai-generate-core.php'
-      - 'sv-netzwerk/public/intern/api/gf-ai-generate.php'
-      - 'sv-netzwerk/scripts/patch-bki-file-search.py'
   workflow_dispatch:
 
 permissions:
