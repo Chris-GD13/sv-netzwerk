@@ -91,6 +91,7 @@ jobs:
           sudo apt-get install --yes lftp
 
       - name: SharePoint-Konfiguration sicher aktualisieren
+        continue-on-error: true
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
           SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
