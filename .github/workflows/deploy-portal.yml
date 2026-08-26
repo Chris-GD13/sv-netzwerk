@@ -1,0 +1,94 @@
+name: SV-Netzwerk Prüfportal bereitstellen
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "sv-netzwerk/public/intern/**"
+      - "sv-netzwerk/src/pages/intern/**"
+      - "sv-netzwerk/src/layouts/InternalLayout.astro"
+      - "sv-netzwerk/src/styles/internal-portal.css"
+      - "sv-netzwerk/src/styles/global.css"
+      - "sv-netzwerk/src/styles/header.css"
+      - "sv-netzwerk/src/lib/internal/**"
+      - "sv-netzwerk/src/assets/sv-netzwerk-logo-portal.svg"
+      - "sv-netzwerk/scripts/prepare-deploy-scope.mjs"
+      - "sv-netzwerk/package.json"
+      - "sv-netzwerk/package-lock.json"
+      - "sv-netzwerk/astro.config.mjs"
+      - ".github/workflows/deploy-portal.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-sv-netzwerk-portal-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-portal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    env:
+      SFTP_REMOTE_DIR: /sv-netzwerk
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v7
+
+      - name: Node.js 22 LTS einrichten
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+
+      - name: Abhängigkeiten installieren
+        run: npm ci --no-audit --no-fund
+
+      - name: Portal bauen und PHP prüfen
+        run: |
+          npm run build
+          find public/intern/api -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Ausschließlich Portaldateien vorbereiten
+        run: |
+          node scripts/prepare-deploy-scope.mjs portal dist deploy-portal
+          test -f deploy-portal/intern/versicherungsfaelle/index.html
+          test -f deploy-portal/intern/api/gf-ai-generate.php
+          test -f deploy-portal/intern/deploy-version.txt
+          test ! -f deploy-portal/index.html
+
+      - name: SFTP-Werkzeug installieren
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes lftp
+
+      - name: Portalpaket ohne Serverkonfiguration übertragen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          timeout 1200s lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --only-newer --parallel=4 --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern/photos --exclude-glob intern/photos/** --exclude-glob intern/api/config.php deploy-portal/ .; quit"
+
+      - name: Portal online verifizieren
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          marker="$(curl --fail --silent --show-error --retry 6 --retry-delay 5 https://www.sv-netzwerk.eu/intern/deploy-version.txt)"
+          printf '%s\n' "$marker"
+          printf '%s\n' "$marker" | grep -Fx "Commit: $EXPECTED_SHA"
+          for path in /intern/login/ /intern/versicherungsfaelle/; do
+            status="$(curl --location --silent --show-error --retry 3 --retry-delay 3 -o /dev/null -w '%{http_code}' "https://www.sv-netzwerk.eu${path}")"
+            test "$status" = "200"
+            echo "$path: HTTP $status"
+          done
