@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Beweissicherung und Fotodokumentation: Standards für belastbare Schadenakten',
+    description: 'Beweissicherung und Fotodokumentation: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/beweissicherung-fotodokumentation-standards/',
+    category: 'Beweissicherung und Fotodokumentation',
+    tags: ['Beweissicherung', 'Fotodokumentation', 'Schadenakte', 'Archivierung'],
+    date: '2026-08-26',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Plausibilitätsprüfung im Schadenfall: Schadenbild, Kausalität und Vorzustand belastbar bewerten',
     description: 'Plausibilitätsprüfung und Schadenbild: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/plausibilitaetspruefung-schadenbild-kausalitaet/',
