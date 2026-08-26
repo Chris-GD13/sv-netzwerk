@@ -36,6 +36,8 @@ jobs:
         run: |
           php -l sv-netzwerk/public/intern/api/gf-ai-generate-core.php
           php -l sv-netzwerk/public/intern/api/gf-ai-generate.php
+          GF_AI_VALIDATE_ONLY=1 GF_AI_VALIDATE_TARGET=/tmp/gf-ai-runtime.php php sv-netzwerk/public/intern/api/gf-ai-generate.php
+          php -l /tmp/gf-ai-runtime.php
 
       - name: Runtime-Dateien direkt nach IONOS uebertragen
         env:

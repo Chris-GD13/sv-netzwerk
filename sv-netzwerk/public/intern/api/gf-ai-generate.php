@@ -297,17 +297,26 @@ if ($countDraftResponse !== 1) throw new RuntimeException('Entwurf konnte nicht 
 $source = str_replace("gfJobUpdate(\$jobId,'done',100,'Dokumentpaket vollständig erstellt.',\$result);", "gfJobUpdate(\$jobId,'done',100,!empty(\$order['draft_only'])?'Entwurf vollständig erstellt.':'Dokumentpaket vollständig erstellt.',\$result);", $source);
 
 // Kein harter Abbruch mehr bei bereits im Kern enthaltenen oder leicht geänderten Mustern.
+if (getenv('GF_AI_VALIDATE_ONLY') === '1') {
+    $target = getenv('GF_AI_VALIDATE_TARGET') ?: sys_get_temp_dir().'/gf-ai-runtime.php';
+    if (file_put_contents($target, "<?php\n".$source) === false) {
+        throw new RuntimeException('Zusammengesetzter KI-Laufzeitcode konnte nicht zur Prüfung geschrieben werden.');
+    }
+    echo $target."\n";
+    exit;
+}
 try {
     eval($source);
 } catch (Throwable $error) {
     $gfFatalHandled = true;
     $errorId = bin2hex(random_bytes(4));
-    error_log('[gf-ai-bootstrap '.$errorId.'] '.$error->getMessage());
+    $detail = $error->getMessage().' in Laufzeitzeile '.$error->getLine();
+    error_log('[gf-ai-bootstrap '.$errorId.'] '.$detail);
     if (!headers_sent()) {
         http_response_code(500);
         header('Content-Type: application/json; charset=utf-8');
         header('Cache-Control: no-store');
     }
-    echo json_encode(['error'=>'Entwurf konnte nicht gestartet werden (Fehler-ID '.$errorId.'): '.$error->getMessage()], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+    echo json_encode(['error'=>'Entwurf konnte nicht gestartet werden (Fehler-ID '.$errorId.'): '.$detail], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
     exit;
 }
