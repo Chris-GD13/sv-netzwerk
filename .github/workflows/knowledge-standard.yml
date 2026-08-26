@@ -70,6 +70,9 @@ jobs:
           DATE_ARG=""
           EXTRA_ARGS=""
           if [ "${{ github.event_name }}" = "schedule" ]; then
+            # GitHub garantiert den Cron-Zeitpunkt, nicht den tatsächlichen Startzeitpunkt.
+            # Ein verspätet gestarteter Zeitplanlauf muss deshalb trotzdem veröffentlichen.
+            EXTRA_ARGS="--allow-outside-window"
             case "${{ github.event.schedule }}" in
               "20 3 * * *"|"20 4 * * *")
                 SLOT_ARG="--slot=morning"
@@ -131,6 +134,10 @@ jobs:
       - name: Zeitfenster vor Commit erneut prüfen
         if: steps.generate.outputs.status != 'skipped'
         run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "Zeitplanlauf erkannt; der Cron bestimmt den Slot, eine GitHub-Verzögerung blockiert die Veröffentlichung nicht."
+            exit 0
+          fi
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.date }}" ]; then
             echo "Backfill-Lauf erkannt; Zeitfensterprüfung vor Commit wird übersprungen."
             exit 0

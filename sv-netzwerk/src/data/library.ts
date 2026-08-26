@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Plausibilitätsprüfung im Schadenfall: Schadenbild, Kausalität und Vorzustand belastbar bewerten',
+    description: 'Plausibilitätsprüfung und Schadenbild: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/plausibilitaetspruefung-schadenbild-kausalitaet/',
+    category: 'Plausibilitätsprüfung und Schadenbild',
+    tags: ['Plausibilitätsprüfung', 'Schadenbild', 'Kausalität', 'Vorzustand', 'Dokumentation'],
+    date: '2026-08-26',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Kostenvoranschläge für Fenster und Türen prüfen: Schadenumfang und Nebenleistungen trennen',
     description: 'Prüffähige Angebote für Fenster und Türen benötigen eindeutige Elemente, Maße, Ausstattung, Anschlussarbeiten und eine technische Begründung des Austauschs.',
     href: '/fachwissen/fenster-tueren-kostenvoranschlag-pruefen/',

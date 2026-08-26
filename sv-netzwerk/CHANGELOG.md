@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.32 – 2026-08-26
+- automatischer morgens Fachbeitrag veröffentlicht: „Plausibilitätsprüfung im Schadenfall: Schadenbild, Kausalität und Vorzustand belastbar bewerten"
+- LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
+- ohne Beitragsbild veröffentlicht; keine typografische Platzhaltergrafik erzeugt
+
 ## 3.4.31 – 2026-08-15
 - automatischer morgens Fachbeitrag veröffentlicht: „Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz (2)"
 - LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt

@@ -34,13 +34,17 @@ jobs:
             echo "run=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          HOUR="$(TZ=Europe/Berlin date +%H)"
-          MINUTE="$(TZ=Europe/Berlin date +%M)"
-          if [ "$HOUR" = "07" ] && [ "$MINUTE" -ge 0 ] && [ "$MINUTE" -le 15 ]; then
+          # GitHub-Zeitpläne dürfen verspätet starten. Die Cron-Identität entscheidet,
+          # welcher der beiden DST-Läufe zuständig ist; die aktuelle Uhrzeit darf
+          # einen verspäteten Kontrolllauf nicht stillschweigend deaktivieren.
+          OFFSET="$(TZ=Europe/Berlin date +%z)"
+          SCHEDULE='${{ github.event.schedule }}'
+          if { [ "$OFFSET" = "+0200" ] && [ "$SCHEDULE" = "5 5 * * *" ]; } || \
+             { [ "$OFFSET" = "+0100" ] && [ "$SCHEDULE" = "5 6 * * *" ]; }; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "DST-Zweitlauf wird übersprungen: $(TZ=Europe/Berlin date '+%F %H:%M %Z')"
+            echo "DST-Zweitlauf wird übersprungen: ${SCHEDULE} / ${OFFSET}"
           fi
 
       - name: Repository auschecken

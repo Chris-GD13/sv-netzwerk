@@ -683,16 +683,10 @@ const buildResumeRuntime = async (row) => {
 
   const knowledgePath = path.join(knowledgeDir, `${slug}.md`);
   const linkedinPath = path.join(linkedinDir, `${berlinDate}_${slug}.txt`);
-  const videoPath = path.join(videosDir, `${berlinDate}_wissen-in-180-sekunden_${slug}.txt`);
-  const imageWebPath = String(row.bilddatei || '').trim() || `/assets/images/linkedin/${slug}.svg`;
-  const imageFileName = path.basename(imageWebPath);
-  const imagePath = path.join(imageDir, imageFileName);
   const missingFiles = [];
 
   if (!(await fileExists(knowledgePath))) missingFiles.push(path.relative(root, knowledgePath).replaceAll('\\', '/'));
   if (!(await fileExists(linkedinPath))) missingFiles.push(path.relative(root, linkedinPath).replaceAll('\\', '/'));
-  if (!(await fileExists(videoPath))) missingFiles.push(path.relative(root, videoPath).replaceAll('\\', '/'));
-  if (!(await fileExists(imagePath))) missingFiles.push(path.relative(root, imagePath).replaceAll('\\', '/'));
 
   if (missingFiles.length > 0) {
     return null;
@@ -725,12 +719,12 @@ const buildResumeRuntime = async (row) => {
     title: String(row.title || '').trim(),
     slug,
     articleUrl,
-    imageWebPath,
-    imageUrl: imageWebPath.startsWith('http') ? imageWebPath : `https://www.sv-netzwerk.eu${imageWebPath}`,
-    imageAlt: String(row.bild_alt_text || '').trim(),
+    imageWebPath: '',
+    imageUrl: '',
+    imageAlt: '',
     knowledgePath: path.relative(root, knowledgePath).replaceAll('\\', '/'),
     linkedinPath: path.relative(root, linkedinPath).replaceAll('\\', '/'),
-    videoPath: path.relative(root, videoPath).replaceAll('\\', '/'),
+    videoPath: '',
     sources: String(row.quellen || '').trim() ? [String(row.quellen || '').trim()] : [],
     publicationLogFile: path.relative(root, publicationLogFile).replaceAll('\\', '/'),
     existingStatuses,
@@ -893,6 +887,7 @@ if (!isWeekend) {
         .filter((item) => Number.isFinite(item.pubDate.getTime()) && Math.abs(nowTs - item.pubDate.getTime()) <= 1000 * 60 * 60 * 72)
         .filter((item) => hasRegionalTitleMatch(item.title))
         .filter((item) => EVENT_HINTS.some((hint) => item.title.toLowerCase().includes(hint)))
+        .filter((item) => !/(auto|pkw|lkw|ford|fahrzeug|garage)\b/i.test(item.title))
         .sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
       if (candidates.length > 0) regionalSignal = candidates[0];
     }
@@ -907,7 +902,16 @@ const shouldUseRegionalNarrative = !isWeekend && Boolean(regionalSignal);
 const topicFromIncompleteRow = incompleteExistingSlotRow
   ? TOPICS.find((item) => item.id === String(incompleteExistingSlotRow.topic_id || '').trim()) ?? null
   : null;
-const topic = topicFromIncompleteRow ?? pickTopic(publicationRows, caseContext?.preferredDamageTypes ?? []);
+let topic = topicFromIncompleteRow ?? pickTopic(publicationRows, caseContext?.preferredDamageTypes ?? []);
+if (!topicFromIncompleteRow && await fileExists(path.join(knowledgeDir, `${topic.slugBase}.md`))) {
+  for (const candidate of TOPICS) {
+    const alreadyLogged = publicationRows.some((row) => String(row.topic_id || '').trim() === candidate.id);
+    if (!alreadyLogged && !await fileExists(path.join(knowledgeDir, `${candidate.slugBase}.md`))) {
+      topic = candidate;
+      break;
+    }
+  }
+}
 const fallbackTitle = caseContext
   ? `${topic.titleBase}: anonymisierte Fallauswertung aus der Praxis`
   : createHeadline(topic, regionalSignal);
@@ -918,10 +922,9 @@ const baseSlug = String(incompleteExistingSlotRow?.url || '').trim()
 const slugBase = baseSlug || (caseContext ? `${topic.slugBase}-anonymisierte-fallauswertung` : topic.slugBase);
 const slug = await ensureUniqueSlug(slugBase, Boolean(baseSlug));
 const articleUrl = `https://www.sv-netzwerk.eu/fachwissen/${slug}/`;
-const imageFileName = `${slug}.svg`;
-const imageWebPath = `/assets/images/linkedin/${imageFileName}`;
-const imageUrl = `https://www.sv-netzwerk.eu${imageWebPath}`;
-const imageAlt = `Symbolbild: ${topic.category} im Kontext der Schadenregulierung und Kumulschadensteuerung`;
+const imageWebPath = '';
+const imageUrl = '';
+const imageAlt = '';
 const caseDocSummary = caseContext?.allDocSignals?.length
   ? caseContext.allDocSignals.map((signal) => docSignalLabels[signal] || signal).join(', ')
   : '';
@@ -983,7 +986,7 @@ const body = [
   `### Technische und regulatorische Einordnung`,
   topic.tech,
   '',
-  `Technische Bewertung und versicherungsrechtliche Entscheidung sind getrennt zu behandeln. Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung, ersetzt jedoch keine individuelle Deckungsprüfung.`,
+  `Die fachliche Einordnung beginnt mit dem dokumentierten Schadenbild und den hieraus abgeleiteten Prüffragen. Technische Bewertung und versicherungstechnische Entscheidung sind getrennt zu behandeln. Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung, ersetzt jedoch keine individuelle Deckungszusage oder Einzelfallprüfung.`,
   '',
   `In Kumulereignissen ist zudem die Reihenfolge der Bearbeitung entscheidend: Sicherheitsrelevante Objekte werden zuerst stabilisiert, parallel erfolgt die Erstklassifizierung nach Schadenumfang und Komplexität. Dadurch lassen sich Vor-Ort-Ressourcen, Nachunternehmer und Regulierkapazitäten priorisiert steuern, ohne dass die Dokumentationsqualität sinkt.`,
   '',
@@ -1005,15 +1008,30 @@ const body = [
   '3. Abgleich mit bereits bekannten Vorschäden, Instandhaltungsdefiziten oder Mängelhinweisen,',
   '4. nachvollziehbare Herleitung, warum einzelne Positionen freigegeben, zurückgestellt oder abgelehnt werden.',
   '',
+  `Die Prüffragen sind je Objekt ausdrücklich festzuhalten: Welcher Befund ist gesichert, welche alternative Ursache bleibt möglich, welche Abgrenzung zu Vorschäden ist erforderlich und welcher zusätzliche Nachweis kann die offene Frage entscheiden? Diese Prüfkette verhindert, dass eine frühe Arbeitshypothese unbemerkt zur endgültigen Schadenursache wird.`,
+  '',
   `### Sanierungsplanung, Rückbau und Trocknung`,
   `Unter hohem Zeitdruck entstehen häufig zu breite Sanierungsumfänge. Fachlich sinnvoller ist eine stufenweise Strategie: Erst sichern und eingrenzen, dann auf Basis belastbarer Mess- und Sichtbefunde den erforderlichen Rückbau festlegen. Die Trocknungsstrategie muss am Material, an Hohlräumen, an Nutzungsvorgaben und an der wirtschaftlich vertretbaren Wiederherstellung ausgerichtet werden.`,
   '',
   `Für Auftraggeber ist wichtig, dass Sofortmaßnahmen nicht automatisch eine Freigabe aller Folgepositionen bedeuten. Jede Folgemaßnahme braucht einen dokumentierten Bezug zur festgestellten Schadenzone und zum notwendigen Wiederherstellungsziel.`,
   '',
+  `### Zuständigkeiten und Fachgrenzen`,
+  `Der technische Schaden-Sachverständige kann Befunde aufnehmen, Schadenzonen abgrenzen, Unterlagen auf Plausibilität prüfen und den weiteren Untersuchungsbedarf benennen. Er ersetzt jedoch weder die objektspezifische Planung noch die Verantwortung ausführender Fachunternehmen. Tragwerksrelevante Auffälligkeiten gehören zu einem qualifizierten Tragwerksplaner; Fragen zu Schadstoffen, Hygiene, Elektrotechnik oder Brandschutz sind der jeweils zuständigen Fachdisziplin zuzuordnen. Ohne deren Prüfung dürfen keine abschließenden Aussagen getroffen werden, wenn die Bewertung von speziellen Messungen, Laboranalysen oder Planungsnachweisen abhängt.`,
+  '',
+  `Diese Trennung ist auch für Freigaben wichtig: Eine Sofortmaßnahme kann zur Gefahrenabwehr erforderlich sein, ohne damit den vollständigen späteren Sanierungsumfang technisch oder versicherungsrechtlich vorwegzunehmen. Offene Fachfragen werden deshalb mit Verantwortlichem, benötigtem Nachweis und Termin in der Schadenakte geführt.`,
+  '',
+  `### Prüffähige Kosten- und Nachtragsprüfung`,
+  `Ein Kostenvoranschlag oder eine Rechnung ist nicht allein wegen eines grundsätzlich plausiblen Schadenbilds vollständig prüffähig. Jede Position braucht einen Bezug zu Bauteil, Schadenzone, Menge, Einheitspreis und technischem Wiederherstellungsziel. Sicherung, Untersuchung, Rückbau, Entsorgung, Trocknung, Reparatur, Wiederherstellung und Erfolgskontrolle sind getrennt darzustellen. Pauschale Sammelpositionen erschweren die Abgrenzung und müssen erläutert oder aufgeteilt werden.`,
+  '',
+  `Bei Nachträgen ist zusätzlich zu dokumentieren, welcher neue Befund nach der ersten Kalkulation aufgetreten ist, warum er vorher nicht erkennbar war und wie sich daraus die geänderte Leistung ableitet. Vorschäden, Instandhaltung, Modernisierung, Sowieso-Kosten und nicht schadenbedingte Zusatzleistungen dürfen nicht in schadenbedingten Mengen aufgehen. Eine vollständige Erneuerung ist nicht automatisch erforderlich, wenn eine technisch gleichwertige lokale Reparatur möglich und fachlich vertretbar ist.`,
+  '',
+  `### Konkrete Dokumentationsanforderungen`,
+  `Eine prüffähige Akte enthält Übersichts-, Bereichs- und Detailaufnahmen mit eindeutiger Bauteilzuordnung, den Erstzustand vor Eingriffen, eine Zeitachse, bekannte Vorschäden und bereits ausgeführte Sofortmaßnahmen. Messungen werden mit Verfahren, Messstelle, Einheit, Zeitpunkt und Randbedingungen dokumentiert. Ausbau- oder Schadenstücke, die für Ursache oder Materialbewertung relevant sein können, sind bis zur Klärung gekennzeichnet aufzubewahren. Planunterlagen, Wartungsinformationen, Angebote, Aufmaße und Abnahmeprotokolle werden so verknüpft, dass Feststellung, Bewertung und Kostenfolge nachvollziehbar bleiben.`,
+  '',
   `### Typische Probleme in der Praxis`,
   ...topic.practice.map((item, index) => `${index + 1}. ${item}`),
   '',
-  `## Praxisbeispiel`,
+  `## Fiktives Praxisbeispiel`,
   caseContext
     ? 'Beispielhafte Fallableitung: Aus einem Schadencluster mit mehreren anonymisierten Realfällen werden zuerst die sicherheitskritischen Objekte priorisiert. Danach werden je Objekt Schadenzone, vorläufige Kausalität und Unterlagenlage getrennt dokumentiert. Erst wenn Mess- und Nachweislage vollständig ist, werden Rückbau- und Kostenfreigaben finalisiert.'
     : shouldUseRegionalNarrative
@@ -1031,17 +1049,28 @@ const body = [
   '- Frühzeitig strukturierte Unterlagen (Fotos, Zeitpunkte, Rechnungen, KVA) bereitstellen.',
   '- Vorläufige Maßnahmen kenntlich machen und spätere Endentscheidungen separat dokumentieren.',
   '- Bei Serienereignissen Priorisierung nach Sicherheits- und Substanzrisiko vornehmen.',
+  '- Versicherungsnehmer sollten den Erstzustand sichern und eigenmächtige irreversible Eingriffe vermeiden, soweit keine akute Gefahrenabwehr entgegensteht.',
+  '- Versicherer und Regulierer sollten offene technische Punkte ausdrücklich zurückstellen, statt aus unvollständigen Unterlagen eine endgültige Freigabe abzuleiten.',
+  '- Sachverständige sollten Befund, technische Hypothese und gesicherte Ursache sprachlich eindeutig unterscheiden.',
   '',
   `### Qualitätssicherung und Nachprüfung`,
   `Die Qualitätssicherung in der Kumulschadenbearbeitung ist kein optionaler Schritt, sondern Voraussetzung für revisionssichere Regulierungsergebnisse. Einheitliche Dokumentationsstandards, systematische Rückprüfungen nach Trocknungsabschluss und strukturierte Abnahmen nach Sanierung sichern die Entscheidungsgrundlage für alle Beteiligten.`,
   '',
   `Für Versicherer bedeutet das: Freigaben sind nur auf Basis dokumentierter Befunde erteilt, nicht pauschal auf Basis des gemeldeten Schadenereignisses. Für Sachverständige heißt es: Die Aussage zur Ursache bleibt vorläufig, solange nicht alle relevanten Unterlagen vorliegen und ausgewertet sind. Für Regulierer gilt: Protokollierte Abstimmungen ersetzen mündliche Absprachen, besonders wenn mehrere Beteiligte an einer Schadenlage mitwirken.`,
   '',
+  `Die Nachprüfung verbindet den technischen Befund mit der Kostenprüfung. Änderungen gegenüber der Erstaufnahme werden einzeln begründet, Mengen werden auf das zugehörige Bauteil zurückgeführt und Freigaben mit ihrem jeweiligen Prüfstand dokumentiert. Damit bleibt erkennbar, welche Entscheidung auf einer Sofortmaßnahme, einer vorläufigen Annahme oder einer abschließend bestätigten Leistung beruht.`,
+  '',
   `## Fazit`,
   `Bei ${topic.category.toLowerCase()} ist nicht die Geschwindigkeit allein entscheidend, sondern die Prüffähigkeit jeder Einzelentscheidung. Wer Feststellung, Bewertung und Empfehlung konsequent trennt, reduziert Nachträge, Konflikte und regulatorische Unsicherheit.`,
   '',
   `## Call-to-Action`,
   `Für die operative Umsetzung unterstützen wir mit strukturierter [Schadenmeldung](/schaden-melden/), methodischer [technischer Schadenabgrenzung](/fachwissen/schadenabgrenzung/), [prüffähiger Dokumentation](/fachwissen/prueffaehige-dokumentation/) und – je nach Fragestellung – der [Gutachter-Plattform](/gutachter-plattform/).`,
+  '',
+  `## Quellen und weiterführende Hinweise`,
+  `- [Bundesministerium der Justiz: Versicherungsvertragsgesetz (VVG)](https://www.gesetze-im-internet.de/vvg_2008/) – gesetzlicher Rahmen; die konkrete Deckungs- und Leistungsprüfung bleibt einzelfallabhängig.`,
+  `- [Bundesanstalt für Arbeitsschutz und Arbeitsmedizin: Technische Regeln für Gefahrstoffe](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html) – Ausgangspunkt für die Gefährdungsbeurteilung bei Tätigkeiten mit möglichen Gefahrstoffen.`,
+  `- [Deutsche Gesetzliche Unfallversicherung: Publikationen](https://publikationen.dguv.de/) – offizielle Regeln und Informationen zu Arbeitsschutz, Gefährdungsbeurteilung und sicheren Arbeitsverfahren.`,
+  `- [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Vorsorge und Verhalten bei Gefahren](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html) – Hinweise zur Gefahrenvorsorge und zum Verhalten in Schadenlagen.`,
 ].join('\n');
 
 const frontmatter = [
@@ -1056,7 +1085,6 @@ const frontmatter = [
   'contentLevel: "B"',
   `teaser: "${teaser}"`,
   `linkedinSummary: "${caseContext ? 'Anonymisierte Fallauswertung aus realen Kalenderfällen mit dokumentenbasierter Einordnung.' : topic.intro}"`,
-  `videoScript: "Wissen in 180 Sekunden: ${caseContext ? 'Anonymisierte Praxisfälle aus dem Einsatzkalender zeigen, wie aus Unterlagen belastbare Regulierungsentscheidungen abgeleitet werden.' : `${topic.intro} Entscheidend sind dokumentierte Feststellungen, klare Abgrenzung von Sofortmaßnahme und Wiederherstellung sowie eine nachvollziehbare Kostenprüfung.`}"`,
   'cta:',
   '  label: "Schaden strukturiert melden"',
   '  href: "/schaden-melden/"',
@@ -1070,8 +1098,7 @@ const frontmatter = [
   `  title: "${truncate(title, 70)}"`,
   `  description: "${truncate(metaDescription, 180)}"`,
   `  canonical: "${articleUrl}"`,
-  `  image: "${imageUrl}"`,
-  `  imageAlt: "${imageAlt}"`,
+  '  noindex: false',
   '---',
   '',
 ].join('\n');
@@ -1090,12 +1117,9 @@ for (const file of knowledgeFiles) {
   }
 }
 
-await mkdir(imageDir, { recursive: true });
 await mkdir(linkedinDir, { recursive: true });
-await mkdir(videosDir, { recursive: true });
 
 await writeFile(knowledgePath, `${frontmatter}${body}\n`);
-await writeFile(path.join(imageDir, imageFileName), makeImageSvg(topic.category, 'Fachlicher Praxisimpuls'));
 
 const hashtagTokens = ['Kumulschaden', 'Schadenregulierung', ...topic.tags]
   .map((tag) => safeSlug(tag))
@@ -1120,11 +1144,6 @@ const linkedinText = [
   hashtags.join(' '),
 ].join('\n');
 await writeFile(path.join(linkedinDir, `${berlinDate}_${slug}.txt`), `${linkedinText}\n`);
-
-const videoText = caseContext
-  ? `Wissen in 180 Sekunden: Heute mit anonymisierten Realfällen aus unserem Einsatzkalender. Fokus: ${topic.category}. Aus Unterlagenhinweisen werden belastbare Feststellungen, klare Maßnahmenpfade und prüffähige Entscheidungen abgeleitet. Mehr dazu: ${articleUrl}`
-  : `Wissen in 180 Sekunden: ${topic.intro} Heute im Fokus: ${topic.category}. Erst Feststellung und Plausibilität sichern, dann Maßnahmen und Kosten freigeben. Mehr dazu: ${articleUrl}`;
-await writeFile(path.join(videosDir, `${berlinDate}_wissen-in-180-sekunden_${slug}.txt`), `${videoText}\n`);
 
 const librarySource = await readText(libraryFile);
 // Normalisiere Zeilenenden für plattformübergreifende Kompatibilität
@@ -1163,7 +1182,7 @@ if (!changelogNormalized.includes(logLine)) {
       })()
     : '1.0.0';
   const dateSection = `## ${nextVersion} – ${berlinDate}`;
-  const stampHeader = `${dateSection}\n${logLine}\n- LinkedIn- und Wissen-in-180-Sekunden-Begleitdateien automatisch erstellt\n- Beitragsbild unter ${imageWebPath} erzeugt\n\n`;
+  const stampHeader = `${dateSection}\n${logLine}\n- LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)\n- ohne Beitragsbild veröffentlicht; keine typografische Platzhaltergrafik erzeugt\n\n`;
   const updated = changelogNormalized.includes(dateSection)
     ? changelogNormalized.replace(`${dateSection}\n`, `${dateSection}\n${logLine}\n`)
     : changelogNormalized.replace(marker, `${marker}${stampHeader}`);
@@ -1190,8 +1209,8 @@ const csvRow = [
   topic.category,
   anlass,
   sources.join(' | '),
-  imageWebPath,
-  imageAlt,
+  '',
+  '',
   'pending',
   'pending',
   'pending',
@@ -1221,7 +1240,7 @@ const runtime = {
   imageAlt,
   knowledgePath: path.relative(root, knowledgePath).replaceAll('\\', '/'),
   linkedinPath: `src/content/linkedin/${berlinDate}_${slug}.txt`,
-  videoPath: `src/content/videos/${berlinDate}_wissen-in-180-sekunden_${slug}.txt`,
+  videoPath: '',
   sources,
   hashtags,
   publicationLogFile: path.relative(root, publicationLogFile).replaceAll('\\', '/'),

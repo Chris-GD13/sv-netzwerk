@@ -1,10 +1,9 @@
 name: Fachbeitrag aus Redaktionsplan veröffentlichen
 
 on:
-  schedule:
-    # 05:20 Europe/Berlin, DST-sicher. Gate verhindert den doppelten UTC-Lauf.
-    - cron: "20 3 * * *"
-    - cron: "20 4 * * *"
+  # Der tägliche Lauf wird ausschließlich von knowledge-standard.yml erzeugt.
+  # Dieser Workflow bleibt als manueller Import redaktionell vorbereiteter
+  # Beiträge erhalten und konkurriert nicht mehr mit der Tagesautomation.
   workflow_dispatch:
     inputs:
       publication_date:

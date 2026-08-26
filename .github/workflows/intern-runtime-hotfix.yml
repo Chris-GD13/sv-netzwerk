@@ -10,6 +10,7 @@ on:
       - 'sv-netzwerk/public/intern/api/outlook-case-calendar.php'
       - 'sv-netzwerk/public/intern/api/bki-calculator.php'
       - 'sv-netzwerk/public/intern/api/kva-release.php'
+      - 'sv-netzwerk/public/intern/api/gf-ai-generate-core.php'
       - 'sv-netzwerk/public/intern/api/gf-ai-generate.php'
       - 'sv-netzwerk/scripts/patch-bki-file-search.py'
   workflow_dispatch:
@@ -31,6 +32,11 @@ jobs:
       - name: Python SFTP installieren
         run: python3 -m pip install --disable-pip-version-check --quiet paramiko
 
+      - name: PHP-Runtime vor dem Deployment prüfen
+        run: |
+          php -l sv-netzwerk/public/intern/api/gf-ai-generate-core.php
+          php -l sv-netzwerk/public/intern/api/gf-ai-generate.php
+
       - name: Runtime-Dateien direkt nach IONOS uebertragen
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
@@ -49,6 +55,7 @@ jobs:
             (Path('sv-netzwerk/public/intern/api/outlook-case-calendar.php'),'/sv-netzwerk/intern/api/outlook-case-calendar.php'),
             (Path('sv-netzwerk/public/intern/api/bki-calculator.php'),'/sv-netzwerk/intern/api/bki-calculator.php'),
             (Path('sv-netzwerk/public/intern/api/kva-release.php'),'/sv-netzwerk/intern/api/kva-release.php'),
+            (Path('sv-netzwerk/public/intern/api/gf-ai-generate-core.php'),'/sv-netzwerk/intern/api/gf-ai-generate-core.php'),
             (Path('sv-netzwerk/public/intern/api/gf-ai-generate.php'),'/sv-netzwerk/intern/api/gf-ai-generate.php'),
           ]
           host=os.environ['SFTP_HOST']; user=os.environ['SFTP_USERNAME']; password=os.environ['SFTP_PASSWORD']; port=int(os.environ.get('SFTP_PORT') or '22')
@@ -79,3 +86,5 @@ jobs:
           test "$calendar_code" = "200" -o "$calendar_code" = "401" -o "$calendar_code" = "403" -o "$calendar_code" = "503"
           kva_code="$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/api/kva-release.php?action=status)"
           test "$kva_code" = "200" -o "$kva_code" = "401" -o "$kva_code" = "403" -o "$kva_code" = "503"
+          ai_code="$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/api/gf-ai-generate.php)"
+          test "$ai_code" = "200" -o "$ai_code" = "400" -o "$ai_code" = "401" -o "$ai_code" = "403" -o "$ai_code" = "405"
