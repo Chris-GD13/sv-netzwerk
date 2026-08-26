@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - "sv-netzwerk/**"
+      - "!sv-netzwerk/public/intern/**"
+      - "!sv-netzwerk/src/pages/intern/**"
+      - "!sv-netzwerk/src/layouts/InternalLayout.astro"
+      - "!sv-netzwerk/src/styles/internal-portal.css"
+      - "!sv-netzwerk/src/lib/internal/**"
       - "!sv-netzwerk/docs/fachbeitrag-veroeffentlichungsprotokoll.csv"
       - "!sv-netzwerk/src/data/calendar-slots.json"
       - ".github/workflows/deploy.yml"
@@ -85,53 +90,17 @@ jobs:
           echo "Build erfolgreich; erzeugte Dateien:"
           find dist -type f | sort | sed -n '1,100p'
 
+      - name: Öffentliches Website-Paket ohne Prüfportal vorbereiten
+        run: |
+          node scripts/prepare-deploy-scope.mjs site dist deploy-site
+          test -f deploy-site/index.html
+          test -f deploy-site/deploy-version.txt
+          test ! -e deploy-site/intern
+
       - name: SFTP-Werkzeug installieren
         run: |
           sudo apt-get update
           sudo apt-get install --yes lftp
-
-      - name: SharePoint-Konfiguration sicher aktualisieren
-        continue-on-error: true
-        env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
-          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
-          MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
-          MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
-          MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
-          MS_SHAREPOINT_SITE_ID: ${{ secrets.MS_SHAREPOINT_SITE_ID }}
-        run: |
-          set -euo pipefail
-          current_env="$(mktemp)"
-          updated_env="$(mktemp)"
-          trap 'rm -f "$current_env" "$updated_env"' EXIT
-          rm -f "$current_env"
-          download_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; get $SFTP_REMOTE_DIR/.env -o $current_env; quit"
-          timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$download_script"
-          test -s "$current_env"
-          cp "$current_env" "$updated_env"
-          sed -i '/^MS_TENANT_ID=/d; /^MS_CLIENT_ID=/d; /^MS_CLIENT_SECRET=/d; /^MS_SHAREPOINT_SITE_ID=/d' "$updated_env"
-          {
-            printf 'MS_TENANT_ID=%s\n' "$MS_TENANT_ID"
-            printf 'MS_CLIENT_ID=%s\n' "$MS_CLIENT_ID"
-            printf 'MS_CLIENT_SECRET=%s\n' "$MS_CLIENT_SECRET"
-            printf 'MS_SHAREPOINT_SITE_ID=%s\n' "$MS_SHAREPOINT_SITE_ID"
-          } >> "$updated_env"
-          if grep -Fq '\\nMS_' "$updated_env"; then
-            echo "::error::Microsoft-Konfiguration enthält literale \\n-Zeichen statt Zeilenumbrüchen."
-            exit 1
-          fi
-          for key in MS_TENANT_ID MS_CLIENT_ID MS_CLIENT_SECRET MS_SHAREPOINT_SITE_ID; do
-            if [ "$(grep -c "^${key}=" "$updated_env")" -ne 1 ]; then
-              echo "::error::Konfigurationsschlüssel ${key} fehlt oder ist mehrfach vorhanden."
-              exit 1
-            fi
-          done
-          test -s "$updated_env"
-          upload_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; put $current_env -o $SFTP_REMOTE_DIR/.env.pre-sharepoint; put $updated_env -o $SFTP_REMOTE_DIR/.env; chmod 600 $SFTP_REMOTE_DIR/.env; rm -f $SFTP_REMOTE_DIR/.env.sharepoint-new; quit"
-          timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$upload_script"
-          echo "SharePoint-Konfiguration wurde sicher aktualisiert; die vorherige Fassung liegt als .env.pre-sharepoint vor."
 
       - name: Document Root vor dem Upload prüfen
         env:
@@ -170,7 +139,7 @@ jobs:
             echo "::warning::$SFTP_REMOTE_DIR/dist/ existiert (wird beim Upload bereinigt)."
           fi
 
-      - name: Inhalt von dist nach IONOS übertragen
+      - name: Öffentliches Website-Paket nach IONOS übertragen
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
           SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
@@ -178,7 +147,7 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --delete --parallel=4 --exclude-glob .git* --exclude-glob .env* --exclude-glob *.log --exclude-glob intern/photos --exclude-glob intern/photos/** dist/ .; quit"
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --only-newer --parallel=4 --exclude-glob .git* --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern --exclude-glob intern/** deploy-site/ .; quit"
           exit_code=1
           for attempt in $(seq 1 "$SFTP_UPLOAD_ATTEMPTS"); do
             echo "Upload-Versuch $attempt/$SFTP_UPLOAD_ATTEMPTS"
