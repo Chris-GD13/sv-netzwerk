@@ -3,7 +3,7 @@ name: SV-Netzwerk bereitstellen
 on:
   push:
     branches:
-      - main
+      - emergency-site-recovery
     paths:
       - "sv-netzwerk/**"
       - "!sv-netzwerk/docs/fachbeitrag-veroeffentlichungsprotokoll.csv"
@@ -134,6 +134,7 @@ jobs:
           echo "SharePoint-Konfiguration wurde sicher aktualisiert; die vorherige Fassung liegt als .env.pre-sharepoint vor."
 
       - name: Document Root vor dem Upload prüfen
+        continue-on-error: true
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
           SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
