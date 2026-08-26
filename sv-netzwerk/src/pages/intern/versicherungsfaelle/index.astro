@@ -94,7 +94,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 </script>
 <script is:inline>
 (() => {
-  const AI='/intern/api/gf-ai-generate.php';
+  const AI='/intern/api/gf-ai-generate.php?legacy=1';
   const currentCase=()=>{for(const storage of[sessionStorage,localStorage])try{const value=JSON.parse(storage.getItem('svnet-case')||'null');if(value?.folder_id)return value}catch{}return null};
   const ensureStarted=async()=>{
     const current=currentCase();
@@ -235,7 +235,7 @@ document.getElementById('vf-recent')?.addEventListener('click',async()=>{
 </script>
 <script is:inline>
 (()=>{
-  const AI='/intern/api/gf-ai-generate.php',FILES='/intern/api/case-file-browser.php';
+  const AI='/intern/api/gf-ai-generate.php?legacy=1',FILES='/intern/api/case-file-browser.php';
   const $=id=>document.getElementById(id),esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const activeCase=()=>{for(const storage of[sessionStorage,localStorage])try{const row=JSON.parse(storage.getItem('svnet-case')||'null');if(row?.folder_id)return row}catch{}return null};
   const request=async(url,options={})=>{const response=await fetch(url,{credentials:'same-origin',...options}),data=await response.json().catch(()=>({}));if(!response.ok)throw Error(data.error||`HTTP ${response.status}`);return data};
