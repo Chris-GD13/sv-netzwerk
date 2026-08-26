@@ -73,9 +73,9 @@ if ($dispatcherCount !== 1) {
 $inlineRunNeedle = <<<'PHP_CODE'
 echo $response;if(function_exists('fastcgi_finish_request')){fastcgi_finish_request();}else{while(ob_get_level()>0){@ob_end_flush();}@flush();}gfRunJob($jobId,$payload);exit;
 PHP_CODE;
-$source = str_replace($inlineRunNeedle, 'echo $response;exit;', $source, $inlineRunCount);
+$source = str_replace($inlineRunNeedle, $inlineRunNeedle, $source, $inlineRunCount);
 if ($inlineRunCount !== 1) {
-    throw new RuntimeException('Synchroner KI-Langläufer konnte nicht sicher getrennt werden.');
+    throw new RuntimeException('KI-Hintergrundlauf konnte nicht sicher angebunden werden.');
 }
 
 
