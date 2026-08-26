@@ -31,6 +31,22 @@ if (!is_string($source) || $source === '') {
 }
 $source = preg_replace('/^<\?php\s*/u', '', $source, 1) ?? $source;
 
+// Ältere bzw. zwischengespeicherte Portaloberflächen haben die sichtbare
+// Einzelauswahl vereinzelt nicht als order.outputs übertragen. Für diesen
+// Fall den eindeutig im Arbeitsauftrag bezeichneten Berichtstyp übernehmen,
+// statt die sichtbare Auswahl fälschlich mit „Keine Dokumente ausgewählt“
+// abzulehnen.
+$outputNeedle = <<<'PHP_CODE'
+$folderId=trim((string)($body['folder_id']??''));$order=is_array($body['order']??null)?$body['order']:[];$outputs=is_array($order['outputs']??null)?$order['outputs']:[];requireCaseFolderAccess($folderId,$user);if(!$outputs)apiError(400,'Keine Dokumente ausgewählt.');
+PHP_CODE;
+$outputReplacement = <<<'PHP_CODE'
+$folderId=trim((string)($body['folder_id']??''));$order=is_array($body['order']??null)?$body['order']:[];$outputs=is_array($order['outputs']??null)?array_values(array_filter(array_map('strval',$order['outputs']))):[];if(!$outputs&&!empty($order['draft_only'])){$selectionText=mb_strtolower(trim((string)($order['instructions']??'')),'UTF-8');$selectionMap=['erstbericht_sv_gf'=>'/(?:erstbericht\s*sv[- ]?gf|sv[- ]?gf[- ]?erstbericht|engel[- ]?erstbericht)/u','zwischenbericht'=>'/\bzwischenbericht\b/u','nachtrag_stellungnahme'=>'/\b(?:nachtrag|stellungnahme)\b/u','schlussbericht'=>'/\bschlussbericht\b/u','schlusserklaerung'=>'/\bschlusserkl[aä]rung\b/u','zahlungsbefuerwortung'=>'/\bzahlungsbef[uü]rwortung\b/u','query_form'=>'/\b(?:r[uü]ckfrageformular|r[uü]ckfrage)\b/u','erstbericht'=>'/\berstbericht\b/u'];foreach($selectionMap as$selectionKey=>$selectionPattern){if(preg_match($selectionPattern,$selectionText)===1){$outputs=[$selectionKey];break;}}}$order['outputs']=$outputs;requireCaseFolderAccess($folderId,$user);if(!$outputs)apiError(400,'Keine Dokumente ausgewählt.');
+PHP_CODE;
+$source = str_replace($outputNeedle, $outputReplacement, $source, $outputRepairCount);
+if ($outputRepairCount !== 1) {
+    throw new RuntimeException('Dokumentauswahl konnte nicht sicher initialisiert werden.');
+}
+
 // Fertige Falldokumente ausschließlich über das angemeldete Portal ausliefern.
 // Direkte Drive-Links würden bei den Sachverständigen ein zusätzliches
 // privates Google-Login verlangen und die Portalberechtigung umgehen.
