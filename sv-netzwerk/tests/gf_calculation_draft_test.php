@@ -71,6 +71,17 @@ if (($documentPart['type'] ?? '') !== 'input_file') {
     fwrite(STDERR, "Dokument wird nicht als Datei an die Auswertung übergeben.\n");
     exit(1);
 }
+if (gfOpenAIUploadName('Schadenbild.JPG', 'image/jpeg') !== 'Schadenbild.jpg'
+    || gfOpenAIUploadName('Beleg.PNG', 'image/png') !== 'Beleg.png'
+    || gfOpenAIUploadName('Aktennotiz.PDF', 'application/pdf') !== 'Aktennotiz.PDF') {
+    fwrite(STDERR, "Bild-Dateiendungen werden für die KI nicht korrekt normalisiert.\n");
+    exit(1);
+}
+if (!gfSupported(['name' => 'Schadenbild.GIF', 'mimeType' => 'image/gif'])
+    || gfSupported(['name' => 'Scan.TIFF', 'mimeType' => 'image/tiff'])) {
+    fwrite(STDERR, "Unterstützte KI-Bildformate sind nicht korrekt begrenzt.\n");
+    exit(1);
+}
 
 $evidence = gfCalculationEvidenceText([['files' => [[
     'name' => 'Schadenfoto_Küche.jpg',
@@ -95,4 +106,30 @@ if (mb_strlen($evidence, 'UTF-8') > 12000) {
     exit(1);
 }
 
-echo "Kalkulationsentwurf: Werte, Quellen, Bilder, Kontextbudget, Hinweise und Bearbeitungslink geprüft.\n";
+$uiFiles = [
+    __DIR__.'/../src/pages/intern/kalkulation/index.astro',
+    __DIR__.'/../src/pages/intern/kalkulation/versicherungsschaeden.astro',
+];
+foreach ($uiFiles as $uiFile) {
+    $ui = file_get_contents($uiFile);
+    if (!is_string($ui)
+        || !str_contains($ui, 'data-optical-settlement-template')
+        || !str_contains($ui, 'data-auto-grow')
+        || !str_contains($ui, 'ausdrücklich als abgegolten bezeichneten Schadenpositionen')) {
+        fwrite(STDERR, "Optische Abgeltung oder mitwachsendes Hinweisfeld fehlt in {$uiFile}.\n");
+        exit(1);
+    }
+    if (str_contains($ui, 'Schadenfall vollumfänglich abgegolten')) {
+        fwrite(STDERR, "Zu weit gefasste Vollabgeltung ist weiterhin in {$uiFile} enthalten.\n");
+        exit(1);
+    }
+}
+$noteHelper = file_get_contents(__DIR__.'/../public/intern/calculation-note-helper.js');
+foreach (['Abgeltungsvereinbarung – optischer Schaden', 'scrollHeight', '[Positionen eintragen]', '[Prozentsatz]'] as $needle) {
+    if (!is_string($noteHelper) || !str_contains($noteHelper, $needle)) {
+        fwrite(STDERR, "Mustertext- oder Größenlogik fehlt: {$needle}\n");
+        exit(1);
+    }
+}
+
+echo "Kalkulationsentwurf: Werte, Quellen, Bilder, Kontextbudget, optische Abgeltung, mitwachsendes Hinweisfeld und Bearbeitungslink geprüft.\n";
