@@ -5,7 +5,7 @@ calc = root / 'src/pages/intern/kalkulation/index.astro'
 portal = root / 'src/pages/intern/versicherungsfaelle/index.astro'
 
 source = calc.read_text(encoding='utf-8')
-calc_tag = '<script is:inline src="/intern/bki-pdf-export.js?v=20260827-1"></script>'
+calc_tag = '<script is:inline src="/intern/bki-pdf-export.js?v=20260827-2"></script>'
 anchor = '<script is:inline src="/intern/calculation-note-helper.js?v=20260827-1"></script>'
 if calc_tag not in source:
     if anchor not in source:
@@ -14,7 +14,7 @@ if calc_tag not in source:
     calc.write_text(source, encoding='utf-8')
 
 source = portal.read_text(encoding='utf-8')
-mail_tag = '<script is:inline src="/intern/bki-mail-attachment.js?v=20260827-1"></script>'
+mail_tag = '<script is:inline src="/intern/bki-mail-attachment.js?v=20260827-2"></script>'
 if mail_tag not in source:
     marker = '</InternalLayout>'
     if marker not in source:
