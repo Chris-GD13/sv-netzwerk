@@ -16,7 +16,7 @@
   function insertTemplate(button){
     const field=document.getElementById(button.dataset.noteTarget||'');
     if(!(field instanceof HTMLTextAreaElement))return;
-    if(getLines().length){
+    if(field.id==='bk-note'&&getLines().length){
       updateSettlementNote();
       field.focus();
       field.setSelectionRange(field.value.length,field.value.length);
@@ -136,23 +136,22 @@
   }
 
   function replaceSettlementBlock(value,block){
-    const current=value.trim();
-    if(lastGeneratedBlock&&current.includes(lastGeneratedBlock)){
-      const next=current.replace(lastGeneratedBlock,block).replace(/\n{3,}/g,'\n\n').trim();
+    if(lastGeneratedBlock&&value.includes(lastGeneratedBlock)){
+      const next=value.replace(lastGeneratedBlock,block);
       lastGeneratedBlock=block;
       return next;
     }
-    const headingIndex=current.indexOf(generatedHeading);
-    const endingIndex=headingIndex>=0?current.indexOf(generatedEnding,headingIndex):-1;
+    const headingIndex=value.indexOf(generatedHeading);
+    const endingIndex=headingIndex>=0?value.indexOf(generatedEnding,headingIndex):-1;
     if(endingIndex>=0){
-      const before=current.slice(0,headingIndex).trim();
-      const after=current.slice(endingIndex+generatedEnding.length).trim();
+      const before=value.slice(0,headingIndex).trimEnd();
+      const after=value.slice(endingIndex+generatedEnding.length).trimStart();
       lastGeneratedBlock=block;
       return [before,block,after].filter(Boolean).join('\n\n');
     }
-    if(!block)return current;
+    if(!block)return value;
     lastGeneratedBlock=block;
-    return [current,block].filter(Boolean).join('\n\n');
+    return [value.trimEnd(),block].filter(Boolean).join('\n\n');
   }
 
   function updateSettlementNote(){
@@ -160,8 +159,14 @@
     if(!(field instanceof HTMLTextAreaElement))return;
     const lines=getLines();
     const block=createSettlementBlock(lines);
-    field.value=replaceSettlementBlock(field.value,block);
-    field.dispatchEvent(new Event('input',{bubbles:true}));
+    const storedGenerated=field.value.includes(generatedHeading)&&field.value.includes(generatedEnding)&&!field.value.includes('[Positionen eintragen]');
+    if(block||lastGeneratedBlock||storedGenerated){
+      const next=replaceSettlementBlock(field.value,block);
+      if(next!==field.value){
+        field.value=next;
+        field.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+    }
     grow(field);
 
     updateSettlementSummary(lines);
