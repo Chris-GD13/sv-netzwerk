@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Sanierungsplanung, Rückbau und Trocknung: Strategie für nachvollziehbare Wiederherstellung',
+    description: 'Sanierungsplanung und Trocknung: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/sanierungsplanung-rueckbau-trocknung-strategie/',
+    category: 'Sanierungsplanung und Trocknung',
+    tags: ['Sanierungsplanung', 'Rückbau', 'Trocknung', 'Gebäudetrocknung', 'Schadenminderung'],
+    date: '2026-08-27',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Beweissicherung und Fotodokumentation: Standards für belastbare Schadenakten',
     description: 'Beweissicherung und Fotodokumentation: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/beweissicherung-fotodokumentation-standards/',

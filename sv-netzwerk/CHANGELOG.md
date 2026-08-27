@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.34 – 2026-08-27
+- automatischer morgens Fachbeitrag veröffentlicht: „Sanierungsplanung, Rückbau und Trocknung: Strategie für nachvollziehbare Wiederherstellung"
+- LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
+- ohne Beitragsbild veröffentlicht; keine typografische Platzhaltergrafik erzeugt
+
 ## 3.4.33 – 2026-08-26
 - automatischer nachmittags Fachbeitrag veröffentlicht: „Beweissicherung und Fotodokumentation: Standards für belastbare Schadenakten"
 - LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
