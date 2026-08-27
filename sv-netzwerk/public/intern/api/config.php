@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 define('APP_VERSION', '1.0.0');
 define('DEFAULT_PROJECT_ID', 1);
+require_once __DIR__ . '/case-search.php';
 
 function ensureRuntimeSchema(PDO $pdo): void
 {
@@ -67,6 +68,11 @@ function ensureRuntimeSchema(PDO $pdo): void
             'object_name' => 'VARCHAR(500) NULL',
             'damage_type' => 'VARCHAR(500) NULL',
             'case_type' => 'VARCHAR(190) NULL',
+            'folder_name' => 'VARCHAR(500) NULL',
+            'modified_time' => 'VARCHAR(50) NULL',
+            'web_view_link' => 'VARCHAR(1000) NULL',
+            'search_text' => 'TEXT NULL',
+            'meta_json' => 'MEDIUMTEXT NULL',
         ] as $column => $definition) {
             $stmt->execute([':table' => 'case_folder_owners', ':column' => $column]);
             if ((int) $stmt->fetchColumn() === 0) {
@@ -96,15 +102,21 @@ function requireProjectDeleteAccess(array $user, int $projectId): void
     }
 }
 
-function registerCaseFolderOwner(string $folderId, array $user, array $meta = []): void
+function registerCaseFolderOwner(string $folderId, array $user, array $meta = [], array $folder = []): void
 {
     if ($folderId === '' || empty($user['id'])) return;
-    $stmt = db()->prepare('INSERT INTO case_folder_owners(folder_id,user_id,user_email,case_no,policy_no,object_name,damage_type,case_type,registered_at)
-        VALUES(:f,:u,:e,:case_no,:policy_no,:object_name,:damage_type,:case_type,NOW())
+    $folderName = trim((string)($folder['name'] ?? ''));
+    $searchText = caseSearchText($meta, $folderName);
+    $metaJson = $meta ? json_encode($meta, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null;
+    $stmt = db()->prepare('INSERT INTO case_folder_owners(folder_id,user_id,user_email,case_no,policy_no,object_name,damage_type,case_type,folder_name,modified_time,web_view_link,search_text,meta_json,registered_at)
+        VALUES(:f,:u,:e,:case_no,:policy_no,:object_name,:damage_type,:case_type,:folder_name,:modified_time,:web_view_link,:search_text,:meta_json,NOW())
         ON DUPLICATE KEY UPDATE user_id=VALUES(user_id),user_email=VALUES(user_email),
         case_no=COALESCE(NULLIF(VALUES(case_no),\'\'),case_no),policy_no=COALESCE(NULLIF(VALUES(policy_no),\'\'),policy_no),
         object_name=COALESCE(NULLIF(VALUES(object_name),\'\'),object_name),damage_type=COALESCE(NULLIF(VALUES(damage_type),\'\'),damage_type),
-        case_type=COALESCE(NULLIF(VALUES(case_type),\'\'),case_type),registered_at=NOW()');
+        case_type=COALESCE(NULLIF(VALUES(case_type),\'\'),case_type),folder_name=COALESCE(NULLIF(VALUES(folder_name),\'\'),folder_name),
+        modified_time=COALESCE(NULLIF(VALUES(modified_time),\'\'),modified_time),web_view_link=COALESCE(NULLIF(VALUES(web_view_link),\'\'),web_view_link),
+        search_text=IF(meta_json IS NOT NULL AND VALUES(meta_json) IS NULL,search_text,COALESCE(NULLIF(VALUES(search_text),\'\'),search_text)),
+        meta_json=COALESCE(VALUES(meta_json),meta_json),registered_at=NOW()');
     $stmt->execute([
         ':f'=>$folderId, ':u'=>(int)$user['id'], ':e'=>(string)($user['email']??''),
         ':case_no'=>(string)($meta['schaden_nr']??''),
@@ -112,7 +124,42 @@ function registerCaseFolderOwner(string $folderId, array $user, array $meta = []
         ':object_name'=>(string)($meta['vn_objekt']??''),
         ':damage_type'=>(string)($meta['schadenart']??''),
         ':case_type'=>(string)($meta['fallart']??''),
+        ':folder_name'=>$folderName,
+        ':modified_time'=>(string)($folder['modifiedTime']??''),
+        ':web_view_link'=>(string)($folder['webViewLink']??''),
+        ':search_text'=>$searchText,
+        ':meta_json'=>$metaJson,
     ]);
+}
+
+function searchCaseFolderIndex(array $user, string $query, int $limit = 30): array
+{
+    if (empty($user['id']) || caseSearchNormalize($query) === '') return [];
+    $terms = array_slice(caseSearchTerms($query), 0, 6);
+    $where = ['user_id = :user_id', 'user_email = :user_email'];
+    $params = [':user_id' => (int)$user['id'], ':user_email' => (string)($user['email'] ?? '')];
+    foreach ($terms as $index => $term) {
+        $key = ':term_' . $index;
+        $where[] = "search_text LIKE {$key}";
+        $params[$key] = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $term) . '%';
+    }
+    $sql = 'SELECT folder_id,folder_name,modified_time,web_view_link,search_text,meta_json FROM case_folder_owners WHERE '
+        . implode(' AND ', $where) . ' ORDER BY registered_at DESC LIMIT ' . max(1, min(100, $limit));
+    $stmt = db()->prepare($sql);
+    $stmt->execute($params);
+    $results = [];
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $meta = json_decode((string)($row['meta_json'] ?? ''), true);
+        $results[] = [
+            'id' => (string)$row['folder_id'],
+            'name' => (string)($row['folder_name'] ?: ($meta['schaden_nr'] ?? 'Versicherungsfall')),
+            'modifiedTime' => $row['modified_time'] ?: null,
+            'webViewLink' => $row['web_view_link'] ?: null,
+            'meta' => is_array($meta) ? $meta : [],
+            '_search_text' => (string)($row['search_text'] ?? ''),
+        ];
+    }
+    return $results;
 }
 
 function requireCaseFolderAccess(string $folderId, array $user): void
