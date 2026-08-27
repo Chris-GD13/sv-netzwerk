@@ -63,6 +63,14 @@ jobs:
       - name: Import Referenzdaten
         run: mysql -h 127.0.0.1 -u root -ptestpass fensterpruefung < analysis_export/testdata/referenz_seed.sql
 
+      - name: Fallsuch-Register gegen MySQL prüfen
+        env:
+          DB_HOST: 127.0.0.1
+          DB_NAME: fensterpruefung
+          DB_USER: root
+          DB_PASS: testpass
+        run: php sv-netzwerk/tests/case_search_registry_test.php
+
       - name: Datenintegrität prüfen
         env:
           DB_HOST: 127.0.0.1
