@@ -7,7 +7,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   <div class="vf-grid">
     <aside>
       <section id="vf-expert-panel" class="vf-card" hidden><label class="vf-order-label" for="vf-expert-select"><strong>Bearbeitung für</strong><small>Fallordner des ausgewählten Sachverständigen</small></label><select id="vf-expert-select"><option value="christian">Christian Wächter</option><option value="holger">Holger Roth</option><option value="marc">Marc Schütt</option></select></section>
-      <section class="vf-card"><header class="vf-step"><b>1</b><div><strong>Fall auswählen</strong><small>Öffnen oder neu beginnen</small></div></header><div class="vf-search"><input id="vf-search-input" placeholder="Schaden-Nr., VN, Objekt oder Ort"><button id="vf-search-btn">Suchen</button></div><button id="vf-recent" class="vf-secondary vf-full">Letzte 10 Fälle</button><div id="vf-results"></div><button id="vf-new" class="vf-secondary vf-full">Neuen Fall anlegen</button></section>
+      <section class="vf-card"><header class="vf-step"><b>1</b><div><strong>Fall auswählen</strong><small>Öffnen oder neu beginnen</small></div></header><div class="vf-search"><input id="vf-search-input" placeholder="Schaden-Nr., Name, Straße oder Ort" autocomplete="off" aria-label="Versicherungsfall suchen"><button id="vf-search-btn">Suchen</button></div><p class="vf-search-hint">Ab 3 Zeichen erscheinen passende Fälle automatisch.</p><button id="vf-recent" class="vf-secondary vf-full">Letzte 10 Fälle</button><div id="vf-results" aria-live="polite"></div><button id="vf-new" class="vf-secondary vf-full">Neuen Fall anlegen</button></section>
       <section id="vf-form" class="vf-card" hidden><div class="vf-title"><div><strong>Falldaten</strong><small>Werden aus Unterlagen ergänzt</small></div><span>automatisch</span></div><div class="vf-fields"><label>Schaden-Nr.<input id="vf-schaden"></label><label>Versicherungsschein-Nr.<input id="vf-vsnr"></label><label class="wide">VN / Objekt<input id="vf-object"></label><label class="wide">VN-Straße<input id="vf-strasse"></label><label>VN-PLZ<input id="vf-plz"></label><label>VN-Ort<input id="vf-ort"></label><label class="wide">Schadenort – Straße<input id="vf-schaden-strasse"></label><label>Schadenort – PLZ<input id="vf-schaden-plz"></label><label>Schadenort – Ort<input id="vf-schaden-ort"></label><label>Schadenart<input id="vf-art"></label><label>Reserve EUR<input id="vf-reserve"></label><label>Telefon<input id="vf-telefon"></label><label>E-Mail<input id="vf-email"></label></div><button id="vf-save" class="vf-primary vf-full">Fall speichern</button><p id="vf-save-state" class="vf-meta"></p></section>
 
     </aside>
@@ -69,6 +69,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 .intern-sidebar>.vf-sidebar-tools{width:auto;margin:auto 0 14px;padding:12px;box-shadow:none;border-radius:3px;background:#fff}.intern-sidebar>.vf-sidebar-tools summary{font-size:.86rem}.intern-sidebar>.vf-sidebar-tools .vf-full{padding:8px 9px;font-size:.78rem}.intern-sidebar>.vf-sidebar-tools .vf-meta{line-height:1.35}@media(max-width:900px){.intern-sidebar>.vf-sidebar-tools{display:none}.vf-system-bottom{width:100%;margin:14px 0 0}}
 .vf-card.vf-collapsible>.vf-collapse-trigger{position:relative;cursor:pointer;margin-bottom:0;padding-right:28px;user-select:none}.vf-card.vf-collapsible>.vf-collapse-trigger::after{content:'›';position:absolute;right:2px;top:50%;font-size:1.25rem;line-height:1;transform:translateY(-50%) rotate(90deg);transition:transform .15s}.vf-card.vf-collapsible.is-collapsed>.vf-collapse-trigger::after{transform:translateY(-50%)}.vf-card.vf-collapsible.is-collapsed>:not(.vf-collapse-trigger){display:none!important}.vf-card.vf-collapsible.is-collapsed{padding-top:13px;padding-bottom:13px}.vf-card.vf-collapsible>.vf-title.vf-collapse-trigger,.vf-card.vf-collapsible>.vf-plaud-head.vf-collapse-trigger{margin-bottom:0}.vf-card.vf-collapsible:not(.is-collapsed)>.vf-step,.vf-card.vf-collapsible:not(.is-collapsed)>.vf-plaud-head{margin-bottom:16px}.vf-card.vf-collapsible:not(.is-collapsed)>.vf-title{margin-bottom:12px}
 .vf-instruction-run{display:block;width:100%;margin-top:12px;border-radius:3px}
+.vf-search-hint{margin:6px 0 12px;color:var(--vfm);font-size:.72rem;line-height:1.35}
 </style>
 <style is:global>
 .vf-polycam{border-top:4px solid #f59a23}.vf-measure-table{overflow:auto;margin-top:10px}.vf-measure-table table{width:100%;border-collapse:collapse;font-size:.78rem}.vf-measure-table th,.vf-measure-table td{border:1px solid #d6dce1;padding:5px;text-align:left}.vf-measure-table input,.vf-measure-table select{width:100%;min-width:72px;box-sizing:border-box;border:1px solid #bdcbd6;border-radius:2px;padding:6px;font:inherit}.vf-measure-table button{border:1px solid #d2a8a8;background:#fff5f5;border-radius:2px;padding:6px 8px;color:#8c2525}
@@ -91,6 +92,21 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     trigger.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();toggle()}});
     if(initiallyExpanded)new MutationObserver(()=>{if(!card.hidden){card.classList.remove('is-collapsed');trigger.setAttribute('aria-expanded','true')}}).observe(card,{attributes:true,attributeFilter:['hidden']});
   });
+})();
+</script>
+<script is:inline>
+(() => {
+  const input=document.getElementById('vf-search-input'),button=document.getElementById('vf-search-btn'),results=document.getElementById('vf-results');
+  if(!input||!button||!results)return;
+  let delay=0,lastQuery='';
+  input.addEventListener('input',()=>{
+    window.clearTimeout(delay);
+    const query=input.value.trim();
+    if(!query){lastQuery='';results.innerHTML='';return}
+    if(query.length<3)return;
+    delay=window.setTimeout(()=>{if(query!==lastQuery){lastQuery=query;button.click()}},350);
+  });
+  button.addEventListener('click',()=>{lastQuery=input.value.trim()});
 })();
 </script>
 <script is:inline>
