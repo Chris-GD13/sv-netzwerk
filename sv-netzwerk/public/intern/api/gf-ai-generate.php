@@ -31,24 +31,6 @@ if (!is_string($source) || $source === '') {
 }
 $source = preg_replace('/^<\?php\s*/u', '', $source, 1) ?? $source;
 
-// Bilder muessen der Responses API als Bilder, Dokumente als Dateien
-// uebergeben werden. So erreicht kein lediglich hochgeladenes JPEG mehr den
-// Context-Stuffing-Pfad fuer Dokumentdateien.
-$inputReferenceNeedles = [
-    "foreach(\$caseRefs as\$r)\$content[]=['type'=>'input_file','file_id'=>\$r['file_id']];",
-    "foreach(\$ruleRefs as\$r)\$content[]=['type'=>'input_file','file_id'=>\$r['file_id']];",
-    "foreach(\$bki as\$r)\$content[]=['type'=>'input_file','file_id'=>\$r['file_id']];",
-];
-foreach ($inputReferenceNeedles as $inputReferenceNeedle) {
-    $source = str_replace(
-        $inputReferenceNeedle,
-        str_replace("=['type'=>'input_file','file_id'=>\$r['file_id']]", '=gfOpenAIInputPart($r)', $inputReferenceNeedle),
-        $source,
-        $inputReferenceCount
-    );
-    if ($inputReferenceCount !== 1) throw new RuntimeException('KI-Eingabedateien konnten nicht sicher typisiert werden.');
-}
-
 // KI-Antworten koennen optionale JSON-Felder als null oder als strukturierte
 // Werte liefern. Regulare Pruefungen sollen daran nicht mit einem PHP-TypeError
 // abbrechen, sondern den normalisierten Text fachlich bewerten.

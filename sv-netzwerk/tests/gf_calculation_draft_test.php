@@ -76,7 +76,6 @@ foreach ([
     "const GF_OPENAI_UPLOAD_POLICY_VERSION='2';",
     'function gfOpenAIUploadExtension',
     'function gfOpenAIUploadName',
-    'function gfOpenAIInputPart',
     "'image/jpeg'=>'jpg'",
     "'image/png'=>'png'",
     "'image/gif'=>'gif'",
@@ -116,26 +115,6 @@ foreach ($uploadNames as [$name, $mime, $expected]) {
         fwrite(STDERR, "KI-Dateiname wurde nicht sicher normalisiert: {$name} / {$mime} => {$actual}.\n");
         exit(1);
     }
-}
-$reportImagePart = gfOpenAIInputPart(['file_id'=>'file-image','mime'=>'image/jpeg']);
-if (($reportImagePart['type'] ?? '') !== 'input_image' || ($reportImagePart['detail'] ?? '') !== 'high') {
-    fwrite(STDERR, "Schadenbild wird im Bericht nicht als Bildquelle übergeben.\n");
-    exit(1);
-}
-$genericImagePart = gfOpenAIInputPart(['file_id'=>'file-generic-image','mime'=>'application/octet-stream','name'=>'Schadenbild.JPG']);
-if (($genericImagePart['type'] ?? '') !== 'input_image') {
-    fwrite(STDERR, "Schadenbild mit generischem MIME-Typ wird nicht anhand der Endung erkannt.\n");
-    exit(1);
-}
-$svgDocumentPart = gfOpenAIInputPart(['file_id'=>'file-svg','mime'=>'image/svg+xml','name'=>'Skizze.svg']);
-if (($svgDocumentPart['type'] ?? '') !== 'input_file') {
-    fwrite(STDERR, "SVG wird fälschlich als Rasterbild übergeben.\n");
-    exit(1);
-}
-$reportDocumentPart = gfOpenAIInputPart(['file_id'=>'file-document','mime'=>'application/pdf']);
-if (($reportDocumentPart['type'] ?? '') !== 'input_file') {
-    fwrite(STDERR, "Berichtsdokument wird nicht als Datei übergeben.\n");
-    exit(1);
 }
 
 $evidence = gfCalculationEvidenceText([['files' => [[

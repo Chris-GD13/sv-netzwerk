@@ -6,7 +6,6 @@ source = core.read_text(encoding='utf-8')
 required = [
     "const GF_OPENAI_UPLOAD_POLICY_VERSION='2';",
     'function gfOpenAIUploadExtension',
-    'function gfOpenAIInputPart',
     "($cached['policy']??'')===GF_OPENAI_UPLOAD_POLICY_VERSION",
 ]
 missing = [needle for needle in required if needle not in source]
