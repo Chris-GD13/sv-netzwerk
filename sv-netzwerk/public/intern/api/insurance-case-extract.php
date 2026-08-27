@@ -2,14 +2,12 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/case-upload-ignore.php';
 commonHeaders();
 $user = requireAuth();
 if (!in_array($user['role'] ?? '', ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) apiError(403, 'Keine Berechtigung.');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
 if (empty($_FILES['file'])) apiError(400, 'Keine Datei hochgeladen.');
-
-$apiKey = trim(env('OPENAI_API_KEY', ''));
-if ($apiKey === '') apiError(503, 'OpenAI API-Key ist nicht konfiguriert.');
 
 $file = $_FILES['file'];
 if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) apiError(400, 'Datei konnte nicht hochgeladen werden.');
@@ -20,6 +18,13 @@ $name = basename((string)($file['name'] ?? 'Unterlage'));
 $mime = mime_content_type((string)$file['tmp_name']) ?: (string)($file['type'] ?? 'application/octet-stream');
 $bytes = file_get_contents((string)$file['tmp_name']);
 if ($bytes === false) apiError(400, 'Datei konnte nicht gelesen werden.');
+$excludedReason = caseUploadExcludedAsset($name, $mime, $bytes);
+if ($excludedReason !== null) {
+    apiJson(['ok'=>true,'excluded'=>true,'file_name'=>$name,'reason'=>$excludedReason,'fields'=>[]]);
+}
+
+$apiKey = trim(env('OPENAI_API_KEY', ''));
+if ($apiKey === '') apiError(503, 'OpenAI API-Key ist nicht konfiguriert.');
 $base64 = base64_encode($bytes);
 
 $system = <<<'PROMPT'

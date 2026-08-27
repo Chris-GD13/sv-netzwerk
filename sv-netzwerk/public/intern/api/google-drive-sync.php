@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/case-upload-ignore.php';
 commonHeaders();
 $user = requireAuth();
 if (!in_array($user['role'], ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) {
@@ -111,25 +112,7 @@ function gdCaseCategory(string $name,string $mime=''):string{$n=gdNormalize($nam
 function gdOriginalCaseName(string $name):string{return preg_replace('/^(?:Fallakte|Unterlage|Gutachten|KVA|Rechnung|Schriftverkehr|Mail)_\d{4}-\d{2}-\d{2}_\d{6}_(.+)$/u','$1',$name)??$name;}
 function gdEnsureCaseFolder(string $caseId,string $name):array{$found=gdFindChildByName($caseId,$name);return$found&&($found['mimeType']??'')==='application/vnd.google-apps.folder'?$found:gdCreateFolder($caseId,$name);}
 function gdExcludedCaseAsset(string $name,string $mime,string $bytes):?string{
-    if(!str_starts_with(strtolower($mime),'image/'))return null;
-    $hash=hash('sha256',$bytes);
-    $knownHashes=[
-        'd7e3662266444a6b1dd36cbb9a95546066eeae0d920a6f702ae716ba8aacb0cf',
-        '102f119c25022500542ab12d312602666f7e210bfbe067170fa15b6a69899880',
-        '008eabe9fac31bc3a22473dcd52b287630b8d7bdc4added8cd01aa47c73f9431',
-        'a3ea5a503049dff4515211b7d41aba2f4e1ee33666df00a36a10fc862da3b1dc'
-    ];
-    if(in_array($hash,$knownHashes,true))return'Bekannte Signatur-, Profil- oder Systemgrafik';
-    $normalized=gdNormalize($name);
-    $knownNames=[
-        'bvslogo2 7ce28f0c 700d 454c b645 db96d1c775fb',
-        'chatgptimage9 aug 2026 19 01 28 4631f03f 1db8 414c a636 9b7ee544d6e1',
-        'klein 353f6da3 e1b8 46b3 9797 b35ae37e31b4',
-        'teams 32x32 9178119f 105b 4f5c abab a3ecadf7ea7c',
-        'teams 32x32 91084020 9e25 41aa b1a1 6681281811c7'
-    ];
-    foreach($knownNames as$known)if(str_contains($normalized,$known))return'Bekannte Signatur-, Profil- oder Systemgrafik';
-    return null;
+    return caseUploadExcludedAsset($name,$mime,$bytes);
 }
 function gdUploadCaseFile(string $folderId,string $name,string $mime,string $bytes,int $originalModified):array{$category=gdCaseCategory($name,$mime);$target=gdEnsureCaseFolder($folderId,$category);$targetId=(string)$target['id'];$size=strlen($bytes);foreach(gdListChildren($targetId,null,1000)as$item){if((string)($item['name']??'')!==$name||(int)($item['size']??-1)!==$size)continue;$saved=(int)($item['appProperties']['svOriginalModified']??0);if($saved===$originalModified)return['duplicate'=>true,'category'=>$category,'file'=>$item];}$meta=['name'=>$name,'mimeType'=>$mime,'parents'=>[$targetId],'appProperties'=>['svOriginalModified'=>(string)$originalModified]];$boundary='svnet'.bin2hex(random_bytes(8));$body='--'.$boundary."\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n".json_encode($meta,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)."\r\n--".$boundary."\r\nContent-Type: ".$mime."\r\n\r\n".$bytes."\r\n--".$boundary."--";$url='https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true&fields=id,name,mimeType,size,modifiedTime,webViewLink,webContentLink,appProperties';$resp=gdHttp('POST',$url,['Content-Type: multipart/related; boundary='.$boundary],$body,true);if($resp['status']<200||$resp['status']>=300)apiError(503,'Dokument konnte nicht in Google Drive gespeichert werden.');return['duplicate'=>false,'category'=>$category,'file'=>json_decode($resp['body'],true)?:[]];}
 function gdOrganizeCase(string $caseId):array{$folders=[];foreach(gdCaseFolders()as$name){$f=gdEnsureCaseFolder($caseId,$name);$folders[$name]=(string)$f['id'];}$moved=0;$ignored=0;foreach(gdListChildren($caseId,null,1000)as$file){if(($file['mimeType']??'')==='application/vnd.google-apps.folder'||in_array((string)($file['name']??''),[CASE_META_NAME,'00_FALLINDEX.md'],true)){$ignored++;continue;}$oldName=(string)($file['name']??'');$name=gdOriginalCaseName($oldName);$category=gdCaseCategory($name,(string)($file['mimeType']??''));$id=(string)($file['id']??'');if($id==='')continue;$query=['addParents'=>$folders[$category],'removeParents'=>$caseId,'fields'=>'id,name,parents'];$body=$name!==$oldName?['name'=>$name]:null;gdApi('PATCH','files/'.rawurlencode($id),$query,$body);$moved++;}return['moved'=>$moved,'ignored'=>$ignored];}
