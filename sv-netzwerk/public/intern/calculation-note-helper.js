@@ -1,8 +1,11 @@
 (()=>{
   const template=`Abgeltungsvereinbarung – optischer Schaden\n\nFür die Positionen [Positionen eintragen] wird auf ausdrücklichen Wunsch und mit Zustimmung des VN anstelle der tatsächlichen Wiederherstellung eine pauschale Abgeltung vereinbart.\n\nDer kalkulierte Wiederherstellungsbetrag dieser Positionen beträgt [Betrag] € brutto. Der vereinbarte Abgeltungssatz beträgt [Prozentsatz] %. Daraus ergibt sich ein Abgeltungsbetrag von [Betrag] €.\n\nMit Auszahlung des vereinbarten Abgeltungsbetrages sind ausschließlich die in dieser Kalkulation ausdrücklich als pauschal abgegolten bezeichneten Schadenpositionen abschließend reguliert. Aus diesen Positionen werden keine weiteren Ansprüche geltend gemacht.`;
   const generatedHeading='Abgeltungsvereinbarung – optischer Schaden';
+  const generatedEnding='Mit Auszahlung des vereinbarten Abgeltungsbetrages sind ausschließlich die in dieser Kalkulation ausdrücklich als pauschal abgegolten bezeichneten Schadenpositionen abschließend reguliert. Aus diesen Positionen werden keine weiteren Ansprüche geltend gemacht.';
   const euro=value=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(value)||0);
   const num=value=>{const n=Number(String(value??'').replace(',','.'));return Number.isFinite(n)?n:0;};
+  const settlementPercent=value=>{const raw=String(value??'').trim(),parsed=Number(raw.replace(',','.'));return raw&&Number.isFinite(parsed)?Math.max(0,Math.min(100,parsed)):30;};
+  let lastGeneratedBlock='';
 
   function grow(field){
     if(!(field instanceof HTMLTextAreaElement))return;
@@ -42,7 +45,7 @@
         totalPayout+=gross;
       }
       if(mode==='percent'){
-        const percent=Math.max(0,Math.min(100,num(line.settlement_percent)||30));
+        const percent=settlementPercent(line.settlement_percent);
         const key=String(percent);
         if(!percentGroups.has(key))percentGroups.set(key,{percent,indices:[],gross:0,payout:0});
         const group=percentGroups.get(key);
@@ -71,14 +74,32 @@
     return parts.join('\n\n');
   }
 
+  function replaceSettlementBlock(value,block){
+    const current=value.trim();
+    if(lastGeneratedBlock&&current.includes(lastGeneratedBlock)){
+      const next=current.replace(lastGeneratedBlock,block).replace(/\n{3,}/g,'\n\n').trim();
+      lastGeneratedBlock=block;
+      return next;
+    }
+    if(!block)return current;
+    const headingIndex=current.indexOf(generatedHeading);
+    const endingIndex=headingIndex>=0?current.indexOf(generatedEnding,headingIndex):-1;
+    if(endingIndex>=0){
+      const before=current.slice(0,headingIndex).trim();
+      const after=current.slice(endingIndex+generatedEnding.length).trim();
+      lastGeneratedBlock=block;
+      return [before,block,after].filter(Boolean).join('\n\n');
+    }
+    lastGeneratedBlock=block;
+    return [current,block].filter(Boolean).join('\n\n');
+  }
+
   function updateSettlementNote(){
     const field=document.getElementById('bk-note');
     if(!(field instanceof HTMLTextAreaElement))return;
     const lines=getLines();
     const block=createSettlementBlock(lines);
-    const headingIndex=field.value.indexOf(generatedHeading);
-    const custom=headingIndex>=0?field.value.slice(0,headingIndex).trim():field.value.trim();
-    field.value=[custom,block].filter(Boolean).join('\n\n');
+    field.value=replaceSettlementBlock(field.value,block);
     field.dispatchEvent(new Event('input',{bubbles:true}));
     grow(field);
 
@@ -90,7 +111,7 @@
     const lines=getLines();
     if(!lines[index])return;
     lines[index].settlement_mode=mode;
-    if(mode==='percent')lines[index].settlement_percent=Math.max(0,Math.min(100,num(percent)||30));
+    if(mode==='percent')lines[index].settlement_percent=settlementPercent(percent);
     else delete lines[index].settlement_percent;
     setLines(lines);
     setTimeout(()=>{enhanceSettlementTable();updateSettlementNote();},0);
@@ -124,7 +145,7 @@
       if(row.querySelector('.bk-settlement-col'))return;
       const line=lines[index]||{};
       const mode=line.settlement_mode||'restore';
-      const percent=Math.max(0,Math.min(100,num(line.settlement_percent)||30));
+      const percent=settlementPercent(line.settlement_percent);
       const td=document.createElement('td');
       td.className='bk-settlement-col';
       td.innerHTML=`<div class="bk-settlement-control"><select aria-label="Abgeltung Position ${index+1}"><option value="restore">Wiederherstellung</option><option value="full">Auszahlung 100 %</option><option value="percent">Abgeltung %</option></select><input type="number" min="0" max="100" step="1" value="${percent}" aria-label="Abgeltungssatz Position ${index+1}" ${mode==='percent'?'':'hidden'}><small>${mode==='full'?'volle Auszahlung ohne Wiederherstellung':mode==='percent'?'pauschale Abgeltung':'reguläre Wiederherstellung'}</small></div>`;
@@ -148,7 +169,15 @@
 
   const tableObserver=new MutationObserver(()=>enhanceSettlementTable());
   const linesBody=document.getElementById('bk-lines');
-  if(linesBody)tableObserver.observe(linesBody,{childList:true,subtree:true});
+  if(linesBody){
+    tableObserver.observe(linesBody,{childList:true,subtree:true});
+    linesBody.addEventListener('input',event=>{
+      if(event.target.matches?.('input[data-k="quantity"], input[data-k="unit_price"], input[data-k="regional_factor"]'))updateSettlementNote();
+    });
+    linesBody.addEventListener('click',event=>{
+      if(event.target.closest?.('[data-remove]'))setTimeout(()=>{enhanceSettlementTable();updateSettlementNote();},0);
+    });
+  }
   enhanceSettlementTable();
 
   document.getElementById('bk-vat')?.addEventListener('input',()=>{
