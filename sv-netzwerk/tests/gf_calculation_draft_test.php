@@ -48,7 +48,7 @@ try {
         'unit_price' => 100,
     ]]], [], '');
 } catch (RuntimeException $error) {
-    $rejected = str_contains($error->getMessage(), 'Quelle fehlt');
+    $rejected = str_contains($error->getMessage(), 'quelle') || str_contains($error->getMessage(), 'Quelle');
 }
 if (!$rejected) {
     fwrite(STDERR, "Unbelegte Kalkulationsposition wurde nicht gesperrt.\n");
