@@ -47,6 +47,19 @@ function gfSafePregMatch(string $pattern, mixed $subject, ?array &$matches = nul
     return preg_match($pattern, $text, $matches, $flags, $offset);
 }
 
+function gfLaunchReportWorker(): bool
+{
+    $worker = __DIR__ . '/gf-ai-worker-cli.php';
+    $setsid = '/usr/bin/setsid';
+    $php = '/usr/bin/php';
+    if (!is_file($worker) || !is_executable($php) || !is_executable($setsid) || !function_exists('exec')) return false;
+    $command = escapeshellarg($setsid) . ' -f ' . escapeshellarg($php) . ' ' . escapeshellarg($worker) . ' >/dev/null 2>&1 </dev/null';
+    $output = [];
+    $status = 1;
+    exec($command, $output, $status);
+    return $status === 0;
+}
+
 // Ältere bzw. zwischengespeicherte Portaloberflächen haben die sichtbare
 // Einzelauswahl vereinzelt nicht als order.outputs übertragen. Für diesen
 // Fall den eindeutig im Arbeitsauftrag bezeichneten Berichtstyp übernehmen,
@@ -100,7 +113,7 @@ if ($dispatcherCount !== 1) {
 }
 $source = str_replace(
     "echo \$runResponse;if(function_exists('fastcgi_finish_request')){fastcgi_finish_request();}else{while(ob_get_level()>0){@ob_end_flush();}@flush();}gfRunJob(\$id,\$runPayload);exit;",
-    "echo \$runResponse;exit;",
+    "if(!gfLaunchReportWorker()){gfJobUpdate(\$id,'failed',100,'Verarbeitung fehlgeschlagen.',null,'Server-Worker konnte nicht gestartet werden.');apiError(500,'Server-Worker konnte nicht gestartet werden.');}echo \$runResponse;exit;",
     $source,
     $workerDispatchCount
 );
@@ -414,14 +427,16 @@ $cliLock=(int)db()->query("SELECT GET_LOCK('svnet_gf_ai_worker',0)")->fetchColum
 if($cliLock!==1)exit(0);
 if($cliJobId>0){$cliStmt=db()->prepare('SELECT id,payload_json,status FROM gf_ai_jobs WHERE id=:id LIMIT 1');$cliStmt->execute([':id'=>$cliJobId]);}
 else{$cliStmt=db()->query("SELECT id,payload_json,status FROM gf_ai_jobs WHERE status='dispatching' ORDER BY id ASC LIMIT 1");}
-$cliRow=$cliStmt->fetch(PDO::FETCH_ASSOC);
-if(!$cliRow){db()->query("SELECT RELEASE_LOCK('svnet_gf_ai_worker')");exit(0);}
-$cliJobId=(int)($cliRow['id']??$cliJobId);
-$cliStatus=(string)($cliRow['status']??'');
-if(!in_array($cliStatus,['queued','dispatching','running'],true))exit(0);
-$cliPayload=json_decode((string)($cliRow['payload_json']??''),true);
-if(!is_array($cliPayload))throw new RuntimeException('KI-Auftrag ist unvollständig.');
-gfRunJob($cliJobId,$cliPayload);
+while($cliRow=$cliStmt->fetch(PDO::FETCH_ASSOC)){
+    $cliJobId=(int)($cliRow['id']??$cliJobId);
+    $cliStatus=(string)($cliRow['status']??'');
+    if(!in_array($cliStatus,['queued','dispatching','running'],true))break;
+    $cliPayload=json_decode((string)($cliRow['payload_json']??''),true);
+    if(!is_array($cliPayload))throw new RuntimeException('KI-Auftrag ist unvollständig.');
+    gfRunJob($cliJobId,$cliPayload);
+    if((int)(getenv('GF_AI_JOB_ID')?:0)>0)break;
+    $cliStmt=db()->query("SELECT id,payload_json,status FROM gf_ai_jobs WHERE status='dispatching' ORDER BY id ASC LIMIT 1");
+}
 db()->query("SELECT RELEASE_LOCK('svnet_gf_ai_worker')");
 exit(0);
 PHP_CODE;
