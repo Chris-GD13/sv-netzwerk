@@ -1,62 +1,75 @@
 (()=>{
   if(!location.pathname.startsWith('/intern/versicherungsfaelle')) return;
+  const API='/intern/api/gf-ai-generate.php';
   const transientText='Verarbeitung unterbrochen';
-  const calculationText='Kalkulation:';
-  const successHints=['Erstellte Dokumente','Kalkulation wurde','Kalkulation erstellt','Kalkulation gespeichert'];
-  const pending=new WeakMap();
+  const resumedJobs=new Set();
+  let resuming=false;
 
-  function isTransientBox(el){
-    if(!(el instanceof HTMLElement)) return false;
-    const text=(el.textContent||'').trim();
-    return text.includes(calculationText)&&text.includes(transientText);
+  function activeCase(){
+    for(const storage of [sessionStorage,localStorage]){
+      try{const row=JSON.parse(storage.getItem('svnet-case')||'null');if(row?.folder_id)return row;}catch{}
+    }
+    return null;
   }
 
-  function hasSuccess(){
-    const page=document.body?.innerText||'';
-    return successHints.some(h=>page.includes(h)) && !page.includes('Noch keine erzeugten Dokumente vorhanden.');
+  async function post(body){
+    const response=await fetch(API,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const json=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(json.error||`HTTP ${response.status}`);
+    return json;
   }
 
-  function deferBox(box){
-    if(pending.has(box)) return;
-    const previousDisplay=box.style.display;
-    box.style.display='none';
-    box.dataset.transientCalculationNotice='1';
-    const timer=setTimeout(()=>{
-      pending.delete(box);
-      if(!box.isConnected) return;
-      if(hasSuccess()){
-        box.remove();
-        return;
+  function interruptedBox(){
+    const box=document.getElementById('vf-job');
+    if(!box)return null;
+    return (box.textContent||'').includes(transientText)?box:null;
+  }
+
+  async function autoResume(){
+    if(resuming)return;
+    const box=interruptedBox();
+    if(!box)return;
+    const current=activeCase();
+    if(!current?.folder_id)return;
+    resuming=true;
+    box.innerHTML='<strong>ChatGPT arbeitet …</strong>';
+    box.hidden=false;
+    try{
+      const latest=await post({action:'latest',folder_id:current.folder_id});
+      const jobId=String(latest.job_id||'');
+      if(!jobId)throw new Error('Kein laufender Auftrag gefunden.');
+      if(!resumedJobs.has(jobId)){
+        resumedJobs.add(jobId);
+        try{await post({action:'resume',job_id:latest.job_id});}
+        catch(error){
+          const msg=String(error?.message||'');
+          if(!msg.includes('nicht unterbrochen')&&!msg.includes('bereits fortgesetzt'))throw error;
+        }
       }
-      if(isTransientBox(box)) box.style.display=previousDisplay;
-    },12000);
-    pending.set(box,timer);
-  }
-
-  function scan(root=document){
-    const candidates=[];
-    if(root instanceof HTMLElement&&isTransientBox(root)) candidates.push(root);
-    root.querySelectorAll?.('div,section,p').forEach(el=>{if(isTransientBox(el)) candidates.push(el);});
-    candidates.sort((a,b)=>a.querySelectorAll('*').length-b.querySelectorAll('*').length);
-    if(candidates[0]) deferBox(candidates[0]);
-
-    if(hasSuccess()){
-      document.querySelectorAll('[data-transient-calculation-notice="1"]').forEach(el=>el.remove());
+      // Die vorhandene Pollinglogik übernimmt danach wieder den aktuellen Jobstatus.
+      setTimeout(()=>{
+        if((box.textContent||'').includes(transientText))box.innerHTML='<strong>ChatGPT arbeitet …</strong>';
+      },300);
+    }catch(error){
+      box.innerHTML='<strong>Bearbeitung angehalten.</strong><br><span class="vf-meta"></span>';
+      const detail=box.querySelector('.vf-meta');
+      if(detail)detail.textContent=String(error?.message||error);
+    }finally{
+      resuming=false;
     }
   }
 
-  const observer=new MutationObserver(records=>{
-    for(const record of records){
-      record.addedNodes.forEach(node=>{if(node instanceof HTMLElement) scan(node);});
-      if(record.type==='characterData'&&record.target.parentElement) scan(record.target.parentElement);
-    }
-    scan();
-  });
+  function scan(){
+    if(interruptedBox())autoResume();
+  }
 
   function start(){
+    const box=document.getElementById('vf-job');
+    if(!box)return;
+    new MutationObserver(scan).observe(box,{childList:true,subtree:true,characterData:true});
     scan();
-    observer.observe(document.body,{childList:true,subtree:true,characterData:true});
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true});
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
 })();
