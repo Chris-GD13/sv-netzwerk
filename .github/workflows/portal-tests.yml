@@ -41,6 +41,9 @@ jobs:
       - name: Upload-Sperre für Signatur- und Profilbilder prüfen
         run: php sv-netzwerk/tests/upload_ignore_signatures_test.php
 
+      - name: XLSM-Struktur der Excel-Dokumente prüfen
+        run: php sv-netzwerk/tests/gf_excel_ooxml_test.php
+
       - name: Import Schema
         run: mysql -h 127.0.0.1 -u root -ptestpass fensterpruefung < sv-netzwerk/public/intern/api/schema.sql
 
