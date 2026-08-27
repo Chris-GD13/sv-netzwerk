@@ -256,7 +256,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
           const ep=usable.reduce((s,x)=>s+choosePrice(x),0),rf=number(d.regional_factor)||number(usable.find(x=>number(x.regional_factor))?.regional_factor)||1,codes=usable.map(x=>x.position_code).filter(Boolean).join(' + ');
           const scope=p.n||'Wiederherstellung inkl. Demontage, Entsorgung und Neumontage';
           bridge()?.addLine?.({position_code:codes||'BKI',description:`${p.l} – ${scope}`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;
-        }catch(e){failed.push(p.l)}
+        }catch(e){addIndex(p,qty);added++}
       }
       state.className=added?'bk-quick-state-ok':'bk-quick-state-error';state.textContent=added?`${added} Schnellposition(en) übernommen.${failed.length?` Ohne belastbaren Treffer: ${failed.join(', ')}.`:''}`:`Keine belastbaren BKI-Treffer. ${failed.join(', ')}`;
     }finally{btn.disabled=false}
