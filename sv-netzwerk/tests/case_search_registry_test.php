@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../public/intern/api/config.php';
+require_once __DIR__ . '/../public/intern/api/case-search.php';
 
 function registryExpect(bool $condition, string $message): void
 {

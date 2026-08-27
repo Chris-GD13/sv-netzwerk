@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 define('APP_VERSION', '1.0.0');
 define('DEFAULT_PROJECT_ID', 1);
-require_once __DIR__ . '/case-search.php';
 
 function ensureRuntimeSchema(PDO $pdo): void
 {
@@ -114,30 +113,6 @@ function registerCaseFolderOwner(string $folderId, array $user, array $meta = []
         ':damage_type'=>(string)($meta['schadenart']??''),
         ':case_type'=>(string)($meta['fallart']??''),
     ]);
-}
-
-function searchCaseFolderIndex(array $user, string $query, int $limit = 30): array
-{
-    if (empty($user['id']) || caseSearchNormalize($query) === '') return [];
-    $stmt = db()->prepare('SELECT folder_id,case_no,policy_no,object_name,damage_type,case_type,registered_at
-        FROM case_folder_owners WHERE user_id=:user_id AND user_email=:user_email ORDER BY registered_at DESC LIMIT 1000');
-    $stmt->execute([':user_id'=>(int)$user['id'],':user_email'=>(string)($user['email']??'')]);
-    $results = [];
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $meta = ['schaden_nr'=>(string)($row['case_no']??''),'versicherungsschein_nr'=>(string)($row['policy_no']??''),'vn_objekt'=>(string)($row['object_name']??''),'schadenart'=>(string)($row['damage_type']??''),'fallart'=>(string)($row['case_type']??'')];
-        $searchText = caseSearchText($meta);
-        if (!caseSearchMatches($searchText, $query)) continue;
-        $results[] = [
-            'id' => (string)$row['folder_id'],
-            'name' => (string)($meta['schaden_nr'] ?: ($meta['vn_objekt'] ?: 'Versicherungsfall')),
-            'modifiedTime' => (string)($row['registered_at']??''),
-            'webViewLink' => null,
-            'meta' => $meta,
-            '_search_text' => $searchText,
-        ];
-        if (count($results) >= $limit) break;
-    }
-    return $results;
 }
 
 function requireCaseFolderAccess(string $folderId, array $user): void
