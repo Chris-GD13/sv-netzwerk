@@ -61,4 +61,38 @@ if ($link !== '/intern/kalkulation/?draft_key=ai%3AFall%201') {
     exit(1);
 }
 
-echo "Kalkulationsentwurf: Werte, Quellen, Hinweise und Bearbeitungslink geprüft.\n";
+$imagePart = gfCalculationInputPart(['file_id' => 'file-photo', 'mime' => 'image/jpeg']);
+if (($imagePart['type'] ?? '') !== 'input_image' || ($imagePart['detail'] ?? '') !== 'high') {
+    fwrite(STDERR, "Schadenfoto wird nicht als hochauflösendes Bild an die Auswertung übergeben.\n");
+    exit(1);
+}
+$documentPart = gfCalculationInputPart(['file_id' => 'file-pdf', 'mime' => 'application/pdf']);
+if (($documentPart['type'] ?? '') !== 'input_file') {
+    fwrite(STDERR, "Dokument wird nicht als Datei an die Auswertung übergeben.\n");
+    exit(1);
+}
+
+$evidence = gfCalculationEvidenceText([['files' => [[
+    'name' => 'Schadenfoto_Küche.jpg',
+    'document_type' => 'Schadenfoto',
+    'facts' => ['Wandbekleidung sichtbar beschädigt.'],
+    'visual_findings' => ['Abplatzung im Sockelbereich; kein Maßstab sichtbar.'],
+    'measurements' => [],
+    'amounts' => [],
+    'open_points' => ['Fläche vor Ort aufmessen.'],
+], [
+    'name' => 'KVA.pdf',
+    'document_type' => 'Kostenvoranschlag',
+    'facts' => [str_repeat('Leistungsbeschreibung ', 2000)],
+    'amounts' => [['description' => 'Wiederherstellung', 'net' => 1000]],
+]]]], 12000);
+if (!str_contains($evidence, 'Schadenfoto_Küche.jpg') || !str_contains($evidence, 'visual_findings')) {
+    fwrite(STDERR, "Bildbefund fehlt im priorisierten Kalkulationsevidenzbestand.\n");
+    exit(1);
+}
+if (mb_strlen($evidence, 'UTF-8') > 12000) {
+    fwrite(STDERR, "Kalkulationsevidenz überschreitet das vorgegebene Kontextbudget.\n");
+    exit(1);
+}
+
+echo "Kalkulationsentwurf: Werte, Quellen, Bilder, Kontextbudget, Hinweise und Bearbeitungslink geprüft.\n";
