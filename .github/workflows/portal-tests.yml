@@ -50,6 +50,9 @@ jobs:
       - name: KI-Kalkulationsentwurf prüfen
         run: php sv-netzwerk/tests/gf_calculation_draft_test.php
 
+      - name: Stabilen Evidenz-Zwischenspeicher prüfen
+        run: php sv-netzwerk/tests/gf_evidence_cache_test.php
+
       - name: Zusammengesetzte KI-Runtime prüfen
         run: |
           php -l sv-netzwerk/public/intern/api/gf-ai-generate-core.php
