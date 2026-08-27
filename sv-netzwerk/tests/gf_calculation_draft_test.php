@@ -73,11 +73,17 @@ if (($documentPart['type'] ?? '') !== 'input_file') {
 }
 $aiCore = file_get_contents(__DIR__.'/../public/intern/api/gf-ai-generate-core.php');
 foreach ([
+    "const GF_OPENAI_UPLOAD_POLICY_VERSION='2';",
+    'function gfOpenAIUploadExtension',
     'function gfOpenAIUploadName',
+    'function gfOpenAIInputPart',
     "'image/jpeg'=>'jpg'",
     "'image/png'=>'png'",
     "'image/gif'=>'gif'",
     "'image/webp'=>'webp'",
+    "'application/x-pdf'=>'pdf'",
+    "\$tmp=\$tmpBase.'.'.\$extension",
+    "'policy'=>GF_OPENAI_UPLOAD_POLICY_VERSION",
     "'upload_name'=>\$uploadName",
 ] as $needle) {
     if (!is_string($aiCore) || !str_contains($aiCore, $needle)) {
@@ -87,6 +93,48 @@ foreach ([
 }
 if (is_string($aiCore) && str_contains($aiCore, "'image/tiff'")) {
     fwrite(STDERR, "Nicht unterstütztes TIFF-Format wird weiterhin als KI-Bild zugelassen.\n");
+    exit(1);
+}
+
+$uploadHelperStart = is_string($aiCore) ? strpos($aiCore, 'function gfOpenAIUploadExtension') : false;
+$uploadHelperEnd = is_string($aiCore) ? strpos($aiCore, 'function gfSupported', (int)$uploadHelperStart) : false;
+if ($uploadHelperStart === false || $uploadHelperEnd === false) {
+    fwrite(STDERR, "KI-Dateiregeln konnten nicht für den Verhaltenstest geladen werden.\n");
+    exit(1);
+}
+eval(substr($aiCore, $uploadHelperStart, $uploadHelperEnd - $uploadHelperStart));
+$uploadNames = [
+    ['Bericht.PDF', 'application/octet-stream', 'Bericht.pdf'],
+    ['scan.noname2', 'application/pdf', 'scan.pdf'],
+    ['scan.noname2', 'application/x-pdf', 'scan.pdf'],
+    ['scan.noname2', 'application/octet-stream', ''],
+    ['Tabelle', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Tabelle.xlsx'],
+];
+foreach ($uploadNames as [$name, $mime, $expected]) {
+    $actual = gfOpenAIUploadName($name, $mime);
+    if ($actual !== $expected) {
+        fwrite(STDERR, "KI-Dateiname wurde nicht sicher normalisiert: {$name} / {$mime} => {$actual}.\n");
+        exit(1);
+    }
+}
+$reportImagePart = gfOpenAIInputPart(['file_id'=>'file-image','mime'=>'image/jpeg']);
+if (($reportImagePart['type'] ?? '') !== 'input_image' || ($reportImagePart['detail'] ?? '') !== 'high') {
+    fwrite(STDERR, "Schadenbild wird im Bericht nicht als Bildquelle übergeben.\n");
+    exit(1);
+}
+$genericImagePart = gfOpenAIInputPart(['file_id'=>'file-generic-image','mime'=>'application/octet-stream','name'=>'Schadenbild.JPG']);
+if (($genericImagePart['type'] ?? '') !== 'input_image') {
+    fwrite(STDERR, "Schadenbild mit generischem MIME-Typ wird nicht anhand der Endung erkannt.\n");
+    exit(1);
+}
+$svgDocumentPart = gfOpenAIInputPart(['file_id'=>'file-svg','mime'=>'image/svg+xml','name'=>'Skizze.svg']);
+if (($svgDocumentPart['type'] ?? '') !== 'input_file') {
+    fwrite(STDERR, "SVG wird fälschlich als Rasterbild übergeben.\n");
+    exit(1);
+}
+$reportDocumentPart = gfOpenAIInputPart(['file_id'=>'file-document','mime'=>'application/pdf']);
+if (($reportDocumentPart['type'] ?? '') !== 'input_file') {
+    fwrite(STDERR, "Berichtsdokument wird nicht als Datei übergeben.\n");
     exit(1);
 }
 
