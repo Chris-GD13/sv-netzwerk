@@ -7,7 +7,8 @@
   const active=bridge.getActive?.()||null, meta=bridge.getMeta?.()||{};
   const folderId=active?.folder_id||'';
   const freeKeyName='svnet-bki-free-draft-key';
-  let draftKey=folderId?`case:${folderId}`:(localStorage.getItem(freeKeyName)||'');
+  const requestedDraftKey=new URLSearchParams(location.search).get('draft_key')||'';
+  let draftKey=requestedDraftKey||(folderId?`case:${folderId}`:(localStorage.getItem(freeKeyName)||''));
   if(!draftKey){draftKey='free:'+(globalThis.crypto?.randomUUID?.()||`${Date.now()}-${Math.random().toString(16).slice(2)}`);localStorage.setItem(freeKeyName,draftKey)}
   const localKey='svnet-bki-draft:'+draftKey;
   let pending=[];

@@ -69,7 +69,7 @@ $outputNeedle = <<<'PHP_CODE'
 $folderId=trim((string)($body['folder_id']??''));$order=is_array($body['order']??null)?$body['order']:[];$outputs=is_array($order['outputs']??null)?$order['outputs']:[];requireCaseFolderAccess($folderId,$user);if(!$outputs)apiError(400,'Keine Dokumente ausgewählt.');
 PHP_CODE;
 $outputReplacement = <<<'PHP_CODE'
-$folderId=trim((string)($body['folder_id']??''));$order=is_array($body['order']??null)?$body['order']:[];$outputs=is_array($order['outputs']??null)?array_values(array_filter(array_map('strval',$order['outputs']))):[];if(!$outputs){$selectionText=mb_strtolower(trim((string)($order['instructions']??'')),'UTF-8');$caseType=mb_strtolower(trim((string)($order['case_type']??'')),'UTF-8');$selectionMap=['erstbericht_sv_gf'=>'/(?:erstbericht\s*sv[- ]?gf|sv[- ]?gf[- ]?erstbericht|engel[- ]?erstbericht|erstbericht[^\n]{0,500}\bengel\b|\bengel\b[^\n]{0,500}erstbericht)/u','zwischenbericht'=>'/\bzwischenbericht\b/u','nachtrag_stellungnahme'=>'/\b(?:nachtrag|stellungnahme)\b/u','schlussbericht'=>'/\bschlussbericht\b/u','schlusserklaerung'=>'/\bschlusserkl[aä]rung\b/u','zahlungsbefuerwortung'=>'/\bzahlungsbef[uü]rwortung\b/u','query_form'=>'/\b(?:r[uü]ckfrageformular|r[uü]ckfrage)\b/u','erstbericht'=>'/\berstbericht\b/u'];if(preg_match('/\bsv[- ]?gf\b/u',$caseType)===1&&preg_match('/\berstbericht\b/u',$selectionText)===1){$outputs=['erstbericht_sv_gf'];}else{foreach($selectionMap as$selectionKey=>$selectionPattern){if(preg_match($selectionPattern,$selectionText)===1){$outputs=[$selectionKey];break;}}}}$order['outputs']=$outputs;requireCaseFolderAccess($folderId,$user);if(!$outputs)apiError(400,'Keine Dokumente ausgewählt.');
+$folderId=trim((string)($body['folder_id']??''));$order=is_array($body['order']??null)?$body['order']:[];$outputs=is_array($order['outputs']??null)?array_values(array_filter(array_map('strval',$order['outputs']))):[];if(!$outputs){$selectionText=mb_strtolower(trim((string)($order['instructions']??'')),'UTF-8');$caseType=mb_strtolower(trim((string)($order['case_type']??'')),'UTF-8');$selectionMap=['erstbericht_sv_gf'=>'/(?:erstbericht\s*sv[- ]?gf|sv[- ]?gf[- ]?erstbericht|engel[- ]?erstbericht|erstbericht[^\n]{0,500}\bengel\b|\bengel\b[^\n]{0,500}erstbericht)/u','zwischenbericht'=>'/\bzwischenbericht\b/u','nachtrag_stellungnahme'=>'/\b(?:nachtrag|stellungnahme)\b/u','schlussbericht'=>'/\bschlussbericht\b/u','schlusserklaerung'=>'/\bschlusserkl[aä]rung\b/u','zahlungsbefuerwortung'=>'/\bzahlungsbef[uü]rwortung\b/u','query_form'=>'/\b(?:r[uü]ckfrageformular|r[uü]ckfrage)\b/u','kalkulation'=>'/\bkalkulation\b/u','erstbericht'=>'/\berstbericht\b/u'];if(preg_match('/\bsv[- ]?gf\b/u',$caseType)===1&&preg_match('/\berstbericht\b/u',$selectionText)===1){$outputs=['erstbericht_sv_gf'];}else{foreach($selectionMap as$selectionKey=>$selectionPattern){if(preg_match($selectionPattern,$selectionText)===1){$outputs=[$selectionKey];break;}}}}$order['outputs']=$outputs;requireCaseFolderAccess($folderId,$user);if(!$outputs)apiError(400,'Keine Dokumente ausgewählt.');
 PHP_CODE;
 $source = str_replace($outputNeedle, $outputReplacement, $source, $outputRepairCount);
 if ($outputRepairCount !== 1) {
@@ -191,6 +191,30 @@ $source = str_replace(
     '$allowed=[\'dokumentenindex\',\'rechnungsregister\',\'erstbericht\',\'erstbericht_sv_gf\',\'schadenprotokoll\'',
     $source
 );
+
+// „Kalkulation“ erzeugt keinen starren Bericht, sondern einen editierbaren
+// KI-Erstentwurf auf der vorhandenen Kalkulationsseite.
+$calculationAllowedNeedle = "'schlussbericht','vorauszahlung','query_form'];if(\$folderId===''||!\$outputs)";
+$calculationAllowedReplacement = "'schlussbericht','vorauszahlung','query_form','kalkulation'];if(\$folderId===''||!\$outputs)";
+$source = str_replace($calculationAllowedNeedle, $calculationAllowedReplacement, $source, $calculationAllowedCount);
+if ($calculationAllowedCount !== 1) throw new RuntimeException('Kalkulation konnte nicht zur Dokumentauswahl hinzugefügt werden.');
+
+$calculationValidationNeedle = 'function gfEngelValidate(string $key,array $result,array $meta,string $instructions):array{if(gfExcelOutput($key))';
+$calculationValidationReplacement = 'function gfEngelValidate(string $key,array $result,array $meta,string $instructions):array{if($key===\'kalkulation\'){gfCalculationDraftState($result,$meta,$instructions);return[\'passed\'=>true,\'checks\'=>[\'documented_quantities\',\'documented_unit_prices\',\'source_per_position\',\'editable_calculation_draft\']];}if(gfExcelOutput($key))';
+$source = str_replace($calculationValidationNeedle, $calculationValidationReplacement, $source, $calculationValidationCount);
+if ($calculationValidationCount !== 1) throw new RuntimeException('Kalkulations-QS konnte nicht angebunden werden.');
+
+$calculationBkiNeedle = '$bkiRequested=preg_match(\'/\\bBKI\\b/ui\',$instructions)===1;';
+$calculationBkiReplacement = '$bkiRequested=in_array(\'kalkulation\',$outputs,true)||preg_match(\'/\\bBKI\\b/ui\',$instructions)===1;';
+$source = str_replace($calculationBkiNeedle, $calculationBkiReplacement, $source, $calculationBkiCount);
+if ($calculationBkiCount !== 1) throw new RuntimeException('BKI-Grundlage der Kalkulation konnte nicht angebunden werden.');
+
+$calculationPromptNeedle = '$bkiRule=$bkiRequested?';
+$calculationPromptReplacement = <<<'PHP_CODE'
+if($key==='kalkulation')$responseRule=' Antworte ausschließlich als JSON {"summary":"...","items":[{"position_code":"BKI-Position oder leer","description":"konkrete Leistung","quantity":1.0,"unit":"m²|m|St|Std|psch","unit_price":123.45,"regional_factor":1.0,"source_name":"exakter Dateiname oder BKI-Quelle","source_page":"Seite"}],"vat":19,"assumptions":["..."],"open_points":["..."]}. Erstelle eine erste, auf der vorhandenen Kalkulationsseite weiter bearbeitbare Schadenkalkulation. Werte Schadenhergang, Schadenumfang, Aufmaße, Kostenvoranschläge, Rechnungen und die beigefügten BKI-Altbau-Quellen vollständig aus. Jede Position benötigt eine konkrete Leistung, eine belegte Menge mit Einheit, einen belastbaren Einheitspreis und die exakte Quelle. Einheitspreise ausschließlich aus BKI oder eindeutig belegten KVA-/Rechnungspositionen übernehmen. Mengen ausschließlich aus belegten Aufmaßen oder ausdrücklich als vorläufige Annahme im Feld assumptions verwenden. Keine Werte erfinden. Nicht belastbare Positionen nicht kalkulieren, sondern als open_points ausweisen. Vorgaben und Ergänzungen aus dem Arbeitsauftrag verbindlich berücksichtigen. Die Ausgabe ist ausdrücklich ein fachlich zu prüfender Erstentwurf und keine Freigabe.';$bkiRule=$bkiRequested?
+PHP_CODE;
+$source = str_replace($calculationPromptNeedle, trim($calculationPromptReplacement), $source, $calculationPromptCount);
+if ($calculationPromptCount !== 1) throw new RuntimeException('KI-Auftrag für die Kalkulationsseite konnte nicht angebunden werden.');
 
 // Die aktuelle Gesamtreserve direkt aus dem Regulierungsauftrag lesen.
 function gfPortalCurrentReserve(array $caseFiles): ?string
@@ -387,7 +411,10 @@ function gfPortalDraftText(string $title, array $result): string
 $source = str_replace('$created=[];$staged=[];', '$created=[];$staged=[];$drafts=[];', $source, $countDraftInit);
 if ($countDraftInit !== 1) throw new RuntimeException('Entwurfsrückgabe konnte nicht initialisiert werden.');
 $draftNeedle = '$contentQs=gfEngelValidate($key,$result,$meta,$instructions);if(gfExcelOutput($key))';
-$draftReplacement = '$contentQs=gfEngelValidate($key,$result,$meta,$instructions);$drafts[]=[\'type\'=>$key,\'title\'=>$title,\'content\'=>gfPortalDraftText($title,$result)];if(!empty($order[\'draft_only\'])){gfJobUpdate($jobId,\'running\',min(94,$base+(int)floor(70/$total)),$title.\' wurde als bearbeitbarer Entwurf erstellt.\');continue;}if(gfExcelOutput($key))';
+$draftReplacement = <<<'PHP_CODE'
+$contentQs=gfEngelValidate($key,$result,$meta,$instructions);if($key==='kalkulation'){$calculationState=gfCalculationDraftState($result,$meta,$instructions);$calculationDraftKey='ai:'.$jobId;gfSaveCalculationDraft($calculationDraftKey,$folderId,$meta,$calculationState,gfCalculationJobOwner($jobId));$created[]=['id'=>$calculationDraftKey,'name'=>'Kalkulation – KI-Erstentwurf bearbeiten','webViewLink'=>gfCalculationDraftLink($calculationDraftKey),'webContentLink'=>null,'type'=>'kalkulation','continued'=>false,'template_used'=>'Kalkulationsseite','qs'=>['content'=>$contentQs,'document'=>['passed'=>true,'checks'=>['editable_draft_saved']]]];gfJobUpdate($jobId,'running',min(94,$base+(int)floor(70/$total)),'Kalkulationsentwurf wurde auf der Kalkulationsseite gespeichert.');continue;}$drafts[]=['type'=>$key,'title'=>$title,'content'=>gfPortalDraftText($title,$result)];if(!empty($order['draft_only'])){gfJobUpdate($jobId,'running',min(94,$base+(int)floor(70/$total)),$title.' wurde als bearbeitbarer Entwurf erstellt.');continue;}if(gfExcelOutput($key))
+PHP_CODE;
+$draftReplacement = trim($draftReplacement);
 $source = str_replace($draftNeedle, $draftReplacement, $source, $countDraftResult);
 if ($countDraftResult !== 1) throw new RuntimeException('Entwurfsrückgabe konnte nicht an die Dokumenterstellung angebunden werden.');
 $finalNeedle = '$result=[\'ok\'=>true,\'created\'=>$created,\'count\'=>count($created),';
