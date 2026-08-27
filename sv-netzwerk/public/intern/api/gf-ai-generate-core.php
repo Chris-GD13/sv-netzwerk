@@ -4,6 +4,7 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/gf-case-isolation.php';
 require_once __DIR__ . '/gf-excel-ooxml.php';
 require_once __DIR__ . '/gf-calculation-draft.php';
+require_once __DIR__ . '/gf-evidence-cache.php';
 commonHeaders();
 $user=requireAuth();
 if(!in_array($user['role']??'', ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) apiError(403,'Keine Berechtigung.');
