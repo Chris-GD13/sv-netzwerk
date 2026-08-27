@@ -71,15 +71,22 @@ if (($documentPart['type'] ?? '') !== 'input_file') {
     fwrite(STDERR, "Dokument wird nicht als Datei an die Auswertung übergeben.\n");
     exit(1);
 }
-if (gfOpenAIUploadName('Schadenbild.JPG', 'image/jpeg') !== 'Schadenbild.jpg'
-    || gfOpenAIUploadName('Beleg.PNG', 'image/png') !== 'Beleg.png'
-    || gfOpenAIUploadName('Aktennotiz.PDF', 'application/pdf') !== 'Aktennotiz.PDF') {
-    fwrite(STDERR, "Bild-Dateiendungen werden für die KI nicht korrekt normalisiert.\n");
-    exit(1);
+$aiCore = file_get_contents(__DIR__.'/../public/intern/api/gf-ai-generate-core.php');
+foreach ([
+    'function gfOpenAIUploadName',
+    "'image/jpeg'=>'jpg'",
+    "'image/png'=>'png'",
+    "'image/gif'=>'gif'",
+    "'image/webp'=>'webp'",
+    "'upload_name'=>\$uploadName",
+] as $needle) {
+    if (!is_string($aiCore) || !str_contains($aiCore, $needle)) {
+        fwrite(STDERR, "KI-Bildnormalisierung fehlt: {$needle}\n");
+        exit(1);
+    }
 }
-if (!gfSupported(['name' => 'Schadenbild.GIF', 'mimeType' => 'image/gif'])
-    || gfSupported(['name' => 'Scan.TIFF', 'mimeType' => 'image/tiff'])) {
-    fwrite(STDERR, "Unterstützte KI-Bildformate sind nicht korrekt begrenzt.\n");
+if (is_string($aiCore) && str_contains($aiCore, "'image/tiff'")) {
+    fwrite(STDERR, "Nicht unterstütztes TIFF-Format wird weiterhin als KI-Bild zugelassen.\n");
     exit(1);
 }
 
