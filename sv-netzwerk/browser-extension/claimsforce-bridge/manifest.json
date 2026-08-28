@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "SV-Netzwerk ClaimsForce-Brücke",
+  "version": "1.0.0",
+  "description": "Liest die eigenen ClaimsForce-Aufträge samt Dateien, Nachrichten und Terminen in das SV-Netzwerk ein.",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": [
+    "https://web.claimsforce.com/*",
+    "https://*.claimsforce.com/*",
+    "https://claimsforce.eu.auth0.com/*",
+    "https://*.execute-api.eu-central-1.amazonaws.com/*",
+    "https://www.sv-netzwerk.eu/*"
+  ],
+  "background": { "service_worker": "service-worker.js", "type": "module" },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": ["https://web.claimsforce.com/*"],
+      "js": ["claims-main.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://web.claimsforce.com/*"],
+      "js": ["claims-bridge.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*"],
+      "js": ["portal-bridge.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://*.claimsforce.com/*", "https://claimsforce.eu.auth0.com/*"],
+      "exclude_matches": ["https://web.claimsforce.com/*"],
+      "js": ["login-helper.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
