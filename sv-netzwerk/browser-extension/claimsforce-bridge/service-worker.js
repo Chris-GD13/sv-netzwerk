@@ -5,6 +5,7 @@ const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const authHeaders = token => ({ Authorization: `Bearer ${token}`, Accept: 'application/json' });
 let runningImport = null;
+let credentialDiagnostic = 'idle';
 const safeRoute = url => { try { return new URL(url).pathname; } catch { return 'unbekannt'; } };
 
 async function diagnostic(run, phase, text, details = {}) {
@@ -14,23 +15,30 @@ async function diagnostic(run, phase, text, details = {}) {
 }
 
 async function credentialsFor(profile) {
+  credentialDiagnostic = 'vault';
   const saved = await Promise.race([loadCredentials(profile).catch(() => null), sleep(600).then(() => null)]);
-  if (saved?.email && saved?.password) return { value: saved, source: 'vault' };
+  if (saved?.email && saved?.password) { credentialDiagnostic = 'vault-ready'; return { value: saved, source: 'vault' }; }
+  credentialDiagnostic = 'native-host';
   try {
     const local = await Promise.race([
       chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile }),
       sleep(800).then(() => null)
     ]);
-    if (local?.email && local?.password) return { value: local, source: 'native-host' };
+    if (local?.email && local?.password) { credentialDiagnostic = 'native-host-ready'; return { value: local, source: 'native-host' }; }
   } catch {}
+  credentialDiagnostic = 'local-config';
   try {
-    const config = await (await fetch(chrome.runtime.getURL('local-config.json'))).json();
+    const configResponse = await fetch(chrome.runtime.getURL('local-config.json'));
+    if (!configResponse.ok) { credentialDiagnostic = `local-config-http-${configResponse.status}`; return null; }
+    const config = await configResponse.json();
+    credentialDiagnostic = 'loopback-request';
     const endpoint = new URL('/credentials', config.url || 'http://127.0.0.1:47831');
     endpoint.searchParams.set('profile', profile);
     const response = await fetch(endpoint, { headers: { 'X-SVNET-Token': config.token } });
     const local = response.ok ? await response.json() : null;
+    credentialDiagnostic = response.ok ? (local?.email && local?.password ? 'loopback-ready' : 'loopback-incomplete') : `loopback-http-${response.status}`;
     return local?.email && local?.password ? { value: local, source: 'loopback' } : null;
-  } catch { return null; }
+  } catch (error) { credentialDiagnostic = `local-fallback-${String(error?.name || 'error').toLowerCase()}`; return null; }
 }
 
 async function tokenValue(profile) {
@@ -263,6 +271,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }).then(value => sendResponse(value || {}));
     return true;
   }
+  if (message?.type === 'GET_CREDENTIAL_DIAGNOSTIC') { sendResponse({ ok: true, phase: credentialDiagnostic }); return; }
   if (message?.type === 'OPEN_OPTIONS') {
     chrome.storage.session.set({ activeProfile: message.profile || 'self' }).then(() => chrome.runtime.openOptionsPage()); sendResponse({ ok: true }); return;
   }

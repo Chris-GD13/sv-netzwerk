@@ -15,7 +15,11 @@ async function fillPortalLogin() {
   }
   mark('requesting-credentials');
   const credentials = await chrome.runtime.sendMessage({ type: 'GET_PORTAL_CREDENTIALS' }).catch(() => null);
-  if (!credentials?.email || !credentials?.password) { mark('credentials-unavailable'); return; }
+  if (!credentials?.email || !credentials?.password) {
+    const status = await chrome.runtime.sendMessage({ type: 'GET_CREDENTIAL_DIAGNOSTIC' }).catch(() => null);
+    mark(`credentials-unavailable-${status?.phase || 'unknown'}`);
+    return;
+  }
   attempted = true;
   const set = (node, value) => {
     const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
