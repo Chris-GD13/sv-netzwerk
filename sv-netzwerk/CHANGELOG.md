@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.35 – 2026-08-28
+- automatischer morgens Fachbeitrag veröffentlicht: „Koordination mehrerer Sachverständiger im Kumulereignis: Rollen, Standards und Qualitätssicherung"
+- LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
+- ohne Beitragsbild veröffentlicht; keine typografische Platzhaltergrafik erzeugt
+
 ## 3.4.34 – 2026-08-27
 - automatischer morgens Fachbeitrag veröffentlicht: „Sanierungsplanung, Rückbau und Trocknung: Strategie für nachvollziehbare Wiederherstellung"
 - LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)

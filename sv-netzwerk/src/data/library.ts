@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Koordination mehrerer Sachverständiger im Kumulereignis: Rollen, Standards und Qualitätssicherung',
+    description: 'Koordination im Sachverständigen-Netzwerk: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/koordination-sachverstaendige-kumulereignis-einsatz/',
+    category: 'Koordination im Sachverständigen-Netzwerk',
+    tags: ['Koordination', 'Sachverständiger', 'Kumulschaden', 'Einsatzplanung', 'Qualitätssicherung'],
+    date: '2026-08-28',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Sanierungsplanung, Rückbau und Trocknung: Strategie für nachvollziehbare Wiederherstellung',
     description: 'Sanierungsplanung und Trocknung: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/sanierungsplanung-rueckbau-trocknung-strategie/',
