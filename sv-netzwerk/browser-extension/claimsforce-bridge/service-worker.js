@@ -145,11 +145,13 @@ async function runImport(run) {
   await chrome.storage.session.set({ activeProfile: profile });
   if (profile !== 'self') {
     const currentProfile = previous.claimsLoggedProfile || '';
-    if (!currentProfile && previous.claimsToken) {
-      await chrome.storage.session.set({ claimsToken: previous.claimsToken, claimsTokenProfile: profile, claimsLoggedProfile: profile });
+    const [openSession] = await chrome.tabs.query({ url: 'https://web.claimsforce.com/*' });
+    const openRoute = safeRoute(openSession?.url || '');
+    if (!currentProfile && openSession && !['/login', '/logout'].includes(openRoute)) {
+      await chrome.storage.session.set({ ...(previous.claimsToken ? { claimsToken: previous.claimsToken, claimsTokenProfile: profile } : {}), claimsLoggedProfile: profile });
       await diagnostic(run, 'CF-AUTH-01', 'Vorhandene ClaimsForce-Sitzung wurde dem angeforderten Profil zugeordnet.', { profileSwitch: 'bestehende Sitzung gebunden' });
     } else if (currentProfile !== profile) {
-      const [open] = await chrome.tabs.query({ url: 'https://web.claimsforce.com/*' });
+      const open = openSession;
       await diagnostic(run, 'CF-AUTH-01', 'ClaimsForce-Profil wird eindeutig neu angemeldet.', { profileSwitch: currentProfile ? 'wechsel' : 'unbekannte Sitzung' });
       await chrome.storage.session.remove(['claimsToken', 'claimsTokenProfile', 'claimsLoggedProfile']);
       if (open?.id) {
