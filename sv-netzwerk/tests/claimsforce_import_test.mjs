@@ -73,12 +73,14 @@ const queue = fs.readFileSync(path.join(root, 'public/intern/api/claimsforce-que
 assert(queue.includes('claimsforce_import_jobs') && queue.includes("$action==='claim'"), 'Zentrale serverseitige Importwarteschlange fehlt');
 assert(queue.includes('heartbeat_at') && queue.includes("$action==='heartbeat'") && queue.includes("$action==='active'"), 'Verwaiste Browserimporte müssen per Heartbeat erkannt und wiederaufgenommen werden');
 assert(queue.includes("phase='CF-RECOVER'") && queue.includes('attempt_count=attempt_count+1'), 'Wiederaufnahme muss als eigener Versuch nachvollziehbar sein');
+assert(queue.includes("$action==='mine'") && queue.includes('WHERE requested_by=:u ORDER BY id DESC LIMIT 20'), 'Eigene Warteschlangenläufe müssen nach einem Portal-Neuladen wiedergefunden werden');
 const central = fs.readFileSync(path.join(root, 'public/intern/claimsforce-central.js'), 'utf8');
 assert(central.includes("action=status&id=") && central.includes("SVNET_CLAIMS_IMPORT_START"), 'Portal kann zentrale Importe starten und verfolgen');
 assert(central.includes("timeZone:'Europe/Berlin'") && central.includes("!==3") && central.includes("['christian','jens','marc','holger']"), 'Täglicher 03:00-Uhr-Import plant alle vier ClaimsForce-Zugänge in Berliner Zeit ein');
 assert(central.includes("job.profile==='jens'?'christian':job.profile"), 'Ehemalige Jens-Maurer-Fälle werden ausschließlich Christians Portalordner zugeordnet');
 assert(central.includes("profile==='christian'?['christian','jens']:[profile]"), 'Manueller Christian-Import liest auch die ehemaligen Jens-Maurer-Fälle ein');
 assert(central.includes("post('active')") && central.includes("post('heartbeat'"), 'Zentrale Station verbindet sich nach einem Browserneustart wieder mit dem laufenden Import');
+assert(central.includes("action=mine") && central.includes('resumeWatch()'), 'Portal stellt die sichtbare Überwachung bereits eingereihter Importe wieder her');
 assert(central.includes('Browser-Brücke 1.1.0 erforderlich') && central.includes("d.version||'0.0.0'"), 'Veraltete geladene Erweiterungen dürfen keine neuen Warteschlangenläufe starten');
 const optionsHtml = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.html'), 'utf8');
 assert(optionsHtml.includes('Ehem. Jens Maurer → Christian Wächter'), 'Jens-Zugang ist in der verschlüsselten Zugangsverwaltung auswählbar');

@@ -70,6 +70,17 @@ if($action==='status'){
     unset($row['requested_by']);
     apiJson(['ok'=>true,'job'=>$row]);
 }
+if($action==='mine'){
+    $s=db()->prepare('SELECT id FROM claimsforce_import_jobs WHERE requested_by=:u ORDER BY id DESC LIMIT 20');
+    $s->execute([':u'=>(string)($user['email']??'')]);
+    $jobs=[];
+    foreach($s->fetchAll(PDO::FETCH_ASSOC)as$row){
+        $job=cqRow((int)$row['id']);
+        unset($job['requested_by']);
+        $jobs[]=$job;
+    }
+    apiJson(['ok'=>true,'jobs'=>$jobs]);
+}
 if(($user['role']??'')!=='administrator')apiError(403,'Nur die zentrale Importstation darf Aufträge übernehmen.');
 
 if($action==='active'){

@@ -19,6 +19,14 @@
     setTimeout(watch,3000);
   }
 
+  async function resumeWatch(){
+    try{
+      const recent=await json('/intern/api/claimsforce-queue.php?action=mine');
+      userJobs=(recent.jobs||[]).filter(job=>['queued','running'].includes(job.status)).map(job=>Number(job.id));
+      if(userJobs.length){button.disabled=true;watch()}
+    }catch(e){show('Importstatus konnte nicht wiederhergestellt werden: '+e.message,true)}
+  }
+
   button.addEventListener('click',async()=>{
     if(userJobs.length)return;
     button.disabled=true;
@@ -96,5 +104,5 @@
   }
 
   setInterval(heartbeat,20000);
-  json('/intern/api/google-drive-sync.php?action=status').then(d=>{context=d;window.postMessage({type:'SVNET_CLAIMS_BRIDGE_PING'},location.origin);automaticImport();setInterval(automaticImport,30000);poll()}).catch(e=>show(e.message,true));
+  json('/intern/api/google-drive-sync.php?action=status').then(async d=>{context=d;window.postMessage({type:'SVNET_CLAIMS_BRIDGE_PING'},location.origin);await resumeWatch();automaticImport();setInterval(automaticImport,30000);poll()}).catch(e=>show(e.message,true));
 })();
