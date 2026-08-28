@@ -1,25 +1,33 @@
-async function fillLogin() {
+let suppliedCredentials = null;
+
+async function fillLogin(credentials = suppliedCredentials) {
   const email = document.querySelector('input[type="email"],input[name="email"],input[name="username"]');
   const password = document.querySelector('input[type="password"]');
-  if (!email || !password || password.dataset.svnetFilled) return;
+  if (!email || !password) return;
   const submit = () => {
-    if (password.dataset.svnetSubmitted) return;
-    password.dataset.svnetSubmitted = '1';
+    const submittedAt = Number(password.dataset.svnetSubmittedAt || 0);
+    if (Date.now() - submittedAt < 3000) return;
+    password.dataset.svnetSubmittedAt = String(Date.now());
     const form = password.closest('form');
-    const button = form?.querySelector('button[type="submit"]');
+    const button = form?.querySelector('button[type="submit"]') || [...document.querySelectorAll('button')].find(node => /^Anmelden$/i.test((node.textContent || '').trim()));
     if (button) button.click();
     else form?.requestSubmit?.();
   };
   if (email.value && password.value) {
-    password.dataset.svnetFilled = '1';
     setTimeout(submit, 250);
     return;
   }
-  const response = await chrome.runtime.sendMessage({ type: 'GET_CREDENTIALS' }).catch(() => null);
+  const response = credentials || await chrome.runtime.sendMessage({ type: 'GET_CREDENTIALS' }).catch(() => null);
   if (!response?.email || !response?.password) return;
   const set = (node, value) => { const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set; setter?.call(node, value); node.dispatchEvent(new Event('input', { bubbles: true })); node.dispatchEvent(new Event('change', { bubbles: true })); };
-  set(email, response.email); set(password, response.password); password.dataset.svnetFilled = '1';
+  set(email, response.email); set(password, response.password);
   setTimeout(submit, 250);
 }
 fillLogin();
 new MutationObserver(fillLogin).observe(document.documentElement, { childList: true, subtree: true });
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type !== 'FILL_LOGIN') return;
+  suppliedCredentials = message.credentials || null;
+  fillLogin(suppliedCredentials).then(() => sendResponse({ ok: true })).catch(() => sendResponse({ ok: false }));
+  return true;
+});

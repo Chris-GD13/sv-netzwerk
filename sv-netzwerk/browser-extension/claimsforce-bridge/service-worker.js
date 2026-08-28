@@ -58,12 +58,16 @@ async function waitTab(tabId, timeout = 30000) {
   throw new Error('ClaimsForce hat nicht rechtzeitig geladen.');
 }
 
-async function claimsTab(profile, run) {
+async function claimsTab(profile, run, credential) {
   let [tab] = await chrome.tabs.query({ url: 'https://web.claimsforce.com/*' });
   if (!tab) tab = await chrome.tabs.create({ url: 'https://web.claimsforce.com/login', active: false });
   await waitTab(tab.id);
   if (safeRoute(tab.url) === '/login') await chrome.storage.session.remove(['claimsToken', 'claimsTokenProfile']);
   await diagnostic(run, 'CF-AUTH-02', 'ClaimsForce-Seite ist geladen.', { route: safeRoute(tab.url) });
+  if (safeRoute(tab.url) === '/login' && credential?.value) {
+    const requested = await chrome.tabs.sendMessage(tab.id, { type: 'FILL_LOGIN', credentials: credential.value }).catch(() => null);
+    await diagnostic(run, 'CF-AUTH-02', requested?.ok ? 'ClaimsForce-Anmeldung wurde an das Formular übergeben.' : 'ClaimsForce-Anmeldehelfer ist auf der Loginseite nicht erreichbar.', { route: '/login', helper: requested?.ok ? 'bereit' : 'nicht erreichbar' });
+  }
   let token = await tokenValue(profile);
   if (!token) {
     token = await waitForToken(profile);
@@ -147,7 +151,7 @@ async function runImport(run) {
   const credential = await credentialsFor(profile);
   await diagnostic(run, 'CF-CRED-01', credential ? 'Zugangsdatenquelle ist verfügbar.' : 'Für das Profil ist keine Zugangsdatenquelle verfügbar.', { source: credential?.source || 'keine' });
   if (!credential) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar.');
-  const { tab, token } = await claimsTab(profile, run);
+  const { tab, token } = await claimsTab(profile, run, credential);
   await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
   const planning = await openPlanning(tab.id);
   await diagnostic(run, 'CF-PLAN-04', 'Planungsansicht „Mit Termin“ wurde angefordert.', { strategy: planning?.strategy || 'bestehende Ansicht' });
