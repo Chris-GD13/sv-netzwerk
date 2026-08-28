@@ -44,7 +44,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes("context.backoffice?`Import für"), 'Susannes ausgewählter Sachverständiger wird angezeigt');
 assert(portal.includes("button.dataset.claimsProfile=context.backoffice?key:(context.claims_profile||'self')"), 'Portal verwendet für Susanne und den angemeldeten Sachverständigen das richtige gespeicherte Profil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20260828-4'), 'Portal lädt die aktuelle Warteschlangen- und Laufzeitdiagnose ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20260828-5'), 'Portal lädt die aktuelle Warteschlangen- und Laufzeitdiagnose ohne alten Browsercache');
 
 const bridge = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/portal-bridge.js'), 'utf8');
 assert(bridge.includes('mergeBlank(existing?.meta || {}, message.mapped)'), 'Import ergänzt bestehende Falldaten nur in leeren Feldern');
@@ -93,6 +93,7 @@ assert(central.includes("profile==='christian'?['christian','jens']:[profile]"),
 assert(central.includes("post('active')") && central.includes("post('heartbeat'"), 'Zentrale Station verbindet sich nach einem Browserneustart wieder mit dem laufenden Import');
 assert(central.includes("action=mine") && central.includes('resumeWatch()'), 'Portal stellt die sichtbare Überwachung bereits eingereihter Importe wieder her');
 assert(central.includes("job.status==='done'?'abgeschlossen':'fehlgeschlagen'") && central.includes("slice(0,4)"), 'Portal zeigt auch die letzten terminalen Profilaufträge mit Phase und Ergebnis an');
+assert(central.includes('setTimeout(()=>show(text,failed),1000)'), 'Terminaler Importstatus bleibt nach dem einmaligen alten Bridge-Ready-Ereignis sichtbar');
 assert(central.includes('SVNET_CLAIMS_RUNTIME_STATUS') && central.includes('SVNET_CLAIMS_RUNTIME_PING'), 'Portal zeigt den persistenten Browserlauf auch nach einem Worker-Neustart an');
 assert(central.includes('Browser-Brücke 1.3.0 erforderlich') && central.includes("versionAtLeast(bridgeVersion,'1.3.0')"), 'Veraltete geladene Erweiterungen dürfen keine neuen Warteschlangenläufe starten');
 const optionsHtml = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.html'), 'utf8');

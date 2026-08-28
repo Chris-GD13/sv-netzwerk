@@ -26,7 +26,7 @@
       userJobs=(recent.jobs||[]).filter(job=>['queued','running'].includes(job.status)).map(job=>Number(job.id));
       if(userJobs.length){button.disabled=true;watch();return}
       const terminal=(recent.jobs||[]).filter(job=>['done','failed'].includes(job.status)).slice(0,4);
-      if(terminal.length)show(terminal.map(job=>`${job.profile}: ${job.status==='done'?'abgeschlossen':'fehlgeschlagen'} [${job.phase||'CF-STATUS'}] – ${job.message||'ohne Meldung'}`).join(' · '),terminal.some(job=>job.status==='failed'));
+      if(terminal.length){const text=terminal.map(job=>`${job.profile}: ${job.status==='done'?'abgeschlossen':'fehlgeschlagen'} [${job.phase||'CF-STATUS'}] – ${job.message||'ohne Meldung'}`).join(' · '),failed=terminal.some(job=>job.status==='failed');show(text,failed);setTimeout(()=>show(text,failed),1000)}
     }catch(e){show('Importstatus konnte nicht wiederhergestellt werden: '+e.message,true)}
   }
 
