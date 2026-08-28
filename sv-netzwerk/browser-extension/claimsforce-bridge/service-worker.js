@@ -102,8 +102,14 @@ async function openPlanning(tabId) {
   return opened;
 }
 
-async function requestJson(url, token, optional = false) {
-  const response = await fetch(url, { headers: authHeaders(token) });
+async function requestJson(url, token, optional = false, timeout = 20000) {
+  const controller = new AbortController(), timer = setTimeout(() => controller.abort(), timeout);
+  let response;
+  try { response = await fetch(url, { headers: authHeaders(token), signal: controller.signal }); }
+  catch (error) {
+    if (optional) return null;
+    throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Abruf hat das Zeitlimit überschritten.' : 'ClaimsForce-Abruf ist fehlgeschlagen.');
+  } finally { clearTimeout(timer); }
   if (optional && response.status === 404) return null;
   if (!response.ok) {
     if (optional) return null;
@@ -113,7 +119,7 @@ async function requestJson(url, token, optional = false) {
 }
 
 async function portal(tabId, message) {
-  const response = await chrome.tabs.sendMessage(tabId, message);
+  const response = await Promise.race([chrome.tabs.sendMessage(tabId, message), sleep(30000).then(() => ({ ok: false, error: 'Das SV-Netzwerk hat innerhalb von 30 Sekunden nicht geantwortet.' }))]);
   if (!response?.ok) throw new Error(response?.error || 'Das SV-Netzwerk hat den Import nicht angenommen.');
   return response;
 }
@@ -175,10 +181,15 @@ async function runImport(run) {
     const state = await chrome.tabs.sendMessage(tab.id, { type: 'SESSION_STATE' }).catch(() => ({}));
     throw new Error(`[CF-LIST-05] Keine Aufträge erkannt (Route ${state.route || 'unbekannt'}, API ${state.observedClaims || 0}).`);
   }
-  const config = await (await fetch('https://web.claimsforce.com/config')).json();
+  const configController = new AbortController(), configTimer = setTimeout(() => configController.abort(), 15000);
+  let config;
+  try { config = await (await fetch('https://web.claimsforce.com/config', { signal: configController.signal })).json(); }
+  catch (error) { throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Konfiguration hat das Zeitlimit überschritten.' : 'ClaimsForce-Konfiguration konnte nicht geladen werden.'); }
+  finally { clearTimeout(configTimer); }
   let filesDone = 0, messagesDone = 0, appointmentsDone = 0;
   for (let index = 0; index < claims.length; index++) {
     const item = claims[index], id = item.id;
+    await diagnostic(run, 'CF-CASE-FETCH', `Auftrag ${index + 1}/${claims.length}: Falldaten werden geladen.`, { current: index, total: claims.length, claimIndex: index + 1 });
     await progress(portalTabId, `Auftrag ${index + 1}/${claims.length} wird eingelesen …`, index, claims.length);
     const [rawDisposition, rawCommunication, rawFiles, rawMessages, rawAppointments, rawStakeholders] = await Promise.all([
       requestJson(`${config.DISPOSITION_API_ENDPOINT}/claims/${id}`, token),
@@ -201,7 +212,11 @@ async function runImport(run) {
       const name = safeFileName(file.name || file.fileName || file.originalFilename, `ClaimsForce-${file.id}`);
       await progress(portalTabId, `${mapped.schaden_nr || item.label}: ${name}`, index, claims.length);
       const url = `${config.FILES_API_ENDPOINT}/claims/${encodeURIComponent(id)}/files/${encodeURIComponent(file.id)}?token=${encodeURIComponent(token)}`;
-      const response = await fetch(url);
+      const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
+      let response;
+      try { response = await fetch(url, { signal: controller.signal }); }
+      catch (error) { throw new Error(error?.name === 'AbortError' ? `Datei „${name}“ hat das Zeitlimit überschritten.` : `Datei „${name}“ konnte nicht geladen werden.`); }
+      finally { clearTimeout(timer); }
       if (!response.ok) throw new Error(`Datei „${name}“ konnte nicht geladen werden (${response.status}).`);
       await uploadBuffer(portalTabId, folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, await response.arrayBuffer());
       filesDone++;
