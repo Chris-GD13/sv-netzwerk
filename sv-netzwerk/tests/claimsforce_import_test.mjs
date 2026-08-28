@@ -23,11 +23,30 @@ const mapped = mapClaim({
 assert.equal(mapped.vn_objekt, 'Lena Prunkl');
 assert.equal(mapped.schaden_ort, 'Metzingen');
 assert.equal(mapped.claimsforce_termin.id, 'termin-1');
+
+const nestedAddress = mapClaim({
+  id: 'claim-2',
+  damage: { location: { address: { streetName: 'Musterweg', houseNumber: '8', zip: '70173', locality: 'Stuttgart' } } }
+});
+assert.deepEqual(
+  [nestedAddress.schaden_strasse, nestedAddress.schaden_plz, nestedAddress.schaden_ort],
+  ['Musterweg 8', '70173', 'Stuttgart'],
+  'Verschachtelte ClaimsForce-Schadenorte werden übernommen'
+);
+
+const appointmentAddress = mapClaim({ id: 'claim-3' }, {}, [{
+  id: 'termin-2', startDate: '2026-09-02T08:00:00Z', location: 'Terminweg 4, 71522 Backnang'
+}]);
+assert.deepEqual(
+  [appointmentAddress.schaden_strasse, appointmentAddress.schaden_plz, appointmentAddress.schaden_ort],
+  ['Terminweg 4', '71522', 'Backnang'],
+  'Die echte ClaimsForce-Terminadresse wird verwendet, ohne auf die VN-Anschrift zurückzufallen'
+);
 assert.equal(safeFileName('KVA: Angebot?.pdf'), 'KVA- Angebot-.pdf');
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, '1.3.0', 'grundlegend reparierte Brücke muss als neue Laufzeitversion erkennbar sein');
+assert.equal(manifest.version, '1.3.1', 'grundlegend reparierte Brücke muss als neue Laufzeitversion erkennbar sein');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*')));
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://claimsforce.eu.auth0.com/*')));
 assert(manifest.content_scripts.some(entry => entry.js.includes('login-helper.js') && entry.matches.includes('https://*.claimsforce.com/*') && !entry.exclude_matches), 'ClaimsForce-Anmeldehilfe muss auch auf web.claimsforce.com/login laufen');
