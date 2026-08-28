@@ -27,6 +27,12 @@ function kvaPreferredSiteRole(string $role): int
     return 0;
 }
 
+function kvaExecutiveRole(string $role): bool
+{
+    $normalized = mb_strtolower(trim($role), 'UTF-8');
+    return $normalized !== '' && preg_match('/geschäftsführer|geschäftsführung|inhaber|vorstand|geschäftsleitung/u', $normalized) === 1;
+}
+
 function kvaDetectedCaseContacts(array $result): array
 {
     $preferred = [];
@@ -55,8 +61,7 @@ function kvaDetectedCaseContacts(array $result): array
             $result['contact_person'] = kvaContactString($result['contact_person'] ?? '');
             $result['contact_role'] = $fallbackRole;
         } else {
-            // Geschäftsführer, Inhaber und sonstige Organvertreter sind keine Sanierer-Ansprechpartner
-            // für die operative Schadenbearbeitung. Ohne Projekt-/Bauleitung bleiben die Felder leer.
+            // Organvertreter sind keine operativen Ansprechpartner für die Schadenbearbeitung.
             $result['contact_person'] = '';
             $result['contact_role'] = '';
         }
@@ -79,7 +84,31 @@ function kvaMergeCaseContacts(array $case, array $detected, string $source, stri
 {
     $applied = [];
     $conflicts = [];
+
+    // Frühere KVA-Läufe konnten Geschäftsführer/Inhaber fälschlich als Ansprechpartner speichern.
+    // Beim erneuten KVA-Einlesen wird genau diese Altbelegung bereinigt bzw. durch eine erkannte
+    // Projekt-/Bauleitung ersetzt. Andere vorhandene, ggf. manuell gepflegte Rollen bleiben geschützt.
+    $existingRole = kvaContactString($case['sanierer_funktion'] ?? '');
+    $incomingRole = kvaContactString($detected['sanierer_funktion'] ?? '');
+    $handledOperationalContact = false;
+    if (kvaExecutiveRole($existingRole)) {
+        $incomingPerson = kvaContactString($detected['sanierer_ansprechpartner'] ?? '');
+        if (kvaPreferredSiteRole($incomingRole) > 0 && $incomingPerson !== '') {
+            $case['sanierer_ansprechpartner'] = $incomingPerson;
+            $case['sanierer_funktion'] = $incomingRole;
+            $applied['sanierer_ansprechpartner'] = $incomingPerson;
+            $applied['sanierer_funktion'] = $incomingRole;
+        } else {
+            $case['sanierer_ansprechpartner'] = '';
+            $case['sanierer_funktion'] = '';
+            $applied['sanierer_ansprechpartner'] = '';
+            $applied['sanierer_funktion'] = '';
+        }
+        $handledOperationalContact = true;
+    }
+
     foreach (array_values(kvaContactFieldMap()) as $field) {
+        if ($handledOperationalContact && in_array($field, ['sanierer_ansprechpartner','sanierer_funktion'], true)) continue;
         $incoming = kvaContactString($detected[$field] ?? '');
         if ($incoming === '') continue;
         $existing = kvaContactString($case[$field] ?? '');
