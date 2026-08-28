@@ -27,7 +27,7 @@ assert.equal(safeFileName('KVA: Angebot?.pdf'), 'KVA- Angebot-.pdf');
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, '1.1.2', 'grundlegend reparierte Brücke muss als neue Laufzeitversion erkennbar sein');
+assert.equal(manifest.version, '1.1.3', 'grundlegend reparierte Brücke muss als neue Laufzeitversion erkennbar sein');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*')));
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://claimsforce.eu.auth0.com/*')));
 assert(manifest.content_scripts.some(entry => entry.js.includes('login-helper.js') && entry.matches.includes('https://*.claimsforce.com/*') && !entry.exclude_matches), 'ClaimsForce-Anmeldehilfe muss auch auf web.claimsforce.com/login laufen');
@@ -83,7 +83,7 @@ assert(central.includes("job.profile==='jens'?'christian':job.profile"), 'Ehemal
 assert(central.includes("profile==='christian'?['christian','jens']:[profile]"), 'Manueller Christian-Import liest auch die ehemaligen Jens-Maurer-Fälle ein');
 assert(central.includes("post('active')") && central.includes("post('heartbeat'"), 'Zentrale Station verbindet sich nach einem Browserneustart wieder mit dem laufenden Import');
 assert(central.includes("action=mine") && central.includes('resumeWatch()'), 'Portal stellt die sichtbare Überwachung bereits eingereihter Importe wieder her');
-assert(central.includes('Browser-Brücke 1.1.2 erforderlich') && central.includes("versionAtLeast(bridgeVersion,'1.1.2')"), 'Veraltete geladene Erweiterungen dürfen keine neuen Warteschlangenläufe starten');
+assert(central.includes('Browser-Brücke 1.1.3 erforderlich') && central.includes("versionAtLeast(bridgeVersion,'1.1.3')"), 'Veraltete geladene Erweiterungen dürfen keine neuen Warteschlangenläufe starten');
 const optionsHtml = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.html'), 'utf8');
 assert(optionsHtml.includes('Ehem. Jens Maurer → Christian Wächter'), 'Jens-Zugang ist in der verschlüsselten Zugangsverwaltung auswählbar');
 assert(manifest.permissions.includes('nativeMessaging'), 'Lokaler Zugangsdaten-Leser ist für den unbeaufsichtigten Import freigegeben');
@@ -91,6 +91,7 @@ assert(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/ser
 assert(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8').includes("chrome.runtime.getURL('local-config.json')"), 'Brücke besitzt einen lokalen 127.0.0.1-Fallback für die Zugangsdaten');
 assert(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8').includes('sleep(800).then(() => null)'), 'Ein hängender nativer Zugangsdatenkanal darf den Loopback-Fallback nicht blockieren');
 const serviceWorker = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8');
+assert(serviceWorker.includes('loadCredentials(profile).catch(() => null), sleep(600)') && serviceWorker.includes('loadPortalCredentials().catch(() => null), sleep(600)'), 'Ein hängender Browser-Tresor darf weder ClaimsForce- noch Portal-Anmeldung blockieren');
 assert(serviceWorker.includes("type: 'FILL_LOGIN'") && serviceWorker.includes('claimsTab(profile, run, credential)'), 'Der Importlauf muss den ClaimsForce-Anmeldehelfer aktiv anstoßen');
 assert(serviceWorker.includes("{ type: 'OPEN_PLANNING' }") && !serviceWorker.includes("chrome.tabs.update(tab.id, { url: PLANNING_URL })"), 'Erfolgreiche ClaimsForce-Anmeldung darf nicht durch einen vollständigen Seitenwechsel verloren gehen');
 assert(manifest.host_permissions.includes('http://127.0.0.1:47831/*'), 'Lokaler Zugangsdaten-Helfer ist auf den festgelegten Loopback-Port begrenzt');

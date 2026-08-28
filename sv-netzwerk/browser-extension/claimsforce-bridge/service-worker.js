@@ -14,7 +14,7 @@ async function diagnostic(run, phase, text, details = {}) {
 }
 
 async function credentialsFor(profile) {
-  const saved = await loadCredentials(profile);
+  const saved = await Promise.race([loadCredentials(profile).catch(() => null), sleep(600).then(() => null)]);
   if (saved?.email && saved?.password) return { value: saved, source: 'vault' };
   try {
     const local = await Promise.race([
@@ -257,7 +257,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
   if (message?.type === 'GET_PORTAL_CREDENTIALS') {
-    loadPortalCredentials().then(async value => {
+    Promise.race([loadPortalCredentials().catch(() => null), sleep(600).then(() => null)]).then(async value => {
       if (value?.email && value?.password) return value;
       return (await credentialsFor('christian'))?.value || null;
     }).then(value => sendResponse(value || {}));
