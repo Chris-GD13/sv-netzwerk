@@ -672,11 +672,6 @@ async function showMoveDialog(
 }
 
 async function redirectAfterLogin() {
-  const returnTo = new URLSearchParams(window.location.search).get('return');
-  if (returnTo && returnTo.startsWith('/') && !returnTo.startsWith('//')) {
-    window.location.assign(returnTo);
-    return;
-  }
   redirectTo('/intern/versicherungsfaelle/');
 }
 
