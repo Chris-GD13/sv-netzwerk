@@ -52,16 +52,31 @@ async function waitTab(tabId, timeout = 30000) {
 
 async function claimsTab() {
   let [tab] = await chrome.tabs.query({ url: 'https://web.claimsforce.com/*' });
-  if (!tab) tab = await chrome.tabs.create({ url: PLANNING_URL, active: false });
-  if (!String(tab.url || '').includes('/planning')) tab = await chrome.tabs.update(tab.id, { url: PLANNING_URL });
+  if (!tab) tab = await chrome.tabs.create({ url: 'https://web.claimsforce.com/login', active: false });
   await waitTab(tab.id);
   let token = await tokenValue();
   if (!token) {
-    await chrome.tabs.reload(tab.id);
-    await waitTab(tab.id);
     token = await waitForToken();
   }
   return { tab, token };
+}
+
+async function openPlanning(tabId) {
+  let tab = await chrome.tabs.get(tabId);
+  if (!String(tab.url || '').includes('/planning')) {
+    const response = await chrome.tabs.sendMessage(tabId, { type: 'OPEN_PLANNING' });
+    if (!response?.ok) throw new Error(response?.error || 'ClaimsForce-Planung konnte nicht geöffnet werden.');
+    const deadline = Date.now() + 15000;
+    while (Date.now() < deadline) {
+      tab = await chrome.tabs.get(tabId);
+      if (String(tab.url || '').includes('/planning')) break;
+      await sleep(250);
+    }
+  }
+  if (!String(tab.url || '').includes('/planning')) throw new Error('ClaimsForce-Planung konnte nicht geöffnet werden.');
+  await sleep(1200);
+  await chrome.tabs.sendMessage(tabId, { type: 'OPEN_FUTURE_APPOINTMENTS' }).catch(() => {});
+  await sleep(1200);
 }
 
 async function requestJson(url, token, optional = false) {
@@ -120,8 +135,7 @@ async function runImport(portalTabId, profile = 'self') {
   }
   await progress(portalTabId, 'ClaimsForce wird geöffnet …');
   const { tab, token } = await claimsTab();
-  await chrome.tabs.update(tab.id, { url: PLANNING_URL });
-  await waitTab(tab.id);
+  await openPlanning(tab.id);
   const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIMS' });
   const claims = scraped?.claims || [];
   if (!claims.length) throw new Error('Unter „Mit Termin“ wurden keine Aufträge gefunden. Bitte ClaimsForce öffnen und die Ansicht vollständig laden.');

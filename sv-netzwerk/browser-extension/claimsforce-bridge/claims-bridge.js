@@ -4,6 +4,21 @@ window.addEventListener('message', event => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type === 'OPEN_PLANNING') {
+    const link = document.querySelector('a[href="/planning"],a[href^="/planning?"]');
+    if (!link) { sendResponse({ ok: false, error: 'ClaimsForce ist noch nicht angemeldet.' }); return; }
+    link.click();
+    sendResponse({ ok: true });
+    return;
+  }
+  if (message?.type === 'OPEN_FUTURE_APPOINTMENTS') {
+    const buttons = [...document.querySelectorAll('button')];
+    const future = buttons.find(button => /Mit Termin|Zukünftige Termine/i.test(button.textContent || ''));
+    const show = [...buttons].filter(button => /^Anzeigen$/i.test((button.textContent || '').trim())).at(-1);
+    (future || show)?.click();
+    sendResponse({ ok: true });
+    return;
+  }
   if (message?.type !== 'SCRAPE_CLAIMS') return;
   const claims = new Map();
   const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
