@@ -7,6 +7,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const versionAtLeast=(actual,required)=>{const a=String(actual).split('.').map(Number),r=String(required).split('.').map(Number);for(let i=0;i<3;i++){if((a[i]||0)!==(r[i]||0))return(a[i]||0)>(r[i]||0)}return true};
+  const resultOf=job=>{try{return typeof job.result==='string'?JSON.parse(job.result):job.result||{}}catch{return{}}};
   const heartbeat=()=>agentJob?post('heartbeat',{id:agentJob.id,message:lastRuntime.message,phase:lastRuntime.phase,current:lastRuntime.current,total:lastRuntime.total,diagnostic:lastRuntime.diagnostic}).catch(()=>{}):Promise.resolve();
 
   async function watch(){
@@ -26,7 +27,7 @@
       userJobs=(recent.jobs||[]).filter(job=>['queued','running'].includes(job.status)).map(job=>Number(job.id));
       if(userJobs.length){button.disabled=true;watch();return}
       const terminal=(recent.jobs||[]).filter(job=>['done','failed'].includes(job.status)).slice(0,4);
-      if(terminal.length){const compact=terminal.map(job=>`${job.id}|${job.profile}|${job.status}|${job.phase||'CF-STATUS'}`).join(';');document.documentElement.setAttribute('data-svnet-claims-jobs',compact);const text=terminal.map(job=>`${job.profile}: ${job.status==='done'?'abgeschlossen':'fehlgeschlagen'} [${job.phase||'CF-STATUS'}] – ${job.message||'ohne Meldung'}`).join(' · '),failed=terminal.some(job=>job.status==='failed');show(text,failed);setTimeout(()=>show(text,failed),1000)}
+      if(terminal.length){const compact=terminal.map(job=>`${job.id}|${job.profile}|${job.status}|${job.phase||'CF-STATUS'}`).join(';');document.documentElement.setAttribute('data-svnet-claims-jobs',compact);const results=terminal.map(job=>{const r=resultOf(job);return`${job.id}|${Number(r.claims||0)}|${Number(r.files||0)}|${Number(r.messages||0)}|${Number(r.appointments||0)}`}).join(';');document.documentElement.setAttribute('data-svnet-claims-results',results);const text=terminal.map(job=>`${job.profile}: ${job.status==='done'?'abgeschlossen':'fehlgeschlagen'} [${job.phase||'CF-STATUS'}] – ${job.message||'ohne Meldung'}`).join(' · '),failed=terminal.some(job=>job.status==='failed');show(text,failed);setTimeout(()=>show(text,failed),1000)}
     }catch(e){show('Importstatus konnte nicht wiederhergestellt werden: '+e.message,true)}
   }
 
@@ -71,6 +72,7 @@
     try{await post('complete',{id,ok,result:result||null,message:ok?`${result?.claims||0} Aufträge vollständig eingelesen.`:(error||'ClaimsForce-Import fehlgeschlagen.')})}
     catch(e){show(`Import ${id}: Abschlussstatus konnte nicht gespeichert werden (${e.message}).`,true)}
     agentJob=null;busy=false;lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
+    await resumeWatch();
   }
 
   window.addEventListener('message',async e=>{
