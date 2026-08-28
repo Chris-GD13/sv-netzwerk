@@ -3,10 +3,19 @@
   if(!old)return;
   const button=old.cloneNode(true);old.replaceWith(button);
   const claimsCard=button.closest('.vf-claims-import');
-  const originalParent=claimsCard?.parentElement||null;
-  const originalNext=claimsCard?.nextSibling||null;
+  const plaudCard=document.querySelector('.vf-plaud');
+  const polycamCard=document.querySelector('.vf-polycam');
+  const remember=card=>({card,parent:card?.parentElement||null,next:card?.nextSibling||null});
+  const originals=[remember(plaudCard),remember(polycamCard),remember(claimsCard)];
   const mobile=window.matchMedia('(max-width:760px)');
-  const placeClaimsCard=()=>{
+  const restore=entry=>{
+    const {card,parent,next}=entry;
+    if(!card||!parent)return;
+    if(next&&next.parentNode===parent)parent.insertBefore(card,next);
+    else parent.appendChild(card);
+    card.style.marginTop='0';
+  };
+  const placeMobileCards=()=>{
     if(!claimsCard)return;
     claimsCard.style.borderTop='4px solid #b9852f';
     const badge=claimsCard.querySelector('.vf-step > b');
@@ -14,18 +23,18 @@
     if(mobile.matches){
       const main=document.querySelector('.vf-app'),systemHome=document.getElementById('vf-system-home');
       if(main){
-        if(systemHome)main.insertBefore(claimsCard,systemHome);
-        else main.appendChild(claimsCard);
+        const anchor=systemHome||null;
+        [plaudCard,polycamCard,claimsCard].forEach(card=>{
+          if(!card)return;
+          if(anchor)main.insertBefore(card,anchor);
+          else main.appendChild(card);
+          card.style.marginTop='12px';
+        });
       }
-      claimsCard.style.marginTop='12px';
-    }else if(originalParent){
-      if(originalNext&&originalNext.parentNode===originalParent)originalParent.insertBefore(claimsCard,originalNext);
-      else originalParent.appendChild(claimsCard);
-      claimsCard.style.marginTop='0';
-    }
+    }else originals.forEach(restore);
   };
-  mobile.addEventListener?.('change',placeClaimsCard);
-  placeClaimsCard();
+  mobile.addEventListener?.('change',placeMobileCards);
+  placeMobileCards();
   let context={},bridge=false,bridgeVersion='',agentJob=null,userJobs=[],busy=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
