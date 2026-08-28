@@ -24,7 +24,7 @@ function gdExpertIdentity(string $key,array $backoffice):array{return match($key
 function gdClaimsProfile(array $user):string{$email=gdUserKey($user);$name=gdNormalize((string)($user['full_name']??''));if(str_contains($email,'hr@')||str_contains($name,'holger roth'))return'holger';if(str_contains($email,'ms@')||str_contains($name,'marc schutt'))return'marc';if(str_contains($email,'cw@')||str_contains($name,'christian wachter'))return'christian';return'self';}
 
 $portalUser=$user;
-$isBackoffice=gdIsSusanne($portalUser);
+$isBackoffice=gdIsSusanne($portalUser)||(string)($portalUser['role']??'')==='administrator';
 $claimsProfile=gdClaimsProfile($portalUser);
 if($isBackoffice&&$action==='select_expert'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
