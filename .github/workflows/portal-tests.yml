@@ -50,6 +50,12 @@ jobs:
       - name: KVA-Saniererkontakte vollständig ergänzen
         run: php sv-netzwerk/tests/kva_contact_enrichment_test.php
 
+      - name: Saniererkontakte aus vorhandenem KVA neu einlesen
+        run: php sv-netzwerk/tests/kva_contact_refresh_test.php
+
+      - name: Ausgewählte Fallunterlagen sicher löschen
+        run: php sv-netzwerk/tests/case_file_delete_selection_test.php
+
       - name: Schnelle Fallsuche prüfen
         run: php sv-netzwerk/tests/case_search_test.php
 

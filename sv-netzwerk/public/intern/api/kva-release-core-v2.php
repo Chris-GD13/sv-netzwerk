@@ -73,6 +73,17 @@ function krV2Handle(array $user): void
         $folder = trim((string)($_REQUEST['folder_id'] ?? ''));
         requireCaseFolderAccess($folder, $user);
         if ($action === 'files') apiJson(['ok'=>true,'files'=>krKvas($folder)]);
+        if ($action === 'refresh_contacts') {
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
+            $kvas = krKvas($folder);
+            if ($kvas === []) throw new RuntimeException('Im aktiven Schadenfall wurde kein KVA oder Angebot gefunden.');
+            $selected = $kvas[0];
+            ['name'=>$name,'mime'=>$mime,'bytes'=>$bytes] = krSelected($folder, (string)$selected['id']);
+            $detectedContacts = kvaDetectedCaseContacts(krAnalyzeContacts($name, $mime, $bytes));
+            if ($detectedContacts === []) throw new RuntimeException('Aus dem neuesten KVA konnten keine Saniererdaten sicher erkannt werden.');
+            $contactMerge = kvaMergeCaseContacts(krCaseContacts($folder), $detectedContacts, $name, '');
+            apiJson(['ok'=>true,'source'=>$name,'contacts'=>$detectedContacts,'case_contact_updates'=>$contactMerge['applied'],'contact_hints'=>$contactMerge['conflicts']]);
+        }
         if ($action === 'sent_status') {
             $caseNo = krCaseNo($folder);
             db()->exec('CREATE TABLE IF NOT EXISTS kva_send_log (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, folder_id VARCHAR(160) NOT NULL, case_no VARCHAR(100) NOT NULL, subject VARCHAR(500) NOT NULL, recipient VARCHAR(320) NOT NULL, cc_json TEXT NOT NULL, bcc VARCHAR(320) NOT NULL, sent_at DATETIME NOT NULL, INDEX idx_kva_send_folder (folder_id, sent_at))');
