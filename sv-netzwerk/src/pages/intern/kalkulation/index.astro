@@ -116,7 +116,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
     {c:'Klempner',l:'Dachrinne Kupfer',u:'m',q:'Dachrinne halbrund Kupfer inklusive Rinnenhalter'},
     {c:'Klempner',l:'Fallrohr Titanzink',u:'m',q:'Regenfallrohr Titanzink inklusive Rohrschellen'},
     {c:'Klempner',l:'Fallrohr Kupfer',u:'m',q:'Regenfallrohr Kupfer inklusive Rohrschellen'},
-    {c:'Gerüst/Rollgerüst',l:'Fassadengerüst – Auf-, Um- und Abbau',u:'m²',q:'Fassadengerüst als Arbeits- und Schutzgerüst Lastklasse 3 Breitenklasse W06 einschließlich Anlieferung, Aufstellen, erforderlichem Umsetzen und vollständigem Abbau; Abrechnung nach Gerüstfläche gemäß ATV DIN 18451',n:'Auf-, Um- und Abbau; Vorhaltung separat kalkulieren'},
+    {c:'Gerüst/Rollgerüst',l:'Fassadengerüst – Auf-, Um- und Abbau',u:'m²',q:'Fassadengerüst als Arbeits- und Schutzgerüst Lastklasse 3 Breitenklasse W06 einschließlich Anlieferung, Aufstellen, erforderlichem Umsetzen und vollständigem Abbau; Abrechnung nach Gerüstfläche gemäß ATV DIN 18451',n:'6–12 EUR/m² netto; unter 60 m² Kleinflächenpauschale 1.400 EUR netto; Vorhaltung separat'},
     {c:'Gerüst/Rollgerüst',l:'Fassadengerüst – Vorhaltung je Woche',u:'m²',q:'Gebrauchsüberlassung und Vorhaltung eines Fassadengerüstes je Quadratmeter Gerüstfläche und Woche gemäß ATV DIN 18451',n:'Vorhaltung je Woche; Menge = Gerüstfläche in m²'},
     {c:'Gerüst/Rollgerüst',l:'Rollgerüst – je Gerüstlage',u:'Lagen',q:'Fahrbares Arbeitsgerüst Rollgerüst je Gerüstlage einschließlich Anlieferung, Aufstellen, Umsetzen, Gebrauchsüberlassung und Abbau',n:'Auf-/Abbau, Umsetzen und Vorhaltung; Menge = Gerüstlagen'},
     {c:'Fenster',l:'Fensterbank Aluminium',u:'m',q:'Außenfensterbank Aluminium Leichtmetall inklusive Endstücke und Befestigung'},
@@ -246,7 +246,22 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
           let d=await api({query:fullQuery,quantity:String(qty),unit:p.u,location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}}),positions=Array.isArray(d.positions)?d.positions:[];
           if(!positions.length){d=await api({query:p.q,quantity:String(qty),unit:p.u,location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}});positions=Array.isArray(d.positions)?d.positions:[]}
           if(!positions.length){addIndex(p,qty);added++;continue}
-          const label=norm(p.l),cap=/photovoltaikmodul/.test(label)?1500:/pv-unterkonstruktion|dachhaken/.test(label)?750:/leuchte|lampe/.test(label)?1500:unitNorm(p.u)==='st'?6000:unitNorm(p.u)==='m2'?1500:1000;
+          const label=norm(p.l);
+          if(/fassadengerust.*auf-/.test(label)){
+            const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?6:level==='high'?12:9,small=qty<60;
+            bridge()?.addLine?.({
+              position_code:'301.000.057',
+              description:small?'Fassadengerüst – Auf-, Um- und Abbau – Kleinflächenpauschale unter 60 m²':'Fassadengerüst – Auf-, Um- und Abbau; Vorhaltung separat',
+              quantity:small?1:qty,
+              recommended_quantity:small?1:qty,
+              unit:small?'psch':'m²',
+              unit_price:small?1400:ep,
+              regional_factor:1
+            });
+            added++;
+            continue
+          }
+          const cap=/photovoltaikmodul/.test(label)?1500:/pv-unterkonstruktion|dachhaken/.test(label)?750:/leuchte|lampe/.test(label)?1500:unitNorm(p.u)==='st'?6000:unitNorm(p.u)==='m2'?1500:1000;
           const positive=positions.filter(x=>x&&Number.isFinite(choosePrice(x))&&choosePrice(x)>0),plausible=positive.filter(x=>unitNorm(x.unit)===unitNorm(p.u)&&choosePrice(x)<=cap),matched=plausible.filter(x=>semanticMatch(x));
           const explicit=best(matched.filter(x=>explicitCodes.includes(String(x.position_code||''))&&phase(x)==='install'));
           const complete=best(matched.filter(x=>/(abbruch|demont|ausbau|entfern|entsorg|aufnehmen)/.test(positionText(x))&&/(liefer|einbau|montage|erneu|herstell|einsetzen)/.test(positionText(x))));
