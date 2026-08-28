@@ -17,6 +17,35 @@ function krCaseInsurer(string $folder): string
     return '';
 }
 
+function krCaseContacts(string $folder): array
+{
+    foreach (krList($folder) as $file) {
+        if (!preg_match('/falldaten.*\.json$/i', (string)($file['name'] ?? ''))) continue;
+        try {
+            $data = json_decode(krDrive('https://www.googleapis.com/drive/v3/files/'.rawurlencode((string)$file['id']).'?alt=media&supportsAllDrives=true'), true);
+            if (is_array($data)) return $data;
+        } catch (Throwable) {
+        }
+    }
+    return [];
+}
+
+function krMergeContacts(array $case, array $result): array
+{
+    $fields = ['company'=>'sanierer_firma','contact_person'=>'sanierer_ansprechpartner','street'=>'sanierer_strasse','postal_code'=>'sanierer_plz','city'=>'sanierer_ort','email'=>'sanierer_email','phone'=>'sanierer_telefon','fax'=>'sanierer_fax','website'=>'sanierer_website'];
+    $updates = [];
+    $hints = [];
+    $contacts = [];
+    foreach ($fields as $source=>$target) {
+        $detected = trim((string)($result[$source] ?? ''));
+        $existing = trim((string)($case[$target] ?? ''));
+        $contacts[$source] = $existing !== '' ? $existing : $detected;
+        if ($existing === '' && $detected !== '') $updates[$target] = $detected;
+        if ($existing !== '' && $detected !== '' && krEvidenceId($existing) !== krEvidenceId($detected)) $hints[$target] = $detected;
+    }
+    return ['contacts'=>$contacts, 'case_contact_updates'=>$updates, 'contact_hints'=>$hints];
+}
+
 function krVerifiedKva(string $folder, string $bytes): array
 {
     $hash = hash('sha256', $bytes);
@@ -65,17 +94,9 @@ function krV2Handle(array $user): void
                 ['name'=>$name,'mime'=>$mime,'bytes'=>$bytes] = krSelected($folder, trim((string)($_POST['file_id'] ?? '')));
             }
             $result = krAnalyze($name, $mime, $bytes);
-            $verified = krVerifiedKva($folder, $bytes);
-            if ($verified !== []) {
-                $result = array_replace($result, $verified);
-                $result['totals_confident'] = true;
-                $result['warnings'] = [];
-            }
             $net = krMoney($result['net_total'] ?? null);
             $vat = krMoney($result['vat_total'] ?? null);
             $gross = krMoney($result['gross_total'] ?? null);
-            if ($net === null && $gross !== null && $vat !== null) $net = round($gross - $vat, 2);
-            if ($gross === null && $net !== null && $vat !== null) $gross = round($net + $vat, 2);
             $warnings = array_values(array_map('strval', is_array($result['warnings'] ?? null) ? $result['warnings'] : []));
             if (!krTotalsValid($net, $vat, $gross, $result)) {
                 $net = null;
@@ -87,7 +108,8 @@ function krV2Handle(array $user): void
             $sparkasse = (bool)($result['sparkassenversicherung'] ?? false)
                 || preg_match('/sparkassen.?versicherung|SV SparkassenVersicherung/i', $insurer) === 1;
             if ($sparkasse && $insurer === '') $insurer = 'SV SparkassenVersicherung';
-            $email = trim((string)($result['email'] ?? ''));
+            $contactMerge = krMergeContacts(krCaseContacts($folder), $result);
+            $email = trim((string)($contactMerge['contacts']['email'] ?? ''));
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $email = '';
                 $warnings[] = 'Die geschäftliche E-Mail-Adresse des KVA-Absenders wurde nicht sicher erkannt.';
@@ -103,6 +125,9 @@ function krV2Handle(array $user): void
                 'gross'=>$gross,
                 'insurer'=>$insurer,
                 'sparkasse'=>$sparkasse,
+                'contacts'=>$contactMerge['contacts'],
+                'case_contact_updates'=>$contactMerge['case_contact_updates'],
+                'contact_hints'=>$contactMerge['contact_hints'],
                 'sender'=>$sender,
                 'sender_name'=>(string)$senderProfile['name'],
                 'issued'=>time(),
@@ -117,6 +142,7 @@ function krV2Handle(array $user): void
                 'sender'=>$sender,
                 'bcc'=>$sparkasse ? KR_ARCHIVE : '',
                 'warnings'=>$warnings,
+                'contact_hints'=>$contactMerge['contact_hints'],
                 'missing'=>$missing,
                 'token'=>krSign($preview),
             ]]);
