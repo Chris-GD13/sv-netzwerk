@@ -104,6 +104,17 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
     {c:'Asbest',l:'Asbest Schadstoffgutachten',u:'psch',q:'Schadstofferkundung und schriftliches Gutachten zur Asbestbelastung mit Bewertung der betroffenen Bauteile',n:'Pauschaler Richtwert; Anzahl zusätzlicher Laborproben separat'},
     {c:'Asbest',l:'Asbest Platten-Bag / Spezialverpackung',u:'St',q:'Zugelassenen Platten-Bag oder Big Bag für asbesthaltige Abfälle bereitstellen, kennzeichnen und verschließen',n:'Spezialverpackung je Stück'},
     {c:'Asbest',l:'Asbest Spezialcontainer / Transport',u:'psch',q:'Spezialcontainer oder geeignetes Transportfahrzeug für verpackte asbesthaltige Abfälle bereitstellen und zur zugelassenen Deponie transportieren',n:'Pauschaler Transportansatz; Deponie-Mehrkosten regional prüfen'},
+    {c:'Baum-/Sturmarbeiten',l:'Sturmschaden – Aufräumteam',u:'h',q:'Sturmbedingte Gefahrenstelle sichern, lose Äste und Baumteile aufnehmen, zerkleinern, verladen und Arbeitsbereich besenrein räumen; Team aus zwei Fachkräften',n:'Teamstunde; Maschinen, Klettertechnik und Entsorgung separat'},
+    {c:'Baum-/Sturmarbeiten',l:'Baumpflege / einfacher Rückschnitt',u:'St',q:'Leicht zugänglichen kleineren Baum fachgerecht zurückschneiden und lose oder geschädigte Äste entfernen, ohne Klettertechnik',n:'Je Baum; Entsorgung separat'},
+    {c:'Baum-/Sturmarbeiten',l:'Baumkletterer / Kronenrückschnitt',u:'m',q:'Sturmbedingten Kronenrückschnitt oder Totholzentfernung mit Seilklettertechnik durchführen',n:'Abrechnung je Meter Baumhöhe; bei dichter Krone oder schwieriger Zugänglichkeit oberes Preisniveau'},
+    {c:'Baum-/Sturmarbeiten',l:'Baumfällung – reine Fällarbeit Standardbaum',u:'St',q:'Sturmgeschädigten Baum in Standardgröße bei guter Zugänglichkeit kontrolliert fällen',n:'Nur Fällarbeit; Genehmigung, Stubben, Räumung und Entsorgung separat'},
+    {c:'Baum-/Sturmarbeiten',l:'Baumfällung – kompletter Standardfall',u:'St',q:'Sturmgeschädigten Baum von etwa 10 bis 15 m Höhe in üblicher Zugänglichkeit fällen und die typischen Nebenarbeiten ausführen',n:'Orientierungsrahmen Standardfall; Problembaum, Kran, Straßensperrung und besondere Sicherung individuell'},
+    {c:'Baum-/Sturmarbeiten',l:'Stubben entfernen',u:'St',q:'Nach Baumfällung verbliebenen Stubben fachgerecht entfernen',n:'Je Stubben; Verfüllung und Oberflächenwiederherstellung separat'},
+    {c:'Baum-/Sturmarbeiten',l:'Baumwurzel entfernen',u:'St',q:'Verbliebenes Wurzelwerk nach Baumfällung ausbauen und entfernen',n:'Einfacher Richtwert je Wurzelstock'},
+    {c:'Baum-/Sturmarbeiten',l:'Grünschnitt entsorgen',u:'t',q:'Baum-, Ast- und Grünschnitt verladen, abtransportieren und fachgerecht verwerten oder entsorgen',n:'Entsorgungsansatz je Tonne; Verladen und Transport gesondert prüfen'},
+    {c:'Baum-/Sturmarbeiten',l:'Grünschnitt-Container',u:'psch',q:'Container für größere Mengen Baum-, Ast- und Grünschnitt bereitstellen, abholen und verwerten',n:'Mindestansatz; Größe und Standzeit regional prüfen'},
+    {c:'Baum-/Sturmarbeiten',l:'Hubarbeitsbühne Baumarbeiten',u:'Tag',q:'Hubarbeitsbühne für Baumrückschnitt oder Baumfällarbeiten bereitstellen',n:'Je Einsatztag; Bedienpersonal gegebenenfalls separat'},
+    {c:'Baum-/Sturmarbeiten',l:'Baumfällgenehmigung / Behördengebühr',u:'St',q:'Erforderliche kommunale Genehmigung für Baumfällung beantragen',n:'Gebühr abhängig von Kommune, Baumart und Stammumfang'},
     {c:'Dachdeckung',l:'Doppelstegplatten / Polycarbonat',u:'m²',q:'Polycarbonat Doppelstegplatten Hohlkammerplatten Dachdeckung. Im BKI keine eigene PC-Stegplattenposition; als konstruktiven Vergleich für die Neumontage LB 320 Dachdeckung Wellplatte Pos. 86 / 320.001.189 prüfen.',n:'Kompletterneuerung auf vorhandener Unterkonstruktion inkl. Demontage, Entsorgung, 16-mm-Platten, Profile, Dichtungen, Befestigung, Zuschnitt und Montage'},
     {c:'Dachdeckung',l:'Dachziegel / Falzziegel',u:'m²',q:'Dachdeckung Falzziegel Ton auf vorhandener Lattung'},
     {c:'Dachdeckung',l:'Biberschwanzziegel',u:'m²',q:'Dachdeckung Biberschwanz Flachziegel Ton Doppeldeckung auf vorhandener Lattung'},
@@ -240,6 +251,23 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
         const phase=x=>{const txt=positionText(x);if(/abbruch|demont|ausbau|entfern|entsorg|aufnehmen/.test(txt))return'remove';if(/liefer|einbau|montage|erneu|herstell|einsetzen|beschicht|streichen|ausbessern/.test(txt))return'install';return'other'};
         const best=a=>a.sort((x,y)=>((explicitCodes.includes(String(y.position_code||''))?20:0)+(requestedRule?.test(positionText(y))?5:0))-((explicitCodes.includes(String(x.position_code||''))?20:0)+(requestedRule?.test(positionText(x))?5:0)))[0];
         try{
+          const treeLabel=norm(p.l),treeRules=[
+            [/sturmschaden.*aufraumteam/,'BAUM-AUFRAEUMEN 2026','Sturmschaden – Sicherung, Zerkleinerung, Verladung und Aufräumarbeiten durch ein Team aus zwei Fachkräften','h',150,180,220],
+            [/baumpflege.*einfacher ruckschnitt/,'BAUM-RUECKSCHNITT 2026','Baumpflege / einfacher Rückschnitt ohne Klettertechnik; Entsorgung separat','St',30,40,50],
+            [/baumkletterer|kronenruckschnitt/,'BAUM-KLETTERER 2026','Baumkletterer / Kronenrückschnitt mit Seilklettertechnik je Meter Baumhöhe; Entsorgung separat','m',25,60,100],
+            [/reine fallarbeit standardbaum/,'BAUM-FAELLUNG 2026','Baumfällung – reine Fällarbeit am Standardbaum bei guter Zugänglichkeit; Nebenleistungen separat','St',200,300,400],
+            [/kompletter standardfall/,'BAUM-KOMPLETT 2026','Baumfällung – kompletter Standardfall für einen etwa 10–15 m hohen Baum; Problembaum und Spezialtechnik individuell','St',500,800,1100],
+            [/stubben entfernen/,'BAUM-STUBBEN 2026','Stubben nach Baumfällung entfernen','St',60,105,150],
+            [/baumwurzel entfernen/,'BAUM-WURZEL 2026','Wurzelwerk nach Baumfällung ausbauen und entfernen','St',70,70,70],
+            [/grunschnitt entsorgen/,'BAUM-ENTSORGUNG 2026','Baum-, Ast- und Grünschnitt fachgerecht entsorgen; Verladen und Transport separat prüfen','t',30,35,40],
+            [/grunschnitt-container/,'BAUM-CONTAINER 2026','Container für größere Mengen Baum-, Ast- und Grünschnitt','psch',300,300,300],
+            [/hubarbeitsbuhne baumarbeiten/,'BAUM-HUBBUEHNE 2026','Hubarbeitsbühne für Baumarbeiten je Einsatztag','Tag',100,100,100],
+            [/baumfallgenehmigung|behordengebuhr/,'BAUM-GENEHMIGUNG 2026','Kommunale Baumfällgenehmigung / Behördengebühr','St',25,55,85]
+          ],tree=treeRules.find(([rx])=>rx.test(treeLabel));
+          if(tree){
+            const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?tree[4]:level==='high'?tree[6]:tree[5];
+            bridge()?.addLine?.({position_code:tree[1],description:tree[2],quantity:qty,recommended_quantity:qty,unit:tree[3],unit_price:ep,regional_factor:1,source_name:'11880 Gartenbau – Baumpflege und Baumfällung Kosten',source_page:'https://www.11880-gartenbau.com/preisvergleich/baumpflege-kosten'});added++;continue
+          }
           if(/asbest.*materialprobe|laboranalyse/.test(norm(p.l))){
             const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?40:level==='high'?80:60;
             bridge()?.addLine?.({position_code:'ASBEST-ANALYSE 2026',description:'Asbest Materialprobe / Laboranalyse durch qualifizierte Probenahme und akkreditiertes Labor',quantity:qty,recommended_quantity:qty,unit:'St',unit_price:ep,regional_factor:1,source_name:'Containerhelfer – Asbest entsorgen: Kosten, Ablauf, Pflichten (2026)',source_page:'https://containerhelfer.de/de/abbruch/wissen/asbest-entsorgen-kosten-ablauf-2026'});added++;continue
