@@ -5,36 +5,23 @@
   const claimsCard=button.closest('.vf-claims-import');
   const plaudCard=document.querySelector('.vf-plaud');
   const polycamCard=document.querySelector('.vf-polycam');
-  const remember=card=>({card,parent:card?.parentElement||null,next:card?.nextSibling||null});
-  const originals=[remember(plaudCard),remember(polycamCard),remember(claimsCard)];
-  const mobile=window.matchMedia('(max-width:760px)');
-  const restore=entry=>{
-    const {card,parent,next}=entry;
-    if(!card||!parent)return;
-    if(next&&next.parentNode===parent)parent.insertBefore(card,next);
-    else parent.appendChild(card);
-    card.style.marginTop='0';
-  };
-  const placeMobileCards=()=>{
+  const placeImportCards=()=>{
     if(!claimsCard)return;
     claimsCard.style.borderTop='4px solid #b9852f';
     const badge=claimsCard.querySelector('.vf-step > b');
     if(badge){badge.style.background='#b9852f';badge.style.color='#fff'}
-    if(mobile.matches){
-      const main=document.querySelector('.vf-app'),systemHome=document.getElementById('vf-system-home');
-      if(main){
-        const anchor=systemHome||null;
-        [plaudCard,polycamCard,claimsCard].forEach(card=>{
-          if(!card)return;
-          if(anchor)main.insertBefore(card,anchor);
-          else main.appendChild(card);
-          card.style.marginTop='12px';
-        });
-      }
-    }else originals.forEach(restore);
+    const main=document.querySelector('.vf-app'),systemHome=document.getElementById('vf-system-home');
+    if(main){
+      const anchor=systemHome||null;
+      [plaudCard,polycamCard,claimsCard].forEach(card=>{
+        if(!card)return;
+        if(anchor)main.insertBefore(card,anchor);
+        else main.appendChild(card);
+        card.style.marginTop='12px';
+      });
+    }
   };
-  mobile.addEventListener?.('change',placeMobileCards);
-  placeMobileCards();
+  placeImportCards();
   let context={},bridge=false,bridgeVersion='',agentJob=null,userJobs=[],busy=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
