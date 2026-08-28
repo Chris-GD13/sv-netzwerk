@@ -180,6 +180,11 @@ async function runImport(run) {
         await chrome.tabs.update(open.id, { url: 'https://web.claimsforce.com/logout' });
         await waitTab(open.id);
         await sleep(900);
+        const loggedOut = await chrome.tabs.get(open.id);
+        if (safeRoute(loggedOut.url) === '/logout') {
+          await chrome.tabs.update(open.id, { url: 'https://web.claimsforce.com/login' });
+          await waitTab(open.id);
+        }
       }
     }
   }

@@ -46,7 +46,7 @@ assert.equal(safeFileName('KVA: Angebot?.pdf'), 'KVA- Angebot-.pdf');
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, '1.3.1', 'grundlegend reparierte Brücke muss als neue Laufzeitversion erkennbar sein');
+assert.equal(manifest.version, '1.3.2', 'grundlegend reparierte Brücke muss als neue Laufzeitversion erkennbar sein');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*')));
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://claimsforce.eu.auth0.com/*')));
 assert(manifest.content_scripts.some(entry => entry.js.includes('login-helper.js') && entry.matches.includes('https://*.claimsforce.com/*') && !entry.exclude_matches), 'ClaimsForce-Anmeldehilfe muss auch auf web.claimsforce.com/login laufen');
@@ -128,6 +128,7 @@ assert(serviceWorker.includes('loadCredentials(profile).catch(() => null), sleep
 assert(serviceWorker.includes('GET_CREDENTIAL_DIAGNOSTIC') && serviceWorker.includes('loopback-http-'), 'Zugangsdatenkette liefert geheimnisfreie Laufzeitstufen');
 assert(serviceWorker.includes("type: 'FILL_LOGIN'") && serviceWorker.includes('claimsTab(profile, run, credential)'), 'Der Importlauf muss den ClaimsForce-Anmeldehelfer aktiv anstoßen');
 assert(serviceWorker.includes("!currentProfile && profile === 'christian' && openSession") && serviceWorker.includes('claimsLoggedProfile: profile'), 'Nur eine vorhandene unbekannte Christian-Sitzung darf ohne Profilwechsel übernommen werden');
+assert(serviceWorker.includes("safeRoute(loggedOut.url) === '/logout'") && serviceWorker.includes("url: 'https://web.claimsforce.com/login'"), 'Eine leere ClaimsForce-Abmeldeseite wird deterministisch zur nächsten Profilanmeldung weitergeführt');
 assert(serviceWorker.includes("{ type: 'OPEN_PLANNING' }") && !serviceWorker.includes("chrome.tabs.update(tab.id, { url: PLANNING_URL })"), 'Erfolgreiche ClaimsForce-Anmeldung darf nicht durch einen vollständigen Seitenwechsel verloren gehen');
 assert(manifest.host_permissions.includes('http://127.0.0.1:47831/*'), 'Lokaler Zugangsdaten-Helfer ist auf den festgelegten Loopback-Port begrenzt');
 assert(serviceWorker.includes('accepted: true') && serviceWorker.includes('claims-import-keepalive'), 'Ein Import darf nicht mehr an einem einzigen lang laufenden Erweiterungs-Nachrichtenkanal hängen');
