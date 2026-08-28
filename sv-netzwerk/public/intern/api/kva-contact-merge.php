@@ -27,14 +27,38 @@ function kvaPreferredSiteRole(string $role): int
     return 0;
 }
 
+function kvaExecutiveRole(string $role): bool
+{
+    $normalized = mb_strtolower(trim($role), 'UTF-8');
+    return $normalized !== '' && preg_match('/\bgeschäftsführer(?:in)?\b|\binhaber(?:in)?\b|\bvorstand\b|\bgeschäftsleitung\b|\bgeschäftsführende\b|\bceo\b|\bmanaging director\b|\bowner\b/u', $normalized) === 1;
+}
+
+function kvaOperationalRole(string $role): bool
+{
+    $normalized = mb_strtolower(trim($role), 'UTF-8');
+    if ($normalized === '' || kvaExecutiveRole($normalized)) return false;
+    return kvaPreferredSiteRole($normalized) > 0
+        || preg_match('/\bobjektleiter(?:in)?\b|\bobjektleitung\b|\beinsatzleiter(?:in)?\b|\beinsatzleitung\b|\bprojektbetreuer(?:in)?\b|\bprojektkoordination\b|\bkoordinator(?:in)?\b|\bkundenbetreuer(?:in)?\b|\bsachbearbeiter(?:in)?\b|\btechnische(?:r|n)?\s+ansprechpartner(?:in)?\b/u', $normalized) === 1;
+}
+
+function kvaIssuerConfirmed(array $result): bool
+{
+    $relation = mb_strtolower(kvaContactString($result['company_relation'] ?? ''), 'UTF-8');
+    return ($result['issuer_confirmed'] ?? false) === true
+        && $relation === 'issuer'
+        && kvaContactString($result['company'] ?? '') !== '';
+}
+
 function kvaDetectedCaseContacts(array $result): array
 {
+    if (!kvaIssuerConfirmed($result)) return [];
     $preferred = [];
     foreach (is_array($result['contact_people'] ?? null) ? $result['contact_people'] : [] as $person) {
         if (!is_array($person)) continue;
         $name = kvaContactString($person['name'] ?? '');
         $role = kvaContactString($person['role'] ?? '');
         $priority = kvaPreferredSiteRole($role);
+        if ($priority === 0 && !kvaExecutiveRole($role) && (($person['operational'] ?? false) === true || kvaOperationalRole($role))) $priority = 1;
         if ($name !== '' && $priority > 0) $preferred[] = ['name'=>$name, 'role'=>$role, 'priority'=>$priority];
     }
 
@@ -51,11 +75,11 @@ function kvaDetectedCaseContacts(array $result): array
         $result['contact_role'] = implode('; ', array_values(array_unique($roles)));
     } else {
         $fallbackRole = kvaContactString($result['contact_role'] ?? '');
-        if (kvaPreferredSiteRole($fallbackRole) > 0) {
+        if (kvaPreferredSiteRole($fallbackRole) > 0 || (($result['contact_operational'] ?? false) === true && !kvaExecutiveRole($fallbackRole)) || kvaOperationalRole($fallbackRole)) {
             $result['contact_person'] = kvaContactString($result['contact_person'] ?? '');
             $result['contact_role'] = $fallbackRole;
         } else {
-            // Kein operativer Projekt-/Bauleiter sicher erkannt.
+            // Kein operativer Ansprechpartner sicher erkannt.
             $result['contact_person'] = '';
             $result['contact_role'] = '';
         }

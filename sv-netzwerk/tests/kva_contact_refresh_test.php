@@ -14,6 +14,10 @@ checkContactRefresh(str_contains($page, 'Saniererdaten aus KVA neu einlesen'), '
 checkContactRefresh(str_contains($page, 'action=refresh_contacts'), 'Kontaktaktualisierung wird nicht aufgerufen.');
 checkContactRefresh(str_contains($page, 'action=save_case'), 'Manuelle Falldaten werden vor der Kontaktaktualisierung nicht gespeichert.');
 checkContactRefresh(str_contains($page, 'action=patch_case_contacts'), 'Erkannte Kontakte werden nicht verlustfrei ergänzt.');
+foreach (['vf-sanierer-strasse','vf-sanierer-plz','vf-sanierer-ort','vf-sanierer-fax','vf-sanierer-website'] as $id) {
+    checkContactRefresh(str_contains($page, 'id="'.$id.'"'), 'Vollständiges sichtbares Saniererfeld fehlt: '.$id);
+}
+checkContactRefresh(str_contains($page, "sanierer_website:'vf-sanierer-website'"), 'Vollständige Saniererdaten werden nach Neuladen nicht ins Formular übernommen.');
 
 checkContactRefresh(is_string($core) && str_contains($core, "if (\$action === 'refresh_contacts')"), 'Kontaktaktualisierungs-Endpunkt fehlt.');
 checkContactRefresh(str_contains($core, '$selected = $kvas[0]'), 'Der neueste KVA wird nicht ausgewählt.');

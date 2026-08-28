@@ -30,8 +30,8 @@ function krAnalyzeContacts(string $name, string $mime, string $bytes): array
         return krOpenAiJson(
             $key,
             $fileId,
-            'Lies ausschließlich die geschäftlichen Kontaktdaten des Absenders aus dem vollständigen Originaldokument. Suche in Briefkopf, Fußzeilen, Unterschrift, Ansprechpartner-/Bauleiterangaben, Impressum sowie AGB- und Widerrufsseiten. Erfasse alle namentlich genannten verantwortlichen Personen mit ihrer jeweiligen Rolle. Verwechsle Empfänger, Versicherungsnehmer, Versicherer oder Regulierer niemals mit dem Absender/Sanierer. Erfinde nichts.',
-            'Datei: '.$name.'. Antworte als JSON mit company, contact_people (Array aus Objekten mit name und role), street, postal_code, city, email, phone, mobile, fax, website. Unbekanntes als null.'
+            'Bestimme zuerst anhand von Briefkopf, Angebotskopf, Fußzeile und Unterschrift eindeutig die Firma, die dieses Angebot oder diesen Kostenvoranschlag ausgestellt hat. Nur diese Ausstellerfirma ist der Sanierer/Auftragnehmer. Empfänger, Versicherungsnehmer, Versicherer, Makler, Regulierer, Sachverständige und andere erwähnte Firmen sind niemals der Aussteller. Setze issuer_confirmed nur bei eindeutigem Dokumentbeleg auf true und company_relation dann exakt auf issuer. Lies ausschließlich die geschäftlichen Kontaktdaten dieser Ausstellerfirma aus dem vollständigen Originaldokument. Erfasse alle namentlich genannten Personen mit Rolle und kennzeichne operational nur bei einem konkreten operativen Fallkontakt. Projektleitung hat Vorrang vor Bauleitung; beide haben Vorrang vor anderen operativen Ansprechpartnern. Geschäftsführer, Inhaber, Vorstand und Geschäftsleitung sind nicht operativ. Erfinde nichts.',
+            'Datei: '.$name.'. Antworte als JSON mit issuer_confirmed (Boolean), company_relation, issuer_evidence, company, contact_people (Array aus Objekten mit name, role und operational als Boolean), street, postal_code, city, email, phone, mobile, fax, website. Unbekanntes als null.'
         );
     } finally {
         @unlink($tmp);
