@@ -155,7 +155,7 @@ async function runImport(run) {
     const currentProfile = previous.claimsLoggedProfile || '';
     const [openSession] = await chrome.tabs.query({ url: 'https://web.claimsforce.com/*' });
     const openRoute = safeRoute(openSession?.url || '');
-    if (!currentProfile && openSession && !['/login', '/logout'].includes(openRoute)) {
+    if (!currentProfile && profile === 'christian' && openSession && !['/login', '/logout'].includes(openRoute)) {
       await chrome.storage.session.set({ ...(previous.claimsToken ? { claimsToken: previous.claimsToken, claimsTokenProfile: profile } : {}), claimsLoggedProfile: profile });
       await diagnostic(run, 'CF-AUTH-01', 'Vorhandene ClaimsForce-Sitzung wurde dem angeforderten Profil zugeordnet.', { profileSwitch: 'bestehende Sitzung gebunden' });
     } else if (currentProfile !== profile) {

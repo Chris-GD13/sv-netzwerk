@@ -92,7 +92,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 function reportRuntime() {
   return chrome.runtime.sendMessage({ type: 'GET_RUNTIME_STATUS' }).then(status => {
     const active = status?.active || {}, diagnostic = status?.diagnostic || {};
-    document.documentElement.setAttribute('data-svnet-claims-runtime', [active.status || 'idle', diagnostic.phase || active.phase || 'CF-IDLE', Number(active.jobId || 0)].join('|'));
+    document.documentElement.setAttribute('data-svnet-claims-runtime', [active.status || 'idle', diagnostic.phase || active.phase || 'CF-IDLE', Number(active.jobId || 0), active.profile || 'none'].join('|'));
     window.postMessage({ type: 'SVNET_CLAIMS_RUNTIME_STATUS', status }, location.origin);
   }).catch(() => document.documentElement.setAttribute('data-svnet-claims-runtime', 'unavailable|CF-RUNTIME|0'));
 }
