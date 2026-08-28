@@ -146,6 +146,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
     {c:'Maler/Gipser',l:'WDVS – Oberputz/Armierung Hagelschaden ausbessern',u:'m²',q:'Hagelschaden an Wärmedämmverbundsystem: geschädigte Putz- und Armierungsschichten lokal entfernen, Putzarmierung Glasfasergewebe und Oberputz systemgerecht wiederherstellen; Dämmplatten bleiben soweit unbeschädigt bestehen; BKI LB 323'},
     {c:'Maler/Gipser',l:'WDVS – Teilfläche komplett erneuern',u:'m²',q:'Wärmedämmverbundsystem in geschädigter Teilfläche vollständig aufnehmen und entsorgen und gleichartiges WDVS einschließlich Dämmstoff, Armierung und Oberputz wiederherstellen; BKI LB 323 WDVS'},
     {c:'Maler/Gipser',l:'Fassade – Riss/Schlagstelle schließen',u:'m',q:'Einzelriss oder lineare Schlagstelle im Außenputz fachgerecht schließen und Oberfläche angleichen; BKI LB 323 Außenputz Risssanierung'},
+    {c:'Fassadenbekleidung',l:'Asbestzement-Fassade – Rückbau und Entsorgung',u:'m²',q:'Fest gebundene asbesthaltige Faserzement-Fassadenplatten durch sachkundigen Fachbetrieb emissionsarm demontieren, Arbeitsbereich sichern, angrenzende Bauteile abdecken, Platten staubarm behandeln, luftdicht verpacken und kennzeichnen, fachgerecht transportieren und entsorgen sowie Arbeitsbereich und Werkzeuge reinigen',n:'Nur Asbestrückbau und Entsorgung; Materialanalyse, Gerüst/Hebebühne, Verkehrsabsicherung und neue Fassade separat kalkulieren'},
     {c:'Fassadenbekleidung',l:'Faserzement-/Eternitplatten Fassade erneuern',u:'m²',q:'Nicht asbesthaltige Faserzement-Fassadenplatten demontieren und entsorgen, gleichartige Faserzement-Tafeln auf vorhandener Unterkonstruktion neu montieren; Rückbau 338.000.021 und Fassadenbekleidung Faserzement-Tafeln LB 338'},
     {c:'Fassadenbekleidung',l:'Faserzement Stülpdeckung Fassade erneuern',u:'m²',q:'Nicht asbesthaltige Faserzement-Fassadenbekleidung in Stülpdeckung demontieren und entsorgen und gleichartige Stülpdeckung auf vorhandener Holz-Unterkonstruktion neu montieren; BKI LB 338'},
     {c:'Fassadenbekleidung',l:'Holzfassade / Stülpschalung erneuern',u:'m²',q:'Holz-Außenwandbekleidung demontieren und entsorgen und gleichartige Holz-Stülpschalung auf vorhandener Unterkonstruktion neu herstellen; BKI LB 338 Fassadenbekleidung Holz Stülpschalung'},
@@ -185,7 +186,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
           [/garagentor|sektionaltor/,{material:1950,hours:6.0,labor:76}]
         ];return rules.find(([rx])=>rx.test(label))?.[1]||{material:100,hours:1,labor:72}};
         const indexComplete=p=>{const label=String(p.l||'').toLowerCase();const rules=[
-          [/asbestzement|asbest.*dach/,70],[/wellplatten|faserzement.*dach/ ,95],[/doppelsteg|polycarbonat/,280],[/dachziegel|falzziegel/,110],[/biberschwanz/,180],[/betondachstein/,95],[/schieferdeckung/,220],[/trapez|profilblech/,105],
+          [/asbest.*fassade|asbestzement.*fassade/,60],[/asbestzement|asbest.*dach/,70],[/wellplatten|faserzement.*dach/ ,95],[/doppelsteg|polycarbonat/,280],[/dachziegel|falzziegel/,110],[/biberschwanz/,180],[/betondachstein/,95],[/schieferdeckung/,220],[/trapez|profilblech/,105],
           [/firstdeckung|firstziegel/,95],[/ortgang/,85],[/dachfenster komplett/,1450],[/lichtkuppel/,1600],
           [/attika/,110],[/dachrinne titanzink/,85],[/dachrinne kupfer/,145],[/fallrohr titanzink/,75],[/fallrohr kupfer/,120],
           [/fassadengerüst.*auf-.*abbau/,9],[/fassadengerüst.*vorhaltung/,0.35],[/rollgerüst/,135],
@@ -234,6 +235,22 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
         const phase=x=>{const txt=positionText(x);if(/abbruch|demont|ausbau|entfern|entsorg|aufnehmen/.test(txt))return'remove';if(/liefer|einbau|montage|erneu|herstell|einsetzen|beschicht|streichen|ausbessern/.test(txt))return'install';return'other'};
         const best=a=>a.sort((x,y)=>((explicitCodes.includes(String(y.position_code||''))?20:0)+(requestedRule?.test(positionText(y))?5:0))-((explicitCodes.includes(String(x.position_code||''))?20:0)+(requestedRule?.test(positionText(x))?5:0)))[0];
         try{
+          if(/asbest.*fassade|asbestzement.*fassade/.test(norm(p.l))){
+            const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?40:level==='high'?80:60;
+            bridge()?.addLine?.({
+              position_code:'ASBEST-FASSADE 2025',
+              description:'Asbestzement-Fassade – Baustellensicherung, emissionsarme Demontage durch sachkundigen Fachbetrieb, staubarme Behandlung, luftdichte Verpackung und Kennzeichnung, Transport, Entsorgung sowie Reinigung; Materialanalyse, Gerüst/Hebebühne, Verkehrsabsicherung und neue Fassade separat',
+              quantity:qty,
+              recommended_quantity:qty,
+              unit:'m²',
+              unit_price:ep,
+              regional_factor:1,
+              source_name:'Obolus Group – Asbest Fassade entfernen: Kosten, Ablauf & Tipps',
+              source_page:'https://obolus-group.de/asbest-fassade-entfernen-kosten/'
+            });
+            added++;
+            continue
+          }
           if(/asbestzement|asbest.*dach/.test(norm(p.l))){
             const level=document.getElementById('bk-level')?.value||'mid',small=qty<20,ep=level==='low'?40:level==='high'?100:70,flat=level==='low'?800:level==='high'?2500:1500;
             bridge()?.addLine?.({
