@@ -76,8 +76,8 @@
     const d=e.data||{},runtime=d.runtime||{};
     if(d.type==='SVNET_CLAIMS_BRIDGE_READY'){
       bridgeVersion=String(d.version||'0.0.0');
-      bridge=versionAtLeast(bridgeVersion,'1.1.7');
-      if(!bridge)show(`Browser-Brücke 1.1.7 erforderlich (geladen: ${bridgeVersion}). Bitte die entpackte Erweiterung einmal neu laden.`,true);
+      bridge=versionAtLeast(bridgeVersion,'1.1.8');
+      if(!bridge)show(`Browser-Brücke 1.1.8 erforderlich (geladen: ${bridgeVersion}). Bitte die entpackte Erweiterung einmal neu laden.`,true);
     }
     if(!agentJob)return;
     if(runtime.jobId&&Number(runtime.jobId)!==Number(agentJob.id))return;

@@ -141,11 +141,14 @@ async function uploadBuffer(portalTabId, folderId, name, mime, modified, buffer)
 
 async function runImport(run) {
   const { portalTabId, profile } = run;
-  const previous = await chrome.storage.session.get(['activeProfile', 'claimsLoggedProfile']);
+  const previous = await chrome.storage.session.get(['activeProfile', 'claimsLoggedProfile', 'claimsToken', 'claimsTokenProfile']);
   await chrome.storage.session.set({ activeProfile: profile });
   if (profile !== 'self') {
     const currentProfile = previous.claimsLoggedProfile || '';
-    if (currentProfile !== profile) {
+    if (!currentProfile && previous.claimsToken) {
+      await chrome.storage.session.set({ claimsToken: previous.claimsToken, claimsTokenProfile: profile, claimsLoggedProfile: profile });
+      await diagnostic(run, 'CF-AUTH-01', 'Vorhandene ClaimsForce-Sitzung wurde dem angeforderten Profil zugeordnet.', { profileSwitch: 'bestehende Sitzung gebunden' });
+    } else if (currentProfile !== profile) {
       const [open] = await chrome.tabs.query({ url: 'https://web.claimsforce.com/*' });
       await diagnostic(run, 'CF-AUTH-01', 'ClaimsForce-Profil wird eindeutig neu angemeldet.', { profileSwitch: currentProfile ? 'wechsel' : 'unbekannte Sitzung' });
       await chrome.storage.session.remove(['claimsToken', 'claimsTokenProfile', 'claimsLoggedProfile']);
