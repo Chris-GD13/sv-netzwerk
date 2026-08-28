@@ -70,6 +70,17 @@ function cbStreamFile(array $file,bool $forceDownload=false):never{
 }
 $tree=cbTree($folderId);$action=(string)($_GET['action']??'list');
 if($action==='file'||$action==='download'){$fileId=trim((string)($_GET['file_id']??''));$file=cbFindInTree($tree,$fileId);if(!$file)apiError(404,'Die Datei gehört nicht zu diesem Schadenfall.');cbStreamFile($file,$action==='download');}
+if($action==='delete_selected'){
+    if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
+    $body=requestBody();$fileIds=is_array($body['file_ids']??null)?array_values(array_unique(array_filter(array_map(static fn($id):string=>trim((string)$id),$body['file_ids'])))):[];
+    if(!$fileIds)apiError(400,'Bitte mindestens eine Datei auswählen.');
+    if(count($fileIds)>100)apiError(400,'Es können höchstens 100 Dateien gleichzeitig gelöscht werden.');
+    $files=[];
+    foreach($fileIds as$fileId){$file=cbFindInTree($tree,$fileId);if(!$file)apiError(404,'Mindestens eine ausgewählte Datei gehört nicht zu diesem Schadenfall.');if(($file['folder']??false)===true)apiError(400,'Ordner können hier nicht gelöscht werden.');if(strcasecmp((string)($file['name']??''),'00_Falldaten.json')===0)apiError(403,'Die zentrale Falldaten-Datei darf nicht gelöscht werden.');$files[]=$file;}
+    $deleted=[];
+    foreach($files as$file){$fileId=(string)$file['id'];$r=cbHttp('PATCH','https://www.googleapis.com/drive/v3/files/'.rawurlencode($fileId).'?supportsAllDrives=true',['Content-Type: application/json'],json_encode(['trashed'=>true],JSON_UNESCAPED_SLASHES));if($r['status']<200||$r['status']>=300)apiError(503,'Nicht alle ausgewählten Dateien konnten in den Papierkorb verschoben werden.');$deleted[]=['id'=>$fileId,'name'=>(string)($file['name']??'Datei')];}
+    apiJson(['ok'=>true,'deleted_count'=>count($deleted),'deleted'=>$deleted,'recoverable'=>true]);
+}
 if($action==='delete'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
     $body=requestBody();$fileId=trim((string)($body['file_id']??''));$file=cbFindInTree($tree,$fileId);
