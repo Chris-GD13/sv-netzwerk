@@ -21,12 +21,30 @@ $detected = kvaDetectedCaseContacts([
 ]);
 
 checkContact($detected['sanierer_firma'] === 'Mey Generalbau GmbH', 'Firma fehlt.');
-checkContact(str_contains($detected['sanierer_ansprechpartner'], 'Andreas Gärtner') && str_contains($detected['sanierer_ansprechpartner'], 'Achim Mey') && str_contains($detected['sanierer_ansprechpartner'], 'Andreas Trauschweizer'), 'Nicht alle Ansprechpartner wurden übernommen.');
-checkContact(str_contains($detected['sanierer_funktion'], 'Bauleiter') && str_contains($detected['sanierer_funktion'], 'Geschäftsführer'), 'Rollen fehlen.');
+checkContact($detected['sanierer_ansprechpartner'] === 'Andreas Gärtner', 'Bauleiter wurde nicht bevorzugt übernommen.');
+checkContact($detected['sanierer_funktion'] === 'Bauleiter', 'Falsche operative Rolle übernommen.');
+checkContact(!str_contains($detected['sanierer_ansprechpartner'], 'Achim Mey') && !str_contains($detected['sanierer_ansprechpartner'], 'Andreas Trauschweizer'), 'Geschäftsführer dürfen bei vorhandener Bau-/Projektleitung nicht übernommen werden.');
 checkContact($detected['sanierer_strasse'] === 'Au Ost 5' && $detected['sanierer_plz'] === '72072' && $detected['sanierer_ort'] === 'Tübingen', 'Anschrift unvollständig.');
 checkContact($detected['sanierer_telefon'] === '0 70 71 / 97 96 2-0' && $detected['sanierer_fax'] === '0 70 71 / 97 96 2-10', 'Telefon oder Fax fehlt.');
 checkContact($detected['sanierer_email'] === 'kontakt@meygeneralbau.de' && $detected['sanierer_website'] === 'www.meygeneralbau.de', 'E-Mail oder Website fehlt.');
 checkContact(!array_key_exists('email', $detected) && !array_key_exists('telefon', $detected), 'Saniererdaten dürfen nicht in VN-Felder geschrieben werden.');
+
+$projectLead = kvaDetectedCaseContacts([
+    'contact_people'=>[
+        ['name'=>'Berta Bau', 'role'=>'Bauleiterin'],
+        ['name'=>'Peter Projekt', 'role'=>'Projektleiter'],
+        ['name'=>'Gerd Geschäftsführer', 'role'=>'Geschäftsführer'],
+    ],
+]);
+checkContact($projectLead['sanierer_ansprechpartner'] === 'Peter Projekt' && $projectLead['sanierer_funktion'] === 'Projektleiter', 'Projektleitung muss vor Bauleitung priorisiert werden.');
+
+$managementOnly = kvaDetectedCaseContacts([
+    'contact_people'=>[
+        ['name'=>'Achim Mey', 'role'=>'Geschäftsführer'],
+        ['name'=>'Andreas Trauschweizer', 'role'=>'Geschäftsführer'],
+    ],
+]);
+checkContact(!isset($managementOnly['sanierer_ansprechpartner']) && !isset($managementOnly['sanierer_funktion']), 'Reine Geschäftsführerangaben dürfen nicht als operativer Ansprechpartner übernommen werden.');
 
 $first = kvaMergeCaseContacts(['sanierer_email'=>'bestehend@example.test'], $detected, 'AN2629355.pdf', 'AN2629355', '2026-08-28T10:00:00Z');
 checkContact($first['case']['sanierer_email'] === 'bestehend@example.test', 'Vorhandene Daten wurden überschrieben.');
@@ -42,4 +60,4 @@ $drive = file_get_contents(__DIR__.'/../public/intern/api/google-drive-sync.php'
 checkContact(is_string($endpoint) && str_contains($endpoint, 'Verwechsle Empfänger, Versicherungsnehmer, Versicherer oder Regulierer niemals mit dem Absender/Sanierer.'), 'Trennregel im Kontaktprompt fehlt.');
 checkContact(is_string($drive) && str_contains($drive, "case'patch_case_contacts'"), 'Atomare Fallergänzung fehlt.');
 
-echo "KVA-Saniererkontakte werden vollständig und verlustfrei ergänzt.\n";
+echo "KVA-Saniererkontakte priorisieren Projekt-/Bauleitung und werden verlustfrei ergänzt.\n";
