@@ -54,12 +54,17 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
   document.getElementById('bk-clear-lines')?.addEventListener('click', () => {
     window.__bkiCalcBridge?.setLines?.([]);
   });
+  const quickCard = document.querySelector('.bk-quick');
+  const searchCard = document.querySelector('.bk-input-card');
+  if (quickCard && searchCard && searchCard.parentElement) {
+    searchCard.parentElement.insertBefore(quickCard, searchCard);
+  }
   const cards = [
+    { selector: '.bk-quick', title: 'Schnellkalkulation typische Schäden', collapsed: false },
     { selector: '.bk-input-card', title: 'BKI-Position suchen', collapsed: true },
-    { selector: '.bk-quick', title: 'Schnellkalkulation typische Schäden', collapsed: true },
-    { selector: '#bk-results-card', title: 'Gefundene BKI-Positionen' },
-    { selector: '.bk-protocol', title: 'Kalkulation' },
-    { selector: '.bk-history', title: 'Gespeicherte Kalkulationen' },
+    { selector: '#bk-results-card', title: 'Gefundene BKI-Positionen', collapsed: true },
+    { selector: '.bk-protocol', title: 'Kalkulation', collapsed: true },
+    { selector: '.bk-history', title: 'Gespeicherte Kalkulationen', collapsed: true },
   ];
   for (const config of cards) {
     const card = document.querySelector(config.selector);
