@@ -83,6 +83,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 window.addEventListener('message', event => {
   if (event.source !== window || event.origin !== location.origin) return;
+  if (event.data?.type === 'SVNET_CLAIMS_BRIDGE_PING') window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY' }, location.origin);
   if (event.data?.type === 'SVNET_CLAIMS_IMPORT_START') chrome.runtime.sendMessage({ type: 'START_IMPORT', profile: event.data.profile || 'self' }).then(response => window.postMessage({ type: response?.ok ? 'SVNET_CLAIMS_IMPORT_DONE' : 'SVNET_CLAIMS_IMPORT_ERROR', result: response?.result, error: response?.error }, location.origin)).catch(error => window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: error.message }, location.origin));
   if (event.data?.type === 'SVNET_CLAIMS_OPEN_OPTIONS') chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS', profile: event.data.profile || 'self' });
 });

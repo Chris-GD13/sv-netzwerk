@@ -49,6 +49,12 @@ assert(options.includes('Kennwort ist verschlüsselt gespeichert'), 'Gespeichert
 const drive = fs.readFileSync(path.join(root, 'public/intern/api/google-drive-sync.php'), 'utf8');
 assert(drive.includes("'claims_profile'=>\$claimsProfile"), 'Status liefert das Claims-Profil des angemeldeten Sachverständigen');
 assert(drive.includes("==='administrator'"), 'Administratoren können die Claims-Anmeldungen aller Sachverständigen zentral bedienen');
+assert(drive.includes("'claims_agent'=>"), 'Administrator wird als zentrale Importstation erkannt');
+const queue = fs.readFileSync(path.join(root, 'public/intern/api/claimsforce-queue.php'), 'utf8');
+assert(queue.includes('claimsforce_import_jobs') && queue.includes("$action==='claim'"), 'Zentrale serverseitige Importwarteschlange fehlt');
+const central = fs.readFileSync(path.join(root, 'public/intern/claimsforce-central.js'), 'utf8');
+assert(central.includes("action=status&id=") && central.includes("SVNET_CLAIMS_IMPORT_START"), 'Portal kann zentrale Importe starten und verfolgen');
+assert(central.includes("now.getHours()!==3") && central.includes("['christian','marc','holger']"), 'Täglicher 03:00-Uhr-Import plant alle drei Profile ein');
 assert(vault.includes("AES-GCM"), 'Kennwörter werden verschlüsselt gespeichert');
 
 console.log('ClaimsForce-Import: Zuordnung, Bestandsschutz, Zugangstresor und Browser-Brücke geprüft.');
