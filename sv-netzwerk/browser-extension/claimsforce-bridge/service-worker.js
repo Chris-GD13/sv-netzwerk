@@ -275,6 +275,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
   if (message?.type === 'GET_CREDENTIAL_DIAGNOSTIC') { sendResponse({ ok: true, phase: credentialDiagnostic }); return; }
+  if (message?.type === 'GET_RUNTIME_STATUS') {
+    Promise.all([chrome.storage.local.get('claimsActiveRun'), chrome.storage.local.get('claimsImportDiagnostic')]).then(([active, diagnostic]) => sendResponse({ ok: true, active: active.claimsActiveRun || null, diagnostic: diagnostic.claimsImportDiagnostic || null }));
+    return true;
+  }
   if (message?.type === 'OPEN_OPTIONS') {
     chrome.storage.session.set({ activeProfile: message.profile || 'self' }).then(() => chrome.runtime.openOptionsPage()); sendResponse({ ok: true }); return;
   }

@@ -92,6 +92,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 window.addEventListener('message', event => {
   if (event.source !== window || event.origin !== location.origin) return;
   if (event.data?.type === 'SVNET_CLAIMS_BRIDGE_PING') window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION }, location.origin);
+  if (event.data?.type === 'SVNET_CLAIMS_RUNTIME_PING') chrome.runtime.sendMessage({ type: 'GET_RUNTIME_STATUS' }).then(status => window.postMessage({ type: 'SVNET_CLAIMS_RUNTIME_STATUS', status }, location.origin)).catch(() => {});
   if (event.data?.type === 'SVNET_CLAIMS_IMPORT_START') {
     activeRequest = { type: 'START_IMPORT', profile: event.data.profile || 'self', jobId: Number(event.data.jobId || 0), runId: event.data.runId || crypto.randomUUID() };
     const request = activeRequest;

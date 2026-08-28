@@ -76,8 +76,16 @@
     const d=e.data||{},runtime=d.runtime||{};
     if(d.type==='SVNET_CLAIMS_BRIDGE_READY'){
       bridgeVersion=String(d.version||'0.0.0');
-      bridge=versionAtLeast(bridgeVersion,'1.1.8');
-      if(!bridge)show(`Browser-Brücke 1.1.8 erforderlich (geladen: ${bridgeVersion}). Bitte die entpackte Erweiterung einmal neu laden.`,true);
+      bridge=versionAtLeast(bridgeVersion,'1.1.9');
+      if(!bridge)show(`Browser-Brücke 1.1.9 erforderlich (geladen: ${bridgeVersion}). Bitte die entpackte Erweiterung einmal neu laden.`,true);
+    }
+    if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&agentJob){
+      const active=d.status?.active||{},diag=d.status?.diagnostic||{};
+      if(Number(active.jobId||0)===Number(agentJob.id)){
+        lastRuntime={phase:diag.phase||active.phase||'CF-RUN',message:diag.text||active.error||'Browserlauf wird fortgesetzt.',current:Number(diag.details?.current||0),total:Number(diag.details?.total||0),diagnostic:diag.details||{}};
+        show(`[${lastRuntime.phase}] ${lastRuntime.message}`,active.status==='failed');
+        await heartbeat();
+      }
     }
     if(!agentJob)return;
     if(runtime.jobId&&Number(runtime.jobId)!==Number(agentJob.id))return;
@@ -105,5 +113,6 @@
   }
 
   setInterval(heartbeat,20000);
+  setInterval(()=>window.postMessage({type:'SVNET_CLAIMS_RUNTIME_PING'},location.origin),5000);
   json('/intern/api/google-drive-sync.php?action=status').then(async d=>{context=d;window.postMessage({type:'SVNET_CLAIMS_BRIDGE_PING'},location.origin);await resumeWatch();automaticImport();setInterval(automaticImport,30000);poll()}).catch(e=>show(e.message,true));
 })();
