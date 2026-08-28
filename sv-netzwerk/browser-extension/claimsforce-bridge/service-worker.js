@@ -296,7 +296,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   if (message?.type === 'GET_CREDENTIAL_DIAGNOSTIC') { sendResponse({ ok: true, phase: credentialDiagnostic }); return; }
   if (message?.type === 'GET_RUNTIME_STATUS') {
-    Promise.all([chrome.storage.local.get('claimsActiveRun'), chrome.storage.local.get('claimsImportDiagnostic')]).then(([active, diagnostic]) => sendResponse({ ok: true, active: active.claimsActiveRun || null, diagnostic: diagnostic.claimsImportDiagnostic || null }));
+    Promise.all([chrome.storage.local.get('claimsActiveRun'), chrome.storage.local.get('claimsImportDiagnostic')]).then(([active, diagnostic]) => {
+      const saved = active.claimsActiveRun || null;
+      if (!runningImport && saved?.status === 'running' && Number(saved.portalTabId || 0) > 0) startImport({ tab: { id: Number(saved.portalTabId) } }, saved).catch(() => {});
+      sendResponse({ ok: true, active: saved, diagnostic: diagnostic.claimsImportDiagnostic || null });
+    });
     return true;
   }
   if (message?.type === 'OPEN_OPTIONS') {
