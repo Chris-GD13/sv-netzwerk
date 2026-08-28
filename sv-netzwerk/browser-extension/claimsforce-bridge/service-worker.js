@@ -12,6 +12,14 @@ async function credentialsFor(profile) {
   try {
     const local = await chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile });
     return local?.email && local?.password ? local : null;
+  } catch {}
+  try {
+    const config = await (await fetch(chrome.runtime.getURL('local-config.json'))).json();
+    const endpoint = new URL('/credentials', config.url || 'http://127.0.0.1:47831');
+    endpoint.searchParams.set('profile', profile);
+    const response = await fetch(endpoint, { headers: { 'X-SVNET-Token': config.token } });
+    const local = response.ok ? await response.json() : null;
+    return local?.email && local?.password ? local : null;
   } catch { return null; }
 }
 
@@ -179,7 +187,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
   if (message?.type === 'GET_PORTAL_CREDENTIALS') {
-    loadPortalCredentials().then(value => sendResponse(value || {}));
+    loadPortalCredentials().then(async value => value?.email && value?.password ? value : credentialsFor('christian')).then(value => sendResponse(value || {}));
     return true;
   }
   if (message?.type === 'OPEN_OPTIONS') {
