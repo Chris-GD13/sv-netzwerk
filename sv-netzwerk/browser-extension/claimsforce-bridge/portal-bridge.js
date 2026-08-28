@@ -2,6 +2,7 @@ const API = '/intern/api/google-drive-sync.php';
 const CAL = '/intern/api/outlook-case-calendar.php';
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 const uploads = new Map();
+const operations = new Map();
 let keepalivePort = null;
 let keepaliveTimer = 0;
 let activeRequest = null;
@@ -78,6 +79,21 @@ async function appointment(message) {
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type === 'PORTAL_UPSERT_ASYNC') {
+    const operationId = String(message.operationId || '');
+    if (!operationId) { sendResponse({ ok: false, error: 'Portal-Operations-ID fehlt.' }); return; }
+    if (!operations.has(operationId)) {
+      operations.set(operationId, { status: 'running' });
+      upsert(message).then(result => operations.set(operationId, { status: 'done', result })).catch(error => operations.set(operationId, { status: 'failed', error: error.message }));
+    }
+    sendResponse({ ok: true, accepted: true, operationId });
+    return;
+  }
+  if (message?.type === 'PORTAL_OPERATION_STATUS') {
+    const operation = operations.get(String(message.operationId || ''));
+    sendResponse({ ok: true, operation: operation || { status: 'missing' } });
+    return;
+  }
   (async () => {
     if (message?.type === 'PORTAL_UPSERT') return { ok: true, ...(await upsert(message)) };
     if (message?.type === 'PORTAL_UPLOAD_START') { uploads.set(message.uploadId, { ...message, chunks: [] }); return { ok: true }; }

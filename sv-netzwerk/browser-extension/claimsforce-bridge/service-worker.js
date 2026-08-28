@@ -130,6 +130,20 @@ async function progress(tabId, text, current = 0, total = 0, runtime = {}) {
   await chrome.tabs.sendMessage(tabId, { type: 'IMPORT_PROGRESS', text, current, total, runtime }).catch(() => {});
 }
 
+async function portalOperation(tabId, message, timeout = 60000) {
+  const operationId = String(message.operationId || '');
+  const accepted = await portal(tabId, message);
+  if (!accepted?.accepted) throw new Error('Das SV-Netzwerk hat die Falloperation nicht angenommen.');
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    const status = await portal(tabId, { type: 'PORTAL_OPERATION_STATUS', operationId });
+    if (status.operation?.status === 'done') return status.operation.result;
+    if (status.operation?.status === 'failed') throw new Error(status.operation.error || 'Portal-Falloperation fehlgeschlagen.');
+    await sleep(500);
+  }
+  throw new Error('Das SV-Netzwerk hat die Falloperation nicht rechtzeitig abgeschlossen.');
+}
+
 function unwrap(data, key) {
   return data?.[key] ?? data ?? {};
 }
@@ -207,8 +221,9 @@ async function runImport(run) {
     const appointments = unwrap(rawAppointments, 'appointments');
     const mapped = mapClaim(disposition, communication, Array.isArray(appointments) ? appointments : []);
     await diagnostic(run, 'CF-CASE-UPSERT', `Auftrag ${index + 1}/${claims.length}: Portal-Fall wird angelegt oder ergänzt.`, { current: index, total: claims.length, claimIndex: index + 1 });
-    const upsert = await portal(portalTabId, { type: 'PORTAL_UPSERT', mapped, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, importedAt: new Date().toISOString() } });
+    const upsert = await portalOperation(portalTabId, { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, importedAt: new Date().toISOString() } });
     const folderId = upsert.folderId;
+    await diagnostic(run, 'CF-CASE-FILES', `Auftrag ${index + 1}/${claims.length}: Anhänge und Nachrichten werden übernommen.`, { current: index, total: claims.length, claimIndex: index + 1 });
     const files = unwrap(rawFiles, 'files');
     for (const file of Array.isArray(files) ? files : []) {
       if (!file?.id) continue;
