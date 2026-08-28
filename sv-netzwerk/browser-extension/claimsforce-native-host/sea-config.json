@@ -1,0 +1,5 @@
+{
+  "main": "claims-credentials-host.cjs",
+  "output": "claims-credentials-host.blob",
+  "disableExperimentalSEAWarning": true
+}

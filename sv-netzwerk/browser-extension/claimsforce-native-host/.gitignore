@@ -1,0 +1,4 @@
+*.blob
+*.exe
+claims-credentials-host.json
+eu.svnetzwerk.claimsforce_credentials.json

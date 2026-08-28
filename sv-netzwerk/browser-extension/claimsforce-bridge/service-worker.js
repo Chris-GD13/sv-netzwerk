@@ -2,8 +2,18 @@ import { loadCredentials, loadPortalCredentials } from './vault.js';
 import { mapClaim, safeFileName } from './import-utils.js';
 
 const PLANNING_URL = 'https://web.claimsforce.com/planning?bucket=WITH_FUTURE_APPOINTMENT#with-future-appointment';
+const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const authHeaders = token => ({ Authorization: `Bearer ${token}`, Accept: 'application/json' });
+
+async function credentialsFor(profile) {
+  const saved = await loadCredentials(profile);
+  if (saved?.email && saved?.password) return saved;
+  try {
+    const local = await chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile });
+    return local?.email && local?.password ? local : null;
+  } catch { return null; }
+}
 
 async function tokenValue() {
   return (await chrome.storage.session.get('claimsToken')).claimsToken || '';
@@ -81,14 +91,20 @@ async function uploadBuffer(portalTabId, folderId, name, mime, modified, buffer)
 }
 
 async function runImport(portalTabId, profile = 'self') {
+  const previous = await chrome.storage.session.get(['activeProfile', 'claimsLoggedProfile']);
   await chrome.storage.session.set({ activeProfile: profile });
   if (profile !== 'self') {
-    const [open] = await chrome.tabs.query({ url: 'https://web.claimsforce.com/*' });
-    await chrome.storage.session.remove('claimsToken');
-    if (open?.id) {
-      await chrome.tabs.update(open.id, { url: 'https://web.claimsforce.com/logout' });
-      await waitTab(open.id);
-      await sleep(900);
+    const currentProfile = previous.claimsLoggedProfile || previous.activeProfile || '';
+    if (currentProfile && currentProfile !== profile) {
+      const [open] = await chrome.tabs.query({ url: 'https://web.claimsforce.com/*' });
+      await chrome.storage.session.remove(['claimsToken', 'claimsLoggedProfile']);
+      if (open?.id) {
+        await chrome.tabs.update(open.id, { url: 'https://web.claimsforce.com/logout' });
+        await waitTab(open.id);
+        await sleep(900);
+      }
+    } else {
+      await chrome.storage.session.set({ claimsLoggedProfile: profile });
     }
   }
   await progress(portalTabId, 'ClaimsForce wird geöffnet …');
@@ -143,6 +159,7 @@ async function runImport(portalTabId, profile = 'self') {
     if (future?.startDate) await portal(portalTabId, { type: 'PORTAL_APPOINTMENT', folderId, appointment: future });
   }
   await progress(portalTabId, `${claims.length} Aufträge, ${filesDone} Dateien und ${messagesDone} Nachrichten eingelesen.`, claims.length, claims.length);
+  if (profile !== 'self') await chrome.storage.session.set({ claimsLoggedProfile: profile });
   return { claims: claims.length, files: filesDone, messages: messagesDone };
 }
 
@@ -153,7 +170,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return;
   }
   if (message?.type === 'GET_CREDENTIALS') {
-    chrome.storage.session.get('activeProfile').then(row => loadCredentials(row.activeProfile || 'self')).then(value => sendResponse(value || {}));
+    chrome.storage.session.get('activeProfile').then(async row => {
+      const profile = row.activeProfile || 'self';
+      const value = await credentialsFor(profile);
+      if (value) await chrome.storage.session.set({ claimsLoggedProfile: profile });
+      return value;
+    }).then(value => sendResponse(value || {}));
     return true;
   }
   if (message?.type === 'GET_PORTAL_CREDENTIALS') {

@@ -1,1 +1,43 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><title>ClaimsForce-Brücke einrichten</title><style>body{font:16px system-ui;max-width:620px;margin:40px auto;padding:0 20px;color:#183651}section{border-top:1px solid #d7e0e7;margin-top:34px;padding-top:20px}label{display:block;margin:18px 0 6px;font-weight:700}input,select{box-sizing:border-box;width:100%;padding:12px;border:1px solid #9eb3c6;border-radius:4px}button{margin-top:20px;padding:12px 18px;border:0;border-radius:4px;background:#183b58;color:white;font-weight:700}.secondary{background:#e9f0f5;color:#183651;margin-left:8px}small,p{color:#5f7488}.ok{color:#18743c}</style></head><body><h1>ClaimsForce-Brücke</h1><p>Die Daten gelten nur für dieses Chrome-Profil. Alle Kennwörter werden mit einem nicht exportierbaren Browserschlüssel verschlüsselt gespeichert. Susanne kann hier getrennte ClaimsForce-Anmeldungen für alle Sachverständigen hinterlegen.</p><form id="form"><label for="profile">ClaimsForce-Anmeldung für</label><select id="profile"><option value="self">Eigene Anmeldung</option><option value="christian">Christian Wächter</option><option value="holger">Holger Roth</option><option value="marc">Marc Schütt</option></select><label for="email">ClaimsForce-E-Mail-Adresse</label><input id="email" type="email" autocomplete="username" required><label for="password">ClaimsForce-Kennwort</label><input id="password" type="password" autocomplete="current-password"><button type="submit">ClaimsForce-Zugang verschlüsselt speichern</button><button id="remove" class="secondary" type="button">Gespeicherte Daten löschen</button></form><p id="state" aria-live="polite"></p><section><h2>Automatische SV-Netzwerk-Anmeldung</h2><p>Damit der Import nachts unbeaufsichtigt starten kann, wird das Prüfportal nach einem Sitzungsablauf automatisch wieder angemeldet.</p><form id="portal-form"><label for="portal-email">SV-Netzwerk-E-Mail-Adresse</label><input id="portal-email" type="email" autocomplete="username" required><label for="portal-password">SV-Netzwerk-Kennwort</label><input id="portal-password" type="password" autocomplete="current-password"><button type="submit">Portal-Zugang verschlüsselt speichern</button><button id="portal-remove" class="secondary" type="button">Portal-Zugang löschen</button></form><p id="portal-state" aria-live="polite"></p></section><script type="module" src="options.js"></script></body></html>
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>ClaimsForce-Brücke einrichten</title>
+  <style>body{font:16px system-ui;max-width:620px;margin:40px auto;padding:0 20px;color:#183651}section{border-top:1px solid #d7e0e7;margin-top:34px;padding-top:20px}label{display:block;margin:18px 0 6px;font-weight:700}input,select{box-sizing:border-box;width:100%;padding:12px;border:1px solid #9eb3c6;border-radius:4px}button{margin-top:20px;padding:12px 18px;border:0;border-radius:4px;background:#183b58;color:white;font-weight:700}.secondary{background:#e9f0f5;color:#183651;margin-left:8px}small,p{color:#5f7488}.ok{color:#18743c}</style>
+</head>
+<body>
+  <h1>ClaimsForce-Brücke</h1>
+  <p>Die Daten gelten nur für dieses Chrome-Profil. Alle Kennwörter werden mit einem nicht exportierbaren Browserschlüssel verschlüsselt gespeichert. Susanne kann hier getrennte ClaimsForce-Anmeldungen für alle Sachverständigen hinterlegen.</p>
+  <form id="form">
+    <label for="profile">ClaimsForce-Anmeldung für</label>
+    <select id="profile">
+      <option value="self">Eigene Anmeldung</option>
+      <option value="christian">Christian Wächter</option>
+      <option value="holger">Holger Roth</option>
+      <option value="marc">Marc Schütt</option>
+      <option value="jens">Ehem. Jens Maurer → Christian Wächter</option>
+    </select>
+    <label for="email">ClaimsForce-E-Mail-Adresse</label>
+    <input id="email" type="email" autocomplete="username" required>
+    <label for="password">ClaimsForce-Kennwort</label>
+    <input id="password" type="password" autocomplete="current-password">
+    <button type="submit">ClaimsForce-Zugang verschlüsselt speichern</button>
+    <button id="remove" class="secondary" type="button">Gespeicherte Daten löschen</button>
+  </form>
+  <p id="state" aria-live="polite"></p>
+  <section>
+    <h2>Automatische SV-Netzwerk-Anmeldung</h2>
+    <p>Damit der Import nachts unbeaufsichtigt starten kann, wird das Prüfportal nach einem Sitzungsablauf automatisch wieder angemeldet.</p>
+    <form id="portal-form">
+      <label for="portal-email">SV-Netzwerk-E-Mail-Adresse</label>
+      <input id="portal-email" type="email" autocomplete="username" required>
+      <label for="portal-password">SV-Netzwerk-Kennwort</label>
+      <input id="portal-password" type="password" autocomplete="current-password">
+      <button type="submit">Portal-Zugang verschlüsselt speichern</button>
+      <button id="portal-remove" class="secondary" type="button">Portal-Zugang löschen</button>
+    </form>
+    <p id="portal-state" aria-live="polite"></p>
+  </section>
+  <script type="module" src="options.js"></script>
+</body>
+</html>
