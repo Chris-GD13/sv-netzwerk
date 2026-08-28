@@ -97,7 +97,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
   const API='/intern/api/bki-calculator.php';
   const presets=[
     {c:'Dachdeckung',l:'Wellplatten / Faserzement',u:'m²',q:'Dachdeckung Faserzement Wellplatten auf vorhandener Unterkonstruktion'},
-    {c:'Dachdeckung',l:'Doppelstegplatten / Polycarbonat',u:'m²',q:'Polycarbonat Doppelstegplatten Hohlkammerplatten Dachdeckung. Im BKI keine eigene PC-Stegplattenposition; als konstruktiven Vergleich für die Neumontage LB 320 Dachdeckung Wellplatte Pos. 86 / 320.001.189 prüfen.'},
+    {c:'Dachdeckung',l:'Doppelstegplatten / Polycarbonat',u:'m²',q:'Polycarbonat Doppelstegplatten Hohlkammerplatten Dachdeckung. Im BKI keine eigene PC-Stegplattenposition; als konstruktiven Vergleich für die Neumontage LB 320 Dachdeckung Wellplatte Pos. 86 / 320.001.189 prüfen.',n:'Kompletterneuerung auf vorhandener Unterkonstruktion inkl. Demontage, Entsorgung, 16-mm-Platten, Profile, Dichtungen, Befestigung, Zuschnitt und Montage'},
     {c:'Dachdeckung',l:'Dachziegel / Falzziegel',u:'m²',q:'Dachdeckung Falzziegel Ton auf vorhandener Lattung'},
     {c:'Dachdeckung',l:'Biberschwanzziegel',u:'m²',q:'Dachdeckung Biberschwanz Flachziegel Ton Doppeldeckung auf vorhandener Lattung'},
     {c:'Dachdeckung',l:'Betondachsteine',u:'m²',q:'Dachdeckung Betondachsteine auf vorhandener Lattung'},
@@ -184,7 +184,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
           [/garagentor|sektionaltor/,{material:1950,hours:6.0,labor:76}]
         ];return rules.find(([rx])=>rx.test(label))?.[1]||{material:100,hours:1,labor:72}};
         const indexComplete=p=>{const label=String(p.l||'').toLowerCase();const rules=[
-          [/wellplatten|faserzement.*dach/ ,95],[/doppelsteg|polycarbonat/,120],[/dachziegel|falzziegel/,110],[/biberschwanz/,180],[/betondachstein/,95],[/schieferdeckung/,220],[/trapez|profilblech/,105],
+          [/wellplatten|faserzement.*dach/ ,95],[/doppelsteg|polycarbonat/,280],[/dachziegel|falzziegel/,110],[/biberschwanz/,180],[/betondachstein/,95],[/schieferdeckung/,220],[/trapez|profilblech/,105],
           [/firstdeckung|firstziegel/,95],[/ortgang/,85],[/dachfenster komplett/,1450],[/lichtkuppel/,1600],
           [/attika/,110],[/dachrinne titanzink/,85],[/dachrinne kupfer/,145],[/fallrohr titanzink/,75],[/fallrohr kupfer/,120],
           [/fassadengerüst.*auf-.*abbau/,9],[/fassadengerüst.*vorhaltung/,0.35],[/rollgerüst/,135],
@@ -233,6 +233,20 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
         const phase=x=>{const txt=positionText(x);if(/abbruch|demont|ausbau|entfern|entsorg|aufnehmen/.test(txt))return'remove';if(/liefer|einbau|montage|erneu|herstell|einsetzen|beschicht|streichen|ausbessern/.test(txt))return'install';return'other'};
         const best=a=>a.sort((x,y)=>((explicitCodes.includes(String(y.position_code||''))?20:0)+(requestedRule?.test(positionText(y))?5:0))-((explicitCodes.includes(String(x.position_code||''))?20:0)+(requestedRule?.test(positionText(x))?5:0)))[0];
         try{
+          if(/doppelsteg|polycarbonat/.test(norm(p.l))){
+            const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?220:level==='high'?350:280,small=qty<10;
+            bridge()?.addLine?.({
+              position_code:'INDEX 2026',
+              description:small?'Doppelstegplatten / Polycarbonat – vollständige Wiederherstellung – Kleinflächenpauschale unter 10 m²':'Doppelstegplatten / Polycarbonat – vollständige Wiederherstellung inkl. Demontage, Entsorgung, 16-mm-Platten, Profile, Dichtungen, Befestigung, Zuschnitt und Montage',
+              quantity:small?1:qty,
+              recommended_quantity:small?1:qty,
+              unit:small?'psch':'m²',
+              unit_price:small?2500:ep,
+              regional_factor:1
+            });
+            added++;
+            continue
+          }
           if(p.mode==='material_labor'){
             const material=number(list.querySelector(`[data-mat=\"${idx}\"]`)?.value),hours=number(list.querySelector(`[data-hours=\"${idx}\"]`)?.value);
             if(material<=0||hours<=0){failed.push(`${p.l} (Materialpreis/Arbeitszeit fehlt)`);continue}
