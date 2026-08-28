@@ -29,17 +29,17 @@ async function vaultKey() {
 }
 
 const profileKey = profile => `credentials_${String(profile || 'self').replace(/[^a-z0-9_-]/gi, '') || 'self'}`;
+const portalKey = 'portal_credentials';
 
-export async function saveCredentials(profile, credentials) {
+async function saveEncrypted(keyName, credentials) {
   const key = await vaultKey();
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const clear = new TextEncoder().encode(JSON.stringify(credentials));
   const encrypted = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, clear));
-  await chrome.storage.local.set({ [profileKey(profile)]: { iv: [...iv], data: [...encrypted] } });
+  await chrome.storage.local.set({ [keyName]: { iv: [...iv], data: [...encrypted] } });
 }
 
-export async function loadCredentials(profile = 'self') {
-  const keyName = profileKey(profile);
+async function loadEncrypted(keyName) {
   const stored = (await chrome.storage.local.get(keyName))[keyName];
   if (!stored?.iv || !stored?.data) return null;
   try {
@@ -48,6 +48,26 @@ export async function loadCredentials(profile = 'self') {
   } catch { return null; }
 }
 
+export async function saveCredentials(profile, credentials) {
+  await saveEncrypted(profileKey(profile), credentials);
+}
+
+export async function loadCredentials(profile = 'self') {
+  return loadEncrypted(profileKey(profile));
+}
+
 export async function clearCredentials(profile = 'self') {
   await chrome.storage.local.remove(profileKey(profile));
+}
+
+export async function savePortalCredentials(credentials) {
+  await saveEncrypted(portalKey, credentials);
+}
+
+export async function loadPortalCredentials() {
+  return loadEncrypted(portalKey);
+}
+
+export async function clearPortalCredentials() {
+  await chrome.storage.local.remove(portalKey);
 }

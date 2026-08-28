@@ -1,4 +1,4 @@
-import { loadCredentials } from './vault.js';
+import { loadCredentials, loadPortalCredentials } from './vault.js';
 import { mapClaim, safeFileName } from './import-utils.js';
 
 const PLANNING_URL = 'https://web.claimsforce.com/planning?bucket=WITH_FUTURE_APPOINTMENT#with-future-appointment';
@@ -154,6 +154,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   if (message?.type === 'GET_CREDENTIALS') {
     chrome.storage.session.get('activeProfile').then(row => loadCredentials(row.activeProfile || 'self')).then(value => sendResponse(value || {}));
+    return true;
+  }
+  if (message?.type === 'GET_PORTAL_CREDENTIALS') {
+    loadPortalCredentials().then(value => sendResponse(value || {}));
     return true;
   }
   if (message?.type === 'OPEN_OPTIONS') {
