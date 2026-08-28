@@ -44,6 +44,9 @@ jobs:
       - name: VN- und Sanierer-Kontaktfelder prüfen
         run: php sv-netzwerk/tests/insurance_case_contact_fields_test.php
 
+      - name: KVA-Dateiauswahl bei Fensterfokus prüfen
+        run: php sv-netzwerk/tests/kva_file_selection_state_test.php
+
       - name: Schnelle Fallsuche prüfen
         run: php sv-netzwerk/tests/case_search_test.php
 
