@@ -2,7 +2,7 @@
   const old=document.getElementById('vf-claims-import'),state=document.getElementById('vf-claims-state');
   if(!old)return;
   const button=old.cloneNode(true);old.replaceWith(button);
-  let context={},bridge=false,agentJob=null,userJobs=[],busy=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
+  let context={},bridge=false,bridgeVersion='',agentJob=null,userJobs=[],busy=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
@@ -65,7 +65,11 @@
   window.addEventListener('message',async e=>{
     if(e.source!==window||e.origin!==location.origin)return;
     const d=e.data||{},runtime=d.runtime||{};
-    if(d.type==='SVNET_CLAIMS_BRIDGE_READY')bridge=true;
+    if(d.type==='SVNET_CLAIMS_BRIDGE_READY'){
+      bridgeVersion=String(d.version||'0.0.0');
+      bridge=/^(?:1\.(?:[1-9]|\d{2,})\.|(?:[2-9]|\d{2,})\.)/.test(bridgeVersion);
+      if(!bridge)show(`Browser-Brücke 1.1.0 erforderlich (geladen: ${bridgeVersion}). Bitte die entpackte Erweiterung einmal neu laden.`,true);
+    }
     if(!agentJob)return;
     if(runtime.jobId&&Number(runtime.jobId)!==Number(agentJob.id))return;
     if(d.type==='SVNET_CLAIMS_IMPORT_ACCEPTED'){

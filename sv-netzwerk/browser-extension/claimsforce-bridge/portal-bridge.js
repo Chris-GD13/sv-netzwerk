@@ -1,5 +1,6 @@
 const API = '/intern/api/google-drive-sync.php';
 const CAL = '/intern/api/outlook-case-calendar.php';
+const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 const uploads = new Map();
 let keepalivePort = null;
 let keepaliveTimer = 0;
@@ -90,7 +91,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 window.addEventListener('message', event => {
   if (event.source !== window || event.origin !== location.origin) return;
-  if (event.data?.type === 'SVNET_CLAIMS_BRIDGE_PING') window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY' }, location.origin);
+  if (event.data?.type === 'SVNET_CLAIMS_BRIDGE_PING') window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION }, location.origin);
   if (event.data?.type === 'SVNET_CLAIMS_IMPORT_START') {
     activeRequest = { type: 'START_IMPORT', profile: event.data.profile || 'self', jobId: Number(event.data.jobId || 0), runId: event.data.runId || crypto.randomUUID() };
     const request = activeRequest;
@@ -126,4 +127,4 @@ function connectKeepalive() {
     keepaliveTimer = setInterval(() => { try { keepalivePort?.postMessage({ type: 'KEEPALIVE', at: Date.now() }); } catch {} }, 15000);
   } catch {}
 }
-window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY' }, location.origin);
+window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION }, location.origin);
