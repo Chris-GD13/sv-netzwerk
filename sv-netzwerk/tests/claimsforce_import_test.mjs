@@ -27,7 +27,7 @@ assert.equal(safeFileName('KVA: Angebot?.pdf'), 'KVA- Angebot-.pdf');
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, '1.1.5', 'grundlegend reparierte Brücke muss als neue Laufzeitversion erkennbar sein');
+assert.equal(manifest.version, '1.1.6', 'grundlegend reparierte Brücke muss als neue Laufzeitversion erkennbar sein');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*')));
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://claimsforce.eu.auth0.com/*')));
 assert(manifest.content_scripts.some(entry => entry.js.includes('login-helper.js') && entry.matches.includes('https://*.claimsforce.com/*') && !entry.exclude_matches), 'ClaimsForce-Anmeldehilfe muss auch auf web.claimsforce.com/login laufen');
@@ -60,6 +60,7 @@ assert(claimsMain.includes('response.clone().json()') && claimsMain.includes('CL
 const vault = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/vault.js'), 'utf8');
 assert(vault.includes('credentials_${String(profile'), 'Zugänge werden getrennt je Sachverständigen-Profil gespeichert');
 const options = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.js'), 'utf8');
+assert(options.includes("OPTIONS_CODE_VERSION = '1.1.6'") && options.includes('chrome.runtime.reload()'), 'Neue entpackte Brückendateien aktivieren ihren Service Worker einmalig selbst');
 assert(options.includes("password.value || currentCredentials?.password"), 'Ein bereits gespeichertes Kennwort darf durch erneutes Speichern nicht geleert werden');
 assert(options.includes('Kennwort ist verschlüsselt gespeichert'), 'Gespeichertes Kennwort muss ohne Klartext sichtbar bestätigt werden');
 assert(options.includes('savePortalCredentials') && options.includes('automatische Prüfportal-Anmeldung'), 'Prüfportal-Zugang kann einmalig verschlüsselt gespeichert werden');
@@ -85,7 +86,7 @@ assert(central.includes("job.profile==='jens'?'christian':job.profile"), 'Ehemal
 assert(central.includes("profile==='christian'?['christian','jens']:[profile]"), 'Manueller Christian-Import liest auch die ehemaligen Jens-Maurer-Fälle ein');
 assert(central.includes("post('active')") && central.includes("post('heartbeat'"), 'Zentrale Station verbindet sich nach einem Browserneustart wieder mit dem laufenden Import');
 assert(central.includes("action=mine") && central.includes('resumeWatch()'), 'Portal stellt die sichtbare Überwachung bereits eingereihter Importe wieder her');
-assert(central.includes('Browser-Brücke 1.1.5 erforderlich') && central.includes("versionAtLeast(bridgeVersion,'1.1.5')"), 'Veraltete geladene Erweiterungen dürfen keine neuen Warteschlangenläufe starten');
+assert(central.includes('Browser-Brücke 1.1.6 erforderlich') && central.includes("versionAtLeast(bridgeVersion,'1.1.6')"), 'Veraltete geladene Erweiterungen dürfen keine neuen Warteschlangenläufe starten');
 const optionsHtml = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.html'), 'utf8');
 assert(optionsHtml.includes('Ehem. Jens Maurer → Christian Wächter'), 'Jens-Zugang ist in der verschlüsselten Zugangsverwaltung auswählbar');
 assert(manifest.permissions.includes('nativeMessaging'), 'Lokaler Zugangsdaten-Leser ist für den unbeaufsichtigten Import freigegeben');
