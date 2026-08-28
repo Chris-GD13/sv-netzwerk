@@ -56,6 +56,9 @@ jobs:
       - name: Ausgewählte Fallunterlagen sicher löschen
         run: php sv-netzwerk/tests/case_file_delete_selection_test.php
 
+      - name: ClaimsForce-Browserimport und Bestandsschutz prüfen
+        run: node sv-netzwerk/tests/claimsforce_import_test.mjs
+
       - name: Schnelle Fallsuche prüfen
         run: php sv-netzwerk/tests/case_search_test.php
 
