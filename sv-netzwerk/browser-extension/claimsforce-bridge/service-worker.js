@@ -104,18 +104,20 @@ async function openPlanning(tabId) {
 
 async function requestJson(url, token, optional = false, timeout = 20000) {
   const controller = new AbortController(), timer = setTimeout(() => controller.abort(), timeout);
-  let response;
-  try { response = await fetch(url, { headers: authHeaders(token), signal: controller.signal }); }
+  try {
+    const response = await fetch(url, { headers: authHeaders(token), signal: controller.signal });
+    if (optional && response.status === 404) return null;
+    if (!response.ok) {
+      if (optional) return null;
+      throw new Error(`ClaimsForce-Abruf fehlgeschlagen (${response.status}).`);
+    }
+    return await response.json();
+  }
   catch (error) {
     if (optional) return null;
+    if (String(error?.message || '').startsWith('ClaimsForce-Abruf fehlgeschlagen')) throw error;
     throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Abruf hat das Zeitlimit überschritten.' : 'ClaimsForce-Abruf ist fehlgeschlagen.');
   } finally { clearTimeout(timer); }
-  if (optional && response.status === 404) return null;
-  if (!response.ok) {
-    if (optional) return null;
-    throw new Error(`ClaimsForce-Abruf fehlgeschlagen (${response.status}).`);
-  }
-  return response.json();
 }
 
 async function portal(tabId, message) {
@@ -204,6 +206,7 @@ async function runImport(run) {
     disposition.id ||= id;
     const appointments = unwrap(rawAppointments, 'appointments');
     const mapped = mapClaim(disposition, communication, Array.isArray(appointments) ? appointments : []);
+    await diagnostic(run, 'CF-CASE-UPSERT', `Auftrag ${index + 1}/${claims.length}: Portal-Fall wird angelegt oder ergänzt.`, { current: index, total: claims.length, claimIndex: index + 1 });
     const upsert = await portal(portalTabId, { type: 'PORTAL_UPSERT', mapped, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, importedAt: new Date().toISOString() } });
     const folderId = upsert.folderId;
     const files = unwrap(rawFiles, 'files');
@@ -213,12 +216,12 @@ async function runImport(run) {
       await progress(portalTabId, `${mapped.schaden_nr || item.label}: ${name}`, index, claims.length);
       const url = `${config.FILES_API_ENDPOINT}/claims/${encodeURIComponent(id)}/files/${encodeURIComponent(file.id)}?token=${encodeURIComponent(token)}`;
       const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
-      let response;
-      try { response = await fetch(url, { signal: controller.signal }); }
+      let response, fileBuffer;
+      try { response = await fetch(url, { signal: controller.signal }); if (response.ok) fileBuffer = await response.arrayBuffer(); }
       catch (error) { throw new Error(error?.name === 'AbortError' ? `Datei „${name}“ hat das Zeitlimit überschritten.` : `Datei „${name}“ konnte nicht geladen werden.`); }
       finally { clearTimeout(timer); }
       if (!response.ok) throw new Error(`Datei „${name}“ konnte nicht geladen werden (${response.status}).`);
-      await uploadBuffer(portalTabId, folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, await response.arrayBuffer());
+      await uploadBuffer(portalTabId, folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, fileBuffer);
       filesDone++;
     }
     const messages = unwrap(rawMessages, 'messages');
