@@ -44,7 +44,19 @@ $managementOnly = kvaDetectedCaseContacts([
         ['name'=>'Andreas Trauschweizer', 'role'=>'Geschäftsführer'],
     ],
 ]);
-checkContact(!isset($managementOnly['sanierer_ansprechpartner']) && !isset($managementOnly['sanierer_funktion']), 'Reine Geschäftsführerangaben dürfen nicht als operativer Ansprechpartner übernommen werden.');
+checkContact(($managementOnly['sanierer_ansprechpartner'] ?? null) === '' && ($managementOnly['sanierer_funktion'] ?? null) === '', 'Reine Geschäftsführerangaben müssen die operativen Ansprechpartnerfelder ausdrücklich leer lassen.');
+
+$staleManagement = kvaMergeCaseContacts([
+    'sanierer_ansprechpartner'=>'Achim Mey; Andreas Trauschweizer',
+    'sanierer_funktion'=>'Geschäftsführer',
+], $managementOnly, 'AN2629355.pdf', 'AN2629355', '2026-08-28T10:00:00Z');
+checkContact(($staleManagement['case']['sanierer_ansprechpartner'] ?? null) === '' && ($staleManagement['case']['sanierer_funktion'] ?? null) === '', 'Alte Geschäftsführerangaben müssen beim KVA-Neueinlesen entfernt werden.');
+
+$replaceManagement = kvaMergeCaseContacts([
+    'sanierer_ansprechpartner'=>'Achim Mey; Andreas Trauschweizer',
+    'sanierer_funktion'=>'Geschäftsführer',
+], $detected, 'AN2629355.pdf', 'AN2629355', '2026-08-28T10:00:00Z');
+checkContact($replaceManagement['case']['sanierer_ansprechpartner'] === 'Andreas Gärtner' && $replaceManagement['case']['sanierer_funktion'] === 'Bauleiter', 'Alte Geschäftsführerangaben müssen durch die erkannte Bau-/Projektleitung ersetzt werden.');
 
 $first = kvaMergeCaseContacts(['sanierer_email'=>'bestehend@example.test'], $detected, 'AN2629355.pdf', 'AN2629355', '2026-08-28T10:00:00Z');
 checkContact($first['case']['sanierer_email'] === 'bestehend@example.test', 'Vorhandene Daten wurden überschrieben.');
