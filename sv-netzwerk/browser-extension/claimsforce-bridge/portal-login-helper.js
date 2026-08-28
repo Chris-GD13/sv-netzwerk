@@ -26,5 +26,9 @@ async function fillPortalLogin() {
   submit();
 }
 
-fillPortalLogin();
-new MutationObserver(fillPortalLogin).observe(document.documentElement, { childList: true, subtree: true });
+function watchPortalLogin() {
+  fillPortalLogin();
+  if (!document.documentElement) { setTimeout(watchPortalLogin, 50); return; }
+  new MutationObserver(fillPortalLogin).observe(document.documentElement, { childList: true, subtree: true });
+}
+watchPortalLogin();
