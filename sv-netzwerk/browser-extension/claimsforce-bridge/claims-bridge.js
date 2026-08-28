@@ -1,6 +1,6 @@
 window.addEventListener('message', event => {
   if (event.source !== window || event.origin !== location.origin || event.data?.source !== 'svnet-claimsforce-main' || event.data?.type !== 'TOKEN') return;
-  chrome.runtime.sendMessage({ type: 'CLAIMS_TOKEN', token: event.data.token }).catch(() => {});
+  try { chrome.runtime.sendMessage({ type: 'CLAIMS_TOKEN', token: event.data.token }).catch(() => {}); } catch {}
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {

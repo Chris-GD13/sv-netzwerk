@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SV-Netzwerk ClaimsForce-Brücke",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Liest die eigenen ClaimsForce-Aufträge samt Dateien, Nachrichten und Terminen in das SV-Netzwerk ein.",
   "permissions": ["storage", "tabs", "nativeMessaging"],
   "host_permissions": [
@@ -37,7 +37,6 @@
     },
     {
       "matches": ["https://*.claimsforce.com/*", "https://claimsforce.eu.auth0.com/*"],
-      "exclude_matches": ["https://web.claimsforce.com/*"],
       "js": ["login-helper.js"],
       "run_at": "document_idle"
     }
