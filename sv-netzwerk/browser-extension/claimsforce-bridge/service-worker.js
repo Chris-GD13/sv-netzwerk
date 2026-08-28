@@ -11,7 +11,7 @@ async function credentialsFor(profile) {
   if (saved?.email && saved?.password) return saved;
   try {
     const local = await chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile });
-    return local?.email && local?.password ? local : null;
+    if (local?.email && local?.password) return local;
   } catch {}
   try {
     const config = await (await fetch(chrome.runtime.getURL('local-config.json'))).json();
