@@ -6,6 +6,12 @@ async function fillPortalLogin() {
   const password = document.querySelector('#login-password,input[name="password"]');
   const form = document.querySelector('#intern-login-form') || password?.closest('form');
   if (!email || !password || !form) return;
+  const submit = () => setTimeout(() => form.querySelector('button[type="submit"]')?.click() || form.requestSubmit?.(), 250);
+  if (email.value && password.value) {
+    attempted = true;
+    submit();
+    return;
+  }
   const credentials = await chrome.runtime.sendMessage({ type: 'GET_PORTAL_CREDENTIALS' }).catch(() => null);
   if (!credentials?.email || !credentials?.password) return;
   attempted = true;
@@ -17,7 +23,7 @@ async function fillPortalLogin() {
   };
   set(email, credentials.email);
   set(password, credentials.password);
-  setTimeout(() => form.requestSubmit?.() || form.querySelector('button[type="submit"]')?.click(), 250);
+  submit();
 }
 
 fillPortalLogin();

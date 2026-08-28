@@ -10,7 +10,10 @@ async function credentialsFor(profile) {
   const saved = await loadCredentials(profile);
   if (saved?.email && saved?.password) return saved;
   try {
-    const local = await chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile });
+    const local = await Promise.race([
+      chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile }),
+      sleep(800).then(() => null)
+    ]);
     if (local?.email && local?.password) return local;
   } catch {}
   try {

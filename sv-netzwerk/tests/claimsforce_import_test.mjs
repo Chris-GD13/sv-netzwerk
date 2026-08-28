@@ -53,6 +53,7 @@ assert(options.includes('Kennwort ist verschlüsselt gespeichert'), 'Gespeichert
 assert(options.includes('savePortalCredentials') && options.includes('automatische Prüfportal-Anmeldung'), 'Prüfportal-Zugang kann einmalig verschlüsselt gespeichert werden');
 const portalLogin = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/portal-login-helper.js'), 'utf8');
 assert(portalLogin.includes('GET_PORTAL_CREDENTIALS') && portalLogin.includes('requestSubmit'), 'Prüfportal wird nach einem Sitzungsablauf automatisch wieder angemeldet');
+assert(portalLogin.includes('if (email.value && password.value)') && portalLogin.includes("button[type=\"submit\"]") , 'Bereits vom Browser ausgefüllte Portal-Zugangsdaten werden automatisch abgesendet');
 
 const drive = fs.readFileSync(path.join(root, 'public/intern/api/google-drive-sync.php'), 'utf8');
 assert(drive.includes("'claims_profile'=>\$claimsProfile"), 'Status liefert das Claims-Profil des angemeldeten Sachverständigen');
@@ -70,6 +71,7 @@ assert(optionsHtml.includes('Ehem. Jens Maurer → Christian Wächter'), 'Jens-Z
 assert(manifest.permissions.includes('nativeMessaging'), 'Lokaler Zugangsdaten-Leser ist für den unbeaufsichtigten Import freigegeben');
 assert(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8').includes('sendNativeMessage'), 'Brücke kann Zugangsdaten aus der freigegebenen lokalen Datei lesen');
 assert(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8').includes("chrome.runtime.getURL('local-config.json')"), 'Brücke besitzt einen lokalen 127.0.0.1-Fallback für die Zugangsdaten');
+assert(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8').includes('sleep(800).then(() => null)'), 'Ein hängender nativer Zugangsdatenkanal darf den Loopback-Fallback nicht blockieren');
 assert(manifest.host_permissions.includes('http://127.0.0.1:47831/*'), 'Lokaler Zugangsdaten-Helfer ist auf den festgelegten Loopback-Port begrenzt');
 assert(vault.includes("AES-GCM"), 'Kennwörter werden verschlüsselt gespeichert');
 
