@@ -27,12 +27,6 @@ function kvaPreferredSiteRole(string $role): int
     return 0;
 }
 
-function kvaExecutiveRole(string $role): bool
-{
-    $normalized = mb_strtolower(trim($role), 'UTF-8');
-    return $normalized !== '' && preg_match('/geschäftsführer|geschäftsführung|inhaber|vorstand|geschäftsleitung/u', $normalized) === 1;
-}
-
 function kvaDetectedCaseContacts(array $result): array
 {
     $preferred = [];
@@ -61,7 +55,7 @@ function kvaDetectedCaseContacts(array $result): array
             $result['contact_person'] = kvaContactString($result['contact_person'] ?? '');
             $result['contact_role'] = $fallbackRole;
         } else {
-            // Organvertreter sind keine operativen Ansprechpartner für die Schadenbearbeitung.
+            // Kein operativer Projekt-/Bauleiter sicher erkannt.
             $result['contact_person'] = '';
             $result['contact_role'] = '';
         }
@@ -72,6 +66,12 @@ function kvaDetectedCaseContacts(array $result): array
         $value = kvaContactString($result[$source] ?? '');
         if ($value !== '') $contacts[$target] = $value;
     }
+
+    // Diese beiden Felder sind beim KVA-Neueinlesen immer autoritativ:
+    // entweder erkannte Projekt-/Bauleitung oder ausdrücklich leer.
+    $contacts['sanierer_ansprechpartner'] = kvaContactString($result['contact_person'] ?? '');
+    $contacts['sanierer_funktion'] = kvaContactString($result['contact_role'] ?? '');
+
     return $contacts;
 }
 
@@ -85,30 +85,21 @@ function kvaMergeCaseContacts(array $case, array $detected, string $source, stri
     $applied = [];
     $conflicts = [];
 
-    // Frühere KVA-Läufe konnten Geschäftsführer/Inhaber fälschlich als Ansprechpartner speichern.
-    // Beim erneuten KVA-Einlesen wird genau diese Altbelegung bereinigt bzw. durch eine erkannte
-    // Projekt-/Bauleitung ersetzt. Andere vorhandene, ggf. manuell gepflegte Rollen bleiben geschützt.
-    $existingRole = kvaContactString($case['sanierer_funktion'] ?? '');
-    $incomingRole = kvaContactString($detected['sanierer_funktion'] ?? '');
-    $handledOperationalContact = false;
-    if (kvaExecutiveRole($existingRole)) {
-        $incomingPerson = kvaContactString($detected['sanierer_ansprechpartner'] ?? '');
-        if (kvaPreferredSiteRole($incomingRole) > 0 && $incomingPerson !== '') {
-            $case['sanierer_ansprechpartner'] = $incomingPerson;
-            $case['sanierer_funktion'] = $incomingRole;
-            $applied['sanierer_ansprechpartner'] = $incomingPerson;
-            $applied['sanierer_funktion'] = $incomingRole;
-        } else {
-            $case['sanierer_ansprechpartner'] = '';
-            $case['sanierer_funktion'] = '';
-            $applied['sanierer_ansprechpartner'] = '';
-            $applied['sanierer_funktion'] = '';
+    // Ansprechpartner/Funktion werden beim KVA-Einlesen immer aus der operativen
+    // Projekt-/Bauleitung neu gesetzt. Geschäftsführer/Inhaber dürfen hier nicht erhalten bleiben.
+    foreach (['sanierer_ansprechpartner','sanierer_funktion'] as $field) {
+        if (array_key_exists($field, $detected)) {
+            $incoming = kvaContactString($detected[$field]);
+            $existing = kvaContactString($case[$field] ?? '');
+            if ($existing !== $incoming) {
+                $case[$field] = $incoming;
+                $applied[$field] = $incoming;
+            }
         }
-        $handledOperationalContact = true;
     }
 
     foreach (array_values(kvaContactFieldMap()) as $field) {
-        if ($handledOperationalContact && in_array($field, ['sanierer_ansprechpartner','sanierer_funktion'], true)) continue;
+        if (in_array($field, ['sanierer_ansprechpartner','sanierer_funktion'], true)) continue;
         $incoming = kvaContactString($detected[$field] ?? '');
         if ($incoming === '') continue;
         $existing = kvaContactString($case[$field] ?? '');
@@ -119,6 +110,7 @@ function kvaMergeCaseContacts(array $case, array $detected, string $source, stri
             $conflicts[$field] = ['existing'=>$existing, 'detected'=>$incoming];
         }
     }
+
     $hints = is_array($case['sanierer_kva_hinweise'] ?? null) ? $case['sanierer_kva_hinweise'] : [];
     if ($conflicts !== []) {
         $fingerprint = hash('sha256', json_encode([$source, $quoteNumber, $conflicts], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
