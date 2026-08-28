@@ -30,6 +30,13 @@ $base64 = base64_encode($bytes);
 $system = <<<'PROMPT'
 Du analysierst Unterlagen zu deutschen Versicherungs-Schadenfällen und extrahierst ausschließlich eindeutig erkennbare Falldaten. Nichts erfinden. Unklare oder nicht vorhandene Werte als leeren String zurückgeben. Telefonnummern und E-Mail-Adressen exakt übernehmen. Schaden-Nr. und Versicherungsschein-Nr. nicht verwechseln.
 
+Kontaktangaben müssen strikt der ausdrücklich bezeichneten Partei zugeordnet werden:
+- telefon, mobil und email sind ausschließlich Kontaktdaten des Versicherungsnehmers (VN) oder eines eindeutig als VN-Ansprechpartner bezeichneten Kontakts.
+- Niemals Kontaktdaten des Versicherers, der Sparkassenversicherung, eines Regulierers, Sachverständigen, Vermittlers oder Sanierers in telefon, mobil oder email eintragen.
+- Ist die Zuordnung zum VN nicht eindeutig belegt, telefon, mobil und email leer lassen.
+- Sanierer-Kontaktdaten ausschließlich in die sanierer_*-Felder eintragen. Das gilt insbesondere für POLYGON, Imle, Rainbow und vergleichbare Sanierungsunternehmen.
+- Einen Objektleiter, Bauleiter, Projektleiter oder sonstigen Verantwortlichen des Sanierers in sanierer_ansprechpartner eintragen und dessen ausdrücklich genannte Funktion in sanierer_funktion.
+
 Bestimme zusätzlich den Versicherer und die Fallart. Zulässige Werte für fallart sind ausschließlich "SV", "SV-GF" oder "Andere Versicherer".
 - "SV-GF" nur bei Sparkassenversicherung und erkennbarem GF-, Großschaden- oder Groß-TF-Bezug beziehungsweise entsprechenden GF-Berichtsformularen.
 - "SV" bei Sparkassenversicherung ohne belegten GF-/Großschadenbezug.
@@ -37,11 +44,14 @@ Bestimme zusätzlich den Versicherer und die Fallart. Zulässige Werte für fall
 - Ist die Einordnung nicht belastbar, fallart leer lassen und die Gründe in fallart_hinweis nennen.
 
 Antworte ausschließlich als JSON mit genau diesen Feldern:
-{"schaden_nr":"","versicherungsschein_nr":"","vn_objekt":"","strasse":"","plz":"","ort":"","schaden_strasse":"","schaden_plz":"","schaden_ort":"","telefon":"","mobil":"","email":"","vorsteuer":"","schadenart":"","schadentag":"","meldedatum":"","reserve":"","kontakt":"","vermittler_firma":"","vermittler_ansprechpartner":"","vermittler_telefon":"","vermittler_mobil":"","vermittler_fax":"","vermittler_email":"","versicherer":"","fallart":"","fallart_hinweis":""}
+{"schaden_nr":"","versicherungsschein_nr":"","vn_objekt":"","strasse":"","plz":"","ort":"","schaden_strasse":"","schaden_plz":"","schaden_ort":"","telefon":"","mobil":"","email":"","vorsteuer":"","schadenart":"","schadentag":"","meldedatum":"","reserve":"","kontakt":"","sanierer_firma":"","sanierer_ansprechpartner":"","sanierer_funktion":"","sanierer_telefon":"","sanierer_mobil":"","sanierer_email":"","vermittler_firma":"","vermittler_ansprechpartner":"","vermittler_telefon":"","vermittler_mobil":"","vermittler_fax":"","vermittler_email":"","versicherer":"","fallart":"","fallart_hinweis":""}
 
 Hinweise:
 - vn_objekt = Versicherungsnehmer / Firmenname / versichertes Objekt, soweit klar erkennbar.\n- strasse, plz und ort sind ausschließlich die Anschrift des Versicherungsnehmers.\n- schaden_strasse, schaden_plz und schaden_ort sind ausschließlich die Besichtigungs- bzw. Schadenortanschrift. Diese kann von der VN-Anschrift abweichen. Nicht gleichsetzen oder aus der VN-Anschrift ableiten, wenn der Schadenort nicht ausdrücklich belegt ist.
 - kontakt = zuständiger Ansprechpartner beim VN/Objekt, sofern separat genannt.
+- sanierer_firma = beauftragtes oder tätiges Sanierungsunternehmen, nur wenn eindeutig genannt.
+- sanierer_ansprechpartner und sanierer_funktion = verantwortliche Kontaktperson des Sanierers und deren Rolle, insbesondere Objektleitung oder Bauleitung, soweit ausdrücklich belegt.
+- sanierer_telefon, sanierer_mobil und sanierer_email = ausschließlich dem Sanierer oder dessen verantwortlicher Kontaktperson eindeutig zugeordnete Kontaktdaten.
 - vorsteuer = z. B. "ja", "nein" oder leer.
 - schadentag und meldedatum möglichst im Format TT.MM.JJJJ.
 - reserve nur mit Betrag/Währung, wenn ausdrücklich genannt.
@@ -109,7 +119,7 @@ if (!is_array($data)) {
 }
 if (!is_array($data)) apiError(503, 'KI-Antwort konnte nicht als Falldaten gelesen werden.');
 
-$allowed=['schaden_nr','versicherungsschein_nr','vn_objekt','strasse','plz','ort','schaden_strasse','schaden_plz','schaden_ort','telefon','mobil','email','vorsteuer','schadenart','schadentag','meldedatum','reserve','kontakt','vermittler_firma','vermittler_ansprechpartner','vermittler_telefon','vermittler_mobil','vermittler_fax','vermittler_email','versicherer','fallart','fallart_hinweis'];
+$allowed=['schaden_nr','versicherungsschein_nr','vn_objekt','strasse','plz','ort','schaden_strasse','schaden_plz','schaden_ort','telefon','mobil','email','vorsteuer','schadenart','schadentag','meldedatum','reserve','kontakt','sanierer_firma','sanierer_ansprechpartner','sanierer_funktion','sanierer_telefon','sanierer_mobil','sanierer_email','vermittler_firma','vermittler_ansprechpartner','vermittler_telefon','vermittler_mobil','vermittler_fax','vermittler_email','versicherer','fallart','fallart_hinweis'];
 $out=[];
 foreach($allowed as $key) $out[$key]=trim((string)($data[$key]??''));
 apiJson(['ok'=>true,'file_name'=>$name,'fields'=>$out]);

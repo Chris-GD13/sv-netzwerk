@@ -41,6 +41,9 @@ jobs:
       - name: Upload-Sperre für Signatur- und Profilbilder prüfen
         run: php sv-netzwerk/tests/upload_ignore_signatures_test.php
 
+      - name: VN- und Sanierer-Kontaktfelder prüfen
+        run: php sv-netzwerk/tests/insurance_case_contact_fields_test.php
+
       - name: Schnelle Fallsuche prüfen
         run: php sv-netzwerk/tests/case_search_test.php
 
