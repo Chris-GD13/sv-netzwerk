@@ -89,14 +89,18 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   return true;
 });
 
-window.addEventListener('message', event => {
-  if (event.source !== window || event.origin !== location.origin) return;
-  if (event.data?.type === 'SVNET_CLAIMS_BRIDGE_PING') window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION }, location.origin);
-  if (event.data?.type === 'SVNET_CLAIMS_RUNTIME_PING') chrome.runtime.sendMessage({ type: 'GET_RUNTIME_STATUS' }).then(status => {
+function reportRuntime() {
+  return chrome.runtime.sendMessage({ type: 'GET_RUNTIME_STATUS' }).then(status => {
     const active = status?.active || {}, diagnostic = status?.diagnostic || {};
     document.documentElement.setAttribute('data-svnet-claims-runtime', [active.status || 'idle', diagnostic.phase || active.phase || 'CF-IDLE', Number(active.jobId || 0)].join('|'));
     window.postMessage({ type: 'SVNET_CLAIMS_RUNTIME_STATUS', status }, location.origin);
   }).catch(() => document.documentElement.setAttribute('data-svnet-claims-runtime', 'unavailable|CF-RUNTIME|0'));
+}
+
+window.addEventListener('message', event => {
+  if (event.source !== window || event.origin !== location.origin) return;
+  if (event.data?.type === 'SVNET_CLAIMS_BRIDGE_PING') window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION }, location.origin);
+  if (event.data?.type === 'SVNET_CLAIMS_RUNTIME_PING') reportRuntime();
   if (event.data?.type === 'SVNET_CLAIMS_IMPORT_START') {
     activeRequest = { type: 'START_IMPORT', profile: event.data.profile || 'self', jobId: Number(event.data.jobId || 0), runId: event.data.runId || crypto.randomUUID() };
     const request = activeRequest;
@@ -133,3 +137,5 @@ function connectKeepalive() {
   } catch {}
 }
 window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION }, location.origin);
+reportRuntime();
+setInterval(reportRuntime, 5000);
