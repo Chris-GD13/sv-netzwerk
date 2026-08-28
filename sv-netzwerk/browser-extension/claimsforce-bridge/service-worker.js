@@ -1,20 +1,27 @@
 import { loadCredentials, loadPortalCredentials } from './vault.js';
 import { mapClaim, safeFileName } from './import-utils.js';
 
-const PLANNING_URL = 'https://web.claimsforce.com/planning?bucket=WITH_FUTURE_APPOINTMENT#with-future-appointment';
 const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const authHeaders = token => ({ Authorization: `Bearer ${token}`, Accept: 'application/json' });
+let runningImport = null;
+const safeRoute = url => { try { return new URL(url).pathname; } catch { return 'unbekannt'; } };
+
+async function diagnostic(run, phase, text, details = {}) {
+  const entry = { runId: run.runId, jobId: run.jobId || 0, profile: run.profile, phase, text, details, at: new Date().toISOString() };
+  await chrome.storage.local.set({ claimsImportDiagnostic: entry, claimsActiveRun: { ...run, status: 'running', phase, updatedAt: entry.at } });
+  await progress(run.portalTabId, `[${phase}] ${text}`, details.current || 0, details.total || 0, { runId: run.runId, jobId: run.jobId || 0, phase, details }).catch(() => {});
+}
 
 async function credentialsFor(profile) {
   const saved = await loadCredentials(profile);
-  if (saved?.email && saved?.password) return saved;
+  if (saved?.email && saved?.password) return { value: saved, source: 'vault' };
   try {
     const local = await Promise.race([
       chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile }),
       sleep(800).then(() => null)
     ]);
-    if (local?.email && local?.password) return local;
+    if (local?.email && local?.password) return { value: local, source: 'native-host' };
   } catch {}
   try {
     const config = await (await fetch(chrome.runtime.getURL('local-config.json'))).json();
@@ -22,18 +29,19 @@ async function credentialsFor(profile) {
     endpoint.searchParams.set('profile', profile);
     const response = await fetch(endpoint, { headers: { 'X-SVNET-Token': config.token } });
     const local = response.ok ? await response.json() : null;
-    return local?.email && local?.password ? local : null;
+    return local?.email && local?.password ? { value: local, source: 'loopback' } : null;
   } catch { return null; }
 }
 
-async function tokenValue() {
-  return (await chrome.storage.session.get('claimsToken')).claimsToken || '';
+async function tokenValue(profile) {
+  const row = await chrome.storage.session.get(['claimsToken', 'claimsTokenProfile']);
+  return row.claimsToken && (profile === 'self' || row.claimsTokenProfile === profile) ? row.claimsToken : '';
 }
 
-async function waitForToken(timeout = 30000) {
+async function waitForToken(profile, timeout = 45000) {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
-    const token = await tokenValue();
+    const token = await tokenValue(profile);
     if (token) return token;
     await sleep(500);
   }
@@ -50,13 +58,15 @@ async function waitTab(tabId, timeout = 30000) {
   throw new Error('ClaimsForce hat nicht rechtzeitig geladen.');
 }
 
-async function claimsTab() {
+async function claimsTab(profile, run) {
   let [tab] = await chrome.tabs.query({ url: 'https://web.claimsforce.com/*' });
   if (!tab) tab = await chrome.tabs.create({ url: 'https://web.claimsforce.com/login', active: false });
   await waitTab(tab.id);
-  let token = await tokenValue();
+  if (safeRoute(tab.url) === '/login') await chrome.storage.session.remove(['claimsToken', 'claimsTokenProfile']);
+  await diagnostic(run, 'CF-AUTH-02', 'ClaimsForce-Seite ist geladen.', { route: safeRoute(tab.url) });
+  let token = await tokenValue(profile);
   if (!token) {
-    token = await waitForToken();
+    token = await waitForToken(profile);
   }
   return { tab, token };
 }
@@ -74,9 +84,10 @@ async function openPlanning(tabId) {
     }
   }
   if (!String(tab.url || '').includes('/planning')) throw new Error('ClaimsForce-Planung konnte nicht geöffnet werden.');
-  await sleep(1200);
-  await chrome.tabs.sendMessage(tabId, { type: 'OPEN_FUTURE_APPOINTMENTS' }).catch(() => {});
-  await sleep(1200);
+  await sleep(1500);
+  const opened = await chrome.tabs.sendMessage(tabId, { type: 'OPEN_FUTURE_APPOINTMENTS' }).catch(() => null);
+  await sleep(3000);
+  return opened;
 }
 
 async function requestJson(url, token, optional = false) {
@@ -95,8 +106,8 @@ async function portal(tabId, message) {
   return response;
 }
 
-async function progress(tabId, text, current = 0, total = 0) {
-  await chrome.tabs.sendMessage(tabId, { type: 'IMPORT_PROGRESS', text, current, total }).catch(() => {});
+async function progress(tabId, text, current = 0, total = 0, runtime = {}) {
+  await chrome.tabs.sendMessage(tabId, { type: 'IMPORT_PROGRESS', text, current, total, runtime }).catch(() => {});
 }
 
 function unwrap(data, key) {
@@ -116,31 +127,39 @@ async function uploadBuffer(portalTabId, folderId, name, mime, modified, buffer)
   return portal(portalTabId, { type: 'PORTAL_UPLOAD_FINISH', uploadId });
 }
 
-async function runImport(portalTabId, profile = 'self') {
+async function runImport(run) {
+  const { portalTabId, profile } = run;
   const previous = await chrome.storage.session.get(['activeProfile', 'claimsLoggedProfile']);
   await chrome.storage.session.set({ activeProfile: profile });
   if (profile !== 'self') {
-    const currentProfile = previous.claimsLoggedProfile || previous.activeProfile || '';
-    if (currentProfile && currentProfile !== profile) {
+    const currentProfile = previous.claimsLoggedProfile || '';
+    if (currentProfile !== profile) {
       const [open] = await chrome.tabs.query({ url: 'https://web.claimsforce.com/*' });
-      await chrome.storage.session.remove(['claimsToken', 'claimsLoggedProfile']);
+      await diagnostic(run, 'CF-AUTH-01', 'ClaimsForce-Profil wird eindeutig neu angemeldet.', { profileSwitch: currentProfile ? 'wechsel' : 'unbekannte Sitzung' });
+      await chrome.storage.session.remove(['claimsToken', 'claimsTokenProfile', 'claimsLoggedProfile']);
       if (open?.id) {
         await chrome.tabs.update(open.id, { url: 'https://web.claimsforce.com/logout' });
         await waitTab(open.id);
         await sleep(900);
       }
-    } else {
-      await chrome.storage.session.set({ claimsLoggedProfile: profile });
     }
   }
-  await progress(portalTabId, 'ClaimsForce wird geöffnet …');
-  const { tab, token } = await claimsTab();
-  await openPlanning(tab.id);
+  const credential = await credentialsFor(profile);
+  await diagnostic(run, 'CF-CRED-01', credential ? 'Zugangsdatenquelle ist verfügbar.' : 'Für das Profil ist keine Zugangsdatenquelle verfügbar.', { source: credential?.source || 'keine' });
+  if (!credential) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar.');
+  const { tab, token } = await claimsTab(profile, run);
+  await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
+  const planning = await openPlanning(tab.id);
+  await diagnostic(run, 'CF-PLAN-04', 'Planungsansicht „Mit Termin“ wurde angefordert.', { strategy: planning?.strategy || 'bestehende Ansicht' });
   const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIMS' });
   const claims = scraped?.claims || [];
-  if (!claims.length) throw new Error('Unter „Mit Termin“ wurden keine Aufträge gefunden. Bitte ClaimsForce öffnen und die Ansicht vollständig laden.');
+  await diagnostic(run, 'CF-LIST-05', `${claims.length} Auftrag/Aufträge wurden in der Planungsansicht erkannt.`, { count: claims.length, observedApi: scraped?.observedClaims || 0, route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url) });
+  if (!claims.length) {
+    const state = await chrome.tabs.sendMessage(tab.id, { type: 'SESSION_STATE' }).catch(() => ({}));
+    throw new Error(`[CF-LIST-05] Keine Aufträge erkannt (Route ${state.route || 'unbekannt'}, API ${state.observedClaims || 0}).`);
+  }
   const config = await (await fetch('https://web.claimsforce.com/config')).json();
-  let filesDone = 0, messagesDone = 0;
+  let filesDone = 0, messagesDone = 0, appointmentsDone = 0;
   for (let index = 0; index < claims.length; index++) {
     const item = claims[index], id = item.id;
     await progress(portalTabId, `Auftrag ${index + 1}/${claims.length} wird eingelesen …`, index, claims.length);
@@ -180,41 +199,71 @@ async function runImport(portalTabId, profile = 'self') {
       await uploadBuffer(portalTabId, folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(record?.updatedAt || record?.createdAt || '') || 0, bytes.buffer);
       messagesDone++;
     }
-    const future = mapped.claimsforce_termin;
-    if (future?.startDate) await portal(portalTabId, { type: 'PORTAL_APPOINTMENT', folderId, appointment: future });
+    for (const appointment of Array.isArray(appointments) ? appointments : []) {
+      if (!appointment?.startDate) continue;
+      const appointmentResult = await portal(portalTabId, { type: 'PORTAL_APPOINTMENT', folderId, appointment });
+      if (!appointmentResult?.result?.skipped) appointmentsDone++;
+    }
+    await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length} wurde vollständig im Portal verarbeitet.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
   }
-  await progress(portalTabId, `${claims.length} Aufträge, ${filesDone} Dateien und ${messagesDone} Nachrichten eingelesen.`, claims.length, claims.length);
+  await progress(portalTabId, `${claims.length} Aufträge, ${filesDone} Dateien, ${messagesDone} Nachrichten und ${appointmentsDone} Termine eingelesen.`, claims.length, claims.length);
   if (profile !== 'self') await chrome.storage.session.set({ claimsLoggedProfile: profile });
-  return { claims: claims.length, files: filesDone, messages: messagesDone };
+  return { claims: claims.length, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
 }
+
+async function startImport(sender, message) {
+  const portalTabId = sender.tab?.id;
+  if (!portalTabId) return { ok: false, error: '[CF-RUN-00] Portal-Registerkarte fehlt.' };
+  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: message.profile || 'self', portalTabId, startedAt: new Date().toISOString() };
+  if (runningImport) {
+    if (runningImport.jobId === requested.jobId && runningImport.profile === requested.profile) return { ok: true, accepted: true, resumed: false, runId: runningImport.runId };
+    return { ok: false, error: '[CF-RUN-00] Ein anderer ClaimsForce-Import läuft bereits.' };
+  }
+  const saved = (await chrome.storage.local.get('claimsActiveRun')).claimsActiveRun;
+  const resumesSaved = saved?.status === 'running' && saved.jobId === requested.jobId && saved.profile === requested.profile;
+  const run = resumesSaved ? { ...saved, portalTabId, runId: saved.runId || requested.runId } : requested;
+  runningImport = run;
+  runImport(run).then(async result => {
+    await chrome.storage.local.set({ claimsActiveRun: { ...run, status: 'done', result, finishedAt: new Date().toISOString() } });
+    await chrome.tabs.sendMessage(portalTabId, { type: 'IMPORT_DONE', result, runtime: { runId: run.runId, jobId: run.jobId, phase: 'CF-DONE-07' } }).catch(() => {});
+  }).catch(async error => {
+    const message = String(error?.message || 'ClaimsForce-Import fehlgeschlagen.').slice(0, 500);
+    await chrome.storage.local.set({ claimsActiveRun: { ...run, status: 'failed', error: message, finishedAt: new Date().toISOString() } });
+    await chrome.tabs.sendMessage(portalTabId, { type: 'IMPORT_ERROR', error: message, runtime: { runId: run.runId, jobId: run.jobId, phase: 'CF-FAIL-99' } }).catch(() => {});
+  }).finally(() => { runningImport = null; });
+  return { ok: true, accepted: true, resumed: resumesSaved, runId: run.runId };
+}
+
+chrome.runtime.onConnect.addListener(port => {
+  if (port.name !== 'claims-import-keepalive') return;
+  port.onMessage.addListener(() => {});
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'CLAIMS_TOKEN') {
-    chrome.storage.session.set({ claimsToken: message.token });
-    sendResponse({ ok: true });
-    return;
+    chrome.storage.session.get('activeProfile').then(row => chrome.storage.session.set({ claimsToken: message.token, claimsTokenProfile: row.activeProfile || 'self', claimsTokenAt: Date.now() })).then(() => sendResponse({ ok: true }));
+    return true;
   }
   if (message?.type === 'GET_CREDENTIALS') {
     chrome.storage.session.get('activeProfile').then(async row => {
       const profile = row.activeProfile || 'self';
-      const value = await credentialsFor(profile);
-      if (value) await chrome.storage.session.set({ claimsLoggedProfile: profile });
-      return value;
+      const found = await credentialsFor(profile);
+      return found?.value || null;
     }).then(value => sendResponse(value || {}));
     return true;
   }
   if (message?.type === 'GET_PORTAL_CREDENTIALS') {
-    loadPortalCredentials().then(async value => value?.email && value?.password ? value : credentialsFor('christian')).then(value => sendResponse(value || {}));
+    loadPortalCredentials().then(async value => {
+      if (value?.email && value?.password) return value;
+      return (await credentialsFor('christian'))?.value || null;
+    }).then(value => sendResponse(value || {}));
     return true;
   }
   if (message?.type === 'OPEN_OPTIONS') {
     chrome.storage.session.set({ activeProfile: message.profile || 'self' }).then(() => chrome.runtime.openOptionsPage()); sendResponse({ ok: true }); return;
   }
   if (message?.type === 'START_IMPORT' && sender.tab?.id) {
-    runImport(sender.tab.id, message.profile || 'self').then(result => sendResponse({ ok: true, result })).catch(async error => {
-      await chrome.tabs.sendMessage(sender.tab.id, { type: 'IMPORT_ERROR', error: error.message }).catch(() => {});
-      sendResponse({ ok: false, error: error.message });
-    });
+    startImport(sender, message).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
     return true;
   }
 });

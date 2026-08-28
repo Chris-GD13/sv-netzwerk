@@ -2,10 +2,12 @@
   const old=document.getElementById('vf-claims-import'),state=document.getElementById('vf-claims-state');
   if(!old)return;
   const button=old.cloneNode(true);old.replaceWith(button);
-  let context={},bridge=false,agentJob=null,userJobs=[],busy=false;
+  let context={},bridge=false,agentJob=null,userJobs=[],busy=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
+  const heartbeat=()=>agentJob?post('heartbeat',{id:agentJob.id,message:lastRuntime.message,phase:lastRuntime.phase,current:lastRuntime.current,total:lastRuntime.total,diagnostic:lastRuntime.diagnostic}).catch(()=>{}):Promise.resolve();
+
   async function watch(){
     if(!userJobs.length)return;
     try{
@@ -16,6 +18,7 @@
     }catch(e){show(e.message,true)}
     setTimeout(watch,3000);
   }
+
   button.addEventListener('click',async()=>{
     if(userJobs.length)return;
     button.disabled=true;
@@ -28,38 +31,66 @@
       watch();
     }catch(e){button.disabled=false;userJobs=[];show(e.message,true)}
   });
-  async function poll(){
-    if(!context.claims_agent||!bridge||busy){setTimeout(poll,5000);return}
-    try{
-      const d=await post('claim');
-      if(d.job){
-        busy=true;agentJob=d.job;
-        const target=d.job.profile==='jens'?'christian':d.job.profile;
-        await json('/intern/api/google-drive-sync.php?action=select_expert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({expert:target})});
-        window.postMessage({type:'SVNET_CLAIMS_IMPORT_START',profile:d.job.profile},location.origin);
-      }
-    }catch(e){show('Zentrale Importstation: '+e.message,true)}
-    setTimeout(poll,5000);
+
+  async function launch(job,resumed=false){
+    busy=true;agentJob=job;
+    lastRuntime={phase:resumed?'CF-RECOVER':'CF-CLAIMED',message:resumed?'Unterbrochener Import wird wiederaufgenommen.':'Import wird im Browser gestartet.',current:Number(job.progress_current||0),total:Number(job.progress_total||0),diagnostic:{attempt:Number(job.attempt_count||1),resumed}};
+    await heartbeat();
+    const target=job.profile==='jens'?'christian':job.profile;
+    await json('/intern/api/google-drive-sync.php?action=select_expert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({expert:target})});
+    window.postMessage({type:'SVNET_CLAIMS_IMPORT_START',profile:job.profile,jobId:Number(job.id),runId:`claimsforce-${job.id}-${job.attempt_count||1}`},location.origin);
   }
+
+  async function poll(){
+    if(!context.claims_agent||!bridge||busy){setTimeout(poll,3000);return}
+    try{
+      const active=await post('active');
+      if(active.job)await launch(active.job,true);
+      else{
+        const claimed=await post('claim');
+        if(claimed.job)await launch(claimed.job,false);
+      }
+    }catch(e){show('Zentrale Importstation: '+e.message,true);agentJob=null;busy=false}
+    setTimeout(poll,3000);
+  }
+
+  async function completeAgent(ok,result,error){
+    if(!agentJob)return;
+    const id=agentJob.id;
+    try{await post('complete',{id,ok,result:result||null,message:ok?`${result?.claims||0} Aufträge vollständig eingelesen.`:(error||'ClaimsForce-Import fehlgeschlagen.')})}
+    catch(e){show(`Import ${id}: Abschlussstatus konnte nicht gespeichert werden (${e.message}).`,true)}
+    agentJob=null;busy=false;lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
+  }
+
   window.addEventListener('message',async e=>{
     if(e.source!==window||e.origin!==location.origin)return;
-    const d=e.data||{};
+    const d=e.data||{},runtime=d.runtime||{};
     if(d.type==='SVNET_CLAIMS_BRIDGE_READY')bridge=true;
-    if(agentJob&&['SVNET_CLAIMS_IMPORT_DONE','SVNET_CLAIMS_IMPORT_ERROR'].includes(d.type)){
-      const ok=d.type==='SVNET_CLAIMS_IMPORT_DONE';
-      await post('complete',{id:agentJob.id,ok,result:d.result||null,message:ok?`${d.result?.claims||0} Aufträge vollständig eingelesen.`:(d.error||'ClaimsForce-Import fehlgeschlagen.')}).catch(()=>{});
-      agentJob=null;busy=false;
+    if(!agentJob)return;
+    if(runtime.jobId&&Number(runtime.jobId)!==Number(agentJob.id))return;
+    if(d.type==='SVNET_CLAIMS_IMPORT_ACCEPTED'){
+      lastRuntime={phase:'CF-ACCEPTED',message:runtime.resumed?'Browserlauf wurde wiederaufgenommen.':'Browserlauf wurde angenommen.',current:0,total:0,diagnostic:{runId:runtime.runId||'',resumed:!!runtime.resumed}};
+      await heartbeat();
     }
+    if(d.type==='SVNET_CLAIMS_IMPORT_PROGRESS'){
+      lastRuntime={phase:runtime.phase||'CF-RUN',message:d.text||'Import läuft …',current:Number(d.current||0),total:Number(d.total||0),diagnostic:runtime.details||{}};
+      await heartbeat();
+    }
+    if(d.type==='SVNET_CLAIMS_IMPORT_DONE')await completeAgent(true,d.result,null);
+    if(d.type==='SVNET_CLAIMS_IMPORT_ERROR')await completeAgent(false,null,d.error);
   });
+
   async function automaticImport(){
     if(!context.claims_agent)return;
-    const now=new Date(),day=now.toISOString().slice(0,10),key='svnet-claimsforce-auto-day';
-    if(now.getHours()!==3||localStorage.getItem(key)===day)return;
+    const now=new Date(),day=now.toLocaleDateString('sv-SE',{timeZone:'Europe/Berlin'}),key='svnet-claimsforce-auto-day';
+    if(Number(new Intl.DateTimeFormat('de-DE',{timeZone:'Europe/Berlin',hour:'2-digit',hour12:false}).format(now))!==3||localStorage.getItem(key)===day)return;
     localStorage.setItem(key,day);
     try{
       for(const profile of['christian','jens','marc','holger'])await post('enqueue',{profile});
       show('Automatischer 03:00-Uhr-Import für alle ClaimsForce-Zugänge wurde eingeplant.');
     }catch(e){localStorage.removeItem(key);show('Automatischer ClaimsForce-Import: '+e.message,true)}
   }
+
+  setInterval(heartbeat,20000);
   json('/intern/api/google-drive-sync.php?action=status').then(d=>{context=d;window.postMessage({type:'SVNET_CLAIMS_BRIDGE_PING'},location.origin);automaticImport();setInterval(automaticImport,30000);poll()}).catch(e=>show(e.message,true));
 })();

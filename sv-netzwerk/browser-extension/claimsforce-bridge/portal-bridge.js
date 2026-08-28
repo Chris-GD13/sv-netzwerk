@@ -1,6 +1,9 @@
 const API = '/intern/api/google-drive-sync.php';
 const CAL = '/intern/api/outlook-case-calendar.php';
 const uploads = new Map();
+let keepalivePort = null;
+let keepaliveTimer = 0;
+let activeRequest = null;
 const blank = value => value == null || (typeof value === 'string' && value.trim() === '');
 const mergeBlank = (existing, incoming) => { const out = { ...(existing || {}) }; Object.entries(incoming || {}).forEach(([key, value]) => { if (blank(out[key]) && !blank(value)) out[key] = value; }); return out; };
 
@@ -53,7 +56,9 @@ async function finishUpload(message) {
 
 async function appointment(message) {
   const loaded = await api(`${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`), meta = loaded.case?.meta || {};
-  if (meta.calendar_event || meta.claimsforce_calendar_appointment_id === message.appointment.id) return { skipped: true };
+  const appointmentId = String(message.appointment.id || message.appointment.startDate || '');
+  const imported = Array.isArray(meta.claimsforce_calendar_appointment_ids) ? meta.claimsforce_calendar_appointment_ids.map(String) : (meta.claimsforce_calendar_appointment_id ? [String(meta.claimsforce_calendar_appointment_id)] : []);
+  if (appointmentId && imported.includes(appointmentId)) return { skipped: true };
   const start = new Date(message.appointment.startDate), end = message.appointment.endDate ? new Date(message.appointment.endDate) : new Date(start.getTime() + 60 * 60000);
   const form = new FormData();
   form.append('folder_id', message.folderId);
@@ -63,8 +68,10 @@ async function appointment(message) {
   form.append('notes', message.appointment.comment || 'Aus ClaimsForce übernommen');
   form.append('invite_vn', '0');
   const result = await api(`${CAL}?action=create`, { method: 'POST', body: form });
-  meta.calendar_event = result.event;
-  meta.claimsforce_calendar_appointment_id = message.appointment.id || message.appointment.startDate;
+  if (appointmentId) imported.push(appointmentId);
+  meta.claimsforce_calendar_appointment_ids = [...new Set(imported)];
+  meta.claimsforce_calendar_appointment_id = appointmentId;
+  meta.claimsforce_calendar_events = [...(Array.isArray(meta.claimsforce_calendar_events) ? meta.claimsforce_calendar_events : []), result.event].filter(Boolean);
   await api(`${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, case: meta }) });
   return result;
 }
@@ -84,11 +91,39 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 window.addEventListener('message', event => {
   if (event.source !== window || event.origin !== location.origin) return;
   if (event.data?.type === 'SVNET_CLAIMS_BRIDGE_PING') window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY' }, location.origin);
-  if (event.data?.type === 'SVNET_CLAIMS_IMPORT_START') chrome.runtime.sendMessage({ type: 'START_IMPORT', profile: event.data.profile || 'self' }).then(response => window.postMessage({ type: response?.ok ? 'SVNET_CLAIMS_IMPORT_DONE' : 'SVNET_CLAIMS_IMPORT_ERROR', result: response?.result, error: response?.error }, location.origin)).catch(error => window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: error.message }, location.origin));
+  if (event.data?.type === 'SVNET_CLAIMS_IMPORT_START') {
+    activeRequest = { type: 'START_IMPORT', profile: event.data.profile || 'self', jobId: Number(event.data.jobId || 0), runId: event.data.runId || crypto.randomUUID() };
+    const request = activeRequest;
+    connectKeepalive();
+    chrome.runtime.sendMessage(request).then(response => {
+      if (!response?.ok) window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: response?.error, runtime: { jobId: request.jobId } }, location.origin);
+      else window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ACCEPTED', runtime: { jobId: request.jobId, runId: response.runId, resumed: response.resumed } }, location.origin);
+    }).catch(error => window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: `[CF-RUN-00] ${error.message}`, runtime: { jobId: request.jobId } }, location.origin));
+  }
   if (event.data?.type === 'SVNET_CLAIMS_OPEN_OPTIONS') chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS', profile: event.data.profile || 'self' });
 });
 chrome.runtime.onMessage.addListener(message => {
   if (message?.type === 'IMPORT_PROGRESS') window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_PROGRESS', ...message }, location.origin);
-  if (message?.type === 'IMPORT_ERROR') window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: message.error }, location.origin);
+  if (message?.type === 'IMPORT_DONE') { activeRequest = null; disconnectKeepalive(); window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_DONE', result: message.result, runtime: message.runtime }, location.origin); }
+  if (message?.type === 'IMPORT_ERROR') { activeRequest = null; disconnectKeepalive(); window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: message.error, runtime: message.runtime }, location.origin); }
 });
+function disconnectKeepalive() {
+  clearInterval(keepaliveTimer);
+  keepaliveTimer = 0;
+  try { keepalivePort?.disconnect(); } catch {}
+  keepalivePort = null;
+}
+function connectKeepalive() {
+  if (keepalivePort) return;
+  try {
+    keepalivePort = chrome.runtime.connect({ name: 'claims-import-keepalive' });
+    keepalivePort.onDisconnect.addListener(() => {
+      keepalivePort = null;
+      clearInterval(keepaliveTimer);
+      keepaliveTimer = 0;
+      if (activeRequest) setTimeout(() => { connectKeepalive(); chrome.runtime.sendMessage(activeRequest).catch(() => {}); }, 1000);
+    });
+    keepaliveTimer = setInterval(() => { try { keepalivePort?.postMessage({ type: 'KEEPALIVE', at: Date.now() }); } catch {} }, 15000);
+  } catch {}
+}
 window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY' }, location.origin);

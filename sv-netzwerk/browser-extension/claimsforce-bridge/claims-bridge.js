@@ -1,22 +1,40 @@
+const observedClaims = new Map();
 window.addEventListener('message', event => {
-  if (event.source !== window || event.origin !== location.origin || event.data?.source !== 'svnet-claimsforce-main' || event.data?.type !== 'TOKEN') return;
-  try { chrome.runtime.sendMessage({ type: 'CLAIMS_TOKEN', token: event.data.token }).catch(() => {}); } catch {}
+  if (event.source !== window || event.origin !== location.origin || event.data?.source !== 'svnet-claimsforce-main') return;
+  if (event.data?.type === 'TOKEN') {
+    try { chrome.runtime.sendMessage({ type: 'CLAIMS_TOKEN', token: event.data.token }).catch(() => {}); } catch {}
+  }
+  if (event.data?.type === 'CLAIMS_SNAPSHOT') {
+    for (const claim of event.data.claims || []) if (claim?.id) observedClaims.set(claim.id, claim);
+  }
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === 'OPEN_PLANNING') {
     const link = document.querySelector('a[href="/planning"],a[href^="/planning?"]');
-    if (!link) { sendResponse({ ok: false, error: 'ClaimsForce ist noch nicht angemeldet.' }); return; }
-    link.click();
+    if (link) link.click();
+    else if (!location.pathname.startsWith('/planning')) { sendResponse({ ok: false, error: 'ClaimsForce ist noch nicht angemeldet.' }); return; }
     sendResponse({ ok: true });
     return;
   }
   if (message?.type === 'OPEN_FUTURE_APPOINTMENTS') {
-    const buttons = [...document.querySelectorAll('button')];
-    const future = buttons.find(button => /Mit Termin|Zukünftige Termine/i.test(button.textContent || ''));
-    const show = [...buttons].filter(button => /^Anzeigen$/i.test((button.textContent || '').trim())).at(-1);
-    (future || show)?.click();
-    sendResponse({ ok: true });
+    const controls = [...document.querySelectorAll('button,[role="tab"],[role="radio"],a')];
+    const future = controls.find(node => /Mit Termin|Zukünftige Termine|Termine in der Zukunft/i.test(node.textContent || ''));
+    if (future) future.click();
+    const url = new URL(location.href);
+    url.pathname = '/planning';
+    url.searchParams.set('bucket', 'WITH_FUTURE_APPOINTMENT');
+    url.hash = 'with-future-appointment';
+    if (url.href !== location.href) {
+      history.pushState({}, '', url);
+      dispatchEvent(new PopStateEvent('popstate'));
+      dispatchEvent(new HashChangeEvent('hashchange'));
+    }
+    sendResponse({ ok: true, strategy: future ? 'control-and-route' : 'route' });
+    return;
+  }
+  if (message?.type === 'SESSION_STATE') {
+    sendResponse({ ok: true, route: location.pathname, observedClaims: observedClaims.size, planning: location.pathname.startsWith('/planning'), login: location.pathname.startsWith('/login') });
     return;
   }
   if (message?.type !== 'SCRAPE_CLAIMS') return;
@@ -49,7 +67,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       }
       collect();
     }
-    sendResponse({ ok: true, claims: [...claims.values()], url: location.href });
+    for (const [id, claim] of observedClaims) if (!claims.has(id)) claims.set(id, claim);
+    sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, domClaims: claims.size - observedClaims.size, observedClaims: observedClaims.size });
   })().catch(error => sendResponse({ ok: false, error: error.message, claims: [] }));
   return true;
 });
