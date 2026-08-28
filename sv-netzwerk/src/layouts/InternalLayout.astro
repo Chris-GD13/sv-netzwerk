@@ -23,6 +23,7 @@ const internalLinks = [
 const isActive = (href: string) => currentPath.startsWith(href);
 ---
 
+
 <!doctype html>
 <html lang="de">
   <head>
@@ -44,6 +45,11 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__nav a.active::before { content: ''; position: absolute; left: -1px; top: 8px; bottom: 8px; width: 3px; background: #f59a23; }
       .intern-sidebar__nav a span, .intern-header__logout span { width: 22px; color: #f59a23; font-size: 1.1rem; text-align: center; }
       #intern-main { min-width: 0; }
+    .intern-sidebar__expert { display: grid; gap: 7px; margin-top: 12px; padding: 12px; border-top: 1px solid #d9dde1; }
+    .intern-sidebar__expert[hidden] { display: none; }
+    .intern-sidebar__expert label { display: grid; gap: 3px; color: #263746; }
+    .intern-sidebar__expert label small { color: #6c7e8e; font-weight: 400; }
+    .intern-sidebar__expert select { width: 100%; min-width: 0; padding: 8px 9px; border: 1px solid #c7ccd1; border-radius: 3px; background: #fff; color: #263746; font: inherit; }
       .intern-header__logout {
         appearance: none;
         display: flex;
@@ -68,6 +74,8 @@ const isActive = (href: string) => currentPath.startsWith(href);
         .intern-sidebar { display: block; padding: 7px 10px; border-right: 0; border-bottom: 1px solid #d9dde1; overflow-x: auto; }
         .intern-sidebar__nav { display: flex; min-width: max-content; }
         .intern-sidebar__nav a { padding: 9px 11px; }
+      .intern-sidebar__expert { grid-template-columns: auto minmax(190px, 1fr); align-items: center; gap: 8px; margin: 0 0 0 8px; padding: 0 0 0 12px; border-top: 0; border-left: 1px solid #d9dde1; }
+      .intern-sidebar__expert label small { display: none; }
         .intern-sidebar .intern-header__logout { display: none; }
       }
     </style>
@@ -92,6 +100,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       <aside class="intern-sidebar">
         <nav aria-label="Interne Navigation" class="intern-sidebar__nav">
           {internalLinks.map((link) => <a class:list={{ active: isActive(link.href) }} href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
+          <slot name="sidebar-extra" />
         </nav>
         <button class="intern-header__logout" id="intern-logout" type="button"><span>↪</span>Abmelden</button>
       </aside>
