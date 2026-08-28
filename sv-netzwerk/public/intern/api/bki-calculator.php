@@ -84,6 +84,8 @@ Regeln:
 - recommended_quantity aus der Nutzereingabe ableiten, aber nur bei eindeutiger Umrechnung. Beispiel: 5 Elemente à 2 m² und BKI-Einheit m² => 10; BKI-Einheit Stück => 5.
 - regional_factor nur aus den BKI-Regionalfaktoren bestimmen, wenn Ort/PLZ eindeutig zuordenbar; sonst null und kurze Erläuterung.
 - source_page muss die BKI-Seite enthalten, soweit sie aus dem Suchtreffer belastbar hervorgeht.
+- Fassadengerüst strikt trennen: Auf-/Um-/Abbau ist eine einmalige Leistung; Vorhaltung ist eine gesonderte zeitabhängige Leistung. Preise oder Einheiten niemals zwischen beiden Positionen vertauschen.
+- Bei Fassadengerüst-Auf-/Um-/Abbau Plausibilitätskorridor 6 bis 12 EUR netto je m² beachten. Für Kleinflächen unter 60 m² ist statt einer m²-Abrechnung eine Mindest-/Kleinflächenpauschale von 1.400 EUR netto anzusetzen und klar als solche zu kennzeichnen.
 PROMPT;
   $text="Leistung: {$q}\nOrt/Region: {$location}\nExplizite Menge: {$qty}\nExplizite Einheit: {$unit}\nSchadenart: ".trim((string)($case['schadenart']??''));
   $payload=[
@@ -116,6 +118,42 @@ PROMPT;
       'source_name'=>trim((string)($p['source_name']??'BKI Baukosten Positionen Altbau 2026')),
       'note'=>trim((string)($p['note']??''))
     ];
+  }
+  $queryNorm=mb_strtolower($q,'UTF-8');
+  $isScaffoldSetup=str_contains($queryNorm,'fassadengerüst')
+    && (str_contains($queryNorm,'auf-')||str_contains($queryNorm,'aufbau')||str_contains($queryNorm,'abbau')||str_contains($queryNorm,'umsetzen'));
+  $quantity=is_numeric(str_replace(',','.',$qty))?(float)str_replace(',','.',$qty):0.0;
+  if($isScaffoldSetup&&$quantity>0){
+    if($quantity<60){
+      $positions=[[
+        'position_code'=>'301.000.057',
+        'description'=>'Fassadengerüst – Auf-, Um- und Abbau – Kleinflächenpauschale unter 60 m²',
+        'unit'=>'psch',
+        'price_low'=>1400.0,
+        'price_mid'=>1400.0,
+        'price_high'=>1400.0,
+        'recommended_quantity'=>1.0,
+        'regional_factor'=>$rf,
+        'source_page'=>'',
+        'source_name'=>'BKI Baukosten Positionen Altbau 2026',
+        'note'=>'Mindest-/Kleinflächenpauschale netto; Vorhaltung separat kalkulieren.'
+      ]];
+    }else{
+      $base=$positions[0]??[];
+      $positions=[[
+        'position_code'=>trim((string)($base['position_code']??''))?:'301.000.057',
+        'description'=>'Fassadengerüst – Auf-, Um- und Abbau',
+        'unit'=>'m²',
+        'price_low'=>6.0,
+        'price_mid'=>9.0,
+        'price_high'=>12.0,
+        'recommended_quantity'=>$quantity,
+        'regional_factor'=>$rf,
+        'source_page'=>trim((string)($base['source_page']??'')),
+        'source_name'=>trim((string)($base['source_name']??'BKI Baukosten Positionen Altbau 2026')),
+        'note'=>'Plausibilitätskorridor 6–12 EUR/m² netto; Vorhaltung separat kalkulieren.'
+      ]];
+    }
   }
   return[
     'positions'=>$positions,
