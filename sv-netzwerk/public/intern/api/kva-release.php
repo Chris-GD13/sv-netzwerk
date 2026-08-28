@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/config.php';commonHeaders();$user=requireAuth();
+require_once __DIR__.'/kva-contact-merge.php';
 if(!in_array((string)($user['role']??''),['administrator','projektleiter','pruefer','sachverstaendiger'],true))apiError(403,'Keine Berechtigung.');
 const KR_ARCHIVE='archiv@sv.de';
 function krSenderProfile(array$user):array{$email=mb_strtolower(trim((string)($user['email']??'')),'UTF-8');$name=mb_strtolower(trim((string)($user['full_name']??'')),'UTF-8');if($email==='ms@sv-schuett.eu'||str_contains($name,'marc'))return['email'=>'ms@sv-schuett.eu','name'=>'Marc Schütt'];if($email==='hr@sv-schuett.eu'||str_contains($name,'holger'))return['email'=>'hr@sv-schuett.eu','name'=>'Holger Roth'];if($email==='ws@sv-schuett.eu'||str_contains($name,'susanne'))return['email'=>'ws@sv-schuett.eu','name'=>'Susanne Wächter'];return['email'=>'cw@sv-schuett.eu','name'=>'Christian Wächter'];}
@@ -15,6 +16,27 @@ function krCaseNo(string$f):string{$s=db()->prepare('SELECT case_no FROM case_fo
 function krSelected(string$f,string$id):array{if($id==='')throw new RuntimeException('Bitte eine KVA-Datei auswählen oder neu hochladen.');$hit=null;foreach(krList($f)as$x)if(hash_equals((string)($x['id']??''),$id)){$hit=$x;break;}if(!$hit)throw new RuntimeException('Die ausgewählte KVA-Datei wurde im aktiven Schadenfall nicht gefunden. Bitte die Fallauswahl prüfen oder die Datei neu hochladen.');return['name'=>(string)$hit['name'],'mime'=>(string)($hit['mimeType']??'application/octet-stream'),'bytes'=>krDrive('https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'?alt=media&supportsAllDrives=true')];}
 function krText(array$r):string{if(is_string($r['output_text']??null))return trim($r['output_text']);$t='';foreach(($r['output']??[])as$i)foreach(($i['content']??[])as$p)if(($p['type']??'')==='output_text')$t.=(string)($p['text']??'');return trim($t);}
 function krOpenAiJson(string$key,string$id,string$instructions,string$input):array{$p=['model'=>env('OPENAI_MODEL','gpt-5.4-mini'),'instructions'=>$instructions,'input'=>[['role'=>'user','content'=>[['type'=>'input_text','text'=>'Antworte ausschließlich als JSON-Objekt. '.$input],['type'=>'input_file','file_id'=>$id]]]],'text'=>['format'=>['type'=>'json_object']],'max_output_tokens'=>3500];$r=krHttp('POST','https://api.openai.com/v1/responses',['Content-Type: application/json','Authorization: Bearer '.$key],json_encode($p,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),600);$x=json_decode($r['body'],true);if($r['status']<200||$r['status']>=300)throw new RuntimeException((string)($x['error']['message']??'KVA konnte nicht ausgewertet werden.'));$o=json_decode(krText($x),true);if(!is_array($o))throw new RuntimeException('KVA-Auswertung war nicht lesbar.');return$o;}
+function krAnalyzeContacts(string $name, string $mime, string $bytes): array
+{
+    $key = env('OPENAI_API_KEY', '');
+    if ($key === '') throw new RuntimeException('OpenAI API-Key ist nicht konfiguriert.');
+    $tmp = tempnam(sys_get_temp_dir(), 'kva-contact-');
+    file_put_contents($tmp, $bytes);
+    try {
+        $upload = krHttp('POST', 'https://api.openai.com/v1/files', ['Authorization: Bearer '.$key], ['purpose'=>'user_data', 'file'=>new CURLFile($tmp, $mime, $name)]);
+        $uploaded = json_decode($upload['body'], true);
+        $fileId = (string)($uploaded['id'] ?? '');
+        if ($upload['status'] < 200 || $upload['status'] >= 300 || $fileId === '') throw new RuntimeException('KVA-Kontaktdaten konnten nicht vorbereitet werden.');
+        return krOpenAiJson(
+            $key,
+            $fileId,
+            'Lies ausschließlich die geschäftlichen Kontaktdaten des Absenders aus dem vollständigen Originaldokument. Suche in Briefkopf, Fußzeilen, Unterschrift, Ansprechpartner-/Bauleiterangaben, Impressum sowie AGB- und Widerrufsseiten. Erfasse alle namentlich genannten verantwortlichen Personen mit ihrer jeweiligen Rolle. Verwechsle Empfänger, Versicherungsnehmer, Versicherer oder Regulierer niemals mit dem Absender/Sanierer. Erfinde nichts.',
+            'Datei: '.$name.'. Antworte als JSON mit company, contact_people (Array aus Objekten mit name und role), street, postal_code, city, email, phone, mobile, fax, website. Unbekanntes als null.'
+        );
+    } finally {
+        @unlink($tmp);
+    }
+}
 function krEvidenceId(mixed $value): string { return preg_replace('/[\s\p{P}]+/u', '', mb_strtolower(trim((string)$value), 'UTF-8')) ?? ''; }
 function krSameTotalsBlock(array ...$reads): bool { $page = null; $evidence = null; foreach ($reads as $read) { $currentPage = filter_var($read['total_page'] ?? null, FILTER_VALIDATE_INT, ['options'=>['min_range'=>1]]); $currentEvidence = krEvidenceId($read['totals_evidence'] ?? ''); if ($currentPage === false || $currentEvidence === '' || ($page !== null && $page !== $currentPage) || ($evidence !== null && $evidence !== $currentEvidence)) return false; $page = $currentPage; $evidence = $currentEvidence; } return true; }
 function krSameOfferIdentity(array ...$reads): bool { $number = null; foreach ($reads as $read) { $current = krEvidenceId($read['quote_number'] ?? ''); if ($current === '' || ($number !== null && $number !== $current) || preg_match('/angebot|kostenvoranschlag/i', (string)($read['document_type'] ?? '')) !== 1) return false; $number = $current; } return true; }

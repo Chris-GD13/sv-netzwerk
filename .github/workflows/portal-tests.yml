@@ -47,6 +47,9 @@ jobs:
       - name: KVA-Dateiauswahl bei Fensterfokus prüfen
         run: php sv-netzwerk/tests/kva_file_selection_state_test.php
 
+      - name: KVA-Saniererkontakte vollständig ergänzen
+        run: php sv-netzwerk/tests/kva_contact_enrichment_test.php
+
       - name: Schnelle Fallsuche prüfen
         run: php sv-netzwerk/tests/case_search_test.php
 
