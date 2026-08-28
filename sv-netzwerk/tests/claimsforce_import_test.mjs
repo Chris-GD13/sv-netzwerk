@@ -27,7 +27,7 @@ assert.equal(safeFileName('KVA: Angebot?.pdf'), 'KVA- Angebot-.pdf');
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, '1.1.3', 'grundlegend reparierte Brücke muss als neue Laufzeitversion erkennbar sein');
+assert.equal(manifest.version, '1.1.4', 'grundlegend reparierte Brücke muss als neue Laufzeitversion erkennbar sein');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*')));
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://claimsforce.eu.auth0.com/*')));
 assert(manifest.content_scripts.some(entry => entry.js.includes('login-helper.js') && entry.matches.includes('https://*.claimsforce.com/*') && !entry.exclude_matches), 'ClaimsForce-Anmeldehilfe muss auch auf web.claimsforce.com/login laufen');
@@ -36,6 +36,7 @@ assert(claimsLogin.includes('if (email.value && password.value)') && claimsLogin
 assert(claimsLogin.includes('svnetSubmittedAt'), 'ClaimsForce-Anmeldeformular darf nicht unkontrolliert doppelt abgesendet werden');
 assert(claimsLogin.includes("message?.type !== 'FILL_LOGIN'") && claimsLogin.includes('suppliedCredentials'), 'Service Worker muss Zugangsdaten direkt und nur innerhalb der Erweiterung an die Loginseite übergeben können');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/login/*') && entry.js.includes('portal-login-helper.js')), 'Automatische Prüfportal-Anmeldung ist in der Brücke registriert');
+assert(manifest.content_scripts.some(entry => entry.js.includes('portal-login-helper.js') && entry.run_at === 'document_idle'), 'Portal-Anmeldehilfe startet erst am vorhandenen Loginformular');
 
 const portal = fs.readFileSync(path.join(root, 'src/pages/intern/versicherungsfaelle/index.astro'), 'utf8');
 assert(portal.includes('Aufträge aus Claims einlesen'));
@@ -66,6 +67,7 @@ const portalLogin = fs.readFileSync(path.join(root, 'browser-extension/claimsfor
 assert(portalLogin.includes('GET_PORTAL_CREDENTIALS') && portalLogin.includes('requestSubmit'), 'Prüfportal wird nach einem Sitzungsablauf automatisch wieder angemeldet');
 assert(portalLogin.includes('if (email.value && password.value)') && portalLogin.includes("button[type=\"submit\"]") , 'Bereits vom Browser ausgefüllte Portal-Zugangsdaten werden automatisch abgesendet');
 assert(portalLogin.includes('if (!document.documentElement)') && portalLogin.includes('watchPortalLogin'), 'Portal-Anmeldehilfe muss auch bei document_start auf das entstehende Formular warten');
+assert(portalLogin.includes('data-svnet-portal-login') && portalLogin.includes("mark('submitted')"), 'Portal-Anmeldehilfe liefert geheimnisfreie DOM-Laufzeitphasen');
 
 const drive = fs.readFileSync(path.join(root, 'public/intern/api/google-drive-sync.php'), 'utf8');
 assert(drive.includes("'claims_profile'=>\$claimsProfile"), 'Status liefert das Claims-Profil des angemeldeten Sachverständigen');
@@ -83,7 +85,7 @@ assert(central.includes("job.profile==='jens'?'christian':job.profile"), 'Ehemal
 assert(central.includes("profile==='christian'?['christian','jens']:[profile]"), 'Manueller Christian-Import liest auch die ehemaligen Jens-Maurer-Fälle ein');
 assert(central.includes("post('active')") && central.includes("post('heartbeat'"), 'Zentrale Station verbindet sich nach einem Browserneustart wieder mit dem laufenden Import');
 assert(central.includes("action=mine") && central.includes('resumeWatch()'), 'Portal stellt die sichtbare Überwachung bereits eingereihter Importe wieder her');
-assert(central.includes('Browser-Brücke 1.1.3 erforderlich') && central.includes("versionAtLeast(bridgeVersion,'1.1.3')"), 'Veraltete geladene Erweiterungen dürfen keine neuen Warteschlangenläufe starten');
+assert(central.includes('Browser-Brücke 1.1.4 erforderlich') && central.includes("versionAtLeast(bridgeVersion,'1.1.4')"), 'Veraltete geladene Erweiterungen dürfen keine neuen Warteschlangenläufe starten');
 const optionsHtml = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.html'), 'utf8');
 assert(optionsHtml.includes('Ehem. Jens Maurer → Christian Wächter'), 'Jens-Zugang ist in der verschlüsselten Zugangsverwaltung auswählbar');
 assert(manifest.permissions.includes('nativeMessaging'), 'Lokaler Zugangsdaten-Leser ist für den unbeaufsichtigten Import freigegeben');
