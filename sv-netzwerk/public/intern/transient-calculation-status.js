@@ -1,13 +1,14 @@
 (()=>{
-  if(!location.pathname.startsWith('/intern/versicherungsfaelle')) return;
+  if(!location.pathname.startsWith('/intern/versicherungsfaelle'))return;
   const API='/intern/api/gf-ai-generate.php';
-  const transientText='Verarbeitung unterbrochen';
-  const resumedJobs=new Set();
-  let resuming=false;
+  const interruptedText='Verarbeitung unterbrochen';
+  const resumeStore='svnet-ai-resume-attempts-v2';
+  let recovering=false;
+  let timer=0;
 
   function activeCase(){
-    for(const storage of [sessionStorage,localStorage]){
-      try{const row=JSON.parse(storage.getItem('svnet-case')||'null');if(row?.folder_id)return row;}catch{}
+    for(const storage of[sessionStorage,localStorage]){
+      try{const row=JSON.parse(storage.getItem('svnet-case')||'null');if(row?.folder_id)return row}catch{}
     }
     return null;
   }
@@ -19,55 +20,85 @@
     return json;
   }
 
-  function interruptedBox(){
-    const box=document.getElementById('vf-job');
-    if(!box)return null;
-    return (box.textContent||'').includes(transientText)?box:null;
+  const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+
+  function resumeAttempts(){
+    try{return JSON.parse(localStorage.getItem(resumeStore)||'{}')||{}}catch{return {}}
   }
 
-  async function autoResume(){
-    if(resuming)return;
-    const box=interruptedBox();
-    if(!box)return;
-    const current=activeCase();
-    if(!current?.folder_id)return;
-    resuming=true;
-    box.innerHTML='<strong>ChatGPT arbeitet …</strong>';
-    box.hidden=false;
+  function rememberResume(jobId){
+    const attempts=resumeAttempts();
+    attempts[String(jobId)]=Date.now();
+    for(const[id,stamp]of Object.entries(attempts))if(!Number(stamp)||Number(stamp)<Date.now()-7*24*60*60*1000)delete attempts[id];
+    localStorage.setItem(resumeStore,JSON.stringify(attempts));
+  }
+
+  function interruptedBox(){
+    const box=document.getElementById('vf-job');
+    return box&&(box.textContent||'').includes(interruptedText)?box:null;
+  }
+
+  function renderDone(box,job){
+    const files=job.result?.created||[];
+    box.className='vf-job ok';
+    box.innerHTML='<strong>Dokument vollständig erstellt.</strong>'+(files.length?'<ul>'+files.map(file=>`<li><a href="${escapeHtml(file.webViewLink||'#')}" target="_blank" rel="noreferrer">${escapeHtml(file.name||'Dokument öffnen')}</a></li>`).join('')+'</ul>':'');
+    window.dispatchEvent(new CustomEvent('svnet:cases-changed'));
+  }
+
+  function renderStopped(box,message){
+    box.className='vf-job bad';
+    box.innerHTML='<strong>Dokumenterstellung wurde angehalten.</strong><br><span class="vf-meta">'+escapeHtml(message||'Der Auftrag konnte nicht abgeschlossen werden.')+'</span>';
+  }
+
+  async function poll(jobId,box,deadline=Date.now()+12*60*1000){
+    window.clearTimeout(timer);
     try{
-      const latest=await post({action:'latest',folder_id:current.folder_id});
-      const jobId=String(latest.job_id||'');
-      if(!jobId)throw new Error('Kein laufender Auftrag gefunden.');
-      if(!resumedJobs.has(jobId)){
-        resumedJobs.add(jobId);
-        try{await post({action:'resume',job_id:latest.job_id});}
-        catch(error){
-          const msg=String(error?.message||'');
-          if(!msg.includes('nicht unterbrochen')&&!msg.includes('bereits fortgesetzt'))throw error;
-        }
-      }
-      // Die vorhandene Pollinglogik übernimmt danach wieder den aktuellen Jobstatus.
-      setTimeout(()=>{
-        if((box.textContent||'').includes(transientText))box.innerHTML='<strong>ChatGPT arbeitet …</strong>';
-      },300);
+      const data=await post({action:'status',job_id:Number(jobId)}),job=data.job||{};
+      if(job.status==='done'){renderDone(box,job);return}
+      if(job.status==='failed'){renderStopped(box,job.error_text||job.message);return}
+      if(job.recoverable){renderStopped(box,'Die einmalige Wiederaufnahme blieb erfolglos. Es wird kein weiterer KI-Aufruf automatisch gestartet.');return}
+      if(Date.now()>deadline){renderStopped(box,'Die Statusprüfung wurde nach zwölf Minuten beendet. Es wird kein weiterer KI-Aufruf automatisch gestartet.');return}
+      box.className='vf-job';
+      box.innerHTML='<strong>'+escapeHtml(job.message||'Dokument wird erstellt …')+'</strong>';
+      timer=window.setTimeout(()=>poll(jobId,box,deadline),2500);
     }catch(error){
-      box.innerHTML='<strong>Bearbeitung angehalten.</strong><br><span class="vf-meta"></span>';
-      const detail=box.querySelector('.vf-meta');
-      if(detail)detail.textContent=String(error?.message||error);
-    }finally{
-      resuming=false;
+      if(Date.now()>deadline){renderStopped(box,String(error?.message||error));return}
+      timer=window.setTimeout(()=>poll(jobId,box,deadline),5000);
     }
   }
 
-  function scan(){
-    if(interruptedBox())autoResume();
+  async function recoverOnce(){
+    if(recovering)return;
+    const box=interruptedBox(),current=activeCase();
+    if(!box||!current?.folder_id)return;
+    recovering=true;
+    box.hidden=false;
+    try{
+      const latest=await post({action:'latest',folder_id:current.folder_id}),jobId=Number(latest.job_id||0);
+      if(!jobId)throw new Error('Kein laufender Auftrag gefunden.');
+      const status=await post({action:'status',job_id:jobId}),job=status.job||{};
+      if(job.status==='done'){renderDone(box,job);return}
+      if(job.status==='failed'){renderStopped(box,job.error_text||job.message);return}
+      if(job.recoverable){
+        if(resumeAttempts()[String(jobId)]){renderStopped(box,'Dieser Auftrag wurde bereits einmal wiederaufgenommen. Zum Kostenschutz erfolgt keine weitere automatische Wiederholung.');return}
+        rememberResume(jobId);
+        box.className='vf-job';
+        box.innerHTML='<strong>Rekon-Schadenbericht wird einmalig fortgesetzt …</strong>';
+        await post({action:'resume',job_id:jobId});
+      }
+      await poll(jobId,box);
+    }catch(error){
+      renderStopped(box,String(error?.message||error));
+    }finally{
+      recovering=false;
+    }
   }
 
   function start(){
     const box=document.getElementById('vf-job');
     if(!box)return;
-    new MutationObserver(scan).observe(box,{childList:true,subtree:true,characterData:true});
-    scan();
+    new MutationObserver(()=>{if(interruptedBox())recoverOnce()}).observe(box,{childList:true,subtree:true,characterData:true});
+    if(interruptedBox())recoverOnce();
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});

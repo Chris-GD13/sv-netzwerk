@@ -97,6 +97,21 @@ if ($outputTokenCount !== 1) {
     throw new RuntimeException('Ausgabereserve für KI-Berichte konnte nicht sicher gesetzt werden.');
 }
 
+// Rekon benötigt weder Schadenfotos noch die umfangreiche allgemeine
+// Regelwerksammlung. Beides würde Laufzeit und Tokenkosten unnötig erhöhen.
+$rekonSourceNeedle = <<<'PHP_CODE'
+$caseFiles=gfCaseFiles($folderId);if(!$caseFiles)throw new RuntimeException('Im aktiven Fall wurden keine auswertbaren Unterlagen gefunden.');$knowledgeFiles=gfKnowledgeFiles();if(!$knowledgeFiles)throw new RuntimeException('Keine Engel/QS-/GF-Regelwerke in der Google-Drive-Wissensbasis gefunden.');gfJobUpdate($jobId,'running',8,'Fallunterlagen werden für die KI vorbereitet.');
+PHP_CODE;
+$rekonSourceReplacement = <<<'PHP_CODE'
+$rekonOnly=count($outputs)===1&&in_array('rekon_schaden',$outputs,true);$caseFiles=gfCaseFiles($folderId);if($rekonOnly)$caseFiles=array_values(array_filter($caseFiles,static fn($file)=>!str_starts_with(mb_strtolower((string)($file['mimeType']??''),'UTF-8'),'image/')));if(!$caseFiles)throw new RuntimeException($rekonOnly?'Für den Rekon-Bericht wurden keine auswertbaren Unterlagen ohne Bilder gefunden.':'Im aktiven Fall wurden keine auswertbaren Unterlagen gefunden.');$knowledgeFiles=$rekonOnly?[]:gfKnowledgeFiles();if(!$rekonOnly&&!$knowledgeFiles)throw new RuntimeException('Keine Engel/QS-/GF-Regelwerke in der Google-Drive-Wissensbasis gefunden.');gfJobUpdate($jobId,'running',8,$rekonOnly?'Rekon-Unterlagen werden ohne Bilder vorbereitet.':'Fallunterlagen werden für die KI vorbereitet.');
+PHP_CODE;
+$source = str_replace($rekonSourceNeedle, $rekonSourceReplacement, $source, $rekonSourceCount);
+if ($rekonSourceCount !== 1) throw new RuntimeException('Kostenarme Rekon-Quellenauswahl konnte nicht angebunden werden.');
+$source = str_replace("if(!\$ruleRefs)throw new RuntimeException('Regelwerke konnten der KI nicht bereitgestellt werden.');", "if(!\$rekonOnly&&!\$ruleRefs)throw new RuntimeException('Regelwerke konnten der KI nicht bereitgestellt werden.');", $source, $rekonRulesCount);
+if ($rekonRulesCount !== 1) throw new RuntimeException('Rekon-Regelwerksausnahme konnte nicht angebunden werden.');
+$source = str_replace('$result=gfEngelPrepare($key,gfOpenAI($content,$system),$meta);', '$result=gfEngelPrepare($key,gfOpenAI($content,$system,$key===\'rekon_schaden\'?12000:null),$meta);', $source, $rekonBudgetCount);
+if ($rekonBudgetCount !== 1) throw new RuntimeException('Rekon-Ausgabebudget konnte nicht begrenzt werden.');
+
 
 // Start und Langläufer trennen: Der Browser erhält zuerst sicher die Job-ID.
 // Die eigentliche Verarbeitung wird anschließend über action=run angestoßen,

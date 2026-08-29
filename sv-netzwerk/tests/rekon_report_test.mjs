@@ -7,6 +7,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const portal = fs.readFileSync(path.join(root, 'src/pages/intern/versicherungsfaelle/index.astro'), 'utf8');
 const generator = fs.readFileSync(path.join(root, 'public/intern/api/gf-ai-generate.php'), 'utf8');
 const core = fs.readFileSync(path.join(root, 'public/intern/api/gf-ai-generate-core.php'), 'utf8');
+const transientStatus = fs.readFileSync(path.join(root, 'public/intern/transient-calculation-status.js'), 'utf8');
 
 assert(portal.includes('value="rekon_schaden"> Rekon-Schaden <small>(ohne Bilder)</small>'), 'Rekon-Schaden muss als dritter, exklusiver Berichtstyp auswählbar sein');
 assert(portal.includes("rekon_schaden:'Rekon-Schaden'"), 'Der Laufstatus muss den verständlichen Rekon-Namen anzeigen');
@@ -51,5 +52,12 @@ assert(!generator.slice(generator.indexOf('function gfRekonDocumentHtml'), gener
 assert.equal((core.match(/function gfEngelValidate\(/g) || []).length, 1, 'Die Rekon-QS benötigt genau einen eindeutigen Laufzeit-Anker');
 assert.equal((core.match(/function gfDocumentHtml\(/g) || []).length, 1, 'Die Rekon-Word-Ausgabe benötigt genau einen eindeutigen Renderer-Anker');
 assert(core.includes("$allowed=['dokumentenindex','rechnungsregister','erstbericht','schadenprotokoll'"), 'Die serverseitige Dokumentfreigabe muss eindeutig erweiterbar bleiben');
+assert(generator.includes("$rekonOnly=count($outputs)===1"), 'Rekon muss eine eigene, kostenarme Quellenroute verwenden');
+assert(generator.includes("!str_starts_with(mb_strtolower((string)($file['mimeType']??'')"), 'Rekon muss Bilddateien vor dem KI-Upload ausschließen');
+assert(generator.includes('$knowledgeFiles=$rekonOnly?[]:gfKnowledgeFiles()'), 'Rekon darf die allgemeine Regelwerksammlung nicht hochladen');
+assert(generator.includes("$key===\\'rekon_schaden\\'?12000:null"), 'Das Rekon-Ausgabebudget muss begrenzt sein');
+assert(!transientStatus.includes('ChatGPT arbeitet'), 'Die fehlerhafte unbestimmte Hängeanzeige darf nicht mehr verwendet werden');
+assert(transientStatus.includes('Zum Kostenschutz erfolgt keine weitere automatische Wiederholung'), 'Die Wiederaufnahme muss gegen Mehrfachaufrufe geschützt sein');
+assert(transientStatus.includes("action:'status'"), 'Die Wiederaufnahme muss den tatsächlichen Jobstatus weiter abfragen');
 
-console.log('Rekon-Schadenbericht: Auswahl, Formularreihenfolge, QS und bildlose Word-Ausgabe geprüft.');
+console.log('Rekon-Schadenbericht: Auswahl, Formularreihenfolge, kostengeschützte Wiederaufnahme und bildlose Word-Ausgabe geprüft.');
