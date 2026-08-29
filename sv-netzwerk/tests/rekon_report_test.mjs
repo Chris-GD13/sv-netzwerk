@@ -56,6 +56,7 @@ assert(generator.includes("$rekonOnly=count($outputs)===1"), 'Rekon muss eine ei
 assert(generator.includes("!str_starts_with(mb_strtolower((string)($file['mimeType']??'')"), 'Rekon muss Bilddateien vor dem KI-Upload ausschließen');
 assert(generator.includes('$knowledgeFiles=$rekonOnly?[]:gfKnowledgeFiles()'), 'Rekon darf die allgemeine Regelwerksammlung nicht hochladen');
 assert(generator.includes("$caseFilesNeedle = '$knowledgeFiles=$rekonOnly?[]:gfKnowledgeFiles();'"), 'Die Reserve-Anbindung muss den bereits eingesetzten Rekon-Quellenanker verwenden');
+assert(generator.includes('$caseUploadNeedle = "\\$caseRefs=[];foreach(\\$caseFiles'), 'Die chargenweise Aktenauswertung darf nicht vom bereits ersetzten Fortschrittstext abhängen');
 assert(generator.includes("$key===\\'rekon_schaden\\'?12000:null"), 'Das Rekon-Ausgabebudget muss begrenzt sein');
 assert(!transientStatus.includes('ChatGPT arbeitet'), 'Die fehlerhafte unbestimmte Hängeanzeige darf nicht mehr verwendet werden');
 assert(transientStatus.includes('Zum Kostenschutz erfolgt keine weitere automatische Wiederholung'), 'Die Wiederaufnahme muss gegen Mehrfachaufrufe geschützt sein');
