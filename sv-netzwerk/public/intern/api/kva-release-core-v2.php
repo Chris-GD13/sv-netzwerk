@@ -46,6 +46,61 @@ function krMergeContacts(array $case, array $result): array
     return ['contacts'=>$contacts, 'case_contact_updates'=>$updates, 'contact_hints'=>$hints];
 }
 
+function krAnalyzeCalculation(string $name, string $mime, string $bytes): array
+{
+    $key = env('OPENAI_API_KEY', '');
+    if ($key === '') throw new RuntimeException('OpenAI API-Key ist nicht konfiguriert.');
+    $tmp = tempnam(sys_get_temp_dir(), 'kva-calc-');
+    file_put_contents($tmp, $bytes);
+    try {
+        $upload = krHttp('POST', 'https://api.openai.com/v1/files', ['Authorization: Bearer '.$key], ['purpose'=>'user_data', 'file'=>new CURLFile($tmp, $mime, $name)]);
+        $uploaded = json_decode($upload['body'], true);
+        $fileId = (string)($uploaded['id'] ?? '');
+        if ($upload['status'] < 200 || $upload['status'] >= 300 || $fileId === '') throw new RuntimeException('KVA konnte nicht für die Nachkalkulation vorbereitet werden.');
+        $result = krOpenAiJson(
+            $key,
+            $fileId,
+            'Lies den Kostenvoranschlag vollständig und positionsgenau. Erfinde keine Leistungen, Mengen, Einheiten oder Preise. Erfasse ausschließlich tatsächlich angebotene Hauptpositionen. Unterpositionen dürfen nur separat erscheinen, wenn sie einen eigenen Preis haben. Alternativ-, Eventual- und Bedarfspositionen kennzeichnest du und rechnest sie nicht in den angebotenen Gesamtbetrag ein. Geldbeträge werden als Dezimalzahlen ohne Währungszeichen ausgegeben. Prüfe quantity mal unit_price gegen line_total und nenne bei Abweichungen eine Warnung. Positionstexte bleiben fachlich vollständig, werden aber ohne Kopf-/Fußzeilen übernommen.',
+            'Datei: '.$name.'. Antworte als JSON mit company, quote_number, quote_date, net_total, vat_rate, vat_total, gross_total, positions (Array mit position_no, description, quantity, unit, unit_price, line_total, optional als Boolean und confidence zwischen 0 und 1), warnings. Unbekannte Werte als null.'
+        );
+        $positions = [];
+        foreach (is_array($result['positions'] ?? null) ? $result['positions'] : [] as $index=>$row) {
+            if (!is_array($row)) continue;
+            $description = trim((string)($row['description'] ?? ''));
+            $quantity = krMoney($row['quantity'] ?? null);
+            $unitPrice = krMoney($row['unit_price'] ?? null);
+            $lineTotal = krMoney($row['line_total'] ?? null);
+            if ($description === '' || $quantity === null || $quantity <= 0) continue;
+            if ($unitPrice === null && $lineTotal !== null) $unitPrice = round($lineTotal / $quantity, 2);
+            if ($lineTotal === null && $unitPrice !== null) $lineTotal = round($quantity * $unitPrice, 2);
+            $positions[] = [
+                'position_no'=>trim((string)($row['position_no'] ?? '')) ?: (string)($index + 1),
+                'description'=>$description,
+                'quantity'=>$quantity,
+                'unit'=>trim((string)($row['unit'] ?? '')) ?: 'St',
+                'unit_price'=>$unitPrice,
+                'line_total'=>$lineTotal,
+                'optional'=>(bool)($row['optional'] ?? false),
+                'confidence'=>max(0, min(1, (float)($row['confidence'] ?? 0))),
+            ];
+        }
+        if ($positions === []) throw new RuntimeException('Im KVA konnten keine belastbaren, bepreisten Positionen erkannt werden.');
+        return [
+            'company'=>trim((string)($result['company'] ?? '')),
+            'quote_number'=>trim((string)($result['quote_number'] ?? '')),
+            'quote_date'=>trim((string)($result['quote_date'] ?? '')),
+            'net_total'=>krMoney($result['net_total'] ?? null),
+            'vat_rate'=>krMoney($result['vat_rate'] ?? null),
+            'vat_total'=>krMoney($result['vat_total'] ?? null),
+            'gross_total'=>krMoney($result['gross_total'] ?? null),
+            'positions'=>$positions,
+            'warnings'=>array_values(array_map('strval', is_array($result['warnings'] ?? null) ? $result['warnings'] : [])),
+        ];
+    } finally {
+        @unlink($tmp);
+    }
+}
+
 function krVerifiedKva(string $folder, string $bytes): array
 {
     $hash = hash('sha256', $bytes);
@@ -73,6 +128,19 @@ function krV2Handle(array $user): void
         $folder = trim((string)($_REQUEST['folder_id'] ?? ''));
         requireCaseFolderAccess($folder, $user);
         if ($action === 'files') apiJson(['ok'=>true,'files'=>krKvas($folder)]);
+        if ($action === 'calculation_analyze') {
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
+            if (isset($_FILES['file']) && is_uploaded_file((string)($_FILES['file']['tmp_name'] ?? ''))) {
+                $file = $_FILES['file'];
+                if ((int)($file['size'] ?? 0) > 30 * 1024 * 1024) throw new RuntimeException('Die Datei darf höchstens 30 MB groß sein.');
+                $name = basename((string)$file['name']);
+                $mime = (string)(mime_content_type((string)$file['tmp_name']) ?: ($file['type'] ?? 'application/octet-stream'));
+                $bytes = (string)file_get_contents((string)$file['tmp_name']);
+            } else {
+                ['name'=>$name,'mime'=>$mime,'bytes'=>$bytes] = krSelected($folder, trim((string)($_POST['file_id'] ?? '')));
+            }
+            apiJson(['ok'=>true,'source'=>$name,'analysis'=>krAnalyzeCalculation($name, $mime, $bytes)]);
+        }
         if ($action === 'refresh_contacts') {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
             $kvas = krKvas($folder);
