@@ -1,25 +1,22 @@
 let suppliedCredentials = null;
 let submitLoop = 0;
+let submissionAttempted = false;
 
 function submitWhenReady() {
-  if (submitLoop) return;
+  if (submitLoop || submissionAttempted) return;
   let attempts = 0;
   const tick = () => {
     submitLoop = 0;
+    if (submissionAttempted) return;
     const password = document.querySelector('input[type="password"]');
     const form = password?.closest('form');
     const button = form?.querySelector('button[type="submit"]') || [...document.querySelectorAll('button')].find(node => /^Anmelden$/i.test((node.textContent || '').trim()));
     if (!password || !button) return;
-    const submittedAt = Number(password.dataset.svnetSubmittedAt || 0);
     const ready = button && !button.disabled && button.getAttribute('aria-disabled') !== 'true';
-    if (Date.now() - submittedAt >= 2500) {
-      if (ready) {
-        password.dataset.svnetSubmittedAt = String(Date.now());
-        button.click();
-      } else if (attempts >= 8 && form) {
-        password.dataset.svnetSubmittedAt = String(Date.now());
-        form.requestSubmit?.();
-      }
+    if (ready) {
+      submissionAttempted = true;
+      button.click();
+      return;
     }
     attempts++;
     if (attempts < 30 && document.contains(password)) submitLoop = setTimeout(tick, 350);
@@ -52,7 +49,6 @@ async function fillLogin(credentials = suppliedCredentials) {
 }
 fillLogin();
 new MutationObserver(() => fillLogin()).observe(document.documentElement, { childList: true, subtree: true });
-setInterval(() => fillLogin(), 1000);
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type !== 'FILL_LOGIN') return;
   suppliedCredentials = message.credentials || null;

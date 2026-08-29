@@ -33,6 +33,28 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     sendResponse({ ok: true, strategy: future ? 'control-and-route' : 'route' });
     return;
   }
+  if (message?.type === 'OPEN_TASKS') {
+    const controls = [...document.querySelectorAll('a,button,[role="tab"]')];
+    const tasks = controls.find(node => /^Aufgaben(?:\s*\d+)?$/i.test((node.textContent || '').replace(/\s+/g, ' ').trim()));
+    if (tasks) tasks.click();
+    sendResponse({ ok: !!tasks });
+    return;
+  }
+  if (message?.type === 'READ_OPEN_TASKS') {
+    const labels = [...document.querySelectorAll('div,span,p,strong')].filter(node => /^Alle$/i.test((node.textContent || '').trim()));
+    let count = null;
+    for (const label of labels) {
+      let node = label;
+      for (let depth = 0; node && depth < 5; depth++, node = node.parentElement) {
+        const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
+        const match = text.match(/^(\d{1,5})\s+Alle$/i) || text.match(/^Alle\s+(\d{1,5})$/i);
+        if (match) { count = Number(match[1]); break; }
+      }
+      if (Number.isInteger(count)) break;
+    }
+    sendResponse({ ok: Number.isInteger(count), openTasks: count });
+    return;
+  }
   if (message?.type === 'SESSION_STATE') {
     sendResponse({ ok: true, route: location.pathname, observedClaims: observedClaims.size, planning: location.pathname.startsWith('/planning'), login: location.pathname.startsWith('/login') });
     return;
@@ -42,18 +64,6 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
   const dayLabel = button => (button.textContent || '').replace(/\s+/g, ' ').trim();
   const isDayButton = button => /^(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag), .+\b20\d{2}$/.test(dayLabel(button));
-  const readAllCount = () => {
-    const controls = [...document.querySelectorAll('button,[role="tab"],[role="radio"],a')];
-    for (const node of controls) {
-      const own = `${node.textContent || ''} ${node.getAttribute('aria-label') || ''}`.replace(/\s+/g, ' ').trim();
-      if (!/\bAlle\b/i.test(own)) continue;
-      const adjacent = /^\s*\d{1,5}\s*$/.test(node.nextElementSibling?.textContent || '') ? node.nextElementSibling?.textContent : '';
-      const nearby = `${own} ${adjacent || ''}`.replace(/\s+/g, ' ').trim();
-      const match = nearby.match(/\bAlle\b\D{0,8}(\d{1,5})/i) || nearby.match(/(\d{1,5})\D{0,8}\bAlle\b/i);
-      if (match) return Number(match[1]);
-    }
-    return null;
-  };
   const collect = () => document.querySelectorAll('a[href*="/claims/"],a[href*="/planning/"]').forEach(anchor => {
     const match = anchor.getAttribute('href')?.match(/\/(?:claims|planning)\/([0-9a-f-]{20,})(?:\/|$)/i);
     if (match) claims.set(match[1], { id: match[1], label: anchor.textContent?.trim() || '' });
@@ -80,7 +90,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       collect();
     }
     for (const [id, claim] of observedClaims) if (!claims.has(id)) claims.set(id, claim);
-    sendResponse({ ok: true, claims: [...claims.values()], allCount: readAllCount(), route: location.pathname, domClaims: claims.size - observedClaims.size, observedClaims: observedClaims.size });
+    sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, domClaims: claims.size - observedClaims.size, observedClaims: observedClaims.size });
   })().catch(error => sendResponse({ ok: false, error: error.message, claims: [] }));
   return true;
 });

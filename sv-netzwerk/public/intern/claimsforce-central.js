@@ -53,7 +53,7 @@
 
   button.addEventListener('click',async()=>{
     if(userJobs.length)return;
-    if(context.claims_agent&&!bridge){show(`Diese zentrale Importstation ist nicht bereit. Browser-Brücke 1.3.9 erforderlich (geladen: ${bridgeVersion||'nicht erkannt'}). Bitte zuerst die Brücke aktualisieren.`,true);return}
+    if(context.claims_agent&&!bridge){show(`Diese zentrale Importstation ist nicht bereit. Browser-Brücke 1.3.10 erforderlich (geladen: ${bridgeVersion||'nicht erkannt'}). Bitte zuerst die Brücke aktualisieren.`,true);return}
     button.disabled=true;
     try{
       const profile=context.backoffice?(context.selected_expert||'christian'):(context.claims_profile||'christian');
@@ -101,8 +101,8 @@
     const d=e.data||{},runtime=d.runtime||{};
     if(d.type==='SVNET_CLAIMS_BRIDGE_READY'){
       bridgeVersion=String(d.version||'0.0.0');
-      bridge=versionAtLeast(bridgeVersion,'1.3.9');
-      if(!bridge)show(`Browser-Brücke 1.3.9 erforderlich (geladen: ${bridgeVersion}). Bitte die Erweiterung aktualisieren.`,true);
+      bridge=versionAtLeast(bridgeVersion,'1.3.10');
+      if(!bridge)show(`Browser-Brücke 1.3.10 erforderlich (geladen: ${bridgeVersion}). Bitte die Erweiterung aktualisieren.`,true);
     }
     if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&agentJob){
       const active=d.status?.active||{},diag=d.status?.diagnostic||{};

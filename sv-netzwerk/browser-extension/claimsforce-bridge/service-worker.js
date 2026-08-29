@@ -131,6 +131,18 @@ async function openPlanning(tabId) {
   return opened;
 }
 
+async function readOpenTasks(tabId) {
+  const opened = await chrome.tabs.sendMessage(tabId, { type: 'OPEN_TASKS' }).catch(() => null);
+  if (!opened?.ok) return null;
+  await sleep(1800);
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const result = await chrome.tabs.sendMessage(tabId, { type: 'READ_OPEN_TASKS' }).catch(() => null);
+    if (Number.isInteger(result?.openTasks)) return Math.max(0, result.openTasks);
+    await sleep(250);
+  }
+  return null;
+}
+
 async function requestJson(url, token, optional = false, timeout = 20000) {
   const controller = new AbortController(), timer = setTimeout(() => controller.abort(), timeout);
   try {
@@ -218,12 +230,13 @@ async function runImport(run) {
   if (!credential) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar.');
   const { tab, token } = await claimsTab(profile, run, credential);
   await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
+  const openTasks = await readOpenTasks(tab.id);
+  await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks });
   const planning = await openPlanning(tab.id);
   await diagnostic(run, 'CF-PLAN-04', 'Planungsansicht „Mit Termin“ wurde angefordert.', { strategy: planning?.strategy || 'bestehende Ansicht' });
   const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIMS' });
   const claims = scraped?.claims || [];
-  const openClaims = Number.isInteger(scraped?.allCount) ? Math.max(0, scraped.allCount) : claims.length;
-  await diagnostic(run, 'CF-LIST-05', `${claims.length} Auftrag/Aufträge wurden in der Planungsansicht erkannt.`, { count: claims.length, openClaims, observedApi: scraped?.observedClaims || 0, route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url) });
+  await diagnostic(run, 'CF-LIST-05', `${claims.length} Auftrag/Aufträge wurden in der Planungsansicht erkannt.`, { count: claims.length, openTasks, observedApi: scraped?.observedClaims || 0, route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url) });
   if (!claims.length) {
     const state = await chrome.tabs.sendMessage(tab.id, { type: 'SESSION_STATE' }).catch(() => ({}));
     throw new Error(`[CF-LIST-05] Keine Aufträge erkannt (Route ${state.route || 'unbekannt'}, API ${state.observedClaims || 0}).`);
@@ -311,7 +324,7 @@ async function runImport(run) {
     await chrome.storage.session.set({ claimsLoggedProfile: profile });
     await chrome.storage.local.set({ claimsLoggedProfile: profile });
   }
-  return { claims: claims.length, openClaims, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
+  return { claims: claims.length, openTasks, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
 }
 
 async function startImport(sender, message) {
