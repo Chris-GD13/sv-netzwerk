@@ -49,7 +49,11 @@ const slugOf = (href) => href.replace('/fachwissen/', '').replace(/\/$/, '');
 const missingSources = allArticleHrefs
   .map(slugOf)
   .filter((slug) => !knowledgeSlugs.has(slug) && !pageSlugs.has(slug));
-assert.deepEqual(missingSources, knownMissingSources, `Fachartikel-URLs ohne Quelle: ${missingSources.join(', ')}`);
+assert.deepEqual(
+  [...missingSources].sort(),
+  [...knownMissingSources].sort(),
+  `Fachartikel-URLs ohne Quelle: ${missingSources.join(', ')}`
+);
 const articleHrefs = allArticleHrefs.filter((href) => !knownMissingSources.includes(slugOf(href)));
 
 // 4. Die zuvor doppelt belegten Themen besitzen jeweils ihre eigene, bereits indexierte URL.
