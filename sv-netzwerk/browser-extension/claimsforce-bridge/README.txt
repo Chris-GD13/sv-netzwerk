@@ -9,3 +9,4 @@ SV-Netzwerk ClaimsForce-Brücke
 Bei Susanne bestimmt die Auswahl "Bearbeitung für", in welchen persönlichen Fallordner importiert wird.
 Manuell geänderte Falldaten werden nicht überschrieben. Neue ClaimsForce-Werte ergänzen nur bisher leere Felder.
 Bereits vollständig importierte und unveränderte Fälle werden übersprungen. Bei Änderungen werden nur neue oder geänderte Unterlagen, Nachrichten und Termine ergänzt.
+Vor einer namentlichen Anmeldung entfernt die Brücke ausschließlich die Sitzungsdaten von ClaimsForce und ClaimsForce-Auth0. Dadurch können alte Chrome-Autofill- oder SSO-Sitzungen nicht mehr versehentlich unter dem neu ausgewählten Profil weiterlaufen.

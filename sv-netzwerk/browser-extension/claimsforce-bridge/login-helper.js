@@ -13,12 +13,11 @@ async function fillLogin(credentials = suppliedCredentials) {
     if (button) button.click();
     else form?.requestSubmit?.();
   };
-  if (email.value && password.value) {
-    setTimeout(submit, 250);
+  const response = credentials || await chrome.runtime.sendMessage({ type: 'GET_CREDENTIALS' }).catch(() => null);
+  if (!response?.email || !response?.password) {
+    if (email.value && password.value) setTimeout(submit, 250);
     return;
   }
-  const response = credentials || await chrome.runtime.sendMessage({ type: 'GET_CREDENTIALS' }).catch(() => null);
-  if (!response?.email || !response?.password) { setTimeout(submit, 250); return; }
   const set = (node, value) => { const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set; setter?.call(node, value); node.dispatchEvent(new Event('input', { bubbles: true })); node.dispatchEvent(new Event('change', { bubbles: true })); };
   set(email, response.email); set(password, response.password);
   setTimeout(submit, 250);

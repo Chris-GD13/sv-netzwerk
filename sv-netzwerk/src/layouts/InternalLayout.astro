@@ -43,14 +43,15 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__nav a:hover { background: #e7e9eb; }
       .intern-sidebar__nav a.active { background: #fff; border-color: #d9dde1; }
       .intern-sidebar__nav a.active::before { content: ''; position: absolute; left: -1px; top: 8px; bottom: 8px; width: 3px; background: #f59a23; }
-      .intern-sidebar__nav a span, .intern-header__logout span { width: 22px; color: #f59a23; font-size: 1.1rem; text-align: center; }
+      .intern-sidebar__nav a span, .intern-header__logout span, .intern-header__login span { width: 22px; color: #f59a23; font-size: 1.1rem; text-align: center; }
       #intern-main { min-width: 0; }
     .intern-sidebar__expert { display: grid; gap: 7px; margin-top: 12px; padding: 12px; border-top: 1px solid #d9dde1; }
     .intern-sidebar__expert[hidden] { display: none; }
     .intern-sidebar__expert label { display: grid; gap: 3px; color: #263746; }
     .intern-sidebar__expert label small { color: #6c7e8e; font-weight: 400; }
     .intern-sidebar__expert select { width: 100%; min-width: 0; padding: 8px 9px; border: 1px solid #c7ccd1; border-radius: 3px; background: #fff; color: #263746; font: inherit; }
-      .intern-header__logout {
+      .intern-header__logout,
+      .intern-header__login {
         appearance: none;
         display: flex;
         align-items: center;
@@ -64,10 +65,16 @@ const isActive = (href: string) => currentPath.startsWith(href);
         font: inherit;
         font-weight: 800;
         cursor: pointer;
+        text-decoration: none;
+      }
+      .intern-header__logout {
         margin-top: 18px;
       }
+      .intern-header__login { margin-top: 8px; }
       .intern-header__logout:hover,
-      .intern-header__logout:focus-visible { background: #e7e9eb; }
+      .intern-header__logout:focus-visible,
+      .intern-header__login:hover,
+      .intern-header__login:focus-visible { background: #e7e9eb; }
       .intern-header__logout:disabled { cursor: wait; opacity: .7; }
       @media (max-width: 900px) {
         .intern-portal-shell { grid-template-columns: 1fr; }
@@ -102,6 +109,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
           <slot name="sidebar-extra" />
         </nav>
         <button class="intern-header__logout" id="intern-logout" type="button"><span>↪</span>Abmelden</button>
+        <a class="intern-header__login" href="/intern/login/"><span>↩</span>Anmelden</a>
       </aside>
       <main id="intern-main"><slot /></main>
     </div>

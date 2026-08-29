@@ -3,6 +3,7 @@ import { mapClaim, safeFileName } from './import-utils.js';
 
 const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
 const PLANNING_URL = 'https://web.claimsforce.com/planning?bucket=WITH_FUTURE_APPOINTMENT#with-future-appointment';
+const CLAIMS_ORIGINS = ['https://web.claimsforce.com', 'https://claimsforce.eu.auth0.com'];
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const authHeaders = token => ({ Authorization: `Bearer ${token}`, Accept: 'application/json' });
 let runningImport = null;
@@ -63,6 +64,20 @@ async function waitTab(tabId, timeout = 30000) {
     await sleep(300);
   }
   throw new Error('ClaimsForce hat nicht rechtzeitig geladen.');
+}
+
+async function resetClaimsSession(run, tabId = 0) {
+  await diagnostic(run, 'CF-AUTH-01', 'Vorhandene ClaimsForce-Anmeldung wird für den eindeutigen Profilwechsel vollständig beendet.', { profileSwitch: 'ClaimsForce und Auth0 zurücksetzen' });
+  await chrome.storage.session.remove(['claimsToken', 'claimsTokenProfile', 'claimsLoggedProfile']);
+  await chrome.storage.local.remove(['claimsLoggedProfile']);
+  await chrome.browsingData.remove(
+    { origins: CLAIMS_ORIGINS },
+    { cookies: true, cacheStorage: true, indexedDB: true, localStorage: true, serviceWorkers: true }
+  );
+  if (tabId) {
+    await chrome.tabs.update(tabId, { url: 'https://web.claimsforce.com/login' });
+    await waitTab(tabId);
+  }
 }
 
 async function claimsTab(profile, run, credential) {
@@ -193,30 +208,10 @@ async function uploadBuffer(portalTabId, folderId, name, mime, modified, buffer)
 
 async function runImport(run) {
   const { portalTabId, profile } = run;
-  const previous = await chrome.storage.session.get(['activeProfile', 'claimsLoggedProfile', 'claimsToken', 'claimsTokenProfile']);
   await chrome.storage.session.set({ activeProfile: profile });
   if (profile !== 'self') {
-    const currentProfile = previous.claimsLoggedProfile || '';
-    const [openSession] = await chrome.tabs.query({ url: 'https://web.claimsforce.com/*' });
-    const openRoute = safeRoute(openSession?.url || '');
-    if (!currentProfile && profile === 'christian' && openSession && !['/login', '/logout'].includes(openRoute)) {
-      await chrome.storage.session.set({ ...(previous.claimsToken ? { claimsToken: previous.claimsToken, claimsTokenProfile: profile } : {}), claimsLoggedProfile: profile });
-      await diagnostic(run, 'CF-AUTH-01', 'Vorhandene ClaimsForce-Sitzung wurde dem angeforderten Profil zugeordnet.', { profileSwitch: 'bestehende Sitzung gebunden' });
-    } else if (currentProfile !== profile) {
-      const open = openSession;
-      await diagnostic(run, 'CF-AUTH-01', 'ClaimsForce-Profil wird eindeutig neu angemeldet.', { profileSwitch: currentProfile ? 'wechsel' : 'unbekannte Sitzung' });
-      await chrome.storage.session.remove(['claimsToken', 'claimsTokenProfile', 'claimsLoggedProfile']);
-      if (open?.id) {
-        await chrome.tabs.update(open.id, { url: 'https://web.claimsforce.com/logout' });
-        await waitTab(open.id);
-        await sleep(900);
-        const loggedOut = await chrome.tabs.get(open.id);
-        if (safeRoute(loggedOut.url) === '/logout') {
-          await chrome.tabs.update(open.id, { url: 'https://web.claimsforce.com/login' });
-          await waitTab(open.id);
-        }
-      }
-    }
+    const [openSession] = await chrome.tabs.query({ url: ['https://web.claimsforce.com/*', 'https://claimsforce.eu.auth0.com/*'] });
+    await resetClaimsSession(run, openSession?.id || 0);
   }
   const credential = await credentialsFor(profile);
   await diagnostic(run, 'CF-CRED-01', credential ? 'Zugangsdatenquelle ist verfügbar.' : 'Für das Profil ist keine Zugangsdatenquelle verfügbar.', { source: credential?.source || 'keine' });
@@ -311,7 +306,10 @@ async function runImport(run) {
     await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length} wurde vollständig im Portal verarbeitet.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
   }
   await progress(portalTabId, `${claims.length} Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
-  if (profile !== 'self') await chrome.storage.session.set({ claimsLoggedProfile: profile });
+  if (profile !== 'self') {
+    await chrome.storage.session.set({ claimsLoggedProfile: profile });
+    await chrome.storage.local.set({ claimsLoggedProfile: profile });
+  }
   return { claims: claims.length, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
 }
 
