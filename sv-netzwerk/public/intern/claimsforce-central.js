@@ -75,6 +75,7 @@
   async function poll(){
     if(!context.claims_agent||!bridge||busy){setTimeout(poll,3000);return}
     try{
+      await post('schedule');
       const active=await post('active');
       if(active.job)show(`Import ${active.job.id} ist noch als laufend markiert und wird nicht automatisch neu gestartet.`,true);
       else{

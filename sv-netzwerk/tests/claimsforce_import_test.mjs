@@ -63,7 +63,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes("context.backoffice?`Import für"), 'Susannes ausgewählter Sachverständiger wird angezeigt');
 assert(portal.includes("button.dataset.claimsProfile=context.backoffice?key:(context.claims_profile||'self')"), 'Portal verwendet für Susanne und den angemeldeten Sachverständigen das richtige gespeicherte Profil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20260829-1'), 'Portal lädt den manuellen ClaimsForce-Modus ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20260829-2'), 'Portal lädt die abgesicherte Werktagsautomatik ohne alten Browsercache');
 
 const bridge = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/portal-bridge.js'), 'utf8');
 assert(bridge.includes('mergeBlank(existing?.meta || {}, message.mapped)'), 'Import ergänzt bestehende Falldaten nur in leeren Feldern');
@@ -105,13 +105,17 @@ const queue = fs.readFileSync(path.join(root, 'public/intern/api/claimsforce-que
 assert(queue.includes('claimsforce_import_jobs') && queue.includes("$action==='claim'"), 'Zentrale serverseitige Importwarteschlange fehlt');
 assert(queue.includes('heartbeat_at') && queue.includes("$action==='heartbeat'") && queue.includes("$action==='active'"), 'Verwaiste Browserimporte müssen per Heartbeat erkannt werden');
 assert(queue.includes("phase='CF-FAIL-STALE'") && queue.includes('cqFailStaleRuns()'), 'Unterbrochene Importe müssen sicher fehlschlagen statt erneut eingeplant zu werden');
-assert(queue.includes("phase='CF-FAIL-EXPIRED'") && queue.includes('INTERVAL 10 MINUTE'), 'Alte Warteschlangenaufträge dürfen nach der Umstellung nicht mehr automatisch anlaufen');
 assert(queue.includes("phase='CF-FAIL-REPLACED'") && queue.includes("status IN ('queued','running')"), 'Ein neuer manueller Import muss ältere eigene Profilaufträge eindeutig ersetzen');
+assert(queue.includes("$action==='schedule'") && queue.includes("new DateTimeZone('Europe/Berlin')"), 'Werktagsautomatik muss serverseitig in Berliner Zeit geplant werden');
+assert(queue.includes('$weekday>5||$clock<230||$clock>=800'), 'Automatik darf nur Montag bis Freitag ab 02:30 Uhr bis vor Arbeitsbeginn eingeplant werden');
+assert(queue.includes('uq_claims_schedule_key') && queue.includes('INSERT IGNORE INTO claimsforce_import_jobs'), 'Pro Arbeitstag und Profil darf höchstens ein Automatikauftrag entstehen');
+assert(queue.includes("$profile='christian'") && queue.includes("'CF-AUTO-QUEUED'"), 'Werktagsautomatik importiert genau Christians ClaimsForce-Profil');
 assert(queue.includes("$action==='mine'") && queue.includes('WHERE requested_by=:u ORDER BY id DESC LIMIT 20'), 'Eigene Warteschlangenläufe müssen nach einem Portal-Neuladen wiedergefunden werden');
 const central = fs.readFileSync(path.join(root, 'public/intern/claimsforce-central.js'), 'utf8');
 assert(central.includes("action=status&id=") && central.includes("SVNET_CLAIMS_IMPORT_START"), 'Portal kann zentrale Importe starten und verfolgen');
 assert(central.includes("job.profile==='jens'?'christian':job.profile"), 'Ehemalige Jens-Maurer-Fälle werden ausschließlich Christians Portalordner zugeordnet');
-assert(!central.includes('automaticImport') && !central.includes("['christian','jens','marc','holger']"), 'Automatische ClaimsForce-Importe müssen vollständig abgeschaltet sein');
+assert(!central.includes('automaticImport') && !central.includes("['christian','jens','marc','holger']"), 'Unsichere browserlokale Mehrprofil-Automatik muss abgeschaltet bleiben');
+assert(central.includes("await post('schedule')"), 'Zentrale Station muss den idempotenten serverseitigen Werktagsauftrag abfragen');
 assert(central.includes("post('enqueue',{profile})") && !central.includes("profile==='christian'?['christian','jens']:[profile]"), 'Ein manueller Klick darf genau einen Profilimport einreihen');
 assert(central.includes("post('active')") && central.includes("post('heartbeat'"), 'Zentrale Station zeigt einen aktiven manuellen Import weiter an');
 assert(!central.includes('if(active.job)await launch'), 'Ein vorhandener Serverlauf darf nach einem Portal-Neuladen nicht automatisch neu gestartet werden');

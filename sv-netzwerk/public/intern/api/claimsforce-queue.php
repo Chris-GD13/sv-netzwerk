@@ -14,7 +14,8 @@ function cqEnsureColumns():void{
         'phase'=>'VARCHAR(40) NULL',
         'progress_current'=>'INT UNSIGNED NOT NULL DEFAULT 0',
         'progress_total'=>'INT UNSIGNED NOT NULL DEFAULT 0',
-        'diagnostic_json'=>'TEXT NULL'
+        'diagnostic_json'=>'TEXT NULL',
+        'schedule_key'=>'VARCHAR(80) NULL'
     ];
     $check=db()->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=:table AND COLUMN_NAME=:column');
     foreach($columns as$name=>$definition){
@@ -25,6 +26,15 @@ function cqEnsureColumns():void{
                 $check->execute([':table'=>'claimsforce_import_jobs',':column'=>$name]);
                 if((int)$check->fetchColumn()===0)throw$e;
             }
+        }
+    }
+    $index=db()->prepare('SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=:table AND INDEX_NAME=:index');
+    $index->execute([':table'=>'claimsforce_import_jobs',':index'=>'uq_claims_schedule_key']);
+    if((int)$index->fetchColumn()===0){
+        try{db()->exec('ALTER TABLE claimsforce_import_jobs ADD UNIQUE INDEX uq_claims_schedule_key(schedule_key)');}
+        catch(PDOException$e){
+            $index->execute([':table'=>'claimsforce_import_jobs',':index'=>'uq_claims_schedule_key']);
+            if((int)$index->fetchColumn()===0)throw$e;
         }
     }
 }
@@ -88,6 +98,18 @@ if($action==='mine'){
 }
 if(($user['role']??'')!=='administrator')apiError(403,'Nur die zentrale Importstation darf Aufträge übernehmen.');
 
+if($action==='schedule'){
+    $now=new DateTimeImmutable('now',new DateTimeZone('Europe/Berlin'));
+    $weekday=(int)$now->format('N');
+    $clock=(int)$now->format('Hi');
+    if($weekday>5||$clock<230||$clock>=800)apiJson(['ok'=>true,'scheduled'=>false,'reason'=>'outside-window']);
+    $profile='christian';
+    $scheduleKey='claims-auto-'.$now->format('Y-m-d').'-'.$profile;
+    $s=db()->prepare("INSERT IGNORE INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,schedule_key,created_at) VALUES(:p,'queued',:u,'Automatischer Werktagsimport wartet auf die zentrale Importstation.','CF-AUTO-QUEUED',:k,NOW())");
+    $s->execute([':p'=>$profile,':u'=>'system:claimsforce',':k'=>$scheduleKey]);
+    apiJson(['ok'=>true,'scheduled'=>$s->rowCount()===1,'schedule_key'=>$scheduleKey]);
+}
+
 if($action==='active'){
     cqFailStaleRuns();
     $row=db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='running' ORDER BY heartbeat_at DESC,id LIMIT 1")->fetch(PDO::FETCH_ASSOC);
@@ -95,7 +117,6 @@ if($action==='active'){
 }
 if($action==='claim'){
     cqFailStaleRuns();
-    db()->exec("UPDATE claimsforce_import_jobs SET status='failed',message='Veralteter Warteschlangenauftrag wurde nicht automatisch ausgeführt.',phase='CF-FAIL-EXPIRED',heartbeat_at=NOW(),finished_at=NOW() WHERE status='queued' AND created_at<DATE_SUB(NOW(),INTERVAL 10 MINUTE)");
     db()->beginTransaction();
     $row=db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='queued' ORDER BY created_at,id LIMIT 1 FOR UPDATE")->fetch(PDO::FETCH_ASSOC);
     if(!$row){db()->commit();apiJson(['ok'=>true,'job'=>null]);}
