@@ -59,5 +59,6 @@ assert(generator.includes("$key===\\'rekon_schaden\\'?12000:null"), 'Das Rekon-A
 assert(!transientStatus.includes('ChatGPT arbeitet'), 'Die fehlerhafte unbestimmte Hängeanzeige darf nicht mehr verwendet werden');
 assert(transientStatus.includes('Zum Kostenschutz erfolgt keine weitere automatische Wiederholung'), 'Die Wiederaufnahme muss gegen Mehrfachaufrufe geschützt sein');
 assert(transientStatus.includes("action:'status'"), 'Die Wiederaufnahme muss den tatsächlichen Jobstatus weiter abfragen');
+assert(transientStatus.includes('recoverOnce(false)'), 'Ein unterbrochener Auftrag muss auch nach einem Seitenneuladen wiedergefunden werden');
 
 console.log('Rekon-Schadenbericht: Auswahl, Formularreihenfolge, kostengeschützte Wiederaufnahme und bildlose Word-Ausgabe geprüft.');

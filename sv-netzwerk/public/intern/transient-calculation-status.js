@@ -67,18 +67,18 @@
     }
   }
 
-  async function recoverOnce(){
+  async function recoverOnce(fromVisibleInterruption=true){
     if(recovering)return;
-    const box=interruptedBox(),current=activeCase();
-    if(!box||!current?.folder_id)return;
+    const box=document.getElementById('vf-job'),current=activeCase();
+    if(!box||!current?.folder_id||(fromVisibleInterruption&&!interruptedBox()))return;
     recovering=true;
     box.hidden=false;
     try{
       const latest=await post({action:'latest',folder_id:current.folder_id}),jobId=Number(latest.job_id||0);
       if(!jobId)throw new Error('Kein laufender Auftrag gefunden.');
       const status=await post({action:'status',job_id:jobId}),job=status.job||{};
-      if(job.status==='done'){renderDone(box,job);return}
-      if(job.status==='failed'){renderStopped(box,job.error_text||job.message);return}
+      if(job.status==='done'){if(fromVisibleInterruption)renderDone(box,job);return}
+      if(job.status==='failed'){if(fromVisibleInterruption)renderStopped(box,job.error_text||job.message);return}
       if(job.recoverable){
         if(resumeAttempts()[String(jobId)]){renderStopped(box,'Dieser Auftrag wurde bereits einmal wiederaufgenommen. Zum Kostenschutz erfolgt keine weitere automatische Wiederholung.');return}
         rememberResume(jobId);
@@ -99,6 +99,15 @@
     if(!box)return;
     new MutationObserver(()=>{if(interruptedBox())recoverOnce()}).observe(box,{childList:true,subtree:true,characterData:true});
     if(interruptedBox())recoverOnce();
+    // Nach einem Seitenneuladen ist die sichtbare Statusmeldung verloren, der
+    // serverseitige Auftrag besteht jedoch weiter. Den aktiven Fall kurz
+    // abwarten und ausschließlich laufende oder wiederaufnehmbare Jobs prüfen.
+    let attempts=0;
+    const restore=()=>{
+      if(activeCase()){recoverOnce(false);return}
+      if(++attempts<12)window.setTimeout(restore,500);
+    };
+    window.setTimeout(restore,500);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
