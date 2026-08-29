@@ -77,6 +77,12 @@ async function claimsTab(profile, run, credential) {
     await diagnostic(run, 'CF-AUTH-02', requested?.ok ? 'ClaimsForce-Anmeldung wurde an das Formular übergeben.' : 'ClaimsForce-Anmeldehelfer ist auf der Loginseite nicht erreichbar.', { route: '/login', helper: requested?.ok ? 'bereit' : 'nicht erreichbar' });
   }
   let token = await tokenValue(profile);
+  if (!token && safeRoute(tab.url) !== '/login') {
+    await diagnostic(run, 'CF-AUTH-02', 'Bestehende ClaimsForce-Sitzung wird einmal neu geladen, damit das Sitzungstoken erneut übernommen werden kann.', { route: safeRoute(tab.url), recovery: 'reload' });
+    await chrome.tabs.reload(tab.id);
+    tab = await waitTab(tab.id);
+    token = await tokenValue(profile);
+  }
   if (!token) {
     token = await waitForToken(profile);
   }
