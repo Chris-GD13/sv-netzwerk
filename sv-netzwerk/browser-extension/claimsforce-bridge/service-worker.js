@@ -120,8 +120,8 @@ async function requestJson(url, token, optional = false, timeout = 20000) {
   } finally { clearTimeout(timer); }
 }
 
-async function portal(tabId, message) {
-  const response = await Promise.race([chrome.tabs.sendMessage(tabId, message), sleep(30000).then(() => ({ ok: false, error: 'Das SV-Netzwerk hat innerhalb von 30 Sekunden nicht geantwortet.' }))]);
+async function portal(tabId, message, timeout = 30000) {
+  const response = await Promise.race([chrome.tabs.sendMessage(tabId, message), sleep(timeout).then(() => ({ ok: false, error: `Das SV-Netzwerk hat innerhalb von ${Math.round(timeout / 1000)} Sekunden nicht geantwortet.` }))]);
   if (!response?.ok) throw new Error(response?.error || 'Das SV-Netzwerk hat den Import nicht angenommen.');
   return response;
 }
@@ -159,7 +159,7 @@ async function uploadBuffer(portalTabId, folderId, name, mime, modified, buffer)
     for (let index = 0; index < chunk.length; index += 0x8000) binary += String.fromCharCode(...chunk.subarray(index, index + 0x8000));
     await portal(portalTabId, { type: 'PORTAL_UPLOAD_CHUNK', uploadId, chunk: btoa(binary) });
   }
-  return portal(portalTabId, { type: 'PORTAL_UPLOAD_FINISH', uploadId });
+  return portal(portalTabId, { type: 'PORTAL_UPLOAD_FINISH', uploadId }, 180000);
 }
 
 async function runImport(run) {
@@ -208,7 +208,8 @@ async function runImport(run) {
   try { config = await (await fetch('https://web.claimsforce.com/config', { signal: configController.signal })).json(); }
   catch (error) { throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Konfiguration hat das Zeitlimit überschritten.' : 'ClaimsForce-Konfiguration konnte nicht geladen werden.'); }
   finally { clearTimeout(configTimer); }
-  let filesDone = 0, messagesDone = 0, appointmentsDone = 0;
+  let filesDone = 0, messagesDone = 0, appointmentsDone = 0, documentsFailed = 0;
+  const warnings = [];
   for (let index = 0; index < claims.length; index++) {
     const item = claims[index], id = item.id;
     await diagnostic(run, 'CF-CASE-FETCH', `Auftrag ${index + 1}/${claims.length}: Falldaten werden geladen.`, { current: index, total: claims.length, claimIndex: index + 1 });
@@ -242,8 +243,14 @@ async function runImport(run) {
       catch (error) { throw new Error(error?.name === 'AbortError' ? `Datei „${name}“ hat das Zeitlimit überschritten.` : `Datei „${name}“ konnte nicht geladen werden.`); }
       finally { clearTimeout(timer); }
       if (!response.ok) throw new Error(`Datei „${name}“ konnte nicht geladen werden (${response.status}).`);
-      await uploadBuffer(portalTabId, folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, fileBuffer);
-      filesDone++;
+      try {
+        await uploadBuffer(portalTabId, folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, fileBuffer);
+        filesDone++;
+      } catch (error) {
+        documentsFailed++;
+        warnings.push(`${mapped.schaden_nr || id}: ${name} – ${String(error?.message || error)}`.slice(0, 300));
+        await diagnostic(run, 'CF-FILE-WARN', `Datei „${name}“ wurde übersprungen; der nächste Auftrag wird weiter verarbeitet.`, { current: index, total: claims.length, claimIndex: index + 1, documentsFailed });
+      }
     }
     const messages = unwrap(rawMessages, 'messages');
     for (const message of Array.isArray(messages) ? messages : []) {
@@ -252,8 +259,13 @@ async function runImport(run) {
       const stamp = String(record?.sentAt || record?.createdAt || '').slice(0, 10) || 'ohne-Datum';
       const subject = safeFileName(record?.subject || record?.payload?.subject || record?.id, 'Nachricht');
       const bytes = new TextEncoder().encode(JSON.stringify(record, null, 2));
-      await uploadBuffer(portalTabId, folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(record?.updatedAt || record?.createdAt || '') || 0, bytes.buffer);
-      messagesDone++;
+      try {
+        await uploadBuffer(portalTabId, folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(record?.updatedAt || record?.createdAt || '') || 0, bytes.buffer);
+        messagesDone++;
+      } catch (error) {
+        documentsFailed++;
+        warnings.push(`${mapped.schaden_nr || id}: Nachricht ${subject} – ${String(error?.message || error)}`.slice(0, 300));
+      }
     }
     for (const appointment of Array.isArray(appointments) ? appointments : []) {
       if (!appointment?.startDate) continue;
@@ -262,9 +274,9 @@ async function runImport(run) {
     }
     await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length} wurde vollständig im Portal verarbeitet.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
   }
-  await progress(portalTabId, `${claims.length} Aufträge, ${filesDone} Dateien, ${messagesDone} Nachrichten und ${appointmentsDone} Termine eingelesen.`, claims.length, claims.length);
+  await progress(portalTabId, `${claims.length} Aufträge, ${filesDone} Dateien, ${messagesDone} Nachrichten und ${appointmentsDone} Termine eingelesen${documentsFailed ? `; ${documentsFailed} Dokumente werden beim nächsten Lauf erneut versucht` : ''}.`, claims.length, claims.length);
   if (profile !== 'self') await chrome.storage.session.set({ claimsLoggedProfile: profile });
-  return { claims: claims.length, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
+  return { claims: claims.length, files: filesDone, messages: messagesDone, appointments: appointmentsDone, documentsFailed, warnings: warnings.slice(0, 20) };
 }
 
 async function startImport(sender, message) {
