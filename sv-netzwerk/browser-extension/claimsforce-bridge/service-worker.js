@@ -139,6 +139,7 @@ async function portalOperation(tabId, message, timeout = 60000) {
     const status = await portal(tabId, { type: 'PORTAL_OPERATION_STATUS', operationId });
     if (status.operation?.status === 'done') return status.operation.result;
     if (status.operation?.status === 'failed') throw new Error(status.operation.error || 'Portal-Falloperation fehlgeschlagen.');
+    if (status.operation?.status === 'missing') throw new Error('Die Portal-Falloperation wurde unterbrochen. Bitte den Import manuell erneut starten.');
     await sleep(500);
   }
   throw new Error('Das SV-Netzwerk hat die Falloperation nicht rechtzeitig abgeschlossen.');
@@ -318,7 +319,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'GET_RUNTIME_STATUS') {
     Promise.all([chrome.storage.local.get('claimsActiveRun'), chrome.storage.local.get('claimsImportDiagnostic')]).then(([active, diagnostic]) => {
       const saved = active.claimsActiveRun || null;
-      if (!runningImport && saved?.status === 'running' && Number(saved.portalTabId || 0) > 0) startImport({ tab: { id: Number(saved.portalTabId) } }, saved).catch(() => {});
       sendResponse({ ok: true, active: saved, diagnostic: diagnostic.claimsImportDiagnostic || null });
     });
     return true;

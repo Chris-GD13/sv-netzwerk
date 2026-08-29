@@ -56,10 +56,9 @@
     button.disabled=true;
     try{
       const profile=context.backoffice?(context.selected_expert||'christian'):(context.claims_profile||'christian');
-      const profiles=profile==='christian'?['christian','jens']:[profile];
       userJobs=[];
-      for(const source of profiles)userJobs.push((await post('enqueue',{profile:source})).job.id);
-      show(profile==='christian'?'Importaufträge für Christian und die ehemaligen Jens-Maurer-Fälle wurden übergeben.':'Importauftrag wurde an die zentrale Importstation übergeben.');
+      userJobs.push((await post('enqueue',{profile})).job.id);
+      show('Importauftrag wurde an die zentrale Importstation übergeben.');
       watch();
     }catch(e){button.disabled=false;userJobs=[];show(e.message,true)}
   });
@@ -77,7 +76,7 @@
     if(!context.claims_agent||!bridge||busy){setTimeout(poll,3000);return}
     try{
       const active=await post('active');
-      if(active.job)await launch(active.job,true);
+      if(active.job)show(`Import ${active.job.id} ist noch als laufend markiert und wird nicht automatisch neu gestartet.`,true);
       else{
         const claimed=await post('claim');
         if(claimed.job)await launch(claimed.job,false);
@@ -100,8 +99,8 @@
     const d=e.data||{},runtime=d.runtime||{};
     if(d.type==='SVNET_CLAIMS_BRIDGE_READY'){
       bridgeVersion=String(d.version||'0.0.0');
-      bridge=versionAtLeast(bridgeVersion,'1.3.0');
-      if(!bridge)show(`Browser-Brücke 1.3.0 erforderlich (geladen: ${bridgeVersion}). Bitte die entpackte Erweiterung einmal neu laden.`,true);
+      bridge=versionAtLeast(bridgeVersion,'1.3.3');
+      if(!bridge)show(`Browser-Brücke 1.3.3 erforderlich (geladen: ${bridgeVersion}). Bitte die entpackte Erweiterung einmal neu laden.`,true);
     }
     if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&agentJob){
       const active=d.status?.active||{},diag=d.status?.diagnostic||{};
@@ -125,18 +124,7 @@
     if(d.type==='SVNET_CLAIMS_IMPORT_ERROR')await completeAgent(false,null,d.error);
   });
 
-  async function automaticImport(){
-    if(!context.claims_agent)return;
-    const now=new Date(),day=now.toLocaleDateString('sv-SE',{timeZone:'Europe/Berlin'}),key='svnet-claimsforce-auto-day';
-    if(Number(new Intl.DateTimeFormat('de-DE',{timeZone:'Europe/Berlin',hour:'2-digit',hour12:false}).format(now))!==3||localStorage.getItem(key)===day)return;
-    localStorage.setItem(key,day);
-    try{
-      for(const profile of['christian','jens','marc','holger'])await post('enqueue',{profile});
-      show('Automatischer 03:00-Uhr-Import für alle ClaimsForce-Zugänge wurde eingeplant.');
-    }catch(e){localStorage.removeItem(key);show('Automatischer ClaimsForce-Import: '+e.message,true)}
-  }
-
   setInterval(heartbeat,20000);
   setInterval(()=>window.postMessage({type:'SVNET_CLAIMS_RUNTIME_PING'},location.origin),5000);
-  json('/intern/api/google-drive-sync.php?action=status').then(async d=>{context=d;window.postMessage({type:'SVNET_CLAIMS_BRIDGE_PING'},location.origin);await resumeWatch();automaticImport();setInterval(automaticImport,30000);poll()}).catch(e=>show(e.message,true));
+  json('/intern/api/google-drive-sync.php?action=status').then(async d=>{context=d;window.postMessage({type:'SVNET_CLAIMS_BRIDGE_PING'},location.origin);await resumeWatch();poll()}).catch(e=>show(e.message,true));
 })();

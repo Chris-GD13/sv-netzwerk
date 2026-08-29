@@ -147,7 +147,6 @@ function connectKeepalive() {
       keepalivePort = null;
       clearInterval(keepaliveTimer);
       keepaliveTimer = 0;
-      if (activeRequest) setTimeout(() => { connectKeepalive(); chrome.runtime.sendMessage(activeRequest).catch(() => {}); }, 1000);
     });
     keepaliveTimer = setInterval(() => { try { keepalivePort?.postMessage({ type: 'KEEPALIVE', at: Date.now() }); } catch {} }, 15000);
   } catch {}

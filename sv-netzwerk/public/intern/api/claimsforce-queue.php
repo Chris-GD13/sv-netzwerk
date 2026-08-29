@@ -52,6 +52,9 @@ function cqPhase(mixed$value):string{
     $phase=preg_replace('/[^A-Z0-9_-]/','',strtoupper((string)$value))?:'CF-RUN';
     return mb_substr($phase,0,40);
 }
+function cqFailStaleRuns():void{
+    db()->exec("UPDATE claimsforce_import_jobs SET status='failed',message='Import wurde unterbrochen und aus Sicherheitsgründen nicht automatisch neu gestartet.',phase='CF-FAIL-STALE',heartbeat_at=NOW(),finished_at=NOW() WHERE status='running' AND COALESCE(heartbeat_at,started_at,created_at)<DATE_SUB(NOW(),INTERVAL 2 MINUTE)");
+}
 
 $action=(string)($_GET['action']??'status');
 $body=$_SERVER['REQUEST_METHOD']==='POST'?requestBody():[];
@@ -59,6 +62,8 @@ $body=$_SERVER['REQUEST_METHOD']==='POST'?requestBody():[];
 if($action==='enqueue'){
     $profile=cqProfile($user);
     if(($user['role']??'')==='administrator'&&in_array((string)($body['profile']??''),['christian','holger','marc','jens'],true))$profile=(string)$body['profile'];
+    $stop=db()->prepare("UPDATE claimsforce_import_jobs SET status='failed',message='Durch einen neuen manuellen Import ersetzt.',phase='CF-FAIL-REPLACED',heartbeat_at=NOW(),finished_at=NOW() WHERE requested_by=:u AND profile=:p AND status IN ('queued','running')");
+    $stop->execute([':p'=>$profile,':u'=>(string)($user['email']??'')]);
     $s=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,created_at) VALUES(:p,'queued',:u,'Import wartet auf die zentrale Importstation.','CF-QUEUED',NOW())");
     $s->execute([':p'=>$profile,':u'=>(string)($user['email']??'')]);
     apiJson(['ok'=>true,'job'=>cqRow((int)db()->lastInsertId())]);
@@ -84,12 +89,13 @@ if($action==='mine'){
 if(($user['role']??'')!=='administrator')apiError(403,'Nur die zentrale Importstation darf Aufträge übernehmen.');
 
 if($action==='active'){
-    db()->exec("UPDATE claimsforce_import_jobs SET status='queued',message='Unterbrochener Import wird erneut eingeplant.',phase='CF-RECOVER',started_at=NULL,heartbeat_at=NULL WHERE status='running' AND COALESCE(heartbeat_at,started_at,created_at)<DATE_SUB(NOW(),INTERVAL 2 MINUTE)");
+    cqFailStaleRuns();
     $row=db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='running' ORDER BY heartbeat_at DESC,id LIMIT 1")->fetch(PDO::FETCH_ASSOC);
     apiJson(['ok'=>true,'job'=>$row?cqRow((int)$row['id']):null]);
 }
 if($action==='claim'){
-    db()->exec("UPDATE claimsforce_import_jobs SET status='queued',message='Unterbrochener Import wird erneut eingeplant.',phase='CF-RECOVER',started_at=NULL,heartbeat_at=NULL WHERE status='running' AND COALESCE(heartbeat_at,started_at,created_at)<DATE_SUB(NOW(),INTERVAL 2 MINUTE)");
+    cqFailStaleRuns();
+    db()->exec("UPDATE claimsforce_import_jobs SET status='failed',message='Veralteter Warteschlangenauftrag wurde nicht automatisch ausgeführt.',phase='CF-FAIL-EXPIRED',heartbeat_at=NOW(),finished_at=NOW() WHERE status='queued' AND created_at<DATE_SUB(NOW(),INTERVAL 10 MINUTE)");
     db()->beginTransaction();
     $row=db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='queued' ORDER BY created_at,id LIMIT 1 FOR UPDATE")->fetch(PDO::FETCH_ASSOC);
     if(!$row){db()->commit();apiJson(['ok'=>true,'job'=>null]);}
