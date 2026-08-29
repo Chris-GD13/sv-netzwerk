@@ -65,6 +65,9 @@ jobs:
       - name: Astro-Website prüfen und bauen
         run: npm run build
 
+      - name: Fachwissen-SEO prüfen (eindeutige Slugs, Canonicals, Sitemap)
+        run: node tests/fachwissen_seo_test.mjs
+
       - name: Build-Ausgabe prüfen
         run: |
           test -d dist

@@ -126,7 +126,7 @@ export const library: LibraryItem[] = [
     featured: false,
   },
   {
-    title: 'Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz',
+    title: 'Leitungswasserschäden bei hoher Schadenfrequenz: Rollen, Koordination und Dokumentation',
     description: 'Leitungswasserschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2/',
     category: 'Leitungswasserschäden',
@@ -526,10 +526,10 @@ export const library: LibraryItem[] = [
   {
     title: 'Lichtbogen an einer LED-Lichtleiste',
     description: 'Technische Einordnung eines elektrischen Entstehungsbrandes mit Fokus auf Brandursache, Spurenbild und Schadenumfang.',
-    href: '/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/',
+    href: '/fachwissen/lichtbogen-led-lichtleiste-brandschaden/',
     category: 'Brandschaden',
     tags: ['Elektrotechnik', 'Brandursache', 'Lichtbogen'],
-    date: '2026-07-09',
+    date: '2026-07-14',
     type: 'article',
     featured: true,
   },
@@ -581,7 +581,7 @@ export const library: LibraryItem[] = [
   {
     title: 'Fenster, Türen und Fassaden technisch beurteilen',
     description: 'Bewertung typischer Schadenbilder an Gebäudehülle, Anschlüssen, Beschlägen und Verglasungen.',
-    href: '/fachwissen/wasserschaden-rueckbau-technische-abgrenzung/',
+    href: '/fachwissen/fenster-tueren-fassaden/',
     category: 'Gebäudehülle',
     tags: ['Fenster', 'Fassade', 'Bautechnik'],
     date: '2026-07-03',

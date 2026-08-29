@@ -12,7 +12,6 @@ export default defineConfig({
         !page.includes('/praxisfaelle') &&
         !page.includes('/fachwissen/tag/') &&
         !page.includes('/fachwissen/kategorie/') &&
-        !page.includes('/fachwissen/seite/') &&
         !page.endsWith('/fachwissen/az/') &&
         !page.includes('/svos/fachwissen') &&
         !page.endsWith('/versicherungen/') &&

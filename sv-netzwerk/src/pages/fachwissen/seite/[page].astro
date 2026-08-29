@@ -17,9 +17,14 @@ const { page, totalPages } = Astro.props;
 const start = (page - 1) * PAGE_SIZE;
 const pageItems = sortedLibrary.slice(start, start + PAGE_SIZE);
 ---
-<BaseLayout title={`Fachartikel – Seite ${page} | SV-Netzwerk`} description={`Weitere Fachbeiträge aus dem SV-Netzwerk Fachartikel-Bereich, Seite ${page}.`} noindex>
+<BaseLayout
+  title={`Fachartikel – Seite ${page} von ${totalPages} | SV-Netzwerk`}
+  description={`Fachbeiträge des SV-Netzwerks zu Leitungswasser-, Brand-, Feuchte-, Gebäude- und Komplexschäden – Seite ${page} von ${totalPages}.`}
+  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Fachartikel', href: '/fachwissen/' }, { label: `Seite ${page}` }]}
+>
   <section class="sv-section">
     <div class="sv-container">
+      <h1>{`Fachartikel – Seite ${page} von ${totalPages}`}</h1>
       <LibraryFilters />
       <LibraryGrid items={pageItems} />
       <Pagination currentPage={page} totalPages={totalPages} />
