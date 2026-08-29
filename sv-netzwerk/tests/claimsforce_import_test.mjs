@@ -46,7 +46,7 @@ assert.equal(safeFileName('KVA: Angebot?.pdf'), 'KVA- Angebot-.pdf');
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, '1.3.7', 'der eindeutige Profilwechsel muss als neue Laufzeitversion erkennbar sein');
+assert.equal(manifest.version, '1.3.8', 'die verzögerte ClaimsForce-Anmeldung muss als neue Laufzeitversion erkennbar sein');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*')));
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://claimsforce.eu.auth0.com/*')));
 assert(manifest.content_scripts.some(entry => entry.js.includes('login-helper.js') && entry.matches.includes('https://*.claimsforce.com/*') && !entry.exclude_matches), 'ClaimsForce-Anmeldehilfe muss auch auf web.claimsforce.com/login laufen');
@@ -55,7 +55,9 @@ assert(claimsLogin.includes('if (email.value && password.value)') && claimsLogin
 assert(claimsLogin.includes('svnetSubmittedAt'), 'ClaimsForce-Anmeldeformular darf nicht unkontrolliert doppelt abgesendet werden');
 assert(claimsLogin.indexOf("const response = credentials ||") < claimsLogin.indexOf('if (email.value && password.value)'), 'Ausdrücklich gewählte Profilzugänge müssen Chrome-Autofill vor dem Absenden überschreiben');
 assert(claimsLogin.includes("message?.type !== 'FILL_LOGIN'") && claimsLogin.includes('suppliedCredentials'), 'Service Worker muss Zugangsdaten direkt und nur innerhalb der Erweiterung an die Loginseite übergeben können');
-assert(claimsLogin.includes('if (!response?.email || !response?.password)') && claimsLogin.includes('if (email.value && password.value) setTimeout(submit, 250)'), 'Chrome-Autofill wird nur verwendet, wenn keine ausdrücklich gewählten Profilzugänge verfügbar sind');
+assert(claimsLogin.includes('if (!response?.email || !response?.password)') && claimsLogin.includes('if (email.value && password.value) submitWhenReady()'), 'Chrome-Autofill wird nur verwendet, wenn keine ausdrücklich gewählten Profilzugänge verfügbar sind');
+assert(claimsLogin.includes("button && !button.disabled") && claimsLogin.includes('attempts < 30') && claimsLogin.includes('form.requestSubmit?.()'), 'Die Brücke wartet auf den verzögert aktivierten ClaimsForce-Anmeldebutton und besitzt einen Formular-Fallback');
+assert(claimsLogin.includes('node._valueTracker?.setValue(previous)') && claimsLogin.includes("new InputEvent('input'"), 'ClaimsForce-React muss die eingesetzten Profilzugänge als echte Eingabe erkennen');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/login/*') && entry.js.includes('portal-login-helper.js')), 'Automatische Prüfportal-Anmeldung ist in der Brücke registriert');
 assert(manifest.content_scripts.some(entry => entry.js.includes('portal-login-helper.js') && entry.run_at === 'document_idle'), 'Portal-Anmeldehilfe startet erst am vorhandenen Loginformular');
 
@@ -68,7 +70,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes("context.backoffice?`Import für"), 'Susannes ausgewählter Sachverständiger wird angezeigt');
 assert(portal.includes("button.dataset.claimsProfile=context.backoffice?key:(context.claims_profile||'self')"), 'Portal verwendet für Susanne und den angemeldeten Sachverständigen das richtige gespeicherte Profil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20260829-6'), 'Portal lädt die reparierte Profilwechsellogik ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20260829-7'), 'Portal lädt die verzögerte Anmeldelogik ohne alten Browsercache');
 assert(portal.includes('<option value="jens">Ehem. Jens Maurer → Christian Wächter</option>'), 'Jens Maurer ist im Portal als eigenes ClaimsForce-Profil auswählbar');
 
 const bridge = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/portal-bridge.js'), 'utf8');
@@ -94,8 +96,8 @@ assert(claimsMain.includes('inspectTokenCache') && claimsMain.includes('inspectS
 const vault = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/vault.js'), 'utf8');
 assert(vault.includes('credentials_${String(profile'), 'Zugänge werden getrennt je Sachverständigen-Profil gespeichert');
 const options = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.js'), 'utf8');
-assert(options.includes("OPTIONS_CODE_VERSION = '1.3.7'"), 'Die Optionsseite lädt die aktualisierte entpackte Erweiterung genau einmal neu');
-assert(options.includes("OPTIONS_CODE_VERSION = '1.3.7'") && options.includes('chrome.runtime.reload()'), 'Neue entpackte Brückendateien aktivieren ihren Service Worker einmalig selbst');
+assert(options.includes("OPTIONS_CODE_VERSION = '1.3.8'"), 'Die Optionsseite lädt die aktualisierte entpackte Erweiterung genau einmal neu');
+assert(options.includes("OPTIONS_CODE_VERSION = '1.3.8'") && options.includes('chrome.runtime.reload()'), 'Neue entpackte Brückendateien aktivieren ihren Service Worker einmalig selbst');
 assert(options.includes("password.value || currentCredentials?.password"), 'Ein bereits gespeichertes Kennwort darf durch erneutes Speichern nicht geleert werden');
 assert(options.includes('Kennwort ist verschlüsselt gespeichert'), 'Gespeichertes Kennwort muss ohne Klartext sichtbar bestätigt werden');
 assert(options.includes('savePortalCredentials') && options.includes('automatische Prüfportal-Anmeldung'), 'Prüfportal-Zugang kann einmalig verschlüsselt gespeichert werden');
@@ -135,7 +137,7 @@ assert(central.includes('setTimeout(()=>show(text,failed),1000)'), 'Terminaler I
 assert(central.includes('data-svnet-claims-jobs') && central.includes("`${job.id}|${job.profile}|${job.status}|${job.phase"), 'Letzte Serverergebnisse sind unabhängig von UI-Listenern geheimnisfrei im DOM prüfbar');
 assert(central.includes('data-svnet-claims-results') && central.includes('resultOf'), 'Der Live-Nachweis enthält sichere Fall-, Datei-, Nachrichten- und Terminzahlen');
 assert(central.includes('SVNET_CLAIMS_RUNTIME_STATUS') && central.includes('SVNET_CLAIMS_RUNTIME_PING'), 'Portal zeigt den persistenten Browserlauf auch nach einem Worker-Neustart an');
-assert(central.includes('Browser-Brücke 1.3.7 erforderlich') && central.includes("versionAtLeast(bridgeVersion,'1.3.7')"), 'Nur die Brücke mit eindeutigem Profilwechsel darf neue Warteschlangenläufe starten');
+assert(central.includes('Browser-Brücke 1.3.8 erforderlich') && central.includes("versionAtLeast(bridgeVersion,'1.3.8')"), 'Nur die Brücke mit bestätigter Formularanmeldung darf neue Warteschlangenläufe starten');
 assert(central.includes('context.claims_agent&&!bridge') && central.includes('Diese zentrale Importstation ist nicht bereit'), 'Eine veraltete zentrale Brücke darf keinen weiteren dauerhaft wartenden Importauftrag erzeugen');
 const optionsHtml = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.html'), 'utf8');
 assert(optionsHtml.includes('Ehem. Jens Maurer → Christian Wächter'), 'Jens-Zugang ist in der verschlüsselten Zugangsverwaltung auswählbar');

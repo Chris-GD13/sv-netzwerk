@@ -1,26 +1,53 @@
 let suppliedCredentials = null;
+let submitLoop = 0;
+
+function submitWhenReady() {
+  if (submitLoop) return;
+  let attempts = 0;
+  const tick = () => {
+    submitLoop = 0;
+    const password = document.querySelector('input[type="password"]');
+    const form = password?.closest('form');
+    const button = form?.querySelector('button[type="submit"]') || [...document.querySelectorAll('button')].find(node => /^Anmelden$/i.test((node.textContent || '').trim()));
+    if (!password || !form) return;
+    const submittedAt = Number(password.dataset.svnetSubmittedAt || 0);
+    const ready = button && !button.disabled && button.getAttribute('aria-disabled') !== 'true';
+    if (Date.now() - submittedAt >= 2500) {
+      if (ready) {
+        password.dataset.svnetSubmittedAt = String(Date.now());
+        button.click();
+      } else if (attempts >= 8) {
+        password.dataset.svnetSubmittedAt = String(Date.now());
+        form.requestSubmit?.();
+      }
+    }
+    attempts++;
+    if (attempts < 30 && document.contains(password)) submitLoop = setTimeout(tick, 350);
+  };
+  submitLoop = setTimeout(tick, 300);
+}
 
 async function fillLogin(credentials = suppliedCredentials) {
   const email = document.querySelector('input[type="email"],input[name="email"],input[name="username"]');
   const password = document.querySelector('input[type="password"]');
   if (!email || !password) return;
-  const submit = () => {
-    const submittedAt = Number(password.dataset.svnetSubmittedAt || 0);
-    if (Date.now() - submittedAt < 3000) return;
-    password.dataset.svnetSubmittedAt = String(Date.now());
-    const form = password.closest('form');
-    const button = form?.querySelector('button[type="submit"]') || [...document.querySelectorAll('button')].find(node => /^Anmelden$/i.test((node.textContent || '').trim()));
-    if (button) button.click();
-    else form?.requestSubmit?.();
-  };
   const response = credentials || await chrome.runtime.sendMessage({ type: 'GET_CREDENTIALS' }).catch(() => null);
   if (!response?.email || !response?.password) {
-    if (email.value && password.value) setTimeout(submit, 250);
+    if (email.value && password.value) submitWhenReady();
     return;
   }
-  const set = (node, value) => { const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set; setter?.call(node, value); node.dispatchEvent(new Event('input', { bubbles: true })); node.dispatchEvent(new Event('change', { bubbles: true })); };
+  const set = (node, value) => {
+    const previous = node.value;
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+    node.focus();
+    setter?.call(node, value);
+    node._valueTracker?.setValue(previous);
+    node.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: value }));
+    node.dispatchEvent(new Event('change', { bubbles: true }));
+    node.blur();
+  };
   set(email, response.email); set(password, response.password);
-  setTimeout(submit, 250);
+  submitWhenReady();
 }
 fillLogin();
 new MutationObserver(fillLogin).observe(document.documentElement, { childList: true, subtree: true });
