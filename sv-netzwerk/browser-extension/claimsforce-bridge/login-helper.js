@@ -9,14 +9,14 @@ function submitWhenReady() {
     const password = document.querySelector('input[type="password"]');
     const form = password?.closest('form');
     const button = form?.querySelector('button[type="submit"]') || [...document.querySelectorAll('button')].find(node => /^Anmelden$/i.test((node.textContent || '').trim()));
-    if (!password || !form) return;
+    if (!password || !button) return;
     const submittedAt = Number(password.dataset.svnetSubmittedAt || 0);
     const ready = button && !button.disabled && button.getAttribute('aria-disabled') !== 'true';
     if (Date.now() - submittedAt >= 2500) {
       if (ready) {
         password.dataset.svnetSubmittedAt = String(Date.now());
         button.click();
-      } else if (attempts >= 8) {
+      } else if (attempts >= 8 && form) {
         password.dataset.svnetSubmittedAt = String(Date.now());
         form.requestSubmit?.();
       }
@@ -28,13 +28,13 @@ function submitWhenReady() {
 }
 
 async function fillLogin(credentials = suppliedCredentials) {
-  const email = document.querySelector('input[type="email"],input[name="email"],input[name="username"]');
+  const email = document.querySelector('input[type="email"],input[inputmode="email"],input[name="email"],input[name="username"],input[autocomplete="username"]');
   const password = document.querySelector('input[type="password"]');
-  if (!email || !password) return;
+  if (!email || !password) return false;
   const response = credentials || await chrome.runtime.sendMessage({ type: 'GET_CREDENTIALS' }).catch(() => null);
   if (!response?.email || !response?.password) {
     if (email.value && password.value) submitWhenReady();
-    return;
+    return !!(email.value && password.value);
   }
   const set = (node, value) => {
     const previous = node.value;
@@ -48,12 +48,14 @@ async function fillLogin(credentials = suppliedCredentials) {
   };
   set(email, response.email); set(password, response.password);
   submitWhenReady();
+  return true;
 }
 fillLogin();
-new MutationObserver(fillLogin).observe(document.documentElement, { childList: true, subtree: true });
+new MutationObserver(() => fillLogin()).observe(document.documentElement, { childList: true, subtree: true });
+setInterval(() => fillLogin(), 1000);
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type !== 'FILL_LOGIN') return;
   suppliedCredentials = message.credentials || null;
-  fillLogin(suppliedCredentials).then(() => sendResponse({ ok: true })).catch(() => sendResponse({ ok: false }));
+  fillLogin(suppliedCredentials).then(ready => sendResponse({ ok: !!ready })).catch(() => sendResponse({ ok: false }));
   return true;
 });

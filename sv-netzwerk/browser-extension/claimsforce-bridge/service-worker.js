@@ -222,7 +222,8 @@ async function runImport(run) {
   await diagnostic(run, 'CF-PLAN-04', 'Planungsansicht „Mit Termin“ wurde angefordert.', { strategy: planning?.strategy || 'bestehende Ansicht' });
   const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIMS' });
   const claims = scraped?.claims || [];
-  await diagnostic(run, 'CF-LIST-05', `${claims.length} Auftrag/Aufträge wurden in der Planungsansicht erkannt.`, { count: claims.length, observedApi: scraped?.observedClaims || 0, route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url) });
+  const openClaims = Number.isInteger(scraped?.allCount) ? Math.max(0, scraped.allCount) : claims.length;
+  await diagnostic(run, 'CF-LIST-05', `${claims.length} Auftrag/Aufträge wurden in der Planungsansicht erkannt.`, { count: claims.length, openClaims, observedApi: scraped?.observedClaims || 0, route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url) });
   if (!claims.length) {
     const state = await chrome.tabs.sendMessage(tab.id, { type: 'SESSION_STATE' }).catch(() => ({}));
     throw new Error(`[CF-LIST-05] Keine Aufträge erkannt (Route ${state.route || 'unbekannt'}, API ${state.observedClaims || 0}).`);
@@ -310,7 +311,7 @@ async function runImport(run) {
     await chrome.storage.session.set({ claimsLoggedProfile: profile });
     await chrome.storage.local.set({ claimsLoggedProfile: profile });
   }
-  return { claims: claims.length, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
+  return { claims: claims.length, openClaims, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
 }
 
 async function startImport(sender, message) {

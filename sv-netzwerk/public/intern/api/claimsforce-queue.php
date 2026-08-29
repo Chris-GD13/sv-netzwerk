@@ -6,6 +6,7 @@ $user=requireAuth();
 if(!in_array((string)($user['role']??''),['administrator','projektleiter','pruefer','sachverstaendiger'],true))apiError(403,'Keine Berechtigung.');
 
 db()->exec("CREATE TABLE IF NOT EXISTS claimsforce_import_jobs(id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,profile VARCHAR(30) NOT NULL,status VARCHAR(30) NOT NULL DEFAULT 'queued',requested_by VARCHAR(255) NOT NULL,message VARCHAR(500) NULL,result_json MEDIUMTEXT NULL,created_at DATETIME NOT NULL,started_at DATETIME NULL,finished_at DATETIME NULL,INDEX idx_claims_queue(status,created_at),INDEX idx_claims_user(requested_by,id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+db()->exec("CREATE TABLE IF NOT EXISTS claimsforce_profile_status(profile VARCHAR(30) PRIMARY KEY,open_count INT UNSIGNED NOT NULL,updated_at DATETIME NOT NULL,source_job_id BIGINT UNSIGNED NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
 function cqEnsureColumns():void{
     $columns=[
@@ -47,6 +48,15 @@ function cqProfile(array$user):string{
     if(str_contains($email,'ms@')||str_contains($name,'marc'))return'marc';
     return'christian';
 }
+function cqVisibleProfiles(array$user):array{
+    $email=mb_strtolower(trim((string)($user['email']??'')),'UTF-8');
+    $name=mb_strtolower(trim((string)($user['full_name']??'')),'UTF-8');
+    if(str_contains($email,'hr@')||str_contains($name,'holger'))return['holger'=>'Holger'];
+    if(str_contains($email,'ms@')||str_contains($name,'marc'))return['marc'=>'Marc'];
+    if(str_contains($email,'cw@')||str_contains($name,'christian'))return['christian'=>'Christian','jens'=>'Maurer'];
+    $selected=(string)($_SESSION['svnet_selected_expert']??'christian');
+    return match($selected){'holger'=>['holger'=>'Holger'],'marc'=>['marc'=>'Marc'],'jens'=>['jens'=>'Maurer'],default=>['christian'=>'Christian','jens'=>'Maurer']};
+}
 function cqRow(int$id):array{
     $s=db()->prepare('SELECT id,profile,status,message,result_json,created_at,started_at,heartbeat_at,attempt_count,phase,progress_current,progress_total,diagnostic_json,finished_at,requested_by FROM claimsforce_import_jobs WHERE id=:id LIMIT 1');
     $s->execute([':id'=>$id]);
@@ -68,6 +78,21 @@ function cqFailStaleRuns():void{
 
 $action=(string)($_GET['action']??'status');
 $body=$_SERVER['REQUEST_METHOD']==='POST'?requestBody():[];
+
+if($action==='summary'){
+    $visible=cqVisibleProfiles($user);
+    $placeholders=implode(',',array_fill(0,count($visible),'?'));
+    $s=db()->prepare('SELECT profile,open_count,updated_at FROM claimsforce_profile_status WHERE profile IN ('.$placeholders.')');
+    $s->execute(array_keys($visible));
+    $stored=[];
+    foreach($s->fetchAll(PDO::FETCH_ASSOC)as$row)$stored[(string)$row['profile']]=$row;
+    $items=[];
+    foreach($visible as$profile=>$label){
+        $row=$stored[$profile]??null;
+        $items[]=['profile'=>$profile,'label'=>$label,'open_count'=>$row===null?null:(int)$row['open_count'],'updated_at'=>$row['updated_at']??null];
+    }
+    apiJson(['ok'=>true,'items'=>$items]);
+}
 
 if($action==='enqueue'){
     $profile=cqProfile($user);
@@ -141,10 +166,17 @@ if($action==='heartbeat'){
 if($action==='complete'){
     $id=(int)($body['id']??0);
     $ok=($body['ok']??false)===true;
+    $job=cqRow($id);
     $message=mb_substr(trim((string)($body['message']??($ok?'Import abgeschlossen.':'Import fehlgeschlagen.'))),0,500);
     $s=db()->prepare("UPDATE claimsforce_import_jobs SET status=:s,message=:m,phase=:p,result_json=:r,heartbeat_at=NOW(),finished_at=NOW() WHERE id=:id AND status='running'");
     $s->execute([':s'=>$ok?'done':'failed',':m'=>$message,':p'=>$ok?'CF-DONE-07':'CF-FAIL-99',':r'=>json_encode($body['result']??null,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':id'=>$id]);
     if($s->rowCount()!==1)apiError(409,'Importauftrag wurde bereits abgeschlossen oder erneut eingeplant.');
+    $result=is_array($body['result']??null)?$body['result']:[];
+    if($ok&&$job&&(array_key_exists('openClaims',$result)||array_key_exists('claims',$result))){
+        $count=max(0,(int)($result['openClaims']??$result['claims']));
+        $status=db()->prepare('INSERT INTO claimsforce_profile_status(profile,open_count,updated_at,source_job_id) VALUES(:profile,:count,NOW(),:job) ON DUPLICATE KEY UPDATE open_count=VALUES(open_count),updated_at=VALUES(updated_at),source_job_id=VALUES(source_job_id)');
+        $status->execute([':profile'=>(string)$job['profile'],':count'=>$count,':job'=>$id]);
+    }
     apiJson(['ok'=>true,'job'=>cqRow($id)]);
 }
 apiError(404,'Unbekannte Aktion.');

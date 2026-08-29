@@ -76,6 +76,11 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-header__login:hover,
       .intern-header__login:focus-visible { background: #e7e9eb; }
       .intern-header__logout:disabled { cursor: wait; opacity: .7; }
+      .intern-header__claims-summary { display: flex; flex: 1 1 310px; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+      .intern-header__claims-summary[hidden] { display: none; }
+      .intern-header__claims-box { min-width: 145px; padding: 9px 12px; border: 1px solid #d67d00; border-radius: 4px; background: #f59a23; color: #071a2e; box-shadow: 0 3px 10px rgba(7, 26, 46, .12); }
+      .intern-header__claims-box span { display: block; font-size: .68rem; font-weight: 800; line-height: 1.2; }
+      .intern-header__claims-box strong { display: block; margin-top: 2px; color: #071a2e; font-size: 1rem; line-height: 1.2; }
       @media (max-width: 900px) {
         .intern-portal-shell { grid-template-columns: 1fr; }
         .intern-sidebar { display: block; padding: 7px 10px; border-right: 0; border-bottom: 1px solid #d9dde1; overflow-x: auto; }
@@ -84,6 +89,8 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__expert { grid-template-columns: auto minmax(190px, 1fr); align-items: center; gap: 8px; margin: 0 0 0 8px; padding: 0 0 0 12px; border-top: 0; border-left: 1px solid #d9dde1; }
       .intern-sidebar__expert label small { display: none; }
         .intern-sidebar .intern-header__logout { display: none; }
+        .intern-header__claims-summary { flex-basis: 100%; justify-content: flex-start; }
+        .intern-header__claims-box { flex: 1 1 145px; }
       }
     </style>
   </head>
@@ -100,6 +107,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
             <small>{portalProject.objectName}</small>
           </div>
         </div>
+        <div class="intern-header__claims-summary" id="intern-claims-summary" aria-live="polite" hidden></div>
       </div>
     </header>
     <div class="intern-portal-shell">
@@ -141,6 +149,31 @@ const isActive = (href: string) => currentPath.startsWith(href);
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js', { scope: '/intern/' }).catch(() => {}));
       }
+      const claimsSummary = document.getElementById('intern-claims-summary');
+      const loadClaimsSummary = async () => {
+        if (!(claimsSummary instanceof HTMLElement)) return;
+        try {
+          const response = await fetch('/intern/api/claimsforce-queue.php?action=summary', { credentials: 'same-origin', cache: 'no-store' });
+          const data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.error || 'Claims-Status nicht verfügbar.');
+          claimsSummary.replaceChildren(...(data.items || []).map((item) => {
+            const box = document.createElement('div');
+            box.className = 'intern-header__claims-box';
+            if (item.updated_at) box.title = `Zuletzt aktualisiert: ${item.updated_at}`;
+            const caption = document.createElement('span');
+            caption.textContent = 'Deine offenen Aufgaben bei Claims';
+            const value = document.createElement('strong');
+            value.textContent = `${item.label}: ${item.open_count ?? '–'}`;
+            box.append(caption, value);
+            return box;
+          }));
+          claimsSummary.hidden = !(data.items || []).length;
+        } catch {
+          claimsSummary.hidden = true;
+        }
+      };
+      loadClaimsSummary();
+      window.addEventListener('svnet:claims-summary-update', loadClaimsSummary);
     </script>
   </body>
 </html>
