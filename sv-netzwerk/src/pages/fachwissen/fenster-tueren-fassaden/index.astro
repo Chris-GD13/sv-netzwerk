@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { site } from '../../../data/site';
+
+const title = 'Fenster, Türen und Fassaden technisch beurteilen';
+const description = 'Fachwissen zu Fenster-, Türen- und Fassadenschäden, Montagefehlern, Abdichtung und Anschlussdetails.';
+const canonical = `${site.url}/fachwissen/fenster-tueren-fassaden/`;
+const published = '2026-07-03';
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: published,
+  dateModified: published,
+  mainEntityOfPage: canonical,
+  url: canonical,
+  inLanguage: 'de-DE',
+  author: {
+    '@type': 'Person',
+    name: 'Marc Schütt',
+    jobTitle: 'Sachverständiger | Fenster, Türen und Fassaden',
+    url: `${site.url}/experten/marc-schuett/`
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SV-Netzwerk',
+    url: `${site.url}/`
+  },
+  image: `${site.url}/og-default.svg`
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  image="/og-default.svg"
+  type="article"
+  structuredData={articleSchema}
+  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Fachartikel', href: '/fachwissen/' }, { label: 'Fenster, Türen und Fassaden' }]}
+>
+  <article class="sv-section">
+    <div class="sv-container article-shell">
+      <header>
+        <p class="sv-eyebrow">Gebäudehülle · Fenster · Türen · Fassaden</p>
+        <h1>Fenster, Türen und Fassaden sind technische Schnittstellen</h1>
+        <p class="lead">Einordnung aus dem Kompetenzzentrum des SV-Netzwerks.</p>
+        <div class="meta"><span>Marc Schütt · Autor und fachlicher Ansprechpartner im SV-Netzwerk</span><time datetime={published}>3. Juli 2026</time></div>
+      </header>
+
+      <div class="prose">
+        <h2>Worum es fachlich geht</h2>
+        <p>In der Schadenpraxis reicht eine pauschale Einschätzung selten aus. Entscheidend ist die saubere Trennung zwischen Ursache, Schadenumfang, technischer Bewertung, Sanierungsweg und regulierungsrelevanter Einordnung.</p>
+
+        <blockquote>
+          <p><strong>Grundsatz des SV-Netzwerks:</strong> Jeder Schaden wird dem passenden Spezialisten zugeordnet. Dadurch entstehen belastbare Gutachten, nachvollziehbare Regulierungsempfehlungen und eine saubere Dokumentation.</p>
+        </blockquote>
+
+        <h2>Typische Prüfpunkte</h2>
+        <ul>
+          <li>Fenster: fachliche Einordnung, Dokumentation und Ableitung des weiteren Vorgehens.</li>
+          <li>Türen: fachliche Einordnung, Dokumentation und Ableitung des weiteren Vorgehens.</li>
+          <li>Fassaden: fachliche Einordnung, Dokumentation und Ableitung des weiteren Vorgehens.</li>
+          <li>Montagefehler: fachliche Einordnung, Dokumentation und Ableitung des weiteren Vorgehens.</li>
+          <li>Anschlussdetails: fachliche Einordnung, Dokumentation und Ableitung des weiteren Vorgehens.</li>
+          <li>Bauforensik: fachliche Einordnung, Dokumentation und Ableitung des weiteren Vorgehens.</li>
+        </ul>
+
+        <h2>Warum das für Versicherer und Auftraggeber wichtig ist</h2>
+        <p>Je komplexer ein Schadenbild wird, desto wichtiger werden strukturierte Kommunikation, belastbare Belegprüfung, saubere Reserven und eine fachlich begründete Sanierungsstrategie. Genau dafür bündelt das SV-Netzwerk die unterschiedlichen Spezialkompetenzen.</p>
+
+        <aside class="service-links">
+          <h2>Weiterführend</h2>
+          <ul>
+            <li><a href="/experten/marc-schuett/">Expertenprofil Marc Schütt</a></li>
+            <li><a href="/fachwissen/fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen/">Fenster- und Türschäden fachlich bewerten</a></li>
+            <li><a href="/fachwissen/glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit/">Glasbruch an Fenster und Fassade fachlich bewerten</a></li>
+            <li><a href="/termin-vereinbaren/">Termin vereinbaren</a></li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .article-shell{max-width:58rem}
+  .article-shell h1{max-width:24ch}
+  .lead{max-width:65ch;color:var(--sv-color-muted);font-size:1.2rem}
+  .meta{display:flex;flex-wrap:wrap;gap:.75rem 1.5rem;margin-top:1.25rem;color:var(--sv-color-muted);font-size:.9rem}
+  .prose{margin-top:var(--sv-space-7);font-size:1.04rem;line-height:1.78}
+  .prose h2{margin-top:2.5rem}
+  .prose li+li{margin-top:.45rem}
+  .prose blockquote{margin:2rem 0;padding:1rem 1.15rem;border-left:.25rem solid var(--sv-color-accent);background:var(--sv-color-surface-alt)}
+  .prose blockquote p{margin:0}
+  .service-links{margin-top:var(--sv-space-7);padding:1rem 1.15rem;border:1px solid var(--sv-color-line);border-radius:.75rem;background:rgba(255,255,255,.72)}
+  .service-links h2{margin:0 0 .65rem;font-size:1.05rem}
+  .service-links ul{display:grid;gap:.45rem;margin:0;padding-left:1.2rem}
+</style>

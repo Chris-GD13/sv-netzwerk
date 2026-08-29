@@ -27,8 +27,15 @@ const articleSchema = {
 };
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical} image="/og-default.svg" type="article">
-  <script is:inline type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  image="/og-default.svg"
+  type="article"
+  structuredData={articleSchema}
+  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Fachartikel', href: '/fachwissen/' }, { label: 'Wasserschaden: Rückbau technisch abgrenzen' }]}
+>
 
   <header class="article-hero">
     <div class="sv-container article-hero-grid">

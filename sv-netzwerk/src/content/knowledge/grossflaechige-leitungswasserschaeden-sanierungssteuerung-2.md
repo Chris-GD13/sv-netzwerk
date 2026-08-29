@@ -1,5 +1,5 @@
 ---
-title: "Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz"
+title: "Leitungswasserschäden bei hoher Schadenfrequenz: Rollen, Koordination und Dokumentation"
 description: "Leitungswasserschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz."
 category: "Leitungswasserschäden"
 tags: ["Leitungswasser", "Schadenregulierung", "Sanierungsplanung", "Kostenprüfung"]
@@ -20,7 +20,7 @@ publication:
   updatedAt: 2026-08-15
   status: published
 seo:
-  title: "Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher"
+  title: "Leitungswasserschäden im Kumulereignis: Rollen und Koordination"
   description: "Leitungswasserschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2/"
   image: "https://www.sv-netzwerk.eu/assets/images/linkedin/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2.svg"
