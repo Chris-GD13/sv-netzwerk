@@ -33,7 +33,7 @@ function bkSettingSet(string $k,string $v):void{try{$s=db()->prepare('INSERT INT
 function bkB64url(string $s):string{return rtrim(strtr(base64_encode($s),'+/','-_'),'=');}
 function bkHttp(string $method,string $url,array $headers=[],?string $body=null,int $timeout=240):array{$ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_HTTPHEADER=>$headers,CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>$timeout,CURLOPT_FOLLOWLOCATION=>true]);if($body!==null)curl_setopt($ch,CURLOPT_POSTFIELDS,$body);$r=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$err=curl_error($ch);curl_close($ch);if($r===false||$err!=='')throw new RuntimeException('Verbindung fehlgeschlagen: '.($err?:'unbekannter Fehler'));return['status'=>$status,'body'=>(string)$r];}
 function bkGoogleToken():string{static$t=null;if($t!==null)return$t;$svcJson=trim(env('GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON',''));if($svcJson!==''){if(!str_starts_with($svcJson,'{')){$d=base64_decode($svcJson,true);if($d!==false)$svcJson=$d;}$svc=json_decode($svcJson,true);if(is_array($svc)&&!empty($svc['client_email'])&&!empty($svc['private_key'])){$now=time();$h=bkB64url(json_encode(['alg'=>'RS256','typ'=>'JWT']));$c=bkB64url(json_encode(['iss'=>$svc['client_email'],'scope'=>'https://www.googleapis.com/auth/drive','aud'=>'https://oauth2.googleapis.com/token','iat'=>$now,'exp'=>$now+3500]));$in=$h.'.'.$c;$sig='';if(openssl_sign($in,$sig,$svc['private_key'],OPENSSL_ALGO_SHA256)){$jwt=$in.'.'.bkB64url($sig);$r=bkHttp('POST','https://oauth2.googleapis.com/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['grant_type'=>'urn:ietf:params:oauth:grant-type:jwt-bearer','assertion'=>$jwt]),90);$j=json_decode($r['body'],true);if($r['status']===200&&!empty($j['access_token']))return$t=(string)$j['access_token'];}}}$cid=env('GOOGLE_DRIVE_CLIENT_ID',bkSettingGet('google_drive_client_id'));$sec=env('GOOGLE_DRIVE_CLIENT_SECRET',bkSettingGet('google_drive_client_secret'));$ref=env('GOOGLE_DRIVE_REFRESH_TOKEN',bkSettingGet('google_drive_refresh_token'));if($cid!==''&&$sec!==''&&$ref!==''){$r=bkHttp('POST','https://oauth2.googleapis.com/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['client_id'=>$cid,'client_secret'=>$sec,'refresh_token'=>$ref,'grant_type'=>'refresh_token']),90);$j=json_decode($r['body'],true);if($r['status']===200&&!empty($j['access_token']))return$t=(string)$j['access_token'];}throw new RuntimeException('Google Drive ist nicht verbunden.');}
-function bkDriveMeta(string $id):array{$r=bkHttp('GET','https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'?'.http_build_query(['fields'=>'id,name,mimeType,modifiedTime,size','supportsAllDrives'=>'true']),['Authorization: Bearer '.bkGoogleToken()],null,120);if($r['status']!==200)throw new RuntimeException('BKI-Datei konnte nicht gelesen werden.');$j=json_decode($r['body'],true);return is_array($j)?$j:[];}
+function bkDriveMeta(string $id):array{$r=bkHttp('GET','https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'?'.http_build_query(['fields'=>'id,name,mimeType,modifiedTime,size,parents','supportsAllDrives'=>'true']),['Authorization: Bearer '.bkGoogleToken()],null,120);if($r['status']!==200)throw new RuntimeException('BKI-Datei konnte nicht gelesen werden.');$j=json_decode($r['body'],true);return is_array($j)?$j:[];}
 function bkDriveBytes(string $id):array{$m=bkDriveMeta($id);$r=bkHttp('GET','https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'?alt=media&supportsAllDrives=true',['Authorization: Bearer '.bkGoogleToken()],null,300);if($r['status']!==200)throw new RuntimeException('BKI-Datei konnte nicht geladen werden.');return['name'=>(string)($m['name']??'BKI.pdf'),'mime'=>(string)($m['mimeType']??'application/pdf'),'modified'=>(string)($m['modifiedTime']??''),'bytes'=>$r['body']];}
 function bkOpenAIFile(string $driveId):array{$meta=bkDriveMeta($driveId);$cacheKey='openai_bki_calc_'.$driveId;$cached=json_decode(bkSettingGet($cacheKey,'{}'),true);if(is_array($cached)&&($cached['modified']??'')===($meta['modifiedTime']??'')&&!empty($cached['file_id']))return['file_id'=>(string)$cached['file_id'],'name'=>(string)($cached['name']??$meta['name']??'BKI')];$apiKey=trim(env('OPENAI_API_KEY',''));if($apiKey==='')throw new RuntimeException('OpenAI API-Key ist nicht konfiguriert.');$d=bkDriveBytes($driveId);$tmp=tempnam(sys_get_temp_dir(),'bki-');if($tmp===false)throw new RuntimeException('Temporäre BKI-Datei konnte nicht erstellt werden.');file_put_contents($tmp,$d['bytes']);$ch=curl_init('https://api.openai.com/v1/files');curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$apiKey],CURLOPT_POSTFIELDS=>['purpose'=>'user_data','file'=>new CURLFile($tmp,$d['mime'],$d['name'])],CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>420]);$resp=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$err=curl_error($ch);curl_close($ch);@unlink($tmp);if($resp===false||$err!==''||$status<200||$status>=300)throw new RuntimeException('BKI-Datei konnte für die Suche nicht vorbereitet werden.');$j=json_decode((string)$resp,true);$fid=(string)($j['id']??'');if($fid==='')throw new RuntimeException('BKI-Datei-ID fehlt.');bkSettingSet($cacheKey,json_encode(['file_id'=>$fid,'modified'=>$d['modified'],'name'=>$d['name']],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));return['file_id'=>$fid,'name'=>$d['name']];}
 function bkOpenAIJson(string $method,string $path,?array $payload=null,int $timeout=360):array{
@@ -63,6 +63,46 @@ function bkVectorStore():string{
 }
 function bkOutputText(array $d):string{$t=trim((string)($d['output_text']??''));if($t!=='')return$t;foreach(($d['output']??[])as$item){if(($item['type']??'')!=='message')continue;foreach(($item['content']??[])as$p)if(($p['type']??'')==='output_text')$t.=(string)($p['text']??'');}return trim($t);}
 function bkJson(string $t):array{if(preg_match('/```(?:json)?\s*(\{.*\})\s*```/s',$t,$m))$t=$m[1];$j=json_decode($t,true);if(is_array($j))return$j;$a=strpos($t,'{');$b=strrpos($t,'}');if($a!==false&&$b!==false&&$b>$a){$j=json_decode(substr($t,$a,$b-$a+1),true);if(is_array($j))return$j;}throw new RuntimeException('BKI-Suchergebnis konnte nicht gelesen werden.');}
+function bkOpenAIUploadBytes(string $name,string $mime,string $bytes):string{
+  $tmp=tempnam(sys_get_temp_dir(),'kva-bki-');
+  if($tmp===false)throw new RuntimeException('KVA konnte nicht vorbereitet werden.');
+  try{
+    file_put_contents($tmp,$bytes);
+    $key=trim(env('OPENAI_API_KEY',''));
+    if($key==='')throw new RuntimeException('OpenAI API-Key ist nicht konfiguriert.');
+    $ch=curl_init('https://api.openai.com/v1/files');
+    curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$key],CURLOPT_POSTFIELDS=>['purpose'=>'user_data','file'=>new CURLFile($tmp,$mime,$name)],CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>420]);
+    $response=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$error=curl_error($ch);curl_close($ch);
+    if($response===false||$error!==''||$status<200||$status>=300)throw new RuntimeException('KVA konnte nicht für die Auswertung bereitgestellt werden.');
+    $json=json_decode((string)$response,true);$id=trim((string)($json['id']??''));
+    if($id==='')throw new RuntimeException('KVA-Datei-ID fehlt.');
+    return$id;
+  }finally{@unlink($tmp);}
+}
+function bkAnalyzeKva(string $name,string $mime,string $bytes):array{
+  if($bytes==='')throw new RuntimeException('KVA-Datei ist leer.');
+  $fileId=bkOpenAIUploadBytes($name,$mime,$bytes);
+  $instructions=<<<'PROMPT'
+Lies den deutschen Kostenvoranschlag vollständig und extrahiere die angebotenen Leistungspositionen als Kalkulationsgrundlage. Übernimm keine Summenzeilen, Zwischensummen, Umsatzsteuer oder Rabatte als Leistungsposition. Fasse eine Position nur dann zusammen, wenn sie im Dokument selbst zusammengefasst ist. Erfinde keine Mengen, Einheiten, Beschreibungen oder Preise.
+
+Antworte ausschließlich als JSON:
+{"quote_number":"","company":"","net_total":null,"positions":[{"source_position":"","description":"","quantity":null,"unit":"","offered_unit_price":null,"offered_total":null}]}
+PROMPT;
+  $response=bkOpenAIJson('POST','responses',[
+    'model'=>env('OPENAI_MODEL','gpt-5.4-mini'),
+    'instructions'=>$instructions,
+    'input'=>[['role'=>'user','content'=>[['type'=>'input_text','text'=>'Extrahiere alle kalkulierbaren Leistungspositionen aus diesem KVA.'],['type'=>'input_file','file_id'=>$fileId]]]],
+    'max_output_tokens'=>8000
+  ],420);
+  $raw=bkJson(bkOutputText($response));$positions=[];
+  foreach(($raw['positions']??[])as$row){
+    if(!is_array($row))continue;$description=trim((string)($row['description']??''));
+    if($description==='')continue;
+    $positions[]=['source_position'=>trim((string)($row['source_position']??'')),'description'=>$description,'quantity'=>is_numeric($row['quantity']??null)?(float)$row['quantity']:null,'unit'=>trim((string)($row['unit']??'')),'offered_unit_price'=>is_numeric($row['offered_unit_price']??null)?(float)$row['offered_unit_price']:null,'offered_total'=>is_numeric($row['offered_total']??null)?(float)$row['offered_total']:null];
+  }
+  if(!$positions)throw new RuntimeException('Im KVA wurden keine belastbaren Leistungspositionen erkannt.');
+  return['source_name'=>$name,'quote_number'=>trim((string)($raw['quote_number']??'')),'company'=>trim((string)($raw['company']??'')),'net_total'=>is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null,'positions'=>$positions];
+}
 function bkSearch(array $in):array{
   $q=trim((string)($in['query']??''));
   if($q==='')throw new RuntimeException('Leistungsbeschreibung fehlt.');
@@ -237,6 +277,13 @@ bkSchema();
 $action=(string)($_GET['action']??'status');
 try{
   if($action==='status') apiJson(['ok'=>true,'source'=>'BKI Altbau 2026','positions_file_id'=>BKI_POSITIONS_ID,'buildings_file_id'=>BKI_BUILDINGS_ID]);
+  if($action==='analyze_kva'){
+    if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
+    $folder=trim((string)($_POST['folder_id']??''));if($folder==='')throw new RuntimeException('Bitte zuerst einen Schadenfall öffnen.');requireCaseFolderAccess($folder,$user);
+    if(isset($_FILES['file'])&&is_uploaded_file((string)($_FILES['file']['tmp_name']??''))){$file=$_FILES['file'];if((int)($file['size']??0)>30*1024*1024)throw new RuntimeException('Die Datei darf höchstens 30 MB groß sein.');$name=basename((string)$file['name']);$mime=(string)(mime_content_type((string)$file['tmp_name'])?:($file['type']??'application/octet-stream'));$bytes=(string)file_get_contents((string)$file['tmp_name']);}
+    else{$fileId=trim((string)($_POST['file_id']??''));if($fileId==='')throw new RuntimeException('Bitte einen KVA auswählen oder fotografieren.');$meta=bkDriveMeta($fileId);if(!in_array($folder,array_map('strval',is_array($meta['parents']??null)?$meta['parents']:[]),true))throw new RuntimeException('Der ausgewählte KVA gehört nicht zum aktiven Fall.');$selected=bkDriveBytes($fileId);$name=(string)$selected['name'];$mime=(string)$selected['mime'];$bytes=(string)$selected['bytes'];}
+    apiJson(['ok'=>true,...bkAnalyzeKva($name,$mime,$bytes)]);
+  }
   if($action==='search'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');apiJson(['ok'=>true,...bkSearch(requestBody())]);}
   if($action==='save'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');$in=requestBody();$items=is_array($in['items']??null)?$in['items']:[];if(!$items)throw new RuntimeException('Kalkulation enthält keine Positionen.');$tot=is_array($in['totals']??null)?$in['totals']:[];$case=is_array($in['case_meta']??null)?$in['case_meta']:[];$folder=trim((string)($in['folder_id']??''));if($folder!=='')requireCaseFolderAccess($folder,$user);$stmt=db()->prepare('INSERT INTO bki_calculations(folder_id,case_no,damage_type,object_name,location,note,net_total,vat_rate,vat_total,gross_total,items_json,created_by,created_at) VALUES(:folder,:case_no,:damage,:obj,:location,:note,:net,:vat,:tax,:gross,:items,:user,NOW())');$stmt->execute([':folder'=>$folder!==''?$folder:null,':case_no'=>trim((string)($case['schaden_nr']??''))?:null,':damage'=>trim((string)($case['schadenart']??''))?:null,':obj'=>trim((string)($case['vn_objekt']??''))?:null,':location'=>trim((string)($in['location']??''))?:null,':note'=>trim((string)($in['note']??''))?:null,':net'=>(float)($tot['net']??0),':vat'=>(float)($tot['vat']??19),':tax'=>(float)($tot['tax']??0),':gross'=>(float)($tot['gross']??0),':items'=>json_encode($items,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':user'=>(string)($user['email']??$user['full_name']??'')]);$calcId=(int)db()->lastInsertId();$driveFile=null;
