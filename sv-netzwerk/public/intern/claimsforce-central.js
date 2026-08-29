@@ -24,6 +24,7 @@
   placeImportCards();
   let context={},bridge=false,bridgeVersion='',agentJob=null,userJobs=[],busy=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
+  const driveStatus=()=>window.svnetDriveStatus?window.svnetDriveStatus():json('/intern/api/google-drive-sync.php?action=status');
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const versionAtLeast=(actual,required)=>{const a=String(actual).split('.').map(Number),r=String(required).split('.').map(Number);for(let i=0;i<3;i++){if((a[i]||0)!==(r[i]||0))return(a[i]||0)>(r[i]||0)}return true};
@@ -128,5 +129,5 @@
 
   setInterval(heartbeat,20000);
   setInterval(()=>window.postMessage({type:'SVNET_CLAIMS_RUNTIME_PING'},location.origin),5000);
-  json('/intern/api/google-drive-sync.php?action=status').then(async d=>{context=d;window.postMessage({type:'SVNET_CLAIMS_BRIDGE_PING'},location.origin);await resumeWatch();poll()}).catch(e=>show(e.message,true));
+  driveStatus().then(async d=>{context=d;window.postMessage({type:'SVNET_CLAIMS_BRIDGE_PING'},location.origin);await resumeWatch();poll()}).catch(e=>show(e.message,true));
 })();

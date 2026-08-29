@@ -116,6 +116,11 @@ const drive = fs.readFileSync(path.join(root, 'public/intern/api/google-drive-sy
 assert(drive.includes("'claims_profile'=>\$claimsProfile"), 'Status liefert das Claims-Profil des angemeldeten Sachverständigen');
 assert(drive.includes("==='administrator'"), 'Administratoren können die Claims-Anmeldungen aller Sachverständigen zentral bedienen');
 assert(drive.includes("'claims_agent'=>"), 'Administrator wird als zentrale Importstation erkannt');
+const driveStatusCache = fs.readFileSync(path.join(root, 'public/intern/drive-status-cache.js'), 'utf8');
+assert(driveStatusCache.includes('window.svnetDriveStatus=load') && driveStatusCache.includes('pending') && driveStatusCache.includes('Date.now()+45000'), 'Parallele Portalabfragen teilen sich einen einzigen Drive-Status und behalten ihn 45 Sekunden');
+assert(internLayout.includes('drive-status-cache.js?v=20260829-1'), 'Der gemeinsame Drive-Status steht vor allen Portalmodulen bereit');
+assert(drive.includes('gdStatusCacheRead') && drive.includes('DATE_SUB(NOW(),INTERVAL 45 SECOND)') && drive.includes('gdStatusCacheWrite'), 'Auch mehrere Portalregister verwenden serverseitig höchstens alle 45 Sekunden eine vollständige Drive-Abfrage');
+assert(portal.includes('window.svnetDriveStatus?window.svnetDriveStatus()'), 'Die Versicherungsfallseite fasst ihre mehrfachen Drive-Statusabfragen zusammen');
 const queue = fs.readFileSync(path.join(root, 'public/intern/api/claimsforce-queue.php'), 'utf8');
 assert(queue.includes('claimsforce_import_jobs') && queue.includes("$action==='claim'"), 'Zentrale serverseitige Importwarteschlange fehlt');
 assert(queue.includes('heartbeat_at') && queue.includes("$action==='heartbeat'") && queue.includes("$action==='active'"), 'Verwaiste Browserimporte müssen per Heartbeat erkannt werden');
@@ -133,6 +138,7 @@ const driveApi = fs.readFileSync(path.join(root, 'public/intern/api/google-drive
 assert(driveApi.includes("['christian','jens','holger','marc']"), 'Backoffice darf das frühere Jens-Maurer-Profil gezielt auswählen');
 assert(queue.includes("$action==='mine'") && queue.includes('WHERE requested_by=:u ORDER BY id DESC LIMIT 20'), 'Eigene Warteschlangenläufe müssen nach einem Portal-Neuladen wiedergefunden werden');
 const central = fs.readFileSync(path.join(root, 'public/intern/claimsforce-central.js'), 'utf8');
+assert(central.includes('window.svnetDriveStatus?window.svnetDriveStatus()'), 'Die Claims-Zentrale verwendet den gemeinsamen Drive-Status statt eines eigenen Abrufs');
 assert(central.includes("action=status&id=") && central.includes("SVNET_CLAIMS_IMPORT_START"), 'Portal kann zentrale Importe starten und verfolgen');
 assert(central.includes("job.profile==='jens'?'christian':job.profile"), 'Ehemalige Jens-Maurer-Fälle werden ausschließlich Christians Portalordner zugeordnet');
 assert(!central.includes('automaticImport') && !central.includes("['christian','jens','marc','holger']"), 'Unsichere browserlokale Mehrprofil-Automatik muss abgeschaltet bleiben');
