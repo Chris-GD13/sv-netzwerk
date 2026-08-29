@@ -29,7 +29,7 @@ $claimsProfile=gdClaimsProfile($portalUser);
 if($isBackoffice&&$action==='select_expert'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
     $body=requestBody();$expert=(string)($body['expert']??'christian');
-    if(!in_array($expert,['christian','holger','marc'],true))apiError(400,'Unbekannter Sachverständiger.');
+    if(!in_array($expert,['christian','jens','holger','marc'],true))apiError(400,'Unbekannter Sachverständiger.');
     $_SESSION['svnet_selected_expert']=$expert;
     apiJson(['ok'=>true,'expert'=>$expert]);
 }

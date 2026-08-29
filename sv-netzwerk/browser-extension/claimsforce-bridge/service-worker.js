@@ -1,7 +1,8 @@
-import { loadCredentials, loadPortalCredentials } from './vault.js';
+import { loadCredentials, loadPortalCredentials, saveCredentials } from './vault.js';
 import { mapClaim, safeFileName } from './import-utils.js';
 
 const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
+const PLANNING_URL = 'https://web.claimsforce.com/planning?bucket=WITH_FUTURE_APPOINTMENT#with-future-appointment';
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const authHeaders = token => ({ Authorization: `Bearer ${token}`, Accept: 'application/json' });
 let runningImport = null;
@@ -24,7 +25,11 @@ async function credentialsFor(profile) {
       chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile }),
       sleep(800).then(() => null)
     ]);
-    if (local?.email && local?.password) { credentialDiagnostic = 'native-host-ready'; return { value: local, source: 'native-host' }; }
+    if (local?.email && local?.password) {
+      await saveCredentials(profile, local).catch(() => {});
+      credentialDiagnostic = 'native-host-ready';
+      return { value: local, source: 'native-host' };
+    }
   } catch {}
   credentialDiagnostic = 'local-config';
   try {
@@ -37,23 +42,17 @@ async function credentialsFor(profile) {
     const response = await fetch(endpoint, { headers: { 'X-SVNET-Token': config.token } });
     const local = response.ok ? await response.json() : null;
     credentialDiagnostic = response.ok ? (local?.email && local?.password ? 'loopback-ready' : 'loopback-incomplete') : `loopback-http-${response.status}`;
-    return local?.email && local?.password ? { value: local, source: 'loopback' } : null;
+    if (local?.email && local?.password) {
+      await saveCredentials(profile, local).catch(() => {});
+      return { value: local, source: 'loopback' };
+    }
+    return null;
   } catch (error) { credentialDiagnostic = `local-fallback-${String(error?.name || 'error').toLowerCase()}`; return null; }
 }
 
 async function tokenValue(profile) {
   const row = await chrome.storage.session.get(['claimsToken', 'claimsTokenProfile']);
   return row.claimsToken && (profile === 'self' || row.claimsTokenProfile === profile) ? row.claimsToken : '';
-}
-
-async function waitForToken(profile, timeout = 45000) {
-  const deadline = Date.now() + timeout;
-  while (Date.now() < deadline) {
-    const token = await tokenValue(profile);
-    if (token) return token;
-    await sleep(500);
-  }
-  throw new Error('ClaimsForce-Anmeldung konnte nicht übernommen werden. Bitte Zugangsdaten in der Browser-Brücke prüfen.');
 }
 
 async function waitTab(tabId, timeout = 30000) {
@@ -67,36 +66,51 @@ async function waitTab(tabId, timeout = 30000) {
 }
 
 async function claimsTab(profile, run, credential) {
-  let [tab] = await chrome.tabs.query({ url: 'https://web.claimsforce.com/*' });
+  let [tab] = await chrome.tabs.query({ url: ['https://web.claimsforce.com/*', 'https://claimsforce.eu.auth0.com/*'] });
   if (!tab) tab = await chrome.tabs.create({ url: 'https://web.claimsforce.com/login', active: false });
-  await waitTab(tab.id);
+  tab = await waitTab(tab.id);
   if (safeRoute(tab.url) === '/login') await chrome.storage.session.remove(['claimsToken', 'claimsTokenProfile']);
   await diagnostic(run, 'CF-AUTH-02', 'ClaimsForce-Seite ist geladen.', { route: safeRoute(tab.url) });
-  if (safeRoute(tab.url) === '/login' && credential?.value) {
-    const requested = await chrome.tabs.sendMessage(tab.id, { type: 'FILL_LOGIN', credentials: credential.value }).catch(() => null);
-    await diagnostic(run, 'CF-AUTH-02', requested?.ok ? 'ClaimsForce-Anmeldung wurde an das Formular übergeben.' : 'ClaimsForce-Anmeldehelfer ist auf der Loginseite nicht erreichbar.', { route: '/login', helper: requested?.ok ? 'bereit' : 'nicht erreichbar' });
-  }
   let token = await tokenValue(profile);
+  if (!token && safeRoute(tab.url) !== '/login') {
+    await diagnostic(run, 'CF-AUTH-02', 'Bestehende ClaimsForce-Sitzung wird einmal neu geladen, damit das Sitzungstoken erneut übernommen werden kann.', { route: safeRoute(tab.url), recovery: 'reload' });
+    await chrome.tabs.reload(tab.id);
+    tab = await waitTab(tab.id);
+    token = await tokenValue(profile);
+  }
   if (!token) {
-    token = await waitForToken(profile);
+    const route = safeRoute(tab.url);
+    if (!String(tab.url || '').includes('claimsforce.eu.auth0.com') && route !== '/login') {
+      await diagnostic(run, 'CF-AUTH-02', 'ClaimsForce-Sitzung ist abgelaufen. Die Anmeldeseite wird automatisch geöffnet.', { route, recovery: 'login' });
+      await chrome.tabs.update(tab.id, { url: 'https://web.claimsforce.com/login' });
+      tab = await waitTab(tab.id);
+    }
+    const loginDeadline = Date.now() + 60000;
+    let helperReady = false;
+    while (!token && Date.now() < loginDeadline) {
+      if (credential?.value) {
+        const requested = await chrome.tabs.sendMessage(tab.id, { type: 'FILL_LOGIN', credentials: credential.value }).catch(() => null);
+        helperReady ||= !!requested?.ok;
+      }
+      await sleep(750);
+      token = await tokenValue(profile);
+      tab = await chrome.tabs.get(tab.id);
+    }
+    await diagnostic(run, 'CF-AUTH-02', helperReady ? 'ClaimsForce-Anmeldung wurde automatisch ausgeführt.' : 'ClaimsForce-Anmeldehelfer hat keine vollständige Anmeldung bestätigt.', { route: safeRoute(tab.url), helper: helperReady ? 'bereit' : 'nicht erreichbar' });
+    if (!token) throw new Error('ClaimsForce-Anmeldung konnte nicht automatisch abgeschlossen werden. Bitte die gespeicherten Zugangsdaten der Browser-Brücke prüfen.');
   }
   return { tab, token };
 }
 
 async function openPlanning(tabId) {
   let tab = await chrome.tabs.get(tabId);
-  if (!String(tab.url || '').includes('/planning')) {
-    const response = await chrome.tabs.sendMessage(tabId, { type: 'OPEN_PLANNING' });
-    if (!response?.ok) throw new Error(response?.error || 'ClaimsForce-Planung konnte nicht geöffnet werden.');
-    const deadline = Date.now() + 15000;
-    while (Date.now() < deadline) {
-      tab = await chrome.tabs.get(tabId);
-      if (String(tab.url || '').includes('/planning')) break;
-      await sleep(250);
-    }
+  const current = String(tab.url || '');
+  if (!current.includes('/planning') || !current.includes('WITH_FUTURE_APPOINTMENT')) {
+    await chrome.tabs.update(tabId, { url: PLANNING_URL });
+    tab = await waitTab(tabId);
   }
   if (!String(tab.url || '').includes('/planning')) throw new Error('ClaimsForce-Planung konnte nicht geöffnet werden.');
-  await sleep(1500);
+  await sleep(2000);
   const opened = await chrome.tabs.sendMessage(tabId, { type: 'OPEN_FUTURE_APPOINTMENTS' }).catch(() => null);
   await sleep(3000);
   return opened;
@@ -120,8 +134,8 @@ async function requestJson(url, token, optional = false, timeout = 20000) {
   } finally { clearTimeout(timer); }
 }
 
-async function portal(tabId, message, timeout = 30000) {
-  const response = await Promise.race([chrome.tabs.sendMessage(tabId, message), sleep(timeout).then(() => ({ ok: false, error: `Das SV-Netzwerk hat innerhalb von ${Math.round(timeout / 1000)} Sekunden nicht geantwortet.` }))]);
+async function portal(tabId, message) {
+  const response = await Promise.race([chrome.tabs.sendMessage(tabId, message), sleep(30000).then(() => ({ ok: false, error: 'Das SV-Netzwerk hat innerhalb von 30 Sekunden nicht geantwortet.' }))]);
   if (!response?.ok) throw new Error(response?.error || 'Das SV-Netzwerk hat den Import nicht angenommen.');
   return response;
 }
@@ -149,6 +163,21 @@ function unwrap(data, key) {
   return data?.[key] ?? data ?? {};
 }
 
+function stable(value) {
+  if (Array.isArray(value)) return value.map(stable);
+  if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])]));
+  return value;
+}
+
+async function fingerprint(value) {
+  const bytes = new TextEncoder().encode(JSON.stringify(stable(value)));
+  const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+  return [...hash].map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+const fileVersion = file => [file?.id, file?.updatedAt || file?.modifiedAt || file?.createdAt, file?.size || file?.fileSize, file?.name || file?.fileName || file?.originalFilename].map(value => String(value || '')).join('|');
+const messageVersion = message => [message?.id, message?.updatedAt || message?.createdAt || message?.sentAt].map(value => String(value || '')).join('|');
+
 async function uploadBuffer(portalTabId, folderId, name, mime, modified, buffer) {
   const uploadId = crypto.randomUUID();
   await portal(portalTabId, { type: 'PORTAL_UPLOAD_START', uploadId, folderId, name: safeFileName(name), mime: mime || 'application/octet-stream', modified: modified || 0 });
@@ -159,7 +188,7 @@ async function uploadBuffer(portalTabId, folderId, name, mime, modified, buffer)
     for (let index = 0; index < chunk.length; index += 0x8000) binary += String.fromCharCode(...chunk.subarray(index, index + 0x8000));
     await portal(portalTabId, { type: 'PORTAL_UPLOAD_CHUNK', uploadId, chunk: btoa(binary) });
   }
-  return portal(portalTabId, { type: 'PORTAL_UPLOAD_FINISH', uploadId }, 180000);
+  return portal(portalTabId, { type: 'PORTAL_UPLOAD_FINISH', uploadId });
 }
 
 async function runImport(run) {
@@ -208,8 +237,7 @@ async function runImport(run) {
   try { config = await (await fetch('https://web.claimsforce.com/config', { signal: configController.signal })).json(); }
   catch (error) { throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Konfiguration hat das Zeitlimit überschritten.' : 'ClaimsForce-Konfiguration konnte nicht geladen werden.'); }
   finally { clearTimeout(configTimer); }
-  let filesDone = 0, messagesDone = 0, appointmentsDone = 0, documentsFailed = 0;
-  const warnings = [];
+  let filesDone = 0, messagesDone = 0, appointmentsDone = 0, skipped = 0, updated = 0;
   for (let index = 0; index < claims.length; index++) {
     const item = claims[index], id = item.id;
     await diagnostic(run, 'CF-CASE-FETCH', `Auftrag ${index + 1}/${claims.length}: Falldaten werden geladen.`, { current: index, total: claims.length, claimIndex: index + 1 });
@@ -226,14 +254,28 @@ async function runImport(run) {
     const communication = unwrap(rawCommunication, 'claim');
     disposition.id ||= id;
     const appointments = unwrap(rawAppointments, 'appointments');
+    const files = Array.isArray(unwrap(rawFiles, 'files')) ? unwrap(rawFiles, 'files') : [];
+    const messages = Array.isArray(unwrap(rawMessages, 'messages')) ? unwrap(rawMessages, 'messages') : [];
     const mapped = mapClaim(disposition, communication, Array.isArray(appointments) ? appointments : []);
+    const signature = await fingerprint({ disposition, communication, files, messages, appointments, stakeholders: rawStakeholders || {} });
+    const state = await portal(portalTabId, { type: 'PORTAL_SYNC_STATE', mapped });
+    const existingMeta = state.result?.meta || {};
+    if (state.result?.existed && existingMeta.claimsforce_sync_signature === signature) {
+      skipped++;
+      await progress(portalTabId, `Auftrag ${index + 1}/${claims.length}: unverändert, wird übersprungen.`, index + 1, claims.length);
+      await diagnostic(run, 'CF-CASE-SKIP', `Auftrag ${index + 1}/${claims.length} ist bereits vollständig und unverändert vorhanden.`, { current: index + 1, total: claims.length, claimIndex: index + 1, skippedCases: skipped });
+      continue;
+    }
     await diagnostic(run, 'CF-CASE-UPSERT', `Auftrag ${index + 1}/${claims.length}: Portal-Fall wird angelegt oder ergänzt.`, { current: index, total: claims.length, claimIndex: index + 1 });
     const upsert = await portalOperation(portalTabId, { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, importedAt: new Date().toISOString() } });
     const folderId = upsert.folderId;
     await diagnostic(run, 'CF-CASE-FILES', `Auftrag ${index + 1}/${claims.length}: Anhänge und Nachrichten werden übernommen.`, { current: index, total: claims.length, claimIndex: index + 1 });
-    const files = unwrap(rawFiles, 'files');
-    for (const file of Array.isArray(files) ? files : []) {
+    const knownFileVersions = new Set(Array.isArray(existingMeta.claimsforce_file_versions) ? existingMeta.claimsforce_file_versions.map(String) : []);
+    const fileVersions = files.map(fileVersion).filter(Boolean);
+    for (const file of files) {
       if (!file?.id) continue;
+      const version = fileVersion(file);
+      if (knownFileVersions.has(version)) continue;
       const name = safeFileName(file.name || file.fileName || file.originalFilename, `ClaimsForce-${file.id}`);
       await progress(portalTabId, `${mapped.schaden_nr || item.label}: ${name}`, index, claims.length);
       const url = `${config.FILES_API_ENDPOINT}/claims/${encodeURIComponent(id)}/files/${encodeURIComponent(file.id)}?token=${encodeURIComponent(token)}`;
@@ -243,40 +285,34 @@ async function runImport(run) {
       catch (error) { throw new Error(error?.name === 'AbortError' ? `Datei „${name}“ hat das Zeitlimit überschritten.` : `Datei „${name}“ konnte nicht geladen werden.`); }
       finally { clearTimeout(timer); }
       if (!response.ok) throw new Error(`Datei „${name}“ konnte nicht geladen werden (${response.status}).`);
-      try {
-        await uploadBuffer(portalTabId, folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, fileBuffer);
-        filesDone++;
-      } catch (error) {
-        documentsFailed++;
-        warnings.push(`${mapped.schaden_nr || id}: ${name} – ${String(error?.message || error)}`.slice(0, 300));
-        await diagnostic(run, 'CF-FILE-WARN', `Datei „${name}“ wurde übersprungen; der nächste Auftrag wird weiter verarbeitet.`, { current: index, total: claims.length, claimIndex: index + 1, documentsFailed });
-      }
+      const uploaded = await uploadBuffer(portalTabId, folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, fileBuffer);
+      if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) filesDone++;
     }
-    const messages = unwrap(rawMessages, 'messages');
-    for (const message of Array.isArray(messages) ? messages : []) {
+    const knownMessageVersions = new Set(Array.isArray(existingMeta.claimsforce_message_versions) ? existingMeta.claimsforce_message_versions.map(String) : []);
+    const messageVersions = messages.map(messageVersion).filter(Boolean);
+    for (const message of messages) {
+      const version = messageVersion(message);
+      if (knownMessageVersions.has(version)) continue;
       const detail = message?.id ? await requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}/messages/${message.id}`, token, true) : message;
       const record = unwrap(detail, 'message');
       const stamp = String(record?.sentAt || record?.createdAt || '').slice(0, 10) || 'ohne-Datum';
       const subject = safeFileName(record?.subject || record?.payload?.subject || record?.id, 'Nachricht');
       const bytes = new TextEncoder().encode(JSON.stringify(record, null, 2));
-      try {
-        await uploadBuffer(portalTabId, folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(record?.updatedAt || record?.createdAt || '') || 0, bytes.buffer);
-        messagesDone++;
-      } catch (error) {
-        documentsFailed++;
-        warnings.push(`${mapped.schaden_nr || id}: Nachricht ${subject} – ${String(error?.message || error)}`.slice(0, 300));
-      }
+      const uploaded = await uploadBuffer(portalTabId, folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(record?.updatedAt || record?.createdAt || '') || 0, bytes.buffer);
+      if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) messagesDone++;
     }
     for (const appointment of Array.isArray(appointments) ? appointments : []) {
       if (!appointment?.startDate) continue;
       const appointmentResult = await portal(portalTabId, { type: 'PORTAL_APPOINTMENT', folderId, appointment });
       if (!appointmentResult?.result?.skipped) appointmentsDone++;
     }
+    await portal(portalTabId, { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions });
+    updated++;
     await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length} wurde vollständig im Portal verarbeitet.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
   }
-  await progress(portalTabId, `${claims.length} Aufträge, ${filesDone} Dateien, ${messagesDone} Nachrichten und ${appointmentsDone} Termine eingelesen${documentsFailed ? `; ${documentsFailed} Dokumente werden beim nächsten Lauf erneut versucht` : ''}.`, claims.length, claims.length);
+  await progress(portalTabId, `${claims.length} Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
   if (profile !== 'self') await chrome.storage.session.set({ claimsLoggedProfile: profile });
-  return { claims: claims.length, files: filesDone, messages: messagesDone, appointments: appointmentsDone, documentsFailed, warnings: warnings.slice(0, 20) };
+  return { claims: claims.length, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
 }
 
 async function startImport(sender, message) {

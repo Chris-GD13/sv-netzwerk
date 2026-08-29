@@ -36,7 +36,23 @@ async function upsert(message) {
   merged.claimsforce_quelle = message.source;
   merged.claimsforce_zuletzt_eingelesen = message.mapped.claimsforce_zuletzt_eingelesen;
   const saved = await api(`${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: existing?.folderId || '', case: merged }) });
-  return { folderId: saved.folder_id, meta: merged };
+  return { folderId: saved.folder_id, meta: merged, existed: !!existing };
+}
+
+async function syncState(message) {
+  const existing = await findCase(message.mapped || {});
+  return existing ? { folderId: existing.folderId, meta: existing.meta || {}, existed: true } : { folderId: '', meta: {}, existed: false };
+}
+
+async function commitSync(message) {
+  const loaded = await api(`${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`);
+  const meta = { ...(loaded.case?.meta || {}) };
+  meta.claimsforce_sync_signature = String(message.signature || '');
+  meta.claimsforce_file_versions = [...new Set((message.fileVersions || []).map(String).filter(Boolean))];
+  meta.claimsforce_message_versions = [...new Set((message.messageVersions || []).map(String).filter(Boolean))];
+  meta.claimsforce_zuletzt_eingelesen = new Date().toISOString();
+  await api(`${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, case: meta }) });
+  return { folderId: message.folderId, meta };
 }
 
 async function finishUpload(message) {
@@ -100,6 +116,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message?.type === 'PORTAL_UPLOAD_CHUNK') { const entry = uploads.get(message.uploadId); if (!entry) throw new Error('Unbekannte Dateiübertragung.'); entry.chunks.push(message.chunk); return { ok: true }; }
     if (message?.type === 'PORTAL_UPLOAD_FINISH') return { ok: true, result: await finishUpload(message) };
     if (message?.type === 'PORTAL_APPOINTMENT') return { ok: true, result: await appointment(message) };
+    if (message?.type === 'PORTAL_SYNC_STATE') return { ok: true, result: await syncState(message) };
+    if (message?.type === 'PORTAL_COMMIT_SYNC') return { ok: true, result: await commitSync(message) };
     return { ok: false, error: 'Unbekannter Auftrag.' };
   })().then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
   return true;

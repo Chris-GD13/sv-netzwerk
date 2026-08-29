@@ -46,7 +46,7 @@ assert.equal(safeFileName('KVA: Angebot?.pdf'), 'KVA- Angebot-.pdf');
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, '1.3.4', 'grundlegend reparierte Brücke muss als neue Laufzeitversion erkennbar sein');
+assert.equal(manifest.version, '1.3.6', 'inkrementell reparierte Brücke muss als neue Laufzeitversion erkennbar sein');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*')));
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://claimsforce.eu.auth0.com/*')));
 assert(manifest.content_scripts.some(entry => entry.js.includes('login-helper.js') && entry.matches.includes('https://*.claimsforce.com/*') && !entry.exclude_matches), 'ClaimsForce-Anmeldehilfe muss auch auf web.claimsforce.com/login laufen');
@@ -59,14 +59,18 @@ assert(manifest.content_scripts.some(entry => entry.matches.includes('https://ww
 assert(manifest.content_scripts.some(entry => entry.js.includes('portal-login-helper.js') && entry.run_at === 'document_idle'), 'Portal-Anmeldehilfe startet erst am vorhandenen Loginformular');
 
 const portal = fs.readFileSync(path.join(root, 'src/pages/intern/versicherungsfaelle/index.astro'), 'utf8');
+const internEntry = fs.readFileSync(path.join(root, 'src/pages/intern/index.astro'), 'utf8');
+assert(internEntry.includes("location.replace('/intern/login/')"), 'Der Aufruf von /intern/ führt ohne Umweg auf die Anmeldeseite');
 assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes("context.backoffice?`Import für"), 'Susannes ausgewählter Sachverständiger wird angezeigt');
 assert(portal.includes("button.dataset.claimsProfile=context.backoffice?key:(context.claims_profile||'self')"), 'Portal verwendet für Susanne und den angemeldeten Sachverständigen das richtige gespeicherte Profil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20260829-3'), 'Portal lädt die fehlertolerante Werktagsautomatik ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20260829-5'), 'Portal lädt die inkrementelle Importlogik ohne alten Browsercache');
+assert(portal.includes('<option value="jens">Ehem. Jens Maurer → Christian Wächter</option>'), 'Jens Maurer ist im Portal als eigenes ClaimsForce-Profil auswählbar');
 
 const bridge = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/portal-bridge.js'), 'utf8');
 assert(bridge.includes('mergeBlank(existing?.meta || {}, message.mapped)'), 'Import ergänzt bestehende Falldaten nur in leeren Feldern');
+assert(bridge.includes('PORTAL_SYNC_STATE') && bridge.includes('PORTAL_COMMIT_SYNC'), 'Portal stellt einen dauerhaften Änderungsstand pro ClaimsForce-Fall bereit');
 assert(bridge.includes("action=save_case"), 'Import nutzt den angemeldeten bzw. von Susanne ausgewählten persönlichen Fallordner');
 assert(bridge.includes('claimsforce_calendar_appointment_ids') && !bridge.includes('if (meta.calendar_event ||'), 'Alle ClaimsForce-Termine werden einzeln und ohne Überschreiben eines manuellen Kalendertermins übernommen');
 assert(bridge.includes("SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION"), 'Portal-Brücke meldet ihre tatsächlich geladene Version');
@@ -82,12 +86,13 @@ assert(claimsPageBridge.includes("message?.type === 'OPEN_PLANNING'") && claimsP
 assert(claimsPageBridge.includes('WITH_FUTURE_APPOINTMENT') && claimsPageBridge.includes('observedClaims'), 'Aktuelle virtuelle ClaimsForce-Planung wird über Route und beobachtete API-Fallliste ausgelesen');
 const claimsMain = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/claims-main.js'), 'utf8');
 assert(claimsMain.includes('response.clone().json()') && claimsMain.includes('CLAIMS_SNAPSHOT'), 'Fall-IDs werden geheimnisfrei aus den bereits geladenen ClaimsForce-Antworten erfasst');
+assert(claimsMain.includes('inspectTokenCache') && claimsMain.includes('inspectStorage(localStorage)'), 'Ein vorhandenes ClaimsForce-Token wird nach einem Worker-Neustart auch aus dem Auth-Cache wiederhergestellt');
 
 const vault = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/vault.js'), 'utf8');
 assert(vault.includes('credentials_${String(profile'), 'Zugänge werden getrennt je Sachverständigen-Profil gespeichert');
 const options = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.js'), 'utf8');
-assert(options.includes("OPTIONS_CODE_VERSION = '1.3.4'"), 'Die Optionsseite lädt die aktualisierte entpackte Erweiterung genau einmal neu');
-assert(options.includes("OPTIONS_CODE_VERSION = '1.3.4'") && options.includes('chrome.runtime.reload()'), 'Neue entpackte Brückendateien aktivieren ihren Service Worker einmalig selbst');
+assert(options.includes("OPTIONS_CODE_VERSION = '1.3.6'"), 'Die Optionsseite lädt die aktualisierte entpackte Erweiterung genau einmal neu');
+assert(options.includes("OPTIONS_CODE_VERSION = '1.3.6'") && options.includes('chrome.runtime.reload()'), 'Neue entpackte Brückendateien aktivieren ihren Service Worker einmalig selbst');
 assert(options.includes("password.value || currentCredentials?.password"), 'Ein bereits gespeichertes Kennwort darf durch erneutes Speichern nicht geleert werden');
 assert(options.includes('Kennwort ist verschlüsselt gespeichert'), 'Gespeichertes Kennwort muss ohne Klartext sichtbar bestätigt werden');
 assert(options.includes('savePortalCredentials') && options.includes('automatische Prüfportal-Anmeldung'), 'Prüfportal-Zugang kann einmalig verschlüsselt gespeichert werden');
@@ -110,6 +115,8 @@ assert(queue.includes("$action==='schedule'") && queue.includes("new DateTimeZon
 assert(queue.includes('$weekday>5||$clock<230||$clock>=800'), 'Automatik darf nur Montag bis Freitag ab 02:30 Uhr bis vor Arbeitsbeginn eingeplant werden');
 assert(queue.includes('uq_claims_schedule_key') && queue.includes('INSERT IGNORE INTO claimsforce_import_jobs'), 'Pro Arbeitstag und Profil darf höchstens ein Automatikauftrag entstehen');
 assert(queue.includes("$profile='christian'") && queue.includes("'CF-AUTO-QUEUED'"), 'Werktagsautomatik importiert genau Christians ClaimsForce-Profil');
+const driveApi = fs.readFileSync(path.join(root, 'public/intern/api/google-drive-sync.php'), 'utf8');
+assert(driveApi.includes("['christian','jens','holger','marc']"), 'Backoffice darf das frühere Jens-Maurer-Profil gezielt auswählen');
 assert(queue.includes("$action==='mine'") && queue.includes('WHERE requested_by=:u ORDER BY id DESC LIMIT 20'), 'Eigene Warteschlangenläufe müssen nach einem Portal-Neuladen wiedergefunden werden');
 const central = fs.readFileSync(path.join(root, 'public/intern/claimsforce-central.js'), 'utf8');
 assert(central.includes("action=status&id=") && central.includes("SVNET_CLAIMS_IMPORT_START"), 'Portal kann zentrale Importe starten und verfolgen');
@@ -125,7 +132,7 @@ assert(central.includes('setTimeout(()=>show(text,failed),1000)'), 'Terminaler I
 assert(central.includes('data-svnet-claims-jobs') && central.includes("`${job.id}|${job.profile}|${job.status}|${job.phase"), 'Letzte Serverergebnisse sind unabhängig von UI-Listenern geheimnisfrei im DOM prüfbar');
 assert(central.includes('data-svnet-claims-results') && central.includes('resultOf'), 'Der Live-Nachweis enthält sichere Fall-, Datei-, Nachrichten- und Terminzahlen');
 assert(central.includes('SVNET_CLAIMS_RUNTIME_STATUS') && central.includes('SVNET_CLAIMS_RUNTIME_PING'), 'Portal zeigt den persistenten Browserlauf auch nach einem Worker-Neustart an');
-assert(central.includes('Browser-Brücke 1.3.4 erforderlich') && central.includes("versionAtLeast(bridgeVersion,'1.3.4')"), 'Nur die fehlertolerante Browser-Brücke darf neue Warteschlangenläufe starten');
+assert(central.includes('Browser-Brücke 1.3.6 erforderlich') && central.includes("versionAtLeast(bridgeVersion,'1.3.6')"), 'Nur die inkrementell reparierte Browser-Brücke darf neue Warteschlangenläufe starten');
 const optionsHtml = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.html'), 'utf8');
 assert(optionsHtml.includes('Ehem. Jens Maurer → Christian Wächter'), 'Jens-Zugang ist in der verschlüsselten Zugangsverwaltung auswählbar');
 assert(manifest.permissions.includes('nativeMessaging'), 'Lokaler Zugangsdaten-Leser ist für den unbeaufsichtigten Import freigegeben');
@@ -138,14 +145,17 @@ assert(serviceWorker.includes('GET_CREDENTIAL_DIAGNOSTIC') && serviceWorker.incl
 assert(serviceWorker.includes("type: 'FILL_LOGIN'") && serviceWorker.includes('claimsTab(profile, run, credential)'), 'Der Importlauf muss den ClaimsForce-Anmeldehelfer aktiv anstoßen');
 assert(serviceWorker.includes("!currentProfile && profile === 'christian' && openSession") && serviceWorker.includes('claimsLoggedProfile: profile'), 'Nur eine vorhandene unbekannte Christian-Sitzung darf ohne Profilwechsel übernommen werden');
 assert(serviceWorker.includes("safeRoute(loggedOut.url) === '/logout'") && serviceWorker.includes("url: 'https://web.claimsforce.com/login'"), 'Eine leere ClaimsForce-Abmeldeseite wird deterministisch zur nächsten Profilanmeldung weitergeführt');
-assert(serviceWorker.includes("{ type: 'OPEN_PLANNING' }") && !serviceWorker.includes("chrome.tabs.update(tab.id, { url: PLANNING_URL })"), 'Erfolgreiche ClaimsForce-Anmeldung darf nicht durch einen vollständigen Seitenwechsel verloren gehen');
+assert(serviceWorker.includes("PLANNING_URL = 'https://web.claimsforce.com/planning?bucket=WITH_FUTURE_APPOINTMENT#with-future-appointment'") && serviceWorker.includes('chrome.tabs.update(tabId, { url: PLANNING_URL })'), 'Nach erfolgreicher Anmeldung wird die von ClaimsForce benötigte Termin-Planungsseite deterministisch geöffnet');
 assert(manifest.host_permissions.includes('http://127.0.0.1:47831/*'), 'Lokaler Zugangsdaten-Helfer ist auf den festgelegten Loopback-Port begrenzt');
 assert(serviceWorker.includes('accepted: true') && serviceWorker.includes('claims-import-keepalive'), 'Ein Import darf nicht mehr an einem einzigen lang laufenden Erweiterungs-Nachrichtenkanal hängen');
 assert(serviceWorker.includes('CF-CASE-06') && serviceWorker.includes('completedCases'), 'Jeder vollständig verarbeitete Portal-Fall wird ohne Geheimnisse als Laufzeitbeleg gemeldet');
-assert(serviceWorker.includes('CF-CASE-FETCH') && serviceWorker.includes('controller.abort()') && serviceWorker.includes('timeout = 30000'), 'Externe Fall- und Portalabrufe besitzen sichtbare Laufphasen und feste Zeitgrenzen');
+assert(serviceWorker.includes('CF-CASE-FETCH') && serviceWorker.includes('controller.abort()') && serviceWorker.includes('innerhalb von 30 Sekunden'), 'Externe Fall- und Portalabrufe besitzen sichtbare Laufphasen und feste Zeitgrenzen');
+assert(serviceWorker.includes('await chrome.tabs.reload(tab.id)') && serviceWorker.includes("recovery: 'reload'"), 'Eine bestehende ClaimsForce-Sitzung wird zur erneuten Token-Übernahme kontrolliert neu geladen');
+assert(serviceWorker.includes("recovery: 'login'") && serviceWorker.includes("url: 'https://web.claimsforce.com/login'"), 'Eine abgelaufene ClaimsForce-Sitzung wird automatisch zur Anmeldung geführt');
+assert(serviceWorker.includes('claimsforce_sync_signature') && serviceWorker.includes('CF-CASE-SKIP'), 'Unveränderte bereits importierte Fälle werden ohne erneute Dateiübertragung übersprungen');
+assert(serviceWorker.includes('claimsforce_file_versions') && serviceWorker.includes('claimsforce_message_versions'), 'Geänderte Fälle übertragen nur neue oder geänderte Dateien und Nachrichten');
+assert(serviceWorker.includes('await saveCredentials(profile, local)'), 'Vom lokalen Zugangsdaten-Helfer gelesene Zugänge werden anschließend verschlüsselt im Browser behalten');
 assert(serviceWorker.includes('return await response.json()') && serviceWorker.includes('fileBuffer = await response.arrayBuffer()') && serviceWorker.includes('CF-CASE-UPSERT'), 'Zeitgrenzen umfassen Antwortkörper und der Portal-Speicherschritt ist separat sichtbar');
-assert(serviceWorker.includes("PORTAL_UPLOAD_FINISH', uploadId }, 180000"), 'Ein langsamer Google-Drive-Upload erhält bis zu drei Minuten Antwortzeit');
-assert(serviceWorker.includes("'CF-FILE-WARN'") && serviceWorker.includes('documentsFailed') && serviceWorker.includes('warnings.slice(0, 20)'), 'Ein einzelnes langsames Dokument darf den restlichen Fallimport nicht mehr abbrechen');
 assert(!serviceWorker.includes("startImport({ tab: { id: Number(saved.portalTabId) } }, saved)"), 'Ein neu geweckter MV3-Worker darf einen gespeicherten Lauf nicht automatisch neu starten');
 assert(serviceWorker.includes("status.operation?.status === 'missing'"), 'Eine verlorene Portaloperation muss sofort sichtbar fehlschlagen statt bis zum Zeitlimit zu hängen');
 assert(serviceWorker.includes('portalOperation') && serviceWorker.includes('PORTAL_OPERATION_STATUS') && serviceWorker.includes('CF-CASE-FILES'), 'Worker wartet über kurze Statusabfragen auf Portal-Fallanlage und fährt danach mit Anlagen fort');

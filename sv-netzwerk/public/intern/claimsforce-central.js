@@ -47,7 +47,7 @@
       userJobs=(recent.jobs||[]).filter(job=>['queued','running'].includes(job.status)).map(job=>Number(job.id));
       if(userJobs.length){button.disabled=true;watch();return}
       const terminal=(recent.jobs||[]).filter(job=>['done','failed'].includes(job.status)).slice(0,4);
-      if(terminal.length){const compact=terminal.map(job=>`${job.id}|${job.profile}|${job.status}|${job.phase||'CF-STATUS'}`).join(';');document.documentElement.setAttribute('data-svnet-claims-jobs',compact);const results=terminal.map(job=>{const r=resultOf(job);return`${job.id}|${Number(r.claims||0)}|${Number(r.files||0)}|${Number(r.messages||0)}|${Number(r.appointments||0)}`}).join(';');document.documentElement.setAttribute('data-svnet-claims-results',results);const text=terminal.map(job=>`${job.profile}: ${job.status==='done'?'abgeschlossen':'fehlgeschlagen'} [${job.phase||'CF-STATUS'}] – ${job.message||'ohne Meldung'}`).join(' · '),failed=terminal.some(job=>job.status==='failed');show(text,failed);setTimeout(()=>show(text,failed),1000)}
+      if(terminal.length){const compact=terminal.map(job=>`${job.id}|${job.profile}|${job.status}|${job.phase||'CF-STATUS'}`).join(';');document.documentElement.setAttribute('data-svnet-claims-jobs',compact);const results=terminal.map(job=>{const r=resultOf(job);return`${job.id}|${Number(r.claims||0)}|${Number(r.updated||0)}|${Number(r.skipped||0)}|${Number(r.files||0)}|${Number(r.messages||0)}|${Number(r.appointments||0)}`}).join(';');document.documentElement.setAttribute('data-svnet-claims-results',results);const text=terminal.map(job=>`${job.profile}: ${job.status==='done'?'abgeschlossen':'fehlgeschlagen'} [${job.phase||'CF-STATUS'}] – ${job.message||'ohne Meldung'}`).join(' · '),failed=terminal.some(job=>job.status==='failed');show(text,failed);setTimeout(()=>show(text,failed),1000)}
     }catch(e){show('Importstatus konnte nicht wiederhergestellt werden: '+e.message,true)}
   }
 
@@ -89,7 +89,7 @@
   async function completeAgent(ok,result,error){
     if(!agentJob)return;
     const id=agentJob.id;
-    try{await post('complete',{id,ok,result:result||null,message:ok?`${result?.claims||0} Aufträge vollständig eingelesen.`:(error||'ClaimsForce-Import fehlgeschlagen.')})}
+    try{await post('complete',{id,ok,result:result||null,message:ok?`${result?.claims||0} Aufträge geprüft · ${result?.updated||0} aktualisiert · ${result?.skipped||0} unverändert übersprungen.`:(error||'ClaimsForce-Import fehlgeschlagen.')})}
     catch(e){show(`Import ${id}: Abschlussstatus konnte nicht gespeichert werden (${e.message}).`,true)}
     agentJob=null;busy=false;lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
     await resumeWatch();
@@ -100,8 +100,8 @@
     const d=e.data||{},runtime=d.runtime||{};
     if(d.type==='SVNET_CLAIMS_BRIDGE_READY'){
       bridgeVersion=String(d.version||'0.0.0');
-      bridge=versionAtLeast(bridgeVersion,'1.3.4');
-      if(!bridge)show(`Browser-Brücke 1.3.4 erforderlich (geladen: ${bridgeVersion}). Bitte die entpackte Erweiterung einmal neu laden.`,true);
+      bridge=versionAtLeast(bridgeVersion,'1.3.6');
+      if(!bridge)show(`Browser-Brücke 1.3.6 erforderlich (geladen: ${bridgeVersion}). Bitte die Erweiterung aktualisieren.`,true);
     }
     if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&agentJob){
       const active=d.status?.active||{},diag=d.status?.diagnostic||{};
