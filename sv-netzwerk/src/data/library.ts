@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Rechnungs- und KVA-Prüfung im Schadenfall: Freigabe auf belastbarer Grundlage',
+    description: 'Rechnungs- und KVA-Prüfung: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/',
+    category: 'Rechnungs- und KVA-Prüfung',
+    tags: ['Rechnungsprüfung', 'KVA', 'Kostenvoranschlag', 'Freigabe', 'Schadenregulierung'],
+    date: '2026-08-29',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Koordination mehrerer Sachverständiger im Kumulereignis: Rollen, Standards und Qualitätssicherung',
     description: 'Koordination im Sachverständigen-Netzwerk: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/koordination-sachverstaendige-kumulereignis-einsatz/',
