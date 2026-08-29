@@ -120,6 +120,7 @@ const driveStatusCache = fs.readFileSync(path.join(root, 'public/intern/drive-st
 assert(driveStatusCache.includes('window.svnetDriveStatus=load') && driveStatusCache.includes('pending') && driveStatusCache.includes('Date.now()+45000'), 'Parallele Portalabfragen teilen sich einen einzigen Drive-Status und behalten ihn 45 Sekunden');
 assert(internLayout.includes('drive-status-cache.js?v=20260829-1'), 'Der gemeinsame Drive-Status steht vor allen Portalmodulen bereit');
 assert(drive.includes('gdStatusCacheRead') && drive.includes('DATE_SUB(NOW(),INTERVAL 45 SECOND)') && drive.includes('gdStatusCacheWrite'), 'Auch mehrere Portalregister verwenden serverseitig höchstens alle 45 Sekunden eine vollständige Drive-Abfrage');
+assert(drive.includes('$indexed=searchCaseFolderIndex') && drive.includes('if($indexed)return gdSortCaseSearchRows'), 'Die Fallsuche antwortet bei einem lokalen Indextreffer ohne eine zusätzliche Drive-Abfrage');
 assert(portal.includes('window.svnetDriveStatus?window.svnetDriveStatus()'), 'Die Versicherungsfallseite fasst ihre mehrfachen Drive-Statusabfragen zusammen');
 const queue = fs.readFileSync(path.join(root, 'public/intern/api/claimsforce-queue.php'), 'utf8');
 assert(queue.includes('claimsforce_import_jobs') && queue.includes("$action==='claim'"), 'Zentrale serverseitige Importwarteschlange fehlt');
