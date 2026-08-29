@@ -385,8 +385,8 @@ function gfPortalCurrentReserve(array $caseFiles): ?string
     }
     return null;
 }
-$caseFilesNeedle = '$caseFiles=gfCaseFiles($folderId);if(!$caseFiles)throw new RuntimeException(\'Im aktiven Fall wurden keine auswertbaren Unterlagen gefunden.\');';
-$caseFilesReplacement = $caseFilesNeedle."\n\$portalReserve=gfPortalCurrentReserve(\$caseFiles);if(\$portalReserve!==null)\$meta['reserve']=\$portalReserve;";
+$caseFilesNeedle = '$knowledgeFiles=$rekonOnly?[]:gfKnowledgeFiles();';
+$caseFilesReplacement = "\$portalReserve=gfPortalCurrentReserve(\$caseFiles);if(\$portalReserve!==null)\$meta['reserve']=\$portalReserve;".$caseFilesNeedle;
 if (!str_contains($source, 'gfPortalCurrentReserve($caseFiles)')) {
     $source = str_replace($caseFilesNeedle, $caseFilesReplacement, $source, $countReserveBinding);
     if ($countReserveBinding !== 1) throw new RuntimeException('Aktuelle Gesamtreserve konnte nicht sicher angebunden werden.');
