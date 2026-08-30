@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Kumulschäden nach Hochwasser und Überflutung: Priorisierung und strukturierte Regulierung',
+    description: 'Hochwasser und Überflutung: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/kumulschaeden-hochwasser-ueberflutung-priorisierung-regulierung/',
+    category: 'Hochwasser und Überflutung',
+    tags: ['Kumulschaden', 'Hochwasser', 'Überflutung', 'Kumulschadenmanagement'],
+    date: '2026-08-30',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Reservierung bei größeren Schadenbeständen: Methodik für belastbare Prognosen',
     description: 'Reservierung im Schadenbestand: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/reservierung-grosser-schadenbestand-methodik/',

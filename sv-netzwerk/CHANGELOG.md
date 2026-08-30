@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.38 – 2026-08-30
+- automatischer nachmittags Fachbeitrag veröffentlicht: „Kumulschäden nach Hochwasser und Überflutung: Priorisierung und strukturierte Regulierung"
+- LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
+- ohne Beitragsbild veröffentlicht; keine typografische Platzhaltergrafik erzeugt
+
 ## 3.4.37 – 2026-08-30
 - automatischer morgens Fachbeitrag veröffentlicht: „Reservierung bei größeren Schadenbeständen: Methodik für belastbare Prognosen"
 - LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
