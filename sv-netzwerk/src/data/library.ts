@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Reservierung bei größeren Schadenbeständen: Methodik für belastbare Prognosen',
+    description: 'Reservierung im Schadenbestand: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/reservierung-grosser-schadenbestand-methodik/',
+    category: 'Reservierung im Schadenbestand',
+    tags: ['Reservierung', 'Schadenbestand', 'Regulierung', 'Mengengerüst', 'Prognose'],
+    date: '2026-08-30',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Rechnungs- und KVA-Prüfung im Schadenfall: Freigabe auf belastbarer Grundlage',
     description: 'Rechnungs- und KVA-Prüfung: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/',

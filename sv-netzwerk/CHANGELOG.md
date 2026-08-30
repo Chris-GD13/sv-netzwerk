@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.37 – 2026-08-30
+- automatischer morgens Fachbeitrag veröffentlicht: „Reservierung bei größeren Schadenbeständen: Methodik für belastbare Prognosen"
+- LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
+- ohne Beitragsbild veröffentlicht; keine typografische Platzhaltergrafik erzeugt
+
 ## 3.4.36 – 2026-08-29
 - automatischer morgens Fachbeitrag veröffentlicht: „Rechnungs- und KVA-Prüfung im Schadenfall: Freigabe auf belastbarer Grundlage"
 - LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
