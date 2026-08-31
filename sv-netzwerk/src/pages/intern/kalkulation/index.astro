@@ -144,6 +144,18 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
 
 <script is:inline>
 (()=>{
+  const card=document.querySelector('.bk-card.bk-history'),box=document.getElementById('bk-history');
+  if(!card||!box)return;
+  const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const money=value=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(value)||0);
+  const refresh=async()=>{try{const folder=window.__bkiCalcBridge?.getActive?.()?.folder_id||'',response=await fetch('/intern/api/bki-calculator.php?action=list&folder_id='+encodeURIComponent(folder),{credentials:'same-origin'}),data=await response.json();if(!response.ok)throw new Error(data.error||`HTTP ${response.status}`);const items=data.calculations||data.items||[];box.innerHTML=items.length?items.map(item=>`<div class="bk-history-item"><strong>${esc(item.case_no||'Freie Kalkulation')} · ${money(item.gross_total)}</strong><br><small>${esc(item.created_at||'')} · ${esc(item.object_name||item.title||'')}</small><div class="bk-history-actions"><button class="bk-secondary" type="button" data-edit-calc="${item.id}">Bearbeiten</button><button class="bk-remove" type="button" data-delete-calc="${item.id}">Löschen</button></div></div>`).join(''):'Noch keine Kalkulation gespeichert.';}catch(error){box.textContent=error.message||String(error);}};
+  card.querySelector('.bk-collapse-toggle')?.addEventListener('click',()=>{if(!card.classList.contains('is-collapsed'))refresh();});
+  document.getElementById('bk-save')?.addEventListener('click',()=>setTimeout(refresh,1000));
+})();
+</script>
+
+<script is:inline>
+(()=>{
   const root=document.querySelector('[data-bki-storm-index="1"]');
   if(!root)return;
   const bridge=()=>window.__bkiCalcBridge;

@@ -38,6 +38,10 @@ assert(api.includes("['image/jpeg','image/png','image/webp','image/gif']"), 'Die
 assert(api.includes('KI-API-Guthaben aufgebraucht') && api.includes('Datei und Fallzuordnung sind in Ordnung'), 'Ein erschöpftes API-Guthaben darf nicht mehr als Datei- oder Fallfehler erscheinen.');
 assert(api.includes("($item['type']??'')==='section'") && api.includes('class="section"'), 'KVA-Überschriften müssen im Fallaktenarchiv als preislose Abschnitte erscheinen.');
 assert(settlementPdf.includes("($line['type']??'')==='section'") && settlementPdf.includes('$position++'), 'KVA-Überschriften dürfen in der Abgeltungs-PDF nicht als berechnete Position gezählt werden.');
+assert(settlementPdf.includes("textLine($ops,45,793,'SV',26,true,$orange)") && settlementPdf.includes("'sv-netzwerk.eu'"), 'Die Abgeltungs-PDF muss das farbige SV-Netzwerk-Logo tragen.');
+assert(settlementPdf.includes('drawPageHeader($ops,count($pages)>0)') && settlementPdf.includes("'Seite '.($index+1).' von '.$pageCount"), 'Mehrseitige PDFs müssen einen wiederholten Kopf und Seitenzahlen erhalten.');
+assert(settlementPdf.includes("$basisText=numberValue($quantity)") && settlementPdf.includes("'Betrag brutto'") && settlementPdf.includes("'Regulierung'"), 'Menge, Einheit, Preis, Bruttobetrag und Regulierung müssen übersichtlich getrennt werden.');
+assert(page.includes("card.querySelector('.bk-collapse-toggle')?.addEventListener('click'") && page.includes("data.calculations||data.items||[]"), 'Gespeicherte Kalkulationen müssen beim Aufklappen zuverlässig neu geladen werden.');
 
 assert(noteHelper.includes("if(line.type==='section')return;"), 'Abschnittsüberschriften dürfen nicht in die Abgeltungsberechnung eingehen.');
 assert(!noteHelper.includes("if(event.target.matches?.('input[data-k]'))updateSettlementNote()"), 'Positionsänderungen dürfen den Mustertext nicht automatisch verändern.');
