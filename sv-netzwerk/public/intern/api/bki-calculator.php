@@ -47,6 +47,8 @@ function bkOpenAIJson(string $method,string $path,?array $payload=null,int $time
   $j=$r['body']!==''?json_decode($r['body'],true):[];
   if($r['status']<200||$r['status']>=300){
     $message=is_array($j)&&!empty($j['error']['message'])?(string)$j['error']['message']:'HTTP '.$r['status'];
+    $code=is_array($j)?strtolower(trim((string)($j['error']['code']??''))):'';
+    if($code==='insufficient_quota'||str_contains(strtolower($message),'no credits remaining'))throw new RuntimeException('Die KVA-Auswertung ist derzeit nicht verfügbar, weil das hinterlegte KI-API-Guthaben aufgebraucht ist. Datei und Fallzuordnung sind in Ordnung; nach Aufladung bitte erneut auslesen.');
     throw new RuntimeException('OpenAI-Dateisuche fehlgeschlagen: '.$message);
   }
   return is_array($j)?$j:[];
@@ -74,8 +76,10 @@ function bkOpenAIUploadBytes(string $name,string $mime,string $bytes):string{
     $ch=curl_init('https://api.openai.com/v1/files');
     curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$key],CURLOPT_POSTFIELDS=>['purpose'=>'user_data','file'=>new CURLFile($tmp,$mime,$name)],CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>420]);
     $response=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$error=curl_error($ch);curl_close($ch);
+    $json=json_decode((string)$response,true);$message=is_array($json)?trim((string)($json['error']['message']??'')):'';$code=is_array($json)?strtolower(trim((string)($json['error']['code']??''))):'';
+    if($code==='insufficient_quota'||str_contains(strtolower($message),'no credits remaining'))throw new RuntimeException('Die KVA-Auswertung ist derzeit nicht verfügbar, weil das hinterlegte KI-API-Guthaben aufgebraucht ist. Datei und Fallzuordnung sind in Ordnung; nach Aufladung bitte erneut auslesen.');
     if($response===false||$error!==''||$status<200||$status>=300)throw new RuntimeException('KVA konnte nicht für die Auswertung bereitgestellt werden.');
-    $json=json_decode((string)$response,true);$id=trim((string)($json['id']??''));
+    $id=trim((string)($json['id']??''));
     if($id==='')throw new RuntimeException('KVA-Datei-ID fehlt.');
     return$id;
   }finally{@unlink($tmp);}

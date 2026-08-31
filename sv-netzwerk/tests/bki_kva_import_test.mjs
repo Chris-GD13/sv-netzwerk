@@ -19,5 +19,6 @@ assert(api.includes("if(!bkDriveBelongsToCase($fileId,$folder))"), 'Die rekursiv
 assert(api.includes("'type'=>'input_image'"), 'Fotos müssen als Bild und nicht als Dokument an die Auswertung übergeben werden.');
 assert(api.includes("'type'=>'input_file'"), 'PDF- und Word-KVA müssen weiterhin als Dokument ausgewertet werden.');
 assert(api.includes("['image/jpeg','image/png','image/webp','image/gif']"), 'Die tatsächlich unterstützten Bildformate müssen eindeutig begrenzt sein.');
+assert(api.includes('KI-API-Guthaben aufgebraucht') && api.includes('Datei und Fallzuordnung sind in Ordnung'), 'Ein erschöpftes API-Guthaben darf nicht mehr als Datei- oder Fallfehler erscheinen.');
 
 console.log('KVA-Import: Unterordner, mobile Dateiauswahl und Fotoauswertung abgesichert.');
