@@ -7,7 +7,7 @@
   const note = document.getElementById('chatgpt-onboarding-note');
   if (!(dialog instanceof HTMLElement) || !(openButton instanceof HTMLButtonElement) || !(checkButton instanceof HTMLButtonElement)) return;
 
-  let installUrl = 'https://chatgpt.com/plugins';
+  let installUrl = 'https://chatgpt.com/codex/open-app?target=plugin&plugin_id=Plugin_636243ee5d9481919ece3f9a5af9adc3';
   const setState = (text, error = false) => {
     if (!(state instanceof HTMLElement)) return;
     state.textContent = text;
@@ -24,11 +24,9 @@
       return data;
     }
     installUrl = data.install_url;
-    openButton.textContent = data.direct_install ? 'Plugin jetzt installieren' : 'Plugin-Verzeichnis öffnen';
+    openButton.textContent = 'Plugin in ChatGPT öffnen';
     if (note instanceof HTMLElement) {
-      note.textContent = data.direct_install
-        ? 'Nach dem Klick meldest du dich mit deinem eigenen ChatGPT-/Work-Zugang an und bestätigst einmal die Verbindung zum Prüfportal.'
-        : `Öffne das Verzeichnis und suche nach „${data.plugin_name}“. Danach bestätigst du einmal die Verbindung zum Prüfportal.`;
+      note.textContent = 'Das Plugin ist installiert. Öffne es in ChatGPT Desktop, starte es einmal und bestätige dort die persönliche Verbindung zum Prüfportal.';
     }
     if (sessionStorage.getItem('svnet-chatgpt-onboarding-later') !== '1') dialog.hidden = false;
     return data;
@@ -36,7 +34,7 @@
 
   openButton.addEventListener('click', () => {
     window.open(installUrl, '_blank', 'noopener,noreferrer');
-    setState('ChatGPT wurde geöffnet. Installiere das Plugin dort und klicke anschließend hier auf „Verbindung prüfen“.');
+    setState('ChatGPT Desktop wurde geöffnet. Starte das Plugin einmal, bestätige den Zugriff auf deinen Portalzugang und klicke danach hier auf „Verbindung prüfen“.');
     checkButton.focus();
   });
   checkButton.addEventListener('click', async () => {
@@ -44,7 +42,7 @@
     setState('Verbindung wird geprüft …');
     try {
       const data = await readStatus(true);
-      if (!data.installed) setState('Noch keine Verbindung erkannt. Schließe die Installation in ChatGPT ab und prüfe danach erneut.', true);
+      if (!data.installed) setState('Noch keine persönliche Portalverbindung erkannt. Öffne das Plugin in ChatGPT Desktop, starte es einmal und bestätige dort den Zugriff auf deinen Portalzugang.', true);
     } catch (error) {
       setState(error instanceof Error ? error.message : 'Verbindung konnte nicht geprüft werden.', true);
     } finally {

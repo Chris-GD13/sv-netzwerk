@@ -43,10 +43,15 @@ assert.match(onboardingApi, /'shared_account'=>true/);
 assert.match(onboardingApi, /'account_owner'=>'Christian Wächter'/);
 assert.match(onboardingApi, /SV_CHATGPT_PLUGIN_INSTALL_URL/);
 assert.match(onboardingApi, /SV_CHATGPT_PLUGIN_LAUNCH_URL/);
+assert.match(onboardingApi, /open-app\?target=plugin&plugin_id=Plugin_636243ee5d9481919ece3f9a5af9adc3/);
+assert.match(onboardingApi, /'direct_install'=>true/);
 
 const onboardingJs = await read('sv-netzwerk/public/intern/chatgpt-onboarding.js');
 assert.doesNotMatch(onboardingJs, /\.zip|\.exe/i);
 assert.match(onboardingJs, /Verbindung prüfen/);
+assert.match(onboardingJs, /open-app\?target=plugin&plugin_id=Plugin_636243ee5d9481919ece3f9a5af9adc3/);
+assert.match(onboardingJs, /Plugin in ChatGPT öffnen/);
+assert.match(onboardingJs, /Noch keine persönliche Portalverbindung erkannt/);
 
 const oauth = await read('sv-netzwerk/public/intern/oauth/token.php');
 assert.match(oauth, /grant === 'refresh_token'/);

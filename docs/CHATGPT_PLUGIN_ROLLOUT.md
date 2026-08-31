@@ -18,7 +18,7 @@ Es werden keine ZIP-Dateien, Programme oder ausführbaren Dateien an die Sachver
 5. Sobald die Verbindung erkannt wurde, erscheint der Einrichtungsdialog nicht mehr.
 6. Bei Berichtsausgaben öffnet das Portal den persönlichen ChatGPT-Zugang und legt den fallbezogenen Arbeitsauftrag in die Zwischenablage. Formulare und Kalkulationen verbleiben in der Portalverarbeitung.
 
-Ohne gesetzte direkte Installationsadresse öffnet das Portal ersatzweise das offizielle Plugin-Verzeichnis und zeigt den zu suchenden Pluginnamen an.
+Ohne abweichend gesetzte Installationsadresse öffnet das Portal direkt das veröffentlichte Workspace-Plugin in der ChatGPT-Desktop-App. Eine manuelle Suche oder die Eingabe des Pluginnamens ist nicht erforderlich.
 
 ## Berechtigungen und Datenschutz
 

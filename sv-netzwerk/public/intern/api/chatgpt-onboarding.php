@@ -9,9 +9,10 @@ $user = requireAuth();
 $email = mb_strtolower(trim((string)($user['email'] ?? '')), 'UTF-8');
 $name = mb_strtolower(trim((string)($user['full_name'] ?? '')), 'UTF-8');
 $isSusanne = $email === 'ws@sv-schuett.eu' || str_contains($name, 'susanne wächter') || str_contains($name, 'susanne waechter');
+$defaultInstallUrl = 'https://chatgpt.com/codex/open-app?target=plugin&plugin_id=Plugin_636243ee5d9481919ece3f9a5af9adc3';
 $configuredInstallUrl = trim(env('SV_CHATGPT_PLUGIN_INSTALL_URL', ''));
-$installUrl = $configuredInstallUrl !== '' ? $configuredInstallUrl : 'https://chatgpt.com/plugins';
-$launchUrl = trim(env('SV_CHATGPT_PLUGIN_LAUNCH_URL', '')) ?: ($configuredInstallUrl !== '' ? $configuredInstallUrl : 'https://chatgpt.com/');
+$installUrl = $configuredInstallUrl !== '' ? $configuredInstallUrl : $defaultInstallUrl;
+$launchUrl = trim(env('SV_CHATGPT_PLUGIN_LAUNCH_URL', '')) ?: $installUrl;
 
 if ($isSusanne) {
     apiJson([
@@ -23,7 +24,7 @@ if ($isSusanne) {
         'connected'=>true,
         'install_url'=>$installUrl,
         'launch_url'=>$launchUrl,
-        'direct_install'=>$configuredInstallUrl !== '',
+        'direct_install'=>true,
     ]);
 }
 
@@ -43,5 +44,5 @@ apiJson([
     'connected'=>$connected,
     'install_url'=>$installUrl,
     'launch_url'=>$launchUrl,
-    'direct_install'=>$configuredInstallUrl !== '',
+    'direct_install'=>true,
 ]);
