@@ -78,7 +78,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes("context.backoffice?`Import für"), 'Susannes ausgewählter Sachverständiger wird angezeigt');
 assert(portal.includes("button.dataset.claimsProfile=context.backoffice?key:(context.claims_profile||'self')"), 'Portal verwendet für Susanne und den angemeldeten Sachverständigen das richtige gespeicherte Profil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20260831-4'), 'Portal lädt die erweiterte Falldatenübernahme ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20260831-5'), 'Portal lädt die erweiterte Falldatenübernahme ohne alten Browsercache');
 assert(portal.includes('<option value="jens">Ehem. Jens Maurer → Christian Wächter</option>'), 'Jens Maurer ist im Portal als eigenes ClaimsForce-Profil auswählbar');
 
 const bridge = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/portal-bridge.js'), 'utf8');
