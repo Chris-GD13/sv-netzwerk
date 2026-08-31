@@ -1,0 +1,57 @@
+name: OpenAI Runtime aktualisieren
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-config:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP-Konfiguration pruefen
+        run: php -l sv-netzwerk/public/intern/api/config.php
+
+      - name: Python SFTP installieren
+        run: python3 -m pip install --disable-pip-version-check --quiet paramiko
+
+      - name: Konfiguration nach IONOS uebertragen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import paramiko
+
+          local = Path('sv-netzwerk/public/intern/api/config.php')
+          remote = '/sv-netzwerk/intern/api/config.php'
+          host = os.environ['SFTP_HOST']
+          user = os.environ['SFTP_USERNAME']
+          password = os.environ['SFTP_PASSWORD']
+          port = int(os.environ.get('SFTP_PORT') or '22')
+
+          transport = paramiko.Transport((host, port))
+          transport.banner_timeout = 15
+          transport.auth_timeout = 15
+          transport.connect(username=user, password=password)
+          sftp = paramiko.SFTPClient.from_transport(transport)
+          sftp.get_channel().settimeout(20)
+          sftp.put(str(local), remote)
+          stat = sftp.stat(remote)
+          print(f'OK {remote} ({stat.st_size} bytes)')
+          sftp.close()
+          transport.close()
+          PY
+
+      - name: Endpoint erreichbar
+        run: |
+          code="$(curl -L -s -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/api/insurance-case-extract.php)"
+          test "$code" = "401" -o "$code" = "405"
