@@ -40,14 +40,17 @@
   function lineLabel(line){return line.description||'Freie Position';}
 
   function settlementModel(lines){
-    const items=lines.map((line,index)=>{
+    let position=0;
+    const items=[];
+    lines.forEach((line,index)=>{
+      if(line.type==='section')return;
       const mode=line.settlement_mode||'restore';
       const percent=settlementPercent(line.settlement_percent);
       const net=lineNet(line);
       const gross=lineGross(line);
       const amount=mode==='percent'?net*percent/100:gross;
       const method=mode==='percent'?`Abgeltung ${String(percent).replace('.',',')} % · netto`:mode==='full'?'Auszahlung 100 % · brutto':'Wiederherstellung · brutto';
-      return{line,index,position:line.position_code||index+1,mode,percent,net,gross,amount,method,label:lineLabel(line)};
+      items.push({line,index,position:String(++position),mode,percent,net,gross,amount,method,label:lineLabel(line)});
     });
     return{
       items,
@@ -110,6 +113,8 @@
     const summary=ensureSettlementSummary();
     if(!summary)return;
     const model=settlementModel(lines);
+    const payoutChoice=[...document.querySelectorAll('.bk-note-choice')].find(input=>String(input.value||'').includes('pauschale Abgeltung an den VN'));
+    if(payoutChoice)payoutChoice.checked=model.hasSettlement;
     summary.hidden=!model.hasSettlement;
     document.querySelector('.bk-summary')?.classList.toggle('has-settlement-total',model.hasSettlement);
     const totalCard=document.getElementById('bk-settlement-total-card');
@@ -170,18 +175,16 @@
     grow(field);
 
     updateSettlementSummary(lines);
-    const payoutChoice=[...document.querySelectorAll('.bk-note-choice')].find(input=>String(input.value||'').includes('pauschale Abgeltung an den VN'));
-    if(payoutChoice)payoutChoice.checked=settlementModel(lines).hasSettlement;
   }
 
   function changeSettlement(index,mode,percent){
     const lines=getLines();
-    if(!lines[index])return;
+    if(!lines[index]||lines[index].type==='section')return;
     lines[index].settlement_mode=mode;
     if(mode==='percent')lines[index].settlement_percent=settlementPercent(percent);
     else delete lines[index].settlement_percent;
     setLines(lines);
-    setTimeout(()=>{enhanceSettlementTable();updateSettlementNote();},0);
+    setTimeout(()=>enhanceSettlementTable(),0);
   }
 
   function ensureStyle(){
@@ -209,8 +212,16 @@
 
     const lines=getLines();
     [...body.querySelectorAll('tr')].forEach((row,index)=>{
-      if(row.querySelector('.bk-settlement-col'))return;
       const line=lines[index]||{};
+      if(line.type==='section'){
+        if(!row.querySelector('.bk-settlement-col')){
+          const empty=document.createElement('td');
+          empty.className='bk-settlement-col bk-section-settlement';
+          row.insertBefore(empty,row.lastElementChild);
+        }
+        return;
+      }
+      if(row.querySelector('.bk-settlement-col'))return;
       const mode=line.settlement_mode||'restore';
       const percent=settlementPercent(line.settlement_percent);
       const td=document.createElement('td');
@@ -248,16 +259,16 @@
   if(linesBody){
     tableObserver.observe(linesBody,{childList:true,subtree:true});
     linesBody.addEventListener('input',event=>{
-      if(event.target.matches?.('input[data-k]'))updateSettlementNote();
+      if(event.target.matches?.('input[data-k]'))updateSettlementSummary(getLines());
     });
     linesBody.addEventListener('click',event=>{
-      if(event.target.closest?.('[data-remove]'))setTimeout(()=>{enhanceSettlementTable();updateSettlementNote();},0);
+      if(event.target.closest?.('[data-remove]'))setTimeout(()=>enhanceSettlementTable(),0);
     });
   }
   enhanceSettlementTable();
 
   document.getElementById('bk-vat')?.addEventListener('input',()=>{
-    if(getLines().length)updateSettlementNote();
+    if(getLines().length)updateSettlementSummary(getLines());
   });
 
   document.addEventListener('click',event=>{
@@ -265,12 +276,11 @@
       setTimeout(()=>{
         document.querySelectorAll('textarea[data-auto-grow]').forEach(grow);
         enhanceSettlementTable();
-        if(getLines().length)updateSettlementNote();
       },0);
     }
   },true);
 
-  setTimeout(()=>{document.querySelectorAll('textarea[data-auto-grow]').forEach(grow);enhanceSettlementTable();if(getLines().length)updateSettlementNote();},250);
-  setTimeout(()=>{document.querySelectorAll('textarea[data-auto-grow]').forEach(grow);enhanceSettlementTable();if(getLines().length)updateSettlementNote();},1000);
-  addEventListener('beforeprint',()=>{document.querySelectorAll('textarea[data-auto-grow]').forEach(grow);updateSettlementNote();});
+  setTimeout(()=>{document.querySelectorAll('textarea[data-auto-grow]').forEach(grow);enhanceSettlementTable();},250);
+  setTimeout(()=>{document.querySelectorAll('textarea[data-auto-grow]').forEach(grow);enhanceSettlementTable();},1000);
+  addEventListener('beforeprint',()=>{document.querySelectorAll('textarea[data-auto-grow]').forEach(grow);enhanceSettlementTable();});
 })();

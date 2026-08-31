@@ -50,6 +50,7 @@ jobs:
       - name: KVA-Unterordner, Mobil-Dateiauswahl und Fotoauswertung prüfen
         run: |
           php -l sv-netzwerk/public/intern/api/bki-calculator.php
+          php -l sv-netzwerk/public/intern/api/bki-settlement-pdf.php
           node sv-netzwerk/tests/bki_kva_import_test.mjs
 
       - name: KVA-Saniererkontakte vollständig ergänzen

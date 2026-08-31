@@ -42,14 +42,20 @@ paragraph($pages,$ops,$y,'Schadenort: '.($location!==''?$location:'-'),9);
 paragraph($pages,$ops,$y,'Datum: '.$date,9);
 $y-=4;
 textLine($ops,48,$y,'Pos.',8,true); textLine($ops,78,$y,'Leistung',8,true); textLine($ops,340,$y,'Betrag',8,true); textLine($ops,430,$y,'Regelung',8,true); $y-=7; rule($ops,48,$y,547,$y); $y-=14;
-$totalGross=0.0; $payout=0.0;
+$totalGross=0.0; $payout=0.0; $position=0;
 foreach($lines as $i=>$line){
+  if(($line['type']??'')==='section'){
+    $desc=wrapText((string)($line['description']??'KVA-Positionen'),85); $height=max(24,count($desc)*12+8); need($pages,$ops,$y,$height);
+    foreach($desc as $j=>$d)textLine($ops,48,$y-$j*12,$d,10,true);
+    $y-=$height; rule($ops,48,$y+5,547,$y+5); continue;
+  }
+  $position++;
   $qty=(float)($line['quantity']??0); $ep=(float)($line['unit_price']??0); $factor=(float)($line['regional_factor']??1); $net=$qty*$ep*$factor; $gross=$net*(1+$vat/100); $totalGross+=$gross;
   $mode=(string)($line['settlement_mode']??'restore'); $percent=max(0,min(100,(float)($line['settlement_percent']??30)));
   $amount=$mode==='percent'?$net*$percent/100:$gross; if($mode!=='restore')$payout+=$amount;
   $ruleText=$mode==='percent'?'Abgeltung '.number_format($percent,0,',','.').' %':($mode==='full'?'Auszahlung 100 %':'Wiederherstellung');
   $desc=wrapText((string)($line['description']??'Freie Position'),46); $height=max(20,count($desc)*11+6); need($pages,$ops,$y,$height);
-  textLine($ops,48,$y,(string)($line['position_code']??($i+1)),8); foreach($desc as $j=>$d)textLine($ops,78,$y-$j*11,$d,8);
+  textLine($ops,48,$y,(string)$position,8); foreach($desc as $j=>$d)textLine($ops,78,$y-$j*11,$d,8);
   textLine($ops,340,$y,money($mode==='percent'?$amount:$gross),8); foreach(wrapText($ruleText,22) as $j=>$r)textLine($ops,430,$y-$j*11,$r,8);
   $y-=$height; rule($ops,48,$y+5,547,$y+5);
 }
