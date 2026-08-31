@@ -57,6 +57,18 @@ const oauth = await read('sv-netzwerk/public/intern/oauth/token.php');
 assert.match(oauth, /grant === 'refresh_token'/);
 assert.match(oauth, /oauth_refresh_tokens/);
 
+const apache = await read('sv-netzwerk/public/.htaccess');
+assert.match(apache, /RewriteRule \^\\\.well-known\/oauth-protected-resource\$ \/\.well-known\/oauth-protected-resource\/index\.php \[END\]/);
+assert.match(apache, /RewriteRule \^\\\.well-known\/oauth-authorization-server\$ \/\.well-known\/oauth-authorization-server\/index\.php \[END\]/);
+
+const deployScope = await read('sv-netzwerk/scripts/prepare-deploy-scope.mjs');
+assert.match(deployScope, /copyTree\('\.well-known'\)/);
+assert.match(deployScope, /file\.startsWith\('\.well-known\/'\)/);
+
+const portalWorkflow = await read('.github/workflows/deploy-portal.yml');
+assert.match(portalWorkflow, /put dist\/\.htaccess -o \.htaccess/);
+assert.match(portalWorkflow, /deploy-portal\/\.well-known\/oauth-protected-resource\/intern\/mcp\/index\.php/);
+
 const mcpServer = await read('sv-netzwerk/public/intern/mcp/index.php');
 assert.match(mcpServer, /'name'=>'read_case_file'/);
 assert.match(mcpServer, /requireCaseFolderAccess\(\$folder,\$user\)/);

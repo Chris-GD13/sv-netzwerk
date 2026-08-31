@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - "sv-netzwerk/public/intern/**"
+      - "sv-netzwerk/public/.well-known/**"
+      - "sv-netzwerk/public/.htaccess"
       - "sv-netzwerk/src/pages/intern/**"
       - "sv-netzwerk/src/layouts/InternalLayout.astro"
       - "sv-netzwerk/src/styles/internal-portal.css"
@@ -59,6 +61,8 @@ jobs:
       - name: Ausschließlich Portaldateien vorbereiten
         run: |
           node scripts/prepare-deploy-scope.mjs portal dist deploy-portal
+          test -f dist/.htaccess
+          test -f deploy-portal/.well-known/oauth-protected-resource/intern/mcp/index.php
           test -f deploy-portal/intern/versicherungsfaelle/index.html
           test -f deploy-portal/intern/api/gf-ai-generate.php
           test -f deploy-portal/intern/deploy-version.txt
@@ -77,7 +81,7 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          timeout 1200s lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --only-newer --parallel=4 --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern/photos --exclude-glob intern/photos/** --exclude-glob intern/api/config.php deploy-portal/ .; quit"
+          timeout 1200s lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; put dist/.htaccess -o .htaccess; mirror --reverse --only-newer --parallel=4 --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern/photos --exclude-glob intern/photos/** --exclude-glob intern/api/config.php deploy-portal/ .; quit"
 
       - name: Portal online verifizieren
         env:
@@ -91,4 +95,14 @@ jobs:
             status="$(curl --location --silent --show-error --retry 3 --retry-delay 3 -o /dev/null -w '%{http_code}' "https://www.sv-netzwerk.eu${path}")"
             test "$status" = "200"
             echo "$path: HTTP $status"
+          done
+          for path in /.well-known/oauth-protected-resource /.well-known/oauth-protected-resource/intern/mcp/ /.well-known/oauth-authorization-server; do
+            headers="$(mktemp)"
+            body="$(mktemp)"
+            status="$(curl --max-redirs 0 --silent --show-error --retry 3 --retry-delay 3 -D "$headers" -o "$body" -w '%{http_code}' "https://www.sv-netzwerk.eu${path}")"
+            test "$status" = "200"
+            grep -Eiq '^content-type: application/json([;[:space:]]|$)' "$headers"
+            node -e "const fs=require('fs'); JSON.parse(fs.readFileSync(process.argv[1],'utf8'));" "$body"
+            echo "$path: HTTP $status, JSON ohne Redirect"
+            rm -f "$headers" "$body"
           done

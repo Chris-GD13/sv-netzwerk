@@ -61,6 +61,7 @@ if (scope === 'site') {
   }
 } else {
   copyTree('intern');
+  copyTree('.well-known');
   for (const file of ['sw.js', 'manifest.webmanifest']) copyFile(file);
 
   const references = referencedBuildFiles(path.join(target, 'intern'));
@@ -82,6 +83,6 @@ const collect = (root) => {
 collect(target);
 if (files.some((file) => protectedName(path.basename(file)))) throw new Error('Geschützte Datei im Deployment-Paket.');
 if (scope === 'site' && files.some((file) => file === 'intern' || file.startsWith('intern/'))) throw new Error('Portaldatei im Website-Paket.');
-if (scope === 'portal' && files.some((file) => !file.startsWith('intern/') && !file.startsWith('_astro/') && !file.startsWith('assets/') && !['sw.js', 'manifest.webmanifest'].includes(file))) throw new Error('Website-Datei im Portal-Paket.');
+if (scope === 'portal' && files.some((file) => !file.startsWith('intern/') && !file.startsWith('.well-known/') && !file.startsWith('_astro/') && !file.startsWith('assets/') && !['sw.js', 'manifest.webmanifest'].includes(file))) throw new Error('Website-Datei im Portal-Paket.');
 if (!files.length) throw new Error('Deployment-Paket ist leer.');
 console.log(`${scope}: ${files.length} Dateien vorbereitet`);
