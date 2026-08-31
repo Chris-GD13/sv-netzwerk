@@ -47,6 +47,11 @@ jobs:
       - name: KVA-Dateiauswahl bei Fensterfokus prüfen
         run: php sv-netzwerk/tests/kva_file_selection_state_test.php
 
+      - name: KVA-Unterordner, Mobil-Dateiauswahl und Fotoauswertung prüfen
+        run: |
+          php -l sv-netzwerk/public/intern/api/bki-calculator.php
+          node sv-netzwerk/tests/bki_kva_import_test.mjs
+
       - name: KVA-Saniererkontakte vollständig ergänzen
         run: php sv-netzwerk/tests/kva_contact_enrichment_test.php
 
