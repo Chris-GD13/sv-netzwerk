@@ -75,6 +75,7 @@ assert.match(wellKnownApache, /DirectorySlash Off/);
 assert.match(wellKnownApache, /RewriteRule \^oauth-protected-resource\/intern\/mcp\$/);
 
 const mcpServer = await read('sv-netzwerk/public/intern/mcp/index.php');
+assert.match(mcpServer, /REQUEST_METHOD'\]\s*!==\s*'POST'\)\s*oauthChallenge\('cases:read cases:drafts\.write'\)/, 'MCP GET probe must return an OAuth challenge');
 assert.match(mcpServer, /'name'=>'read_case_file'/);
 assert.match(mcpServer, /requireCaseFolderAccess\(\$folder,\$user\)/);
 assert.match(mcpServer, /mcpDriveFindCaseFile/);

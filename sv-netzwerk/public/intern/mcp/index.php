@@ -56,7 +56,10 @@ function caseTitle(array $row): string {
     return $parts?implode(' · ',$parts):'Versicherungsfall '.substr((string)$row['folder_id'],0,12);
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') oauthJson(['name'=>'SV-Netzwerk Fallbearbeitung','version'=>'1.0.0','mcp'=>'POST erforderlich.'], 200);
+// OAuth-aware MCP clients probe the endpoint with GET before sending an
+// initialize request. Return the same RFC 9728 challenge as an unauthenticated
+// POST; a 200 informational document is otherwise mistaken for auth metadata.
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') oauthChallenge('cases:read cases:drafts.write');
 
 // Challenge the MCP client before initialization so ChatGPT starts the
 // personal OAuth flow instead of merely listing an unauthenticated server.
