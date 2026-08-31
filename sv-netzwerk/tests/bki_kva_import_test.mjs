@@ -11,6 +11,9 @@ assert(page.includes('id="bk-kva-file"') && page.includes('Datei vom Gerät ausw
 assert(!/id="bk-kva-file"[^>]*capture=/u.test(page), 'Die normale Dateiauswahl darf nicht die Kamera erzwingen.');
 assert(/id="bk-kva-camera"[^>]*capture="environment"/u.test(page), 'Für das direkte Fotografieren muss es einen getrennten Kameraweg geben.');
 assert(page.includes("file.files?.[0]||camera.files?.[0]"), 'Datei- und Kameraauswahl müssen an denselben KVA-Import übergeben werden.');
+assert(page.includes('Alle Positionen 1:1 in die Kalkulation übernehmen'), 'Alle erkannten KVA-Positionen müssen ohne BKI-Treffer 1:1 übernommen werden können.');
+assert(page.includes('offeredUnit||(offeredTotal/quantity)||0'), 'Der 1:1-Import muss den angebotenen Einheitspreis oder den aus der Positionssumme abgeleiteten Preis verwenden.');
+assert(page.includes("positions.forEach((row,index)=>"), 'Der 1:1-Import darf keine KVA-Position wegen eines fehlenden BKI-Treffers auslassen.');
 
 assert(api.includes('function bkDriveBelongsToCase('), 'Die Fallzuordnung muss über den vollständigen Drive-Unterordnerpfad geprüft werden.');
 assert(api.includes("if(hash_equals($folderId,$parent))return true"), 'Ein KVA in einem Unterordner des aktiven Falls muss zugelassen werden.');
