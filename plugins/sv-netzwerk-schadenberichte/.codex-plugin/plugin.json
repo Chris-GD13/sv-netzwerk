@@ -1,0 +1,19 @@
+{
+  "name": "sv-netzwerk-schadenberichte",
+  "version": "0.1.0",
+  "description": "Erstellt beleggebundene Schadenberichte aus den eigenen Fällen im SV-Netzwerk Prüfportal.",
+  "author": {
+    "name": "SV-Netzwerk"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "SV-Netzwerk Schadenberichte",
+    "shortDescription": "Schadenberichte aus der persönlichen Portalakte.",
+    "longDescription": "Liest ausschließlich die dem angemeldeten Sachverständigen zugeordneten Schadenfälle und erstellt daraus kopierfertige, beleggebundene Berichte. Normale Schadenberichte und SV-GF-Berichte verwenden getrennte, verbindliche Gliederungen.",
+    "developerName": "SV-Netzwerk",
+    "category": "Productivity",
+    "capabilities": ["MCP", "Skills"],
+    "defaultPrompt": "Suche meinen Schadenfall und erstelle einen kopierfertigen Schadenbericht aus den belegten Aktenangaben."
+  },
+  "mcpServers": "./.mcp.json"
+}

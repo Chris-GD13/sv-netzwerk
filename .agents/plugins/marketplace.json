@@ -1,0 +1,20 @@
+{
+  "name": "sv-netzwerk",
+  "interface": {
+    "displayName": "Sv Netzwerk"
+  },
+  "plugins": [
+    {
+      "name": "sv-netzwerk-schadenberichte",
+      "source": {
+        "source": "local",
+        "path": "./plugins/sv-netzwerk-schadenberichte"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

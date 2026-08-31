@@ -25,7 +25,7 @@ oauthJson([
     'client_id_issued_at'=>time(),
     'client_name'=>$name,
     'redirect_uris'=>$uris,
-    'grant_types'=>['authorization_code'],
+    'grant_types'=>['authorization_code','refresh_token'],
     'response_types'=>['code'],
     'token_endpoint_auth_method'=>'none',
 ]);

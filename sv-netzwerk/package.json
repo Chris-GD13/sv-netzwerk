@@ -16,7 +16,8 @@
     "validate:encoding": "node scripts/validate-encoding.mjs",
     "fachbeitrag:run": "node scripts/run-fachbeitrag-automation.mjs",
     "fachbeitrag:log": "node scripts/update-fachbeitrag-log.mjs",
-    "test:publication-gating": "node scripts/test-publication-gating.mjs"
+    "test:publication-gating": "node scripts/test-publication-gating.mjs",
+    "test:chatgpt-plugin": "node scripts/test-chatgpt-plugin.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

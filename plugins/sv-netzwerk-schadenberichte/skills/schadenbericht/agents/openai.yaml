@@ -1,0 +1,12 @@
+interface:
+  display_name: "SV-Netzwerk Schadenbericht"
+  short_description: "Kopierfertige Berichte aus der eigenen Schadenakte"
+  default_prompt: "Suche den genannten Schadenfall, werte seine Unterlagen aus und schreibe den passenden kopierfertigen Schadenbericht."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sv-netzwerk"
+      description: "Persönlicher, fallbezogener Zugriff auf das SV-Netzwerk Prüfportal"
+      transport: "streamable_http"
+      url: "https://www.sv-netzwerk.eu/intern/mcp/"

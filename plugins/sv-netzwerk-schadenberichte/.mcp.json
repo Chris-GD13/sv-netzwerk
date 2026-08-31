@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "sv-netzwerk": {
+      "type": "http",
+      "url": "https://www.sv-netzwerk.eu/intern/mcp/"
+    }
+  }
+}

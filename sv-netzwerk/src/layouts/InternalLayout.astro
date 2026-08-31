@@ -45,6 +45,18 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__nav a.active::before { content: ''; position: absolute; left: -1px; top: 8px; bottom: 8px; width: 3px; background: #f59a23; }
       .intern-sidebar__nav a span, .intern-header__logout span, .intern-header__login span { width: 22px; color: #f59a23; font-size: 1.1rem; text-align: center; }
       #intern-main { min-width: 0; }
+      .chatgpt-onboarding { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; background: rgba(7, 26, 46, .66); }
+      .chatgpt-onboarding[hidden] { display: none; }
+      .chatgpt-onboarding__card { width: min(620px, 100%); padding: 28px; border: 1px solid #c9d1d8; border-top: 5px solid #f59a23; background: #fff; color: #263746; box-shadow: 0 18px 60px rgba(7, 26, 46, .3); }
+      .chatgpt-onboarding__card h2 { margin: 0 0 10px; color: #071a2e; }
+      .chatgpt-onboarding__steps { margin: 18px 0; padding-left: 22px; }
+      .chatgpt-onboarding__steps li { margin: 8px 0; }
+      .chatgpt-onboarding__actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+      .chatgpt-onboarding__actions button { padding: 11px 15px; border: 1px solid #18324a; background: #18324a; color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
+      .chatgpt-onboarding__actions .secondary { background: #fff; color: #18324a; }
+      .chatgpt-onboarding__actions .later { border-color: transparent; background: transparent; color: #526575; }
+      .chatgpt-onboarding__state { margin: 16px 0 0; padding: 10px 12px; background: #e9f5eb; border-left: 4px solid #34834b; }
+      .chatgpt-onboarding__state.is-error { background: #fff1eb; border-left-color: #c44f1a; }
     .intern-sidebar__expert { display: grid; gap: 7px; margin-top: 12px; padding: 12px; border-top: 1px solid #d9dde1; }
     .intern-sidebar__expert[hidden] { display: none; }
     .intern-sidebar__expert label { display: grid; gap: 3px; color: #263746; }
@@ -122,11 +134,31 @@ const isActive = (href: string) => currentPath.startsWith(href);
       <script is:inline src="/intern/drive-status-cache.js?v=20260829-1"></script>
       <main id="intern-main"><slot /></main>
     </div>
+    <section id="chatgpt-onboarding" class="chatgpt-onboarding" role="dialog" aria-modal="true" aria-labelledby="chatgpt-onboarding-title" hidden>
+      <div class="chatgpt-onboarding__card">
+        <p class="intern-header__eyebrow">Einmalige Einrichtung</p>
+        <h2 id="chatgpt-onboarding-title">Schadenberichte mit deinem ChatGPT schreiben</h2>
+        <p id="chatgpt-onboarding-note">Melde dich mit deinem eigenen ChatGPT-/Work-Zugang an und bestätige einmal die Verbindung zum Prüfportal.</p>
+        <ol class="chatgpt-onboarding__steps">
+          <li>Plugin in ChatGPT öffnen und installieren.</li>
+          <li>Mit deinen eigenen Zugangsdaten anmelden.</li>
+          <li>Den Zugriff auf deine persönlichen Portal-Fälle bestätigen.</li>
+        </ol>
+        <p>Es wird nichts heruntergeladen. Fälle anderer Sachverständiger bleiben gesperrt.</p>
+        <div class="chatgpt-onboarding__actions">
+          <button id="chatgpt-onboarding-open" type="button">Plugin jetzt installieren</button>
+          <button id="chatgpt-onboarding-check" class="secondary" type="button">Verbindung prüfen</button>
+          <button id="chatgpt-onboarding-later" class="later" type="button">Später</button>
+        </div>
+        <p id="chatgpt-onboarding-state" class="chatgpt-onboarding__state" role="status" aria-live="polite" hidden></p>
+      </div>
+    </section>
     <script src="/intern/erstbericht-output-options.js" defer></script>
     <script src="/intern/versicherungsfaelle-enhancements.js" defer></script>
     <script src="/intern/case-document-browser.js?v=20260828-1" defer></script>
     <script src="/intern/bki-offline.js" defer></script>
     <script src="/intern/transient-calculation-status.js?v=20260829-3" defer></script>
+    <script is:inline src="/intern/chatgpt-onboarding.js?v=20260831-1" defer></script>
     <script is:inline>
       document.getElementById('intern-logout')?.addEventListener('click', async (event) => {
         const button = event.currentTarget;

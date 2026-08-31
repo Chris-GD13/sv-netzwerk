@@ -8,7 +8,7 @@ echo json_encode([
   'token_endpoint'=>'https://www.sv-netzwerk.eu/intern/oauth/token.php',
   'registration_endpoint'=>'https://www.sv-netzwerk.eu/intern/oauth/register.php',
   'response_types_supported'=>['code'],
-  'grant_types_supported'=>['authorization_code'],
+  'grant_types_supported'=>['authorization_code','refresh_token'],
   'token_endpoint_auth_methods_supported'=>['none'],
   'code_challenge_methods_supported'=>['S256'],
   'scopes_supported'=>['cases:read','cases:drafts.write'],

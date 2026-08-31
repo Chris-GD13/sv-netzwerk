@@ -46,6 +46,19 @@ function oauthSchema(): void
         KEY idx_oauth_token_user (user_id),
         KEY idx_oauth_token_expiry (expires_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    db()->exec("CREATE TABLE IF NOT EXISTS oauth_refresh_tokens (
+        token_hash CHAR(64) PRIMARY KEY,
+        client_id VARCHAR(190) NOT NULL,
+        user_id INT UNSIGNED NOT NULL,
+        resource_uri VARCHAR(1000) NOT NULL,
+        scope VARCHAR(500) NOT NULL,
+        expires_at DATETIME NOT NULL,
+        revoked_at DATETIME NULL,
+        created_at DATETIME NOT NULL,
+        last_used_at DATETIME NULL,
+        KEY idx_oauth_refresh_user (user_id),
+        KEY idx_oauth_refresh_expiry (expires_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     db()->exec("DELETE FROM oauth_authorization_codes WHERE expires_at < UTC_TIMESTAMP() OR used_at IS NOT NULL");
 }
 
