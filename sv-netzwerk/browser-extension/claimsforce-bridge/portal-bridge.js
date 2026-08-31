@@ -32,6 +32,7 @@ async function upsert(message) {
   const existing = await findCase(message.mapped);
   const merged = mergeBlank(existing?.meta || {}, message.mapped);
   merged.claimsforce_claim_id = message.mapped.claimsforce_claim_id;
+  merged.claimsforce_profile = String(message.profile || '');
   merged.claimsforce_termin = message.mapped.claimsforce_termin;
   merged.claimsforce_quelle = message.source;
   merged.claimsforce_zuletzt_eingelesen = message.mapped.claimsforce_zuletzt_eingelesen;
@@ -48,6 +49,7 @@ async function commitSync(message) {
   const loaded = await api(`${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`);
   const meta = { ...(loaded.case?.meta || {}) };
   meta.claimsforce_sync_signature = String(message.signature || '');
+  meta.claimsforce_profile = String(message.profile || meta.claimsforce_profile || '');
   meta.claimsforce_file_versions = [...new Set((message.fileVersions || []).map(String).filter(Boolean))];
   meta.claimsforce_message_versions = [...new Set((message.messageVersions || []).map(String).filter(Boolean))];
   meta.claimsforce_zuletzt_eingelesen = new Date().toISOString();
@@ -80,6 +82,7 @@ async function appointment(message) {
   const start = new Date(message.appointment.startDate), end = message.appointment.endDate ? new Date(message.appointment.endDate) : new Date(start.getTime() + 60 * 60000);
   const form = new FormData();
   form.append('folder_id', message.folderId);
+  form.append('claims_profile', String(message.profile || ''));
   form.append('date', start.toLocaleDateString('sv-SE', { timeZone: 'Europe/Berlin' }));
   form.append('time', start.toLocaleTimeString('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit', hour12: false }));
   form.append('duration', String(Math.max(15, Math.round((end - start) / 60000))));

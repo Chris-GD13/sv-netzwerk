@@ -267,7 +267,7 @@ async function runImport(run) {
     const messages = Array.isArray(unwrap(rawMessages, 'messages')) ? unwrap(rawMessages, 'messages') : [];
     const mapped = mapClaim(disposition, communication, Array.isArray(appointments) ? appointments : []);
     const signature = await fingerprint({ disposition, communication, files, messages, appointments, stakeholders: rawStakeholders || {} });
-    const state = await portal(portalTabId, { type: 'PORTAL_SYNC_STATE', mapped });
+    const state = await portal(portalTabId, { type: 'PORTAL_SYNC_STATE', mapped, profile });
     const existingMeta = state.result?.meta || {};
     if (state.result?.existed && existingMeta.claimsforce_sync_signature === signature) {
       skipped++;
@@ -276,7 +276,7 @@ async function runImport(run) {
       continue;
     }
     await diagnostic(run, 'CF-CASE-UPSERT', `Auftrag ${index + 1}/${claims.length}: Portal-Fall wird angelegt oder ergänzt.`, { current: index, total: claims.length, claimIndex: index + 1 });
-    const upsert = await portalOperation(portalTabId, { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, importedAt: new Date().toISOString() } });
+    const upsert = await portalOperation(portalTabId, { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, profile, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, importedAt: new Date().toISOString() } });
     const folderId = upsert.folderId;
     await diagnostic(run, 'CF-CASE-FILES', `Auftrag ${index + 1}/${claims.length}: Anhänge und Nachrichten werden übernommen.`, { current: index, total: claims.length, claimIndex: index + 1 });
     const knownFileVersions = new Set(Array.isArray(existingMeta.claimsforce_file_versions) ? existingMeta.claimsforce_file_versions.map(String) : []);
@@ -312,10 +312,10 @@ async function runImport(run) {
     }
     for (const appointment of Array.isArray(appointments) ? appointments : []) {
       if (!appointment?.startDate) continue;
-      const appointmentResult = await portal(portalTabId, { type: 'PORTAL_APPOINTMENT', folderId, appointment });
+      const appointmentResult = await portal(portalTabId, { type: 'PORTAL_APPOINTMENT', folderId, appointment, profile });
       if (!appointmentResult?.result?.skipped) appointmentsDone++;
     }
-    await portal(portalTabId, { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions });
+    await portal(portalTabId, { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions, profile });
     updated++;
     await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length} wurde vollständig im Portal verarbeitet.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
   }
