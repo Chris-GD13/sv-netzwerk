@@ -93,6 +93,11 @@ const protectedResource = await read('sv-netzwerk/public/.well-known/oauth-prote
 assert.match(protectedResource, /'resource'=>'https:\/\/www\.sv-netzwerk\.eu\/intern\/mcp\/'/);
 
 const portal = await read('sv-netzwerk/src/pages/intern/versicherungsfaelle/index.astro');
+const caseReextract = await read('sv-netzwerk/public/intern/case-document-reextract.js');
+assert.match(portal, /case-document-reextract\.js/);
+assert.match(caseReextract, /Gespeicherte Unterlagen erneut einlesen/);
+assert.match(caseReextract, /if\(!value\|\|String\(meta\[key\]\|\|''\)\.trim\(\)\)continue/, 'manual and previously stored fields must not be overwritten');
+assert.match(caseReextract, /addEventListener\('change'.*extractFiles/s, 'uploads to existing cases must be extracted');
 assert.match(portal, /persönlichen ChatGPT-\/Work-Zugang als kopierfertiger Text/);
 assert.match(portal, /personalReportKeys=new Set\(\['erstbericht','erstbericht_sv_gf','rekon_schaden','zwischenbericht','schlussbericht','nachtrag_stellungnahme'\]\)/);
 assert.match(portal, /navigator\.clipboard\.writeText\(prompt\)/);
