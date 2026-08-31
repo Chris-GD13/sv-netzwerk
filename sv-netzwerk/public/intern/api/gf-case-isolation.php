@@ -28,7 +28,7 @@ function gfCaseIsolationIdentifiers(string $text): array
     return array_values(array_unique($identifiers));
 }
 
-function gfCaseIsolationAllowedIdentifiers(array $meta, array $sourceNames): array
+function gfCaseIsolationAllowedIdentifiers(array $meta, array $sourceNames, array $sourceEvidence = []): array
 {
     $haystack = implode(' ', array_merge([
         (string)($meta['schaden_nr'] ?? ''),
@@ -41,13 +41,21 @@ function gfCaseIsolationAllowedIdentifiers(array $meta, array $sourceNames): arr
         $identifier = trim((string)($meta[$field] ?? ''));
         if ($identifier !== '') $allowed[gfCaseIsolationCompact($identifier)] = true;
     }
+    $activeCase = gfCaseIsolationCompact((string)($meta['schaden_nr'] ?? ''));
+    if ($activeCase !== '') {
+        foreach ($sourceEvidence as $evidence) {
+            $encoded = json_encode($evidence, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if (!is_string($encoded) || !str_contains(gfCaseIsolationCompact($encoded), $activeCase)) continue;
+            foreach (gfCaseIsolationIdentifiers($encoded) as $identifier) $allowed[gfCaseIsolationCompact($identifier)] = true;
+        }
+    }
     return $allowed;
 }
 
-function gfValidateCaseIsolation(array $result, array $meta, array $sourceNames, string $instructions = ''): array
+function gfValidateCaseIsolation(array $result, array $meta, array $sourceNames, string $instructions = '', array $sourceEvidence = []): array
 {
     $text = gfCaseIsolationText($result);
-    $allowed = gfCaseIsolationAllowedIdentifiers($meta, $sourceNames);
+    $allowed = gfCaseIsolationAllowedIdentifiers($meta, $sourceNames, $sourceEvidence);
     $foreign = [];
     foreach (gfCaseIsolationIdentifiers($text) as $identifier) {
         $compact = gfCaseIsolationCompact($identifier);

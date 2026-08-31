@@ -41,6 +41,17 @@ expectBlocked(
     'Fremde Vertragsnummer muss blockiert werden'
 );
 
+$sameCaseEvidence = [['files' => [['name' => 'Unterlagen-Kompakt.pdf', 'facts' => ['Schaden-Nr. 25-242258-2', 'VSNR 12-5392833-60']]]]];
+$sameCasePolicy = ['summary' => 'Schlussbericht zum Schaden 25-242258-2 und Vertrag 12-5392833-60.', 'sections' => []];
+$sameCaseAudit = gfValidateCaseIsolation($sameCasePolicy, $meta, $sources, 'Schlussbericht erstellen', $sameCaseEvidence);
+if (($sameCaseAudit['passed'] ?? false) !== true) throw new RuntimeException('In derselben Fallquelle belegte Vertragsnummer wurde fälschlich blockiert.');
+
+$unrelatedEvidence = [['files' => [['name' => 'Fremd.pdf', 'facts' => ['VSNR 98-7654321-10']]]]];
+expectBlocked(
+    static fn() => gfValidateCaseIsolation($sameCasePolicy, $meta, $sources, 'Schlussbericht erstellen', $unrelatedEvidence),
+    'Vertragsnummer ohne Bezug zur aktiven Schaden-Nr. muss blockiert werden'
+);
+
 $foreignFire = [
     'summary' => 'Schlussbericht',
     'sections' => [[
@@ -52,6 +63,12 @@ expectBlocked(
     static fn() => gfValidateCaseIsolation($foreignFire, $meta, $sources, 'Schlussbericht erstellen'),
     'Brandschadeninhalt im Leitungswasserschaden muss blockiert werden'
 );
+
+$generator = file_get_contents(__DIR__.'/../public/intern/api/gf-ai-generate.php');
+$core = file_get_contents(__DIR__.'/../public/intern/api/gf-ai-generate-core.php');
+if (!is_string($generator) || !str_contains($generator, 'gfValidateCaseIsolation($result,$meta,$sourceNames,$instructions,$caseEvidence)')) throw new RuntimeException('Falltrennung erhält den dateibezogenen Evidenzbestand nicht.');
+if (!str_contains($generator, "'Datei '.(\\\$processedCaseFiles+count(\\\$chunkRefs)+1).' von '") || !str_contains($generator, "' · Gruppe '.(\\\$chunkIndex+1)")) throw new RuntimeException('Eindeutiger Datei- und Gruppenfortschritt fehlt.');
+if (!is_string($core) || !str_contains($core, 'BKI-Kalkulation|BKI-Abgeltung|Abgeltungsvereinbarung')) throw new RuntimeException('Erzeugte BKI-/Abgeltungsdateien werden erneut als Fallquellen eingelesen.');
 
 echo "GF case isolation tests passed\n";
 

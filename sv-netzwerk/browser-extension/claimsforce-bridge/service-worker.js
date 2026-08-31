@@ -265,7 +265,7 @@ async function runImport(run) {
     const appointments = unwrap(rawAppointments, 'appointments');
     const files = Array.isArray(unwrap(rawFiles, 'files')) ? unwrap(rawFiles, 'files') : [];
     const messages = Array.isArray(unwrap(rawMessages, 'messages')) ? unwrap(rawMessages, 'messages') : [];
-    const mapped = mapClaim(disposition, communication, Array.isArray(appointments) ? appointments : []);
+    const mapped = mapClaim(disposition, communication, Array.isArray(appointments) ? appointments : [], rawStakeholders || {});
     const signature = await fingerprint({ disposition, communication, files, messages, appointments, stakeholders: rawStakeholders || {} });
     const state = await portal(portalTabId, { type: 'PORTAL_SYNC_STATE', mapped, profile });
     const existingMeta = state.result?.meta || {};
