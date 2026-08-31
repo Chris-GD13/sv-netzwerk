@@ -49,6 +49,9 @@ function cqProfile(array$user):string{
     if(str_contains($email,'ms@')||str_contains($name,'marc'))return'marc';
     return'christian';
 }
+function cqIsCentralAgent(array$user):bool{
+    return(string)($user['role']??'')==='administrator'&&!in_array(cqProfile($user),['marc','holger'],true);
+}
 function cqVisibleProfiles(array$user):array{
     $email=mb_strtolower(trim((string)($user['email']??'')),'UTF-8');
     $name=mb_strtolower(trim((string)($user['full_name']??'')),'UTF-8');
@@ -97,7 +100,7 @@ if($action==='summary'){
 
 if($action==='enqueue'){
     $profile=cqProfile($user);
-    if(($user['role']??'')==='administrator'&&in_array((string)($body['profile']??''),['christian','holger','marc','jens'],true))$profile=(string)$body['profile'];
+    if(cqIsCentralAgent($user)&&in_array((string)($body['profile']??''),['christian','holger','marc','jens'],true))$profile=(string)$body['profile'];
     $stop=db()->prepare("UPDATE claimsforce_import_jobs SET status='failed',message='Durch einen neuen manuellen Import ersetzt.',phase='CF-FAIL-REPLACED',heartbeat_at=NOW(),finished_at=NOW() WHERE requested_by=:u AND profile=:p AND status IN ('queued','running')");
     $stop->execute([':p'=>$profile,':u'=>(string)($user['email']??'')]);
     $s=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,created_at) VALUES(:p,'queued',:u,'Import wartet auf die zentrale Importstation.','CF-QUEUED',NOW())");
@@ -122,7 +125,7 @@ if($action==='mine'){
     }
     apiJson(['ok'=>true,'jobs'=>$jobs]);
 }
-if(($user['role']??'')!=='administrator')apiError(403,'Nur die zentrale Importstation darf Aufträge übernehmen.');
+if(!cqIsCentralAgent($user))apiError(403,'Nur die zentrale Christian-Importstation darf Aufträge übernehmen.');
 
 if($action==='schedule'){
     $now=new DateTimeImmutable('now',new DateTimeZone('Europe/Berlin'));

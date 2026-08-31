@@ -1,5 +1,5 @@
 (()=>{
-  const old=document.getElementById('vf-claims-import'),state=document.getElementById('vf-claims-state');
+  const old=document.getElementById('vf-claims-import'),state=document.getElementById('vf-claims-state'),settings=document.getElementById('vf-claims-settings'),download=document.getElementById('vf-claims-download');
   if(!old)return;
   const button=old.cloneNode(true);old.replaceWith(button);
   const claimsCard=button.closest('.vf-claims-import');
@@ -129,5 +129,16 @@
 
   setInterval(heartbeat,20000);
   setInterval(()=>window.postMessage({type:'SVNET_CLAIMS_RUNTIME_PING'},location.origin),5000);
-  driveStatus().then(async d=>{context=d;window.postMessage({type:'SVNET_CLAIMS_BRIDGE_PING'},location.origin);await resumeWatch();poll()}).catch(e=>show(e.message,true));
+  driveStatus().then(async d=>{
+    context=d;
+    const personalBridgeBlocked=['marc','holger'].includes(String(d.claims_profile||''));
+    if(personalBridgeBlocked){
+      settings?.remove();
+      download?.remove();
+      show('Dein ClaimsForce-Import wird zentral ausgeführt. Auf diesem Rechner ist keine Browser-Brücke erforderlich.');
+    }
+    window.postMessage({type:'SVNET_CLAIMS_BRIDGE_PING'},location.origin);
+    await resumeWatch();
+    poll();
+  }).catch(e=>show(e.message,true));
 })();

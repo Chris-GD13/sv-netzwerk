@@ -73,7 +73,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes("context.backoffice?`Import für"), 'Susannes ausgewählter Sachverständiger wird angezeigt');
 assert(portal.includes("button.dataset.claimsProfile=context.backoffice?key:(context.claims_profile||'self')"), 'Portal verwendet für Susanne und den angemeldeten Sachverständigen das richtige gespeicherte Profil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20260829-9'), 'Portal lädt die korrigierte Aufgabenanzeige ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20260831-1'), 'Portal lädt die auf eine zentrale Christian-Brücke begrenzte Importsteuerung ohne alten Browsercache');
 assert(portal.includes('<option value="jens">Ehem. Jens Maurer → Christian Wächter</option>'), 'Jens Maurer ist im Portal als eigenes ClaimsForce-Profil auswählbar');
 
 const bridge = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/portal-bridge.js'), 'utf8');
@@ -116,6 +116,8 @@ const drive = fs.readFileSync(path.join(root, 'public/intern/api/google-drive-sy
 assert(drive.includes("'claims_profile'=>\$claimsProfile"), 'Status liefert das Claims-Profil des angemeldeten Sachverständigen');
 assert(drive.includes("==='administrator'"), 'Administratoren können die Claims-Anmeldungen aller Sachverständigen zentral bedienen');
 assert(drive.includes("'claims_agent'=>"), 'Administrator wird als zentrale Importstation erkannt');
+assert(drive.includes("!in_array($claimsProfile,['marc','holger'],true)"), 'Marc und Holger dürfen auch als Administratoren keine zentrale Browser-Brücke betreiben');
+assert(drive.includes("gdUserKey($portalUser).'|'.$claimsProfile.'|'.$selectedExpert"), 'Der Statuscache darf die Brückenberechtigung verschiedener Administratoren nicht vermischen');
 const driveStatusCache = fs.readFileSync(path.join(root, 'public/intern/drive-status-cache.js'), 'utf8');
 assert(driveStatusCache.includes('window.svnetDriveStatus=load') && driveStatusCache.includes('pending') && driveStatusCache.includes('Date.now()+45000'), 'Parallele Portalabfragen teilen sich einen einzigen Drive-Status und behalten ihn 45 Sekunden');
 assert(internLayout.includes('drive-status-cache.js?v=20260829-1'), 'Der gemeinsame Drive-Status steht vor allen Portalmodulen bereit');
@@ -134,6 +136,8 @@ assert(queue.includes("$profile='christian'") && queue.includes("'CF-AUTO-QUEUED
 assert(queue.includes('claimsforce_task_status') && queue.includes("$action==='summary'"), 'Die offenen Claims-Aufgaben werden je Profil dauerhaft gespeichert und portalweit bereitgestellt');
 assert(queue.includes("['christian'=>'Christian','jens'=>'Maurer']"), 'Christian sieht getrennte Zähler für Christian und den früheren Jens-Maurer-Zugang');
 assert(queue.includes("VALUES('christian',1,NOW(),NULL),('jens',6,NOW(),NULL)"), 'Die vom Benutzer bestätigten Ausgangswerte Christian 1 und Maurer 6 werden einmalig gesetzt');
+assert(queue.includes('function cqIsCentralAgent') && queue.includes("!in_array(cqProfile($user),['marc','holger'],true)"), 'Marc und Holger dürfen keine zentralen Importjobs übernehmen');
+assert(queue.includes("if(!cqIsCentralAgent($user))apiError(403,'Nur die zentrale Christian-Importstation darf Aufträge übernehmen.')"), 'Die Queue erzwingt die zentrale Christian-Importstation serverseitig');
 assert(queue.includes("is_numeric($result['openTasks']??null)") && queue.includes("(int)$result['openTasks']") && queue.includes('ON DUPLICATE KEY UPDATE open_count=VALUES(open_count)'), 'Ein erfolgreicher Import speichert ausschließlich den Zähler Aufgaben – Alle');
 const driveApi = fs.readFileSync(path.join(root, 'public/intern/api/google-drive-sync.php'), 'utf8');
 assert(driveApi.includes("['christian','jens','holger','marc']"), 'Backoffice darf das frühere Jens-Maurer-Profil gezielt auswählen');
@@ -155,6 +159,8 @@ assert(central.includes('data-svnet-claims-results') && central.includes('result
 assert(central.includes('SVNET_CLAIMS_RUNTIME_STATUS') && central.includes('SVNET_CLAIMS_RUNTIME_PING'), 'Portal zeigt den persistenten Browserlauf auch nach einem Worker-Neustart an');
 assert(central.includes('Browser-Brücke 1.3.10 erforderlich') && central.includes("versionAtLeast(bridgeVersion,'1.3.10')"), 'Nur die Brücke mit einmaliger Anmeldung und Aufgabenzähler darf neue Warteschlangenläufe starten');
 assert(central.includes('context.claims_agent&&!bridge') && central.includes('Diese zentrale Importstation ist nicht bereit'), 'Eine veraltete zentrale Brücke darf keinen weiteren dauerhaft wartenden Importauftrag erzeugen');
+assert(central.includes("['marc','holger'].includes") && central.includes('settings?.remove()') && central.includes('download?.remove()'), 'Marc und Holger sehen weder Brücken-Download noch lokale Zugangsverwaltung');
+assert(central.includes('Dein ClaimsForce-Import wird zentral ausgeführt'), 'Marc und Holger erhalten statt einer Installationsaufforderung den Hinweis auf die zentrale Ausführung');
 assert(central.includes("new CustomEvent('svnet:claims-summary-update')"), 'Nach einem Claims-Import wird die Kopfzeilenanzeige unmittelbar aktualisiert');
 assert(internLayout.includes('id="intern-claims-summary"') && internLayout.includes('Deine offenen Aufgaben bei Claims') && internLayout.includes("claimsforce-queue.php?action=summary"), 'Das Prüfportal zeigt die offenen Claims-Aufträge in orangefarbenen Kopfzeilenkästen');
 const optionsHtml = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.html'), 'utf8');
