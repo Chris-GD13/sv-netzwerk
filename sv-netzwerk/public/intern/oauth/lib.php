@@ -137,7 +137,7 @@ function oauthBearerUser(string $requiredScope = 'cases:read'): array
 function oauthChallenge(string $scope): never
 {
     http_response_code(401);
-    header('WWW-Authenticate: Bearer resource_metadata="https://www.sv-netzwerk.eu/.well-known/oauth-protected-resource", scope="'.$scope.'"');
+    header('WWW-Authenticate: Bearer resource_metadata="https://www.sv-netzwerk.eu/.well-known/oauth-protected-resource/", scope="'.$scope.'"');
     oauthJson(['error' => 'unauthorized', 'error_description' => 'OAuth-Anmeldung am SV-Netzwerk erforderlich.'], 401);
 }
 

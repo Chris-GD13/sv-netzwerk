@@ -57,15 +57,15 @@ const oauth = await read('sv-netzwerk/public/intern/oauth/token.php');
 assert.match(oauth, /grant === 'refresh_token'/);
 assert.match(oauth, /oauth_refresh_tokens/);
 
-const apache = await read('sv-netzwerk/public/.htaccess');
-assert.match(apache, /RewriteRule \^\\\.well-known\/oauth-protected-resource\$ \/\.well-known\/oauth-protected-resource\/index\.php \[END\]/);
-assert.match(apache, /RewriteRule \^\\\.well-known\/oauth-authorization-server\$ \/\.well-known\/oauth-authorization-server\/index\.php \[END\]/);
-
 const mcpServer = await read('sv-netzwerk/public/intern/mcp/index.php');
 assert.match(mcpServer, /'name'=>'read_case_file'/);
 assert.match(mcpServer, /requireCaseFolderAccess\(\$folder,\$user\)/);
 assert.match(mcpServer, /mcpDriveFindCaseFile/);
 assert.match(mcpServer, /if \(!oauthBearerUserOrNull\('cases:read'\)\) oauthChallenge\('cases:read cases:drafts\.write'\)/);
+assert.match(mcpServer, /resource_metadata="https:\/\/www\.sv-netzwerk\.eu\/\.well-known\/oauth-protected-resource\/"/);
+
+const oauthLib = await read('sv-netzwerk/public/intern/oauth/lib.php');
+assert.match(oauthLib, /resource_metadata="https:\/\/www\.sv-netzwerk\.eu\/\.well-known\/oauth-protected-resource\/"/);
 
 const portal = await read('sv-netzwerk/src/pages/intern/versicherungsfaelle/index.astro');
 assert.match(portal, /persönlichen ChatGPT-\/Work-Zugang als kopierfertiger Text/);

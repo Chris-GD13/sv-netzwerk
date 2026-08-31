@@ -7,7 +7,7 @@ commonHeaders();
 function mcpResult(mixed $id, array $result): never { oauthJson(['jsonrpc'=>'2.0','id'=>$id,'result'=>$result]); }
 function mcpFailure(mixed $id, int $code, string $message): never { oauthJson(['jsonrpc'=>'2.0','id'=>$id,'error'=>['code'=>$code,'message'=>$message]], 200); }
 function mcpAuthFailure(mixed $id, string $scope='cases:read'): never {
-    $challenge = 'Bearer resource_metadata="https://www.sv-netzwerk.eu/.well-known/oauth-protected-resource", scope="'.$scope.'"';
+    $challenge = 'Bearer resource_metadata="https://www.sv-netzwerk.eu/.well-known/oauth-protected-resource/", scope="'.$scope.'"';
     mcpResult($id,[
         'content'=>[['type'=>'text','text'=>'Bitte zuerst den persönlichen SV-Netzwerk-Zugang verbinden.']],
         'isError'=>true,
