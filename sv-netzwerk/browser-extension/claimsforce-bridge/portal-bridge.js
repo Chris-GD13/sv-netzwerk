@@ -1,6 +1,12 @@
 const API = '/intern/api/google-drive-sync.php';
 const CAL = '/intern/api/outlook-case-calendar.php';
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
+const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens'];
+const profileKey = value => {
+  const profile = String(value || '').trim().toLowerCase();
+  if (!SUPPORTED_PROFILES.includes(profile)) throw new Error('Ungültiges ClaimsForce-Profil.');
+  return profile;
+};
 const uploads = new Map();
 const operations = new Map();
 let keepalivePort = null;
@@ -29,10 +35,11 @@ async function findCase(mapped) {
 }
 
 async function upsert(message) {
+  const profile = profileKey(message.profile);
   const existing = await findCase(message.mapped);
   const merged = mergeBlank(existing?.meta || {}, message.mapped);
   merged.claimsforce_claim_id = message.mapped.claimsforce_claim_id;
-  merged.claimsforce_profile = String(message.profile || '');
+  merged.claimsforce_profile = profile;
   merged.claimsforce_termin = message.mapped.claimsforce_termin;
   merged.claimsforce_quelle = message.source;
   merged.claimsforce_zuletzt_eingelesen = message.mapped.claimsforce_zuletzt_eingelesen;
@@ -46,10 +53,11 @@ async function syncState(message) {
 }
 
 async function commitSync(message) {
+  const profile = profileKey(message.profile);
   const loaded = await api(`${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`);
   const meta = { ...(loaded.case?.meta || {}) };
   meta.claimsforce_sync_signature = String(message.signature || '');
-  meta.claimsforce_profile = String(message.profile || meta.claimsforce_profile || '');
+  meta.claimsforce_profile = profile;
   meta.claimsforce_file_versions = [...new Set((message.fileVersions || []).map(String).filter(Boolean))];
   meta.claimsforce_message_versions = [...new Set((message.messageVersions || []).map(String).filter(Boolean))];
   meta.claimsforce_zuletzt_eingelesen = new Date().toISOString();
@@ -75,6 +83,7 @@ async function finishUpload(message) {
 }
 
 async function appointment(message) {
+  const profile = profileKey(message.profile);
   const loaded = await api(`${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`), meta = loaded.case?.meta || {};
   const appointmentId = String(message.appointment.id || message.appointment.startDate || '');
   const imported = Array.isArray(meta.claimsforce_calendar_appointment_ids) ? meta.claimsforce_calendar_appointment_ids.map(String) : (meta.claimsforce_calendar_appointment_id ? [String(meta.claimsforce_calendar_appointment_id)] : []);
@@ -82,7 +91,7 @@ async function appointment(message) {
   const start = new Date(message.appointment.startDate), end = message.appointment.endDate ? new Date(message.appointment.endDate) : new Date(start.getTime() + 60 * 60000);
   const form = new FormData();
   form.append('folder_id', message.folderId);
-  form.append('claims_profile', String(message.profile || ''));
+  form.append('claims_profile', profile);
   form.append('date', start.toLocaleDateString('sv-SE', { timeZone: 'Europe/Berlin' }));
   form.append('time', start.toLocaleTimeString('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit', hour12: false }));
   form.append('duration', String(Math.max(15, Math.round((end - start) / 60000))));
@@ -139,7 +148,10 @@ window.addEventListener('message', event => {
   if (event.data?.type === 'SVNET_CLAIMS_BRIDGE_PING') window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION }, location.origin);
   if (event.data?.type === 'SVNET_CLAIMS_RUNTIME_PING') reportRuntime();
   if (event.data?.type === 'SVNET_CLAIMS_IMPORT_START') {
-    activeRequest = { type: 'START_IMPORT', profile: event.data.profile || 'self', jobId: Number(event.data.jobId || 0), runId: event.data.runId || crypto.randomUUID() };
+    let profile;
+    try { profile = profileKey(event.data.profile); }
+    catch (error) { window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: error.message, runtime: { jobId: Number(event.data.jobId || 0) } }, location.origin); return; }
+    activeRequest = { type: 'START_IMPORT', profile, jobId: Number(event.data.jobId || 0), runId: event.data.runId || crypto.randomUUID() };
     const request = activeRequest;
     connectKeepalive();
     chrome.runtime.sendMessage(request).then(response => {
@@ -147,7 +159,10 @@ window.addEventListener('message', event => {
       else window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ACCEPTED', runtime: { jobId: request.jobId, runId: response.runId, resumed: response.resumed } }, location.origin);
     }).catch(error => window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: `[CF-RUN-00] ${error.message}`, runtime: { jobId: request.jobId } }, location.origin));
   }
-  if (event.data?.type === 'SVNET_CLAIMS_OPEN_OPTIONS') chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS', profile: event.data.profile || 'self' });
+  if (event.data?.type === 'SVNET_CLAIMS_OPEN_OPTIONS') {
+    try { chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS', profile: profileKey(event.data.profile) }); }
+    catch (error) { window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: error.message }, location.origin); }
+  }
 });
 chrome.runtime.onMessage.addListener(message => {
   if (message?.type === 'IMPORT_PROGRESS') window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_PROGRESS', ...message }, location.origin);

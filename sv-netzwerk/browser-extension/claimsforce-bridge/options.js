@@ -1,18 +1,22 @@
 import { saveCredentials, loadCredentials, clearCredentials, savePortalCredentials, loadPortalCredentials, clearPortalCredentials } from './vault.js';
-const OPTIONS_CODE_VERSION = '1.3.13';
+const OPTIONS_CODE_VERSION = '1.3.14';
 if (localStorage.getItem('svnet-bridge-options-code-version') !== OPTIONS_CODE_VERSION) {
   localStorage.setItem('svnet-bridge-options-code-version', OPTIONS_CODE_VERSION);
   setTimeout(() => chrome.runtime.reload(), 250);
 }
 const profile = document.querySelector('#profile'), email = document.querySelector('#email'), password = document.querySelector('#password'), state = document.querySelector('#state');
 const active = (await chrome.storage.session.get('activeProfile')).activeProfile;
-if (active && [...profile.options].some(option => option.value === active)) profile.value = active;
+const supportedProfiles = [...profile.options].map(option => option.value);
+if (!active) profile.value = 'christian';
+else if (supportedProfiles.includes(active)) profile.value = active;
+else { profile.selectedIndex = -1; state.textContent = 'Das übergebene Bearbeiterprofil ist ungültig. Bitte ein gültiges Profil auswählen.'; }
 let currentCredentials = null;
-async function showProfile() { currentCredentials = await loadCredentials(profile.value); email.value = currentCredentials?.email || ''; password.value = ''; password.placeholder = currentCredentials?.password ? 'Kennwort ist verschlüsselt gespeichert' : ''; state.textContent = currentCredentials?.email && currentCredentials?.password ? 'E-Mail-Adresse und Kennwort sind für diese Anmeldung gespeichert.' : 'Für diese Anmeldung sind noch keine vollständigen Zugangsdaten gespeichert.'; state.className = currentCredentials?.email && currentCredentials?.password ? 'ok' : ''; }
+async function showProfile() { if(!supportedProfiles.includes(profile.value)){currentCredentials=null;return}currentCredentials = await loadCredentials(profile.value); email.value = currentCredentials?.email || ''; password.value = ''; password.placeholder = currentCredentials?.password ? 'Kennwort ist verschlüsselt gespeichert' : ''; state.textContent = currentCredentials?.email && currentCredentials?.password ? 'E-Mail-Adresse und Kennwort sind für diese Anmeldung gespeichert.' : 'Für diese Anmeldung sind noch keine vollständigen Zugangsdaten gespeichert.'; state.className = currentCredentials?.email && currentCredentials?.password ? 'ok' : ''; }
 profile.addEventListener('change', showProfile);
 await showProfile();
 document.querySelector('#form').addEventListener('submit', async event => {
   event.preventDefault();
+  if (!supportedProfiles.includes(profile.value)) { state.textContent = 'Bitte ein gültiges Bearbeiterprofil auswählen.'; state.className = ''; return; }
   const savedPassword = password.value || currentCredentials?.password || '';
   if (!savedPassword) { state.textContent = 'Bitte das ClaimsForce-Kennwort eingeben.'; state.className = ''; return; }
   await saveCredentials(profile.value, { email: email.value.trim(), password: savedPassword });

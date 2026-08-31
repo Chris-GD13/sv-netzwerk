@@ -6,6 +6,7 @@ require_once __DIR__ . '/case-search.php';
 require_once __DIR__ . '/case-upload-ignore.php';
 require_once __DIR__ . '/kva-contact-merge.php';
 require_once __DIR__ . '/kva-contact-persistence.php';
+require_once __DIR__ . '/profile-routing.php';
 commonHeaders();
 $user = requireAuth();
 if (!in_array($user['role'], ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) {
@@ -19,21 +20,31 @@ const CASE_META_NAME = '00_Falldaten.json';
 
 $action = (string)($_GET['action'] ?? 'status');
 
-function gdIsSusanne(array $user):bool{$email=gdUserKey($user);$name=gdNormalize((string)($user['full_name']??''));return str_contains($email,'susanne')||str_contains($name,'susanne waechter');}
-function gdExpertIdentity(string $key,array $backoffice):array{return match($key){'holger'=>array_merge($backoffice,['email'=>'hr@sv-schuett.eu','full_name'=>'Holger Roth']),'marc'=>array_merge($backoffice,['email'=>'ms@sv-schuett.eu','full_name'=>'Marc Schütt']),default=>array_merge($backoffice,['email'=>'cw@sv-netzwerk.eu','full_name'=>'Christian Wächter'])};}
-function gdClaimsProfile(array $user):string{$email=gdUserKey($user);$name=gdNormalize((string)($user['full_name']??''));if(str_contains($email,'hr@')||str_contains($name,'holger roth'))return'holger';if(str_contains($email,'ms@')||str_contains($name,'marc schutt'))return'marc';if(str_contains($email,'cw@')||str_contains($name,'christian wachter'))return'christian';return'self';}
+function gdSupportedExpertKeys():array{return svnetSupportedProfiles();}
+function gdIsSusanne(array $user):bool{return svnetIsBackofficeUser($user);}
+function gdExpertIdentity(string $key,array $backoffice):array{return svnetExpertIdentity($key,$backoffice);}
+function gdClaimsProfile(array $user):string{return svnetUserProfile($user);}
 
 $portalUser=$user;
-$isBackoffice=gdIsSusanne($portalUser)||(string)($portalUser['role']??'')==='administrator';
+$isBackoffice=gdIsSusanne($portalUser);
 $claimsProfile=gdClaimsProfile($portalUser);
 if($isBackoffice&&$action==='select_expert'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
-    $body=requestBody();$expert=(string)($body['expert']??'christian');
-    if(!in_array($expert,['christian','jens','holger','marc'],true))apiError(400,'Unbekannter Sachverständiger.');
+    $body=requestBody();$expert=mb_strtolower(trim((string)($body['expert']??'')),'UTF-8');
+    if(!in_array($expert,gdSupportedExpertKeys(),true))apiError(400,'Unbekannter Sachverständiger.');
     $_SESSION['svnet_selected_expert']=$expert;
     apiJson(['ok'=>true,'expert'=>$expert]);
 }
-$selectedExpert=$isBackoffice?(string)($_SESSION['svnet_selected_expert']??'christian'):'';
+$selectedExpert='';
+if($isBackoffice){
+    $storedExpert=(string)($_SESSION['svnet_selected_expert']??'');
+    try{$storedExpert=svnetSelectedProfile($portalUser,$storedExpert);}
+    catch(InvalidArgumentException){
+        unset($_SESSION['svnet_selected_expert']);
+        apiError(409,'Das gespeicherte Bearbeiterprofil ist ungültig. Bitte ein Profil neu auswählen.');
+    }
+    $selectedExpert=$storedExpert;
+}
 if($isBackoffice)$user=gdExpertIdentity($selectedExpert,$portalUser);
 
 function gdEnsureSettingsTable():void{
@@ -112,8 +123,17 @@ function gdUserKey(array $user):string{return strtolower(trim((string)($user['em
 function gdIsMarc(array $user):bool{$email=gdUserKey($user);$name=gdNormalize((string)($user['full_name']??''));return $email==='ms@sv-schuett.eu'||str_contains($name,'marc schuett');}
 function gdIsHolger(array $user):bool{$email=gdUserKey($user);$name=gdNormalize((string)($user['full_name']??''));return $email==='hr@sv-schuett.eu'||str_contains($name,'holger roth');}
 function gdUserCasesName(array $user):string{$name=trim((string)($user['full_name']??''));if($name===''){$local=explode('@',gdUserKey($user),2)[0]??'Benutzer';$name=preg_replace('/[^a-z0-9._-]+/i',' ',(string)$local)?:'Benutzer';}return'Schadenfälle '.$name;}
-function gdUserCasesRoot(array $user):array{$legacy=gdFolderId('cases');if(!gdIsMarc($user)&&!gdIsHolger($user))return['id'=>$legacy,'name'=>'Schadenfälle Christian Wächter'];$meta=gdFileMeta($legacy);$parent=trim((string)(($meta['parents']??[])[0]??''));if($parent==='')apiError(503,'Der persönliche Schadenfälle-Ordner kann nicht angelegt werden: Übergeordneter Drive-Ordner fehlt.');$name=gdIsMarc($user)?'Schadenfälle Marc Schütt':'Schadenfälle Holger Roth';$folder=gdFindChildByName($parent,$name);if(!$folder||($folder['mimeType']??'')!=='application/vnd.google-apps.folder')$folder=gdCreateFolder($parent,$name);return['id'=>(string)$folder['id'],'name'=>$name];}
-function gdEnsureKnownCasesRoots():void{$legacy=gdFolderId('cases');$meta=gdFileMeta($legacy);$parent=trim((string)(($meta['parents']??[])[0]??''));if($parent==='')return;foreach(['Schadenfälle Holger Roth','Schadenfälle Marc Schütt']as$name){$folder=gdFindChildByName($parent,$name);if(!$folder||($folder['mimeType']??'')!=='application/vnd.google-apps.folder')gdCreateFolder($parent,$name);}}
+function gdUserCasesRoot(array $user):array{
+    $legacy=gdFolderId('cases');$profile=gdClaimsProfile($user);
+    if($profile==='christian')return['id'=>$legacy,'name'=>svnetCasesFolderName($profile)];
+    if(!in_array($profile,['holger','marc','jens'],true))apiError(409,'Für den angemeldeten Benutzer ist kein unterstütztes Bearbeiterprofil hinterlegt.');
+    $meta=gdFileMeta($legacy);$parent=trim((string)(($meta['parents']??[])[0]??''));
+    if($parent==='')apiError(503,'Der persönliche Schadenfälle-Ordner kann nicht angelegt werden: Übergeordneter Drive-Ordner fehlt.');
+    $name=svnetCasesFolderName($profile);$folder=gdFindChildByName($parent,$name);
+    if(!$folder||($folder['mimeType']??'')!=='application/vnd.google-apps.folder')$folder=gdCreateFolder($parent,$name);
+    return['id'=>(string)$folder['id'],'name'=>$name];
+}
+function gdEnsureKnownCasesRoots():void{$legacy=gdFolderId('cases');$meta=gdFileMeta($legacy);$parent=trim((string)(($meta['parents']??[])[0]??''));if($parent==='')return;foreach(['Schadenfälle Holger Roth','Schadenfälle Marc Schütt','Schadenfälle Jens Maurer']as$name){$folder=gdFindChildByName($parent,$name);if(!$folder||($folder['mimeType']??'')!=='application/vnd.google-apps.folder')gdCreateFolder($parent,$name);}}
 function gdAssertCaseAccess(string $caseId,array $user):void{if($caseId==='')apiError(400,'Kein aktiver Fallordner.');$root=gdUserCasesRoot($user);$folder=gdFileMeta($caseId);if(($folder['mimeType']??'')!=='application/vnd.google-apps.folder'||!in_array((string)$root['id'],$folder['parents']??[],true))apiError(403,'Dieser Schadenfall gehört zu einem anderen Benutzer und darf nicht geöffnet oder verändert werden.');registerCaseFolderOwner($caseId,$user,gdCaseMeta($caseId));}
 function gdUploadJson(string $parentId,string $name,array $payload):array{$existing=gdFindChildByName($parentId,$name);$meta=['name'=>$name,'mimeType'=>'application/json'];if(!$existing)$meta['parents']=[$parentId];$boundary='svnet'.bin2hex(random_bytes(8));$body='--'.$boundary."\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n".json_encode($meta,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)."\r\n--".$boundary."\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n".json_encode($payload,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)."\r\n--".$boundary."--";$method=$existing?'PATCH':'POST';$url='https://www.googleapis.com/upload/drive/v3/files'.($existing?'/'.rawurlencode($existing['id']):'').'?uploadType=multipart&supportsAllDrives=true&fields=id,name,modifiedTime,webViewLink';$resp=gdHttp($method,$url,['Content-Type: multipart/related; boundary='.$boundary],$body,true);if($resp['status']<200||$resp['status']>=300)apiError(503,'Falldaten konnten nicht in Google Drive gespeichert werden.');return json_decode($resp['body'],true)?:[];}
 function gdUploadBytes(string $parentId,string $name,string $mime,string $bytes):array{$meta=['name'=>$name,'mimeType'=>$mime,'parents'=>[$parentId]];$boundary='svnet'.bin2hex(random_bytes(8));$body='--'.$boundary."\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n".json_encode($meta,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)."\r\n--".$boundary."\r\nContent-Type: ".$mime."\r\n\r\n".$bytes."\r\n--".$boundary."--";$url='https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true&fields=id,name,mimeType,modifiedTime,webViewLink,webContentLink';$resp=gdHttp('POST',$url,['Content-Type: multipart/related; boundary='.$boundary],$body,true);if($resp['status']<200||$resp['status']>=300)apiError(503,'Dokument konnte nicht in Google Drive gespeichert werden.');return json_decode($resp['body'],true)?:[];}
@@ -136,7 +156,7 @@ function gfSections(string $key):array{return match($key){'erstbericht'=>['Versi
 function gfDocumentHtml(string $key,array $meta,array $order,string $userName):string{$title=gfOutputTitle($key);$schaden=(string)($meta['schaden_nr']??'');$vsnr=(string)($meta['versicherungsschein_nr']??'');$obj=(string)($meta['vn_objekt']??'');$ort=trim(((string)($meta['strasse']??'')).' '.((string)($meta['ort']??'')));$reserve=(string)($meta['reserve']??'');$instruction=(string)($order['instructions']??'');$work=(string)($order['work_mode']??'');$open=(string)($order['open_points']??'');$sections='';foreach(gfSections($key)as$s)$sections.='<h2>'.gdH($s).'</h2><p><em>Aus der Fallakte fachlich zu befüllen. Fehlende Angaben als offen kennzeichnen; keine Tatsachen erfinden.</em></p>';$generated=date('d.m.Y H:i');return'<!doctype html><html><head><meta charset="utf-8"><title>'.gdH($title).'</title><style>body{font-family:Arial,sans-serif;font-size:11pt;line-height:1.45;margin:2cm;color:#111}h1{font-size:18pt;margin-bottom:18px}h2{font-size:13pt;margin-top:22px;border-bottom:1px solid #bbb;padding-bottom:4px}table{border-collapse:collapse;width:100%;margin:12px 0 20px}td{border:1px solid #ccc;padding:6px;vertical-align:top}.label{font-weight:bold;width:30%}.note{background:#f3f6f8;padding:10px;border:1px solid #d6e0e7}.footer{margin-top:30px}</style></head><body><h1>'.gdH($title).'</h1><table><tr><td class="label">Schaden-Nr.</td><td>'.gdH($schaden).'</td></tr><tr><td class="label">Versicherungsschein-Nr.</td><td>'.gdH($vsnr).'</td></tr><tr><td class="label">VN / Objekt</td><td>'.gdH($obj).'</td></tr><tr><td class="label">Schadenort</td><td>'.gdH($ort).'</td></tr><tr><td class="label">Aktuelle Schadenhöhe / Reserve</td><td>'.gdH($reserve).'</td></tr></table><div class="note"><strong>Arbeitsauftrag</strong><br>'.nl2br(gdH($instruction?:'Kein zusätzlicher Freitext hinterlegt.')).'<br><br><strong>Bearbeitungsart:</strong> '.gdH($work).'<br><strong>Offene Punkte:</strong> '.gdH($open).'</div>'.$sections.'<div class="footer"><p>Erstellt am '.gdH($generated).' durch '.gdH($userName).'.</p><p>Christian Wächter<br>Sachverständiger &amp; Großschadenregulierer<br>DIN EN ISO/IEC 17024 zertifiziert<br>https://www.sv-netzwerk.eu/</p></div></body></html>';}
 
 switch($action){
-case'status':$statusKey='drive_status_'.hash('sha256',gdUserKey($portalUser).'|'.$claimsProfile.'|'.$selectedExpert);$cached=gdStatusCacheRead($statusKey);if($cached!==null){$cached['cached']=true;apiJson($cached);}gdAccessToken();gdEnsureKnownCasesRoots();$caseRoot=gdUserCasesRoot($user);$counts=['cases'=>count(gdListChildren($caseRoot['id'],null,1000)),'knowledge'=>count(gdListChildren(gdFolderId('knowledge'),null,1000)),'blanco'=>count(gdListChildren(gdFolderId('blanco'),null,1000))];$claimsAgent=(string)($portalUser['role']??'')==='administrator'&&!in_array($claimsProfile,['marc','holger'],true);$status=['ok'=>true,'connected'=>true,'cached'=>false,'user_scope'=>hash('sha256',gdUserKey($user)),'backoffice'=>$isBackoffice,'selected_expert'=>$selectedExpert,'claims_profile'=>$claimsProfile,'claims_agent'=>$claimsAgent,'folders'=>['cases'=>['id'=>$caseRoot['id'],'name'=>$caseRoot['name'],'items'=>$counts['cases']],'knowledge'=>['id'=>gdFolderId('knowledge'),'name'=>'00_KI-Wissensbasis','items'=>$counts['knowledge']],'blanco'=>['id'=>gdFolderId('blanco'),'name'=>'SV-GF Fälle','items'=>$counts['blanco']]]];gdStatusCacheWrite($statusKey,$status,$portalUser);apiJson($status);
+case'status':$statusKey='drive_status_'.hash('sha256',gdUserKey($portalUser).'|'.$claimsProfile.'|'.$selectedExpert);$cached=gdStatusCacheRead($statusKey);if($cached!==null){$cached['cached']=true;apiJson($cached);}gdAccessToken();gdEnsureKnownCasesRoots();$caseRoot=gdUserCasesRoot($user);$counts=['cases'=>count(gdListChildren($caseRoot['id'],null,1000)),'knowledge'=>count(gdListChildren(gdFolderId('knowledge'),null,1000)),'blanco'=>count(gdListChildren(gdFolderId('blanco'),null,1000))];$claimsAgent=$isBackoffice;$status=['ok'=>true,'connected'=>true,'cached'=>false,'user_scope'=>hash('sha256',gdUserKey($user)),'backoffice'=>$isBackoffice,'selected_expert'=>$selectedExpert,'claims_profile'=>$claimsProfile,'claims_agent'=>$claimsAgent,'folders'=>['cases'=>['id'=>$caseRoot['id'],'name'=>$caseRoot['name'],'items'=>$counts['cases']],'knowledge'=>['id'=>gdFolderId('knowledge'),'name'=>'00_KI-Wissensbasis','items'=>$counts['knowledge']],'blanco'=>['id'=>gdFolderId('blanco'),'name'=>'SV-GF Fälle','items'=>$counts['blanco']]]];gdStatusCacheWrite($statusKey,$status,$portalUser);apiJson($status);
 case'recent_cases':
   $caseRoot=gdUserCasesRoot($user);
   $folders=gdListChildren($caseRoot['id'],'application/vnd.google-apps.folder',1000);

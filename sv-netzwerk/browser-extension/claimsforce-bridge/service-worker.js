@@ -4,6 +4,12 @@ import { mapClaim, safeFileName } from './import-utils.js';
 const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
 const PLANNING_URL = 'https://web.claimsforce.com/planning?bucket=WITH_FUTURE_APPOINTMENT#with-future-appointment';
 const CLAIMS_ORIGINS = ['https://web.claimsforce.com', 'https://claimsforce.eu.auth0.com'];
+const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens'];
+const profileKey = value => {
+  const profile = String(value || '').trim().toLowerCase();
+  if (!SUPPORTED_PROFILES.includes(profile)) throw new Error('Ungültiges ClaimsForce-Profil.');
+  return profile;
+};
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const authHeaders = token => ({ Authorization: `Bearer ${token}`, Accept: 'application/json' });
 let runningImport = null;
@@ -17,6 +23,7 @@ async function diagnostic(run, phase, text, details = {}) {
 }
 
 async function credentialsFor(profile) {
+  profile = profileKey(profile);
   credentialDiagnostic = 'vault';
   const saved = await Promise.race([loadCredentials(profile).catch(() => null), sleep(600).then(() => null)]);
   if (saved?.email && saved?.password) { credentialDiagnostic = 'vault-ready'; return { value: saved, source: 'vault' }; }
@@ -52,8 +59,9 @@ async function credentialsFor(profile) {
 }
 
 async function tokenValue(profile) {
+  profile = profileKey(profile);
   const row = await chrome.storage.session.get(['claimsToken', 'claimsTokenProfile']);
-  return row.claimsToken && (profile === 'self' || row.claimsTokenProfile === profile) ? row.claimsToken : '';
+  return row.claimsToken && row.claimsTokenProfile === profile ? row.claimsToken : '';
 }
 
 async function waitTab(tabId, timeout = 30000) {
@@ -219,12 +227,11 @@ async function uploadBuffer(portalTabId, folderId, name, mime, modified, buffer)
 }
 
 async function runImport(run) {
-  const { portalTabId, profile } = run;
+  const portalTabId = run.portalTabId, profile = profileKey(run.profile);
+  run.profile = profile;
   await chrome.storage.session.set({ activeProfile: profile });
-  if (profile !== 'self') {
-    const [openSession] = await chrome.tabs.query({ url: ['https://web.claimsforce.com/*', 'https://claimsforce.eu.auth0.com/*'] });
-    await resetClaimsSession(run, openSession?.id || 0);
-  }
+  const [openSession] = await chrome.tabs.query({ url: ['https://web.claimsforce.com/*', 'https://claimsforce.eu.auth0.com/*'] });
+  await resetClaimsSession(run, openSession?.id || 0);
   const credential = await credentialsFor(profile);
   await diagnostic(run, 'CF-CRED-01', credential ? 'Zugangsdatenquelle ist verfügbar.' : 'Für das Profil ist keine Zugangsdatenquelle verfügbar.', { source: credential?.source || 'keine' });
   if (!credential) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar.');
@@ -322,17 +329,15 @@ async function runImport(run) {
     await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length} wurde vollständig im Portal verarbeitet.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
   }
   await progress(portalTabId, `${claims.length} Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
-  if (profile !== 'self') {
-    await chrome.storage.session.set({ claimsLoggedProfile: profile });
-    await chrome.storage.local.set({ claimsLoggedProfile: profile });
-  }
+  await chrome.storage.session.set({ claimsLoggedProfile: profile });
+  await chrome.storage.local.set({ claimsLoggedProfile: profile });
   return { claims: claims.length, openTasks, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
 }
 
 async function startImport(sender, message) {
   const portalTabId = sender.tab?.id;
   if (!portalTabId) return { ok: false, error: '[CF-RUN-00] Portal-Registerkarte fehlt.' };
-  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: message.profile || 'self', portalTabId, startedAt: new Date().toISOString() };
+  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), portalTabId, startedAt: new Date().toISOString() };
   if (runningImport) {
     if (runningImport.jobId === requested.jobId && runningImport.profile === requested.profile) return { ok: true, accepted: true, resumed: false, runId: runningImport.runId };
     return { ok: false, error: '[CF-RUN-00] Ein anderer ClaimsForce-Import läuft bereits.' };
@@ -359,15 +364,15 @@ chrome.runtime.onConnect.addListener(port => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'CLAIMS_TOKEN') {
-    chrome.storage.session.get('activeProfile').then(row => chrome.storage.session.set({ claimsToken: message.token, claimsTokenProfile: row.activeProfile || 'self', claimsTokenAt: Date.now() })).then(() => sendResponse({ ok: true }));
+    chrome.storage.session.get('activeProfile').then(row => chrome.storage.session.set({ claimsToken: message.token, claimsTokenProfile: profileKey(row.activeProfile), claimsTokenAt: Date.now() })).then(() => sendResponse({ ok: true })).catch(error => sendResponse({ ok: false, error: error.message }));
     return true;
   }
   if (message?.type === 'GET_CREDENTIALS') {
     chrome.storage.session.get('activeProfile').then(async row => {
-      const profile = row.activeProfile || 'self';
+      const profile = profileKey(row.activeProfile);
       const found = await credentialsFor(profile);
       return found?.value || null;
-    }).then(value => sendResponse(value || {}));
+    }).then(value => sendResponse(value || {})).catch(() => sendResponse({}));
     return true;
   }
   if (message?.type === 'GET_PORTAL_CREDENTIALS') {
@@ -386,7 +391,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
   if (message?.type === 'OPEN_OPTIONS') {
-    chrome.storage.session.set({ activeProfile: message.profile || 'self' }).then(() => chrome.runtime.openOptionsPage()); sendResponse({ ok: true }); return;
+    try {
+      const profile = profileKey(message.profile);
+      chrome.storage.session.set({ activeProfile: profile }).then(() => chrome.runtime.openOptionsPage());
+      sendResponse({ ok: true });
+    } catch (error) { sendResponse({ ok: false, error: error.message }); }
+    return;
   }
   if (message?.type === 'START_IMPORT' && sender.tab?.id) {
     startImport(sender, message).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));

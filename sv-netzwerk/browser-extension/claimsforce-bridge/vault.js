@@ -28,7 +28,12 @@ async function vaultKey() {
   return key;
 }
 
-const profileKey = profile => `credentials_${String(profile || 'self').replace(/[^a-z0-9_-]/gi, '') || 'self'}`;
+const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens'];
+const profileKey = value => {
+  const profile = String(value || '').trim().toLowerCase();
+  if (!SUPPORTED_PROFILES.includes(profile)) throw new Error('Ungültiges ClaimsForce-Profil.');
+  return `credentials_${profile}`;
+};
 const portalKey = 'portal_credentials';
 
 async function saveEncrypted(keyName, credentials) {
@@ -52,11 +57,11 @@ export async function saveCredentials(profile, credentials) {
   await saveEncrypted(profileKey(profile), credentials);
 }
 
-export async function loadCredentials(profile = 'self') {
+export async function loadCredentials(profile) {
   return loadEncrypted(profileKey(profile));
 }
 
-export async function clearCredentials(profile = 'self') {
+export async function clearCredentials(profile) {
   await chrome.storage.local.remove(profileKey(profile));
 }
 

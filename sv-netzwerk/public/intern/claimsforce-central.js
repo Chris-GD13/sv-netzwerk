@@ -27,6 +27,12 @@
   const driveStatus=()=>window.svnetDriveStatus?window.svnetDriveStatus():json('/intern/api/google-drive-sync.php?action=status');
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
+  const supportedProfiles=['christian','holger','marc','jens'];
+  const selectedProfile=()=>{
+    const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
+    if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
+    return raw;
+  };
   const versionAtLeast=(actual,required)=>{const a=String(actual).split('.').map(Number),r=String(required).split('.').map(Number);for(let i=0;i<3;i++){if((a[i]||0)!==(r[i]||0))return(a[i]||0)>(r[i]||0)}return true};
   const resultOf=job=>{try{return typeof job.result==='string'?JSON.parse(job.result):job.result||{}}catch{return{}}};
   const heartbeat=()=>agentJob?post('heartbeat',{id:agentJob.id,message:lastRuntime.message,phase:lastRuntime.phase,current:lastRuntime.current,total:lastRuntime.total,diagnostic:lastRuntime.diagnostic}).catch(()=>{}):Promise.resolve();
@@ -54,10 +60,10 @@
 
   button.addEventListener('click',async()=>{
     if(userJobs.length)return;
-    if(context.claims_agent&&!bridge){show(`Diese zentrale Importstation ist nicht bereit. Browser-Brücke 1.3.13 erforderlich (geladen: ${bridgeVersion||'nicht erkannt'}). Bitte zuerst die Brücke aktualisieren.`,true);return}
+    if(context.claims_agent&&!bridge){show(`Diese zentrale Importstation ist nicht bereit. Browser-Brücke 1.3.14 erforderlich (geladen: ${bridgeVersion||'nicht erkannt'}). Bitte zuerst die Brücke aktualisieren.`,true);return}
     button.disabled=true;
     try{
-      const profile=context.backoffice?(context.selected_expert||'christian'):(context.claims_profile||'christian');
+      const profile=selectedProfile();
       userJobs=[];
       userJobs.push((await post('enqueue',{profile})).job.id);
       show('Importauftrag wurde an die zentrale Importstation übergeben.');
@@ -69,8 +75,12 @@
     busy=true;agentJob=job;
     lastRuntime={phase:resumed?'CF-RECOVER':'CF-CLAIMED',message:resumed?'Unterbrochener Import wird wiederaufgenommen.':'Import wird im Browser gestartet.',current:Number(job.progress_current||0),total:Number(job.progress_total||0),diagnostic:{attempt:Number(job.attempt_count||1),resumed}};
     await heartbeat();
-    const target=job.profile==='jens'?'christian':job.profile;
+    const target=String(job.profile||'').trim().toLowerCase();
+    if(!supportedProfiles.includes(target))throw Error('Importauftrag enthält ein ungültiges Bearbeiterprofil.');
+    sessionStorage.removeItem('svnet-case');
+    localStorage.removeItem('svnet-case');
     await json('/intern/api/google-drive-sync.php?action=select_expert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({expert:target})});
+    context.selected_expert=target;
     window.postMessage({type:'SVNET_CLAIMS_IMPORT_START',profile:job.profile,jobId:Number(job.id),runId:`claimsforce-${job.id}-${job.attempt_count||1}`},location.origin);
   }
 
@@ -102,8 +112,8 @@
     const d=e.data||{},runtime=d.runtime||{};
     if(d.type==='SVNET_CLAIMS_BRIDGE_READY'){
       bridgeVersion=String(d.version||'0.0.0');
-      bridge=versionAtLeast(bridgeVersion,'1.3.13');
-      if(!bridge)show(`Browser-Brücke 1.3.13 erforderlich (geladen: ${bridgeVersion}). Bitte die Erweiterung aktualisieren.`,true);
+      bridge=versionAtLeast(bridgeVersion,'1.3.14');
+      if(!bridge)show(`Browser-Brücke 1.3.14 erforderlich (geladen: ${bridgeVersion}). Bitte die Erweiterung aktualisieren.`,true);
     }
     if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&agentJob){
       const active=d.status?.active||{},diag=d.status?.diagnostic||{};
@@ -131,7 +141,7 @@
   setInterval(()=>window.postMessage({type:'SVNET_CLAIMS_RUNTIME_PING'},location.origin),5000);
   driveStatus().then(async d=>{
     context=d;
-    const personalBridgeBlocked=['marc','holger'].includes(String(d.claims_profile||''));
+    const personalBridgeBlocked=!d.backoffice&&supportedProfiles.includes(String(d.claims_profile||''));
     if(personalBridgeBlocked){
       settings?.remove();
       download?.remove();

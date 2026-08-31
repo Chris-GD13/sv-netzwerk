@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/config.php';
+require_once __DIR__.'/profile-routing.php';
 commonHeaders();
 $user=requireAuth();
 if(!in_array((string)($user['role']??''),['administrator','projektleiter','pruefer','sachverstaendiger'],true))apiError(403,'Keine Berechtigung.');
@@ -43,23 +44,24 @@ function cqEnsureColumns():void{
 cqEnsureColumns();
 
 function cqProfile(array$user):string{
-    $email=mb_strtolower((string)($user['email']??''),'UTF-8');
-    $name=mb_strtolower((string)($user['full_name']??''),'UTF-8');
-    if(str_contains($email,'hr@')||str_contains($name,'holger'))return'holger';
-    if(str_contains($email,'ms@')||str_contains($name,'marc'))return'marc';
-    return'christian';
+    return svnetUserProfile($user);
+}
+function cqIsSusanne(array$user):bool{
+    return svnetIsBackofficeUser($user);
 }
 function cqIsCentralAgent(array$user):bool{
-    return(string)($user['role']??'')==='administrator'&&!in_array(cqProfile($user),['marc','holger'],true);
+    return cqIsSusanne($user);
 }
 function cqVisibleProfiles(array$user):array{
-    $email=mb_strtolower(trim((string)($user['email']??'')),'UTF-8');
-    $name=mb_strtolower(trim((string)($user['full_name']??'')),'UTF-8');
-    if(str_contains($email,'hr@')||str_contains($name,'holger'))return['holger'=>'Holger'];
-    if(str_contains($email,'ms@')||str_contains($name,'marc'))return['marc'=>'Marc'];
-    if(str_contains($email,'cw@')||str_contains($name,'christian'))return['christian'=>'Christian','jens'=>'Maurer'];
-    $selected=(string)($_SESSION['svnet_selected_expert']??'christian');
-    return match($selected){'holger'=>['holger'=>'Holger'],'marc'=>['marc'=>'Marc'],'jens'=>['jens'=>'Maurer'],default=>['christian'=>'Christian','jens'=>'Maurer']};
+    $labels=['christian'=>'Christian','holger'=>'Holger','marc'=>'Marc','jens'=>'Jens'];
+    if(cqIsCentralAgent($user)){
+        try{$selected=svnetSelectedProfile($user,(string)($_SESSION['svnet_selected_expert']??''));}
+        catch(InvalidArgumentException){apiError(409,'Das gespeicherte Bearbeiterprofil ist ungültig.');}
+        return[$selected=>$labels[$selected]];
+    }
+    $profile=cqProfile($user);
+    if(!isset($labels[$profile]))apiError(409,'Für den angemeldeten Benutzer ist kein ClaimsForce-Profil hinterlegt.');
+    return[$profile=>$labels[$profile]];
 }
 function cqRow(int$id):array{
     $s=db()->prepare('SELECT id,profile,status,message,result_json,created_at,started_at,heartbeat_at,attempt_count,phase,progress_current,progress_total,diagnostic_json,finished_at,requested_by FROM claimsforce_import_jobs WHERE id=:id LIMIT 1');
@@ -99,8 +101,9 @@ if($action==='summary'){
 }
 
 if($action==='enqueue'){
-    $profile=cqProfile($user);
-    if(cqIsCentralAgent($user)&&in_array((string)($body['profile']??''),['christian','holger','marc','jens'],true))$profile=(string)$body['profile'];
+    $allowed=array_keys(cqVisibleProfiles($user));
+    $profile=trim((string)($body['profile']??''));
+    if(!in_array($profile,$allowed,true))apiError(409,'ClaimsForce-Profil und ausgewählter Sachverständiger stimmen nicht überein.');
     $stop=db()->prepare("UPDATE claimsforce_import_jobs SET status='failed',message='Durch einen neuen manuellen Import ersetzt.',phase='CF-FAIL-REPLACED',heartbeat_at=NOW(),finished_at=NOW() WHERE requested_by=:u AND profile=:p AND status IN ('queued','running')");
     $stop->execute([':p'=>$profile,':u'=>(string)($user['email']??'')]);
     $s=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,created_at) VALUES(:p,'queued',:u,'Import wartet auf die zentrale Importstation.','CF-QUEUED',NOW())");
@@ -125,7 +128,7 @@ if($action==='mine'){
     }
     apiJson(['ok'=>true,'jobs'=>$jobs]);
 }
-if(!cqIsCentralAgent($user))apiError(403,'Nur die zentrale Christian-Importstation darf Aufträge übernehmen.');
+if(!cqIsCentralAgent($user))apiError(403,'Nur Susannes zentrale Backoffice-Importstation darf Aufträge übernehmen.');
 
 if($action==='schedule'){
     $now=new DateTimeImmutable('now',new DateTimeZone('Europe/Berlin'));
