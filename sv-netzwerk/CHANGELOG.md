@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.39 – 2026-08-31
+- automatischer morgens Fachbeitrag veröffentlicht: „Kommunikation mit Versicherern, Schadenregulierern und Versicherungsnehmern: Struktur für klare Verfahren"
+- LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
+- ohne Beitragsbild veröffentlicht; keine typografische Platzhaltergrafik erzeugt
+
 ## 3.4.38 – 2026-08-30
 - automatischer nachmittags Fachbeitrag veröffentlicht: „Kumulschäden nach Hochwasser und Überflutung: Priorisierung und strukturierte Regulierung"
 - LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)

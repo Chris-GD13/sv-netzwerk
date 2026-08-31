@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Kommunikation mit Versicherern, Schadenregulierern und Versicherungsnehmern: Struktur für klare Verfahren',
+    description: 'Kommunikation im Schadenfall: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/kommunikation-beteiligte-schadenfall-struktur/',
+    category: 'Kommunikation im Schadenfall',
+    tags: ['Kommunikation', 'Versicherer', 'Versicherungsnehmer', 'Schadenmanagement', 'Transparenz'],
+    date: '2026-08-31',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Kumulschäden nach Hochwasser und Überflutung: Priorisierung und strukturierte Regulierung',
     description: 'Hochwasser und Überflutung: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/kumulschaeden-hochwasser-ueberflutung-priorisierung-regulierung/',
