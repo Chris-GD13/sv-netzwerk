@@ -20,6 +20,10 @@ new = """if(!is_array($data)){
     $reason=trim((string)($j['incomplete_details']['reason']??''));
     throw new RuntimeException($reason!==''?'KI-Antwort konnte auch nach automatischer Wiederholung nicht vollständig erzeugt werden ('.$reason.').':'KI-Antwort konnte auch nach automatischer Wiederholung nicht als vollständiges JSON erzeugt werden.');
 }return$data;}"""
+if 'static $jsonRetryDepth=0;' in text:
+    print('GF JSON retry already active.')
+    raise SystemExit(0)
 if old not in text:
     raise SystemExit('target gfOpenAI JSON guard not found')
 path.write_text(text.replace(old, new, 1), encoding='utf-8')
+print('GF JSON retry added.')
