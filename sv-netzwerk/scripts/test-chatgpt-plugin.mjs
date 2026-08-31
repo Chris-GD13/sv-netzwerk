@@ -61,6 +61,7 @@ const mcpServer = await read('sv-netzwerk/public/intern/mcp/index.php');
 assert.match(mcpServer, /'name'=>'read_case_file'/);
 assert.match(mcpServer, /requireCaseFolderAccess\(\$folder,\$user\)/);
 assert.match(mcpServer, /mcpDriveFindCaseFile/);
+assert.match(mcpServer, /if \(!oauthBearerUserOrNull\('cases:read'\)\) oauthChallenge\('cases:read cases:drafts\.write'\)/);
 
 const portal = await read('sv-netzwerk/src/pages/intern/versicherungsfaelle/index.astro');
 assert.match(portal, /persönlichen ChatGPT-\/Work-Zugang als kopierfertiger Text/);

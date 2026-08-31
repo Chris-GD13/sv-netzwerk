@@ -57,6 +57,11 @@ function caseTitle(array $row): string {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') oauthJson(['name'=>'SV-Netzwerk Fallbearbeitung','version'=>'1.0.0','mcp'=>'POST erforderlich.'], 200);
+
+// Challenge the MCP client before initialization so ChatGPT starts the
+// personal OAuth flow instead of merely listing an unauthenticated server.
+if (!oauthBearerUserOrNull('cases:read')) oauthChallenge('cases:read cases:drafts.write');
+
 $request=requestBody();$id=$request['id']??null;$method=(string)($request['method']??'');$params=is_array($request['params']??null)?$request['params']:[];
 if ($method==='initialize') mcpResult($id,['protocolVersion'=>(string)($params['protocolVersion']??'2025-06-18'),'capabilities'=>['tools'=>(object)[]],'serverInfo'=>['name'=>'sv-netzwerk-fallbearbeitung','version'=>'1.2.0'],'instructions'=>'Nutze ausschließlich Fälle des angemeldeten Portalbenutzers. Vor jeder inhaltlichen Bearbeitung zuerst search und anschließend fetch aufrufen. Relevante Akten anschließend gezielt mit read_case_file lesen. Normale Schadenberichte und SV-GF-/Groß-TF-Schäden haben unterschiedliche verbindliche Gliederungen. Ergebnisse nur auf ausdrücklichen Wunsch des Benutzers mit save_case_draft als neuen Entwurf zurückgeben. Originalunterlagen und Falldaten niemals verändern.']);
 if ($method==='notifications/initialized') { http_response_code(202); exit; }
