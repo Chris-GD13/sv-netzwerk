@@ -10,8 +10,16 @@ if (!$uris || count($uris) > 10) oauthError('invalid_redirect_uri', 'Mindestens 
 foreach ($uris as $uri) {
     $parts = parse_url($uri);
     $host = strtolower((string)($parts['host'] ?? ''));
-    if (($parts['scheme'] ?? '') !== 'https' || !in_array($host, ['chatgpt.com','www.chatgpt.com'], true)) {
-        oauthError('invalid_redirect_uri', 'Für diese interne Anbindung sind ausschließlich HTTPS-Callbacks von ChatGPT zulässig.');
+    $isChatGpt = ($parts['scheme'] ?? '') === 'https'
+        && in_array($host, ['chatgpt.com','www.chatgpt.com'], true);
+    $isCodexLoopback = ($parts['scheme'] ?? '') === 'http'
+        && in_array($host, ['127.0.0.1','localhost'], true)
+        && isset($parts['port']) && (int)$parts['port'] > 0
+        && preg_match('#^/callback/[A-Za-z0-9_-]{12}$#', (string)($parts['path'] ?? '')) === 1
+        && !isset($parts['query']) && !isset($parts['fragment'])
+        && !isset($parts['user']) && !isset($parts['pass']);
+    if (!$isChatGpt && !$isCodexLoopback) {
+        oauthError('invalid_redirect_uri', 'Zulässig sind ausschließlich ChatGPT-HTTPS-Callbacks oder lokale Codex-PKCE-Callbacks.');
     }
 }
 $method = (string)($body['token_endpoint_auth_method'] ?? 'none');
