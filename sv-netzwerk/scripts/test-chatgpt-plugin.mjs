@@ -62,10 +62,13 @@ assert.match(mcpServer, /'name'=>'read_case_file'/);
 assert.match(mcpServer, /requireCaseFolderAccess\(\$folder,\$user\)/);
 assert.match(mcpServer, /mcpDriveFindCaseFile/);
 assert.match(mcpServer, /if \(!oauthBearerUserOrNull\('cases:read'\)\) oauthChallenge\('cases:read cases:drafts\.write'\)/);
-assert.match(mcpServer, /resource_metadata="https:\/\/www\.sv-netzwerk\.eu\/\.well-known\/oauth-protected-resource\/"/);
+assert.match(mcpServer, /resource_metadata="https:\/\/www\.sv-netzwerk\.eu\/\.well-known\/oauth-protected-resource\/intern\/mcp\/"/);
 
 const oauthLib = await read('sv-netzwerk/public/intern/oauth/lib.php');
-assert.match(oauthLib, /resource_metadata="https:\/\/www\.sv-netzwerk\.eu\/\.well-known\/oauth-protected-resource\/"/);
+assert.match(oauthLib, /resource_metadata="https:\/\/www\.sv-netzwerk\.eu\/\.well-known\/oauth-protected-resource\/intern\/mcp\/"/);
+
+const protectedResource = await read('sv-netzwerk/public/.well-known/oauth-protected-resource/intern/mcp/index.php');
+assert.match(protectedResource, /'resource'=>'https:\/\/www\.sv-netzwerk\.eu\/intern\/mcp\/'/);
 
 const portal = await read('sv-netzwerk/src/pages/intern/versicherungsfaelle/index.astro');
 assert.match(portal, /persönlichen ChatGPT-\/Work-Zugang als kopierfertiger Text/);
