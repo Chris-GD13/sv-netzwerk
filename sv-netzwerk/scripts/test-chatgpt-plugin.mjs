@@ -67,7 +67,12 @@ assert.match(deployScope, /file\.startsWith\('\.well-known\/'\)/);
 
 const portalWorkflow = await read('.github/workflows/deploy-portal.yml');
 assert.match(portalWorkflow, /put dist\/\.htaccess -o \.htaccess/);
+assert.match(portalWorkflow, /put dist\/\.well-known\/\.htaccess -o \.well-known\/\.htaccess/);
 assert.match(portalWorkflow, /deploy-portal\/\.well-known\/oauth-protected-resource\/intern\/mcp\/index\.php/);
+
+const wellKnownApache = await read('sv-netzwerk/public/.well-known/.htaccess');
+assert.match(wellKnownApache, /DirectorySlash Off/);
+assert.match(wellKnownApache, /RewriteRule \^oauth-protected-resource\/intern\/mcp\$/);
 
 const mcpServer = await read('sv-netzwerk/public/intern/mcp/index.php');
 assert.match(mcpServer, /'name'=>'read_case_file'/);

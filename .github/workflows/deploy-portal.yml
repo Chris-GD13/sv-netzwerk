@@ -62,6 +62,7 @@ jobs:
         run: |
           node scripts/prepare-deploy-scope.mjs portal dist deploy-portal
           test -f dist/.htaccess
+          test -f dist/.well-known/.htaccess
           test -f deploy-portal/.well-known/oauth-protected-resource/intern/mcp/index.php
           test -f deploy-portal/intern/versicherungsfaelle/index.html
           test -f deploy-portal/intern/api/gf-ai-generate.php
@@ -81,7 +82,7 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          timeout 1200s lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; put dist/.htaccess -o .htaccess; mirror --reverse --only-newer --parallel=4 --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern/photos --exclude-glob intern/photos/** --exclude-glob intern/api/config.php deploy-portal/ .; quit"
+          timeout 1200s lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; put dist/.htaccess -o .htaccess; put dist/.well-known/.htaccess -o .well-known/.htaccess; mirror --reverse --only-newer --parallel=4 --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern/photos --exclude-glob intern/photos/** --exclude-glob intern/api/config.php deploy-portal/ .; quit"
 
       - name: Portal online verifizieren
         env:
@@ -96,7 +97,7 @@ jobs:
             test "$status" = "200"
             echo "$path: HTTP $status"
           done
-          for path in /.well-known/oauth-protected-resource /.well-known/oauth-protected-resource/intern/mcp/ /.well-known/oauth-authorization-server; do
+          for path in /.well-known/oauth-protected-resource /.well-known/oauth-protected-resource/intern/mcp /.well-known/oauth-protected-resource/intern/mcp/ /.well-known/oauth-authorization-server; do
             headers="$(mktemp)"
             body="$(mktemp)"
             status="$(curl --max-redirs 0 --silent --show-error --retry 3 --retry-delay 3 -D "$headers" -o "$body" -w '%{http_code}' "https://www.sv-netzwerk.eu${path}")"

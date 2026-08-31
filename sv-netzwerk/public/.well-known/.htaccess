@@ -1,0 +1,8 @@
+RewriteEngine On
+DirectorySlash Off
+
+# OpenAI clients derive both base and resource-path metadata URLs. Serve each
+# slashless request directly instead of returning Apache's HTML redirect page.
+RewriteRule ^oauth-protected-resource$ oauth-protected-resource/index.php [END]
+RewriteRule ^oauth-protected-resource/intern/mcp$ oauth-protected-resource/intern/mcp/index.php [END]
+RewriteRule ^oauth-authorization-server$ oauth-authorization-server/index.php [END]
