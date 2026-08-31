@@ -24,6 +24,9 @@ assert(page.includes("addSection?.('Eigene Kalkulation nach BKI')") && page.incl
 assert(page.includes("isLegacyQuick=/^(INDEX|BAUM-|ASBEST)/i") && page.includes("grouped.push({type:'section',description:'Eigene Kalkulation nach BKI'"), 'Bestehende ungruppierte Schnellkalkulationspositionen müssen beim Laden nachträglich einen eigenen Abschnitt erhalten.');
 assert(page.includes("[/rollladenpanzer pvc/,{material:72,hours:1.75,labor:72}]") && page.includes("[/rollladenpanzer aluminium/,{material:115,hours:1.75,labor:72}]"), 'Die Rollladenpanzer müssen den KVA-belegten höheren Montageaufwand berücksichtigen.');
 assert(page.includes("[/attika|blechverwahrung|anschlussblech/,216]") && page.includes("kvaFloor=/attika|blechverwahrung|anschlussblech/.test(label)?216:0"), 'Individuelle Blechverwahrungen dürfen den KVA-belegten Mindestansatz nicht unterschreiten.');
+assert(page.includes("{c:'Insektenschutz',l:'Insektenschutz-Spannrahmen'") && page.includes("l:'Insektenschutz-Drehtür'") && page.includes("l:'Insektenschutz-Pendeltür'") && page.includes("l:'Insektenschutz-Schiebetür'") && page.includes("l:'Insektenschutz-Lichtschachtabdeckung'"), 'Die fünf üblichen Insektenschutzarten müssen in der Schnellkalkulation vorhanden sein.');
+assert(page.includes("const area=Math.max(1,height*width),ep=number(p.base)*area"), 'Insektenschutzpreise müssen aus Höhe mal Breite mit mindestens einem Quadratmeter Grundpreis berechnet werden.');
+assert(page.includes("description:`${p.l} – maßgefertigt, geliefert und montiert`") && !page.includes("description:`${p.l} – ${height}"), 'Die verwendeten Insektenschutzmaße dürfen nicht in der Kalkulationsposition erscheinen.');
 
 assert(api.includes('function bkDriveBelongsToCase('), 'Die Fallzuordnung muss über den vollständigen Drive-Unterordnerpfad geprüft werden.');
 assert(api.includes("if(hash_equals($folderId,$parent))return true"), 'Ein KVA in einem Unterordner des aktiven Falls muss zugelassen werden.');
