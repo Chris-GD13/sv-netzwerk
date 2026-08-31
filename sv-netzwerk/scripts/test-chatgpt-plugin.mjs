@@ -82,7 +82,7 @@ assert.match(mcpServer, /mcpDriveFindCaseFile/);
 
 const oauthRegistration = await read('sv-netzwerk/public/intern/oauth/register.php');
 assert.match(oauthRegistration, /\['127\.0\.0\.1','localhost'\]/, 'Codex loopback callbacks must be explicitly allowlisted');
-assert.match(oauthRegistration, /\^\/callback\/\[A-Za-z0-9_-\]\{12\}\$/, 'Codex callback path must remain narrowly constrained');
+assert.match(oauthRegistration, /\^\/callback\(\?:\/\[A-Za-z0-9_-\]\{12\}\)\?\$/, 'Codex callback path must remain narrowly constrained');
 assert.match(mcpServer, /if \(!oauthBearerUserOrNull\('cases:read'\)\) oauthChallenge\('cases:read cases:drafts\.write'\)/);
 assert.match(mcpServer, /resource_metadata="https:\/\/www\.sv-netzwerk\.eu\/\.well-known\/oauth-protected-resource\/intern\/mcp\/"/);
 

@@ -15,7 +15,7 @@ foreach ($uris as $uri) {
     $isCodexLoopback = ($parts['scheme'] ?? '') === 'http'
         && in_array($host, ['127.0.0.1','localhost'], true)
         && isset($parts['port']) && (int)$parts['port'] > 0
-        && preg_match('#^/callback/[A-Za-z0-9_-]{12}$#', (string)($parts['path'] ?? '')) === 1
+        && preg_match('#^/callback(?:/[A-Za-z0-9_-]{12})?$#', (string)($parts['path'] ?? '')) === 1
         && !isset($parts['query']) && !isset($parts['fragment'])
         && !isset($parts['user']) && !isset($parts['pass']);
     if (!$isChatGpt && !$isCodexLoopback) {
