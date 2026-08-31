@@ -310,10 +310,12 @@ async function runImport(run) {
       const uploaded = await uploadBuffer(portalTabId, folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(record?.updatedAt || record?.createdAt || '') || 0, bytes.buffer);
       if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) messagesDone++;
     }
-    for (const appointment of Array.isArray(appointments) ? appointments : []) {
-      if (!appointment?.startDate) continue;
-      const appointmentResult = await portal(portalTabId, { type: 'PORTAL_APPOINTMENT', folderId, appointment, profile });
-      if (!appointmentResult?.result?.skipped) appointmentsDone++;
+    if (!['christian', 'jens'].includes(profile)) {
+      for (const appointment of Array.isArray(appointments) ? appointments : []) {
+        if (!appointment?.startDate) continue;
+        const appointmentResult = await portal(portalTabId, { type: 'PORTAL_APPOINTMENT', folderId, appointment, profile });
+        if (!appointmentResult?.result?.skipped) appointmentsDone++;
+      }
     }
     await portal(portalTabId, { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions, profile });
     updated++;
