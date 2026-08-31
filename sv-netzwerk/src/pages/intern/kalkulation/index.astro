@@ -45,7 +45,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
   const bridge=window.__bkiCalcBridge;if(!bridge)return;
   const originalGet=bridge.getLines.bind(bridge),originalSet=bridge.setLines.bind(bridge),originalAdd=bridge.addLine.bind(bridge);
   let normalizing=false;
-  const normalize=value=>{let position=0;return(Array.isArray(value)?value:[]).map(raw=>{const line={...raw};if(line.type==='section'){line.position_code='';line.quantity=0;line.unit='';line.unit_price=0;line.regional_factor=1}else{line.type='position';line.source_position_code=line.source_position_code||line.position_code||'';line.position_code=String(++position)}return line})};
+  const normalize=value=>{const grouped=[];let inQuickSection=false;for(const raw of(Array.isArray(value)?value:[])){const line={...raw};if(line.type==='section'){inQuickSection=String(line.description||'').trim()==='Eigene Kalkulation nach BKI';grouped.push(line);continue}const source=String(line.source_position_code||line.position_code||''),description=String(line.description||''),isLegacyQuick=/^(INDEX|BAUM-|ASBEST)/i.test(source)||/Index-Material|Indexansatz 2026|Mindestansatz aus KVA-Marktvergleich/i.test(description);if(isLegacyQuick&&!inQuickSection)grouped.push({type:'section',description:'Eigene Kalkulation nach BKI',position_code:'',quantity:0,unit:'',unit_price:0,regional_factor:1});inQuickSection=isLegacyQuick;grouped.push(line)}let position=0;return grouped.map(raw=>{const line={...raw};if(line.type==='section'){line.position_code='';line.quantity=0;line.unit='';line.unit_price=0;line.regional_factor=1}else{line.type='position';line.source_position_code=line.source_position_code||line.position_code||'';line.position_code=String(++position)}return line})};
   const sameNumbering=(before,after)=>before.length===after.length&&before.every((line,index)=>line.type===after[index].type&&String(line.position_code||'')===String(after[index].position_code||''));
   function decorate(){const lines=originalGet(),rows=[...document.querySelectorAll('#bk-lines>tr')];rows.forEach((row,index)=>{const line=lines[index];if(line?.type!=='section'||row.classList.contains('bk-section-row'))return;row.className='bk-section-row';row.innerHTML=`<td></td><td colspan="6"><input class="desc" value="${String(line.description||'KVA-Positionen').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}" aria-label="Abschnittsüberschrift"></td><td><button class="bk-remove" type="button" aria-label="Abschnitt entfernen">×</button></td>`;row.querySelector('input').addEventListener('input',event=>{const current=originalGet();if(current[index]){current[index].description=event.target.value;originalSet(normalize(current))}});row.querySelector('button').addEventListener('click',()=>{const current=originalGet();current.splice(index,1);originalSet(normalize(current))})})}
   bridge.setLines=value=>originalSet(normalize(value));
@@ -183,6 +183,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
     {c:'Dachdetails',l:'Dachfensterrollladen manuell',u:'St',q:'Dachfenster Rollladen außen manuell mechanisch',mode:'material_labor'},
     {c:'Dachdetails',l:'Dachfensterrollladen Solar',u:'St',q:'Dachfenster Rollladen außen solar elektrisch',mode:'material_labor'},
     {c:'Klempner',l:'Attika-Abdeckung / Verblechung',u:'m',q:'Attika Abdeckung Mauerabdeckung Blech Titanzink Aluminium'},
+    {c:'Klempner',l:'Blechverwahrung / Anschlussblech nach Aufmaß',u:'m',q:'Individuell gekantete Blechverwahrung oder Anschlussblech aus Aluminium, Zuschnitt 20 bis 60 cm, einschließlich Aufmaß, Anfertigung, Demontage der beschädigten Verwahrung, Entsorgung, Lieferung und Montage',n:'KVA-Marktvergleich 2026: individuell gekantetes Aluminiumblech inkl. Demontage, Entsorgung, Aufmaß, Anfertigung und Montage'},
     {c:'Klempner',l:'Dachrinne Titanzink',u:'m',q:'Dachrinne halbrund Titanzink inklusive Rinnenhalter'},
     {c:'Klempner',l:'Dachrinne Kupfer',u:'m',q:'Dachrinne halbrund Kupfer inklusive Rinnenhalter'},
     {c:'Klempner',l:'Fallrohr Titanzink',u:'m',q:'Regenfallrohr Titanzink inklusive Rohrschellen'},
@@ -235,16 +236,18 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
   ];
   const cats=['Alle',...new Set(presets.map(x=>x.c))], catBox=document.getElementById('bk-quick-cats'),list=document.getElementById('bk-quick-list'),state=document.getElementById('bk-quick-state');
   function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  let quickSectionOpen=false;
+  const addQuickLine=line=>{if(!quickSectionOpen){bridge()?.addSection?.('Eigene Kalkulation nach BKI');quickSectionOpen=true}bridge()?.addLine?.(line)};
   cats.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.className='bk-quick-cat'+(i===0?' on':'');b.textContent=c;b.dataset.cat=c;b.onclick=()=>{catBox.querySelectorAll('.bk-quick-cat').forEach(x=>x.classList.toggle('on',x===b));list.querySelectorAll('.bk-quick-item').forEach(x=>x.classList.toggle('off',c!=='Alle'&&x.dataset.cat!==c));};catBox.appendChild(b)});
   const indexDefaults=p=>{const label=String(p.l||'').toLowerCase();const rules=[
           [/eindeckrahmen velux/,{material:240,hours:1.5,labor:72}],
           [/eindeckrahmen roto/,{material:250,hours:1.5,labor:72}],
           [/dachfensterrollladen manuell/,{material:620,hours:2.0,labor:72}],
           [/dachfensterrollladen solar/,{material:980,hours:2.5,labor:72}],
-          [/rollladenpanzer aluminium/,{material:115,hours:1.0,labor:72}],
-          [/rollladenpanzer pvc/,{material:72,hours:1.0,labor:72}],
-          [/vorbaurollladen, panzer alu/,{material:690,hours:3.0,labor:72}],
-          [/vorbaurollladen, panzer pvc/,{material:520,hours:3.0,labor:72}],
+          [/rollladenpanzer aluminium/,{material:115,hours:1.75,labor:72}],
+          [/rollladenpanzer pvc/,{material:72,hours:1.75,labor:72}],
+          [/vorbaurollladen, panzer alu/,{material:690,hours:4.0,labor:72}],
+          [/vorbaurollladen, panzer pvc/,{material:520,hours:4.0,labor:72}],
           [/pv-unterkonstruktion|dachhaken/,{material:75,hours:0.5,labor:78}],
           [/photovoltaikmodul/,{material:160,hours:1.0,labor:78}],
           [/außenleuchte|lampe/,{material:95,hours:1.0,labor:72}],
@@ -257,7 +260,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
         const indexComplete=p=>{const label=String(p.l||'').toLowerCase();const rules=[
           [/asbest.*fassade|asbestzement.*fassade/,60],[/asbestzement|asbest.*dach/,70],[/wellplatten|faserzement.*dach/ ,95],[/doppelsteg|polycarbonat/,280],[/dachziegel|falzziegel/,110],[/biberschwanz/,180],[/betondachstein/,95],[/schieferdeckung/,220],[/trapez|profilblech/,105],
           [/firstdeckung|firstziegel/,95],[/ortgang/,85],[/dachfenster komplett/,1450],[/lichtkuppel/,1600],
-          [/attika/,110],[/dachrinne titanzink/,85],[/dachrinne kupfer/,145],[/fallrohr titanzink/,75],[/fallrohr kupfer/,120],
+          [/attika|blechverwahrung|anschlussblech/,216],[/dachrinne titanzink/,85],[/dachrinne kupfer/,145],[/fallrohr titanzink/,75],[/fallrohr kupfer/,120],
           [/fassadengerüst.*auf-.*abbau/,9],[/fassadengerüst.*vorhaltung/,0.35],[/rollgerüst/,135],
           [/fensterbank/,70],[/floatglas 4/,140],[/isolierverglasung 2/,280],[/isolierverglasung 3/,360],[/kittfuge|kittfalz/,18],[/nassverglasung/,14],[/trockenverglasung/,18],[/esg/,300],[/vsg/,350],
           [/raffstore|außenjalousie/,900],[/außenleuchte|lampe/,180],[/feuchtraum|wannenleuchte/,140],
@@ -266,15 +269,15 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
           [/faserzement.*fassade/,190],[/holzfassade|stülpschalung/,210],[/holzschindel/,280],[/metall|wellblechfassade/,175],
           [/fassade reinigen.*streichen/,38],[/fassade nur streichen/,29],[/holzfenster.*streichen/,220],[/holztür außen/,85],[/holztür innen/,75],[/metalltür|metallfläche/,70],[/holzfassade reinigen/,55]
         ];const hit=rules.find(([rx])=>rx.test(label));if(hit)return hit[1];const unit=String(p.u||'').toLowerCase();return unit.includes('m²')?150:unit==='m'?85:unit==='st'?350:150};
-        const addIndex=(p,qty)=>{const ep=indexComplete(p),scope=p.n||'inkl. Demontage, Entsorgung und Neumontage';bridge()?.addLine?.({position_code:'INDEX 2026',description:`${p.l} – Indexansatz 2026; ${scope}; EP veränderbar`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:1});return ep};
-        presets.forEach((p,i)=>{const e=document.createElement('div');e.className='bk-quick-item';e.dataset.cat=p.c;const estimate=indexDefaults(p),extra=p.mode==='material_labor'?`<div class="bk-quick-extra"><label>Index-Material EP netto <input data-mat="${i}" inputmode="decimal" value="${estimate.material}"></label><label>Arbeitszeit h/St <input data-hours="${i}" inputmode="decimal" value="${estimate.hours}"></label><small>Indexansatz 2026, veränderbar; Arbeitslohn vorrangig nach BKI-Facharbeiterstundensatz.</small></div>`:'';const note=p.n||'inkl. Demontage, Entsorgung + Montage';e.innerHTML=`<label><input type="checkbox" data-preset="${i}"><span>${esc(p.l)}<small class="bk-quick-note">${esc(note)}</small></span></label><span></span><input class="bk-quick-qty" data-qty="${i}" inputmode="decimal" value="1"><span class="bk-quick-unit">${esc(p.u)}</span>${extra}`;const cb=e.querySelector('input[type=checkbox]');cb.onchange=()=>e.classList.toggle('checked',cb.checked);list.appendChild(e)});
+        const addIndex=(p,qty)=>{const ep=indexComplete(p),scope=p.n||'inkl. Demontage, Entsorgung und Neumontage';addQuickLine({position_code:'INDEX 2026',description:`${p.l} – Indexansatz 2026; ${scope}; EP veränderbar`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:1});return ep};
+        presets.forEach((p,i)=>{const e=document.createElement('div');e.className='bk-quick-item';e.dataset.cat=p.c;const estimate=indexDefaults(p),extra=p.mode==='material_labor'?`<div class="bk-quick-extra"><label>Index-Material EP netto <input data-mat="${i}" inputmode="decimal" value="${estimate.material}"></label><label>Arbeitszeit h/${esc(p.u)} <input data-hours="${i}" inputmode="decimal" value="${estimate.hours}"></label><small>Indexansatz 2026, veränderbar; Arbeitslohn vorrangig nach BKI-Facharbeiterstundensatz.</small></div>`:'';const note=p.n||'inkl. Demontage, Entsorgung + Montage';e.innerHTML=`<label><input type="checkbox" data-preset="${i}"><span>${esc(p.l)}<small class="bk-quick-note">${esc(note)}</small></span></label><span></span><input class="bk-quick-qty" data-qty="${i}" inputmode="decimal" value="1"><span class="bk-quick-unit">${esc(p.u)}</span>${extra}`;const cb=e.querySelector('input[type=checkbox]');cb.onchange=()=>e.classList.toggle('checked',cb.checked);list.appendChild(e)});
   document.getElementById('bk-quick-clear').onclick=()=>{list.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=false);list.querySelectorAll('.bk-quick-item').forEach(x=>x.classList.remove('checked'));state.textContent='';};
   const number=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
   const choosePrice=p=>{const level=document.getElementById('bk-level')?.value||'mid';return number(level==='low'?p.price_low:level==='high'?p.price_high:p.price_mid)};
   async function api(payload){const r=await fetch(API+'?action=search',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||`HTTP ${r.status}`);return j}
   document.getElementById('bk-quick-calc').onclick=async()=>{
     const selected=[...list.querySelectorAll('input[type=checkbox]:checked')];if(!selected.length){state.textContent='Bitte mindestens ein Bauteil anhaken.';state.className='bk-quick-state-error';return}
-    const btn=document.getElementById('bk-quick-calc');btn.disabled=true;let added=0,failed=[];state.className='';
+    const btn=document.getElementById('bk-quick-calc');btn.disabled=true;let added=0,failed=[];quickSectionOpen=false;state.className='';
     try{
       for(let n=0;n<selected.length;n++){
         const idx=+selected[n].dataset.preset,p=presets[idx],qty=number(list.querySelector(`[data-qty="${idx}"]`)?.value)||1;
@@ -295,7 +298,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
           [/holzfenster/i,/holzfenster/], [/holztur/i,/holztur|tur.*holz/], [/metalltur/i,/metalltur|stahltur/], [/fassade.*streichen|fassade reinigen/i,/fassadenfarbe|fassadenbeschichtung|fassadenflache/],
           [/wellplatten/i,/wellplatte|faserzement/], [/doppelsteg/i,/doppelsteg|polycarbonat|hohlkammer/], [/dachziegel/i,/dachziegel|falzziegel/], [/biberschwanz/i,/biberschwanz/],
           [/betondachstein/i,/betondachstein/], [/schiefer/i,/schiefer/], [/trapez/i,/trapez|profilblech/], [/first/i,/firstziegel|firstdeckung/], [/ortgang/i,/ortgang/],
-          [/attika/i,/attika|mauerabdeckung/], [/dachrinne/i,/dachrinne/], [/fallrohr/i,/fallrohr|regenfallrohr/], [/esg/i,/esg|einscheibensicherheitsglas/], [/vsg/i,/vsg|verbundsicherheitsglas/],
+          [/attika/i,/attika|mauerabdeckung/], [/blechverwahrung|anschlussblech/i,/verwahrung|anschlussblech|abdeckblech|kantblech/], [/dachrinne/i,/dachrinne/], [/fallrohr/i,/fallrohr|regenfallrohr/], [/esg/i,/esg|einscheibensicherheitsglas/], [/vsg/i,/vsg|verbundsicherheitsglas/],
           [/leuchte|lampe/i,/leuchte|lampe/], [/pv-unterkonstruktion/i,/pv.*unterkonstruktion|dachhaken|montageschiene/]
         ];
         const requestedRule=termRules.find(([label])=>label.test(norm(p.l)))?.[1];
@@ -319,31 +322,31 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
           ],tree=treeRules.find(([rx])=>rx.test(treeLabel));
           if(tree){
             const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?tree[4]:level==='high'?tree[6]:tree[5];
-            bridge()?.addLine?.({position_code:tree[1],description:tree[2],quantity:qty,recommended_quantity:qty,unit:tree[3],unit_price:ep,regional_factor:1,source_name:'11880 Gartenbau – Baumpflege und Baumfällung Kosten',source_page:'https://www.11880-gartenbau.com/preisvergleich/baumpflege-kosten'});added++;continue
+            addQuickLine({position_code:tree[1],description:tree[2],quantity:qty,recommended_quantity:qty,unit:tree[3],unit_price:ep,regional_factor:1,source_name:'11880 Gartenbau – Baumpflege und Baumfällung Kosten',source_page:'https://www.11880-gartenbau.com/preisvergleich/baumpflege-kosten'});added++;continue
           }
           if(/asbest.*materialprobe|laboranalyse/.test(norm(p.l))){
             const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?40:level==='high'?80:60;
-            bridge()?.addLine?.({position_code:'ASBEST-ANALYSE 2026',description:'Asbest Materialprobe / Laboranalyse durch qualifizierte Probenahme und akkreditiertes Labor',quantity:qty,recommended_quantity:qty,unit:'St',unit_price:ep,regional_factor:1,source_name:'Containerhelfer – Asbest entsorgen: Kosten, Ablauf, Pflichten (2026)',source_page:'https://containerhelfer.de/de/abbruch/wissen/asbest-entsorgen-kosten-ablauf-2026'});added++;continue
+            addQuickLine({position_code:'ASBEST-ANALYSE 2026',description:'Asbest Materialprobe / Laboranalyse durch qualifizierte Probenahme und akkreditiertes Labor',quantity:qty,recommended_quantity:qty,unit:'St',unit_price:ep,regional_factor:1,source_name:'Containerhelfer – Asbest entsorgen: Kosten, Ablauf, Pflichten (2026)',source_page:'https://containerhelfer.de/de/abbruch/wissen/asbest-entsorgen-kosten-ablauf-2026'});added++;continue
           }
           if(/asbest.*schadstoffgutachten/.test(norm(p.l))){
             const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?200:level==='high'?600:400;
-            bridge()?.addLine?.({position_code:'ASBEST-GUTACHTEN 2026',description:'Asbest Schadstofferkundung und schriftliches Gutachten; zusätzliche Laborproben separat',quantity:qty,recommended_quantity:qty,unit:'psch',unit_price:ep,regional_factor:1,source_name:'Containerhelfer – Asbest entsorgen: Kosten, Ablauf, Pflichten (2026)',source_page:'https://containerhelfer.de/de/abbruch/wissen/asbest-entsorgen-kosten-ablauf-2026'});added++;continue
+            addQuickLine({position_code:'ASBEST-GUTACHTEN 2026',description:'Asbest Schadstofferkundung und schriftliches Gutachten; zusätzliche Laborproben separat',quantity:qty,recommended_quantity:qty,unit:'psch',unit_price:ep,regional_factor:1,source_name:'Containerhelfer – Asbest entsorgen: Kosten, Ablauf, Pflichten (2026)',source_page:'https://containerhelfer.de/de/abbruch/wissen/asbest-entsorgen-kosten-ablauf-2026'});added++;continue
           }
           if(/asbest.*platten-bag|spezialverpackung/.test(norm(p.l))){
             const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?30:level==='high'?60:45;
-            bridge()?.addLine?.({position_code:'ASBEST-BAG 2026',description:'Zugelassener Platten-Bag / Big Bag für Asbestabfall einschließlich Kennzeichnung und Verschluss',quantity:qty,recommended_quantity:qty,unit:'St',unit_price:ep,regional_factor:1,source_name:'Containerhelfer – Asbest entsorgen: Kosten, Ablauf, Pflichten (2026)',source_page:'https://containerhelfer.de/de/abbruch/wissen/asbest-entsorgen-kosten-ablauf-2026'});added++;continue
+            addQuickLine({position_code:'ASBEST-BAG 2026',description:'Zugelassener Platten-Bag / Big Bag für Asbestabfall einschließlich Kennzeichnung und Verschluss',quantity:qty,recommended_quantity:qty,unit:'St',unit_price:ep,regional_factor:1,source_name:'Containerhelfer – Asbest entsorgen: Kosten, Ablauf, Pflichten (2026)',source_page:'https://containerhelfer.de/de/abbruch/wissen/asbest-entsorgen-kosten-ablauf-2026'});added++;continue
           }
           if(/asbest.*spezialcontainer|asbest.*transport/.test(norm(p.l))){
             const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?150:level==='high'?400:275;
-            bridge()?.addLine?.({position_code:'ASBEST-TRANSPORT 2026',description:'Spezialcontainer / Transport für verpackte asbesthaltige Abfälle zur zugelassenen Deponie',quantity:qty,recommended_quantity:qty,unit:'psch',unit_price:ep,regional_factor:1,source_name:'Containerhelfer – Asbest entsorgen: Kosten, Ablauf, Pflichten (2026)',source_page:'https://containerhelfer.de/de/abbruch/wissen/asbest-entsorgen-kosten-ablauf-2026'});added++;continue
+            addQuickLine({position_code:'ASBEST-TRANSPORT 2026',description:'Spezialcontainer / Transport für verpackte asbesthaltige Abfälle zur zugelassenen Deponie',quantity:qty,recommended_quantity:qty,unit:'psch',unit_price:ep,regional_factor:1,source_name:'Containerhelfer – Asbest entsorgen: Kosten, Ablauf, Pflichten (2026)',source_page:'https://containerhelfer.de/de/abbruch/wissen/asbest-entsorgen-kosten-ablauf-2026'});added++;continue
           }
           if(/asbest.*innenraum|schwach gebundene/.test(norm(p.l))){
             const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?100:level==='high'?200:150;
-            bridge()?.addLine?.({position_code:'ASBEST-INNEN 2026',description:'Schwach gebundene asbesthaltige Innenbauteile – Abschottung, Schutzmaßnahmen, fachgerechter Rückbau, Verpackung, Transport und Entsorgung; Laboranalyse und Freimessung separat',quantity:qty,recommended_quantity:qty,unit:'m²',unit_price:ep,regional_factor:1,source_name:'Containerhelfer – Asbest entsorgen: Kosten, Ablauf, Pflichten (2026)',source_page:'https://containerhelfer.de/de/abbruch/wissen/asbest-entsorgen-kosten-ablauf-2026'});added++;continue
+            addQuickLine({position_code:'ASBEST-INNEN 2026',description:'Schwach gebundene asbesthaltige Innenbauteile – Abschottung, Schutzmaßnahmen, fachgerechter Rückbau, Verpackung, Transport und Entsorgung; Laboranalyse und Freimessung separat',quantity:qty,recommended_quantity:qty,unit:'m²',unit_price:ep,regional_factor:1,source_name:'Containerhelfer – Asbest entsorgen: Kosten, Ablauf, Pflichten (2026)',source_page:'https://containerhelfer.de/de/abbruch/wissen/asbest-entsorgen-kosten-ablauf-2026'});added++;continue
           }
           if(/asbest.*fassade|asbestzement.*fassade/.test(norm(p.l))){
             const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?40:level==='high'?80:60;
-            bridge()?.addLine?.({
+            addQuickLine({
               position_code:'ASBEST-FASSADE 2025',
               description:'Asbestzement-Fassade – Baustellensicherung, emissionsarme Demontage durch sachkundigen Fachbetrieb, staubarme Behandlung, luftdichte Verpackung und Kennzeichnung, Transport, Entsorgung sowie Reinigung; Materialanalyse, Gerüst/Hebebühne, Verkehrsabsicherung und neue Fassade separat',
               quantity:qty,
@@ -359,7 +362,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
           }
           if(/asbestzement|asbest.*dach/.test(norm(p.l))){
             const level=document.getElementById('bk-level')?.value||'mid',small=qty<20,ep=level==='low'?40:level==='high'?100:70,flat=level==='low'?800:level==='high'?2500:1500;
-            bridge()?.addLine?.({
+            addQuickLine({
               position_code:'ASBEST 2026',
               description:small?'Asbestzement-Dachplatten – fachgerechter Rückbau und Entsorgung – Kleinmengenpauschale unter 20 m²':'Asbestzement-Dachplatten – zerstörungsfreier Rückbau, zugelassene Verpackung, Spezialtransport, Deponieentsorgung und Entsorgungsnachweis; Schadstoffprobe, Gerüst und Neueindeckung separat',
               quantity:small?1:qty,
@@ -375,7 +378,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
           }
           if(/doppelsteg|polycarbonat/.test(norm(p.l))){
             const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?220:level==='high'?350:280,small=qty<10;
-            bridge()?.addLine?.({
+            addQuickLine({
               position_code:'INDEX 2026',
               description:small?'Doppelstegplatten / Polycarbonat – vollständige Wiederherstellung – Kleinflächenpauschale unter 10 m²':'Doppelstegplatten / Polycarbonat – vollständige Wiederherstellung inkl. Demontage, Entsorgung, 16-mm-Platten, Profile, Dichtungen, Befestigung, Zuschnitt und Montage',
               quantity:small?1:qty,
@@ -394,7 +397,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
             let d={positions:[]};try{d=await api({query:laborQuery,quantity:String(hours),unit:'h',location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}})}catch{}
             const positions=Array.isArray(d.positions)?d.positions:[],labor=positions.find(x=>/stundensatz|facharbeiter/i.test(positionText(x))&&unitNorm(x.unit)==='h'),laborRate=labor&&choosePrice(labor)>0?choosePrice(labor):indexDefaults(p).labor;
             const rf=number(d.regional_factor)||1,ep=material+(hours*laborRate),basis=labor?'Index-Material + BKI-Lohn':'Index 2026';
-            bridge()?.addLine?.({position_code:(labor?.position_code?`INDEX + ${labor.position_code}`:'INDEX 2026'),description:`${p.l} – ${basis}, Material ${material.toFixed(2)} EUR zzgl. ${hours} h × ${laborRate.toFixed(2)} EUR; veränderbar; Demontage und Montage enthalten`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;continue
+            addQuickLine({position_code:(labor?.position_code?`INDEX + ${labor.position_code}`:'INDEX 2026'),description:`${p.l} – ${basis}, Material ${material.toFixed(2)} EUR zzgl. ${hours} h × ${laborRate.toFixed(2)} EUR; veränderbar; Demontage und Montage enthalten`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;continue
           }
           const fullQuery=`STURM-/HAGEL-SCHNELLKALKULATION. Gesucht ist eine Komplett-Wiederherstellung für: ${p.q}. Gib NUR die notwendigen BKI-Teilleistungen für (1) Demontage/Ausbau und Entsorgung des beschädigten Altbauteils und (2) Lieferung/Einbau bzw. Montage der gleichartigen Wiederherstellung zurück. Keine Alternativpositionen, keine bloßen Varianten. Die Summe soll die vollständige Demontage + Entsorgung + Neumontage abbilden.`;
           let d=await api({query:fullQuery,quantity:String(qty),unit:p.u,location:document.getElementById('bk-location')?.value||'',case_meta:bridge()?.getMeta?.()||{}}),positions=Array.isArray(d.positions)?d.positions:[];
@@ -403,7 +406,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
           const label=norm(p.l);
           if(/fassadengerust.*auf-/.test(label)){
             const level=document.getElementById('bk-level')?.value||'mid',ep=level==='low'?6:level==='high'?12:9,small=qty<60;
-            bridge()?.addLine?.({
+            addQuickLine({
               position_code:'301.000.057',
               description:small?'Fassadengerüst – Auf-, Um- und Abbau – Kleinflächenpauschale unter 60 m²':'Fassadengerüst – Auf-, Um- und Abbau; Vorhaltung separat',
               quantity:small?1:qty,
@@ -422,9 +425,9 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
           const remove=best(matched.filter(x=>phase(x)==='remove')),install=best(matched.filter(x=>phase(x)==='install'));
           const usable=explicit?[explicit]:remove&&install?[remove,install]:complete?[complete]:matched.length?[best(matched)]:[];
           if(!usable.length){addIndex(p,qty);added++;continue}
-          const ep=usable.reduce((s,x)=>s+choosePrice(x),0),rf=number(d.regional_factor)||number(usable.find(x=>number(x.regional_factor))?.regional_factor)||1,codes=usable.map(x=>x.position_code).filter(Boolean).join(' + ');
+          const bkiEp=usable.reduce((s,x)=>s+choosePrice(x),0),kvaFloor=/attika|blechverwahrung|anschlussblech/.test(label)?216:0,ep=Math.max(bkiEp,kvaFloor),rf=number(d.regional_factor)||number(usable.find(x=>number(x.regional_factor))?.regional_factor)||1,codes=usable.map(x=>x.position_code).filter(Boolean).join(' + ');
           const scope=p.n||'Wiederherstellung inkl. Demontage, Entsorgung und Neumontage';
-          bridge()?.addLine?.({position_code:codes||'BKI',description:`${p.l} – ${scope}`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;
+          addQuickLine({position_code:codes||'BKI',description:`${p.l} – ${scope}${kvaFloor>bkiEp?'; Mindestansatz aus KVA-Marktvergleich 2026':''}`,quantity:qty,recommended_quantity:qty,unit:p.u,unit_price:ep,regional_factor:rf});added++;
         }catch(e){addIndex(p,qty);added++}
       }
       state.className=added?'bk-quick-state-ok':'bk-quick-state-error';state.textContent=added?`${added} Schnellposition(en) übernommen.${failed.length?` Ohne belastbaren Treffer: ${failed.join(', ')}.`:''}`:`Keine belastbaren BKI-Treffer. ${failed.join(', ')}`;

@@ -20,6 +20,10 @@ assert(page.includes("line.position_code=String(++position)"), 'Kalkulationsposi
 assert(page.includes("bridge.addSection=value=>") && page.includes("addSection?.(groupTitle())"), 'Vor importierten KVA-Positionen muss eine eigene Firmen- oder Tätigkeitsüberschrift eingefügt werden.');
 assert(page.includes("const groupTitle=()=>String($('bk-kva-title').textContent||'KVA-Positionen').trim()"), 'Die Gruppenüberschrift muss Aussteller und KVA-Nummer vollständig übernehmen.');
 assert(page.includes("line.source_position_code=line.source_position_code||line.position_code||''"), 'Die ursprüngliche KVA-Positionsnummer muss als Herkunftsinformation erhalten bleiben.');
+assert(page.includes("addSection?.('Eigene Kalkulation nach BKI')") && page.includes('quickSectionOpen=false'), 'Schnellkalkulationspositionen müssen in einem eigenen BKI-Abschnitt beginnen.');
+assert(page.includes("isLegacyQuick=/^(INDEX|BAUM-|ASBEST)/i") && page.includes("grouped.push({type:'section',description:'Eigene Kalkulation nach BKI'"), 'Bestehende ungruppierte Schnellkalkulationspositionen müssen beim Laden nachträglich einen eigenen Abschnitt erhalten.');
+assert(page.includes("[/rollladenpanzer pvc/,{material:72,hours:1.75,labor:72}]") && page.includes("[/rollladenpanzer aluminium/,{material:115,hours:1.75,labor:72}]"), 'Die Rollladenpanzer müssen den KVA-belegten höheren Montageaufwand berücksichtigen.');
+assert(page.includes("[/attika|blechverwahrung|anschlussblech/,216]") && page.includes("kvaFloor=/attika|blechverwahrung|anschlussblech/.test(label)?216:0"), 'Individuelle Blechverwahrungen dürfen den KVA-belegten Mindestansatz nicht unterschreiten.');
 
 assert(api.includes('function bkDriveBelongsToCase('), 'Die Fallzuordnung muss über den vollständigen Drive-Unterordnerpfad geprüft werden.');
 assert(api.includes("if(hash_equals($folderId,$parent))return true"), 'Ein KVA in einem Unterordner des aktiven Falls muss zugelassen werden.');
