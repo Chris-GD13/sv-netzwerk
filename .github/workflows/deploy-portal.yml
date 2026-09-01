@@ -88,6 +88,28 @@ jobs:
           test -n "$PORTAL_MS_TENANT_ID"
           test -n "$PORTAL_MS_CLIENT_ID"
           test -n "$PORTAL_MS_CLIENT_SECRET"
+          token_response="$(curl --silent --show-error --fail \
+            --request POST \
+            --header 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode "client_id=$PORTAL_MS_CLIENT_ID" \
+            --data-urlencode "client_secret=$PORTAL_MS_CLIENT_SECRET" \
+            --data-urlencode 'scope=https://graph.microsoft.com/.default' \
+            --data-urlencode 'grant_type=client_credentials' \
+            "https://login.microsoftonline.com/$PORTAL_MS_TENANT_ID/oauth2/v2.0/token")"
+          access_token="$(printf '%s' "$token_response" | python3 -c 'import json,sys; print(json.load(sys.stdin)["access_token"])')"
+          printf '%s' "$access_token" | python3 -c '
+          import base64, json, sys
+          token = sys.stdin.read().strip()
+          payload = token.split(".")[1]
+          payload += "=" * (-len(payload) % 4)
+          roles = set(json.loads(base64.urlsafe_b64decode(payload))["roles"])
+          required = {"Mail.Send", "Calendars.ReadWrite", "Sites.Selected"}
+          missing = sorted(required - roles)
+          if missing:
+              raise SystemExit("Portal-App-Berechtigungen fehlen: " + ", ".join(missing))
+          print("Portal-App-Berechtigungen vollständig geprüft.")
+          '
+          unset access_token token_response
           env_dir="$(mktemp -d)"
           env_file="$env_dir/server.env"
           trap 'rm -f "$env_file"; rmdir "$env_dir"' EXIT
