@@ -8,6 +8,7 @@ const page = fs.readFileSync(path.join(root, 'src/pages/intern/kalkulation/index
 const api = fs.readFileSync(path.join(root, 'public/intern/api/bki-calculator.php'), 'utf8');
 const noteHelper = fs.readFileSync(path.join(root, 'public/intern/calculation-note-helper.js'), 'utf8');
 const settlementPdf = fs.readFileSync(path.join(root, 'public/intern/api/bki-settlement-pdf.php'), 'utf8');
+const pdfExport = fs.readFileSync(path.join(root, 'public/intern/bki-pdf-export.js'), 'utf8');
 
 assert(page.includes('id="bk-kva-file"') && page.includes('Datei vom Gerät auswählen'), 'Die normale Dateiauswahl muss auf Mobilgeräten ausdrücklich verfügbar sein.');
 assert(!/id="bk-kva-file"[^>]*capture=/u.test(page), 'Die normale Dateiauswahl darf nicht die Kamera erzwingen.');
@@ -45,6 +46,12 @@ assert(settlementPdf.includes("($line['type']??'')==='section'") && settlementPd
 assert(settlementPdf.includes("textLine($ops,45,793,'SV',26,true,$orange)") && settlementPdf.includes("'sv-netzwerk.eu'"), 'Die Abgeltungs-PDF muss das farbige SV-Netzwerk-Logo tragen.');
 assert(settlementPdf.includes('drawPageHeader($ops,count($pages)>0)') && settlementPdf.includes("'Seite '.($index+1).' von '.$pageCount"), 'Mehrseitige PDFs müssen einen wiederholten Kopf und Seitenzahlen erhalten.');
 assert(settlementPdf.includes("$basisText=numberValue($quantity)") && settlementPdf.includes("'Betrag brutto'") && settlementPdf.includes("'Regulierung'"), 'Menge, Einheit, Preis, Bruttobetrag und Regulierung müssen übersichtlich getrennt werden.');
+assert(pdfExport.includes('id="bk-create-kva-review"') && pdfExport.includes("type:'kva_review'"), 'Die KVA-Prüfung muss als eigener PDF-Button neben der Abgeltungsvereinbarung angeboten werden.');
+assert(pdfExport.includes('kva_company') && pdfExport.includes('kva_net_total'), 'Aussteller, KVA-Nummer und KVA-Summe müssen aus der Nachkalkulation in die KVA-Prüfung übernommen werden.');
+assert(settlementPdf.includes("$documentType==='kva_review'") && settlementPdf.includes("'KVA-PRÜFUNG'") && settlementPdf.includes("'KVA-Prüfung'"), 'Die KVA-Prüfung benötigt einen eigenen Dokumentkopf und Titel.');
+assert(settlementPdf.includes("'Ursprünglicher KVA-Betrag brutto'") && settlementPdf.includes("'BKI-Nachkalkulation brutto'") && settlementPdf.includes("'Differenz KVA minus BKI'") && settlementPdf.includes("'Freigegebener Betrag'"), 'Ursprünglicher KVA-, BKI-, Differenz- und freigegebener Betrag müssen getrennt ausgewiesen werden.');
+assert(settlementPdf.includes("'Prüfergebnis'") && settlementPdf.includes('wurde mit BKI-Preisen nachkalkuliert'), 'Die KVA-Prüfung muss einen neutralen Prüftext ohne Abgeltung erzeugen.');
+assert(settlementPdf.includes("'Geprüft:'") && settlementPdf.includes("'Sachverständiger & Regulierer'") && settlementPdf.includes("if($isKvaReview){needSpace"), 'Die KVA-Prüfung darf statt Unterschriftenfeldern nur den Prüfvermerk des Sachverständigen zeigen.');
 assert(page.includes("card.querySelector('.bk-collapse-toggle')?.addEventListener('click'") && page.includes("data.calculations||data.items||[]"), 'Gespeicherte Kalkulationen müssen beim Aufklappen zuverlässig neu geladen werden.');
 
 assert(noteHelper.includes("if(line.type==='section')return;"), 'Abschnittsüberschriften dürfen nicht in die Abgeltungsberechnung eingehen.');
