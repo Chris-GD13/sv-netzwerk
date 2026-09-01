@@ -28,6 +28,17 @@ function bkSchema():void{
     INDEX idx_bki_folder(folder_id), INDEX idx_bki_case(case_no), INDEX idx_bki_created(created_at)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
+function bkCalculationForUser(int $id,array $user):array{
+  $s=db()->prepare('SELECT * FROM bki_calculations WHERE id=:id LIMIT 1');$s->execute([':id'=>$id]);$row=$s->fetch();
+  if(!$row)apiError(404,'Kalkulation nicht gefunden.');
+  $folder=trim((string)($row['folder_id']??''));
+  if($folder!=='')requireCaseFolderAccess($folder,$user);
+  else{
+    $who=(string)($user['email']??$user['full_name']??'');
+    if(!hash_equals($who,(string)($row['created_by']??'')))apiError(404,'Kalkulation nicht gefunden.');
+  }
+  return$row;
+}
 function bkSettingGet(string $k,string $d=''):string{try{db()->exec("CREATE TABLE IF NOT EXISTS app_settings(setting_key VARCHAR(190) PRIMARY KEY,setting_value MEDIUMTEXT NULL,updated_at DATETIME NOT NULL,updated_by VARCHAR(190) NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");$s=db()->prepare('SELECT setting_value FROM app_settings WHERE setting_key=:k LIMIT 1');$s->execute([':k'=>$k]);$v=$s->fetchColumn();return$v===false?$d:(string)$v;}catch(Throwable){return$d;}}
 function bkSettingSet(string $k,string $v):void{try{$s=db()->prepare('INSERT INTO app_settings(setting_key,setting_value,updated_at,updated_by) VALUES(:k,:v,NOW(),:u) ON DUPLICATE KEY UPDATE setting_value=VALUES(setting_value),updated_at=NOW(),updated_by=VALUES(updated_by)');$s->execute([':k'=>$k,':v'=>$v,':u'=>'bki-calculator']);}catch(Throwable){}}
 function bkB64url(string $s):string{return rtrim(strtr(base64_encode($s),'+/','-_'),'=');}
@@ -316,17 +327,14 @@ try{
     apiJson(['ok'=>true,'id'=>$calcId,'folder_id'=>$folder,'drive_file'=>$driveFile]);
   }
   if($action==='list'){
-    $folder=trim((string)($_GET['folder_id']??''));if($folder!=='')requireCaseFolderAccess($folder,$user);if($folder!=='' ){$s=db()->prepare('SELECT id,case_no,damage_type,object_name,gross_total,created_at FROM bki_calculations WHERE folder_id=:f ORDER BY id DESC LIMIT 30');$s->execute([':f'=>$folder]);}else{$s=db()->query('SELECT id,case_no,damage_type,object_name,gross_total,created_at FROM bki_calculations WHERE folder_id IS NULL OR folder_id="" ORDER BY id DESC LIMIT 30');}$out=[];foreach($s->fetchAll()as$r)$out[]=['id'=>(int)$r['id'],'case_no'=>(string)($r['case_no']??''),'gross_total'=>(float)$r['gross_total'],'created_at'=>(string)$r['created_at'],'title'=>trim(((string)($r['damage_type']??'')).' '.((string)($r['object_name']??'')))?:'BKI-Kalkulation'];apiJson(['ok'=>true,'items'=>$out]);
+    $folder=trim((string)($_GET['folder_id']??''));if($folder!=='')requireCaseFolderAccess($folder,$user);if($folder!=='' ){$s=db()->prepare('SELECT id,case_no,damage_type,object_name,gross_total,items_json,created_at FROM bki_calculations WHERE folder_id=:f ORDER BY id DESC LIMIT 30');$s->execute([':f'=>$folder]);}else{$s=db()->prepare('SELECT id,case_no,damage_type,object_name,gross_total,items_json,created_at FROM bki_calculations WHERE (folder_id IS NULL OR folder_id="") AND created_by=:u ORDER BY id DESC LIMIT 30');$s->execute([':u'=>(string)($user['email']??$user['full_name']??'')]);}$out=[];foreach($s->fetchAll()as$r){$savedItems=json_decode((string)($r['items_json']??''),true);$out[]=['id'=>(int)$r['id'],'case_no'=>(string)($r['case_no']??''),'damage_type'=>(string)($r['damage_type']??''),'object_name'=>(string)($r['object_name']??''),'gross_total'=>(float)$r['gross_total'],'item_count'=>is_array($savedItems)?count($savedItems):0,'created_at'=>(string)$r['created_at'],'title'=>trim(((string)($r['damage_type']??'')).' '.((string)($r['object_name']??'')))?:'BKI-Kalkulation'];}apiJson(['ok'=>true,'items'=>$out]);
   }
-  if($action==='get'){$id=(int)($_GET['id']??0);if($id<=0)apiError(400,'ID fehlt.');$s=db()->prepare('SELECT * FROM bki_calculations WHERE id=:id AND created_by=:u LIMIT 1');$s->execute([':id'=>$id,':u'=>(string)($user['email']??$user['full_name']??'')]);$r=$s->fetch();if(!$r)apiError(404,'Kalkulation nicht gefunden.');$r['items']=json_decode((string)$r['items_json'],true)?:[];unset($r['items_json']);apiJson(['ok'=>true,'item'=>$r]);}
+  if($action==='get'){$id=(int)($_GET['id']??0);if($id<=0)apiError(400,'ID fehlt.');$r=bkCalculationForUser($id,$user);$r['items']=json_decode((string)$r['items_json'],true)?:[];unset($r['items_json']);apiJson(['ok'=>true,'item'=>$r]);}
   if($action==='delete'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
     $in=requestBody();$id=(int)($in['id']??0);if($id<=0)apiError(400,'ID fehlt.');
-    $who=(string)($user['email']??$user['full_name']??'');
-    $s=db()->prepare('SELECT folder_id FROM bki_calculations WHERE id=:id AND created_by=:u LIMIT 1');$s->execute([':id'=>$id,':u'=>$who]);$row=$s->fetch();
-    if(!$row)apiError(404,'Kalkulation nicht gefunden oder keine Löschberechtigung.');
-    $folder=trim((string)($row['folder_id']??''));if($folder!=='')requireCaseFolderAccess($folder,$user);
-    $del=db()->prepare('DELETE FROM bki_calculations WHERE id=:id AND created_by=:u');$del->execute([':id'=>$id,':u'=>$who]);
+    bkCalculationForUser($id,$user);
+    $del=db()->prepare('DELETE FROM bki_calculations WHERE id=:id');$del->execute([':id'=>$id]);
     apiJson(['ok'=>true,'deleted_id'=>$id]);
   }
   apiError(404,'Unbekannte Aktion.');
