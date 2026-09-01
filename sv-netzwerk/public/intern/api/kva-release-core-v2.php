@@ -118,6 +118,32 @@ function krVerifiedKva(string $folder, string $bytes): array
     return [];
 }
 
+function krReviewedKva(array $preview, array $input): array
+{
+    $value = static fn(string $key): string => trim((string)($input[$key] ?? $preview[$key] ?? ''));
+    $reviewed = [
+        'company'=>$value('company'),
+        'email'=>$value('email'),
+        'quote_number'=>$value('quote_number'),
+        'insurer'=>$value('insurer'),
+        'net'=>krMoney($input['net'] ?? $preview['net'] ?? null),
+        'gross'=>krMoney($input['gross'] ?? $preview['gross'] ?? null),
+        'subject'=>trim((string)($input['subject'] ?? ('KVA-Freigabe · Schaden-Nr. '.($preview['case_no'] ?? '')))),
+        'body'=>trim((string)($input['body'] ?? '')),
+    ];
+    $missing = [];
+    foreach (['company'=>'Firma','email'=>'E-Mail-Adresse','quote_number'=>'KVA-Nummer','insurer'=>'Versicherer','net'=>'Netto-Gesamtbetrag','gross'=>'Brutto-Gesamtbetrag','subject'=>'Betreff','body'=>'Freigabetext'] as $key=>$label) {
+        if ($reviewed[$key] === null || $reviewed[$key] === '') $missing[] = $label;
+    }
+    if ($missing !== []) throw new RuntimeException('Bitte die manuell prüfbaren Pflichtfelder ergänzen: '.implode(', ', $missing).'.');
+    if (!filter_var($reviewed['email'], FILTER_VALIDATE_EMAIL)) throw new RuntimeException('Die E-Mail-Adresse des KVA-Absenders ist ungültig.');
+    if ((float)$reviewed['net'] <= 0 || (float)$reviewed['gross'] <= 0 || (float)$reviewed['gross'] < (float)$reviewed['net']) throw new RuntimeException('Netto- und Brutto-Gesamtbetrag sind nicht plausibel.');
+    foreach (['company','quote_number','insurer'] as $key) if (mb_strlen((string)$reviewed[$key]) > 300) throw new RuntimeException('Eine manuell geprüfte KVA-Angabe ist zu lang.');
+    if (mb_strlen($reviewed['subject']) > 500) throw new RuntimeException('Der Betreff ist zu lang.');
+    $reviewed['sparkasse'] = preg_match('/sparkassen.?versicherung|SV SparkassenVersicherung/i', $reviewed['insurer']) === 1;
+    return $reviewed;
+}
+
 function krV2Handle(array $user): void
 {
     $action = (string)($_GET['action'] ?? 'status');
@@ -233,20 +259,19 @@ function krV2Handle(array $user): void
             $preview = krVerify((string)($input['token'] ?? ''));
             if (!hash_equals($folder, (string)$preview['folder']) || !hash_equals(krCaseNo($folder), (string)$preview['case_no'])) throw new RuntimeException('Aktiver Fall hat sich geändert.');
             if (!hash_equals($sender, (string)($preview['sender'] ?? ''))) throw new RuntimeException('Der angemeldete Benutzer hat sich geändert. Bitte KVA erneut auslesen.');
-            if ($preview['company'] === '' || !filter_var((string)$preview['email'], FILTER_VALIDATE_EMAIL) || $preview['quote_number'] === '' || $preview['insurer'] === '' || !is_numeric($preview['net']) || !is_numeric($preview['gross'])) throw new RuntimeException('Pflichtangaben fehlen.');
-            $to = trim((string)($input['to'] ?? $preview['email']));
+            $reviewed = krReviewedKva($preview, $input);
+            $to = $reviewed['email'];
             $cc = [];
             foreach (preg_split('/[;,\s]+/', trim((string)($input['cc'] ?? ''))) ?: [] as $address) {
                 if ($address === '') continue;
                 if (!filter_var($address, FILTER_VALIDATE_EMAIL)) throw new RuntimeException('Ungültige CC-E-Mail-Adresse: '.$address);
                 $cc[strtolower($address)] = krRec($address);
             }
-            $body = trim((string)($input['body'] ?? ''));
-            if ($body === '') throw new RuntimeException('E-Mail-Text fehlt.');
-            $subject = 'KVA-Freigabe · Schaden-Nr. '.$preview['case_no'];
+            $body = $reviewed['body'];
+            $subject = preg_replace('/[\r\n]+/u', ' ', $reviewed['subject']) ?? $reviewed['subject'];
             $message = ['subject'=>$subject,'body'=>['contentType'=>'HTML','content'=>'<p>'.nl2br(htmlspecialchars($body,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8')).'</p>'],'toRecipients'=>[krRec($to)]];
             if ($cc !== []) $message['ccRecipients'] = array_values($cc);
-            if ($preview['sparkasse']) $message['bccRecipients'] = [krRec(KR_ARCHIVE)];
+            if ($reviewed['sparkasse']) $message['bccRecipients'] = [krRec(KR_ARCHIVE)];
             $response = krHttp('POST','https://graph.microsoft.com/v1.0/users/'.rawurlencode($sender).'/sendMail',['Authorization: Bearer '.krMs(),'Content-Type: application/json'],json_encode(['message'=>$message,'saveToSentItems'=>true],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
             if ($response['status'] < 200 || $response['status'] >= 300) {
                 $graph = json_decode($response['body'], true);
@@ -256,8 +281,8 @@ function krV2Handle(array $user): void
             }
             db()->exec('CREATE TABLE IF NOT EXISTS kva_send_log (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, folder_id VARCHAR(160) NOT NULL, case_no VARCHAR(100) NOT NULL, subject VARCHAR(500) NOT NULL, recipient VARCHAR(320) NOT NULL, cc_json TEXT NOT NULL, bcc VARCHAR(320) NOT NULL, sent_at DATETIME NOT NULL, INDEX idx_kva_send_folder (folder_id, sent_at))');
             $log = db()->prepare('INSERT INTO kva_send_log (folder_id, case_no, subject, recipient, cc_json, bcc, sent_at) VALUES (:folder,:case_no,:subject,:recipient,:cc,:bcc,NOW())');
-            $log->execute([':folder'=>$folder,':case_no'=>$preview['case_no'],':subject'=>$subject,':recipient'=>$to,':cc'=>json_encode(array_keys($cc),JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':bcc'=>$preview['sparkasse']?KR_ARCHIVE:'']);
-            apiJson(['ok'=>true,'subject'=>$subject,'sender'=>$sender,'recipient'=>$to,'cc'=>array_keys($cc),'bcc'=>$preview['sparkasse']?KR_ARCHIVE:'']);
+            $log->execute([':folder'=>$folder,':case_no'=>$preview['case_no'],':subject'=>$subject,':recipient'=>$to,':cc'=>json_encode(array_keys($cc),JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':bcc'=>$reviewed['sparkasse']?KR_ARCHIVE:'']);
+            apiJson(['ok'=>true,'subject'=>$subject,'sender'=>$sender,'recipient'=>$to,'cc'=>array_keys($cc),'bcc'=>$reviewed['sparkasse']?KR_ARCHIVE:'']);
         }
         apiError(404, 'Unbekannte Aktion.');
     } catch (Throwable $error) {
