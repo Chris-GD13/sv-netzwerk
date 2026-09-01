@@ -15,6 +15,7 @@ assert.match(core, /gfDocxSetTableCell\(\$dom,\$xp,2,4,0,\$fields\['regulierer'\
 assert.match(core, /\$isGewerbe=str_contains\(gfNorm\(\$templateText\),'gesellschaftsform'\)/);
 assert.match(core, /function gfProtocolValidateDocx\(/);
 assert.match(core, /Kopffeld nicht an der vorgesehenen Position/);
+assert.doesNotMatch(core, /Reserve wird in Zusammenfassung oder offenen Punkten erwähnt/, 'internal summaries must not block a Word document when the reserve field itself is valid');
 assert.match(runtime, /\$protocolValidationReplacement/);
 assert.match(runtime, /Schadenprotokoll-QS konnte nicht angebunden werden/);
 assert.match(runtime, /"form_fields":\{"meldetag":"","gespraechspartner":"","schadenhergang":""/);
