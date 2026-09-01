@@ -40,11 +40,12 @@ function cbList(string $parentId): array {
 }
 function cbTree(string $folderId,int $depth=0): array {
     if($depth>8)return [];$out=[];
-    foreach(cbList($folderId) as $f){$isFolder=(($f['mimeType']??'')==='application/vnd.google-apps.folder');$item=['id'=>(string)$f['id'],'name'=>(string)$f['name'],'mimeType'=>(string)($f['mimeType']??''),'modifiedTime'=>(string)($f['modifiedTime']??''),'size'=>(int)($f['size']??0),'folder'=>$isFolder];if($isFolder)$item['children']=cbTree((string)$f['id'],$depth+1);$out[]=$item;}
+    foreach(cbList($folderId) as $f){$isFolder=(($f['mimeType']??'')==='application/vnd.google-apps.folder');$item=['id'=>(string)$f['id'],'name'=>(string)$f['name'],'mimeType'=>(string)($f['mimeType']??''),'modifiedTime'=>(string)($f['modifiedTime']??''),'size'=>(int)($f['size']??0),'folder'=>$isFolder,'parentId'=>$folderId];if($isFolder)$item['children']=cbTree((string)$f['id'],$depth+1);$out[]=$item;}
     return $out;
 }
 $folderId=trim((string)($_GET['folder_id']??''));requireCaseFolderAccess($folderId,$user);
 function cbFindInTree(array $items,string $fileId):?array{foreach($items as$item){if(!$item['folder']&&hash_equals((string)$item['id'],$fileId))return$item;if($item['folder']){$found=cbFindInTree((array)($item['children']??[]),$fileId);if($found)return$found;}}return null;}
+function cbFindFolderInTree(array $items,string $folderId):?array{foreach($items as$item){if($item['folder']&&hash_equals((string)$item['id'],$folderId))return$item;if($item['folder']){$found=cbFindFolderInTree((array)($item['children']??[]),$folderId);if($found)return$found;}}return null;}
 function cbSafeName(string $name):string{$name=preg_replace('/[\x00-\x1F\x7F"\\\\\/]+/u','_',basename($name))??'Datei';return trim($name)!==''?$name:'Datei';}
 function cbDocxPreview(string $bytes,string $name):string{
     $tmp=tempnam(sys_get_temp_dir(),'svnet-docx-');if($tmp===false)return'';file_put_contents($tmp,$bytes);$zip=new ZipArchive();if($zip->open($tmp)!==true){@unlink($tmp);return'';}$xml=$zip->getFromName('word/document.xml');$zip->close();@unlink($tmp);if(!is_string($xml)||$xml==='')return'';
@@ -80,6 +81,20 @@ if($action==='delete_selected'){
     $deleted=[];
     foreach($files as$file){$fileId=(string)$file['id'];$r=cbHttp('PATCH','https://www.googleapis.com/drive/v3/files/'.rawurlencode($fileId).'?supportsAllDrives=true',['Content-Type: application/json'],json_encode(['trashed'=>true],JSON_UNESCAPED_SLASHES));if($r['status']<200||$r['status']>=300)apiError(503,'Nicht alle ausgewählten Dateien konnten in den Papierkorb verschoben werden.');$deleted[]=['id'=>$fileId,'name'=>(string)($file['name']??'Datei')];}
     apiJson(['ok'=>true,'deleted_count'=>count($deleted),'deleted'=>$deleted,'recoverable'=>true]);
+}
+if($action==='move_selected'){
+    if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
+    $body=requestBody();$fileIds=is_array($body['file_ids']??null)?array_values(array_unique(array_filter(array_map(static fn($id):string=>trim((string)$id),$body['file_ids'])))):[];$targetId=trim((string)($body['target_folder_id']??''));
+    if(!$fileIds)apiError(400,'Bitte mindestens eine Datei auswählen.');
+    if(count($fileIds)>100)apiError(400,'Es können höchstens 100 Dateien gleichzeitig verschoben werden.');
+    if($targetId==='')apiError(400,'Bitte einen Zielordner auswählen.');
+    $target=$targetId===$folderId?['id'=>$folderId,'name'=>'Fallakte','folder'=>true]:cbFindFolderInTree($tree,$targetId);
+    if(!$target||($target['folder']??false)!==true)apiError(403,'Der Zielordner gehört nicht zu diesem Schadenfall.');
+    $files=[];
+    foreach($fileIds as$fileId){$file=cbFindInTree($tree,$fileId);if(!$file)apiError(404,'Mindestens eine ausgewählte Datei gehört nicht zu diesem Schadenfall.');if(($file['folder']??false)===true)apiError(400,'Ordner können hier nicht verschoben werden.');if(strcasecmp((string)($file['name']??''),'00_Falldaten.json')===0)apiError(403,'Die zentrale Falldaten-Datei darf nicht verschoben werden.');$files[]=$file;}
+    $moved=[];$skipped=[];
+    foreach($files as$file){$fileId=(string)$file['id'];$sourceId=trim((string)($file['parentId']??''));if($sourceId===$targetId){$skipped[]=['id'=>$fileId,'name'=>(string)($file['name']??'Datei')];continue;}$query=http_build_query(['supportsAllDrives'=>'true','addParents'=>$targetId,'removeParents'=>$sourceId,'fields'=>'id,name,parents']);$r=cbHttp('PATCH','https://www.googleapis.com/drive/v3/files/'.rawurlencode($fileId).'?'.$query,['Content-Type: application/json'],'{}');if($r['status']<200||$r['status']>=300)apiError(503,'Nicht alle ausgewählten Dateien konnten verschoben werden.');$moved[]=['id'=>$fileId,'name'=>(string)($file['name']??'Datei')];}
+    apiJson(['ok'=>true,'moved_count'=>count($moved),'moved'=>$moved,'skipped_count'=>count($skipped),'target'=>['id'=>$targetId,'name'=>(string)$target['name']]]);
 }
 if($action==='delete'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
