@@ -14,6 +14,7 @@ $state = gfCalculationDraftState([
         'regional_factor' => '1,05',
         'source_name' => 'BKI Altbau 2026',
         'source_page' => '123',
+        'quantity_source' => 'Aufmaß.pdf, Seite 2',
     ]],
     'vat' => 19,
     'assumptions' => ['Schadenfläche vor Ort prüfen.'],
@@ -32,7 +33,7 @@ if (($state['location'] ?? '') !== '72661 Grafenberg') {
     fwrite(STDERR, "Schadenort wurde nicht übernommen.\n");
     exit(1);
 }
-foreach (['KI-Erstentwurf', 'Annahmen:', 'Offene Punkte:', 'Berücksichtigte Vorgabe:'] as $needle) {
+foreach (['KI-Erstentwurf', 'Mengenquellen:', 'Aufmaß.pdf, Seite 2', 'Annahmen:', 'Offene Punkte:', 'Berücksichtigte Vorgabe:'] as $needle) {
     if (!str_contains((string)($state['note'] ?? ''), $needle)) {
         fwrite(STDERR, "Pflichtvermerk fehlt: {$needle}\n");
         exit(1);
@@ -53,6 +54,21 @@ try {
 if (!$rejected) {
     fwrite(STDERR, "Unbelegte Kalkulationsposition wurde nicht gesperrt.\n");
     exit(1);
+}
+
+$calculationHelper = file_get_contents(__DIR__.'/../public/intern/api/gf-calculation-draft.php');
+foreach ([
+    'function gfPlanCalculationFromEvidence(',
+    'function gfPriceCalculationPlan(',
+    'Werte den Bericht, vorhandene Aufmaße und die dateibezogenen Fotobefunde gemeinsam aus.',
+    'Fotos dürfen sichtbare Bauteile, Schäden und eindeutig zählbare Einzelstücke belegen',
+    'if (!empty($result[\'items\']) && is_array($result[\'items\'])) return $result;',
+    'return gfPriceCalculationPlan($plan, $storeId, $meta, $instructions);',
+] as $needle) {
+    if (!is_string($calculationHelper) || !str_contains($calculationHelper, $needle)) {
+        fwrite(STDERR, "Zweistufige Kalkulation aus Bericht, Aufmaß, Bildern und BKI fehlt: {$needle}\n");
+        exit(1);
+    }
 }
 
 $emptyState = gfCalculationDraftState([
@@ -78,7 +94,8 @@ foreach (['keine vollständig kalkulierbare Position', 'keine Positionen oder Pr
 $generator = file_get_contents(__DIR__.'/../public/intern/api/gf-ai-generate.php');
 if (!is_string($generator)
     || !str_contains($generator, "'empty_editable_draft','manual_completion_required'")
-    || !str_contains($generator, "!empty(\$calculationState['requiresManualCompletion'])")) {
+    || !str_contains($generator, "!empty(\$calculationState['requiresManualCompletion'])")
+    || !str_contains($generator, "\$bkiRequested=in_array('kalkulation',\$outputs,true)")) {
     fwrite(STDERR, "Die Dokument-QS erkennt den sicheren leeren Kalkulationsentwurf nicht.\n");
     exit(1);
 }

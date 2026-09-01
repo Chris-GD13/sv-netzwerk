@@ -32,6 +32,7 @@ function gfCalculationDraftState(array $result, array $meta, string $instruction
             'regional_factor' => gfCalculationNumber($item['regional_factor'] ?? 1),
             'source_name' => trim((string)($item['source_name'] ?? '')),
             'source_page' => trim((string)($item['source_page'] ?? '')),
+            'quantity_source' => trim((string)($item['quantity_source'] ?? '')),
         ];
         if ($line['regional_factor'] <= 0) $line['regional_factor'] = 1.0;
         $number = $index + 1;
@@ -52,6 +53,13 @@ function gfCalculationDraftState(array $result, array $meta, string $instruction
     }
     $summary = trim((string)($result['summary'] ?? ''));
     if ($summary !== '') $notes[] = $summary;
+    $quantitySources = [];
+    foreach ($lines as $line) {
+        if ($line['quantity_source'] !== '') {
+            $quantitySources[] = $line['description'].': '.$line['quantity_source'];
+        }
+    }
+    if ($quantitySources) $notes[] = 'Mengenquellen: '.implode('; ', $quantitySources);
     foreach (['assumptions' => 'Annahmen', 'open_points' => 'Offene Punkte'] as $field => $label) {
         $values = is_array($result[$field] ?? null) ? array_values(array_filter(array_map(
             static fn($value): string => trim((string)$value),
@@ -233,6 +241,39 @@ function gfCalculationVectorStore(array $bkiReferences): string
     return $storeId;
 }
 
+function gfPlanCalculationFromEvidence(string $evidence, array $meta, string $instructions): array
+{
+    $system = 'Du planst einen ersten, fachlich zu prüfenden Kalkulationsentwurf für einen deutschen Versicherungsschaden. Werte den Bericht, vorhandene Aufmaße und die dateibezogenen Fotobefunde gemeinsam aus. Erstelle nur Arbeitspositionen, deren beschädigtes Bauteil und erforderliche Leistung belegt sind und für die eine konkrete Menge mit Einheit aus Bericht, Aufmaß oder eindeutig zählbarem Fotobefund vorliegt. Maße, Flächen, Längen, Stückzahlen, verdeckte Schäden und Ausführungsumfänge niemals aus Perspektive, Erfahrungswerten oder typischen Annahmen schätzen. Fotos dürfen sichtbare Bauteile, Schäden und eindeutig zählbare Einzelstücke belegen; Berichts- und Aufmaßwerte liefern vorrangig die Mengen. Trenne Rückbau, Entsorgung und Wiederherstellung nur, wenn der Akteninhalt diese Leistungen trägt. Antworte ausschließlich als JSON {"summary":"...","work_items":[{"description":"konkrete erforderliche Leistung","quantity":1.0,"unit":"m²|m|St|Std|psch","quantity_source":"exakter Dateiname und konkrete Fundstelle","evidence":"kurze belegte Begründung","bki_query":"präzise Suchbeschreibung für BKI Altbau"}],"assumptions":[],"open_points":[]}.';
+    $input = "Falldaten:\n".json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+        ."\n\nArbeitsauftrag:\n".$instructions
+        ."\n\nDateibezogener Evidenzbestand aus Berichten, Aufmaßen und Bildern:\n".$evidence;
+    return gfCalculationOpenAIRequest([
+        'model' => env('OPENAI_MODEL', 'gpt-5.4-mini'),
+        'instructions' => $system,
+        'input' => $input,
+        'max_output_tokens' => 7000,
+    ]);
+}
+
+function gfPriceCalculationPlan(array $plan, string $storeId, array $meta, string $instructions): array
+{
+    $system = 'Du bepreist einen bereits aktenbasiert ermittelten Arbeitsplan für einen deutschen Versicherungsschaden. Nutze für Einheitspreise ausschließlich die über die Dateisuche zugänglichen lizenzierten BKI-Unterlagen. Suche für jeden geplanten Arbeitsschritt gezielt eine passende BKI-Altbau-Position. Mengen und Einheiten aus dem Arbeitsplan unverändert übernehmen, außer eine in den BKI-Unterlagen eindeutig erforderliche Einheitenumrechnung ist vollständig nachvollziehbar. Erfinde keine BKI-Position, keinen Preis, keine Seite und keine Quelle. Ohne belastbaren BKI-Treffer die betreffende Position weglassen und als offenen Punkt benennen. Antworte ausschließlich als JSON {"summary":"...","items":[{"position_code":"BKI-Position","description":"konkrete Leistung","quantity":1.0,"unit":"m²|m|St|Std|psch","unit_price":123.45,"regional_factor":1.0,"source_name":"BKI Baukosten Positionen Altbau 2026","source_page":"Seite","quantity_source":"aus dem Arbeitsplan unverändert"}],"vat":19,"assumptions":[],"open_points":[]}.';
+    $input = "Falldaten für eine mögliche Regionalzuordnung:\n".json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+        ."\n\nArbeitsauftrag:\n".$instructions
+        ."\n\nAktenbasierter Arbeitsplan:\n".json_encode($plan, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    return gfCalculationOpenAIRequest([
+        'model' => env('OPENAI_MODEL', 'gpt-5.4-mini'),
+        'instructions' => $system,
+        'input' => $input,
+        'tools' => [[
+            'type' => 'file_search',
+            'vector_store_ids' => [$storeId],
+            'max_num_results' => 30,
+        ]],
+        'max_output_tokens' => 12000,
+    ]);
+}
+
 function gfGenerateCalculation(array $caseEvidence, array $meta, string $instructions, array $bkiReferences): array
 {
     $storeId = gfCalculationVectorStore($bkiReferences);
@@ -245,7 +286,7 @@ function gfGenerateCalculation(array $caseEvidence, array $meta, string $instruc
             ."\n\nArbeitsauftrag:\n".$instructions
             ."\n\nPriorisierter, dateibezogener Evidenzbestand einschließlich Bildauswertung:\n".$evidence;
         try {
-            return gfCalculationOpenAIRequest([
+            $result = gfCalculationOpenAIRequest([
                 'model' => env('OPENAI_MODEL', 'gpt-5.4-mini'),
                 'instructions' => $system,
                 'input' => $input,
@@ -256,6 +297,19 @@ function gfGenerateCalculation(array $caseEvidence, array $meta, string $instruc
                 ]],
                 'max_output_tokens' => 12000,
             ]);
+            if (!empty($result['items']) && is_array($result['items'])) return $result;
+            $plan = gfPlanCalculationFromEvidence($evidence, $meta, $instructions);
+            $workItems = is_array($plan['work_items'] ?? null) ? array_values($plan['work_items']) : [];
+            if (!$workItems) {
+                return [
+                    'summary' => trim((string)($plan['summary'] ?? $result['summary'] ?? '')),
+                    'items' => [],
+                    'vat' => 19,
+                    'assumptions' => is_array($plan['assumptions'] ?? null) ? $plan['assumptions'] : [],
+                    'open_points' => is_array($plan['open_points'] ?? null) ? $plan['open_points'] : [],
+                ];
+            }
+            return gfPriceCalculationPlan($plan, $storeId, $meta, $instructions);
         } catch (RuntimeException $error) {
             $lastError = $error;
             $message = mb_strtolower($error->getMessage(), 'UTF-8');
