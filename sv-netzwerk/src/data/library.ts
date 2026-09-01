@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Massenanfall von Einzelschäden: Einsatzsteuerung bei außergewöhnlich hoher Schadenfrequenz',
+    description: 'Massenanfall von Einzelschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/massenanfall-einzelschaeden-einsatzsteuerung/',
+    category: 'Massenanfall von Einzelschäden',
+    tags: ['Massenanfall', 'Schadenfrequenz', 'Kumulschaden', 'Priorisierung', 'Einsatzsteuerung'],
+    date: '2026-09-01',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Schadenminderungspflicht und Sofortmaßnahmen: Was Versicherungsnehmer und Regulierer wissen müssen',
     description: 'Schadenminderung und Sofortmaßnahmenpflicht: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/schadenminderung-obliegenheit-sofortmassnahmen-praxis/',
