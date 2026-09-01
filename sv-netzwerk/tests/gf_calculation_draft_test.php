@@ -55,6 +55,34 @@ if (!$rejected) {
     exit(1);
 }
 
+$emptyState = gfCalculationDraftState([
+    'summary' => 'Die Akte enthält noch keine belegten Mengen und Preise.',
+    'items' => [],
+    'open_points' => ['Leistungen und Mengen auf der Kalkulationsseite ergänzen.'],
+], [
+    'schaden_nr' => '26-154397-2',
+    'schaden_plz' => '72639',
+    'schaden_ort' => 'Neuffen',
+], 'Kalkulation als bearbeitbaren Entwurf vorbereiten.');
+if (($emptyState['lines'] ?? null) !== [] || empty($emptyState['requiresManualCompletion'])) {
+    fwrite(STDERR, "Ein aktenbedingt leerer Kalkulationsentwurf wurde nicht zur manuellen Ergänzung freigegeben.\n");
+    exit(1);
+}
+foreach (['keine vollständig kalkulierbare Position', 'keine Positionen oder Preise erfunden'] as $needle) {
+    if (!str_contains((string)($emptyState['note'] ?? ''), $needle)) {
+        fwrite(STDERR, "Sicherheitshinweis im leeren Kalkulationsentwurf fehlt: {$needle}.\n");
+        exit(1);
+    }
+}
+
+$generator = file_get_contents(__DIR__.'/../public/intern/api/gf-ai-generate.php');
+if (!is_string($generator)
+    || !str_contains($generator, "'empty_editable_draft','manual_completion_required'")
+    || !str_contains($generator, "!empty(\$calculationState['requiresManualCompletion'])")) {
+    fwrite(STDERR, "Die Dokument-QS erkennt den sicheren leeren Kalkulationsentwurf nicht.\n");
+    exit(1);
+}
+
 $link = gfCalculationDraftLink('ai:Fall 1');
 if ($link !== '/intern/kalkulation/?draft_key=ai%3AFall%201') {
     fwrite(STDERR, "Entwurfslink ist nicht URL-sicher.\n");

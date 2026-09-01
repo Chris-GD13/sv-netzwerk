@@ -42,11 +42,14 @@ function gfCalculationDraftState(array $result, array $meta, string $instruction
         if ($line['source_name'] === '') $errors[] = 'Position '.$number.': Preis- oder Mengenquelle fehlt.';
         $lines[] = $line;
     }
-    if (!$lines) $errors[] = 'Keine belastbar kalkulierbare Position erkannt.';
     if (count($lines) > 200) $errors[] = 'Mehr als 200 Kalkulationspositionen sind nicht zulässig.';
     if ($errors) throw new RuntimeException('Kalkulations-QS-Sperre: '.implode(' ', $errors));
 
     $notes = ['KI-Erstentwurf – vor Verwendung sämtliche Positionen, Mengen und Preise fachlich prüfen.'];
+    $requiresManualCompletion = !$lines;
+    if ($requiresManualCompletion) {
+        $notes[] = 'Aus den belegten Aktenangaben konnte keine vollständig kalkulierbare Position mit Menge, Einheitspreis und Quelle abgeleitet werden. Der leere Entwurf wurde deshalb zur manuellen Ergänzung auf der Kalkulationsseite angelegt; es wurden keine Positionen oder Preise erfunden.';
+    }
     $summary = trim((string)($result['summary'] ?? ''));
     if ($summary !== '') $notes[] = $summary;
     foreach (['assumptions' => 'Annahmen', 'open_points' => 'Offene Punkte'] as $field => $label) {
@@ -72,6 +75,7 @@ function gfCalculationDraftState(array $result, array $meta, string $instruction
         'note' => implode("\n", $notes),
         'lines' => $lines,
         'pendingQueries' => [],
+        'requiresManualCompletion' => $requiresManualCompletion,
         'updatedAt' => gmdate('c'),
     ];
 }

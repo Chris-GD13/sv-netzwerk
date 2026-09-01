@@ -305,7 +305,7 @@ $source = str_replace($calculationAllowedNeedle, $calculationAllowedReplacement,
 if ($calculationAllowedCount !== 1) throw new RuntimeException('Kalkulation konnte nicht zur Dokumentauswahl hinzugefügt werden.');
 
 $calculationValidationNeedle = 'function gfEngelValidate(string $key,array $result,array $meta,string $instructions):array{if(gfExcelOutput($key))';
-$calculationValidationReplacement = 'function gfEngelValidate(string $key,array $result,array $meta,string $instructions):array{if($key===\'kalkulation\'){gfCalculationDraftState($result,$meta,$instructions);return[\'passed\'=>true,\'checks\'=>[\'documented_quantities\',\'documented_unit_prices\',\'source_per_position\',\'editable_calculation_draft\']];}if(gfExcelOutput($key))';
+$calculationValidationReplacement = 'function gfEngelValidate(string $key,array $result,array $meta,string $instructions):array{if($key===\'kalkulation\'){$calculationState=gfCalculationDraftState($result,$meta,$instructions);return[\'passed\'=>true,\'checks\'=>!empty($calculationState[\'requiresManualCompletion\'])?[\'empty_editable_draft\',\'manual_completion_required\']:[\'documented_quantities\',\'documented_unit_prices\',\'source_per_position\',\'editable_calculation_draft\']];}if(gfExcelOutput($key))';
 $source = str_replace($calculationValidationNeedle, $calculationValidationReplacement, $source, $calculationValidationCount);
 if ($calculationValidationCount !== 1) throw new RuntimeException('Kalkulations-QS konnte nicht angebunden werden.');
 $rekonValidationNeedle = "function gfEngelValidate(string \$key,array \$result,array \$meta,string \$instructions):array{if(\$key==='kalkulation')";
