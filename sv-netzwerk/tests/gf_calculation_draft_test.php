@@ -15,6 +15,7 @@ $state = gfCalculationDraftState([
         'source_name' => 'BKI Altbau 2026',
         'source_page' => '123',
         'quantity_source' => 'Aufmaß.pdf, Seite 2',
+        'quantity_confidence' => 'belegt',
     ]],
     'vat' => 19,
     'assumptions' => ['Schadenfläche vor Ort prüfen.'],
@@ -56,19 +57,67 @@ if (!$rejected) {
     exit(1);
 }
 
+$provisionalState = gfCalculationDraftState([
+    'items' => [[
+        'position_code' => 'BKI 456',
+        'description' => 'Sichtbar geschädigte Wandfläche bearbeiten',
+        'quantity' => 8,
+        'unit' => 'm²',
+        'unit_price' => 52.40,
+        'source_name' => 'BKI Altbau 2026',
+        'source_page' => '456',
+        'quantity_source' => 'Vorläufige Schätzmenge aus Schadenfoto 3',
+        'quantity_confidence' => 'vorläufig',
+    ]],
+], [], 'Erste Kalkulation erstellen.');
+if (!str_contains((string)($provisionalState['note'] ?? ''), 'Vorläufig geschätzte Mengen – zwingend vor Ort prüfen')) {
+    fwrite(STDERR, "Vorläufige Bild-/Berichtsmenge wird nicht transparent gekennzeichnet.\n");
+    exit(1);
+}
+
 $calculationHelper = file_get_contents(__DIR__.'/../public/intern/api/gf-calculation-draft.php');
 foreach ([
     'function gfPlanCalculationFromEvidence(',
     'function gfPriceCalculationPlan(',
+    'function gfCalculationRequiresWaterBlocks(',
+    'function gfCalculationHasRequiredWaterBlocks(',
+    'function gfEnsureRequiredWaterCalculationBlocks(',
     'Werte den Bericht, vorhandene Aufmaße und die dateibezogenen Fotobefunde gemeinsam aus.',
     'Fotos dürfen sichtbare Bauteile, Schäden und eindeutig zählbare Einzelstücke belegen',
-    'if (!empty($result[\'items\']) && is_array($result[\'items\'])) return $result;',
-    'return gfPriceCalculationPlan($plan, $storeId, $meta, $instructions);',
+    'Ziel ist eine tatsächlich nutzbare erste Kalkulation und nicht ein leerer Entwurf.',
+    'Eine Position darf nicht allein wegen fehlenden Aufmaßes entfallen.',
+    'Trocknung, Rückbau einschließlich Entsorgung und Wiederherstellung',
+    'quantity_confidence',
+    'if (!empty($result[\'items\']) && is_array($result[\'items\'])) return gfEnsureRequiredWaterCalculationBlocks(',
+    'return gfEnsureRequiredWaterCalculationBlocks($priced, $evidence, $meta, $instructions, $storeId);',
 ] as $needle) {
     if (!is_string($calculationHelper) || !str_contains($calculationHelper, $needle)) {
         fwrite(STDERR, "Zweistufige Kalkulation aus Bericht, Aufmaß, Bildern und BKI fehlt: {$needle}\n");
         exit(1);
     }
+}
+
+if (!gfCalculationRequiresWaterBlocks(['schadenart' => 'Leitungswasserschaden'])) {
+    fwrite(STDERR, "Wasserschaden wurde nicht als Fall mit drei Pflicht-Kostenblöcken erkannt.\n");
+    exit(1);
+}
+if (gfCalculationRequiresWaterBlocks(['schadenart' => 'Sturmschaden'])) {
+    fwrite(STDERR, "Die Wasserschaden-Pflichtblöcke wurden fälschlich auf einen Sturmschaden angewendet.\n");
+    exit(1);
+}
+$completeWaterCalculation = ['items' => [
+    ['description' => 'Ergebnisorientierte Leckageortung und Reparatur der Leckage'],
+    ['description' => 'Technische Trocknung der durchfeuchteten Bauteile'],
+    ['description' => 'Rückbau und Entsorgung geschädigter Wandbekleidungen'],
+    ['description' => 'Wiederherstellung von Innenputz und Anstrich'],
+]];
+if (!gfCalculationHasRequiredWaterBlocks($completeWaterCalculation)) {
+    fwrite(STDERR, "Vollständige Wasserschaden-Kalkulation wurde nicht erkannt.\n");
+    exit(1);
+}
+if (gfCalculationHasRequiredWaterBlocks(['items' => array_slice($completeWaterCalculation['items'], 0, 3)])) {
+    fwrite(STDERR, "Unvollständige Wasserschaden-Kalkulation hat die Vier-Block-QS bestanden.\n");
+    exit(1);
 }
 
 $emptyState = gfCalculationDraftState([
@@ -97,6 +146,33 @@ foreach (['empty_editable_draft', 'manual_completion_required', 'requiresManualC
         fwrite(STDERR, "Kalkulations-QS oder automatische BKI-Aktivierung fehlt: {$needle}\n");
         exit(1);
     }
+}
+
+$portalPage = file_get_contents(__DIR__.'/../src/pages/intern/versicherungsfaelle/index.astro');
+foreach (['statusFailures=0', 'läuft serverseitig weiter.', 'Statusverbindung kurz unterbrochen', 'return loadGenerated(attempt+1)', 'Erneuter Abruf läuft'] as $needle) {
+    if (!is_string($portalPage) || !str_contains($portalPage, $needle)) {
+        fwrite(STDERR, "Tolerantes Kalkulations-Polling fehlt: {$needle}\n");
+        exit(1);
+    }
+}
+$insuranceCalculationPage = file_get_contents(__DIR__.'/../src/pages/intern/kalkulation/versicherungsschaeden.astro');
+foreach (['Diesen Fall kalkulieren', 'vs-case-tools', 'waterQuick', "['01.01.000',1,'Ortung / Reparatur']", "['02.01.000',1,'Trocknung']", "['10.00.000',10,'Rückbau']", "['03.01.000',1,'Wiederherstellung']", 'Schnelldurchgang Wasserschaden'] as $needle) {
+    if (!is_string($insuranceCalculationPage) || !str_contains($insuranceCalculationPage, $needle)) {
+        fwrite(STDERR, "Wasserschaden-Schnelldurchgang auf der Versicherungsschaden-Kalkulation fehlt: {$needle}\n");
+        exit(1);
+    }
+}
+$recoveryScript = file_get_contents(__DIR__.'/../public/intern/transient-calculation-status.js');
+foreach (['Bearbeitung angehalten', 'Failed to fetch', 'interruptedTexts.some'] as $needle) {
+    if (!is_string($recoveryScript) || !str_contains($recoveryScript, $needle)) {
+        fwrite(STDERR, "Wiederaufnahme nach Verbindungsfehler fehlt: {$needle}\n");
+        exit(1);
+    }
+}
+$portalLayout = file_get_contents(__DIR__.'/../src/layouts/InternalLayout.astro');
+if (!is_string($portalLayout) || !str_contains($portalLayout, 'transient-calculation-status.js?v=20260901-1')) {
+    fwrite(STDERR, "Cache-Busting für die korrigierte Statuswiederaufnahme fehlt.\n");
+    exit(1);
 }
 
 $link = gfCalculationDraftLink('ai:Fall 1');

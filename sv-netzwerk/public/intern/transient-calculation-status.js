@@ -1,7 +1,7 @@
 (()=>{
   if(!location.pathname.startsWith('/intern/versicherungsfaelle'))return;
   const API='/intern/api/gf-ai-generate.php';
-  const interruptedText='Verarbeitung unterbrochen';
+  const interruptedTexts=['Verarbeitung unterbrochen','Bearbeitung angehalten','Failed to fetch','Verbindung zur Bearbeitung unterbrochen'];
   const resumeStore='svnet-ai-resume-attempts-v2';
   let recovering=false;
   let timer=0;
@@ -35,7 +35,8 @@
 
   function interruptedBox(){
     const box=document.getElementById('vf-job');
-    return box&&(box.textContent||'').includes(interruptedText)?box:null;
+    const text=box?.textContent||'';
+    return box&&interruptedTexts.some(needle=>text.includes(needle))?box:null;
   }
 
   function renderDone(box,job){
