@@ -18,6 +18,11 @@ assert.match(core, /Kopffeld nicht an der vorgesehenen Position/);
 assert.match(runtime, /\$protocolValidationReplacement/);
 assert.match(runtime, /Schadenprotokoll-QS konnte nicht angebunden werden/);
 assert.match(runtime, /"form_fields":\{"meldetag":"","gespraechspartner":"","schadenhergang":""/);
+const protocolPromptIndex = runtime.indexOf("if($key==='schadenprotokoll')$responseRule=");
+const calculationPromptIndex = runtime.indexOf("if($key==='kalkulation')$responseRule=");
+const bkiTernaryIndex = runtime.indexOf(";$bkiRule=$bkiRequested?", calculationPromptIndex);
+assert.ok(protocolPromptIndex >= 0 && protocolPromptIndex < calculationPromptIndex, 'protocol prompt must be inserted before the calculation prompt');
+assert.ok(calculationPromptIndex < bkiTernaryIndex, 'all response rules must be complete before the existing BKI ternary continues');
 assert.match(portal, /queue=\[primary,\.\.\.additional,protocol\]\.filter\(Boolean\)/);
 assert.doesNotMatch(portal, /navigator\.clipboard\.writeText\(prompt\)/);
 
