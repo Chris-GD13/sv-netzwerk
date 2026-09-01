@@ -95,7 +95,7 @@ $generator = file_get_contents(__DIR__.'/../public/intern/api/gf-ai-generate.php
 if (!is_string($generator)
     || !str_contains($generator, "'empty_editable_draft','manual_completion_required'")
     || !str_contains($generator, "!empty(\$calculationState['requiresManualCompletion'])")
-    || !str_contains($generator, "\$bkiRequested=in_array('kalkulation',\$outputs,true)")) {
+    || !str_contains($generator, "in_array(\\'kalkulation\\',\$outputs,true)")) {
     fwrite(STDERR, "Die Dokument-QS erkennt den sicheren leeren Kalkulationsentwurf nicht.\n");
     exit(1);
 }
