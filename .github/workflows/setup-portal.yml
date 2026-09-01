@@ -26,6 +26,9 @@ jobs:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          M365_TENANT_ID: ${{ secrets.M365_TENANT_ID }}
+          M365_CLIENT_ID: ${{ secrets.M365_CLIENT_ID }}
+          M365_CLIENT_SECRET: ${{ secrets.M365_CLIENT_SECRET }}
         run: |
           set -euo pipefail
           sudo apt-get update && sudo apt-get install --yes lftp
@@ -42,6 +45,9 @@ jobs:
           SEED_ADMIN_NAME=Administrator
           PROJECT_NAME=Fensterbeschlagsprüfung BMVg Bonn
           OPENAI_API_KEY=${OPENAI_API_KEY}
+          MS_TENANT_ID=${M365_TENANT_ID}
+          MS_CLIENT_ID=${M365_CLIENT_ID}
+          MS_CLIENT_SECRET=${M365_CLIENT_SECRET}
           ENVFILE
 
           # Whitespace am Anfang entfernen (heredoc-Einrückung)
