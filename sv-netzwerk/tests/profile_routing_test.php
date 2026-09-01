@@ -8,7 +8,8 @@ function expectSame(string $actual, string $expected, string $label): void
     if ($actual !== $expected) throw new RuntimeException($label.': erwartet '.$expected.', erhalten '.$actual);
 }
 
-$susanne=['email'=>'susanne@example.invalid','full_name'=>'Susanne Wächter','role'=>'administrator'];
+$susanne=['email'=>'ws@sv-schuett.eu','full_name'=>'Susanne Wächter','role'=>'administrator'];
+$susanneByPortalEmail=['email'=>'ws@sv-schuett.eu','full_name'=>'S. Wächter','role'=>'administrator'];
 $matrix=[
     ['label'=>'Susanne -> Christian','user'=>$susanne,'selected'=>'christian','expected'=>'christian'],
     ['label'=>'Susanne -> Holger','user'=>$susanne,'selected'=>'holger','expected'=>'holger'],
@@ -24,6 +25,7 @@ $matrix=[
 foreach($matrix as $row) expectSame(svnetSelectedProfile($row['user'],$row['selected']),$row['expected'],$row['label']);
 
 if(!svnetIsBackofficeUser($susanne))throw new RuntimeException('Susanne muss als Backoffice erkannt werden.');
+if(!svnetIsBackofficeUser($susanneByPortalEmail))throw new RuntimeException('Susannes Portaladresse muss unabhängig vom Anzeigenamen als Backoffice erkannt werden.');
 foreach(array_slice($matrix,5)as$row)if(svnetIsBackofficeUser($row['user']))throw new RuntimeException($row['label'].' darf nicht als Backoffice erkannt werden.');
 
 foreach(['christian','holger','marc','jens']as$profile){
