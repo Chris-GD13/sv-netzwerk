@@ -28,6 +28,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
+  const minimumBridgeVersion='1.3.14',currentBridgeVersion='1.3.15';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -60,7 +61,7 @@
 
   button.addEventListener('click',async()=>{
     if(userJobs.length)return;
-    if(context.claims_agent&&!bridge){show(`Diese zentrale Importstation ist nicht bereit. Browser-Brücke 1.3.15 erforderlich (geladen: ${bridgeVersion||'nicht erkannt'}). Bitte zuerst die Brücke aktualisieren.`,true);return}
+    if(context.claims_agent&&!bridge){show(`Diese zentrale Importstation ist nicht bereit. Browser-Brücke ${minimumBridgeVersion} oder neuer erforderlich (geladen: ${bridgeVersion||'nicht erkannt'}).`,true);return}
     button.disabled=true;
     try{
       const profile=selectedProfile();
@@ -112,8 +113,9 @@
     const d=e.data||{},runtime=d.runtime||{};
     if(d.type==='SVNET_CLAIMS_BRIDGE_READY'){
       bridgeVersion=String(d.version||'0.0.0');
-      bridge=versionAtLeast(bridgeVersion,'1.3.15');
-      if(!bridge)show(`Browser-Brücke 1.3.15 erforderlich (geladen: ${bridgeVersion}). Bitte die Erweiterung aktualisieren.`,true);
+      bridge=versionAtLeast(bridgeVersion,minimumBridgeVersion);
+      if(!bridge)show(`Browser-Brücke ${minimumBridgeVersion} oder neuer erforderlich (geladen: ${bridgeVersion}).`,true);
+      else if(!versionAtLeast(bridgeVersion,currentBridgeVersion))show(`Browser-Brücke ${bridgeVersion} ist einsatzbereit. Version ${currentBridgeVersion} steht als empfohlenes Update bereit.`);
     }
     if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&agentJob){
       const active=d.status?.active||{},diag=d.status?.diagnostic||{};
