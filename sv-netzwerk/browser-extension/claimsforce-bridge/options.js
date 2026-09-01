@@ -1,8 +1,7 @@
 import { saveCredentials, loadCredentials, clearCredentials, savePortalCredentials, loadPortalCredentials, clearPortalCredentials } from './vault.js';
-const OPTIONS_CODE_VERSION = '1.3.14';
+const OPTIONS_CODE_VERSION = '1.3.15';
 if (localStorage.getItem('svnet-bridge-options-code-version') !== OPTIONS_CODE_VERSION) {
   localStorage.setItem('svnet-bridge-options-code-version', OPTIONS_CODE_VERSION);
-  setTimeout(() => chrome.runtime.reload(), 250);
 }
 const profile = document.querySelector('#profile'), email = document.querySelector('#email'), password = document.querySelector('#password'), state = document.querySelector('#state');
 const active = (await chrome.storage.session.get('activeProfile')).activeProfile;

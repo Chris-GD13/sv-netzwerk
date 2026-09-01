@@ -1,6 +1,19 @@
 const API = '/intern/api/google-drive-sync.php';
 const CAL = '/intern/api/outlook-case-calendar.php';
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
+const CONTEXT_RELOAD_MESSAGE = 'Die Browser-Brücke wurde aktualisiert. Bitte diese Portalseite einmal neu laden und den Import danach erneut starten.';
+let contextReloadReported = false;
+const invalidExtensionContext = error => /Extension context invalidated|Receiving end does not exist|message port closed/i.test(String(error?.message || error || ''));
+function reportInvalidExtensionContext() {
+  if (contextReloadReported) return;
+  contextReloadReported = true;
+  document.documentElement.setAttribute('data-svnet-claims-runtime', 'unavailable|CF-EXTENSION-RELOAD|0');
+  window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: CONTEXT_RELOAD_MESSAGE }, location.origin);
+}
+function safeSendResponse(sendResponse, value) {
+  try { sendResponse(value); }
+  catch (error) { if (invalidExtensionContext(error)) reportInvalidExtensionContext(); }
+}
 const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens'];
 const profileKey = value => {
   const profile = String(value || '').trim().toLowerCase();
@@ -131,7 +144,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message?.type === 'PORTAL_SYNC_STATE') return { ok: true, result: await syncState(message) };
     if (message?.type === 'PORTAL_COMMIT_SYNC') return { ok: true, result: await commitSync(message) };
     return { ok: false, error: 'Unbekannter Auftrag.' };
-  })().then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
+  })().then(value => safeSendResponse(sendResponse, value)).catch(error => {
+    const invalid = invalidExtensionContext(error);
+    if (invalid) reportInvalidExtensionContext();
+    safeSendResponse(sendResponse, { ok: false, error: invalid ? CONTEXT_RELOAD_MESSAGE : error.message });
+  });
   return true;
 });
 
@@ -140,7 +157,10 @@ function reportRuntime() {
     const active = status?.active || {}, diagnostic = status?.diagnostic || {};
     document.documentElement.setAttribute('data-svnet-claims-runtime', [active.status || 'idle', diagnostic.phase || active.phase || 'CF-IDLE', Number(active.jobId || 0), active.profile || 'none'].join('|'));
     window.postMessage({ type: 'SVNET_CLAIMS_RUNTIME_STATUS', status }, location.origin);
-  }).catch(() => document.documentElement.setAttribute('data-svnet-claims-runtime', 'unavailable|CF-RUNTIME|0'));
+  }).catch(error => {
+    if (invalidExtensionContext(error)) reportInvalidExtensionContext();
+    else document.documentElement.setAttribute('data-svnet-claims-runtime', 'unavailable|CF-RUNTIME|0');
+  });
 }
 
 window.addEventListener('message', event => {
@@ -157,7 +177,11 @@ window.addEventListener('message', event => {
     chrome.runtime.sendMessage(request).then(response => {
       if (!response?.ok) window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: response?.error, runtime: { jobId: request.jobId } }, location.origin);
       else window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ACCEPTED', runtime: { jobId: request.jobId, runId: response.runId, resumed: response.resumed } }, location.origin);
-    }).catch(error => window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: `[CF-RUN-00] ${error.message}`, runtime: { jobId: request.jobId } }, location.origin));
+    }).catch(error => {
+      const invalid = invalidExtensionContext(error);
+      if (invalid) reportInvalidExtensionContext();
+      window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: invalid ? CONTEXT_RELOAD_MESSAGE : `[CF-RUN-00] ${error.message}`, runtime: { jobId: request.jobId } }, location.origin);
+    });
   }
   if (event.data?.type === 'SVNET_CLAIMS_OPEN_OPTIONS') {
     try { chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS', profile: profileKey(event.data.profile) }); }

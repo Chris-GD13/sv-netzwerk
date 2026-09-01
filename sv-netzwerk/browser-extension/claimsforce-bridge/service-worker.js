@@ -5,6 +5,8 @@ const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
 const PLANNING_URL = 'https://web.claimsforce.com/planning?bucket=WITH_FUTURE_APPOINTMENT#with-future-appointment';
 const CLAIMS_ORIGINS = ['https://web.claimsforce.com', 'https://claimsforce.eu.auth0.com'];
 const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens'];
+const BRIDGE_VERSION = chrome.runtime.getManifest().version;
+const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*';
 const profileKey = value => {
   const profile = String(value || '').trim().toLowerCase();
   if (!SUPPORTED_PROFILES.includes(profile)) throw new Error('Ungültiges ClaimsForce-Profil.');
@@ -15,6 +17,26 @@ const authHeaders = token => ({ Authorization: `Bearer ${token}`, Accept: 'appli
 let runningImport = null;
 let credentialDiagnostic = 'idle';
 const safeRoute = url => { try { return new URL(url).pathname; } catch { return 'unbekannt'; } };
+
+async function activateBridgeVersion() {
+  const row = await chrome.storage.local.get(['bridgeActivatedVersion', 'claimsActiveRun']);
+  if (row.bridgeActivatedVersion === BRIDGE_VERSION) return;
+  if (row.claimsActiveRun?.status === 'running') {
+    await chrome.storage.local.set({
+      claimsActiveRun: {
+        ...row.claimsActiveRun,
+        status: 'failed',
+        phase: 'CF-EXTENSION-UPDATE',
+        error: 'Die Browser-Brücke wurde während des Imports aktualisiert. Bitte den Import im Portal erneut starten.',
+        finishedAt: new Date().toISOString()
+      }
+    });
+  }
+  await chrome.storage.local.set({ bridgeActivatedVersion: BRIDGE_VERSION });
+  const tabs = await chrome.tabs.query({ url: PORTAL_TAB_PATTERN });
+  await Promise.all(tabs.filter(tab => Number.isInteger(tab.id)).map(tab => chrome.tabs.reload(tab.id).catch(() => {})));
+}
+activateBridgeVersion().catch(() => {});
 
 async function diagnostic(run, phase, text, details = {}) {
   const entry = { runId: run.runId, jobId: run.jobId || 0, profile: run.profile, phase, text, details, at: new Date().toISOString() };
