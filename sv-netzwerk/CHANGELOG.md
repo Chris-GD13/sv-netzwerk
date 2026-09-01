@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.40 – 2026-09-01
+- automatischer morgens Fachbeitrag veröffentlicht: „Schadenminderungspflicht und Sofortmaßnahmen: Was Versicherungsnehmer und Regulierer wissen müssen"
+- LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
+- ohne Beitragsbild veröffentlicht; keine typografische Platzhaltergrafik erzeugt
+
 ## 3.4.39 – 2026-08-31
 - automatischer morgens Fachbeitrag veröffentlicht: „Kommunikation mit Versicherern, Schadenregulierern und Versicherungsnehmern: Struktur für klare Verfahren"
 - LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)

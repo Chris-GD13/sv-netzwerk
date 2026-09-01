@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Schadenminderungspflicht und Sofortmaßnahmen: Was Versicherungsnehmer und Regulierer wissen müssen',
+    description: 'Schadenminderung und Sofortmaßnahmenpflicht: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/schadenminderung-obliegenheit-sofortmassnahmen-praxis/',
+    category: 'Schadenminderung und Sofortmaßnahmenpflicht',
+    tags: ['Schadenminderung', 'Sofortmaßnahmen', 'Obliegenheiten', 'Versicherungsnehmer'],
+    date: '2026-09-01',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Kommunikation mit Versicherern, Schadenregulierern und Versicherungsnehmern: Struktur für klare Verfahren',
     description: 'Kommunikation im Schadenfall: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/kommunikation-beteiligte-schadenfall-struktur/',
