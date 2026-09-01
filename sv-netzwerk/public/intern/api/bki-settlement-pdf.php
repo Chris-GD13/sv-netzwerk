@@ -77,7 +77,7 @@ foreach($lines as$line){
 }
 
 if($isKvaReview){
-  $difference=$kvaGross-$totalGross;$approvedGross=$kvaGross;needSpace($pages,$ops,$y,142,false);$y-=14;fillRect($ops,45,$y-110,505,110,$panel);fillRect($ops,45,$y-110,4,110,$orange);
+  $difference=$kvaGross-$totalGross;$approvedGross=(float)($kva['approved_gross']??$kvaGross);if($approvedGross<=0)$approvedGross=$kvaGross;needSpace($pages,$ops,$y,142,false);$y-=14;fillRect($ops,45,$y-110,505,110,$panel);fillRect($ops,45,$y-110,4,110,$orange);
   textLine($ops,60,$y-18,'ERGEBNIS DER KVA-PRÜFUNG',7,true,$muted);textLine($ops,60,$y-37,'Ursprünglicher KVA-Betrag brutto',9,false,$navy);rightText($ops,535,$y-37,money($kvaGross),11,true,$navy);textLine($ops,60,$y-57,'BKI-Nachkalkulation brutto',9,false,$navy);rightText($ops,535,$y-57,money($totalGross),11,true,$navy);textLine($ops,60,$y-77,'Differenz KVA minus BKI',9,false,$navy);rightText($ops,535,$y-77,money($difference),11,true,$navy);textLine($ops,60,$y-97,'Freigegebener Betrag',9,true,$navy);rightText($ops,535,$y-97,money($approvedGross),11,true,$navy);$y-=132;
   $result='Der Kostenvoranschlag der Firma '.$kvaCompany.' mit der Nummer '.$kvaNumber.' über '.money($kvaGross).' brutto wurde mit BKI-Preisen nachkalkuliert. Die BKI-Nachkalkulation beträgt '.money($totalGross).' brutto. Die Differenz KVA minus BKI beträgt '.money($difference).'. Der KVA wurde in Höhe von '.money($approvedGross).' brutto zur Ausführung freigegeben.';
   if($y-125<66)startPage($pages,$ops,$y,false);textLine($ops,45,$y,'Prüfergebnis',13,true,$navy);$y-=8;fillRect($ops,45,$y-2,46,3,$orange);$y-=18;paragraph($pages,$ops,$y,$result,96,9,true);

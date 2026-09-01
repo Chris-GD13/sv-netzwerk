@@ -29,7 +29,8 @@
     const caseNo=String(m.schaden_nr||m.schadenNr||'').trim();
     const vn=String(m.vn_objekt||m.objekt||m.vn||'').trim();
     const location=[m.schaden_strasse||m.strasse,m.schaden_plz||m.plz,m.schaden_ort||m.ort].filter(Boolean).join(', ');
-    return {document_type:documentType,case_no:caseNo,vn,location,date:today(),regulator:regulator(),note:note(),vat:vat(),lines:lines(),kva:kvaReview()};
+    const kva=kvaReview(),approvedInput=document.getElementById('bk-approved-gross')?.value?.trim()||'',approvedGross=approvedInput!==''?germanNumber(approvedInput):kva.gross_total;
+    return {document_type:documentType,case_no:caseNo,vn,location,date:today(),regulator:regulator(),note:note(),vat:vat(),lines:lines(),kva:{...kva,approved_gross:approvedGross}};
   }
 
   function filenameFrom(response,data){
@@ -77,9 +78,9 @@
     if(!host)return;
     const wrap=document.createElement('div');
     wrap.className='bk-pdf-actions';
-    wrap.innerHTML='<button id="bk-create-pdf" type="button" class="bk-secondary">PDF Abgeltungsvereinbarung erstellen</button><button id="bk-create-kva-review" type="button" class="bk-secondary">PDF KVA-Prüfung erstellen</button><button id="bk-mail-pdf" type="button" class="bk-primary">Als E-Mail-Anhang übernehmen</button><span id="bk-pdf-state" class="bk-pdf-state"></span>';
+    wrap.innerHTML='<label class="bk-approved-gross">Freigegebener Betrag brutto<input id="bk-approved-gross" type="text" inputmode="decimal" placeholder="leer = ursprünglicher KVA-Betrag"></label><button id="bk-create-pdf" type="button" class="bk-secondary">PDF Abgeltungsvereinbarung erstellen</button><button id="bk-create-kva-review" type="button" class="bk-secondary">PDF KVA-Prüfung erstellen</button><button id="bk-mail-pdf" type="button" class="bk-primary">Als E-Mail-Anhang übernehmen</button><span id="bk-pdf-state" class="bk-pdf-state"></span>';
     host.insertAdjacentElement('beforebegin',wrap);
-    const style=document.createElement('style');style.textContent='.bk-pdf-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid #dce5ec}.bk-pdf-state{font-size:.82rem;color:#536a7d}.bk-pdf-state[data-state="ok"]{color:#236e50}.bk-pdf-state[data-state="bad"]{color:#a82929}@media print{.bk-pdf-actions{display:none!important}}';document.head.appendChild(style);
+    const style=document.createElement('style');style.textContent='.bk-pdf-actions{display:flex;flex-wrap:wrap;align-items:end;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid #dce5ec}.bk-approved-gross{display:grid;gap:4px;min-width:235px;font-size:.78rem;font-weight:750;color:#536a7d}.bk-approved-gross input{box-sizing:border-box;width:100%;border:1px solid #bdcbd6;border-radius:9px;padding:10px;color:#17324a;background:#fff}.bk-pdf-state{font-size:.82rem;color:#536a7d}.bk-pdf-state[data-state="ok"]{color:#236e50}.bk-pdf-state[data-state="bad"]{color:#a82929}@media print{.bk-pdf-actions{display:none!important}}';document.head.appendChild(style);
     document.getElementById('bk-create-pdf').onclick=async()=>{try{updateStatus('PDF wird erstellt …');await generatePdf({download:true});}catch(error){updateStatus(error.message||String(error),'bad');}};
     document.getElementById('bk-create-kva-review').onclick=async()=>{try{updateStatus('KVA-Prüfung wird erstellt …');await generatePdf({download:true,type:'kva_review'});}catch(error){updateStatus(error.message||String(error),'bad');}};
     document.getElementById('bk-mail-pdf').onclick=async()=>{try{updateStatus('PDF wird vorbereitet …');await handoffToMail();}catch(error){updateStatus(error.message||String(error),'bad');}};
