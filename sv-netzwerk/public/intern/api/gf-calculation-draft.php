@@ -305,7 +305,7 @@ function gfCalculationHasRequiredWaterBlocks(array $result): bool
     return preg_match('/\\b(?:leckageort|ortung|schadenursache|reparatur der leckage)\\b/u', $descriptions) === 1
         && preg_match('/\\btrockn/u', $descriptions) === 1
         && preg_match('/\\b(?:rückbau|rueckbau|abbruch|demontage|ausbau)\\b/u', $descriptions) === 1
-        && preg_match('/\\b(?:wiederherstell|rekonstruktion|erneuern|erneuerung)\\b/u', $descriptions) === 1;
+        && preg_match('/\\b(?:wiederherstell|wiederaufbau|rekonstruktion|erneuer)/u', $descriptions) === 1;
 }
 
 function gfEnsureRequiredWaterCalculationBlocks(array $result, string $evidence, array $meta, string $instructions, string $storeId): array

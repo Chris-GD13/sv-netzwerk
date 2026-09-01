@@ -82,8 +82,8 @@ foreach ([
     'function gfCalculationRequiresWaterBlocks(',
     'function gfCalculationHasRequiredWaterBlocks(',
     'function gfEnsureRequiredWaterCalculationBlocks(',
-    'Werte den Bericht, vorhandene Aufmaße und die dateibezogenen Fotobefunde gemeinsam aus.',
-    'Fotos dürfen sichtbare Bauteile, Schäden und eindeutig zählbare Einzelstücke belegen',
+    'Werte Bericht, vorhandene Aufmaße und die dateibezogenen Fotobefunde gemeinsam aus.',
+    'Mengen aus Bericht, Aufmaß oder eindeutig zählbarem Fotobefund haben Vorrang',
     'Ziel ist eine tatsächlich nutzbare erste Kalkulation und nicht ein leerer Entwurf.',
     'Eine Position darf nicht allein wegen fehlenden Aufmaßes entfallen.',
     'Trocknung, Rückbau einschließlich Entsorgung und Wiederherstellung',
@@ -98,7 +98,7 @@ foreach ([
 }
 
 if (!gfCalculationRequiresWaterBlocks(['schadenart' => 'Leitungswasserschaden'])) {
-    fwrite(STDERR, "Wasserschaden wurde nicht als Fall mit drei Pflicht-Kostenblöcken erkannt.\n");
+    fwrite(STDERR, "Wasserschaden wurde nicht als Fall mit vier Pflicht-Kostenblöcken erkannt.\n");
     exit(1);
 }
 if (gfCalculationRequiresWaterBlocks(['schadenart' => 'Sturmschaden'])) {
@@ -133,7 +133,7 @@ if (($emptyState['lines'] ?? null) !== [] || empty($emptyState['requiresManualCo
     fwrite(STDERR, "Ein aktenbedingt leerer Kalkulationsentwurf wurde nicht zur manuellen Ergänzung freigegeben.\n");
     exit(1);
 }
-foreach (['keine vollständig kalkulierbare Position', 'keine Positionen oder Preise erfunden'] as $needle) {
+foreach (['keine fachlich vertretbare Position', 'zur manuellen Ergänzung angelegt'] as $needle) {
     if (!str_contains((string)($emptyState['note'] ?? ''), $needle)) {
         fwrite(STDERR, "Sicherheitshinweis im leeren Kalkulationsentwurf fehlt: {$needle}.\n");
         exit(1);
@@ -156,7 +156,7 @@ foreach (['statusFailures=0', 'läuft serverseitig weiter.', 'Statusverbindung k
     }
 }
 $insuranceCalculationPage = file_get_contents(__DIR__.'/../src/pages/intern/kalkulation/versicherungsschaeden.astro');
-foreach (['Diesen Fall kalkulieren', 'vs-case-tools', 'waterQuick', "['01.01.000',1,'Ortung / Reparatur']", "['02.01.000',1,'Trocknung']", "['10.00.000',10,'Rückbau']", "['03.01.000',1,'Wiederherstellung']", 'Schnelldurchgang Wasserschaden'] as $needle) {
+foreach (['Diesen Fall kalkulieren', 'vs-case-tools', 'waterQuick', "['01.01.000',1,'Ortung / Reparatur']", "['02.01.000',1,'Trocknung']", "['10.00.000',10,'Rückbau']", "['03.01.000',1,'Wiederherstellung']", "['13.02.000',24,'Rückbau Laminat']", "['13.04.000',24,'Wiederherstellung Laminat']", "['13.05.004',24,'Wiederherstellung Laminat']", 'Schnelldurchgang Wasserschaden'] as $needle) {
     if (!is_string($insuranceCalculationPage) || !str_contains($insuranceCalculationPage, $needle)) {
         fwrite(STDERR, "Wasserschaden-Schnelldurchgang auf der Versicherungsschaden-Kalkulation fehlt: {$needle}\n");
         exit(1);
