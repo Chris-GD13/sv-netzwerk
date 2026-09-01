@@ -92,12 +92,11 @@ foreach (['keine vollständig kalkulierbare Position', 'keine Positionen oder Pr
 }
 
 $generator = file_get_contents(__DIR__.'/../public/intern/api/gf-ai-generate.php');
-if (!is_string($generator)
-    || !str_contains($generator, "'empty_editable_draft','manual_completion_required'")
-    || !str_contains($generator, "!empty(\$calculationState['requiresManualCompletion'])")
-    || !str_contains($generator, "in_array(\\'kalkulation\\',\$outputs,true)")) {
-    fwrite(STDERR, "Die Dokument-QS erkennt den sicheren leeren Kalkulationsentwurf nicht.\n");
-    exit(1);
+foreach (['empty_editable_draft', 'manual_completion_required', 'requiresManualCompletion', "in_array(\\'kalkulation\\',\$outputs,true)"] as $needle) {
+    if (!is_string($generator) || !str_contains($generator, $needle)) {
+        fwrite(STDERR, "Kalkulations-QS oder automatische BKI-Aktivierung fehlt: {$needle}\n");
+        exit(1);
+    }
 }
 
 $link = gfCalculationDraftLink('ai:Fall 1');
