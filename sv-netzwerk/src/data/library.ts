@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Abgrenzung versicherter und nicht versicherter Schadteile: Methodik für belastbare Freigaben',
+    description: 'Abgrenzung versicherter Schadteile: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/abgrenzung-versicherter-nichtversicherter-schadteil/',
+    category: 'Abgrenzung versicherter Schadteile',
+    tags: ['Schadenabgrenzung', 'Versicherungsdeckung', 'Vorzustand', 'Instandhaltung', 'Regulierung'],
+    date: '2026-09-02',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Gutachter-Plattform und regionale Sachverständigennetzwerke: Mehrwert bei Kumulereignissen',
     description: 'Gutachter-Plattform und regionale Netzwerke: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/gutachter-plattform-regional-kumulschaden/',

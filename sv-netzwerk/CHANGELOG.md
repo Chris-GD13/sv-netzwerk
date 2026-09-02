@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.43 – 2026-09-02
+- automatischer nachmittags Fachbeitrag veröffentlicht: „Abgrenzung versicherter und nicht versicherter Schadteile: Methodik für belastbare Freigaben"
+- LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
+- ohne Beitragsbild veröffentlicht; keine typografische Platzhaltergrafik erzeugt
+
 ## 3.4.42 – 2026-09-02
 - automatischer morgens Fachbeitrag veröffentlicht: „Gutachter-Plattform und regionale Sachverständigennetzwerke: Mehrwert bei Kumulereignissen"
 - LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
