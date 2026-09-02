@@ -24,7 +24,8 @@ const calculationPromptIndex = runtime.indexOf("if($key==='kalkulation')$respons
 const bkiTernaryIndex = runtime.indexOf(";$bkiRule=$bkiRequested?", calculationPromptIndex);
 assert.ok(protocolPromptIndex >= 0 && protocolPromptIndex < calculationPromptIndex, 'protocol prompt must be inserted before the calculation prompt');
 assert.ok(calculationPromptIndex < bkiTernaryIndex, 'all response rules must be complete before the existing BKI ternary continues');
-assert.match(portal, /queue=\[primary,\.\.\.additional,protocol\]\.filter\(Boolean\)/);
+assert.match(portal, /const selectedOutputs=\(\)=>/);
+assert.match(portal, /const queue=selectedOutputs\(\)/);
 assert.doesNotMatch(portal, /navigator\.clipboard\.writeText\(prompt\)/);
 
 console.log('Schadenprotokoll-Vorlagenwahl, Kopfpositionen, Privat-/Gewerbe-Zuordnung und Portalauftrag: OK');
