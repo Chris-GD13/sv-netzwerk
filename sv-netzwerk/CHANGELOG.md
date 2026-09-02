@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.42 – 2026-09-02
+- automatischer morgens Fachbeitrag veröffentlicht: „Gutachter-Plattform und regionale Sachverständigennetzwerke: Mehrwert bei Kumulereignissen"
+- LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
+- ohne Beitragsbild veröffentlicht; keine typografische Platzhaltergrafik erzeugt
+
 ## 3.4.41 – 2026-09-01
 - automatischer nachmittags Fachbeitrag veröffentlicht: „Massenanfall von Einzelschäden: Einsatzsteuerung bei außergewöhnlich hoher Schadenfrequenz"
 - LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
