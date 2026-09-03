@@ -48,7 +48,7 @@ $incompleteSourceState = gfCalculationDraftState(['items' => [[
     'unit_price' => 100,
 ]]], [], '');
 if (empty($incompleteSourceState['requiresManualCompletion'])
-    || !str_contains(implode(' ', $incompleteSourceState['validationIssues'] ?? []), 'Quelle fehlt')) {
+    || !str_contains(implode(' ', $incompleteSourceState['validationIssues'] ?? []), 'Mengenquelle fehlt')) {
     fwrite(STDERR, "Unbelegte Kalkulationsposition wurde nicht als manuell zu ergänzen markiert.\n");
     exit(1);
 }
@@ -88,6 +88,13 @@ if (!str_contains((string)($provisionalState['note'] ?? ''), 'Vorläufig geschä
 
 $calculationHelper = file_get_contents(__DIR__.'/../public/intern/api/gf-calculation-draft.php');
 foreach ([
+    'function gfCalculationAssessmentRule(',
+    'kurze Gesamtaussage mit angebotener und maximal vertretbarer Netto-/Bruttosumme',
+    'Mengenermittlung mit Anzahl, Einzelabmessungen, Rechenwegen und Gesamtsumme',
+    'eigene Nachkalkulation mit Material, Nebenmaterial, Transport, Vorbereitung/Zuschnitt, Arbeitszeit sowie Entsorgung',
+    'Gegenüberstellung von KVA und Nachkalkulation jeweils netto und brutto einschließlich Differenzen und prozentualer Abweichung',
+    'unmittelbar verwendbare Regulierungsempfehlung als vollständiger Textblock',
+    'Weiterverwendete Bauteile und Profile dürfen nicht als Erneuerungsleistung angesetzt werden.',
     'function gfPlanCalculationFromEvidence(',
     'function gfPriceCalculationPlan(',
     'function gfCalculationRequiresWaterBlocks(',
