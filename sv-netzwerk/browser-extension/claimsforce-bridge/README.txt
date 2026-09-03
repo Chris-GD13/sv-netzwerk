@@ -12,3 +12,5 @@ Bei Susanne bestimmt die Auswahl "Bearbeitung für", in welchen persönlichen Fa
 Manuell geänderte Falldaten werden nicht überschrieben. Neue ClaimsForce-Werte ergänzen nur bisher leere Felder.
 Bereits vollständig importierte und unveränderte Fälle werden übersprungen. Bei Änderungen werden nur neue oder geänderte Unterlagen, Nachrichten und Termine ergänzt.
 Vor einer namentlichen Anmeldung entfernt die Brücke ausschließlich die Sitzungsdaten von ClaimsForce und ClaimsForce-Auth0. Dadurch können alte Chrome-Autofill- oder SSO-Sitzungen nicht mehr versehentlich unter dem neu ausgewählten Profil weiterlaufen.
+
+Werktags um 03:00 Uhr öffnet oder lädt die Brücke die zentrale Importstation und reiht dort nacheinander die Aufträge aller vier hinterlegten SV-Profile ein. Chrome und der Rechner müssen dafür laufen. Wird Chrome erst später gestartet, wird der Import bis 10:00 Uhr nachgeholt. Ein gespeicherter ClaimsForce-Zugang wird nur noch verwendet, wenn seine E-Mail-Adresse eindeutig zum ausgewählten Bearbeiterprofil gehört.

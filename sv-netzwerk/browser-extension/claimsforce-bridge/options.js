@@ -1,9 +1,11 @@
 import { saveCredentials, loadCredentials, clearCredentials, savePortalCredentials, loadPortalCredentials, clearPortalCredentials } from './vault.js';
-const OPTIONS_CODE_VERSION = '1.3.15';
+const OPTIONS_CODE_VERSION = '1.3.16';
 if (localStorage.getItem('svnet-bridge-options-code-version') !== OPTIONS_CODE_VERSION) {
   localStorage.setItem('svnet-bridge-options-code-version', OPTIONS_CODE_VERSION);
 }
 const profile = document.querySelector('#profile'), email = document.querySelector('#email'), password = document.querySelector('#password'), state = document.querySelector('#state');
+const profileEmails = { christian: 'cw@sv-schuett.eu', holger: 'hr@sv-schuett.eu', marc: 'ms@sv-schuett.eu', jens: 'ws@sv-schuett.eu' };
+const normalizeEmail = value => String(value || '').trim().toLowerCase();
 const active = (await chrome.storage.session.get('activeProfile')).activeProfile;
 const supportedProfiles = [...profile.options].map(option => option.value);
 if (!active) profile.value = 'christian';
@@ -16,6 +18,7 @@ await showProfile();
 document.querySelector('#form').addEventListener('submit', async event => {
   event.preventDefault();
   if (!supportedProfiles.includes(profile.value)) { state.textContent = 'Bitte ein gültiges Bearbeiterprofil auswählen.'; state.className = ''; return; }
+  if (normalizeEmail(email.value) !== profileEmails[profile.value]) { state.textContent = `Die E-Mail-Adresse gehört nicht zum ausgewählten Bearbeiterprofil. Erwartet wird ${profileEmails[profile.value]}.`; state.className = ''; return; }
   const savedPassword = password.value || currentCredentials?.password || '';
   if (!savedPassword) { state.textContent = 'Bitte das ClaimsForce-Kennwort eingeben.'; state.className = ''; return; }
   await saveCredentials(profile.value, { email: email.value.trim(), password: savedPassword });

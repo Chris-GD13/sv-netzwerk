@@ -134,12 +134,15 @@ if($action==='schedule'){
     $now=new DateTimeImmutable('now',new DateTimeZone('Europe/Berlin'));
     $weekday=(int)$now->format('N');
     $clock=(int)$now->format('Hi');
-    if($weekday>5||$clock<230||$clock>=800)apiJson(['ok'=>true,'scheduled'=>false,'reason'=>'outside-window']);
-    $profile='christian';
-    $scheduleKey='claims-auto-'.$now->format('Y-m-d').'-'.$profile;
+    if($weekday>5||$clock<300||$clock>=1000)apiJson(['ok'=>true,'scheduled'=>false,'reason'=>'outside-window']);
     $s=db()->prepare("INSERT IGNORE INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,schedule_key,created_at) VALUES(:p,'queued',:u,'Automatischer Werktagsimport wartet auf die zentrale Importstation.','CF-AUTO-QUEUED',:k,NOW())");
-    $s->execute([':p'=>$profile,':u'=>'system:claimsforce',':k'=>$scheduleKey]);
-    apiJson(['ok'=>true,'scheduled'=>$s->rowCount()===1,'schedule_key'=>$scheduleKey]);
+    $scheduled=[];
+    foreach(svnetSupportedProfiles()as$profile){
+        $scheduleKey='claims-auto-'.$now->format('Y-m-d').'-'.$profile;
+        $s->execute([':p'=>$profile,':u'=>'system:claimsforce',':k'=>$scheduleKey]);
+        if($s->rowCount()===1)$scheduled[]=$profile;
+    }
+    apiJson(['ok'=>true,'scheduled'=>count($scheduled)>0,'profiles'=>$scheduled]);
 }
 
 if($action==='active'){

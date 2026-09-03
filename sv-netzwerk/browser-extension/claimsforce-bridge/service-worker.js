@@ -1,18 +1,29 @@
-import { loadCredentials, loadPortalCredentials, saveCredentials } from './vault.js';
+import { clearCredentials, loadCredentials, loadPortalCredentials, saveCredentials } from './vault.js';
 import { mapClaim, safeFileName } from './import-utils.js';
 
 const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
 const PLANNING_URL = 'https://web.claimsforce.com/planning?bucket=WITH_FUTURE_APPOINTMENT#with-future-appointment';
 const CLAIMS_ORIGINS = ['https://web.claimsforce.com', 'https://claimsforce.eu.auth0.com'];
 const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens'];
+const PROFILE_EMAILS = {
+  christian: 'cw@sv-schuett.eu',
+  holger: 'hr@sv-schuett.eu',
+  marc: 'ms@sv-schuett.eu',
+  jens: 'ws@sv-schuett.eu'
+};
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*';
+const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/';
+const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
+const DAILY_IMPORT_ALARM = 'svnet-claimsforce-daily-0300';
 const profileKey = value => {
   const profile = String(value || '').trim().toLowerCase();
   if (!SUPPORTED_PROFILES.includes(profile)) throw new Error('Ungültiges ClaimsForce-Profil.');
   return profile;
 };
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const normalizeEmail = value => String(value || '').trim().toLowerCase();
+const credentialMatchesProfile = (profile, credentials) => normalizeEmail(credentials?.email) === PROFILE_EMAILS[profileKey(profile)];
 const authHeaders = token => ({ Authorization: `Bearer ${token}`, Accept: 'application/json' });
 let runningImport = null;
 let credentialDiagnostic = 'idle';
@@ -38,6 +49,48 @@ async function activateBridgeVersion() {
 }
 activateBridgeVersion().catch(() => {});
 
+function nextWeekdayImportAt(now = new Date()) {
+  const next = new Date(now);
+  next.setHours(3, 0, 0, 0);
+  if (next <= now) next.setDate(next.getDate() + 1);
+  while (next.getDay() === 0 || next.getDay() === 6) next.setDate(next.getDate() + 1);
+  return next.getTime();
+}
+
+async function scheduleDailyImportAlarm() {
+  await chrome.alarms.create(DAILY_IMPORT_ALARM, { when: nextWeekdayImportAt() });
+}
+
+async function wakeCentralImportStation() {
+  const portalTabs = await chrome.tabs.query({ url: PORTAL_TAB_PATTERN });
+  const portalTab = portalTabs.find(tab => Number.isInteger(tab.id));
+  if (portalTab) {
+    await chrome.tabs.reload(portalTab.id);
+    return;
+  }
+  const loginTabs = await chrome.tabs.query({ url: PORTAL_LOGIN_PATTERN });
+  const loginTab = loginTabs.find(tab => Number.isInteger(tab.id));
+  if (loginTab) {
+    await chrome.tabs.update(loginTab.id, { url: PORTAL_URL, active: false });
+    return;
+  }
+  await chrome.tabs.create({ url: PORTAL_URL, active: false });
+}
+
+async function catchUpMorningImport() {
+  const now = new Date();
+  const clock = now.getHours() * 100 + now.getMinutes();
+  if (now.getDay() !== 0 && now.getDay() !== 6 && clock >= 300 && clock < 1000) await wakeCentralImportStation();
+}
+
+chrome.alarms.onAlarm.addListener(alarm => {
+  if (alarm.name !== DAILY_IMPORT_ALARM) return;
+  wakeCentralImportStation().finally(() => scheduleDailyImportAlarm().catch(() => {}));
+});
+chrome.runtime.onInstalled.addListener(() => scheduleDailyImportAlarm().then(catchUpMorningImport).catch(() => {}));
+chrome.runtime.onStartup.addListener(() => scheduleDailyImportAlarm().then(catchUpMorningImport).catch(() => {}));
+scheduleDailyImportAlarm().catch(() => {});
+
 async function diagnostic(run, phase, text, details = {}) {
   const entry = { runId: run.runId, jobId: run.jobId || 0, profile: run.profile, phase, text, details, at: new Date().toISOString() };
   await chrome.storage.local.set({ claimsImportDiagnostic: entry, claimsActiveRun: { ...run, status: 'running', phase, updatedAt: entry.at } });
@@ -48,18 +101,23 @@ async function credentialsFor(profile) {
   profile = profileKey(profile);
   credentialDiagnostic = 'vault';
   const saved = await Promise.race([loadCredentials(profile).catch(() => null), sleep(600).then(() => null)]);
-  if (saved?.email && saved?.password) { credentialDiagnostic = 'vault-ready'; return { value: saved, source: 'vault' }; }
+  if (saved?.email && saved?.password && credentialMatchesProfile(profile, saved)) { credentialDiagnostic = 'vault-ready'; return { value: saved, source: 'vault' }; }
+  if (saved?.email && saved?.password) {
+    credentialDiagnostic = 'vault-profile-mismatch';
+    await clearCredentials(profile).catch(() => {});
+  }
   credentialDiagnostic = 'native-host';
   try {
     const local = await Promise.race([
       chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile }),
       sleep(800).then(() => null)
     ]);
-    if (local?.email && local?.password) {
+    if (local?.email && local?.password && credentialMatchesProfile(profile, local)) {
       await saveCredentials(profile, local).catch(() => {});
       credentialDiagnostic = 'native-host-ready';
       return { value: local, source: 'native-host' };
     }
+    if (local?.email && local?.password) credentialDiagnostic = 'native-host-profile-mismatch';
   } catch {}
   credentialDiagnostic = 'local-config';
   try {
@@ -71,8 +129,8 @@ async function credentialsFor(profile) {
     endpoint.searchParams.set('profile', profile);
     const response = await fetch(endpoint, { headers: { 'X-SVNET-Token': config.token } });
     const local = response.ok ? await response.json() : null;
-    credentialDiagnostic = response.ok ? (local?.email && local?.password ? 'loopback-ready' : 'loopback-incomplete') : `loopback-http-${response.status}`;
-    if (local?.email && local?.password) {
+    credentialDiagnostic = response.ok ? (local?.email && local?.password ? (credentialMatchesProfile(profile, local) ? 'loopback-ready' : 'loopback-profile-mismatch') : 'loopback-incomplete') : `loopback-http-${response.status}`;
+    if (local?.email && local?.password && credentialMatchesProfile(profile, local)) {
       await saveCredentials(profile, local).catch(() => {});
       return { value: local, source: 'loopback' };
     }
@@ -192,7 +250,7 @@ async function requestJson(url, token, optional = false, timeout = 20000) {
 }
 
 async function portal(tabId, message) {
-  const response = await Promise.race([chrome.tabs.sendMessage(tabId, message), sleep(30000).then(() => ({ ok: false, error: 'Das SV-Netzwerk hat innerhalb von 30 Sekunden nicht geantwortet.' }))]);
+  const response = await Promise.race([chrome.tabs.sendMessage(tabId, message), sleep(120000).then(() => ({ ok: false, error: 'Das SV-Netzwerk hat innerhalb von 120 Sekunden nicht geantwortet.' }))]);
   if (!response?.ok) throw new Error(response?.error || 'Das SV-Netzwerk hat den Import nicht angenommen.');
   return response;
 }
@@ -257,6 +315,7 @@ async function runImport(run) {
   const credential = await credentialsFor(profile);
   await diagnostic(run, 'CF-CRED-01', credential ? 'Zugangsdatenquelle ist verfügbar.' : 'Für das Profil ist keine Zugangsdatenquelle verfügbar.', { source: credential?.source || 'keine' });
   if (!credential) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar.');
+  if (!credentialMatchesProfile(profile, credential.value)) throw new Error('[CF-CRED-02] Das gespeicherte ClaimsForce-Konto gehört nicht zum ausgewählten Bearbeiterprofil.');
   const { tab, token } = await claimsTab(profile, run, credential);
   await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
   const openTasks = await readOpenTasks(tab.id);
