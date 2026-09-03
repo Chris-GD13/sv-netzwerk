@@ -36,6 +36,7 @@
   };
   const versionAtLeast=(actual,required)=>{const a=String(actual).split('.').map(Number),r=String(required).split('.').map(Number);for(let i=0;i<3;i++){if((a[i]||0)!==(r[i]||0))return(a[i]||0)>(r[i]||0)}return true};
   const resultOf=job=>{try{return typeof job.result==='string'?JSON.parse(job.result):job.result||{}}catch{return{}}};
+  const browserRuntime=()=>{const [status='',phase='',jobId='0',profile='']=String(document.documentElement.getAttribute('data-svnet-claims-runtime')||'').split('|');return{status,phase,jobId:Number(jobId||0),profile}};
   const heartbeat=()=>agentJob?post('heartbeat',{id:agentJob.id,message:lastRuntime.message,phase:lastRuntime.phase,current:lastRuntime.current,total:lastRuntime.total,diagnostic:lastRuntime.diagnostic}).catch(()=>{}):Promise.resolve();
 
   async function watch(){
@@ -90,7 +91,14 @@
     try{
       await post('schedule');
       const active=await post('active');
-      if(active.job)show(`Import ${active.job.id} ist noch als laufend markiert und wird nicht automatisch neu gestartet.`,true);
+      if(active.job){
+        const runtime=browserRuntime();
+        if(runtime.status==='failed'&&runtime.jobId===Number(active.job.id)){
+          await post('complete',{id:Number(active.job.id),ok:false,result:null,message:`Browserlauf wurde abgebrochen (${runtime.phase||'CF-RUNTIME'}).`});
+          show(`Import ${active.job.id} wurde nach einem abgebrochenen Browserlauf sicher beendet.`,true);
+          await resumeWatch();
+        }else show(`Import ${active.job.id} ist noch als laufend markiert und wird nicht automatisch neu gestartet.`,true);
+      }
       else{
         const claimed=await post('claim');
         if(claimed.job)await launch(claimed.job,false);
