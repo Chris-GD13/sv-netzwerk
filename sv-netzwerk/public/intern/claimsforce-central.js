@@ -22,7 +22,7 @@
     }
   };
   placeImportCards();
-  let context={},bridge=false,bridgeVersion='',agentJob=null,userJobs=[],busy=false,reconciling=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
+  let context={},bridge=false,bridgeVersion='',agentJob=null,userJobs=[],busy=false,reconciling=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}},reconciledJobs=new Set();
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
   const driveStatus=()=>window.svnetDriveStatus?window.svnetDriveStatus():json('/intern/api/google-drive-sync.php?action=status');
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
@@ -128,13 +128,14 @@
     }
     if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&!agentJob&&!reconciling){
       const active=d.status?.active||{},diag=d.status?.diagnostic||{};
-      if(active.status==='failed'&&Number(active.jobId||0)>0){
+      if(active.status==='failed'&&Number(active.jobId||0)>0&&!reconciledJobs.has(Number(active.jobId))){
+        reconciledJobs.add(Number(active.jobId));
         reconciling=true;
         try{
           await post('complete',{id:Number(active.jobId),ok:false,result:null,message:`Browserlauf wurde abgebrochen (${diag.phase||active.phase||'CF-RUNTIME'}).`});
           show(`Import ${active.jobId} wurde nach einem abgebrochenen Browserlauf sicher beendet.`,true);
           await resumeWatch();
-        }catch(error){show(`Import ${active.jobId}: Abbruchstatus konnte nicht gespeichert werden (${error.message}).`,true)}
+        }catch(error){if(!/bereits abgeschlossen|erneut eingeplant/i.test(error.message))show(`Import ${active.jobId}: Abbruchstatus konnte nicht gespeichert werden (${error.message}).`,true)}
         finally{reconciling=false}
       }
     }

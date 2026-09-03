@@ -78,7 +78,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20260903-4'), 'Portal lädt die kompatible Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20260903-5'), 'Portal lädt die kompatible Brückensteuerung ohne alten Browsercache');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(portal.includes(`<option value="${key}">${label}</option>`), `${label} ist als Bearbeiterprofil auswählbar`);
 assert(!portal.includes('<option value="susanne"') && !portal.includes('Susanne Wächter</option>'), 'Susanne darf nicht als eigenes Bearbeiterprofil erscheinen');
 assert(portal.includes("sessionStorage.removeItem('svnet-case')") && portal.includes("localStorage.removeItem('svnet-case')"), 'Profilwechsel löscht den aktiven Fall aus beiden Browser-Speichern');
@@ -182,6 +182,7 @@ assert(central.includes('SVNET_CLAIMS_RUNTIME_STATUS') && central.includes('SVNE
 assert(central.includes("minimumBridgeVersion='1.3.17'") && central.includes('versionAtLeast(bridgeVersion,minimumBridgeVersion)'), 'Die zentrale Importstation darf nur mit der gegen Profilverwechslung abgesicherten Brücke laufen');
 assert(central.includes("runtime.status==='failed'") && central.includes('Browserlauf wurde abgebrochen'), 'Ein im Browser bereits fehlgeschlagener Lauf muss den noch aktiven Serverauftrag sicher beenden');
 assert(central.includes("d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&!agentJob&&!reconciling") && central.includes('button.disabled=false'), 'Ein vor der Auftragsuebernahme gemeldeter Browserabbruch muss abgeglichen und die Importschaltflaeche wieder freigegeben werden');
+assert(central.includes('reconciledJobs=new Set()') && central.includes('reconciledJobs.add(Number(active.jobId))'), 'Ein bereits abgeglichener Browserabbruch darf nicht bei jedem Laufzeit-Ping erneut gemeldet werden');
 assert(central.includes("currentBridgeVersion='1.3.17'") && central.includes('steht als empfohlenes Update bereit'), 'Die aktuelle Brücke muss weiterhin als empfohlenes Update angezeigt werden');
 assert(central.includes('context.claims_agent&&!bridge') && central.includes('Diese zentrale Importstation ist nicht bereit'), 'Eine veraltete zentrale Brücke darf keinen weiteren dauerhaft wartenden Importauftrag erzeugen');
 assert(central.includes('!d.backoffice&&supportedProfiles.includes') && central.includes('settings?.remove()') && central.includes('download?.remove()'), 'Alle vier Sachverständigen nutzen Susannes zentrale Brücke statt einer eigenen Installation');
