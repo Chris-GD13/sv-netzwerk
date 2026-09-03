@@ -20,7 +20,7 @@ function gfCalculationDraftState(array $result, array $meta, string $instruction
 {
     $rawItems = is_array($result['items'] ?? null) ? $result['items'] : [];
     $lines = [];
-    $errors = [];
+    $issues = [];
     foreach ($rawItems as $index => $item) {
         if (!is_array($item)) continue;
         $line = [
@@ -40,20 +40,21 @@ function gfCalculationDraftState(array $result, array $meta, string $instruction
         }
         if ($line['regional_factor'] <= 0) $line['regional_factor'] = 1.0;
         $number = $index + 1;
-        if ($line['description'] === '') $errors[] = 'Position '.$number.': Leistungsbeschreibung fehlt.';
-        if ($line['quantity'] <= 0) $errors[] = 'Position '.$number.': Menge fehlt.';
-        if ($line['unit'] === '') $errors[] = 'Position '.$number.': Einheit fehlt.';
-        if ($line['unit_price'] <= 0) $errors[] = 'Position '.$number.': belastbarer Einheitspreis fehlt.';
-        if ($line['source_name'] === '') $errors[] = 'Position '.$number.': Preis- oder Mengenquelle fehlt.';
+        if ($line['description'] === '') $issues[] = 'Position '.$number.': Leistungsbeschreibung fehlt.';
+        if ($line['quantity'] <= 0) $issues[] = 'Position '.$number.': Menge fehlt.';
+        if ($line['unit'] === '') $issues[] = 'Position '.$number.': Einheit fehlt.';
+        if ($line['unit_price'] <= 0) $issues[] = 'Position '.$number.': belastbarer Einheitspreis fehlt.';
+        if ($line['source_name'] === '') $issues[] = 'Position '.$number.': Preis- oder Mengenquelle fehlt.';
         $lines[] = $line;
     }
-    if (count($lines) > 200) $errors[] = 'Mehr als 200 Kalkulationspositionen sind nicht zulässig.';
-    if ($errors) throw new RuntimeException('Kalkulations-QS-Sperre: '.implode(' ', $errors));
+    if (count($lines) > 200) throw new RuntimeException('Kalkulations-QS-Sperre: Mehr als 200 Kalkulationspositionen sind nicht zulässig.');
 
     $notes = ['KI-Erstentwurf – vor Verwendung sämtliche Positionen, Mengen und Preise fachlich prüfen.'];
-    $requiresManualCompletion = !$lines;
-    if ($requiresManualCompletion) {
+    $requiresManualCompletion = !$lines || (bool)$issues;
+    if (!$lines) {
         $notes[] = 'Aus Bericht, Bildern und sonstigen Aktenangaben konnte keine fachlich vertretbare Position mit belegter oder vorläufig schätzbarer Menge, Einheitspreis und Quelle abgeleitet werden. Der leere Entwurf wurde deshalb zur manuellen Ergänzung angelegt.';
+    } elseif ($issues) {
+        $notes[] = 'Unvollständige Positionen – vor weiterer Verwendung manuell ergänzen: '.implode(' ', $issues);
     }
     $summary = trim((string)($result['summary'] ?? ''));
     if ($summary !== '') $notes[] = $summary;
@@ -95,6 +96,7 @@ function gfCalculationDraftState(array $result, array $meta, string $instruction
         'lines' => $lines,
         'pendingQueries' => [],
         'requiresManualCompletion' => $requiresManualCompletion,
+        'validationIssues' => $issues,
         'updatedAt' => gmdate('c'),
     ];
 }

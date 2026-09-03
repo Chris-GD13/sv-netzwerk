@@ -41,19 +41,30 @@ foreach (['KI-Erstentwurf', 'Mengenquellen:', 'Aufmaß.pdf, Seite 2', 'Annahmen:
     }
 }
 
-$rejected = false;
-try {
-    gfCalculationDraftState(['items' => [[
-        'description' => 'Unbelegte Position',
-        'quantity' => 1,
-        'unit' => 'St',
-        'unit_price' => 100,
-    ]]], [], '');
-} catch (RuntimeException $error) {
-    $rejected = str_contains($error->getMessage(), 'quelle') || str_contains($error->getMessage(), 'Quelle');
+$incompleteSourceState = gfCalculationDraftState(['items' => [[
+    'description' => 'Unbelegte Position',
+    'quantity' => 1,
+    'unit' => 'St',
+    'unit_price' => 100,
+]]], [], '');
+if (empty($incompleteSourceState['requiresManualCompletion'])
+    || !str_contains(implode(' ', $incompleteSourceState['validationIssues'] ?? []), 'Quelle fehlt')) {
+    fwrite(STDERR, "Unbelegte Kalkulationsposition wurde nicht als manuell zu ergänzen markiert.\n");
+    exit(1);
 }
-if (!$rejected) {
-    fwrite(STDERR, "Unbelegte Kalkulationsposition wurde nicht gesperrt.\n");
+
+$missingQuantityState = gfCalculationDraftState(['items' => [[
+    'description' => 'Vollständige Position', 'quantity' => 1, 'unit' => 'St', 'unit_price' => 10, 'source_name' => 'BKI 2026',
+], [
+    'description' => 'Position ohne Menge 1', 'quantity' => null, 'unit' => 'm²', 'unit_price' => 20, 'source_name' => 'BKI 2026',
+], [
+    'description' => 'Position ohne Menge 2', 'quantity' => 0, 'unit' => 'm', 'unit_price' => 30, 'source_name' => 'BKI 2026',
+]]], [], '');
+if (count($missingQuantityState['lines'] ?? []) !== 3
+    || empty($missingQuantityState['requiresManualCompletion'])
+    || !str_contains((string)($missingQuantityState['note'] ?? ''), 'Position 2: Menge fehlt.')
+    || !str_contains((string)($missingQuantityState['note'] ?? ''), 'Position 3: Menge fehlt.')) {
+    fwrite(STDERR, "Fehlende Mengen wurden nicht in einen bearbeitbaren, manuell zu ergänzenden Entwurf überführt.\n");
     exit(1);
 }
 
@@ -141,7 +152,7 @@ foreach (['keine fachlich vertretbare Position', 'zur manuellen Ergänzung angel
 }
 
 $generator = file_get_contents(__DIR__.'/../public/intern/api/gf-ai-generate.php');
-foreach (['empty_editable_draft', 'manual_completion_required', 'requiresManualCompletion', "in_array(\\'kalkulation\\',\$outputs,true)"] as $needle) {
+foreach (['editable_draft_saved', 'manual_completion_required', 'requiresManualCompletion', "in_array(\\'kalkulation\\',\$outputs,true)"] as $needle) {
     if (!is_string($generator) || !str_contains($generator, $needle)) {
         fwrite(STDERR, "Kalkulations-QS oder automatische BKI-Aktivierung fehlt: {$needle}\n");
         exit(1);
