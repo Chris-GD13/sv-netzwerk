@@ -82,6 +82,9 @@ jobs:
       - name: Stabilen Evidenz-Zwischenspeicher prüfen
         run: php sv-netzwerk/tests/gf_evidence_cache_test.php
 
+      - name: BKI-Kontext-Routing prüfen
+        run: php sv-netzwerk/tests/gf_bki_context_routing_test.php
+
       - name: Zusammengesetzte KI-Runtime prüfen
         run: |
           php -l sv-netzwerk/public/intern/api/gf-ai-generate-core.php

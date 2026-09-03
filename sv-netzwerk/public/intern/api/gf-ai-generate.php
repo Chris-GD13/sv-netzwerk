@@ -318,7 +318,12 @@ $source = str_replace($protocolValidationNeedle, $protocolValidationReplacement,
 if ($protocolValidationCount !== 1) throw new RuntimeException('Schadenprotokoll-QS konnte nicht angebunden werden.');
 
 $calculationBkiNeedle = '$bkiRequested=preg_match(\'/\\bBKI\\b/ui\',$instructions)===1;';
-$calculationBkiReplacement = '$bkiRequested=in_array(\'kalkulation\',$outputs,true)||preg_match(\'/\\bBKI\\b/ui\',$instructions)===1;';
+// Die beiden umfangreichen BKI-Altbauwerke nur an die eigentliche Kalkulation
+// anhängen. In Berichten reicht ein BKI-Hinweis im Arbeitsauftrag nicht aus:
+// dort werden bereits belegte Beträge aus der dateibezogenen Fallevidenz
+// übernommen. Andernfalls kann schon die Erwähnung "mittels BKI ermittelt"
+// zusammen mit den Regelwerken das Modell-Kontextfenster überschreiten.
+$calculationBkiReplacement = '$bkiRequested=in_array(\'kalkulation\',$outputs,true);';
 $source = str_replace($calculationBkiNeedle, $calculationBkiReplacement, $source, $calculationBkiCount);
 if ($calculationBkiCount !== 1) throw new RuntimeException('BKI-Grundlage der Kalkulation konnte nicht angebunden werden.');
 
