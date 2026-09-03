@@ -78,7 +78,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20260903-2'), 'Portal lädt die kompatible Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20260903-3'), 'Portal lädt die kompatible Brückensteuerung ohne alten Browsercache');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(portal.includes(`<option value="${key}">${label}</option>`), `${label} ist als Bearbeiterprofil auswählbar`);
 assert(!portal.includes('<option value="susanne"') && !portal.includes('Susanne Wächter</option>'), 'Susanne darf nicht als eigenes Bearbeiterprofil erscheinen');
 assert(portal.includes("sessionStorage.removeItem('svnet-case')") && portal.includes("localStorage.removeItem('svnet-case')"), 'Profilwechsel löscht den aktiven Fall aus beiden Browser-Speichern');
