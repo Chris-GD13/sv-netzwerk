@@ -22,7 +22,7 @@
     }
   };
   placeImportCards();
-  let context={},bridge=false,bridgeVersion='',agentJob=null,userJobs=[],busy=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
+  let context={},bridge=false,bridgeVersion='',agentJob=null,userJobs=[],busy=false,reconciling=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
   const driveStatus=()=>window.svnetDriveStatus?window.svnetDriveStatus():json('/intern/api/google-drive-sync.php?action=status');
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
@@ -55,6 +55,7 @@
       const recent=await json('/intern/api/claimsforce-queue.php?action=mine');
       userJobs=(recent.jobs||[]).filter(job=>['queued','running'].includes(job.status)).map(job=>Number(job.id));
       if(userJobs.length){button.disabled=true;watch();return}
+      button.disabled=false;
       const terminal=(recent.jobs||[]).filter(job=>['done','failed'].includes(job.status)).slice(0,4);
       if(terminal.length){const compact=terminal.map(job=>`${job.id}|${job.profile}|${job.status}|${job.phase||'CF-STATUS'}`).join(';');document.documentElement.setAttribute('data-svnet-claims-jobs',compact);const results=terminal.map(job=>{const r=resultOf(job);return`${job.id}|${Number(r.claims||0)}|${Number(r.updated||0)}|${Number(r.skipped||0)}|${Number(r.files||0)}|${Number(r.messages||0)}|${Number(r.appointments||0)}`}).join(';');document.documentElement.setAttribute('data-svnet-claims-results',results);const text=terminal.map(job=>`${job.profile}: ${job.status==='done'?'abgeschlossen':'fehlgeschlagen'} [${job.phase||'CF-STATUS'}] – ${job.message||'ohne Meldung'}`).join(' · '),failed=terminal.some(job=>job.status==='failed');show(text,failed);window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'));setTimeout(()=>show(text,failed),1000)}
     }catch(e){show('Importstatus konnte nicht wiederhergestellt werden: '+e.message,true)}
@@ -124,6 +125,18 @@
       bridge=versionAtLeast(bridgeVersion,minimumBridgeVersion);
       if(!bridge)show(`Browser-Brücke ${minimumBridgeVersion} oder neuer erforderlich (geladen: ${bridgeVersion}).`,true);
       else if(!versionAtLeast(bridgeVersion,currentBridgeVersion))show(`Browser-Brücke ${bridgeVersion} ist einsatzbereit. Version ${currentBridgeVersion} steht als empfohlenes Update bereit.`);
+    }
+    if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&!agentJob&&!reconciling){
+      const active=d.status?.active||{},diag=d.status?.diagnostic||{};
+      if(active.status==='failed'&&Number(active.jobId||0)>0){
+        reconciling=true;
+        try{
+          await post('complete',{id:Number(active.jobId),ok:false,result:null,message:`Browserlauf wurde abgebrochen (${diag.phase||active.phase||'CF-RUNTIME'}).`});
+          show(`Import ${active.jobId} wurde nach einem abgebrochenen Browserlauf sicher beendet.`,true);
+          await resumeWatch();
+        }catch(error){show(`Import ${active.jobId}: Abbruchstatus konnte nicht gespeichert werden (${error.message}).`,true)}
+        finally{reconciling=false}
+      }
     }
     if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&agentJob){
       const active=d.status?.active||{},diag=d.status?.diagnostic||{};
