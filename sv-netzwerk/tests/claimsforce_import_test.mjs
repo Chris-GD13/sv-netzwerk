@@ -51,7 +51,7 @@ assert.equal(safeFileName('KVA: Angebot?.pdf'), 'KVA- Angebot-.pdf');
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, '1.3.16', 'die gegen Profilverwechslung und Ausfall der Morgenplanung abgesicherte Brücke muss als neue Laufzeitversion erkennbar sein');
+assert.equal(manifest.version, '1.3.17', 'die gegen Profilverwechslung und Ausfall der Morgenplanung abgesicherte Brücke muss als neue Laufzeitversion erkennbar sein');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*')));
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://claimsforce.eu.auth0.com/*')));
 assert(manifest.content_scripts.some(entry => entry.js.includes('login-helper.js') && entry.matches.includes('https://*.claimsforce.com/*') && !entry.exclude_matches), 'ClaimsForce-Anmeldehilfe muss auch auf web.claimsforce.com/login laufen');
@@ -78,7 +78,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20260903-1'), 'Portal lädt die kompatible Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20260903-2'), 'Portal lädt die kompatible Brückensteuerung ohne alten Browsercache');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(portal.includes(`<option value="${key}">${label}</option>`), `${label} ist als Bearbeiterprofil auswählbar`);
 assert(!portal.includes('<option value="susanne"') && !portal.includes('Susanne Wächter</option>'), 'Susanne darf nicht als eigenes Bearbeiterprofil erscheinen');
 assert(portal.includes("sessionStorage.removeItem('svnet-case')") && portal.includes("localStorage.removeItem('svnet-case')"), 'Profilwechsel löscht den aktiven Fall aus beiden Browser-Speichern');
@@ -113,7 +113,7 @@ assert(claimsMain.includes('inspectTokenCache') && claimsMain.includes('inspectS
 const vault = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/vault.js'), 'utf8');
 assert(vault.includes('credentials_${profile}') && vault.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens']"), 'Zugänge werden nur für die vier unterstützten Sachverständigen-Profile getrennt gespeichert');
 const options = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.js'), 'utf8');
-assert(options.includes("OPTIONS_CODE_VERSION = '1.3.16'"), 'Die Optionsseite kennzeichnet die aktuelle Brückenversion');
+assert(options.includes("OPTIONS_CODE_VERSION = '1.3.17'"), 'Die Optionsseite kennzeichnet die aktuelle Brückenversion');
 assert(options.includes('profileEmails') && options.includes('Die E-Mail-Adresse gehört nicht zum ausgewählten Bearbeiterprofil'), 'Die Optionsseite verhindert das Speichern eines fremden ClaimsForce-Kontos unter dem gewählten SV-Profil');
 assert(!options.includes('chrome.runtime.reload()'), 'Die Optionsseite darf den laufenden Erweiterungskontext nicht selbst entwerten');
 assert(options.includes("password.value || currentCredentials?.password"), 'Ein bereits gespeichertes Kennwort darf durch erneutes Speichern nicht geleert werden');
@@ -179,8 +179,8 @@ assert(central.includes('setTimeout(()=>show(text,failed),1000)'), 'Terminaler I
 assert(central.includes('data-svnet-claims-jobs') && central.includes("`${job.id}|${job.profile}|${job.status}|${job.phase"), 'Letzte Serverergebnisse sind unabhängig von UI-Listenern geheimnisfrei im DOM prüfbar');
 assert(central.includes('data-svnet-claims-results') && central.includes('resultOf'), 'Der Live-Nachweis enthält sichere Fall-, Datei-, Nachrichten- und Terminzahlen');
 assert(central.includes('SVNET_CLAIMS_RUNTIME_STATUS') && central.includes('SVNET_CLAIMS_RUNTIME_PING'), 'Portal zeigt den persistenten Browserlauf auch nach einem Worker-Neustart an');
-assert(central.includes("minimumBridgeVersion='1.3.16'") && central.includes('versionAtLeast(bridgeVersion,minimumBridgeVersion)'), 'Die zentrale Importstation darf nur mit der gegen Profilverwechslung abgesicherten Brücke laufen');
-assert(central.includes("currentBridgeVersion='1.3.16'") && central.includes('steht als empfohlenes Update bereit'), 'Die aktuelle Brücke muss weiterhin als empfohlenes Update angezeigt werden');
+assert(central.includes("minimumBridgeVersion='1.3.17'") && central.includes('versionAtLeast(bridgeVersion,minimumBridgeVersion)'), 'Die zentrale Importstation darf nur mit der gegen Profilverwechslung abgesicherten Brücke laufen');
+assert(central.includes("currentBridgeVersion='1.3.17'") && central.includes('steht als empfohlenes Update bereit'), 'Die aktuelle Brücke muss weiterhin als empfohlenes Update angezeigt werden');
 assert(central.includes('context.claims_agent&&!bridge') && central.includes('Diese zentrale Importstation ist nicht bereit'), 'Eine veraltete zentrale Brücke darf keinen weiteren dauerhaft wartenden Importauftrag erzeugen');
 assert(central.includes('!d.backoffice&&supportedProfiles.includes') && central.includes('settings?.remove()') && central.includes('download?.remove()'), 'Alle vier Sachverständigen nutzen Susannes zentrale Brücke statt einer eigenen Installation');
 assert(central.includes('Dein ClaimsForce-Import wird zentral ausgeführt'), 'Sachverständige erhalten statt einer Installationsaufforderung den Hinweis auf die zentrale Ausführung');
@@ -206,7 +206,8 @@ assert(serviceWorker.includes('readOpenTasks(tab.id)') && serviceWorker.includes
 assert(serviceWorker.includes("type: 'PORTAL_APPOINTMENT', folderId, appointment, profile"), 'Der Service Worker bindet jeden Termin an das aktuell importierte ClaimsForce-Profil');
 assert(serviceWorker.includes("if (!['christian', 'jens'].includes(profile))"), 'Christian und das in Christians Kalender umgeleitete Jens-Profil erzeugen keine automatischen Termine');
 assert(manifest.permissions.includes('browsingData') && serviceWorker.includes('chrome.browsingData.remove') && serviceWorker.includes('CLAIMS_ORIGINS'), 'Beim Profilwechsel werden ausschließlich ClaimsForce- und Auth0-Sitzungsdaten vollständig entfernt');
-assert(serviceWorker.includes('await resetClaimsSession(run, openSession?.id || 0)') && !serviceWorker.includes('bestehende Sitzung gebunden'), 'Ein namentlich gewähltes Profil darf niemals einer unbekannten bereits offenen ClaimsForce-Sitzung zugeordnet werden');
+assert(serviceWorker.includes('await resetClaimsSession(run)') && serviceWorker.includes('chrome.tabs.remove(tab.id)') && !serviceWorker.includes('bestehende Sitzung gebunden'), 'Vor jeder namentlichen Anmeldung müssen alle alten ClaimsForce-Seiten samt flüchtigem Sitzungskontext geschlossen werden');
+assert(serviceWorker.includes('tokenEmail') && serviceWorker.includes('CF-AUTH-03'), 'Eine im Sitzungstoken erkennbare fremde ClaimsForce-Identität wird vor dem Einlesen gesperrt');
 assert(serviceWorker.includes("PLANNING_URL = 'https://web.claimsforce.com/planning?bucket=WITH_FUTURE_APPOINTMENT#with-future-appointment'") && serviceWorker.includes('chrome.tabs.update(tabId, { url: PLANNING_URL })'), 'Nach erfolgreicher Anmeldung wird die von ClaimsForce benötigte Termin-Planungsseite deterministisch geöffnet');
 assert(manifest.host_permissions.includes('http://127.0.0.1:47831/*'), 'Lokaler Zugangsdaten-Helfer ist auf den festgelegten Loopback-Port begrenzt');
 assert(serviceWorker.includes('accepted: true') && serviceWorker.includes('claims-import-keepalive'), 'Ein Import darf nicht mehr an einem einzigen lang laufenden Erweiterungs-Nachrichtenkanal hängen');

@@ -28,7 +28,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.3.16',currentBridgeVersion='1.3.16';
+  const minimumBridgeVersion='1.3.17',currentBridgeVersion='1.3.17';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');

@@ -24,6 +24,14 @@ const profileKey = value => {
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const normalizeEmail = value => String(value || '').trim().toLowerCase();
 const credentialMatchesProfile = (profile, credentials) => normalizeEmail(credentials?.email) === PROFILE_EMAILS[profileKey(profile)];
+const tokenEmail = token => {
+  try {
+    const payload = String(token || '').split('.')[1];
+    if (!payload) return '';
+    const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(payload.length / 4) * 4, '=')));
+    return normalizeEmail(decoded.email || decoded.preferred_username || decoded.upn || decoded['https://claimsforce.com/email']);
+  } catch { return ''; }
+};
 const authHeaders = token => ({ Authorization: `Bearer ${token}`, Accept: 'application/json' });
 let runningImport = null;
 let credentialDiagnostic = 'idle';
@@ -154,18 +162,16 @@ async function waitTab(tabId, timeout = 30000) {
   throw new Error('ClaimsForce hat nicht rechtzeitig geladen.');
 }
 
-async function resetClaimsSession(run, tabId = 0) {
+async function resetClaimsSession(run) {
   await diagnostic(run, 'CF-AUTH-01', 'Vorhandene ClaimsForce-Anmeldung wird für den eindeutigen Profilwechsel vollständig beendet.', { profileSwitch: 'ClaimsForce und Auth0 zurücksetzen' });
   await chrome.storage.session.remove(['claimsToken', 'claimsTokenProfile', 'claimsLoggedProfile']);
   await chrome.storage.local.remove(['claimsLoggedProfile']);
+  const claimsTabs = await chrome.tabs.query({ url: ['https://web.claimsforce.com/*', 'https://claimsforce.eu.auth0.com/*'] });
+  await Promise.all(claimsTabs.filter(tab => Number.isInteger(tab.id)).map(tab => chrome.tabs.remove(tab.id).catch(() => {})));
   await chrome.browsingData.remove(
     { origins: CLAIMS_ORIGINS },
     { cookies: true, cacheStorage: true, indexedDB: true, localStorage: true, serviceWorkers: true }
   );
-  if (tabId) {
-    await chrome.tabs.update(tabId, { url: 'https://web.claimsforce.com/login' });
-    await waitTab(tabId);
-  }
 }
 
 async function claimsTab(profile, run, credential) {
@@ -202,6 +208,8 @@ async function claimsTab(profile, run, credential) {
     await diagnostic(run, 'CF-AUTH-02', helperReady ? 'ClaimsForce-Anmeldung wurde automatisch ausgeführt.' : 'ClaimsForce-Anmeldehelfer hat keine vollständige Anmeldung bestätigt.', { route: safeRoute(tab.url), helper: helperReady ? 'bereit' : 'nicht erreichbar' });
     if (!token) throw new Error('ClaimsForce-Anmeldung konnte nicht automatisch abgeschlossen werden. Bitte die gespeicherten Zugangsdaten der Browser-Brücke prüfen.');
   }
+  const authenticatedEmail = tokenEmail(token);
+  if (authenticatedEmail && authenticatedEmail !== PROFILE_EMAILS[profile]) throw new Error(`[CF-AUTH-03] ClaimsForce hat ${authenticatedEmail} statt des ausgewählten Profils ${PROFILE_EMAILS[profile]} angemeldet.`);
   return { tab, token };
 }
 
@@ -310,8 +318,7 @@ async function runImport(run) {
   const portalTabId = run.portalTabId, profile = profileKey(run.profile);
   run.profile = profile;
   await chrome.storage.session.set({ activeProfile: profile });
-  const [openSession] = await chrome.tabs.query({ url: ['https://web.claimsforce.com/*', 'https://claimsforce.eu.auth0.com/*'] });
-  await resetClaimsSession(run, openSession?.id || 0);
+  await resetClaimsSession(run);
   const credential = await credentialsFor(profile);
   await diagnostic(run, 'CF-CRED-01', credential ? 'Zugangsdatenquelle ist verfügbar.' : 'Für das Profil ist keine Zugangsdatenquelle verfügbar.', { source: credential?.source || 'keine' });
   if (!credential) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar.');
