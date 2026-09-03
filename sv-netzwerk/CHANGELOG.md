@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.44 – 2026-09-03
+- automatischer morgens Fachbeitrag veröffentlicht: „Katastrophenschäden in der Region: Management, Koordination und fachliche Einordnung"
+- LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
+- ohne Beitragsbild veröffentlicht; keine typografische Platzhaltergrafik erzeugt
+
 ## 3.4.43 – 2026-09-02
 - automatischer nachmittags Fachbeitrag veröffentlicht: „Abgrenzung versicherter und nicht versicherter Schadteile: Methodik für belastbare Freigaben"
 - LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)

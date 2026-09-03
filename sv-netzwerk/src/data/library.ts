@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Katastrophenschäden in der Region: Management, Koordination und fachliche Einordnung',
+    description: 'Katastrophenschäden in der Region: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/katastrophenschaeden-region-management-koordination/',
+    category: 'Katastrophenschäden in der Region',
+    tags: ['Katastrophenschaden', 'Unwetter', 'Überflutung', 'Großschaden', 'Koordination'],
+    date: '2026-09-03',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Abgrenzung versicherter und nicht versicherter Schadteile: Methodik für belastbare Freigaben',
     description: 'Abgrenzung versicherter Schadteile: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/abgrenzung-versicherter-nichtversicherter-schadteil/',
