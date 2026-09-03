@@ -113,6 +113,11 @@ assert.match(portal, /Regeln zu Reserve, Schadenhöhe und Kalkulation/);
 assert.match(portal, /Flächen-, Aufmaß- und Polycam-Regeln/);
 assert.match(portal, /genau acht aussagekräftige, unterschiedliche Schadenbilder/);
 assert.match(portal, /Kopfdaten in die dafür vorgesehenen Eingabezeilen/);
+assert.match(
+  portal,
+  /closest\('#vf-close'\)[\s\S]{0,240}sessionStorage\.removeItem\('svnet-case'\)[\s\S]{0,160}localStorage\.removeItem\('svnet-case'\)[\s\S]{0,160}window\.location\.reload\(\)/,
+  'closing a case must discard the case state and reload every case-bound UI module',
+);
 assert.doesNotMatch(portal, /personalReportKeys=new Set/);
 assert.doesNotMatch(portal, /chatgpt-onboarding\.php/);
 
