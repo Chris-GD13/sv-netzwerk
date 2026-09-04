@@ -9,6 +9,7 @@ const api = fs.readFileSync(path.join(root, 'public/intern/api/bki-calculator.ph
 const noteHelper = fs.readFileSync(path.join(root, 'public/intern/calculation-note-helper.js'), 'utf8');
 const settlementPdf = fs.readFileSync(path.join(root, 'public/intern/api/bki-settlement-pdf.php'), 'utf8');
 const pdfExport = fs.readFileSync(path.join(root, 'public/intern/bki-pdf-export.js'), 'utf8');
+const offline = fs.readFileSync(path.join(root, 'public/intern/bki-offline.js'), 'utf8');
 
 assert(page.includes('id="bk-kva-file"') && page.includes('Datei vom Gerät auswählen'), 'Die normale Dateiauswahl muss auf Mobilgeräten ausdrücklich verfügbar sein.');
 assert(!/id="bk-kva-file"[^>]*capture=/u.test(page), 'Die normale Dateiauswahl darf nicht die Kamera erzwingen.');
@@ -18,7 +19,8 @@ assert(page.includes('Alle Positionen 1:1 in die Kalkulation übernehmen'), 'All
 assert(page.includes('offeredUnit||(offeredTotal/quantity)||0'), 'Der 1:1-Import muss den angebotenen Einheitspreis oder den aus der Positionssumme abgeleiteten Preis verwenden.');
 assert(page.includes("positions.forEach((row,index)=>"), 'Der 1:1-Import darf keine KVA-Position wegen eines fehlenden BKI-Treffers auslassen.');
 assert(page.includes("line.position_code=String(++position)"), 'Kalkulationspositionen müssen automatisch fortlaufend neu nummeriert werden.');
-assert(page.includes("bridge.addSection=value=>") && page.includes("addSection?.(groupTitle())"), 'Vor importierten KVA-Positionen muss eine eigene Firmen- oder Tätigkeitsüberschrift eingefügt werden.');
+assert(page.includes("bridge.addSection=value=>") && page.includes("addSection?.(groupData())"), 'Vor importierten KVA-Positionen muss eine eigene Firmen- oder Tätigkeitsüberschrift mit den KVA-Stammdaten eingefügt werden.');
+assert(page.includes("if(!added)window.__bkiCalcBridge?.addSection?.(groupData())"), 'Auch die BKI-Nachkalkulation muss KVA-Firma, Nummer und Originalsumme in der Abschnittszeile erhalten.');
 assert(page.includes("const groupTitle=()=>String($('bk-kva-title').textContent||'KVA-Positionen').trim()"), 'Die Gruppenüberschrift muss Aussteller und KVA-Nummer vollständig übernehmen.');
 assert(page.includes("line.source_position_code=line.source_position_code||line.position_code||''"), 'Die ursprüngliche KVA-Positionsnummer muss als Herkunftsinformation erhalten bleiben.');
 assert(page.includes("addSection?.('Eigene Kalkulation nach BKI')") && page.includes('quickSectionOpen=false'), 'Schnellkalkulationspositionen müssen in einem eigenen BKI-Abschnitt beginnen.');
@@ -66,5 +68,6 @@ assert(noteHelper.includes("if(line.type==='section')return;"), 'Abschnittsüber
 assert(!noteHelper.includes("if(event.target.matches?.('input[data-k]'))updateSettlementNote()"), 'Positionsänderungen dürfen den Mustertext nicht automatisch verändern.');
 assert(!noteHelper.includes("if(getLines().length)updateSettlementNote()"), 'Laden, Bearbeiten und Umsatzsteueränderungen dürfen den Mustertext nicht automatisch verändern.');
 assert(noteHelper.includes("button.addEventListener('click',()=>insertTemplate(button))"), 'Der Mustertext muss weiterhin ausdrücklich über seinen Button eingefügt werden.');
+assert(offline.includes('kvaReview:window.__bkiKvaReview||null') && offline.includes("window.__bkiKvaReview={...s.kvaReview}"), 'KVA-Metadaten müssen mit dem Offline- und Serverentwurf gespeichert und nach einem Reload wiederhergestellt werden.');
 
 console.log('KVA-Import: Dateiauswahl, Gruppierung, fortlaufende Nummerierung und expliziter Mustertext abgesichert.');

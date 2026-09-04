@@ -6,8 +6,8 @@ portal = root / 'src/pages/intern/versicherungsfaelle/index.astro'
 
 source = calc.read_text(encoding='utf-8')
 calc_tag = '<script is:inline src="/intern/bki-pdf-export.js?v=20260901-1"></script>'
-anchor = '<script is:inline src="/intern/calculation-note-helper.js?v=20260827-1"></script>'
-if calc_tag not in source:
+anchor = '<script is:inline src="/intern/calculation-note-helper.js?v=20260831-1"></script>'
+if '/intern/bki-pdf-export.js?v=' not in source:
     if anchor not in source:
         raise SystemExit('BKI helper anchor not found')
     source = source.replace(anchor, anchor + '\n' + calc_tag, 1)
