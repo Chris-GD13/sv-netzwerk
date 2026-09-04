@@ -78,11 +78,51 @@ function rsCount(array $sheet,int $row):int {
 function rsPeriod(array $sheet,int $year,int $through):array {
     $groups=rsMonthGroups($sheet);$rows=[];for($month=1;$month<=$through;$month++)foreach(($groups[$month]??[])as$row)$rows[]=$row;$total=0.0;$count=0;foreach($rows as$row){$total+=(float)rsCell($sheet,$row,9);$count+=rsCount($sheet,$row);}return['year'=>$year,'period'=>'Jan.–'.RS_MONTH_LABELS[$through].' '.$year,'months'=>$through,'ytd_net'=>round($total,2),'annualized_net'=>round($total/$through*12,2),'average_net'=>$count?round($total/$count,2):0.0];
 }
+function rsExcelDate(mixed $value):string {
+    if(is_numeric($value)&&(float)$value>20000)return gmdate('d.m.Y',(int)round(((float)$value-25569)*86400));
+    return trim((string)$value);
+}
+function rsEntries(array $sheet,int $year,int $through):array {
+    $entries=[];$seen=[];$groups=rsMonthGroups($sheet);
+    for($month=1;$month<=$through;$month++)foreach(($groups[$month]??[])as$totalRow){
+        $formula=(string)($sheet['formulas']['I'.$totalRow]??'');
+        if(!preg_match('/^=SUM\(I(\d+):I(\d+)\)$/i',$formula,$match))continue;
+        for($row=(int)$match[1];$row<=(int)$match[2];$row++){
+            if(isset($seen[$row]))continue;$amount=rsCell($sheet,$row,9);if(!is_numeric($amount)||(float)$amount==0.0)continue;
+            $seen[$row]=true;$payout=round((float)$amount,2);$actual=round($payout/0.60,2);
+            $regulierer=round($actual-$payout,2);$entries[]=['year'=>$year,'month'=>$month,'month_label'=>RS_MONTH_LABELS[$month],'order_no'=>trim((string)rsCell($sheet,$row,1)),'customer'=>trim((string)rsCell($sheet,$row,2)),'scheduled'=>rsExcelDate(rsCell($sheet,$row,3)),'performed'=>rsExcelDate(rsCell($sheet,$row,4)),'billed'=>rsExcelDate(rsCell($sheet,$row,5)),'insurer'=>trim((string)rsCell($sheet,$row,11)),'payout_net'=>$payout,'payout_gross'=>round($payout*1.19,2),'actual_order_net'=>$actual,'actual_order_gross'=>round($actual*1.19,2),'regulierer_net'=>$regulierer,'regulierer_gross'=>round($regulierer*1.19,2),'damage_amount'=>is_numeric(rsCell($sheet,$row,10))?round((float)rsCell($sheet,$row,10),2):null];
+        }
+    }
+    usort($entries,fn($a,$b)=>[$b['year'],$b['month'],$b['billed'],$b['order_no']]<=>[$a['year'],$a['month'],$a['billed'],$a['order_no']]);return$entries;
+}
+function rsAddShares(array $period):array {
+    $actual=round((float)$period['ytd_net']/0.60,2);$annualActual=round((float)$period['annualized_net']/0.60,2);
+    $regulierer=round($actual-(float)$period['ytd_net'],2);$annualRegulierer=round($annualActual-(float)$period['annualized_net'],2);$period['share_rate']=0.60;$period['vat_rate']=0.19;$period['ytd_gross']=round((float)$period['ytd_net']*1.19,2);$period['actual_order_net']=$actual;$period['actual_order_gross']=round($actual*1.19,2);$period['regulierer_net']=$regulierer;$period['regulierer_gross']=round($regulierer*1.19,2);$period['annualized_actual_order_net']=$annualActual;$period['annualized_actual_order_gross']=round($annualActual*1.19,2);$period['annualized_regulierer_net']=$annualRegulierer;$period['annualized_regulierer_gross']=round($annualRegulierer*1.19,2);return$period;
+}
 function rsPrivate(array $sheets,array $years):array {
     $sheet=null;foreach($sheets as$name=>$candidate)if(str_starts_with(rsText($name),'privatauftr')){$sheet=$candidate;break;}if(!$sheet)throw new RuntimeException('Das Blatt Privataufträge fehlt.');$totals=array_fill_keys($years,0.0);$active=null;$max=rsMaxRow($sheet);for($row=1;$row<=$max;$row++){$a=rsCell($sheet,$row,1);if(is_numeric($a)&&isset($totals[(int)$a])){$active=(int)$a;continue;}if($active===null||rsText((string)$a)==='gesamt')continue;$amount=rsCell($sheet,$row,4);if(is_numeric($amount))$totals[$active]+=(float)$amount;}return array_map(fn($value)=>round((float)$value,2),$totals);
 }
+function rsPrivateEntries(array $sheets,array $years):array {
+    $sheet=null;foreach($sheets as$name=>$candidate)if(str_starts_with(rsText($name),'privatauftr')){$sheet=$candidate;break;}if(!$sheet)return[];
+    $allowed=array_fill_keys($years,true);$active=null;$entries=[];$max=rsMaxRow($sheet);
+    for($row=1;$row<=$max;$row++){$a=rsCell($sheet,$row,1);if(is_numeric($a)&&isset($allowed[(int)$a])){$active=(int)$a;continue;}if($active===null||rsText((string)$a)==='gesamt')continue;$amount=rsCell($sheet,$row,4);if(!is_numeric($amount)||(float)$amount==0.0)continue;$entries[]=['year'=>$active,'customer'=>trim((string)$a),'place'=>trim((string)rsCell($sheet,$row,2)),'appointment'=>rsExcelDate(rsCell($sheet,$row,3)),'gross'=>round((float)$amount,2)];}
+    usort($entries,fn($a,$b)=>[$b['year'],$b['appointment'],$b['customer']]<=>[$a['year'],$a['appointment'],$a['customer']]);return$entries;
+}
 function rsRefresh(array $user):array {
-    [$meta,$bytes]=rsSourceFile();$tmp=tempnam(sys_get_temp_dir(),'revenue-');if($tmp===false||file_put_contents($tmp,$bytes)===false)throw new RuntimeException('Die Umsatzdatei konnte nicht zwischengespeichert werden.');try{$sheets=rsWorkbook($tmp);}finally{@unlink($tmp);}$currentYear=(int)date('Y');$previousYear=$currentYear-1;if(!isset($sheets[(string)$currentYear],$sheets[(string)$previousYear]))throw new RuntimeException('Aktuelles oder vorheriges Jahresblatt fehlt.');$groups=rsMonthGroups($sheets[(string)$currentYear]);$completed=array_keys(array_filter($groups));if(!$completed)throw new RuntimeException('Im aktuellen Jahresblatt fehlt eine blaue Gesamtzeile.');$through=max($completed);$current=rsPeriod($sheets[(string)$currentYear],$currentYear,$through);$previous=rsPeriod($sheets[(string)$previousYear],$previousYear,$through);$private=rsPrivate($sheets,[$currentYear,$previousYear]);$current['private_gross']=$private[$currentYear];$previous['private_gross']=$private[$previousYear];$payload=['source'=>(string)($meta['name']??'CL Umsatzaufstellung Wächter.xlsx'),'source_updated_at'=>isset($meta['lastModifiedDateTime'])?date('d.m.Y H:i',strtotime((string)$meta['lastModifiedDateTime'])):date('d.m.Y H:i'),'comparison'=>'gleicher Zeitraum','current'=>$current,'previous'=>$previous];rsEnsureTable();$stmt=db()->prepare("INSERT INTO portal_revenue_summary(profile,payload_json,source_modified_at,updated_by,updated_at) VALUES('christian',:payload,:source,:user,NOW()) ON DUPLICATE KEY UPDATE payload_json=VALUES(payload_json),source_modified_at=VALUES(source_modified_at),updated_by=VALUES(updated_by),updated_at=NOW()");$stmt->execute([':payload'=>json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':source'=>(string)($meta['lastModifiedDateTime']??''),':user'=>(string)($user['email']??'')]);return$payload;
+    [$meta,$bytes]=rsSourceFile();$tmp=tempnam(sys_get_temp_dir(),'revenue-');
+    if($tmp===false||file_put_contents($tmp,$bytes)===false)throw new RuntimeException('Die Umsatzdatei konnte nicht zwischengespeichert werden.');
+    try{$sheets=rsWorkbook($tmp);}finally{@unlink($tmp);}
+    $currentYear=(int)date('Y');$previousYear=$currentYear-1;
+    if(!isset($sheets[(string)$currentYear],$sheets[(string)$previousYear]))throw new RuntimeException('Aktuelles oder vorheriges Jahresblatt fehlt.');
+    $groups=rsMonthGroups($sheets[(string)$currentYear]);$completed=array_keys(array_filter($groups));
+    if(!$completed)throw new RuntimeException('Im aktuellen Jahresblatt fehlt eine blaue Gesamtzeile.');
+    $through=max($completed);$current=rsAddShares(rsPeriod($sheets[(string)$currentYear],$currentYear,$through));$previous=rsAddShares(rsPeriod($sheets[(string)$previousYear],$previousYear,$through));
+    $private=rsPrivate($sheets,[$currentYear,$previousYear]);$current['private_gross']=$private[$currentYear];$previous['private_gross']=$private[$previousYear];
+    $availableYears=[];$entries=[];
+    foreach($sheets as$name=>$sheet){if(!preg_match('/^20\d{2}$/',trim((string)$name)))continue;$year=(int)$name;$yearGroups=rsMonthGroups($sheet);$yearMonths=array_keys(array_filter($yearGroups));if(!$yearMonths)continue;$availableYears[]=$year;$entries=array_merge($entries,rsEntries($sheet,$year,max($yearMonths)));}
+    rsort($availableYears);$privateEntries=rsPrivateEntries($sheets,$availableYears);
+    $payload=['source'=>(string)($meta['name']??'CL Umsatzaufstellung Wächter.xlsx'),'source_updated_at'=>isset($meta['lastModifiedDateTime'])?date('d.m.Y H:i',strtotime((string)$meta['lastModifiedDateTime'])):date('d.m.Y H:i'),'comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'vat_rate'=>0.19,'current'=>$current,'previous'=>$previous,'available_years'=>$availableYears,'entries'=>$entries,'private_entries'=>$privateEntries];
+    rsEnsureTable();$stmt=db()->prepare("INSERT INTO portal_revenue_summary(profile,payload_json,source_modified_at,updated_by,updated_at) VALUES('christian',:payload,:source,:user,NOW()) ON DUPLICATE KEY UPDATE payload_json=VALUES(payload_json),source_modified_at=VALUES(source_modified_at),updated_by=VALUES(updated_by),updated_at=NOW()");$stmt->execute([':payload'=>json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':source'=>(string)($meta['lastModifiedDateTime']??''),':user'=>(string)($user['email']??'')]);return$payload;
 }
 
 $action=(string)($_GET['action']??'summary');
@@ -97,5 +137,5 @@ $user=requireAuth();
 if(!rsVisible($user))apiJson(['ok'=>true,'visible'=>false]);
 try{
     if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if(!rsCanRefresh($user))apiError(403,'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');$payload=rsRefresh($user);apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,...$payload]);}
-    $payload=rsStored()??rsFallback();apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>rsCanRefresh($user),...$payload]);
+    $payload=rsStored()??rsFallback();if($action!=='settlement'){unset($payload['entries'],$payload['private_entries'],$payload['available_years']);}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>rsCanRefresh($user),...$payload]);
 }catch(Throwable $error){error_log('[revenue-summary] '.$error->getMessage());apiError(503,$error->getMessage());}

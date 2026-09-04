@@ -136,6 +136,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       <aside class="intern-sidebar">
         <nav aria-label="Interne Navigation" class="intern-sidebar__nav">
           {internalLinks.map((link) => <a class:list={{ active: isActive(link.href) }} href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
+          <a id="intern-settlement-link" class:list={{ active: isActive('/intern/abrechnungen/') }} href="/intern/abrechnungen/" aria-current={isActive('/intern/abrechnungen/') ? 'page' : undefined} hidden><span>€</span>Abrechnungen</a>
           <slot name="sidebar-extra" />
         </nav>
         <button class="intern-header__logout" id="intern-logout" type="button"><span>↪</span>Abmelden</button>
@@ -193,6 +194,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
         window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js', { scope: '/intern/' }).catch(() => {}));
       }
       const revenueSummary = document.getElementById('intern-revenue-summary');
+      const settlementLink = document.getElementById('intern-settlement-link');
       const money = (value, maximumFractionDigits = 0) => new Intl.NumberFormat('de-DE', {
         style: 'currency', currency: 'EUR', maximumFractionDigits, minimumFractionDigits: maximumFractionDigits,
       }).format(Number(value) || 0);
@@ -202,7 +204,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
           const response = await fetch('/intern/api/revenue-summary-v2.php', { credentials: 'same-origin', cache: 'no-store' });
           const data = await response.json();
           if (!response.ok || !data.ok) throw new Error(data.error || 'Umsatzstand nicht verfügbar.');
-          if (!data.visible) { revenueSummary.hidden = true; return; }
+          if (!data.visible) { revenueSummary.hidden = true; if (settlementLink instanceof HTMLElement) settlementLink.hidden = true; return; }
           const renderRevenueSummary = (summary) => {
           const current = summary.current || {};
           const previous = summary.previous || {};
@@ -215,6 +217,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
               <div class="intern-header__revenue-item"><span>Privataufträge brutto</span><strong>${current.year}: ${money(current.private_gross)}</strong><small>${previous.year}: ${money(previous.private_gross)}</small></div>
             </div>`;
           revenueSummary.hidden = false;
+          if (settlementLink instanceof HTMLElement) settlementLink.hidden = false;
           const refresh = revenueSummary.querySelector('.intern-header__revenue-refresh');
           refresh?.addEventListener('click', async () => {
             if (!(refresh instanceof HTMLButtonElement)) return;
