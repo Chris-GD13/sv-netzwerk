@@ -82,6 +82,20 @@ function rsExcelDate(mixed $value):string {
     if(is_numeric($value)&&(float)$value>20000)return gmdate('d.m.Y',(int)round(((float)$value-25569)*86400));
     return trim((string)$value);
 }
+function rsNullableMoney(mixed $value):?float {
+    return is_numeric($value)?round((float)$value,2):null;
+}
+function rsDistanceKm(array $sheet,int $row):?float {
+    $source=rsCell($sheet,$row,12);
+    if(is_numeric($source))return round((float)$source,2);
+    $formula=str_replace([',',' '],['.',''],(string)($sheet['formulas']['F'.$row]??''));
+    if(!preg_match('/^=\d+(?:\.\d+)?(?:\*\d+(?:\.\d+)?)+$/',$formula))return null;
+    $factors=array_map('floatval',explode('*',substr($formula,1)));$rate=null;$product=1.0;
+    foreach($factors as$factor){$product*=$factor;if($factor>0&&$factor<2&&($rate===null||$factor<$rate))$rate=$factor;}
+    $amount=rsCell($sheet,$row,6);
+    if($rate===null||!is_numeric($amount)||abs($product-(float)$amount)>0.02)return null;
+    return round($product/$rate,2);
+}
 function rsEntries(array $sheet,int $year,int $through):array {
     $entries=[];$seen=[];$groups=rsMonthGroups($sheet);
     for($month=1;$month<=$through;$month++)foreach(($groups[$month]??[])as$totalRow){
@@ -90,7 +104,7 @@ function rsEntries(array $sheet,int $year,int $through):array {
         for($row=(int)$match[1];$row<=(int)$match[2];$row++){
             if(isset($seen[$row]))continue;$amount=rsCell($sheet,$row,9);if(!is_numeric($amount)||(float)$amount==0.0)continue;
             $seen[$row]=true;$payout=round((float)$amount,2);$actual=round($payout/0.60,2);
-            $regulierer=round($actual-$payout,2);$entries[]=['year'=>$year,'month'=>$month,'month_label'=>RS_MONTH_LABELS[$month],'order_no'=>trim((string)rsCell($sheet,$row,1)),'customer'=>trim((string)rsCell($sheet,$row,2)),'scheduled'=>rsExcelDate(rsCell($sheet,$row,3)),'performed'=>rsExcelDate(rsCell($sheet,$row,4)),'billed'=>rsExcelDate(rsCell($sheet,$row,5)),'insurer'=>trim((string)rsCell($sheet,$row,11)),'payout_net'=>$payout,'payout_gross'=>round($payout*1.19,2),'actual_order_net'=>$actual,'actual_order_gross'=>round($actual*1.19,2),'regulierer_net'=>$regulierer,'regulierer_gross'=>round($regulierer*1.19,2),'damage_amount'=>is_numeric(rsCell($sheet,$row,10))?round((float)rsCell($sheet,$row,10),2):null];
+            $regulierer=round($actual-$payout,2);$kmAmount=rsNullableMoney(rsCell($sheet,$row,6));$workAmount=rsNullableMoney(rsCell($sheet,$row,7));$travelAmount=rsNullableMoney(rsCell($sheet,$row,8));$entries[]=['year'=>$year,'month'=>$month,'month_label'=>RS_MONTH_LABELS[$month],'order_no'=>trim((string)rsCell($sheet,$row,1)),'customer'=>trim((string)rsCell($sheet,$row,2)),'place'=>'','scheduled'=>rsExcelDate(rsCell($sheet,$row,3)),'performed'=>rsExcelDate(rsCell($sheet,$row,4)),'billed'=>rsExcelDate(rsCell($sheet,$row,5)),'insurer'=>trim((string)rsCell($sheet,$row,11)),'distance_km'=>rsDistanceKm($sheet,$row),'km_amount_net'=>$kmAmount,'km_amount_gross'=>$kmAmount===null?null:round($kmAmount*1.19,2),'work_time_net'=>$workAmount,'work_time_gross'=>$workAmount===null?null:round($workAmount*1.19,2),'travel_time_net'=>$travelAmount,'travel_time_gross'=>$travelAmount===null?null:round($travelAmount*1.19,2),'payout_net'=>$payout,'payout_gross'=>round($payout*1.19,2),'actual_order_net'=>$actual,'actual_order_gross'=>round($actual*1.19,2),'regulierer_net'=>$regulierer,'regulierer_gross'=>round($regulierer*1.19,2),'damage_amount'=>is_numeric(rsCell($sheet,$row,10))?round((float)rsCell($sheet,$row,10),2):null];
         }
     }
     usort($entries,fn($a,$b)=>[$b['year'],$b['month'],$b['billed'],$b['order_no']]<=>[$a['year'],$a['month'],$a['billed'],$a['order_no']]);return$entries;
@@ -121,7 +135,7 @@ function rsRefresh(array $user):array {
     $availableYears=[];$entries=[];
     foreach($sheets as$name=>$sheet){if(!preg_match('/^20\d{2}$/',trim((string)$name)))continue;$year=(int)$name;$yearGroups=rsMonthGroups($sheet);$yearMonths=array_keys(array_filter($yearGroups));if(!$yearMonths)continue;$availableYears[]=$year;$entries=array_merge($entries,rsEntries($sheet,$year,max($yearMonths)));}
     rsort($availableYears);$privateEntries=rsPrivateEntries($sheets,$availableYears);
-    $payload=['source'=>(string)($meta['name']??'CL Umsatzaufstellung Wächter.xlsx'),'source_updated_at'=>isset($meta['lastModifiedDateTime'])?date('d.m.Y H:i',strtotime((string)$meta['lastModifiedDateTime'])):date('d.m.Y H:i'),'comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'vat_rate'=>0.19,'current'=>$current,'previous'=>$previous,'available_years'=>$availableYears,'entries'=>$entries,'private_entries'=>$privateEntries];
+    $payload=['source'=>(string)($meta['name']??'CL Umsatzaufstellung Wächter.xlsx'),'source_updated_at'=>isset($meta['lastModifiedDateTime'])?date('d.m.Y H:i',strtotime((string)$meta['lastModifiedDateTime'])):date('d.m.Y H:i'),'comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'vat_rate'=>0.19,'entry_schema_version'=>2,'current'=>$current,'previous'=>$previous,'available_years'=>$availableYears,'entries'=>$entries,'private_entries'=>$privateEntries];
     rsEnsureTable();$stmt=db()->prepare("INSERT INTO portal_revenue_summary(profile,payload_json,source_modified_at,updated_by,updated_at) VALUES('christian',:payload,:source,:user,NOW()) ON DUPLICATE KEY UPDATE payload_json=VALUES(payload_json),source_modified_at=VALUES(source_modified_at),updated_by=VALUES(updated_by),updated_at=NOW()");$stmt->execute([':payload'=>json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':source'=>(string)($meta['lastModifiedDateTime']??''),':user'=>(string)($user['email']??'')]);return$payload;
 }
 
