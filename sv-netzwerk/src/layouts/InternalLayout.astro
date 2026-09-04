@@ -18,7 +18,7 @@ const internalLinks = [
   { href: '/intern/versicherungsfaelle/', label: 'Startseite', icon: '⌂' },
   { href: '/intern/kalkulation/', label: 'Kalkulation', icon: '▦' },
   { href: '/intern/zeitwertberechnung/', label: 'Zeitwertberechnung', icon: '⌛' },
-  { href: '/intern/fensterpruefung-bonn/', label: 'Fenster', icon: '▣' },
+  { href: '/intern/fensterpruefung-bonn/', label: 'Fenstergutachten', icon: '▣' },
   { href: '/intern/kalender/', label: 'Kalender', icon: '□' },
 ];
 const isActive = (href: string) => currentPath.startsWith(href);
@@ -83,6 +83,10 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-header__login {
         appearance: none;
         display: inline-flex;
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        transform: translateY(-50%);
         flex: 0 0 auto;
         align-items: center;
         gap: 5px;
@@ -134,7 +138,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       @media (max-width: 680px) {
         .intern-header .intern-header__brand { flex-wrap: wrap; }
         .intern-header__identity { width: 100%; }
-        .intern-header__login { padding: 7px 8px; font-size: .76rem; }
+        .intern-header__login { position: static; transform: none; padding: 7px 8px; font-size: .76rem; }
       }
     </style>
   </head>
@@ -215,7 +219,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
         }
       });
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=20260904-4', { scope: '/intern/', updateViaCache: 'none' }).then((registration) => registration.update()).catch(() => {}));
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=20260904-5', { scope: '/intern/', updateViaCache: 'none' }).then((registration) => registration.update()).catch(() => {}));
       }
       const revenueSummary = document.getElementById('intern-revenue-summary');
       const settlementLink = document.getElementById('intern-settlement-link');
