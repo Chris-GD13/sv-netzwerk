@@ -1,0 +1,1946 @@
+[
+  {
+    "code": "1.1",
+    "name": "Betonfundament",
+    "min": 80,
+    "mean": 100,
+    "max": 120,
+    "page": 7
+  },
+  {
+    "code": "1.1.1",
+    "name": "Einzelfundament",
+    "min": null,
+    "mean": 100,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "1.1.2",
+    "name": "Streifenfundament",
+    "min": null,
+    "mean": 100,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "1.1.3",
+    "name": "Plattenfundament",
+    "min": null,
+    "mean": 100,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "1.2",
+    "name": "Bauwerksabdichtung erdberührter Bauteile",
+    "min": 25,
+    "mean": 40,
+    "max": 60,
+    "page": 7
+  },
+  {
+    "code": "1.2.1",
+    "name": "gegen nichtdrückendes Wasser",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "1.2.2",
+    "name": "gegen drückendes Wasser",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "1.3",
+    "name": "Dränanlagen",
+    "min": 25,
+    "mean": 40,
+    "max": 50,
+    "page": 7
+  },
+  {
+    "code": "1.3.1",
+    "name": "Leitungen",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "1.3.2",
+    "name": "Schächte",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.0.1",
+    "name": "Fachwerk, Holz",
+    "min": 20,
+    "mean": 30,
+    "max": 40,
+    "page": 7
+  },
+  {
+    "code": "2.0.2",
+    "name": "Betonwand",
+    "min": 30,
+    "mean": 55,
+    "max": 80,
+    "page": 7
+  },
+  {
+    "code": "2.0.3",
+    "name": "Sichtmauerwerk",
+    "min": 40,
+    "mean": 60,
+    "max": 80,
+    "page": 7
+  },
+  {
+    "code": "2.1.1",
+    "name": "Beton",
+    "min": null,
+    "mean": 90,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.1.2",
+    "name": "Ziegel",
+    "min": null,
+    "mean": 100,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.1.3",
+    "name": "Stein (sonstiger)",
+    "min": null,
+    "mean": 90,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.1.4",
+    "name": "Holz hart",
+    "min": null,
+    "mean": 75,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.1.5",
+    "name": "Holz weich",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.1.3a",
+    "name": "Porenbeton",
+    "min": null,
+    "mean": 80,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.2.1",
+    "name": "Klinker, Verblender",
+    "min": null,
+    "mean": 90,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.2.2",
+    "name": "Vefugung, Sichtmauerwerk",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.2.3",
+    "name": "Fliesen, Platten",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.2.4",
+    "name": "Außenputz, mineralisch/organisch",
+    "min": 35,
+    "mean": 50,
+    "max": 65,
+    "page": 7
+  },
+  {
+    "code": "2.2.6",
+    "name": "Holz weich",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.2.7",
+    "name": "Naturstein",
+    "min": null,
+    "mean": 70,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.2.8",
+    "name": "Faserzement",
+    "min": null,
+    "mean": 35,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.2.9",
+    "name": "Stahlblech",
+    "min": 30,
+    "mean": 40,
+    "max": 50,
+    "page": 7
+  },
+  {
+    "code": "2.2.10",
+    "name": "Kunststoff",
+    "min": 25,
+    "mean": 30,
+    "max": 40,
+    "page": 7
+  },
+  {
+    "code": "2.2.11",
+    "name": "Glas",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.2.12",
+    "name": "Kupferblech",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.2.13",
+    "name": "Aluminium",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 7
+  },
+  {
+    "code": "2.2.14",
+    "name": "WDVS",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.2.15",
+    "name": "Zinkblech",
+    "min": 30,
+    "mean": null,
+    "max": 40,
+    "page": 8
+  },
+  {
+    "code": "2.2.15.1",
+    "name": "Polystyrol, PU",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.2.15.2",
+    "name": "Kork, Zellulose, Wolle etc.",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.2.15.3",
+    "name": "Schaumglas, Blähton",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.3.1",
+    "name": "Edelstahl",
+    "min": null,
+    "mean": 70,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.3.2",
+    "name": "Stahl",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.3.3",
+    "name": "Holz",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.4.1",
+    "name": "Kalkfarbe",
+    "min": null,
+    "mean": 8,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.4.2",
+    "name": "Kunststoffdispersionsfarbe",
+    "min": null,
+    "mean": 15,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.4.3",
+    "name": "Mineralfarbe",
+    "min": null,
+    "mean": 15,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.4.4",
+    "name": "Öl und Kunstharz",
+    "min": null,
+    "mean": 15,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.4.5.1",
+    "name": "auf Holz",
+    "min": 5,
+    "mean": 7,
+    "max": 10,
+    "page": 8
+  },
+  {
+    "code": "2.4.6",
+    "name": "Kunststoffbeschichtung auf Beton",
+    "min": null,
+    "mean": 15,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.4.7",
+    "name": "Anstrich auf Beton",
+    "min": null,
+    "mean": 10,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.4.8",
+    "name": "Silikonharzimprägnierungen auf Ziegeln und Klinkern",
+    "min": 3,
+    "mean": 4,
+    "max": 5,
+    "page": 8
+  },
+  {
+    "code": "2.5.1.1",
+    "name": "Hartholz",
+    "min": 25,
+    "mean": 40,
+    "max": 60,
+    "page": 8
+  },
+  {
+    "code": "2.5.1.2",
+    "name": "Weichholz",
+    "min": 20,
+    "mean": 30,
+    "max": 40,
+    "page": 8
+  },
+  {
+    "code": "2.5.1.3",
+    "name": "Aluminium",
+    "min": 25,
+    "mean": 35,
+    "max": 50,
+    "page": 8
+  },
+  {
+    "code": "2.5.1.4",
+    "name": "Stahl",
+    "min": 25,
+    "mean": 40,
+    "max": 50,
+    "page": 8
+  },
+  {
+    "code": "2.5.1.5",
+    "name": "Kunststoff - PVC",
+    "min": 20,
+    "mean": 30,
+    "max": 40,
+    "page": 8
+  },
+  {
+    "code": "2.5.1.6",
+    "name": "Garagentore in verzinktem Stahlblech",
+    "min": 25,
+    "mean": null,
+    "max": 40,
+    "page": 8
+  },
+  {
+    "code": "2.5.1.7",
+    "name": "Garagentore in Aluminium",
+    "min": 30,
+    "mean": null,
+    "max": 40,
+    "page": 8
+  },
+  {
+    "code": "2.5.1.8",
+    "name": "Garagentore in Kupfer",
+    "min": 40,
+    "mean": null,
+    "max": 50,
+    "page": 8
+  },
+  {
+    "code": "2.5.1.9",
+    "name": "Garagentore in Holz",
+    "min": 20,
+    "mean": null,
+    "max": 30,
+    "page": 8
+  },
+  {
+    "code": "2.5.5.1",
+    "name": "Farbanstrich auf Holz, Lack",
+    "min": null,
+    "mean": 6,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.5.5.2",
+    "name": "Lasur",
+    "min": null,
+    "mean": 6,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.5.6.1",
+    "name": "Holz",
+    "min": null,
+    "mean": 35,
+    "max": null,
+    "page": 8
+  },
+  {
+    "code": "2.5.6.2",
+    "name": "Kunststoff",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "2.5.6.3",
+    "name": "Stahl",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "2.5.6.4",
+    "name": "Aluminium",
+    "min": null,
+    "mean": 35,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "2.5.7.1",
+    "name": "Naturstein",
+    "min": null,
+    "mean": 75,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "2.5.7.2",
+    "name": "Kunststein",
+    "min": null,
+    "mean": 75,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "2.5.7.3",
+    "name": "Aluminium",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "2.5.7.4",
+    "name": "Kupfer",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "2.5.7.5",
+    "name": "Faserzement",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "2.5.7.6",
+    "name": "Zinkblech",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.1.1",
+    "name": "Beton",
+    "min": null,
+    "mean": 100,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.1.2",
+    "name": "Ziegel",
+    "min": null,
+    "mean": 100,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.1.3",
+    "name": "Stein",
+    "min": null,
+    "mean": 100,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.1.4",
+    "name": "Holz weich",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.1.5",
+    "name": "Holz hart",
+    "min": null,
+    "mean": 75,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.1.6",
+    "name": "Metallständer, Stahlblech",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.2.1",
+    "name": "Gipskartonplatten, Gipsfaserplatten, Platten allgemein",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.2.2",
+    "name": "Putz",
+    "min": null,
+    "mean": 70,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.2.3",
+    "name": "Holz",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.2.4",
+    "name": "Fliesen",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.3.1",
+    "name": "Innenanstriche",
+    "min": null,
+    "mean": 8,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.3.2",
+    "name": "Tapeten",
+    "min": null,
+    "mean": 10,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.4.1.1",
+    "name": "Holztür",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.4.1.2",
+    "name": "Stahl",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.4.1.3",
+    "name": "Sperrholz, Schichtholz",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.4.1.4",
+    "name": "Glas",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.4.3.1",
+    "name": "Holz",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.4.3.2",
+    "name": "Naturstein, Keramik",
+    "min": null,
+    "mean": 70,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "3.4.3.3",
+    "name": "Kunststoff, Aluminium",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 9
+  },
+  {
+    "code": "4.1.1",
+    "name": "Beton",
+    "min": null,
+    "mean": 100,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.1.2",
+    "name": "Weichholz",
+    "min": null,
+    "mean": 65,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.1.3",
+    "name": "Hartholz",
+    "min": null,
+    "mean": 75,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.1.4",
+    "name": "Stahl",
+    "min": null,
+    "mean": 80,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.1.5",
+    "name": "Steindecke, Kappendecke",
+    "min": null,
+    "mean": 90,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.2.1",
+    "name": "Estrich, schwimmend",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.3.2",
+    "name": "Naturstein, weich",
+    "min": null,
+    "mean": 80,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.3.3",
+    "name": "Hartholz, Keramik, Parkett",
+    "min": null,
+    "mean": 80,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.3.4",
+    "name": "Weichholz, Vollparkett",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.3.5",
+    "name": "PVC",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.3.6",
+    "name": "Linoleum",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.3.7",
+    "name": "Textil",
+    "min": null,
+    "mean": 15,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.3.8",
+    "name": "Laminat",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.3.9",
+    "name": "Parkett, Fertigparkett",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.3.10",
+    "name": "Fliesen",
+    "min": 30,
+    "mean": 40,
+    "max": 60,
+    "page": 10
+  },
+  {
+    "code": "4.3.11",
+    "name": "Natursteinfliesen",
+    "min": 30,
+    "mean": 40,
+    "max": 60,
+    "page": 10
+  },
+  {
+    "code": "4.3.2b",
+    "name": "Betonwerkstein, Kunststein",
+    "min": 50,
+    "mean": 70,
+    "max": 80,
+    "page": 10
+  },
+  {
+    "code": "4.4.1",
+    "name": "Versiegelung, Lack",
+    "min": 5,
+    "mean": 7,
+    "max": 10,
+    "page": 10
+  },
+  {
+    "code": "4.4.2",
+    "name": "Imprägnierung, Öl, Wachs",
+    "min": 5,
+    "mean": 7,
+    "max": 10,
+    "page": 10
+  },
+  {
+    "code": "4.5.1.1",
+    "name": "Holz",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.5.1.2",
+    "name": "Metall",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.5.2.1",
+    "name": "Holz",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.5.2.2",
+    "name": "Metall",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.5.2.3",
+    "name": "Gipskarton",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.5.2.4",
+    "name": "Kunststoff",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.5.2.5",
+    "name": "Putz",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "4.5.2.6",
+    "name": "Mineralfaser (OWA etc.)",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 10
+  },
+  {
+    "code": "5.1.1",
+    "name": "Beton",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "5.1.2",
+    "name": "Stahl",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "5.1.3",
+    "name": "Weichholz",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "5.1.4",
+    "name": "Hartholz",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "5.4.1",
+    "name": "Stahl",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "5.4.2",
+    "name": "Aluminium",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "5.4.3",
+    "name": "Holz",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "6.1.1",
+    "name": "Beton",
+    "min": null,
+    "mean": 80,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "6.1.2",
+    "name": "Stahl",
+    "min": null,
+    "mean": 70,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "6.1.3",
+    "name": "Holz, weich",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "7.2.1",
+    "name": "Bituminös",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "7.2.2",
+    "name": "Kunststoff, hochwertig",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "7.2.3",
+    "name": "Kunststoff, einfach",
+    "min": 15,
+    "mean": 17,
+    "max": 20,
+    "page": 11
+  },
+  {
+    "code": "7.3",
+    "name": "Ausstiege, Lichtöffnungen",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.1",
+    "name": "Geneigte Dachkonstruktionen",
+    "min": 60,
+    "mean": 75,
+    "max": 90,
+    "page": 11
+  },
+  {
+    "code": "8.1.1",
+    "name": "Holz, Stahl, Nagelbinder",
+    "min": null,
+    "mean": 75,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.1.3",
+    "name": "Stahl",
+    "min": null,
+    "mean": 75,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.1.6",
+    "name": "Leimbinder, BSH",
+    "min": null,
+    "mean": 75,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.1.7",
+    "name": "Nagelbinder",
+    "min": null,
+    "mean": 75,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.2.1",
+    "name": "Zinkblech",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.2.2",
+    "name": "Kupferblech",
+    "min": null,
+    "mean": 70,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.2.3",
+    "name": "Stahlprofilblech (Trapezblech)",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.2.4",
+    "name": "Faserzementplatten",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.2.5",
+    "name": "Dachziegel",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.2.6",
+    "name": "Dachsteine",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.2.7",
+    "name": "Schieferplatten",
+    "min": null,
+    "mean": 75,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.2.9",
+    "name": "Aluminium",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 11
+  },
+  {
+    "code": "8.3.1",
+    "name": "Dampfsperre",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.3.1.1",
+    "name": "PE-Folie",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.3.1.2",
+    "name": "Aluminiumfolie",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.3.2",
+    "name": "Dampfbremse",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.3.2.1",
+    "name": "Spezialpapier",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.3.3",
+    "name": "Winddichtung",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.3.3.1",
+    "name": "PVC-Folie",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.3.3.2",
+    "name": "Spezialpapier",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.3.4",
+    "name": "Abdichtung",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.3.4.1",
+    "name": "Klebestreifen",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.3.4.3",
+    "name": "Klebemassen",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.4",
+    "name": "Dachöffnungen, Dachfenster",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.4.1",
+    "name": "Stahl",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.4.2",
+    "name": "Holz",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.4.3",
+    "name": "Kunststoff",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.5.1.1",
+    "name": "Zinkblech",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.5.1.2",
+    "name": "Kunststoff",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.5.1.3",
+    "name": "Kupferblech",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.6",
+    "name": "Schneefänge, Leitern",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.6.1",
+    "name": "Zink",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.6.2",
+    "name": "Stahl",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.7.1",
+    "name": "Edelstahl",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.7.2",
+    "name": "Formsteine",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "8.7.3",
+    "name": "Mauerwerk",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "9.1.1",
+    "name": "PVC-Rohre, PP-Rohre",
+    "min": null,
+    "mean": 70,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "9.1.2",
+    "name": "Steinzeug",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "9.1.3",
+    "name": "Gussrohre",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "9.1.4",
+    "name": "Hebeanlagen",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "10.1.1",
+    "name": "Stahlrohre",
+    "min": null,
+    "mean": 35,
+    "max": null,
+    "page": 12
+  },
+  {
+    "code": "10.1.2",
+    "name": "Kupferrohre",
+    "min": null,
+    "mean": 45,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "10.1.3",
+    "name": "Edelstahl, Verbundrohre, Kunststoffe",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "10.2",
+    "name": "Wasseraufbereitung",
+    "min": null,
+    "mean": 15,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "10.3",
+    "name": "Sanitärobjekte",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "10.3.1",
+    "name": "Duschabtrennungen aus  Alu / Kunststoff",
+    "min": 10,
+    "mean": null,
+    "max": 15,
+    "page": 13
+  },
+  {
+    "code": "10.3.2",
+    "name": "Duschabtrennungen aus Glas",
+    "min": 15,
+    "mean": null,
+    "max": 20,
+    "page": 13
+  },
+  {
+    "code": "11",
+    "name": "Warmwasseranlage",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "11.2",
+    "name": "Zentraler Warmwasserwärmer",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "11.3",
+    "name": "Durchlauferhitzer / Gas / Elektro",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "11.4",
+    "name": "Thermische Solaranlage",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "12.1",
+    "name": "Gasleitungen",
+    "min": 40,
+    "mean": 50,
+    "max": 60,
+    "page": 13
+  },
+  {
+    "code": "13.1.1",
+    "name": "Pumpen; Motore",
+    "min": null,
+    "mean": 15,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "13.2",
+    "name": "Gasheizthermen",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "13.3",
+    "name": "Heizrohrleitungen",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "13.4",
+    "name": "Brenner",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "13.5",
+    "name": "Feststoffbrennkessel, Koks, Kohle, Holz",
+    "min": 15,
+    "mean": null,
+    "max": 25,
+    "page": 13
+  },
+  {
+    "code": "13.6",
+    "name": "Holzpellet-Heizkessel",
+    "min": 15,
+    "mean": null,
+    "max": 20,
+    "page": 13
+  },
+  {
+    "code": "13.6",
+    "name": "Heizölbehälter",
+    "min": null,
+    "mean": 45,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "13.6.1",
+    "name": "Im Keller",
+    "min": null,
+    "mean": 45,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "13.6.2",
+    "name": "Unterirdisch",
+    "min": null,
+    "mean": 45,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "13.7",
+    "name": "Gasheizkessel",
+    "min": 18,
+    "mean": null,
+    "max": 24,
+    "page": 13
+  },
+  {
+    "code": "13.7.1",
+    "name": "Stahlblechrippen",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "13.7.2",
+    "name": "Stahlblechflächen",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "13.7.3",
+    "name": "Gusseisen",
+    "min": null,
+    "mean": 65,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "13.7.5",
+    "name": "Flächenheizsysteme",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "13.8",
+    "name": "Ölheizkessel",
+    "min": 15,
+    "mean": null,
+    "max": 20,
+    "page": 13
+  },
+  {
+    "code": "13.9",
+    "name": "Blockheizkraftwerk, Kleinanlage",
+    "min": 12,
+    "mean": null,
+    "max": 18,
+    "page": 13
+  },
+  {
+    "code": "13.10",
+    "name": "Fernwärmeübergabe",
+    "min": 15,
+    "mean": null,
+    "max": 18,
+    "page": 13
+  },
+  {
+    "code": "13.11",
+    "name": "Wärmepumpenanlagen",
+    "min": 18,
+    "mean": null,
+    "max": 25,
+    "page": 13
+  },
+  {
+    "code": "14",
+    "name": "Lufttechnische Anlagen",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "14.1",
+    "name": "Abluftanlagen",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "14.2",
+    "name": "Wärmetauscher",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "14.3",
+    "name": "Wärmerückgewinnung",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 13
+  },
+  {
+    "code": "14.4",
+    "name": "Lüftungsleitungen",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "15.1",
+    "name": "Leitungen unter Putz",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "15.2",
+    "name": "Schalter, Steckdosen",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "15.5",
+    "name": "Leuchten, innen",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "15.6",
+    "name": "Leuchten, außen",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "15.8",
+    "name": "elektrische Nachtspeichergeräte",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "15.9",
+    "name": "elektrische Lüftungen",
+    "min": null,
+    "mean": 10,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "15.10",
+    "name": "Blitzschutzanlagen",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "16.2",
+    "name": "Sprechanlagen, Klingelanlagen",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "16.3",
+    "name": "Antennenanlagen",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "16.4",
+    "name": "Brandmeldeanlagen",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "16.5.1",
+    "name": "Regler",
+    "min": 10,
+    "mean": null,
+    "max": 15,
+    "page": 14
+  },
+  {
+    "code": "16.5.2",
+    "name": "Photovoltaik-Zellen",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "17.1",
+    "name": "Personenaufzüge",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "17.1.1",
+    "name": "Seilaufzüge",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "17.1.2",
+    "name": "Hydraulikaufzüge",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "17.2",
+    "name": "Liftanlagen",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "18.1.1",
+    "name": "Natursteinbelag",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "18.1.2",
+    "name": "Kunststeinbelag",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "18.1.3",
+    "name": "Ziegel",
+    "min": null,
+    "mean": 40,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "18.1.4",
+    "name": "Kies",
+    "min": null,
+    "mean": 15,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "18.1.5",
+    "name": "Holzpflaster",
+    "min": null,
+    "mean": 15,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "18.2.1",
+    "name": "Beton",
+    "min": null,
+    "mean": 35,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "18.2.2",
+    "name": "Asphalt",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "18.2.3",
+    "name": "Naturstein",
+    "min": null,
+    "mean": 50,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "19.1.1",
+    "name": "Ziegel",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "19.1.2",
+    "name": "Beton",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 14
+  },
+  {
+    "code": "19.2.1",
+    "name": "Holz/Sockel, massiv",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 15
+  },
+  {
+    "code": "19.2.2",
+    "name": "Holz",
+    "min": null,
+    "mean": 20,
+    "max": null,
+    "page": 15
+  },
+  {
+    "code": "19.2.3",
+    "name": "Draht/Sockel, massiv",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 15
+  },
+  {
+    "code": "19.2.4",
+    "name": "Draht/Stahlpfosten",
+    "min": null,
+    "mean": 30,
+    "max": null,
+    "page": 15
+  },
+  {
+    "code": "20.1",
+    "name": "Fahrradständer, Fahnenmaste",
+    "min": null,
+    "mean": 25,
+    "max": null,
+    "page": 15
+  },
+  {
+    "code": "21",
+    "name": "Abwasseranlagen in Außenanlagen",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 15
+  },
+  {
+    "code": "21.1.1",
+    "name": "Steinzeug",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 15
+  },
+  {
+    "code": "21.1.3",
+    "name": "Stahl",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 15
+  },
+  {
+    "code": "21.1.4",
+    "name": "PVC-U",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 15
+  },
+  {
+    "code": "21.2.1",
+    "name": "Beton",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 15
+  },
+  {
+    "code": "21.2.2",
+    "name": "Mauerwerk",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 15
+  },
+  {
+    "code": "21.3.1",
+    "name": "Beton",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 15
+  },
+  {
+    "code": "21.3.2",
+    "name": "Mauerwerk",
+    "min": null,
+    "mean": 60,
+    "max": null,
+    "page": 15
+  }
+]

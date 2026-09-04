@@ -56,6 +56,21 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
   const initial=originalGet(),normalized=normalize(initial);if(!sameNumbering(initial,normalized))originalSet(normalized);decorate();
 })();
 </script>
+<script is:inline>
+(() => {
+  const importTimeValue=()=>{const key='svnet-time-value-transfer',raw=sessionStorage.getItem(key);if(!raw)return;
+  try{
+    const transfer=JSON.parse(raw),bridge=window.__bkiCalcBridge;if(!bridge)return;
+    if(transfer.includeAmount&&transfer.item){bridge.addSection?.({description:transfer.section||'Zeitwertermittlung'});bridge.addLine?.(transfer.item)}
+    if(transfer.includeText&&transfer.note){const field=document.getElementById('bk-note'),text=String(transfer.note).trim();if(field&&text&&!field.value.includes(text))field.value=[field.value.trim(),text].filter(Boolean).join('\n\n')}
+    sessionStorage.removeItem(key);
+    const card=document.querySelector('.bk-protocol');card?.classList.remove('is-collapsed');card?.querySelector('[aria-expanded]')?.setAttribute('aria-expanded','true');
+    const state=document.getElementById('bk-save-state');if(state)state.textContent='Zeitwertberechnung wurde übernommen. Bitte Kalkulation prüfen und speichern.';
+    card?.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(error){const state=document.getElementById('bk-save-state');if(state)state.textContent='Zeitwertberechnung konnte nicht übernommen werden.'}};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',importTimeValue,{once:true});else importTimeValue();
+})();
+</script>
 <style is:global>
 .bk-kva-import{border-left:4px solid var(--bko)}.bk-kva-head h2{margin:.1rem 0}.bk-kva-head p{margin:.25rem 0;color:var(--bkm);max-width:920px}.bk-kva-source{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:end;margin-top:14px}.bk-kva-source>label{display:grid;gap:5px;font-size:.78rem;font-weight:750;color:#536a7d}.bk-kva-source>span{align-self:center;color:var(--bkm);font-weight:750}.bk-kva-source select,.bk-kva-file{width:100%;box-sizing:border-box;border:1px solid #bdcbd6;border-radius:9px;padding:10px;background:#fff;color:var(--bki)}.bk-kva-file input{display:block;width:100%;margin-top:6px}.bk-kva-review-head{display:flex;justify-content:space-between;gap:12px;margin-top:18px}.bk-kva-positions{display:grid;gap:7px;margin-top:8px}.bk-kva-position{display:grid;grid-template-columns:auto 72px 1fr 90px 54px 120px;gap:8px;align-items:center;border:1px solid var(--bkl);border-radius:7px;padding:8px}.bk-kva-position input[type=text],.bk-kva-position input[inputmode]{min-width:0;width:100%;box-sizing:border-box;border:1px solid #bdcbd6;border-radius:5px;padding:6px}.bk-kva-offer{font-size:.75rem;color:var(--bkm);text-align:right}@media(max-width:800px){.bk-kva-source{grid-template-columns:1fr}.bk-kva-source>span{text-align:center}.bk-kva-position{grid-template-columns:auto 55px 1fr}.bk-kva-position .bk-kva-qty,.bk-kva-position .bk-kva-unit,.bk-kva-position .bk-kva-offer{grid-row:2}.bk-kva-position .bk-kva-qty{grid-column:2}.bk-kva-position .bk-kva-unit{grid-column:3}.bk-kva-position .bk-kva-offer{grid-column:3;text-align:left;padding-left:70px}}@media print{.bk-kva-import{display:none!important}}
 .bk-kva-upload-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bk-kva-upload-options>label{display:grid;gap:5px;font-size:.78rem;font-weight:750;color:#536a7d}.bk-kva-actions{align-items:flex-start;flex-wrap:wrap}.bk-kva-actions>button{max-width:320px}.bk-kva-actions>[role=status]{flex:1 1 320px}.bk-section-row{background:#eef4f7}.bk-section-row td{border-top:2px solid var(--bki);border-bottom:1px solid #b8c7d2}.bk-section-row .desc{border:0;background:transparent;color:var(--bki);font-weight:850;font-size:.95rem}.bk-section-row .bk-section-settlement{min-width:0}@media(max-width:800px){.bk-kva-upload-options{grid-template-columns:1fr}.bk-kva-actions>button,.bk-kva-actions>[role=status]{width:100%;max-width:none;flex-basis:100%}}@media print{.bk-section-row{background:#eef4f7!important}.bk-section-row .desc{font-weight:850!important}}

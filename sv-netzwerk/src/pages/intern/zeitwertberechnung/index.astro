@@ -1,0 +1,95 @@
+---
+import InternalLayout from '../../../layouts/InternalLayout.astro';
+import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.astro';
+import bteCatalog from '../../../data/bte-life-expectancy.json';
+
+const sourceUrl = 'https://drive.google.com/file/d/16MVmTfbjPO5BhiXHz8JN8kurrEYxP9aK/view';
+---
+<InternalLayout title="Zeitwertberechnung" description="Technische Zeitwertermittlung nach dem BTE-Arbeitsblatt Lebensdauer von Bauteilen, Zeitwerte." currentPath="/intern/zeitwertberechnung/">
+  <main class="zw-app" data-catalog={JSON.stringify(bteCatalog)}>
+    <a class="zw-back" href="/intern/versicherungsfaelle/">← Zurück zum Versicherungsportal</a>
+    <CalculationTypeNav active="timevalue" />
+    <section class="zw-head">
+      <div><p class="zw-kicker">BTE-Lebensdauerkatalog</p><h1>Zeitwertberechnung</h1><p>Technischen Zeitwert, Abzug „Neu für Alt“ und einen kopierfertigen Begründungstext ermitteln.</p></div>
+      <div id="zw-case" class="zw-case">Freie Berechnung · keinem Fall zugeordnet</div>
+    </section>
+
+    <section class="zw-notice">
+      <strong>Fachlicher Rahmen</strong>
+      <p>Die BTE-Werte sind Richtwerte. Maßgeblich bleiben der Einzelfall sowie Beanspruchung, Qualität, Pflege, Unterhaltung, Nutzbarkeit und gegebenenfalls die Schicksalsgemeinschaft verbundener Bauteile. Technische und wirtschaftliche Lebensdauer sind nicht gleichzusetzen.</p>
+      <a href={sourceUrl} target="_blank" rel="noreferrer">BTE-Arbeitsblatt in Google Drive öffnen</a>
+    </section>
+
+    <div class="zw-layout">
+      <section class="zw-card">
+        <div class="zw-title"><div><p class="zw-step">1</p><h2>Bauteil und Ausgangswerte</h2></div><span id="zw-count"></span></div>
+        <label>Bauteil suchen<input id="zw-search" type="search" placeholder="z. B. Dachziegel, Parkett, Kupferrohr"></label>
+        <label>Bauteil aus BTE-Katalog<select id="zw-component"></select></label>
+        <div id="zw-reference" class="zw-reference" aria-live="polite"></div>
+        <div class="zw-grid">
+          <label>Neuwert netto<input id="zw-new-value" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00"></label>
+          <label>Umsatzsteuer<input id="zw-vat" type="number" min="0" step="0.1" value="19"></label>
+          <label>Lebensalter in Jahren<input id="zw-age" type="number" min="0" step="0.1" value="0"></label>
+          <label>Technische Lebensdauer<input id="zw-lifetime" type="number" min="0.1" step="0.1"></label>
+          <label>Korrekturfaktor 0,8–1,2<input id="zw-factor" type="number" min="0.8" max="1.2" step="0.05" value="1"></label>
+          <label>Begrenzende Restlebensdauer optional<input id="zw-limited-life" type="number" min="0" step="0.1" placeholder="z. B. 3"></label>
+        </div>
+        <label class="zw-check"><input id="zw-no-extension" type="checkbox"> Teilreparatur ohne Verlängerung der Nutzungsdauer – keine Entwertung</label>
+        <button id="zw-calculate" class="zw-primary" type="button">Zeitwert berechnen</button>
+        <p id="zw-state" class="zw-state" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="zw-card zw-result-card">
+        <div class="zw-title"><div><p class="zw-step">2</p><h2>Ergebnis</h2></div></div>
+        <div id="zw-empty" class="zw-empty">Bitte Bauteil, Neuwert, Alter und Lebensdauer eingeben.</div>
+        <div id="zw-result" hidden>
+          <dl class="zw-results">
+            <div><dt>Neuwert</dt><dd id="zw-new-result"></dd></div>
+            <div><dt>Lineare Grundentwertung</dt><dd id="zw-base-rate"></dd></div>
+            <div><dt>Abzug „Neu für Alt“</dt><dd id="zw-deduction"></dd></div>
+            <div class="zw-highlight"><dt>Technischer Zeitwert</dt><dd id="zw-time-value"></dd></div>
+          </dl>
+          <div class="zw-formula"><strong>Rechenweg</strong><p id="zw-formula"></p></div>
+          <label>Begründungstext<textarea id="zw-text" rows="10"></textarea></label>
+          <div class="zw-actions"><button id="zw-copy" class="zw-secondary" type="button">Text kopieren</button><span id="zw-copy-state"></span></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="zw-card zw-transfer">
+      <div class="zw-title"><div><p class="zw-step">3</p><h2>In die Kalkulation übernehmen</h2></div></div>
+      <p>Wähle, welche Bestandteile in der BKI-Kalkulation ergänzt werden sollen.</p>
+      <div class="zw-transfer-options">
+        <label class="zw-check"><input id="zw-transfer-amount" type="checkbox" checked> Betrag als Kalkulationsposition übernehmen</label>
+        <label>Art der Position<select id="zw-transfer-mode"><option value="deduction">Abzug „Neu für Alt“ als negative Position</option><option value="timevalue">Technischen Zeitwert als positive Position</option></select></label>
+        <label class="zw-check"><input id="zw-transfer-text" type="checkbox" checked> Begründungstext als Hinweis übernehmen</label>
+      </div>
+      <button id="zw-transfer" class="zw-primary" type="button" disabled>Auswahl in Kalkulation übernehmen</button>
+      <p id="zw-transfer-state" class="zw-state" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+</InternalLayout>
+
+<style is:global>
+:root{--zw-navy:#17324a;--zw-muted:#687b8c;--zw-orange:#ff970f;--zw-line:#d7e1e8;--zw-green:#2e775b}.zw-app{max-width:1420px;margin:auto;padding:18px 24px 56px;color:var(--zw-navy)}.zw-back{display:inline-block;margin-bottom:12px;color:var(--zw-navy);font-weight:800;text-decoration:none}.zw-head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:16px}.zw-head h1{margin:.15rem 0}.zw-head p{margin:.2rem 0;color:var(--zw-muted)}.zw-kicker{color:var(--zw-orange)!important;font-weight:900;text-transform:uppercase;letter-spacing:.04em}.zw-case{max-width:480px;padding:10px 13px;border:1px solid var(--zw-line);border-left:4px solid var(--zw-orange);background:#fff;font-weight:800}.zw-case.on{border-left-color:var(--zw-green);background:#edf7f2;color:#225f49}.zw-notice{margin-bottom:16px;padding:14px 16px;border:1px solid #e7c48e;border-left:4px solid var(--zw-orange);background:#fff8ed}.zw-notice p{margin:.35rem 0 .45rem;line-height:1.5}.zw-notice a{color:var(--zw-navy);font-weight:800}.zw-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(420px,.9fr);gap:16px}.zw-card{margin-bottom:16px;padding:18px;border:1px solid var(--zw-line);background:#fff;box-shadow:0 2px 8px rgba(7,26,46,.05)}.zw-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.zw-title>div{display:flex;align-items:center;gap:10px}.zw-title h2{margin:0}.zw-step{display:grid;place-items:center;width:30px;height:30px;margin:0;border-radius:2px;background:var(--zw-navy);color:#fff;font-weight:900}.zw-card label{display:grid;gap:5px;margin-bottom:11px;color:#526a7d;font-size:.8rem;font-weight:800}.zw-card input,.zw-card select,.zw-card textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid #b9c8d3;border-radius:3px;background:#fff;color:#172f44;font:inherit}.zw-card input:focus,.zw-card select:focus,.zw-card textarea:focus{outline:2px solid rgba(255,151,15,.24);border-color:var(--zw-orange)}.zw-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}.zw-reference{margin:4px 0 14px;padding:11px 12px;border:1px solid var(--zw-line);background:#f5f8fa;line-height:1.5}.zw-reference strong,.zw-reference span{display:block}.zw-reference span{color:var(--zw-muted);font-size:.8rem}.zw-check{display:flex!important;align-items:flex-start;gap:8px;color:var(--zw-navy)!important;font-size:.88rem!important}.zw-check input{flex:0 0 auto;width:18px;height:18px;margin:1px 0 0;accent-color:var(--zw-orange)}.zw-primary,.zw-secondary{padding:10px 14px;border-radius:3px;font-weight:850;cursor:pointer}.zw-primary{border:1px solid var(--zw-navy);background:var(--zw-navy);color:#fff}.zw-secondary{border:1px solid #aebfcb;background:#fff;color:var(--zw-navy)}.zw-primary:disabled{cursor:not-allowed;opacity:.45}.zw-state{min-height:1.3em;margin:.6rem 0 0;color:var(--zw-muted);font-size:.85rem}.zw-empty{display:grid;min-height:260px;place-items:center;padding:20px;border:1px dashed #b9c8d3;background:#f8fafb;color:var(--zw-muted);text-align:center}.zw-results{display:grid;gap:9px;margin:0}.zw-results>div{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 12px;border-bottom:1px solid #e5ebef}.zw-results dt{color:var(--zw-muted)}.zw-results dd{margin:0;text-align:right;font-weight:900}.zw-results dd small{display:block;color:var(--zw-muted);font-weight:700}.zw-results .zw-highlight{border:1px solid #a9d1bf;background:#edf7f2}.zw-formula{margin:14px 0;padding:12px;border-left:4px solid var(--zw-orange);background:#fff8ed}.zw-formula p{margin:.35rem 0 0;line-height:1.5}.zw-actions{display:flex;align-items:center;gap:10px}.zw-transfer{border-top:4px solid var(--zw-orange)}.zw-transfer>p{color:var(--zw-muted)}.zw-transfer-options{display:grid;grid-template-columns:1fr minmax(280px,.7fr) 1fr;gap:14px;align-items:end}.zw-transfer-options label{margin:0}.zw-transfer-options .zw-check{align-self:center}.zw-result-card textarea{line-height:1.45;resize:vertical}@media(max-width:1000px){.zw-layout{grid-template-columns:1fr}.zw-transfer-options{grid-template-columns:1fr}}@media(max-width:620px){.zw-app{padding:12px 10px 40px}.zw-head{display:block}.zw-case{margin-top:12px}.zw-grid{grid-template-columns:1fr}.zw-results>div{grid-template-columns:1fr}.zw-results dd{text-align:left}.zw-primary,.zw-secondary{width:100%}.zw-actions{align-items:stretch;flex-direction:column}.zw-card input,.zw-card select,.zw-card textarea{font-size:16px}}@media print{.intern-header,.intern-sidebar,.calculation-type-nav,.zw-back,.zw-transfer,.zw-actions,.skip-link{display:none!important}.intern-portal-shell{display:block!important}.zw-app{max-width:none;padding:0}.zw-layout{display:block}.zw-card,.zw-notice{box-shadow:none;break-inside:avoid}.zw-card:first-child{margin-bottom:8mm}.zw-result-card textarea{border:0;min-height:70mm}}
+</style>
+
+<script type="module" is:inline>
+import { calculateTimeValue, buildTimeValueText } from '/intern/time-value.js';
+(() => {
+  const root=document.querySelector('.zw-app');if(!root)return;
+  const catalog=JSON.parse(root.dataset.catalog||'[]'),$=id=>document.getElementById(id);
+  const money=value=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(value)||0);
+  const number=value=>new Intl.NumberFormat('de-DE',{maximumFractionDigits:2}).format(Number(value)||0);
+  const percent=value=>new Intl.NumberFormat('de-DE',{maximumFractionDigits:2}).format((Number(value)||0)*100)+' %';
+  let filtered=catalog,current=null,result=null;
+  for(const store of[sessionStorage,localStorage])try{const active=JSON.parse(store.getItem('svnet-case')||'null');if(active?.folder_id){const meta=active.meta||{};$('zw-case').classList.add('on');$('zw-case').textContent=`Fall ${meta.schaden_nr||'ohne Schaden-Nr.'} · ${meta.schadenart||'Schaden'} · ${meta.vn_objekt||meta.ort||''}`;break}}catch{}
+  const defaultLifetime=row=>Number(row.mean??(row.min!=null&&row.max!=null?(Number(row.min)+Number(row.max))/2:row.min??row.max??0));
+  function esc(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}
+  function fill(){const prior=$('zw-component').value;$('zw-component').innerHTML=filtered.map(row=>`<option value="${catalog.indexOf(row)}">${esc(row.code)} · ${esc(row.name)}</option>`).join('');if(prior&&[...$('zw-component').options].some(option=>option.value===prior))$('zw-component').value=prior;selectComponent();$('zw-count').textContent=`${filtered.length} von ${catalog.length} Richtwerten`}
+  function selectComponent(){current=catalog[Number($('zw-component').value)]||filtered[0]||null;if(!current){$('zw-reference').textContent='Kein passendes Bauteil gefunden.';return}const suggested=defaultLifetime(current),range=current.min!=null&&current.max!=null?`${number(current.min)} bis ${number(current.max)} Jahre`:current.mean!=null?`${number(current.mean)} Jahre`:'';$('zw-lifetime').value=number(suggested).replace('.','').replace(',','.');$('zw-reference').innerHTML=`<strong>BTE ${esc(current.code)} · ${esc(current.name)}</strong><span>${current.mean!=null?`Mittelwert ${number(current.mean)} Jahre`:current.min!=null&&current.max!=null?`Kein Mittelwert angegeben; Spanne ${range}`:'Richtwert'}${current.min!=null&&current.max!=null&&current.mean!=null?` · Spanne ${range}`:''} · Tabellenblatt Seite ${current.page}</span>`;result=null;showEmpty()}
+  function showEmpty(){$('zw-empty').hidden=false;$('zw-result').hidden=true;$('zw-transfer').disabled=true}
+  function calculate(){if(!current)return;result=calculateTimeValue({newValueNet:$('zw-new-value').value,age:$('zw-age').value,lifetime:$('zw-lifetime').value,correctionFactor:$('zw-factor').value,limitedRemainingLife:$('zw-limited-life').value,vatRate:$('zw-vat').value,noLifeExtension:$('zw-no-extension').checked});if(!result.valid){showEmpty();$('zw-state').textContent=result.error;return}$('zw-state').textContent='Zeitwert wurde berechnet. Bitte Ansatz und Einzelfall würdigen.';$('zw-empty').hidden=true;$('zw-result').hidden=false;$('zw-new-result').innerHTML=`${money(result.newValueNet)} netto<small>${money(result.newValueGross)} brutto</small>`;$('zw-base-rate').innerHTML=`${percent(result.baseDepreciationRate)}<small>${result.age} ÷ ${result.effectiveLifetime} Jahre</small>`;$('zw-deduction').innerHTML=`${money(result.deductionNet)} netto<small>${money(result.deductionGross)} brutto · ${percent(result.depreciationRate)}</small>`;$('zw-time-value').innerHTML=`${money(result.timeValueNet)} netto<small>${money(result.timeValueGross)} brutto · ${percent(result.timeValueRate)}</small>`;$('zw-formula').textContent=result.noLifeExtension?'Teilreparatur ohne Nutzungsdauerverlängerung: Zeitwertanteil 100 %.':`Grundentwertung = ${number(result.age)} Jahre ÷ ${number(result.effectiveLifetime)} Jahre = ${percent(result.baseDepreciationRate)}; korrigierte Entwertung = ${percent(result.baseDepreciationRate)} × ${number(result.correctionFactor)} = ${percent(result.depreciationRate)}; Zeitwert = Neuwert × ${percent(result.timeValueRate)}.`;$('zw-text').value=buildTimeValueText(current.name,result,{page:current.page});$('zw-transfer').disabled=false}
+  $('zw-search').oninput=()=>{const query=$('zw-search').value.trim().toLocaleLowerCase('de');filtered=catalog.filter(row=>`${row.code} ${row.name}`.toLocaleLowerCase('de').includes(query));fill()};$('zw-component').onchange=selectComponent;$('zw-calculate').onclick=calculate;['zw-new-value','zw-vat','zw-age','zw-lifetime','zw-factor','zw-limited-life','zw-no-extension'].forEach(id=>$(id).addEventListener('input',()=>{if(result)calculate()}));$('zw-copy').onclick=async()=>{try{await navigator.clipboard.writeText($('zw-text').value);$('zw-copy-state').textContent='Text kopiert.'}catch{$('zw-text').select();$('zw-copy-state').textContent='Text ist markiert – bitte Strg+C drücken.'}};$('zw-transfer').onclick=()=>{if(!result?.valid||!current)return;const includeAmount=$('zw-transfer-amount').checked,includeText=$('zw-transfer-text').checked;if(!includeAmount&&!includeText){$('zw-transfer-state').textContent='Bitte Betrag oder Begründungstext auswählen.';return}const deduction=$('zw-transfer-mode').value==='deduction',amount=deduction?-result.deductionNet:result.timeValueNet,description=deduction?`Abzug „Neu für Alt“ – ${current.name}, Zeitwertanteil ${percent(result.timeValueRate)}, BTE-TLD ${number(result.lifetime)} Jahre`:`Technischer Zeitwert – ${current.name}, Zeitwertanteil ${percent(result.timeValueRate)}, BTE-TLD ${number(result.lifetime)} Jahre`;sessionStorage.setItem('svnet-time-value-transfer',JSON.stringify({includeAmount,includeText,section:`Zeitwertermittlung – ${current.name}`,item:{position_code:`ZW ${current.code}`,description,quantity:1,unit:'psch',unit_price:amount,regional_factor:1,source_name:'BTE-Arbeitsblatt Lebensdauer von Bauteilen, Zeitwerte · Stand 14.03.2008'},note:$('zw-text').value,createdAt:new Date().toISOString()}));window.location.assign('/intern/kalkulation/?zeitwert=1')};fill();
+})();
+</script>

@@ -1,6 +1,6 @@
 ---
 interface Props {
-  active: 'bki' | 'insurance' | 'glass';
+  active: 'bki' | 'insurance' | 'glass' | 'timevalue';
 }
 
 const { active } = Astro.props;
@@ -8,6 +8,7 @@ const entries = [
   { id: 'bki', label: 'BKI-Kalkulation', href: '/intern/kalkulation/' },
   { id: 'insurance', label: 'Versicherungsschäden', href: '/intern/kalkulation/versicherungsschaeden/' },
   { id: 'glass', label: 'Glas-Erstattungspreise', href: '/intern/kalkulation/glas-erstattungspreise/' },
+  { id: 'timevalue', label: 'Zeitwertberechnung', href: '/intern/zeitwertberechnung/' },
 ] as const;
 ---
 <section class="calculation-type-nav" aria-label="Kalkulationsart">
