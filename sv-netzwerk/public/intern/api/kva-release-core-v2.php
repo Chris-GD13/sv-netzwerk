@@ -1,6 +1,38 @@
 <?php
 declare(strict_types=1);
 
+const KR_MEY_GENERALBAU_RECIPIENT = 'backoffice@meygeneralbau.de';
+
+function krMeyGeneralbau(string $company): bool
+{
+    $normalized = preg_replace('/[^\p{L}\p{N}]+/u', '', mb_strtolower(trim($company), 'UTF-8')) ?? '';
+    return str_contains($normalized, 'meygeneralbau');
+}
+
+function krMeyOperationalCc(array $contactAnalysis, array $caseContacts): array
+{
+    $emails = [];
+    $add = static function (mixed $value) use (&$emails): void {
+        foreach (preg_split('/[;,\s]+/', trim((string)$value)) ?: [] as $email) {
+            $email = mb_strtolower(trim($email), 'UTF-8');
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) continue;
+            if (in_array($email, [KR_MEY_GENERALBAU_RECIPIENT, 'kontakt@meygeneralbau.de'], true)) continue;
+            $emails[$email] = $email;
+        }
+    };
+    $people = kvaIssuerConfirmed($contactAnalysis) && is_array($contactAnalysis['contact_people'] ?? null) ? $contactAnalysis['contact_people'] : [];
+    foreach ($people as $person) {
+        if (!is_array($person)) continue;
+        $role = trim((string)($person['role'] ?? ''));
+        $operational = ($person['operational'] ?? false) === true || kvaOperationalRole($role);
+        if ($operational && !kvaExecutiveRole($role)) $add($person['email'] ?? '');
+    }
+    $caseRole = trim((string)($caseContacts['sanierer_funktion'] ?? ''));
+    $casePerson = trim((string)($caseContacts['sanierer_ansprechpartner'] ?? ''));
+    if ($casePerson !== '' && kvaOperationalRole($caseRole) && !kvaExecutiveRole($caseRole)) $add($caseContacts['sanierer_email'] ?? '');
+    return array_values($emails);
+}
+
 function krCaseInsurer(string $folder): string
 {
     foreach (krList($folder) as $file) {
@@ -131,6 +163,8 @@ function krReviewedKva(array $preview, array $input): array
         'subject'=>trim((string)($input['subject'] ?? ('KVA-Freigabe · Schaden-Nr. '.($preview['case_no'] ?? '')))),
         'body'=>trim((string)($input['body'] ?? '')),
     ];
+    $reviewed['mey_generalbau'] = krMeyGeneralbau((string)($preview['company'] ?? '')) || krMeyGeneralbau($reviewed['company']);
+    if ($reviewed['mey_generalbau']) $reviewed['email'] = KR_MEY_GENERALBAU_RECIPIENT;
     $missing = [];
     foreach (['company'=>'Firma','email'=>'E-Mail-Adresse','quote_number'=>'KVA-Nummer','insurer'=>'Versicherer','net'=>'Netto-Gesamtbetrag','gross'=>'Brutto-Gesamtbetrag','subject'=>'Betreff','body'=>'Freigabetext'] as $key=>$label) {
         if ($reviewed[$key] === null || $reviewed[$key] === '') $missing[] = $label;
@@ -199,7 +233,9 @@ function krV2Handle(array $user): void
                 ['name'=>$name,'mime'=>$mime,'bytes'=>$bytes] = krSelected($folder, trim((string)($_POST['file_id'] ?? '')));
             }
             $result = krAnalyze($name, $mime, $bytes);
-            $detectedContacts = kvaDetectedCaseContacts(krAnalyzeContacts($name, $mime, $bytes));
+            $contactAnalysis = krAnalyzeContacts($name, $mime, $bytes);
+            $detectedContacts = kvaDetectedCaseContacts($contactAnalysis);
+            $caseContacts = krCaseContacts($folder);
             $net = krMoney($result['net_total'] ?? null);
             $vat = krMoney($result['vat_total'] ?? null);
             $gross = krMoney($result['gross_total'] ?? null);
@@ -214,8 +250,12 @@ function krV2Handle(array $user): void
             $sparkasse = (bool)($result['sparkassenversicherung'] ?? false)
                 || preg_match('/sparkassen.?versicherung|SV SparkassenVersicherung/i', $insurer) === 1;
             if ($sparkasse && $insurer === '') $insurer = 'SV SparkassenVersicherung';
-            $contactMerge = kvaMergeCaseContacts(krCaseContacts($folder), $detectedContacts, $name, trim((string)($result['quote_number'] ?? '')));
+            $contactMerge = kvaMergeCaseContacts($caseContacts, $detectedContacts, $name, trim((string)($result['quote_number'] ?? '')));
+            $company = trim((string)($detectedContacts['sanierer_firma'] ?? $caseContacts['sanierer_firma'] ?? $result['company'] ?? ''));
             $email = trim((string)($detectedContacts['sanierer_email'] ?? ''));
+            $meyGeneralbau = krMeyGeneralbau($company);
+            $operationalCc = $meyGeneralbau ? krMeyOperationalCc($contactAnalysis, $caseContacts) : [];
+            if ($meyGeneralbau) $email = KR_MEY_GENERALBAU_RECIPIENT;
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $email = '';
                 $warnings[] = 'Die geschäftliche E-Mail-Adresse des KVA-Absenders wurde nicht sicher erkannt.';
@@ -224,8 +264,10 @@ function krV2Handle(array $user): void
                 'folder'=>$folder,
                 'case_no'=>krCaseNo($folder),
                 'source'=>$name,
-                'company'=>trim((string)($detectedContacts['sanierer_firma'] ?? $result['company'] ?? '')),
+                'company'=>$company,
                 'email'=>$email,
+                'operational_cc'=>$operationalCc,
+                'recipient_locked'=>$meyGeneralbau,
                 'quote_number'=>trim((string)($result['quote_number'] ?? '')),
                 'net'=>$net,
                 'gross'=>$gross,
@@ -267,6 +309,12 @@ function krV2Handle(array $user): void
                 if (!filter_var($address, FILTER_VALIDATE_EMAIL)) throw new RuntimeException('Ungültige CC-E-Mail-Adresse: '.$address);
                 $cc[strtolower($address)] = krRec($address);
             }
+            foreach (is_array($preview['operational_cc'] ?? null) ? $preview['operational_cc'] : [] as $address) {
+                $address = mb_strtolower(trim((string)$address), 'UTF-8');
+                if (filter_var($address, FILTER_VALIDATE_EMAIL)) $cc[$address] = krRec($address);
+            }
+            unset($cc[mb_strtolower($to, 'UTF-8')]);
+            if ($reviewed['mey_generalbau']) unset($cc['kontakt@meygeneralbau.de']);
             $body = $reviewed['body'];
             $subject = preg_replace('/[\r\n]+/u', ' ', $reviewed['subject']) ?? $reviewed['subject'];
             $message = ['subject'=>$subject,'body'=>['contentType'=>'HTML','content'=>'<p>'.nl2br(htmlspecialchars($body,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8')).'</p>'],'toRecipients'=>[krRec($to)]];
