@@ -117,6 +117,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-header__revenue-title > span:last-child { display: flex; align-items: center; gap: 7px; }
       .intern-header__revenue-title small { font-size: .64rem; font-weight: 700; opacity: .78; }
       .intern-header__revenue-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+      .intern-header__revenue-grid.is-holger { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .intern-header__revenue-item { min-width: 0; padding-left: 9px; border-left: 1px solid rgba(7, 26, 46, .28); }
       .intern-header__revenue-item:first-child { padding-left: 0; border-left: 0; }
       .intern-header__revenue-item span { display: block; overflow: hidden; font-size: .65rem; font-weight: 800; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
@@ -219,7 +220,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
         }
       });
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=20260904-5', { scope: '/intern/', updateViaCache: 'none' }).then((registration) => registration.update()).catch(() => {}));
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=20260904-6', { scope: '/intern/', updateViaCache: 'none' }).then((registration) => registration.update()).catch(() => {}));
       }
       const revenueSummary = document.getElementById('intern-revenue-summary');
       const settlementLink = document.getElementById('intern-settlement-link');
@@ -233,9 +234,22 @@ const isActive = (href: string) => currentPath.startsWith(href);
           const data = await response.json();
           if (!response.ok || !data.ok) throw new Error(data.error || 'Umsatzstand nicht verfügbar.');
           if (!data.visible) { revenueSummary.hidden = true; if (settlementLink instanceof HTMLElement) settlementLink.hidden = true; return; }
-          if (settlementLink instanceof HTMLElement) settlementLink.hidden = false;
+          if (settlementLink instanceof HTMLElement) settlementLink.hidden = data.show_settlement_link === false;
           if (!data.show_summary) { revenueSummary.hidden = true; return; }
           const renderRevenueSummary = (summary) => {
+          if (summary.summary_type === 'holger') {
+            const claims = summary.claims || {};
+            const rekon = summary.rekon || {};
+            revenueSummary.title = `Claims Stand ${claims.updated_at || '–'} · Rekon Stand ${rekon.updated_at || '–'}`;
+            revenueSummary.innerHTML = `
+              <div class="intern-header__revenue-title"><span>Holger · Umsatz</span><span><small>laufendes Jahr</small></span></div>
+              <div class="intern-header__revenue-grid is-holger">
+                <div class="intern-header__revenue-item"><span>Claims · ${claims.period || '–'}</span><strong>${money(claims.net)} netto</strong><small>${money(claims.gross)} brutto</small></div>
+                <div class="intern-header__revenue-item"><span>Rekon · ${rekon.period || '–'}</span><strong>${money(rekon.net)} netto</strong><small>${money(rekon.gross)} brutto</small></div>
+              </div>`;
+            revenueSummary.hidden = false;
+            return;
+          }
           const current = summary.current || {};
           const previous = summary.previous || {};
           revenueSummary.title = `Quelle: ${summary.source || 'Umsatzaufstellung'} · Stand ${summary.source_updated_at || '–'}`;

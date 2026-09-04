@@ -24,7 +24,7 @@ function rsIsKatja(array $user):bool {
     return str_contains($identity,'katja')||str_contains($identity,'schaefer');
 }
 function rsVisible(array $user):bool {
-    return in_array(svnetUserProfile($user),['christian','marc'],true)||rsCanRefresh($user)||rsIsKatja($user);
+    return in_array(svnetUserProfile($user),['christian','holger','marc'],true)||rsCanRefresh($user)||rsIsKatja($user);
 }
 function rsCanViewProfile(array $user,string $profile):bool {
     if(rsCanRefresh($user)||svnetUserProfile($user)==='christian')return true;
@@ -243,7 +243,15 @@ if($action==='scheduled_rekon'){
     try{$payloads=rsRefreshRekon(['email'=>'server-automation@sv-netzwerk.eu','full_name'=>'Server-Automation'],rsRekonSharePointSources());apiJson(['ok'=>true,'scheduled'=>true,'profiles'=>array_keys($payloads)]);}catch(Throwable $error){error_log('[revenue-summary scheduled rekon] '.$error->getMessage());apiError(503,$error->getMessage());}
 }
 $user=requireAuth();
-if($action==='access'){if(!rsVisible($user))apiJson(['ok'=>true,'visible'=>false]);if(rsCanViewProfile($user,'christian')){$payload=rsStored('christian')??rsFallback();unset($payload['entries'],$payload['private_entries'],$payload['available_years']);apiJson(['ok'=>true,'visible'=>true,'show_summary'=>true,'can_refresh'=>rsCanRefreshProfile($user,'christian'),...$payload]);}apiJson(['ok'=>true,'visible'=>true,'show_summary'=>false,'default_profile'=>'rekon_marc']);}
+if($action==='access'){
+    if(!rsVisible($user))apiJson(['ok'=>true,'visible'=>false]);
+    if(svnetUserProfile($user)==='holger'){
+        $claims=rsStored('holger')??rsHolgerEmpty();$rekon=rsStored('rekon_holger')??rsRekonEmpty('rekon_holger');$claimsCurrent=is_array($claims['current']??null)?$claims['current']:[];$rekonCurrent=is_array($rekon['current']??null)?$rekon['current']:[];
+        apiJson(['ok'=>true,'visible'=>true,'show_summary'=>true,'show_settlement_link'=>false,'summary_type'=>'holger','claims'=>['period'=>(string)($claimsCurrent['period']??date('Y')),'net'=>(float)($claimsCurrent['income_net']??0),'gross'=>(float)($claimsCurrent['income_gross']??0),'updated_at'=>(string)($claims['source_updated_at']??'–')],'rekon'=>['period'=>(string)($rekonCurrent['period']??date('Y')),'net'=>(float)($rekonCurrent['payout_net']??0),'gross'=>(float)($rekonCurrent['payout_gross']??0),'updated_at'=>(string)($rekon['source_updated_at']??'–')]]);
+    }
+    if(rsCanViewProfile($user,'christian')){$payload=rsStored('christian')??rsFallback();unset($payload['entries'],$payload['private_entries'],$payload['available_years']);apiJson(['ok'=>true,'visible'=>true,'show_summary'=>true,'show_settlement_link'=>true,...$payload]);}
+    apiJson(['ok'=>true,'visible'=>true,'show_summary'=>false,'show_settlement_link'=>true,'default_profile'=>'rekon_marc']);
+}
 if(!rsVisible($user)||!rsCanViewProfile($user,$profile))apiJson(['ok'=>true,'visible'=>false,'default_profile'=>(rsIsKatja($user)||svnetUserProfile($user)==='marc')?'rekon_marc':null]);
 try{
     if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if(!rsCanRefreshProfile($user,$profile))apiError(403,str_starts_with($profile,'rekon_')?'Nur Katja oder Susanne dürfen Rekon manuell aktualisieren.':'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');if(str_starts_with($profile,'rekon_'))$payload=rsRefreshRekon($user,rsUploadedSources(),$profile);else{$source=rsUploadedSource();$payload=$profile==='holger'?rsRefreshHolger($user,$source):rsRefresh($user,$source);}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,...$payload]);}

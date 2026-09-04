@@ -5,7 +5,7 @@ import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst, NetworkFirst } from 'workbox-strategies';
 
-const CACHE_VERSION = '20260904-5';
+const CACHE_VERSION = '20260904-6';
 const PAGE_CACHE = `portal-pages-${CACHE_VERSION}`;
 const API_CACHE = `api-cache-${CACHE_VERSION}`;
 const ASSET_CACHE = `assets-cache-${CACHE_VERSION}`;
