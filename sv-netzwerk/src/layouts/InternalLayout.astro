@@ -45,6 +45,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__nav a.active { background: #fff; border-color: #d9dde1; }
       .intern-sidebar__nav a.active::before { content: ''; position: absolute; left: -1px; top: 8px; bottom: 8px; width: 3px; background: #f59a23; }
       .intern-sidebar__nav a span, .intern-header__logout span, .intern-header__login span { width: 22px; color: #f59a23; font-size: 1.1rem; text-align: center; }
+      .intern-header__identity { display: flex; align-items: center; gap: 9px; }
       #intern-main { min-width: 0; }
       .chatgpt-onboarding { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; background: rgba(7, 26, 46, .66); }
       .chatgpt-onboarding[hidden] { display: none; }
@@ -63,8 +64,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
     .intern-sidebar__expert label { display: grid; gap: 3px; color: #263746; }
     .intern-sidebar__expert label small { color: #6c7e8e; font-weight: 400; }
     .intern-sidebar__expert select { width: 100%; min-width: 0; padding: 8px 9px; border: 1px solid #c7ccd1; border-radius: 3px; background: #fff; color: #263746; font: inherit; }
-      .intern-header__logout,
-      .intern-header__login {
+      .intern-header__logout {
         appearance: none;
         display: flex;
         align-items: center;
@@ -80,10 +80,28 @@ const isActive = (href: string) => currentPath.startsWith(href);
         cursor: pointer;
         text-decoration: none;
       }
+      .intern-header__login {
+        appearance: none;
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        gap: 5px;
+        width: auto;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, .48);
+        border-radius: 3px;
+        background: #fff;
+        color: #263746;
+        font: inherit;
+        font-size: .82rem;
+        font-weight: 800;
+        line-height: 1;
+        text-decoration: none;
+        white-space: nowrap;
+      }
       .intern-header__logout {
         margin-top: 18px;
       }
-      .intern-header__login { margin-top: 8px; }
       .intern-header__logout:hover,
       .intern-header__logout:focus-visible,
       .intern-header__login:hover,
@@ -113,15 +131,23 @@ const isActive = (href: string) => currentPath.startsWith(href);
         .intern-header__revenue-item { padding: 5px 0 0; border-top: 1px solid rgba(7, 26, 46, .22); border-left: 0; }
         .intern-header__revenue-item:first-child { padding-top: 0; border-top: 0; }
       }
+      @media (max-width: 680px) {
+        .intern-header .intern-header__brand { flex-wrap: wrap; }
+        .intern-header__identity { width: 100%; }
+        .intern-header__login { padding: 7px 8px; font-size: .76rem; }
+      }
     </style>
   </head>
   <body class="intern-body">
     <header class="intern-header">
       <div class="sv-container intern-header__inner">
         <div class="intern-header__brand">
-          <a class="site-brand" href="/" aria-label="SV-Netzwerk – Startseite">
-            <img class="intern-header__logo" src={logoSrc.src} alt="SV-Netzwerk" width="220" height="46" />
-          </a>
+          <div class="intern-header__identity">
+            <a class="intern-header__login" href="/intern/login/"><span>↩</span>Anmelden</a>
+            <a class="site-brand" href="/" aria-label="SV-Netzwerk – Startseite">
+              <img class="intern-header__logo" src={logoSrc.src} alt="SV-Netzwerk" width="220" height="46" />
+            </a>
+          </div>
           <div class="intern-header__meta">
             <p class="intern-header__eyebrow">Geschütztes Prüfportal</p>
             <strong>{portalProject.title}</strong>
@@ -139,7 +165,6 @@ const isActive = (href: string) => currentPath.startsWith(href);
           <slot name="sidebar-extra" />
         </nav>
         <button class="intern-header__logout" id="intern-logout" type="button"><span>↪</span>Abmelden</button>
-        <a class="intern-header__login" href="/intern/login/"><span>↩</span>Anmelden</a>
       </aside>
       <script is:inline src="/intern/drive-status-cache.js?v=20260829-1"></script>
       <main id="intern-main"><slot /></main>
@@ -190,7 +215,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
         }
       });
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=20260904-3', { scope: '/intern/', updateViaCache: 'none' }).then((registration) => registration.update()).catch(() => {}));
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=20260904-4', { scope: '/intern/', updateViaCache: 'none' }).then((registration) => registration.update()).catch(() => {}));
       }
       const revenueSummary = document.getElementById('intern-revenue-summary');
       const settlementLink = document.getElementById('intern-settlement-link');
