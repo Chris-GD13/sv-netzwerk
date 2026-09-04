@@ -88,11 +88,19 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-header__login:hover,
       .intern-header__login:focus-visible { background: #e7e9eb; }
       .intern-header__logout:disabled { cursor: wait; opacity: .7; }
-      .intern-header__claims-summary { display: flex; flex: 1 1 310px; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
-      .intern-header__claims-summary[hidden] { display: none; }
-      .intern-header__claims-box { min-width: 145px; padding: 9px 12px; border: 1px solid #d67d00; border-radius: 4px; background: #f59a23; color: #071a2e; box-shadow: 0 3px 10px rgba(7, 26, 46, .12); }
-      .intern-header__claims-box span { display: block; font-size: .68rem; font-weight: 800; line-height: 1.2; }
-      .intern-header__claims-box strong { display: block; margin-top: 2px; color: #071a2e; font-size: 1rem; line-height: 1.2; }
+      .intern-header__revenue-summary { flex: 0 1 620px; min-width: 0; padding: 9px 12px; border: 1px solid #d67d00; border-radius: 4px; background: #f59a23; color: #071a2e; box-shadow: 0 3px 10px rgba(7, 26, 46, .12); }
+      .intern-header__revenue-summary[hidden] { display: none; }
+      .intern-header__revenue-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 5px; font-size: .72rem; font-weight: 900; line-height: 1.2; }
+      .intern-header__revenue-title > span:last-child { display: flex; align-items: center; gap: 7px; }
+      .intern-header__revenue-title small { font-size: .64rem; font-weight: 700; opacity: .78; }
+      .intern-header__revenue-refresh { padding: 3px 7px; border: 1px solid rgba(7, 26, 46, .55); border-radius: 3px; background: #fff; color: #071a2e; font: inherit; font-size: .64rem; font-weight: 900; cursor: pointer; }
+      .intern-header__revenue-refresh:disabled { cursor: wait; opacity: .65; }
+      .intern-header__revenue-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+      .intern-header__revenue-item { min-width: 0; padding-left: 9px; border-left: 1px solid rgba(7, 26, 46, .28); }
+      .intern-header__revenue-item:first-child { padding-left: 0; border-left: 0; }
+      .intern-header__revenue-item span { display: block; overflow: hidden; font-size: .65rem; font-weight: 800; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+      .intern-header__revenue-item strong { display: block; margin-top: 2px; font-size: .83rem; line-height: 1.25; }
+      .intern-header__revenue-item small { display: block; margin-top: 1px; font-size: .61rem; font-weight: 700; line-height: 1.2; }
       @media (max-width: 900px) {
         .intern-portal-shell { grid-template-columns: 1fr; }
         .intern-sidebar { display: block; padding: 7px 10px; border-right: 0; border-bottom: 1px solid #d9dde1; overflow-x: auto; }
@@ -101,8 +109,10 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__expert { grid-template-columns: auto minmax(190px, 1fr); align-items: center; gap: 8px; margin: 0 0 0 8px; padding: 0 0 0 12px; border-top: 0; border-left: 1px solid #d9dde1; }
       .intern-sidebar__expert label small { display: none; }
         .intern-sidebar .intern-header__logout { display: none; }
-        .intern-header__claims-summary { flex-basis: 100%; justify-content: flex-start; }
-        .intern-header__claims-box { flex: 1 1 145px; }
+        .intern-header__revenue-summary { flex-basis: 100%; }
+        .intern-header__revenue-grid { grid-template-columns: 1fr; gap: 5px; }
+        .intern-header__revenue-item { padding: 5px 0 0; border-top: 1px solid rgba(7, 26, 46, .22); border-left: 0; }
+        .intern-header__revenue-item:first-child { padding-top: 0; border-top: 0; }
       }
     </style>
   </head>
@@ -119,7 +129,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
             <small>{portalProject.objectName}</small>
           </div>
         </div>
-        <div class="intern-header__claims-summary" id="intern-claims-summary" aria-live="polite" hidden></div>
+        <section class="intern-header__revenue-summary" id="intern-revenue-summary" aria-live="polite" hidden></section>
       </div>
     </header>
     <div class="intern-portal-shell">
@@ -182,31 +192,51 @@ const isActive = (href: string) => currentPath.startsWith(href);
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js', { scope: '/intern/' }).catch(() => {}));
       }
-      const claimsSummary = document.getElementById('intern-claims-summary');
-      const loadClaimsSummary = async () => {
-        if (!(claimsSummary instanceof HTMLElement)) return;
+      const revenueSummary = document.getElementById('intern-revenue-summary');
+      const money = (value, maximumFractionDigits = 0) => new Intl.NumberFormat('de-DE', {
+        style: 'currency', currency: 'EUR', maximumFractionDigits, minimumFractionDigits: maximumFractionDigits,
+      }).format(Number(value) || 0);
+      const loadRevenueSummary = async () => {
+        if (!(revenueSummary instanceof HTMLElement)) return;
         try {
-          const response = await fetch('/intern/api/claimsforce-queue.php?action=summary', { credentials: 'same-origin', cache: 'no-store' });
+          const response = await fetch('/intern/api/revenue-summary.php', { credentials: 'same-origin', cache: 'no-store' });
           const data = await response.json();
-          if (!response.ok || !data.ok) throw new Error(data.error || 'Claims-Status nicht verfügbar.');
-          claimsSummary.replaceChildren(...(data.items || []).map((item) => {
-            const box = document.createElement('div');
-            box.className = 'intern-header__claims-box';
-            if (item.updated_at) box.title = `Zuletzt aktualisiert: ${item.updated_at}`;
-            const caption = document.createElement('span');
-            caption.textContent = 'Deine offenen Aufgaben bei Claims';
-            const value = document.createElement('strong');
-            value.textContent = `${item.label}: ${item.open_count ?? '–'}`;
-            box.append(caption, value);
-            return box;
-          }));
-          claimsSummary.hidden = !(data.items || []).length;
+          if (!response.ok || !data.ok) throw new Error(data.error || 'Umsatzstand nicht verfügbar.');
+          if (!data.visible) { revenueSummary.hidden = true; return; }
+          const renderRevenueSummary = (summary) => {
+          const current = summary.current || {};
+          const previous = summary.previous || {};
+          revenueSummary.title = `Quelle: ${summary.source || 'Umsatzaufstellung'} · Stand ${summary.source_updated_at || '–'}`;
+          revenueSummary.innerHTML = `
+            <div class="intern-header__revenue-title"><span>Die Regulierer · Umsatz</span><span><small>Stand ${summary.source_updated_at || '–'}</small>${summary.can_refresh ? '<button class="intern-header__revenue-refresh" type="button">Jetzt aktualisieren</button>' : ''}</span></div>
+            <div class="intern-header__revenue-grid">
+              <div class="intern-header__revenue-item"><span>${current.period || current.year}</span><strong>${money(current.ytd_net)} netto · Ø ${money(current.average_net, 2)}</strong><small>Jahreswert ${money(current.annualized_net)}</small></div>
+              <div class="intern-header__revenue-item"><span>${previous.period || previous.year}</span><strong>${money(previous.ytd_net)} netto · Ø ${money(previous.average_net, 2)}</strong><small>Jahreswert ${money(previous.annualized_net)}</small></div>
+              <div class="intern-header__revenue-item"><span>Privataufträge brutto</span><strong>${current.year}: ${money(current.private_gross)}</strong><small>${previous.year}: ${money(previous.private_gross)}</small></div>
+            </div>`;
+          revenueSummary.hidden = false;
+          const refresh = revenueSummary.querySelector('.intern-header__revenue-refresh');
+          refresh?.addEventListener('click', async () => {
+            if (!(refresh instanceof HTMLButtonElement)) return;
+            refresh.disabled = true;
+            refresh.textContent = 'Wird aktualisiert …';
+            try {
+              const response = await fetch('/intern/api/revenue-summary.php?action=refresh', { method: 'POST', credentials: 'same-origin', cache: 'no-store' });
+              const next = await response.json();
+              if (!response.ok || !next.ok) throw new Error(next.error || 'Aktualisierung fehlgeschlagen.');
+              renderRevenueSummary(next);
+            } catch (error) {
+              refresh.disabled = false;
+              refresh.textContent = error instanceof Error ? error.message : 'Aktualisierung fehlgeschlagen';
+            }
+          });
+          };
+          renderRevenueSummary(data);
         } catch {
-          claimsSummary.hidden = true;
+          revenueSummary.hidden = true;
         }
       };
-      loadClaimsSummary();
-      window.addEventListener('svnet:claims-summary-update', loadClaimsSummary);
+      loadRevenueSummary();
     </script>
   </body>
 </html>

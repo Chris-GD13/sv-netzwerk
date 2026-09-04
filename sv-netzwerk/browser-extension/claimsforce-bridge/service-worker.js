@@ -17,6 +17,7 @@ const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/versicherungsfaell
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
 const DAILY_IMPORT_ALARM = 'svnet-claimsforce-daily-0300';
+const REVENUE_REFRESH_ALARM = 'svnet-revenue-15-30';
 const profileKey = value => {
   const profile = String(value || '').trim().toLowerCase();
   if (!SUPPORTED_PROFILES.includes(profile)) throw new Error('Ungültiges ClaimsForce-Profil.');
@@ -70,6 +71,29 @@ async function scheduleDailyImportAlarm() {
   await chrome.alarms.create(DAILY_IMPORT_ALARM, { when: nextWeekdayImportAt() });
 }
 
+function nextRevenueRefreshAt(now = new Date()) {
+  const candidates = [];
+  for (let monthOffset = 0; monthOffset < 3; monthOffset += 1) {
+    for (const day of [15, 30]) {
+      const candidate = new Date(now.getFullYear(), now.getMonth() + monthOffset, day, 6, 0, 0, 0);
+      if (candidate > now && candidate.getDate() === day) candidates.push(candidate);
+    }
+  }
+  return Math.min(...candidates.map(date => date.getTime()));
+}
+
+async function scheduleRevenueRefreshAlarm() {
+  await chrome.alarms.create(REVENUE_REFRESH_ALARM, { when: nextRevenueRefreshAt() });
+}
+
+async function refreshRevenueSummary() {
+  const response = await fetch('https://www.sv-netzwerk.eu/intern/api/revenue-summary.php?action=refresh', {
+    method: 'POST', credentials: 'include', cache: 'no-store'
+  });
+  if (!response.ok) throw new Error(`Umsatzaktualisierung HTTP ${response.status}`);
+  await chrome.storage.local.set({ revenueRefreshDate: new Date().toISOString().slice(0, 10) });
+}
+
 async function wakeCentralImportStation() {
   const portalTabs = await chrome.tabs.query({ url: PORTAL_TAB_PATTERN });
   const portalTab = portalTabs.find(tab => Number.isInteger(tab.id));
@@ -92,13 +116,22 @@ async function catchUpMorningImport() {
   if (now.getDay() !== 0 && now.getDay() !== 6 && clock >= 300 && clock < 1000) await wakeCentralImportStation();
 }
 
+async function catchUpRevenueRefresh() {
+  const now = new Date();
+  if (![15, 30].includes(now.getDate()) || now.getHours() < 6) return;
+  const today = now.toISOString().slice(0, 10);
+  const stored = await chrome.storage.local.get('revenueRefreshDate');
+  if (stored.revenueRefreshDate !== today) await refreshRevenueSummary();
+}
+
 chrome.alarms.onAlarm.addListener(alarm => {
-  if (alarm.name !== DAILY_IMPORT_ALARM) return;
-  wakeCentralImportStation().finally(() => scheduleDailyImportAlarm().catch(() => {}));
+  if (alarm.name === DAILY_IMPORT_ALARM) wakeCentralImportStation().finally(() => scheduleDailyImportAlarm().catch(() => {}));
+  if (alarm.name === REVENUE_REFRESH_ALARM) refreshRevenueSummary().finally(() => scheduleRevenueRefreshAlarm().catch(() => {}));
 });
-chrome.runtime.onInstalled.addListener(() => scheduleDailyImportAlarm().then(catchUpMorningImport).catch(() => {}));
-chrome.runtime.onStartup.addListener(() => scheduleDailyImportAlarm().then(catchUpMorningImport).catch(() => {}));
+chrome.runtime.onInstalled.addListener(() => Promise.all([scheduleDailyImportAlarm(),scheduleRevenueRefreshAlarm()]).then(() => Promise.all([catchUpMorningImport(),catchUpRevenueRefresh()])).catch(() => {}));
+chrome.runtime.onStartup.addListener(() => Promise.all([scheduleDailyImportAlarm(),scheduleRevenueRefreshAlarm()]).then(() => Promise.all([catchUpMorningImport(),catchUpRevenueRefresh()])).catch(() => {}));
 scheduleDailyImportAlarm().catch(() => {});
+scheduleRevenueRefreshAlarm().catch(() => {});
 
 async function diagnostic(run, phase, text, details = {}) {
   const entry = { runId: run.runId, jobId: run.jobId || 0, profile: run.profile, phase, text, details, at: new Date().toISOString() };
