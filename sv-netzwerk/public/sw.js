@@ -5,6 +5,13 @@ import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst, NetworkFirst } from 'workbox-strategies';
 
+const CACHE_VERSION = '20260904-2';
+const PAGE_CACHE = `portal-pages-${CACHE_VERSION}`;
+const API_CACHE = `api-cache-${CACHE_VERSION}`;
+const ASSET_CACHE = `assets-cache-${CACHE_VERSION}`;
+
+self.addEventListener('install', () => self.skipWaiting());
+
 // Precache files from build
 precacheAndRoute(self.__WB_MANIFEST || []);
 
@@ -12,16 +19,16 @@ precacheAndRoute(self.__WB_MANIFEST || []);
 registerRoute(
   ({ request }) => request.mode === 'navigate',
   new NetworkFirst({
-    cacheName: 'portal-pages',
+    cacheName: PAGE_CACHE,
     plugins: [],
   })
 );
 
 // API calls - Network First with short timeout
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/'),
+  ({ url }) => url.pathname.startsWith('/intern/api/'),
   new NetworkFirst({
-    cacheName: 'api-cache',
+    cacheName: API_CACHE,
     networkTimeoutSeconds: 5,
     plugins: [],
   })
@@ -35,24 +42,10 @@ registerRoute(
     request.destination === 'style' ||
     request.destination === 'script',
   new CacheFirst({
-    cacheName: 'assets-cache',
+    cacheName: ASSET_CACHE,
     plugins: [],
   })
 );
-
-// Offline page fallback
-self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
-
-  event.respondWith(
-    fetch(event.request).catch(() => {
-      // Return offline page or cached response
-      return caches.match(event.request) || 
-        caches.match('/offline.html') ||
-        new Response('Offline - Die Seite ist nicht verfügbar', { status: 503 });
-    })
-  );
-});
 
 // Background Sync for queued updates (when online again)
 self.addEventListener('sync', (event) => {
@@ -83,18 +76,13 @@ self.addEventListener('message', (event) => {
 // Clean up old caches on activate
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames
-          .filter(cacheName => {
-            const isOld = 
-              !cacheName.includes('portal-pages') &&
-              !cacheName.includes('api-cache') &&
-              !cacheName.includes('assets-cache');
-            return isOld;
-          })
-          .map(cacheName => caches.delete(cacheName))
-      );
-    })
+    Promise.all([
+      caches.keys().then((cacheNames) => Promise.all(cacheNames.filter((cacheName) =>
+        (cacheName.startsWith('portal-pages') && cacheName !== PAGE_CACHE) ||
+        (cacheName.startsWith('api-cache') && cacheName !== API_CACHE) ||
+        (cacheName.startsWith('assets-cache') && cacheName !== ASSET_CACHE)
+      ).map((cacheName) => caches.delete(cacheName)))),
+      self.clients.claim(),
+    ])
   );
 });
