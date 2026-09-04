@@ -5,6 +5,7 @@ require_once __DIR__.'/config.php';
 require_once __DIR__.'/profile-routing.php';
 
 const RS_SOURCE_URL = 'https://sv1schuett-my.sharepoint.com/:x:/r/personal/ws_sv-schuett_eu/_layouts/15/Doc.aspx?sourcedoc=%7B368ACA1B-6D24-402A-816C-B7B40827CF07%7D&file=CL%20Umsatzaufstellung%20W%25u00e4chter.xlsx&fromShare=true&action=default&mobileredirect=true';
+const RS_HOLGER_SOURCE_URL = 'https://1drv.ms/u/c/b09ce03dd5dcb502/IQD54mN-TXeFQ6hhpGj7ewM8AWXVLYIoZfTcMXHNL1Sf2nA?e=j6Fi3Z';
 const RS_GOOGLE_FILE_ID = '1OSL9jQow1C0azdi1NlbVSWXpbxfBZej9';
 const RS_MONTHS = ['januar'=>1,'februar'=>2,'maerz'=>3,'mrz'=>3,'april'=>4,'mai'=>5,'juni'=>6,'juli'=>7,'august'=>8,'september'=>9,'oktober'=>10,'november'=>11,'dezember'=>12];
 const RS_MONTH_LABELS = [1=>'Jan.',2=>'Feb.',3=>'März',4=>'April',5=>'Mai',6=>'Juni',7=>'Juli',8=>'Aug.',9=>'Sept.',10=>'Okt.',11=>'Nov.',12=>'Dez.'];
@@ -24,8 +25,8 @@ function rsVisible(array $user):bool {
 function rsEnsureTable():void {
     db()->exec("CREATE TABLE IF NOT EXISTS portal_revenue_summary(profile VARCHAR(30) PRIMARY KEY,payload_json MEDIUMTEXT NOT NULL,source_modified_at VARCHAR(40) NULL,updated_by VARCHAR(255) NOT NULL,updated_at DATETIME NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
-function rsStored():?array {
-    rsEnsureTable();$stmt=db()->prepare("SELECT payload_json FROM portal_revenue_summary WHERE profile='christian' LIMIT 1");$stmt->execute();$decoded=json_decode((string)($stmt->fetchColumn()?:''),true);return is_array($decoded)?$decoded:null;
+function rsStored(string $profile='christian'):?array {
+    rsEnsureTable();$stmt=db()->prepare('SELECT payload_json FROM portal_revenue_summary WHERE profile=:profile LIMIT 1');$stmt->execute([':profile'=>$profile]);$decoded=json_decode((string)($stmt->fetchColumn()?:''),true);return is_array($decoded)?$decoded:null;
 }
 function rsFallback():array {
     $data=require __DIR__.'/revenue-summary-fallback.php';return is_array($data)?$data:[];
@@ -141,6 +142,9 @@ function rsPrivateEntries(array $sheets,array $years):array {
     for($row=1;$row<=$max;$row++){$a=rsCell($sheet,$row,1);if(is_numeric($a)&&isset($allowed[(int)$a])){$active=(int)$a;continue;}if($active===null||rsText((string)$a)==='gesamt')continue;$amount=rsCell($sheet,$row,4);if(!is_numeric($amount)||(float)$amount==0.0)continue;$entries[]=['year'=>$active,'customer'=>trim((string)$a),'place'=>trim((string)rsCell($sheet,$row,2)),'appointment'=>rsExcelDate(rsCell($sheet,$row,3)),'gross'=>round((float)$amount,2)];}
     usort($entries,fn($a,$b)=>[$b['year'],$b['appointment'],$b['customer']]<=>[$a['year'],$a['appointment'],$a['customer']]);return$entries;
 }
+function rsPersist(string $profile,array $payload,array $meta,array $user):array {
+    rsEnsureTable();$stmt=db()->prepare('INSERT INTO portal_revenue_summary(profile,payload_json,source_modified_at,updated_by,updated_at) VALUES(:profile,:payload,:source,:user,NOW()) ON DUPLICATE KEY UPDATE payload_json=VALUES(payload_json),source_modified_at=VALUES(source_modified_at),updated_by=VALUES(updated_by),updated_at=NOW()');$stmt->execute([':profile'=>$profile,':payload'=>json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':source'=>(string)($meta['lastModifiedDateTime']??''),':user'=>(string)($user['email']??'')]);return$payload;
+}
 function rsRefresh(array $user,?array $source=null):array {
     [$meta,$bytes]=$source??rsSourceFile();$tmp=tempnam(sys_get_temp_dir(),'revenue-');
     if($tmp===false||file_put_contents($tmp,$bytes)===false)throw new RuntimeException('Die Umsatzdatei konnte nicht zwischengespeichert werden.');
@@ -155,10 +159,36 @@ function rsRefresh(array $user,?array $source=null):array {
     foreach($sheets as$name=>$sheet){if(!preg_match('/^20\d{2}$/',trim((string)$name)))continue;$year=(int)$name;$yearGroups=rsMonthGroups($sheet);$yearMonths=array_keys(array_filter($yearGroups));if(!$yearMonths)continue;$availableYears[]=$year;$entries=array_merge($entries,rsEntries($sheet,$year,max($yearMonths)));}
     rsort($availableYears);$privateEntries=rsPrivateEntries($sheets,$availableYears);
     $payload=['source'=>(string)($meta['name']??'CL Umsatzaufstellung Wächter.xlsx'),'source_provider'=>(string)($meta['sourceProvider']??'SharePoint / OneDrive'),'source_updated_at'=>isset($meta['lastModifiedDateTime'])?date('d.m.Y H:i',strtotime((string)$meta['lastModifiedDateTime'])):date('d.m.Y H:i'),'comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'vat_rate'=>0.19,'entry_schema_version'=>2,'current'=>$current,'previous'=>$previous,'available_years'=>$availableYears,'entries'=>$entries,'private_entries'=>$privateEntries];
-    rsEnsureTable();$stmt=db()->prepare("INSERT INTO portal_revenue_summary(profile,payload_json,source_modified_at,updated_by,updated_at) VALUES('christian',:payload,:source,:user,NOW()) ON DUPLICATE KEY UPDATE payload_json=VALUES(payload_json),source_modified_at=VALUES(source_modified_at),updated_by=VALUES(updated_by),updated_at=NOW()");$stmt->execute([':payload'=>json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':source'=>(string)($meta['lastModifiedDateTime']??''),':user'=>(string)($user['email']??'')]);return$payload;
+    return rsPersist('christian',$payload,$meta,$user);
+}
+function rsHolgerRanges(array $sheet):array {
+    $ranges=[];$max=rsMaxRow($sheet);
+    for($row=1;$row<=$max;$row++){$label=rsText((string)rsCell($sheet,$row,1));if(preg_match('/^(20\d{2}) gesamtumsatz/',$label,$year)&&preg_match('/^=SUM\(D(\d+):D(\d+)\)$/i',(string)($sheet['formulas']['D'.$row]??''),$range))$ranges[(int)$year[1]]=[(int)$range[1],(int)$range[2]];}
+    $headers=[];for($row=1;$row<=$max;$row++){$value=rsCell($sheet,$row,1);if(is_numeric($value)&&(int)$value>=2000&&(int)$value<=2100)$headers[]=[(int)$value,$row];}
+    foreach($headers as$index=>[$year,$row])if(!isset($ranges[$year]))$ranges[$year]=[$row+1,($headers[$index+1][1]??($max+1))-1];
+    ksort($ranges);return$ranges;
+}
+function rsHolgerEntries(array $sheet):array {
+    $entries=[];foreach(rsHolgerRanges($sheet)as$year=>[$start,$end])for($row=$start;$row<=$end;$row++){
+        $incomeNet=rsNullableMoney(rsCell($sheet,$row,3));$incomeGross=rsNullableMoney(rsCell($sheet,$row,4));if($incomeNet===null||$incomeGross===null||$incomeGross==0.0)continue;
+        $date=rsExcelDate(rsCell($sheet,$row,2));$month=0;if(preg_match('/^\d{2}\.(\d{2})\.\d{4}$/',$date,$match))$month=(int)$match[1];if($month<1||$month>12)continue;
+        $officeGross=rsNullableMoney(rsCell($sheet,$row,7))??0.0;$officeNet=round($officeGross/1.19,2);$ourNet=rsNullableMoney(rsCell($sheet,$row,5))??round($incomeNet*0.10,2);$ourGross=rsNullableMoney(rsCell($sheet,$row,6))??round($incomeGross*0.10,2);$billingGross=rsNullableMoney(rsCell($sheet,$row,8))??round($ourGross+$officeGross,2);$billingNet=round($ourNet+$officeNet,2);$actualNet=round($incomeNet/0.60,2);$actualGross=round($incomeGross/0.60,2);$reguliererNet=round($actualNet-$incomeNet,2);$reguliererGross=round($actualGross-$incomeGross,2);
+        $entries[]=['year'=>$year,'month'=>$month,'month_label'=>RS_MONTH_LABELS[$month],'service_period'=>rsExcelDate(rsCell($sheet,$row,1)),'credit_date'=>$date,'income_net'=>$incomeNet,'income_gross'=>$incomeGross,'actual_order_net'=>$actualNet,'actual_order_gross'=>$actualGross,'regulierer_net'=>$reguliererNet,'regulierer_gross'=>$reguliererGross,'our_share_net'=>$ourNet,'our_share_gross'=>$ourGross,'office_net'=>$officeNet,'office_gross'=>$officeGross,'our_total_net'=>$billingNet,'our_total_gross'=>$billingGross,'holger_after_share_net'=>round($incomeNet-$ourNet,2),'holger_after_share_gross'=>round($incomeGross-$ourGross,2),'holger_after_total_net'=>round($incomeNet-$billingNet,2),'holger_after_total_gross'=>round($incomeGross-$billingGross,2)];
+    }usort($entries,fn($a,$b)=>[$b['year'],$b['month'],$b['credit_date']]<=>[$a['year'],$a['month'],$a['credit_date']]);return$entries;
+}
+function rsHolgerPeriod(array $entries,int $year,int $through):array {
+    $rows=array_values(array_filter($entries,fn($row)=>(int)$row['year']===$year&&(int)$row['month']<=$through));$sum=fn(string$key)=>round(array_sum(array_map(fn($row)=>(float)($row[$key]??0),$rows)),2);
+    return['year'=>$year,'period'=>'Jan.–'.RS_MONTH_LABELS[$through].' '.$year,'months'=>$through,'booking_count'=>count($rows),'income_net'=>$sum('income_net'),'income_gross'=>$sum('income_gross'),'actual_order_net'=>$sum('actual_order_net'),'actual_order_gross'=>$sum('actual_order_gross'),'regulierer_net'=>$sum('regulierer_net'),'regulierer_gross'=>$sum('regulierer_gross'),'our_share_net'=>$sum('our_share_net'),'our_share_gross'=>$sum('our_share_gross'),'office_net'=>$sum('office_net'),'office_gross'=>$sum('office_gross'),'our_total_net'=>$sum('our_total_net'),'our_total_gross'=>$sum('our_total_gross'),'holger_after_share_net'=>$sum('holger_after_share_net'),'holger_after_share_gross'=>$sum('holger_after_share_gross'),'holger_after_total_net'=>$sum('holger_after_total_net'),'holger_after_total_gross'=>$sum('holger_after_total_gross')];
+}
+function rsRefreshHolger(array $user,array $source):array {
+    [$meta,$bytes]=$source;$tmp=tempnam(sys_get_temp_dir(),'revenue-holger-');if($tmp===false||file_put_contents($tmp,$bytes)===false)throw new RuntimeException('Holgers Umsatzdatei konnte nicht zwischengespeichert werden.');try{$sheets=rsWorkbook($tmp);}finally{@unlink($tmp);}if(!$sheets)throw new RuntimeException('Holgers Umsatzdatei enthält kein lesbares Tabellenblatt.');$sheet=array_values($sheets)[0];$entries=rsHolgerEntries($sheet);if(!$entries)throw new RuntimeException('In Holgers Umsatzdatei wurden keine abrechenbaren Gutschriften gefunden.');$years=array_values(array_unique(array_map(fn($row)=>(int)$row['year'],$entries)));rsort($years);$currentYear=(int)date('Y');$previousYear=$currentYear-1;$currentMonths=array_map(fn($row)=>(int)$row['month'],array_filter($entries,fn($row)=>(int)$row['year']===$currentYear));if(!$currentMonths)throw new RuntimeException('In Holgers Umsatzdatei fehlen Buchungen für das aktuelle Jahr.');$through=max($currentMonths);$payload=['profile'=>'holger','source'=>(string)($meta['name']??'Holger Roth.xlsx'),'source_provider'=>(string)($meta['sourceProvider']??'Manuell eingelesene Originaldatei'),'source_url'=>RS_HOLGER_SOURCE_URL,'source_updated_at'=>date('d.m.Y H:i',strtotime((string)($meta['lastModifiedDateTime']??'now'))),'comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'office_share_rate'=>0.10,'vat_rate'=>0.19,'current'=>rsHolgerPeriod($entries,$currentYear,$through),'previous'=>rsHolgerPeriod($entries,$previousYear,$through),'available_years'=>$years,'entries'=>$entries];return rsPersist('holger',$payload,$meta,$user);
+}
+function rsHolgerEmpty():array {
+    return['profile'=>'holger','source'=>'Holger Roth.xlsx','source_provider'=>'Noch nicht eingelesen','source_url'=>RS_HOLGER_SOURCE_URL,'source_updated_at'=>'–','comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'office_share_rate'=>0.10,'vat_rate'=>0.19,'current'=>[],'previous'=>[],'available_years'=>[],'entries'=>[]];
 }
 
 $action=(string)($_GET['action']??'summary');
+$profile=rsText((string)($_GET['profile']??'christian'));if(!in_array($profile,['christian','holger'],true))$profile='christian';
 if($action==='scheduled'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
     $expected=rsCfg('SETUP_KEY');$provided=trim((string)($_SERVER['HTTP_X_SVNET_SCHEDULE_KEY']??''));
@@ -169,6 +199,6 @@ if($action==='scheduled'){
 $user=requireAuth();
 if(!rsVisible($user))apiJson(['ok'=>true,'visible'=>false]);
 try{
-    if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if(!rsCanRefresh($user))apiError(403,'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');$payload=rsRefresh($user,rsUploadedSource());apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,...$payload]);}
-    $payload=rsStored()??rsFallback();if($action!=='settlement'){unset($payload['entries'],$payload['private_entries'],$payload['available_years']);}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>rsCanRefresh($user),...$payload]);
+    if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if(!rsCanRefresh($user))apiError(403,'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');$source=rsUploadedSource();$payload=$profile==='holger'?rsRefreshHolger($user,$source):rsRefresh($user,$source);apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,...$payload]);}
+    $payload=rsStored($profile)??($profile==='holger'?rsHolgerEmpty():rsFallback());if($action!=='settlement'){unset($payload['entries'],$payload['private_entries'],$payload['available_years']);}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>rsCanRefresh($user),...$payload]);
 }catch(Throwable $error){error_log('[revenue-summary] '.$error->getMessage());apiError(503,$error->getMessage());}
