@@ -15,7 +15,8 @@ interface Props {
 const props = Astro.props;
 const currentPath = props.currentPath ?? Astro.url.pathname;
 const internalLinks = [
-  { href: '/intern/versicherungsfaelle/', label: 'Startseite', icon: '⌂' },
+  { href: '/intern/tagescockpit/', label: 'Tagescockpit', icon: '●' },
+  { href: '/intern/versicherungsfaelle/', label: 'Versicherungsfälle', icon: '⌂' },
   { href: '/intern/kalkulation/', label: 'Kalkulation', icon: '▦' },
   { href: '/intern/zeitwertberechnung/', label: 'Zeitwertberechnung', icon: '⌛' },
   { href: '/intern/fensterpruefung-bonn/', label: 'Fenstergutachten', icon: '▣' },
@@ -221,7 +222,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
         }
       });
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=20260904-6', { scope: '/intern/', updateViaCache: 'none' }).then((registration) => registration.update()).catch(() => {}));
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=20260904-7', { scope: '/intern/', updateViaCache: 'none' }).then((registration) => registration.update()).catch(() => {}));
       }
       const revenueSummary = document.getElementById('intern-revenue-summary');
       const settlementLink = document.getElementById('intern-settlement-link');

@@ -672,7 +672,7 @@ async function showMoveDialog(
 }
 
 async function redirectAfterLogin() {
-  redirectTo('/intern/versicherungsfaelle/');
+  redirectTo('/intern/tagescockpit/');
 }
 
 function renderLogin(context: AppContext) {
