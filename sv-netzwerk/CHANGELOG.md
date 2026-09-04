@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.45 – 2026-09-04
+- automatischer morgens Fachbeitrag veröffentlicht: „Zusammenarbeit mit Fachplanern, Statikern und Sanierern im Schadenfall: Rollen und Schnittstellen"
+- LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)
+- ohne Beitragsbild veröffentlicht; keine typografische Platzhaltergrafik erzeugt
+
 ## 3.4.44 – 2026-09-03
 - automatischer morgens Fachbeitrag veröffentlicht: „Katastrophenschäden in der Region: Management, Koordination und fachliche Einordnung"
 - LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)

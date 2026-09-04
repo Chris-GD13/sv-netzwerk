@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Zusammenarbeit mit Fachplanern, Statikern und Sanierern im Schadenfall: Rollen und Schnittstellen',
+    description: 'Zusammenarbeit mit Fachplanern und Sanierern: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
+    href: '/fachwissen/zusammenarbeit-fachplaner-sanierer-schadenfall/',
+    category: 'Zusammenarbeit mit Fachplanern und Sanierern',
+    tags: ['Fachplaner', 'Statik', 'Sanierung', 'Trocknung', 'Koordination', 'Schadenregulierung'],
+    date: '2026-09-04',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Katastrophenschäden in der Region: Management, Koordination und fachliche Einordnung',
     description: 'Katastrophenschäden in der Region: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/katastrophenschaeden-region-management-koordination/',
