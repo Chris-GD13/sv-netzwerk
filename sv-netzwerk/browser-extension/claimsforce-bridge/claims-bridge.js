@@ -17,20 +17,26 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     sendResponse({ ok: true });
     return;
   }
-  if (message?.type === 'OPEN_FUTURE_APPOINTMENTS') {
+  if (message?.type === 'OPEN_PLANNING_BUCKET') {
+    const buckets = {
+      WITH_FUTURE_APPOINTMENT: { hash: 'with-future-appointment', control: /Mit Termin|Zukünftige Termine|Termine in der Zukunft/i },
+      WITHOUT_APPOINTMENT: { hash: 'without-appointment', control: /Ohne Termin|Kein Termin|Termin ausstehend/i }
+    };
+    const bucket = buckets[String(message.bucket || '').toUpperCase()];
+    if (!bucket) { sendResponse({ ok: false, error: 'Unbekannte Planungsansicht.' }); return; }
     const controls = [...document.querySelectorAll('button,[role="tab"],[role="radio"],a')];
-    const future = controls.find(node => /Mit Termin|Zukünftige Termine|Termine in der Zukunft/i.test(node.textContent || ''));
-    if (future) future.click();
+    const control = controls.find(node => bucket.control.test(node.textContent || ''));
+    if (control) control.click();
     const url = new URL(location.href);
     url.pathname = '/planning';
-    url.searchParams.set('bucket', 'WITH_FUTURE_APPOINTMENT');
-    url.hash = 'with-future-appointment';
+    url.searchParams.set('bucket', String(message.bucket).toUpperCase());
+    url.hash = bucket.hash;
     if (url.href !== location.href) {
       history.pushState({}, '', url);
       dispatchEvent(new PopStateEvent('popstate'));
       dispatchEvent(new HashChangeEvent('hashchange'));
     }
-    sendResponse({ ok: true, strategy: future ? 'control-and-route' : 'route' });
+    sendResponse({ ok: true, strategy: control ? 'control-and-route' : 'route', bucket: String(message.bucket).toUpperCase() });
     return;
   }
   if (message?.type === 'OPEN_TASKS') {

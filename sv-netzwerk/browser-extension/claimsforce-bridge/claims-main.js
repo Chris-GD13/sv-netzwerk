@@ -43,18 +43,19 @@
     value.appointments?.nextAppointment?.updatedAt,
     value.appointments?.nextAppointment?.startDate
   ].map(entry => String(entry || '')).filter(Boolean).join('|');
-  const inspectClaims = (value, futureContext = false, depth = 0) => {
+  const inspectClaims = (value, planningContext = false, depth = 0) => {
     if (!value || depth > 7) return;
     if (Array.isArray(value)) {
-      value.forEach(entry => inspectClaims(entry, futureContext, depth + 1));
+      value.forEach(entry => inspectClaims(entry, planningContext, depth + 1));
       return;
     }
     if (typeof value !== 'object') return;
     const id = claimId(value.id || value.claimId);
     const insurerClaimId = value.insurerClaimId || value.data?.insurerClaimId || value.claimNumber || '';
     const hasClaimShape = insurerClaimId || value.claimType || value.bucket || value.appointments || value.actualAppointmentLocation;
-    const future = futureContext || value.bucket === 'WITH_FUTURE_APPOINTMENT' || !!value.appointments?.nextAppointment;
-    if (id && hasClaimShape && future) {
+    const supportedBucket = ['WITH_FUTURE_APPOINTMENT', 'WITHOUT_APPOINTMENT'].includes(String(value.bucket || '').toUpperCase());
+    const visiblePlanningClaim = planningContext || supportedBucket || !!value.appointments?.nextAppointment;
+    if (id && hasClaimShape && visiblePlanningClaim) {
       const previous = seenClaims.get(id) || {};
       seenClaims.set(id, {
         id,
@@ -62,18 +63,18 @@
         listVersion: listVersion(value) || previous.listVersion || ''
       });
     }
-    Object.values(value).forEach(entry => inspectClaims(entry, futureContext, depth + 1));
+    Object.values(value).forEach(entry => inspectClaims(entry, planningContext, depth + 1));
   };
-  const futureRequest = (input, init) => {
+  const planningRequest = (input, init) => {
     const url = String(input instanceof Request ? input.url : input || '');
     const body = typeof init?.body === 'string' ? init.body : '';
-    return /futureAppointment|WITH_FUTURE_APPOINTMENT|with-future-appointment/i.test(`${url} ${body}`);
+    return /futureAppointment|withoutAppointment|WITH_FUTURE_APPOINTMENT|WITHOUT_APPOINTMENT|with-future-appointment|without-appointment/i.test(`${url} ${body}`);
   };
   const inspectResponse = async (response, input, init) => {
     try {
       const url = String(response?.url || (input instanceof Request ? input.url : input) || '');
       if (!/\/claims(?:[/?]|$)/i.test(url) || !String(response.headers.get('content-type') || '').includes('json')) return;
-      inspectClaims(await response.clone().json(), futureRequest(input, init));
+      inspectClaims(await response.clone().json(), planningRequest(input, init));
       if (seenClaims.size) window.postMessage({ source: 'svnet-claimsforce-main', type: 'CLAIMS_SNAPSHOT', claims: [...seenClaims.values()] }, location.origin);
     } catch {}
   };
@@ -97,11 +98,11 @@
   };
   const originalSend = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = function(body) {
-    const future = futureRequest(this.__svnetUrl, { body });
+    const planning = planningRequest(this.__svnetUrl, { body });
     this.addEventListener('load', () => {
       try {
         if (/\/claims(?:[/?]|$)/i.test(this.__svnetUrl || '') && typeof this.responseText === 'string') {
-          inspectClaims(JSON.parse(this.responseText), future);
+          inspectClaims(JSON.parse(this.responseText), planning);
           if (seenClaims.size) window.postMessage({ source: 'svnet-claimsforce-main', type: 'CLAIMS_SNAPSHOT', claims: [...seenClaims.values()] }, location.origin);
         }
       } catch {}

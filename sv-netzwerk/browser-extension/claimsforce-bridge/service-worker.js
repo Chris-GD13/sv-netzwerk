@@ -2,7 +2,10 @@ import { clearCredentials, loadCredentials, loadPortalCredentials, saveCredentia
 import { mapClaim, safeFileName } from './import-utils.js';
 
 const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
-const PLANNING_URL = 'https://web.claimsforce.com/planning?bucket=WITH_FUTURE_APPOINTMENT#with-future-appointment';
+const PLANNING_BUCKETS = [
+  { key: 'WITH_FUTURE_APPOINTMENT', hash: 'with-future-appointment', label: 'Mit Termin' },
+  { key: 'WITHOUT_APPOINTMENT', hash: 'without-appointment', label: 'Ohne Termin' }
+];
 const CLAIMS_ORIGINS = ['https://web.claimsforce.com', 'https://claimsforce.eu.auth0.com'];
 const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens'];
 const PROFILE_EMAILS = {
@@ -228,16 +231,19 @@ async function claimsTab(profile, run, credential) {
   return { tab, token };
 }
 
-async function openPlanning(tabId) {
+async function openPlanning(tabId, bucket) {
+  const planningBucket = PLANNING_BUCKETS.find(entry => entry.key === bucket);
+  if (!planningBucket) throw new Error('Unbekannte ClaimsForce-Planungsansicht.');
+  const planningUrl = `https://web.claimsforce.com/planning?bucket=${encodeURIComponent(planningBucket.key)}#${planningBucket.hash}`;
   let tab = await chrome.tabs.get(tabId);
   const current = String(tab.url || '');
-  if (!current.includes('/planning') || !current.includes('WITH_FUTURE_APPOINTMENT')) {
-    await chrome.tabs.update(tabId, { url: PLANNING_URL });
+  if (!current.includes('/planning') || !current.includes(planningBucket.key)) {
+    await chrome.tabs.update(tabId, { url: planningUrl });
     tab = await waitTab(tabId);
   }
   if (!String(tab.url || '').includes('/planning')) throw new Error('ClaimsForce-Planung konnte nicht geöffnet werden.');
   await sleep(2000);
-  const opened = await chrome.tabs.sendMessage(tabId, { type: 'OPEN_FUTURE_APPOINTMENTS' }).catch(() => null);
+  const opened = await chrome.tabs.sendMessage(tabId, { type: 'OPEN_PLANNING_BUCKET', bucket: planningBucket.key }).catch(() => null);
   await sleep(3000);
   return opened;
 }
@@ -342,11 +348,18 @@ async function runImport(run) {
   await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
   const openTasks = await readOpenTasks(tab.id);
   await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks });
-  const planning = await openPlanning(tab.id);
-  await diagnostic(run, 'CF-PLAN-04', 'Planungsansicht „Mit Termin“ wurde angefordert.', { strategy: planning?.strategy || 'bestehende Ansicht' });
-  const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIMS' });
-  const claims = scraped?.claims || [];
-  await diagnostic(run, 'CF-LIST-05', `${claims.length} Auftrag/Aufträge wurden in der Planungsansicht erkannt.`, { count: claims.length, openTasks, observedApi: scraped?.observedClaims || 0, route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url) });
+  const claimsById = new Map(), bucketCounts = {};
+  for (const planningBucket of PLANNING_BUCKETS) {
+    const planning = await openPlanning(tab.id, planningBucket.key);
+    await diagnostic(run, 'CF-PLAN-04', `Planungsansicht „${planningBucket.label}“ wurde angefordert.`, { bucket: planningBucket.key, strategy: planning?.strategy || 'bestehende Ansicht' });
+    const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIMS' });
+    const bucketClaims = scraped?.claims || [];
+    bucketCounts[planningBucket.key] = bucketClaims.length;
+    for (const claim of bucketClaims) if (claim?.id) claimsById.set(claim.id, { ...(claimsById.get(claim.id) || {}), ...claim });
+    await diagnostic(run, 'CF-LIST-05', `${bucketClaims.length} Auftrag/Aufträge wurden in „${planningBucket.label}“ erkannt.`, { bucket: planningBucket.key, count: bucketClaims.length, combined: claimsById.size, openTasks, observedApi: scraped?.observedClaims || 0, route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url) });
+  }
+  const claims = [...claimsById.values()];
+  await diagnostic(run, 'CF-LIST-05', `${claims.length} unterschiedliche Aufträge mit und ohne Termin wurden erkannt.`, { count: claims.length, bucketCounts, openTasks });
   if (!claims.length) {
     const state = await chrome.tabs.sendMessage(tab.id, { type: 'SESSION_STATE' }).catch(() => ({}));
     throw new Error(`[CF-LIST-05] Keine Aufträge erkannt (Route ${state.route || 'unbekannt'}, API ${state.observedClaims || 0}).`);
