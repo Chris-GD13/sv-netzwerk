@@ -67,6 +67,11 @@ function ensureRuntimeSchema(PDO $pdo): void
             'object_name' => 'VARCHAR(500) NULL',
             'damage_type' => 'VARCHAR(500) NULL',
             'case_type' => 'VARCHAR(190) NULL',
+            'phone' => 'VARCHAR(100) NULL',
+            'mobile' => 'VARCHAR(100) NULL',
+            'contractor_phone' => 'VARCHAR(100) NULL',
+            'contractor_mobile' => 'VARCHAR(100) NULL',
+            'phone_contacts' => 'TEXT NULL',
         ] as $column => $definition) {
             $stmt->execute([':table' => 'case_folder_owners', ':column' => $column]);
             if ((int) $stmt->fetchColumn() === 0) {
@@ -99,12 +104,15 @@ function requireProjectDeleteAccess(array $user, int $projectId): void
 function registerCaseFolderOwner(string $folderId, array $user, array $meta = []): void
 {
     if ($folderId === '' || empty($user['id'])) return;
-    $stmt = db()->prepare('INSERT INTO case_folder_owners(folder_id,user_id,user_email,case_no,policy_no,object_name,damage_type,case_type,registered_at)
-        VALUES(:f,:u,:e,:case_no,:policy_no,:object_name,:damage_type,:case_type,NOW())
+    $stmt = db()->prepare('INSERT INTO case_folder_owners(folder_id,user_id,user_email,case_no,policy_no,object_name,damage_type,case_type,phone,mobile,contractor_phone,contractor_mobile,phone_contacts,registered_at)
+        VALUES(:f,:u,:e,:case_no,:policy_no,:object_name,:damage_type,:case_type,:phone,:mobile,:contractor_phone,:contractor_mobile,:phone_contacts,NOW())
         ON DUPLICATE KEY UPDATE user_id=VALUES(user_id),user_email=VALUES(user_email),
         case_no=COALESCE(NULLIF(VALUES(case_no),\'\'),case_no),policy_no=COALESCE(NULLIF(VALUES(policy_no),\'\'),policy_no),
         object_name=COALESCE(NULLIF(VALUES(object_name),\'\'),object_name),damage_type=COALESCE(NULLIF(VALUES(damage_type),\'\'),damage_type),
-        case_type=COALESCE(NULLIF(VALUES(case_type),\'\'),case_type),registered_at=NOW()');
+        case_type=COALESCE(NULLIF(VALUES(case_type),\'\'),case_type),phone=IF(VALUES(phone) IS NULL,phone,VALUES(phone)),
+        mobile=IF(VALUES(mobile) IS NULL,mobile,VALUES(mobile)),contractor_phone=IF(VALUES(contractor_phone) IS NULL,contractor_phone,VALUES(contractor_phone)),
+        contractor_mobile=IF(VALUES(contractor_mobile) IS NULL,contractor_mobile,VALUES(contractor_mobile)),
+        phone_contacts=IF(VALUES(phone_contacts) IS NULL,phone_contacts,VALUES(phone_contacts)),registered_at=NOW()');
     $stmt->execute([
         ':f'=>$folderId, ':u'=>(int)$user['id'], ':e'=>(string)($user['email']??''),
         ':case_no'=>(string)($meta['schaden_nr']??''),
@@ -112,6 +120,11 @@ function registerCaseFolderOwner(string $folderId, array $user, array $meta = []
         ':object_name'=>(string)($meta['vn_objekt']??''),
         ':damage_type'=>(string)($meta['schadenart']??''),
         ':case_type'=>(string)($meta['fallart']??''),
+        ':phone'=>array_key_exists('telefon',$meta)?(string)$meta['telefon']:null,
+        ':mobile'=>array_key_exists('mobil',$meta)?(string)$meta['mobil']:null,
+        ':contractor_phone'=>array_key_exists('sanierer_telefon',$meta)?(string)$meta['sanierer_telefon']:null,
+        ':contractor_mobile'=>array_key_exists('sanierer_mobil',$meta)?(string)$meta['sanierer_mobil']:null,
+        ':phone_contacts'=>array_key_exists('telefonkontakte',$meta)?json_encode($meta['telefonkontakte'],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES):null,
     ]);
 }
 
