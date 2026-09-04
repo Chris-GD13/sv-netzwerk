@@ -87,10 +87,13 @@ async function scheduleRevenueRefreshAlarm() {
 }
 
 async function refreshRevenueSummary() {
-  const response = await fetch('https://www.sv-netzwerk.eu/intern/api/revenue-summary.php?action=refresh', {
-    method: 'POST', credentials: 'include', cache: 'no-store'
-  });
-  if (!response.ok) throw new Error(`Umsatzaktualisierung HTTP ${response.status}`);
+  let [portalTab] = await chrome.tabs.query({ url: PORTAL_TAB_PATTERN });
+  if (!Number.isInteger(portalTab?.id)) {
+    portalTab = await chrome.tabs.create({ url: PORTAL_URL, active: false });
+    portalTab = await waitTab(portalTab.id, 30000);
+  }
+  const result = await chrome.tabs.sendMessage(portalTab.id, { type: 'PORTAL_REVENUE_REFRESH' });
+  if (!result?.ok) throw new Error(result?.error || 'Umsatzaktualisierung fehlgeschlagen.');
   await chrome.storage.local.set({ revenueRefreshDate: new Date().toISOString().slice(0, 10) });
 }
 
