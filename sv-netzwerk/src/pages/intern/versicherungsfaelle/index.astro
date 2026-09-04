@@ -83,10 +83,167 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 .vf-card.vf-collapsible>.vf-collapse-trigger{position:relative;cursor:pointer;margin-bottom:0;padding-right:28px;user-select:none}.vf-card.vf-collapsible>.vf-collapse-trigger::after{content:'›';position:absolute;right:2px;top:50%;font-size:1.25rem;line-height:1;transform:translateY(-50%) rotate(90deg);transition:transform .15s}.vf-card.vf-collapsible.is-collapsed>.vf-collapse-trigger::after{transform:translateY(-50%)}.vf-card.vf-collapsible.is-collapsed>:not(.vf-collapse-trigger){display:none!important}.vf-card.vf-collapsible.is-collapsed{padding-top:13px;padding-bottom:13px}.vf-card.vf-collapsible>.vf-title.vf-collapse-trigger,.vf-card.vf-collapsible>.vf-plaud-head.vf-collapse-trigger{margin-bottom:0}.vf-card.vf-collapsible:not(.is-collapsed)>.vf-step,.vf-card.vf-collapsible:not(.is-collapsed)>.vf-plaud-head{margin-bottom:16px}.vf-card.vf-collapsible:not(.is-collapsed)>.vf-title{margin-bottom:12px}
 .vf-instruction-run{display:block;width:100%;margin-top:12px;border-radius:3px}
 .vf-search-hint{margin:6px 0 12px;color:var(--vfm);font-size:.72rem;line-height:1.35}
+.vf-phone-control{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;align-items:end}
+.vf-phone-control input{min-width:0}
+.vf-call{align-self:stretch;margin-top:4px;border:1px solid #17324a;border-radius:3px;padding:0 10px;background:#17324a;color:#fff;font:inherit;font-size:.78rem;font-weight:800;cursor:pointer;white-space:nowrap}
+.vf-call:hover,.vf-call:focus-visible{background:#0d263b}
+.vf-extra-phone{grid-column:1/-1;border:1px solid #dce5ec;border-radius:9px;padding:11px;background:#f8fafb}.vf-extra-phone strong{display:block}.vf-extra-phone small{display:block;color:var(--vfm);margin-top:2px}.vf-extra-phone-list{display:grid;gap:5px;margin-top:8px}.vf-extra-phone-item{display:flex;justify-content:space-between;gap:10px;border-top:1px solid #e1e8ed;padding-top:6px;font-size:.78rem}.vf-extra-phone-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;margin-top:9px}.vf-extra-phone-add input{margin-top:0}.vf-extra-phone-add button{margin-top:0}.vf-extra-phone-state{margin:6px 0 0}
+@media(max-width:420px){.vf-phone-control{grid-template-columns:1fr}.vf-call{min-height:40px;margin-top:0}}
 </style>
 <style is:global>
 .vf-polycam{border-top:4px solid #f59a23}.vf-measure-table{overflow:auto;margin-top:10px}.vf-measure-table table{width:100%;border-collapse:collapse;font-size:.78rem}.vf-measure-table th,.vf-measure-table td{border:1px solid #d6dce1;padding:5px;text-align:left}.vf-measure-table input,.vf-measure-table select{width:100%;min-width:72px;box-sizing:border-box;border:1px solid #bdcbd6;border-radius:2px;padding:6px;font:inherit}.vf-measure-table button{border:1px solid #d2a8a8;background:#fff5f5;border-radius:2px;padding:6px 8px;color:#8c2525}
 </style>
+<script is:inline>
+(() => {
+  const mobileDevice=()=>navigator.userAgentData?.mobile??/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const phoneFields=[
+    ['vf-telefon','VN-Telefon'],
+    ['vf-mobil','VN-Mobilnummer'],
+    ['vf-sanierer-telefon','Sanierer-Telefon'],
+    ['vf-sanierer-mobil','Sanierer-Mobilnummer']
+  ];
+  for(const [id,label] of phoneFields){
+    const input=document.getElementById(id);
+    if(!input||input.parentElement?.querySelector('.vf-phone-control'))continue;
+    const control=document.createElement('div');
+    control.className='vf-phone-control';
+    input.before(control);
+    control.append(input);
+    const call=document.createElement('button');
+    call.type='button';
+    call.className='vf-call';
+    call.textContent='Anrufen';
+    call.setAttribute('aria-label',`${label} anrufen`);
+    call.title='Am PC über xtelsio und das GEQUDIO GZ-6 anrufen';
+    call.addEventListener('click',()=>{
+      const number=input.value.trim().replace(/[^\d+*#]/g,'');
+      if(!number){
+        input.setCustomValidity('Bitte zuerst eine Telefonnummer eingeben.');
+        input.reportValidity();
+        input.focus();
+        return;
+      }
+      input.setCustomValidity('');
+      window.location.href=`${mobileDevice()?'tel':'callto'}:${number}`;
+    });
+    input.addEventListener('input',()=>input.setCustomValidity(''));
+    control.append(call);
+  }
+})();
+</script>
+<script is:inline>
+(() => {
+  const incoming=new URLSearchParams(location.search).get('anrufer')?.trim();
+  if(!incoming)return;
+  const incomingName=new URLSearchParams(location.search).get('anrufername')?.trim()||'';
+  sessionStorage.setItem('svnet-incoming-phone',incoming);
+  if(incomingName)sessionStorage.setItem('svnet-incoming-name',incomingName);
+  const run=async()=>{
+    const box=document.getElementById('vf-results');
+    const input=document.getElementById('vf-search-input');
+    if(!box||!input)return;
+    input.value=incoming;
+    box.innerHTML='<p class="vf-meta">Eingehender Anruf wird einem Schadenfall zugeordnet …</p>';
+    const openCase=async row=>{
+      box.innerHTML='<p class="vf-meta">Treffer erkannt. Schadenfall wird geöffnet …</p>';
+      const response=await fetch(`/intern/api/google-drive-sync.php?action=load_case&id=${encodeURIComponent(row.id)}`,{credentials:'same-origin'});
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok)throw Error(data.error||`HTTP ${response.status}`);
+      const selected={folder_id:data.case?.id||row.id,meta:{...(row.meta||{}),...(data.case?.meta||{})}};
+      sessionStorage.setItem('svnet-case',JSON.stringify(selected));
+      localStorage.setItem('svnet-case',JSON.stringify(selected));
+      sessionStorage.removeItem('svnet-incoming-phone');
+      sessionStorage.removeItem('svnet-incoming-name');
+      const target=new URL(location.href);
+      target.searchParams.delete('anrufer');
+      target.searchParams.delete('anrufername');
+      location.replace(target.href);
+    };
+    try{
+      const response=await fetch(`/intern/api/google-drive-sync.php?action=incoming_phone&number=${encodeURIComponent(incoming)}`,{credentials:'same-origin'});
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok)throw Error(data.error||`HTTP ${response.status}`);
+      const rows=data.results||[];
+      if(rows.length===1){await openCase(rows[0]);return}
+      box.innerHTML='';
+      if(!rows.length){
+        const message=document.createElement('p');
+        message.className='vf-meta';
+        message.textContent=`Anrufer ${incoming}: Kein hinterlegter Schadenfall gefunden.`;
+        box.append(message);
+        return;
+      }
+      const message=document.createElement('p');
+      message.className='vf-meta';
+      message.textContent=`Anrufer ${incoming}: ${rows.length} mögliche Schadenfälle gefunden. Bitte auswählen.`;
+      box.append(message);
+      rows.forEach(row=>{
+        const card=document.createElement('div');
+        card.className='vf-result';
+        const title=document.createElement('strong');
+        title.textContent=row.meta?.schaden_nr||row.name||'Versicherungsfall';
+        const detail=document.createElement('div');
+        detail.className='vf-meta';
+        detail.textContent=[row.meta?.vn_objekt,row.meta?.ort].filter(Boolean).join(' · ');
+        const button=document.createElement('button');
+        button.type='button';
+        button.className='vf-secondary';
+        button.textContent='Fall öffnen';
+        button.addEventListener('click',()=>openCase(row).catch(error=>{box.textContent=error.message}));
+        card.append(title,detail,button);
+        box.append(card);
+      });
+    }catch(error){box.innerHTML='';const message=document.createElement('p');message.className='vf-meta';message.textContent='Anrufer konnte nicht zugeordnet werden: '+error.message;box.append(message)}
+  };
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',run,{once:true}):run();
+})();
+</script>
+<script is:inline>
+(() => {
+  const fields=document.querySelector('#vf-form .vf-fields');
+  if(!fields)return;
+  const panel=document.createElement('div');
+  panel.className='vf-extra-phone';
+  panel.innerHTML='<strong>Weitere Anrufer</strong><small>Zusätzliche Rufnummern mit Namen oder Ansprechpartner direkt diesem Schadenfall zuordnen.</small><div class="vf-extra-phone-list"></div><div class="vf-extra-phone-add" hidden><input type="text" maxlength="160" placeholder="Name oder Ansprechpartner" aria-label="Name oder Ansprechpartner"><button type="button" class="vf-secondary">Rufnummer übernehmen</button></div><p class="vf-meta vf-extra-phone-state"></p>';
+  fields.append(panel);
+  const list=panel.querySelector('.vf-extra-phone-list');
+  const add=panel.querySelector('.vf-extra-phone-add');
+  const nameInput=add.querySelector('input');
+  const button=add.querySelector('button');
+  const state=panel.querySelector('.vf-extra-phone-state');
+  const readActive=()=>{for(const store of[sessionStorage,localStorage])try{const value=JSON.parse(store.getItem('svnet-case')||'null');if(value?.folder_id)return value}catch{}return null};
+  const phoneKey=value=>String(value||'').replace(/\D/g,'').replace(/^00/,'').replace(/^49(?=\d{10,}$)/,'').replace(/^0+/,'');
+  const currentNumber=()=>new URLSearchParams(location.search).get('anrufer')?.trim()||sessionStorage.getItem('svnet-incoming-phone')||'';
+  const currentName=()=>new URLSearchParams(location.search).get('anrufername')?.trim()||sessionStorage.getItem('svnet-incoming-name')||'';
+  const render=()=>{
+    const active=readActive(),contacts=Array.isArray(active?.meta?.telefonkontakte)?active.meta.telefonkontakte:[];
+    list.innerHTML='';
+    contacts.forEach(contact=>{const row=document.createElement('div');row.className='vf-extra-phone-item';const name=document.createElement('span');name.textContent=contact.name||'Ansprechpartner';const number=document.createElement('span');number.textContent=contact.nummer||'';row.append(name,number);list.append(row)});
+    const incoming=currentNumber(),known=contacts.some(contact=>phoneKey(contact.nummer)===phoneKey(incoming));
+    add.hidden=!active?.folder_id||!incoming||known;
+    if(!add.hidden&&!nameInput.value&&currentName())nameInput.value=currentName();
+    button.textContent=incoming?`${incoming} übernehmen`:'Rufnummer übernehmen';
+    state.textContent=contacts.length?`${contacts.length} zusätzliche Rufnummer${contacts.length===1?'':'n'} hinterlegt.`:(active?.folder_id?'Noch keine zusätzliche Rufnummer hinterlegt.':'');
+  };
+  button.addEventListener('click',async()=>{
+    const active=readActive(),number=currentNumber(),name=nameInput.value.trim();
+    if(!active?.folder_id){state.textContent='Bitte zuerst den richtigen Schadenfall öffnen.';return}
+    if(!name){nameInput.setCustomValidity('Bitte einen Namen oder Ansprechpartner eingeben.');nameInput.reportValidity();nameInput.focus();return}
+    nameInput.setCustomValidity('');button.disabled=true;state.textContent='Rufnummer wird im geöffneten Schadenfall gespeichert …';
+    try{
+      const response=await fetch('/intern/api/google-drive-sync.php?action=save_phone_contact',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({folder_id:active.folder_id,number,name})});
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok)throw Error(data.error||`HTTP ${response.status}`);
+      const updated={...active,meta:data.meta||active.meta};
+      sessionStorage.setItem('svnet-case',JSON.stringify(updated));localStorage.setItem('svnet-case',JSON.stringify(updated));sessionStorage.removeItem('svnet-incoming-phone');sessionStorage.removeItem('svnet-incoming-name');
+      const target=new URL(location.href);target.searchParams.delete('anrufer');target.searchParams.delete('anrufername');history.replaceState({},'',target.href);nameInput.value='';render();state.textContent=`${name} wurde mit ${number} gespeichert. Der nächste Anruf wird automatisch erkannt.`;
+    }catch(error){state.textContent='Rufnummer konnte nicht gespeichert werden: '+error.message}finally{button.disabled=false}
+  });
+  nameInput.addEventListener('input',()=>nameInput.setCustomValidity(''));
+  new MutationObserver(render).observe(document.getElementById('vf-active'),{attributes:true,childList:true,subtree:true});
+  render();
+})();
+</script>
 <script is:inline>
 (() => {
   document.querySelectorAll('.vf-app section.vf-card:not(.vf-processing)').forEach((card,index)=>{
