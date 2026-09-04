@@ -9,7 +9,6 @@ const RS_MONTHS = ['januar'=>1,'februar'=>2,'maerz'=>3,'mrz'=>3,'april'=>4,'mai'
 const RS_MONTH_LABELS = [1=>'Jan.',2=>'Feb.',3=>'März',4=>'April',5=>'Mai',6=>'Juni',7=>'Juli',8=>'Aug.',9=>'Sept.',10=>'Okt.',11=>'Nov.',12=>'Dez.'];
 
 commonHeaders();
-$user = requireAuth();
 
 function rsText(string $value):string {
     return trim(strtr(mb_strtolower($value,'UTF-8'),['ä'=>'ae','ö'=>'oe','ü'=>'ue','ß'=>'ss'])," \t\n\r\0\x0B:");
@@ -67,8 +66,16 @@ function rsRefresh(array $user):array {
     $share=rawurlencode(rsShareId());$meta=rsGraph('shares/'.$share.'/driveItem?%24select=id,name,lastModifiedDateTime');$bytes=rsGraph('shares/'.$share.'/driveItem/content',true);$tmp=tempnam(sys_get_temp_dir(),'revenue-');if($tmp===false||file_put_contents($tmp,$bytes)===false)throw new RuntimeException('Die Umsatzdatei konnte nicht zwischengespeichert werden.');try{$sheets=rsWorkbook($tmp);}finally{@unlink($tmp);}$currentYear=(int)date('Y');$previousYear=$currentYear-1;if(!isset($sheets[(string)$currentYear],$sheets[(string)$previousYear]))throw new RuntimeException('Aktuelles oder vorheriges Jahresblatt fehlt.');$groups=rsMonthGroups($sheets[(string)$currentYear]);$completed=array_keys(array_filter($groups));if(!$completed)throw new RuntimeException('Im aktuellen Jahresblatt fehlt eine blaue Gesamtzeile.');$through=max($completed);$current=rsPeriod($sheets[(string)$currentYear],$currentYear,$through);$previous=rsPeriod($sheets[(string)$previousYear],$previousYear,$through);$private=rsPrivate($sheets,[$currentYear,$previousYear]);$current['private_gross']=$private[$currentYear];$previous['private_gross']=$private[$previousYear];$payload=['source'=>(string)($meta['name']??'CL Umsatzaufstellung Wächter.xlsx'),'source_updated_at'=>isset($meta['lastModifiedDateTime'])?date('d.m.Y H:i',strtotime((string)$meta['lastModifiedDateTime'])):date('d.m.Y H:i'),'comparison'=>'gleicher Zeitraum','current'=>$current,'previous'=>$previous];rsEnsureTable();$stmt=db()->prepare("INSERT INTO portal_revenue_summary(profile,payload_json,source_modified_at,updated_by,updated_at) VALUES('christian',:payload,:source,:user,NOW()) ON DUPLICATE KEY UPDATE payload_json=VALUES(payload_json),source_modified_at=VALUES(source_modified_at),updated_by=VALUES(updated_by),updated_at=NOW()");$stmt->execute([':payload'=>json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':source'=>(string)($meta['lastModifiedDateTime']??''),':user'=>(string)($user['email']??'')]);return$payload;
 }
 
-if(!rsVisible($user))apiJson(['ok'=>true,'visible'=>false]);
 $action=(string)($_GET['action']??'summary');
+if($action==='scheduled'){
+    if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
+    $expected=rsCfg('SETUP_KEY');$provided=trim((string)($_SERVER['HTTP_X_SVNET_SCHEDULE_KEY']??''));
+    if($expected===''||$provided===''||!hash_equals($expected,$provided))apiError(403,'Automationsschlüssel ungültig.');
+    try{$payload=rsRefresh(['email'=>'server-automation@sv-netzwerk.eu','full_name'=>'Server-Automation']);apiJson(['ok'=>true,'scheduled'=>true,...$payload]);}
+    catch(Throwable $error){error_log('[revenue-summary scheduled] '.$error->getMessage());apiError(503,$error->getMessage());}
+}
+$user=requireAuth();
+if(!rsVisible($user))apiJson(['ok'=>true,'visible'=>false]);
 try{
     if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if(!rsCanRefresh($user))apiError(403,'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');$payload=rsRefresh($user);apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,...$payload]);}
     $payload=rsStored()??rsFallback();apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>rsCanRefresh($user),...$payload]);

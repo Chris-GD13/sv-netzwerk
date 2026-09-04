@@ -67,6 +67,7 @@ jobs:
           php -l sv-netzwerk/public/intern/api/profile-routing.php
           php -l sv-netzwerk/public/intern/api/google-drive-sync.php
           php -l sv-netzwerk/public/intern/api/claimsforce-queue.php
+          php -l sv-netzwerk/public/intern/api/revenue-summary.php
           php sv-netzwerk/tests/profile_routing_test.php
           node sv-netzwerk/tests/claimsforce_import_test.mjs
 

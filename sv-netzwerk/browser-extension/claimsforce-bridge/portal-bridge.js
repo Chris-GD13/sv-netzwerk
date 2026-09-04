@@ -144,7 +144,6 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message?.type === 'PORTAL_APPOINTMENT') return { ok: true, result: await appointment(message) };
     if (message?.type === 'PORTAL_SYNC_STATE') return { ok: true, result: await syncState(message) };
     if (message?.type === 'PORTAL_COMMIT_SYNC') return { ok: true, result: await commitSync(message) };
-    if (message?.type === 'PORTAL_REVENUE_REFRESH') return { ok: true, result: await api('/intern/api/revenue-summary.php?action=refresh', { method: 'POST', cache: 'no-store' }) };
     return { ok: false, error: 'Unbekannter Auftrag.' };
   })().then(value => safeSendResponse(sendResponse, value)).catch(error => {
     const invalid = invalidExtensionContext(error);
