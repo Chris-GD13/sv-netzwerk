@@ -11,8 +11,8 @@ const RS_MONTH_LABELS = [1=>'Jan.',2=>'Feb.',3=>'März',4=>'April',5=>'Mai',6=>'
 
 commonHeaders();
 
-function rsText(string $value):string {
-    return trim(strtr(mb_strtolower($value,'UTF-8'),['ä'=>'ae','ö'=>'oe','ü'=>'ue','ß'=>'ss'])," \t\n\r\0\x0B:");
+function rsText(mixed $value):string {
+    return trim(strtr(mb_strtolower((string)$value,'UTF-8'),['ä'=>'ae','ö'=>'oe','ü'=>'ue','ß'=>'ss'])," \t\n\r\0\x0B:");
 }
 function rsCanRefresh(array $user):bool {
     $identity=rsText((string)($user['email']??'').' '.(string)($user['full_name']??''));
