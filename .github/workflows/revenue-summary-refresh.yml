@@ -24,7 +24,7 @@ jobs:
             --output "$response_file" --write-out '%{http_code}' \
             --request POST \
             --header "X-SVNET-Schedule-Key: $SCHEDULE_KEY" \
-            'https://www.sv-netzwerk.eu/intern/api/revenue-summary.php?action=scheduled')"
+            'https://www.sv-netzwerk.eu/intern/api/revenue-summary-v2.php?action=scheduled')"
           cat "$response_file"
           test "$status" = '200'
           python3 - "$response_file" <<'PY'

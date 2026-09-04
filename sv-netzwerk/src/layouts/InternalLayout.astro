@@ -199,7 +199,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       const loadRevenueSummary = async () => {
         if (!(revenueSummary instanceof HTMLElement)) return;
         try {
-          const response = await fetch('/intern/api/revenue-summary.php', { credentials: 'same-origin', cache: 'no-store' });
+          const response = await fetch('/intern/api/revenue-summary-v2.php', { credentials: 'same-origin', cache: 'no-store' });
           const data = await response.json();
           if (!response.ok || !data.ok) throw new Error(data.error || 'Umsatzstand nicht verfügbar.');
           if (!data.visible) { revenueSummary.hidden = true; return; }
@@ -221,7 +221,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
             refresh.disabled = true;
             refresh.textContent = 'Wird aktualisiert …';
             try {
-              const response = await fetch('/intern/api/revenue-summary.php?action=refresh', { method: 'POST', credentials: 'same-origin', cache: 'no-store' });
+              const response = await fetch('/intern/api/revenue-summary-v2.php?action=refresh', { method: 'POST', credentials: 'same-origin', cache: 'no-store' });
               const next = await response.json();
               if (!response.ok || !next.ok) throw new Error(next.error || 'Aktualisierung fehlgeschlagen.');
               renderRevenueSummary(next);
