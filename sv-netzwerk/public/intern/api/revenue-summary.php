@@ -5,6 +5,7 @@ require_once __DIR__.'/config.php';
 require_once __DIR__.'/profile-routing.php';
 
 const RS_SOURCE_URL = 'https://sv1schuett-my.sharepoint.com/:x:/r/personal/ws_sv-schuett_eu/_layouts/15/Doc.aspx?sourcedoc=%7B368ACA1B-6D24-402A-816C-B7B40827CF07%7D&file=CL%20Umsatzaufstellung%20W%25u00e4chter.xlsx&fromShare=true&action=default&mobileredirect=true';
+const RS_GOOGLE_FILE_ID = '1OSL9jQow1C0azdi1NlbVSWXpbxfBZej9';
 const RS_MONTHS = ['januar'=>1,'februar'=>2,'maerz'=>3,'mrz'=>3,'april'=>4,'mai'=>5,'juni'=>6,'juli'=>7,'august'=>8,'september'=>9,'oktober'=>10,'november'=>11,'dezember'=>12];
 const RS_MONTH_LABELS = [1=>'Jan.',2=>'Feb.',3=>'März',4=>'April',5=>'Mai',6=>'Juni',7=>'Juli',8=>'Aug.',9=>'Sept.',10=>'Okt.',11=>'Nov.',12=>'Dez.'];
 
@@ -32,6 +33,9 @@ function rsFallback():array {
 function rsCfg(string $key):string {
     $value=getenv($key);return $value===false?'':trim($value);
 }
+function rsSetting(string $key):string {
+    try{db()->exec("CREATE TABLE IF NOT EXISTS app_settings(setting_key VARCHAR(190) PRIMARY KEY,setting_value MEDIUMTEXT NULL,updated_at DATETIME NOT NULL,updated_by VARCHAR(190) NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");$stmt=db()->prepare('SELECT setting_value FROM app_settings WHERE setting_key=:key LIMIT 1');$stmt->execute([':key'=>$key]);$value=$stmt->fetchColumn();return$value===false?'':trim((string)$value);}catch(Throwable){return'';}
+}
 function rsHttp(string $method,string $url,array $headers=[],?string $body=null,int $timeout=60):array {
     $ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_RETURNTRANSFER=>true,CURLOPT_FOLLOWLOCATION=>true,CURLOPT_TIMEOUT=>$timeout,CURLOPT_HTTPHEADER=>$headers]);if($body!==null)curl_setopt($ch,CURLOPT_POSTFIELDS,$body);$response=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$error=curl_error($ch);curl_close($ch);if(!is_string($response))throw new RuntimeException('SharePoint-Verbindung fehlgeschlagen'.($error!==''?': '.$error:'.'));return['status'=>$status,'body'=>$response];
 }
@@ -39,6 +43,15 @@ function rsToken():string {
     static $token=null;if($token!==null)return$token;$tenant=rsCfg('MS_TENANT_ID');$client=rsCfg('MS_CLIENT_ID');$secret=rsCfg('MS_CLIENT_SECRET');if($tenant===''||$client===''||$secret==='')throw new RuntimeException('Die Microsoft-Verbindung ist nicht vollständig eingerichtet.');$response=rsHttp('POST','https://login.microsoftonline.com/'.rawurlencode($tenant).'/oauth2/v2.0/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['client_id'=>$client,'client_secret'=>$secret,'scope'=>'https://graph.microsoft.com/.default','grant_type'=>'client_credentials']),30);$json=json_decode($response['body'],true);if($response['status']!==200||!is_array($json)||empty($json['access_token']))throw new RuntimeException('Die Microsoft-Anmeldung ist fehlgeschlagen.');$token=(string)$json['access_token'];return$token;
 }
 function rsShareId():string {return'u!'.rtrim(strtr(base64_encode(RS_SOURCE_URL),'+/','-_'),'=');}
+function rsB64(string $value):string{return rtrim(strtr(base64_encode($value),'+/','-_'),'=');}
+function rsGoogleToken():string {
+    static$token=null;if($token!==null)return$token;$client=rsCfg('GOOGLE_DRIVE_CLIENT_ID')?:rsSetting('google_drive_client_id');$secret=rsCfg('GOOGLE_DRIVE_CLIENT_SECRET')?:rsSetting('google_drive_client_secret');$refresh=rsCfg('GOOGLE_DRIVE_REFRESH_TOKEN')?:rsSetting('google_drive_refresh_token');if($client!==''&&$secret!==''&&$refresh!==''){$response=rsHttp('POST','https://oauth2.googleapis.com/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['client_id'=>$client,'client_secret'=>$secret,'refresh_token'=>$refresh,'grant_type'=>'refresh_token']),30);$json=json_decode($response['body'],true);if($response['status']===200&&is_array($json)&&!empty($json['access_token']))return$token=(string)$json['access_token'];}
+    $raw=rsCfg('GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON');if($raw!==''&&!str_starts_with($raw,'{'))$raw=(string)(base64_decode($raw,true)?:$raw);$service=json_decode($raw,true);if(is_array($service)&&!empty($service['client_email'])&&!empty($service['private_key'])){$now=time();$header=rsB64(json_encode(['alg'=>'RS256','typ'=>'JWT']));$claims=rsB64(json_encode(['iss'=>$service['client_email'],'scope'=>'https://www.googleapis.com/auth/drive.readonly','aud'=>'https://oauth2.googleapis.com/token','iat'=>$now,'exp'=>$now+3500]));$input=$header.'.'.$claims;$signature='';if(openssl_sign($input,$signature,$service['private_key'],OPENSSL_ALGO_SHA256)){$response=rsHttp('POST','https://oauth2.googleapis.com/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['grant_type'=>'urn:ietf:params:oauth:grant-type:jwt-bearer','assertion'=>$input.'.'.rsB64($signature)]),30);$json=json_decode($response['body'],true);if($response['status']===200&&is_array($json)&&!empty($json['access_token']))return$token=(string)$json['access_token'];}}
+    throw new RuntimeException('Google Drive ist für den Umsatzabgleich nicht verbunden.');
+}
+function rsGoogleSource():array {
+    $headers=['Authorization: Bearer '.rsGoogleToken()];$id=rawurlencode(RS_GOOGLE_FILE_ID);$metaResponse=rsHttp('GET','https://www.googleapis.com/drive/v3/files/'.$id.'?supportsAllDrives=true&fields=id,name,mimeType,modifiedTime',$headers,null,60);$meta=json_decode($metaResponse['body'],true);if($metaResponse['status']!==200||!is_array($meta))throw new RuntimeException('Die Google-Umsatzdatei ist für den Server nicht lesbar (HTTP '.$metaResponse['status'].').');$fileResponse=rsHttp('GET','https://www.googleapis.com/drive/v3/files/'.$id.'?alt=media&supportsAllDrives=true',$headers,null,180);if($fileResponse['status']!==200)throw new RuntimeException('Die Google-Umsatzdatei konnte nicht geladen werden (HTTP '.$fileResponse['status'].').');return[['name'=>(string)($meta['name']??'CL Umsatzaufstellung Wächter.xlsx'),'lastModifiedDateTime'=>(string)($meta['modifiedTime']??'')],$fileResponse['body']];
+}
 function rsGraph(string $path,bool $binary=false):array|string {
     $response=rsHttp('GET','https://graph.microsoft.com/v1.0/'.$path,['Authorization: Bearer '.rsToken()],null,$binary?180:60);if($response['status']<200||$response['status']>=300)throw new RuntimeException('SharePoint konnte nicht gelesen werden (HTTP '.$response['status'].').');if($binary)return$response['body'];$json=json_decode($response['body'],true);if(!is_array($json))throw new RuntimeException('SharePoint hat keine gültigen Dateiinformationen geliefert.');return$json;
 }
@@ -46,9 +59,7 @@ function rsGraphMaybe(string $path,bool $binary=false):array|string|null {
     $response=rsHttp('GET','https://graph.microsoft.com/v1.0/'.$path,['Authorization: Bearer '.rsToken()],null,$binary?180:60);if($response['status']<200||$response['status']>=300)return null;if($binary)return$response['body'];$json=json_decode($response['body'],true);return is_array($json)?$json:null;
 }
 function rsSourceFile():array {
-    $share=rawurlencode(rsShareId());$meta=rsGraphMaybe('shares/'.$share.'/driveItem?%24select=id,name,lastModifiedDateTime');$bytes=is_array($meta)?rsGraphMaybe('shares/'.$share.'/driveItem/content',true):null;if(is_array($meta)&&is_string($bytes))return[$meta,$bytes];
-    $site=rsGraphMaybe('sites/sv1schuett-my.sharepoint.com:/personal/ws_sv-schuett_eu:?%24select=id');$siteId=is_array($site)?(string)($site['id']??''):'';$file=rawurlencode('CL Umsatzaufstellung Wächter.xlsx');if($siteId!=='')foreach(['Desktop/'.$file,$file]as$path){$base='sites/'.rawurlencode($siteId).'/drive/root:/'.$path;$meta=rsGraphMaybe($base.':?%24select=id,name,lastModifiedDateTime');$bytes=is_array($meta)?rsGraphMaybe($base.':/content',true):null;if(is_array($meta)&&is_string($bytes))return[$meta,$bytes];}
-    throw new RuntimeException('SharePoint-Zugriff auf die Umsatzdatei ist nicht freigegeben.');
+    return rsGoogleSource();
 }
 function rsWorkbook(string $path):array {
     $zip=new ZipArchive();if($zip->open($path)!==true)throw new RuntimeException('Die Umsatzdatei ist keine lesbare Excel-Arbeitsmappe.');$shared=[];$sharedXml=$zip->getFromName('xl/sharedStrings.xml');if($sharedXml!==false&&($xml=simplexml_load_string((string)$sharedXml))!==false){foreach($xml->si as$si){$parts=[];if(isset($si->t))$parts[]=(string)$si->t;foreach($si->r as$run)if(isset($run->t))$parts[]=(string)$run->t;$shared[]=implode('',$parts);}}$bookXml=$zip->getFromName('xl/workbook.xml');$relsXml=$zip->getFromName('xl/_rels/workbook.xml.rels');$book=$bookXml!==false?simplexml_load_string((string)$bookXml):false;$rels=$relsXml!==false?simplexml_load_string((string)$relsXml):false;if($book===false||$rels===false){$zip->close();throw new RuntimeException('Die Tabellenstruktur der Umsatzdatei fehlt.');}$relMap=[];foreach($rels->Relationship as$rel)$relMap[(string)$rel['Id']]=(string)$rel['Target'];$namespaces=$book->getNamespaces(true);$rns=$namespaces['r']??null;$sheets=[];
