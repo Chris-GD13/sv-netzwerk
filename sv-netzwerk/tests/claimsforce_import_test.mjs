@@ -193,6 +193,7 @@ assert(central.includes('Dein ClaimsForce-Import wird zentral ausgeführt'), 'Sa
 assert(central.includes("new CustomEvent('svnet:claims-summary-update')"), 'Nach einem Claims-Import wird die Kopfzeilenanzeige unmittelbar aktualisiert');
 assert(!internLayout.includes('id="intern-claims-summary"') && !internLayout.includes('Deine offenen Aufgaben bei Claims') && !internLayout.includes("claimsforce-queue.php?action=summary"), 'Der unzuverlässige orange Claims-Auftragskasten ist für alle Profile entfernt');
 assert(internLayout.includes('id="intern-revenue-summary"') && internLayout.includes('Die Regulierer · Umsatz') && internLayout.includes('/intern/api/revenue-summary-v2.php'), 'Christian erhält anstelle des Claims-Kastens die Umsatzübersicht Die Regulierer');
+assert(!internLayout.includes('intern-header__revenue-refresh') && !internLayout.includes('Abrechnungen öffnen'), 'Das orange Umsatzfeld enthält keine eigene oder doppelte Aktualisierungsschaltfläche');
 assert(internLayout.includes('id="intern-settlement-link"') && internLayout.includes('/intern/abrechnungen/') && internLayout.includes('settlementLink.hidden = false'), 'Der geschützte Menüpunkt Abrechnungen wird erst nach bestätigter Umsatzberechtigung sichtbar');
 const revenueApi = fs.readFileSync(path.join(root, 'public/intern/api/revenue-summary.php'), 'utf8');
 const settlementPage = fs.readFileSync(path.join(root, 'src/pages/intern/abrechnungen/index.astro'), 'utf8');

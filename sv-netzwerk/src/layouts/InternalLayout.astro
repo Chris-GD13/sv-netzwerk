@@ -93,8 +93,6 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-header__revenue-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 5px; font-size: .72rem; font-weight: 900; line-height: 1.2; }
       .intern-header__revenue-title > span:last-child { display: flex; align-items: center; gap: 7px; }
       .intern-header__revenue-title small { font-size: .64rem; font-weight: 700; opacity: .78; }
-      .intern-header__revenue-refresh { padding: 3px 7px; border: 1px solid rgba(7, 26, 46, .55); border-radius: 3px; background: #fff; color: #071a2e; font: inherit; font-size: .64rem; font-weight: 900; cursor: pointer; }
-      .intern-header__revenue-refresh:disabled { cursor: wait; opacity: .65; }
       .intern-header__revenue-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
       .intern-header__revenue-item { min-width: 0; padding-left: 9px; border-left: 1px solid rgba(7, 26, 46, .28); }
       .intern-header__revenue-item:first-child { padding-left: 0; border-left: 0; }
@@ -212,15 +210,13 @@ const isActive = (href: string) => currentPath.startsWith(href);
           const previous = summary.previous || {};
           revenueSummary.title = `Quelle: ${summary.source || 'Umsatzaufstellung'} · Stand ${summary.source_updated_at || '–'}`;
           revenueSummary.innerHTML = `
-            <div class="intern-header__revenue-title"><span>Die Regulierer · Umsatz</span><span><small>Stand ${summary.source_updated_at || '–'}</small>${summary.can_refresh ? '<button class="intern-header__revenue-refresh" type="button">Abrechnungen öffnen</button>' : ''}</span></div>
+            <div class="intern-header__revenue-title"><span>Die Regulierer · Umsatz</span><span><small>Stand ${summary.source_updated_at || '–'}</small></span></div>
             <div class="intern-header__revenue-grid">
               <div class="intern-header__revenue-item"><span>${current.period || current.year}</span><strong>${money(current.ytd_net)} netto · Ø ${money(current.average_net, 2)}</strong><small>Jahreswert ${money(current.annualized_net)}</small></div>
               <div class="intern-header__revenue-item"><span>${previous.period || previous.year}</span><strong>${money(previous.ytd_net)} netto · Ø ${money(previous.average_net, 2)}</strong><small>Jahreswert ${money(previous.annualized_net)}</small></div>
               <div class="intern-header__revenue-item"><span>Privataufträge brutto</span><strong>${current.year}: ${money(current.private_gross)}</strong><small>${previous.year}: ${money(previous.private_gross)}</small></div>
             </div>`;
           revenueSummary.hidden = false;
-          const refresh = revenueSummary.querySelector('.intern-header__revenue-refresh');
-          refresh?.addEventListener('click', () => window.location.assign('/intern/abrechnungen/'));
           };
           renderRevenueSummary(data);
         } catch {
