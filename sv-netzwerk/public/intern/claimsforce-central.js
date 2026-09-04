@@ -28,7 +28,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.3.18',currentBridgeVersion='1.3.21';
+  const minimumBridgeVersion='1.3.18',currentBridgeVersion='1.3.22';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -56,7 +56,12 @@
       userJobs=(recent.jobs||[]).filter(job=>['queued','running'].includes(job.status)).map(job=>Number(job.id));
       if(userJobs.length){button.disabled=true;watch();return}
       button.disabled=false;
-      const terminal=(recent.jobs||[]).filter(job=>['done','failed'].includes(job.status)).slice(0,4);
+      const latestByProfile=new Map();
+      for(const job of (recent.jobs||[]).filter(job=>['done','failed'].includes(job.status))){
+        const profile=String(job.profile||'unbekannt');
+        if(!latestByProfile.has(profile))latestByProfile.set(profile,job);
+      }
+      const terminal=[...latestByProfile.values()].slice(0,4);
       if(terminal.length){const compact=terminal.map(job=>`${job.id}|${job.profile}|${job.status}|${job.phase||'CF-STATUS'}`).join(';');document.documentElement.setAttribute('data-svnet-claims-jobs',compact);const results=terminal.map(job=>{const r=resultOf(job);return`${job.id}|${Number(r.claims||0)}|${Number(r.updated||0)}|${Number(r.skipped||0)}|${Number(r.files||0)}|${Number(r.messages||0)}|${Number(r.appointments||0)}`}).join(';');document.documentElement.setAttribute('data-svnet-claims-results',results);const text=terminal.map(job=>`${job.profile}: ${job.status==='done'?'abgeschlossen':'fehlgeschlagen'} [${job.phase||'CF-STATUS'}] – ${job.message||'ohne Meldung'}`).join(' · '),failed=terminal.some(job=>job.status==='failed');show(text,failed);window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'));setTimeout(()=>show(text,failed),1000)}
     }catch(e){show('Importstatus konnte nicht wiederhergestellt werden: '+e.message,true)}
   }

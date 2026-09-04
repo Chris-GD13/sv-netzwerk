@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SV-Netzwerk ClaimsForce-Brücke",
-  "version": "1.3.21",
+  "version": "1.3.22",
   "description": "Liest die eigenen ClaimsForce-Aufträge samt Dateien, Nachrichten und Terminen in das SV-Netzwerk ein.",
   "permissions": ["storage", "tabs", "nativeMessaging", "browsingData", "alarms"],
   "host_permissions": [
@@ -27,7 +27,10 @@
       "run_at": "document_start"
     },
     {
-      "matches": ["https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*"],
+      "matches": [
+        "https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*",
+        "https://www.sv-netzwerk.eu/intern/tagescockpit/*"
+      ],
       "js": ["portal-bridge.js"],
       "run_at": "document_idle"
     },

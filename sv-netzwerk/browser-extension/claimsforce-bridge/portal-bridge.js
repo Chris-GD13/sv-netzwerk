@@ -168,6 +168,27 @@ window.addEventListener('message', event => {
   if (event.source !== window || event.origin !== location.origin) return;
   if (event.data?.type === 'SVNET_CLAIMS_BRIDGE_PING') window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION }, location.origin);
   if (event.data?.type === 'SVNET_CLAIMS_RUNTIME_PING') reportRuntime();
+  if (event.data?.type === 'SVNET_CLAIMS_CREDENTIAL_CHECK') {
+    const requestId = String(event.data.requestId || '');
+    let profile;
+    try { profile = profileKey(event.data.profile); }
+    catch (error) {
+      window.postMessage({ type: 'SVNET_CLAIMS_CREDENTIAL_STATUS', requestId, ok: false, profile: '', phase: 'invalid-profile' }, location.origin);
+      return;
+    }
+    chrome.runtime.sendMessage({ type: 'CHECK_PROFILE_CREDENTIALS', profile }).then(status => {
+      window.postMessage({
+        type: 'SVNET_CLAIMS_CREDENTIAL_STATUS',
+        requestId,
+        ok: status?.ok === true,
+        profile,
+        phase: String(status?.phase || 'unknown')
+      }, location.origin);
+    }).catch(error => {
+      if (invalidExtensionContext(error)) reportInvalidExtensionContext();
+      window.postMessage({ type: 'SVNET_CLAIMS_CREDENTIAL_STATUS', requestId, ok: false, profile, phase: 'bridge-unavailable' }, location.origin);
+    });
+  }
   if (event.data?.type === 'SVNET_CLAIMS_IMPORT_START') {
     let profile;
     try { profile = profileKey(event.data.profile); }

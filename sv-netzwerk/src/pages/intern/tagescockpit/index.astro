@@ -73,6 +73,15 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   const monday=value=>{const date=new Date(value);date.setHours(12,0,0,0);const day=date.getDay()||7;date.setDate(date.getDate()-day+1);return date};
   const nextImport=()=>{const now=new Date(),next=new Date(now);next.setHours(3,0,0,0);if(next<=now)next.setDate(next.getDate()+1);while(next.getDay()===0||next.getDay()===6)next.setDate(next.getDate()+1);return new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).format(next)};
   const formatTime=value=>new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit'}).format(new Date(value));
+  const credentialCheck=profile=>new Promise(resolve=>{
+    if(!profile){resolve(null);return}
+    const requestId=crypto.randomUUID(),finish=value=>{clearTimeout(timer);window.removeEventListener('message',receive);resolve(value)},receive=event=>{
+      if(event.source!==window||event.origin!==location.origin||event.data?.type!=='SVNET_CLAIMS_CREDENTIAL_STATUS'||event.data.requestId!==requestId)return;
+      finish({ok:event.data.ok===true,profile:String(event.data.profile||''),phase:String(event.data.phase||'unknown')});
+    },timer=setTimeout(()=>finish(null),2500);
+    window.addEventListener('message',receive);
+    window.postMessage({type:'SVNET_CLAIMS_CREDENTIAL_CHECK',requestId,profile},location.origin);
+  });
   const required=[['schaden_nr','Schaden-Nr.'],['vn_objekt','VN / Objekt'],['schadenart','Schadenart'],['schaden_ort','Schadenort']];
   let recentCases=[];
 
@@ -96,8 +105,15 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 
   async function loadClaims(){
     const [summary,mine]=await Promise.all([request('/intern/api/claimsforce-queue.php?action=summary'),request('/intern/api/claimsforce-queue.php?action=mine')]),items=summary.items||[],open=items.reduce((sum,item)=>sum+(Number.isFinite(Number(item.open_count))?Number(item.open_count):0),0),jobs=mine.jobs||[],active=jobs.find(job=>['queued','running'].includes(job.status)),last=jobs[0];
+    const profile=String(items[0]?.profile||last?.profile||''),credential=await credentialCheck(profile),profileLabel=profileNames[profile]||profile;
     $('dc-claims-count').textContent=items.some(item=>item.open_count!==null)?String(open):'–';$('dc-claims-summary').textContent=items.map(item=>`${item.label}: ${item.open_count??'–'}`).join(' · ')||'Kein Aufgabenstand';
-    if(active)setSystem('claims','warn',`${active.profile}: ${active.message||active.status}`);else if(last?.status==='failed')setSystem('claims','bad',`${last.profile}: ${last.message||'letzter Import fehlgeschlagen'}`);else setSystem('claims','ok',last?.finished_at?`Letzter Lauf ${last.status==='done'?'abgeschlossen':'beendet'} · ${last.profile}`:'Warteschlange erreichbar');
+    const staleCredentialFailure=last?.status==='failed'&&/\[CF-CRED-01\]/.test(String(last.message||''));
+    if(active)setSystem('claims','warn',`${active.profile}: ${active.message||active.status}`);
+    else if(staleCredentialFailure&&credential?.ok)setSystem('claims','ok',`${profileLabel}: Zugangsdaten aktuell verfügbar · vorheriger Fehler erledigt`);
+    else if(last?.status==='failed')setSystem('claims','bad',`${last.profile}: ${last.message||'letzter Import fehlgeschlagen'}`);
+    else if(credential?.ok)setSystem('claims','ok',`${profileLabel}: Zugangsdaten verfügbar · Warteschlange erreichbar`);
+    else if(credential)setSystem('claims','bad',`${profileLabel}: Zugangsdaten nicht verfügbar [${credential.phase}]`);
+    else setSystem('claims','ok',last?.finished_at?`Letzter Lauf ${last.status==='done'?'abgeschlossen':'beendet'} · ${last.profile}`:'Warteschlange erreichbar');
   }
 
   async function loadRevenue(){

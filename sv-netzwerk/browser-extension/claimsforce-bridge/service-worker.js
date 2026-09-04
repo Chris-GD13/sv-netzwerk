@@ -490,6 +490,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }).then(value => sendResponse(value || {})).catch(() => sendResponse({}));
     return true;
   }
+  if (message?.type === 'CHECK_PROFILE_CREDENTIALS') {
+    let profile;
+    try { profile = profileKey(message.profile); }
+    catch (error) { sendResponse({ ok: false, profile: '', phase: 'invalid-profile', error: error.message }); return; }
+    credentialsFor(profile).then(found => sendResponse({
+      ok: !!found,
+      profile,
+      phase: credentialDiagnostic
+    })).catch(error => sendResponse({ ok: false, profile, phase: credentialDiagnostic || 'credential-check-error', error: error.message }));
+    return true;
+  }
   if (message?.type === 'GET_PORTAL_CREDENTIALS') {
     Promise.race([loadPortalCredentials().catch(() => null), sleep(600).then(() => null)]).then(async value => {
       if (value?.email && value?.password) return value;
