@@ -68,6 +68,18 @@ function rsSharePointSource():array {
 function rsSourceFile():array {
     return rsSharePointSource();
 }
+function rsUploadedSource():array {
+    $upload=$_FILES['workbook']??null;
+    if(!is_array($upload))throw new RuntimeException('Bitte die aktuell gespeicherte Umsatzdatei auswählen.');
+    $error=(int)($upload['error']??UPLOAD_ERR_NO_FILE);
+    if($error!==UPLOAD_ERR_OK)throw new RuntimeException($error===UPLOAD_ERR_INI_SIZE||$error===UPLOAD_ERR_FORM_SIZE?'Die ausgewählte Umsatzdatei ist zu groß.':'Die ausgewählte Umsatzdatei konnte nicht hochgeladen werden.');
+    $name=basename(trim((string)($upload['name']??'')));$tmp=(string)($upload['tmp_name']??'');$size=(int)($upload['size']??0);$extension=mb_strtolower(pathinfo($name,PATHINFO_EXTENSION),'UTF-8');
+    if(!in_array($extension,['xlsx','xlsm'],true))throw new RuntimeException('Bitte eine Excel-Arbeitsmappe im Format XLSX oder XLSM auswählen.');
+    if($size<=0||$size>25*1024*1024)throw new RuntimeException('Die ausgewählte Umsatzdatei ist leer oder größer als 25 MB.');
+    if($tmp===''||!is_uploaded_file($tmp))throw new RuntimeException('Der Datei-Upload konnte nicht sicher bestätigt werden.');
+    $bytes=file_get_contents($tmp);if(!is_string($bytes)||$bytes==='')throw new RuntimeException('Die ausgewählte Umsatzdatei konnte nicht gelesen werden.');
+    return[['name'=>$name,'lastModifiedDateTime'=>date(DATE_ATOM),'sourceProvider'=>'Manuell eingelesene Originaldatei'], $bytes];
+}
 function rsWorkbook(string $path):array {
     $zip=new ZipArchive();if($zip->open($path)!==true)throw new RuntimeException('Die Umsatzdatei ist keine lesbare Excel-Arbeitsmappe.');$shared=[];$sharedXml=$zip->getFromName('xl/sharedStrings.xml');if($sharedXml!==false&&($xml=simplexml_load_string((string)$sharedXml))!==false){foreach($xml->si as$si){$parts=[];if(isset($si->t))$parts[]=(string)$si->t;foreach($si->r as$run)if(isset($run->t))$parts[]=(string)$run->t;$shared[]=implode('',$parts);}}$bookXml=$zip->getFromName('xl/workbook.xml');$relsXml=$zip->getFromName('xl/_rels/workbook.xml.rels');$book=$bookXml!==false?simplexml_load_string((string)$bookXml):false;$rels=$relsXml!==false?simplexml_load_string((string)$relsXml):false;if($book===false||$rels===false){$zip->close();throw new RuntimeException('Die Tabellenstruktur der Umsatzdatei fehlt.');}$relMap=[];foreach($rels->Relationship as$rel)$relMap[(string)$rel['Id']]=(string)$rel['Target'];$namespaces=$book->getNamespaces(true);$rns=$namespaces['r']??null;$sheets=[];
     foreach($book->sheets->sheet as$sheet){$name=trim((string)$sheet['name']);$attrs=$rns?$sheet->attributes($rns):null;$rid=$attrs?(string)($attrs['id']??''):'';$target=$relMap[$rid]??'';if($target==='')continue;$sheetPath=ltrim($target,'/');if(!str_starts_with($sheetPath,'xl/'))$sheetPath='xl/'.$sheetPath;$raw=$zip->getFromName($sheetPath);if($raw===false)continue;$xml=simplexml_load_string((string)$raw);if($xml===false)continue;$cells=[];$formulas=[];foreach($xml->sheetData->row as$row)foreach($row->c as$cell){$ref=(string)$cell['r'];$type=(string)$cell['t'];$value='';if($type==='s')$value=$shared[(int)((string)$cell->v)]??'';elseif($type==='inlineStr'){$parts=[];if(isset($cell->is->t))$parts[]=(string)$cell->is->t;foreach($cell->is->r as$run)if(isset($run->t))$parts[]=(string)$run->t;$value=implode('',$parts);}else{$rawValue=(string)$cell->v;$value=$rawValue!==''&&is_numeric($rawValue)?(float)$rawValue:$rawValue;}if($value!==''&&$value!==null)$cells[$ref]=$value;if(isset($cell->f))$formulas[$ref]='='.(string)$cell->f;}$sheets[$name]=['cells'=>$cells,'formulas'=>$formulas];}
@@ -129,8 +141,8 @@ function rsPrivateEntries(array $sheets,array $years):array {
     for($row=1;$row<=$max;$row++){$a=rsCell($sheet,$row,1);if(is_numeric($a)&&isset($allowed[(int)$a])){$active=(int)$a;continue;}if($active===null||rsText((string)$a)==='gesamt')continue;$amount=rsCell($sheet,$row,4);if(!is_numeric($amount)||(float)$amount==0.0)continue;$entries[]=['year'=>$active,'customer'=>trim((string)$a),'place'=>trim((string)rsCell($sheet,$row,2)),'appointment'=>rsExcelDate(rsCell($sheet,$row,3)),'gross'=>round((float)$amount,2)];}
     usort($entries,fn($a,$b)=>[$b['year'],$b['appointment'],$b['customer']]<=>[$a['year'],$a['appointment'],$a['customer']]);return$entries;
 }
-function rsRefresh(array $user):array {
-    [$meta,$bytes]=rsSourceFile();$tmp=tempnam(sys_get_temp_dir(),'revenue-');
+function rsRefresh(array $user,?array $source=null):array {
+    [$meta,$bytes]=$source??rsSourceFile();$tmp=tempnam(sys_get_temp_dir(),'revenue-');
     if($tmp===false||file_put_contents($tmp,$bytes)===false)throw new RuntimeException('Die Umsatzdatei konnte nicht zwischengespeichert werden.');
     try{$sheets=rsWorkbook($tmp);}finally{@unlink($tmp);}
     $currentYear=(int)date('Y');$previousYear=$currentYear-1;
@@ -157,6 +169,6 @@ if($action==='scheduled'){
 $user=requireAuth();
 if(!rsVisible($user))apiJson(['ok'=>true,'visible'=>false]);
 try{
-    if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if(!rsCanRefresh($user))apiError(403,'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');$payload=rsRefresh($user);apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,...$payload]);}
+    if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if(!rsCanRefresh($user))apiError(403,'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');$payload=rsRefresh($user,rsUploadedSource());apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,...$payload]);}
     $payload=rsStored()??rsFallback();if($action!=='settlement'){unset($payload['entries'],$payload['private_entries'],$payload['available_years']);}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>rsCanRefresh($user),...$payload]);
 }catch(Throwable $error){error_log('[revenue-summary] '.$error->getMessage());apiError(503,$error->getMessage());}
