@@ -58,8 +58,15 @@ function rsGraph(string $path,bool $binary=false):array|string {
 function rsGraphMaybe(string $path,bool $binary=false):array|string|null {
     $response=rsHttp('GET','https://graph.microsoft.com/v1.0/'.$path,['Authorization: Bearer '.rsToken()],null,$binary?180:60);if($response['status']<200||$response['status']>=300)return null;if($binary)return$response['body'];$json=json_decode($response['body'],true);return is_array($json)?$json:null;
 }
+function rsSharePointSource():array {
+    $share=rawurlencode(rsShareId());$meta=rsGraphMaybe('shares/'.$share.'/driveItem?%24select=id,name,lastModifiedDateTime');$bytes=is_array($meta)?rsGraphMaybe('shares/'.$share.'/driveItem/content',true):null;
+    if(is_array($meta)&&is_string($bytes)){$meta['sourceProvider']='SharePoint / OneDrive';return[$meta,$bytes];}
+    $site=rsGraphMaybe('sites/sv1schuett-my.sharepoint.com:/personal/ws_sv-schuett_eu:?%24select=id');$siteId=is_array($site)?(string)($site['id']??''):'';$file=rawurlencode('CL Umsatzaufstellung Wächter.xlsx');
+    if($siteId!=='')foreach(['Desktop/'.$file,$file]as$path){$base='sites/'.rawurlencode($siteId).'/drive/root:/'.$path;$meta=rsGraphMaybe($base.':?%24select=id,name,lastModifiedDateTime');$bytes=is_array($meta)?rsGraphMaybe($base.':/content',true):null;if(is_array($meta)&&is_string($bytes)){$meta['sourceProvider']='SharePoint / OneDrive';return[$meta,$bytes];}}
+    throw new RuntimeException('Die von Susanne bearbeitete SharePoint-Umsatzdatei ist für den Portalserver nicht lesbar.');
+}
 function rsSourceFile():array {
-    return rsGoogleSource();
+    return rsSharePointSource();
 }
 function rsWorkbook(string $path):array {
     $zip=new ZipArchive();if($zip->open($path)!==true)throw new RuntimeException('Die Umsatzdatei ist keine lesbare Excel-Arbeitsmappe.');$shared=[];$sharedXml=$zip->getFromName('xl/sharedStrings.xml');if($sharedXml!==false&&($xml=simplexml_load_string((string)$sharedXml))!==false){foreach($xml->si as$si){$parts=[];if(isset($si->t))$parts[]=(string)$si->t;foreach($si->r as$run)if(isset($run->t))$parts[]=(string)$run->t;$shared[]=implode('',$parts);}}$bookXml=$zip->getFromName('xl/workbook.xml');$relsXml=$zip->getFromName('xl/_rels/workbook.xml.rels');$book=$bookXml!==false?simplexml_load_string((string)$bookXml):false;$rels=$relsXml!==false?simplexml_load_string((string)$relsXml):false;if($book===false||$rels===false){$zip->close();throw new RuntimeException('Die Tabellenstruktur der Umsatzdatei fehlt.');}$relMap=[];foreach($rels->Relationship as$rel)$relMap[(string)$rel['Id']]=(string)$rel['Target'];$namespaces=$book->getNamespaces(true);$rns=$namespaces['r']??null;$sheets=[];
@@ -135,7 +142,7 @@ function rsRefresh(array $user):array {
     $availableYears=[];$entries=[];
     foreach($sheets as$name=>$sheet){if(!preg_match('/^20\d{2}$/',trim((string)$name)))continue;$year=(int)$name;$yearGroups=rsMonthGroups($sheet);$yearMonths=array_keys(array_filter($yearGroups));if(!$yearMonths)continue;$availableYears[]=$year;$entries=array_merge($entries,rsEntries($sheet,$year,max($yearMonths)));}
     rsort($availableYears);$privateEntries=rsPrivateEntries($sheets,$availableYears);
-    $payload=['source'=>(string)($meta['name']??'CL Umsatzaufstellung Wächter.xlsx'),'source_updated_at'=>isset($meta['lastModifiedDateTime'])?date('d.m.Y H:i',strtotime((string)$meta['lastModifiedDateTime'])):date('d.m.Y H:i'),'comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'vat_rate'=>0.19,'entry_schema_version'=>2,'current'=>$current,'previous'=>$previous,'available_years'=>$availableYears,'entries'=>$entries,'private_entries'=>$privateEntries];
+    $payload=['source'=>(string)($meta['name']??'CL Umsatzaufstellung Wächter.xlsx'),'source_provider'=>(string)($meta['sourceProvider']??'SharePoint / OneDrive'),'source_updated_at'=>isset($meta['lastModifiedDateTime'])?date('d.m.Y H:i',strtotime((string)$meta['lastModifiedDateTime'])):date('d.m.Y H:i'),'comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'vat_rate'=>0.19,'entry_schema_version'=>2,'current'=>$current,'previous'=>$previous,'available_years'=>$availableYears,'entries'=>$entries,'private_entries'=>$privateEntries];
     rsEnsureTable();$stmt=db()->prepare("INSERT INTO portal_revenue_summary(profile,payload_json,source_modified_at,updated_by,updated_at) VALUES('christian',:payload,:source,:user,NOW()) ON DUPLICATE KEY UPDATE payload_json=VALUES(payload_json),source_modified_at=VALUES(source_modified_at),updated_by=VALUES(updated_by),updated_at=NOW()");$stmt->execute([':payload'=>json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':source'=>(string)($meta['lastModifiedDateTime']??''),':user'=>(string)($user['email']??'')]);return$payload;
 }
 
