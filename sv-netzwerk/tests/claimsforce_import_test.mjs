@@ -209,6 +209,9 @@ assert(settlementPage.includes("if(!next.visible){location.replace('/intern/vers
 assert(revenueWorkflow.includes("cron: '10 5 15,30 * *'") && revenueWorkflow.includes('secrets.SETUP_KEY') && revenueWorkflow.includes('revenue-summary-v2.php?action=scheduled'), 'Der Umsatzabgleich läuft serverseitig am 15. und 30. jedes Monats');
 const revenueFallback = fs.readFileSync(path.join(root, 'public/intern/api/revenue-summary-fallback.php'), 'utf8');
 assert(revenueFallback.includes("'period' => 'Jan.–Aug. 2026'") && revenueFallback.includes("'annualized_net' => 182239.32") && revenueFallback.includes("'private_gross' => 9352.30"), 'Aktueller Umsatzstand, Jahreswert und Privataufträge sind als geprüfter Rückfallstand hinterlegt');
+const reportApi = fs.readFileSync(path.join(root, 'public/intern/api/gf-ai-generate.php'), 'utf8');
+assert(reportApi.includes('Wert 1914 ist eine Bewertungsgrundlage der Gebäudeversicherung und niemals ein Eurobetrag'), 'Rekon-Berichte trennen Wert 1914 verbindlich vom Selbstbehalt');
+assert(reportApi.includes('Rekon-QS-Sperre: Ein Selbstbehalt wurde unzulässig dem Wert 1914 als Geldbetrag zugeordnet'), 'Eine erneute Zuordnung eines Eurobetrags zum Wert 1914 wird vor der Dokumentausgabe gesperrt');
 const optionsHtml = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.html'), 'utf8');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(optionsHtml.includes(`<option value="${key}">${label}</option>`), `${label} ist in der verschlüsselten Zugangsverwaltung auswählbar`);
 assert(!optionsHtml.includes('value="self"') && !optionsHtml.includes('Susanne Wächter'), 'Optionsseite bietet weder Susanne noch ein unbestimmtes eigenes Profil an');

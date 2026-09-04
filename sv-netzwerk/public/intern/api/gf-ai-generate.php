@@ -182,6 +182,13 @@ if (!str_contains($source, 'VERBINDLICHE PORTALREGEL ALLGEMEINER ERSTBERICHT')) 
         throw new RuntimeException('Portalregeln konnten nicht sicher an den Arbeitsauftrag angebunden werden.');
     }
 }
+$source = str_replace(
+    'Rekon-Auswahlwerte niemals umformulieren, sofern ein belegter Originalwert vorliegt. Die Word-Ausgabe darf keine Bilder enthalten.',
+    'Rekon-Auswahlwerte niemals umformulieren, sofern ein belegter Originalwert vorliegt. Wert 1914 ist eine Bewertungsgrundlage der Gebäudeversicherung und niemals ein Eurobetrag. Eine Formulierung wie Wert 1914 VGB 2002 - 300,00 EUR Selbstbehalt bedeutet: VGB 2002 auf Grundlage des Werts 1914; der Betrag von 300,00 EUR ist ausschließlich der Selbstbehalt. Wert 1914, Versicherungssumme, Selbstbehalt, Reserve und Schadenhöhe strikt voneinander trennen. Die Word-Ausgabe darf keine Bilder enthalten.',
+    $source,
+    $rekonValue1914RuleCount
+);
+if ($rekonValue1914RuleCount !== 1) throw new RuntimeException('Rekon-Regel zu Wert 1914 und Selbstbehalt konnte nicht sicher angebunden werden.');
 
 // Rekon verwendet ein festes dynamisches Formular. Die KI liefert nur die
 // fallbezogenen Werte; Reihenfolge und Word-Layout werden deterministisch hier
@@ -236,6 +243,10 @@ function gfRekonValidateResult(array $result): array
             if ($position === false) throw new RuntimeException('Rekon-QS-Sperre: Feld fehlt oder ist falsch angeordnet: '.$label.'.');
             $offset = $position + mb_strlen($label.':', 'UTF-8');
         }
+    }
+    $fullText = implode("\n", array_map(static fn($section) => (string)($section['text'] ?? ''), $sections));
+    if (preg_match('/\bWert\s*1914(?:(?!Selbstbehalt).){0,60}\b\d{1,3}(?:\.\d{3})*(?:,\d{2})?\s*(?:EUR|€)/uis', $fullText)) {
+        throw new RuntimeException('Rekon-QS-Sperre: Ein Selbstbehalt wurde unzulässig dem Wert 1914 als Geldbetrag zugeordnet.');
     }
     return ['passed'=>true,'checks'=>['rekon_section_order','rekon_field_order','no_images','no_document_appendix']];
 }
