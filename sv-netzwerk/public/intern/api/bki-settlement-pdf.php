@@ -77,9 +77,18 @@ foreach($lines as$line){
 }
 
 if($isKvaReview){
-  $difference=$kvaGross-$totalGross;$approvedGross=(float)($kva['approved_gross']??$kvaGross);if($approvedGross<=0)$approvedGross=$kvaGross;needSpace($pages,$ops,$y,142,false);$y-=14;fillRect($ops,45,$y-110,505,110,$panel);fillRect($ops,45,$y-110,4,110,$orange);
+  $difference=$kvaGross-$totalGross;$approvedIsManual=(bool)($kva['approved_is_manual']??false);$approvedGross=$approvedIsManual?(float)($kva['approved_gross']??0):min($kvaGross,$totalGross);if($approvedGross<=0)$approvedGross=min($kvaGross,$totalGross);if($approvedGross>$kvaGross+.01){http_response_code(400);echo 'Der freigegebene Betrag darf den ursprünglichen KVA-Betrag nicht überschreiten';exit;}needSpace($pages,$ops,$y,142,false);$y-=14;fillRect($ops,45,$y-110,505,110,$panel);fillRect($ops,45,$y-110,4,110,$orange);
   textLine($ops,60,$y-18,'ERGEBNIS DER KVA-PRÜFUNG',7,true,$muted);textLine($ops,60,$y-37,'Ursprünglicher KVA-Betrag brutto',9,false,$navy);rightText($ops,535,$y-37,money($kvaGross),11,true,$navy);textLine($ops,60,$y-57,'BKI-Nachkalkulation brutto',9,false,$navy);rightText($ops,535,$y-57,money($totalGross),11,true,$navy);textLine($ops,60,$y-77,'Differenz KVA minus BKI',9,false,$navy);rightText($ops,535,$y-77,money($difference),11,true,$navy);textLine($ops,60,$y-97,'Freigegebener Betrag',9,true,$navy);rightText($ops,535,$y-97,money($approvedGross),11,true,$navy);$y-=132;
-  $result='Der Kostenvoranschlag der Firma '.$kvaCompany.' mit der Nummer '.$kvaNumber.' über '.money($kvaGross).' brutto wurde mit BKI-Preisen nachkalkuliert. Die BKI-Nachkalkulation beträgt '.money($totalGross).' brutto. Die Differenz KVA minus BKI beträgt '.money($difference).'. Der KVA wurde in Höhe von '.money($approvedGross).' brutto zur Ausführung freigegeben.';
+  $result='Der Kostenvoranschlag der Firma '.$kvaCompany.' mit der Nummer '.$kvaNumber.' über '.money($kvaGross).' brutto wurde positionsweise mit BKI-Preisen nachkalkuliert. Die BKI-Nachkalkulation beträgt '.money($totalGross).' brutto. ';
+  if(abs($approvedGross-$kvaGross)<=.01&&$difference>.01){
+    $result.='Der BKI-Vergleichswert liegt um '.money($difference).' unter dem KVA. Abweichend vom niedrigeren BKI-Wert wurde eine fachliche Vollfreigabe eingetragen. Der KVA wird deshalb in Höhe von '.money($approvedGross).' brutto zur Ausführung freigegeben.';
+  }elseif(abs($approvedGross-$kvaGross)<=.01){
+    $result.='Die BKI-Nachkalkulation unterschreitet den KVA nicht. Der KVA wird deshalb in voller Höhe von '.money($approvedGross).' brutto zur Ausführung freigegeben.';
+  }elseif(abs($approvedGross-$totalGross)<=.01){
+    $result.='Der Freigabebetrag wird auf den positionsweise ermittelten niedrigeren BKI-Wert von '.money($approvedGross).' brutto begrenzt. Gegenüber dem KVA ergibt sich eine Kürzung um '.money($kvaGross-$approvedGross).'.';
+  }else{
+    $result.=($approvedIsManual?'Auf Grundlage der eingetragenen fachlichen Prüfentscheidung':'Auf Grundlage der positionsweisen Nachkalkulation').' wird der KVA nicht vollständig, sondern nur in Höhe von '.money($approvedGross).' brutto freigegeben. Der nicht freigegebene Anteil beträgt '.money($kvaGross-$approvedGross).'.';
+  }
   if($y-125<66)startPage($pages,$ops,$y,false);textLine($ops,45,$y,'Prüfergebnis',13,true,$navy);$y-=8;fillRect($ops,45,$y-2,46,3,$orange);$y-=18;paragraph($pages,$ops,$y,$result,96,9,true);
 }else{
   needSpace($pages,$ops,$y,102,false);$y-=14;fillRect($ops,45,$y-70,505,70,$panel);fillRect($ops,45,$y-70,4,70,$orange);

@@ -11,6 +11,7 @@
   const regulator=()=>document.getElementById('bk-regulator')?.value?.trim()||'Christian Wächter';
   const note=()=>document.getElementById('bk-note')?.value?.trim()||'';
   const germanNumber=value=>{const normalized=String(value??'').replace(/[^0-9,.-]/g,'').replace(/\./g,'').replace(',','.');const parsed=Number(normalized);return Number.isFinite(parsed)?parsed:0;};
+  const calculatedGross=()=>lines().reduce((sum,line)=>line?.type==='section'?sum:sum+(num(line?.quantity)*num(line?.unit_price)*num(line?.regional_factor||1)*(1+vat()/100)),0);
 
   function kvaReview(){
     const current=window.__bkiKvaReview||{};
@@ -29,8 +30,8 @@
     const caseNo=String(m.schaden_nr||m.schadenNr||'').trim();
     const vn=String(m.vn_objekt||m.objekt||m.vn||'').trim();
     const location=[m.schaden_strasse||m.strasse,m.schaden_plz||m.plz,m.schaden_ort||m.ort].filter(Boolean).join(', ');
-    const kva=kvaReview(),approvedInput=document.getElementById('bk-approved-gross')?.value?.trim()||'',approvedGross=approvedInput!==''?germanNumber(approvedInput):kva.gross_total;
-    return {document_type:documentType,case_no:caseNo,vn,location,date:today(),regulator:regulator(),note:note(),vat:vat(),lines:lines(),kva:{...kva,approved_gross:approvedGross}};
+    const kva=kvaReview(),approvedInput=document.getElementById('bk-approved-gross')?.value?.trim()||'',bkiGross=calculatedGross(),approvedGross=approvedInput!==''?germanNumber(approvedInput):Math.min(kva.gross_total,bkiGross);
+    return {document_type:documentType,case_no:caseNo,vn,location,date:today(),regulator:regulator(),note:note(),vat:vat(),lines:lines(),kva:{...kva,approved_gross:approvedGross,approved_is_manual:approvedInput!==''}};
   }
 
   function filenameFrom(response,data){
@@ -78,9 +79,9 @@
     if(!host)return;
     const wrap=document.createElement('div');
     wrap.className='bk-pdf-actions';
-    wrap.innerHTML='<label class="bk-approved-gross">Freigegebener Betrag brutto<input id="bk-approved-gross" type="text" inputmode="decimal" placeholder="leer = ursprünglicher KVA-Betrag"></label><button id="bk-create-pdf" type="button" class="bk-secondary">PDF Abgeltungsvereinbarung erstellen</button><button id="bk-create-kva-review" type="button" class="bk-secondary">PDF KVA-Prüfung erstellen</button><button id="bk-mail-pdf" type="button" class="bk-primary">Als E-Mail-Anhang übernehmen</button><span id="bk-pdf-state" class="bk-pdf-state"></span>';
+    wrap.innerHTML='<label class="bk-approved-gross">Freigegebener Betrag brutto<input id="bk-approved-gross" type="text" inputmode="decimal" placeholder="leer = niedrigerer Betrag aus KVA und BKI"><small>Ohne manuelle Prüfentscheidung wird automatisch höchstens der niedrigere geprüfte Bruttobetrag freigegeben. Eine abweichende fachliche Entscheidung kann hier eingetragen werden.</small></label><button id="bk-create-pdf" type="button" class="bk-secondary">PDF Abgeltungsvereinbarung erstellen</button><button id="bk-create-kva-review" type="button" class="bk-secondary">PDF KVA-Prüfung erstellen</button><button id="bk-mail-pdf" type="button" class="bk-primary">Als E-Mail-Anhang übernehmen</button><span id="bk-pdf-state" class="bk-pdf-state"></span>';
     host.insertAdjacentElement('beforebegin',wrap);
-    const style=document.createElement('style');style.textContent='.bk-pdf-actions{display:flex;flex-wrap:wrap;align-items:end;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid #dce5ec}.bk-approved-gross{display:grid;gap:4px;min-width:235px;font-size:.78rem;font-weight:750;color:#536a7d}.bk-approved-gross input{box-sizing:border-box;width:100%;border:1px solid #bdcbd6;border-radius:9px;padding:10px;color:#17324a;background:#fff}.bk-pdf-state{font-size:.82rem;color:#536a7d}.bk-pdf-state[data-state="ok"]{color:#236e50}.bk-pdf-state[data-state="bad"]{color:#a82929}@media print{.bk-pdf-actions{display:none!important}}';document.head.appendChild(style);
+    const style=document.createElement('style');style.textContent='.bk-pdf-actions{display:flex;flex-wrap:wrap;align-items:end;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid #dce5ec}.bk-approved-gross{display:grid;gap:4px;min-width:285px;max-width:420px;font-size:.78rem;font-weight:750;color:#536a7d}.bk-approved-gross input{box-sizing:border-box;width:100%;border:1px solid #bdcbd6;border-radius:9px;padding:10px;color:#17324a;background:#fff}.bk-approved-gross small{font-size:.72rem;line-height:1.35;font-weight:500;color:#61788b}.bk-pdf-state{font-size:.82rem;color:#536a7d}.bk-pdf-state[data-state="ok"]{color:#236e50}.bk-pdf-state[data-state="bad"]{color:#a82929}@media print{.bk-pdf-actions{display:none!important}}';document.head.appendChild(style);
     document.getElementById('bk-create-pdf').onclick=async()=>{try{updateStatus('PDF wird erstellt …');await generatePdf({download:true});}catch(error){updateStatus(error.message||String(error),'bad');}};
     document.getElementById('bk-create-kva-review').onclick=async()=>{try{updateStatus('KVA-Prüfung wird erstellt …');await generatePdf({download:true,type:'kva_review'});}catch(error){updateStatus(error.message||String(error),'bad');}};
     document.getElementById('bk-mail-pdf').onclick=async()=>{try{updateStatus('PDF wird vorbereitet …');await handoffToMail();}catch(error){updateStatus(error.message||String(error),'bad');}};
