@@ -98,12 +98,12 @@ function searchCasePhoneIndex(array $user, string $number, int $limit = 10): arr
 function searchCaseFolderIndex(array $user, string $query, int $limit = 30): array
 {
     if (empty($user['id']) || caseSearchNormalize($query) === '') return [];
-    $stmt = db()->prepare('SELECT folder_id,case_no,policy_no,object_name,damage_type,case_type,registered_at
+    $stmt = db()->prepare('SELECT folder_id,case_no,policy_no,object_name,damage_type,case_type,phone,mobile,contractor_phone,contractor_mobile,phone_contacts,registered_at
         FROM case_folder_owners WHERE user_id=:user_id AND user_email=:user_email ORDER BY registered_at DESC LIMIT 1000');
     $stmt->execute([':user_id'=>(int)$user['id'],':user_email'=>(string)($user['email']??'')]);
     $results = [];
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $meta = ['schaden_nr'=>(string)($row['case_no']??''),'versicherungsschein_nr'=>(string)($row['policy_no']??''),'vn_objekt'=>(string)($row['object_name']??''),'schadenart'=>(string)($row['damage_type']??''),'fallart'=>(string)($row['case_type']??'')];
+        $meta = ['schaden_nr'=>(string)($row['case_no']??''),'versicherungsschein_nr'=>(string)($row['policy_no']??''),'vn_objekt'=>(string)($row['object_name']??''),'schadenart'=>(string)($row['damage_type']??''),'fallart'=>(string)($row['case_type']??''),'telefon'=>(string)($row['phone']??''),'mobil'=>(string)($row['mobile']??''),'sanierer_telefon'=>(string)($row['contractor_phone']??''),'sanierer_mobil'=>(string)($row['contractor_mobile']??''),'telefonkontakte'=>json_decode((string)($row['phone_contacts']??''),true)?:[]];
         $searchText = caseSearchText($meta);
         if (!caseSearchMatches($searchText, $query)) continue;
         $results[] = [
