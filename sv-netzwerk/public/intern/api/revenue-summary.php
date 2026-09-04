@@ -19,8 +19,19 @@ function rsCanRefresh(array $user):bool {
     $identity=rsText((string)($user['email']??'').' '.(string)($user['full_name']??''));
     return str_contains($identity,'susanne')||str_contains($identity,'ws@sv-schuett.eu');
 }
+function rsIsKatja(array $user):bool {
+    $identity=rsText((string)($user['email']??'').' '.(string)($user['full_name']??''));
+    return str_contains($identity,'katja')||str_contains($identity,'schaefer');
+}
 function rsVisible(array $user):bool {
-    return svnetUserProfile($user)==='christian'||rsCanRefresh($user);
+    return in_array(svnetUserProfile($user),['christian','marc'],true)||rsCanRefresh($user)||rsIsKatja($user);
+}
+function rsCanViewProfile(array $user,string $profile):bool {
+    if(rsCanRefresh($user)||svnetUserProfile($user)==='christian')return true;
+    return str_starts_with($profile,'rekon_')&&(rsIsKatja($user)||svnetUserProfile($user)==='marc');
+}
+function rsCanRefreshProfile(array $user,string $profile):bool {
+    return rsCanRefresh($user)||(str_starts_with($profile,'rekon_')&&rsIsKatja($user));
 }
 function rsEnsureTable():void {
     db()->exec("CREATE TABLE IF NOT EXISTS portal_revenue_summary(profile VARCHAR(30) PRIMARY KEY,payload_json MEDIUMTEXT NOT NULL,source_modified_at VARCHAR(40) NULL,updated_by VARCHAR(255) NOT NULL,updated_at DATETIME NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
@@ -66,6 +77,12 @@ function rsSharePointSource():array {
     if($siteId!=='')foreach(['Desktop/'.$file,$file]as$path){$base='sites/'.rawurlencode($siteId).'/drive/root:/'.$path;$meta=rsGraphMaybe($base.':?%24select=id,name,lastModifiedDateTime');$bytes=is_array($meta)?rsGraphMaybe($base.':/content',true):null;if(is_array($meta)&&is_string($bytes)){$meta['sourceProvider']='SharePoint / OneDrive';return[$meta,$bytes];}}
     throw new RuntimeException('Die von Susanne bearbeitete SharePoint-Umsatzdatei ist für den Portalserver nicht lesbar.');
 }
+function rsRekonSharePointSources():array {
+    $site=rsGraphMaybe('sites/sv1schuett.sharepoint.com:/sites/SVBroSchtt:?%24select=id');$siteId=is_array($site)?(string)($site['id']??''):'';
+    if($siteId==='')throw new RuntimeException('Der SharePoint-Bereich Rekon ist für den Portalserver nicht lesbar.');
+    $sources=[];foreach([(int)date('Y')-1,(int)date('Y')]as$year){$folder='Buchhaltung Intern/Rekon/'.$year.'/Schütt';$listing=rsGraphMaybe('sites/'.rawurlencode($siteId).'/drive/root:/'.str_replace('%2F','/',rawurlencode($folder)).':/children?%24select=id,name,lastModifiedDateTime,parentReference');if(!is_array($listing))continue;foreach(($listing['value']??[])as$item){$name=(string)($item['name']??'');if(!preg_match('/einzelposten.*\.(xlsx|xlsm)$/iu',$name))continue;$driveId=(string)($item['parentReference']['driveId']??'');$itemId=(string)($item['id']??'');if($driveId===''||$itemId==='')continue;$bytes=rsGraphMaybe('drives/'.rawurlencode($driveId).'/items/'.rawurlencode($itemId).'/content',true);if(is_string($bytes)&&$bytes!==''){$item['sourceProvider']='SharePoint Rekon';$sources[]=[$item,$bytes];}}}
+    if(!$sources)throw new RuntimeException('Im Rekon-Ordner wurde keine lesbare Einzelpostenliste gefunden.');return$sources;
+}
 function rsSourceFile():array {
     return rsSharePointSource();
 }
@@ -80,6 +97,11 @@ function rsUploadedSource():array {
     if($tmp===''||!is_uploaded_file($tmp))throw new RuntimeException('Der Datei-Upload konnte nicht sicher bestätigt werden.');
     $bytes=file_get_contents($tmp);if(!is_string($bytes)||$bytes==='')throw new RuntimeException('Die ausgewählte Umsatzdatei konnte nicht gelesen werden.');
     return[['name'=>$name,'lastModifiedDateTime'=>date(DATE_ATOM),'sourceProvider'=>'Manuell eingelesene Originaldatei'], $bytes];
+}
+function rsUploadedSources():array {
+    $uploads=$_FILES['workbooks']??null;if(!is_array($uploads)||!is_array($uploads['name']??null))return[rsUploadedSource()];$sources=[];
+    foreach($uploads['name']as$index=>$rawName){$error=(int)($uploads['error'][$index]??UPLOAD_ERR_NO_FILE);if($error!==UPLOAD_ERR_OK)throw new RuntimeException('Mindestens eine Rekon-Datei konnte nicht hochgeladen werden.');$name=basename(trim((string)$rawName));$tmp=(string)($uploads['tmp_name'][$index]??'');$size=(int)($uploads['size'][$index]??0);$extension=mb_strtolower(pathinfo($name,PATHINFO_EXTENSION),'UTF-8');if(!in_array($extension,['xlsx','xlsm'],true))throw new RuntimeException('Bitte nur Rekon-Arbeitsmappen im Format XLSX oder XLSM auswählen.');if($size<=0||$size>25*1024*1024||$tmp===''||!is_uploaded_file($tmp))throw new RuntimeException('Eine ausgewählte Rekon-Datei ist leer, zu groß oder konnte nicht sicher bestätigt werden.');$bytes=file_get_contents($tmp);if(!is_string($bytes)||$bytes==='')throw new RuntimeException('Eine ausgewählte Rekon-Datei konnte nicht gelesen werden.');$sources[]=[['name'=>$name,'lastModifiedDateTime'=>date(DATE_ATOM),'sourceProvider'=>'Manuell eingelesene Rekon-Originaldatei'],$bytes];}
+    if(!$sources)throw new RuntimeException('Bitte mindestens eine Rekon-Einzelpostenliste auswählen.');return$sources;
 }
 function rsWorkbook(string $path):array {
     $zip=new ZipArchive();if($zip->open($path)!==true)throw new RuntimeException('Die Umsatzdatei ist keine lesbare Excel-Arbeitsmappe.');$shared=[];$sharedXml=$zip->getFromName('xl/sharedStrings.xml');if($sharedXml!==false&&($xml=simplexml_load_string((string)$sharedXml))!==false){foreach($xml->si as$si){$parts=[];if(isset($si->t))$parts[]=(string)$si->t;foreach($si->r as$run)if(isset($run->t))$parts[]=(string)$run->t;$shared[]=implode('',$parts);}}$bookXml=$zip->getFromName('xl/workbook.xml');$relsXml=$zip->getFromName('xl/_rels/workbook.xml.rels');$book=$bookXml!==false?simplexml_load_string((string)$bookXml):false;$rels=$relsXml!==false?simplexml_load_string((string)$relsXml):false;if($book===false||$rels===false){$zip->close();throw new RuntimeException('Die Tabellenstruktur der Umsatzdatei fehlt.');}$relMap=[];foreach($rels->Relationship as$rel)$relMap[(string)$rel['Id']]=(string)$rel['Target'];$namespaces=$book->getNamespaces(true);$rns=$namespaces['r']??null;$sheets=[];
@@ -186,9 +208,29 @@ function rsRefreshHolger(array $user,array $source):array {
 function rsHolgerEmpty():array {
     return['profile'=>'holger','source'=>'Holger Roth.xlsx','source_provider'=>'Noch nicht eingelesen','source_url'=>RS_HOLGER_SOURCE_URL,'source_updated_at'=>'–','comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'office_share_rate'=>0.10,'vat_rate'=>0.19,'current'=>[],'previous'=>[],'available_years'=>[],'entries'=>[]];
 }
+function rsRekonIdentity(string $value):string {
+    $text=rsText($value);if(str_contains($text,'holger')||str_contains($text,'roth'))return'rekon_holger';if(str_contains($text,'marc')||str_contains($text,'schuett'))return'rekon_marc';return'';
+}
+function rsRekonEntries(array $sources):array {
+    $entries=[];foreach($sources as[$meta,$bytes]){$tmp=tempnam(sys_get_temp_dir(),'revenue-rekon-');if($tmp===false||file_put_contents($tmp,$bytes)===false)throw new RuntimeException('Eine Rekon-Datei konnte nicht zwischengespeichert werden.');try{$sheets=rsWorkbook($tmp);}finally{@unlink($tmp);}foreach($sheets as$sheetName=>$sheet){$month=RS_MONTHS[rsText((string)$sheetName)]??0;if(!$month&&preg_match('/^(\d{4})-(\d{2})/',trim((string)rsCell($sheet,9,3)),$dateMatch))$month=(int)$dateMatch[2];$period=trim((string)rsCell($sheet,9,3));$year=preg_match('/(20\d{2})/',$period,$yearMatch)?(int)$yearMatch[1]:0;if(!$year||$month<1||$month>12)continue;$max=rsMaxRow($sheet);for($row=1;$row<=$max;$row++){$id=trim((string)rsCell($sheet,$row,2));$payout=rsNullableMoney(rsCell($sheet,$row,6));$profile=rsRekonIdentity((string)rsCell($sheet,$row,5));if($id===''||$payout===null||$payout<=0||$profile==='')continue;$actual=round($payout/0.60,2);$rekon=round($actual-$payout,2);$entries[]=['profile'=>$profile,'year'=>$year,'month'=>$month,'month_label'=>RS_MONTH_LABELS[$month],'id'=>$id,'claim_no'=>trim((string)rsCell($sheet,$row,3)),'insurer'=>trim((string)rsCell($sheet,$row,4)),'regulator'=>trim((string)rsCell($sheet,$row,5)),'invoice_date'=>rsExcelDate(rsCell($sheet,$row,7)),'appointment'=>rsExcelDate(rsCell($sheet,$row,8)),'invoice_type'=>trim((string)rsCell($sheet,$row,10)),'payout_net'=>$payout,'payout_gross'=>round($payout*1.19,2),'actual_order_net'=>$actual,'actual_order_gross'=>round($actual*1.19,2),'rekon_net'=>$rekon,'rekon_gross'=>round($rekon*1.19,2),'source'=>(string)($meta['name']??'Rekon-Einzelpostenliste')];}}}
+    usort($entries,fn($a,$b)=>[$b['year'],$b['month'],$b['invoice_date'],$b['id']]<=>[$a['year'],$a['month'],$a['invoice_date'],$a['id']]);return$entries;
+}
+function rsRekonPeriod(array $entries,int $year,int $through):array {
+    $rows=array_values(array_filter($entries,fn($row)=>(int)$row['year']===$year&&(int)$row['month']<=$through));$sum=fn(string$key)=>round(array_sum(array_map(fn($row)=>(float)($row[$key]??0),$rows)),2);$count=count($rows);$payout=$sum('payout_net');
+    return['year'=>$year,'period'=>'Jan.–'.RS_MONTH_LABELS[$through].' '.$year,'months'=>$through,'booking_count'=>$count,'payout_net'=>$payout,'payout_gross'=>$sum('payout_gross'),'actual_order_net'=>$sum('actual_order_net'),'actual_order_gross'=>$sum('actual_order_gross'),'rekon_net'=>$sum('rekon_net'),'rekon_gross'=>$sum('rekon_gross'),'average_net'=>$count?round($payout/$count,2):0.0,'annualized_payout_net'=>round($payout/$through*12,2),'annualized_payout_gross'=>round($sum('payout_gross')/$through*12,2)];
+}
+function rsRekonPayload(string $profile,array $entries,array $sources):array {
+    $own=array_values(array_filter($entries,fn($row)=>$row['profile']===$profile));$years=array_values(array_unique(array_map(fn($row)=>(int)$row['year'],$own)));rsort($years);$currentYear=(int)date('Y');$previousYear=$currentYear-1;$months=array_map(fn($row)=>(int)$row['month'],array_filter($own,fn($row)=>(int)$row['year']===$currentYear));$through=$months?max($months):max(1,(int)date('n'));$names=array_values(array_unique(array_map(fn($source)=>(string)($source[0]['name']??'Rekon-Einzelpostenliste'),$sources)));$modified=array_values(array_filter(array_map(fn($source)=>(string)($source[0]['lastModifiedDateTime']??''),$sources)));sort($modified);return['profile'=>$profile,'provider'=>'rekon','person'=>$profile==='rekon_holger'?'Holger Roth':'Marc Schütt','source'=>implode(', ',$names),'source_provider'=>(string)($sources[0][0]['sourceProvider']??'Rekon'),'source_updated_at'=>$modified?date('d.m.Y H:i',strtotime((string)end($modified))):date('d.m.Y H:i'),'comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'vat_rate'=>0.19,'current'=>rsRekonPeriod($own,$currentYear,$through),'previous'=>rsRekonPeriod($own,$previousYear,$through),'available_years'=>$years,'entries'=>$own];
+}
+function rsRefreshRekon(array $user,array $sources,string $requested=''):array {
+    $entries=rsRekonEntries($sources);if(!$entries)throw new RuntimeException('In den Rekon-Dateien wurden keine abrechenbaren Einzelposten für Marc oder Holger gefunden.');$saved=[];foreach(['rekon_marc','rekon_holger']as$profile){$own=array_filter($entries,fn($row)=>$row['profile']===$profile);if(!$own)continue;$payload=rsRekonPayload($profile,$entries,$sources);$meta=['lastModifiedDateTime'=>date(DATE_ATOM)];rsPersist($profile,$payload,$meta,$user);$saved[$profile]=$payload;}if($requested!==''&&!isset($saved[$requested]))throw new RuntimeException($requested==='rekon_holger'?'In den ausgewählten Rekon-Dateien wurden noch keine Holger-Positionen gefunden.':'In den ausgewählten Rekon-Dateien wurden keine Marc-Positionen gefunden.');return$requested!==''?$saved[$requested]:$saved;
+}
+function rsRekonEmpty(string $profile):array {
+    return['profile'=>$profile,'provider'=>'rekon','person'=>$profile==='rekon_holger'?'Holger Roth':'Marc Schütt','source'=>'Rekon-Einzelpostenlisten','source_provider'=>'Noch nicht eingelesen','source_updated_at'=>'–','comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'vat_rate'=>0.19,'current'=>[],'previous'=>[],'available_years'=>[],'entries'=>[]];
+}
 
 $action=(string)($_GET['action']??'summary');
-$profile=rsText((string)($_GET['profile']??'christian'));if(!in_array($profile,['christian','holger'],true))$profile='christian';
+$profile=rsText((string)($_GET['profile']??'christian'));if(!in_array($profile,['christian','holger','rekon_marc','rekon_holger'],true))$profile='christian';
 if($action==='scheduled'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
     $expected=rsCfg('SETUP_KEY');$provided=trim((string)($_SERVER['HTTP_X_SVNET_SCHEDULE_KEY']??''));
@@ -196,9 +238,14 @@ if($action==='scheduled'){
     try{$payload=rsRefresh(['email'=>'server-automation@sv-netzwerk.eu','full_name'=>'Server-Automation']);apiJson(['ok'=>true,'scheduled'=>true,...$payload]);}
     catch(Throwable $error){error_log('[revenue-summary scheduled] '.$error->getMessage());apiError(503,$error->getMessage());}
 }
+if($action==='scheduled_rekon'){
+    if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');$expected=rsCfg('SETUP_KEY');$provided=trim((string)($_SERVER['HTTP_X_SVNET_SCHEDULE_KEY']??''));if($expected===''||$provided===''||!hash_equals($expected,$provided))apiError(403,'Automationsschlüssel ungültig.');
+    try{$payloads=rsRefreshRekon(['email'=>'server-automation@sv-netzwerk.eu','full_name'=>'Server-Automation'],rsRekonSharePointSources());apiJson(['ok'=>true,'scheduled'=>true,'profiles'=>array_keys($payloads)]);}catch(Throwable $error){error_log('[revenue-summary scheduled rekon] '.$error->getMessage());apiError(503,$error->getMessage());}
+}
 $user=requireAuth();
-if(!rsVisible($user))apiJson(['ok'=>true,'visible'=>false]);
+if($action==='access'){if(!rsVisible($user))apiJson(['ok'=>true,'visible'=>false]);if(rsCanViewProfile($user,'christian')){$payload=rsStored('christian')??rsFallback();unset($payload['entries'],$payload['private_entries'],$payload['available_years']);apiJson(['ok'=>true,'visible'=>true,'show_summary'=>true,'can_refresh'=>rsCanRefreshProfile($user,'christian'),...$payload]);}apiJson(['ok'=>true,'visible'=>true,'show_summary'=>false,'default_profile'=>'rekon_marc']);}
+if(!rsVisible($user)||!rsCanViewProfile($user,$profile))apiJson(['ok'=>true,'visible'=>false,'default_profile'=>(rsIsKatja($user)||svnetUserProfile($user)==='marc')?'rekon_marc':null]);
 try{
-    if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if(!rsCanRefresh($user))apiError(403,'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');$source=rsUploadedSource();$payload=$profile==='holger'?rsRefreshHolger($user,$source):rsRefresh($user,$source);apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,...$payload]);}
-    $payload=rsStored($profile)??($profile==='holger'?rsHolgerEmpty():rsFallback());if($action!=='settlement'){unset($payload['entries'],$payload['private_entries'],$payload['available_years']);}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>rsCanRefresh($user),...$payload]);
+    if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if(!rsCanRefreshProfile($user,$profile))apiError(403,str_starts_with($profile,'rekon_')?'Nur Katja oder Susanne dürfen Rekon manuell aktualisieren.':'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');if(str_starts_with($profile,'rekon_'))$payload=rsRefreshRekon($user,rsUploadedSources(),$profile);else{$source=rsUploadedSource();$payload=$profile==='holger'?rsRefreshHolger($user,$source):rsRefresh($user,$source);}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,...$payload]);}
+    $payload=rsStored($profile)??($profile==='holger'?rsHolgerEmpty():(str_starts_with($profile,'rekon_')?rsRekonEmpty($profile):rsFallback()));if($action!=='settlement'){unset($payload['entries'],$payload['private_entries'],$payload['available_years']);}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>rsCanRefreshProfile($user,$profile),...$payload]);
 }catch(Throwable $error){error_log('[revenue-summary] '.$error->getMessage());apiError(503,$error->getMessage());}

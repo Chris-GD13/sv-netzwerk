@@ -201,38 +201,26 @@ const isActive = (href: string) => currentPath.startsWith(href);
       const loadRevenueSummary = async () => {
         if (!(revenueSummary instanceof HTMLElement)) return;
         try {
-          const response = await fetch('/intern/api/revenue-summary-v2.php', { credentials: 'same-origin', cache: 'no-store' });
+          const response = await fetch('/intern/api/revenue-summary-v2.php?action=access', { credentials: 'same-origin', cache: 'no-store' });
           const data = await response.json();
           if (!response.ok || !data.ok) throw new Error(data.error || 'Umsatzstand nicht verfügbar.');
           if (!data.visible) { revenueSummary.hidden = true; if (settlementLink instanceof HTMLElement) settlementLink.hidden = true; return; }
+          if (settlementLink instanceof HTMLElement) settlementLink.hidden = false;
+          if (!data.show_summary) { revenueSummary.hidden = true; return; }
           const renderRevenueSummary = (summary) => {
           const current = summary.current || {};
           const previous = summary.previous || {};
           revenueSummary.title = `Quelle: ${summary.source || 'Umsatzaufstellung'} · Stand ${summary.source_updated_at || '–'}`;
           revenueSummary.innerHTML = `
-            <div class="intern-header__revenue-title"><span>Die Regulierer · Umsatz</span><span><small>Stand ${summary.source_updated_at || '–'}</small>${summary.can_refresh ? '<button class="intern-header__revenue-refresh" type="button">Jetzt aktualisieren</button>' : ''}</span></div>
+            <div class="intern-header__revenue-title"><span>Die Regulierer · Umsatz</span><span><small>Stand ${summary.source_updated_at || '–'}</small>${summary.can_refresh ? '<button class="intern-header__revenue-refresh" type="button">Abrechnungen öffnen</button>' : ''}</span></div>
             <div class="intern-header__revenue-grid">
               <div class="intern-header__revenue-item"><span>${current.period || current.year}</span><strong>${money(current.ytd_net)} netto · Ø ${money(current.average_net, 2)}</strong><small>Jahreswert ${money(current.annualized_net)}</small></div>
               <div class="intern-header__revenue-item"><span>${previous.period || previous.year}</span><strong>${money(previous.ytd_net)} netto · Ø ${money(previous.average_net, 2)}</strong><small>Jahreswert ${money(previous.annualized_net)}</small></div>
               <div class="intern-header__revenue-item"><span>Privataufträge brutto</span><strong>${current.year}: ${money(current.private_gross)}</strong><small>${previous.year}: ${money(previous.private_gross)}</small></div>
             </div>`;
           revenueSummary.hidden = false;
-          if (settlementLink instanceof HTMLElement) settlementLink.hidden = false;
           const refresh = revenueSummary.querySelector('.intern-header__revenue-refresh');
-          refresh?.addEventListener('click', async () => {
-            if (!(refresh instanceof HTMLButtonElement)) return;
-            refresh.disabled = true;
-            refresh.textContent = 'Wird aktualisiert …';
-            try {
-              const response = await fetch('/intern/api/revenue-summary-v2.php?action=refresh', { method: 'POST', credentials: 'same-origin', cache: 'no-store' });
-              const next = await response.json();
-              if (!response.ok || !next.ok) throw new Error(next.error || 'Aktualisierung fehlgeschlagen.');
-              renderRevenueSummary(next);
-            } catch (error) {
-              refresh.disabled = false;
-              refresh.textContent = error instanceof Error ? error.message : 'Aktualisierung fehlgeschlagen';
-            }
-          });
+          refresh?.addEventListener('click', () => window.location.assign('/intern/abrechnungen/'));
           };
           renderRevenueSummary(data);
         } catch {

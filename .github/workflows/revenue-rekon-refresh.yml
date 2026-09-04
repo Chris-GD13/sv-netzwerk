@@ -1,0 +1,36 @@
+name: Rekon-Abrechnung aktualisieren
+
+on:
+  schedule:
+    - cron: '20 5 15 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    name: Rekon-Einzelpostenlisten einlesen
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rekon-Abrechnung serverseitig aktualisieren
+        env:
+          SCHEDULE_KEY: ${{ secrets.SETUP_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$SCHEDULE_KEY"
+          response_file="$(mktemp)"
+          status="$(curl --silent --show-error --location \
+            --output "$response_file" --write-out '%{http_code}' \
+            --request POST \
+            --header "X-SVNET-Schedule-Key: $SCHEDULE_KEY" \
+            'https://www.sv-netzwerk.eu/intern/api/revenue-summary-v2.php?action=scheduled_rekon')"
+          cat "$response_file"
+          test "$status" = '200'
+          python3 - "$response_file" <<'PY'
+          import json, sys
+          with open(sys.argv[1], encoding='utf-8') as source:
+              payload = json.load(source)
+          if payload.get('ok') is not True or payload.get('scheduled') is not True:
+              raise SystemExit('Rekon-Aktualisierung wurde nicht bestätigt.')
+          PY
