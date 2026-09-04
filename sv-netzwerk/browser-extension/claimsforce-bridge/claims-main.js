@@ -37,6 +37,12 @@
     } catch {}
   };
   const claimId = value => /^[0-9a-f]{8}-[0-9a-f-]{20,}$/i.test(String(value || '')) ? String(value) : '';
+  const listVersion = value => [
+    value.updatedAt, value.modifiedAt, value.lastModifiedAt, value.version,
+    value.appointments?.nextAppointment?.id,
+    value.appointments?.nextAppointment?.updatedAt,
+    value.appointments?.nextAppointment?.startDate
+  ].map(entry => String(entry || '')).filter(Boolean).join('|');
   const inspectClaims = (value, futureContext = false, depth = 0) => {
     if (!value || depth > 7) return;
     if (Array.isArray(value)) {
@@ -48,7 +54,14 @@
     const insurerClaimId = value.insurerClaimId || value.data?.insurerClaimId || value.claimNumber || '';
     const hasClaimShape = insurerClaimId || value.claimType || value.bucket || value.appointments || value.actualAppointmentLocation;
     const future = futureContext || value.bucket === 'WITH_FUTURE_APPOINTMENT' || !!value.appointments?.nextAppointment;
-    if (id && hasClaimShape && future) seenClaims.set(id, { id, label: String(insurerClaimId || '').slice(0, 100) });
+    if (id && hasClaimShape && future) {
+      const previous = seenClaims.get(id) || {};
+      seenClaims.set(id, {
+        id,
+        label: String(insurerClaimId || previous.label || '').slice(0, 100),
+        listVersion: listVersion(value) || previous.listVersion || ''
+      });
+    }
     Object.values(value).forEach(entry => inspectClaims(entry, futureContext, depth + 1));
   };
   const futureRequest = (input, init) => {

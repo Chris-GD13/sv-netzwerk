@@ -11,6 +11,7 @@ const PROFILE_EMAILS = {
   marc: 'ms@sv-schuett.eu',
   jens: 'ws@sv-schuett.eu'
 };
+const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/';
@@ -166,6 +167,12 @@ async function resetClaimsSession(run) {
   await diagnostic(run, 'CF-AUTH-01', 'Vorhandene ClaimsForce-Anmeldung wird für den eindeutigen Profilwechsel vollständig beendet.', { profileSwitch: 'ClaimsForce und Auth0 zurücksetzen' });
   await chrome.storage.session.remove(['claimsToken', 'claimsTokenProfile', 'claimsLoggedProfile']);
   await chrome.storage.local.remove(['claimsLoggedProfile']);
+  let logoutTab = null;
+  try {
+    logoutTab = await chrome.tabs.create({ url: 'https://web.claimsforce.com/logout', active: false });
+    await waitTab(logoutTab.id, 30000);
+  } catch {}
+  finally { if (Number.isInteger(logoutTab?.id)) await chrome.tabs.remove(logoutTab.id).catch(() => {}); }
   const claimsTabs = await chrome.tabs.query({ url: ['https://web.claimsforce.com/*', 'https://claimsforce.eu.auth0.com/*'] });
   await Promise.all(claimsTabs.filter(tab => Number.isInteger(tab.id)).map(tab => chrome.tabs.remove(tab.id).catch(() => {})));
   await chrome.browsingData.remove(
@@ -210,6 +217,15 @@ async function claimsTab(profile, run, credential) {
   }
   const authenticatedEmail = tokenEmail(token);
   if (authenticatedEmail && authenticatedEmail !== PROFILE_EMAILS[profile]) throw new Error(`[CF-AUTH-03] ClaimsForce hat ${authenticatedEmail} statt des ausgewählten Profils ${PROFILE_EMAILS[profile]} angemeldet.`);
+  const badgeDeadline = Date.now() + 10000;
+  let badges = [];
+  while (Date.now() < badgeDeadline) {
+    const identity = await chrome.tabs.sendMessage(tab.id, { type: 'READ_ACCOUNT_IDENTITY' }).catch(() => null);
+    badges = Array.isArray(identity?.badges) ? identity.badges : [];
+    if (PROFILE_BADGES[profile].some(badge => badges.includes(badge)) || badges.length) break;
+    await sleep(400);
+  }
+  if (!PROFILE_BADGES[profile].some(badge => badges.includes(badge))) throw new Error(`[CF-AUTH-04] ClaimsForce zeigt ${badges.join(', ') || 'keine eindeutige Konto-Kennung'} statt ${PROFILE_BADGES[profile].join('/')} für ${PROFILE_EMAILS[profile]}.`);
   return { tab, token };
 }
 
@@ -344,6 +360,15 @@ async function runImport(run) {
   let filesDone = 0, messagesDone = 0, appointmentsDone = 0, skipped = 0, updated = 0;
   for (let index = 0; index < claims.length; index++) {
     const item = claims[index], id = item.id;
+    const preliminary = { claimsforce_claim_id: id, schaden_nr: String(item.label || '').trim() };
+    const preliminaryState = await portal(portalTabId, { type: 'PORTAL_SYNC_STATE', mapped: preliminary, profile });
+    const preliminaryMeta = preliminaryState.result?.meta || {};
+    if (preliminaryState.result?.existed && item.listVersion && preliminaryMeta.claimsforce_list_version === item.listVersion) {
+      skipped++;
+      await progress(portalTabId, `Auftrag ${index + 1}/${claims.length}: seit dem letzten Import unverändert, wird ohne erneuten Detailabruf übersprungen.`, index + 1, claims.length);
+      await diagnostic(run, 'CF-CASE-DELTA-SKIP', `Auftrag ${index + 1}/${claims.length} ist laut ClaimsForce-Änderungsstand unverändert.`, { current: index + 1, total: claims.length, claimIndex: index + 1, skippedCases: skipped });
+      continue;
+    }
     await diagnostic(run, 'CF-CASE-FETCH', `Auftrag ${index + 1}/${claims.length}: Falldaten werden geladen.`, { current: index, total: claims.length, claimIndex: index + 1 });
     await progress(portalTabId, `Auftrag ${index + 1}/${claims.length} wird eingelesen …`, index, claims.length);
     const [rawDisposition, rawCommunication, rawFiles, rawMessages, rawAppointments, rawStakeholders] = await Promise.all([
@@ -361,7 +386,12 @@ async function runImport(run) {
     const files = Array.isArray(unwrap(rawFiles, 'files')) ? unwrap(rawFiles, 'files') : [];
     const messages = Array.isArray(unwrap(rawMessages, 'messages')) ? unwrap(rawMessages, 'messages') : [];
     const mapped = mapClaim(disposition, communication, Array.isArray(appointments) ? appointments : [], rawStakeholders || {});
-    const signature = await fingerprint({ disposition, communication, files, messages, appointments, stakeholders: rawStakeholders || {} });
+    const fileVersions = files.map(fileVersion).filter(Boolean);
+    const messageVersions = messages.map(messageVersion).filter(Boolean);
+    const stableMapped = { ...mapped };
+    delete stableMapped.claimsforce_zuletzt_eingelesen;
+    const appointmentVersions = (Array.isArray(appointments) ? appointments : []).map(appointment => [appointment?.id, appointment?.updatedAt, appointment?.startDate, appointment?.endDate].map(value => String(value || '')).join('|'));
+    const signature = await fingerprint({ mapped: stableMapped, fileVersions, messageVersions, appointmentVersions });
     const state = await portal(portalTabId, { type: 'PORTAL_SYNC_STATE', mapped, profile });
     const existingMeta = state.result?.meta || {};
     if (state.result?.existed && existingMeta.claimsforce_sync_signature === signature) {
@@ -375,7 +405,6 @@ async function runImport(run) {
     const folderId = upsert.folderId;
     await diagnostic(run, 'CF-CASE-FILES', `Auftrag ${index + 1}/${claims.length}: Anhänge und Nachrichten werden übernommen.`, { current: index, total: claims.length, claimIndex: index + 1 });
     const knownFileVersions = new Set(Array.isArray(existingMeta.claimsforce_file_versions) ? existingMeta.claimsforce_file_versions.map(String) : []);
-    const fileVersions = files.map(fileVersion).filter(Boolean);
     for (const file of files) {
       if (!file?.id) continue;
       const version = fileVersion(file);
@@ -393,7 +422,6 @@ async function runImport(run) {
       if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) filesDone++;
     }
     const knownMessageVersions = new Set(Array.isArray(existingMeta.claimsforce_message_versions) ? existingMeta.claimsforce_message_versions.map(String) : []);
-    const messageVersions = messages.map(messageVersion).filter(Boolean);
     for (const message of messages) {
       const version = messageVersion(message);
       if (knownMessageVersions.has(version)) continue;
@@ -412,7 +440,7 @@ async function runImport(run) {
         if (!appointmentResult?.result?.skipped) appointmentsDone++;
       }
     }
-    await portal(portalTabId, { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions, profile });
+    await portal(portalTabId, { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions, listVersion: item.listVersion || '', profile });
     updated++;
     await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length} wurde vollständig im Portal verarbeitet.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
   }

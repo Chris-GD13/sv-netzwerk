@@ -59,6 +59,16 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     sendResponse({ ok: true, route: location.pathname, observedClaims: observedClaims.size, planning: location.pathname.startsWith('/planning'), login: location.pathname.startsWith('/login') });
     return;
   }
+  if (message?.type === 'READ_ACCOUNT_IDENTITY') {
+    const roots = [...new Set([document.querySelector('header'), document.querySelector('[role="banner"]'), document.querySelector('nav')].filter(Boolean))];
+    const badges = new Set();
+    for (const root of roots) for (const node of [root, ...root.querySelectorAll('*')]) {
+      const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
+      if (/^[A-ZÄÖÜ]{2}$/.test(text)) badges.add(text);
+    }
+    sendResponse({ ok: true, badges: [...badges] });
+    return;
+  }
   if (message?.type !== 'SCRAPE_CLAIMS') return;
   const claims = new Map();
   const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));

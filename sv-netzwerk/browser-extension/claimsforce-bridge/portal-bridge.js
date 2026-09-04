@@ -73,6 +73,7 @@ async function commitSync(message) {
   meta.claimsforce_profile = profile;
   meta.claimsforce_file_versions = [...new Set((message.fileVersions || []).map(String).filter(Boolean))];
   meta.claimsforce_message_versions = [...new Set((message.messageVersions || []).map(String).filter(Boolean))];
+  meta.claimsforce_list_version = String(message.listVersion || '');
   meta.claimsforce_zuletzt_eingelesen = new Date().toISOString();
   await api(`${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, case: meta }) });
   return { folderId: message.folderId, meta };
