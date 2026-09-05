@@ -336,8 +336,8 @@ try {
             apiError(400, 'Der vollständige Telefonbuch-Abgleich wurde nicht bestätigt.');
         }
         $raw = is_array($body['contacts'] ?? null) ? $body['contacts'] : [];
-        if (count($raw) > 2000) {
-            apiError(400, 'Bitte höchstens 2.000 bereinigte Rufnummerneinträge gleichzeitig abgleichen.');
+        if (count($raw) > 5000) {
+            apiError(400, 'Bitte höchstens 5.000 bereinigte Rufnummerneinträge gleichzeitig abgleichen.');
         }
         $contacts = phonebookContacts($raw);
         if ($contacts === [] || count($contacts) !== count($raw)) {
