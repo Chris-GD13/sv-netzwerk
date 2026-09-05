@@ -4,9 +4,14 @@ import { fileURLToPath } from 'node:url';
 
 const clean = value => String(value ?? '').trim();
 const unfold = value => String(value ?? '').replace(/\r?\n[ \t]/g, '');
-const phoneKey = value => clean(value).replace(/\D/g, '').replace(/^00/, '');
+const phoneKey = value => {
+  let digits = clean(value).replace(/\D/g, '').replace(/^00/, '');
+  if (/^490/.test(digits)) digits = `49${digits.slice(3)}`;
+  else if (/^0/.test(digits)) digits = `49${digits.slice(1)}`;
+  return digits;
+};
 const emailKey = value => clean(value).toLocaleLowerCase('de-DE');
-const outlookArtifact = /(?:ms-outlook:\/\/|X-APPLE-OL-(?:CUSTOMER-ID|MAPPING-INFO))/i;
+const outlookArtifact = /(?:ms-outlook:\/\/|X-APPLE-OL-[A-Z0-9-]+)/i;
 
 function stripOutlookArtifact(value) {
   const match = String(value ?? '').search(outlookArtifact);

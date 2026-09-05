@@ -48,4 +48,16 @@ END:VCARD`]);
 assert.match(malformed.vcf, /TEL:\+49 123 456/);
 assert.doesNotMatch(malformed.vcf, /X-APPLE-OL-|4,99722E\+12/i);
 
+const germanFormats = cleanVCards([`BEGIN:VCARD
+VERSION:3.0
+FN:Format eins
+TEL:0170 1234567
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Format zwei
+TEL:+49 170 1234567
+END:VCARD`]);
+assert.equal(germanFormats.report.cleanedCards, 1);
+
 console.log('phonebook_cleaner_test: ok');
