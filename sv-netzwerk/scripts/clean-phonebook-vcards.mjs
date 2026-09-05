@@ -12,6 +12,14 @@ const phoneKey = value => {
 };
 const emailKey = value => clean(value).toLocaleLowerCase('de-DE');
 const outlookArtifact = /(?:ms-outlook:\/\/|X-APPLE-OL-[A-Z0-9-]+)/i;
+const nameKey = value => clean(value)
+  .normalize('NFKD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLocaleLowerCase('de-DE')
+  .replace(/\b(?:herr|frau|dr|prof|dipl|ing)\b/g, ' ')
+  .replace(/[^a-z0-9]+/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
 
 function stripOutlookArtifact(value) {
   const match = String(value ?? '').search(outlookArtifact);
@@ -65,7 +73,7 @@ function parseCard(card, sourceIndex) {
   const emails = values('EMAIL').map(emailKey).filter(Boolean);
   const fn = values('FN')[0] || '';
   const fingerprint = items.map(item => `${item.key}:${item.value.toLocaleLowerCase('de-DE')}`).sort().join('|');
-  return { sourceIndex, items, phones: [...new Set(phones)], emails: [...new Set(emails)], fn, fingerprint, removedOutlookLines };
+  return { sourceIndex, items, phones: [...new Set(phones)], emails: [...new Set(emails)], fn, nameKey: nameKey(fn), fingerprint, removedOutlookLines };
 }
 
 function mergeCards(cards) {
@@ -85,8 +93,8 @@ function mergeCards(cards) {
   const identities = new Map();
   cards.forEach((card, index) => {
     const keys = [
-      ...card.phones.map(value => `tel:${value}`),
-      ...card.emails.map(value => `mail:${value}`),
+      ...card.phones.map(value => `tel:${value}|name:${card.nameKey}`),
+      ...card.emails.map(value => `mail:${value}|name:${card.nameKey}`),
     ];
     if (!keys.length && card.fingerprint) keys.push(`card:${card.fingerprint}`);
     keys.forEach(key => {
@@ -144,9 +152,15 @@ function csvCell(value) {
 }
 
 function portalCsv(cards) {
-  const rows = [['Name', 'Telefon', 'Notiz']];
-  cards.forEach(card => card.phoneValues.forEach(phone => rows.push([card.name, phone, 'iCloud'])));
-  return `\uFEFF${rows.map(row => row.map(csvCell).join(';')).join('\r\n')}\r\n`;
+  const contacts = new Map();
+  cards.forEach(card => card.phoneValues.forEach(phone => {
+    const key = phoneKey(phone);
+    if (!key) return;
+    const existing = contacts.get(key);
+    if (!existing || card.name.length > existing.name.length) contacts.set(key, { name: card.name, phone });
+  }));
+  const rows = [['Name', 'Telefon', 'Notiz'], ...[...contacts.values()].map(contact => [contact.name, contact.phone, 'iCloud'])];
+  return { csv: `\uFEFF${rows.map(row => row.map(csvCell).join(';')).join('\r\n')}\r\n`, count: contacts.size };
 }
 
 export function cleanVCards(texts) {
@@ -161,15 +175,17 @@ export function cleanVCards(texts) {
     });
   });
   const merged = mergeCards(cards);
+  const portal = portalCsv(merged);
   const report = {
     sourceCards: cards.length,
     cleanedCards: merged.length,
     duplicatesRemoved: cards.length - merged.length,
     contactsWithPhone: merged.filter(card => card.phones > 0).length,
     contactsWithoutPhone: merged.filter(card => card.phones === 0).length,
+    portalPhoneRows: portal.count,
     removedOutlookLines,
   };
-  return { vcf: `${merged.map(card => card.text).join('\r\n')}\r\n`, portalCsv: portalCsv(merged), report };
+  return { vcf: `${merged.map(card => card.text).join('\r\n')}\r\n`, portalCsv: portal.csv, report };
 }
 
 function runCli() {

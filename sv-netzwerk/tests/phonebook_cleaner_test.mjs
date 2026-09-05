@@ -55,9 +55,21 @@ TEL:0170 1234567
 END:VCARD
 BEGIN:VCARD
 VERSION:3.0
-FN:Format zwei
+FN:Format eins
 TEL:+49 170 1234567
 END:VCARD`]);
 assert.equal(germanFormats.report.cleanedCards, 1);
+
+const sharedSwitchboard = cleanVCards([`BEGIN:VCARD
+VERSION:3.0
+FN:Ansprechpartner eins
+TEL:+49 7367 1234
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Ansprechpartner zwei
+TEL:07367 1234
+END:VCARD`]);
+assert.equal(sharedSwitchboard.report.cleanedCards, 2);
 
 console.log('phonebook_cleaner_test: ok');
