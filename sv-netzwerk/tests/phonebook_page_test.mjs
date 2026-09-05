@@ -26,4 +26,5 @@ assert(api.includes("$action === 'same_name_review'") && api.includes("count($co
 assert(page.includes('ph-contact-business') && page.includes('ph-contact-private') && page.includes('ph-contact-mobile') && page.includes('ph-contact-email'), 'Strukturierte Kontaktfelder fehlen.');
 assert(page.includes('ph-contact-details') && page.includes('<details'), 'Mehrere Nummern müssen pro Kontakt aufklappbar sein.');
 assert(api.includes("$action === 'save_group'") && api.includes('phonebookTypedPhones'), 'Gebündeltes Speichern eines Kontakts fehlt.');
+assert(page.includes('ph-create-contact') && page.includes('createContactFromSearch'), 'Direktes Anlegen aus einer erfolglosen Suche fehlt.');
 console.log('phonebook_page_test: ok');
