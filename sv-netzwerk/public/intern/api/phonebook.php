@@ -67,6 +67,33 @@ try {
         apiJson(['ok' => true, 'contacts' => phonebookList((string)($_GET['q'] ?? ''))]);
     }
 
+    if ($action === 'same_name_review') {
+        $rows = db()->query('SELECT id, name, phone, note, updated_at FROM phonebook_contacts ORDER BY name, phone')->fetchAll();
+        $groups = [];
+        foreach ($rows as $row) {
+            $groups[phonebookNameKey($row['name'] ?? '')][] = $row;
+        }
+        $contacts = [];
+        $groupCount = 0;
+        foreach ($groups as $group) {
+            $numbers = array_unique(array_map(static fn(array $row): string => phonebookPhoneKey($row['phone'] ?? ''), $group));
+            if (count($numbers) < 2) {
+                continue;
+            }
+            $groupCount++;
+            foreach ($group as $row) {
+                $contacts[] = [
+                    'id' => (int)$row['id'],
+                    'name' => (string)$row['name'],
+                    'phone' => (string)$row['phone'],
+                    'note' => (string)($row['note'] ?? ''),
+                    'updated_at' => (string)$row['updated_at'],
+                ];
+            }
+        }
+        apiJson(['ok' => true, 'contacts' => array_slice($contacts, 0, 500), 'group_count' => $groupCount, 'total' => count($contacts)]);
+    }
+
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         apiError(405, 'POST erforderlich.');
     }
@@ -170,6 +197,49 @@ try {
         apiJson(['ok' => true, 'deleted' => $deleted]);
     }
 
+    if ($action === 'cleanup_duplicates') {
+        if (!in_array((string)($user['role'] ?? ''), ['administrator', 'projektleiter'], true)) {
+            apiError(403, 'Die Dublettenbereinigung ist nur für Administration und Projektleitung verfügbar.');
+        }
+        $rows = db()->query('SELECT id, name, phone FROM phonebook_contacts ORDER BY id')->fetchAll();
+        $groups = [];
+        foreach ($rows as $row) {
+            $key = phonebookNameKey($row['name'] ?? '') . '|' . phonebookPhoneKey($row['phone'] ?? '');
+            if (!str_ends_with($key, '|')) {
+                $groups[$key][] = $row;
+            }
+        }
+        $deleteIds = [];
+        $keepers = [];
+        foreach ($groups as $group) {
+            usort($group, static function (array $left, array $right): int {
+                $score = static fn(string $phone): int => preg_match('/^\s*(?:\+49|0049)/', $phone) ? 3 : (preg_match('/^\s*0/', $phone) ? 2 : 1);
+                return $score((string)$right['phone']) <=> $score((string)$left['phone']);
+            });
+            $keepers[] = $group[0];
+            foreach (array_slice($group, 1) as $duplicate) {
+                $deleteIds[] = (int)$duplicate['id'];
+            }
+        }
+        $pdo = db();
+        $pdo->beginTransaction();
+        try {
+            $delete = $pdo->prepare('DELETE FROM phonebook_contacts WHERE id=:id');
+            foreach ($deleteIds as $id) {
+                $delete->execute([':id' => $id]);
+            }
+            $update = $pdo->prepare('UPDATE phonebook_contacts SET phone_key=:phone_key, updated_by=:actor, updated_at=NOW() WHERE id=:id');
+            foreach ($keepers as $keeper) {
+                $update->execute([':phone_key' => phonebookPhoneKey($keeper['phone']), ':actor' => $actor, ':id' => (int)$keeper['id']]);
+            }
+            $pdo->commit();
+        } catch (Throwable $error) {
+            $pdo->rollBack();
+            throw $error;
+        }
+        apiJson(['ok' => true, 'deleted' => count($deleteIds)]);
+    }
+
     if ($action === 'import') {
         $raw = is_array($body['contacts'] ?? null) ? $body['contacts'] : [];
         $contacts = phonebookContacts($raw);
@@ -179,13 +249,13 @@ try {
         $pdo = db();
         $pdo->beginTransaction();
         try {
-            $find = $pdo->prepare('SELECT id, name, note FROM phonebook_contacts WHERE phone_key=:phone_key ORDER BY CHAR_LENGTH(name) DESC, id LIMIT 1');
+            $find = $pdo->prepare('SELECT id, name, note FROM phonebook_contacts WHERE phone_key=:phone_key AND name=:name ORDER BY id LIMIT 1');
             $insert = $pdo->prepare('INSERT INTO phonebook_contacts(name, phone, phone_key, note, created_by, updated_by, created_at, updated_at) VALUES(:name,:phone,:phone_key,:note,:actor,:actor,NOW(),NOW())');
             $update = $pdo->prepare('UPDATE phonebook_contacts SET name=:name, phone=:phone, note=:note, updated_by=:actor, updated_at=NOW() WHERE id=:id');
             $inserted = 0;
             $updated = 0;
             foreach ($contacts as $contact) {
-                $find->execute([':phone_key' => $contact['phone_key']]);
+                $find->execute([':phone_key' => $contact['phone_key'], ':name' => $contact['name']]);
                 $existing = $find->fetch();
                 if ($existing) {
                     $note = $contact['note'] !== '' ? $contact['note'] : (string)($existing['note'] ?? '');

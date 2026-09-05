@@ -19,7 +19,15 @@ function phonebookNote(mixed $value, int $limit = 255): string
 
 function phonebookPhoneKey(mixed $value): string
 {
-    return preg_replace('/\D+/', '', (string)$value) ?? '';
+    $digits = preg_replace('/\D+/', '', (string)$value) ?? '';
+    $digits = preg_replace('/^0049(?=\d{5,})/', '', $digits) ?? $digits;
+    $digits = preg_replace('/^49(?=\d{5,})/', '', $digits) ?? $digits;
+    return preg_replace('/^0+/', '', $digits) ?? $digits;
+}
+
+function phonebookNameKey(mixed $value): string
+{
+    return mb_strtolower(phonebookText($value, 150), 'UTF-8');
 }
 
 function phonebookContact(mixed $value): ?array
@@ -53,7 +61,7 @@ function phonebookContacts(mixed $values, int $limit = 2000): array
         if ($contact === null) {
             continue;
         }
-        $key = $contact['phone_key'];
+        $key = $contact['phone_key'] . '|' . phonebookNameKey($contact['name']);
         if (isset($seen[$key])) {
             continue;
         }

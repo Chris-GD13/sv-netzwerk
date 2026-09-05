@@ -10,6 +10,7 @@ const phoneKey = value => {
   else if (/^0/.test(digits)) digits = `49${digits.slice(1)}`;
   return digits;
 };
+const phoneMatchKey = value => phoneKey(value).replace(/^49(?=\d{5,})/, '').replace(/^0+/, '');
 const emailKey = value => clean(value).toLocaleLowerCase('de-DE');
 const outlookArtifact = /(?:ms-outlook:\/\/|X-APPLE-OL-[A-Z0-9-]+)/i;
 const unwantedContactName = /(?:andersson|\bab\b|per\s*mail)/i;
@@ -70,7 +71,7 @@ function parseCard(card, sourceIndex) {
   });
 
   const values = key => items.filter(item => item.key === key).map(item => item.value);
-  const phones = values('TEL').map(value => value.replace(/^tel:/i, '')).map(phoneKey).filter(key => key.length >= 3);
+  const phones = values('TEL').map(value => value.replace(/^tel:/i, '')).map(phoneMatchKey).filter(key => key.length >= 3);
   const emails = values('EMAIL').map(emailKey).filter(Boolean);
   const fn = values('FN')[0] || '';
   const fingerprint = items.map(item => `${item.key}:${item.value.toLocaleLowerCase('de-DE')}`).sort().join('|');
@@ -120,7 +121,7 @@ function mergeCards(cards) {
     const add = item => {
       if (item.key === 'FN' || item.key === 'N') return;
       if (item.key === 'TEL') {
-        const key = phoneKey(item.value.replace(/^tel:/i, ''));
+        const key = phoneMatchKey(item.value.replace(/^tel:/i, ''));
         if (!key || seenPhones.has(key)) return;
         seenPhones.add(key);
       }
@@ -155,7 +156,7 @@ function csvCell(value) {
 function portalCsv(cards) {
   const contacts = new Map();
   cards.forEach(card => card.phoneValues.forEach(phone => {
-    const key = phoneKey(phone);
+    const key = `${phoneMatchKey(phone)}|${nameKey(card.name)}`;
     if (!key) return;
     const existing = contacts.get(key);
     if (!existing || card.name.length > existing.name.length) contacts.set(key, { name: card.name, phone });

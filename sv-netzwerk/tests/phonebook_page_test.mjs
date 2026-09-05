@@ -12,11 +12,15 @@ assert(page.includes("PHONEBOOK_API='/intern/api/phonebook.php'"), 'Telefonbuch-
 assert(page.includes("action=save") && page.includes("action=delete") && page.includes("action=import"), 'Pflegeaktionen sind unvollständig.');
 assert(page.includes('ph-clean-unwanted') && page.includes('action=cleanup_unwanted'), 'Gezielte Bereinigung für Andersson, AB und per Mail fehlt.');
 assert(page.includes('Alle markieren') && page.includes('Auswahl löschen') && page.includes('action=delete_many'), 'Mehrfachauswahl im Telefonbuch fehlt.');
+assert(page.includes('Doppelte Rufnummern bereinigen') && page.includes('action=cleanup_duplicates'), 'Dublettenbereinigung fehlt.');
+assert(page.includes('Gleiche Namen / Durchwahlen prüfen') && page.includes('action=same_name_review'), 'Manuelle Prüfliste für unterschiedliche Durchwahlen fehlt.');
 assert(page.includes("addToSpeedDial"), 'Übernahme in die persönliche Kurzwahl fehlt.');
 assert(page.includes('Promise.allSettled'), 'Telefonbuch- und Fallsuche müssen bei einem Teilfehler getrennt weiterlaufen.');
 assert(api.includes('CREATE TABLE IF NOT EXISTS phonebook_contacts'), 'Zentrale Telefonbuchtabelle fehlt.');
-assert(api.includes("WHERE phone_key=:phone_key ORDER BY CHAR_LENGTH(name) DESC, id LIMIT 1"), 'Import muss bestehende Rufnummern zusammenführen.');
+assert(api.includes("WHERE phone_key=:phone_key AND name=:name ORDER BY id LIMIT 1"), 'Import muss Rufnummern desselben Kontakts zusammenführen, ohne andere Namen zu verlieren.');
 assert(api.includes("$action === 'list'") && api.includes("$action === 'save'") && api.includes("$action === 'delete'") && api.includes("$action === 'import'"), 'API-Aktionen sind unvollständig.');
 assert(api.includes("$action === 'cleanup_unwanted'") && api.includes("andersson|\\bab\\b|per\\s*mail"), 'Serverseitige Schrottkontakt-Bereinigung fehlt.');
 assert(api.includes("$action === 'delete_many'") && api.includes('count($ids) > 500'), 'Begrenzte Sammellöschung fehlt.');
+assert(api.includes("$action === 'cleanup_duplicates'") && api.includes('phonebookPhoneKey'), 'Serverseitige Dublettenbereinigung fehlt.');
+assert(api.includes("$action === 'same_name_review'") && api.includes("count($numbers) < 2"), 'API-Prüfliste für gleiche Namen mit unterschiedlichen Nummern fehlt.');
 console.log('phonebook_page_test: ok');

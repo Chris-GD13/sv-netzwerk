@@ -8,7 +8,8 @@
     .replace(/\bms-outlook:\/\/\S+/gi, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-  const phoneKey = value => clean(value).replace(/\D/g, '').replace(/^00/, '');
+  const phoneKey = value => clean(value).replace(/\D/g, '').replace(/^0049(?=\d{5,})/, '').replace(/^49(?=\d{5,})/, '').replace(/^0+/, '');
+  const nameKey = value => clean(value).toLocaleLowerCase('de-DE').replace(/\s+/g, ' ');
   const unescapeVCard = value => clean(value).replace(/\\n/gi, ' ').replace(/\\([,;\\])/g, '$1');
 
   function deduplicate(contacts) {
@@ -17,7 +18,7 @@
     contacts.forEach(contact => {
       const name = clean(contact?.name);
       const phone = clean(contact?.phone);
-      const key = phoneKey(phone);
+      const key = `${phoneKey(phone)}|${nameKey(name)}`;
       if (!name || key.length < 3) return;
       const note = cleanNote(contact?.note);
       if (!seen.has(key)) {

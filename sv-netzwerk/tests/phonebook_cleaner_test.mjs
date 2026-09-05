@@ -71,5 +71,19 @@ FN:Ansprechpartner zwei
 TEL:07367 1234
 END:VCARD`]);
 assert.equal(sharedSwitchboard.report.cleanedCards, 2);
+assert.equal((sharedSwitchboard.portalCsv.match(/Ansprechpartner/g) || []).length, 2);
+
+const missingNationalZero = cleanVCards([`BEGIN:VCARD
+VERSION:3.0
+FN:Abele Jens
+TEL:+497143 8 83 32-0
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Abele Jens
+TEL:+7143 8 83 32-0
+END:VCARD`]);
+assert.equal(missingNationalZero.report.cleanedCards, 1);
+assert.equal(missingNationalZero.report.portalPhoneRows, 1);
 
 console.log('phonebook_cleaner_test: ok');
