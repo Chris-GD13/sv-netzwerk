@@ -12,6 +12,7 @@ const phoneKey = value => {
 };
 const emailKey = value => clean(value).toLocaleLowerCase('de-DE');
 const outlookArtifact = /(?:ms-outlook:\/\/|X-APPLE-OL-[A-Z0-9-]+)/i;
+const unwantedContactName = /(?:andersson|\bab\b|per\s*mail)/i;
 const nameKey = value => clean(value)
   .normalize('NFKD')
   .replace(/[\u0300-\u036f]/g, '')
@@ -174,12 +175,14 @@ export function cleanVCards(texts) {
       if (card.items.length) cards.push(card);
     });
   });
-  const merged = mergeCards(cards);
+  const allMerged = mergeCards(cards);
+  const merged = allMerged.filter(card => !unwantedContactName.test(card.name));
   const portal = portalCsv(merged);
   const report = {
     sourceCards: cards.length,
     cleanedCards: merged.length,
-    duplicatesRemoved: cards.length - merged.length,
+    duplicatesRemoved: cards.length - allMerged.length,
+    excludedUnwantedContacts: allMerged.length - merged.length,
     contactsWithPhone: merged.filter(card => card.phones > 0).length,
     contactsWithoutPhone: merged.filter(card => card.phones === 0).length,
     portalPhoneRows: portal.count,

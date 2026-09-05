@@ -114,6 +114,62 @@ try {
         apiJson(['ok' => true, 'deleted' => $stmt->rowCount()]);
     }
 
+    if ($action === 'delete_many') {
+        if (!in_array((string)($user['role'] ?? ''), ['administrator', 'projektleiter'], true)) {
+            apiError(403, 'Die Sammellöschung ist nur für Administration und Projektleitung verfügbar.');
+        }
+        $ids = array_values(array_unique(array_filter(array_map('intval', is_array($body['ids'] ?? null) ? $body['ids'] : []), static fn(int $id): bool => $id > 0)));
+        if ($ids === [] || count($ids) > 500) {
+            apiError(400, 'Bitte zwischen 1 und 500 Kontakte auswählen.');
+        }
+        $pdo = db();
+        $pdo->beginTransaction();
+        try {
+            $delete = $pdo->prepare('DELETE FROM phonebook_contacts WHERE id=:id');
+            $deleted = 0;
+            foreach ($ids as $id) {
+                $delete->execute([':id' => $id]);
+                $deleted += $delete->rowCount();
+            }
+            $pdo->commit();
+        } catch (Throwable $error) {
+            $pdo->rollBack();
+            throw $error;
+        }
+        apiJson(['ok' => true, 'deleted' => $deleted]);
+    }
+
+    if ($action === 'cleanup_unwanted') {
+        if (!in_array((string)($user['role'] ?? ''), ['administrator', 'projektleiter'], true)) {
+            apiError(403, 'Die Sammelbereinigung ist nur für Administration und Projektleitung verfügbar.');
+        }
+        $rows = db()->query('SELECT id, name FROM phonebook_contacts')->fetchAll();
+        $ids = [];
+        foreach ($rows as $row) {
+            if (preg_match('/(?:andersson|\bab\b|per\s*mail)/iu', (string)($row['name'] ?? ''))) {
+                $ids[] = (int)$row['id'];
+            }
+        }
+        if ($ids === []) {
+            apiJson(['ok' => true, 'deleted' => 0]);
+        }
+        $pdo = db();
+        $pdo->beginTransaction();
+        try {
+            $delete = $pdo->prepare('DELETE FROM phonebook_contacts WHERE id=:id');
+            $deleted = 0;
+            foreach ($ids as $id) {
+                $delete->execute([':id' => $id]);
+                $deleted += $delete->rowCount();
+            }
+            $pdo->commit();
+        } catch (Throwable $error) {
+            $pdo->rollBack();
+            throw $error;
+        }
+        apiJson(['ok' => true, 'deleted' => $deleted]);
+    }
+
     if ($action === 'import') {
         $raw = is_array($body['contacts'] ?? null) ? $body['contacts'] : [];
         $contacts = phonebookContacts($raw);
