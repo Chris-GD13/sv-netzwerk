@@ -18,7 +18,8 @@
     "fachbeitrag:log": "node scripts/update-fachbeitrag-log.mjs",
     "test:publication-gating": "node scripts/test-publication-gating.mjs",
     "test:chatgpt-plugin": "node scripts/test-chatgpt-plugin.mjs",
-    "test:schadenprotokoll": "node scripts/test-schadenprotokoll.mjs"
+    "test:schadenprotokoll": "node scripts/test-schadenprotokoll.mjs",
+    "test:phonebook-cleaner": "node tests/phonebook_cleaner_test.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
