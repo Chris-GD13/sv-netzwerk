@@ -11,6 +11,7 @@ const phoneKey = value => {
   return digits;
 };
 const phoneMatchKey = value => phoneKey(value).replace(/^49(?=\d{5,})/, '').replace(/^0+/, '');
+const phoneDisplayScore = value => /^(?:\+49|0049)/.test(clean(value)) ? 3 : (/^0/.test(clean(value)) ? 2 : 1);
 const emailKey = value => clean(value).toLocaleLowerCase('de-DE');
 const outlookArtifact = /(?:ms-outlook:\/\/|X-APPLE-OL-[A-Z0-9-]+)/i;
 const unwantedContactName = /(?:andersson|\bab\b|per\s*mail)/i;
@@ -113,6 +114,10 @@ function mergeCards(cards) {
   });
 
   return [...groups.values()].map(group => {
+    group.sort((left, right) => {
+      const score = card => Math.max(0, ...card.items.filter(item => item.key === 'TEL').map(item => phoneDisplayScore(item.value)));
+      return score(right) - score(left);
+    });
     const preferredFn = group.map(card => card.fn).filter(Boolean).sort((a, b) => b.length - a.length)[0] || 'Unbenannter Kontakt';
     const lines = [];
     const seen = new Set();

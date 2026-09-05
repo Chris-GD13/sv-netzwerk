@@ -85,5 +85,6 @@ TEL:+7143 8 83 32-0
 END:VCARD`]);
 assert.equal(missingNationalZero.report.cleanedCards, 1);
 assert.equal(missingNationalZero.report.portalPhoneRows, 1);
+assert.match(missingNationalZero.vcf, /TEL:\+497143 8 83 32-0/);
 
 console.log('phonebook_cleaner_test: ok');
