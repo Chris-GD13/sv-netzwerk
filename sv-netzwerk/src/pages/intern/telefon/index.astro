@@ -69,7 +69,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   const activeCase=()=>{for(const store of[sessionStorage,localStorage])try{const value=JSON.parse(store.getItem('svnet-case')||'null');if(value?.folder_id)return value}catch{}return null};
   const keep=value=>{sessionStorage.setItem('svnet-case',JSON.stringify(value));localStorage.setItem('svnet-case',JSON.stringify(value));renderActive()};
   const mobile=()=>navigator.userAgentData?.mobile??/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const dial=number=>{const clean=String(number||'').trim().replace(/[^\d+*#]/g,'');if(!clean){$('ph-dial-state').textContent='Bitte eine Telefonnummer eingeben.';return}$('ph-dial-state').textContent=`${clean} wird an ${mobile()?'die Telefon-App':'xtelsio'} übergeben …`;location.href=`${mobile()?'tel':'callto'}:${clean}`};
+  const dial=number=>{const clean=String(number||'').trim().replace(/[^\d+*#]/g,'');if(!clean){$('ph-dial-state').textContent='Bitte eine Telefonnummer eingeben.';return}$('ph-dial-state').textContent=`${clean} wird an ${mobile()?'die Telefon-App':'xtelsio'} übergeben …`;location.href=mobile()?`tel:${clean}`:`svnet-xtelsio://dial?number=${encodeURIComponent(clean)}`};
   const contactRows=meta=>[
     ['VN Telefon',meta.telefon],['VN Mobil',meta.mobil],['Sanierer Telefon',meta.sanierer_telefon],['Sanierer Mobil',meta.sanierer_mobil],
     ...(Array.isArray(meta.telefonkontakte)?meta.telefonkontakte.map(row=>[row.name||'Ansprechpartner',row.nummer]):[])

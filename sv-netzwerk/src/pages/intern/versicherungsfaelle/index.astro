@@ -124,7 +124,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
         return;
       }
       input.setCustomValidity('');
-      window.location.href=`${mobileDevice()?'tel':'callto'}:${number}`;
+      window.location.href=mobileDevice()?`tel:${number}`:`svnet-xtelsio://dial?number=${encodeURIComponent(number)}`;
     });
     input.addEventListener('input',()=>input.setCustomValidity(''));
     control.append(call);

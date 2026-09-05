@@ -45,6 +45,18 @@ $action = $parsed.Host.ToLowerInvariant()
 switch ($action) {
     'answer' { $commandArguments = @('/answer', '-ringing') }
     'drop'   { $commandArguments = @('/drop', '-current') }
+    'dial'   {
+        $phoneNumber = $null
+        foreach ($queryPart in $parsed.Query.TrimStart('?') -split '&') {
+            $keyValue = $queryPart -split '=', 2
+            if ($keyValue.Count -eq 2 -and $keyValue[0] -eq 'number') {
+                $phoneNumber = [Uri]::UnescapeDataString($keyValue[1])
+                break
+            }
+        }
+        if (-not $phoneNumber -or $phoneNumber -notmatch '^\+?[0-9*#]+$') { exit 6 }
+        $commandArguments = @('/dial', $phoneNumber)
+    }
     default  { exit 5 }
 }
 
@@ -70,5 +82,5 @@ $openCommand = '"' + $powershellPath + '" -NoProfile -ExecutionPolicy Bypass -Fi
 Write-Host ''
 Write-Host 'Einrichtung abgeschlossen.' -ForegroundColor Green
 Write-Host ('Verwendeter xtelsio CTI Client: ' + $ctiPath)
-Write-Host 'Die Telefonzentrale im SV-Netzwerk kann jetzt Anrufe annehmen und beenden.'
+Write-Host 'Die Telefonzentrale im SV-Netzwerk kann jetzt ueber xtelsio waehlen, Anrufe annehmen und beenden.'
 Read-Host 'Mit Eingabetaste schliessen'
