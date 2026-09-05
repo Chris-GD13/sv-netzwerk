@@ -78,7 +78,7 @@ function phonebookContact(mixed $value): ?array
     ];
 }
 
-function phonebookContacts(mixed $values, int $limit = 2000): array
+function phonebookContacts(mixed $values, int $limit = 5000): array
 {
     if (!is_array($values)) {
         return [];
