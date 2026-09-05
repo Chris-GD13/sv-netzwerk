@@ -17,6 +17,9 @@ assert(page.includes('Doppelte Rufnummern bereinigen') && page.includes('action=
 assert(page.includes('Gleiche Namen / Durchwahlen prüfen') && page.includes('action=same_name_review'), 'Manuelle Prüfliste für unterschiedliche Durchwahlen fehlt.');
 assert(page.includes("addToSpeedDial"), 'Übernahme in die persönliche Kurzwahl fehlt.');
 assert(page.includes('Promise.allSettled'), 'Telefonbuch- und Fallsuche müssen bei einem Teilfehler getrennt weiterlaufen.');
+assert(page.includes('per_page=100') && page.includes('Seite ${page} von ${pages}') && page.includes("actionButton('Weiter'"), 'Vollständige paginierte Telefonbuchanzeige fehlt.');
+assert(api.includes("'total' => $total") && api.includes("'pages' => $pages") && api.includes('array_slice($allContacts, $offset, $perPage)'), 'Serverseitige Telefonbuch-Paginierung fehlt.');
+assert(api.includes('int $groupLimit = 0'), 'Die feste 500er-Anzeigegrenze muss entfernt sein.');
 assert(api.includes('CREATE TABLE IF NOT EXISTS phonebook_contacts'), 'Zentrale Telefonbuchtabelle fehlt.');
 assert(api.includes("WHERE phone_key=:phone_key AND name=:name ORDER BY id LIMIT 1"), 'Import muss Rufnummern desselben Kontakts zusammenführen, ohne andere Namen zu verlieren.');
 assert(api.includes("$action === 'list'") && api.includes("$action === 'save'") && api.includes("$action === 'delete'") && api.includes("$action === 'import'"), 'API-Aktionen sind unvollständig.');
