@@ -26,6 +26,13 @@ function phonebookEnsureSchema(): void
         INDEX idx_phonebook_name (name),
         INDEX idx_phonebook_phone (phone_key)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    $columns = db()->query('SHOW COLUMNS FROM phonebook_contacts')->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('phone_type', $columns, true)) {
+        db()->exec("ALTER TABLE phonebook_contacts ADD COLUMN phone_type VARCHAR(20) NOT NULL DEFAULT 'other' AFTER phone_key");
+    }
+    if (!in_array('email', $columns, true)) {
+        db()->exec("ALTER TABLE phonebook_contacts ADD COLUMN email VARCHAR(190) NULL AFTER phone_type");
+    }
 }
 
 function phonebookUserLabel(array $user): string
@@ -37,26 +44,31 @@ function phonebookList(string $query): array
 {
     $query = phonebookText($query, 120);
     if ($query === '') {
-        $stmt = db()->query('SELECT id, name, phone, note, updated_at FROM phonebook_contacts ORDER BY name, phone LIMIT 500');
+        $stmt = db()->query('SELECT id, name, phone, phone_type, email, note, updated_at FROM phonebook_contacts ORDER BY name, phone');
     } else {
         $phoneKey = phonebookPhoneKey($query);
-        $stmt = db()->prepare("SELECT id, name, phone, note, updated_at FROM phonebook_contacts
-            WHERE name LIKE :query_name OR phone LIKE :query_phone OR note LIKE :query_note" . ($phoneKey !== '' ? ' OR phone_key LIKE :phone_key' : '') . "
-            ORDER BY name, phone LIMIT 500");
+        $stmt = db()->prepare("SELECT id, name, phone, phone_type, email, note, updated_at FROM phonebook_contacts
+            WHERE name LIKE :query_name OR phone LIKE :query_phone OR email LIKE :query_email OR note LIKE :query_note" . ($phoneKey !== '' ? ' OR phone_key LIKE :phone_key' : '') . "
+            ORDER BY name, phone LIMIT 3000");
         $like = '%' . $query . '%';
-        $params = [':query_name' => $like, ':query_phone' => $like, ':query_note' => $like];
+        $params = [':query_name' => $like, ':query_phone' => $like, ':query_email' => $like, ':query_note' => $like];
         if ($phoneKey !== '') {
             $params[':phone_key'] = '%' . $phoneKey . '%';
         }
         $stmt->execute($params);
     }
-    return array_map(static fn(array $row): array => [
-        'id' => (int)$row['id'],
-        'name' => (string)$row['name'],
-        'phone' => (string)$row['phone'],
-        'note' => (string)($row['note'] ?? ''),
-        'updated_at' => (string)$row['updated_at'],
-    ], $stmt->fetchAll());
+    $groups = [];
+    foreach ($stmt->fetchAll() as $row) {
+        $key = phonebookNameKey($row['name'] ?? '');
+        if (!isset($groups[$key])) {
+            $groups[$key] = ['id'=>(int)$row['id'], 'ids'=>[], 'name'=>(string)$row['name'], 'email'=>(string)($row['email'] ?? ''), 'note'=>(string)($row['note'] ?? ''), 'phones'=>[], 'updated_at'=>(string)$row['updated_at']];
+        }
+        $groups[$key]['ids'][] = (int)$row['id'];
+        if ($groups[$key]['email'] === '' && (string)($row['email'] ?? '') !== '') $groups[$key]['email'] = (string)$row['email'];
+        if ($groups[$key]['note'] === '' && (string)($row['note'] ?? '') !== '') $groups[$key]['note'] = (string)$row['note'];
+        if (trim((string)$row['phone']) !== '') $groups[$key]['phones'][] = ['id'=>(int)$row['id'], 'type'=>phonebookPhoneType($row['phone_type'] ?? 'other'), 'number'=>(string)$row['phone']];
+    }
+    return array_slice(array_values($groups), 0, 500);
 }
 
 $action = (string)($_GET['action'] ?? 'list');
@@ -68,30 +80,9 @@ try {
     }
 
     if ($action === 'same_name_review') {
-        $rows = db()->query('SELECT id, name, phone, note, updated_at FROM phonebook_contacts ORDER BY name, phone')->fetchAll();
-        $groups = [];
-        foreach ($rows as $row) {
-            $groups[phonebookNameKey($row['name'] ?? '')][] = $row;
-        }
-        $contacts = [];
-        $groupCount = 0;
-        foreach ($groups as $group) {
-            $numbers = array_unique(array_map(static fn(array $row): string => phonebookPhoneKey($row['phone'] ?? ''), $group));
-            if (count($numbers) < 2) {
-                continue;
-            }
-            $groupCount++;
-            foreach ($group as $row) {
-                $contacts[] = [
-                    'id' => (int)$row['id'],
-                    'name' => (string)$row['name'],
-                    'phone' => (string)$row['phone'],
-                    'note' => (string)($row['note'] ?? ''),
-                    'updated_at' => (string)$row['updated_at'],
-                ];
-            }
-        }
-        apiJson(['ok' => true, 'contacts' => array_slice($contacts, 0, 500), 'group_count' => $groupCount, 'total' => count($contacts)]);
+        $contacts = array_values(array_filter(phonebookList(''), static fn(array $contact): bool => count($contact['phones'] ?? []) > 1));
+        $numberCount = array_sum(array_map(static fn(array $contact): int => count($contact['phones'] ?? []), $contacts));
+        apiJson(['ok' => true, 'contacts' => $contacts, 'group_count' => count($contacts), 'total' => $numberCount]);
     }
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -99,6 +90,31 @@ try {
     }
     $body = requestBody();
     $actor = phonebookUserLabel($user);
+
+    if ($action === 'save_group') {
+        $name = phonebookText($body['name'] ?? '', 150);
+        $email = phonebookEmail($body['email'] ?? '');
+        $note = phonebookNote($body['note'] ?? '');
+        $phones = phonebookTypedPhones($body['phones'] ?? []);
+        if ($name === '' || ($phones === [] && $email === '')) apiError(400, 'Bitte Name sowie mindestens eine Rufnummer oder E-Mail-Adresse angeben.');
+        $ids = array_values(array_unique(array_filter(array_map('intval', is_array($body['ids'] ?? null) ? $body['ids'] : []), static fn(int $id): bool => $id > 0)));
+        $pdo = db(); $pdo->beginTransaction();
+        try {
+            if ($ids !== []) {
+                $delete = $pdo->prepare('DELETE FROM phonebook_contacts WHERE id=:id');
+                foreach ($ids as $id) { $delete->execute([':id'=>$id]); }
+            }
+            if ($phones === []) $phones[] = ['type'=>'other', 'number'=>'', 'phone_key'=>''];
+            $insert = $pdo->prepare('INSERT INTO phonebook_contacts(name,phone,phone_key,phone_type,email,note,created_by,updated_by,created_at,updated_at) VALUES(:name,:phone,:phone_key,:phone_type,:email,:note,:actor,:actor,NOW(),NOW())');
+            $newIds = [];
+            foreach ($phones as $phone) {
+                $insert->execute([':name'=>$name, ':phone'=>$phone['number'], ':phone_key'=>$phone['phone_key'], ':phone_type'=>$phone['type'], ':email'=>$email, ':note'=>$note, ':actor'=>$actor]);
+                $newIds[] = (int)$pdo->lastInsertId();
+            }
+            $pdo->commit();
+        } catch (Throwable $error) { $pdo->rollBack(); throw $error; }
+        apiJson(['ok'=>true, 'ids'=>$newIds]);
+    }
 
     if ($action === 'save') {
         $contact = phonebookContact($body);
@@ -249,9 +265,9 @@ try {
         $pdo = db();
         $pdo->beginTransaction();
         try {
-            $find = $pdo->prepare('SELECT id, name, note FROM phonebook_contacts WHERE phone_key=:phone_key AND name=:name ORDER BY id LIMIT 1');
-            $insert = $pdo->prepare('INSERT INTO phonebook_contacts(name, phone, phone_key, note, created_by, updated_by, created_at, updated_at) VALUES(:name,:phone,:phone_key,:note,:actor,:actor,NOW(),NOW())');
-            $update = $pdo->prepare('UPDATE phonebook_contacts SET name=:name, phone=:phone, note=:note, updated_by=:actor, updated_at=NOW() WHERE id=:id');
+            $find = $pdo->prepare('SELECT id, name, phone_type, email, note FROM phonebook_contacts WHERE phone_key=:phone_key AND name=:name ORDER BY id LIMIT 1');
+            $insert = $pdo->prepare('INSERT INTO phonebook_contacts(name, phone, phone_key, phone_type, email, note, created_by, updated_by, created_at, updated_at) VALUES(:name,:phone,:phone_key,:phone_type,:email,:note,:actor,:actor,NOW(),NOW())');
+            $update = $pdo->prepare('UPDATE phonebook_contacts SET name=:name, phone=:phone, phone_type=:phone_type, email=:email, note=:note, updated_by=:actor, updated_at=NOW() WHERE id=:id');
             $inserted = 0;
             $updated = 0;
             foreach ($contacts as $contact) {
@@ -259,7 +275,9 @@ try {
                 $existing = $find->fetch();
                 if ($existing) {
                     $note = $contact['note'] !== '' ? $contact['note'] : (string)($existing['note'] ?? '');
-                    $update->execute([':name' => (string)$existing['name'], ':phone' => $contact['phone'], ':note' => $note, ':actor' => $actor, ':id' => (int)$existing['id']]);
+                    $type = $contact['phone_type'] !== 'other' ? $contact['phone_type'] : (string)($existing['phone_type'] ?? 'other');
+                    $email = $contact['email'] !== '' ? $contact['email'] : (string)($existing['email'] ?? '');
+                    $update->execute([':name' => (string)$existing['name'], ':phone' => $contact['phone'], ':phone_type'=>$type, ':email'=>$email, ':note' => $note, ':actor' => $actor, ':id' => (int)$existing['id']]);
                     $updated++;
                     continue;
                 }
@@ -267,6 +285,8 @@ try {
                     ':name' => $contact['name'],
                     ':phone' => $contact['phone'],
                     ':phone_key' => $contact['phone_key'],
+                    ':phone_type' => $contact['phone_type'],
+                    ':email' => $contact['email'],
                     ':note' => $contact['note'],
                     ':actor' => $actor,
                 ]);

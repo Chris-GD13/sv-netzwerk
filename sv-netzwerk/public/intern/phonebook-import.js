@@ -20,15 +20,16 @@
       const phone = clean(contact?.phone);
       const key = `${phoneKey(phone)}|${nameKey(name)}`;
       if (!name || key.length < 3) return;
-      const note = cleanNote(contact?.note);
+      const note = cleanNote(contact?.note), email = clean(contact?.email), phone_type = clean(contact?.phone_type || contact?.type || 'other');
       if (!seen.has(key)) {
         seen.set(key, rows.length);
-        rows.push({ name, phone, note });
+        rows.push({ name, phone, phone_type, email, note });
         return;
       }
       const existing = rows[seen.get(key)];
       if (name.length > existing.name.length) existing.name = name;
       if (!existing.note && note) existing.note = note;
+      if (!existing.email && email) existing.email = email;
     });
     return rows;
   }
@@ -55,18 +56,25 @@
     const rows = lines.map(line => parseCsvLine(line, delimiter));
     const headers = rows[0].map(value => value.toLocaleLowerCase('de-DE').replace(/[^a-z0-9äöüß]+/g, ''));
     const indexOf = names => headers.findIndex(header => names.includes(header));
-    const phoneIndex = indexOf(['telefon', 'telefonnummer', 'phone', 'mobil', 'mobile', 'handy', 'rufnummer']);
+    const phoneIndex = indexOf(['telefon', 'telefonnummer', 'phone', 'rufnummer']);
+    const businessIndex = indexOf(['geschäft', 'geschaeft', 'geschäftlich', 'geschaeftlich', 'business', 'workphone']);
+    const privateIndex = indexOf(['privat', 'private', 'homephone']);
+    const mobileIndex = indexOf(['mobil', 'mobile', 'handy', 'mobilfunk']);
+    const otherIndex = indexOf(['weitere', 'weiteretelefonnummer', 'otherphone']);
+    const emailIndex = indexOf(['email', 'emailadresse', 'mail']);
     const nameIndex = indexOf(['name', 'vollständigername', 'vollstaendigername', 'fullname', 'kontakt', 'firma']);
     const firstIndex = indexOf(['vorname', 'firstname', 'givenname']);
     const lastIndex = indexOf(['nachname', 'lastname', 'surname', 'familyname']);
     const noteIndex = indexOf(['notiz', 'notizen', 'note', 'notes', 'bemerkung', 'firma', 'company']);
-    const hasHeader = phoneIndex >= 0 && (nameIndex >= 0 || firstIndex >= 0 || lastIndex >= 0);
+    const phoneColumns = [[businessIndex,'business'],[privateIndex,'private'],[mobileIndex,'mobile'],[otherIndex,'other'],[phoneIndex,'other']].filter(([index])=>index>=0);
+    const hasHeader = phoneColumns.length > 0 && (nameIndex >= 0 || firstIndex >= 0 || lastIndex >= 0);
     const body = hasHeader ? rows.slice(1) : rows;
-    return deduplicate(body.map(row => ({
-      name: nameIndex >= 0 ? clean(row[nameIndex]) : clean([row[firstIndex], row[lastIndex]].filter(Boolean).join(' ')) || clean(row[0]),
-      phone: phoneIndex >= 0 ? clean(row[phoneIndex]) : clean(row[1]),
-      note: noteIndex >= 0 ? cleanNote(row[noteIndex]) : cleanNote(row[2]),
-    })));
+    return deduplicate(body.flatMap(row => {
+      const name=nameIndex>=0?clean(row[nameIndex]):clean([row[firstIndex],row[lastIndex]].filter(Boolean).join(' '))||clean(row[0]);
+      const note=noteIndex>=0?cleanNote(row[noteIndex]):cleanNote(row[2]),email=emailIndex>=0?clean(row[emailIndex]):'';
+      const columns=hasHeader?phoneColumns:[[1,'other']];
+      return columns.flatMap(([index,phone_type])=>clean(row[index]).split(/[,;\n]+/).map(phone=>clean(phone)).filter(Boolean).map(phone=>({name,phone,phone_type,email,note})));
+    }));
   }
 
   function parseVCard(text) {
@@ -79,8 +87,12 @@
       const formatted = values('FN')[0] || '';
       const parts = (values('N')[0] || '').split(';');
       const name = formatted || clean([parts[1], parts[0]].filter(Boolean).join(' '));
-      const note = cleanNote(values('NOTE')[0] || values('ORG')[0] || '');
-      values('TEL').forEach(value => { const phone = value.replace(/^tel:/i, ''); if (name && phone) contacts.push({ name, phone, note }); });
+      const note = cleanNote(values('NOTE')[0] || values('ORG')[0] || ''), email = values('EMAIL')[0] || '';
+      lines.filter(line => /^(?:[^.:;]+\.)?TEL(?:;[^:]*)?:/i.test(line)).forEach(line => {
+        const meta=line.slice(0,line.indexOf(':')).toUpperCase(), phone=line.slice(line.indexOf(':')+1).replace(/^tel:/i,'');
+        const phone_type=/CELL|MOBILE/.test(meta)?'mobile':/HOME/.test(meta)?'private':/WORK/.test(meta)?'business':'other';
+        if(name&&phone)contacts.push({name,phone,phone_type,email,note});
+      });
     });
     return deduplicate(contacts);
   }

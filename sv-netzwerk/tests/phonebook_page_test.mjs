@@ -22,5 +22,8 @@ assert(api.includes("$action === 'list'") && api.includes("$action === 'save'") 
 assert(api.includes("$action === 'cleanup_unwanted'") && api.includes("andersson|\\bab\\b|per\\s*mail"), 'Serverseitige Schrottkontakt-Bereinigung fehlt.');
 assert(api.includes("$action === 'delete_many'") && api.includes('count($ids) > 500'), 'Begrenzte Sammellöschung fehlt.');
 assert(api.includes("$action === 'cleanup_duplicates'") && api.includes('phonebookPhoneKey'), 'Serverseitige Dublettenbereinigung fehlt.');
-assert(api.includes("$action === 'same_name_review'") && api.includes("count($numbers) < 2"), 'API-Prüfliste für gleiche Namen mit unterschiedlichen Nummern fehlt.');
+assert(api.includes("$action === 'same_name_review'") && api.includes("count($contact['phones'] ?? []) > 1"), 'API-Prüfliste für gleiche Namen mit unterschiedlichen Nummern fehlt.');
+assert(page.includes('ph-contact-business') && page.includes('ph-contact-private') && page.includes('ph-contact-mobile') && page.includes('ph-contact-email'), 'Strukturierte Kontaktfelder fehlen.');
+assert(page.includes('ph-contact-details') && page.includes('<details'), 'Mehrere Nummern müssen pro Kontakt aufklappbar sein.');
+assert(api.includes("$action === 'save_group'") && api.includes('phonebookTypedPhones'), 'Gebündeltes Speichern eines Kontakts fehlt.');
 console.log('phonebook_page_test: ok');

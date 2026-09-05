@@ -30,6 +30,33 @@ function phonebookNameKey(mixed $value): string
     return mb_strtolower(phonebookText($value, 150), 'UTF-8');
 }
 
+function phonebookPhoneType(mixed $value): string
+{
+    $type = strtolower(phonebookText($value, 20));
+    return in_array($type, ['business', 'private', 'mobile', 'other'], true) ? $type : 'other';
+}
+
+function phonebookEmail(mixed $value): string
+{
+    $email = phonebookText($value, 190);
+    return $email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : '';
+}
+
+function phonebookTypedPhones(mixed $values): array
+{
+    if (!is_array($values)) return [];
+    $result = []; $seen = [];
+    foreach (array_slice($values, 0, 20) as $value) {
+        if (!is_array($value)) continue;
+        $number = phonebookText($value['number'] ?? $value['phone'] ?? '', 80);
+        $key = phonebookPhoneKey($number);
+        if (strlen($key) < 3 || isset($seen[$key])) continue;
+        $seen[$key] = true;
+        $result[] = ['type'=>phonebookPhoneType($value['type'] ?? 'other'), 'number'=>$number, 'phone_key'=>mb_substr($key, 0, 40, 'UTF-8')];
+    }
+    return $result;
+}
+
 function phonebookContact(mixed $value): ?array
 {
     if (!is_array($value)) {
@@ -45,6 +72,8 @@ function phonebookContact(mixed $value): ?array
         'name' => $name,
         'phone' => $phone,
         'phone_key' => mb_substr($phoneKey, 0, 40, 'UTF-8'),
+        'phone_type' => phonebookPhoneType($value['phone_type'] ?? $value['type'] ?? 'other'),
+        'email' => phonebookEmail($value['email'] ?? ''),
         'note' => phonebookNote($value['note'] ?? $value['notiz'] ?? ''),
     ];
 }
