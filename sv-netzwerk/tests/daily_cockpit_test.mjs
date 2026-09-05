@@ -29,11 +29,13 @@ assert(cases.includes('svnet-xtelsio://dial?number=${encodeURIComponent(number)}
 assert(phoneInstaller.includes("'dial'   {")&&phoneInstaller.includes("$commandArguments = @('/dial', $phoneNumber)")&&phoneInstaller.includes("'^\\+?[0-9*#]+$'"),'Die Windows-Verknüpfung muss Rufnummern geprüft an den xtelsio-Dial-Befehl weiterreichen');
 assert(phoneInstaller.includes("$installerVersion = '2026.09.05.1'")&&phone.includes('vor dem 05.09.2026 installiert'),'Die Telefonzentrale muss die notwendige Neuinstallation der erweiterten Verknüpfung eindeutig ausweisen');
 assert(cockpit.includes('phoneContacts(meta)')&&cockpit.includes('Kein aktiver Schadenfall.'),'Kontakte des aktiven Schadenfalls müssen im Telefonbereich erscheinen');
+assert(cockpit.includes('id="dc-speed-dial-form"')&&cockpit.includes("speedDialKey='svnet-phone-speed-dials-v1'")&&cockpit.includes("{name:'Christian Handy',number:'01604092134'}")&&cockpit.includes("{name:'Marc Handy',number:''}")&&cockpit.includes("{name:'Cedric Kalabis',number:''}"),'Kurzwahlen müssen lokal speicherbar sein und die vorgegebenen Startkontakte enthalten');
+assert(cockpit.includes('saveSpeedDials();renderSpeedDials();resetSpeedDialForm()')&&cockpit.includes('call.onclick=()=>dial(entry.number)'),'Kurzwahlen müssen gespeichert, geändert, entfernt und direkt gewählt werden können');
 assert(cockpit.includes('revenue-summary-v2.php?action=access'),'Cockpit muss den rollenbezogenen Abrechnungsstand lesen');
 assert(cockpit.includes('id="dc-quick-settlement"')&&cockpit.includes("hidden=data.show_settlement_link!==true"),'Abrechnungen dürfen im Cockpit nur mit bestätigter Berechtigung erscheinen');
 assert(!cockpit.includes("method:'POST'")&&!cockpit.includes('method: "POST"'),'Cockpit darf beim Laden keine schreibende Aktion ausführen');
 assert(cockpit.includes("sessionStorage.setItem('svnet-case'")&&cockpit.includes("location.assign('/intern/versicherungsfaelle/')"),'Fallübergabe muss in den bestehenden Fallbereich führen');
 assert(cockpit.includes('data-system="drive"')&&cockpit.includes('data-system="outlook"')&&cockpit.includes('data-system="claims"')&&cockpit.includes('data-system="revenue"'),'Alle vier Systemampeln müssen vorhanden sein');
-assert(layout.includes("/sw.js?v=20260905-1")&&sw.includes("CACHE_VERSION = '20260905-1'"),'Portalcache muss für die korrigierte Telefonsteuerung eindeutig erneuert werden');
+assert(layout.includes("/sw.js?v=20260905-2")&&sw.includes("CACHE_VERSION = '20260905-2'"),'Portalcache muss für die speicherbare Kurzwahl eindeutig erneuert werden');
 
 console.log('daily_cockpit_test: ok');

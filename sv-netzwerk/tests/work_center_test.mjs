@@ -17,6 +17,6 @@ assert(page.includes('upload_case_document'),'Vor-Ort-Dateien müssen den vorhan
 assert(page.includes("300 € als Selbstbehalt behandeln")&&page.includes('backoffice@meygeneralbau.de'),'Bekannte kritische Berichts- und KVA-Regeln fehlen');
 assert(page.includes('Sie verändert und sperrt keine Berichts- oder Versandfunktion'),'Qualitätsprüfung muss additiv und nicht blockierend bleiben');
 assert(page.includes('keine Umsatz- oder Leistungsabrechnung'),'Controlling darf nicht als Finanzabrechnung dargestellt werden');
-assert(layout.includes("/sw.js?v=20260905-1"),'Neue Arbeitszentrale muss den Portalcache erneuern');
+assert(layout.includes("/sw.js?v=20260905-2"),'Neue Arbeitszentrale muss den Portalcache erneuern');
 
 console.log('work_center_test: ok');
