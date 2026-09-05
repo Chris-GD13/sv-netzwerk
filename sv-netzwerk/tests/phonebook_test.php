@@ -11,5 +11,10 @@ pbAssert($contact['phone_key'] === '491604092134', 'Rufnummernschlüssel ist fal
 pbAssert(phonebookContact(['name' => 'Ohne Nummer', 'phone' => 'x']) === null, 'Ungültige Nummer wurde angenommen.');
 $batch = phonebookContacts([$contact, $contact, ['name' => 'Zentrale', 'phone' => '12345']]);
 pbAssert(count($batch) === 2, 'Dubletten im Import wurden nicht entfernt.');
+$samePhone = phonebookContacts([
+    ['name' => 'Marc', 'phone' => '+49 170 1234567', 'note' => 'ms-outlook://people/AAAA'],
+    ['name' => 'Marc Schütt', 'phone' => '+49 (170) 1234567', 'note' => 'Chef'],
+]);
+pbAssert(count($samePhone) === 1, 'Gleiche Rufnummern mit abweichenden Namen wurden nicht zusammengeführt.');
+pbAssert($samePhone[0]['note'] === '', 'Interner Outlook-Link wurde nicht entfernt.');
 echo "phonebook_test: ok\n";
-

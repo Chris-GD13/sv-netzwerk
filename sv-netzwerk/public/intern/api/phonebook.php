@@ -123,22 +123,35 @@ try {
         $pdo = db();
         $pdo->beginTransaction();
         try {
-            $stmt = $pdo->prepare('INSERT INTO phonebook_contacts(name, phone, phone_key, note, created_by, updated_by, created_at, updated_at) VALUES(:name,:phone,:phone_key,:note,:actor,:actor,NOW(),NOW()) ON DUPLICATE KEY UPDATE phone=VALUES(phone), note=IF(VALUES(note)<>\'\',VALUES(note),note), updated_by=VALUES(updated_by), updated_at=NOW()');
+            $find = $pdo->prepare('SELECT id, name, note FROM phonebook_contacts WHERE phone_key=:phone_key ORDER BY CHAR_LENGTH(name) DESC, id LIMIT 1');
+            $insert = $pdo->prepare('INSERT INTO phonebook_contacts(name, phone, phone_key, note, created_by, updated_by, created_at, updated_at) VALUES(:name,:phone,:phone_key,:note,:actor,:actor,NOW(),NOW())');
+            $update = $pdo->prepare('UPDATE phonebook_contacts SET name=:name, phone=:phone, note=:note, updated_by=:actor, updated_at=NOW() WHERE id=:id');
+            $inserted = 0;
+            $updated = 0;
             foreach ($contacts as $contact) {
-                $stmt->execute([
+                $find->execute([':phone_key' => $contact['phone_key']]);
+                $existing = $find->fetch();
+                if ($existing) {
+                    $note = $contact['note'] !== '' ? $contact['note'] : (string)($existing['note'] ?? '');
+                    $update->execute([':name' => (string)$existing['name'], ':phone' => $contact['phone'], ':note' => $note, ':actor' => $actor, ':id' => (int)$existing['id']]);
+                    $updated++;
+                    continue;
+                }
+                $insert->execute([
                     ':name' => $contact['name'],
                     ':phone' => $contact['phone'],
                     ':phone_key' => $contact['phone_key'],
                     ':note' => $contact['note'],
                     ':actor' => $actor,
                 ]);
+                $inserted++;
             }
             $pdo->commit();
         } catch (Throwable $error) {
             $pdo->rollBack();
             throw $error;
         }
-        apiJson(['ok' => true, 'imported' => count($contacts), 'skipped' => max(0, count($raw) - count($contacts))]);
+        apiJson(['ok' => true, 'imported' => count($contacts), 'inserted' => $inserted, 'updated' => $updated, 'skipped' => max(0, count($raw) - count($contacts))]);
     }
 
     apiError(404, 'Unbekannte Telefonbuch-Aktion.');

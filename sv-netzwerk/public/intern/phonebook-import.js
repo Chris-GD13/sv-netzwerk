@@ -4,7 +4,33 @@
   else root.SVNetPhonebookImport = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   const clean = value => String(value == null ? '' : value).trim();
+  const cleanNote = value => clean(value)
+    .replace(/\bms-outlook:\/\/\S+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const phoneKey = value => clean(value).replace(/\D/g, '').replace(/^00/, '');
   const unescapeVCard = value => clean(value).replace(/\\n/gi, ' ').replace(/\\([,;\\])/g, '$1');
+
+  function deduplicate(contacts) {
+    const rows = [];
+    const seen = new Map();
+    contacts.forEach(contact => {
+      const name = clean(contact?.name);
+      const phone = clean(contact?.phone);
+      const key = phoneKey(phone);
+      if (!name || key.length < 3) return;
+      const note = cleanNote(contact?.note);
+      if (!seen.has(key)) {
+        seen.set(key, rows.length);
+        rows.push({ name, phone, note });
+        return;
+      }
+      const existing = rows[seen.get(key)];
+      if (name.length > existing.name.length) existing.name = name;
+      if (!existing.note && note) existing.note = note;
+    });
+    return rows;
+  }
 
   function parseCsvLine(line, delimiter) {
     const cells = [];
@@ -35,11 +61,11 @@
     const noteIndex = indexOf(['notiz', 'notizen', 'note', 'notes', 'bemerkung', 'firma', 'company']);
     const hasHeader = phoneIndex >= 0 && (nameIndex >= 0 || firstIndex >= 0 || lastIndex >= 0);
     const body = hasHeader ? rows.slice(1) : rows;
-    return body.map(row => ({
+    return deduplicate(body.map(row => ({
       name: nameIndex >= 0 ? clean(row[nameIndex]) : clean([row[firstIndex], row[lastIndex]].filter(Boolean).join(' ')) || clean(row[0]),
       phone: phoneIndex >= 0 ? clean(row[phoneIndex]) : clean(row[1]),
-      note: noteIndex >= 0 ? clean(row[noteIndex]) : clean(row[2]),
-    })).filter(row => row.name && row.phone);
+      note: noteIndex >= 0 ? cleanNote(row[noteIndex]) : cleanNote(row[2]),
+    })));
   }
 
   function parseVCard(text) {
@@ -48,20 +74,19 @@
     const contacts = [];
     cards.forEach(card => {
       const lines = card.split(/\r?\n/);
-      const values = key => lines.filter(line => new RegExp(`^${key}(?:;[^:]*)?:`, 'i').test(line)).map(line => unescapeVCard(line.slice(line.indexOf(':') + 1)));
+      const values = key => lines.filter(line => new RegExp(`^(?:[^.:;]+\\.)?${key}(?:;[^:]*)?:`, 'i').test(line)).map(line => unescapeVCard(line.slice(line.indexOf(':') + 1)));
       const formatted = values('FN')[0] || '';
       const parts = (values('N')[0] || '').split(';');
       const name = formatted || clean([parts[1], parts[0]].filter(Boolean).join(' '));
-      const note = values('NOTE')[0] || values('ORG')[0] || '';
-      values('TEL').forEach(phone => { if (name && phone) contacts.push({ name, phone, note }); });
+      const note = cleanNote(values('NOTE')[0] || values('ORG')[0] || '');
+      values('TEL').forEach(value => { const phone = value.replace(/^tel:/i, ''); if (name && phone) contacts.push({ name, phone, note }); });
     });
-    return contacts;
+    return deduplicate(contacts);
   }
 
   function parse(text, filename) {
     return /\.vcf$/i.test(String(filename || '')) || /BEGIN:VCARD/i.test(String(text || '')) ? parseVCard(text) : parseCsv(text);
   }
 
-  return { parse, parseCsv, parseVCard };
+  return { parse, parseCsv, parseVCard, deduplicate, phoneKey, cleanNote };
 });
-
