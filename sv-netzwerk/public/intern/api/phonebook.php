@@ -40,7 +40,7 @@ function phonebookUserLabel(array $user): string
     return phonebookText($user['email'] ?? $user['full_name'] ?? '', 190);
 }
 
-function phonebookList(string $query): array
+function phonebookList(string $query, int $groupLimit = 500): array
 {
     $query = phonebookText($query, 120);
     if ($query === '') {
@@ -68,7 +68,8 @@ function phonebookList(string $query): array
         if ($groups[$key]['note'] === '' && (string)($row['note'] ?? '') !== '') $groups[$key]['note'] = (string)$row['note'];
         if (trim((string)$row['phone']) !== '') $groups[$key]['phones'][] = ['id'=>(int)$row['id'], 'type'=>phonebookPhoneType($row['phone_type'] ?? 'other'), 'number'=>(string)$row['phone']];
     }
-    return array_slice(array_values($groups), 0, 500);
+    $groups = array_values($groups);
+    return $groupLimit > 0 ? array_slice($groups, 0, $groupLimit) : $groups;
 }
 
 $action = (string)($_GET['action'] ?? 'list');
@@ -77,6 +78,17 @@ try {
     phonebookEnsureSchema();
     if ($action === 'list') {
         apiJson(['ok' => true, 'contacts' => phonebookList((string)($_GET['q'] ?? ''))]);
+    }
+
+    if ($action === 'export') {
+        $contacts = phonebookList('', 0);
+        apiJson([
+            'ok' => true,
+            'exported_at' => date(DATE_ATOM),
+            'group_count' => count($contacts),
+            'phone_count' => array_sum(array_map(static fn(array $contact): int => count($contact['phones'] ?? []), $contacts)),
+            'contacts' => $contacts,
+        ]);
     }
 
     if ($action === 'same_name_review') {
