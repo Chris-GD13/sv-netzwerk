@@ -7,7 +7,8 @@ const api=fs.readFileSync(path.join(root,'public/intern/api/work-center.php'),'u
 const layout=fs.readFileSync(path.join(root,'src/layouts/InternalLayout.astro'),'utf8');
 const assert=(condition,message)=>{if(!condition)throw new Error(message)};
 
-assert(layout.includes("'/intern/arbeitszentrale/'")&&layout.includes("label: 'Arbeitszentrale'"),'Arbeitszentrale fehlt im Portalmenü');
+assert(!layout.includes("label: 'Arbeitszentrale'")&&layout.includes("label: 'Tagescockpit'"),'Tagescockpit und Arbeitszentrale müssen als ein Menübereich erscheinen');
+assert(page.includes('currentPath="/intern/tagescockpit/"')&&page.includes('Tagescockpit Ansichten')&&page.includes('Arbeitsorganisation'),'Arbeitsorganisation muss als zweite Ansicht des Tagescockpits erscheinen');
 for(const label of ['Fristen & Wiedervorlagen','Globale Fallsuche','Qualitätsprüfung','Vor Ort','Controlling'])assert(page.includes(label),`${label} fehlt`);
 assert(api.includes('requireAuth()')&&api.includes('svnetSelectedProfile'),'API muss Anmeldung und ausgewähltes Profil erzwingen');
 assert(api.includes("WHERE profile=:p")&&api.includes("AND profile=:p"),'Wiedervorlagen müssen strikt nach Profil getrennt sein');

@@ -13,6 +13,7 @@ const assert=(condition,message)=>{if(!condition)throw new Error(message)};
 
 assert(layout.includes("'/intern/tagescockpit/'")&&layout.includes("label: 'Tagescockpit'"),'Tagescockpit fehlt als erster eigener Portalbereich');
 assert(layout.indexOf("'/intern/tagescockpit/'")<layout.indexOf("'/intern/versicherungsfaelle/'"),'Tagescockpit muss vor den Versicherungsfällen stehen');
+assert(cockpit.includes('Tagescockpit Ansichten')&&cockpit.includes('Arbeitsorganisation'),'Die Arbeitsorganisation muss im gemeinsamen Tagescockpit erreichbar sein');
 assert(client.includes("redirectTo('/intern/tagescockpit/')"),'Nach erfolgreicher Anmeldung muss das Tagescockpit starten');
 assert(!client.includes('INACTIVITY_MS')&&!client.includes("reason=inactivity"),'Das Portal darf angemeldete Benutzer nicht wegen Inaktivität automatisch abmelden');
 assert(client.includes("querySelector<HTMLButtonElement>('#header-logout')")&&client.includes('await apiLogout()'),'Die Abmeldung muss weiterhin bewusst über den manuellen Abmeldeknopf erfolgen');
