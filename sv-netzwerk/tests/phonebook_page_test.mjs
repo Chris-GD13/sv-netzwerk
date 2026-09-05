@@ -5,6 +5,7 @@ const page = readFileSync(new URL('../src/pages/intern/telefon/index.astro', imp
 const api = readFileSync(new URL('../public/intern/api/phonebook.php', import.meta.url), 'utf8');
 
 assert(page.includes('Telefonbuch pflegen und Kontakte importieren'), 'Telefonbuchpflege fehlt.');
+assert(page.includes('ph-setup-compact') && !page.includes('Einmalige Windows-Einrichtung für Annehmen und Auflegen</summary>'), 'Windows-Einrichtung muss platzsparend im Wählbereich stehen.');
 assert(page.includes('accept=".csv,.vcf'), 'CSV- und VCF-Import fehlt.');
 assert(page.includes("PHONEBOOK_API='/intern/api/phonebook.php'"), 'Telefonbuch-API ist nicht angebunden.');
 assert(page.includes("action=save") && page.includes("action=delete") && page.includes("action=import"), 'Pflegeaktionen sind unvollständig.');
