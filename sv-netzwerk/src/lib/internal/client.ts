@@ -194,55 +194,6 @@ export async function mountInternalPortal(root: HTMLElement) {
   await renderRoute(context);
   if (navigator.onLine) void syncDraftQueue(context);
 
-  // Inaktivitäts-Logout nach 60 Minuten; während aktiver Eingaben wird der Timer pausiert.
-  const INACTIVITY_MS = 60 * 60 * 1000;
-  let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
-
-  const isEditingActive = () => {
-    const activeElement = document.activeElement;
-    return !!activeElement && (
-      activeElement instanceof HTMLInputElement ||
-      activeElement instanceof HTMLTextAreaElement ||
-      activeElement instanceof HTMLSelectElement ||
-      activeElement instanceof HTMLElement && activeElement.isContentEditable
-    );
-  };
-
-  const resetInactivityTimer = () => {
-    if (!context.user) return;
-    if (inactivityTimer !== null) clearTimeout(inactivityTimer);
-    if (isEditingActive()) return;
-    inactivityTimer = setTimeout(async () => {
-      await apiLogout();
-      redirectTo('/intern/login/?reason=inactivity');
-    }, INACTIVITY_MS);
-  };
-
-  const activityEvents = ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'] as const;
-  const handleFocusIn = () => {
-    if (inactivityTimer !== null) clearTimeout(inactivityTimer);
-    inactivityTimer = null;
-  };
-  const handleFocusOut = () => {
-    if (!isEditingActive()) resetInactivityTimer();
-  };
-
-  activityEvents.forEach(ev =>
-    document.addEventListener(ev, resetInactivityTimer, { passive: true })
-  );
-  document.addEventListener('focusin', handleFocusIn);
-  document.addEventListener('focusout', handleFocusOut);
-  disposers.push(() => {
-    if (inactivityTimer !== null) clearTimeout(inactivityTimer);
-    activityEvents.forEach(ev =>
-      document.removeEventListener(ev, resetInactivityTimer)
-    );
-    document.removeEventListener('focusin', handleFocusIn);
-    document.removeEventListener('focusout', handleFocusOut);
-  });
-
-  // Starte Timer sofort
-  resetInactivityTimer();
 }
 
 function bindAuthListener(context: AppContext) {
@@ -703,14 +654,6 @@ function renderLogin(context: AppContext) {
       <div id="intern-login-message"></div>
     </div>
   `;
-
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('reason') === 'inactivity') {
-    const msg = context.root.querySelector<HTMLElement>('#intern-login-message');
-    if (msg) {
-      msg.innerHTML = '<div class="intern-alert intern-alert--warn">Sie wurden nach 10 Minuten Inaktivät automatisch abgemeldet.</div>';
-    }
-  }
 
   const form = context.root.querySelector<HTMLFormElement>('#intern-login-form');
   const message = context.root.querySelector<HTMLElement>('#intern-login-message');
