@@ -1,8 +1,9 @@
 param()
 
 $ErrorActionPreference = 'Stop'
+$installerVersion = '2026.09.05.1'
 
-Write-Host 'SV-Netzwerk Telefonverknuepfung wird eingerichtet ...' -ForegroundColor Cyan
+Write-Host ('SV-Netzwerk Telefonverknuepfung ' + $installerVersion + ' wird eingerichtet ...') -ForegroundColor Cyan
 
 $ctiPath = $null
 $running = Get-Process -Name 'cti_client' -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -81,6 +82,7 @@ $openCommand = '"' + $powershellPath + '" -NoProfile -ExecutionPolicy Bypass -Fi
 
 Write-Host ''
 Write-Host 'Einrichtung abgeschlossen.' -ForegroundColor Green
+Write-Host ('Version: ' + $installerVersion)
 Write-Host ('Verwendeter xtelsio CTI Client: ' + $ctiPath)
 Write-Host 'Die Telefonzentrale im SV-Netzwerk kann jetzt ueber xtelsio waehlen, Anrufe annehmen und beenden.'
 Read-Host 'Mit Eingabetaste schliessen'

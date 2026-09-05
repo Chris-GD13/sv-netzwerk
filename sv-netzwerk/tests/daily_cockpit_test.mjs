@@ -27,6 +27,7 @@ assert(cockpit.includes('svnet-xtelsio://dial?number=${encodeURIComponent(clean)
 assert(phone.includes('svnet-xtelsio://dial?number=${encodeURIComponent(clean)}')&&!phone.includes("'callto'"),'Die Telefonzentrale darf beim Wählen nicht die Windows-Zuordnung und damit Teams verwenden');
 assert(cases.includes('svnet-xtelsio://dial?number=${encodeURIComponent(number)}')&&!cases.includes("'callto'"),'Auch fallbezogene Rufnummern müssen direkt an xtelsio übergeben werden');
 assert(phoneInstaller.includes("'dial'   {")&&phoneInstaller.includes("$commandArguments = @('/dial', $phoneNumber)")&&phoneInstaller.includes("'^\\+?[0-9*#]+$'"),'Die Windows-Verknüpfung muss Rufnummern geprüft an den xtelsio-Dial-Befehl weiterreichen');
+assert(phoneInstaller.includes("$installerVersion = '2026.09.05.1'")&&phone.includes('vor dem 05.09.2026 installiert'),'Die Telefonzentrale muss die notwendige Neuinstallation der erweiterten Verknüpfung eindeutig ausweisen');
 assert(cockpit.includes('phoneContacts(meta)')&&cockpit.includes('Kein aktiver Schadenfall.'),'Kontakte des aktiven Schadenfalls müssen im Telefonbereich erscheinen');
 assert(cockpit.includes('revenue-summary-v2.php?action=access'),'Cockpit muss den rollenbezogenen Abrechnungsstand lesen');
 assert(cockpit.includes('id="dc-quick-settlement"')&&cockpit.includes("hidden=data.show_settlement_link!==true"),'Abrechnungen dürfen im Cockpit nur mit bestätigter Berechtigung erscheinen');
