@@ -40,7 +40,7 @@ function phonebookUserLabel(array $user): string
     return phonebookText($user['email'] ?? $user['full_name'] ?? '', 190);
 }
 
-function phonebookList(string $query, int $groupLimit = 500): array
+function phonebookList(string $query, int $groupLimit = 0): array
 {
     $query = phonebookText($query, 120);
     if ($query === '') {
@@ -77,7 +77,23 @@ $action = (string)($_GET['action'] ?? 'list');
 try {
     phonebookEnsureSchema();
     if ($action === 'list') {
-        apiJson(['ok' => true, 'contacts' => phonebookList((string)($_GET['q'] ?? ''))]);
+        $allContacts = phonebookList((string)($_GET['q'] ?? ''), 0);
+        $perPage = min(100, max(25, (int)($_GET['per_page'] ?? 100)));
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $total = count($allContacts);
+        $pages = max(1, (int)ceil($total / $perPage));
+        if ($page > $pages) {
+            $page = $pages;
+        }
+        $offset = ($page - 1) * $perPage;
+        apiJson([
+            'ok' => true,
+            'contacts' => array_slice($allContacts, $offset, $perPage),
+            'total' => $total,
+            'page' => $page,
+            'per_page' => $perPage,
+            'pages' => $pages,
+        ]);
     }
 
     if ($action === 'export') {
