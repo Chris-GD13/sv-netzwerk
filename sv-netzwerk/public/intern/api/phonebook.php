@@ -312,6 +312,46 @@ try {
         apiJson(['ok' => true, 'imported' => count($contacts), 'inserted' => $inserted, 'updated' => $updated, 'skipped' => max(0, count($raw) - count($contacts))]);
     }
 
+    if ($action === 'replace') {
+        if (!in_array((string)($user['role'] ?? ''), ['administrator', 'projektleiter'], true)) {
+            apiError(403, 'Der vollständige Telefonbuch-Abgleich ist nur für Administration und Projektleitung verfügbar.');
+        }
+        if (($body['confirm_replace'] ?? false) !== true) {
+            apiError(400, 'Der vollständige Telefonbuch-Abgleich wurde nicht bestätigt.');
+        }
+        $raw = is_array($body['contacts'] ?? null) ? $body['contacts'] : [];
+        if (count($raw) > 2000) {
+            apiError(400, 'Bitte höchstens 2.000 bereinigte Rufnummerneinträge gleichzeitig abgleichen.');
+        }
+        $contacts = phonebookContacts($raw);
+        if ($contacts === [] || count($contacts) !== count($raw)) {
+            apiError(400, 'Der Abgleich wurde abgebrochen: Mindestens ein Kontakt ist unvollständig oder doppelt.');
+        }
+        $pdo = db();
+        $pdo->beginTransaction();
+        try {
+            $previous = (int)$pdo->query('SELECT COUNT(*) FROM phonebook_contacts')->fetchColumn();
+            $pdo->exec('DELETE FROM phonebook_contacts');
+            $insert = $pdo->prepare('INSERT INTO phonebook_contacts(name, phone, phone_key, phone_type, email, note, created_by, updated_by, created_at, updated_at) VALUES(:name,:phone,:phone_key,:phone_type,:email,:note,:actor,:actor,NOW(),NOW())');
+            foreach ($contacts as $contact) {
+                $insert->execute([
+                    ':name' => $contact['name'],
+                    ':phone' => $contact['phone'],
+                    ':phone_key' => $contact['phone_key'],
+                    ':phone_type' => $contact['phone_type'],
+                    ':email' => $contact['email'],
+                    ':note' => $contact['note'],
+                    ':actor' => $actor,
+                ]);
+            }
+            $pdo->commit();
+        } catch (Throwable $error) {
+            $pdo->rollBack();
+            throw $error;
+        }
+        apiJson(['ok' => true, 'previous' => $previous, 'imported' => count($contacts)]);
+    }
+
     apiError(404, 'Unbekannte Telefonbuch-Aktion.');
 } catch (PDOException $error) {
     if ((string)$error->getCode() === '23000') {

@@ -7,6 +7,7 @@ const api = readFileSync(new URL('../public/intern/api/phonebook.php', import.me
 assert(page.includes('Telefonbuch pflegen und Kontakte importieren'), 'Telefonbuchpflege fehlt.');
 assert(page.includes('ph-setup-compact') && !page.includes('Einmalige Windows-Einrichtung für Annehmen und Auflegen</summary>'), 'Windows-Einrichtung muss platzsparend im Wählbereich stehen.');
 assert(page.includes('accept=".csv,.vcf'), 'CSV- und VCF-Import fehlt.');
+assert(page.includes('ph-contact-replace') && page.includes('action=replace') && page.includes('confirm_replace:true'), 'Atomarer Portalabgleich fehlt.');
 assert(page.includes('Apple/iCloud') && page.includes('chunkSize=500'), 'Apple-Hinweis oder stapelweiser Großimport fehlt.');
 assert(page.includes("PHONEBOOK_API='/intern/api/phonebook.php'"), 'Telefonbuch-API ist nicht angebunden.');
 assert(page.includes("action=save") && page.includes("action=delete") && page.includes("action=import"), 'Pflegeaktionen sind unvollständig.');
@@ -21,6 +22,7 @@ assert(api.includes("WHERE phone_key=:phone_key AND name=:name ORDER BY id LIMIT
 assert(api.includes("$action === 'list'") && api.includes("$action === 'save'") && api.includes("$action === 'delete'") && api.includes("$action === 'import'"), 'API-Aktionen sind unvollständig.');
 assert(api.includes("$action === 'cleanup_unwanted'") && api.includes("andersson|\\bab\\b|per\\s*mail"), 'Serverseitige Schrottkontakt-Bereinigung fehlt.');
 assert(api.includes("$action === 'delete_many'") && api.includes('count($ids) > 500'), 'Begrenzte Sammellöschung fehlt.');
+assert(api.includes("$action === 'replace'") && api.includes("$pdo->exec('DELETE FROM phonebook_contacts')") && api.includes('$pdo->beginTransaction()'), 'Transaktionaler Portalabgleich fehlt.');
 assert(api.includes("$action === 'cleanup_duplicates'") && api.includes('phonebookPhoneKey'), 'Serverseitige Dublettenbereinigung fehlt.');
 assert(api.includes("$action === 'same_name_review'") && api.includes("count($contact['phones'] ?? []) > 1"), 'API-Prüfliste für gleiche Namen mit unterschiedlichen Nummern fehlt.');
 assert(page.includes('ph-contact-business') && page.includes('ph-contact-private') && page.includes('ph-contact-mobile') && page.includes('ph-contact-email'), 'Strukturierte Kontaktfelder fehlen.');
