@@ -41,9 +41,10 @@ function phonebookList(string $query): array
     } else {
         $phoneKey = phonebookPhoneKey($query);
         $stmt = db()->prepare("SELECT id, name, phone, note, updated_at FROM phonebook_contacts
-            WHERE name LIKE :query OR phone LIKE :query OR note LIKE :query" . ($phoneKey !== '' ? ' OR phone_key LIKE :phone_key' : '') . "
+            WHERE name LIKE :query_name OR phone LIKE :query_phone OR note LIKE :query_note" . ($phoneKey !== '' ? ' OR phone_key LIKE :phone_key' : '') . "
             ORDER BY name, phone LIMIT 500");
-        $params = [':query' => '%' . $query . '%'];
+        $like = '%' . $query . '%';
+        $params = [':query_name' => $like, ':query_phone' => $like, ':query_note' => $like];
         if ($phoneKey !== '') {
             $params[':phone_key'] = '%' . $phoneKey . '%';
         }

@@ -224,7 +224,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
         }
       });
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=20260905-3', { scope: '/intern/', updateViaCache: 'none' }).then((registration) => registration.update()).catch(() => {}));
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=20260905-4', { scope: '/intern/', updateViaCache: 'none' }).then((registration) => registration.update()).catch(() => {}));
       }
       const revenueSummary = document.getElementById('intern-revenue-summary');
       const settlementLink = document.getElementById('intern-settlement-link');

@@ -36,6 +36,6 @@ assert(cockpit.includes('id="dc-quick-settlement"')&&cockpit.includes("hidden=da
 assert(!cockpit.includes("method:'POST'")&&!cockpit.includes('method: "POST"'),'Cockpit darf beim Laden keine schreibende Aktion ausführen');
 assert(cockpit.includes("sessionStorage.setItem('svnet-case'")&&cockpit.includes("location.assign('/intern/versicherungsfaelle/')"),'Fallübergabe muss in den bestehenden Fallbereich führen');
 assert(cockpit.includes('data-system="drive"')&&cockpit.includes('data-system="outlook"')&&cockpit.includes('data-system="claims"')&&cockpit.includes('data-system="revenue"'),'Alle vier Systemampeln müssen vorhanden sein');
-assert(layout.includes("/sw.js?v=20260905-3")&&sw.includes("CACHE_VERSION = '20260905-3'"),'Portalcache muss für die speicherbare Kurzwahl eindeutig erneuert werden');
+assert(layout.includes("/sw.js?v=20260905-4")&&sw.includes("CACHE_VERSION = '20260905-4'"),'Portalcache muss für die speicherbare Kurzwahl eindeutig erneuert werden');
 
 console.log('daily_cockpit_test: ok');
