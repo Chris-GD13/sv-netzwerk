@@ -34,7 +34,7 @@ jobs:
         run: npm run build
 
       - name: Zielseite prüfen
-        run: test -f dist/intern/fensterpruefung-bonn/massenaenderung/index.html
+        run: test -f dist/intern/fensterpruefung-bonn/massenaenderung/index.php
 
       - name: Python SFTP-Client installieren
         run: python3 -m pip install --disable-pip-version-check --quiet paramiko
@@ -50,8 +50,8 @@ jobs:
           import os
           from pathlib import Path
           import paramiko
-          local = Path('dist/intern/fensterpruefung-bonn/massenaenderung/index.html')
-          remote = '/sv-netzwerk/intern/fensterpruefung-bonn/massenaenderung/index.html'
+          local = Path('dist/intern/fensterpruefung-bonn/massenaenderung/index.php')
+          remote = '/sv-netzwerk/intern/fensterpruefung-bonn/massenaenderung/index.php'
           host=os.environ['SFTP_HOST']; user=os.environ['SFTP_USERNAME']; password=os.environ['SFTP_PASSWORD']; port=int(os.environ.get('SFTP_PORT') or '22')
           transport=paramiko.Transport((host,port)); transport.banner_timeout=15; transport.auth_timeout=15; transport.connect(username=user,password=password)
           sftp=paramiko.SFTPClient.from_transport(transport); sftp.get_channel().settimeout(20)

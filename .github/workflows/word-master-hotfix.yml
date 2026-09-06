@@ -32,8 +32,8 @@ jobs:
       - run: npm run build
       - name: Zielartefakte prüfen
         run: |
-          test -f dist/intern/fensterpruefung-bonn/word-master/index.html
-          test -f dist/intern/fensterpruefung-bonn/gutachten/index.html
+          test -f dist/intern/fensterpruefung-bonn/word-master/index.php
+          test -f dist/intern/fensterpruefung-bonn/gutachten/index.php
           test -f dist/intern/api/word-master-import.php
           test -f dist/intern/api/photo-sequence-repair.php
           test -f dist/intern/api/sharepoint-report-source.php
@@ -52,8 +52,8 @@ jobs:
           import paramiko
           host=os.environ['SFTP_HOST']; user=os.environ['SFTP_USERNAME']; password=os.environ['SFTP_PASSWORD']; port=int(os.environ.get('SFTP_PORT') or '22')
           files=[
-            (Path('dist/intern/fensterpruefung-bonn/word-master/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/word-master/index.html'),
-            (Path('dist/intern/fensterpruefung-bonn/gutachten/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/gutachten/index.html'),
+            (Path('dist/intern/fensterpruefung-bonn/word-master/index.php'),'/sv-netzwerk/intern/fensterpruefung-bonn/word-master/index.php'),
+            (Path('dist/intern/fensterpruefung-bonn/gutachten/index.php'),'/sv-netzwerk/intern/fensterpruefung-bonn/gutachten/index.php'),
             (Path('dist/intern/api/word-master-import.php'),'/sv-netzwerk/intern/api/word-master-import.php'),
             (Path('dist/intern/api/photo-sequence-repair.php'),'/sv-netzwerk/intern/api/photo-sequence-repair.php'),
             (Path('dist/intern/api/sharepoint-report-source.php'),'/sv-netzwerk/intern/api/sharepoint-report-source.php'),

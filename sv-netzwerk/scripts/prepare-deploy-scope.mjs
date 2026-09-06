@@ -29,7 +29,7 @@ const copyTree = (relative, filter = () => true) => {
 const referencedBuildFiles = (scanRoot) => {
   const references = new Set();
   const scanFile = (absolute) => {
-    if (!/\.(?:html|css|js)$/i.test(absolute)) return;
+    if (!/\.(?:html|php|css|js)$/i.test(absolute)) return;
     const text = fs.readFileSync(absolute, 'utf8');
     for (const match of text.matchAll(/["'(]\/((?:_astro|assets)\/[^"')?#\s]+)/g)) references.add(match[1]);
   };

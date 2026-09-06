@@ -31,7 +31,7 @@ jobs:
         run: npm run build
       - name: Zielartefakte prüfen
         run: |
-          test -f dist/intern/fensterpruefung-bonn/massenaenderung/index.html
+          test -f dist/intern/fensterpruefung-bonn/massenaenderung/index.php
           test -f public/intern/api/bulk-update.php
       - name: Python SFTP-Client installieren
         run: python3 -m pip install --disable-pip-version-check --quiet paramiko
@@ -48,7 +48,7 @@ jobs:
           import paramiko
           host=os.environ['SFTP_HOST']; user=os.environ['SFTP_USERNAME']; password=os.environ['SFTP_PASSWORD']; port=int(os.environ.get('SFTP_PORT') or '22')
           files=[
-            (Path('dist/intern/fensterpruefung-bonn/massenaenderung/index.html'), '/sv-netzwerk/intern/fensterpruefung-bonn/massenaenderung/index.html'),
+            (Path('dist/intern/fensterpruefung-bonn/massenaenderung/index.php'), '/sv-netzwerk/intern/fensterpruefung-bonn/massenaenderung/index.php'),
             (Path('public/intern/api/bulk-update.php'), '/sv-netzwerk/intern/api/bulk-update.php'),
           ]
           t=paramiko.Transport((host,port)); t.banner_timeout=15; t.auth_timeout=15; t.connect(username=user,password=password)

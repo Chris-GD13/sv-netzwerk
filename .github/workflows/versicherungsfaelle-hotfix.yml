@@ -25,13 +25,13 @@ jobs:
         run: npm run build
       - name: Zielartefakte pruefen
         run: |
-          test -f dist/intern/versicherungsfaelle/index.html
-          test -f dist/intern/versicherungsfaelle/sv-gf/index.html
+          test -f dist/intern/versicherungsfaelle/index.php
+          test -f dist/intern/versicherungsfaelle/sv-gf/index.php
           test -f dist/intern/api/google-drive-sync.php
           test -f dist/intern/api/google-drive-oauth.php
-          test -f dist/intern/index.html
-          test -f dist/intern/kalkulation/index.html
-          test -f dist/intern/fensterpruefung-bonn/index.html
+          test -f dist/intern/index.php
+          test -f dist/intern/kalkulation/index.php
+          test -f dist/intern/fensterpruefung-bonn/index.php
       - name: Python SFTP installieren
         run: python3 -m pip install --disable-pip-version-check --quiet paramiko
       - name: Versicherungsportal und Navigation nach IONOS uebertragen
@@ -53,11 +53,11 @@ jobs:
           files=[
             (Path('dist/intern/api/google-drive-sync.php'),'/sv-netzwerk/intern/api/google-drive-sync.php'),
             (Path('dist/intern/api/google-drive-oauth.php'),'/sv-netzwerk/intern/api/google-drive-oauth.php'),
-            (Path('dist/intern/index.html'),'/sv-netzwerk/intern/index.html'),
-            (Path('dist/intern/fensterpruefung-bonn/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/index.html'),
-            (Path('dist/intern/fensterpruefung-bonn/fenster/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/fenster/index.html'),
-            (Path('dist/intern/fensterpruefung-bonn/auswertung/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/auswertung/index.html'),
-            (Path('dist/intern/fensterpruefung-bonn/export/index.html'),'/sv-netzwerk/intern/fensterpruefung-bonn/export/index.html'),
+            (Path('dist/intern/index.php'),'/sv-netzwerk/intern/index.php'),
+            (Path('dist/intern/fensterpruefung-bonn/index.php'),'/sv-netzwerk/intern/fensterpruefung-bonn/index.php'),
+            (Path('dist/intern/fensterpruefung-bonn/fenster/index.php'),'/sv-netzwerk/intern/fensterpruefung-bonn/fenster/index.php'),
+            (Path('dist/intern/fensterpruefung-bonn/auswertung/index.php'),'/sv-netzwerk/intern/fensterpruefung-bonn/auswertung/index.php'),
+            (Path('dist/intern/fensterpruefung-bonn/export/index.php'),'/sv-netzwerk/intern/fensterpruefung-bonn/export/index.php'),
           ]
           t=paramiko.Transport((host,port)); t.banner_timeout=15; t.auth_timeout=15; t.connect(username=user,password=password)
           s=paramiko.SFTPClient.from_transport(t); s.get_channel().settimeout(20)

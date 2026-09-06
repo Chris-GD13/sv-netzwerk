@@ -56,7 +56,7 @@ jobs:
       - name: Portal bauen und PHP prüfen
         run: |
           npm run build
-          find public/intern/api -name '*.php' -print0 | xargs -0 -n1 php -l
+          find public/intern -name '*.php' -print0 | xargs -0 -n1 php -l
 
       - name: Ausschließlich Portaldateien vorbereiten
         run: |
@@ -64,7 +64,11 @@ jobs:
           test -f dist/.htaccess
           test -f dist/.well-known/.htaccess
           test -f deploy-portal/.well-known/oauth-protected-resource/intern/mcp/index.php
-          test -f deploy-portal/intern/versicherungsfaelle/index.html
+          test -f deploy-portal/intern/versicherungsfaelle/index.php
+          test -f deploy-portal/intern/auth_check.php
+          test -f deploy-portal/intern/login/index.html
+          test "$(head -n 1 deploy-portal/intern/versicherungsfaelle/index.php)" = "<?php require_once \$_SERVER['DOCUMENT_ROOT'] . '/intern/auth_check.php'; ?>"
+          test -z "$(find deploy-portal/intern -name index.html ! -path '*/login/index.html' -print -quit)"
           test -f deploy-portal/intern/api/gf-ai-generate.php
           test -f deploy-portal/intern/deploy-version.txt
           test ! -f deploy-portal/index.html

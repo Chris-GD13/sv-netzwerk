@@ -1,0 +1,47 @@
+---
+import SEO from '../components/SEO.astro';
+import logoSrc from '../assets/sv-netzwerk-logo-portal.svg';
+import '../styles/global.css';
+import '../styles/internal-portal.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const props = Astro.props;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071a2e" />
+    <meta name="color-scheme" content="light" />
+    <SEO {...props} noindex={true} robotsContent="noindex,nofollow" />
+  </head>
+  <body class="intern-body">
+    <main class="intern-login-page" id="intern-main">
+      <a class="intern-login-page__brand" href="/" aria-label="SV-Netzwerk – Startseite">
+        <img src={logoSrc.src} alt="SV-Netzwerk" width="220" height="46" />
+      </a>
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style>
+  .intern-login-page {
+    display: grid;
+    min-height: 100vh;
+    place-content: center;
+    gap: 22px;
+    padding: 24px;
+    background: #f4f5f6;
+  }
+
+  .intern-login-page__brand {
+    justify-self: center;
+  }
+</style>

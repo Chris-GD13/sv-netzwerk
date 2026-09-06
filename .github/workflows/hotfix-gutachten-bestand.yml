@@ -35,8 +35,8 @@ jobs:
 
       - name: Zielseiten prüfen
         run: |
-          test -f dist/intern/fensterpruefung-bonn/gutachten/index.html
-          test -f dist/intern/fensterpruefung-bonn/bestand-pruefen/index.html
+          test -f dist/intern/fensterpruefung-bonn/gutachten/index.php
+          test -f dist/intern/fensterpruefung-bonn/bestand-pruefen/index.php
 
       - name: Python SFTP-Client installieren
         run: python3 -m pip install --disable-pip-version-check --quiet paramiko
@@ -58,8 +58,8 @@ jobs:
           password = os.environ['SFTP_PASSWORD']
           port = int(os.environ.get('SFTP_PORT') or '22')
           files = [
-              (Path('dist/intern/fensterpruefung-bonn/gutachten/index.html'), '/sv-netzwerk/intern/fensterpruefung-bonn/gutachten/index.html'),
-              (Path('dist/intern/fensterpruefung-bonn/bestand-pruefen/index.html'), '/sv-netzwerk/intern/fensterpruefung-bonn/bestand-pruefen/index.html'),
+              (Path('dist/intern/fensterpruefung-bonn/gutachten/index.php'), '/sv-netzwerk/intern/fensterpruefung-bonn/gutachten/index.php'),
+              (Path('dist/intern/fensterpruefung-bonn/bestand-pruefen/index.php'), '/sv-netzwerk/intern/fensterpruefung-bonn/bestand-pruefen/index.php'),
           ]
 
           transport = paramiko.Transport((host, port))

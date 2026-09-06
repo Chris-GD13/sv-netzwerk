@@ -40,7 +40,7 @@ async function collectHtml(directory) {
   for (const entry of entries) {
     const absolute = path.join(directory, entry.name);
     if (entry.isDirectory()) files.push(...await collectHtml(absolute));
-    if (entry.isFile() && entry.name.endsWith('.html')) files.push(absolute);
+    if (entry.isFile() && (entry.name.endsWith('.html') || entry.name === 'index.php')) files.push(absolute);
   }
   return files;
 }
