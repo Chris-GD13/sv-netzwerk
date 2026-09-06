@@ -46,7 +46,7 @@ export function calculateBuildingValuation(input = {}) {
   const specialValue = Math.max(0, finite(input.specialValue));
   const outbuildingValue = Math.max(0, finite(input.outbuildingValue));
   const factor = Math.max(0, finite(input.factor));
-  const selected = Array.isArray(input.surcharges) ? input.surcharges : [];
+  const selected = [...new Set(Array.isArray(input.surcharges) ? input.surcharges : [])];
   const surcharge = selected.reduce((sum, key) => sum + (SURCHARGES[key] || 0), 0);
   if (!rate) return { valid: false, error: 'Bitte Keller, Dachform und Geschosszahl vollständig auswählen.' };
   if (!area) return { valid: false, error: 'Bitte die Wohn-/Gewerbefläche eingeben.' };
