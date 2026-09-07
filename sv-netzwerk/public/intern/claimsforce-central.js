@@ -12,7 +12,8 @@
     const main=document.querySelector('.vf-app'),systemHome=document.getElementById('vf-system-home');
     if(main){
       const anchor=systemHome||null;
-      [analysisGrid,claimsCard].forEach(card=>{
+      const movableCards=claimsCard.closest('.vf-import-grid')?[analysisGrid]:[analysisGrid,claimsCard];
+      movableCards.forEach(card=>{
         if(!card)return;
         if(anchor)main.insertBefore(card,anchor);
         else main.appendChild(card);
