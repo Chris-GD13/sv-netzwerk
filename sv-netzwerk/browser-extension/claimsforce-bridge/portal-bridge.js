@@ -221,10 +221,20 @@ window.addEventListener('message', event => {
     try { profile = profileKey(event.data.profile); }
     catch (error) { window.postMessage({ type: 'SVNET_REKON_IMPORT_ERROR', error: error.message }, location.origin); return; }
     connectKeepalive();
-    chrome.runtime.sendMessage({ type: 'START_REKON_IMPORT', profile, runId: event.data.runId || crypto.randomUUID() }).then(response => {
+    window.postMessage({ type: 'SVNET_REKON_IMPORT_PROGRESS', text: 'Startsignal wurde an die Browser-Brücke übergeben …', current: 0, total: 0 }, location.origin);
+    let startTimer = 0;
+    const startRequest = chrome.runtime.sendMessage({ type: 'START_REKON_IMPORT', profile, runId: event.data.runId || crypto.randomUUID() });
+    Promise.race([
+      startRequest,
+      new Promise((_, reject) => { startTimer = setTimeout(() => reject(new Error('Die Browser-Brücke hat den Rekon-Start nicht innerhalb von 10 Sekunden bestätigt.')), 10000); })
+    ]).then(response => {
       if (!response?.ok) window.postMessage({ type: 'SVNET_REKON_IMPORT_ERROR', error: response?.error }, location.origin);
       else window.postMessage({ type: 'SVNET_REKON_IMPORT_ACCEPTED', runId: response.runId }, location.origin);
-    }).catch(error => window.postMessage({ type: 'SVNET_REKON_IMPORT_ERROR', error: error.message }, location.origin));
+    }).catch(error => {
+      const invalid = invalidExtensionContext(error);
+      if (invalid) reportInvalidExtensionContext();
+      window.postMessage({ type: 'SVNET_REKON_IMPORT_ERROR', error: invalid ? CONTEXT_RELOAD_MESSAGE : error.message }, location.origin);
+    }).finally(() => clearTimeout(startTimer));
   }
   if (event.data?.type === 'SVNET_CLAIMS_OPEN_OPTIONS') {
     try { chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS', profile: profileKey(event.data.profile) }); }

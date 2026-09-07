@@ -584,7 +584,7 @@ async function rekonSession(profile, portalTabId) {
   return { tab, token };
 }
 
-async function readRekonTasks(token) {
+async function readRekonTasks(token, portalTabId) {
   const all = [];
   for (let skip = 0, total = 1; skip < total; skip += 100) {
     const data = await rekonGraph(REKON_TASKS_QUERY, {
@@ -596,6 +596,7 @@ async function readRekonTasks(token) {
     const page = data.tasks?.data || [];
     total = Number(data.tasks?.paginatorInfo?.total || page.length);
     all.push(...page);
+    await rekonProgress(portalTabId, `Rekon-Auftragsliste wird eingelesen (${Math.min(all.length, total)} von ${total}) …`, Math.min(all.length, total), total);
     if (!page.length) break;
   }
   return all.filter(isActiveRekonTask);
@@ -617,7 +618,7 @@ async function runRekonImport(run) {
   const profile = rekonProfileKey(run.profile), portalTabId = Number(run.portalTabId || 0);
   await rekonProgress(portalTabId, 'Rekon-Import wird im Microsoft Edge vorbereitet …');
   const { token } = await rekonSession(profile, portalTabId);
-  const tasks = await readRekonTasks(token);
+  const tasks = await readRekonTasks(token, portalTabId);
   if (!tasks.length) throw new Error('Rekon hat keine aktiven Aufträge geliefert. Der Import wurde ohne Änderungen beendet.');
   const wrongOwner = tasks.find(task => !ownerMatchesRekonProfile(task?.owner?.name, profile));
   if (wrongOwner) throw new Error(`Rekon-Auftrag ${wrongOwner.id} gehört zu „${wrongOwner?.owner?.name || 'unbekannt'}“ und nicht zum ausgewählten Zielprofil.`);
@@ -680,7 +681,7 @@ async function runRekonImport(run) {
   return { tasks: tasks.length, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
 }
 
-async function startRekonImport(sender, message) {
+function startRekonImport(sender, message) {
   const portalTabId = sender.tab?.id;
   if (!portalTabId) return { ok: false, error: 'Portal-Registerkarte fehlt.' };
   const run = { runId: message.runId || crypto.randomUUID(), profile: rekonProfileKey(message.profile), portalTabId, startedAt: new Date().toISOString() };
@@ -762,7 +763,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
   if (message?.type === 'START_REKON_IMPORT' && sender.tab?.id) {
-    startRekonImport(sender, message).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
-    return true;
+    try { sendResponse(startRekonImport(sender, message)); }
+    catch (error) { sendResponse({ ok: false, error: error.message }); }
+    return;
   }
 });

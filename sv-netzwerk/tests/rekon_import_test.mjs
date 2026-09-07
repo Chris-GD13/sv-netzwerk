@@ -27,7 +27,7 @@ assert.equal(mapped.rekon_task_id, '270330');
 assert.equal(mapped.schaden_strasse, 'Andreas-Hofer-Str. 3');
 assert.equal(mapped.vn_objekt, 'WEG Andreas-Hofer-Str. 3/1');
 
-assert.equal(manifest.version, '1.4.4');
+assert.equal(manifest.version, '1.4.5');
 assert(manifest.host_permissions.includes('https://www.rekoninterschaden-portal.de/*'));
 assert(manifest.host_permissions.includes('https://api.www.rekoninterschaden-portal.de/*'));
 assert(manifest.content_scripts.some(entry => entry.js?.includes('rekon-main.js') && entry.world === 'MAIN'));
@@ -36,12 +36,15 @@ assert(worker.includes('REKON_TASKS_QUERY') && worker.includes('REKON_FILES_QUER
 assert(worker.includes("filter(isActiveRekonTask)"), 'Nur aktive Rekon-Fälle werden verarbeitet');
 assert(worker.includes("column: 'REMOVED_AT', operator: 'IS_NULL'") && worker.includes("column: 'ID', order: 'DESC'"), 'Die Aufgabenliste verwendet exakt Rekons Nicht-entfernt-Filter und ID-Sortierung');
 assert(worker.includes("payload.errors?.[0]?.message"), 'GraphQL-Fehler werden konkret und begrenzt ausgegeben');
+assert(worker.includes('Rekon-Auftragsliste wird eingelesen') && worker.includes('readRekonTasks(token, portalTabId)'), 'Das seitenweise Einlesen der Auftragsliste wird sichtbar gemeldet');
+assert(worker.includes('sendResponse(startRekonImport(sender, message))'), 'Der Rekon-Start wird synchron und ohne offenen Nachrichtenkanal bestätigt');
 assert(worker.includes("ownerMatchesRekonProfile"), 'Rekon-Konto und Portalziel werden abgeglichen');
 assert(worker.includes("!session?.identity") && worker.includes("while ((!token || !session?.identity)"), 'Die sichtbare Rekon-Profilkennung wird nach dem Seitenaufbau abgewartet');
 assert(worker.includes("Mail_Rekon-Nachricht_"), 'E-Mails werden als Korrespondenz archiviert');
 assert(worker.includes("for (const attachment of email.attachments || [])"), 'E-Mail-Anhänge werden separat übertragen');
 assert(worker.includes("sourceType: 'rekon'"), 'Rekon-Metadaten bleiben von ClaimsForce getrennt');
 assert(portal.includes("message.sourceType === 'rekon'"));
+assert(portal.includes('Startsignal wurde an die Browser-Brücke übergeben') && portal.includes('nicht innerhalb von 10 Sekunden bestätigt'), 'Startübergabe und Start-Timeout sind im Portal sichtbar');
 assert(page.includes('Aktive Aufträge aus Rekon einlesen'));
 assert(page.includes('SVNET_REKON_IMPORT_START'));
 
