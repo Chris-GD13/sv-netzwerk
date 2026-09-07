@@ -299,6 +299,10 @@ if($action==='scheduled_rekon'){
 $user=requireAuth();
 if($action==='access'){
     if(!rsVisible($user))apiJson(['ok'=>true,'visible'=>false]);
+    if(svnetUserProfile($user)==='marc'){
+        $claims=rsStored('claims_marc')??rsMarcEmpty();$rekon=rsStored('rekon_marc')??rsRekonEmpty('rekon_marc');$claimsCurrent=is_array($claims['current']??null)?$claims['current']:[];$rekonCurrent=is_array($rekon['current']??null)?$rekon['current']:[];
+        apiJson(['ok'=>true,'visible'=>true,'show_summary'=>true,'show_settlement_link'=>true,'default_profile'=>'claims_marc','allowed_profiles'=>rsAllowedProfiles($user),'summary_type'=>'marc','claims'=>['period'=>(string)($claimsCurrent['period']??date('Y')),'net'=>(float)($claimsCurrent['income_net']??0),'gross'=>(float)($claimsCurrent['income_gross']??0),'updated_at'=>(string)($claims['source_updated_at']??'–')],'rekon'=>['period'=>(string)($rekonCurrent['period']??date('Y')),'net'=>(float)($rekonCurrent['payout_net']??0),'gross'=>(float)($rekonCurrent['payout_gross']??0),'updated_at'=>(string)($rekon['source_updated_at']??'–')]]);
+    }
     if(svnetUserProfile($user)==='holger'){
         $claims=rsStored('holger')??rsHolgerEmpty();$rekon=rsStored('rekon_holger')??rsRekonEmpty('rekon_holger');$claimsCurrent=is_array($claims['current']??null)?$claims['current']:[];$rekonCurrent=is_array($rekon['current']??null)?$rekon['current']:[];
         apiJson(['ok'=>true,'visible'=>true,'show_summary'=>true,'show_settlement_link'=>true,'default_profile'=>'holger','allowed_profiles'=>rsAllowedProfiles($user),'summary_type'=>'holger','claims'=>['period'=>(string)($claimsCurrent['period']??date('Y')),'net'=>(float)($claimsCurrent['income_net']??0),'gross'=>(float)($claimsCurrent['income_gross']??0),'updated_at'=>(string)($claims['source_updated_at']??'–')],'rekon'=>['period'=>(string)($rekonCurrent['period']??date('Y')),'net'=>(float)($rekonCurrent['payout_net']??0),'gross'=>(float)($rekonCurrent['payout_gross']??0),'updated_at'=>(string)($rekon['source_updated_at']??'–')]]);

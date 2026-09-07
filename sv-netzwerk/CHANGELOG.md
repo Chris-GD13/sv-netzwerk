@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.49 – 2026-09-07
+- Umsatzkopf im Prüfportal personenbezogen korrigiert: Marc sieht seine ausgewerteten Claims- und Rekon-Umsätze statt der Christian-Werte
+- Holgers bereits korrekte personenbezogene Anzeige und Christians bestehende Umsatzanzeige bleiben unverändert
+- Zugriffsschutz und Abrechnungsberechtigungen bleiben unverändert; ergänzt wurden ein eigener Marc-Header-Payload und statische Regressionstests
+
 ## 3.4.48 – 2026-09-07
 - fehlende Fachbeiträge vom 05., 06. und 07.09.2026 als redaktionelle Nachlieferung ergänzt
 - „Blitz- und Überspannungsschäden an Gebäudetechnik fachlich prüfen“ (05.09.) veröffentlicht

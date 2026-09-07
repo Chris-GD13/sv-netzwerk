@@ -240,12 +240,13 @@ const isActive = (href: string) => currentPath.startsWith(href);
           if (settlementLink instanceof HTMLElement) settlementLink.hidden = data.show_settlement_link === false;
           if (!data.show_summary) { revenueSummary.hidden = true; return; }
           const renderRevenueSummary = (summary) => {
-          if (summary.summary_type === 'holger') {
+          if (summary.summary_type === 'marc' || summary.summary_type === 'holger') {
             const claims = summary.claims || {};
             const rekon = summary.rekon || {};
+            const person = summary.summary_type === 'marc' ? 'Marc' : 'Holger';
             revenueSummary.title = `Claims Stand ${claims.updated_at || '–'} · Rekon Stand ${rekon.updated_at || '–'}`;
             revenueSummary.innerHTML = `
-              <div class="intern-header__revenue-title"><span>Holger · Umsatz</span><span><small>laufendes Jahr</small></span></div>
+              <div class="intern-header__revenue-title"><span>${person} · Umsatz</span><span><small>laufendes Jahr</small></span></div>
               <div class="intern-header__revenue-grid is-holger">
                 <div class="intern-header__revenue-item"><span>Claims · ${claims.period || '–'}</span><strong>${money(claims.net)} netto</strong><small>${money(claims.gross)} brutto</small></div>
                 <div class="intern-header__revenue-item"><span>Rekon · ${rekon.period || '–'}</span><strong>${money(rekon.net)} netto</strong><small>${money(rekon.gross)} brutto</small></div>
