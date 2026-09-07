@@ -562,13 +562,16 @@ async function rekonSession(profile, portalTabId) {
   tab = await waitTab(tab.id, 60000);
   let token = await rekonTokenValue();
   let session = await chrome.tabs.sendMessage(tab.id, { type: 'REKON_SESSION_STATE' }).catch(() => null);
-  if (!token || !session?.ok) {
+  if (!token || !session?.ok || !session?.identity) {
     await rekonProgress(portalTabId, 'Rekon-Sitzung wird im Microsoft Edge neu eingelesen …');
     await chrome.tabs.reload(tab.id);
     tab = await waitTab(tab.id, 60000);
     const deadline = Date.now() + 30000;
-    while (!token && Date.now() < deadline) { await sleep(500); token = await rekonTokenValue(); }
-    session = await chrome.tabs.sendMessage(tab.id, { type: 'REKON_SESSION_STATE' }).catch(() => null);
+    while ((!token || !session?.identity) && Date.now() < deadline) {
+      await sleep(500);
+      token = await rekonTokenValue();
+      session = await chrome.tabs.sendMessage(tab.id, { type: 'REKON_SESSION_STATE' }).catch(() => null);
+    }
   }
   if (!session?.ok || !token) throw new Error('Rekon ist im Microsoft Edge nicht vollständig angemeldet. Bitte den geöffneten Rekon-Tab prüfen.');
   if (!ownerMatchesRekonProfile(session.identity, profile)) throw new Error(`Rekon zeigt „${session.identity || 'kein eindeutiges Profil'}“ statt des ausgewählten Profils ${profile === 'marc' ? 'Marc Schütt' : 'Holger Roth'}.`);
