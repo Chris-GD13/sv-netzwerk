@@ -27,14 +27,14 @@ assert.equal(mapped.rekon_task_id, '270330');
 assert.equal(mapped.schaden_strasse, 'Andreas-Hofer-Str. 3');
 assert.equal(mapped.vn_objekt, 'WEG Andreas-Hofer-Str. 3/1');
 
-assert.equal(manifest.version, '1.4.3');
+assert.equal(manifest.version, '1.4.4');
 assert(manifest.host_permissions.includes('https://www.rekoninterschaden-portal.de/*'));
 assert(manifest.host_permissions.includes('https://api.www.rekoninterschaden-portal.de/*'));
 assert(manifest.content_scripts.some(entry => entry.js?.includes('rekon-main.js') && entry.world === 'MAIN'));
 assert(manifest.content_scripts.some(entry => entry.js?.includes('rekon-bridge.js')));
 assert(worker.includes('REKON_TASKS_QUERY') && worker.includes('REKON_FILES_QUERY') && worker.includes('REKON_EMAILS_QUERY') && worker.includes('REKON_LOGS_QUERY'));
 assert(worker.includes("filter(isActiveRekonTask)"), 'Nur aktive Rekon-Fälle werden verarbeitet');
-assert(worker.includes("{ filter: {}, sort: { columns: [] }"), 'Leere Rekon-Filter werden im erwarteten GraphQL-Format gesendet');
+assert(worker.includes("column: 'REMOVED_AT', operator: 'IS_NULL'") && worker.includes("column: 'ID', order: 'DESC'"), 'Die Aufgabenliste verwendet exakt Rekons Nicht-entfernt-Filter und ID-Sortierung');
 assert(worker.includes("payload.errors?.[0]?.message"), 'GraphQL-Fehler werden konkret und begrenzt ausgegeben');
 assert(worker.includes("ownerMatchesRekonProfile"), 'Rekon-Konto und Portalziel werden abgeglichen');
 assert(worker.includes("!session?.identity") && worker.includes("while ((!token || !session?.identity)"), 'Die sichtbare Rekon-Profilkennung wird nach dem Seitenaufbau abgewartet');

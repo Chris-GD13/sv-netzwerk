@@ -587,7 +587,12 @@ async function rekonSession(profile, portalTabId) {
 async function readRekonTasks(token) {
   const all = [];
   for (let skip = 0, total = 1; skip < total; skip += 100) {
-    const data = await rekonGraph(REKON_TASKS_QUERY, { filter: {}, sort: { columns: [] }, pagination: { take: 100, skip }, with_removed: false }, token);
+    const data = await rekonGraph(REKON_TASKS_QUERY, {
+      filter: { AND: [{ AND: [{ column: 'REMOVED_AT', operator: 'IS_NULL' }] }] },
+      sort: { columns: [{ column: 'ID', order: 'DESC' }] },
+      pagination: { take: 100, skip },
+      with_removed: false
+    }, token);
     const page = data.tasks?.data || [];
     total = Number(data.tasks?.paginatorInfo?.total || page.length);
     all.push(...page);
