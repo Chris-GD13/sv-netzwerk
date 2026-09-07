@@ -23,6 +23,12 @@ const assert = (condition, message) => {
 
 assert(page.includes("Technische Freigabe"), "Der neue Portalpunkt fehlt.");
 assert(
+  page.includes("KVA-Freigabe Sanierer") &&
+    page.includes("Technische Freigabe Allgemein / VN") &&
+    page.includes('class="vf-release-grid"'),
+  "Sanierer- und VN-Freigabe muessen nebeneinander eindeutig bezeichnet sein.",
+);
+assert(
   !page.includes("Referenz öffnen"),
   "Die interne PDF-Vorlage darf nicht als Bedienpunkt angezeigt werden.",
 );
