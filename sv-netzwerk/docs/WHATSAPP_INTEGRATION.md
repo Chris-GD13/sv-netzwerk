@@ -8,7 +8,7 @@ Die WhatsApp-Anbindung ist ausschließlich für folgende Sachverständigenprofil
 | --- | --- | --- |
 | Christian Wächter | +49 160 4092134 | `WHATSAPP_CHRISTIAN_PHONE_NUMBER_ID` |
 | Holger Roth | +49 173 1645162 | `WHATSAPP_HOLGER_PHONE_NUMBER_ID` |
-| Marc Schütt | +49 171 2119777 | `WHATSAPP_MARC_PHONE_NUMBER_ID` |
+| Marc Schütt | +49 2392 6592751 | `WHATSAPP_MARC_PHONE_NUMBER_ID` |
 
 Susanne Wächter und Jens Maurer erhalten kein WhatsApp-Profil.
 
@@ -16,7 +16,7 @@ Susanne Wächter und Jens Maurer erhalten kein WhatsApp-Profil.
 
 Die drei vorhandenen WhatsApp-Business-App-Konten dürfen nicht abgemeldet oder über eine normale Nummernmigration ausgetauscht werden. Die Anbindung erfolgt über das von Meta bereitgestellte Coexistence-/Embedded-Signup-Verfahren. Bis zum Abschluss dieses Vorgangs zeigt das Portal für das jeweilige Profil den Status `Meta-Coexistence noch nicht verbunden` und verhindert den Versand.
 
-Christian, Holger und Marc erhalten im Bereich `Ortstermin planen` jeweils den Knopf `WhatsApp verbinden`. Der Ablauf prüft serverseitig, ob exakt die für das Profil hinterlegte Mobilnummer ausgewählt wurde und ob Meta `is_on_biz_app=true` meldet. Ohne diese ausdrückliche Coexistence-Bestätigung wird die Verbindung verworfen, damit die bestehende Handy-App nicht versehentlich durch eine normale Migration ersetzt wird.
+Christian, Holger und Marc erhalten im Bereich `Ortstermin planen` jeweils den Knopf `WhatsApp verbinden`. Der Ablauf prüft serverseitig, ob exakt die für das Profil hinterlegte WhatsApp-Business-Nummer ausgewählt wurde und ob Meta `is_on_biz_app=true` meldet. Ohne diese ausdrückliche Coexistence-Bestätigung wird die Verbindung verworfen, damit die bestehende WhatsApp-Business-App nicht versehentlich durch eine normale Migration ersetzt wird.
 
 Erforderliche Servervariablen:
 
