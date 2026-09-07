@@ -33,7 +33,10 @@ if (
 if (!/>\s*Susanne\s*<small>\(CC\)<\/small>/.test(page)) {
   throw new Error("ws@sv-schuett.eu ist nicht eindeutig als Susanne beschriftet.");
 }
-if (!page.includes('id="vf-mail-bcc"') || !page.includes('fd.append("bcc"')) {
+if (
+  !page.includes('id="vf-mail-bcc"') ||
+  !/fd\.append\(["']bcc["']/.test(page)
+) {
   throw new Error("BCC wird nicht sichtbar erfasst oder nicht übertragen.");
 }
 if (!source.includes("if ($bcc) $message['bccRecipients'] = $bcc;")) {
