@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.4.48 – 2026-09-07
+- fehlende Fachbeiträge vom 05., 06. und 07.09.2026 als redaktionelle Nachlieferung ergänzt
+- „Blitz- und Überspannungsschäden an Gebäudetechnik fachlich prüfen“ (05.09.) veröffentlicht
+- „Schadstoffverdacht beim Rückbau in Bestandsgebäuden richtig einordnen“ (06.09.) veröffentlicht
+- „Elektrische Anlagen nach Wasser- und Löschwasserschäden sicher prüfen“ (07.09.) veröffentlicht
+- Startseite um die vorhandene Komponente für die drei neuesten Fachartikel ergänzt; Fachwissensübersicht, Kategorien, Tags, Autor, Suche, Breadcrumbs und Sitemap über die vorhandenen Astro-Mechanismen integriert
+- drei LinkedIn-Begleitdateien vorbereitet, nicht extern veröffentlicht
+- ohne Beitragsbilder veröffentlicht; keine typografischen Platzhaltergrafiken erzeugt
+- tatsächlich geändert: drei Knowledge-Dateien, drei LinkedIn-Dateien, `src/data/library.ts`, `src/pages/index.astro`, Veröffentlichungsprotokoll und Changelog
+- lokale Prüfung am 07.09.2026 ab 08:05 Uhr: `npm ci`, `validate:knowledge`, `astro check`, Produktionsbuild mit 697 Seiten, Dist-/Such-/Sitemap-/Linkprüfung und öffentliche Text-/Umlautprüfung erfolgreich; Lighthouse Startseite: Performance 100, Accessibility 96, Best Practices 100, SEO 100
+
 ## 3.4.45 – 2026-09-04
 - automatischer morgens Fachbeitrag veröffentlicht: „Zusammenarbeit mit Fachplanern, Statikern und Sanierern im Schadenfall: Rollen und Schnittstellen"
 - LinkedIn-Begleitdatei vorbereitet (nicht extern veröffentlicht)

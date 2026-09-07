@@ -14,6 +14,36 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Elektrische Anlagen nach Wasser- und Löschwasserschäden sicher prüfen',
+    description: 'Elektrische Anlagen nach Wasser- oder Löschwassereinwirkung: Abschaltung, Befund, Fachprüfung, Wiederinbetriebnahme und Kosten sauber dokumentieren.',
+    href: '/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/',
+    category: 'Elektrische Anlagen im Gebäudeschaden',
+    tags: ['Wasserschaden', 'Löschwasser', 'Elektroanlage', 'Wiederinbetriebnahme', 'Arbeitssicherheit', 'Kostenprüfung'],
+    date: '2026-09-07',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Schadstoffverdacht beim Rückbau in Bestandsgebäuden richtig einordnen',
+    description: 'Schadstoffverdacht vor schadenbedingtem Rückbau: Erkundung, Probenahme, Arbeitsschutz, Entsorgung und Kostenfreigabe nachvollziehbar trennen.',
+    href: '/fachwissen/schadstoffverdacht-rueckbau-bestandsgebaeude/',
+    category: 'Schadstoffe und Rückbau',
+    tags: ['Schadstoffverdacht', 'Asbest', 'Rückbau', 'Bestandsgebäude', 'Arbeitsschutz', 'Kostenprüfung'],
+    date: '2026-09-06',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Blitz- und Überspannungsschäden an Gebäudetechnik fachlich prüfen',
+    description: 'Prüfpfad für Blitz- und Überspannungsschäden: Ereignis, Schadenbild, Schutzkonzept, Kausalität und Kosten bei vernetzter Gebäudetechnik trennen.',
+    href: '/fachwissen/blitz-ueberspannungsschaden-gebaeudetechnik-pruefen/',
+    category: 'Blitz- und Überspannungsschäden',
+    tags: ['Blitzschaden', 'Überspannung', 'Gebäudetechnik', 'Elektrotechnik', 'Kausalität', 'Kostenprüfung'],
+    date: '2026-09-05',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Zusammenarbeit mit Fachplanern, Statikern und Sanierern im Schadenfall: Rollen und Schnittstellen',
     description: 'Zusammenarbeit mit Fachplanern und Sanierern: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz.',
     href: '/fachwissen/zusammenarbeit-fachplaner-sanierer-schadenfall/',
