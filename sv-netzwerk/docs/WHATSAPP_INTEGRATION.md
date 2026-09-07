@@ -16,15 +16,22 @@ Susanne Wächter und Jens Maurer erhalten kein WhatsApp-Profil.
 
 Die drei vorhandenen WhatsApp-Business-App-Konten dürfen nicht abgemeldet oder über eine normale Nummernmigration ausgetauscht werden. Die Anbindung erfolgt über das von Meta bereitgestellte Coexistence-/Embedded-Signup-Verfahren. Bis zum Abschluss dieses Vorgangs zeigt das Portal für das jeweilige Profil den Status `Meta-Coexistence noch nicht verbunden` und verhindert den Versand.
 
+Christian, Holger und Marc erhalten im Bereich `Ortstermin planen` jeweils den Knopf `WhatsApp verbinden`. Der Ablauf prüft serverseitig, ob exakt die für das Profil hinterlegte Mobilnummer ausgewählt wurde und ob Meta `is_on_biz_app=true` meldet. Ohne diese ausdrückliche Coexistence-Bestätigung wird die Verbindung verworfen, damit die bestehende Handy-App nicht versehentlich durch eine normale Migration ersetzt wird.
+
 Erforderliche Servervariablen:
 
 - `WHATSAPP_ACCESS_TOKEN`
 - `WHATSAPP_APP_SECRET`
+- `WHATSAPP_META_APP_ID`
+- `WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID` mit aktiviertem Business-App-Onboarding/Coexistence
+- `WHATSAPP_TOKEN_ENCRYPTION_KEY` (eigener, langer Zufallswert)
 - `WHATSAPP_VERIFY_TOKEN`
 - `WHATSAPP_APPOINTMENT_TEMPLATE`
 - `WHATSAPP_TEMPLATE_LANGUAGE` (Standard `de`)
 - `WHATSAPP_GRAPH_VERSION` (Standard `v25.0`)
 - die jeweilige profilbezogene Phone Number ID aus der Tabelle oben
+
+Die globale Phone Number ID und `WHATSAPP_ACCESS_TOKEN` bleiben nur als Übergangsfallback bestehen. Nach einer erfolgreichen Selbstverbindung werden Phone Number ID, WABA-ID und das verschlüsselte profilbezogene Zugriffstoken in `whatsapp_profile_connections` verwendet. Ein Zugriffstoken wird nie an den Browser zurückgegeben.
 
 Webhook-Adresse: `https://www.sv-netzwerk.eu/intern/api/whatsapp-case.php?action=webhook`
 

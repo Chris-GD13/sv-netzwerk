@@ -19,8 +19,43 @@ function waProfiles(): array
     ];
 }
 
+function waTokenKey(): string
+{
+    $secret = waEnv('WHATSAPP_TOKEN_ENCRYPTION_KEY', waEnv('WHATSAPP_APP_SECRET'));
+    if ($secret === '') throw new RuntimeException('Der sichere WhatsApp-Schlüssel ist noch nicht eingerichtet.');
+    return hash('sha256', 'sv-netzwerk:whatsapp:v1:' . $secret, true);
+}
+
+function waEncryptToken(string $token): string
+{
+    $iv = random_bytes(12);
+    $tag = '';
+    $cipher = openssl_encrypt($token, 'aes-256-gcm', waTokenKey(), OPENSSL_RAW_DATA, $iv, $tag);
+    if ($cipher === false) throw new RuntimeException('WhatsApp-Verbindung konnte nicht sicher gespeichert werden.');
+    return base64_encode($iv . $tag . $cipher);
+}
+
+function waDecryptToken(string $payload): string
+{
+    $raw = base64_decode($payload, true);
+    if ($raw === false || strlen($raw) < 29) return '';
+    $plain = openssl_decrypt(substr($raw, 28), 'aes-256-gcm', waTokenKey(), OPENSSL_RAW_DATA, substr($raw, 0, 12), substr($raw, 12, 16));
+    return $plain === false ? '' : $plain;
+}
+
 function waEnsureSchema(): void
 {
+    db()->exec("CREATE TABLE IF NOT EXISTS whatsapp_profile_connections (
+        profile_key VARCHAR(32) PRIMARY KEY,
+        phone_number_id VARCHAR(190) NOT NULL,
+        waba_id VARCHAR(190) NOT NULL,
+        access_token_ciphertext TEXT NOT NULL,
+        display_phone_number VARCHAR(64) NOT NULL,
+        verified_name VARCHAR(255) NULL,
+        connected_by VARCHAR(255) NOT NULL,
+        connected_at DATETIME NOT NULL,
+        updated_at DATETIME NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     db()->exec("CREATE TABLE IF NOT EXISTS whatsapp_case_links (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         profile_key VARCHAR(32) NOT NULL,
@@ -58,6 +93,20 @@ function waEnsureSchema(): void
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 
+function waConnection(string $profileKey): array
+{
+    $profile = waProfiles()[$profileKey] ?? null;
+    if (!$profile) return ['phone_id'=>'','waba_id'=>'','token'=>''];
+    $stmt = db()->prepare('SELECT phone_number_id,waba_id,access_token_ciphertext,display_phone_number,verified_name FROM whatsapp_profile_connections WHERE profile_key=:profile LIMIT 1');
+    $stmt->execute([':profile'=>$profileKey]);
+    $row = $stmt->fetch();
+    if (is_array($row)) {
+        $token = waDecryptToken((string)$row['access_token_ciphertext']);
+        if ($token !== '') return ['phone_id'=>(string)$row['phone_number_id'],'waba_id'=>(string)$row['waba_id'],'token'=>$token,'display_phone_number'=>(string)$row['display_phone_number'],'verified_name'=>(string)($row['verified_name']??'')];
+    }
+    return ['phone_id'=>(string)$profile['phone_id'],'waba_id'=>'','token'=>waEnv('WHATSAPP_ACCESS_TOKEN'),'display_phone_number'=>(string)$profile['number'],'verified_name'=>(string)$profile['name']];
+}
+
 function waHttp(string $method, string $url, array $headers = [], ?string $body = null): array
 {
     $ch = curl_init($url);
@@ -74,7 +123,10 @@ function waHttp(string $method, string $url, array $headers = [], ?string $body 
 
 function waProfileByPhoneId(string $phoneId): ?array
 {
-    foreach (waProfiles() as $key => $profile) if ($profile['phone_id'] !== '' && hash_equals($profile['phone_id'], $phoneId)) return ['key'=>$key] + $profile;
+    foreach (waProfiles() as $key => $profile) {
+        $connection = waConnection($key);
+        if ($connection['phone_id'] !== '' && hash_equals($connection['phone_id'], $phoneId)) return ['key'=>$key,'connection'=>$connection] + $profile;
+    }
     return null;
 }
 
@@ -85,9 +137,9 @@ function waTargetProfile(array $user): string
     return $selected;
 }
 
-function waConfigured(array $profile): bool
+function waConfigured(array $connection): bool
 {
-    return $profile['phone_id'] !== '' && waEnv('WHATSAPP_ACCESS_TOKEN') !== '' && waEnv('WHATSAPP_APP_SECRET') !== '' && waEnv('WHATSAPP_VERIFY_TOKEN') !== '' && waEnv('WHATSAPP_APPOINTMENT_TEMPLATE') !== '';
+    return $connection['phone_id'] !== '' && $connection['token'] !== '' && waEnv('WHATSAPP_APP_SECRET') !== '' && waEnv('WHATSAPP_VERIFY_TOKEN') !== '' && waEnv('WHATSAPP_APPOINTMENT_TEMPLATE') !== '';
 }
 
 function waNormalizePhone(string $value): string
@@ -99,9 +151,9 @@ function waNormalizePhone(string $value): string
     return preg_match('/^\+[1-9][0-9]{7,14}$/', $value) ? $value : '';
 }
 
-function waGraph(string $method, string $path, ?array $json = null): array
+function waGraph(string $method, string $path, ?array $json = null, string $accessToken = ''): array
 {
-    $token = waEnv('WHATSAPP_ACCESS_TOKEN');
+    $token = $accessToken !== '' ? $accessToken : waEnv('WHATSAPP_ACCESS_TOKEN');
     if ($token === '') throw new RuntimeException('WhatsApp-Zugriff ist noch nicht eingerichtet.');
     $headers = ['Authorization: Bearer ' . $token];
     $body = null;
@@ -119,10 +171,10 @@ function waGraph(string $method, string $path, ?array $json = null): array
     return is_array($data) ? $data : [];
 }
 
-function waSendAppointment(array $profile, string $recipient, array $appointment): string
+function waSendAppointment(array $profile, array $connection, string $recipient, array $appointment): string
 {
     $template = waEnv('WHATSAPP_APPOINTMENT_TEMPLATE');
-    $result = waGraph('POST', rawurlencode((string)$profile['phone_id']) . '/messages', [
+    $result = waGraph('POST', rawurlencode((string)$connection['phone_id']) . '/messages', [
         'messaging_product'=>'whatsapp',
         'to'=>ltrim($recipient, '+'),
         'type'=>'template',
@@ -136,7 +188,7 @@ function waSendAppointment(array $profile, string $recipient, array $appointment
                 ['type'=>'text','text'=>(string)$profile['name']],
             ]]],
         ],
-    ]);
+    ], (string)$connection['token']);
     $wamid = (string)($result['messages'][0]['id'] ?? '');
     if ($wamid === '') throw new RuntimeException('WhatsApp hat keine Versandbestätigung geliefert.');
     return $wamid;
@@ -247,12 +299,12 @@ function waDriveUpload(string $folderId, string $name, string $mime, string $byt
     return (string)$data['id'];
 }
 
-function waDownloadMedia(string $mediaId): array
+function waDownloadMedia(string $mediaId, string $accessToken): array
 {
-    $meta = waGraph('GET', rawurlencode($mediaId));
+    $meta = waGraph('GET', rawurlencode($mediaId), null, $accessToken);
     $url = (string)($meta['url'] ?? '');
     if ($url === '') throw new RuntimeException('WhatsApp-Mediendatei besitzt keine Download-Adresse.');
-    $response = waHttp('GET', $url, ['Authorization: Bearer '.waEnv('WHATSAPP_ACCESS_TOKEN')]);
+    $response = waHttp('GET', $url, ['Authorization: Bearer '.$accessToken]);
     if ($response['status'] !== 200) throw new RuntimeException('WhatsApp-Mediendatei konnte nicht geladen werden.');
     if (strlen($response['body']) > 25 * 1024 * 1024) throw new RuntimeException('WhatsApp-Datei ist größer als 25 MB.');
     $mime = strtolower(trim(explode(';', (string)($meta['mime_type'] ?? $response['content_type'] ?? 'application/octet-stream'))[0]));
@@ -304,7 +356,7 @@ function waHandleWebhook(): never
             if (!waRecordMessage($row)) continue;
             if ($mediaId === '' || !$case) continue;
             try {
-                $download = waDownloadMedia($mediaId);
+                $download = waDownloadMedia($mediaId, (string)$profile['connection']['token']);
                 $name = waSafeFileName((string)($media['filename'] ?? 'Dokument'), (string)$download['mime']);
                 $driveId = waDriveUpload((string)$case['folder_id'], $name, (string)$download['mime'], (string)$download['bytes'], $caption);
                 $stmt = db()->prepare("UPDATE whatsapp_messages SET original_name=:name,drive_file_id=:drive,status='stored',error_text=NULL WHERE wamid=:wamid");
@@ -330,8 +382,42 @@ try {
     waEnsureSchema();
     $profileKey = waTargetProfile($user);
     $profile = waProfiles()[$profileKey];
+    $connection = waConnection($profileKey);
+    if ($action === 'signup_config') {
+        $appId = waEnv('WHATSAPP_META_APP_ID');
+        $configId = waEnv('WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID');
+        if ($appId === '' || $configId === '' || waEnv('WHATSAPP_APP_SECRET') === '') apiError(503, 'Die zentrale Meta-Einrichtung ist noch nicht abgeschlossen.');
+        apiJson(['ok'=>true,'app_id'=>$appId,'config_id'=>$configId,'graph_version'=>waEnv('WHATSAPP_GRAPH_VERSION','v25.0'),'profile'=>$profileKey,'name'=>$profile['name'],'number'=>$profile['number']]);
+    }
+    if ($action === 'complete_signup') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
+        $body = requestBody();
+        $code = trim((string)($body['code'] ?? ''));
+        $phoneId = trim((string)($body['phone_number_id'] ?? ''));
+        $wabaId = trim((string)($body['waba_id'] ?? ''));
+        if ($code === '' || !preg_match('/^[0-9]{5,30}$/', $phoneId) || !preg_match('/^[0-9]{5,30}$/', $wabaId)) apiError(400, 'Meta hat keine vollständigen Verbindungsdaten geliefert.');
+        $appId = waEnv('WHATSAPP_META_APP_ID');
+        $appSecret = waEnv('WHATSAPP_APP_SECRET');
+        if ($appId === '' || $appSecret === '') apiError(503, 'Die zentrale Meta-Einrichtung ist noch nicht abgeschlossen.');
+        $version = waEnv('WHATSAPP_GRAPH_VERSION','v25.0');
+        $tokenResponse = waHttp('GET', 'https://graph.facebook.com/'.rawurlencode($version).'/oauth/access_token?'.http_build_query(['client_id'=>$appId,'client_secret'=>$appSecret,'code'=>$code]));
+        $tokenData = json_decode($tokenResponse['body'], true);
+        $accessToken = (string)($tokenData['access_token'] ?? '');
+        if ($tokenResponse['status'] !== 200 || $accessToken === '') throw new RuntimeException('Meta konnte die WhatsApp-Freigabe nicht bestätigen.');
+        $numberData = waGraph('GET', rawurlencode($phoneId).'?fields=display_phone_number,verified_name,status,platform_type,is_on_biz_app', null, $accessToken);
+        $displayNumber = waNormalizePhone((string)($numberData['display_phone_number'] ?? ''));
+        if ($displayNumber === '' || !hash_equals(waNormalizePhone((string)$profile['number']), $displayNumber)) throw new RuntimeException('Die ausgewählte Nummer gehört nicht zum angemeldeten Bearbeiterprofil.');
+        if (($numberData['is_on_biz_app'] ?? null) !== true) throw new RuntimeException('Meta hat Coexistence mit der bestehenden WhatsApp-Business-App nicht bestätigt. Die Nummer wurde nicht übernommen.');
+        waGraph('POST', rawurlencode($wabaId).'/subscribed_apps', null, $accessToken);
+        $stmt = db()->prepare("INSERT INTO whatsapp_profile_connections(profile_key,phone_number_id,waba_id,access_token_ciphertext,display_phone_number,verified_name,connected_by,connected_at,updated_at)
+            VALUES(:profile,:phone_id,:waba,:token,:display,:verified,:by,NOW(),NOW())
+            ON DUPLICATE KEY UPDATE phone_number_id=VALUES(phone_number_id),waba_id=VALUES(waba_id),access_token_ciphertext=VALUES(access_token_ciphertext),display_phone_number=VALUES(display_phone_number),verified_name=VALUES(verified_name),connected_by=VALUES(connected_by),connected_at=NOW(),updated_at=NOW()");
+        $stmt->execute([':profile'=>$profileKey,':phone_id'=>$phoneId,':waba'=>$wabaId,':token'=>waEncryptToken($accessToken),':display'=>$displayNumber,':verified'=>(string)($numberData['verified_name']??''),':by'=>(string)($user['email']??'')]);
+        apiJson(['ok'=>true,'profile'=>$profileKey,'number'=>$displayNumber,'connected'=>true]);
+    }
     if ($action === 'status') {
-        apiJson(['ok'=>true,'profile'=>$profileKey,'name'=>$profile['name'],'number'=>$profile['number'],'connected'=>waConfigured($profile),'state'=>waConfigured($profile)?'verbunden':'Meta-Coexistence noch nicht verbunden']);
+        $connected = waConfigured($connection);
+        apiJson(['ok'=>true,'profile'=>$profileKey,'name'=>$profile['name'],'number'=>$profile['number'],'connected'=>$connected,'onboarding_available'=>waEnv('WHATSAPP_META_APP_ID')!==''&&waEnv('WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID')!==''&&waEnv('WHATSAPP_APP_SECRET')!=='','state'=>$connected?'verbunden':'Meta-Coexistence noch nicht verbunden']);
     }
     if ($action === 'recent') {
         $stmt = db()->prepare("SELECT wamid,sender_phone,direction,message_type,original_name,caption,folder_id,case_no,contact_type,status,error_text,received_at FROM whatsapp_messages WHERE profile_key=:p ORDER BY received_at DESC LIMIT 30");
@@ -353,7 +439,7 @@ try {
         $driveId = (string)($message['drive_file_id'] ?? '');
         $savedName = (string)($message['original_name'] ?? '');
         if ($driveId === '' && (string)($message['media_id'] ?? '') !== '') {
-            $download = waDownloadMedia((string)$message['media_id']);
+            $download = waDownloadMedia((string)$message['media_id'], (string)$connection['token']);
             $savedName = waSafeFileName((string)($message['original_name'] ?? 'Dokument'), (string)$download['mime']);
             $driveId = waDriveUpload($folderId, $savedName, (string)$download['mime'], (string)$download['bytes'], (string)($message['caption'] ?? ''));
         }
@@ -364,7 +450,7 @@ try {
     }
     if ($action === 'send_appointment') {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
-        if (!waConfigured($profile)) apiError(409, 'WhatsApp ist für dieses Bearbeiterprofil noch nicht über Meta-Coexistence verbunden.');
+        if (!waConfigured($connection)) apiError(409, 'WhatsApp ist für dieses Bearbeiterprofil noch nicht über Meta-Coexistence verbunden.');
         $body = requestBody();
         $folderId = trim((string)($body['folder_id'] ?? ''));
         requireCaseFolderAccess($folderId, $user);
@@ -380,7 +466,7 @@ try {
             $type = in_array((string)($recipient['type'] ?? ''), ['vn','sanierer'], true) ? (string)$recipient['type'] : '';
             $phone = waNormalizePhone((string)($recipient['phone'] ?? ''));
             if ($type === '' || $phone === '') throw new RuntimeException('Eine ausgewählte WhatsApp-Rufnummer ist ungültig.');
-            $wamid = waSendAppointment($profile, $phone, ['case_no'=>$caseNo!==''?$caseNo:'ohne Schaden-Nr.','date_time'=>$date.' · '.$time.' Uhr','address'=>$address]);
+            $wamid = waSendAppointment($profile, $connection, $phone, ['case_no'=>$caseNo!==''?$caseNo:'ohne Schaden-Nr.','date_time'=>$date.' · '.$time.' Uhr','address'=>$address]);
             waLinkCase($profileKey, $phone, $type, $folderId, $caseNo, $wamid, (string)($user['email'] ?? ''));
             waRecordMessage(['wamid'=>$wamid,'profile'=>$profileKey,'sender'=>$phone,'direction'=>'outbound','type'=>'template','caption'=>'Ortstermin '.$date.' '.$time,'folder'=>$folderId,'case_no'=>$caseNo,'contact_type'=>$type,'status'=>'sent']);
             $sent[] = ['type'=>$type,'phone'=>$phone,'wamid'=>$wamid];
