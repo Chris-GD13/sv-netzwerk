@@ -43,9 +43,11 @@ assert(
   "Ausgewählte und abgelegte KVA werden nicht vollständig nacheinander eingelesen.",
 );
 assert(page.includes('technicalMailFallback'), 'A sachverstaendiger fallback mail text should be generated');
+assert(page.includes('usableTechnicalDraft'), 'Unformatted or evidence-gap drafts must fall back to the controlled wording');
 assert(page.includes('Etwaige darüber hinausgehende Mehrleistungen'), 'The mail must reserve additional work for separate review');
 assert(core.includes('email_draft'), 'The technical analysis should return a source-grounded mail draft');
 assert(core.includes('Ursprungsangebot'), 'The mail prompt should cover documented prior offers');
+assert(core.includes('Nicht belegte Bausteine werden vollständig weggelassen'), 'Missing comparison data must be omitted from the mail');
 assert(
   page.includes("rows.reduce((sum,row)=>sum+(Number(row.gross_total)||0),0)"),
   "Die gemeinsame Bruttosumme fehlt.",
