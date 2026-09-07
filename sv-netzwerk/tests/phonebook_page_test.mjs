@@ -16,11 +16,14 @@ assert(page.includes('Alle markieren') && page.includes('Auswahl löschen') && p
 assert(page.includes('Doppelte Rufnummern bereinigen') && page.includes('action=cleanup_duplicates'), 'Dublettenbereinigung fehlt.');
 assert(page.includes('Gleiche Namen / Durchwahlen prüfen') && page.includes('action=same_name_review'), 'Manuelle Prüfliste für unterschiedliche Durchwahlen fehlt.');
 assert(page.includes("addToSpeedDial"), 'Übernahme in die persönliche Kurzwahl fehlt.');
+assert(page.includes('id="ph-phone-mode"') && page.includes('xtelsio / Sipgate') && page.includes('Handy / Telefon-App'), 'Persönliche Telefonverbindung kann nicht ausgewählt werden.');
+assert(page.includes("context.legacy_owner?legacy:`${legacy}-${context.scope}`") && page.includes("context.legacy_owner?'xtelsio':'none'"), 'Persönliche Telefon- und Kurzwahldaten sind nicht nach Benutzer getrennt.');
 assert(page.includes('Promise.allSettled'), 'Telefonbuch- und Fallsuche müssen bei einem Teilfehler getrennt weiterlaufen.');
 assert(page.includes('per_page=100') && page.includes('Seite ${page} von ${pages}') && page.includes("actionButton('Weiter'"), 'Vollständige paginierte Telefonbuchanzeige fehlt.');
 assert(api.includes("'total' => $total") && api.includes("'pages' => $pages") && api.includes('array_slice($allContacts, $offset, $perPage)'), 'Serverseitige Telefonbuch-Paginierung fehlt.');
 assert(api.includes('int $groupLimit = 0'), 'Die feste 500er-Anzeigegrenze muss entfernt sein.');
 assert(api.includes('CREATE TABLE IF NOT EXISTS phonebook_contacts'), 'Zentrale Telefonbuchtabelle fehlt.');
+assert(api.includes("$action === 'personal_context'") && api.includes('phonebookPersonalScope') && api.includes('phonebookLegacyOwner'), 'Benutzergebundener Telefonkontext fehlt.');
 assert(api.includes("WHERE phone_key=:phone_key AND name=:name ORDER BY id LIMIT 1"), 'Import muss Rufnummern desselben Kontakts zusammenführen, ohne andere Namen zu verlieren.');
 assert(api.includes("$action === 'list'") && api.includes("$action === 'save'") && api.includes("$action === 'delete'") && api.includes("$action === 'import'"), 'API-Aktionen sind unvollständig.');
 assert(api.includes("$action === 'cleanup_unwanted'") && api.includes("andersson|\\bab\\b|per\\s*mail"), 'Serverseitige Schrottkontakt-Bereinigung fehlt.');

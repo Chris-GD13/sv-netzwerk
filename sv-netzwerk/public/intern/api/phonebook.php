@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/phonebook-core.php';
+require_once __DIR__ . '/profile-routing.php';
 
 commonHeaders();
 $user = requireAuth();
@@ -40,6 +41,20 @@ function phonebookUserLabel(array $user): string
     return phonebookText($user['email'] ?? $user['full_name'] ?? '', 190);
 }
 
+function phonebookPersonalScope(array $user): string
+{
+    $identity = mb_strtolower(trim((string)($user['email'] ?? '')), 'UTF-8');
+    if ($identity === '') $identity = 'user-id:' . (string)($user['id'] ?? 'unknown');
+    return substr(hash('sha256', $identity), 0, 24);
+}
+
+function phonebookLegacyOwner(array $user): bool
+{
+    $email = svnetProfileText((string)($user['email'] ?? ''));
+    $name = svnetProfileText((string)($user['full_name'] ?? ''));
+    return $email === 'ws@sv-schuett.eu' || str_contains($email, 'susanne') || str_contains($name, 'susanne');
+}
+
 function phonebookList(string $query, int $groupLimit = 0): array
 {
     $query = phonebookText($query, 120);
@@ -75,6 +90,14 @@ function phonebookList(string $query, int $groupLimit = 0): array
 $action = (string)($_GET['action'] ?? 'list');
 
 try {
+    if ($action === 'personal_context') {
+        apiJson([
+            'ok' => true,
+            'scope' => phonebookPersonalScope($user),
+            'legacy_owner' => phonebookLegacyOwner($user),
+            'display_name' => phonebookText($user['full_name'] ?? $user['email'] ?? '', 120),
+        ]);
+    }
     phonebookEnsureSchema();
     if ($action === 'list') {
         $allContacts = phonebookList((string)($_GET['q'] ?? ''), 0);

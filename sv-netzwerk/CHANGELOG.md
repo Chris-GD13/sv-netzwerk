@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.50 – 2026-09-07
+
+- Telefon und Kurzwahlen strikt nach angemeldetem Benutzer getrennt; neue Benutzer starten ohne fremde Kurzwahlen und verbinden ihr Handy beziehungsweise xtelsio/Sipgate selbst.
+- Susannes bestehende Kurzwahlen und ihre funktionierende xtelsio-/Sipgate-Einrichtung bleiben unverändert erhalten.
+
 ## 3.4.49 – 2026-09-07
 - Umsatzkopf im Prüfportal personenbezogen korrigiert: Marc sieht seine ausgewerteten Claims- und Rekon-Umsätze statt der Christian-Werte
 - Holgers bereits korrekte personenbezogene Anzeige und Christians bestehende Umsatzanzeige bleiben unverändert
