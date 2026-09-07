@@ -159,7 +159,9 @@ try {
         $caseNo = trim((string)($_POST['case_no'] ?? ''));
         $damageType = trim((string)($_POST['damage_type'] ?? ''));
         if ($caseNo === '') throw new RuntimeException('Schaden-Nr. fehlt im aktiven Fall.');
-        $subject = $caseNo . ($damageType !== '' ? ' – ' . $damageType : '');
+        $subjectOverride = trim((string)($_POST['subject'] ?? ''));
+        if (mb_strlen($subjectOverride, 'UTF-8') > 500) throw new RuntimeException('Der Betreff ist zu lang.');
+        $subject = $subjectOverride !== '' ? $subjectOverride : $caseNo . ($damageType !== '' ? ' – ' . $damageType : '');
         $text = trim((string)($_POST['body'] ?? ''));
         if ($text === '') throw new RuntimeException('E-Mail-Text fehlt.');
 

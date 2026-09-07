@@ -92,8 +92,8 @@ function krAnalyzeCalculation(string $name, string $mime, string $bytes): array
         $result = krOpenAiJson(
             $key,
             $fileId,
-            'Lies den Kostenvoranschlag vollständig und positionsgenau. Erfinde keine Leistungen, Mengen, Einheiten oder Preise. Erfasse ausschließlich tatsächlich angebotene Hauptpositionen. Unterpositionen dürfen nur separat erscheinen, wenn sie einen eigenen Preis haben. Alternativ-, Eventual- und Bedarfspositionen kennzeichnest du und rechnest sie nicht in den angebotenen Gesamtbetrag ein. Geldbeträge werden als Dezimalzahlen ohne Währungszeichen ausgegeben. Prüfe quantity mal unit_price gegen line_total und nenne bei Abweichungen eine Warnung. Positionstexte bleiben fachlich vollständig, werden aber ohne Kopf-/Fußzeilen übernommen.',
-            'Datei: '.$name.'. Antworte als JSON mit company, quote_number, quote_date, net_total, vat_rate, vat_total, gross_total, positions (Array mit position_no, description, quantity, unit, unit_price, line_total, optional als Boolean und confidence zwischen 0 und 1), warnings. Unbekannte Werte als null.'
+            'Lies den Kostenvoranschlag vollständig und positionsgenau. Erfinde keine Leistungen, Mengen, Einheiten oder Preise. Erfasse ausschließlich tatsächlich angebotene Hauptpositionen. Unterpositionen dürfen nur separat erscheinen, wenn sie einen eigenen Preis haben. Alternativ-, Eventual- und Bedarfspositionen kennzeichnest du und rechnest sie nicht in den angebotenen Gesamtbetrag ein. Geldbeträge werden als Dezimalzahlen ohne Währungszeichen ausgegeben. Prüfe quantity mal unit_price gegen line_total und nenne bei Abweichungen eine Warnung. Wenn nur eine eindeutige Nettosumme und ein ausdrücklicher Umsatzsteuersatz angegeben sind, dürfen vat_total und gross_total rechnerisch daraus abgeleitet werden; kennzeichne dies mit totals_basis=calculated_from_net_and_vat_rate. Positionstexte bleiben fachlich vollständig, werden aber ohne Kopf-/Fußzeilen übernommen. Lies den Empfänger/Auftraggeber und dessen vollständige Anschrift getrennt vom Aussteller. Formuliere außerdem eine knappe technische Plausibilitätsbewertung, aber bestätige ohne Schadenakte keine Schadenkausalität.',
+            'Datei: '.$name.'. Antworte als JSON mit company, company_email, company_street, company_postal_code, company_city, recipient_name, recipient_street, recipient_postal_code, recipient_city, project_location, quote_number, quote_date, net_total, vat_rate, vat_total, gross_total, totals_basis, technical_assessment, delimitation, release_recommendation, positions (Array mit position_no, description, quantity, unit, unit_price, line_total, optional als Boolean und confidence zwischen 0 und 1), warnings. Unbekannte Werte als null.'
         );
         $positions = [];
         foreach (is_array($result['positions'] ?? null) ? $result['positions'] : [] as $index=>$row) {
@@ -117,14 +117,49 @@ function krAnalyzeCalculation(string $name, string $mime, string $bytes): array
             ];
         }
         if ($positions === []) throw new RuntimeException('Im KVA konnten keine belastbaren, bepreisten Positionen erkannt werden.');
+        $netTotal = krMoney($result['net_total'] ?? null);
+        $vatRate = krMoney($result['vat_rate'] ?? null);
+        $vatTotal = krMoney($result['vat_total'] ?? null);
+        $grossTotal = krMoney($result['gross_total'] ?? null);
+        $totalsBasis = trim((string)($result['totals_basis'] ?? 'printed'));
+        $derivedTax = $vatTotal === null;
+        $derivedGross = $grossTotal === null;
+        if ($netTotal === null) {
+            $positionSum = 0.0;
+            $complete = true;
+            foreach ($positions as $position) {
+                if (($position['optional'] ?? false) === true) continue;
+                if (!is_numeric($position['line_total'] ?? null)) { $complete = false; break; }
+                $positionSum += (float)$position['line_total'];
+            }
+            if ($complete && $positionSum > 0) { $netTotal = round($positionSum, 2); $totalsBasis = 'calculated_from_positions'; }
+        }
+        if ($netTotal !== null && $vatRate !== null && $vatRate >= 0 && $vatRate <= 30) {
+            if ($vatTotal === null) $vatTotal = round($netTotal * $vatRate / 100, 2);
+            if ($grossTotal === null) $grossTotal = round($netTotal + $vatTotal, 2);
+            if (($derivedTax || $derivedGross) && ($totalsBasis === '' || $totalsBasis === 'printed')) $totalsBasis = 'calculated_from_net_and_vat_rate';
+        }
         return [
             'company'=>trim((string)($result['company'] ?? '')),
+            'company_email'=>trim((string)($result['company_email'] ?? '')),
+            'company_street'=>trim((string)($result['company_street'] ?? '')),
+            'company_postal_code'=>trim((string)($result['company_postal_code'] ?? '')),
+            'company_city'=>trim((string)($result['company_city'] ?? '')),
+            'recipient_name'=>trim((string)($result['recipient_name'] ?? '')),
+            'recipient_street'=>trim((string)($result['recipient_street'] ?? '')),
+            'recipient_postal_code'=>trim((string)($result['recipient_postal_code'] ?? '')),
+            'recipient_city'=>trim((string)($result['recipient_city'] ?? '')),
+            'project_location'=>trim((string)($result['project_location'] ?? '')),
             'quote_number'=>trim((string)($result['quote_number'] ?? '')),
             'quote_date'=>trim((string)($result['quote_date'] ?? '')),
-            'net_total'=>krMoney($result['net_total'] ?? null),
-            'vat_rate'=>krMoney($result['vat_rate'] ?? null),
-            'vat_total'=>krMoney($result['vat_total'] ?? null),
-            'gross_total'=>krMoney($result['gross_total'] ?? null),
+            'net_total'=>$netTotal,
+            'vat_rate'=>$vatRate,
+            'vat_total'=>$vatTotal,
+            'gross_total'=>$grossTotal,
+            'totals_basis'=>$totalsBasis,
+            'technical_assessment'=>trim((string)($result['technical_assessment'] ?? '')),
+            'delimitation'=>trim((string)($result['delimitation'] ?? '')),
+            'release_recommendation'=>trim((string)($result['release_recommendation'] ?? '')),
             'positions'=>$positions,
             'warnings'=>array_values(array_map('strval', is_array($result['warnings'] ?? null) ? $result['warnings'] : [])),
         ];
@@ -185,6 +220,16 @@ function krV2Handle(array $user): void
     $sender = (string)$senderProfile['email'];
     try {
         if ($action === 'status') apiJson(['ok'=>true,'sender'=>$sender,'sender_name'=>$senderProfile['name'],'sparkassen_bcc'=>KR_ARCHIVE]);
+        if ($action === 'technical_analyze') {
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
+            if (!isset($_FILES['file']) || !is_uploaded_file((string)($_FILES['file']['tmp_name'] ?? ''))) throw new RuntimeException('Bitte einen KVA per Drag-and-drop oder Dateiauswahl übergeben.');
+            $file = $_FILES['file'];
+            if ((int)($file['size'] ?? 0) > 30 * 1024 * 1024) throw new RuntimeException('Die Datei darf höchstens 30 MB groß sein.');
+            $name = basename((string)($file['name'] ?? 'KVA'));
+            $mime = (string)(mime_content_type((string)$file['tmp_name']) ?: ($file['type'] ?? 'application/octet-stream'));
+            $bytes = (string)file_get_contents((string)$file['tmp_name']);
+            apiJson(['ok'=>true,'source'=>$name,'analysis'=>krAnalyzeCalculation($name, $mime, $bytes)]);
+        }
         $folder = trim((string)($_REQUEST['folder_id'] ?? ''));
         requireCaseFolderAccess($folder, $user);
         if ($action === 'files') apiJson(['ok'=>true,'files'=>krKvas($folder)]);
