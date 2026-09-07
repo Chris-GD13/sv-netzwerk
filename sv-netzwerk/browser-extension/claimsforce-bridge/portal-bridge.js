@@ -168,6 +168,7 @@ function reportRuntime() {
   return chrome.runtime.sendMessage({ type: 'GET_RUNTIME_STATUS' }).then(status => {
     const active = status?.active || {}, diagnostic = status?.diagnostic || {};
     document.documentElement.setAttribute('data-svnet-claims-runtime', [active.status || 'idle', diagnostic.phase || active.phase || 'CF-IDLE', Number(active.jobId || 0), active.profile || 'none'].join('|'));
+    document.documentElement.setAttribute('data-svnet-rekon-runtime', [status?.rekon?.status || 'idle', status?.rekon?.runId || 'none', status?.rekon?.profile || 'none'].join('|'));
     window.postMessage({ type: 'SVNET_CLAIMS_RUNTIME_STATUS', status }, location.origin);
   }).catch(error => {
     if (invalidExtensionContext(error)) reportInvalidExtensionContext();

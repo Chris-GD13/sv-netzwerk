@@ -687,9 +687,9 @@ function startRekonImport(sender, message) {
   const run = { runId: message.runId || crypto.randomUUID(), profile: rekonProfileKey(message.profile), portalTabId, startedAt: new Date().toISOString() };
   if (runningRekonImport) return { ok: false, error: 'Ein Rekon-Import läuft bereits.' };
   runningRekonImport = run;
-  setTimeout(() => {
+  queueMicrotask(() => {
     runRekonImport(run).then(result => chrome.tabs.sendMessage(portalTabId, { type: 'REKON_IMPORT_DONE', result }).catch(() => {})).catch(error => chrome.tabs.sendMessage(portalTabId, { type: 'REKON_IMPORT_ERROR', error: String(error?.message || 'Rekon-Import fehlgeschlagen.').slice(0, 500) }).catch(() => {})).finally(() => { runningRekonImport = null; });
-  }, 0);
+  });
   return { ok: true, accepted: true, runId: run.runId };
 }
 
@@ -748,7 +748,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'GET_RUNTIME_STATUS') {
     Promise.all([chrome.storage.local.get('claimsActiveRun'), chrome.storage.local.get('claimsImportDiagnostic')]).then(([active, diagnostic]) => {
       const saved = active.claimsActiveRun || null;
-      sendResponse({ ok: true, active: saved, diagnostic: diagnostic.claimsImportDiagnostic || null });
+      sendResponse({ ok: true, active: saved, diagnostic: diagnostic.claimsImportDiagnostic || null, rekon: runningRekonImport ? { status: 'running', runId: runningRekonImport.runId, profile: runningRekonImport.profile, startedAt: runningRekonImport.startedAt } : { status: 'idle' } });
     });
     return true;
   }
