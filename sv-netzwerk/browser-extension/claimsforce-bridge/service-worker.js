@@ -687,7 +687,9 @@ function startRekonImport(sender, message) {
   const run = { runId: message.runId || crypto.randomUUID(), profile: rekonProfileKey(message.profile), portalTabId, startedAt: new Date().toISOString() };
   if (runningRekonImport) return { ok: false, error: 'Ein Rekon-Import läuft bereits.' };
   runningRekonImport = run;
-  runRekonImport(run).then(result => chrome.tabs.sendMessage(portalTabId, { type: 'REKON_IMPORT_DONE', result }).catch(() => {})).catch(error => chrome.tabs.sendMessage(portalTabId, { type: 'REKON_IMPORT_ERROR', error: String(error?.message || 'Rekon-Import fehlgeschlagen.').slice(0, 500) }).catch(() => {})).finally(() => { runningRekonImport = null; });
+  setTimeout(() => {
+    runRekonImport(run).then(result => chrome.tabs.sendMessage(portalTabId, { type: 'REKON_IMPORT_DONE', result }).catch(() => {})).catch(error => chrome.tabs.sendMessage(portalTabId, { type: 'REKON_IMPORT_ERROR', error: String(error?.message || 'Rekon-Import fehlgeschlagen.').slice(0, 500) }).catch(() => {})).finally(() => { runningRekonImport = null; });
+  }, 0);
   return { ok: true, accepted: true, runId: run.runId };
 }
 

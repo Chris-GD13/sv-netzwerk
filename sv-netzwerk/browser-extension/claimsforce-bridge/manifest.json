@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SV-Netzwerk Auftragsbrücke",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "Liest ClaimsForce- und Rekon-Aufträge samt Dateien, Nachrichten und Terminen in das SV-Netzwerk ein.",
   "permissions": ["storage", "tabs", "nativeMessaging", "browsingData", "alarms"],
   "host_permissions": [
