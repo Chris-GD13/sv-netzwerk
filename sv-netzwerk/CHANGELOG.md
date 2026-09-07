@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.51 – 2026-09-07
+
+- PLAUD-Ortstermin und Polycam-Aufmaß im Versicherungsfall in einer gemeinsamen, mittig geteilten Zeile angeordnet; auf kleinen Bildschirmen bleiben beide Bereiche untereinander bedienbar.
+
 ## 3.4.50 – 2026-09-07
 
 - Telefon und Kurzwahlen strikt nach angemeldetem Benutzer getrennt; neue Benutzer starten ohne fremde Kurzwahlen und verbinden ihr Handy beziehungsweise xtelsio/Sipgate selbst.

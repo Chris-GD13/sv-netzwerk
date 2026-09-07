@@ -29,6 +29,11 @@ assert(
   "Sanierer- und VN-Freigabe muessen nebeneinander eindeutig bezeichnet sein.",
 );
 assert(
+  page.includes('class="vf-analysis-grid"') &&
+    page.includes('.vf-analysis-grid{display:grid;grid-column:1/-1;grid-template-columns:minmax(0,1fr) minmax(0,1fr)'),
+  "PLAUD und Polycam muessen in einer gemeinsamen, mittig geteilten Zeile stehen.",
+);
+assert(
   !page.includes("Referenz öffnen"),
   "Die interne PDF-Vorlage darf nicht als Bedienpunkt angezeigt werden.",
 );
