@@ -90,9 +90,33 @@ function omValidRecipients(string $value): array {
     foreach ($parts as $part) {
         if ($part === '') continue;
         if (!filter_var($part, FILTER_VALIDATE_EMAIL)) throw new RuntimeException('Ungültige E-Mail-Adresse: ' . $part);
-        $out[] = ['emailAddress' => ['address' => $part]];
+        $key = mb_strtolower($part, 'UTF-8');
+        $out[$key] = ['emailAddress' => ['address' => $part]];
     }
-    return $out;
+    return array_values($out);
+}
+
+function omRecipientAddress(array $recipient): string {
+    return mb_strtolower(trim((string)($recipient['emailAddress']['address'] ?? '')), 'UTF-8');
+}
+
+function omEnforceBlindCopies(array &$to, array &$cc, array &$bcc): void {
+    $protected = [
+        'service.schaden@sparkassenversicherung.de',
+        'archiv@sparkassenversicherung.de',
+    ];
+    $selected = [];
+    foreach (array_merge($to, $cc, $bcc) as $recipient) {
+        $address = omRecipientAddress($recipient);
+        if (in_array($address, $protected, true)) $selected[$address] = $recipient;
+    }
+    $keepVisible = static fn(array $recipient): bool => !in_array(omRecipientAddress($recipient), $protected, true);
+    $to = array_values(array_filter($to, $keepVisible));
+    $cc = array_values(array_filter($cc, $keepVisible));
+    $bcc = array_values(array_filter($bcc, $keepVisible));
+    foreach ($protected as $address) {
+        if (isset($selected[$address])) $bcc[] = $selected[$address];
+    }
 }
 
 function omHtml(string $value): string {
@@ -128,8 +152,10 @@ try {
     if ($action === 'send') {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
         $to = omValidRecipients((string)($_POST['to'] ?? ''));
-        if (!$to) throw new RuntimeException('Empfänger fehlt.');
         $cc = omValidRecipients((string)($_POST['cc'] ?? ''));
+        $bcc = omValidRecipients((string)($_POST['bcc'] ?? ''));
+        omEnforceBlindCopies($to, $cc, $bcc);
+        if (!$to && !$cc && !$bcc) throw new RuntimeException('Empfänger fehlt.');
         $caseNo = trim((string)($_POST['case_no'] ?? ''));
         $damageType = trim((string)($_POST['damage_type'] ?? ''));
         if ($caseNo === '') throw new RuntimeException('Schaden-Nr. fehlt im aktiven Fall.');
@@ -144,9 +170,10 @@ try {
         $message = [
             'subject' => $subject,
             'body' => ['contentType' => 'HTML', 'content' => '<p>' . omHtml($text) . '</p>' . $signature],
-            'toRecipients' => $to,
         ];
+        if ($to) $message['toRecipients'] = $to;
         if ($cc) $message['ccRecipients'] = $cc;
+        if ($bcc) $message['bccRecipients'] = $bcc;
         $attachments = omAttachments();
         if ($attachments) $message['attachments'] = $attachments;
 
