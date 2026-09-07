@@ -1,5 +1,6 @@
 import { clearCredentials, loadCredentials, loadPortalCredentials, saveCredentials } from './vault.js';
 import { mapClaim, safeFileName } from './import-utils.js';
+import { isActiveRekonTask, mapRekonTask, ownerMatchesRekonProfile, rekonFileVersion, rekonMessageVersion, rekonProfileKey } from './rekon-utils.js';
 
 const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
 const PLANNING_BUCKETS = [
@@ -38,6 +39,7 @@ const tokenEmail = token => {
 };
 const authHeaders = token => ({ Authorization: `Bearer ${token}`, Accept: 'application/json' });
 let runningImport = null;
+let runningRekonImport = null;
 let credentialDiagnostic = 'idle';
 const safeRoute = url => { try { return new URL(url).pathname; } catch { return 'unbekannt'; } };
 
@@ -489,12 +491,201 @@ async function startImport(sender, message) {
   return { ok: true, accepted: true, resumed: resumesSaved, runId: run.runId };
 }
 
+const REKON_URL = 'https://www.rekoninterschaden-portal.de/dashboard';
+const REKON_TAB_PATTERN = 'https://www.rekoninterschaden-portal.de/*';
+const REKON_GRAPHQL = 'https://api.www.rekoninterschaden-portal.de/service';
+const REKON_TASKS_QUERY = `query Tasks($filter: TasksFilter!, $sort: TasksSort!, $pagination: PaginationInput!, $with_removed: Boolean) {
+  tasks(filter: $filter, sort: $sort, pagination: $pagination, with_removed: $with_removed) {
+    data { id identifier external_number policy_number reserve created_at state_changed_date
+      claimant { id name }
+      customer { id first_name name full_name phone phone2 mobile mobile2 email email2 }
+      primary_location { street street_no postcode city country { title } }
+      primary_form { id template { id title shortcut } }
+      visit_type { id title need_location }
+      state { id title color }
+      appointment { id date_from date_to description event_type { id title } calendar_event { id } }
+      owner { id name job_title }
+      leader { id name job_title }
+    }
+    paginatorInfo { total }
+  }
+}`;
+const REKON_FILES_QUERY = `query TaskFoldersAndFiles($task_id: ID!) {
+  taskFiles(task_id: $task_id) { data { id name original_file_name size mime_type created_at updated_at url folder_id } }
+  taskFolders(task_id: $task_id) { id name task_id parent_id folder_type }
+}`;
+const REKON_EMAILS_QUERY = `query TaskEmails($taskId: ID!) {
+  emails(task_id: $taskId) { data { id subject body body_preview state_id send_date
+    created_from_client { id name email }
+    attachments { id file { id name size mime_type created_at updated_at url_download } }
+    contacts { id address name type }
+  } }
+}`;
+const REKON_LOGS_QUERY = `query TaskLogs($taskId: ID!) {
+  taskLogs(task_id: $taskId) { id title created_at log_state_id state { id title color } client { name job_title } sms_message { body } }
+}`;
+
+async function rekonProgress(tabId, text, current = 0, total = 0) {
+  await chrome.tabs.sendMessage(tabId, { type: 'REKON_IMPORT_PROGRESS', text, current, total }).catch(() => {});
+}
+
+async function rekonGraph(query, variables, token, optional = false) {
+  const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 120000);
+  try {
+    const response = await fetch(REKON_GRAPHQL, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables }),
+      signal: controller.signal
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || payload.errors?.length) {
+      if (optional) return null;
+      throw new Error(`Rekon-Abruf fehlgeschlagen (${response.status || 'GraphQL'}).`);
+    }
+    return payload.data || {};
+  } catch (error) {
+    if (optional) return null;
+    if (String(error?.message || '').startsWith('Rekon-Abruf fehlgeschlagen')) throw error;
+    throw new Error(error?.name === 'AbortError' ? 'Rekon-Abruf hat das Zeitlimit überschritten.' : 'Rekon-Abruf ist fehlgeschlagen.');
+  } finally { clearTimeout(timer); }
+}
+
+async function rekonTokenValue() {
+  const row = await chrome.storage.session.get(['rekonToken', 'rekonTokenAt']);
+  return row.rekonToken && Date.now() - Number(row.rekonTokenAt || 0) < 12 * 60 * 60 * 1000 ? row.rekonToken : '';
+}
+
+async function rekonSession(profile, portalTabId) {
+  let [tab] = await chrome.tabs.query({ url: REKON_TAB_PATTERN });
+  if (!tab) tab = await chrome.tabs.create({ url: REKON_URL, active: true });
+  tab = await waitTab(tab.id, 60000);
+  let token = await rekonTokenValue();
+  let session = await chrome.tabs.sendMessage(tab.id, { type: 'REKON_SESSION_STATE' }).catch(() => null);
+  if (!token || !session?.ok) {
+    await rekonProgress(portalTabId, 'Rekon-Sitzung wird im Microsoft Edge neu eingelesen …');
+    await chrome.tabs.reload(tab.id);
+    tab = await waitTab(tab.id, 60000);
+    const deadline = Date.now() + 30000;
+    while (!token && Date.now() < deadline) { await sleep(500); token = await rekonTokenValue(); }
+    session = await chrome.tabs.sendMessage(tab.id, { type: 'REKON_SESSION_STATE' }).catch(() => null);
+  }
+  if (!session?.ok || !token) throw new Error('Rekon ist im Microsoft Edge nicht vollständig angemeldet. Bitte den geöffneten Rekon-Tab prüfen.');
+  if (!ownerMatchesRekonProfile(session.identity, profile)) throw new Error(`Rekon zeigt „${session.identity || 'kein eindeutiges Profil'}“ statt des ausgewählten Profils ${profile === 'marc' ? 'Marc Schütt' : 'Holger Roth'}.`);
+  return { tab, token };
+}
+
+async function readRekonTasks(token) {
+  const all = [];
+  for (let skip = 0, total = 1; skip < total; skip += 100) {
+    const data = await rekonGraph(REKON_TASKS_QUERY, { filter: { logic: 'and', filters: [] }, sort: { columns: [] }, pagination: { take: 100, skip }, with_removed: false }, token);
+    const page = data.tasks?.data || [];
+    total = Number(data.tasks?.paginatorInfo?.total || page.length);
+    all.push(...page);
+    if (!page.length) break;
+  }
+  return all.filter(isActiveRekonTask);
+}
+
+async function downloadRekonFile(file, token) {
+  const url = String(file?.url_download || file?.url || '').trim();
+  if (!url) throw new Error(`Rekon-Datei ${file?.name || file?.id || ''} besitzt keinen Downloadlink.`);
+  const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 120000);
+  try {
+    let response = await fetch(url, { headers: { Authorization: `Bearer ${token}` }, signal: controller.signal });
+    if (!response.ok) response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) throw new Error(`Rekon-Datei konnte nicht geladen werden (${response.status}).`);
+    return { buffer: await response.arrayBuffer(), mime: file.mime_type || response.headers.get('content-type') || 'application/octet-stream' };
+  } finally { clearTimeout(timer); }
+}
+
+async function runRekonImport(run) {
+  const profile = rekonProfileKey(run.profile), portalTabId = Number(run.portalTabId || 0);
+  await rekonProgress(portalTabId, 'Rekon-Import wird im Microsoft Edge vorbereitet …');
+  const { token } = await rekonSession(profile, portalTabId);
+  const tasks = await readRekonTasks(token);
+  if (!tasks.length) throw new Error('Rekon hat keine aktiven Aufträge geliefert. Der Import wurde ohne Änderungen beendet.');
+  const wrongOwner = tasks.find(task => !ownerMatchesRekonProfile(task?.owner?.name, profile));
+  if (wrongOwner) throw new Error(`Rekon-Auftrag ${wrongOwner.id} gehört zu „${wrongOwner?.owner?.name || 'unbekannt'}“ und nicht zum ausgewählten Zielprofil.`);
+  let updated = 0, skipped = 0, filesDone = 0, messagesDone = 0, appointmentsDone = 0;
+  for (let index = 0; index < tasks.length; index++) {
+    const task = tasks[index], mapped = mapRekonTask(task), id = String(task.id);
+    await rekonProgress(portalTabId, `Rekon ${mapped.schaden_nr || id}: Dateien und E-Mails werden geprüft …`, index, tasks.length);
+    const [fileData, emailData, logData] = await Promise.all([
+      rekonGraph(REKON_FILES_QUERY, { task_id: id }, token),
+      rekonGraph(REKON_EMAILS_QUERY, { taskId: id }, token, true),
+      rekonGraph(REKON_LOGS_QUERY, { taskId: id }, token, true)
+    ]);
+    const files = fileData?.taskFiles?.data || [], emails = emailData?.emails?.data || [], logs = logData?.taskLogs || [];
+    const fileVersions = files.map(rekonFileVersion).filter(Boolean);
+    const messageVersions = emails.map(rekonMessageVersion).filter(Boolean);
+    const appointmentVersions = mapped.rekon_termin ? [mapped.rekon_termin.id, mapped.rekon_termin.startDate, mapped.rekon_termin.endDate].map(String) : [];
+    const stableMapped = { ...mapped }; delete stableMapped.rekon_zuletzt_eingelesen;
+    const signature = await fingerprint({ mapped: stableMapped, fileVersions, messageVersions, appointmentVersions, logs });
+    const sync = await portal(portalTabId, { type: 'PORTAL_SYNC_STATE', mapped });
+    const existingMeta = sync.result?.meta || {};
+    if (existingMeta.rekon_sync_signature === signature) { skipped++; continue; }
+    const saved = await portalOperation(portalTabId, { type: 'PORTAL_UPSERT_ASYNC', operationId: crypto.randomUUID(), mapped, profile, source: mapped.rekon_quelle, sourceType: 'rekon' }, 120000);
+    const folderId = saved.folderId;
+    const knownFiles = new Set(Array.isArray(existingMeta.rekon_file_versions) ? existingMeta.rekon_file_versions.map(String) : []);
+    for (const file of files) {
+      const version = rekonFileVersion(file);
+      if (knownFiles.has(version)) continue;
+      const content = await downloadRekonFile(file, token);
+      const uploaded = await uploadBuffer(portalTabId, folderId, file.original_file_name || file.name || `Rekon-Datei-${file.id}`, content.mime, Date.parse(file.updated_at || file.created_at || '') || 0, content.buffer);
+      if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) filesDone++;
+    }
+    const knownMessages = new Set(Array.isArray(existingMeta.rekon_message_versions) ? existingMeta.rekon_message_versions.map(String) : []);
+    for (const email of emails) {
+      const version = rekonMessageVersion(email);
+      if (!knownMessages.has(version)) {
+        const stamp = String(email.send_date || '').replace(/[^0-9]/g, '').slice(0, 14) || id;
+        const subject = safeFileName(email.subject || `E-Mail-${email.id}`, 'Rekon-E-Mail').slice(0, 80);
+        const bytes = new TextEncoder().encode(JSON.stringify({ source: 'Rekon', task_id: id, ...email }, null, 2));
+        const uploaded = await uploadBuffer(portalTabId, folderId, `Mail_Rekon-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(email.send_date || '') || 0, bytes.buffer);
+        if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) messagesDone++;
+      }
+      for (const attachment of email.attachments || []) {
+        const file = attachment?.file;
+        if (!file || knownFiles.has(rekonFileVersion(file))) continue;
+        const content = await downloadRekonFile(file, token);
+        const uploaded = await uploadBuffer(portalTabId, folderId, file.name || `Rekon-Mail-Anhang-${file.id}`, content.mime, Date.parse(file.updated_at || file.created_at || email.send_date || '') || 0, content.buffer);
+        if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) filesDone++;
+      }
+    }
+    const auditBytes = new TextEncoder().encode(JSON.stringify({ source: 'Rekon', task, folders: fileData?.taskFolders || [], logs }, null, 2));
+    await uploadBuffer(portalTabId, folderId, `00_Rekon-Auftragsakte_${id}.json`, 'application/json', Date.parse(task.updated_at || task.state_changed_date || task.created_at || '') || 0, auditBytes.buffer);
+    if (mapped.rekon_termin?.startDate) {
+      const result = await portal(portalTabId, { type: 'PORTAL_APPOINTMENT', folderId, appointment: mapped.rekon_termin, profile, sourceType: 'rekon' });
+      if (!result?.result?.skipped) appointmentsDone++;
+    }
+    await portal(portalTabId, { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions, listVersion: String(task.updated_at || task.state_changed_date || ''), profile, sourceType: 'rekon' });
+    updated++;
+  }
+  await rekonProgress(portalTabId, `${tasks.length} aktive Rekon-Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, tasks.length, tasks.length);
+  return { tasks: tasks.length, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
+}
+
+async function startRekonImport(sender, message) {
+  const portalTabId = sender.tab?.id;
+  if (!portalTabId) return { ok: false, error: 'Portal-Registerkarte fehlt.' };
+  const run = { runId: message.runId || crypto.randomUUID(), profile: rekonProfileKey(message.profile), portalTabId, startedAt: new Date().toISOString() };
+  if (runningRekonImport) return { ok: false, error: 'Ein Rekon-Import läuft bereits.' };
+  runningRekonImport = run;
+  runRekonImport(run).then(result => chrome.tabs.sendMessage(portalTabId, { type: 'REKON_IMPORT_DONE', result }).catch(() => {})).catch(error => chrome.tabs.sendMessage(portalTabId, { type: 'REKON_IMPORT_ERROR', error: String(error?.message || 'Rekon-Import fehlgeschlagen.').slice(0, 500) }).catch(() => {})).finally(() => { runningRekonImport = null; });
+  return { ok: true, accepted: true, runId: run.runId };
+}
+
 chrome.runtime.onConnect.addListener(port => {
   if (port.name !== 'claims-import-keepalive') return;
   port.onMessage.addListener(() => {});
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type === 'REKON_TOKEN') {
+    chrome.storage.session.set({ rekonToken: message.token, rekonTokenAt: Date.now() }).then(() => sendResponse({ ok: true })).catch(error => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
   if (message?.type === 'CLAIMS_TOKEN') {
     chrome.storage.session.get('activeProfile').then(row => chrome.storage.session.set({ claimsToken: message.token, claimsTokenProfile: profileKey(row.activeProfile), claimsTokenAt: Date.now() })).then(() => sendResponse({ ok: true })).catch(error => sendResponse({ ok: false, error: error.message }));
     return true;
@@ -543,6 +734,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   if (message?.type === 'START_IMPORT' && sender.tab?.id) {
     startImport(sender, message).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
+  if (message?.type === 'START_REKON_IMPORT' && sender.tab?.id) {
+    startRekonImport(sender, message).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
     return true;
   }
 });

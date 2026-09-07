@@ -36,13 +36,13 @@ async function api(url, options = {}) {
 }
 
 async function findCase(mapped) {
-  const query = mapped.schaden_nr || mapped.claimsforce_claim_id;
+  const query = mapped.schaden_nr || mapped.claimsforce_claim_id || mapped.rekon_task_id;
   if (!query) return null;
   const found = await api(`${API}?action=search_cases&q=${encodeURIComponent(query)}`);
   for (const row of found.results || []) {
     const loaded = await api(`${API}?action=load_case&id=${encodeURIComponent(row.id)}`);
     const meta = loaded.case?.meta || row.meta || {};
-    if (meta.claimsforce_claim_id === mapped.claimsforce_claim_id || (mapped.schaden_nr && meta.schaden_nr === mapped.schaden_nr)) return { folderId: row.id, meta };
+    if ((mapped.claimsforce_claim_id && meta.claimsforce_claim_id === mapped.claimsforce_claim_id) || (mapped.rekon_task_id && meta.rekon_task_id === mapped.rekon_task_id) || (mapped.schaden_nr && meta.schaden_nr === mapped.schaden_nr)) return { folderId: row.id, meta };
   }
   return null;
 }
@@ -51,11 +51,19 @@ async function upsert(message) {
   const profile = profileKey(message.profile);
   const existing = await findCase(message.mapped);
   const merged = mergeBlank(existing?.meta || {}, message.mapped);
+  if (message.sourceType === 'rekon') {
+    merged.rekon_task_id = message.mapped.rekon_task_id;
+    merged.rekon_profile = profile;
+    merged.rekon_termin = message.mapped.rekon_termin;
+    merged.rekon_quelle = message.source;
+    merged.rekon_zuletzt_eingelesen = message.mapped.rekon_zuletzt_eingelesen;
+  } else {
   merged.claimsforce_claim_id = message.mapped.claimsforce_claim_id;
   merged.claimsforce_profile = profile;
   merged.claimsforce_termin = message.mapped.claimsforce_termin;
   merged.claimsforce_quelle = message.source;
   merged.claimsforce_zuletzt_eingelesen = message.mapped.claimsforce_zuletzt_eingelesen;
+  }
   const saved = await api(`${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: existing?.folderId || '', case: merged }) });
   return { folderId: saved.folder_id, meta: merged, existed: !!existing };
 }
@@ -69,12 +77,13 @@ async function commitSync(message) {
   const profile = profileKey(message.profile);
   const loaded = await api(`${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`);
   const meta = { ...(loaded.case?.meta || {}) };
-  meta.claimsforce_sync_signature = String(message.signature || '');
-  meta.claimsforce_profile = profile;
-  meta.claimsforce_file_versions = [...new Set((message.fileVersions || []).map(String).filter(Boolean))];
-  meta.claimsforce_message_versions = [...new Set((message.messageVersions || []).map(String).filter(Boolean))];
-  meta.claimsforce_list_version = String(message.listVersion || '');
-  meta.claimsforce_zuletzt_eingelesen = new Date().toISOString();
+  const prefix = message.sourceType === 'rekon' ? 'rekon' : 'claimsforce';
+  meta[`${prefix}_sync_signature`] = String(message.signature || '');
+  meta[`${prefix}_profile`] = profile;
+  meta[`${prefix}_file_versions`] = [...new Set((message.fileVersions || []).map(String).filter(Boolean))];
+  meta[`${prefix}_message_versions`] = [...new Set((message.messageVersions || []).map(String).filter(Boolean))];
+  meta[`${prefix}_list_version`] = String(message.listVersion || '');
+  meta[`${prefix}_zuletzt_eingelesen`] = new Date().toISOString();
   await api(`${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, case: meta }) });
   return { folderId: message.folderId, meta };
 }
@@ -100,7 +109,9 @@ async function appointment(message) {
   const profile = profileKey(message.profile);
   const loaded = await api(`${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`), meta = loaded.case?.meta || {};
   const appointmentId = String(message.appointment.id || message.appointment.startDate || '');
-  const imported = Array.isArray(meta.claimsforce_calendar_appointment_ids) ? meta.claimsforce_calendar_appointment_ids.map(String) : (meta.claimsforce_calendar_appointment_id ? [String(meta.claimsforce_calendar_appointment_id)] : []);
+  const prefix = message.sourceType === 'rekon' ? 'rekon' : 'claimsforce';
+  const idsKey = `${prefix}_calendar_appointment_ids`, idKey = `${prefix}_calendar_appointment_id`, eventsKey = `${prefix}_calendar_events`;
+  const imported = Array.isArray(meta[idsKey]) ? meta[idsKey].map(String) : (meta[idKey] ? [String(meta[idKey])] : []);
   if (appointmentId && imported.includes(appointmentId)) return { skipped: true };
   const start = new Date(message.appointment.startDate), end = message.appointment.endDate ? new Date(message.appointment.endDate) : new Date(start.getTime() + 60 * 60000);
   const form = new FormData();
@@ -109,13 +120,13 @@ async function appointment(message) {
   form.append('date', start.toLocaleDateString('sv-SE', { timeZone: 'Europe/Berlin' }));
   form.append('time', start.toLocaleTimeString('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit', hour12: false }));
   form.append('duration', String(Math.max(15, Math.round((end - start) / 60000))));
-  form.append('notes', message.appointment.comment || 'Aus ClaimsForce übernommen');
+  form.append('notes', message.appointment.comment || (message.sourceType === 'rekon' ? 'Aus Rekon übernommen' : 'Aus ClaimsForce übernommen'));
   form.append('invite_vn', '0');
   const result = await api(`${CAL}?action=create`, { method: 'POST', body: form });
   if (appointmentId) imported.push(appointmentId);
-  meta.claimsforce_calendar_appointment_ids = [...new Set(imported)];
-  meta.claimsforce_calendar_appointment_id = appointmentId;
-  meta.claimsforce_calendar_events = [...(Array.isArray(meta.claimsforce_calendar_events) ? meta.claimsforce_calendar_events : []), result.event].filter(Boolean);
+  meta[idsKey] = [...new Set(imported)];
+  meta[idKey] = appointmentId;
+  meta[eventsKey] = [...(Array.isArray(meta[eventsKey]) ? meta[eventsKey] : []), result.event].filter(Boolean);
   await api(`${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, case: meta }) });
   return result;
 }
@@ -205,6 +216,16 @@ window.addEventListener('message', event => {
       window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: invalid ? CONTEXT_RELOAD_MESSAGE : `[CF-RUN-00] ${error.message}`, runtime: { jobId: request.jobId } }, location.origin);
     });
   }
+  if (event.data?.type === 'SVNET_REKON_IMPORT_START') {
+    let profile;
+    try { profile = profileKey(event.data.profile); }
+    catch (error) { window.postMessage({ type: 'SVNET_REKON_IMPORT_ERROR', error: error.message }, location.origin); return; }
+    connectKeepalive();
+    chrome.runtime.sendMessage({ type: 'START_REKON_IMPORT', profile, runId: event.data.runId || crypto.randomUUID() }).then(response => {
+      if (!response?.ok) window.postMessage({ type: 'SVNET_REKON_IMPORT_ERROR', error: response?.error }, location.origin);
+      else window.postMessage({ type: 'SVNET_REKON_IMPORT_ACCEPTED', runId: response.runId }, location.origin);
+    }).catch(error => window.postMessage({ type: 'SVNET_REKON_IMPORT_ERROR', error: error.message }, location.origin));
+  }
   if (event.data?.type === 'SVNET_CLAIMS_OPEN_OPTIONS') {
     try { chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS', profile: profileKey(event.data.profile) }); }
     catch (error) { window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: error.message }, location.origin); }
@@ -214,6 +235,9 @@ chrome.runtime.onMessage.addListener(message => {
   if (message?.type === 'IMPORT_PROGRESS') window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_PROGRESS', ...message }, location.origin);
   if (message?.type === 'IMPORT_DONE') { activeRequest = null; disconnectKeepalive(); window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_DONE', result: message.result, runtime: message.runtime }, location.origin); }
   if (message?.type === 'IMPORT_ERROR') { activeRequest = null; disconnectKeepalive(); window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: message.error, runtime: message.runtime }, location.origin); }
+  if (message?.type === 'REKON_IMPORT_PROGRESS') window.postMessage({ type: 'SVNET_REKON_IMPORT_PROGRESS', ...message }, location.origin);
+  if (message?.type === 'REKON_IMPORT_DONE') { disconnectKeepalive(); window.postMessage({ type: 'SVNET_REKON_IMPORT_DONE', result: message.result }, location.origin); }
+  if (message?.type === 'REKON_IMPORT_ERROR') { disconnectKeepalive(); window.postMessage({ type: 'SVNET_REKON_IMPORT_ERROR', error: message.error }, location.origin); }
 });
 function disconnectKeepalive() {
   clearInterval(keepaliveTimer);

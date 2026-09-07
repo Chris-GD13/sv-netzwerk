@@ -78,6 +78,7 @@ jobs:
           php -l sv-netzwerk/public/intern/api/revenue-summary-v2.php
           php sv-netzwerk/tests/profile_routing_test.php
           node sv-netzwerk/tests/claimsforce_import_test.mjs
+          node sv-netzwerk/tests/rekon_import_test.mjs
 
       - name: Schnelle Fallsuche prüfen
         run: php sv-netzwerk/tests/case_search_test.php
