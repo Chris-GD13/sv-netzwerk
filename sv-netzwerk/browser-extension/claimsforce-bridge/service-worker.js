@@ -541,7 +541,8 @@ async function rekonGraph(query, variables, token, optional = false) {
     const payload = await response.json().catch(() => ({}));
     if (!response.ok || payload.errors?.length) {
       if (optional) return null;
-      throw new Error(`Rekon-Abruf fehlgeschlagen (${response.status || 'GraphQL'}).`);
+      const graphqlMessage = String(payload.errors?.[0]?.message || '').replace(/\s+/g, ' ').trim().slice(0, 220);
+      throw new Error(`Rekon-Abruf fehlgeschlagen (${response.status || 'GraphQL'})${graphqlMessage ? `: ${graphqlMessage}` : '.'}`);
     }
     return payload.data || {};
   } catch (error) {
@@ -581,7 +582,7 @@ async function rekonSession(profile, portalTabId) {
 async function readRekonTasks(token) {
   const all = [];
   for (let skip = 0, total = 1; skip < total; skip += 100) {
-    const data = await rekonGraph(REKON_TASKS_QUERY, { filter: { logic: 'and', filters: [] }, sort: { columns: [] }, pagination: { take: 100, skip }, with_removed: false }, token);
+    const data = await rekonGraph(REKON_TASKS_QUERY, { filter: {}, sort: { columns: [] }, pagination: { take: 100, skip }, with_removed: false }, token);
     const page = data.tasks?.data || [];
     total = Number(data.tasks?.paginatorInfo?.total || page.length);
     all.push(...page);
