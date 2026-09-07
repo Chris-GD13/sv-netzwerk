@@ -2,6 +2,11 @@ name: Portal-Setup (einmalig)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/setup-portal.yml'
+      - 'tests/portal_screenshot_test.js'
 
 permissions:
   contents: read

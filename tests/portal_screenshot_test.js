@@ -7,8 +7,15 @@ const BASE = process.env.PORTAL_URL || 'https://www.sv-netzwerk.eu';
 const INTERN_URL = `${BASE}/intern/fensterpruefung-bonn/`;
 const API_URL = `${BASE}/intern/api`;
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+  throw new Error('ADMIN_EMAIL und ADMIN_PASSWORD müssen als Umgebungsvariablen gesetzt sein.');
+}
+
 const ROLES = [
-  { name: 'admin', email: 'info@sv-netzwerk.eu', password: '@Stauffenberg10@Stauffenberg20' },
+  { name: 'admin', email: ADMIN_EMAIL, password: ADMIN_PASSWORD },
   // Test users (will only work if test data is seeded):
   // { name: 'pruefer', email: 'pruefer1@testprojekt.local', password: 'Test2026!' },
   // { name: 'gast', email: 'gast@testprojekt.local', password: 'Test2026!' },
