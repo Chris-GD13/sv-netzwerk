@@ -336,7 +336,7 @@ async function uploadBuffer(portalTabId, folderId, name, mime, modified, buffer)
 }
 
 async function runImport(run) {
-  const portalTabId = run.portalTabId, profile = profileKey(run.profile);
+  const portalTabId = () => Number(run.portalTabId || 0), profile = profileKey(run.profile);
   run.profile = profile;
   await chrome.storage.session.set({ activeProfile: profile });
   await resetClaimsSession(run);
@@ -373,16 +373,16 @@ async function runImport(run) {
   for (let index = 0; index < claims.length; index++) {
     const item = claims[index], id = item.id;
     const preliminary = { claimsforce_claim_id: id, schaden_nr: String(item.label || '').trim() };
-    const preliminaryState = await portal(portalTabId, { type: 'PORTAL_SYNC_STATE', mapped: preliminary, profile });
+    const preliminaryState = await portal(portalTabId(), { type: 'PORTAL_SYNC_STATE', mapped: preliminary, profile });
     const preliminaryMeta = preliminaryState.result?.meta || {};
     if (preliminaryState.result?.existed && item.listVersion && preliminaryMeta.claimsforce_list_version === item.listVersion) {
       skipped++;
-      await progress(portalTabId, `Auftrag ${index + 1}/${claims.length}: seit dem letzten Import unverändert, wird ohne erneuten Detailabruf übersprungen.`, index + 1, claims.length);
+      await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length}: seit dem letzten Import unverändert, wird ohne erneuten Detailabruf übersprungen.`, index + 1, claims.length);
       await diagnostic(run, 'CF-CASE-DELTA-SKIP', `Auftrag ${index + 1}/${claims.length} ist laut ClaimsForce-Änderungsstand unverändert.`, { current: index + 1, total: claims.length, claimIndex: index + 1, skippedCases: skipped });
       continue;
     }
     await diagnostic(run, 'CF-CASE-FETCH', `Auftrag ${index + 1}/${claims.length}: Falldaten werden geladen.`, { current: index, total: claims.length, claimIndex: index + 1 });
-    await progress(portalTabId, `Auftrag ${index + 1}/${claims.length} wird eingelesen …`, index, claims.length);
+    await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length} wird eingelesen …`, index, claims.length);
     const [rawDisposition, rawCommunication, rawFiles, rawMessages, rawAppointments, rawStakeholders] = await Promise.all([
       requestJson(`${config.DISPOSITION_API_ENDPOINT}/claims/${id}`, token),
       requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}`, token, true),
@@ -404,16 +404,16 @@ async function runImport(run) {
     delete stableMapped.claimsforce_zuletzt_eingelesen;
     const appointmentVersions = (Array.isArray(appointments) ? appointments : []).map(appointment => [appointment?.id, appointment?.updatedAt, appointment?.startDate, appointment?.endDate].map(value => String(value || '')).join('|'));
     const signature = await fingerprint({ mapped: stableMapped, fileVersions, messageVersions, appointmentVersions });
-    const state = await portal(portalTabId, { type: 'PORTAL_SYNC_STATE', mapped, profile });
+    const state = await portal(portalTabId(), { type: 'PORTAL_SYNC_STATE', mapped, profile });
     const existingMeta = state.result?.meta || {};
     if (state.result?.existed && existingMeta.claimsforce_sync_signature === signature) {
       skipped++;
-      await progress(portalTabId, `Auftrag ${index + 1}/${claims.length}: unverändert, wird übersprungen.`, index + 1, claims.length);
+      await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length}: unverändert, wird übersprungen.`, index + 1, claims.length);
       await diagnostic(run, 'CF-CASE-SKIP', `Auftrag ${index + 1}/${claims.length} ist bereits vollständig und unverändert vorhanden.`, { current: index + 1, total: claims.length, claimIndex: index + 1, skippedCases: skipped });
       continue;
     }
     await diagnostic(run, 'CF-CASE-UPSERT', `Auftrag ${index + 1}/${claims.length}: Portal-Fall wird angelegt oder ergänzt.`, { current: index, total: claims.length, claimIndex: index + 1 });
-    const upsert = await portalOperation(portalTabId, { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, profile, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, importedAt: new Date().toISOString() } });
+    const upsert = await portalOperation(portalTabId(), { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, profile, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, importedAt: new Date().toISOString() } });
     const folderId = upsert.folderId;
     await diagnostic(run, 'CF-CASE-FILES', `Auftrag ${index + 1}/${claims.length}: Anhänge und Nachrichten werden übernommen.`, { current: index, total: claims.length, claimIndex: index + 1 });
     const knownFileVersions = new Set(Array.isArray(existingMeta.claimsforce_file_versions) ? existingMeta.claimsforce_file_versions.map(String) : []);
@@ -422,7 +422,7 @@ async function runImport(run) {
       const version = fileVersion(file);
       if (knownFileVersions.has(version)) continue;
       const name = safeFileName(file.name || file.fileName || file.originalFilename, `ClaimsForce-${file.id}`);
-      await progress(portalTabId, `${mapped.schaden_nr || item.label}: ${name}`, index, claims.length);
+      await progress(portalTabId(), `${mapped.schaden_nr || item.label}: ${name}`, index, claims.length);
       const url = `${config.FILES_API_ENDPOINT}/claims/${encodeURIComponent(id)}/files/${encodeURIComponent(file.id)}?token=${encodeURIComponent(token)}`;
       const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
       let response, fileBuffer;
@@ -430,7 +430,7 @@ async function runImport(run) {
       catch (error) { throw new Error(error?.name === 'AbortError' ? `Datei „${name}“ hat das Zeitlimit überschritten.` : `Datei „${name}“ konnte nicht geladen werden.`); }
       finally { clearTimeout(timer); }
       if (!response.ok) throw new Error(`Datei „${name}“ konnte nicht geladen werden (${response.status}).`);
-      const uploaded = await uploadBuffer(portalTabId, folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, fileBuffer);
+      const uploaded = await uploadBuffer(portalTabId(), folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, fileBuffer);
       if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) filesDone++;
     }
     const knownMessageVersions = new Set(Array.isArray(existingMeta.claimsforce_message_versions) ? existingMeta.claimsforce_message_versions.map(String) : []);
@@ -442,21 +442,21 @@ async function runImport(run) {
       const stamp = String(record?.sentAt || record?.createdAt || '').slice(0, 10) || 'ohne-Datum';
       const subject = safeFileName(record?.subject || record?.payload?.subject || record?.id, 'Nachricht');
       const bytes = new TextEncoder().encode(JSON.stringify(record, null, 2));
-      const uploaded = await uploadBuffer(portalTabId, folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(record?.updatedAt || record?.createdAt || '') || 0, bytes.buffer);
+      const uploaded = await uploadBuffer(portalTabId(), folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(record?.updatedAt || record?.createdAt || '') || 0, bytes.buffer);
       if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) messagesDone++;
     }
     if (!['christian', 'jens'].includes(profile)) {
       for (const appointment of Array.isArray(appointments) ? appointments : []) {
         if (!appointment?.startDate) continue;
-        const appointmentResult = await portal(portalTabId, { type: 'PORTAL_APPOINTMENT', folderId, appointment, profile });
+        const appointmentResult = await portal(portalTabId(), { type: 'PORTAL_APPOINTMENT', folderId, appointment, profile });
         if (!appointmentResult?.result?.skipped) appointmentsDone++;
       }
     }
-    await portal(portalTabId, { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions, listVersion: item.listVersion || '', profile });
+    await portal(portalTabId(), { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions, listVersion: item.listVersion || '', profile });
     updated++;
     await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length} wurde vollständig im Portal verarbeitet.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
   }
-  await progress(portalTabId, `${claims.length} Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
+  await progress(portalTabId(), `${claims.length} Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
   await chrome.storage.session.set({ claimsLoggedProfile: profile });
   await chrome.storage.local.set({ claimsLoggedProfile: profile });
   return { claims: claims.length, openTasks, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
@@ -467,7 +467,11 @@ async function startImport(sender, message) {
   if (!portalTabId) return { ok: false, error: '[CF-RUN-00] Portal-Registerkarte fehlt.' };
   const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), portalTabId, startedAt: new Date().toISOString() };
   if (runningImport) {
-    if (runningImport.jobId === requested.jobId && runningImport.profile === requested.profile) return { ok: true, accepted: true, resumed: false, runId: runningImport.runId };
+    if (runningImport.jobId === requested.jobId && runningImport.profile === requested.profile) {
+      runningImport.portalTabId = portalTabId;
+      await chrome.storage.local.set({ claimsActiveRun: { ...runningImport, status: 'running', updatedAt: new Date().toISOString() } });
+      return { ok: true, accepted: true, resumed: true, runId: runningImport.runId };
+    }
     return { ok: false, error: '[CF-RUN-00] Ein anderer ClaimsForce-Import läuft bereits.' };
   }
   const saved = (await chrome.storage.local.get('claimsActiveRun')).claimsActiveRun;
@@ -476,11 +480,11 @@ async function startImport(sender, message) {
   runningImport = run;
   runImport(run).then(async result => {
     await chrome.storage.local.set({ claimsActiveRun: { ...run, status: 'done', result, finishedAt: new Date().toISOString() } });
-    await chrome.tabs.sendMessage(portalTabId, { type: 'IMPORT_DONE', result, runtime: { runId: run.runId, jobId: run.jobId, phase: 'CF-DONE-07' } }).catch(() => {});
+    await chrome.tabs.sendMessage(Number(run.portalTabId || 0), { type: 'IMPORT_DONE', result, runtime: { runId: run.runId, jobId: run.jobId, phase: 'CF-DONE-07' } }).catch(() => {});
   }).catch(async error => {
     const message = String(error?.message || 'ClaimsForce-Import fehlgeschlagen.').slice(0, 500);
     await chrome.storage.local.set({ claimsActiveRun: { ...run, status: 'failed', error: message, finishedAt: new Date().toISOString() } });
-    await chrome.tabs.sendMessage(portalTabId, { type: 'IMPORT_ERROR', error: message, runtime: { runId: run.runId, jobId: run.jobId, phase: 'CF-FAIL-99' } }).catch(() => {});
+    await chrome.tabs.sendMessage(Number(run.portalTabId || 0), { type: 'IMPORT_ERROR', error: message, runtime: { runId: run.runId, jobId: run.jobId, phase: 'CF-FAIL-99' } }).catch(() => {});
   }).finally(() => { runningImport = null; });
   return { ok: true, accepted: true, resumed: resumesSaved, runId: run.runId };
 }

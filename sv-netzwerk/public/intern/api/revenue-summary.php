@@ -27,7 +27,7 @@ function rsVisible(array $user):bool {
     return in_array(svnetUserProfile($user),['christian','holger','marc'],true)||rsCanRefresh($user)||rsIsKatja($user);
 }
 function rsCanViewProfile(array $user,string $profile):bool {
-    if(rsCanRefresh($user)||svnetUserProfile($user)==='christian')return true;
+    if(rsCanRefresh($user)||in_array(svnetUserProfile($user),['christian','marc'],true))return true;
     return str_starts_with($profile,'rekon_')&&(rsIsKatja($user)||svnetUserProfile($user)==='marc');
 }
 function rsCanRefreshProfile(array $user,string $profile):bool {

@@ -28,7 +28,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.3.18',currentBridgeVersion='1.3.23';
+  const minimumBridgeVersion='1.3.18',currentBridgeVersion='1.3.24';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -103,7 +103,10 @@
           await post('complete',{id:Number(active.job.id),ok:false,result:null,message:`Browserlauf wurde abgebrochen (${runtime.phase||'CF-RUNTIME'}).`});
           show(`Import ${active.job.id} wurde nach einem abgebrochenen Browserlauf sicher beendet.`,true);
           await resumeWatch();
-        }else show(`Import ${active.job.id} ist noch als laufend markiert und wird nicht automatisch neu gestartet.`,true);
+        }else{
+          show(`Import ${active.job.id} wird mit derselben Job-ID sicher wiederaufgenommen.`);
+          await launch(active.job,true);
+        }
       }
       else{
         const claimed=await post('claim');
