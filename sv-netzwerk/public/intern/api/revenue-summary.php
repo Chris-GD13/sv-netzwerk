@@ -5,6 +5,7 @@ require_once __DIR__.'/config.php';
 require_once __DIR__.'/profile-routing.php';
 
 const RS_SOURCE_URL = 'https://sv1schuett-my.sharepoint.com/:x:/r/personal/ws_sv-schuett_eu/_layouts/15/Doc.aspx?sourcedoc=%7B368ACA1B-6D24-402A-816C-B7B40827CF07%7D&file=CL%20Umsatzaufstellung%20W%25u00e4chter.xlsx&fromShare=true&action=default&mobileredirect=true';
+const RS_MARC_SOURCE_URL = 'https://sv1schuett-my.sharepoint.com/:x:/r/personal/ws_sv-schuett_eu/_layouts/15/Doc.aspx?sourcedoc=%7B74BA27B9-C9A3-4FC3-8094-782606044951%7D&file=CL%20Ums%25u00e4tze%20MS.xlsx&fromShare=true&action=default&mobileredirect=true';
 const RS_HOLGER_SOURCE_URL = 'https://1drv.ms/u/c/b09ce03dd5dcb502/IQD54mN-TXeFQ6hhpGj7ewM8AWXVLYIoZfTcMXHNL1Sf2nA?e=j6Fi3Z';
 const RS_GOOGLE_FILE_ID = '1OSL9jQow1C0azdi1NlbVSWXpbxfBZej9';
 const RS_MONTHS = ['januar'=>1,'februar'=>2,'maerz'=>3,'mrz'=>3,'april'=>4,'mai'=>5,'juni'=>6,'juli'=>7,'august'=>8,'september'=>9,'oktober'=>10,'november'=>11,'dezember'=>12];
@@ -27,8 +28,16 @@ function rsVisible(array $user):bool {
     return in_array(svnetUserProfile($user),['christian','holger','marc'],true)||rsCanRefresh($user)||rsIsKatja($user);
 }
 function rsCanViewProfile(array $user,string $profile):bool {
-    if(rsCanRefresh($user)||in_array(svnetUserProfile($user),['christian','marc'],true))return true;
-    return str_starts_with($profile,'rekon_')&&(rsIsKatja($user)||svnetUserProfile($user)==='marc');
+    $own=svnetUserProfile($user);
+    if(rsCanRefresh($user)||in_array($own,['christian','marc'],true))return true;
+    if($own==='holger')return in_array($profile,['holger','rekon_holger'],true);
+    return str_starts_with($profile,'rekon_')&&rsIsKatja($user);
+}
+function rsAllowedProfiles(array $user):array {
+    return array_values(array_filter(['christian','claims_marc','holger','rekon_marc','rekon_holger'],fn($profile)=>rsCanViewProfile($user,$profile)));
+}
+function rsDefaultProfile(array $user):?string {
+    $own=svnetUserProfile($user);if($own==='holger')return'holger';if($own==='marc')return'claims_marc';if(rsIsKatja($user))return'rekon_marc';return rsCanViewProfile($user,'christian')?'christian':null;
 }
 function rsCanRefreshProfile(array $user,string $profile):bool {
     return rsCanRefresh($user)||(str_starts_with($profile,'rekon_')&&rsIsKatja($user));
@@ -54,7 +63,7 @@ function rsHttp(string $method,string $url,array $headers=[],?string $body=null,
 function rsToken():string {
     static $token=null;if($token!==null)return$token;$tenant=rsCfg('MS_TENANT_ID');$client=rsCfg('MS_CLIENT_ID');$secret=rsCfg('MS_CLIENT_SECRET');if($tenant===''||$client===''||$secret==='')throw new RuntimeException('Die Microsoft-Verbindung ist nicht vollständig eingerichtet.');$response=rsHttp('POST','https://login.microsoftonline.com/'.rawurlencode($tenant).'/oauth2/v2.0/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['client_id'=>$client,'client_secret'=>$secret,'scope'=>'https://graph.microsoft.com/.default','grant_type'=>'client_credentials']),30);$json=json_decode($response['body'],true);if($response['status']!==200||!is_array($json)||empty($json['access_token']))throw new RuntimeException('Die Microsoft-Anmeldung ist fehlgeschlagen.');$token=(string)$json['access_token'];return$token;
 }
-function rsShareId():string {return'u!'.rtrim(strtr(base64_encode(RS_SOURCE_URL),'+/','-_'),'=');}
+function rsShareId(string $url=RS_SOURCE_URL):string {return'u!'.rtrim(strtr(base64_encode($url),'+/','-_'),'=');}
 function rsB64(string $value):string{return rtrim(strtr(base64_encode($value),'+/','-_'),'=');}
 function rsGoogleToken():string {
     static$token=null;if($token!==null)return$token;$client=rsCfg('GOOGLE_DRIVE_CLIENT_ID')?:rsSetting('google_drive_client_id');$secret=rsCfg('GOOGLE_DRIVE_CLIENT_SECRET')?:rsSetting('google_drive_client_secret');$refresh=rsCfg('GOOGLE_DRIVE_REFRESH_TOKEN')?:rsSetting('google_drive_refresh_token');if($client!==''&&$secret!==''&&$refresh!==''){$response=rsHttp('POST','https://oauth2.googleapis.com/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['client_id'=>$client,'client_secret'=>$secret,'refresh_token'=>$refresh,'grant_type'=>'refresh_token']),30);$json=json_decode($response['body'],true);if($response['status']===200&&is_array($json)&&!empty($json['access_token']))return$token=(string)$json['access_token'];}
@@ -70,12 +79,18 @@ function rsGraph(string $path,bool $binary=false):array|string {
 function rsGraphMaybe(string $path,bool $binary=false):array|string|null {
     $response=rsHttp('GET','https://graph.microsoft.com/v1.0/'.$path,['Authorization: Bearer '.rsToken()],null,$binary?180:60);if($response['status']<200||$response['status']>=300)return null;if($binary)return$response['body'];$json=json_decode($response['body'],true);return is_array($json)?$json:null;
 }
-function rsSharePointSource():array {
-    $share=rawurlencode(rsShareId());$meta=rsGraphMaybe('shares/'.$share.'/driveItem?%24select=id,name,lastModifiedDateTime');$bytes=is_array($meta)?rsGraphMaybe('shares/'.$share.'/driveItem/content',true):null;
+function rsSharePointSourceFor(string $url,string $fileName,array $fallbackPaths=[]):array {
+    $share=rawurlencode(rsShareId($url));$meta=rsGraphMaybe('shares/'.$share.'/driveItem?%24select=id,name,lastModifiedDateTime');$bytes=is_array($meta)?rsGraphMaybe('shares/'.$share.'/driveItem/content',true):null;
     if(is_array($meta)&&is_string($bytes)){$meta['sourceProvider']='SharePoint / OneDrive';return[$meta,$bytes];}
-    $site=rsGraphMaybe('sites/sv1schuett-my.sharepoint.com:/personal/ws_sv-schuett_eu:?%24select=id');$siteId=is_array($site)?(string)($site['id']??''):'';$file=rawurlencode('CL Umsatzaufstellung Wächter.xlsx');
-    if($siteId!=='')foreach(['Desktop/'.$file,$file]as$path){$base='sites/'.rawurlencode($siteId).'/drive/root:/'.$path;$meta=rsGraphMaybe($base.':?%24select=id,name,lastModifiedDateTime');$bytes=is_array($meta)?rsGraphMaybe($base.':/content',true):null;if(is_array($meta)&&is_string($bytes)){$meta['sourceProvider']='SharePoint / OneDrive';return[$meta,$bytes];}}
-    throw new RuntimeException('Die von Susanne bearbeitete SharePoint-Umsatzdatei ist für den Portalserver nicht lesbar.');
+    $site=rsGraphMaybe('sites/sv1schuett-my.sharepoint.com:/personal/ws_sv-schuett_eu:?%24select=id');$siteId=is_array($site)?(string)($site['id']??''):'';$file=rawurlencode($fileName);
+    if($siteId!=='')foreach(array_merge($fallbackPaths,['Desktop/'.$file,$file])as$path){$base='sites/'.rawurlencode($siteId).'/drive/root:/'.$path;$meta=rsGraphMaybe($base.':?%24select=id,name,lastModifiedDateTime');$bytes=is_array($meta)?rsGraphMaybe($base.':/content',true):null;if(is_array($meta)&&is_string($bytes)){$meta['sourceProvider']='SharePoint / OneDrive';return[$meta,$bytes];}}
+    throw new RuntimeException($fileName.' ist für den Portalserver nicht lesbar.');
+}
+function rsSharePointSource():array {
+    return rsSharePointSourceFor(RS_SOURCE_URL,'CL Umsatzaufstellung Wächter.xlsx');
+}
+function rsMarcSharePointSource():array {
+    return rsSharePointSourceFor(RS_MARC_SOURCE_URL,'CL Umsätze MS.xlsx');
 }
 function rsRekonSharePointSources():array {
     $site=rsGraphMaybe('sites/sv1schuett.sharepoint.com:/sites/SVBroSchtt:?%24select=id');$siteId=is_array($site)?(string)($site['id']??''):'';
@@ -208,6 +223,33 @@ function rsRefreshHolger(array $user,array $source):array {
 function rsHolgerEmpty():array {
     return['profile'=>'holger','source'=>'Holger Roth.xlsx','source_provider'=>'Noch nicht eingelesen','source_url'=>RS_HOLGER_SOURCE_URL,'source_updated_at'=>'–','comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'office_share_rate'=>0.10,'vat_rate'=>0.19,'current'=>[],'previous'=>[],'available_years'=>[],'entries'=>[]];
 }
+function rsMarcEntries(array $sheet):array {
+    $entries=[];$activeYear=0;$max=rsMaxRow($sheet);
+    for($row=1;$row<=$max;$row++){
+        $first=rsCell($sheet,$row,1);
+        if(is_numeric($first)&&(int)$first>=2000&&(int)$first<=2100){$activeYear=(int)$first;continue;}
+        if($activeYear===0)continue;
+        $incomeNet=rsNullableMoney(rsCell($sheet,$row,3));$incomeGross=rsNullableMoney(rsCell($sheet,$row,4));$creditDate=rsExcelDate(rsCell($sheet,$row,2));
+        if($incomeNet===null||$incomeGross===null||$incomeNet<=0||$incomeGross<=0||$creditDate==='')continue;
+        $month=0;if(preg_match('/^\d{2}\.(\d{2})\.\d{4}$/',$creditDate,$match))$month=(int)$match[1];if($month<1||$month>12)continue;
+        $actualNet=round($incomeNet/0.60,2);$actualGross=round($incomeGross/0.60,2);
+        $entries[]=['year'=>$activeYear,'month'=>$month,'month_label'=>RS_MONTH_LABELS[$month],'service_period'=>trim((string)$first),'credit_date'=>$creditDate,'income_net'=>$incomeNet,'income_gross'=>$incomeGross,'actual_order_net'=>$actualNet,'actual_order_gross'=>$actualGross,'regulierer_net'=>round($actualNet-$incomeNet,2),'regulierer_gross'=>round($actualGross-$incomeGross,2)];
+    }
+    usort($entries,fn($a,$b)=>[$b['year'],$b['month'],$b['credit_date']]<=>[$a['year'],$a['month'],$a['credit_date']]);return$entries;
+}
+function rsMarcWarnings(array $entries):array {
+    $warnings=[];foreach($entries as$row){$period=(string)($row['service_period']??'');preg_match_all('/\b\d{2}\.\d{2}\.\d{4}\b/',$period,$matches);if(count($matches[0])<2)continue;$start=DateTimeImmutable::createFromFormat('!d.m.Y',$matches[0][0]);$end=DateTimeImmutable::createFromFormat('!d.m.Y',$matches[0][1]);if($start&&$end&&$end<$start)$warnings[]='Leistungszeitraum „'.$period.'“ endet vor seinem Beginn und wurde unverändert aus der Quelle übernommen.';}return array_values(array_unique($warnings));
+}
+function rsMarcPeriod(array $entries,int $year,int $through):array {
+    $rows=array_values(array_filter($entries,fn($row)=>(int)$row['year']===$year&&(int)$row['month']<=$through));$sum=fn(string$key)=>round(array_sum(array_map(fn($row)=>(float)($row[$key]??0),$rows)),2);$count=count($rows);$incomeNet=$sum('income_net');$incomeGross=$sum('income_gross');$actualNet=$sum('actual_order_net');$actualGross=$sum('actual_order_gross');
+    return['year'=>$year,'period'=>'Jan.–'.RS_MONTH_LABELS[$through].' '.$year,'months'=>$through,'settlement_count'=>$count,'income_net'=>$incomeNet,'income_gross'=>$incomeGross,'actual_order_net'=>$actualNet,'actual_order_gross'=>$actualGross,'regulierer_net'=>$sum('regulierer_net'),'regulierer_gross'=>$sum('regulierer_gross'),'average_income_net'=>$count?round($incomeNet/$count,2):0.0,'average_income_gross'=>$count?round($incomeGross/$count,2):0.0,'annualized_income_net'=>$through?round($incomeNet/$through*12,2):0.0,'annualized_income_gross'=>$through?round($incomeGross/$through*12,2):0.0];
+}
+function rsRefreshMarc(array $user,array $source):array {
+    [$meta,$bytes]=$source;$tmp=tempnam(sys_get_temp_dir(),'revenue-marc-');if($tmp===false||file_put_contents($tmp,$bytes)===false)throw new RuntimeException('Marcs Umsatzdatei konnte nicht zwischengespeichert werden.');try{$sheets=rsWorkbook($tmp);}finally{@unlink($tmp);}if(!$sheets)throw new RuntimeException('Marcs Umsatzdatei enthält kein lesbares Tabellenblatt.');$entries=rsMarcEntries(array_values($sheets)[0]);if(!$entries)throw new RuntimeException('In Marcs Umsatzdatei wurden keine abrechenbaren Gutschriften gefunden.');$years=array_values(array_unique(array_map(fn($row)=>(int)$row['year'],$entries)));rsort($years);$currentYear=(int)date('Y');$previousYear=$currentYear-1;$currentMonths=array_map(fn($row)=>(int)$row['month'],array_filter($entries,fn($row)=>(int)$row['year']===$currentYear));if(!$currentMonths)throw new RuntimeException('In Marcs Umsatzdatei fehlen Gutschriften für das aktuelle Jahr.');$through=max($currentMonths);$payload=['profile'=>'claims_marc','provider'=>'claims','person'=>'Marc Schütt','source'=>(string)($meta['name']??'CL Umsätze MS.xlsx'),'source_provider'=>(string)($meta['sourceProvider']??'Manuell eingelesene Originaldatei'),'source_url'=>RS_MARC_SOURCE_URL,'source_updated_at'=>date('d.m.Y H:i',strtotime((string)($meta['lastModifiedDateTime']??'now'))),'comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'vat_rate'=>0.19,'current'=>rsMarcPeriod($entries,$currentYear,$through),'previous'=>rsMarcPeriod($entries,$previousYear,$through),'available_years'=>$years,'entries'=>$entries,'source_warnings'=>rsMarcWarnings($entries)];return rsPersist('claims_marc',$payload,$meta,$user);
+}
+function rsMarcEmpty():array {
+    return['profile'=>'claims_marc','provider'=>'claims','person'=>'Marc Schütt','source'=>'CL Umsätze MS.xlsx','source_provider'=>'Noch nicht eingelesen','source_url'=>RS_MARC_SOURCE_URL,'source_updated_at'=>'–','comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'vat_rate'=>0.19,'current'=>[],'previous'=>[],'available_years'=>[],'entries'=>[],'source_warnings'=>[]];
+}
 function rsRekonIdentity(string $value):string {
     $text=rsText($value);if(str_contains($text,'holger')||str_contains($text,'roth'))return'rekon_holger';if(str_contains($text,'marc')||str_contains($text,'schuett'))return'rekon_marc';return'';
 }
@@ -230,12 +272,12 @@ function rsRekonEmpty(string $profile):array {
 }
 
 $action=(string)($_GET['action']??'summary');
-$profile=rsText((string)($_GET['profile']??'christian'));if(!in_array($profile,['christian','holger','rekon_marc','rekon_holger'],true))$profile='christian';
+$profile=rsText((string)($_GET['profile']??'christian'));if(!in_array($profile,['christian','claims_marc','holger','rekon_marc','rekon_holger'],true))$profile='christian';
 if($action==='scheduled'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
     $expected=rsCfg('SETUP_KEY');$provided=trim((string)($_SERVER['HTTP_X_SVNET_SCHEDULE_KEY']??''));
     if($expected===''||$provided===''||!hash_equals($expected,$provided))apiError(403,'Automationsschlüssel ungültig.');
-    try{$payload=rsRefresh(['email'=>'server-automation@sv-netzwerk.eu','full_name'=>'Server-Automation']);apiJson(['ok'=>true,'scheduled'=>true,...$payload]);}
+    try{$automation=['email'=>'server-automation@sv-netzwerk.eu','full_name'=>'Server-Automation'];$christian=rsRefresh($automation);$marc=rsRefreshMarc($automation,rsMarcSharePointSource());apiJson(['ok'=>true,'scheduled'=>true,'profiles'=>['christian','claims_marc'],'christian_updated_at'=>$christian['source_updated_at']??null,'marc_updated_at'=>$marc['source_updated_at']??null]);}
     catch(Throwable $error){error_log('[revenue-summary scheduled] '.$error->getMessage());apiError(503,$error->getMessage());}
 }
 if($action==='scheduled_rekon'){
@@ -247,13 +289,13 @@ if($action==='access'){
     if(!rsVisible($user))apiJson(['ok'=>true,'visible'=>false]);
     if(svnetUserProfile($user)==='holger'){
         $claims=rsStored('holger')??rsHolgerEmpty();$rekon=rsStored('rekon_holger')??rsRekonEmpty('rekon_holger');$claimsCurrent=is_array($claims['current']??null)?$claims['current']:[];$rekonCurrent=is_array($rekon['current']??null)?$rekon['current']:[];
-        apiJson(['ok'=>true,'visible'=>true,'show_summary'=>true,'show_settlement_link'=>false,'summary_type'=>'holger','claims'=>['period'=>(string)($claimsCurrent['period']??date('Y')),'net'=>(float)($claimsCurrent['income_net']??0),'gross'=>(float)($claimsCurrent['income_gross']??0),'updated_at'=>(string)($claims['source_updated_at']??'–')],'rekon'=>['period'=>(string)($rekonCurrent['period']??date('Y')),'net'=>(float)($rekonCurrent['payout_net']??0),'gross'=>(float)($rekonCurrent['payout_gross']??0),'updated_at'=>(string)($rekon['source_updated_at']??'–')]]);
+        apiJson(['ok'=>true,'visible'=>true,'show_summary'=>true,'show_settlement_link'=>true,'default_profile'=>'holger','allowed_profiles'=>rsAllowedProfiles($user),'summary_type'=>'holger','claims'=>['period'=>(string)($claimsCurrent['period']??date('Y')),'net'=>(float)($claimsCurrent['income_net']??0),'gross'=>(float)($claimsCurrent['income_gross']??0),'updated_at'=>(string)($claims['source_updated_at']??'–')],'rekon'=>['period'=>(string)($rekonCurrent['period']??date('Y')),'net'=>(float)($rekonCurrent['payout_net']??0),'gross'=>(float)($rekonCurrent['payout_gross']??0),'updated_at'=>(string)($rekon['source_updated_at']??'–')]]);
     }
-    if(rsCanViewProfile($user,'christian')){$payload=rsStored('christian')??rsFallback();unset($payload['entries'],$payload['private_entries'],$payload['available_years']);apiJson(['ok'=>true,'visible'=>true,'show_summary'=>true,'show_settlement_link'=>true,...$payload]);}
-    apiJson(['ok'=>true,'visible'=>true,'show_summary'=>false,'show_settlement_link'=>true,'default_profile'=>'rekon_marc']);
+    if(rsCanViewProfile($user,'christian')){$payload=rsStored('christian')??rsFallback();unset($payload['entries'],$payload['private_entries'],$payload['available_years']);apiJson(['ok'=>true,'visible'=>true,'show_summary'=>true,'show_settlement_link'=>true,'default_profile'=>rsDefaultProfile($user),'allowed_profiles'=>rsAllowedProfiles($user),...$payload]);}
+    apiJson(['ok'=>true,'visible'=>true,'show_summary'=>false,'show_settlement_link'=>true,'default_profile'=>rsDefaultProfile($user),'allowed_profiles'=>rsAllowedProfiles($user)]);
 }
-if(!rsVisible($user)||!rsCanViewProfile($user,$profile))apiJson(['ok'=>true,'visible'=>false,'default_profile'=>(rsIsKatja($user)||svnetUserProfile($user)==='marc')?'rekon_marc':null]);
+if(!rsVisible($user)||!rsCanViewProfile($user,$profile))apiJson(['ok'=>true,'visible'=>false,'default_profile'=>rsDefaultProfile($user),'allowed_profiles'=>rsAllowedProfiles($user)]);
 try{
-    if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if(!rsCanRefreshProfile($user,$profile))apiError(403,str_starts_with($profile,'rekon_')?'Nur Katja oder Susanne dürfen Rekon manuell aktualisieren.':'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');if(str_starts_with($profile,'rekon_'))$payload=rsRefreshRekon($user,rsUploadedSources(),$profile);else{$source=rsUploadedSource();$payload=$profile==='holger'?rsRefreshHolger($user,$source):rsRefresh($user,$source);}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,...$payload]);}
-    $payload=rsStored($profile)??($profile==='holger'?rsHolgerEmpty():(str_starts_with($profile,'rekon_')?rsRekonEmpty($profile):rsFallback()));if($action!=='settlement'){unset($payload['entries'],$payload['private_entries'],$payload['available_years']);}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>$action==='settlement'&&rsCanRefreshProfile($user,$profile),...$payload]);
+    if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if(!rsCanRefreshProfile($user,$profile))apiError(403,str_starts_with($profile,'rekon_')?'Nur Katja oder Susanne dürfen Rekon manuell aktualisieren.':'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');if(str_starts_with($profile,'rekon_'))$payload=rsRefreshRekon($user,rsUploadedSources(),$profile);else{$source=rsUploadedSource();$payload=$profile==='holger'?rsRefreshHolger($user,$source):($profile==='claims_marc'?rsRefreshMarc($user,$source):rsRefresh($user,$source));}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,'allowed_profiles'=>rsAllowedProfiles($user),...$payload]);}
+    $payload=rsStored($profile)??($profile==='holger'?rsHolgerEmpty():($profile==='claims_marc'?rsMarcEmpty():(str_starts_with($profile,'rekon_')?rsRekonEmpty($profile):rsFallback())));if($action!=='settlement'){unset($payload['entries'],$payload['private_entries'],$payload['available_years']);}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>$action==='settlement'&&rsCanRefreshProfile($user,$profile),'allowed_profiles'=>rsAllowedProfiles($user),...$payload]);
 }catch(Throwable $error){error_log('[revenue-summary] '.$error->getMessage());apiError(503,$error->getMessage());}
