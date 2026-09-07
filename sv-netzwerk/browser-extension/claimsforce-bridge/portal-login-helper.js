@@ -7,9 +7,14 @@ async function fillPortalLogin() {
   const password = document.querySelector('#login-password,input[name="password"]');
   const form = document.querySelector('#intern-login-form') || password?.closest('form');
   if (!email || !password || !form) { mark('waiting-form'); return; }
+  attempted = true;
+  const permission = await chrome.runtime.sendMessage({ type: 'CONSUME_PORTAL_AUTOLOGIN' }).catch(() => null);
+  if (!permission?.allowed) {
+    mark('manual-login');
+    return;
+  }
   const submit = () => setTimeout(() => form.querySelector('button[type="submit"]')?.click() || form.requestSubmit?.(), 250);
   if (email.value && password.value) {
-    attempted = true;
     submit();
     return;
   }
@@ -20,7 +25,6 @@ async function fillPortalLogin() {
     mark(`credentials-unavailable-${status?.phase || 'unknown'}`);
     return;
   }
-  attempted = true;
   const set = (node, value) => {
     const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
     setter?.call(node, value);

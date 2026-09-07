@@ -51,20 +51,20 @@ assert.equal(safeFileName('KVA: Angebot?.pdf'), 'KVA- Angebot-.pdf');
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, '1.4.2', 'die Brücke für ClaimsForce und Rekon muss als neue Laufzeitversion erkennbar sein');
+assert.equal(manifest.version, '1.4.3', 'die Brücke für ClaimsForce und Rekon muss als neue Laufzeitversion erkennbar sein');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*')));
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://claimsforce.eu.auth0.com/*')));
 assert(manifest.content_scripts.some(entry => entry.js.includes('login-helper.js') && entry.matches.includes('https://*.claimsforce.com/*') && !entry.exclude_matches), 'ClaimsForce-Anmeldehilfe muss auch auf web.claimsforce.com/login laufen');
 const claimsLogin = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/login-helper.js'), 'utf8');
-assert(claimsLogin.includes('if (email.value && password.value)') && claimsLogin.includes('button.click()'), 'Bereits von Chrome ausgefüllte ClaimsForce-Zugangsdaten werden automatisch abgesendet');
+assert(!claimsLogin.includes("sendMessage({ type: 'GET_CREDENTIALS'"), 'Eine normal geöffnete ClaimsForce-Anmeldeseite darf keine gespeicherten Zugangsdaten anfordern');
+assert(!claimsLogin.includes('if (email.value && password.value) submitWhenReady()'), 'Browser-Autofill darf nach einer manuellen ClaimsForce-Abmeldung nicht automatisch abgesendet werden');
 assert(claimsLogin.includes('submissionAttempted = false') && claimsLogin.includes('if (submitLoop || submissionAttempted) return') && claimsLogin.includes('submissionAttempted = true'), 'Eine geladene ClaimsForce-Anmeldeseite darf höchstens einen einzigen Anmeldeversuch auslösen');
-assert(claimsLogin.indexOf("const response = credentials ||") < claimsLogin.indexOf('if (email.value && password.value)'), 'Ausdrücklich gewählte Profilzugänge müssen Chrome-Autofill vor dem Absenden überschreiben');
 assert(claimsLogin.includes("message?.type !== 'FILL_LOGIN'") && claimsLogin.includes('suppliedCredentials'), 'Service Worker muss Zugangsdaten direkt und nur innerhalb der Erweiterung an die Loginseite übergeben können');
-assert(claimsLogin.includes('if (!response?.email || !response?.password)') && claimsLogin.includes('if (email.value && password.value) submitWhenReady()'), 'Chrome-Autofill wird nur verwendet, wenn keine ausdrücklich gewählten Profilzugänge verfügbar sind');
+assert(claimsLogin.includes('const response = credentials;') && claimsLogin.includes('if (!response?.email || !response?.password) return false'), 'Nur die ausdrücklich vom laufenden Import übergebenen Profilzugänge dürfen verwendet werden');
 assert(claimsLogin.includes("button && !button.disabled") && claimsLogin.includes('attempts < 30') && !claimsLogin.includes('form.requestSubmit?.()'), 'Die Brücke wartet nur auf den verzögert aktivierten ClaimsForce-Anmeldebutton und sendet niemals über einen zweiten Formularweg ab');
 assert(claimsLogin.includes('node._valueTracker?.setValue(previous)') && claimsLogin.includes("new InputEvent('input'"), 'ClaimsForce-React muss die eingesetzten Profilzugänge als echte Eingabe erkennen');
 assert(claimsLogin.includes('input[inputmode="email"]') && claimsLogin.includes('if (!password || !button) return'), 'Die aktuelle ClaimsForce-Anmeldeseite ohne HTML-Formular und mit Text-E-Mailfeld wird unterstützt');
-assert(claimsLogin.includes('new MutationObserver(() => fillLogin())') && !claimsLogin.includes('setInterval('), 'Die Felder dürfen nach einem verzögerten ClaimsForce-Neuaufbau erkannt werden, ohne eine endlose Anmeldeschleife zu starten');
+assert(claimsLogin.includes('function observeRequestedLogin()') && claimsLogin.includes('new MutationObserver(() => fillLogin(suppliedCredentials))') && claimsLogin.indexOf('observeRequestedLogin();') > claimsLogin.indexOf("message?.type !== 'FILL_LOGIN'"), 'Ein verzögerter ClaimsForce-Neuaufbau wird erst nach einer ausdrücklichen Import-Anmeldeanforderung beobachtet');
 assert(claimsLogin.includes('sendResponse({ ok: !!ready })'), 'Der Service Worker erhält nur dann eine Anmeldebestätigung, wenn die Felder tatsächlich gefunden wurden');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/login/*') && entry.js.includes('portal-login-helper.js')), 'Automatische Prüfportal-Anmeldung ist in der Brücke registriert');
 assert(manifest.content_scripts.some(entry => entry.js.includes('portal-login-helper.js') && entry.run_at === 'document_idle'), 'Portal-Anmeldehilfe startet erst am vorhandenen Loginformular');
@@ -123,8 +123,10 @@ assert(options.includes("password.value || currentCredentials?.password"), 'Ein 
 assert(options.includes('Kennwort ist verschlüsselt gespeichert'), 'Gespeichertes Kennwort muss ohne Klartext sichtbar bestätigt werden');
 assert(options.includes('savePortalCredentials') && options.includes('automatische Prüfportal-Anmeldung'), 'Prüfportal-Zugang kann einmalig verschlüsselt gespeichert werden');
 const portalLogin = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/portal-login-helper.js'), 'utf8');
-assert(portalLogin.includes('GET_PORTAL_CREDENTIALS') && portalLogin.includes('requestSubmit'), 'Prüfportal wird nach einem Sitzungsablauf automatisch wieder angemeldet');
-assert(portalLogin.includes('if (email.value && password.value)') && portalLogin.includes("button[type=\"submit\"]") , 'Bereits vom Browser ausgefüllte Portal-Zugangsdaten werden automatisch abgesendet');
+assert(portalLogin.includes('CONSUME_PORTAL_AUTOLOGIN') && portalLogin.indexOf('CONSUME_PORTAL_AUTOLOGIN') < portalLogin.indexOf('GET_PORTAL_CREDENTIALS'), 'Prüfportal-Zugangsdaten dürfen nur nach einer ausdrücklichen einmaligen Importanforderung gelesen werden');
+assert(portalLogin.includes("mark('manual-login')") && portalLogin.includes('if (!permission?.allowed)'), 'Ein normaler Login nach dem Abmelden bleibt für die manuelle Profilwahl offen');
+assert(portalLogin.includes('GET_PORTAL_CREDENTIALS') && portalLogin.includes('requestSubmit'), 'Der ausdrücklich gestartete zentrale Import kann das Prüfportal weiterhin automatisch anmelden');
+assert(portalLogin.includes('if (email.value && password.value)') && portalLogin.includes("button[type=\"submit\"]") , 'Bereits vom Browser ausgefüllte Portal-Zugangsdaten werden nur im ausdrücklich gestarteten Import abgesendet');
 assert(portalLogin.includes('if (!document.documentElement)') && portalLogin.includes('watchPortalLogin'), 'Portal-Anmeldehilfe muss auch bei document_start auf das entstehende Formular warten');
 assert(portalLogin.includes('data-svnet-portal-login') && portalLogin.includes("mark('submitted')"), 'Portal-Anmeldehilfe liefert geheimnisfreie DOM-Laufzeitphasen');
 
@@ -262,7 +264,8 @@ assert(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/ser
 assert(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8').includes("chrome.runtime.getURL('local-config.json')"), 'Brücke besitzt einen lokalen 127.0.0.1-Fallback für die Zugangsdaten');
 assert(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8').includes('sleep(800).then(() => null)'), 'Ein hängender nativer Zugangsdatenkanal darf den Loopback-Fallback nicht blockieren');
 const serviceWorker = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8');
-assert(manifest.version === '1.4.2' && !serviceWorker.includes('REVENUE_REFRESH_ALARM') && !serviceWorker.includes('PORTAL_REVENUE_REFRESH') && !bridge.includes('PORTAL_REVENUE_REFRESH'), 'Der Umsatzabgleich darf nicht mehr von einer installierten Browser-Brücke abhängen');
+assert(manifest.version === '1.4.3' && !serviceWorker.includes('REVENUE_REFRESH_ALARM') && !serviceWorker.includes('PORTAL_REVENUE_REFRESH') && !bridge.includes('PORTAL_REVENUE_REFRESH'), 'Der Umsatzabgleich darf nicht mehr von einer installierten Browser-Brücke abhängen');
+assert(serviceWorker.includes('portalAutoLoginRequest: { tabId:') && serviceWorker.includes("message?.type === 'CONSUME_PORTAL_AUTOLOGIN'") && serviceWorker.includes("remove('portalAutoLoginRequest')"), 'Automatische Portal-Anmeldung ist tabgebunden, kurzlebig und nur einmal nutzbar');
 assert(claimsMain.includes('listVersion') && serviceWorker.includes('CF-CASE-DELTA-SKIP'), 'Unveränderte Bestandsfälle müssen anhand des ClaimsForce-Änderungsstands vor dem erneuten Detailabruf übersprungen werden');
 assert(serviceWorker.includes('delete stableMapped.claimsforce_zuletzt_eingelesen') && serviceWorker.includes('fileVersions, messageVersions, appointmentVersions'), 'Der Vollabgleich darf keine bei jedem Lauf wechselnden Importzeitpunkte in die Signatur aufnehmen');
 assert(serviceWorker.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens']") && serviceWorker.includes('profileKey(message.profile)'), 'Service Worker verwendet das angeforderte Profil nur nach Whitelist-Prüfung');

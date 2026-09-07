@@ -21,6 +21,7 @@ const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/versicherungsfaell
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
 const DAILY_IMPORT_ALARM = 'svnet-claimsforce-daily-0300';
+const PORTAL_AUTOLOGIN_TTL_MS = 30000;
 const profileKey = value => {
   const profile = String(value || '').trim().toLowerCase();
   if (!SUPPORTED_PROFILES.includes(profile)) throw new Error('Ungültiges ClaimsForce-Profil.');
@@ -85,10 +86,14 @@ async function wakeCentralImportStation() {
   const loginTabs = await chrome.tabs.query({ url: PORTAL_LOGIN_PATTERN });
   const loginTab = loginTabs.find(tab => Number.isInteger(tab.id));
   if (loginTab) {
+    await chrome.storage.session.set({ portalAutoLoginRequest: { tabId: loginTab.id, requestedAt: Date.now() } });
     await chrome.tabs.update(loginTab.id, { url: PORTAL_URL, active: false });
     return;
   }
-  await chrome.tabs.create({ url: PORTAL_URL, active: false });
+  const createdTab = await chrome.tabs.create({ url: PORTAL_URL, active: false });
+  if (Number.isInteger(createdTab.id)) {
+    await chrome.storage.session.set({ portalAutoLoginRequest: { tabId: createdTab.id, requestedAt: Date.now() } });
+  }
 }
 
 async function catchUpMorningImport() {
@@ -718,6 +723,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (value?.email && value?.password) return value;
       return (await credentialsFor('christian'))?.value || null;
     }).then(value => sendResponse(value || {}));
+    return true;
+  }
+  if (message?.type === 'CONSUME_PORTAL_AUTOLOGIN') {
+    chrome.storage.session.get('portalAutoLoginRequest').then(async row => {
+      const request = row.portalAutoLoginRequest;
+      await chrome.storage.session.remove('portalAutoLoginRequest');
+      const allowed = Number.isInteger(sender.tab?.id)
+        && request?.tabId === sender.tab.id
+        && Date.now() - Number(request.requestedAt || 0) <= PORTAL_AUTOLOGIN_TTL_MS;
+      sendResponse({ allowed });
+    }).catch(() => sendResponse({ allowed: false }));
     return true;
   }
   if (message?.type === 'GET_CREDENTIAL_DIAGNOSTIC') { sendResponse({ ok: true, phase: credentialDiagnostic }); return; }
