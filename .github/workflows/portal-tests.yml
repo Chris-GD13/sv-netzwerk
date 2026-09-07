@@ -56,6 +56,9 @@ jobs:
       - name: KVA-Saniererkontakte vollständig ergänzen
         run: php sv-netzwerk/tests/kva_contact_enrichment_test.php
 
+      - name: Technische Freigabe mit mehreren KVA prüfen
+        run: node sv-netzwerk/tests/technical_release_multi_kva_test.mjs
+
       - name: Saniererkontakte aus vorhandenem KVA neu einlesen
         run: php sv-netzwerk/tests/kva_contact_refresh_test.php
 

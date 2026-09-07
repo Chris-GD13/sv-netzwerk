@@ -5,6 +5,10 @@ DirectoryIndex index.php index.html
 # Deployments verbliebene HTML-Einstiegspunkte dürfen die Auth-Prüfung nicht umgehen.
 RewriteRule ^intern/(?!login/)(?:.*/)?index\.html$ - [R=404,L,NC]
 
+# Das fallbezogene Referenzformular darf nur über den authentifizierten
+# PHP-Endpunkt ausgeliefert werden, niemals als frei abrufbare statische Datei.
+RewriteRule ^intern/references/technische-kva-freigabe-referenz\.pdf$ /intern/api/technical-release-reference.php [END,NC]
+
 # Canonical host and protocol
 RewriteCond %{HTTPS} !=on [OR]
 RewriteCond %{HTTP_HOST} !^www\.sv-netzwerk\.eu$ [NC]
