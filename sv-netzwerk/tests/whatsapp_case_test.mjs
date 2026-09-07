@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+const page=fs.readFileSync('src/pages/intern/versicherungsfaelle/index.astro','utf8');
+const api=fs.readFileSync('public/intern/api/whatsapp-case.php','utf8');
+const client=fs.readFileSync('public/intern/whatsapp-case.js','utf8');
+const assert=(condition,message)=>{if(!condition)throw new Error(message)};
+for(const token of ['vf-wa-panel','vf-wa-vn','vf-wa-sanierer','vf-wa-send','WhatsApp noch nicht verbunden','/intern/whatsapp-case.js'])assert(page.includes(token),`Portalbestandteil fehlt: ${token}`);
+assert(!api.includes("'susanne' =>")&&!api.includes("'jens' =>"),'Susanne und Jens dürfen kein WhatsApp-Profil erhalten');
+for(const token of ['christian','holger','marc','WHATSAPP_CHRISTIAN_PHONE_NUMBER_ID','WHATSAPP_HOLGER_PHONE_NUMBER_ID','WHATSAPP_MARC_PHONE_NUMBER_ID'])assert(api.includes(token),`Profilkonfiguration fehlt: ${token}`);
+for(const token of ['X_HUB_SIGNATURE_256',"hash_hmac('sha256'",'last_outbound_wamid','valid_until>=NOW()','unassigned','gd'])void token;
+assert(api.includes('HTTP_X_HUB_SIGNATURE_256')&&api.includes("hash_hmac('sha256'"),'Webhook-Signaturprüfung fehlt');
+assert(api.includes('last_outbound_wamid')&&api.includes('valid_until>=NOW()'),'Kontextgebundene Fallzuordnung fehlt');
+assert(api.includes("status'=>'unassigned'")||api.includes("'unassigned'"),'Nicht eindeutige Eingänge müssen unzugeordnet bleiben');
+assert(api.includes("$action === 'assign_message'")&&client.includes('Aktivem Fall zuordnen'),'Manuelle Zuordnung eines uneindeutigen WhatsApp-Eingangs fehlt');
+assert(api.includes("'02_Fotos'")&&api.includes("'04_Rechnungen_KVA'")&&api.includes("'07_Korrespondenz'"),'Drive-Zielordner fehlen');
+assert(client.includes("meta.mobil,meta.telefon")&&client.includes("meta.sanierer_mobil,meta.sanierer_telefon"),'VN- und Sanierer-Rufnummern werden nicht getrennt übernommen');
+assert(client.includes('connection?.connected'),'Versand darf ohne Meta-Verbindung nicht aktiv werden');
+assert(client.includes('const escape=')&&client.includes('escape(row.original_name||row.caption'),'WhatsApp-Inhalte müssen vor der Darstellung maskiert werden');
+console.log('whatsapp_case_test: ok');
