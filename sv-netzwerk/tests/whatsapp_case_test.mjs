@@ -1,7 +1,8 @@
 import fs from 'node:fs';
-const page=fs.readFileSync('src/pages/intern/versicherungsfaelle/index.astro','utf8');
-const api=fs.readFileSync('public/intern/api/whatsapp-case.php','utf8');
-const client=fs.readFileSync('public/intern/whatsapp-case.js','utf8');
+const fromProject=path=>new URL(`../${path}`,import.meta.url);
+const page=fs.readFileSync(fromProject('src/pages/intern/versicherungsfaelle/index.astro'),'utf8');
+const api=fs.readFileSync(fromProject('public/intern/api/whatsapp-case.php'),'utf8');
+const client=fs.readFileSync(fromProject('public/intern/whatsapp-case.js'),'utf8');
 const assert=(condition,message)=>{if(!condition)throw new Error(message)};
 for(const token of ['vf-wa-panel','vf-wa-vn','vf-wa-sanierer','vf-wa-send','WhatsApp noch nicht verbunden','/intern/whatsapp-case.js'])assert(page.includes(token),`Portalbestandteil fehlt: ${token}`);
 assert(!api.includes("'susanne' =>")&&!api.includes("'jens' =>"),'Susanne und Jens dürfen kein WhatsApp-Profil erhalten');
