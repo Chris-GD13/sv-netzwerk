@@ -530,8 +530,8 @@ const REKON_LOGS_QUERY = `query TaskLogs($taskId: ID!) {
   taskLogs(task_id: $taskId) { id title created_at log_state_id state { id title color } client { name job_title } sms_message { body } }
 }`;
 
-async function rekonProgress(tabId, text, current = 0, total = 0) {
-  await chrome.tabs.sendMessage(tabId, { type: 'REKON_IMPORT_PROGRESS', text, current, total }).catch(() => {});
+function rekonProgress(tabId, text, current = 0, total = 0) {
+  chrome.tabs.sendMessage(tabId, { type: 'REKON_IMPORT_PROGRESS', text, current, total }).catch(() => {});
 }
 
 async function rekonGraph(query, variables, token, optional = false) {

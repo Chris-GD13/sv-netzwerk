@@ -27,7 +27,7 @@ assert.equal(mapped.rekon_task_id, '270330');
 assert.equal(mapped.schaden_strasse, 'Andreas-Hofer-Str. 3');
 assert.equal(mapped.vn_objekt, 'WEG Andreas-Hofer-Str. 3/1');
 
-assert.equal(manifest.version, '1.4.6');
+assert.equal(manifest.version, '1.4.7');
 assert(manifest.host_permissions.includes('https://www.rekoninterschaden-portal.de/*'));
 assert(manifest.host_permissions.includes('https://api.www.rekoninterschaden-portal.de/*'));
 assert(manifest.content_scripts.some(entry => entry.js?.includes('rekon-main.js') && entry.world === 'MAIN'));
@@ -37,6 +37,7 @@ assert(worker.includes("filter(isActiveRekonTask)"), 'Nur aktive Rekon-Fälle we
 assert(worker.includes("column: 'REMOVED_AT', operator: 'IS_NULL'") && worker.includes("column: 'ID', order: 'DESC'"), 'Die Aufgabenliste verwendet exakt Rekons Nicht-entfernt-Filter und ID-Sortierung');
 assert(worker.includes("payload.errors?.[0]?.message"), 'GraphQL-Fehler werden konkret und begrenzt ausgegeben');
 assert(worker.includes('Rekon-Auftragsliste wird eingelesen') && worker.includes('readRekonTasks(token, portalTabId)'), 'Das seitenweise Einlesen der Auftragsliste wird sichtbar gemeldet');
+assert(worker.includes("function rekonProgress(tabId") && !worker.includes("await chrome.tabs.sendMessage(tabId, { type: 'REKON_IMPORT_PROGRESS'"), 'Reine Fortschrittsmeldungen dürfen den Rekon-Abruf nicht auf eine Edge-Antwort blockieren');
 assert(worker.includes('sendResponse(startRekonImport(sender, message))'), 'Der Rekon-Start wird synchron und ohne offenen Nachrichtenkanal bestätigt');
 assert(worker.includes("setTimeout(() => {\n    runRekonImport(run)") && worker.includes('}, 0);'), 'Der Import beginnt erst nach der sofortigen Startbestätigung und kann den Nachrichtenkanal nicht blockieren');
 assert(worker.includes("ownerMatchesRekonProfile"), 'Rekon-Konto und Portalziel werden abgeglichen');
