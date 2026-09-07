@@ -99,7 +99,7 @@ function rsRekonSharePointSources():array {
     if(!$sources)throw new RuntimeException('Im Rekon-Ordner wurde keine lesbare Einzelpostenliste gefunden.');return$sources;
 }
 function rsSourceFile():array {
-    return rsSharePointSource();
+    try{return rsSharePointSource();}catch(Throwable $sharePointError){try{return rsGoogleSource();}catch(Throwable $googleError){throw new RuntimeException('Christians Umsatzquelle ist weder über SharePoint noch über Google Drive lesbar. SharePoint: '.$sharePointError->getMessage().' Google Drive: '.$googleError->getMessage());}}
 }
 function rsUploadedSource():array {
     $upload=$_FILES['workbook']??null;
@@ -277,7 +277,7 @@ if($action==='scheduled'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
     $expected=rsCfg('SETUP_KEY');$provided=trim((string)($_SERVER['HTTP_X_SVNET_SCHEDULE_KEY']??''));
     if($expected===''||$provided===''||!hash_equals($expected,$provided))apiError(403,'Automationsschlüssel ungültig.');
-    try{$automation=['email'=>'server-automation@sv-netzwerk.eu','full_name'=>'Server-Automation'];$christian=rsRefresh($automation);$marc=rsRefreshMarc($automation,rsMarcSharePointSource());apiJson(['ok'=>true,'scheduled'=>true,'profiles'=>['christian','claims_marc'],'christian_updated_at'=>$christian['source_updated_at']??null,'marc_updated_at'=>$marc['source_updated_at']??null]);}
+    try{$automation=['email'=>'server-automation@sv-netzwerk.eu','full_name'=>'Server-Automation'];$saved=[];$errors=[];try{$saved['christian']=rsRefresh($automation);}catch(Throwable $error){$errors['christian']=$error->getMessage();error_log('[revenue-summary scheduled christian] '.$error->getMessage());}try{$saved['claims_marc']=rsRefreshMarc($automation,rsMarcSharePointSource());}catch(Throwable $error){$errors['claims_marc']=$error->getMessage();error_log('[revenue-summary scheduled marc] '.$error->getMessage());}if(!$saved)throw new RuntimeException('Keine Claims-Umsatzquelle konnte aktualisiert werden.');apiJson(['ok'=>true,'scheduled'=>true,'profiles'=>array_keys($saved),'errors'=>$errors]);}
     catch(Throwable $error){error_log('[revenue-summary scheduled] '.$error->getMessage());apiError(503,$error->getMessage());}
 }
 if($action==='scheduled_rekon'){

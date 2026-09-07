@@ -33,4 +33,6 @@ jobs:
               payload = json.load(source)
           if payload.get('ok') is not True or payload.get('scheduled') is not True:
               raise SystemExit('Umsatzaktualisierung wurde nicht bestätigt.')
+          if 'claims_marc' not in payload.get('profiles', []):
+              raise SystemExit('Marcs Claims-Umsätze wurden nicht aktualisiert: ' + str(payload.get('errors', {}).get('claims_marc', 'unbekannter Fehler')))
           PY
