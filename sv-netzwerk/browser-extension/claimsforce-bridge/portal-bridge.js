@@ -22,6 +22,7 @@ const profileKey = value => {
 };
 const uploads = new Map();
 const operations = new Map();
+const PORTAL_REQUEST_TYPES = new Set(['PORTAL_UPSERT', 'PORTAL_UPLOAD_START', 'PORTAL_UPLOAD_CHUNK', 'PORTAL_UPLOAD_FINISH', 'PORTAL_APPOINTMENT', 'PORTAL_SYNC_STATE', 'PORTAL_COMMIT_SYNC']);
 let keepalivePort = null;
 let keepaliveTimer = 0;
 let activeRequest = null;
@@ -147,6 +148,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     sendResponse({ ok: true, operation: operation || { status: 'missing' } });
     return;
   }
+  if (!PORTAL_REQUEST_TYPES.has(message?.type)) return;
   (async () => {
     if (message?.type === 'PORTAL_UPSERT') return { ok: true, ...(await upsert(message)) };
     if (message?.type === 'PORTAL_UPLOAD_START') { uploads.set(message.uploadId, { ...message, chunks: [] }); return { ok: true }; }
@@ -168,7 +170,9 @@ function reportRuntime() {
   return chrome.runtime.sendMessage({ type: 'GET_RUNTIME_STATUS' }).then(status => {
     const active = status?.active || {}, diagnostic = status?.diagnostic || {};
     document.documentElement.setAttribute('data-svnet-claims-runtime', [active.status || 'idle', diagnostic.phase || active.phase || 'CF-IDLE', Number(active.jobId || 0), active.profile || 'none'].join('|'));
-    document.documentElement.setAttribute('data-svnet-rekon-runtime', [status?.rekon?.status || 'idle', status?.rekon?.runId || 'none', status?.rekon?.profile || 'none'].join('|'));
+    const rekon = status?.rekon || {};
+    document.documentElement.setAttribute('data-svnet-rekon-runtime', [rekon.status || 'idle', rekon.runId || 'none', rekon.profile || 'none', rekon.current || 0, rekon.total || 0].join('|'));
+    if (rekon.status === 'running' && rekon.text) window.postMessage({ type: 'SVNET_REKON_IMPORT_PROGRESS', text: rekon.text, current: rekon.current || 0, total: rekon.total || 0 }, location.origin);
     window.postMessage({ type: 'SVNET_CLAIMS_RUNTIME_STATUS', status }, location.origin);
   }).catch(error => {
     if (invalidExtensionContext(error)) reportInvalidExtensionContext();

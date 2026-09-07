@@ -531,6 +531,7 @@ const REKON_LOGS_QUERY = `query TaskLogs($taskId: ID!) {
 }`;
 
 function rekonProgress(tabId, text, current = 0, total = 0) {
+  if (runningRekonImport && Number(runningRekonImport.portalTabId) === Number(tabId)) Object.assign(runningRekonImport, { text, current, total });
   chrome.tabs.sendMessage(tabId, { type: 'REKON_IMPORT_PROGRESS', text, current, total }).catch(() => {});
 }
 
@@ -748,7 +749,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'GET_RUNTIME_STATUS') {
     Promise.all([chrome.storage.local.get('claimsActiveRun'), chrome.storage.local.get('claimsImportDiagnostic')]).then(([active, diagnostic]) => {
       const saved = active.claimsActiveRun || null;
-      sendResponse({ ok: true, active: saved, diagnostic: diagnostic.claimsImportDiagnostic || null, rekon: runningRekonImport ? { status: 'running', runId: runningRekonImport.runId, profile: runningRekonImport.profile, startedAt: runningRekonImport.startedAt } : { status: 'idle' } });
+      sendResponse({ ok: true, active: saved, diagnostic: diagnostic.claimsImportDiagnostic || null, rekon: runningRekonImport ? { status: 'running', runId: runningRekonImport.runId, profile: runningRekonImport.profile, startedAt: runningRekonImport.startedAt, text: runningRekonImport.text || 'Rekon-Import läuft …', current: Number(runningRekonImport.current || 0), total: Number(runningRekonImport.total || 0) } : { status: 'idle' } });
     });
     return true;
   }
