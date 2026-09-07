@@ -12,6 +12,10 @@ const core = fs.readFileSync(
   new URL("../public/intern/api/kva-release-core-v2.php", import.meta.url),
   "utf8",
 );
+const claimsforceCentral = fs.readFileSync(
+  new URL("../public/intern/claimsforce-central.js", import.meta.url),
+  "utf8",
+);
 const reference = new URL(
   "../public/intern/references/technische-kva-freigabe-referenz.pdf",
   import.meta.url,
@@ -32,6 +36,11 @@ assert(
   page.includes('class="vf-analysis-grid"') &&
     page.includes('.vf-analysis-grid{display:grid;grid-column:1/-1;grid-template-columns:minmax(0,1fr) minmax(0,1fr)'),
   "PLAUD und Polycam muessen in einer gemeinsamen, mittig geteilten Zeile stehen.",
+);
+assert(
+  claimsforceCentral.includes("const analysisGrid=document.querySelector('.vf-analysis-grid')") &&
+    claimsforceCentral.includes('[analysisGrid,claimsCard].forEach'),
+  "Die ClaimsForce-Nachsortierung darf PLAUD und Polycam nicht aus ihrer gemeinsamen Zeile loesen.",
 );
 assert(
   !page.includes("Referenz öffnen"),

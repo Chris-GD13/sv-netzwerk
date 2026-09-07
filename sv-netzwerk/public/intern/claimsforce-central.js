@@ -3,8 +3,7 @@
   if(!old)return;
   const button=old.cloneNode(true);old.replaceWith(button);
   const claimsCard=button.closest('.vf-claims-import');
-  const plaudCard=document.querySelector('.vf-plaud');
-  const polycamCard=document.querySelector('.vf-polycam');
+  const analysisGrid=document.querySelector('.vf-analysis-grid');
   const placeImportCards=()=>{
     if(!claimsCard)return;
     claimsCard.style.borderTop='4px solid #b9852f';
@@ -13,7 +12,7 @@
     const main=document.querySelector('.vf-app'),systemHome=document.getElementById('vf-system-home');
     if(main){
       const anchor=systemHome||null;
-      [plaudCard,polycamCard,claimsCard].forEach(card=>{
+      [analysisGrid,claimsCard].forEach(card=>{
         if(!card)return;
         if(anchor)main.insertBefore(card,anchor);
         else main.appendChild(card);
