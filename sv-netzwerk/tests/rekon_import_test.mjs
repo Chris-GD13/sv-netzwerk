@@ -44,6 +44,7 @@ assert(worker.includes("rekon: runningRekonImport ? { status: 'running'") && por
 assert(worker.includes("Object.assign(runningRekonImport, { text, current, total })") && portal.includes("rekon.status === 'running' && rekon.text"), 'Der gepollte Laufstatus stellt Fortschritt auch bei verlorenen Edge-Ereignissen wieder her');
 assert(portal.includes('if (!PORTAL_REQUEST_TYPES.has(message?.type)) return;'), 'Rekon-Fortschritt wird nicht als unbekannter Portalauftrag mit offenem Antwortkanal abgefangen');
 assert(worker.includes("ownerMatchesRekonProfile"), 'Rekon-Konto und Portalziel werden abgeglichen');
+assert(page.includes("minimum='1.4.11'") && page.includes('event.stopImmediatePropagation()'), 'Eine veraltete Browser-Brücke darf keinen scheinbar gestarteten Rekon-Lauf mehr auslösen');
 assert(worker.includes("!session?.identity") && worker.includes("while ((!token || !session?.identity)"), 'Die sichtbare Rekon-Profilkennung wird nach dem Seitenaufbau abgewartet');
 assert(worker.includes("Mail_Rekon-Nachricht_"), 'E-Mails werden als Korrespondenz archiviert');
 assert(worker.includes("for (const attachment of email.attachments || [])"), 'E-Mail-Anhänge werden separat übertragen');
