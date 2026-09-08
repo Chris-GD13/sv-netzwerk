@@ -380,7 +380,7 @@ if (!in_array((string)($user['role'] ?? ''), ['administrator','projektleiter','p
 
 if ($action === 'menu_access') {
     $ownProfile = svnetUserProfile($user);
-    apiJson(['ok'=>true,'visible'=>in_array($ownProfile, ['christian','marc'], true),'profile'=>$ownProfile]);
+    apiJson(['ok'=>true,'visible'=>in_array($ownProfile, ['christian','marc','holger'], true),'profile'=>$ownProfile]);
 }
 
 try {

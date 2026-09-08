@@ -29,6 +29,7 @@ assert(client.includes('connection?.connected'),'Versand darf ohne Meta-Verbindu
 assert(client.includes('whatsapp_business_app_onboarding')&&client.includes('WA_EMBEDDED_SIGNUP'),'Meta-Coexistence muss aus dem Portal geführt werden');
 assert(client.includes('Die WhatsApp-Konten anderer Bearbeiter bleiben getrennt.'),'Der Verbindungsdialog muss die profilbezogene Kontentrennung eindeutig anzeigen');
 assert(layout.includes('intern-whatsapp-link')&&layout.includes('/intern/whatsapp/')&&layout.includes("action=menu_access"),'Der persönliche WhatsApp-Menüpunkt fehlt in der linken Navigation');
+assert(api.includes("['christian','marc','holger']"),'Der persönliche WhatsApp-Menüpunkt muss für Christian, Marc und Holger freigegeben sein');
 for(const token of ['WhatsApp Business','wa-profile-select','wa-connect','wa-messages','/intern/whatsapp-account.js'])assert(accountPage.includes(token),`Eigene WhatsApp-Kontoseite unvollständig: ${token}`);
 assert(accountClient.includes('selected_expert')&&accountClient.includes('complete_signup')&&accountClient.includes('Die WhatsApp-Konten anderer Bearbeiter bleiben getrennt.'),'Die eigene Kontoseite muss Profilwahl, Meta-Verbindung und Kontentrennung enthalten');
 assert(client.includes('const escape=')&&client.includes('escape(row.original_name||row.caption'),'WhatsApp-Inhalte müssen vor der Darstellung maskiert werden');
