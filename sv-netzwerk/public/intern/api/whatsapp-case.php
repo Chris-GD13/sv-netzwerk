@@ -13,9 +13,9 @@ function waEnv(string $key, string $default = ''): string
 function waProfiles(): array
 {
     return [
-        'christian' => ['name'=>'Christian Wächter','number'=>'+4973673103045','phone_id'=>waEnv('WHATSAPP_CHRISTIAN_PHONE_NUMBER_ID','1282747221593843'),'waba_id'=>waEnv('WHATSAPP_CHRISTIAN_WABA_ID','2484676038720950')],
-        'holger' => ['name'=>'Holger Roth','number'=>'+491731645162','phone_id'=>waEnv('WHATSAPP_HOLGER_PHONE_NUMBER_ID')],
-        'marc' => ['name'=>'Marc Schütt','number'=>'+4923926592751','phone_id'=>waEnv('WHATSAPP_MARC_PHONE_NUMBER_ID')],
+        'christian' => ['name'=>'Christian Wächter','number'=>'+4973673103045','phone_id'=>waEnv('WHATSAPP_CHRISTIAN_PHONE_NUMBER_ID','1282747221593843'),'waba_id'=>waEnv('WHATSAPP_CHRISTIAN_WABA_ID','2484676038720950'),'access_token'=>waEnv('WHATSAPP_CHRISTIAN_ACCESS_TOKEN',waEnv('WHATSAPP_ACCESS_TOKEN'))],
+        'holger' => ['name'=>'Holger Roth','number'=>'+491731645162','phone_id'=>waEnv('WHATSAPP_HOLGER_PHONE_NUMBER_ID'),'waba_id'=>waEnv('WHATSAPP_HOLGER_WABA_ID'),'access_token'=>waEnv('WHATSAPP_HOLGER_ACCESS_TOKEN')],
+        'marc' => ['name'=>'Marc Schütt','number'=>'+4923926592751','phone_id'=>waEnv('WHATSAPP_MARC_PHONE_NUMBER_ID'),'waba_id'=>waEnv('WHATSAPP_MARC_WABA_ID'),'access_token'=>waEnv('WHATSAPP_MARC_ACCESS_TOKEN')],
     ];
 }
 
@@ -104,7 +104,7 @@ function waConnection(string $profileKey): array
         $token = waDecryptToken((string)$row['access_token_ciphertext']);
         if ($token !== '') return ['phone_id'=>(string)$row['phone_number_id'],'waba_id'=>(string)$row['waba_id'],'token'=>$token,'display_phone_number'=>(string)$row['display_phone_number'],'verified_name'=>(string)($row['verified_name']??'')];
     }
-    return ['phone_id'=>(string)$profile['phone_id'],'waba_id'=>(string)($profile['waba_id']??''),'token'=>waEnv('WHATSAPP_ACCESS_TOKEN'),'display_phone_number'=>(string)$profile['number'],'verified_name'=>(string)$profile['name']];
+    return ['phone_id'=>(string)$profile['phone_id'],'waba_id'=>(string)($profile['waba_id']??''),'token'=>(string)($profile['access_token']??''),'display_phone_number'=>(string)$profile['number'],'verified_name'=>(string)$profile['name']];
 }
 
 function waHttp(string $method, string $url, array $headers = [], ?string $body = null): array

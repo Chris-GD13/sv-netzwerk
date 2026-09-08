@@ -6,11 +6,12 @@ const client=fs.readFileSync(fromProject('public/intern/whatsapp-case.js'),'utf8
 const assert=(condition,message)=>{if(!condition)throw new Error(message)};
 for(const token of ['vf-wa-panel','vf-wa-vn','vf-wa-sanierer','vf-wa-send','vf-wa-connect','WhatsApp verbinden','WhatsApp noch nicht verbunden','/intern/whatsapp-case.js'])assert(page.includes(token),`Portalbestandteil fehlt: ${token}`);
 assert(!api.includes("'susanne' =>")&&!api.includes("'jens' =>"),'Susanne und Jens dürfen kein WhatsApp-Profil erhalten');
-for(const token of ['christian','holger','marc','WHATSAPP_CHRISTIAN_PHONE_NUMBER_ID','WHATSAPP_HOLGER_PHONE_NUMBER_ID','WHATSAPP_MARC_PHONE_NUMBER_ID'])assert(api.includes(token),`Profilkonfiguration fehlt: ${token}`);
+for(const token of ['christian','holger','marc','WHATSAPP_CHRISTIAN_PHONE_NUMBER_ID','WHATSAPP_HOLGER_PHONE_NUMBER_ID','WHATSAPP_MARC_PHONE_NUMBER_ID','WHATSAPP_MARC_WABA_ID','WHATSAPP_MARC_ACCESS_TOKEN'])assert(api.includes(token),`Profilkonfiguration fehlt: ${token}`);
 for(const number of ['+4973673103045','+491731645162','+4923926592751'])assert(api.includes(`'number'=>'${number}'`),`WhatsApp-Business-Nummer fehlt: ${number}`);
 assert(!api.includes("'number'=>'+491604092134'"),'Christians frühere Mobilnummer darf nicht mehr als WhatsApp-Business-Nummer verwendet werden');
 assert(api.includes("'1282747221593843'")&&api.includes("'2484676038720950'"),'Christians neue Meta-Telefon- und WABA-Zuordnung muss im Portal vorbereitet sein');
 assert(!api.includes('+491712119777'),'Marcs frühere Mobilnummer darf nicht mehr als WhatsApp-Business-Nummer verwendet werden');
+assert(api.includes("'access_token'=>waEnv('WHATSAPP_MARC_ACCESS_TOKEN')")&&api.includes("'access_token'=>waEnv('WHATSAPP_HOLGER_ACCESS_TOKEN')")&&api.includes("'access_token'=>waEnv('WHATSAPP_CHRISTIAN_ACCESS_TOKEN',waEnv('WHATSAPP_ACCESS_TOKEN'))"),'Der globale Übergangstoken darf nicht auf Marcs oder Holgers WhatsApp-Konto übergreifen');
 assert(api.includes('Portal-App noch nicht mit Meta verbunden'),'Ein fehlendes Portal-App-Setup darf nicht als fehlende WhatsApp-Business-Registrierung dargestellt werden');
 assert(api.includes('Meta-Prüfung ausstehend')&&api.includes("'pending_review'=>\$pendingReview")&&client.includes('Warten auf Meta-Freigabe')&&client.includes('WhatsApp-Verbindung abschließen'),'Das Portal muss die vorbereitete Meta-Nummer vom Prüfstatus bis zum Verbindungsabschluss eindeutig führen');
 for(const token of ['whatsapp_profile_connections','WHATSAPP_META_APP_ID','WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID','waEncryptToken','is_on_biz_app','complete_signup','subscribed_apps'])assert(api.includes(token),`Sichere Meta-Selbstverbindung fehlt: ${token}`);
@@ -23,5 +24,6 @@ assert(api.includes("'02_Fotos'")&&api.includes("'04_Rechnungen_KVA'")&&api.incl
 assert(client.includes("meta.mobil,meta.telefon")&&client.includes("meta.sanierer_mobil,meta.sanierer_telefon"),'VN- und Sanierer-Rufnummern werden nicht getrennt übernommen');
 assert(client.includes('connection?.connected'),'Versand darf ohne Meta-Verbindung nicht aktiv werden');
 assert(client.includes('whatsapp_business_app_onboarding')&&client.includes('WA_EMBEDDED_SIGNUP'),'Meta-Coexistence muss aus dem Portal geführt werden');
+assert(client.includes('Die WhatsApp-Konten anderer Bearbeiter bleiben getrennt.'),'Der Verbindungsdialog muss die profilbezogene Kontentrennung eindeutig anzeigen');
 assert(client.includes('const escape=')&&client.includes('escape(row.original_name||row.caption'),'WhatsApp-Inhalte müssen vor der Darstellung maskiert werden');
 console.log('whatsapp_case_test: ok');

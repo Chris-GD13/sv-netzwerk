@@ -30,8 +30,12 @@ Erforderliche Servervariablen:
 - `WHATSAPP_TEMPLATE_LANGUAGE` (Standard `de`)
 - `WHATSAPP_GRAPH_VERSION` (Standard `v25.0`)
 - die jeweilige profilbezogene Phone Number ID aus der Tabelle oben
+- optional die jeweilige profilbezogene WABA-ID (`WHATSAPP_<PROFIL>_WABA_ID`)
+- optional ein profilbezogener Übergangstoken (`WHATSAPP_<PROFIL>_ACCESS_TOKEN`); der globale Übergangstoken wird ausschließlich für Christian verwendet
 
-Die globale Phone Number ID und `WHATSAPP_ACCESS_TOKEN` bleiben nur als Übergangsfallback bestehen. Nach einer erfolgreichen Selbstverbindung werden Phone Number ID, WABA-ID und das verschlüsselte profilbezogene Zugriffstoken in `whatsapp_profile_connections` verwendet. Ein Zugriffstoken wird nie an den Browser zurückgegeben.
+`WHATSAPP_ACCESS_TOKEN` bleibt ausschließlich für Christian als Übergangsfallback bestehen. Nach einer erfolgreichen Selbstverbindung werden Phone Number ID, WABA-ID und das verschlüsselte profilbezogene Zugriffstoken in `whatsapp_profile_connections` verwendet. Ein Zugriffstoken wird nie an den Browser zurückgegeben.
+
+Jedes Profil wird getrennt gespeichert. Insbesondere kann Marc Schütt im Portal sein eigenes Meta-Unternehmenskonto und ausschließlich die Rufnummer `+49 2392 6592751` verbinden. Christians oder Holgers WABA-ID und Zugriffstoken werden dabei weder verwendet noch überschrieben.
 
 Webhook-Adresse: `https://www.sv-netzwerk.eu/intern/api/whatsapp-case.php?action=webhook`
 
