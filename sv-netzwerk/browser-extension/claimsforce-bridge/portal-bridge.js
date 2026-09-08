@@ -36,12 +36,17 @@ async function api(url, options = {}) {
   return data;
 }
 
-async function findCase(mapped) {
+async function scopedApi(profile, url, options = {}) {
+  const headers = { ...(options.headers || {}), 'X-SVNET-Expert-Profile': profileKey(profile) };
+  return api(url, { ...options, headers });
+}
+
+async function findCase(mapped, profile) {
   const query = mapped.schaden_nr || mapped.claimsforce_claim_id || mapped.rekon_task_id;
   if (!query) return null;
-  const found = await api(`${API}?action=search_cases&q=${encodeURIComponent(query)}`);
+  const found = await scopedApi(profile, `${API}?action=search_cases&q=${encodeURIComponent(query)}`);
   for (const row of found.results || []) {
-    const loaded = await api(`${API}?action=load_case&id=${encodeURIComponent(row.id)}`);
+    const loaded = await scopedApi(profile, `${API}?action=load_case&id=${encodeURIComponent(row.id)}`);
     const meta = loaded.case?.meta || row.meta || {};
     if ((mapped.claimsforce_claim_id && meta.claimsforce_claim_id === mapped.claimsforce_claim_id) || (mapped.rekon_task_id && meta.rekon_task_id === mapped.rekon_task_id) || (mapped.schaden_nr && meta.schaden_nr === mapped.schaden_nr)) return { folderId: row.id, meta };
   }
@@ -50,7 +55,7 @@ async function findCase(mapped) {
 
 async function upsert(message) {
   const profile = profileKey(message.profile);
-  const existing = await findCase(message.mapped);
+  const existing = await findCase(message.mapped, profile);
   const merged = mergeBlank(existing?.meta || {}, message.mapped);
   if (message.sourceType === 'rekon') {
     merged.rekon_task_id = message.mapped.rekon_task_id;
@@ -65,18 +70,19 @@ async function upsert(message) {
   merged.claimsforce_quelle = message.source;
   merged.claimsforce_zuletzt_eingelesen = message.mapped.claimsforce_zuletzt_eingelesen;
   }
-  const saved = await api(`${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: existing?.folderId || '', case: merged }) });
+  const saved = await scopedApi(profile, `${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: existing?.folderId || '', case: merged }) });
   return { folderId: saved.folder_id, meta: merged, existed: !!existing };
 }
 
 async function syncState(message) {
-  const existing = await findCase(message.mapped || {});
+  const profile = profileKey(message.profile);
+  const existing = await findCase(message.mapped || {}, profile);
   return existing ? { folderId: existing.folderId, meta: existing.meta || {}, existed: true } : { folderId: '', meta: {}, existed: false };
 }
 
 async function commitSync(message) {
   const profile = profileKey(message.profile);
-  const loaded = await api(`${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`);
+  const loaded = await scopedApi(profile, `${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`);
   const meta = { ...(loaded.case?.meta || {}) };
   const prefix = message.sourceType === 'rekon' ? 'rekon' : 'claimsforce';
   meta[`${prefix}_sync_signature`] = String(message.signature || '');
@@ -85,7 +91,7 @@ async function commitSync(message) {
   meta[`${prefix}_message_versions`] = [...new Set((message.messageVersions || []).map(String).filter(Boolean))];
   meta[`${prefix}_list_version`] = String(message.listVersion || '');
   meta[`${prefix}_zuletzt_eingelesen`] = new Date().toISOString();
-  await api(`${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, case: meta }) });
+  await scopedApi(profile, `${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, case: meta }) });
   return { folderId: message.folderId, meta };
 }
 
@@ -103,12 +109,12 @@ async function finishUpload(message) {
   form.append('folder_id', entry.folderId);
   form.append('last_modified', String(entry.modified || 0));
   form.append('file', new File(bytes, entry.name, { type: entry.mime, lastModified: entry.modified || Date.now() }));
-  return api(`${API}?action=upload_case_document`, { method: 'POST', body: form });
+  return scopedApi(entry.profile, `${API}?action=upload_case_document`, { method: 'POST', body: form });
 }
 
 async function appointment(message) {
   const profile = profileKey(message.profile);
-  const loaded = await api(`${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`), meta = loaded.case?.meta || {};
+  const loaded = await scopedApi(profile, `${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`), meta = loaded.case?.meta || {};
   const appointmentId = String(message.appointment.id || message.appointment.startDate || '');
   const prefix = message.sourceType === 'rekon' ? 'rekon' : 'claimsforce';
   const idsKey = `${prefix}_calendar_appointment_ids`, idKey = `${prefix}_calendar_appointment_id`, eventsKey = `${prefix}_calendar_events`;
@@ -123,12 +129,12 @@ async function appointment(message) {
   form.append('duration', String(Math.max(15, Math.round((end - start) / 60000))));
   form.append('notes', message.appointment.comment || (message.sourceType === 'rekon' ? 'Aus Rekon übernommen' : 'Aus ClaimsForce übernommen'));
   form.append('invite_vn', '0');
-  const result = await api(`${CAL}?action=create`, { method: 'POST', body: form });
+  const result = await scopedApi(profile, `${CAL}?action=create`, { method: 'POST', body: form });
   if (appointmentId) imported.push(appointmentId);
   meta[idsKey] = [...new Set(imported)];
   meta[idKey] = appointmentId;
   meta[eventsKey] = [...(Array.isArray(meta[eventsKey]) ? meta[eventsKey] : []), result.event].filter(Boolean);
-  await api(`${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, case: meta }) });
+  await scopedApi(profile, `${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, case: meta }) });
   return result;
 }
 

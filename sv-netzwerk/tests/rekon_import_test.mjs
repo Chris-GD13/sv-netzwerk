@@ -27,7 +27,7 @@ assert.equal(mapped.rekon_task_id, '270330');
 assert.equal(mapped.schaden_strasse, 'Andreas-Hofer-Str. 3');
 assert.equal(mapped.vn_objekt, 'WEG Andreas-Hofer-Str. 3/1');
 
-assert.equal(manifest.version, '1.4.9');
+assert.equal(manifest.version, '1.4.10');
 assert(manifest.host_permissions.includes('https://www.rekoninterschaden-portal.de/*'));
 assert(manifest.host_permissions.includes('https://api.www.rekoninterschaden-portal.de/*'));
 assert(manifest.content_scripts.some(entry => entry.js?.includes('rekon-main.js') && entry.world === 'MAIN'));

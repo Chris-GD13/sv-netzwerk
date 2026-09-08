@@ -28,6 +28,9 @@ function gdClaimsProfile(array $user):string{return svnetUserProfile($user);}
 $portalUser=$user;
 $isBackoffice=gdIsSusanne($portalUser);
 $claimsProfile=gdClaimsProfile($portalUser);
+$requestedExpert=mb_strtolower(trim((string)($_SERVER['HTTP_X_SVNET_EXPERT_PROFILE']??'')),'UTF-8');
+if($requestedExpert!==''&&!in_array($requestedExpert,gdSupportedExpertKeys(),true))apiError(400,'Unbekanntes Importprofil.');
+if(!$isBackoffice&&$requestedExpert!==''&&$requestedExpert!==$claimsProfile)apiError(403,'Das angeforderte Importprofil ist für diesen Benutzer nicht freigegeben.');
 if($isBackoffice&&$action==='select_expert'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
     $body=requestBody();$expert=mb_strtolower(trim((string)($body['expert']??'')),'UTF-8');
@@ -37,13 +40,16 @@ if($isBackoffice&&$action==='select_expert'){
 }
 $selectedExpert='';
 if($isBackoffice){
-    $storedExpert=(string)($_SESSION['svnet_selected_expert']??'');
-    try{$storedExpert=svnetSelectedProfile($portalUser,$storedExpert);}
-    catch(InvalidArgumentException){
-        unset($_SESSION['svnet_selected_expert']);
-        apiError(409,'Das gespeicherte Bearbeiterprofil ist ungültig. Bitte ein Profil neu auswählen.');
+    if($requestedExpert!=='')$selectedExpert=$requestedExpert;
+    else{
+        $storedExpert=(string)($_SESSION['svnet_selected_expert']??'');
+        try{$storedExpert=svnetSelectedProfile($portalUser,$storedExpert);}
+        catch(InvalidArgumentException){
+            unset($_SESSION['svnet_selected_expert']);
+            apiError(409,'Das gespeicherte Bearbeiterprofil ist ungültig. Bitte ein Profil neu auswählen.');
+        }
+        $selectedExpert=$storedExpert;
     }
-    $selectedExpert=$storedExpert;
 }
 if($isBackoffice)$user=gdExpertIdentity($selectedExpert,$portalUser);
 

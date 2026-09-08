@@ -329,9 +329,9 @@ async function fingerprint(value) {
 const fileVersion = file => [file?.id, file?.updatedAt || file?.modifiedAt || file?.createdAt, file?.size || file?.fileSize, file?.name || file?.fileName || file?.originalFilename].map(value => String(value || '')).join('|');
 const messageVersion = message => [message?.id, message?.updatedAt || message?.createdAt || message?.sentAt].map(value => String(value || '')).join('|');
 
-async function uploadBuffer(portalTabId, folderId, name, mime, modified, buffer) {
+async function uploadBuffer(portalTabId, profile, folderId, name, mime, modified, buffer) {
   const uploadId = crypto.randomUUID();
-  await portal(portalTabId, { type: 'PORTAL_UPLOAD_START', uploadId, folderId, name: safeFileName(name), mime: mime || 'application/octet-stream', modified: modified || 0 });
+  await portal(portalTabId, { type: 'PORTAL_UPLOAD_START', uploadId, profile, folderId, name: safeFileName(name), mime: mime || 'application/octet-stream', modified: modified || 0 });
   const bytes = new Uint8Array(buffer), size = 384 * 1024;
   for (let offset = 0; offset < bytes.length; offset += size) {
     const chunk = bytes.subarray(offset, Math.min(offset + size, bytes.length));
@@ -437,7 +437,7 @@ async function runImport(run) {
       catch (error) { throw new Error(error?.name === 'AbortError' ? `Datei „${name}“ hat das Zeitlimit überschritten.` : `Datei „${name}“ konnte nicht geladen werden.`); }
       finally { clearTimeout(timer); }
       if (!response.ok) throw new Error(`Datei „${name}“ konnte nicht geladen werden (${response.status}).`);
-      const uploaded = await uploadBuffer(portalTabId(), folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, fileBuffer);
+      const uploaded = await uploadBuffer(portalTabId(), profile, folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, fileBuffer);
       if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) filesDone++;
     }
     const knownMessageVersions = new Set(Array.isArray(existingMeta.claimsforce_message_versions) ? existingMeta.claimsforce_message_versions.map(String) : []);
@@ -449,7 +449,7 @@ async function runImport(run) {
       const stamp = String(record?.sentAt || record?.createdAt || '').slice(0, 10) || 'ohne-Datum';
       const subject = safeFileName(record?.subject || record?.payload?.subject || record?.id, 'Nachricht');
       const bytes = new TextEncoder().encode(JSON.stringify(record, null, 2));
-      const uploaded = await uploadBuffer(portalTabId(), folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(record?.updatedAt || record?.createdAt || '') || 0, bytes.buffer);
+      const uploaded = await uploadBuffer(portalTabId(), profile, folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(record?.updatedAt || record?.createdAt || '') || 0, bytes.buffer);
       if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) messagesDone++;
     }
     if (!['christian', 'jens'].includes(profile)) {
@@ -638,7 +638,7 @@ async function runRekonImport(run) {
     const appointmentVersions = mapped.rekon_termin ? [mapped.rekon_termin.id, mapped.rekon_termin.startDate, mapped.rekon_termin.endDate].map(String) : [];
     const stableMapped = { ...mapped }; delete stableMapped.rekon_zuletzt_eingelesen;
     const signature = await fingerprint({ mapped: stableMapped, fileVersions, messageVersions, appointmentVersions, logs });
-    const sync = await portal(portalTabId, { type: 'PORTAL_SYNC_STATE', mapped });
+    const sync = await portal(portalTabId, { type: 'PORTAL_SYNC_STATE', mapped, profile });
     const existingMeta = sync.result?.meta || {};
     if (existingMeta.rekon_sync_signature === signature) { skipped++; continue; }
     const saved = await portalOperation(portalTabId, { type: 'PORTAL_UPSERT_ASYNC', operationId: crypto.randomUUID(), mapped, profile, source: mapped.rekon_quelle, sourceType: 'rekon' }, 120000);
@@ -648,7 +648,7 @@ async function runRekonImport(run) {
       const version = rekonFileVersion(file);
       if (knownFiles.has(version)) continue;
       const content = await downloadRekonFile(file, token);
-      const uploaded = await uploadBuffer(portalTabId, folderId, file.original_file_name || file.name || `Rekon-Datei-${file.id}`, content.mime, Date.parse(file.updated_at || file.created_at || '') || 0, content.buffer);
+      const uploaded = await uploadBuffer(portalTabId, profile, folderId, file.original_file_name || file.name || `Rekon-Datei-${file.id}`, content.mime, Date.parse(file.updated_at || file.created_at || '') || 0, content.buffer);
       if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) filesDone++;
     }
     const knownMessages = new Set(Array.isArray(existingMeta.rekon_message_versions) ? existingMeta.rekon_message_versions.map(String) : []);
@@ -658,19 +658,19 @@ async function runRekonImport(run) {
         const stamp = String(email.send_date || '').replace(/[^0-9]/g, '').slice(0, 14) || id;
         const subject = safeFileName(email.subject || `E-Mail-${email.id}`, 'Rekon-E-Mail').slice(0, 80);
         const bytes = new TextEncoder().encode(JSON.stringify({ source: 'Rekon', task_id: id, ...email }, null, 2));
-        const uploaded = await uploadBuffer(portalTabId, folderId, `Mail_Rekon-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(email.send_date || '') || 0, bytes.buffer);
+        const uploaded = await uploadBuffer(portalTabId, profile, folderId, `Mail_Rekon-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(email.send_date || '') || 0, bytes.buffer);
         if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) messagesDone++;
       }
       for (const attachment of email.attachments || []) {
         const file = attachment?.file;
         if (!file || knownFiles.has(rekonFileVersion(file))) continue;
         const content = await downloadRekonFile(file, token);
-        const uploaded = await uploadBuffer(portalTabId, folderId, file.name || `Rekon-Mail-Anhang-${file.id}`, content.mime, Date.parse(file.updated_at || file.created_at || email.send_date || '') || 0, content.buffer);
+        const uploaded = await uploadBuffer(portalTabId, profile, folderId, file.name || `Rekon-Mail-Anhang-${file.id}`, content.mime, Date.parse(file.updated_at || file.created_at || email.send_date || '') || 0, content.buffer);
         if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) filesDone++;
       }
     }
     const auditBytes = new TextEncoder().encode(JSON.stringify({ source: 'Rekon', task, folders: fileData?.taskFolders || [], logs }, null, 2));
-    await uploadBuffer(portalTabId, folderId, `00_Rekon-Auftragsakte_${id}.json`, 'application/json', Date.parse(task.updated_at || task.state_changed_date || task.created_at || '') || 0, auditBytes.buffer);
+    await uploadBuffer(portalTabId, profile, folderId, `00_Rekon-Auftragsakte_${id}.json`, 'application/json', Date.parse(task.updated_at || task.state_changed_date || task.created_at || '') || 0, auditBytes.buffer);
     if (mapped.rekon_termin?.startDate) {
       const result = await portal(portalTabId, { type: 'PORTAL_APPOINTMENT', folderId, appointment: mapped.rekon_termin, profile, sourceType: 'rekon' });
       if (!result?.result?.skipped) appointmentsDone++;

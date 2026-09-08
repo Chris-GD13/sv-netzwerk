@@ -28,7 +28,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.3.18',currentBridgeVersion='1.3.24';
+  const minimumBridgeVersion='1.4.10',currentBridgeVersion='1.4.10';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -89,8 +89,6 @@
     if(!supportedProfiles.includes(target))throw Error('Importauftrag enthält ein ungültiges Bearbeiterprofil.');
     sessionStorage.removeItem('svnet-case');
     localStorage.removeItem('svnet-case');
-    await json('/intern/api/google-drive-sync.php?action=select_expert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({expert:target})});
-    context.selected_expert=target;
     window.postMessage({type:'SVNET_CLAIMS_IMPORT_START',profile:job.profile,jobId:Number(job.id),runId:`claimsforce-${job.id}-${job.attempt_count||1}`},location.origin);
   }
 
