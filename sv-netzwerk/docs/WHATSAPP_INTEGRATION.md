@@ -6,7 +6,7 @@ Die WhatsApp-Anbindung ist ausschließlich für folgende Sachverständigenprofil
 
 | Profil | Geschäftsnummer | Servervariable für die Meta Phone Number ID |
 | --- | --- | --- |
-| Christian Wächter | +49 160 4092134 | `WHATSAPP_CHRISTIAN_PHONE_NUMBER_ID` |
+| Christian Wächter | +49 7367 3103045 | `WHATSAPP_CHRISTIAN_PHONE_NUMBER_ID` |
 | Holger Roth | +49 173 1645162 | `WHATSAPP_HOLGER_PHONE_NUMBER_ID` |
 | Marc Schütt | +49 2392 6592751 | `WHATSAPP_MARC_PHONE_NUMBER_ID` |
 
