@@ -34,6 +34,8 @@
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
     return raw;
   };
+  const isOwnJob=job=>userJobs.includes(Number(job?.id||0));
+  const showAgent=(text,bad=false)=>{if(isOwnJob(agentJob))show(text,bad)};
   const versionAtLeast=(actual,required)=>{const a=String(actual).split('.').map(Number),r=String(required).split('.').map(Number);for(let i=0;i<3;i++){if((a[i]||0)!==(r[i]||0))return(a[i]||0)>(r[i]||0)}return true};
   const resultOf=job=>{try{return typeof job.result==='string'?JSON.parse(job.result):job.result||{}}catch{return{}}};
   const browserRuntime=()=>{const [status='',phase='',jobId='0',profile='']=String(document.documentElement.getAttribute('data-svnet-claims-runtime')||'').split('|');return{status,phase,jobId:Number(jobId||0),profile}};
@@ -101,10 +103,10 @@
         const runtime=browserRuntime();
         if(runtime.status==='failed'&&runtime.jobId===Number(active.job.id)){
           await post('complete',{id:Number(active.job.id),ok:false,result:null,message:`Browserlauf wurde abgebrochen (${runtime.phase||'CF-RUNTIME'}).`});
-          show(`Import ${active.job.id} wurde nach einem abgebrochenen Browserlauf sicher beendet.`,true);
+          if(isOwnJob(active.job))show(`Import ${active.job.id} wurde nach einem abgebrochenen Browserlauf sicher beendet.`,true);
           await resumeWatch();
         }else{
-          show(`Import ${active.job.id} wird mit derselben Job-ID sicher wiederaufgenommen.`);
+          if(isOwnJob(active.job))show(`Import ${active.job.id} wird mit derselben Job-ID sicher wiederaufgenommen.`);
           await launch(active.job,true);
         }
       }
@@ -112,7 +114,7 @@
         const claimed=await post('claim');
         if(claimed.job)await launch(claimed.job,false);
       }
-    }catch(e){show('Zentrale Importstation: '+e.message,true);agentJob=null;busy=false}
+    }catch(e){showAgent('Zentrale Importstation: '+e.message,true);agentJob=null;busy=false;await resumeWatch()}
     setTimeout(poll,3000);
   }
 
@@ -120,7 +122,7 @@
     if(!agentJob)return;
     const id=agentJob.id;
     try{await post('complete',{id,ok,result:result||null,message:ok?`${result?.claims||0} Aufträge geprüft · ${result?.updated||0} aktualisiert · ${result?.skipped||0} unverändert übersprungen.`:(error||'ClaimsForce-Import fehlgeschlagen.')});if(ok)window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'))}
-    catch(e){show(`Import ${id}: Abschlussstatus konnte nicht gespeichert werden (${e.message}).`,true)}
+    catch(e){showAgent(`Import ${id}: Abschlussstatus konnte nicht gespeichert werden (${e.message}).`,true)}
     agentJob=null;busy=false;lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
     await resumeWatch();
   }
@@ -141,9 +143,9 @@
         reconciling=true;
         try{
           await post('complete',{id:Number(active.jobId),ok:false,result:null,message:`Browserlauf wurde abgebrochen (${diag.phase||active.phase||'CF-RUNTIME'}).`});
-          show(`Import ${active.jobId} wurde nach einem abgebrochenen Browserlauf sicher beendet.`,true);
+          if(userJobs.includes(Number(active.jobId)))show(`Import ${active.jobId} wurde nach einem abgebrochenen Browserlauf sicher beendet.`,true);
           await resumeWatch();
-        }catch(error){if(!/bereits abgeschlossen|erneut eingeplant/i.test(error.message))show(`Import ${active.jobId}: Abbruchstatus konnte nicht gespeichert werden (${error.message}).`,true)}
+        }catch(error){if(userJobs.includes(Number(active.jobId))&&!/bereits abgeschlossen|erneut eingeplant/i.test(error.message))show(`Import ${active.jobId}: Abbruchstatus konnte nicht gespeichert werden (${error.message}).`,true)}
         finally{reconciling=false}
       }
     }
@@ -151,7 +153,7 @@
       const active=d.status?.active||{},diag=d.status?.diagnostic||{};
       if(Number(active.jobId||0)===Number(agentJob.id)){
         lastRuntime={phase:diag.phase||active.phase||'CF-RUN',message:diag.text||active.error||'Browserlauf wird fortgesetzt.',current:Number(diag.details?.current||0),total:Number(diag.details?.total||0),diagnostic:diag.details||{}};
-        show(`[${lastRuntime.phase}] ${lastRuntime.message}`,active.status==='failed');
+        showAgent(`[${lastRuntime.phase}] ${lastRuntime.message}`,active.status==='failed');
         await heartbeat();
       }
     }
@@ -163,6 +165,7 @@
     }
     if(d.type==='SVNET_CLAIMS_IMPORT_PROGRESS'){
       lastRuntime={phase:runtime.phase||'CF-RUN',message:d.text||'Import läuft …',current:Number(d.current||0),total:Number(d.total||0),diagnostic:runtime.details||{}};
+      showAgent(`[${lastRuntime.phase}] ${lastRuntime.message}`);
       await heartbeat();
     }
     if(d.type==='SVNET_CLAIMS_IMPORT_DONE')await completeAgent(true,d.result,null);
