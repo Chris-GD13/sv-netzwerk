@@ -13,7 +13,7 @@ function waEnv(string $key, string $default = ''): string
 function waProfiles(): array
 {
     return [
-        'christian' => ['name'=>'Christian Wächter','number'=>'+491604092134','phone_id'=>waEnv('WHATSAPP_CHRISTIAN_PHONE_NUMBER_ID')],
+        'christian' => ['name'=>'Christian Wächter','number'=>'+4973673103045','phone_id'=>waEnv('WHATSAPP_CHRISTIAN_PHONE_NUMBER_ID','1282747221593843'),'waba_id'=>waEnv('WHATSAPP_CHRISTIAN_WABA_ID','2484676038720950')],
         'holger' => ['name'=>'Holger Roth','number'=>'+491731645162','phone_id'=>waEnv('WHATSAPP_HOLGER_PHONE_NUMBER_ID')],
         'marc' => ['name'=>'Marc Schütt','number'=>'+4923926592751','phone_id'=>waEnv('WHATSAPP_MARC_PHONE_NUMBER_ID')],
     ];
@@ -104,7 +104,7 @@ function waConnection(string $profileKey): array
         $token = waDecryptToken((string)$row['access_token_ciphertext']);
         if ($token !== '') return ['phone_id'=>(string)$row['phone_number_id'],'waba_id'=>(string)$row['waba_id'],'token'=>$token,'display_phone_number'=>(string)$row['display_phone_number'],'verified_name'=>(string)($row['verified_name']??'')];
     }
-    return ['phone_id'=>(string)$profile['phone_id'],'waba_id'=>'','token'=>waEnv('WHATSAPP_ACCESS_TOKEN'),'display_phone_number'=>(string)$profile['number'],'verified_name'=>(string)$profile['name']];
+    return ['phone_id'=>(string)$profile['phone_id'],'waba_id'=>(string)($profile['waba_id']??''),'token'=>waEnv('WHATSAPP_ACCESS_TOKEN'),'display_phone_number'=>(string)$profile['number'],'verified_name'=>(string)$profile['name']];
 }
 
 function waHttp(string $method, string $url, array $headers = [], ?string $body = null): array
@@ -418,8 +418,10 @@ try {
     if ($action === 'status') {
         $connected = waConfigured($connection);
         $onboardingAvailable = waEnv('WHATSAPP_META_APP_ID')!=='' && waEnv('WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID')!=='' && waEnv('WHATSAPP_APP_SECRET')!=='';
-        $state = $connected ? 'verbunden' : ($onboardingAvailable ? 'Meta-Coexistence noch nicht verbunden' : 'Portal-App noch nicht mit Meta verbunden');
-        apiJson(['ok'=>true,'profile'=>$profileKey,'name'=>$profile['name'],'number'=>$profile['number'],'connected'=>$connected,'onboarding_available'=>$onboardingAvailable,'state'=>$state]);
+        $metaPrepared = $connection['phone_id']!=='' && $connection['waba_id']!=='';
+        $pendingReview = !$connected && $metaPrepared;
+        $state = $connected ? 'verbunden' : ($pendingReview ? 'Meta-Prüfung ausstehend' : ($onboardingAvailable ? 'Meta-Coexistence noch nicht verbunden' : 'Portal-App noch nicht mit Meta verbunden'));
+        apiJson(['ok'=>true,'profile'=>$profileKey,'name'=>$profile['name'],'number'=>$profile['number'],'connected'=>$connected,'meta_prepared'=>$metaPrepared,'pending_review'=>$pendingReview,'onboarding_available'=>$onboardingAvailable,'state'=>$state]);
     }
     if ($action === 'recent') {
         $stmt = db()->prepare("SELECT wamid,sender_phone,direction,message_type,original_name,caption,folder_id,case_no,contact_type,status,error_text,received_at FROM whatsapp_messages WHERE profile_key=:p ORDER BY received_at DESC LIMIT 30");
