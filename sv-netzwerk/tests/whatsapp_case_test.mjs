@@ -12,7 +12,7 @@ assert(!api.includes("'number'=>'+491604092134'"),'Christians frühere Mobilnumm
 assert(api.includes("'1282747221593843'")&&api.includes("'2484676038720950'"),'Christians neue Meta-Telefon- und WABA-Zuordnung muss im Portal vorbereitet sein');
 assert(!api.includes('+491712119777'),'Marcs frühere Mobilnummer darf nicht mehr als WhatsApp-Business-Nummer verwendet werden');
 assert(api.includes('Portal-App noch nicht mit Meta verbunden'),'Ein fehlendes Portal-App-Setup darf nicht als fehlende WhatsApp-Business-Registrierung dargestellt werden');
-assert(api.includes('Meta-Prüfung ausstehend')&&api.includes("'pending_review'=>\$pendingReview")&&client.includes('Warten auf Meta-Freigabe'),'Das Portal muss die vorbereitete, aber noch nicht freigegebene Meta-Nummer eindeutig anzeigen');
+assert(api.includes('Meta-Prüfung ausstehend')&&api.includes("'pending_review'=>\$pendingReview")&&client.includes('Warten auf Meta-Freigabe')&&client.includes('WhatsApp-Verbindung abschließen'),'Das Portal muss die vorbereitete Meta-Nummer vom Prüfstatus bis zum Verbindungsabschluss eindeutig führen');
 for(const token of ['whatsapp_profile_connections','WHATSAPP_META_APP_ID','WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID','waEncryptToken','is_on_biz_app','complete_signup','subscribed_apps'])assert(api.includes(token),`Sichere Meta-Selbstverbindung fehlt: ${token}`);
 for(const token of ['X_HUB_SIGNATURE_256',"hash_hmac('sha256'",'last_outbound_wamid','valid_until>=NOW()','unassigned','gd'])void token;
 assert(api.includes('HTTP_X_HUB_SIGNATURE_256')&&api.includes("hash_hmac('sha256'"),'Webhook-Signaturprüfung fehlt');
