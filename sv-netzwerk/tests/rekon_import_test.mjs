@@ -27,7 +27,7 @@ assert.equal(mapped.rekon_task_id, '270330');
 assert.equal(mapped.schaden_strasse, 'Andreas-Hofer-Str. 3');
 assert.equal(mapped.vn_objekt, 'WEG Andreas-Hofer-Str. 3/1');
 
-assert.equal(manifest.version, '1.4.10');
+assert.equal(manifest.version, '1.4.11');
 assert(manifest.host_permissions.includes('https://www.rekoninterschaden-portal.de/*'));
 assert(manifest.host_permissions.includes('https://api.www.rekoninterschaden-portal.de/*'));
 assert(manifest.content_scripts.some(entry => entry.js?.includes('rekon-main.js') && entry.world === 'MAIN'));
@@ -39,7 +39,7 @@ assert(worker.includes("payload.errors?.[0]?.message"), 'GraphQL-Fehler werden k
 assert(worker.includes('Rekon-Auftragsliste wird eingelesen') && worker.includes('readRekonTasks(token, portalTabId)'), 'Das seitenweise Einlesen der Auftragsliste wird sichtbar gemeldet');
 assert(worker.includes("function rekonProgress(tabId") && !worker.includes("await chrome.tabs.sendMessage(tabId, { type: 'REKON_IMPORT_PROGRESS'"), 'Reine Fortschrittsmeldungen dürfen den Rekon-Abruf nicht auf eine Edge-Antwort blockieren');
 assert(worker.includes('sendResponse(startRekonImport(sender, message))'), 'Der Rekon-Start wird synchron und ohne offenen Nachrichtenkanal bestätigt');
-assert(worker.includes("queueMicrotask(() => {\n    runRekonImport(run)"), 'Der Import beginnt als Microtask nach der sofortigen Startbestätigung und kann nicht zwischen Antwort und Timer schlafen gelegt werden');
+assert(worker.includes("runningRekonImport = run;\n  runRekonImport(run).then"), 'Der Rekon-Import muss unmittelbar im Nachrichtenlauf starten und darf nicht vor dem ersten Fortschritt schlafen gelegt werden');
 assert(worker.includes("rekon: runningRekonImport ? { status: 'running'") && portal.includes('data-svnet-rekon-runtime'), 'Der tatsächliche Rekon-Laufstatus ist im Portal diagnostizierbar');
 assert(worker.includes("Object.assign(runningRekonImport, { text, current, total })") && portal.includes("rekon.status === 'running' && rekon.text"), 'Der gepollte Laufstatus stellt Fortschritt auch bei verlorenen Edge-Ereignissen wieder her');
 assert(portal.includes('if (!PORTAL_REQUEST_TYPES.has(message?.type)) return;'), 'Rekon-Fortschritt wird nicht als unbekannter Portalauftrag mit offenem Antwortkanal abgefangen');

@@ -19,8 +19,10 @@ function svnetIsBackofficeUser(array $user): bool
     $name = svnetProfileText((string)($user['full_name'] ?? ''));
     return (string)($user['role'] ?? '') === 'administrator'
         || $email === 'ws@sv-schuett.eu'
+        || $email === 'ks@sv-schuett.eu'
         || str_contains($email, 'susanne')
-        || str_contains($name, 'susanne');
+        || str_contains($name, 'susanne')
+        || str_contains($name, 'katja schaefer');
 }
 
 function svnetUserProfile(array $user): string

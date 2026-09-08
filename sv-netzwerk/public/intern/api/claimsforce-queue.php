@@ -128,7 +128,7 @@ if($action==='mine'){
     }
     apiJson(['ok'=>true,'jobs'=>$jobs]);
 }
-if(!cqIsCentralAgent($user))apiError(403,'Nur Susannes zentrale Backoffice-Importstation darf Aufträge übernehmen.');
+if(!cqIsCentralAgent($user))apiError(403,'Nur eine freigegebene zentrale Backoffice-Importstation darf Aufträge übernehmen.');
 
 if($action==='schedule'){
     $now=new DateTimeImmutable('now',new DateTimeZone('Europe/Berlin'));
