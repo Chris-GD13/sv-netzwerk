@@ -37,6 +37,8 @@ Erforderliche Servervariablen:
 
 Jedes Profil wird getrennt gespeichert. Insbesondere kann Marc Schütt im Portal sein eigenes Meta-Unternehmenskonto und ausschließlich die Rufnummer `+49 2392 6592751` verbinden. Christians oder Holgers WABA-ID und Zugriffstoken werden dabei weder verwendet noch überschrieben.
 
+Christian Wächter und Marc Schütt erhalten in der linken Portalnavigation den eigenen Menüpunkt `WhatsApp`. Die dortige Kontoseite zeigt ausschließlich Status und Eingang des aktiven Bearbeiterprofils. Bei einer Backoffice-Anmeldung kann das Profil auf der WhatsApp-Seite bewusst gewechselt werden; eine normale Sachverständigenanmeldung bleibt fest an das eigene Profil gebunden. Susanne Wächter und Jens Maurer erhalten den Menüpunkt nicht.
+
 Webhook-Adresse: `https://www.sv-netzwerk.eu/intern/api/whatsapp-case.php?action=webhook`
 
 Die freigegebene Terminvorschlagsvorlage erwartet vier Textparameter in dieser Reihenfolge: Schaden-Nr., Datum/Uhrzeit, Besichtigungsadresse und Name des Sachverständigen.

@@ -169,6 +169,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       <aside class="intern-sidebar">
         <nav aria-label="Interne Navigation" class="intern-sidebar__nav">
           {internalLinks.map((link) => <a class:list={{ active: isActive(link.href) }} href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
+          <a id="intern-whatsapp-link" class:list={{ active: isActive('/intern/whatsapp/') }} href="/intern/whatsapp/" aria-current={isActive('/intern/whatsapp/') ? 'page' : undefined} hidden><span>◉</span>WhatsApp</a>
           <a id="intern-settlement-link" class:list={{ active: isActive('/intern/abrechnungen/') }} href="/intern/abrechnungen/" aria-current={isActive('/intern/abrechnungen/') ? 'page' : undefined} hidden><span>€</span>Abrechnungen</a>
           <slot name="sidebar-extra" />
         </nav>
@@ -227,6 +228,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       }
       const revenueSummary = document.getElementById('intern-revenue-summary');
       const settlementLink = document.getElementById('intern-settlement-link');
+      const whatsappLink = document.getElementById('intern-whatsapp-link');
       const money = (value, maximumFractionDigits = 0) => new Intl.NumberFormat('de-DE', {
         style: 'currency', currency: 'EUR', maximumFractionDigits, minimumFractionDigits: maximumFractionDigits,
       }).format(Number(value) || 0);
@@ -272,6 +274,12 @@ const isActive = (href: string) => currentPath.startsWith(href);
         }
       };
       loadRevenueSummary();
+      if (whatsappLink instanceof HTMLElement) {
+        fetch('/intern/api/whatsapp-case.php?action=menu_access', { credentials: 'same-origin', cache: 'no-store' })
+          .then((response) => response.ok ? response.json() : Promise.reject())
+          .then((data) => { whatsappLink.hidden = data.visible !== true; })
+          .catch(() => { whatsappLink.hidden = true; });
+      }
     </script>
   </body>
 </html>

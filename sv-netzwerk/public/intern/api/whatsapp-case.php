@@ -378,6 +378,11 @@ commonHeaders();
 $user = requireAuth();
 if (!in_array((string)($user['role'] ?? ''), ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) apiError(403, 'Keine Berechtigung.');
 
+if ($action === 'menu_access') {
+    $ownProfile = svnetUserProfile($user);
+    apiJson(['ok'=>true,'visible'=>in_array($ownProfile, ['christian','marc'], true),'profile'=>$ownProfile]);
+}
+
 try {
     waEnsureSchema();
     $profileKey = waTargetProfile($user);

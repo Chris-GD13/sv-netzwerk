@@ -3,6 +3,9 @@ const fromProject=path=>new URL(`../${path}`,import.meta.url);
 const page=fs.readFileSync(fromProject('src/pages/intern/versicherungsfaelle/index.astro'),'utf8');
 const api=fs.readFileSync(fromProject('public/intern/api/whatsapp-case.php'),'utf8');
 const client=fs.readFileSync(fromProject('public/intern/whatsapp-case.js'),'utf8');
+const accountPage=fs.readFileSync(fromProject('src/pages/intern/whatsapp/index.astro'),'utf8');
+const accountClient=fs.readFileSync(fromProject('public/intern/whatsapp-account.js'),'utf8');
+const layout=fs.readFileSync(fromProject('src/layouts/InternalLayout.astro'),'utf8');
 const assert=(condition,message)=>{if(!condition)throw new Error(message)};
 for(const token of ['vf-wa-panel','vf-wa-vn','vf-wa-sanierer','vf-wa-send','vf-wa-connect','WhatsApp verbinden','WhatsApp noch nicht verbunden','/intern/whatsapp-case.js'])assert(page.includes(token),`Portalbestandteil fehlt: ${token}`);
 assert(!api.includes("'susanne' =>")&&!api.includes("'jens' =>"),'Susanne und Jens dürfen kein WhatsApp-Profil erhalten');
@@ -25,5 +28,8 @@ assert(client.includes("meta.mobil,meta.telefon")&&client.includes("meta.saniere
 assert(client.includes('connection?.connected'),'Versand darf ohne Meta-Verbindung nicht aktiv werden');
 assert(client.includes('whatsapp_business_app_onboarding')&&client.includes('WA_EMBEDDED_SIGNUP'),'Meta-Coexistence muss aus dem Portal geführt werden');
 assert(client.includes('Die WhatsApp-Konten anderer Bearbeiter bleiben getrennt.'),'Der Verbindungsdialog muss die profilbezogene Kontentrennung eindeutig anzeigen');
+assert(layout.includes('intern-whatsapp-link')&&layout.includes('/intern/whatsapp/')&&layout.includes("action=menu_access"),'Der persönliche WhatsApp-Menüpunkt fehlt in der linken Navigation');
+for(const token of ['WhatsApp Business','wa-profile-select','wa-connect','wa-messages','/intern/whatsapp-account.js'])assert(accountPage.includes(token),`Eigene WhatsApp-Kontoseite unvollständig: ${token}`);
+assert(accountClient.includes('selected_expert')&&accountClient.includes('complete_signup')&&accountClient.includes('Die WhatsApp-Konten anderer Bearbeiter bleiben getrennt.'),'Die eigene Kontoseite muss Profilwahl, Meta-Verbindung und Kontentrennung enthalten');
 assert(client.includes('const escape=')&&client.includes('escape(row.original_name||row.caption'),'WhatsApp-Inhalte müssen vor der Darstellung maskiert werden');
 console.log('whatsapp_case_test: ok');
