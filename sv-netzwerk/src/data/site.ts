@@ -1,6 +1,7 @@
 export const site = {
   name: 'SV-Netzwerk',
   legalName: 'SV-Netzwerk Bau & Schaden',
+  registeredName: 'Sachverständigenbüro Marc Schütt e.K.',
   description: 'Sachverständige, Großschaden- und Komplexschadenregulierung und vernetzte Fachkompetenz für komplexe Bau- und Versicherungsschäden.',
   url: 'https://www.sv-netzwerk.eu',
   email: 'info@sv-netzwerk.eu',
