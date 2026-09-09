@@ -78,7 +78,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes lftp
 
-      - name: Bestehende Microsoft-Konfiguration absichern
+      - name: Serverkonfiguration absichern
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
           SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
@@ -87,11 +87,23 @@ jobs:
           PORTAL_MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
           PORTAL_MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
           PORTAL_MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
+          PORTAL_WHATSAPP_META_APP_ID: ${{ secrets.WHATSAPP_META_APP_ID }}
+          PORTAL_WHATSAPP_APP_SECRET: ${{ secrets.WHATSAPP_APP_SECRET }}
+          PORTAL_WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID: ${{ secrets.WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID }}
+          PORTAL_WHATSAPP_VERIFY_TOKEN: ${{ secrets.WHATSAPP_VERIFY_TOKEN }}
+          PORTAL_WHATSAPP_TOKEN_ENCRYPTION_KEY: ${{ secrets.WHATSAPP_TOKEN_ENCRYPTION_KEY }}
+          PORTAL_WHATSAPP_APPOINTMENT_TEMPLATE: ${{ secrets.WHATSAPP_APPOINTMENT_TEMPLATE }}
         run: |
           set -euo pipefail
           test -n "$PORTAL_MS_TENANT_ID"
           test -n "$PORTAL_MS_CLIENT_ID"
           test -n "$PORTAL_MS_CLIENT_SECRET"
+          test -n "$PORTAL_WHATSAPP_META_APP_ID"
+          test -n "$PORTAL_WHATSAPP_APP_SECRET"
+          test -n "$PORTAL_WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID"
+          test -n "$PORTAL_WHATSAPP_VERIFY_TOKEN"
+          test -n "$PORTAL_WHATSAPP_TOKEN_ENCRYPTION_KEY"
+          test -n "$PORTAL_WHATSAPP_APPOINTMENT_TEMPLATE"
           token_response="$(curl --silent --show-error --fail \
             --request POST \
             --header 'Content-Type: application/x-www-form-urlencoded' \
@@ -118,14 +130,21 @@ jobs:
           env_file="$env_dir/server.env"
           trap 'rm -f "$env_file"; rmdir "$env_dir"' EXIT
           lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; get $SFTP_REMOTE_DIR/.env -o $env_file; quit"
-          sed -i '/^MS_TENANT_ID=/d;/^MS_CLIENT_ID=/d;/^MS_CLIENT_SECRET=/d;/^M365_TENANT_ID=/d;/^M365_CLIENT_ID=/d;/^M365_CLIENT_SECRET=/d' "$env_file"
+          sed -i '/^MS_TENANT_ID=/d;/^MS_CLIENT_ID=/d;/^MS_CLIENT_SECRET=/d;/^M365_TENANT_ID=/d;/^M365_CLIENT_ID=/d;/^M365_CLIENT_SECRET=/d;/^WHATSAPP_META_APP_ID=/d;/^WHATSAPP_APP_SECRET=/d;/^WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID=/d;/^WHATSAPP_VERIFY_TOKEN=/d;/^WHATSAPP_TOKEN_ENCRYPTION_KEY=/d;/^WHATSAPP_APPOINTMENT_TEMPLATE=/d;/^WHATSAPP_TEMPLATE_LANGUAGE=/d' "$env_file"
           {
             printf 'MS_TENANT_ID=%s\n' "$PORTAL_MS_TENANT_ID"
             printf 'MS_CLIENT_ID=%s\n' "$PORTAL_MS_CLIENT_ID"
             printf 'MS_CLIENT_SECRET=%s\n' "$PORTAL_MS_CLIENT_SECRET"
+            printf 'WHATSAPP_META_APP_ID=%s\n' "$PORTAL_WHATSAPP_META_APP_ID"
+            printf 'WHATSAPP_APP_SECRET=%s\n' "$PORTAL_WHATSAPP_APP_SECRET"
+            printf 'WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID=%s\n' "$PORTAL_WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID"
+            printf 'WHATSAPP_VERIFY_TOKEN=%s\n' "$PORTAL_WHATSAPP_VERIFY_TOKEN"
+            printf 'WHATSAPP_TOKEN_ENCRYPTION_KEY=%s\n' "$PORTAL_WHATSAPP_TOKEN_ENCRYPTION_KEY"
+            printf 'WHATSAPP_APPOINTMENT_TEMPLATE=%s\n' "$PORTAL_WHATSAPP_APPOINTMENT_TEMPLATE"
+            printf 'WHATSAPP_TEMPLATE_LANGUAGE=de\n'
           } >> "$env_file"
           lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; put $env_file -o $SFTP_REMOTE_DIR/.env; quit"
-          echo "Microsoft-Konfiguration ist vollständig hinterlegt."
+          echo "Microsoft- und WhatsApp-Konfiguration sind vollständig hinterlegt."
 
       - name: Portalpaket ohne Serverkonfiguration übertragen
         env:
