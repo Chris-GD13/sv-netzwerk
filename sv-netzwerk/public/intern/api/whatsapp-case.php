@@ -388,6 +388,16 @@ try {
     $profileKey = waTargetProfile($user);
     $profile = waProfiles()[$profileKey];
     $connection = waConnection($profileKey);
+    if ($action === 'webhook_setup') {
+        if ((string)($user['role'] ?? '') !== 'administrator') apiError(403, 'Nur Administratoren dürfen die Webhook-Konfiguration abrufen.');
+        $verifyToken = waEnv('WHATSAPP_VERIFY_TOKEN');
+        if ($verifyToken === '') apiError(503, 'Das WhatsApp-Verifizierungstoken ist noch nicht eingerichtet.');
+        apiJson([
+            'ok'=>true,
+            'callback_url'=>'https://www.sv-netzwerk.eu/intern/api/whatsapp-case.php?action=webhook',
+            'verify_token'=>$verifyToken,
+        ]);
+    }
     if ($action === 'signup_config') {
         $appId = waEnv('WHATSAPP_META_APP_ID');
         $configId = waEnv('WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID');
