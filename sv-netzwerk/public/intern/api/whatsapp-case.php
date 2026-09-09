@@ -424,8 +424,10 @@ try {
         $connected = waConfigured($connection);
         $onboardingAvailable = waEnv('WHATSAPP_META_APP_ID')!=='' && waEnv('WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID')!=='' && waEnv('WHATSAPP_APP_SECRET')!=='';
         $metaPrepared = $connection['phone_id']!=='' && $connection['waba_id']!=='';
-        $pendingReview = !$connected && $metaPrepared;
-        $state = $connected ? 'verbunden' : ($pendingReview ? 'Meta-Prüfung ausstehend' : ($onboardingAvailable ? 'Meta-Coexistence noch nicht verbunden' : 'Portal-App noch nicht mit Meta verbunden'));
+        // Stored phone/WABA ids only mean that the number was prepared in Meta.
+        // They are not evidence of a Meta review and must not block Embedded Signup.
+        $pendingReview = false;
+        $state = $connected ? 'verbunden' : ($onboardingAvailable ? 'Meta-Coexistence noch nicht verbunden' : 'Portal-App noch nicht mit Meta verbunden');
         apiJson(['ok'=>true,'profile'=>$profileKey,'name'=>$profile['name'],'number'=>$profile['number'],'connected'=>$connected,'meta_prepared'=>$metaPrepared,'pending_review'=>$pendingReview,'onboarding_available'=>$onboardingAvailable,'state'=>$state]);
     }
     if ($action === 'recent') {
