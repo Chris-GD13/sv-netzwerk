@@ -39,8 +39,13 @@ assert(
 );
 assert(
   claimsforceCentral.includes("const analysisGrid=document.querySelector('.vf-analysis-grid')") &&
-    claimsforceCentral.includes('[analysisGrid,claimsCard].forEach'),
+    claimsforceCentral.includes("claimsCard.closest('.vf-import-grid')?[analysisGrid]:[analysisGrid,claimsCard]") &&
+    claimsforceCentral.includes('movableCards.forEach'),
   "Die ClaimsForce-Nachsortierung darf PLAUD und Polycam nicht aus ihrer gemeinsamen Zeile loesen.",
+);
+assert(
+  page.indexOf('id="vf-system-panel"') < page.indexOf('class="vf-import-grid vf-import-grid-bottom"'),
+  "ClaimsForce und Rekon muessen als gemeinsame Importzeile ganz unten stehen.",
 );
 assert(
   !page.includes("Referenz öffnen"),
