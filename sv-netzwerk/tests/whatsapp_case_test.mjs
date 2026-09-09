@@ -24,7 +24,8 @@ assert(api.includes('last_outbound_wamid')&&api.includes('valid_until>=NOW()'),'
 assert(api.includes("status'=>'unassigned'")||api.includes("'unassigned'"),'Nicht eindeutige Eingänge müssen unzugeordnet bleiben');
 assert(api.includes("$action === 'assign_message'")&&client.includes('Aktivem Fall zuordnen'),'Manuelle Zuordnung eines uneindeutigen WhatsApp-Eingangs fehlt');
 assert(api.includes("'02_Fotos'")&&api.includes("'04_Rechnungen_KVA'")&&api.includes("'07_Korrespondenz'"),'Drive-Zielordner fehlen');
-assert(client.includes("meta.mobil,meta.telefon")&&client.includes("meta.sanierer_mobil,meta.sanierer_telefon"),'VN- und Sanierer-Rufnummern werden nicht getrennt übernommen');
+assert(client.includes('meta.mobil')&&client.includes('meta.telefon')&&client.includes('meta.sanierer_mobil')&&client.includes('meta.sanierer_telefon'),'VN- und Sanierer-Rufnummern werden nicht getrennt übernommen');
+assert(client.includes('telefonkontakte')&&client.includes('addCasePhonePicker')&&client.includes('Aus Akte übernehmen'),'VN-, Sanierer- und zusätzliche Aktenkontakte müssen in der WhatsApp-Terminierung auswählbar sein');
 assert(client.includes('connection?.connected'),'Versand darf ohne Meta-Verbindung nicht aktiv werden');
 assert(client.includes('whatsapp_business_app_onboarding')&&client.includes('WA_EMBEDDED_SIGNUP'),'Meta-Coexistence muss aus dem Portal geführt werden');
 assert(client.includes('Die WhatsApp-Konten anderer Bearbeiter bleiben getrennt.'),'Der Verbindungsdialog muss die profilbezogene Kontentrennung eindeutig anzeigen');
