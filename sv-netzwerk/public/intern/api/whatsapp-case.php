@@ -142,6 +142,34 @@ function waConfigured(array $connection): bool
     return $connection['phone_id'] !== '' && $connection['token'] !== '' && waEnv('WHATSAPP_APP_SECRET') !== '' && waEnv('WHATSAPP_VERIFY_TOKEN') !== '' && waEnv('WHATSAPP_APPOINTMENT_TEMPLATE') !== '';
 }
 
+function waReadiness(array $connection): array
+{
+    if (!waConfigured($connection)) return ['ready'=>false,'phone_status'=>'','template_status'=>'','state'=>'WhatsApp ist technisch noch nicht eingerichtet.'];
+    $phone = waGraph('GET', rawurlencode((string)$connection['phone_id']) . '?fields=status', null, (string)$connection['token']);
+    $phoneStatus = strtoupper(trim((string)($phone['status'] ?? '')));
+    $templateStatus = '';
+    if ((string)$connection['waba_id'] !== '') {
+        $templateName = waEnv('WHATSAPP_APPOINTMENT_TEMPLATE');
+        $templates = waGraph('GET', rawurlencode((string)$connection['waba_id']) . '/message_templates?' . http_build_query([
+            'fields'=>'name,status,language',
+            'name'=>$templateName,
+            'limit'=>50,
+        ]), null, (string)$connection['token']);
+        $language = waEnv('WHATSAPP_TEMPLATE_LANGUAGE', 'de');
+        foreach (($templates['data'] ?? []) as $template) {
+            if ((string)($template['name'] ?? '') === $templateName && (string)($template['language'] ?? '') === $language) {
+                $templateStatus = strtoupper(trim((string)($template['status'] ?? '')));
+                break;
+            }
+        }
+    }
+    $ready = $phoneStatus === 'CONNECTED' && $templateStatus === 'APPROVED';
+    $state = $ready ? 'versandbereit' : ($phoneStatus !== 'CONNECTED'
+        ? 'Meta-Telefonnummer noch ausstehend'
+        : ($templateStatus !== 'APPROVED' ? 'WhatsApp-Vorlage noch in Prüfung' : 'noch nicht versandbereit'));
+    return ['ready'=>$ready,'phone_status'=>$phoneStatus,'template_status'=>$templateStatus,'state'=>$state];
+}
+
 function waNormalizePhone(string $value): string
 {
     $value = preg_replace('/[^0-9+]/', '', trim($value)) ?? '';
@@ -431,14 +459,16 @@ try {
         apiJson(['ok'=>true,'profile'=>$profileKey,'number'=>$displayNumber,'connected'=>true]);
     }
     if ($action === 'status') {
-        $connected = waConfigured($connection);
+        $configured = waConfigured($connection);
+        $readiness = $configured ? waReadiness($connection) : ['ready'=>false,'phone_status'=>'','template_status'=>'','state'=>''];
+        $connected = (bool)$readiness['ready'];
         $onboardingAvailable = waEnv('WHATSAPP_META_APP_ID')!=='' && waEnv('WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID')!=='' && waEnv('WHATSAPP_APP_SECRET')!=='';
         $metaPrepared = $connection['phone_id']!=='' && $connection['waba_id']!=='';
         // Stored phone/WABA ids only mean that the number was prepared in Meta.
         // They are not evidence of a Meta review and must not block Embedded Signup.
         $pendingReview = false;
-        $state = $connected ? 'verbunden' : ($onboardingAvailable ? 'Meta-Coexistence noch nicht verbunden' : 'Portal-App noch nicht mit Meta verbunden');
-        apiJson(['ok'=>true,'profile'=>$profileKey,'name'=>$profile['name'],'number'=>$profile['number'],'connected'=>$connected,'meta_prepared'=>$metaPrepared,'pending_review'=>$pendingReview,'onboarding_available'=>$onboardingAvailable,'state'=>$state]);
+        $state = $configured ? (string)$readiness['state'] : ($onboardingAvailable ? 'Meta-Coexistence noch nicht verbunden' : 'Portal-App noch nicht mit Meta verbunden');
+        apiJson(['ok'=>true,'profile'=>$profileKey,'name'=>$profile['name'],'number'=>$profile['number'],'connected'=>$connected,'configured'=>$configured,'meta_prepared'=>$metaPrepared,'pending_review'=>$pendingReview,'onboarding_available'=>$onboardingAvailable,'phone_status'=>$readiness['phone_status'],'template_status'=>$readiness['template_status'],'state'=>$state]);
     }
     if ($action === 'recent') {
         $stmt = db()->prepare("SELECT wamid,sender_phone,direction,message_type,original_name,caption,folder_id,case_no,contact_type,status,error_text,received_at FROM whatsapp_messages WHERE profile_key=:p ORDER BY received_at DESC LIMIT 30");
@@ -472,6 +502,8 @@ try {
     if ($action === 'send_appointment') {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
         if (!waConfigured($connection)) apiError(409, 'WhatsApp ist für dieses Bearbeiterprofil noch nicht über Meta-Coexistence verbunden.');
+        $readiness = waReadiness($connection);
+        if (!$readiness['ready']) apiError(409, 'WhatsApp ist bei Meta noch nicht versandbereit: ' . $readiness['state'] . '.');
         $body = requestBody();
         $folderId = trim((string)($body['folder_id'] ?? ''));
         requireCaseFolderAccess($folderId, $user);
