@@ -222,6 +222,19 @@ function waSendAppointment(array $profile, array $connection, string $recipient,
     return $wamid;
 }
 
+function waSendText(array $connection, string $recipient, string $message): string
+{
+    $result = waGraph('POST', rawurlencode((string)$connection['phone_id']) . '/messages', [
+        'messaging_product'=>'whatsapp',
+        'to'=>ltrim($recipient, '+'),
+        'type'=>'text',
+        'text'=>['preview_url'=>false, 'body'=>$message],
+    ], (string)$connection['token']);
+    $wamid = (string)($result['messages'][0]['id'] ?? '');
+    if ($wamid === '') throw new RuntimeException('WhatsApp hat keine Versandbestätigung geliefert.');
+    return $wamid;
+}
+
 function waLinkCase(string $profile, string $phone, string $type, string $folderId, string $caseNo, string $wamid, string $createdBy): void
 {
     $stmt = db()->prepare("INSERT INTO whatsapp_case_links(profile_key,contact_phone,contact_type,folder_id,case_no,last_outbound_wamid,valid_until,created_by,created_at,updated_at)
@@ -498,6 +511,25 @@ try {
         $stmt->execute([':folder'=>$folderId,':case_no'=>$caseNo,':drive'=>$driveId!==''?$driveId:null,':name'=>$savedName!==''?$savedName:null,':status'=>$driveId!==''?'stored':'assigned',':wamid'=>$wamid,':profile'=>$profileKey]);
         waLinkCase($profileKey, (string)$message['sender_phone'], (string)($message['contact_type'] ?: 'kontakt'), $folderId, $caseNo, '', (string)($user['email'] ?? ''));
         apiJson(['ok'=>true,'wamid'=>$wamid,'folder_id'=>$folderId,'status'=>$driveId!==''?'stored':'assigned']);
+    }
+    if ($action === 'send_message') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
+        if (!waConfigured($connection)) apiError(409, 'WhatsApp ist für dieses Bearbeiterprofil noch nicht über Meta-Coexistence verbunden.');
+        $readiness = waReadiness($connection);
+        if (!$readiness['ready']) apiError(409, 'WhatsApp ist bei Meta noch nicht versandbereit: ' . $readiness['state'] . '.');
+        $body = requestBody();
+        $phone = waNormalizePhone((string)($body['phone'] ?? ''));
+        $message = trim((string)($body['message'] ?? ''));
+        $folderId = trim((string)($body['folder_id'] ?? ''));
+        $caseNo = mb_substr(trim((string)($body['case_no'] ?? '')), 0, 190);
+        if ($phone === '') apiError(400, 'Bitte eine gültige WhatsApp-Rufnummer angeben.');
+        if ($message === '') apiError(400, 'Bitte eine Nachricht eingeben.');
+        if (mb_strlen($message) > 4096) apiError(400, 'Die WhatsApp-Nachricht darf höchstens 4.096 Zeichen enthalten.');
+        if ($folderId !== '') requireCaseFolderAccess($folderId, $user);
+        $wamid = waSendText($connection, $phone, $message);
+        if ($folderId !== '') waLinkCase($profileKey, $phone, 'kontakt', $folderId, $caseNo, $wamid, (string)($user['email'] ?? ''));
+        waRecordMessage(['wamid'=>$wamid,'profile'=>$profileKey,'sender'=>$phone,'direction'=>'outbound','type'=>'text','caption'=>$message,'folder'=>$folderId!==''?$folderId:null,'case_no'=>$caseNo!==''?$caseNo:null,'contact_type'=>'kontakt','status'=>'sent']);
+        apiJson(['ok'=>true,'profile'=>$profileKey,'phone'=>$phone,'wamid'=>$wamid,'case_no'=>$caseNo]);
     }
     if ($action === 'send_appointment') {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');

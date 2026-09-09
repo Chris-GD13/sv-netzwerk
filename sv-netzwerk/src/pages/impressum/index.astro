@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Hero from '../../components/Hero.astro';
+import { site } from '../../data/site';
 ---
 
 <BaseLayout title="Impressum" description="Impressum und Anbieterkennzeichnung des SV-Netzwerks Bau & Schaden." breadcrumbs={[{label:'Start',href:'/'},{label:'Impressum'}]}>
@@ -12,6 +13,7 @@ import Hero from '../../components/Hero.astro';
       <p><strong>Geschäftsauftritt:</strong><br />SV-Netzwerk Bau &amp; Schaden</p>
       <p><strong>Anschrift:</strong><br />Nordstraße 17<br />73432 Aalen</p>
       <p><strong>Vertreten durch:</strong><br />Marc Schütt</p>
+      <p><strong>{site.authorizedRepresentative.role}:</strong><br />{site.authorizedRepresentative.name}</p>
       <h2>Rechtsform und Netzwerkstruktur</h2>
       <p>Das SV-Netzwerk Bau &amp; Schaden ist eine partnerschaftlich organisierte Arbeitsgemeinschaft rechtlich selbstständig tätiger Sachverständiger, Regulierer und Dienstleister. Die jeweils beauftragten Leistungen werden durch den konkret benannten Auftragnehmer oder Netzwerkpartner erbracht.</p>
       <h2>Kontakt</h2>

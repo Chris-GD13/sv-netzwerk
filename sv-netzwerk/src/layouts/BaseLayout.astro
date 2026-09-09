@@ -41,6 +41,13 @@ const organizationSchema = {
   email: site.email,
   telephone: site.phone,
   sameAs: site.sameAs,
+  contactPoint: {
+    '@type': 'ContactPoint',
+    name: site.authorizedRepresentative.name,
+    contactType: site.authorizedRepresentative.role,
+    email: site.email,
+    telephone: site.phone,
+  },
   address: {
     '@type': 'PostalAddress',
     streetAddress: site.address[0],

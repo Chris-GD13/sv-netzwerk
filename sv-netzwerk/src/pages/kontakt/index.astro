@@ -25,6 +25,7 @@ const error = Astro.url.searchParams.get('fehler');
         <p class="sv-eyebrow">Direkter Kontakt</p>
         <h2>{site.legalName}</h2>
         <p>{site.address[0]}<br />{site.address[1]}</p>
+        <p><strong>{site.authorizedRepresentative.role}:</strong><br />{site.authorizedRepresentative.name}</p>
         <p><a href={`mailto:${site.email}`}>{site.email}</a><br /><a href={`tel:${site.phone.replace(/\D/g, '')}`}>{site.phone}</a></p>
         <p>Für Terminabstimmungen nutzen Sie die dedizierte Seite <a href="/termin-vereinbaren/">Termin vereinbaren</a>.</p>
       </article>

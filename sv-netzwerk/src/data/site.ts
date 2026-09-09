@@ -15,6 +15,10 @@ export const site = {
     role: 'Sachverständiger | Regulierung im Komplex- und Großschaden',
     qualification: 'DIN EN ISO/IEC 17024 zertifiziert'
   },
+  authorizedRepresentative: {
+    name: 'Christian Wächter',
+    role: 'Beauftragter und Handlungsbevollmächtigter'
+  },
   version: '5.1.12',
   navigation: [
     { label: 'Start', href: '/' },
