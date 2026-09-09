@@ -32,6 +32,8 @@ assert(client.includes('Die WhatsApp-Konten anderer Bearbeiter bleiben getrennt.
 assert(layout.includes('intern-whatsapp-link')&&layout.includes('/intern/whatsapp/')&&layout.includes("action=menu_access"),'Der persönliche WhatsApp-Menüpunkt fehlt in der linken Navigation');
 assert(api.includes("['christian','marc','holger']"),'Der persönliche WhatsApp-Menüpunkt muss für Christian, Marc und Holger freigegeben sein');
 for(const token of ['WhatsApp Business','wa-profile-select','wa-connect','wa-messages','/intern/whatsapp-account.js'])assert(accountPage.includes(token),`Eigene WhatsApp-Kontoseite unvollständig: ${token}`);
+assert(accountPage.indexOf('Nachrichten und Dateien') < accountPage.indexOf('wa-account-card'),'Kontostatus muss am Seitenende unterhalb von Versand und Eingang stehen');
+assert(accountPage.includes('<details class="wa-card wa-account-card">'),'Kontostatus muss standardmäßig zugeklappt sein');
 assert(accountClient.includes('selected_expert')&&accountClient.includes('complete_signup')&&accountClient.includes('Die WhatsApp-Konten anderer Bearbeiter bleiben getrennt.'),'Die eigene Kontoseite muss Profilwahl, Meta-Verbindung und Kontentrennung enthalten');
 for(const token of ['wa-recipient-phone','wa-message-text','wa-message-send','wa-phonebook-search','wa-case-search'])assert(accountPage.includes(token),`Versandfeld der WhatsApp-Kontoseite unvollständig: ${token}`);
 assert(accountClient.includes('PHONEBOOK_API')&&accountClient.includes('?action=list')&&accountClient.includes('action=search_cases')&&accountClient.includes('action=send_message'),'Telefonbuch-, Akten- oder Direktversand-Anbindung fehlt');
