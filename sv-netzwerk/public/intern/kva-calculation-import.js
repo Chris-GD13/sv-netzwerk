@@ -39,7 +39,7 @@ function init(){
     return new File([await response.blob()],select.options[select.selectedIndex]?.textContent?.trim()||'KVA.pdf',{type:response.headers.get('content-type')||'application/pdf'})
   }
   async function renderPdf(file){
-    const pdfjs=await import('/vendor/pdfjs/pdf.mjs');pdfjs.GlobalWorkerOptions.workerSrc='/vendor/pdfjs/pdf.worker.mjs';
+    const modulePath='/vendor/pdfjs/pdf.mjs',pdfjs=await import(modulePath);pdfjs.GlobalWorkerOptions.workerSrc='/vendor/pdfjs/pdf.worker.mjs';
     const pdf=await pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()),useSystemFonts:true}).promise,pages=[];
     for(let number=1;number<=pdf.numPages;number++){
       setState(`KVA-Seite ${number} von ${pdf.numPages} wird als Bild vorbereitet …`);const page=await pdf.getPage(number),base=page.getViewport({scale:1}),scale=Math.min(2.4,1700/base.width),viewport=page.getViewport({scale}),canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);await page.render({canvasContext:canvas.getContext('2d',{alpha:false}),viewport,background:'rgb(255,255,255)'}).promise;const blob=await new Promise((resolve,reject)=>canvas.toBlob(value=>value?resolve(value):reject(Error('PDF-Seite konnte nicht gerendert werden.')),'image/jpeg',.88));pages.push(new File([blob],`seite-${String(number).padStart(2,'0')}.jpg`,{type:'image/jpeg'}));page.cleanup()

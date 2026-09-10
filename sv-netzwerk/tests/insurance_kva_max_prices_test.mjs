@@ -29,7 +29,7 @@ assert.equal(bestAutomaticMatch({description:'Herd nach Einbau der Küche anschl
 for(const id of['vs-kva-select','vs-kva-file','vs-kva-read','vs-kva-lines','vs-kva-remap','vs-kva-import','vs-kva-offered-net','vs-kva-approved-net','vs-kva-difference'])assert(page.includes(`id="${id}"`),`KVA-Nachkalkulation benötigt ${id}.`);
 assert(page.includes('/intern/kva-calculation-import.js?v=20260910-3'),'Die Höchstpreis-Nachkalkulation muss mit der aktuellen Cache-Version geladen werden.');
 assert(script.includes("/intern/api/bki-calculator.php?action=analyze_kva"),'Der KVA muss über die beleggesicherte Positionsauslesung laufen.');
-assert(script.includes("import('/vendor/pdfjs/pdf.mjs')")&&script.includes("form.append('pages[]'")&&script.includes('case-file-browser.php?action=download'),'PDF-KVA aus Fallakte und Gerät müssen lokal als Seitenbilder gerendert werden.');
+assert(script.includes("modulePath='/vendor/pdfjs/pdf.mjs'")&&script.includes('import(modulePath)')&&script.includes("form.append('pages[]'")&&script.includes('case-file-browser.php?action=download'),'PDF-KVA aus Fallakte und Gerät müssen lokal als Seitenbilder gerendert werden, ohne den Renderer in die Astro-Prüfung zu ziehen.');
 assert(script.includes('Math.min(offered,maximum)'),'Der Prüfpreis muss der niedrigere Wert aus KVA und Höchstpreis sein.');
 assert(script.includes('wurde positionsweise anhand der hinterlegten Höchstpreisliste nachkalkuliert'),'Die Übernahme muss eine nachvollziehbare Prüfnotiz in der Kalkulation hinterlassen.');
 assert(script.includes('Noch nicht eindeutig zugeordnet')&&page.includes('nicht automatisch angesetzt'),'Unsichere Zuordnungen müssen sichtbar offen bleiben.');

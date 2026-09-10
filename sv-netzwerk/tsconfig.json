@@ -4,5 +4,5 @@
     "baseUrl": ".",
     "paths": { "@/*": ["src/*"] }
   },
-  "exclude": ["dist", "node_modules", "public/vendor/**"]
+  "exclude": ["dist", "dist/**", "node_modules", "public/vendor/**"]
 }
