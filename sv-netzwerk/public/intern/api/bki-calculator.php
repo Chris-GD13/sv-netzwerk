@@ -95,270 +95,32 @@ function bkOpenAIUploadBytes(string $name,string $mime,string $bytes):string{
     return$id;
   }finally{@unlink($tmp);}
 }
-function bkKvaNorm(string $value):string{
-  $value=mb_strtolower(trim($value),'UTF-8');
-  return trim((string)preg_replace('/[^\p{L}\p{N}]+/u',' ',$value));
-}
-function bkKvaEvidenceHasNumber(string $evidence,?float $expected):bool{
-  if($expected===null)return true;
-  if(!preg_match_all('/(?<!\d)(?:\d{1,3}(?:[.\s]\d{3})+|\d+)(?:[,.]\d+)?(?!\d)/u',$evidence,$matches))return false;
-  foreach($matches[0]as$token){
-    $token=str_replace([' ',"\u{00A0}"],'',$token);$candidates=[];
-    if(str_contains($token,','))$candidates[]=(float)str_replace(',','.',str_replace('.','',$token));
-    elseif(substr_count($token,'.')===1)$candidates[]=(float)$token;
-    $candidates[]=(float)str_replace(['.',','],'',$token);
-    foreach($candidates as$value)if(abs($value-$expected)<=max(0.01,abs($expected)*0.0001))return true;
-  }
-  return false;
-}
-function bkKvaEvidenceCoversText(string $evidence,string $expected):bool{
-  $evidenceNorm=bkKvaNorm($evidence);$expectedNorm=bkKvaNorm($expected);
-  if($expectedNorm===''||$evidenceNorm==='')return false;
-  if(str_contains($evidenceNorm,$expectedNorm))return true;
-  $ignore=['der','die','das','den','dem','des','ein','eine','einer','einen','einem','und','oder','mit','ohne','von','vom','zur','zum','im','in','auf','aus','für','inkl','einschl'];
-  $tokens=array_values(array_unique(array_filter(explode(' ',$expectedNorm),static fn(string $token):bool=>mb_strlen($token,'UTF-8')>=4&&!in_array($token,$ignore,true))));
-  if(!$tokens)return false;
-  $found=0;foreach($tokens as$token)if(str_contains($evidenceNorm,$token))$found++;
-  return $found>=min(count($tokens),max(2,(int)ceil(count($tokens)*0.45)));
-}
-function bkKvaEvidenceHasUnit(string $evidence,string $unit):bool{
-  $evidenceNorm=' '.bkKvaNorm($evidence).' ';$unitNorm=bkKvaNorm($unit);
-  // Wichtig: m²/m³ enthalten die eigentlichen Unicode-Hochzahlzeichen (²/³), die bkKvaNorm unverändert
-  // als Ziffer belässt. Ohne die tatsächlichen Hochzahl-Aliase wurde jede KVA-Position mit der sehr
-  // gebräuchlichen Einheit m² fälschlich als "nicht belegt" verworfen, obwohl Menge und Preis exakt stimmten.
-  $aliases=match($unitNorm){
-    'qm','m2','m 2','m²'=>[' qm ',' m2 ',' m 2 ',' m² '],
-    'cbm','m3','m 3','m³'=>[' cbm ',' m3 ',' m 3 ',' m³ '],
-    'lfm','lfd m','laufende meter'=>[' lfm ',' lfd m ',' laufende meter '],
-    'st','stk','stck','stück'=>[' st ',' stk ',' stck ',' stück '],
-    'psch','pausch','pauschal'=>[' psch ',' pausch ',' pauschal '],
-    'std','stunden','stunde'=>[' std ',' stunden ',' stunde '],
-    default=>[' '.$unitNorm.' '],
-  };
-  $aliases[]=' '.$unitNorm.' ';
-  foreach($aliases as$alias)if(str_contains($evidenceNorm,$alias))return true;
-  return false;
-}
-function bkKvaSchema():array{return[
-  'type'=>'json_schema','name'=>'kva_extraction','strict'=>true,'schema'=>[
-    'type'=>'object','additionalProperties'=>false,
-    'properties'=>[
-      'quote_number'=>['type'=>'string'],
-      'company'=>['type'=>'string'],
-      'net_total'=>['type'=>['number','null']],
-      'positions'=>['type'=>'array','items'=>[
-        'type'=>'object','additionalProperties'=>false,
-        'properties'=>[
-          'source_position'=>['type'=>'string'],
-          'page_number'=>['type'=>'integer'],
-          'evidence'=>['type'=>'string'],
-          'description'=>['type'=>'string'],
-          'quantity'=>['type'=>['number','null']],
-          'unit'=>['type'=>'string'],
-          'offered_unit_price'=>['type'=>['number','null']],
-          'offered_total'=>['type'=>['number','null']],
-        ],
-        'required'=>['source_position','page_number','evidence','description','quantity','unit','offered_unit_price','offered_total'],
-      ]],
-    ],
-    'required'=>['quote_number','company','net_total','positions'],
-  ],
-];}
-function bkFinalizeKva(string $name,array $raw):array{
-  $rawRows=is_array($raw['positions']??null)?$raw['positions']:[];$rawPositionsTotal=array_sum(array_map(static fn($row):float=>is_array($row)&&is_numeric($row['offered_total']??null)?(float)$row['offered_total']:0.0,$rawRows));$positions=[];$verifiedNet=is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null;
-  if(preg_match('/\bAN\d{5,}\b/i',$name,$expectedMatch)){
-    $expected=strtoupper($expectedMatch[0]);$actual=strtoupper(trim((string)($raw['quote_number']??'')));
-    if($actual===''||!hash_equals($expected,$actual))throw new RuntimeException('Die erkannte Angebotsnummer stimmt nicht mit der ausgewählten Quelldatei überein. Die Auswertung wurde aus Sicherheitsgründen verworfen.');
-  }
-  foreach(($raw['positions']??[])as$row){
-    if(!is_array($row)){continue;}$description=trim((string)($row['description']??''));$sourcePosition=trim((string)($row['source_position']??''));$evidence=trim((string)($row['evidence']??''));$page=(int)($row['page_number']??0);$quantity=is_numeric($row['quantity']??null)?(float)$row['quantity']:null;$unit=trim((string)($row['unit']??''));$unitPrice=is_numeric($row['offered_unit_price']??null)?(float)$row['offered_unit_price']:null;$lineTotal=is_numeric($row['offered_total']??null)?(float)$row['offered_total']:null;
-    $descriptionNorm=bkKvaNorm($description);$evidenceNorm=bkKvaNorm($evidence);$sourceNorm=bkKvaNorm($sourcePosition);$unitNorm=bkKvaNorm($unit);
-    $sourceMatches=$sourceNorm===''||str_contains($evidenceNorm,$sourceNorm);
-    $numbersMatchEvidence=$quantity!==null&&$quantity>0&&(($unitPrice!==null&&$unitPrice>0)||($lineTotal!==null&&$lineTotal>0))&&bkKvaEvidenceHasNumber($evidence,$quantity)&&bkKvaEvidenceHasNumber($evidence,$unitPrice)&&bkKvaEvidenceHasNumber($evidence,$lineTotal);
-    $arithmeticMatches=!($unitPrice!==null&&$lineTotal!==null)||abs(($quantity*$unitPrice)-$lineTotal)<=max(0.15,abs($lineTotal)*0.01);
-    // Ein kurzer, rein tabellarischer Beleg (Positionsnummer + Menge/Einheit/Preise) reicht ebenfalls als Nachweis, wenn
-    // Positionsnummer, Menge, Einheitspreis und Gesamtpreis exakt zueinander passen; eine lange, mehrzeilige Original-
-    // beschreibung muss dafür nicht wortgetreu im kurzen Beleg wiederholt sein. Ohne diesen Ausweg wurden korrekt
-    // ausgelesene, aber knapp belegte Positionen fälschlich verworfen, wodurch die Summenprüfung fehlschlug.
-    $stronglyIdentifiedByNumbers=$sourceNorm!==''&&$sourceMatches&&$numbersMatchEvidence&&$arithmeticMatches;
-    $descriptionGrounded=bkKvaEvidenceCoversText($evidence,$description)||$stronglyIdentifiedByNumbers;
-    $grounded=$description!==''&&$sourcePosition!==''&&$page>0&&$evidence!==''&&!preg_match('/^Seite\s+\d+\s*[,;-]?\s*Position\s+\d+$/iu',$sourcePosition)&&mb_strlen($descriptionNorm,'UTF-8')>=5&&$descriptionGrounded&&$sourceMatches&&$unitNorm!==''&&bkKvaEvidenceHasUnit($evidence,$unit)&&$numbersMatchEvidence&&$arithmeticMatches;
-    if(!$grounded)continue;
-    $positions[]=['source_position'=>$sourcePosition,'page_number'=>$page,'description'=>$description,'quantity'=>$quantity,'unit'=>$unit,'offered_unit_price'=>$unitPrice,'offered_total'=>$lineTotal];
-  }
-  if(!$positions)throw new RuntimeException('Die KI-Antwort enthielt keine am Original-KVA belegbaren Leistungspositionen. Es wurden keine Ersatz- oder Standardpositionen übernommen.');
-  $positionsTotal=array_sum(array_map(static fn(array$row):float=>(float)($row['offered_total']??0),$positions));
-  if($verifiedNet===null||$verifiedNet<=0||abs($positionsTotal-$verifiedNet)>max(0.10,$verifiedNet*0.005))throw new RuntimeException('Die ausgelesenen Positionssummen ('.number_format($positionsTotal,2,',','.').' EUR) stimmen nicht mit der sichtbaren Netto-Angebotssumme ('.($verifiedNet===null?'nicht erkannt':number_format($verifiedNet,2,',','.').' EUR').') überein. Vor der Belegprüfung wurden '.count($rawRows).' Zeilen mit '.number_format($rawPositionsTotal,2,',','.').' EUR erkannt, danach '.count($positions).' Zeilen. Die Auswertung wurde verworfen; es wurden keine fehlerhaften Werte übernommen.');
-  return['source_name'=>$name,'quote_number'=>trim((string)($raw['quote_number']??'')),'company'=>trim((string)($raw['company']??'')),'net_total'=>$verifiedNet,'positions'=>$positions];
-}
-function bkAnalyzeKva(string $name,string $mime,string $bytes,?callable $progress=null):array{
+function bkAnalyzeKva(string $name,string $mime,string $bytes):array{
   if($bytes==='')throw new RuntimeException('KVA-Datei ist leer.');
   $imageMime=strtolower(trim(explode(';',$mime,2)[0]));
   $isImage=str_starts_with($imageMime,'image/');
   if($isImage&&!in_array($imageMime,['image/jpeg','image/png','image/webp','image/gif'],true))throw new RuntimeException('Dieses Bildformat kann nicht ausgewertet werden. Bitte das Foto als JPG, PNG oder WEBP auswählen.');
   $fileId=$isImage?'':bkOpenAIUploadBytes($name,$mime,$bytes);
-  if($progress)$progress(10,'KVA wird vollständig ausgelesen …');
   $instructions=<<<'PROMPT'
-Lies den deutschen Kostenvoranschlag vollständig anhand der tatsächlich sichtbaren PDF-Seiten beziehungsweise des sichtbaren Bildes. Die eingebettete PDF-Textebene kann fehlerhaft codiert oder unlesbar sein; in diesem Fall ist ausschließlich das visuell gerenderte Dokument maßgeblich. Verwende niemals Inhalte aus anderen Dokumenten, Trainingswissen, typischen Baupositionen oder früheren Anfragen.
-
-Extrahiere ausschließlich echte, bepreiste Leistungspositionen des Angebots. Übernimm keine Abschnittsüberschriften, Raum-/Aufmaß-Unterzeilen, Summenzeilen, Zwischensummen, Umsatzsteuer, Rabatte, Bedingungen oder Widerrufstexte als Leistungsposition. Fasse eine Position nur dann zusammen, wenn sie im Dokument selbst zusammengefasst ist. Erfinde keine Positionsnummern, Seitenangaben, Mengen, Einheiten, Beschreibungen oder Preise.
-
-Für jede Position gilt zwingend:
-- source_position ist die im Dokument sichtbar gedruckte Positionsnummer, niemals eine selbst erzeugte Angabe wie "Seite 2, Position 1".
-- page_number ist die tatsächliche PDF-Seite, auf der die Position gedruckt ist.
-- description wird möglichst wortgetreu aus der gedruckten Positionszeile übernommen.
-- evidence ist ein kurzer, wortgetreuer sichtbarer Beleg derselben Seite und enthält Positionsnummer, Beschreibung, Menge/Einheit sowie den angebotenen Preis. Ohne solchen Beleg ist die Position wegzulassen.
-- quantity, unit, offered_unit_price und offered_total werden nur aus der gedruckten Positionszeile übernommen. Nicht sichtbare Werte bleiben null beziehungsweise leer.
-
-Lies Angebotsnummer, Anbieter und Nettosumme ebenfalls ausschließlich aus dem sichtbaren Dokument. Wenn eine sichere visuelle Auslesung nicht möglich ist, gib keine Positionen zurück.
+Lies den deutschen Kostenvoranschlag vollständig und extrahiere die angebotenen Leistungspositionen als Kalkulationsgrundlage. Übernimm keine Summenzeilen, Zwischensummen, Umsatzsteuer oder Rabatte als Leistungsposition. Fasse eine Position nur dann zusammen, wenn sie im Dokument selbst zusammengefasst ist. Erfinde keine Mengen, Einheiten, Beschreibungen oder Preise.
 
 Antworte ausschließlich als JSON:
-{"quote_number":"","company":"","net_total":null,"positions":[{"source_position":"","page_number":1,"evidence":"","description":"","quantity":null,"unit":"","offered_unit_price":null,"offered_total":null}]}
+{"quote_number":"","company":"","net_total":null,"positions":[{"source_position":"","description":"","quantity":null,"unit":"","offered_unit_price":null,"offered_total":null}]}
 PROMPT;
   $response=bkOpenAIJson('POST','responses',[
-    'model'=>env('OPENAI_KVA_MODEL','gpt-5.4'),
+    'model'=>env('OPENAI_MODEL','gpt-5.4-mini'),
     'instructions'=>$instructions,
-    'input'=>[['role'=>'user','content'=>array_merge([['type'=>'input_text','text'=>'Quelldatei: '.$name."\nExtrahiere alle visuell belegten kalkulierbaren Leistungspositionen ausschließlich aus dieser Quelldatei."]],$isImage?[['type'=>'input_image','image_url'=>'data:'.$imageMime.';base64,'.base64_encode($bytes),'detail'=>'high']]:[['type'=>'input_file','file_id'=>$fileId]])]],
-    'text'=>['format'=>bkKvaSchema()],
+    'input'=>[['role'=>'user','content'=>array_merge([['type'=>'input_text','text'=>'Extrahiere alle kalkulierbaren Leistungspositionen aus diesem KVA.']],$isImage?[['type'=>'input_image','image_url'=>'data:'.$imageMime.';base64,'.base64_encode($bytes),'detail'=>'high']]:[['type'=>'input_file','file_id'=>$fileId]])]],
     'max_output_tokens'=>8000
   ],420);
-  $raw=bkJson(bkOutputText($response));
-  $verificationInstructions=<<<'PROMPT'
-Du bist die unabhängige Schlusskontrolle einer KVA-Tabellenerfassung. Der beigefügte Entwurf ist unzuverlässig und darf weder bestätigt noch übernommen werden, ohne jede Angabe erneut direkt auf den visuell gerenderten Seiten der beigefügten Quelldatei abzulesen.
-
-Lies die Angebotstabelle Zeile für Zeile. Die Spalten lauten regelmäßig Pos., Bezeichnung, Menge, Einheit, EUR Preis und EUR G-Preis. Raumaufmaßzeilen, Titel, Titelsummen und Abschnittssummen sind keine Positionen. Übernimm Positionsnummer, vollständige Beschreibung, Menge, Einheit, Netto-Einheitspreis und Netto-Gesamtpreis exakt aus derselben gedruckten Leistungsposition. Verwechsle insbesondere nie Titelbezeichnungen wie "Fliesenarbeiten" oder Zeitangaben aus Beschreibungstexten mit Menge oder Einheit. Positionsnummern dürfen keine Ziffer verlieren. Die Summe aller bepreisten Positions-Gesamtpreise muss die gedruckte Nettosumme des Angebots ergeben; andernfalls suche den Fehler und korrigiere oder ergänze die Positionen. Nullpreispositionen dürfen entfallen.
-
-evidence muss für jede Position ein kurzer wortgetreuer Beleg der sichtbaren Seite sein, der Positionsnummer, Beschreibung, Menge, Einheit, Einheitspreis und Gesamtpreis enthält. Wenn ein Wert nicht sicher sichtbar ist, lasse die gesamte Position weg. Nutze keine anderen Angebote, keine Preislisten und kein Trainingswissen.
-PROMPT;
-  $draftRaw=$raw;$draftPositions=is_array($draftRaw['positions']??null)?$draftRaw['positions']:[];
-  $lastOfferPage=$isImage?1:0;
-  foreach($draftPositions as$draftRow)if(is_array($draftRow))$lastOfferPage=max($lastOfferPage,(int)($draftRow['page_number']??0));
-  $documentPages=0;if(!$isImage)$documentPages=preg_match_all('/\/Type\s*\/Page\b/',$bytes,$pageMarkers)?:0;
-  $pagesToInspect=max(1,min(20,max($lastOfferPage,$documentPages)));
-  $verified=['quote_number'=>'','company'=>'','net_total'=>null,'positions'=>[]];
-  for($pageToRead=1;$pageToRead<=$pagesToInspect;$pageToRead++){
-    if($progress)$progress(20+(int)floor(($pageToRead-1)/max(1,$pagesToInspect)*70),'Seite '.$pageToRead.' von '.$pagesToInspect.' wird positionsgenau geprüft …');
-    $pageDraft=array_values(array_filter($draftPositions,static fn($row):bool=>is_array($row)&&(int)($row['page_number']??0)===$pageToRead));
-    $pagePrompt='Quelldatei: '.$name."\nLies ausschließlich die visuell gerenderte PDF-Seite ".$pageToRead.". Ignoriere die PDF-Textebene vollständig. Gib nur Leistungspositionen zurück, deren Positionsnummer, Beschreibung, Menge, Einheit, Einzelpreis und Gesamtpreis auf genau dieser Seite sichtbar sind. net_total darf nur gesetzt werden, wenn die Netto-Angebotssumme auf genau dieser Seite sichtbar gedruckt ist; sonst null. Unzuverlässige Hinweise des Erstentwurfs für diese Seite:\n".json_encode($pageDraft,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
-    $pageResponse=bkOpenAIJson('POST','responses',[
-      'model'=>env('OPENAI_KVA_MODEL','gpt-5.4'),
-      'instructions'=>$verificationInstructions,
-      'input'=>[['role'=>'user','content'=>array_merge([['type'=>'input_text','text'=>$pagePrompt]],$isImage?[['type'=>'input_image','image_url'=>'data:'.$imageMime.';base64,'.base64_encode($bytes),'detail'=>'high']]:[['type'=>'input_file','file_id'=>$fileId]])]],
-      'text'=>['format'=>bkKvaSchema()],
-      'max_output_tokens'=>5000
-    ],420);
-    $pageRaw=bkJson(bkOutputText($pageResponse));
-    if(trim((string)($pageRaw['quote_number']??''))!=='')$verified['quote_number']=trim((string)$pageRaw['quote_number']);
-    if(trim((string)($pageRaw['company']??''))!=='')$verified['company']=trim((string)$pageRaw['company']);
-    if(is_numeric($pageRaw['net_total']??null))$verified['net_total']=(float)$pageRaw['net_total'];
-    foreach(($pageRaw['positions']??[])as$pageRow)if(is_array($pageRow)){$pageRow['page_number']=$pageToRead;$verified['positions'][]=$pageRow;}
-    if(is_numeric($pageRaw['net_total']??null)&&(float)$pageRaw['net_total']>0)break;
+  $raw=bkJson(bkOutputText($response));$positions=[];
+  foreach(($raw['positions']??[])as$row){
+    if(!is_array($row))continue;$description=trim((string)($row['description']??''));
+    if($description==='')continue;
+    $positions[]=['source_position'=>trim((string)($row['source_position']??'')),'description'=>$description,'quantity'=>is_numeric($row['quantity']??null)?(float)$row['quantity']:null,'unit'=>trim((string)($row['unit']??'')),'offered_unit_price'=>is_numeric($row['offered_unit_price']??null)?(float)$row['offered_unit_price']:null,'offered_total'=>is_numeric($row['offered_total']??null)?(float)$row['offered_total']:null];
   }
-  return bkFinalizeKva($name,$verified);
-}
-function bkAnalyzeKvaRenderedPages(string $name,array $pages,?callable $progress=null):array{
-  if(!$pages)throw new RuntimeException('Es wurden keine gerenderten KVA-Seiten übergeben.');
-  $verified=['quote_number'=>'','company'=>'','net_total'=>null,'positions'=>[]];$positionMap=[];
-  $instructions=<<<'PROMPT'
-Lies ausschließlich den beigefügten gerenderten Bildausschnitt einer oder zweier direkt aufeinanderfolgender Seiten eines deutschen Kostenvoranschlags. Es gibt keine PDF-Textebene. Extrahiere ausnahmslos jede im Ausschnitt vollständig erkennbare, bepreiste Leistungsposition exakt aus Pos., Bezeichnung, Menge, Einheit, EUR Preis und EUR G-Preis. Bei einem Seitenwechsel darf eine Position unten beginnen und oben auf der Folgeseite mit Menge und Preisen enden; führe genau diese sichtbaren Teile zu einer Position zusammen.
-
-Eine Aufmaßposition besteht häufig aus Positionsnummer und Beschreibung, danach einer Tabelle "Bezeichnung / Faktor / Länge / Breite / Höhe / Summe" und erst darunter der fett gedruckten Gesamtmenge, Einheit, dem Einheitspreis und Gesamtpreis. Diese Aufmaßzeilen sind keine eigenen Positionen. Verbinde die Positionsnummer und Beschreibung zwingend mit der zugehörigen fett gedruckten Preiszeile, auch wenn eine längere Aufmaßtabelle oder ein Seitenwechsel dazwischenliegt.
-
-Raumaufmaßzeilen, Titel, Titelsummen, Zwischensummen, Umsatzsteuer, Bedingungen und Widerrufstexte sind keine Leistungspositionen. source_position ist die sichtbar gedruckte Positionsnummer. description ist die vollständige sichtbare Leistungsbeschreibung. quantity und unit stammen nur aus den sichtbaren Spalten Menge und Einheit. offered_unit_price ist EUR Preis, offered_total ist EUR G-Preis. Verwechsle niemals Zahlen oder Wörter aus der Beschreibung mit Menge, Einheit oder Preis. evidence enthält als wortgetreuen Beleg die vollständige sichtbare Tabellenzeile mit allen sechs Werten.
-
-net_total darf nur die auf dieser Bildseite ausdrücklich gedruckte Netto-Angebotssumme sein. Ist keine Netto-Angebotssumme sichtbar, gib null zurück. Angebotsnummer und Anbieter nur angeben, wenn sie auf dieser Bildseite sichtbar sind. Nichts rechnen, ergänzen, erraten oder aus Trainingswissen ableiten.
-PROMPT;
-  foreach(array_values($pages)as$index=>$page){
-    if($progress)$progress(10+(int)floor($index/max(1,count($pages))*80),'Gerenderter KVA-Ausschnitt '.($index+1).' von '.count($pages).' wird positionsgenau ausgelesen …');
-    $pageNumber=max(1,(int)($page['page_number']??($index+1)));$part=trim((string)($page['part']??''));$mime=strtolower(trim((string)($page['mime']??'image/jpeg')));$bytes=(string)($page['bytes']??'');if($bytes==='')continue;
-    if(!in_array($mime,['image/jpeg','image/png','image/webp'],true))throw new RuntimeException('Eine gerenderte KVA-Seite hat ein ungültiges Bildformat.');
-    $response=bkOpenAIJson('POST','responses',[
-      'model'=>env('OPENAI_KVA_MODEL','gpt-5.4'),
-      'instructions'=>$instructions,
-      'input'=>[['role'=>'user','content'=>[
-        ['type'=>'input_text','text'=>'Gerenderte KVA-Seite '.$pageNumber.($part!==''?' (Ausschnitt '.$part.')':'').' aus '.$name.'. Lies jede vollständig sichtbare Tabellenposition exakt aus diesem Bild.'],
-        ['type'=>'input_image','image_url'=>'data:'.$mime.';base64,'.base64_encode($bytes),'detail'=>'high'],
-      ]]],
-      'text'=>['format'=>bkKvaSchema()],
-      'max_output_tokens'=>5000,
-    ],420);
-    $pageRaw=bkJson(bkOutputText($response));
-    if(trim((string)($pageRaw['quote_number']??''))!=='')$verified['quote_number']=trim((string)$pageRaw['quote_number']);
-    if(trim((string)($pageRaw['company']??''))!=='')$verified['company']=trim((string)$pageRaw['company']);
-    if(is_numeric($pageRaw['net_total']??null))$verified['net_total']=(float)$pageRaw['net_total'];
-    foreach(($pageRaw['positions']??[])as$row)if(is_array($row)){$row['page_number']=$pageNumber;$source=bkKvaNorm((string)($row['source_position']??''));$key=$pageNumber.'|'.($source!==''?$source:hash('sha256',bkKvaNorm((string)($row['description']??'')).'|'.(string)($row['offered_total']??'')));$score=mb_strlen(trim((string)($row['evidence']??'')),'UTF-8')+mb_strlen(trim((string)($row['description']??'')),'UTF-8');if(!isset($positionMap[$key])||$score>$positionMap[$key]['score'])$positionMap[$key]=['score'=>$score,'row'=>$row];}
-    if(is_numeric($pageRaw['net_total']??null)&&(float)$pageRaw['net_total']>0)break;
-  }
-  $verified['positions']=array_values(array_map(static fn(array$item):array=>$item['row'],$positionMap));
-  if($progress)$progress(92,'Ausgelesene Positionen werden gegen die Netto-Angebotssumme geprüft …');
-  return bkFinalizeKva($name,$verified);
-}
-function bkKvaJobSchema():void{db()->exec("CREATE TABLE IF NOT EXISTS bki_kva_jobs(
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  folder_id VARCHAR(190) NOT NULL,
-  status VARCHAR(30) NOT NULL DEFAULT 'queued',
-  progress INT NOT NULL DEFAULT 0,
-  message VARCHAR(500) NULL,
-  payload_json MEDIUMTEXT NOT NULL,
-  result_json LONGTEXT NULL,
-  error_text MEDIUMTEXT NULL,
-  created_by VARCHAR(190) NULL,
-  created_at DATETIME NOT NULL,
-  started_at DATETIME NULL,
-  finished_at DATETIME NULL,
-  INDEX idx_kva_job_folder(folder_id), INDEX idx_kva_job_status(status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");}
-function bkKvaJobUpdate(int $id,string $status,int $progress,string $message='',?array $result=null,?string $error=null):void{
-  $sql='UPDATE bki_kva_jobs SET status=:s,progress=:p,message=:m';$params=[':s'=>$status,':p'=>max(0,min(100,$progress)),':m'=>mb_substr($message,0,500,'UTF-8'),':id'=>$id];
-  if($status==='running')$sql.=',started_at=COALESCE(started_at,NOW())';
-  if(in_array($status,['done','failed'],true))$sql.=',finished_at=NOW()';
-  if($result!==null){$sql.=',result_json=:r';$params[':r']=json_encode($result,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);}
-  if($error!==null){$sql.=',error_text=:e';$params[':e']=$error;}
-  $sql.=' WHERE id=:id';
-  $statement=db()->prepare($sql);$statement->execute($params);
-}
-function bkKvaJobWorkspace(int $id):string{return rtrim(sys_get_temp_dir(),'/\\').DIRECTORY_SEPARATOR.'svnet-kva-job-'.$id;}
-function bkKvaJobCleanup(int $id):void{
-  $dir=bkKvaJobWorkspace($id);
-  if(!is_dir($dir))return;
-  foreach((array)glob($dir.DIRECTORY_SEPARATOR.'*')as$file)if(is_string($file)&&is_file($file))@unlink($file);
-  @rmdir($dir);
-}
-// Mehrseitige KVA erfordern viele sequenzielle KI-Aufrufe. Würde die HTTP-Antwort erst danach gesendet,
-// bricht jedes vorgeschaltete Gateway die Verbindung mit HTTP 504 ab. Der Auftrag wird deshalb – wie
-// bereits bei gf-ai-smart.php etabliert – sofort quittiert und im Hintergrund weiterverarbeitet.
-function bkRunKvaJob(int $jobId,array $payload):void{
-  try{
-    ignore_user_abort(true);@set_time_limit(0);
-    // Die PHP-Session ist exklusiv gesperrt, solange dieser Request läuft. Ohne das Schließen würden
-    // sämtliche Statusabfragen desselben Nutzers bis zum Ende der Auslesung blockieren – die Oberfläche
-    // bliebe ohne Fortschritt stehen. Gleiches Vorgehen wie in gfRunJob().
-    if(session_status()===PHP_SESSION_ACTIVE)session_write_close();
-    bkKvaJobUpdate($jobId,'running',3,'KVA-Auslesung wurde gestartet …');
-    $progress=static function(int $percent,string $message)use($jobId):void{bkKvaJobUpdate($jobId,'running',$percent,$message);};
-    $name=(string)($payload['source_name']??'KVA.pdf');
-    if(($payload['mode']??'')==='pages'){
-      $pages=[];
-      foreach((array)($payload['pages']??[])as$page){
-        $path=(string)($page['path']??'');if($path===''||!is_file($path))continue;
-        $pages[]=['mime'=>(string)($page['mime']??'image/jpeg'),'bytes'=>(string)file_get_contents($path),'page_number'=>(int)($page['page_number']??1),'part'=>(string)($page['part']??'')];
-      }
-      $result=bkAnalyzeKvaRenderedPages($name,$pages,$progress);
-    }elseif(($payload['mode']??'')==='upload'){
-      $path=(string)($payload['path']??'');
-      if($path===''||!is_file($path))throw new RuntimeException('Die hochgeladene KVA-Datei steht nicht mehr zur Verfügung. Bitte erneut auslesen.');
-      $result=bkAnalyzeKva($name,(string)($payload['mime']??'application/octet-stream'),(string)file_get_contents($path),$progress);
-    }else{
-      $selected=bkDriveBytes((string)($payload['file_id']??''));
-      $result=bkAnalyzeKva((string)$selected['name'],(string)$selected['mime'],(string)$selected['bytes'],$progress);
-    }
-    bkKvaJobUpdate($jobId,'done',100,'KVA wurde vollständig ausgelesen.',['ok'=>true,...$result]);
-  }catch(Throwable $e){
-    error_log('[bki-calculator kva-job '.$jobId.'] '.$e->getMessage());
-    bkKvaJobUpdate($jobId,'failed',100,'KVA-Auslesung fehlgeschlagen.',null,$e->getMessage());
-  }finally{
-    bkKvaJobCleanup($jobId);
-  }
+  if(!$positions)throw new RuntimeException('Im KVA wurden keine belastbaren Leistungspositionen erkannt.');
+  return['source_name'=>$name,'quote_number'=>trim((string)($raw['quote_number']??'')),'company'=>trim((string)($raw['company']??'')),'net_total'=>is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null,'positions'=>$positions];
 }
 function bkSearch(array $in):array{
   $q=trim((string)($in['query']??''));
@@ -540,60 +302,12 @@ bkSchema();
 $action=(string)($_GET['action']??'status');
 try{
   if($action==='status') apiJson(['ok'=>true,'source'=>'BKI Altbau 2026','positions_file_id'=>BKI_POSITIONS_ID,'buildings_file_id'=>BKI_BUILDINGS_ID]);
-  if($action==='kva_job_status'){
-    bkKvaJobSchema();
-    $jobId=(int)($_GET['job_id']??($_POST['job_id']??0));
-    if($jobId<=0)apiError(400,'job_id fehlt.');
-    $statement=db()->prepare('SELECT id,folder_id,status,progress,message,result_json,error_text,created_at,started_at,finished_at FROM bki_kva_jobs WHERE id=:id AND created_by=:u LIMIT 1');
-    $statement->execute([':id'=>$jobId,':u'=>(string)($user['email']??$user['full_name']??'')]);
-    $row=$statement->fetch(PDO::FETCH_ASSOC);
-    if(!$row)apiError(404,'KVA-Auftrag nicht gefunden.');
-    requireCaseFolderAccess((string)$row['folder_id'],$user);
-    $result=$row['result_json']!==null&&$row['result_json']!==''?json_decode((string)$row['result_json'],true):null;
-    unset($row['result_json']);
-    apiJson(['ok'=>true,'job'=>['id'=>(int)$row['id'],'status'=>(string)$row['status'],'progress'=>(int)$row['progress'],'message'=>(string)($row['message']??''),'error'=>(string)($row['error_text']??'')],'result'=>is_array($result)?$result:null]);
-  }
   if($action==='analyze_kva'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
-    // Mehrseitige KVA benötigen viele sequenzielle KI-Anfragen (Entwurf plus Kontrolle je Seite/Ausschnitt).
-    // Würde erst danach geantwortet, bricht jedes vorgeschaltete Gateway die Verbindung mit HTTP 504 ab.
-    // Der Auftrag wird deshalb sofort quittiert und im Hintergrund verarbeitet; der Client fragt den
-    // Fortschritt über kva_job_status ab.
-    @set_time_limit(0);
-    ignore_user_abort(true);
     $folder=trim((string)($_POST['folder_id']??''));if($folder==='')throw new RuntimeException('Bitte zuerst einen Schadenfall öffnen.');requireCaseFolderAccess($folder,$user);
-    bkKvaJobSchema();
-    $payload=null;$pendingPages=[];$pendingUpload=null;
-    if(isset($_FILES['pages'])&&is_array($_FILES['pages']['tmp_name']??null)){
-      $fileId=trim((string)($_POST['file_id']??''));if($fileId!==''&&!bkDriveBelongsToCase($fileId,$folder))throw new RuntimeException('Der ausgewählte KVA wurde im aktiven Fall nicht gefunden. Bitte die Fallauswahl prüfen.');
-      $name=basename(trim((string)($_POST['source_name']??'KVA.pdf')))?:'KVA.pdf';$totalSize=0;
-      foreach($_FILES['pages']['tmp_name']as$index=>$tmp){if(!is_uploaded_file((string)$tmp))continue;$size=(int)($_FILES['pages']['size'][$index]??0);$totalSize+=$size;if($totalSize>30*1024*1024)throw new RuntimeException('Die gerenderten KVA-Seiten dürfen zusammen höchstens 30 MB groß sein.');$mime=(string)(mime_content_type((string)$tmp)?:($_FILES['pages']['type'][$index]??'image/jpeg'));$pendingPages[]=['tmp'=>(string)$tmp,'mime'=>$mime,'page_number'=>(int)($_POST['page_numbers'][$index]??($index+1)),'part'=>trim((string)($_POST['page_parts'][$index]??''))];}
-      if(!$pendingPages)throw new RuntimeException('Es wurden keine gerenderten KVA-Seiten übergeben.');
-      $payload=['mode'=>'pages','source_name'=>$name];
-    }elseif(isset($_FILES['file'])&&is_uploaded_file((string)($_FILES['file']['tmp_name']??''))){
-      $file=$_FILES['file'];if((int)($file['size']??0)>30*1024*1024)throw new RuntimeException('Die Datei darf höchstens 30 MB groß sein.');
-      $pendingUpload=['tmp'=>(string)$file['tmp_name'],'mime'=>(string)(mime_content_type((string)$file['tmp_name'])?:($file['type']??'application/octet-stream'))];
-      $payload=['mode'=>'upload','source_name'=>basename((string)$file['name']),'mime'=>$pendingUpload['mime']];
-    }else{
-      $fileId=trim((string)($_POST['file_id']??''));if($fileId==='')throw new RuntimeException('Bitte einen KVA auswählen, eine Datei laden oder fotografieren.');
-      if(!bkDriveBelongsToCase($fileId,$folder))throw new RuntimeException('Der ausgewählte KVA wurde im aktiven Fall nicht gefunden. Bitte die Fallauswahl prüfen.');
-      $payload=['mode'=>'drive','file_id'=>$fileId,'source_name'=>basename(trim((string)($_POST['source_name']??'KVA.pdf')))?:'KVA.pdf'];
-    }
-    $insert=db()->prepare('INSERT INTO bki_kva_jobs(folder_id,status,progress,message,payload_json,created_by,created_at) VALUES(:f,\'queued\',0,:m,:p,:u,NOW())');
-    $insert->execute([':f'=>$folder,':m'=>'KVA-Auslesung wurde angenommen.',':p'=>json_encode(['mode'=>$payload['mode']],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':u'=>(string)($user['email']??$user['full_name']??'')]);
-    $jobId=(int)db()->lastInsertId();
-    $workspace=bkKvaJobWorkspace($jobId);
-    if(!is_dir($workspace)&&!@mkdir($workspace,0700,true)&&!is_dir($workspace))throw new RuntimeException('Die KVA-Auslesung konnte nicht vorbereitet werden.');
-    foreach($pendingPages as$index=>$page){$target=$workspace.DIRECTORY_SEPARATOR.'seite-'.$index.'.bin';if(!@move_uploaded_file($page['tmp'],$target))throw new RuntimeException('Eine gerenderte KVA-Seite konnte nicht zwischengespeichert werden.');$payload['pages'][]=['path'=>$target,'mime'=>$page['mime'],'page_number'=>$page['page_number'],'part'=>$page['part']];}
-    if($pendingUpload!==null){$target=$workspace.DIRECTORY_SEPARATOR.'kva.bin';if(!@move_uploaded_file($pendingUpload['tmp'],$target))throw new RuntimeException('Die KVA-Datei konnte nicht zwischengespeichert werden.');$payload['path']=$target;}
-    $store=db()->prepare('UPDATE bki_kva_jobs SET payload_json=:p WHERE id=:id');
-    $store->execute([':p'=>json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':id'=>$jobId]);
-    http_response_code(202);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['ok'=>true,'accepted'=>true,'job_id'=>$jobId,'status'=>'queued'],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
-    if(function_exists('fastcgi_finish_request'))fastcgi_finish_request();else{@ob_end_flush();@flush();}
-    bkRunKvaJob($jobId,$payload);
-    exit;
+    if(isset($_FILES['file'])&&is_uploaded_file((string)($_FILES['file']['tmp_name']??''))){$file=$_FILES['file'];if((int)($file['size']??0)>30*1024*1024)throw new RuntimeException('Die Datei darf höchstens 30 MB groß sein.');$name=basename((string)$file['name']);$mime=(string)(mime_content_type((string)$file['tmp_name'])?:($file['type']??'application/octet-stream'));$bytes=(string)file_get_contents((string)$file['tmp_name']);}
+    else{$fileId=trim((string)($_POST['file_id']??''));if($fileId==='')throw new RuntimeException('Bitte einen KVA auswählen, eine Datei laden oder fotografieren.');if(!bkDriveBelongsToCase($fileId,$folder))throw new RuntimeException('Der ausgewählte KVA wurde im aktiven Fall nicht gefunden. Bitte die Fallauswahl prüfen.');$selected=bkDriveBytes($fileId);$name=(string)$selected['name'];$mime=(string)$selected['mime'];$bytes=(string)$selected['bytes'];}
+    apiJson(['ok'=>true,...bkAnalyzeKva($name,$mime,$bytes)]);
   }
   if($action==='search'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');apiJson(['ok'=>true,...bkSearch(requestBody())]);}
   if($action==='save'){

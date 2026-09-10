@@ -18,15 +18,6 @@ assert(page.includes("file.files?.[0]||camera.files?.[0]"), 'Datei- und Kameraau
 assert(page.includes('Alle Positionen 1:1 in die Kalkulation übernehmen'), 'Alle erkannten KVA-Positionen müssen ohne BKI-Treffer 1:1 übernommen werden können.');
 assert(page.includes('offeredUnit||(offeredTotal/quantity)||0'), 'Der 1:1-Import muss den angebotenen Einheitspreis oder den aus der Positionssumme abgeleiteten Preis verwenden.');
 assert(page.includes("positions.forEach((row,index)=>"), 'Der 1:1-Import darf keine KVA-Position wegen eines fehlenden BKI-Treffers auslassen.');
-assert(api.includes("env('OPENAI_KVA_MODEL','gpt-5.4')") && api.includes("'text'=>['format'=>bkKvaSchema()]"), 'Die KVA-Auslesung muss das leistungsfähige Modell mit strengem JSON-Schema verwenden.');
-assert(api.includes('visuell gerenderte Dokument') && api.includes('evidence') && api.includes('bkKvaEvidenceCoversText($evidence,$description)') && api.includes('bkKvaEvidenceHasUnit($evidence,$unit)'), 'Jede KVA-Position muss visuell und durch einen toleranten, aber konkreten Quellbeleg abgesichert sein.');
-assert(api.includes('unabhängige Schlusskontrolle') && api.includes('bkKvaEvidenceHasNumber') && api.includes('$positionsTotal-$verifiedNet'), 'Mengen und Preise müssen in einem zweiten visuellen Durchgang sowie gegen die Nettosumme geprüft werden.');
-assert(api.includes("preg_match_all('/\\/Type\\s*\\/Page\\b/'") && api.includes('for($pageToRead=1;$pageToRead<=$pagesToInspect;$pageToRead++)') && api.includes('Lies ausschließlich die visuell gerenderte PDF-Seite') && api.includes('Ignoriere die PDF-Textebene vollständig'), 'Mehrseitige KVA müssen seitenweise aus den gerenderten Seiten statt aus der fehlerhaften PDF-Textebene gelesen werden.');
-assert(api.includes('bkAnalyzeKvaRenderedPages')&&api.includes("isset(\$_FILES['pages'])")&&api.includes("'type'=>'input_image'"),'Vom Browser gerenderte KVA-Seiten müssen als echte Bilder ausgewertet werden.');
-assert(api.includes("\$_POST['page_numbers']")&&api.includes('$positionMap')&&api.includes("Ausschnitt '.$part"),'Überlappende Seitenausschnitte müssen ihrer echten Seite zugeordnet und doppelte Positionen zusammengeführt werden.');
-assert(api.includes('Eine Aufmaßposition besteht häufig')&&api.includes('Bei einem Seitenwechsel darf eine Position'),'Mehrseitige Aufmaßpositionen müssen als eine belegte KVA-Zeile gelesen werden.');
-assert(api.includes("preg_match('/^Seite\\s+\\d+") && api.includes('keine Ersatz- oder Standardpositionen übernommen'), 'Erfundene Seiten-/Positionsnummern müssen verworfen werden statt Standardpositionen anzuzeigen.');
-assert(api.includes("preg_match('/\\bAN\\d{5,}\\b/i',$name") && api.includes('erkannte Angebotsnummer stimmt nicht'), 'Die erkannte Angebotsnummer muss gegen den ausgewählten Dateinamen geprüft werden.');
 assert(page.includes("line.position_code=String(++position)"), 'Kalkulationspositionen müssen automatisch fortlaufend neu nummeriert werden.');
 assert(page.includes("bridge.addSection=value=>") && page.includes("addSection?.(groupData())"), 'Vor importierten KVA-Positionen muss eine eigene Firmen- oder Tätigkeitsüberschrift mit den KVA-Stammdaten eingefügt werden.');
 assert(page.includes("if(!added)window.__bkiCalcBridge?.addSection?.(groupData())"), 'Auch die BKI-Nachkalkulation muss KVA-Firma, Nummer und Originalsumme in der Abschnittszeile erhalten.');
@@ -45,13 +36,6 @@ assert(page.includes("p.c==='Sanitär'?'LEITUNGSWASSER-/SANITÄRSCHADEN-SCHNELLK
 assert(page.includes('<option value="mid" selected>Mittelwert</option>'), 'Die Schnellkalkulation muss standardmäßig den BKI-Mittelpreis verwenden.');
 
 assert(api.includes('function bkDriveBelongsToCase('), 'Die Fallzuordnung muss über den vollständigen Drive-Unterordnerpfad geprüft werden.');
-assert(api.includes("action==='kva_job_status'") && api.includes('fastcgi_finish_request') && api.includes('bkRunKvaJob') && api.includes('CREATE TABLE IF NOT EXISTS bki_kva_jobs'), 'Die mehrseitige KVA-Auslesung muss als quittierter Hintergrundauftrag laufen, damit kein Gateway-Timeout (HTTP 504) entsteht.');
-assert(api.includes('http_response_code(202)') && api.includes("'job_id'=>\$jobId"), 'Der KVA-Auftrag muss sofort mit einer Auftragsnummer quittiert werden.');
-assert(api.includes('bkKvaJobCleanup($jobId)') && api.includes('move_uploaded_file'), 'Zwischengespeicherte KVA-Seiten müssen nach dem Auftrag wieder entfernt werden.');
-assert(api.includes("AND created_by=:u") , 'Der Auftragsstatus darf nur dem eigenen Ersteller ausgegeben werden.');
-assert(api.includes('if(session_status()===PHP_SESSION_ACTIVE)session_write_close();'), 'Der Hintergrundauftrag muss die Session freigeben, sonst blockieren die Statusabfragen desselben Nutzers bis zum Ende der Auslesung.');
-assert(page.includes('awaitKvaJob') && page.includes('action=kva_job_status'), 'Auch die BKI-Kalkulationsseite muss den KVA-Hintergrundauftrag abfragen.');
-assert(page.includes("if(!Array.isArray(analysed?.positions)||!analysed.positions.length)throw new Error("), 'Eine Antwort ohne belegte Positionen darf nicht als leeres Ergebnis angezeigt werden.');
 assert(api.includes("if(hash_equals($folderId,$parent))return true"), 'Ein KVA in einem Unterordner des aktiven Falls muss zugelassen werden.');
 assert(api.includes("if(!bkDriveBelongsToCase($fileId,$folder))"), 'Die rekursive Fallprüfung muss beim KVA-Import verwendet werden.');
 
