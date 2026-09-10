@@ -58,6 +58,9 @@ jobs:
           php -l sv-netzwerk/public/intern/api/bki-settlement-pdf.php
           node sv-netzwerk/tests/bki_kva_import_test.mjs
 
+      - name: KVA-Belegprüfung und Hintergrundauftrag prüfen
+        run: php sv-netzwerk/tests/kva_position_evidence_test.php
+
       - name: KVA-Saniererkontakte vollständig ergänzen
         run: php sv-netzwerk/tests/kva_contact_enrichment_test.php
 
