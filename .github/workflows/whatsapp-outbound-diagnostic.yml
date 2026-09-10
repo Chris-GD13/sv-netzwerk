@@ -29,7 +29,7 @@ jobs:
             --data-urlencode "input_token=$ACCESS_TOKEN" \
             --data-urlencode "access_token=$APP_ID|$APP_SECRET" \
             'https://graph.facebook.com/v25.0/debug_token' \
-            | jq '{is_valid:.data.is_valid,app_id:.data.app_id,type:.data.type,expires_at:.data.expires_at,data_access_expires_at:.data.data_access_expires_at,scopes:.data.scopes,granular_scopes:.data.granular_scopes,user_id:.data.user_id}'
+            | jq --arg expected_app "$APP_ID" '{is_valid:.data.is_valid,app_matches:(.data.app_id|tostring)==$expected_app,type:.data.type,expires_at:.data.expires_at,data_access_expires_at:.data.data_access_expires_at,scopes:.data.scopes,granular_scopes:.data.granular_scopes,user_id:.data.user_id}'
           echo 'PHONE'
           curl --fail --silent --show-error \
             --header "Authorization: Bearer $ACCESS_TOKEN" \
@@ -38,3 +38,13 @@ jobs:
           curl --fail --silent --show-error \
             --header "Authorization: Bearer $ACCESS_TOKEN" \
             'https://graph.facebook.com/v25.0/2484676038720950?fields=id,name,account_review_status,ownership_type' | jq .
+          echo 'WABA SUBSCRIBED APP'
+          curl --fail --silent --show-error \
+            --header "Authorization: Bearer $ACCESS_TOKEN" \
+            'https://graph.facebook.com/v25.0/2484676038720950/subscribed_apps' \
+            | jq --arg expected_app "$APP_ID" '{app_matches:any(.data[]?;(.id|tostring)==$expected_app),apps:[.data[]?|{id,name}]}'
+          echo 'WABA PHONE OWNERSHIP'
+          curl --fail --silent --show-error \
+            --header "Authorization: Bearer $ACCESS_TOKEN" \
+            'https://graph.facebook.com/v25.0/2484676038720950/phone_numbers?fields=id,display_phone_number,status,code_verification_status' \
+            | jq '{phone_matches:any(.data[]?;(.id|tostring)=="1282747221593843"),phones:[.data[]?|{id,display_phone_number,status,code_verification_status}]}'
