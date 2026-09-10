@@ -139,7 +139,10 @@ function waTargetProfile(array $user): string
 
 function waConfigured(array $connection): bool
 {
-    return $connection['phone_id'] !== '' && $connection['token'] !== '' && waEnv('WHATSAPP_APP_SECRET') !== '' && waEnv('WHATSAPP_VERIFY_TOKEN') !== '' && waEnv('WHATSAPP_APPOINTMENT_TEMPLATE') !== '';
+    // Core sending readiness must not depend on a message template.
+    // A customer reply opens the 24-hour service window and free text
+    // must work even while templates are still pending at Meta.
+    return $connection['phone_id'] !== '' && $connection['token'] !== '';
 }
 
 function waReadiness(array $connection): array
@@ -163,10 +166,11 @@ function waReadiness(array $connection): array
             }
         }
     }
-    $ready = $phoneStatus === 'CONNECTED' && $templateStatus === 'APPROVED';
-    $state = $ready ? 'versandbereit' : ($phoneStatus !== 'CONNECTED'
-        ? 'Meta-Telefonnummer noch ausstehend'
-        : ($templateStatus !== 'APPROVED' ? 'WhatsApp-Vorlage noch in Prüfung' : 'noch nicht versandbereit'));
+    // Free-text replies inside Meta's 24-hour service window only need a
+    // connected phone number. Template approval is checked separately when
+    // a template-based message (for example an appointment) is sent.
+    $ready = $phoneStatus === 'CONNECTED';
+    $state = $ready ? 'versandbereit' : 'Meta-Telefonnummer noch ausstehend';
     return ['ready'=>$ready,'phone_status'=>$phoneStatus,'template_status'=>$templateStatus,'state'=>$state];
 }
 
@@ -194,6 +198,9 @@ function waGraph(string $method, string $path, ?array $json = null, string $acce
     $data = json_decode($response['body'], true);
     if ($response['status'] < 200 || $response['status'] >= 300) {
         $message = (string)($data['error']['message'] ?? 'WhatsApp-Anfrage wurde nicht angenommen.');
+        $code = (string)($data['error']['code'] ?? '');
+        $subcode = (string)($data['error']['error_subcode'] ?? '');
+        if ($code !== '') $message .= ' (Meta-Code ' . $code . ($subcode !== '' ? '/' . $subcode : '') . ')';
         throw new RuntimeException($message);
     }
     return is_array($data) ? $data : [];
@@ -542,6 +549,7 @@ try {
         if (!waConfigured($connection)) apiError(409, 'WhatsApp ist für dieses Bearbeiterprofil noch nicht über Meta-Coexistence verbunden.');
         $readiness = waReadiness($connection);
         if (!$readiness['ready']) apiError(409, 'WhatsApp ist bei Meta noch nicht versandbereit: ' . $readiness['state'] . '.');
+        if (($readiness['template_status'] ?? '') !== 'APPROVED') apiError(409, 'Die Terminvorlage ist bei Meta noch nicht freigegeben.');
         $body = requestBody();
         $folderId = trim((string)($body['folder_id'] ?? ''));
         requireCaseFolderAccess($folderId, $user);
