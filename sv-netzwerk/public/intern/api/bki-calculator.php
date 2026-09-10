@@ -119,18 +119,23 @@ function bkKvaEvidenceCoversText(string $evidence,string $expected):bool{
   $tokens=array_values(array_unique(array_filter(explode(' ',$expectedNorm),static fn(string $token):bool=>mb_strlen($token,'UTF-8')>=4&&!in_array($token,$ignore,true))));
   if(!$tokens)return false;
   $found=0;foreach($tokens as$token)if(str_contains($evidenceNorm,$token))$found++;
-  return $found>=min(count($tokens),max(2,(int)ceil(count($tokens)*0.6)));
+  return $found>=min(count($tokens),max(2,(int)ceil(count($tokens)*0.45)));
 }
 function bkKvaEvidenceHasUnit(string $evidence,string $unit):bool{
   $evidenceNorm=' '.bkKvaNorm($evidence).' ';$unitNorm=bkKvaNorm($unit);
+  // Wichtig: m²/m³ enthalten die eigentlichen Unicode-Hochzahlzeichen (²/³), die bkKvaNorm unverändert
+  // als Ziffer belässt. Ohne die tatsächlichen Hochzahl-Aliase wurde jede KVA-Position mit der sehr
+  // gebräuchlichen Einheit m² fälschlich als "nicht belegt" verworfen, obwohl Menge und Preis exakt stimmten.
   $aliases=match($unitNorm){
-    'qm','m2','m 2','m²'=>[' qm ',' m2 ',' m 2 '],
+    'qm','m2','m 2','m²'=>[' qm ',' m2 ',' m 2 ',' m² '],
+    'cbm','m3','m 3','m³'=>[' cbm ',' m3 ',' m 3 ',' m³ '],
     'lfm','lfd m','laufende meter'=>[' lfm ',' lfd m ',' laufende meter '],
     'st','stk','stck','stück'=>[' st ',' stk ',' stck ',' stück '],
     'psch','pausch','pauschal'=>[' psch ',' pausch ',' pauschal '],
     'std','stunden','stunde'=>[' std ',' stunden ',' stunde '],
     default=>[' '.$unitNorm.' '],
   };
+  $aliases[]=' '.$unitNorm.' ';
   foreach($aliases as$alias)if(str_contains($evidenceNorm,$alias))return true;
   return false;
 }
@@ -168,8 +173,16 @@ function bkFinalizeKva(string $name,array $raw):array{
   foreach(($raw['positions']??[])as$row){
     if(!is_array($row)){continue;}$description=trim((string)($row['description']??''));$sourcePosition=trim((string)($row['source_position']??''));$evidence=trim((string)($row['evidence']??''));$page=(int)($row['page_number']??0);$quantity=is_numeric($row['quantity']??null)?(float)$row['quantity']:null;$unit=trim((string)($row['unit']??''));$unitPrice=is_numeric($row['offered_unit_price']??null)?(float)$row['offered_unit_price']:null;$lineTotal=is_numeric($row['offered_total']??null)?(float)$row['offered_total']:null;
     $descriptionNorm=bkKvaNorm($description);$evidenceNorm=bkKvaNorm($evidence);$sourceNorm=bkKvaNorm($sourcePosition);$unitNorm=bkKvaNorm($unit);
-    $grounded=$description!==''&&$sourcePosition!==''&&$page>0&&$evidence!==''&&!preg_match('/^Seite\s+\d+\s*[,;-]?\s*Position\s+\d+$/iu',$sourcePosition)&&mb_strlen($descriptionNorm,'UTF-8')>=5&&bkKvaEvidenceCoversText($evidence,$description)&&($sourceNorm===''||str_contains($evidenceNorm,$sourceNorm))&&$unitNorm!==''&&bkKvaEvidenceHasUnit($evidence,$unit)&&$quantity!==null&&$quantity>0&&(($unitPrice!==null&&$unitPrice>0)||($lineTotal!==null&&$lineTotal>0))&&bkKvaEvidenceHasNumber($evidence,$quantity)&&bkKvaEvidenceHasNumber($evidence,$unitPrice)&&bkKvaEvidenceHasNumber($evidence,$lineTotal);
-    if($grounded&&$unitPrice!==null&&$lineTotal!==null&&abs(($quantity*$unitPrice)-$lineTotal)>max(0.15,abs($lineTotal)*0.01))$grounded=false;
+    $sourceMatches=$sourceNorm===''||str_contains($evidenceNorm,$sourceNorm);
+    $numbersMatchEvidence=$quantity!==null&&$quantity>0&&(($unitPrice!==null&&$unitPrice>0)||($lineTotal!==null&&$lineTotal>0))&&bkKvaEvidenceHasNumber($evidence,$quantity)&&bkKvaEvidenceHasNumber($evidence,$unitPrice)&&bkKvaEvidenceHasNumber($evidence,$lineTotal);
+    $arithmeticMatches=!($unitPrice!==null&&$lineTotal!==null)||abs(($quantity*$unitPrice)-$lineTotal)<=max(0.15,abs($lineTotal)*0.01);
+    // Ein kurzer, rein tabellarischer Beleg (Positionsnummer + Menge/Einheit/Preise) reicht ebenfalls als Nachweis, wenn
+    // Positionsnummer, Menge, Einheitspreis und Gesamtpreis exakt zueinander passen; eine lange, mehrzeilige Original-
+    // beschreibung muss dafür nicht wortgetreu im kurzen Beleg wiederholt sein. Ohne diesen Ausweg wurden korrekt
+    // ausgelesene, aber knapp belegte Positionen fälschlich verworfen, wodurch die Summenprüfung fehlschlug.
+    $stronglyIdentifiedByNumbers=$sourceNorm!==''&&$sourceMatches&&$numbersMatchEvidence&&$arithmeticMatches;
+    $descriptionGrounded=bkKvaEvidenceCoversText($evidence,$description)||$stronglyIdentifiedByNumbers;
+    $grounded=$description!==''&&$sourcePosition!==''&&$page>0&&$evidence!==''&&!preg_match('/^Seite\s+\d+\s*[,;-]?\s*Position\s+\d+$/iu',$sourcePosition)&&mb_strlen($descriptionNorm,'UTF-8')>=5&&$descriptionGrounded&&$sourceMatches&&$unitNorm!==''&&bkKvaEvidenceHasUnit($evidence,$unit)&&$numbersMatchEvidence&&$arithmeticMatches;
     if(!$grounded)continue;
     $positions[]=['source_position'=>$sourcePosition,'page_number'=>$page,'description'=>$description,'quantity'=>$quantity,'unit'=>$unit,'offered_unit_price'=>$unitPrice,'offered_total'=>$lineTotal];
   }
@@ -458,6 +471,11 @@ try{
   if($action==='status') apiJson(['ok'=>true,'source'=>'BKI Altbau 2026','positions_file_id'=>BKI_POSITIONS_ID,'buildings_file_id'=>BKI_BUILDINGS_ID]);
   if($action==='analyze_kva'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
+    // Mehrseitige KVA benötigen mehrere sequenzielle KI-Anfragen (Entwurf + Seite-für-Seite-Kontrolle).
+    // Das bisherige PHP-Zeitlimit von 300 s reichte dafür bei umfangreicheren Belegen nicht aus und führte
+    // zu einem Abbruch mit HTTP 504, obwohl die Auslesung selbst korrekt weitergelaufen wäre.
+    @set_time_limit(0);
+    ignore_user_abort(true);
     $folder=trim((string)($_POST['folder_id']??''));if($folder==='')throw new RuntimeException('Bitte zuerst einen Schadenfall öffnen.');requireCaseFolderAccess($folder,$user);
     if(isset($_FILES['pages'])&&is_array($_FILES['pages']['tmp_name']??null)){
       $fileId=trim((string)($_POST['file_id']??''));if($fileId!==''&&!bkDriveBelongsToCase($fileId,$folder))throw new RuntimeException('Der ausgewählte KVA wurde im aktiven Fall nicht gefunden. Bitte die Fallauswahl prüfen.');
