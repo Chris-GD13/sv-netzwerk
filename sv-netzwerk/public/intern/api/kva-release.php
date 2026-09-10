@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/config.php';commonHeaders();$user=requireAuth();
 require_once __DIR__.'/kva-contact-merge.php';
+require_once __DIR__.'/kva-upload-name.php';
 if(!in_array((string)($user['role']??''),['administrator','projektleiter','pruefer','sachverstaendiger'],true))apiError(403,'Keine Berechtigung.');
 const KR_ARCHIVE='archiv@sv.de';
 function krSenderProfile(array$user):array{$email=mb_strtolower(trim((string)($user['email']??'')),'UTF-8');$name=mb_strtolower(trim((string)($user['full_name']??'')),'UTF-8');if($email==='ms@sv-schuett.eu'||str_contains($name,'marc'))return['email'=>'ms@sv-schuett.eu','name'=>'Marc Schütt'];if($email==='hr@sv-schuett.eu'||str_contains($name,'holger'))return['email'=>'hr@sv-schuett.eu','name'=>'Holger Roth'];if($email==='ws@sv-schuett.eu'||str_contains($name,'susanne'))return['email'=>'ws@sv-schuett.eu','name'=>'Susanne Wächter'];return['email'=>'cw@sv-schuett.eu','name'=>'Christian Wächter'];}
@@ -25,7 +26,8 @@ function krAnalyzeContacts(string $name, string $mime, string $bytes): array
     $tmp = tempnam(sys_get_temp_dir(), 'kva-contact-');
     file_put_contents($tmp, $bytes);
     try {
-        $upload = krHttp('POST', 'https://api.openai.com/v1/files', ['Authorization: Bearer '.$key], ['purpose'=>'user_data', 'file'=>new CURLFile($tmp, $mime, $name)]);
+        $uploadName = kvaOpenAiUploadName($name, $mime);
+        $upload = krHttp('POST', 'https://api.openai.com/v1/files', ['Authorization: Bearer '.$key], ['purpose'=>'user_data', 'file'=>new CURLFile($tmp, $mime, $uploadName)]);
         $uploaded = json_decode($upload['body'], true);
         $fileId = (string)($uploaded['id'] ?? '');
         if ($upload['status'] < 200 || $upload['status'] >= 300 || $fileId === '') throw new RuntimeException('KVA-Kontaktdaten konnten nicht vorbereitet werden.');

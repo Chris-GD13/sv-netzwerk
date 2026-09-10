@@ -85,7 +85,8 @@ function krAnalyzeCalculation(string $name, string $mime, string $bytes): array
     $tmp = tempnam(sys_get_temp_dir(), 'kva-calc-');
     file_put_contents($tmp, $bytes);
     try {
-        $upload = krHttp('POST', 'https://api.openai.com/v1/files', ['Authorization: Bearer '.$key], ['purpose'=>'user_data', 'file'=>new CURLFile($tmp, $mime, $name)]);
+        $uploadName = kvaOpenAiUploadName($name, $mime);
+        $upload = krHttp('POST', 'https://api.openai.com/v1/files', ['Authorization: Bearer '.$key], ['purpose'=>'user_data', 'file'=>new CURLFile($tmp, $mime, $uploadName)]);
         $uploaded = json_decode($upload['body'], true);
         $fileId = (string)($uploaded['id'] ?? '');
         if ($upload['status'] < 200 || $upload['status'] >= 300 || $fileId === '') throw new RuntimeException('KVA konnte nicht für die Nachkalkulation vorbereitet werden.');
@@ -278,8 +279,9 @@ function krV2Handle(array $user): void
             } else {
                 ['name'=>$name,'mime'=>$mime,'bytes'=>$bytes] = krSelected($folder, trim((string)($_POST['file_id'] ?? '')));
             }
-            $result = krAnalyze($name, $mime, $bytes);
-            $contactAnalysis = krAnalyzeContacts($name, $mime, $bytes);
+            $uploadName = kvaOpenAiUploadName($name, $mime);
+            $result = krAnalyze($uploadName, $mime, $bytes);
+            $contactAnalysis = krAnalyzeContacts($uploadName, $mime, $bytes);
             $detectedContacts = kvaDetectedCaseContacts($contactAnalysis);
             $caseContacts = krCaseContacts($folder);
             $net = krMoney($result['net_total'] ?? null);
