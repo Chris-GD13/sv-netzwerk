@@ -1,0 +1,66 @@
+name: WhatsApp-Telefonnummer registrieren
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GRAPH_VERSION: v25.0
+      PHONE_NUMBER_ID: "1282747221593843"
+      WABA_ID: "2484676038720950"
+      ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
+      REGISTRATION_PIN: ${{ secrets.WHATSAPP_REGISTRATION_PIN }}
+    steps:
+      - name: Konfiguration pruefen
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$ACCESS_TOKEN"
+          [[ "$REGISTRATION_PIN" =~ ^[0-9]{6}$ ]]
+
+      - name: Telefonnummer bei der WhatsApp Cloud API registrieren
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload="$(jq -n --arg pin "$REGISTRATION_PIN" '{messaging_product:"whatsapp", pin:$pin}')"
+          response="$(curl --silent --show-error --fail-with-body \
+            --request POST \
+            --header "Authorization: Bearer $ACCESS_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data "$payload" \
+            "https://graph.facebook.com/$GRAPH_VERSION/$PHONE_NUMBER_ID/register")"
+          jq -e '.success == true' <<<"$response" >/dev/null
+
+      - name: Webhook-Abonnement sicherstellen
+        shell: bash
+        run: |
+          set -euo pipefail
+          response="$(curl --silent --show-error --fail-with-body \
+            --request POST \
+            --header "Authorization: Bearer $ACCESS_TOKEN" \
+            "https://graph.facebook.com/$GRAPH_VERSION/$WABA_ID/subscribed_apps")"
+          jq -e '.success == true' <<<"$response" >/dev/null
+
+      - name: Verbindungsstatus pruefen
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 12); do
+            response="$(curl --silent --show-error --fail-with-body \
+              --header "Authorization: Bearer $ACCESS_TOKEN" \
+              "https://graph.facebook.com/$GRAPH_VERSION/$PHONE_NUMBER_ID?fields=status,display_phone_number,verified_name,platform_type")"
+            status="$(jq -r '.status // empty' <<<"$response")"
+            if [ "$status" = "CONNECTED" ]; then
+              jq '{status, display_phone_number, verified_name, platform_type}' <<<"$response"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::Meta meldet die Telefonnummer nach der Registrierung weiterhin nicht als CONNECTED."
+          exit 1
