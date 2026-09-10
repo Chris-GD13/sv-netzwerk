@@ -28,5 +28,9 @@ $assert(
     str_contains($core, "if(str_contains(gfNorm(\$heading),'reserve'))\$body=trim((string)(\$meta['reserve']??\$body));"),
     'The DOCX reserve must stay bound to the manually confirmed case reserve.'
 );
+$assert(
+    str_contains($core, "if(count(\$sections)===count(\$expected)){foreach(\$expected as\$i=>\$heading){\$sections[\$i]['heading']=\$heading;}"),
+    'A complete AI result must be normalized to the exact approved template headings before Engel validation.'
+);
 
 echo "gf_interim_report_continuity_test: ok\n";
