@@ -40,6 +40,10 @@ jobs:
             'https://graph.facebook.com/v25.0/2484676038720950?fields=id,name,account_review_status,ownership_type' | jq .
           echo 'WABA SUBSCRIBED APP'
           curl --fail --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer $ACCESS_TOKEN" \
+            'https://graph.facebook.com/v25.0/2484676038720950/subscribed_apps' | jq .
+          curl --fail --silent --show-error \
             --header "Authorization: Bearer $ACCESS_TOKEN" \
             'https://graph.facebook.com/v25.0/2484676038720950/subscribed_apps' \
             | jq --arg expected_app "$APP_ID" '{app_matches:any(.data[]?;(.id|tostring)==$expected_app),apps:[.data[]?|{id,name}]}'
