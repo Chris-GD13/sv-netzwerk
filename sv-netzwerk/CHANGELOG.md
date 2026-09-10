@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.52 – 2026-09-10
+
+- Meta-Unternehmenskonto `SV-Netzwerk` für Christian Wächter als verifiziert und genehmigt hinterlegt.
+- Bestehende WhatsApp-Business-Coexistence-Verbindung von Christian Wächter als verbunden hinterlegt; Portalstatus unterscheidet sie weiterhin von der technischen Versandbereitschaft.
+
 ## 3.4.51 – 2026-09-07
 
 - PLAUD-Ortstermin und Polycam-Aufmaß im Versicherungsfall in einer gemeinsamen, mittig geteilten Zeile angeordnet; auf kleinen Bildschirmen bleiben beide Bereiche untereinander bedienbar.
