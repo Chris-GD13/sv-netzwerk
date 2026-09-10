@@ -3,5 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": { "@/*": ["src/*"] }
-  }
+  },
+  "exclude": [
+    "public/intern/case-mail-history.js",
+    "scripts/case-mail-history.client.js"
+  ]
 }
