@@ -7,23 +7,34 @@ on:
       - .github/workflows/whatsapp-outbound-diagnostic.yml
 
 jobs:
-  send-test:
+  inspect-token-and-account:
     runs-on: ubuntu-latest
     steps:
-      - name: Send authorized test and expose Meta result
+      - name: Inspect token permissions and WhatsApp assets
         env:
           ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
+          APP_ID: ${{ secrets.WHATSAPP_META_APP_ID }}
+          APP_SECRET: ${{ secrets.WHATSAPP_APP_SECRET }}
         run: |
           test -n "$ACCESS_TOKEN"
-          payload='{"messaging_product":"whatsapp","to":"491604092134","type":"text","text":{"preview_url":false,"body":"SV-Netzwerk WhatsApp-Test: Die Anbindung ist erfolgreich eingerichtet. Keine Antwort erforderlich."}}'
-          result="$(curl --silent --show-error --write-out '\n%{http_code}' \
-            --request POST \
+          test -n "$APP_ID"
+          test -n "$APP_SECRET"
+          echo 'TOKEN PERMISSIONS'
+          curl --fail --silent --show-error \
             --header "Authorization: Bearer $ACCESS_TOKEN" \
-            --header 'Content-Type: application/json' \
-            --data "$payload" \
-            'https://graph.facebook.com/v25.0/1282747221593843/messages')"
-          status="${result##*$'\n'}"
-          body="${result%$'\n'*}"
-          printf '%s\n' "$body"
-          test "$status" -ge 200
-          test "$status" -lt 300
+            'https://graph.facebook.com/v25.0/me/permissions' | jq .
+          echo 'TOKEN DEBUG'
+          curl --fail --silent --show-error \
+            --get \
+            --data-urlencode "input_token=$ACCESS_TOKEN" \
+            --data-urlencode "access_token=$APP_ID|$APP_SECRET" \
+            'https://graph.facebook.com/v25.0/debug_token' \
+            | jq '{is_valid:.data.is_valid,app_id:.data.app_id,type:.data.type,expires_at:.data.expires_at,data_access_expires_at:.data.data_access_expires_at,scopes:.data.scopes,granular_scopes:.data.granular_scopes,user_id:.data.user_id}'
+          echo 'PHONE'
+          curl --fail --silent --show-error \
+            --header "Authorization: Bearer $ACCESS_TOKEN" \
+            'https://graph.facebook.com/v25.0/1282747221593843?fields=id,display_phone_number,verified_name,status,quality_rating,code_verification_status,platform_type,is_official_business_account' | jq .
+          echo 'WABA'
+          curl --fail --silent --show-error \
+            --header "Authorization: Bearer $ACCESS_TOKEN" \
+            'https://graph.facebook.com/v25.0/2484676038720950?fields=id,name,account_review_status,ownership_type' | jq .
