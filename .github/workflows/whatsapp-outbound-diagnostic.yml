@@ -52,3 +52,5 @@ jobs:
             --header "Authorization: Bearer $ACCESS_TOKEN" \
             'https://graph.facebook.com/v25.0/2484676038720950/phone_numbers?fields=id,display_phone_number,status,code_verification_status' \
             | jq '{phone_matches:any(.data[]?;(.id|tostring)=="1282747221593843"),phones:[.data[]?|{id,display_phone_number,status,code_verification_status}]}'
+
+# manual diagnostic trigger 2026-09-10
