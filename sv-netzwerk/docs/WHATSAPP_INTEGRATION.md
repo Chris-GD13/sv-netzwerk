@@ -12,6 +12,10 @@ Die WhatsApp-Anbindung ist ausschließlich für folgende Sachverständigenprofil
 
 Susanne Wächter und Jens Maurer erhalten kein WhatsApp-Profil.
 
+## Meta-Unternehmenskonto
+
+Das Meta-Unternehmenskonto `SV-Netzwerk` ist seit dem 10.09.2026 verifiziert und genehmigt. Die bestehende WhatsApp-Business-App von Christian Wächter ist über Meta Coexistence verbunden. Das Portal weist beide Zustände getrennt von der technischen Versandbereitschaft aus.
+
 ## Sichere Inbetriebnahme
 
 Die drei vorhandenen WhatsApp-Business-App-Konten dürfen nicht abgemeldet oder über eine normale Nummernmigration ausgetauscht werden. Die Anbindung erfolgt über das von Meta bereitgestellte Coexistence-/Embedded-Signup-Verfahren. Bis zum Abschluss dieses Vorgangs zeigt das Portal für das jeweilige Profil den Status `Meta-Coexistence noch nicht verbunden` und verhindert den Versand.
