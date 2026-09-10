@@ -197,15 +197,30 @@ Lies die Angebotstabelle Zeile für Zeile. Die Spalten lauten regelmäßig Pos.,
 
 evidence muss für jede Position ein kurzer wortgetreuer Beleg der sichtbaren Seite sein, der Positionsnummer, Beschreibung, Menge, Einheit, Einheitspreis und Gesamtpreis enthält. Wenn ein Wert nicht sicher sichtbar ist, lasse die gesamte Position weg. Nutze keine anderen Angebote, keine Preislisten und kein Trainingswissen.
 PROMPT;
-  $draft=json_encode($raw,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
-  $verifiedResponse=bkOpenAIJson('POST','responses',[
-    'model'=>env('OPENAI_KVA_MODEL','gpt-5.4'),
-    'instructions'=>$verificationInstructions,
-    'input'=>[['role'=>'user','content'=>array_merge([['type'=>'input_text','text'=>'Quelldatei: '.$name."\nUnzuverlässiger Erstentwurf, vollständig gegen das sichtbare Original korrigieren:\n".$draft]],$isImage?[['type'=>'input_image','image_url'=>'data:'.$imageMime.';base64,'.base64_encode($bytes),'detail'=>'high']]:[['type'=>'input_file','file_id'=>$fileId]])]],
-    'text'=>['format'=>bkKvaSchema()],
-    'max_output_tokens'=>10000
-  ],420);
-  $raw=bkJson(bkOutputText($verifiedResponse));$positions=[];$verifiedNet=is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null;
+  $draftRaw=$raw;$draftPositions=is_array($draftRaw['positions']??null)?$draftRaw['positions']:[];
+  $lastOfferPage=$isImage?1:0;
+  foreach($draftPositions as$draftRow)if(is_array($draftRow))$lastOfferPage=max($lastOfferPage,(int)($draftRow['page_number']??0));
+  $documentPages=0;if(!$isImage)$documentPages=preg_match_all('/\/Type\s*\/Page\b/',$bytes,$pageMarkers)?:0;
+  $pagesToInspect=max(1,min(20,max($lastOfferPage,$documentPages)));
+  $verified=['quote_number'=>'','company'=>'','net_total'=>null,'positions'=>[]];
+  for($pageToRead=1;$pageToRead<=$pagesToInspect;$pageToRead++){
+    $pageDraft=array_values(array_filter($draftPositions,static fn($row):bool=>is_array($row)&&(int)($row['page_number']??0)===$pageToRead));
+    $pagePrompt='Quelldatei: '.$name."\nLies ausschließlich die visuell gerenderte PDF-Seite ".$pageToRead.". Ignoriere die PDF-Textebene vollständig. Gib nur Leistungspositionen zurück, deren Positionsnummer, Beschreibung, Menge, Einheit, Einzelpreis und Gesamtpreis auf genau dieser Seite sichtbar sind. net_total darf nur gesetzt werden, wenn die Netto-Angebotssumme auf genau dieser Seite sichtbar gedruckt ist; sonst null. Unzuverlässige Hinweise des Erstentwurfs für diese Seite:\n".json_encode($pageDraft,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+    $pageResponse=bkOpenAIJson('POST','responses',[
+      'model'=>env('OPENAI_KVA_MODEL','gpt-5.4'),
+      'instructions'=>$verificationInstructions,
+      'input'=>[['role'=>'user','content'=>array_merge([['type'=>'input_text','text'=>$pagePrompt]],$isImage?[['type'=>'input_image','image_url'=>'data:'.$imageMime.';base64,'.base64_encode($bytes),'detail'=>'high']]:[['type'=>'input_file','file_id'=>$fileId]])]],
+      'text'=>['format'=>bkKvaSchema()],
+      'max_output_tokens'=>5000
+    ],420);
+    $pageRaw=bkJson(bkOutputText($pageResponse));
+    if(trim((string)($pageRaw['quote_number']??''))!=='')$verified['quote_number']=trim((string)$pageRaw['quote_number']);
+    if(trim((string)($pageRaw['company']??''))!=='')$verified['company']=trim((string)$pageRaw['company']);
+    if(is_numeric($pageRaw['net_total']??null))$verified['net_total']=(float)$pageRaw['net_total'];
+    foreach(($pageRaw['positions']??[])as$pageRow)if(is_array($pageRow)){$pageRow['page_number']=$pageToRead;$verified['positions'][]=$pageRow;}
+    if(is_numeric($pageRaw['net_total']??null)&&(float)$pageRaw['net_total']>0)break;
+  }
+  $raw=$verified;$positions=[];$verifiedNet=is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null;
   if(preg_match('/\bAN\d{5,}\b/i',$name,$expectedMatch)){
     $expected=strtoupper($expectedMatch[0]);$actual=strtoupper(trim((string)($raw['quote_number']??'')));
     if($actual===''||!hash_equals($expected,$actual))throw new RuntimeException('Die erkannte Angebotsnummer stimmt nicht mit der ausgewählten Quelldatei überein. Die Auswertung wurde aus Sicherheitsgründen verworfen.');
