@@ -1,5 +1,9 @@
-import MsgReader from '@kenjiuno/msgreader';
+import * as MsgReaderPackage from '@kenjiuno/msgreader';
 import PostalMime from 'postal-mime';
+
+const MsgReader = typeof MsgReaderPackage.default === 'function'
+  ? MsgReaderPackage.default
+  : MsgReaderPackage.default?.default;
 
 (() => {
   const API = '/intern/api/google-drive-sync.php';
@@ -159,7 +163,13 @@ import PostalMime from 'postal-mime';
       const buffer = await response.arrayBuffer();
       const mail = /\.eml$/i.test(item.name || '')
         ? normalizeEml(await new PostalMime().parse(buffer))
-        : (() => { const reader = new MsgReader(buffer); return normalizeMsg(reader, reader.getFileData()); })();
+        : (() => {
+          if (typeof MsgReader !== 'function') throw Error('MSG-Parser konnte nicht initialisiert werden.');
+          const reader = new MsgReader(buffer);
+          const info = reader.getFileData();
+          if (info.error) throw Error(info.error);
+          return normalizeMsg(reader, info);
+        })();
       showMail(mail, downloadUrl);
     } catch (error) {
       viewer.querySelector('.vf-mail-viewer-body').textContent = `Die Mail konnte nicht angezeigt werden: ${error.message}`;

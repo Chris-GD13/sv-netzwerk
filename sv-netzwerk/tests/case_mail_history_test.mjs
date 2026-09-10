@@ -13,6 +13,7 @@ assert(page.includes('.vf-command-grid,.vf-analysis-grid,.vf-mail-row{grid-templ
 assert(client.includes('/intern/api/case-file-browser.php') && client.includes('action=upload_case_document'), 'Fallablage und Mailverlauf sind nicht verbunden.');
 assert(source.includes('/\\.(?:msg|eml)$/i') && source.includes('07[_\\s-]*korrespondenz'), 'Mailformate oder Korrespondenzordner werden nicht erkannt.');
 assert(source.includes("from '@kenjiuno/msgreader'") && source.includes("from 'postal-mime'"), 'Die lokalen Parser fuer MSG und EML fehlen.');
+assert(source.includes("MsgReaderPackage.default?.default"), 'Der CommonJS-Export des MSG-Parsers wird nicht browserfest aufgeloest.');
 assert(source.includes('data-mail-open') && source.includes('event.preventDefault()'), 'Oeffnen muss den Browser-Download abfangen.');
 assert(source.includes('svnet-mail-viewer-v1') && source.includes('Original speichern'), 'Die interne Mailansicht fehlt.');
 assert(client.includes('svnet-mail-viewer-v1'), 'Die gebaute Mailansicht fehlt im ausgelieferten Skript.');
