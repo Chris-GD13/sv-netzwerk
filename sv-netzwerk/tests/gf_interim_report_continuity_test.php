@@ -32,5 +32,15 @@ $assert(
     str_contains($core, "if(count(\$sections)===count(\$expected)){foreach(\$expected as\$i=>\$heading){\$sections[\$i]['heading']=\$heading;}"),
     'A complete AI result must be normalized to the exact approved template headings before Engel validation.'
 );
+$assert(
+    str_contains($core, 'function gfDocxFillTableRow(')
+    && str_contains($core, "'Letzte Besprechung am'=>(string)(\$form['letzte_besprechung_am']??'')")
+    && str_contains($core, "'Mietausfall'=>'mietausfall'"),
+    'Interim-report meeting date and payment table must be transferred to the Word template.'
+);
+$assert(
+    str_contains($core, 'keine Zahlungsempfehlung als bereits gezahlt ausgeben'),
+    'Recommended payments must not be written into the already-paid column.'
+);
 
 echo "gf_interim_report_continuity_test: ok\n";
