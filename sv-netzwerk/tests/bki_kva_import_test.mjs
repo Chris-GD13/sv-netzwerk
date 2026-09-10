@@ -49,7 +49,9 @@ assert(api.includes("action==='kva_job_status'") && api.includes('fastcgi_finish
 assert(api.includes('http_response_code(202)') && api.includes("'job_id'=>\$jobId"), 'Der KVA-Auftrag muss sofort mit einer Auftragsnummer quittiert werden.');
 assert(api.includes('bkKvaJobCleanup($jobId)') && api.includes('move_uploaded_file'), 'Zwischengespeicherte KVA-Seiten müssen nach dem Auftrag wieder entfernt werden.');
 assert(api.includes("AND created_by=:u") , 'Der Auftragsstatus darf nur dem eigenen Ersteller ausgegeben werden.');
+assert(api.includes('if(session_status()===PHP_SESSION_ACTIVE)session_write_close();'), 'Der Hintergrundauftrag muss die Session freigeben, sonst blockieren die Statusabfragen desselben Nutzers bis zum Ende der Auslesung.');
 assert(page.includes('awaitKvaJob') && page.includes('action=kva_job_status'), 'Auch die BKI-Kalkulationsseite muss den KVA-Hintergrundauftrag abfragen.');
+assert(page.includes("if(!Array.isArray(analysed?.positions)||!analysed.positions.length)throw new Error("), 'Eine Antwort ohne belegte Positionen darf nicht als leeres Ergebnis angezeigt werden.');
 assert(api.includes("if(hash_equals($folderId,$parent))return true"), 'Ein KVA in einem Unterordner des aktiven Falls muss zugelassen werden.');
 assert(api.includes("if(!bkDriveBelongsToCase($fileId,$folder))"), 'Die rekursive Fallprüfung muss beim KVA-Import verwendet werden.');
 

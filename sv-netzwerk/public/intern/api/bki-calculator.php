@@ -330,6 +330,10 @@ function bkKvaJobCleanup(int $id):void{
 function bkRunKvaJob(int $jobId,array $payload):void{
   try{
     ignore_user_abort(true);@set_time_limit(0);
+    // Die PHP-Session ist exklusiv gesperrt, solange dieser Request läuft. Ohne das Schließen würden
+    // sämtliche Statusabfragen desselben Nutzers bis zum Ende der Auslesung blockieren – die Oberfläche
+    // bliebe ohne Fortschritt stehen. Gleiches Vorgehen wie in gfRunJob().
+    if(session_status()===PHP_SESSION_ACTIVE)session_write_close();
     bkKvaJobUpdate($jobId,'running',3,'KVA-Auslesung wurde gestartet …');
     $progress=static function(int $percent,string $message)use($jobId):void{bkKvaJobUpdate($jobId,'running',$percent,$message);};
     $name=(string)($payload['source_name']??'KVA.pdf');
