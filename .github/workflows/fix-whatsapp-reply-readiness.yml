@@ -67,7 +67,6 @@ jobs:
                   $body = requestBody();
                   $folderId = trim((string)($body['folder_id'] ?? ''));
           """
-          # Replace the occurrence belonging to send_appointment, not send_message.
           marker = "if ($action === 'send_appointment')"
           pos = s.find(marker)
           if pos < 0:
@@ -78,7 +77,6 @@ jobs:
           tail = tail.replace(old, new, 1)
           s = head + tail
 
-          # Make generic Meta errors diagnosable without exposing tokens.
           old = """        $message = (string)($data['error']['message'] ?? 'WhatsApp-Anfrage wurde nicht angenommen.');
                   throw new RuntimeException($message);
           """
@@ -102,3 +100,5 @@ jobs:
           git add sv-netzwerk/public/intern/api/whatsapp-case.php
           git commit -m "Allow WhatsApp free-text replies in 24h window"
           git push origin HEAD:main
+
+# trigger 2026-09-10T23:04+02:00
