@@ -40,11 +40,13 @@ function init(){
   }
   async function renderPdf(file){
     const modulePath='/vendor/pdfjs/pdf.mjs',pdfjs=await import(modulePath);pdfjs.GlobalWorkerOptions.workerSrc='/vendor/pdfjs/pdf.worker.mjs';
-    const pdf=await pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()),useSystemFonts:true}).promise,pages=[];
+    const pdf=await pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()),useSystemFonts:true}).promise,pages=[];let previousBottom=null;
     for(let number=1;number<=pdf.numPages;number++){
       setState(`KVA-Seite ${number} von ${pdf.numPages} wird als Bild vorbereitet …`);const page=await pdf.getPage(number),base=page.getViewport({scale:1}),scale=Math.min(3.2,2200/base.width),viewport=page.getViewport({scale}),canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);await page.render({canvasContext:canvas.getContext('2d',{alpha:false}),viewport,background:'rgb(255,255,255)'}).promise;
+      const edgeHeight=Math.ceil(canvas.height*.42);if(previousBottom){const seam=document.createElement('canvas');seam.width=canvas.width;seam.height=previousBottom.height+edgeHeight;const context=seam.getContext('2d',{alpha:false});context.fillStyle='#fff';context.fillRect(0,0,seam.width,seam.height);context.drawImage(previousBottom,0,0);context.drawImage(canvas,0,0,canvas.width,edgeHeight,0,previousBottom.height,canvas.width,edgeHeight);const blob=await new Promise((resolve,reject)=>seam.toBlob(value=>value?resolve(value):reject(Error('PDF-Seitenwechsel konnte nicht gerendert werden.')),'image/jpeg',.88));pages.push({file:new File([blob],`seite-${String(number-1).padStart(2,'0')}-${String(number).padStart(2,'0')}-wechsel.jpg`,{type:'image/jpeg'}),pageNumber:number-1,part:`Seitenwechsel ${number-1}/${number}`})}
       const stripHeight=Math.ceil(canvas.height*.62),starts=[0,Math.max(0,canvas.height-stripHeight)],parts=['oben','unten'];
       for(let partIndex=0;partIndex<starts.length;partIndex++){const strip=document.createElement('canvas');strip.width=canvas.width;strip.height=stripHeight;strip.getContext('2d',{alpha:false}).drawImage(canvas,0,starts[partIndex],canvas.width,stripHeight,0,0,canvas.width,stripHeight);const blob=await new Promise((resolve,reject)=>strip.toBlob(value=>value?resolve(value):reject(Error('PDF-Seite konnte nicht gerendert werden.')),'image/jpeg',.9));pages.push({file:new File([blob],`seite-${String(number).padStart(2,'0')}-${parts[partIndex]}.jpg`,{type:'image/jpeg'}),pageNumber:number,part:parts[partIndex]})}
+      previousBottom=document.createElement('canvas');previousBottom.width=canvas.width;previousBottom.height=edgeHeight;previousBottom.getContext('2d',{alpha:false}).drawImage(canvas,0,canvas.height-edgeHeight,canvas.width,edgeHeight,0,0,canvas.width,edgeHeight);
       page.cleanup()
     }
     await pdf.destroy();return pages
