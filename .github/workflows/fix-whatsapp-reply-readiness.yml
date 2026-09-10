@@ -1,0 +1,104 @@
+name: Fix WhatsApp reply readiness
+
+on:
+  push:
+    paths:
+      - .github/workflows/fix-whatsapp-reply-readiness.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch WhatsApp readiness
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('sv-netzwerk/public/intern/api/whatsapp-case.php')
+          s = p.read_text()
+
+          old = """function waConfigured(array $connection): bool
+          {
+              return $connection['phone_id'] !== '' && $connection['token'] !== '' && waEnv('WHATSAPP_APP_SECRET') !== '' && waEnv('WHATSAPP_VERIFY_TOKEN') !== '' && waEnv('WHATSAPP_APPOINTMENT_TEMPLATE') !== '';
+          }
+          """
+          new = """function waConfigured(array $connection): bool
+          {
+              // Core sending readiness must not depend on a message template.
+              // A customer reply opens the 24-hour service window and free text
+              // must work even while templates are still pending at Meta.
+              return $connection['phone_id'] !== '' && $connection['token'] !== '';
+          }
+          """
+          if old not in s:
+              raise SystemExit('waConfigured block not found')
+          s = s.replace(old, new, 1)
+
+          old = """    $ready = $phoneStatus === 'CONNECTED' && $templateStatus === 'APPROVED';
+              $state = $ready ? 'versandbereit' : ($phoneStatus !== 'CONNECTED'
+                  ? 'Meta-Telefonnummer noch ausstehend'
+                  : ($templateStatus !== 'APPROVED' ? 'WhatsApp-Vorlage noch in Prüfung' : 'noch nicht versandbereit'));
+              return ['ready'=>$ready,'phone_status'=>$phoneStatus,'template_status'=>$templateStatus,'state'=>$state];
+          """
+          new = """    // Free-text replies inside Meta's 24-hour service window only need a
+              // connected phone number. Template approval is checked separately when
+              // a template-based message (for example an appointment) is sent.
+              $ready = $phoneStatus === 'CONNECTED';
+              $state = $ready ? 'versandbereit' : 'Meta-Telefonnummer noch ausstehend';
+              return ['ready'=>$ready,'phone_status'=>$phoneStatus,'template_status'=>$templateStatus,'state'=>$state];
+          """
+          if old not in s:
+              raise SystemExit('waReadiness block not found')
+          s = s.replace(old, new, 1)
+
+          old = """        $readiness = waReadiness($connection);
+                  if (!$readiness['ready']) apiError(409, 'WhatsApp ist bei Meta noch nicht versandbereit: ' . $readiness['state'] . '.');
+                  $body = requestBody();
+                  $folderId = trim((string)($body['folder_id'] ?? ''));
+          """
+          new = """        $readiness = waReadiness($connection);
+                  if (!$readiness['ready']) apiError(409, 'WhatsApp ist bei Meta noch nicht versandbereit: ' . $readiness['state'] . '.');
+                  if (($readiness['template_status'] ?? '') !== 'APPROVED') apiError(409, 'Die Terminvorlage ist bei Meta noch nicht freigegeben.');
+                  $body = requestBody();
+                  $folderId = trim((string)($body['folder_id'] ?? ''));
+          """
+          # Replace the occurrence belonging to send_appointment, not send_message.
+          marker = "if ($action === 'send_appointment')"
+          pos = s.find(marker)
+          if pos < 0:
+              raise SystemExit('send_appointment block not found')
+          head, tail = s[:pos], s[pos:]
+          if old not in tail:
+              raise SystemExit('appointment readiness sequence not found')
+          tail = tail.replace(old, new, 1)
+          s = head + tail
+
+          # Make generic Meta errors diagnosable without exposing tokens.
+          old = """        $message = (string)($data['error']['message'] ?? 'WhatsApp-Anfrage wurde nicht angenommen.');
+                  throw new RuntimeException($message);
+          """
+          new = """        $message = (string)($data['error']['message'] ?? 'WhatsApp-Anfrage wurde nicht angenommen.');
+                  $code = (string)($data['error']['code'] ?? '');
+                  $subcode = (string)($data['error']['error_subcode'] ?? '');
+                  if ($code !== '') $message .= ' (Meta-Code ' . $code . ($subcode !== '' ? '/' . $subcode : '') . ')';
+                  throw new RuntimeException($message);
+          """
+          if old not in s:
+              raise SystemExit('Meta error block not found')
+          s = s.replace(old, new, 1)
+
+          p.write_text(s)
+          PY
+          php -l sv-netzwerk/public/intern/api/whatsapp-case.php
+      - name: Commit fix
+        run: |
+          git config user.name "SV-Netzwerk Automation"
+          git config user.email "automation@sv-netzwerk.eu"
+          git add sv-netzwerk/public/intern/api/whatsapp-case.php
+          git commit -m "Allow WhatsApp free-text replies in 24h window"
+          git push origin HEAD:main
