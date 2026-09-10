@@ -29,7 +29,7 @@ jobs:
             --data-urlencode "input_token=$ACCESS_TOKEN" \
             --data-urlencode "access_token=$APP_ID|$APP_SECRET" \
             'https://graph.facebook.com/v25.0/debug_token' \
-            | jq --arg expected_app "$APP_ID" '{is_valid:.data.is_valid,app_matches:(.data.app_id|tostring)==$expected_app,type:.data.type,expires_at:.data.expires_at,data_access_expires_at:.data.data_access_expires_at,scopes:.data.scopes,granular_scopes:.data.granular_scopes,user_id:.data.user_id}'
+            | jq --arg expected_app "$APP_ID" '{is_valid:.data.is_valid,app_matches:((.data.app_id|tostring)==$expected_app),type:.data.type,expires_at:.data.expires_at,data_access_expires_at:.data.data_access_expires_at,scopes:.data.scopes,granular_scopes:.data.granular_scopes,user_id:.data.user_id}'
           echo 'PHONE'
           curl --fail --silent --show-error \
             --header "Authorization: Bearer $ACCESS_TOKEN" \
