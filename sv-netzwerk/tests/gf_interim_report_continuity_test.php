@@ -42,5 +42,10 @@ $assert(
     str_contains($core, 'keine Zahlungsempfehlung als bereits gezahlt ausgeben'),
     'Recommended payments must not be written into the already-paid column.'
 );
+$assert(
+    str_contains($core, 'function gfInterimExplicitFields(')
+    && str_contains($core, "\$form['teilnehmer']=trim((string)\$m[1])"),
+    'An explicitly stated meeting date and exclusive participant list must override an empty AI form field.'
+);
 
 echo "gf_interim_report_continuity_test: ok\n";
