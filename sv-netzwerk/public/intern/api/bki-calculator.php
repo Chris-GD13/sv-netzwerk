@@ -160,7 +160,7 @@ function bkKvaSchema():array{return[
   ],
 ];}
 function bkFinalizeKva(string $name,array $raw):array{
-  $positions=[];$verifiedNet=is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null;
+  $rawRows=is_array($raw['positions']??null)?$raw['positions']:[];$rawPositionsTotal=array_sum(array_map(static fn($row):float=>is_array($row)&&is_numeric($row['offered_total']??null)?(float)$row['offered_total']:0.0,$rawRows));$positions=[];$verifiedNet=is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null;
   if(preg_match('/\bAN\d{5,}\b/i',$name,$expectedMatch)){
     $expected=strtoupper($expectedMatch[0]);$actual=strtoupper(trim((string)($raw['quote_number']??'')));
     if($actual===''||!hash_equals($expected,$actual))throw new RuntimeException('Die erkannte Angebotsnummer stimmt nicht mit der ausgewählten Quelldatei überein. Die Auswertung wurde aus Sicherheitsgründen verworfen.');
@@ -175,7 +175,7 @@ function bkFinalizeKva(string $name,array $raw):array{
   }
   if(!$positions)throw new RuntimeException('Die KI-Antwort enthielt keine am Original-KVA belegbaren Leistungspositionen. Es wurden keine Ersatz- oder Standardpositionen übernommen.');
   $positionsTotal=array_sum(array_map(static fn(array$row):float=>(float)($row['offered_total']??0),$positions));
-  if($verifiedNet===null||$verifiedNet<=0||abs($positionsTotal-$verifiedNet)>max(0.10,$verifiedNet*0.005))throw new RuntimeException('Die ausgelesenen Positionssummen ('.number_format($positionsTotal,2,',','.').' EUR) stimmen nicht mit der sichtbaren Netto-Angebotssumme ('.($verifiedNet===null?'nicht erkannt':number_format($verifiedNet,2,',','.').' EUR').') überein. Die Auswertung wurde verworfen; es wurden keine fehlerhaften Werte übernommen.');
+  if($verifiedNet===null||$verifiedNet<=0||abs($positionsTotal-$verifiedNet)>max(0.10,$verifiedNet*0.005))throw new RuntimeException('Die ausgelesenen Positionssummen ('.number_format($positionsTotal,2,',','.').' EUR) stimmen nicht mit der sichtbaren Netto-Angebotssumme ('.($verifiedNet===null?'nicht erkannt':number_format($verifiedNet,2,',','.').' EUR').') überein. Vor der Belegprüfung wurden '.count($rawRows).' Zeilen mit '.number_format($rawPositionsTotal,2,',','.').' EUR erkannt, danach '.count($positions).' Zeilen. Die Auswertung wurde verworfen; es wurden keine fehlerhaften Werte übernommen.');
   return['source_name'=>$name,'quote_number'=>trim((string)($raw['quote_number']??'')),'company'=>trim((string)($raw['company']??'')),'net_total'=>$verifiedNet,'positions'=>$positions];
 }
 function bkAnalyzeKva(string $name,string $mime,string $bytes):array{
