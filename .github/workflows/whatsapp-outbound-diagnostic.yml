@@ -1,0 +1,29 @@
+name: WhatsApp outbound diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/whatsapp-outbound-diagnostic.yml
+
+jobs:
+  send-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send authorized test and expose Meta result
+        env:
+          ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
+        run: |
+          test -n "$ACCESS_TOKEN"
+          payload='{"messaging_product":"whatsapp","to":"491604092134","type":"text","text":{"preview_url":false,"body":"SV-Netzwerk WhatsApp-Test: Die Anbindung ist erfolgreich eingerichtet. Keine Antwort erforderlich."}}'
+          result="$(curl --silent --show-error --write-out '\n%{http_code}' \
+            --request POST \
+            --header "Authorization: Bearer $ACCESS_TOKEN" \
+            --header 'Content-Type: application/json' \
+            --data "$payload" \
+            'https://graph.facebook.com/v25.0/1282747221593843/messages')"
+          status="${result##*$'\n'}"
+          body="${result%$'\n'*}"
+          printf '%s\n' "$body"
+          test "$status" -ge 200
+          test "$status" -lt 300
