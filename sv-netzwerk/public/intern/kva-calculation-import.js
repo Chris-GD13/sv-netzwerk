@@ -1,10 +1,11 @@
 const PERCENT_CODES=new Set(['01.04.002','07.00.001','14.03.000']);
 const STOP_WORDS=new Set(['aber','alle','aller','auch','aus','bei','bis','das','dem','den','der','des','die','eine','einer','eines','fuer','für','gegen','inkl','inklusive','mit','nach','oder','pro','sowie','und','von','zur','zum']);
+const GENERIC_MATCH_TOKENS=new Set(['arbeit','ausbau','einbau','entfern','liefer','montag','reinig','sanier','trockn','verleg']);
 
 export function normaliseText(value){return String(value??'').toLocaleLowerCase('de-DE').replaceAll('ä','ae').replaceAll('ö','oe').replaceAll('ü','ue').replaceAll('ß','ss').replace(/[^a-z0-9]+/g,' ').trim()}
 function stem(token){return token.replace(/(ungen|ung|ern|er|en|es|e|n|s)$/,'')}
 export function textTokens(value){return[...new Set(normaliseText(value).split(/\s+/).filter(token=>token.length>=4&&!STOP_WORDS.has(token)).map(stem).filter(token=>token.length>=3))]}
-export function canonicalUnit(value){const unit=normaliseText(value).replaceAll(' ','');if(['m2','qm','quadratmeter'].includes(unit))return'm²';if(['m3','kubikmeter'].includes(unit))return'm³';if(['st','stk','stueck'].includes(unit))return'St';if(['h','std','stunde','stunden'].includes(unit))return'h';if(['psch','pausch','pauschal'].includes(unit))return'psch';if(['lfm','m'].includes(unit))return'm';if(['kg','kilogramm'].includes(unit))return'kg';if(unit==='kwh')return'kWh';return String(value??'').trim()}
+export function canonicalUnit(value){const raw=String(value??'').trim().toLocaleLowerCase('de-DE').replaceAll(' ','');if(['m²','m2','qm','quadratmeter'].includes(raw))return'm²';if(['m³','m3','kubikmeter'].includes(raw))return'm³';const unit=normaliseText(raw).replaceAll(' ','');if(['st','stk','stck','stueck'].includes(unit))return'St';if(['h','std','stunde','stunden'].includes(unit))return'h';if(['psch','pausch','pauschal'].includes(unit))return'psch';if(['lfm','m'].includes(unit))return'm';if(['kg','kilogramm'].includes(unit))return'kg';if(unit==='kwh')return'kWh';return String(value??'').trim()}
 export function offeredUnitPrice(row){const quantity=Number(row?.quantity)||0,unitPrice=Number(row?.offered_unit_price);if(Number.isFinite(unitPrice)&&unitPrice>0)return unitPrice;const total=Number(row?.offered_total);return quantity>0&&Number.isFinite(total)&&total>0?total/quantity:null}
 export function cappedUnitPrice(row,candidate){const offered=offeredUnitPrice(row),maximum=Number(candidate?.price);if(!Number.isFinite(maximum)||maximum<=0)return null;return offered!==null?Math.min(offered,maximum):maximum}
 
@@ -18,7 +19,8 @@ function matchScore(row,candidate){
   const rowUnit=canonicalUnit(row?.unit),candidateUnit=canonicalUnit(candidate?.unit);if(rowUnit&&candidateUnit&&rowUnit!==candidateUnit)return 0;
   const source=textTokens(row?.description),target=textTokens(`${candidate?.description||''} ${candidate?.group||''}`);if(!source.length||!target.length)return 0;
   const sourceText=normaliseText(row?.description),targetText=normaliseText(candidate?.description),sourceRemoves=/abbruch|ausbau|demont|entfern|rueckbau/.test(sourceText),targetRemoves=/abbruch|ausbau|demont|entfern|rueckbau/.test(targetText),sourceBuilds=/einbau|montage|montier|verleg|liefer|herstell/.test(sourceText),targetBuilds=/einbau|montage|montier|verleg|liefer|herstell/.test(targetText);if(sourceRemoves&&!sourceBuilds&&targetBuilds&&!targetRemoves)return 0;if(sourceBuilds&&!sourceRemoves&&targetRemoves&&!targetBuilds)return 0;
-  const common=source.filter(token=>target.some(other=>other===token||(token.length>=6&&other.length>=6&&token.slice(0,6)===other.slice(0,6)))).length;if(!common)return 0;
+  if(sourceText===targetText||(sourceText.length>=24&&targetText.includes(sourceText))||(targetText.length>=24&&sourceText.includes(targetText)))return 1;
+  const shared=source.filter(token=>target.some(other=>other===token||(token.length>=6&&other.length>=6&&token.slice(0,6)===other.slice(0,6)))),common=shared.length,distinctive=shared.filter(token=>!GENERIC_MATCH_TOKENS.has(token));if(!common||!distinctive.length)return 0;
   const dice=2*common/(source.length+target.length),group=inferredGroup(row?.description);return dice*.72+(rowUnit===candidateUnit?0.16:0)+(group&&group===candidate.group?0.22:0)
 }
 export function rankedMatches(row,priceList){return priceList.map((candidate,index)=>({candidate,index,score:matchScore(row,candidate)})).filter(item=>item.score>0).sort((a,b)=>b.score-a.score||String(a.candidate.code).localeCompare(String(b.candidate.code),'de'))}
