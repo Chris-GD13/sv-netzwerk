@@ -1,0 +1,60 @@
+name: Register WhatsApp service templates
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/whatsapp-template-register.yml
+
+jobs:
+  register-templates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create missing WhatsApp templates
+        env:
+          ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
+          WABA_ID: '2484676038720950'
+        run: |
+          set -euo pipefail
+          test -n "$ACCESS_TOKEN"
+
+          create_template() {
+            local name="$1"
+            local body="$2"
+            echo "Checking $name"
+            existing=$(curl --fail --silent --show-error \
+              --get \
+              --header "Authorization: Bearer $ACCESS_TOKEN" \
+              --data-urlencode "name=$name" \
+              --data-urlencode 'fields=name,status,language' \
+              "https://graph.facebook.com/v25.0/$WABA_ID/message_templates")
+            if echo "$existing" | jq -e --arg name "$name" '.data[]? | select(.name==$name and .language=="de")' >/dev/null; then
+              echo "$existing" | jq --arg name "$name" '{template:$name,statuses:[.data[]?|select(.name==$name)|{name,status,language}]}'
+              return 0
+            fi
+
+            payload=$(jq -n --arg name "$name" --arg body "$body" '{name:$name,language:"de",category:"UTILITY",components:[{type:"BODY",text:$body,example:{body_text:[["Herr Mustermann","63-1234567-00","Christian Wächter"]]}},{type:"FOOTER",text:"SV-Netzwerk · BAU · SCHADEN · REGULIERUNG"}]}')
+            response=$(curl --silent --show-error \
+              --request POST \
+              --header "Authorization: Bearer $ACCESS_TOKEN" \
+              --header 'Content-Type: application/json' \
+              --data "$payload" \
+              "https://graph.facebook.com/v25.0/$WABA_ID/message_templates")
+            echo "$response" | jq .
+            if echo "$response" | jq -e '.error' >/dev/null; then
+              echo "Template creation failed for $name" >&2
+              exit 1
+            fi
+          }
+
+          create_template 'sv_kva_anfrage_v1' 'Guten Tag {{1}}, für die weitere Bearbeitung des Schadenfalls {{2}} benötigen wir einen Kostenvoranschlag für die schadenbedingten Reparaturarbeiten. Bitte senden Sie uns diesen per E-Mail oder WhatsApp. Mit freundlichen Grüßen {{3}}, SV-Netzwerk'
+          create_template 'sv_unterlagen_anfordern_v1' 'Guten Tag {{1}}, für die weitere Bearbeitung des Schadenfalls {{2}} benötigen wir noch die ausstehenden Unterlagen. Bitte senden Sie uns diese per E-Mail oder WhatsApp. Mit freundlichen Grüßen {{3}}, SV-Netzwerk'
+          create_template 'sv_rueckrufbitte_v1' 'Guten Tag {{1}}, wir möchten den Schadenfall {{2}} kurz mit Ihnen abstimmen. Bitte rufen Sie uns bei Gelegenheit zurück. Mit freundlichen Grüßen {{3}}, SV-Netzwerk'
+          create_template 'sv_terminabstimmung_v1' 'Guten Tag {{1}}, zum Schadenfall {{2}} möchten wir einen Besichtigungstermin mit Ihnen abstimmen. Bitte teilen Sie uns mit, wann Sie erreichbar sind. Mit freundlichen Grüßen {{3}}, SV-Netzwerk'
+          create_template 'sv_allgemeine_rueckmeldung_v1' 'Guten Tag {{1}}, wir melden uns zum Schadenfall {{2}}. Bitte antworten Sie auf diese WhatsApp-Nachricht, damit wir die weitere Abstimmung direkt fortführen können. Mit freundlichen Grüßen {{3}}, SV-Netzwerk'
+
+          echo 'FINAL TEMPLATE STATUS'
+          curl --fail --silent --show-error \
+            --header "Authorization: Bearer $ACCESS_TOKEN" \
+            "https://graph.facebook.com/v25.0/$WABA_ID/message_templates?fields=name,status,language&limit=100" \
+            | jq '[.data[]?|select(.name|startswith("sv_"))|{name,status,language}]'
