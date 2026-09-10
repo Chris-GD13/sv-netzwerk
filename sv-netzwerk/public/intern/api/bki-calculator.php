@@ -471,6 +471,11 @@ try{
   if($action==='status') apiJson(['ok'=>true,'source'=>'BKI Altbau 2026','positions_file_id'=>BKI_POSITIONS_ID,'buildings_file_id'=>BKI_BUILDINGS_ID]);
   if($action==='analyze_kva'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
+    // Mehrseitige KVA benötigen mehrere sequenzielle KI-Anfragen (Entwurf + Seite-für-Seite-Kontrolle).
+    // Das bisherige PHP-Zeitlimit von 300 s reichte dafür bei umfangreicheren Belegen nicht aus und führte
+    // zu einem Abbruch mit HTTP 504, obwohl die Auslesung selbst korrekt weitergelaufen wäre.
+    @set_time_limit(0);
+    ignore_user_abort(true);
     $folder=trim((string)($_POST['folder_id']??''));if($folder==='')throw new RuntimeException('Bitte zuerst einen Schadenfall öffnen.');requireCaseFolderAccess($folder,$user);
     if(isset($_FILES['pages'])&&is_array($_FILES['pages']['tmp_name']??null)){
       $fileId=trim((string)($_POST['file_id']??''));if($fileId!==''&&!bkDriveBelongsToCase($fileId,$folder))throw new RuntimeException('Der ausgewählte KVA wurde im aktiven Fall nicht gefunden. Bitte die Fallauswahl prüfen.');
