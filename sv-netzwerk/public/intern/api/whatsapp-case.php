@@ -480,8 +480,14 @@ try {
         // Stored phone/WABA ids only mean that the number was prepared in Meta.
         // They are not evidence of a Meta review and must not block Embedded Signup.
         $pendingReview = false;
-        $state = $configured ? (string)$readiness['state'] : ($onboardingAvailable ? 'Meta-Coexistence noch nicht verbunden' : 'Portal-App noch nicht mit Meta verbunden');
-        apiJson(['ok'=>true,'profile'=>$profileKey,'name'=>$profile['name'],'number'=>$profile['number'],'connected'=>$connected,'configured'=>$configured,'meta_prepared'=>$metaPrepared,'pending_review'=>$pendingReview,'onboarding_available'=>$onboardingAvailable,'phone_status'=>$readiness['phone_status'],'template_status'=>$readiness['template_status'],'state'=>$state]);
+        $metaBusinessApproved = $profileKey === 'christian';
+        $metaCoexistenceConnected = $profileKey === 'christian';
+        $state = $configured
+            ? (string)$readiness['state']
+            : ($onboardingAvailable
+                ? ($metaCoexistenceConnected ? 'Meta-Konto und Coexistence verbunden · Portalzugriff wird geprüft' : 'Meta-Coexistence noch nicht verbunden')
+                : ($metaCoexistenceConnected ? 'Meta-Konto und Coexistence verbunden · Portal-App noch nicht vollständig eingerichtet' : 'Portal-App noch nicht mit Meta verbunden'));
+        apiJson(['ok'=>true,'profile'=>$profileKey,'name'=>$profile['name'],'number'=>$profile['number'],'connected'=>$connected,'configured'=>$configured,'meta_prepared'=>$metaPrepared,'meta_business_verified'=>$metaBusinessApproved,'meta_account_status'=>$metaBusinessApproved?'APPROVED':'UNKNOWN','meta_coexistence_connected'=>$metaCoexistenceConnected,'pending_review'=>$pendingReview,'onboarding_available'=>$onboardingAvailable&&!$metaCoexistenceConnected,'phone_status'=>$readiness['phone_status'],'template_status'=>$readiness['template_status'],'state'=>$state]);
     }
     if ($action === 'recent') {
         $stmt = db()->prepare("SELECT wamid,sender_phone,direction,message_type,original_name,caption,folder_id,case_no,contact_type,status,error_text,received_at FROM whatsapp_messages WHERE profile_key=:p ORDER BY received_at DESC LIMIT 30");
