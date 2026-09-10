@@ -23,7 +23,7 @@
     "build:case-mail-history": "esbuild scripts/case-mail-history.client.js --bundle --minify --format=iife --platform=browser --outfile=public/intern/case-mail-history.js"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.3",
+    "@astrojs/sitemap": "^3.7.4",
     "@kenjiuno/msgreader": "^1.28.0",
     "astro": "^7.2.9",
     "postal-mime": "^2.7.6",
