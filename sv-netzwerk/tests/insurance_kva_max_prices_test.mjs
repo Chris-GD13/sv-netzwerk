@@ -27,7 +27,7 @@ assert.equal(bestAutomaticMatch({description:'Türarbeiten im Schadenbereich',un
 assert.equal(bestAutomaticMatch({description:'Herd nach Einbau der Küche anschließen',unit:'Stk'},prices),null,'Allgemeine Wörter wie Einbau dürfen keine fachfremde automatische Zuordnung auslösen.');
 
 for(const id of['vs-kva-select','vs-kva-file','vs-kva-read','vs-kva-lines','vs-kva-remap','vs-kva-import','vs-kva-offered-net','vs-kva-approved-net','vs-kva-difference'])assert(page.includes(`id="${id}"`),`KVA-Nachkalkulation benötigt ${id}.`);
-assert(page.includes('/intern/kva-calculation-import.js?v=20260910-1'),'Die Höchstpreis-Nachkalkulation muss auf der Versicherungsseite geladen werden.');
+assert(page.includes('/intern/kva-calculation-import.js?v=20260910-2'),'Die Höchstpreis-Nachkalkulation muss mit der aktuellen Cache-Version geladen werden.');
 assert(script.includes("/intern/api/bki-calculator.php?action=analyze_kva"),'Der KVA muss über die beleggesicherte Positionsauslesung laufen.');
 assert(script.includes('Math.min(offered,maximum)'),'Der Prüfpreis muss der niedrigere Wert aus KVA und Höchstpreis sein.');
 assert(script.includes('wurde positionsweise anhand der hinterlegten Höchstpreisliste nachkalkuliert'),'Die Übernahme muss eine nachvollziehbare Prüfnotiz in der Kalkulation hinterlassen.');
