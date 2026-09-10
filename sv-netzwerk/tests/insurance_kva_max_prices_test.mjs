@@ -27,7 +27,7 @@ assert.equal(bestAutomaticMatch({description:'Türarbeiten im Schadenbereich',un
 assert.equal(bestAutomaticMatch({description:'Herd nach Einbau der Küche anschließen',unit:'Stk'},prices),null,'Allgemeine Wörter wie Einbau dürfen keine fachfremde automatische Zuordnung auslösen.');
 
 for(const id of['vs-kva-select','vs-kva-file','vs-kva-read','vs-kva-lines','vs-kva-remap','vs-kva-import','vs-kva-offered-net','vs-kva-approved-net','vs-kva-difference'])assert(page.includes(`id="${id}"`),`KVA-Nachkalkulation benötigt ${id}.`);
-assert(page.includes('/intern/kva-calculation-import.js?v=20260910-6'),'Die Höchstpreis-Nachkalkulation muss mit der aktuellen Cache-Version geladen werden.');
+assert(page.includes('/intern/kva-calculation-import.js?v=20260910-7'),'Die Höchstpreis-Nachkalkulation muss mit der aktuellen Cache-Version geladen werden.');
 assert(script.includes("/intern/api/bki-calculator.php?action=analyze_kva"),'Der KVA muss über die beleggesicherte Positionsauslesung laufen.');
 assert(script.includes("modulePath='/vendor/pdfjs/pdf.mjs'")&&script.includes('import(modulePath)')&&script.includes("form.append('pages[]'")&&script.includes("form.append('page_numbers[]'")&&script.includes("parts=['oben','unten']")&&script.includes('previousBottom')&&script.includes('Seitenwechsel')&&script.includes('case-file-browser.php?action=download'),'PDF-KVA aus Fallakte und Gerät müssen lokal als überlappende Seiten- und Seitenwechselbilder gerendert werden, ohne den Renderer in die Astro-Prüfung zu ziehen.');
 assert(script.includes('Math.min(offered,maximum)'),'Der Prüfpreis muss der niedrigere Wert aus KVA und Höchstpreis sein.');
@@ -35,5 +35,6 @@ assert(script.includes('wurde positionsweise anhand der hinterlegten Höchstprei
 assert(script.includes('Noch nicht eindeutig zugeordnet')&&page.includes('nicht automatisch angesetzt'),'Unsichere Zuordnungen müssen sichtbar offen bleiben.');
 assert(page.includes("!/^KVA\\b/i.test(input.value)"),'KVA-Originalbeschreibungen dürfen nicht nachträglich durch Kurztexte überschrieben werden.');
 assert(script.includes('action=kva_job_status')&&script.includes('awaitKvaJob')&&script.includes("job.status==='failed'"),'Die KVA-Auslesung muss den Hintergrundauftrag abfragen, statt in einem Gateway-Timeout zu laufen.');
+assert(script.includes("if(!Array.isArray(analysis?.positions)||!analysis.positions.length)throw new Error("),'Eine Antwort ohne belegte Positionen darf nicht als leeres Ergebnis angezeigt werden.');
 
 console.log('KVA-Nachkalkulation gegen die Höchstpreisliste abgesichert.');
