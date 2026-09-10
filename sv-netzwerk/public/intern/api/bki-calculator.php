@@ -95,6 +95,35 @@ function bkOpenAIUploadBytes(string $name,string $mime,string $bytes):string{
     return$id;
   }finally{@unlink($tmp);}
 }
+function bkKvaNorm(string $value):string{
+  $value=mb_strtolower(trim($value),'UTF-8');
+  return trim((string)preg_replace('/[^\p{L}\p{N}]+/u',' ',$value));
+}
+function bkKvaSchema():array{return[
+  'type'=>'json_schema','name'=>'kva_extraction','strict'=>true,'schema'=>[
+    'type'=>'object','additionalProperties'=>false,
+    'properties'=>[
+      'quote_number'=>['type'=>'string'],
+      'company'=>['type'=>'string'],
+      'net_total'=>['type'=>['number','null']],
+      'positions'=>['type'=>'array','items'=>[
+        'type'=>'object','additionalProperties'=>false,
+        'properties'=>[
+          'source_position'=>['type'=>'string'],
+          'page_number'=>['type'=>'integer'],
+          'evidence'=>['type'=>'string'],
+          'description'=>['type'=>'string'],
+          'quantity'=>['type'=>['number','null']],
+          'unit'=>['type'=>'string'],
+          'offered_unit_price'=>['type'=>['number','null']],
+          'offered_total'=>['type'=>['number','null']],
+        ],
+        'required'=>['source_position','page_number','evidence','description','quantity','unit','offered_unit_price','offered_total'],
+      ]],
+    ],
+    'required'=>['quote_number','company','net_total','positions'],
+  ],
+];}
 function bkAnalyzeKva(string $name,string $mime,string $bytes):array{
   if($bytes==='')throw new RuntimeException('KVA-Datei ist leer.');
   $imageMime=strtolower(trim(explode(';',$mime,2)[0]));
@@ -102,24 +131,43 @@ function bkAnalyzeKva(string $name,string $mime,string $bytes):array{
   if($isImage&&!in_array($imageMime,['image/jpeg','image/png','image/webp','image/gif'],true))throw new RuntimeException('Dieses Bildformat kann nicht ausgewertet werden. Bitte das Foto als JPG, PNG oder WEBP auswählen.');
   $fileId=$isImage?'':bkOpenAIUploadBytes($name,$mime,$bytes);
   $instructions=<<<'PROMPT'
-Lies den deutschen Kostenvoranschlag vollständig und extrahiere die angebotenen Leistungspositionen als Kalkulationsgrundlage. Übernimm keine Summenzeilen, Zwischensummen, Umsatzsteuer oder Rabatte als Leistungsposition. Fasse eine Position nur dann zusammen, wenn sie im Dokument selbst zusammengefasst ist. Erfinde keine Mengen, Einheiten, Beschreibungen oder Preise.
+Lies den deutschen Kostenvoranschlag vollständig anhand der tatsächlich sichtbaren PDF-Seiten beziehungsweise des sichtbaren Bildes. Die eingebettete PDF-Textebene kann fehlerhaft codiert oder unlesbar sein; in diesem Fall ist ausschließlich das visuell gerenderte Dokument maßgeblich. Verwende niemals Inhalte aus anderen Dokumenten, Trainingswissen, typischen Baupositionen oder früheren Anfragen.
+
+Extrahiere ausschließlich echte, bepreiste Leistungspositionen des Angebots. Übernimm keine Abschnittsüberschriften, Raum-/Aufmaß-Unterzeilen, Summenzeilen, Zwischensummen, Umsatzsteuer, Rabatte, Bedingungen oder Widerrufstexte als Leistungsposition. Fasse eine Position nur dann zusammen, wenn sie im Dokument selbst zusammengefasst ist. Erfinde keine Positionsnummern, Seitenangaben, Mengen, Einheiten, Beschreibungen oder Preise.
+
+Für jede Position gilt zwingend:
+- source_position ist die im Dokument sichtbar gedruckte Positionsnummer, niemals eine selbst erzeugte Angabe wie "Seite 2, Position 1".
+- page_number ist die tatsächliche PDF-Seite, auf der die Position gedruckt ist.
+- description wird möglichst wortgetreu aus der gedruckten Positionszeile übernommen.
+- evidence ist ein kurzer, wortgetreuer sichtbarer Beleg derselben Seite und enthält Positionsnummer, Beschreibung, Menge/Einheit sowie den angebotenen Preis. Ohne solchen Beleg ist die Position wegzulassen.
+- quantity, unit, offered_unit_price und offered_total werden nur aus der gedruckten Positionszeile übernommen. Nicht sichtbare Werte bleiben null beziehungsweise leer.
+
+Lies Angebotsnummer, Anbieter und Nettosumme ebenfalls ausschließlich aus dem sichtbaren Dokument. Wenn eine sichere visuelle Auslesung nicht möglich ist, gib keine Positionen zurück.
 
 Antworte ausschließlich als JSON:
-{"quote_number":"","company":"","net_total":null,"positions":[{"source_position":"","description":"","quantity":null,"unit":"","offered_unit_price":null,"offered_total":null}]}
+{"quote_number":"","company":"","net_total":null,"positions":[{"source_position":"","page_number":1,"evidence":"","description":"","quantity":null,"unit":"","offered_unit_price":null,"offered_total":null}]}
 PROMPT;
   $response=bkOpenAIJson('POST','responses',[
-    'model'=>env('OPENAI_MODEL','gpt-5.4-mini'),
+    'model'=>env('OPENAI_KVA_MODEL','gpt-5.4'),
     'instructions'=>$instructions,
-    'input'=>[['role'=>'user','content'=>array_merge([['type'=>'input_text','text'=>'Extrahiere alle kalkulierbaren Leistungspositionen aus diesem KVA.']],$isImage?[['type'=>'input_image','image_url'=>'data:'.$imageMime.';base64,'.base64_encode($bytes),'detail'=>'high']]:[['type'=>'input_file','file_id'=>$fileId]])]],
+    'input'=>[['role'=>'user','content'=>array_merge([['type'=>'input_text','text'=>'Quelldatei: '.$name."\nExtrahiere alle visuell belegten kalkulierbaren Leistungspositionen ausschließlich aus dieser Quelldatei."]],$isImage?[['type'=>'input_image','image_url'=>'data:'.$imageMime.';base64,'.base64_encode($bytes),'detail'=>'high']]:[['type'=>'input_file','file_id'=>$fileId]])]],
+    'text'=>['format'=>bkKvaSchema()],
     'max_output_tokens'=>8000
   ],420);
   $raw=bkJson(bkOutputText($response));$positions=[];
-  foreach(($raw['positions']??[])as$row){
-    if(!is_array($row))continue;$description=trim((string)($row['description']??''));
-    if($description==='')continue;
-    $positions[]=['source_position'=>trim((string)($row['source_position']??'')),'description'=>$description,'quantity'=>is_numeric($row['quantity']??null)?(float)$row['quantity']:null,'unit'=>trim((string)($row['unit']??'')),'offered_unit_price'=>is_numeric($row['offered_unit_price']??null)?(float)$row['offered_unit_price']:null,'offered_total'=>is_numeric($row['offered_total']??null)?(float)$row['offered_total']:null];
+  if(preg_match('/\bAN\d{5,}\b/i',$name,$expectedMatch)){
+    $expected=strtoupper($expectedMatch[0]);$actual=strtoupper(trim((string)($raw['quote_number']??'')));
+    if($actual===''||!hash_equals($expected,$actual))throw new RuntimeException('Die erkannte Angebotsnummer stimmt nicht mit der ausgewählten Quelldatei überein. Die Auswertung wurde aus Sicherheitsgründen verworfen.');
   }
-  if(!$positions)throw new RuntimeException('Im KVA wurden keine belastbaren Leistungspositionen erkannt.');
+  foreach(($raw['positions']??[])as$row){
+    if(!is_array($row)){continue;}$description=trim((string)($row['description']??''));$sourcePosition=trim((string)($row['source_position']??''));$evidence=trim((string)($row['evidence']??''));$page=(int)($row['page_number']??0);$quantity=is_numeric($row['quantity']??null)?(float)$row['quantity']:null;$unit=trim((string)($row['unit']??''));$unitPrice=is_numeric($row['offered_unit_price']??null)?(float)$row['offered_unit_price']:null;$lineTotal=is_numeric($row['offered_total']??null)?(float)$row['offered_total']:null;
+    $descriptionNorm=bkKvaNorm($description);$evidenceNorm=bkKvaNorm($evidence);$sourceNorm=bkKvaNorm($sourcePosition);
+    $grounded=$description!==''&&$sourcePosition!==''&&$page>0&&$evidence!==''&&!preg_match('/^Seite\s+\d+\s*[,;-]?\s*Position\s+\d+$/iu',$sourcePosition)&&mb_strlen($descriptionNorm,'UTF-8')>=5&&str_contains($evidenceNorm,$descriptionNorm)&&($sourceNorm===''||str_contains($evidenceNorm,$sourceNorm))&&$quantity!==null&&$quantity>0&&$unit!==''&&(($unitPrice!==null&&$unitPrice>0)||($lineTotal!==null&&$lineTotal>0));
+    if($grounded&&$unitPrice!==null&&$lineTotal!==null&&abs(($quantity*$unitPrice)-$lineTotal)>max(0.15,abs($lineTotal)*0.01))$grounded=false;
+    if(!$grounded)continue;
+    $positions[]=['source_position'=>$sourcePosition,'description'=>$description,'quantity'=>$quantity,'unit'=>$unit,'offered_unit_price'=>$unitPrice,'offered_total'=>$lineTotal];
+  }
+  if(!$positions)throw new RuntimeException('Die KI-Antwort enthielt keine am Original-KVA belegbaren Leistungspositionen. Es wurden keine Ersatz- oder Standardpositionen übernommen.');
   return['source_name'=>$name,'quote_number'=>trim((string)($raw['quote_number']??'')),'company'=>trim((string)($raw['company']??'')),'net_total'=>is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null,'positions'=>$positions];
 }
 function bkSearch(array $in):array{

@@ -18,6 +18,10 @@ assert(page.includes("file.files?.[0]||camera.files?.[0]"), 'Datei- und Kameraau
 assert(page.includes('Alle Positionen 1:1 in die Kalkulation übernehmen'), 'Alle erkannten KVA-Positionen müssen ohne BKI-Treffer 1:1 übernommen werden können.');
 assert(page.includes('offeredUnit||(offeredTotal/quantity)||0'), 'Der 1:1-Import muss den angebotenen Einheitspreis oder den aus der Positionssumme abgeleiteten Preis verwenden.');
 assert(page.includes("positions.forEach((row,index)=>"), 'Der 1:1-Import darf keine KVA-Position wegen eines fehlenden BKI-Treffers auslassen.');
+assert(api.includes("env('OPENAI_KVA_MODEL','gpt-5.4')") && api.includes("'text'=>['format'=>bkKvaSchema()]"), 'Die KVA-Auslesung muss das leistungsfähige Modell mit strengem JSON-Schema verwenden.');
+assert(api.includes('visuell gerenderte Dokument') && api.includes('evidence') && api.includes('str_contains($evidenceNorm,$descriptionNorm)'), 'Jede KVA-Position muss visuell und durch wortgetreuen Quellbeleg abgesichert sein.');
+assert(api.includes("preg_match('/^Seite\\s+\\d+") && api.includes('keine Ersatz- oder Standardpositionen übernommen'), 'Erfundene Seiten-/Positionsnummern müssen verworfen werden statt Standardpositionen anzuzeigen.');
+assert(api.includes("preg_match('/\\bAN\\d{5,}\\b/i',$name") && api.includes('erkannte Angebotsnummer stimmt nicht'), 'Die erkannte Angebotsnummer muss gegen den ausgewählten Dateinamen geprüft werden.');
 assert(page.includes("line.position_code=String(++position)"), 'Kalkulationspositionen müssen automatisch fortlaufend neu nummeriert werden.');
 assert(page.includes("bridge.addSection=value=>") && page.includes("addSection?.(groupData())"), 'Vor importierten KVA-Positionen muss eine eigene Firmen- oder Tätigkeitsüberschrift mit den KVA-Stammdaten eingefügt werden.');
 assert(page.includes("if(!added)window.__bkiCalcBridge?.addSection?.(groupData())"), 'Auch die BKI-Nachkalkulation muss KVA-Firma, Nummer und Originalsumme in der Abschnittszeile erhalten.');
