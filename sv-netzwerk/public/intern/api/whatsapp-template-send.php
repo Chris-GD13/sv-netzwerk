@@ -22,7 +22,8 @@ function wtProfiles(): array
 function wtTemplates(): array
 {
     return [
-        'kva' => ['label'=>'KVA anfordern','name'=>'sv_kva_anfrage_v1','text'=>'Guten Tag {{1}}, für die weitere Bearbeitung des Schadenfalls {{2}} benötigen wir einen Kostenvoranschlag für die schadenbedingten Reparaturarbeiten. Bitte senden Sie uns diesen per E-Mail oder WhatsApp. Mit freundlichen Grüßen {{3}}, SV-Netzwerk'],
+        'meta_start' => ['label'=>'Kontakt eröffnen (Meta-Standard)','name'=>'hello_world','text'=>'Meta-Standardnachricht zur Eröffnung des WhatsApp-Kontakts. Nach einer Antwort kann innerhalb von 24 Stunden Freitext gesendet werden.','parameters'=>0],
+        'kva' => ['label'=>'KVA anfordern','name'=>'sv_kva_anfrage_v1','text'=>'Guten Tag {{1}}, für die weitere Bearbeitung des Schadenfalls {{2}} benötigen wir einen Kostenvoranschlag für die schadenbedingten Reparaturarbeiten. Bitte senden Sie uns diesen per E-Mail oder WhatsApp. Mit freundlichen Grüßen {{3}}, SV-Netzwerk','parameters'=>3],
         'unterlagen' => ['label'=>'Unterlagen anfordern','name'=>'sv_unterlagen_anfordern_v1','text'=>'Guten Tag {{1}}, für die weitere Bearbeitung des Schadenfalls {{2}} benötigen wir noch die ausstehenden Unterlagen. Bitte senden Sie uns diese per E-Mail oder WhatsApp. Mit freundlichen Grüßen {{3}}, SV-Netzwerk'],
         'rueckruf' => ['label'=>'Rückruf erbeten','name'=>'sv_rueckrufbitte_v1','text'=>'Guten Tag {{1}}, wir möchten den Schadenfall {{2}} kurz mit Ihnen abstimmen. Bitte rufen Sie uns bei Gelegenheit zurück. Mit freundlichen Grüßen {{3}}, SV-Netzwerk'],
         'termin' => ['label'=>'Termin abstimmen','name'=>'sv_terminabstimmung_v1','text'=>'Guten Tag {{1}}, zum Schadenfall {{2}} möchten wir einen Besichtigungstermin mit Ihnen abstimmen. Bitte teilen Sie uns mit, wann Sie erreichbar sind. Mit freundlichen Grüßen {{3}}, SV-Netzwerk'],
@@ -111,7 +112,7 @@ try {
             foreach (($remote['data'] ?? []) as $row) $statuses[(string)($row['name'] ?? '')] = strtoupper((string)($row['status'] ?? ''));
         }
         $result = [];
-        foreach ($templates as $key=>$tpl) $result[] = ['key'=>$key,'label'=>$tpl['label'],'name'=>$tpl['name'],'text'=>$tpl['text'],'status'=>$statuses[$tpl['name']] ?? 'MISSING'];
+        foreach ($templates as $key=>$tpl) $result[] = ['key'=>$key,'label'=>$tpl['label'],'name'=>$tpl['name'],'text'=>$tpl['text'],'parameters'=>(int)($tpl['parameters']??3),'status'=>$statuses[$tpl['name']] ?? 'MISSING'];
         apiJson(['ok'=>true,'templates'=>$result]);
     }
 
@@ -127,19 +128,17 @@ try {
         $caseNo = trim((string)($body['case_no'] ?? '')) ?: 'ohne Schaden-Nr.';
         $contact = mb_substr($contact,0,120);
         $caseNo = mb_substr($caseNo,0,120);
+        $templatePayload = ['name'=>$tpl['name'],'language'=>['code'=>$key==='meta_start'?'en_US':wtEnv('WHATSAPP_TEMPLATE_LANGUAGE','de')]];
+        if ((int)($tpl['parameters']??3) > 0) $templatePayload['components'] = [['type'=>'body','parameters'=>[
+            ['type'=>'text','text'=>$contact],
+            ['type'=>'text','text'=>$caseNo],
+            ['type'=>'text','text'=>(string)$profile['name']],
+        ]]];
         $result = wtGraph('POST', rawurlencode($connection['phone_id']) . '/messages', [
             'messaging_product'=>'whatsapp',
             'to'=>ltrim($phone,'+'),
             'type'=>'template',
-            'template'=>[
-                'name'=>$tpl['name'],
-                'language'=>['code'=>wtEnv('WHATSAPP_TEMPLATE_LANGUAGE','de')],
-                'components'=>[['type'=>'body','parameters'=>[
-                    ['type'=>'text','text'=>$contact],
-                    ['type'=>'text','text'=>$caseNo],
-                    ['type'=>'text','text'=>(string)$profile['name']],
-                ]]],
-            ],
+            'template'=>$templatePayload,
         ], $connection['token']);
         $wamid = (string)($result['messages'][0]['id'] ?? '');
         if ($wamid === '') throw new RuntimeException('WhatsApp hat keine Versandbestätigung geliefert.');
