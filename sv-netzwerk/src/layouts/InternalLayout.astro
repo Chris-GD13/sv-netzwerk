@@ -17,12 +17,17 @@ const currentPath = props.currentPath ?? Astro.url.pathname;
 const internalLinks = [
   { href: '/intern/tagescockpit/', label: 'Tagescockpit', icon: '●' },
   { href: '/intern/versicherungsfaelle/', label: 'Versicherungsfälle', icon: '⌂' },
+  { href: '/intern/privatauftraege/', label: 'Privatgutachten', icon: '⌑' },
+  { href: '/intern/fensterpruefung-bonn/', label: 'Fenstergutachten', icon: '▣', sub: true },
+  { divider: true },
   { href: '/intern/telefon/', label: 'Telefonzentrale', icon: '☎' },
+  { dynamic: 'whatsapp', label: 'WhatsApp', icon: '◉' },
+  { href: '/intern/kalender/', label: 'Kalender', icon: '□' },
+  { divider: true },
   { href: '/intern/kalkulation/', label: 'Kalkulation', icon: '▦' },
   { href: '/intern/zeitwertberechnung/', label: 'Zeitwertberechnung', icon: '⌛' },
-  { href: '/intern/fensterpruefung-bonn/', label: 'Fenstergutachten', icon: '▣' },
-  { href: '/intern/kalender/', label: 'Kalender', icon: '□' },
-  { href: '/intern/privatauftraege/', label: 'Privataufträge', icon: '⌑' },
+  { divider: true },
+  { dynamic: 'settlement', label: 'Buchhaltung', icon: '€' },
 ];
 const isActive = (href: string) => currentPath.startsWith(href);
 ---
@@ -47,6 +52,8 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__nav a:hover { background: #e7e9eb; }
       .intern-sidebar__nav a.active { background: #fff; border-color: #d9dde1; }
       .intern-sidebar__nav a.active::before { content: ''; position: absolute; left: -1px; top: 8px; bottom: 8px; width: 3px; background: #f59a23; }
+      .intern-sidebar__nav a.sub { margin-left: 14px; padding-top: 8px; padding-bottom: 8px; font-size: .92rem; }
+      .intern-sidebar__divider { height: 12px; border-top: 1px solid #d9dde1; margin: 8px 8px 0; }
       .intern-sidebar__nav a span, .intern-header__logout span, .intern-header__login span { width: 22px; color: #f59a23; font-size: 1.1rem; text-align: center; }
       .intern-header__identity { display: flex; align-items: center; gap: 9px; }
       #intern-main { min-width: 0; }
@@ -169,9 +176,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
     <div class="intern-portal-shell">
       <aside class="intern-sidebar">
         <nav aria-label="Interne Navigation" class="intern-sidebar__nav">
-          {internalLinks.map((link) => <a class:list={{ active: isActive(link.href) }} href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
-          <a id="intern-whatsapp-link" class:list={{ active: isActive('/intern/whatsapp/') }} href="/intern/whatsapp/" aria-current={isActive('/intern/whatsapp/') ? 'page' : undefined} hidden><span>◉</span>WhatsApp</a>
-          <a id="intern-settlement-link" class:list={{ active: isActive('/intern/abrechnungen/') }} href="/intern/abrechnungen/" aria-current={isActive('/intern/abrechnungen/') ? 'page' : undefined} hidden><span>€</span>Abrechnungen</a>
+          {internalLinks.map((link) => link.divider ? <div class="intern-sidebar__divider" aria-hidden="true"></div> : link.dynamic === 'whatsapp' ? <a id="intern-whatsapp-link" class:list={{ active: isActive('/intern/whatsapp/') }} href="/intern/whatsapp/" aria-current={isActive('/intern/whatsapp/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : link.dynamic === 'settlement' ? <a id="intern-settlement-link" class:list={{ active: isActive('/intern/abrechnungen/') }} href="/intern/abrechnungen/" aria-current={isActive('/intern/abrechnungen/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : <a class:list={{ active: isActive(link.href ?? ''), sub: link.sub }} href={link.href ?? '#'} aria-current={isActive(link.href ?? '') ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
           <slot name="sidebar-extra" />
         </nav>
         <button class="intern-header__logout" id="intern-logout" type="button"><span>↪</span>Abmelden</button>
