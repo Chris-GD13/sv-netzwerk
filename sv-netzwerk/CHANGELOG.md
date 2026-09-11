@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.53 – 2026-09-11
+
+- WhatsApp-Erstkontakte wählen automatisch einen bei Meta freigegebenen Textbaustein statt unzulässigem Freitext außerhalb des 24-Stunden-Fensters.
+- Parameterlose Meta-Startvorlage `hello_world` als sicherer Eröffnungskanal ergänzt; nach Antwort bleibt Freitext innerhalb des Servicefensters möglich.
+- Aussagekräftiger Hinweis ergänzt, falls noch keine freigegebene Vorlage verfügbar ist.
+
 ## 3.4.52 – 2026-09-10
 
 - Meta-Unternehmenskonto `SV-Netzwerk` für Christian Wächter als verifiziert und genehmigt hinterlegt.
