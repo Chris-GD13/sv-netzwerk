@@ -1,0 +1,16 @@
+---
+import InternalLayout from '../../../layouts/InternalLayout.astro';
+---
+<InternalLayout title="Privataufträge" description="Eigene private Gutachten und Auftragsunterlagen.">
+  <main class="private-orders"><header><p class="eyebrow">Persönlicher Arbeitsbereich</p><h1>Privataufträge</h1><p id="state">Eigene Auftragsunterlagen werden geladen …</p></header><label class="search">Suchen<input id="q" type="search" placeholder="Auftrag, Kunde, Ort oder Datei"></label><section id="list" aria-live="polite"></section></main>
+</InternalLayout>
+<style>
+.private-orders{padding:28px;max-width:1200px;color:#17324a}.private-orders header{border-bottom:1px solid #d9dde1;padding-bottom:18px;margin-bottom:18px}.eyebrow{margin:0;color:#f59a23;font-weight:900}.private-orders h1{margin:4px 0}.private-orders header p:last-child{color:#607486}.search{display:grid;gap:6px;max-width:560px;font-weight:800}.search input{padding:11px;border:1px solid #bdc8d1;font:inherit}.tree{margin-top:20px;display:grid;gap:8px}.row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:12px 14px;border:1px solid #d4dce2;background:#fff}.row.folder{background:#f4f7f9;font-weight:800}.path{color:#647789;font-size:.84rem}.row a{color:#146b8c;font-weight:800}.empty{padding:14px;background:#fff8ec;border-left:4px solid #f59a23}
+</style>
+<script is:inline>
+const state=document.getElementById('state'), list=document.getElementById('list'), q=document.getElementById('q'); let items=[];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const flat=(rows,out=[])=>{for(const row of rows){out.push(row);if(row.folder)flat(row.children||[],out)}return out};
+function render(){const term=q.value.trim().toLowerCase();const rows=items.filter(x=>!term||`${x.name} ${x.path}`.toLowerCase().includes(term));list.innerHTML=rows.length?`<div class="tree">${rows.map(x=>x.folder?`<div class="row folder"><span>📁 ${esc(x.path)}</span><span class="path">Ordner</span></div>`:`<div class="row"><span>📄 ${esc(x.path)}</span><a href="/intern/api/private-orders.php?action=file&id=${encodeURIComponent(x.id)}" target="_blank" rel="noreferrer">Öffnen</a></div>`).join('')}</div>`:'<p class="empty">Keine passenden Privataufträge gefunden.</p>'}
+async function load(){try{const r=await fetch('/intern/api/private-orders.php?action=list',{credentials:'same-origin',cache:'no-store'}),d=await r.json();if(!r.ok||!d.ok)throw Error(d.error||`HTTP ${r.status}`);items=flat(d.items||[]);state.textContent=`Quelle: ${d.root?.path||'OneDrive'} · ${items.filter(x=>!x.folder).length} Dateien`;render()}catch(e){state.textContent=e.message;state.className='error'}}q.addEventListener('input',render);load();
+</script>
