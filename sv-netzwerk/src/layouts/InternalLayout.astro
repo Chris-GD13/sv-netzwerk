@@ -56,6 +56,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__divider { height: 12px; border-top: 1px solid #d9dde1; margin: 8px 8px 0; }
       .intern-sidebar__nav a span, .intern-header__logout span, .intern-header__login span { width: 22px; color: #f59a23; font-size: 1.1rem; text-align: center; }
       .intern-header__identity { display: flex; align-items: center; gap: 9px; }
+      .intern-header__auth-actions { display: inline-flex; align-items: center; gap: 7px; }
       #intern-main { min-width: 0; }
       .chatgpt-onboarding { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; background: rgba(7, 26, 46, .66); }
       .chatgpt-onboarding[hidden] { display: none; }
@@ -116,6 +117,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-header__logout {
         margin-top: 18px;
       }
+      .intern-header__auth-actions .intern-header__logout { margin-top: 0; width: auto; padding: 8px 10px; border-color: rgba(255, 255, 255, .48); line-height: 1; white-space: nowrap; }
       .intern-header__logout:hover,
       .intern-header__logout:focus-visible,
       .intern-header__login:hover,
@@ -150,6 +152,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
         .intern-header .intern-header__brand { flex-wrap: wrap; }
         .intern-header__identity { width: 100%; }
         .intern-header__login { position: static; transform: none; padding: 7px 8px; font-size: .76rem; }
+        .intern-header__auth-actions .intern-header__logout { padding: 7px 8px; font-size: .76rem; }
         .intern-header__revenue-summary { display: none; }
       }
     </style>
@@ -159,7 +162,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       <div class="sv-container intern-header__inner">
         <div class="intern-header__brand">
           <div class="intern-header__identity">
-            <a class="intern-header__login" href="/intern/login/"><span>↩</span>Anmelden</a>
+            <div class="intern-header__auth-actions"><a class="intern-header__login" href="/intern/login/"><span>↩</span>Anmelden</a><button class="intern-header__logout" id="intern-logout" type="button"><span>↪</span>Abmelden</button></div>
             <a class="site-brand" href="/" aria-label="SV-Netzwerk – Startseite">
               <img class="intern-header__logo" src={logoSrc.src} alt="SV-Netzwerk" width="220" height="46" />
             </a>
@@ -179,7 +182,6 @@ const isActive = (href: string) => currentPath.startsWith(href);
           {internalLinks.map((link) => link.divider ? <div class="intern-sidebar__divider" aria-hidden="true"></div> : link.dynamic === 'whatsapp' ? <a id="intern-whatsapp-link" class:list={{ active: isActive('/intern/whatsapp/') }} href="/intern/whatsapp/" aria-current={isActive('/intern/whatsapp/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : link.dynamic === 'settlement' ? <a id="intern-settlement-link" class:list={{ active: isActive('/intern/abrechnungen/') }} href="/intern/abrechnungen/" aria-current={isActive('/intern/abrechnungen/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : <a class:list={{ active: isActive(link.href ?? ''), sub: link.sub }} href={link.href ?? '#'} aria-current={isActive(link.href ?? '') ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
           <slot name="sidebar-extra" />
         </nav>
-        <button class="intern-header__logout" id="intern-logout" type="button"><span>↪</span>Abmelden</button>
       </aside>
       <script is:inline src="/intern/drive-status-cache.js?v=20260829-1"></script>
       <main id="intern-main"><slot /></main>
