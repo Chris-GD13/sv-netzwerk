@@ -44,4 +44,6 @@ assert(templateApi.includes("'meta_start' =>")&&templateApi.includes("'name'=>'h
 assert(api.includes('function waSendText')&&api.includes("$action === 'send_message'")&&api.includes("'type'=>'text'"),'Freier WhatsApp-Textversand fehlt serverseitig');
 assert(!accountPage.includes('wa-webhook-setup')&&!accountPage.includes('Verifizierungstoken')&&!accountClient.includes('webhook_setup'),'Webhook-Geheimnisse dürfen auf der persönlichen WhatsApp-Seite nicht angezeigt werden');
 assert(client.includes('const escape=')&&client.includes('escape(row.original_name||row.caption'),'WhatsApp-Inhalte müssen vor der Darstellung maskiert werden');
+assert(accountClient.includes('META_REENGAGEMENT_CODE=131047')&&accountClient.includes('metaErrorCode(text)===META_REENGAGEMENT_CODE')&&!accountClient.includes('/unknown error/i.test'),'Nur der echte Meta-Code 131047 darf als 24-Stunden-Fensterproblem angezeigt werden, sonst wird der wahre Fehler (z. B. ein ungültiger Zugriffstoken) verschleiert');
+assert(!templateApi.includes("stripos($message, 'unknown error')"),'Ein generischer Meta-Fehler beim Textbaustein-Versand darf nicht pauschal als 24-Stunden-Fensterproblem umgedeutet werden');
 console.log('whatsapp_case_test: ok');

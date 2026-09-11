@@ -87,7 +87,11 @@ function wtGraph(string $method, string $path, ?array $json, string $token): arr
     if ($status < 200 || $status >= 300) {
         $message = trim((string)($data['error']['message'] ?? ''));
         $code = (int)($data['error']['code'] ?? 0);
-        if ($message === '' || stripos($message, 'unknown error') !== false) $message = 'Meta hat den Versand abgelehnt. Bitte prüfen Sie, ob für Freitext ein 24-Stunden-Servicefenster besteht oder verwenden Sie einen freigegebenen Textbaustein.';
+        // Ein generischer Meta-Fehler (z. B. Code 1 "Unknown error" bei einem abgelaufenen Zugriffstoken oder
+        // einer falsch konfigurierten WABA) darf niemals pauschal als 24-Stunden-Fensterproblem ausgegeben
+        // werden: Freigegebene Textbausteine funktionieren gerade unabhängig vom Servicefenster, daher wäre
+        // diese Erklärung hier sachlich falsch und würde den tatsächlich behebbaren Fehler verschleiern.
+        if ($message === '') $message = 'Meta hat die Anfrage ohne nähere Angabe abgelehnt.';
         throw new RuntimeException($message . ($code ? ' (Meta-Code ' . $code . ')' : ''));
     }
     return is_array($data) ? $data : [];
