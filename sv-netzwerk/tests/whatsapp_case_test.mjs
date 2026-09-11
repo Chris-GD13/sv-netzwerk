@@ -5,6 +5,7 @@ const api=fs.readFileSync(fromProject('public/intern/api/whatsapp-case.php'),'ut
 const client=fs.readFileSync(fromProject('public/intern/whatsapp-case.js'),'utf8');
 const accountPage=fs.readFileSync(fromProject('src/pages/intern/whatsapp/index.astro'),'utf8');
 const accountClient=fs.readFileSync(fromProject('public/intern/whatsapp-account.js'),'utf8');
+const templateApi=fs.readFileSync(fromProject('public/intern/api/whatsapp-template-send.php'),'utf8');
 const layout=fs.readFileSync(fromProject('src/layouts/InternalLayout.astro'),'utf8');
 const assert=(condition,message)=>{if(!condition)throw new Error(message)};
 for(const token of ['vf-wa-panel','vf-wa-vn','vf-wa-sanierer','vf-wa-send','vf-wa-connect','WhatsApp verbinden','WhatsApp noch nicht verbunden','/intern/whatsapp-case.js'])assert(page.includes(token),`Portalbestandteil fehlt: ${token}`);
@@ -38,6 +39,8 @@ assert(accountPage.includes('<details class="wa-card wa-account-card">'),'Kontos
 assert(accountClient.includes('selected_expert')&&accountClient.includes('complete_signup')&&accountClient.includes('Die WhatsApp-Konten anderer Bearbeiter bleiben getrennt.'),'Die eigene Kontoseite muss Profilwahl, Meta-Verbindung und Kontentrennung enthalten');
 for(const token of ['wa-recipient-phone','wa-message-text','wa-message-send','wa-phonebook-search','wa-case-search'])assert(accountPage.includes(token),`Versandfeld der WhatsApp-Kontoseite unvollständig: ${token}`);
 assert(accountClient.includes('PHONEBOOK_API')&&accountClient.includes('?action=list')&&accountClient.includes('action=search_cases')&&accountClient.includes('action=send_message'),'Telefonbuch-, Akten- oder Direktversand-Anbindung fehlt');
+assert(accountClient.includes("approved.find(t=>t.key==='allgemein')||approved.find(t=>t.key==='meta_start')")&&accountClient.includes('ist für den Erstkontakt vorausgewählt'),'Ein freigegebener Textbaustein muss beim Erstkontakt automatisch vorausgewählt werden');
+assert(templateApi.includes("'meta_start' =>")&&templateApi.includes("'name'=>'hello_world'")&&templateApi.includes("$key==='meta_start'?'en_US'")&&templateApi.includes("'parameters'=>0"),'Die parameterlose Meta-Startvorlage fehlt');
 assert(api.includes('function waSendText')&&api.includes("$action === 'send_message'")&&api.includes("'type'=>'text'"),'Freier WhatsApp-Textversand fehlt serverseitig');
 assert(!accountPage.includes('wa-webhook-setup')&&!accountPage.includes('Verifizierungstoken')&&!accountClient.includes('webhook_setup'),'Webhook-Geheimnisse dürfen auf der persönlichen WhatsApp-Seite nicht angezeigt werden');
 assert(client.includes('const escape=')&&client.includes('escape(row.original_name||row.caption'),'WhatsApp-Inhalte müssen vor der Darstellung maskiert werden');
