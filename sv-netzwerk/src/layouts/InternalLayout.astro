@@ -56,8 +56,10 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__divider { height: 12px; border-top: 1px solid #d9dde1; margin: 8px 8px 0; }
       .intern-sidebar__nav a span, .intern-header__logout span, .intern-header__login span { width: 22px; color: #f59a23; font-size: 1.1rem; text-align: center; }
       .intern-header__identity { display: flex; align-items: center; gap: 9px; }
-      .intern-header__auth-actions { display: inline-flex; align-items: center; gap: 7px; }
-      .intern-header__auth-actions { position: relative; left: -22px; }
+      .intern-header__inner { position: relative; }
+      .intern-header__auth-actions { display: inline-flex; align-items: center; gap: 7px; position: absolute; left: 24px; top: 50%; transform: translateY(-50%); }
+      .intern-header__auth-actions .intern-header__login,
+      .intern-header__auth-actions .intern-header__logout { box-sizing: border-box; height: 36px; padding: 8px 12px; font-size: .82rem; font-weight: 800; line-height: 1; }
       .intern-header__auth-actions .intern-header__login { position: static !important; top: auto !important; left: auto !important; transform: none !important; }
       .intern-header__auth-actions .intern-header__logout { width: auto; margin-top: 0; padding: 8px 10px; border-color: rgba(255,255,255,.48); line-height: 1; white-space: nowrap; }
       @media (min-width: 681px) { .intern-header__inner { flex-wrap: nowrap; } .intern-header__brand { flex-wrap: nowrap; min-width: 0; } .intern-header__revenue-summary { margin-left: auto; } }
@@ -152,7 +154,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
         .intern-header__revenue-item:first-child { padding-top: 0; border-top: 0; }
       }
       @media (max-width: 680px) {
-        .intern-header__auth-actions { left: 0; }
+        .intern-header__auth-actions { position: static; transform: none; }
         .intern-header .intern-header__brand { flex-wrap: wrap; }
         .intern-header__identity { width: 100%; }
         .intern-header__login { position: static; transform: none; padding: 7px 8px; font-size: .76rem; }
