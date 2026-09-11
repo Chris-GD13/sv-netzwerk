@@ -57,6 +57,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__nav a span, .intern-header__logout span, .intern-header__login span { width: 22px; color: #f59a23; font-size: 1.1rem; text-align: center; }
       .intern-header__identity { display: flex; align-items: center; gap: 9px; }
       .intern-header__auth-actions { display: inline-flex; align-items: center; gap: 7px; }
+      .intern-header__auth-actions .intern-header__login { position: static; transform: none; padding: 8px 10px; line-height: 1; }
       #intern-main { min-width: 0; }
       .chatgpt-onboarding { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; background: rgba(7, 26, 46, .66); }
       .chatgpt-onboarding[hidden] { display: none; }
