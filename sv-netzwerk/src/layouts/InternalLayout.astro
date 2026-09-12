@@ -57,7 +57,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__nav a span, .intern-header__logout span, .intern-header__login span { width: 22px; color: #f59a23; font-size: 1.1rem; text-align: center; }
       .intern-header__identity { display: flex; align-items: center; gap: 9px; }
       .intern-header__inner { position: relative; }
-      .intern-header__auth-actions { display: inline-flex; align-items: center; gap: 7px; position: absolute; left: 24px; top: 50%; transform: translateY(-50%); }
+      .intern-header__auth-actions { display: inline-flex; align-items: center; gap: 7px; position: absolute; left: 0; top: 10px; transform: none; z-index: 3; }
       .intern-header__auth-actions .intern-header__login,
       .intern-header__auth-actions .intern-header__logout { box-sizing: border-box; height: 36px; padding: 8px 12px; font-size: .82rem; font-weight: 800; line-height: 1; }
       .intern-header__auth-actions .intern-header__login { position: static !important; top: auto !important; left: auto !important; transform: none !important; }
