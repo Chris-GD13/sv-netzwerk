@@ -34,7 +34,22 @@ function poDriveId(): string { static $id=null; if (is_string($id)&&$id!=='') re
 function poItemByPath(string $path): array { $parent=''; $match=null; foreach(array_values(array_filter(explode('/',trim($path,'/')),fn($p)=>$p!=='')) as $part){$url='https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).($parent===''?'/root/children':'/items/'.rawurlencode($parent).'/children'). '?$select=id,name,size,file,folder,createdDateTime,lastModifiedDateTime,webUrl&$top=200'; $match=null; do{$page=poRequest($url);foreach(($page['value']??[]) as $item){if(is_array($item)&&strcasecmp((string)($item['name']??''),$part)===0){$match=$item;break 2;}}$url=(string)($page['@odata.nextLink']??'');}while($url!==''); if(!is_array($match)||empty($match['id']))apiError(404,'Privatauftragsordner nicht gefunden: '.$part);$parent=(string)$match['id'];} return $match?:[]; }
 function poTree(string $id,string $path='',int $depth=0): array { if($depth>8)return []; $url='https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id).'/children?$select=id,name,size,file,folder,createdDateTime,lastModifiedDateTime,webUrl&$top=200';$out=[];do{$page=poRequest($url);foreach(($page['value']??[]) as $item){if(!is_array($item)||empty($item['id']))continue;$name=(string)($item['name']??'');$row=['id'=>(string)$item['id'],'name'=>$name,'path'=>ltrim($path.'/'.$name,'/'),'folder'=>isset($item['folder']),'size'=>(int)($item['size']??0),'modified'=>(string)($item['lastModifiedDateTime']??''),'webUrl'=>(string)($item['webUrl']??'')];if($row['folder'])$row['children']=poTree($row['id'],$row['path'],$depth+1);$out[]=$row;}$url=(string)($page['@odata.nextLink']??'');}while($url!=='');usort($out,fn($a,$b)=>[$b['folder'],$a['name']]<=>[$a['folder'],$b['name']]);return $out; }
 function poFind(array $rows,string $id): ?array { foreach($rows as $row){ if(hash_equals((string)($row['id']??''),$id)) return $row; if(!empty($row['folder'])){ $found=poFind((array)($row['children']??[]),$id); if($found)return $found; } } return null; }
+function poStandardFolders(): array { return ['Auftrag','Angebot','Rechnungen','Gutachten','Dateien','Bilder','E-Mails','Eingang KI']; }
+function poEnsureFolders(array $item): void {
+    if (empty($item['id']) || empty($item['folder'])) return;
+    $existing = [];
+    foreach ((array)($item['children'] ?? []) as $child) if (!empty($child['folder'])) $existing[mb_strtolower((string)($child['name'] ?? ''), 'UTF-8')] = true;
+    foreach (poStandardFolders() as $name) {
+        if (isset($existing[mb_strtolower($name, 'UTF-8')])) continue;
+        poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode((string)$item['id']).'/children',['name'=>$name,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'fail']);
+    }
+}
 $root=poItemByPath($roots[$profile]);
-if ($action==='list') { apiJson(['ok'=>true,'profile'=>$profile,'root'=>['name'=>$root['name']??basename($roots[$profile]),'path'=>$roots[$profile]],'items'=>poTree((string)$root['id'])]); }
+if ($action==='list') {
+    $items = poTree((string)$root['id']);
+    foreach ($items as $item) poEnsureFolders($item);
+    if ($items) $items = poTree((string)$root['id']);
+    apiJson(['ok'=>true,'profile'=>$profile,'root'=>['name'=>$root['name']??basename($roots[$profile]),'path'=>$roots[$profile]],'items'=>$items,'standard_folders'=>poStandardFolders()]);
+}
 if ($action==='file') { $id=trim((string)($_GET['id']??'')); if($id==='')apiError(400,'Datei-ID fehlt.'); $tree=poTree((string)$root['id']); $item=poFind($tree,$id); if(!$item||!empty($item['folder']))apiError(403,'Diese Datei gehört nicht zum eigenen Privatauftragsbereich.'); $r=poRequest('https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id).'/content',true); header('Content-Type: '.($r['content_type']?:'application/octet-stream')); header('Content-Disposition: inline; filename="'.str_replace('"','',basename((string)$item['name'])).'"'); echo $r['body']; exit; }
 apiError(404,'Unbekannte Aktion für Privataufträge.');
