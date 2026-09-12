@@ -17,8 +17,6 @@ const currentPath = props.currentPath ?? Astro.url.pathname;
 const internalLinks = [
   { href: '/intern/tagescockpit/', label: 'Tagescockpit', icon: '●' },
   { href: '/intern/versicherungsfaelle/', label: 'Versicherungsfälle', icon: '⌂' },
-  { href: '/intern/privatauftraege/', label: 'Privatgutachten', icon: '⌑' },
-  { href: '/intern/fensterpruefung-bonn/', label: 'Fenstergutachten', icon: '▣', sub: true },
   { divider: true },
   { href: '/intern/telefon/', label: 'Telefonzentrale', icon: '☎' },
   { dynamic: 'whatsapp', label: 'WhatsApp', icon: '◉' },
@@ -28,6 +26,9 @@ const internalLinks = [
   { href: '/intern/zeitwertberechnung/', label: 'Zeitwertberechnung', icon: '⌛' },
   { divider: true },
   { dynamic: 'settlement', label: 'Buchhaltung', icon: '€' },
+  { divider: true },
+  { href: '/intern/privatauftraege/', label: 'Privatgutachten', icon: '⌑' },
+  { href: '/intern/fensterpruefung-bonn/', label: 'Fenstergutachten', icon: '▣', sub: true },
 ];
 const isActive = (href: string) => currentPath.startsWith(href);
 ---
