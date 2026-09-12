@@ -61,9 +61,13 @@ function poEnsureFolders(array $item): void {
 $root=poItemByPath($roots[$profile]);
 if ($action==='list') {
     $items = poTree((string)$root['id']);
-    foreach ($items as $item) poEnsureFolders($item);
-    if ($items) $items = poTree((string)$root['id']);
     apiJson(['ok'=>true,'profile'=>$profile,'root'=>['name'=>$root['name']??basename($roots[$profile]),'path'=>$roots[$profile]],'items'=>$items,'standard_folders'=>poStandardFolders()]);
+}
+if ($action==='ensure' && $_SERVER['REQUEST_METHOD']==='POST') {
+    $input=json_decode((string)file_get_contents('php://input'),true);$id=trim((string)($input['id']??''));
+    $tree=poTree((string)$root['id']);$item=poFind($tree,$id);
+    if(!$item||empty($item['folder'])||preg_match('/^20\\d{2}$/',(string)($item['name']??'')))apiError(403,'Ungültiger Auftragsordner.');
+    poEnsureFolders($item);apiJson(['ok'=>true]);
 }
 if ($action==='file') { $id=trim((string)($_GET['id']??'')); if($id==='')apiError(400,'Datei-ID fehlt.'); $tree=poTree((string)$root['id']); $item=poFind($tree,$id); if(!$item||!empty($item['folder']))apiError(403,'Diese Datei gehört nicht zum eigenen Privatauftragsbereich.'); $r=poRequest('https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id).'/content',true); header('Content-Type: '.($r['content_type']?:'application/octet-stream')); header('Content-Disposition: inline; filename="'.str_replace('"','',basename((string)$item['name'])).'"'); echo $r['body']; exit; }
 if ($action==='create' && $_SERVER['REQUEST_METHOD']==='POST') { $input=json_decode((string)file_get_contents('php://input'),true);$name=trim((string)($input['name']??''));$parent=trim((string)($input['parent_id']??$root['id']));if($name===''||mb_strlen($name)>120||preg_match('/[\\\/\x00-\x1F]/u',$name))apiError(400,'Bitte einen gültigen Auftragsnamen eingeben.');$tree=poTree((string)$root['id']);if($parent!==(string)$root['id']&&!poFind($tree,$parent))apiError(403,'Der Zielordner gehört nicht zum eigenen Privatauftragsbereich.');$created=poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($parent).'/children',['name'=>$name,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'rename']);foreach(['Auftrag','Fotos','Gutachten','Angebot','Rechnungen','E-Mails','Bilder','Dateien','Sonstige Unterlagen','Eingang KI'] as $sub)poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode((string)($created['id']??'')).'/children',['name'=>$sub,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'fail']);apiJson(['ok'=>true,'item'=>$created]);}
