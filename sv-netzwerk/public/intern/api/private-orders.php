@@ -49,7 +49,13 @@ function poEnsureFolders(array $item): void {
     foreach ((array)($item['children'] ?? []) as $child) if (!empty($child['folder'])) $existing[mb_strtolower((string)($child['name'] ?? ''), 'UTF-8')] = true;
     foreach (poStandardFolders() as $name) {
         if (isset($existing[mb_strtolower($name, 'UTF-8')])) continue;
-        poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode((string)$item['id']).'/children',['name'=>$name,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'fail']);
+        try {
+            poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode((string)$item['id']).'/children',['name'=>$name,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'fail']);
+        } catch (Throwable $e) {
+            // Leserechte genügen für die Aktenansicht; die Liste darf bei einem
+            // schreibgeschützten OneDrive nicht mit HTTP 403 abbrechen.
+            continue;
+        }
     }
 }
 $root=poItemByPath($roots[$profile]);
