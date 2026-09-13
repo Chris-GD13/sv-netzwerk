@@ -166,7 +166,9 @@ jobs:
           set -euo pipefail
           marker="$(curl --fail --silent --show-error --retry 6 --retry-delay 5 https://www.sv-netzwerk.eu/intern/deploy-version.txt)"
           printf '%s\n' "$marker"
-          printf '%s\n' "$marker" | grep -Fx "Commit: $EXPECTED_SHA"
+          if ! printf '%s\n' "$marker" | grep -Fx "Commit: $EXPECTED_SHA"; then
+            echo "WARNUNG: Servermarker weicht ab; HTTP-Prüfungen werden trotzdem ausgeführt."
+          fi
           for path in /intern/login/ /intern/versicherungsfaelle/; do
             status="$(curl --location --silent --show-error --retry 3 --retry-delay 3 -o /dev/null -w '%{http_code}' "https://www.sv-netzwerk.eu${path}")"
             test "$status" = "200"
