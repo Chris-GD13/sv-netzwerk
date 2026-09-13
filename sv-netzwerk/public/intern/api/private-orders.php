@@ -76,6 +76,13 @@ if ($action==='list' || $action==='cases') {
 if ($action==='case') {
     $id=trim((string)($_GET['id']??''));if($id==='')apiError(400,'Auftrags-ID fehlt.');$item=poValidateScope($id,(string)$root['id']);if(empty($item['folder']))apiError(403,'Ungültiger Auftragsordner.');$path=ltrim((string)($item['name']??''),'/');$children=poChildren($id,$path);foreach($children as &$child){if($child['folder'])$child['children']=poChildren($child['id'],$child['path']);}unset($child);$item=['id'=>(string)$item['id'],'name'=>(string)($item['name']??''),'path'=>$path,'folder'=>true,'children'=>$children];apiJson(['ok'=>true,'item'=>$item]);
 }
+if ($action==='organize-lite' && $_SERVER['REQUEST_METHOD']==='POST') {
+    $top=poChildren((string)$root['id'],$roots[$profile]);$orders=[];
+    foreach($top as $item){if(!$item['folder']||poIsStandardFolder($item))continue;if(poIsYearFolder($item)){foreach(poChildren($item['id'],$item['path']) as $candidate)if($candidate['folder']&&!poIsStandardFolder($candidate))$orders[]=$candidate;}else $orders[]=$item;}
+    $moved=0;$created=0;
+    foreach($orders as $order){$children=poChildren($order['id'],$order['path']);$folders=[];foreach($children as $child)if($child['folder'])$folders[mb_strtolower($child['name'],'UTF-8')]=(string)$child['id'];foreach(poStandardFolders() as $folderName){$key=mb_strtolower($folderName,'UTF-8');if(isset($folders[$key]))continue;$new=poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($order['id']).'/children',['name'=>$folderName,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'fail']);if(!empty($new['id'])){$folders[$key]=(string)$new['id'];$created++;}}foreach($children as $file){if($file['folder'])continue;$target=$folders[mb_strtolower(poCategory($file),'UTF-8')]??'';if($target==='')continue;poMoveFile($file['id'],$target);$moved++;}}
+    apiJson(['ok'=>true,'cases'=>count($orders),'moved'=>$moved,'created'=>$created]);
+}
 if ($action==='ensure' && $_SERVER['REQUEST_METHOD']==='POST') {
     $input=json_decode((string)file_get_contents('php://input'),true);$id=trim((string)($input['id']??''));
     $tree=poTree((string)$root['id']);$item=poFind($tree,$id);
