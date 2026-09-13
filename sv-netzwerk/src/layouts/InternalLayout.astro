@@ -44,7 +44,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
     <SEO {...props} noindex={true} robotsContent="noindex,nofollow" />
     <style is:global>
       .intern-body { background: #f4f5f6; }
-      .intern-header { border-bottom: 1px solid #d9dde1; }
+      .intern-header { position: relative; border-bottom: 1px solid #d9dde1; }
       .intern-portal-shell { display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: calc(100vh - 112px); }
       .intern-header__logo { filter: none; }
       .intern-sidebar { display: flex; flex-direction: column; justify-content: flex-start; gap: 0; padding: 22px 14px; background: #f0f1f2; border-right: 1px solid #d9dde1; }
@@ -58,7 +58,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__nav a span, .intern-header__logout span, .intern-header__login span { width: 22px; color: #f59a23; font-size: 1.1rem; text-align: center; }
       .intern-header__identity { display: flex; align-items: center; gap: 9px; }
       .intern-header__inner { position: relative; }
-      .intern-header__auth-actions { display: inline-flex; align-items: center; gap: 7px; position: absolute; left: 0; top: 10px; transform: translateX(calc((1240px - 100vw) / 2)); z-index: 3; }
+      .intern-header__auth-actions { display: inline-flex; align-items: center; gap: 7px; position: absolute; left: 14px; top: 10px; transform: none; z-index: 3; }
       .intern-header__auth-actions .intern-header__login,
       .intern-header__auth-actions .intern-header__logout { box-sizing: border-box; height: 36px; padding: 8px 12px; font-size: .82rem; font-weight: 800; line-height: 1; }
       .intern-header__auth-actions .intern-header__login { position: static !important; top: auto !important; left: auto !important; transform: none !important; }
@@ -165,10 +165,10 @@ const isActive = (href: string) => currentPath.startsWith(href);
   </head>
   <body class="intern-body">
     <header class="intern-header">
+      <div class="intern-header__auth-actions"><a class="intern-header__login" href="/intern/login/"><span>↩</span>Anmelden</a><button class="intern-header__logout" id="intern-logout" type="button"><span>↪</span>Abmelden</button></div>
       <div class="sv-container intern-header__inner">
         <div class="intern-header__brand">
           <div class="intern-header__identity">
-            <div class="intern-header__auth-actions"><a class="intern-header__login" href="/intern/login/"><span>↩</span>Anmelden</a><button class="intern-header__logout" id="intern-logout" type="button"><span>↪</span>Abmelden</button></div>
             <a class="site-brand" href="/" aria-label="SV-Netzwerk – Startseite">
               <img class="intern-header__logo" src={logoSrc.src} alt="SV-Netzwerk" width="220" height="46" />
             </a>
