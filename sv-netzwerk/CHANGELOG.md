@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.54 – 2026-09-13
+
+- Vier fehlende Fachbeiträge für die Arbeitstage 08.–11.09.2026 ergänzt: Leckageortung, Regiekostenabgrenzung, Fachgrenzen und Flachdach-Prüfpfad.
+- Fachwissenübersicht, Canonical-Routen, Suchindex-/Sitemap-Integration und vorbereitete LinkedIn-Begleittexte für die Nachlieferung ergänzt.
+
 ## 3.4.53 – 2026-09-11
 
 - WhatsApp-Erstkontakte wählen automatisch einen bei Meta freigegebenen Textbaustein statt unzulässigem Freitext außerhalb des 24-Stunden-Fensters.
