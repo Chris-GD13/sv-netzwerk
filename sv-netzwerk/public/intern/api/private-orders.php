@@ -43,6 +43,9 @@ function poItemByPath(string $path): array { $parent=''; $match=null; foreach(ar
 function poTree(string $id,string $path='',int $depth=0): array { if($depth>8)return []; $url='https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id).'/children?$select=id,name,size,file,folder,createdDateTime,lastModifiedDateTime,webUrl&$top=200';$out=[];do{$page=poRequest($url);foreach(($page['value']??[]) as $item){if(!is_array($item)||empty($item['id']))continue;$name=(string)($item['name']??'');$row=['id'=>(string)$item['id'],'name'=>$name,'path'=>ltrim($path.'/'.$name,'/'),'folder'=>isset($item['folder']),'size'=>(int)($item['size']??0),'modified'=>(string)($item['lastModifiedDateTime']??''),'webUrl'=>(string)($item['webUrl']??'')];if($row['folder'])$row['children']=poTree($row['id'],$row['path'],$depth+1);$out[]=$row;}$url=(string)($page['@odata.nextLink']??'');}while($url!=='');usort($out,fn($a,$b)=>[$b['folder'],$a['name']]<=>[$a['folder'],$b['name']]);return $out; }
 function poFind(array $rows,string $id): ?array { foreach($rows as $row){ if(hash_equals((string)($row['id']??''),$id)) return $row; if(!empty($row['folder'])){ $found=poFind((array)($row['children']??[]),$id); if($found)return $found; } } return null; }
 function poStandardFolders(): array { return ['Auftrag','Fotos','Gutachten','Angebot','Rechnungen','E-Mails','Bilder','Dateien','Sonstige Unterlagen','Eingang KI']; }
+function poIsYearFolder(array $item): bool { return !empty($item['folder']) && preg_match('/^(?:19|20)\d{2}$/', trim((string)($item['name'] ?? ''))) === 1; }
+function poIsStandardFolder(array $item): bool { static $names=null; $names ??= array_map(fn($v)=>mb_strtolower($v,'UTF-8'), poStandardFolders()); return !empty($item['folder']) && in_array(mb_strtolower(trim((string)($item['name'] ?? '')), 'UTF-8'), $names, true); }
+function poOrders(array $tree): array { $orders=[]; foreach($tree as $item){ if(empty($item['folder'])||poIsStandardFolder($item)) continue; if(poIsYearFolder($item)){ foreach((array)($item['children']??[]) as $candidate) if(!empty($candidate['folder'])&&!poIsStandardFolder($candidate)) $orders[]=$candidate; } elseif(!preg_match('/^(?:19|20)\d{2}$/',trim((string)($item['name']??'')))) $orders[]=$item; } usort($orders,fn($a,$b)=>strcasecmp((string)($a['name']??''),(string)($b['name']??''))); return $orders; }
 function poEnsureFolders(array $item): void {
     if (empty($item['id']) || empty($item['folder'])) return;
     $existing = [];
@@ -60,7 +63,7 @@ function poEnsureFolders(array $item): void {
 }
 $root=poItemByPath($roots[$profile]);
 if ($action==='list') {
-    $items = poTree((string)$root['id']);
+    $items = poOrders(poTree((string)$root['id']));
     apiJson(['ok'=>true,'profile'=>$profile,'root'=>['name'=>$root['name']??basename($roots[$profile]),'path'=>$roots[$profile]],'items'=>$items,'standard_folders'=>poStandardFolders()]);
 }
 if ($action==='ensure' && $_SERVER['REQUEST_METHOD']==='POST') {
