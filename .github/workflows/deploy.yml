@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      SFTP_REMOTE_DIR: /sv-netzwerk
+      SFTP_REMOTE_DIR: sv-netzwerk
       SFTP_CONNECT_TIMEOUT_SECONDS: 25
       SFTP_CHECK_TIMEOUT_SECONDS: 45
       SFTP_CHECK_ATTEMPTS: 10
