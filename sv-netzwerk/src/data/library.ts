@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Heizungswasserschäden fachlich prüfen: Leckage, Korrosion, Frost und Folgeschäden trennen',
+    description: 'Heizungswasserschäden werden belastbar bewertet, wenn Austrittsstelle, technische Ursache, Korrosion, Frost, Vorzustand und schadenbedingte Folgemaßnahmen getrennt dokumentiert werden.',
+    href: '/fachwissen/heizungswasserschaden-leckage-korrosion-frost-abgrenzung/',
+    category: 'Leitungswasser',
+    tags: ['Heizungswasserschaden', 'Leckage', 'Korrosion', 'Frostschaden', 'Schadenabgrenzung', 'Kostenprüfung'],
+    date: '2026-09-14',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Leitungswasserschäden: Leckageortung als prüffähige Beweiskette',
     description: 'Leckageortung bei Leitungswasserschäden fachlich einordnen: Eintrittsstelle, Ursache, Suchöffnung, Messung, Schadenminderung und Kosten sauber trennen.',
     href: '/fachwissen/leitungswasserschaden-leckageortung-pruefstrategie/',

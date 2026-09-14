@@ -370,3 +370,7 @@
 
 ## 1.5.4 – 2026-07-14
 - Performance- und Accessibility-Grundlagen erweitert
+## 2026-09-14
+- eigenständigen Fachbeitrag „Heizungswasserschäden fachlich prüfen: Leckage, Korrosion, Frost und Folgeschäden trennen“ veröffentlicht
+- Fachwissensübersicht, Kategorien, Tags, Suchindex und Sitemap um die neue Detailroute ergänzt
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt; Veröffentlichung ohne Beitragsbild gemäß Fachbeitragsstandard
