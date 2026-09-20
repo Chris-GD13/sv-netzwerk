@@ -1,5 +1,5 @@
 ---
-title: "Fenster- und Glasschäden: Verglasung, Rahmen und Reparaturgrenze getrennt bewerten"
+title: "Fenster- und Glasschäden prüffähig abgrenzen"
 description: "Bei Fenster- und Glasschäden müssen Verglasung, Rahmen, Beschlag, Anschluss und Nebenarbeiten bauteilbezogen aufgenommen und bewertet werden."
 category: "Fenster und Türen"
 tags: ["Fenster", "Glasbruch", "Verglasung", "Rahmen", "Reparatur", "Schadenabgrenzung"]
@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-09-17
   status: published
 seo:
-  title: "Fenster- und Glasschäden: Verglasung, Rahmen und Reparaturgrenze getrennt bewerten"
+  title: "Fenster- und Glasschäden prüffähig abgrenzen"
   description: "Bei Fenster- und Glasschäden müssen Verglasung, Rahmen, Beschlag, Anschluss und Nebenarbeiten bauteilbezogen aufgenommen und bewertet werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/fenster-glasschaden-verglasung-reparaturgrenze/"
   noindex: false
