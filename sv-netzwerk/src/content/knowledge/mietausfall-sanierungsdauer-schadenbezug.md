@@ -1,5 +1,5 @@
 ---
-title: "Mietausfall während der Sanierung: Nutzbarkeit, Dauer und Schadenbezug dokumentieren"
+title: "Mietausfall bei Sanierung nachvollziehbar prüfen"
 description: "Mietausfall lässt sich nur nachvollziehbar bewerten, wenn Nutzbarkeit, Sanierungsabschnitte, Vertragsgrundlage und schadenbedingte Dauer getrennt dokumentiert werden."
 category: "Regulierung und Versicherungsrecht"
 tags: ["Mietausfall", "Nutzbarkeit", "Sanierung", "Schadenbezug", "Mietminderung", "Dokumentation"]
@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-09-18
   status: published
 seo:
-  title: "Mietausfall während der Sanierung: Nutzbarkeit, Dauer und Schadenbezug dokumentieren"
+  title: "Mietausfall bei Sanierung nachvollziehbar prüfen"
   description: "Mietausfall lässt sich nur nachvollziehbar bewerten, wenn Nutzbarkeit, Sanierungsabschnitte, Vertragsgrundlage und schadenbedingte Dauer getrennt dokumentiert werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/mietausfall-sanierungsdauer-schadenbezug/"
   noindex: false
