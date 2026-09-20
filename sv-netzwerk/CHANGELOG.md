@@ -1,3 +1,8 @@
+## 2026-09-15 bis 2026-09-20
+- sechs fehlende Fachbeiträge ergänzt und in die Fachwissensübersicht integriert
+- Suchindex und Sitemap werden durch die Content Collection beim Build erzeugt
+- LinkedIn-Begleittexte als prepared-not-posted abgelegt; ohne öffentliches Beitragsbild gemäß Standard
+
 # Changelog
 
 ## 3.4.54 – 2026-09-13
