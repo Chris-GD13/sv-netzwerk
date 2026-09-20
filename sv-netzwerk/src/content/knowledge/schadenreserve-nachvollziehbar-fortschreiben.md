@@ -1,5 +1,5 @@
 ---
-title: "Schadenreserve nachvollziehbar fortschreiben: Befund, Kostenprognose und Freigabe trennen"
+title: "Schadenreserve nachvollziehbar fortschreiben"
 description: "Eine Schadenreserve bleibt belastbar, wenn Befund, beauftragte Leistungen, offene Positionen, Nachträge und Prognoserisiken getrennt fortgeschrieben werden."
 category: "Reservierung im Schadenbestand"
 tags: ["Schadenreserve", "Kostenprognose", "Freigabe", "Nachtrag", "Schadenbestand", "Dokumentation"]
@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-09-20
   status: published
 seo:
-  title: "Schadenreserve nachvollziehbar fortschreiben: Befund, Kostenprognose und Freigabe trennen"
+  title: "Schadenreserve nachvollziehbar fortschreiben"
   description: "Eine Schadenreserve bleibt belastbar, wenn Befund, beauftragte Leistungen, offene Positionen, Nachträge und Prognoserisiken getrennt fortgeschrieben werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/schadenreserve-nachvollziehbar-fortschreiben/"
   noindex: false
