@@ -1,5 +1,5 @@
 ---
-title: "Rechnungskürzungen im Schadenfall: Leistung, Menge und Schadenbezug sauber prüfen"
+title: "Rechnungskürzungen im Schadenfall prüffähig begründen"
 description: "Rechnungskürzungen sind nur belastbar, wenn Leistung, Menge, Ausführung, Schadenbezug und bereits freigegebene Positionen getrennt geprüft werden."
 category: "Rechnungs- und KVA-Prüfung"
 tags: ["Rechnungsprüfung", "Kürzung", "Schadenbezug", "Mengenprüfung", "Freigabe", "Dokumentation"]
@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-09-15
   status: published
 seo:
-  title: "Rechnungskürzungen im Schadenfall: Leistung, Menge und Schadenbezug sauber prüfen"
+  title: "Rechnungskürzungen im Schadenfall prüffähig begründen"
   description: "Rechnungskürzungen sind nur belastbar, wenn Leistung, Menge, Ausführung, Schadenbezug und bereits freigegebene Positionen getrennt geprüft werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/rechnungskuerzung-schadenfall-prueffaehigkeit/"
   noindex: false
