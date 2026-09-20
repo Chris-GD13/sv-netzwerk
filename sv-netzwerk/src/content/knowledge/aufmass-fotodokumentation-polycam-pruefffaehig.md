@@ -1,5 +1,5 @@
 ---
-title: "Digitales Aufmaß und Fotodokumentation: Messergebnisse im Schadenfall prüffähig sichern"
+title: "Digitales Aufmaß im Schadenfall prüffähig dokumentieren"
 description: "Digitales Aufmaß und Fotodokumentation sind nur dann belastbar, wenn Messgrundlage, Maßstab, Zuordnung, Genauigkeit und Bearbeitungsschritte nachvollziehbar bleiben."
 category: "Beweissicherung und Fotodokumentation"
 tags: ["Aufmaß", "Fotodokumentation", "Polycam", "Messergebnis", "Beweissicherung", "Schadenaufnahme"]
@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-09-19
   status: published
 seo:
-  title: "Digitales Aufmaß und Fotodokumentation: Messergebnisse im Schadenfall prüffähig sichern"
+  title: "Digitales Aufmaß im Schadenfall prüffähig dokumentieren"
   description: "Digitales Aufmaß und Fotodokumentation sind nur dann belastbar, wenn Messgrundlage, Maßstab, Zuordnung, Genauigkeit und Bearbeitungsschritte nachvollziehbar bleiben."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/aufmass-fotodokumentation-polycam-pruefffaehig/"
   noindex: false
@@ -55,7 +55,11 @@ Bei drohendem Rückbau oder Räumung sind zunächst Übersicht, Details und Refe
 
 ## Beweissicherung und Dokumentation
 
-Fotos sollten Raum, Blickrichtung und Maßstab zeigen. Referenzstrecken sind mit Messgerät oder Maßband aufzunehmen. Dateien sind unverändert zu archivieren; Exporte und bearbeitete Pläne müssen als solche gekennzeichnet werden. Eine Versions- und Dateibezeichnung verhindert spätere Verwechslungen.
+Fotos sollten Raum, Blickrichtung und Maßstab zeigen. Referenzstrecken sind mit Messgerät oder Maßband aufzunehmen. Dateien sind unverändert zu archivieren; Exporte und bearbeitete Pläne müssen als solche gekennzeichnet werden. Eine Versions- und Dateibezeichnung verhindert spätere Verwechslungen. Für jede Datei sollten Entstehungszeitpunkt, verantwortliche Person und verwendetes Gerät festgehalten werden.
+
+## Qualitätskontrolle digitaler Modelle
+
+Vor der Verwendung werden mindestens drei unterschiedliche Kontrollmaße an verschiedenen Stellen mit dem Modell verglichen. Die Abweichung ist mit Einheit und Messmethode zu dokumentieren. Große, glänzende, verdeckte oder strukturlose Flächen können die Erkennung beeinflussen; solche Bereiche sind im Bericht zu markieren. Werden Maße geglättet, ergänzt oder aus einer Punktwolke abgeleitet, muss der Bearbeitungsschritt nachvollziehbar bleiben. Ein Export ohne Projektdatei ist bei späteren Rückfragen nur eingeschränkt prüfbar.
 
 ## Zuständigkeits- und Fachgrenzen
 
@@ -77,7 +81,9 @@ In einem fiktiven Leitungswasserschaden wird ein mit Polycam erstelltes Aufmaß 
 
 - Versicherungsnehmer sollten Aufnehmende sollten Originaldaten, Referenzmaße und Grenzen dokumentieren.
 - Versicherer sollten Versicherer sollten digitale Aufmaße mit Fotos und Kontrollmaßen abgleichen.
-- Sachverständige sollten Sachverständige sollten Modellwerte, Messwerte und Schätzungen klar kennzeichnen..
+- Sachverständige sollten Sachverständige sollten Modellwerte, Messwerte und Schätzungen klar kennzeichnen.
+- Alle Beteiligten sollten die unveränderte Ausgangsdatei zusammen mit Export, Kontrollmaßen und Versionsnotiz archivieren.
+- Bei relevanten Abweichungen sollte die Messung wiederholt oder durch eine geeignete Fachperson ergänzt werden.
 
 ## Fazit
 
