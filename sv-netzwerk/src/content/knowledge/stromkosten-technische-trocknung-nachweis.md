@@ -1,5 +1,5 @@
 ---
-title: "Stromkosten der technischen Trocknung: Verbrauch, Laufzeit und Preisbeleg nachweisen"
+title: "Stromkosten der Trocknung prüffähig nachweisen"
 description: "Stromkosten der technischen Trocknung sind nur prüffähig, wenn Geräte, Laufzeit, Verbrauch, Strompreis und Abrechnung nachvollziehbar belegt werden."
 category: "Sanierungsplanung und Trocknung"
 tags: ["Trocknung", "Stromkosten", "kWh", "Nachweis", "EVU-Abrechnung", "Schadenminderung"]
@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-09-16
   status: published
 seo:
-  title: "Stromkosten der technischen Trocknung: Verbrauch, Laufzeit und Preisbeleg nachweisen"
+  title: "Stromkosten der Trocknung prüffähig nachweisen"
   description: "Stromkosten der technischen Trocknung sind nur prüffähig, wenn Geräte, Laufzeit, Verbrauch, Strompreis und Abrechnung nachvollziehbar belegt werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/stromkosten-technische-trocknung-nachweis/"
   noindex: false
