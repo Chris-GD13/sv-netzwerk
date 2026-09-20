@@ -31,15 +31,15 @@ In laufenden Schadenfällen verändert sich die Kostenprognose mit jeder Besicht
 
 ## Typisches Schadenbild und betroffene Bereiche
 
-Für die Reserve sind Schadenumfang, betroffene Sparten, bereits gezahlte Beträge, freigegebene Leistungen, erwartete Restkosten und mögliche Drittkosten zu erfassen. Ein technischer Befund ohne Mengen- und Kostenbezug reicht ebenso wenig wie eine Rechnung ohne Zuordnung zum Schadenbereich.
+Für die Reserve sind Schadenumfang, betroffene Sparten, bereits gezahlte Beträge, freigegebene Leistungen, erwartete Restkosten und mögliche Drittkosten zu erfassen. Ein technischer Befund ohne Mengen- und Kostenbezug reicht ebenso wenig wie eine Rechnung ohne Zuordnung zum Schadenbereich. Bei einem Leitungswasserschaden können etwa Leckageortung, Rückbau, Trocknung, Wiederherstellung, Einlagerung und Mietausfall getrennt fortgeschrieben werden.
 
 ## Abgrenzung ähnlicher Ursachen und Vorschäden
 
-Zu trennen sind gesicherte Kosten, beauftragte aber noch nicht abgerechnete Leistungen, ungeprüfte Nachträge, Prognoserisiken und nicht versicherte oder schadenfremde Positionen. Die Reserve darf nicht durch bereits erledigte oder doppelt berücksichtigte Positionen aufgebläht werden. Bei mehreren Sparten ist die Herleitung je Sparte und zusätzlich als Gesamtreserve zu dokumentieren.
+Zu trennen sind gesicherte Kosten, beauftragte aber noch nicht abgerechnete Leistungen, ungeprüfte Nachträge, Prognoserisiken und nicht versicherte oder schadenfremde Positionen. Die Reserve darf nicht durch bereits erledigte oder doppelt berücksichtigte Positionen aufgebläht werden. Bei mehreren Sparten ist die Herleitung je Sparte und zusätzlich als Gesamtreserve zu dokumentieren. Vorschäden und Verbesserungen gehören in eine eigene Abgrenzung, damit sie nicht unbemerkt in die Schadenprognose einfließen.
 
 ## Typische Befunde und Nachweise
 
-Erforderlich sind Erstbericht, Aufmaß, Freigaben, Rechnungsübersicht, Zahlungsübersicht, Nachträge, Terminplan und offene Prüfhinweise. Jede Änderung erhält Datum, Anlass und Betrag. Abweichungen zwischen prognostizierter und ausgeführter Menge sind ausdrücklich zu erläutern.
+Erforderlich sind Erstbericht, Aufmaß, Freigaben, Rechnungsübersicht, Zahlungsübersicht, Nachträge, Terminplan und offene Prüfhinweise. Jede Änderung erhält Datum, Anlass und Betrag. Abweichungen zwischen prognostizierter und ausgeführter Menge sind ausdrücklich zu erläutern. Für größere Positionen sollte außerdem festgehalten werden, ob der Betrag aus einem Angebot, einer geprüften Rechnung, einem Einheitspreis oder einer begründeten Schätzung stammt.
 
 ## Konkrete Prüffragen
 
@@ -48,26 +48,31 @@ Erforderlich sind Erstbericht, Aufmaß, Freigaben, Rechnungsübersicht, Zahlungs
 3. Welche Nachträge beruhen auf neuem Befund?
 4. Welche Positionen sind technisch oder vertraglich ungeklärt?
 5. Wie ergibt sich die konkrete Gesamtreserve?
+6. Welche Beträge werden bei der nächsten Prüfung voraussichtlich erledigt oder reduziert?
+
+## Aufbau einer nachvollziehbaren Reservetabelle
+
+Eine praxistaugliche Tabelle enthält mindestens Kostenart, Schadenbereich, Status, Nettobetrag oder Bruttobetrag nach einheitlicher Systematik, Quelle, Prüfdatum und Bearbeiter. Zusätzlich sollten bereits gezahlte Beträge, offene Freigaben und noch nicht beauftragte Prognosepositionen in getrennten Spalten stehen. Der aktuelle Reservewert ergibt sich dann aus den offenen, begründeten Positionen; erledigte oder bezahlte Positionen werden nicht nochmals addiert. Änderungen am Gesamtwert lassen sich über eine Versionszeile mit altem Wert, neuem Wert und Änderungsgrund nachvollziehen.
 
 ## Gefahrenabwehr und Sofortmaßnahmen
 
-Sofortmaßnahmen können die Prognose kurzfristig verändern. Sie sind als eigener Kostenblock zu erfassen und später mit der endgültigen Leistung abzugleichen. Eine Eilfreigabe darf nicht stillschweigend eine umfassende Wiederherstellung freigeben.
+Sofortmaßnahmen können die Prognose kurzfristig verändern. Sie sind als eigener Kostenblock zu erfassen und später mit der endgültigen Leistung abzugleichen. Eine Eilfreigabe darf nicht stillschweigend eine umfassende Wiederherstellung freigeben. Wird wegen einer Gefahrenlage ohne vollständiges Aufmaß beauftragt, sollte die vorläufige Annahme ausdrücklich als vorläufig markiert und nach Abschluss der Sicherung ersetzt werden.
 
 ## Beweissicherung und Dokumentation
 
-Reserveänderungen sollten auf Befund, Angebot, Rechnung, Aufmaß oder schriftlicher Stellungnahme beruhen. Die zugrunde liegende Datei ist mit Datum und Dokumentart zu benennen. So bleibt später nachvollziehbar, warum sich der Zahlenwert verändert hat.
+Reserveänderungen sollten auf Befund, Angebot, Rechnung, Aufmaß oder schriftlicher Stellungnahme beruhen. Die zugrunde liegende Datei ist mit Datum und Dokumentart zu benennen. So bleibt später nachvollziehbar, warum sich der Zahlenwert verändert hat. Telefonische Abstimmungen sind durch eine kurze Gesprächsnotiz zu ergänzen; bei strittigen Mengen sollten Fotos, Pläne oder Messprotokolle direkt verknüpft werden.
 
 ## Zuständigkeits- und Fachgrenzen
 
-Der Sachverständige liefert technische Feststellungen und Kostenprognosen. Der Regulierer oder Versicherer entscheidet über Deckung, Zahlung und Reserveführung. Bei umfangreichen Bau- oder Schadstoffrisiken sind Fachplaner und Projektsteuerung einzubeziehen.
+Der Sachverständige liefert technische Feststellungen und Kostenprognosen. Der Regulierer oder Versicherer entscheidet über Deckung, Zahlung und Reserveführung. Bei umfangreichen Bau- oder Schadstoffrisiken sind Fachplaner und Projektsteuerung einzubeziehen. Keine beteiligte Rolle sollte technische Feststellungen, rechtliche Deckungsbewertung und Zahlungsfreigabe in einer nicht trennbaren Sammelposition dokumentieren.
 
 ## Versicherungstechnische Einordnung ohne Deckungszusage
 
-Eine technische Kostenprognose ist keine Deckungszusage. Nicht versicherte, verbessernde oder haftpflichtrechtlich gesondert zu bewertende Positionen sind abzugrenzen. Die Reserve sollte deshalb nicht als verdeckte Leistungsentscheidung formuliert werden.
+Eine technische Kostenprognose ist keine Deckungszusage. Nicht versicherte, verbessernde oder haftpflichtrechtlich gesondert zu bewertende Positionen sind abzugrenzen. Die Reserve sollte deshalb nicht als verdeckte Leistungsentscheidung formuliert werden. Bei unsicherer Deckung sind die technisch erforderlichen Kosten und die versicherungsrechtliche Bewertung in getrennten Feldern zu führen.
 
 ## Anforderungen an die prüffähige Kostenprüfung
 
-Die Gesamtreserve muss als konkrete Zahl ausgewiesen werden. Zusätzlich sind bereits gezahlte Beträge, offene Freigaben und erwartete Nachträge getrennt sichtbar zu machen. Negative Endbeträge oder rein prozentuale Sicherheitszuschläge ohne Grundlage sind zu vermeiden.
+Die Gesamtreserve muss als konkrete Zahl ausgewiesen werden. Zusätzlich sind bereits gezahlte Beträge, offene Freigaben und erwartete Nachträge getrennt sichtbar zu machen. Negative Endbeträge oder rein prozentuale Sicherheitszuschläge ohne Grundlage sind zu vermeiden. Ein pauschaler Zuschlag kann nur dann vertretbar sein, wenn Anlass, Bezugsgröße, Laufzeit und Auflösungskriterium dokumentiert sind.
 
 ## Fiktives Praxisbeispiel
 
@@ -77,11 +82,13 @@ In einem fiktiven Großschaden sind Rückbau und Trocknung freigegeben, der Ausb
 
 - Versicherungsnehmer sollten Regulierer sollten Änderungen mit Datum und Begründung protokollieren.
 - Versicherer sollten Sachverständige sollten offene Risiken und Mengen klar benennen.
-- Sachverständige sollten Versicherungsnehmer und Dienstleister sollten Nachträge vor Ausführung schriftlich begründen und belegen..
+- Sachverständige sollten Versicherungsnehmer und Dienstleister sollten Nachträge vor Ausführung schriftlich begründen und belegen.
+- Alle Beteiligten sollten eine einheitliche Kostenlogik verwenden und zwischen Prognose, Freigabe, Rechnung und Zahlung unterscheiden.
+- Bei jeder wesentlichen Änderung sollte der alte Reservewert erhalten bleiben, damit die Entwicklung später prüfbar ist.
 
 ## Fazit
 
-Eine Reserve ist belastbar, wenn sie aus dokumentierten Kostenbausteinen entsteht. Ihre Qualität zeigt sich nicht an der Höhe, sondern an der nachvollziehbaren Herleitung und laufenden Bereinigung.
+Eine Reserve ist belastbar, wenn sie aus dokumentierten Kostenbausteinen entsteht. Ihre Qualität zeigt sich nicht an der Höhe, sondern an der nachvollziehbaren Herleitung und laufenden Bereinigung. Eine klare Trennung von Befund, Kostenstatus, Deckungsbewertung und Zahlung schafft dabei die entscheidende Prüfbarkeit.
 
 ## Quellen und weiterführende Hinweise
 
