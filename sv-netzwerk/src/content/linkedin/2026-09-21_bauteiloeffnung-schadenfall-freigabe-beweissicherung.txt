@@ -1,4 +1,5 @@
-Status: prepared-not-posted
+Status: published
+LinkedIn-URL: https://www.linkedin.com/feed/update/urn:li:activity:7507810721066409985/
 
 Bauteilöffnungen im Schadenfall fachlich und prüffähig steuern
 
