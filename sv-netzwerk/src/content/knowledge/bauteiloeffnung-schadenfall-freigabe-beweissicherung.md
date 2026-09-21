@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-09-21
   status: published
 seo:
-  title: "Bauteilöffnungen im Schadenfall prüffähig steuern"
+  title: "Bauteilöffnungen im Schadenfall prüfen"
   description: "Bauteilöffnungen müssen mit Prüfziel, Freigabe, Beweissicherung, Sicherheitsprüfung und klarer Abgrenzung zur Wiederherstellung dokumentiert werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/bauteiloeffnung-schadenfall-freigabe-beweissicherung/"
   noindex: false
