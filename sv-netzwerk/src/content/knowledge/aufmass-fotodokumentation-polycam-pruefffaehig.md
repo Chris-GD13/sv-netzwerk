@@ -1,6 +1,6 @@
 ---
 title: "Digitales Aufmaß im Schadenfall prüffähig dokumentieren"
-description: "Digitales Aufmaß und Fotodokumentation sind nur dann belastbar, wenn Messgrundlage, Maßstab, Zuordnung, Genauigkeit und Bearbeitungsschritte nachvollziehbar bleiben."
+description: "Digitales Aufmaß und Fotodokumentation sind belastbar, wenn Messgrundlage, Maßstab, Zuordnung und Bearbeitungsschritte nachvollziehbar bleiben."
 category: "Beweissicherung und Fotodokumentation"
 tags: ["Aufmaß", "Fotodokumentation", "Polycam", "Messergebnis", "Beweissicherung", "Schadenaufnahme"]
 author: "christian-waechter"
@@ -19,8 +19,8 @@ publication:
   updatedAt: 2026-09-19
   status: published
 seo:
-  title: "Digitales Aufmaß im Schadenfall prüffähig dokumentieren"
-  description: "Digitales Aufmaß und Fotodokumentation sind nur dann belastbar, wenn Messgrundlage, Maßstab, Zuordnung, Genauigkeit und Bearbeitungsschritte nachvollziehbar bleiben."
+  title: "Digitales Aufmaß prüffähig dokumentieren"
+  description: "Digitales Aufmaß und Fotodokumentation sind belastbar, wenn Messgrundlage, Maßstab, Zuordnung und Bearbeitungsschritte nachvollziehbar bleiben."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/aufmass-fotodokumentation-polycam-pruefffaehig/"
   noindex: false
 ---
