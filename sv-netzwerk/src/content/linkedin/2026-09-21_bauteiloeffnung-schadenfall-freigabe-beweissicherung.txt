@@ -1,0 +1,9 @@
+Status: prepared-not-posted
+
+Bauteilöffnungen im Schadenfall fachlich und prüffähig steuern
+
+Eine Bauteilöffnung ist kein pauschaler Rückbau. Sie muss auf ein konkretes Prüfziel begrenzt, vorab dokumentiert und nach jedem neuen Befund erneut bewertet werden.
+
+Der neue Fachbeitrag zeigt, wie Ausgangszustand, Freigabeumfang, Sicherheitsanforderungen, Beweissicherung und Kostenprüfung nachvollziehbar getrennt werden. Das Praxisbeispiel ist ausdrücklich fiktiv; der Beitrag enthält keine pauschale Deckungszusage.
+
+https://www.sv-netzwerk.eu/fachwissen/bauteiloeffnung-schadenfall-freigabe-beweissicherung/

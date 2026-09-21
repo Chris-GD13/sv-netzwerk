@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Bauteilöffnungen im Schadenfall fachlich und prüffähig steuern',
+    description: 'Bauteilöffnungen müssen mit Prüfziel, Freigabe, Beweissicherung, Sicherheitsprüfung und klarer Abgrenzung zur Wiederherstellung dokumentiert werden.',
+    href: '/fachwissen/bauteiloeffnung-schadenfall-freigabe-beweissicherung/',
+    category: 'Beweissicherung und Schadenaufnahme',
+    tags: ['Bauteilöffnung', 'Beweissicherung', 'Schadenaufnahme', 'Freigabe', 'Rückbau', 'Kostenprüfung'],
+    date: '2026-09-21',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Rechnungskürzungen im Schadenfall: Leistung, Menge und Schadenbezug sauber prüfen',
     description: 'Rechnungskürzungen sind nur belastbar, wenn Leistung, Menge, Ausführung, Schadenbezug und bereits freigegebene Positionen getrennt geprüft werden.',
     href: '/fachwissen/rechnungskuerzung-schadenfall-prueffaehigkeit/',
