@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-09-15
   status: published
 seo:
-  title: "Rechnungskürzungen im Schadenfall prüffähig begründen"
+  title: "Rechnungskürzungen im Schadenfall prüfen"
   description: "Rechnungskürzungen sind nur belastbar, wenn Leistung, Menge, Ausführung, Schadenbezug und bereits freigegebene Positionen getrennt geprüft werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/rechnungskuerzung-schadenfall-prueffaehigkeit/"
   noindex: false
