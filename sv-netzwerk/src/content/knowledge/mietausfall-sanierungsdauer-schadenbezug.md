@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-09-18
   status: published
 seo:
-  title: "Mietausfall bei Sanierung prüfen"
+  title: "Mietausfall bei Sanierung nachvollziehbar prüfen"
   description: "Mietausfall ist nur belastbar, wenn Nutzbarkeit, Sanierungsabschnitte, Vertragsgrundlage und schadenbedingte Dauer getrennt dokumentiert werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/mietausfall-sanierungsdauer-schadenbezug/"
   noindex: false
