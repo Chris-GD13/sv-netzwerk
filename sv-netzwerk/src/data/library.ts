@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Geruchsschäden nach Gebäudeereignissen fachlich einordnen und nachweisen',
+    description: 'Geruchsschäden nach Leitungswasser- oder Brandschäden müssen über Ursache, betroffene Materialien, Sanierungsstufe und Erfolgskontrolle getrennt bewertet werden.',
+    href: '/fachwissen/geruchsschaden-ursache-sanierung-erfolgskontrolle/',
+    category: 'Brand, Kontamination und Geruch',
+    tags: ['Geruchsschaden', 'Leitungswasser', 'Brandschaden', 'Kontamination', 'Sanierung', 'Nachweis'],
+    date: '2026-09-22',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Bauteilöffnungen im Schadenfall fachlich und prüffähig steuern',
     description: 'Bauteilöffnungen müssen mit Prüfziel, Freigabe, Beweissicherung, Sicherheitsprüfung und klarer Abgrenzung zur Wiederherstellung dokumentiert werden.',
     href: '/fachwissen/bauteiloeffnung-schadenfall-freigabe-beweissicherung/',
