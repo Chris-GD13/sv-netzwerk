@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Baufeuchte oder Schadenfeuchte: Feuchtequellen im Gebäude fachlich abgrenzen',
+    description: 'Baufeuchte und schadenbedingte Feuchte müssen über Ursache, Zeitpunkt, Bauteil, Messverfahren und Trocknungsziel getrennt bewertet werden.',
+    href: '/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/',
+    category: 'Leitungswasser und Feuchte',
+    tags: ['Baufeuchte', 'Schadenfeuchte', 'Feuchtemessung', 'Leitungswasser', 'Trocknung', 'Ursachenprüfung'],
+    date: '2026-09-23',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Geruchsschäden nach Gebäudeereignissen fachlich einordnen und nachweisen',
     description: 'Geruchsschäden nach Leitungswasser- oder Brandschäden müssen über Ursache, betroffene Materialien, Sanierungsstufe und Erfolgskontrolle getrennt bewertet werden.',
     href: '/fachwissen/geruchsschaden-ursache-sanierung-erfolgskontrolle/',
