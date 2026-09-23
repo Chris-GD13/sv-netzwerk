@@ -10,6 +10,12 @@
 
 # Changelog
 
+## 5.1.15 – 2026-09-23
+
+- Fachbeitrag „Baufeuchte oder Schadenfeuchte: Feuchtequellen im Gebäude fachlich abgrenzen“ veröffentlicht
+- Fachwissensübersicht, Suchindex und Sitemap werden aus dem Content-Modell aktualisiert
+- LinkedIn-Begleittext als `prepared-not-posted` und Veröffentlichungsprotokoll ergänzt
+
 ## 3.4.54 – 2026-09-13
 
 - Vier fehlende Fachbeiträge für die Arbeitstage 08.–11.09.2026 ergänzt: Leckageortung, Regiekostenabgrenzung, Fachgrenzen und Flachdach-Prüfpfad.
