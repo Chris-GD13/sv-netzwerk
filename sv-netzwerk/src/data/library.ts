@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Balkon- und Terrassenabdichtungen nach Wassereintritt fachlich prüfen',
+    description: 'Wassereintritt über Balkon oder Terrasse wird erst durch Abdichtung, Gefälle, Anschlüsse, Entwässerung und Innenbefund fachlich prüffähig abgegrenzt.',
+    href: '/fachwissen/balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung/',
+    category: 'Gebäudehülle und Abdichtung',
+    tags: ['Balkon', 'Terrasse', 'Abdichtung', 'Wassereintritt', 'Entwässerung', 'Schadenabgrenzung'],
+    date: '2026-09-24',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Baufeuchte oder Schadenfeuchte: Feuchtequellen im Gebäude fachlich abgrenzen',
     description: 'Baufeuchte und schadenbedingte Feuchte müssen über Ursache, Zeitpunkt, Bauteil, Messverfahren und Trocknungsziel getrennt bewertet werden.',
     href: '/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/',
