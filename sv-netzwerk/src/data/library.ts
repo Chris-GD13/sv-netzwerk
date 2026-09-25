@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Badfugen und Abdichtungen nach Feuchteeintritt fachlich abgrenzen',
+    description: 'Feuchte im Bad ist nicht automatisch ein Leitungswasserschaden. Wartungsfugen, Abdichtung, Installationen und Vorzustand müssen getrennt geprüft und dokumentiert werden.',
+    href: '/fachwissen/badfugen-abdichtung-feuchteeintritt-schadenabgrenzung/',
+    category: 'Bad und Sanitärschaden',
+    tags: ['Bad', 'Wartungsfuge', 'Abdichtung', 'Feuchteeintritt', 'Leitungswasser', 'Schadenabgrenzung'],
+    date: '2026-09-25',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Balkon- und Terrassenabdichtungen nach Wassereintritt fachlich prüfen',
     description: 'Wassereintritt über Balkon oder Terrasse wird erst durch Abdichtung, Gefälle, Anschlüsse, Entwässerung und Innenbefund fachlich prüffähig abgegrenzt.',
     href: '/fachwissen/balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung/',

@@ -8,6 +8,11 @@
 - Suchindex und Sitemap werden durch die Content Collection beim Build erzeugt
 - LinkedIn-Begleittexte als prepared-not-posted abgelegt; ohne öffentliches Beitragsbild gemäß Standard
 
+## 2026-09-25
+- Fachbeitrag „Badfugen und Abdichtungen nach Feuchteeintritt fachlich abgrenzen“ veröffentlicht
+- Fachwissensübersicht, Kategorie-, Tag-, Suchindex- und Sitemap-Integration ergänzt
+- LinkedIn-Begleittext als prepared-not-posted abgelegt; ohne Beitragsbild gemäß Fachbeitragsstandard
+
 # Changelog
 
 ## 5.1.16 – 2026-09-24
@@ -15,6 +20,12 @@
 - Fachbeitrag „Balkon- und Terrassenabdichtungen nach Wassereintritt fachlich prüfen“ veröffentlicht
 - Fachwissensübersicht, Suchindex und Sitemap werden aus dem Content-Modell aktualisiert
 - LinkedIn-Begleittext als `prepared-not-posted` ergänzt
+
+## 5.1.17 – 2026-09-25
+
+- Fachbeitrag „Badfugen und Abdichtungen nach Feuchteeintritt fachlich abgrenzen“ veröffentlicht
+- Fachwissensübersicht, Suchindex und Sitemap werden aus dem Content-Modell aktualisiert
+- LinkedIn-Begleittext als `prepared-not-posted` und Veröffentlichungsprotokoll ergänzt
 
 ## 5.1.15 – 2026-09-23
 
