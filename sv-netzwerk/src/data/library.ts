@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Entsorgungskosten nach Gebäudeschäden prüffähig abgrenzen',
+    description: 'Entsorgungskosten werden erst durch Abfallart, Menge, Einstufung, Transportweg, Annahmestelle und Belege prüffähig. Schadenbedingte und ohnehin anfallende Kosten sind zu trennen.',
+    href: '/fachwissen/entsorgungskosten-gebaeudeschaden-nachweis-abgrenzung/',
+    category: 'Rechnungs- und KVA-Prüfung',
+    tags: ['Entsorgung', 'Bauabfall', 'Schadstoffverdacht', 'Mengenprüfung', 'Nachweis', 'Kostenprüfung'],
+    date: '2026-09-26',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Badfugen und Abdichtungen nach Feuchteeintritt fachlich abgrenzen',
     description: 'Feuchte im Bad ist nicht automatisch ein Leitungswasserschaden. Wartungsfugen, Abdichtung, Installationen und Vorzustand müssen getrennt geprüft und dokumentiert werden.',
     href: '/fachwissen/badfugen-abdichtung-feuchteeintritt-schadenabgrenzung/',

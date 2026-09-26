@@ -1,3 +1,8 @@
+## 2026-09-26
+- Fachbeitrag „Entsorgungskosten nach Gebäudeschäden prüffähig abgrenzen“ veröffentlicht
+- Fachwissensübersicht, Kategorie-, Tag-, Suchindex- und Sitemap-Integration ergänzt
+- LinkedIn-Begleittext als prepared-not-posted abgelegt; ohne Beitragsbild gemäß Fachbeitragsstandard
+
 ## 2026-09-21
 - Fachbeitrag „Bauteilöffnungen im Schadenfall fachlich und prüffähig steuern“ veröffentlicht
 - Fachwissensübersicht, Kategorie-, Tag-, Suchindex- und Sitemap-Integration ergänzt
@@ -14,6 +19,12 @@
 - LinkedIn-Begleittext als prepared-not-posted abgelegt; ohne Beitragsbild gemäß Fachbeitragsstandard
 
 # Changelog
+
+## 5.1.18 – 2026-09-26
+
+- Fachbeitrag „Entsorgungskosten nach Gebäudeschäden prüffähig abgrenzen“ veröffentlicht
+- Fachwissensübersicht, Suchindex und Sitemap werden aus dem Content-Modell aktualisiert
+- LinkedIn-Begleittext als `prepared-not-posted` und Veröffentlichungsprotokoll ergänzt
 
 ## 5.1.16 – 2026-09-24
 
