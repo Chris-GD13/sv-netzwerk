@@ -1,0 +1,240 @@
+---
+import type { PortalRoute } from '../../lib/internal/types';
+
+interface Props {
+  route: PortalRoute;
+  recordId?: string;
+}
+
+const { route, recordId = '' } = Astro.props;
+---
+
+<section class="intern-shell sv-section">
+  <div class="sv-container">
+    <div class="intern-shell__surface" style="overflow:visible">
+      <div data-internal-app data-route={route} data-record-id={recordId}>
+        <div class="intern-loading" aria-live="polite">
+          <p>Interner Bereich wird geladen…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { mountInternalPortal } from '../../lib/internal/client';
+
+  const renderStartupError = (root: HTMLElement, detail?: string) => {
+    root.classList.add('intern-app');
+    root.innerHTML = `
+      <div class="intern-card intern-login">
+        <p class="sv-eyebrow">Technischer Hinweis</p>
+        <h1>Prüfportal konnte nicht gestartet werden</h1>
+        <p>Die Anwendung hat beim Laden nicht ordnungsgemäß geantwortet.</p>
+        <div class="intern-alert intern-alert--warn">
+          Bitte laden Sie die Seite erneut. Bleibt der Fehler bestehen, wenden Sie sich an den Systemadministrator.
+        </div>
+        ${detail ? `<p class="intern-meta">Fehlerhinweis: ${detail.replace(/[<>&"']/g, '')}</p>` : ''}
+        <div class="intern-actions">
+          <button class="sv-button sv-button-primary" type="button" data-reload-portal>Seite neu laden</button>
+          <a class="sv-button sv-button-secondary" href="/intern/login/">Zur Anmeldung</a>
+        </div>
+      </div>
+    `;
+    root.querySelector('[data-reload-portal]')?.addEventListener('click', () => window.location.reload());
+  };
+
+  const installSharePointAutoReport = (root: HTMLElement) => {
+    if (root.dataset.route !== 'sharepoint-import') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('photo_only') === '1') return;
+
+    let running = false;
+    const observer = new MutationObserver(() => {
+      if (running) return;
+      const status = root.querySelector<HTMLElement>('#sp-url-status');
+      const text = status?.textContent ?? '';
+      if (!/vollständig aus SharePoint übernommen/i.test(text)) return;
+      running = true;
+      observer.disconnect();
+      const path = window.location.pathname;
+      const slugMatch = path.match(/\/intern\/([^/]+)\//);
+      const slug = slugMatch?.[1] ?? 'fensterpruefung-bonn';
+      window.setTimeout(() => {
+        window.location.assign(`/intern/${encodeURIComponent(slug)}/export/?autostart=gutachten`);
+      }, 700);
+    });
+    observer.observe(root, { subtree: true, childList: true, characterData: true });
+  };
+
+  const installPhotoOnlyAutostart = (root: HTMLElement) => {
+    if (root.dataset.route !== 'sharepoint-import') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('photo_only') !== '1') return;
+
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      const button = root.querySelector<HTMLButtonElement>('#sp-auto-read-btn');
+      if (button && !button.disabled) {
+        window.clearInterval(timer);
+        button.click();
+        return;
+      }
+      if (attempts >= 120) window.clearInterval(timer);
+    }, 250);
+  };
+
+  /**
+   * Fotoanalyse kann bei mehreren tausend Bildern deutlich laenger als die normale
+   * Inaktivitaetsfrist dauern. Solange der Foto-only-Lauf laeuft, halten wir deshalb
+   * die Portalsitzung aktiv und warnen vor versehentlichem Schliessen/Aktualisieren.
+   */
+  const installLongPhotoImportGuard = (root: HTMLElement) => {
+    if (root.dataset.route !== 'sharepoint-import') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('photo_only') !== '1') return;
+
+    let running = true;
+    const startedAt = new Date().toISOString();
+    localStorage.setItem('svnet-photo-import-running', JSON.stringify({ started_at: startedAt, path: location.pathname + location.search }));
+
+    const keepAlive = () => {
+      // Der bestehende Client-Inaktivitaetszaehler reagiert auf Benutzeraktivitaet.
+      document.dispatchEvent(new Event('mousemove', { bubbles: true }));
+      document.dispatchEvent(new Event('keydown', { bubbles: true }));
+    };
+    keepAlive();
+    const keepAliveTimer = window.setInterval(keepAlive, 2 * 60 * 1000);
+
+    const beforeUnload = (event: BeforeUnloadEvent) => {
+      if (!running) return;
+      event.preventDefault();
+      Object.defineProperty(event, 'returnValue', { value: 'Die Fotoanalyse läuft noch. Seite nicht schließen oder aktualisieren.', configurable: true });
+    };
+    window.addEventListener('beforeunload', beforeUnload);
+
+    const finish = () => {
+      if (!running) return;
+      running = false;
+      localStorage.removeItem('svnet-photo-import-running');
+      window.clearInterval(keepAliveTimer);
+      window.removeEventListener('beforeunload', beforeUnload);
+    };
+
+    // Erst beenden, wenn die Analyse/Übernahme nachweislich fertig ist. Ein bloßer
+    // Seitenwechsel oder ein leerer Zwischenstatus beendet den Schutz nicht.
+    const observer = new MutationObserver(() => {
+      const photoStatus = root.querySelector<HTMLElement>('#photo-status')?.textContent ?? '';
+      const uploadStatus = root.querySelector<HTMLElement>('#photo-upload-status')?.textContent ?? '';
+      const combined = `${photoStatus} ${uploadStatus}`;
+      if (/vollständig aus SharePoint übernommen|Fotos? (?:wurden )?übernommen|Fotos? erfolgreich übernommen/i.test(combined)) {
+        finish();
+        observer.disconnect();
+      }
+    });
+    observer.observe(root, { subtree: true, childList: true, characterData: true });
+
+    window.addEventListener('pagehide', () => window.clearInterval(keepAliveTimer), { once: true });
+  };
+
+  const installExportAutostart = (root: HTMLElement) => {
+    if (root.dataset.route !== 'export') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('autostart') !== 'gutachten') return;
+
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      const button = root.querySelector<HTMLButtonElement>('#create-report');
+      if (button && !button.disabled) {
+        window.clearInterval(timer);
+        button.click();
+        return;
+      }
+      if (attempts >= 80) window.clearInterval(timer);
+    }, 250);
+  };
+
+  const installLongExportGuard = (root: HTMLElement) => {
+    if (root.dataset.route !== 'export') return;
+    let running = false;
+    let keepAliveTimer: number | null = null;
+
+    const beforeUnload = (event: BeforeUnloadEvent) => {
+      if (!running) return;
+      event.preventDefault();
+      Object.defineProperty(event, 'returnValue', { value: 'Das Gutachten wird noch erzeugt.', configurable: true });
+    };
+    window.addEventListener('beforeunload', beforeUnload);
+
+    const setRunning = (next: boolean) => {
+      if (running === next) return;
+      running = next;
+      if (running) {
+        localStorage.setItem('svnet-report-running', JSON.stringify({ started_at: new Date().toISOString(), path: location.pathname }));
+        keepAliveTimer = window.setInterval(() => {
+          document.dispatchEvent(new Event('mousemove'));
+        }, 5 * 60 * 1000);
+      } else {
+        localStorage.removeItem('svnet-report-running');
+        if (keepAliveTimer !== null) window.clearInterval(keepAliveTimer);
+        keepAliveTimer = null;
+      }
+    };
+
+    let attempts = 0;
+    const install = window.setInterval(() => {
+      attempts += 1;
+      const button = root.querySelector<HTMLButtonElement>('#create-report');
+      const progress = root.querySelector<HTMLElement>('#report-progress');
+      if (!button || !progress) {
+        if (attempts >= 80) window.clearInterval(install);
+        return;
+      }
+      window.clearInterval(install);
+      const sync = () => {
+        const text = progress.textContent ?? '';
+        const active = button.disabled && !progress.hidden && /geladen|aufbereitet|ermittelt|archiviert|Gutachten|Fotos|Fensterdaten/i.test(text);
+        setRunning(active);
+      };
+      new MutationObserver(sync).observe(progress, { subtree: true, childList: true, characterData: true, attributes: true });
+      new MutationObserver(sync).observe(button, { attributes: true, attributeFilter: ['disabled'] });
+      sync();
+    }, 250);
+
+    window.addEventListener('pagehide', () => {
+      if (keepAliveTimer !== null) window.clearInterval(keepAliveTimer);
+    }, { once: true });
+  };
+
+  const roots = document.querySelectorAll('[data-internal-app]');
+  roots.forEach((root) => {
+    if (!(root instanceof HTMLElement)) return;
+
+    let settled = false;
+    const timeout = window.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      renderStartupError(root, 'Zeitüberschreitung beim Initialisieren');
+    }, 8000);
+
+    mountInternalPortal(root)
+      .then(() => {
+        settled = true;
+        window.clearTimeout(timeout);
+        installSharePointAutoReport(root);
+        installPhotoOnlyAutostart(root);
+        installLongPhotoImportGuard(root);
+        installExportAutostart(root);
+        installLongExportGuard(root);
+      })
+      .catch((error: unknown) => {
+        settled = true;
+        window.clearTimeout(timeout);
+        const message = error instanceof Error ? error.message : 'Unbekannter Initialisierungsfehler';
+        console.error('Interne Anwendung konnte nicht gestartet werden:', error);
+        renderStartupError(root, message);
+      });
+  });
+</script>

@@ -1,0 +1,299 @@
+---
+import SEO from '../components/SEO.astro';
+import { portalProject } from '../lib/internal/schema';
+import logoSrc from '../assets/sv-netzwerk-logo-portal.svg';
+import '../styles/global.css';
+import '../styles/header.css';
+import '../styles/internal-portal.css';
+
+interface Props {
+  title: string;
+  description: string;
+  currentPath?: string;
+}
+
+const props = Astro.props;
+const currentPath = props.currentPath ?? Astro.url.pathname;
+const internalLinks = [
+  { href: '/intern/tagescockpit/', label: 'Tagescockpit', icon: '●' },
+  { href: '/intern/versicherungsfaelle/', label: 'Versicherungsfälle', icon: '⌂' },
+  { divider: true },
+  { href: '/intern/telefon/', label: 'Telefonzentrale', icon: '☎' },
+  { dynamic: 'whatsapp', label: 'WhatsApp', icon: '◉' },
+  { href: '/intern/kalender/', label: 'Kalender', icon: '□' },
+  { divider: true },
+  { href: '/intern/kalkulation/', label: 'Kalkulation', icon: '▦' },
+  { href: '/intern/zeitwertberechnung/', label: 'Zeitwertberechnung', icon: '⌛' },
+  { divider: true },
+  { dynamic: 'settlement', label: 'Buchhaltung', icon: '€' },
+  { divider: true },
+  { href: '/intern/privatauftraege/', label: 'Privatgutachten', icon: '⌑' },
+  { href: '/intern/fensterpruefung-bonn/', label: 'Fenstergutachten', icon: '▣', sub: true },
+];
+const isActive = (href: string) => currentPath.startsWith(href);
+---
+
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071a2e" />
+    <meta name="color-scheme" content="light" />
+    <SEO {...props} noindex={true} robotsContent="noindex,nofollow" />
+    <style is:global>
+      .intern-body { background: #f4f5f6; }
+      .intern-header { position: relative; border-bottom: 1px solid #d9dde1; }
+      .intern-portal-shell { display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: calc(100vh - 112px); }
+      .intern-header__logo { filter: none; }
+      .intern-sidebar { display: flex; flex-direction: column; justify-content: flex-start; gap: 0; padding: 22px 14px; background: #f0f1f2; border-right: 1px solid #d9dde1; }
+      .intern-sidebar__nav { display: grid; gap: 4px; }
+      .intern-sidebar__nav a { position: relative; display: flex; align-items: center; gap: 11px; padding: 11px 13px; color: #263746; text-decoration: none; font-weight: 700; border: 1px solid transparent; border-radius: 3px; }
+      .intern-sidebar__nav a:hover { background: #e7e9eb; }
+      .intern-sidebar__nav a.active { background: #fff; border-color: #d9dde1; }
+      .intern-sidebar__nav a.active::before { content: ''; position: absolute; left: -1px; top: 8px; bottom: 8px; width: 3px; background: #f59a23; }
+      .intern-sidebar__nav a.sub { margin-left: 14px; padding-top: 8px; padding-bottom: 8px; font-size: .92rem; }
+      .intern-sidebar__divider { height: 12px; border-top: 1px solid #d9dde1; margin: 8px 8px 0; }
+      .intern-sidebar__nav a span, .intern-header__logout span, .intern-header__login span { width: 22px; color: #f59a23; font-size: 1.1rem; text-align: center; }
+      .intern-header__identity { display: flex; align-items: center; gap: 9px; }
+      .intern-header__inner { position: relative; }
+      .intern-header__auth-actions { display: inline-flex; align-items: center; gap: 7px; position: absolute; left: 14px; top: 10px; transform: none; z-index: 3; }
+      .intern-header__auth-actions .intern-header__login,
+      .intern-header__auth-actions .intern-header__logout { box-sizing: border-box; height: 36px; padding: 8px 12px; font-size: .82rem; font-weight: 800; line-height: 1; }
+      .intern-header__auth-actions .intern-header__login { position: static !important; top: auto !important; left: auto !important; transform: none !important; }
+      .intern-header__auth-actions .intern-header__logout { width: auto; margin-top: 0; padding: 8px 10px; border-color: rgba(255,255,255,.48); line-height: 1; white-space: nowrap; }
+      @media (min-width: 681px) { .intern-header__inner { flex-wrap: nowrap; } .intern-header__brand { flex-wrap: nowrap; min-width: 0; } .intern-header__revenue-summary { margin-left: auto; } }
+      #intern-main { min-width: 0; }
+      .chatgpt-onboarding { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; background: rgba(7, 26, 46, .66); }
+      .chatgpt-onboarding[hidden] { display: none; }
+      .chatgpt-onboarding__card { width: min(620px, 100%); padding: 28px; border: 1px solid #c9d1d8; border-top: 5px solid #f59a23; background: #fff; color: #263746; box-shadow: 0 18px 60px rgba(7, 26, 46, .3); }
+      .chatgpt-onboarding__card h2 { margin: 0 0 10px; color: #071a2e; }
+      .chatgpt-onboarding__steps { margin: 18px 0; padding-left: 22px; }
+      .chatgpt-onboarding__steps li { margin: 8px 0; }
+      .chatgpt-onboarding__actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+      .chatgpt-onboarding__actions button { padding: 11px 15px; border: 1px solid #18324a; background: #18324a; color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
+      .chatgpt-onboarding__actions .secondary { background: #fff; color: #18324a; }
+      .chatgpt-onboarding__actions .later { border-color: transparent; background: transparent; color: #526575; }
+      .chatgpt-onboarding__state { margin: 16px 0 0; padding: 10px 12px; background: #e9f5eb; border-left: 4px solid #34834b; }
+      .chatgpt-onboarding__state.is-error { background: #fff1eb; border-left-color: #c44f1a; }
+    .intern-sidebar__expert { display: grid; gap: 7px; margin-top: 12px; padding: 12px; border-top: 1px solid #d9dde1; }
+    .intern-sidebar__expert[hidden] { display: none; }
+    .intern-sidebar__expert label { display: grid; gap: 3px; color: #263746; }
+    .intern-sidebar__expert label small { color: #6c7e8e; font-weight: 400; }
+    .intern-sidebar__expert select { width: 100%; min-width: 0; padding: 8px 9px; border: 1px solid #c7ccd1; border-radius: 3px; background: #fff; color: #263746; font: inherit; }
+      .intern-header__logout {
+        appearance: none;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        width: 100%;
+        padding: 11px 13px;
+        border: 1px solid #c7ccd1;
+        border-radius: 3px;
+        background: #fff;
+        color: #263746;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .intern-header__login {
+        appearance: none;
+        display: inline-flex;
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        transform: translateY(-50%);
+        flex: 0 0 auto;
+        align-items: center;
+        gap: 5px;
+        width: auto;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, .48);
+        border-radius: 3px;
+        background: #fff;
+        color: #263746;
+        font: inherit;
+        font-size: .82rem;
+        font-weight: 800;
+        line-height: 1;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .intern-header__logout {
+        margin-top: 18px;
+      }
+      .intern-header__logout:hover,
+      .intern-header__logout:focus-visible,
+      .intern-header__login:hover,
+      .intern-header__login:focus-visible { background: #e7e9eb; }
+      .intern-header__logout:disabled { cursor: wait; opacity: .7; }
+      .intern-header__revenue-summary { flex: 0 1 620px; min-width: 0; padding: 9px 12px; border: 1px solid #d67d00; border-radius: 4px; background: #f59a23; color: #071a2e; box-shadow: 0 3px 10px rgba(7, 26, 46, .12); }
+      .intern-header__revenue-summary[hidden] { display: none; }
+      .intern-header__revenue-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 5px; font-size: .72rem; font-weight: 900; line-height: 1.2; }
+      .intern-header__revenue-title > span:last-child { display: flex; align-items: center; gap: 7px; }
+      .intern-header__revenue-title small { font-size: .64rem; font-weight: 700; opacity: .78; }
+      .intern-header__revenue-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+      .intern-header__revenue-grid.is-holger { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .intern-header__revenue-item { min-width: 0; padding-left: 9px; border-left: 1px solid rgba(7, 26, 46, .28); }
+      .intern-header__revenue-item:first-child { padding-left: 0; border-left: 0; }
+      .intern-header__revenue-item span { display: block; overflow: hidden; font-size: .65rem; font-weight: 800; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+      .intern-header__revenue-item strong { display: block; margin-top: 2px; font-size: .83rem; line-height: 1.25; }
+      .intern-header__revenue-item small { display: block; margin-top: 1px; font-size: .61rem; font-weight: 700; line-height: 1.2; }
+      @media (max-width: 900px) {
+        .intern-portal-shell { grid-template-columns: 1fr; }
+        .intern-sidebar { display: block; padding: 7px 10px; border-right: 0; border-bottom: 1px solid #d9dde1; overflow-x: auto; }
+        .intern-sidebar__nav { display: flex; min-width: max-content; }
+        .intern-sidebar__nav a { padding: 9px 11px; }
+      .intern-sidebar__expert { grid-template-columns: auto minmax(190px, 1fr); align-items: center; gap: 8px; margin: 0 0 0 8px; padding: 0 0 0 12px; border-top: 0; border-left: 1px solid #d9dde1; }
+      .intern-sidebar__expert label small { display: none; }
+        .intern-sidebar .intern-header__logout { display: none; }
+        .intern-header__revenue-summary { flex-basis: 100%; }
+        .intern-header__revenue-grid { grid-template-columns: 1fr; gap: 5px; }
+        .intern-header__revenue-item { padding: 5px 0 0; border-top: 1px solid rgba(7, 26, 46, .22); border-left: 0; }
+        .intern-header__revenue-item:first-child { padding-top: 0; border-top: 0; }
+      }
+      @media (max-width: 680px) {
+        .intern-header__auth-actions { position: static; transform: none; }
+        .intern-header .intern-header__brand { flex-wrap: wrap; }
+        .intern-header__identity { width: 100%; }
+        .intern-header__login { position: static; transform: none; padding: 7px 8px; font-size: .76rem; }
+        .intern-header__revenue-summary { display: none; }
+      }
+    </style>
+  </head>
+  <body class="intern-body">
+    <header class="intern-header">
+      <div class="intern-header__auth-actions"><a class="intern-header__login" href="/intern/login/"><span>↩</span>Anmelden</a><button class="intern-header__logout" id="intern-logout" type="button"><span>↪</span>Abmelden</button></div>
+      <div class="sv-container intern-header__inner">
+        <div class="intern-header__brand">
+          <div class="intern-header__identity">
+            <a class="site-brand" href="/" aria-label="SV-Netzwerk – Startseite">
+              <img class="intern-header__logo" src={logoSrc.src} alt="SV-Netzwerk" width="220" height="46" />
+            </a>
+          </div>
+          <div class="intern-header__meta">
+            <p class="intern-header__eyebrow">Geschütztes Prüfportal</p>
+            <strong>{portalProject.title}</strong>
+            <small>{portalProject.objectName}</small>
+          </div>
+        </div>
+        <section class="intern-header__revenue-summary" id="intern-revenue-summary" aria-live="polite" hidden></section>
+      </div>
+    </header>
+    <div class="intern-portal-shell">
+      <aside class="intern-sidebar">
+        <nav aria-label="Interne Navigation" class="intern-sidebar__nav">
+          {internalLinks.map((link) => link.divider ? <div class="intern-sidebar__divider" aria-hidden="true"></div> : link.dynamic === 'whatsapp' ? <a id="intern-whatsapp-link" class:list={{ active: isActive('/intern/whatsapp/') }} href="/intern/whatsapp/" aria-current={isActive('/intern/whatsapp/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : link.dynamic === 'settlement' ? <a id="intern-settlement-link" class:list={{ active: isActive('/intern/abrechnungen/') }} href="/intern/abrechnungen/" aria-current={isActive('/intern/abrechnungen/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : <a class:list={{ active: isActive(link.href ?? ''), sub: link.sub }} href={link.href ?? '#'} aria-current={isActive(link.href ?? '') ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
+          <slot name="sidebar-extra" />
+        </nav>
+      </aside>
+      <script is:inline src="/intern/drive-status-cache.js?v=20260829-1"></script>
+      <main id="intern-main"><slot /></main>
+    </div>
+    <section id="chatgpt-onboarding" class="chatgpt-onboarding" role="dialog" aria-modal="true" aria-labelledby="chatgpt-onboarding-title" hidden>
+      <div class="chatgpt-onboarding__card">
+        <p class="intern-header__eyebrow">Einmalige Einrichtung</p>
+        <h2 id="chatgpt-onboarding-title">Schadenberichte mit deinem ChatGPT schreiben</h2>
+        <p id="chatgpt-onboarding-note">Melde dich mit deinem eigenen ChatGPT-/Work-Zugang an und bestätige einmal die Verbindung zum Prüfportal.</p>
+        <ol class="chatgpt-onboarding__steps">
+          <li>Installiertes Plugin in ChatGPT Desktop öffnen.</li>
+          <li>Plugin einmal starten und mit den eigenen Portal-Zugangsdaten verbinden.</li>
+          <li>Den Zugriff auf deine persönlichen Portal-Fälle bestätigen.</li>
+        </ol>
+        <p>Es wird nichts heruntergeladen. Fälle anderer Sachverständiger bleiben gesperrt.</p>
+        <div class="chatgpt-onboarding__actions">
+          <button id="chatgpt-onboarding-open" type="button">Plugin jetzt installieren</button>
+          <button id="chatgpt-onboarding-check" class="secondary" type="button">Verbindung prüfen</button>
+          <button id="chatgpt-onboarding-later" class="later" type="button">Später</button>
+        </div>
+        <p id="chatgpt-onboarding-state" class="chatgpt-onboarding__state" role="status" aria-live="polite" hidden></p>
+      </div>
+    </section>
+    <script is:inline src="/intern/erstbericht-output-options.js" defer></script>
+    <script is:inline src="/intern/versicherungsfaelle-enhancements.js" defer></script>
+    <script is:inline src="/intern/case-document-browser.js?v=20260901-2" defer></script>
+    <script is:inline src="/intern/bki-offline.js?v=20260904-1" defer></script>
+    <script is:inline src="/intern/transient-calculation-status.js?v=20260901-1" defer></script>
+    <script is:inline src="/intern/chatgpt-onboarding.js?v=20260831-1" defer></script>
+    <script is:inline>
+      document.getElementById('intern-logout')?.addEventListener('click', async (event) => {
+        const button = event.currentTarget;
+        if (!(button instanceof HTMLButtonElement)) return;
+        button.disabled = true;
+        button.textContent = 'Wird abgemeldet …';
+        try {
+          await fetch('/intern/api/auth.php?action=logout', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: '{}',
+          });
+        } finally {
+          sessionStorage.removeItem('svnet-case');
+          localStorage.removeItem('svnet-case');
+          localStorage.removeItem('svnet-case-owner');
+          window.location.assign('/intern/login/');
+        }
+      });
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=20260905-7', { scope: '/intern/', updateViaCache: 'none' }).then((registration) => registration.update()).catch(() => {}));
+      }
+      const revenueSummary = document.getElementById('intern-revenue-summary');
+      const settlementLink = document.getElementById('intern-settlement-link');
+      const whatsappLink = document.getElementById('intern-whatsapp-link');
+      const money = (value, maximumFractionDigits = 0) => new Intl.NumberFormat('de-DE', {
+        style: 'currency', currency: 'EUR', maximumFractionDigits, minimumFractionDigits: maximumFractionDigits,
+      }).format(Number(value) || 0);
+      const loadRevenueSummary = async () => {
+        if (!(revenueSummary instanceof HTMLElement)) return;
+        try {
+          const response = await fetch('/intern/api/revenue-summary-v2.php?action=access', { credentials: 'same-origin', cache: 'no-store' });
+          const data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.error || 'Umsatzstand nicht verfügbar.');
+          if (!data.visible) { revenueSummary.hidden = true; if (settlementLink instanceof HTMLElement) settlementLink.hidden = true; return; }
+          if (settlementLink instanceof HTMLElement) settlementLink.hidden = data.show_settlement_link === false;
+          if (!data.show_summary) { revenueSummary.hidden = true; return; }
+          const renderRevenueSummary = (summary) => {
+          if (summary.summary_type === 'marc' || summary.summary_type === 'holger') {
+            const claims = summary.claims || {};
+            const rekon = summary.rekon || {};
+            const person = summary.summary_type === 'marc' ? 'Marc' : 'Holger';
+            revenueSummary.title = `Claims Stand ${claims.updated_at || '–'} · Rekon Stand ${rekon.updated_at || '–'}`;
+            revenueSummary.innerHTML = `
+              <div class="intern-header__revenue-title"><span>${person} · Umsatz</span><span><small>laufendes Jahr</small></span></div>
+              <div class="intern-header__revenue-grid is-holger">
+                <div class="intern-header__revenue-item"><span>Claims · ${claims.period || '–'}</span><strong>${money(claims.net)} netto</strong><small>${money(claims.gross)} brutto</small></div>
+                <div class="intern-header__revenue-item"><span>Rekon · ${rekon.period || '–'}</span><strong>${money(rekon.net)} netto</strong><small>${money(rekon.gross)} brutto</small></div>
+              </div>`;
+            revenueSummary.hidden = false;
+            return;
+          }
+          const current = summary.current || {};
+          const previous = summary.previous || {};
+          revenueSummary.title = `Quelle: ${summary.source || 'Umsatzaufstellung'} · Stand ${summary.source_updated_at || '–'}`;
+          revenueSummary.innerHTML = `
+            <div class="intern-header__revenue-title"><span>Die Regulierer · Umsatz</span><span><small>Stand ${summary.source_updated_at || '–'}</small></span></div>
+            <div class="intern-header__revenue-grid">
+              <div class="intern-header__revenue-item"><span>${current.period || current.year}</span><strong>${money(current.ytd_net)} netto · Ø ${money(current.average_net, 2)}</strong><small>Jahreswert ${money(current.annualized_net)}</small></div>
+              <div class="intern-header__revenue-item"><span>${previous.period || previous.year}</span><strong>${money(previous.ytd_net)} netto · Ø ${money(previous.average_net, 2)}</strong><small>Jahreswert ${money(previous.annualized_net)}</small></div>
+              <div class="intern-header__revenue-item"><span>Privataufträge brutto</span><strong>${current.year}: ${money(current.private_gross)}</strong><small>${previous.year}: ${money(previous.private_gross)}</small></div>
+            </div>`;
+          revenueSummary.hidden = false;
+          };
+          renderRevenueSummary(data);
+        } catch {
+          revenueSummary.hidden = true;
+        }
+      };
+      loadRevenueSummary();
+      if (whatsappLink instanceof HTMLElement) {
+        fetch('/intern/api/whatsapp-case.php?action=menu_access', { credentials: 'same-origin', cache: 'no-store' })
+          .then((response) => response.ok ? response.json() : Promise.reject())
+          .then((data) => { whatsappLink.hidden = data.visible !== true; })
+          .catch(() => { whatsappLink.hidden = true; });
+      }
+    </script>
+  </body>
+</html>

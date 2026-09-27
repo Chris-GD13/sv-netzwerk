@@ -1,0 +1,266 @@
+---
+import InternalLayout from '../../../../layouts/InternalLayout.astro';
+import { windowFormSections } from '../../../../lib/internal/schema';
+const hiddenBulkFields = new Set(['inspection_date','time_started','time_finished']);
+const bulkSections = windowFormSections.map((section) => ({
+  id: section.id,
+  title: section.title,
+  fields: section.fields.filter((field) => !hiddenBulkFields.has(field.id)).map((field) => ({
+    id: field.id,
+    label: field.label,
+    type: field.type,
+    step: field.step ?? '',
+    min: field.min ?? null,
+    max: field.max ?? null,
+    options: field.options ?? [],
+  })),
+}));
+const bulkSectionsJson = JSON.stringify(bulkSections).replace(/</g, '\\u003c');
+---
+<InternalLayout title="Massenänderung" description="Werte projektweit für alle Fenster ändern oder fehlende Felder vervollständigen.">
+  <main class="intern-app" style="max-width:1280px;margin:0 auto;padding:24px">
+    <section class="intern-card">
+      <p class="sv-eyebrow">SV-Netzwerk Prüfportal</p>
+      <h1>Massenänderung</h1>
+      <p>Hier können Werte aus den Prüf-Abfragen projektweit gesetzt werden, z. B. Prüfer, Glasstärke, Gewichte, Hersteller oder Bewertungsfelder.</p>
+      <div class="intern-alert intern-alert--info" style="margin-top:12px"><strong>Sicherheitslogik:</strong> Standardmäßig werden nur leere Felder vervollständigt. „Vorhandene Werte überschreiben“ muss ausdrücklich gewählt und bestätigt werden.</div>
+      <div class="intern-actions" style="margin-top:16px">
+        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/">Dashboard</a>
+        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/bestand-pruefen/">Bestand prüfen</a>
+        <a class="sv-button sv-button-secondary" href="/intern/fensterpruefung-bonn/gutachten/">Gutachten</a>
+      </div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px;position:sticky;top:10px;z-index:20;box-shadow:0 8px 24px rgba(8,35,58,.12)">
+      <div style="display:flex;gap:16px;align-items:end;justify-content:space-between;flex-wrap:wrap">
+        <div class="intern-field" style="min-width:300px;max-width:460px;flex:1">
+          <label for="bulk-mode">Änderungsmodus</label>
+          <select id="bulk-mode" class="intern-input">
+            <option value="empty_only" selected>Nur leere Felder vervollständigen</option>
+            <option value="overwrite">Vorhandene Werte für alle Fenster überschreiben</option>
+          </select>
+        </div>
+        <div class="intern-actions" style="flex-wrap:wrap">
+          <button id="save-all" type="button" class="sv-button sv-button-primary">Änderungen speichern & übernehmen</button>
+          <button id="save-report" type="button" class="sv-button sv-button-secondary">Speichern & neue Gutachtenfassung erzeugen</button>
+        </div>
+      </div>
+      <div id="unsaved-status" class="intern-meta" style="margin-top:10px">Noch keine ungespeicherten Änderungen.</div>
+      <div id="bulk-result" style="margin-top:12px"></div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <h2>Prüftermine / Ortstermine</h2>
+      <p class="intern-meta">Mehrere Prüftage mit eigener Beginn- und Endzeit erfassen und gemeinsam auf alle Fenster übertragen.</p>
+      <div id="period-rows" style="display:grid;gap:10px;margin-top:12px"></div>
+      <div class="intern-actions" style="margin-top:12px;flex-wrap:wrap">
+        <button id="add-period" type="button" class="sv-button sv-button-secondary">+ Weiteren Tag hinzufügen</button>
+        <button id="apply-periods" type="button" class="sv-button sv-button-primary">Prüftermine sofort übernehmen</button>
+      </div>
+      <div class="intern-alert intern-alert--info" style="margin-top:12px">Voreingetragen: 12.08.2026 und 13.08.2026 jeweils 08:00–15:30 Uhr sowie 17.08.2026 von 08:00–14:45 Uhr.</div>
+    </section>
+
+    <section class="intern-card" style="margin-top:16px">
+      <div id="bulk-tabs" class="intern-actions" role="tablist" style="gap:8px;flex-wrap:wrap"></div>
+    </section>
+
+    <div id="bulk-panels"></div>
+    <section class="intern-card" style="margin-top:16px">
+      <div class="intern-actions" style="justify-content:flex-end;flex-wrap:wrap">
+        <button id="save-all-bottom" type="button" class="sv-button sv-button-primary">Änderungen speichern & übernehmen</button>
+        <button id="save-report-bottom" type="button" class="sv-button sv-button-secondary">Speichern & neue Gutachtenfassung erzeugen</button>
+      </div>
+    </section>
+    <script is:inline type="application/json" id="bulk-sections" set:html={bulkSectionsJson}></script>
+  </main>
+
+  <script is:inline>
+    (() => {
+      const dataEl = document.getElementById('bulk-sections');
+      const tabsEl = document.getElementById('bulk-tabs');
+      const panelsEl = document.getElementById('bulk-panels');
+      const resultEl = document.getElementById('bulk-result');
+      const modeEl = document.getElementById('bulk-mode');
+      const periodRowsEl = document.getElementById('period-rows');
+      const addPeriodBtn = document.getElementById('add-period');
+      const applyPeriodsBtn = document.getElementById('apply-periods');
+      const unsavedEl = document.getElementById('unsaved-status');
+      const saveButtons = [document.getElementById('save-all'), document.getElementById('save-all-bottom')].filter(Boolean);
+      const reportButtons = [document.getElementById('save-report'), document.getElementById('save-report-bottom')].filter(Boolean);
+      if (!dataEl || !tabsEl || !panelsEl || !modeEl || !periodRowsEl || !addPeriodBtn || !applyPeriodsBtn) return;
+
+      let sections = [];
+      try { sections = JSON.parse(dataEl.textContent || '[]'); } catch { sections = []; }
+      const dirtyFields = new Set();
+      let periodsDirty = false;
+      let saving = false;
+
+      const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
+      const attr = (value) => esc(value).replace(/`/g, '&#096;');
+
+      function updateUnsavedStatus() {
+        const count = dirtyFields.size + (periodsDirty ? 1 : 0);
+        if (!unsavedEl) return;
+        unsavedEl.textContent = count ? `${count} Änderung(en) noch nicht übernommen.` : 'Alle Änderungen sind übernommen.';
+        unsavedEl.style.fontWeight = count ? '700' : '400';
+      }
+
+      let periods = [
+        { date:'2026-08-12', start:'08:00', end:'15:30' },
+        { date:'2026-08-13', start:'08:00', end:'15:30' },
+        { date:'2026-08-17', start:'08:00', end:'14:45' },
+      ];
+
+      function markPeriodsDirty() { periodsDirty = true; updateUnsavedStatus(); }
+
+      function renderPeriods() {
+        periodRowsEl.innerHTML = periods.map((period, index) => `
+          <div style="display:grid;grid-template-columns:minmax(180px,1fr) minmax(150px,1fr) minmax(150px,1fr) auto;gap:10px;align-items:end;border-bottom:1px solid #e2e8f0;padding-bottom:10px">
+            <div class="intern-field"><label>Prüfdatum</label><input class="intern-input" type="date" data-period-date="${index}" value="${attr(period.date)}"></div>
+            <div class="intern-field"><label>Beginn</label><input class="intern-input" type="time" data-period-start="${index}" value="${attr(period.start)}"></div>
+            <div class="intern-field"><label>Abschluss</label><input class="intern-input" type="time" data-period-end="${index}" value="${attr(period.end)}"></div>
+            <button type="button" class="sv-button sv-button-secondary" data-remove-period="${index}" ${periods.length <= 1 ? 'disabled' : ''}>Entfernen</button>
+          </div>`).join('');
+        periodRowsEl.querySelectorAll('[data-period-date]').forEach((el) => el.addEventListener('change', () => { periods[Number(el.getAttribute('data-period-date'))].date = el.value; markPeriodsDirty(); }));
+        periodRowsEl.querySelectorAll('[data-period-start]').forEach((el) => el.addEventListener('change', () => { periods[Number(el.getAttribute('data-period-start'))].start = el.value; markPeriodsDirty(); }));
+        periodRowsEl.querySelectorAll('[data-period-end]').forEach((el) => el.addEventListener('change', () => { periods[Number(el.getAttribute('data-period-end'))].end = el.value; markPeriodsDirty(); }));
+        periodRowsEl.querySelectorAll('[data-remove-period]').forEach((el) => el.addEventListener('click', () => { periods.splice(Number(el.getAttribute('data-remove-period')), 1); markPeriodsDirty(); renderPeriods(); }));
+      }
+
+      addPeriodBtn.addEventListener('click', () => { periods.push({date:'',start:'08:00',end:'15:30'}); markPeriodsDirty(); renderPeriods(); });
+
+      async function postChange(field, value, type, mode) {
+        const response = await fetch('/intern/api/bulk-update.php', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({project_id:1, field, value, field_type:type, mode}) });
+        const json = await response.json();
+        if (!response.ok) throw new Error(json.error || `Massenänderung für ${field} fehlgeschlagen.`);
+        return json;
+      }
+
+      async function savePeriodsOnly() {
+        const valid = periods.filter((p) => p.date);
+        if (!valid.length) throw new Error('Bitte mindestens einen Prüftag auswählen.');
+        const mode = 'value' in modeEl ? modeEl.value : 'empty_only';
+        return postChange('inspection_periods', valid, 'json', mode);
+      }
+
+      applyPeriodsBtn.addEventListener('click', async () => {
+        const valid = periods.filter((p) => p.date);
+        if (!valid.length) { alert('Bitte mindestens einen Prüftag auswählen.'); return; }
+        const mode = 'value' in modeEl ? modeEl.value : 'empty_only';
+        const summary = valid.map((p) => `${p.date.split('-').reverse().join('.')} ${p.start || '—'}–${p.end || '—'} Uhr`).join('\n');
+        if (!confirm(`Folgende Prüftermine auf alle Fenster anwenden?\n\n${summary}\n\n${mode === 'overwrite' ? 'Vorhandene Werte werden überschrieben.' : 'Nur leere Werte werden ergänzt.'}`)) return;
+        applyPeriodsBtn.disabled = true;
+        if (resultEl) { resultEl.className = 'intern-alert intern-alert--info'; resultEl.textContent = 'Prüftermine werden übernommen …'; }
+        try {
+          const json = await savePeriodsOnly();
+          periodsDirty = false; updateUnsavedStatus();
+          if (resultEl) { resultEl.className = 'intern-alert intern-alert--success'; resultEl.textContent = `${json.changed} Fenster mit den Prüfterminen aktualisiert, ${json.skipped} unverändert/übersprungen.`; }
+        } catch (error) {
+          if (resultEl) { resultEl.className = 'intern-alert intern-alert--error'; resultEl.textContent = error && error.message ? error.message : 'Prüftermine konnten nicht gespeichert werden.'; }
+        } finally { applyPeriodsBtn.disabled = false; }
+      });
+      renderPeriods();
+
+      function inputHtml(field) {
+        if (field.type === 'select') return `<select class="intern-input" data-bulk-input data-field="${attr(field.id)}" data-type="select"><option value="">— Wert wählen —</option>${(field.options || []).map((o) => `<option value="${attr(o.value)}">${esc(o.label)}</option>`).join('')}</select>`;
+        if (field.type === 'checkbox') return `<select class="intern-input" data-bulk-input data-field="${attr(field.id)}" data-type="checkbox"><option value="">— Wert wählen —</option><option value="true">Ja</option><option value="false">Nein</option></select>`;
+        if (field.type === 'textarea') return `<textarea class="intern-input" rows="3" data-bulk-input data-field="${attr(field.id)}" data-type="text"></textarea>`;
+        const htmlType = ['number','date','time'].includes(field.type) ? field.type : 'text';
+        const step = field.step ? ` step="${attr(field.step)}"` : '';
+        const min = field.min !== null && field.min !== undefined ? ` min="${attr(field.min)}"` : '';
+        const max = field.max !== null && field.max !== undefined ? ` max="${attr(field.max)}"` : '';
+        return `<input class="intern-input" type="${htmlType}"${step}${min}${max} data-bulk-input data-field="${attr(field.id)}" data-type="${attr(field.type)}">`;
+      }
+
+      tabsEl.innerHTML = sections.map((section, index) => `<button type="button" class="sv-button ${index === 0 ? 'sv-button-primary' : 'sv-button-secondary'}" data-tab="${attr(section.id)}">${esc(section.title)}</button>`).join('');
+      panelsEl.innerHTML = sections.map((section, index) => `<section class="intern-card bulk-section" data-panel="${attr(section.id)}" style="margin-top:16px;${index === 0 ? '' : 'display:none'}"><h2>${esc(section.title)}</h2><p class="intern-meta">Werte eintragen und anschließend oben oder unten mit „Änderungen speichern & übernehmen“ gemeinsam auf den Projektbestand anwenden. Einzelne Felder können weiterhin sofort übernommen werden.</p><div class="intern-form-grid">${(section.fields || []).map((field) => `<div class="intern-field" style="border-bottom:1px solid #e2e8f0;padding-bottom:14px"><label><strong>${esc(field.label)}</strong></label>${inputHtml(field)}<button type="button" class="sv-button sv-button-secondary" style="margin-top:8px" data-apply="${attr(field.id)}" data-label="${attr(field.label)}">Dieses Feld sofort übernehmen</button></div>`).join('')}</div></section>`).join('');
+
+      panelsEl.querySelectorAll('[data-bulk-input]').forEach((input) => {
+        const field = input.getAttribute('data-field');
+        const mark = () => { if (field) dirtyFields.add(field); updateUnsavedStatus(); };
+        input.addEventListener('input', mark);
+        input.addEventListener('change', mark);
+      });
+
+      tabsEl.querySelectorAll('[data-tab]').forEach((button) => button.addEventListener('click', () => {
+        const id = button.getAttribute('data-tab');
+        panelsEl.querySelectorAll('.bulk-section').forEach((panel) => { panel.style.display = panel.getAttribute('data-panel') === id ? '' : 'none'; });
+        tabsEl.querySelectorAll('[data-tab]').forEach((tab) => { tab.className = 'sv-button ' + (tab === button ? 'sv-button-primary' : 'sv-button-secondary'); });
+      }));
+
+      panelsEl.querySelectorAll('[data-apply]').forEach((button) => button.addEventListener('click', async () => {
+        const field = button.getAttribute('data-apply');
+        const label = button.getAttribute('data-label') || field || 'Feld';
+        if (!field) return;
+        const input = panelsEl.querySelector(`[data-bulk-input][data-field="${CSS.escape(field)}"]`);
+        if (!input || !('value' in input)) return;
+        const value = input.value;
+        const type = input.getAttribute('data-type') || 'text';
+        if (value === '') { alert('Bitte zuerst einen Wert eingeben.'); return; }
+        const mode = 'value' in modeEl ? modeEl.value : 'empty_only';
+        const wording = mode === 'overwrite' ? 'für ALLE Fenster überschreiben' : 'nur in leeren Feldern ergänzen';
+        if (!confirm(`„${label}“ = „${value}“ ${wording}?\n\nDiese Änderung wird im Audit-Log dokumentiert.`)) return;
+        button.disabled = true;
+        if (resultEl) { resultEl.className = 'intern-alert intern-alert--info'; resultEl.textContent = 'Massenänderung wird ausgeführt …'; }
+        try {
+          const json = await postChange(field, value, type, mode);
+          dirtyFields.delete(field); updateUnsavedStatus();
+          if (resultEl) { resultEl.className = 'intern-alert intern-alert--success'; resultEl.textContent = `${json.changed} Fenster geändert, ${json.skipped} unverändert/übersprungen, ${json.total} geprüft.`; }
+        } catch (error) {
+          if (resultEl) { resultEl.className = 'intern-alert intern-alert--error'; resultEl.textContent = error && error.message ? error.message : 'Massenänderung fehlgeschlagen.'; }
+        } finally { button.disabled = false; }
+      }));
+
+      async function saveAll(redirectToReport) {
+        if (saving) return;
+        const changes = [];
+        dirtyFields.forEach((field) => {
+          const input = panelsEl.querySelector(`[data-bulk-input][data-field="${CSS.escape(field)}"]`);
+          if (!input || !('value' in input) || input.value === '') return;
+          changes.push({ field, value: input.value, type: input.getAttribute('data-type') || 'text' });
+        });
+        const totalChanges = changes.length + (periodsDirty ? 1 : 0);
+        if (!totalChanges) {
+          if (redirectToReport) window.location.assign('/intern/fensterpruefung-bonn/export/');
+          else alert('Es sind keine ungespeicherten Änderungen vorhanden.');
+          return;
+        }
+        const mode = 'value' in modeEl ? modeEl.value : 'empty_only';
+        const wording = mode === 'overwrite' ? 'Vorhandene Werte werden dabei überschrieben.' : 'Vorhandene Werte bleiben erhalten; nur leere Felder werden ergänzt.';
+        if (!confirm(`${totalChanges} Änderung(en) jetzt für den gesamten Fensterbestand speichern und übernehmen?\n\n${wording}`)) return;
+        saving = true;
+        [...saveButtons, ...reportButtons].forEach((button) => button.disabled = true);
+        if (resultEl) { resultEl.className = 'intern-alert intern-alert--info'; resultEl.textContent = `0/${totalChanges} Änderungen übernommen …`; }
+        try {
+          let done = 0;
+          let windowsChanged = 0;
+          for (const change of changes) {
+            const json = await postChange(change.field, change.value, change.type, mode);
+            windowsChanged += Number(json.changed || 0);
+            dirtyFields.delete(change.field);
+            done++;
+            if (resultEl) resultEl.textContent = `${done}/${totalChanges} Änderungen übernommen …`;
+          }
+          if (periodsDirty) {
+            const json = await savePeriodsOnly();
+            windowsChanged += Number(json.changed || 0);
+            periodsDirty = false;
+            done++;
+          }
+          updateUnsavedStatus();
+          if (resultEl) { resultEl.className = 'intern-alert intern-alert--success'; resultEl.innerHTML = `<strong>Änderungen erfolgreich gespeichert und übernommen.</strong><br>${totalChanges} Feld-/Terminänderung(en) verarbeitet. Die Daten stehen jetzt für eine neu erzeugte Gutachtenfassung zur Verfügung.`; }
+          if (redirectToReport) window.setTimeout(() => window.location.assign('/intern/fensterpruefung-bonn/export/'), 700);
+        } catch (error) {
+          if (resultEl) { resultEl.className = 'intern-alert intern-alert--error'; resultEl.textContent = error && error.message ? error.message : 'Änderungen konnten nicht vollständig gespeichert werden.'; }
+        } finally {
+          saving = false;
+          [...saveButtons, ...reportButtons].forEach((button) => button.disabled = false);
+        }
+      }
+
+      saveButtons.forEach((button) => button.addEventListener('click', () => saveAll(false)));
+      reportButtons.forEach((button) => button.addEventListener('click', () => saveAll(true)));
+      updateUnsavedStatus();
+    })();
+  </script>
+</InternalLayout>

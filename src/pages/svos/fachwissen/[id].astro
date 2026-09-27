@@ -1,0 +1,33 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import KnowledgeMeta from '../../../components/knowledge/KnowledgeMeta.astro';
+import RelatedKnowledge from '../../../components/knowledge/RelatedKnowledge.astro';
+import { getPublishedKnowledge, estimateReadingMinutes, findRelatedKnowledge } from '../../../utils/knowledge';
+import { slugify } from '../../../utils/content';
+type PublishedKnowledgeEntry = CollectionEntry<'knowledge'> & { data: CollectionEntry<'knowledge'>['data'] & { publication: CollectionEntry<'knowledge'>['data']['publication'] & { status: 'published'; publishedAt: Date } } };
+
+export async function getStaticPaths() {
+  const entries = await getPublishedKnowledge();
+  return entries.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+interface Props { entry: PublishedKnowledgeEntry; }
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const allEntries = await getPublishedKnowledge();
+const related = findRelatedKnowledge(entry, allEntries);
+const readingMinutes = estimateReadingMinutes(entry.body ?? '', entry.data.readingMinutes);
+const publishedAt = entry.data.publication.publishedAt;
+const seoTitle = entry.data.seo.title ?? `${entry.data.title} | SV-Netzwerk`;
+const seoDescription = entry.data.seo.description ?? entry.data.description;
+const canonical = `/fachwissen/${entry.id}/`;
+---
+<BaseLayout title={seoTitle} description={seoDescription} canonical={canonical} noindex image={entry.data.seo.image} imageAlt={entry.data.seo.imageAlt} type="article" breadcrumbs={[{label:'Start',href:'/'},{label:'SVOS',href:'/svos/'},{label:'Fachartikel',href:'/fachwissen/'},{label:entry.data.title}]}>
+  <article class="sv-section"><div class="sv-container article-shell">
+    <header><p class="eyebrow"><a href={`/fachwissen/kategorie/${slugify(entry.data.category)}/`}>{entry.data.category}</a></p><h1>{entry.data.title}</h1><p class="lead">{entry.data.description}</p><KnowledgeMeta author={entry.data.author} publishedAt={publishedAt} updatedAt={entry.data.publication.updatedAt} readingMinutes={readingMinutes}/></header>
+    <div class="prose"><Content /></div>
+    <footer><ul>{entry.data.tags.map((tag) => <li><a href={`/fachwissen/tag/${slugify(tag)}/`}>#{tag}</a></li>)}</ul></footer>
+    <RelatedKnowledge entries={related}/>
+  </div></article>
+</BaseLayout>
+<style>.article-shell{max-width:54rem}.eyebrow{font-weight:800}.eyebrow a{text-decoration:none}h1{max-width:18ch}.lead{max-width:65ch;color:var(--sv-color-muted);font-size:1.18rem}.prose{margin-top:var(--sv-space-7);font-size:1.04rem;line-height:1.75}.prose :global(h2){margin-top:2.3rem}.prose :global(a){text-underline-offset:.18em}footer ul{display:flex;flex-wrap:wrap;gap:.5rem;margin:var(--sv-space-7) 0 0;padding:0;list-style:none}footer a{display:inline-flex;padding:.35rem .65rem;border-radius:999px;background:var(--sv-color-surface-alt);text-decoration:none}</style>
