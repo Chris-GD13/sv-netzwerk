@@ -1,3 +1,8 @@
+## 2026-09-27
+- Fachbeitrag „Eigenleistungen nach Gebäudeschäden prüffähig dokumentieren“ veröffentlicht
+- Fachwissensübersicht, Kategorie-, Tag-, Suchindex- und Sitemap-Integration ergänzt
+- LinkedIn-Begleittext als prepared-not-posted abgelegt; ohne Beitragsbild gemäß Fachbeitragsstandard
+
 ## 2026-09-26
 - Fachbeitrag „Entsorgungskosten nach Gebäudeschäden prüffähig abgrenzen“ veröffentlicht
 - Fachwissensübersicht, Kategorie-, Tag-, Suchindex- und Sitemap-Integration ergänzt

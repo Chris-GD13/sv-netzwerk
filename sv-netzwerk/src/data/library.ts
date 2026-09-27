@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Eigenleistungen nach Gebäudeschäden prüffähig dokumentieren',
+    description: 'Eigenleistungen werden durch Tätigkeitsnachweis, Zeitaufwand, Qualifikation, Materialbelege und Schadenbezug prüffähig. Fachgrenzen und Sowieso-Kosten sind getrennt zu bewerten.',
+    href: '/fachwissen/eigenleistungen-gebaeudeschaden-stunden-material-nachweis/',
+    category: 'Rechnungs- und KVA-Prüfung',
+    tags: ['Eigenleistung', 'Stundennachweis', 'Materialkosten', 'Schadenbezug', 'Fachgrenzen', 'Kostenprüfung'],
+    date: '2026-09-27',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Entsorgungskosten nach Gebäudeschäden prüffähig abgrenzen',
     description: 'Entsorgungskosten werden erst durch Abfallart, Menge, Einstufung, Transportweg, Annahmestelle und Belege prüffähig. Schadenbedingte und ohnehin anfallende Kosten sind zu trennen.',
     href: '/fachwissen/entsorgungskosten-gebaeudeschaden-nachweis-abgrenzung/',
