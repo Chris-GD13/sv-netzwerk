@@ -1,3 +1,8 @@
+## 2026-09-28
+- Fachbeitrag „Gerüstkosten nach Gebäudeschäden prüffähig abgrenzen“ ergänzt
+- Gerüstumfang, Standzeit, Schutzleistungen und schadenbedingte Kosten in Übersicht, Suchindex und Sitemap integriert
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt
+
 ## 2026-09-27
 - Fachbeitrag „Eigenleistungen nach Gebäudeschäden prüffähig dokumentieren“ veröffentlicht
 - Fachwissensübersicht, Kategorie-, Tag-, Suchindex- und Sitemap-Integration ergänzt

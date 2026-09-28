@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Gerüstkosten nach Gebäudeschäden prüffähig abgrenzen',
+    description: 'Gerüstkosten werden anhand von Arbeitsbereich, Gerüstausführung, Standzeit und Schutzleistungen fachlich geprüft. Schadenbedingte und ohnehin geplante Arbeiten sind zu trennen.',
+    href: '/fachwissen/geruestkosten-gebaeudeschaden-umfang-standzeit-pruefung/',
+    category: 'Rechnungs- und KVA-Prüfung',
+    tags: ['Gerüst', 'Gerüstkosten', 'Standzeit', 'Fassadenschaden', 'Kostenprüfung', 'Arbeitsschutz'],
+    date: '2026-09-28',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Eigenleistungen nach Gebäudeschäden prüffähig dokumentieren',
     description: 'Eigenleistungen werden durch Tätigkeitsnachweis, Zeitaufwand, Qualifikation, Materialbelege und Schadenbezug prüffähig. Fachgrenzen und Sowieso-Kosten sind getrennt zu bewerten.',
     href: '/fachwissen/eigenleistungen-gebaeudeschaden-stunden-material-nachweis/',
