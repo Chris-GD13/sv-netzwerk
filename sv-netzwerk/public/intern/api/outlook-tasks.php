@@ -71,7 +71,7 @@ function otGraph(string $method, string $path, ?array $json=null): array {
     $response = otHttp($method, 'https://graph.microsoft.com/v1.0/' . $path, $headers, $body);
     $data = $response['body'] !== '' ? json_decode($response['body'], true) : [];
     if ($response['status'] < 200 || $response['status'] >= 300) {
-        if (in_array($response['status'], [401, 403], true)) throw new RuntimeException('Microsoft Graph verweigert den Zugriff auf die Outlook-Aufgabenordner.');
+        if (in_array($response['status'], [401, 403], true)) throw new RuntimeException('Der Azure-App fehlen die Microsoft-Graph-Anwendungsberechtigungen Mail.ReadWrite und Administratorzustimmung. Danach können „Zu erledigen“ und „Erledigt“ gelesen und verarbeitet werden.');
         $message = is_array($data) ? (string)($data['error']['message'] ?? '') : '';
         throw new RuntimeException($message !== '' ? $message : 'Outlook-Aufgabe konnte nicht verarbeitet werden.');
     }
