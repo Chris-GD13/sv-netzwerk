@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Rückbau nach Brandschäden fachlich begrenzen und dokumentieren',
+    description: 'Rückbau und Entkernung nach Brandschäden werden anhand von Befund, Schutzmaßnahmen, Freigaben, Mengen und Schadenbezug prüffähig abgegrenzt.',
+    href: '/fachwissen/rueckbau-brandschaden-fachlich-begrenzen-dokumentieren/',
+    category: 'Schadstoffe und Rückbau',
+    tags: ['Brandschaden', 'Rückbau', 'Entkernung', 'Ruß', 'Kontamination', 'Kostenprüfung'],
+    date: '2026-09-29',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Gerüstkosten nach Gebäudeschäden prüffähig abgrenzen',
     description: 'Gerüstkosten werden anhand von Arbeitsbereich, Gerüstausführung, Standzeit und Schutzleistungen fachlich geprüft. Schadenbedingte und ohnehin geplante Arbeiten sind zu trennen.',
     href: '/fachwissen/geruestkosten-gebaeudeschaden-umfang-standzeit-pruefung/',

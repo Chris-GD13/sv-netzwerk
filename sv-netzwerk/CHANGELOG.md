@@ -428,3 +428,7 @@
 - eigenständigen Fachbeitrag „Heizungswasserschäden fachlich prüfen: Leckage, Korrosion, Frost und Folgeschäden trennen“ veröffentlicht
 - Fachwissensübersicht, Kategorien, Tags, Suchindex und Sitemap um die neue Detailroute ergänzt
 - LinkedIn-Begleittext als `prepared-not-posted` abgelegt; Veröffentlichung ohne Beitragsbild gemäß Fachbeitragsstandard
+## 2026-09-29
+- Fachbeitrag „Rückbau nach Brandschäden fachlich begrenzen und dokumentieren“ ergänzt
+- Rückbau, Schutzmaßnahmen, Freigaben, Entsorgung und Schadenbezug in Übersicht, Suchindex und Sitemap integriert
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt
