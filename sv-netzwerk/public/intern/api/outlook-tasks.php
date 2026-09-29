@@ -96,21 +96,22 @@ function otPage(string $path): array {
 
 function otFolders(string $mailbox): array {
     $all = [];
-    $walk = function (string $path, int $depth) use (&$walk, &$all): void {
+    $walk = function (string $path, int $depth) use (&$walk, &$all, $mailbox): void {
         if ($depth > 4) return;
         foreach (otPage($path) as $folder) {
             $id = (string)($folder['id'] ?? '');
             if ($id === '') continue;
             $all[] = $folder;
-            $walk('users/' . rawurlencode($GLOBALS['ot_mailbox_for_walk']) . '/mailFolders/' . rawurlencode($id) . '/childFolders?$top=100', $depth + 1);
+            try {
+                $walk('users/' . rawurlencode($mailbox) . '/mailFolders/' . rawurlencode($id) . '/childFolders?$top=100', $depth + 1);
+            } catch (Throwable) {
+                // A folder without readable children must not hide the remaining task folders.
+            }
         }
     };
-    $GLOBALS['ot_mailbox_for_walk'] = $mailbox;
     $walk('users/' . rawurlencode($mailbox) . '/mailFolders?$top=100', 0);
-    unset($GLOBALS['ot_mailbox_for_walk']);
     return $all;
 }
-
 function otFolderByName(string $mailbox, string $wanted): ?array {
     $needle = mb_strtolower(trim($wanted), 'UTF-8');
     foreach (otFolders($mailbox) as $folder) {
