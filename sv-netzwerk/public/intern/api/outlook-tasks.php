@@ -132,7 +132,7 @@ function otCaseNumber(string $text): string {
 }
 
 function otMessage(string $mailbox, string $folderId, string $id): array {
-    return otGraph('GET', 'users/' . rawurlencode($mailbox) . '/mailFolders/' . rawurlencode($folderId) . '/messages/' . rawurlencode($id) . '?$select=id,subject,receivedDateTime,bodyPreview,webLink,from');
+    return otGraph('GET', 'users/' . rawurlencode($mailbox) . '/mailFolders/' . rawurlencode($folderId) . '/messages/' . rawurlencode($id) . '?$select=id,subject,receivedDateTime,body,bodyPreview,webLink,from,replyTo');
 }
 
 $profileMailbox = otMailbox($user);
@@ -163,11 +163,37 @@ try {
                 'preview' => $preview,
                 'case_number' => $case,
                 'web_link' => (string)($message['webLink'] ?? ''),
-                'edit_url' => $case !== '' ? '/intern/versicherungsfaelle/?schaden_nr=' . rawurlencode($case) : '/intern/versicherungsfaelle/',
+                'edit_url' => '/intern/versicherungsfaelle/?' . http_build_query(array_filter(['schaden_nr' => $case, 'aufgabe' => (string)($message['id'] ?? '')])),
             ];
         }
         usort($items, static fn(array $a, array $b): int => strcmp($a['received_at'], $b['received_at']));
         apiJson(['ok' => true, 'mailbox' => $profileMailbox, 'folder' => $folder['displayName'] ?? 'Zu erledigen', 'items' => $items]);
+    }
+
+    if ($action === 'detail' || $action === 'attachment') {
+        $id = trim((string)($_GET['id'] ?? ''));
+        if ($id === '') apiError(400, 'Aufgabe fehlt.');
+        $open = otFolderByName($profileMailbox, 'Zu erledigen');
+        if (!$open) apiError(404, 'Der Aufgabenordner wurde nicht gefunden.');
+        $message = otMessage($profileMailbox, (string)$open['id'], $id);
+        $path = 'users/' . rawurlencode($profileMailbox) . '/messages/' . rawurlencode($id) . '/attachments';
+        if ($action === 'attachment') {
+            $attachmentId = trim((string)($_GET['attachment_id'] ?? ''));
+            if ($attachmentId === '') apiError(400, 'Anhang fehlt.');
+            $attachment = otGraph('GET', $path . '/' . rawurlencode($attachmentId));
+            if (($attachment['@odata.type'] ?? '') !== '#microsoft.graph.fileAttachment' || empty($attachment['contentBytes'])) apiError(415, 'Dieser Anhang kann nicht übernommen werden.');
+            apiJson(['ok' => true, 'name' => basename((string)($attachment['name'] ?? 'Anhang')), 'content_type' => (string)($attachment['contentType'] ?? 'application/octet-stream'), 'content_base64' => (string)$attachment['contentBytes']]);
+        }
+        $attachments = otPage($path . '?$select=id,name,contentType,size,isInline&$top=100');
+        $body = (string)($message['body']['content'] ?? $message['bodyPreview'] ?? '');
+        if (strcasecmp((string)($message['body']['contentType'] ?? ''), 'html') === 0) $body = html_entity_decode(strip_tags(preg_replace('/<\s*br\s*\/?\s*>/i', "\n", $body) ?? $body), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        apiJson(['ok' => true, 'task' => [
+            'id' => (string)($message['id'] ?? ''), 'subject' => (string)($message['subject'] ?? ''),
+            'case_number' => otCaseNumber((string)($message['subject'] ?? '') . ' ' . $body),
+            'body' => trim($body), 'from' => (string)($message['from']['emailAddress']['address'] ?? ''),
+            'web_link' => (string)($message['webLink'] ?? ''),
+            'attachments' => array_values(array_map(static fn(array $a): array => ['id' => (string)($a['id'] ?? ''), 'name' => (string)($a['name'] ?? ''), 'size' => (int)($a['size'] ?? 0)], array_filter($attachments, static fn(array $a): bool => empty($a['isInline']) && ($a['@odata.type'] ?? '') === '#microsoft.graph.fileAttachment'))),
+        ]]);
     }
 
     if ($action === 'move') {
