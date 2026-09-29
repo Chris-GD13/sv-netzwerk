@@ -5,6 +5,13 @@ declare(strict_types=1);
 require_once __DIR__ . '/api/config.php';
 
 commonHeaders();
+if (empty($_COOKIE[session_name()])) {
+    $requestUri = (string) ($_SERVER['REQUEST_URI'] ?? '/intern/');
+    $requestPath = parse_url($requestUri, PHP_URL_PATH);
+    if (!is_string($requestPath) || !str_starts_with($requestPath, '/intern/')) $requestPath = '/intern/';
+    header('Location: /intern/login/?next=' . rawurlencode($requestPath), true, 302);
+    exit();
+}
 startSession();
 
 $user = currentUser();

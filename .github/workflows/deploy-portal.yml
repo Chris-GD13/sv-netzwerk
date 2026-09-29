@@ -169,11 +169,15 @@ jobs:
           if ! printf '%s\n' "$marker" | grep -Fx "Commit: $EXPECTED_SHA"; then
             echo "WARNUNG: Servermarker weicht ab; HTTP-Prüfungen werden trotzdem ausgeführt."
           fi
-          for path in /intern/login/ /intern/versicherungsfaelle/; do
-            status="$(curl --location --silent --show-error --retry 3 --retry-delay 3 -o /dev/null -w '%{http_code}' "https://www.sv-netzwerk.eu${path}")"
-            test "$status" = "200"
-            echo "$path: HTTP $status"
-          done
+          status="$(curl --max-time 20 --silent --show-error --retry 2 -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/login/)"
+          test "$status" = "200"
+          echo "/intern/login/: HTTP $status"
+          headers="$(mktemp)"
+          status="$(curl --max-time 20 --max-redirs 0 --silent --show-error --retry 2 -D "$headers" -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/versicherungsfaelle/)"
+          test "$status" = "302"
+          grep -Eiq '^location: /intern/login/\?next=' "$headers"
+          echo "/intern/versicherungsfaelle/: HTTP $status, Anmeldung erforderlich"
+          rm -f "$headers"
           for path in /.well-known/oauth-protected-resource /.well-known/oauth-protected-resource/intern/mcp /.well-known/oauth-protected-resource/intern/mcp/ /.well-known/oauth-authorization-server; do
             headers="$(mktemp)"
             body="$(mktemp)"
