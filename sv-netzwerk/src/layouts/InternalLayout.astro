@@ -143,8 +143,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-header__revenue-item strong { display: block; margin-top: 2px; font-size: .83rem; line-height: 1.25; }
       .intern-header__revenue-item small { display: block; margin-top: 1px; font-size: .61rem; font-weight: 700; line-height: 1.2; }
       @media (max-width: 64rem) {
-        .intern-header__auth-actions { top: 10px; right: 14px; left: auto; }
-        .intern-header__inner { padding-top: 3.5rem; }
+        .intern-header .intern-header__auth-actions { position: static; display: flex; justify-content: flex-end; width: 100%; box-sizing: border-box; padding: 10px 14px 0; }
       }
       @media (max-width: 900px) {
         .intern-portal-shell { grid-template-columns: 1fr; }
