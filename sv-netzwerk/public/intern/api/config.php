@@ -234,14 +234,9 @@ function db(): PDO
         // mehrfach in einer Anweisung (z. B. :now für created_at und updated_at).
         // Native MySQL-Prepares unterstützen das nicht zuverlässig und werfen HY093.
         PDO::ATTR_EMULATE_PREPARES   => true,
-        PDO::ATTR_TIMEOUT          => 5,
     ]);
     $pdo->exec("SET time_zone='+00:00'");
-    // Schemaänderungen dürfen den Login und geschützte Seiten nicht blockieren.
-    // Sie werden nur noch bei ausdrücklich aktivierter Wartung ausgeführt.
-    if (env('RUN_RUNTIME_MIGRATIONS', env('GITHUB_ACTIONS', '') === 'true' ? '1' : '0') === '1') {
-        ensureRuntimeSchema($pdo);
-    }
+    ensureRuntimeSchema($pdo);
     return $pdo;
 }
 
