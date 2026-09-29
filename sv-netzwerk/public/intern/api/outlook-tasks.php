@@ -9,16 +9,14 @@ if (!in_array((string)($user['role'] ?? ''), ['administrator','projektleiter','p
 }
 
 function otEnv(string $key, string $default=''): string {
-    $value = getenv($key);
-    if ($value !== false && trim((string)$value) !== '') return trim((string)$value);
-
-    // Die bestehende Produktionskonfiguration verwendet M365_*; ältere
-    // Portal-Endpunkte verwenden MS_*. Beide Namen werden unterstützt.
+    // Für die Aufgaben-API hat die aktuelle M365-Konfiguration Vorrang.
+    // MS_* bleibt als Rückfall für ältere Portal-Endpunkte erhalten.
     if (str_starts_with($key, 'MS_')) {
-        $legacyValue = getenv('M365_' . substr($key, 3));
-        if ($legacyValue !== false && trim((string)$legacyValue) !== '') return trim((string)$legacyValue);
+        $currentValue = getenv('M365_' . substr($key, 3));
+        if ($currentValue !== false && trim((string)$currentValue) !== '') return trim((string)$currentValue);
     }
-    return $default;
+    $value = getenv($key);
+    return $value === false || trim((string)$value) === '' ? $default : trim((string)$value);
 }
 
 function otMailbox(array $user): string {
