@@ -1,3 +1,8 @@
+## 2026-09-29
+- Neues Portal-Feld „Aufgaben“ ersetzt die Claims-Aufgabenanzeige im Tagescockpit und in der Navigation
+- Outlook-Nachrichten aus „Zu erledigen“ werden je Bearbeiter chronologisch angezeigt und anhand der Schadennummer mit der Fallsuche verknüpft
+- „Erledigt“ verschiebt die Nachricht ohne Outlook-Zusatzklick automatisch in den Outlook-Ordner „Erledigt"
+
 ## 2026-09-28
 - Fachbeitrag „Gerüstkosten nach Gebäudeschäden prüffähig abgrenzen“ ergänzt
 - Gerüstumfang, Standzeit, Schutzleistungen und schadenbedingte Kosten in Übersicht, Suchindex und Sitemap integriert
