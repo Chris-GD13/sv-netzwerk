@@ -5,6 +5,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 <section slot="sidebar-extra" id="vf-expert-panel" class="intern-sidebar__expert" hidden><label class="vf-order-label" for="vf-expert-select"><strong>Bearbeitung für</strong><small>Fallordner und ClaimsForce-Anmeldung des ausgewählten Profils</small></label><select id="vf-expert-select"><option value="christian">Christian Wächter</option><option value="holger">Holger Roth</option><option value="marc">Marc Schütt</option><option value="jens">Jens Maurer</option></select></section>
 <main class="vf-app">
   <section id="vf-active" class="vf-active"><div><i></i><strong>Noch kein Fall geöffnet</strong><small>Fall suchen, neu anlegen oder Unterlagen zur automatischen Anlage hochladen.</small></div></section>
+  <section id="vf-task-context" class="vf-card vf-task-context" hidden aria-live="polite"><header class="vf-step"><b>✉</b><div><strong>Aufgabe bearbeiten</strong><small id="vf-task-meta">Aufgabe wird geladen …</small></div></header><h2 id="vf-task-subject"></h2><div id="vf-task-body" class="vf-task-body"></div><div id="vf-task-attachments" class="vf-task-attachments"></div><div class="vf-calendar-actions"><button id="vf-task-done" class="vf-primary" type="button">Aufgabe erledigen</button><a id="vf-task-outlook" class="vf-secondary" target="_blank" rel="noreferrer" hidden>In Outlook öffnen</a></div><p id="vf-task-state" class="vf-meta"></p></section>
   <div class="vf-grid">
     <aside>
       <section class="vf-card"><header class="vf-step"><b>1</b><div><strong>Fall auswählen</strong><small>Öffnen oder neu beginnen</small></div></header><div class="vf-search"><input id="vf-search-input" placeholder="Schaden-Nr., Name, Straße oder Ort" autocomplete="off" aria-label="Versicherungsfall suchen"><button id="vf-search-btn">Suchen</button></div><p class="vf-search-hint">Ab 3 Zeichen erscheinen passende Fälle automatisch.</p><button id="vf-recent" class="vf-secondary vf-full">Letzte 10 Fälle</button><div id="vf-results" aria-live="polite"></div><button id="vf-new" class="vf-secondary vf-full">Neuen Fall anlegen</button></section>
@@ -582,4 +583,115 @@ document.getElementById('vf-recent')?.addEventListener('click',async()=>{
 </style>
 <script is:inline src="/intern/bki-mail-attachment.js?v=20260827-2"></script>
 <script is:inline src="/intern/whatsapp-case.js?v=20260909-3"></script>
+<style is:global>.vf-task-context{border-left:4px solid #f59a23}.vf-task-context h2{margin:0 0 10px}.vf-task-body{white-space:pre-wrap;line-height:1.5;padding:12px;background:#f6f8fa;border:1px solid #dce5ec;border-radius:8px}.vf-task-attachments{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.vf-task-attachments button{border:1px solid #bac8d3;background:#fff;color:#17324a;border-radius:8px;padding:8px 10px;cursor:pointer}.vf-task-attachments button[disabled]{opacity:.6;cursor:wait}</style>
+<script is:inline>
+(() => {
+  const params=new URLSearchParams(location.search), taskId=params.get('aufgabe')?.trim(), number=params.get('schaden_nr')?.trim();
+  if(!taskId)return;
+  const API='/intern/api/outlook-tasks.php', DRIVE='/intern/api/google-drive-sync.php';
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const request=async(url,opt={})=>{const r=await fetch(url,{credentials:'same-origin',...opt}),j=await r.json().catch(()=>({}));if(!r.ok||j.ok===false)throw Error(j.error||`HTTP ${r.status}`);return j};
+  const readCase=()=>{
+    for(const storage of [sessionStorage,localStorage]){
+      try{const value=JSON.parse(storage.getItem('svnet-case')||'null');if(value?.folder_id)return value}catch{}
+    }
+    return null;
+  };
+  const saveCase=current=>{
+    sessionStorage.setItem('svnet-case',JSON.stringify(current));
+    localStorage.setItem('svnet-case',JSON.stringify(current));
+  };
+  const clearCase=()=>{sessionStorage.removeItem('svnet-case');localStorage.removeItem('svnet-case')};
+  const norm=v=>String(v??'').toLocaleLowerCase('de').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+  const taskQueries=task=>[task.case_number,task.from,task.subject,task.body].filter(v=>String(v||'').trim().length>=2);
+  const candidateScore=(row,task)=>{
+    const meta=row.meta||{},hay=norm([row.name,meta.schaden_nr,meta.vn_objekt,meta.strasse,meta.plz,meta.ort,meta.schaden_strasse,meta.schaden_plz,meta.schaden_ort,meta.email].join(' '));
+    const from=norm(task.from),subject=norm(task.subject),body=norm(task.body),number=norm(task.case_number);
+    let score=0;
+    if(number&&norm(meta.schaden_nr)===number)score+=100;
+    if(from&&hay.includes(from))score+=30;
+    const words=[...new Set([...norm(task.from+' '+task.subject+' '+task.body).split(' ').filter(word=>word.length>=4)])];
+    for(const word of words)if(hay.includes(word))score+=word===from?20:1;
+    if(subject&&hay.includes(subject))score+=10;
+    if(body&&hay.includes(body))score+=10;
+    return score;
+  };
+  const findTaskCases=async task=>{
+    const found=new Map();
+    for(const query of taskQueries(task)){
+      try{const data=await request(`${DRIVE}?action=search_cases&q=${encodeURIComponent(query)}`);for(const row of data.results||[])if(row?.id)found.set(row.id,row)}catch{}
+    }
+    return [...found.values()].map(row=>({...row,_task_score:candidateScore(row,task)})).sort((a,b)=>b._task_score-a._task_score);
+  };
+  const renderTask=(task,current,choices=[],notice='')=>{
+    const box=document.getElementById('vf-task-context'),state=document.getElementById('vf-task-state');
+    if(!box)return;
+    box.hidden=false;
+    document.getElementById('vf-task-subject').textContent=task.subject||'Aufgabe';
+    document.getElementById('vf-task-meta').textContent=[task.from,task.case_number?'Schaden-Nr. '+task.case_number:''].filter(Boolean).join(' · ');
+    document.getElementById('vf-task-body').textContent=task.body||'Kein Nachrichtentext vorhanden.';
+    const attachments=document.getElementById('vf-task-attachments');attachments.innerHTML='';
+    if(!current&&!choices.length){
+      const claimButton=document.createElement('button');claimButton.type='button';claimButton.className='vf-primary';claimButton.textContent='ClaimsForce durchsuchen und Fall anlegen';
+      claimButton.onclick=()=>runClaimsFallback(task,claimButton);
+      attachments.appendChild(claimButton);
+    }
+    if(choices.length){
+      for(const row of choices){
+        const b=document.createElement('button');b.type='button';b.className='vf-secondary';
+        b.textContent='Fall öffnen: '+[row.meta?.schaden_nr,row.meta?.vn_objekt,row.meta?.ort].filter(Boolean).join(' · ');
+        b.onclick=async()=>{b.disabled=true;b.textContent='Fall wird geöffnet …';try{const loaded=await request(`${DRIVE}?action=load_case&id=${encodeURIComponent(row.id)}`);saveCase({folder_id:loaded.case?.id||row.id,meta:{...(row.meta||{}),...(loaded.case?.meta||{})}});location.replace('/intern/versicherungsfaelle/?aufgabe='+encodeURIComponent(taskId))}catch(e){b.disabled=false;b.textContent='Fall öffnen: '+[row.meta?.schaden_nr,row.meta?.vn_objekt,row.meta?.ort].filter(Boolean).join(' · ');state.textContent=e.message}};
+        attachments.appendChild(b);
+      }
+    }
+    if(current){
+      for(const a of task.attachments||[]){
+        const b=document.createElement('button');b.type='button';b.textContent='Anhang übernehmen: '+a.name;
+        b.onclick=async()=>{b.disabled=true;try{const file=await request(`${API}?action=attachment&id=${encodeURIComponent(taskId)}&attachment_id=${encodeURIComponent(a.id)}`),raw=atob(file.content_base64),bytes=Uint8Array.from(raw,c=>c.charCodeAt(0)),fd=new FormData();fd.append('folder_id',current.folder_id);fd.append('last_modified','0');fd.append('file',new File([bytes],file.name,{type:file.content_type}));await request(`${DRIVE}?action=upload_case_document`,{method:'POST',body:fd});b.textContent='Übernommen: '+a.name;state.textContent='Anhang wurde in der Fallakte gespeichert.'}catch(e){b.disabled=false;state.textContent=e.message}};
+        attachments.appendChild(b);
+      }
+    }
+    const done=document.getElementById('vf-task-done');done.disabled=!current;done.onclick=current?async()=>{done.disabled=true;try{await request(`${API}?action=move`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:taskId})});state.textContent='Aufgabe erledigt und nach „Erledigt“ verschoben.';done.textContent='Erledigt'}catch(e){done.disabled=false;state.textContent=e.message}}:null;
+    const outlook=document.getElementById('vf-task-outlook');if(task.web_link){outlook.hidden=false;outlook.href=task.web_link}
+    state.textContent=notice;
+  };
+  const runClaimsFallback=async(task,button=null)=>{
+    const state=document.getElementById('vf-task-state'),key='svnet-task-claims:'+taskId;
+    if(button){button.disabled=true;button.textContent='ClaimsForce wird durchsucht …'}
+    state.textContent='Kein Fall im Portal gefunden. ClaimsForce wird nach Absender, Name, Adresse und Mailinhalt abgeglichen; gefundene Unterlagen werden in die Fallakte übernommen.';
+    sessionStorage.setItem(key,'running');
+    const importButton=document.getElementById('vf-claims-import');
+    if(!importButton){state.textContent='ClaimsForce-Importstation ist nicht verfügbar. Bitte den Fall manuell auswählen.';if(button){button.disabled=false;button.textContent='ClaimsForce erneut durchsuchen'};return}
+    const finish=async()=>{
+      window.removeEventListener('svnet:claims-summary-update',finish);window.removeEventListener('svnet:cases-changed',finish);
+      const rows=await findTaskCases(task),best=rows[0],second=rows[1];
+      if(best&&best._task_score>=30&&(!second||best._task_score>second._task_score)){
+        try{const loaded=await request(`${DRIVE}?action=load_case&id=${encodeURIComponent(best.id)}`);saveCase({folder_id:loaded.case?.id||best.id,meta:{...(best.meta||{}),...(loaded.case?.meta||{})}});sessionStorage.removeItem(key);location.replace('/intern/versicherungsfaelle/?aufgabe='+encodeURIComponent(taskId));return}catch(e){state.textContent=e.message}
+      }
+      sessionStorage.removeItem(key);renderTask(task,null,rows,'ClaimsForce wurde abgeglichen. Bitte den zutreffenden Fall öffnen.');
+    };
+    window.addEventListener('svnet:claims-summary-update',finish,{once:true});window.addEventListener('svnet:cases-changed',finish,{once:true});
+    try{if(!importButton.disabled)importButton.click();else state.textContent='ClaimsForce-Abgleich läuft bereits. Neue Falldaten werden nach Abschluss übernommen.'}catch(e){window.removeEventListener('svnet:claims-summary-update',finish);window.removeEventListener('svnet:cases-changed',finish);state.textContent=e.message;if(button){button.disabled=false;button.textContent='ClaimsForce erneut durchsuchen'}}
+  };
+  const bootstrap=async()=>{
+    const box=document.getElementById('vf-task-context'),state=document.getElementById('vf-task-state');
+    try{
+      const detail=await request(`${API}?action=detail&id=${encodeURIComponent(taskId)}`),task=detail.task||{};
+      let current=readCase();
+      if(!current?.folder_id || (number && String(current.meta?.schaden_nr||'')!==number)){
+        clearCase();
+        const searchText=[number,task.subject,task.body].filter(Boolean).join(' ');
+        const found=await request(`${DRIVE}?action=search_cases&q=${encodeURIComponent(searchText)}`),rows=found.results||[];
+        const exact=number?rows.filter(r=>String(r.meta?.schaden_nr||'')===number):[];
+        if(exact.length===1){const row=exact[0],loaded=await request(`${DRIVE}?action=load_case&id=${encodeURIComponent(row.id)}`);saveCase({folder_id:loaded.case?.id||row.id,meta:{...(row.meta||{}),...(loaded.case?.meta||{})}});location.replace('/intern/versicherungsfaelle/?aufgabe='+encodeURIComponent(taskId));return}
+        renderTask(task,null,rows,rows.length?'Mehrere mögliche Fälle gefunden. Bitte den zutreffenden Fall öffnen.':'Kein Fall konnte automatisch zugeordnet werden. ClaimsForce-Abgleich wird gestartet …');
+        if(!rows.length)setTimeout(()=>{if(sessionStorage.getItem('svnet-task-claims:'+taskId)!=='running')runClaimsFallback(task)},0);
+        return;
+      }
+      renderTask(task,current);
+    }catch(e){if(box){box.hidden=false;state.textContent=e.message;state.className='vf-meta vf-claims-bad'}}
+  };
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',bootstrap,{once:true}):bootstrap();
+})();
+</script>
 </InternalLayout>
