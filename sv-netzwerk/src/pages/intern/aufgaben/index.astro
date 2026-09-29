@@ -81,7 +81,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     list.innerHTML = items.map((item, index) => {
       const from = item.from ? ' · ' + esc(item.from) : '';
       const caseText = item.case_number ? esc(item.case_number) : 'Fallnummer nicht erkannt';
-      const edit = item.case_number ? '<a class="tasks-action" href="' + esc(item.edit_url) + '">Bearbeiten</a>' : '<a class="tasks-action" href="/intern/versicherungsfaelle/">Fall suchen</a>';
+      const edit = '<a class="tasks-action" href="' + esc(item.edit_url) + '">Bearbeiten</a>';
       return '<article class="task-row" data-id="' + esc(item.id) + '" data-index="' + index + '">' +
         '<div class="task-main"><div class="task-meta"><span class="task-case">' + caseText + '</span><span>' + esc(date(item.received_at)) + from + '</span></div>' +
         '<h2 class="task-subject">' + esc(item.subject) + '</h2>' +
