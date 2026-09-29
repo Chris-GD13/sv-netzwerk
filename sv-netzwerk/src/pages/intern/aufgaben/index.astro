@@ -1,0 +1,137 @@
+---
+import InternalLayout from '../../../layouts/InternalLayout.astro';
+---
+<InternalLayout title="Aufgaben" description="Outlook-Aufgaben aus dem Ordner Zu erledigen, chronologisch und fallbezogen." currentPath="/intern/aufgaben/">
+  <main class="tasks-app">
+    <header class="tasks-head">
+      <div>
+        <p class="tasks-kicker">Arbeitsliste</p>
+        <h1>Aufgaben</h1>
+        <p>Alle Nachrichten aus Outlook „Zu erledigen“, älteste zuerst. Erledigte Aufgaben werden direkt nach „Erledigt“ verschoben.</p>
+      </div>
+      <div class="tasks-head-actions">
+        <span id="tasks-count" class="tasks-count">– offene Aufgaben</span>
+        <button id="tasks-refresh" class="tasks-secondary" type="button">Aktualisieren</button>
+      </div>
+    </header>
+    <section class="tasks-status" id="tasks-status" role="status" aria-live="polite">Aufgaben werden geladen …</section>
+    <section id="tasks-list" class="tasks-list" aria-label="Offene Aufgaben"></section>
+    <section id="tasks-empty" class="tasks-empty" hidden>
+      <strong>Keine offenen Aufgaben</strong>
+      <span>Der Outlook-Ordner „Zu erledigen“ ist leer.</span>
+    </section>
+  </main>
+</InternalLayout>
+
+<style>
+  .tasks-app { max-width: 1180px; margin: 0 auto; padding: clamp(22px, 4vw, 48px); color: #263746; }
+  .tasks-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 22px; border-bottom: 1px solid #d9dde1; }
+  .tasks-kicker { margin: 0 0 6px; color: #f59a23; font-size: .76rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+  .tasks-head h1 { margin: 0; color: #071a2e; font-size: clamp(1.8rem, 3vw, 2.7rem); }
+  .tasks-head p:not(.tasks-kicker) { max-width: 700px; margin: 10px 0 0; color: #637483; line-height: 1.5; }
+  .tasks-head-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; }
+  .tasks-count { padding: 9px 11px; border: 1px solid #d9dde1; background: #fff; font-weight: 800; white-space: nowrap; }
+  .tasks-secondary, .tasks-action { appearance: none; border: 1px solid #18324a; border-radius: 3px; background: #fff; color: #18324a; padding: 9px 12px; font: inherit; font-weight: 800; cursor: pointer; text-decoration: none; }
+  .tasks-secondary:hover, .tasks-action:hover { background: #eef2f5; }
+  .tasks-status { margin: 18px 0 12px; color: #637483; font-size: .92rem; }
+  .tasks-status.is-error { color: #a63d1e; }
+  .tasks-list { display: grid; gap: 10px; }
+  .task-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 16px 18px; border: 1px solid #d9dde1; border-left: 4px solid #f59a23; background: #fff; box-shadow: 0 2px 8px rgba(7,26,46,.04); }
+  .task-main { min-width: 0; }
+  .task-meta { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-bottom: 6px; color: #637483; font-size: .8rem; }
+  .task-case { color: #c56d00; font-weight: 900; letter-spacing: .02em; }
+  .task-subject { margin: 0; color: #071a2e; font-size: 1.04rem; line-height: 1.35; overflow-wrap: anywhere; }
+  .task-preview { margin: 7px 0 0; color: #637483; font-size: .88rem; line-height: 1.45; }
+  .task-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+  .task-action--done { border-color: #34834b; background: #34834b; color: #fff; }
+  .task-action--done:hover { background: #2a6c3d; }
+  .task-action[disabled] { cursor: wait; opacity: .6; }
+  .tasks-empty { display: grid; gap: 7px; padding: 40px 24px; border: 1px dashed #b8c1c8; background: #fff; text-align: center; color: #637483; }
+  .tasks-empty strong { color: #071a2e; font-size: 1.15rem; }
+  @media (max-width: 720px) {
+    .tasks-head { align-items: flex-start; flex-direction: column; }
+    .tasks-head-actions { justify-content: flex-start; }
+    .task-row { grid-template-columns: 1fr; }
+    .task-actions { justify-content: flex-start; }
+  }
+</style>
+
+<script is:inline>
+(() => {
+  const API = '/intern/api/outlook-tasks.php';
+  const list = document.getElementById('tasks-list');
+  const empty = document.getElementById('tasks-empty');
+  const state = document.getElementById('tasks-status');
+  const count = document.getElementById('tasks-count');
+  const refresh = document.getElementById('tasks-refresh');
+  const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
+  const date = (value) => {
+    if (!value) return 'Eingang unbekannt';
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? value : new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' }).format(parsed);
+  };
+  const short = (value, max = 280) => {
+    const text = String(value ?? '').replace(/\s+/g, ' ').trim();
+    return text.length > max ? text.slice(0, max - 1) + '…' : text;
+  };
+  const setState = (text, error = false) => { state.textContent = text; state.classList.toggle('is-error', error); };
+  const render = (items) => {
+    count.textContent = items.length + (items.length === 1 ? ' offene Aufgabe' : ' offene Aufgaben');
+    empty.hidden = items.length !== 0;
+    list.innerHTML = items.map((item, index) => {
+      const from = item.from ? ' · ' + esc(item.from) : '';
+      const caseText = item.case_number ? esc(item.case_number) : 'Fallnummer nicht erkannt';
+      const edit = item.case_number ? '<a class="tasks-action" href="' + esc(item.edit_url) + '">Bearbeiten</a>' : '<a class="tasks-action" href="/intern/versicherungsfaelle/">Fall suchen</a>';
+      return '<article class="task-row" data-id="' + esc(item.id) + '" data-index="' + index + '">' +
+        '<div class="task-main"><div class="task-meta"><span class="task-case">' + caseText + '</span><span>' + esc(date(item.received_at)) + from + '</span></div>' +
+        '<h2 class="task-subject">' + esc(item.subject) + '</h2>' +
+        (item.preview ? '<p class="task-preview">' + esc(short(item.preview)) + '</p>' : '') +
+        '</div><div class="task-actions">' + edit + '<button class="tasks-action task-action--done" type="button" data-done="' + esc(item.id) + '">Erledigt</button></div></article>';
+    }).join('');
+    list.querySelectorAll('[data-done]').forEach((button) => button.addEventListener('click', () => complete(button)));
+  };
+  const load = async () => {
+    refresh.disabled = true;
+    setState('Aufgaben werden geladen …');
+    try {
+      const response = await fetch(API + '?action=list', { credentials: 'same-origin', cache: 'no-store' });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.error || 'Aufgaben konnten nicht geladen werden.');
+      render(data.items || []);
+      setState((data.folder || 'Zu erledigen') + ' · älteste Aufgabe oben');
+    } catch (error) {
+      list.innerHTML = '';
+      empty.hidden = true;
+      count.textContent = '– offene Aufgaben';
+      setState(error.message || 'Aufgaben konnten nicht geladen werden.', true);
+    } finally {
+      refresh.disabled = false;
+    }
+  };
+  const complete = async (button) => {
+    const row = button.closest('.task-row');
+    const id = button.dataset.done;
+    if (!row || !id) return;
+    button.disabled = true;
+    button.textContent = 'Wird erledigt …';
+    try {
+      const response = await fetch(API + '?action=move', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.error || 'Aufgabe konnte nicht verschoben werden.');
+      row.remove();
+      const remaining = list.querySelectorAll('.task-row').length;
+      count.textContent = remaining + (remaining === 1 ? ' offene Aufgabe' : ' offene Aufgaben');
+      if (remaining === 0) empty.hidden = false;
+      setState('Aufgabe nach „Erledigt“ verschoben. Nächste offene Aufgabe ist bereit.');
+      const next = list.querySelector('.task-row button[data-done]');
+      if (next) next.focus();
+    } catch (error) {
+      button.disabled = false;
+      button.textContent = 'Erledigt';
+      setState(error.message || 'Aufgabe konnte nicht verschoben werden.', true);
+    }
+  };
+  refresh?.addEventListener('click', load);
+  load();
+})();
+</script>
