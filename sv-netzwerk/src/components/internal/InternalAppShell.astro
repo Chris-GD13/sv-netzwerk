@@ -217,7 +217,7 @@ const { route, recordId = '' } = Astro.props;
       if (settled) return;
       settled = true;
       renderStartupError(root, 'Zeitüberschreitung beim Initialisieren');
-    }, 8000);
+    }, 30000);
 
     mountInternalPortal(root)
       .then(() => {
