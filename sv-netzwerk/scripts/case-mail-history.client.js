@@ -92,6 +92,24 @@ const MsgReader = typeof MsgReaderPackage.default === 'function'
       name: attachment.filename || 'Anhang', type: attachment.mimeType || 'application/octet-stream', content: attachment.content,
     })),
   });
+  const readMail = async file => {
+    const buffer = await file.arrayBuffer();
+    if (/\.eml$/i.test(file.name || '')) return normalizeEml(await new PostalMime().parse(buffer));
+    if (typeof MsgReader !== 'function') throw Error('MSG-Parser konnte nicht initialisiert werden.');
+    const reader = new MsgReader(buffer);
+    const info = reader.getFileData();
+    if (info.error) throw Error(info.error);
+    return normalizeMsg(reader, info);
+  };
+  const attachmentFile = attachment => {
+    if (!attachment?.content || !attachment.name) return null;
+    const content = attachment.content instanceof ArrayBuffer
+      ? attachment.content
+      : (ArrayBuffer.isView(attachment.content)
+        ? attachment.content.slice().buffer
+        : attachment.content);
+    return new File([content], attachment.name, { type: attachment.type || 'application/octet-stream' });
+  };
   const ensureViewer = () => {
     let viewer = document.getElementById('vf-mail-viewer');
     if (viewer) return viewer;
@@ -240,6 +258,7 @@ const MsgReader = typeof MsgReaderPackage.default === 'function'
     setEnabled(false);
     let uploaded = 0;
     let duplicates = 0;
+    let attachmentsUploaded = 0;
     try {
       for (const [index, file] of files.entries()) {
         state.textContent = `Mail ${index + 1} von ${files.length} wird in der Fallakte gespeichert …`;
@@ -249,10 +268,30 @@ const MsgReader = typeof MsgReaderPackage.default === 'function'
         body.append('file', file);
         const result = await request(`${API}?action=upload_case_document`, { method: 'POST', body });
         result.duplicate ? duplicates++ : uploaded++;
+        // Keep the original mail and also file every embedded document in the
+        // case archive so KVA, invoices and other evidence can be processed by
+        // the normal document pipeline.
+        try {
+          const mail = await readMail(file);
+          for (const attachment of mail.attachments || []) {
+            const extracted = attachmentFile(attachment);
+            if (!extracted) continue;
+            const attachmentBody = new FormData();
+            attachmentBody.append('folder_id', active.folder_id);
+            attachmentBody.append('last_modified', '0');
+            attachmentBody.append('file', extracted);
+            const saved = await request(`${API}?action=upload_case_document`, { method: 'POST', body: attachmentBody });
+            if (!saved.duplicate && !saved.excluded) attachmentsUploaded++;
+          }
+        } catch {
+          // A malformed or encrypted attachment must not prevent the mail itself
+          // from being archived. It remains available in the original message.
+        }
       }
       input.value = '';
       await load();
-      state.textContent = `${uploaded} Mail${uploaded === 1 ? '' : 's'} gespeichert${duplicates ? ` · ${duplicates} bereits vorhanden` : ''}.`;
+      state.textContent = `${uploaded} Mail${uploaded === 1 ? '' : 's'} gespeichert${attachmentsUploaded ? ` · ${attachmentsUploaded} Mail-Anhang${attachmentsUploaded === 1 ? '' : 'e'} übernommen` : ''}${duplicates ? ` · ${duplicates} bereits vorhanden` : ''}.`;
+      window.dispatchEvent(new CustomEvent('svnet:case-documents-changed'));
     } catch (error) {
       state.textContent = `Mail konnte nicht gespeichert werden: ${error.message}`;
     } finally {
