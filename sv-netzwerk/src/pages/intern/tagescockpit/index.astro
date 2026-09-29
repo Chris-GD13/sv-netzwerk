@@ -24,7 +24,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     <section class="dc-summary" aria-label="Tagesübersicht">
       <a class="dc-summary-card" href="#dc-cases-section" aria-label="Fälle im Ordner anzeigen"><span>Fälle im Ordner</span><strong id="dc-case-count">–</strong><small id="dc-case-folder">Google Drive</small><em>Fälle anzeigen →</em></a>
       <a class="dc-summary-card" href="#dc-today-section" aria-label="Heutige Termine anzeigen"><span>Termine heute</span><strong id="dc-today-count">–</strong><small id="dc-next-event">Kalender wird geprüft</small><em>Termine anzeigen →</em></a>
-      <a class="dc-summary-card" href="https://web.claimsforce.com/tasks" target="_blank" rel="noreferrer" aria-label="ClaimsForce-Aufgaben öffnen und bearbeiten"><span>Claims-Aufgaben</span><strong id="dc-claims-count">–</strong><small id="dc-claims-summary">ClaimsForce wird geprüft</small><em>In ClaimsForce bearbeiten ↗</em></a>
+      <a class="dc-summary-card" href="/intern/aufgaben/" aria-label="Offene Aufgaben anzeigen und bearbeiten"><span>Aufgaben</span><strong id="dc-claims-count">–</strong><small id="dc-claims-summary">Outlook wird geprüft</small><em>Aufgaben bearbeiten →</em></a>
       <a class="dc-summary-card" href="#dc-cases-section" aria-label="Prüfhinweise in den zuletzt bearbeiteten Fällen anzeigen"><span>Prüfhinweise</span><strong id="dc-warning-count">–</strong><small>in den letzten 10 Fällen</small><em>Betroffene Fälle anzeigen →</em></a>
     </section>
 
@@ -145,8 +145,8 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   }
 
   async function loadClaims(){
-    const summary=await request('/intern/api/claimsforce-queue.php?action=summary'),items=summary.items||[],open=items.reduce((sum,item)=>sum+(Number.isFinite(Number(item.open_count))?Number(item.open_count):0),0);
-    $('dc-claims-count').textContent=items.some(item=>item.open_count!==null)?String(open):'–';$('dc-claims-summary').textContent=items.map(item=>`${item.label}: ${item.open_count??'–'}`).join(' · ')||'Kein Aufgabenstand';
+    const data=await request('/intern/api/outlook-tasks.php?action=list'),items=data.items||[];
+    $('dc-claims-count').textContent=String(items.length);$('dc-claims-summary').textContent=items.length===1?'1 offene Aufgabe':`${items.length} offene Aufgaben`;
   }
 
   async function loadRevenue(){
