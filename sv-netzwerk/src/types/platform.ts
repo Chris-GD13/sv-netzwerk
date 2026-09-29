@@ -20,6 +20,7 @@ export interface ExpertProfile {
   group: 'expert' | 'backoffice';
   function: string;
   expertise: string[];
+  expertiseDetails?: string[];
   regions: string[];
   qualifications: string[];
   certifications: string[];
