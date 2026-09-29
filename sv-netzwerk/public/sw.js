@@ -3,9 +3,9 @@
 
 import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { CacheFirst, NetworkFirst } from 'workbox-strategies';
+import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
 
-const CACHE_VERSION = '20260905-7';
+const CACHE_VERSION = '20260929-1';
 const PAGE_CACHE = `portal-pages-${CACHE_VERSION}`;
 const API_CACHE = `api-cache-${CACHE_VERSION}`;
 const ASSET_CACHE = `assets-cache-${CACHE_VERSION}`;
@@ -22,6 +22,12 @@ registerRoute(
     cacheName: PAGE_CACHE,
     plugins: [],
   })
+);
+
+// Authentication state must never fall back to a cached session response.
+registerRoute(
+  ({ url }) => url.pathname === '/intern/api/auth.php',
+  new NetworkOnly()
 );
 
 // API calls - Network First with short timeout

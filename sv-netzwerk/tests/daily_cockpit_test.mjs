@@ -39,6 +39,7 @@ assert(cockpit.includes('id="dc-quick-settlement"')&&cockpit.includes("hidden=da
 assert(cockpit.includes("method:'POST'")&&cockpit.includes("postReminder('save'")&&cockpit.includes("postReminder('complete'"),'Nur die sichtbare Wiedervorlage darf im Cockpit gespeichert und erledigt werden');
 assert(cockpit.includes("sessionStorage.setItem('svnet-case'")&&cockpit.includes("location.assign('/intern/versicherungsfaelle/')"),'Fallübergabe muss in den bestehenden Fallbereich führen');
 assert(!cockpit.includes('data-system="drive"'),'Die Systemampeln dürfen nicht mehr die erste Seite belegen');
-assert(layout.includes("/sw.js?v=20260905-7")&&sw.includes("CACHE_VERSION = '20260905-7'"),'Portalcache muss für die neue Tagescockpit-Aufteilung eindeutig erneuert werden');
+assert(layout.includes("/sw.js?v=20260929-1")&&sw.includes("CACHE_VERSION = '20260929-1'"),'Portalcache muss für die neue Tagescockpit-Aufteilung eindeutig erneuert werden');
+assert(sw.includes("({ url }) => url.pathname === '/intern/api/auth.php'")&&sw.includes('new NetworkOnly()')&&sw.indexOf('new NetworkOnly()')<sw.indexOf('new NetworkFirst({\n    cacheName: API_CACHE'),'Anmeldesitzungen dürfen nicht aus dem Cache geladen werden');
 
 console.log('daily_cockpit_test: ok');
