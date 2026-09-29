@@ -239,7 +239,7 @@ function db(): PDO
     $pdo->exec("SET time_zone='+00:00'");
     // Schemaänderungen dürfen den Login und geschützte Seiten nicht blockieren.
     // Sie werden nur noch bei ausdrücklich aktivierter Wartung ausgeführt.
-    if (env('RUN_RUNTIME_MIGRATIONS', '0') === '1') {
+    if (env('RUN_RUNTIME_MIGRATIONS', env('GITHUB_ACTIONS', '') === 'true' ? '1' : '0') === '1') {
         ensureRuntimeSchema($pdo);
     }
     return $pdo;
