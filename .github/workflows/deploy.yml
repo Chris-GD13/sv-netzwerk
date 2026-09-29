@@ -6,14 +6,6 @@ on:
       - main
     paths:
       - "sv-netzwerk/**"
-      - "!sv-netzwerk/public/intern/**"
-      - "!sv-netzwerk/src/pages/intern/**"
-      - "!sv-netzwerk/src/layouts/InternalLayout.astro"
-      - "!sv-netzwerk/src/styles/internal-portal.css"
-      - "!sv-netzwerk/src/lib/internal/**"
-      - "!sv-netzwerk/tests/**"
-      - "!sv-netzwerk/docs/fachbeitrag-veroeffentlichungsprotokoll.csv"
-      - "!sv-netzwerk/src/data/calendar-slots.json"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
