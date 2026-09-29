@@ -142,6 +142,10 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-header__revenue-item span { display: block; overflow: hidden; font-size: .65rem; font-weight: 800; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
       .intern-header__revenue-item strong { display: block; margin-top: 2px; font-size: .83rem; line-height: 1.25; }
       .intern-header__revenue-item small { display: block; margin-top: 1px; font-size: .61rem; font-weight: 700; line-height: 1.2; }
+      @media (max-width: 64rem) {
+        .intern-header__auth-actions { top: 10px; right: 14px; left: auto; }
+        .intern-header__inner { padding-top: 3.5rem; }
+      }
       @media (max-width: 900px) {
         .intern-portal-shell { grid-template-columns: 1fr; }
         .intern-sidebar { display: block; padding: 7px 10px; border-right: 0; border-bottom: 1px solid #d9dde1; overflow-x: auto; }
@@ -156,7 +160,6 @@ const isActive = (href: string) => currentPath.startsWith(href);
         .intern-header__revenue-item:first-child { padding-top: 0; border-top: 0; }
       }
       @media (max-width: 680px) {
-        .intern-header__auth-actions { position: static; transform: none; }
         .intern-header .intern-header__brand { flex-wrap: wrap; }
         .intern-header__identity { width: 100%; }
         .intern-header__login { position: static; transform: none; padding: 7px 8px; font-size: .76rem; }
