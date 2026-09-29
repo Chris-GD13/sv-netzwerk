@@ -33,10 +33,19 @@ export const experts: ExpertProfile[] = [
   {
     id: 'expert-carmen-gohl', slug: 'carmen-gohl', name: 'Carmen Gohl', role: 'Sachverständiger', roleLabel: 'Sachverständige', group: 'expert',
     function: 'Sachverständige für Sachschadenbewertungen von Immobilien',
-    expertise: ['Sachschadenbewertung', 'Schimmelpilze', 'Innenraumschadstoffe', 'Ölschäden', 'Zeitwertermittlung', 'Kumulschäden'],
-    regions: ['Bundesweit nach Aufgabenstellung'], qualifications: ['Sachschadenbewertung von Immobilien'],
-    certifications: ['Personenzertifizierung nach DIN EN ISO/IEC 17024', 'Vorstandsmitglied im BSS'],
-    shortProfile: 'Sachverständige für Sachschadenbewertungen von Immobilien. Ihre Schwerpunkte sind Schadenregulierung, Sachschadenermittlung, Schimmelpilze, Feuchteprobleme, Innenraumschadstoffe und Ölschäden.',
+    expertise: ['Schadenregulierung', 'Sachschadenbewertung', 'Schimmelpilze in Gebäuden', 'Innenraumschadstoffe', 'Ölschäden', 'Groß- und Komplexschadenregulierung'],
+    expertiseDetails: [
+      'Regulierung von Gebäude- und Sachschäden – von der Schadenaufnahme und Schadenabgrenzung bis zur Prüfung und Bewertung erforderlicher Sanierungsmaßnahmen und Kosten.',
+      'Bewertung von Brand-, Leitungswasser-, Sturm-, Elementar- und Haftpflichtschäden an Gebäuden und Hausrat einschließlich Schadenumfang, erforderlicher Wiederherstellungsmaßnahmen und Zeitwertermittlung.',
+      'Ursachen- und Schadensbewertung bei Feuchte- und Schimmelschäden sowie Sanierungsplanung, Sanierungsbegleitung und Sanierungskontrolle.',
+      'Untersuchung und Bewertung von Innenraumschadstoffen wie Asbest, PAK, PCB, Holzschutzmitteln und Formaldehyd einschließlich Probenahmen, Raumluftmessungen und Sanierungsbegleitung.',
+      'Bewertung von Heizölschäden in Gebäuden sowie Sanierungsplanung und Sanierungsbegleitung.',
+      'Regulierung umfangreicher und komplexer Gebäude- und Sachschäden.',
+    ],
+    regions: ['Heilbronn', 'Baden-Württemberg', 'Bundesweit nach Aufgabenstellung und Schadenumfang'],
+    qualifications: ['Bautechnikerin Hochbau', 'Sach- und Fachkunde Schimmelpilzschäden in Innenräumen', 'Mehrjährige Berufserfahrung in der Brand- und Wasserschadensanierung', 'Niederlassungsleitung und Projektleitung Schadstoffsanierung'],
+    certifications: ['Personenzertifizierung nach DIN EN ISO/IEC 17024 – „Sachverständige für Versicherungswertermittlungen und Sachschadenbewertungen von Immobilien“', 'Vorstandsmitglied im Bundesverband Schimmel- und Schadstoffsanierung e.V. (BSS e.V.)'],
+    shortProfile: 'Sachverständige für Sachschadenbewertungen von Immobilien. Ihre Schwerpunkte sind Schadenregulierung, Sachschadenbewertung, Schimmelpilze in Gebäuden, Innenraumschadstoffe, Ölschäden sowie die Regulierung umfangreicher und komplexer Gebäude- und Sachschäden.',
     contact: centralContact, linkedin: 'https://www.linkedin.com/in/carmen-gohl-34364324a/', image: '/assets/images/team/carmen-gohl-aktuell-bw.webp', status: 'active', tags: ['Sachschadenbewertung', 'Schimmelpilze', 'Innenraumschadstoffe'], publications: [], articles: [],
     company: {
       name: 'Sachverständigenbüro Carmen Gohl',
