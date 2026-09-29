@@ -583,3 +583,18 @@ document.getElementById('vf-recent')?.addEventListener('click',async()=>{
 <script is:inline src="/intern/bki-mail-attachment.js?v=20260827-2"></script>
 <script is:inline src="/intern/whatsapp-case.js?v=20260909-3"></script>
 </InternalLayout>
+
+<script is:inline>
+(() => {
+  const number = new URLSearchParams(location.search).get('schaden_nr')?.trim();
+  if (!number) return;
+  const run = () => {
+    const input = document.getElementById('vf-search-input');
+    const button = document.getElementById('vf-search-btn');
+    if (!(input instanceof HTMLInputElement) || !(button instanceof HTMLButtonElement)) return;
+    input.value = number;
+    button.click();
+  };
+  document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', run, { once: true }) : run();
+})();
+</script>
