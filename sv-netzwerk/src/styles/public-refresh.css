@@ -26,6 +26,38 @@
   box-shadow: 0 4px 16px rgba(7, 26, 46, .08);
 }
 
+.public-site .site-header,
+.public-site .site-header.is-scrolled {
+  border-bottom-color: rgba(255, 255, 255, .12);
+  background: rgba(7, 26, 46, .96);
+}
+
+.public-site .site-brand__logo {
+  width: clamp(10.5rem, 15vw, 13.75rem);
+  height: auto;
+  max-height: 3.25rem;
+  filter: brightness(0) invert(1);
+}
+
+.public-site .desktop-nav__trigger,
+.public-site .desktop-nav__link {
+  color: rgba(255, 255, 255, .88);
+}
+
+.public-site .desktop-nav__trigger:hover,
+.public-site .desktop-nav__trigger[aria-expanded="true"],
+.public-site .desktop-nav__link:hover,
+.public-site .desktop-nav__trigger.is-active,
+.public-site .desktop-nav__link.is-active {
+  background: rgba(255, 255, 255, .1);
+  color: #fff;
+}
+
+.public-site .mobile-menu__top {
+  border-bottom-color: rgba(255, 255, 255, .12);
+  background: #071a2e;
+}
+
 .public-site .sv-card,
 .public-site .search-panel,
 .public-site .search-field,
