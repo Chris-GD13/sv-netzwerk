@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/stromkosten-technische-trocknung-nac
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-23
-  updatedAt: 2026-09-23
+  updatedAt: 2026-09-30
   status: published
 seo:
   title: "Baufeuchte und Schadenfeuchte fachlich abgrenzen"
@@ -111,6 +111,10 @@ In einem ausdrücklich fiktiven Fall werden nach einer gemeldeten Leitungsleckag
 ## Fazit
 
 Baufeuchte und Schadenfeuchte lassen sich nicht anhand eines einzelnen Messwerts unterscheiden. Eine belastbare Bewertung verbindet zeitliche Einordnung, Bauteilkenntnis, geeignete Messverfahren, Vergleichswerte und ein konkret begründetes Trocknungsziel. Die getrennte Dokumentation von Ursache, Maßnahme, Verlauf und Kosten schafft eine nachvollziehbare Grundlage für Sanierung und Regulierung.
+
+## Aktualitätsprüfung zum 30.09.2026
+
+Der Umweltbundesamt-Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall liegt in einer aktualisierten Auflage von April 2024 vor; die zugehörige UBA-Informationsseite wurde am 17.01.2025 aktualisiert. Diese fachliche Leitlinie bestätigt für die Praxis die hier beschriebene Reihenfolge: Feuchteursache klären, Befund erfassen, Sanierungsumfang begründen und Erfolg kontrollieren. Sie ersetzt weder eine objektspezifische Bauwerksdiagnostik noch eine Deckungsentscheidung. Veröffentlichungsdatum dieses Beitrags (23.09.2026), Aktualisierungsdatum (30.09.2026) und der Geltungsstand der Quelle (April 2024/17.01.2025) sind damit getrennt dokumentiert.
 
 ## Quellen und weiterführende Hinweise
 

@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-22
-  updatedAt: 2026-09-22
+  updatedAt: 2026-09-30
   status: published
 seo:
   title: "Geruchsschäden nach Gebäudeereignissen prüfen"
@@ -111,6 +111,10 @@ In einem ausdrücklich fiktiven Leitungswasserschaden wird nach der Trocknung we
 ## Fazit
 
 Geruchsschäden werden erst durch eine belastbare Ursachen- und Materialzuordnung prüffähig. Eine strukturierte Aufnahme, fachgerechte Gefahrenabwehr, getrennte Kostenprüfung und dokumentierte Erfolgskontrolle verhindern pauschale Sanierungsentscheidungen und schaffen eine nachvollziehbare Grundlage für die weitere Regulierung.
+
+## Aktualitätsprüfung zum 30.09.2026
+
+Für die Einordnung mikrobiell bedingter Gerüche wurde der aktuelle UBA-Schimmelleitfaden geprüft. Die aktualisierte Auflage stammt aus April 2024; die UBA-Informationsseite zum Leitfaden wurde am 17.01.2025 aktualisiert. Die Quelle ist eine fachliche Leitlinie und keine verbindliche Deckungs- oder Kostenregel. Praktisch bestätigt sie die im Beitrag geforderte Trennung von Ursache, betroffenen Materialien, Sanierungsmaßnahme und Erfolgskontrolle. Veröffentlichungsdatum (22.09.2026), Aktualisierungsdatum (30.09.2026) und Quellenstand (April 2024/17.01.2025) bleiben getrennt ausgewiesen.
 
 ## Quellen und weiterführende Hinweise
 

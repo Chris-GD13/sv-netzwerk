@@ -1,3 +1,10 @@
+## 2026-09-30
+- Fachbeitrag „Schimmel nach Wasserschäden fachlich einordnen und Sanierung abgrenzen“ ergänzt
+- UBA-Schimmelleitfaden, Quellenstand, Geltungsstatus und VVG-Prüffelder dokumentiert
+- Vier thematisch passende ältere Beiträge mit belastbaren UBA-Aktualitätsständen präzisiert; übrige Beiträge ohne belegte Änderungsnotwendigkeit unverändert belassen
+- Fachbeitrags-Aktualitätsprüfung, Fachwissensübersicht, Suchindex und Sitemap für den Build vorbereitet
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt; ohne ungeprüftes Beitragsbild gemäß Fachbeitragsstandard
+
 ## 2026-09-29
 - Neues Portal-Feld „Aufgaben“ ersetzt die Claims-Aufgabenanzeige im Tagescockpit und in der Navigation
 - Outlook-Nachrichten aus „Zu erledigen“ werden je Bearbeiter chronologisch angezeigt und anhand der Schadennummer mit der Fallsuche verknüpft

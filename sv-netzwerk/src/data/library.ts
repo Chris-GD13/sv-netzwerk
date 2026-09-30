@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Schimmel nach Wasserschäden fachlich einordnen und Sanierung abgrenzen',
+    description: 'Feuchteursache, Schimmelbefund, Sanierungsziel, Schutzmaßnahmen und Kosten nach Wasserschäden werden nachvollziehbar getrennt.',
+    href: '/fachwissen/schimmel-nach-wasserschaden-ursache-sanierungsumfang-kostenabgrenzung/',
+    category: 'Leitungswasser und Feuchte',
+    tags: ['Schimmel', 'Wasserschaden', 'Feuchteursache', 'Sanierung', 'Innenraumhygiene', 'Kostenprüfung'],
+    date: '2026-09-30',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Rückbau nach Brandschäden fachlich begrenzen und dokumentieren',
     description: 'Rückbau und Entkernung nach Brandschäden werden anhand von Befund, Schutzmaßnahmen, Freigaben, Mengen und Schadenbezug prüffähig abgegrenzt.',
     href: '/fachwissen/rueckbau-brandschaden-fachlich-begrenzen-dokumentieren/',
