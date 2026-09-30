@@ -11,10 +11,13 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       </div>
       <div class="tasks-head-actions">
         <span id="tasks-count" class="tasks-count">– offene Aufgaben</span>
-        <button id="tasks-drive-sync" class="tasks-secondary" type="button">Drive-Abgleich starten</button>
         <button id="tasks-refresh" class="tasks-secondary" type="button">Aktualisieren</button>
       </div>
     </header>
+    <section class="tasks-drive-panel" aria-label="Google-Drive-Abgleich">
+      <div><strong>E-Mails in Google Drive ablegen</strong><span>Fehlende Fälle mit erkannter Schadennummer werden dabei neu angelegt.</span></div>
+      <button id="tasks-drive-sync" class="tasks-drive-button" type="button">Drive-Abgleich starten</button>
+    </section>
     <section class="tasks-status" id="tasks-status" role="status" aria-live="polite">Aufgaben werden geladen …</section>
     <section id="tasks-list" class="tasks-list" aria-label="Offene Aufgaben"></section>
     <section id="tasks-empty" class="tasks-empty" hidden>
@@ -34,6 +37,13 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   .tasks-count { padding: 9px 11px; border: 1px solid #d9dde1; background: #fff; font-weight: 800; white-space: nowrap; }
   .tasks-secondary, .tasks-action { appearance: none; border: 1px solid #18324a; border-radius: 3px; background: #fff; color: #18324a; padding: 9px 12px; font: inherit; font-weight: 800; cursor: pointer; text-decoration: none; }
   .tasks-secondary:hover, .tasks-action:hover { background: #eef2f5; }
+  .tasks-drive-panel { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; padding: 16px; border: 1px solid #d9dde1; border-left: 4px solid #f59a23; background: #fff; }
+  .tasks-drive-panel > div { display: grid; gap: 4px; }
+  .tasks-drive-panel strong { color: #071a2e; }
+  .tasks-drive-panel span { color: #637483; font-size: .88rem; line-height: 1.4; }
+  .tasks-drive-button { appearance: none; flex: 0 0 auto; min-height: 44px; border: 1px solid #18324a; border-radius: 3px; background: #18324a; color: #fff; padding: 10px 16px; font: inherit; font-weight: 850; cursor: pointer; }
+  .tasks-drive-button:hover { background: #294860; }
+  .tasks-drive-button:disabled { cursor: wait; opacity: .65; }
   .tasks-status { margin: 18px 0 12px; color: #637483; font-size: .92rem; }
   .tasks-status.is-error { color: #a63d1e; }
   .tasks-list { display: grid; gap: 10px; }
@@ -52,6 +62,8 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   @media (max-width: 720px) {
     .tasks-head { align-items: flex-start; flex-direction: column; }
     .tasks-head-actions { justify-content: flex-start; }
+    .tasks-drive-panel { align-items: stretch; flex-direction: column; gap: 12px; margin-top: 14px; padding: 14px; }
+    .tasks-drive-button { width: 100%; min-height: 48px; }
     .task-row { grid-template-columns: 1fr; }
     .task-actions { justify-content: flex-start; }
   }
