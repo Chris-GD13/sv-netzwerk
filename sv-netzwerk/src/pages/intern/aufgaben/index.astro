@@ -7,7 +7,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       <div>
         <p class="tasks-kicker">Arbeitsliste</p>
         <h1>Aufgaben</h1>
-        <p>Alle Nachrichten aus Outlook „Zu erledigen“, älteste zuerst. Erledigte Aufgaben werden direkt nach „Erledigt“ verschoben.</p>
+        <p>Alle Nachrichten aus Outlook „Zu erledigen“, älteste zuerst. E-Mails mit eindeutiger Schadennummer werden automatisch samt Anhängen in der Fallakte auf Google Drive abgelegt.</p>
       </div>
       <div class="tasks-head-actions">
         <span id="tasks-count" class="tasks-count">– offene Aufgaben</span>
@@ -59,11 +59,13 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 <script is:inline>
 (() => {
   const API = '/intern/api/outlook-tasks.php';
+  const DRIVE_API = '/intern/api/google-drive-sync.php';
   const list = document.getElementById('tasks-list');
   const empty = document.getElementById('tasks-empty');
   const state = document.getElementById('tasks-status');
   const count = document.getElementById('tasks-count');
   const refresh = document.getElementById('tasks-refresh');
+  let archiveRunning = false;
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
   const date = (value) => {
     if (!value) return 'Eingang unbekannt';
@@ -75,6 +77,75 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     return text.length > max ? text.slice(0, max - 1) + '…' : text;
   };
   const setState = (text, error = false) => { state.textContent = text; state.classList.toggle('is-error', error); };
+  const archiveOpenTasks = async (items, mailbox) => {
+    if (archiveRunning) return;
+    archiveRunning = true;
+    let archived = 0, unresolved = 0, failures = 0;
+    const cases = new Map();
+    for (const [index, item] of items.entries()) {
+      const taskKey = `svnet-drive-mail:${mailbox}:${item.id}`;
+      if (!item.id || sessionStorage.getItem(taskKey) === 'done') continue;
+      try {
+        setState(`Google Drive: E-Mail ${index + 1} von ${items.length} wird der Fallakte zugeordnet …`);
+        const detail = await request(`${API}?action=detail&id=${encodeURIComponent(item.id)}`);
+        const task = detail.task || {};
+        const caseNumber = String(task.case_number || item.case_number || '').trim();
+        if (!caseNumber) { unresolved++; continue; }
+        if (!cases.has(caseNumber)) {
+          cases.set(caseNumber, request(`${DRIVE_API}?action=search_cases&q=${encodeURIComponent(caseNumber)}`).then(data =>
+            (data.results || []).filter(row => String(row.meta?.schaden_nr || '').trim() === caseNumber)
+          ));
+        }
+        const exactCases = await cases.get(caseNumber);
+        if (exactCases.length !== 1) { unresolved++; continue; }
+        const folderId = exactCases[0].id;
+        const emlResponse = await fetch(`${API}?action=eml&id=${encodeURIComponent(item.id)}`, { credentials: 'same-origin', cache: 'no-store' });
+        if (!emlResponse.ok) {
+          const error = await emlResponse.json().catch(() => ({}));
+          throw new Error(error.error || `Original-Mail: HTTP ${emlResponse.status}`);
+        }
+        const filename = emlResponse.headers.get('Content-Disposition')?.match(/filename="([^"]+)"/i)?.[1]
+          || `Mail_${encodeURIComponent(item.id).replace(/[^a-z0-9_-]/gi, '').slice(0, 48)}.eml`;
+        const eml = new File([await emlResponse.blob()], filename, { type: 'message/rfc822' });
+        const upload = async file => {
+          const body = new FormData();
+          body.append('folder_id', folderId);
+          body.append('last_modified', '0');
+          body.append('file', file);
+          return request(`${DRIVE_API}?action=upload_case_document`, { method: 'POST', body });
+        };
+        await upload(eml);
+        let attachmentFailures = 0;
+        for (const [attachmentIndex, attachment] of (task.attachments || []).entries()) {
+          try {
+            const data = await request(`${API}?action=attachment&id=${encodeURIComponent(item.id)}&attachment_id=${encodeURIComponent(attachment.id)}`);
+            const raw = atob(data.content_base64);
+            const bytes = Uint8Array.from(raw, character => character.charCodeAt(0));
+            const safeName = String(data.name || 'Anhang').replace(/[\/\\\u0000-\u001f]/g, '_').slice(0, 120);
+            const prefix = filename.replace(/\.eml$/i, '');
+            const file = new File([bytes], `${prefix}_Anhang_${String(attachmentIndex + 1).padStart(2, '0')}_${safeName}`, { type: data.content_type || 'application/octet-stream' });
+            const result = await upload(file);
+            if (result.excluded) attachmentFailures++;
+          } catch { attachmentFailures++; }
+        }
+        if (attachmentFailures === 0) {
+          sessionStorage.setItem(taskKey, 'done');
+          archived++;
+        } else {
+          failures++;
+        }
+      } catch {
+        failures++;
+      }
+    }
+    const summary = `${archived} E-Mail(s) neu oder bereits in Google Drive abgelegt.`;
+    const notes = [
+      unresolved ? `${unresolved} ohne eindeutigen Falltreffer` : '',
+      failures ? `${failures} mit Übertragungsfehler` : '',
+    ].filter(Boolean);
+    setState([summary, ...notes].join(' ') || 'Google-Drive-Abgleich abgeschlossen.', failures > 0);
+    archiveRunning = false;
+  };
   const render = (items) => {
     count.textContent = items.length + (items.length === 1 ? ' offene Aufgabe' : ' offene Aufgaben');
     empty.hidden = items.length !== 0;
@@ -98,7 +169,8 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) throw new Error(data.error || 'Aufgaben konnten nicht geladen werden.');
       render(data.items || []);
-      setState((data.folder || 'Zu erledigen') + ' · älteste Aufgabe oben');
+      setState((data.folder || 'Zu erledigen') + ' · älteste Aufgabe oben · Google-Drive-Abgleich läuft');
+      void archiveOpenTasks(data.items || [], data.mailbox || '');
     } catch (error) {
       list.innerHTML = '';
       empty.hidden = true;
