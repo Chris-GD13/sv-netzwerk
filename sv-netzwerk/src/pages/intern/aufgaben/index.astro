@@ -7,13 +7,17 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       <div>
         <p class="tasks-kicker">Arbeitsliste</p>
         <h1>Aufgaben</h1>
-        <p>Alle Nachrichten aus Outlook „Zu erledigen“, älteste zuerst. Erledigte Aufgaben werden direkt nach „Erledigt“ verschoben.</p>
+        <p>Alle Nachrichten aus Outlook „Zu erledigen“, älteste zuerst. E-Mails mit eindeutiger Schadennummer werden automatisch samt Anhängen in der Fallakte auf Google Drive abgelegt.</p>
       </div>
       <div class="tasks-head-actions">
         <span id="tasks-count" class="tasks-count">– offene Aufgaben</span>
         <button id="tasks-refresh" class="tasks-secondary" type="button">Aktualisieren</button>
       </div>
     </header>
+    <section class="tasks-drive-panel" aria-label="Google-Drive-Abgleich">
+      <div><strong>E-Mails in Google Drive ablegen</strong><span>Fehlende Fälle mit erkannter Schadennummer werden dabei neu angelegt.</span></div>
+      <button id="tasks-drive-sync" class="tasks-drive-button" type="button">Drive-Abgleich starten</button>
+    </section>
     <section class="tasks-status" id="tasks-status" role="status" aria-live="polite">Aufgaben werden geladen …</section>
     <section id="tasks-list" class="tasks-list" aria-label="Offene Aufgaben"></section>
     <section id="tasks-empty" class="tasks-empty" hidden>
@@ -33,6 +37,13 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   .tasks-count { padding: 9px 11px; border: 1px solid #d9dde1; background: #fff; font-weight: 800; white-space: nowrap; }
   .tasks-secondary, .tasks-action { appearance: none; border: 1px solid #18324a; border-radius: 3px; background: #fff; color: #18324a; padding: 9px 12px; font: inherit; font-weight: 800; cursor: pointer; text-decoration: none; }
   .tasks-secondary:hover, .tasks-action:hover { background: #eef2f5; }
+  .tasks-drive-panel { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; padding: 16px; border: 1px solid #d9dde1; border-left: 4px solid #f59a23; background: #fff; }
+  .tasks-drive-panel > div { display: grid; gap: 4px; }
+  .tasks-drive-panel strong { color: #071a2e; }
+  .tasks-drive-panel span { color: #637483; font-size: .88rem; line-height: 1.4; }
+  .tasks-drive-button { appearance: none; flex: 0 0 auto; min-height: 44px; border: 1px solid #18324a; border-radius: 3px; background: #18324a; color: #fff; padding: 10px 16px; font: inherit; font-weight: 850; cursor: pointer; }
+  .tasks-drive-button:hover { background: #294860; }
+  .tasks-drive-button:disabled { cursor: wait; opacity: .65; }
   .tasks-status { margin: 18px 0 12px; color: #637483; font-size: .92rem; }
   .tasks-status.is-error { color: #a63d1e; }
   .tasks-list { display: grid; gap: 10px; }
@@ -51,6 +62,8 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   @media (max-width: 720px) {
     .tasks-head { align-items: flex-start; flex-direction: column; }
     .tasks-head-actions { justify-content: flex-start; }
+    .tasks-drive-panel { align-items: stretch; flex-direction: column; gap: 12px; margin-top: 14px; padding: 14px; }
+    .tasks-drive-button { width: 100%; min-height: 48px; }
     .task-row { grid-template-columns: 1fr; }
     .task-actions { justify-content: flex-start; }
   }
@@ -59,11 +72,16 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 <script is:inline>
 (() => {
   const API = '/intern/api/outlook-tasks.php';
+  const DRIVE_API = '/intern/api/google-drive-sync.php';
   const list = document.getElementById('tasks-list');
   const empty = document.getElementById('tasks-empty');
   const state = document.getElementById('tasks-status');
   const count = document.getElementById('tasks-count');
   const refresh = document.getElementById('tasks-refresh');
+  const driveSync = document.getElementById('tasks-drive-sync');
+  let archiveRunning = false;
+  let currentItems = [];
+  let currentMailbox = '';
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
   const date = (value) => {
     if (!value) return 'Eingang unbekannt';
@@ -75,6 +93,99 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     return text.length > max ? text.slice(0, max - 1) + '…' : text;
   };
   const setState = (text, error = false) => { state.textContent = text; state.classList.toggle('is-error', error); };
+  const archiveOpenTasks = async (items, mailbox) => {
+    if (archiveRunning) return;
+    archiveRunning = true;
+    if (driveSync) driveSync.disabled = true;
+    let archived = 0, unresolved = 0, failures = 0;
+    const cases = new Map();
+    for (const [index, item] of items.entries()) {
+      const taskKey = `svnet-drive-mail:${mailbox}:${item.id}`;
+      if (!item.id || sessionStorage.getItem(taskKey) === 'done') continue;
+      try {
+        setState(`Google Drive: E-Mail ${index + 1} von ${items.length} wird der Fallakte zugeordnet …`);
+        const detail = await request(`${API}?action=detail&id=${encodeURIComponent(item.id)}`);
+        const task = detail.task || {};
+        const caseNumber = String(task.case_number || item.case_number || '').trim();
+        if (!caseNumber) { unresolved++; continue; }
+        if (!cases.has(caseNumber)) {
+          cases.set(caseNumber, request(`${DRIVE_API}?action=search_cases&q=${encodeURIComponent(caseNumber)}`).then(data =>
+            (data.results || []).filter(row => String(row.meta?.schaden_nr || '').trim() === caseNumber)
+          ));
+        }
+        let exactCases = await cases.get(caseNumber);
+        if (exactCases.length > 1) { unresolved++; continue; }
+        if (exactCases.length === 0) {
+          setState(`Google Drive: Fall ${caseNumber} wird neu angelegt …`);
+          const created = await request(`${DRIVE_API}?action=save_case`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ case: {
+              schaden_nr: caseNumber,
+              quelle: 'Outlook-Aufgabe',
+              aufgaben_mail_id: item.id,
+              aufgaben_betreff: String(task.subject || item.subject || '').slice(0, 500),
+              aufgaben_absender: String(task.from || item.from || '').slice(0, 255),
+              aufgaben_eingang: task.received_at || item.received_at || '',
+            } }),
+          });
+          if (!created.folder_id) throw new Error('Der neue Schadenfallordner wurde nicht zurückgegeben.');
+          exactCases = [{
+            id: created.folder_id,
+            name: created.name || caseNumber,
+            meta: { schaden_nr: caseNumber },
+          }];
+          cases.set(caseNumber, Promise.resolve(exactCases));
+        }
+        const folderId = exactCases[0].id;
+        const emlResponse = await fetch(`${API}?action=eml&id=${encodeURIComponent(item.id)}`, { credentials: 'same-origin', cache: 'no-store' });
+        if (!emlResponse.ok) {
+          const error = await emlResponse.json().catch(() => ({}));
+          throw new Error(error.error || `Original-Mail: HTTP ${emlResponse.status}`);
+        }
+        const filename = emlResponse.headers.get('Content-Disposition')?.match(/filename="([^"]+)"/i)?.[1]
+          || `Mail_${encodeURIComponent(item.id).replace(/[^a-z0-9_-]/gi, '').slice(0, 48)}.eml`;
+        const eml = new File([await emlResponse.blob()], filename, { type: 'message/rfc822' });
+        const upload = async file => {
+          const body = new FormData();
+          body.append('folder_id', folderId);
+          body.append('last_modified', '0');
+          body.append('file', file);
+          return request(`${DRIVE_API}?action=upload_case_document`, { method: 'POST', body });
+        };
+        await upload(eml);
+        let attachmentFailures = 0;
+        for (const [attachmentIndex, attachment] of (task.attachments || []).entries()) {
+          try {
+            const data = await request(`${API}?action=attachment&id=${encodeURIComponent(item.id)}&attachment_id=${encodeURIComponent(attachment.id)}`);
+            const raw = atob(data.content_base64);
+            const bytes = Uint8Array.from(raw, character => character.charCodeAt(0));
+            const safeName = String(data.name || 'Anhang').replace(/[\/\\\u0000-\u001f]/g, '_').slice(0, 120);
+            const prefix = filename.replace(/\.eml$/i, '');
+            const file = new File([bytes], `${prefix}_Anhang_${String(attachmentIndex + 1).padStart(2, '0')}_${safeName}`, { type: data.content_type || 'application/octet-stream' });
+            const result = await upload(file);
+            if (result.excluded) attachmentFailures++;
+          } catch { attachmentFailures++; }
+        }
+        if (attachmentFailures === 0) {
+          sessionStorage.setItem(taskKey, 'done');
+          archived++;
+        } else {
+          failures++;
+        }
+      } catch {
+        failures++;
+      }
+    }
+    const summary = `${archived} E-Mail(s) neu oder bereits in Google Drive abgelegt.`;
+    const notes = [
+      unresolved ? `${unresolved} ohne eindeutigen Falltreffer` : '',
+      failures ? `${failures} mit Übertragungsfehler` : '',
+    ].filter(Boolean);
+    setState([summary, ...notes].join(' ') || 'Google-Drive-Abgleich abgeschlossen.', failures > 0);
+    archiveRunning = false;
+    if (driveSync) driveSync.disabled = false;
+  };
   const render = (items) => {
     count.textContent = items.length + (items.length === 1 ? ' offene Aufgabe' : ' offene Aufgaben');
     empty.hidden = items.length !== 0;
@@ -98,7 +209,10 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) throw new Error(data.error || 'Aufgaben konnten nicht geladen werden.');
       render(data.items || []);
-      setState((data.folder || 'Zu erledigen') + ' · älteste Aufgabe oben');
+      currentItems = data.items || [];
+      currentMailbox = data.mailbox || '';
+      setState((data.folder || 'Zu erledigen') + ' · älteste Aufgabe oben · Google-Drive-Abgleich läuft');
+      void archiveOpenTasks(data.items || [], data.mailbox || '');
     } catch (error) {
       list.innerHTML = '';
       empty.hidden = true;
@@ -131,6 +245,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       setState(error.message || 'Aufgabe konnte nicht verschoben werden.', true);
     }
   };
+  driveSync?.addEventListener('click', () => { void archiveOpenTasks(currentItems, currentMailbox); });
   refresh?.addEventListener('click', load);
   load();
 })();

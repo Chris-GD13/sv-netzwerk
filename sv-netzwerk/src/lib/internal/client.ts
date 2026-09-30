@@ -623,6 +623,18 @@ async function showMoveDialog(
 }
 
 async function redirectAfterLogin() {
+  const returnTo = new URLSearchParams(window.location.search).get('return');
+  if (returnTo) {
+    try {
+      const returnUrl = new URL(returnTo, window.location.origin);
+      if (returnUrl.origin === window.location.origin && returnUrl.pathname === '/intern/oauth/authorize.php') {
+        redirectTo(`${returnUrl.pathname}${returnUrl.search}`);
+        return;
+      }
+    } catch {
+      // Ignore invalid return URLs and continue to the standard portal landing page.
+    }
+  }
   redirectTo('/intern/tagescockpit/');
 }
 
