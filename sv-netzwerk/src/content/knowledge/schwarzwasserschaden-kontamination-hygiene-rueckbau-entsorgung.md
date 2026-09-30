@@ -16,6 +16,7 @@ relatedLinks: ["/fachwissen/starkregen-rueckstau-eintrittswege-rueckstauebene-sc
 damageTypes: ["rueckstau", "ueberflutung", "gebaeude"]
 publication:
   publishedAt: 2026-08-13
+  updatedAt: 2026-09-30
   status: published
 seo:
   title: "Schwarzwasserschäden fachlich sauber bewerten"
@@ -85,6 +86,10 @@ Erst die getrennte Dokumentation zeigt jedoch Unterschiede: Die gefliesten Flurf
 ## Fazit
 
 Schwarzwasserschäden sind nur dann belastbar zu bewerten, wenn Kontaminationsweg, hygienische Gefährdung, Materialbetroffenheit, Rückbaugrenze und Entsorgungsweg als getrennte Prüffelder behandelt werden. Erst diese Trennung schafft eine fachlich tragfähige Grundlage für Sanierung und Regulierung.
+
+## Aktualitätsprüfung zum 30.09.2026
+
+Die Quellenprüfung wurde um den UBA-Schimmelleitfaden in der aktualisierten Auflage April 2024 und die am 17.01.2025 aktualisierte UBA-Informationsseite ergänzt. Diese Quellen sind fachliche Leitlinien für Erfassung und Sanierung; sie ersetzen keine objektspezifische Hygiene- oder Arbeitsschutzbeurteilung. Für die Praxis bedeutet das: direkte Kontamination, Folgefeuchte, Rückbau, Reinigung und Erfolgskontrolle müssen weiterhin getrennt nachgewiesen werden. Veröffentlichungsdatum (13.08.2026), Aktualisierungsdatum (30.09.2026) und Quellenstand (April 2024/17.01.2025) sind getrennt dokumentiert.
 
 ## Quellen und weiterführende Hinweise
 

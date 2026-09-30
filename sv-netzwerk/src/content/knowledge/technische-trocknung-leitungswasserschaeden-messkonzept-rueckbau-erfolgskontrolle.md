@@ -17,12 +17,13 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/kontrollierter-rueckbau-bei-leit
 damageTypes: ["leitungswasser", "gebaeude"]
 publication:
   publishedAt: 2026-08-04
-  updatedAt: 2026-08-04
+  updatedAt: 2026-09-30
   status: published
 seo:
   title: "Technische Trocknung nach Leitungswasserschäden fachlich prüfen"
   description: "Messkonzept, Rückbau, Trocknungsführung und Erfolgskontrolle nach Leitungswasserschäden belastbar dokumentieren und abgrenzen."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle/"
+  noindex: false
 ---
 
 Technische Trocknung nach Leitungswasserschäden wird in der Praxis noch zu oft als schematischer Folgeschritt behandelt: Wasser ist ausgetreten, also wird geöffnet, getrocknet und später wieder geschlossen. Für eine fachlich belastbare Bewertung reicht dieses Muster nicht aus. Erforderlich wird Trocknung erst aus einem dokumentierten Schadenbereich, einem nachvollziehbaren Messkonzept und einer technisch begründeten Erfolgskontrolle.
@@ -246,6 +247,10 @@ Der Rückbau beschränkt sich auf jene Zonen, die für Zugang, Luftführung und 
 ## Fazit
 
 Technische Trocknung nach Leitungswasserschäden ist keine Standardroutine, sondern eine nachvollziehbar zu begründende Maßnahme. Erst Messkonzept, schichtbezogene Schadenabgrenzung, technisch begründeter Rückbau und dokumentierte Erfolgskontrolle machen Trocknung prüffähig. Genau diese Trennung entscheidet darüber, ob Aufwand, Maßnahme und Ergebnis später belastbar zusammenpassen.
+
+## Aktualitätsprüfung zum 30.09.2026
+
+Die Ergänzung berücksichtigt den UBA-Schimmelleitfaden in der aktualisierten Auflage April 2024 sowie die am 17.01.2025 aktualisierte UBA-Informationsseite. Beide Quellen sind fachliche Leitlinien und keine verbindlichen Preis- oder Deckungsregeln. Ihre praktische Bedeutung für die Trocknungsprüfung liegt in der Reihenfolge aus Ursachenklärung, Erfassung, fachlich begründetem Sanierungsumfang und dokumentierter Erfolgskontrolle. Veröffentlichungsdatum (04.08.2026), Aktualisierungsdatum (30.09.2026) und Quellenstand (April 2024/17.01.2025) werden getrennt geführt.
 
 ## Quellen und weiterführende Hinweise
 
