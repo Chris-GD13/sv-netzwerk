@@ -11,6 +11,7 @@ assert(tasksPage.includes("String(row.meta?.schaden_nr || '').trim() === caseNum
 assert(tasksPage.includes('if (exactCases.length > 1) { unresolved++; continue; }'), 'Bei mehreren passenden Fällen darf keine automatische Ablage erfolgen.');
 assert(tasksPage.includes("action=save_case") && tasksPage.includes("schaden_nr: caseNumber"), 'Bei Schadennummer ohne Treffer muss ein neuer Drive-Fall angelegt werden.');
 assert(tasksPage.includes("action=upload_case_document") && tasksPage.includes("action=attachment"), 'Original-Mails und Mailanhänge müssen in Google Drive abgelegt werden.');
+assert(tasksPage.includes('const request = async (url, options = {})') && tasksPage.includes('if (!response.ok || data.ok === false)'), 'Alle API-Aufrufe des Drive-Abgleichs müssen über einen definierten Request-Helper laufen.');
 assert(tasksPage.includes('void archiveOpenTasks(data.items || [], data.mailbox || \'\')'), 'Der Aufgabenabruf muss den automatischen Drive-Abgleich starten.');
 assert(tasksPage.includes('id="tasks-drive-sync"') && tasksPage.includes("driveSync?.addEventListener('click'"), 'Der Drive-Abgleich muss manuell über einen Button gestartet werden können.');
 
