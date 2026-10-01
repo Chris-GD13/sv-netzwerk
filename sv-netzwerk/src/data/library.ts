@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Farbtonabweichungen nach Gebäudeschäden: Anstrichflächen prüffähig abgrenzen',
+    description: 'Örtliche Ausbesserung und zusätzliche Anstrichflächen werden anhand von Ausgangszustand, Farbton, Struktur, Sichtfläche und Schadenbezug geprüft.',
+    href: '/fachwissen/farbtonabweichung-anstrich-wiederherstellung-schadenfall/',
+    category: 'Rechnungs- und KVA-Prüfung',
+    tags: ['Farbtonabweichung', 'Malerarbeiten', 'Wiederherstellung', 'Schadenabgrenzung', 'Kostenprüfung'],
+    date: '2026-10-01',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Schimmel nach Wasserschäden fachlich einordnen und Sanierung abgrenzen',
     description: 'Feuchteursache, Schimmelbefund, Sanierungsziel, Schutzmaßnahmen und Kosten nach Wasserschäden werden nachvollziehbar getrennt.',
     href: '/fachwissen/schimmel-nach-wasserschaden-ursache-sanierungsumfang-kostenabgrenzung/',
