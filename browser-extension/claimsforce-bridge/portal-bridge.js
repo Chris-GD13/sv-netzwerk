@@ -1,0 +1,304 @@
+const API = '/intern/api/google-drive-sync.php';
+const CAL = '/intern/api/outlook-case-calendar.php';
+const BRIDGE_VERSION = chrome.runtime.getManifest().version;
+const CONTEXT_RELOAD_MESSAGE = 'Die Browser-Brücke wurde aktualisiert. Bitte diese Portalseite einmal neu laden und den Import danach erneut starten.';
+let contextReloadReported = false;
+const invalidExtensionContext = error => /Extension context invalidated|Receiving end does not exist|message port closed/i.test(String(error?.message || error || ''));
+function reportInvalidExtensionContext() {
+  if (contextReloadReported) return;
+  contextReloadReported = true;
+  document.documentElement.setAttribute('data-svnet-claims-runtime', 'unavailable|CF-EXTENSION-RELOAD|0');
+  window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: CONTEXT_RELOAD_MESSAGE }, location.origin);
+}
+function safeSendResponse(sendResponse, value) {
+  try { sendResponse(value); }
+  catch (error) { if (invalidExtensionContext(error)) reportInvalidExtensionContext(); }
+}
+const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens'];
+const profileKey = value => {
+  const profile = String(value || '').trim().toLowerCase();
+  if (!SUPPORTED_PROFILES.includes(profile)) throw new Error('Ungültiges ClaimsForce-Profil.');
+  return profile;
+};
+const uploads = new Map();
+const operations = new Map();
+const PORTAL_OPERATION_TIMEOUT_MS = 90000;
+const PORTAL_OPERATION_RETENTION_MS = 300000;
+const PORTAL_REQUEST_TYPES = new Set(['PORTAL_UPSERT', 'PORTAL_UPLOAD_START', 'PORTAL_UPLOAD_CHUNK', 'PORTAL_UPLOAD_FINISH', 'PORTAL_APPOINTMENT', 'PORTAL_SYNC_STATE', 'PORTAL_COMMIT_SYNC']);
+let keepalivePort = null;
+let keepaliveTimer = 0;
+let activeRequest = null;
+const blank = value => value == null || (typeof value === 'string' && value.trim() === '');
+const mergeBlank = (existing, incoming) => { const out = { ...(existing || {}) }; Object.entries(incoming || {}).forEach(([key, value]) => { if (blank(out[key]) && !blank(value)) out[key] = value; }); return out; };
+
+async function api(url, options = {}) {
+  const controller = new AbortController();
+  const timeout = Number(options.timeoutMs || 30000);
+  const timer = setTimeout(() => controller.abort(), timeout);
+  const requestOptions = { ...options };
+  delete requestOptions.timeoutMs;
+  requestOptions.signal = controller.signal;
+  try {
+    const response = await fetch(url, { credentials: 'same-origin', ...requestOptions });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+    return data;
+  } catch (error) {
+    if (error?.name === 'AbortError') throw new Error(`Portal-Anfrage hat das Zeitlimit von ${Math.round(timeout / 1000)} Sekunden überschritten.`);
+    throw error;
+  } finally { clearTimeout(timer); }
+}
+
+async function scopedApi(profile, url, options = {}) {
+  const headers = { ...(options.headers || {}), 'X-SVNET-Expert-Profile': profileKey(profile) };
+  return api(url, { ...options, headers });
+}
+
+async function findCase(mapped, profile) {
+  const query = mapped.schaden_nr || mapped.claimsforce_claim_id || mapped.rekon_task_id;
+  if (!query) return null;
+  const found = await scopedApi(profile, `${API}?action=search_cases&q=${encodeURIComponent(query)}`);
+  for (const row of found.results || []) {
+    const loaded = await scopedApi(profile, `${API}?action=load_case&id=${encodeURIComponent(row.id)}`);
+    const meta = loaded.case?.meta || row.meta || {};
+    if ((mapped.claimsforce_claim_id && meta.claimsforce_claim_id === mapped.claimsforce_claim_id) || (mapped.rekon_task_id && meta.rekon_task_id === mapped.rekon_task_id) || (mapped.schaden_nr && meta.schaden_nr === mapped.schaden_nr)) return { folderId: row.id, meta };
+  }
+  return null;
+}
+
+async function upsert(message) {
+  const profile = profileKey(message.profile);
+  const existing = await findCase(message.mapped, profile);
+  const merged = mergeBlank(existing?.meta || {}, message.mapped);
+  if (message.sourceType === 'rekon') {
+    merged.rekon_task_id = message.mapped.rekon_task_id;
+    merged.rekon_profile = profile;
+    merged.rekon_termin = message.mapped.rekon_termin;
+    merged.rekon_quelle = message.source;
+    merged.rekon_zuletzt_eingelesen = message.mapped.rekon_zuletzt_eingelesen;
+  } else {
+  merged.claimsforce_claim_id = message.mapped.claimsforce_claim_id;
+  merged.claimsforce_profile = profile;
+  merged.claimsforce_termin = message.mapped.claimsforce_termin;
+  merged.claimsforce_quelle = message.source;
+  merged.claimsforce_zuletzt_eingelesen = message.mapped.claimsforce_zuletzt_eingelesen;
+  }
+  const saved = await scopedApi(profile, `${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: existing?.folderId || '', case: merged }) });
+  return { folderId: saved.folder_id, meta: merged, existed: !!existing };
+}
+
+async function syncState(message) {
+  const profile = profileKey(message.profile);
+  const existing = await findCase(message.mapped || {}, profile);
+  return existing ? { folderId: existing.folderId, meta: existing.meta || {}, existed: true } : { folderId: '', meta: {}, existed: false };
+}
+
+async function commitSync(message) {
+  const profile = profileKey(message.profile);
+  const loaded = await scopedApi(profile, `${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`);
+  const meta = { ...(loaded.case?.meta || {}) };
+  const prefix = message.sourceType === 'rekon' ? 'rekon' : 'claimsforce';
+  meta[`${prefix}_sync_signature`] = String(message.signature || '');
+  meta[`${prefix}_profile`] = profile;
+  meta[`${prefix}_file_versions`] = [...new Set((message.fileVersions || []).map(String).filter(Boolean))];
+  meta[`${prefix}_message_versions`] = [...new Set((message.messageVersions || []).map(String).filter(Boolean))];
+  meta[`${prefix}_list_version`] = String(message.listVersion || '');
+  meta[`${prefix}_zuletzt_eingelesen`] = new Date().toISOString();
+  await scopedApi(profile, `${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, case: meta }) });
+  return { folderId: message.folderId, meta };
+}
+
+async function finishUpload(message) {
+  const entry = uploads.get(message.uploadId);
+  if (!entry) throw new Error('Dateiübertragung ist unvollständig.');
+  uploads.delete(message.uploadId);
+  const bytes = [];
+  for (const encoded of entry.chunks) {
+    const binary = atob(encoded), chunk = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index++) chunk[index] = binary.charCodeAt(index);
+    bytes.push(chunk);
+  }
+  const form = new FormData();
+  form.append('folder_id', entry.folderId);
+  form.append('last_modified', String(entry.modified || 0));
+  form.append('file', new File(bytes, entry.name, { type: entry.mime, lastModified: entry.modified || Date.now() }));
+  return scopedApi(entry.profile, `${API}?action=upload_case_document`, { method: 'POST', body: form });
+}
+
+async function appointment(message) {
+  const profile = profileKey(message.profile);
+  const loaded = await scopedApi(profile, `${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`), meta = loaded.case?.meta || {};
+  const appointmentId = String(message.appointment.id || message.appointment.startDate || '');
+  const prefix = message.sourceType === 'rekon' ? 'rekon' : 'claimsforce';
+  const idsKey = `${prefix}_calendar_appointment_ids`, idKey = `${prefix}_calendar_appointment_id`, eventsKey = `${prefix}_calendar_events`;
+  const imported = Array.isArray(meta[idsKey]) ? meta[idsKey].map(String) : (meta[idKey] ? [String(meta[idKey])] : []);
+  if (appointmentId && imported.includes(appointmentId)) return { skipped: true };
+  const start = new Date(message.appointment.startDate), end = message.appointment.endDate ? new Date(message.appointment.endDate) : new Date(start.getTime() + 60 * 60000);
+  const form = new FormData();
+  form.append('folder_id', message.folderId);
+  form.append('claims_profile', profile);
+  form.append('date', start.toLocaleDateString('sv-SE', { timeZone: 'Europe/Berlin' }));
+  form.append('time', start.toLocaleTimeString('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit', hour12: false }));
+  form.append('duration', String(Math.max(15, Math.round((end - start) / 60000))));
+  form.append('notes', message.appointment.comment || (message.sourceType === 'rekon' ? 'Aus Rekon übernommen' : 'Aus ClaimsForce übernommen'));
+  form.append('invite_vn', '0');
+  const result = await scopedApi(profile, `${CAL}?action=create`, { method: 'POST', body: form });
+  if (appointmentId) imported.push(appointmentId);
+  meta[idsKey] = [...new Set(imported)];
+  meta[idKey] = appointmentId;
+  meta[eventsKey] = [...(Array.isArray(meta[eventsKey]) ? meta[eventsKey] : []), result.event].filter(Boolean);
+  await scopedApi(profile, `${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, case: meta }) });
+  return result;
+}
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type === 'PORTAL_UPSERT_ASYNC') {
+    const operationId = String(message.operationId || '');
+    if (!operationId) { sendResponse({ ok: false, error: 'Portal-Operations-ID fehlt.' }); return; }
+    if (!operations.has(operationId)) {
+      const startedAt = Date.now();
+      operations.set(operationId, { status: 'running', startedAt });
+      const finish = operation => {
+        if (operations.get(operationId)?.status !== 'running') return;
+        const finishedAt = Date.now();
+        operations.set(operationId, { ...operation, startedAt, finishedAt });
+        setTimeout(() => { if (operations.get(operationId)?.finishedAt === finishedAt) operations.delete(operationId); }, PORTAL_OPERATION_RETENTION_MS);
+      };
+      const timeout = setTimeout(() => finish({ status: 'failed', error: 'Portal-Fallanlage hat das Zeitlimit von 90 Sekunden überschritten und wurde sauber beendet.' }), PORTAL_OPERATION_TIMEOUT_MS);
+      upsert(message).then(result => finish({ status: 'done', result })).catch(error => finish({ status: 'failed', error: error.message || 'Portal-Fallanlage fehlgeschlagen.' })).finally(() => clearTimeout(timeout));
+    }
+    sendResponse({ ok: true, accepted: true, operationId });
+    return;
+  }
+  if (message?.type === 'PORTAL_OPERATION_STATUS') {
+    const operation = operations.get(String(message.operationId || ''));
+    sendResponse({ ok: true, operation: operation || { status: 'missing' } });
+    return;
+  }
+  if (!PORTAL_REQUEST_TYPES.has(message?.type)) return;
+  (async () => {
+    if (message?.type === 'PORTAL_UPSERT') return { ok: true, ...(await upsert(message)) };
+    if (message?.type === 'PORTAL_UPLOAD_START') { uploads.set(message.uploadId, { ...message, chunks: [] }); return { ok: true }; }
+    if (message?.type === 'PORTAL_UPLOAD_CHUNK') { const entry = uploads.get(message.uploadId); if (!entry) throw new Error('Unbekannte Dateiübertragung.'); entry.chunks.push(message.chunk); return { ok: true }; }
+    if (message?.type === 'PORTAL_UPLOAD_FINISH') return { ok: true, result: await finishUpload(message) };
+    if (message?.type === 'PORTAL_APPOINTMENT') return { ok: true, result: await appointment(message) };
+    if (message?.type === 'PORTAL_SYNC_STATE') return { ok: true, result: await syncState(message) };
+    if (message?.type === 'PORTAL_COMMIT_SYNC') return { ok: true, result: await commitSync(message) };
+    return { ok: false, error: 'Unbekannter Auftrag.' };
+  })().then(value => safeSendResponse(sendResponse, value)).catch(error => {
+    const invalid = invalidExtensionContext(error);
+    if (invalid) reportInvalidExtensionContext();
+    safeSendResponse(sendResponse, { ok: false, error: invalid ? CONTEXT_RELOAD_MESSAGE : error.message });
+  });
+  return true;
+});
+
+function reportRuntime() {
+  return chrome.runtime.sendMessage({ type: 'GET_RUNTIME_STATUS' }).then(status => {
+    const active = status?.active || {}, diagnostic = status?.diagnostic || {};
+    document.documentElement.setAttribute('data-svnet-claims-runtime', [active.status || 'idle', diagnostic.phase || active.phase || 'CF-IDLE', Number(active.jobId || 0), active.profile || 'none'].join('|'));
+    const rekon = status?.rekon || {};
+    document.documentElement.setAttribute('data-svnet-rekon-runtime', [rekon.status || 'idle', rekon.runId || 'none', rekon.profile || 'none', rekon.current || 0, rekon.total || 0].join('|'));
+    if (rekon.status === 'running' && rekon.text) window.postMessage({ type: 'SVNET_REKON_IMPORT_PROGRESS', text: rekon.text, current: rekon.current || 0, total: rekon.total || 0 }, location.origin);
+    window.postMessage({ type: 'SVNET_CLAIMS_RUNTIME_STATUS', status }, location.origin);
+  }).catch(error => {
+    if (invalidExtensionContext(error)) reportInvalidExtensionContext();
+    else document.documentElement.setAttribute('data-svnet-claims-runtime', 'unavailable|CF-RUNTIME|0');
+  });
+}
+
+window.addEventListener('message', event => {
+  if (event.source !== window || event.origin !== location.origin) return;
+  if (event.data?.type === 'SVNET_CLAIMS_BRIDGE_PING') window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION }, location.origin);
+  if (event.data?.type === 'SVNET_CLAIMS_RUNTIME_PING') reportRuntime();
+  if (event.data?.type === 'SVNET_CLAIMS_CREDENTIAL_CHECK') {
+    const requestId = String(event.data.requestId || '');
+    let profile;
+    try { profile = profileKey(event.data.profile); }
+    catch (error) {
+      window.postMessage({ type: 'SVNET_CLAIMS_CREDENTIAL_STATUS', requestId, ok: false, profile: '', phase: 'invalid-profile' }, location.origin);
+      return;
+    }
+    chrome.runtime.sendMessage({ type: 'CHECK_PROFILE_CREDENTIALS', profile }).then(status => {
+      window.postMessage({
+        type: 'SVNET_CLAIMS_CREDENTIAL_STATUS',
+        requestId,
+        ok: status?.ok === true,
+        profile,
+        phase: String(status?.phase || 'unknown')
+      }, location.origin);
+    }).catch(error => {
+      if (invalidExtensionContext(error)) reportInvalidExtensionContext();
+      window.postMessage({ type: 'SVNET_CLAIMS_CREDENTIAL_STATUS', requestId, ok: false, profile, phase: 'bridge-unavailable' }, location.origin);
+    });
+  }
+  if (event.data?.type === 'SVNET_CLAIMS_IMPORT_START') {
+    let profile;
+    try { profile = profileKey(event.data.profile); }
+    catch (error) { window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: error.message, runtime: { jobId: Number(event.data.jobId || 0) } }, location.origin); return; }
+    activeRequest = { type: 'START_IMPORT', profile, jobId: Number(event.data.jobId || 0), runId: event.data.runId || crypto.randomUUID() };
+    const request = activeRequest;
+    connectKeepalive();
+    chrome.runtime.sendMessage(request).then(response => {
+      if (!response?.ok) window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: response?.error, runtime: { jobId: request.jobId } }, location.origin);
+      else window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ACCEPTED', runtime: { jobId: request.jobId, runId: response.runId, resumed: response.resumed } }, location.origin);
+    }).catch(error => {
+      const invalid = invalidExtensionContext(error);
+      if (invalid) reportInvalidExtensionContext();
+      window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: invalid ? CONTEXT_RELOAD_MESSAGE : `[CF-RUN-00] ${error.message}`, runtime: { jobId: request.jobId } }, location.origin);
+    });
+  }
+  if (event.data?.type === 'SVNET_REKON_IMPORT_START') {
+    let profile;
+    try { profile = profileKey(event.data.profile); }
+    catch (error) { window.postMessage({ type: 'SVNET_REKON_IMPORT_ERROR', error: error.message }, location.origin); return; }
+    connectKeepalive();
+    window.postMessage({ type: 'SVNET_REKON_IMPORT_PROGRESS', text: 'Startsignal wurde an die Browser-Brücke übergeben …', current: 0, total: 0 }, location.origin);
+    let startTimer = 0;
+    const startRequest = chrome.runtime.sendMessage({ type: 'START_REKON_IMPORT', profile, runId: event.data.runId || crypto.randomUUID() });
+    Promise.race([
+      startRequest,
+      new Promise((_, reject) => { startTimer = setTimeout(() => reject(new Error('Die Browser-Brücke hat den Rekon-Start nicht innerhalb von 10 Sekunden bestätigt.')), 10000); })
+    ]).then(response => {
+      if (!response?.ok) window.postMessage({ type: 'SVNET_REKON_IMPORT_ERROR', error: response?.error }, location.origin);
+      else window.postMessage({ type: 'SVNET_REKON_IMPORT_ACCEPTED', runId: response.runId }, location.origin);
+    }).catch(error => {
+      const invalid = invalidExtensionContext(error);
+      if (invalid) reportInvalidExtensionContext();
+      window.postMessage({ type: 'SVNET_REKON_IMPORT_ERROR', error: invalid ? CONTEXT_RELOAD_MESSAGE : error.message }, location.origin);
+    }).finally(() => clearTimeout(startTimer));
+  }
+  if (event.data?.type === 'SVNET_CLAIMS_OPEN_OPTIONS') {
+    try { chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS', profile: profileKey(event.data.profile) }); }
+    catch (error) { window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: error.message }, location.origin); }
+  }
+});
+chrome.runtime.onMessage.addListener(message => {
+  if (message?.type === 'IMPORT_PROGRESS') window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_PROGRESS', ...message }, location.origin);
+  if (message?.type === 'IMPORT_DONE') { activeRequest = null; disconnectKeepalive(); window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_DONE', result: message.result, runtime: message.runtime }, location.origin); }
+  if (message?.type === 'IMPORT_ERROR') { activeRequest = null; disconnectKeepalive(); window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: message.error, runtime: message.runtime }, location.origin); }
+  if (message?.type === 'REKON_IMPORT_PROGRESS') window.postMessage({ type: 'SVNET_REKON_IMPORT_PROGRESS', ...message }, location.origin);
+  if (message?.type === 'REKON_IMPORT_DONE') { disconnectKeepalive(); window.postMessage({ type: 'SVNET_REKON_IMPORT_DONE', result: message.result }, location.origin); }
+  if (message?.type === 'REKON_IMPORT_ERROR') { disconnectKeepalive(); window.postMessage({ type: 'SVNET_REKON_IMPORT_ERROR', error: message.error }, location.origin); }
+});
+function disconnectKeepalive() {
+  clearInterval(keepaliveTimer);
+  keepaliveTimer = 0;
+  try { keepalivePort?.disconnect(); } catch {}
+  keepalivePort = null;
+}
+function connectKeepalive() {
+  if (keepalivePort) return;
+  try {
+    keepalivePort = chrome.runtime.connect({ name: 'claims-import-keepalive' });
+    keepalivePort.onDisconnect.addListener(() => {
+      keepalivePort = null;
+      clearInterval(keepaliveTimer);
+      keepaliveTimer = 0;
+    });
+    keepaliveTimer = setInterval(() => { try { keepalivePort?.postMessage({ type: 'KEEPALIVE', at: Date.now() }); } catch {} }, 15000);
+  } catch {}
+}
+window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION }, location.origin);
+reportRuntime();
+setInterval(reportRuntime, 5000);
