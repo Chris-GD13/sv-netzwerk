@@ -295,7 +295,7 @@ async function progress(tabId, text, current = 0, total = 0, runtime = {}) {
   await chrome.tabs.sendMessage(tabId, { type: 'IMPORT_PROGRESS', text, current, total, runtime }).catch(() => {});
 }
 
-async function portalOperation(tabId, message, timeout = 60000) {
+async function portalOperation(tabId, message, timeout = 90000) {
   const operationId = String(message.operationId || '');
   const accepted = await portal(tabId, message);
   if (!accepted?.accepted) throw new Error('Das SV-Netzwerk hat die Falloperation nicht angenommen.');
@@ -376,9 +376,11 @@ async function runImport(run) {
   try { config = await (await fetch('https://web.claimsforce.com/config', { signal: configController.signal })).json(); }
   catch (error) { throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Konfiguration hat das Zeitlimit überschritten.' : 'ClaimsForce-Konfiguration konnte nicht geladen werden.'); }
   finally { clearTimeout(configTimer); }
-  let filesDone = 0, messagesDone = 0, appointmentsDone = 0, skipped = 0, updated = 0;
+  let filesDone = 0, messagesDone = 0, appointmentsDone = 0, skipped = 0, updated = 0, failed = 0;
+  const caseErrors = [];
   for (let index = 0; index < claims.length; index++) {
     const item = claims[index], id = item.id;
+    try {
     const preliminary = { claimsforce_claim_id: id, schaden_nr: String(item.label || '').trim() };
     const preliminaryState = await portal(portalTabId(), { type: 'PORTAL_SYNC_STATE', mapped: preliminary, profile });
     const preliminaryMeta = preliminaryState.result?.meta || {};
@@ -462,11 +464,19 @@ async function runImport(run) {
     await portal(portalTabId(), { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions, listVersion: item.listVersion || '', profile });
     updated++;
     await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length} wurde vollständig im Portal verarbeitet.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
+    } catch (error) {
+      failed++;
+      const detail = String(error?.message || error || 'Unbekannter Fehler').slice(0, 400);
+      caseErrors.push({ index: index + 1, claimId: id, error: detail });
+      await diagnostic(run, 'CF-CASE-FAILED', `Auftrag ${index + 1}/${claims.length} wurde übersprungen: ${detail}`, { current: index + 1, total: claims.length, claimIndex: index + 1, failedCases: failed, error: detail }).catch(() => {});
+      await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length} fehlgeschlagen; nächster Auftrag wird verarbeitet.`, index + 1, claims.length).catch(() => {});
+    }
   }
-  await progress(portalTabId(), `${claims.length} Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
+  await progress(portalTabId(), `${claims.length} Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${failed} fehlgeschlagen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
+
   await chrome.storage.session.set({ claimsLoggedProfile: profile });
   await chrome.storage.local.set({ claimsLoggedProfile: profile });
-  return { claims: claims.length, openTasks, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
+  return { claims: claims.length, openTasks, updated, skipped, failed, errors: caseErrors, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
 }
 
 async function startImport(sender, message) {
@@ -570,7 +580,7 @@ async function rekonSession(profile, portalTabId) {
   let token = await rekonTokenValue();
   let session = await chrome.tabs.sendMessage(tab.id, { type: 'REKON_SESSION_STATE' }).catch(() => null);
   if (!token || !session?.ok || !session?.identity) {
-    rekonProgress(portalTabId, 'Rekon-Sitzung wird im Microsoft Edge neu eingelesen …');
+    await rekonProgress(portalTabId, 'Rekon-Sitzung wird im Microsoft Edge neu eingelesen …');
     await chrome.tabs.reload(tab.id);
     tab = await waitTab(tab.id, 60000);
     const deadline = Date.now() + 30000;
@@ -597,7 +607,7 @@ async function readRekonTasks(token, portalTabId) {
     const page = data.tasks?.data || [];
     total = Number(data.tasks?.paginatorInfo?.total || page.length);
     all.push(...page);
-    rekonProgress(portalTabId, `Rekon-Auftragsliste wird eingelesen (${Math.min(all.length, total)} von ${total}) …`, Math.min(all.length, total), total);
+    await rekonProgress(portalTabId, `Rekon-Auftragsliste wird eingelesen (${Math.min(all.length, total)} von ${total}) …`, Math.min(all.length, total), total);
     if (!page.length) break;
   }
   return all.filter(isActiveRekonTask);
@@ -617,7 +627,7 @@ async function downloadRekonFile(file, token) {
 
 async function runRekonImport(run) {
   const profile = rekonProfileKey(run.profile), portalTabId = Number(run.portalTabId || 0);
-  rekonProgress(portalTabId, 'Rekon-Import wird im Microsoft Edge vorbereitet …');
+  await rekonProgress(portalTabId, 'Rekon-Import wird im Microsoft Edge vorbereitet …');
   const { token } = await rekonSession(profile, portalTabId);
   const tasks = await readRekonTasks(token, portalTabId);
   if (!tasks.length) throw new Error('Rekon hat keine aktiven Aufträge geliefert. Der Import wurde ohne Änderungen beendet.');
@@ -626,7 +636,7 @@ async function runRekonImport(run) {
   let updated = 0, skipped = 0, filesDone = 0, messagesDone = 0, appointmentsDone = 0;
   for (let index = 0; index < tasks.length; index++) {
     const task = tasks[index], mapped = mapRekonTask(task), id = String(task.id);
-    rekonProgress(portalTabId, `Rekon ${mapped.schaden_nr || id}: Dateien und E-Mails werden geprüft …`, index, tasks.length);
+    await rekonProgress(portalTabId, `Rekon ${mapped.schaden_nr || id}: Dateien und E-Mails werden geprüft …`, index, tasks.length);
     const [fileData, emailData, logData] = await Promise.all([
       rekonGraph(REKON_FILES_QUERY, { task_id: id }, token),
       rekonGraph(REKON_EMAILS_QUERY, { taskId: id }, token, true),
@@ -678,7 +688,7 @@ async function runRekonImport(run) {
     await portal(portalTabId, { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions, listVersion: String(task.updated_at || task.state_changed_date || ''), profile, sourceType: 'rekon' });
     updated++;
   }
-  rekonProgress(portalTabId, `${tasks.length} aktive Rekon-Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, tasks.length, tasks.length);
+  await rekonProgress(portalTabId, `${tasks.length} aktive Rekon-Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, tasks.length, tasks.length);
   return { tasks: tasks.length, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
 }
 
