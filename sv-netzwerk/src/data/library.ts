@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Schließanlagen nach Einbruchschäden: Austauschumfang und Kosten prüffähig bestimmen',
+    description: 'Nach Einbruch oder Schlüsselverlust werden mechanischer Schaden, Schlüsselrisiko, Systemumfang und Austauschkosten getrennt geprüft.',
+    href: '/fachwissen/schliessanlage-einbruchschaden-austausch-kosten-pruefen/',
+    category: 'Einbruch und Sicherung',
+    tags: ['Einbruchschaden', 'Schließanlage', 'Schließzylinder', 'Schlüsselverlust', 'Sicherungstechnik', 'Kostenprüfung'],
+    date: '2026-10-02',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Farbtonabweichungen nach Gebäudeschäden: Anstrichflächen prüffähig abgrenzen',
     description: 'Örtliche Ausbesserung und zusätzliche Anstrichflächen werden anhand von Ausgangszustand, Farbton, Struktur, Sichtfläche und Schadenbezug geprüft.',
     href: '/fachwissen/farbtonabweichung-anstrich-wiederherstellung-schadenfall/',
