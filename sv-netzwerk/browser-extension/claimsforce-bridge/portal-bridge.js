@@ -22,6 +22,7 @@ const profileKey = value => {
 };
 const uploads = new Map();
 const operations = new Map();
+const operationControllers = new Map();
 const PORTAL_REQUEST_TYPES = new Set(['PORTAL_UPSERT', 'PORTAL_UPLOAD_START', 'PORTAL_UPLOAD_CHUNK', 'PORTAL_UPLOAD_FINISH', 'PORTAL_APPOINTMENT', 'PORTAL_SYNC_STATE', 'PORTAL_COMMIT_SYNC']);
 let keepalivePort = null;
 let keepaliveTimer = 0;
@@ -41,21 +42,21 @@ async function scopedApi(profile, url, options = {}) {
   return api(url, { ...options, headers });
 }
 
-async function findCase(mapped, profile) {
+async function findCase(mapped, profile, signal) {
   const query = mapped.schaden_nr || mapped.claimsforce_claim_id || mapped.rekon_task_id;
   if (!query) return null;
-  const found = await scopedApi(profile, `${API}?action=search_cases&q=${encodeURIComponent(query)}`);
+  const found = await scopedApi(profile, `${API}?action=search_cases&q=${encodeURIComponent(query)}`, { signal });
   for (const row of found.results || []) {
-    const loaded = await scopedApi(profile, `${API}?action=load_case&id=${encodeURIComponent(row.id)}`);
+    const loaded = await scopedApi(profile, `${API}?action=load_case&id=${encodeURIComponent(row.id)}`, { signal });
     const meta = loaded.case?.meta || row.meta || {};
     if ((mapped.claimsforce_claim_id && meta.claimsforce_claim_id === mapped.claimsforce_claim_id) || (mapped.rekon_task_id && meta.rekon_task_id === mapped.rekon_task_id) || (mapped.schaden_nr && meta.schaden_nr === mapped.schaden_nr)) return { folderId: row.id, meta };
   }
   return null;
 }
 
-async function upsert(message) {
+async function upsert(message, signal) {
   const profile = profileKey(message.profile);
-  const existing = await findCase(message.mapped, profile);
+  const existing = await findCase(message.mapped, profile, signal);
   const merged = mergeBlank(existing?.meta || {}, message.mapped);
   if (message.sourceType === 'rekon') {
     merged.rekon_task_id = message.mapped.rekon_task_id;
@@ -70,7 +71,7 @@ async function upsert(message) {
   merged.claimsforce_quelle = message.source;
   merged.claimsforce_zuletzt_eingelesen = message.mapped.claimsforce_zuletzt_eingelesen;
   }
-  const saved = await scopedApi(profile, `${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: existing?.folderId || '', case: merged }) });
+  const saved = await scopedApi(profile, `${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: existing?.folderId || '', case: merged }), signal });
   return { folderId: saved.folder_id, meta: merged, existed: !!existing };
 }
 
@@ -144,9 +145,18 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (!operationId) { sendResponse({ ok: false, error: 'Portal-Operations-ID fehlt.' }); return; }
     if (!operations.has(operationId)) {
       operations.set(operationId, { status: 'running' });
-      upsert(message).then(result => operations.set(operationId, { status: 'done', result })).catch(error => operations.set(operationId, { status: 'failed', error: error.message }));
+      const controller = new AbortController();
+      operationControllers.set(operationId, controller);
+      upsert(message, controller.signal).then(result => operations.set(operationId, { status: 'done', result })).catch(error => operations.set(operationId, { status: 'failed', error: error.name === 'AbortError' ? 'Portal-Falloperation wurde wegen Zeitüberschreitung abgebrochen.' : error.message })).finally(() => operationControllers.delete(operationId));
     }
     sendResponse({ ok: true, accepted: true, operationId });
+    return;
+  }
+  if (message?.type === 'PORTAL_OPERATION_CANCEL') {
+    const operationId = String(message.operationId || ''), controller = operationControllers.get(operationId);
+    if (controller) controller.abort();
+    if (operations.get(operationId)?.status === 'running') operations.set(operationId, { status: 'failed', error: 'Portal-Falloperation wurde wegen Zeitüberschreitung abgebrochen.' });
+    sendResponse({ ok: true, cancelled: true });
     return;
   }
   if (message?.type === 'PORTAL_OPERATION_STATUS') {

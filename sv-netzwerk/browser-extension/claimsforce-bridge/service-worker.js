@@ -307,6 +307,7 @@ async function portalOperation(tabId, message, timeout = 60000) {
     if (status.operation?.status === 'missing') throw new Error('Die Portal-Falloperation wurde unterbrochen. Bitte den Import manuell erneut starten.');
     await sleep(500);
   }
+  await portal(tabId, { type: 'PORTAL_OPERATION_CANCEL', operationId }).catch(() => {});
   throw new Error('Das SV-Netzwerk hat die Falloperation nicht rechtzeitig abgeschlossen.');
 }
 
@@ -376,8 +377,9 @@ async function runImport(run) {
   try { config = await (await fetch('https://web.claimsforce.com/config', { signal: configController.signal })).json(); }
   catch (error) { throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Konfiguration hat das Zeitlimit überschritten.' : 'ClaimsForce-Konfiguration konnte nicht geladen werden.'); }
   finally { clearTimeout(configTimer); }
-  let filesDone = 0, messagesDone = 0, appointmentsDone = 0, skipped = 0, updated = 0;
+  let filesDone = 0, messagesDone = 0, appointmentsDone = 0, skipped = 0, updated = 0, failed = 0;
   for (let index = 0; index < claims.length; index++) {
+    try {
     const item = claims[index], id = item.id;
     const preliminary = { claimsforce_claim_id: id, schaden_nr: String(item.label || '').trim() };
     const preliminaryState = await portal(portalTabId(), { type: 'PORTAL_SYNC_STATE', mapped: preliminary, profile });
@@ -462,11 +464,17 @@ async function runImport(run) {
     await portal(portalTabId(), { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions, listVersion: item.listVersion || '', profile });
     updated++;
     await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length} wurde vollständig im Portal verarbeitet.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
+    } catch (error) {
+      failed++;
+      const message = String(error?.message || 'Portal-Falloperation fehlgeschlagen.').slice(0, 500);
+      await diagnostic(run, 'CF-CASE-FAIL', `Auftrag ${index + 1}/${claims.length} wurde übersprungen: ${message}`, { current: index + 1, total: claims.length, claimIndex: index + 1, failedCases: failed });
+      await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length} fehlgeschlagen, nächster Auftrag wird verarbeitet.`, index + 1, claims.length);
+    }
   }
-  await progress(portalTabId(), `${claims.length} Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
+  await progress(portalTabId(), `${claims.length} Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${failed} fehlgeschlagen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
   await chrome.storage.session.set({ claimsLoggedProfile: profile });
   await chrome.storage.local.set({ claimsLoggedProfile: profile });
-  return { claims: claims.length, openTasks, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
+  return { claims: claims.length, openTasks, updated, skipped, failed, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
 }
 
 async function startImport(sender, message) {
