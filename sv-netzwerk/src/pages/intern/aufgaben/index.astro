@@ -93,6 +93,12 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     return text.length > max ? text.slice(0, max - 1) + '…' : text;
   };
   const setState = (text, error = false) => { state.textContent = text; state.classList.toggle('is-error', error); };
+  const request = async (url, options = {}) => {
+    const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', ...options });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data.ok === false) throw new Error(data.error || `HTTP ${response.status}`);
+    return data;
+  };
   const archiveOpenTasks = async (items, mailbox) => {
     if (archiveRunning) return;
     archiveRunning = true;
