@@ -1,3 +1,9 @@
+## 2026-10-02
+- Fachbeitrag „Schließanlagen nach Einbruchschäden: Austauschumfang und Kosten prüffähig bestimmen“ ergänzt
+- DIN EN 1303:2026-08, Polizeiberatung, VdS-Anwendungsbereiche sowie §§ 249 BGB, 82 und 83 VVG mit Geltungsstatus dokumentiert
+- Fachwissensübersicht, Kategorie-, Tag-, Suchindex- und Sitemap-Integration für den Build vorbereitet
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt; ohne ungeprüftes Beitragsbild gemäß Fachbeitragsstandard
+
 ## 2026-09-30
 - Fachbeitrag „Schimmel nach Wasserschäden fachlich einordnen und Sanierung abgrenzen“ ergänzt
 - UBA-Schimmelleitfaden, Quellenstand, Geltungsstatus und VVG-Prüffelder dokumentiert
