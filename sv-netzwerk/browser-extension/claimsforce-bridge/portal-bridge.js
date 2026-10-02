@@ -31,10 +31,22 @@ const blank = value => value == null || (typeof value === 'string' && value.trim
 const mergeBlank = (existing, incoming) => { const out = { ...(existing || {}) }; Object.entries(incoming || {}).forEach(([key, value]) => { if (blank(out[key]) && !blank(value)) out[key] = value; }); return out; };
 
 async function api(url, options = {}) {
-  const response = await fetch(url, { credentials: 'same-origin', ...options });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
-  return data;
+  const controller = new AbortController();
+  const timeout = Number(options.timeoutMs || 30000);
+  const timer = setTimeout(() => controller.abort(), timeout);
+  const requestOptions = { ...options, signal: controller.signal };
+  delete requestOptions.timeoutMs;
+  const onAbort = () => controller.abort();
+  options.signal?.addEventListener('abort', onAbort, { once: true });
+  try {
+    const response = await fetch(url, { credentials: 'same-origin', ...requestOptions });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+    return data;
+  } finally {
+    clearTimeout(timer);
+    options.signal?.removeEventListener('abort', onAbort);
+  }
 }
 
 async function scopedApi(profile, url, options = {}) {
