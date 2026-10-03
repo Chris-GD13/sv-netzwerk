@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Aufzüge nach Wasserschäden: Stillsetzung, Prüfung und Kosten fachlich abgrenzen',
+    description: 'Stillsetzung, Schadenermittlung, elektrische Sicherheit und Wiederinbetriebnahme von Aufzugsanlagen nach Wasserschäden werden getrennt und prüffähig dokumentiert.',
+    href: '/fachwissen/aufzug-wasserschaden-stillsetzung-pruefung-kostenabgrenzung/',
+    category: 'Gebäudetechnik und Aufzüge',
+    tags: ['Aufzug', 'Wasserschaden', 'Stillsetzung', 'BetrSichV', 'Prüfung', 'Kostenprüfung'],
+    date: '2026-10-03',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Schließanlagen nach Einbruchschäden: Austauschumfang und Kosten prüffähig bestimmen',
     description: 'Nach Einbruch oder Schlüsselverlust werden mechanischer Schaden, Schlüsselrisiko, Systemumfang und Austauschkosten getrennt geprüft.',
     href: '/fachwissen/schliessanlage-einbruchschaden-austausch-kosten-pruefen/',
