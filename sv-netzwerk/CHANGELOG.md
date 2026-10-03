@@ -454,3 +454,8 @@
 - Fachbeitrag „Farbtonabweichungen nach Gebäudeschäden: Anstrichflächen prüffähig abgrenzen“ mit BFS-Fachregel Nr. 25 (Stand November 2025), DIN 18363:2019-09 und amtlichen Gesetzesquellen ergänzt
 - Fachwissensübersicht, Kategorie, Tags, Suchindex und Sitemap über Content Collection und `library.ts` integriert
 - LinkedIn-Begleittext als `prepared-not-posted` abgelegt; keine externe Veröffentlichung behauptet
+## 2026-10-03
+- Fachbeitrag „Aufzüge nach Wasserschäden: Stillsetzung, Prüfung und Kosten fachlich abgrenzen“ ergänzt
+- Stillsetzung, Anlagenbefund, Prüfbedarf, Wiederinbetriebnahme und schadenbedingte Kosten getrennt dokumentiert; BetrSichV, TRBS 3121, TRBS 1201 Teil 4 und DGUV fachlich eingeordnet
+- Fachwissensübersicht, Kategorie, Tags, Suchindex und Sitemap über Content Collection und `library.ts` integriert
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt; ohne öffentliches Beitragsbild veröffentlicht
