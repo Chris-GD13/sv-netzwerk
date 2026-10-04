@@ -117,7 +117,7 @@ assert(claimsMain.includes('inspectTokenCache') && claimsMain.includes('inspectS
 const vault = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/vault.js'), 'utf8');
 assert(vault.includes('credentials_${profile}') && vault.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens']"), 'Zugänge werden nur für die vier unterstützten Sachverständigen-Profile getrennt gespeichert');
 const options = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/options.js'), 'utf8');
-assert(options.includes("OPTIONS_CODE_VERSION = '1.4.11'"), 'Die Optionsseite kennzeichnet die aktuelle Brückenversion');
+assert(options.includes("OPTIONS_CODE_VERSION = '1.4.12'"), 'Die Optionsseite kennzeichnet die aktuelle Brückenversion');
 assert(options.includes('profileEmails') && options.includes('Die E-Mail-Adresse gehört nicht zum ausgewählten Bearbeiterprofil'), 'Die Optionsseite verhindert das Speichern eines fremden ClaimsForce-Kontos unter dem gewählten SV-Profil');
 assert(!options.includes('chrome.runtime.reload()'), 'Die Optionsseite darf den laufenden Erweiterungskontext nicht selbst entwerten');
 assert(options.includes("password.value || currentCredentials?.password"), 'Ein bereits gespeichertes Kennwort darf durch erneutes Speichern nicht geleert werden');
@@ -189,11 +189,11 @@ assert(central.includes('setTimeout(()=>show(text,failed),1000)'), 'Terminaler I
 assert(central.includes('data-svnet-claims-jobs') && central.includes("`${job.id}|${job.profile}|${job.status}|${job.phase"), 'Letzte Serverergebnisse sind unabhängig von UI-Listenern geheimnisfrei im DOM prüfbar');
 assert(central.includes('data-svnet-claims-results') && central.includes('resultOf'), 'Der Live-Nachweis enthält sichere Fall-, Datei-, Nachrichten- und Terminzahlen');
 assert(central.includes('SVNET_CLAIMS_RUNTIME_STATUS') && central.includes('SVNET_CLAIMS_RUNTIME_PING'), 'Portal zeigt den persistenten Browserlauf auch nach einem Worker-Neustart an');
-assert(central.includes("minimumBridgeVersion='1.4.11'") && central.includes('versionAtLeast(bridgeVersion,minimumBridgeVersion)'), 'Die zentrale Importstation darf nur mit der unmittelbar startenden und anforderungsbezogen gerouteten Brücke laufen');
+assert(central.includes("minimumBridgeVersion='1.4.12'") && central.includes('versionAtLeast(bridgeVersion,minimumBridgeVersion)'), 'Die zentrale Importstation darf nur mit der unmittelbar startenden und anforderungsbezogen gerouteten Brücke laufen');
 assert(central.includes("runtime.status==='failed'") && central.includes('Browserlauf wurde abgebrochen'), 'Ein im Browser bereits fehlgeschlagener Lauf muss den noch aktiven Serverauftrag sicher beenden');
 assert(central.includes("d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&!agentJob&&!reconciling") && central.includes('button.disabled=false'), 'Ein vor der Auftragsuebernahme gemeldeter Browserabbruch muss abgeglichen und die Importschaltflaeche wieder freigegeben werden');
 assert(central.includes('reconciledJobs=new Set()') && central.includes('reconciledJobs.add(Number(active.jobId))'), 'Ein bereits abgeglichener Browserabbruch darf nicht bei jedem Laufzeit-Ping erneut gemeldet werden');
-assert(central.includes("currentBridgeVersion='1.4.11'") && central.includes('steht als empfohlenes Update bereit'), 'Die aktuelle Brücke muss weiterhin als empfohlenes Update angezeigt werden');
+assert(central.includes("currentBridgeVersion='1.4.12'") && central.includes('steht als empfohlenes Update bereit'), 'Die aktuelle Brücke muss weiterhin als empfohlenes Update angezeigt werden');
 const identityWorker = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8');
 assert(identityWorker.includes("url: 'https://web.claimsforce.com/logout'") && identityWorker.includes("chrome.browsingData.remove"), 'Vor jedem Profilwechsel muss zuerst die serverseitige ClaimsForce-Sitzung beendet und danach der Browserzustand gelöscht werden');
 assert(identityWorker.includes('PROFILE_BADGES') && identityWorker.includes('CF-AUTH-04') && claimsPageBridge.includes("message?.type === 'READ_ACCOUNT_IDENTITY'"), 'Die sichtbare ClaimsForce-Konto-Kennung muss vor dem Import zum ausgewählten Profil passen');
@@ -270,7 +270,7 @@ assert(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/ser
 assert(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8').includes('sleep(800).then(() => null)'), 'Ein hängender nativer Zugangsdatenkanal darf den Loopback-Fallback nicht blockieren');
 const serviceWorker = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8');
 const portalBridge = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/portal-bridge.js'), 'utf8');
-assert(manifest.version === '1.4.11' && !serviceWorker.includes('REVENUE_REFRESH_ALARM') && !serviceWorker.includes('PORTAL_REVENUE_REFRESH') && !bridge.includes('PORTAL_REVENUE_REFRESH'), 'Der Umsatzabgleich darf nicht mehr von einer installierten Browser-Brücke abhängen');
+assert(manifest.version === '1.4.12' && !serviceWorker.includes('REVENUE_REFRESH_ALARM') && !serviceWorker.includes('PORTAL_REVENUE_REFRESH') && !bridge.includes('PORTAL_REVENUE_REFRESH'), 'Der Umsatzabgleich darf nicht mehr von einer installierten Browser-Brücke abhängen');
 assert(serviceWorker.includes('portalAutoLoginRequest: { tabId:') && serviceWorker.includes("message?.type === 'CONSUME_PORTAL_AUTOLOGIN'") && serviceWorker.includes("remove('portalAutoLoginRequest')"), 'Automatische Portal-Anmeldung ist tabgebunden, kurzlebig und nur einmal nutzbar');
 assert(claimsMain.includes('listVersion') && serviceWorker.includes('CF-CASE-DELTA-SKIP'), 'Unveränderte Bestandsfälle müssen anhand des ClaimsForce-Änderungsstands vor dem erneuten Detailabruf übersprungen werden');
 assert(serviceWorker.includes('delete stableMapped.claimsforce_zuletzt_eingelesen') && serviceWorker.includes('fileVersions, messageVersions, appointmentVersions'), 'Der Vollabgleich darf keine bei jedem Lauf wechselnden Importzeitpunkte in die Signatur aufnehmen');

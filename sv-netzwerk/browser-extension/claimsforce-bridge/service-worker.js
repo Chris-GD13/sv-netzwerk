@@ -370,7 +370,7 @@ async function runImport(run) {
   await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks });
   const claimsById = new Map(), bucketCounts = {};
   if (fullSync) {
-    await diagnostic(run, 'CF-FULL-04', `Vollabgleich ab ${run.since || 'ohne Datumsgrenze'}: Aufgabenbestand wird vollständig eingelesen.`, { since: run.since || '', strategy: 'tasks-all-pages' });
+    await diagnostic(run, 'CF-FULL-04', `Vollabgleich der ClaimsForce-Fälle ab ${run.since || 'ohne Datumsgrenze'}: Fallliste wird vollständig eingelesen.`, { since: run.since || '', strategy: 'claims-all-pages' });
     const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
     const allClaims = Array.isArray(scraped?.claims) ? scraped.claims : [];
     for (const claim of allClaims) if (claim?.id) claimsById.set(claim.id, claim);
