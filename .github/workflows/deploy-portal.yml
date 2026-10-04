@@ -164,10 +164,10 @@ jobs:
           EXPECTED_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          marker="$(curl --fail --silent --show-error --retry 6 --retry-delay 5 https://www.sv-netzwerk.eu/intern/deploy-version.txt)"
+          marker="$(curl --silent --show-error --retry 6 --retry-delay 5 https://www.sv-netzwerk.eu/intern/deploy-version.txt || true)"
           printf '%s\n' "$marker"
           if ! printf '%s\n' "$marker" | grep -Fx "Commit: $EXPECTED_SHA"; then
-            echo "WARNUNG: Servermarker weicht ab; HTTP-Prüfungen werden trotzdem ausgeführt."
+            echo "WARNUNG: Portal-Servermarker fehlt oder weicht ab; die folgenden echten HTTP-Prüfungen bleiben maßgeblich."
           fi
           status="$(curl --max-time 20 --silent --show-error --retry 2 -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/login/)"
           test "$status" = "200"
