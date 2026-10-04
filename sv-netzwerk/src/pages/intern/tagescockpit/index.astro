@@ -24,8 +24,8 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     <section class="dc-summary" aria-label="Tagesübersicht">
       <a class="dc-summary-card" href="#dc-cases-section" aria-label="Fälle im Ordner anzeigen"><span>Fälle im Ordner</span><strong id="dc-case-count">–</strong><small id="dc-case-folder">Google Drive</small><em>Fälle anzeigen →</em></a>
       <a class="dc-summary-card" href="#dc-today-section" aria-label="Heutige Termine anzeigen"><span>Termine heute</span><strong id="dc-today-count">–</strong><small id="dc-next-event">Kalender wird geprüft</small><em>Termine anzeigen →</em></a>
-      <a class="dc-summary-card" href="/intern/aufgaben/" aria-label="Offene Aufgaben anzeigen und bearbeiten"><span>Aufgaben</span><strong id="dc-claims-count">–</strong><small id="dc-claims-summary">Outlook wird geprüft</small><em>Aufgaben bearbeiten →</em></a>
-      <a class="dc-summary-card" href="#dc-cases-section" aria-label="Prüfhinweise in den zuletzt bearbeiteten Fällen anzeigen"><span>Prüfhinweise</span><strong id="dc-warning-count">–</strong><small>in den letzten 10 Fällen</small><em>Betroffene Fälle anzeigen →</em></a>
+      <a class="dc-summary-card" href="/intern/aufgaben/" aria-label="Offene ClaimsForce-Aufgaben anzeigen und bearbeiten"><span>ClaimsForce-Aufgaben</span><strong id="dc-claims-count">–</strong><small id="dc-claims-summary">ClaimsForce wird geprüft</small><em>Aufgaben bearbeiten →</em></a>
+
     </section>
 
     <div class="dc-columns">
@@ -134,7 +134,6 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     setSystem('drive','ok',`${status.folders?.cases?.items??0} Fälle · ${status.cached?'geprüfter Zwischenspeicher':'direkt verbunden'}`);
     recentCases=Array.isArray(recent.results)?recent.results:[];let warnings=0;
     $('dc-cases').innerHTML=recentCases.length?recentCases.map((row,index)=>{const meta=row.meta||{},missing=required.filter(([key])=>!String(meta[key]||'').trim()).map(([,label])=>label);warnings+=missing.length;const title=meta.schaden_nr||row.name||'Fall ohne Schaden-Nr.',object=meta.vn_objekt||meta.versicherungsnehmer||'VN / Objekt noch offen',place=[meta.schaden_plz,meta.schaden_ort].filter(Boolean).join(' ');return `<article class="dc-case"><div><h3>${esc(title)}</h3><p>${esc(object)}${place?' · '+esc(place):''}</p>${missing.length?`<ul>${missing.map(item=>`<li>${esc(item)} fehlt</li>`).join('')}</ul>`:'<p>Pflichtangaben für das Cockpit vollständig.</p>'}</div><button type="button" data-open-case="${index}">Fall öffnen</button></article>`}).join(''):'<p class="dc-empty">Keine zuletzt bearbeiteten Fälle gefunden.</p>';
-    $('dc-warning-count').textContent=String(warnings);
   }
 
   async function loadCalendar(){
@@ -145,8 +144,9 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   }
 
   async function loadClaims(){
-    const data=await request('/intern/api/outlook-tasks.php?action=list'),items=data.items||[];
-    $('dc-claims-count').textContent=String(items.length);$('dc-claims-summary').textContent=items.length===1?'1 offene Aufgabe':`${items.length} offene Aufgaben`;
+    const data=await request('/intern/api/claimsforce-queue.php?action=summary'),items=data.items||[];
+    const open=items.reduce((sum,item)=>sum+(Number.isFinite(Number(item.open_count))?Number(item.open_count):0),0);
+    $('dc-claims-count').textContent=String(open);$('dc-claims-summary').textContent=`${open} offene ClaimsForce-Aufgaben`;
   }
 
   async function loadRevenue(){
