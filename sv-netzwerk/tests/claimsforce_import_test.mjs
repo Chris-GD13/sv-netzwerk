@@ -51,7 +51,7 @@ assert.equal(safeFileName('KVA: Angebot?.pdf'), 'KVA- Angebot-.pdf');
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, '1.4.11', 'die Brücke für ClaimsForce und Rekon muss als neue Laufzeitversion erkennbar sein');
+assert.equal(manifest.version, '1.4.12', 'die Brücke für ClaimsForce und Rekon muss als neue Laufzeitversion erkennbar sein');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*')));
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://claimsforce.eu.auth0.com/*')));
 assert(manifest.content_scripts.some(entry => entry.js.includes('login-helper.js') && entry.matches.includes('https://*.claimsforce.com/*') && !entry.exclude_matches), 'ClaimsForce-Anmeldehilfe muss auch auf web.claimsforce.com/login laufen');
