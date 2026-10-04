@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Rauch- und Wärmeabzugsanlagen nach Brandschäden fachlich prüfen',
+    description: 'RWA-Anlagen nach Brandschäden werden sicher stillgesetzt, fachkundig geprüft, wieder freigegeben und kostenmäßig nachvollziehbar abgegrenzt.',
+    href: '/fachwissen/rauchwaermeabzug-brandschaden-funktionspruefung-kostenabgrenzung/',
+    category: 'Brand und Kontamination',
+    tags: ['Rauchabzug', 'RWA', 'Brandschaden', 'Funktionsprüfung', 'Brandschutz', 'Kostenprüfung'],
+    date: '2026-10-04',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Aufzüge nach Wasserschäden: Stillsetzung, Prüfung und Kosten fachlich abgrenzen',
     description: 'Stillsetzung, Schadenermittlung, elektrische Sicherheit und Wiederinbetriebnahme von Aufzugsanlagen nach Wasserschäden werden getrennt und prüffähig dokumentiert.',
     href: '/fachwissen/aufzug-wasserschaden-stillsetzung-pruefung-kostenabgrenzung/',
