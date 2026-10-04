@@ -102,6 +102,7 @@ async function commitSync(message) {
   meta[`${prefix}_profile`] = profile;
   meta[`${prefix}_file_versions`] = [...new Set((message.fileVersions || []).map(String).filter(Boolean))];
   meta[`${prefix}_message_versions`] = [...new Set((message.messageVersions || []).map(String).filter(Boolean))];
+  if (prefix === 'claimsforce' && Array.isArray(message.notes)) meta.claimsforce_notizen = message.notes.slice(0, 500);
   meta[`${prefix}_list_version`] = String(message.listVersion || '');
   meta[`${prefix}_zuletzt_eingelesen`] = new Date().toISOString();
   await scopedApi(profile, `${API}?action=save_case`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, case: meta }) });

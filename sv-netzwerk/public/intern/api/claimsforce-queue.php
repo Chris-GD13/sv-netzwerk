@@ -18,7 +18,9 @@ function cqEnsureColumns():void{
         'progress_current'=>'INT UNSIGNED NOT NULL DEFAULT 0',
         'progress_total'=>'INT UNSIGNED NOT NULL DEFAULT 0',
         'diagnostic_json'=>'TEXT NULL',
-        'schedule_key'=>'VARCHAR(80) NULL'
+        'schedule_key'=>'VARCHAR(80) NULL',
+        'sync_mode'=>'VARCHAR(20) NOT NULL DEFAULT \'quick\'',
+        'since_date'=>'DATE NULL'
     ];
     $check=db()->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=:table AND COLUMN_NAME=:column');
     foreach($columns as$name=>$definition){
@@ -64,7 +66,7 @@ function cqVisibleProfiles(array$user):array{
     return[$profile=>$labels[$profile]];
 }
 function cqRow(int$id):array{
-    $s=db()->prepare('SELECT id,profile,status,message,result_json,created_at,started_at,heartbeat_at,attempt_count,phase,progress_current,progress_total,diagnostic_json,finished_at,requested_by FROM claimsforce_import_jobs WHERE id=:id LIMIT 1');
+    $s=db()->prepare('SELECT id,profile,status,message,result_json,created_at,started_at,heartbeat_at,attempt_count,phase,progress_current,progress_total,diagnostic_json,finished_at,requested_by,sync_mode,since_date FROM claimsforce_import_jobs WHERE id=:id LIMIT 1');
     $s->execute([':id'=>$id]);
     $row=$s->fetch(PDO::FETCH_ASSOC)?:[];
     if($row){
@@ -103,11 +105,13 @@ if($action==='summary'){
 if($action==='enqueue'){
     $allowed=array_keys(cqVisibleProfiles($user));
     $profile=trim((string)($body['profile']??''));
+    $syncMode=(($body['mode']??'')==='full'||!empty($body['full']))?'full':'quick';
+    $sinceDate=preg_match('/^\d{4}-\d{2}-\d{2}$/',(string)($body['since']??''))?(string)$body['since']:null;
     if(!in_array($profile,$allowed,true))apiError(409,'ClaimsForce-Profil und ausgewählter Sachverständiger stimmen nicht überein.');
     $stop=db()->prepare("UPDATE claimsforce_import_jobs SET status='failed',message='Durch einen neuen manuellen Import ersetzt.',phase='CF-FAIL-REPLACED',heartbeat_at=NOW(),finished_at=NOW() WHERE requested_by=:u AND profile=:p AND status IN ('queued','running')");
     $stop->execute([':p'=>$profile,':u'=>(string)($user['email']??'')]);
-    $s=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,created_at) VALUES(:p,'queued',:u,'Import wartet auf die zentrale Importstation.','CF-QUEUED',NOW())");
-    $s->execute([':p'=>$profile,':u'=>(string)($user['email']??'')]);
+    $s=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,sync_mode,since_date,created_at) VALUES(:p,'queued',:u,:m,'CF-QUEUED',:mode,:since,NOW())");
+    $s->execute([':p'=>$profile,':u'=>(string)($user['email']??''),':m'=>$syncMode==='full'?'Vollständiger ClaimsForce-Abgleich wartet auf die zentrale Importstation.':'Import wartet auf die zentrale Importstation.',':mode'=>$syncMode,':since'=>$sinceDate]);
     apiJson(['ok'=>true,'job'=>cqRow((int)db()->lastInsertId())]);
 }
 if($action==='status'){
