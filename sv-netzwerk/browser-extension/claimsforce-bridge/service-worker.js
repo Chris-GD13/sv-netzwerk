@@ -371,7 +371,7 @@ async function runImport(run) {
   const claimsById = new Map(), bucketCounts = {};
   if (fullSync) {
     await diagnostic(run, 'CF-FULL-04', `Vollabgleich ab ${run.since || 'ohne Datumsgrenze'}: Aufgabenbestand wird vollständig eingelesen.`, { since: run.since || '', strategy: 'tasks-all-pages' });
-    const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS' });
+    const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
     const allClaims = Array.isArray(scraped?.claims) ? scraped.claims : [];
     for (const claim of allClaims) if (claim?.id) claimsById.set(claim.id, claim);
     bucketCounts.ALL_TASKS = claimsById.size;

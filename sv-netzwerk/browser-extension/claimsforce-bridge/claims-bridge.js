@@ -65,25 +65,36 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
     const claimPattern = /\/claims\/([0-9a-f-]{20,})(?:\/|$)/i;
     const claims = new Map();
+    const since = String(message.since || '').trim();
+    const sinceTime = /^\d{4}-\d{2}-\d{2}$/.test(since) ? Date.parse(`${since}T00:00:00`) : NaN;
+    const parseGermanDate = value => {
+      const match = String(value || '').match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+      return match ? Date.parse(`${match[3]}-${match[2]}-${match[1]}T00:00:00`) : NaN;
+    };
     const collect = () => {
-      for (const anchor of document.querySelectorAll('a[href*="/claims/"]')) {
+      for (const row of document.querySelectorAll('table tbody tr,[role="row"]')) {
+        const anchor = row.querySelector('a[href*="/claims/"]');
+        if (!anchor) continue;
         const match = String(anchor.getAttribute('href') || '').match(claimPattern);
         if (!match) continue;
-        const row = anchor.closest('tr,[role="row"],li,article,button') || anchor.parentElement;
-        const text = (row?.textContent || anchor.textContent || '').replace(/\s+/g, ' ').trim();
-        const dateNode = row?.querySelector?.('time[datetime],[data-date],[data-created-at],[data-updated-at]');
-        const date = dateNode?.getAttribute('datetime') || dateNode?.getAttribute('data-date') || dateNode?.getAttribute('data-created-at') || dateNode?.getAttribute('data-updated-at') || '';
-        claims.set(match[1], { id: match[1], label: String(anchor.textContent || '').replace(/\s+/g, ' ').trim() || text.slice(0, 120), listVersion: date || text.slice(0, 180) });
+        const cells = [...row.querySelectorAll('td,[role="cell"]')].map(cell => (cell.textContent || '').replace(/\s+/g, ' ').trim());
+        const dates = [...(row.querySelectorAll('time[datetime],[data-date],[data-created-at],[data-updated-at]') || [])].map(node => node.getAttribute('datetime') || node.getAttribute('data-date') || node.getAttribute('data-created-at') || node.getAttribute('data-updated-at') || '');
+        const entered = cells[3]?.match(/\b\d{2}\.\d{2}\.\d{4}\b/)?.[0] || dates[0] || '';
+        const enteredTime = parseGermanDate(entered) || Date.parse(entered);
+        if (Number.isFinite(sinceTime) && (!Number.isFinite(enteredTime) || enteredTime < sinceTime)) continue;
+        const text = (row.textContent || anchor.textContent || '').replace(/\s+/g, ' ').trim();
+        claims.set(match[1], { id: match[1], label: cells[1] || String(anchor.textContent || '').replace(/\s+/g, ' ').trim() || text.slice(0, 120), listVersion: entered || text.slice(0, 180), enteredAt: entered });
       }
     };
     const nextButton = () => [...document.querySelectorAll('button,a,[role="button"]')].find(node => {
       const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
-      return /^(Nächste|Weiter|Next|›|>)$/i.test(text) && !node.disabled && node.getAttribute('aria-disabled') !== 'true';
+      const label = `${text} ${node.getAttribute('aria-label') || ''} ${node.getAttribute('title') || ''}`;
+      return (/^(Nächste|Weiter|Next|›|>)$/i.test(text) || /Nächste|Weiter|Next|next page/i.test(label)) && !node.disabled && node.getAttribute('aria-disabled') !== 'true';
     });
     (async () => {
-      if (location.pathname !== '/tasks') {
-        const link = [...document.querySelectorAll('a')].find(node => /Aufgaben/i.test(node.textContent || '') && /\/tasks(?:$|\?)/.test(node.getAttribute('href') || ''));
-        if (link) link.click(); else location.assign('https://web.claimsforce.com/tasks');
+      if (location.pathname !== '/claims') {
+        const link = [...document.querySelectorAll('a')].find(node => /Schäden|Schadenliste/i.test(node.textContent || '') && /\/claims(?:$|\?)/.test(node.getAttribute('href') || ''));
+        if (link) link.click(); else location.assign('https://web.claimsforce.com/claims');
         await wait(2200);
       }
       for (let page = 0; page < 120; page++) {
@@ -97,7 +108,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         if (claims.size === before && page > 2) break;
       }
       for (const [id, claim] of observedClaims) if (!claims.has(id)) claims.set(id, claim);
-      sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, pages: claims.size });
+      sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, pages: claims.size, since });
     })().catch(error => sendResponse({ ok: false, error: error.message, claims: [] }));
     return true;
   }
