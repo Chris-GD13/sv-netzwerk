@@ -37,7 +37,7 @@ jobs:
       run:
         working-directory: sv-netzwerk
     env:
-      SFTP_REMOTE_DIR: /sv-netzwerk
+      SFTP_REMOTE_DIR: ${{ secrets.SFTP_REMOTE_DIR }}
 
     steps:
       - name: Repository auschecken

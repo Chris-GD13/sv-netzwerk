@@ -81,9 +81,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       return /^(Nächste|Weiter|Next|›|>)$/i.test(text) && !node.disabled && node.getAttribute('aria-disabled') !== 'true';
     });
     (async () => {
-      if (location.pathname !== '/planning') {
+      if (location.pathname !== '/tasks') {
         const link = [...document.querySelectorAll('a')].find(node => /Aufgaben/i.test(node.textContent || '') && /\/tasks(?:$|\?)/.test(node.getAttribute('href') || ''));
-        if (link) link.click(); else location.assign('https://web.claimsforce.com/planning?bucket=WITHOUT_APPOINTMENT#without-appointment');
+        if (link) link.click(); else location.assign('https://web.claimsforce.com/tasks');
         await wait(2200);
       }
       for (let page = 0; page < 120; page++) {
