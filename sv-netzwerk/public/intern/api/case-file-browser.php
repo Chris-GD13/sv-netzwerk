@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/ionos-storage.php';
 commonHeaders();
 $user = requireAuth();
 if (!in_array($user['role'] ?? '', ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) apiError(403,'Keine Berechtigung.');
@@ -36,6 +37,11 @@ function cbToken(): string {
 }
 function cbList(string $parentId): array {
     $q="'".str_replace("'","\\'",$parentId)."' in parents and trashed=false";$url='https://www.googleapis.com/drive/v3/files?'.http_build_query(['q'=>$q,'fields'=>'files(id,name,mimeType,modifiedTime,size)','pageSize'=>1000,'orderBy'=>'folder,name_natural','supportsAllDrives'=>'true','includeItemsFromAllDrives'=>'true']);
+    if (ionosStorageEnabled()) {
+        $local=ionosDriveRequest('GET',$url);
+        if (is_array($local) && (int)($local['status']??0)===200) { $payload=json_decode((string)($local['body']??''),true); return is_array($payload['files']??null)?$payload['files']:[]; }
+        apiError(503,'IONOS-Fallakte konnte nicht geladen werden.');
+    }
     $r=cbHttp('GET',$url);if($r['status']!==200)apiError(503,'Fallunterlagen konnten nicht geladen werden.');$j=json_decode($r['body'],true);return is_array($j['files']??null)?$j['files']:[];
 }
 function cbTree(string $folderId,int $depth=0): array {
@@ -56,9 +62,13 @@ function cbDocxPreview(string $bytes,string $name):string{
 function cbStreamFile(array $file,bool $forceDownload=false):never{
     $id=(string)$file['id'];$mime=(string)($file['mimeType']??'application/octet-stream');$name=cbSafeName((string)($file['name']??'Datei'));
     $export=['application/vnd.google-apps.document'=>['application/vnd.openxmlformats-officedocument.wordprocessingml.document','.docx'],'application/vnd.google-apps.spreadsheet'=>['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','.xlsx'],'application/vnd.google-apps.presentation'=>['application/vnd.openxmlformats-officedocument.presentationml.presentation','.pptx']];
-    if(isset($export[$mime])){[$outMime,$ext]=$export[$mime];if(!str_ends_with(strtolower($name),$ext))$name.=$ext;$url='https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'/export?'.http_build_query(['mimeType'=>$outMime]);}
+    $localBody=null;
+    if (ionosStorageEnabled()) {
+        try { $localBody=ionosBytes($id); } catch (Throwable) { apiError(503,'Datei konnte nicht aus der IONOS-Fallakte geladen werden.'); }
+        $outMime=$mime;
+    } elseif(isset($export[$mime])){[$outMime,$ext]=$export[$mime];if(!str_ends_with(strtolower($name),$ext))$name.=$ext;$url='https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'/export?'.http_build_query(['mimeType'=>$outMime]);}
     else{$outMime=$mime;$url='https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'?alt=media&supportsAllDrives=true';}
-    $r=cbHttp('GET',$url);if($r['status']!==200)apiError(503,'Datei konnte nicht aus der Fallakte geladen werden.');
+    $r=$localBody!==null?['status'=>200,'body'=>$localBody]:cbHttp('GET',$url);if($r['status']!==200)apiError(503,'Datei konnte nicht aus der Fallakte geladen werden.');
     $isDocx=$outMime==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'||str_ends_with(strtolower($name),'.docx');
     if($isDocx&&!$forceDownload){$preview=cbDocxPreview($r['body'],$name);if($preview!==''){header('Content-Type: text/html; charset=utf-8');header('Content-Length: '.strlen($preview));header("Content-Disposition: inline; filename*=UTF-8''".rawurlencode($name.'.html'));echo$preview;exit;}}
     // Allgemeine Portalberichte werden aus Kompatibilitätsgründen als .doc
