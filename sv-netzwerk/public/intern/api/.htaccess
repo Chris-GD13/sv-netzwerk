@@ -34,3 +34,6 @@ AddDefaultCharset UTF-8
     Header always set X-Frame-Options "DENY"
     Header always set Cache-Control "no-store"
 </IfModule>
+<FilesMatch "^insurance-knowledge-index\.json$">
+  Require all denied
+</FilesMatch>
