@@ -43,6 +43,14 @@ function otHttp(string $method, string $url, array $headers=[], ?string $body=nu
     $error = curl_error($ch);
     curl_close($ch);
     if ($response === false || $error !== '') throw new RuntimeException('Microsoft-Verbindung fehlgeschlagen.');
+    if ($status === 404 && str_contains($url, 'login.microsoftonline.com/')) {
+        $fallbackHeaders = [];
+        foreach ($headers as $header) if (stripos($header, 'content-type:') === 0) $fallbackHeaders[] = $header;
+        $context = stream_context_create(['http' => ['method' => $method, 'header' => implode("\r\n", $fallbackHeaders) . "\r\n", 'content' => $body ?? '', 'ignore_errors' => true, 'timeout' => 180]]);
+        $fallback = @file_get_contents($url, false, $context);
+        $line = $http_response_header[0] ?? '';
+        if ($fallback !== false && preg_match('/\s(\d{3})\s/', $line, $match)) return ['status' => (int)$match[1], 'body' => (string)$fallback];
+    }
     return ['status' => $status, 'body' => (string)$response];
 }
 

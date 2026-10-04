@@ -7,16 +7,16 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       <div>
         <p class="tasks-kicker">Arbeitsliste</p>
         <h1>Aufgaben</h1>
-        <p>Alle Nachrichten aus Outlook „Zu erledigen“, älteste zuerst. E-Mails mit eindeutiger Schadennummer werden automatisch samt Anhängen in der Fallakte auf Google Drive abgelegt.</p>
+        <p>Alle Nachrichten aus Outlook „Zu erledigen“, älteste zuerst. E-Mails mit eindeutiger Schadennummer werden automatisch samt Anhängen in der IONOS-Fallakte abgelegt.</p>
       </div>
       <div class="tasks-head-actions">
         <span id="tasks-count" class="tasks-count">– offene Aufgaben</span>
         <button id="tasks-refresh" class="tasks-secondary" type="button">Aktualisieren</button>
       </div>
     </header>
-    <section class="tasks-drive-panel" aria-label="Google-Drive-Abgleich">
-      <div><strong>E-Mails in Google Drive ablegen</strong><span>Fehlende Fälle mit erkannter Schadennummer werden dabei neu angelegt.</span></div>
-      <button id="tasks-drive-sync" class="tasks-drive-button" type="button">Drive-Abgleich starten</button>
+    <section class="tasks-drive-panel" aria-label="IONOS-Abgleich">
+      <div><strong>E-Mails in IONOS-Fallakte ablegen</strong><span>Fehlende Fälle mit erkannter Schadennummer werden dabei neu angelegt.</span></div>
+      <button id="tasks-drive-sync" class="tasks-drive-button" type="button">IONOS-Abgleich starten</button>
     </section>
     <section class="tasks-status" id="tasks-status" role="status" aria-live="polite">Aufgaben werden geladen …</section>
     <section id="tasks-list" class="tasks-list" aria-label="Offene Aufgaben"></section>
@@ -109,7 +109,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       const taskKey = `svnet-drive-mail:${mailbox}:${item.id}`;
       if (!item.id || sessionStorage.getItem(taskKey) === 'done') continue;
       try {
-        setState(`Google Drive: E-Mail ${index + 1} von ${items.length} wird der Fallakte zugeordnet …`);
+        setState(`IONOS: E-Mail ${index + 1} von ${items.length} wird der Fallakte zugeordnet …`);
         const detail = await request(`${API}?action=detail&id=${encodeURIComponent(item.id)}`);
         const task = detail.task || {};
         const caseNumber = String(task.case_number || item.case_number || '').trim();
@@ -122,7 +122,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
         let exactCases = await cases.get(caseNumber);
         if (exactCases.length > 1) { unresolved++; continue; }
         if (exactCases.length === 0) {
-          setState(`Google Drive: Fall ${caseNumber} wird neu angelegt …`);
+          setState(`IONOS: Fall ${caseNumber} wird neu angelegt …`);
           const created = await request(`${DRIVE_API}?action=save_case`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -183,12 +183,12 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
         failures++;
       }
     }
-    const summary = `${archived} E-Mail(s) neu oder bereits in Google Drive abgelegt.`;
+    const summary = `${archived} E-Mail(s) neu oder bereits in der IONOS-Fallakte abgelegt.`;
     const notes = [
       unresolved ? `${unresolved} ohne eindeutigen Falltreffer` : '',
       failures ? `${failures} mit Übertragungsfehler` : '',
     ].filter(Boolean);
-    setState([summary, ...notes].join(' ') || 'Google-Drive-Abgleich abgeschlossen.', failures > 0);
+    setState([summary, ...notes].join(' ') || 'IONOS-Abgleich abgeschlossen.', failures > 0);
     archiveRunning = false;
     if (driveSync) driveSync.disabled = false;
   };
@@ -217,7 +217,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       render(data.items || []);
       currentItems = data.items || [];
       currentMailbox = data.mailbox || '';
-      setState((data.folder || 'Zu erledigen') + ' · älteste Aufgabe oben · Google-Drive-Abgleich läuft');
+    setState((data.folder || 'Zu erledigen') + ' · älteste Aufgabe oben · IONOS-Abgleich läuft');
       void archiveOpenTasks(data.items || [], data.mailbox || '');
     } catch (error) {
       list.innerHTML = '';
