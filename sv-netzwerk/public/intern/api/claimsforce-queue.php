@@ -89,6 +89,8 @@ $body=$_SERVER['REQUEST_METHOD']==='POST'?requestBody():[];
 
 if($action==='summary'){
     $visible=cqVisibleProfiles($user);
+    $selectedProfile=(string)array_key_first($visible);
+    if(($_GET['include_maurer']??'')==='1'&&(cqIsCentralAgent($user)||cqProfile($user)==='christian'))$visible['jens']='Maurer';
     $placeholders=implode(',',array_fill(0,count($visible),'?'));
     $s=db()->prepare('SELECT profile,open_count,updated_at,source_job_id FROM claimsforce_task_status WHERE profile IN ('.$placeholders.')');
     $s->execute(array_keys($visible));
@@ -97,9 +99,11 @@ if($action==='summary'){
     $items=[];
     foreach($visible as$profile=>$label){
         $row=$stored[$profile]??null;
-        $count=$row===null?null:(int)$row['open_count']; if($profile==='christian'&&$row!==null&&$row['source_job_id']===null&&$count===1)$count=17; $items[]=['profile'=>$profile,'label'=>$label,'open_count'=>$count,'updated_at'=>$row['updated_at']??null];
+        $count=$row===null?null:(int)$row['open_count']; if($profile==='christian'&&$row!==null&&$row['source_job_id']===null&&$count===1)$count=17;
+        if($profile==='jens'&&($row['source_job_id']??null)===null)$count=null;
+        $items[]=['profile'=>$profile,'label'=>$label,'open_count'=>$count,'updated_at'=>$row['updated_at']??null];
     }
-    apiJson(['ok'=>true,'items'=>$items]);
+    apiJson(['ok'=>true,'selected_profile'=>$selectedProfile,'items'=>$items]);
 }
 
 if($action==='enqueue'){
