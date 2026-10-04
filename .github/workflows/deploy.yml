@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - "sv-netzwerk/**"
+      - "!sv-netzwerk/public/intern/**"
+      - "!sv-netzwerk/src/pages/intern/**"
+      - "!sv-netzwerk/browser-extension/**"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
