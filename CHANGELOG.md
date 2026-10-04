@@ -1,3 +1,26 @@
+## 2026-10-02
+- Fachbeitrag „Schließanlagen nach Einbruchschäden: Austauschumfang und Kosten prüffähig bestimmen“ ergänzt
+- DIN EN 1303:2026-08, Polizeiberatung, VdS-Anwendungsbereiche sowie §§ 249 BGB, 82 und 83 VVG mit Geltungsstatus dokumentiert
+- Fachwissensübersicht, Kategorie-, Tag-, Suchindex- und Sitemap-Integration für den Build vorbereitet
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt; ohne ungeprüftes Beitragsbild gemäß Fachbeitragsstandard
+
+## 2026-09-30
+- Fachbeitrag „Schimmel nach Wasserschäden fachlich einordnen und Sanierung abgrenzen“ ergänzt
+- UBA-Schimmelleitfaden, Quellenstand, Geltungsstatus und VVG-Prüffelder dokumentiert
+- Vier thematisch passende ältere Beiträge mit belastbaren UBA-Aktualitätsständen präzisiert; übrige Beiträge ohne belegte Änderungsnotwendigkeit unverändert belassen
+- Fachbeitrags-Aktualitätsprüfung, Fachwissensübersicht, Suchindex und Sitemap für den Build vorbereitet
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt; ohne ungeprüftes Beitragsbild gemäß Fachbeitragsstandard
+
+## 2026-09-29
+- Neues Portal-Feld „Aufgaben“ ersetzt die Claims-Aufgabenanzeige im Tagescockpit und in der Navigation
+- Outlook-Nachrichten aus „Zu erledigen“ werden je Bearbeiter chronologisch angezeigt und anhand der Schadennummer mit der Fallsuche verknüpft
+- „Erledigt“ verschiebt die Nachricht ohne Outlook-Zusatzklick automatisch in den Outlook-Ordner „Erledigt"
+
+## 2026-09-28
+- Fachbeitrag „Gerüstkosten nach Gebäudeschäden prüffähig abgrenzen“ ergänzt
+- Gerüstumfang, Standzeit, Schutzleistungen und schadenbedingte Kosten in Übersicht, Suchindex und Sitemap integriert
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt
+
 ## 2026-09-27
 - Fachbeitrag „Eigenleistungen nach Gebäudeschäden prüffähig dokumentieren“ veröffentlicht
 - Fachwissensübersicht, Kategorie-, Tag-, Suchindex- und Sitemap-Integration ergänzt
@@ -423,3 +446,20 @@
 - eigenständigen Fachbeitrag „Heizungswasserschäden fachlich prüfen: Leckage, Korrosion, Frost und Folgeschäden trennen“ veröffentlicht
 - Fachwissensübersicht, Kategorien, Tags, Suchindex und Sitemap um die neue Detailroute ergänzt
 - LinkedIn-Begleittext als `prepared-not-posted` abgelegt; Veröffentlichung ohne Beitragsbild gemäß Fachbeitragsstandard
+## 2026-09-29
+- Fachbeitrag „Rückbau nach Brandschäden fachlich begrenzen und dokumentieren“ ergänzt
+- Rückbau, Schutzmaßnahmen, Freigaben, Entsorgung und Schadenbezug in Übersicht, Suchindex und Sitemap integriert
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt
+## 2026-10-01
+- Fachbeitrag „Farbtonabweichungen nach Gebäudeschäden: Anstrichflächen prüffähig abgrenzen“ mit BFS-Fachregel Nr. 25 (Stand November 2025), DIN 18363:2019-09 und amtlichen Gesetzesquellen ergänzt
+- Fachwissensübersicht, Kategorie, Tags, Suchindex und Sitemap über Content Collection und `library.ts` integriert
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt; keine externe Veröffentlichung behauptet
+## 2026-10-03
+- Fachbeitrag „Aufzüge nach Wasserschäden: Stillsetzung, Prüfung und Kosten fachlich abgrenzen“ ergänzt
+- Stillsetzung, Anlagenbefund, Prüfbedarf, Wiederinbetriebnahme und schadenbedingte Kosten getrennt dokumentiert; BetrSichV, TRBS 3121, TRBS 1201 Teil 4 und DGUV fachlich eingeordnet
+- Fachwissensübersicht, Kategorie, Tags, Suchindex und Sitemap über Content Collection und `library.ts` integriert
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt; ohne öffentliches Beitragsbild veröffentlicht
+## 2026-10-04
+
+- Neuer Fachbeitrag „Rauch- und Wärmeabzugsanlagen nach Brandschäden fachlich prüfen“ mit geprüftem Beitragsbild, SEO-Canonical, Quellenstand zu DIN 18232-10/-101/-2/-5, DIBt und TRBS 1112.
+- Detailroute, Bibliothek, Suchindex und Sitemap werden über den regulären Astro-Build integriert; LinkedIn-Begleittext bleibt bis zur separaten Freigabe `prepared-not-posted`.
