@@ -7,6 +7,7 @@ require_once __DIR__ . '/case-upload-ignore.php';
 require_once __DIR__ . '/kva-contact-merge.php';
 require_once __DIR__ . '/kva-contact-persistence.php';
 require_once __DIR__ . '/profile-routing.php';
+require_once __DIR__ . '/ionos-storage.php';
 commonHeaders();
 $user = requireAuth();
 if (!in_array($user['role'], ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) {
@@ -112,6 +113,8 @@ function gdAccessToken(): string {
 }
 
 function gdHttp(string $method,string $url,array $headers=[],?string $body=null,bool $auth=true): array {
+    $local=ionosDriveRequest($method,$url,$headers,$body);
+    if ($local!==null) return ['status'=>(int)$local['status'],'body'=>(string)$local['body']];
     if ($auth) $headers[]='Authorization: Bearer '.gdAccessToken();
     $ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_HTTPHEADER=>$headers,CURLOPT_CONNECTTIMEOUT=>12,CURLOPT_TIMEOUT=>90,CURLOPT_FOLLOWLOCATION=>true]);
     if ($body!==null) curl_setopt($ch,CURLOPT_POSTFIELDS,$body);
