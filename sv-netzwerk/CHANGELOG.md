@@ -459,3 +459,7 @@
 - Stillsetzung, Anlagenbefund, Prüfbedarf, Wiederinbetriebnahme und schadenbedingte Kosten getrennt dokumentiert; BetrSichV, TRBS 3121, TRBS 1201 Teil 4 und DGUV fachlich eingeordnet
 - Fachwissensübersicht, Kategorie, Tags, Suchindex und Sitemap über Content Collection und `library.ts` integriert
 - LinkedIn-Begleittext als `prepared-not-posted` abgelegt; ohne öffentliches Beitragsbild veröffentlicht
+## 2026-10-04
+
+- Neuer Fachbeitrag „Rauch- und Wärmeabzugsanlagen nach Brandschäden fachlich prüfen“ mit geprüftem Beitragsbild, SEO-Canonical, Quellenstand zu DIN 18232-10/-101/-2/-5, DIBt und TRBS 1112.
+- Detailroute, Bibliothek, Suchindex und Sitemap werden über den regulären Astro-Build integriert; LinkedIn-Begleittext bleibt bis zur separaten Freigabe `prepared-not-posted`.
