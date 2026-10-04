@@ -274,6 +274,11 @@ window.addEventListener('message', event => {
     try { chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS', profile: profileKey(event.data.profile) }); }
     catch (error) { window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: error.message }, location.origin); }
   }
+  if (event.data?.type === 'SVNET_KUSS_SCAN_START') {
+    chrome.runtime.sendMessage({ type: 'KUSS_SCAN_JOBS', all: true }).then(result => {
+      window.postMessage({ type: 'SVNET_KUSS_SCAN_RESULT', ...result }, location.origin);
+    }).catch(error => window.postMessage({ type: 'SVNET_KUSS_SCAN_RESULT', ok: false, error: error.message }, location.origin));
+  }
 });
 chrome.runtime.onMessage.addListener(message => {
   if (message?.type === 'IMPORT_PROGRESS') window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_PROGRESS', ...message }, location.origin);

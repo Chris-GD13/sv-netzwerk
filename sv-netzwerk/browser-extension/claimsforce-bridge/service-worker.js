@@ -20,6 +20,7 @@ const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
+const KUSS_TAB_PATTERN = 'https://portal.kussgmbh.de/*';
 const DAILY_IMPORT_ALARM = 'svnet-claimsforce-daily-0300';
 const PORTAL_AUTOLOGIN_TTL_MS = 30000;
 const profileKey = value => {
@@ -105,6 +106,15 @@ async function catchUpMorningImport() {
 chrome.alarms.onAlarm.addListener(alarm => {
   if (alarm.name === DAILY_IMPORT_ALARM) wakeCentralImportStation().finally(() => scheduleDailyImportAlarm().catch(() => {}));
 });
+
+async function scanKussJobs() {
+  const tabs = await chrome.tabs.query({ url: KUSS_TAB_PATTERN });
+  const tab = tabs.find(entry => Number.isInteger(entry.id));
+  if (!tab) throw new Error('KUSS-Portal ist in Chrome nicht geöffnet. Die sitzungsbasierte Verbindung benötigt den angemeldeten Tab.');
+  const result = await chrome.tabs.sendMessage(tab.id, { type: 'KUSS_SCAN_JOBS', all: true });
+  if (!result?.ok) throw new Error('KUSS-Auftragsliste konnte nicht gelesen werden.');
+  return { ...result, jobs: Array.isArray(result.jobs) ? result.jobs : [] };
+}
 chrome.runtime.onInstalled.addListener(() => scheduleDailyImportAlarm().then(catchUpMorningImport).catch(() => {}));
 chrome.runtime.onStartup.addListener(() => scheduleDailyImportAlarm().then(catchUpMorningImport).catch(() => {}));
 scheduleDailyImportAlarm().catch(() => {});
@@ -359,7 +369,14 @@ async function runImport(run) {
   const openTasks = await readOpenTasks(tab.id);
   await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks });
   const claimsById = new Map(), bucketCounts = {};
-  for (const planningBucket of PLANNING_BUCKETS) {
+  if (fullSync) {
+    await diagnostic(run, 'CF-FULL-04', `Vollabgleich ab ${run.since || 'ohne Datumsgrenze'}: Aufgabenbestand wird vollständig eingelesen.`, { since: run.since || '', strategy: 'tasks-all-pages' });
+    const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS' });
+    const allClaims = Array.isArray(scraped?.claims) ? scraped.claims : [];
+    for (const claim of allClaims) if (claim?.id) claimsById.set(claim.id, claim);
+    bucketCounts.ALL_TASKS = claimsById.size;
+    await diagnostic(run, 'CF-LIST-05', `${claimsById.size} unterschiedliche Aufträge aus „Aufgaben – Alle“ wurden erkannt.`, { count: claimsById.size, since: run.since || '', pages: scraped?.pages || 0, route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url) });
+  } else for (const planningBucket of PLANNING_BUCKETS) {
     const planning = await openPlanning(tab.id, planningBucket.key);
     await diagnostic(run, 'CF-PLAN-04', `Planungsansicht „${planningBucket.label}“ wurde angefordert.`, { bucket: planningBucket.key, strategy: planning?.strategy || 'bestehende Ansicht' });
     const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIMS' });
@@ -720,6 +737,10 @@ chrome.runtime.onConnect.addListener(port => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type === 'KUSS_SCAN_JOBS' && sender.tab?.id) {
+    scanKussJobs().then(result => sendResponse(result)).catch(error => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
   if (message?.type === 'REKON_TOKEN') {
     chrome.storage.session.set({ rekonToken: message.token, rekonTokenAt: Date.now() }).then(() => sendResponse({ ok: true })).catch(error => sendResponse({ ok: false, error: error.message }));
     return true;

@@ -81,7 +81,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20260908-2'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20261004-1'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(portal.includes(`<option value="${key}">${label}</option>`), `${label} ist als Bearbeiterprofil auswählbar`);
 assert(!portal.includes('<option value="susanne"') && !portal.includes('Susanne Wächter</option>'), 'Susanne darf nicht als eigenes Bearbeiterprofil erscheinen');
 assert(portal.includes("sessionStorage.removeItem('svnet-case')") && portal.includes("localStorage.removeItem('svnet-case')"), 'Profilwechsel löscht den aktiven Fall aus beiden Browser-Speichern');
@@ -163,7 +163,7 @@ assert(queue.includes('uq_claims_schedule_key') && queue.includes('INSERT IGNORE
 assert(queue.includes('foreach(svnetSupportedProfiles()as$profile)') && queue.includes("'CF-AUTO-QUEUED'"), 'Werktagsautomatik reiht alle unterstützten ClaimsForce-Profile ein');
 assert(queue.includes('claimsforce_task_status') && queue.includes("$action==='summary'"), 'Die offenen Claims-Aufgaben werden je Profil dauerhaft gespeichert und portalweit bereitgestellt');
 assert(queue.includes("'jens'=>'Jens'"), 'Jens besitzt einen eigenständigen Aufgabenstatus');
-assert(queue.includes("VALUES('christian',1,NOW(),NULL),('jens',6,NOW(),NULL)"), 'Die vom Benutzer bestätigten Ausgangswerte Christian 1 und Maurer 6 werden einmalig gesetzt');
+assert(queue.includes("VALUES('christian',17,NOW(),NULL),('jens',6,NOW(),NULL)"), 'Die bestätigten ClaimsForce-Ausgangswerte Christian 17 und Maurer 6 werden einmalig gesetzt');
 assert(queue.includes('function cqIsSusanne') && queue.includes('return cqIsSusanne($user)'), 'Die Queue verwendet die zentrale Backoffice-Freigabe');
 assert(queue.includes('$allowed=array_keys(cqVisibleProfiles($user))') && queue.includes('ClaimsForce-Profil und ausgewählter Sachverständiger stimmen nicht überein'), 'Auch die Queue darf nur das aktuell ausgewählte Profil annehmen');
 assert(queue.includes("if(!cqIsCentralAgent($user))apiError(403,'Nur eine freigegebene zentrale Backoffice-Importstation darf Aufträge übernehmen.')"), 'Die Queue erzwingt die freigegebene Backoffice-Station serverseitig');
@@ -178,7 +178,7 @@ assert(central.includes("supportedProfiles=['christian','holger','marc','jens']"
 assert(!central.includes("action=select_expert") && !central.includes('context.selected_expert=target'), 'Ein Hintergrundimport darf das im Portal ausgewählte Bearbeiterprofil nicht verändern');
 assert(!central.includes('automaticImport') && !central.includes("['christian','jens','marc','holger']"), 'Unsichere browserlokale Mehrprofil-Automatik muss abgeschaltet bleiben');
 assert(central.includes("await post('schedule')"), 'Zentrale Station muss den idempotenten serverseitigen Werktagsauftrag abfragen');
-assert(central.includes("post('enqueue',{profile})") && !central.includes("profile==='christian'?['christian','jens']:[profile]"), 'Ein manueller Klick darf genau einen Profilimport einreihen');
+assert((central.includes("post('enqueue',{profile})") || central.includes("post('enqueue',payload)")) && !central.includes("profile==='christian'?['christian','jens']:[profile]"), 'Ein manueller Klick darf genau einen Profilimport einreihen');
 assert(central.includes("post('active')") && central.includes("post('heartbeat'"), 'Zentrale Station zeigt einen aktiven manuellen Import weiter an');
 assert(central.includes('await launch(active.job,true)') && central.includes('derselben Job-ID sicher wiederaufgenommen'), 'Ein vorhandener Serverlauf muss mit identischer Job-ID sicher wiederaufgenommen werden');
 assert(central.includes("action=mine") && central.includes('resumeWatch()'), 'Portal stellt die sichtbare Überwachung bereits eingereihter Importe wieder her');

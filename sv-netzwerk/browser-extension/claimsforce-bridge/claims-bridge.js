@@ -61,6 +61,46 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     sendResponse({ ok: Number.isInteger(count), openTasks: count });
     return;
   }
+  if (message?.type === 'SCRAPE_ALL_CLAIMS') {
+    const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+    const claimPattern = /\/claims\/([0-9a-f-]{20,})(?:\/|$)/i;
+    const claims = new Map();
+    const collect = () => {
+      for (const anchor of document.querySelectorAll('a[href*="/claims/"]')) {
+        const match = String(anchor.getAttribute('href') || '').match(claimPattern);
+        if (!match) continue;
+        const row = anchor.closest('tr,[role="row"],li,article,button') || anchor.parentElement;
+        const text = (row?.textContent || anchor.textContent || '').replace(/\s+/g, ' ').trim();
+        const dateNode = row?.querySelector?.('time[datetime],[data-date],[data-created-at],[data-updated-at]');
+        const date = dateNode?.getAttribute('datetime') || dateNode?.getAttribute('data-date') || dateNode?.getAttribute('data-created-at') || dateNode?.getAttribute('data-updated-at') || '';
+        claims.set(match[1], { id: match[1], label: String(anchor.textContent || '').replace(/\s+/g, ' ').trim() || text.slice(0, 120), listVersion: date || text.slice(0, 180) });
+      }
+    };
+    const nextButton = () => [...document.querySelectorAll('button,a,[role="button"]')].find(node => {
+      const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
+      return /^(Nächste|Weiter|Next|›|>)$/i.test(text) && !node.disabled && node.getAttribute('aria-disabled') !== 'true';
+    });
+    (async () => {
+      if (location.pathname !== '/tasks') {
+        const link = [...document.querySelectorAll('a')].find(node => /Aufgaben/i.test(node.textContent || '') && /\/tasks(?:$|\?)/.test(node.getAttribute('href') || ''));
+        if (link) link.click(); else location.assign('https://web.claimsforce.com/tasks');
+        await wait(2200);
+      }
+      for (let page = 0; page < 120; page++) {
+        const before = claims.size;
+        collect();
+        const next = nextButton();
+        if (!next) break;
+        next.click();
+        await wait(900);
+        collect();
+        if (claims.size === before && page > 2) break;
+      }
+      for (const [id, claim] of observedClaims) if (!claims.has(id)) claims.set(id, claim);
+      sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, pages: claims.size });
+    })().catch(error => sendResponse({ ok: false, error: error.message, claims: [] }));
+    return true;
+  }
   if (message?.type === 'SESSION_STATE') {
     sendResponse({ ok: true, route: location.pathname, observedClaims: observedClaims.size, planning: location.pathname.startsWith('/planning'), login: location.pathname.startsWith('/login') });
     return;

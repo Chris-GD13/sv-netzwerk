@@ -8,6 +8,7 @@
     "https://web.claimsforce.com/*",
     "https://*.claimsforce.com/*",
     "https://claimsforce.eu.auth0.com/*",
+    "https://portal.kussgmbh.de/*",
     "https://*.execute-api.eu-central-1.amazonaws.com/*",
     "https://www.rekoninterschaden-portal.de/*",
     "https://api.www.rekoninterschaden-portal.de/*",
@@ -27,6 +28,11 @@
       "matches": ["https://web.claimsforce.com/*"],
       "js": ["claims-bridge.js"],
       "run_at": "document_start"
+    },
+    {
+      "matches": ["https://portal.kussgmbh.de/*"],
+      "js": ["kuss-bridge.js"],
+      "run_at": "document_idle"
     },
     {
       "matches": ["https://www.rekoninterschaden-portal.de/*"],
