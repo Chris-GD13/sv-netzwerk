@@ -97,7 +97,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     const checks=[
       ['drive',async()=>{const data=await request(`${DRIVE}?action=status`);return `Drive · ${data.folders?.cases?.items??0} Fälle`}],
       ['outlook',async()=>{const data=await request('/intern/api/outlook-case-calendar.php?action=list&start='+encodeURIComponent(localIso(monday(new Date()))));return `Outlook · ${data.events?.length||0} Termine`}],
-      ['claims',async()=>{const data=await request('/intern/api/claimsforce-queue.php?action=summary'),items=data.items||[],open=items.reduce((sum,item)=>sum+(Number.isFinite(Number(item.open_count))?Number(item.open_count):0),0);return items.some(item=>item.open_count!==null)?`ClaimsForce · ${open} offen`:'ClaimsForce erreichbar'}],
+      ['claims',async()=>{const data=await request('/intern/api/claimsforce-queue.php?action=summary'),items=data.items||[],open=items.reduce((sum,item)=>sum+(Number.isFinite(Number(item.open_count))?Number(item.open_count):0),0);$('wc-open').textContent=String(open);return items.some(item=>item.open_count!==null)?`ClaimsForce · ${open} offen`:'ClaimsForce erreichbar'}],
       ['revenue',async()=>{const data=await request('/intern/api/revenue-summary-v2.php?action=access');const stamp=data.summary_type==='holger'?[data.claims?.updated_at,data.rekon?.updated_at].filter(Boolean).join(' · '):data.source_updated_at;return stamp?`Abrechnung · ${stamp}`:'Abrechnung erreichbar'}]
     ];
     const results=await Promise.allSettled(checks.map(([,check])=>check()));results.forEach((result,index)=>setSystem(checks[index][0],result.status==='fulfilled'?'ok':'bad',result.status==='fulfilled'?result.value:'nicht erreichbar'));
