@@ -85,6 +85,18 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         const text = (row.textContent || anchor.textContent || '').replace(/\s+/g, ' ').trim();
         claims.set(match[1], { id: match[1], label: cells[1] || String(anchor.textContent || '').replace(/\s+/g, ' ').trim() || text.slice(0, 120), listVersion: entered || text.slice(0, 180), enteredAt: entered });
       }
+      // Some ClaimsForce list variants render claim links without table rows.
+      // Collect those links as a fallback so full sync never falls back to
+      // the 14 planning tasks.
+      for (const anchor of document.querySelectorAll('a[href*="/claims/"]')) {
+        const match = String(anchor.getAttribute('href') || '').match(claimPattern);
+        if (!match || claims.has(match[1])) continue;
+        const text = (anchor.closest('tr,[role="row"],article,li')?.textContent || anchor.textContent || '').replace(/\s+/g, ' ').trim();
+        const entered = text.match(/\b\d{2}\.\d{2}\.\d{4}\b/)?.[0] || '';
+        const enteredTime = parseGermanDate(entered) || Date.parse(entered);
+        if (Number.isFinite(sinceTime) && (!Number.isFinite(enteredTime) || enteredTime < sinceTime)) continue;
+        claims.set(match[1], { id: match[1], label: String(anchor.textContent || '').replace(/\s+/g, ' ').trim() || text.slice(0, 120), listVersion: entered || text.slice(0, 180), enteredAt: entered });
+      }
     };
     const nextButton = () => [...document.querySelectorAll('button,a,[role="button"]')].find(node => {
       const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
