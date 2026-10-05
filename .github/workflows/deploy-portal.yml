@@ -128,7 +128,7 @@ jobs:
           print("Portal-App-Berechtigungen vollständig geprüft.")
           '
           unset access_token token_response
-          config_dir="${SFTP_REMOTE_DIR%/}/.."
+          config_dir="${SFTP_REMOTE_DIR%/}"
           deploy_dir="${SFTP_REMOTE_DIR%/}/.."
           # Das öffentliche Paket liegt im SFTP-Ordner /public; das geschützte
           # Prüfportal liegt eine Ebene darüber im IONOS-Portalroot.
