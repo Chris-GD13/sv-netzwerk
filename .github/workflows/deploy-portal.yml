@@ -128,9 +128,11 @@ jobs:
           print("Portal-App-Berechtigungen vollständig geprüft.")
           '
           unset access_token token_response
-          config_dir="$SFTP_REMOTE_DIR"
-          deploy_dir="$SFTP_REMOTE_DIR"
-          if lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/public; quit"; then config_dir="$SFTP_REMOTE_DIR"; deploy_dir="${SFTP_REMOTE_DIR%/}/public"; elif lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk/public; quit"; then config_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk/public"; elif lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk; quit"; then config_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; fi
+          config_dir="${SFTP_REMOTE_DIR%/}"
+          deploy_dir="${SFTP_REMOTE_DIR%/}"
+          # Das Prüfportal liegt im IONOS-Portalroot. Ein vorhandener
+          # /public-Unterordner ist der öffentliche Website-Stand und darf
+          # nicht als Prüfportalziel bevorzugt werden.
           env_dir="$(mktemp -d)"
           env_file="$env_dir/server.env"
           trap 'rm -f "$env_file"; rmdir "$env_dir"' EXIT
@@ -162,8 +164,7 @@ jobs:
           set -euo pipefail
           echo "SFTP-DNS:"; getent hosts "$SFTP_HOST" || true
           echo "Portal-DNS:"; getent hosts www.sv-netzwerk.eu || true
-          deploy_dir="$SFTP_REMOTE_DIR"
-          if lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/public; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/public"; elif lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk/public; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk/public"; elif lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; fi
+          deploy_dir="${SFTP_REMOTE_DIR%/}"
           echo "SFTP-Zielverzeichnis: $deploy_dir"
           lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; pwd; cls -1; cd ..; pwd; cls -1; quit"
           timeout 1200s lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $deploy_dir; put dist/.htaccess -o .htaccess; put dist/.well-known/.htaccess -o .well-known/.htaccess; mirror --reverse --overwrite --parallel=4 --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern/photos --exclude-glob intern/photos/** --exclude-glob intern/api/config.php deploy-portal/ .; put deploy-portal/intern/versicherungsfaelle/index.php -o intern/versicherungsfaelle/index.php; put deploy-portal/intern/tagescockpit/index.php -o intern/tagescockpit/index.php; put deploy-portal/intern/arbeitszentrale/index.php -o intern/arbeitszentrale/index.php; put deploy-portal/intern/claimsforce-central.js -o intern/claimsforce-central.js; put deploy-portal/intern/deploy-version.txt -o intern/deploy-version.txt; quit"
@@ -176,7 +177,8 @@ jobs:
           marker="$(curl --silent --show-error --retry 6 --retry-delay 5 https://www.sv-netzwerk.eu/intern/deploy-version.txt || true)"
           printf '%s\n' "$marker"
           if ! printf '%s\n' "$marker" | grep -Fx "Commit: $EXPECTED_SHA"; then
-            echo "WARNUNG: Portal-Servermarker fehlt oder weicht ab; die folgenden echten HTTP-Prüfungen bleiben maßgeblich."
+            echo "Portal-Servermarker fehlt oder weicht ab: falsches IONOS-Zielverzeichnis."
+            exit 1
           fi
           status="$(curl --max-time 20 --silent --show-error --retry 2 -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/login/)"
           test "$status" = "200"
