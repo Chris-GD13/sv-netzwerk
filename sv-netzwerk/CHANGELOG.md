@@ -463,3 +463,8 @@
 
 - Neuer Fachbeitrag „Rauch- und Wärmeabzugsanlagen nach Brandschäden fachlich prüfen“ mit geprüftem Beitragsbild, SEO-Canonical, Quellenstand zu DIN 18232-10/-101/-2/-5, DIBt und TRBS 1112.
 - Detailroute, Bibliothek, Suchindex und Sitemap werden über den regulären Astro-Build integriert; LinkedIn-Begleittext bleibt bis zur separaten Freigabe `prepared-not-posted`.
+## 2026-10-05
+- Fachbeitrag „Sprinkleranlagen nach Auslösung und Wasserschäden fachlich prüfen“ ergänzt
+- VdS 2091, VdS CEA 4001, BetrSichV sowie §§ 82 und 83 VVG mit Quellenstand, Geltungsstatus und praktischer Bedeutung dokumentiert
+- Fachwissensübersicht, Kategorie-, Tag-, Suchindex- und Sitemap-Integration für den Build vorbereitet
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt; geprüftes Beitragsbild integriert

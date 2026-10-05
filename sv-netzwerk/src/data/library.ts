@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Sprinkleranlagen nach Auslösung und Wasserschäden fachlich prüfen',
+    description: 'Auslöseursache, betroffene Schutzzone, Fachprüfung, Wiederinbetriebnahme und Kosten einer Sprinkleranlage werden nach einem Ereignis getrennt dokumentiert.',
+    href: '/fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/',
+    category: 'Gebäudetechnik und Brandschutz',
+    tags: ['Sprinkleranlage', 'Wasserschaden', 'Brandschutz', 'Stillsetzung', 'Funktionsprüfung', 'Kostenprüfung'],
+    date: '2026-10-05',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Rauch- und Wärmeabzugsanlagen nach Brandschäden fachlich prüfen',
     description: 'RWA-Anlagen nach Brandschäden werden sicher stillgesetzt, fachkundig geprüft, wieder freigegeben und kostenmäßig nachvollziehbar abgegrenzt.',
     href: '/fachwissen/rauchwaermeabzug-brandschaden-funktionspruefung-kostenabgrenzung/',
