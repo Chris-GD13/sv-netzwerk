@@ -48,19 +48,24 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
   if (message?.type === 'READ_OPEN_TASKS') {
     const visible = node => node.getClientRects?.().length > 0 && getComputedStyle(node).visibility !== 'hidden' && getComputedStyle(node).display !== 'none';
-    const labels = [...document.querySelectorAll('div,span,p,strong')].filter(node => visible(node) && /^Alle$/i.test((node.textContent || '').trim()));
+    const clean = value => String(value || '').replace(/\s+/g, ' ').trim();
+    const patterns = [/^(\d{1,5})\s*Alle$/i, /^Alle\s*[(\[]?\s*(\d{1,5})\s*[)\]]?$/i, /^Aufgaben\s*[-–:]?\s*Alle\s*[(\[]?\s*(\d{1,5})\s*[)\]]?$/i];
     const counts = [];
-    for (const label of labels) {
-      let node = label;
-      for (let depth = 0; node && depth < 5; depth++, node = node.parentElement) {
-        const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
-        const match = text.match(/^(\d{1,5})\s+Alle$/i) || text.match(/^Alle\s+(\d{1,5})$/i);
+    const samples = [];
+    for (const node of document.querySelectorAll('body *')) {
+      if (!visible(node)) continue;
+      const text = clean(node.textContent);
+      if (!text || text.length > 40 || !/Alle/i.test(text)) continue;
+      if (samples.length < 8) samples.push(text);
+      for (const pattern of patterns) {
+        const match = text.match(pattern);
         if (match) { counts.push(Number(match[1])); break; }
       }
     }
     const uniqueCounts = [...new Set(counts)];
-    const count = location.pathname.startsWith('/tasks') && uniqueCounts.length === 1 ? uniqueCounts[0] : null;
-    sendResponse({ ok: Number.isInteger(count), openTasks: count });
+    const onTasks = location.pathname.startsWith('/tasks');
+    const count = onTasks && uniqueCounts.length === 1 ? uniqueCounts[0] : null;
+    sendResponse({ ok: Number.isInteger(count), openTasks: count, debug: { path: location.pathname, candidates: uniqueCounts, samples } });
     return;
   }
   if (message?.type === 'SCRAPE_ALL_CLAIMS') {
