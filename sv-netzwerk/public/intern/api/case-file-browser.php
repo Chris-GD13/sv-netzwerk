@@ -11,6 +11,8 @@ function cbSetting(string $key,string $default=''):string{
     try{$stmt=db()->prepare('SELECT setting_value FROM app_settings WHERE setting_key=:k LIMIT 1');$stmt->execute([':k'=>$key]);$value=$stmt->fetchColumn();return$value===false?$default:(string)$value;}catch(Throwable){return$default;}
 }
 function cbHttp(string $method,string $url,array $headers=[],?string $body=null,bool $auth=true): array {
+    $local=ionosDriveRequest($method,$url,$headers,$body);
+    if($local!==null)return['status'=>(int)$local['status'],'body'=>(string)$local['body']];
     if ($auth) $headers[]='Authorization: Bearer '.cbToken();
     $ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_HTTPHEADER=>$headers,CURLOPT_CONNECTTIMEOUT=>12,CURLOPT_TIMEOUT=>60,CURLOPT_FOLLOWLOCATION=>true]);
     if($body!==null)curl_setopt($ch,CURLOPT_POSTFIELDS,$body);$resp=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$err=curl_error($ch);curl_close($ch);

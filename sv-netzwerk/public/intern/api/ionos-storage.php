@@ -2,7 +2,15 @@
 declare(strict_types=1);
 
 /** ID-preserving local document store. Remote services remain disabled until verified cutover. */
-function ionosStorageEnabled(): bool { return getenv('PORTAL_STORAGE_BACKEND') === 'ionos'; }
+function ionosStorageEnabled(): bool {
+    $backend = strtolower(trim((string)getenv('PORTAL_STORAGE_BACKEND')));
+    if ($backend === 'google') return false;
+    if ($backend === 'ionos') return true;
+    // The web process may not inherit the deployment environment. Once the
+    // verified local index exists, use it automatically so IONOS file IDs are
+    // never sent to the Google Drive API as a fallback.
+    return is_file(rtrim(getenv('IONOS_STORAGE_ROOT') ?: '/srv/svnet-storage', '/') . '/index.sqlite');
+}
 function ionosStorageRoot(): string { return rtrim(getenv('IONOS_STORAGE_ROOT') ?: '/srv/svnet-storage', '/'); }
 function ionosStorageDb(): PDO {
     static $db=null;
