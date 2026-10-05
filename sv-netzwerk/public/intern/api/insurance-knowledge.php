@@ -15,5 +15,5 @@ $files = array_values(array_filter($data['files'] ?? [], static function(array $
     if ($q !== '') return str_contains(mb_strtolower(($f['path'] ?? '').' '.($f['name'] ?? ''), 'UTF-8'), $q);
     return true;
 }));
-$sheets = $insurer === 'Sparkassen Versicherung' ? ($data['sparkassen_workbook'] ?? []) : [];
+$sheets = $data['sparkassen_workbook'] ?? [];
 apiJson(['ok'=>true,'generated_at'=>$data['generated_at']??null,'file_count'=>$data['file_count']??0,'insurers'=>array_values(array_unique(array_map(static fn(array $f)=>(string)($f['insurer']??''),$data['files']??[]))),'files'=>$files,'workbook'=>$sheets]);
