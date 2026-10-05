@@ -19,7 +19,7 @@
   `sv-netzwerk/browser-extension/claimsforce-bridge/`; Portal-Skript:
   `sv-netzwerk/public/intern/claimsforce-central.js`. Das Bridge-Paket wird in
   CI aus dem Quellcode erzeugt, nie von Hand ersetzt.
-- `SFTP_REMOTE_DIR` kommt nur aus dem Secret und wird per Probedatei gegen die
+- Portal-Zielpfad `/var/www/sv-netzwerk` auf `217.160.143.102`; der Workflow nutzt nur die Secrets `PORTAL_SFTP_*` und `PORTAL_SSH_KEY`. `PORTAL_SFTP_REMOTE_DIR` kommt nur aus dem Secret und wird per Probedatei gegen die
   Domain verifiziert (siehe `DEPLOYMENT.md`); keine Fallback-Pfade einbauen.
 
 ## Allgemein

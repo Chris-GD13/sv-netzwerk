@@ -38,7 +38,7 @@ jobs:
       run:
         working-directory: sv-netzwerk
     env:
-      SFTP_REMOTE_DIR: ${{ secrets.SFTP_REMOTE_DIR }}
+      SFTP_REMOTE_DIR: ${{ secrets.PORTAL_SFTP_REMOTE_DIR }}
 
     steps:
       - name: Repository auschecken
@@ -98,12 +98,25 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes lftp
 
+      - name: SSH-Schlüssel für den Portal-Server einrichten
+        env:
+          PORTAL_SSH_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+          PORTAL_SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          PORTAL_SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          test -n "$PORTAL_SSH_KEY"
+          install -d -m 700 ~/.ssh ~/.lftp
+          printf '%s\n' "$PORTAL_SSH_KEY" > ~/.ssh/portal_key
+          chmod 600 ~/.ssh/portal_key
+          ssh-keyscan -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "set sftp:connect-program \"ssh -a -x -i $HOME/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes\"" > ~/.lftp/rc
       - name: SFTP-Stammverzeichnis gegen Domain-Dokumentenstamm verifizieren
         env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
-          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SFTP_PASSWORD: key-auth
+          SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
         run: |
           set -euo pipefail
           if [ -z "${SFTP_REMOTE_DIR:-}" ]; then
@@ -137,10 +150,10 @@ jobs:
 
       - name: Serverkonfiguration absichern
         env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
-          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SFTP_PASSWORD: key-auth
+          SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
           PORTAL_MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
           PORTAL_MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
           PORTAL_MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
@@ -210,10 +223,10 @@ jobs:
 
       - name: Portalpaket ohne Serverkonfiguration übertragen
         env:
-          SFTP_HOST: ${{ secrets.SFTP_HOST }}
-          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
-          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
-          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SFTP_PASSWORD: key-auth
+          SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
         run: |
           set -euo pipefail
           echo "SFTP-DNS:"; getent hosts "$SFTP_HOST" || true

@@ -17,10 +17,10 @@
 
 ### Portal-Deployment (`.github/workflows/deploy-portal.yml`)
 
-- Zielverzeichnis ist ausschließlich das Secret `SFTP_REMOTE_DIR`; es gibt
+- Zielverzeichnis ist ausschließlich das Secret `PORTAL_SFTP_REMOTE_DIR`; es gibt
   keine Fallback-Pfade. Vor jeder Übertragung (und vor dem Schreiben der
   `.env`) lädt der Workflow eine zufällige Probedatei nach
-  `$SFTP_REMOTE_DIR/intern/` und liest sie per HTTPS unter
+  `$PORTAL_SFTP_REMOTE_DIR/intern/` und liest sie per HTTPS unter
   `https://www.sv-netzwerk.eu/intern/` zurück. Nur wenn der Inhalt exakt passt,
   ist die Zuordnung SFTP-Stamm → Domain-Dokumentenstamm bestätigt; sonst bricht
   der Lauf ohne Deployment ab. Der Wert des Secrets muss der reale IONOS-Pfad
@@ -36,16 +36,22 @@
   Anmeldung (Secrets `ADMIN_EMAIL`/`ADMIN_PASSWORD`, ein Versuch pro Lauf) und
   danach `/intern/tagescockpit/` = 200, Bridge-Paket live identisch.
 
+### Zugang zum Portal-Server
+
+Das Portal wird auf den neuen IONOS-VPS (`217.160.143.102`) ausgeliefert;
+Apache stellt `www.sv-netzwerk.eu` aus `/var/www/sv-netzwerk` bereit (bestätigt
+per SSH durch Christian am 05.10.2026). Der Portal-Workflow nutzt ausschließlich
+eigene Secrets: `PORTAL_SFTP_HOST`, `PORTAL_SFTP_USERNAME`, `PORTAL_SFTP_PORT`,
+`PORTAL_SFTP_REMOTE_DIR` und `PORTAL_SSH_KEY` (SSH-Key-Anmeldung). Die alten
+`SFTP_*`-Secrets der öffentlichen Website bleiben unverändert und werden vom
+Portal-Workflow nicht verwendet. Die Probedatei prüft vor jedem Deployment, dass
+`PORTAL_SFTP_REMOTE_DIR` wirklich unter `https://www.sv-netzwerk.eu/intern/`
+ausgeliefert wird.
+
 ### Offener Blocker (Stand 05.10.2026)
 
-Der exakte IONOS-Dokument-Root für `www.sv-netzwerk.eu` muss noch als Secret
-`SFTP_REMOTE_DIR` gesetzt werden. Bis die Probedatei die Zuordnung bestätigt,
-stellt der Portal-Workflow nichts bereit. Der bisherige Lauf auf `main`
-(`6b9fa8e3`) scheiterte an einem geratenen Pfad; live steht deshalb weiter
-`Commit: local-build`.
-
-Maßgeblich ist `sv-netzwerk/`; die Kopien unter `public/intern/` und
-`browser-extension/` im Repository-Stamm sind veraltet.
+Die `PORTAL_*`-Secrets müssen im Repository gesetzt sein, bevor der
+Portal-Workflow erfolgreich laufen kann.
 ## Öffentliche Website (`.github/workflows/deploy.yml`)
 
 Die kanonische Adresse ist `https://www.sv-netzwerk.eu`; die `.htaccess` leitet
