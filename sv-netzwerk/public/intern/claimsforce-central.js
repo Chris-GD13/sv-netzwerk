@@ -75,6 +75,7 @@
     try{const profile=selectedProfile(),payload={profile};if(mode==='full'){payload.mode='full';payload.since=sinceInput?.value||''}if(mode==='tasks')payload.mode='tasks';userJobs=[];userJobs.push((await post('enqueue',payload)).job.id);show(mode==='full'?'Vollständiger ClaimsForce-Abgleich wurde übergeben.':mode==='tasks'?'ClaimsForce-Aufgaben werden automatisch aktualisiert.':'Importauftrag wurde an die zentrale Importstation übergeben.');watch()}
     catch(e){button.disabled=false;if(fullButton)fullButton.disabled=false;userJobs=[];show(e.message,true)}
   };
+  window.svnetClaimsTaskCheck=true;
   window.addEventListener('svnet:claims-task-check',()=>{enqueue('tasks')});
   // Der Hauptbutton startet den vollständigen Falllistenimport. Der frühere
   // Schnellimport las nur die beiden Planungsansichten „Mit Termin“ und „Ohne Termin“.

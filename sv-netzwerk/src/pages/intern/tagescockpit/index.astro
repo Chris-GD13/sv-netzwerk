@@ -154,6 +154,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   }
 
   const wait=milliseconds=>new Promise(resolve=>setTimeout(resolve,milliseconds));
+  let claimsAutoChecked=false;
   async function loadClaims(force=false){
     let data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1');
     if(force){
@@ -162,7 +163,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
         if(window.svnetClaimsTaskCheck){
           setSystem('claims','warn','ClaimsForce-Aufgaben werden automatisch aktualisiert …');
           window.dispatchEvent(new CustomEvent('svnet:claims-task-check'));
-          for(let attempt=0;attempt<20;attempt++){
+          for(let attempt=0;attempt<60;attempt++){
             await wait(1500);
             data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1');
             const item=(data.items||[]).find(row=>row.profile===profile);
@@ -182,6 +183,8 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     const maurer=items.find(item=>item.profile==='jens');
     $('dc-maurer-card').hidden=!maurer;
     renderCount(maurer,'dc-maurer-count','dc-maurer-summary');
+    const unknown=own&&(own.open_count===null||own.open_count===undefined);
+    if(!force&&unknown&&!claimsAutoChecked&&window.svnetClaimsTaskCheck){claimsAutoChecked=true;return loadClaims(true)}
   }
 
   async function loadRevenue(){
