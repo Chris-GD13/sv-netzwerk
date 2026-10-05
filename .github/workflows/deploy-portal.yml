@@ -128,12 +128,12 @@ jobs:
           print("Portal-App-Berechtigungen vollständig geprüft.")
           '
           unset access_token token_response
+          config_dir="$SFTP_REMOTE_DIR"
           deploy_dir="$SFTP_REMOTE_DIR"
-          if lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; fi
-          env_dir="$(mktemp -d)"
+          if lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk/public; quit"; then config_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk/public"; elif lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk; quit"; then config_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; fi
           env_file="$env_dir/server.env"
           trap 'rm -f "$env_file"; rmdir "$env_dir"' EXIT
-          lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; get $deploy_dir/.env -o $env_file; quit"
+          lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; get $config_dir/.env -o $env_file; quit"
           sed -i '/^MS_TENANT_ID=/d;/^MS_CLIENT_ID=/d;/^MS_CLIENT_SECRET=/d;/^M365_TENANT_ID=/d;/^M365_CLIENT_ID=/d;/^M365_CLIENT_SECRET=/d;/^WHATSAPP_META_APP_ID=/d;/^WHATSAPP_APP_SECRET=/d;/^WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID=/d;/^WHATSAPP_VERIFY_TOKEN=/d;/^WHATSAPP_TOKEN_ENCRYPTION_KEY=/d;/^WHATSAPP_APPOINTMENT_TEMPLATE=/d;/^WHATSAPP_TEMPLATE_LANGUAGE=/d;/^WHATSAPP_ACCESS_TOKEN=/d' "$env_file"
           {
             printf 'MS_TENANT_ID=%s\n' "$PORTAL_MS_TENANT_ID"
@@ -148,7 +148,7 @@ jobs:
             printf 'WHATSAPP_TEMPLATE_LANGUAGE=de_AT\n'
             printf 'WHATSAPP_ACCESS_TOKEN=%s\n' "$PORTAL_WHATSAPP_ACCESS_TOKEN"
           } >> "$env_file"
-          lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; put $env_file -o $deploy_dir/.env; quit"
+          lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; put $env_file -o $config_dir/.env; quit"
           echo "Microsoft- und WhatsApp-Konfiguration sind vollständig hinterlegt."
 
       - name: Portalpaket ohne Serverkonfiguration übertragen
@@ -160,11 +160,10 @@ jobs:
         run: |
           set -euo pipefail
           deploy_dir="$SFTP_REMOTE_DIR"
-          if lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; fi
+          if lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk/public; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk/public"; elif lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; fi
           echo "SFTP-Zielverzeichnis: $deploy_dir"
           lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; pwd; cls -1; cd ..; pwd; cls -1; quit"
           timeout 1200s lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $deploy_dir; put dist/.htaccess -o .htaccess; put dist/.well-known/.htaccess -o .well-known/.htaccess; mirror --reverse --overwrite --parallel=4 --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern/photos --exclude-glob intern/photos/** --exclude-glob intern/api/config.php deploy-portal/ .; put deploy-portal/intern/versicherungsfaelle/index.php -o intern/versicherungsfaelle/index.php; put deploy-portal/intern/tagescockpit/index.php -o intern/tagescockpit/index.php; put deploy-portal/intern/arbeitszentrale/index.php -o intern/arbeitszentrale/index.php; put deploy-portal/intern/claimsforce-central.js -o intern/claimsforce-central.js; put deploy-portal/intern/deploy-version.txt -o intern/deploy-version.txt; quit"
-          lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; find $SFTP_REMOTE_DIR -name deploy-version.txt; quit"
 
       - name: Portal online verifizieren
         env:
@@ -195,6 +194,8 @@ jobs:
             echo "$path: HTTP $status, JSON ohne Redirect"
             rm -f "$headers" "$body"
           done
+
+
 
 
 
