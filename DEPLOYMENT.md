@@ -48,24 +48,27 @@ Portal-Workflow nicht verwendet. Die Probedatei prüft vor jedem Deployment, das
 `PORTAL_SFTP_REMOTE_DIR` wirklich unter `https://www.sv-netzwerk.eu/intern/`
 ausgeliefert wird.
 
-### Offener Blocker (Stand 05.10.2026)
+### Stand (05.10.2026)
 
-Die `PORTAL_*`-Secrets müssen im Repository gesetzt sein, bevor der
-Portal-Workflow erfolgreich laufen kann.
+Kein offener Blocker: Die `PORTAL_*`-Secrets sind gesetzt, der Portal-Workflow ist
+bestätigt (Marker `/intern/deploy-version.txt` zeigt den aktuellen Commit).
+
 ## Öffentliche Website (`.github/workflows/deploy.yml`)
 
 Die kanonische Adresse ist `https://www.sv-netzwerk.eu`; die `.htaccess` leitet
 HTTP und den Host ohne `www` auf HTTPS mit `www` um. Der Website-Workflow baut
-das Astro-Projekt, überträgt den Website-Anteil von `dist/` (ohne `intern/`) per
-SFTP und nutzt dasselbe Secret `SFTP_REMOTE_DIR`. Das Portal ist davon getrennt
-(eigener Workflow, eigener Marker `/intern/deploy-version.txt`). Der Website-
-Workflow prüft die SFTP-Zuordnung bisher nicht per Probedatei; solange der Pfad
-unbestätigt ist, gilt auch für ihn: ein Upload allein ist kein Erfolg.
+das Astro-Projekt und überträgt den Website-Anteil von `dist/` (ohne `intern/`,
+`.env*` und `.htaccess`) auf denselben VPS wie das Portal. Er nutzt deshalb
+ebenfalls die Secrets `PORTAL_SFTP_*` und `PORTAL_SSH_KEY`; die alten
+`SFTP_*`-Secrets zeigen auf den abgelösten Server und werden nicht mehr
+verwendet. Vor dem Upload prüft eine Probedatei im Dokumentenstamm, dass das
+SFTP-Verzeichnis per HTTPS unter `www.sv-netzwerk.eu` erreichbar ist. Erfolg gilt
+erst, wenn `https://www.sv-netzwerk.eu/deploy-version.txt` den aktuellen Commit
+zeigt und der erwartete Fachbeitrag live mit HTTP 200 erreichbar ist. Das Portal
+bleibt getrennt (eigener Workflow, eigener Marker `/intern/deploy-version.txt`).
 
-Zugangsdaten kommen ausschließlich aus den GitHub-Actions-Secrets `SFTP_HOST`,
-`SFTP_USERNAME`, `SFTP_PASSWORD`, `SFTP_PORT`, `SFTP_REMOTE_DIR`. Niemals Werte
+Zugangsdaten kommen ausschließlich aus den GitHub-Actions-Secrets. Niemals Werte
 in Logs, Quellcode oder Dokumentation schreiben.
-
 ## IONOS-Laufzeit
 
 PHP läuft über die globale IONOS-PHP-FPM-Konfiguration. In `.htaccess` keinen
