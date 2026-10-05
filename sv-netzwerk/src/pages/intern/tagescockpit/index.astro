@@ -85,6 +85,14 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
         <a id="dc-quick-settlement" href="/intern/abrechnungen/" hidden><strong>Abrechnungen</strong><span>Claims und Rekon auswerten</span></a>
       </nav>
     </section>
+    <section id="dc-claims-bridge-host" hidden>
+      <button type="button" id="vf-claims-import">ClaimsForce-Aufgaben aktualisieren</button>
+      <button type="button" id="vf-claims-full">Vollabgleich</button>
+      <input id="vf-claims-since" type="date" value="2026-01-01">
+      <p id="vf-claims-state"></p>
+      <button type="button" id="vf-claims-settings"></button>
+      <a id="vf-claims-download" href="/intern/downloads/svnet-claimsforce-bridge.zip"></a>
+    </section>
   </main>
 </InternalLayout>
 
@@ -201,12 +209,4 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   loadPersonalPhone().catch(error=>{$('dc-phone-state').textContent=error.message});resetReminder();loadPhone();load();
 })();
 </script>
-<section id="dc-claims-bridge-host" hidden>
-  <button type="button" id="vf-claims-import">ClaimsForce-Aufgaben aktualisieren</button>
-  <button type="button" id="vf-claims-full">Vollabgleich</button>
-  <input id="vf-claims-since" type="date">
-  <p id="vf-claims-state"></p>
-  <button type="button" id="vf-claims-settings"></button>
-  <a id="vf-claims-download" href="/intern/downloads/svnet-claimsforce-bridge.zip"></a>
-</section>
 <script is:inline src="/intern/claimsforce-central.js?v=20261005-2"></script>
