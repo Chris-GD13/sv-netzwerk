@@ -7,8 +7,9 @@ $user = requireAuth();
 if (!in_array((string)($user['role'] ?? ''), ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) apiError(403, 'Keine Berechtigung.');
 
 function omEnv(string $key, string $default=''): string {
-    $value = getenv($key);
-    return $value === false || trim((string)$value) === '' ? $default : trim((string)$value);
+    // Always use the current .env value loaded by config.php. PHP-FPM workers
+    // can retain an older getenv() value after a secret was rotated.
+    return env($key, $default);
 }
 
 function omProfile(array $user): array {
