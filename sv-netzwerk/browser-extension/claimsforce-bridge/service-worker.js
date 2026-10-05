@@ -19,8 +19,8 @@ const PROFILE_EMAILS = {
 // mit dem Kürzel SW angezeigt. JM/WS bleiben als ältere Kontokennungen gültig.
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS', 'SW'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
-const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/*';
-const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/versicherungsfaelle/';
+const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
+const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
 const KUSS_TAB_PATTERN = 'https://portal.kussgmbh.de/*';
 const DAILY_IMPORT_ALARM = 'svnet-claimsforce-daily-0300';
