@@ -55,7 +55,7 @@ function omToken(): string {
     if ($tenant === '' || $client === '' || $secret === '') throw new RuntimeException('Microsoft-Verbindung ist nicht vollständig eingerichtet.');
     $response = omHttp(
         'POST',
-        'https://login.microsoftonline.com/' . rawurlencode($tenant) . '/oauth2/v2.0/token',
+        msLoginBase() . '/' . rawurlencode($tenant) . '/oauth2/v2.0/token',
         ['Content-Type: application/x-www-form-urlencoded'],
         http_build_query([
             'client_id' => $client,

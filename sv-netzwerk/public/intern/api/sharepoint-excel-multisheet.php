@@ -23,7 +23,7 @@ function msToken(): string {
     if ($token) return $token;
     $tenant = msCfg('MS_TENANT_ID'); $client = msCfg('MS_CLIENT_ID'); $secret = msCfg('MS_CLIENT_SECRET');
     if ($tenant === '' || $client === '' || $secret === '') apiError(503, 'SharePoint-Verbindung unvollständig.');
-    $c = curl_init('https://login.microsoftonline.com/' . rawurlencode($tenant) . '/oauth2/v2.0/token');
+    $c = curl_init(msLoginBase() . '/' . rawurlencode($tenant) . '/oauth2/v2.0/token');
     curl_setopt_array($c, [CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>30,
         CURLOPT_HTTPHEADER=>['Content-Type: application/x-www-form-urlencoded'],
         CURLOPT_POSTFIELDS=>http_build_query(['client_id'=>$client,'client_secret'=>$secret,'scope'=>'https://graph.microsoft.com/.default','grant_type'=>'client_credentials'])]);
