@@ -268,8 +268,8 @@ async function openPlanning(tabId, bucket) {
 }
 
 async function readOpenTasks(tabId) {
-  const opened = await chrome.tabs.sendMessage(tabId, { type: 'OPEN_TASKS' }).catch(() => null);
-  if (!opened?.ok) return null;
+  await chrome.tabs.update(tabId, { url: 'https://web.claimsforce.com/tasks' });
+  await waitTab(tabId);
   await sleep(1800);
   for (let attempt = 0; attempt < 20; attempt++) {
     const result = await chrome.tabs.sendMessage(tabId, { type: 'READ_OPEN_TASKS' }).catch(() => null);
@@ -357,6 +357,20 @@ async function uploadBuffer(portalTabId, profile, folderId, name, mime, modified
 
 function collectClaimsforceNotes(values){const out=[],seen=new Set();const visit=(v,d=0)=>{if(v==null||d>8||typeof v==='string')return;if(Array.isArray(v)){v.forEach(x=>visit(x,d+1));return}if(typeof v!=='object'||seen.has(v))return;seen.add(v);for(const [k,c] of Object.entries(v)){if(/^(notes?|internalNotes|claimsforceNotes)$/i.test(k)){const list=Array.isArray(c)?c:(c&&typeof c==='object'?Object.values(c):[c]);for(const n of list){if(typeof n==='string'&&n.trim())out.push({text:n.trim()});else if(n&&typeof n==='object'){const text=String(n.text||n.body||n.content||n.note||'').trim();if(text)out.push({id:String(n.id||''),text,author:String(n.author?.name||n.author||n.createdBy?.name||n.user?.name||n.user||''),createdAt:String(n.createdAt||n.updatedAt||n.date||'')})}}}else visit(c,d+1)}};values.forEach(v=>visit(v));const unique=new Map();for(const n of out)unique.set([n.id,n.createdAt,n.author,n.text].join('|'),n);return[...unique.values()]}
 
+async function ensureClaimsListTab(tabId){
+  const current=await chrome.tabs.get(tabId);
+  if(new URL(String(current.url||'')).pathname==='/claims')return;
+  await chrome.tabs.update(tabId,{url:'https://web.claimsforce.com/claims'});
+  const deadline=Date.now()+15000;
+  while(Date.now()<deadline){
+    await new Promise(resolve=>setTimeout(resolve,500));
+    const tab=await chrome.tabs.get(tabId),pathname=new URL(String(tab.url||'')).pathname;
+    if(pathname==='/claims'){await new Promise(resolve=>setTimeout(resolve,1400));return;}
+    if(pathname==='/login')throw new Error('ClaimsForce-Sitzung ist abgelaufen; bitte ClaimsForce anmelden.');
+  }
+  throw new Error('ClaimsForce-Fallliste konnte nicht geöffnet werden.');
+}
+
 async function runImport(run) {
   const portalTabId = () => Number(run.portalTabId || 0), profile = profileKey(run.profile), fullSync = run.mode === 'full' || !!run.full;
   run.profile = profile;
@@ -370,14 +384,19 @@ async function runImport(run) {
   await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
   const openTasks = await readOpenTasks(tab.id);
   await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks });
+  if(run.mode==='tasks'){
+    if(!Number.isInteger(openTasks))throw new Error('Kein eindeutiger sichtbarer Aufgabenstand aus ClaimsForce gelesen.');
+    return { claims: 0, openTasks, taskCheck: true, updated: 0, skipped: 0 };
+  }
   const claimsById = new Map(), bucketCounts = {};
   if (fullSync) {
     await diagnostic(run, 'CF-FULL-04', `Vollabgleich der ClaimsForce-Fälle ab ${run.since || 'ohne Datumsgrenze'}: Fallliste wird vollständig eingelesen.`, { since: run.since || '', strategy: 'claims-all-pages' });
+    await ensureClaimsListTab(tab.id);
     const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
     const allClaims = Array.isArray(scraped?.claims) ? scraped.claims : [];
     for (const claim of allClaims) if (claim?.id) claimsById.set(claim.id, claim);
     bucketCounts.ALL_TASKS = claimsById.size;
-    await diagnostic(run, 'CF-LIST-05', `${claimsById.size} unterschiedliche Aufträge aus „Aufgaben – Alle“ wurden erkannt.`, { count: claimsById.size, since: run.since || '', pages: scraped?.pages || 0, route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url) });
+    await diagnostic(run, 'CF-LIST-05', `${claimsById.size} unterschiedliche Aufträge aus „Aufgaben – Alle“ wurden erkannt.`, { count: claimsById.size, since: run.since || '', pages: scraped?.pages || 0, excludedUndated: scraped?.excludedUndated || 0, route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url) });
   } else for (const planningBucket of PLANNING_BUCKETS) {
     const planning = await openPlanning(tab.id, planningBucket.key);
     await diagnostic(run, 'CF-PLAN-04', `Planungsansicht „${planningBucket.label}“ wurde angefordert.`, { bucket: planningBucket.key, strategy: planning?.strategy || 'bestehende Ansicht' });
@@ -438,7 +457,7 @@ async function runImport(run) {
     const signature = await fingerprint({ mapped: stableMapped, fileVersions, messageVersions, appointmentVersions, notes });
     const state = await portal(portalTabId(), { type: 'PORTAL_SYNC_STATE', mapped, profile });
     const existingMeta = state.result?.meta || {};
-    if (!fullSync && state.result?.existed && existingMeta.claimsforce_sync_signature === signature) {
+    if (state.result?.existed && existingMeta.claimsforce_sync_signature === signature) {
       skipped++;
       await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length}: unverändert, wird übersprungen.`, index + 1, claims.length);
       await diagnostic(run, 'CF-CASE-SKIP', `Auftrag ${index + 1}/${claims.length} ist bereits vollständig und unverändert vorhanden.`, { current: index + 1, total: claims.length, claimIndex: index + 1, skippedCases: skipped });
@@ -478,7 +497,6 @@ async function runImport(run) {
       const bytes = new TextEncoder().encode(JSON.stringify(record, null, 2));
       const uploaded = await uploadBuffer(portalTabId(), profile, folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${subject}.json`, 'application/json', Date.parse(record?.updatedAt || record?.createdAt || '') || 0, bytes.buffer);
       if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) messagesDone++;
-    }
       const attachments = Array.isArray(record?.attachments) ? record.attachments : (Array.isArray(record?.files) ? record.files : []);
       for (const attachment of attachments) {
         const attachmentName = safeFileName(attachment.name || attachment.fileName || attachment.filename, 'Anhang-' + (attachment.id || crypto.randomUUID()));
@@ -487,7 +505,8 @@ async function runImport(run) {
         else if (attachment.id && record?.id) { const response = await fetch(config.COMMUNICATION_API_ENDPOINT + '/claims/' + encodeURIComponent(id) + '/messages/' + encodeURIComponent(record.id) + '/attachments/' + encodeURIComponent(attachment.id), { headers: { Authorization: 'Bearer ' + token } }).catch(() => null); if (response?.ok) attachmentBuffer = await response.arrayBuffer(); }
         if (attachmentBuffer) await uploadBuffer(portalTabId(), profile, folderId, 'Mail_ClaimsForce-Anhang_' + stamp + '_' + attachmentName, attachment.mimeType || attachment.contentType || 'application/octet-stream', Date.parse(attachment.updatedAt || attachment.createdAt || '') || 0, attachmentBuffer);
       }
-        if (!['christian', 'jens'].includes(profile)) {
+    }
+    if (!['christian', 'jens'].includes(profile)) {
       for (const appointment of Array.isArray(appointments) ? appointments : []) {
         if (!appointment?.startDate) continue;
         const appointmentResult = await portal(portalTabId(), { type: 'PORTAL_APPOINTMENT', folderId, appointment, profile });
@@ -513,7 +532,7 @@ async function runImport(run) {
 async function startImport(sender, message) {
   const portalTabId = sender.tab?.id;
   if (!portalTabId) return { ok: false, error: '[CF-RUN-00] Portal-Registerkarte fehlt.' };
-  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), mode: message.mode === 'full' || message.full ? 'full' : 'quick', since: String(message.since || ''), portalTabId, startedAt: new Date().toISOString() };
+  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), mode: message.mode === 'tasks' ? 'tasks' : message.mode === 'full' || message.full ? 'full' : 'quick', since: String(message.since || ''), portalTabId, startedAt: new Date().toISOString() };
   if (runningImport) {
     if (runningImport.jobId === requested.jobId && runningImport.profile === requested.profile) {
       runningImport.portalTabId = portalTabId;

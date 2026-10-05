@@ -99,8 +99,7 @@ if($action==='summary'){
     $items=[];
     foreach($visible as$profile=>$label){
         $row=$stored[$profile]??null;
-        $count=$row===null?null:(int)$row['open_count']; if($profile==='christian'&&$row!==null&&$row['source_job_id']===null&&$count===1)$count=17;
-        if($profile==='jens'&&($row['source_job_id']??null)===null)$count=null;
+        $count=($row!==null&&$row['source_job_id']!==null)?(int)$row['open_count']:null;
         $items[]=['profile'=>$profile,'label'=>$label,'open_count'=>$count,'updated_at'=>$row['updated_at']??null];
     }
     apiJson(['ok'=>true,'selected_profile'=>$selectedProfile,'items'=>$items]);
@@ -109,7 +108,7 @@ if($action==='summary'){
 if($action==='enqueue'){
     $allowed=array_keys(cqVisibleProfiles($user));
     $profile=trim((string)($body['profile']??''));
-    $syncMode=(($body['mode']??'')==='full'||!empty($body['full']))?'full':'quick';
+    $syncMode=($body['mode']??'')==='tasks'?'tasks':((($body['mode']??'')==='full'||!empty($body['full']))?'full':'quick');
     $sinceDate=preg_match('/^\d{4}-\d{2}-\d{2}$/',(string)($body['since']??''))?(string)$body['since']:null;
     if(!in_array($profile,$allowed,true))apiError(409,'ClaimsForce-Profil und ausgewählter Sachverständiger stimmen nicht überein.');
     $stop=db()->prepare("UPDATE claimsforce_import_jobs SET status='failed',message='Durch einen neuen manuellen Import ersetzt.',phase='CF-FAIL-REPLACED',heartbeat_at=NOW(),finished_at=NOW() WHERE requested_by=:u AND profile=:p AND status IN ('queued','running')");

@@ -145,8 +145,26 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     setSystem('outlook','ok',`${data.calendar||'Kalender'} · ${data.events?.length||0} Termine diese Woche`);
   }
 
-  async function loadClaims(){
-    const data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1'),items=data.items||[];
+  const wait=milliseconds=>new Promise(resolve=>setTimeout(resolve,milliseconds));
+  async function loadClaims(force=false){
+    let data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1');
+    if(force){
+      const profile=String(data.selected_profile||'').trim();
+      if(profile){
+        const queued=await request('/intern/api/claimsforce-queue.php?action=enqueue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile,mode:'tasks'})});
+        const jobId=Number(queued.job?.id||0);setSystem('claims','warn','ClaimsForce wird jetzt geprüft …');
+        if(jobId)for(let attempt=0;attempt<20;attempt++){
+          await wait(1500);
+          const status=await request('/intern/api/claimsforce-queue.php?action=status&id='+encodeURIComponent(jobId));
+          if(['done','failed'].includes(String(status.job?.status||''))){
+            data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1');
+            if(status.job.status==='failed')setSystem('claims','bad',status.job.message||'ClaimsForce-Prüfung fehlgeschlagen.');
+            break;
+          }
+        }
+      }
+    }
+    const items=data.items||[];
     const own=items.find(item=>item.profile===data.selected_profile)||items.find(item=>item.profile!=='jens');
     const renderCount=(item,countId,summaryId)=>{
       const known=item?.open_count!==null&&item?.open_count!==undefined&&Number.isFinite(Number(item.open_count));
@@ -167,13 +185,13 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     setSystem('revenue',stamp?'ok':'warn',stamp?`Datenstand ${stamp}`:'Noch kein Datenstand gespeichert');
   }
 
-  async function load(){
+  async function load(force=false){
     const button=$('dc-refresh');button.disabled=true;$('dc-updated').textContent='Prüfung läuft …';
-    const tasks=[['drive',loadDrive],['outlook',loadCalendar],['claims',loadClaims],['revenue',loadRevenue],['reminders',loadReminders]],results=await Promise.allSettled(tasks.map(([,fn])=>fn()));
+    const tasks=[['drive',loadDrive],['outlook',loadCalendar],['claims',()=>loadClaims(force)],['revenue',loadRevenue],['reminders',loadReminders]],results=await Promise.allSettled(tasks.map(([,fn])=>fn()));
     results.forEach((result,index)=>{if(result.status==='rejected'){const key=tasks[index][0];if(key==='reminders'){$('dc-reminder-summary').textContent='nicht erreichbar';$('dc-reminder-list').innerHTML=`<p class="dc-empty">${esc(result.reason?.message||'Wiedervorlagen konnten nicht geladen werden.')}</p>`;return}setSystem(key,'bad',result.reason?.message||'Verbindung fehlgeschlagen');if(key==='outlook'){$('dc-today-count').textContent='–';$('dc-next-event').textContent='Kalender nicht erreichbar';$('dc-events').innerHTML='<p class="dc-empty">Kalender konnte nicht geladen werden.</p>'}}});
     $('dc-updated').textContent='Geprüft '+new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());button.disabled=false;
   }
-  $('dc-refresh').addEventListener('click',load);
+  $('dc-refresh').addEventListener('click',()=>load(true));
   $('dc-reminder-form').addEventListener('submit',async event=>{event.preventDefault();const state=$('dc-reminder-state'),active=activeCase(),meta=active?.meta||{};state.className='';state.textContent='Wird gespeichert …';try{await postReminder('save',{id:$('dc-reminder-id').value,title:$('dc-reminder-title').value,due_at:$('dc-reminder-due').value,priority:$('dc-reminder-priority').value,note:$('dc-reminder-note').value,case_folder_id:$('dc-reminder-case').checked?active?.folder_id||'':'',case_no:$('dc-reminder-case').checked?meta.schaden_nr||'':''});resetReminder();state.className='ok';state.textContent='Wiedervorlage gespeichert.';await loadReminders()}catch(error){state.className='bad';state.textContent=error.message}});
   $('dc-reminder-reset').addEventListener('click',resetReminder);
   $('dc-reminder-list').addEventListener('click',async event=>{const edit=event.target.closest('[data-reminder-edit]'),done=event.target.closest('[data-reminder-done]');if(edit){const item=reminders.find(row=>row.id===Number(edit.dataset.reminderEdit));if(!item)return;$('dc-reminder-id').value=item.id;$('dc-reminder-title').value=item.title;$('dc-reminder-due').value=reminderInput(item.due_at);$('dc-reminder-priority').value=item.priority;$('dc-reminder-note').value=item.note||'';$('dc-reminder-case').checked=Boolean(item.case_folder_id);$('dc-reminder-title').focus()}if(done){done.disabled=true;try{await postReminder('complete',{id:Number(done.dataset.reminderDone)});await loadReminders()}catch(error){done.disabled=false;alert(error.message)}}});

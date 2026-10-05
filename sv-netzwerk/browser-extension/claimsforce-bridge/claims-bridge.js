@@ -47,17 +47,19 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return;
   }
   if (message?.type === 'READ_OPEN_TASKS') {
-    const labels = [...document.querySelectorAll('div,span,p,strong')].filter(node => /^Alle$/i.test((node.textContent || '').trim()));
-    let count = null;
+    const visible = node => node.getClientRects?.().length > 0 && getComputedStyle(node).visibility !== 'hidden' && getComputedStyle(node).display !== 'none';
+    const labels = [...document.querySelectorAll('div,span,p,strong')].filter(node => visible(node) && /^Alle$/i.test((node.textContent || '').trim()));
+    const counts = [];
     for (const label of labels) {
       let node = label;
       for (let depth = 0; node && depth < 5; depth++, node = node.parentElement) {
         const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
         const match = text.match(/^(\d{1,5})\s+Alle$/i) || text.match(/^Alle\s+(\d{1,5})$/i);
-        if (match) { count = Number(match[1]); break; }
+        if (match) { counts.push(Number(match[1])); break; }
       }
-      if (Number.isInteger(count)) break;
     }
+    const uniqueCounts = [...new Set(counts)];
+    const count = location.pathname.startsWith('/tasks') && uniqueCounts.length === 1 ? uniqueCounts[0] : null;
     sendResponse({ ok: Number.isInteger(count), openTasks: count });
     return;
   }
@@ -71,6 +73,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       const match = String(value || '').match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
       return match ? Date.parse(`${match[3]}-${match[2]}-${match[1]}T00:00:00`) : NaN;
     };
+    const dateTime = value => {
+      const german = parseGermanDate(value);
+      if (Number.isFinite(german)) return german;
+      const parsed = Date.parse(String(value || ''));
+      return Number.isFinite(parsed) ? parsed : NaN;
+    };
+    const include = entered => !Number.isFinite(sinceTime) || (Number.isFinite(dateTime(entered)) && dateTime(entered) >= sinceTime);
     const collect = () => {
       for (const row of document.querySelectorAll('table tbody tr,[role="row"]')) {
         const anchor = row.querySelector('a[href*="/claims/"]');
@@ -80,8 +89,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         const cells = [...row.querySelectorAll('td,[role="cell"]')].map(cell => (cell.textContent || '').replace(/\s+/g, ' ').trim());
         const dates = [...(row.querySelectorAll('time[datetime],[data-date],[data-created-at],[data-updated-at]') || [])].map(node => node.getAttribute('datetime') || node.getAttribute('data-date') || node.getAttribute('data-created-at') || node.getAttribute('data-updated-at') || '');
         const entered = cells[3]?.match(/\b\d{2}\.\d{2}\.\d{4}\b/)?.[0] || dates[0] || '';
-        const enteredTime = parseGermanDate(entered) || Date.parse(entered);
-        if (Number.isFinite(sinceTime) && (!Number.isFinite(enteredTime) || enteredTime < sinceTime)) continue;
+        if (!include(entered)) continue;
         const text = (row.textContent || anchor.textContent || '').replace(/\s+/g, ' ').trim();
         claims.set(match[1], { id: match[1], label: cells[1] || String(anchor.textContent || '').replace(/\s+/g, ' ').trim() || text.slice(0, 120), listVersion: entered || text.slice(0, 180), enteredAt: entered });
       }
@@ -93,8 +101,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         if (!match || claims.has(match[1])) continue;
         const text = (anchor.closest('tr,[role="row"],article,li')?.textContent || anchor.textContent || '').replace(/\s+/g, ' ').trim();
         const entered = text.match(/\b\d{2}\.\d{2}\.\d{4}\b/)?.[0] || '';
-        const enteredTime = parseGermanDate(entered) || Date.parse(entered);
-        if (Number.isFinite(sinceTime) && (!Number.isFinite(enteredTime) || enteredTime < sinceTime)) continue;
+        if (!include(entered)) continue;
         claims.set(match[1], { id: match[1], label: String(anchor.textContent || '').replace(/\s+/g, ' ').trim() || text.slice(0, 120), listVersion: entered || text.slice(0, 180), enteredAt: entered });
       }
     };
@@ -104,12 +111,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       return (/^(Nächste|Weiter|Next|›|>)$/i.test(text) || /Nächste|Weiter|Next|next page/i.test(label)) && !node.disabled && node.getAttribute('aria-disabled') !== 'true';
     });
     (async () => {
-      if (location.pathname !== '/claims') {
-        const link = [...document.querySelectorAll('a')].find(node => /Schäden|Schadenliste/i.test(node.textContent || '') && /\/claims(?:$|\?)/.test(node.getAttribute('href') || ''));
-        if (link) link.click(); else location.assign('https://web.claimsforce.com/claims');
-        await wait(2200);
-      }
-      for (let page = 0; page < 120; page++) {
+      if (location.pathname !== '/claims') throw new Error(`ClaimsForce-Fallliste ist nicht geöffnet (aktuell ${location.pathname || 'unbekannt'}).`);
+      let page = 0;
+      for (; page < 120; page++) {
         const before = claims.size;
         collect();
         const next = nextButton();
@@ -119,8 +123,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         collect();
         if (claims.size === before && page > 2) break;
       }
-      for (const [id, claim] of observedClaims) if (!claims.has(id)) claims.set(id, claim);
-      sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, pages: claims.size, since });
+      for (const [id, claim] of observedClaims) {
+        if (!claims.has(id) && include(claim?.enteredAt || claim?.createdAt || claim?.updatedAt || claim?.date)) claims.set(id, claim);
+      }
+      sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, pages: page + 1, since, excludedUndated: Number.isFinite(sinceTime) ? [...observedClaims.values()].filter(claim => !Number.isFinite(dateTime(claim?.enteredAt || claim?.createdAt || claim?.updatedAt || claim?.date))).length : 0 });
     })().catch(error => sendResponse({ ok: false, error: error.message, claims: [] }));
     return true;
   }

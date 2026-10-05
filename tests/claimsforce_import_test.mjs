@@ -154,3 +154,4 @@ assert(!serviceWorker.includes('console.log') && !serviceWorker.includes('consol
 assert(vault.includes("AES-GCM"), 'Kennwörter werden verschlüsselt gespeichert');
 
 console.log('ClaimsForce-Import: Zuordnung, Bestandsschutz, Zugangstresor und Browser-Brücke geprüft.');
+
