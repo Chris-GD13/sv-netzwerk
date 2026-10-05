@@ -191,6 +191,13 @@ function env(string $key, string $default = ''): string
 }
 
 /** Gibt den konfigurierten Projektnamen zurück. */
+function msLoginBase(): string
+{
+    // Optionales Relay für den Microsoft-Token-Endpunkt (z. B. wenn die Server-IP dort abgewiesen wird).
+    $base = rtrim(env('MS_LOGIN_BASE', ''), '/');
+    if ($base !== '' && !preg_match('#^https://[^\s]+$#', $base)) $base = '';
+    return $base !== '' ? $base : 'https://login.microsoftonline.com';
+}
 function appProjectName(): string   { return env('PROJECT_NAME', 'SV-Netzwerk Prüfportal'); }
 /** Gibt den Auftraggeber zurück. */
 function appClientName(): string    { return env('CLIENT_NAME', 'Bundesministerium der Verteidigung'); }

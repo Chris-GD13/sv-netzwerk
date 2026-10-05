@@ -61,7 +61,7 @@ function otToken(): string {
     $client = otEnv('MS_CLIENT_ID');
     $secret = otEnv('MS_CLIENT_SECRET');
     if ($tenant === '' || $client === '' || $secret === '') throw new RuntimeException('Microsoft-Verbindung ist nicht vollständig eingerichtet.');
-    $response = otHttp('POST', 'https://login.microsoftonline.com/' . rawurlencode($tenant) . '/oauth2/v2.0/token',
+    $response = otHttp('POST', msLoginBase() . '/' . rawurlencode($tenant) . '/oauth2/v2.0/token',
         ['Content-Type: application/x-www-form-urlencoded'],
         http_build_query([
             'client_id' => $client,

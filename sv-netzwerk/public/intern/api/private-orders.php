@@ -18,7 +18,7 @@ function poToken(): string {
     static $token = null; if (is_string($token) && $token !== '') return $token;
     $tenant = poConfig('MS_TENANT_ID'); $client = poConfig('MS_CLIENT_ID'); $secret = poConfig('MS_CLIENT_SECRET');
     if ($tenant === '' || $client === '' || $secret === '') apiError(503, 'Die SharePoint-Verbindung ist auf dem Server noch nicht vollständig eingerichtet.');
-    $ch = curl_init('https://login.microsoftonline.com/' . rawurlencode($tenant) . '/oauth2/v2.0/token');
+    $ch = curl_init(msLoginBase() . '/' . rawurlencode($tenant) . '/oauth2/v2.0/token');
     curl_setopt_array($ch, [CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>30,CURLOPT_HTTPHEADER=>['Content-Type: application/x-www-form-urlencoded'],CURLOPT_POSTFIELDS=>http_build_query(['client_id'=>$client,'client_secret'=>$secret,'scope'=>'https://graph.microsoft.com/.default','grant_type'=>'client_credentials'])]);
     $body = curl_exec($ch); $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch); $json = is_string($body) ? json_decode($body, true) : null;
     if ($status < 200 || $status >= 300 || !is_array($json) || empty($json['access_token'])) apiError(503, 'Microsoft-Anmeldung für die Privataufträge fehlgeschlagen.');

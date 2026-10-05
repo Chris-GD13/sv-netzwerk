@@ -42,7 +42,7 @@ function v2GraphAccessToken(): string
         apiError(503, 'Die SharePoint-Verbindung ist auf dem Server noch nicht vollständig eingerichtet.');
     }
 
-    $curl = curl_init('https://login.microsoftonline.com/' . rawurlencode($tenantId) . '/oauth2/v2.0/token');
+    $curl = curl_init(msLoginBase() . '/' . rawurlencode($tenantId) . '/oauth2/v2.0/token');
     curl_setopt_array($curl, [
         CURLOPT_POST => true,
         CURLOPT_RETURNTRANSFER => true,
