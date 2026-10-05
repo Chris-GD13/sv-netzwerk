@@ -1,25 +1,73 @@
 # Deployment – sv-netzwerk.eu
 
-## Bestätigtes IONOS-Ziel
+## Verbindliche Produktionsumgebung (Stand 05.10.2026)
 
-Das Document Root der Domain `sv-netzwerk.eu` ist verbindlich:
+- Prüfportal (`/intern/*`) und Importfunktionen laufen auf dem neuen
+  IONOS-Server; die öffentliche Website ist davon getrennt.
+- `G:` und `/intern` auf alten Laufwerken sind keine Produktionsquelle.
+- ClaimsForce-Bridge-Ziele: `https://www.sv-netzwerk.eu/intern/*`. Die Bridge
+  wird automatisch aktualisiert; manuelle Neueingaben oder alte `G:`-Pfade sind
+  unzulässig.
+- Der Workflow muss das tatsächliche IONOS-SFTP-Dokumentenstammverzeichnis
+  verwenden; der Pfad wird nicht geraten.
+- Nach jedem Deployment muss `/intern/deploy-version.txt` exakt den aktuellen
+  Git-Commit ausweisen.
+- Erfolg ist erst bestätigt, wenn der aktuelle Commit live per HTTPS gelesen
+  wird und Login sowie Dashboard funktionieren. Ein grüner Build genügt nicht.
 
-`/sv-netzwerk`
+### Portal-Deployment (`.github/workflows/deploy-portal.yml`)
 
-Der Inhalt des lokalen Build-Verzeichnisses `sv-netzwerk/dist/` wird direkt in dieses Verzeichnis übertragen. Dadurch liegen insbesondere `index.html`, `assets/` und `deploy-version.txt` unmittelbar unter `/sv-netzwerk`.
+- Zielverzeichnis ist ausschließlich das Secret `SFTP_REMOTE_DIR`; es gibt
+  keine Fallback-Pfade. Vor jeder Übertragung (und vor dem Schreiben der
+  `.env`) lädt der Workflow eine zufällige Probedatei nach
+  `$SFTP_REMOTE_DIR/intern/` und liest sie per HTTPS unter
+  `https://www.sv-netzwerk.eu/intern/` zurück. Nur wenn der Inhalt exakt passt,
+  ist die Zuordnung SFTP-Stamm → Domain-Dokumentenstamm bestätigt; sonst bricht
+  der Lauf ohne Deployment ab. Der Wert des Secrets muss der reale IONOS-Pfad
+  sein und wird nicht geraten.
+- Das ClaimsForce-Bridge-Paket
+  (`public/intern/downloads/svnet-claimsforce-bridge.zip`) wird bei jedem
+  Portal-Deployment aus `sv-netzwerk/browser-extension/claimsforce-bridge/`
+  neu erzeugt (Version gegen `manifest.json` geprüft, Ziele
+  `https://www.sv-netzwerk.eu/intern/*`, keine `G:`-Pfade). Nach dem Upload
+  muss das live ausgelieferte Paket byte-identisch sein.
+- Erfolg erst nach: `/intern/deploy-version.txt` = aktueller Commit,
+  `/intern/login/` = 200, `/intern/tagescockpit/` ohne Sitzung = 302 zum Login,
+  Anmeldung (Secrets `ADMIN_EMAIL`/`ADMIN_PASSWORD`, ein Versuch pro Lauf) und
+  danach `/intern/tagescockpit/` = 200, Bridge-Paket live identisch.
 
-Ein Unterordner `/sv-netzwerk/dist/` darf nicht entstehen. Der Workflow prüft das Document Root vor und nach dem Upload und bricht ab, sobald dort ein `dist/`-Unterordner erkannt wird.
+### Offener Blocker (Stand 05.10.2026)
 
-## Live-Verifikation
+Der exakte IONOS-Dokument-Root für `www.sv-netzwerk.eu` muss noch als Secret
+`SFTP_REMOTE_DIR` gesetzt werden. Bis die Probedatei die Zuordnung bestätigt,
+stellt der Portal-Workflow nichts bereit. Der bisherige Lauf auf `main`
+(`6b9fa8e3`) scheiterte an einem geratenen Pfad; live steht deshalb weiter
+`Commit: local-build`.
 
-Der Build erzeugt `dist/deploy-version.txt` mit:
+Maßgeblich ist `sv-netzwerk/`; die Kopien unter `public/intern/` und
+`browser-extension/` im Repository-Stamm sind veraltet.
+## Öffentliche Website (`.github/workflows/deploy.yml`)
 
-- vollständiger Git-Commit-ID
-- Build-Zeit in UTC
-- Kennzeichnung `Homepage-v5`
+Die kanonische Adresse ist `https://www.sv-netzwerk.eu`; die `.htaccess` leitet
+HTTP und den Host ohne `www` auf HTTPS mit `www` um. Der Website-Workflow baut
+das Astro-Projekt, überträgt den Website-Anteil von `dist/` (ohne `intern/`) per
+SFTP und nutzt dasselbe Secret `SFTP_REMOTE_DIR`. Das Portal ist davon getrennt
+(eigener Workflow, eigener Marker `/intern/deploy-version.txt`). Der Website-
+Workflow prüft die SFTP-Zuordnung bisher nicht per Probedatei; solange der Pfad
+unbestätigt ist, gilt auch für ihn: ein Upload allein ist kein Erfolg.
 
-Nach dem Upload ruft der Workflow `https://sv-netzwerk.eu/deploy-version.txt` ab. Das Deployment gilt nur dann als erfolgreich, wenn die dort gelesene Commit-ID exakt `github.sha` entspricht.
+Zugangsdaten kommen ausschließlich aus den GitHub-Actions-Secrets `SFTP_HOST`,
+`SFTP_USERNAME`, `SFTP_PASSWORD`, `SFTP_PORT`, `SFTP_REMOTE_DIR`. Niemals Werte
+in Logs, Quellcode oder Dokumentation schreiben.
 
+## IONOS-Laufzeit
+
+PHP läuft über die globale IONOS-PHP-FPM-Konfiguration. In `.htaccess` keinen
+`SetHandler` ergänzen: Das kann PHP-FPM überschreiben und PHP-Quelltext
+offenlegen. `.env` und `intern/photos` werden vom Deployment nie überschrieben.
 ## Fachwissensprüfung
 
-Der Build führt vor der statischen Erzeugung den täglichen Fachwissensstandard aus. Ein separater GitHub-Workflow prüft den vorhandenen Tagesbeitrag um 04:00 und 12:00 UTC; fachlich entsprechen diese Läufe am 14.07.2026 den vorgesehenen Prüfzeiten 06:00 und 14:00 Uhr Europe/Berlin. Es findet keine automatische Inhaltserzeugung oder Veröffentlichung statt.
+Der Website-Build führt vor der statischen Erzeugung den täglichen
+Fachwissensstandard aus. Ein separater GitHub-Workflow prüft den vorhandenen
+Tagesbeitrag planmäßig; er erzeugt oder veröffentlicht keine Inhalte
+automatisch.

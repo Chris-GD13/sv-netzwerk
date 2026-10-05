@@ -16,6 +16,7 @@ on:
       - "sv-netzwerk/src/lib/internal/**"
       - "sv-netzwerk/src/assets/sv-netzwerk-logo-portal.svg"
       - "sv-netzwerk/scripts/prepare-deploy-scope.mjs"
+      - "sv-netzwerk/browser-extension/claimsforce-bridge/**"
       - "sv-netzwerk/package.json"
       - "sv-netzwerk/package-lock.json"
       - "sv-netzwerk/astro.config.mjs"
@@ -53,6 +54,25 @@ jobs:
       - name: Abhängigkeiten installieren
         run: npm ci --no-audit --no-fund
 
+      - name: ClaimsForce-Bridge-Paket aus dem Quellcode erzeugen
+        run: |
+          set -euo pipefail
+          src=browser-extension/claimsforce-bridge
+          zip_file=public/intern/downloads/svnet-claimsforce-bridge.zip
+          grep -Fq '"https://www.sv-netzwerk.eu/intern/*"' "$src/manifest.json"
+          grep -Fq "https://www.sv-netzwerk.eu/intern/tagescockpit/" "$src/service-worker.js"
+          if grep -rnE '(^|[^A-Za-z])G:[\\/]' "$src"; then
+            echo "::error::Veraltete G:-Pfade im Bridge-Quellcode."
+            exit 1
+          fi
+          expected_version="$(node -p "require('./$src/manifest.json').version")"
+          rm -f "$zip_file"
+          (cd "$src" && zip -r -X "$OLDPWD/$zip_file" . -x '*.map')
+          actual_version="$(unzip -p "$zip_file" manifest.json | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).version")"
+          test "$actual_version" = "$expected_version"
+          echo "Bridge-Paket Version $actual_version aus $src erzeugt."
+          sha256sum "$zip_file" | cut -d' ' -f1 > "$RUNNER_TEMP/bridge-zip.sha256"
+
       - name: Portal bauen und PHP prüfen
         run: |
           npm run build
@@ -77,6 +97,43 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes lftp
+
+      - name: SFTP-Stammverzeichnis gegen Domain-Dokumentenstamm verifizieren
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SFTP_REMOTE_DIR:-}" ]; then
+            echo "::error::Secret SFTP_REMOTE_DIR fehlt. Der IONOS-Dokumentenstamm wird nicht geraten."
+            exit 1
+          fi
+          sftp() {
+            lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; $1; quit"
+          }
+          token="$(openssl rand -hex 16)"
+          probe_name="deploy-probe-${GITHUB_RUN_ID}-${token}.txt"
+          probe_file="$(mktemp)"
+          printf '%s\n' "$token" > "$probe_file"
+          cleanup() {
+            sftp "cd $SFTP_REMOTE_DIR/intern; rm -f $probe_name" >/dev/null 2>&1 || true
+            rm -f "$probe_file"
+          }
+          trap cleanup EXIT
+          if ! sftp "cd $SFTP_REMOTE_DIR/intern; put $probe_file -o $probe_name"; then
+            echo "::error::SFTP_REMOTE_DIR existiert nicht oder enthält kein intern/-Verzeichnis."
+            sftp "pwd; cls -1" || true
+            exit 1
+          fi
+          live="$(curl --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors "https://www.sv-netzwerk.eu/intern/$probe_name" || true)"
+          if [ "$live" != "$token" ]; then
+            echo "::error::SFTP_REMOTE_DIR gehört nicht zum Dokumentenstamm von www.sv-netzwerk.eu. Es wurde nichts bereitgestellt; Secret SFTP_REMOTE_DIR mit dem realen IONOS-Pfad korrigieren."
+            sftp "pwd; cd $SFTP_REMOTE_DIR; pwd; cls -1" || true
+            exit 1
+          fi
+          echo "Zuordnung bestätigt: SFTP_REMOTE_DIR liefert unter https://www.sv-netzwerk.eu/intern/ aus."
 
       - name: Serverkonfiguration absichern
         env:
@@ -130,7 +187,6 @@ jobs:
           unset access_token token_response
           config_dir="$SFTP_REMOTE_DIR"
           deploy_dir="$SFTP_REMOTE_DIR"
-          if lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/public; quit"; then config_dir="$SFTP_REMOTE_DIR"; deploy_dir="${SFTP_REMOTE_DIR%/}/public"; elif lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk/public; quit"; then config_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk/public"; elif lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk; quit"; then config_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; fi
           env_dir="$(mktemp -d)"
           env_file="$env_dir/server.env"
           trap 'rm -f "$env_file"; rmdir "$env_dir"' EXIT
@@ -163,14 +219,14 @@ jobs:
           echo "SFTP-DNS:"; getent hosts "$SFTP_HOST" || true
           echo "Portal-DNS:"; getent hosts www.sv-netzwerk.eu || true
           deploy_dir="$SFTP_REMOTE_DIR"
-          if lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/public; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/public"; elif lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk/public; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk/public"; elif lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; fi
           echo "SFTP-Zielverzeichnis: $deploy_dir"
-          lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; pwd; cls -1; cd ..; pwd; cls -1; quit"
           timeout 1200s lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $deploy_dir; put dist/.well-known/.htaccess -o .well-known/.htaccess; mirror --reverse --overwrite --parallel=4 --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern/photos --exclude-glob intern/photos/** --exclude-glob intern/api/config.php deploy-portal/ .; put deploy-portal/intern/versicherungsfaelle/index.php -o intern/versicherungsfaelle/index.php; put deploy-portal/intern/tagescockpit/index.php -o intern/tagescockpit/index.php; put deploy-portal/intern/arbeitszentrale/index.php -o intern/arbeitszentrale/index.php; put deploy-portal/intern/claimsforce-central.js -o intern/claimsforce-central.js; put deploy-portal/intern/deploy-version.txt -o intern/deploy-version.txt; quit"
 
       - name: Portal online verifizieren
         env:
           EXPECTED_SHA: ${{ github.sha }}
+          PORTAL_CHECK_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          PORTAL_CHECK_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
         run: |
           set -euo pipefail
           marker="$(curl --silent --show-error --retry 6 --retry-delay 5 https://www.sv-netzwerk.eu/intern/deploy-version.txt || true)"
@@ -182,6 +238,31 @@ jobs:
           status="$(curl --max-time 20 --silent --show-error --retry 2 -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/login/)"
           test "$status" = "200"
           echo "/intern/login/: HTTP $status"
+          headers="$(mktemp)"
+          status="$(curl --max-time 20 --max-redirs 0 --silent --show-error --retry 2 -D "$headers" -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/tagescockpit/)"
+          test "$status" = "302"
+          grep -Eiq '^location: /intern/login/\?next=' "$headers"
+          echo "/intern/tagescockpit/: HTTP $status, Anmeldung erforderlich"
+          rm -f "$headers"
+          jar="$(mktemp)"
+          login_body="$(mktemp)"
+          jq -n --arg email "$PORTAL_CHECK_EMAIL" --arg password "$PORTAL_CHECK_PASSWORD" '{email:$email,password:$password}' > "$login_body"
+          status="$(curl --max-time 20 --silent --show-error -c "$jar" -H 'Content-Type: application/json' --data @"$login_body" -o /dev/null -w '%{http_code}' 'https://www.sv-netzwerk.eu/intern/api/auth.php?action=login')"
+          rm -f "$login_body"
+          test "$status" = "200"
+          echo "Portal-Anmeldung: HTTP $status"
+          page="$(mktemp)"
+          status="$(curl --max-time 20 --max-redirs 0 --silent --show-error -b "$jar" -o "$page" -w '%{http_code}' https://www.sv-netzwerk.eu/intern/tagescockpit/)"
+          test "$status" = "200"
+          grep -Fq 'Tagescockpit' "$page"
+          echo "/intern/tagescockpit/: HTTP $status, Dashboard geladen"
+          curl --max-time 20 --silent --show-error -b "$jar" -X POST -o /dev/null 'https://www.sv-netzwerk.eu/intern/api/auth.php?action=logout' || true
+          rm -f "$jar" "$page"
+          zip_live="$(mktemp)"
+          curl --max-time 60 --silent --show-error --fail --retry 3 -o "$zip_live" https://www.sv-netzwerk.eu/intern/downloads/svnet-claimsforce-bridge.zip
+          test "$(sha256sum "$zip_live" | cut -d' ' -f1)" = "$(cat "$RUNNER_TEMP/bridge-zip.sha256")"
+          rm -f "$zip_live"
+          echo "ClaimsForce-Bridge-Paket live entspricht dem Quellcode dieses Commits."
           headers="$(mktemp)"
           status="$(curl --max-time 20 --max-redirs 0 --silent --show-error --retry 2 -D "$headers" -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/versicherungsfaelle/)"
           test "$status" = "302"
