@@ -76,7 +76,9 @@
     catch(e){button.disabled=false;if(fullButton)fullButton.disabled=false;userJobs=[];show(e.message,true)}
   };
   window.addEventListener('svnet:claims-task-check',()=>{enqueue('tasks')});
-  button.addEventListener('click',()=>enqueue('quick'));
+  // Der Hauptbutton startet den vollständigen Falllistenimport. Der frühere
+  // Schnellimport las nur die beiden Planungsansichten „Mit Termin“ und „Ohne Termin“.
+  button.addEventListener('click',()=>enqueue('full'));
   fullButton?.addEventListener('click',()=>enqueue('full'));
 
   async function launch(job,resumed=false){
