@@ -160,6 +160,8 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
+          echo "SFTP-DNS:"; getent hosts "$SFTP_HOST" || true
+          echo "Portal-DNS:"; getent hosts www.sv-netzwerk.eu || true
           deploy_dir="$SFTP_REMOTE_DIR"
           if lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/public; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/public"; elif lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk/public; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk/public"; elif lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd ${SFTP_REMOTE_DIR%/}/sv-netzwerk; quit"; then deploy_dir="${SFTP_REMOTE_DIR%/}/sv-netzwerk"; fi
           echo "SFTP-Zielverzeichnis: $deploy_dir"
