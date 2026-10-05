@@ -23,8 +23,47 @@ if ($excludedReason !== null) {
     apiJson(['ok'=>true,'excluded'=>true,'file_name'=>$name,'reason'=>$excludedReason,'fields'=>[]]);
 }
 
+/** Deterministic fallback for the IONOS VPS when no external extraction key is configured. */
+function localCaseExtract(string $name, string $mime, string $bytes): array {
+    $text = '';
+    if ($mime === 'application/pdf' || str_ends_with(strtolower($name), '.pdf')) {
+        $tmp = tempnam(sys_get_temp_dir(), 'svnet-pdf-');
+        if ($tmp !== false) {
+            file_put_contents($tmp, $bytes);
+            $cmd = 'pdftotext -layout ' . escapeshellarg($tmp) . ' - 2>/dev/null';
+            $text = (string)shell_exec($cmd);
+            @unlink($tmp);
+        }
+    } elseif (str_starts_with($mime, 'text/') || in_array(strtolower(pathinfo($name, PATHINFO_EXTENSION)), ['eml','txt','csv','md'], true)) {
+        $text = $bytes;
+    }
+    $text = preg_replace('/[ \t]+/u', ' ', str_replace(["\r\n", "\r"], "\n", $text)) ?? '';
+    $text = preg_replace('/\n{2,}/u', "\n", $text) ?? '';
+    $out = array_fill_keys(['schaden_nr','versicherungsschein_nr','vn_objekt','strasse','plz','ort','schaden_strasse','schaden_plz','schaden_ort','telefon','mobil','email','vorsteuer','schadenart','schadentag','meldedatum','reserve','kontakt','sanierer_firma','sanierer_ansprechpartner','sanierer_funktion','sanierer_telefon','sanierer_mobil','sanierer_email','vermittler_firma','vermittler_ansprechpartner','vermittler_telefon','vermittler_mobil','vermittler_fax','vermittler_email','versicherer','fallart','fallart_hinweis'], '');
+    $pick = static function(string $pattern) use ($text): string { return preg_match($pattern, $text, $m) ? trim((string)($m[1] ?? '')) : ''; };
+    $out['schaden_nr'] = $pick('/(?:Vers\.?\s*)?Schaden\s*Nr\.?\s*:\s*([0-9][0-9A-Za-z _\/-]*)/iu');
+    if ($out['schaden_nr'] === '') $out['schaden_nr'] = $pick('/Schaden[- ]?Nr\.?\s*([0-9][0-9A-Za-z _\/-]*)/iu');
+    $out['versicherer'] = $pick('/Versicherung\s*:\s*([^\n]+)/iu');
+    $damage = $pick('/Schadenort\s+([^\n]+)/iu');
+    if ($damage !== '') {
+        if (preg_match('/^(.+?)\s+(\d{5})\s+(.+)$/u', $damage, $m)) { $out['schaden_strasse']=trim($m[1]); $out['schaden_plz']=$m[2]; $out['schaden_ort']=trim($m[3]); }
+        else $out['schaden_ort']=$damage;
+    }
+    if (preg_match('/Stra(?:ß|ss)e\s*:\s*([^\n]+)\s+PLZ\s+Ort\s*:\s*(\d{5})\s+([^\n]+)/iu', $text, $m)) {
+        $out['schaden_strasse']=trim($m[1]); $out['schaden_plz']=$m[2]; $out['schaden_ort']=trim($m[3]);
+    }
+    if ($out['schaden_strasse'] === '' && preg_match('/(?:BV|Lieferadresse)\s*:\s*([^,\n]+),?\s*(\d{5})\s+([^\n]+)/iu', $text, $m)) {
+        $out['schaden_strasse']=trim($m[1]); $out['schaden_plz']=$m[2]; $out['schaden_ort']=trim($m[3]);
+    }
+    if (preg_match('/\b(Wasser(?:schaden)?|Brand(?:schaden)?|Sturm|Hagel|Leckage)\b/iu', $text, $m)) $out['schadenart']=trim($m[1]);
+    if (preg_match('/\b(Rainbow\s+Sanierungen[^\n]+|Grillenberger\s+Schadenmanagement[^\n]*)/iu', $text, $m)) $out['sanierer_firma']=trim($m[1]);
+    if ($out['sanierer_firma'] === '' && stripos($text, 'Rainbow') !== false) $out['sanierer_firma']='Rainbow Sanierungen';
+    if (preg_match('/\b([\w.+-]+@[\w.-]+\.[A-Za-z]{2,})\b/u', $text, $m)) $out['sanierer_email']=trim($m[1]);
+    return $out;
+}
+
 $apiKey = trim(env('OPENAI_API_KEY', ''));
-if ($apiKey === '') apiError(503, 'OpenAI API-Key ist nicht konfiguriert.');
+if ($apiKey === '') apiJson(['ok'=>true,'file_name'=>$name,'fields'=>localCaseExtract($name,$mime,$bytes),'fallback'=>'local']);
 $base64 = base64_encode($bytes);
 
 $system = <<<'PROMPT'
