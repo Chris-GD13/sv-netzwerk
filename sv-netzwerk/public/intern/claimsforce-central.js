@@ -72,9 +72,10 @@
     if(userJobs.length)return;
     if(context.claims_agent&&!bridge){show('Diese zentrale Importstation ist nicht bereit.',true);return}
     button.disabled=true;if(fullButton)fullButton.disabled=true;
-    try{const profile=selectedProfile(),payload={profile};if(mode==='full'){payload.mode='full';payload.since=sinceInput?.value||''}userJobs=[];userJobs.push((await post('enqueue',payload)).job.id);show(mode==='full'?'Vollständiger ClaimsForce-Abgleich wurde übergeben.':'Importauftrag wurde an die zentrale Importstation übergeben.');watch()}
+    try{const profile=selectedProfile(),payload={profile};if(mode==='full'){payload.mode='full';payload.since=sinceInput?.value||''}if(mode==='tasks')payload.mode='tasks';userJobs=[];userJobs.push((await post('enqueue',payload)).job.id);show(mode==='full'?'Vollständiger ClaimsForce-Abgleich wurde übergeben.':mode==='tasks'?'ClaimsForce-Aufgaben werden automatisch aktualisiert.':'Importauftrag wurde an die zentrale Importstation übergeben.');watch()}
     catch(e){button.disabled=false;if(fullButton)fullButton.disabled=false;userJobs=[];show(e.message,true)}
   };
+  window.addEventListener('svnet:claims-task-check',()=>{enqueue('tasks')});
   button.addEventListener('click',()=>enqueue('quick'));
   fullButton?.addEventListener('click',()=>enqueue('full'));
 

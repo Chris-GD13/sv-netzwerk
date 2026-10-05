@@ -151,15 +151,14 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     if(force){
       const profile=String(data.selected_profile||'').trim();
       if(profile){
-        const queued=await request('/intern/api/claimsforce-queue.php?action=enqueue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile,mode:'tasks'})});
-        const jobId=Number(queued.job?.id||0);setSystem('claims','warn','ClaimsForce wird jetzt geprüft …');
-        if(jobId)for(let attempt=0;attempt<20;attempt++){
-          await wait(1500);
-          const status=await request('/intern/api/claimsforce-queue.php?action=status&id='+encodeURIComponent(jobId));
-          if(['done','failed'].includes(String(status.job?.status||''))){
+        if(window.svnetClaimsTaskCheck){
+          setSystem('claims','warn','ClaimsForce-Aufgaben werden automatisch aktualisiert …');
+          window.dispatchEvent(new CustomEvent('svnet:claims-task-check'));
+          for(let attempt=0;attempt<20;attempt++){
+            await wait(1500);
             data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1');
-            if(status.job.status==='failed')setSystem('claims','bad',status.job.message||'ClaimsForce-Prüfung fehlgeschlagen.');
-            break;
+            const item=(data.items||[]).find(row=>row.profile===profile);
+            if(item?.source_job_id&&item.source_job_id!==null&&item.updated_at){break}
           }
         }
       }
@@ -202,3 +201,12 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   loadPersonalPhone().catch(error=>{$('dc-phone-state').textContent=error.message});resetReminder();loadPhone();load();
 })();
 </script>
+<section id="dc-claims-bridge-host" hidden>
+  <button type="button" id="vf-claims-import">ClaimsForce-Aufgaben aktualisieren</button>
+  <button type="button" id="vf-claims-full">Vollabgleich</button>
+  <input id="vf-claims-since" type="date">
+  <p id="vf-claims-state"></p>
+  <button type="button" id="vf-claims-settings"></button>
+  <a id="vf-claims-download" href="/intern/downloads/svnet-claimsforce-bridge.zip"></a>
+</section>
+<script is:inline src="/intern/claimsforce-central.js?v=20261005-2"></script>
