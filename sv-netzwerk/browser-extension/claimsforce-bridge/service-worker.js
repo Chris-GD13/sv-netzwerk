@@ -267,13 +267,16 @@ async function openPlanning(tabId, bucket) {
   return opened;
 }
 
+let lastTaskDebug = null;
 async function readOpenTasks(tabId) {
+  lastTaskDebug = null;
   await chrome.tabs.update(tabId, { url: 'https://web.claimsforce.com/tasks' });
   await waitTab(tabId);
   await sleep(1800);
-  for (let attempt = 0; attempt < 20; attempt++) {
+  for (let attempt = 0; attempt < 40; attempt++) {
     const result = await chrome.tabs.sendMessage(tabId, { type: 'READ_OPEN_TASKS' }).catch(() => null);
     if (Number.isInteger(result?.openTasks)) return Math.max(0, result.openTasks);
+    if (result?.debug) lastTaskDebug = result.debug;
     await sleep(250);
   }
   return null;
@@ -383,7 +386,7 @@ async function runImport(run) {
   const { tab, token } = await claimsTab(profile, run, credential);
   await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
   const openTasks = await readOpenTasks(tab.id);
-  await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks });
+  await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks, reader: lastTaskDebug });
   if(run.mode==='tasks'){
     if(!Number.isInteger(openTasks))throw new Error('Kein eindeutiger sichtbarer Aufgabenstand aus ClaimsForce gelesen.');
     return { claims: 0, openTasks, taskCheck: true, updated: 0, skipped: 0 };
