@@ -143,7 +143,7 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --overwrite --parallel=4 --exclude-glob .git* --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern --exclude-glob intern/** deploy-site/ .; quit"
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --overwrite --ignore-time --parallel=4 --exclude-glob .git* --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern --exclude-glob intern/** deploy-site/ .; quit"
           exit_code=1
           for attempt in $(seq 1 "$SFTP_UPLOAD_ATTEMPTS"); do
             echo "Upload-Versuch $attempt/$SFTP_UPLOAD_ATTEMPTS"
@@ -207,6 +207,15 @@ jobs:
           printf '%s\n' "$listing" | grep -Eq ' assets$'
           printf '%s\n' "$listing" | grep -Eq ' deploy-version\.txt$'
 
+          # Der heutige Fachbeitrag muss als verschachtelte öffentliche Route
+          # vorhanden sein; so bleibt ein scheinbar erfolgreicher Root-Upload
+          # ohne die eigentliche Fachwissensseite ausgeschlossen.
+          article_path="fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/index.html"
+          article_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; ls $article_path; quit"
+          article_listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$article_script")"
+          printf '%s\n' "$article_listing" | grep -Eq ' index\.html$'
+          echo "Fachbeitrag: $article_path vorhanden"
+
           if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
             echo "::error::$SFTP_REMOTE_DIR/dist/ wurde unerwartet angelegt."
             exit 1
@@ -263,3 +272,13 @@ jobs:
             exit 1
           fi
           echo "/intern/fensterpruefung-bonn/: HTTP $status OK"
+
+          # 5. Der heutige Fachbeitrag
+          article_url="https://www.sv-netzwerk.eu/fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/"
+          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+            -o /dev/null -w '%{http_code}' "$article_url" || true)"
+          if [ "$status" != "200" ]; then
+            echo "::error::$article_url liefert HTTP $status statt 200."
+            exit 1
+          fi
+          echo "Fachbeitrag: HTTP $status OK"
