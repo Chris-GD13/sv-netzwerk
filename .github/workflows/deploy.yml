@@ -260,11 +260,11 @@ jobs:
           # Der heutige Fachbeitrag muss als verschachtelte öffentliche Route
           # vorhanden sein; so bleibt ein scheinbar erfolgreicher Root-Upload
           # ohne die eigentliche Fachwissensseite ausgeschlossen.
-          article_path="fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/index.html"
-          article_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; ls $article_path; quit"
+          article_dir="fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung"
+          article_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; ls $article_dir/; quit"
           article_listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$article_script")"
           printf '%s\n' "$article_listing" | grep -Eq ' index\.html$'
-          echo "Fachbeitrag: $article_path vorhanden"
+          echo "Fachbeitrag: $article_dir/index.html vorhanden"
 
           if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
             echo "::error::$SFTP_REMOTE_DIR/dist/ wurde unerwartet angelegt."
