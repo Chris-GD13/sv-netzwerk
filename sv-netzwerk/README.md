@@ -24,7 +24,7 @@ https://www.sv-netzwerk.eu
 
 \- Astro
 
-\- Node.js 24
+\- Node.js 22 (GitHub-Actions-Deployment)
 
 \- Git
 
@@ -84,7 +84,8 @@ npm run build
 
 
 
-Jeder Commit auf den Branch \*\*main\*\* löst automatisch aus:
+Änderungen unter `sv-netzwerk/` auf **main** (mit Ausnahmen für das
+Fachbeitragsprotokoll und die Kalender-Slots) lösen automatisch aus:
 
 
 
@@ -92,7 +93,11 @@ Jeder Commit auf den Branch \*\*main\*\* löst automatisch aus:
 
 2\. Build der Website
 
-3\. Upload nach IONOS per SFTP
+3\. Upload des Inhalts von `dist/` per SFTP direkt in das IONOS-Document-Root
+   `/sv-netzwerk`
+
+Der vollständige Ablauf und die Live-Prüfungen stehen in der Repository-Datei
+[`DEPLOYMENT.md`](../DEPLOYMENT.md).
 
 
 
@@ -133,4 +138,3 @@ docs/
 
 
 Alle Rechte vorbehalten.
-
