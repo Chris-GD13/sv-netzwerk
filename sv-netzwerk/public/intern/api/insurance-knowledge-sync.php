@@ -8,7 +8,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') apiError(405, 'Nur POST is
 
 $payload = json_decode((string)file_get_contents('php://input'), true);
 $password = is_array($payload) ? trim((string)($payload['password'] ?? '')) : '';
-$storage = __DIR__ . '/storage';
+$storage = photosDir() . '/insurance-knowledge';
 $secretFile = $storage . '/insurance-knowledge-source.secret';
 $master = env('APP_SECRET', '');
 if ($master === '') apiError(503, 'Zentrale Importverschlüsselung ist nicht konfiguriert.');
@@ -49,6 +49,8 @@ if ($ok === false || $status !== 200) { @unlink($tmp); apiError(502, 'Originalfr
 $zip = new ZipArchive();
 if ($zip->open($tmp) !== true) { @unlink($tmp); apiError(502, 'Originalfreigabe lieferte kein gültiges ZIP.'); }
 $files = [];
+$filesRoot = $storage . '/files';
+if (!is_dir($filesRoot) && !mkdir($filesRoot, 0750, true) && !is_dir($filesRoot)) { $zip->close(); @unlink($tmp); apiError(500, 'Serverablage konnte nicht angelegt werden.'); }
 for ($i = 0; $i < $zip->numFiles; $i++) {
     $entry = $zip->statIndex($i);
     $name = str_replace('\\', '/', (string)($entry['name'] ?? ''));
@@ -59,6 +61,14 @@ for ($i = 0; $i < $zip->numFiles; $i++) {
     $insurer = (string)($parts[0] ?? '');
     $fileName = (string)end($parts);
     $folder = implode('/', array_slice($parts, 0, -1));
+    $destination = $filesRoot . '/' . $path;
+    $destinationDir = dirname($destination);
+    if (!is_dir($destinationDir) && !mkdir($destinationDir, 0750, true) && !is_dir($destinationDir)) continue;
+    $input = $zip->getStream($name);
+    if (!is_resource($input)) continue;
+    $output = fopen($destination, 'wb');
+    if (!is_resource($output)) { fclose($input); continue; }
+    stream_copy_to_stream($input, $output); fclose($input); fclose($output); @chmod($destination, 0640);
     $stream = $zip->getStream($name);
     if (!is_resource($stream)) continue;
     $hash = hash_init('sha256'); $size = 0;
@@ -66,7 +76,7 @@ for ($i = 0; $i < $zip->numFiles; $i++) {
     fclose($stream);
     $segments = array_map(static fn(string $s): string => rawurlencode($s), $parts);
     $folderUrl = 'https://cloud.allriskportal.de/index.php/s/' . $token . '?dir=/' . implode('/', array_map(static fn(string $s): string => rawurlencode($s), array_filter(explode('/', $folder), 'strlen')));
-    $files[] = ['path' => $path, 'name' => $fileName, 'insurer' => $insurer, 'extension' => strtolower((string)pathinfo($fileName, PATHINFO_EXTENSION)) === '' ? '' : '.' . strtolower((string)pathinfo($fileName, PATHINFO_EXTENSION)), 'size' => $size, 'sha256' => hash_final($hash), 'source_url' => 'https://cloud.allriskportal.de/public.php/dav/files/' . $token . '/' . implode('/', $segments), 'folder_url' => $folderUrl];
+    $files[] = ['path' => $path, 'name' => $fileName, 'insurer' => $insurer, 'extension' => strtolower((string)pathinfo($fileName, PATHINFO_EXTENSION)) === '' ? '' : '.' . strtolower((string)pathinfo($fileName, PATHINFO_EXTENSION)), 'size' => $size, 'sha256' => hash_final($hash), 'source_url' => '/intern/api/insurance-knowledge-file.php?path=' . rawurlencode($path), 'folder_url' => $folderUrl];
 }
 $zip->close(); @unlink($tmp);
 if (!$files) apiError(502, 'Die Originalfreigabe enthält keine Unterlagen.');

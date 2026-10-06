@@ -4,7 +4,7 @@ require_once __DIR__ . '/config.php';
 commonHeaders();
 $user = requireAuth();
 if (!in_array($user['role'] ?? '', ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) apiError(403, 'Keine Berechtigung.');
-$liveIndex = __DIR__ . '/storage/insurance-knowledge-live.json';
+$liveIndex = photosDir() . '/insurance-knowledge/insurance-knowledge-live.json';
 $index = is_file($liveIndex) ? $liveIndex : (getenv('INSURANCE_KNOWLEDGE_INDEX') ?: __DIR__ . '/insurance-knowledge-index.json');
 if (!is_file($index)) apiError(503, 'Versicherungswissen ist noch nicht bereitgestellt.');
 $data = json_decode((string)file_get_contents($index), true);
