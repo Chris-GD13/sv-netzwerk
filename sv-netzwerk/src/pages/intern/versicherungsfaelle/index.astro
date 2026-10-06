@@ -57,6 +57,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
             </div>
       <details class="vf-card vf-processing"><summary>Berichte und Dokumente erstellen</summary>
         <label class="vf-order-label" for="vf-instructions"><strong>Meine Notiz / Arbeitsauftrag</strong><small>Schreiben Sie frei, was festgestellt wurde und welches Dokument entstehen soll. Enter erzeugt einen Zeilenumbruch.</small></label>
+        <label class="vf-financial-preset"><input id="vf-financial-preset" type="checkbox"> KVA- und Rechnungsübersicht mit Zahlungsabgleich</label>
         <textarea id="vf-instructions" rows="7" placeholder="Hier Arbeitsauftrag, Feststellungen oder Diktat eingeben …"></textarea>
         <small id="vf-instruction-state" class="vf-meta" aria-live="polite"></small>
         <fieldset class="vf-output-group"><legend>Bericht auswählen – genau einer</legend><div id="vf-primary-outputs"><label><input type="radio" name="vf-primary-output" value="erstbericht"> Schadenbericht</label><label><input type="radio" name="vf-primary-output" value="erstbericht_sv_gf"> TF-/GF-Schadenbericht</label><label><input type="radio" name="vf-primary-output" value="rekon_schaden"> Rekon-Schaden <small>(ohne Bilder)</small></label></div></fieldset>
@@ -711,5 +712,7 @@ document.getElementById('vf-recent')?.addEventListener('click',async()=>{
 </style>
 <script is:inline src="/intern/bki-mail-attachment.js?v=20260827-2"></script>
 <script is:inline src="/intern/whatsapp-case.js?v=20260909-3"></script>
+<style>.vf-financial-preset{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--vfl);background:#f5f8fa;padding:10px 12px;margin:8px 0;font-size:.85rem;font-weight:750}.vf-financial-preset input{width:auto;flex:0 0 auto;margin-top:3px}</style>
+<script is:inline type="module" src="/intern/financial-register-preset.js?v=20261006-1"></script>
 </InternalLayout>
 

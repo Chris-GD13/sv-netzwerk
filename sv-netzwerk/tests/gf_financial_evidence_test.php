@@ -84,3 +84,8 @@ function gfH(string $text): string { return htmlspecialchars($text,ENT_QUOTES,'U
 $html=gfFinancialSectionHtml(['heading'=>'Test','text'=>'Text','tables'=>[['columns'=>['Firma'],'rows'=>[['<script>unsafe</script>']]]]]);
 check(str_contains($html,'<table>')&&!str_contains($html,'<script>'), 'Registertabellen müssen sicher gerendert werden.');
 echo "GF financial evidence tests passed\n";
+check($register['compact_register']===true&&$register['open_points']===[]&&$register['sections'][5]['internal_only']===true,'Routinehinweise dürfen nicht nochmals unter den Tabellen erscheinen.');
+$htmlStart=strpos($core,'function gfDocumentHtml(');$htmlEnd=strpos($core,"\n",$htmlStart);eval(substr($core,$htmlStart,$htmlEnd-$htmlStart));
+$registerHtml=gfDocumentHtml('Register',[], $register,['Brief.pdf'],['Master.md'],'Test');
+check(str_contains($registerHtml,'KVA – getrennte Übersicht')&&str_contains($registerHtml,'11.745,40'),'Tabellen und Berechnung müssen erhalten bleiben.');
+foreach(['Zahlungsempfehlung / weiterer Klärungsbedarf','Offene Punkte','Angewendete Regelwerke','Ausgewertete Unterlagen'] as $noise)check(!str_contains($registerHtml,$noise),'Unnötiger Registeranhang: '.$noise);

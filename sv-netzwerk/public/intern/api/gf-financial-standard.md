@@ -12,3 +12,5 @@ Eine Gesamtberechnung ausdrücklich unter den Vorbehalt vollständiger sachliche
 
 Trocknungsstrom separat mit belegten kWh, genanntem Tarif und Rechenweg ausweisen. Der übliche Ansatz von 0,35 EUR/kWh wird nur verwendet, wenn im Auftrag so angegeben oder im Fall belegt; abweichende belegte Tarife beachten. Stromkosten zusätzlich nur unter Anerkennungsvorbehalt ausweisen und nicht nochmals ansetzen, wenn bereits in einer Rechnung enthalten.
 
+
+Rechnungsregister knapp halten: Tabellen und die fachlichen Erläuterungen davor erhalten. Danach nur konkrete, entscheidungsrelevante Klärungspunkte nennen, die nicht bereits in den Tabellen stehen; jeden Punkt nur einmal. Keine allgemeinen Warntexte, Seitenblock-Lesemeldungen, Hinweise auf Dokumente ohne Finanzbeleg, doppelten offenen Punkte oder Listen der angewendeten Regeldateien anhängen. Interne Prüf- und Quellenlisten bleiben in der Verarbeitung verfügbar.

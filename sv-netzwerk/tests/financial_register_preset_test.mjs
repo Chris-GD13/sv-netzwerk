@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {FINANCIAL_REGISTER_INSTRUCTION as preset,setFinancialRegisterPreset as set} from '../public/intern/financial-register-preset.js';
+const own = 'Meine Feststellungen und individuelle Prüfung.';
+const combined=set(own,true);
+assert(combined.startsWith(own+'\n\n'));
+assert.equal(set(combined,true),combined,'Wiederholtes Anhaken darf keinen zweiten Arbeitsauftrag einfügen.');
+assert.equal(set(combined,false),own,'Eigene Notizen müssen beim Abwählen erhalten bleiben.');
+assert.equal(set('Weitere eigene Notiz\n\n'+combined,false),'Weitere eigene Notiz\n\n'+own);
+assert(!/26-126162|4\.803|0,35|19\.08/.test(preset),'Der feste Text darf keine Fallbeträge, Daten oder pauschalen Stromtarife übernehmen.');
+console.log('financial_register_preset_test: OK');

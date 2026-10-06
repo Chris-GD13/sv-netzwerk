@@ -244,7 +244,10 @@ function gfFinancialRegisterGenerate(array $evidence, string $instructions='', ?
     $sections[1]['tables']=[$tables['invoices']];
     $sections[4]['tables']=[$tables['calculation']];
     $sections[4]['text']='Bedingte Berechnung bei vollständiger sachlicher und preislicher Anerkennung der offenen Originalbelege. Bereits abgerechnete KVA werden nicht nochmals angesetzt.'.$tables['note'];
-    return ['summary'=>'Inhaltliches Belegregister aus den Originalunterlagen, einschließlich gescannter Sammelakten und der jeweiligen Originalseiten.','sections'=>$sections,'open_points'=>array_values(array_unique($notes))];
+    $critical=array_values(array_unique(array_filter($notes,static fn($note)=>str_starts_with($note,'Abweichende Originalbeträge'))));
+    $sections[5]['text']=$critical?implode("\n",$critical):'Die erforderlichen Entscheidungen sind in den Tabellen ausgewiesen.';
+    $sections[5]['internal_only']=$critical===[];
+    return ['summary'=>'Inhaltliches Belegregister aus den Originalunterlagen, einschließlich gescannter Sammelakten und der jeweiligen Originalseiten.','sections'=>$sections,'open_points'=>[],'audit_open_points'=>array_values(array_unique($notes)),'compact_register'=>true];
 }
 
 function gfFinancialDecisionContext(array $documents, string $instructions): array
