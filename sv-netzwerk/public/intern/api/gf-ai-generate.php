@@ -441,6 +441,20 @@ $caseUploadReplacement = str_replace(
 );
 $source = str_replace($caseUploadNeedle, trim($caseUploadReplacement), $source, $countCaseUpload);
 if ($countCaseUpload !== 1) throw new RuntimeException('Chargenweise Aktenauswertung konnte nicht sicher angebunden werden.');
+$financialHook = <<<'PHP_CODE'
+if(array_intersect($outputs,['schlusserklaerung','zahlungsbefuerwortung','rechnungsregister','kalkulation','vorauszahlung'])){
+    // Read original files again with a dedicated financial schema. The general
+    // evidence cache may only contain correspondence or photo summaries.
+    $financialEvidence=gfFinancialExtractCase($jobId,$caseFiles);
+    foreach($financialEvidence as$financialFileEvidence)$caseEvidence[]=$financialFileEvidence;
+    // Keep the user's instructions unchanged: extraction guidance must never
+    // accidentally satisfy the explicit KVA approval gate.
+    $caseEvidence[]=['financial_policy'=>'Die financial_documents wurden direkt aus sämtlichen Originaldateien einschließlich Scan-Seiten extrahiert. Klassifiziere Brief/Schreiben nicht nach Dateiname. Nutze jeden eigenständigen Beleg mit Aussteller, Nummer, Datum und Originalseiten. Identische Kopien, Nachträge, ursprüngliche Angebote und spätere Rechnungen nicht ungeprüft mehrfach summieren. Bedarfspositionen gesondert ausweisen. Eine Freigabe ist keine bereits erfolgte Zahlung. Bei ausdrücklich beauftragter KVA-Freigabe ausschließlich fachlich begründete Originalbeträge als Freigegebener KVA aufnehmen. Offene Positionen gesondert nennen; eine bloße Betragsnennung in Schriftverkehr ist kein weiterer Beleg.','user_requested_kva_approval'=>gfInstructionApprovesKva($instructions)];
+}
+PHP_CODE;
+$financialAnchor = '$ruleRefs=[];foreach($knowledgeFiles as$f)';
+$source = str_replace($financialAnchor, trim($financialHook).$financialAnchor, $source, $financialHookCount);
+if ($financialHookCount !== 1) throw new RuntimeException('Inhaltliche Originalbelegprüfung konnte nicht sicher angebunden werden.');
 $sourceNamesNeedle = '$sourceNames=array_map(fn($r)=>(string)$r[\'name\'],$caseRefs);';
 $sourceNamesReplacement = '$sourceNames=array_map(fn($f)=>(string)($f[\'name\']??\'Quelle\'),$caseFiles);';
 $source = str_replace($sourceNamesNeedle, $sourceNamesReplacement, $source, $countSourceNames);
