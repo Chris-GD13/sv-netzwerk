@@ -271,6 +271,10 @@ function gfFinancialDecisionTables(array $documents, array $context): array
         $invoice=(string)($link['invoice_number']??'');
         if (!isset($invoiceByNumber[$invoice])||trim((string)($link['source']??''))==='') continue;
         foreach (($link['offer_numbers']??[]) as $offer) if (isset($offerByNumber[(string)$offer])) {
+            $issuerKey=static fn(string $issuer)=>preg_replace('/[^\p{L}\p{N}]+/u','',mb_strtolower($issuer));
+            $offerIssuer=$issuerKey((string)($offerByNumber[(string)$offer]['issuer']??''));
+            $invoiceIssuer=$issuerKey((string)($invoiceByNumber[$invoice]['issuer']??''));
+            if ($offerIssuer===''||$offerIssuer!==$invoiceIssuer||isset($covered[(string)$offer])) continue;
             $covered[(string)$offer]=$invoice;
             $invoiceOffers[$invoice][]=(string)$offer;
         }

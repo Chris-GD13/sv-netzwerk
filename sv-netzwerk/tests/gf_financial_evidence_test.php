@@ -89,3 +89,7 @@ $htmlStart=strpos($core,'function gfDocumentHtml(');$htmlEnd=strpos($core,"\n",$
 $registerHtml=gfDocumentHtml('Register',[], $register,['Brief.pdf'],['Master.md'],'Test');
 check(str_contains($registerHtml,'KVA – getrennte Übersicht')&&str_contains($registerHtml,'11.745,40'),'Tabellen und Berechnung müssen erhalten bleiben.');
 foreach(['Zahlungsempfehlung / weiterer Klärungsbedarf','Offene Punkte','Angewendete Regelwerke','Ausgewertete Unterlagen'] as $noise)check(!str_contains($registerHtml,$noise),'Unnötiger Registeranhang: '.$noise);
+$foreignDocuments=$documents;
+$foreignDocuments[4]['issuer']='Andere Firma';
+$foreignRegister=gfFinancialRegisterGenerate([['files'=>[['name'=>'Brief.pdf','financial_documents'=>$foreignDocuments]]]],'', $context);
+check(!str_contains(json_encode($foreignRegister,JSON_UNESCAPED_UNICODE),'341,46'),'KVA einer anderen Firma dürfen nicht zur Rechnung zugeordnet werden.');
