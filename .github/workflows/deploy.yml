@@ -143,7 +143,28 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --overwrite --parallel=4 --exclude-glob .git* --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern --exclude-glob intern/** deploy-site/ .; quit"
+          latest_entry=""
+          while IFS= read -r file; do
+            published_at="$(sed -n 's/^  publishedAt:[[:space:]]*//p' "$file" | head -n 1)"
+            if [ -n "$published_at" ]; then
+              printf '%s\t%s\n' "$published_at" "$file"
+            fi
+          done < <(find src/content/knowledge -maxdepth 1 -type f -name '*.md' -print | sort) > /tmp/knowledge-dates.txt
+          latest_entry="$(sort /tmp/knowledge-dates.txt | tail -n 1)"
+          latest_file="${latest_entry#*$'\t'}"
+          latest_slug="$(basename "$latest_file" .md)"
+          latest_image="$(sed -n 's/^  image:[[:space:]]*//p' "$latest_file" | head -n 1 | tr -d '"')"
+          if [ -z "$latest_slug" ]; then
+            echo "::error::Kein veröffentlichter Fachbeitrag für den Nachupload gefunden."
+            exit 1
+          fi
+          article_upload_command="mirror --reverse --overwrite --parallel=2 deploy-site/fachwissen/${latest_slug}/ fachwissen/${latest_slug}/;"
+          image_upload_command=""
+          if [ -n "$latest_image" ]; then
+            image_path="${latest_image#/}"
+            image_upload_command="put deploy-site/$image_path -o $image_path;"
+          fi
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --overwrite --parallel=4 --exclude-glob .git* --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern --exclude-glob intern/** deploy-site/ .; $article_upload_command $image_upload_command quit"
           exit_code=1
           for attempt in $(seq 1 "$SFTP_UPLOAD_ATTEMPTS"); do
             echo "Upload-Versuch $attempt/$SFTP_UPLOAD_ATTEMPTS"
