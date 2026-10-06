@@ -124,7 +124,14 @@ PROMPT;
   }
   if(!$positions)throw new RuntimeException('Im Dokument wurden keine belastbaren Leistungspositionen erkannt.');
   if($quoteNumber!==''&&preg_replace('/[^a-z0-9]/i','',strtolower($quoteNumber))!==preg_replace('/[^a-z0-9]/i','',strtolower((string)($raw['quote_number']??''))))throw new RuntimeException('Die ausgelesene Angebotsnummer stimmt nicht mit der Belegauswahl überein.');
-  $warnings=kvaBundlePositionWarnings($positions,is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null);
+  $net=is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null;
+  $warnings=kvaBundlePositionWarnings($positions,$net);
+  if($warnings&&$fileId!==''&&$net!==null){
+    $repairResponse=bkOpenAIJson('POST','responses',['model'=>env('OPENAI_MODEL','gpt-5.4-mini'),'instructions'=>'Prüfe die vollständigen Originalseiten des gewählten Angebots erneut visuell. Die bisherigen Positionen erreichen die gedruckte Nettosumme nicht. Suche ausschließlich weitere im Original ausdrücklich gedruckte, bepreiste Kostenpositionen, insbesondere Logistikpauschalen oder Zuschläge am Ende des Angebots. Erfinde keine Position aus der Differenz und übernimm keine Summen, Steuern, Rabatte, Rechnungen oder bloße Bezugnahmen. Gib ausschließlich tatsächlich fehlende Originalpositionen zurück. Antworte als JSON mit quote_number, net_total, positions (source_position, description, quantity, unit, offered_unit_price, offered_total).','input'=>[['role'=>'user','content'=>[['type'=>'input_text','text'=>'Gewähltes Angebot: '.(string)($raw['quote_number']??'').'. Bisherige JSON-Ablesung nur als Vergleich: '.json_encode(['net_total'=>$net,'positions'=>$positions],JSON_UNESCAPED_UNICODE)],['type'=>'input_file','file_id'=>$fileId]]]],'max_output_tokens'=>3000],180);
+    $repair=bkJson(bkOutputText($repairResponse));
+    $positions=kvaBundleRepairPositions($positions,$net,(string)($raw['quote_number']??''),$repair);
+    $warnings=kvaBundlePositionWarnings($positions,$net);
+  }
   return['warnings'=>$warnings,'source_name'=>$name,'quote_number'=>trim((string)($raw['quote_number']??'')),'company'=>trim((string)($raw['company']??'')),'net_total'=>is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null,'positions'=>$positions];
 }
 function bkSearch(array $in):array{
@@ -321,7 +328,13 @@ try{
       return bkJson(bkOutputText($response));
     },static fn(string $key):string=>bkSettingGet($key,'{}'),static fn(string $key,string $value)=>bkSettingSet($key,$value),$folder.'|'.(string)($user['id']??$user['email']??''));
     if(($prepared['selection_required']??false)===true)apiJson(['ok'=>true,'source_name'=>$name,'selection_required'=>true,'offers'=>$prepared['offers']]);
-    apiJson(['ok'=>true,...bkAnalyzeKva($name,$mime,$prepared['bytes'],$prepared['quote_number'])]);
+    $analysisKey='kva_calc_complete_v1_'.hash('sha256',$folder.'|'.(string)($user['id']??$user['email']??'').'|'.hash('sha256',$bytes).'|'.$prepared['quote_number']);
+    $analysis=json_decode(bkSettingGet($analysisKey,'{}'),true);
+    if(!is_array($analysis)||empty($analysis['positions'])||!is_numeric($analysis['net_total']??null)||!empty($analysis['warnings'])){
+      $analysis=bkAnalyzeKva($name,$mime,$prepared['bytes'],$prepared['quote_number']);
+      if(empty($analysis['warnings'])&&is_numeric($analysis['net_total']??null))bkSettingSet($analysisKey,json_encode($analysis,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR));
+    }
+    apiJson(['ok'=>true,...$analysis]);
   }
   if($action==='search'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');apiJson(['ok'=>true,...bkSearch(requestBody())]);}
   if($action==='save'){

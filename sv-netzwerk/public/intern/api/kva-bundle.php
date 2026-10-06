@@ -12,6 +12,20 @@ function kvaBundlePositionWarnings(array $positions,?float $net): array
     if($net!==null&&abs(round($sum,2)-$net)>0.02)return ['Die erkannten Hauptpositionen stimmen nicht mit der gedruckten Nettosumme überein. Zuschläge und Positionen am Original prüfen.'];
     return [];
 }
+function kvaBundleRepairPositions(array $positions,float $net,string $number,array $repair): array
+{
+    $identity=static fn(string $value)=>strtolower(preg_replace('/[^a-z0-9]/i','',$value));
+    if($number===''||$identity($number)!==$identity((string)($repair['quote_number']??''))||!is_numeric($repair['net_total']??null)||abs((float)$repair['net_total']-$net)>0.01)return $positions;
+    $merged=$positions;
+    foreach(is_array($repair['positions']??null)?$repair['positions']:[] as $row){
+        if(!is_array($row)||trim((string)($row['description']??''))===''||!is_numeric($row['quantity']??null)||(float)$row['quantity']<=0||!is_numeric($row['offered_total']??null)||(float)$row['offered_total']<=0||!is_numeric($row['offered_unit_price']??null))continue;
+        if(abs(round((float)$row['quantity']*(float)$row['offered_unit_price'],2)-(float)$row['offered_total'])>0.02)continue;
+        $duplicate=false;foreach($positions as $existing)if(($row['source_position']??'')!==''&&($row['source_position']??'')===($existing['source_position']??'')){$duplicate=true;break;}
+        if($duplicate)continue;
+        $merged[]=['source_position'=>trim((string)($row['source_position']??'')),'description'=>trim((string)$row['description']),'quantity'=>(float)$row['quantity'],'unit'=>trim((string)($row['unit']??''))?:'psch','offered_unit_price'=>(float)$row['offered_unit_price'],'offered_total'=>(float)$row['offered_total'],'optional'=>false];
+    }
+    return kvaBundlePositionWarnings($merged,$net)===[]?$merged:$positions;
+}
 
 /** Read scanned bundles by content; filenames never establish an offer. */
 function kvaBundleCommand(array $command): string

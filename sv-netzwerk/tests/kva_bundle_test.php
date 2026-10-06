@@ -16,3 +16,8 @@ $pdf=kvaBundleTemp();ensure(str_ends_with($pdf,'.pdf')&&is_file($pdf),'PDF-Endun
 echo "kva_bundle_test: OK\n";
 ensure(count(kvaBundlePositionWarnings([['offered_total'=>3987]],4036.84))===1,'Fehlende Logistikpauschale muss als Summenabweichung sichtbar werden.');
 ensure(kvaBundlePositionWarnings([['offered_total'=>3987],['offered_total'=>49.84],['offered_total'=>999,'optional'=>true]],4036.84)===[],'Gedruckte Kostenposition berücksichtigen; Bedarfspositionen aus der Hauptsumme ausschließen.');
+$repair=['quote_number'=>'A/1','net_total'=>4036.84,'positions'=>[['source_position'=>'Logistik','description'=>'Gedruckte Logistikpauschale','quantity'=>1,'unit'=>'psch','offered_unit_price'=>49.84,'offered_total'=>49.84]]];
+ensure(count(kvaBundleRepairPositions([['offered_total'=>3987]],4036.84,'A/1',$repair))===2,'Belegte und centgenau abgeglichene Kostenposition ergänzen.');
+ensure(count(kvaBundleRepairPositions([['offered_total'=>3987]],4036.84,'A/2',$repair))===1,'Fremdes Angebot darf keine Zuschläge liefern.');
+$repair['positions'][0]['offered_total']=100;
+ensure(count(kvaBundleRepairPositions([['offered_total'=>3987]],4036.84,'A/1',$repair))===1,'Nicht abgeglichene Nachablesung darf nicht übernommen werden.');
