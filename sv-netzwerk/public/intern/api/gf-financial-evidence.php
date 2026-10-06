@@ -68,3 +68,15 @@ function gfFinancialExtractCase(int $jobId, array $caseFiles): array
     }
     return $evidence;
 }
+
+/** Repair presentation only, preserving the extracted original evidence. */
+function gfFinancialRegisterStructure(array $result, array $content, string $system): array
+{
+    $headings = gfHeadings('rechnungsregister');
+    if (count(is_array($result['sections'] ?? null) ? $result['sections'] : []) === count($headings)) return $result;
+    $content[] = ['type'=>'input_text', 'text'=>
+        'Korrigiere ausschließlich die Gliederung des folgenden Rechnungsregisters. Gib genau '.count($headings).
+        ' sections in dieser Reihenfolge aus: '.json_encode($headings, JSON_UNESCAPED_UNICODE).
+        '. Jeder Abschnitt hat heading und text. Keine zusätzlichen sections. Alle belegten Rechnungen, Angebote, Nachträge, Quellen und offenen Punkte vollständig erhalten und in die passenden Abschnitte einordnen. Keine neue Freigabe oder Zahlung ableiten. Antworte ausschließlich im bereits verlangten JSON-Format. Entwurf: '.json_encode($result, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)];
+    return gfOpenAI($content, $system, 16000);
+}

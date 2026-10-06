@@ -31,6 +31,11 @@ function gfOpenAIUploadName(string $name, string $mime): string { return $name; 
 function gfCalculationInputPart(array $ref): array { return ['type'=>'input_file','file_id'=>$ref['file_id']]; }
 function gfOpenAI(array $content, string $system, ?int $maxOutputTokens=null): array {
     $GLOBALS['calls']++;
+    if (!empty($GLOBALS['registry_repair'])) {
+        check($content[0]['text']==='Originalbeleg R-123: 250 EUR', 'Originalevidenz fehlt bei Gliederungskorrektur.');
+        check(str_contains($content[1]['text'], 'R-123') && $maxOutputTokens===16000, 'Entwurf oder vollständiges Ausgabelimit fehlt.');
+        return ['sections'=>array_map(fn($h)=>['heading'=>$h,'text'=>'R-123: 250 EUR'],gfHeadings('rechnungsregister'))];
+    }
     if ($GLOBALS['missing']) return ['files'=>[]];
     check($content[1]['file_id']==='brief-1', 'Original-Sammelakte wurde nicht gelesen.');
     return ['files'=>[['name'=>'Brief_26-1261626.pdf','financial_documents'=>[
@@ -50,4 +55,13 @@ check($calls===2, 'Geänderte Originaldatei wurde nicht neu gelesen.');
 $file['modifiedTime']='2026-10-04T10:00:00Z'; $missing=true;
 try { gfFinancialExtractCase(4, [$file]); throw new LogicException('Unvollständige Belegprüfung wurde akzeptiert.'); }
 catch (RuntimeException $e) { check(str_contains($e->getMessage(), 'unvollständig'), 'Unvollständige Belege müssen ausdrücklich sperren.'); }
+$headingsStart=strpos($core, 'function gfHeadings(');
+$headingsEnd=strpos($core, "\n", $headingsStart);
+eval(substr($core, $headingsStart, $headingsEnd-$headingsStart));
+$registry_repair=true;
+$repaired=gfFinancialRegisterStructure(['sections'=>[['heading'=>'Abweichend','text'=>'R-123: 250 EUR']]], [['type'=>'input_text','text'=>'Originalbeleg R-123: 250 EUR']], 'Register');
+check(count($repaired['sections'])===6, 'Register muss sechs Abschnitte enthalten.');
+$previousCalls=$calls;
+gfFinancialRegisterStructure($repaired, [], 'Register');
+check($calls===$previousCalls, 'Gültige Register benötigen keine weitere KI-Korrektur.');
 echo "GF financial evidence tests passed\n";
