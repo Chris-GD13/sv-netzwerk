@@ -14,3 +14,5 @@ $unsupported=kvaBundlePrepare('Foto.jpg','image/jpeg','image-bytes','',fn()=>[],
 ensure($unsupported['bytes']==='image-bytes','Fotografieren ohne PDF-Seitenprüfung erhalten.');
 $pdf=kvaBundleTemp();ensure(str_ends_with($pdf,'.pdf')&&is_file($pdf),'PDF-Endung für geschützten Serverworker.');unlink($pdf);
 echo "kva_bundle_test: OK\n";
+ensure(count(kvaBundlePositionWarnings([['offered_total'=>3987]],4036.84))===1,'Fehlende Logistikpauschale muss als Summenabweichung sichtbar werden.');
+ensure(kvaBundlePositionWarnings([['offered_total'=>3987],['offered_total'=>49.84],['offered_total'=>999,'optional'=>true]],4036.84)===[],'Gedruckte Kostenposition berücksichtigen; Bedarfspositionen aus der Hauptsumme ausschließen.');

@@ -1,6 +1,18 @@
 <?php
 declare(strict_types=1);
 
+function kvaBundlePositionWarnings(array $positions,?float $net): array
+{
+    $sum=0.0;
+    foreach($positions as $row){
+        if(($row['optional']??false)===true)continue;
+        if(!is_numeric($row['offered_total']??null))return ['Ein Angebotspreis fehlt. Originalposition prüfen.'];
+        $sum+=(float)$row['offered_total'];
+    }
+    if($net!==null&&abs(round($sum,2)-$net)>0.02)return ['Die erkannten Hauptpositionen stimmen nicht mit der gedruckten Nettosumme überein. Zuschläge und Positionen am Original prüfen.'];
+    return [];
+}
+
 /** Read scanned bundles by content; filenames never establish an offer. */
 function kvaBundleCommand(array $command): string
 {

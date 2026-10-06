@@ -105,7 +105,7 @@ function bkAnalyzeKva(string $name,string $mime,string $bytes,string $quoteNumbe
   if($isImage&&!in_array($imageMime,['image/jpeg','image/png','image/webp','image/gif'],true))throw new RuntimeException('Dieses Bildformat kann nicht ausgewertet werden. Bitte das Foto als JPG, PNG oder WEBP auswählen.');
   $fileId=$isImage?'':bkOpenAIUploadBytes($name,$mime,$bytes);
   $instructions=<<<'PROMPT'
-Lies den deutschen Kostenvoranschlag vollständig und extrahiere die angebotenen Leistungspositionen als Kalkulationsgrundlage. Übernimm keine Summenzeilen, Zwischensummen, Umsatzsteuer oder Rabatte als Leistungsposition. Fasse eine Position nur dann zusammen, wenn sie im Dokument selbst zusammengefasst ist. Erfinde keine Mengen, Einheiten, Beschreibungen oder Preise. Kennzeichne Bedarfs-, Eventual- und Alternativpositionen mit optional=true. Rechnungen gehören nicht in die Angebotspositionen.
+Lies den deutschen Kostenvoranschlag vollständig und extrahiere die angebotenen Leistungspositionen als Kalkulationsgrundlage. Übernimm keine Summenzeilen, Zwischensummen, Umsatzsteuer oder Rabatte als Leistungsposition. Fasse eine Position nur dann zusammen, wenn sie im Dokument selbst zusammengefasst ist. Erfinde keine Mengen, Einheiten, Beschreibungen oder Preise. Kennzeichne Bedarfs-, Eventual- und Alternativpositionen mit optional=true. Rechnungen gehören nicht in die Angebotspositionen. Übernimm separat bepreiste Kosten wie Logistikpauschalen oder Zuschläge als eigene Kostenposition (Menge 1, Einheit psch, gedruckter Betrag als Einzel- und Gesamtpreis); Summen selbst bleiben ausgeschlossen. Ergänze bei Stunden- und Material-Unterpositionen den gedruckten Titel und dessen Leistungsbeschreibung, damit das Gewerk erkennbar bleibt. Kosten, die erst nach Fertigstellung, nach Absprache oder auf Nachweis berechnet werden, sind optional=true; fehlende Preise bleiben null und dürfen nicht als 0 erfunden werden. Lies die gedruckte Nettosumme des gewählten Angebots; keine Zwischensumme als Nettosumme verwenden.
 
 Antworte ausschließlich als JSON:
 {"quote_number":"","company":"","net_total":null,"positions":[{"source_position":"","description":"","quantity":null,"unit":"","offered_unit_price":null,"offered_total":null,"optional":false}]}
@@ -120,11 +120,12 @@ PROMPT;
   foreach(($raw['positions']??[])as$row){
     if(!is_array($row))continue;$description=trim((string)($row['description']??''));
     if($description==='')continue;
-    $positions[]=['source_position'=>trim((string)($row['source_position']??'')),'description'=>$description,'quantity'=>is_numeric($row['quantity']??null)?(float)$row['quantity']:null,'unit'=>trim((string)($row['unit']??'')),'offered_unit_price'=>is_numeric($row['offered_unit_price']??null)?(float)$row['offered_unit_price']:null,'offered_total'=>is_numeric($row['offered_total']??null)?(float)$row['offered_total']:null,'optional'=>($row['optional']??false)===true];
+    $positions[]=['source_position'=>trim((string)($row['source_position']??'')),'description'=>$description,'quantity'=>is_numeric($row['quantity']??null)?(float)$row['quantity']:null,'unit'=>trim((string)($row['unit']??'')),'offered_unit_price'=>is_numeric($row['offered_unit_price']??null)?(float)$row['offered_unit_price']:null,'offered_total'=>is_numeric($row['offered_total']??null)?(float)$row['offered_total']:null,'optional'=>($row['optional']??false)===true||!is_numeric($row['offered_total']??null)];
   }
   if(!$positions)throw new RuntimeException('Im Dokument wurden keine belastbaren Leistungspositionen erkannt.');
   if($quoteNumber!==''&&preg_replace('/[^a-z0-9]/i','',strtolower($quoteNumber))!==preg_replace('/[^a-z0-9]/i','',strtolower((string)($raw['quote_number']??''))))throw new RuntimeException('Die ausgelesene Angebotsnummer stimmt nicht mit der Belegauswahl überein.');
-  return['source_name'=>$name,'quote_number'=>trim((string)($raw['quote_number']??'')),'company'=>trim((string)($raw['company']??'')),'net_total'=>is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null,'positions'=>$positions];
+  $warnings=kvaBundlePositionWarnings($positions,is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null);
+  return['warnings'=>$warnings,'source_name'=>$name,'quote_number'=>trim((string)($raw['quote_number']??'')),'company'=>trim((string)($raw['company']??'')),'net_total'=>is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null,'positions'=>$positions];
 }
 function bkSearch(array $in):array{
   $q=trim((string)($in['query']??''));
