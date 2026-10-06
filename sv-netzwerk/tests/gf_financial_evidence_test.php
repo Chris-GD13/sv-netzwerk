@@ -69,4 +69,16 @@ check(count($repaired['sections'])===6, 'Register muss sechs Abschnitte enthalte
 $previousCalls=$calls;
 gfFinancialRegisterStructure($repaired, [], 'Register');
 check($calls===$previousCalls, 'Gültige Register benötigen keine weitere KI-Korrektur.');
+$documents=[];
+foreach ([476,388.93,297.50,589.05,3928.56,1261.52] as $index=>$amount) $documents[]=['document_type'=>'Rechnung','issuer'=>'Firma A','number'=>'R'.($index+1),'gross'=>$amount,'pages'=>(string)($index+1),'payment_status'=>$index<3?'bezahlt':'kein Zahlungsnachweis'];
+foreach ([1441.57,2145.53,4803.84] as $index=>$amount) $documents[]=['document_type'=>'Angebot','issuer'=>'Firma A','number'=>'K'.($index+1),'gross'=>$amount,'pages'=>(string)($index+10),'approval_status'=>$index<2?'freigegeben':'offen'];
+$documents[]=$documents[0]; // overlap of two page blocks must not double count
+$context=['offer_invoice_links'=>[['offer_numbers'=>['K1','K2'],'invoice_number'=>'R5','source'=>'Originalrechnung']], 'drying_kwh'=>226,'electricity_rate'=>0.35];
+$register=gfFinancialRegisterGenerate([['files'=>[['name'=>'Brief.pdf','financial_documents'=>$documents]]]],'', $context);
+$rendered=json_encode($register,JSON_UNESCAPED_UNICODE);
+foreach (['6.941,56','1.162,43','5.779,13','3.587,10','341,46','11.745,40','10.582,97','79,10','11.824,50','10.662,07'] as $expected) check(str_contains($rendered,$expected), 'Fehlerhafter Abrechnungswert: '.$expected);
+check($register['sections'][0]['tables'][0]['caption']==='KVA – getrennte Übersicht', 'KVA müssen zuerst und getrennt ausgegeben werden.');
+function gfH(string $text): string { return htmlspecialchars($text,ENT_QUOTES,'UTF-8'); }
+$html=gfFinancialSectionHtml(['heading'=>'Test','text'=>'Text','tables'=>[['columns'=>['Firma'],'rows'=>[['<script>unsafe</script>']]]]]);
+check(str_contains($html,'<table>')&&!str_contains($html,'<script>'), 'Registertabellen müssen sicher gerendert werden.');
 echo "GF financial evidence tests passed\n";
