@@ -341,8 +341,9 @@ jobs:
             image_path="${latest_image#/}"
             image_dir="$(dirname "$image_path")"
             image_name="$(basename "$image_path")"
-            image_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; cls -1 $image_dir/; quit"
+            image_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR/$image_dir; cls -1; quit"
             image_listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$image_script")"
+            printf '%s\n' "$image_listing"
             printf '%s\n' "$image_listing" | grep -Fx "$image_name"
             echo "Fachbeitragsbild: $image_path vorhanden"
           fi
