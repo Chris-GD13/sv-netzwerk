@@ -73,6 +73,8 @@ $documents=[];
 foreach ([476,388.93,297.50,589.05,3928.56,1261.52] as $index=>$amount) $documents[]=['document_type'=>'Rechnung','issuer'=>'Firma A','number'=>'R'.($index+1),'gross'=>$amount,'pages'=>(string)($index+1),'payment_status'=>$index<3?'bezahlt':'kein Zahlungsnachweis'];
 foreach ([1441.57,2145.53,4803.84] as $index=>$amount) $documents[]=['document_type'=>'Angebot','issuer'=>'Firma A','number'=>'K'.($index+1),'gross'=>$amount,'pages'=>(string)($index+10),'approval_status'=>$index<2?'freigegeben':'offen'];
 $documents[]=$documents[0]; // overlap of two page blocks must not double count
+$documents[]=['document_type'=>'KVA','issuer'=>'Firma A','number'=>'','gross'=>1441.57,'description'=>'KVA nur im Anschreiben erwähnt'];
+$documents[]=['document_type'=>'Rechnung','issuer'=>'Technischer Bericht','number'=>'','gross'=>null,'description'=>'Messprotokoll'];
 $context=['offer_invoice_links'=>[['offer_numbers'=>['K1','K2'],'invoice_number'=>'R5','source'=>'Originalrechnung']], 'drying_kwh'=>226,'electricity_rate'=>0.35];
 $register=gfFinancialRegisterGenerate([['files'=>[['name'=>'Brief.pdf','financial_documents'=>$documents]]]],'', $context);
 $rendered=json_encode($register,JSON_UNESCAPED_UNICODE);

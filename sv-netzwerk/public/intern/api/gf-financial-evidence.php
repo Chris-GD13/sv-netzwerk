@@ -184,14 +184,17 @@ function gfFinancialRegisterGenerate(array $evidence, string $instructions='', ?
     $groups=[]; $notes=[]; $duplicates=[];
     foreach ($evidence as $bundle) foreach (($bundle['files']??[]) as $file) {
         if (!isset($file['financial_documents'])) continue;
-        foreach (($file['open_points']??[]) as $point) $notes[]=(string)$point;
         foreach ($file['financial_documents'] as $document) {
             $type=trim((string)($document['document_type']??'Finanzbeleg'));
             $number=trim((string)($document['number']??''));
             $issuer=trim((string)($document['issuer']??''));
             $issuerWords=preg_split('/\s+/u',mb_strtolower($issuer,'UTF-8'))?:[];
             $key=$number!==''?$type.'|'.($issuerWords[0]??'').'|'.$number:hash('sha256',json_encode($document));
-            $source=(string)($file['name']??'Original').' · S. '.(string)($document['pages']??'offen');
+            $source=(string)($file['name']??'Original').' · Originalseiten '.(string)($document['original_page_block']??$document['pages']??'offen');
+            if (in_array($type,['Rechnung','KVA','Angebot','Nachtrag'],true) && $number==='' && (!is_numeric($document['net']??null) || empty($document['line_items']))) {
+                $notes[]='Bezugnahme bzw. Begleitunterlage, kein zusätzlich anzusetzender eigenständiger Finanzbeleg: '.$issuer.' · '.(string)($document['description']??'').' · '.$source;
+                continue;
+            }
             $document['_source']=$source;
             if (isset($groups[$key])) {
                 $duplicates[]=$issuer.' · '.$number.' · '.$source;
