@@ -207,14 +207,35 @@ jobs:
           printf '%s\n' "$listing" | grep -Eq ' assets$'
           printf '%s\n' "$listing" | grep -Eq ' deploy-version\.txt$'
 
-          # Der heutige Fachbeitrag muss als verschachtelte öffentliche Route
-          # vorhanden sein; so bleibt ein scheinbar erfolgreicher Root-Upload
-          # ohne die eigentliche Fachwissensseite ausgeschlossen.
-          article_path="fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/index.html"
+          # Den neuesten Fachbeitrag aus dem Content-Modell ermitteln.
+          latest_entry=""
+          while IFS= read -r file; do
+            published_at="$(sed -n 's/^  publishedAt:[[:space:]]*//p' "$file" | head -n 1)"
+            if [ -n "$published_at" ]; then
+              printf '%s\t%s\n' "$published_at" "$file"
+            fi
+          done < <(find src/content/knowledge -maxdepth 1 -type f -name '*.md' -print | sort) > /tmp/knowledge-dates.txt
+          latest_entry="$(sort /tmp/knowledge-dates.txt | tail -n 1)"
+          latest_file="${latest_entry#*$'\t'}"
+          latest_slug="$(basename "$latest_file" .md)"
+          latest_image="$(sed -n 's/^  image:[[:space:]]*//p' "$latest_file" | head -n 1 | tr -d '"')"
+          if [ -z "$latest_slug" ]; then
+            echo "::error::Kein veröffentlichter Fachbeitrag im Content-Modell gefunden."
+            exit 1
+          fi
+          article_path="fachwissen/${latest_slug}/index.html"
           article_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; ls $article_path; quit"
           article_listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$article_script")"
           printf '%s\n' "$article_listing" | grep -Eq ' index\.html$'
           echo "Fachbeitrag: $article_path vorhanden"
+
+          if [ -n "$latest_image" ]; then
+            image_path="${latest_image#/}"
+            image_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; ls $image_path; quit"
+            image_listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$image_script")"
+            printf '%s\n' "$image_listing" | grep -Eq ' [^ ]+\.(jpg|jpeg|png|webp)$'
+            echo "Fachbeitragsbild: $image_path vorhanden"
+          fi
 
           if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
             echo "::error::$SFTP_REMOTE_DIR/dist/ wurde unerwartet angelegt."
@@ -273,12 +294,22 @@ jobs:
           fi
           echo "/intern/fensterpruefung-bonn/: HTTP $status OK"
 
-          # 5. Der heutige Fachbeitrag
-          article_url="https://www.sv-netzwerk.eu/fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/"
+          # 5. Der neueste Fachbeitrag aus dem Content-Modell
+          latest_entry=""
+          while IFS= read -r file; do
+            published_at="$(sed -n 's/^  publishedAt:[[:space:]]*//p' "$file" | head -n 1)"
+            if [ -n "$published_at" ]; then
+              printf '%s\t%s\n' "$published_at" "$file"
+            fi
+          done < <(find src/content/knowledge -maxdepth 1 -type f -name '*.md' -print | sort) > /tmp/knowledge-dates.txt
+          latest_entry="$(sort /tmp/knowledge-dates.txt | tail -n 1)"
+          latest_file="${latest_entry#*$'\t'}"
+          latest_slug="$(basename "$latest_file" .md)"
+          article_url="https://www.sv-netzwerk.eu/fachwissen/${latest_slug}/"
           status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
             -o /dev/null -w '%{http_code}' "$article_url" || true)"
           if [ "$status" != "200" ]; then
             echo "::error::$article_url liefert HTTP $status statt 200."
             exit 1
           fi
-          echo "Fachbeitrag: HTTP $status OK"
+          echo "Fachbeitrag: HTTP $status OK ($article_url)"
