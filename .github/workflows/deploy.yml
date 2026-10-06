@@ -199,7 +199,7 @@ jobs:
           article_source="deploy-site/fachwissen/${latest_slug}/index.html"
           article_target="fachwissen/${latest_slug}/index.html"
           test -f "$article_source"
-          article_lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR/fachwissen; mkdir ${latest_slug}; put $article_source -o ${latest_slug}/index.html;"
+          article_lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; put $article_source -o $article_target;"
           if [ -n "$latest_image" ]; then
             image_path="${latest_image#/}"
             test -f "deploy-site/$image_path"
