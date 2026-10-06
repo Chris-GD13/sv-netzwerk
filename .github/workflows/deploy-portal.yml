@@ -116,6 +116,14 @@ jobs:
           chmod 600 ~/.ssh/portal_key
           ssh-keyscan -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           echo "set sftp:connect-program \"ssh -a -x -i $HOME/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes\"" > ~/.lftp/rc
+      - name: PDF-Seitenprüfung auf dem Portalserver sicherstellen
+        env:
+          SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+        run: |
+          ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT" "$SFTP_USERNAME@$SFTP_HOST" 'set -e; command -v qpdf >/dev/null || (apt-get update && apt-get install --yes qpdf); test -x /usr/bin/qpdf'
+
       - name: SFTP-Stammverzeichnis gegen Domain-Dokumentenstamm verifizieren
         env:
           SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}

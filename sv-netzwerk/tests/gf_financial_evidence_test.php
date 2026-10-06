@@ -43,7 +43,7 @@ function gfOpenAI(array $content, string $system, ?int $maxOutputTokens=null): a
         ['document_type'=>'Angebot','issuer'=>'Firma B','number'=>'A-123','pages'=>'10–12','gross'=>1441.57],
     ]]]];
 }
-$file=['id'=>'brief-1','name'=>'Brief_26-1261626.pdf','mimeType'=>'application/pdf','modifiedTime'=>'2026-10-02T10:00:00Z'];
+$file=['id'=>'brief-1','name'=>'Brief_26-1261626.pdf','mimeType'=>'image/jpeg','modifiedTime'=>'2026-10-02T10:00:00Z'];
 $cache[gfEvidenceFileCacheKey($file)]=json_encode(['files'=>[['name'=>$file['name'],'document_type'=>'Brief','facts'=>['Schriftverkehr']]]]);
 $result=gfFinancialExtractCase(1, [$file]);
 check($calls===1 && count($result[0]['files'][0]['financial_documents'])===2, 'Alter Brief-Cache verdeckt eingebettete Finanzbelege.');
@@ -59,6 +59,8 @@ $headingsStart=strpos($core, 'function gfHeadings(');
 $headingsEnd=strpos($core, "\n", $headingsStart);
 eval(substr($core, $headingsStart, $headingsEnd-$headingsStart));
 $registry_repair=true;
+check(gfFinancialPageRanges(71)===[[1,12],[11,22],[21,32],[31,42],[41,52],[51,62],[61,71]], 'Große Sammelakte muss vollständig mit Überlappung gelesen werden.');
+check(!gfFinancialRegisterComplete(['sections'=>[]],[['type'=>'input_text','text'=>json_encode(['files'=>[['financial_documents'=>[['number'=>'R-123']]]]])]]), 'Erkannter Originalbeleg darf im Register nicht fehlen.');
 $repaired=gfFinancialRegisterStructure(['sections'=>[['heading'=>'Abweichend','text'=>'R-123: 250 EUR']]], [['type'=>'input_text','text'=>'Originalbeleg R-123: 250 EUR']], 'Register');
 check(count($repaired['sections'])===6, 'Register muss sechs Abschnitte enthalten.');
 $previousCalls=$calls;
