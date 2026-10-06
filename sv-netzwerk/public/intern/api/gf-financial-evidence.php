@@ -36,8 +36,10 @@ function gfFinancialExtractCase(int $jobId, array $caseFiles): array
         if (gfFinancialEvidenceUsable($cached)) $evidence[] = $cached;
         else $pending[] = $file;
     }
-    foreach (array_chunk($pending, 2) as $index => $chunk) {
-        gfJobUpdate($jobId, 'running', 27, 'Originalbelege werden inhaltlich geprüft, einschließlich Sammelakten und Scans · Gruppe '.($index + 1).' von '.(int)ceil(count($pending) / 2).'.');
+    // One original per request prevents embedded invoice titles from being
+    // confused with separate uploaded files in large insurer bundles.
+    foreach (array_chunk($pending, 1) as $index => $chunk) {
+        gfJobUpdate($jobId, 'running', 27, 'Originalbelege werden inhaltlich geprüft, einschließlich Sammelakten und Scans · Datei '.($index + 1).' von '.count($pending).' · '.(string)($chunk[0]['name'] ?? 'Unterlage').'.');
         $content = [['type' => 'input_text', 'text' => gfFinancialEvidencePrompt()]];
         $sources = [];
         foreach ($chunk as $file) {
@@ -47,10 +49,16 @@ function gfFinancialExtractCase(int $jobId, array $caseFiles): array
             $sources[] = $file;
             $content[] = gfCalculationInputPart($ref);
         }
+        $content[0]['text'].="\n\nVERBINDLICHE ORIGINALDATEILISTE: ".json_encode(array_column($sources, '_evidence_name'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES).". Genau eine Originaldatei wurde beigefügt. Alle enthaltenen Einzelbelege gehören in deren financial_documents-Array, nicht als weitere Dateien in files. Gib für die Originaldatei den oben vorgegebenen Namen aus.";
         $extracted = gfOpenAI($content, 'Du prüfst deutsche Schadenakten vollständig auf Finanzbelege. Klassifiziere nach Originalinhalt, lies alle Seiten, trenne eingebettete Belege und liefere ausschließlich quellengetreues JSON.', 16000);
+        // The source identity is unambiguous for a single-file request even if
+        // the model uses the printed heading instead of the upload filename.
+        if (gfFinancialEvidenceUsable($extracted) && count($extracted['files']) === 1) {
+            $extracted['files'][0]['name'] = $sources[0]['_evidence_name'];
+        }
         $split = gfEvidenceSplitBySource($extracted, $sources);
         if (count($split) !== count($sources) || !gfFinancialEvidenceUsable($extracted)) {
-            throw new RuntimeException('Originalbelegprüfung unvollständig: Nicht alle Dateien wurden mit einer Finanzbelegliste ausgewertet.');
+            throw new RuntimeException('Originalbelegprüfung unvollständig für '.(string)($chunk[0]['name'] ?? 'Unterlage').': Erwartet ist eine Originaldatei mit financial_documents; erhaltene Dateien: '.count(is_array($extracted['files'] ?? null) ? $extracted['files'] : []).'.');
         }
         foreach ($sources as $file) {
             $single = $split[gfEvidenceFileCacheKey($file)];
