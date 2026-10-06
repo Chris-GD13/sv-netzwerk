@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Photovoltaikanlagen nach Sturm- und Hagelschäden fachlich prüfen',
+    description: 'PV-Anlagen nach Sturm oder Hagel werden hinsichtlich Modul-, Montage-, Dach- und Elektroschäden sowie möglicher Ertragsfolgen getrennt und prüffähig bewertet.',
+    href: '/fachwissen/pv-anlage-hagelschaden-pruefung-kostenabgrenzung/',
+    category: 'Gebäudetechnik und Elementarschäden',
+    tags: ['Photovoltaik', 'PV-Anlage', 'Hagelschaden', 'Sturmschaden', 'Elektrosicherheit', 'Kostenprüfung'],
+    date: '2026-10-06',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Sprinkleranlagen nach Auslösung und Wasserschäden fachlich prüfen',
     description: 'Auslöseursache, betroffene Schutzzone, Fachprüfung, Wiederinbetriebnahme und Kosten einer Sprinkleranlage werden nach einem Ereignis getrennt dokumentiert.',
     href: '/fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/',

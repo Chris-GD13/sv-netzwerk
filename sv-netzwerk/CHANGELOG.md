@@ -1,3 +1,10 @@
+## 2026-10-06
+- Fachbeitrag „Photovoltaikanlagen nach Sturm- und Hagelschäden fachlich prüfen“ ergänzt
+- Modul-, Montage-, Dach- und Elektroschäden sowie mögliche Ertragsfolgen getrennt dokumentiert
+- DIN EN 62446-1:2019-04, DGUV Information 203-080, BetrSichV und der Norm-Entwurf DIN EN IEC 62446-1:2026-01 mit Geltungsstatus eingeordnet
+- Beitragsbild, Fachwissensübersicht, Suchindex und Sitemap-Integration ergänzt
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt
+
 ## 2026-10-02
 - Fachbeitrag „Schließanlagen nach Einbruchschäden: Austauschumfang und Kosten prüffähig bestimmen“ ergänzt
 - DIN EN 1303:2026-08, Polizeiberatung, VdS-Anwendungsbereiche sowie §§ 249 BGB, 82 und 83 VVG mit Geltungsstatus dokumentiert
