@@ -1,0 +1,21 @@
+Status: prepared-not-posted
+Datum: 06.10.2026
+Titel: Photovoltaikanlagen nach Sturm- und Hagelschäden fachlich prüfen
+URL: https://www.sv-netzwerk.eu/fachwissen/pv-anlage-hagelschaden-pruefung-kostenabgrenzung/
+
+Nach Sturm oder Hagel ist eine Photovoltaikanlage nicht durch eine reine Sichtprüfung wieder freigegeben.
+
+Für eine belastbare Schadenprüfung müssen mindestens getrennt dokumentiert werden:
+
+• Ereignis und konkrete Einwirkung
+• Modul-, Rahmen- und Befestigungsschäden
+• Dachanschlüsse und Leitungswege
+• elektrische Sicherheit und fachliche Freigabe
+• Reparatur- und Entsorgungskosten
+• ein möglicher Ertrags- oder Betriebsunterbrechungsschaden
+
+Der neue Fachbeitrag zeigt eine prüffähige Vorgehensweise für Sachverständige, Versicherer und Großschadenregulierer. Besonders wichtig: Der bei DIN Media ausgewiesene Stand DIN EN IEC 62446-1:2026-01 ist ein Norm-Entwurf und ersetzt keine geltende Regel.
+
+Mehr: https://www.sv-netzwerk.eu/fachwissen/pv-anlage-hagelschaden-pruefung-kostenabgrenzung/
+
+#Photovoltaik #Hagelschaden #Sturmschaden #Schadenregulierung #Sachverständige
