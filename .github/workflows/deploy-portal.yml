@@ -82,6 +82,7 @@ jobs:
           php tests/gf_evidence_cache_test.php
           php tests/gf_saved_calculation_test.php
           php tests/gf_case_isolation_test.php
+          php tests/kva_bundle_test.php
 
       - name: Ausschließlich Portaldateien vorbereiten
         run: |

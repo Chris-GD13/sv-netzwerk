@@ -234,7 +234,7 @@ function krV2Handle(array $user): void
         }
         $folder = trim((string)($_REQUEST['folder_id'] ?? ''));
         requireCaseFolderAccess($folder, $user);
-        if ($action === 'files') apiJson(['ok'=>true,'files'=>krKvas($folder)]);
+        if ($action === 'files') apiJson(['ok'=>true,'files'=>krCalculationFiles($folder)]);
         if ($action === 'calculation_analyze') {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
             if (isset($_FILES['file']) && is_uploaded_file((string)($_FILES['file']['tmp_name'] ?? ''))) {
