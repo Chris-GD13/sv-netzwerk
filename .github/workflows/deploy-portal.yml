@@ -123,6 +123,7 @@ jobs:
           SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
         run: |
           ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT" "$SFTP_USERNAME@$SFTP_HOST" 'set -e; command -v qpdf >/dev/null || (apt-get update && apt-get install --yes qpdf); test -x /usr/bin/qpdf'
+          ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT" "$SFTP_USERNAME@$SFTP_HOST" 'runuser -u www-data -- sh -c '\''set -e; t=$(mktemp --suffix=.pdf); trap "rm -f $t" EXIT; qpdf --empty "$t"; qpdf --show-npages "$t"'\'''
 
       - name: SFTP-Stammverzeichnis gegen Domain-Dokumentenstamm verifizieren
         env:

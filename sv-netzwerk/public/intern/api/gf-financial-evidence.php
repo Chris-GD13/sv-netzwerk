@@ -102,6 +102,15 @@ function gfFinancialUploadPart(string $path, string $name): string
     return $id;
 }
 
+function gfFinancialTempPdf(string $prefix): string
+{
+    $base=tempnam(sys_get_temp_dir(),$prefix);
+    if ($base===false) throw new RuntimeException('PDF-Prüfdatei konnte nicht angelegt werden.');
+    $path=$base.'.pdf';
+    if (!rename($base,$path)) { @unlink($base); throw new RuntimeException('PDF-Prüfdatei konnte nicht benannt werden.'); }
+    return $path;
+}
+
 function gfFinancialReadOriginal(array $file, array $content, int $jobId): array
 {
     $system='Du prüfst deutsche Schadenakten vollständig auf Finanzbelege. Klassifiziere nach Originalinhalt, lies alle Seiten, trenne eingebettete Belege und liefere ausschließlich quellengetreues JSON.';
@@ -109,8 +118,7 @@ function gfFinancialReadOriginal(array $file, array $content, int $jobId): array
     if (!is_executable('/usr/bin/qpdf')) throw new RuntimeException('PDF-Seitenprüfung ist auf dem Portalserver nicht verfügbar.');
     $download=gfDriveDownload($file);
     if (!$download) throw new RuntimeException('PDF-Original konnte nicht gelesen werden.');
-    $source=tempnam(sys_get_temp_dir(),'gf-original-');
-    if ($source===false) throw new RuntimeException('PDF-Prüfdatei konnte nicht angelegt werden.');
+    $source=gfFinancialTempPdf('gf-original-');
     $parts=[];
     try {
         if (file_put_contents($source,$download['bytes'])===false) throw new RuntimeException('PDF-Prüfdatei konnte nicht geschrieben werden.');
@@ -120,8 +128,7 @@ function gfFinancialReadOriginal(array $file, array $content, int $jobId): array
         $documents=[]; $points=[]; $ranges=gfFinancialPageRanges($pages);
         foreach ($ranges as $index=>[$start,$end]) {
             gfJobUpdate($jobId,'running',27,'Sammelakte wird seitenweise geprüft · Originalseiten '.$start.'–'.$end.' von '.$pages.' · Block '.($index+1).' von '.count($ranges).'.');
-            $part=tempnam(sys_get_temp_dir(),'gf-pages-');
-            if ($part===false) throw new RuntimeException('PDF-Seitenblock konnte nicht angelegt werden.');
+            $part=gfFinancialTempPdf('gf-pages-');
             $parts[]=$part;
             gfFinancialCommand(['/usr/bin/qpdf',$source,'--pages','.',$start.'-'.$end,'--',$part]);
             $partId=gfFinancialUploadPart($part,'Originalseiten-'.$start.'-'.$end.'.pdf');
