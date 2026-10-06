@@ -235,7 +235,9 @@ jobs:
             image_listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$image_script")"
             printf '%s\n' "$image_listing" | grep -Eq ' [^ ]+\.(jpg|jpeg|png|webp)$'
             echo "Fachbeitragsbild: $image_path vorhanden"
-          fi          if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
+          fi
+
+          if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
             echo "::error::$SFTP_REMOTE_DIR/dist/ wurde unerwartet angelegt."
             exit 1
           fi
@@ -305,7 +307,7 @@ jobs:
           latest_slug="$(basename "$latest_file" .md)"
           article_url="https://www.sv-netzwerk.eu/fachwissen/${latest_slug}/"
           status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
-            -o /dev/null -w '%{http_code}' "$article_url" || true)
+            -o /dev/null -w '%{http_code}' "$article_url" || true)"
           if [ "$status" != "200" ]; then
             echo "::error::$article_url liefert HTTP $status statt 200."
             exit 1
