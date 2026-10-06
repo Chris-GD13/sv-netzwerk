@@ -3,11 +3,25 @@ declare(strict_types=1);
 require_once __DIR__ . '/config.php';
 commonHeaders();
 $user = requireAuth();
-if (!in_array($user['role'] ?? '', ['administrator', 'projektleiter'], true)) apiError(403, 'Keine Berechtigung für die Bestandsaktualisierung.');
+if (!in_array($user['role'] ?? '', ['administrator', 'projektleiter', 'pruefer', 'sachverstaendiger'], true)) apiError(403, 'Keine Berechtigung für die Bestandsaktualisierung.');
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') apiError(405, 'Nur POST ist zulässig.');
 
 $payload = json_decode((string)file_get_contents('php://input'), true);
 $password = is_array($payload) ? trim((string)($payload['password'] ?? '')) : '';
+$storage = __DIR__ . '/storage';
+$secretFile = $storage . '/insurance-knowledge-source.secret';
+$master = env('APP_SECRET', '');
+if ($master === '') apiError(503, 'Zentrale Importverschlüsselung ist nicht konfiguriert.');
+$key = hash('sha256', 'sv-netzwerk:insurance-knowledge-source:' . $master, true);
+if ($password === '' && is_file($secretFile)) {
+    $saved = json_decode((string)file_get_contents($secretFile), true);
+    if (is_array($saved) && isset($saved['iv'], $saved['tag'], $saved['value'])) {
+        $decoded = base64_decode((string)$saved['value'], true);
+        $iv = base64_decode((string)$saved['iv'], true);
+        $tag = base64_decode((string)$saved['tag'], true);
+        if (is_string($decoded) && is_string($iv) && is_string($tag)) $password = (string)(openssl_decrypt($decoded, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag) ?: '');
+    }
+}
 if ($password === '') apiError(422, 'Passwort für die Originalfreigabe fehlt.');
 
 $token = 'BBCwxbB4tyRdi6M';
@@ -60,7 +74,11 @@ if (!$files) apiError(502, 'Die Originalfreigabe enthält keine Unterlagen.');
 $static = __DIR__ . '/insurance-knowledge-index.json';
 $old = is_file($static) ? json_decode((string)file_get_contents($static), true) : [];
 $data = ['generated_at' => gmdate('c'), 'source' => 'SR-Netzwerk Originalfreigabe', 'file_count' => count($files), 'files' => $files, 'sparkassen_workbook' => is_array($old) ? ($old['sparkassen_workbook'] ?? []) : []];
-$storage = __DIR__ . '/storage';
 if (!is_dir($storage) && !mkdir($storage, 0750, true) && !is_dir($storage)) apiError(500, 'Importordner konnte nicht angelegt werden.');
+if (!is_file($secretFile)) {
+    $iv = random_bytes(12); $tag = ''; $cipher = openssl_encrypt($password, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+    if ($cipher === false || file_put_contents($secretFile, json_encode(['iv' => base64_encode($iv), 'tag' => base64_encode($tag), 'value' => base64_encode($cipher)], JSON_UNESCAPED_SLASHES), LOCK_EX) === false) apiError(500, 'Importpasswort konnte nicht zentral gespeichert werden.');
+    @chmod($secretFile, 0600);
+}
 if (file_put_contents($storage . '/insurance-knowledge-live.json', json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT), LOCK_EX) === false) apiError(500, 'Aktualisierter Bestand konnte nicht gespeichert werden.');
 apiJson(['ok' => true, 'generated_at' => $data['generated_at'], 'file_count' => count($files)]);
