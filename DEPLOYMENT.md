@@ -54,16 +54,25 @@ Die `PORTAL_*`-Secrets müssen im Repository gesetzt sein, bevor der
 Portal-Workflow erfolgreich laufen kann.
 ## Öffentliche Website (`.github/workflows/deploy.yml`)
 
+Stand 06.10.2026: Die auf `fix/website-deploy-vps` erfolgreich geprüfte
+Serverzuordnung ist auch im Website-Workflow auf `main` hinterlegt. Beide
+Deployments verwenden den neuen IONOS-VPS mit `PORTAL_SFTP_*` und
+`PORTAL_SSH_KEY`; ihre Upload-Pakete und Marker bleiben getrennt. Der
+Website-Upload schließt `intern/`, `.env` und `.htaccess` weiterhin aus.
+Vor dem Upload muss eine zufällige Probedatei aus `PORTAL_SFTP_REMOTE_DIR`
+unter der öffentlichen Domain mit identischem Inhalt erreichbar sein.
+Nach dem Upload muss `/deploy-version.txt` exakt den Deployment-Commit
+ausweisen und der jeweils neueste Fachbeitrag HTTP 200 liefern.
+
 Die kanonische Adresse ist `https://www.sv-netzwerk.eu`; die `.htaccess` leitet
 HTTP und den Host ohne `www` auf HTTPS mit `www` um. Der Website-Workflow baut
 das Astro-Projekt, überträgt den Website-Anteil von `dist/` (ohne `intern/`) per
-SFTP und nutzt dasselbe Secret `SFTP_REMOTE_DIR`. Das Portal ist davon getrennt
+SFTP und nutzt das Secret `PORTAL_SFTP_REMOTE_DIR`. Das Portal ist davon getrennt
 (eigener Workflow, eigener Marker `/intern/deploy-version.txt`). Der Website-
-Workflow prüft die SFTP-Zuordnung bisher nicht per Probedatei; solange der Pfad
-unbestätigt ist, gilt auch für ihn: ein Upload allein ist kein Erfolg.
+Workflow prüft die SFTP-Zuordnung per Probedatei; ein Upload allein ist kein Erfolg.
 
-Zugangsdaten kommen ausschließlich aus den GitHub-Actions-Secrets `SFTP_HOST`,
-`SFTP_USERNAME`, `SFTP_PASSWORD`, `SFTP_PORT`, `SFTP_REMOTE_DIR`. Niemals Werte
+Zugangsdaten kommen ausschließlich aus den GitHub-Actions-Secrets `PORTAL_SFTP_HOST`,
+`PORTAL_SFTP_USERNAME`, `PORTAL_SSH_KEY`, `PORTAL_SFTP_PORT`, `PORTAL_SFTP_REMOTE_DIR`. Niemals Werte
 in Logs, Quellcode oder Dokumentation schreiben.
 
 ## IONOS-Laufzeit
