@@ -10,6 +10,7 @@ function gfEvidenceFileSignature(array $file): array
         'modified' => (string)($file['modifiedTime'] ?? ''),
         'name' => (string)($file['name'] ?? ''),
         'mime' => (string)($file['mimeType'] ?? ''),
+        'backend' => function_exists('gfCaseStorageLocal') && gfCaseStorageLocal((string)($file['id'] ?? '')) ? 'ionos' : 'external',
     ];
 }
 
