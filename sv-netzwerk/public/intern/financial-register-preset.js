@@ -23,7 +23,6 @@ if (typeof document !== 'undefined') {
     note.addEventListener('input', sync);
     note.addEventListener('focus', sync);
     document.addEventListener('click', event => { if (!event.target.closest?.('.vf-financial-preset')) sync(); });
-    window.addEventListener('focus', sync);
     sync();
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
