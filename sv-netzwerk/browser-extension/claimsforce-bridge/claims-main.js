@@ -60,7 +60,8 @@
       seenClaims.set(id, {
         id,
         label: String(insurerClaimId || previous.label || '').slice(0, 100),
-        listVersion: listVersion(value) || previous.listVersion || ''
+        listVersion: listVersion(value) || previous.listVersion || '',
+        createdAt: String(value.createdAt || value.created || previous.createdAt || '')
       });
     }
     Object.values(value).forEach(entry => inspectClaims(entry, planningContext, depth + 1));

@@ -103,7 +103,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       const parsed = Date.parse(String(value || ''));
       return Number.isFinite(parsed) ? parsed : NaN;
     };
-    const include = entered => !Number.isFinite(sinceTime) || (Number.isFinite(dateTime(entered)) && dateTime(entered) >= sinceTime);
+    const include = entered => !Number.isFinite(sinceTime) || !Number.isFinite(dateTime(entered)) || dateTime(entered) >= sinceTime;
     const collect = () => {
       for (const row of document.querySelectorAll('table tbody tr,[role="row"]')) {
         const anchor = row.querySelector('a[href*="/claims/"]');
