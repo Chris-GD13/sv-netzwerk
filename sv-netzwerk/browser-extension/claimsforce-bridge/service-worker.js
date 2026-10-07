@@ -117,8 +117,11 @@ async function scanKussJobs() {
   if (!result?.ok) throw new Error('KUSS-Auftragsliste konnte nicht gelesen werden.');
   return { ...result, jobs: Array.isArray(result.jobs) ? result.jobs : [] };
 }
-chrome.runtime.onInstalled.addListener(() => scheduleDailyImportAlarm().then(catchUpMorningImport).catch(() => {}));
-chrome.runtime.onStartup.addListener(() => scheduleDailyImportAlarm().then(catchUpMorningImport).catch(() => {}));
+async function preloadCredentials() {
+  for (const profile of SUPPORTED_PROFILES) await credentialsFor(profile).catch(() => null);
+}
+chrome.runtime.onInstalled.addListener(() => { preloadCredentials(); scheduleDailyImportAlarm().then(catchUpMorningImport).catch(() => {}); });
+chrome.runtime.onStartup.addListener(() => { preloadCredentials(); scheduleDailyImportAlarm().then(catchUpMorningImport).catch(() => {}); });
 scheduleDailyImportAlarm().catch(() => {});
 
 async function diagnostic(run, phase, text, details = {}) {
@@ -138,10 +141,13 @@ async function credentialsFor(profile) {
   }
   credentialDiagnostic = 'native-host';
   try {
-    const local = await Promise.race([
-      chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile }),
-      sleep(800).then(() => null)
-    ]);
+    let local = null;
+    for (let attempt = 0; attempt < 2 && !(local?.email && local?.password); attempt++) {
+      local = await Promise.race([
+        chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile }).catch(() => null),
+        sleep(8000).then(() => null)
+      ]);
+    }
     if (local?.email && local?.password && credentialMatchesProfile(profile, local)) {
       await saveCredentials(profile, local).catch(() => {});
       credentialDiagnostic = 'native-host-ready';
