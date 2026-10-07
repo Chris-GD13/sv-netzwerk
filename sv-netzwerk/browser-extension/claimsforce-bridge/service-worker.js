@@ -280,9 +280,15 @@ async function readOpenTasks(tabId) {
   await chrome.tabs.update(tabId, { url: 'https://web.claimsforce.com/tasks' });
   await waitTab(tabId);
   await sleep(1800);
-  for (let attempt = 0; attempt < 40; attempt++) {
+  let lastValue = null, stable = 0;
+  for (let attempt = 0; attempt < 60; attempt++) {
     const result = await chrome.tabs.sendMessage(tabId, { type: 'READ_OPEN_TASKS' }).catch(() => null);
-    if (Number.isInteger(result?.openTasks)) return Math.max(0, result.openTasks);
+    if (Number.isInteger(result?.openTasks)) {
+      const value = Math.max(0, result.openTasks);
+      stable = value === lastValue ? stable + 1 : 1;
+      lastValue = value;
+      if (stable >= 8 && (result.rows || 0) <= value) return value;
+    }
     if (result?.debug) lastTaskDebug = result.debug;
     await sleep(250);
   }
