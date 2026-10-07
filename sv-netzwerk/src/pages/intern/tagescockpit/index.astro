@@ -154,7 +154,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   }
 
   const wait=milliseconds=>new Promise(resolve=>setTimeout(resolve,milliseconds));
-  let claimsAutoChecked=false;
+  let claimsAutoChecked=false,claimsCheckFailed=false;
   async function loadClaims(force=false){
     let data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1');
     if(force){
@@ -163,11 +163,12 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
         if(window.svnetClaimsTaskCheck){
           setSystem('claims','warn','ClaimsForce-Aufgaben werden automatisch aktualisiert …');
           window.dispatchEvent(new CustomEvent('svnet:claims-task-check'));
+          claimsCheckFailed=true;
           for(let attempt=0;attempt<60;attempt++){
             await wait(1500);
             data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1');
             const item=(data.items||[]).find(row=>row.profile===profile);
-            if(item?.source_job_id&&item.source_job_id!==null&&item.updated_at){break}
+            if(item?.source_job_id&&item.source_job_id!==null&&item.updated_at){claimsCheckFailed=false;break}
           }
         }
       }
@@ -177,7 +178,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     const renderCount=(item,countId,summaryId)=>{
       const known=item?.open_count!==null&&item?.open_count!==undefined&&Number.isFinite(Number(item.open_count));
       $(countId).textContent=known?String(item.open_count):'–';
-      $(summaryId).textContent=known?`${item.open_count} offene ClaimsForce-Aufgaben`:'Noch kein bestätigter Aufgabenstand';
+      $(summaryId).textContent=known?`${item.open_count} offene ClaimsForce-Aufgaben`:(claimsCheckFailed?'Prüfung nicht abgeschlossen – bitte unter „Versicherungsfälle → Claims-Zugangsdaten verwalten“ die Anmeldung prüfen und die Erweiterung neu laden.':'Noch kein bestätigter Aufgabenstand');
     };
     renderCount(own,'dc-claims-count','dc-claims-summary');
     const maurer=items.find(item=>item.profile==='jens');
