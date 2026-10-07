@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "timezone": "Europe/Berlin",
+  "days": {
+    "2026-10-07": {
+      "publication_id": "2026-10-07-waermepumpe-ueberflutung-pruefung-kostenabgrenzung",
+      "article": {
+        "title": "Wärmepumpen nach Überflutung: Prüfung und Kosten fachlich abgrenzen",
+        "slug": "waermepumpe-ueberflutung-pruefung-kostenabgrenzung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/waermepumpe-ueberflutung-pruefung-kostenabgrenzung/",
+        "status": "published-verified",
+        "commit": "d6b944195376e9799a13796416e79f911d5b578d",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/37604005751",
+        "verification_note": "Detailseite, Datum, Inhalt und deploy-version.txt am 07.10.2026 direkt geprüft; ursprünglicher Live-Zeitpunkt nicht nachträglich erfunden."
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
+    }
+  }
+}

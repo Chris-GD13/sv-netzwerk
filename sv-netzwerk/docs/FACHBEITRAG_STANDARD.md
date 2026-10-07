@@ -1,3 +1,7 @@
+# Aktuelle Auftragsfreigabe vom 07.10.2026
+
+Täglich genau ein Fachartikel um 06:00 Europe/Berlin, anschließend dessen verifizierten Live-Stand ab 07:00 auf Christian Wächters persönlichem LinkedIn-Profil veröffentlichen. Diese ausdrückliche Nutzerfreigabe ersetzt für diesen täglichen Auftrag frühere Arbeitstags-/Zwei-Slot-Regeln und Beschränkungen auf lediglich vorbereitete LinkedIn-Texte. Alle fachlichen Qualitätsvorgaben unten bleiben verbindlich. Der gemeinsame Doppelveröffentlichungsschutz ist in FACHBEITRAG_AUTOMATION.md beschrieben.
+
 # Fachbeitragsstandard SV-Netzwerk
 
 Stand: 09.08.2026
