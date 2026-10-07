@@ -72,7 +72,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     const uniqueCounts = [...new Set(counts)];
     const onTasks = location.pathname.startsWith('/tasks');
     const count = onTasks && uniqueCounts.length === 1 ? uniqueCounts[0] : null;
-    sendResponse({ ok: Number.isInteger(count), openTasks: count, debug: { path: location.pathname, candidates: uniqueCounts, samples } });
+    const rows = [...document.querySelectorAll('button,a')].filter(node => visible(node) && /^Überprüfen$/i.test(clean(node.textContent))).length;
+    sendResponse({ ok: Number.isInteger(count), openTasks: count, rows, debug: { path: location.pathname, candidates: uniqueCounts, samples } });
     return;
   }
   if (message?.type === 'SCRAPE_ALL_CLAIMS') {
