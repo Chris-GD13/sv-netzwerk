@@ -141,10 +141,10 @@ async function credentialsFor(profile) {
   }
   credentialDiagnostic = 'native-host';
   try {
-    let local = null;
+    let local = null, nativeError = '';
     for (let attempt = 0; attempt < 2 && !(local?.email && local?.password); attempt++) {
       local = await Promise.race([
-        chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile }).catch(() => null),
+        chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile }).catch(error => { nativeError = String(error?.message || error).slice(0, 80); return null; }),
         sleep(8000).then(() => null)
       ]);
     }
@@ -154,11 +154,12 @@ async function credentialsFor(profile) {
       return { value: local, source: 'native-host' };
     }
     if (local?.email && local?.password) credentialDiagnostic = 'native-host-profile-mismatch';
+    else credentialDiagnostic = nativeError ? `native-host-fehler: ${nativeError}` : (local?.error ? `native-host-antwort: ${String(local.error).slice(0, 80)}` : 'native-host-keine-antwort');
   } catch {}
-  credentialDiagnostic = 'local-config';
+  credentialDiagnostic = ` > local-config`;
   try {
     const configResponse = await fetch(chrome.runtime.getURL('local-config.json'));
-    if (!configResponse.ok) { credentialDiagnostic = `local-config-http-${configResponse.status}`; return null; }
+    if (!configResponse.ok) { credentialDiagnostic = `-http-${configResponse.status}`; return null; }
     const config = await configResponse.json();
     credentialDiagnostic = 'loopback-request';
     const endpoint = new URL('/credentials', config.url || 'http://127.0.0.1:47831');
@@ -388,7 +389,7 @@ async function runImport(run) {
   await resetClaimsSession(run);
   const credential = await credentialsFor(profile);
   await diagnostic(run, 'CF-CRED-01', credential ? 'Zugangsdatenquelle ist verfügbar.' : 'Für das Profil ist keine Zugangsdatenquelle verfügbar.', { source: credential?.source || 'keine' });
-  if (!credential) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar.');
+  if (!credential) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar. Ursache: ' + (credentialDiagnostic || 'unbekannt') + '.');
   if (!credentialMatchesProfile(profile, credential.value)) throw new Error('[CF-CRED-02] Das gespeicherte ClaimsForce-Konto gehört nicht zum ausgewählten Bearbeiterprofil.');
   const { tab, token } = await claimsTab(profile, run, credential);
   await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
