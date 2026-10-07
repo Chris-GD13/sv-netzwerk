@@ -78,6 +78,7 @@
   window.svnetClaimsTaskCheck=true;
   window.addEventListener('svnet:claims-task-check',async event=>{
     window.svnetClaimsTaskError='';
+    for(let i=0;i<20&&userJobs.length;i++)await new Promise(r=>setTimeout(r,500));
     if(userJobs.length){window.svnetClaimsTaskError='Es läuft bereits eine ClaimsForce-Prüfung.';return}
     await enqueue('tasks',String(event.detail?.profile||''));
     if(!userJobs.length)window.svnetClaimsTaskError=state.textContent||'Prüfauftrag konnte nicht angelegt werden.';
