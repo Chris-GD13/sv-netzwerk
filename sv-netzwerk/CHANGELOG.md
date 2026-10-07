@@ -475,3 +475,8 @@
 - VdS 2091, VdS CEA 4001, BetrSichV sowie §§ 82 und 83 VVG mit Quellenstand, Geltungsstatus und praktischer Bedeutung dokumentiert
 - Fachwissensübersicht, Kategorie-, Tag-, Suchindex- und Sitemap-Integration für den Build vorbereitet
 - LinkedIn-Begleittext als `prepared-not-posted` abgelegt; geprüftes Beitragsbild integriert
+
+## 2026-10-07
+- Fachbeitrag „Wärmepumpen nach Überflutung: Prüfung und Kosten fachlich abgrenzen“ mit Quellenprüfung, Fachgrenzen, fiktivem Praxisbeispiel und bauteilbezogener Kostenprüfung ergänzt.
+- Bibliothek, Kategorie und Tags integriert; Detailroute, Suchindex und Sitemap werden im Astro-Build erzeugt.
+- LinkedIn-Begleittext vorbereitet; Veröffentlichung ohne Beitragsbild gemäß Fachbeitragsstandard.
