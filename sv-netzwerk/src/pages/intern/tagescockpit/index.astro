@@ -154,29 +154,28 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   }
 
   const wait=milliseconds=>new Promise(resolve=>setTimeout(resolve,milliseconds));
-  let claimsAutoChecked=false,claimsCheckFailed=false;
+  let claimsAutoChecked=false;const claimsFailedProfiles=new Set();
   async function loadClaims(force=false){
     let data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1');
-    if(force){
-      const profile=String(data.selected_profile||'').trim();
-      if(profile){
-        if(window.svnetClaimsTaskCheck){
-          setSystem('claims','warn','ClaimsForce-Aufgaben werden automatisch aktualisiert …');
-          const before=Number((data.items||[]).find(row=>row.profile===profile)?.source_job_id||0);
-          window.dispatchEvent(new CustomEvent('svnet:claims-task-check'));
-          claimsCheckFailed=true;
-          for(let attempt=0;attempt<60;attempt++){
-            await wait(1500);
-            data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1');
-            const item=(data.items||[]).find(row=>row.profile===profile);
-            if(Number(item?.source_job_id||0)>before){claimsCheckFailed=false;break}
-          }
+    if(force&&window.svnetClaimsTaskCheck){
+      const own=String(data.selected_profile||'').trim();
+      const profiles=[own,...((data.items||[]).some(row=>row.profile==='jens')&&own!=='jens'?['jens']:[])].filter(Boolean);
+      claimsFailedProfiles.clear();
+      for(const profile of profiles){
+        const before=Number((data.items||[]).find(row=>row.profile===profile)?.source_job_id||0);
+        setSystem('claims','warn','ClaimsForce-Aufgaben werden automatisch aktualisiert …');
+        window.dispatchEvent(new CustomEvent('svnet:claims-task-check',{detail:{profile}}));
+        let done=false;
+        for(let attempt=0;attempt<60&&!done;attempt++){
+          await wait(1500);
+          data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1');
+          done=Number((data.items||[]).find(row=>row.profile===profile)?.source_job_id||0)>before;
         }
+        if(!done)claimsFailedProfiles.add(profile);
       }
-    }
-    const items=data.items||[];
+    }    const items=data.items||[];
     const own=items.find(item=>item.profile===data.selected_profile)||items.find(item=>item.profile!=='jens');
-    const renderCount=(item,countId,summaryId)=>{
+    const renderCount=(item,countId,summaryId)=>{const claimsCheckFailed=claimsFailedProfiles.has(item?.profile);
       const known=item?.open_count!==null&&item?.open_count!==undefined&&Number.isFinite(Number(item.open_count));
       $(countId).textContent=known?String(item.open_count):'–';
       $(summaryId).textContent=known?`${item.open_count} offene ClaimsForce-Aufgaben`:(claimsCheckFailed?(window.svnetClaimsTaskError||'Prüfung nicht abgeschlossen – bitte unter „Versicherungsfälle → Claims-Zugangsdaten verwalten“ die Anmeldung prüfen und die Erweiterung neu laden.'):'Noch kein bestätigter Aufgabenstand');

@@ -68,18 +68,18 @@
     }catch(e){show('Importstatus konnte nicht wiederhergestellt werden: '+e.message,true)}
   }
 
-  const enqueue=async(mode)=>{
+  const enqueue=async(mode,targetProfile='')=>{
     if(userJobs.length)return;
     if(context.claims_agent&&!bridge){show('Diese zentrale Importstation ist nicht bereit.',true);return}
     button.disabled=true;if(fullButton)fullButton.disabled=true;
-    try{const profile=selectedProfile(),payload={profile};if(mode==='full'){payload.mode='full';payload.since=sinceInput?.value||''}if(mode==='tasks')payload.mode='tasks';userJobs=[];userJobs.push((await post('enqueue',payload)).job.id);show(mode==='full'?'Vollständiger ClaimsForce-Abgleich wurde übergeben.':mode==='tasks'?'ClaimsForce-Aufgaben werden automatisch aktualisiert.':'Importauftrag wurde an die zentrale Importstation übergeben.');watch()}
+    try{const profile=targetProfile||selectedProfile(),payload={profile};if(mode==='full'){payload.mode='full';payload.since=sinceInput?.value||''}if(mode==='tasks')payload.mode='tasks';userJobs=[];userJobs.push((await post('enqueue',payload)).job.id);show(mode==='full'?'Vollständiger ClaimsForce-Abgleich wurde übergeben.':mode==='tasks'?'ClaimsForce-Aufgaben werden automatisch aktualisiert.':'Importauftrag wurde an die zentrale Importstation übergeben.');watch()}
     catch(e){button.disabled=false;if(fullButton)fullButton.disabled=false;userJobs=[];show(e.message,true)}
   };
   window.svnetClaimsTaskCheck=true;
-  window.addEventListener('svnet:claims-task-check',async()=>{
+  window.addEventListener('svnet:claims-task-check',async event=>{
     window.svnetClaimsTaskError='';
     if(userJobs.length){window.svnetClaimsTaskError='Es läuft bereits eine ClaimsForce-Prüfung.';return}
-    await enqueue('tasks');
+    await enqueue('tasks',String(event.detail?.profile||''));
     if(!userJobs.length)window.svnetClaimsTaskError=state.textContent||'Prüfauftrag konnte nicht angelegt werden.';
   });
   // Der Hauptbutton startet den vollständigen Falllistenimport. Der frühere
