@@ -172,7 +172,7 @@ async function credentialsFor(profile) {
       return { value: local, source: 'loopback' };
     }
     return null;
-  } catch (error) { credentialDiagnostic = `local-fallback-${String(error?.name || 'error').toLowerCase()}`; return null; }
+  } catch (error) { credentialDiagnostic = `${credentialDiagnostic.split(' > ')[0]} > local-fallback-${String(error?.name || 'error').toLowerCase()}`; return null; }
 }
 
 async function tokenValue(profile) {
