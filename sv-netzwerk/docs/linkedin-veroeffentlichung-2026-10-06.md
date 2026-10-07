@@ -27,3 +27,14 @@ Der bisherige 06:00-Uhr-Fachartikelauftrag erstellte nur einen LinkedIn-Begleitt
 Der Auftrag läuft lokal in Codex und benötigt einen verfügbaren Rechner, die laufende Codex-App sowie die verbundene und angemeldete Chrome-Sitzung Christian. Anmeldung oder CAPTCHA dürfen nicht umgangen werden; ein solcher Blocker muss ausdrücklich gemeldet werden. Wenn kein heutiger Fachartikel live vorliegt, darf kein alter Beitrag als heutiger ausgegeben werden. Bei verzögertem Website-Deployment soll der Auftrag begrenzt bis 08:00 Uhr nachprüfen.
 
 Die Einrichtung und der angemeldete Zugriff sind geprüft. Der erste automatisch veröffentlichte Beitrag dieses neuen Auftrags wird erst beim nächsten erfolgreichen Lauf nachweisbar sein; heute wurde bewusst kein Duplikat als Test veröffentlicht.
+
+
+## Ergänzung 07.10.2026 – ausgeführte Korrektur
+
+Nutzerfreigabe: „ja, bitte entsprechend anpassen, der Linkedin ist noch zu veröffentlichen“. Bestehende lokale Automationen sind ACTIVE: Fachartikel täglich 06:00, LinkedIn täglich 07:00 Europe/Berlin; beide projektlos mit sauberem Worktree des kanonischen Repositorys, keine SV-Portal-Zuordnung. Historischer einmaliger Nachholauftrag ist PAUSED. Die zusätzliche ChatGPT-Aufgabe „Täglicher SV-Netzwerk-Fachartikel“ wurde in Chrome pausiert; „Pausiert · Täglich um 6:00“ und Menü „Fortsetzen“ geprüft.
+
+Der heutige Wärmepumpenartikel war bereits live; kein zweiter Websiteartikel wurde erstellt. Live-Deployment: d6b944195376e9799a13796416e79f911d5b578d, https://github.com/Chris-GD13/sv-netzwerk/actions/runs/37604005751, deploy-version.txt und Detailseite geprüft.
+
+Heute auf Christian Wächters persönlichem Profil veröffentlicht und direkt verifiziert: https://www.linkedin.com/feed/update/urn:li:activity:7513552787721306112/ . Fachlicher Text, kanonischer Artikelverweis, ImageGen-Symbolbild mit KI-Kennzeichnung und Alt-Text sichtbar. Verifiziert am 07.10.2026 12:57 Europe/Berlin. Dies ist die autorisierte manuelle Nachholung; der erste unbeaufsichtigte automatische Lauf bleibt noch nachzuweisen.
+
+Gemeinsamer Doppelveröffentlichungsschutz: FACHBEITRAG_AUTOMATION.md, scripts/publication-day-guard.mjs und fachbeitrag-tagesregister.json. Die LinkedIn-Reservierung wurde vor dem Absenden auf main bestätigt; nach Live-Prüfung mit Permalink abgeschlossen. Drei gezielte Tests bestehen, einschließlich konkurrierender Tagesreservierungen und Freigabezeit. CSV: fehlerhafte Commit-/Live-Spalten vom 04.10. korrigiert; Artikelcommit und sichtbarer LinkedIn-Status vom 05.10. ergänzt. Alte Statusmeldungen sind kein Freibrief für erneutes Absenden.
