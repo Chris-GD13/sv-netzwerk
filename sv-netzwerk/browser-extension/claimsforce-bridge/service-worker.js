@@ -287,6 +287,7 @@ async function readOpenTasks(tabId) {
       const value = Math.max(0, result.openTasks);
       stable = value === lastValue ? stable + 1 : 1;
       lastValue = value;
+      lastTaskDebug = { ...(result.debug || {}), rows: result.rows || 0, value };
       if (stable >= 8 && (result.rows || 0) <= value) return value;
     }
     if (result?.debug) lastTaskDebug = result.debug;
@@ -403,7 +404,7 @@ async function runImport(run) {
   await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks, reader: lastTaskDebug });
   if(run.mode==='tasks'){
     if(!Number.isInteger(openTasks))throw new Error(`[CF-TASKS-04] Zaehler nicht lesbar. ${lastTaskDebug?.path || '?'}; K=${JSON.stringify(lastTaskDebug?.candidates || [])}; ${(lastTaskDebug?.samples || []).filter(t => t.startsWith('Umfeld')).slice(0, 2).join(' // ').replace(/Umfeld: /g, '')}`.slice(0, 480));
-    return { claims: 0, openTasks, taskCheck: true, updated: 0, skipped: 0 };
+    return { claims: 0, openTasks, taskCheck: true, updated: 0, skipped: 0, bridge: BRIDGE_VERSION, rows: lastTaskDebug?.rows ?? null };
   }
   const claimsById = new Map(), bucketCounts = {};
   if (fullSync) {
