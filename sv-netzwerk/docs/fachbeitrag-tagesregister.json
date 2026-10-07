@@ -14,8 +14,12 @@
         "verification_note": "Detailseite, Datum, Inhalt und deploy-version.txt am 07.10.2026 direkt geprüft; ursprünglicher Live-Zeitpunkt nicht nachträglich erfunden."
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "reserved",
+        "owner": "codex-20261007-manual-followup",
+        "reserved_at": "2026-10-07T10:54:57.080Z",
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/waermepumpe-ueberflutung-pruefung-kostenabgrenzung/"
       }
     }
-  }
+  },
+  "updated_at": "2026-10-07T10:54:57.080Z"
 }
