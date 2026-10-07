@@ -288,7 +288,7 @@ async function readOpenTasks(tabId) {
       stable = value === lastValue ? stable + 1 : 1;
       lastValue = value;
       lastTaskDebug = { ...(result.debug || {}), rows: result.rows || 0, value };
-      if (stable >= 8 && (result.rows || 0) <= value) return value;
+      if (stable >= (value === 0 ? 30 : 8) && (result.rows || 0) <= value) return value;
     }
     if (result?.debug) lastTaskDebug = result.debug;
     await sleep(250);

@@ -69,12 +69,23 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       const value = badge && (badge[1] || badge[2]);
       if (value !== undefined) counts.push(Number(value));
     }
-    const uniqueCounts = [...new Set(counts)];
-    const onTasks = location.pathname.startsWith('/tasks');
-    const count = onTasks && uniqueCounts.length === 1 ? uniqueCounts[0] : null;
+    const navBadges = [];
+    for (const node of document.querySelectorAll('a,button,[role="tab"]')) {
+      if (!visible(node)) continue;
+      const match = clean(node.textContent).match(/^Aufgaben\s*(\d{1,5})$/i);
+      if (match) navBadges.push(Number(match[1]));
+    }
     const rows = [...document.querySelectorAll('button,a')].filter(node => visible(node) && /^Überprüfen$/i.test(clean(node.textContent))).length;
-    sendResponse({ ok: Number.isInteger(count), openTasks: count, rows, debug: { path: location.pathname, candidates: uniqueCounts, samples } });
-    return;
+    const headerVisible = [...document.querySelectorAll('th,[role="columnheader"]')].some(node => visible(node) && /^Schadennummer$/i.test(clean(node.textContent)));
+    const onTasks = location.pathname.startsWith('/tasks');
+    const uniqueBadges = [...new Set(navBadges)];
+    let count = null;
+    if (onTasks) {
+      if (uniqueBadges.length === 1) count = uniqueBadges[0];
+      else if (rows > 0) count = rows;
+      else if (headerVisible) count = 0;
+    }
+    sendResponse({ ok: Number.isInteger(count), openTasks: count, rows, debug: { path: location.pathname, candidates: [...uniqueBadges, 'rows=' + rows, 'header=' + headerVisible], samples } });    return;
   }
   if (message?.type === 'SCRAPE_ALL_CLAIMS') {
     const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
