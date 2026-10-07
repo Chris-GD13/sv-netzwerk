@@ -285,6 +285,7 @@ async function readOpenTasks(tabId) {
     if (result?.debug) lastTaskDebug = result.debug;
     await sleep(250);
   }
+  if (!lastTaskDebug) lastTaskDebug = { path: `keine Antwort der Seite (${safeRoute((await chrome.tabs.get(tabId).catch(() => ({})))?.url || '')})`, candidates: [], samples: [] };
   return null;
 }
 
@@ -394,7 +395,7 @@ async function runImport(run) {
   const openTasks = await readOpenTasks(tab.id);
   await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks, reader: lastTaskDebug });
   if(run.mode==='tasks'){
-    if(!Number.isInteger(openTasks))throw new Error('Kein eindeutiger sichtbarer Aufgabenstand aus ClaimsForce gelesen.');
+    if(!Number.isInteger(openTasks))throw new Error(`[CF-TASKS-04] Kein eindeutiger sichtbarer Aufgabenstand gelesen. Seite: ${lastTaskDebug?.path || 'unbekannt'}; Kandidaten: ${JSON.stringify(lastTaskDebug?.candidates || [])}; Texte: ${JSON.stringify((lastTaskDebug?.samples || []).slice(0, 6))}`.slice(0, 480));
     return { claims: 0, openTasks, taskCheck: true, updated: 0, skipped: 0 };
   }
   const claimsById = new Map(), bucketCounts = {};
