@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Wärmepumpen nach Überflutung: Prüfung und Kosten fachlich abgrenzen',
+    description: 'Überflutete Wärmepumpen werden anhand von Anlagenbefund, Fachprüfung, Wiederinbetriebnahme und schadenbedingten Kosten nachvollziehbar bewertet.',
+    href: '/fachwissen/waermepumpe-ueberflutung-pruefung-kostenabgrenzung/',
+    category: 'Gebäudetechnik und Elementarschäden',
+    tags: ['Wärmepumpe', 'Überflutung', 'Elektrosicherheit', 'Wiederinbetriebnahme', 'Kostenprüfung'],
+    date: '2026-10-07',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Photovoltaikanlagen nach Sturm- und Hagelschäden fachlich prüfen',
     description: 'PV-Anlagen nach Sturm oder Hagel werden hinsichtlich Modul-, Montage-, Dach- und Elektroschäden sowie möglicher Ertragsfolgen getrennt und prüffähig bewertet.',
     href: '/fachwissen/pv-anlage-hagelschaden-pruefung-kostenabgrenzung/',
