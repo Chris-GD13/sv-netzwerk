@@ -76,7 +76,12 @@
     catch(e){button.disabled=false;if(fullButton)fullButton.disabled=false;userJobs=[];show(e.message,true)}
   };
   window.svnetClaimsTaskCheck=true;
-  window.addEventListener('svnet:claims-task-check',()=>{enqueue('tasks')});
+  window.addEventListener('svnet:claims-task-check',async()=>{
+    window.svnetClaimsTaskError='';
+    if(userJobs.length){window.svnetClaimsTaskError='Es läuft bereits eine ClaimsForce-Prüfung.';return}
+    await enqueue('tasks');
+    if(!userJobs.length)window.svnetClaimsTaskError=state.textContent||'Prüfauftrag konnte nicht angelegt werden.';
+  });
   // Der Hauptbutton startet den vollständigen Falllistenimport. Der frühere
   // Schnellimport las nur die beiden Planungsansichten „Mit Termin“ und „Ohne Termin“.
   button.addEventListener('click',()=>enqueue('full'));
