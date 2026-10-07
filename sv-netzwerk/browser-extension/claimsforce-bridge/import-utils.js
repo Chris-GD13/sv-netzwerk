@@ -9,7 +9,13 @@ export function mergeOnlyBlank(existing, incoming) {
 const text = value => typeof value === 'string' || typeof value === 'number' ? String(value).trim() : '';
 const path = (object, value) => value.split('.').reduce((current, part) => current?.[part], object);
 const first = (object, paths) => { for (const candidate of paths) { const value = text(path(object, candidate)); if (value) return value; } return ''; };
-const personName = value => text(value) || [value?.firstName, value?.lastName].map(text).filter(Boolean).join(' ');
+const personName = value => text(value) || [value?.name?.givenName ?? value?.givenName ?? value?.firstName, value?.name?.familyName ?? value?.familyName ?? value?.lastName].map(text).filter(Boolean).join(' ') || text(value?.name) || text(value?.companyName);
+const reserveText = value => {
+  if (!value || typeof value !== 'object' || !Number.isFinite(Number(value.amount))) return '';
+  const precision = Number.isInteger(Number(value.precision)) ? Number(value.precision) : 2;
+  const amount = Number(value.amount) / 10 ** precision;
+  return amount.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + (text(value.currency) || 'EUR');
+};
 
 const deepObjects = (value, depth = 0, seen = new Set()) => {
   if (!value || typeof value !== 'object' || depth > 7 || seen.has(value)) return [];
@@ -69,7 +75,7 @@ function addressFrom(value) {
     const parsed = addressFrom(nested);
     if (parsed.street || parsed.postalCode || parsed.city) return parsed;
   }
-  const streetName = addressPart(value, ['street', 'streetAddress', 'addressLine1', 'streetName', 'road']);
+  const streetName = addressPart(value, ['street', 'streetAddress', 'addressLine1', 'line1', 'streetName', 'road']);
   const houseNumber = addressPart(value, ['houseNumber', 'streetNumber']);
   return {
     street: [streetName, houseNumber].filter(Boolean).join(' '),
@@ -101,7 +107,7 @@ export function mapClaim(claim, communication = {}, appointments = [], stakehold
   ]);
   return {
     schaden_nr: first(claim, ['insurerClaimId', 'claimNumber', 'externalId', 'number']),
-    versicherungsschein_nr: first(claim, ['policyNumber', 'insurancePolicyNumber', 'contractNumber']) || deepFirst(allSources, ['policyNumber', 'insurancePolicyNumber', 'contractNumber', 'insuranceNumber', 'versicherungsscheinNr', 'vertragsnummer']),
+    versicherungsschein_nr: first(claim, ['policyNumber', 'insurancePolicyNumber', 'contractNumber', 'insurerPolicyId']) || deepFirst(allSources, ['policyNumber', 'insurancePolicyNumber', 'contractNumber', 'insuranceNumber', 'versicherungsscheinNr', 'vertragsnummer']),
     vn_objekt: personName(policyholder) || first(claim, ['policyholderName', 'objectName']) || deepFirst(allSources, ['policyholderName', 'insuredName', 'versicherungsnehmer']),
     strasse: addressFrom(policyAddress).street || addressFrom(policyholder).street || '',
     plz: addressFrom(policyAddress).postalCode || addressFrom(policyholder).postalCode || '',
@@ -109,8 +115,8 @@ export function mapClaim(claim, communication = {}, appointments = [], stakehold
     schaden_strasse: damage.street || '',
     schaden_plz: damage.postalCode || '',
     schaden_ort: damage.city || '',
-    schadenart: first(claim, ['damageType.name', 'damageType', 'damage.name', 'damage']),
-    reserve: first(claim, ['reserve', 'reserveAmount', 'claimAmount']),
+    schadenart: first(claim, ['damageType.name', 'damageType', 'damage.name', 'damage', 'danger.dangerId']),
+    reserve: first(claim, ['reserve', 'reserveAmount', 'claimAmount']) || reserveText(claim?.reserve),
     telefon: first(policyholder, ['phone', 'phoneNumber', 'landline']),
     mobil: first(policyholder, ['mobile', 'mobilePhone', 'cellPhone']),
     email: first(policyholder, ['email', 'emailAddress']),
