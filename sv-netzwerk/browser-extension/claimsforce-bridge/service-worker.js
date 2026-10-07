@@ -396,7 +396,7 @@ async function runImport(run) {
   const openTasks = await readOpenTasks(tab.id);
   await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks, reader: lastTaskDebug });
   if(run.mode==='tasks'){
-    if(!Number.isInteger(openTasks))throw new Error(`[CF-TASKS-04] Kein eindeutiger sichtbarer Aufgabenstand gelesen. Seite: ${lastTaskDebug?.path || 'unbekannt'}; Kandidaten: ${JSON.stringify(lastTaskDebug?.candidates || [])}; Texte: ${JSON.stringify((lastTaskDebug?.samples || []).slice(0, 6))}`.slice(0, 480));
+    if(!Number.isInteger(openTasks))throw new Error(`[CF-TASKS-04] Zaehler nicht lesbar. ${lastTaskDebug?.path || '?'}; K=${JSON.stringify(lastTaskDebug?.candidates || [])}; ${(lastTaskDebug?.samples || []).filter(t => t.startsWith('Umfeld')).slice(0, 2).join(' // ').replace(/Umfeld: /g, '')}`.slice(0, 480));
     return { claims: 0, openTasks, taskCheck: true, updated: 0, skipped: 0 };
   }
   const claimsById = new Map(), bucketCounts = {};

@@ -57,10 +57,17 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       const text = clean(node.textContent);
       if (!text || text.length > 40 || !/Alle/i.test(text)) continue;
       if (samples.length < 8) samples.push(text);
+      let found = false;
       for (const pattern of patterns) {
         const match = text.match(pattern);
-        if (match) { counts.push(Number(match[1])); break; }
+        if (match) { counts.push(Number(match[1])); found = true; break; }
       }
+      if (found || !/^Alle$/i.test(text)) continue;
+      const around = [node.nextElementSibling, node.previousElementSibling, node.parentElement?.nextElementSibling, node.parentElement].map(item => clean(item?.textContent));
+      if (samples.length < 14) samples.push('Umfeld: ' + around.map(item => item.slice(0, 30)).join(' | '));
+      const badge = around.slice(0, 3).map(item => item.match(/^\(?\[?(\d{1,5})\)?\]?$/)).find(Boolean) || clean(node.parentElement?.textContent).match(/^Alle\s*[(\[]?\s*(\d{1,5})\s*[)\]]?$|^(\d{1,5})\s*Alle$/i);
+      const value = badge && (badge[1] || badge[2]);
+      if (value !== undefined) counts.push(Number(value));
     }
     const uniqueCounts = [...new Set(counts)];
     const onTasks = location.pathname.startsWith('/tasks');
