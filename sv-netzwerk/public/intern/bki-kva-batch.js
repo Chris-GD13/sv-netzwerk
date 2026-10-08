@@ -2,20 +2,21 @@
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = value => new Intl.NumberFormat('de-DE', {style:'currency',currency:'EUR'}).format(Number(value) || 0);
   const amount = row => Number(row.offered_total) || (Number(row.offered_unit_price) || 0) * Number(row.quantity);
-  const sourceLines = (row, result) => result.priced_components ? [
-    ...result.priced_components.map(component=>({...component,source_position_code:component.position_code,regional_factor:1,bki_scope_checked:result.status==='ready',bki_batch_checked:true,kva_source_position:row.source_position,kva_description:row.description,kva_scope:row.scope,bki_note:(result.open_items||[]).map(item=>item.label).join('; ')||result.reason,comparison_basis:result.status==='ready'?'bki':'bki_partial'})),
-    ...(result.status==='ready'?[]:[{description:'Noch nicht bepreist · '+row.description,quantity:1,unit:'psch',unit_price:0,regional_factor:1,comparison_basis:'kva_open',source_name:'Offene Teilleistungen · kein Preis angesetzt',kva_source_position:row.source_position,kva_description:row.description,kva_scope:row.scope,bki_note:(result.open_items||[]).map(item=>item.label).join('; ')||result.reason,offered_total:amount(row)}]),
-  ] : result.status === 'ready' ? result.components.map(component => ({
-    ...component, description: component.description, source_position_code: component.position_code,
-    regional_factor: 1, bki_scope_checked: true, bki_batch_checked: true,
-    kva_source_position: row.source_position, kva_description: row.description, kva_scope: row.scope,
-    bki_note: result.reason, comparison_basis: 'bki',
-  })) : [{
-    description: row.description, quantity: Number(row.quantity), unit: row.unit,
-    unit_price: Number(row.offered_unit_price) || amount(row) / Number(row.quantity),
-    regional_factor: 1, source_name: 'KVA-Angebotspreis · BKI-Abgleich offen',
-    kva_source_position: row.source_position, kva_description: row.description,
-    bki_note: result.reason, comparison_basis: 'kva_open',
+  // A price comparison must preserve the complete offered service and its quantities.
+  const comparisonTotal = (row,result) => result.status==='ready'
+    ? (result.calculated_net ?? (result.components||[]).reduce((sum,c)=>sum+c.quantity*c.unit_price,0))
+    : amount(row);
+  const sourceLines = (row,result) => [{
+    description:row.description, quantity:Number(row.quantity), unit:row.unit,
+    unit_price:comparisonTotal(row,result)/Number(row.quantity), regional_factor:1,
+    offered_total:amount(row), offered_unit_price:row.offered_unit_price,
+    kva_source_position:row.source_position, kva_description:row.description,kva_scope:row.scope,
+    bki_scope_checked:result.status==='ready',bki_batch_checked:true,
+    comparison_basis:result.status==='ready'?'bki':'kva_open',
+    source_name:result.status==='ready'?'BKI-Vergleichspreis für vollständige KVA-Leistung':'KVA-Angebotspreis erhalten · Preisprüfung offen',
+    bki_note:result.reason,
+    bki_price_evidence:result.priced_components||result.components||[],
+    bki_open_items:result.open_items||[],
   }];
   function replaceGroup(existing, group, lines) {
     const identity = value => String(value || '').toLocaleLowerCase('de-DE').replace(/[^\p{L}\p{N}]/gu,'');
@@ -53,14 +54,13 @@
         let proposed = 0, offered = 0;
         const rendered = data.positions.map((result, i) => {
           const row = rows[Number(result.row_id)] || rows[i];offered += amount(row);
-          const total = catalog ? result.calculated_net : result.status === 'ready' ? result.components.reduce((sum,c) => sum + c.quantity * c.unit_price, 0) : amount(row);proposed += total||0;
+          const total = comparisonTotal(row,result);proposed += total||0;
           return `<tr><td>${esc(row.source_position)}</td><td>${esc(row.description)}${(result.open_items||[]).length?'<small style="display:block">Offen: '+(result.open_items||[]).map(item=>esc(item.label)).join(' · ')+'</small>':''}<details><summary>Begründung und Quelle</summary><p>${esc(row.scope || "")}</p><p>${esc(result.reason)}</p>${(result.status==='ready'?result.components:(result.source_candidates||[]).filter(c=>c.evidence_verified)).map(c=>`<p>${c.scope_issue?'<em>Nicht addiert: '+esc(c.scope_issue)+'</em><br>':result.status==='ready'?'':'<em>Belegter Teilpreis; Gesamtleistung weiterhin offen.</em><br>'}<strong>${esc(c.position_code)} · ${esc(c.description)}</strong><br>${c.quantity_verified?esc(c.quantity)+' '+esc(c.unit)+' × '+money(c.unit_price):money(c.unit_price)+' / '+esc(c.unit)+' · Menge offen'}<br>${esc(c.source_name)}${c.source_page?' · '+esc(c.source_page):' · Originalauszug'}<br>${esc(c.source_quote)}${c.source_url?'<br><a href="'+esc(c.source_url)+'" target="_blank" rel="noopener">Originalfundstelle öffnen</a>':''}</p>`).join('')}</details></td><td>${money(amount(row))}</td><td>${result.status==='ready'?'BKI belegt':'BKI offen · KVA bleibt'}</td><td>${money(total)}</td></tr>`;
         }).join('');
-        results.innerHTML = `<div class="bk-batch-table"><table><thead><tr><th>KVA</th><th>Leistung</th><th>Angebot netto</th><th>Grundlage</th><th>${catalog?'Berechnet netto':'Entwurf netto'}</th></tr></thead><tbody>${rendered}</tbody></table></div><p>Angebot: ${money(offered)} · ${catalog?'Aus Originalpreisen berechnet':'Vergleichsentwurf'}: ${money(proposed)}. ${catalog&&open?'Diese Summe enthält nur belegte Teilleistungen. Offene Teile sind noch nicht bepreist; Angebotspreise werden nicht als Berechnung ausgegeben.':open?'Enthält Angebotspreise für offene Leistungen; noch keine vollständige BKI-Vergleichssumme.':'Alle ausgewählten Leistungen sind durch BKI-Fundstellen belegt.'} Regionalfaktor ist nicht belegt und wird nicht ergänzt.</p>`;
-        if(catalog){results.querySelectorAll('tbody tr').forEach((tr,i)=>{const result=data.positions[i];tr.cells[3].textContent=result.status==='ready'?'Vollständig berechnet':result.status==='partial'?'Teilbetrag · offene Teile':'Noch nicht bepreist';tr.cells[4].textContent=result.calculated_net===null?'—':money(result.calculated_net);});}
+        results.innerHTML = `<div class="bk-batch-table"><table><thead><tr><th>KVA</th><th>Leistung</th><th>Angebot netto</th><th>Grundlage</th><th>Vergleich netto</th></tr></thead><tbody>${rendered}</tbody></table></div><p>Angebot: ${money(offered)} · Vergleichsentwurf: ${money(proposed)}. ${open?'Mengen, Stückzahlen und Leistungsumfang bleiben aus dem KVA erhalten. Bei unvollständiger Preiszuordnung bleibt der vollständige Angebotspreis bestehen und ist als ungeprüft gekennzeichnet. BKI-Teilpreise sind nur Hinweise in den Details, keine Kürzung.':'Alle ausgewählten Leistungen sind durch BKI-Fundstellen belegt.'} Regionalfaktor ist nicht belegt und wird nicht ergänzt.</p>`;
         if(catalog){
-          const notice=document.createElement('p');notice.textContent=data.planning?'Vorläufige Terminplanung: Nutzerannahmen sind berücksichtigt. Die Werte sind keine abschließende Schadenhöhe.':'Preisrahmen aus Originalquellen; offene Aufmaße können für den Ortstermin gesammelt ergänzt werden.';results.prepend(notice);
-          results.querySelectorAll('tbody tr').forEach((tr,i)=>{const result=data.positions[i];if(result.calculated_net!==null){const range=document.createElement('small');range.style.display='block';range.textContent='von '+money(result.calculated_low)+' bis '+money(result.calculated_high);tr.cells[4].append(range);}else{const priced=(result.source_candidates||[]).filter(c=>c.evidence_verified&&c.scope_issue==='');const rates=priced.slice(0,2).map(c=>money(c.unit_price)+' / '+c.unit);if(rates.length)tr.cells[4].textContent=rates.join(' · ')+' (Menge offen)';}});
+          results.querySelectorAll('tbody tr').forEach((tr,i)=>{const result=data.positions[i];tr.cells[3].textContent=result.status==='ready'?'Vollständiger BKI-Vergleich':'Angebotspreis erhalten · ungeprüft';});
+          const notice=document.createElement('p');notice.textContent='Preisprüfung bei unverändertem KVA-Leistungsumfang. Unvollständige BKI-Teilpreise ersetzen keinen vollständigen Angebotspreis.';results.prepend(notice);
           const taskList=document.createElement('details');taskList.innerHTML='<summary>Gebündelte Angaben für den Ortstermin</summary><ul>'+[...new Set((data.questions||[]).map(q=>q.label).filter(Boolean))].slice(0,8).map(label=>'<li>'+esc(label)+'</li>').join('')+'</ul>';results.append(taskList);
         }
         const questions = new Map();for(const question of data.questions || [])if(question?.label)questions.set(question.key || question.label,question.label);
@@ -68,18 +68,18 @@
         factsPanel.hidden = open === 0;
         factsPanel.querySelector('[data-questions]').innerHTML = [...questions.values()].slice(0,8).map(q=>'<li>'+esc(q)+'</li>').join('') || '<li>Die offenen Leistungen stehen in der Übersicht. Ergänzen Sie vorhandene Angaben zum Leistungsumfang gesammelt.</li>';
         const apply = document.createElement('button');apply.type = 'button';apply.className = 'bk-primary';apply.textContent = 'Vergleichsentwurf in Kalkulation übernehmen';
-        if(catalog)apply.textContent='Berechnete Leistungen und offene Teile übernehmen';
+        if(catalog)apply.textContent='Preisvergleich mit unveränderten KVA-Mengen übernehmen';
         apply.onclick = () => {
           if(pending || apply.disabled)return;
           const before = bridge.getLines();const lines = data.positions.flatMap((result,i)=>sourceLines(rows[Number(result.row_id)]||rows[i],result));
           if(lines.some(line=>!Number.isFinite(line.unit_price)||(!(line.unit_price>0)&&!(catalog&&line.comparison_basis==='kva_open'))||!(line.quantity>0))) {state.textContent='Übernahme gesperrt: Menge oder Preis fehlt.';return;}
           if(data.planning)for(const line of lines){line.bki_scope_checked=false;line.planning_assumptions=data.facts?.notes||'';if(line.comparison_basis==='bki')line.comparison_basis='bki_partial';}
           bridge.setLines(replaceGroup(before,group,lines));apply.disabled = true;
-          state.textContent = catalog?`Nachkalkulation übernommen: ${money(proposed)} belegte Teilleistungen. ${open} Positionen enthalten noch nicht bepreiste Teile.`:`${rows.length} KVA-Leistungen übernommen. ${open} BKI-Zuordnungen bleiben offen; deren Angebotspreise sind erhalten.`;
+          state.textContent = catalog?`Preisvergleich übernommen: ${money(proposed)} netto bei unveränderten KVA-Mengen. ${open} Angebotspreise bleiben ungeprüft erhalten.`:`${rows.length} KVA-Leistungen übernommen. ${open} BKI-Zuordnungen bleiben offen; deren Angebotspreise sind erhalten.`;
           const undo = document.createElement('button');undo.type='button';undo.className='bk-secondary';undo.textContent='Vorherige Kalkulation wiederherstellen';undo.onclick=()=>{bridge.setLines(before);undo.disabled=true;apply.disabled=false;state.textContent='Vorherige Kalkulation wiederhergestellt.';};actions.append(undo);
           document.querySelector('.bk-protocol')?.scrollIntoView({behavior:'smooth',block:'start'});
         };actions.append(apply);
-        state.textContent = catalog?`${rows.length} KVA-Leistungen geprüft · ${money(proposed)} ${data.planning?'vorläufiger':'berechneter'} Teilbetrag · weitere Leistungen noch nicht bepreist.`:`${rows.length} KVA-Leistungen gemeinsam abgeglichen · ${ready} BKI belegt · ${open} offen.`;
+        state.textContent = catalog?`${rows.length} KVA-Leistungen abgeglichen · ${money(proposed)} netto · ${open} Angebotspreise unverändert, Preisprüfung offen.`:`${rows.length} KVA-Leistungen gemeinsam abgeglichen · ${ready} BKI belegt · ${open} offen.`;
       } catch(error) {
         state.textContent = 'BKI-Abgleich fehlgeschlagen: '+error.message+'. Die bestehende Kalkulation wurde nicht verändert.';
         summary.textContent = 'Der Abgleich konnte nicht abgeschlossen werden.';results.replaceChildren();factsPanel.hidden=false;

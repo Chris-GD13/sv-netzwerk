@@ -16,3 +16,9 @@ console.log('BKI batch draft retention and group replacement tests passed');
 
 const variantGroup={...group,kva_company:'BAU | EXPERT',description:'BAU | EXPERT · KVA 0030/2026'};
 assert.equal(batch.replaceGroup(previous,variantGroup,preserved).filter(x=>x.type==='section'&&x.kva_number==='0030/2026').length,1);
+
+const partial=batch.sourceLines(row,{status:'partial',calculated_net:300,priced_components:[{quantity:12,unit:'m',unit_price:25}],reason:'Restleistung offen'});
+assert.equal(partial.length,1);assert.equal(partial[0].quantity,12);assert.equal(partial[0].unit,'m');assert.equal(partial[0].unit_price,165);assert.equal(partial[0].comparison_basis,'kva_open');
+const complete=batch.sourceLines(row,{status:'ready',calculated_net:1800,priced_components:[{quantity:12,unit:'m',unit_price:150}]});
+assert.equal(complete.length,1);assert.equal(complete[0].quantity,12);assert.equal(complete[0].unit,'m');assert.equal(complete[0].unit_price,150);
+console.log('Incomplete catalog prices cannot reduce the offered service; original quantities preserved');
