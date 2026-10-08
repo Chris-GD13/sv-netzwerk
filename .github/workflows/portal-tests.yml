@@ -33,7 +33,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: pdo_mysql, curl
+          extensions: pdo_mysql, pdo_sqlite, mbstring, curl
 
       - name: Falltrennung der KI-Berichte prüfen
         run: php sv-netzwerk/tests/gf_case_isolation_test.php
@@ -57,6 +57,13 @@ jobs:
           php -l sv-netzwerk/public/intern/api/bki-calculator.php
           php -l sv-netzwerk/public/intern/api/bki-settlement-pdf.php
           node sv-netzwerk/tests/bki_kva_import_test.mjs
+
+      - name: IONOS-Preisbestand, Quellen und Planungsvarianten prüfen
+        run: |
+          php sv-netzwerk/tests/bki_library_test.php
+          php sv-netzwerk/tests/bki_catalog_scope_test.php
+          python3 -B sv-netzwerk/tests/bki_library_builder_test.py
+          node sv-netzwerk/tests/bki_batch_ui_test.mjs
 
       - name: KVA-Saniererkontakte vollständig ergänzen
         run: php sv-netzwerk/tests/kva_contact_enrichment_test.php

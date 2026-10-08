@@ -13,6 +13,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
       <div class="bk-title-row bk-kva-head"><div><p class="bk-kicker">KVA vor Ort</p><h2>Kostenvoranschlag nachkalkulieren</h2><p>Unterlage auswählen oder direkt fotografieren – auch Dateien wie „Brief“ werden nach Inhalt gelesen. Bei Sammelakten den enthaltenen KVA auswählen. Die erkannten Positionen werden mit BKI-Vorschlägen abgeglichen. Leistungsumfang und Mengen sind vor der Übernahme zu prüfen.</p></div></div>
       <div class="bk-kva-source"><label>KVA aus dem aktiven Fall<select id="bk-kva-select" disabled><option value="">Bitte zuerst einen Fall öffnen</option></select></label><span>oder</span><div class="bk-kva-upload-options"><label class="bk-kva-file">Datei vom Gerät auswählen<input id="bk-kva-file" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp"></label><label class="bk-kva-file">KVA fotografieren<input id="bk-kva-camera" type="file" accept="image/*" capture="environment"></label></div></div>
       <div class="bk-actions"><button id="bk-kva-read" class="bk-secondary" type="button" disabled>KVA auslesen</button><span id="bk-kva-state" role="status" aria-live="polite"></span></div>
+      <div class="bk-actions"><label>Preisgrundlage<select id="bk-price-basis"><option value="bki">BKI Altbau 2026 · Einzelpositionen und Leistungspakete</option><option value="rpa">RPA-Höchstpreise · nur bei vereinbarter Anwendung</option></select></label><label><input id="bk-rpa-confirmed" type="checkbox">RPA-Höchstpreisliste gilt für diesen Auftrag</label></div>
       <label id="bk-kva-offer-choice" hidden>Enthaltenen KVA auswählen<select id="bk-kva-offer"><option value="">Bitte einen KVA auswählen</option></select></label>
       <div id="bk-kva-review" hidden><div class="bk-kva-review-head"><strong id="bk-kva-title">Erkannte Positionen</strong><label><input id="bk-kva-all" type="checkbox" checked> alle auswählen</label></div><div id="bk-kva-positions" class="bk-kva-positions"></div><div class="bk-actions bk-kva-actions"><button id="bk-kva-copy" class="bk-secondary" type="button">Ausgewählte Positionen 1:1 in die Kalkulation übernehmen</button><button id="bk-kva-calc" class="bk-primary" type="button">KVA gemeinsam mit BKI abgleichen</button><span id="bk-kva-calc-state" role="status" aria-live="polite"></span></div></div>
     </section>
@@ -80,7 +81,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
 </style>
 <script is:inline src="/intern/bki-kva-review.js"></script>
 <script is:inline src="/intern/bki-library.js"></script>
-<script is:inline src="/intern/bki-kva-batch.js?v=20261008-6"></script>
+<script is:inline src="/intern/bki-kva-batch.js?v=20261008-7"></script>
 <script is:inline>
 (()=>{
   const root=document.querySelector('[data-kva-import]');if(!root)return;

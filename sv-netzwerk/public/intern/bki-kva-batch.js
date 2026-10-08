@@ -42,7 +42,7 @@
       pending = true;actions.replaceChildren();factsPanel.querySelector('button').disabled = true;
       state.textContent = 'Der gesamte KVA wird gemeinsam mit den gekauften BKI-Unterlagen abgeglichen …';summary.textContent = 'Leistungsumfang, Mengen und Preisbelege werden zusammen geprüft.';
       try {
-        data = await request('/intern/api/bki-calculator.php?action=compare_kva', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rows,location,case_meta:caseMeta,level,facts:{notes:factsPanel.querySelector('textarea').value.trim()}})});
+        data = await request('/intern/api/bki-calculator.php?action=compare_kva', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rows,location,case_meta:caseMeta,level,basis:document.getElementById('bk-price-basis')?.value||'bki',rpa_confirmed:document.getElementById('bk-rpa-confirmed')?.checked===true,facts:{notes:factsPanel.querySelector('textarea').value.trim()}})});
         const ready = data.positions.filter(row => row.status === 'ready').length;
         const open = rows.length - ready;
         const catalog=data.search_mode==='ionos_catalog';
@@ -77,7 +77,7 @@
           const undo = document.createElement('button');undo.type='button';undo.className='bk-secondary';undo.textContent='Vorherige Kalkulation wiederherstellen';undo.onclick=()=>{bridge.setLines(before);undo.disabled=true;apply.disabled=false;state.textContent='Vorherige Kalkulation wiederhergestellt.';};actions.append(undo);
           document.querySelector('.bk-protocol')?.scrollIntoView({behavior:'smooth',block:'start'});
         };actions.append(apply);
-        state.textContent = `${rows.length} KVA-Leistungen gemeinsam abgeglichen · ${ready} BKI belegt · ${open} offen.`;
+        state.textContent = catalog?`${rows.length} KVA-Leistungen geprüft · ${money(proposed)} ${data.planning?'vorläufiger':'berechneter'} Teilbetrag · weitere Leistungen noch nicht bepreist.`:`${rows.length} KVA-Leistungen gemeinsam abgeglichen · ${ready} BKI belegt · ${open} offen.`;
       } catch(error) {
         state.textContent = 'BKI-Abgleich fehlgeschlagen: '+error.message+'. Die bestehende Kalkulation wurde nicht verändert.';
         summary.textContent = 'Der Abgleich konnte nicht abgeschlossen werden.';results.replaceChildren();factsPanel.hidden=false;
