@@ -355,6 +355,11 @@ async function requestInvestigationList(endpoint, token, name, query, tabId) {
 }
 async function requestInvestigationClaims(endpoint, token, since, tabId) {
   const investigations = [], errors = [];
+  if (tabId) {
+    // Erst die Berichte-Seite öffnen: Nur sie ruft die API auf, damit die Bridge deren Authorization-Header übernehmen kann.
+    await chrome.tabs.sendMessage(tabId, { type: 'OPEN_REPORTS' }).catch(() => null);
+    await sleep(7000);
+  }
   for (const [name, query] of Object.entries(INVESTIGATION_QUERIES)) {
     const result = await requestInvestigationList(endpoint, token, name, query, tabId);
     if (result.list) investigations.push(...result.list); else errors.push(result.error);
