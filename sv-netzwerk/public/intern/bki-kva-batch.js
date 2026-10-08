@@ -37,6 +37,7 @@
     factsPanel.innerHTML = '<strong>Fehlende Angaben einmal für den gesamten KVA ergänzen</strong><ul data-questions></ul><label>Aufmaß / Ausführung / Arbeitsbedingungen<textarea data-facts rows="3" placeholder="Nur bekannte Angaben, z. B. Rohrdurchmesser, Öffnungsfläche, Zugänglichkeit oder Abfallgewicht."></textarea></label><button data-retry type="button">Mit ergänzten Angaben erneut abgleichen</button>';
     host.append(factsPanel);
     factsPanel.querySelector('textarea').value=document.getElementById('bk-known-facts')?.value||'';
+    factsPanel.querySelector('textarea').addEventListener('input',()=>{const known=document.getElementById('bk-known-facts');if(known){known.value=factsPanel.querySelector('textarea').value;known.dispatchEvent(new Event('input',{bubbles:true}));}});
     const actions = document.createElement('div');actions.className = 'bk-actions';host.append(actions);
     let data = null, pending = false;
     const run = async () => {
