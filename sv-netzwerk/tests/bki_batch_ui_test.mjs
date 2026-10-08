@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
-const context={window:{},Intl};vm.createContext(context);vm.runInContext(fs.readFileSync('public/intern/bki-kva-batch.js','utf8'),context);
+const context={window:{},Intl};vm.createContext(context);vm.runInContext(fs.readFileSync(new URL('../public/intern/bki-kva-batch.js',import.meta.url),'utf8'),context);
 const batch=context.window.SVNetBkiBatch;
 const group={description:'BAU-EXPERT · KVA 0030/2026',kva_number:'0030/2026',kva_company:'BAU-EXPERT'};
 const previous=[{description:'Freie Eigenposition',quantity:1,unit_price:50},{type:'section',...group},{description:'Falscher alter Meter-/Flächenansatz'},{type:'section',description:'BKI-Prüfansätze · '+group.description},{description:'Doppelter Ansatz'},{type:'section',description:'Anderer KVA'},{description:'Andere Leistung'}];
