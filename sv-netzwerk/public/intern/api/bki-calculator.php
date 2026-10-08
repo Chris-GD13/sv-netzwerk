@@ -141,7 +141,7 @@ function bkSearch(array $in):array{
   require_once __DIR__.'/bki-library.php';
   $q=trim((string)($in['query']??''));if($q==='')throw new RuntimeException('Leistungsbeschreibung fehlt.');
   if(bklStatus()['positions']<1)throw new RuntimeException('Der IONOS-Preisbestand fehlt.');
-  $positions=bklSearch($q,12);
+  $positions=array_values(array_filter(bklSearch($q,24),fn($p)=>($p['source_kind']??'bki')==='bki'));
   foreach($positions as &$p){$p['regional_factor']=1;$p['source_page']='Seite '.$p['source_page'];$p['note']=$p['scope'];$p['recommended_quantity']=null;}unset($p);
   return ['positions'=>$positions,'regional_factor'=>null,'regional_factor_note'=>'Bundesdurchschnitt; kein belegter Regionalfaktor.','search_mode'=>'ionos_catalog'];
 }

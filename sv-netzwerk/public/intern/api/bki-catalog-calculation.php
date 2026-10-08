@@ -1,6 +1,18 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/bki-library.php';
+function bkCatalogRemoveOverlap(array $components):array {
+  foreach($components as $packet){
+    if(($packet['source_action']??'')!=='Herstellen'||empty($packet['gross_prices'])||empty($packet['quantity_verified'])||($packet['scope_issue']??'')!==''||bkBatchUnit($packet['unit'])!=='m')continue;
+    if(!preg_match('/\b(HT|PP|PE|Guss)\b/iu',$packet['description'],$material)||!preg_match('/DN(?:\/OD)?\s*(\d+)/iu',$packet['description'],$diameter)||!preg_match('/Abwasser|Abfluss/iu',$packet['description']))continue;
+    foreach($components as &$component){
+      if($component['id']===$packet['id']||!empty($component['gross_prices'])||empty($component['quantity_verified'])||bkBatchUnit($component['unit'])!=='m'||abs($component['quantity']-$packet['quantity'])>.00001)continue;
+      if(preg_match('/demont|abbrech|entfern|ausbau/iu',$component['description']))continue;
+      if(preg_match('/Abwasser|Abfluss/iu',$component['description'])&&preg_match('/\b'.preg_quote($material[1],'/').'\b/iu',$component['description'])&&preg_match('/DN(?:\/OD)?\s*'.preg_quote($diameter[1],'/').'(?!\d)/iu',$component['description']))$component['scope_issue']='Im gewählten Leitungspaket '.$packet['position_code'].' enthalten; nicht nochmals addiert.';
+    }unset($component);
+  }
+  return $components;
+}
 function bkCatalogScopeIssue(array $component,array $row,array $facts):string {
   $issue=bkBatchScopeIssue($component,$row,$facts);
   if(preg_match('/Gussrohrleitung.*demontieren/iu',$component['description'])){
@@ -20,7 +32,7 @@ function bkCatalogCalculate(array $rows,array $input):array {
   $key='bki_catalog_v4_'.hash('sha256',json_encode([$status,$rows,$level,$facts,$input['location']??'',$basis],JSON_UNESCAPED_UNICODE));
   $cached=json_decode(bkSettingGet($key,'{}'),true);
   if(isset($cached['positions'])){
-    foreach($cached['positions'] as &$position){$row=$rows[(int)$position['row_id']];foreach($position['source_candidates'] as &$component){$issue=bkCatalogScopeIssue($component,$row,$facts);if($issue!=='')$component['scope_issue']=$issue;}unset($component);$position['priced_components']=array_values(array_filter($position['source_candidates'],fn($c)=>$c['quantity_verified']&&$c['scope_issue']===''));$position['calculated_net']=$position['priced_components']?round(array_sum(array_map(fn($c)=>$c['quantity']*$c['unit_price'],$position['priced_components'])),2):null;if($position['status']==='ready'&&count($position['priced_components'])!==count($position['components'])){$position['components']=[];$position['status']=$position['priced_components']?'partial':'open';}elseif($position['status']!=='ready')$position['status']=$position['priced_components']?'partial':'open';}unset($position);
+    foreach($cached['positions'] as &$position){$row=$rows[(int)$position['row_id']];foreach($position['source_candidates'] as &$component){$issue=bkCatalogScopeIssue($component,$row,$facts);if($issue!=='')$component['scope_issue']=$issue;}unset($component);$position['source_candidates']=bkCatalogRemoveOverlap($position['source_candidates']);$position['priced_components']=array_values(array_filter($position['source_candidates'],fn($c)=>$c['quantity_verified']&&$c['scope_issue']===''));$position['calculated_net']=$position['priced_components']?round(array_sum(array_map(fn($c)=>$c['quantity']*$c['unit_price'],$position['priced_components'])),2):null;foreach(['low','high'] as $range)$position['calculated_'.$range]=$position['priced_components']?round(array_sum(array_map(fn($c)=>$c['quantity']*($c['price_'.$range]??$c['unit_price']),$position['priced_components'])),2):null;if($position['status']==='ready'&&(count($position['priced_components'])!==count($position['components'])||str_contains($row['scope'],'Reinigungsstück'))){$position['components']=[];$position['status']=$position['priced_components']?'partial':'open';}elseif($position['status']!=='ready')$position['status']=$position['priced_components']?'partial':'open';}unset($position);
     $cached['calculated_net']=round(array_sum(array_map(fn($p)=>$p['calculated_net']??0,$cached['positions'])),2);return $cached+['cached'=>true];
   }
   $candidates=[];$pool=[];
@@ -66,7 +78,9 @@ PROMPT;
       if($component['quantity_verified']&&$issue==='')$used[$duplicate]=true;else $ready=false;
       $components[]=$component;
     }
+    $components=bkCatalogRemoveOverlap($components);
     $priced=array_values(array_filter($components,fn($c)=>$c['quantity_verified']&&$c['scope_issue']===''));
+    if(str_contains($row['scope'],'Reinigungsstück')&&!array_filter($priced,fn($c)=>preg_match('/Reinigungs(?:stück|rohr)|Putzstück/iu',$c['description'].' '.$c['source_quote']))){$ready=false;$match['reason']=trim((string)($match['reason']??'')).' Das ausdrücklich geforderte Reinigungsstück ist in den gewählten Originalpreisen nicht gesondert belegt.';}
     $subtotal=round(array_sum(array_map(fn($c)=>$c['quantity']*$c['unit_price'],$priced)),2);
     $low=round(array_sum(array_map(fn($c)=>$c['quantity']*($c['price_low']??$c['unit_price']),$priced)),2);$high=round(array_sum(array_map(fn($c)=>$c['quantity']*($c['price_high']??$c['unit_price']),$priced)),2);
     $positions[]=['row_id'=>$row['row_id'],'source_position'=>$row['source_position'],'description'=>$row['description'],'status'=>$ready&&$priced?'ready':($priced?'partial':'open'),'reason'=>(string)($match['reason']??'Keine passende Preisgrundlage gefunden.'),'components'=>$ready?$priced:[],'source_candidates'=>$components,'priced_components'=>$priced,'calculated_net'=>$priced?$subtotal:null,'calculated_low'=>$priced?$low:null,'calculated_high'=>$priced?$high:null,'offered_total'=>$row['offered_total']??null];

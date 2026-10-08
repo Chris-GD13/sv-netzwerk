@@ -9,3 +9,6 @@ if(bkCatalogScopeIssue($component,$row,['notes'=>'Planungsannahme Gussleitung DN
 $component['scope']='Durchmesser: DN125 bis DN200';$component['description']='Gussrohrleitung demontieren, bis DN200';
 if(bkCatalogScopeIssue($component,$row,['notes'=>'Planungsannahme Gussleitung DN150'])!=='')throw new RuntimeException('Belegte Planungsvariante fehlt.');
 echo "Old-pipe dimensions remain separate from replacement dimensions.\n";
+$parts=[['id'=>'packet','source_action'=>'Herstellen','gross_prices'=>[85,92,109],'quantity_verified'=>true,'scope_issue'=>'','unit'=>'m','quantity'=>12,'description'=>'Abwasser HT-Rohrleitungen DN/OD110 Formteile','position_code'=>'411.10/05'],['id'=>'pipe','quantity_verified'=>true,'scope_issue'=>'','unit'=>'m','quantity'=>12,'description'=>'Abwasserleitung HT-Rohr DN/OD110']];
+$parts=bkCatalogRemoveOverlap($parts);if($parts[1]['scope_issue']==='')throw new RuntimeException('Paket und Einzelrohr wurden doppelt angesetzt.');
+echo "Assembly prices exclude duplicate constituent pipe prices.\n";
