@@ -145,7 +145,7 @@ async function credentialsFor(profile) {
     for (let attempt = 0; attempt < 2 && !(local?.email && local?.password); attempt++) {
       local = await Promise.race([
         chrome.runtime.sendNativeMessage(CREDENTIAL_HOST, { profile }).catch(error => { nativeError = String(error?.message || error).slice(0, 80); return null; }),
-        sleep(8000).then(() => null)
+        sleep(800).then(() => null)
       ]);
     }
     if (local?.email && local?.password && credentialMatchesProfile(profile, local)) {

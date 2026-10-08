@@ -1,0 +1,16 @@
+Wallboxen nach Überflutung: Eine trockene Gehäuseoberfläche ist keine elektrische Freigabe.
+
+Der neue Fachbeitrag zeigt, wie Ladeinfrastruktur nach einem Wassereintritt prüffähig beurteilt wird:
+
+• Wasserstand, Beaufschlagung und betroffene Strompfade bauteilbezogen dokumentieren
+• Außerbetriebnahme, Elektroprüfung und Wiederinbetriebnahme klar trennen
+• Wallbox, Zuleitung, Schutztechnik und Lastmanagement als System betrachten
+• Reparatur, schadenbedingten Austausch und Modernisierung kostenmäßig abgrenzen
+• Norm-Entwürfe nicht mit geltenden technischen Regeln verwechseln
+
+https://www.sv-netzwerk.eu/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung/
+
+#Wallbox #Ladeinfrastruktur #Überflutung #Elektrosicherheit #Schadenregulierung
+
+Bild: /assets/images/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung.jpg
+Status: prepared-not-posted
