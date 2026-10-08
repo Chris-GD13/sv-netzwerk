@@ -72,12 +72,13 @@ function bkBatchValidate(array $raw,array $rows,array $excerpts,array $facts=[])
         $reason.=!$quantityValid?' BKI-Menge bzw. Umrechnung ist nicht belegt.':(!$evidence?' Preis oder Quellenbeleg ist nicht eindeutig nachgewiesen.':' Möglicher Doppelansatz oder ungültiger Preis.');
       }
       $keys[$key]=true;
+      $component['evidence_verified']=$evidence;$component['quantity_verified']=$quantityValid;
       $checked[]=$component;
     }
     if($ready)foreach($keys as $key=>$_)$used[$key]=true;
-    $positions[]=['row_id'=>$row['row_id'],'source_position'=>$row['source_position'],'description'=>$row['description'],'status'=>$ready?'ready':'open','reason'=>$ready?trim((string)($result['reason']??'')):($reason!==''?trim($reason):'Keine vollständige, belegte BKI-Zuordnung gefunden.'),'components'=>$ready?$checked:[],'offered_total'=>$row['offered_total']??null];
+    $positions[]=['row_id'=>$row['row_id'],'source_position'=>$row['source_position'],'description'=>$row['description'],'status'=>$ready?'ready':'open','reason'=>$ready?trim((string)($result['reason']??'')):($reason!==''?trim($reason):'Keine vollständige, belegte BKI-Zuordnung gefunden.'),'components'=>$ready?$checked:[],'source_candidates'=>$checked,'offered_total'=>$row['offered_total']??null];
   }
-  return ['positions'=>$positions,'questions'=>is_array($raw['questions']??null)?$raw['questions']:[]];
+  return ['retrieval_count'=>count($excerpts),'retrieval_sources'=>array_values(array_unique(array_column($excerpts,'filename'))),'positions'=>$positions,'questions'=>is_array($raw['questions']??null)?$raw['questions']:[]];
 }
 
 function bkBatchSearch(array $input): array {
@@ -91,7 +92,7 @@ function bkBatchSearch(array $input): array {
   $store=bkVectorStore();$location=trim((string)($input['location']??''));
   $level=in_array($input['level']??'mid',['low','mid','high'],true)?($input['level']??'mid'):'mid';
   $context=is_array($input['facts']??null)?$input['facts']:[];
-  $key='bki_batch_v3_'.hash('sha256',json_encode([$store,$rows,$location,$level,$context],JSON_UNESCAPED_UNICODE));
+  $key='bki_batch_v4_'.hash('sha256',json_encode([$store,$rows,$location,$level,$context],JSON_UNESCAPED_UNICODE));
   $cached=json_decode(bkSettingGet($key,'{}'),true);
   if(is_array($cached)&&($cached['created']??0)>time()-604800&&isset($cached['data']['positions']))return $cached['data']+['cached'=>true];
   $instructions=<<<'PROMPT'
