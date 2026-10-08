@@ -1,6 +1,14 @@
 const observedClaims = new Map();
+const pendingInvestigations = new Map();
+const requestViaPage = (endpoint, queries) => new Promise(resolve => {
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const timer = setTimeout(() => { pendingInvestigations.delete(id); resolve({ ok: false, status: 0, hasAuth: false, body: 'Zeitlimit' }); }, 60000);
+  pendingInvestigations.set(id, data => { clearTimeout(timer); pendingInvestigations.delete(id); resolve(data); });
+  window.postMessage({ source: 'svnet-claimsforce-bridge', type: 'INVESTIGATIONS_REQUEST', id, endpoint, queries }, location.origin);
+});
 window.addEventListener('message', event => {
   if (event.source !== window || event.origin !== location.origin || event.data?.source !== 'svnet-claimsforce-main') return;
+  if (event.data?.type === 'INVESTIGATIONS_RESPONSE') pendingInvestigations.get(event.data.id)?.(event.data);
   if (event.data?.type === 'TOKEN') {
     try { chrome.runtime.sendMessage({ type: 'CLAIMS_TOKEN', token: event.data.token }).catch(() => {}); } catch {}
   }
@@ -11,12 +19,15 @@ window.addEventListener('message', event => {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === 'FETCH_INVESTIGATIONS') {
-    // Aufruf aus dem Seitenkontext, damit Origin und Header exakt der ClaimsForce-App entsprechen.
-    const headers = new Headers({ 'Content-Type': 'application/json; charset=UTF-8' });
-    if (message.authorization) headers.append('Authorization', message.authorization);
-    fetch(`${String(message.endpoint).replace(/\/+$/, '')}/investigation-list`, { method: 'POST', mode: 'cors', headers, body: JSON.stringify({ queries: message.queries, countsOnly: false }) })
-      .then(async response => sendResponse({ ok: response.ok, status: response.status, via: 'tab', info: [response.headers.get('x-amzn-errortype'), response.headers.get('content-type'), response.headers.get('x-amzn-requestid') ? 'rid' : ''].filter(Boolean).join(','), body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) }))
-      .catch(error => sendResponse({ ok: false, status: 0, via: 'tab', body: String(error?.message || error).slice(0, 120) }));
+    // Zuerst mit dem Authorization-Header, den die ClaimsForce-Seite selbst an diese API sendet.
+    requestViaPage(message.endpoint, message.queries).then(pageResult => {
+      if (pageResult.hasAuth) { sendResponse({ ...pageResult, via: 'seite' }); return; }
+      const headers = new Headers({ 'Content-Type': 'application/json; charset=UTF-8' });
+      if (message.authorization) headers.append('Authorization', message.authorization);
+      return fetch(`${String(message.endpoint).replace(/\/+$/, '')}/investigation-list`, { method: 'POST', mode: 'cors', headers, body: JSON.stringify({ queries: message.queries, countsOnly: false }) })
+        .then(async response => sendResponse({ ok: response.ok, status: response.status, via: 'tab', info: [response.headers.get('x-amzn-errortype'), response.headers.get('content-type')].filter(Boolean).join(','), body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) }))
+        .catch(error => sendResponse({ ok: false, status: 0, via: 'tab', body: String(error?.message || error).slice(0, 120) }));
+    });
     return true;
   }
   if (message?.type === 'OPEN_PLANNING') {

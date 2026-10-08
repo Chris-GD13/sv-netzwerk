@@ -323,7 +323,7 @@ const INVESTIGATION_QUERIES = {
 
 async function requestInvestigationList(endpoint, token, name, query, tabId) {
   const authorizations = [`Bearer ${token}`, token];
-  let last = '';
+  const attempts = [];
   for (let round = 0; round < 2; round++) {
     for (const [index, authorization] of authorizations.entries()) {
       let result = null;
@@ -345,11 +345,13 @@ async function requestInvestigationList(endpoint, token, name, query, tabId) {
       }
       const list = result.body?.results?.[name]?.investigations;
       if (result.ok && Array.isArray(list)) return { list };
-      last = `${name}: ${result.ok ? 'Format' : result.status} [${result.via || '?'}${result.info ? ' ' + result.info : ''}]${result.body && typeof result.body === 'string' ? ` "${result.body.replace(/\s+/g, ' ').slice(0, 80)}"` : ''}${index ? ' (ohne Bearer)' : ''}`;
+      const entry = `${result.ok ? 'Format' : result.status} [${result.via || '?'}${result.info ? ' ' + result.info : ''}]${result.body && typeof result.body === 'string' ? ` "${result.body.replace(/\s+/g, ' ').slice(0, 60)}"` : ''}${index ? ' roh' : ''}`;
+      if (!attempts.includes(entry)) attempts.push(entry);
+      if (result.via === 'seite') break;
     }
     await sleep(1500);
   }
-  return { error: last };
+  return { error: `${name}: ${attempts.join(' | ')}` };
 }
 async function requestInvestigationClaims(endpoint, token, since, tabId) {
   const investigations = [], errors = [];
