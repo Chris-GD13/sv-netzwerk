@@ -315,24 +315,45 @@ async function requestJson(url, token, optional = false, timeout = 20000) {
   } finally { clearTimeout(timer); }
 }
 
+const INVESTIGATION_QUERIES = {
+  sentReports: { status: { in: ['SENT'] }, investigationType: { notEqual: 'ADDENDUM' } },
+  sentFollowUps: { status: { in: ['SENT'] }, investigationType: { equal: 'ADDENDUM' } },
+  openReports: { status: { notIn: ['SENT'] } }
+};
+
+async function requestInvestigationList(endpoint, token, name, query) {
+  let lastStatus = 0;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 60000);
+    try {
+      const response = await fetch(`${String(endpoint).replace(/\/+$/, '')}/investigation-list`, {
+        method: 'POST',
+        headers: { ...authHeaders(token), 'Content-Type': 'application/json; charset=UTF-8' },
+        body: JSON.stringify({ queries: { [name]: query }, countsOnly: false }),
+        signal: controller.signal
+      });
+      lastStatus = response.status;
+      if (response.ok) {
+        const list = (await response.json())?.results?.[name]?.investigations;
+        if (Array.isArray(list)) return { list };
+        lastStatus = 'Format';
+      }
+    } catch (error) { lastStatus = error?.name === 'AbortError' ? 'Zeitlimit' : 'Netzwerk'; }
+    finally { clearTimeout(timer); }
+    await sleep(1500 * (attempt + 1));
+  }
+  return { error: `${name}: ${lastStatus}` };
+}
+
 async function requestInvestigationClaims(endpoint, token, since) {
-  const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
-  try {
-    const response = await fetch(`${String(endpoint).replace(/\/+$/, '')}/investigation-list`, {
-      method: 'POST',
-      headers: { ...authHeaders(token), 'Content-Type': 'application/json; charset=UTF-8' },
-      body: JSON.stringify({ queries: { all: {} }, countsOnly: false }),
-      signal: controller.signal
-    });
-    if (!response.ok) throw new Error(`ClaimsForce-Berichte und Nachträge konnten nicht gelesen werden (${response.status}).`);
-    const payload = await response.json();
-    const investigations = payload?.results?.all?.investigations;
-    if (!Array.isArray(investigations)) throw new Error('ClaimsForce-Berichte und Nachträge haben ein unerwartetes Antwortformat.');
-    return collectInvestigationClaims(investigations, since);
-  } catch (error) {
-    if (String(error?.message || '').startsWith('ClaimsForce-Berichte und Nachträge')) throw error;
-    throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Berichte und Nachträge haben das Zeitlimit überschritten.' : 'ClaimsForce-Berichte und Nachträge konnten nicht geladen werden.');
-  } finally { clearTimeout(timer); }
+  const investigations = [], errors = [];
+  for (const [name, query] of Object.entries(INVESTIGATION_QUERIES)) {
+    const result = await requestInvestigationList(endpoint, token, name, query);
+    if (result.list) investigations.push(...result.list); else errors.push(result.error);
+  }
+  if (errors.length === Object.keys(INVESTIGATION_QUERIES).length) throw new Error(`ClaimsForce-Berichte und Nachträge konnten nicht gelesen werden (${errors.join(', ')}).`);
+  const collected = collectInvestigationClaims(investigations, since);
+  return { ...collected, errors };
 }
 
 async function portal(tabId, message) {
@@ -449,13 +470,14 @@ async function runImport(run) {
     bucketCounts.CLAIM_LIST = allClaims.length;
     bucketCounts.REPORT_RECORDS = claimsFromReports.linkedRecords;
     bucketCounts.REPORTS_AND_ADDENDA = claimsFromReports.claims.length;
-    await progress(portalTabId(), `${claimsById.size} Fälle gefunden: ${allClaims.length} aus der Fallliste und ${claimsFromReports.claims.length} aus Berichten/Nachträgen.`, 0, claimsById.size);
+    await progress(portalTabId(), `${claimsById.size} Fälle gefunden: ${allClaims.length} aus der Fallliste und ${claimsFromReports.claims.length} aus Berichten/Nachträgen.${claimsFromReports.errors.length ? ' Fehlgeschlagene Abfragen: ' + claimsFromReports.errors.join(', ') + '.' : ''}`, 0, claimsById.size);
     await diagnostic(run, 'CF-LIST-05', `${claimsById.size} unterschiedliche Fälle erkannt: ${allClaims.length} aus der Fallliste und ${claimsFromReports.claims.length} aus Berichten/Nachträgen.`, {
       count: claimsById.size,
       claimListCount: allClaims.length,
       investigationRecordCount: claimsFromReports.linkedRecords,
       investigationClaimCount: claimsFromReports.claims.length,
       excludedInvestigationRecords: claimsFromReports.excludedByDate,
+      investigationErrors: claimsFromReports.errors,
       undatedInvestigationRecords: claimsFromReports.undated,
       since: run.since || '',
       pages: scraped?.pages || 0,
