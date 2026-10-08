@@ -17,7 +17,7 @@
 - Sitemap und robots.txt: HTTP 200; Canonical in `sitemap-0.xml`, Sitemap in robots.txt referenziert.
 - Defekte ursprüngliche JPEG-Datei: aus Repository und Live-Server entfernt; direkter Altpfad liefert HTTP 404.
 - Beitragsbildstatus: ohne öffentliches Beitragsbild veröffentlicht.
-- LinkedIn-Status: `prepared-not-posted`; Veröffentlichung bleibt dem gesonderten 07:00-Auftrag vorbehalten.
+- LinkedIn-Status: `published-verified`; am 08.10.2026 um 07:07 Europe/Berlin durch den gesonderten Tagesauftrag veröffentlicht und um 07:13 Europe/Berlin am tatsächlichen Permalink geprüft: https://www.linkedin.com/feed/update/urn:li:activity:7513827399436845056/ . Vollständiger Nachweis: `linkedin-veroeffentlichung-2026-10-08.md`.
 
 ## Prüfungen
 

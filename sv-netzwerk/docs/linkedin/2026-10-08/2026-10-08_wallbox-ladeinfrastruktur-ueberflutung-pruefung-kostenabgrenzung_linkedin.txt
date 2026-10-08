@@ -1,0 +1,23 @@
+Wallbox nach Überflutung: Eine Probeladung ist keine Freigabe.
+
+Auch wenn das Gehäuse wieder trocken ist, bleibt der Anlagenzustand fachlich zu prüfen. Die Wallbox, ihre Zuleitung, die vorgelagerte Verteilung und das Lastmanagement können unterschiedlich betroffen sein.
+
+Für Versicherer, Sachverständige und Schadenregulierer sind aus meiner Sicht fünf Prüfpunkte entscheidend:
+
+• Wasserstand, Einwirkungsdauer und Befunde jedem Ladepunkt eindeutig zuordnen.
+• Wallbox, Zuleitung, Schutzgeräte und Steuerung getrennt erfassen; Vorschäden und andere Störungsursachen prüfen.
+• Sichere Außerbetriebnahme, elektrotechnische Prüfung und Freigabe durch die zuständige Elektrofachkraft dokumentieren.
+• Reparatur oder Austausch anhand von Befund, Prüfergebnissen und Herstelleranforderungen begründen.
+• Schadenbedingte Wiederherstellung, gemeinsame Leistungen und Erweiterungen in der Kostenprüfung getrennt ausweisen.
+
+Die sachverständige Bewertung ersetzt keine elektrotechnische Freigabe. Ein Komplettaustausch braucht eine technische Begründung; die Erstattungsfähigkeit bleibt anhand des konkreten Versicherungsvertrags zu prüfen.
+
+Der heutige Fachartikel erläutert den Prüfweg und die Anforderungen an eine nachvollziehbare Kostenabgrenzung:
+https://www.sv-netzwerk.eu/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung/
+
+Christian Wächter
+Sachverständiger | Regulierung im Komplex- und Großschaden
+
+#Wallbox #Ladeinfrastruktur #Überflutung #Schadenregulierung #Kostenprüfung
+
+Bild: KI-generiertes Symbolbild.

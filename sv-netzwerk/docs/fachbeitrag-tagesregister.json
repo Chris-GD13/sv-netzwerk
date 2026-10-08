@@ -31,9 +31,15 @@
         "status": "published-verified",
         "owner": "codex-2026-10-08-0557",
         "reserved_at": "2026-10-08T04:01:11.632Z",
-        "commit": "85e6cd49c13696ceeb25322458ac8dfbfbfc9f30",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/37726585438",
-        "verified_at": "2026-10-08T04:19:57.575Z"
+        "commit": "773cebae79b1fdb594261394d458ae5de3028c71",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/37728642592",
+        "verified_at": "2026-10-08T05:13:08.568Z",
+        "initial_live_verification": {
+          "commit": "85e6cd49c13696ceeb25322458ac8dfbfbfc9f30",
+          "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/37726585438",
+          "verified_at": "2026-10-08T04:19:57.575Z"
+        },
+        "verification_note": "Finalen Deployment-Commit in deploy-version.txt (HTTP 200), erfolgreichen Actions-Lauf sowie Live-Übersicht und vollständige kanonische Artikelseite am 08.10.2026 geprüft."
       },
       "linkedin": {
         "status": "published-verified",
@@ -41,7 +47,18 @@
         "reserved_at": "2026-10-08T05:02:51.120Z",
         "article_url": "https://www.sv-netzwerk.eu/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung/",
         "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7513827399436845056/",
-        "verified_at": "2026-10-08T05:13:08.568Z"
+        "verified_at": "2026-10-08T05:13:08.568Z",
+        "published_at_berlin": "2026-10-08T07:07+02:00",
+        "published_time_precision": "minute",
+        "verified_at_berlin": "2026-10-08T07:13:08.568+02:00",
+        "profile_url": "https://www.linkedin.com/in/christian-w-156408204/",
+        "proof_document": "docs/linkedin-veroeffentlichung-2026-10-08.md",
+        "text_file": "docs/linkedin/2026-10-08/2026-10-08_wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung_linkedin.txt",
+        "image_file": "docs/linkedin/2026-10-08/2026-10-08_wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung_symbolbild.png",
+        "screenshots": [
+          "docs/linkedin/2026-10-08/2026-10-08_wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung_linkedin-text-live.jpg",
+          "docs/linkedin/2026-10-08/2026-10-08_wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung_linkedin-bild-live.jpg"
+        ]
       }
     }
   },
