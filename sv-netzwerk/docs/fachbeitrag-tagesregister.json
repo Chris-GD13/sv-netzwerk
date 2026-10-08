@@ -36,9 +36,12 @@
         "verified_at": "2026-10-08T04:19:57.575Z"
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "reserved",
+        "owner": "codex-linkedin-20261008-01a119e1-c500-7281-9e92-a26b23bbc98b",
+        "reserved_at": "2026-10-08T05:02:51.120Z",
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung/"
       }
     }
   },
-  "updated_at": "2026-10-08T04:19:57.575Z"
+  "updated_at": "2026-10-08T05:02:51.120Z"
 }
