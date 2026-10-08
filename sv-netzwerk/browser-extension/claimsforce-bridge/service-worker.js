@@ -359,7 +359,7 @@ async function requestInvestigationClaims(endpoint, token, since, tabId) {
     const result = await requestInvestigationList(endpoint, token, name, query, tabId);
     if (result.list) investigations.push(...result.list); else errors.push(result.error);
   }
-  if (errors.length === Object.keys(INVESTIGATION_QUERIES).length) throw new Error(`ClaimsForce-Berichte und Nachträge konnten nicht gelesen werden (${errors.join(', ')}).`);
+  if (errors.length === Object.keys(INVESTIGATION_QUERIES).length) throw new Error(`ClaimsForce-Berichte und Nachträge konnten nicht gelesen werden [Bridge ${chrome.runtime.getManifest().version}] (${errors.join(', ')}).`);
   const collected = collectInvestigationClaims(investigations, since);
   return { ...collected, errors };
 }
