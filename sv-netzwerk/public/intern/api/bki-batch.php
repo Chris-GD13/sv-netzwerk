@@ -14,6 +14,25 @@ function bkBatchNumber(string $text): float {
   if(str_contains($text,','))$text=str_replace(',','.',str_replace('.','',$text));
   return (float)$text;
 }
+/** Read the price directly from the original BKI row; models only select a code. */
+function bkBatchBindSource(array $component,array $excerpts,string $level): array {
+  $code=trim((string)($component['position_code']??''));if($code==='')return $component;
+  foreach($excerpts as $excerpt){
+    $text=(string)($excerpt['text']??'');$end=strpos($text,$code);if($end===false)continue;
+    $before=substr($text,0,$end);$lineStart=strrpos($before,"
+");$priceLine=substr($before,$lineStart===false?0:$lineStart+1);
+    if(!preg_match('/((?:(?:[0-9]+(?:[.,][0-9]+)?€|[–-])\s+){4}(?:[0-9]+(?:[.,][0-9]+)?€|[–-]))\s+\[([^\]]+)\]/u',$priceLine,$match))continue;
+    if(bkBatchUnit($match[2])!==bkBatchUnit((string)($component['unit']??'')))continue;
+    $prices=preg_split('/\s+/u',trim($match[1]));$token=$prices[$level==='low'?1:($level==='high'?3:2)]??'';
+    $price=bkBatchNumber($token);if($price<=0)continue;
+    $start=max(0,$end-1600);if(preg_match_all('/(?:^|\n)[0-9]+ [^\n]*KG [0-9]+/u',$before,$headers,PREG_OFFSET_CAPTURE))$start=end($headers[0])[1];
+    $quote=substr($text,$start,$end+strlen($code)-$start);if(strlen($quote)>6000)continue;
+    $component['unit_price']=$price;$component['price_text']=$token;$component['source_name']=(string)($excerpt['filename']??'');$component['source_quote']=trim($quote);$component['source_bound']=true;
+    return $component;
+  }
+  return $component;
+}
+
 /** Bind every proposed price to an actual returned file-search excerpt. */
 function bkBatchEvidence(array $component,array $excerpts): bool {
   $quote=bkBatchText((string)($component['source_quote']??''));
@@ -21,7 +40,7 @@ function bkBatchEvidence(array $component,array $excerpts): bool {
   $token=bkBatchText((string)($component['price_text']??''));
   $page=trim((string)($component['source_page']??''));
   $unit=bkBatchUnit((string)($component['unit']??''));
-  if(strlen($quote)<10||strlen($quote)>2000||$code===''||$token===''||preg_match('/(?:Seite|S\.)\s*0\b/i',$page)||$page==='0')return false;
+  if(strlen($quote)<10||strlen($quote)>6000||$code===''||$token===''||preg_match('/(?:Seite|S\.)\s*0\b/i',$page)||$page==='0')return false;
   if($unit===''||!preg_match('/(?<![a-z0-9])'.preg_quote($unit,'/').'(?![a-z0-9])/iu',$quote))return false;
   if(!str_contains($quote,$code)||!preg_match('/(?<![0-9])'.preg_quote($token,'/').'(?![0-9])/u',str_replace($code,'',$quote))||abs(bkBatchNumber($token)-(float)($component['unit_price']??0))>.005)return false;
   foreach($excerpts as $excerpt){
@@ -44,7 +63,7 @@ function bkBatchQuantity(array $component,array $row,array $rows,array $facts): 
   foreach($matches as$match)if(bkBatchUnit($match[1])===$unit&&abs(bkBatchNumber(substr($match[0],0,-strlen($match[1])))-$quantity)<.00001)return true;
   return false;
 }
-function bkBatchValidate(array $raw,array $rows,array $excerpts,array $facts=[]): array {
+function bkBatchValidate(array $raw,array $rows,array $excerpts,array $facts=[],string $level='mid'): array {
   $byId=[];foreach(($raw['positions']??[])as $result){if(is_array($result))$byId[(string)($result['row_id']??'')]=$result;}
   $positions=[];$used=[];
   foreach($rows as $row){
@@ -55,6 +74,7 @@ function bkBatchValidate(array $raw,array $rows,array $excerpts,array $facts=[])
     $checked=[];$keys=[];
     foreach($components as $component){
       if(!is_array($component)){$ready=false;continue;}
+      $component=bkBatchBindSource($component,$excerpts,$level);
       $quantity=(float)($component['quantity']??0);$ep=(float)($component['unit_price']??0);
       $sameUnit=bkBatchUnit((string)$row['unit'])===bkBatchUnit((string)($component['unit']??''));
       // Automatic quantities may only reuse the explicit quantity of this same KVA row.
@@ -92,7 +112,7 @@ function bkBatchSearch(array $input): array {
   $store=bkVectorStore();$location=trim((string)($input['location']??''));
   $level=in_array($input['level']??'mid',['low','mid','high'],true)?($input['level']??'mid'):'mid';
   $context=is_array($input['facts']??null)?$input['facts']:[];
-  $key='bki_batch_v5_'.hash('sha256',json_encode([$store,$rows,$location,$level,$context],JSON_UNESCAPED_UNICODE));
+  $key='bki_batch_v6_'.hash('sha256',json_encode([$store,$rows,$location,$level,$context],JSON_UNESCAPED_UNICODE));
   $cached=json_decode(bkSettingGet($key,'{}'),true);
   if(is_array($cached)&&($cached['created']??0)>time()-604800&&isset($cached['data']['positions']))return $cached['data']+['cached'=>true];
   $instructions=<<<'PROMPT'
@@ -105,7 +125,7 @@ Pro Teilleistung source_quote als kurzen WÖRTLICHEN zusammenhängenden Auszug d
 PROMPT;
   $response=bkOpenAIJson('POST','responses',['model'=>env('OPENAI_BKI_MODEL','gpt-5.4'),'instructions'=>$instructions,'input'=>json_encode(['rows'=>$rows,'location'=>$location,'price_level'=>$level,'known_facts'=>$context,'damage_type'=>trim((string)($input['case_meta']['schadenart']??''))],JSON_UNESCAPED_UNICODE),'tools'=>[['type'=>'file_search','vector_store_ids'=>[$store],'max_num_results'=>30]],'include'=>['file_search_call.results'],'tool_choice'=>'required','max_output_tokens'=>14000],480);
   $excerpts=[];foreach(($response['output']??[])as $item){if(($item['type']??'')==='file_search_call')foreach(($item['results']??[])as $result)if(is_array($result))$excerpts[]=$result;}
-  $data=bkBatchValidate(bkJson(bkOutputText($response)),$rows,$excerpts,$context);
+  $data=bkBatchValidate(bkJson(bkOutputText($response)),$rows,$excerpts,$context,$level);
   $data['search_mode']='whole_kva';$data['regional_factor']=null;
   bkSettingSet($key,json_encode(['created'=>time(),'data'=>$data],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
   return $data+['cached'=>false];

@@ -17,3 +17,9 @@ check(!bkBatchQuantity($component,$rows[0],$rows,[]),'No inferred area');check(b
 $component['quantity']=24;check(!bkBatchQuantity($component,$rows[0],$rows,['notes'=>'Gemessen: 12 m² Öffnungsfläche']),'Fact quantity mismatch blocked');
 $component['unit']='t';$component['quantity']=1;check(!bkBatchQuantity($component,['unit'=>'Pausch','quantity'=>1],$rows,[]),'One lump sum cannot become one tonne');
 echo "BKI batch source and quantity tests passed\n";
+
+$table=['filename'=>'Original.pdf','text'=>"12 Abwasserleitung, HT-Rohr, DN/OD110 KG 411\nMaterial: Polypropylen (PP)\n30€ 34€ 36€ 42€ 56€ [m] ⏱ 0,35h/m 344.000.075"];
+$choice=['position_code'=>'344.000.075','unit'=>'m','unit_price'=>999,'price_text'=>'30€ 34€ 36€ 42€ 56€','source_name'=>'falsche Bezeichnung','source_quote'=>'gekürzter Modelltext'];
+$bound=bkBatchBindSource($choice,[$table],'mid');check($bound['unit_price']===36.0&&$bound['source_name']==='Original.pdf','Price comes directly from the original row');check(bkBatchEvidence($bound,[$table]),'Clock and labor time retained in exact original quote');
+check(bkBatchBindSource($choice,[$table],'low')['unit_price']===34.0,'Low bound uses lower BKI interval');check(bkBatchBindSource($choice,[$table],'high')['unit_price']===42.0,'High bound uses upper BKI interval');
+$choice['unit']='m2';check(empty(bkBatchBindSource($choice,[$table],'mid')['source_bound']),'Source resolver cannot change units');
