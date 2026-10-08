@@ -65,10 +65,10 @@ function bklImport(string $path):array {
     $db->commit();return bklStatus();
   }catch(Throwable $e){$db->rollBack();throw $e;}
 }
-function bklSearch(string $query,int $limit=25,string $kind='position'):array {
-  $words=preg_split('/[^\p{L}\p{N}]+/u',mb_strtolower($query));$words=array_values(array_unique(array_filter($words,fn($w)=>mb_strlen($w)>3)));
+function bklSearch(string $query,int $limit=25,string $kind='position',bool $allTerms=false):array {
+  $words=preg_split('/[^\p{L}\p{N}]+/u',mb_strtolower($query));$words=array_values(array_unique(array_filter($words,fn($w)=>mb_strlen($w)>($allTerms?1:3))));
   if(!$words)return [];
-  $terms=implode(' OR ',array_map(fn($w)=>'"'.str_replace('"','',$w).'"*',array_slice($words,0,45)));
+  $terms=implode($allTerms?' AND ':' OR ',array_map(fn($w)=>'"'.str_replace('"','',$w).'"*',array_slice($words,0,45)));
   $db=bklDb();$s=$db->prepare('SELECT id,text,bm25(source_search) AS rank FROM source_search WHERE source_search MATCH ? AND kind=? ORDER BY rank LIMIT ?');$s->bindValue(1,$terms);$s->bindValue(2,$kind);$s->bindValue(3,min(100,max(1,$limit)),PDO::PARAM_INT);$s->execute();$result=[];
   $lookup=$db->prepare('SELECT data FROM positions WHERE id=?');
   foreach($s->fetchAll() as $row){if($kind!=='position'){$result[]=$row;continue;}$lookup->execute([$row['id']]);$json=$lookup->fetchColumn();if($json)$result[]=json_decode($json,true);}

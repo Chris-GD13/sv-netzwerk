@@ -1,6 +1,26 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/bki-library.php';
+/** Translate offer vocabulary to original catalog terminology without assigning prices or measures. */
+function bkCatalogQueries(array $row):array {
+  $text=$row['description'].' '.$row['scope'];$queries=[];
+  $groups=[
+    ['/Guss/iu',['Gussrohrleitung demontieren']],
+    ['/Öffnen|Installationsbereich|Wandstreifen/iu',['Schlitz Mauerwerk','Stundensatz Maurer']],
+    ['/Deckendurch|Betonplatte/iu',['Kernbohrung Stb','Deckendurchbruch Stb']],
+    ['/HT|Fallleitung|Hauptlüftung/iu',['Abwasser HT','Rohrleitungen Formteile DN110']],
+    ['/Schall/iu',['Abwasser gedämmt','Rohrdämmung']],
+    ['/Dach|Lüftungsabschluss/iu',['Dunstrohr Durchgangsformstück','Dunstrohr Durchgangsziegel']],
+    ['/Schutz/iu',['Schutzwand staubdicht','Bodenflächen abdecken']],
+    ['/Reinigungsstück/iu',['Reinigungsrohr','Putzstück']],
+    ['/Keramik|Steinzeug|Übergang/iu',['Übergang Steinzeug','Stundensatz Sanitär']],
+    ['/Bestandsaufnahme|Leitungsortung|Badabläufe|Funktionsprüfung|Übergabe/iu',['Stundensatz Sanitär','Dichtheitsprüfung']],
+    ['/Abfall|Bauschutt|Baustellenreinigung/iu',['Bauschutt entsorgen','Baureinigung Baubetrieb','Bauschutt laden']],
+    ['/Abschottung|Brandschutz/iu',['Brandschutzabschottung']],
+  ];
+  foreach($groups as [$pattern,$terms])if(preg_match($pattern,$text))$queries=array_merge($queries,$terms);
+  return array_values(array_unique($queries));
+}
 function bkCatalogRemoveOverlap(array $components):array {
   foreach($components as $packet){
     if(($packet['source_action']??'')!=='Herstellen'||empty($packet['gross_prices'])||empty($packet['quantity_verified'])||($packet['scope_issue']??'')!==''||bkBatchUnit($packet['unit'])!=='m')continue;
@@ -29,7 +49,8 @@ function bkCatalogCalculate(array $rows,array $input):array {
   foreach($status['documents'] as $doc)if(!$doc['on_ionos'])throw new RuntimeException('Original-PDF fehlt auf IONOS: '.$doc['name']);
   $level=in_array($input['level']??'mid',['low','mid','high'],true)?($input['level']??'mid'):'mid';$facts=is_array($input['facts']??null)?$input['facts']:[];
   $basis=($input['basis']??'bki')==='rpa'?'rpa':'bki';if($basis==='rpa'&&($input['rpa_confirmed']??false)!==true)throw new RuntimeException('Bitte die Gültigkeit der RPA-Höchstpreisliste für den Auftrag bestätigen.');
-  $key='bki_catalog_v4_'.hash('sha256',json_encode([$status,$rows,$level,$facts,$input['location']??'',$basis],JSON_UNESCAPED_UNICODE));
+  $facts['notes']=preg_replace('/\s+/u',' ',trim((string)($facts['notes']??'')));
+  $key='bki_catalog_v5_'.hash('sha256',json_encode([$status,$rows,$level,$facts,$input['location']??'',$basis],JSON_UNESCAPED_UNICODE));
   $cached=json_decode(bkSettingGet($key,'{}'),true);
   if(isset($cached['positions'])){
     foreach($cached['positions'] as &$position){$row=$rows[(int)$position['row_id']];foreach($position['source_candidates'] as &$component){$issue=bkCatalogScopeIssue($component,$row,$facts);if($issue!=='')$component['scope_issue']=$issue;}unset($component);$position['source_candidates']=bkCatalogRemoveOverlap($position['source_candidates']);$position['priced_components']=array_values(array_filter($position['source_candidates'],fn($c)=>$c['quantity_verified']&&$c['scope_issue']===''));$position['calculated_net']=$position['priced_components']?round(array_sum(array_map(fn($c)=>$c['quantity']*$c['unit_price'],$position['priced_components'])),2):null;foreach(['low','high'] as $range)$position['calculated_'.$range]=$position['priced_components']?round(array_sum(array_map(fn($c)=>$c['quantity']*($c['price_'.$range]??$c['unit_price']),$position['priced_components'])),2):null;if($position['status']==='ready'&&(count($position['priced_components'])!==count($position['components'])||str_contains($row['scope'],'Reinigungsstück'))){$position['components']=[];$position['status']=$position['priced_components']?'partial':'open';}elseif($position['status']!=='ready')$position['status']=$position['priced_components']?'partial':'open';}unset($position);
@@ -38,9 +59,8 @@ function bkCatalogCalculate(array $rows,array $input):array {
   $candidates=[];$pool=[];
   foreach($rows as $row){
     $query=$row['description'].' '.$row['scope'];
-    $found=array_merge(bklSearch($row['description'],20),bklSearch($query,25));$selected=[];$seen=[];
-    $hints=['/Guss/iu'=>'Gussrohrleitung demontieren','/Deckendurch|Betonplatte/iu'=>'Kernbohrung Beton Durchbruch Stahlbeton','/HT|Fallleitung|Hauptlüftung/iu'=>'Abwasser HT Rohrleitungen Formteile DN110','/Schall/iu'=>'Abwasserleitung gedämmt Rohrdämmung','/Dach|Lüftungsabschluss/iu'=>'Dunstrohr Durchgangsformstück','/Schutz/iu'=>'Staubschutzwand Schutzabdeckung','/Reinigungsstück/iu'=>'Reinigungsrohr Putzstück'];
-    foreach($hints as $pattern=>$hint)if(preg_match($pattern,$query))$found=array_merge($found,bklSearch($hint,6));
+    $focused=[];foreach(bkCatalogQueries($row) as $hint)$focused=array_merge($focused,bklSearch($hint,8,'position',true));
+    $found=array_merge($focused,bklSearch($row['description'],20),bklSearch($query,25));$selected=[];$seen=[];
     if($basis==='rpa')$found=array_merge($found,bklSearch($query,100));
     foreach($found as $p){if(($p['source_kind']??'bki')!==$basis||isset($seen[$p['id']]))continue;$seen[$p['id']]=true;$pool[$p['id']]=$p;$selected[]=['id'=>$p['id'],'code'=>$p['position_code'],'description'=>$p['description'],'unit'=>$p['unit'],'scope'=>$p['scope'],'inherited'=>$p['inherited'],'source_action'=>$p['source_action']??null,'measure'=>$p['measure']??null];}
     $candidates[]=['row_id'=>$row['row_id'],'candidates'=>$selected];
@@ -53,6 +73,7 @@ Bei keinem passenden Kandidaten benenne konkret benötigte Leistung als missing_
 PROMPT;
   $instructions.=' Bevorzuge passende Altbau-Gebäude-Leistungspakete einschließlich Formteilen, Befestigung und Dämmung, um den vollständigen Umfang zu berechnen. Die Bruttoquellen werden serverseitig netto umgerechnet. Enthaltene Leistungen nicht doppelt ansetzen. Ergänze jede Komponentenwahl um scope_compatible=true nur bei wirklich passenden Abmessungen, Material und Tätigkeit. Ein 30x15cm-Schlitz bei KVA bis40cm ohne Tiefenmaß ist nur ein Vergleichskandidat, KEINE belegte Teilmenge. Alle nicht kompatiblen Kandidaten scope_compatible=false. Eine kleine Variante darf keine andere größere/ungeklärte Ausführung als berechnete Teilleistung ersetzen. quantity_source.type=scope mit row_id und quote darf explizite tatsächliche Mengen im Langtext belegen, aber niemals bis/max-Mengen. Fehlende Preise oder Mengen nicht durch andere unpassende Gewerke ersetzen.';
   $instructions.=' Bei einer vorläufigen Planungsannahme in known_facts.notes darf die ausdrücklich vom Nutzer angenommene Ausführung als Planungsvariante gewählt werden, mit klarer Kennzeichnung im reason. Keine weiteren Annahmen ergänzen. Für Tätigkeiten ohne belegt passende Pauschalposition wähle den belegten fachlich passenden Stundenlohn als Preisgrundlage mit quantity=0; dabei keine Stunden erfinden. Auch offene Bauteile bekommen passende Einheitspreise als Prüf-/Planungsgrundlage, wenn sachlich vorhanden. quantities nur aus der exakten row_id (0-basierter Index), nicht aus gedruckter KVA-Positionsnummer. Wenn keine vollständige Quellenleistung verfügbar ist, benenne eine kurze konkret abzugrenzende Restleistung, keine langen pauschalen Warntexte.';
+  $instructions.=' Für jede unvollständige Zeile zusätzlich open_items mit {label,kind} liefern: kind=quantity für fehlendes Aufmaß/Arbeitszeit, execution für unbekannte Abmessung/Material/System, source nur wenn trotz aller passenden Kandidaten kein Preisbeleg vorliegt, extra_work für nicht enthaltene Zusatzarbeiten. Jede notwendige fehlende Menge oder Ausführung in questions zusammenfassen, dabei gleiche Angaben gruppieren. Alle vorhandenen Angaben nutzen. Beispiel: bei Baureinigung m2 ohne Fläche kind=quantity; nicht behaupten, es gebe keine Preisquelle. Bei Reinigungsstück für HT keine Kanal-Putzstücke oder Steinzeugmontage verwenden. Ein Stundenlohn ist kein belegter Gesamtpreis für eine Pauschalleistung. scope_compatible auch bei quantity=0 nur dann true, wenn die Tätigkeit und Ausführung passen.';
   if($basis==='rpa')$instructions.=' Für diesen Lauf gilt ausschließlich die vom Nutzer bestätigte RPA-Höchstpreisliste. Kandidatenpreise sind Höchstpreise, keine BKI-Mittelwerte. FAQ-Bedingungen, enthaltene Nebenleistungen, Exklusivpositionen und Grenzen der RPA-Positionen zwingend berücksichtigen. Keine BKI-Positionen ergänzen.';
   $response=bkOpenAIJson('POST','responses',['model'=>env('OPENAI_BKI_MODEL','gpt-5.4'),'instructions'=>$instructions,'input'=>json_encode(['rows'=>$rows,'candidate_groups'=>$candidates,'known_facts'=>$facts,'location'=>$input['location']??''],JSON_UNESCAPED_UNICODE),'max_output_tokens'=>14000],480);
   $raw=bkJson(bkOutputText($response));$positions=[];$used=[];
@@ -83,7 +104,7 @@ PROMPT;
     if(str_contains($row['scope'],'Reinigungsstück')&&!array_filter($priced,fn($c)=>preg_match('/Reinigungs(?:stück|rohr)|Putzstück/iu',$c['description'].' '.$c['source_quote']))){$ready=false;$match['reason']=trim((string)($match['reason']??'')).' Das ausdrücklich geforderte Reinigungsstück ist in den gewählten Originalpreisen nicht gesondert belegt.';}
     $subtotal=round(array_sum(array_map(fn($c)=>$c['quantity']*$c['unit_price'],$priced)),2);
     $low=round(array_sum(array_map(fn($c)=>$c['quantity']*($c['price_low']??$c['unit_price']),$priced)),2);$high=round(array_sum(array_map(fn($c)=>$c['quantity']*($c['price_high']??$c['unit_price']),$priced)),2);
-    $positions[]=['row_id'=>$row['row_id'],'source_position'=>$row['source_position'],'description'=>$row['description'],'status'=>$ready&&$priced?'ready':($priced?'partial':'open'),'reason'=>(string)($match['reason']??'Keine passende Preisgrundlage gefunden.'),'components'=>$ready?$priced:[],'source_candidates'=>$components,'priced_components'=>$priced,'calculated_net'=>$priced?$subtotal:null,'calculated_low'=>$priced?$low:null,'calculated_high'=>$priced?$high:null,'offered_total'=>$row['offered_total']??null];
+    $positions[]=['row_id'=>$row['row_id'],'source_position'=>$row['source_position'],'description'=>$row['description'],'status'=>$ready&&$priced?'ready':($priced?'partial':'open'),'reason'=>(string)($match['reason']??'Keine passende Preisgrundlage gefunden.'),'open_items'=>array_values(array_filter($match['open_items']??[],fn($item)=>is_array($item)&&in_array($item['kind']??'',['quantity','execution','source','extra_work'],true)&&is_string($item['label']??null))),'components'=>$ready?$priced:[],'source_candidates'=>$components,'priced_components'=>$priced,'calculated_net'=>$priced?$subtotal:null,'calculated_low'=>$priced?$low:null,'calculated_high'=>$priced?$high:null,'offered_total'=>$row['offered_total']??null];
   }
   $data=['positions'=>$positions,'questions'=>$raw['questions']??[],'search_mode'=>'ionos_catalog','basis'=>$basis,'regional_factor'=>null,'planning'=>preg_match('/Annahme|vorläufig|ungeprüft/iu',(string)($facts['notes']??''))===1,'facts'=>$facts,'calculated_net'=>round(array_sum(array_map(fn($p)=>$p['calculated_net']??0,$positions)),2),'catalog_positions'=>$status['positions'],'documents'=>$status['documents']];
   bkSettingSet($key,json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));return $data+['cached'=>false];
