@@ -339,13 +339,13 @@ async function requestInvestigationList(endpoint, token, name, query, tabId) {
             body: JSON.stringify({ queries: { [name]: query }, countsOnly: false }),
             signal: controller.signal
           });
-          result = { ok: response.ok, status: response.status, body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) };
-        } catch (error) { result = { ok: false, status: 0, body: error?.name === 'AbortError' ? 'Zeitlimit' : 'Netzwerk' }; }
+          result = { ok: response.ok, status: response.status, via: 'worker', info: [response.headers.get('x-amzn-errortype'), response.headers.get('content-type')].filter(Boolean).join(','), body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) };
+        } catch (error) { result = { ok: false, status: 0, via: 'worker', body: error?.name === 'AbortError' ? 'Zeitlimit' : 'Netzwerk' }; }
         finally { clearTimeout(timer); }
       }
       const list = result.body?.results?.[name]?.investigations;
       if (result.ok && Array.isArray(list)) return { list };
-      last = `${name}: ${result.ok ? 'Format' : result.status}${result.body && typeof result.body === 'string' ? ` "${result.body.replace(/\s+/g, ' ').slice(0, 80)}"` : ''}${index ? ' (ohne Bearer)' : ''}`;
+      last = `${name}: ${result.ok ? 'Format' : result.status} [${result.via || '?'}${result.info ? ' ' + result.info : ''}]${result.body && typeof result.body === 'string' ? ` "${result.body.replace(/\s+/g, ' ').slice(0, 80)}"` : ''}${index ? ' (ohne Bearer)' : ''}`;
     }
     await sleep(1500);
   }
