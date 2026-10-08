@@ -4,7 +4,7 @@ import CalculationTypeNav from '../../../components/internal/CalculationTypeNav.
 import bteCatalog from '../../../data/bte-life-expectancy.json';
 import paritaetCatalog from '../../../data/paritaet-life-expectancy.json';
 
-const sourceUrl = 'https://drive.google.com/file/d/16MVmTfbjPO5BhiXHz8JN8kurrEYxP9aK/view';
+const sourceUrl = '/intern/api/bki-library-upload.php?action=pdf&kind=lifetime';
 const catalog = [
   ...bteCatalog.map((row) => ({ ...row, source: 'bte', sourceLabel: 'BTE', sourceTitle: 'BTE-Arbeitsblatt „Lebensdauer von Bauteilen, Zeitwerte“', sourceStand: '14.03.2008' })),
   ...paritaetCatalog.map((row) => ({ ...row, source: 'paritaet', sourceLabel: 'Paritätische Tabelle', sourceTitle: 'Paritätische Lebensdauertabelle der Mieter- und Hauseigentümerverbände', sourceStand: 'PDF Lebensdauer' })),
@@ -22,7 +22,7 @@ const catalog = [
     <section class="zw-notice">
       <strong>Fachlicher Rahmen</strong>
       <p>Die Werte aus dem BTE-Arbeitsblatt und der paritätischen Lebensdauertabelle sind Richtwerte. Maßgeblich bleiben der Einzelfall sowie Beanspruchung, Qualität, Pflege, Unterhaltung, Nutzbarkeit und gegebenenfalls die Schicksalsgemeinschaft verbundener Bauteile. Technische und wirtschaftliche Lebensdauer sind nicht gleichzusetzen.</p>
-      <a href={sourceUrl} target="_blank" rel="noreferrer">BTE-Arbeitsblatt in Google Drive öffnen</a>
+      <a href={sourceUrl} target="_blank" rel="noreferrer">BTE-Arbeitsblatt auf IONOS öffnen</a>
     </section>
 
     <div class="zw-layout">

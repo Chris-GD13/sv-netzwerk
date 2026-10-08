@@ -13,12 +13,16 @@ def build(directory):
         if kind == 'buildings' and 'Altbau' in document['name']:
             for page in document['pages']:
                 text=re.sub(r'\n\s*\n','\n',page['text'].replace('\r','\n')).replace('\u00a0',' ')
-                category=re.search(r'(?m)^(\d{3}\.\d{2})\s+[^\n]+',text)
+                categories=list(re.finditer(r'(?m)^(\d{3}\.\d{2})\s+[^\n]+',text))
                 heading=re.search(r'KG\.OZ\s+(Abbrechen|Wiederherstellen|Herstellen)',text)
-                if not category or not heading or 'inkl. 19% MwSt.' not in text: continue
+                if not categories or not heading or 'inkl. 19% MwSt.' not in text: continue
                 blocks=list(re.finditer(r'(?m)^(\d{2})\s+[^\W\d_][^\n]+',text))
                 for i,header in enumerate(blocks):
                     block=text[header.start():blocks[i+1].start() if i+1<len(blocks) else len(text)]
+                    preceding=[c for c in categories if c.start()<header.start()]
+                    category=preceding[-1] if preceding else categories[-1]
+                    boundary=re.search(r'(?m)^\d{3}\.\d{2}\s+',block)
+                    if boundary:block=block[:boundary.start()]
                     price=re.search(r'([\d.]+,\d{2})\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})',block)
                     unit=re.search(r'Einheit:\s*(\S+)([^\n]*)',block)
                     if not price or not unit: continue

@@ -7,7 +7,9 @@ $action=$_GET['action']??'status';
 try {
   if($action==='status')apiJson(bklStatus());
   if($action==='pdf'){
-    $id=(string)($_GET['id']??'');if(!preg_match('/^[a-f0-9]{64}$/D',$id))apiError(404,'Quelle nicht gefunden.');
+    $id=(string)($_GET['id']??'');
+    if($id===''&&in_array($_GET['kind']??'',['lifetime','rpa'],true)){$s=bklDb()->prepare('SELECT id FROM documents WHERE kind=? LIMIT 1');$s->execute([$_GET['kind']]);$id=(string)$s->fetchColumn();}
+    if(!preg_match('/^[a-f0-9]{64}$/D',$id))apiError(404,'Quelle nicht gefunden.');
     $path=bklRoot().'/'.$id.'.pdf';if(!is_file($path))apiError(404,'Quelle nicht gefunden.');
     header('Content-Type: application/pdf');header('Content-Disposition: inline; filename="Preisquelle.pdf"');readfile($path);exit;
   }
