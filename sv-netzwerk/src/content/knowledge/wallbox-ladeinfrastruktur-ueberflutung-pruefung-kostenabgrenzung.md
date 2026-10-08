@@ -61,7 +61,7 @@ Der Prüfauftrag muss konkreter sein als „Funktion prüfen“. Für eine belas
 - Liegt die Störung an Wallbox, vorgelagerter Installation, Lastmanagement oder Fahrzeug?
 - Welche Prüfergebnisse beziehen sich eindeutig auf welchen Ladepunkt?
 
-Messwerte benötigen Prüfverfahren, Messgerät, Datum, Umgebungsbedingungen, eindeutige Anlagenzuordnung und fachliche Bewertung. Ein einzelner Zahlenwert ohne Sollbezug ist nicht prüffähig. Die [DGUV Information 203-072](https://publikationen.dguv.de/regelwerk/dguv-informationen/2872/wiederkehrende-pruefungen-elektrischer-anlagen-und-ortsfester-betriebsmittel-fachwissen-fuer-pruefpersonen) beschreibt die fachliche Systematik wiederkehrender Prüfungen ortsfester elektrischer Anlagen; nach einem Schadenereignis bestimmt die beauftragte Fachkraft den ereignisbezogenen Prüfpfad. Ein kurzer Probeladevorgang ersetzt diese Sicherheitsbewertung nicht.
+Messwerte benötigen Prüfverfahren, Messgerät, Datum, Umgebungsbedingungen, eindeutige Anlagenzuordnung und fachliche Bewertung. Ein einzelner Zahlenwert ohne Sollbezug ist nicht prüffähig. Die [DGUV Information 203-072](https://publikationen.dguv.de/regelwerk/dguv-informationen/2879/wiederkehrende-pruefungen-elektrischer-anlagen-und-ortsfester-betriebsmittel-fachwissen-fuer-pruefper) beschreibt die fachliche Systematik wiederkehrender Prüfungen ortsfester elektrischer Anlagen; nach einem Schadenereignis bestimmt die beauftragte Fachkraft den ereignisbezogenen Prüfpfad. Ein kurzer Probeladevorgang ersetzt diese Sicherheitsbewertung nicht.
 
 ## Beweissicherung und Dokumentation
 
@@ -71,15 +71,15 @@ Zur Akte gehören außerdem Einsatz- und Abschaltprotokolle, Fehlerspeicher, Her
 
 ## Fachgrenzen und technische Regelwerke
 
-Die grundlegenden Anforderungen an konduktive Ladesysteme beschreibt die veröffentlichte [DIN EN IEC 61851-1:2019-12](https://www.dinmedia.de/de/norm/din-en-iec-61851-1/304315770). Berichtigungen und die konkrete Anlagenkonfiguration sind bei der Fachprüfung zu berücksichtigen. Die Norm liefert jedoch keine ferngesteuerte Einzelfallfreigabe für eine überflutete Wallbox. Herstelleranforderungen und die Ergebnisse der Elektroprüfung bleiben entscheidend.
+Die grundlegenden Anforderungen an konduktive Ladesysteme beschreibt die veröffentlichte [DIN EN IEC 61851-1:2019-12](https://www.dinmedia.de/de/norm/din-en-iec-61851-1/312355027). Berichtigungen und die konkrete Anlagenkonfiguration sind bei der Fachprüfung zu berücksichtigen. Die Norm liefert jedoch keine ferngesteuerte Einzelfallfreigabe für eine überflutete Wallbox. Herstelleranforderungen und die Ergebnisse der Elektroprüfung bleiben entscheidend.
 
-Die für Juni 2026 veröffentlichte [DIN EN IEC 61851-1:2026-06](https://www.dinmedia.de/de/norm-entwurf/din-en-iec-61851-1/392942366) ist als **Norm-Entwurf** zu kennzeichnen. Ihr Veröffentlichungsdatum macht sie nicht zu einer verbindlichen Ersatzregel für die veröffentlichte Fassung. Entwurfsinhalte dürfen als fachliche Entwicklung beobachtet, aber nicht ohne Statusprüfung als geltende Anforderung ausgegeben werden.
+Die für Juni 2026 veröffentlichte [DIN EN IEC 61851-1:2026-06](https://www.dinmedia.de/de/norm-entwurf/din-en-iec-61851-1/401725186) ist als **Norm-Entwurf** zu kennzeichnen. Ihr Veröffentlichungsdatum macht sie nicht zu einer verbindlichen Ersatzregel für die veröffentlichte Fassung. Entwurfsinhalte dürfen als fachliche Entwicklung beobachtet, aber nicht ohne Statusprüfung als geltende Anforderung ausgegeben werden.
 
 Der [VDE|FNN-Hinweis zur Elektromobilität](https://www.vde.com/de/fnn/themen/elektromobilitaet) ordnet Netzanschluss, Installation und Zuständigkeit ein. Arbeiten an der festen Elektroinstallation gehören in die Hände dafür qualifizierter und gegebenenfalls beim Netzbetreiber eingetragener Unternehmen. Sachverständige können Befund, Plausibilität und Kostenbezug bewerten, dürfen aber keine elektrotechnische Freigabe vortäuschen, wenn Qualifikation oder Prüfgrundlage fehlen. Bei komplexem Lastmanagement, Batteriespeichern oder größeren Ladeparks kann zusätzliche Elektrofachplanung erforderlich sein.
 
 ## Wiederinbetriebnahme und Betreiberverantwortung
 
-Eine Freigabe benennt die geprüften Anlagenteile, ausgeführten Arbeiten, Ergebnisse, verbleibenden Einschränkungen und die verantwortliche Fachperson. Bei gewerblich bereitgestellter Ladeinfrastruktur können zusätzlich Betreiber- und Arbeitsschutzpflichten einschlägig sein. Die [DGUV Regel 109-009](https://publikationen.dguv.de/regelwerk/dguv-regeln/3388/fahrzeuginstandhaltung) fordert für betriebliche Ladevorgänge geeignete, bestimmungsgemäße Ladeeinrichtungen und verweist auf die elektrotechnischen Anforderungen.
+Eine Freigabe benennt die geprüften Anlagenteile, ausgeführten Arbeiten, Ergebnisse, verbleibenden Einschränkungen und die verantwortliche Fachperson. Bei gewerblich bereitgestellter Ladeinfrastruktur können zusätzlich Betreiber- und Arbeitsschutzpflichten einschlägig sein. Die [DGUV Regel 109-009](https://publikationen.dguv.de/regelwerk/dguv-regeln/1346/fahrzeuginstandhaltung) fordert für betriebliche Ladevorgänge geeignete, bestimmungsgemäße Ladeeinrichtungen und verweist auf die elektrotechnischen Anforderungen.
 
 Eine Freigabe nur der Wallbox genügt nicht, wenn die vorgelagerte Verteilung ungeprüft bleibt. Umgekehrt bedeutet die Freigabe der Gebäudeinstallation nicht automatisch, dass das Ladegerät wiederverwendbar ist. Beide Entscheidungen werden aufeinander bezogen. Soweit Nachprüfungen oder Beobachtungszeiträume erforderlich sind, müssen Umfang, Verantwortlichkeit und Termin dokumentiert sein.
 
@@ -118,10 +118,10 @@ Nach einer Überflutung entscheidet nicht die trockene Oberfläche über die wei
 Quellenprüfung und Veröffentlichung: **08.10.2026**. Die DIN EN IEC 61851-1:2019-12 ist die veröffentlichte Normfassung; spätere Berichtigungen sind bei der Fachanwendung zu berücksichtigen. Die DIN EN IEC 61851-1:2026-06 ist zum Prüfdatum ein **Norm-Entwurf** und ersetzt die veröffentlichte Fassung nicht. Der VDE-Sicherheitshinweis, die VDE|FNN-Informationen und die DGUV-Veröffentlichungen begründen Sicherheits-, Zuständigkeits- und Dokumentationsanforderungen; sie ersetzen keine hersteller- und anlagenbezogene Einzelfallprüfung. Die VVG-Quellen dienen nur der begrenzten rechtlichen Einordnung.
 
 - [VDE: Richtiges Verhalten bei überfluteten Räumen](https://www.vde.com/resource/blob/1574620/fda279015cf78879792fcb038468b4e1/vde-infoblatt-ueberflutung-data.pdf) – elektrische Gefahren und fachkundige Freigabe.
-- [DIN EN IEC 61851-1:2019-12](https://www.dinmedia.de/de/norm/din-en-iec-61851-1/304315770) – veröffentlichte Grundanforderungen an konduktive Ladesysteme.
-- [DIN EN IEC 61851-1:2026-06](https://www.dinmedia.de/de/norm-entwurf/din-en-iec-61851-1/392942366) – ausdrücklich als Norm-Entwurf dokumentiert.
+- [DIN EN IEC 61851-1:2019-12](https://www.dinmedia.de/de/norm/din-en-iec-61851-1/312355027) – veröffentlichte Grundanforderungen an konduktive Ladesysteme.
+- [DIN EN IEC 61851-1:2026-06](https://www.dinmedia.de/de/norm-entwurf/din-en-iec-61851-1/401725186) – ausdrücklich als Norm-Entwurf dokumentiert.
 - [VDE|FNN: Elektromobilität](https://www.vde.com/de/fnn/themen/elektromobilitaet) – Netzanschluss, Installation und Zuständigkeiten.
-- [DGUV Information 203-072](https://publikationen.dguv.de/regelwerk/dguv-informationen/2872/wiederkehrende-pruefungen-elektrischer-anlagen-und-ortsfester-betriebsmittel-fachwissen-fuer-pruefpersonen) – Prüfgrundsätze für ortsfeste elektrische Anlagen.
+- [DGUV Information 203-072](https://publikationen.dguv.de/regelwerk/dguv-informationen/2879/wiederkehrende-pruefungen-elektrischer-anlagen-und-ortsfester-betriebsmittel-fachwissen-fuer-pruefper) – Prüfgrundsätze für ortsfeste elektrische Anlagen.
 - [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html) – Schadenminderung und Aufwendungsersatz.
 
 Weiterführend: [Elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/), [Wärmepumpen nach Überflutung](/fachwissen/waermepumpe-ueberflutung-pruefung-kostenabgrenzung/), [Eintrittswege bei Überflutung](/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/) und [Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).
