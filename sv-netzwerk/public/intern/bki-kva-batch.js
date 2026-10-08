@@ -2,7 +2,10 @@
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = value => new Intl.NumberFormat('de-DE', {style:'currency',currency:'EUR'}).format(Number(value) || 0);
   const amount = row => Number(row.offered_total) || (Number(row.offered_unit_price) || 0) * Number(row.quantity);
-  const sourceLines = (row, result) => result.status === 'ready' ? result.components.map(component => ({
+  const sourceLines = (row, result) => result.priced_components ? [
+    ...result.priced_components.map(component=>({...component,source_position_code:component.position_code,regional_factor:1,bki_scope_checked:result.status==='ready',bki_batch_checked:true,kva_source_position:row.source_position,kva_description:row.description,kva_scope:row.scope,bki_note:result.reason,comparison_basis:result.status==='ready'?'bki':'bki_partial'})),
+    ...(result.status==='ready'?[]:[{description:'Noch nicht bepreist · '+row.description,quantity:1,unit:'psch',unit_price:0,regional_factor:1,comparison_basis:'kva_open',source_name:'Offene Teilleistungen · kein Preis angesetzt',kva_source_position:row.source_position,kva_description:row.description,kva_scope:row.scope,bki_note:result.reason,offered_total:amount(row)}]),
+  ] : result.status === 'ready' ? result.components.map(component => ({
     ...component, description: component.description, source_position_code: component.position_code,
     regional_factor: 1, bki_scope_checked: true, bki_batch_checked: true,
     kva_source_position: row.source_position, kva_description: row.description, kva_scope: row.scope,
@@ -42,25 +45,29 @@
         data = await request('/intern/api/bki-calculator.php?action=compare_kva', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rows,location,case_meta:caseMeta,level,facts:{notes:factsPanel.querySelector('textarea').value.trim()}})});
         const ready = data.positions.filter(row => row.status === 'ready').length;
         const open = rows.length - ready;
-        summary.textContent = `${ready} von ${rows.length} Leistungen vollständig aus BKI belegt. ${open} offen. ${data.cached ? 'Gespeichertes Ergebnis verwendet.' : ''}`;
+        const catalog=data.search_mode==='ionos_catalog';
+        const partial=data.positions.filter(row=>row.status==='partial').length;
+        summary.textContent = catalog ? `${ready} Leistungen vollständig bepreist · ${partial} mit berechneten Teilleistungen · ${open} mit offenen Teilen. Preisgrundlage: ${data.catalog_positions} Positionen auf IONOS.` : `${ready} von ${rows.length} Leistungen vollständig aus BKI belegt. ${open} offen. ${data.cached ? 'Gespeichertes Ergebnis verwendet.' : ''}`;
         let proposed = 0, offered = 0;
         const rendered = data.positions.map((result, i) => {
           const row = rows[Number(result.row_id)] || rows[i];offered += amount(row);
-          const total = result.status === 'ready' ? result.components.reduce((sum,c) => sum + c.quantity * c.unit_price, 0) : amount(row);proposed += total;
+          const total = catalog ? result.calculated_net : result.status === 'ready' ? result.components.reduce((sum,c) => sum + c.quantity * c.unit_price, 0) : amount(row);proposed += total||0;
           return `<tr><td>${esc(row.source_position)}</td><td>${esc(row.description)}<details><summary>Begründung und Quelle</summary><p>${esc(row.scope || "")}</p><p>${esc(result.reason)}</p>${(result.status==='ready'?result.components:(result.source_candidates||[]).filter(c=>c.evidence_verified)).map(c=>`<p>${result.status==='ready'?'':'<em>Belegter Teilpreis; Gesamtleistung weiterhin offen.</em><br>'}<strong>${esc(c.position_code)} · ${esc(c.description)}</strong><br>${c.quantity_verified?esc(c.quantity)+' '+esc(c.unit)+' × '+money(c.unit_price):money(c.unit_price)+' / '+esc(c.unit)+' · Menge offen'}<br>${esc(c.source_name)}${c.source_page?' · '+esc(c.source_page):' · Originalauszug'}<br>${esc(c.source_quote)}</p>`).join('')}</details></td><td>${money(amount(row))}</td><td>${result.status==='ready'?'BKI belegt':'BKI offen · KVA bleibt'}</td><td>${money(total)}</td></tr>`;
         }).join('');
-        results.innerHTML = `<div class="bk-batch-table"><table><thead><tr><th>KVA</th><th>Leistung</th><th>Angebot netto</th><th>Grundlage</th><th>Entwurf netto</th></tr></thead><tbody>${rendered}</tbody></table></div><p>Angebot: ${money(offered)} · Vergleichsentwurf: ${money(proposed)}. ${open?'Enthält Angebotspreise für offene Leistungen; noch keine vollständige BKI-Vergleichssumme.':'Alle ausgewählten Leistungen sind durch BKI-Fundstellen belegt.'} Regionalfaktor ist nicht belegt und wird nicht ergänzt.</p>`;
+        results.innerHTML = `<div class="bk-batch-table"><table><thead><tr><th>KVA</th><th>Leistung</th><th>Angebot netto</th><th>Grundlage</th><th>${catalog?'Berechnet netto':'Entwurf netto'}</th></tr></thead><tbody>${rendered}</tbody></table></div><p>Angebot: ${money(offered)} · ${catalog?'Aus Originalpreisen berechnet':'Vergleichsentwurf'}: ${money(proposed)}. ${catalog&&open?'Diese Summe enthält nur belegte Teilleistungen. Offene Teile sind noch nicht bepreist; Angebotspreise werden nicht als Berechnung ausgegeben.':open?'Enthält Angebotspreise für offene Leistungen; noch keine vollständige BKI-Vergleichssumme.':'Alle ausgewählten Leistungen sind durch BKI-Fundstellen belegt.'} Regionalfaktor ist nicht belegt und wird nicht ergänzt.</p>`;
+        if(catalog){results.querySelectorAll('tbody tr').forEach((tr,i)=>{const result=data.positions[i];tr.cells[3].textContent=result.status==='ready'?'Vollständig berechnet':result.status==='partial'?'Teilbetrag · offene Teile':'Noch nicht bepreist';tr.cells[4].textContent=result.calculated_net===null?'—':money(result.calculated_net);});}
         const questions = new Map();for(const question of data.questions || [])if(question?.label)questions.set(question.key || question.label,question.label);
         for(const position of data.positions)if(position.status==='open'&&String(position.reason).includes('Feuerwiderstandsklasse'))questions.set('fire_resistance','Welche Feuerwiderstandsklasse ist für die Deckendurchführungen tatsächlich erforderlich?');
         factsPanel.hidden = open === 0;
         factsPanel.querySelector('[data-questions]').innerHTML = [...questions.values()].slice(0,8).map(q=>'<li>'+esc(q)+'</li>').join('') || '<li>Die offenen Leistungen stehen in der Übersicht. Ergänzen Sie vorhandene Angaben zum Leistungsumfang gesammelt.</li>';
         const apply = document.createElement('button');apply.type = 'button';apply.className = 'bk-primary';apply.textContent = 'Vergleichsentwurf in Kalkulation übernehmen';
+        if(catalog)apply.textContent='Berechnete Leistungen und offene Teile übernehmen';
         apply.onclick = () => {
           if(pending || apply.disabled)return;
           const before = bridge.getLines();const lines = data.positions.flatMap((result,i)=>sourceLines(rows[Number(result.row_id)]||rows[i],result));
-          if(lines.some(line=>!Number.isFinite(line.unit_price)||!(line.unit_price>0)||!(line.quantity>0))) {state.textContent='Übernahme gesperrt: KVA-Menge oder Angebotspreis fehlt.';return;}
+          if(lines.some(line=>!Number.isFinite(line.unit_price)||(!(line.unit_price>0)&&!(catalog&&line.comparison_basis==='kva_open'))||!(line.quantity>0))) {state.textContent='Übernahme gesperrt: Menge oder Preis fehlt.';return;}
           bridge.setLines(replaceGroup(before,group,lines));apply.disabled = true;
-          state.textContent = `${rows.length} KVA-Leistungen übernommen. ${open} BKI-Zuordnungen bleiben offen; deren Angebotspreise sind erhalten.`;
+          state.textContent = catalog?`Nachkalkulation übernommen: ${money(proposed)} belegte Teilleistungen. ${open} Positionen enthalten noch nicht bepreiste Teile.`:`${rows.length} KVA-Leistungen übernommen. ${open} BKI-Zuordnungen bleiben offen; deren Angebotspreise sind erhalten.`;
           const undo = document.createElement('button');undo.type='button';undo.className='bk-secondary';undo.textContent='Vorherige Kalkulation wiederherstellen';undo.onclick=()=>{bridge.setLines(before);undo.disabled=true;apply.disabled=false;state.textContent='Vorherige Kalkulation wiederhergestellt.';};actions.append(undo);
           document.querySelector('.bk-protocol')?.scrollIntoView({behavior:'smooth',block:'start'});
         };actions.append(apply);

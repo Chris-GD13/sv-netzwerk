@@ -116,6 +116,8 @@ function bkBatchSearch(array $input): array {
   }
   if(!$rows||count($rows)>60)throw new RuntimeException('Bitte 1 bis 60 KVA-Positionen auswählen.');
   set_time_limit(600);
+  require_once __DIR__.'/bki-catalog-calculation.php';
+  return bkCatalogCalculate($rows,$input);
   $store=bkVectorStore();$location=trim((string)($input['location']??''));
   $level=in_array($input['level']??'mid',['low','mid','high'],true)?($input['level']??'mid'):'mid';
   $context=is_array($input['facts']??null)?$input['facts']:[];
