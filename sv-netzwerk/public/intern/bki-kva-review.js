@@ -9,7 +9,7 @@
     host.replaceChildren();
     let results=0,sectionAdded=false;
     const entries=[];
-    const update=()=>{const open=entries.filter(e=>!e.adopted).length;state.textContent=`${results}/${rows.length} Positionen geprüft. ${open} Position(en) offen. BKI-Treffer sind Vorschläge; eine Teilsumme ist keine vollständige Vergleichskalkulation.`};
+    const update=()=>{const open=entries.filter(e=>!e.adopted).length;state.textContent=`BKI-Suche für ${results}/${rows.length} Positionen abgeschlossen. ${open} Position(en) offen. BKI-Treffer sind Vorschläge; eine Teilsumme ist keine vollständige Vergleichskalkulation.`};
     for(let i=0;i<rows.length;i++){
       const row=rows[i],entry={adopted:false};entries.push(entry);
       const panel=document.createElement('section');panel.className='bk-kva-match';host.appendChild(panel);
