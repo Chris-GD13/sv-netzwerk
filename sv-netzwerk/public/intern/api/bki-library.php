@@ -16,6 +16,25 @@ function bklStatus():array {
   foreach($docs as &$doc){$file=bklRoot().'/'.$doc['sha256'].'.pdf';$doc['on_ionos']=is_file($file)&&filesize($file)===(int)$doc['size'];}unset($doc);
   return ['backend'=>'IONOS','documents'=>$docs,'positions'=>(int)$db->query('SELECT COUNT(*) FROM positions')->fetchColumn(),'catalog_sha256'=>$db->query("SELECT value FROM catalog_meta WHERE key='sha256'")->fetchColumn()?:null];
 }
+function bklBindPrices(array $position,string $original):array {
+  $normalize=fn($text)=>trim((string)preg_replace('/\s+/u',' ',str_replace("\u{00a0}",' ',$text)));
+  $quote=(string)($position['source_quote']??'');
+  if($quote===''||!str_contains($normalize($original),$normalize($quote)))throw new RuntimeException('Preisbeleg ist nicht in der Originalseite enthalten.');
+  $number=fn($value)=>(float)str_replace(',','.',str_replace('.','',$value));
+  if(($position['source_vat']??null)===19){
+    if(!str_contains($original,'inkl. 19% MwSt.')||!preg_match('/([\d.]+,\d{2})\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})/u',$quote,$prices))throw new RuntimeException('Brutto-Preiszeile fehlt.');
+    foreach(['low','mid','high'] as $i=>$level)$position['price_'.$level]=$number($prices[$i+1])/1.19;
+  }elseif(($position['source_kind']??'bki')==='rpa'){
+    if(!preg_match('/\b(?:Pau\.?|Std\.?|m²|m2|m|Stck\.?|Stk\.?|St\.?|lfdm\.?|lfm)\s+([\d.,]+)\s*€/u',$quote,$price))throw new RuntimeException('RPA-Preiszeile fehlt.');
+    foreach(['low','mid','high'] as $level)$position['price_'.$level]=$number($price[1]);
+  }else{
+    if(!preg_match('/((?:(?:[\d.,]+€?|[–-])\s+){4}(?:[\d.,]+€?|[–-]))\s*\[/u',$quote,$line))throw new RuntimeException('BKI-Preiszeile fehlt.');
+    preg_match_all('/[\d.,]+|[–-]/u',$line[1],$tokens);
+    foreach(['low'=>1,'mid'=>2,'high'=>3] as $level=>$column)$position['price_'.$level]=in_array($tokens[0][$column],['–','-'],true)?null:$number($tokens[0][$column]);
+  }
+  if(!is_numeric($position['price_mid'])||$position['price_mid']<=0)throw new RuntimeException('Kein belegter Mittelwert.');
+  return $position;
+}
 function bklImport(string $path):array {
   $data=json_decode(file_get_contents($path),true,512,JSON_THROW_ON_ERROR);
   if(($data['schema']??null)!==1||count($data['documents']??[])>20||count($data['positions']??[])>20000)throw new RuntimeException('Ungültiger Preisbestand.');
@@ -38,6 +57,7 @@ function bklImport(string $path):array {
       $doc=$docs[$p['document_id']??'']??null;$page=(int)($p['source_page']??0);
       if(!$doc||$page<1||$page>count($doc['pages'])||!is_numeric($p['price_mid']??null)||$p['price_mid']<=0)throw new RuntimeException('Unbelegte Preisposition.');
       $tokens=$p['source_code_tokens']??[$p['position_code']];foreach($tokens as $token)if(!str_contains($doc['pages'][$page-1]['text'],(string)$token))throw new RuntimeException('Positionsnummer ist nicht in der Originalseite belegt.');
+      $p=bklBindPrices($p,(string)$doc['pages'][$page-1]['text']);
       $entry->execute([$p['id'],$p['document_id'],json_encode($p,JSON_UNESCAPED_UNICODE)]);
       $search->execute([$p['id'],'position',$p['description'].' '.$p['scope'].' '.json_encode($p['inherited'],JSON_UNESCAPED_UNICODE)]);
     }
