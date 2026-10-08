@@ -50,8 +50,8 @@ function bkBatchEvidence(array $component,array $excerpts): bool {
   return false;
 }
 
-function bkBatchScopeIssue(array $component,array $row): string {
-  $scope=(string)($row['description']??'').' '.(string)($row['scope']??'');
+function bkBatchScopeIssue(array $component,array $row,array $facts=[]): string {
+  $scope=(string)($row['description']??'').' '.(string)($row['scope']??'').' '.(string)($facts['notes']??'');
   $source=(string)($component['description']??'').' '.(string)($component['source_quote']??'');
   if(preg_match('/\b([RF] ?(?:30|60|90|120))\b/u',$source,$class)&&!preg_match('/\b'.preg_quote($class[1],'/').'\b/u',$scope))return 'Die BKI-Position setzt '.$class[1].' voraus; die erforderliche Feuerwiderstandsklasse ist im KVA nicht belegt.';
   return '';
@@ -87,7 +87,7 @@ function bkBatchValidate(array $raw,array $rows,array $excerpts,array $facts=[],
       // Automatic quantities may only reuse the explicit quantity of this same KVA row.
       // Conversions and quantities derived from other rows stay questions, not invented values.
       $quantityValid=bkBatchQuantity($component,$row,$rows,$facts);
-      $evidence=bkBatchEvidence($component,$excerpts);$scopeIssue=bkBatchScopeIssue($component,$row);if($scopeIssue!==''){$ready=false;$reason.=' '.$scopeIssue;}
+      $evidence=bkBatchEvidence($component,$excerpts);$scopeIssue=bkBatchScopeIssue($component,$row,$facts);if($scopeIssue!==''){$ready=false;$reason.=' '.$scopeIssue;}
       // Page numbers supplied by a model are not citations unless the retrieved
       // original text proves them. The verbatim excerpt remains the citation.
       $page=(string)($component['source_page']??'');$pageProved=false;
@@ -122,7 +122,7 @@ function bkBatchSearch(array $input): array {
   $key='bki_batch_v6_'.hash('sha256',json_encode([$store,$rows,$location,$level,$context],JSON_UNESCAPED_UNICODE));
   $cached=json_decode(bkSettingGet($key,'{}'),true);
   if(is_array($cached)&&($cached['created']??0)>time()-604800&&isset($cached['data']['positions'])){
-    $data=$cached['data'];foreach($data['positions'] as &$position)if(($position['status']??'')==='ready')foreach(($position['components']??[])as $component){$issue=bkBatchScopeIssue($component,$rows[(int)$position['row_id']]??[]);if($issue!==''){$position['status']='open';$position['reason']=$issue;$position['components']=[];break;}}unset($position);return $data+['cached'=>true];
+    $data=$cached['data'];foreach($data['positions'] as &$position)if(($position['status']??'')==='ready')foreach(($position['components']??[])as $component){$issue=bkBatchScopeIssue($component,$rows[(int)$position['row_id']]??[],$context);if($issue!==''){$position['status']='open';$position['reason']=$issue;$position['components']=[];break;}}unset($position);return $data+['cached'=>true];
   }
   $instructions=<<<'PROMPT'
 Gleiche den gesamten KVA gemeinsam mit den beiden lizenzierten BKI-Altbau-2026-Dateien ab. Verwende die Dateisuche für alle erforderlichen Gewerke, nicht nur für die erste Position. Stelle pro KVA-Position die tatsächlich passenden Teilleistungen zusammen. Prüfe den Gesamtzusammenhang: bereits separat angebotene Öffnungen, Entsorgung, Schutzmaßnahmen und Wiederherstellung nicht nochmals anderen Positionen zuschlagen. Keine fachfremden Treffer (z.B. Dachöffnung für Wand-/Installationsöffnung). Kein erster Treffer als Standard; zwischen unterschiedlichen Durchmessern/Ausführungen nur bei belegten Angaben auswählen. Eine Schnittposition alleine deckt keinen Wandabbruch mit Handfreilegen ab. Für Rohrbrandschutz muss der Durchmesser zum HT DN110 passen, kein DN12 für Heizungsleitungen. Rückfragen ausschließlich zu im scope tatsächlich fehlenden Angaben, nicht zu bereits ausdrücklich genannten DN110/PP/Mauerwerk/25cm/bis40cm. Fehlende Quellen sind keine fehlenden Benutzerangaben. Wenn unklar: eine gebündelte konkrete Rückfrage, nicht eine Liste aller möglichen BKI-Treffer.
