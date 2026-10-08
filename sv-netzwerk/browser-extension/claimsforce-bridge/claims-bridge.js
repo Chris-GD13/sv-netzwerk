@@ -25,10 +25,16 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       const headers = new Headers({ 'Content-Type': 'application/json; charset=UTF-8' });
       if (message.authorization) headers.append('Authorization', message.authorization);
       return fetch(`${String(message.endpoint).replace(/\/+$/, '')}/investigation-list`, { method: 'POST', mode: 'cors', headers, body: JSON.stringify({ queries: message.queries, countsOnly: false }) })
-        .then(async response => sendResponse({ ok: response.ok, status: response.status, via: 'tab', info: [response.headers.get('x-amzn-errortype'), response.headers.get('content-type')].filter(Boolean).join(','), body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) }))
+        .then(async response => sendResponse({ ok: response.ok, status: response.status, via: 'tab', info: ['ohne Seitentoken', response.headers.get('x-amzn-errortype'), response.headers.get('content-type')].filter(Boolean).join(','), body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) }))
         .catch(error => sendResponse({ ok: false, status: 0, via: 'tab', body: String(error?.message || error).slice(0, 120) }));
     });
     return true;
+  }
+  if (message?.type === 'OPEN_REPORTS') {
+    const link = [...document.querySelectorAll('a')].find(node => /^Berichte$/i.test((node.textContent || '').replace(/\s+/g, ' ').trim()));
+    if (link) link.click();
+    sendResponse({ ok: !!link, href: link ? String(link.getAttribute('href') || '') : '' });
+    return;
   }
   if (message?.type === 'OPEN_PLANNING') {
     const link = document.querySelector('a[href="/planning"],a[href^="/planning?"]');
