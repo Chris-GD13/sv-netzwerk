@@ -35,7 +35,6 @@ jobs:
           args: >-
             --verbose
             --no-progress
-            --exclude-mail
             --max-retries 2
             --accept 200,204,206,301,302,307,308,429
             "sv-netzwerk/dist/**/*.html"
