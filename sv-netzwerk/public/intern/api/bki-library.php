@@ -36,7 +36,8 @@ function bklImport(string $path):array {
     $docs=array_column($data['documents'],null,'id');
     foreach($data['positions'] as $p){
       $doc=$docs[$p['document_id']??'']??null;$page=(int)($p['source_page']??0);
-      if(!$doc||$page<1||$page>count($doc['pages'])||!str_contains($doc['pages'][$page-1]['text'],(string)$p['position_code'])||!is_numeric($p['price_mid']??null)||$p['price_mid']<=0)throw new RuntimeException('Unbelegte Preisposition.');
+      if(!$doc||$page<1||$page>count($doc['pages'])||!is_numeric($p['price_mid']??null)||$p['price_mid']<=0)throw new RuntimeException('Unbelegte Preisposition.');
+      $tokens=$p['source_code_tokens']??[$p['position_code']];foreach($tokens as $token)if(!str_contains($doc['pages'][$page-1]['text'],(string)$token))throw new RuntimeException('Positionsnummer ist nicht in der Originalseite belegt.');
       $entry->execute([$p['id'],$p['document_id'],json_encode($p,JSON_UNESCAPED_UNICODE)]);
       $search->execute([$p['id'],'position',$p['description'].' '.$p['scope'].' '.json_encode($p['inherited'],JSON_UNESCAPED_UNICODE)]);
     }

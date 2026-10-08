@@ -6,13 +6,15 @@ function bkCatalogCalculate(array $rows,array $input):array {
   $status=bklStatus();if($status['positions']<1)throw new RuntimeException('Der geprüfte IONOS-Preisbestand fehlt. Bitte Originale und Preisindex einspielen.');
   foreach($status['documents'] as $doc)if(!$doc['on_ionos'])throw new RuntimeException('Original-PDF fehlt auf IONOS: '.$doc['name']);
   $level=in_array($input['level']??'mid',['low','mid','high'],true)?($input['level']??'mid'):'mid';$facts=is_array($input['facts']??null)?$input['facts']:[];
-  $key='bki_catalog_v1_'.hash('sha256',json_encode([$status,$rows,$level,$facts,$input['location']??''],JSON_UNESCAPED_UNICODE));
+  $key='bki_catalog_v2_'.hash('sha256',json_encode([$status,$rows,$level,$facts,$input['location']??''],JSON_UNESCAPED_UNICODE));
   $cached=json_decode(bkSettingGet($key,'{}'),true);if(isset($cached['positions']))return $cached+['cached'=>true];
   $candidates=[];$pool=[];
   foreach($rows as $row){
     $query=$row['description'].' '.$row['scope'];
-    $found=bklSearch($query,35);$selected=[];
-    foreach($found as $p){if(($p['source_kind']??'bki')!=='bki')continue;$pool[$p['id']]=$p;$selected[]=['id'=>$p['id'],'code'=>$p['position_code'],'description'=>$p['description'],'unit'=>$p['unit'],'scope'=>$p['scope'],'inherited'=>$p['inherited']];}
+    $found=array_merge(bklSearch($row['description'],20),bklSearch($query,25));$selected=[];$seen=[];
+    $hints=['/Guss/iu'=>'Gussrohrleitung demontieren','/Deckendurch|Betonplatte/iu'=>'Kernbohrung Beton Durchbruch Stahlbeton','/HT|Fallleitung|Hauptlüftung/iu'=>'Abwasser HT Rohrleitungen Formteile DN110','/Schall/iu'=>'Abwasserleitung gedämmt Rohrdämmung','/Dach|Lüftungsabschluss/iu'=>'Dunstrohr Durchgangsformstück','/Schutz/iu'=>'Staubschutzwand Schutzabdeckung','/Reinigungsstück/iu'=>'Reinigungsrohr Putzstück'];
+    foreach($hints as $pattern=>$hint)if(preg_match($pattern,$query))$found=array_merge($found,bklSearch($hint,6));
+    foreach($found as $p){if(($p['source_kind']??'bki')!=='bki'||isset($seen[$p['id']]))continue;$seen[$p['id']]=true;$pool[$p['id']]=$p;$selected[]=['id'=>$p['id'],'code'=>$p['position_code'],'description'=>$p['description'],'unit'=>$p['unit'],'scope'=>$p['scope'],'inherited'=>$p['inherited'],'source_action'=>$p['source_action']??null,'measure'=>$p['measure']??null];}
     $candidates[]=['row_id'=>$row['row_id'],'candidates'=>$selected];
   }
   $instructions=<<<'PROMPT'
@@ -21,6 +23,7 @@ Für Komponenten quantity und quantity_source angeben: type=kva,row_id für ausd
 Bei keinem passenden Kandidaten benenne konkret benötigte Leistung als missing_search, damit eine gezielte zweite lokale Suche möglich ist, statt Benutzer nach vorhandenen Quellen zu fragen. Nur tatsächlich noch fehlende Ausführungs-/Mengenangaben in gebündelten questions. Ausgabe nur JSON:
 {"positions":[{"row_id":"0","coverage":"complete|partial|unmatched","reason":"berechnete Leistungsabdeckung, fehlende Teilleistungen und Doppelansätze","components":[{"candidate_id":"","quantity":0,"quantity_source":{"type":"kva|fact","row_id":"","quote":""}}],"missing_search":["konkrete fehlende Teilleistung"]}],"questions":[{"key":"","label":"konkrete fehlende Angabe","row_ids":["0"]}]}
 PROMPT;
+  $instructions.=' Bevorzuge passende Altbau-Gebäude-Leistungspakete einschließlich Formteilen, Befestigung und Dämmung, um den vollständigen Umfang zu berechnen. Die Bruttoquellen werden serverseitig netto umgerechnet. Enthaltene Leistungen nicht doppelt ansetzen. Ergänze jede Komponentenwahl um scope_compatible=true nur bei wirklich passenden Abmessungen, Material und Tätigkeit. Ein 30x15cm-Schlitz bei KVA bis40cm ohne Tiefenmaß ist nur ein Vergleichskandidat, KEINE belegte Teilmenge. Alle nicht kompatiblen Kandidaten scope_compatible=false. Eine kleine Variante darf keine andere größere/ungeklärte Ausführung als berechnete Teilleistung ersetzen. quantity_source.type=scope mit row_id und quote darf explizite tatsächliche Mengen im Langtext belegen, aber niemals bis/max-Mengen. Fehlende Preise oder Mengen nicht durch andere unpassende Gewerke ersetzen.';
   $response=bkOpenAIJson('POST','responses',['model'=>env('OPENAI_BKI_MODEL','gpt-5.4'),'instructions'=>$instructions,'input'=>json_encode(['rows'=>$rows,'candidate_groups'=>$candidates,'known_facts'=>$facts,'location'=>$input['location']??''],JSON_UNESCAPED_UNICODE),'max_output_tokens'=>14000],480);
   $raw=bkJson(bkOutputText($response));$positions=[];$used=[];
   foreach($rows as $row){
@@ -31,7 +34,7 @@ PROMPT;
       $component=$p+['quantity'=>(float)($selection['quantity']??0),'quantity_source'=>$selection['quantity_source']??[]];
       $component['unit_price']=(float)($p['price_'.$level]??$p['price_mid']);$component['source_page']='Seite '.$p['source_page'];$component['source_url']='/intern/api/bki-library-upload.php?action=pdf&id='.$p['document_id'].'#page='.$p['source_page'];
       $component['evidence_verified']=true;$component['quantity_verified']=bkBatchQuantity($component,$row,$rows,$facts);
-      $issue=bkBatchScopeIssue($component,$row,$facts);$component['scope_issue']=$issue;
+      $issue=bkBatchScopeIssue($component,$row,$facts);if(($selection['scope_compatible']??false)!==true)$issue='Ausführung oder Abmessungen der gewählten Preisposition sind nicht bestätigt.';$component['scope_issue']=$issue;
       $duplicate=$p['id'].'|'.json_encode($selection['quantity_source']??[]).'|'.$component['quantity'];
       if(isset($used[$duplicate])){$ready=false;continue;}
       if($component['quantity_verified']&&$issue==='')$used[$duplicate]=true;else $ready=false;

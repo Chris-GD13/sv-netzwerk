@@ -10,6 +10,25 @@ def build(directory):
         key = document['sha256']
         kind = 'positions' if 'Positionen' in document['name'] else 'buildings' if 'Gebaeude' in document['name'] else 'rpa' if 'RPA' in document['name'] else 'lifetime'
         documents.append({**document, 'id':key, 'kind':kind})
+        if kind == 'buildings' and 'Altbau' in document['name']:
+            for page in document['pages']:
+                text=re.sub(r'\n\s*\n','\n',page['text'].replace('\r','\n')).replace('\u00a0',' ')
+                category=re.search(r'(?m)^(\d{3}\.\d{2})\s+[^\n]+',text)
+                heading=re.search(r'KG\.OZ\s+(Abbrechen|Wiederherstellen|Herstellen)',text)
+                if not category or not heading or 'inkl. 19% MwSt.' not in text: continue
+                blocks=list(re.finditer(r'(?m)^(\d{2})\s+[^\W\d_][^\n]+',text))
+                for i,header in enumerate(blocks):
+                    block=text[header.start():blocks[i+1].start() if i+1<len(blocks) else len(text)]
+                    price=re.search(r'([\d.]+,\d{2})\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})',block)
+                    unit=re.search(r'Einheit:\s*(\S+)([^\n]*)',block)
+                    if not price or not unit: continue
+                    gross=[float(n.replace('.','').replace(',','.')) for n in price.groups()];net=[n/1.19 for n in gross]
+                    title=re.sub(r'\s+',' ',block[len(header[1]):price.start()]).strip()
+                    code=category[1]+'/'+header[1]
+                    positions.append({'id':key+':'+heading[1]+':'+code,'document_id':key,'position_code':code,'description':title+' · '+heading[1],
+                        'unit':unit[1],'measure':unit[2].strip(),'price_low':net[0],'price_mid':net[1],'price_high':net[2],'gross_prices':gross,'source_vat':19,
+                        'source_page':page['page'],'source_name':document['name'],'scope':block[price.end():].strip(),'inherited':[],
+                        'source_quote':block.strip(),'source_code_tokens':[category[1],header[1]],'source_kind':'bki','source_action':heading[1]})
         if kind == 'rpa':
             for page in document['pages']:
                 text=re.sub(r'\n\s*\n','\n',page['text'].replace('\r','\n'))
@@ -30,7 +49,7 @@ def build(directory):
             lb = re.search(r'\bLB\s+(\d+)', text)
             if lb and chapter != lb[1]: chapter, definitions = lb[1], {}
             # Definitions occur between position blocks and can span several pages.
-            headers = list(re.finditer(r'(?m)^(?:\d+ [^\n]+ KG \d+|A\s*\d+ [^\n]+Beschreibung für Pos[^\n]*)', text))
+            headers = list(re.finditer(r'(?m)^(?:\d{1,3} [^\W\d_][^\n]+|A\s*\d+ [^\n]+Beschreibung für Pos[^\n]*)', text))
             price_pattern = r'((?:(?:[\d.,]+€|[–-])\s+){4}(?:[\d.,]+€|[–-]))\s*\[([^\]]+)\][^\n]*?(\d{3}\.\d{3}\.\d{3})'
             for i, header in enumerate(headers):
                 block = text[header.start():headers[i+1].start() if i+1<len(headers) else len(text)]
