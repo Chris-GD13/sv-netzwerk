@@ -23,3 +23,6 @@ $choice=['position_code'=>'344.000.075','unit'=>'m','unit_price'=>999,'price_tex
 $bound=bkBatchBindSource($choice,[$table],'mid');check($bound['unit_price']===36.0&&$bound['source_name']==='Original.pdf','Price comes directly from the original row');check(bkBatchEvidence($bound,[$table]),'Clock and labor time retained in exact original quote');
 check(bkBatchBindSource($choice,[$table],'low')['unit_price']===34.0,'Low bound uses lower BKI interval');check(bkBatchBindSource($choice,[$table],'high')['unit_price']===42.0,'High bound uses upper BKI interval');
 $choice['unit']='m2';check(empty(bkBatchBindSource($choice,[$table],'mid')['source_bound']),'Source resolver cannot change units');
+
+check(bkBatchScopeIssue(['description'=>'Brandschutzabschottung R90'],['scope'=>'erforderliche Brandschutzmanschetten'])!=='','Fire resistance class cannot be inferred');
+check(bkBatchScopeIssue(['description'=>'Brandschutzabschottung R90'],['scope'=>'Abschottung R90'])==='','Explicit fire resistance class accepted');
