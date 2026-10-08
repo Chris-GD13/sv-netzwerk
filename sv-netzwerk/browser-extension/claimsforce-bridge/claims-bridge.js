@@ -10,6 +10,15 @@ window.addEventListener('message', event => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type === 'FETCH_INVESTIGATIONS') {
+    // Aufruf aus dem Seitenkontext, damit Origin und Header exakt der ClaimsForce-App entsprechen.
+    const headers = new Headers({ 'Content-Type': 'application/json; charset=UTF-8' });
+    if (message.authorization) headers.append('Authorization', message.authorization);
+    fetch(`${String(message.endpoint).replace(/\/+$/, '')}/investigation-list`, { method: 'POST', mode: 'cors', headers, body: JSON.stringify({ queries: message.queries, countsOnly: false }) })
+      .then(async response => sendResponse({ ok: response.ok, status: response.status, body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) }))
+      .catch(error => sendResponse({ ok: false, status: 0, body: String(error?.message || error).slice(0, 120) }));
+    return true;
+  }
   if (message?.type === 'OPEN_PLANNING') {
     const link = document.querySelector('a[href="/planning"],a[href^="/planning?"]');
     if (link) link.click();

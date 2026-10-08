@@ -321,34 +321,40 @@ const INVESTIGATION_QUERIES = {
   openReports: { status: { notIn: ['SENT'] } }
 };
 
-async function requestInvestigationList(endpoint, token, name, query) {
-  let lastStatus = 0;
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 60000);
-    try {
-      const response = await fetch(`${String(endpoint).replace(/\/+$/, '')}/investigation-list`, {
-        method: 'POST',
-        headers: { ...authHeaders(token), 'Content-Type': 'application/json; charset=UTF-8' },
-        body: JSON.stringify({ queries: { [name]: query }, countsOnly: false }),
-        signal: controller.signal
-      });
-      lastStatus = response.status;
-      if (response.ok) {
-        const list = (await response.json())?.results?.[name]?.investigations;
-        if (Array.isArray(list)) return { list };
-        lastStatus = 'Format';
+async function requestInvestigationList(endpoint, token, name, query, tabId) {
+  const authorizations = [`Bearer ${token}`, token];
+  let last = '';
+  for (let round = 0; round < 2; round++) {
+    for (const [index, authorization] of authorizations.entries()) {
+      let result = null;
+      try {
+        if (tabId) result = await chrome.tabs.sendMessage(tabId, { type: 'FETCH_INVESTIGATIONS', endpoint, authorization, queries: { [name]: query } });
+      } catch { result = null; }
+      if (!result) {
+        const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 60000);
+        try {
+          const response = await fetch(`${String(endpoint).replace(/\/+$/, '')}/investigation-list`, {
+            method: 'POST',
+            headers: { Authorization: authorization, 'Content-Type': 'application/json; charset=UTF-8' },
+            body: JSON.stringify({ queries: { [name]: query }, countsOnly: false }),
+            signal: controller.signal
+          });
+          result = { ok: response.ok, status: response.status, body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) };
+        } catch (error) { result = { ok: false, status: 0, body: error?.name === 'AbortError' ? 'Zeitlimit' : 'Netzwerk' }; }
+        finally { clearTimeout(timer); }
       }
-    } catch (error) { lastStatus = error?.name === 'AbortError' ? 'Zeitlimit' : 'Netzwerk'; }
-    finally { clearTimeout(timer); }
-    await sleep(1500 * (attempt + 1));
+      const list = result.body?.results?.[name]?.investigations;
+      if (result.ok && Array.isArray(list)) return { list };
+      last = `${name}: ${result.ok ? 'Format' : result.status}${result.body && typeof result.body === 'string' ? ` "${result.body.replace(/\s+/g, ' ').slice(0, 80)}"` : ''}${index ? ' (ohne Bearer)' : ''}`;
+    }
+    await sleep(1500);
   }
-  return { error: `${name}: ${lastStatus}` };
+  return { error: last };
 }
-
-async function requestInvestigationClaims(endpoint, token, since) {
+async function requestInvestigationClaims(endpoint, token, since, tabId) {
   const investigations = [], errors = [];
   for (const [name, query] of Object.entries(INVESTIGATION_QUERIES)) {
-    const result = await requestInvestigationList(endpoint, token, name, query);
+    const result = await requestInvestigationList(endpoint, token, name, query, tabId);
     if (result.list) investigations.push(...result.list); else errors.push(result.error);
   }
   if (errors.length === Object.keys(INVESTIGATION_QUERIES).length) throw new Error(`ClaimsForce-Berichte und Nachträge konnten nicht gelesen werden (${errors.join(', ')}).`);
@@ -459,7 +465,7 @@ async function runImport(run) {
     const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
     const allClaims = Array.isArray(scraped?.claims) ? scraped.claims : [];
     for (const claim of allClaims) if (claim?.id) claimsById.set(claim.id, claim);
-    const claimsFromReports = await requestInvestigationClaims(config.ASSESSMENT_API_ENDPOINT, token, run.since || '');
+    const claimsFromReports = await requestInvestigationClaims(config.ASSESSMENT_API_ENDPOINT, token, run.since || '', tab.id);
     for (const claim of claimsFromReports.claims) {
       const existing = claimsById.get(claim.id);
       if (existing) {
