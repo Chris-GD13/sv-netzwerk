@@ -94,7 +94,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20261008-1'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20261008-2'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
 assert(portal.includes('leer = alle Fälle') && portal.includes('ClaimsForce-Fälle vollständig einlesen'), 'Der Vollabgleich erklärt den unbegrenzten Zeitraum verständlich');
 assert(dashboard.includes('<input id="vf-claims-since" type="date">') && !dashboard.includes('value="2026-01-01"'), 'Dashboard-Vollabgleich darf alte Fälle nicht durch einen voreingestellten Stichtag ausschließen');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(portal.includes(`<option value="${key}">${label}</option>`), `${label} ist als Bearbeiterprofil auswählbar`);
@@ -129,7 +129,7 @@ const claimsMain = fs.readFileSync(path.join(root, 'browser-extension/claimsforc
 assert(claimsMain.includes('response.clone().json()') && claimsMain.includes('CLAIMS_SNAPSHOT'), 'Fall-IDs werden geheimnisfrei aus den bereits geladenen ClaimsForce-Antworten erfasst');
 assert(claimsMain.includes('inspectTokenCache') && claimsMain.includes('inspectStorage(localStorage)'), 'Ein vorhandenes ClaimsForce-Token wird nach einem Worker-Neustart auch aus dem Auth-Cache wiederhergestellt');
 const importWorker = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8');
-assert(importWorker.includes('/investigation-list') && importWorker.includes('queries: { all: {} }') && importWorker.includes('collectInvestigationClaims'), 'Vollabgleich ergänzt die Claims-Liste um Fälle aus Berichten und Nachträgen');
+assert(importWorker.includes('/investigation-list') && importWorker.includes('INVESTIGATION_QUERIES') && importWorker.includes('collectInvestigationClaims'), 'Vollabgleich ergänzt die Claims-Liste um Fälle aus Berichten und Nachträgen');
 
 const vault = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/vault.js'), 'utf8');
 assert(vault.includes('credentials_${profile}') && vault.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens']"), 'Zugänge werden nur für die vier unterstützten Sachverständigen-Profile getrennt gespeichert');
