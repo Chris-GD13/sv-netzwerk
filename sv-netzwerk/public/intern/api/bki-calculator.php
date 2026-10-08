@@ -150,6 +150,8 @@ Antworte ausschließlich als JSON:
 {"regional_factor":null,"regional_factor_note":"","positions":[{"position_code":"","description":"","unit":"","price_low":null,"price_mid":null,"price_high":null,"recommended_quantity":null,"source_page":"","source_name":"BKI Baukosten Positionen Altbau 2026","note":""}]}
 
 Regeln:
+- Die KVA-Beschreibung kann mehrere Teilleistungen enthalten. Nenne für jeden Treffer im Feld note ausdrücklich, welche angefragten Teilleistungen enthalten sind und welche fehlen oder nicht belegt sind. Alternative Ausführungen (z. B. unterschiedliche Rohrdurchmesser) als Alternativen kennzeichnen, nicht addieren. Zugänglichkeit, Rohrdurchmesser, Öffnungsbreite, Gewicht, Fläche oder Arbeitsstunden niemals aus einer bloßen Längen- oder Pauschalangabe erfinden.
+- Eine Demontageposition ist kein Beleg für Öffnen, Schutzmaßnahmen, Zugang über mehrere Geschosse oder Wiederherstellung. Nur als enthalten benennen, wenn es in der konkreten BKI-Quelle belegt ist. Preise für andere Leistungsumfänge nicht als vollständige KVA-Preise ausgeben.
 - maximal 6 wirklich passende Positionen.
 - BKI-Preise als Netto-Einheitspreise in EUR numerisch zurückgeben.
 - Wenn mehrere notwendige Teilleistungen bestehen, z. B. Ausbau/Entsorgung und Neueinbau, dürfen mehrere Positionen vorgeschlagen werden.

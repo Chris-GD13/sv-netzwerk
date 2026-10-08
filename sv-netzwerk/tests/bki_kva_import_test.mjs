@@ -20,7 +20,7 @@ assert(page.includes('offeredUnit||(offeredTotal/quantity)||0'), 'Der 1:1-Import
 assert(page.includes("positions.forEach((row,index)=>"), 'Der 1:1-Import darf keine KVA-Position wegen eines fehlenden BKI-Treffers auslassen.');
 assert(page.includes("line.position_code=String(++position)"), 'Kalkulationspositionen müssen automatisch fortlaufend neu nummeriert werden.');
 assert(page.includes("bridge.addSection=value=>") && page.includes("addSection?.(groupData())"), 'Vor importierten KVA-Positionen muss eine eigene Firmen- oder Tätigkeitsüberschrift mit den KVA-Stammdaten eingefügt werden.');
-assert(page.includes("if(!added)window.__bkiCalcBridge?.addSection?.(groupData())"), 'Auch die BKI-Nachkalkulation muss KVA-Firma, Nummer und Originalsumme in der Abschnittszeile erhalten.');
+assert(page.includes("group:groupData()") && fs.readFileSync(path.join(root,'public/intern/bki-kva-review.js'),'utf8').includes("bridge.addSection({...group,"), 'Auch die BKI-Nachkalkulation muss KVA-Firma, Nummer und Originalsumme in der Abschnittszeile erhalten.');
 assert(page.includes("const groupTitle=()=>String($('bk-kva-title').textContent||'KVA-Positionen').trim()"), 'Die Gruppenüberschrift muss Aussteller und KVA-Nummer vollständig übernehmen.');
 assert(page.includes("line.source_position_code=line.source_position_code||line.position_code||''"), 'Die ursprüngliche KVA-Positionsnummer muss als Herkunftsinformation erhalten bleiben.');
 assert(page.includes("addSection?.('Eigene Kalkulation nach BKI')") && page.includes('quickSectionOpen=false'), 'Schnellkalkulationspositionen müssen in einem eigenen BKI-Abschnitt beginnen.');
