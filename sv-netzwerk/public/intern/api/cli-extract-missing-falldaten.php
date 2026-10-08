@@ -53,7 +53,7 @@ foreach ($rows as $row) {
     $s = $db->prepare('SELECT name FROM items WHERE id=? AND verified=1'); $s->execute([$fid]);
     $folderName = $s->fetchColumn();
     if ($folderName === false) continue;
-    $s = $db->prepare("SELECT 1 FROM items WHERE parent=? AND name='00_Falldaten.json' AND verified=1"); $s->execute([$fid]);
+    $s = $db->prepare("SELECT id FROM items WHERE parent=? AND name='00_Falldaten.json' AND verified=1"); $s->execute([$fid]);
     $existingId = (string)$s->fetchColumn();
     $existing = [];
     if ($existingId !== '') {
