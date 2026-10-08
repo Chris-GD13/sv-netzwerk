@@ -13,3 +13,6 @@ assert.equal(merged.length,5);assert.equal(merged[0].description,'Freie Eigenpos
 assert.equal(previous.length,7);assert(!merged.some(x=>/Falscher|Doppelter/.test(x.description)));
 const repeat=batch.replaceGroup(merged,group,preserved);assert.equal(repeat.length,merged.length);
 console.log('BKI batch draft retention and group replacement tests passed');
+
+const variantGroup={...group,kva_company:'BAU | EXPERT',description:'BAU | EXPERT · KVA 0030/2026'};
+assert.equal(batch.replaceGroup(previous,variantGroup,preserved).filter(x=>x.type==='section'&&x.kva_number==='0030/2026').length,1);

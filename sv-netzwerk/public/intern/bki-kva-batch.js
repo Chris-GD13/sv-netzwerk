@@ -15,11 +15,12 @@
     bki_note: result.reason, comparison_basis: 'kva_open',
   }];
   function replaceGroup(existing, group, lines) {
+    const identity = value => String(value || '').toLocaleLowerCase('de-DE').replace(/[^\p{L}\p{N}]/gu,'');
     let skip = false;
     const retained = existing.filter(line => {
       if (line.type === 'section') skip =
-        !!(group.kva_number && group.kva_number === line.kva_number && group.kva_company === line.kva_company) ||
-        !!(group.description && String(line.description || '').includes(group.description));
+        !!(group.kva_number && group.kva_number === line.kva_number && identity(group.kva_company) === identity(line.kva_company)) ||
+        !!(group.description && identity(line.description).includes(identity(group.description)));
       return !skip;
     });
     return [...retained, {...group, type:'section', description:'KVA-/BKI-Vergleich · '+group.description, quantity:0, unit_price:0, regional_factor:1}, ...lines];
