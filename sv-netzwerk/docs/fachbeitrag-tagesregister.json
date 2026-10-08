@@ -28,14 +28,17 @@
         "title": "Wallboxen und Ladeinfrastruktur nach Überflutung fachlich prüfen",
         "slug": "wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung",
         "url": "https://www.sv-netzwerk.eu/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-2026-10-08-0557",
-        "reserved_at": "2026-10-08T04:01:11.632Z"
+        "reserved_at": "2026-10-08T04:01:11.632Z",
+        "commit": "85e6cd49c13696ceeb25322458ac8dfbfbfc9f30",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/37726585438",
+        "verified_at": "2026-10-08T04:19:57.575Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-08T04:01:11.632Z"
+  "updated_at": "2026-10-08T04:19:57.575Z"
 }
