@@ -5,6 +5,7 @@ require_once __DIR__ . '/ionos-storage.php';
 require_once __DIR__ . '/gf-case-storage.php';
 require_once __DIR__ . '/kva-bundle.php';
 require_once __DIR__ . '/bki-openai-cache.php';
+require_once __DIR__ . '/bki-batch.php';
 commonHeaders();
 $user=requireAuth();
 if(!in_array((string)($user['role']??''),['administrator','projektleiter','pruefer','sachverstaendiger'],true)) apiError(403,'Keine Berechtigung.');
@@ -340,6 +341,7 @@ try{
     apiJson(['ok'=>true,...$analysis]);
   }
   if($action==='search'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');apiJson(['ok'=>true,...bkSearch(requestBody())]);}
+  if($action==='compare_kva'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if(session_status()===PHP_SESSION_ACTIVE)session_write_close();apiJson(['ok'=>true,...bkBatchSearch(requestBody())]);}
   if($action==='save'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');$in=requestBody();$items=is_array($in['items']??null)?$in['items']:[];if(!$items)throw new RuntimeException('Kalkulation enthält keine Positionen.');$tot=is_array($in['totals']??null)?$in['totals']:[];$case=is_array($in['case_meta']??null)?$in['case_meta']:[];$folder=trim((string)($in['folder_id']??''));if($folder!=='')requireCaseFolderAccess($folder,$user);$stmt=db()->prepare('INSERT INTO bki_calculations(folder_id,case_no,damage_type,object_name,location,note,net_total,vat_rate,vat_total,gross_total,items_json,created_by,created_at) VALUES(:folder,:case_no,:damage,:obj,:location,:note,:net,:vat,:tax,:gross,:items,:user,NOW())');$stmt->execute([':folder'=>$folder!==''?$folder:null,':case_no'=>trim((string)($case['schaden_nr']??''))?:null,':damage'=>trim((string)($case['schadenart']??''))?:null,':obj'=>trim((string)($case['vn_objekt']??''))?:null,':location'=>trim((string)($in['location']??''))?:null,':note'=>trim((string)($in['note']??''))?:null,':net'=>(float)($tot['net']??0),':vat'=>(float)($tot['vat']??19),':tax'=>(float)($tot['tax']??0),':gross'=>(float)($tot['gross']??0),':items'=>json_encode($items,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':user'=>(string)($user['email']??$user['full_name']??'')]);$calcId=(int)db()->lastInsertId();$driveFile=null;
     if($folder!==''){
