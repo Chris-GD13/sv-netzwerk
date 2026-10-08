@@ -1,5 +1,5 @@
 import { clearCredentials, loadCredentials, loadPortalCredentials, saveCredentials } from './vault.js';
-import { mapClaim, safeFileName } from './import-utils.js';
+import { collectInvestigationClaims, mapClaim, safeFileName } from './import-utils.js';
 import { isActiveRekonTask, mapRekonTask, ownerMatchesRekonProfile, rekonFileVersion, rekonMessageVersion, rekonProfileKey } from './rekon-utils.js';
 
 const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
@@ -315,6 +315,26 @@ async function requestJson(url, token, optional = false, timeout = 20000) {
   } finally { clearTimeout(timer); }
 }
 
+async function requestInvestigationClaims(endpoint, token, since) {
+  const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
+  try {
+    const response = await fetch(`${String(endpoint).replace(/\/+$/, '')}/investigation-list`, {
+      method: 'POST',
+      headers: { ...authHeaders(token), 'Content-Type': 'application/json; charset=UTF-8' },
+      body: JSON.stringify({ queries: { all: {} }, countsOnly: false }),
+      signal: controller.signal
+    });
+    if (!response.ok) throw new Error(`ClaimsForce-Berichte und Nachträge konnten nicht gelesen werden (${response.status}).`);
+    const payload = await response.json();
+    const investigations = payload?.results?.all?.investigations;
+    if (!Array.isArray(investigations)) throw new Error('ClaimsForce-Berichte und Nachträge haben ein unerwartetes Antwortformat.');
+    return collectInvestigationClaims(investigations, since);
+  } catch (error) {
+    if (String(error?.message || '').startsWith('ClaimsForce-Berichte und Nachträge')) throw error;
+    throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Berichte und Nachträge haben das Zeitlimit überschritten.' : 'ClaimsForce-Berichte und Nachträge konnten nicht geladen werden.');
+  } finally { clearTimeout(timer); }
+}
+
 async function portal(tabId, message) {
   const response = await Promise.race([chrome.tabs.sendMessage(tabId, message), sleep(120000).then(() => ({ ok: false, error: 'Das SV-Netzwerk hat innerhalb von 120 Sekunden nicht geantwortet.' }))]);
   if (!response?.ok) throw new Error(response?.error || 'Das SV-Netzwerk hat den Import nicht angenommen.');
@@ -406,15 +426,42 @@ async function runImport(run) {
     if(!Number.isInteger(openTasks))throw new Error(`[CF-TASKS-04] Zaehler nicht lesbar. ${lastTaskDebug?.path || '?'}; K=${JSON.stringify(lastTaskDebug?.candidates || [])}; ${(lastTaskDebug?.samples || []).filter(t => t.startsWith('Umfeld')).slice(0, 2).join(' // ').replace(/Umfeld: /g, '')}`.slice(0, 480));
     return { claims: 0, openTasks, taskCheck: true, updated: 0, skipped: 0, bridge: BRIDGE_VERSION, rows: lastTaskDebug?.rows ?? null };
   }
+  const configController = new AbortController(), configTimer = setTimeout(() => configController.abort(), 15000);
+  let config;
+  try { config = await (await fetch('https://web.claimsforce.com/config', { signal: configController.signal })).json(); }
+  catch (error) { throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Konfiguration hat das Zeitlimit überschritten.' : 'ClaimsForce-Konfiguration konnte nicht geladen werden.'); }
+  finally { clearTimeout(configTimer); }
   const claimsById = new Map(), bucketCounts = {};
   if (fullSync) {
-    await diagnostic(run, 'CF-FULL-04', `Vollabgleich der ClaimsForce-Fälle ab ${run.since || 'ohne Datumsgrenze'}: Fallliste wird vollständig eingelesen.`, { since: run.since || '', strategy: 'claims-all-pages' });
+    await diagnostic(run, 'CF-FULL-04', `Vollabgleich der ClaimsForce-Fälle ab ${run.since || 'ohne Datumsgrenze'}: Fallliste sowie Berichte und Nachträge werden eingelesen.`, { since: run.since || '', strategy: 'claims-and-investigations' });
     await ensureClaimsListTab(tab.id);
     const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
     const allClaims = Array.isArray(scraped?.claims) ? scraped.claims : [];
     for (const claim of allClaims) if (claim?.id) claimsById.set(claim.id, claim);
-    bucketCounts.ALL_TASKS = claimsById.size;
-    await diagnostic(run, 'CF-LIST-05', `${claimsById.size} unterschiedliche Aufträge aus „Aufgaben – Alle“ wurden erkannt.`, { count: claimsById.size, since: run.since || '', pages: scraped?.pages || 0, excludedUndated: scraped?.excludedUndated || 0, route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url) });
+    const claimsFromReports = await requestInvestigationClaims(config.ASSESSMENT_API_ENDPOINT, token, run.since || '');
+    for (const claim of claimsFromReports.claims) {
+      const existing = claimsById.get(claim.id);
+      if (existing) {
+        existing.label ||= claim.label;
+        existing.listVersion = [existing.listVersion, claim.listVersion].filter(Boolean).join('|');
+      } else claimsById.set(claim.id, claim);
+    }
+    bucketCounts.CLAIM_LIST = allClaims.length;
+    bucketCounts.REPORT_RECORDS = claimsFromReports.linkedRecords;
+    bucketCounts.REPORTS_AND_ADDENDA = claimsFromReports.claims.length;
+    await progress(portalTabId(), `${claimsById.size} Fälle gefunden: ${allClaims.length} aus der Fallliste und ${claimsFromReports.claims.length} aus Berichten/Nachträgen.`, 0, claimsById.size);
+    await diagnostic(run, 'CF-LIST-05', `${claimsById.size} unterschiedliche Fälle erkannt: ${allClaims.length} aus der Fallliste und ${claimsFromReports.claims.length} aus Berichten/Nachträgen.`, {
+      count: claimsById.size,
+      claimListCount: allClaims.length,
+      investigationRecordCount: claimsFromReports.linkedRecords,
+      investigationClaimCount: claimsFromReports.claims.length,
+      excludedInvestigationRecords: claimsFromReports.excludedByDate,
+      undatedInvestigationRecords: claimsFromReports.undated,
+      since: run.since || '',
+      pages: scraped?.pages || 0,
+      excludedUndated: scraped?.excludedUndated || 0,
+      route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url)
+    });
   } else for (const planningBucket of PLANNING_BUCKETS) {
     const planning = await openPlanning(tab.id, planningBucket.key);
     await diagnostic(run, 'CF-PLAN-04', `Planungsansicht „${planningBucket.label}“ wurde angefordert.`, { bucket: planningBucket.key, strategy: planning?.strategy || 'bestehende Ansicht' });
@@ -430,11 +477,6 @@ async function runImport(run) {
     const state = await chrome.tabs.sendMessage(tab.id, { type: 'SESSION_STATE' }).catch(() => ({}));
     throw new Error(`[CF-LIST-05] Keine Aufträge erkannt (Route ${state.route || 'unbekannt'}, API ${state.observedClaims || 0}).`);
   }
-  const configController = new AbortController(), configTimer = setTimeout(() => configController.abort(), 15000);
-  let config;
-  try { config = await (await fetch('https://web.claimsforce.com/config', { signal: configController.signal })).json(); }
-  catch (error) { throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Konfiguration hat das Zeitlimit überschritten.' : 'ClaimsForce-Konfiguration konnte nicht geladen werden.'); }
-  finally { clearTimeout(configTimer); }
   let filesDone = 0, messagesDone = 0, appointmentsDone = 0, skipped = 0, updated = 0, failed = 0;
   for (let index = 0; index < claims.length; index++) {
     try {
@@ -541,10 +583,11 @@ async function runImport(run) {
       await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length} fehlgeschlagen, nächster Auftrag wird verarbeitet.`, index + 1, claims.length);
     }
   }
-  await progress(portalTabId(), `${claims.length} Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${failed} fehlgeschlagen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
+  const sourceSummary = fullSync ? ` (${bucketCounts.CLAIM_LIST || 0} aus Fallliste, ${bucketCounts.REPORTS_AND_ADDENDA || 0} aus Berichten/Nachträgen)` : '';
+  await progress(portalTabId(), `${claims.length} Fälle${sourceSummary} geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${failed} fehlgeschlagen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
   await chrome.storage.session.set({ claimsLoggedProfile: profile });
   await chrome.storage.local.set({ claimsLoggedProfile: profile });
-  return { claims: claims.length, openTasks, updated, skipped, failed, files: filesDone, messages: messagesDone, notes: claims.length, appointments: appointmentsDone };
+  return { claims: claims.length, openTasks, updated, skipped, failed, files: filesDone, messages: messagesDone, notes: claims.length, appointments: appointmentsDone, sources: fullSync ? bucketCounts : {} };
 }
 
 async function startImport(sender, message) {

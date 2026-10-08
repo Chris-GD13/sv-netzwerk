@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { mergeOnlyBlank, mapClaim, safeFileName } from '../browser-extension/claimsforce-bridge/import-utils.js';
+import { collectInvestigationClaims, mergeOnlyBlank, mapClaim, safeFileName } from '../browser-extension/claimsforce-bridge/import-utils.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -23,6 +23,18 @@ const mapped = mapClaim({
 assert.equal(mapped.vn_objekt, 'Lena Prunkl');
 assert.equal(mapped.schaden_ort, 'Metzingen');
 assert.equal(mapped.claimsforce_termin.id, 'termin-1');
+
+const discoveredClaims = collectInvestigationClaims([
+  { id: 'report-1', claimId: 'claim-a', insurerClaimId: '26-123456-1', sentAt: '2026-04-01T12:00:00Z' },
+  { id: 'addendum-1', claimId: 'claim-a', statusUpdatedAt: '2026-05-01T12:00:00Z' },
+  { id: 'report-old', claimId: 'claim-old', createdAt: '2025-12-31T12:00:00Z' },
+  { id: 'report-undated', claimId: 'claim-undated' }
+], '2026-01-01');
+assert.deepEqual(discoveredClaims.claims.map(claim => claim.id), ['claim-a', 'claim-undated'], 'Berichte und Nachträge ergänzen Fälle anhand der ClaimsForce-claimId unter Beachtung des Stichtags');
+assert.equal(discoveredClaims.claims[0].label, '26-123456-1', 'Schadennummer aus einem Bericht wird als Anzeigename übernommen');
+assert.equal(discoveredClaims.linkedRecords, 4);
+assert.equal(discoveredClaims.excludedByDate, 1);
+assert.equal(discoveredClaims.undated, 1);
 
 const nestedStakeholder = mapClaim({ insurerClaimId: '65-1196231-20' }, {}, [], { stakeholders: [{ stakeholderType: 'VERSICHERUNGSNEHMER', firstName: 'Rolf', lastName: 'Philipp', address: { street: 'Saaleweg', houseNumber: '5', postalCode: '71522', city: 'Backnang' }, contractNumber: '12-5392833-60' }] });
 assert.equal(nestedStakeholder.versicherungsschein_nr, '12-5392833-60', 'Verschachtelte ClaimsForce-Vertragsnummer muss übernommen werden');
@@ -70,6 +82,7 @@ assert(manifest.content_scripts.some(entry => entry.matches.includes('https://ww
 assert(manifest.content_scripts.some(entry => entry.js.includes('portal-login-helper.js') && entry.run_at === 'document_idle'), 'Portal-Anmeldehilfe startet erst am vorhandenen Loginformular');
 
 const portal = fs.readFileSync(path.join(root, 'src/pages/intern/versicherungsfaelle/index.astro'), 'utf8');
+const dashboard = fs.readFileSync(path.join(root, 'src/pages/intern/tagescockpit/index.astro'), 'utf8');
 const internEntry = fs.readFileSync(path.join(root, 'src/pages/intern/index.astro'), 'utf8');
 const internLayout = fs.readFileSync(path.join(root, 'src/layouts/InternalLayout.astro'), 'utf8');
 const calculationPage = fs.readFileSync(path.join(root, 'src/pages/intern/kalkulation/index.astro'), 'utf8');
@@ -81,7 +94,9 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20261005-1'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20261008-1'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('leer = alle Fälle') && portal.includes('ClaimsForce-Fälle vollständig einlesen'), 'Der Vollabgleich erklärt den unbegrenzten Zeitraum verständlich');
+assert(dashboard.includes('<input id="vf-claims-since" type="date">') && !dashboard.includes('value="2026-01-01"'), 'Dashboard-Vollabgleich darf alte Fälle nicht durch einen voreingestellten Stichtag ausschließen');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(portal.includes(`<option value="${key}">${label}</option>`), `${label} ist als Bearbeiterprofil auswählbar`);
 assert(!portal.includes('<option value="susanne"') && !portal.includes('Susanne Wächter</option>'), 'Susanne darf nicht als eigenes Bearbeiterprofil erscheinen');
 assert(portal.includes("sessionStorage.removeItem('svnet-case')") && portal.includes("localStorage.removeItem('svnet-case')"), 'Profilwechsel löscht den aktiven Fall aus beiden Browser-Speichern');
@@ -113,6 +128,8 @@ assert(claimsPageBridge.includes('openTasks: count') && !claimsPageBridge.includ
 const claimsMain = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/claims-main.js'), 'utf8');
 assert(claimsMain.includes('response.clone().json()') && claimsMain.includes('CLAIMS_SNAPSHOT'), 'Fall-IDs werden geheimnisfrei aus den bereits geladenen ClaimsForce-Antworten erfasst');
 assert(claimsMain.includes('inspectTokenCache') && claimsMain.includes('inspectStorage(localStorage)'), 'Ein vorhandenes ClaimsForce-Token wird nach einem Worker-Neustart auch aus dem Auth-Cache wiederhergestellt');
+const importWorker = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8');
+assert(importWorker.includes('/investigation-list') && importWorker.includes('queries: { all: {} }') && importWorker.includes('collectInvestigationClaims'), 'Vollabgleich ergänzt die Claims-Liste um Fälle aus Berichten und Nachträgen');
 
 const vault = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/vault.js'), 'utf8');
 assert(vault.includes('credentials_${profile}') && vault.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens']"), 'Zugänge werden nur für die vier unterstützten Sachverständigen-Profile getrennt gespeichert');
@@ -313,4 +330,3 @@ assert(!serviceWorker.includes('console.log') && !serviceWorker.includes('consol
 assert(vault.includes("AES-GCM"), 'Kennwörter werden verschlüsselt gespeichert');
 
 console.log('ClaimsForce-Import: Zuordnung, Bestandsschutz, Zugangstresor und Browser-Brücke geprüft.');
-
