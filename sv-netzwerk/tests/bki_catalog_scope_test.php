@@ -17,3 +17,7 @@ if(!in_array('Bauschutt entsorgen',$queries,true)||!in_array('Baureinigung Baube
 $queries=bkCatalogQueries(['description'=>'Kontrolliertes Öffnen des Installationsbereichs','scope'=>'Mauerwerk entlang der Fallleitung öffnen']);
 if(!in_array('Schlitz Mauerwerk',$queries,true))throw new RuntimeException('Wandschlitz fehlt in den Suchvarianten.');
 echo "Offer vocabulary reaches original work-item terminology.\n";
+$shared=['id'=>'shared','scope'=>'Original scope','unit'=>'m'];
+$request=bkCatalogPromptInput([], [['row_id'=>'0','candidates'=>[$shared]],['row_id'=>'1','candidates'=>[$shared]]], [], 'Kuchen');
+if(count($request['original_catalog'])!==1||count($request['candidate_groups'])!==2||$request['candidate_groups'][1]['candidate_ids']!==['shared']||$request['original_catalog'][0]['scope']!=='Original scope')throw new RuntimeException('Shared source text was duplicated or lost.');
+echo "Shared original evidence is sent once without losing row assignments.\n";

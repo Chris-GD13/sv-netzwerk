@@ -21,6 +21,11 @@ function bkCatalogQueries(array $row):array {
   foreach($groups as [$pattern,$terms])if(preg_match($pattern,$text))$queries=array_merge($queries,$terms);
   return array_values(array_unique($queries));
 }
+function bkCatalogPromptInput(array $rows,array $groups,array $facts,string $location):array {
+  $catalog=[];$references=[];
+  foreach($groups as $group){$ids=[];foreach($group['candidates'] as $candidate){$catalog[$candidate['id']]=$candidate;$ids[]=$candidate['id'];}$references[]=['row_id'=>$group['row_id'],'candidate_ids'=>array_values(array_unique($ids))];}
+  return ['rows'=>$rows,'original_catalog'=>array_values($catalog),'candidate_groups'=>$references,'known_facts'=>$facts,'location'=>$location];
+}
 function bkCatalogRemoveOverlap(array $components):array {
   foreach($components as $packet){
     if(($packet['source_action']??'')!=='Herstellen'||empty($packet['gross_prices'])||empty($packet['quantity_verified'])||($packet['scope_issue']??'')!==''||bkBatchUnit($packet['unit'])!=='m')continue;
@@ -75,7 +80,8 @@ PROMPT;
   $instructions.=' Bei einer vorläufigen Planungsannahme in known_facts.notes darf die ausdrücklich vom Nutzer angenommene Ausführung als Planungsvariante gewählt werden, mit klarer Kennzeichnung im reason. Keine weiteren Annahmen ergänzen. Für Tätigkeiten ohne belegt passende Pauschalposition wähle den belegten fachlich passenden Stundenlohn als Preisgrundlage mit quantity=0; dabei keine Stunden erfinden. Auch offene Bauteile bekommen passende Einheitspreise als Prüf-/Planungsgrundlage, wenn sachlich vorhanden. quantities nur aus der exakten row_id (0-basierter Index), nicht aus gedruckter KVA-Positionsnummer. Wenn keine vollständige Quellenleistung verfügbar ist, benenne eine kurze konkret abzugrenzende Restleistung, keine langen pauschalen Warntexte.';
   $instructions.=' Für jede unvollständige Zeile zusätzlich open_items mit {label,kind} liefern: kind=quantity für fehlendes Aufmaß/Arbeitszeit, execution für unbekannte Abmessung/Material/System, source nur wenn trotz aller passenden Kandidaten kein Preisbeleg vorliegt, extra_work für nicht enthaltene Zusatzarbeiten. Jede notwendige fehlende Menge oder Ausführung in questions zusammenfassen, dabei gleiche Angaben gruppieren. Alle vorhandenen Angaben nutzen. Beispiel: bei Baureinigung m2 ohne Fläche kind=quantity; nicht behaupten, es gebe keine Preisquelle. Bei Reinigungsstück für HT keine Kanal-Putzstücke oder Steinzeugmontage verwenden. Ein Stundenlohn ist kein belegter Gesamtpreis für eine Pauschalleistung. scope_compatible auch bei quantity=0 nur dann true, wenn die Tätigkeit und Ausführung passen.';
   if($basis==='rpa')$instructions.=' Für diesen Lauf gilt ausschließlich die vom Nutzer bestätigte RPA-Höchstpreisliste. Kandidatenpreise sind Höchstpreise, keine BKI-Mittelwerte. FAQ-Bedingungen, enthaltene Nebenleistungen, Exklusivpositionen und Grenzen der RPA-Positionen zwingend berücksichtigen. Keine BKI-Positionen ergänzen.';
-  $response=bkOpenAIJson('POST','responses',['model'=>env('OPENAI_BKI_MODEL','gpt-5.4'),'instructions'=>$instructions,'input'=>json_encode(['rows'=>$rows,'candidate_groups'=>$candidates,'known_facts'=>$facts,'location'=>$input['location']??''],JSON_UNESCAPED_UNICODE),'max_output_tokens'=>14000],480);
+  $instructions.=' original_catalog enthält jeden Originaldatensatz genau einmal. candidate_groups ordnet jeder Zeile ihre passenden candidate_ids zu. Die candidate_id in der Antwort muss eine id aus original_catalog sein; Beschreibungen und Original-Leistungsumfang dort nachschlagen.';
+  $response=bkOpenAIJson('POST','responses',['model'=>env('OPENAI_BKI_MODEL','gpt-5.4'),'instructions'=>$instructions,'input'=>json_encode(bkCatalogPromptInput($rows,$candidates,$facts,(string)($input['location']??'')),JSON_UNESCAPED_UNICODE),'max_output_tokens'=>14000],480);
   $raw=bkJson(bkOutputText($response));$positions=[];$used=[];
   foreach($rows as $row){
     $match=null;foreach(($raw['positions']??[])as $p)if((string)($p['row_id']??'')===$row['row_id']){$match=$p;break;}
