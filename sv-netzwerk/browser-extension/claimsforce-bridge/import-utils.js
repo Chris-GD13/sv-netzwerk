@@ -126,6 +126,49 @@ export function mapClaim(claim, communication = {}, appointments = [], stakehold
   };
 }
 
+export function collectInvestigationClaims(investigations, since = '') {
+  const sinceTime = /^\d{4}-\d{2}-\d{2}$/.test(since) ? Date.parse(`${since}T00:00:00`) : NaN;
+  const claims = new Map();
+  let excludedByDate = 0;
+  let undated = 0;
+  let linkedRecords = 0;
+
+  for (const investigation of Array.isArray(investigations) ? investigations : []) {
+    const claimId = text(investigation?.claimId || investigation?.claim?.id);
+    if (!claimId) continue;
+    linkedRecords++;
+
+    const date = text(investigation.sentAt || investigation.createdAt || investigation.statusUpdatedAt || investigation.invoicedAt);
+    const germanDate = date.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+    const timestamp = germanDate ? Date.parse(`${germanDate[3]}-${germanDate[2]}-${germanDate[1]}T00:00:00`) : Date.parse(date);
+    if (Number.isFinite(sinceTime) && Number.isFinite(timestamp) && timestamp < sinceTime) {
+      excludedByDate++;
+      continue;
+    }
+    if (Number.isFinite(sinceTime) && !Number.isFinite(timestamp)) undated++;
+
+    const existing = claims.get(claimId) || { id: claimId, label: '', records: 0, latest: '', latestTime: NaN };
+    existing.records++;
+    existing.label ||= text(investigation.insurerClaimId || investigation.claimNumber || investigation.claim?.insurerClaimId || investigation.claim?.claimNumber);
+    if (Number.isFinite(timestamp) && timestamp > existing.latestTime) {
+      existing.latest = date;
+      existing.latestTime = timestamp;
+    }
+    claims.set(claimId, existing);
+  }
+
+  return {
+    claims: [...claims.values()].map(({ id, label, records, latest }) => ({
+      id,
+      label,
+      listVersion: `investigations:${records}:${latest || 'undated'}`
+    })),
+    linkedRecords,
+    excludedByDate,
+    undated
+  };
+}
+
 export function safeFileName(value, fallback = 'ClaimsForce-Datei') {
   const name = String(value || fallback).replace(/[<>:"/\\|?*\x00-\x1f]/g, '-').trim();
   return name.slice(0, 180) || fallback;
