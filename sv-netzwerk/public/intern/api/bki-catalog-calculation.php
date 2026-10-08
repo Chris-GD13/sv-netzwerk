@@ -26,6 +26,12 @@ function bkCatalogPromptInput(array $rows,array $groups,array $facts,string $loc
   foreach($groups as $group){$ids=[];foreach($group['candidates'] as $candidate){$catalog[$candidate['id']]=$candidate;$ids[]=$candidate['id'];}$references[]=['row_id'=>$group['row_id'],'candidate_ids'=>array_values(array_unique($ids))];}
   return ['rows'=>$rows,'original_catalog'=>array_values($catalog),'candidate_groups'=>$references,'known_facts'=>$facts,'location'=>$location];
 }
+/** Exact specified pipe system takes precedence over a broader polymer designation. */
+function bkCatalogSystemPosition(array $position,array $row,array $pool):array {
+  if(!preg_match('/\bHT\b/iu',$row['description'].' '.$row['scope'])||($position['source_action']??'')!=='Herstellen'||!preg_match('/\bPP-Rohrleitungen\b/iu',$position['description'])||!preg_match('/DN\/OD\s*(\d+)/iu',$position['description'],$dn))return $position;
+  foreach($pool as $candidate)if(($candidate['source_action']??'')==='Herstellen'&&($candidate['document_id']??'')===($position['document_id']??'')&&preg_match('/\bHT-Rohrleitungen\b/iu',$candidate['description'])&&preg_match('/DN\/OD\s*'.preg_quote($dn[1],'/').'(?!\d)/iu',$candidate['description'])&&bkBatchUnit($candidate['unit'])===bkBatchUnit($position['unit'])&&str_contains($candidate['description'],'gedämmt')===str_contains($position['description'],'gedämmt'))return $candidate;
+  return $position;
+}
 function bkCatalogRemoveOverlap(array $components):array {
   foreach($components as $packet){
     if(($packet['source_action']??'')!=='Herstellen'||empty($packet['gross_prices'])||empty($packet['quantity_verified'])||($packet['scope_issue']??'')!==''||bkBatchUnit($packet['unit'])!=='m')continue;
@@ -40,6 +46,7 @@ function bkCatalogRemoveOverlap(array $components):array {
 }
 function bkCatalogScopeIssue(array $component,array $row,array $facts):string {
   $issue=bkBatchScopeIssue($component,$row,$facts);
+  if(preg_match('/\bHT\b/iu',$row['description'].' '.$row['scope'])&&preg_match('/\bPP-Rohrleitungen\b/iu',$component['description']))return 'Der KVA nennt HT; der Katalog führt hierfür eine eigene HT-Preisposition. PP-Paket nicht als identischen Vergleichspreis verwenden.';
   if(preg_match('/Gussrohrleitung.*demontieren/iu',$component['description'])){
     $evidence=$row['scope'].' '.$row['description'];
     if(preg_match('/Guss[^.\n]{0,80}\bDN\s*\d+/iu',(string)($facts['notes']??''),$fact))$evidence.=' '.$fact[0];
@@ -58,7 +65,8 @@ function bkCatalogCalculate(array $rows,array $input):array {
   $key='bki_catalog_v5_'.hash('sha256',json_encode([$status,$rows,$level,$facts,$input['location']??'',$basis],JSON_UNESCAPED_UNICODE));
   $cached=json_decode(bkSettingGet($key,'{}'),true);
   if(isset($cached['positions'])){
-    foreach($cached['positions'] as &$position){$row=$rows[(int)$position['row_id']];foreach($position['source_candidates'] as &$component){$issue=bkCatalogScopeIssue($component,$row,$facts);if($issue!=='')$component['scope_issue']=$issue;}unset($component);$position['source_candidates']=bkCatalogRemoveOverlap($position['source_candidates']);$position['priced_components']=array_values(array_filter($position['source_candidates'],fn($c)=>$c['quantity_verified']&&$c['scope_issue']===''));$position['calculated_net']=$position['priced_components']?round(array_sum(array_map(fn($c)=>$c['quantity']*$c['unit_price'],$position['priced_components'])),2):null;foreach(['low','high'] as $range)$position['calculated_'.$range]=$position['priced_components']?round(array_sum(array_map(fn($c)=>$c['quantity']*($c['price_'.$range]??$c['unit_price']),$position['priced_components'])),2):null;if($position['status']==='ready'&&(count($position['priced_components'])!==count($position['components'])||str_contains($row['scope'],'Reinigungsstück'))){$position['components']=[];$position['status']=$position['priced_components']?'partial':'open';}elseif($position['status']!=='ready')$position['status']=$position['priced_components']?'partial':'open';}unset($position);
+    $systems=bklSearch('Abwasser HT',20,'position',true);
+    foreach($cached['positions'] as &$position){$row=$rows[(int)$position['row_id']];foreach($position['source_candidates'] as &$component){$specified=bkCatalogSystemPosition($component,$row,$systems);if($specified['id']!==$component['id']){$component=array_replace($component,$specified);$component['unit_price']=(float)$specified['price_'.$level];$component['source_page']='Seite '.$specified['source_page'];$component['source_url']='/intern/api/bki-library-upload.php?action=pdf&id='.$specified['document_id'].'#page='.$specified['source_page'];}$issue=bkCatalogScopeIssue($component,$row,$facts);if($issue!=='')$component['scope_issue']=$issue;}unset($component);$position['source_candidates']=bkCatalogRemoveOverlap($position['source_candidates']);$position['priced_components']=array_values(array_filter($position['source_candidates'],fn($c)=>$c['quantity_verified']&&$c['scope_issue']===''));$position['calculated_net']=$position['priced_components']?round(array_sum(array_map(fn($c)=>$c['quantity']*$c['unit_price'],$position['priced_components'])),2):null;foreach(['low','high'] as $range)$position['calculated_'.$range]=$position['priced_components']?round(array_sum(array_map(fn($c)=>$c['quantity']*($c['price_'.$range]??$c['unit_price']),$position['priced_components'])),2):null;if($position['status']==='ready'&&(count($position['priced_components'])!==count($position['components'])||str_contains($row['scope'],'Reinigungsstück'))){$position['components']=[];$position['status']=$position['priced_components']?'partial':'open';}elseif($position['status']!=='ready')$position['status']=$position['priced_components']?'partial':'open';}unset($position);
     $cached['calculated_net']=round(array_sum(array_map(fn($p)=>$p['calculated_net']??0,$cached['positions'])),2);return $cached+['cached'=>true];
   }
   $candidates=[];$pool=[];
@@ -81,13 +89,14 @@ PROMPT;
   $instructions.=' Für jede unvollständige Zeile zusätzlich open_items mit {label,kind} liefern: kind=quantity für fehlendes Aufmaß/Arbeitszeit, execution für unbekannte Abmessung/Material/System, source nur wenn trotz aller passenden Kandidaten kein Preisbeleg vorliegt, extra_work für nicht enthaltene Zusatzarbeiten. Jede notwendige fehlende Menge oder Ausführung in questions zusammenfassen, dabei gleiche Angaben gruppieren. Alle vorhandenen Angaben nutzen. Beispiel: bei Baureinigung m2 ohne Fläche kind=quantity; nicht behaupten, es gebe keine Preisquelle. Bei Reinigungsstück für HT keine Kanal-Putzstücke oder Steinzeugmontage verwenden. Ein Stundenlohn ist kein belegter Gesamtpreis für eine Pauschalleistung. scope_compatible auch bei quantity=0 nur dann true, wenn die Tätigkeit und Ausführung passen.';
   if($basis==='rpa')$instructions.=' Für diesen Lauf gilt ausschließlich die vom Nutzer bestätigte RPA-Höchstpreisliste. Kandidatenpreise sind Höchstpreise, keine BKI-Mittelwerte. FAQ-Bedingungen, enthaltene Nebenleistungen, Exklusivpositionen und Grenzen der RPA-Positionen zwingend berücksichtigen. Keine BKI-Positionen ergänzen.';
   $instructions.=' original_catalog enthält jeden Originaldatensatz genau einmal. candidate_groups ordnet jeder Zeile ihre passenden candidate_ids zu. Die candidate_id in der Antwort muss eine id aus original_catalog sein; Beschreibungen und Original-Leistungsumfang dort nachschlagen.';
+  $instructions.=' Bei ausdrücklich HT-Rohr im KVA die eigene HT-Katalogposition wählen, nicht das getrennt bepreiste PP-Leitungspaket, auch wenn HT als Polymerwerkstoff PP nennt. Katalogseitig getrennte Rohrsysteme sind keine identischen Preise.';
   $response=bkOpenAIJson('POST','responses',['model'=>env('OPENAI_BKI_MODEL','gpt-5.4'),'instructions'=>$instructions,'input'=>json_encode(bkCatalogPromptInput($rows,$candidates,$facts,(string)($input['location']??'')),JSON_UNESCAPED_UNICODE),'max_output_tokens'=>14000],480);
   $raw=bkJson(bkOutputText($response));$positions=[];$used=[];
   foreach($rows as $row){
     $match=null;foreach(($raw['positions']??[])as $p)if((string)($p['row_id']??'')===$row['row_id']){$match=$p;break;}
     $match=$match??[];$components=[];$ready=($match['coverage']??'')==='complete';
     foreach(($match['components']??[])as $selection){
-      $p=$pool[$selection['candidate_id']??'']??null;if(!$p){$ready=false;continue;}
+      $p=$pool[$selection['candidate_id']??'']??null;if(!$p){$ready=false;continue;}$p=bkCatalogSystemPosition($p,$row,$pool);
       $component=$p+['quantity'=>(float)($selection['quantity']??0),'quantity_source'=>$selection['quantity_source']??[]];
       $component['unit_price']=(float)($p['price_'.$level]??$p['price_mid']);$component['source_page']='Seite '.$p['source_page'];$component['source_url']='/intern/api/bki-library-upload.php?action=pdf&id='.$p['document_id'].'#page='.$p['source_page'];
       $component['evidence_verified']=true;$component['quantity_verified']=bkBatchQuantity($component,$row,$rows,$facts);
