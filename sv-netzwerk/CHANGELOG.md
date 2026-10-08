@@ -1,3 +1,10 @@
+## 2026-10-08
+- Fachbeitrag „Wallboxen und Ladeinfrastruktur nach Überflutung fachlich prüfen“ ergänzt
+- Beaufschlagung, elektrische Sicherheit, Wiederinbetriebnahme, Modernisierung und schadenbedingte Kosten getrennt dokumentiert
+- DIN EN IEC 61851-1:2019-12, VDE-, DGUV- und VVG-Quellen eingeordnet; DIN EN IEC 61851-1:2026-06 ausdrücklich als nicht verbindlicher Norm-Entwurf gekennzeichnet
+- Beitragsbild, Fachwissensübersicht, Suchindex und Sitemap-Integration ergänzt
+- LinkedIn-Begleittext bis zur separaten Live-Veröffentlichung als `prepared-not-posted` abgelegt
+
 ## 2026-10-06
 - Fachbeitrag „Photovoltaikanlagen nach Sturm- und Hagelschäden fachlich prüfen“ ergänzt
 - Modul-, Montage-, Dach- und Elektroschäden sowie mögliche Ertragsfolgen getrennt dokumentiert

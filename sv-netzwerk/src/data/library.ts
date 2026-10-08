@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Wallboxen und Ladeinfrastruktur nach Überflutung fachlich prüfen',
+    description: 'Überflutete Wallboxen werden anhand von Wasserbeaufschlagung, elektrischer Fachprüfung, Wiederinbetriebnahme und schadenbedingten Kosten nachvollziehbar bewertet.',
+    href: '/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung/',
+    category: 'Gebäudetechnik und Elementarschäden',
+    tags: ['Wallbox', 'Ladeinfrastruktur', 'Überflutung', 'Elektrosicherheit', 'Wiederinbetriebnahme', 'Kostenprüfung'],
+    date: '2026-10-08',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Wärmepumpen nach Überflutung: Prüfung und Kosten fachlich abgrenzen',
     description: 'Überflutete Wärmepumpen werden anhand von Anlagenbefund, Fachprüfung, Wiederinbetriebnahme und schadenbedingten Kosten nachvollziehbar bewertet.',
     href: '/fachwissen/waermepumpe-ueberflutung-pruefung-kostenabgrenzung/',
