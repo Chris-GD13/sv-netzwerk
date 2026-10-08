@@ -7,7 +7,7 @@ $data=['schema'=>1,'documents'=>[['id'=>$sha,'name'=>'Fixture.pdf','kind'=>'posi
 $data['documents'][0]['pages'][0]['text']='Synthetic fixture 1€ 8€ 10€ 12€ 20€ [m] 100.000.001';$data['positions'][0]['source_quote']=$data['documents'][0]['pages'][0]['text'];$data['positions'][0]['price_mid']=999;
 $path=$root.'/input.json';file_put_contents($path,json_encode($data));$result=bklImport($path);
 if($result['positions']!==1||!$result['documents'][0]['on_ionos']||count(bklSearch('Abwasserleitung'))!==1)throw new RuntimeException('Index oder Suche fehlt.');
-if(bklSearch('Abwasserleitung')[0]['price_mid']!==10.0)throw new RuntimeException('Import hat erfundenen Preis akzeptiert.');
+if((float)bklSearch('Abwasserleitung')[0]['price_mid']!==10.0)throw new RuntimeException('Import hat erfundenen Preis akzeptiert.');
 $data['documents'][0]['sha256']=str_repeat('a',64);file_put_contents($path,json_encode($data));
 $failed=false;try{bklImport($path);}catch(Throwable){$failed=true;}if(!$failed||bklStatus()['positions']!==1)throw new RuntimeException('Ungeprüfter Import oder beschädigter Bestand.');
 echo "Private library import, search, original binding and rollback passed.\n";
