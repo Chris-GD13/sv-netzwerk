@@ -8,13 +8,13 @@ function bklRoot():string {
 }
 function bklDb():PDO {
   $db=new PDO('sqlite:'.bklRoot().'/catalog.sqlite',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
-  $db->exec('PRAGMA busy_timeout=30000; CREATE TABLE IF NOT EXISTS documents(id TEXT PRIMARY KEY,name TEXT,kind TEXT,sha256 TEXT,size INTEGER,pages INTEGER); CREATE TABLE IF NOT EXISTS positions(id TEXT PRIMARY KEY,document_id TEXT,data TEXT); CREATE VIRTUAL TABLE IF NOT EXISTS source_search USING fts5(id UNINDEXED,kind UNINDEXED,text,tokenize="unicode61 remove_diacritics 2");');
+  $db->exec('PRAGMA busy_timeout=30000; CREATE TABLE IF NOT EXISTS catalog_meta(key TEXT PRIMARY KEY,value TEXT); CREATE TABLE IF NOT EXISTS documents(id TEXT PRIMARY KEY,name TEXT,kind TEXT,sha256 TEXT,size INTEGER,pages INTEGER); CREATE TABLE IF NOT EXISTS positions(id TEXT PRIMARY KEY,document_id TEXT,data TEXT); CREATE VIRTUAL TABLE IF NOT EXISTS source_search USING fts5(id UNINDEXED,kind UNINDEXED,text,tokenize="unicode61 remove_diacritics 2");');
   return $db;
 }
 function bklStatus():array {
   $db=bklDb();$docs=$db->query('SELECT * FROM documents')->fetchAll();
   foreach($docs as &$doc){$file=bklRoot().'/'.$doc['sha256'].'.pdf';$doc['on_ionos']=is_file($file)&&filesize($file)===(int)$doc['size'];}unset($doc);
-  return ['backend'=>'IONOS','documents'=>$docs,'positions'=>(int)$db->query('SELECT COUNT(*) FROM positions')->fetchColumn()];
+  return ['backend'=>'IONOS','documents'=>$docs,'positions'=>(int)$db->query('SELECT COUNT(*) FROM positions')->fetchColumn(),'catalog_sha256'=>$db->query("SELECT value FROM catalog_meta WHERE key='sha256'")->fetchColumn()?:null];
 }
 function bklImport(string $path):array {
   $data=json_decode(file_get_contents($path),true,512,JSON_THROW_ON_ERROR);
@@ -41,6 +41,7 @@ function bklImport(string $path):array {
       $entry->execute([$p['id'],$p['document_id'],json_encode($p,JSON_UNESCAPED_UNICODE)]);
       $search->execute([$p['id'],'position',$p['description'].' '.$p['scope'].' '.json_encode($p['inherited'],JSON_UNESCAPED_UNICODE)]);
     }
+    $revision=$db->prepare('INSERT OR REPLACE INTO catalog_meta VALUES(?,?)');$revision->execute(['sha256',hash_file('sha256',$path)]);
     $db->commit();return bklStatus();
   }catch(Throwable $e){$db->rollBack();throw $e;}
 }

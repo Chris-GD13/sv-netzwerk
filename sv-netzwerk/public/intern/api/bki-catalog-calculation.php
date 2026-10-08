@@ -1,13 +1,27 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/bki-library.php';
+function bkCatalogScopeIssue(array $component,array $row,array $facts):string {
+  $issue=bkBatchScopeIssue($component,$row,$facts);
+  if(preg_match('/Gussrohrleitung.*demontieren/iu',$component['description'])){
+    $evidence=$row['scope'].' '.$row['description'];
+    if(preg_match('/Guss[^.\n]{0,80}\bDN\s*\d+/iu',(string)($facts['notes']??''),$fact))$evidence.=' '.$fact[0];
+    if(!preg_match('/\bDN\s*(\d+)/iu',$evidence,$diameter))return 'Durchmesser der vorhandenen Gussleitung fehlt; die neue HT-Nennweite belegt ihn nicht.';
+    if(preg_match('/Durchmesser:\s*DN(\d+)\s*bis\s*DN(\d+)/iu',(string)($component['scope']??''),$range)&&((int)$diameter[1]<(int)$range[1]||(int)$diameter[1]>(int)$range[2]))return 'Die gewählte Guss-Variante passt nicht zum belegten Alt-Durchmesser.';
+  }
+  return $issue;
+}
 /** Retrieve every work item independently; prices come exclusively from the private catalog. */
 function bkCatalogCalculate(array $rows,array $input):array {
   $status=bklStatus();if($status['positions']<1)throw new RuntimeException('Der geprüfte IONOS-Preisbestand fehlt. Bitte Originale und Preisindex einspielen.');
   foreach($status['documents'] as $doc)if(!$doc['on_ionos'])throw new RuntimeException('Original-PDF fehlt auf IONOS: '.$doc['name']);
   $level=in_array($input['level']??'mid',['low','mid','high'],true)?($input['level']??'mid'):'mid';$facts=is_array($input['facts']??null)?$input['facts']:[];
-  $key='bki_catalog_v2_'.hash('sha256',json_encode([$status,$rows,$level,$facts,$input['location']??''],JSON_UNESCAPED_UNICODE));
-  $cached=json_decode(bkSettingGet($key,'{}'),true);if(isset($cached['positions']))return $cached+['cached'=>true];
+  $key='bki_catalog_v3_'.hash('sha256',json_encode([$status,$rows,$level,$facts,$input['location']??''],JSON_UNESCAPED_UNICODE));
+  $cached=json_decode(bkSettingGet($key,'{}'),true);
+  if(isset($cached['positions'])){
+    foreach($cached['positions'] as &$position){$row=$rows[(int)$position['row_id']];foreach($position['source_candidates'] as &$component){$issue=bkCatalogScopeIssue($component,$row,$facts);if($issue!=='')$component['scope_issue']=$issue;}unset($component);$position['priced_components']=array_values(array_filter($position['source_candidates'],fn($c)=>$c['quantity_verified']&&$c['scope_issue']===''));$position['calculated_net']=$position['priced_components']?round(array_sum(array_map(fn($c)=>$c['quantity']*$c['unit_price'],$position['priced_components'])),2):null;if($position['status']==='ready'&&count($position['priced_components'])!==count($position['components'])){$position['components']=[];$position['status']=$position['priced_components']?'partial':'open';}elseif($position['status']!=='ready')$position['status']=$position['priced_components']?'partial':'open';}unset($position);
+    $cached['calculated_net']=round(array_sum(array_map(fn($p)=>$p['calculated_net']??0,$cached['positions'])),2);return $cached+['cached'=>true];
+  }
   $candidates=[];$pool=[];
   foreach($rows as $row){
     $query=$row['description'].' '.$row['scope'];
@@ -24,6 +38,7 @@ Bei keinem passenden Kandidaten benenne konkret benötigte Leistung als missing_
 {"positions":[{"row_id":"0","coverage":"complete|partial|unmatched","reason":"berechnete Leistungsabdeckung, fehlende Teilleistungen und Doppelansätze","components":[{"candidate_id":"","quantity":0,"quantity_source":{"type":"kva|fact","row_id":"","quote":""}}],"missing_search":["konkrete fehlende Teilleistung"]}],"questions":[{"key":"","label":"konkrete fehlende Angabe","row_ids":["0"]}]}
 PROMPT;
   $instructions.=' Bevorzuge passende Altbau-Gebäude-Leistungspakete einschließlich Formteilen, Befestigung und Dämmung, um den vollständigen Umfang zu berechnen. Die Bruttoquellen werden serverseitig netto umgerechnet. Enthaltene Leistungen nicht doppelt ansetzen. Ergänze jede Komponentenwahl um scope_compatible=true nur bei wirklich passenden Abmessungen, Material und Tätigkeit. Ein 30x15cm-Schlitz bei KVA bis40cm ohne Tiefenmaß ist nur ein Vergleichskandidat, KEINE belegte Teilmenge. Alle nicht kompatiblen Kandidaten scope_compatible=false. Eine kleine Variante darf keine andere größere/ungeklärte Ausführung als berechnete Teilleistung ersetzen. quantity_source.type=scope mit row_id und quote darf explizite tatsächliche Mengen im Langtext belegen, aber niemals bis/max-Mengen. Fehlende Preise oder Mengen nicht durch andere unpassende Gewerke ersetzen.';
+  $instructions.=' Bei einer vorläufigen Planungsannahme in known_facts.notes darf die ausdrücklich vom Nutzer angenommene Ausführung als Planungsvariante gewählt werden, mit klarer Kennzeichnung im reason. Keine weiteren Annahmen ergänzen. Für Tätigkeiten ohne belegt passende Pauschalposition wähle den belegten fachlich passenden Stundenlohn als Preisgrundlage mit quantity=0; dabei keine Stunden erfinden. Auch offene Bauteile bekommen passende Einheitspreise als Prüf-/Planungsgrundlage, wenn sachlich vorhanden. quantities nur aus der exakten row_id (0-basierter Index), nicht aus gedruckter KVA-Positionsnummer. Wenn keine vollständige Quellenleistung verfügbar ist, benenne eine kurze konkret abzugrenzende Restleistung, keine langen pauschalen Warntexte.';
   $response=bkOpenAIJson('POST','responses',['model'=>env('OPENAI_BKI_MODEL','gpt-5.4'),'instructions'=>$instructions,'input'=>json_encode(['rows'=>$rows,'candidate_groups'=>$candidates,'known_facts'=>$facts,'location'=>$input['location']??''],JSON_UNESCAPED_UNICODE),'max_output_tokens'=>14000],480);
   $raw=bkJson(bkOutputText($response));$positions=[];$used=[];
   foreach($rows as $row){
@@ -41,8 +56,7 @@ PROMPT;
           if(strlen($quote)>2&&str_contains($scope,$quote)&&!preg_match('/\b(bis|max|höchstens|maximal)\b/iu',$quote))$component['quantity_verified']=bkBatchQuantity(['quantity'=>$component['quantity'],'unit'=>$component['unit'],'quantity_source'=>['type'=>'fact','quote'=>$quote]],['unit'=>'','quantity'=>0],[],['notes'=>$quote]);
         }
       }
-      $issue=bkBatchScopeIssue($component,$row,$facts);if(($selection['scope_compatible']??false)!==true)$issue='Ausführung oder Abmessungen der gewählten Preisposition sind nicht bestätigt.';
-      if(preg_match('/Gussrohrleitung.*demontieren/iu',$p['description'])&&!preg_match('/\bDN\s*\d+/iu',$row['scope'].' '.$row['description'])&&!preg_match('/Guss[^.\n]{0,80}\bDN\s*\d+/iu',(string)($facts['notes']??'')))$issue='Durchmesser der vorhandenen Gussleitung fehlt; die neue HT-Nennweite belegt ihn nicht.';
+      $issue=bkCatalogScopeIssue($component,$row,$facts);if(($selection['scope_compatible']??false)!==true)$issue='Ausführung oder Abmessungen der gewählten Preisposition sind nicht bestätigt.';
       $component['scope_issue']=$issue;
       $duplicate=$p['id'].'|'.json_encode($selection['quantity_source']??[]).'|'.$component['quantity'];
       if(isset($used[$duplicate])){$ready=false;continue;}
@@ -51,8 +65,9 @@ PROMPT;
     }
     $priced=array_values(array_filter($components,fn($c)=>$c['quantity_verified']&&$c['scope_issue']===''));
     $subtotal=round(array_sum(array_map(fn($c)=>$c['quantity']*$c['unit_price'],$priced)),2);
-    $positions[]=['row_id'=>$row['row_id'],'source_position'=>$row['source_position'],'description'=>$row['description'],'status'=>$ready&&$priced?'ready':($priced?'partial':'open'),'reason'=>(string)($match['reason']??'Keine passende Preisgrundlage gefunden.'),'components'=>$ready?$priced:[],'source_candidates'=>$components,'priced_components'=>$priced,'calculated_net'=>$priced?$subtotal:null,'offered_total'=>$row['offered_total']??null];
+    $low=round(array_sum(array_map(fn($c)=>$c['quantity']*($c['price_low']??$c['unit_price']),$priced)),2);$high=round(array_sum(array_map(fn($c)=>$c['quantity']*($c['price_high']??$c['unit_price']),$priced)),2);
+    $positions[]=['row_id'=>$row['row_id'],'source_position'=>$row['source_position'],'description'=>$row['description'],'status'=>$ready&&$priced?'ready':($priced?'partial':'open'),'reason'=>(string)($match['reason']??'Keine passende Preisgrundlage gefunden.'),'components'=>$ready?$priced:[],'source_candidates'=>$components,'priced_components'=>$priced,'calculated_net'=>$priced?$subtotal:null,'calculated_low'=>$priced?$low:null,'calculated_high'=>$priced?$high:null,'offered_total'=>$row['offered_total']??null];
   }
-  $data=['positions'=>$positions,'questions'=>$raw['questions']??[],'search_mode'=>'ionos_catalog','regional_factor'=>null,'calculated_net'=>round(array_sum(array_map(fn($p)=>$p['calculated_net']??0,$positions)),2),'catalog_positions'=>$status['positions'],'documents'=>$status['documents']];
+  $data=['positions'=>$positions,'questions'=>$raw['questions']??[],'search_mode'=>'ionos_catalog','regional_factor'=>null,'planning'=>preg_match('/Annahme|vorläufig|ungeprüft/iu',(string)($facts['notes']??''))===1,'facts'=>$facts,'calculated_net'=>round(array_sum(array_map(fn($p)=>$p['calculated_net']??0,$positions)),2),'catalog_positions'=>$status['positions'],'documents'=>$status['documents']];
   bkSettingSet($key,json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));return $data+['cached'=>false];
 }
