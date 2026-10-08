@@ -62,6 +62,11 @@
 
 # Changelog
 
+## 2026-10-08 – Beitragsbild des Wallbox-Fachbeitrags korrigiert
+
+- Die nicht dekodierbare Bilddatei des heutigen Fachbeitrags wurde entfernt.
+- Artikel-Metadaten, LinkedIn-Vorbereitung und Veröffentlichungsprotokoll weisen den Beitrag nun regelkonform ohne öffentliches Beitragsbild aus.
+
 ## 5.1.18 – 2026-09-26
 
 - Fachbeitrag „Entsorgungskosten nach Gebäudeschäden prüffähig abgrenzen“ veröffentlicht

@@ -23,8 +23,6 @@ seo:
   description: "Wallboxen nach Überflutung: Wasserbeaufschlagung, elektrische Sicherheit, Fachprüfung, Wiederinbetriebnahme und Kosten prüffähig abgrenzen."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung/"
   noindex: false
-  image: "/assets/images/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung.jpg"
-  imageAlt: "Wallbox und elektrische Verteilung mit Schlamm- und Wasserstandsspuren in einer überfluteten Tiefgarage"
 ---
 
 ## Fachliche Einordnung
