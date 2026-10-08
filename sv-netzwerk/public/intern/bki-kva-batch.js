@@ -5,7 +5,7 @@
   const sourceLines = (row, result) => result.status === 'ready' ? result.components.map(component => ({
     ...component, description: component.description, source_position_code: component.position_code,
     regional_factor: 1, bki_scope_checked: true, bki_batch_checked: true,
-    kva_source_position: row.source_position, kva_description: row.description,
+    kva_source_position: row.source_position, kva_description: row.description, kva_scope: row.scope,
     bki_note: result.reason, comparison_basis: 'bki',
   })) : [{
     description: row.description, quantity: Number(row.quantity), unit: row.unit,
@@ -46,7 +46,7 @@
         const rendered = data.positions.map((result, i) => {
           const row = rows[Number(result.row_id)] || rows[i];offered += amount(row);
           const total = result.status === 'ready' ? result.components.reduce((sum,c) => sum + c.quantity * c.unit_price, 0) : amount(row);proposed += total;
-          return `<tr><td>${esc(row.source_position)}</td><td>${esc(row.description)}<details><summary>Begründung und Quelle</summary><p>${esc(result.reason)}</p>${(result.components||[]).map(c=>`<p><strong>${esc(c.position_code)} · ${esc(c.description)}</strong><br>${esc(c.quantity)} ${esc(c.unit)} × ${money(c.unit_price)}<br>${esc(c.source_name)}${c.source_page?' · '+esc(c.source_page):' · Originalauszug'}<br>${esc(c.source_quote)}</p>`).join('')}</details></td><td>${money(amount(row))}</td><td>${result.status==='ready'?'BKI belegt':'BKI offen · KVA bleibt'}</td><td>${money(total)}</td></tr>`;
+          return `<tr><td>${esc(row.source_position)}</td><td>${esc(row.description)}<details><summary>Begründung und Quelle</summary><p>${esc(row.scope || "")}</p><p>${esc(result.reason)}</p>${(result.components||[]).map(c=>`<p><strong>${esc(c.position_code)} · ${esc(c.description)}</strong><br>${esc(c.quantity)} ${esc(c.unit)} × ${money(c.unit_price)}<br>${esc(c.source_name)}${c.source_page?' · '+esc(c.source_page):' · Originalauszug'}<br>${esc(c.source_quote)}</p>`).join('')}</details></td><td>${money(amount(row))}</td><td>${result.status==='ready'?'BKI belegt':'BKI offen · KVA bleibt'}</td><td>${money(total)}</td></tr>`;
         }).join('');
         results.innerHTML = `<div class="bk-batch-table"><table><thead><tr><th>KVA</th><th>Leistung</th><th>Angebot netto</th><th>Grundlage</th><th>Entwurf netto</th></tr></thead><tbody>${rendered}</tbody></table></div><p>Angebot: ${money(offered)} · Vergleichsentwurf: ${money(proposed)}. ${open?'Enthält Angebotspreise für offene Leistungen; noch keine vollständige BKI-Vergleichssumme.':'Alle ausgewählten Leistungen sind durch BKI-Fundstellen belegt.'} Regionalfaktor ist nicht belegt und wird nicht ergänzt.</p>`;
         const questions = new Map();for(const question of data.questions || [])if(question?.label)questions.set(question.key || question.label,question.label);

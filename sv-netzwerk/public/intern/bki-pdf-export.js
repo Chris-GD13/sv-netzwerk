@@ -43,6 +43,7 @@
   async function generatePdf({download=false,type='settlement'}={}){
     const data=payload(type);
     if(!data.lines.length)throw new Error('Keine Kalkulationspositionen vorhanden.');
+    if(type==='kva_review'&&data.lines.some(line=>line.type!=='section'&&(line.comparison_basis==='kva_open'||(line.source_position_code&&!line.bki_scope_checked))))throw new Error('BKI-Abgleich ist noch offen. Eine automatische KVA-Freigabe oder Kürzung ist daraus nicht möglich. Offene Leistungen zuerst fachlich klären.');
     if(type==='kva_review'&&(!data.kva.company||!data.kva.quote_number||data.kva.gross_total<=0))throw new Error('Für die KVA-Prüfung fehlen Firma, KVA-Nummer oder KVA-Gesamtbetrag. Bitte den KVA zuerst auslesen.');
     const response=await fetch(PDF_API,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/pdf'},body:JSON.stringify(data),credentials:'same-origin'});
     if(!response.ok){const msg=(await response.text()).trim();throw new Error(msg||`PDF konnte nicht erstellt werden (${response.status}).`);}

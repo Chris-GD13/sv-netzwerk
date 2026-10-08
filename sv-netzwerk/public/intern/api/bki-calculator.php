@@ -109,8 +109,9 @@ function bkAnalyzeKva(string $name,string $mime,string $bytes,string $quoteNumbe
   $instructions=<<<'PROMPT'
 Lies den deutschen Kostenvoranschlag vollständig und extrahiere die angebotenen Leistungspositionen als Kalkulationsgrundlage. Übernimm keine Summenzeilen, Zwischensummen, Umsatzsteuer oder Rabatte als Leistungsposition. Fasse eine Position nur dann zusammen, wenn sie im Dokument selbst zusammengefasst ist. Erfinde keine Mengen, Einheiten, Beschreibungen oder Preise. Kennzeichne Bedarfs-, Eventual- und Alternativpositionen mit optional=true. Rechnungen gehören nicht in die Angebotspositionen. Übernimm separat bepreiste Kosten wie Logistikpauschalen oder Zuschläge als eigene Kostenposition (Menge 1, Einheit psch, gedruckter Betrag als Einzel- und Gesamtpreis); Summen selbst bleiben ausgeschlossen. Ergänze bei Stunden- und Material-Unterpositionen den gedruckten Titel und dessen Leistungsbeschreibung, damit das Gewerk erkennbar bleibt. Kosten, die erst nach Fertigstellung, nach Absprache oder auf Nachweis berechnet werden, sind optional=true; fehlende Preise bleiben null und dürfen nicht als 0 erfunden werden. Lies die gedruckte Nettosumme des gewählten Angebots; keine Zwischensumme als Nettosumme verwenden.
 
+Übernimm zu JEDER Position den vollständigen gedruckten Langtext in scope: Material, DN/Durchmesser, Breiten, Dicken, Anschlusszahlen, Nebenleistungen, Erschwernisse und Einschränkungen. description bleibt der kurze Positionstitel.
 Antworte ausschließlich als JSON:
-{"quote_number":"","company":"","net_total":null,"positions":[{"source_position":"","description":"","quantity":null,"unit":"","offered_unit_price":null,"offered_total":null,"optional":false}]}
+{"quote_number":"","company":"","net_total":null,"positions":[{"source_position":"","description":"","scope":"vollständiger gedruckter Langtext","quantity":null,"unit":"","offered_unit_price":null,"offered_total":null,"optional":false}]}
 PROMPT;
   $response=bkOpenAIJson('POST','responses',[
     'model'=>env('OPENAI_MODEL','gpt-5.4-mini'),
@@ -122,7 +123,7 @@ PROMPT;
   foreach(($raw['positions']??[])as$row){
     if(!is_array($row))continue;$description=trim((string)($row['description']??''));
     if($description==='')continue;
-    $positions[]=['source_position'=>trim((string)($row['source_position']??'')),'description'=>$description,'quantity'=>is_numeric($row['quantity']??null)?(float)$row['quantity']:null,'unit'=>trim((string)($row['unit']??'')),'offered_unit_price'=>is_numeric($row['offered_unit_price']??null)?(float)$row['offered_unit_price']:null,'offered_total'=>is_numeric($row['offered_total']??null)?(float)$row['offered_total']:null,'optional'=>($row['optional']??false)===true||!is_numeric($row['offered_total']??null)];
+    $positions[]=['source_position'=>trim((string)($row['source_position']??'')),'description'=>$description,'scope'=>trim((string)($row['scope']??'')),'quantity'=>is_numeric($row['quantity']??null)?(float)$row['quantity']:null,'unit'=>trim((string)($row['unit']??'')),'offered_unit_price'=>is_numeric($row['offered_unit_price']??null)?(float)$row['offered_unit_price']:null,'offered_total'=>is_numeric($row['offered_total']??null)?(float)$row['offered_total']:null,'optional'=>($row['optional']??false)===true||!is_numeric($row['offered_total']??null)];
   }
   if(!$positions)throw new RuntimeException('Im Dokument wurden keine belastbaren Leistungspositionen erkannt.');
   if($quoteNumber!==''&&preg_replace('/[^a-z0-9]/i','',strtolower($quoteNumber))!==preg_replace('/[^a-z0-9]/i','',strtolower((string)($raw['quote_number']??''))))throw new RuntimeException('Die ausgelesene Angebotsnummer stimmt nicht mit der Belegauswahl überein.');
@@ -332,7 +333,7 @@ try{
       return bkJson(bkOutputText($response));
     },static fn(string $key):string=>bkSettingGet($key,'{}'),static fn(string $key,string $value)=>bkSettingSet($key,$value),$folder.'|'.(string)($user['id']??$user['email']??''));
     if(($prepared['selection_required']??false)===true)apiJson(['ok'=>true,'source_name'=>$name,'selection_required'=>true,'offers'=>$prepared['offers']]);
-    $analysisKey='kva_calc_complete_v1_'.hash('sha256',$folder.'|'.(string)($user['id']??$user['email']??'').'|'.hash('sha256',$bytes).'|'.$prepared['quote_number']);
+    $analysisKey='kva_calc_scope_v2_'.hash('sha256',$folder.'|'.(string)($user['id']??$user['email']??'').'|'.hash('sha256',$bytes).'|'.$prepared['quote_number']);
     $analysis=json_decode(bkSettingGet($analysisKey,'{}'),true);
     if(!is_array($analysis)||empty($analysis['positions'])||!is_numeric($analysis['net_total']??null)||!empty($analysis['warnings'])){
       $analysis=bkAnalyzeKva($name,$mime,$prepared['bytes'],$prepared['quote_number']);

@@ -27,6 +27,7 @@ $note=trim((string)($data['note']??''));
 $vat=(float)($data['vat']??0);
 $lines=is_array($data['lines']??null)?$data['lines']:[];
 if(!$lines){http_response_code(400);echo 'Keine Kalkulationspositionen';exit;}
+if($isKvaReview)foreach($lines as $line)if(($line['type']??'')!=='section'&&(($line['comparison_basis']??'')==='kva_open'||(!empty($line['source_position_code'])&&empty($line['bki_scope_checked'])))){http_response_code(422);echo 'BKI-Abgleich ist noch offen. Automatische KVA-Freigabe oder Kürzung gesperrt.';exit;}
 $kva=is_array($data['kva']??null)?$data['kva']:[];
 $kvaCompany=trim((string)($kva['company']??''));
 $kvaNumber=trim((string)($kva['quote_number']??''));
