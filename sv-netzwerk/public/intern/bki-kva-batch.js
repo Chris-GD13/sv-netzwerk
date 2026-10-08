@@ -36,6 +36,7 @@
     const factsPanel = document.createElement('div');factsPanel.hidden = true;
     factsPanel.innerHTML = '<strong>Fehlende Angaben einmal für den gesamten KVA ergänzen</strong><ul data-questions></ul><label>Aufmaß / Ausführung / Arbeitsbedingungen<textarea data-facts rows="3" placeholder="Nur bekannte Angaben, z. B. Rohrdurchmesser, Öffnungsfläche, Zugänglichkeit oder Abfallgewicht."></textarea></label><button data-retry type="button">Mit ergänzten Angaben erneut abgleichen</button>';
     host.append(factsPanel);
+    factsPanel.querySelector('textarea').value=document.getElementById('bk-known-facts')?.value||'';
     const actions = document.createElement('div');actions.className = 'bk-actions';host.append(actions);
     let data = null, pending = false;
     const run = async () => {
@@ -59,7 +60,7 @@
         if(catalog){
           const notice=document.createElement('p');notice.textContent=data.planning?'Vorläufige Terminplanung: Nutzerannahmen sind berücksichtigt. Die Werte sind keine abschließende Schadenhöhe.':'Preisrahmen aus Originalquellen; offene Aufmaße können für den Ortstermin gesammelt ergänzt werden.';results.prepend(notice);
           results.querySelectorAll('tbody tr').forEach((tr,i)=>{const result=data.positions[i];if(result.calculated_net!==null){const range=document.createElement('small');range.style.display='block';range.textContent='von '+money(result.calculated_low)+' bis '+money(result.calculated_high);tr.cells[4].append(range);}else{const priced=(result.source_candidates||[]).filter(c=>c.evidence_verified&&c.scope_issue==='');const rates=priced.slice(0,2).map(c=>money(c.unit_price)+' / '+c.unit);if(rates.length)tr.cells[4].textContent=rates.join(' · ')+' (Menge offen)';}});
-          const taskList=document.createElement('details');taskList.innerHTML='<summary>Aufmaßliste für den Ortstermin</summary><ul>'+data.positions.filter(p=>p.status!=='ready').map(p=>'<li><strong>KVA '+esc(p.source_position)+'</strong> · '+esc(p.description)+'<br>'+esc(p.reason)+'</li>').join('')+'</ul>';results.append(taskList);
+          const taskList=document.createElement('details');taskList.innerHTML='<summary>Gebündelte Angaben für den Ortstermin</summary><ul>'+[...new Set((data.questions||[]).map(q=>q.label).filter(Boolean))].slice(0,8).map(label=>'<li>'+esc(label)+'</li>').join('')+'</ul>';results.append(taskList);
         }
         const questions = new Map();for(const question of data.questions || [])if(question?.label)questions.set(question.key || question.label,question.label);
         for(const position of data.positions)if(position.status==='open'&&String(position.reason).includes('Feuerwiderstandsklasse'))questions.set('fire_resistance','Welche Feuerwiderstandsklasse ist für die Deckendurchführungen tatsächlich erforderlich?');
