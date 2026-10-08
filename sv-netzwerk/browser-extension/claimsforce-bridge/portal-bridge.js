@@ -27,6 +27,7 @@ const PORTAL_REQUEST_TYPES = new Set(['PORTAL_UPSERT', 'PORTAL_UPLOAD_START', 'P
 let keepalivePort = null;
 let keepaliveTimer = 0;
 let activeRequest = null;
+const caseNumberKey = value => String(value || '').replace(/[\s\u00ad\u2010-\u2015\u2212-]+/gu, '').toUpperCase();
 const blank = value => value == null || (typeof value === 'string' && value.trim() === '');
 const mergeBlank = (existing, incoming) => { const out = { ...(existing || {}) }; Object.entries(incoming || {}).forEach(([key, value]) => { if (blank(out[key]) && !blank(value)) out[key] = value; }); return out; };
 
@@ -61,7 +62,7 @@ async function findCase(mapped, profile, signal) {
   for (const row of found.results || []) {
     const loaded = await scopedApi(profile, `${API}?action=load_case&id=${encodeURIComponent(row.id)}`, { signal });
     const meta = loaded.case?.meta || row.meta || {};
-    if ((mapped.claimsforce_claim_id && meta.claimsforce_claim_id === mapped.claimsforce_claim_id) || (mapped.rekon_task_id && meta.rekon_task_id === mapped.rekon_task_id) || (mapped.schaden_nr && meta.schaden_nr === mapped.schaden_nr)) return { folderId: row.id, meta };
+    if ((mapped.claimsforce_claim_id && meta.claimsforce_claim_id === mapped.claimsforce_claim_id) || (mapped.rekon_task_id && meta.rekon_task_id === mapped.rekon_task_id) || (mapped.schaden_nr && caseNumberKey(meta.schaden_nr) === caseNumberKey(mapped.schaden_nr))) return { folderId: loaded.case?.id || row.id, meta };
   }
   return null;
 }

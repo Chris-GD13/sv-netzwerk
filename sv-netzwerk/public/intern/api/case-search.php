@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__ . '/case-identity.php';
 
 /** Normalized representation used by the local case search index. */
 function caseSearchNormalize(string $value): string
@@ -12,7 +13,7 @@ function caseSearchNormalize(string $value): string
 /** All scalar case fields are searchable, including both postal addresses. */
 function caseSearchText(array $meta, string $folderName = ''): string
 {
-    $values = [$folderName];
+    $values = [$folderName, caseNumberKey((string)($meta['schaden_nr']??''))];
     array_walk_recursive($meta, static function (mixed $value) use (&$values): void {
         if (is_scalar($value)) {
             $values[] = (string) $value;
@@ -29,6 +30,8 @@ function caseSearchTerms(string $query): array
 
 function caseSearchMatches(string $searchText, string $query): bool
 {
+    $key=caseNumberKey($query);
+    if(preg_match('/^[0-9]{6,}$/D',$key))return str_contains(str_replace(' ','',$searchText),$key);
     foreach (caseSearchTerms($query) as $term) {
         if (!str_contains($searchText, $term)) {
             return false;
