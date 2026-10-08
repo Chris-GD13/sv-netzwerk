@@ -138,105 +138,12 @@ PROMPT;
   return['warnings'=>$warnings,'source_name'=>$name,'quote_number'=>trim((string)($raw['quote_number']??'')),'company'=>trim((string)($raw['company']??'')),'net_total'=>is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null,'positions'=>$positions];
 }
 function bkSearch(array $in):array{
-  $q=trim((string)($in['query']??''));
-  if($q==='')throw new RuntimeException('Leistungsbeschreibung fehlt.');
-  $location=trim((string)($in['location']??''));
-  $qty=trim((string)($in['quantity']??''));
-  $unit=trim((string)($in['unit']??''));
-  $case=is_array($in['case_meta']??null)?$in['case_meta']:[];
-  $vectorStoreId=bkVectorStore();
-  $instructions=<<<'PROMPT'
-Du arbeitest ausschließlich mit den über die Dateisuche zugänglichen lizenzierten BKI-Unterlagen "BKI Baukosten Positionen Altbau 2026" und "BKI Baukosten Gebäude Altbau 2026". Nutze die Dateisuche gezielt, um für die konkrete Schaden- oder Instandsetzungsleistung passende BKI-Altbau-Positionen und – soweit erforderlich – den Regionalfaktor zu finden. Erfinde keine Positionsnummern, Einheiten, Seiten oder Preise. Wenn eine Angabe nicht belastbar aus den BKI-Dateien auffindbar ist, lasse das Feld leer bzw. null. Verwende keine allgemeinen Marktpreise außerhalb der BKI-Dateien.
-
-Antworte ausschließlich als JSON:
-{"regional_factor":null,"regional_factor_note":"","positions":[{"position_code":"","description":"","unit":"","price_low":null,"price_mid":null,"price_high":null,"recommended_quantity":null,"source_page":"","source_name":"BKI Baukosten Positionen Altbau 2026","note":""}]}
-
-Regeln:
-- Die KVA-Beschreibung kann mehrere Teilleistungen enthalten. Nenne für jeden Treffer im Feld note ausdrücklich, welche angefragten Teilleistungen enthalten sind und welche fehlen oder nicht belegt sind. Alternative Ausführungen (z. B. unterschiedliche Rohrdurchmesser) als Alternativen kennzeichnen, nicht addieren. Zugänglichkeit, Rohrdurchmesser, Öffnungsbreite, Gewicht, Fläche oder Arbeitsstunden niemals aus einer bloßen Längen- oder Pauschalangabe erfinden.
-- Eine Demontageposition ist kein Beleg für Öffnen, Schutzmaßnahmen, Zugang über mehrere Geschosse oder Wiederherstellung. Nur als enthalten benennen, wenn es in der konkreten BKI-Quelle belegt ist. Preise für andere Leistungsumfänge nicht als vollständige KVA-Preise ausgeben.
-- maximal 6 wirklich passende Positionen.
-- BKI-Preise als Netto-Einheitspreise in EUR numerisch zurückgeben.
-- Wenn mehrere notwendige Teilleistungen bestehen, z. B. Ausbau/Entsorgung und Neueinbau, dürfen mehrere Positionen vorgeschlagen werden.
-- recommended_quantity aus der Nutzereingabe ableiten, aber nur bei eindeutiger Umrechnung. Beispiel: 5 Elemente à 2 m² und BKI-Einheit m² => 10; BKI-Einheit Stück => 5.
-- regional_factor nur aus den BKI-Regionalfaktoren bestimmen, wenn Ort/PLZ eindeutig zuordenbar; sonst null und kurze Erläuterung.
-- source_page muss die BKI-Seite enthalten, soweit sie aus dem Suchtreffer belastbar hervorgeht.
-- Fassadengerüst strikt trennen: Auf-/Um-/Abbau ist eine einmalige Leistung; Vorhaltung ist eine gesonderte zeitabhängige Leistung. Preise oder Einheiten niemals zwischen beiden Positionen vertauschen.
-- Bei Fassadengerüst-Auf-/Um-/Abbau Plausibilitätskorridor 6 bis 12 EUR netto je m² beachten. Für Kleinflächen unter 60 m² ist statt einer m²-Abrechnung eine Mindest-/Kleinflächenpauschale von 1.400 EUR netto anzusetzen und klar als solche zu kennzeichnen.
-PROMPT;
-  $text="Leistung: {$q}\nOrt/Region: {$location}\nExplizite Menge: {$qty}\nExplizite Einheit: {$unit}\nSchadenart: ".trim((string)($case['schadenart']??''));
-  $payload=[
-    'model'=>env('OPENAI_MODEL','gpt-5.4-mini'),
-    'instructions'=>$instructions,
-    'input'=>$text,
-    'tools'=>[[
-      'type'=>'file_search',
-      'vector_store_ids'=>[$vectorStoreId],
-      'max_num_results'=>12
-    ]],
-    'max_output_tokens'=>4500
-  ];
-  $d=bkOpenAIJson('POST','responses',$payload,360);
-  $out=bkJson(bkOutputText($d));
-  $rf=is_numeric($out['regional_factor']??null)?(float)$out['regional_factor']:null;
-  $positions=[];
-  foreach(($out['positions']??[])as$p){
-    if(!is_array($p))continue;
-    $positions[]=[
-      'position_code'=>trim((string)($p['position_code']??'')),
-      'description'=>trim((string)($p['description']??'')),
-      'unit'=>trim((string)($p['unit']??'')),
-      'price_low'=>is_numeric($p['price_low']??null)?(float)$p['price_low']:null,
-      'price_mid'=>is_numeric($p['price_mid']??null)?(float)$p['price_mid']:null,
-      'price_high'=>is_numeric($p['price_high']??null)?(float)$p['price_high']:null,
-      'recommended_quantity'=>is_numeric($p['recommended_quantity']??null)?(float)$p['recommended_quantity']:null,
-      'regional_factor'=>$rf,
-      'source_page'=>trim((string)($p['source_page']??'')),
-      'source_name'=>trim((string)($p['source_name']??'BKI Baukosten Positionen Altbau 2026')),
-      'note'=>trim((string)($p['note']??''))
-    ];
-  }
-  $queryNorm=mb_strtolower($q,'UTF-8');
-  $isScaffoldSetup=str_contains($queryNorm,'fassadengerüst')
-    && (str_contains($queryNorm,'auf-')||str_contains($queryNorm,'aufbau')||str_contains($queryNorm,'abbau')||str_contains($queryNorm,'umsetzen'));
-  $quantity=is_numeric(str_replace(',','.',$qty))?(float)str_replace(',','.',$qty):0.0;
-  if($isScaffoldSetup&&$quantity>0){
-    if($quantity<60){
-      $positions=[[
-        'position_code'=>'301.000.057',
-        'description'=>'Fassadengerüst – Auf-, Um- und Abbau – Kleinflächenpauschale unter 60 m²',
-        'unit'=>'psch',
-        'price_low'=>1400.0,
-        'price_mid'=>1400.0,
-        'price_high'=>1400.0,
-        'recommended_quantity'=>1.0,
-        'regional_factor'=>$rf,
-        'source_page'=>'',
-        'source_name'=>'BKI Baukosten Positionen Altbau 2026',
-        'note'=>'Mindest-/Kleinflächenpauschale netto; Vorhaltung separat kalkulieren.'
-      ]];
-    }else{
-      $base=$positions[0]??[];
-      $positions=[[
-        'position_code'=>trim((string)($base['position_code']??''))?:'301.000.057',
-        'description'=>'Fassadengerüst – Auf-, Um- und Abbau',
-        'unit'=>'m²',
-        'price_low'=>6.0,
-        'price_mid'=>9.0,
-        'price_high'=>12.0,
-        'recommended_quantity'=>$quantity,
-        'regional_factor'=>$rf,
-        'source_page'=>trim((string)($base['source_page']??'')),
-        'source_name'=>trim((string)($base['source_name']??'BKI Baukosten Positionen Altbau 2026')),
-        'note'=>'Plausibilitätskorridor 6–12 EUR/m² netto; Vorhaltung separat kalkulieren.'
-      ]];
-    }
-  }
-  return[
-    'positions'=>$positions,
-    'regional_factor'=>$rf,
-    'regional_factor_note'=>trim((string)($out['regional_factor_note']??'')),
-    'search_mode'=>'file_search'
-  ];
+  require_once __DIR__.'/bki-library.php';
+  $q=trim((string)($in['query']??''));if($q==='')throw new RuntimeException('Leistungsbeschreibung fehlt.');
+  if(bklStatus()['positions']<1)throw new RuntimeException('Der IONOS-Preisbestand fehlt.');
+  $positions=bklSearch($q,12);
+  foreach($positions as &$p){$p['regional_factor']=1;$p['source_page']='Seite '.$p['source_page'];$p['note']=$p['scope'];$p['recommended_quantity']=null;}unset($p);
+  return ['positions'=>$positions,'regional_factor'=>null,'regional_factor_note'=>'Bundesdurchschnitt; kein belegter Regionalfaktor.','search_mode'=>'ionos_catalog'];
 }
 
 function bkSafeName(string $value):string{
