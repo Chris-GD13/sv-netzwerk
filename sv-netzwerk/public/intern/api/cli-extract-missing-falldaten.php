@@ -5,13 +5,18 @@ declare(strict_types=1);
  * Nur CLI: legt für Fallordner ohne 00_Falldaten.json die Falldaten aus den gespeicherten Unterlagen an
  * (KI-Auslese wie im Portal). Es werden ausschließlich neue Falldaten geschrieben, bestehende nie verändert.
  *
- *   runuser -u www-data -- php cli-extract-missing-falldaten.php [--apply] [--limit=N]
+ *   runuser -u www-data -- php cli-extract-missing-falldaten.php [--apply] [--limit=N] [--fill-empty]
+ *
+ * Mit --fill-empty werden zusätzlich bestehende Falldaten ohne VN/Objekt oder Schadenart (z. B. aus dem
+ * ClaimsForce-Import) aus den Unterlagen ergänzt; nur leere Felder werden gefüllt.
  */
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/ionos-storage.php';
 
 $apply = in_array('--apply', $argv, true);
+$fillEmpty = in_array('--fill-empty', $argv, true);
+$fillEmpty = in_array('--fill-empty', $argv, true);
 $limit = 1000;
 foreach ($argv as $arg) if (preg_match('/^--limit=(\d+)$/', $arg, $m)) $limit = (int)$m[1];
 $apiKey = trim(env('OPENAI_API_KEY', ''));
@@ -49,7 +54,13 @@ foreach ($rows as $row) {
     $folderName = $s->fetchColumn();
     if ($folderName === false) continue;
     $s = $db->prepare("SELECT 1 FROM items WHERE parent=? AND name='00_Falldaten.json' AND verified=1"); $s->execute([$fid]);
-    if ($s->fetchColumn()) continue;
+    $existingId = (string)$s->fetchColumn();
+    $existing = [];
+    if ($existingId !== '') {
+        if (!$fillEmpty) continue;
+        $existing = json_decode(ionosBytes($existingId), true);
+        if (!is_array($existing) || (trim((string)($existing['vn_objekt'] ?? '')) !== '' && trim((string)($existing['schadenart'] ?? '')) !== '')) continue;
+    }
     $stat['kandidaten']++;
     $q = $db->prepare("WITH RECURSIVE t(id,name,mime) AS (SELECT id,name,mime FROM items WHERE parent=? AND verified=1 UNION ALL SELECT i.id,i.name,i.mime FROM items i JOIN t ON i.parent=t.id WHERE i.verified=1) SELECT id,name FROM t WHERE mime='application/pdf'");
     $q->execute([$fid]);
@@ -68,6 +79,19 @@ foreach ($rows as $row) {
             foreach (openAiExtract($apiKey, (string)$d['name'], 'application/pdf', ionosBytes($d['id'])) as $key => $value) {
                 if ($value !== '' && ($case[$key] ?? '') === '') $case[$key] = $value;
             }
+        }
+        if ($existingId !== '') {
+            $added = 0;
+            foreach ($case as $key => $value) if ($value !== '' && trim((string)($existing[$key] ?? '')) === '') { $existing[$key] = $value; $added++; }
+            if ($added === 0) { $stat['ohne_ergebnis']++; echo "Nichts zu ergänzen: $folderName\n"; continue; }
+            $existing['updated_at'] = gmdate('c'); $existing['updated_by'] = 'Automatische Auslese aus Fallunterlagen';
+            echo ($apply ? 'Ergänzt' : 'Gefunden') . ': ' . $folderName . " => $added Felder\n";
+            if ($apply) {
+                ionosWrite([], json_encode($existing, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT), $existingId);
+                registerCaseFolderOwner($fid, ['id' => (int)$row['user_id'], 'email' => (string)$row['user_email']], $existing);
+            }
+            $stat['angelegt']++;
+            continue;
         }
         if (count(array_filter($case)) < 2) { $stat['ohne_ergebnis']++; echo "Zu wenig Daten: $folderName\n"; continue; }
         $case['updated_at'] = gmdate('c'); $case['updated_by'] = 'Automatische Auslese aus Fallunterlagen'; $case['created_at'] = $case['updated_at'];
