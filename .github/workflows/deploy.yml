@@ -214,7 +214,7 @@ jobs:
             image_path="${latest_image#/}"
             image_upload_command="put deploy-site/$image_path -o $image_path;"
           fi
-          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --overwrite --parallel=4 --exclude-glob .git* --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern --exclude-glob intern/** deploy-site/ .; $article_upload_command $image_upload_command quit"
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --overwrite --parallel=4 --exclude-glob .git* --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern --exclude-glob intern/** deploy-site/ .; $article_upload_command $image_upload_command rm -f assets/images/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung.jpg; quit"
           exit_code=1
           for attempt in $(seq 1 "$SFTP_UPLOAD_ATTEMPTS"); do
             echo "Upload-Versuch $attempt/$SFTP_UPLOAD_ATTEMPTS"
