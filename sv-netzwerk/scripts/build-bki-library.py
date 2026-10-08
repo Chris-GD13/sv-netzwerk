@@ -50,7 +50,7 @@ def build(directory):
             if lb and chapter != lb[1]: chapter, definitions = lb[1], {}
             # Definitions occur between position blocks and can span several pages.
             headers = list(re.finditer(r'(?m)^(?:\d{1,3} [^\W\d_][^\n]+|A\s*\d+ [^\n]+Beschreibung für Pos[^\n]*)', text))
-            price_pattern = r'((?:(?:[\d.,]+€|[–-])\s+){4}(?:[\d.,]+€|[–-]))\s*\[([^\]]+)\][^\n]*?(\d{3}\.\d{3}\.\d{3})'
+            price_pattern = r'((?:(?:[\d.,]+€?|[–-])\s+){4}(?:[\d.,]+€?|[–-]))\s*\[([^\]]+)\][^\n]*?(\d{3}\.\d{3}\.\d{3})'
             for i, header in enumerate(headers):
                 block = text[header.start():headers[i+1].start() if i+1<len(headers) else len(text)]
                 if header[0].startswith('A'):
@@ -59,7 +59,7 @@ def build(directory):
                     continue
                 price = re.search(price_pattern, block)
                 if not price: continue
-                numbers = [float(n.replace('.','').replace(',','.')) if n not in ('–','-') else None for n in re.findall(r'[\d.,]+(?=€)|[–-]', price[1])]
+                numbers = [float(n.replace('.','').replace(',','.')) if n not in ('–','-') else None for n in re.findall(r'[\d.,]+|[–-]', price[1])]
                 if len(numbers)!=5 or numbers[2] is None: continue
                 description = re.sub(r'^\d+\s+|\s+KG\s+\d+$','',header[0])
                 scope = block[:price.start()].strip()

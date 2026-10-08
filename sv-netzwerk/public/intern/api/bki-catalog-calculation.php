@@ -34,6 +34,13 @@ PROMPT;
       $component=$p+['quantity'=>(float)($selection['quantity']??0),'quantity_source'=>$selection['quantity_source']??[]];
       $component['unit_price']=(float)($p['price_'.$level]??$p['price_mid']);$component['source_page']='Seite '.$p['source_page'];$component['source_url']='/intern/api/bki-library-upload.php?action=pdf&id='.$p['document_id'].'#page='.$p['source_page'];
       $component['evidence_verified']=true;$component['quantity_verified']=bkBatchQuantity($component,$row,$rows,$facts);
+      $quantitySource=$selection['quantity_source']??[];
+      if(($quantitySource['type']??'')==='scope'){
+        foreach($rows as $quantityRow)if($quantityRow['row_id']===(string)($quantitySource['row_id']??'')){
+          $quote=bkBatchText((string)($quantitySource['quote']??''));$scope=bkBatchText($quantityRow['scope']);
+          if(strlen($quote)>2&&str_contains($scope,$quote)&&!preg_match('/\b(bis|max|höchstens|maximal)\b/iu',$quote))$component['quantity_verified']=bkBatchQuantity(['quantity'=>$component['quantity'],'unit'=>$component['unit'],'quantity_source'=>['type'=>'fact','quote'=>$quote]],['unit'=>'','quantity'=>0],[],['notes'=>$quote]);
+        }
+      }
       $issue=bkBatchScopeIssue($component,$row,$facts);if(($selection['scope_compatible']??false)!==true)$issue='Ausführung oder Abmessungen der gewählten Preisposition sind nicht bestätigt.';$component['scope_issue']=$issue;
       $duplicate=$p['id'].'|'.json_encode($selection['quantity_source']??[]).'|'.$component['quantity'];
       if(isset($used[$duplicate])){$ready=false;continue;}
