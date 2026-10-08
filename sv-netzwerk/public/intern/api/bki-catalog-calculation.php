@@ -41,7 +41,9 @@ PROMPT;
           if(strlen($quote)>2&&str_contains($scope,$quote)&&!preg_match('/\b(bis|max|höchstens|maximal)\b/iu',$quote))$component['quantity_verified']=bkBatchQuantity(['quantity'=>$component['quantity'],'unit'=>$component['unit'],'quantity_source'=>['type'=>'fact','quote'=>$quote]],['unit'=>'','quantity'=>0],[],['notes'=>$quote]);
         }
       }
-      $issue=bkBatchScopeIssue($component,$row,$facts);if(($selection['scope_compatible']??false)!==true)$issue='Ausführung oder Abmessungen der gewählten Preisposition sind nicht bestätigt.';$component['scope_issue']=$issue;
+      $issue=bkBatchScopeIssue($component,$row,$facts);if(($selection['scope_compatible']??false)!==true)$issue='Ausführung oder Abmessungen der gewählten Preisposition sind nicht bestätigt.';
+      if(preg_match('/Gussrohrleitung.*demontieren/iu',$p['description'])&&!preg_match('/\bDN\s*\d+/iu',$row['scope'].' '.$row['description'])&&!preg_match('/Guss[^.\n]{0,80}\bDN\s*\d+/iu',(string)($facts['notes']??'')))$issue='Durchmesser der vorhandenen Gussleitung fehlt; die neue HT-Nennweite belegt ihn nicht.';
+      $component['scope_issue']=$issue;
       $duplicate=$p['id'].'|'.json_encode($selection['quantity_source']??[]).'|'.$component['quantity'];
       if(isset($used[$duplicate])){$ready=false;continue;}
       if($component['quantity_verified']&&$issue==='')$used[$duplicate]=true;else $ready=false;
