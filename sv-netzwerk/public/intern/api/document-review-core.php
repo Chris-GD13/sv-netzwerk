@@ -9,6 +9,13 @@ function drMoney(mixed $value): ?float {
     return is_numeric($text) ? round((float)$text, 2) : null;
 }
 
+function drEnergyNumber(mixed $value): ?float {
+    if ($value===null || $value==='') return null;
+    $text=preg_replace('/(?:EUR|€|\s)/iu','',trim((string)$value))??'';
+    if (str_contains($text,',')) $text=str_replace(',','.',str_replace('.','',$text));
+    return is_numeric($text)?round((float)$text,4):null;
+}
+
 function drValidate(array $preview, array $input): array {
     $out = [];
     foreach (['company','number','date','reason','assessment','to','cc','bcc'] as $key) $out[$key] = trim((string)($input[$key] ?? ''));
@@ -17,6 +24,15 @@ function drValidate(array $preview, array $input): array {
     $out['release_amount'] = drMoney($input['release_amount'] ?? null);
     $out['net'] = drMoney($input['net'] ?? null);
     $out['vat'] = drMoney($input['vat'] ?? null);
+    $out['energy_kwh'] = drEnergyNumber($input['energy_kwh'] ?? null);
+    if (trim((string)($input['energy_kwh'] ?? ''))!=='' && $out['energy_kwh']===null) throw new RuntimeException('Bitte einen gültigen Energieverbrauch in kWh eingeben.');
+    $out['energy_rate'] = drEnergyNumber($input['energy_rate'] ?? '0,35');
+    $out['energy_vn'] = trim((string)($input['energy_vn'] ?? ''));
+    $out['energy_amount'] = null;
+    if ($out['energy_kwh'] !== null) {
+        if ($out['energy_kwh']<0 || $out['energy_rate']===null || $out['energy_rate']<=0) throw new RuntimeException('Verbrauch muss mindestens null und der Strompreis größer als null sein.');
+        $out['energy_amount']=round($out['energy_kwh']*$out['energy_rate'],2);
+    } elseif (isset($preview['analysis']['energy_kwh']) && is_numeric($preview['analysis']['energy_kwh'])) throw new RuntimeException('Den nachgewiesenen Energieverbrauch bitte separat übernehmen.');
     if (!in_array($out['decision'], ['approved','rejected'], true)) throw new RuntimeException('Bitte freigegeben oder nicht freigegeben auswählen.');
     if ($out['company'] === '' || $out['number'] === '' || $out['gross'] === null || $out['gross'] <= 0) throw new RuntimeException('Aussteller, Belegnummer und Original-Bruttobetrag fehlen.');
     if (($preview['mode'] ?? '') === 'review') {
@@ -49,13 +65,20 @@ function drBody(array $record): string {
     $v = $record['values'];
     $label = $record['kind'] === 'invoice' ? 'Rechnung' : 'Angebot';
     $status = $v['decision'] === 'approved' ? 'freigegeben' : 'nicht freigegeben';
-    $body = "Sehr geehrte Damen und Herren,\n\nzur Schaden-Nr. {$record['case_no']} erhalten Sie anbei die {$label} von {$v['company']}, Nr. {$v['number']}";
+    $article=$record['kind']==='invoice'?'die':'das';
+    $reference=str_starts_with($record['case_no'],'Freie Prüfung ')?'zum Vorgang':'zur Schaden-Nr.';
+    $body = "Sehr geehrte Damen und Herren,\n\n{$reference} {$record['case_no']} erhalten Sie anbei {$article} {$label} von {$v['company']}, Nr. {$v['number']}";
     if ($v['date'] !== '') $body .= ' vom '.$v['date'];
     $body .= ' über '.number_format($v['gross'], 2, ',', '.')." EUR brutto.\n\nDer Beleg wird {$status}.";
     if ($v['decision'] === 'approved') $body .= '\nFreigabebetrag: '.number_format($v['release_amount'], 2, ',', '.').' EUR brutto.';
     $body = str_replace('\\n', "\n", $body);
     if ($record['mode'] === 'direct') $body .= "\n\nDie Übernahme erfolgt ohne erneute Prüfung. Grund: ".$v['reason'];
     else $body .= "\n\nPrüfergebnis: ".$v['assessment'].($v['reason'] !== '' ? "\nBegründung: ".$v['reason'] : '');
+    if (($v['energy_kwh']??null)!==null) {
+        $rate=rtrim(rtrim(number_format($v['energy_rate'],4,',','.'),'0'),',');
+        $kwh=rtrim(rtrim(number_format($v['energy_kwh'],4,',','.'),'0'),',');
+        $body .= "\n\nStromkosten – separat zur Erstattung an den VN".(!empty($v['energy_vn'])?' ('.$v['energy_vn'].')':'').":\n".$kwh.' kWh × '.$rate.' EUR/kWh = '.number_format($v['energy_amount'],2,',','.')." EUR.\nDieser Betrag ist nicht im Freigabebetrag für den Auftragnehmer enthalten. Die Auszahlung an den VN erfolgt separat.";
+    }
     $body .= "\n\nMit freundlichen Grüßen\n".drSignature($record['sender_name']);
     return $body;
 }

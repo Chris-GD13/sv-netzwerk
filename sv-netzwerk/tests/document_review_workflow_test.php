@@ -4,6 +4,7 @@ declare(strict_types=1);
 // Authentication and external transports are stubs; no real claims or mailboxes are touched.
 require_once __DIR__.'/../public/intern/api/ionos-storage.php';
 require_once __DIR__.'/../public/intern/api/document-review-core.php';
+require_once __DIR__.'/../public/intern/api/document-review-storage.php';
 $temp=sys_get_temp_dir().'/svnet-review-test-'.bin2hex(random_bytes(8));
 mkdir($temp,0700);mkdir($temp.'/objects',0700);putenv('IONOS_STORAGE_ROOT='.$temp);putenv('PORTAL_STORAGE_BACKEND=ionos');
 $database=new PDO('sqlite:'.$temp.'/index.sqlite');
@@ -40,6 +41,7 @@ function krHttp(string $method,string $url,array $headers=[],mixed $body=null,in
         return['status'=>((int)$m[2]+1===(int)$m[3]?201:202),'body'=>'{}'];
     }
     if(str_ends_with($url,'/messages'))return['status'=>201,'body'=>'{"id":"isolated-draft"}'];
+    if(str_ends_with($url,'/attachments'))return['status'=>201,'body'=>'{"id":"attachment"}'];
     throw new RuntimeException('Unexpected external request');
 }
 $entry=file_get_contents(__DIR__.'/../public/intern/api/document-review.php');
@@ -48,7 +50,7 @@ eval(substr($entry,$start,$main-$start));
 $dispatcher=substr($entry,$main);
 $dispatcher=str_replace('catch (Throwable $error) { apiError(400,$error->getMessage()); }','catch (Throwable $error) { if ($error instanceof ReviewResponse) throw $error; apiError(400,$error->getMessage()); }',$dispatcher);
 function callReview(string $action,array $data):array {
-    $GLOBALS['request']=$data;$_GET=['action'=>$action];$_SERVER=['REQUEST_METHOD'=>'POST','HTTP_HOST'=>'test.invalid','HTTP_ORIGIN'=>'https://test.invalid'];$user=['id'=>17];
+    $GLOBALS['request']=$data;$_GET=['action'=>$action];$_SERVER=['REQUEST_METHOD'=>'POST','HTTP_HOST'=>'test.invalid','HTTP_ORIGIN'=>'https://test.invalid'];$user=['id'=>17];$GLOBALS['user']=$user;
     try {eval($GLOBALS['dispatcher']);}catch(ReviewResponse $response){return['status'=>$response->status]+$response->data;}
     throw new RuntimeException('No response');
 }
@@ -80,4 +82,24 @@ $sent=callReview('send',['folder_id'=>$folder,'record_id'=>$saved['record_id']])
 $parts=array_values(array_filter($calls,fn($call)=>$call['method']==='PUT'));
 expectReview(implode('',array_column($parts,'body'))===$largeBytes,'All large attachment bytes survive chunking');
 $last=end($calls);expectReview(str_ends_with($last['url'],'/send'),'Send occurs only after full upload');
+
+$workspace=callReview('workspace',[])['folder_id'];
+$main=drWorkspaceWrite($workspace,'Sammelangebot.pdf','application/pdf',"%PDF-main\x00")['id'];
+$proof=drWorkspaceWrite($workspace,'Messprotokoll.pdf','application/pdf',"%PDF-proof\xff")['id'];
+$prepared=callReview('prepare',['folder_id'=>$workspace,'file_id'=>$main,'support_ids'=>[$proof,$main,$proof],'kind'=>'offer','mode'=>'direct','comment'=>'Demontage und Trocknung laut Begleitmail bereits freigegeben.','case_no'=>'26-859059','attach_support'=>true]);
+expectReview($prepared['ok']===true&&count($prepared['source_names'])===2,'Standalone multi-document preparation deduplicates originals');
+$preview=krVerify($prepared['token']);expectReview(str_contains($preview['comment'],'bereits freigegeben'),'Comment retained in signed preview');
+$saved=callReview('save',['folder_id'=>$workspace,'token'=>$prepared['token'],'values'=>$values,'case_no'=>'26-859059']);
+expectReview($saved['ok']===true&&str_contains($saved['subject'],'26-859059'),'Standalone decision saves without a case');
+$calls=[];$sent=callReview('send',['folder_id'=>$workspace,'record_id'=>$saved['record_id']]);
+expectReview($sent['ok']===true,'Standalone multi-attachment send');
+$message=json_decode($calls[0]['body'],true)['message'];
+expectReview(count($message['attachments'])===2&&base64_decode($message['attachments'][1]['contentBytes'])==="%PDF-proof\xff",'Supporting original attached byte-identically');
+$GLOBALS['user']=['id'=>18];try{drSelected($workspace,$main);throw new RuntimeException('Owner isolation failed');}catch(ReviewResponse $r){expectReview($r->status===403,'Standalone owner isolation');}$GLOBALS['user']=['id'=>17];
+$other=callReview('workspace',[])['folder_id'];$wrong=callReview('prepare',['folder_id'=>$other,'file_id'=>$main,'kind'=>'offer','mode'=>'direct']);expectReview($wrong['status']===400,'Cross-workspace source blocked');
+$prepared=callReview('prepare',['folder_id'=>$folder,'file_id'=>$large,'support_ids'=>[$file],'kind'=>'offer','mode'=>'direct']);
+$saved=callReview('save',['folder_id'=>$folder,'token'=>$prepared['token'],'values'=>$values]);$calls=[];
+$sent=callReview('send',['folder_id'=>$folder,'record_id'=>$saved['record_id']]);expectReview($sent['ok']===true,'Mixed large and small original attachments');
+expectReview(count(array_filter($calls,fn($c)=>str_ends_with($c['url'],'/attachments')))===1,'Small proof attached to large draft');
+expectReview(str_ends_with(end($calls)['url'],'/send'),'Mixed attachment draft sent only after all attachments');
 echo "Isolierter Workflow: Fallzuordnung, echte IONOS-Speicherung, Direktmodus ohne KI, Originalanhang, große Anhänge und Wiederholschutz geprüft.\n";

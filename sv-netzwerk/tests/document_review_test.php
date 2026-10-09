@@ -35,4 +35,9 @@ check(str_contains($text,'Angebot')&&str_contains($text,'nicht freigegeben'),'Se
 check(!str_contains($text,'Freigabebetrag:'),'No release amount for rejection');
 fails(fn()=>drRecipients('not-an-address'),'Invalid email rejected');
 check(count(drRecipients('test@example.org, TEST@example.org'))===1,'Deduplicate recipients');
+$energy=drValidate(['mode'=>'direct'],array_replace($values,['energy_kwh'=>'431','energy_rate'=>'0,35','energy_vn'=>'ETG Bussenstraße 45a']));
+check($energy['energy_amount']===150.85 && $energy['gross']===1190.0 && $energy['release_amount']===1190.0,'Energy separate from supplier release');
+$changed=drValidate(['mode'=>'direct'],array_replace($values,['energy_kwh'=>'431','energy_rate'=>'0,40']));check($changed['energy_amount']===172.40,'Editable energy tariff');
+$energyMail=drBody(array_replace($record,['values'=>$energy]));check(str_contains($energyMail,'150,85 EUR')&&str_contains($energyMail,'Erstattung an den VN'),'Separate VN energy reimbursement in email');
+fails(fn()=>drValidate(['mode'=>'direct'],array_replace($values,['energy_kwh'=>'431','energy_rate'=>'0'])),'Invalid energy rate rejected');
 echo "Rechnung/Angebot, direkte Übernahme, Entscheidungen, Centbeträge und Originalanhang geprüft.\n";
