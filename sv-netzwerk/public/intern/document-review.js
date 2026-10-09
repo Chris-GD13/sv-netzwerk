@@ -34,6 +34,7 @@
     const recipient = (key, name, address, locked=false) => `<div class="dr-recipient"><label><input type="checkbox" data-recipient="${key}"> ${esc(name)}</label><input type="email" data-address="${key}" value="${esc(address)}" aria-label="E-Mail ${esc(name)}" ${locked?'readonly':''}><select data-role="${key}" aria-label="Empfängerart ${esc(name)}"><option value="to">An</option><option value="cc" ${key==='controlling'||key==='ws'?'selected':''}>CC</option><option value="bcc" ${key==='archiv'?'selected':''}>BCC</option></select></div>`;
     panel.innerHTML = `<summary><b>${step}</b><span><strong>${title}</strong><small>${noun} prüfen oder direkt übernehmen · Freigabe und Mail mit Beleg</small></span><span class="dr-arrow">›</span></summary>
       <div class="dr-content">
+        <p id="${prefix}sender" class="vf-meta" style="white-space:pre-line"></p>
         <label>${noun} aus dem Fall<select id="${prefix}file"><option value="">Bitte einen Fall öffnen</option></select></label>
         <div class="dr-actions"><button class="vf-secondary" type="button" id="${prefix}reload">Belege aktualisieren</button><label class="vf-secondary dr-upload">Neuen Beleg hochladen<input type="file" id="${prefix}upload" accept=".pdf,.docx,.jpg,.jpeg,.png,.webp" hidden></label><a id="${prefix}original" class="vf-secondary" target="_blank" rel="noopener" hidden>Original öffnen</a></div>
         <label class="dr-choice"><input type="checkbox" id="${prefix}direct"> ${noun} ohne erneute Prüfung übernehmen</label>
@@ -67,7 +68,7 @@
     const message = (text, bad=false) => { el('state').textContent=text; el('state').classList.toggle('dr-error',bad); };
     const reset = () => { state.token=''; state.recordId=''; el('mail').hidden=true; el('send').disabled=true; el('confirmed').checked=false; };
     const clear = () => {
-      reset(); el('edit').hidden=true; el('checks').replaceChildren(); el('send-state').textContent='';el('history').hidden=true;el('history').replaceChildren();
+      reset(); el('edit').hidden=true; el('checks').replaceChildren(); el('sender').textContent=''; el('send-state').textContent='';el('history').hidden=true;el('history').replaceChildren();
       for (const name of ['company','number','date','net','vat','gross','assessment','reason','release_amount','extra-to','extra-cc','extra-bcc']) el(name).value='';
       el('decision').value=''; el('direct').checked=false;
       panel.querySelectorAll('[data-recipient]').forEach(input=>input.checked=false);
@@ -92,6 +93,7 @@
       const old=el('file').value, ref=el('reference').value;
       const data=await request('files',folder); sameCase(folder);
       state.files=data.files; state.sender=data.sender;
+      el('sender').textContent=`Absender: ${data.sender}\n${data.signature || data.sender_name || ''}`;
       const history=(data.reviews||[]).filter(r=>r.kind===kind);
       el('history').hidden=!history.length;
       el('history').innerHTML='<strong>Gespeicherte Entscheidungen</strong>'+history.map(r=>`<p><a target="_blank" rel="noopener" href="/intern/api/case-file-browser.php?action=file&folder_id=${encodeURIComponent(folder)}&file_id=${encodeURIComponent(r.id)}">${esc(r.company)} · ${esc(r.number)}</a><br>${r.decision==='approved'?'freigegeben':'nicht freigegeben'}${r.decision==='approved'?` · ${Number(r.release_amount).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} EUR brutto`:''} · ${r.mode==='direct'?'ohne erneute Prüfung':'fachlich bestätigt'} · ${r.send_status==='sent'?'Mail versendet':r.send_status==='unsent'?'noch nicht versendet':'Versandstatus klären'}</p>`).join('');

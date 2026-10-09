@@ -68,7 +68,7 @@ try {
         }
         usort($reviews,fn($a,$b)=>strcmp($b['saved_at'],$a['saved_at']));
         $profile=drReviewSender(krSenderProfile($user));
-        apiJson(['ok'=>true,'files'=>$files,'reviews'=>array_slice($reviews,0,50),'sender'=>$profile['email'],'sender_name'=>$profile['name']]);
+        apiJson(['ok'=>true,'files'=>$files,'reviews'=>array_slice($reviews,0,50),'sender'=>$profile['email'],'sender_name'=>$profile['name'],'signature'=>drSignature($profile['name'])]);
     }
     if ($_SERVER['REQUEST_METHOD']!=='POST') apiError(405,'POST erforderlich.');
     if ($action === 'prepare') {
