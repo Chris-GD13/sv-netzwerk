@@ -133,7 +133,8 @@ async function diagnostic(run, phase, text, details = {}) {
 async function credentialsFor(profile) {
   profile = profileKey(profile);
   credentialDiagnostic = 'vault';
-  const saved = await Promise.race([loadCredentials(profile).catch(() => null), sleep(600).then(() => null)]);
+  let vaultState = 'vault-timeout';
+  const saved = await Promise.race([loadCredentials(profile).then(value => { vaultState = value ? 'vault-unvollstaendig' : 'vault-leer'; return value; }).catch(error => { vaultState = `vault-fehler-${String(error?.name || 'error').toLowerCase()}`; return null; }), sleep(5000).then(() => null)]);
   if (saved?.email && saved?.password && credentialMatchesProfile(profile, saved)) { credentialDiagnostic = 'vault-ready'; return { value: saved, source: 'vault' }; }
   if (saved?.email && saved?.password) {
     credentialDiagnostic = 'vault-profile-mismatch';
@@ -156,7 +157,7 @@ async function credentialsFor(profile) {
     if (local?.email && local?.password) credentialDiagnostic = 'native-host-profile-mismatch';
     else credentialDiagnostic = nativeError ? `native-host-fehler: ${nativeError}` : (local?.error ? `native-host-antwort: ${String(local.error).slice(0, 80)}` : 'native-host-keine-antwort');
   } catch {}
-  credentialDiagnostic = ` > local-config`;
+  credentialDiagnostic = `${vaultState}; ${credentialDiagnostic} > local-config`;
   try {
     const configResponse = await fetch(chrome.runtime.getURL('local-config.json'));
     if (!configResponse.ok) { credentialDiagnostic = `-http-${configResponse.status}`; return null; }

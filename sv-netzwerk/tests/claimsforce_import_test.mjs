@@ -75,7 +75,7 @@ assert(serviceWorkerDiagnostic.includes("https://web.claimsforce.com/invoiced") 
 assert(serviceWorkerDiagnostic.includes('chrome.tabs.reload(tabId)') && serviceWorkerDiagnostic.includes('const refreshed=await waitTab(tabId)'), 'Vollabgleich aktualisiert eine bereits geöffnete ClaimsForce-Kostennotenliste vor dem Scrape');
 assert(serviceWorkerDiagnostic.includes('INVOICED_SCRAPE_PROGRESS') && serviceWorkerDiagnostic.includes('sender.tab?.id !== run.claimsTabId'), 'Der lange Kostennotenabgleich aktualisiert den Queue-Heartbeat nur aus seinem ClaimsForce-Tab');
 assert(serviceWorkerDiagnostic.includes('erwarteter Tab') && /sendResponse\(\{ ok: true \}\);\s*diagnostic\(run/.test(serviceWorkerDiagnostic), 'Heartbeat antwortet sofort und zeigt Ablehnungsursachen');
-assert(serviceWorkerDiagnostic.includes('loadCredentials(profile).catch(() => null), sleep(600)'), 'Der verschlüsselte Zugangstresor behält sein Timeout gegen hängende Browser-Speicher');
+assert(serviceWorkerDiagnostic.includes("vaultState = 'vault-timeout'") && serviceWorkerDiagnostic.includes('sleep(5000)'), 'Der verschlüsselte Zugangstresor behält ein Timeout gegen hängende Browser-Speicher und nennt den Grund');
 assert(claimsBridgeDiagnostic.includes("location.pathname.replace(/\\/+$/, '') !== '/invoiced'") && claimsBridgeDiagnostic.includes('damageNumberPattern'), 'Kostennotenliste wird seitenweise gelesen und Schadennummern aus den Zeilen übernommen');
 assert(claimsMainDiagnostic.includes("location.pathname.replace(/\\/+$/, '') === '/invoiced'") && claimsMainDiagnostic.includes('invoicedContext && insurerClaimId'), 'Auf /invoiced geladene ClaimsForce-Antworten ergänzen Claim-IDs mit Schadennummern');
 const claimRowAnchor = { textContent: 'Schaden öffnen', getAttribute: name => name === 'href' ? '/claims/12345678-1234-1234-1234-123456789012' : '', closest: () => null };
@@ -156,7 +156,7 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
       return [];
     }
   },
-  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.43' }) } },
+  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.44' }) } },
   Event,
   HTMLInputElement: MockInput,
   setTimeout,
@@ -411,7 +411,7 @@ assert(claimsMain.includes('listVersion') && serviceWorker.includes('CF-CASE-DEL
 assert(serviceWorker.includes('delete stableMapped.claimsforce_zuletzt_eingelesen') && serviceWorker.includes('fileVersions, messageVersions, appointmentVersions'), 'Der Vollabgleich darf keine bei jedem Lauf wechselnden Importzeitpunkte in die Signatur aufnehmen');
 assert(serviceWorker.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens']") && serviceWorker.includes('profileKey(message.profile)'), 'Service Worker verwendet das angeforderte Profil nur nach Whitelist-Prüfung');
 assert(!serviceWorker.includes("message.profile || 'self'") && !serviceWorker.includes("row.activeProfile || 'self'"), 'Service Worker darf ein fehlendes oder unbekanntes Profil nicht als self behandeln');
-assert(serviceWorker.includes('loadCredentials(profile).catch(() => null), sleep(600)') && serviceWorker.includes('loadPortalCredentials().catch(() => null), sleep(600)'), 'Ein hängender Browser-Tresor darf weder ClaimsForce- noch Portal-Anmeldung blockieren');
+assert(serviceWorker.includes('sleep(5000)') && serviceWorker.includes('loadPortalCredentials().catch(() => null), sleep(600)'), 'Ein hängender Browser-Tresor darf weder ClaimsForce- noch Portal-Anmeldung blockieren');
 assert(serviceWorker.includes('PROFILE_EMAILS') && serviceWorker.includes('credentialMatchesProfile') && serviceWorker.includes('clearCredentials(profile)'), 'Ein unter dem falschen SV-Profil gespeicherter Zugang wird verworfen und nicht zur Anmeldung verwendet');
 assert(serviceWorker.includes('CF-CRED-02'), 'Eine verbleibende Profil-Zugang-Abweichung muss vor der ClaimsForce-Anmeldung sichtbar abbrechen');
 assert(serviceWorker.includes('GET_CREDENTIAL_DIAGNOSTIC') && serviceWorker.includes('loopback-http-'), 'Zugangsdatenkette liefert geheimnisfreie Laufzeitstufen');
