@@ -75,6 +75,7 @@ function drMessage(array $record, string $bytes): array {
     $to = drRecipients($v['to']); $cc = drRecipients($v['cc']); $bcc = drRecipients($v['bcc']);
     if (!$to) throw new RuntimeException('Bitte mindestens einen An-Empfänger auswählen.');
     $message = ['subject'=>$record['subject'],'body'=>['contentType'=>'Text','content'=>drBody($record)],'toRecipients'=>$to];
+    if (!empty($record['sender'])) $message['from'] = ['emailAddress'=>['address'=>$record['sender'],'name'=>$record['sender_name']]];
     if ($cc) $message['ccRecipients'] = $cc;
     if ($bcc) $message['bccRecipients'] = $bcc;
     $message['attachments'] = [['@odata.type'=>'#microsoft.graph.fileAttachment','name'=>$record['file_name'],'contentType'=>$record['mime'],'contentBytes'=>base64_encode($bytes)]];

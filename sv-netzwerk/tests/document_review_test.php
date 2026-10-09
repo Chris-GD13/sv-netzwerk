@@ -17,6 +17,7 @@ fails(fn()=>drValidate(['mode'=>'review','analysis'=>null],array_replace($values
 $accepted=drValidate(['mode'=>'direct'],$values);
 $record=['kind'=>'invoice','mode'=>'direct','case_no'=>'TEST-17','values'=>$accepted,'sender_name'=>'Christian Wächter','subject'=>'Rechnungsprüfung · TEST-17','file_name'=>'Original-Rechnung.pdf','mime'=>'application/pdf'];
 $message=drMessage($record,"%PDF-Original\x00\xff");
+check(drMessage($record+['sender'=>'cw@sv-netzwerk.eu'],'original')['from']['emailAddress']['address']==='cw@sv-netzwerk.eu','Actual From address is explicit');
 check(base64_decode($message['attachments'][0]['contentBytes'])==="%PDF-Original\x00\xff",'Original byte-identical attachment');
 check($message['attachments'][0]['name']==='Original-Rechnung.pdf','Original attachment name');
 check($message['toRecipients'][0]['emailAddress']['address']==='versicherung@example.org','Recipient role');
