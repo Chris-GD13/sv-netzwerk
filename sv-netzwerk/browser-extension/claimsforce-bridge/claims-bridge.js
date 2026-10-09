@@ -158,11 +158,24 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     };
     const listedDamageNumbers = new Map();
     const expectedCount = Number((document.body?.innerText || '').match(/Schäden mit erstellten Kostennoten\s*\((\d+)\)/i)?.[1] || 0);
+    // Die Zeilen der virtualisierten Liste tragen die Fall-ID in den React-Zeilendaten; so entfällt die langsame Einzelsuche.
+    const rowClaimId = row => {
+      try {
+        const fiberKey = Object.keys(row).find(key => key.startsWith('__reactFiber'));
+        let fiber = fiberKey ? row[fiberKey] : null;
+        for (let depth = 0; depth < 8 && fiber; depth++, fiber = fiber.return) {
+          const original = fiber.memoizedProps?.row?.original;
+          const id = String(original?.claimId || original?.claim?.id || original?.id || '');
+          if (/^[0-9a-f-]{20,}$/i.test(id)) return id;
+        }
+      } catch {}
+      return '';
+    };
     const collect = () => {
       const observed = observedByDamageNumber();
       for (const row of document.querySelectorAll('table tbody tr,[role="row"]')) {
         const anchor = row.querySelector('a[href*="/claims/"]');
-        const match = String(anchor?.getAttribute('href') || '').match(claimPattern);
+        const match = String(anchor?.getAttribute('href') || '').match(claimPattern) || (rowClaimId(row) ? [null, rowClaimId(row)] : null);
         const cells = [...row.querySelectorAll('td,[role="cell"]')].map(cell => (cell.innerText || cell.textContent || '').trim());
         const dates = [...(row.querySelectorAll('time[datetime],[data-date],[data-created-at],[data-updated-at]') || [])].map(node => node.getAttribute('datetime') || node.getAttribute('data-date') || node.getAttribute('data-created-at') || node.getAttribute('data-updated-at') || '');
         const numberCell = cells.find(cell => extractDamageNumber(cell)) || '';
