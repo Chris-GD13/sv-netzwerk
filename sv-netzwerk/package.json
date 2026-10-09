@@ -21,7 +21,7 @@
     "test:seo": "node tests/fachwissen_seo_test.mjs && node tests/public_seo_test.mjs"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.3",
+    "@astrojs/sitemap": "^3.7.4",
     "@kenjiuno/msgreader": "^1.28.0",
     "astro": "^7.2.9",
     "postal-mime": "^2.7.6",
