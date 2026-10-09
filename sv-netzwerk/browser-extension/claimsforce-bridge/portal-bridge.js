@@ -108,7 +108,7 @@ async function commitSync(message) {
   const loaded = await scopedApi(profile, `${API}?action=load_case&id=${encodeURIComponent(message.folderId)}`);
   const meta = { ...(loaded.case?.meta || {}) };
   const prefix = message.sourceType === 'rekon' ? 'rekon' : 'claimsforce';
-  meta[`${prefix}_sync_signature`] = String(message.signature || '');
+  meta[`${prefix}_sync_signature`] = message.partial ? '' : String(message.signature || '');
   meta[`${prefix}_profile`] = profile;
   meta[`${prefix}_file_versions`] = [...new Set((message.fileVersions || []).map(String).filter(Boolean))];
   meta[`${prefix}_message_versions`] = [...new Set((message.messageVersions || []).map(String).filter(Boolean))];

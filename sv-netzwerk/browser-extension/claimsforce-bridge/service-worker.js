@@ -537,9 +537,9 @@ async function runImport(run) {
     const preliminary = { claimsforce_claim_id: id, schaden_nr: String(item.label || '').trim() };
     const preliminaryState = await portal(portalTabId(), { type: 'PORTAL_SYNC_STATE', mapped: preliminary, profile });
     const preliminaryMeta = preliminaryState.result?.meta || {};
-    // A full pass always rechecks metadata so new mails and notes are not missed
-    // just because the invoiced-list row itself did not change.
-    if (!fullSync && preliminaryState.result?.existed && item.listVersion && preliminaryMeta.claimsforce_list_version === item.listVersion) {
+    // Ein Vollabgleich übernimmt nur noch Fälle, die noch nicht vollständig im Portal liegen (Signatur wird erst nach erfolgreichem Fall gespeichert); so setzt ein abgebrochener Lauf dort fort, wo er stand.
+    const alreadyComplete = !!preliminaryState.result?.existed && !!preliminaryMeta.claimsforce_sync_signature;
+    if ((fullSync && alreadyComplete) || (!fullSync && preliminaryState.result?.existed && item.listVersion && preliminaryMeta.claimsforce_list_version === item.listVersion)) {
       skipped++;
       await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length}: seit dem letzten Import unverändert, wird ohne erneuten Detailabruf übersprungen.`, index + 1, claims.length);
       await diagnostic(run, 'CF-CASE-DELTA-SKIP', `Auftrag ${index + 1}/${claims.length} ist laut ClaimsForce-Änderungsstand unverändert.`, { current: index + 1, total: claims.length, claimIndex: index + 1, skippedCases: skipped });
@@ -582,9 +582,11 @@ async function runImport(run) {
     const upsert = await portalOperation(portalTabId(), { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, profile, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, importedAt: new Date().toISOString() }, knownState: { existed: !!state.result?.existed, folderId: state.result?.folderId || '', meta: existingMeta } });
     const folderId = upsert.folderId;
     await diagnostic(run, 'CF-CASE-FILES', `Auftrag ${index + 1}/${claims.length}: Anhänge und Nachrichten werden übernommen (Bridge ${BRIDGE_VERSION}).`, { current: index, total: claims.length, claimIndex: index + 1 });
-    const caseDeadline = Date.now() + 300000;
-    const checkDeadline = where => { if (Date.now() > caseDeadline) throw new Error(`Zeitlimit von 5 Minuten für diesen Auftrag überschritten (${where}).`); };
+    let caseDeadline = Date.now() + 300000;
+    const checkDeadline = where => { if (Date.now() > caseDeadline) throw new Error(`Zeitlimit von 5 Minuten ohne Fortschritt für diesen Auftrag überschritten (${where}).`); };
     const knownFileVersions = new Set(Array.isArray(existingMeta.claimsforce_file_versions) ? existingMeta.claimsforce_file_versions.map(String) : []);
+    const doneFileVersions = new Set(knownFileVersions);
+    const savePartial = () => portal(portalTabId(), { type: 'PORTAL_COMMIT_SYNC', folderId, signature: '', partial: true, fileVersions: [...doneFileVersions], messageVersions: existingMeta.claimsforce_message_versions || [], notes: null, listVersion: '', profile });
     let fileNumber = 0;
     for (const file of files) {
       if (!file?.id) continue;
@@ -606,7 +608,12 @@ async function runImport(run) {
       if (!response.ok) throw new Error(`Datei „${name}“ konnte nicht geladen werden (${response.status}).`);
       const uploaded = await uploadBuffer(portalTabId(), profile, folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, fileBuffer);
       if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) filesDone++;
+      doneFileVersions.add(version);
+      caseDeadline = Date.now() + 300000;
+      // Zwischenstand: nach Abbruch oder Stopp setzt der Import bei der nächsten Datei fort.
+      if (fileNumber % 10 === 0) await savePartial().catch(() => {});
     }
+    if (fileNumber % 10 !== 0) await savePartial().catch(() => {});
     const knownMessageVersions = new Set(Array.isArray(existingMeta.claimsforce_message_versions) ? existingMeta.claimsforce_message_versions.map(String) : []);
     for (const message of messages) {
       const version = messageVersion(message);
