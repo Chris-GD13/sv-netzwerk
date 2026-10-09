@@ -156,7 +156,7 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
       return [];
     }
   },
-  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.48' }) } },
+  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.49' }) } },
   Event,
   HTMLInputElement: MockInput,
   setTimeout,
