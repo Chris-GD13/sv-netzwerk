@@ -255,15 +255,18 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           for (let index = 0; index < 320; index++) {
             collect();
             if (index > 0 && index % 10 === 0) {
-              const heartbeat = await chrome.runtime.sendMessage({
-                type: 'INVOICED_SCRAPE_PROGRESS',
-                current: listedDamageNumbers.size,
-                total: expectedCount || listedDamageNumbers.size,
-                listedCount: listedDamageNumbers.size,
-                observedCount: claims.size,
-                searchResolvedCount: 0
-              });
-              if (!heartbeat?.ok) throw new Error(`[CF-INVOICED-01] Fortschritt des Kostennotenabgleichs konnte nicht bestätigt werden: ${heartbeat?.error || 'keine Rückmeldung'} (Bridge ${chrome.runtime.getManifest().version}; ${listedDamageNumbers.size} Nummern gelesen).`);
+              // Fortschrittsmeldung ist rein informativ; eine ausbleibende Antwort darf den Lesevorgang nicht abbrechen.
+              await Promise.race([
+                chrome.runtime.sendMessage({
+                  type: 'INVOICED_SCRAPE_PROGRESS',
+                  current: listedDamageNumbers.size,
+                  total: expectedCount || listedDamageNumbers.size,
+                  listedCount: listedDamageNumbers.size,
+                  observedCount: claims.size,
+                  searchResolvedCount: 0
+                }).catch(() => null),
+                new Promise(resolve => setTimeout(resolve, 2000))
+              ]);
             }
             const nextTop = Math.min(scroller.scrollHeight - scroller.clientHeight, scroller.scrollTop + step);
             if (nextTop <= scroller.scrollTop) break;
@@ -318,15 +321,17 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         searchResolvedCount++;
         if (searchResolvedCount % 10 === 0 || searchResolvedCount === listedDamageNumbers.size) {
           const current = Math.min(listedDamageNumbers.size, observedCount + searchResolvedCount);
-          const heartbeat = await chrome.runtime.sendMessage({
-            type: 'INVOICED_SCRAPE_PROGRESS',
-            current,
-            total: listedDamageNumbers.size,
-            listedCount: listedDamageNumbers.size,
-            observedCount,
-            searchResolvedCount
-          });
-          if (!heartbeat?.ok) throw new Error(`[CF-INVOICED-01] Fortschritt des Kostennotenabgleichs konnte nicht bestätigt werden: ${heartbeat?.error || 'keine Rückmeldung'} (Bridge ${chrome.runtime.getManifest().version}; ${searchResolvedCount} Suchtreffer).`);
+          await Promise.race([
+            chrome.runtime.sendMessage({
+              type: 'INVOICED_SCRAPE_PROGRESS',
+              current,
+              total: listedDamageNumbers.size,
+              listedCount: listedDamageNumbers.size,
+              observedCount,
+              searchResolvedCount
+            }).catch(() => null),
+            new Promise(resolve => setTimeout(resolve, 2000))
+          ]);
         }
       }
       if (usedSearch) setSearchValue('');

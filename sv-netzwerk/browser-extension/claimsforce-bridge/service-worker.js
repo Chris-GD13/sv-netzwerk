@@ -884,6 +884,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return;
     }
     const current = Number(message.current || 0), total = Number(message.total || 0);
+    sendResponse({ ok: true });
     diagnostic(run, 'CF-INVOICED-01', `ClaimsForce-Zuordnung: ${current} von ${total} Schadennummern bearbeitet.`, {
       current,
       total,
@@ -891,8 +892,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       observedCount: Number(message.observedCount || 0),
       searchResolvedCount: Number(message.searchResolvedCount || 0),
       bridge: BRIDGE_VERSION
-    }).then(() => sendResponse({ ok: true })).catch(error => sendResponse({ ok: false, error: `Fortschritt konnte nicht gespeichert werden: ${String(error?.message || error).slice(0, 160)}` }));
-    return true;
+    }).catch(() => {});
+    return false;
   }
   if (message?.type === 'REKON_TOKEN') {
     chrome.storage.session.set({ rekonToken: message.token, rekonTokenAt: Date.now() }).then(() => sendResponse({ ok: true })).catch(error => sendResponse({ ok: false, error: error.message }));
