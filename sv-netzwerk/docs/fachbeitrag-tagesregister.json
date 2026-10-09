@@ -60,7 +60,21 @@
           "docs/linkedin/2026-10-08/2026-10-08_wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung_linkedin-bild-live.jpg"
         ]
       }
+    },
+    "2026-10-09": {
+      "publication_id": "2026-10-09-batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung",
+      "article": {
+        "title": "Batteriespeicher nach Wasser- und Brandschäden fachlich prüfen",
+        "slug": "batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung/",
+        "status": "reserved",
+        "owner": "codex-2026-10-09-0602",
+        "reserved_at": "2026-10-09T04:05:22.239Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-10-08T05:13:08.568Z"
+  "updated_at": "2026-10-09T04:05:22.239Z"
 }
