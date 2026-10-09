@@ -99,6 +99,7 @@ assert.equal(invoicedScrape.claims[0].label, '26-015885-8', 'Schadennummer links
 assert.equal(invoicedScrape.claims[0].enteredAt, '05.02.2026', 'Erstellungsdatum unter der Schadennummer wird für den Stichtagsfilter verwendet');
 assert(claimsBridgeDiagnostic.includes('findListScroller') && claimsBridgeDiagnostic.includes('scroller.scrollTop = nextTop'), 'Virtualisierte Kostennotentabellen werden beim Lesen durchgescrollt');
 assert(claimsBridgeDiagnostic.includes('stableScans >= 2'), 'Die virtuelle Kostennotenliste wird nach asynchronem Nachladen erneut bis zum stabilen Ende gescannt');
+assert(claimsBridgeDiagnostic.indexOf('const scroller = findListScroller()') < claimsBridgeDiagnostic.indexOf('const next = nextButton()'), 'Eine scrollbare Kostennotenliste wird vor möglichen Next-Schaltflächen erkannt');
 let noLinkScrapeListener;
 const virtualCases = [
   ['26-015885-8', '12345678-1234-1234-1234-123456789012'],
@@ -134,6 +135,8 @@ const searchAnchors = () => {
   if (!found) return [];
   return [{ innerText: found[0], textContent: found[0], getAttribute: name => name === 'href' ? `/claims/${found[1]}/redirect` : '', closest: () => null }];
 };
+let misleadingNextClicks = 0;
+const misleadingNext = { textContent: 'Weiter', disabled: false, getAttribute: () => null, click: () => { misleadingNextClicks++; } };
 vm.runInNewContext(claimsBridgeDiagnostic, {
   window: { addEventListener() {}, postMessage() {} },
   document: {
@@ -141,6 +144,7 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
     querySelector: selector => selector === 'table' ? { parentElement: listScroller } : null,
     querySelectorAll: selector => {
       if (selector === 'input') return [searchInput];
+      if (selector === 'button,a,[role="button"]') return [misleadingNext];
       if (selector === 'table tbody tr,[role="row"]') {
         const first = Math.floor(listScroller.scrollTop / 70);
         const availableRows = Date.now() - scanStartedAt >= 900 ? virtualRows : virtualRows.slice(0, 4);
@@ -150,7 +154,7 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
       return [];
     }
   },
-  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.39' }) } },
+  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.40' }) } },
   Event,
   HTMLInputElement: MockInput,
   setTimeout,
@@ -165,6 +169,7 @@ assert.equal(scrapeProgress.length, 1, 'Ein langer Kostennotenabgleich sendet ei
 assert.equal(scrapeProgress[0].type, 'INVOICED_SCRAPE_PROGRESS');
 assert.equal(scrapeProgress[0].searchResolvedCount, virtualCases.length);
 assert.equal(numberOnlyScrape.claims.length, virtualCases.length, 'Beim virtuellen Scrollen müssen alle Schadennummern einzeln aufgelöst werden');
+assert.equal(misleadingNextClicks, 0, 'Bei einer scrollbaren Liste darf eine nicht zur Liste gehörende Weiter-Schaltfläche keine Pagination vortäuschen');
 assert(numberOnlyScrape.claims.some(claim => claim.id === virtualCases[4][1]), 'Alphanumerische Schadennummern werden einzeln zugeordnet');
 assert(numberOnlyScrape.claims.some(claim => claim.id === virtualCases[5][1]), 'Punktgetrennte Schadennummern werden einzeln zugeordnet');
 assert(numberOnlyScrape.claims.some(claim => claim.label === 'HS74698170-0160'), 'ClaimsForce-Schadennummern mit Präfix werden vollständig übernommen');

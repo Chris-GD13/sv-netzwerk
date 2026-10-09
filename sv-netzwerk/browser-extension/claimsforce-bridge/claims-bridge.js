@@ -241,46 +241,56 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       if (location.pathname.replace(/\/+$/, '') !== '/invoiced') throw new Error(`ClaimsForce-Kostennotenliste ist nicht geöffnet (aktuell ${location.pathname || 'unbekannt'}).`);
       if (/Seite ist veraltet/i.test(document.body?.innerText || '')) throw new Error(`[CF-INVOICED-01] Die ClaimsForce-Seite ist veraltet. Bitte den Import erneut starten, damit /invoiced frisch geladen wird (Bridge ${chrome.runtime.getManifest().version}).`);
       let page = 0;
-      for (; page < 120; page++) {
-        const before = claims.size;
-        collect();
-        const next = nextButton();
-        if (!next) break;
-        next.click();
-        await wait(900);
-        collect();
-        if (claims.size === before && page > 2) break;
-      }
-      if (page === 0) {
-        const scroller = findListScroller();
-        if (scroller) {
-          const originalTop = scroller.scrollTop;
-          const step = Math.max(150, scroller.clientHeight - 140);
-          let previousCount = -1;
-          let previousHeight = -1;
-          let stableScans = 0;
-          for (let scan = 0; scan < 6; scan++) {
-            if (scan > 0) await wait(700);
-            scroller.scrollTop = 0;
-            await wait(120);
-            for (let index = 0; index < 160; index++) {
-              collect();
-              const nextTop = Math.min(scroller.scrollHeight - scroller.clientHeight, scroller.scrollTop + step);
-              if (nextTop <= scroller.scrollTop) break;
-              scroller.scrollTop = nextTop;
-              await wait(120);
-            }
+      const scroller = findListScroller();
+      if (scroller) {
+        const originalTop = scroller.scrollTop;
+        const step = Math.max(120, Math.min(240, Math.floor(scroller.clientHeight / 3)));
+        let previousCount = -1;
+        let previousHeight = -1;
+        let stableScans = 0;
+        for (let scan = 0; scan < 6; scan++) {
+          if (scan > 0) await wait(700);
+          scroller.scrollTop = 0;
+          await wait(120);
+          for (let index = 0; index < 320; index++) {
             collect();
-            const count = listedDamageNumbers.size;
-            const height = scroller.scrollHeight;
-            if (expectedCount && count >= expectedCount) break;
-            stableScans = count === previousCount && height === previousHeight ? stableScans + 1 : 0;
-            if (stableScans >= 2) break;
-            previousCount = count;
-            previousHeight = height;
+            if (index > 0 && index % 10 === 0) {
+              const heartbeat = await chrome.runtime.sendMessage({
+                type: 'INVOICED_SCRAPE_PROGRESS',
+                current: listedDamageNumbers.size,
+                total: expectedCount || listedDamageNumbers.size,
+                listedCount: listedDamageNumbers.size,
+                observedCount: claims.size,
+                searchResolvedCount: 0
+              });
+              if (!heartbeat?.ok) throw new Error(`[CF-INVOICED-01] Fortschritt des Kostennotenabgleichs konnte nicht bestätigt werden (Bridge ${chrome.runtime.getManifest().version}; ${listedDamageNumbers.size} Nummern gelesen).`);
+            }
+            const nextTop = Math.min(scroller.scrollHeight - scroller.clientHeight, scroller.scrollTop + step);
+            if (nextTop <= scroller.scrollTop) break;
+            scroller.scrollTop = nextTop;
+            await wait(140);
           }
-          scroller.scrollTop = originalTop;
-          await wait(80);
+          collect();
+          const count = listedDamageNumbers.size;
+          const height = scroller.scrollHeight;
+          if (expectedCount && count >= expectedCount) break;
+          stableScans = count === previousCount && height === previousHeight ? stableScans + 1 : 0;
+          if (stableScans >= 2) break;
+          previousCount = count;
+          previousHeight = height;
+        }
+        scroller.scrollTop = originalTop;
+        await wait(80);
+      } else {
+        for (; page < 120; page++) {
+          const before = claims.size;
+          collect();
+          const next = nextButton();
+          if (!next) break;
+          next.click();
+          await wait(900);
+          collect();
+          if (claims.size === before && page > 2) break;
         }
       }
       const observed = observedByDamageNumber();
