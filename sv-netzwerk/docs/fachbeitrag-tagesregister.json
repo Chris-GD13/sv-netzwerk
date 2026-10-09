@@ -76,12 +76,14 @@
         "verification_note": "Detailseite, Veröffentlichungsdatum, Beitragsbild, Fachwissensübersicht, Suchindex, Sitemap, robots.txt und deploy-version.txt am 09.10.2026 direkt geprüft."
       },
       "linkedin": {
-        "status": "prepared-not-posted",
+        "status": "reserved",
+        "owner": "codex-linkedin-20261009-01a11f08-0f1e-7392-83a5-3a010337a7b7",
+        "reserved_at": "2026-10-09T05:04:41.729Z",
         "article_url": "https://www.sv-netzwerk.eu/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung/",
-        "text_file": "src/content/linkedin/2026-10-09_batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung.txt",
-        "image_file": "public/assets/images/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung.jpg"
+        "previous_status": "prepared-not-posted",
+        "duplicate_check_note": "Persönliche Profilaktivitäten am 09.10.2026 live geprüft: neuester eigener Beitrag Wallbox vom 08.10., kein Batteriespeicher-Beitrag. Vorbereitung enthält keine Veröffentlichung oder Reservierung."
       }
     }
   },
-  "updated_at": "2026-10-09T04:22:15.521Z"
+  "updated_at": "2026-10-09T05:04:41.729Z"
 }
