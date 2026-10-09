@@ -1,0 +1,18 @@
+Batteriespeicher nach Wasser- und Brandschäden fachlich prüfen
+
+Ein unauffälliges Gehäuse oder eine erreichbare App ist nach einem Schadenereignis keine technische Freigabe.
+
+Der neue Fachbeitrag zeigt, wie stationäre Energiespeicher prüffähig beurteilt werden:
+
+• Wasser-, Rauch-, Ruß- und Wärmeeinwirkung bauteilbezogen dokumentieren
+• Gefahrenabwehr, Herstellerdiagnose und Wiederinbetriebnahme klar trennen
+• Batterie, Wechselrichter, Schutztechnik und angeschlossene Anlagen als System betrachten
+• Fehlerspeicher und Identifikationsdaten vor Reset oder Demontage sichern
+• Wiederherstellung, Komplettaustausch und technische Verbesserung kostenmäßig abgrenzen
+
+https://www.sv-netzwerk.eu/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung/
+
+#Batteriespeicher #LithiumIonenBatterie #Brandschaden #Wasserschaden #Schadenregulierung
+
+Bild: /assets/images/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung.jpg
+Status: prepared-not-posted
