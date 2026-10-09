@@ -28,7 +28,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.4.12',currentBridgeVersion='1.4.50';
+  const minimumBridgeVersion='1.4.12',currentBridgeVersion='1.4.51';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -39,7 +39,13 @@
   const versionAtLeast=(actual,required)=>{const a=String(actual).split('.').map(Number),r=String(required).split('.').map(Number);for(let i=0;i<3;i++){if((a[i]||0)!==(r[i]||0))return(a[i]||0)>(r[i]||0)}return true};
   const resultOf=job=>{try{return typeof job.result==='string'?JSON.parse(job.result):job.result||{}}catch{return{}}};
   const browserRuntime=()=>{const [status='',phase='',jobId='0',profile='']=String(document.documentElement.getAttribute('data-svnet-claims-runtime')||'').split('|');return{status,phase,jobId:Number(jobId||0),profile}};
-  const heartbeat=()=>agentJob?post('heartbeat',{id:agentJob.id,message:lastRuntime.message,phase:lastRuntime.phase,current:lastRuntime.current,total:lastRuntime.total,diagnostic:lastRuntime.diagnostic}).catch(()=>{}):Promise.resolve();
+  const heartbeat=()=>agentJob?post('heartbeat',{id:agentJob.id,message:lastRuntime.message,phase:lastRuntime.phase,current:lastRuntime.current,total:lastRuntime.total,diagnostic:lastRuntime.diagnostic}).catch(e=>{if(/läuft nicht mehr/i.test(e.message))stopLocal()}):Promise.resolve();
+  const stopLocal=()=>{
+    if(!agentJob)return;
+    window.postMessage({type:'SVNET_CLAIMS_IMPORT_STOP',jobId:Number(agentJob.id)},location.origin);
+    agentJob=null;busy=false;lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
+    resumeWatch();
+  };
 
   async function watch(){
     if(!userJobs.length)return;
@@ -86,6 +92,17 @@
   // Neue Aufträge erscheinen zuerst in der Planung; Kostennotenfälle kommen über den Vollabgleich.
   button.addEventListener('click',()=>enqueue('quick'));
   fullButton?.addEventListener('click',()=>enqueue('full'));
+  if(fullButton){
+    const stopButton=document.createElement('button');
+    stopButton.type='button';stopButton.id='vf-claims-stop';stopButton.className=fullButton.className;stopButton.textContent='Import pausieren';
+    stopButton.addEventListener('click',async()=>{
+      stopButton.disabled=true;
+      try{await post('stop');userJobs=[];show('Import pausiert. Der nächste Start setzt dort fort, wo er stehen geblieben ist.');button.disabled=false;fullButton.disabled=false}
+      catch(e){show(e.message,true)}
+      finally{stopButton.disabled=false}
+    });
+    fullButton.insertAdjacentElement('afterend',stopButton);
+  }
 
   async function launch(job,resumed=false){
     busy=true;agentJob=job;

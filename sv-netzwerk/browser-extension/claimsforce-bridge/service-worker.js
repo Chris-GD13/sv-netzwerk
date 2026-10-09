@@ -532,6 +532,7 @@ async function runImport(run) {
   }
   let filesDone = 0, messagesDone = 0, appointmentsDone = 0, skipped = 0, updated = 0, failed = 0;
   for (let index = 0; index < claims.length; index++) {
+    if (run.stopRequested) break;
     try {
     const item = claims[index], id = item.id;
     const preliminary = { claimsforce_claim_id: id, schaden_nr: String(item.label || '').trim() };
@@ -593,6 +594,7 @@ async function runImport(run) {
       const version = fileVersion(file);
       if (knownFileVersions.has(version)) continue;
       fileNumber++;
+      if (run.stopRequested) { await savePartial().catch(() => {}); throw new Error('Import wurde pausiert.'); }
       checkDeadline(`Datei ${fileNumber}/${files.length}`);
       await diagnostic(run, 'CF-CASE-FILE', `Auftrag ${index + 1}/${claims.length}: Datei ${fileNumber}/${files.length} wird übertragen.`, { current: index, total: claims.length, claimIndex: index + 1 });
       const sourcePath = String(file.folderPath || file.path || file.folder?.path || file.folder?.name || '').replaceAll('\\', '/').replace(/^\/+|\/+$/g, '');
@@ -975,6 +977,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'START_IMPORT' && sender.tab?.id) {
     startImport(sender, message).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
     return true;
+  }
+  if (message?.type === 'STOP_IMPORT') {
+    if (runningImport && (!message.jobId || runningImport.jobId === Number(message.jobId))) runningImport.stopRequested = true;
+    sendResponse({ ok: true });
+    return;
   }
   if (message?.type === 'START_REKON_IMPORT' && sender.tab?.id) {
     try { sendResponse(startRekonImport(sender, message)); }

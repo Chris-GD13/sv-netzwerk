@@ -260,6 +260,7 @@ window.addEventListener('message', event => {
       window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: invalid ? CONTEXT_RELOAD_MESSAGE : `[CF-RUN-00] ${error.message}`, runtime: { jobId: request.jobId } }, location.origin);
     });
   }
+  if (event.data?.type === 'SVNET_CLAIMS_IMPORT_STOP') chrome.runtime.sendMessage({ type: 'STOP_IMPORT', jobId: Number(event.data.jobId || 0) }).catch(() => {});
   if (event.data?.type === 'SVNET_REKON_IMPORT_START') {
     let profile;
     try { profile = profileKey(event.data.profile); }
