@@ -440,14 +440,21 @@ function collectClaimsforceNotes(values){const out=[],seen=new Set();const visit
 
 async function ensureInvoicedListTab(tabId){
   const current=await chrome.tabs.get(tabId);
-  if(new URL(String(current.url||'')).pathname.replace(/\/+$/,'')==='/invoiced')return;
+  const pathname=new URL(String(current.url||'')).pathname.replace(/\/+$/,'');
+  if(pathname==='/invoiced'){
+    await chrome.tabs.reload(tabId);
+    await sleep(300);
+    const refreshed=await waitTab(tabId);
+    if(new URL(String(refreshed.url||'')).pathname.replace(/\/+$/,'')==='/login')throw new Error('ClaimsForce-Sitzung ist abgelaufen; bitte ClaimsForce anmelden.');
+    return;
+  }
   await chrome.tabs.update(tabId,{url:'https://web.claimsforce.com/invoiced'});
   const deadline=Date.now()+15000;
   while(Date.now()<deadline){
     await new Promise(resolve=>setTimeout(resolve,500));
-    const tab=await chrome.tabs.get(tabId),pathname=new URL(String(tab.url||'')).pathname.replace(/\/+$/,'');
-    if(pathname==='/invoiced'){await new Promise(resolve=>setTimeout(resolve,1400));return;}
-    if(pathname==='/login')throw new Error('ClaimsForce-Sitzung ist abgelaufen; bitte ClaimsForce anmelden.');
+    const tab=await chrome.tabs.get(tabId),nextPath=new URL(String(tab.url||'')).pathname.replace(/\/+$/,'');
+    if(nextPath==='/invoiced'){await new Promise(resolve=>setTimeout(resolve,1400));return;}
+    if(nextPath==='/login')throw new Error('ClaimsForce-Sitzung ist abgelaufen; bitte ClaimsForce anmelden.');
   }
   throw new Error('ClaimsForce-Kostennotenliste unter /invoiced konnte nicht geöffnet werden.');
 }

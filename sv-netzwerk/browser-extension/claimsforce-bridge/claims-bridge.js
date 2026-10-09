@@ -123,7 +123,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === 'SCRAPE_ALL_CLAIMS') {
     const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
     const claimPattern = /\/claims\/([0-9a-f-]{20,})(?:\/|$)/i;
-    const damageNumberPattern = /\b(?:\d{2,3}-)?\d{2,9}(?:-\d{1,9}){1,3}\b|\b\d{2}\.\d{5,}\.\d{1,3}\b|\b\d{8,14}\b/;
+    const damageNumberPattern = /\b[A-Za-z]{1,4}\d[A-Za-z0-9]*(?:[-.][A-Za-z0-9]+)+\b|\b(?:\d{2,3}-)?\d{2,9}(?:-\d{1,9}){1,3}\b|\b\d{2}\.\d{5,}\.\d{1,3}\b|\b\d{8,14}\b/;
     const claims = new Map();
     const since = String(message.since || '').trim();
     const sinceTime = /^\d{4}-\d{2}-\d{2}$/.test(since) ? Date.parse(`${since}T00:00:00`) : NaN;
@@ -239,6 +239,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     });
     (async () => {
       if (location.pathname.replace(/\/+$/, '') !== '/invoiced') throw new Error(`ClaimsForce-Kostennotenliste ist nicht geöffnet (aktuell ${location.pathname || 'unbekannt'}).`);
+      if (/Seite ist veraltet/i.test(document.body?.innerText || '')) throw new Error(`[CF-INVOICED-01] Die ClaimsForce-Seite ist veraltet. Bitte den Import erneut starten, damit /invoiced frisch geladen wird (Bridge ${chrome.runtime.getManifest().version}).`);
       let page = 0;
       for (; page < 120; page++) {
         const before = claims.size;
