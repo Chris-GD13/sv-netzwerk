@@ -70,10 +70,16 @@
         "status": "published-verified",
         "owner": "codex-2026-10-09-0602",
         "reserved_at": "2026-10-09T04:05:22.239Z",
-        "commit": "f9327493a6c38d178461d234564f1a3d4c8e5421",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/37882940267",
-        "verified_at": "2026-10-09T04:22:15.521Z",
-        "verification_note": "Detailseite, Veröffentlichungsdatum, Beitragsbild, Fachwissensübersicht, Suchindex, Sitemap, robots.txt und deploy-version.txt am 09.10.2026 direkt geprüft."
+        "commit": "f5bbf121a362edc4de07bcaa768d7bbff8fb3b54",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/37883759585",
+        "verified_at": "2026-10-09T05:11:57.765Z",
+        "verification_note": "Finalen Deployment-Commit in deploy-version.txt (HTTP 200), erfolgreichen Actions-Lauf sowie heutige Live-Übersicht und vollständige kanonische Artikelseite am 09.10.2026 direkt geprüft.",
+        "initial_live_verification": {
+          "commit": "f9327493a6c38d178461d234564f1a3d4c8e5421",
+          "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/37882940267",
+          "verified_at": "2026-10-09T04:22:15.521Z",
+          "verification_note": "Detailseite, Veröffentlichungsdatum, Beitragsbild, Fachwissensübersicht, Suchindex, Sitemap, robots.txt und deploy-version.txt am 09.10.2026 direkt geprüft."
+        }
       },
       "linkedin": {
         "status": "published-verified",
@@ -83,9 +89,21 @@
         "previous_status": "prepared-not-posted",
         "duplicate_check_note": "Persönliche Profilaktivitäten am 09.10.2026 live geprüft: neuester eigener Beitrag Wallbox vom 08.10., kein Batteriespeicher-Beitrag. Vorbereitung enthält keine Veröffentlichung oder Reservierung.",
         "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7514189979817000960/",
-        "verified_at": "2026-10-09T05:11:57.765Z"
+        "verified_at": "2026-10-09T05:11:57.765Z",
+        "published_at_berlin": "2026-10-09T07:08+02:00",
+        "published_time_precision": "minute",
+        "verified_at_berlin": "2026-10-09T07:11:57.765+02:00",
+        "profile_url": "https://www.linkedin.com/in/christian-w-156408204/",
+        "proof_document": "docs/linkedin-veroeffentlichung-2026-10-09.md",
+        "text_file": "docs/linkedin/2026-10-09/2026-10-09_batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung_linkedin.txt",
+        "image_file": "docs/linkedin/2026-10-09/2026-10-09_batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung_symbolbild.png",
+        "screenshots": [
+          "docs/linkedin/2026-10-09/2026-10-09_batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung_linkedin-text-live.jpg",
+          "docs/linkedin/2026-10-09/2026-10-09_batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung_linkedin-bild-live.jpg"
+        ],
+        "shortlink": "https://lnkd.in/dZXppDxu"
       }
     }
   },
-  "updated_at": "2026-10-09T05:11:57.765Z"
+  "updated_at": "2026-10-09T05:12:50.468Z"
 }
