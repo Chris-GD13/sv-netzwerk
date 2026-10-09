@@ -1,5 +1,5 @@
 import { saveCredentials, loadCredentials, clearCredentials, savePortalCredentials, loadPortalCredentials, clearPortalCredentials } from './vault.js';
-const OPTIONS_CODE_VERSION = '1.4.44';
+const OPTIONS_CODE_VERSION = '1.4.45';
 if (localStorage.getItem('svnet-bridge-options-code-version') !== OPTIONS_CODE_VERSION) {
   localStorage.setItem('svnet-bridge-options-code-version', OPTIONS_CODE_VERSION);
 }
