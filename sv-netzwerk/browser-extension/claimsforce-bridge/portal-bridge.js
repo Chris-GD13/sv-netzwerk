@@ -59,17 +59,26 @@ async function findCase(mapped, profile, signal) {
   const query = mapped.schaden_nr || mapped.claimsforce_claim_id || mapped.rekon_task_id;
   if (!query) return null;
   const found = await scopedApi(profile, `${API}?action=search_cases&q=${encodeURIComponent(query)}`, { signal });
-  for (const row of found.results || []) {
+  const matches = meta => (mapped.claimsforce_claim_id && meta.claimsforce_claim_id === mapped.claimsforce_claim_id) || (mapped.rekon_task_id && meta.rekon_task_id === mapped.rekon_task_id) || (mapped.schaden_nr && caseNumberKey(meta.schaden_nr) === caseNumberKey(mapped.schaden_nr));
+  const rows = found.results || [];
+  // Treffer mit mitgelieferten Falldaten zuerst prüfen; Einzelabrufe sind langsam und werden begrenzt.
+  for (const row of rows) if (row.meta && Object.keys(row.meta).length && matches(row.meta)) return { folderId: row.id, meta: row.meta };
+  const deadline = Date.now() + 40000;
+  let loads = 0;
+  for (const row of rows) {
+    if (loads >= 8 || Date.now() > deadline) break;
+    if (row.meta && Object.keys(row.meta).length) continue;
+    loads++;
     const loaded = await scopedApi(profile, `${API}?action=load_case&id=${encodeURIComponent(row.id)}`, { signal });
-    const meta = loaded.case?.meta || row.meta || {};
-    if ((mapped.claimsforce_claim_id && meta.claimsforce_claim_id === mapped.claimsforce_claim_id) || (mapped.rekon_task_id && meta.rekon_task_id === mapped.rekon_task_id) || (mapped.schaden_nr && caseNumberKey(meta.schaden_nr) === caseNumberKey(mapped.schaden_nr))) return { folderId: loaded.case?.id || row.id, meta };
+    const meta = loaded.case?.meta || {};
+    if (matches(meta)) return { folderId: loaded.case?.id || row.id, meta };
   }
   return null;
 }
 
 async function upsert(message, signal) {
   const profile = profileKey(message.profile);
-  const existing = await findCase(message.mapped, profile, signal);
+  const existing = message.knownState ? (message.knownState.existed ? { folderId: message.knownState.folderId, meta: message.knownState.meta || {} } : null) : await findCase(message.mapped, profile, signal);
   const merged = mergeBlank(existing?.meta || {}, message.mapped);
   if (message.sourceType === 'rekon') {
     merged.rekon_task_id = message.mapped.rekon_task_id;
