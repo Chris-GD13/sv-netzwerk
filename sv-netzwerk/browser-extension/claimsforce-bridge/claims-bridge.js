@@ -168,7 +168,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       return matches;
     };
     const listedDamageNumbers = new Map();
-    const expectedCount = Number((document.body?.innerText || '').match(/Schäden mit erstellten Kostennoten\s*\((\d+)\)/i)?.[1] || 0);
+    let expectedCount = Number((document.body?.innerText || '').match(/Schäden mit erstellten Kostennoten\s*\((\d+)\)/i)?.[1] || 0);
     const collect = () => {
       const observed = observedByDamageNumber();
       for (const row of document.querySelectorAll('table tbody tr,[role="row"]')) {
@@ -250,6 +250,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     });
     (async () => {
       if (location.pathname.replace(/\/+$/, '') !== '/invoiced') throw new Error(`ClaimsForce-Kostennotenliste ist nicht geöffnet (aktuell ${location.pathname || 'unbekannt'}).`);
+      // Nach einem Neustart ist die Tabelle erst nach dem Laden der Daten gefüllt.
+      for (let waited = 0; waited < 60 && !(document.querySelector('table tbody tr') && /Schäden mit erstellten Kostennoten\s*\(\d+\)/i.test(document.body?.innerText || '')); waited++) await wait(500);
+      expectedCount = Number((document.body?.innerText || '').match(/Schäden mit erstellten Kostennoten\s*\((\d+)\)/i)?.[1] || 0);
       if (/Seite ist veraltet/i.test(document.body?.innerText || '')) throw new Error(`[CF-INVOICED-01] Die ClaimsForce-Seite ist veraltet. Bitte den Import erneut starten, damit /invoiced frisch geladen wird (Bridge ${chrome.runtime.getManifest().version}).`);
       let page = 0;
       // Die Zeilendaten der Tabelle enthalten alle Schäden; das Scrollen entfällt (im Hintergrund-Tab rendert die virtualisierte Liste nicht).
