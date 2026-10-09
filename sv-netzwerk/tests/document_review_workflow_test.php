@@ -35,7 +35,11 @@ function krHttp(string $method,string $url,array $headers=[],mixed $body=null,in
     $GLOBALS['calls'][]=['method'=>$method,'url'=>$url,'body'=>$body];
     if($GLOBALS['transportFail'])throw new RuntimeException('Simulated network ambiguity');
     if(($GLOBALS['draftFail']??false)&&str_ends_with($url,'/messages'))return['status'=>404,'body'=>'{"error":{"code":"ErrorInvalidUser"}}'];
-    if(str_ends_with($url,'/sendMail')||str_ends_with($url,'/send'))return['status'=>202,'body'=>''];
+    if(str_ends_with($url,'/send')) {
+        if($body!=='' || !in_array('Content-Length: 0',$headers,true))return['status'=>411,'body'=>'Length Required'];
+        return['status'=>202,'body'=>''];
+    }
+    if(str_ends_with($url,'/sendMail'))return['status'=>202,'body'=>''];
     if(str_ends_with($url,'/createUploadSession'))return['status'=>201,'body'=>'{"uploadUrl":"https://test.invalid/upload"}'];
     if($url==='https://test.invalid/upload'){
         $range=implode(' ',$headers);preg_match('/Content-Range: bytes (\d+)-(\d+)\/(\d+)/',$range,$m);

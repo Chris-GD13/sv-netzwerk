@@ -171,9 +171,17 @@ try {
                 }
                 }
                 $sendAttempted=true;
-                $response=krHttp('POST',$base.'/messages/'.rawurlencode($draftId).'/send',$headers);
+                $response=krHttp('POST',$base.'/messages/'.rawurlencode($draftId).'/send',[...$headers,'Content-Length: 0'],'');
             }
-            if ($response['status']!==202) throw new RuntimeException('Outlook hat den Versand nicht bestätigt. Bitte vor einem erneuten Versand den Gesendet-Ordner prüfen.');
+            if ($response['status']!==202) {
+                $record['send_http_status']=$response['status'];
+                $record['send_error_code']=(string)(json_decode($response['body'],true)['error']['code']??'');
+                if (in_array($response['status'],[400,401,403,405,411,413,415,422,429],true)) {
+                    $sendAttempted=false;
+                    throw new RuntimeException('Outlook hat den Versand abgelehnt (HTTP '.$response['status'].($record['send_error_code']!==''?', '.$record['send_error_code']:'').'). Die Mail wurde nicht versendet.');
+                }
+                throw new RuntimeException('Outlook hat den Versand nicht bestätigt. Bitte vor einem erneuten Versand den Gesendet-Ordner prüfen.');
+            }
             $record['send_status']='sent'; $record['sent_at']=gmdate('c'); drStore($record,$id);
             apiJson(['ok'=>true,'sender'=>$record['sender'],'subject'=>$record['subject'],'attachment'=>$record['file_name']]);
         } catch (Throwable $error) {
