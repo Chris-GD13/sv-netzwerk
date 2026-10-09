@@ -146,7 +146,8 @@
     el('standalone').onchange=()=>{clear();state.folder='';load().catch(e=>message(e.message,true));};
     el('new-workspace').onclick=()=>{clear();state.workspace='';state.folder='';load().catch(e=>message(e.message,true));};
     el('supports').onchange=event=>{const id=event.target.dataset.support;if(id){event.target.checked?state.support.add(id):state.support.delete(id);reset();el('edit').hidden=true;}};
-    for (const key of ['comment','case_no','attach-support']) el(key).addEventListener('input',()=>{reset();el('edit').hidden=true;});
+    for (const key of ['comment','attach-support']) el(key).addEventListener('input',()=>{reset();el('edit').hidden=true;});
+    el('case_no').addEventListener('input',()=>{state.recordId='';el('mail').hidden=true;el('send').disabled=true;});
     el('file').onchange=()=>{reset();el('edit').hidden=true;original();};
     el('reference').onchange=()=>{reset();el('edit').hidden=true;};
     el('direct').onchange=()=>{reset();el('edit').hidden=true;syncMode();};
