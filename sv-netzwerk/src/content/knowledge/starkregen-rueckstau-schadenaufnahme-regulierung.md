@@ -20,8 +20,8 @@ publication:
   updatedAt: 2026-08-11
   status: published
 seo:
-  title: "Starkregen und Rückstau: Schadenaufnahme und Regulierung im"
-  description: "Starkregen und Rückstau: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz."
+  title: "Starkregen und Rückstau: Schadenbereiche und Kosten abgrenzen"
+  description: "Wasserwege, Schadenbereiche und Wiederherstellung bei Starkregen und Rückstau dokumentieren. Sofortmaßnahmen und regulierungsfähige Kosten getrennt prüfen."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung/"
   image: "https://www.sv-netzwerk.eu/assets/images/linkedin/starkregen-rueckstau-schadenaufnahme-regulierung.svg"
   imageAlt: "Symbolbild: Starkregen und Rückstau im Kontext der Schadenregulierung und Kumulschadensteuerung"

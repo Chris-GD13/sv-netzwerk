@@ -16,14 +16,18 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/rechnungs-kva-pruefung-freigabe-
 damageTypes: ["gebaeude", "leitungswasser", "brand"]
 publication:
   publishedAt: 2026-09-09
-  updatedAt: 2026-09-09
+  updatedAt: 2026-10-09
   status: published
 seo:
-  title: "Regiekosten im Schadenfall prüffähig abgrenzen"
-  description: "Regiekosten prüfen: Koordinationsleistung, Zeitaufwand, Schadenbezug, Fremdleistungen und normale Bauleitung sauber trennen."
+  title: "Regiekosten: Bedeutung, Nachweise und Prüfung im Schadenfall"
+  description: "Was sind Regiekosten? Koordination, Bauleitung und Stundenaufwand im Versicherungsschaden unterscheiden, belegen und auf Schadenbezug prüfen."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/regiekosten-schadenregulierung-abgrenzung/"
   noindex: false
 ---
+
+## Was sind Regiekosten im Schadenfall?
+
+Regiekosten bezeichnen hier Kosten für die Organisation und Koordination einer Schadenmaßnahme, etwa die Abstimmung von Gewerken, Terminen und technischen Freigaben. Sie sind von den ausgeführten Handwerkerleistungen zu unterscheiden. Eine Position „Regie“ kann in Handwerkerrechnungen auch Arbeiten nach tatsächlichem Stunden- und Materialaufwand meinen; deshalb muss die Rechnung den konkreten Leistungsinhalt erklären. Ob die Kosten erstattungsfähig sind, wird anhand von Auftrag, Nachweis, Schadenbezug und Versicherungsvertrag geprüft.
 
 ## Fachliche Einordnung
 

@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-09-11
   status: published
 seo:
-  title: "Flachdachschäden nach Sturm und Starkregen prüfen"
+  title: "Flachdachschaden prüfen: Windsog, Befestigung und Entwässerung"
   description: "Windsog, Abdichtung, Anschlüsse und Entwässerung nach Sturm und Starkregen fachlich abgrenzen und prüffähig dokumentieren."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/flachdachschaden-pruefpfad-windsog-entwaesserung/"
   noindex: false

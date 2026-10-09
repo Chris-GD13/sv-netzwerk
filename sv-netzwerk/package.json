@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "prebuild": "npm run build:case-mail-history && python3 scripts/patch-window-report-rules.py && python3 scripts/patch-bki-drive-archive.py && python3 scripts/patch-bki-file-search.py && python3 scripts/patch-bki-offline-bridge.py && python3 scripts/patch-bki-storm-quick-index.py && python3 scripts/patch-bki-storm-facade-painter-index.py && python3 scripts/patch-bki-storm-pricing.py && python3 scripts/patch-bki-rollladen-pricing.py && python3 scripts/patch-bki-pdf-mail.py && python3 scripts/patch-gf-openai-upload-name.py && python3 scripts/patch-gf-json-retry.py && python3 scripts/patch-general-report-reserve-qc.py && npm run validate:encoding && npm run validate:knowledge && node scripts/write-deploy-version.mjs",
-    "build": "astro check && astro build && node scripts/protect-internal-pages.mjs dist && npm run validate:public-copy && npm run validate:visible-umlauts",
+    "build": "astro check && astro build && node scripts/protect-internal-pages.mjs dist && npm run validate:public-copy && npm run validate:visible-umlauts && npm run test:seo",
     "preview": "astro preview",
     "check": "astro check",
     "validate:knowledge": "node scripts/validate-knowledge.mjs",
@@ -17,7 +17,8 @@
     "test:chatgpt-plugin": "node scripts/test-chatgpt-plugin.mjs",
     "test:schadenprotokoll": "node scripts/test-schadenprotokoll.mjs",
     "test:phonebook-cleaner": "node tests/phonebook_cleaner_test.mjs",
-    "build:case-mail-history": "esbuild scripts/case-mail-history.client.js --bundle --minify --format=iife --platform=browser --outfile=public/intern/case-mail-history.js"
+    "build:case-mail-history": "esbuild scripts/case-mail-history.client.js --bundle --minify --format=iife --platform=browser --outfile=public/intern/case-mail-history.js",
+    "test:seo": "node tests/fachwissen_seo_test.mjs && node tests/public_seo_test.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

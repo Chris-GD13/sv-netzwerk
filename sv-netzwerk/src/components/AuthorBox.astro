@@ -3,11 +3,13 @@ import { site } from '../data/site';
 
 interface Props {
   name?: string;
+  href?: string;
   role?: string;
   qualification?: string;
 }
 
 const {
+  href,
   name = site.author.name,
   role = site.author.role,
   qualification = site.author.qualification,
@@ -19,7 +21,7 @@ const {
     {name.split(' ').map((part) => part[0]).join('').slice(0, 2)}
   </div>
   <div>
-    <strong>{name}</strong>
+    <strong>{href ? <a href={href} rel="author">{name}</a> : name}</strong>
     <p>{role}<br />{qualification}</p>
   </div>
 </aside>
