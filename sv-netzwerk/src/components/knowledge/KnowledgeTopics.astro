@@ -1,0 +1,42 @@
+---
+const topics = [
+  { title: 'Wasserschaden und technische Trocknung', items: [
+    { label: 'Technische Trocknung: Messkonzept und Erfolgskontrolle', href: '/fachwissen/technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle/' },
+    { label: 'Wasserschaden: Wann ist Rückbau erforderlich?', href: '/fachwissen/wasserschaden-rueckbau-technische-abgrenzung/' },
+    { label: 'Stromkosten der Trocknung nachweisen', href: '/fachwissen/stromkosten-technische-trocknung-nachweis/' },
+  ] },
+  { title: 'Rechnungen, Regiekosten und Freigaben', items: [
+    { label: 'Was sind Regiekosten und welche Nachweise sind erforderlich?', href: '/fachwissen/regiekosten-schadenregulierung-abgrenzung/' },
+    { label: 'Rechnungs- und Nachtragsprüfung im Schadenfall', href: '/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug/' },
+    { label: 'Rechnungs- und KVA-Prüfung beauftragen', href: '/leistungen/rechnungs-und-kva-pruefung/' },
+  ] },
+  { title: 'Sturm, Hagel und Gebäudehülle', items: [
+    { label: 'Hagelschäden an Polycarbonat- und Stegplatten', href: '/fachwissen/polycarbonat-stegplatten-hagel-spannungsrisse-montagefehler/' },
+    { label: 'Flachdachschäden: Windsog und Entwässerung prüfen', href: '/fachwissen/flachdachschaden-pruefpfad-windsog-entwaesserung/' },
+    { label: 'Hagelschäden an Dach und Fassade abgrenzen', href: '/fachwissen/hagelschaden-dach-fassade-schadenspuren-vorschaden-reparaturfaehigkeit/' },
+  ] },
+  { title: 'Brand- und Großschadenregulierung', items: [
+    { label: 'Rauch, Ruß und Sanierungsumfang beurteilen', href: '/fachwissen/brandschaden-rauch-russ-kontamination-schadenbereiche-sanierungsumfang/' },
+    { label: 'Großschadenregulierung für Versicherer', href: '/grossschadenregulierung/' },
+    { label: 'Kumulschadenmanagement und Einsatzkoordination', href: '/leistungen/kumulschadenmanagement/' },
+  ] },
+];
+---
+<section class="sv-section sv-section-alt" aria-labelledby="knowledge-topics-title">
+  <div class="sv-container">
+    <p class="sv-eyebrow">Nach Fragestellung auswählen</p>
+    <h2 id="knowledge-topics-title">Fachartikel und Leistungen nach Schwerpunkten</h2>
+    <p>Direkte Einstiege zu technischen Prüfschritten, erforderlichen Nachweisen und der Bearbeitung Ihres Schadenfalls.</p>
+    <div class="topics-grid">
+      {topics.map((topic) => <section class="sv-card topic-card"><h3>{topic.title}</h3><ul>{topic.items.map((item) => <li><a href={item.href}>{item.label}</a></li>)}</ul></section>)}
+    </div>
+  </div>
+</section>
+<style>
+  .topics-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sv-space-5)}
+  .topic-card{padding:var(--sv-space-5);min-width:0}
+  .topic-card h3{margin-top:0}
+  .topic-card ul{margin:0;padding-left:1.2rem;display:grid;gap:.75rem}
+  .topic-card a{overflow-wrap:anywhere;text-underline-offset:.18em}
+  @media(max-width:42rem){.topics-grid{grid-template-columns:1fr}}
+</style>

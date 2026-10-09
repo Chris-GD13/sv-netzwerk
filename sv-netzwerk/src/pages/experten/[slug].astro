@@ -9,7 +9,8 @@ import type { ExpertProfile } from '../../types/platform';
 export function getStaticPaths(){return experts.filter((expert)=>expert.status==='active').map((expert)=>({params:{slug:expert.slug},props:{expert}}));}
 interface Props { expert: ExpertProfile }
 const { expert } = Astro.props;
-const personSchema={'@context':'https://schema.org','@type':'Person',name:expert.name,jobTitle:expert.function,email:expert.contact.email,knowsAbout:expert.expertise,sameAs:expert.linkedin?[expert.linkedin]:undefined,worksFor:{'@type':'Organization',name:'SV-Netzwerk'}};
+const profileUrl=new URL(`/experten/${expert.slug}/`,Astro.site).toString();
+const personSchema={'@context':'https://schema.org','@type':'Person','@id':`${profileUrl}#person`,url:profileUrl,image:expert.image?new URL(expert.image,Astro.site).toString():undefined,name:expert.name,jobTitle:expert.function,email:expert.contact.email,knowsAbout:expert.expertise,sameAs:expert.linkedin?[expert.linkedin]:undefined,worksFor:{'@type':'Organization',name:'SV-Netzwerk'}};
 const showProfileMetaSections = expert.group !== 'backoffice';
 const hasRegions = expert.regions.length > 0;
 const hasQualifications = showProfileMetaSections && expert.qualifications.length > 0;

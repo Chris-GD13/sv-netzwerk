@@ -6,6 +6,7 @@ import Pagination from '../../components/Pagination.astro';
 import AlphabeticalNavigation from '../../components/AlphabeticalNavigation.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import FeatureCard from '../../components/FeatureCard.astro';
+import KnowledgeTopics from '../../components/knowledge/KnowledgeTopics.astro';
 import { PAGE_SIZE, sortedLibrary } from '../../data/library';
 
 const pageItems = sortedLibrary.slice(0, PAGE_SIZE);
@@ -27,6 +28,7 @@ const totalPages = Math.ceil(sortedLibrary.length / PAGE_SIZE);
       </div>
     </div>
   </section>
+  <KnowledgeTopics />
   <section class="sv-section knowledge-podcast" aria-labelledby="knowledge-podcast-title">
     <div class="sv-container knowledge-podcast__layout">
       <div class="knowledge-podcast__copy">

@@ -41,9 +41,8 @@ const pageSlugs = new Set(
     .filter((item) => item.isDirectory() && fs.existsSync(path.join(root, 'src/pages/fachwissen', item.name, 'index.astro')))
     .map((item) => item.name)
 );
-// Bekannte Altlast ohne Quelldatei (Klasse C laut docs/MASTERBEFEHL_FACHBEITRAG_MIGRATION_VOR_2026-08-01.md).
-// Der Eintrag bleibt erhalten; die Liste darf nicht wachsen.
-const knownMissingSources = ['unwetter-ludwigsburg-starkregen-hagel-sturm-schadensteuerung'];
+// Entfernte Artikel dürfen weder im Listing noch im Suchindex verlinkt sein.
+const knownMissingSources = [];
 const allArticleHrefs = libraryEntries.map((entry) => entry.href).filter((href) => href.startsWith('/fachwissen/'));
 const slugOf = (href) => href.replace('/fachwissen/', '').replace(/\/$/, '');
 const missingSources = allArticleHrefs
