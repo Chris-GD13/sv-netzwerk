@@ -581,11 +581,17 @@ async function runImport(run) {
     const upsert = await portalOperation(portalTabId(), { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, profile, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, importedAt: new Date().toISOString() } });
     const folderId = upsert.folderId;
     await diagnostic(run, 'CF-CASE-FILES', `Auftrag ${index + 1}/${claims.length}: Anhänge und Nachrichten werden übernommen.`, { current: index, total: claims.length, claimIndex: index + 1 });
+    const caseDeadline = Date.now() + 300000;
+    const checkDeadline = where => { if (Date.now() > caseDeadline) throw new Error(`Zeitlimit von 5 Minuten für diesen Auftrag überschritten (${where}).`); };
     const knownFileVersions = new Set(Array.isArray(existingMeta.claimsforce_file_versions) ? existingMeta.claimsforce_file_versions.map(String) : []);
+    let fileNumber = 0;
     for (const file of files) {
       if (!file?.id) continue;
       const version = fileVersion(file);
       if (knownFileVersions.has(version)) continue;
+      fileNumber++;
+      checkDeadline(`Datei ${fileNumber}/${files.length}`);
+      await diagnostic(run, 'CF-CASE-FILE', `Auftrag ${index + 1}/${claims.length}: Datei ${fileNumber}/${files.length} wird übertragen.`, { current: index, total: claims.length, claimIndex: index + 1 });
       const sourcePath = String(file.folderPath || file.path || file.folder?.path || file.folder?.name || '').replaceAll('\\', '/').replace(/^\/+|\/+$/g, '');
       const baseName = safeFileName(file.name || file.fileName || file.originalFilename, `ClaimsForce-${file.id}`);
       const name = safeFileName(sourcePath ? `${sourcePath}__${baseName}` : baseName);
@@ -604,6 +610,8 @@ async function runImport(run) {
     for (const message of messages) {
       const version = messageVersion(message);
       if (knownMessageVersions.has(version)) continue;
+      checkDeadline('Nachrichten');
+      await diagnostic(run, 'CF-CASE-MESSAGE', `Auftrag ${index + 1}/${claims.length}: Nachrichten und Anhänge werden übertragen.`, { current: index, total: claims.length, claimIndex: index + 1 });
       const detail = message?.id ? await requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}/messages/${message.id}`, token, true) : message;
       const record = unwrap(detail, 'message');
       const stamp = String(record?.sentAt || record?.createdAt || '').slice(0, 10) || 'ohne-Datum';
@@ -616,7 +624,7 @@ async function runImport(run) {
         const attachmentName = safeFileName(attachment.name || attachment.fileName || attachment.filename, 'Anhang-' + (attachment.id || crypto.randomUUID()));
         let attachmentBuffer = null;
         if (attachment.contentBytes) { const binary = atob(String(attachment.contentBytes)); const bytes = new Uint8Array(binary.length); for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i); attachmentBuffer = bytes.buffer; }
-        else if (attachment.id && record?.id) { const response = await fetch(config.COMMUNICATION_API_ENDPOINT + '/claims/' + encodeURIComponent(id) + '/messages/' + encodeURIComponent(record.id) + '/attachments/' + encodeURIComponent(attachment.id), { headers: { Authorization: 'Bearer ' + token } }).catch(() => null); if (response?.ok) attachmentBuffer = await response.arrayBuffer(); }
+        else if (attachment.id && record?.id) { const response = await fetch(config.COMMUNICATION_API_ENDPOINT + '/claims/' + encodeURIComponent(id) + '/messages/' + encodeURIComponent(record.id) + '/attachments/' + encodeURIComponent(attachment.id), { headers: { Authorization: 'Bearer ' + token }, signal: AbortSignal.timeout(30000) }).catch(() => null); if (response?.ok) attachmentBuffer = await response.arrayBuffer(); }
         if (attachmentBuffer) await uploadBuffer(portalTabId(), profile, folderId, 'Mail_ClaimsForce-Anhang_' + stamp + '_' + attachmentName, attachment.mimeType || attachment.contentType || 'application/octet-stream', Date.parse(attachment.updatedAt || attachment.createdAt || '') || 0, attachmentBuffer);
       }
     }
