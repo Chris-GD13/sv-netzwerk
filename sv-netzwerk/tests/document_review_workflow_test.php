@@ -34,6 +34,7 @@ function krMs():string {return 'TEST-TRANSPORT';}
 function krHttp(string $method,string $url,array $headers=[],mixed $body=null,int $timeout=240):array {
     $GLOBALS['calls'][]=['method'=>$method,'url'=>$url,'body'=>$body];
     if($GLOBALS['transportFail'])throw new RuntimeException('Simulated network ambiguity');
+    if(($GLOBALS['draftFail']??false)&&str_ends_with($url,'/messages'))return['status'=>404,'body'=>'{"error":{"code":"ErrorInvalidUser"}}'];
     if(str_ends_with($url,'/sendMail')||str_ends_with($url,'/send'))return['status'=>202,'body'=>''];
     if(str_ends_with($url,'/createUploadSession'))return['status'=>201,'body'=>'{"uploadUrl":"https://test.invalid/upload"}'];
     if($url==='https://test.invalid/upload'){
@@ -44,7 +45,7 @@ function krHttp(string $method,string $url,array $headers=[],mixed $body=null,in
     if(str_ends_with($url,'/attachments'))return['status'=>201,'body'=>'{"id":"attachment"}'];
     throw new RuntimeException('Unexpected external request');
 }
-$entry=file_get_contents(__DIR__.'/../public/intern/api/document-review.php');
+$entry=str_replace("\r\n","\n",file_get_contents(__DIR__.'/../public/intern/api/document-review.php'));
 $start=strpos($entry,'function drChildren(');$main=strpos($entry,"\ntry {\n    if (!ionosStorageEnabled())");
 eval(substr($entry,$start,$main-$start));
 $dispatcher=substr($entry,$main);
@@ -82,6 +83,11 @@ $sent=callReview('send',['folder_id'=>$folder,'record_id'=>$saved['record_id']])
 $parts=array_values(array_filter($calls,fn($call)=>$call['method']==='PUT'));
 expectReview(implode('',array_column($parts,'body'))===$largeBytes,'All large attachment bytes survive chunking');
 $last=end($calls);expectReview(str_ends_with($last['url'],'/send'),'Send occurs only after full upload');
+$prepared=callReview('prepare',['folder_id'=>$folder,'file_id'=>$large,'kind'=>'invoice','mode'=>'direct']);
+$saved=callReview('save',['folder_id'=>$folder,'token'=>$prepared['token'],'values'=>$values]);$draftFail=true;$calls=[];
+$failed=callReview('send',['folder_id'=>$folder,'record_id'=>$saved['record_id']]);
+expectReview($failed['status']===400&&json_decode(ionosBytes($saved['record_id']),true)['send_status']==='unsent','Failed draft is definitely unsent');
+expectReview(count($calls)===1&&str_ends_with($calls[0]['url'],'/messages'),'Failed draft never submits send');$draftFail=false;
 
 $workspace=callReview('workspace',[])['folder_id'];
 $main=drWorkspaceWrite($workspace,'Sammelangebot.pdf','application/pdf',"%PDF-main\x00")['id'];

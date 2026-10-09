@@ -128,6 +128,7 @@ try {
         if (!is_dir($lockDir) && !mkdir($lockDir,0770,true)) throw new RuntimeException('Versandsperre konnte nicht eingerichtet werden.');
         $lock=fopen($lockDir.'/'.hash('sha256',$id).'.lock','c');
         if ($lock===false || !flock($lock,LOCK_EX|LOCK_NB)) throw new RuntimeException('Der Versand läuft bereits.');
+        $sendAttempted=false;
         try {
             $record=json_decode(drSelected($folder,$id)['bytes'],true,512,JSON_THROW_ON_ERROR);
             if ($record['send_status']!=='unsent') throw new RuntimeException('Versand bereits ausgeführt oder Ergebnis unklar. Bitte zuerst den Gesendet-Ordner prüfen.');
@@ -141,9 +142,10 @@ try {
             $mailSources=($record['attach_support']??true)?$sources:[$source];
             foreach (array_slice($mailSources,1) as $extra) $message['attachments'][]=['@odata.type'=>'#microsoft.graph.fileAttachment','name'=>$extra['name'],'contentType'=>$extra['mime'],'contentBytes'=>base64_encode($extra['bytes'])];
             $record['send_status']='sending'; $record['send_started_at']=gmdate('c'); drStore($record,$id);
-            $base='https://graph.microsoft.com/v1.0/users/'.rawurlencode($record['sender']);
+            $base='https://graph.microsoft.com/v1.0/users/'.rawurlencode($profile['mailbox']);
             $headers=['Authorization: Bearer '.krMs(),'Content-Type: application/json'];
             if (array_sum(array_map(fn($f)=>strlen($f['bytes']),$mailSources))<=2*1024*1024) {
+                $sendAttempted=true;
                 $response=krHttp('POST',$base.'/sendMail',$headers,json_encode(['message'=>$message,'saveToSentItems'=>true],JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE));
             } else {
                 unset($message['attachments']);
@@ -167,13 +169,14 @@ try {
                     if (!in_array($part['status'],[200,201,202],true)||($end===$size-1&&$part['status']!==201)) throw new RuntimeException('Anhang nicht vollständig übertragen. Der Entwurf wurde nicht versendet.');
                 }
                 }
+                $sendAttempted=true;
                 $response=krHttp('POST',$base.'/messages/'.rawurlencode($draftId).'/send',$headers);
             }
             if ($response['status']!==202) throw new RuntimeException('Outlook hat den Versand nicht bestätigt. Bitte vor einem erneuten Versand den Gesendet-Ordner prüfen.');
             $record['send_status']='sent'; $record['sent_at']=gmdate('c'); drStore($record,$id);
             apiJson(['ok'=>true,'sender'=>$record['sender'],'subject'=>$record['subject'],'attachment'=>$record['file_name']]);
         } catch (Throwable $error) {
-            if (($record['send_status']??'')==='sending') { $record['send_status']='uncertain'; $record['send_error']=$error->getMessage(); drStore($record,$id); }
+            if (($record['send_status']??'')==='sending') { $record['send_status']=$sendAttempted?'uncertain':'unsent'; $record['send_error']=$error->getMessage(); drStore($record,$id); }
             throw $error;
         } finally { flock($lock,LOCK_UN); fclose($lock); }
     }

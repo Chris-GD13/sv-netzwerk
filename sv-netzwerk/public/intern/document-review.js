@@ -55,6 +55,7 @@
           <label>Entscheidung<select id="${prefix}decision"><option value="">Bitte auswählen</option><option value="approved">freigegeben</option><option value="rejected">nicht freigegeben</option></select></label>
           <label id="${prefix}amount-label">Freigabebetrag brutto EUR<input id="${prefix}release_amount" inputmode="decimal" autocomplete="off"></label>
           <label>Begründung / Grund der direkten Übernahme<textarea id="${prefix}reason" rows="3" placeholder="z. B. bereits geprüft am … oder Abschlagsrechnung; bei Nichtfreigabe den Grund nennen"></textarea></label>
+          <div class="dr-fields" aria-label="Standardtexte für die Begründung"><button type="button" data-reason-preset="0">Geprüft – Höhe in Ordnung</button><button type="button" data-reason-preset="1">Bereits geprüft – übernehmen</button><button type="button" data-reason-preset="2">${kind==='invoice'?'Abschlagsrechnung / Baufortschritt':'Freigabe nach Baufortschritt'}</button></div>
           <fieldset><legend>Energieverbrauch / separate Erstattung an den VN</legend><div class="dr-fields">${field('energy_kwh','Nachgewiesener Verbrauch kWh')}${field('energy_rate','Strompreis EUR/kWh (änderbar)')}${field('energy_vn','VN / Zahlungsempfänger')}</div><label>Stromkosten EUR – separat vom Angebot<input id="${prefix}energy_amount" readonly></label><p class="vf-meta">Standard 0,35 €/kWh. Energieverbrauch wird separat ausgewertet; Stromkosten werden nicht auf die Freigabesumme des Auftragnehmers aufgeschlagen.</p></fieldset>
           <fieldset><legend>Empfänger auswählen</legend>
             ${recipient('supplier',kind==='invoice'?'Rechnungssteller':'Angebotssteller','')}
@@ -72,6 +73,8 @@
     wrap.append(panel);
     const el = name => document.getElementById(prefix+name);
     const state = {folder:'', workspace:sessionStorage.getItem('svnet-review-'+kind)||'', files:[], support:new Set(), token:'', recordId:'', busy:false, sender:'', source:''};
+    const reasonPresets=kind==='invoice'?['Die Rechnung wurde geprüft und ist der Höhe nach in Ordnung.','Die Rechnung wurde bereits geprüft und wird ohne erneute Prüfung übernommen.','Es handelt sich um eine Abschlagsrechnung. Die Freigabe erfolgt entsprechend dem dokumentierten Baufortschritt.']:['Das Angebot wurde geprüft und ist der Höhe nach in Ordnung.','Das Angebot wurde bereits geprüft und wird ohne erneute Prüfung übernommen.','Die Freigabe der angebotenen Leistungen erfolgt entsprechend dem dokumentierten Baufortschritt.'];
+    panel.querySelectorAll('[data-reason-preset]').forEach(button=>button.onclick=()=>{const text=reasonPresets[Number(button.dataset.reasonPreset)],current=el('reason').value.trim();if(!current.includes(text))el('reason').value=current?current+'\n'+text:text;el('reason').dispatchEvent(new Event('input',{bubbles:true}));el('reason').focus();});
     const context = () => el('standalone').checked ? state.workspace : (active()?.folder_id||'');
     const message = (text, bad=false) => { el('state').textContent=text; el('state').classList.toggle('dr-error',bad); };
     const reset = () => { state.token=''; state.recordId=''; el('mail').hidden=true; el('send').disabled=true; el('confirmed').checked=false; el('save-state').textContent=''; };

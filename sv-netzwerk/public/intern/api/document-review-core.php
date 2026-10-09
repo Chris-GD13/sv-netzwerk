@@ -52,6 +52,7 @@ function drValidate(array $preview, array $input): array {
 }
 
 function drReviewSender(array $profile): array {
+    $profile['mailbox'] = $profile['email'];
     if (($profile['name'] ?? '') === 'Christian Wächter') $profile['email'] = 'cw@sv-netzwerk.eu';
     return $profile;
 }

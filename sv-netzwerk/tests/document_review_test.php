@@ -7,6 +7,7 @@ check(drMoney('9.760,16 €')===9760.16,'German cents');
 check(drMoney('9760.16')===9760.16,'Decimal API amount');
 check(drMoney(null)===null,'Unknown is not zero');
 check(drReviewSender(['name'=>'Christian Wächter','email'=>'cw@sv-schuett.eu'])['email']==='cw@sv-netzwerk.eu','Christian uses SV-Netzwerk sender');
+check(drReviewSender(['name'=>'Christian Wächter','email'=>'cw@sv-schuett.eu'])['mailbox']==='cw@sv-schuett.eu','Mailbox identity remains separate from From alias');
 check(drReviewSender(['name'=>'Marc Schütt','email'=>'ms@sv-schuett.eu'])['email']==='ms@sv-schuett.eu','Other profiles retained');
 $values=['company'=>'POLYGON Deutschland GmbH','number'=>'RE-17','date'=>'09.10.2026','gross'=>'1.190,00','net'=>'1.000,00','vat'=>'190,00','release_amount'=>'1.190,00','decision'=>'approved','reason'=>'Abschlagsrechnung','to'=>'versicherung@example.org','cc'=>'controlling@dieregulierer.de','bcc'=>'Archiv@sv.de'];
 fails(fn()=>drValidate(['mode'=>'direct'],array_replace($values,['reason'=>''])),'Direct needs reason');
