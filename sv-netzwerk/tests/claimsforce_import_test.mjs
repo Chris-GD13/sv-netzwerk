@@ -98,6 +98,7 @@ assert.equal(invoicedScrape.claims[0].id, '12345678-1234-1234-1234-123456789012'
 assert.equal(invoicedScrape.claims[0].label, '26-015885-8', 'Schadennummer links in der Kostennoten-Zeile wird als Fallnummer übernommen');
 assert.equal(invoicedScrape.claims[0].enteredAt, '05.02.2026', 'Erstellungsdatum unter der Schadennummer wird für den Stichtagsfilter verwendet');
 assert(claimsBridgeDiagnostic.includes('findListScroller') && claimsBridgeDiagnostic.includes('scroller.scrollTop = nextTop'), 'Virtualisierte Kostennotentabellen werden beim Lesen durchgescrollt');
+assert(claimsBridgeDiagnostic.includes('stableScans >= 2'), 'Die virtuelle Kostennotenliste wird nach asynchronem Nachladen erneut bis zum stabilen Ende gescannt');
 let noLinkScrapeListener;
 const virtualCases = [
   ['26-015885-8', '12345678-1234-1234-1234-123456789012'],
@@ -113,7 +114,12 @@ const virtualRows = virtualCases.map(([number]) => ({
   querySelector: () => null,
   querySelectorAll: selector => selector.startsWith('td,') ? [{ textContent: `${number} GF 05.02.2026`, innerText: `${number}\n05.02.2026` }, { textContent: '23.01.2026', innerText: '23.01.2026' }] : []
 }));
-const listScroller = { scrollHeight: 500, clientHeight: 160, scrollTop: 0 };
+const scanStartedAt = Date.now();
+const listScroller = {
+  get scrollHeight() { return Date.now() - scanStartedAt >= 900 ? 800 : 500; },
+  clientHeight: 160,
+  scrollTop: 0
+};
 let searchText = '';
 const searchedNumbers = [];
 const scrapeProgress = [];
@@ -137,13 +143,14 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
       if (selector === 'input') return [searchInput];
       if (selector === 'table tbody tr,[role="row"]') {
         const first = Math.floor(listScroller.scrollTop / 70);
-        return virtualRows.slice(first, first + 3);
+        const availableRows = Date.now() - scanStartedAt >= 900 ? virtualRows : virtualRows.slice(0, 4);
+        return availableRows.slice(first, first + 3);
       }
       if (selector === 'a[href*="/claims/"]') return searchAnchors();
       return [];
     }
   },
-  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.38' }) } },
+  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.39' }) } },
   Event,
   HTMLInputElement: MockInput,
   setTimeout,
