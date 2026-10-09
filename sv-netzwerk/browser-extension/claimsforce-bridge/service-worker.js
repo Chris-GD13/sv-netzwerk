@@ -133,7 +133,8 @@ async function diagnostic(run, phase, text, details = {}) {
 async function credentialsFor(profile) {
   profile = profileKey(profile);
   credentialDiagnostic = 'vault';
-  const saved = await Promise.race([loadCredentials(profile).catch(() => null), sleep(600).then(() => null)]);
+  let vaultState = 'vault-timeout';
+  const saved = await Promise.race([loadCredentials(profile).then(value => { vaultState = value ? 'vault-unvollstaendig' : 'vault-leer'; return value; }).catch(error => { vaultState = `vault-fehler-${String(error?.name || 'error').toLowerCase()}`; return null; }), sleep(5000).then(() => null)]);
   if (saved?.email && saved?.password && credentialMatchesProfile(profile, saved)) { credentialDiagnostic = 'vault-ready'; return { value: saved, source: 'vault' }; }
   if (saved?.email && saved?.password) {
     credentialDiagnostic = 'vault-profile-mismatch';
@@ -156,7 +157,7 @@ async function credentialsFor(profile) {
     if (local?.email && local?.password) credentialDiagnostic = 'native-host-profile-mismatch';
     else credentialDiagnostic = nativeError ? `native-host-fehler: ${nativeError}` : (local?.error ? `native-host-antwort: ${String(local.error).slice(0, 80)}` : 'native-host-keine-antwort');
   } catch {}
-  credentialDiagnostic = ` > local-config`;
+  credentialDiagnostic = `${vaultState}; ${credentialDiagnostic} > local-config`;
   try {
     const configResponse = await fetch(chrome.runtime.getURL('local-config.json'));
     if (!configResponse.ok) { credentialDiagnostic = `-http-${configResponse.status}`; return null; }
@@ -356,9 +357,18 @@ async function requestInvestigationList(endpoint, token, name, query, tabId) {
 async function requestInvestigationClaims(endpoint, token, since, tabId) {
   const investigations = [], errors = [];
   if (tabId) {
-    // Erst die Berichte-Seite öffnen: Nur sie ruft die API auf, damit die Bridge deren Authorization-Header übernehmen kann.
-    await chrome.tabs.sendMessage(tabId, { type: 'OPEN_REPORTS' }).catch(() => null);
+    const reportsNavigation = await chrome.tabs.sendMessage(tabId, { type: 'OPEN_REPORTS' }).catch(() => null);
     await sleep(7000);
+    const currentTab = await chrome.tabs.get(tabId).catch(() => null);
+    if (!reportsNavigation?.ok || currentTab?.url?.includes('/claims')) {
+      await diagnostic(run, 'CF-REPORTS-01', 'ClaimsForce-Berichte-Ansicht konnte nicht sicher geöffnet werden.', {
+        clicked: !!reportsNavigation?.ok,
+        control: reportsNavigation?.control || '',
+        href: reportsNavigation?.href || '',
+        routeBefore: reportsNavigation?.route || '',
+        routeAfter: currentTab?.url ? safeRoute(currentTab.url) : ''
+      });
+    }
   }
   for (const [name, query] of Object.entries(INVESTIGATION_QUERIES)) {
     const result = await requestInvestigationList(endpoint, token, name, query, tabId);
@@ -429,18 +439,25 @@ async function uploadBuffer(portalTabId, profile, folderId, name, mime, modified
 
 function collectClaimsforceNotes(values){const out=[],seen=new Set();const visit=(v,d=0)=>{if(v==null||d>8||typeof v==='string')return;if(Array.isArray(v)){v.forEach(x=>visit(x,d+1));return}if(typeof v!=='object'||seen.has(v))return;seen.add(v);for(const [k,c] of Object.entries(v)){if(/^(notes?|internalNotes|claimsforceNotes)$/i.test(k)){const list=Array.isArray(c)?c:(c&&typeof c==='object'?Object.values(c):[c]);for(const n of list){if(typeof n==='string'&&n.trim())out.push({text:n.trim()});else if(n&&typeof n==='object'){const text=String(n.text||n.body||n.content||n.note||'').trim();if(text)out.push({id:String(n.id||''),text,author:String(n.author?.name||n.author||n.createdBy?.name||n.user?.name||n.user||''),createdAt:String(n.createdAt||n.updatedAt||n.date||'')})}}}else visit(c,d+1)}};values.forEach(v=>visit(v));const unique=new Map();for(const n of out)unique.set([n.id,n.createdAt,n.author,n.text].join('|'),n);return[...unique.values()]}
 
-async function ensureClaimsListTab(tabId){
+async function ensureInvoicedListTab(tabId){
   const current=await chrome.tabs.get(tabId);
-  if(new URL(String(current.url||'')).pathname==='/claims')return;
-  await chrome.tabs.update(tabId,{url:'https://web.claimsforce.com/claims'});
+  const pathname=new URL(String(current.url||'')).pathname.replace(/\/+$/,'');
+  if(pathname==='/invoiced'){
+    await chrome.tabs.reload(tabId);
+    await sleep(300);
+    const refreshed=await waitTab(tabId);
+    if(new URL(String(refreshed.url||'')).pathname.replace(/\/+$/,'')==='/login')throw new Error('ClaimsForce-Sitzung ist abgelaufen; bitte ClaimsForce anmelden.');
+    return;
+  }
+  await chrome.tabs.update(tabId,{url:'https://web.claimsforce.com/invoiced'});
   const deadline=Date.now()+15000;
   while(Date.now()<deadline){
     await new Promise(resolve=>setTimeout(resolve,500));
-    const tab=await chrome.tabs.get(tabId),pathname=new URL(String(tab.url||'')).pathname;
-    if(pathname==='/claims'){await new Promise(resolve=>setTimeout(resolve,1400));return;}
-    if(pathname==='/login')throw new Error('ClaimsForce-Sitzung ist abgelaufen; bitte ClaimsForce anmelden.');
+    const tab=await chrome.tabs.get(tabId),nextPath=new URL(String(tab.url||'')).pathname.replace(/\/+$/,'');
+    if(nextPath==='/invoiced'){await new Promise(resolve=>setTimeout(resolve,1400));return;}
+    if(nextPath==='/login')throw new Error('ClaimsForce-Sitzung ist abgelaufen; bitte ClaimsForce anmelden.');
   }
-  throw new Error('ClaimsForce-Fallliste konnte nicht geöffnet werden.');
+  throw new Error('ClaimsForce-Kostennotenliste unter /invoiced konnte nicht geöffnet werden.');
 }
 
 async function runImport(run) {
@@ -453,6 +470,7 @@ async function runImport(run) {
   if (!credential) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar. Ursache: ' + (credentialDiagnostic || 'unbekannt') + '.');
   if (!credentialMatchesProfile(profile, credential.value)) throw new Error('[CF-CRED-02] Das gespeicherte ClaimsForce-Konto gehört nicht zum ausgewählten Bearbeiterprofil.');
   const { tab, token } = await claimsTab(profile, run, credential);
+  run.claimsTabId = tab.id;
   await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
   const openTasks = await readOpenTasks(tab.id);
   await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks, reader: lastTaskDebug });
@@ -467,33 +485,33 @@ async function runImport(run) {
   finally { clearTimeout(configTimer); }
   const claimsById = new Map(), bucketCounts = {};
   if (fullSync) {
-    await diagnostic(run, 'CF-FULL-04', `Vollabgleich der ClaimsForce-Fälle ab ${run.since || 'ohne Datumsgrenze'}: Fallliste sowie Berichte und Nachträge werden eingelesen.`, { since: run.since || '', strategy: 'claims-and-investigations' });
-    await ensureClaimsListTab(tab.id);
+    await diagnostic(run, 'CF-FULL-04', `Vollabgleich der ClaimsForce-Kostennoten ab ${run.since || 'ohne Datumsgrenze'}: Schadennummern aus „/invoiced“ werden eingelesen.`, { since: run.since || '', strategy: 'invoiced-claims' });
+    await ensureInvoicedListTab(tab.id);
     const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
+    if (!scraped?.ok) throw new Error(scraped?.error || '[CF-INVOICED-01] Schadennummern aus „/invoiced“ konnten nicht gelesen werden.');
+    if (String(scraped.route || '').replace(/\/+$/, '') !== '/invoiced') throw new Error(`[CF-INVOICED-01] Kostennotenliste nicht bestätigt (Route ${safeRoute((await chrome.tabs.get(tab.id)).url)}).`);
     const allClaims = Array.isArray(scraped?.claims) ? scraped.claims : [];
     for (const claim of allClaims) if (claim?.id) claimsById.set(claim.id, claim);
-    const claimsFromReports = await requestInvestigationClaims(config.ASSESSMENT_API_ENDPOINT, token, run.since || '', tab.id);
-    for (const claim of claimsFromReports.claims) {
-      const existing = claimsById.get(claim.id);
-      if (existing) {
-        existing.label ||= claim.label;
-        existing.listVersion = [existing.listVersion, claim.listVersion].filter(Boolean).join('|');
-      } else claimsById.set(claim.id, claim);
-    }
-    bucketCounts.CLAIM_LIST = allClaims.length;
-    bucketCounts.REPORT_RECORDS = claimsFromReports.linkedRecords;
-    bucketCounts.REPORTS_AND_ADDENDA = claimsFromReports.claims.length;
-    await progress(portalTabId(), `${claimsById.size} Fälle gefunden: ${allClaims.length} aus der Fallliste und ${claimsFromReports.claims.length} aus Berichten/Nachträgen.${claimsFromReports.errors.length ? ' Fehlgeschlagene Abfragen: ' + claimsFromReports.errors.join(', ') + '.' : ''}`, 0, claimsById.size);
-    await diagnostic(run, 'CF-LIST-05', `${claimsById.size} unterschiedliche Fälle erkannt: ${allClaims.length} aus der Fallliste und ${claimsFromReports.claims.length} aus Berichten/Nachträgen.`, {
+    bucketCounts.INVOICED_CLAIMS = allClaims.length;
+    await progress(portalTabId(), `${claimsById.size} Schäden aus „/invoiced“ gefunden; anschließend werden Falldaten, Nachrichten und Anhänge einzeln abgeglichen.`, 0, claimsById.size);
+    await diagnostic(run, 'CF-INVOICED-01', `${claimsById.size} Schäden aus der ClaimsForce-Kostennotenliste erkannt.`, {
       count: claimsById.size,
-      claimListCount: allClaims.length,
-      investigationRecordCount: claimsFromReports.linkedRecords,
-      investigationClaimCount: claimsFromReports.claims.length,
-      excludedInvestigationRecords: claimsFromReports.excludedByDate,
-      investigationErrors: claimsFromReports.errors,
-      undatedInvestigationRecords: claimsFromReports.undated,
+      listedCount: scraped.listedCount || 0,
+      observedCount: scraped.observedCount || 0,
+      searchResolvedCount: scraped.searchResolvedCount || 0,
+      pages: scraped.pages || 0,
+      route: scraped.route,
+      bridge: BRIDGE_VERSION
+    });
+    await diagnostic(run, 'CF-LIST-05', `${claimsById.size} unterschiedliche Schäden aus „/invoiced“ erkannt.`, {
+      count: claimsById.size,
+      invoicedClaimCount: allClaims.length,
       since: run.since || '',
       pages: scraped?.pages || 0,
+      listedCount: scraped?.listedCount || 0,
+      observedCount: scraped?.observedCount || 0,
+      searchResolvedCount: scraped?.searchResolvedCount || 0,
+      bridge: BRIDGE_VERSION,
       excludedUndated: scraped?.excludedUndated || 0,
       route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url)
     });
@@ -519,6 +537,8 @@ async function runImport(run) {
     const preliminary = { claimsforce_claim_id: id, schaden_nr: String(item.label || '').trim() };
     const preliminaryState = await portal(portalTabId(), { type: 'PORTAL_SYNC_STATE', mapped: preliminary, profile });
     const preliminaryMeta = preliminaryState.result?.meta || {};
+    // A full pass always rechecks metadata so new mails and notes are not missed
+    // just because the invoiced-list row itself did not change.
     if (!fullSync && preliminaryState.result?.existed && item.listVersion && preliminaryMeta.claimsforce_list_version === item.listVersion) {
       skipped++;
       await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length}: seit dem letzten Import unverändert, wird ohne erneuten Detailabruf übersprungen.`, index + 1, claims.length);
@@ -559,14 +579,20 @@ async function runImport(run) {
       continue;
     }
     await diagnostic(run, 'CF-CASE-UPSERT', `Auftrag ${index + 1}/${claims.length}: Portal-Fall wird angelegt oder ergänzt.`, { current: index, total: claims.length, claimIndex: index + 1 });
-    const upsert = await portalOperation(portalTabId(), { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, profile, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, importedAt: new Date().toISOString() } });
+    const upsert = await portalOperation(portalTabId(), { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, profile, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, importedAt: new Date().toISOString() }, knownState: { existed: !!state.result?.existed, folderId: state.result?.folderId || '', meta: existingMeta } });
     const folderId = upsert.folderId;
-    await diagnostic(run, 'CF-CASE-FILES', `Auftrag ${index + 1}/${claims.length}: Anhänge und Nachrichten werden übernommen.`, { current: index, total: claims.length, claimIndex: index + 1 });
+    await diagnostic(run, 'CF-CASE-FILES', `Auftrag ${index + 1}/${claims.length}: Anhänge und Nachrichten werden übernommen (Bridge ${BRIDGE_VERSION}).`, { current: index, total: claims.length, claimIndex: index + 1 });
+    const caseDeadline = Date.now() + 300000;
+    const checkDeadline = where => { if (Date.now() > caseDeadline) throw new Error(`Zeitlimit von 5 Minuten für diesen Auftrag überschritten (${where}).`); };
     const knownFileVersions = new Set(Array.isArray(existingMeta.claimsforce_file_versions) ? existingMeta.claimsforce_file_versions.map(String) : []);
+    let fileNumber = 0;
     for (const file of files) {
       if (!file?.id) continue;
       const version = fileVersion(file);
       if (knownFileVersions.has(version)) continue;
+      fileNumber++;
+      checkDeadline(`Datei ${fileNumber}/${files.length}`);
+      await diagnostic(run, 'CF-CASE-FILE', `Auftrag ${index + 1}/${claims.length}: Datei ${fileNumber}/${files.length} wird übertragen.`, { current: index, total: claims.length, claimIndex: index + 1 });
       const sourcePath = String(file.folderPath || file.path || file.folder?.path || file.folder?.name || '').replaceAll('\\', '/').replace(/^\/+|\/+$/g, '');
       const baseName = safeFileName(file.name || file.fileName || file.originalFilename, `ClaimsForce-${file.id}`);
       const name = safeFileName(sourcePath ? `${sourcePath}__${baseName}` : baseName);
@@ -585,6 +611,8 @@ async function runImport(run) {
     for (const message of messages) {
       const version = messageVersion(message);
       if (knownMessageVersions.has(version)) continue;
+      checkDeadline('Nachrichten');
+      await diagnostic(run, 'CF-CASE-MESSAGE', `Auftrag ${index + 1}/${claims.length}: Nachrichten und Anhänge werden übertragen.`, { current: index, total: claims.length, claimIndex: index + 1 });
       const detail = message?.id ? await requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}/messages/${message.id}`, token, true) : message;
       const record = unwrap(detail, 'message');
       const stamp = String(record?.sentAt || record?.createdAt || '').slice(0, 10) || 'ohne-Datum';
@@ -597,7 +625,7 @@ async function runImport(run) {
         const attachmentName = safeFileName(attachment.name || attachment.fileName || attachment.filename, 'Anhang-' + (attachment.id || crypto.randomUUID()));
         let attachmentBuffer = null;
         if (attachment.contentBytes) { const binary = atob(String(attachment.contentBytes)); const bytes = new Uint8Array(binary.length); for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i); attachmentBuffer = bytes.buffer; }
-        else if (attachment.id && record?.id) { const response = await fetch(config.COMMUNICATION_API_ENDPOINT + '/claims/' + encodeURIComponent(id) + '/messages/' + encodeURIComponent(record.id) + '/attachments/' + encodeURIComponent(attachment.id), { headers: { Authorization: 'Bearer ' + token } }).catch(() => null); if (response?.ok) attachmentBuffer = await response.arrayBuffer(); }
+        else if (attachment.id && record?.id) { const response = await fetch(config.COMMUNICATION_API_ENDPOINT + '/claims/' + encodeURIComponent(id) + '/messages/' + encodeURIComponent(record.id) + '/attachments/' + encodeURIComponent(attachment.id), { headers: { Authorization: 'Bearer ' + token }, signal: AbortSignal.timeout(30000) }).catch(() => null); if (response?.ok) attachmentBuffer = await response.arrayBuffer(); }
         if (attachmentBuffer) await uploadBuffer(portalTabId(), profile, folderId, 'Mail_ClaimsForce-Anhang_' + stamp + '_' + attachmentName, attachment.mimeType || attachment.contentType || 'application/octet-stream', Date.parse(attachment.updatedAt || attachment.createdAt || '') || 0, attachmentBuffer);
       }
     }
@@ -618,7 +646,7 @@ async function runImport(run) {
       await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length} fehlgeschlagen, nächster Auftrag wird verarbeitet.`, index + 1, claims.length);
     }
   }
-  const sourceSummary = fullSync ? ` (${bucketCounts.CLAIM_LIST || 0} aus Fallliste, ${bucketCounts.REPORTS_AND_ADDENDA || 0} aus Berichten/Nachträgen)` : '';
+  const sourceSummary = fullSync ? ` (${bucketCounts.INVOICED_CLAIMS || 0} aus Kostennoten)` : '';
   await progress(portalTabId(), `${claims.length} Fälle${sourceSummary} geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${failed} fehlgeschlagen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
   await chrome.storage.session.set({ claimsLoggedProfile: profile });
   await chrome.storage.local.set({ claimsLoggedProfile: profile });
@@ -857,6 +885,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'KUSS_SCAN_JOBS' && sender.tab?.id) {
     scanKussJobs().then(result => sendResponse(result)).catch(error => sendResponse({ ok: false, error: error.message }));
     return true;
+  }
+  if (message?.type === 'INVOICED_SCRAPE_PROGRESS') {
+    const run = runningImport;
+    if (!run || sender.tab?.id !== run.claimsTabId) {
+      sendResponse({ ok: false, error: `Kein passender Kostennotenabgleich läuft (Bridge-Tab ${sender.tab?.id ?? 'unbekannt'}, aktiver Lauf ${run?.runId || 'keiner'}, erwarteter Tab ${run?.claimsTabId ?? 'unbekannt'}).` });
+      return;
+    }
+    const current = Number(message.current || 0), total = Number(message.total || 0);
+    sendResponse({ ok: true });
+    diagnostic(run, 'CF-INVOICED-01', `ClaimsForce-Zuordnung: ${current} von ${total} Schadennummern bearbeitet.`, {
+      current,
+      total,
+      listedCount: Number(message.listedCount || 0),
+      observedCount: Number(message.observedCount || 0),
+      searchResolvedCount: Number(message.searchResolvedCount || 0),
+      bridge: BRIDGE_VERSION
+    }).catch(() => {});
+    return false;
   }
   if (message?.type === 'REKON_TOKEN') {
     chrome.storage.session.set({ rekonToken: message.token, rekonTokenAt: Date.now() }).then(() => sendResponse({ ok: true })).catch(error => sendResponse({ ok: false, error: error.message }));
