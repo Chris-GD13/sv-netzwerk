@@ -157,6 +157,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       return matches;
     };
     const listedDamageNumbers = new Map();
+    const expectedCount = Number((document.body?.innerText || '').match(/Schäden mit erstellten Kostennoten\s*\((\d+)\)/i)?.[1] || 0);
     const collect = () => {
       const observed = observedByDamageNumber();
       for (const row of document.querySelectorAll('table tbody tr,[role="row"]')) {
@@ -267,6 +268,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         }
       }
       const observed = observedByDamageNumber();
+      const observedCount = claims.size;
+      let searchResolvedCount = 0;
       let usedSearch = false;
       for (const [key, listed] of listedDamageNumbers) {
         if ([...claims.values()].some(claim => normalizedDamageNumber(claim.label) === key)) continue;
@@ -278,7 +281,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         }
         usedSearch = true;
         const resolved = await resolveClaimByDamageNumber(listed.label);
-        if (!resolved) throw new Error(`[CF-INVOICED-01] Die ClaimsForce-Suche hat für Schadennummer ${listed.label} keine eindeutige Fall-ID geliefert.`);
+        if (!resolved) throw new Error(`[CF-INVOICED-01] Die ClaimsForce-Suche hat für Schadennummer ${listed.label} keine eindeutige Fall-ID geliefert (Bridge ${chrome.runtime.getManifest().version}; Nummern gelesen ${listedDamageNumbers.size}${expectedCount ? `/${expectedCount}` : ''}; IDs aus Liste/API ${observedCount}; Suchtreffer ${searchResolvedCount}).`);
         claims.set(resolved.id, {
           ...(observedClaims.get(resolved.id) || {}),
           id: resolved.id,
@@ -286,11 +289,23 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           listVersion: listed.enteredAt || '',
           enteredAt: listed.enteredAt || ''
         });
+        searchResolvedCount++;
+        if (searchResolvedCount % 10 === 0 || searchResolvedCount === listedDamageNumbers.size) {
+          const current = Math.min(listedDamageNumbers.size, observedCount + searchResolvedCount);
+          const heartbeat = await chrome.runtime.sendMessage({
+            type: 'INVOICED_SCRAPE_PROGRESS',
+            current,
+            total: listedDamageNumbers.size,
+            listedCount: listedDamageNumbers.size,
+            observedCount,
+            searchResolvedCount
+          });
+          if (!heartbeat?.ok) throw new Error(`[CF-INVOICED-01] Fortschritt des Kostennotenabgleichs konnte nicht bestätigt werden (Bridge ${chrome.runtime.getManifest().version}; ${searchResolvedCount} Suchtreffer).`);
+        }
       }
       if (usedSearch) setSearchValue('');
-      const expectedCount = Number((document.body?.innerText || '').match(/Schäden mit erstellten Kostennoten\s*\((\d+)\)/i)?.[1] || 0);
-      if (!Number.isFinite(sinceTime) && expectedCount && claims.size < expectedCount) throw new Error(`[CF-INVOICED-01] Kostennotenliste unvollständig: ${claims.size} von ${expectedCount} Schäden konnten zugeordnet werden.`);
-      sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, pages: page + 1, expectedCount, since, excludedUndated: Number.isFinite(sinceTime) ? [...observedClaims.values()].filter(claim => !Number.isFinite(dateTime(claim?.enteredAt || claim?.createdAt || claim?.updatedAt || claim?.date))).length : 0 });
+      if (!Number.isFinite(sinceTime) && expectedCount && claims.size < expectedCount) throw new Error(`[CF-INVOICED-01] Kostennotenliste unvollständig: ${claims.size} von ${expectedCount} Schäden konnten zugeordnet werden (Bridge ${chrome.runtime.getManifest().version}; Schadennummern gelesen ${listedDamageNumbers.size}; IDs aus Liste/API ${observedCount}; Suchtreffer ${searchResolvedCount}).`);
+      sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, pages: page + 1, expectedCount, listedCount: listedDamageNumbers.size, observedCount, searchResolvedCount, since, excludedUndated: Number.isFinite(sinceTime) ? [...observedClaims.values()].filter(claim => !Number.isFinite(dateTime(claim?.enteredAt || claim?.createdAt || claim?.updatedAt || claim?.date))).length : 0 });
     })().catch(error => sendResponse({ ok: false, error: error.message, claims: [] }));
     return true;
   }

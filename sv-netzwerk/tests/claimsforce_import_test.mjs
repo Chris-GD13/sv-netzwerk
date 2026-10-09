@@ -72,6 +72,7 @@ assert(claimsBridgeDiagnostic.includes('a,button,[role="tab"],[role="link"]') &&
 assert(claimsBridgeDiagnostic.includes('info: pageResult.body'), 'Fehlermeldung enthält den Seitentoken-Diagnosestatus');
 assert(claimsMainDiagnostic.includes('authCaptureCounts') && claimsMainDiagnostic.includes('authOrigins='), 'Seitentoken-Diagnose nennt nur erfasste API-Ursprünge, nie den Token');
 assert(serviceWorkerDiagnostic.includes("https://web.claimsforce.com/invoiced") && serviceWorkerDiagnostic.includes('ensureInvoicedListTab') && serviceWorkerDiagnostic.includes('CF-INVOICED-01'), 'Vollabgleich öffnet und bestätigt die Kostennotenliste /invoiced');
+assert(serviceWorkerDiagnostic.includes('INVOICED_SCRAPE_PROGRESS') && serviceWorkerDiagnostic.includes('sender.tab?.id !== run.claimsTabId'), 'Der lange Kostennotenabgleich aktualisiert den Queue-Heartbeat nur aus seinem ClaimsForce-Tab');
 assert(claimsBridgeDiagnostic.includes("location.pathname.replace(/\\/+$/, '') !== '/invoiced'") && claimsBridgeDiagnostic.includes('damageNumberPattern'), 'Kostennotenliste wird seitenweise gelesen und Schadennummern aus den Zeilen übernommen');
 assert(claimsMainDiagnostic.includes("location.pathname.replace(/\\/+$/, '') === '/invoiced'") && claimsMainDiagnostic.includes('invoicedContext && insurerClaimId'), 'Auf /invoiced geladene ClaimsForce-Antworten ergänzen Claim-IDs mit Schadennummern');
 const claimRowAnchor = { textContent: 'Schaden öffnen', getAttribute: name => name === 'href' ? '/claims/12345678-1234-1234-1234-123456789012' : '', closest: () => null };
@@ -103,7 +104,8 @@ const virtualCases = [
   ['26-119445-2', '32345678-1234-1234-1234-123456789012'],
   ['26-164408-6', '42345678-1234-1234-1234-123456789012'],
   ['ABCD1234EF-5678', '52345678-1234-1234-1234-123456789012'],
-  ['12.1234567.8', '62345678-1234-1234-1234-123456789012']
+  ['12.1234567.8', '62345678-1234-1234-1234-123456789012'],
+  ['HS74698170-0160', '72345678-1234-1234-1234-123456789012']
 ];
 const virtualRows = virtualCases.map(([number]) => ({
   textContent: `${number} GF 05.02.2026 23.01.2026 06.10.2026 25.000,00 €`,
@@ -113,6 +115,7 @@ const virtualRows = virtualCases.map(([number]) => ({
 const listScroller = { scrollHeight: 500, clientHeight: 160, scrollTop: 0 };
 let searchText = '';
 const searchedNumbers = [];
+const scrapeProgress = [];
 const searchInput = {
   getAttribute: name => name === 'placeholder' ? 'Schäden durchsuchen' : null,
   dispatchEvent: event => { if (event.type === 'input') searchedNumbers.push(searchText); }
@@ -139,7 +142,7 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
       return [];
     }
   },
-  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } } } },
+  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.37' }) } },
   Event,
   HTMLInputElement: MockInput,
   setTimeout,
@@ -148,9 +151,15 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
 const numberOnlyScrape = await new Promise(resolve => noLinkScrapeListener({ type: 'SCRAPE_ALL_CLAIMS' }, {}, resolve));
 assert.equal(numberOnlyScrape.ok, true, `Schadennummern werden ohne Tabellen-Claim-IDs einzeln über die ClaimsForce-Suche aufgelöst: ${JSON.stringify(numberOnlyScrape)}`);
 assert.equal(numberOnlyScrape.expectedCount, virtualCases.length);
+assert.equal(numberOnlyScrape.listedCount, virtualCases.length, 'Alle eindeutigen Schadennummern werden im Scrape-Ergebnis ausgewiesen');
+assert.equal(numberOnlyScrape.searchResolvedCount, virtualCases.length, 'Alle über die Suche ermittelten IDs werden im Scrape-Ergebnis ausgewiesen');
+assert.equal(scrapeProgress.length, 1, 'Ein langer Kostennotenabgleich sendet einen bestätigten Heartbeat');
+assert.equal(scrapeProgress[0].type, 'INVOICED_SCRAPE_PROGRESS');
+assert.equal(scrapeProgress[0].searchResolvedCount, virtualCases.length);
 assert.equal(numberOnlyScrape.claims.length, virtualCases.length, 'Beim virtuellen Scrollen müssen alle Schadennummern einzeln aufgelöst werden');
 assert(numberOnlyScrape.claims.some(claim => claim.id === virtualCases[4][1]), 'Alphanumerische Schadennummern werden einzeln zugeordnet');
 assert(numberOnlyScrape.claims.some(claim => claim.id === virtualCases[5][1]), 'Punktgetrennte Schadennummern werden einzeln zugeordnet');
+assert(numberOnlyScrape.claims.some(claim => claim.label === 'HS74698170-0160'), 'ClaimsForce-Schadennummern mit Präfix werden vollständig übernommen');
 assert(virtualCases.every(([number]) => searchedNumbers.includes(number)), 'Jede aus der Liste gelesene Schadennummer wird einzeln in ClaimsForce gesucht');
 assert.equal(searchText, '', 'Einzelsuche wird nach der Zuordnung geleert');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/*')));

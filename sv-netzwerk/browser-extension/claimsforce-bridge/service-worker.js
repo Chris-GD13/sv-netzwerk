@@ -462,6 +462,7 @@ async function runImport(run) {
   if (!credential) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar. Ursache: ' + (credentialDiagnostic || 'unbekannt') + '.');
   if (!credentialMatchesProfile(profile, credential.value)) throw new Error('[CF-CRED-02] Das gespeicherte ClaimsForce-Konto gehört nicht zum ausgewählten Bearbeiterprofil.');
   const { tab, token } = await claimsTab(profile, run, credential);
+  run.claimsTabId = tab.id;
   await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
   const openTasks = await readOpenTasks(tab.id);
   await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks, reader: lastTaskDebug });
@@ -485,12 +486,24 @@ async function runImport(run) {
     for (const claim of allClaims) if (claim?.id) claimsById.set(claim.id, claim);
     bucketCounts.INVOICED_CLAIMS = allClaims.length;
     await progress(portalTabId(), `${claimsById.size} Schäden aus „/invoiced“ gefunden; anschließend werden Falldaten, Nachrichten und Anhänge einzeln abgeglichen.`, 0, claimsById.size);
-    await diagnostic(run, 'CF-INVOICED-01', `${claimsById.size} Schäden aus der ClaimsForce-Kostennotenliste erkannt.`, { count: claimsById.size, pages: scraped.pages || 0, route: scraped.route });
+    await diagnostic(run, 'CF-INVOICED-01', `${claimsById.size} Schäden aus der ClaimsForce-Kostennotenliste erkannt.`, {
+      count: claimsById.size,
+      listedCount: scraped.listedCount || 0,
+      observedCount: scraped.observedCount || 0,
+      searchResolvedCount: scraped.searchResolvedCount || 0,
+      pages: scraped.pages || 0,
+      route: scraped.route,
+      bridge: BRIDGE_VERSION
+    });
     await diagnostic(run, 'CF-LIST-05', `${claimsById.size} unterschiedliche Schäden aus „/invoiced“ erkannt.`, {
       count: claimsById.size,
       invoicedClaimCount: allClaims.length,
       since: run.since || '',
       pages: scraped?.pages || 0,
+      listedCount: scraped?.listedCount || 0,
+      observedCount: scraped?.observedCount || 0,
+      searchResolvedCount: scraped?.searchResolvedCount || 0,
+      bridge: BRIDGE_VERSION,
       excludedUndated: scraped?.excludedUndated || 0,
       route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url)
     });
@@ -855,6 +868,23 @@ chrome.runtime.onConnect.addListener(port => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'KUSS_SCAN_JOBS' && sender.tab?.id) {
     scanKussJobs().then(result => sendResponse(result)).catch(error => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
+  if (message?.type === 'INVOICED_SCRAPE_PROGRESS') {
+    const run = runningImport;
+    if (!run || sender.tab?.id !== run.claimsTabId) {
+      sendResponse({ ok: false, error: 'Kein passender Kostennotenabgleich läuft.' });
+      return;
+    }
+    const current = Number(message.current || 0), total = Number(message.total || 0);
+    diagnostic(run, 'CF-INVOICED-01', `ClaimsForce-Zuordnung: ${current} von ${total} Schadennummern bearbeitet.`, {
+      current,
+      total,
+      listedCount: Number(message.listedCount || 0),
+      observedCount: Number(message.observedCount || 0),
+      searchResolvedCount: Number(message.searchResolvedCount || 0),
+      bridge: BRIDGE_VERSION
+    }).then(() => sendResponse({ ok: true })).catch(error => sendResponse({ ok: false, error: String(error?.message || error).slice(0, 200) }));
     return true;
   }
   if (message?.type === 'REKON_TOKEN') {
