@@ -10,13 +10,13 @@ contentLevel: "B"
 teaser: "Eine gebrochene Scheibe rechtfertigt nicht automatisch den Austausch des gesamten Fensters. Maßgeblich sind Glasaufbau, Rahmenzustand, Beschlag, Anschluss und technische Reparaturfähigkeit."
 linkedinSummary: "Fensterschäden werden prüffähig, wenn Glas, Rahmen, Beschlag, Anschluss und Wiederherstellung getrennt dokumentiert werden."
 cta:
-  label: "Schaden strukturiert melden"
-  href: "/schaden-melden/"
+  label: "Fachliche Prüfung für Versicherer anfragen"
+  href: "/versicherer/#anfrage"
 relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-17
-  updatedAt: 2026-09-17
+  updatedAt: 2026-10-09
   status: published
 seo:
   title: "Fenster- und Glasschäden prüffähig abgrenzen"
@@ -88,3 +88,9 @@ Die Reparaturgrenze folgt dem konkreten Befund. Erst die bauteilbezogene Trennun
 - [Quelle 1](https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren) – offizieller Bezug zum jeweiligen Prüffeld.
 - [Quelle 2](https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6) – fachliche oder sicherheitsbezogene Einordnung.
 - [Quelle 3](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – gesetzlicher beziehungsweise technischer Rahmen.
+
+## Fachliche Prüfung für Ihre Schadenakte
+
+Für Versicherer, Schadenabteilungen und Regulierer bieten wir abgegrenzte technische Prüfaufträge und die Bearbeitung komplexer Schadenlagen an. Prüfziel, Unterlagenstand und gewünschte Bearbeitungstiefe werden vorab abgestimmt.
+
+[Leistungen und Ansprechpartner für Versicherer](/versicherer/) · [Rechnungs- und KVA-Prüfung](/leistungen/rechnungs-und-kva-pruefung/) · [Prüfauftrag anfragen](/versicherer/#anfrage)

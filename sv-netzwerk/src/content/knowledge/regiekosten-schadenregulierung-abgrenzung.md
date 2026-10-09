@@ -10,8 +10,8 @@ contentLevel: "A"
 teaser: "Regiekosten sind keine automatische Pauschale für jede Baustelle. Prüffähig werden sie erst, wenn Leistung, Zeit, Anlass, Ergebnis und Abgrenzung zur normalen Bauleitung nachvollziehbar sind."
 linkedinSummary: "Regiekosten im Schadenfall brauchen einen konkreten Leistungsnachweis und eine klare Trennung von schadenbedingter Koordination und allgemeiner Projektsteuerung."
 cta:
-  label: "Schaden strukturiert melden"
-  href: "/schaden-melden/"
+  label: "Fachliche Prüfung für Versicherer anfragen"
+  href: "/versicherer/#anfrage"
 relatedLinks: ["/schaden-melden/", "/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/", "/fachwissen/prueffaehige-dokumentation/", "/fachwissen/schadenabgrenzung/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "leitungswasser", "brand"]
 publication:
@@ -127,3 +127,9 @@ Als Mindestbestand sollten Auftrag, Leistungsbeschreibung, Tages- oder Stundenbe
 - HOAI, Verordnung über die Honorare für Architekten- und Ingenieurleistungen: https://www.gesetze-im-internet.de/haoi_2013/
 - Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen, Bauwesen: https://www.bmwsb.bund.de/Webs/BMWSB/DE/themen/bauen/bauen-node.html
 - VDI, Richtlinien und technische Gebäudeausrüstung: https://www.vdi.de/richtlinien
+
+## Fachliche Prüfung für Ihre Schadenakte
+
+Für Versicherer, Schadenabteilungen und Regulierer bieten wir abgegrenzte technische Prüfaufträge und die Bearbeitung komplexer Schadenlagen an. Prüfziel, Unterlagenstand und gewünschte Bearbeitungstiefe werden vorab abgestimmt.
+
+[Leistungen und Ansprechpartner für Versicherer](/versicherer/) · [Rechnungs- und KVA-Prüfung](/leistungen/rechnungs-und-kva-pruefung/) · [Prüfauftrag anfragen](/versicherer/#anfrage)

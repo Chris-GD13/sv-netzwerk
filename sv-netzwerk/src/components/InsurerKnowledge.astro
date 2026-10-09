@@ -1,0 +1,25 @@
+---
+const topics = [
+  { question: 'Sind Regiekosten und Nachträge nachvollziehbar?', text: 'Leistungsinhalt, Zeitaufwand, Schadenbezug und Überschneidungen mit bestehenden Positionen prüfen.', href: '/fachwissen/regiekosten-schadenregulierung-abgrenzung/', label: 'Regiekosten einordnen', service: '/leistungen/rechnungs-und-kva-pruefung/' },
+  { question: 'Wie weit muss nach einem Wasserschaden zurückgebaut werden?', text: 'Befund, betroffenen Bauteilaufbau und Wiederherstellungsbedarf zusammenführen, bevor Mengen und Kosten bewertet werden.', href: '/fachwissen/wasserschaden-rueckbau-technische-abgrenzung/', label: 'Rückbau technisch abgrenzen', service: '/leistungen/rechnungs-und-kva-pruefung/' },
+  { question: 'Welche Befunde braucht eine belastbare Ursachenklärung?', text: 'Leckageortung, Suchöffnungen und dokumentierte Befunde auf die konkrete Schadenfrage ausrichten.', href: '/fachwissen/leitungswasserschaden-leckageortung-pruefstrategie/', label: 'Prüfstrategie bei Leitungswasser', service: '/leistungen/schadenregulierung-fuer-versicherer/' },
+  { question: 'Ist das Fenster reparierbar oder muss es ersetzt werden?', text: 'Verglasung, Rahmen, Beschlag und Anschluss getrennt aufnehmen; die Reparaturgrenze bauteilbezogen begründen.', href: '/fachwissen/fenster-glasschaden-verglasung-reparaturgrenze/', label: 'Fenster- und Glasschäden prüfen', service: '/leistungen/schadenregulierung-fuer-versicherer/' },
+];
+---
+<section class="sv-section sv-section-alt" aria-labelledby="insurer-knowledge-title">
+  <div class="sv-container">
+    <p class="sv-eyebrow">Fachwissen für die Schadenakte</p>
+    <h2 id="insurer-knowledge-title">Konkrete Prüffragen aus der Sachbearbeitung</h2>
+    <p class="sv-lead">Fachbeiträge für die erste Einordnung – mit direktem Weg zum passenden Prüfauftrag.</p>
+    <div class="knowledge-grid">
+      {topics.map((topic) => <article class="sv-card"><h3>{topic.question}</h3><p>{topic.text}</p><a href={topic.href}>{topic.label}</a><a class="service-link" href={topic.service}>Passende Prüfung und Leistungsumfang</a></article>)}
+    </div>
+    <p>Die Beiträge erläutern Prüfmethoden. Eine konkrete Bewertung erfordert die Unterlagen und Feststellungen des jeweiligen Schadenfalls. <a href="/fachwissen/">Alle Fachbeiträge</a></p>
+  </div>
+</section>
+<style>
+  .knowledge-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sv-space-5);margin-block:var(--sv-space-5)}
+  .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}
+  .service-link{display:block;margin-top:.75rem}
+  @media(max-width:48rem){.knowledge-grid{grid-template-columns:1fr}}
+</style>

@@ -2,20 +2,26 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import FeatureCard from '../../components/FeatureCard.astro';
+import InsurerKnowledge from '../../components/InsurerKnowledge.astro';
+import { experts } from '../../data/experts';
+const insurerExperts = experts.filter((expert) => ['christian-waechter', 'carmen-gohl', 'holger-roth'].includes(expert.slug));
 
 const sent = Astro.url.searchParams.get('gesendet') === '1';
 const error = Astro.url.searchParams.get('fehler');
 const modules = [
   {
     title: 'Schadenregulierung für Versicherer',
+    href: '/leistungen/schadenregulierung-fuer-versicherer/',
     text: 'Belastbare Entscheidungsvorlagen aus technischer Feststellung, Kostenabgrenzung und dokumentierter Plausibilitätsprüfung.'
   },
   {
     title: 'Großschaden- und Kumulsteuerung',
+    href: '/grossschadenregulierung/',
     text: 'Priorisierte Bearbeitung komplexer Schadenlagen mit einheitlicher Aktenführung, transparenten Zuständigkeiten und fortlaufender Statusmeldung.'
   },
   {
     title: 'Rechnungs- und KVA-Prüfung',
+    href: '/leistungen/rechnungs-und-kva-pruefung/',
     text: 'Technische und kaufmännische Prüfung von KVA, Rechnung, Nachträgen und Regiekosten mit prüffähiger Herleitung.'
   }
 ];
@@ -29,8 +35,16 @@ const faqItems = [
     answer: 'Schadennummer, Schadenort, Kurzbeschreibung, vorhandene Unterlagen sowie der gewünschte Leistungsumfang reichen für die priorisierte Erstaufnahme aus.'
   },
   {
-    question: 'Wie werden SLA und Rückmeldungen organisiert?',
+    question: 'Wie werden Bearbeitungsfristen und Rückmeldungen organisiert?',
     answer: 'Erstreaktion, Bearbeitungstiefe und Berichtstakt werden auftragsbezogen abgestimmt und als fester Prozessrahmen dokumentiert.'
+  },
+  {
+    question: 'Welche Ergebnisse erhält die Sachbearbeitung?',
+    answer: 'Je nach Auftrag erhalten Sie eine technische Stellungnahme oder einen Schadenbericht mit Feststellungen, Schadenabgrenzung, geprüften Kosten, begründeter Empfehlung und offenen Punkten. Reserveänderungen und Freigabevorbehalte werden ausdrücklich ausgewiesen.'
+  },
+  {
+    question: 'Ist eine Einzelprüfung ohne vollständige Schadenregulierung möglich?',
+    answer: 'Ja. Rechnungs-, KVA- und Nachtragsprüfungen sowie bauteilbezogene technische Stellungnahmen können als abgegrenzte Prüfaufträge angefragt werden. Prüfziel, Unterlagenstand und Umfang werden vor der Bearbeitung abgestimmt.'
   },
 ];
 const serviceSchema = {
@@ -57,22 +71,68 @@ const faqSchema = {
 ---
 
 <BaseLayout
-  title="Schadenregulierung für Versicherer | Anfrage & Beauftragung"
-  description="Schadenregulierung für Versicherer mit direktem Einstieg für Großschäden, Kumulschadenlagen und prüffähige KVA-/Rechnungsprüfung."
+  title="Sachverständige für Versicherer: Schadenregulierung & Kostenprüfung"
+  description="Sachverständige für Versicherer und Schadenabteilungen: Gebäude- und Großschäden, Rechnungs- und KVA-Prüfung sowie nachvollziehbare Entscheidungsvorlagen."
   structuredData={[serviceSchema, faqSchema]}
   breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Für Versicherer' }]}
 >
   <section class="sv-section">
     <div class="sv-container entry-header">
       <p class="sv-eyebrow">Versicherer</p>
-      <h1>Schadenregulierung für Versicherer direkt beauftragen</h1>
-      <p class="sv-lead">Schadenart, Vorgangsdaten und Leistungsumfang werden strukturiert übermittelt und unmittelbar in die technische Bearbeitung überführt.</p>
+      <h1>Sachverständige und Schadenregulierung für Versicherer</h1>
+      <p class="sv-lead">Für Sachbearbeiter, Schadenabteilungen und Regulierer: Wir klären technische Schadenfragen, prüfen Wiederherstellungskosten und erstellen nachvollziehbare Grundlagen für Ihre Regulierungsentscheidung.</p>
+      <p>Von der abgegrenzten Rechnungsprüfung bis zum Komplex- und Großschaden: Feststellungen, Bewertung und Empfehlung bleiben getrennt. Standort Aalen; bundesweite Einsätze nach Aufgabenstellung und Abstimmung.</p>
       <div class="quick-links">
         <a class="sv-button sv-button-primary" href="#anfrage">Anfrage / Beauftragung</a>
         <a class="sv-button sv-button-secondary" href="/grossschadenregulierung/#grossschaden-formular">Direkteinstieg Großschaden</a>
         <a class="sv-button sv-button-secondary" href="/leistungen/kumulschadenmanagement/#kumulschaden-formular">Direkteinstieg Kumulschaden</a>
         <a class="sv-button sv-button-secondary" href="/versicherer/fuer-wen-wir-taetig-sind/">Für wen wir tätig sind</a>
       </div>
+    </div>
+  </section>
+
+  <section class="sv-section sv-section-alt" aria-labelledby="pruefauftrag-title">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Ihr Prüfauftrag" title="Welche Entscheidung steht in Ihrer Schadenakte an?" id="pruefauftrag-title" />
+      <div class="service-columns">
+        <article class="sv-card"><h2>Schadenumfang und Ursache klären</h2><p>Ist der Befund schadenbedingt? Welche Bauteile sind betroffen, welche Vorschäden bestehen und welche Untersuchungen fehlen?</p><a href="/leistungen/schadenregulierung-fuer-versicherer/">Technische Feststellung und Schadenabgrenzung</a></article>
+        <article class="sv-card"><h2>KVA, Rechnung oder Nachtrag prüfen</h2><p>Passen Mengen, Leistungen und Preise zum Schaden? Sind Regiekosten belegt und überschneiden sich Positionen mit bestehenden Freigaben?</p><a href="/leistungen/rechnungs-und-kva-pruefung/">Kostenprüfung mit begründeter Empfehlung</a></article>
+        <article class="sv-card"><h2>Komplexe Schadenlagen steuern</h2><p>Welche Maßnahmen haben Vorrang? Wie werden Sachverständige, Sanierung, Reserven und offene Entscheidungen nachvollziehbar zusammengeführt?</p><a href="/grossschadenregulierung/">Großschadenregulierung</a> · <a href="/leistungen/kumulschadenmanagement/">Kumulschadenmanagement</a></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sv-section" aria-labelledby="entscheidung-title">
+    <div class="sv-container">
+      <h2 id="entscheidung-title">Was Sie für die weitere Bearbeitung erhalten</h2>
+      <p class="sv-lead">Eine nachvollziehbare Entscheidungsvorlage statt einer unkommentierten Kostensumme.</p>
+      <ul class="deliverables">
+        <li><strong>Feststellungen:</strong> Schadenbild, Unterlagenstand und technische Befunde mit nachvollziehbaren Quellen.</li>
+        <li><strong>Bewertung:</strong> Schadenbezug, erforderliche Wiederherstellung und Abgrenzung von Vorschaden, Instandhaltung und Verbesserungen.</li>
+        <li><strong>Kostenprüfung:</strong> Zuordnung geprüfter Positionen, Mengen und begründeter Abzüge oder Vorbehalte.</li>
+        <li><strong>Empfehlung:</strong> Konkreter nächster Schritt; offene Nachweise, Reservebedarf und Freigabegrenzen ausdrücklich benannt.</li>
+      </ul>
+      <p>Der Umfang richtet sich nach dem vereinbarten Auftrag. Versicherungsrechtliche Entscheidungen und Zahlungen erfolgen im Rahmen der jeweiligen Zuständigkeit und Vollmacht.</p>
+    </div>
+  </section>
+
+  <InsurerKnowledge />
+
+  <section class="sv-section" aria-labelledby="expertise-title">
+    <div class="sv-container">
+      <h2 id="expertise-title">Fachkompetenz passend zur Schadenfrage</h2>
+      <div class="service-columns">
+        {insurerExperts.map((expert) => <article class="sv-card"><h3><a href={`/experten/${expert.slug}/`}>{expert.name}</a></h3><p>{expert.function}</p><p>{expert.expertise.slice(0, 3).join(' · ')}</p><a href={`/experten/${expert.slug}/`}>Qualifikationen und Einsatzbereiche</a></article>)}
+      </div>
+      <p>Die fachliche Zuordnung und Verfügbarkeit werden für den konkreten Auftrag abgestimmt. <a href="/experten/">Alle Expertenprofile</a></p>
+    </div>
+  </section>
+
+  <section class="sv-section sv-section-alt">
+    <div class="sv-container">
+      <h2>Prüfwissen für Ihre Schadenabteilung</h2>
+      <p>Für wiederkehrende Prüfprobleme bieten wir themenbezogene Seminare und Inhouse-Formate an. Schwerpunkte, Zielgruppe und Bearbeitungstiefe stimmen wir mit Ihnen ab – etwa für Schadenabgrenzung, Kostenprüfung oder Fenster- und Glasschäden.</p>
+      <a class="sv-button sv-button-secondary" href="/seminare/">Schulung für Sachbearbeiter anfragen</a>
     </div>
   </section>
 
@@ -158,7 +218,7 @@ const faqSchema = {
     <div class="sv-container">
       <SectionHeader eyebrow="Leistungsmodule" title="Direkteinstiege für Versicherer und Schadenabteilungen" />
       <div class="sv-grid sv-grid-3">
-        {modules.map((module, index) => <FeatureCard index={`0${index + 1}`} title={module.title} text={module.text} />)}
+        {modules.map((module, index) => <FeatureCard index={`0${index + 1}`} title={module.title} text={module.text} href={module.href} linkLabel="Leistung und Prüfablauf" />)}
       </div>
     </div>
   </section>
@@ -208,6 +268,7 @@ const faqSchema = {
 </BaseLayout>
 
 <style>
+  .deliverables{display:grid;gap:.8rem;padding-left:1.3rem;max-width:85ch}
   .entry-header{display:grid;gap:1rem}
   .entry-header h1{margin:0}
   .entry-header .sv-lead{margin:0}

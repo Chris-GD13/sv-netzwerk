@@ -10,13 +10,13 @@ contentLevel: "A"
 teaser: "Eine Ortungsanzeige ist noch kein Ursachennachweis. Erst die Verbindung aus Zeitachse, Messverfahren, Suchöffnung, Befund und Rückbaugrenze macht die Prüfung belastbar."
 linkedinSummary: "Leckageortung bei Leitungswasserschäden braucht eine dokumentierte Beweiskette von der ersten Auffälligkeit bis zur technisch begründeten Reparatur."
 cta:
-  label: "Schaden strukturiert melden"
-  href: "/schaden-melden/"
+  label: "Fachliche Prüfung für Versicherer anfragen"
+  href: "/versicherer/#anfrage"
 relatedLinks: ["/schaden-melden/", "/fachwissen/prueffaehige-dokumentation/", "/fachwissen/schadenabgrenzung/", "/fachwissen/sanierungsplanung-rueckbau-trocknung-strategie/", "/gutachter-plattform/"]
 damageTypes: ["leitungswasser", "gebaeude"]
 publication:
   publishedAt: 2026-09-08
-  updatedAt: 2026-09-08
+  updatedAt: 2026-10-09
   status: published
 seo:
   title: "Leckageortung bei Leitungswasserschäden prüfen"
@@ -113,3 +113,9 @@ Leckageortung ist dann belastbar, wenn Messung, Leitungsverlauf, Suchöffnung, k
 - Umweltbundesamt, Trinkwasser und Trinkwasserinstallation: https://www.umweltbundesamt.de/themen/wasser/trinkwasser
 - DVGW, Informationen zu Wasserinstallation und Hygiene: https://www.dvgw.de/themen/wasser
 - WTA, Fachinformationen zur Bauwerkserhaltung und Feuchte: https://www.wta-international.org/de/technische-mitteilungen/
+
+## Fachliche Prüfung für Ihre Schadenakte
+
+Für Versicherer, Schadenabteilungen und Regulierer bieten wir abgegrenzte technische Prüfaufträge und die Bearbeitung komplexer Schadenlagen an. Prüfziel, Unterlagenstand und gewünschte Bearbeitungstiefe werden vorab abgestimmt.
+
+[Leistungen und Ansprechpartner für Versicherer](/versicherer/) · [Rechnungs- und KVA-Prüfung](/leistungen/rechnungs-und-kva-pruefung/) · [Prüfauftrag anfragen](/versicherer/#anfrage)
