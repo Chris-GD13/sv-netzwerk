@@ -41,7 +41,7 @@ function drReviewSender(array $profile): array {
 }
 
 function drSignature(string $name): string {
-    if ($name === 'Christian Wächter') return $name."\nRegulierer und Bausachverständiger\nDIN EN ISO/IEC 17024 zertifiziert\ncw@sv-netzwerk.eu\nhttps://www.sv-netzwerk.eu/";
+    if ($name === 'Christian Wächter') return $name."\nRegulierer und Bausachverständiger\nSV-Netzwerk\nDIN EN ISO/IEC 17024 zertifiziert\ncw@sv-netzwerk.eu\nhttps://www.sv-netzwerk.eu/";
     return $name."\nSV-Büro Marc Schütt e.K.";
 }
 
