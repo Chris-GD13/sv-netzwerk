@@ -65,6 +65,7 @@
           </fieldset>
           <p class="vf-meta" id="${prefix}attachment"></p>
           <button class="vf-primary" type="button" id="${prefix}save">Entscheidung speichern und Mail vorbereiten</button>
+          <p id="${prefix}save-state" class="vf-meta" role="alert" aria-live="polite"></p>
         </div>
         <div id="${prefix}mail" class="dr-mail" hidden><strong>Mailvorschau</strong><p id="${prefix}mail-header"></p><pre id="${prefix}mail-body"></pre><button type="button" class="vf-primary" id="${prefix}send">Mail mit Originalbeleg senden</button><p class="vf-meta" id="${prefix}send-state" role="status"></p></div>
       </div>`;
@@ -73,7 +74,7 @@
     const state = {folder:'', workspace:sessionStorage.getItem('svnet-review-'+kind)||'', files:[], support:new Set(), token:'', recordId:'', busy:false, sender:'', source:''};
     const context = () => el('standalone').checked ? state.workspace : (active()?.folder_id||'');
     const message = (text, bad=false) => { el('state').textContent=text; el('state').classList.toggle('dr-error',bad); };
-    const reset = () => { state.token=''; state.recordId=''; el('mail').hidden=true; el('send').disabled=true; el('confirmed').checked=false; };
+    const reset = () => { state.token=''; state.recordId=''; el('mail').hidden=true; el('send').disabled=true; el('confirmed').checked=false; el('save-state').textContent=''; };
     const clear = () => {
       reset(); el('edit').hidden=true; el('checks').replaceChildren(); el('sender').textContent=''; el('send-state').textContent='';el('history').hidden=true;el('history').replaceChildren();
       state.support.clear();el('supports').replaceChildren();el('comment').value='';el('case_no').value='';
@@ -207,15 +208,22 @@
     el('edit').addEventListener('change',()=>{state.recordId='';el('mail').hidden=true;el('send').disabled=true;});
     el('save').onclick=async()=>{
       const folder=context();
-      if (!state.token||folder!==state.folder) {message('Bitte den Beleg erneut vorbereiten.',true);return;}
+      const saveMessage=(text,bad=false)=>{message(text,bad);el('save-state').textContent=text;el('save-state').classList.toggle('dr-error',bad);};
+      if (!state.token||folder!==state.folder) {saveMessage('Bitte den Beleg erneut vorbereiten.',true);return;}
+      if (!el('direct').checked && !el('confirmed').checked) {
+        saveMessage('Zum Speichern bitte zuerst „Prüfergebnis fachlich kontrolliert und bestätigt“ nach deiner Kontrolle anhaken.',true);
+        el('confirmed').focus();el('confirm-label').scrollIntoView({behavior:'smooth',block:'center'});return;
+      }
       el('save').disabled=true;
+      saveMessage('Entscheidung wird gespeichert und Mailvorschau vorbereitet …');
       try {
         const v=values();const data=await request('save',folder,{token:state.token,values:v,case_no:el('case_no').value.trim()});sameCase(folder);
         state.recordId=data.record_id;
         el('mail-header').textContent=`Von: ${data.sender}\nAn: ${v.to||'noch nicht ausgewählt'}\nCC: ${v.cc||'–'}\nBCC: ${v.bcc||'–'}\nBetreff: ${data.subject}\nAnhang: ${state.source}`;
         el('mail-body').textContent=data.body;el('mail').hidden=false;el('send').disabled=!v.to;el('send-state').textContent='';
-        message(`Entscheidung ${el('standalone').checked?'im persönlichen Prüfvorgang':'im Fall unter 06_Freigaben_Zahlungen'} gespeichert. ${v.to?'Mail bereit zur Durchsicht.':'Für den Versand einen An-Empfänger auswählen und erneut speichern.'}`);
-      } catch(error) {message(error.message,true);}finally{el('save').disabled=false;}
+        saveMessage(`Entscheidung ${el('standalone').checked?'im persönlichen Prüfvorgang':'im Fall unter 06_Freigaben_Zahlungen'} gespeichert. ${v.to?'Mail bereit zur Durchsicht.':'Für den Versand einen An-Empfänger auswählen und erneut speichern.'}`);
+        el('mail').scrollIntoView({behavior:'smooth',block:'start'});
+      } catch(error) {saveMessage(error.message,true);}finally{el('save').disabled=false;}
     };
     el('send').onclick=async()=>{
       const folder=context();
