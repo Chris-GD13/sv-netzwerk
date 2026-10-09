@@ -880,7 +880,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'INVOICED_SCRAPE_PROGRESS') {
     const run = runningImport;
     if (!run || sender.tab?.id !== run.claimsTabId) {
-      sendResponse({ ok: false, error: 'Kein passender Kostennotenabgleich läuft.' });
+      sendResponse({ ok: false, error: `Kein passender Kostennotenabgleich läuft (Bridge-Tab ${sender.tab?.id ?? 'unbekannt'}, aktiver Lauf ${run?.runId || 'keiner'}, erwarteter Tab ${run?.claimsTabId ?? 'unbekannt'}).` });
       return;
     }
     const current = Number(message.current || 0), total = Number(message.total || 0);
@@ -891,7 +891,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       observedCount: Number(message.observedCount || 0),
       searchResolvedCount: Number(message.searchResolvedCount || 0),
       bridge: BRIDGE_VERSION
-    }).then(() => sendResponse({ ok: true })).catch(error => sendResponse({ ok: false, error: String(error?.message || error).slice(0, 200) }));
+    }).then(() => sendResponse({ ok: true })).catch(error => sendResponse({ ok: false, error: `Fortschritt konnte nicht gespeichert werden: ${String(error?.message || error).slice(0, 160)}` }));
     return true;
   }
   if (message?.type === 'REKON_TOKEN') {

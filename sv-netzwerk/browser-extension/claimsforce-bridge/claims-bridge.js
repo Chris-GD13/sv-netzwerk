@@ -263,7 +263,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
                 observedCount: claims.size,
                 searchResolvedCount: 0
               });
-              if (!heartbeat?.ok) throw new Error(`[CF-INVOICED-01] Fortschritt des Kostennotenabgleichs konnte nicht bestätigt werden (Bridge ${chrome.runtime.getManifest().version}; ${listedDamageNumbers.size} Nummern gelesen).`);
+              if (!heartbeat?.ok) throw new Error(`[CF-INVOICED-01] Fortschritt des Kostennotenabgleichs konnte nicht bestätigt werden: ${heartbeat?.error || 'keine Rückmeldung'} (Bridge ${chrome.runtime.getManifest().version}; ${listedDamageNumbers.size} Nummern gelesen).`);
             }
             const nextTop = Math.min(scroller.scrollHeight - scroller.clientHeight, scroller.scrollTop + step);
             if (nextTop <= scroller.scrollTop) break;
@@ -326,7 +326,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
             observedCount,
             searchResolvedCount
           });
-          if (!heartbeat?.ok) throw new Error(`[CF-INVOICED-01] Fortschritt des Kostennotenabgleichs konnte nicht bestätigt werden (Bridge ${chrome.runtime.getManifest().version}; ${searchResolvedCount} Suchtreffer).`);
+          if (!heartbeat?.ok) throw new Error(`[CF-INVOICED-01] Fortschritt des Kostennotenabgleichs konnte nicht bestätigt werden: ${heartbeat?.error || 'keine Rückmeldung'} (Bridge ${chrome.runtime.getManifest().version}; ${searchResolvedCount} Suchtreffer).`);
         }
       }
       if (usedSearch) setSearchValue('');

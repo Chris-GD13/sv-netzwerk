@@ -74,6 +74,8 @@ assert(claimsMainDiagnostic.includes('authCaptureCounts') && claimsMainDiagnosti
 assert(serviceWorkerDiagnostic.includes("https://web.claimsforce.com/invoiced") && serviceWorkerDiagnostic.includes('ensureInvoicedListTab') && serviceWorkerDiagnostic.includes('CF-INVOICED-01'), 'Vollabgleich öffnet und bestätigt die Kostennotenliste /invoiced');
 assert(serviceWorkerDiagnostic.includes('chrome.tabs.reload(tabId)') && serviceWorkerDiagnostic.includes('const refreshed=await waitTab(tabId)'), 'Vollabgleich aktualisiert eine bereits geöffnete ClaimsForce-Kostennotenliste vor dem Scrape');
 assert(serviceWorkerDiagnostic.includes('INVOICED_SCRAPE_PROGRESS') && serviceWorkerDiagnostic.includes('sender.tab?.id !== run.claimsTabId'), 'Der lange Kostennotenabgleich aktualisiert den Queue-Heartbeat nur aus seinem ClaimsForce-Tab');
+assert(serviceWorkerDiagnostic.includes('Fortschritt konnte nicht gespeichert werden:') && serviceWorkerDiagnostic.includes('erwarteter Tab'), 'Heartbeat-Fehler zeigen die Ablehnungsursache statt einer generischen Meldung');
+assert(serviceWorkerDiagnostic.includes('loadCredentials(profile).catch(() => null), sleep(600)'), 'Der verschlüsselte Zugangstresor behält sein Timeout gegen hängende Browser-Speicher');
 assert(claimsBridgeDiagnostic.includes("location.pathname.replace(/\\/+$/, '') !== '/invoiced'") && claimsBridgeDiagnostic.includes('damageNumberPattern'), 'Kostennotenliste wird seitenweise gelesen und Schadennummern aus den Zeilen übernommen');
 assert(claimsMainDiagnostic.includes("location.pathname.replace(/\\/+$/, '') === '/invoiced'") && claimsMainDiagnostic.includes('invoicedContext && insurerClaimId'), 'Auf /invoiced geladene ClaimsForce-Antworten ergänzen Claim-IDs mit Schadennummern');
 const claimRowAnchor = { textContent: 'Schaden öffnen', getAttribute: name => name === 'href' ? '/claims/12345678-1234-1234-1234-123456789012' : '', closest: () => null };
@@ -154,7 +156,7 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
       return [];
     }
   },
-  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.40' }) } },
+  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.41' }) } },
   Event,
   HTMLInputElement: MockInput,
   setTimeout,
