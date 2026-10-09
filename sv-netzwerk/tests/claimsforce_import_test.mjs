@@ -156,7 +156,7 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
       return [];
     }
   },
-  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.49' }) } },
+  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.50' }) } },
   Event,
   HTMLInputElement: MockInput,
   setTimeout,
@@ -243,7 +243,7 @@ assert(claimsMain.includes('response.clone().json()') && claimsMain.includes('CL
 assert(claimsMain.includes('inspectTokenCache') && claimsMain.includes('inspectStorage(localStorage)'), 'Ein vorhandenes ClaimsForce-Token wird nach einem Worker-Neustart auch aus dem Auth-Cache wiederhergestellt');
 const importWorker = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8');
 assert(importWorker.includes("strategy: 'invoiced-claims'") && importWorker.includes('bucketCounts.INVOICED_CLAIMS') && importWorker.includes('Schadennummern aus „/invoiced“'), 'Vollabgleich verwendet die vollständige Kostennotenliste als Ausgangspunkt');
-assert(importWorker.includes('if (!fullSync && preliminaryState.result?.existed') && importWorker.includes('fileVersions, messageVersions, appointmentVersions, notes'), 'Nach dem Erstabgleich werden Mails, Notizen, Termine und Dateien per Signatur erneut geprüft und unveränderte Fälle übersprungen');
+assert(importWorker.includes('(fullSync && alreadyComplete)') && importWorker.includes('fileVersions, messageVersions, appointmentVersions, notes'), 'Nach dem Erstabgleich werden Mails, Notizen, Termine und Dateien per Signatur erneut geprüft und unveränderte Fälle übersprungen');
 
 const vault = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/vault.js'), 'utf8');
 assert(vault.includes('credentials_${profile}') && vault.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens']"), 'Zugänge werden nur für die vier unterstützten Sachverständigen-Profile getrennt gespeichert');
