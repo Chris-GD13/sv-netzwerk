@@ -4,7 +4,14 @@ import Hero from '../../components/Hero.astro';
 import CallToAction from '../../components/CallToAction.astro';
 ---
 
-<BaseLayout title="Seminare" description="Seminare und Fachartikel-Transfer zu Schadenpraxis und Regulierung.">
-  <Hero compact eyebrow="Seminare" title="Fachartikel-Transfer für Schadenpraxis und Regulierung." text="Seminar- und Inhouse-Formate werden inhaltlich auf Ihren Schadenkontext abgestimmt." primaryLabel="Kontakt" primaryHref="/kontakt/" secondaryLabel="Fachartikel" secondaryHref="/fachwissen/" />
+<BaseLayout title="Schulungen für Versicherer und Sachbearbeiter | SV-Netzwerk" description="Seminare und Inhouse-Schulungen für Schadenabteilungen: Schadenabgrenzung, Rechnungs- und KVA-Prüfung sowie Fenster- und Glasschäden.">
+  <Hero compact eyebrow="Seminare" title="Schulungen für Versicherer und Sachbearbeiter" text="Konkrete Prüfprobleme aus der Schadenakte verstehen und nachvollziehbar bearbeiten. Seminar- und Inhouse-Formate werden auf Ihre Zielgruppe und Ihren Schadenkontext abgestimmt." primaryLabel="Kontakt" primaryHref="/kontakt/" secondaryLabel="Fachartikel" secondaryHref="/fachwissen/" />
+  <section class="sv-section"><div class="sv-container"><h2>Prüfthemen für Ihre Schadenabteilung</h2><div class="training-grid">
+    <article class="sv-card"><h3>Rechnungen, KVA und Nachträge</h3><p>Schadenbezug, Mengen, Regiekosten und Überschneidungen nachvollziehbar prüfen; offene Nachweise und begründete Empfehlungen dokumentieren.</p><a href="/fachwissen/regiekosten-schadenregulierung-abgrenzung/">Regiekosten als Fachthema</a></article>
+    <article class="sv-card"><h3>Leitungswasser und Wiederherstellung</h3><p>Ursachenklärung, erforderlichen Rückbau und Trocknung im Zusammenhang betrachten. Befund, Maßnahme und Kostenfolge getrennt darstellen.</p><a href="/fachwissen/leitungswasserschaden-leckageortung-pruefstrategie/">Prüfstrategie bei Leitungswasser</a></article>
+    <article class="sv-card"><h3>Fenster, Türen und Glas</h3><p>Bauteile und Schadenbilder richtig einordnen; technische Reparaturfähigkeit, Austauschbedarf und Nebenarbeiten begründen.</p><a href="/fachwissen/fenster-glasschaden-verglasung-reparaturgrenze/">Reparaturgrenzen bei Fensterschäden</a></article>
+  </div><h2>Inhalte auf Ihre Bearbeitungspraxis abstimmen</h2><p>Bitte nennen Sie Zielgruppe, Prüfprobleme, Teilnehmerzahl, gewünschtes Format und Zeitraum. Inhalte, Referenten, Dauer und Konditionen werden im Angebot abgestimmt. Fallbeispiele können anhand anonymisierter Unterlagen besprochen werden.</p><p><a href="/experten/">Fachliche Profile des Netzwerks</a> · <a href="/versicherer/">Leistungen für Versicherer</a></p></div></section>
   <CallToAction title="Seminaranfrage stellen" text="Senden Sie Themengebiet, Zielgruppe und gewünschten Zeitraum für ein passendes Angebot." href="/kontakt/" label="Seminar anfragen" />
 </BaseLayout>
+
+<style>.training-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sv-space-5);margin-block:var(--sv-space-5)}.sv-card{padding:clamp(1.3rem,2.8vw,2rem)}@media(max-width:62rem){.training-grid{grid-template-columns:1fr}}</style>
