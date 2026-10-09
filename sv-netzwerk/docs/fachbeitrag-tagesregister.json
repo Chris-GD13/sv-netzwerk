@@ -67,14 +67,21 @@
         "title": "Batteriespeicher nach Wasser- und Brandschäden fachlich prüfen",
         "slug": "batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung",
         "url": "https://www.sv-netzwerk.eu/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-2026-10-09-0602",
-        "reserved_at": "2026-10-09T04:05:22.239Z"
+        "reserved_at": "2026-10-09T04:05:22.239Z",
+        "commit": "f9327493a6c38d178461d234564f1a3d4c8e5421",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/37882940267",
+        "verified_at": "2026-10-09T04:22:15.521Z",
+        "verification_note": "Detailseite, Veröffentlichungsdatum, Beitragsbild, Fachwissensübersicht, Suchindex, Sitemap, robots.txt und deploy-version.txt am 09.10.2026 direkt geprüft."
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "prepared-not-posted",
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung/",
+        "text_file": "src/content/linkedin/2026-10-09_batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung.txt",
+        "image_file": "public/assets/images/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung.jpg"
       }
     }
   },
-  "updated_at": "2026-10-09T04:05:22.239Z"
+  "updated_at": "2026-10-09T04:22:15.521Z"
 }
