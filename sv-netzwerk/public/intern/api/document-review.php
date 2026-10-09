@@ -67,7 +67,7 @@ try {
             }
         }
         usort($reviews,fn($a,$b)=>strcmp($b['saved_at'],$a['saved_at']));
-        $profile=krSenderProfile($user);
+        $profile=drReviewSender(krSenderProfile($user));
         apiJson(['ok'=>true,'files'=>$files,'reviews'=>array_slice($reviews,0,50),'sender'=>$profile['email'],'sender_name'=>$profile['name']]);
     }
     if ($_SERVER['REQUEST_METHOD']!=='POST') apiError(405,'POST erforderlich.');
@@ -89,7 +89,7 @@ try {
         if (!hash_equals($preview['sha256'],hash('sha256',$source['bytes']))) throw new RuntimeException('Der Originalbeleg wurde geändert. Bitte neu vorbereiten.');
         $values=drValidate($preview,(array)($input['values']??[]));
         foreach (['to','cc','bcc'] as $field) drRecipients($values[$field]);
-        $profile=krSenderProfile($user);
+        $profile=drReviewSender(krSenderProfile($user));
         $record=$preview+['case_no'=>krCaseNo($folder),'values'=>$values,'sender'=>$profile['email'],'sender_name'=>$profile['name'],'saved_at'=>gmdate('c'),'send_status'=>'unsent'];
         if ($record['case_no']==='') throw new RuntimeException('Die Schadennummer ist im Fall nicht hinterlegt.');
         $record['subject']=($record['kind']==='invoice'?'Rechnungsprüfung':'Angebotsprüfung').' · Schaden-Nr. '.$record['case_no'].' · '.$values['number'].' · '.($values['decision']==='approved'?'freigegeben':'nicht freigegeben');
@@ -107,6 +107,9 @@ try {
         try {
             $record=json_decode(ionosBytes($id),true,512,JSON_THROW_ON_ERROR);
             if ($record['send_status']!=='unsent') throw new RuntimeException('Versand bereits ausgeführt oder Ergebnis unklar. Bitte zuerst den Gesendet-Ordner prüfen.');
+            $profile=drReviewSender(krSenderProfile($user));
+            $record['sender']=$profile['email'];
+            $record['sender_name']=$profile['name'];
             $source=krSelected($folder,$record['file_id']);
             if (!hash_equals($record['sha256'],hash('sha256',$source['bytes']))) throw new RuntimeException('Der Originalbeleg wurde verändert. Bitte neu vorbereiten.');
             // Keep small sendMail payloads below Graph's request limit. Large originals use a draft/upload session.

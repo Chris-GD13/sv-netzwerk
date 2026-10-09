@@ -35,6 +35,11 @@ function drValidate(array $preview, array $input): array {
     return $out;
 }
 
+function drReviewSender(array $profile): array {
+    if (($profile['name'] ?? '') === 'Christian Wächter') $profile['email'] = 'cw@sv-netzwerk.eu';
+    return $profile;
+}
+
 function drBody(array $record): string {
     $v = $record['values'];
     $label = $record['kind'] === 'invoice' ? 'Rechnung' : 'Angebot';
@@ -46,7 +51,10 @@ function drBody(array $record): string {
     $body = str_replace('\\n', "\n", $body);
     if ($record['mode'] === 'direct') $body .= "\n\nDie Übernahme erfolgt ohne erneute Prüfung. Grund: ".$v['reason'];
     else $body .= "\n\nPrüfergebnis: ".$v['assessment'].($v['reason'] !== '' ? "\nBegründung: ".$v['reason'] : '');
-    $body .= "\n\nMit freundlichen Grüßen\n".$record['sender_name']."\nSV-Büro Marc Schütt e.K.";
+    $body .= "\n\nMit freundlichen Grüßen\n".$record['sender_name'];
+    if ($record['sender_name'] === 'Christian Wächter') {
+        $body .= "\nRegulierer und Bausachverständiger\nDIN EN ISO/IEC 17024 zertifiziert\ncw@sv-netzwerk.eu\nhttps://www.sv-netzwerk.eu/";
+    } else $body .= "\nSV-Büro Marc Schütt e.K.";
     return $body;
 }
 

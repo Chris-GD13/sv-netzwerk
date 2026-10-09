@@ -6,6 +6,8 @@ function fails(callable $fn,string $text):void { try {$fn();}catch(RuntimeExcept
 check(drMoney('9.760,16 €')===9760.16,'German cents');
 check(drMoney('9760.16')===9760.16,'Decimal API amount');
 check(drMoney(null)===null,'Unknown is not zero');
+check(drReviewSender(['name'=>'Christian Wächter','email'=>'cw@sv-schuett.eu'])['email']==='cw@sv-netzwerk.eu','Christian uses SV-Netzwerk sender');
+check(drReviewSender(['name'=>'Marc Schütt','email'=>'ms@sv-schuett.eu'])['email']==='ms@sv-schuett.eu','Other profiles retained');
 $values=['company'=>'POLYGON Deutschland GmbH','number'=>'RE-17','date'=>'09.10.2026','gross'=>'1.190,00','net'=>'1.000,00','vat'=>'190,00','release_amount'=>'1.190,00','decision'=>'approved','reason'=>'Abschlagsrechnung','to'=>'versicherung@example.org','cc'=>'controlling@dieregulierer.de','bcc'=>'Archiv@sv.de'];
 fails(fn()=>drValidate(['mode'=>'direct'],array_replace($values,['reason'=>''])),'Direct needs reason');
 fails(fn()=>drValidate(['mode'=>'direct'],array_replace($values,['decision'=>''])),'Explicit decision');
@@ -22,6 +24,8 @@ check($message['bccRecipients'][0]['emailAddress']['address']==='Archiv@sv.de','
 check(str_contains($message['body']['content'],'ohne erneute Prüfung'),'Direct wording');
 check(!str_contains($message['body']['content'],'Prüfergebnis:'),'Never claim a direct invoice was checked');
 check(str_contains($message['body']['content'],'1.190,00 EUR brutto'),'Exact cents in email');
+check(str_contains($message['body']['content'],'Bausachverständiger') && str_contains($message['body']['content'],'cw@sv-netzwerk.eu'),'Full Christian signature');
+check(!str_contains($message['body']['content'],'SV-Büro Marc Schütt'),'No wrong office in Christian signature');
 $rejected=drValidate(['mode'=>'review','analysis'=>['assessment'=>'Plausibility']],array_replace($values,['decision'=>'rejected','assessment'=>'Doppelt berechnet','review_confirmed'=>true,'reason'=>'Bereits abgerechnet']));
 check($rejected['release_amount']===0.0,'Rejected is never a payment');
 $record['values']=$rejected;$record['mode']='review';$record['kind']='offer';
