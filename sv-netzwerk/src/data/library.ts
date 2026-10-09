@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Batteriespeicher nach Wasser- und Brandschäden fachlich prüfen',
+    description: 'Stationäre Batteriespeicher werden nach Wasser- oder Brandeinwirkung anhand von Gefahrenlage, Herstellerdiagnose, Wiederinbetriebnahme und schadenbedingten Kosten bewertet.',
+    href: '/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung/',
+    category: 'Gebäudetechnik und Energiespeicher',
+    tags: ['Batteriespeicher', 'Lithium-Ionen-Batterie', 'Wasserschaden', 'Brandschaden', 'Elektrosicherheit', 'Kostenprüfung'],
+    date: '2026-10-09',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Wallboxen und Ladeinfrastruktur nach Überflutung fachlich prüfen',
     description: 'Überflutete Wallboxen werden anhand von Wasserbeaufschlagung, elektrischer Fachprüfung, Wiederinbetriebnahme und schadenbedingten Kosten nachvollziehbar bewertet.',
     href: '/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung/',

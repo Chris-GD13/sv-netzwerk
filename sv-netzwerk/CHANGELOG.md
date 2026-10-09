@@ -1,3 +1,10 @@
+## 2026-10-09
+- Fachbeitrag „Batteriespeicher nach Wasser- und Brandschäden fachlich prüfen“ ergänzt
+- Gefahrenabwehr, Systemgrenze, Herstellerdiagnose, Wiederinbetriebnahme und schadenbedingte Kosten getrennt dokumentiert
+- VDE-Anwendungsregeln, DIN EN IEC 62619:2023-08, DGUV Information 205-041 und VVG-Quellen eingeordnet; DIN EN IEC 62933-5-2:2025-08 ausdrücklich als nicht verbindlicher Norm-Entwurf gekennzeichnet
+- Beitragsbild, Fachwissensübersicht, Suchindex und Sitemap-Integration ergänzt
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt
+
 ## 2026-10-08
 - Fachbeitrag „Wallboxen und Ladeinfrastruktur nach Überflutung fachlich prüfen“ ergänzt
 - Beaufschlagung, elektrische Sicherheit, Wiederinbetriebnahme, Modernisierung und schadenbedingte Kosten getrennt dokumentiert
