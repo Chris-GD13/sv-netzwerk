@@ -94,11 +94,17 @@ function drRecipients(string $value): array {
     return array_values($result);
 }
 
+function drSubject(array $record): string {
+    $caseNo=trim((string)($record['case_no']??''));
+    if ($caseNo==='' || str_starts_with($caseNo,'Freie Prüfung ')) throw new RuntimeException('Bitte die Schadennummer der Versicherung für den Mailbetreff angeben.');
+    return $caseNo.' · '.($record['kind']==='invoice'?'Rechnungsprüfung':'Angebotsprüfung').' · '.$record['values']['number'].' · '.($record['values']['decision']==='approved'?'freigegeben':'nicht freigegeben');
+}
+
 function drMessage(array $record, string $bytes): array {
     $v = $record['values'];
     $to = drRecipients($v['to']); $cc = drRecipients($v['cc']); $bcc = drRecipients($v['bcc']);
     if (!$to) throw new RuntimeException('Bitte mindestens einen An-Empfänger auswählen.');
-    $message = ['subject'=>$record['subject'],'body'=>['contentType'=>'Text','content'=>drBody($record)],'toRecipients'=>$to];
+    $message = ['subject'=>drSubject($record),'body'=>['contentType'=>'Text','content'=>drBody($record)],'toRecipients'=>$to];
     if (!empty($record['sender'])) $message['from'] = ['emailAddress'=>['address'=>$record['sender'],'name'=>$record['sender_name']]];
     if ($cc) $message['ccRecipients'] = $cc;
     if ($bcc) $message['bccRecipients'] = $bcc;

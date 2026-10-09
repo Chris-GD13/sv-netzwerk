@@ -36,7 +36,7 @@
       <div class="dr-content">
         <p id="${prefix}sender" class="vf-meta" style="white-space:pre-line"></p>
         <label class="dr-choice"><input id="${prefix}standalone" type="checkbox"> Ohne angelegten Schadenfall prüfen</label>
-        <div id="${prefix}workspace-controls" hidden>${field('case_no','Vorgangs- / Schaden-Nr. (optional)')}<button id="${prefix}new-workspace" type="button" class="vf-secondary">Neue freie Prüfung</button><p class="vf-meta">Belege und Ergebnis werden in deinem persönlichen Prüfvorgang gespeichert. Es wird kein Schadenfall angelegt.</p></div>
+        <div id="${prefix}workspace-controls" hidden>${field('case_no','Schadennummer der Versicherung (für Mail erforderlich)')}<button id="${prefix}new-workspace" type="button" class="vf-secondary">Neue freie Prüfung</button><p class="vf-meta">Belege und Ergebnis werden in deinem persönlichen Prüfvorgang gespeichert. Es wird kein Schadenfall angelegt.</p></div>
         <label>Hauptbeleg: ${noun} / Sammelangebot<select id="${prefix}file"><option value="">Belege hochladen oder aus dem Fall wählen</option></select></label>
         <div class="dr-actions"><button class="vf-secondary" type="button" id="${prefix}reload">Belege aktualisieren</button><label class="vf-secondary dr-upload">Mehrere Belege hochladen<input type="file" id="${prefix}upload" multiple accept=".pdf,.docx,.jpg,.jpeg,.png,.webp" hidden></label><a id="${prefix}original" class="vf-secondary" target="_blank" rel="noopener" hidden>Original öffnen</a></div>
         <fieldset><legend>Ergänzende Belege gemeinsam prüfen</legend><div id="${prefix}supports" class="dr-supports"></div><p class="vf-meta">z. B. Messprotokoll, Energieverbrauch, Fotos oder bisherige Freigaben. Hauptbeleg oben auswählen.</p></fieldset>

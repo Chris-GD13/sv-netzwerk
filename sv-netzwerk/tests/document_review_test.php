@@ -17,6 +17,8 @@ fails(fn()=>drValidate(['mode'=>'review','analysis'=>['assessment'=>'Read']],$va
 fails(fn()=>drValidate(['mode'=>'review','analysis'=>null],array_replace($values,['review_confirmed'=>true,'assessment'=>'checked'])),'Bypass cannot masquerade as review');
 $accepted=drValidate(['mode'=>'direct'],$values);
 $record=['kind'=>'invoice','mode'=>'direct','case_no'=>'TEST-17','values'=>$accepted,'sender_name'=>'Christian Wächter','subject'=>'Rechnungsprüfung · TEST-17','file_name'=>'Original-Rechnung.pdf','mime'=>'application/pdf'];
+check(str_starts_with(drSubject(array_replace($record,['case_no'=>'26-085905-9'])),'26-085905-9 · Rechnungsprüfung'),'Insurance claim number leads subject');
+fails(fn()=>drSubject(array_replace($record,['case_no'=>''])),'No email subject without insurance claim number');
 $message=drMessage($record,"%PDF-Original\x00\xff");
 check(drMessage($record+['sender'=>'cw@sv-netzwerk.eu'],'original')['from']['emailAddress']['address']==='cw@sv-netzwerk.eu','Actual From address is explicit');
 check(base64_decode($message['attachments'][0]['contentBytes'])==="%PDF-Original\x00\xff",'Original byte-identical attachment');
