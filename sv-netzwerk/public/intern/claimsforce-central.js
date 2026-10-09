@@ -28,7 +28,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.4.12',currentBridgeVersion='1.4.33';
+  const minimumBridgeVersion='1.4.12',currentBridgeVersion='1.4.36';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -83,9 +83,8 @@
     await enqueue('tasks',String(event.detail?.profile||''));
     if(!userJobs.length)window.svnetClaimsTaskError=state.textContent||'Prüfauftrag konnte nicht angelegt werden.';
   });
-  // Der Hauptbutton startet den vollständigen Falllistenimport. Der frühere
-  // Schnellimport las nur die beiden Planungsansichten „Mit Termin“ und „Ohne Termin“.
-  button.addEventListener('click',()=>enqueue('full'));
+  // Neue Aufträge erscheinen zuerst in der Planung; Kostennotenfälle kommen über den Vollabgleich.
+  button.addEventListener('click',()=>enqueue('quick'));
   fullButton?.addEventListener('click',()=>enqueue('full'));
 
   async function launch(job,resumed=false){

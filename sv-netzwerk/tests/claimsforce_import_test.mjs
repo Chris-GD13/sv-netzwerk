@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { collectInvestigationClaims, mergeOnlyBlank, mapClaim, safeFileName } from '../browser-extension/claimsforce-bridge/import-utils.js';
 
@@ -64,6 +65,94 @@ assert.equal(safeFileName('KVA: Angebot?.pdf'), 'KVA- Angebot-.pdf');
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
 assert.match(manifest.version, /^\d+\.\d+\.\d+$/, 'Die gemeinsame Bridge benötigt eine gültige Releaseversion');
+const claimsBridgeDiagnostic = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/claims-bridge.js'), 'utf8');
+const claimsMainDiagnostic = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/claims-main.js'), 'utf8');
+const serviceWorkerDiagnostic = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8');
+assert(claimsBridgeDiagnostic.includes('a,button,[role="tab"],[role="link"]') && claimsBridgeDiagnostic.includes("message?.type === 'OPEN_REPORTS'"), 'Berichte-Navigation berücksichtigt auch Buttons und Tabs statt nur Links');
+assert(claimsBridgeDiagnostic.includes('info: pageResult.body'), 'Fehlermeldung enthält den Seitentoken-Diagnosestatus');
+assert(claimsMainDiagnostic.includes('authCaptureCounts') && claimsMainDiagnostic.includes('authOrigins='), 'Seitentoken-Diagnose nennt nur erfasste API-Ursprünge, nie den Token');
+assert(serviceWorkerDiagnostic.includes("https://web.claimsforce.com/invoiced") && serviceWorkerDiagnostic.includes('ensureInvoicedListTab') && serviceWorkerDiagnostic.includes('CF-INVOICED-01'), 'Vollabgleich öffnet und bestätigt die Kostennotenliste /invoiced');
+assert(claimsBridgeDiagnostic.includes("location.pathname.replace(/\\/+$/, '') !== '/invoiced'") && claimsBridgeDiagnostic.includes('damageNumberPattern'), 'Kostennotenliste wird seitenweise gelesen und Schadennummern aus den Zeilen übernommen');
+assert(claimsMainDiagnostic.includes("location.pathname.replace(/\\/+$/, '') === '/invoiced'") && claimsMainDiagnostic.includes('invoicedContext && insurerClaimId'), 'Auf /invoiced geladene ClaimsForce-Antworten ergänzen Claim-IDs mit Schadennummern');
+const claimRowAnchor = { textContent: 'Schaden öffnen', getAttribute: name => name === 'href' ? '/claims/12345678-1234-1234-1234-123456789012' : '', closest: () => null };
+const claimRow = {
+  textContent: '26-015885-8 GF 05.02.2026 23.01.2026 06.10.2026 25.000,00 €',
+  querySelector: selector => selector.includes('a[href*="/claims/"]') ? claimRowAnchor : null,
+  querySelectorAll: selector => selector.startsWith('td,') ? [{ textContent: '26-015885-8 GF 05.02.2026' }, { textContent: '23.01.2026' }] : []
+};
+let scrapeListener;
+vm.runInNewContext(claimsBridgeDiagnostic, {
+  window: { addEventListener() {}, postMessage() {} },
+  document: { querySelector: () => null, querySelectorAll: selector => selector === 'table tbody tr,[role="row"]' ? [claimRow] : [] },
+  chrome: { runtime: { onMessage: { addListener(listener) { scrapeListener = listener; } } } },
+  location: { pathname: '/invoiced', origin: 'https://web.claimsforce.com' }
+});
+const invoicedScrape = await new Promise((resolve, reject) => {
+  try { assert.equal(scrapeListener({ type: 'SCRAPE_ALL_CLAIMS' }, {}, resolve), true); }
+  catch (error) { reject(error); }
+});
+assert.equal(invoicedScrape.route, '/invoiced', JSON.stringify(invoicedScrape));
+assert.equal(invoicedScrape.claims[0].id, '12345678-1234-1234-1234-123456789012');
+assert.equal(invoicedScrape.claims[0].label, '26-015885-8', 'Schadennummer links in der Kostennoten-Zeile wird als Fallnummer übernommen');
+assert.equal(invoicedScrape.claims[0].enteredAt, '05.02.2026', 'Erstellungsdatum unter der Schadennummer wird für den Stichtagsfilter verwendet');
+assert(claimsBridgeDiagnostic.includes('findListScroller') && claimsBridgeDiagnostic.includes('scroller.scrollTop = nextTop'), 'Virtualisierte Kostennotentabellen werden beim Lesen durchgescrollt');
+let noLinkScrapeListener;
+const virtualCases = [
+  ['26-015885-8', '12345678-1234-1234-1234-123456789012'],
+  ['26-165840-0', '22345678-1234-1234-1234-123456789012'],
+  ['26-119445-2', '32345678-1234-1234-1234-123456789012'],
+  ['26-164408-6', '42345678-1234-1234-1234-123456789012'],
+  ['ABCD1234EF-5678', '52345678-1234-1234-1234-123456789012'],
+  ['12.1234567.8', '62345678-1234-1234-1234-123456789012']
+];
+const virtualRows = virtualCases.map(([number]) => ({
+  textContent: `${number} GF 05.02.2026 23.01.2026 06.10.2026 25.000,00 €`,
+  querySelector: () => null,
+  querySelectorAll: selector => selector.startsWith('td,') ? [{ textContent: `${number} GF 05.02.2026`, innerText: `${number}\n05.02.2026` }, { textContent: '23.01.2026', innerText: '23.01.2026' }] : []
+}));
+const listScroller = { scrollHeight: 500, clientHeight: 160, scrollTop: 0 };
+let searchText = '';
+const searchedNumbers = [];
+const searchInput = {
+  getAttribute: name => name === 'placeholder' ? 'Schäden durchsuchen' : null,
+  dispatchEvent: event => { if (event.type === 'input') searchedNumbers.push(searchText); }
+};
+class MockInput {}
+Object.defineProperty(MockInput.prototype, 'value', { set(value) { if (this === searchInput) searchText = value; }, get() { return searchText; } });
+const searchAnchors = () => {
+  const found = virtualCases.find(([number]) => number === searchText);
+  if (!found) return [];
+  return [{ innerText: found[0], textContent: found[0], getAttribute: name => name === 'href' ? `/claims/${found[1]}/redirect` : '', closest: () => null }];
+};
+vm.runInNewContext(claimsBridgeDiagnostic, {
+  window: { addEventListener() {}, postMessage() {} },
+  document: {
+    body: { innerText: `Schäden mit erstellten Kostennoten (${virtualCases.length})` },
+    querySelector: selector => selector === 'table' ? { parentElement: listScroller } : null,
+    querySelectorAll: selector => {
+      if (selector === 'input') return [searchInput];
+      if (selector === 'table tbody tr,[role="row"]') {
+        const first = Math.floor(listScroller.scrollTop / 70);
+        return virtualRows.slice(first, first + 3);
+      }
+      if (selector === 'a[href*="/claims/"]') return searchAnchors();
+      return [];
+    }
+  },
+  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } } } },
+  Event,
+  HTMLInputElement: MockInput,
+  setTimeout,
+  location: { pathname: '/invoiced', origin: 'https://web.claimsforce.com' }
+});
+const numberOnlyScrape = await new Promise(resolve => noLinkScrapeListener({ type: 'SCRAPE_ALL_CLAIMS' }, {}, resolve));
+assert.equal(numberOnlyScrape.ok, true, `Schadennummern werden ohne Tabellen-Claim-IDs einzeln über die ClaimsForce-Suche aufgelöst: ${JSON.stringify(numberOnlyScrape)}`);
+assert.equal(numberOnlyScrape.expectedCount, virtualCases.length);
+assert.equal(numberOnlyScrape.claims.length, virtualCases.length, 'Beim virtuellen Scrollen müssen alle Schadennummern einzeln aufgelöst werden');
+assert(numberOnlyScrape.claims.some(claim => claim.id === virtualCases[4][1]), 'Alphanumerische Schadennummern werden einzeln zugeordnet');
+assert(numberOnlyScrape.claims.some(claim => claim.id === virtualCases[5][1]), 'Punktgetrennte Schadennummern werden einzeln zugeordnet');
+assert(virtualCases.every(([number]) => searchedNumbers.includes(number)), 'Jede aus der Liste gelesene Schadennummer wird einzeln in ClaimsForce gesucht');
+assert.equal(searchText, '', 'Einzelsuche wird nach der Zuordnung geleert');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/*')));
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://claimsforce.eu.auth0.com/*')));
 assert(manifest.content_scripts.some(entry => entry.js.includes('login-helper.js') && entry.matches.includes('https://*.claimsforce.com/*') && !entry.exclude_matches), 'ClaimsForce-Anmeldehilfe muss auch auf web.claimsforce.com/login laufen');
@@ -94,7 +183,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20261008-7'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20261008-10'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
 assert(portal.includes('leer = alle Fälle') && portal.includes('ClaimsForce-Fälle vollständig einlesen'), 'Der Vollabgleich erklärt den unbegrenzten Zeitraum verständlich');
 assert(dashboard.includes('<input id="vf-claims-since" type="date">') && !dashboard.includes('value="2026-01-01"'), 'Dashboard-Vollabgleich darf alte Fälle nicht durch einen voreingestellten Stichtag ausschließen');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(portal.includes(`<option value="${key}">${label}</option>`), `${label} ist als Bearbeiterprofil auswählbar`);
@@ -129,7 +218,8 @@ const claimsMain = fs.readFileSync(path.join(root, 'browser-extension/claimsforc
 assert(claimsMain.includes('response.clone().json()') && claimsMain.includes('CLAIMS_SNAPSHOT'), 'Fall-IDs werden geheimnisfrei aus den bereits geladenen ClaimsForce-Antworten erfasst');
 assert(claimsMain.includes('inspectTokenCache') && claimsMain.includes('inspectStorage(localStorage)'), 'Ein vorhandenes ClaimsForce-Token wird nach einem Worker-Neustart auch aus dem Auth-Cache wiederhergestellt');
 const importWorker = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8');
-assert(importWorker.includes('/investigation-list') && importWorker.includes('INVESTIGATION_QUERIES') && importWorker.includes('collectInvestigationClaims'), 'Vollabgleich ergänzt die Claims-Liste um Fälle aus Berichten und Nachträgen');
+assert(importWorker.includes("strategy: 'invoiced-claims'") && importWorker.includes('bucketCounts.INVOICED_CLAIMS') && importWorker.includes('Schadennummern aus „/invoiced“'), 'Vollabgleich verwendet die vollständige Kostennotenliste als Ausgangspunkt');
+assert(importWorker.includes('if (!fullSync && preliminaryState.result?.existed') && importWorker.includes('fileVersions, messageVersions, appointmentVersions, notes'), 'Nach dem Erstabgleich werden Mails, Notizen, Termine und Dateien per Signatur erneut geprüft und unveränderte Fälle übersprungen');
 
 const vault = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/vault.js'), 'utf8');
 assert(vault.includes('credentials_${profile}') && vault.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens']"), 'Zugänge werden nur für die vier unterstützten Sachverständigen-Profile getrennt gespeichert');
@@ -176,8 +266,10 @@ assert(queue.includes("phase='CF-FAIL-STALE'") && queue.includes('cqFailStaleRun
 assert(queue.includes("phase='CF-FAIL-REPLACED'") && queue.includes("status IN ('queued','running')"), 'Ein neuer manueller Import muss ältere eigene Profilaufträge eindeutig ersetzen');
 assert(queue.includes("$action==='schedule'") && queue.includes("new DateTimeZone('Europe/Berlin')"), 'Werktagsautomatik muss serverseitig in Berliner Zeit geplant werden');
 assert(queue.includes('$weekday>5||$clock<300||$clock>=1000'), 'Automatik darf nur Montag bis Freitag ab 03:00 Uhr innerhalb des Nachholfensters eingeplant werden');
-assert(queue.includes('uq_claims_schedule_key') && queue.includes('INSERT IGNORE INTO claimsforce_import_jobs'), 'Pro Arbeitstag und Profil darf höchstens ein Automatikauftrag entstehen');
+assert(queue.includes('uq_claims_schedule_key') && queue.includes('INSERT IGNORE INTO claimsforce_import_jobs'), 'Pro Arbeitstag, Profil und Importmodus darf höchstens ein Automatikauftrag entstehen');
 assert(queue.includes('foreach(svnetSupportedProfiles()as$profile)') && queue.includes("'CF-AUTO-QUEUED'"), 'Werktagsautomatik reiht alle unterstützten ClaimsForce-Profile ein');
+assert(queue.includes('schedule_key,sync_mode,since_date,created_at') && queue.includes("foreach(['quick','full']as$mode)") && queue.includes("'-'.$mode") && queue.includes("':mode'=>$mode") && queue.includes('ClaimsForce-Abgleich'), 'Der idempotente Werktagslauf plant neue Planungsfälle und Kostennoten-Vollabgleich ohne Stichtag ein');
+assert(queue.includes('SELECT sync_mode FROM claimsforce_import_jobs WHERE schedule_key=:k LIMIT 1') && queue.includes("if($legacy->fetchColumn()===$mode)continue"), 'Migration der Tagesautomatik darf vorhandene Läufe desselben Modus nicht duplizieren');
 assert(queue.includes('claimsforce_task_status') && queue.includes("$action==='summary'"), 'Die offenen Claims-Aufgaben werden je Profil dauerhaft gespeichert und portalweit bereitgestellt');
 assert(queue.includes("'jens'=>'Jens'"), 'Jens besitzt einen eigenständigen Aufgabenstatus');
 assert(!queue.includes("VALUES('christian',17,NOW(),NULL),('jens',6,NOW(),NULL)"), 'Die Queue darf keine veralteten ClaimsForce-Ausgangswerte mehr setzen');
@@ -188,6 +280,7 @@ assert(queue.includes("is_numeric($result['openTasks']??null)") && queue.include
 assert(routing.includes("return ['christian', 'holger', 'marc', 'jens']"), 'Backoffice darf alle vier Bearbeiterprofile gezielt auswählen');
 assert(queue.includes("$action==='mine'") && queue.includes('WHERE requested_by=:u ORDER BY id DESC LIMIT 20'), 'Eigene Warteschlangenläufe müssen nach einem Portal-Neuladen wiedergefunden werden');
 const central = fs.readFileSync(path.join(root, 'public/intern/claimsforce-central.js'), 'utf8');
+assert(central.includes("button.addEventListener('click',()=>enqueue('quick'))") && central.includes("fullButton?.addEventListener('click',()=>enqueue('full'))"), 'Der obere Button bleibt beim Planungsschnellimport; nur der Vollabgleich nutzt Kostennoten');
 assert(central.includes('window.svnetDriveStatus?window.svnetDriveStatus()'), 'Die Claims-Zentrale verwendet den gemeinsamen Drive-Status statt eines eigenen Abrufs');
 assert(central.includes("action=status&id=") && central.includes("SVNET_CLAIMS_IMPORT_START"), 'Portal kann zentrale Importe starten und verfolgen');
 assert(!central.includes("job.profile==='jens'?'christian':job.profile") && central.includes("const target=String(job.profile||'')"), 'Jens darf beim Import nicht auf Christians Portalordner umgeschrieben werden');

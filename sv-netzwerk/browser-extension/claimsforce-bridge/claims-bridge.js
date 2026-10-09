@@ -25,15 +25,22 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       const headers = new Headers({ 'Content-Type': 'application/json; charset=UTF-8' });
       if (message.authorization) headers.append('Authorization', message.authorization);
       return fetch(`${String(message.endpoint).replace(/\/+$/, '')}/investigation-list`, { method: 'POST', mode: 'cors', headers, body: JSON.stringify({ queries: message.queries, countsOnly: false }) })
-        .then(async response => sendResponse({ ok: response.ok, status: response.status, via: 'tab', info: ['ohne Seitentoken', response.headers.get('x-amzn-errortype'), response.headers.get('content-type')].filter(Boolean).join(','), body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) }))
-        .catch(error => sendResponse({ ok: false, status: 0, via: 'tab', body: String(error?.message || error).slice(0, 120) }));
+        .then(async response => sendResponse({ ok: response.ok, status: response.status, via: 'tab', info: [pageResult.body, response.headers.get('x-amzn-errortype'), response.headers.get('content-type')].filter(Boolean).join(','), body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) }))
+        .catch(error => sendResponse({ ok: false, status: 0, via: 'tab', info: pageResult.body, body: String(error?.message || error).slice(0, 120) }));
     });
     return true;
   }
   if (message?.type === 'OPEN_REPORTS') {
-    const link = [...document.querySelectorAll('a')].find(node => /^Berichte$/i.test((node.textContent || '').replace(/\s+/g, ' ').trim()));
-    if (link) link.click();
-    sendResponse({ ok: !!link, href: link ? String(link.getAttribute('href') || '') : '' });
+    const label = node => (node.textContent || node.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim();
+    const control = [...document.querySelectorAll('a,button,[role="tab"],[role="link"]')]
+      .find(node => /^Berichte(?:\s+\d+)?$/i.test(label(node)));
+    if (control) control.click();
+    sendResponse({
+      ok: !!control,
+      href: control ? String(control.getAttribute('href') || '') : '',
+      route: location.pathname,
+      control: control ? control.tagName.toLowerCase() : ''
+    });
     return;
   }
   if (message?.type === 'OPEN_PLANNING') {
@@ -116,6 +123,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === 'SCRAPE_ALL_CLAIMS') {
     const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
     const claimPattern = /\/claims\/([0-9a-f-]{20,})(?:\/|$)/i;
+    const damageNumberPattern = /\b(?:\d{2,3}-)?\d{2,9}(?:-\d{1,9}){1,3}\b|\b\d{2}\.\d{5,}\.\d{1,3}\b|\b\d{8,14}\b/;
     const claims = new Map();
     const since = String(message.since || '').trim();
     const sinceTime = /^\d{4}-\d{2}-\d{2}$/.test(since) ? Date.parse(`${since}T00:00:00`) : NaN;
@@ -130,18 +138,46 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       return Number.isFinite(parsed) ? parsed : NaN;
     };
     const include = entered => !Number.isFinite(sinceTime) || !Number.isFinite(dateTime(entered)) || dateTime(entered) >= sinceTime;
+    const extractDamageNumber = value => {
+      const text = String(value || '');
+      const match = text.match(damageNumberPattern);
+      if (match) return match[0];
+      const firstLine = text.split(/\r?\n/)[0].trim();
+      return /[A-Za-z]/.test(firstLine) && /^[A-Za-z0-9][A-Za-z0-9./-]{3,}$/.test(firstLine) ? firstLine : '';
+    };
+    const normalizedDamageNumber = value => extractDamageNumber(value).replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    const observedByDamageNumber = () => {
+      const matches = new Map();
+      for (const claim of observedClaims.values()) {
+        const key = normalizedDamageNumber(claim?.label);
+        if (!key) continue;
+        if (!matches.has(key)) matches.set(key, []);
+        matches.get(key).push(claim);
+      }
+      return matches;
+    };
+    const listedDamageNumbers = new Map();
     const collect = () => {
+      const observed = observedByDamageNumber();
       for (const row of document.querySelectorAll('table tbody tr,[role="row"]')) {
         const anchor = row.querySelector('a[href*="/claims/"]');
-        if (!anchor) continue;
-        const match = String(anchor.getAttribute('href') || '').match(claimPattern);
-        if (!match) continue;
-        const cells = [...row.querySelectorAll('td,[role="cell"]')].map(cell => (cell.textContent || '').replace(/\s+/g, ' ').trim());
+        const match = String(anchor?.getAttribute('href') || '').match(claimPattern);
+        const cells = [...row.querySelectorAll('td,[role="cell"]')].map(cell => (cell.innerText || cell.textContent || '').trim());
         const dates = [...(row.querySelectorAll('time[datetime],[data-date],[data-created-at],[data-updated-at]') || [])].map(node => node.getAttribute('datetime') || node.getAttribute('data-date') || node.getAttribute('data-created-at') || node.getAttribute('data-updated-at') || '');
-        const entered = cells[3]?.match(/\b\d{2}\.\d{2}\.\d{4}\b/)?.[0] || dates[0] || '';
+        const numberCell = cells.find(cell => extractDamageNumber(cell)) || '';
+        const damageNumber = extractDamageNumber(numberCell);
+        if (!damageNumber) continue;
+        const entered = numberCell.match(/\b\d{2}\.\d{2}\.\d{4}\b/)?.[0] || cells.find(cell => /\b\d{2}\.\d{2}\.\d{4}\b/.test(cell))?.match(/\b\d{2}\.\d{2}\.\d{4}\b/)?.[0] || dates[0] || '';
         if (!include(entered)) continue;
+        const key = normalizedDamageNumber(damageNumber);
+        listedDamageNumbers.set(key, { label: damageNumber, enteredAt: entered });
         const text = (row.textContent || anchor.textContent || '').replace(/\s+/g, ' ').trim();
-        claims.set(match[1], { id: match[1], label: cells[1] || String(anchor.textContent || '').replace(/\s+/g, ' ').trim() || text.slice(0, 120), listVersion: entered || text.slice(0, 180), enteredAt: entered });
+        const candidates = observed.get(normalizedDamageNumber(damageNumber)) || [];
+        const claim = match ? observedClaims.get(match[1]) : candidates.length === 1 ? candidates[0] : null;
+        const id = match?.[1] || claim?.id;
+        if (!id) continue;
+        const snapshot = observedClaims.get(id) || claim || {};
+        claims.set(id, { ...snapshot, id, label: damageNumber, listVersion: [snapshot.listVersion, entered || text.slice(0, 180)].filter(Boolean).join('|'), enteredAt: entered || snapshot.enteredAt || '' });
       }
       // Some ClaimsForce list variants render claim links without table rows.
       // Collect those links as a fallback so full sync never falls back to
@@ -149,11 +185,51 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       for (const anchor of document.querySelectorAll('a[href*="/claims/"]')) {
         const match = String(anchor.getAttribute('href') || '').match(claimPattern);
         if (!match || claims.has(match[1])) continue;
-        const text = (anchor.closest('tr,[role="row"],article,li')?.textContent || anchor.textContent || '').replace(/\s+/g, ' ').trim();
+        const row = anchor.closest('tr,[role="row"],article,li');
+        const text = (row?.textContent || anchor.textContent || '').replace(/\s+/g, ' ').trim();
         const entered = text.match(/\b\d{2}\.\d{2}\.\d{4}\b/)?.[0] || '';
         if (!include(entered)) continue;
-        claims.set(match[1], { id: match[1], label: String(anchor.textContent || '').replace(/\s+/g, ' ').trim() || text.slice(0, 120), listVersion: entered || text.slice(0, 180), enteredAt: entered });
+        const damageNumber = extractDamageNumber(text);
+        const observed = observedClaims.get(match[1]) || {};
+        claims.set(match[1], { ...observed, id: match[1], label: damageNumber || observed.label || String(anchor.textContent || '').replace(/\s+/g, ' ').trim() || text.slice(0, 120), listVersion: [observed.listVersion, entered || text.slice(0, 180)].filter(Boolean).join('|'), enteredAt: entered || observed.enteredAt || '' });
       }
+    };
+    const setSearchValue = value => {
+      const input = [...document.querySelectorAll('input')].find(node => /Schäden durchsuchen/i.test(`${node.getAttribute('placeholder') || ''} ${node.getAttribute('aria-label') || ''}`));
+      if (!input) throw new Error('[CF-INVOICED-01] ClaimsForce-Suchfeld für die Einzelfallzuordnung wurde nicht gefunden.');
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+      if (!setter) throw new Error('[CF-INVOICED-01] ClaimsForce-Suchfeld konnte nicht gesetzt werden.');
+      setter.call(input, value);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      return input;
+    };
+    const resolveClaimByDamageNumber = async damageNumber => {
+      setSearchValue(damageNumber);
+      const key = normalizedDamageNumber(damageNumber);
+      for (let attempt = 0; attempt < 40; attempt++) {
+        await wait(150);
+        const candidates = [...document.querySelectorAll('a[href*="/claims/"]')].filter(anchor => {
+          const href = String(anchor.getAttribute('href') || '');
+          const label = extractDamageNumber(anchor.innerText || anchor.textContent);
+          return claimPattern.test(href) && normalizedDamageNumber(label) === key;
+        });
+        const matches = new Map();
+        for (const anchor of candidates) {
+          const id = String(anchor.getAttribute('href') || '').match(claimPattern)?.[1];
+          if (id) matches.set(id, anchor);
+        }
+        if (matches.size > 1) throw new Error(`[CF-INVOICED-01] Die Schadennummer ${damageNumber} ist in der ClaimsForce-Suche nicht eindeutig.`);
+        if (matches.size === 1) return { id: [...matches.keys()][0] };
+      }
+      return null;
+    };
+    const findListScroller = () => {
+      const table = document.querySelector('table');
+      for (let node = table?.parentElement; node; node = node.parentElement) {
+        if (node.scrollHeight > node.clientHeight + 100 && node.clientHeight > 150) return node;
+      }
+      return null;
     };
     const nextButton = () => [...document.querySelectorAll('button,a,[role="button"]')].find(node => {
       const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
@@ -161,7 +237,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       return (/^(Nächste|Weiter|Next|›|>)$/i.test(text) || /Nächste|Weiter|Next|next page/i.test(label)) && !node.disabled && node.getAttribute('aria-disabled') !== 'true';
     });
     (async () => {
-      if (location.pathname !== '/claims') throw new Error(`ClaimsForce-Fallliste ist nicht geöffnet (aktuell ${location.pathname || 'unbekannt'}).`);
+      if (location.pathname.replace(/\/+$/, '') !== '/invoiced') throw new Error(`ClaimsForce-Kostennotenliste ist nicht geöffnet (aktuell ${location.pathname || 'unbekannt'}).`);
       let page = 0;
       for (; page < 120; page++) {
         const before = claims.size;
@@ -173,10 +249,48 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         collect();
         if (claims.size === before && page > 2) break;
       }
-      for (const [id, claim] of observedClaims) {
-        if (!claims.has(id) && include(claim?.enteredAt || claim?.createdAt || claim?.updatedAt || claim?.date)) claims.set(id, claim);
+      if (page === 0) {
+        const scroller = findListScroller();
+        if (scroller) {
+          const originalTop = scroller.scrollTop;
+          const step = Math.max(150, scroller.clientHeight - 140);
+          for (let index = 0; index < 160; index++) {
+            collect();
+            const nextTop = Math.min(scroller.scrollHeight - scroller.clientHeight, scroller.scrollTop + step);
+            if (nextTop <= scroller.scrollTop) break;
+            scroller.scrollTop = nextTop;
+            await wait(120);
+          }
+          collect();
+          scroller.scrollTop = originalTop;
+          await wait(80);
+        }
       }
-      sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, pages: page + 1, since, excludedUndated: Number.isFinite(sinceTime) ? [...observedClaims.values()].filter(claim => !Number.isFinite(dateTime(claim?.enteredAt || claim?.createdAt || claim?.updatedAt || claim?.date))).length : 0 });
+      const observed = observedByDamageNumber();
+      let usedSearch = false;
+      for (const [key, listed] of listedDamageNumbers) {
+        if ([...claims.values()].some(claim => normalizedDamageNumber(claim.label) === key)) continue;
+        const candidates = observed.get(key) || [];
+        if (candidates.length === 1) {
+          const claim = candidates[0];
+          claims.set(claim.id, { ...claim, label: listed.label, enteredAt: listed.enteredAt || claim.enteredAt || '' });
+          continue;
+        }
+        usedSearch = true;
+        const resolved = await resolveClaimByDamageNumber(listed.label);
+        if (!resolved) throw new Error(`[CF-INVOICED-01] Die ClaimsForce-Suche hat für Schadennummer ${listed.label} keine eindeutige Fall-ID geliefert.`);
+        claims.set(resolved.id, {
+          ...(observedClaims.get(resolved.id) || {}),
+          id: resolved.id,
+          label: listed.label,
+          listVersion: listed.enteredAt || '',
+          enteredAt: listed.enteredAt || ''
+        });
+      }
+      if (usedSearch) setSearchValue('');
+      const expectedCount = Number((document.body?.innerText || '').match(/Schäden mit erstellten Kostennoten\s*\((\d+)\)/i)?.[1] || 0);
+      if (!Number.isFinite(sinceTime) && expectedCount && claims.size < expectedCount) throw new Error(`[CF-INVOICED-01] Kostennotenliste unvollständig: ${claims.size} von ${expectedCount} Schäden konnten zugeordnet werden.`);
+      sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, pages: page + 1, expectedCount, since, excludedUndated: Number.isFinite(sinceTime) ? [...observedClaims.values()].filter(claim => !Number.isFinite(dateTime(claim?.enteredAt || claim?.createdAt || claim?.updatedAt || claim?.date))).length : 0 });
     })().catch(error => sendResponse({ ok: false, error: error.message, claims: [] }));
     return true;
   }

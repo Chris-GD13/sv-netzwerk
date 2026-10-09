@@ -142,14 +142,24 @@ if($action==='schedule'){
     $weekday=(int)$now->format('N');
     $clock=(int)$now->format('Hi');
     if($weekday>5||$clock<300||$clock>=1000)apiJson(['ok'=>true,'scheduled'=>false,'reason'=>'outside-window']);
-    $s=db()->prepare("INSERT IGNORE INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,schedule_key,created_at) VALUES(:p,'queued',:u,'Automatischer Werktagsimport wartet auf die zentrale Importstation.','CF-AUTO-QUEUED',:k,NOW())");
+    $s=db()->prepare("INSERT IGNORE INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,schedule_key,sync_mode,since_date,created_at) VALUES(:p,'queued',:u,'Automatischer ClaimsForce-Abgleich wartet auf die zentrale Importstation.','CF-AUTO-QUEUED',:k,:mode,NULL,NOW())");
+    $legacySchedule=$now->format('Y-m-d');
+    $legacy=db()->prepare('SELECT sync_mode FROM claimsforce_import_jobs WHERE schedule_key=:k LIMIT 1');
     $scheduled=[];
+    $scheduledModes=[];
     foreach(svnetSupportedProfiles()as$profile){
-        $scheduleKey='claims-auto-'.$now->format('Y-m-d').'-'.$profile;
-        $s->execute([':p'=>$profile,':u'=>'system:claimsforce',':k'=>$scheduleKey]);
-        if($s->rowCount()===1)$scheduled[]=$profile;
+        foreach(['quick','full']as$mode){
+            $legacy->execute([':k'=>'claims-auto-'.$legacySchedule.'-'.$profile]);
+            if($legacy->fetchColumn()===$mode)continue;
+            $scheduleKey='claims-auto-'.$now->format('Y-m-d').'-'.$profile.'-'.$mode;
+            $s->execute([':p'=>$profile,':u'=>'system:claimsforce',':k'=>$scheduleKey,':mode'=>$mode]);
+            if($s->rowCount()===1){
+                if(!in_array($profile,$scheduled,true))$scheduled[]=$profile;
+                if(!in_array($mode,$scheduledModes,true))$scheduledModes[]=$mode;
+            }
+        }
     }
-    apiJson(['ok'=>true,'scheduled'=>count($scheduled)>0,'profiles'=>$scheduled]);
+    apiJson(['ok'=>true,'scheduled'=>count($scheduled)>0,'profiles'=>$scheduled,'modes'=>$scheduledModes]);
 }
 
 if($action==='active'){

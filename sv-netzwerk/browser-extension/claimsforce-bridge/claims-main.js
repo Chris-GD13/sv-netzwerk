@@ -5,6 +5,7 @@
     if (token.length > 40) window.postMessage({ source: 'svnet-claimsforce-main', type: 'TOKEN', token }, location.origin);
   };
   const authByOrigin = new Map();
+  const authCaptureCounts = new Map();
   const headerValue = (headers, name) => {
     try {
       if (!headers) return '';
@@ -16,7 +17,10 @@
   const rememberAuthorization = (url, value) => {
     try {
       const origin = new URL(String(url), location.href).origin;
-      if (value && origin !== location.origin) authByOrigin.set(origin, String(value));
+      if (value) {
+        authByOrigin.set(origin, String(value));
+        authCaptureCounts.set(origin, (authCaptureCounts.get(origin) || 0) + 1);
+      }
     } catch {}
   };
   const inspect = headers => {
@@ -58,19 +62,20 @@
     value.appointments?.nextAppointment?.updatedAt,
     value.appointments?.nextAppointment?.startDate
   ].map(entry => String(entry || '')).filter(Boolean).join('|');
-  const inspectClaims = (value, planningContext = false, depth = 0) => {
+  const inspectClaims = (value, planningContext = false, depth = 0, invoicedContext = false) => {
     if (!value || depth > 7) return;
     if (Array.isArray(value)) {
-      value.forEach(entry => inspectClaims(entry, planningContext, depth + 1));
+      value.forEach(entry => inspectClaims(entry, planningContext, depth + 1, invoicedContext));
       return;
     }
     if (typeof value !== 'object') return;
-    const id = claimId(value.id || value.claimId);
-    const insurerClaimId = value.insurerClaimId || value.data?.insurerClaimId || value.claimNumber || '';
+    const explicitClaimId = claimId(value.claimId) || claimId(value.claim?.id);
+    const id = explicitClaimId || (!invoicedContext || value.claimType || value.bucket || value.appointments || value.actualAppointmentLocation ? claimId(value.id) : '');
+    const insurerClaimId = value.insurerClaimId || value.data?.insurerClaimId || value.claimNumber || value.claim?.insurerClaimId || value.claim?.claimNumber || '';
     const hasClaimShape = insurerClaimId || value.claimType || value.bucket || value.appointments || value.actualAppointmentLocation;
     const supportedBucket = ['WITH_FUTURE_APPOINTMENT', 'WITHOUT_APPOINTMENT'].includes(String(value.bucket || '').toUpperCase());
     const visiblePlanningClaim = planningContext || supportedBucket || !!value.appointments?.nextAppointment;
-    if (id && hasClaimShape && visiblePlanningClaim) {
+    if (id && hasClaimShape && (visiblePlanningClaim || invoicedContext && insurerClaimId)) {
       const previous = seenClaims.get(id) || {};
       seenClaims.set(id, {
         id,
@@ -79,7 +84,7 @@
         createdAt: String(value.createdAt || value.created || previous.createdAt || '')
       });
     }
-    Object.values(value).forEach(entry => inspectClaims(entry, planningContext, depth + 1));
+    Object.values(value).forEach(entry => inspectClaims(entry, planningContext, depth + 1, invoicedContext));
   };
   const planningRequest = (input, init) => {
     const url = String(input instanceof Request ? input.url : input || '');
@@ -89,8 +94,9 @@
   const inspectResponse = async (response, input, init) => {
     try {
       const url = String(response?.url || (input instanceof Request ? input.url : input) || '');
-      if (!/\/claims(?:[/?]|$)/i.test(url) || !String(response.headers.get('content-type') || '').includes('json')) return;
-      inspectClaims(await response.clone().json(), planningRequest(input, init));
+      const invoicedContext = location.pathname.replace(/\/+$/, '') === '/invoiced';
+      if (!(/\/claims(?:[/?]|$)/i.test(url) || invoicedContext) || !String(response.headers.get('content-type') || '').includes('json')) return;
+      inspectClaims(await response.clone().json(), planningRequest(input, init), 0, invoicedContext);
       if (seenClaims.size) window.postMessage({ source: 'svnet-claimsforce-main', type: 'CLAIMS_SNAPSHOT', claims: [...seenClaims.values()] }, location.origin);
     } catch {}
   };
@@ -118,8 +124,9 @@
     const planning = planningRequest(this.__svnetUrl, { body });
     this.addEventListener('load', () => {
       try {
-        if (/\/claims(?:[/?]|$)/i.test(this.__svnetUrl || '') && typeof this.responseText === 'string') {
-          inspectClaims(JSON.parse(this.responseText), planning);
+        const invoicedContext = location.pathname.replace(/\/+$/, '') === '/invoiced';
+        if ((/\/claims(?:[/?]|$)/i.test(this.__svnetUrl || '') || invoicedContext) && typeof this.responseText === 'string') {
+          inspectClaims(JSON.parse(this.responseText), planning, 0, invoicedContext);
           if (seenClaims.size) window.postMessage({ source: 'svnet-claimsforce-main', type: 'CLAIMS_SNAPSHOT', claims: [...seenClaims.values()] }, location.origin);
         }
       } catch {}
@@ -133,7 +140,15 @@
     try {
       const endpoint = String(data.endpoint || '').replace(/\/+$/, '');
       const authorization = authByOrigin.get(new URL(endpoint).origin) || '';
-      if (!authorization) { reply({ ok: false, status: 0, hasAuth: false, body: 'kein Seitentoken' }); return; }
+      if (!authorization) {
+        reply({
+          ok: false,
+          status: 0,
+          hasAuth: false,
+          body: `kein Seitentoken; route=${location.pathname}; authOrigins=${[...authCaptureCounts.keys()].join('|') || 'keine'}`
+        });
+        return;
+      }
       const response = await originalFetch.call(window, `${endpoint}/investigation-list`, {
         method: 'POST', mode: 'cors',
         headers: { 'Content-Type': 'application/json; charset=UTF-8', Authorization: authorization },
