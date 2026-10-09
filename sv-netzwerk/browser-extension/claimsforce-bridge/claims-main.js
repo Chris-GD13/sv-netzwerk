@@ -157,6 +157,29 @@
       reply({ ok: response.ok, status: response.status, hasAuth: true, body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) });
     } catch (error) { reply({ ok: false, status: 0, hasAuth: true, body: String(error?.message || error).slice(0, 120) }); }
   });
+  window.addEventListener('message', event => {
+    const data = event.data;
+    if (event.source !== window || data?.source !== 'svnet-claimsforce-bridge' || data.type !== 'INVOICED_ROWS_REQUEST') return;
+    const reply = payload => window.postMessage({ source: 'svnet-claimsforce-main', type: 'INVOICED_ROWS_RESPONSE', id: data.id, ...payload }, location.origin);
+    try {
+      const row = document.querySelector('table tbody tr');
+      const fiberKey = row && Object.keys(row).find(key => key.startsWith('__reactFiber'));
+      let fiber = fiberKey ? row[fiberKey] : null;
+      let table = null;
+      for (let depth = 0; depth < 40 && fiber; depth++, fiber = fiber.return) {
+        if (typeof fiber.memoizedProps?.table?.getCoreRowModel === 'function') { table = fiber.memoizedProps.table; break; }
+      }
+      if (!table) { reply({ ok: false, rows: [] }); return; }
+      const rows = table.getCoreRowModel().rows.map(entry => entry.original).map(original => {
+        const id = claimId(original?.claimId) || claimId(original?.claim?.id) || claimId(original?.id);
+        const label = String(original?.claim?.insurerClaimId || original?.claim?.tpaClaimId || '').slice(0, 100);
+        const invoiced = new Date(original?.invoicedAt || '');
+        const enteredAt = Number.isNaN(invoiced.getTime()) ? '' : invoiced.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        return { id, label, enteredAt };
+      }).filter(entry => entry.id && entry.label);
+      reply({ ok: true, rows });
+    } catch (error) { reply({ ok: false, rows: [], error: String(error?.message || error).slice(0, 120) }); }
+  });
   inspectStorage(localStorage);
   inspectStorage(sessionStorage);
   addEventListener('storage', event => inspectTokenCache(event.newValue, event.key || '', 0));

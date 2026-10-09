@@ -86,7 +86,7 @@ const claimRow = {
 };
 let scrapeListener;
 vm.runInNewContext(claimsBridgeDiagnostic, {
-  window: { addEventListener() {}, postMessage() {} },
+  window: { addEventListener() {}, removeEventListener() {}, postMessage() {} }, setTimeout, clearTimeout,
   document: { querySelector: () => null, querySelectorAll: selector => selector === 'table tbody tr,[role="row"]' ? [claimRow] : [] },
   chrome: { runtime: { onMessage: { addListener(listener) { scrapeListener = listener; } } } },
   location: { pathname: '/invoiced', origin: 'https://web.claimsforce.com' }
@@ -140,7 +140,7 @@ const searchAnchors = () => {
 let misleadingNextClicks = 0;
 const misleadingNext = { textContent: 'Weiter', disabled: false, getAttribute: () => null, click: () => { misleadingNextClicks++; } };
 vm.runInNewContext(claimsBridgeDiagnostic, {
-  window: { addEventListener() {}, postMessage() {} },
+  window: { addEventListener() {}, removeEventListener() {}, postMessage() {} }, setTimeout, clearTimeout,
   document: {
     body: { innerText: `Schäden mit erstellten Kostennoten (${virtualCases.length})` },
     querySelector: selector => selector === 'table' ? { parentElement: listScroller } : null,
@@ -156,7 +156,7 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
       return [];
     }
   },
-  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.47' }) } },
+  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.48' }) } },
   Event,
   HTMLInputElement: MockInput,
   setTimeout,
@@ -447,3 +447,5 @@ assert(!serviceWorker.includes('console.log') && !serviceWorker.includes('consol
 assert(vault.includes("AES-GCM"), 'Kennwörter werden verschlüsselt gespeichert');
 
 console.log('ClaimsForce-Import: Zuordnung, Bestandsschutz, Zugangstresor und Browser-Brücke geprüft.');
+
+assert.match(claimsBridgeDiagnostic, /INVOICED_ROWS_REQUEST/, 'Kostennotenliste wird ohne Scrollen aus den Tabellenzeilen gelesen');

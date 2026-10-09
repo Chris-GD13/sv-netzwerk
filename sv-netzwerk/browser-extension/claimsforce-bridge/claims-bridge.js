@@ -6,6 +6,17 @@ const requestViaPage = (endpoint, queries) => new Promise(resolve => {
   pendingInvestigations.set(id, data => { clearTimeout(timer); pendingInvestigations.delete(id); resolve(data); });
   window.postMessage({ source: 'svnet-claimsforce-bridge', type: 'INVESTIGATIONS_REQUEST', id, endpoint, queries }, location.origin);
 });
+const requestInvoicedRows = () => new Promise(resolve => {
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const finish = value => { clearTimeout(timer); window.removeEventListener('message', onMessage); resolve(value); };
+  const onMessage = event => {
+    if (event.source !== window || event.origin !== location.origin || event.data?.source !== 'svnet-claimsforce-main' || event.data?.type !== 'INVOICED_ROWS_RESPONSE' || event.data.id !== id) return;
+    finish(event.data);
+  };
+  const timer = setTimeout(() => finish({ ok: false, rows: [] }), 5000);
+  window.addEventListener('message', onMessage);
+  window.postMessage({ source: 'svnet-claimsforce-bridge', type: 'INVOICED_ROWS_REQUEST', id }, location.origin);
+});
 window.addEventListener('message', event => {
   if (event.source !== window || event.origin !== location.origin || event.data?.source !== 'svnet-claimsforce-main') return;
   if (event.data?.type === 'INVESTIGATIONS_RESPONSE') pendingInvestigations.get(event.data.id)?.(event.data);
@@ -158,24 +169,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     };
     const listedDamageNumbers = new Map();
     const expectedCount = Number((document.body?.innerText || '').match(/Schäden mit erstellten Kostennoten\s*\((\d+)\)/i)?.[1] || 0);
-    // Die Zeilen der virtualisierten Liste tragen die Fall-ID in den React-Zeilendaten; so entfällt die langsame Einzelsuche.
-    const rowClaimId = row => {
-      try {
-        const fiberKey = Object.keys(row).find(key => key.startsWith('__reactFiber'));
-        let fiber = fiberKey ? row[fiberKey] : null;
-        for (let depth = 0; depth < 8 && fiber; depth++, fiber = fiber.return) {
-          const original = fiber.memoizedProps?.row?.original;
-          const id = String(original?.claimId || original?.claim?.id || original?.id || '');
-          if (/^[0-9a-f-]{20,}$/i.test(id)) return id;
-        }
-      } catch {}
-      return '';
-    };
     const collect = () => {
       const observed = observedByDamageNumber();
       for (const row of document.querySelectorAll('table tbody tr,[role="row"]')) {
         const anchor = row.querySelector('a[href*="/claims/"]');
-        const match = String(anchor?.getAttribute('href') || '').match(claimPattern) || (rowClaimId(row) ? [null, rowClaimId(row)] : null);
+        const match = String(anchor?.getAttribute('href') || '').match(claimPattern);
         const cells = [...row.querySelectorAll('td,[role="cell"]')].map(cell => (cell.innerText || cell.textContent || '').trim());
         const dates = [...(row.querySelectorAll('time[datetime],[data-date],[data-created-at],[data-updated-at]') || [])].map(node => node.getAttribute('datetime') || node.getAttribute('data-date') || node.getAttribute('data-created-at') || node.getAttribute('data-updated-at') || '');
         const numberCell = cells.find(cell => extractDamageNumber(cell)) || '';
@@ -254,6 +252,16 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       if (location.pathname.replace(/\/+$/, '') !== '/invoiced') throw new Error(`ClaimsForce-Kostennotenliste ist nicht geöffnet (aktuell ${location.pathname || 'unbekannt'}).`);
       if (/Seite ist veraltet/i.test(document.body?.innerText || '')) throw new Error(`[CF-INVOICED-01] Die ClaimsForce-Seite ist veraltet. Bitte den Import erneut starten, damit /invoiced frisch geladen wird (Bridge ${chrome.runtime.getManifest().version}).`);
       let page = 0;
+      // Die Zeilendaten der Tabelle enthalten alle Schäden; das Scrollen entfällt (im Hintergrund-Tab rendert die virtualisierte Liste nicht).
+      const direct = await requestInvoicedRows();
+      if (direct.ok && direct.rows.length && (!expectedCount || direct.rows.length >= expectedCount)) {
+        for (const row of direct.rows) {
+          if (!include(row.enteredAt)) continue;
+          claims.set(row.id, { id: row.id, label: row.label, listVersion: row.enteredAt, enteredAt: row.enteredAt });
+        }
+        sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, pages: 1, expectedCount, listedCount: direct.rows.length, observedCount: claims.size, searchResolvedCount: 0, since, via: 'zeilendaten', excludedUndated: 0 });
+        return;
+      }
       const scroller = findListScroller();
       if (scroller) {
         const originalTop = scroller.scrollTop;
