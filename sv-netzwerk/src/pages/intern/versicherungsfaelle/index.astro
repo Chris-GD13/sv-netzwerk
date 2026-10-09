@@ -512,7 +512,7 @@ document.addEventListener('click',event=>{
   const panel=document.getElementById('vf-system-panel'),home=document.getElementById('vf-system-home'),sidebar=document.querySelector('.intern-sidebar'),logout=document.getElementById('intern-logout'),desktop=window.matchMedia('(min-width:901px)');
   if(!panel||!home||!sidebar)return;
   const place=()=>{
-    if(desktop.matches){panel.classList.add('vf-sidebar-tools');sidebar.insertBefore(panel,logout||null)}
+    if(desktop.matches){panel.classList.add('vf-sidebar-tools');sidebar.insertBefore(panel,logout?.parentNode===sidebar?logout:null)}
     else{panel.classList.remove('vf-sidebar-tools');home.after(panel)}
   };
   desktop.addEventListener?.('change',place);
