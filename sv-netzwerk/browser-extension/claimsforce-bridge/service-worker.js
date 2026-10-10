@@ -464,7 +464,7 @@ async function runImport(run) {
   if (singleSync && !singleClaimNumber.replace(/[^A-Za-z0-9]/g, '')) throw new Error('[CF-SINGLE-01] Für den Einzelfallimport fehlt die Schadennummer.');
   run.profile = profile;
   await chrome.storage.session.set({ activeProfile: profile });
-  await resetClaimsSession(run);
+  if (!singleSync) await resetClaimsSession(run);
   const credential = await credentialsFor(profile);
   await diagnostic(run, 'CF-CRED-01', credential ? 'Zugangsdatenquelle ist verfügbar.' : 'Für das Profil ist keine Zugangsdatenquelle verfügbar.', { source: credential?.source || 'keine' });
   if (!credential) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar. Ursache: ' + (credentialDiagnostic || 'unbekannt') + '.');
@@ -472,8 +472,8 @@ async function runImport(run) {
   const { tab, token } = await claimsTab(profile, run, credential);
   run.claimsTabId = tab.id;
   await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
-  const openTasks = await readOpenTasks(tab.id);
-  await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks, reader: lastTaskDebug });
+  const openTasks = singleSync ? null : await readOpenTasks(tab.id);
+  if (!singleSync) await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks, reader: lastTaskDebug });
   if(run.mode==='tasks'){
     if(!Number.isInteger(openTasks))throw new Error(`[CF-TASKS-04] Zaehler nicht lesbar. ${lastTaskDebug?.path || '?'}; K=${JSON.stringify(lastTaskDebug?.candidates || [])}; ${(lastTaskDebug?.samples || []).filter(t => t.startsWith('Umfeld')).slice(0, 2).join(' // ').replace(/Umfeld: /g, '')}`.slice(0, 480));
     return { claims: 0, openTasks, taskCheck: true, updated: 0, skipped: 0, bridge: BRIDGE_VERSION, rows: lastTaskDebug?.rows ?? null };
@@ -486,25 +486,26 @@ async function runImport(run) {
   const claimsById = new Map(), bucketCounts = {};
   if (useInvoicedClaims) {
     const fullSyncWindow = run.since ? `ab ${run.since}` : 'ohne Datumsgrenze';
-    await diagnostic(run, 'CF-FULL-04', singleSync ? `Einzelfall-Vollimport für Schadennummer ${singleClaimNumber}: Fall-ID aus „/invoiced“ wird ermittelt.` : `Vollabgleich der ClaimsForce-Kostennoten ${fullSyncWindow}: Schadennummern aus „/invoiced“ werden eingelesen.`, { since: run.since || '', strategy: 'invoiced-claims', claimNumber: singleClaimNumber });
+    await diagnostic(run, 'CF-FULL-04', singleSync ? `ClaimsForce-Kostennotenliste wird für die Suche nach Schadennummer ${singleClaimNumber} geöffnet.` : `Vollabgleich der ClaimsForce-Kostennoten ${fullSyncWindow}: Schadennummern aus „/invoiced“ werden eingelesen.`, { since: run.since || '', strategy: 'invoiced-claims', claimNumber: singleClaimNumber });
     await ensureInvoicedListTab(tab.id);
     const scraped = singleSync
       ? await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER', damageNumber: singleClaimNumber })
       : await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
     if (!scraped?.ok) throw new Error(scraped?.error || '[CF-INVOICED-01] Schadennummern aus „/invoiced“ konnten nicht gelesen werden.');
-    if (String(scraped.route || '').replace(/\/+$/, '') !== '/invoiced') throw new Error(`[CF-INVOICED-01] Kostennotenliste nicht bestätigt (Route ${safeRoute((await chrome.tabs.get(tab.id)).url)}).`);
+    const scrapedRoute = String(scraped.route || '').replace(/\/+$/, '');
+    if (scrapedRoute !== '/invoiced') throw new Error(`[CF-INVOICED-01] Kostennotenliste nicht bestätigt (Route ${safeRoute((await chrome.tabs.get(tab.id)).url)}).`);
     const allClaims = Array.isArray(scraped?.claims) ? scraped.claims : [];
     for (const claim of allClaims) if (claim?.id) claimsById.set(claim.id, claim);
     bucketCounts.INVOICED_CLAIMS = allClaims.length;
-    await progress(portalTabId(), singleSync ? `Schadennummer ${singleClaimNumber} wurde zugeordnet; Falldaten, Nachrichten und Anhänge werden vollständig abgeglichen.` : `${claimsById.size} Schäden aus „/invoiced“ gefunden; anschließend werden Falldaten, Nachrichten und Anhänge einzeln abgeglichen.`, 0, claimsById.size);
-    await diagnostic(run, 'CF-INVOICED-01', singleSync ? `Einzelfall ${singleClaimNumber} wurde in der ClaimsForce-Kostennotenliste erkannt.` : `${claimsById.size} Schäden aus der ClaimsForce-Kostennotenliste erkannt.`, {
+    await progress(portalTabId(), singleSync ? `Schadennummer ${singleClaimNumber} wurde in ClaimsForce gefunden; Falldaten, Nachrichten und Anhänge werden vollständig abgeglichen.` : `${claimsById.size} Schäden aus „/invoiced“ gefunden; anschließend werden Falldaten, Nachrichten und Anhänge einzeln abgeglichen.`, 0, claimsById.size);
+    await diagnostic(run, 'CF-INVOICED-01', singleSync ? `Einzelfall ${singleClaimNumber} wurde über die ClaimsForce-Kostennotenliste erkannt.` : `${claimsById.size} Schäden aus der ClaimsForce-Kostennotenliste erkannt.`, {
       count: claimsById.size,
       importedCount: claimsById.size,
       listedCount: scraped.listedCount || 0,
       observedCount: scraped.observedCount || 0,
       searchResolvedCount: scraped.searchResolvedCount || 0,
       pages: scraped.pages || 0,
-      route: scraped.route,
+      route: scrapedRoute,
       bridge: BRIDGE_VERSION,
       claimNumber: singleClaimNumber
     });
