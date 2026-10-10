@@ -141,6 +141,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   const completing = new Set();
   let loaded = false;
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
+  const caseNumberKey = value => String(value || '').replace(/[\s\u00ad\u2010-\u2015\u2212-]+/gu, '').toUpperCase();
   const date = (value) => {
     if (!value) return 'Eingang unbekannt';
     const parsed = new Date(value);
@@ -186,7 +187,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
         if (!caseNumber) { unresolved++; setArchiveState(item, 'Schadennummer fehlt', 'is-error'); continue; }
         if (!cases.has(caseNumber)) {
           cases.set(caseNumber, request(`${DRIVE_API}?action=search_cases&q=${encodeURIComponent(caseNumber)}`).then(data =>
-            (data.results || []).filter(row => String(row.meta?.schaden_nr || '').trim() === caseNumber)
+            (data.results || []).filter(row => caseNumberKey(row.meta?.schaden_nr) === caseNumberKey(caseNumber))
           ));
         }
         let exactCases = await cases.get(caseNumber);

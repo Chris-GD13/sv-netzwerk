@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/outlook-task-number.php';
 commonHeaders();
 $user = requireAuth();
 if (!in_array((string)($user['role'] ?? ''), ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) {
@@ -143,11 +144,6 @@ function otFolderByName(string $mailbox, string $wanted): ?array {
         if (mb_strtolower(trim((string)($folder['displayName'] ?? '')), 'UTF-8') === $needle) return $folder;
     }
     return null;
-}
-
-function otCaseNumber(string $text): string {
-    if (preg_match('/\b\d{2}-\d{6,7}(?:-\d)?\b/u', $text, $match)) return $match[0];
-    return '';
 }
 
 function otMessage(string $mailbox, string $folderId, string $id): array {
