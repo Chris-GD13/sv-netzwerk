@@ -5,6 +5,7 @@ require_once __DIR__.'/case-analysis.php';
 require_once __DIR__.'/case-work-core.php';
 require_once __DIR__.'/claimsforce-queue-utils.php';
 require_once __DIR__.'/gf-jobs-schema.php';
+require_once __DIR__.'/profile-routing.php';
 
 function cwRows(string $folder, int $userId): array {
     $s = db()->prepare('SELECT w.*,a.status,a.message,a.result_json,a.updated_at FROM case_work_turns w LEFT JOIN case_analysis_jobs a ON a.id=w.analysis_id WHERE w.folder_id=:f AND w.user_id=:u ORDER BY w.id');
@@ -21,9 +22,13 @@ try {
     db()->exec("CREATE TABLE IF NOT EXISTS case_work_turns (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, folder_id VARCHAR(190) NOT NULL, user_id BIGINT NOT NULL,
         request_key VARCHAR(64) NOT NULL, instructions TEXT NOT NULL, task_id TEXT NOT NULL, analysis_id BIGINT UNSIGNED NULL,
-        import_id BIGINT UNSIGNED NULL, document_id BIGINT UNSIGNED NULL, created_at DATETIME NOT NULL,
+        import_id BIGINT UNSIGNED NULL, document_id BIGINT UNSIGNED NULL, expert_profile VARCHAR(30) NOT NULL DEFAULT '', created_at DATETIME NOT NULL,
         UNIQUE KEY request_once(user_id,request_key), INDEX work_context(user_id,folder_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    $columns=db()->query('SHOW COLUMNS FROM case_work_turns')->fetchAll(PDO::FETCH_COLUMN);
+    if(!in_array('expert_profile',$columns,true))db()->exec("ALTER TABLE case_work_turns ADD COLUMN expert_profile VARCHAR(30) NOT NULL DEFAULT ''");
+    $profile=svnetIsBackofficeUser($user)?svnetSelectedProfile($user,(string)($_SESSION['svnet_selected_expert']??'')):svnetUserProfile($user);
+    $effective=svnetIsBackofficeUser($user)?svnetExpertIdentity($profile,$user):$user;
     $action = (string)($body['action'] ?? 'history');
     if ($action === 'history') {
         $rows = cwRows($folder, $uid);
@@ -43,29 +48,8 @@ try {
     if ((int)$lock->fetchColumn() !== 1) apiError(409, 'Dieser Fall wird bereits bearbeitet. Bitte Status aktualisieren.');
     $rows = cwRows($folder, $uid);
     if ($action === 'documents') {
-        $turn = null;
-        foreach ($rows as $row) if ((int)$row['id'] === (int)($body['turn_id'] ?? 0)) $turn = $row;
-        if (!$turn) apiError(404, 'Arbeitsauftrag nicht gefunden.');
-        if ($turn['document_id']) apiJson(['ok'=>true, 'job_id'=>(int)$turn['document_id']]);
-        if ($turn['status'] !== 'done') apiError(409, 'Die Ausarbeitung ist noch nicht abgeschlossen.');
-        $result=json_decode((string)$turn['result_json'],true,512,JSON_THROW_ON_ERROR);
-        $requests=cwDocumentRequests($result);
-        if (!$requests) apiError(409, 'Kein Dokumentauftrag erforderlich.');
-        if (!is_executable('/usr/bin/php') || !is_executable('/usr/bin/setsid') || !function_exists('exec')) throw new RuntimeException('Dokumentverarbeitung ist auf diesem Server nicht verfügbar.');
-        gfJobsTable();
-        $payload=['folder_id'=>$folder, 'user_name'=>(string)($user['full_name'] ?? $user['email']),
-            'order'=>['instructions'=>cwRules()."\nAktueller Betreiberauftrag:\n".$turn['instructions']."\nDokumentaufträge (Ausarbeitung, keine neuen Originalnachweise):\n".json_encode($requests,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),
-                'outputs'=>array_column($requests,'type'),'work_mode'=>'vollpruefung','open_points'=>'beides','automatic'=>true]];
-        db()->beginTransaction();
-        $s=db()->prepare("INSERT INTO gf_ai_jobs(folder_id,status,progress,message,payload_json,created_by,created_at,heartbeat_at) VALUES(:f,'dispatching',0,'Dokumente aus Fall-Work werden erstellt.',:p,:u,NOW(),NOW())");
-        $s->execute([':f'=>$folder,':p'=>json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),':u'=>$user['email']]);
-        $id=(int)db()->lastInsertId();
-        $s = db()->prepare('UPDATE case_work_turns SET document_id=:d WHERE id=:id'); $s->execute([':d'=>$id, ':id'=>$turn['id']]);
-        db()->commit();
-        $output=[]; $exit=0;
-        exec('/usr/bin/setsid -f /usr/bin/php '.escapeshellarg(__DIR__.'/gf-ai-worker-cli.php').' >/dev/null 2>&1 </dev/null',$output,$exit);
-        if ($exit !== 0) throw new RuntimeException('Dokumentauftrag gespeichert, Hintergrundverarbeitung konnte nicht gestartet werden.');
-        apiJson(['ok'=>true,'job_id'=>$id]);
+        require_once __DIR__.'/case-work-documents.php';
+        apiJson(['ok'=>true,'job_id'=>cwQueueDocuments((int)($body['turn_id']??0),$folder,$user)]);
     }
     if ($action !== 'start') apiError(400, 'Unbekannte Aktion.');
     $key = (string)($body['request_key'] ?? '');
@@ -93,8 +77,8 @@ try {
     db()->beginTransaction();
     $s=db()->prepare("INSERT INTO case_analysis_jobs(folder_id,task_key,user_id,status,message,created_at,updated_at) VALUES(:f,:t,:u,'running','Fallbearbeitung angenommen.',NOW(),NOW())");
     $s->execute([':f'=>$folder, ':t'=>hash('sha256', $taskId), ':u'=>$uid]); $job=(int)db()->lastInsertId();
-    $s=db()->prepare('INSERT INTO case_work_turns(folder_id,user_id,request_key,instructions,task_id,analysis_id,import_id,created_at) VALUES(:f,:u,:k,:i,:t,:a,:p,NOW())');
-    $s->execute([':f'=>$folder, ':u'=>$uid, ':k'=>$key, ':i'=>$instructions, ':t'=>$taskId, ':a'=>$job, ':p'=>$importId ?: null]);
+    $s=db()->prepare('INSERT INTO case_work_turns(folder_id,user_id,request_key,instructions,task_id,analysis_id,import_id,expert_profile,created_at) VALUES(:f,:u,:k,:i,:t,:a,:p,:profile,NOW())');
+    $s->execute([':f'=>$folder, ':u'=>$uid, ':k'=>$key, ':i'=>$instructions, ':t'=>$taskId, ':a'=>$job, ':p'=>$importId ?: null, ':profile'=>$profile]);
     $turn=(int)db()->lastInsertId(); db()->commit();
     if (!is_executable('/usr/bin/php') || !is_executable('/usr/bin/setsid') || !function_exists('exec')) {
         caUpdate($job,'failed','Hintergrundverarbeitung auf diesem Server nicht verfügbar.');

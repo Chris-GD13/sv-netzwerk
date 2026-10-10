@@ -46,7 +46,10 @@ function ionosWrite(array $meta, ?string $bytes=null, ?string $id=null): array {
         $path=ionosStorageRoot().'/objects/'.$id;
         if($bytes!==null){
             if(is_file($path)){$versions=ionosStorageRoot().'/versions';if(!is_dir($versions)&&!mkdir($versions,0770,true))throw new RuntimeException('Versionsordner fehlt.');if(!copy($path,$versions.'/'.$id.'-'.bin2hex(random_bytes(8))))throw new RuntimeException('Vorversion konnte nicht gesichert werden.');}
-            $tmp=tempnam(ionosStorageRoot().'/objects','write-');if($tmp===false||file_put_contents($tmp,$bytes)!==strlen($bytes))throw new RuntimeException('Datei konnte nicht vollständig geschrieben werden.');chmod($tmp,0660);if(!rename($tmp,$path))throw new RuntimeException('Datei konnte nicht übernommen werden.');
+            $tmp=tempnam(ionosStorageRoot().'/objects','write-');if($tmp===false||file_put_contents($tmp,$bytes)!==strlen($bytes))throw new RuntimeException('Datei konnte nicht vollständig geschrieben werden.');chmod($tmp,0660);
+            // Maintenance writes must remain readable by the existing storage service.
+            if(function_exists('posix_geteuid')&&posix_geteuid()===0){$owner=stat(ionosStorageRoot().'/objects');if(!$owner||!chown($tmp,$owner['uid'])||!chgrp($tmp,$owner['gid']))throw new RuntimeException('Dienstbesitzer der gespeicherten Datei konnte nicht erhalten werden.');}
+            if(!rename($tmp,$path))throw new RuntimeException('Datei konnte nicht übernommen werden.');
             $m['size']=(string)strlen($bytes);$m['md5Checksum']=md5($bytes);
         } elseif($m['mimeType']!=='application/vnd.google-apps.folder'&&!is_file($path))throw new RuntimeException('Dateiinhalt fehlt.');
         $m['modifiedTime']=gmdate('Y-m-d\TH:i:s\Z');$m['createdTime']??=$m['modifiedTime'];$m['trashed']??=false;

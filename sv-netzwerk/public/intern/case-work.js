@@ -44,7 +44,8 @@
             target.value=result.reply_draft;target.dispatchEvent(new Event('input',{bubbles:true}));
             const number=String(result.case_no||active()?.meta?.schaden_nr||'').trim();
             if(subject)subject.value=String(result.subject||'').startsWith(number)?result.subject:number+' – '+(result.subject||'Schadenbearbeitung');
-            target.closest('section')?.classList.remove('vf-collapsed');target.scrollIntoView({behavior:'smooth',block:'center'});target.focus();
+            const card=target.closest('.vf-card');card?.classList.remove('is-collapsed');card?.querySelector(':scope > .vf-collapse-trigger')?.setAttribute('aria-expanded','true');
+            target.scrollIntoView({behavior:'smooth',block:'center'});target.focus();
             notice('Entwurf übernommen. Empfänger und Originalanhänge im Mailformular ergänzen; noch nicht versendet.');
           }));
           details(answer,'Einzelne Anliegen',(result.task_results||[]).map(item=>item.request+'\n'+item.answer));
