@@ -36,7 +36,7 @@
   width: clamp(10.5rem, 15vw, 13.75rem);
   height: auto;
   max-height: 3.25rem;
-  filter: brightness(0) invert(1);
+  filter: none;
 }
 
 .public-site .desktop-nav__trigger,
