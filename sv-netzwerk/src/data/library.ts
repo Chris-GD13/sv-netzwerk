@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Brandmeldeanlagen nach Wasser- und Brandschäden fachlich prüfen',
+    description: 'Brandmeldeanlagen werden nach Wasser-, Rauch- oder Wärmeeinwirkung anhand von Schutzumfang, Fachprüfung, Wiederinbetriebnahme und schadenbedingten Kosten bewertet.',
+    href: '/fachwissen/brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung/',
+    category: 'Gebäudetechnik und Brandschutz',
+    tags: ['Brandmeldeanlage', 'Brandschutz', 'Wasserschaden', 'Brandschaden', 'Funktionsprüfung', 'Kostenprüfung'],
+    date: '2026-10-10',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Batteriespeicher nach Wasser- und Brandschäden fachlich prüfen',
     description: 'Stationäre Batteriespeicher werden nach Wasser- oder Brandeinwirkung anhand von Gefahrenlage, Herstellerdiagnose, Wiederinbetriebnahme und schadenbedingten Kosten bewertet.',
     href: '/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung/',

@@ -1,3 +1,10 @@
+## 2026-10-10
+- Fachbeitrag „Brandmeldeanlagen nach Wasser- und Brandschäden fachlich prüfen“ ergänzt
+- Schutzumfang, Ereignisspeicher, Fachprüfung, Wiederinbetriebnahme und schadenbedingte Kosten getrennt dokumentiert
+- DIN 14675-1:2020-01, DIN VDE 0833-2:2022-06, VdS 2095, DGUV Vorschrift 3, BetrSichV und VVG-Quellen mit Anwendungs- und Geltungsstatus eingeordnet
+- Beitragsbild, Fachwissensübersicht, Suchindex und Sitemap-Integration ergänzt
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt
+
 ## 2026-10-09
 - Fachbeitrag „Batteriespeicher nach Wasser- und Brandschäden fachlich prüfen“ ergänzt
 - Gefahrenabwehr, Systemgrenze, Herstellerdiagnose, Wiederinbetriebnahme und schadenbedingte Kosten getrennt dokumentiert
