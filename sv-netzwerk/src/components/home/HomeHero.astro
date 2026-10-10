@@ -1,12 +1,36 @@
-<section class="v4-hero">
-  <div class="v4-shell v4-hero__copy">
-    <p class="v4-kicker"><span></span>Sachverständige · Schadenregulierung · unabhängige Prüfung</p>
-    <h1>Technische Klarheit für komplexe Sachschäden.</h1>
-    <p class="v4-hero__lead">Technische Feststellung, Beweissicherung, Kostenprüfung und koordinierte Schadenbearbeitung für Versicherer, Unternehmen, öffentliche Auftraggeber und private Eigentümer.</p>
-    <div class="v4-hero__actions">
-      <a class="v4-button v4-button--accent" href="/schaden-melden/">Schadenbearbeitung beauftragen</a>
-      <a class="v4-button v4-button--dark" href="/auftraggeber/">Leistungen nach Auftraggeber</a>
-      <a class="v4-button v4-button--dark" href="/experten/">Experten finden</a>
+<section class="home-intro" aria-labelledby="home-title">
+  <div class="v4-shell home-intro__grid">
+    <div class="home-intro__copy">
+      <p class="v4-kicker"><span></span>SV-Netzwerk · Bau · Schaden · Regulierung</p>
+      <h1 id="home-title">Schäden verstehen.<br /><em>Entscheidungen begründen.</em></h1>
+      <p class="home-intro__lead">Sachverständige und Schadenregulierer für technische Klarheit – vom einzelnen Prüfauftrag bis zum Komplex- und Großschaden.</p>
+      <p class="home-intro__text">Wir verbinden Schadenfeststellung, Beweissicherung und Kostenprüfung. Damit Versicherer und weitere Auftraggeber auf einer nachvollziehbaren Grundlage entscheiden können.</p>
+      <div class="home-intro__actions">
+        <a class="v4-button v4-button--accent" href="/versicherer/">Für Versicherer und Sachbearbeiter <span aria-hidden="true">→</span></a>
+        <a class="home-intro__secondary" href="#prueffragen">Was möchten Sie prüfen lassen? <span aria-hidden="true">↓</span></a>
+      </div>
+      <ul class="home-intro__facts" aria-label="Unsere Arbeitsweise"><li>Technische Feststellungen</li><li>Begründete Kostenprüfung</li><li>Dokumentierte Empfehlungen</li></ul>
     </div>
+    <figure class="home-intro__portrait">
+      <img src="/assets/images/team/christian-waechter-weit-bw.webp" alt="Christian Wächter, Sachverständiger und Großschadenregulierer" width="1500" height="938" fetchpriority="high" />
+      <figcaption><span>Persönliche Verantwortung im Netzwerk</span><strong>Christian Wächter</strong><p>Sachverständiger &amp; Großschadenregulierer<br />DIN EN ISO/IEC 17024 zertifiziert</p><a href="/experten/christian-waechter/">Profil und Qualifikationen <span aria-hidden="true">↗</span></a></figcaption>
+    </figure>
   </div>
 </section>
+<style>
+  .home-intro{overflow:hidden;background:linear-gradient(115deg,#edf2f5 0%,#f8f8f5 60%,#fff1dc 100%);border-bottom:1px solid var(--v4-line)}
+  .home-intro__grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:clamp(2rem,5vw,5rem);align-items:center;padding-block:clamp(2.5rem,5vw,5rem)}
+  .home-intro h1{font-size:clamp(2.4rem,4.5vw,4.7rem);line-height:1.08;letter-spacing:-.045em;margin:1.1rem 0 1.5rem;max-width:16ch}
+  .home-intro h1 em{font-style:normal;color:#a85508}
+  .home-intro__lead{font-size:clamp(1.1rem,1.6vw,1.35rem);line-height:1.6;max-width:48ch}
+  .home-intro__text{color:#3f5c6f;max-width:62ch;line-height:1.7}
+  .home-intro__actions{display:flex;flex-wrap:wrap;gap:1.2rem;align-items:center;margin-top:1.7rem}
+  .home-intro__secondary{font-weight:800;color:#0d4f73;text-underline-offset:.3em}
+  .home-intro__facts{display:flex;flex-wrap:wrap;gap:.5rem 1.1rem;list-style:none;padding:0;margin:1.7rem 0 0;color:#3f5c6f;font-size:.85rem}
+  .home-intro__facts li{border-left:2px solid #ff9d12;padding-left:.65rem}
+  .home-intro__portrait{min-width:0;margin:0;background:#071a2e;color:white;overflow:hidden;border-radius:var(--sv-radius-sm);box-shadow:0 16px 45px rgba(7,26,46,.12)}
+  .home-intro__portrait img{display:block;width:100%;height:auto;aspect-ratio:1.2;object-fit:cover;object-position:50% 30%}
+  figcaption{padding:1.5rem 1.7rem}figcaption>span{display:block;color:#ffb34d;font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}figcaption strong{display:block;margin:.6rem 0;font-size:1.5rem}figcaption p{color:#d0dce5;font-size:.9rem;margin:0 0 .8rem}figcaption a{color:white;text-underline-offset:.25em;font-weight:700;font-size:.9rem}
+  @media(max-width:62rem){.home-intro__grid{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:1.5rem}.home-intro h1{font-size:clamp(2rem,4.5vw,3.5rem)}}
+  @media(max-width:46rem){.home-intro__grid{grid-template-columns:1fr}.home-intro h1{max-width:19ch;font-size:clamp(2.2rem,8vw,3.5rem)}.home-intro__actions{align-items:stretch;flex-direction:column}.home-intro__actions .v4-button{white-space:normal;text-align:left}.home-intro__portrait{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}.home-intro__portrait img{height:100%;aspect-ratio:auto;object-position:55% center}figcaption{padding:1.15rem}figcaption strong{font-size:1.2rem}}
+</style>
