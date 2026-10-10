@@ -6,16 +6,16 @@ const requestViaPage = (endpoint, queries) => new Promise(resolve => {
   pendingInvestigations.set(id, data => { clearTimeout(timer); pendingInvestigations.delete(id); resolve(data); });
   window.postMessage({ source: 'svnet-claimsforce-bridge', type: 'INVESTIGATIONS_REQUEST', id, endpoint, queries }, location.origin);
 });
-const requestInvoicedRows = () => new Promise(resolve => {
+const requestInvoicedRows = (expected = 0) => new Promise(resolve => {
   const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const finish = value => { clearTimeout(timer); window.removeEventListener('message', onMessage); resolve(value); };
   const onMessage = event => {
     if (event.source !== window || event.origin !== location.origin || event.data?.source !== 'svnet-claimsforce-main' || event.data?.type !== 'INVOICED_ROWS_RESPONSE' || event.data.id !== id) return;
     finish(event.data);
   };
-  const timer = setTimeout(() => finish({ ok: false, rows: [] }), 5000);
+  const timer = setTimeout(() => finish({ ok: false, rows: [] }), 75000);
   window.addEventListener('message', onMessage);
-  window.postMessage({ source: 'svnet-claimsforce-bridge', type: 'INVOICED_ROWS_REQUEST', id }, location.origin);
+  window.postMessage({ source: 'svnet-claimsforce-bridge', type: 'INVOICED_ROWS_REQUEST', id, expected }, location.origin);
 });
 window.addEventListener('message', event => {
   if (event.source !== window || event.origin !== location.origin || event.data?.source !== 'svnet-claimsforce-main') return;
@@ -256,7 +256,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       if (/Seite ist veraltet/i.test(document.body?.innerText || '')) throw new Error(`[CF-INVOICED-01] Die ClaimsForce-Seite ist veraltet. Bitte den Import erneut starten, damit /invoiced frisch geladen wird (Bridge ${chrome.runtime.getManifest().version}).`);
       let page = 0;
       // Die Zeilendaten der Tabelle enthalten alle Schäden; das Scrollen entfällt (im Hintergrund-Tab rendert die virtualisierte Liste nicht).
-      const direct = await requestInvoicedRows();
+      const direct = await requestInvoicedRows(expectedCount);
+      const directDiag = `direkt: ok=${!!direct.ok}, Zeilen=${direct.rows?.length || 0}${direct.diag ? ', ' + direct.diag : ''}${direct.error ? ', ' + direct.error : ''}`;
       if (direct.ok && direct.rows.length && (!expectedCount || direct.rows.length >= expectedCount)) {
         for (const row of direct.rows) {
           if (!include(row.enteredAt)) continue;
@@ -359,7 +360,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         }
       }
       if (usedSearch) setSearchValue('');
-      if (!Number.isFinite(sinceTime) && expectedCount && claims.size < expectedCount) throw new Error(`[CF-INVOICED-01] Kostennotenliste unvollständig: ${claims.size} von ${expectedCount} Schäden konnten zugeordnet werden (Bridge ${chrome.runtime.getManifest().version}; Schadennummern gelesen ${listedDamageNumbers.size}; IDs aus Liste/API ${observedCount}; Suchtreffer ${searchResolvedCount}).`);
+      if (!Number.isFinite(sinceTime) && expectedCount && claims.size < expectedCount) throw new Error(`[CF-INVOICED-01] Kostennotenliste unvollständig: ${claims.size} von ${expectedCount} Schäden konnten zugeordnet werden (Bridge ${chrome.runtime.getManifest().version}; Schadennummern gelesen ${listedDamageNumbers.size}; IDs aus Liste/API ${observedCount}; Suchtreffer ${searchResolvedCount}; ${directDiag}).`);
       sendResponse({ ok: true, claims: [...claims.values()], route: location.pathname, pages: page + 1, expectedCount, listedCount: listedDamageNumbers.size, observedCount, searchResolvedCount, since, excludedUndated: Number.isFinite(sinceTime) ? [...observedClaims.values()].filter(claim => !Number.isFinite(dateTime(claim?.enteredAt || claim?.createdAt || claim?.updatedAt || claim?.date))).length : 0 });
     })().catch(error => sendResponse({ ok: false, error: error.message, claims: [] }));
     return true;
