@@ -22,12 +22,14 @@ function cwQueueDocuments(int $turnId,string $folder,array $user,bool $saveText=
             $text=trim((string)($result['reply_draft']??''));if($text==='')throw new RuntimeException('Kein vollständiger Text für Word vorhanden.');
             $number=trim((string)($result['case_no']??''));
             $bytes=cwTextDocx(($number!==''?'Schaden-Nr. '.$number."\n\n":'').$text);
-            $parent='';
+            $parent='';$meta=[];
             foreach(ionosList(['q'=>"'".str_replace("'","\\'",$folder)."' in parents and trashed=false",'pageSize'=>1000])['files'] as $file){
-                if(($file['mimeType']??'')==='application/vnd.google-apps.folder'&&str_starts_with($file['name'],'05_')){$parent=$file['id'];break;}
+                if(($file['mimeType']??'')==='application/vnd.google-apps.folder'&&str_starts_with($file['name'],'05_'))$parent=$file['id'];
+                if($file['name']==='00_Falldaten.json')$meta=json_decode(ionosBytes($file['id']),true,512,JSON_THROW_ON_ERROR);
             }
             if($parent==='')$parent=ionosWrite(['name'=>'05_Berichte_Nachtraege','mimeType'=>'application/vnd.google-apps.folder','parents'=>[$folder]])['id'];
-            $name=preg_replace('/[^\p{L}\p{N}._-]/u','_',$number?:'Fall').'_Nachtrag_Fall-Work_'.date('Y-m-d').'_'.$turnId.'.docx';
+            $prefix=implode('_',array_filter([$number?:'Fall',(string)($meta['vn_objekt']??''),(string)($meta['schadenart']??$meta['gefahr']??'')]));
+            $name=preg_replace('/[^\p{L}\p{N}._-]/u','_',$prefix).'_Nachtrag_'.date('Y-m-d').'_Work'.$turnId.'.docx';
             $file=ionosWrite(['name'=>$name,'mimeType'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document','parents'=>[$parent]],$bytes);
             $created=['ok'=>true,'created'=>[['id'=>$file['id'],'name'=>$name,'type'=>'nachtrag_stellungnahme','template_used'=>null]],'count'=>1,'text_preserved'=>true];
             gfJobsTable();db()->beginTransaction();
