@@ -105,30 +105,51 @@
       }
     },
     "2026-10-10": {
-      "publication_id": "2026-10-10-brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung",
+      "publication_id": "2026-10-10-fenstermontage-anschlussfugen-maengel-nachbesserung",
       "article": {
-        "title": "Brandmeldeanlagen nach Wasser- und Brandschäden fachlich prüfen",
-        "slug": "brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung/",
-        "status": "published-verified",
-        "owner": "codex-2026-10-10-0600",
-        "reserved_at": "2026-10-10T04:02:51.123Z",
-        "commit": "a814118006f87336fdef16d41d4652ff27e46cfc",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38023365108",
-        "verified_at": "2026-10-10T04:20:52.803Z"
+        "title": "Fenstermontage und Anschlussfugen: Mängel fachlich prüfen und Nachbesserung begründen",
+        "slug": "fenstermontage-anschlussfugen-maengel-nachbesserung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/fenstermontage-anschlussfugen-maengel-nachbesserung/",
+        "status": "reserved",
+        "owner": "codex-window-recovery-20261010-01a11f08",
+        "reserved_at": "2026-10-10T08:49:02.973Z"
       },
       "linkedin": {
-        "status": "not-posted",
-        "blocker": {
-          "code": "blocked-topic-mismatch",
-          "checked_at": "2026-10-10T05:06:09.467Z",
-          "expected_topic": "Fensterbau: Fenstermontage und Anschlussfugen, Ausführungsqualität, Mängelbefund und fachgerechte Nachbesserung; kein Wasserschaden-Schwerpunkt",
-          "actual_title": "Brandmeldeanlagen nach Wasser- und Brandschäden fachlich prüfen",
-          "article_url": "https://www.sv-netzwerk.eu/fachwissen/brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung/",
-          "evidence": "docs/linkedin-veroeffentlichung-2026-10-10.md"
-        }
+        "status": "not-posted"
+      },
+      "recovery": {
+        "authorized_by": "Direkter Nutzerauftrag im bestehenden Chat: dann jetzt veröffentlichen",
+        "reason": "Fensterbau für 10.10. ausdrücklich beauftragt; konkurrierender BMA-Artikel verfehlte die Themenvorgabe. Dokumentierte Nachholung, keine Wiederholung eines LinkedIn-Beitrags.",
+        "authorized_at": "2026-10-10T08:49:02.974Z",
+        "prior_publications": [
+          {
+            "publication_id": "2026-10-10-brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung",
+            "article": {
+              "title": "Brandmeldeanlagen nach Wasser- und Brandschäden fachlich prüfen",
+              "slug": "brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung",
+              "url": "https://www.sv-netzwerk.eu/fachwissen/brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung/",
+              "status": "published-verified",
+              "owner": "codex-2026-10-10-0600",
+              "reserved_at": "2026-10-10T04:02:51.123Z",
+              "commit": "a814118006f87336fdef16d41d4652ff27e46cfc",
+              "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38023365108",
+              "verified_at": "2026-10-10T04:20:52.803Z"
+            },
+            "linkedin": {
+              "status": "not-posted",
+              "blocker": {
+                "code": "blocked-topic-mismatch",
+                "checked_at": "2026-10-10T05:06:09.467Z",
+                "expected_topic": "Fensterbau: Fenstermontage und Anschlussfugen, Ausführungsqualität, Mängelbefund und fachgerechte Nachbesserung; kein Wasserschaden-Schwerpunkt",
+                "actual_title": "Brandmeldeanlagen nach Wasser- und Brandschäden fachlich prüfen",
+                "article_url": "https://www.sv-netzwerk.eu/fachwissen/brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung/",
+                "evidence": "docs/linkedin-veroeffentlichung-2026-10-10.md"
+              }
+            }
+          }
+        ]
       }
     }
   },
-  "updated_at": "2026-10-10T04:20:52.803Z"
+  "updated_at": "2026-10-10T08:49:02.975Z"
 }
