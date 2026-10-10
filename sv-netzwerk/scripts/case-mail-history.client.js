@@ -1,6 +1,6 @@
 import * as MsgReaderPackage from '@kenjiuno/msgreader';
 import PostalMime from 'postal-mime';
-import { normalizeClaimsforceMail } from './claimsforce-mail.js';
+import { isClaimsforceMail, normalizeClaimsforceMail } from './claimsforce-mail.js';
 
 const MsgReader = typeof MsgReaderPackage.default === 'function'
   ? MsgReaderPackage.default
@@ -38,7 +38,7 @@ const MsgReader = typeof MsgReaderPackage.default === 'function'
     if (!response.ok) throw Error(data.error || `HTTP ${response.status}`);
     return data;
   };
-  const isClaimsforceMessage = item => /^Mail_ClaimsForce-Nachricht_.*\.json$/i.test(item.name || '');
+  const isClaimsforceMessage = isClaimsforceMail;
   const isMessage = item => isClaimsforceMessage(item) || /\.(?:msg|eml)$/i.test(item.name || '') || ['message/rfc822', 'application/vnd.ms-outlook'].includes(item.mimeType || '');
   const flatten = (items, inCorrespondence = false, result = []) => {
     for (const item of items || []) {
