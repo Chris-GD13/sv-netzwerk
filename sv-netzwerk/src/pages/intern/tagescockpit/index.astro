@@ -88,7 +88,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     <section id="dc-claims-bridge-host" hidden>
       <button type="button" id="vf-claims-import">ClaimsForce-Aufgaben aktualisieren</button>
       <button type="button" id="vf-claims-full">Vollabgleich</button>
-      <input id="vf-claims-since" type="date">
+      <input id="vf-claims-number" type="text">
       <p id="vf-claims-state"></p>
       <button type="button" id="vf-claims-settings"></button>
       <a id="vf-claims-download" href="/intern/downloads/svnet-claimsforce-bridge.zip"></a>
@@ -213,4 +213,4 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   loadPersonalPhone().catch(error=>{$('dc-phone-state').textContent=error.message});resetReminder();loadPhone();load();
 })();
 </script>
-<script is:inline src="/intern/claimsforce-central.js?v=20261008-10"></script>
+<script is:inline src="/intern/claimsforce-central.js?v=20261010-1"></script>

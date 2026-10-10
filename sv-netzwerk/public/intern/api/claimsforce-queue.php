@@ -19,7 +19,8 @@ function cqEnsureColumns():void{
         'diagnostic_json'=>'TEXT NULL',
         'schedule_key'=>'VARCHAR(80) NULL',
         'sync_mode'=>'VARCHAR(20) NOT NULL DEFAULT \'quick\'',
-        'since_date'=>'DATE NULL'
+        'since_date'=>'DATE NULL',
+        'claim_number'=>'VARCHAR(120) NULL'
     ];
     $check=db()->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=:table AND COLUMN_NAME=:column');
     foreach($columns as$name=>$definition){
@@ -65,7 +66,7 @@ function cqVisibleProfiles(array$user):array{
     return[$profile=>$labels[$profile]];
 }
 function cqRow(int$id):array{
-    $s=db()->prepare('SELECT id,profile,status,message,result_json,created_at,started_at,heartbeat_at,attempt_count,phase,progress_current,progress_total,diagnostic_json,finished_at,requested_by,sync_mode,since_date FROM claimsforce_import_jobs WHERE id=:id LIMIT 1');
+    $s=db()->prepare('SELECT id,profile,status,message,result_json,created_at,started_at,heartbeat_at,attempt_count,phase,progress_current,progress_total,diagnostic_json,finished_at,requested_by,sync_mode,since_date,claim_number FROM claimsforce_import_jobs WHERE id=:id LIMIT 1');
     $s->execute([':id'=>$id]);
     $row=$s->fetch(PDO::FETCH_ASSOC)?:[];
     if($row){
@@ -107,14 +108,23 @@ if($action==='summary'){
 if($action==='enqueue'){
     $allowed=array_keys(cqVisibleProfiles($user));
     $profile=trim((string)($body['profile']??''));
-    $syncMode=($body['mode']??'')==='tasks'?'tasks':((($body['mode']??'')==='full'||!empty($body['full']))?'full':'quick');
+    $mode=(string)($body['mode']??'');
+    $syncMode=$mode==='tasks'?'tasks':($mode==='single'?'single':(($mode==='full'||!empty($body['full']))?'full':'quick'));
     $sinceDate=preg_match('/^\d{4}-\d{2}-\d{2}$/',(string)($body['since']??''))?(string)$body['since']:null;
+    $claimNumber=trim((string)($body['claimNumber']??$body['claim_number']??''));
+    if($syncMode==='single'){
+        $sinceDate=null;
+        if($claimNumber==='')apiError(409,'Für den Einzelfall-Vollimport muss eine Schadennummer angegeben werden.');
+        if(mb_strlen($claimNumber)>120)apiError(409,'Die Schadennummer darf höchstens 120 Zeichen enthalten.');
+    }else{
+        $claimNumber='';
+    }
     if($syncMode==='tasks'&&$profile==='jens'&&(cqIsCentralAgent($user)||cqProfile($user)==='christian'))$allowed[]='jens';
     if(!in_array($profile,$allowed,true))apiError(409,'ClaimsForce-Profil und ausgewählter Sachverständiger stimmen nicht überein.');
     $stop=db()->prepare("UPDATE claimsforce_import_jobs SET status='failed',message='Durch einen neuen manuellen Import ersetzt.',phase='CF-FAIL-REPLACED',heartbeat_at=NOW(),finished_at=NOW() WHERE requested_by=:u AND profile=:p AND status IN ('queued','running')");
     $stop->execute([':p'=>$profile,':u'=>(string)($user['email']??'')]);
-    $s=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,sync_mode,since_date,created_at) VALUES(:p,'queued',:u,:m,'CF-QUEUED',:mode,:since,NOW())");
-    $s->execute([':p'=>$profile,':u'=>(string)($user['email']??''),':m'=>$syncMode==='full'?'Vollständiger ClaimsForce-Abgleich wartet auf die zentrale Importstation.':'Import wartet auf die zentrale Importstation.',':mode'=>$syncMode,':since'=>$sinceDate]);
+    $s=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,sync_mode,since_date,claim_number,created_at) VALUES(:p,'queued',:u,:m,'CF-QUEUED',:mode,:since,:claim,NOW())");
+    $s->execute([':p'=>$profile,':u'=>(string)($user['email']??''),':m'=>$syncMode==='full'?'Vollständiger ClaimsForce-Abgleich wartet auf die zentrale Importstation.':($syncMode==='single'?'Einzelfall-Vollimport wartet auf die zentrale Importstation.':'Import wartet auf die zentrale Importstation.'),':mode'=>$syncMode,':since'=>$sinceDate,':claim'=>$claimNumber!==''?$claimNumber:null]);
     apiJson(['ok'=>true,'job'=>cqRow((int)db()->lastInsertId())]);
 }
 if($action==='status'){
@@ -148,7 +158,7 @@ if($action==='schedule'){
     $weekday=(int)$now->format('N');
     $clock=(int)$now->format('Hi');
     if($weekday>5||$clock<300||$clock>=1000)apiJson(['ok'=>true,'scheduled'=>false,'reason'=>'outside-window']);
-    $s=db()->prepare("INSERT IGNORE INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,schedule_key,sync_mode,since_date,created_at) VALUES(:p,'queued',:u,'Automatischer ClaimsForce-Abgleich wartet auf die zentrale Importstation.','CF-AUTO-QUEUED',:k,:mode,NULL,NOW())");
+    $s=db()->prepare("INSERT IGNORE INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,schedule_key,sync_mode,since_date,claim_number,created_at) VALUES(:p,'queued',:u,'Automatischer ClaimsForce-Abgleich wartet auf die zentrale Importstation.','CF-AUTO-QUEUED',:k,:mode,NULL,NULL,NOW())");
     $legacySchedule=$now->format('Y-m-d');
     $legacy=db()->prepare('SELECT sync_mode FROM claimsforce_import_jobs WHERE schedule_key=:k LIMIT 1');
     $scheduled=[];

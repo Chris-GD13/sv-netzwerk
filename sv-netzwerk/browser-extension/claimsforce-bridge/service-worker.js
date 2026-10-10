@@ -304,13 +304,11 @@ async function requestJson(url, token, optional = false, timeout = 20000) {
     const response = await fetch(url, { headers: authHeaders(token), signal: controller.signal });
     if (optional && response.status === 404) return null;
     if (!response.ok) {
-      if (optional) return null;
       throw new Error(`ClaimsForce-Abruf fehlgeschlagen (${response.status}).`);
     }
     return await response.json();
   }
   catch (error) {
-    if (optional) return null;
     if (String(error?.message || '').startsWith('ClaimsForce-Abruf fehlgeschlagen')) throw error;
     throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Abruf hat das Zeitlimit überschritten.' : 'ClaimsForce-Abruf ist fehlgeschlagen.');
   } finally { clearTimeout(timer); }
@@ -461,7 +459,9 @@ async function ensureInvoicedListTab(tabId){
 }
 
 async function runImport(run) {
-  const portalTabId = () => Number(run.portalTabId || 0), profile = profileKey(run.profile), fullSync = run.mode === 'full' || !!run.full;
+  const portalTabId = () => Number(run.portalTabId || 0), profile = profileKey(run.profile), singleClaimNumber = String(run.claimNumber || '').trim(), singleSync = run.mode === 'single' || singleClaimNumber !== '', fullSync = run.mode === 'full' || !!run.full;
+  const useInvoicedClaims = fullSync || singleSync;
+  if (singleSync && !singleClaimNumber.replace(/[^A-Za-z0-9]/g, '')) throw new Error('[CF-SINGLE-01] Für den Einzelfallimport fehlt die Schadennummer.');
   run.profile = profile;
   await chrome.storage.session.set({ activeProfile: profile });
   await resetClaimsSession(run);
@@ -484,26 +484,31 @@ async function runImport(run) {
   catch (error) { throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Konfiguration hat das Zeitlimit überschritten.' : 'ClaimsForce-Konfiguration konnte nicht geladen werden.'); }
   finally { clearTimeout(configTimer); }
   const claimsById = new Map(), bucketCounts = {};
-  if (fullSync) {
-    await diagnostic(run, 'CF-FULL-04', `Vollabgleich der ClaimsForce-Kostennoten ab ${run.since || 'ohne Datumsgrenze'}: Schadennummern aus „/invoiced“ werden eingelesen.`, { since: run.since || '', strategy: 'invoiced-claims' });
+  if (useInvoicedClaims) {
+    const fullSyncWindow = run.since ? `ab ${run.since}` : 'ohne Datumsgrenze';
+    await diagnostic(run, 'CF-FULL-04', singleSync ? `Einzelfall-Vollimport für Schadennummer ${singleClaimNumber}: Fall-ID aus „/invoiced“ wird ermittelt.` : `Vollabgleich der ClaimsForce-Kostennoten ${fullSyncWindow}: Schadennummern aus „/invoiced“ werden eingelesen.`, { since: run.since || '', strategy: 'invoiced-claims', claimNumber: singleClaimNumber });
     await ensureInvoicedListTab(tab.id);
-    const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
+    const scraped = singleSync
+      ? await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER', damageNumber: singleClaimNumber })
+      : await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
     if (!scraped?.ok) throw new Error(scraped?.error || '[CF-INVOICED-01] Schadennummern aus „/invoiced“ konnten nicht gelesen werden.');
     if (String(scraped.route || '').replace(/\/+$/, '') !== '/invoiced') throw new Error(`[CF-INVOICED-01] Kostennotenliste nicht bestätigt (Route ${safeRoute((await chrome.tabs.get(tab.id)).url)}).`);
     const allClaims = Array.isArray(scraped?.claims) ? scraped.claims : [];
     for (const claim of allClaims) if (claim?.id) claimsById.set(claim.id, claim);
     bucketCounts.INVOICED_CLAIMS = allClaims.length;
-    await progress(portalTabId(), `${claimsById.size} Schäden aus „/invoiced“ gefunden; anschließend werden Falldaten, Nachrichten und Anhänge einzeln abgeglichen.`, 0, claimsById.size);
-    await diagnostic(run, 'CF-INVOICED-01', `${claimsById.size} Schäden aus der ClaimsForce-Kostennotenliste erkannt.`, {
+    await progress(portalTabId(), singleSync ? `Schadennummer ${singleClaimNumber} wurde zugeordnet; Falldaten, Nachrichten und Anhänge werden vollständig abgeglichen.` : `${claimsById.size} Schäden aus „/invoiced“ gefunden; anschließend werden Falldaten, Nachrichten und Anhänge einzeln abgeglichen.`, 0, claimsById.size);
+    await diagnostic(run, 'CF-INVOICED-01', singleSync ? `Einzelfall ${singleClaimNumber} wurde in der ClaimsForce-Kostennotenliste erkannt.` : `${claimsById.size} Schäden aus der ClaimsForce-Kostennotenliste erkannt.`, {
       count: claimsById.size,
+      importedCount: claimsById.size,
       listedCount: scraped.listedCount || 0,
       observedCount: scraped.observedCount || 0,
       searchResolvedCount: scraped.searchResolvedCount || 0,
       pages: scraped.pages || 0,
       route: scraped.route,
-      bridge: BRIDGE_VERSION
+      bridge: BRIDGE_VERSION,
+      claimNumber: singleClaimNumber
     });
-    await diagnostic(run, 'CF-LIST-05', `${claimsById.size} unterschiedliche Schäden aus „/invoiced“ erkannt.`, {
+    await diagnostic(run, 'CF-LIST-05', singleSync ? `${claimsById.size} ausgewählter Schaden aus „/invoiced“ erkannt.` : `${claimsById.size} unterschiedliche Schäden aus „/invoiced“ erkannt.`, {
       count: claimsById.size,
       invoicedClaimCount: allClaims.length,
       since: run.since || '',
@@ -530,7 +535,7 @@ async function runImport(run) {
     const state = await chrome.tabs.sendMessage(tab.id, { type: 'SESSION_STATE' }).catch(() => ({}));
     throw new Error(`[CF-LIST-05] Keine Aufträge erkannt (Route ${state.route || 'unbekannt'}, API ${state.observedClaims || 0}).`);
   }
-  let filesDone = 0, messagesDone = 0, appointmentsDone = 0, skipped = 0, updated = 0, failed = 0;
+  let filesDone = 0, messagesDone = 0, appointmentsDone = 0, skipped = 0, updated = 0, failed = 0, firstError = '';
   for (let index = 0; index < claims.length; index++) {
     if (run.stopRequested) break;
     try {
@@ -540,7 +545,7 @@ async function runImport(run) {
     const preliminaryMeta = preliminaryState.result?.meta || {};
     // Ein Vollabgleich übernimmt nur noch Fälle, die noch nicht vollständig im Portal liegen (Signatur wird erst nach erfolgreichem Fall gespeichert); so setzt ein abgebrochener Lauf dort fort, wo er stand.
     const alreadyComplete = !!preliminaryState.result?.existed && !!preliminaryMeta.claimsforce_sync_signature;
-    if ((fullSync && alreadyComplete) || (!fullSync && preliminaryState.result?.existed && item.listVersion && preliminaryMeta.claimsforce_list_version === item.listVersion)) {
+    if ((fullSync && !singleSync && alreadyComplete) || (!useInvoicedClaims && preliminaryState.result?.existed && item.listVersion && preliminaryMeta.claimsforce_list_version === item.listVersion)) {
       skipped++;
       await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length}: seit dem letzten Import unverändert, wird ohne erneuten Detailabruf übersprungen.`, index + 1, claims.length);
       await diagnostic(run, 'CF-CASE-DELTA-SKIP', `Auftrag ${index + 1}/${claims.length} ist laut ClaimsForce-Änderungsstand unverändert.`, { current: index + 1, total: claims.length, claimIndex: index + 1, skippedCases: skipped });
@@ -623,7 +628,7 @@ async function runImport(run) {
       checkDeadline('Nachrichten');
       await diagnostic(run, 'CF-CASE-MESSAGE', `Auftrag ${index + 1}/${claims.length}: Nachrichten und Anhänge werden übertragen.`, { current: index, total: claims.length, claimIndex: index + 1 });
       const detail = message?.id ? await requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}/messages/${message.id}`, token, true) : message;
-      const record = unwrap(detail, 'message');
+      const record = detail == null ? message : unwrap(detail, 'message');
       const stamp = String(record?.sentAt || record?.createdAt || '').slice(0, 10) || 'ohne-Datum';
       const subject = safeFileName(record?.subject || record?.payload?.subject || record?.id, 'Nachricht');
       const bytes = new TextEncoder().encode(JSON.stringify(record, null, 2));
@@ -634,8 +639,16 @@ async function runImport(run) {
         const attachmentName = safeFileName(attachment.name || attachment.fileName || attachment.filename, 'Anhang-' + (attachment.id || crypto.randomUUID()));
         let attachmentBuffer = null;
         if (attachment.contentBytes) { const binary = atob(String(attachment.contentBytes)); const bytes = new Uint8Array(binary.length); for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i); attachmentBuffer = bytes.buffer; }
-        else if (attachment.id && record?.id) { const response = await fetch(config.COMMUNICATION_API_ENDPOINT + '/claims/' + encodeURIComponent(id) + '/messages/' + encodeURIComponent(record.id) + '/attachments/' + encodeURIComponent(attachment.id), { headers: { Authorization: 'Bearer ' + token }, signal: AbortSignal.timeout(30000) }).catch(() => null); if (response?.ok) attachmentBuffer = await response.arrayBuffer(); }
-        if (attachmentBuffer) await uploadBuffer(portalTabId(), profile, folderId, 'Mail_ClaimsForce-Anhang_' + stamp + '_' + attachmentName, attachment.mimeType || attachment.contentType || 'application/octet-stream', Date.parse(attachment.updatedAt || attachment.createdAt || '') || 0, attachmentBuffer);
+        else if (attachment.id && record?.id) {
+          const attachmentUrl = config.COMMUNICATION_API_ENDPOINT + '/claims/' + encodeURIComponent(id) + '/messages/' + encodeURIComponent(record.id) + '/attachments/' + encodeURIComponent(attachment.id);
+          let response;
+          try { response = await fetch(attachmentUrl, { headers: { Authorization: 'Bearer ' + token }, signal: AbortSignal.timeout(30000) }); }
+          catch (error) { throw new Error(error?.name === 'TimeoutError' ? `Mail-Anhang „${attachmentName}“ hat das Zeitlimit überschritten.` : `Mail-Anhang „${attachmentName}“ konnte nicht geladen werden.`); }
+          if (!response.ok) throw new Error(`Mail-Anhang „${attachmentName}“ konnte nicht geladen werden (${response.status}).`);
+          attachmentBuffer = await response.arrayBuffer();
+        }
+        if (attachmentBuffer === null) throw new Error(`Mail-Anhang „${attachmentName}“ enthält keine abrufbaren Dateidaten.`);
+        await uploadBuffer(portalTabId(), profile, folderId, 'Mail_ClaimsForce-Anhang_' + stamp + '_' + attachmentName, attachment.mimeType || attachment.contentType || 'application/octet-stream', Date.parse(attachment.updatedAt || attachment.createdAt || '') || 0, attachmentBuffer);
       }
     }
     if (!['christian', 'jens'].includes(profile)) {
@@ -651,28 +664,32 @@ async function runImport(run) {
     } catch (error) {
       failed++;
       const message = String(error?.message || 'Portal-Falloperation fehlgeschlagen.').slice(0, 500);
+      if (!firstError) firstError = message;
       await diagnostic(run, 'CF-CASE-FAIL', `Auftrag ${index + 1}/${claims.length} wurde übersprungen: ${message}`, { current: index + 1, total: claims.length, claimIndex: index + 1, failedCases: failed });
       await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length} fehlgeschlagen, nächster Auftrag wird verarbeitet.`, index + 1, claims.length);
     }
   }
-  const sourceSummary = fullSync ? ` (${bucketCounts.INVOICED_CLAIMS || 0} aus Kostennoten)` : '';
+  const sourceSummary = useInvoicedClaims ? ` (${bucketCounts.INVOICED_CLAIMS || 0} aus Kostennoten)` : '';
   await progress(portalTabId(), `${claims.length} Fälle${sourceSummary} geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${failed} fehlgeschlagen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
   await chrome.storage.session.set({ claimsLoggedProfile: profile });
   await chrome.storage.local.set({ claimsLoggedProfile: profile });
-  return { claims: claims.length, openTasks, updated, skipped, failed, files: filesDone, messages: messagesDone, notes: claims.length, appointments: appointmentsDone, sources: fullSync ? bucketCounts : {} };
+  if (failed > 0 && failed === claims.length) throw new Error(`[CF-CASE-ALL] Alle ${failed} Aufträge sind fehlgeschlagen. Erste Ursache: ${firstError}`.slice(0, 480));
+  return { claims: claims.length, openTasks, updated, skipped, failed, firstError, claimNumber: singleClaimNumber, files: filesDone, messages: messagesDone, notes: claims.length, appointments: appointmentsDone, sources: useInvoicedClaims ? bucketCounts : {} };
 }
 
 async function startImport(sender, message) {
   const portalTabId = sender.tab?.id;
   if (!portalTabId) return { ok: false, error: '[CF-RUN-00] Portal-Registerkarte fehlt.' };
-  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), mode: message.mode === 'tasks' ? 'tasks' : message.mode === 'full' || message.full ? 'full' : 'quick', since: String(message.since || ''), portalTabId, startedAt: new Date().toISOString() };
+  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), mode: message.mode === 'tasks' ? 'tasks' : message.mode === 'single' ? 'single' : message.mode === 'full' || message.full ? 'full' : 'quick', claimNumber: String(message.claimNumber || ''), since: String(message.since || ''), portalTabId, startedAt: new Date().toISOString() };
   if (runningImport) {
     if (runningImport.jobId === requested.jobId && runningImport.profile === requested.profile) {
       runningImport.portalTabId = portalTabId;
       await chrome.storage.local.set({ claimsActiveRun: { ...runningImport, status: 'running', updatedAt: new Date().toISOString() } });
       return { ok: true, accepted: true, resumed: true, runId: runningImport.runId };
     }
-    return { ok: false, error: '[CF-RUN-00] Ein anderer ClaimsForce-Import läuft bereits.' };
+    runningImport.stopRequested = true;
+    for (let i = 0; i < 120 && runningImport; i++) await new Promise(resolve => setTimeout(resolve, 500));
+    if (runningImport) return { ok: false, error: '[CF-RUN-00] Ein alter ClaimsForce-Import hängt noch. Bitte Edge neu starten oder die Erweiterung neu laden.' };
   }
   const saved = (await chrome.storage.local.get('claimsActiveRun')).claimsActiveRun;
   const resumesSaved = saved?.status === 'running' && saved.jobId === requested.jobId && saved.profile === requested.profile;

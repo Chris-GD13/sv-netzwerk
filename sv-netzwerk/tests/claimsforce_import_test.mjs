@@ -156,7 +156,7 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
       return [];
     }
   },
-  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.52' }) } },
+  chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.53' }) } },
   Event,
   HTMLInputElement: MockInput,
   setTimeout,
@@ -173,10 +173,15 @@ assert.equal(scrapeProgress[0].searchResolvedCount, virtualCases.length);
 assert.equal(numberOnlyScrape.claims.length, virtualCases.length, 'Beim virtuellen Scrollen müssen alle Schadennummern einzeln aufgelöst werden');
 assert.equal(misleadingNextClicks, 0, 'Bei einer scrollbaren Liste darf eine nicht zur Liste gehörende Weiter-Schaltfläche keine Pagination vortäuschen');
 assert(numberOnlyScrape.claims.some(claim => claim.id === virtualCases[4][1]), 'Alphanumerische Schadennummern werden einzeln zugeordnet');
+const singleClaimScrape = await new Promise(resolve => noLinkScrapeListener({ type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER', damageNumber: virtualCases[3][0] }, {}, resolve));
+assert.equal(singleClaimScrape.ok, true, `Einzelfall-Suche findet die angegebene Schadennummer direkt: ${JSON.stringify(singleClaimScrape)}`);
+assert.equal(singleClaimScrape.claims.length, 1, 'Einzelfall-Suche gibt genau einen Treffer zurück');
+assert.equal(singleClaimScrape.claims[0].id, virtualCases[3][1]);
+assert.equal(singleClaimScrape.claims[0].label, virtualCases[3][0]);
 assert(numberOnlyScrape.claims.some(claim => claim.id === virtualCases[5][1]), 'Punktgetrennte Schadennummern werden einzeln zugeordnet');
 assert(numberOnlyScrape.claims.some(claim => claim.label === 'HS74698170-0160'), 'ClaimsForce-Schadennummern mit Präfix werden vollständig übernommen');
 assert(virtualCases.every(([number]) => searchedNumbers.includes(number)), 'Jede aus der Liste gelesene Schadennummer wird einzeln in ClaimsForce gesucht');
-assert.equal(searchText, '', 'Einzelsuche wird nach der Zuordnung geleert');
+assert.equal(searchText, virtualCases[3][0], 'ClaimsForce-Suchfeld wird gezielt auf die angeforderte Schadennummer gesetzt');
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://www.sv-netzwerk.eu/intern/*')));
 assert(manifest.content_scripts.some(entry => entry.matches.includes('https://claimsforce.eu.auth0.com/*')));
 assert(manifest.content_scripts.some(entry => entry.js.includes('login-helper.js') && entry.matches.includes('https://*.claimsforce.com/*') && !entry.exclude_matches), 'ClaimsForce-Anmeldehilfe muss auch auf web.claimsforce.com/login laufen');
@@ -207,9 +212,9 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20261008-10'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
-assert(portal.includes('leer = alle Fälle') && portal.includes('ClaimsForce-Fälle vollständig einlesen'), 'Der Vollabgleich erklärt den unbegrenzten Zeitraum verständlich');
-assert(dashboard.includes('<input id="vf-claims-since" type="date">') && !dashboard.includes('value="2026-01-01"'), 'Dashboard-Vollabgleich darf alte Fälle nicht durch einen voreingestellten Stichtag ausschließen');
+assert(portal.includes('claimsforce-central.js?v=20261010-1'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('Schadennummer für Vollimport') && portal.includes('Diesen Schaden vollständig einlesen'), 'Der Vollimport ist als gezielter Einzelfallimport mit Schadennummer beschrieben');
+assert(dashboard.includes('<input id="vf-claims-number" type="text">') && !dashboard.includes('value="2026-01-01"'), 'Dashboard-Host stellt das Feld für die Einzelfall-Schadennummer ohne voreingestellten Filter bereit');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(portal.includes(`<option value="${key}">${label}</option>`), `${label} ist als Bearbeiterprofil auswählbar`);
 assert(!portal.includes('<option value="susanne"') && !portal.includes('Susanne Wächter</option>'), 'Susanne darf nicht als eigenes Bearbeiterprofil erscheinen');
 assert(portal.includes("sessionStorage.removeItem('svnet-case')") && portal.includes("localStorage.removeItem('svnet-case')"), 'Profilwechsel löscht den aktiven Fall aus beiden Browser-Speichern');
@@ -243,7 +248,11 @@ assert(claimsMain.includes('response.clone().json()') && claimsMain.includes('CL
 assert(claimsMain.includes('inspectTokenCache') && claimsMain.includes('inspectStorage(localStorage)'), 'Ein vorhandenes ClaimsForce-Token wird nach einem Worker-Neustart auch aus dem Auth-Cache wiederhergestellt');
 const importWorker = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8');
 assert(importWorker.includes("strategy: 'invoiced-claims'") && importWorker.includes('bucketCounts.INVOICED_CLAIMS') && importWorker.includes('Schadennummern aus „/invoiced“'), 'Vollabgleich verwendet die vollständige Kostennotenliste als Ausgangspunkt');
-assert(importWorker.includes('(fullSync && alreadyComplete)') && importWorker.includes('fileVersions, messageVersions, appointmentVersions, notes'), 'Nach dem Erstabgleich werden Mails, Notizen, Termine und Dateien per Signatur erneut geprüft und unveränderte Fälle übersprungen');
+assert(importWorker.includes('(fullSync && !singleSync && alreadyComplete)') && importWorker.includes('fileVersions, messageVersions, appointmentVersions, notes') && importWorker.includes('claimNumber'), 'Nach dem Erstabgleich werden Mails, Notizen, Termine und Dateien per Signatur erneut geprüft; der Einzelfallimport bleibt gezielt erzwingbar');
+assert(importWorker.includes("type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER'") && claimsPageBridge.includes("message?.type === 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER'") && claimsPageBridge.includes('Schadennummer ${damageNumber} wurde in der ClaimsForce-Kostennotenliste nicht gefunden'), 'Der Einzelfall-Vollimport löst nur die eingegebene Schadennummer auf statt alle Kostennoten abzugleichen');
+assert(importWorker.includes('if (attachmentBuffer === null) throw new Error') && importWorker.includes('Mail-Anhang „${attachmentName}“ konnte nicht geladen werden'), 'Nicht herunterladbare Mail-Anhänge müssen den Import als fehlgeschlagen melden statt unbemerkt ausgelassen zu werden');
+const claimsRequestJson = importWorker.slice(importWorker.indexOf('async function requestJson'), importWorker.indexOf('const INVESTIGATION_QUERIES'));
+assert(!claimsRequestJson.includes('if (optional) return null;') && claimsRequestJson.includes('if (optional && response.status === 404) return null;'), 'Optionale ClaimsForce-Bereiche dürfen nur bei HTTP 404 leer bleiben; Netzwerk- und Serverfehler müssen sichtbar fehlschlagen');
 
 const vault = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/vault.js'), 'utf8');
 assert(vault.includes('credentials_${profile}') && vault.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens']"), 'Zugänge werden nur für die vier unterstützten Sachverständigen-Profile getrennt gespeichert');
@@ -292,7 +301,7 @@ assert(queue.includes("$action==='schedule'") && queue.includes("new DateTimeZon
 assert(queue.includes('$weekday>5||$clock<300||$clock>=1000'), 'Automatik darf nur Montag bis Freitag ab 03:00 Uhr innerhalb des Nachholfensters eingeplant werden');
 assert(queue.includes('uq_claims_schedule_key') && queue.includes('INSERT IGNORE INTO claimsforce_import_jobs'), 'Pro Arbeitstag, Profil und Importmodus darf höchstens ein Automatikauftrag entstehen');
 assert(queue.includes('foreach(svnetSupportedProfiles()as$profile)') && queue.includes("'CF-AUTO-QUEUED'"), 'Werktagsautomatik reiht alle unterstützten ClaimsForce-Profile ein');
-assert(queue.includes('schedule_key,sync_mode,since_date,created_at') && queue.includes("foreach(['quick','full']as$mode)") && queue.includes("'-'.$mode") && queue.includes("':mode'=>$mode") && queue.includes('ClaimsForce-Abgleich'), 'Der idempotente Werktagslauf plant neue Planungsfälle und Kostennoten-Vollabgleich ohne Stichtag ein');
+assert(queue.includes('schedule_key,sync_mode,since_date,claim_number,created_at') && queue.includes("foreach(['quick','full']as$mode)") && queue.includes("'-'.$mode") && queue.includes("':mode'=>$mode") && queue.includes('ClaimsForce-Abgleich'), 'Der idempotente Werktagslauf plant neue Planungsfälle und Kostennoten-Vollabgleich ohne Stichtag ein');
 assert(queue.includes('SELECT sync_mode FROM claimsforce_import_jobs WHERE schedule_key=:k LIMIT 1') && queue.includes("if($legacy->fetchColumn()===$mode)continue"), 'Migration der Tagesautomatik darf vorhandene Läufe desselben Modus nicht duplizieren');
 assert(queue.includes('claimsforce_task_status') && queue.includes("$action==='summary'"), 'Die offenen Claims-Aufgaben werden je Profil dauerhaft gespeichert und portalweit bereitgestellt');
 assert(queue.includes("'jens'=>'Jens'"), 'Jens besitzt einen eigenständigen Aufgabenstatus');
@@ -304,7 +313,7 @@ assert(queue.includes("is_numeric($result['openTasks']??null)") && queue.include
 assert(routing.includes("return ['christian', 'holger', 'marc', 'jens']"), 'Backoffice darf alle vier Bearbeiterprofile gezielt auswählen');
 assert(queue.includes("$action==='mine'") && queue.includes('WHERE requested_by=:u ORDER BY id DESC LIMIT 20'), 'Eigene Warteschlangenläufe müssen nach einem Portal-Neuladen wiedergefunden werden');
 const central = fs.readFileSync(path.join(root, 'public/intern/claimsforce-central.js'), 'utf8');
-assert(central.includes("button.addEventListener('click',()=>enqueue('quick'))") && central.includes("fullButton?.addEventListener('click',()=>enqueue('full'))"), 'Der obere Button bleibt beim Planungsschnellimport; nur der Vollabgleich nutzt Kostennoten');
+assert(central.includes("button.addEventListener('click',()=>enqueue('quick'))") && central.includes("fullButton?.addEventListener('click',()=>enqueue('single'))") && central.includes("payload.claimNumber=claimNumber"), 'Der obere Button bleibt beim Planungsschnellimport; der Einzelfallimport nutzt die eingegebene Schadennummer');
 assert(central.includes('window.svnetDriveStatus?window.svnetDriveStatus()'), 'Die Claims-Zentrale verwendet den gemeinsamen Drive-Status statt eines eigenen Abrufs');
 assert(central.includes("action=status&id=") && central.includes("SVNET_CLAIMS_IMPORT_START"), 'Portal kann zentrale Importe starten und verfolgen');
 assert(!central.includes("job.profile==='jens'?'christian':job.profile") && central.includes("const target=String(job.profile||'')"), 'Jens darf beim Import nicht auf Christians Portalordner umgeschrieben werden');
