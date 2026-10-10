@@ -409,7 +409,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           return;
         }
       }
-      throw new Error(`[CF-SINGLE-01] Schadennummer ${damageNumber} wurde über die ClaimsForce-Suche nicht gefunden.`);
+      throw new Error(`[CF-SINGLE-01] Schadennummer ${damageNumber} wurde über die ClaimsForce-Suche nicht gefunden. Die Suche muss den Fall exakt anzeigen.`);
     })().catch(error => sendResponse({ ok: false, error: error.message }));
     return true;
   }

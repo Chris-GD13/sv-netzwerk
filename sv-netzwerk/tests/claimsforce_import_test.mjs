@@ -180,7 +180,7 @@ assert.equal(singleClaimScrape.ok, true, `Einzelfall-Suche findet die Schadennum
 assert.equal(singleClaimScrape.claims.length, 1, 'Einzelfall-Suche gibt genau einen Treffer zurück');
 assert.equal(singleClaimScrape.claims[0].id, virtualCases[3][1]);
 assert.equal(singleClaimScrape.claims[0].label, virtualCases[3][0]);
-assert.equal(singleClaimScrape.route, '/planning', 'Einzelfall-Suche bleibt auf der aktuellen ClaimsForce-Seite');
+assert.equal(singleClaimScrape.route, '/planning', 'Einzelfall-Suche meldet die Ausgangsseite ohne das Content-Script während der Antwort zu navigieren');
 assert(numberOnlyScrape.claims.some(claim => claim.id === virtualCases[5][1]), 'Punktgetrennte Schadennummern werden einzeln zugeordnet');
 assert(numberOnlyScrape.claims.some(claim => claim.label === 'HS74698170-0160'), 'ClaimsForce-Schadennummern mit Präfix werden vollständig übernommen');
 assert(virtualCases.every(([number]) => searchedNumbers.includes(number)), 'Jede aus der Liste gelesene Schadennummer wird einzeln in ClaimsForce gesucht');
@@ -253,6 +253,7 @@ const importWorker = fs.readFileSync(path.join(root, 'browser-extension/claimsfo
 assert(importWorker.includes("singleSync ? 'current-page-damage-number-search' : 'invoiced-claims'") && importWorker.includes('bucketCounts.INVOICED_CLAIMS') && importWorker.includes('Schadennummern aus „/invoiced“'), 'Nur der Sammelabgleich verwendet die vollständige Kostennotenliste als Ausgangspunkt');
 assert(importWorker.includes('(fullSync && !singleSync && alreadyComplete)') && importWorker.includes('fileVersions, messageVersions, appointmentVersions, notes') && importWorker.includes('claimNumber'), 'Nach dem Erstabgleich werden Mails, Notizen, Termine und Dateien per Signatur erneut geprüft; der Einzelfallimport bleibt gezielt erzwingbar');
 assert(importWorker.includes("type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER'") && claimsPageBridge.includes("message?.type === 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER'") && claimsPageBridge.includes('Schadennummer ${damageNumber} wurde über die ClaimsForce-Suche nicht gefunden'), 'Der Einzelfall-Vollimport löst nur die angegebene Schadennummer über die globale Suche auf');
+assert(importWorker.includes('await openSelectedClaimTab(tab.id, allClaims[0].id)') && importWorker.includes('chrome.tabs.update(tabId, { url: selectedUrl })') && importWorker.includes("!route.endsWith('/redirect')"), 'Service Worker öffnet erst nach Fallauflösung den exakten ClaimsForce-Treffer und wartet auf die Zieldetailseite');
 assert(importWorker.includes('if (attachmentBuffer === null) throw new Error') && importWorker.includes('Mail-Anhang „${attachmentName}“ konnte nicht geladen werden'), 'Nicht herunterladbare Mail-Anhänge müssen den Import als fehlgeschlagen melden statt unbemerkt ausgelassen zu werden');
 const claimsRequestJson = importWorker.slice(importWorker.indexOf('async function requestJson'), importWorker.indexOf('const INVESTIGATION_QUERIES'));
 assert(!claimsRequestJson.includes('if (optional) return null;') && claimsRequestJson.includes('if (optional && response.status === 404) return null;'), 'Optionale ClaimsForce-Bereiche dürfen nur bei HTTP 404 leer bleiben; Netzwerk- und Serverfehler müssen sichtbar fehlschlagen');

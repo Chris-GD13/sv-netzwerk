@@ -458,6 +458,29 @@ async function ensureInvoicedListTab(tabId){
   throw new Error('ClaimsForce-Kostennotenliste unter /invoiced konnte nicht geöffnet werden.');
 }
 
+async function openSelectedClaimTab(tabId, claimId) {
+  const expected = String(claimId || '').toLowerCase();
+  if (!/^[0-9a-f-]{20,}$/.test(expected)) throw new Error('[CF-SINGLE-01] ClaimsForce-Suche hat keine gültige Fall-ID geliefert.');
+  const selectedUrl = `https://web.claimsforce.com/claims/${expected}/redirect`;
+  const current = await chrome.tabs.get(tabId);
+  const currentUrl = new URL(String(current.url || ''));
+  const currentRoute = currentUrl.pathname.replace(/\/+$/, '').toLowerCase();
+  if (currentUrl.origin !== 'https://web.claimsforce.com' || !currentRoute.startsWith(`/claims/${expected}/`) || currentRoute.endsWith('/redirect')) {
+    await chrome.tabs.update(tabId, { url: selectedUrl });
+  }
+  const deadline = Date.now() + 20000;
+  while (Date.now() < deadline) {
+    const tab = await chrome.tabs.get(tabId);
+    const url = new URL(String(tab.url || ''));
+    const route = url.pathname.replace(/\/+$/, '').toLowerCase();
+    if (url.origin === 'https://web.claimsforce.com' && route.startsWith(`/claims/${expected}/`) && !route.endsWith('/redirect')) {
+      if (tab.status === 'complete') return tab;
+    }
+    await sleep(250);
+  }
+  throw new Error('[CF-SINGLE-01] Der exakte ClaimsForce-Suchtreffer wurde nicht geöffnet. Bitte prüfen, ob der Eintrag aus „Suchergebnisse“ angeklickt wurde.');
+}
+
 async function runImport(run) {
   const portalTabId = () => Number(run.portalTabId || 0), profile = profileKey(run.profile), singleClaimNumber = String(run.claimNumber || '').trim(), singleSync = run.mode === 'single' || singleClaimNumber !== '', fullSync = run.mode === 'full' || !!run.full;
   const useInvoicedClaims = fullSync || singleSync;
@@ -495,6 +518,10 @@ async function runImport(run) {
     const scrapedRoute = String(scraped.route || '').replace(/\/+$/, '');
     if (!singleSync && scrapedRoute !== '/invoiced') throw new Error(`[CF-INVOICED-01] Kostennotenliste nicht bestätigt (Route ${safeRoute((await chrome.tabs.get(tab.id)).url)}).`);
     const allClaims = Array.isArray(scraped?.claims) ? scraped.claims : [];
+    if (singleSync) {
+      if (allClaims.length !== 1 || !allClaims[0]?.id) throw new Error('[CF-SINGLE-01] ClaimsForce-Suche hat nicht genau einen Fall geliefert.');
+      await openSelectedClaimTab(tab.id, allClaims[0].id);
+    }
     for (const claim of allClaims) if (claim?.id) claimsById.set(claim.id, claim);
     bucketCounts.INVOICED_CLAIMS = allClaims.length;
     await progress(portalTabId(), singleSync ? `Schadennummer ${singleClaimNumber} wurde über die globale ClaimsForce-Suche gefunden; Falldaten, Nachrichten und Anhänge werden vollständig abgeglichen.` : `${claimsById.size} Schäden aus „/invoiced“ gefunden; anschließend werden Falldaten, Nachrichten und Anhänge einzeln abgeglichen.`, 0, claimsById.size);
