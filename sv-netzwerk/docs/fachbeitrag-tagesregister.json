@@ -110,12 +110,20 @@
         "title": "Fenstermontage und Anschlussfugen: Mängel fachlich prüfen und Nachbesserung begründen",
         "slug": "fenstermontage-anschlussfugen-maengel-nachbesserung",
         "url": "https://www.sv-netzwerk.eu/fachwissen/fenstermontage-anschlussfugen-maengel-nachbesserung/",
-        "status": "reserved",
+        "status": "live-content-rejected",
         "owner": "codex-window-recovery-20261010-01a11f08",
-        "reserved_at": "2026-10-10T08:49:02.973Z"
+        "reserved_at": "2026-10-10T08:49:02.973Z",
+        "commit": "78ccc16630b8fbd7fd995c204363aae17ecd09dc",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38040155499",
+        "live_content_checked_at": "2026-10-10T09:09:38.337Z",
+        "verification_note": "Artikel, Datum, Bild, Canonical, Übersicht, Suchindex, Sitemap und Deployment-Kennung live geprüft; Workflow-Abschluss nicht bestätigt. Anschließend Nutzerstopp wegen inhaltlicher Ablehnung. Kein freigegebener Veröffentlichungserfolg."
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "blocked-user-content-rejected",
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/fenstermontage-anschlussfugen-maengel-nachbesserung/",
+        "blocked_at": "2026-10-10T09:14:14.884Z",
+        "reason": "Direkter Nutzerstopp: ich habe ihn gestoppt, der inhalt ist blödsinn. Nachfolgende Beanstandung der Formulierung zum Nachstellen. Posten wurde durch den Agenten nie geklickt. Keine Wiederaufnahme ohne neue ausdrückliche Freigabe.",
+        "proof_document": "docs/linkedin-veroeffentlichung-2026-10-10-fensterbau-gestoppt.md"
       },
       "recovery": {
         "authorized_by": "Direkter Nutzerauftrag im bestehenden Chat: dann jetzt veröffentlichen",
@@ -147,9 +155,15 @@
               }
             }
           }
-        ]
+        ],
+        "user_stop": {
+          "at": "2026-10-10T09:14:14.884Z",
+          "reason": "Inhalt abgelehnt; Aussage zum Nachstellen ausdrücklich beanstandet",
+          "publication_authorization": "revoked-for-this-content",
+          "linkedin_submitted": false
+        }
       }
     }
   },
-  "updated_at": "2026-10-10T08:49:02.975Z"
+  "updated_at": "2026-10-10T09:14:14.884Z"
 }
