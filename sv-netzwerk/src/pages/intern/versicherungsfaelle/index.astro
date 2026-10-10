@@ -150,6 +150,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   }
 })();
 </script>
+<script is:inline src="/intern/task-case-address.js"></script>
 <script is:inline>
 (() => {
   const params=new URLSearchParams(location.search), taskId=params.get('aufgabe')?.trim(), number=params.get('schaden_nr')?.trim(), manualFolder=params.get('fallordner')?.trim();
@@ -257,11 +258,22 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     try{
       const detail=await request(`${API}?action=detail&id=${encodeURIComponent(taskId)}`),task=detail.task||{},taskNumber=String(task.case_number||number||'').trim();
       let current=readCase();
+      if(manualFolder&&!taskNumber&&current?.folder_id!==manualFolder){
+        const loaded=await request(`${DRIVE}?action=load_case&id=${encodeURIComponent(manualFolder)}`);
+        if(!loaded.case?.id)throw Error('Der ausgewählte Fall konnte nicht geladen werden.');
+        current={folder_id:loaded.case.id,meta:loaded.case.meta||{}};
+        saveCase(current);
+      }
       const manuallySelected=current?.folder_id&&manualFolder===current.folder_id&&(!taskNumber||caseNumberKey(current.meta?.schaden_nr)===caseNumberKey(taskNumber));
       if(!manuallySelected&&(!taskNumber||!current?.folder_id||caseNumberKey(current.meta?.schaden_nr)!==caseNumberKey(taskNumber))){
         clearCase();
         const searchText=taskNumber||[task.subject,task.body].filter(Boolean).join(' ');
-        const found=await request(`${DRIVE}?action=search_cases&q=${encodeURIComponent(searchText)}`),rows=found.results||[];
+        const found=taskNumber?await request(`${DRIVE}?action=search_cases&q=${encodeURIComponent(searchText)}`):null;
+        let rows=found?found.results||[]:await window.SVNetTaskAddress.search(task,request);
+        if(!taskNumber&&!rows.length){
+          const fallback=await request(`${DRIVE}?action=search_cases&q=${encodeURIComponent(searchText)}`);
+          rows=fallback.results||[];
+        }
         const exact=taskNumber?rows.filter(r=>caseNumberKey(r.meta?.schaden_nr)===caseNumberKey(taskNumber)):[];
         const choices=taskNumber?exact:rows;
         if(exact.length===1){const row=exact[0],loaded=await request(`${DRIVE}?action=load_case&id=${encodeURIComponent(row.id)}`);saveCase({folder_id:loaded.case?.id||row.id,meta:{...(row.meta||{}),...(loaded.case?.meta||{})}});location.replace('/intern/versicherungsfaelle/?schaden_nr='+encodeURIComponent(taskNumber)+'&aufgabe='+encodeURIComponent(taskId));return}
