@@ -96,6 +96,7 @@ jobs:
           php tests/case_analysis_test.php
           php tests/case_analysis_worker_test.php
           php tests/case_work_test.php
+          node tests/case_work_ui_test.mjs
           php tests/case_rules_import_test.php
           node tests/claimsforce_single_scope_test.mjs
           node tests/claimsforce_worker_handshake_test.mjs

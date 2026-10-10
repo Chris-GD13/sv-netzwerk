@@ -16,6 +16,15 @@ Du kannst hier Quellen lesen, Ausarbeitungen speichern und Dokumentaufträge vor
 RULES;
 }
 
+function cwTaskRequests(string $instructions, array $task, array $otherTasks): array {
+    $requests=[['id'=>'request-1','request'=>trim($instructions)?:'Bitte abarbeiten']];
+    foreach([$task,...$otherTasks] as $item){
+        if(!$item)continue;
+        $requests[]=['id'=>'request-'.(count($requests)+1),'request'=>'Aktuelles Anliegen der zugeordneten Aufgabe: '.(string)($item['subject']??'Aufgabe ohne Betreff')];
+    }
+    return $requests;
+}
+
 function cwSender(array $user): array {
     $sender = krSenderProfile($user);
     if (str_contains(mb_strtolower((string)($sender['name'] ?? $user['name'] ?? '')), 'christian')) {
@@ -58,6 +67,7 @@ function cwReadRule(array $file, string $api, array &$uploads): array {
 function cwDocumentRequests(array $result): array {
     $allowed = ['erstbericht','erstbericht_sv_gf','zwischenbericht','schlussbericht','nachtrag_stellungnahme','zahlungsbefuerwortung','schlusserklaerung','rechnungsregister','query_form','kalkulation'];
     $out = [];
+    if(isset($result['document_requests'])&&(!is_array($result['document_requests'])||!array_is_list($result['document_requests'])))throw new RuntimeException('Dokumentaufträge müssen als Liste vorliegen.');
     foreach (($result['document_requests'] ?? []) as $item) {
         if (!is_array($item) || !in_array($item['type'] ?? '', $allowed, true)
             || !is_string($item['instructions'] ?? null) || trim($item['instructions']) === '') {

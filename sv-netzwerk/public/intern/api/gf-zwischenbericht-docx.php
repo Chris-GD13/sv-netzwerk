@@ -64,6 +64,8 @@ function gfZwischenberichtDocx(string $bytes, array $meta, array $result, string
         $signaturePr->appendChild($dom->createElementNS($ns,'w:keepLines'));
         foreach([5,8,14,17,20,23] as $slot){$p=$paragraphs->item($slot);$pr=$xp->query('./w:pPr',$p)->item(0);if(!$pr){$pr=$dom->createElementNS($ns,'w:pPr');$p->insertBefore($pr,$p->firstChild);}if(!$xp->query('./w:keepNext',$pr)->length)$pr->appendChild($dom->createElementNS($ns,'w:keepNext'));}
         foreach($xp->query('//w:tr') as $row){$pr=$xp->query('./w:trPr',$row)->item(0);if(!$pr){$pr=$dom->createElementNS($ns,'w:trPr');$row->insertBefore($pr,$row->firstChild);}if(!$xp->query('./w:cantSplit',$pr)->length)$pr->appendChild($dom->createElementNS($ns,'w:cantSplit'));}
+        // The original offers extra prose slots; unused slots must not force a signature-only page.
+        foreach([7,12,16] as $slot){$p=$paragraphs->item($slot);if(trim($p->textContent)==='')$p->parentNode->removeChild($p);}
         $zip->addFromString('word/document.xml',$dom->saveXML());
         $header=new DOMDocument();
         if(!$header->loadXML((string)$zip->getFromName('word/header1.xml'),LIBXML_NONET))throw new RuntimeException('Original-Berichtskopf fehlt.');

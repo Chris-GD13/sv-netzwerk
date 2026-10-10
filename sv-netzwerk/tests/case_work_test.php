@@ -4,6 +4,8 @@ require __DIR__.'/../public/intern/api/case-work-core.php';
 function krSenderProfile(array $user):array{return ['name'=>$user['full_name'],'email'=>$user['email']];}
 function check(bool $ok,string $message):void{if(!$ok)throw new RuntimeException($message);}
 $sender=cwSender(['full_name'=>'Christian Wächter','email'=>'cw@sv-schuett.eu']);
+$requests=cwTaskRequests('Bitte abarbeiten',[],[['subject'=>'26-123456-1 Rechnung']]);
+check(count($requests)===2&&$requests[1]['id']==='request-2','Task planning lost source task');
 check($sender['email']==='cw@sv-netzwerk.eu','Wrong sender');
 check(str_contains($sender['signature'],'Regulierer und Bausachverständiger'),'Missing role');
 $history=cwHistoryContext([['instructions'=>'Bitte nur 1.500 EUR empfehlen','created_at'=>'2026-10-10','result_json'=>json_encode(['reply_draft'=>'Entwurf','assessment'=>'Bewertung','open_points'=>['Zahlung nicht bestätigt']])]]);

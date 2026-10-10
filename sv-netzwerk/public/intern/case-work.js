@@ -121,6 +121,7 @@
     start.onclick=async()=>{
       const current=active();if(!current?.folder_id||busy)return;
       const version=epoch;busy=true;start.disabled=true;
+      notice('Arbeitsauftrag wird vorbereitet …');
       const instructions=order.value.trim()||'Bitte abarbeiten',requestKey=crypto.randomUUID();
       try{
         for(const file of Array.from(files.files)){

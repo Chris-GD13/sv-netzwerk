@@ -124,7 +124,9 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
         }
         $caseTasks = $work !== null ? cwCaseTasks($user, $meta, $files, $gaps, $taskId) : [];
         $requests = [];
-        if ($taskId !== '' || trim($instructions) !== '') {
+        if ($work !== null) {
+            $requests = cwTaskRequests($instructions, $task, $caseTasks);
+        } elseif ($taskId !== '' || trim($instructions) !== '') {
             caUpdate($job, 'running', 'Konkrete Anliegen der aktuellen Aufgabe werden erfasst.');
             $requests = caValidateTaskRequests(krOpenAiJson($api, [],
                 'Erfasse die konkret abzuarbeitenden Anliegen der aktuellen Nachricht und des ergänzenden Betreiberauftrags. '
