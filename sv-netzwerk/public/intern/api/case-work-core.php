@@ -70,6 +70,10 @@ function cwReadRule(array $file, string $api, array &$uploads): array {
     $cached=$s->fetchColumn();
     if($cached!==false)return caValidateEvidence(['documents'=>json_decode((string)$cached,true,512,JSON_THROW_ON_ERROR)],[$file]);
     $read=caReadBatch([$file],$api,$uploads,true);
+    if(!$read[0]['content_complete']||$read[0]['warnings']){
+        $read=caReadBatch([$file],$api,$uploads,true,[],
+            $read[0]['warnings']?:['Inhalt wurde nicht vollständig bestätigt. Gedruckte Inhalte und leere Vorlagenfelder erneut prüfen.']);
+    }
     if($read[0]['content_complete']&&!$read[0]['warnings']){
         $s=db()->prepare('INSERT IGNORE INTO case_work_rule_cache(cache_key,result_json,created_at) VALUES(:k,:r,NOW())');
         $s->execute([':k'=>$key,':r'=>json_encode($read,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)]);
