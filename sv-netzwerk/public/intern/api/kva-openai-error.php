@@ -11,6 +11,7 @@ function kvaOpenAiFailure(array $response, string $fallback): RuntimeException
     $message = match ($code) {
         'account_deactivated' => 'Die KVA-Auswertung ist derzeit nicht verfügbar: Das OpenAI-Konto des hinterlegten API-Zugangs ist deaktiviert (account_deactivated). Bitte den API-Kontozugang wiederherstellen. Ein erneuter Datei-Upload behebt diesen Zugangsfehler nicht.',
         'invalid_api_key' => 'Die KVA-Auswertung ist derzeit nicht verfügbar: Der hinterlegte OpenAI-API-Zugang ist ungültig. Bitte die Serverkonfiguration des API-Zugangs prüfen.',
+        'credit_balance_exhausted' => 'Die KVA-Auswertung ist derzeit nicht verfügbar: Das OpenAI-API-Guthaben ist aufgebraucht. Bitte im zugehörigen API-Konto Guthaben nachladen.',
         'insufficient_quota' => 'Die KVA-Auswertung ist derzeit nicht verfügbar: Das OpenAI-API-Guthaben oder Nutzungslimit ist ausgeschöpft. Bitte Guthaben und Limits des API-Kontos prüfen.',
         'rate_limit_exceeded' => 'Die KVA-Auswertung ist vorübergehend nicht verfügbar: Das OpenAI-Anfragelimit wurde erreicht. Bitte später erneut prüfen.',
         default => match (true) {

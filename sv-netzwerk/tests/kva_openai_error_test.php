@@ -11,6 +11,7 @@ foreach ([
     [401, 'account_deactivated', 'deaktiviert'],
     [401, 'invalid_api_key', 'ungültig'],
     [429, 'insufficient_quota', 'Guthaben'],
+    [429, 'credit_balance_exhausted', 'Guthaben nachladen'],
     [429, 'rate_limit_exceeded', 'Anfragelimit'],
     [403, '', 'Berechtigung'],
     [503, '', 'Störung'],
