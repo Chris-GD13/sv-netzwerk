@@ -6,6 +6,7 @@ $core = file_get_contents(__DIR__.'/../public/intern/api/kva-release-core-v2.php
 $page = file_get_contents(__DIR__.'/../src/pages/intern/versicherungsfaelle/index.astro');
 if (!is_string($api) || !is_string($core) || !is_string($page)) exit(1);
 require_once __DIR__.'/../public/intern/api/kva-contact-merge.php';
+require_once __DIR__.'/../public/intern/api/review-correspondence.php';
 if (!defined('KR_MEY_GENERALBAU_RECIPIENT')) define('KR_MEY_GENERALBAU_RECIPIENT', 'backoffice@meygeneralbau.de');
 
 function loadKvaFunction(string $source, string $name): void
@@ -31,6 +32,10 @@ $reviewed = krReviewedKva($preview, ['net'=>'19.842,16 €','gross'=>'23.612,18 
 if (abs($reviewed['net'] - 19842.16) > 0.001 || abs($reviewed['gross'] - 23612.18) > 0.001) throw new RuntimeException('Manuell ergänzte Beträge werden nicht übernommen.');
 if ($reviewed['subject'] !== 'Manuell geprüfte KVA-Freigabe' || !$reviewed['sparkasse']) throw new RuntimeException('Manuell geprüfte Angaben werden nicht vollständig übernommen.');
 if ($reviewed['email'] !== 'backoffice@meygeneralbau.de' || !$reviewed['mey_generalbau']) throw new RuntimeException('Mey-Generalbau-Freigaben werden nicht verbindlich ans Backoffice geroutet.');
+foreach (['Die KI hat den KVA geprüft.','Das ist als mitgeteilte Angabe dokumentiert, nicht als unabhängig nachgewiesene Freigabe.'] as $badText) {
+    try { krReviewedKva($preview,['net'=>'100','gross'=>'119','body'=>$badText]); throw new LogicException('Internal KVA text was accepted'); }
+    catch (RuntimeException $error) { if (!str_contains($error->getMessage(),'Korrespondenz')) throw $error; }
+}
 $meyCc = krMeyOperationalCc([
     'issuer_confirmed'=>true,
     'company_relation'=>'issuer',

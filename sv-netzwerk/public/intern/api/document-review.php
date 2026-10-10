@@ -87,6 +87,17 @@ try {
         apiJson(['ok'=>true,'files'=>$files,'reviews'=>array_slice($reviews,0,50),'sender'=>$profile['email'],'sender_name'=>$profile['name'],'signature'=>drSignature($profile['name'])]);
     }
     if ($_SERVER['REQUEST_METHOD']!=='POST') apiError(405,'POST erforderlich.');
+    if ($action === 'reopen') {
+        $id=(string)($input['record_id']??'');
+        $record=json_decode(drSelected($folder,$id)['bytes'],true,512,JSON_THROW_ON_ERROR);
+        if (($record['folder_id']??'')!==$folder || (int)($record['user_id']??0)!==(int)$user['id']) apiError(403,'Die Entscheidung gehört zu einem anderen Vorgang.');
+        if (($record['send_status']??'')!=='unsent') throw new RuntimeException('Die Mail ist bereits versendet oder der Versandstatus ist unklar. Bitte zuerst den Gesendet-Ordner prüfen.');
+        $source=drSelected($folder,$record['file_id']);drRecordSources($folder,$record);
+        if (!hash_equals($record['sha256'],hash('sha256',$source['bytes']))) throw new RuntimeException('Der Originalbeleg wurde geändert. Bitte erneut prüfen.');
+        $preview=array_intersect_key($record,array_flip(['user_id','folder_id','file_id','file_name','mime','sha256','kind','mode','analysis','reference_id','sources','comment','attach_support','case_no']));
+        $preview['issued']=time();$preview['key']=bin2hex(random_bytes(16));
+        apiJson(['ok'=>true,'token'=>krSign($preview),'kind'=>$record['kind'],'mode'=>$record['mode'],'analysis'=>$record['analysis']??null,'values'=>$record['values'],'file_id'=>$record['file_id'],'file_name'=>$record['file_name'],'reference_id'=>$record['reference_id']??'','sources'=>$record['sources']??[],'comment'=>$record['comment']??'','attach_support'=>$record['attach_support']??true,'case_no'=>$record['case_no']]);
+    }
     if ($action === 'prepare') {
         $kind=(string)($input['kind']??''); $mode=(string)($input['mode']??'');
         if (!in_array($kind,['invoice','offer'],true)||!in_array($mode,['review','direct'],true)) apiError(400,'Ungültige Auswahl.');
@@ -119,9 +130,11 @@ try {
         if (drStandalone($folder)) $preview['case_no']=trim((string)($input['case_no']??$preview['case_no']??''))?:'Freie Prüfung '.substr($folder,-8);
         $record=$preview+['case_no'=>krCaseNo($folder),'values'=>$values,'sender'=>$profile['email'],'sender_name'=>$profile['name'],'saved_at'=>gmdate('c'),'send_status'=>'unsent'];
         if ($record['case_no']==='') throw new RuntimeException('Die Schadennummer ist im Fall nicht hinterlegt.');
+        $record['mail_policy_version']=2;
         $record['subject']=drSubject($record);
+        $body=drBody($record);
         $saved=drStore($record);
-        apiJson(['ok'=>true,'record_id'=>$saved['id'],'file_name'=>$saved['name'],'subject'=>$record['subject'],'body'=>drBody($record),'sender'=>$record['sender']]);
+        apiJson(['ok'=>true,'record_id'=>$saved['id'],'file_name'=>$saved['name'],'subject'=>$record['subject'],'body'=>$body,'sender'=>$record['sender']]);
     }
     if ($action === 'send') {
         $id=(string)($input['record_id']??'');
@@ -135,6 +148,7 @@ try {
         try {
             $record=json_decode(drSelected($folder,$id)['bytes'],true,512,JSON_THROW_ON_ERROR);
             if ($record['send_status']!=='unsent') throw new RuntimeException('Versand bereits ausgeführt oder Ergebnis unklar. Bitte zuerst den Gesendet-Ordner prüfen.');
+            if (($record['mail_policy_version']??0)!==2) throw new RuntimeException('Bitte die Mail mit der aktuellen Textfassung erneut vorbereiten und die Vorschau kontrollieren. Der bisherige Entwurf wurde nicht versendet.');
             $profile=drReviewSender(krSenderProfile($user));
             $record['sender']=$profile['email'];
             $record['sender_name']=$profile['name'];

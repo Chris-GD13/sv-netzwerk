@@ -6,7 +6,7 @@ function fails(callable $fn,string $text):void { try {$fn();}catch(RuntimeExcept
 check(drMoney('9.760,16 €')===9760.16,'German cents');
 check(drMoney('9760.16')===9760.16,'Decimal API amount');
 check(drMoney(null)===null,'Unknown is not zero');
-check(drReviewSender(['name'=>'Christian Wächter','email'=>'cw@sv-schuett.eu'])['email']==='cw@sv-netzwerk.eu','Christian uses SV-Netzwerk sender');
+check(drReviewSender(['name'=>'Christian Wächter','email'=>'cw@sv-schuett.eu'])['email']==='cw@sv-schuett.eu','Christian uses the connected mailbox as sender');
 check(drReviewSender(['name'=>'Christian Wächter','email'=>'cw@sv-schuett.eu'])['mailbox']==='cw@sv-schuett.eu','Mailbox identity remains separate from From alias');
 check(drReviewSender(['name'=>'Marc Schütt','email'=>'ms@sv-schuett.eu'])['email']==='ms@sv-schuett.eu','Other profiles retained');
 $values=['company'=>'POLYGON Deutschland GmbH','number'=>'RE-17','date'=>'09.10.2026','gross'=>'1.190,00','net'=>'1.000,00','vat'=>'190,00','release_amount'=>'1.190,00','decision'=>'approved','reason'=>'Abschlagsrechnung','to'=>'versicherung@example.org','cc'=>'controlling@dieregulierer.de','bcc'=>'Archiv@sv.de'];
@@ -28,7 +28,7 @@ check($message['bccRecipients'][0]['emailAddress']['address']==='Archiv@sv.de','
 check(str_contains($message['body']['content'],'ohne erneute Prüfung'),'Direct wording');
 check(!str_contains($message['body']['content'],'Prüfergebnis:'),'Never claim a direct invoice was checked');
 check(str_contains($message['body']['content'],'1.190,00 EUR brutto'),'Exact cents in email');
-check(str_contains($message['body']['content'],'Bausachverständiger') && str_contains($message['body']['content'],'cw@sv-netzwerk.eu'),'Full Christian signature');
+check(str_contains($message['body']['content'],'Bausachverständiger') && str_contains($message['body']['content'],'cw@sv-schuett.eu'),'Full Christian signature with connected sender');
 check(!str_contains($message['body']['content'],'SV-Büro Marc Schütt'),'No wrong office in Christian signature');
 $rejected=drValidate(['mode'=>'review','analysis'=>['assessment'=>'Plausibility']],array_replace($values,['decision'=>'rejected','assessment'=>'Doppelt berechnet','review_confirmed'=>true,'reason'=>'Bereits abgerechnet']));
 check($rejected['release_amount']===0.0,'Rejected is never a payment');
@@ -36,6 +36,24 @@ $record['values']=$rejected;$record['mode']='review';$record['kind']='offer';
 $text=drBody($record);
 check(str_contains($text,'Angebot')&&str_contains($text,'nicht freigegeben'),'Separate offer rejection');
 check(!str_contains($text,'Freigabebetrag:'),'No release amount for rejection');
+check(str_contains($text,'Bereits abgerechnet')&&!str_contains($text,'Doppelt berechnet'),'Mail uses the human statement, not the internal assessment');
+$internal='Das ist als mitgeteilte Angabe dokumentiert, nicht als unabhängig nachgewiesene Freigabe. Offene Punkte: keine zusätzlichen Nachweise zu Leistungsumfang, Aufmaß, Zahlungsstand oder etwaigen Teilfreigaben im Belegsatz erkennbar. KI-Prüfvorschlag.';
+foreach (['invoice','offer'] as $kind) {
+    $human='Ich habe den Beleg geprüft. Bitte reichen Sie das Aufmaß für die noch nicht anerkannten Leistungen nach.';
+    $review=drValidate(['mode'=>'review','analysis'=>['assessment'=>$internal]],array_replace($values,['assessment'=>$internal,'review_confirmed'=>true,'reason'=>$human]));
+    $mail=drMessage(array_replace($record,['kind'=>$kind,'mode'=>'review','values'=>$review,'sender'=>'cw@sv-schuett.eu']),'original');
+    check(str_contains($mail['body']['content'],$human)&&!str_contains($mail['body']['content'],$internal),'Internal evidence notes never reach either mail kind');
+    check($mail['from']['emailAddress']['address']==='cw@sv-schuett.eu','Mail From uses the connected mailbox');
+    fails(fn()=>drValidate(['mode'=>'review','analysis'=>['assessment'=>$internal]],array_replace($values,['assessment'=>$internal,'review_confirmed'=>true,'reason'=>''])),'A checked internal analysis cannot replace the human mail statement');
+    foreach (['review','direct'] as $mode) {
+        fails(fn()=>drValidate(['mode'=>$mode,'analysis'=>['assessment'=>$internal]],array_replace($values,['assessment'=>$internal,'review_confirmed'=>true,'reason'=>$internal])),'Copied internal notes are rejected for both modes');
+        fails(fn()=>drBody(array_replace($record,['kind'=>$kind,'mode'=>$mode,'values'=>array_replace($review,['reason'=>'Die KI hat den Beleg freigegeben.'])])),'Last-step body validation prevents automated release wording');
+    }
+}
+foreach (['Die Rechnung wurde durch KI geprüft.','Automatisierte Freigabe','Offene Punkte: Belege fehlen.','Das ist als mitgeteilte Angabe dokumentiert.','Nicht unabhängig nachgewiesen.'] as $forbidden) {
+    fails(fn()=>reviewAssertCorrespondence($forbidden),'Internal or machine wording blocked');
+}
+reviewAssertCorrespondence('Die Freigabe umfasst ausschließlich die aufgeführten Leistungen. Der Zahlungsstand ist vor Auszahlung abzugleichen. Bitte reichen Sie die Fremdgewerksrechnung nach.');
 fails(fn()=>drRecipients('not-an-address'),'Invalid email rejected');
 check(count(drRecipients('test@example.org, TEST@example.org'))===1,'Deduplicate recipients');
 $energy=drValidate(['mode'=>'direct'],array_replace($values,['energy_kwh'=>'431','energy_rate'=>'0,35','energy_vn'=>'ETG Bussenstraße 45a']));

@@ -112,4 +112,17 @@ $saved=callReview('save',['folder_id'=>$folder,'token'=>$prepared['token'],'valu
 $sent=callReview('send',['folder_id'=>$folder,'record_id'=>$saved['record_id']]);expectReview($sent['ok']===true,'Mixed large and small original attachments');
 expectReview(count(array_filter($calls,fn($c)=>str_ends_with($c['url'],'/attachments')))===1,'Small proof attached to large draft');
 expectReview(str_ends_with(end($calls)['url'],'/send'),'Mixed attachment draft sent only after all attachments');
+$prepared=callReview('prepare',['folder_id'=>$folder,'file_id'=>$file,'kind'=>'invoice','mode'=>'direct']);
+$beforeCalls=count($calls);
+$bad=callReview('save',['folder_id'=>$folder,'token'=>$prepared['token'],'values'=>array_replace($values,['reason'=>'Offene Punkte: keine zusätzlichen Nachweise im Belegsatz erkennbar.'])]);
+expectReview($bad['status']===400&&count($calls)===$beforeCalls,'Internal wording blocked before storing a sendable decision');
+$saved=callReview('save',['folder_id'=>$folder,'token'=>$prepared['token'],'values'=>$values]);
+$oldRecord=json_decode(ionosBytes($saved['record_id']),true);unset($oldRecord['mail_policy_version']);drStore($oldRecord,$saved['record_id']);
+$reopened=callReview('reopen',['folder_id'=>$folder,'record_id'=>$saved['record_id']]);
+expectReview($reopened['ok']===true&&$reopened['values']['reason']===$values['reason']&&count($calls)===$beforeCalls,'Reopen preserves the human decision without analysis or mail calls');
+$renewed=callReview('save',['folder_id'=>$folder,'token'=>$reopened['token'],'values'=>$values]);
+expectReview($renewed['ok']===true&&json_decode(ionosBytes($renewed['record_id']),true)['mail_policy_version']===2,'New visible preview has the current mail policy');
+$blocked=callReview('send',['folder_id'=>$folder,'record_id'=>$saved['record_id']]);
+expectReview($blocked['status']===400&&count($calls)===$beforeCalls&&str_contains($blocked['error'],'aktuelle'),'Old prepared mail needs a fresh visible preview; no Graph call');
+expectReview(json_decode(ionosBytes($saved['record_id']),true)['send_status']==='unsent','Blocked old draft remains definitely unsent');
 echo "Isolierter Workflow: Fallzuordnung, echte IONOS-Speicherung, Direktmodus ohne KI, Originalanhang, große Anhänge und Wiederholschutz geprüft.\n";

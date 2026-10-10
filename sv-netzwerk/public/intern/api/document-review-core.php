@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/review-correspondence.php';
 
 function drMoney(mixed $value): ?float {
     if ($value === null || $value === '') return null;
@@ -41,6 +42,8 @@ function drValidate(array $preview, array $input): array {
     } elseif (($preview['mode'] ?? '') === 'direct') {
         if ($out['reason'] === '') throw new RuntimeException('Bitte den Grund für die Übernahme ohne erneute Prüfung angeben.');
     } else throw new RuntimeException('Ungültiger Prüfmodus.');
+    if ($out['reason'] === '') throw new RuntimeException('Bitte die eigene fachliche Stellungnahme für die Mail ergänzen oder einen passenden Standardtext auswählen.');
+    reviewAssertCorrespondence($out['reason']);
     if ($out['decision'] === 'rejected') {
         if ($out['reason'] === '') throw new RuntimeException('Bitte die Nichtfreigabe begründen.');
         $out['release_amount'] = 0.0;
@@ -53,12 +56,11 @@ function drValidate(array $preview, array $input): array {
 
 function drReviewSender(array $profile): array {
     $profile['mailbox'] = $profile['email'];
-    if (($profile['name'] ?? '') === 'Christian Wächter') $profile['email'] = 'cw@sv-netzwerk.eu';
     return $profile;
 }
 
 function drSignature(string $name): string {
-    if ($name === 'Christian Wächter') return $name."\nRegulierer und Bausachverständiger\nSV-Netzwerk\nDIN EN ISO/IEC 17024 zertifiziert\ncw@sv-netzwerk.eu\nhttps://www.sv-netzwerk.eu/";
+    if ($name === 'Christian Wächter') return $name."\nRegulierer und Bausachverständiger\nSV-Netzwerk\nDIN EN ISO/IEC 17024 zertifiziert\ncw@sv-schuett.eu\nhttps://www.sv-netzwerk.eu/";
     return $name."\nSV-Büro Marc Schütt e.K.";
 }
 
@@ -73,14 +75,16 @@ function drBody(array $record): string {
     $body .= ' über '.number_format($v['gross'], 2, ',', '.')." EUR brutto.\n\nDer Beleg wird {$status}.";
     if ($v['decision'] === 'approved') $body .= '\nFreigabebetrag: '.number_format($v['release_amount'], 2, ',', '.').' EUR brutto.';
     $body = str_replace('\\n', "\n", $body);
-    if ($record['mode'] === 'direct') $body .= "\n\nDie Übernahme erfolgt ohne erneute Prüfung. Grund: ".$v['reason'];
-    else $body .= "\n\nPrüfergebnis: ".$v['assessment'].($v['reason'] !== '' ? "\nBegründung: ".$v['reason'] : '');
+    // The assessment contains internal evidence checks, not an outgoing statement.
+    if ($record['mode'] === 'direct') $body .= "\n\nDie Übernahme erfolgt ohne erneute Prüfung.";
+    if ($v['reason'] !== '') $body .= "\n\n".$v['reason'];
     if (($v['energy_kwh']??null)!==null) {
         $rate=rtrim(rtrim(number_format($v['energy_rate'],4,',','.'),'0'),',');
         $kwh=rtrim(rtrim(number_format($v['energy_kwh'],4,',','.'),'0'),',');
         $body .= "\n\nStromkosten – separat zur Erstattung an den VN".(!empty($v['energy_vn'])?' ('.$v['energy_vn'].')':'').":\n".$kwh.' kWh × '.$rate.' EUR/kWh = '.number_format($v['energy_amount'],2,',','.')." EUR.\nDieser Betrag ist nicht im Freigabebetrag für den Auftragnehmer enthalten. Die Auszahlung an den VN erfolgt separat.";
     }
     $body .= "\n\nMit freundlichen Grüßen\n".drSignature($record['sender_name']);
+    reviewAssertCorrespondence($body);
     return $body;
 }
 

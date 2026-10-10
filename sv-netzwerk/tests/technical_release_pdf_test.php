@@ -16,6 +16,13 @@ $positions=[
 ];
 $pdf=trBuildTechnicalReleasePdf(['meta'=>['case_no'=>'TEST-26','vn'=>'Klaus Droxler','location'=>'Törlestraße 3, 76646 Bruchsal','insurer'=>'Testversicherung','regulator'=>'Christian Wächter','decision'=>'Freigabe mit Vorbehalt','assessment'=>'Die angebotenen Arbeiten sind rechnerisch nachvollziehbar.','delimitation'=>'Schadenbezug ist anhand der Fallakte abschließend zu bestätigen.','date'=>'2026-09-07'],'quotes'=>[['source'=>'Angebot 03.09.2026.pdf','company'=>'Babic GmbH','quote_number'=>'2026-29b','quote_date'=>'2026-09-03','net_total'=>$net,'vat_rate'=>19,'vat_total'=>$vat,'gross_total'=>$gross,'technical_assessment'=>'Die Positionen ergeben die ausgewiesene Nettosumme.','positions'=>$positions]]]);
 if(!str_starts_with($pdf,'%PDF-1.4'))throw new RuntimeException('Keine gültige PDF-Ausgabe.');
+foreach (['meta','quote'] as $scope) {
+    $bad=['meta'=>['assessment'=>'Fachlich begrenzte Freigabe.'],'quotes'=>[['technical_assessment'=>'Fachlich geprüfte Leistungen.']]];
+    if($scope==='meta')$bad['meta']['assessment']='Offene Punkte: keine Nachweise im Belegsatz.';
+    else $bad['quotes'][0]['technical_assessment']='Das ist als mitgeteilte Angabe dokumentiert, nicht als unabhängig nachgewiesene Freigabe.';
+    try {trBuildTechnicalReleasePdf($bad);throw new LogicException('Internal notes reached the mail attachment');}
+    catch(RuntimeException $error){if(!str_contains($error->getMessage(),'Korrespondenz'))throw $error;}
+}
 foreach(['Technische Freigabe','2026-29b','2.639,00 EUR','501,41 EUR','3.140,41 EUR','Baustelleneinrichtung']as$needle)if(!str_contains($pdf,$needle))throw new RuntimeException('PDF-Inhalt fehlt: '.$needle);
 if(isset($argv[1]))file_put_contents($argv[1],$pdf);
 echo "Technische Freigabe: PDF-Vorlage, Summen und Detailpositionen geprüft.\n";

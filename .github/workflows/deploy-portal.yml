@@ -86,6 +86,10 @@ jobs:
           php tests/kva_openai_error_test.php
           php tests/document_review_test.php
           php tests/document_review_workflow_test.php
+          php tests/review_sender_test.php
+          php tests/kva_manual_review_test.php
+          php tests/technical_release_pdf_test.php
+          node tests/technical_release_multi_kva_test.mjs
           php tests/claimsforce_single_result_test.php
           php tests/outlook_task_number_test.php
           node tests/task_case_address_test.mjs
