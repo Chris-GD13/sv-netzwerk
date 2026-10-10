@@ -46,6 +46,31 @@ bestehenden Fallbestand gesucht. Adresstreffer erscheinen als prüfpflichtige
 Fallvorschläge mit Aufgabenbezug; sie lösen weder eine automatische Ablage noch
 eine Neuanlage aus.
 
+Im Versicherungsfall startet „Fall analysieren und ausarbeiten“ eine
+serverseitige OpenAI-API-Analyse direkt auf derselben Seite. Die aktuelle
+Outlook-Aufgabe einschließlich Datei-Anhängen und der IONOS-Fallbestand mit
+Unterordnern werden berücksichtigt; zusätzliche Originale werden vor dem Start
+im bestehenden Fall gespeichert. Alle MD-Dateien aus den eindeutig erreichbaren
+Drive-Masterbereichen `00_Standards_Regeln` (einschließlich `ab sofort immer gültig`),
+`00_KI-Wissensbasis` und `SV-Netzwerk-Projekt` werden bei jedem Auftrag neu geladen,
+nicht auf eine Auswahl der ersten Regeln gekürzt. Fehlende Masterquellen sperren
+die Ausarbeitung.
+
+Das Ergebnis enthält belegte Feststellungen, fachliche Bewertung, offene Punkte,
+Arbeitsschritte, Regelprüfung und Antwortentwurf und wird als JSON-Entwurf im
+IONOS-Berichte-Unterordner gespeichert. Status und Ergebnis lassen sich im
+gleichen Fall-/Aufgabenkontext wieder laden. Die Antwort gelangt nur per
+ausdrücklichem Klick ins E-Mail-Feld; Versand, Freigaben und Erledigen bleiben
+manuell. Die API wird unabhängig vom ChatGPT-Business-Abo abgerechnet.
+
+Originale werden in Paketen vollständig übergeben (max. 30 MB je Datei,
+40 MB je Paket, 200 MB insgesamt). PDF/DOCX/XLSX/PPTX, Textformate und
+PNG/JPEG/WEBP/GIF werden verarbeitet. Nicht unterstützte Formate, übergroße oder
+unlesbare Quellen erscheinen ausdrücklich als Lücken. EML wird als MIME-Originaltext
+gelesen; eingebettete Anhänge sind nur geprüft, soweit sie separat vorliegen.
+MSG/ZIP werden nicht stillschweigend als verarbeitet ausgegeben. MD- und
+Fallkontextgrenzen führen zu einem Fehler statt einer gekürzten Ausarbeitung.
+
 ```text
 cd sv-netzwerk
 npm ci

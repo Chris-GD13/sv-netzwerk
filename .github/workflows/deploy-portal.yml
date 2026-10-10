@@ -93,6 +93,8 @@ jobs:
           php tests/claimsforce_single_result_test.php
           php tests/outlook_task_number_test.php
           node tests/task_case_address_test.mjs
+          php tests/case_analysis_test.php
+          php tests/case_analysis_worker_test.php
           node tests/claimsforce_single_scope_test.mjs
           node tests/claimsforce_worker_handshake_test.mjs
           node tests/claimsforce_source_restrictions_test.mjs
@@ -327,8 +329,6 @@ jobs:
             echo "$path: HTTP $status, JSON ohne Redirect"
             rm -f "$headers" "$body"
           done
-
-
 
 
 

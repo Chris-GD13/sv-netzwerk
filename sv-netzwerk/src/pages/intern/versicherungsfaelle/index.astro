@@ -6,6 +6,27 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 <main class="vf-app">
   <section id="vf-active" class="vf-active"><div><i></i><strong>Noch kein Fall geöffnet</strong><small>Fall suchen, neu anlegen oder Unterlagen zur automatischen Anlage hochladen.</small></div></section>
   <section id="vf-task-context" class="vf-card vf-task-context" hidden aria-live="polite"><header class="vf-step"><b>✉</b><div><strong>Aufgabe bearbeiten</strong><small id="vf-task-meta">Aufgabe wird geladen …</small></div></header><h2 id="vf-task-subject"></h2><div id="vf-task-body" class="vf-task-body"></div><div id="vf-task-attachments" class="vf-task-attachments"></div><div class="vf-calendar-actions"><button id="vf-task-reply" class="vf-primary" type="button">Antwort im Fall verfassen</button><button id="vf-task-kva" class="vf-secondary" type="button">KVA prüfen / freigeben</button><button id="vf-task-done" class="vf-secondary" type="button">Aufgabe erledigen</button><a id="vf-task-outlook" class="vf-secondary" target="_blank" rel="noreferrer" hidden>In Outlook öffnen</a></div><p id="vf-task-state" class="vf-meta"></p></section>
+  <section id="vf-analysis" class="vf-card" aria-labelledby="vf-analysis-title">
+    <header class="vf-step"><b>KI</b><div><strong id="vf-analysis-title">Fall analysieren und ausarbeiten</strong><small>Direkt im Fall · aktuelle Aufgabe, Anhänge und vorhandene Unterlagen</small></div></header>
+    <p class="vf-meta">Die OpenAI-API verarbeitet die Fallunterlagen mit allen MD-Vorgaben aus „00_Standards_Regeln“ einschließlich „ab sofort immer gültig“, „00_KI-Wissensbasis“ und „SV-Netzwerk-Projekt“. Nicht lesbare Quellen werden ausdrücklich ausgewiesen. Es entsteht nur ein Entwurf – kein Versand, keine Freigabe und kein automatisches Erledigen.</p>
+    <label class="vf-order-label" for="vf-analysis-order"><strong>Zusätzlicher Arbeitsauftrag (optional)</strong></label>
+    <textarea id="vf-analysis-order" class="vf-analysis-order" rows="3" maxlength="12000" placeholder="Zum Beispiel: Tür/Zarge, Malerarbeiten und Bodenbelag getrennt prüfen; bisherige Freigaben berücksichtigen und Antwort vorbereiten."></textarea>
+    <label class="vf-order-label" for="vf-analysis-files"><strong>Weitere Originalunterlagen ergänzen (optional)</strong></label>
+    <input id="vf-analysis-files" type="file" multiple accept=".pdf,.docx,.xlsx,.pptx,.txt,.md,.csv,.json,.eml,.jpg,.jpeg,.png,.webp,.gif">
+    <div class="vf-calendar-actions"><button id="vf-analysis-start" class="vf-primary" type="button" disabled>Fall analysieren und ausarbeiten</button><button id="vf-analysis-refresh" class="vf-secondary" type="button" disabled>Status aktualisieren</button></div>
+    <p id="vf-analysis-state" class="vf-meta" role="status" aria-live="polite">Bitte zuerst einen Fall öffnen.</p>
+    <div id="vf-analysis-result" hidden></div>
+  </section>
+  <script is:inline src="/intern/case-analysis.js"></script>
+  <style is:global>
+    #vf-analysis .vf-analysis-order{width:100%;box-sizing:border-box;resize:vertical;font:inherit;padding:10px;border:1px solid #b8c8d6;border-radius:8px}
+    #vf-analysis input[type="file"]{max-width:100%}
+    #vf-analysis-result section{margin-top:16px}
+    #vf-analysis-result h3{font-size:1rem;margin:0 0 6px}
+    #vf-analysis-result p,#vf-analysis-result li{overflow-wrap:anywhere}
+    #vf-analysis-result details{margin-top:16px}
+    #vf-analysis-result summary{cursor:pointer;font-weight:700}
+  </style>
   <div class="vf-grid">
     <aside>
       <section id="vf-case-selection" class="vf-card"><header class="vf-step"><b>1</b><div><strong>Fall auswählen</strong><small>Öffnen oder neu beginnen</small></div></header><div class="vf-search"><input id="vf-search-input" placeholder="Schaden-Nr., Name, Straße oder Ort" autocomplete="off" aria-label="Versicherungsfall suchen"><button id="vf-search-btn">Suchen</button></div><p class="vf-search-hint">Ab 3 Zeichen erscheinen passende Fälle automatisch.</p><button id="vf-recent" class="vf-secondary vf-full">Letzte 10 Fälle</button><div id="vf-results" aria-live="polite"></div><button id="vf-new" class="vf-secondary vf-full">Neuen Fall anlegen</button></section>
@@ -406,7 +427,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     if(card.id==='vf-case-selection')return;
     const trigger=card.querySelector(':scope > .vf-step, :scope > .vf-title, :scope > .vf-plaud-head');
     if(!trigger)return;
-    const initiallyExpanded=card.id==='vf-form';
+    const initiallyExpanded=card.id==='vf-form'||card.id==='vf-analysis';
     card.classList.add('vf-collapsible');
     if(!initiallyExpanded)card.classList.add('is-collapsed');
     trigger.classList.add('vf-collapse-trigger');
