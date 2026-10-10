@@ -148,8 +148,9 @@ if($action==='mine'){
 }
 if($action==='stop'){
     $isAdmin=($user['role']??'')==='administrator';
-    $s=db()->prepare("UPDATE claimsforce_import_jobs SET status='failed',message='Pausiert. Der nächste Start setzt bei den noch nicht übernommenen Fällen und Dateien fort.',phase='CF-FAIL-STOPPED',heartbeat_at=NOW(),finished_at=NOW() WHERE status IN ('queued','running') AND (requested_by=:u OR :admin=1)");
-    $s->execute([':u'=>(string)($user['email']??''),':admin'=>$isAdmin?1:0]);
+    $targetId=max(0,(int)($body['id']??0));
+    $s=db()->prepare("UPDATE claimsforce_import_jobs SET status='failed',message='Pausiert. Mit Import fortsetzen wird derselbe Auftrag weiter geprüft.',phase='CF-FAIL-STOPPED',heartbeat_at=NOW(),finished_at=NOW() WHERE status IN ('queued','running') AND (requested_by=:u OR :admin=1) AND (:target_check=0 OR id=:target_id)");
+    $s->execute([':u'=>(string)($user['email']??''),':admin'=>$isAdmin?1:0,':target_check'=>$targetId,':target_id'=>$targetId]);
     apiJson(['ok'=>true,'stopped'=>$s->rowCount()]);
 }
 if(!cqIsCentralAgent($user))apiError(403,'Nur eine freigegebene zentrale Backoffice-Importstation darf Aufträge übernehmen.');
