@@ -51,6 +51,12 @@ jobs:
           cache: npm
           cache-dependency-path: sv-netzwerk/package-lock.json
 
+      - name: PHP für Word-Ausgabe einrichten
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, pdo_sqlite, mbstring, curl, zip
+
       - name: Abhängigkeiten installieren
         run: npm ci --no-audit --no-fund
 
@@ -96,6 +102,7 @@ jobs:
           php tests/case_analysis_test.php
           php tests/case_analysis_worker_test.php
           php tests/case_work_test.php
+          php tests/case_work_docx_test.php
           node tests/case_work_ui_test.mjs
           php tests/case_rules_import_test.php
           node tests/claimsforce_single_scope_test.mjs

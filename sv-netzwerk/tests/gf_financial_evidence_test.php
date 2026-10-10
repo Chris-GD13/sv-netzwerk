@@ -85,7 +85,9 @@ $html=gfFinancialSectionHtml(['heading'=>'Test','text'=>'Text','tables'=>[['colu
 check(str_contains($html,'<table>')&&!str_contains($html,'<script>'), 'Registertabellen müssen sicher gerendert werden.');
 echo "GF financial evidence tests passed\n";
 check($register['compact_register']===true&&$register['open_points']===[]&&$register['sections'][5]['internal_only']===true,'Routinehinweise dürfen nicht nochmals unter den Tabellen erscheinen.');
-$htmlStart=strpos($core,'function gfDocumentHtml(');$htmlEnd=strpos($core,"\n",$htmlStart);eval(substr($core,$htmlStart,$htmlEnd-$htmlStart));
+foreach(['gfSignatureHtml','gfDocumentHtml'] as $function){$htmlStart=strpos($core,'function '.$function.'(');$htmlEnd=strpos($core,"\n",$htmlStart);eval(substr($core,$htmlStart,$htmlEnd-$htmlStart));}
+check(str_contains(gfSignatureHtml('Christian Wächter'),'cw@sv-netzwerk.eu')&&str_contains(gfSignatureHtml('Christian Wächter'),'Regulierer und Bausachverständiger'),'Verifizierter Absender fehlt.');
+check(!str_contains(gfSignatureHtml('Holger Roth'),'Christian'),'Signatur darf kein fremdes Bearbeiterprofil einsetzen.');
 $registerHtml=gfDocumentHtml('Register',[], $register,['Brief.pdf'],['Master.md'],'Test');
 check(str_contains($registerHtml,'KVA – getrennte Übersicht')&&str_contains($registerHtml,'11.745,40'),'Tabellen und Berechnung müssen erhalten bleiben.');
 foreach(['Zahlungsempfehlung / weiterer Klärungsbedarf','Offene Punkte','Angewendete Regelwerke','Ausgewertete Unterlagen'] as $noise)check(!str_contains($registerHtml,$noise),'Unnötiger Registeranhang: '.$noise);
