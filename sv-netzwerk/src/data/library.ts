@@ -24,6 +24,17 @@ export const library: LibraryItem[] = [
     featured: false,
   },
   {
+    title: 'Fenstermontage und Anschlussfugen: Mängel fachlich prüfen und Nachbesserung begründen',
+    description: 'Fenstermontage anhand von Sollzustand, Befestigung, Anschlussfugen und dokumentiertem Befund prüfen; Nachbesserung und Kosten nachvollziehbar begründen.',
+    href: '/fachwissen/fenstermontage-anschlussfugen-maengel-nachbesserung/',
+    category: 'Fenster und Türen',
+    tags: ['Fenstermontage', 'Anschlussfugen', 'Befestigung', 'Mängelprüfung', 'Nachbesserung', 'Kostenprüfung'],
+    date: '2026-10-10',
+    publishedAt: '2026-10-10T08:49:02.973Z',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Batteriespeicher nach Wasser- und Brandschäden fachlich prüfen',
     description: 'Stationäre Batteriespeicher werden nach Wasser- oder Brandeinwirkung anhand von Gefahrenlage, Herstellerdiagnose, Wiederinbetriebnahme und schadenbedingten Kosten bewertet.',
     href: '/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung/',
