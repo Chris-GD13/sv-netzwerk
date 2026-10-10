@@ -238,6 +238,23 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
             .'Kontext: '.$context, $work!==null?24000:14000, $work!==null?cwResultSchema($requests,array_column($evidence,'name')):null,
             $work!==null?env('OPENAI_WORK_MODEL','gpt-5.4'):null),
             $requests, array_column($evidence, 'name'));
+        if($work!==null){
+            caUpdate($job,'running','Ausarbeitung wird auf Vollständigkeit, Zahlungszuordnung und richtigen Empfänger geprüft.');
+            $result=caValidateResult(krOpenAiJson($api,[],caPrompt($rules)."\n".cwRules(),
+                'Fachliche Endkontrolle: Liefere die vollständig korrigierte Ausarbeitung im gleichen JSON-Schema, keinen Prüfkommentar. '
+                .'Der aktuelle Betreiberauftrag ist maßgeblich, nicht ein früherer Entwurf oder eine zitierte Nachricht. '
+                .'Prüfe jedes geforderte Ergebnis: Ein Nachtrag AN DIE VERSICHERUNG darf nicht an den VN adressiert sein. '
+                .'Eine angeforderte Zahlungsübersicht muss alle aktuellen Forderungen, zugehörige Vorleistungen, den NEU empfohlenen Betrag und konkret strittige Reste enthalten. '
+                .'Die Aussage, dass aus einer alten bereits bezahlten Position nichts mehr zu zahlen ist, beantwortet nicht die Frage nach der Auszahlung neuer Rechnungen. '
+                .'Keine Zahlungen fremder Schadenpositionen abziehen; keine unbelegten Kürzungen übernehmen. '
+                .'Unstrittige Teile jetzt beziffern; fehlen entscheidende Originalangaben, genau deren Auswirkung benennen statt pauschal alles zurückzustellen. '
+                .'Alle Aussagen gegen evidence prüfen, Rechenwege nachrechnen, tatsächliche Zahlungen von Vorschlägen unterscheiden. '
+                .'Dokumentaufträge müssen die vollständigen korrigierten Ergebnisse, den Adressaten und offene Punkte enthalten. '
+                .'Behaupte keine bereits erfolgte Dokumenterstellung oder Versendung. '
+                .'Originalkontext und aktueller Auftrag: '.$context.'\nZu prüfender KI-Entwurf (keine Originalquelle): '.json_encode($result,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),
+                24000,cwResultSchema($requests,array_column($evidence,'name')),env('OPENAI_WORK_MODEL','gpt-5.4')),
+                $requests,array_column($evidence,'name'));
+        }
         $requestTexts = array_column($requests, 'request', 'id');
         if ($requests) foreach ($result['task_results'] as &$item) {
             $item['request'] = $requestTexts[$item['request_id']];
