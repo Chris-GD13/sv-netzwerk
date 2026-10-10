@@ -1,3 +1,7 @@
+export function isClaimsforceMail(item) {
+  return /^Mail_ClaimsForce-Nachricht_/i.test(item.name || '') && (item.mimeType === 'application/json' || /\.json$/i.test(item.name || ''));
+}
+
 export function normalizeClaimsforceMail(record, textFromHtml = value => String(value || '')) {
   const payload = record.payload || record;
   const address = value => {

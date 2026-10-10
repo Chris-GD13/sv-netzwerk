@@ -50,11 +50,11 @@
         <div id="${prefix}edit" hidden>
           <div id="${prefix}checks" class="dr-checks"></div>
           <div class="dr-fields">${field('company',kind==='invoice'?'Rechnungssteller':'Angebotssteller')}${field('number',`${noun}snummer`)}${field('date','Belegdatum')}${field('net','Netto EUR')}${field('vat','Umsatzsteuer EUR')}${field('gross','Original-Bruttobetrag EUR')}</div>
-          <label id="${prefix}assessment-label">Prüfergebnis / Stellungnahme<textarea id="${prefix}assessment" rows="5"></textarea></label>
+          <label id="${prefix}assessment-label">Interne Auswertung – wird nicht in die Mail übernommen<textarea id="${prefix}assessment" rows="5"></textarea></label>
           <label id="${prefix}confirm-label" class="dr-choice"><input id="${prefix}confirmed" type="checkbox"> Prüfergebnis fachlich kontrolliert und bestätigt</label>
           <label>Entscheidung<select id="${prefix}decision"><option value="">Bitte auswählen</option><option value="approved">freigegeben</option><option value="rejected">nicht freigegeben</option></select></label>
           <label id="${prefix}amount-label">Freigabebetrag brutto EUR<input id="${prefix}release_amount" inputmode="decimal" autocomplete="off"></label>
-          <label>Begründung / Grund der direkten Übernahme<textarea id="${prefix}reason" rows="3" placeholder="z. B. bereits geprüft am … oder Abschlagsrechnung; bei Nichtfreigabe den Grund nennen"></textarea></label>
+          <label>Eigene fachliche Stellungnahme für die Mail<textarea id="${prefix}reason" rows="4" placeholder="Eigene Bewertung, Begründung oder konkrete Rückfrage an den Empfänger"></textarea></label><p class="vf-meta">Nur diese Stellungnahme und deine Entscheidung werden in die Mail übernommen. Interne Prüfhilfen bleiben im Vorgang. Freigabeumfang, konkrete Vorbehalte und erforderliche Unterlagen hier ausdrücklich benennen.</p>
           <div class="dr-fields" aria-label="Standardtexte für die Begründung"><button type="button" data-reason-preset="0">Geprüft – Höhe in Ordnung</button><button type="button" data-reason-preset="1">Bereits geprüft – übernehmen</button><button type="button" data-reason-preset="2">${kind==='invoice'?'Abschlagsrechnung / Baufortschritt':'Freigabe nach Baufortschritt'}</button></div>
           <fieldset><legend>Energieverbrauch / separate Erstattung an den VN</legend><div class="dr-fields">${field('energy_kwh','Nachgewiesener Verbrauch kWh')}${field('energy_rate','Strompreis EUR/kWh (änderbar)')}${field('energy_vn','VN / Zahlungsempfänger')}</div><label>Stromkosten EUR – separat vom Angebot<input id="${prefix}energy_amount" readonly></label><p class="vf-meta">Standard 0,35 €/kWh. Energieverbrauch wird separat ausgewertet; Stromkosten werden nicht auf die Freigabesumme des Auftragnehmers aufgeschlagen.</p></fieldset>
           <fieldset><legend>Empfänger auswählen</legend>
@@ -73,7 +73,7 @@
     wrap.append(panel);
     const el = name => document.getElementById(prefix+name);
     const state = {folder:'', workspace:sessionStorage.getItem('svnet-review-'+kind)||'', files:[], support:new Set(), token:'', recordId:'', busy:false, sender:'', source:''};
-    const reasonPresets=kind==='invoice'?['Die Rechnung wurde geprüft und ist der Höhe nach in Ordnung.','Die Rechnung wurde bereits geprüft und wird ohne erneute Prüfung übernommen.','Es handelt sich um eine Abschlagsrechnung. Die Freigabe erfolgt entsprechend dem dokumentierten Baufortschritt.']:['Das Angebot wurde geprüft und ist der Höhe nach in Ordnung.','Das Angebot wurde bereits geprüft und wird ohne erneute Prüfung übernommen.','Die Freigabe der angebotenen Leistungen erfolgt entsprechend dem dokumentierten Baufortschritt.'];
+    const reasonPresets=kind==='invoice'?['Ich habe die Rechnung geprüft. Der Rechnungsbetrag ist der Höhe nach in Ordnung.','Die Rechnung wurde bereits geprüft. Ich übernehme den festgestellten Rechnungsbetrag.','Es handelt sich um eine Abschlagsrechnung. Die Freigabe bezieht sich auf die dem festgestellten Baufortschritt entsprechenden Leistungen.']:['Ich habe das Angebot geprüft. Der angebotene Betrag ist der Höhe nach in Ordnung.','Das Angebot wurde bereits geprüft. Ich übernehme den festgestellten Angebotsbetrag.','Die Freigabe bezieht sich auf die dem festgestellten Baufortschritt entsprechenden angebotenen Leistungen.'];
     panel.querySelectorAll('[data-reason-preset]').forEach(button=>button.onclick=()=>{const text=reasonPresets[Number(button.dataset.reasonPreset)],current=el('reason').value.trim();if(!current.includes(text))el('reason').value=current?current+'\n'+text:text;el('reason').dispatchEvent(new Event('input',{bubbles:true}));el('reason').focus();});
     const context = () => el('standalone').checked ? state.workspace : (active()?.folder_id||'');
     const message = (text, bad=false) => { el('state').textContent=text; el('state').classList.toggle('dr-error',bad); };
@@ -127,7 +127,7 @@
       el('sender').textContent=`Absender: ${data.sender}\n${data.signature || data.sender_name || ''}`;
       const history=(data.reviews||[]).filter(r=>r.kind===kind);
       el('history').hidden=!history.length;
-      el('history').innerHTML='<strong>Gespeicherte Entscheidungen</strong>'+history.map(r=>`<p><a target="_blank" rel="noopener" href="${sourceLink(r.id)}">${esc(r.company)} · ${esc(r.number)}</a><br>${r.decision==='approved'?'freigegeben':'nicht freigegeben'}${r.decision==='approved'?` · ${Number(r.release_amount).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} EUR brutto`:''} · ${r.mode==='direct'?'ohne erneute Prüfung':'fachlich bestätigt'} · ${r.send_status==='sent'?'Mail versendet':r.send_status==='unsent'?'noch nicht versendet':'Versandstatus klären'}</p>`).join('');
+      el('history').innerHTML='<strong>Gespeicherte Entscheidungen</strong>'+history.map(r=>`<p><a target="_blank" rel="noopener" href="${sourceLink(r.id)}">${esc(r.company)} · ${esc(r.number)}</a><br>${r.decision==='approved'?'freigegeben':'nicht freigegeben'}${r.decision==='approved'?` · ${Number(r.release_amount).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} EUR brutto`:''} · ${r.mode==='direct'?'ohne erneute Prüfung':'fachlich bestätigt'} · ${r.send_status==='sent'?'Mail versendet':r.send_status==='unsent'?'noch nicht versendet':'Versandstatus klären'}${r.send_status==='unsent'?` <button type="button" data-reopen-review="${esc(r.id)}">Entwurf öffnen</button>`:''}</p>`).join('');
       // All eligible originals remain selectable, including generically named imported scans.
       const ranked=[...data.files].sort((a,b)=>Number(new RegExp(kind==='invoice'?'rechnung|invoice|abschlag|schlussrechnung':'angebot|kva|kostenvoranschlag','i').test(b.name))-Number(new RegExp(kind==='invoice'?'rechnung|invoice|abschlag|schlussrechnung':'angebot|kva|kostenvoranschlag','i').test(a.name)));
       el('file').innerHTML='<option value="">Originalbeleg auswählen</option>'+ranked.map(f=>`<option value="${esc(f.id)}">${esc(f.name)}</option>`).join('');
@@ -141,6 +141,25 @@
       if (!panel.querySelector('[data-address="supplier"]').value) panel.querySelector('[data-address="supplier"]').value=meta.sanierer_email||'';
       original();
     }
+    el('history').onclick=async event=>{
+      const id=event.target.dataset.reopenReview;if(!id)return;
+      const folder=context();reset();message('Gespeicherte Entscheidung wird mit der aktuellen Mailfassung geöffnet …');
+      try{
+        const r=await request('reopen',folder,{record_id:id});sameCase(folder);
+        if(r.kind!==kind)throw Error('Die Entscheidung gehört zu einer anderen Belegart.');
+        el('file').value=r.file_id;el('reference').value=r.reference_id||'';el('direct').checked=r.mode==='direct';
+        state.support=new Set((r.sources||[]).map(s=>s.id).filter(x=>x!==r.file_id));el('comment').value=r.comment||'';el('attach-support').checked=r.attach_support;
+        if(el('standalone').checked)el('case_no').value=r.case_no;
+        const v=r.values;for(const key of ['company','number','date','assessment','reason','decision','energy_vn'])el(key).value=v[key]||'';
+        for(const key of ['net','vat','gross','release_amount'])el(key).value=Number.isFinite(v[key])?v[key].toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}):'';
+        for(const key of ['energy_kwh','energy_rate'])el(key).value=Number.isFinite(v[key])?v[key].toLocaleString('de-DE',{maximumFractionDigits:4}):'';energyAmount();
+        panel.querySelectorAll('[data-recipient]').forEach(x=>x.checked=false);for(const role of ['to','cc','bcc'])el('extra-'+role).value=v[role]||'';
+        el('checks').innerHTML=(r.analysis?.checks||[]).map(c=>`<p><strong>${esc(c.item)}: ${esc(c.result)}</strong><br>${esc(c.detail)}</p>`).join('')+(r.analysis?.warnings||[]).map(w=>`<p class="dr-error">${esc(w)}</p>`).join('');
+        state.token=r.token;state.source=(r.attach_support?(r.sources||[]).map(s=>s.name):[r.file_name]).join(', ')||r.file_name;
+        el('attachment').textContent=`Mailanhänge: ${state.source} (Originalbelege)`;el('edit').hidden=false;el('amount-label').hidden=v.decision==='rejected';original();syncMode();
+        message('Gespeicherte Entscheidung geöffnet. Eigene Stellungnahme und Empfänger kontrollieren, Ergebnis bestätigen und die neue Mailvorschau speichern.');
+      }catch(error){message(error.message,true);}
+    };
     panel.addEventListener('toggle',()=>{ if (panel.open) load().catch(e=>message(e.message,true)); });
     el('reload').onclick=()=>load().catch(e=>message(e.message,true));
     el('standalone').onchange=()=>{clear();state.folder='';load().catch(e=>message(e.message,true));};

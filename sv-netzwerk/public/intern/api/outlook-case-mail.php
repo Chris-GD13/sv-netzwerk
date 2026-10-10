@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/review-correspondence.php';
 
 require_once __DIR__ . '/config.php';
 commonHeaders();
@@ -165,6 +166,7 @@ try {
         $subject = $subjectOverride !== '' ? $subjectOverride : $caseNo . ($damageType !== '' ? ' – ' . $damageType : '');
         $text = trim((string)($_POST['body'] ?? ''));
         if ($text === '') throw new RuntimeException('E-Mail-Text fehlt.');
+        reviewAssertCorrespondence($subject."\n".$text);
 
         $signature = '<p>Mit freundlichen Grüßen<br>'
             . htmlspecialchars((string)$profile['sender_name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')

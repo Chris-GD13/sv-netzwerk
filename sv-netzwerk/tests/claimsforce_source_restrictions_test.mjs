@@ -2,7 +2,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { claimFolderPath, safeFileName } from '../browser-extension/claimsforce-bridge/import-utils.js';
-import { normalizeClaimsforceMail } from '../scripts/claimsforce-mail.js';
+import { isClaimsforceMail, normalizeClaimsforceMail } from '../scripts/claimsforce-mail.js';
+
+assert(isClaimsforceMail({name:'Mail_ClaimsForce-Nachricht_langer-Betreff-ohne-Endung',mimeType:'application/json'}));
+assert(isClaimsforceMail({name:'Mail_ClaimsForce-Nachricht_kurz.json'}));
+assert(!isClaimsforceMail({name:'Mail_ClaimsForce-Nachricht_Bild.jpg',mimeType:'image/jpeg'}));
+assert(!isClaimsforceMail({name:'00_Falldaten.json',mimeType:'application/json'}));
 
 assert.equal(claimFolderPath({ rootFolderId: 'OTHER', parentFolderId: 'child' }, [
   { id: 'child', name: 'Mailanhänge', parentFolderId: 'parent' },

@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/review-correspondence.php';
 
 function trCp(string $text): string { $value=@iconv('UTF-8','Windows-1252//TRANSLIT',$text); return $value===false?(preg_replace('/[^\x20-\x7E]/','?',$text)??''):$value; }
 function trEsc(string $text): string { return str_replace(['\\','(',')',"\r"],['\\\\','\\(','\\)',''],trCp($text)); }
@@ -23,6 +24,8 @@ function trBuildTechnicalReleasePdf(array $data): string
     $quotes=is_array($data['quotes']??null)?array_values($data['quotes']):[];
     if($quotes===[])throw new RuntimeException('Keine geprüften Kostenvoranschläge vorhanden.');
     $meta=is_array($data['meta']??null)?$data['meta']:[];
+    foreach (['assessment','delimitation'] as $field) reviewAssertCorrespondence((string)($meta[$field]??''));
+    foreach ($quotes as $quote) foreach (['technical_assessment','release_scope'] as $field) reviewAssertCorrespondence((string)($quote[$field]??''));
     $navy=[.027,.102,.180];$orange=[1,.616,.071];$muted=[.35,.443,.522];$line=[.82,.867,.902];$panel=[.956,.972,.984];$green=[.90,.96,.92];$warn=[1,.95,.89];
     $pages=[];$ops=[];$y=0.0;trStart($pages,$ops,$y);
     trText($ops,45,$y,'Technische Freigabe',19,true,$navy);$y-=18;trText($ops,45,$y,'Prüfung und Freigabe der eingereichten Kostenvoranschläge',9,false,$muted);$y-=24;
