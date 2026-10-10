@@ -147,7 +147,7 @@ function caEvidenceSchema(array $batch, bool $rules): array {
         'findings'=>['type'=>'string'],'warnings'=>$strings];
     if($rules)$fields+=['content_complete'=>['type'=>'boolean'],'layout_warnings'=>$strings,'empty_template_fields'=>$strings];
     return ['type'=>'object','additionalProperties'=>false,'required'=>['documents'],
-        'properties'=>['documents'=>['type'=>'array','items'=>['type'=>'object','additionalProperties'=>false,
+        'properties'=>['documents'=>['type'=>'array','minItems'=>count($batch),'maxItems'=>count($batch),'items'=>['type'=>'object','additionalProperties'=>false,
             'required'=>array_keys($fields),'properties'=>$fields]]]];
 }
 

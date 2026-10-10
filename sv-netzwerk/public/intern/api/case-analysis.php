@@ -80,7 +80,14 @@ function caReadBatch(array $batch, string $api, array &$uploads, bool $ruleDocum
             : ' Aktuell abzuarbeitende Anliegen: '.json_encode($requests, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE)
                 .'. Zu jedem dafür relevanten Original alle Einzelpositionen, Mengen, Beträge, bisherigen Antworten '
                 .'und Widersprüche mit Seitenbezug auslesen; nicht nur den Dokumenttyp benennen.'), 14000, caEvidenceSchema($batch,$ruleDocuments));
-    $documents = caValidateEvidence($read, $batch);
+    try {$documents = caValidateEvidence($read, $batch);}
+    catch(RuntimeException $error){
+        if(count($batch)<2)throw $error;
+        // Some mixed bundles lose source boundaries. Re-read each actual source,
+        // never accept a guessed name or silently drop an unreturned document.
+        $documents=[];
+        foreach($batch as $file)array_push($documents,...caReadBatch([$file],$api,$uploads,$ruleDocuments,$requests,$previousWarnings));
+    }
     if ($ruleDocuments) foreach ($documents as $document) {
         if (!is_bool($document['content_complete'] ?? null)
             || !is_array($document['layout_warnings'] ?? null) || !array_is_list($document['layout_warnings'])
