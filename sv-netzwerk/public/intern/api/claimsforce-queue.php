@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/config.php';
 require_once __DIR__.'/profile-routing.php';
+require_once __DIR__.'/claimsforce-queue-utils.php';
 commonHeaders();
 $user=requireAuth();
 if(!in_array((string)($user['role']??''),['administrator','projektleiter','pruefer','sachverstaendiger'],true))apiError(403,'Keine Berechtigung.');
@@ -20,7 +21,8 @@ function cqEnsureColumns():void{
         'schedule_key'=>'VARCHAR(80) NULL',
         'sync_mode'=>'VARCHAR(20) NOT NULL DEFAULT \'quick\'',
         'since_date'=>'DATE NULL',
-        'claim_number'=>'VARCHAR(120) NULL'
+        'claim_number'=>'VARCHAR(120) NULL',
+        'agent_key'=>'CHAR(64) NULL'
     ];
     $check=db()->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=:table AND COLUMN_NAME=:column');
     foreach($columns as$name=>$definition){
@@ -83,7 +85,6 @@ function cqPhase(mixed$value):string{
 function cqFailStaleRuns():void{
     db()->exec("UPDATE claimsforce_import_jobs SET status='failed',message='Import wurde unterbrochen und aus Sicherheitsgründen nicht automatisch neu gestartet.',phase='CF-FAIL-STALE',heartbeat_at=NOW(),finished_at=NOW() WHERE status='running' AND COALESCE(heartbeat_at,started_at,created_at)<DATE_SUB(NOW(),INTERVAL 2 MINUTE)");
 }
-
 $action=(string)($_GET['action']??'status');
 $body=$_SERVER['REQUEST_METHOD']==='POST'?requestBody():[];
 
@@ -179,23 +180,32 @@ if($action==='schedule'){
 }
 
 if($action==='active'){
+    $key=cqStationKey($body);
     cqFailStaleRuns();
     $row=db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='running' ORDER BY heartbeat_at DESC,id LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-    apiJson(['ok'=>true,'job'=>$row?cqRow((int)$row['id']):null]);
+    if(!$row)apiJson(['ok'=>true,'job'=>null,'busy'=>false]);
+    $s=db()->prepare('SELECT agent_key FROM claimsforce_import_jobs WHERE id=:id');$s->execute([':id'=>(int)$row['id']]);
+    $own=hash_equals((string)($s->fetchColumn()?:''),$key);
+    apiJson(['ok'=>true,'job'=>$own?cqRow((int)$row['id']):null,'busy'=>!$own]);
 }
 if($action==='claim'){
+    $key=cqStationKey($body);
     cqFailStaleRuns();
+    if((int)db()->query("SELECT GET_LOCK('svnet-claimsforce-import',3)")->fetchColumn()!==1)apiJson(['ok'=>true,'job'=>null]);
     db()->beginTransaction();
+    if(db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='running' LIMIT 1 FOR UPDATE")->fetchColumn()){db()->commit();db()->query("SELECT RELEASE_LOCK('svnet-claimsforce-import')");apiJson(['ok'=>true,'job'=>null]);}
     $row=db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='queued' ORDER BY (sync_mode='single') DESC,(requested_by='system:claimsforce') ASC,created_at,id LIMIT 1 FOR UPDATE")->fetch(PDO::FETCH_ASSOC);
-    if(!$row){db()->commit();apiJson(['ok'=>true,'job'=>null]);}
+    if(!$row){db()->commit();db()->query("SELECT RELEASE_LOCK('svnet-claimsforce-import')");apiJson(['ok'=>true,'job'=>null]);}
     $id=(int)$row['id'];
-    $s=db()->prepare("UPDATE claimsforce_import_jobs SET status='running',message='Import wird auf der zentralen Station ausgeführt.',phase='CF-CLAIMED',started_at=NOW(),heartbeat_at=NOW(),attempt_count=attempt_count+1 WHERE id=:id AND status='queued'");
-    $s->execute([':id'=>$id]);
+    $s=db()->prepare("UPDATE claimsforce_import_jobs SET status='running',agent_key=:key,message='Import wird auf der zentralen Station ausgeführt.',phase='CF-CLAIMED',started_at=NOW(),heartbeat_at=NOW(),attempt_count=attempt_count+1 WHERE id=:id AND status='queued'");
+    $s->execute([':id'=>$id,':key'=>$key]);
     db()->commit();
+    db()->query("SELECT RELEASE_LOCK('svnet-claimsforce-import')");
     apiJson(['ok'=>true,'job'=>cqRow($id)]);
 }
 if($action==='heartbeat'){
     $id=(int)($body['id']??0);
+    cqRequireOwner($id,$body);
     $message=mb_substr(trim((string)($body['message']??'Import läuft.')),0,500);
     $phase=cqPhase($body['phase']??'CF-RUN');
     $current=max(0,(int)($body['current']??0));
@@ -203,14 +213,16 @@ if($action==='heartbeat'){
     $diagnostic=is_array($body['diagnostic']??null)?$body['diagnostic']:[];
     $s=db()->prepare("UPDATE claimsforce_import_jobs SET message=:m,phase=:p,progress_current=:c,progress_total=:t,diagnostic_json=:d,heartbeat_at=NOW() WHERE id=:id AND status='running'");
     $s->execute([':m'=>$message,':p'=>$phase,':c'=>$current,':t'=>$total,':d'=>json_encode($diagnostic,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':id'=>$id]);
-    if($s->rowCount()!==1)apiError(409,'Importauftrag läuft nicht mehr.');
+    cqConfirmHeartbeat($id,$body,$s->rowCount());
     apiJson(['ok'=>true,'job'=>cqRow($id)]);
 }
 if($action==='complete'){
     $id=(int)($body['id']??0);
+    cqRequireOwner($id,$body);
     $ok=($body['ok']??false)===true;
     $job=cqRow($id);
     $message=mb_substr(trim((string)($body['message']??($ok?'Import abgeschlossen.':'Import fehlgeschlagen.'))),0,500);
+    if($ok&&!cqSingleResultValid($job,is_array($body['result']??null)?$body['result']:[])){$ok=false;$message='Einzelfallimport unvollständig oder falscher Umfang. Ergebnis wird nicht als erfolgreich bestätigt.';}
     $s=db()->prepare("UPDATE claimsforce_import_jobs SET status=:s,message=:m,phase=:p,result_json=:r,heartbeat_at=NOW(),finished_at=NOW() WHERE id=:id AND status='running'");
     $s->execute([':s'=>$ok?'done':'failed',':m'=>$message,':p'=>$ok?'CF-DONE-07':'CF-FAIL-99',':r'=>json_encode($body['result']??null,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':id'=>$id]);
     if($s->rowCount()!==1)apiError(409,'Importauftrag wurde bereits abgeschlossen oder erneut eingeplant.');

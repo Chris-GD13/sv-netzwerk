@@ -86,6 +86,9 @@ jobs:
           php tests/kva_openai_error_test.php
           php tests/document_review_test.php
           php tests/document_review_workflow_test.php
+          php tests/claimsforce_single_result_test.php
+          node tests/claimsforce_single_scope_test.mjs
+          node tests/claimsforce_worker_handshake_test.mjs
           node tests/financial_register_preset_test.mjs
 
       - name: Ausschließlich Portaldateien vorbereiten

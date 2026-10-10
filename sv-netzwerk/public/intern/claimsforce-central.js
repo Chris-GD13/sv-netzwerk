@@ -22,13 +22,14 @@
     }
   };
   placeImportCards();
-  let context={},bridge=false,bridgeVersion='',agentJob=null,userJobs=[],busy=false,reconciling=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}},reconciledJobs=new Set();
+  let context={},bridge=false,bridgeVersion='',workerVersion='',bridgeProblem='',agentJob=null,userJobs=[],busy=false,reconciling=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}},reconciledJobs=new Set();
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
   const driveStatus=()=>window.svnetDriveStatus?window.svnetDriveStatus():json('/intern/api/google-drive-sync.php?action=status');
-  const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
-  const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
+  const stationId=crypto.randomUUID();
+  const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,stationId,bridgeVersion,workerVersion,protocol:2})});
+  const show=(t,b=false)=>{if(context.claims_agent&&bridgeProblem){t=bridgeProblem;b=true;button.disabled=true;if(fullButton)fullButton.disabled=true;}state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.4.12',currentBridgeVersion='1.4.57';
+  const minimumBridgeVersion='1.4.59',currentBridgeVersion='1.4.59';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -53,7 +54,7 @@
       const jobs=await Promise.all(userJobs.map(async id=>(await json('/intern/api/claimsforce-queue.php?action=status&id='+id)).job));
       const failed=jobs.some(job=>job.status==='failed');
       show(jobs.map(job=>job.message||'Import läuft …').join(' · '),failed);
-      if(jobs.every(job=>['done','failed'].includes(job.status))){button.disabled=false;userJobs=[];window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'));return}
+      if(jobs.every(job=>['done','failed'].includes(job.status))){button.disabled=false;if(fullButton)fullButton.disabled=false;if(claimInput)claimInput.disabled=false;userJobs=[];window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'));return}
     }catch(e){show(e.message,true)}
     setTimeout(watch,3000);
   }
@@ -63,7 +64,7 @@
       const recent=await json('/intern/api/claimsforce-queue.php?action=mine');
       userJobs=(recent.jobs||[]).filter(job=>['queued','running'].includes(job.status)).map(job=>Number(job.id));
       if(userJobs.length){button.disabled=true;if(fullButton)fullButton.disabled=true;if(claimInput)claimInput.disabled=true;watch();return}
-      button.disabled=false;if(claimInput)claimInput.disabled=false;
+      button.disabled=false;if(fullButton)fullButton.disabled=false;if(claimInput)claimInput.disabled=false;
       const latestByProfile=new Map();
       for(const job of (recent.jobs||[]).filter(job=>['done','failed'].includes(job.status))){
         const profile=String(job.profile||'unbekannt');
@@ -112,7 +113,7 @@
     stopButton.type='button';stopButton.id='vf-claims-stop';stopButton.className=fullButton.className;stopButton.textContent='Import pausieren';
     stopButton.addEventListener('click',async()=>{
       stopButton.disabled=true;
-      try{await post('stop');userJobs=[];show('Import pausiert. Der nächste Start setzt dort fort, wo er stehen geblieben ist.');button.disabled=false;fullButton.disabled=false;if(claimInput)claimInput.disabled=false}
+      try{await post('stop');stopLocal();userJobs=[];show('Import pausiert. Der nächste Start setzt dort fort, wo er stehen geblieben ist.');button.disabled=false;fullButton.disabled=false;if(claimInput)claimInput.disabled=false}
       catch(e){show(e.message,true)}
       finally{stopButton.disabled=false}
     });
@@ -127,7 +128,7 @@
     if(!supportedProfiles.includes(target))throw Error('Importauftrag enthält ein ungültiges Bearbeiterprofil.');
     sessionStorage.removeItem('svnet-case');
     localStorage.removeItem('svnet-case');
-    window.postMessage({type:'SVNET_CLAIMS_IMPORT_START',profile:job.profile,mode:job.sync_mode||'quick',full:job.sync_mode==='full',claimNumber:job.claim_number||'',since:job.since_date||'',jobId:Number(job.id),runId:`claimsforce-${job.id}-${job.attempt_count||1}`},location.origin);
+    window.postMessage({type:'SVNET_CLAIMS_IMPORT_START_V2',profile:job.profile,mode:job.sync_mode||'quick',full:job.sync_mode==='full',claimNumber:job.claim_number||'',since:job.since_date||'',jobId:Number(job.id),runId:`claimsforce-${job.id}-${job.attempt_count||1}`},location.origin);
   }
 
   async function poll(){
@@ -142,11 +143,11 @@
           if(isOwnJob(active.job))show(`Import ${active.job.id} wurde nach einem abgebrochenen Browserlauf sicher beendet.`,true);
           await resumeWatch();
         }else{
-          if(isOwnJob(active.job))show(`Import ${active.job.id} wird mit derselben Job-ID sicher wiederaufgenommen.`);
+          if(isOwnJob(active.job))show(`Import ${active.job.id} wird auf dieser Importstation wiederaufgenommen.`);
           await launch(active.job,true);
         }
       }
-      else{
+      else if(!active.busy){
         const claimed=await post('claim');
         if(claimed.job)await launch(claimed.job,false);
       }
@@ -167,12 +168,19 @@
     if(e.source!==window||e.origin!==location.origin)return;
     const d=e.data||{},runtime=d.runtime||{};
     if(d.type==='SVNET_CLAIMS_BRIDGE_READY'){
+      if(!bridge){bridgeProblem='Das tatsächlich laufende Importprogramm ist nicht geprüft. Bitte die Browser-Brücke in Chrome neu laden; ein normaler Fensterneustart reicht dafür möglicherweise nicht.';show(bridgeProblem,true);}
+    }
+    if(d.type==='SVNET_CLAIMS_BRIDGE_READY_V2'){
       bridgeVersion=String(d.version||'0.0.0');
-      bridge=versionAtLeast(bridgeVersion,minimumBridgeVersion);
-      if(!bridge)show(`Browser-Brücke ${minimumBridgeVersion} oder neuer erforderlich (geladen: ${bridgeVersion}).`,true);
+      document.documentElement.setAttribute('data-svnet-claims-bridge-version',bridgeVersion);
+      workerVersion=String(d.workerVersion||'');
+      bridge=versionAtLeast(bridgeVersion,minimumBridgeVersion)&&d.protocol===2&&d.portalVersion==='1.4.59'&&workerVersion==='1.4.59';
+      bridgeProblem=bridge?'':`Browser-Brücke neu laden: Dateien ${bridgeVersion}, tatsächlich laufendes Importprogramm ${workerVersion||'alter Stand'}. Einzelimport bleibt gesperrt.`;
+      if(!bridge)show(bridgeProblem,true);
+      else if(!userJobs.length){button.disabled=false;if(fullButton)fullButton.disabled=false;}
       else if(!versionAtLeast(bridgeVersion,currentBridgeVersion))show(`Browser-Brücke ${bridgeVersion} ist einsatzbereit. Version ${currentBridgeVersion} steht als empfohlenes Update bereit.`);
     }
-    if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&!agentJob&&!reconciling){
+    if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS_V2'&&!agentJob&&!reconciling){
       const active=d.status?.active||{},diag=d.status?.diagnostic||{};
       if(active.status==='failed'&&Number(active.jobId||0)>0&&!reconciledJobs.has(Number(active.jobId))){
         reconciledJobs.add(Number(active.jobId));
@@ -185,7 +193,7 @@
         finally{reconciling=false}
       }
     }
-    if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&agentJob){
+    if(d.type==='SVNET_CLAIMS_RUNTIME_STATUS_V2'&&agentJob){
       const active=d.status?.active||{},diag=d.status?.diagnostic||{};
       if(Number(active.jobId||0)===Number(agentJob.id)){
         lastRuntime={phase:diag.phase||active.phase||'CF-RUN',message:diag.text||active.error||'Browserlauf wird fortgesetzt.',current:Number(diag.details?.current||0),total:Number(diag.details?.total||0),diagnostic:diag.details||{}};

@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import { sameImportScope, assertSingleClaim, mergeClaimFiles } from '../browser-extension/claimsforce-bridge/import-utils.js';
+const request = { jobId: 44, profile: 'christian', mode: 'single', claimNumber: '26-085905-9' };
+assert(sameImportScope(request, {...request}));
+for (const change of [{mode:'quick'}, {claimNumber:'26-076821-6'}, {profile:'marc'}, {jobId:45}]) assert(!sameImportScope(request,{...request,...change}));
+assertSingleClaim(request.claimNumber,[{id:'target',label:'26-085905-9'}]);
+assert.throws(()=>assertSingleClaim(request.claimNumber,[{id:'wrong',label:'26-076821-6'}]));
+assert.throws(()=>assertSingleClaim(request.claimNumber,[{id:'target',label:request.claimNumber},{id:'other',label:'other'}]));
+assert.throws(()=>assertSingleClaim(request.claimNumber,[]));
+const merged=mergeClaimFiles([{id:'shared',fileName:'A.pdf'}],[{id:'client',fileName:'Auftrag.pdf'}],[{attachments:[{id:'shared',type:'CLAIM_FILE'},{id:'mail-only',type:'CLAIM_FILE'}]}]);
+assert.deepEqual(merged.map(f=>f.id),['shared','client','mail-only']);
+assert.equal(merged[2].attachmentReference,true);
+console.log('Einzelfallumfang, Wiederaufnahme und Dokument-/Mailanhangzuordnung geprüft.');
