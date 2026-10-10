@@ -25,15 +25,15 @@ function drValidate(array $preview, array $input): array {
     $out['release_amount'] = drMoney($input['release_amount'] ?? null);
     $out['net'] = drMoney($input['net'] ?? null);
     $out['vat'] = drMoney($input['vat'] ?? null);
-    $out['energy_kwh'] = drEnergyNumber($input['energy_kwh'] ?? null);
-    if (trim((string)($input['energy_kwh'] ?? ''))!=='' && $out['energy_kwh']===null) throw new RuntimeException('Bitte einen gültigen Energieverbrauch in kWh eingeben.');
+    $out['energy_enabled'] = ($input['energy_enabled'] ?? false) === true;
+    $out['energy_kwh'] = $out['energy_enabled'] ? drEnergyNumber($input['energy_kwh'] ?? null) : null;
     $out['energy_rate'] = drEnergyNumber($input['energy_rate'] ?? '0,35');
     $out['energy_vn'] = trim((string)($input['energy_vn'] ?? ''));
     $out['energy_amount'] = null;
-    if ($out['energy_kwh'] !== null) {
-        if ($out['energy_kwh']<0 || $out['energy_rate']===null || $out['energy_rate']<=0) throw new RuntimeException('Verbrauch muss mindestens null und der Strompreis größer als null sein.');
+    if ($out['energy_enabled']) {
+        if ($out['energy_kwh']===null || $out['energy_kwh']<=0 || $out['energy_rate']===null || $out['energy_rate']<=0) throw new RuntimeException('Für die ausgewählte Stromkostenerstattung bitte einen nachgewiesenen Verbrauch und Strompreis größer als null eingeben.');
         $out['energy_amount']=round($out['energy_kwh']*$out['energy_rate'],2);
-    } elseif (isset($preview['analysis']['energy_kwh']) && is_numeric($preview['analysis']['energy_kwh'])) throw new RuntimeException('Den nachgewiesenen Energieverbrauch bitte separat übernehmen.');
+    }
     if (!in_array($out['decision'], ['approved','rejected'], true)) throw new RuntimeException('Bitte freigegeben oder nicht freigegeben auswählen.');
     if ($out['company'] === '' || $out['number'] === '' || $out['gross'] === null || $out['gross'] <= 0) throw new RuntimeException('Aussteller, Belegnummer und Original-Bruttobetrag fehlen.');
     if (($preview['mode'] ?? '') === 'review') {
@@ -65,25 +65,38 @@ function drSignature(string $name): string {
 }
 
 function drBody(array $record): string {
+    if (array_key_exists('mail_body', $record)) return drMailText($record['mail_body']);
     $v = $record['values'];
     $label = $record['kind'] === 'invoice' ? 'Rechnung' : 'Angebot';
-    $status = $v['decision'] === 'approved' ? 'freigegeben' : 'nicht freigegeben';
-    $article=$record['kind']==='invoice'?'die':'das';
     $reference=str_starts_with($record['case_no'],'Freie Prüfung ')?'zum Vorgang':'zur Schaden-Nr.';
-    $body = "Sehr geehrte Damen und Herren,\n\n{$reference} {$record['case_no']} erhalten Sie anbei {$article} {$label} von {$v['company']}, Nr. {$v['number']}";
-    if ($v['date'] !== '') $body .= ' vom '.$v['date'];
-    $body .= ' über '.number_format($v['gross'], 2, ',', '.')." EUR brutto.\n\nDer Beleg wird {$status}.";
+    $body = "Guten Tag,\n\n{$reference} {$record['case_no']}:\n";
+    $document="{$label} von {$v['company']}, Nr. {$v['number']}";
+    if ($v['date'] !== '') $document .= ' vom '.$v['date'];
+    if ($record['kind']==='offer') {
+        $body.=$v['decision']==='approved'?"Die im beigefügten {$document} aufgeführten Leistungen gebe ich im nachfolgend genannten Umfang zur Ausführung frei.":"Die im beigefügten {$document} aufgeführten Leistungen kann ich derzeit nicht zur Ausführung freigeben.";
+    } else {
+        $body.=$v['decision']==='approved'?"Die beigefügte {$document} erkenne ich im nachfolgend genannten Umfang an.":"Die beigefügte {$document} kann ich derzeit nicht anerkennen.";
+    }
+    $body.="\n".($record['kind']==='invoice'?'Rechnungsbetrag':'Angebotssumme').': '.number_format($v['gross'],2,',','.').' EUR brutto.';
     if ($v['decision'] === 'approved') $body .= '\nFreigabebetrag: '.number_format($v['release_amount'], 2, ',', '.').' EUR brutto.';
     $body = str_replace('\\n', "\n", $body);
     // The assessment contains internal evidence checks, not an outgoing statement.
     if ($record['mode'] === 'direct') $body .= "\n\nDie Übernahme erfolgt ohne erneute Prüfung.";
     if ($v['reason'] !== '') $body .= "\n\n".$v['reason'];
-    if (($v['energy_kwh']??null)!==null) {
+    if (($v['energy_enabled']??true) && ($v['energy_kwh']??0)>0 && ($v['energy_amount']??0)>0) {
         $rate=rtrim(rtrim(number_format($v['energy_rate'],4,',','.'),'0'),',');
         $kwh=rtrim(rtrim(number_format($v['energy_kwh'],4,',','.'),'0'),',');
         $body .= "\n\nStromkosten – separat zur Erstattung an den VN".(!empty($v['energy_vn'])?' ('.$v['energy_vn'].')':'').":\n".$kwh.' kWh × '.$rate.' EUR/kWh = '.number_format($v['energy_amount'],2,',','.')." EUR.\nDieser Betrag ist nicht im Freigabebetrag für den Auftragnehmer enthalten. Die Auszahlung an den VN erfolgt separat.";
     }
     $body .= "\n\nMit freundlichen Grüßen\n".drSignature($record['sender_name']);
+    reviewAssertCorrespondence($body);
+    return $body;
+}
+
+function drMailText(mixed $value): string {
+    if (!is_string($value)) throw new RuntimeException('Bitte den Mailtext prüfen.');
+    $body=str_replace(["\r\n","\r"],"\n",$value);
+    if (trim($body)==='' || mb_strlen($body)>20000) throw new RuntimeException('Der Mailtext muss ausgefüllt sein und darf höchstens 20.000 Zeichen enthalten.');
     reviewAssertCorrespondence($body);
     return $body;
 }
@@ -101,6 +114,7 @@ function drRecipients(string $value): array {
 function drSubject(array $record): string {
     $caseNo=trim((string)($record['case_no']??''));
     if ($caseNo==='' || str_starts_with($caseNo,'Freie Prüfung ')) throw new RuntimeException('Bitte die Schadennummer der Versicherung für den Mailbetreff angeben.');
+    if (array_key_exists('mail_subject',$record)) return reviewMailSubject($record['mail_subject'],$caseNo);
     return $caseNo.' · '.($record['kind']==='invoice'?'Rechnungsprüfung':'Angebotsprüfung').' · '.$record['values']['number'].' · '.($record['values']['decision']==='approved'?'freigegeben':'nicht freigegeben');
 }
 

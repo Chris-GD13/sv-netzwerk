@@ -28,9 +28,10 @@ loadKvaFunction($core, 'krMeyOperationalCc');
 loadKvaFunction($core, 'krReviewedKva');
 
 $preview = ['case_no'=>'26-130133-6 GF','company'=>'Mey Generalbau GmbH','email'=>'kontakt@meygeneralbau.de','quote_number'=>'AN2629164','insurer'=>'SV SparkassenVersicherung','net'=>null,'gross'=>null];
-$reviewed = krReviewedKva($preview, ['net'=>'19.842,16 €','gross'=>'23.612,18 €','subject'=>'Manuell geprüfte KVA-Freigabe','body'=>'Geprüfter Freigabetext']);
+$reviewed = krReviewedKva($preview, ['net'=>'19.842,16 €','gross'=>'23.612,18 €','subject'=>'26-130133-6 GF · Manuell geprüfte KVA-Freigabe','body'=>'Geprüfter Freigabetext']);
 if (abs($reviewed['net'] - 19842.16) > 0.001 || abs($reviewed['gross'] - 23612.18) > 0.001) throw new RuntimeException('Manuell ergänzte Beträge werden nicht übernommen.');
-if ($reviewed['subject'] !== 'Manuell geprüfte KVA-Freigabe' || !$reviewed['sparkasse']) throw new RuntimeException('Manuell geprüfte Angaben werden nicht vollständig übernommen.');
+if ($reviewed['subject'] !== '26-130133-6 GF · Manuell geprüfte KVA-Freigabe' || $reviewed['body']!=='Geprüfter Freigabetext' || !$reviewed['sparkasse']) throw new RuntimeException('Manuell geprüfte Angaben werden nicht vollständig übernommen.');
+try{krReviewedKva($preview,['net'=>'100','gross'=>'119','subject'=>'Ohne Schadennummer','body'=>'Mein Freigabetext']);throw new LogicException('Missing claim number accepted');}catch(RuntimeException $error){if(!str_contains($error->getMessage(),'Schadennummer'))throw$error;}
 if ($reviewed['email'] !== 'backoffice@meygeneralbau.de' || !$reviewed['mey_generalbau']) throw new RuntimeException('Mey-Generalbau-Freigaben werden nicht verbindlich ans Backoffice geroutet.');
 foreach (['Die KI hat den KVA geprüft.','Das ist als mitgeteilte Angabe dokumentiert, nicht als unabhängig nachgewiesene Freigabe.'] as $badText) {
     try { krReviewedKva($preview,['net'=>'100','gross'=>'119','body'=>$badText]); throw new LogicException('Internal KVA text was accepted'); }

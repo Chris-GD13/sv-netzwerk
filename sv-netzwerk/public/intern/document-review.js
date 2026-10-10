@@ -56,8 +56,10 @@
           <label id="${prefix}amount-label">Freigabebetrag brutto EUR<input id="${prefix}release_amount" inputmode="decimal" autocomplete="off"></label>
           <label>Eigene fachliche Stellungnahme für die Mail<textarea id="${prefix}reason" rows="4" placeholder="Eigene Bewertung, Begründung oder konkrete Rückfrage an den Empfänger"></textarea></label><p class="vf-meta">Nur diese Stellungnahme und deine Entscheidung werden in die Mail übernommen. Interne Prüfhilfen bleiben im Vorgang. Freigabeumfang, konkrete Vorbehalte und erforderliche Unterlagen hier ausdrücklich benennen.</p>
           <div class="dr-fields" aria-label="Standardtexte für die Begründung"><button type="button" data-reason-preset="0">Geprüft – Höhe in Ordnung</button><button type="button" data-reason-preset="1">Bereits geprüft – übernehmen</button><button type="button" data-reason-preset="2">${kind==='invoice'?'Abschlagsrechnung / Baufortschritt':'Freigabe nach Baufortschritt'}</button></div>
-          <fieldset><legend>Energieverbrauch / separate Erstattung an den VN</legend><div class="dr-fields">${field('energy_kwh','Nachgewiesener Verbrauch kWh')}${field('energy_rate','Strompreis EUR/kWh (änderbar)')}${field('energy_vn','VN / Zahlungsempfänger')}</div><label>Stromkosten EUR – separat vom Angebot<input id="${prefix}energy_amount" readonly></label><p class="vf-meta">Standard 0,35 €/kWh. Energieverbrauch wird separat ausgewertet; Stromkosten werden nicht auf die Freigabesumme des Auftragnehmers aufgeschlagen.</p></fieldset>
+          <label class="dr-choice"><input id="${prefix}energy-enabled" type="checkbox"> Stromkosten separat zur Erstattung an den VN aufnehmen</label>
+          <fieldset id="${prefix}energy-fields" hidden><legend>Stromkosten / separate Erstattung an den VN</legend><div class="dr-fields">${field('energy_kwh','Nachgewiesener Verbrauch kWh')}${field('energy_rate','Strompreis EUR/kWh (änderbar)')}${field('energy_vn','VN / Zahlungsempfänger')}</div><label>Stromkosten EUR – separat vom Freigabebetrag<input id="${prefix}energy_amount" readonly></label><p class="vf-meta">Standard 0,35 €/kWh. Ohne Auswahl wird kein Stromkostentext in die Mail aufgenommen.</p></fieldset>
           <fieldset><legend>Empfänger auswählen</legend>
+            ${recipient('vn','Versicherungsnehmer','')}
             ${recipient('supplier',kind==='invoice'?'Rechnungssteller':'Angebotssteller','')}
             ${recipient('insurer','Versicherung (z. B. Sparkassenversicherung)','')}
             ${fixed.map(([key,name,address])=>recipient(key,name,address,true)).join('')}
@@ -68,7 +70,7 @@
           <button class="vf-primary" type="button" id="${prefix}save">Entscheidung speichern und Mail vorbereiten</button>
           <p id="${prefix}save-state" class="vf-meta" role="alert" aria-live="polite"></p>
         </div>
-        <div id="${prefix}mail" class="dr-mail" hidden><strong>Mailvorschau</strong><p id="${prefix}mail-header"></p><pre id="${prefix}mail-body"></pre><button type="button" class="vf-primary" id="${prefix}send">Mail mit Originalbeleg senden</button><p class="vf-meta" id="${prefix}send-state" role="status"></p></div>
+        <div id="${prefix}mail" class="dr-mail" hidden><strong>Mail vor dem Versand bearbeiten</strong><p id="${prefix}mail-header"></p><label>Betreff<input id="${prefix}mail-subject" maxlength="500"></label><p class="vf-meta">Der Betreff muss die vollständige Schadennummer enthalten.</p><label>Mailtext<textarea id="${prefix}mail-body" rows="16" maxlength="20000"></textarea></label><div class="dr-actions"><button type="button" class="vf-secondary" id="${prefix}mail-save">Mailänderungen speichern</button><button type="button" class="vf-primary" id="${prefix}send">Mail mit Originalbeleg senden</button></div><p class="vf-meta" id="${prefix}send-state" role="status"></p></div>
       </div>`;
     wrap.append(panel);
     const el = name => document.getElementById(prefix+name);
@@ -82,10 +84,12 @@
       reset(); el('edit').hidden=true; el('checks').replaceChildren(); el('sender').textContent=''; el('send-state').textContent='';el('history').hidden=true;el('history').replaceChildren();
       state.support.clear();el('supports').replaceChildren();el('comment').value='';el('case_no').value='';
       for (const key of ['energy_kwh','energy_amount','energy_vn']) el(key).value='';el('energy_rate').value='0,35';
+      el('energy-enabled').checked=false;el('energy-fields').hidden=true;
       for (const name of ['company','number','date','net','vat','gross','assessment','reason','release_amount','extra-to','extra-cc','extra-bcc']) el(name).value='';
       el('decision').value=''; el('direct').checked=false;
       panel.querySelectorAll('[data-recipient]').forEach(input=>input.checked=false);
       panel.querySelector('[data-address="supplier"]').value=''; panel.querySelector('[data-address="insurer"]').value='';
+      panel.querySelector('[data-address="vn"]').value='';
       message(''); syncMode();
     };
     const sameCase = folder => { if (context()!==folder) throw Error('Der Prüfvorgang wurde gewechselt. Bitte die Belege im richtigen Vorgang neu auswählen.'); };
@@ -112,6 +116,7 @@
       el('energy_amount').value=kwh!==null&&Number.isFinite(kwh)&&rate!==null&&Number.isFinite(rate)?(Math.round((kwh*rate+Number.EPSILON)*100)/100).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}):'';
     }
     el('energy_kwh').addEventListener('input',energyAmount);el('energy_rate').addEventListener('input',energyAmount);
+    el('energy-enabled').addEventListener('change',()=>{el('energy-fields').hidden=!el('energy-enabled').checked;energyAmount();});
     async function load() {
       if (!active()?.folder_id && !el('standalone').checked) el('standalone').checked=true;
       syncMode();
@@ -139,6 +144,7 @@
       const insurerAddress=meta.versicherer_email||meta.insurer_email||(/sparkassen|^sv$/i.test(insurer)?'service.schaden@sparkassenversicherung.de':'');
       if (!panel.querySelector('[data-address="insurer"]').value) panel.querySelector('[data-address="insurer"]').value=insurerAddress;
       if (!panel.querySelector('[data-address="supplier"]').value) panel.querySelector('[data-address="supplier"]').value=meta.sanierer_email||'';
+      if (!panel.querySelector('[data-address="vn"]').value) panel.querySelector('[data-address="vn"]').value=meta.vn_email||meta.email||document.getElementById('vf-email')?.value||'';
       original();
     }
     el('history').onclick=async event=>{
@@ -153,11 +159,13 @@
         const v=r.values;for(const key of ['company','number','date','assessment','reason','decision','energy_vn'])el(key).value=v[key]||'';
         for(const key of ['net','vat','gross','release_amount'])el(key).value=Number.isFinite(v[key])?v[key].toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}):'';
         for(const key of ['energy_kwh','energy_rate'])el(key).value=Number.isFinite(v[key])?v[key].toLocaleString('de-DE',{maximumFractionDigits:4}):'';energyAmount();
+        el('energy-enabled').checked=v.energy_enabled===true||(v.energy_enabled===undefined&&v.energy_kwh>0);el('energy-fields').hidden=!el('energy-enabled').checked;
         panel.querySelectorAll('[data-recipient]').forEach(x=>x.checked=false);for(const role of ['to','cc','bcc'])el('extra-'+role).value=v[role]||'';
         el('checks').innerHTML=(r.analysis?.checks||[]).map(c=>`<p><strong>${esc(c.item)}: ${esc(c.result)}</strong><br>${esc(c.detail)}</p>`).join('')+(r.analysis?.warnings||[]).map(w=>`<p class="dr-error">${esc(w)}</p>`).join('');
         state.token=r.token;state.source=(r.attach_support?(r.sources||[]).map(s=>s.name):[r.file_name]).join(', ')||r.file_name;
         el('attachment').textContent=`Mailanhänge: ${state.source} (Originalbelege)`;el('edit').hidden=false;el('amount-label').hidden=v.decision==='rejected';original();syncMode();
-        message('Gespeicherte Entscheidung geöffnet. Eigene Stellungnahme und Empfänger kontrollieren, Ergebnis bestätigen und die neue Mailvorschau speichern.');
+        if(r.mail){state.recordId=r.mail.record_id;el('mail-header').textContent=`Von: ${r.mail.sender}\nAn: ${v.to||'noch nicht ausgewählt'}\nCC: ${v.cc||'–'}\nBCC: ${v.bcc||'–'}\nAnhang: ${state.source}`;el('mail-subject').value=r.mail.subject;el('mail-body').value=r.mail.body;el('mail').hidden=false;el('send').disabled=!v.to;}
+        message(r.mail?'Gespeicherte Entscheidung geöffnet. Betreff und Mailtext können direkt bearbeitet werden.':'Gespeicherte Entscheidung geöffnet. Eigene Stellungnahme und Empfänger kontrollieren, Ergebnis bestätigen und die neue Mailvorschau speichern.');
       }catch(error){message(error.message,true);}
     };
     panel.addEventListener('toggle',()=>{ if (panel.open) load().catch(e=>message(e.message,true)); });
@@ -203,6 +211,7 @@
         state.token=result.token; state.source=result.file_name;
         const a=result.analysis||{};
         el('energy_kwh').value=Number.isFinite(a.energy_kwh)?a.energy_kwh.toLocaleString('de-DE',{maximumFractionDigits:4}):'';el('energy_rate').value='0,35';el('energy_vn').value=a.energy_vn||(!el('standalone').checked?active()?.meta?.object||document.getElementById('vf-object')?.value||'':'');energyAmount();
+        el('energy-enabled').checked=false;el('energy-fields').hidden=true;
         if (el('standalone').checked && !caseNo && a.case_no) el('case_no').value=a.case_no;
         for (const key of ['company','number','date','assessment']) el(key).value=a[key]||'';
         for (const key of ['net','vat','gross']) el(key).value=Number.isFinite(a[key])?a[key].toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}):'';
@@ -222,6 +231,7 @@
     const values = () => {
       const v={};for(const key of ['company','number','date','net','vat','gross','reason','assessment','release_amount','decision','energy_kwh','energy_rate','energy_vn'])v[key]=el(key).value.trim();
       v.review_confirmed=el('confirmed').checked;
+      v.energy_enabled=el('energy-enabled').checked;
       for(const role of ['to','cc','bcc'])v[role]=el('extra-'+role).value.trim();
       panel.querySelectorAll('[data-recipient]:checked').forEach(input=>{const key=input.dataset.recipient,role=panel.querySelector(`[data-role="${key}"]`).value,address=panel.querySelector(`[data-address="${key}"]`).value.trim();if(!address)throw Error('Bitte die E-Mail-Adresse des ausgewählten Empfängers ergänzen.');v[role]=[v[role],address].filter(Boolean).join(', ');});
       return v;
@@ -242,18 +252,27 @@
       try {
         const v=values();const data=await request('save',folder,{token:state.token,values:v,case_no:el('case_no').value.trim()});sameCase(folder);
         state.recordId=data.record_id;
-        el('mail-header').textContent=`Von: ${data.sender}\nAn: ${v.to||'noch nicht ausgewählt'}\nCC: ${v.cc||'–'}\nBCC: ${v.bcc||'–'}\nBetreff: ${data.subject}\nAnhang: ${state.source}`;
-        el('mail-body').textContent=data.body;el('mail').hidden=false;el('send').disabled=!v.to;el('send-state').textContent='';
+        el('mail-header').textContent=`Von: ${data.sender}\nAn: ${v.to||'noch nicht ausgewählt'}\nCC: ${v.cc||'–'}\nBCC: ${v.bcc||'–'}\nAnhang: ${state.source}`;
+        el('mail-subject').value=data.subject;el('mail-body').value=data.body;el('mail').hidden=false;el('send').disabled=!v.to;el('send-state').textContent='';
         saveMessage(`Entscheidung ${el('standalone').checked?'im persönlichen Prüfvorgang':'im Fall unter 06_Freigaben_Zahlungen'} gespeichert. ${v.to?'Mail bereit zur Durchsicht.':'Für den Versand einen An-Empfänger auswählen und erneut speichern.'}`);
         el('mail').scrollIntoView({behavior:'smooth',block:'start'});
       } catch(error) {saveMessage(error.message,true);}finally{el('save').disabled=false;}
+    };
+    const mailValues=()=>({record_id:state.recordId,subject:el('mail-subject').value,body:el('mail-body').value});
+    for(const key of ['mail-subject','mail-body'])el(key).addEventListener('input',()=>{el('send-state').classList.remove('dr-error');el('send-state').textContent='Mail geändert. Beim Versand wird dieser Text verwendet.';});
+    el('mail-save').onclick=async()=>{
+      const folder=context();if(!state.recordId||folder!==state.folder){message('Bitte im richtigen Fall erneut speichern.',true);return;}
+      el('mail-save').disabled=true;el('send').disabled=true;
+      try{await request('update_mail',folder,mailValues());sameCase(folder);el('send-state').classList.remove('dr-error');el('send-state').textContent='Betreff und Mailtext gespeichert. Die Mail wurde nicht versendet.';}
+      catch(error){el('send-state').textContent=error.message;el('send-state').classList.add('dr-error');}
+      finally{el('mail-save').disabled=false;el('send').disabled=!values().to;}
     };
     el('send').onclick=async()=>{
       const folder=context();
       if (!state.recordId||folder!==state.folder) {message('Bitte im richtigen Fall erneut speichern.',true);return;}
       el('send').disabled=true;el('send-state').textContent='Mail mit Originalbeleg wird versendet …';
       try {
-        const data=await request('send',folder,{record_id:state.recordId});sameCase(folder);
+        const data=await request('send',folder,mailValues());sameCase(folder);
         el('send-state').textContent=`Versand von ${data.sender} bestätigt. Originalbeleg angehängt; Versandstatus in der Fallakte gespeichert.`;
       } catch(error) {el('send-state').textContent=error.message;el('send-state').classList.add('dr-error');}
     };
