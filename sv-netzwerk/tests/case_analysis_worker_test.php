@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/../public/intern/api/case-analysis-core.php';
+require_once __DIR__.'/../public/intern/api/case-rules.php';
 require_once __DIR__.'/../public/intern/api/case-identity.php';
 $source = str_replace("\r\n", "\n", file_get_contents(__DIR__.'/../public/intern/api/case-analysis.php'));
 $start = strpos($source, 'function caJobs()');
@@ -18,22 +19,24 @@ class FakeDatabase {
 function db(): FakeDatabase { return new FakeDatabase(); }
 function env(string $key, string $fallback = ''): string { return $key === 'OPENAI_API_KEY' ? 'test-not-a-secret' : $fallback; }
 function krSenderProfile(array $user): array { return ['name'=>'Test', 'email'=>'test@example.invalid']; }
-function krDrive(string $url): string {
-    global $mode;
-    if (!str_contains($url, '?alt=media')) {
-        parse_str((string)parse_url($url, PHP_URL_QUERY), $params); $query = $params['q'];
-        foreach (CA_RULE_ROOTS as $index=>$name) if (str_contains($query, "name='".$name."'")) {
-            return json_encode(['files'=>$mode === 'missing-rules' ? [] : [['id'=>'rules-'.$index, 'name'=>$name]]]);
-        }
-        if (str_contains($query, "'rules-0' in parents")) return json_encode(['files'=>[
-            ['id'=>'binding', 'name'=>'ab sofort immer gültig', 'mimeType'=>'application/vnd.google-apps.folder'],
-            ['id'=>'master', 'name'=>'MASTER.md', 'mimeType'=>'text/markdown'],
-        ]]);
-        return json_encode(['files'=>[['id'=>hash('sha256', $query), 'name'=>'REGEL.md', 'mimeType'=>'text/markdown']]]);
-    }
-    return 'Verbindliche Originalregel: Fakten und Bewertung trennen.';
-}
+function ionosItem(string $id): array { return ['id'=>'rules-1', 'name'=>'00_KI-Wissensbasis', 'mimeType'=>'application/vnd.google-apps.folder']; }
 function ionosList(array $query): array {
+    global $mode;
+    $q = $query['q'];
+    if (str_contains($q, "name=") || str_contains($q, "'rules-") || str_contains($q, "'binding'")) {
+        foreach (CA_RULE_ROOTS as $index=>$name) if (str_contains($q, "name='".$name."'")) {
+            return ['files'=>$mode === 'missing-rules' ? [] : [['id'=>'rules-'.$index, 'name'=>$name]]];
+        }
+        if (str_contains($q, "'rules-0' in parents")) return ['files'=>[
+            ['id'=>'binding', 'name'=>'ab sofort immer gültig', 'mimeType'=>'application/vnd.google-apps.folder'],
+            ['id'=>'master', 'name'=>'MASTER-ARBEITSSTANDARD.md', 'mimeType'=>'text/markdown'],
+        ]];
+        if (str_contains($q, "'rules-1' in parents")) return ['files'=>[
+            ['id'=>'rule-pdf', 'name'=>'Richtlinie.pdf', 'mimeType'=>'application/pdf'],
+            ['id'=>hash('sha256', $q), 'name'=>'REGEL.md', 'mimeType'=>'text/markdown'],
+        ]];
+        return ['files'=>[['id'=>hash('sha256', $q), 'name'=>'REGEL.md', 'mimeType'=>'text/markdown']]];
+    }
     if (str_contains($query['q'], "'reports'")) return ['files'=>[]];
     if (str_contains($query['q'], "'photos'")) return ['files'=>[['id'=>'photo', 'name'=>'Boden.jpg', 'mimeType'=>'image/jpeg', 'size'=>8]]];
     return ['files'=>[
@@ -45,7 +48,8 @@ function ionosList(array $query): array {
     ]];
 }
 function ionosBytes(string $id): string {
-    return match ($id) { 'meta'=>json_encode(['schaden_nr'=>'26-031578-4', 'vn_objekt'=>'Testobjekt']), 'offer'=>'PDF-original', 'photo'=>'photo-original', default=>throw new RuntimeException('Unexpected original '.$id) };
+    if ($id === 'master' || preg_match('/^[a-f0-9]{64}$/D', $id)) return 'Verbindliche Originalregel: Fakten und Bewertung trennen.';
+    return match ($id) { 'meta'=>json_encode(['schaden_nr'=>'26-031578-4', 'vn_objekt'=>'Testobjekt']), 'offer'=>'PDF-original', 'photo'=>'photo-original', 'rule-pdf'=>'PDF-rule-original', default=>throw new RuntimeException('Unexpected original '.$id) };
 }
 function ionosWrite(array $meta, string $bytes): array {
     if ($GLOBALS['mode'] === 'storage-failure') throw new RuntimeException('IONOS-Speicherung fehlgeschlagen');
@@ -76,7 +80,8 @@ function krOpenAiJson(string $key, array $content, string $system, string $promp
     if (str_contains($prompt, 'JSON mit documents')) {
         $documents = [];
         foreach ($content as $part) if ($part['type'] === 'input_text' && preg_match('/^Original(?:quelle|foto|beleg): ([^\n]+)/', $part['text'], $match)) {
-            $documents[] = ['name'=>$match[1], 'findings'=>'Originalquelle mit belegten Angaben geprüft.', 'warnings'=>[]];
+            $documents[] = ['name'=>$match[1], 'findings'=>'Originalquelle mit belegten Angaben geprüft.',
+                'warnings'=>$GLOBALS['mode'] === 'unreadable-rule' && str_contains($match[1], 'Richtlinie.pdf') ? ['Seite unlesbar'] : []];
         }
         if ($GLOBALS['mode'] === 'incomplete-read') array_pop($documents);
         return ['documents'=>$documents];
@@ -92,13 +97,14 @@ assertWorker($done[':s'] === 'done', 'Worker must complete after confirmed IONOS
 assertWorker(count($written) === 1 && $written[0]['meta']['parents'] === ['reports'], 'Existing IONOS report folder');
 $record = $written[0]['record'];
 assertWorker($record['folder_id'] === 'case-folder' && $record['status'] === 'draft', 'Model cannot override case identity or draft status');
-assertWorker(count($record['rules']) === 4, 'All MD areas loaded');
+assertWorker(count($record['rules']) === 5, 'All MD areas and binary original rules loaded');
 assertWorker(count($record['sources']) === 5, 'Case originals, current attachment and inline photo included');
 assertWorker(count(array_filter($record['sources'], fn($file)=>$file['duplicate_of'] !== null)) === 1, 'Same offer not processed twice');
 assertWorker(count($record['source_gaps']) === 1 && str_contains($record['source_gaps'][0], 'Alte Mail.msg'), 'Unsupported originals visible');
 assertWorker(count($uploaded) === count($deleted), 'Temporary OpenAI files cleaned up');
 assertWorker(str_contains(end($aiCalls)['system'], 'Verbindliche Originalregel'), 'MD content used, not just filenames');
-foreach (['missing-rules', 'wrong-case', 'incomplete-read', 'storage-failure'] as $failure) {
+assertWorker(str_contains($aiCalls[0]['system'], 'Transkribiere'), 'Original PDF rules require full transcription, not case evidence extraction');
+foreach (['missing-rules', 'wrong-case', 'incomplete-read', 'storage-failure', 'unreadable-rule'] as $failure) {
     $mode = $failure; $updates = []; $written = [];
     caRun(2, 'case-folder', 'task-one', '', ['id'=>1]);
     assertWorker(end($updates)[':s'] === 'failed', $failure.' must fail explicitly');
