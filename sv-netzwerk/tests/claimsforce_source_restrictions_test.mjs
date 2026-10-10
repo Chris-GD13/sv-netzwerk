@@ -13,6 +13,21 @@ assert.equal(claimFolderPath({ parentFolderId: 'CALCULATION_INVOICE' }), 'Rechnu
 // Den echten Übertragungsabschnitt ausführen: geschützte Referenzen dürfen
 // weder weitere Dateien/Mails blockieren noch als heruntergeladen gelten.
 const worker = fs.readFileSync(new URL('../browser-extension/claimsforce-bridge/service-worker.js', import.meta.url), 'utf8');
+const tabSelection = worker.slice(worker.indexOf('  const invokingTab =', worker.indexOf('async function claimsTab')), worker.indexOf('  tab = await waitTab', worker.indexOf('async function claimsTab')));
+for (const groupId of [7, -1]) {
+  const groups = [], created = [];
+  const chrome = { tabs: {
+    get: async () => ({ id: 1, windowId: 3, index: 2, groupId }),
+    query: async () => [{ id: 99, windowId: 8, groupId }],
+    create: async options => { created.push(options); return {id: 2}; },
+    group: async options => groups.push(options)
+  } };
+  const selected = await vm.runInNewContext(`(async()=>{${tabSelection}\nreturn tab;})()`, { chrome, run: {portalTabId: 1} });
+  assert.equal(selected.id, 2, 'Ein fremdes Fenster darf keinen Importtab liefern');
+  assert.equal(created[0].windowId, 3);
+  assert.equal(groups.length, groupId >= 0 ? 1 : 0);
+  if (groupId >= 0) assert.equal(groups[0].groupId, groupId, 'Neuer Tab bleibt im aufrufenden Chat');
+}
 const transfer = worker.slice(worker.indexOf('    let caseDeadline ='), worker.indexOf('\n    updated++;'));
 async function run(status, reference) {
   const uploaded = [], calls = [], commits = [];

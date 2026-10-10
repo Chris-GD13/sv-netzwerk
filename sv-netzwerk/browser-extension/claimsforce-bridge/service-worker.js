@@ -216,7 +216,10 @@ async function claimsTab(profile, run, credential) {
   const invokingTab = await chrome.tabs.get(run.portalTabId);
   const available = await chrome.tabs.query({ url: ['https://web.claimsforce.com/*', 'https://claimsforce.eu.auth0.com/*'] });
   let tab = available.find(candidate => candidate.windowId === invokingTab.windowId && candidate.groupId === invokingTab.groupId);
-  if (!tab) tab = await chrome.tabs.create({ url: 'https://web.claimsforce.com/login', windowId: invokingTab.windowId, index: invokingTab.index + 1, active: false });
+  if (!tab) {
+    tab = await chrome.tabs.create({ url: 'https://web.claimsforce.com/login', windowId: invokingTab.windowId, index: invokingTab.index + 1, active: false });
+    if (Number.isInteger(invokingTab.groupId) && invokingTab.groupId >= 0) await chrome.tabs.group({ groupId: invokingTab.groupId, tabIds: [tab.id] });
+  }
   tab = await waitTab(tab.id);
   if (safeRoute(tab.url) === '/login') await chrome.storage.session.remove(['claimsToken', 'claimsTokenProfile']);
   await diagnostic(run, 'CF-AUTH-02', 'ClaimsForce-Seite ist geladen.', { route: safeRoute(tab.url) });
