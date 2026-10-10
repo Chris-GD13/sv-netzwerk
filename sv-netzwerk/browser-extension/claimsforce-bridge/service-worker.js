@@ -486,19 +486,19 @@ async function runImport(run) {
   const claimsById = new Map(), bucketCounts = {};
   if (useInvoicedClaims) {
     const fullSyncWindow = run.since ? `ab ${run.since}` : 'ohne Datumsgrenze';
-    await diagnostic(run, 'CF-FULL-04', singleSync ? `ClaimsForce-Kostennotenliste wird für die Suche nach Schadennummer ${singleClaimNumber} geöffnet.` : `Vollabgleich der ClaimsForce-Kostennoten ${fullSyncWindow}: Schadennummern aus „/invoiced“ werden eingelesen.`, { since: run.since || '', strategy: 'invoiced-claims', claimNumber: singleClaimNumber });
-    await ensureInvoicedListTab(tab.id);
+    await diagnostic(run, 'CF-FULL-04', singleSync ? `Die globale ClaimsForce-Suche wird auf der aktuellen Seite für Schadennummer ${singleClaimNumber} verwendet.` : `Vollabgleich der ClaimsForce-Kostennoten ${fullSyncWindow}: Schadennummern aus „/invoiced“ werden eingelesen.`, { since: run.since || '', strategy: singleSync ? 'current-page-damage-number-search' : 'invoiced-claims', claimNumber: singleClaimNumber });
+    if (!singleSync) await ensureInvoicedListTab(tab.id);
     const scraped = singleSync
       ? await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER', damageNumber: singleClaimNumber })
       : await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
     if (!scraped?.ok) throw new Error(scraped?.error || '[CF-INVOICED-01] Schadennummern aus „/invoiced“ konnten nicht gelesen werden.');
     const scrapedRoute = String(scraped.route || '').replace(/\/+$/, '');
-    if (scrapedRoute !== '/invoiced') throw new Error(`[CF-INVOICED-01] Kostennotenliste nicht bestätigt (Route ${safeRoute((await chrome.tabs.get(tab.id)).url)}).`);
+    if (!singleSync && scrapedRoute !== '/invoiced') throw new Error(`[CF-INVOICED-01] Kostennotenliste nicht bestätigt (Route ${safeRoute((await chrome.tabs.get(tab.id)).url)}).`);
     const allClaims = Array.isArray(scraped?.claims) ? scraped.claims : [];
     for (const claim of allClaims) if (claim?.id) claimsById.set(claim.id, claim);
     bucketCounts.INVOICED_CLAIMS = allClaims.length;
-    await progress(portalTabId(), singleSync ? `Schadennummer ${singleClaimNumber} wurde in ClaimsForce gefunden; Falldaten, Nachrichten und Anhänge werden vollständig abgeglichen.` : `${claimsById.size} Schäden aus „/invoiced“ gefunden; anschließend werden Falldaten, Nachrichten und Anhänge einzeln abgeglichen.`, 0, claimsById.size);
-    await diagnostic(run, 'CF-INVOICED-01', singleSync ? `Einzelfall ${singleClaimNumber} wurde über die ClaimsForce-Kostennotenliste erkannt.` : `${claimsById.size} Schäden aus der ClaimsForce-Kostennotenliste erkannt.`, {
+    await progress(portalTabId(), singleSync ? `Schadennummer ${singleClaimNumber} wurde über die globale ClaimsForce-Suche gefunden; Falldaten, Nachrichten und Anhänge werden vollständig abgeglichen.` : `${claimsById.size} Schäden aus „/invoiced“ gefunden; anschließend werden Falldaten, Nachrichten und Anhänge einzeln abgeglichen.`, 0, claimsById.size);
+    await diagnostic(run, 'CF-INVOICED-01', singleSync ? `Einzelfall ${singleClaimNumber} wurde über die globale ClaimsForce-Suche erkannt.` : `${claimsById.size} Schäden aus der ClaimsForce-Kostennotenliste erkannt.`, {
       count: claimsById.size,
       importedCount: claimsById.size,
       listedCount: scraped.listedCount || 0,
@@ -509,7 +509,7 @@ async function runImport(run) {
       bridge: BRIDGE_VERSION,
       claimNumber: singleClaimNumber
     });
-    await diagnostic(run, 'CF-LIST-05', singleSync ? `${claimsById.size} ausgewählter Schaden aus „/invoiced“ erkannt.` : `${claimsById.size} unterschiedliche Schäden aus „/invoiced“ erkannt.`, {
+    await diagnostic(run, 'CF-LIST-05', singleSync ? `${claimsById.size} ausgewählter Schaden über die globale ClaimsForce-Suche erkannt.` : `${claimsById.size} unterschiedliche Schäden aus „/invoiced“ erkannt.`, {
       count: claimsById.size,
       invoicedClaimCount: allClaims.length,
       since: run.since || '',
@@ -681,7 +681,8 @@ async function runImport(run) {
 async function startImport(sender, message) {
   const portalTabId = sender.tab?.id;
   if (!portalTabId) return { ok: false, error: '[CF-RUN-00] Portal-Registerkarte fehlt.' };
-  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), mode: message.mode === 'tasks' ? 'tasks' : message.mode === 'single' ? 'single' : message.mode === 'full' || message.full ? 'full' : 'quick', claimNumber: String(message.claimNumber || ''), since: String(message.since || ''), portalTabId, startedAt: new Date().toISOString() };
+  const claimNumber = String(message.claimNumber || '').trim();
+  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), mode: claimNumber ? 'single' : message.mode === 'tasks' ? 'tasks' : message.mode === 'single' ? 'single' : message.mode === 'full' || message.full ? 'full' : 'quick', claimNumber, since: String(message.since || ''), portalTabId, startedAt: new Date().toISOString() };
   if (runningImport) {
     if (runningImport.jobId === requested.jobId && runningImport.profile === requested.profile) {
       runningImport.portalTabId = portalTabId;

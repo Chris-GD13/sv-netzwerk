@@ -374,8 +374,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       sendResponse({ ok: false, error: '[CF-SINGLE-01] Für den Einzelfallimport fehlt die Schadennummer.' });
       return;
     }
-    if (location.pathname.replace(/\/+$/, '') !== '/invoiced') {
-      sendResponse({ ok: false, error: `[CF-SINGLE-01] ClaimsForce-Kostennotenliste ist nicht geöffnet (aktuell ${location.pathname || 'unbekannt'}).` });
+    if (location.pathname.replace(/\/+$/, '') === '/login') {
+      sendResponse({ ok: false, error: '[CF-SINGLE-01] ClaimsForce ist nicht angemeldet; die globale Schadensuche ist nicht verfügbar.' });
       return;
     }
     const input = [...document.querySelectorAll('input')].find(node => /Schäden durchsuchen/i.test(`${node.getAttribute('placeholder') || ''} ${node.getAttribute('aria-label') || ''}`));
@@ -409,7 +409,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           return;
         }
       }
-      throw new Error(`[CF-SINGLE-01] Schadennummer ${damageNumber} wurde in der ClaimsForce-Kostennotenliste nicht gefunden.`);
+      throw new Error(`[CF-SINGLE-01] Schadennummer ${damageNumber} wurde über die ClaimsForce-Suche nicht gefunden.`);
     })().catch(error => sendResponse({ ok: false, error: error.message }));
     return true;
   }
