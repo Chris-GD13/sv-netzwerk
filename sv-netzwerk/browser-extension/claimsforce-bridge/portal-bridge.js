@@ -248,7 +248,16 @@ window.addEventListener('message', event => {
     let profile;
     try { profile = profileKey(event.data.profile); }
     catch (error) { window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: error.message, runtime: { jobId: Number(event.data.jobId || 0) } }, location.origin); return; }
-    activeRequest = { type: 'START_IMPORT', profile, jobId: Number(event.data.jobId || 0), runId: event.data.runId || crypto.randomUUID(), mode: event.data.mode === 'tasks' ? 'tasks' : event.data.mode === 'full' || event.data.full ? 'full' : 'quick', full: event.data.full === true, since: String(event.data.since || '') };
+    activeRequest = {
+      type: 'START_IMPORT',
+      profile,
+      jobId: Number(event.data.jobId || 0),
+      runId: event.data.runId || crypto.randomUUID(),
+      mode: event.data.mode === 'tasks' ? 'tasks' : event.data.mode === 'single' ? 'single' : event.data.mode === 'full' || event.data.full ? 'full' : 'quick',
+      full: event.data.full === true,
+      claimNumber: String(event.data.claimNumber || ''),
+      since: String(event.data.since || '')
+    };
     const request = activeRequest;
     connectKeepalive();
     chrome.runtime.sendMessage(request).then(response => {

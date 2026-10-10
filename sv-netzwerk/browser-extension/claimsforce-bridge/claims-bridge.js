@@ -365,6 +365,54 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     })().catch(error => sendResponse({ ok: false, error: error.message, claims: [] }));
     return true;
   }
+  if (message?.type === 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER') {
+    const damageNumber = String(message.damageNumber || '').trim();
+    const key = damageNumber.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    const claimPattern = /\/claims\/([0-9a-f-]{20,})(?:\/|$)/i;
+    const damageNumberPattern = /\b[A-Za-z]{1,4}\d[A-Za-z0-9]*(?:[-.][A-Za-z0-9]+)+\b|\b(?:\d{2,3}-)?\d{2,9}(?:-\d{1,9}){1,3}\b|\b\d{2}\.\d{5,}\.\d{1,3}\b|\b\d{8,14}\b/;
+    if (!key) {
+      sendResponse({ ok: false, error: '[CF-SINGLE-01] Für den Einzelfallimport fehlt die Schadennummer.' });
+      return;
+    }
+    if (location.pathname.replace(/\/+$/, '') !== '/invoiced') {
+      sendResponse({ ok: false, error: `[CF-SINGLE-01] ClaimsForce-Kostennotenliste ist nicht geöffnet (aktuell ${location.pathname || 'unbekannt'}).` });
+      return;
+    }
+    const input = [...document.querySelectorAll('input')].find(node => /Schäden durchsuchen/i.test(`${node.getAttribute('placeholder') || ''} ${node.getAttribute('aria-label') || ''}`));
+    if (!input) {
+      sendResponse({ ok: false, error: '[CF-SINGLE-01] ClaimsForce-Suchfeld für die Schadennummer wurde nicht gefunden.' });
+      return;
+    }
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+    if (!setter) {
+      sendResponse({ ok: false, error: '[CF-SINGLE-01] ClaimsForce-Suchfeld konnte nicht gesetzt werden.' });
+      return;
+    }
+    setter.call(input, damageNumber);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    (async () => {
+      const matches = new Map();
+      for (let attempt = 0; attempt < 40; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, 150));
+        for (const anchor of document.querySelectorAll('a[href*="/claims/"]')) {
+          const id = String(anchor.getAttribute('href') || '').match(claimPattern)?.[1];
+          const row = anchor.closest('tr,[role="row"],article,li');
+          const labels = [anchor.innerText || anchor.textContent || '', anchor.getAttribute('aria-label') || '', row?.innerText || row?.textContent || ''];
+          const exact = labels.some(label => (String(label).match(damageNumberPattern)?.[0] || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase() === key);
+          if (id && exact) matches.set(id, anchor);
+        }
+        if (matches.size > 1) throw new Error(`[CF-SINGLE-01] Die Schadennummer ${damageNumber} ist in ClaimsForce nicht eindeutig.`);
+        if (matches.size === 1) {
+          const id = [...matches.keys()][0];
+          sendResponse({ ok: true, route: location.pathname, claims: [{ id, label: damageNumber }], listedCount: 1 });
+          return;
+        }
+      }
+      throw new Error(`[CF-SINGLE-01] Schadennummer ${damageNumber} wurde in der ClaimsForce-Kostennotenliste nicht gefunden.`);
+    })().catch(error => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
   if (message?.type === 'SESSION_STATE') {
     sendResponse({ ok: true, route: location.pathname, observedClaims: observedClaims.size, planning: location.pathname.startsWith('/planning'), login: location.pathname.startsWith('/login') });
     return;

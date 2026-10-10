@@ -1,5 +1,5 @@
 (()=>{
-  const old=document.getElementById('vf-claims-import'),fullButton=document.getElementById('vf-claims-full'),sinceInput=document.getElementById('vf-claims-since'),state=document.getElementById('vf-claims-state'),settings=document.getElementById('vf-claims-settings'),download=document.getElementById('vf-claims-download');
+  const old=document.getElementById('vf-claims-import'),fullButton=document.getElementById('vf-claims-full'),claimInput=document.getElementById('vf-claims-number'),state=document.getElementById('vf-claims-state'),settings=document.getElementById('vf-claims-settings'),download=document.getElementById('vf-claims-download');
   if(!old)return;
   const button=old.cloneNode(true);old.replaceWith(button);
   const claimsCard=button.closest('.vf-claims-import');
@@ -28,7 +28,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.4.12',currentBridgeVersion='1.4.52';
+  const minimumBridgeVersion='1.4.12',currentBridgeVersion='1.4.53';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -62,8 +62,8 @@
     try{
       const recent=await json('/intern/api/claimsforce-queue.php?action=mine');
       userJobs=(recent.jobs||[]).filter(job=>['queued','running'].includes(job.status)).map(job=>Number(job.id));
-      if(userJobs.length){button.disabled=true;if(fullButton)fullButton.disabled=true;watch();return}
-      button.disabled=false;
+      if(userJobs.length){button.disabled=true;if(fullButton)fullButton.disabled=true;if(claimInput)claimInput.disabled=true;watch();return}
+      button.disabled=false;if(claimInput)claimInput.disabled=false;
       const latestByProfile=new Map();
       for(const job of (recent.jobs||[]).filter(job=>['done','failed'].includes(job.status))){
         const profile=String(job.profile||'unbekannt');
@@ -77,9 +77,22 @@
   const enqueue=async(mode,targetProfile='')=>{
     if(userJobs.length)return;
     if(context.claims_agent&&!bridge){show('Diese zentrale Importstation ist nicht bereit.',true);return}
-    button.disabled=true;if(fullButton)fullButton.disabled=true;
-    try{const profile=targetProfile||selectedProfile(),payload={profile};if(mode==='full'){payload.mode='full';payload.since=sinceInput?.value||''}if(mode==='tasks')payload.mode='tasks';userJobs=[];userJobs.push((await post('enqueue',payload)).job.id);show(mode==='full'?'Vollständiger ClaimsForce-Abgleich wurde übergeben.':mode==='tasks'?'ClaimsForce-Aufgaben werden automatisch aktualisiert.':'Importauftrag wurde an die zentrale Importstation übergeben.');watch()}
-    catch(e){button.disabled=false;if(fullButton)fullButton.disabled=false;userJobs=[];show(e.message,true)}
+    button.disabled=true;if(fullButton)fullButton.disabled=true;if(claimInput)claimInput.disabled=true;
+    try{
+      const profile=targetProfile||selectedProfile(),payload={profile};
+      if(mode==='single'){
+        const claimNumber=String(claimInput?.value||'').trim();
+        if(!claimNumber)throw Error('Bitte eine Schadennummer für den Vollimport eingeben.');
+        payload.mode='single';
+        payload.claimNumber=claimNumber;
+      }
+      if(mode==='tasks')payload.mode='tasks';
+      userJobs=[];
+      userJobs.push((await post('enqueue',payload)).job.id);
+      show(mode==='single'?'Einzelfall-Vollimport wurde an die zentrale Importstation übergeben.':mode==='tasks'?'ClaimsForce-Aufgaben werden automatisch aktualisiert.':'Importauftrag wurde an die zentrale Importstation übergeben.');
+      watch();
+    }
+    catch(e){button.disabled=false;if(fullButton)fullButton.disabled=false;if(claimInput)claimInput.disabled=false;userJobs=[];show(e.message,true)}
   };
   window.svnetClaimsTaskCheck=true;
   window.addEventListener('svnet:claims-task-check',async event=>{
@@ -89,15 +102,15 @@
     await enqueue('tasks',String(event.detail?.profile||''));
     if(!userJobs.length)window.svnetClaimsTaskError=state.textContent||'Prüfauftrag konnte nicht angelegt werden.';
   });
-  // Neue Aufträge erscheinen zuerst in der Planung; Kostennotenfälle kommen über den Vollabgleich.
+  // Neue Aufträge erscheinen zuerst in der Planung; ein Vollimport läuft gezielt für die angegebene Schadennummer.
   button.addEventListener('click',()=>enqueue('quick'));
-  fullButton?.addEventListener('click',()=>enqueue('full'));
+  fullButton?.addEventListener('click',()=>enqueue('single'));
   if(fullButton){
     const stopButton=document.createElement('button');
     stopButton.type='button';stopButton.id='vf-claims-stop';stopButton.className=fullButton.className;stopButton.textContent='Import pausieren';
     stopButton.addEventListener('click',async()=>{
       stopButton.disabled=true;
-      try{await post('stop');userJobs=[];show('Import pausiert. Der nächste Start setzt dort fort, wo er stehen geblieben ist.');button.disabled=false;fullButton.disabled=false}
+      try{await post('stop');userJobs=[];show('Import pausiert. Der nächste Start setzt dort fort, wo er stehen geblieben ist.');button.disabled=false;fullButton.disabled=false;if(claimInput)claimInput.disabled=false}
       catch(e){show(e.message,true)}
       finally{stopButton.disabled=false}
     });
@@ -112,7 +125,7 @@
     if(!supportedProfiles.includes(target))throw Error('Importauftrag enthält ein ungültiges Bearbeiterprofil.');
     sessionStorage.removeItem('svnet-case');
     localStorage.removeItem('svnet-case');
-    window.postMessage({type:'SVNET_CLAIMS_IMPORT_START',profile:job.profile,mode:job.sync_mode||'quick',full:job.sync_mode==='full',since:job.since_date||'',jobId:Number(job.id),runId:`claimsforce-${job.id}-${job.attempt_count||1}`},location.origin);
+    window.postMessage({type:'SVNET_CLAIMS_IMPORT_START',profile:job.profile,mode:job.sync_mode||'quick',full:job.sync_mode==='full',claimNumber:job.claim_number||'',since:job.since_date||'',jobId:Number(job.id),runId:`claimsforce-${job.id}-${job.attempt_count||1}`},location.origin);
   }
 
   async function poll(){
@@ -142,7 +155,7 @@
   async function completeAgent(ok,result,error){
     if(!agentJob)return;
     const id=agentJob.id;
-    try{await post('complete',{id,ok,result:result||null,message:ok?`${result?.claims||0} Aufträge geprüft · ${result?.updated||0} aktualisiert · ${result?.skipped||0} unverändert übersprungen.`:(error||'ClaimsForce-Import fehlgeschlagen.')});if(ok)window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'))}
+    try{await post('complete',{id,ok,result:result||null,message:ok?`${result?.claims||0} Aufträge geprüft · ${result?.updated||0} aktualisiert · ${result?.skipped||0} unverändert übersprungen${result?.failed?` · ${result.failed} fehlgeschlagen (${String(result.firstError||'').slice(0,200)})`:''}.`:(error||'ClaimsForce-Import fehlgeschlagen.')});if(ok)window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'))}
     catch(e){showAgent(`Import ${id}: Abschlussstatus konnte nicht gespeichert werden (${e.message}).`,true)}
     agentJob=null;busy=false;lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
     await resumeWatch();
