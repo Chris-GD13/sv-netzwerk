@@ -110,14 +110,17 @@
         "title": "Brandmeldeanlagen nach Wasser- und Brandschäden fachlich prüfen",
         "slug": "brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung",
         "url": "https://www.sv-netzwerk.eu/fachwissen/brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-2026-10-10-0600",
-        "reserved_at": "2026-10-10T04:02:51.123Z"
+        "reserved_at": "2026-10-10T04:02:51.123Z",
+        "commit": "a814118006f87336fdef16d41d4652ff27e46cfc",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38023365108",
+        "verified_at": "2026-10-10T04:20:52.803Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-10T04:02:51.123Z"
+  "updated_at": "2026-10-10T04:20:52.803Z"
 }
