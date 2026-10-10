@@ -1,6 +1,7 @@
 const API = '/intern/api/google-drive-sync.php';
 const CAL = '/intern/api/outlook-case-calendar.php';
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
+const PORTAL_CODE_VERSION = '1.4.59';
 const CONTEXT_RELOAD_MESSAGE = 'Die Browser-Brücke wurde aktualisiert. Bitte diese Portalseite einmal neu laden und den Import danach erneut starten.';
 let contextReloadReported = false;
 const invalidExtensionContext = error => /Extension context invalidated|Receiving end does not exist|message port closed/i.test(String(error?.message || error || ''));
@@ -214,7 +215,9 @@ function reportRuntime() {
     const rekon = status?.rekon || {};
     document.documentElement.setAttribute('data-svnet-rekon-runtime', [rekon.status || 'idle', rekon.runId || 'none', rekon.profile || 'none', rekon.current || 0, rekon.total || 0].join('|'));
     if (rekon.status === 'running' && rekon.text) window.postMessage({ type: 'SVNET_REKON_IMPORT_PROGRESS', text: rekon.text, current: rekon.current || 0, total: rekon.total || 0 }, location.origin);
-    window.postMessage({ type: 'SVNET_CLAIMS_RUNTIME_STATUS', status }, location.origin);
+    document.documentElement.setAttribute('data-svnet-claims-worker-version', status?.workerVersion || 'nicht geladen');
+    window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY_V2', version: BRIDGE_VERSION, portalVersion: PORTAL_CODE_VERSION, workerVersion: status?.workerVersion || '', protocol: status?.protocol || 0 }, location.origin);
+    window.postMessage({ type: 'SVNET_CLAIMS_RUNTIME_STATUS_V2', status }, location.origin);
   }).catch(error => {
     if (invalidExtensionContext(error)) reportInvalidExtensionContext();
     else document.documentElement.setAttribute('data-svnet-claims-runtime', 'unavailable|CF-RUNTIME|0');
@@ -223,7 +226,7 @@ function reportRuntime() {
 
 window.addEventListener('message', event => {
   if (event.source !== window || event.origin !== location.origin) return;
-  if (event.data?.type === 'SVNET_CLAIMS_BRIDGE_PING') window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION }, location.origin);
+  if (event.data?.type === 'SVNET_CLAIMS_BRIDGE_PING') reportRuntime();
   if (event.data?.type === 'SVNET_CLAIMS_RUNTIME_PING') reportRuntime();
   if (event.data?.type === 'SVNET_CLAIMS_CREDENTIAL_CHECK') {
     const requestId = String(event.data.requestId || '');
@@ -246,12 +249,14 @@ window.addEventListener('message', event => {
       window.postMessage({ type: 'SVNET_CLAIMS_CREDENTIAL_STATUS', requestId, ok: false, profile, phase: 'bridge-unavailable' }, location.origin);
     });
   }
-  if (event.data?.type === 'SVNET_CLAIMS_IMPORT_START') {
+  if (event.data?.type === 'SVNET_CLAIMS_IMPORT_START_V2') {
     let profile;
     try { profile = profileKey(event.data.profile); }
     catch (error) { window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: error.message, runtime: { jobId: Number(event.data.jobId || 0) } }, location.origin); return; }
     activeRequest = {
-      type: 'START_IMPORT',
+      type: 'START_IMPORT_V2',
+      protocol: 2,
+      workerVersion: PORTAL_CODE_VERSION,
       profile,
       jobId: Number(event.data.jobId || 0),
       runId: event.data.runId || crypto.randomUUID(),
@@ -328,6 +333,5 @@ function connectKeepalive() {
     keepaliveTimer = setInterval(() => { try { keepalivePort?.postMessage({ type: 'KEEPALIVE', at: Date.now() }); } catch {} }, 15000);
   } catch {}
 }
-window.postMessage({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: BRIDGE_VERSION }, location.origin);
 reportRuntime();
 setInterval(reportRuntime, 5000);

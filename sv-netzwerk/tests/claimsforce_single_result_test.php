@@ -7,10 +7,10 @@ foreach([['claims'=>26],['updated'=>0],['claimNumber'=>'26-076821-6'],['inventor
 echo "Einzelfallabschluss weist Sammelläufe, falsche Fälle und unvollständige Ergebnisse zurück.\n";
 function apiError($status,$text){throw new RuntimeException($text,$status);}
 function db(){return new class{function prepare($sql){return new class{function execute($args){}function fetchColumn(){return $GLOBALS['testOwner']??'';}};}};}
-$owner=['stationId'=>'11111111-1111-4111-8111-111111111111','bridgeVersion'=>'1.4.58'];
+$owner=['stationId'=>'11111111-1111-4111-8111-111111111111','bridgeVersion'=>'1.4.59','workerVersion'=>'1.4.59','protocol'=>2];
 $GLOBALS['testOwner']=cqStationKey($owner);
 cqRequireOwner(44,$owner);
-foreach([array_replace($owner,['stationId'=>'22222222-2222-4222-8222-222222222222']),array_replace($owner,['bridgeVersion'=>'1.4.51']),[]]as$other){
+foreach([array_replace($owner,['stationId'=>'22222222-2222-4222-8222-222222222222']),array_replace($owner,['bridgeVersion'=>'1.4.51']),array_replace($owner,['workerVersion'=>'']),array_replace($owner,['workerVersion'=>'1.4.58']),array_replace($owner,['protocol'=>1]),[]]as$other){
     try{cqRequireOwner(44,$other);throw new Exception('Fremde oder alte Importstation akzeptiert');}catch(RuntimeException$e){if($e->getCode()!==409)throw $e;}
 }
 echo "Nur die übernehmende aktuelle Importstation darf Fortschritt oder Abschluss schreiben.\n";

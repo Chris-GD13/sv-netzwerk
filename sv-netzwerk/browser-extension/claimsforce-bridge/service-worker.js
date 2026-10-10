@@ -19,6 +19,8 @@ const PROFILE_EMAILS = {
 // mit dem Kürzel SW angezeigt. JM/WS bleiben als ältere Kontokennungen gültig.
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS', 'SW'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
+// Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
+const WORKER_CODE_VERSION = '1.4.59';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
@@ -729,6 +731,7 @@ async function runImport(run) {
 }
 
 async function startImport(sender, message) {
+  if (message.protocol !== 2 || message.workerVersion !== WORKER_CODE_VERSION) return { ok: false, error: '[CF-WORKER-VERSION] Importprogramm muss neu geladen werden.' };
   const portalTabId = sender.tab?.id;
   if (!portalTabId) return { ok: false, error: '[CF-RUN-00] Portal-Registerkarte fehlt.' };
   const claimNumber = String(message.claimNumber || '').trim();
@@ -1031,7 +1034,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'GET_RUNTIME_STATUS') {
     Promise.all([chrome.storage.local.get('claimsActiveRun'), chrome.storage.local.get('claimsImportDiagnostic')]).then(([active, diagnostic]) => {
       const saved = active.claimsActiveRun || null;
-      sendResponse({ ok: true, active: saved, diagnostic: diagnostic.claimsImportDiagnostic || null, rekon: runningRekonImport ? { status: 'running', runId: runningRekonImport.runId, profile: runningRekonImport.profile, startedAt: runningRekonImport.startedAt, text: runningRekonImport.text || 'Rekon-Import läuft …', current: Number(runningRekonImport.current || 0), total: Number(runningRekonImport.total || 0) } : { status: 'idle' } });
+      sendResponse({ ok: true, workerVersion: WORKER_CODE_VERSION, protocol: 2, active: saved, diagnostic: diagnostic.claimsImportDiagnostic || null, rekon: runningRekonImport ? { status: 'running', runId: runningRekonImport.runId, profile: runningRekonImport.profile, startedAt: runningRekonImport.startedAt, text: runningRekonImport.text || 'Rekon-Import läuft …', current: Number(runningRekonImport.current || 0), total: Number(runningRekonImport.total || 0) } : { status: 'idle' } });
     });
     return true;
   }
@@ -1043,7 +1046,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     } catch (error) { sendResponse({ ok: false, error: error.message }); }
     return;
   }
-  if (message?.type === 'START_IMPORT' && sender.tab?.id) {
+  if (message?.type === 'START_IMPORT_V2' && sender.tab?.id) {
     startImport(sender, message).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
     return true;
   }

@@ -12,7 +12,7 @@ function cqSingleResultValid(array $job,array $result):bool{
 }
 function cqStationKey(array$body):string{
     $id=(string)($body['stationId']??'');
-    if(!preg_match('/^[a-f0-9-]{36}$/i',$id)||version_compare((string)($body['bridgeVersion']??'0'),'1.4.58','<'))apiError(409,'Aktuelle Browser-Brücke 1.4.58 erforderlich. Diese alte Importstation darf keinen Auftrag übernehmen.');
+    if(!preg_match('/^[a-f0-9-]{36}$/i',$id)||version_compare((string)($body['bridgeVersion']??'0'),'1.4.59','<')||($body['workerVersion']??'')!=='1.4.59'||(int)($body['protocol']??0)!==2)apiError(409,'Aktuelle Browser-Brücke 1.4.59 erforderlich. Diese alte Importstation darf keinen Auftrag übernehmen.');
     return hash('sha256',$id);
 }
 function cqRequireOwner(int$id,array$body):void{
