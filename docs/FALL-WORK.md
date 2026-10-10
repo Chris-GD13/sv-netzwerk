@@ -43,7 +43,10 @@ importierten IONOS-Fassungen mit Quellenmanifest und Inhaltsprüfsummen; sie
 behauptet keinen Live-Drive-Abgleich. Binäre Regeltranskriptionen werden nur bei
 identischem Inhalt, Dateipfad, Modell und Leserstand wiederverwendet.
 
-Dokumentaufträge laufen über die vorhandene Berichtserstellung. Engel-Zwischenberichte
+Nachträge übernehmen den endgeprüften Antworttext unverändert in eine echte DOCX-Datei;
+Zahlungsübersichten werden native Word-Tabellen. Ohne bereits beauftragte Dokumente
+kann ein Antworttext zusätzlich über „Diesen Text als Word speichern“ abgelegt werden.
+Weitere Dokumentaufträge laufen über die vorhandene Berichtserstellung. Engel-Zwischenberichte
 verwenden das originale DOCX einschließlich Kopf, Fuß, Tabellen und Seitenfeldern.
 Die Felder werden über geprüfte Originalpositionen befüllt; falsche Vorlagenstruktur
 oder unbelegte Berichtnummer blockieren die Ausgabe. Inhaltliche und strukturelle
