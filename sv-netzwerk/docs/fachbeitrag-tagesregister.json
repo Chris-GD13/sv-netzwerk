@@ -110,9 +110,12 @@
         "title": "Fensteranschluss richtig abdichten: Untergrund, Fugenmaß und Materialwahl",
         "slug": "fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl",
         "url": "https://www.sv-netzwerk.eu/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-window-replacement-20261010-01a11f08",
-        "reserved_at": "2026-10-10T09:29:33.621808Z"
+        "reserved_at": "2026-10-10T09:29:33.621808Z",
+        "commit": "52c5bdfa08f8d80b4052306be1f139847e1fcece",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38042315323",
+        "verified_at": "2026-10-10T09:47:47.966Z"
       },
       "linkedin": {
         "status": "not-posted"
@@ -191,5 +194,5 @@
       }
     }
   },
-  "updated_at": "2026-10-10T09:30:41.107517Z"
+  "updated_at": "2026-10-10T09:47:47.966Z"
 }
