@@ -68,6 +68,21 @@ als offene Punkte und im Regelmanifest gespeichert, ohne die inhaltliche Analyse
 zu sperren. Fehlende strukturierte Vollständigkeitsprüfung ist ein Fehler.
 Die maschinelle Transkription ersetzt keine layoutgetreue
 Originalvorlage und muss fachlich geprüft werden.
+Lesbare, absichtlich leere Kontakt-, Frage- oder Eingabefelder einer allgemeinen
+Blanko-Vorlage sind keine unlesbaren Regeltexte und keine fehlenden Falldaten.
+Sie werden separat im Regelmanifest dokumentiert und blockieren die Bearbeitung
+nicht. Gedruckte, tatsächlich unlesbare Inhalte bleiben ein Fehler.
+
+Im Aufgabenkontext ist die aktuelle Outlook-Nachricht der Hauptauftrag;
+ein erneutes Eintippen von „Aufgabe abarbeiten“ ist nicht erforderlich.
+Die aktuellen Anliegen werden vor der Regelprüfung einzeln erfasst und den
+Originalprüfungen als Arbeitsfokus mitgegeben. Das Ergebnis muss jedes Anliegen
+konkret ausarbeiten oder den dafür tatsächlich fehlenden Nachweis benennen.
+Ausgearbeitete Anliegen benötigen Belege aus den gelesenen Originalen;
+fehlende, doppelte oder falsche Anliegen und erfundene Quellen führen zum Fehler.
+Die Oberfläche zeigt die ausgearbeiteten Anliegen und den Antwortentwurf zuerst,
+allgemeine Fallanalyse und Regelprüfung bleiben aufklappbar. Versand, fachliche
+Freigaben und die Erledigt-Markierung bleiben ausdrücklich manuell.
 
 Unter `/intern/versicherungswissen/` können Administratoren den aktuellen
 IONOS-Regelbestand prüfen und MD/TXT/PDF/DOCX/XLSX/PPTX-Originale importieren.

@@ -79,6 +79,10 @@ const result = {
   rule_checks: ['MASTER.md: Keine ungeprüfte Freigabe'], reply_draft: 'Sehr geehrte Damen und Herren,\n\nbitte ergänzen Sie die Nachweise.',
   sources: [{ name: 'Aktuelle E-Mail/Angebot neu.pdf' }],
   rules: [{ path: '00_Standards_Regeln/MASTER.md', modified_at: '2026-10-10' }],
+  task_results: [
+    { request_id: 'request-1', request: 'Türposition im Angebot prüfen', answer: 'Die Türposition ist anhand des Originalangebots ausgearbeitet.', status: 'worked_out', source_refs: ['Aktuelle E-Mail/Angebot neu.pdf'] },
+    { request_id: 'request-2', request: 'Bodenaufnahme zuordnen', answer: 'Für die Datumszuordnung fehlt das Aufnahmedatum.', status: 'open', source_refs: [] },
+  ],
 };
 
 async function setup(page, options = {}) {
@@ -114,6 +118,10 @@ test('Analyse bleibt eingebunden, liest Aufgabenbezug und überträgt nur auf au
   await expect(page.locator('#vf-analysis-result img')).toHaveCount(0);
   await expect(page.locator('#vf-analysis-result')).toContainText('Angebot neu.pdf');
   await expect(page.locator('#vf-analysis-result')).toContainText('00_Standards_Regeln/MASTER.md');
+  await expect(page.locator('#vf-analysis-start')).toHaveText('Aufgabe ausarbeiten und beantworten');
+  await expect(page.locator('#vf-analysis-result > section').first()).toContainText('Ausgearbeitet: Türposition im Angebot prüfen');
+  await expect(page.locator('#vf-analysis-result')).toContainText('Noch offen: Bodenaufnahme zuordnen');
+  await expect(page.locator('#vf-analysis-result details').first()).not.toHaveAttribute('open', '');
   await expect(page.locator('#vf-mail-body')).toHaveValue('');
   await page.getByRole('button', { name: 'Antwortentwurf ins E-Mail-Feld übernehmen' }).click();
   await expect(page.locator('#vf-mail-body')).toHaveValue(result.reply_draft);
