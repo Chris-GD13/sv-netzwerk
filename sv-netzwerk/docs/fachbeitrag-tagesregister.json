@@ -118,10 +118,12 @@
         "verified_at": "2026-10-10T09:47:47.966Z"
       },
       "linkedin": {
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-linkedin-sealing-20261010-01a11f08",
         "reserved_at": "2026-10-10T09:47:51.657Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/"
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/",
+        "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7514622910435856384/",
+        "verified_at": "2026-10-10T09:49:39.222Z"
       },
       "recovery": {
         "authorized_by": "Direkter Nutzerauftrag im bestehenden Chat: dann jetzt veröffentlichen",
@@ -197,5 +199,5 @@
       }
     }
   },
-  "updated_at": "2026-10-10T09:47:51.657Z"
+  "updated_at": "2026-10-10T09:49:39.222Z"
 }
