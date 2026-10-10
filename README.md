@@ -54,7 +54,11 @@ im bestehenden Fall gespeichert. Alle MD-Dateien aus den eindeutig erreichbaren
 Drive-Masterbereichen `00_Standards_Regeln` (einschließlich `ab sofort immer gültig`),
 `00_KI-Wissensbasis` und `SV-Netzwerk-Projekt` werden bei jedem Auftrag neu geladen,
 nicht auf eine Auswahl der ersten Regeln gekürzt. Fehlende Masterquellen sperren
-die Ausarbeitung.
+die Ausarbeitung. Liegt `00_Standards_Regeln` ausschließlich innerhalb der
+KI-Wissensbasis, wird dieser eindeutig erreichbare Ordner ebenfalls verwendet.
+Gemeinsam erreichbare MD-Dateien werden nur einmal geladen; die Pfade der
+verbindlichen Standards bleiben erhalten. Fehlermeldungen unterscheiden fehlende
+Freigaben (keine Treffer) von mehreren gleichnamigen Ordnern.
 
 Das Ergebnis enthält belegte Feststellungen, fachliche Bewertung, offene Punkte,
 Arbeitsschritte, Regelprüfung und Antwortentwurf und wird als JSON-Entwurf im

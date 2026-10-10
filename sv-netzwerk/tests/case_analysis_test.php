@@ -28,6 +28,27 @@ $rules = caRuleFiles($list);
 check(count($rules) === 4, 'Every rule root and the always-binding directory must be loaded');
 check(count(array_filter($rules, fn($file)=>str_contains($file['path'], 'ab sofort immer gültig'))) === 1, 'Binding subfolder missing');
 fails(fn()=>caRuleFiles(fn($query)=>[]), 'nicht eindeutig');
+$nestedList = function(string $query) use ($list): array {
+    if (str_contains($query, "name='00_Standards_Regeln'")) {
+        return [['id'=>'root-0', 'name'=>'00_Standards_Regeln', 'parents'=>['root-1']]];
+    }
+    if (str_contains($query, "'root-1' in parents")) {
+        return [['id'=>'root-0', 'name'=>'00_Standards_Regeln', 'mimeType'=>'application/vnd.google-apps.folder']];
+    }
+    return $list($query);
+};
+$nestedRules = caRuleFiles($nestedList);
+check(count($nestedRules) === 3, 'Nested standards must be reachable and shared MD files loaded only once');
+check(count(array_filter($nestedRules, fn($file)=>str_starts_with($file['path'], '00_Standards_Regeln/ab sofort immer gültig/'))) === 1,
+    'Knowledge traversal must not overwrite mandatory standards paths');
+fails(fn()=>caRuleFiles(function($query) use($nestedList) {
+    $files = $nestedList($query);
+    if (str_contains($query, "name='00_Standards_Regeln'")) {
+        $files[] = ['id'=>'other-standard', 'parents'=>['root-1']];
+    }
+    return $files;
+}), '2 Treffer');
+fails(fn()=>caRuleFiles(fn($query)=>[]), '0 Treffer');
 fails(fn()=>caRuleFiles(function($query) use($list) {
     if (str_contains($query, "'always' in parents")) return [];
     return $list($query);

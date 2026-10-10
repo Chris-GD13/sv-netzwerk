@@ -22,12 +22,16 @@ function caRuleFiles(callable $list): array {
         $rootsByName[$name] = $list("mimeType='application/vnd.google-apps.folder' and trashed=false and name='".$name."'");
     }
     $knowledgeIds = array_column($rootsByName['00_KI-Wissensbasis'], 'id');
-    $rootsByName['00_Standards_Regeln'] = array_values(array_filter($rootsByName['00_Standards_Regeln'],
+    $standaloneStandards = array_values(array_filter($rootsByName['00_Standards_Regeln'],
         fn($file) => !array_intersect($file['parents'] ?? [], $knowledgeIds)));
+    if ($standaloneStandards) $rootsByName['00_Standards_Regeln'] = $standaloneStandards;
     foreach (CA_RULE_ROOTS as $name) {
         $roots = $rootsByName[$name];
-        if (count($roots) !== 1) throw new RuntimeException('MD-Masterordner nicht eindeutig erreichbar: '.$name);
-        $queue = [[$roots[0]['id'], $name, 0]]; $seen = []; $count = 0;
+        if (count($roots) !== 1) throw new RuntimeException('MD-Masterordner nicht eindeutig erreichbar: '.$name
+            .' ('.count($roots).' Treffer; '.(count($roots) === 0
+                ? 'Freigabe für das verbundene Google-Drive-Konto prüfen'
+                : 'mehrere gleichnamige Ordner erreichbar').').');
+        $queue = [[$roots[0]['id'], $name, 0]]; $seen = []; $count = 0; $hasRules = false;
         while ($queue) {
             [$parent, $path, $depth] = array_shift($queue);
             if (isset($seen[$parent])) throw new RuntimeException('Zyklische MD-Ordnerstruktur: '.$path);
@@ -40,11 +44,12 @@ function caRuleFiles(callable $list): array {
                     if ($name === '00_Standards_Regeln' && $file['name'] === 'ab sofort immer gültig') $always = true;
                     $queue[] = [$file['id'], $file['path'], $depth + 1];
                 } elseif (preg_match('/\.md$/i', $file['name'])) {
-                    $rules[$file['id']] = $file;
+                    $hasRules = true;
+                    if (!isset($rules[$file['id']])) $rules[$file['id']] = $file;
                 }
             }
         }
-        if (!array_filter($rules, fn($file) => str_starts_with($file['path'], $name.'/'))) {
+        if (!$hasRules) {
             throw new RuntimeException('Keine MD-Vorgaben im Masterordner: '.$name);
         }
     }
