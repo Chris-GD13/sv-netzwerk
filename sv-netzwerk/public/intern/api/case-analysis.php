@@ -76,7 +76,7 @@ function caReadBatch(array $batch, string $api, array &$uploads, bool $ruleDocum
         .($ruleDocuments ? ' Für jedes Dokument zusätzlich content_complete (Boolean), layout_warnings und empty_template_fields (Arrays von Strings) angeben.'
             : ' Aktuell abzuarbeitende Anliegen: '.json_encode($requests, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE)
                 .'. Zu jedem dafür relevanten Original alle Einzelpositionen, Mengen, Beträge, bisherigen Antworten '
-                .'und Widersprüche mit Seitenbezug auslesen; nicht nur den Dokumenttyp benennen.'), 14000);
+                .'und Widersprüche mit Seitenbezug auslesen; nicht nur den Dokumenttyp benennen.'), 14000, caEvidenceSchema($batch,$ruleDocuments));
     $documents = caValidateEvidence($read, $batch);
     if ($ruleDocuments) foreach ($documents as $document) {
         if (!is_bool($document['content_complete'] ?? null)
@@ -224,7 +224,7 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
             .'Antwortentwurf muss die aktuellen Anliegen einzeln beantworten und die ausgearbeiteten Ergebnisse enthalten. '
             .'Anrede und verbindlichen Absenderblock verwenden. Quellenlücken zwingend als offene Punkte kennzeichnen. '
             .($work !== null ? 'Zusätzlich subject (Schadennummer zuerst), document_requests (Array; nur tatsächlich benötigte oder angeforderte Dokumente, sonst leer). Je Dokument type (erstbericht für normale Schäden, erstbericht_sv_gf für SV-GF, zwischenbericht, schlussbericht, nachtrag_stellungnahme, zahlungsbefuerwortung, schlusserklaerung, rechnungsregister, query_form, kalkulation) und instructions (vollständiger konkreter Auftrag mit Belegbezug und Berichtnummer sofern belegt). Bei Bitte abarbeiten aus den aktuellen Anliegen entscheiden, welche Dokumente benötigt werden. Dokumente werden erst anschließend vom Werkzeug erzeugt, niemals bereits als erstellt melden. ' : '')
-            .'Kontext: '.$context, 14000),
+            .'Kontext: '.$context, 14000, $work!==null?cwResultSchema($requests,array_column($evidence,'name')):null),
             $requests, array_column($evidence, 'name'));
         $requestTexts = array_column($requests, 'request', 'id');
         if ($requests) foreach ($result['task_results'] as &$item) {

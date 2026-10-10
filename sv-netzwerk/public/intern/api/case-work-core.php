@@ -25,6 +25,19 @@ function cwTaskRequests(string $instructions, array $task, array $otherTasks): a
     return $requests;
 }
 
+function cwResultSchema(array $requests, array $sources): array {
+    $string=['type'=>'string'];$strings=['type'=>'array','items'=>$string];
+    $object=static fn(array $fields):array=>['type'=>'object','additionalProperties'=>false,'required'=>array_keys($fields),'properties'=>$fields];
+    $source=$sources?['type'=>'string','enum'=>array_values(array_unique($sources))]:$string;
+    return $object(['summary'=>$string,'assessment'=>$string,'reply_draft'=>$string,'subject'=>$string,
+        'facts'=>$strings,'open_points'=>$strings,'next_steps'=>$strings,'rule_checks'=>$strings,
+        'task_results'=>['type'=>'array','items'=>$object(['request_id'=>['type'=>'string','enum'=>array_column($requests,'id')],
+            'answer'=>$string,'status'=>['type'=>'string','enum'=>['worked_out','open']],
+            'source_refs'=>['type'=>'array','items'=>$source]])],
+        'document_requests'=>['type'=>'array','items'=>$object(['type'=>['type'=>'string','enum'=>['erstbericht','erstbericht_sv_gf','zwischenbericht','schlussbericht','nachtrag_stellungnahme','zahlungsbefuerwortung','schlusserklaerung','rechnungsregister','query_form','kalkulation']],
+            'instructions'=>$string])]]);
+}
+
 function cwSender(array $user): array {
     $sender = krSenderProfile($user);
     if (str_contains(mb_strtolower((string)($sender['name'] ?? $user['name'] ?? '')), 'christian')) {

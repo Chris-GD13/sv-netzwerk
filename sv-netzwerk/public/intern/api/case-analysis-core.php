@@ -141,6 +141,16 @@ function caValidateResult(array $result, array $requests = [], array $sourceName
     return $result;
 }
 
+function caEvidenceSchema(array $batch, bool $rules): array {
+    $strings=['type'=>'array','items'=>['type'=>'string']];
+    $fields=['name'=>['type'=>'string','enum'=>array_column($batch,'name')],
+        'findings'=>['type'=>'string'],'warnings'=>$strings];
+    if($rules)$fields+=['content_complete'=>['type'=>'boolean'],'layout_warnings'=>$strings,'empty_template_fields'=>$strings];
+    return ['type'=>'object','additionalProperties'=>false,'required'=>['documents'],
+        'properties'=>['documents'=>['type'=>'array','items'=>['type'=>'object','additionalProperties'=>false,
+            'required'=>array_keys($fields),'properties'=>$fields]]]];
+}
+
 function caValidateEvidence(array $read, array $batch): array {
     if (!isset($read['documents']) || !is_array($read['documents']) || count($read['documents']) !== count($batch)) {
         throw new RuntimeException('Originalprüfung unvollständig.');

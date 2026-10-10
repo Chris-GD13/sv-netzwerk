@@ -38,7 +38,7 @@ function gfZwischenberichtDocx(string $bytes, array $meta, array $result, string
         if(!preg_match('/^[1-9][0-9]{0,2}$/',$number))throw new RuntimeException('Zwischenberichtnummer nicht eindeutig belegt. Bitte Nummer im Auftrag angeben.');
         $address=trim((string)($form['vn_anschrift']??''));
         $risk=trim((string)($form['schadenort']??''));
-        if($risk==='')$risk=trim(implode(' ',array_filter([$meta['strasse']??'',$meta['plz']??'',$meta['ort']??''])));
+        if($risk==='')$risk=trim(implode(' ',array_filter([$meta['schaden_strasse']??'',$meta['schaden_plz']??'',$meta['schaden_ort']??''])));
         foreach([
             [0,0,$userName],[0,1,date('d.m.Y')],[2,0,(string)($meta['schaden_nr']??'')],
             [2,1,(string)($form['schadentag']??$meta['schadentag']??$meta['schadendatum']??'')],
