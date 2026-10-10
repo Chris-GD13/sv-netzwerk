@@ -82,6 +82,13 @@ function krOpenAiJson(string $key, array $content, string $system, string $promp
         foreach ($content as $part) if ($part['type'] === 'input_text' && preg_match('/^Original(?:quelle|foto|beleg): ([^\n]+)/', $part['text'], $match)) {
             $documents[] = ['name'=>$match[1], 'findings'=>'Originalquelle mit belegten Angaben geprüft.',
                 'warnings'=>$GLOBALS['mode'] === 'unreadable-rule' && str_contains($match[1], 'Richtlinie.pdf') ? ['Seite unlesbar'] : []];
+            if (str_contains($prompt, 'content_complete')) {
+                $index = array_key_last($documents);
+                $documents[$index]['content_complete'] = $GLOBALS['mode'] !== 'incomplete-rule-content';
+                $documents[$index]['layout_warnings'] = $GLOBALS['mode'] === 'layout-only' ? ['Formularraster und visuelle Platzierung nicht rekonstruierbar'] : [];
+                if ($GLOBALS['mode'] === 'missing-rule-completeness') unset($documents[$index]['content_complete']);
+                if ($GLOBALS['mode'] === 'invalid-layout-warning') $documents[$index]['layout_warnings'] = [42];
+            }
         }
         if ($GLOBALS['mode'] === 'incomplete-read') array_pop($documents);
         return ['documents'=>$documents];
@@ -104,7 +111,16 @@ assertWorker(count($record['source_gaps']) === 1 && str_contains($record['source
 assertWorker(count($uploaded) === count($deleted), 'Temporary OpenAI files cleaned up');
 assertWorker(str_contains(end($aiCalls)['system'], 'Verbindliche Originalregel'), 'MD content used, not just filenames');
 assertWorker(str_contains($aiCalls[0]['system'], 'Transkribiere'), 'Original PDF rules require full transcription, not case evidence extraction');
-foreach (['missing-rules', 'wrong-case', 'incomplete-read', 'storage-failure', 'unreadable-rule'] as $failure) {
+$mode = 'layout-only'; $updates = []; $written = [];
+caRun(2, 'case-folder', 'task-one', '', ['id'=>1]);
+assertWorker(end($updates)[':s'] === 'done', 'Layout-only limitations must not block a content-complete analysis');
+$layoutRecord = $written[0]['record'];
+assertWorker(count(array_filter($layoutRecord['open_points'], fn($point)=>str_contains($point, 'Layout wurde nicht bestätigt'))) === 1,
+    'Layout limitations must remain visible in persisted open points');
+assertWorker(count(array_filter($layoutRecord['rules'], fn($rule)=>!empty($rule['layout_warnings']))) === 1,
+    'Rule manifest must retain layout limitations');
+foreach (['missing-rules', 'wrong-case', 'incomplete-read', 'storage-failure', 'unreadable-rule',
+    'incomplete-rule-content', 'missing-rule-completeness', 'invalid-layout-warning'] as $failure) {
     $mode = $failure; $updates = []; $written = [];
     caRun(2, 'case-folder', 'task-one', '', ['id'=>1]);
     assertWorker(end($updates)[':s'] === 'failed', $failure.' must fail explicitly');
