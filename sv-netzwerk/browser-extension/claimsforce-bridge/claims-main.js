@@ -157,7 +157,7 @@
       reply({ ok: response.ok, status: response.status, hasAuth: true, body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) });
     } catch (error) { reply({ ok: false, status: 0, hasAuth: true, body: String(error?.message || error).slice(0, 120) }); }
   });
-  window.addEventListener('message', event => {
+  window.addEventListener('message', async event => {
     const data = event.data;
     if (event.source !== window || data?.source !== 'svnet-claimsforce-bridge' || data.type !== 'INVOICED_ROWS_REQUEST') return;
     const reply = payload => window.postMessage({ source: 'svnet-claimsforce-main', type: 'INVOICED_ROWS_RESPONSE', id: data.id, ...payload }, location.origin);
@@ -169,15 +169,33 @@
       for (let depth = 0; depth < 40 && fiber; depth++, fiber = fiber.return) {
         if (typeof fiber.memoizedProps?.table?.getCoreRowModel === 'function') { table = fiber.memoizedProps.table; break; }
       }
-      if (!table) { reply({ ok: false, rows: [] }); return; }
-      const rows = table.getCoreRowModel().rows.map(entry => entry.original).map(original => {
+      if (!table) { reply({ ok: false, rows: [], diag: 'keine-tabelle' }); return; }
+      const readRows = () => table.getCoreRowModel().rows.map(entry => entry.original);
+      let originals = readRows();
+      const expected = Number(data.expected || 0);
+      if (expected && originals.length < expected) {
+        // Die Liste lädt beim Scrollen nach; der Container wird direkt ans Ende gesetzt, bis alle Zeilen im Modell liegen.
+        let scroller = null;
+        for (let node = document.querySelector('table')?.parentElement; node; node = node.parentElement) if (node.scrollHeight > node.clientHeight + 100 && node.clientHeight > 150) { scroller = node; break; }
+        let stable = 0, last = originals.length;
+        for (let i = 0; i < 120 && originals.length < expected && stable < 12; i++) {
+          if (scroller) scroller.scrollTop = scroller.scrollHeight;
+          document.querySelector('table tbody tr:last-child')?.scrollIntoView?.({ block: 'end' });
+          await new Promise(resolve => setTimeout(resolve, 500));
+          originals = readRows();
+          stable = originals.length === last ? stable + 1 : 0;
+          last = originals.length;
+        }
+        if (scroller) scroller.scrollTop = 0;
+      }
+      const rows = originals.map(original => {
         const id = claimId(original?.claimId) || claimId(original?.claim?.id) || claimId(original?.id);
         const label = String(original?.claim?.insurerClaimId || original?.claim?.tpaClaimId || '').slice(0, 100);
         const invoiced = new Date(original?.invoicedAt || '');
         const enteredAt = Number.isNaN(invoiced.getTime()) ? '' : invoiced.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
         return { id, label, enteredAt };
       }).filter(entry => entry.id && entry.label);
-      reply({ ok: true, rows });
+      reply({ ok: true, rows, modelCount: originals.length });
     } catch (error) { reply({ ok: false, rows: [], error: String(error?.message || error).slice(0, 120) }); }
   });
   inspectStorage(localStorage);
