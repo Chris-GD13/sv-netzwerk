@@ -4,7 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/outlook-task-number.php';
 commonHeaders();
-$user = requireAuth();
+$user = (PHP_SAPI==='cli'&&defined('SVNET_CASE_WORK_USER'))?SVNET_CASE_WORK_USER:requireAuth();
 if (!in_array((string)($user['role'] ?? ''), ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) {
     apiError(403, 'Keine Berechtigung.');
 }

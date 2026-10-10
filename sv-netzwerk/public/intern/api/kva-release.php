@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__.'/config.php';commonHeaders();$user=requireAuth();
+require_once __DIR__.'/config.php';commonHeaders();$user=(PHP_SAPI==='cli'&&defined('SVNET_CASE_WORK_USER'))?SVNET_CASE_WORK_USER:requireAuth();
 require_once __DIR__.'/kva-contact-merge.php';
 require_once __DIR__.'/kva-upload-name.php';
 require_once __DIR__.'/kva-openai-error.php';

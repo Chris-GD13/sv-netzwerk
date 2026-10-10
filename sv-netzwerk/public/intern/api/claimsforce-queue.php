@@ -122,6 +122,14 @@ if($action==='enqueue'){
     }
     if($syncMode==='tasks'&&$profile==='jens'&&(cqIsCentralAgent($user)||cqProfile($user)==='christian'))$allowed[]='jens';
     if(!in_array($profile,$allowed,true))apiError(409,'ClaimsForce-Profil und ausgewählter Sachverständiger stimmen nicht überein.');
+    if (!empty($body['preserve_active'])) {
+        $lock=db()->prepare('SELECT GET_LOCK(:k,0)');
+        $lock->execute([':k'=>'claims-work:'.substr(hash('sha256',(string)$user['email'].$profile),0,40)]);
+        if ((int)$lock->fetchColumn()!==1) apiError(409,'Ein Importauftrag wird bereits angelegt.');
+        $pending=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE requested_by=:u AND profile=:p AND status IN ('queued','running') LIMIT 1");
+        $pending->execute([':p'=>$profile,':u'=>(string)$user['email']]);
+        if ($pending->fetchColumn()) apiError(409,'Ein Import läuft bereits und wird nicht ersetzt.');
+    }
     $stop=db()->prepare("UPDATE claimsforce_import_jobs SET status='failed',message='Durch einen neuen manuellen Import ersetzt.',phase='CF-FAIL-REPLACED',heartbeat_at=NOW(),finished_at=NOW() WHERE requested_by=:u AND profile=:p AND status IN ('queued','running')");
     $stop->execute([':p'=>$profile,':u'=>(string)($user['email']??'')]);
     $s=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,sync_mode,since_date,claim_number,created_at) VALUES(:p,'queued',:u,:m,'CF-QUEUED',:mode,:since,:claim,NOW())");

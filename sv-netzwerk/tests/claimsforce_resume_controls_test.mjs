@@ -16,7 +16,7 @@ const selected=state([stopped,{id:12,profile:'marc',status:'running'}],'christia
 assert.equal(selected.job.claim_number,'26-085905-9');
 assert.equal(selected.job.sync_mode,'single');
 // Die echte Enqueue-Funktion darf beim Fortsetzen keine geänderte Eingabe übernehmen.
-const enqueue=source.slice(source.indexOf('  const enqueue=async'),source.indexOf('  window.svnetClaimsTaskCheck='));
+const enqueue=source.slice(source.indexOf('  const enqueue=async'),source.indexOf('  // Narrow interface for Fall-Work'));
 const queued=[];const claimInput={value:'26-076821-6',disabled:false};
 const sandbox={userJobs:[],context:{claims_agent:true},bridge:true,button:{},fullButton:{},claimInput,controlJobs:[],selectedProfile:()=> 'christian',show:()=>{},refreshControl:()=>{},watch:()=>{},post:async(action,payload)=>{queued.push({action,payload});return {job:{id:20,profile:payload.profile,sync_mode:payload.mode,claim_number:payload.claimNumber}};}};
 await vm.runInNewContext(enqueue+'enqueue;',sandbox)('single','christian',stopped);
@@ -28,3 +28,14 @@ await vm.runInNewContext(enqueue+'enqueue;',{...sandbox,userJobs:[]})('full','ch
 assert.equal(queued[0].payload.mode,'full');
 assert.equal(queued[0].payload.since,'2026-01-01');
 console.log('Pause/Fortsetzen/erneut prüfen, Profiltrennung und unveränderter Einzelumfang geprüft.');
+const reloadSource=source.slice(source.indexOf('  window.svnetClaimsReloadCase='),source.indexOf('  window.svnetClaimsTaskCheck='));
+let jobs=[single],calls=[];
+const reloadContext={window:{},selectedProfile:()=> 'christian',json:async()=>({jobs}),enqueue:async(...args)=>{calls.push(args);return{id:31};}};
+vm.runInNewContext(reloadSource,reloadContext);
+assert.equal((await reloadContext.window.svnetClaimsReloadCase('26-085905-9')).id,10);
+await assert.rejects(()=>reloadContext.window.svnetClaimsReloadCase('26-999999-9'),/anderer Import/);
+assert.equal(calls.length,0);
+jobs=[];
+assert.equal((await reloadContext.window.svnetClaimsReloadCase('26-085905-9')).id,31);
+assert.equal(calls[0][0],'single');assert.equal(calls[0][2].claim_number,'26-085905-9');assert.equal(calls[0][3],true);
+console.log('Fall-Work reuses matching import and refuses to replace unrelated imports.');

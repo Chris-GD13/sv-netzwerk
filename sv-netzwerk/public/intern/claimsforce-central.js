@@ -92,12 +92,13 @@
     }catch(e){show('Importstatus konnte nicht wiederhergestellt werden: '+e.message,true)}
   }
 
-  const enqueue=async(mode,targetProfile='',previousJob=null)=>{
-    if(userJobs.length)return;
-    if(context.claims_agent&&!bridge){show('Diese zentrale Importstation ist nicht bereit.',true);return}
+  const enqueue=async(mode,targetProfile='',previousJob=null,workRequest=false)=>{
+    if(userJobs.length){if(workRequest)throw Error('Ein Claims-Import läuft bereits. Bitte dessen Abschluss abwarten.');return}
+    if(context.claims_agent&&!bridge){if(workRequest)throw Error('Diese zentrale Importstation ist nicht bereit.');show('Diese zentrale Importstation ist nicht bereit.',true);return}
     button.disabled=true;if(fullButton)fullButton.disabled=true;if(claimInput)claimInput.disabled=true;
     try{
       const profile=targetProfile||selectedProfile(),payload={profile};
+      if(workRequest)payload.preserve_active=true;
       if(mode==='single'){
         const claimNumber=String(previousJob?previousJob.claim_number:claimInput?.value||'').trim();
         if(!claimNumber)throw Error('Bitte eine Schadennummer für den Vollimport eingeben.');
@@ -114,8 +115,20 @@
       controlJobs=[queued,...controlJobs];refreshControl();
       show(mode==='single'?'Einzelfall-Vollimport wurde an die zentrale Importstation übergeben.':mode==='tasks'?'ClaimsForce-Aufgaben werden automatisch aktualisiert.':'Importauftrag wurde an die zentrale Importstation übergeben.');
       watch();
+      return queued;
     }
-    catch(e){button.disabled=false;if(fullButton)fullButton.disabled=false;if(claimInput)claimInput.disabled=false;userJobs=[];show(e.message,true)}
+    catch(e){button.disabled=false;if(fullButton)fullButton.disabled=false;if(claimInput)claimInput.disabled=false;userJobs=[];show(e.message,true);if(workRequest)throw e}
+  };
+  // Narrow interface for Fall-Work: always the selected profile and one claim.
+  window.svnetClaimsReloadCase=async claimNumber=>{
+    const number=String(claimNumber||'').trim();
+    if(!number)throw Error('Im aktiven Fall fehlt die Schadennummer für den Vollimport.');
+    const recent=await json('/intern/api/claimsforce-queue.php?action=mine');
+    const activeJobs=(recent.jobs||[]).filter(job=>['queued','running'].includes(job.status)&&job.profile===selectedProfile());
+    const same=activeJobs.find(job=>job.sync_mode==='single'&&String(job.claim_number).trim()===number);
+    if(same)return same;
+    if(activeJobs.length)throw Error('Ein anderer Import läuft bereits. Er wird durch die Fallbearbeitung nicht ersetzt.');
+    return enqueue('single','',{claim_number:number},true);
   };
   window.svnetClaimsTaskCheck=true;
   window.addEventListener('svnet:claims-task-check',async event=>{

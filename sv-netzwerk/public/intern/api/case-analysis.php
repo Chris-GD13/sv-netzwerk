@@ -94,7 +94,7 @@ function caReadBatch(array $batch, string $api, array &$uploads, bool $ruleDocum
     return $documents;
 }
 
-function caRun(int $job, string $folder, string $taskId, string $instructions, array $user): void {
+function caRun(int $job, string $folder, string $taskId, string $instructions, array $user, ?array $work = null): void {
     $uploads = []; $api = trim(env('OPENAI_API_KEY', ''));
     try {
         ignore_user_abort(true); set_time_limit(0);
@@ -122,6 +122,7 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
                     'attachment_path'=>$path.'/'.rawurlencode($attachment['id'])];
             }
         }
+        $caseTasks = $work !== null ? cwCaseTasks($user, $meta, $files, $gaps, $taskId) : [];
         $requests = [];
         if ($taskId !== '' || trim($instructions) !== '') {
             caUpdate($job, 'running', 'Konkrete Anliegen der aktuellen Aufgabe werden erfasst.');
@@ -131,7 +132,7 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
                 .'Jede aktuelle Frage, angeforderte Prüfung, Stellungnahme und Berechnung als eigenes Anliegen mit Originalgegenstand festhalten. '
                 .'Nicht durch allgemeine Fallanalyse oder zusätzliche Anliegen aus Vorlagen ersetzen.',
                 'JSON mit requests (nicht leeres Array von Strings). Nachricht und Betreiberauftrag: '
-                    .json_encode(['task'=>$task, 'instructions'=>$instructions], JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE), 4000));
+                    .json_encode(['task'=>$task, 'other_open_tasks'=>$caseTasks, 'instructions'=>$instructions], JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE), 4000));
         }
         caUpdate($job, 'running', 'Alle verbindlichen MD-Masterquellen werden eingelesen.');
         $ruleFiles = caIonosRuleFiles(); $rules = ''; $ruleManifest = []; $ruleBytes = 0; $ruleLayoutWarnings = [];
@@ -148,7 +149,8 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
                 if (!mb_check_encoding($bytes, 'UTF-8')) throw new RuntimeException('Textvorgabe nicht UTF-8: '.$file['path']);
             } else {
                 caUpdate($job, 'running', 'Originalrichtlinie wird eingelesen: '.$file['path']);
-                $read = caReadBatch([['name'=>$file['path'], 'mime'=>$file['mimeType'], 'bytes'=>$bytes]], $api, $uploads, true);
+                $ruleInput = ['name'=>$file['path'], 'mime'=>$file['mimeType'], 'bytes'=>$bytes];
+                $read = $work !== null ? cwReadRule($ruleInput, $api, $uploads) : caReadBatch([$ruleInput], $api, $uploads, true);
                 if (!$read[0]['content_complete'] || $read[0]['warnings']) throw new RuntimeException('Originalrichtlinie inhaltlich unvollständig lesbar: '.$file['path'].'; '.implode('; ', $read[0]['warnings']));
                 $layoutWarnings = $read[0]['layout_warnings'];
                 $emptyFields = $read[0]['empty_template_fields'];
@@ -203,17 +205,20 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
         unset($batch, $bytes);
         foreach ($evidence as $document) foreach ($document['warnings'] as $warning) $gaps[] = $document['name'].': '.$warning;
         caUpdate($job, 'running', 'Aktuelle Aufgabe wird anhand der Anhänge und Fallbelege ausgearbeitet und beantwortet.');
-        $context = json_encode(['case'=>$meta, 'task'=>$task, 'task_requests'=>$requests, 'instructions'=>$instructions,
-            'sender'=>krSenderProfile($user), 'evidence'=>$evidence, 'source_gaps'=>$gaps], JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
+        $context = json_encode(['case'=>$meta, 'task'=>$task, 'other_open_tasks'=>$caseTasks, 'task_requests'=>$requests, 'instructions'=>$instructions,
+            'conversation'=>$work['history'] ?? [], 'import_status'=>$work['import'] ?? null,
+            'sender'=>$work !== null ? cwSender($user) : krSenderProfile($user), 'evidence'=>$evidence, 'source_gaps'=>$gaps], JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
         if (strlen($context) > 700000) throw new RuntimeException('Fallkontext zu groß; keine gekürzte Ausarbeitung erstellt.');
-        $result = caValidateResult(krOpenAiJson($api, [], caPrompt($rules),
+        $result = caValidateResult(krOpenAiJson($api, [], caPrompt($rules).($work !== null ? "\n".cwRules() : ''),
             'Erstelle JSON mit summary, assessment, reply_draft (Strings); facts, open_points, next_steps, rule_checks (Arrays von Strings). '
             .'Falls task_requests vorhanden: task_results als Array, exakt ein Ergebnis je request_id; '
             .'jedes Ergebnis enthält request_id, answer (konkret ausgearbeitetes Ergebnis oder genaue fehlende Nachweise und Auswirkung), '
             .'status (worked_out oder open), source_refs (Array exakter Namen gelesener Originalquellen aus evidence). '
             .'Ein belegbares Anliegen jetzt ausarbeiten, nicht als künftigen Arbeitsschritt zurückgeben. '
             .'Antwortentwurf muss die aktuellen Anliegen einzeln beantworten und die ausgearbeiteten Ergebnisse enthalten. '
-            .'Anrede und verbindlichen Absenderblock verwenden. Quellenlücken zwingend als offene Punkte kennzeichnen. Kontext: '.$context, 14000),
+            .'Anrede und verbindlichen Absenderblock verwenden. Quellenlücken zwingend als offene Punkte kennzeichnen. '
+            .($work !== null ? 'Zusätzlich subject (Schadennummer zuerst), document_requests (Array; nur tatsächlich benötigte oder angeforderte Dokumente, sonst leer). Je Dokument type (erstbericht, zwischenbericht, schlussbericht, nachtrag_stellungnahme, zahlungsbefuerwortung, rechnungsregister, query_form) und instructions (vollständiger konkreter Auftrag mit Belegbezug und Berichtnummer sofern belegt). Bei Bitte abarbeiten aus den aktuellen Anliegen entscheiden, welche Dokumente benötigt werden. Dokumente werden erst anschließend vom Werkzeug erzeugt, niemals bereits als erstellt melden. ' : '')
+            .'Kontext: '.$context, 14000),
             $requests, array_column($evidence, 'name'));
         $requestTexts = array_column($requests, 'request', 'id');
         if ($requests) foreach ($result['task_results'] as &$item) {
@@ -221,6 +226,10 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
             if ($item['status'] === 'open') $result['open_points'][] = $item['request'].': '.$item['answer'];
         }
         unset($item);
+        if ($work !== null) {
+            $result['document_requests'] = cwDocumentRequests($result);
+            $result = cwFinishDraft($result, $meta, $user);
+        }
         if (!$requests) unset($result['task_results']);
         $result['open_points'] = array_values(array_unique([...$gaps, ...$result['open_points']]));
         $result = array_merge($result, ['folder_id'=>$folder, 'task_id'=>$taskId, 'sources'=>$sources, 'rules'=>$ruleManifest,
@@ -247,6 +256,8 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
         }
     }
 }
+
+if (defined('SVNET_CASE_ANALYSIS_LIBRARY_ONLY')) return;
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
