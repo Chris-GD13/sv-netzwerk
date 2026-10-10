@@ -49,7 +49,7 @@ try {
     $rows = cwRows($folder, $uid);
     if ($action === 'documents') {
         require_once __DIR__.'/case-work-documents.php';
-        apiJson(['ok'=>true,'job_id'=>cwQueueDocuments((int)($body['turn_id']??0),$folder,$user)]);
+        apiJson(['ok'=>true,'job_id'=>cwQueueDocuments((int)($body['turn_id']??0),$folder,$user,!empty($body['as_text']))]);
     }
     if ($action !== 'start') apiError(400, 'Unbekannte Aktion.');
     $key = (string)($body['request_key'] ?? '');

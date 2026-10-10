@@ -33,7 +33,10 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: pdo_mysql, pdo_sqlite, mbstring, curl
+          extensions: pdo_mysql, pdo_sqlite, mbstring, curl, zip
+
+      - name: Fall-Work Word-Ausgabe prüfen
+        run: php sv-netzwerk/tests/case_work_docx_test.php
 
       - name: Falltrennung der KI-Berichte prüfen
         run: php sv-netzwerk/tests/gf_case_isolation_test.php

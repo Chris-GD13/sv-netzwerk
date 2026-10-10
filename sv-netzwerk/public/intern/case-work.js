@@ -37,6 +37,10 @@
           const answer=document.createElement('div');answer.className='vf-work-answer';
           para(answer,result.summary);para(answer,result.reply_draft);
           answer.append(button('Vollständigen Text kopieren',async()=>{try{await navigator.clipboard.writeText(result.reply_draft);notice('Text kopiert.');}catch(error){notice(error.message,true);}}));
+          if(!turn.document_id)answer.append(button('Diesen Text als Word speichern',async()=>{
+            const current=active(),version=epoch;if(current?.folder_id!==folder)return;
+            try{await api({action:'documents',folder_id:folder,turn_id:turn.id,as_text:true});if(version===epoch)await poll(current,version);}catch(error){notice(error.message,true);}
+          }));
           answer.append(button('Als E-Mail vorbereiten',()=>{
             if(active()?.folder_id!==folder)return;
             const target=el('vf-mail-body'), subject=el('vf-mail-subject');
