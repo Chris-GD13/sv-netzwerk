@@ -24,6 +24,17 @@ export const library: LibraryItem[] = [
     featured: false,
   },
   {
+    title: 'Fensteranschluss richtig abdichten: Untergrund, Fugenmaß und Materialwahl',
+    description: 'Fensteranschluss-Abdichtungen anhand von Materialfunktionen, Untergrund, Fugenmaß, Ecken und dokumentierter Verarbeitung fachlich prüfen.',
+    href: '/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/',
+    category: 'Fenster und Türen',
+    tags: ['Fenstereinbau', 'Fensterabdichtung', 'Anschlussfugen', 'Luftdichtheit', 'Fugendichtband', 'Ausführungsqualität'],
+    date: '2026-10-10',
+    publishedAt: '2026-10-10T09:30:41.107517Z',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Batteriespeicher nach Wasser- und Brandschäden fachlich prüfen',
     description: 'Stationäre Batteriespeicher werden nach Wasser- oder Brandeinwirkung anhand von Gefahrenlage, Herstellerdiagnose, Wiederinbetriebnahme und schadenbedingten Kosten bewertet.',
     href: '/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung/',

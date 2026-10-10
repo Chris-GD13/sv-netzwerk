@@ -153,14 +153,18 @@
               "title": "Fenstermontage und Anschlussfugen: Mängel fachlich prüfen und Nachbesserung begründen",
               "slug": "fenstermontage-anschlussfugen-maengel-nachbesserung",
               "url": "https://www.sv-netzwerk.eu/fachwissen/fenstermontage-anschlussfugen-maengel-nachbesserung/",
-              "status": "withdrawal-deploy-pending",
+              "status": "withdrawn-verified",
               "owner": "codex-window-recovery-20261010-01a11f08",
               "reserved_at": "2026-10-10T08:49:02.973Z",
               "commit": "78ccc16630b8fbd7fd995c204363aae17ecd09dc",
               "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38040155499",
               "live_content_checked_at": "2026-10-10T09:09:38.337Z",
               "verification_note": "Artikel, Datum, Bild, Canonical, Übersicht, Suchindex, Sitemap und Deployment-Kennung live geprüft; Workflow-Abschluss nicht bestätigt. Anschließend Nutzerstopp wegen inhaltlicher Ablehnung. Kein freigegebener Veröffentlichungserfolg.",
-              "withdrawal_requested_at": "2026-10-10T09:22:00.781305Z"
+              "withdrawal_requested_at": "2026-10-10T09:22:00.781305Z",
+              "withdrawal_commit": "a2bf74d601589c9431cb5a6c3fcec5fab1cbb44c",
+              "withdrawal_run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38041234772",
+              "withdrawal_verified_at": "2026-10-10T09:30:41.107517Z",
+              "withdrawal_proof": "docs/fensterbau-ruecknahme-2026-10-10.md"
             },
             "linkedin": {
               "status": "blocked-user-content-rejected",
@@ -187,5 +191,5 @@
       }
     }
   },
-  "updated_at": "2026-10-10T09:29:33.621808Z"
+  "updated_at": "2026-10-10T09:30:41.107517Z"
 }

@@ -506,3 +506,7 @@
 - Fachbeitrag „Wärmepumpen nach Überflutung: Prüfung und Kosten fachlich abgrenzen“ mit Quellenprüfung, Fachgrenzen, fiktivem Praxisbeispiel und bauteilbezogener Kostenprüfung ergänzt.
 - Bibliothek, Kategorie und Tags integriert; Detailroute, Suchindex und Sitemap werden im Astro-Build erzeugt.
 - LinkedIn-Begleittext vorbereitet; Veröffentlichung ohne Beitragsbild gemäß Fachbeitragsstandard.
+
+## 2026-10-10 – Fensteranschluss-Abdichtung, recherchierte Neufassung
+
+Abgelehnten Fensterbau-Beitrag mit Bild und Detailrouten zurückgenommen. Neue eigenständige Darstellung zur Fensteranschluss-Abdichtung anhand von acht überprüften Primärquellen: Funktionsbereiche, Untergrund, Fugenmaß, Folien, Flüssigmembranen und spezifische luftdichte Dämmstoffe. Keine erfundenen Fälle oder Messwerte. Alte und neue Veröffentlichungen bleiben im gemeinsamen Tagesregister eindeutig getrennt.
