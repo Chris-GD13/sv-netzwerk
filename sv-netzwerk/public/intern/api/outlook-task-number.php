@@ -10,13 +10,14 @@ function otCaseNumber(string $text): string {
         . '(?:' . $space . '-' . $space . '(\d{1,2}))?';
     $multiPart = '\d{2,4}(?:' . $space . '-' . $space . '\d{2,8}){2,5}'
         . $space . '-' . $space . '\d{1,8}';
+    $compact = '\d{8,20}';
     $start = '(?<![\p{L}\p{N}+\-\/])';
     $end = '(?![\p{L}\p{N}]|' . $space . '-[\h]*\d)';
     $label = '(?:Schaden(?:s)?' . $space . '(?:-' . $space . ')?(?:Nr\.?|Nummer)|Schaden)'
         . $space . '[:#]?' . $space;
 
     // An explicit damage-number label takes precedence over unrelated references.
-    if (preg_match('/' . $label . '(' . $multiPart . '|' . $legacy . ')' . $end . '/iu', $text, $match)) {
+    if (preg_match('/' . $label . '(' . $multiPart . '|' . $legacy . '|' . $compact . ')' . $end . '/iu', $text, $match)) {
         $candidate = $match[1];
     } else {
         if (!preg_match_all('/' . $start . '(?:' . $legacy . '|' . $multiPart . ')' . $end . '/u', $text, $matches, PREG_OFFSET_CAPTURE)) return '';

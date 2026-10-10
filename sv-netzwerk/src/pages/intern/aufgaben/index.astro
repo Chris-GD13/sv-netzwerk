@@ -43,7 +43,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     <div id="tasks-table-wrap" class="tasks-table-wrap" role="region" aria-label="Aufgabentabelle, horizontal scrollbar" tabindex="0" hidden>
       <table class="tasks-table">
         <caption>Schadennummer: Fall mit dieser Nachricht im neuen Tab öffnen. „Aufgabe bearbeiten“ zeigt die Nachricht im Fall. „Erledigt“ verschiebt sie in Outlook nach „Erledigt“.</caption>
-        <thead><tr><th scope="col">Eingang</th><th scope="col">Schadennummer</th><th scope="col">Absender</th><th scope="col">Betreff / Nachricht</th><th scope="col">IONOS-Ablage</th><th scope="col">Aktionen</th></tr></thead>
+        <thead><tr><th scope="col">Eingang</th><th scope="col">Fall / Schadennummer</th><th scope="col">Absender</th><th scope="col">Betreff / Nachricht</th><th scope="col">IONOS-Ablage</th><th scope="col">Aktionen</th></tr></thead>
         <tbody id="tasks-list"></tbody>
       </table>
     </div>
@@ -116,6 +116,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   }
 </style>
 
+<script is:inline src="/intern/task-case-address.js"></script>
 <script is:inline>
 (() => {
   const API = '/intern/api/outlook-tasks.php';
@@ -138,6 +139,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   let currentItems = [];
   let currentMailbox = '';
   const archiveStates = new Map();
+  const addressCases = new Map();
   const completing = new Set();
   let loaded = false;
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
@@ -165,6 +167,15 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     if (!response.ok || data.ok === false) throw new Error(data.error || `HTTP ${response.status}`);
     return data;
   };
+  const caseLinks = item => {
+    if (item.case_number) return '<a href="' + esc(item.edit_url) + '" target="_blank" rel="noopener" aria-label="' + esc('Fall ' + item.case_number + ' mit Aufgabe: ' + item.subject + ' (neuer Tab)') + '">' + esc(item.case_number) + '</a><small>Mit dieser Aufgabe ↗</small>';
+    const candidates = addressCases.get(item.id) || [];
+    return candidates.length ? candidates.map(row => {
+      const params = new URLSearchParams({ aufgabe: item.id, fallordner: row.id });
+      const label = [row.meta?.schaden_nr, row.meta?.vn_objekt || row.name || row.task_address].filter(Boolean).join(' · ');
+      return '<a href="/intern/versicherungsfaelle/?' + esc(params.toString()) + '" target="_blank" rel="noopener">' + esc(label) + '</a><small>' + esc(row.task_address) + ' · Zuordnung prüfen ↗</small>';
+    }).join('<br>') : 'Nicht erkannt';
+  };
   const archiveOpenTasks = async (items, mailbox) => {
     if (archiveRunning) return;
     archiveRunning = true;
@@ -184,7 +195,26 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
         const detail = await request(`${API}?action=detail&id=${encodeURIComponent(item.id)}`);
         const task = detail.task || {};
         const caseNumber = String(task.case_number || item.case_number || '').trim();
-        if (!caseNumber) { unresolved++; setArchiveState(item, 'Schadennummer fehlt', 'is-error'); continue; }
+        if (caseNumber && caseNumber !== item.case_number) {
+          item.case_number = caseNumber;
+          item.edit_url = '/intern/versicherungsfaelle/?' + new URLSearchParams({ schaden_nr: caseNumber, aufgabe: item.id });
+          const row = Array.from(list.querySelectorAll('.task-row')).find(row => row.dataset.id === item.id);
+          if (row) {
+            row.querySelector('.task-case').innerHTML = caseLinks(item);
+            row.querySelector('.task-case').classList.remove('task-case--missing');
+            row.querySelector('.task-actions a').href = item.edit_url;
+          }
+        }
+        if (!caseNumber) {
+          unresolved++;
+          const candidates = await window.SVNetTaskAddress.search(task, request);
+          addressCases.set(item.id, candidates);
+          const row = Array.from(list.querySelectorAll('.task-row')).find(row => row.dataset.id === item.id);
+          const cell = row?.querySelector('.task-case');
+          if (cell) cell.innerHTML = caseLinks(item);
+          setArchiveState(item, candidates.length ? 'Adress-Falltreffer prüfen' : 'Schadennummer fehlt', 'is-error');
+          continue;
+        }
         if (!cases.has(caseNumber)) {
           cases.set(caseNumber, request(`${DRIVE_API}?action=search_cases&q=${encodeURIComponent(caseNumber)}`).then(data =>
             (data.results || []).filter(row => caseNumberKey(row.meta?.schaden_nr) === caseNumberKey(caseNumber))
@@ -292,9 +322,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     list.innerHTML = items.map((item) => {
       const status = archiveState(item);
       const pending = completing.has(item.id);
-      const caseText = item.case_number
-        ? '<a href="' + esc(item.edit_url) + '" target="_blank" rel="noopener" aria-label="' + esc('Fall ' + item.case_number + ' mit Aufgabe: ' + item.subject + ' (neuer Tab)') + '">' + esc(item.case_number) + '</a><small>Mit dieser Aufgabe ↗</small>'
-        : 'Nicht erkannt';
+      const caseText = caseLinks(item);
       const edit = '<a class="tasks-action" href="' + esc(item.edit_url) + '" aria-label="' + esc('Aufgabe bearbeiten: ' + item.subject) + '">Aufgabe bearbeiten</a>';
       return '<tr class="task-row" data-id="' + esc(item.id) + '">' +
         '<td class="task-date">' + esc(date(item.received_at)) + '</td>' +

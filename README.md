@@ -38,6 +38,13 @@ Mehrteilige Versicherer-Nummern wie `00-031-404193-0001` und
 Nullen. Eine ausdrücklich als Schadennummer bezeichnete Nummer hat Vorrang
 vor anderen Referenzen; Telefon-, Rechnungs- und Auftragsnummern werden nicht
 als solche übernommen.
+Durchgehende Ziffernfolgen wie `22671159490` werden bei ausdrücklicher
+Schadennummer-Bezeichnung ebenfalls unverändert erkannt. Unbeschriftete
+Ziffernfolgen werden nicht allein aufgrund ihrer Länge einem Fall zugeordnet.
+Ohne Schadennummer werden Straße und Hausnummer aus der Nachricht im
+bestehenden Fallbestand gesucht. Adresstreffer erscheinen als prüfpflichtige
+Fallvorschläge mit Aufgabenbezug; sie lösen weder eine automatische Ablage noch
+eine Neuanlage aus.
 
 ```text
 cd sv-netzwerk

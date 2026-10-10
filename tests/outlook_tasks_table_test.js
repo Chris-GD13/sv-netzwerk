@@ -37,7 +37,7 @@ async function openTasks(page, options = {}) {
       }
     }
     if (url.pathname.endsWith('/google-drive-sync.php')) {
-      if (action === 'search_cases') return route.fulfill({ json: { ok: true, results: [{ id: 'test-folder', name: options.storedObject || 'Testfall', meta: { schaden_nr: options.storedNumber || url.searchParams.get('q'), vn_objekt: options.storedObject || 'Testfall' } }] } });
+      if (action === 'search_cases') return route.fulfill({ json: { ok: true, results: options.addressRows || [{ id: 'test-folder', name: options.storedObject || 'Testfall', meta: { schaden_nr: options.storedNumber || url.searchParams.get('q'), vn_objekt: options.storedObject || 'Testfall' } }] } });
       if (action === 'load_case') return route.fulfill({ json: { ok: true, case: { id: 'test-folder', meta: { schaden_nr: options.storedNumber || tasks[0].case_number, vn_objekt: options.storedObject || 'Testfall' } } } });
       if (action === 'upload_case_document') {
         if (options.archiveError) return route.fulfill({ status: 500, json: { ok: false, error: 'IONOS nicht erreichbar' } });
@@ -48,7 +48,7 @@ async function openTasks(page, options = {}) {
   });
   await page.goto(`${BASE}/intern/aufgaben/`);
   if (!options.listError) {
-    await expect(page.locator('#tasks-count')).toHaveText(`${items.length} offene Aufgaben`);
+    await expect(page.locator('#tasks-count')).toHaveText(`${items.length} offene ${items.length === 1 ? 'Aufgabe' : 'Aufgaben'}`);
     await expect(page.locator('#tasks-sync-status')).toContainText('neu in der IONOS-Fallakte');
   }
   return moves;
@@ -228,6 +228,7 @@ test('geteilte Schadennummer verweist auf denselben bestehenden Fall mit Aufgabe
 for (const example of [
   { number: '00-031-404193-0001', name: 'Ott Matthias', subject: 'Fwd: Schaden-Nr: 00-031-404193-0001 / Aktenzeichen: 26/0351328 / Auftrags-ID: 450421' },
   { number: '408-53-25000238-1', name: 'Xhemerson Sefa', subject: 'Fwd: Fwd: KUSS Service-Portal: Sie haben neue Unterlagen erhalten - 408-53-25000238-1' },
+  { number: '22671159490', name: 'Mertingen', subject: 'Fwd: AW: Schadennr.: 22671159490 - LWS - Königsberger Str. 21, 86690 Mertingen - Termin zur Begutachtung' },
 ]) {
   test(`Versicherer-Nummer ${example.number}: bestehender benannter Fall statt Neuanlage`, async ({ page }) => {
     const helper = path.resolve(__dirname, '..', 'sv-netzwerk', 'public', 'intern', 'api', 'outlook-task-number.php');
@@ -254,3 +255,48 @@ for (const example of [
     await popup.close();
   });
 }
+
+test('Adresse ohne Nummer zeigt vorhandenen Fall mit Mail und verlangt Zuordnungsprüfung', async ({ page }) => {
+  const item = { ...tasks[0], case_number: '', subject: 'Unterlagen Hagenbacher Ring 246', edit_url: '/intern/versicherungsfaelle/?aufgabe=oldest' };
+  const writes = [];
+  page.context().on('request', request => {
+    if (/action=(save_case|upload_case_document)/.test(request.url())) writes.push(request.url());
+  });
+  await openTasks(page, {
+    items: [item, tasks[1]],
+    storedObject: 'Hagenbacher Ring 246',
+    addressRows: [{ id: 'test-folder', meta: { vn_objekt: 'Hagenbacher Ring 246' } }],
+  });
+  await expect(page.locator('[data-id="oldest"] .task-case a')).toHaveText('Hagenbacher Ring 246');
+  await expect(page.locator('[data-id="oldest"] .task-archive')).toHaveText('Adress-Falltreffer prüfen');
+  expect(writes).toEqual([]);
+  const popupPromise = page.waitForEvent('popup');
+  await page.locator('[data-id="oldest"] .task-case a').click();
+  const popup = await popupPromise;
+  await expect(popup.locator('#vf-task-subject')).toHaveText(item.subject);
+  await expect(popup.locator('#vf-task-done')).toBeEnabled();
+  expect(await popup.evaluate(() => JSON.parse(sessionStorage.getItem('svnet-case')).meta.vn_objekt)).toBe('Hagenbacher Ring 246');
+  expect(writes).toEqual([]);
+  await popup.close();
+});
+
+test('Adresse mit mehreren Fällen bleibt eine Auswahl und legt nichts automatisch ab', async ({ page }) => {
+  const item = { ...tasks[1], subject: 'Unterlagen Hagenbacher Ring 246' };
+  const writes = [];
+  page.context().on('request', request => {
+    if (/action=(save_case|upload_case_document)/.test(request.url())) writes.push(request.url());
+  });
+  await openTasks(page, {
+    items: [item],
+    addressRows: [
+      { id: 'first-folder', meta: { schaden_nr: '26-000001', vn_objekt: 'Hagenbacher Ring 246' } },
+      { id: 'second-folder', meta: { schaden_nr: '26-000002', vn_objekt: 'Hagenbacher Ring 246' } },
+      { id: 'wrong-folder', meta: { vn_objekt: 'Hagenbacher Ring 2460' } },
+    ],
+  });
+  await expect(page.locator('[data-id="missing"] .task-case a')).toHaveCount(2);
+  await page.locator('[data-id="missing"] .task-actions a').click();
+  await expect(page.locator('#vf-task-attachments button')).toHaveCount(2);
+  await expect(page.locator('#vf-task-done')).toBeDisabled();
+  expect(writes).toEqual([]);
+});

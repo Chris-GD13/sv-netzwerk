@@ -38,6 +38,17 @@ $examples = [
     'Aktenzeichen: 123-45-67890123-0002' => '',
     'Rechnung: 123-45-67890123-0002' => '',
     'Keine Nummer, nur ein Name: Ott Matthias' => '',
+    'Fwd: AW: Schadennr.: 22671159490 - LWS - Königsberger Str. 21, 86690 Mertingen - Termin zur Begutachtung' => '22671159490',
+    'Schadennummer: 0022671159490' => '0022671159490',
+    'Schaden-Nr.: 12345678' => '12345678',
+    'Schadensnummer: 12345678901234567890' => '12345678901234567890',
+    'Auftrags-ID: 22671159490' => '',
+    'Telefon: 22671159490' => '',
+    'Rechnungsnummer: 22671159490' => '',
+    'Referenz 22671159490' => '',
+    'Schaden-Nr.: 1234567' => '',
+    'Schaden-Nr.: 123456789012345678901' => '',
+    'Schaden-Nr.: 22671159490ABC' => '',
 ];
 foreach ($examples as $text => $expected) {
     $actual = otCaseNumber($text);
