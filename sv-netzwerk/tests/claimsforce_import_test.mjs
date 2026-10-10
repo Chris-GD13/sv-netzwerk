@@ -218,7 +218,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20261010-3'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20261010-4'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
 assert(portal.includes('Schadennummer für Vollimport') && portal.includes('Diesen Schaden vollständig einlesen'), 'Der Vollimport ist als gezielter Einzelfallimport mit Schadennummer beschrieben');
 assert(dashboard.includes('<input id="vf-claims-number" type="text">') && !dashboard.includes('value="2026-01-01"'), 'Dashboard-Host stellt das Feld für die Einzelfall-Schadennummer ohne voreingestellten Filter bereit');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(portal.includes(`<option value="${key}">${label}</option>`), `${label} ist als Bearbeiterprofil auswählbar`);

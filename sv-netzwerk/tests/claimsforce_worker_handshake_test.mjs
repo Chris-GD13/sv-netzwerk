@@ -6,7 +6,7 @@ async function station(workerStatus) {
   const handlers = [], requests = [], messages = [], attributes = {};
   const window = { addEventListener(type, listener) { if (type === 'message') handlers.push(listener); }, postMessage(data) { messages.push(data); } };
   const chrome = { runtime: {
-    getManifest: () => ({ version: '1.4.59' }),
+    getManifest: () => ({ version: '1.4.60' }),
     onMessage: { addListener() {} },
     connect: () => ({ onDisconnect: { addListener() {} }, postMessage() {}, disconnect() {} }),
     async sendMessage(request) { requests.push(request); return request.type === 'GET_RUNTIME_STATUS' ? workerStatus : { ok: true, runId: request.runId }; }
@@ -21,17 +21,17 @@ async function station(workerStatus) {
 // Ein neuer Manifestwert darf einen noch alten Hintergrundprozess nicht bestätigen.
 const stale = await station({ ok: true, active: { status: 'idle' } });
 const staleReady = stale.messages.find(m => m.type === 'SVNET_CLAIMS_BRIDGE_READY_V2');
-assert.equal(staleReady.version, '1.4.59');
+assert.equal(staleReady.version, '1.4.60');
 assert.equal(staleReady.workerVersion, '');
 assert.equal(staleReady.protocol, 0);
 assert.equal(stale.attributes['data-svnet-claims-worker-version'], 'nicht geladen');
-const current = await station({ ok: true, workerVersion: '1.4.59', protocol: 2, active: { status: 'idle' } });
+const current = await station({ ok: true, workerVersion: '1.4.60', protocol: 2, active: { status: 'idle' } });
 await current.send({ type: 'SVNET_CLAIMS_IMPORT_START', profile: 'christian', jobId: 9 });
 assert.equal(current.requests.filter(r => r.type.startsWith('START_IMPORT')).length, 0, 'Altes Startsignal muss ignoriert werden');
 await current.send({ type: 'SVNET_CLAIMS_IMPORT_START_V2', profile: 'christian', jobId: 10, claimNumber: '26-085905-9', mode: 'single', runId: 'single-10' });
 const starts = current.requests.filter(r => r.type.startsWith('START_IMPORT'));
 assert.equal(starts.length, 1);
-assert.deepEqual(JSON.parse(JSON.stringify(starts[0])), { type: 'START_IMPORT_V2', protocol: 2, workerVersion: '1.4.59', profile: 'christian', jobId: 10, runId: 'single-10', mode: 'single', full: false, claimNumber: '26-085905-9', since: '' });
+assert.deepEqual(JSON.parse(JSON.stringify(starts[0])), { type: 'START_IMPORT_V2', protocol: 2, workerVersion: '1.4.60', profile: 'christian', jobId: 10, runId: 'single-10', mode: 'single', full: false, claimNumber: '26-085905-9', since: '' });
 console.log('Alter Worker wird erkannt; altes Startsignal bleibt wirkungslos; Einzelauftrag bleibt vollständig erhalten.');
 
 const centralCode = fs.readFileSync(new URL('../public/intern/claimsforce-central.js', import.meta.url), 'utf8');
@@ -54,21 +54,21 @@ async function centralStation() {
   };
 }
 const blocked = await centralStation();
-await blocked.send({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: '1.4.59' });
+await blocked.send({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: '1.4.60' });
 await blocked.poll();
 assert.equal(blocked.calls.filter(c => c.url.endsWith('action=claim')).length, 0);
-await blocked.send({ type: 'SVNET_CLAIMS_BRIDGE_READY_V2', version: '1.4.59', portalVersion: '1.4.59', workerVersion: '', protocol: 0 });
+await blocked.send({ type: 'SVNET_CLAIMS_BRIDGE_READY_V2', version: '1.4.60', portalVersion: '1.4.60', workerVersion: '', protocol: 0 });
 await blocked.poll();
 assert.equal(blocked.calls.filter(c => c.url.endsWith('action=claim')).length, 0, 'Manifest allein darf keinen Auftrag übernehmen');
 assert.equal(blocked.elements['vf-claims-full'].disabled, true);
 const verified = await centralStation();
-await verified.send({ type: 'SVNET_CLAIMS_BRIDGE_READY_V2', version: '1.4.59', portalVersion: '1.4.59', workerVersion: '1.4.59', protocol: 2 });
+await verified.send({ type: 'SVNET_CLAIMS_BRIDGE_READY_V2', version: '1.4.60', portalVersion: '1.4.60', workerVersion: '1.4.60', protocol: 2 });
 await verified.poll();
 const launch = verified.messages.find(m => m.type === 'SVNET_CLAIMS_IMPORT_START_V2');
 assert.equal(launch.claimNumber, '26-085905-9');
 assert.equal(launch.mode, 'single');
 assert.equal(verified.messages.some(m => m.type === 'SVNET_CLAIMS_IMPORT_START'), false, 'Alte Brücken dürfen das Startsignal nicht empfangen');
 const claim = verified.calls.find(c => c.url.endsWith('action=claim'));
-assert.equal(claim.body.workerVersion, '1.4.59');
+assert.equal(claim.body.workerVersion, '1.4.60');
 assert.equal(claim.body.protocol, 2);
 console.log('Portal startet nur nach echter Worker-Prüfung; alte Brücken bleiben gesperrt.');

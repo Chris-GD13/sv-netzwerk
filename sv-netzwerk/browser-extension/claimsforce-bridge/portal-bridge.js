@@ -1,7 +1,7 @@
 const API = '/intern/api/google-drive-sync.php';
 const CAL = '/intern/api/outlook-case-calendar.php';
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
-const PORTAL_CODE_VERSION = '1.4.59';
+const PORTAL_CODE_VERSION = '1.4.60';
 const CONTEXT_RELOAD_MESSAGE = 'Die Browser-Brücke wurde aktualisiert. Bitte diese Portalseite einmal neu laden und den Import danach erneut starten.';
 let contextReloadReported = false;
 const invalidExtensionContext = error => /Extension context invalidated|Receiving end does not exist|message port closed/i.test(String(error?.message || error || ''));
