@@ -1,5 +1,18 @@
 export const isBlank = value => value == null || (typeof value === 'string' && value.trim() === '');
 
+export const normalizedClaimNumber = value => String(value || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+export const sameImportScope = (a, b) => Number(a?.jobId) === Number(b?.jobId) && a?.profile === b?.profile && a?.mode === b?.mode && normalizedClaimNumber(a?.claimNumber) === normalizedClaimNumber(b?.claimNumber);
+export function assertSingleClaim(number, claims) {
+  if (!normalizedClaimNumber(number) || claims.length !== 1 || !claims[0]?.id || normalizedClaimNumber(claims[0].label || claims[0].schaden_nr) !== normalizedClaimNumber(number)) throw new Error('[CF-SINGLE-SCOPE] Der Einzelimport hat nicht genau den angeforderten Schaden geliefert.');
+}
+export function mergeClaimFiles(files, clientFiles, messages) {
+  const byId = new Map([...files, ...clientFiles].filter(f => f?.id && !f.deletedDate).map(f => [f.id, f]));
+  for (const message of messages) for (const attachment of message.attachments || []) {
+    if (attachment.type === 'CLAIM_FILE' && attachment.id && !byId.has(attachment.id)) byId.set(attachment.id, { id: attachment.id, fileName: `ClaimsForce-Anhang-${attachment.id}`, attachmentReference: true });
+  }
+  return [...byId.values()];
+}
+
 export function mergeOnlyBlank(existing, incoming) {
   const merged = { ...(existing || {}) };
   Object.entries(incoming || {}).forEach(([key, value]) => { if (isBlank(merged[key]) && !isBlank(value)) merged[key] = value; });

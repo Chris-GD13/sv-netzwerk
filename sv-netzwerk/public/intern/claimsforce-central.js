@@ -25,10 +25,11 @@
   let context={},bridge=false,bridgeVersion='',agentJob=null,userJobs=[],busy=false,reconciling=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}},reconciledJobs=new Set();
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
   const driveStatus=()=>window.svnetDriveStatus?window.svnetDriveStatus():json('/intern/api/google-drive-sync.php?action=status');
-  const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
+  const stationId=crypto.randomUUID();
+  const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,stationId,bridgeVersion})});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.4.12',currentBridgeVersion='1.4.57';
+  const minimumBridgeVersion='1.4.58',currentBridgeVersion='1.4.58';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -53,7 +54,7 @@
       const jobs=await Promise.all(userJobs.map(async id=>(await json('/intern/api/claimsforce-queue.php?action=status&id='+id)).job));
       const failed=jobs.some(job=>job.status==='failed');
       show(jobs.map(job=>job.message||'Import läuft …').join(' · '),failed);
-      if(jobs.every(job=>['done','failed'].includes(job.status))){button.disabled=false;userJobs=[];window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'));return}
+      if(jobs.every(job=>['done','failed'].includes(job.status))){button.disabled=false;if(fullButton)fullButton.disabled=false;if(claimInput)claimInput.disabled=false;userJobs=[];window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'));return}
     }catch(e){show(e.message,true)}
     setTimeout(watch,3000);
   }
@@ -63,7 +64,7 @@
       const recent=await json('/intern/api/claimsforce-queue.php?action=mine');
       userJobs=(recent.jobs||[]).filter(job=>['queued','running'].includes(job.status)).map(job=>Number(job.id));
       if(userJobs.length){button.disabled=true;if(fullButton)fullButton.disabled=true;if(claimInput)claimInput.disabled=true;watch();return}
-      button.disabled=false;if(claimInput)claimInput.disabled=false;
+      button.disabled=false;if(fullButton)fullButton.disabled=false;if(claimInput)claimInput.disabled=false;
       const latestByProfile=new Map();
       for(const job of (recent.jobs||[]).filter(job=>['done','failed'].includes(job.status))){
         const profile=String(job.profile||'unbekannt');
@@ -112,7 +113,7 @@
     stopButton.type='button';stopButton.id='vf-claims-stop';stopButton.className=fullButton.className;stopButton.textContent='Import pausieren';
     stopButton.addEventListener('click',async()=>{
       stopButton.disabled=true;
-      try{await post('stop');userJobs=[];show('Import pausiert. Der nächste Start setzt dort fort, wo er stehen geblieben ist.');button.disabled=false;fullButton.disabled=false;if(claimInput)claimInput.disabled=false}
+      try{await post('stop');stopLocal();userJobs=[];show('Import pausiert. Der nächste Start setzt dort fort, wo er stehen geblieben ist.');button.disabled=false;fullButton.disabled=false;if(claimInput)claimInput.disabled=false}
       catch(e){show(e.message,true)}
       finally{stopButton.disabled=false}
     });
@@ -142,11 +143,11 @@
           if(isOwnJob(active.job))show(`Import ${active.job.id} wurde nach einem abgebrochenen Browserlauf sicher beendet.`,true);
           await resumeWatch();
         }else{
-          if(isOwnJob(active.job))show(`Import ${active.job.id} wird mit derselben Job-ID sicher wiederaufgenommen.`);
+          if(isOwnJob(active.job))show(`Import ${active.job.id} wird auf dieser Importstation wiederaufgenommen.`);
           await launch(active.job,true);
         }
       }
-      else{
+      else if(!active.busy){
         const claimed=await post('claim');
         if(claimed.job)await launch(claimed.job,false);
       }
@@ -168,6 +169,7 @@
     const d=e.data||{},runtime=d.runtime||{};
     if(d.type==='SVNET_CLAIMS_BRIDGE_READY'){
       bridgeVersion=String(d.version||'0.0.0');
+      document.documentElement.setAttribute('data-svnet-claims-bridge-version',bridgeVersion);
       bridge=versionAtLeast(bridgeVersion,minimumBridgeVersion);
       if(!bridge)show(`Browser-Brücke ${minimumBridgeVersion} oder neuer erforderlich (geladen: ${bridgeVersion}).`,true);
       else if(!versionAtLeast(bridgeVersion,currentBridgeVersion))show(`Browser-Brücke ${bridgeVersion} ist einsatzbereit. Version ${currentBridgeVersion} steht als empfohlenes Update bereit.`);

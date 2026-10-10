@@ -6,6 +6,9 @@ import { fileURLToPath } from 'node:url';
 import { collectInvestigationClaims, mergeOnlyBlank, mapClaim, safeFileName } from '../browser-extension/claimsforce-bridge/import-utils.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// Die Fixtures antworten absichtlich nicht auf MAIN-World-Netzwerkabfragen.
+// Deren langes Produktionstimeout wird im Test sofort als fehlende Antwort simuliert.
+const fixtureSetTimeout = (callback, delay, ...args) => setTimeout(callback, delay >= 60000 ? 10 : delay, ...args);
 
 const merged = mergeOnlyBlank(
   { schaden_nr: '26-123456-1', email: 'manuell@example.de', mobil: '', sanierer_firma: 'Manuell GmbH' },
@@ -86,7 +89,7 @@ const claimRow = {
 };
 let scrapeListener;
 vm.runInNewContext(claimsBridgeDiagnostic, {
-  window: { addEventListener() {}, removeEventListener() {}, postMessage() {} }, setTimeout, clearTimeout,
+  window: { addEventListener() {}, removeEventListener() {}, postMessage() {} }, setTimeout: fixtureSetTimeout, clearTimeout,
   document: { querySelector: () => null, querySelectorAll: selector => selector === 'table tbody tr,[role="row"]' ? [claimRow] : [] },
   chrome: { runtime: { onMessage: { addListener(listener) { scrapeListener = listener; } } } },
   location: { pathname: '/invoiced', origin: 'https://web.claimsforce.com' }
@@ -141,7 +144,7 @@ const searchAnchors = () => {
 let misleadingNextClicks = 0;
 const misleadingNext = { textContent: 'Weiter', disabled: false, getAttribute: () => null, click: () => { misleadingNextClicks++; } };
 vm.runInNewContext(claimsBridgeDiagnostic, {
-  window: { addEventListener() {}, removeEventListener() {}, postMessage() {} }, setTimeout, clearTimeout,
+  window: { addEventListener() {}, removeEventListener() {}, postMessage() {} }, setTimeout: fixtureSetTimeout, clearTimeout,
   document: {
     body: { innerText: `Schäden mit erstellten Kostennoten (${virtualCases.length})` },
     querySelector: selector => selector === 'table' ? { parentElement: listScroller } : null,
@@ -160,7 +163,7 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
   chrome: { runtime: { onMessage: { addListener(listener) { noLinkScrapeListener = listener; } }, sendMessage: async message => { scrapeProgress.push(message); return { ok: true }; }, getManifest: () => ({ version: '1.4.53' }) } },
   Event,
   HTMLInputElement: MockInput,
-  setTimeout,
+  setTimeout: fixtureSetTimeout,
   location: { get pathname() { return currentRoute.value; }, origin: 'https://web.claimsforce.com' }
 });
 const numberOnlyScrape = await new Promise(resolve => noLinkScrapeListener({ type: 'SCRAPE_ALL_CLAIMS' }, {}, resolve));
@@ -215,7 +218,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20261010-1'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20261010-2'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
 assert(portal.includes('Schadennummer für Vollimport') && portal.includes('Diesen Schaden vollständig einlesen'), 'Der Vollimport ist als gezielter Einzelfallimport mit Schadennummer beschrieben');
 assert(dashboard.includes('<input id="vf-claims-number" type="text">') && !dashboard.includes('value="2026-01-01"'), 'Dashboard-Host stellt das Feld für die Einzelfall-Schadennummer ohne voreingestellten Filter bereit');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(portal.includes(`<option value="${key}">${label}</option>`), `${label} ist als Bearbeiterprofil auswählbar`);
@@ -328,7 +331,7 @@ assert(!central.includes('automaticImport') && !central.includes("['christian','
 assert(central.includes("await post('schedule')"), 'Zentrale Station muss den idempotenten serverseitigen Werktagsauftrag abfragen');
 assert((central.includes("post('enqueue',{profile})") || central.includes("post('enqueue',payload)")) && !central.includes("profile==='christian'?['christian','jens']:[profile]"), 'Ein manueller Klick darf genau einen Profilimport einreihen');
 assert(central.includes("post('active')") && central.includes("post('heartbeat'"), 'Zentrale Station zeigt einen aktiven manuellen Import weiter an');
-assert(central.includes('await launch(active.job,true)') && central.includes('derselben Job-ID sicher wiederaufgenommen'), 'Ein vorhandener Serverlauf muss mit identischer Job-ID sicher wiederaufgenommen werden');
+assert(central.includes('await launch(active.job,true)') && central.includes('auf dieser Importstation wiederaufgenommen'), 'Ein vorhandener Serverlauf muss mit identischer Job-ID sicher wiederaufgenommen werden');
 assert(central.includes("action=mine") && central.includes('resumeWatch()'), 'Portal stellt die sichtbare Überwachung bereits eingereihter Importe wieder her');
 assert(central.includes('const isOwnJob=job=>userJobs.includes') && central.includes('showAgent('), 'Fortschritt fremder zentraler Profilimporte darf den eigenen Claims-Bereich nicht überschreiben');
 assert(central.includes('if(isOwnJob(active.job))show(') && central.includes('if(userJobs.includes(Number(active.jobId)))show('), 'Auch Wiederaufnahme und Fehler fremder Queue-Läufe bleiben in der eigenen Anzeige unsichtbar');
@@ -337,7 +340,7 @@ assert(central.includes('setTimeout(()=>show(text,failed),1000)'), 'Terminaler I
 assert(central.includes('data-svnet-claims-jobs') && central.includes("`${job.id}|${job.profile}|${job.status}|${job.phase"), 'Letzte Serverergebnisse sind unabhängig von UI-Listenern geheimnisfrei im DOM prüfbar');
 assert(central.includes('data-svnet-claims-results') && central.includes('resultOf'), 'Der Live-Nachweis enthält sichere Fall-, Datei-, Nachrichten- und Terminzahlen');
 assert(central.includes('SVNET_CLAIMS_RUNTIME_STATUS') && central.includes('SVNET_CLAIMS_RUNTIME_PING'), 'Portal zeigt den persistenten Browserlauf auch nach einem Worker-Neustart an');
-assert(central.includes("minimumBridgeVersion='1.4.12'") && central.includes('versionAtLeast(bridgeVersion,minimumBridgeVersion)'), 'Die zentrale Importstation darf nur mit der unmittelbar startenden und anforderungsbezogen gerouteten Brücke laufen');
+assert(central.includes("minimumBridgeVersion='1.4.58'") && central.includes('versionAtLeast(bridgeVersion,minimumBridgeVersion)'), 'Die zentrale Importstation darf nur mit der unmittelbar startenden und anforderungsbezogen gerouteten Brücke laufen');
 assert(central.includes("runtime.status==='failed'") && central.includes('Browserlauf wurde abgebrochen'), 'Ein im Browser bereits fehlgeschlagener Lauf muss den noch aktiven Serverauftrag sicher beenden');
 assert(central.includes("d.type==='SVNET_CLAIMS_RUNTIME_STATUS'&&!agentJob&&!reconciling") && central.includes('button.disabled=false'), 'Ein vor der Auftragsuebernahme gemeldeter Browserabbruch muss abgeglichen und die Importschaltflaeche wieder freigegeben werden');
 assert(central.includes('reconciledJobs=new Set()') && central.includes('reconciledJobs.add(Number(active.jobId))'), 'Ein bereits abgeglichener Browserabbruch darf nicht bei jedem Laufzeit-Ping erneut gemeldet werden');
