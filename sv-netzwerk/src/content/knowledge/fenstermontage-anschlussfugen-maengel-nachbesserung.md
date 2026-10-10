@@ -27,7 +27,7 @@ seo:
   imageAlt: "KI-generiertes Symbolbild eines Fensters im Mauerwerksanschluss mit der Titelzeile Fenstermontage – Qualität am Anschluss"
 ---
 
-![Fenstermontage – Qualität am Anschluss: KI-generiertes Symbolbild eines Fensters mit sichtbarem Mauerwerksanschluss](/assets/images/fachwissen/fenstermontage-anschlussfugen-maengel-nachbesserung.png)
+<figure><img src="/assets/images/fachwissen/fenstermontage-anschlussfugen-maengel-nachbesserung.png" alt="Fenstermontage – Qualität am Anschluss: KI-generiertes Symbolbild eines Fensters mit sichtbarem Mauerwerksanschluss" width="1536" height="1024" loading="lazy" /></figure>
 
 *KI-generiertes Symbolbild. Die Darstellung veranschaulicht das Thema; sie dokumentiert keinen ausgeführten Montageaufbau und keinen tatsächlichen Schadenfall.*
 
