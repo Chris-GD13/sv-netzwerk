@@ -107,10 +107,10 @@
         let docsRunning=false;
         for(const turn of turns)if(turn.result&&(turn.document_id||turn.result.document_requests?.length))docsRunning=(await checkDocs(turn,current,version))||docsRunning;
         if(version!==epoch)return;
-        const running=turns.find(t=>t.status==='running');busy=!!running||!!pending(current.folder_id)||docsRunning;
+        const running=turns.find(t=>t.status==='running');busy=!!running||!!pending(current.folder_id);
         start.disabled=busy;start.textContent=busy?'Bearbeitung läuft …':turns.length?'Auftrag ausführen':'Bitte abarbeiten';
         if(!pending(current.folder_id))notice(running?.message||(docsRunning?'Dokumente werden erstellt …':turns.at(-1)?.status==='failed'?turns.at(-1).message:'Bereit. Du kannst einen neuen Auftrag oder eine Korrektur schreiben.'),turns.at(-1)?.status==='failed');
-        if(busy)timer=setTimeout(()=>poll(current,version),4000);
+        if(busy||docsRunning)timer=setTimeout(()=>poll(current,version),4000);
       }catch(error){if(version!==epoch)return;notice(error.message,true);start.disabled=!!pending(current.folder_id);busy=false;}
     };
     const sync=()=>{
