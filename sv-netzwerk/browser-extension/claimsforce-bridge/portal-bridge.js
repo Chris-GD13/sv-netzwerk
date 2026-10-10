@@ -253,7 +253,7 @@ window.addEventListener('message', event => {
       profile,
       jobId: Number(event.data.jobId || 0),
       runId: event.data.runId || crypto.randomUUID(),
-      mode: event.data.mode === 'tasks' ? 'tasks' : event.data.mode === 'single' ? 'single' : event.data.mode === 'full' || event.data.full ? 'full' : 'quick',
+      mode: String(event.data.claimNumber || '').trim() ? 'single' : event.data.mode === 'tasks' ? 'tasks' : event.data.mode === 'single' ? 'single' : event.data.mode === 'full' || event.data.full ? 'full' : 'quick',
       full: event.data.full === true,
       claimNumber: String(event.data.claimNumber || ''),
       since: String(event.data.since || '')

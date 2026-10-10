@@ -28,7 +28,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
   const show=(t,b=false)=>{state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.4.12',currentBridgeVersion='1.4.54';
+  const minimumBridgeVersion='1.4.12',currentBridgeVersion='1.4.55';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -88,7 +88,9 @@
       }
       if(mode==='tasks')payload.mode='tasks';
       userJobs=[];
-      userJobs.push((await post('enqueue',payload)).job.id);
+      const queued=(await post('enqueue',payload)).job;
+      if(mode==='single'&&(queued?.sync_mode!=='single'||String(queued?.claim_number||'').trim()!==String(payload.claimNumber||'')))throw Error('Einzelfallauftrag wurde nicht eindeutig mit der eingegebenen Schadennummer gespeichert.');
+      userJobs.push(queued.id);
       show(mode==='single'?'Einzelfall-Vollimport wurde an die zentrale Importstation übergeben.':mode==='tasks'?'ClaimsForce-Aufgaben werden automatisch aktualisiert.':'Importauftrag wurde an die zentrale Importstation übergeben.');
       watch();
     }

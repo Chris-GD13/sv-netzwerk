@@ -126,6 +126,7 @@ const listScroller = {
 let searchText = '';
 const searchedNumbers = [];
 const scrapeProgress = [];
+const currentRoute = { value: '/invoiced' };
 const searchInput = {
   getAttribute: name => name === 'placeholder' ? 'Schäden durchsuchen' : null,
   dispatchEvent: event => { if (event.type === 'input') searchedNumbers.push(searchText); }
@@ -160,7 +161,7 @@ vm.runInNewContext(claimsBridgeDiagnostic, {
   Event,
   HTMLInputElement: MockInput,
   setTimeout,
-  location: { pathname: '/invoiced', origin: 'https://web.claimsforce.com' }
+  location: { get pathname() { return currentRoute.value; }, origin: 'https://web.claimsforce.com' }
 });
 const numberOnlyScrape = await new Promise(resolve => noLinkScrapeListener({ type: 'SCRAPE_ALL_CLAIMS' }, {}, resolve));
 assert.equal(numberOnlyScrape.ok, true, `Schadennummern werden ohne Tabellen-Claim-IDs einzeln über die ClaimsForce-Suche aufgelöst: ${JSON.stringify(numberOnlyScrape)}`);
@@ -173,11 +174,13 @@ assert.equal(scrapeProgress[0].searchResolvedCount, virtualCases.length);
 assert.equal(numberOnlyScrape.claims.length, virtualCases.length, 'Beim virtuellen Scrollen müssen alle Schadennummern einzeln aufgelöst werden');
 assert.equal(misleadingNextClicks, 0, 'Bei einer scrollbaren Liste darf eine nicht zur Liste gehörende Weiter-Schaltfläche keine Pagination vortäuschen');
 assert(numberOnlyScrape.claims.some(claim => claim.id === virtualCases[4][1]), 'Alphanumerische Schadennummern werden einzeln zugeordnet');
+currentRoute.value = '/planning';
 const singleClaimScrape = await new Promise(resolve => noLinkScrapeListener({ type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER', damageNumber: virtualCases[3][0] }, {}, resolve));
-assert.equal(singleClaimScrape.ok, true, `Einzelfall-Suche findet die angegebene Schadennummer direkt: ${JSON.stringify(singleClaimScrape)}`);
+assert.equal(singleClaimScrape.ok, true, `Einzelfall-Suche findet die Schadennummer direkt auf der Planungsseite: ${JSON.stringify(singleClaimScrape)}`);
 assert.equal(singleClaimScrape.claims.length, 1, 'Einzelfall-Suche gibt genau einen Treffer zurück');
 assert.equal(singleClaimScrape.claims[0].id, virtualCases[3][1]);
 assert.equal(singleClaimScrape.claims[0].label, virtualCases[3][0]);
+assert.equal(singleClaimScrape.route, '/planning', 'Einzelfall-Suche bleibt auf der aktuellen ClaimsForce-Seite');
 assert(numberOnlyScrape.claims.some(claim => claim.id === virtualCases[5][1]), 'Punktgetrennte Schadennummern werden einzeln zugeordnet');
 assert(numberOnlyScrape.claims.some(claim => claim.label === 'HS74698170-0160'), 'ClaimsForce-Schadennummern mit Präfix werden vollständig übernommen');
 assert(virtualCases.every(([number]) => searchedNumbers.includes(number)), 'Jede aus der Liste gelesene Schadennummer wird einzeln in ClaimsForce gesucht');
@@ -247,9 +250,9 @@ const claimsMain = fs.readFileSync(path.join(root, 'browser-extension/claimsforc
 assert(claimsMain.includes('response.clone().json()') && claimsMain.includes('CLAIMS_SNAPSHOT'), 'Fall-IDs werden geheimnisfrei aus den bereits geladenen ClaimsForce-Antworten erfasst');
 assert(claimsMain.includes('inspectTokenCache') && claimsMain.includes('inspectStorage(localStorage)'), 'Ein vorhandenes ClaimsForce-Token wird nach einem Worker-Neustart auch aus dem Auth-Cache wiederhergestellt');
 const importWorker = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/service-worker.js'), 'utf8');
-assert(importWorker.includes("strategy: 'invoiced-claims'") && importWorker.includes('bucketCounts.INVOICED_CLAIMS') && importWorker.includes('Schadennummern aus „/invoiced“'), 'Vollabgleich verwendet die vollständige Kostennotenliste als Ausgangspunkt');
+assert(importWorker.includes("singleSync ? 'current-page-damage-number-search' : 'invoiced-claims'") && importWorker.includes('bucketCounts.INVOICED_CLAIMS') && importWorker.includes('Schadennummern aus „/invoiced“'), 'Nur der Sammelabgleich verwendet die vollständige Kostennotenliste als Ausgangspunkt');
 assert(importWorker.includes('(fullSync && !singleSync && alreadyComplete)') && importWorker.includes('fileVersions, messageVersions, appointmentVersions, notes') && importWorker.includes('claimNumber'), 'Nach dem Erstabgleich werden Mails, Notizen, Termine und Dateien per Signatur erneut geprüft; der Einzelfallimport bleibt gezielt erzwingbar');
-assert(importWorker.includes("type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER'") && claimsPageBridge.includes("message?.type === 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER'") && claimsPageBridge.includes('Schadennummer ${damageNumber} wurde in der ClaimsForce-Kostennotenliste nicht gefunden'), 'Der Einzelfall-Vollimport löst nur die eingegebene Schadennummer auf statt alle Kostennoten abzugleichen');
+assert(importWorker.includes("type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER'") && claimsPageBridge.includes("message?.type === 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER'") && claimsPageBridge.includes('Schadennummer ${damageNumber} wurde über die ClaimsForce-Suche nicht gefunden'), 'Der Einzelfall-Vollimport löst nur die angegebene Schadennummer über die globale Suche auf');
 assert(importWorker.includes('if (attachmentBuffer === null) throw new Error') && importWorker.includes('Mail-Anhang „${attachmentName}“ konnte nicht geladen werden'), 'Nicht herunterladbare Mail-Anhänge müssen den Import als fehlgeschlagen melden statt unbemerkt ausgelassen zu werden');
 const claimsRequestJson = importWorker.slice(importWorker.indexOf('async function requestJson'), importWorker.indexOf('const INVESTIGATION_QUERIES'));
 assert(!claimsRequestJson.includes('if (optional) return null;') && claimsRequestJson.includes('if (optional && response.status === 404) return null;'), 'Optionale ClaimsForce-Bereiche dürfen nur bei HTTP 404 leer bleiben; Netzwerk- und Serverfehler müssen sichtbar fehlschlagen');
@@ -297,6 +300,7 @@ assert(queue.includes('claimsforce_import_jobs') && queue.includes("$action==='c
 assert(queue.includes('heartbeat_at') && queue.includes("$action==='heartbeat'") && queue.includes("$action==='active'"), 'Verwaiste Browserimporte müssen per Heartbeat erkannt werden');
 assert(queue.includes("phase='CF-FAIL-STALE'") && queue.includes('cqFailStaleRuns()'), 'Unterbrochene Importe müssen sicher fehlschlagen statt erneut eingeplant zu werden');
 assert(queue.includes("phase='CF-FAIL-REPLACED'") && queue.includes("status IN ('queued','running')"), 'Ein neuer manueller Import muss ältere eigene Profilaufträge eindeutig ersetzen');
+assert(queue.includes("$syncMode=$claimNumber!==''?'single':") && queue.includes("ORDER BY (sync_mode='single') DESC,(requested_by='system:claimsforce') ASC"), 'Schadennummern werden serverseitig immer als Einzelfall gespeichert und vor automatischen Sammelläufen eingeplant');
 assert(queue.includes("$action==='schedule'") && queue.includes("new DateTimeZone('Europe/Berlin')"), 'Werktagsautomatik muss serverseitig in Berliner Zeit geplant werden');
 assert(queue.includes('$weekday>5||$clock<300||$clock>=1000'), 'Automatik darf nur Montag bis Freitag ab 03:00 Uhr innerhalb des Nachholfensters eingeplant werden');
 assert(queue.includes('uq_claims_schedule_key') && queue.includes('INSERT IGNORE INTO claimsforce_import_jobs'), 'Pro Arbeitstag, Profil und Importmodus darf höchstens ein Automatikauftrag entstehen');
@@ -313,7 +317,7 @@ assert(queue.includes("is_numeric($result['openTasks']??null)") && queue.include
 assert(routing.includes("return ['christian', 'holger', 'marc', 'jens']"), 'Backoffice darf alle vier Bearbeiterprofile gezielt auswählen');
 assert(queue.includes("$action==='mine'") && queue.includes('WHERE requested_by=:u ORDER BY id DESC LIMIT 20'), 'Eigene Warteschlangenläufe müssen nach einem Portal-Neuladen wiedergefunden werden');
 const central = fs.readFileSync(path.join(root, 'public/intern/claimsforce-central.js'), 'utf8');
-assert(central.includes("button.addEventListener('click',()=>enqueue('quick'))") && central.includes("fullButton?.addEventListener('click',()=>enqueue('single'))") && central.includes("payload.claimNumber=claimNumber"), 'Der obere Button bleibt beim Planungsschnellimport; der Einzelfallimport nutzt die eingegebene Schadennummer');
+assert(central.includes("button.addEventListener('click',()=>enqueue('quick'))") && central.includes("fullButton?.addEventListener('click',()=>enqueue('single'))") && central.includes("payload.claimNumber=claimNumber") && central.includes("queued?.sync_mode!=='single'"), 'Der obere Button bleibt beim Planungsschnellimport; der Einzelfallauftrag wird mit Schadennummer verifiziert');
 assert(central.includes('window.svnetDriveStatus?window.svnetDriveStatus()'), 'Die Claims-Zentrale verwendet den gemeinsamen Drive-Status statt eines eigenen Abrufs');
 assert(central.includes("action=status&id=") && central.includes("SVNET_CLAIMS_IMPORT_START"), 'Portal kann zentrale Importe starten und verfolgen');
 assert(!central.includes("job.profile==='jens'?'christian':job.profile") && central.includes("const target=String(job.profile||'')"), 'Jens darf beim Import nicht auf Christians Portalordner umgeschrieben werden');
@@ -430,7 +434,7 @@ assert(serviceWorker.includes("type: 'PORTAL_APPOINTMENT', folderId, appointment
 assert(serviceWorker.includes("if (!['christian', 'jens'].includes(profile))"), 'Christian und das in Christians Kalender umgeleitete Jens-Profil erzeugen keine automatischen Termine');
 assert(manifest.permissions.includes('browsingData') && serviceWorker.includes('chrome.browsingData.remove') && serviceWorker.includes('CLAIMS_ORIGINS'), 'Beim Profilwechsel werden ausschließlich ClaimsForce- und Auth0-Sitzungsdaten vollständig entfernt');
 assert(serviceWorker.includes('if (!singleSync) await resetClaimsSession(run)') && serviceWorker.includes('const openTasks = singleSync ? null : await readOpenTasks(tab.id)'), 'Einzelfallimporte behalten die angemeldete ClaimsForce-Sitzung und überspringen die Aufgaben-Navigation');
-assert(serviceWorker.includes('await ensureInvoicedListTab(tab.id)') && serviceWorker.includes("if (scrapedRoute !== '/invoiced')"), 'Einzelfallimporte navigieren gezielt zur Suchliste statt über Aufgaben und bestätigen die Route');
+assert(serviceWorker.includes('if (!singleSync) await ensureInvoicedListTab(tab.id)') && serviceWorker.includes("if (!singleSync && scrapedRoute !== '/invoiced')"), 'Nur der Listenabgleich navigiert zu /invoiced; Einzelfallimporte suchen auf der aktuellen ClaimsForce-Seite');
 assert(serviceWorker.includes('await resetClaimsSession(run)') && serviceWorker.includes('chrome.tabs.remove(tab.id)'), 'Vollimporte setzen ClaimsForce-Sitzungen bei einem Profilwechsel weiterhin zurück');
 assert(serviceWorker.includes('tokenEmail') && serviceWorker.includes('CF-AUTH-03'), 'Eine im Sitzungstoken erkennbare fremde ClaimsForce-Identität wird vor dem Einlesen gesperrt');
 assert(serviceWorker.includes("key: 'WITH_FUTURE_APPOINTMENT'") && serviceWorker.includes("key: 'WITHOUT_APPOINTMENT'") && serviceWorker.includes('chrome.tabs.update(tabId, { url: planningUrl })'), 'Nach erfolgreicher Anmeldung werden beide ClaimsForce-Planungsansichten deterministisch geöffnet');

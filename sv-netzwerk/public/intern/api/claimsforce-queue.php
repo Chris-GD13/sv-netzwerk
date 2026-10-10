@@ -108,10 +108,10 @@ if($action==='summary'){
 if($action==='enqueue'){
     $allowed=array_keys(cqVisibleProfiles($user));
     $profile=trim((string)($body['profile']??''));
-    $mode=(string)($body['mode']??'');
-    $syncMode=$mode==='tasks'?'tasks':($mode==='single'?'single':(($mode==='full'||!empty($body['full']))?'full':'quick'));
-    $sinceDate=preg_match('/^\d{4}-\d{2}-\d{2}$/',(string)($body['since']??''))?(string)$body['since']:null;
     $claimNumber=trim((string)($body['claimNumber']??$body['claim_number']??''));
+    $mode=(string)($body['mode']??'');
+    $syncMode=$claimNumber!==''?'single':($mode==='tasks'?'tasks':($mode==='single'?'single':(($mode==='full'||!empty($body['full']))?'full':'quick')));
+    $sinceDate=preg_match('/^\d{4}-\d{2}-\d{2}$/',(string)($body['since']??''))?(string)$body['since']:null;
     if($syncMode==='single'){
         $sinceDate=null;
         if($claimNumber==='')apiError(409,'Für den Einzelfall-Vollimport muss eine Schadennummer angegeben werden.');
@@ -186,7 +186,7 @@ if($action==='active'){
 if($action==='claim'){
     cqFailStaleRuns();
     db()->beginTransaction();
-    $row=db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='queued' ORDER BY created_at,id LIMIT 1 FOR UPDATE")->fetch(PDO::FETCH_ASSOC);
+    $row=db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='queued' ORDER BY (sync_mode='single') DESC,(requested_by='system:claimsforce') ASC,created_at,id LIMIT 1 FOR UPDATE")->fetch(PDO::FETCH_ASSOC);
     if(!$row){db()->commit();apiJson(['ok'=>true,'job'=>null]);}
     $id=(int)$row['id'];
     $s=db()->prepare("UPDATE claimsforce_import_jobs SET status='running',message='Import wird auf der zentralen Station ausgeführt.',phase='CF-CLAIMED',started_at=NOW(),heartbeat_at=NOW(),attempt_count=attempt_count+1 WHERE id=:id AND status='queued'");
