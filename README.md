@@ -33,6 +33,11 @@ Die Schadennummernerkennung berücksichtigt auch geteilte Zifferngruppen wie
 `26-165 840-0` und `26-165-840-0` sowie zweistellige Endungen wie
 `61-1181377-91`. Die Fallzuordnung ignoriert reine Trennzeichenunterschiede,
 behält aber sämtliche Ziffern einschließlich der Endung bei.
+Mehrteilige Versicherer-Nummern wie `00-031-404193-0001` und
+`408-53-25000238-1` bleiben vollständig erhalten, einschließlich führender
+Nullen. Eine ausdrücklich als Schadennummer bezeichnete Nummer hat Vorrang
+vor anderen Referenzen; Telefon-, Rechnungs- und Auftragsnummern werden nicht
+als solche übernommen.
 
 ```text
 cd sv-netzwerk

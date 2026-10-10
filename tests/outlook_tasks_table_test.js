@@ -1,4 +1,6 @@
 const { test, expect } = require('@playwright/test');
+const { execFileSync } = require('node:child_process');
+const path = require('node:path');
 
 const BASE = process.env.PORTAL_URL || 'http://127.0.0.1:4327';
 const tasks = [
@@ -35,8 +37,8 @@ async function openTasks(page, options = {}) {
       }
     }
     if (url.pathname.endsWith('/google-drive-sync.php')) {
-      if (action === 'search_cases') return route.fulfill({ json: { ok: true, results: [{ id: 'test-folder', meta: { schaden_nr: options.storedNumber || url.searchParams.get('q') } }] } });
-      if (action === 'load_case') return route.fulfill({ json: { ok: true, case: { id: 'test-folder', meta: { schaden_nr: options.storedNumber || tasks[0].case_number } } } });
+      if (action === 'search_cases') return route.fulfill({ json: { ok: true, results: [{ id: 'test-folder', name: options.storedObject || 'Testfall', meta: { schaden_nr: options.storedNumber || url.searchParams.get('q'), vn_objekt: options.storedObject || 'Testfall' } }] } });
+      if (action === 'load_case') return route.fulfill({ json: { ok: true, case: { id: 'test-folder', meta: { schaden_nr: options.storedNumber || tasks[0].case_number, vn_objekt: options.storedObject || 'Testfall' } } } });
       if (action === 'upload_case_document') {
         if (options.archiveError) return route.fulfill({ status: 500, json: { ok: false, error: 'IONOS nicht erreichbar' } });
         return route.fulfill({ json: { ok: true } });
@@ -222,3 +224,33 @@ test('geteilte Schadennummer verweist auf denselben bestehenden Fall mit Aufgabe
   await expect(popup.locator('#vf-task-state')).not.toContainText('Kein Fall');
   await popup.close();
 });
+
+for (const example of [
+  { number: '00-031-404193-0001', name: 'Ott Matthias', subject: 'Fwd: Schaden-Nr: 00-031-404193-0001 / Aktenzeichen: 26/0351328 / Auftrags-ID: 450421' },
+  { number: '408-53-25000238-1', name: 'Xhemerson Sefa', subject: 'Fwd: Fwd: KUSS Service-Portal: Sie haben neue Unterlagen erhalten - 408-53-25000238-1' },
+]) {
+  test(`Versicherer-Nummer ${example.number}: bestehender benannter Fall statt Neuanlage`, async ({ page }) => {
+    const helper = path.resolve(__dirname, '..', 'sv-netzwerk', 'public', 'intern', 'api', 'outlook-task-number.php');
+    const number = execFileSync('php', ['-r', 'require $argv[1]; echo otCaseNumber($argv[2]);', helper, example.subject], { encoding: 'utf8' });
+    expect(number).toBe(example.number);
+    const item = { ...tasks[0], case_number: number, subject: example.subject, edit_url: `/intern/versicherungsfaelle/?schaden_nr=${number}&aufgabe=oldest` };
+    const creations = [];
+    page.context().on('request', request => {
+      if (request.url().includes('action=save_case')) creations.push(request.url());
+    });
+    await openTasks(page, { items: [item, tasks[1]], storedNumber: example.number, storedObject: example.name });
+    await expect(page.locator('[data-id="oldest"] .task-case a')).toHaveText(example.number);
+    await expect(page.locator('[data-id="oldest"] .task-archive')).toHaveText(/Mail \+ Anhänge abgelegt|Bereits abgelegt/);
+    const popupPromise = page.waitForEvent('popup');
+    await page.locator('[data-id="oldest"] .task-case a').click();
+    const popup = await popupPromise;
+    await expect(popup.locator('#vf-task-subject')).toHaveText(example.subject);
+    await expect(popup.locator('#vf-task-done')).toBeEnabled();
+    const current = await popup.evaluate(() => JSON.parse(sessionStorage.getItem('svnet-case')));
+    expect(current.folder_id).toBe('test-folder');
+    expect(current.meta.vn_objekt).toBe(example.name);
+    expect(current.meta.schaden_nr).toBe(example.number);
+    expect(creations).toEqual([]);
+    await popup.close();
+  });
+}
