@@ -7,7 +7,7 @@ const tasksPage = fs.readFileSync(new URL('../src/pages/intern/aufgaben/index.as
 assert(tasksApi.includes("in_array($action, ['detail', 'attachment', 'eml'], true)"), 'Der EML-Abruf muss dieselbe Zu-erledigen-Nachricht prüfen wie die Detailansicht.');
 assert(tasksApi.includes("'/messages/' . rawurlencode($id) . '/$value'"), 'Die Original-Mail muss als MIME/EML aus Microsoft Graph geladen werden.');
 assert(tasksApi.includes("header('Content-Type: message/rfc822')") && tasksApi.includes("25 * 1024 * 1024"), 'Der EML-Endpunkt muss Original-Mails mit Größenlimit ausliefern.');
-assert(tasksPage.includes("String(row.meta?.schaden_nr || '').trim() === caseNumber"), 'Mails dürfen nur einem Fall mit exakt passender Schadennummer zugeordnet werden.');
+assert(tasksPage.includes("caseNumberKey(row.meta?.schaden_nr) === caseNumberKey(caseNumber)"), 'Mails dürfen nur einem Fall mit exakt passender Schadennummer zugeordnet werden; Trennzeichen sind keine andere Fallidentität.');
 assert(tasksPage.includes("if (exactCases.length > 1) { unresolved++; setArchiveState(item, 'Mehrere Falltreffer', 'is-error'); continue; }"), 'Bei mehreren passenden Fällen darf keine automatische Ablage erfolgen und der Zuordnungsfehler muss sichtbar sein.');
 assert(tasksPage.includes("action=save_case") && tasksPage.includes("schaden_nr: caseNumber"), 'Bei Schadennummer ohne Treffer muss ein neuer Drive-Fall angelegt werden.');
 assert(tasksPage.includes("action=upload_case_document") && tasksPage.includes("action=attachment"), 'Original-Mails und Mailanhänge müssen in Google Drive abgelegt werden.');

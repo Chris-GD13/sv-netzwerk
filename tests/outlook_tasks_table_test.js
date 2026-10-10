@@ -35,8 +35,8 @@ async function openTasks(page, options = {}) {
       }
     }
     if (url.pathname.endsWith('/google-drive-sync.php')) {
-      if (action === 'search_cases') return route.fulfill({ json: { ok: true, results: [{ id: 'test-folder', meta: { schaden_nr: url.searchParams.get('q') } }] } });
-      if (action === 'load_case') return route.fulfill({ json: { ok: true, case: { id: 'test-folder', meta: { schaden_nr: tasks[0].case_number } } } });
+      if (action === 'search_cases') return route.fulfill({ json: { ok: true, results: [{ id: 'test-folder', meta: { schaden_nr: options.storedNumber || url.searchParams.get('q') } }] } });
+      if (action === 'load_case') return route.fulfill({ json: { ok: true, case: { id: 'test-folder', meta: { schaden_nr: options.storedNumber || tasks[0].case_number } } } });
       if (action === 'upload_case_document') {
         if (options.archiveError) return route.fulfill({ status: 500, json: { ok: false, error: 'IONOS nicht erreichbar' } });
         return route.fulfill({ json: { ok: true } });
@@ -203,4 +203,22 @@ test('20 Aufgaben bleiben bei langen Betreffzeilen kompakt', async ({ page }, te
   expect(Math.max(...heights)).toBeLessThan(120);
   expect(await page.locator('#tasks-table-wrap').evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('aufgaben-desktop.png'), fullPage: true });
+});
+
+test('geteilte Schadennummer verweist auf denselben bestehenden Fall mit Aufgabe', async ({ page }) => {
+  const item = {
+    ...tasks[0],
+    case_number: '26-165840-0',
+    subject: 'Fwd: Schaden 26-165 840-0 / HC CAS-69406-F8F9P2',
+    edit_url: '/intern/versicherungsfaelle/?schaden_nr=26-165840-0&aufgabe=oldest',
+  };
+  await openTasks(page, { items: [item, tasks[1]], storedNumber: '26-165-840-0' });
+  await expect(page.locator('[data-id="oldest"] .task-archive')).toHaveText(/Mail \+ Anhänge abgelegt|Bereits abgelegt/);
+  const popupPromise = page.waitForEvent('popup');
+  await page.locator('[data-id="oldest"] .task-case a').click();
+  const popup = await popupPromise;
+  await expect(popup.locator('#vf-task-subject')).toHaveText(item.subject);
+  await expect(popup.locator('#vf-task-done')).toBeEnabled();
+  await expect(popup.locator('#vf-task-state')).not.toContainText('Kein Fall');
+  await popup.close();
 });

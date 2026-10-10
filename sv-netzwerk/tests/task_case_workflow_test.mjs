@@ -7,8 +7,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const page = fs.readFileSync(path.join(root, 'src/pages/intern/versicherungsfaelle/index.astro'), 'utf8');
 
 assert(page.includes("taskNumber=String(task.case_number||number||'').trim()"), 'Die Schadennummer aus dem vollständigen Mailtext muss Vorrang vor der Vorschau haben');
-assert(page.includes("String(r.meta?.schaden_nr||'').trim()===taskNumber"), 'Aufgaben dürfen nur einem Fall mit exakt passender Schadennummer zugeordnet werden');
-assert(page.includes("if(!manuallySelected&&(!taskNumber||!current?.folder_id||String(current.meta?.schaden_nr||'').trim()!==taskNumber))"), 'Ein beliebiger zuvor geöffneter Fall darf nicht stillschweigend übernommen werden');
+assert(page.includes("caseNumberKey(r.meta?.schaden_nr)===caseNumberKey(taskNumber)"), 'Aufgaben dürfen nur einem Fall mit exakt passender Schadennummer zugeordnet werden, unabhängig von Trennzeichen');
+assert(page.includes("if(!manuallySelected&&(!taskNumber||!current?.folder_id||caseNumberKey(current.meta?.schaden_nr)!==caseNumberKey(taskNumber)))"), 'Ein beliebiger zuvor geöffneter Fall darf nicht stillschweigend übernommen werden');
 assert(page.includes("new URLSearchParams({aufgabe:taskId,fallordner:folderId})"), 'Eine manuelle Fallzuordnung muss beim Laden der Aufgabenansicht erhalten bleiben');
 assert(page.includes('id="vf-task-reply"') && page.includes('recipient.value=task.from') && page.includes('body?.focus'), 'Die Aufgabe muss eine Antwort im fallbezogenen Mailformular vorbereiten');
 assert(page.includes('id="vf-task-kva"') && page.includes("document.querySelector('.vf-technical-release')"), 'Die Aufgabe muss direkt zur KVA-Prüfung und Freigabe führen');

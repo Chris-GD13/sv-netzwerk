@@ -29,6 +29,10 @@ Arbeitsliste erhalten bleibt. „Aufgabe bearbeiten“ öffnet ebenfalls die
 fallbezogene Nachricht, „Erledigt“ verschiebt sie in den gleichnamigen
 Outlook-Ordner. Der automatische IONOS-Abgleich zeigt seinen Stand je Nachricht
 separat an und ersetzt keine fachliche Erledigung.
+Die Schadennummernerkennung berücksichtigt auch geteilte Zifferngruppen wie
+`26-165 840-0` und `26-165-840-0` sowie zweistellige Endungen wie
+`61-1181377-91`. Die Fallzuordnung ignoriert reine Trennzeichenunterschiede,
+behält aber sämtliche Ziffern einschließlich der Endung bei.
 
 ```text
 cd sv-netzwerk
