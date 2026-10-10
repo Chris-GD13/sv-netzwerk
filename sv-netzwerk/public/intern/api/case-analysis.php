@@ -100,6 +100,10 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
         ignore_user_abort(true); set_time_limit(0);
         caUpdate($job, 'running', 'Aktuelle Aufgabe und vollständiger Fallbestand werden geladen.');
         $files = caCaseFiles($folder); $meta = []; $sources = []; $gaps = []; $task = [];
+        if($work!==null){
+            if(empty($work['import']))$gaps[]='Kein bestätigter Claims-Vollimport zu diesem Arbeitsauftrag vorhanden. Bearbeitet wird der vorhandene Portalbestand.';
+            foreach(($work['import']['result']['inventories']??[]) as $inventory)foreach(($inventory['restrictedFiles']??[]) as $restricted)$gaps[]='Claims-Originalquelle gesperrt: '.($restricted['name']??$restricted['id']??'Anhang').' – '.($restricted['reason']??'Kein Originalinhalt verfügbar.');
+        }
         foreach ($files as $file) if ($file['name'] === '00_Falldaten.json') {
             $meta = json_decode(ionosBytes($file['id']), true, 512, JSON_THROW_ON_ERROR);
             break;
@@ -219,7 +223,7 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
             .'Ein belegbares Anliegen jetzt ausarbeiten, nicht als künftigen Arbeitsschritt zurückgeben. '
             .'Antwortentwurf muss die aktuellen Anliegen einzeln beantworten und die ausgearbeiteten Ergebnisse enthalten. '
             .'Anrede und verbindlichen Absenderblock verwenden. Quellenlücken zwingend als offene Punkte kennzeichnen. '
-            .($work !== null ? 'Zusätzlich subject (Schadennummer zuerst), document_requests (Array; nur tatsächlich benötigte oder angeforderte Dokumente, sonst leer). Je Dokument type (erstbericht, zwischenbericht, schlussbericht, nachtrag_stellungnahme, zahlungsbefuerwortung, rechnungsregister, query_form) und instructions (vollständiger konkreter Auftrag mit Belegbezug und Berichtnummer sofern belegt). Bei Bitte abarbeiten aus den aktuellen Anliegen entscheiden, welche Dokumente benötigt werden. Dokumente werden erst anschließend vom Werkzeug erzeugt, niemals bereits als erstellt melden. ' : '')
+            .($work !== null ? 'Zusätzlich subject (Schadennummer zuerst), document_requests (Array; nur tatsächlich benötigte oder angeforderte Dokumente, sonst leer). Je Dokument type (erstbericht für normale Schäden, erstbericht_sv_gf für SV-GF, zwischenbericht, schlussbericht, nachtrag_stellungnahme, zahlungsbefuerwortung, schlusserklaerung, rechnungsregister, query_form, kalkulation) und instructions (vollständiger konkreter Auftrag mit Belegbezug und Berichtnummer sofern belegt). Bei Bitte abarbeiten aus den aktuellen Anliegen entscheiden, welche Dokumente benötigt werden. Dokumente werden erst anschließend vom Werkzeug erzeugt, niemals bereits als erstellt melden. ' : '')
             .'Kontext: '.$context, 14000),
             $requests, array_column($evidence, 'name'));
         $requestTexts = array_column($requests, 'request', 'id');
@@ -236,6 +240,7 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
         $result['open_points'] = array_values(array_unique([...$gaps, ...$result['open_points']]));
         $result = array_merge($result, ['folder_id'=>$folder, 'task_id'=>$taskId, 'sources'=>$sources, 'rules'=>$ruleManifest,
             'task_requests'=>$requests, 'source_gaps'=>$gaps, 'status'=>'draft', 'created_at'=>gmdate('c'), 'case_no'=>$meta['schaden_nr'] ?? '']);
+        if($work!==null)$result['import_manifest']=$work['import']??null;
         $safe = preg_replace('/[^\p{L}\p{N}._-]/u', '_', (string)($meta['schaden_nr'] ?? 'Fall'));
         $parent = $folder;
         foreach (ionosList(['q'=>"'".str_replace("'", "\\'", $folder)."' in parents and trashed=false", 'pageSize'=>1000])['files'] as $file) {

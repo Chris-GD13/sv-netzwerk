@@ -63,6 +63,7 @@ try {
     if (trim(env('OPENAI_API_KEY', '')) === '') throw new RuntimeException('OpenAI-Anbindung fehlt.');
     $history = cwHistoryContext($rows); $taskId = trim((string)($body['task_id'] ?? ''));
     $importId = (int)($body['import_id'] ?? 0); $import = null;
+    if(!$importId)foreach(array_reverse($rows) as $previous){if($previous['import_id']){$importId=(int)$previous['import_id'];break;}}
     if ($importId) {
         $s = db()->prepare('SELECT * FROM claimsforce_import_jobs WHERE id=:id AND requested_by=:u');
         $s->execute([':id'=>$importId, ':u'=>$user['email']]); $import = $s->fetch(PDO::FETCH_ASSOC);
