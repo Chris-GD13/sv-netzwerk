@@ -118,7 +118,15 @@
         "verified_at": "2026-10-10T04:20:52.803Z"
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "not-posted",
+        "blocker": {
+          "code": "blocked-topic-mismatch",
+          "checked_at": "2026-10-10T05:06:09.467Z",
+          "expected_topic": "Fensterbau: Fenstermontage und Anschlussfugen, Ausführungsqualität, Mängelbefund und fachgerechte Nachbesserung; kein Wasserschaden-Schwerpunkt",
+          "actual_title": "Brandmeldeanlagen nach Wasser- und Brandschäden fachlich prüfen",
+          "article_url": "https://www.sv-netzwerk.eu/fachwissen/brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung/",
+          "evidence": "docs/linkedin-veroeffentlichung-2026-10-10.md"
+        }
       }
     }
   },
