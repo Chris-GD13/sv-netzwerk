@@ -38,7 +38,10 @@ function drAnalysis(array $source, string $kind, ?array $reference, array $suppo
             try {
                 $upload = krHttp('POST','https://api.openai.com/v1/files',['Authorization: Bearer '.$key],['purpose'=>'user_data','file'=>new CURLFile($temp,$file['mime'],kvaOpenAiUploadName($file['name'],$file['mime']))]);
                 $data = json_decode($upload['body'],true); $id = (string)($data['id']??'');
-                if ($upload['status']<200 || $upload['status']>=300 || $id==='') throw new RuntimeException('Originalbeleg konnte nicht vollständig zur Prüfung übergeben werden.');
+                if ($upload['status']<200 || $upload['status']>=300 || $id==='') {
+                    $apiError=mb_substr(preg_replace('/\s+/',' ',(string)($data['error']['message']??'')),0,160);
+                    throw new RuntimeException('Originalbeleg konnte nicht vollständig zur Prüfung übergeben werden (KI-Dienst HTTP '.$upload['status'].($apiError!==''?': '.$apiError:'').'; Datei '.(string)($file['name']??'Unterlage').', '.(string)($file['mime']??'').').');
+                }
                 $ids[]=$id;
                 $parts[]=['type'=>'input_text','text'=>$role.$file['name']];
                 $parts[]=['type'=>'input_file','file_id'=>$id];
