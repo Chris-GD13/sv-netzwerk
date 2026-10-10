@@ -34,7 +34,7 @@ $rejected=drValidate(['mode'=>'review','analysis'=>['assessment'=>'Plausibility'
 check($rejected['release_amount']===0.0,'Rejected is never a payment');
 $record['values']=$rejected;$record['mode']='review';$record['kind']='offer';
 $text=drBody($record);
-check(str_contains($text,'Angebot')&&str_contains($text,'nicht freigegeben'),'Separate offer rejection');
+check(str_contains($text,'Angebot')&&str_contains($text,'nicht zur Ausführung freigeben'),'Separate offer rejection');
 check(!str_contains($text,'Freigabebetrag:'),'No release amount for rejection');
 check(str_contains($text,'Bereits abgerechnet')&&!str_contains($text,'Doppelt berechnet'),'Mail uses the human statement, not the internal assessment');
 $internal='Das ist als mitgeteilte Angabe dokumentiert, nicht als unabhängig nachgewiesene Freigabe. Offene Punkte: keine zusätzlichen Nachweise zu Leistungsumfang, Aufmaß, Zahlungsstand oder etwaigen Teilfreigaben im Belegsatz erkennbar. KI-Prüfvorschlag.';
@@ -56,9 +56,24 @@ foreach (['Die Rechnung wurde durch KI geprüft.','Automatisierte Freigabe','Off
 reviewAssertCorrespondence('Die Freigabe umfasst ausschließlich die aufgeführten Leistungen. Der Zahlungsstand ist vor Auszahlung abzugleichen. Bitte reichen Sie die Fremdgewerksrechnung nach.');
 fails(fn()=>drRecipients('not-an-address'),'Invalid email rejected');
 check(count(drRecipients('test@example.org, TEST@example.org'))===1,'Deduplicate recipients');
-$energy=drValidate(['mode'=>'direct'],array_replace($values,['energy_kwh'=>'431','energy_rate'=>'0,35','energy_vn'=>'ETG Bussenstraße 45a']));
+$energy=drValidate(['mode'=>'direct'],array_replace($values,['energy_enabled'=>true,'energy_kwh'=>'431','energy_rate'=>'0,35','energy_vn'=>'ETG Bussenstraße 45a']));
 check($energy['energy_amount']===150.85 && $energy['gross']===1190.0 && $energy['release_amount']===1190.0,'Energy separate from supplier release');
-$changed=drValidate(['mode'=>'direct'],array_replace($values,['energy_kwh'=>'431','energy_rate'=>'0,40']));check($changed['energy_amount']===172.40,'Editable energy tariff');
+$changed=drValidate(['mode'=>'direct'],array_replace($values,['energy_enabled'=>true,'energy_kwh'=>'431','energy_rate'=>'0,40']));check($changed['energy_amount']===172.40,'Editable energy tariff');
 $energyMail=drBody(array_replace($record,['values'=>$energy]));check(str_contains($energyMail,'150,85 EUR')&&str_contains($energyMail,'Erstattung an den VN'),'Separate VN energy reimbursement in email');
-fails(fn()=>drValidate(['mode'=>'direct'],array_replace($values,['energy_kwh'=>'431','energy_rate'=>'0'])),'Invalid energy rate rejected');
+fails(fn()=>drValidate(['mode'=>'direct'],array_replace($values,['energy_enabled'=>true,'energy_kwh'=>'431','energy_rate'=>'0'])),'Invalid energy rate rejected');
+foreach(['invoice','offer']as$kind){
+    $disabled=drValidate(['mode'=>'direct','analysis'=>['energy_kwh'=>431]],array_replace($values,['energy_kwh'=>'0','energy_enabled'=>false]));
+    check($disabled['energy_amount']===null&&!str_contains(drBody(array_replace($record,['kind'=>$kind,'values'=>$disabled])),'Stromkosten'),'No automatic zero energy paragraph');
+    $disabled=drValidate(['mode'=>'direct'],array_replace($values,['energy_kwh'=>'431','energy_enabled'=>false]));
+    check($disabled['energy_kwh']===null,'Positive analysis never opts user into reimbursement');
+    fails(fn()=>drValidate(['mode'=>'direct'],array_replace($values,['energy_enabled'=>true,'energy_kwh'=>'0'])),'Selected reimbursement cannot be zero');
+    check(!str_contains(drBody(array_replace($record,['kind'=>$kind,'values'=>array_replace($accepted,['energy_kwh'=>0,'energy_amount'=>0])])),'Stromkosten'),'Legacy zero draft has no energy text');
+}
+$edited=array_replace($record,['mail_body'=>"Sehr geehrter Herr Hollenbach,\n\nMein bearbeiteter Text.\n",'mail_subject'=>'TEST-17 · Individueller Betreff']);
+check(drMessage($edited,'original')['body']['content']===$edited['mail_body'],'Exact edited body is transmitted');
+check(drMessage($edited,'original')['subject']===$edited['mail_subject'],'Exact edited subject is transmitted');
+fails(fn()=>drSubject(array_replace($edited,['mail_subject'=>'TEST-170 · Falscher Fall'])),'Partial case number is rejected');
+fails(fn()=>drSubject(array_replace($edited,['mail_subject'=>'Individueller Betreff'])),'Claim number is mandatory');
+fails(fn()=>drBody(array_replace($edited,['mail_body'=>''])),'Empty edited mail cannot send');
+fails(fn()=>drBody(array_replace($edited,['mail_body'=>'Die KI hat die Rechnung geprüft.'])),'Edited body cannot leak machine wording');
 echo "Rechnung/Angebot, direkte Übernahme, Entscheidungen, Centbeträge und Originalanhang geprüft.\n";

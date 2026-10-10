@@ -198,7 +198,7 @@ function krReviewedKva(array $preview, array $input): array
         'insurer'=>$value('insurer'),
         'net'=>krMoney($input['net'] ?? $preview['net'] ?? null),
         'gross'=>krMoney($input['gross'] ?? $preview['gross'] ?? null),
-        'subject'=>trim((string)($input['subject'] ?? ('KVA-Freigabe · Schaden-Nr. '.($preview['case_no'] ?? '')))),
+        'subject'=>trim((string)($input['subject'] ?? (($preview['case_no'] ?? '').' · KVA-Freigabe'))),
         'body'=>trim((string)($input['body'] ?? '')),
     ];
     $reviewed['mey_generalbau'] = krMeyGeneralbau((string)($preview['company'] ?? '')) || krMeyGeneralbau($reviewed['company']);
@@ -212,6 +212,7 @@ function krReviewedKva(array $preview, array $input): array
     if ((float)$reviewed['net'] <= 0 || (float)$reviewed['gross'] <= 0 || (float)$reviewed['gross'] < (float)$reviewed['net']) throw new RuntimeException('Netto- und Brutto-Gesamtbetrag sind nicht plausibel.');
     foreach (['company','quote_number','insurer'] as $key) if (mb_strlen((string)$reviewed[$key]) > 300) throw new RuntimeException('Eine manuell geprüfte KVA-Angabe ist zu lang.');
     if (mb_strlen($reviewed['subject']) > 500) throw new RuntimeException('Der Betreff ist zu lang.');
+    $reviewed['subject']=reviewMailSubject($reviewed['subject'],(string)($preview['case_no']??''));
     reviewAssertCorrespondence($reviewed['subject']."\n".$reviewed['body']);
     $reviewed['sparkasse'] = preg_match('/sparkassen.?versicherung|SV SparkassenVersicherung/i', $reviewed['insurer']) === 1;
     return $reviewed;
@@ -335,7 +336,7 @@ function krV2Handle(array $user): void
                 if ($preview[$key] === null || $preview[$key] === '') $missing[] = $label;
             }
             apiJson(['ok'=>true,'draft'=>$preview+[
-                'subject'=>'KVA-Freigabe · Schaden-Nr. '.$preview['case_no'],
+                'subject'=>$preview['case_no'].' · KVA-Freigabe',
                 'body'=>krDraftBody($preview),
                 'sender'=>$sender,
                 'bcc'=>$sparkasse ? KR_ARCHIVE : '',

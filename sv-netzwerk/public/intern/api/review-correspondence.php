@@ -11,3 +11,11 @@ function reviewAssertCorrespondence(string $text): void {
         throw new RuntimeException('Bitte die Stellungnahme für die Mail fachlich formulieren. Interne Prüf- und Quellenhinweise sowie Angaben zur automatisierten Verarbeitung dürfen nicht in die Korrespondenz übernommen werden. Konkrete Vorbehalte oder benötigte Unterlagen bitte direkt benennen.');
     }
 }
+
+function reviewMailSubject(string $text, string $caseNo): string {
+    $text=trim($text);$caseNo=trim($caseNo);
+    if ($caseNo==='' || $text==='' || mb_strlen($text)>500 || preg_match('/[\r\n]/',$text)) throw new RuntimeException('Bitte einen gültigen Betreff mit der Schadennummer eingeben (maximal 500 Zeichen).');
+    if (!preg_match('/(?<![\p{L}\p{N}-])'.preg_quote($caseNo,'/').'(?![\p{L}\p{N}-])/u',$text)) throw new RuntimeException('Der Betreff muss die vollständige Schadennummer '.$caseNo.' enthalten.');
+    reviewAssertCorrespondence($text);
+    return $text;
+}

@@ -164,6 +164,7 @@ try {
         $subjectOverride = trim((string)($_POST['subject'] ?? ''));
         if (mb_strlen($subjectOverride, 'UTF-8') > 500) throw new RuntimeException('Der Betreff ist zu lang.');
         $subject = $subjectOverride !== '' ? $subjectOverride : $caseNo . ($damageType !== '' ? ' – ' . $damageType : '');
+        $subject = reviewMailSubject($subject,$caseNo);
         $text = trim((string)($_POST['body'] ?? ''));
         if ($text === '') throw new RuntimeException('E-Mail-Text fehlt.');
         reviewAssertCorrespondence($subject."\n".$text);
