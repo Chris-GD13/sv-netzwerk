@@ -97,6 +97,21 @@ function searchCasePhoneIndex(array $user, string $number, int $limit = 10): arr
     return $results;
 }
 
+/** Exact claim lookups need current sync state, not the shortened search index. */
+function caseSearchHydrateExactRows(array $rows, string $query, callable $loadMeta): array
+{
+    $key=caseNumberKey($query);
+    foreach($rows as &$row){
+        $number=(string)($row['meta']['schaden_nr']??'');
+        if($key===''||$number===''||caseNumberKey($number)!==$key)continue;
+        $meta=$loadMeta((string)$row['id']);
+        if(!is_array($meta)||!$meta)throw new RuntimeException('Der aktuelle Übernahmestand dieses Falls konnte nicht gelesen werden.');
+        $row['meta']=$meta;
+    }
+    unset($row);
+    return $rows;
+}
+
 /** Uses only columns from the long-standing production table. */
 function searchCaseFolderIndex(array $user, string $query, int $limit = 30): array
 {

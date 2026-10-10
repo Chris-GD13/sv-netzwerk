@@ -42,7 +42,7 @@ async function centralStation() {
   const window = { addEventListener(type, handler) { if (type === 'message') handlers.push(handler); }, postMessage(data) { messages.push(data); }, dispatchEvent() {}, svnetDriveStatus: async () => ({ claims_agent: true, backoffice: true, selected_expert: 'christian' }) };
   const job = { id: 91, profile: 'christian', sync_mode: 'single', claim_number: '26-085905-9', attempt_count: 1 };
   vm.runInNewContext(centralCode, { window,
-    document: { getElementById: id => elements[id] || null, querySelector: () => null, createElement: () => ({ addEventListener() {} }), documentElement: { getAttribute: () => '', setAttribute() {} } },
+    document: { getElementById: id => elements[id] || null, querySelector: () => null, createElement: () => ({ dataset: {}, addEventListener() {} }), documentElement: { getAttribute: () => '', setAttribute() {} } },
     async fetch(url, options) { calls.push({ url, body: options?.body ? JSON.parse(options.body) : null }); const result = url.endsWith('action=mine') ? { jobs: [] } : url.endsWith('action=active') ? { job: null, busy: false } : url.endsWith('action=claim') ? { job } : {}; return { ok: true, json: async () => ({ ok: true, ...result }) }; },
     location: { origin: 'https://www.sv-netzwerk.eu' }, crypto: { randomUUID: () => '11111111-1111-4111-8111-111111111111' },
     sessionStorage: { removeItem() {} }, localStorage: { removeItem() {} }, CustomEvent: class {},

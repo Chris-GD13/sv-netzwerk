@@ -22,7 +22,7 @@
     }
   };
   placeImportCards();
-  let context={},bridge=false,bridgeVersion='',workerVersion='',bridgeProblem='',agentJob=null,userJobs=[],busy=false,reconciling=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}},reconciledJobs=new Set();
+  let context={},bridge=false,bridgeVersion='',workerVersion='',bridgeProblem='',agentJob=null,userJobs=[],busy=false,reconciling=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}},reconciledJobs=new Set(),controlJobs=[],controlButton=null,controlBusy=false;
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
   const driveStatus=()=>window.svnetDriveStatus?window.svnetDriveStatus():json('/intern/api/google-drive-sync.php?action=status');
   const stationId=crypto.randomUUID();
@@ -36,6 +36,21 @@
     return raw;
   };
   const isOwnJob=job=>userJobs.includes(Number(job?.id||0));
+  const importControlState=(jobs,profile)=>{
+    const own=jobs.filter(job=>job.profile===profile).sort((a,b)=>Number(b.id)-Number(a.id));
+    const active=own.find(job=>['queued','running'].includes(job.status));
+    const job=active||own[0]||null;
+    return {job,action:active?'pause':job?.status==='failed'?'resume':job?.status==='done'?'recheck':'idle'};
+  };
+  const refreshControl=()=>{
+    if(!controlButton)return;
+    let control;try{control=importControlState(controlJobs,selectedProfile())}catch{control={action:'idle',job:null}}
+    const labels={pause:'Import pausieren',resume:'Import fortsetzen',recheck:'Import erneut prüfen',idle:'Import pausieren'};
+    controlButton.textContent=labels[control.action];
+    controlButton.disabled=controlBusy||control.action==='idle'||(control.action!=='pause'&&context.claims_agent&&!bridge);
+    controlButton.dataset.importAction=control.action;
+    controlButton.title=control.job?.sync_mode==='single'?`${control.job.claim_number||''} · gleicher Einzelauftrag`:'';
+  };
   const showAgent=(text,bad=false)=>{if(isOwnJob(agentJob))show(text,bad)};
   const versionAtLeast=(actual,required)=>{const a=String(actual).split('.').map(Number),r=String(required).split('.').map(Number);for(let i=0;i<3;i++){if((a[i]||0)!==(r[i]||0))return(a[i]||0)>(r[i]||0)}return true};
   const resultOf=job=>{try{return typeof job.result==='string'?JSON.parse(job.result):job.result||{}}catch{return{}}};
@@ -52,6 +67,7 @@
     if(!userJobs.length)return;
     try{
       const jobs=await Promise.all(userJobs.map(async id=>(await json('/intern/api/claimsforce-queue.php?action=status&id='+id)).job));
+      controlJobs=[...jobs,...controlJobs.filter(job=>!jobs.some(current=>Number(current.id)===Number(job.id)))];refreshControl();
       const failed=jobs.some(job=>job.status==='failed');
       show(jobs.map(job=>job.message||'Import läuft …').join(' · '),failed);
       if(jobs.every(job=>['done','failed'].includes(job.status))){button.disabled=false;if(fullButton)fullButton.disabled=false;if(claimInput)claimInput.disabled=false;userJobs=[];window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'));return}
@@ -62,6 +78,7 @@
   async function resumeWatch(){
     try{
       const recent=await json('/intern/api/claimsforce-queue.php?action=mine');
+      controlJobs=recent.jobs||[];refreshControl();
       userJobs=(recent.jobs||[]).filter(job=>['queued','running'].includes(job.status)).map(job=>Number(job.id));
       if(userJobs.length){button.disabled=true;if(fullButton)fullButton.disabled=true;if(claimInput)claimInput.disabled=true;watch();return}
       button.disabled=false;if(fullButton)fullButton.disabled=false;if(claimInput)claimInput.disabled=false;
@@ -75,23 +92,26 @@
     }catch(e){show('Importstatus konnte nicht wiederhergestellt werden: '+e.message,true)}
   }
 
-  const enqueue=async(mode,targetProfile='')=>{
+  const enqueue=async(mode,targetProfile='',previousJob=null)=>{
     if(userJobs.length)return;
     if(context.claims_agent&&!bridge){show('Diese zentrale Importstation ist nicht bereit.',true);return}
     button.disabled=true;if(fullButton)fullButton.disabled=true;if(claimInput)claimInput.disabled=true;
     try{
       const profile=targetProfile||selectedProfile(),payload={profile};
       if(mode==='single'){
-        const claimNumber=String(claimInput?.value||'').trim();
+        const claimNumber=String(previousJob?previousJob.claim_number:claimInput?.value||'').trim();
         if(!claimNumber)throw Error('Bitte eine Schadennummer für den Vollimport eingeben.');
         payload.mode='single';
         payload.claimNumber=claimNumber;
+        if(claimInput)claimInput.value=claimNumber;
       }
-      if(mode==='tasks')payload.mode='tasks';
+      if(mode==='tasks'||mode==='full')payload.mode=mode;
+      if(previousJob?.since_date&&mode!=='single')payload.since=previousJob.since_date;
       userJobs=[];
       const queued=(await post('enqueue',payload)).job;
       if(mode==='single'&&(queued?.sync_mode!=='single'||String(queued?.claim_number||'').trim()!==String(payload.claimNumber||'')))throw Error('Einzelfallauftrag wurde nicht eindeutig mit der eingegebenen Schadennummer gespeichert.');
       userJobs.push(queued.id);
+      controlJobs=[queued,...controlJobs];refreshControl();
       show(mode==='single'?'Einzelfall-Vollimport wurde an die zentrale Importstation übergeben.':mode==='tasks'?'ClaimsForce-Aufgaben werden automatisch aktualisiert.':'Importauftrag wurde an die zentrale Importstation übergeben.');
       watch();
     }
@@ -110,12 +130,22 @@
   fullButton?.addEventListener('click',()=>enqueue('single'));
   if(fullButton){
     const stopButton=document.createElement('button');
-    stopButton.type='button';stopButton.id='vf-claims-stop';stopButton.className=fullButton.className;stopButton.textContent='Import pausieren';
+    stopButton.type='button';stopButton.id='vf-claims-stop';stopButton.className=fullButton.className;stopButton.textContent='Import pausieren';controlButton=stopButton;refreshControl();
     stopButton.addEventListener('click',async()=>{
-      stopButton.disabled=true;
-      try{await post('stop');stopLocal();userJobs=[];show('Import pausiert. Der nächste Start setzt dort fort, wo er stehen geblieben ist.');button.disabled=false;fullButton.disabled=false;if(claimInput)claimInput.disabled=false}
+      controlBusy=true;refreshControl();
+      try{
+        const profile=selectedProfile(),control=importControlState(controlJobs,profile);
+        if(control.action==='pause'){
+          await post('stop',{id:Number(control.job.id)});if(Number(agentJob?.id)===Number(control.job.id))stopLocal();userJobs=[];
+          show('Import pausiert. Mit „Import fortsetzen“ wird derselbe Auftrag weiter geprüft.');
+          button.disabled=false;fullButton.disabled=false;if(claimInput)claimInput.disabled=false;
+          await resumeWatch();
+        }else if(control.job&&['resume','recheck'].includes(control.action)){
+          await enqueue(control.job.sync_mode||'quick',profile,control.job);
+        }
+      }
       catch(e){show(e.message,true)}
-      finally{stopButton.disabled=false}
+      finally{controlBusy=false;refreshControl()}
     });
     fullButton.insertAdjacentElement('afterend',stopButton);
   }
@@ -177,6 +207,7 @@
       workerVersion=String(d.workerVersion||'');
       bridge=versionAtLeast(bridgeVersion,minimumBridgeVersion)&&d.protocol===2&&d.portalVersion==='1.4.60'&&workerVersion==='1.4.60';
       bridgeProblem=bridge?'':`Browser-Brücke neu laden: Dateien ${bridgeVersion}, tatsächlich laufendes Importprogramm ${workerVersion||'alter Stand'}. Einzelimport bleibt gesperrt.`;
+      refreshControl();
       if(!bridge)show(bridgeProblem,true);
       else if(!userJobs.length){button.disabled=false;if(fullButton)fullButton.disabled=false;}
       else if(!versionAtLeast(bridgeVersion,currentBridgeVersion))show(`Browser-Brücke ${bridgeVersion} ist einsatzbereit. Version ${currentBridgeVersion} steht als empfohlenes Update bereit.`);

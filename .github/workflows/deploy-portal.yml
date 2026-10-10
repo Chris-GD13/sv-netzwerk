@@ -92,6 +92,8 @@ jobs:
           node tests/claimsforce_single_scope_test.mjs
           node tests/claimsforce_worker_handshake_test.mjs
           node tests/claimsforce_source_restrictions_test.mjs
+          node tests/claimsforce_resume_controls_test.mjs
+          php tests/claimsforce_resume_metadata_test.php
           node tests/financial_register_preset_test.mjs
 
       - name: Ausschließlich Portaldateien vorbereiten
