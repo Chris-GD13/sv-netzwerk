@@ -50,15 +50,30 @@ Im Versicherungsfall startet „Fall analysieren und ausarbeiten“ eine
 serverseitige OpenAI-API-Analyse direkt auf derselben Seite. Die aktuelle
 Outlook-Aufgabe einschließlich Datei-Anhängen und der IONOS-Fallbestand mit
 Unterordnern werden berücksichtigt; zusätzliche Originale werden vor dem Start
-im bestehenden Fall gespeichert. Alle MD-Dateien aus den eindeutig erreichbaren
-Drive-Masterbereichen `00_Standards_Regeln` (einschließlich `ab sofort immer gültig`),
-`00_KI-Wissensbasis` und `SV-Netzwerk-Projekt` werden bei jedem Auftrag neu geladen,
-nicht auf eine Auswahl der ersten Regeln gekürzt. Fehlende Masterquellen sperren
-die Ausarbeitung. Liegt `00_Standards_Regeln` ausschließlich innerhalb der
-KI-Wissensbasis, wird dieser eindeutig erreichbare Ordner ebenfalls verwendet.
-Gemeinsam erreichbare MD-Dateien werden nur einmal geladen; die Pfade der
-verbindlichen Standards bleiben erhalten. Fehlermeldungen unterscheiden fehlende
-Freigaben (keine Treffer) von mehreren gleichnamigen Ordnern.
+im bestehenden Fall gespeichert. Seit der Betreiberanweisung vom 10.10.2026
+werden auch Vorgaben ausschließlich aus dem geprüften IONOS-Dateibestand gelesen,
+ohne Google-Authentifizierung oder Drive-Fallback. Ausgangspunkt ist die bereits
+konfigurierte Wissensbasis (ID aus `GOOGLE_DRIVE_KNOWLEDGE_FOLDER_ID`, bestehende
+Standard-ID wie beim bisherigen Wissenszugriff). Zusätzlich werden alle vorhandenen
+Bereiche `00_Standards_Regeln` und `SV-Netzwerk-Projekt` rekursiv berücksichtigt.
+Historische Drive-Ordnernamen sind keine Voraussetzung für eine anders strukturierte
+IONOS-Ablage. `MASTER-ARBEITSSTANDARD.md` muss vorhanden sein. Gemeinsam erreichbare
+Originale werden nur einmal gelesen; es gibt keine Auswahl der ersten Regeln.
+MD/TXT werden unverändert eingelesen, PDF- und Office-Vorgaben werden zuvor
+quellentreu durch die API ausgelesen. Unlesbare Vorgaben und Größenüberschreitungen
+sperren die Analyse. Die maschinelle Transkription ersetzt keine layoutgetreue
+Originalvorlage und muss fachlich geprüft werden.
+
+Unter `/intern/versicherungswissen/` können Administratoren den aktuellen
+IONOS-Regelbestand prüfen und MD/TXT/PDF/DOCX/XLSX/PPTX-Originale importieren.
+Der Import verwendet ausschließlich die vorhandene Wissensbasis und legt
+gewählte Unterbereiche bei Bedarf an. Identische Dateien werden wiederverwendet;
+andere gleichnamige Fassungen benötigen eine ausdrückliche Ersetzungsbestätigung
+und werden durch die bestehende IONOS-Versionssicherung geschützt.
+Jeder Import wird durch erneutes Lesen und SHA-256-Abgleich bestätigt.
+Die Originale liegen im geschützten IONOS-Dateispeicher, nicht in öffentlich
+abrufbaren Website-Dateien. Der Import ersetzt keine Prüfung, ob alle fachlich
+erforderlichen Vorgaben und Vorlagen vorliegen.
 
 Das Ergebnis enthält belegte Feststellungen, fachliche Bewertung, offene Punkte,
 Arbeitsschritte, Regelprüfung und Antwortentwurf und wird als JSON-Entwurf im

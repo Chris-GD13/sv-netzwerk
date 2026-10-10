@@ -2,6 +2,76 @@ const { test, expect } = require('@playwright/test');
 const fs = require('node:fs');
 const path = require('node:path');
 const script = fs.readFileSync(path.join(__dirname, '..', 'sv-netzwerk', 'public', 'intern', 'case-analysis.js'), 'utf8');
+const importScript = fs.readFileSync(path.join(__dirname, '..', 'sv-netzwerk', 'public', 'intern', 'case-rules-import.js'), 'utf8');
+
+async function setupRuleImport(page, options = {}) {
+  const uploads = [];
+  await page.route('http://portal.test/intern/versicherungswissen/', route => route.fulfill({ contentType: 'text/html', body: `<!doctype html>
+    <section id="case-rules-import" hidden><p id="case-rules-status"></p><form id="case-rules-form">
+    <select id="case-rules-target"><option value="standards">Standards</option></select>
+    <input id="case-rules-files" type="file" multiple><input id="case-rules-replace" type="checkbox">
+    <button type="submit">Importieren</button><button id="case-rules-refresh" type="button">Bestand</button></form>
+    <ul id="case-rules-results"></ul><ul id="case-rules-list"></ul></section>` }));
+  await page.route('**/intern/api/case-rules-import.php', async route => {
+    if (options.denied) return route.fulfill({ status: 403, json: { ok: false, error: 'Nur Administratoren' } });
+    if (route.request().method() === 'POST') {
+      uploads.push(route.request().postData());
+      if (options.failSecond && uploads.length === 2) return route.fulfill({ status: 422, json: { ok: false, error: 'Andere Fassung vorhanden' } });
+      return route.fulfill({ json: { ok: true, file: { name: '<img src=x onerror=alert(1)>.md', duplicate: uploads.length > 1 } } });
+    }
+    return route.fulfill({ json: { ok: true, root: { name: '00_KI-Wissensbasis' }, files: [{ path: '<script>alert(1)</script>.md' }] } });
+  });
+  await page.goto('http://portal.test/intern/versicherungswissen/');
+  await page.addScriptTag({ content: importScript });
+  return uploads;
+}
+
+test('IONOS-Regelimport bestätigt Originale und rendert Namen nur als Text', async ({ page }) => {
+  const uploads = await setupRuleImport(page);
+  await expect(page.locator('#case-rules-import')).toBeVisible();
+  await page.locator('#case-rules-files').setInputFiles([
+    { name: 'MASTER-ARBEITSSTANDARD.md', mimeType: 'text/markdown', buffer: Buffer.from('# Master') },
+    { name: 'MASTER-ARBEITSSTANDARD.md', mimeType: 'text/markdown', buffer: Buffer.from('# Master') },
+  ]);
+  await page.getByRole('button', { name: 'Importieren' }).click();
+  await expect(page.locator('#case-rules-results')).toContainText('2 Originale bestätigt');
+  expect(uploads).toHaveLength(2);
+  expect(uploads[0]).toContain('# Master');
+  expect(uploads[0]).toContain('standards');
+  await expect(page.locator('#case-rules-results img')).toHaveCount(0);
+  await expect(page.locator('#case-rules-list script')).toHaveCount(0);
+});
+
+test('IONOS-Regelimport meldet Teilimport ausdrücklich und stoppt weitere Dateien', async ({ page }) => {
+  const uploads = await setupRuleImport(page, { failSecond: true });
+  await page.locator('#case-rules-files').setInputFiles(['one.md', 'two.md', 'three.md'].map(name => ({
+    name, mimeType: 'text/markdown', buffer: Buffer.from('# Regel'),
+  })));
+  await page.getByRole('button', { name: 'Importieren' }).click();
+  await expect(page.locator('#case-rules-status')).toContainText('1 vorherige Originale sind bereits bestätigt');
+  expect(uploads).toHaveLength(2);
+  await expect(page.getByRole('button', { name: 'Importieren' })).toBeEnabled();
+});
+
+test('IONOS-Regelimport ist für Nichtadministratoren ausgeblendet', async ({ page }) => {
+  await setupRuleImport(page, { denied: true });
+  await expect(page.locator('#case-rules-import')).toBeHidden();
+});
+
+test('Echte Wissensseite bietet den IONOS-Administratorimport an', async ({ page }) => {
+  await page.route('**/intern/api/**', async route => {
+    if (route.request().url().includes('case-rules-import.php')) {
+      return route.fulfill({ json: { ok: true, root: { name: '00_KI-Wissensbasis' }, files: [], message: 'Master importieren' } });
+    }
+    return route.fulfill({ json: { ok: true, user: { role: 'administrator', full_name: 'Test' },
+      files: [], insurers: [], workbook: {}, items: [], results: [] } });
+  });
+  await page.goto((process.env.PORTAL_URL || 'http://127.0.0.1:4327') + '/intern/versicherungswissen/');
+  await expect(page.locator('#case-rules-import')).toBeVisible();
+  await expect(page.locator('#case-rules-status')).toContainText('Master importieren');
+  await expect(page.locator('#case-rules-target option')).toHaveCount(4);
+  await expect(page.locator('#case-rules-files')).toHaveAttribute('accept', '.md,.txt,.pdf,.docx,.xlsx,.pptx');
+});
 const result = {
   folder_id: 'case-one', task_id: 'task-one', summary: '<img src=x onerror=alert(1)>',
   facts: ['Angebot neu.pdf: Tür und Malerarbeiten'], assessment: 'Freigabeumfang prüfen.',

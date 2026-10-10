@@ -95,6 +95,7 @@ jobs:
           node tests/task_case_address_test.mjs
           php tests/case_analysis_test.php
           php tests/case_analysis_worker_test.php
+          php tests/case_rules_import_test.php
           node tests/claimsforce_single_scope_test.mjs
           node tests/claimsforce_worker_handshake_test.mjs
           node tests/claimsforce_source_restrictions_test.mjs
@@ -306,6 +307,9 @@ jobs:
           test "$status" = "200"
           grep -Fq 'Tagescockpit' "$page"
           echo "/intern/tagescockpit/: HTTP $status, Dashboard geladen"
+          status="$(curl --max-time 60 --silent --show-error -b "$jar" -o "$page" -w '%{http_code}' https://www.sv-netzwerk.eu/intern/api/case-rules-import.php)"
+          test "$status" = "200"
+          node -e "const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); if(!d.ok || !d.root || !Array.isArray(d.files)) process.exit(1); console.log('IONOS-Regelbestand erreichbar: '+d.files.length+' Originale; Master vorhanden: '+Boolean(d.ready)); if(d.message) console.log('IONOS-Regelhinweis: '+d.message);" "$page"
           curl --max-time 20 --silent --show-error -b "$jar" -X POST -o /dev/null 'https://www.sv-netzwerk.eu/intern/api/auth.php?action=logout' || true
           rm -f "$jar" "$page"
           zip_live="$(mktemp)"
@@ -329,7 +333,5 @@ jobs:
             echo "$path: HTTP $status, JSON ohne Redirect"
             rm -f "$headers" "$body"
           done
-
-
 
 
