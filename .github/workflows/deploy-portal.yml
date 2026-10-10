@@ -83,6 +83,7 @@ jobs:
           php tests/gf_saved_calculation_test.php
           php tests/gf_case_isolation_test.php
           php tests/kva_bundle_test.php
+          php tests/kva_openai_error_test.php
           php tests/document_review_test.php
           php tests/document_review_workflow_test.php
           node tests/financial_register_preset_test.mjs

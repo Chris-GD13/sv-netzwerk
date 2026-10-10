@@ -89,7 +89,7 @@ function krAnalyzeCalculation(string $name, string $mime, string $bytes): array
         $upload = krHttp('POST', 'https://api.openai.com/v1/files', ['Authorization: Bearer '.$key], ['purpose'=>'user_data', 'file'=>new CURLFile($tmp, $mime, $uploadName)]);
         $uploaded = json_decode($upload['body'], true);
         $fileId = (string)($uploaded['id'] ?? '');
-        if ($upload['status'] < 200 || $upload['status'] >= 300 || $fileId === '') throw new RuntimeException('KVA konnte nicht für die Nachkalkulation vorbereitet werden.');
+        if ($upload['status'] < 200 || $upload['status'] >= 300 || $fileId === '') throw kvaOpenAiFailure($upload, 'KVA konnte nicht für die Nachkalkulation vorbereitet werden.');
         $result = krOpenAiJson(
             $key,
             $fileId,
@@ -382,6 +382,6 @@ function krV2Handle(array $user): void
         }
         apiError(404, 'Unbekannte Aktion.');
     } catch (Throwable $error) {
-        apiError(500, $error->getMessage());
+        apiError($error->getCode() === 503 ? 503 : 500, $error->getMessage());
     }
 }
