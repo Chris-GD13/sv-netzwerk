@@ -62,6 +62,26 @@ fails(fn()=>caTaskMatches(['case_number'=>'26-031578-4'], ['schaden_nr'=>'26-031
 $result = ['summary'=>'Entwurf', 'assessment'=>'Prüfvorschlag', 'reply_draft'=>'Bitte Nachweise senden.',
     'facts'=>[], 'open_points'=>[], 'next_steps'=>[], 'rule_checks'=>['MASTER.md geprüft']];
 check(caValidateResult($result) === $result, 'Valid result');
+$requests = caValidateTaskRequests(['requests'=>['Türposition prüfen', 'Bodenaufnahme zuordnen']]);
+check($requests[0]['id'] === 'request-1' && $requests[1]['request'] === 'Bodenaufnahme zuordnen', 'Stable current request identity');
+fails(fn()=>caValidateTaskRequests(['requests'=>[]]), 'nicht erkannt');
+fails(fn()=>caValidateTaskRequests(['requests'=>['']]), 'Ungültiges Anliegen');
+$worked = $result;
+$worked['task_results'] = [
+    ['request_id'=>'request-1', 'answer'=>'Türposition konkret geprüft.', 'status'=>'worked_out', 'source_refs'=>['Angebot.pdf']],
+    ['request_id'=>'request-2', 'answer'=>'Die Aufnahme ist nicht datiert; Aufnahmedatum zum Abgleich erforderlich.', 'status'=>'open', 'source_refs'=>['Boden.jpg']],
+];
+check(caValidateResult($worked, $requests, ['Angebot.pdf', 'Boden.jpg']) === $worked, 'Each current request is worked out or specifically open');
+$invalidWork = $worked; array_pop($invalidWork['task_results']);
+fails(fn()=>caValidateResult($invalidWork, $requests, ['Angebot.pdf', 'Boden.jpg']), 'nicht vollständig');
+$invalidWork = $worked; $invalidWork['task_results'][1]['request_id'] = 'request-1';
+fails(fn()=>caValidateResult($invalidWork, $requests, ['Angebot.pdf', 'Boden.jpg']), 'doppelte Anliegen');
+$invalidWork = $worked; $invalidWork['task_results'][0]['source_refs'] = ['Erfunden.pdf'];
+fails(fn()=>caValidateResult($invalidWork, $requests, ['Angebot.pdf', 'Boden.jpg']), 'nicht gelesene Quelle');
+$invalidWork = $worked; $invalidWork['task_results'][0]['source_refs'] = [];
+fails(fn()=>caValidateResult($invalidWork, $requests, ['Angebot.pdf', 'Boden.jpg']), 'ohne Beleg');
+$invalidWork = $worked; $invalidWork['task_results'][0]['answer'] = '';
+fails(fn()=>caValidateResult($invalidWork, $requests, ['Angebot.pdf', 'Boden.jpg']), 'Ungültiges Arbeitsergebnis');
 $invalid = $result; $invalid['rule_checks'] = [];
 fails(fn()=>caValidateResult($invalid), 'MD-Regelprüfung');
 $invalid = $result; $invalid['reply_draft'] = null;

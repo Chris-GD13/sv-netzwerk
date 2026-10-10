@@ -5,6 +5,8 @@
     const resultBox = el('vf-analysis-result'), order = el('vf-analysis-order'), files = el('vf-analysis-files');
     if (!start || !refresh || !state || !resultBox) return;
     const taskId = new URLSearchParams(location.search).get('aufgabe') || '';
+    const startLabel = taskId ? 'Aufgabe ausarbeiten und beantworten' : 'Fall analysieren und ausarbeiten';
+    if (el('vf-analysis-title')) el('vf-analysis-title').textContent = startLabel;
     let context = '', generation = 0, timer = null, running = false, starting = false;
     const active = () => {
       const raw = sessionStorage.getItem('svnet-case');
@@ -43,12 +45,12 @@
     };
     const render = (result, captured) => {
       resultBox.replaceChildren(); resultBox.hidden = false;
-      section('Analyseentwurf', result.summary);
-      section('Belegte Feststellungen / Quellen', result.facts);
-      section('Fachliche Bewertung', result.assessment);
-      section('Offene Punkte', result.open_points);
-      section('Nächste Arbeitsschritte', result.next_steps);
-      section('MD-Regelprüfung', result.rule_checks);
+      if (Array.isArray(result.task_results) && result.task_results.length) {
+        for (const item of result.task_results) {
+          section((item.status === 'open' ? 'Noch offen: ' : 'Ausgearbeitet: ') + item.request, item.answer);
+          if (item.source_refs?.length) section('Belege zum Anliegen', item.source_refs);
+        }
+      }
       section('Antwortentwurf – vor Versand prüfen', result.reply_draft);
       const transfer = document.createElement('button');
       transfer.type = 'button'; transfer.className = 'vf-secondary'; transfer.textContent = 'Antwortentwurf ins E-Mail-Feld übernehmen';
@@ -64,6 +66,15 @@
         } catch (error) { fail(error); }
       };
       resultBox.append(transfer);
+      section('Verbleibende offene Punkte', result.open_points);
+      const analysis = document.createElement('details'), analysisSummary = document.createElement('summary');
+      analysisSummary.textContent = 'Fachliche Ausarbeitung und Regelprüfung'; analysis.append(analysisSummary);
+      section('Zusammenfassung', result.summary, analysis);
+      section('Belegte Feststellungen / Quellen', result.facts, analysis);
+      section('Fachliche Bewertung', result.assessment, analysis);
+      section('Weitere Arbeitsschritte', result.next_steps, analysis);
+      section('MD-Regelprüfung', result.rule_checks, analysis);
+      resultBox.append(analysis);
       const provenance = document.createElement('details'), summary = document.createElement('summary');
       summary.textContent = 'Quellen und geladene MD-Vorgaben nachvollziehen'; provenance.append(summary);
       section('Gelesene Originalquellen', (result.sources || []).map(source => source.name + (source.duplicate_of ? ' (identisch mit '+source.duplicate_of+')' : '')), provenance);
@@ -77,9 +88,11 @@
         const job = data.job;
         running = job?.status === 'running';
         start.disabled = running || starting; refresh.disabled = starting;
-        start.textContent = running ? 'Analyse läuft …' : 'Fall analysieren und ausarbeiten';
+        start.textContent = running ? 'Ausarbeitung läuft …' : startLabel;
         state.className = 'vf-meta';
-        state.textContent = job?.message || 'Startklar. Die aktuellen MD-Vorgaben werden vor jeder Analyse neu geladen.';
+        state.textContent = job?.message || (taskId
+          ? 'Startklar. Die Aufgabe oben wird mit allen Anhängen und Fallunterlagen ausgearbeitet; ein zusätzlicher Auftrag ist nicht erforderlich.'
+          : 'Startklar. Die aktuellen Vorgaben werden vor jeder Analyse neu geladen.');
         if (job?.status === 'done') {
           if (!job.result || job.result.folder_id !== captured.folder_id || job.result.task_id !== taskId) throw Error('Analyse gehört zu einem anderen Fall oder einer anderen Aufgabe.');
           render(job.result, captured);
@@ -99,7 +112,7 @@
         if (key === context) return;
         context = key; generation++; clearTimeout(timer); running = false; starting = false;
         resultBox.replaceChildren(); resultBox.hidden = true; order.value = ''; files.value = '';
-        start.disabled = !ready; refresh.disabled = !ready; start.textContent = 'Fall analysieren und ausarbeiten';
+        start.disabled = !ready; refresh.disabled = !ready; start.textContent = startLabel;
         state.textContent = ready ? 'Gespeicherte Analyse wird geprüft …' : 'Bitte zuerst den passenden Fall zur Aufgabe öffnen.';
         if (ready) load(current, generation);
       } catch (error) { start.disabled = true; refresh.disabled = true; fail(error); }
