@@ -7,7 +7,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       <div>
         <p class="tasks-kicker">Arbeitsliste</p>
         <h1>Aufgaben</h1>
-        <p>Alle Nachrichten aus Outlook „Zu erledigen“, älteste zuerst. E-Mails mit eindeutiger Schadennummer werden automatisch samt Anhängen in der IONOS-Fallakte abgelegt.</p>
+        <p>Outlook „Zu erledigen“: gezielt suchen, Nachricht prüfen und im Fall bearbeiten. Standardmäßig stehen die ältesten Aufgaben oben.</p>
       </div>
       <div class="tasks-head-actions">
         <span id="tasks-count" class="tasks-count">– offene Aufgaben</span>
@@ -15,20 +15,49 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       </div>
     </header>
     <section class="tasks-drive-panel" aria-label="IONOS-Abgleich">
-      <div><strong>E-Mails in IONOS-Fallakte ablegen</strong><span>Fehlende Fälle mit erkannter Schadennummer werden dabei neu angelegt.</span></div>
+      <div><strong>E-Mails in IONOS-Fallakte ablegen</strong><span>Automatisch samt Anhängen bei eindeutiger Schadennummer. Fehlende Fälle werden neu angelegt.</span><span id="tasks-sync-status" role="status" aria-live="polite"></span></div>
       <button id="tasks-drive-sync" class="tasks-drive-button" type="button">IONOS-Abgleich starten</button>
     </section>
+    <section class="tasks-toolbar" aria-label="Aufgaben filtern">
+      <label class="tasks-search">Suchen
+        <input id="tasks-search" type="search" placeholder="Schadennummer, Betreff oder Absender" />
+      </label>
+      <label>Fallbezug
+        <select id="tasks-case-filter">
+          <option value="all">Alle Aufgaben</option>
+          <option value="identified">Mit Schadennummer</option>
+          <option value="unresolved">Ohne Schadennummer</option>
+        </select>
+      </label>
+      <label>Sortierung
+        <select id="tasks-sort">
+          <option value="oldest">Älteste zuerst</option>
+          <option value="newest">Neueste zuerst</option>
+          <option value="case">Schadennummer</option>
+          <option value="sender">Absender</option>
+        </select>
+      </label>
+      <button id="tasks-reset" class="tasks-secondary" type="button">Zurücksetzen</button>
+    </section>
     <section class="tasks-status" id="tasks-status" role="status" aria-live="polite">Aufgaben werden geladen …</section>
-    <section id="tasks-list" class="tasks-list" aria-label="Offene Aufgaben"></section>
+    <div id="tasks-table-wrap" class="tasks-table-wrap" role="region" aria-label="Aufgabentabelle, horizontal scrollbar" tabindex="0" hidden>
+      <table class="tasks-table">
+        <caption>Schadennummer: Fall mit dieser Nachricht im neuen Tab öffnen. „Aufgabe bearbeiten“ zeigt die Nachricht im Fall. „Erledigt“ verschiebt sie in Outlook nach „Erledigt“.</caption>
+        <thead><tr><th scope="col">Eingang</th><th scope="col">Schadennummer</th><th scope="col">Absender</th><th scope="col">Betreff / Nachricht</th><th scope="col">IONOS-Ablage</th><th scope="col">Aktionen</th></tr></thead>
+        <tbody id="tasks-list"></tbody>
+      </table>
+    </div>
     <section id="tasks-empty" class="tasks-empty" hidden>
-      <strong>Keine offenen Aufgaben</strong>
-      <span>Der Outlook-Ordner „Zu erledigen“ ist leer.</span>
+      <strong id="tasks-empty-title">Keine offenen Aufgaben</strong>
+      <span id="tasks-empty-text">Der Outlook-Ordner „Zu erledigen“ ist leer.</span>
     </section>
   </main>
 </InternalLayout>
 
-<style>
-  .tasks-app { max-width: 1180px; margin: 0 auto; padding: clamp(22px, 4vw, 48px); color: #263746; }
+<style is:global>
+  .tasks-app { max-width: 1500px; margin: 0 auto; padding: clamp(16px, 2.5vw, 36px); color: #263746; }
+  .tasks-app [hidden] { display: none !important; }
+  .tasks-app :is(button, input, select, a, summary):focus-visible { outline: 3px solid #f59a23; outline-offset: 3px; }
   .tasks-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 22px; border-bottom: 1px solid #d9dde1; }
   .tasks-kicker { margin: 0 0 6px; color: #f59a23; font-size: .76rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
   .tasks-head h1 { margin: 0; color: #071a2e; font-size: clamp(1.8rem, 3vw, 2.7rem); }
@@ -37,6 +66,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   .tasks-count { padding: 9px 11px; border: 1px solid #d9dde1; background: #fff; font-weight: 800; white-space: nowrap; }
   .tasks-secondary, .tasks-action { appearance: none; border: 1px solid #18324a; border-radius: 3px; background: #fff; color: #18324a; padding: 9px 12px; font: inherit; font-weight: 800; cursor: pointer; text-decoration: none; }
   .tasks-secondary:hover, .tasks-action:hover { background: #eef2f5; }
+  .tasks-app button:disabled { cursor: wait; opacity: .65; }
   .tasks-drive-panel { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; padding: 16px; border: 1px solid #d9dde1; border-left: 4px solid #f59a23; background: #fff; }
   .tasks-drive-panel > div { display: grid; gap: 4px; }
   .tasks-drive-panel strong { color: #071a2e; }
@@ -45,18 +75,35 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   .tasks-drive-button:hover { background: #294860; }
   .tasks-drive-button:disabled { cursor: wait; opacity: .65; }
   .tasks-status { margin: 18px 0 12px; color: #637483; font-size: .92rem; }
-  .tasks-status.is-error { color: #a63d1e; }
-  .tasks-list { display: grid; gap: 10px; }
-  .task-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 16px 18px; border: 1px solid #d9dde1; border-left: 4px solid #f59a23; background: #fff; box-shadow: 0 2px 8px rgba(7,26,46,.04); }
-  .task-main { min-width: 0; }
-  .task-meta { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-bottom: 6px; color: #637483; font-size: .8rem; }
-  .task-case { color: #c56d00; font-weight: 900; letter-spacing: .02em; }
-  .task-subject { margin: 0; color: #071a2e; font-size: 1.04rem; line-height: 1.35; overflow-wrap: anywhere; }
-  .task-preview { margin: 7px 0 0; color: #637483; font-size: .88rem; line-height: 1.45; }
-  .task-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
-  .task-action--done { border-color: #34834b; background: #34834b; color: #fff; }
-  .task-action--done:hover { background: #2a6c3d; }
-  .task-action[disabled] { cursor: wait; opacity: .6; }
+  .tasks-app .is-error { color: #a63d1e; }
+  .tasks-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-top: 20px; }
+  .tasks-toolbar label { display: grid; gap: 5px; color: #18324a; font-size: .82rem; font-weight: 800; }
+  .tasks-search { flex: 1 1 280px; }
+  .tasks-toolbar input, .tasks-toolbar select { width: 100%; min-height: 42px; border: 1px solid #b8c1c8; border-radius: 3px; background: #fff; padding: 9px 11px; color: #263746; font: inherit; font-size: .92rem; font-weight: 400; }
+  .tasks-table-wrap { overflow-x: auto; border: 1px solid #d9dde1; border-radius: 3px; background: #fff; }
+  .tasks-table { width: 100%; min-width: 1000px; border-collapse: collapse; font-size: .86rem; line-height: 1.4; }
+  .tasks-table caption { padding: 11px 14px; color: #637483; text-align: left; font-size: .8rem; }
+  .tasks-table th { padding: 11px 12px; background: #18324a; color: #fff; text-align: left; font-size: .78rem; white-space: nowrap; }
+  .tasks-table td { padding: 12px; border-top: 1px solid #d9dde1; vertical-align: top; }
+  .tasks-table .task-row:nth-child(even) { background: #f7f9fa; }
+  .tasks-table .task-row:hover { background: #eef3f7; }
+  .tasks-table .task-date { width: 110px; white-space: nowrap; color: #526575; }
+  .tasks-table .task-case { width: 145px; color: #18324a; font-weight: 800; }
+  .tasks-table .task-case a { color: #185d87; text-decoration: underline; text-underline-offset: 3px; }
+  .tasks-table .task-case small { display: block; margin-top: 5px; color: #637483; font-size: .73rem; font-weight: 400; }
+  .tasks-table .task-case--missing { color: #a63d1e; font-weight: 600; }
+  .tasks-table .task-sender { width: 150px; overflow-wrap: anywhere; }
+  .tasks-table .task-subject { min-width: 240px; overflow-wrap: anywhere; }
+  .tasks-table .task-subject > strong { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; color: #071a2e; font-size: .9rem; font-weight: 700; }
+  .tasks-table .task-subject summary { cursor: pointer; color: #526575; margin-top: 6px; font-size: .78rem; }
+  .tasks-table .task-preview { margin: 8px 0 0; padding: 10px; border-left: 3px solid #f59a23; background: #fff; color: #526575; font-size: .84rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .tasks-table .task-archive { width: 140px; color: #526575; font-size: .8rem; }
+  .tasks-table .task-archive.is-error { color: #a63d1e; }
+  .tasks-table .task-archive.is-done { color: #27653a; }
+  .tasks-table .task-actions { display: flex; flex-direction: column; gap: 7px; min-width: 112px; }
+  .tasks-table .tasks-action { padding: 7px 10px; font-size: .8rem; font-weight: 700; text-align: center; white-space: nowrap; }
+  .tasks-table .task-action--done { border-color: #34834b; background: #34834b; color: #fff; }
+  .tasks-table .task-action--done:hover { background: #2a6c3d; }
   .tasks-empty { display: grid; gap: 7px; padding: 40px 24px; border: 1px dashed #b8c1c8; background: #fff; text-align: center; color: #637483; }
   .tasks-empty strong { color: #071a2e; font-size: 1.15rem; }
   @media (max-width: 720px) {
@@ -64,8 +111,8 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     .tasks-head-actions { justify-content: flex-start; }
     .tasks-drive-panel { align-items: stretch; flex-direction: column; gap: 12px; margin-top: 14px; padding: 14px; }
     .tasks-drive-button { width: 100%; min-height: 48px; }
-    .task-row { grid-template-columns: 1fr; }
-    .task-actions { justify-content: flex-start; }
+    .tasks-toolbar label { flex: 1 1 160px; }
+    .tasks-toolbar .tasks-search { flex-basis: 100%; }
   }
 </style>
 
@@ -79,20 +126,38 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   const count = document.getElementById('tasks-count');
   const refresh = document.getElementById('tasks-refresh');
   const driveSync = document.getElementById('tasks-drive-sync');
+  const syncState = document.getElementById('tasks-sync-status');
+  const tableWrap = document.getElementById('tasks-table-wrap');
+  const search = document.getElementById('tasks-search');
+  const caseFilter = document.getElementById('tasks-case-filter');
+  const sort = document.getElementById('tasks-sort');
+  const reset = document.getElementById('tasks-reset');
+  const emptyTitle = document.getElementById('tasks-empty-title');
+  const emptyText = document.getElementById('tasks-empty-text');
   let archiveRunning = false;
   let currentItems = [];
   let currentMailbox = '';
+  const archiveStates = new Map();
+  const completing = new Set();
+  let loaded = false;
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
   const date = (value) => {
     if (!value) return 'Eingang unbekannt';
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime()) ? value : new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' }).format(parsed);
   };
-  const short = (value, max = 280) => {
-    const text = String(value ?? '').replace(/\s+/g, ' ').trim();
-    return text.length > max ? text.slice(0, max - 1) + '…' : text;
-  };
   const setState = (text, error = false) => { state.textContent = text; state.classList.toggle('is-error', error); };
+  const setSyncState = (text, error = false) => { syncState.textContent = text; syncState.classList.toggle('is-error', error); };
+  const archiveState = (item) => archiveStates.get(item.id) || { text: item.case_number ? 'Abgleich ausstehend' : 'Zuordnung prüfen', kind: item.case_number ? '' : 'is-error' };
+  const setArchiveState = (item, text, kind = '') => {
+    archiveStates.set(item.id, { text, kind });
+    const row = Array.from(list.querySelectorAll('.task-row')).find(row => row.dataset.id === item.id);
+    const cell = row?.querySelector('.task-archive');
+    if (cell) {
+      cell.textContent = text;
+      cell.className = 'task-archive ' + kind;
+    }
+  };
   const request = async (url, options = {}) => {
     const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', ...options });
     const data = await response.json().catch(() => ({}));
@@ -107,22 +172,27 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     const cases = new Map();
     for (const [index, item] of items.entries()) {
       const taskKey = `svnet-drive-mail:${mailbox}:${item.id}`;
-      if (!item.id || sessionStorage.getItem(taskKey) === 'done') continue;
+      if (!item.id) continue;
+      if (sessionStorage.getItem(taskKey) === 'done') {
+        setArchiveState(item, 'Bereits abgelegt', 'is-done');
+        continue;
+      }
       try {
-        setState(`IONOS: E-Mail ${index + 1} von ${items.length} wird der Fallakte zugeordnet …`);
+        setSyncState(`IONOS: E-Mail ${index + 1} von ${items.length} wird der Fallakte zugeordnet …`);
+        setArchiveState(item, 'Wird geprüft …');
         const detail = await request(`${API}?action=detail&id=${encodeURIComponent(item.id)}`);
         const task = detail.task || {};
         const caseNumber = String(task.case_number || item.case_number || '').trim();
-        if (!caseNumber) { unresolved++; continue; }
+        if (!caseNumber) { unresolved++; setArchiveState(item, 'Schadennummer fehlt', 'is-error'); continue; }
         if (!cases.has(caseNumber)) {
           cases.set(caseNumber, request(`${DRIVE_API}?action=search_cases&q=${encodeURIComponent(caseNumber)}`).then(data =>
             (data.results || []).filter(row => String(row.meta?.schaden_nr || '').trim() === caseNumber)
           ));
         }
         let exactCases = await cases.get(caseNumber);
-        if (exactCases.length > 1) { unresolved++; continue; }
+        if (exactCases.length > 1) { unresolved++; setArchiveState(item, 'Mehrere Falltreffer', 'is-error'); continue; }
         if (exactCases.length === 0) {
-          setState(`IONOS: Fall ${caseNumber} wird neu angelegt …`);
+          setSyncState(`IONOS: Fall ${caseNumber} wird neu angelegt …`);
           const created = await request(`${DRIVE_API}?action=save_case`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -171,39 +241,68 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
             const file = new File([bytes], `${prefix}_Anhang_${String(attachmentIndex + 1).padStart(2, '0')}_${safeName}`, { type: data.content_type || 'application/octet-stream' });
             const result = await upload(file);
             if (result.excluded) attachmentFailures++;
-          } catch { attachmentFailures++; }
+          } catch (error) {
+            attachmentFailures++;
+            setArchiveState(item, error.message || 'Anhang konnte nicht abgelegt werden.', 'is-error');
+          }
         }
         if (attachmentFailures === 0) {
           sessionStorage.setItem(taskKey, 'done');
           archived++;
+          setArchiveState(item, 'Mail + Anhänge abgelegt', 'is-done');
         } else {
           failures++;
+          setArchiveState(item, `${attachmentFailures} Anhang/Anhänge nicht abgelegt`, 'is-error');
         }
-      } catch {
+      } catch (error) {
         failures++;
+        setArchiveState(item, error.message || 'Übertragung fehlgeschlagen', 'is-error');
       }
     }
-    const summary = `${archived} E-Mail(s) neu oder bereits in der IONOS-Fallakte abgelegt.`;
+    const summary = `${archived} E-Mail(s) neu in der IONOS-Fallakte abgelegt.`;
     const notes = [
       unresolved ? `${unresolved} ohne eindeutigen Falltreffer` : '',
       failures ? `${failures} mit Übertragungsfehler` : '',
     ].filter(Boolean);
-    setState([summary, ...notes].join(' ') || 'IONOS-Abgleich abgeschlossen.', failures > 0);
+    setSyncState([summary, ...notes].join(' '), failures > 0);
     archiveRunning = false;
     if (driveSync) driveSync.disabled = false;
   };
-  const render = (items) => {
-    count.textContent = items.length + (items.length === 1 ? ' offene Aufgabe' : ' offene Aufgaben');
+  const render = () => {
+    if (!loaded) return;
+    const query = search.value.trim().toLocaleLowerCase('de-DE');
+    const items = currentItems.filter(item => {
+      const matchesCase = caseFilter.value === 'all' || (caseFilter.value === 'identified' ? !!item.case_number : !item.case_number);
+      return matchesCase && [item.case_number, item.subject, item.from, item.preview].some(value => String(value || '').toLocaleLowerCase('de-DE').includes(query));
+    }).sort((a, b) => {
+      const oldest = String(a.received_at || '').localeCompare(String(b.received_at || ''));
+      if (sort.value === 'newest') return -oldest;
+      if (sort.value === 'case') return String(a.case_number || '\uffff').localeCompare(String(b.case_number || '\uffff'), 'de', { numeric: true }) || oldest;
+      if (sort.value === 'sender') return String(a.from || '').localeCompare(String(b.from || ''), 'de') || oldest;
+      return oldest;
+    });
+    count.textContent = currentItems.length + (currentItems.length === 1 ? ' offene Aufgabe' : ' offene Aufgaben');
+    const filtered = items.length !== currentItems.length;
+    setState(`${items.length} von ${currentItems.length} Aufgaben angezeigt` + (filtered ? ' · Filter aktiv' : ''));
     empty.hidden = items.length !== 0;
-    list.innerHTML = items.map((item, index) => {
-      const from = item.from ? ' · ' + esc(item.from) : '';
-      const caseText = item.case_number ? esc(item.case_number) : 'Fallnummer nicht erkannt';
-      const edit = '<a class="tasks-action" href="' + esc(item.edit_url) + '">Bearbeiten</a>';
-      return '<article class="task-row" data-id="' + esc(item.id) + '" data-index="' + index + '">' +
-        '<div class="task-main"><div class="task-meta"><span class="task-case">' + caseText + '</span><span>' + esc(date(item.received_at)) + from + '</span></div>' +
-        '<h2 class="task-subject">' + esc(item.subject) + '</h2>' +
-        (item.preview ? '<p class="task-preview">' + esc(short(item.preview)) + '</p>' : '') +
-        '</div><div class="task-actions">' + edit + '<button class="tasks-action task-action--done" type="button" data-done="' + esc(item.id) + '">Erledigt</button></div></article>';
+    emptyTitle.textContent = currentItems.length ? 'Keine passenden Aufgaben' : 'Keine offenen Aufgaben';
+    emptyText.textContent = currentItems.length ? 'Suche oder Fallfilter ändern bzw. zurücksetzen.' : 'Der Outlook-Ordner „Zu erledigen“ ist leer.';
+    tableWrap.hidden = items.length === 0;
+    list.innerHTML = items.map((item) => {
+      const status = archiveState(item);
+      const pending = completing.has(item.id);
+      const caseText = item.case_number
+        ? '<a href="' + esc(item.edit_url) + '" target="_blank" rel="noopener" aria-label="' + esc('Fall ' + item.case_number + ' mit Aufgabe: ' + item.subject + ' (neuer Tab)') + '">' + esc(item.case_number) + '</a><small>Mit dieser Aufgabe ↗</small>'
+        : 'Nicht erkannt';
+      const edit = '<a class="tasks-action" href="' + esc(item.edit_url) + '" aria-label="' + esc('Aufgabe bearbeiten: ' + item.subject) + '">Aufgabe bearbeiten</a>';
+      return '<tr class="task-row" data-id="' + esc(item.id) + '">' +
+        '<td class="task-date">' + esc(date(item.received_at)) + '</td>' +
+        '<td class="task-case' + (item.case_number ? '' : ' task-case--missing') + '">' + caseText + '</td>' +
+        '<td class="task-sender">' + esc(item.from || 'Unbekannt') + '</td>' +
+        '<td class="task-subject"><strong title="' + esc(item.subject) + '">' + esc(item.subject) + '</strong>' +
+        '<details><summary>Mailvorschau</summary><p class="task-preview">' + esc(item.subject) + '\n\n' + esc(item.preview || 'Keine Vorschau vorhanden. Vollständige Nachricht über „Aufgabe bearbeiten“ öffnen.') + '</p></details>' +
+        '</td><td class="task-archive ' + esc(status.kind) + '">' + esc(status.text) + '</td>' +
+        '<td><div class="task-actions">' + edit + '<button class="tasks-action task-action--done" type="button" data-done="' + esc(item.id) + '" aria-label="' + esc('Erledigt: ' + item.subject) + '"' + (pending ? ' disabled' : '') + '>' + (pending ? 'Wird erledigt …' : 'Erledigt') + '</button></div></td></tr>';
     }).join('');
     list.querySelectorAll('[data-done]').forEach((button) => button.addEventListener('click', () => complete(button)));
   };
@@ -214,13 +313,16 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       const response = await fetch(API + '?action=list', { credentials: 'same-origin', cache: 'no-store' });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) throw new Error(data.error || 'Aufgaben konnten nicht geladen werden.');
-      render(data.items || []);
       currentItems = data.items || [];
       currentMailbox = data.mailbox || '';
-    setState((data.folder || 'Zu erledigen') + ' · älteste Aufgabe oben · IONOS-Abgleich läuft');
+      loaded = true;
+      render();
       void archiveOpenTasks(data.items || [], data.mailbox || '');
     } catch (error) {
       list.innerHTML = '';
+      loaded = false;
+      currentItems = [];
+      tableWrap.hidden = true;
       empty.hidden = true;
       count.textContent = '– offene Aufgaben';
       setState(error.message || 'Aufgaben konnten nicht geladen werden.', true);
@@ -231,28 +333,44 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   const complete = async (button) => {
     const row = button.closest('.task-row');
     const id = button.dataset.done;
-    if (!row || !id) return;
+    if (!row || !id || completing.has(id)) return;
+    completing.add(id);
+    const visibleIds = Array.from(list.querySelectorAll('.task-row'), row => row.dataset.id);
+    const rowIndex = visibleIds.indexOf(id);
     button.disabled = true;
     button.textContent = 'Wird erledigt …';
     try {
       const response = await fetch(API + '?action=move', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) throw new Error(data.error || 'Aufgabe konnte nicht verschoben werden.');
-      row.remove();
-      const remaining = list.querySelectorAll('.task-row').length;
-      count.textContent = remaining + (remaining === 1 ? ' offene Aufgabe' : ' offene Aufgaben');
-      if (remaining === 0) empty.hidden = false;
-      setState('Aufgabe nach „Erledigt“ verschoben. Nächste offene Aufgabe ist bereit.');
-      const next = list.querySelector('.task-row button[data-done]');
-      if (next) next.focus();
+      currentItems = currentItems.filter(item => item.id !== id);
+      render();
+      setState('Aufgabe nach „Erledigt“ verschoben. ' + state.textContent);
+      if (document.activeElement === document.body || document.activeElement === button) {
+        const nextId = visibleIds[rowIndex + 1] || visibleIds[rowIndex - 1];
+        const nextRow = Array.from(list.querySelectorAll('.task-row')).find(row => row.dataset.id === nextId);
+        (nextRow?.querySelector('a') || search).focus();
+      }
     } catch (error) {
-      button.disabled = false;
-      button.textContent = 'Erledigt';
+      completing.delete(id);
+      render();
       setState(error.message || 'Aufgabe konnte nicht verschoben werden.', true);
+    } finally {
+      completing.delete(id);
     }
   };
   driveSync?.addEventListener('click', () => { void archiveOpenTasks(currentItems, currentMailbox); });
   refresh?.addEventListener('click', load);
+  search.addEventListener('input', render);
+  caseFilter.addEventListener('change', render);
+  sort.addEventListener('change', render);
+  reset.addEventListener('click', () => {
+    search.value = '';
+    caseFilter.value = 'all';
+    sort.value = 'oldest';
+    render();
+    search.focus();
+  });
   load();
 })();
 </script>
