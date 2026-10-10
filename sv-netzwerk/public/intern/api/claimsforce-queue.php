@@ -213,7 +213,7 @@ if($action==='heartbeat'){
     $diagnostic=is_array($body['diagnostic']??null)?$body['diagnostic']:[];
     $s=db()->prepare("UPDATE claimsforce_import_jobs SET message=:m,phase=:p,progress_current=:c,progress_total=:t,diagnostic_json=:d,heartbeat_at=NOW() WHERE id=:id AND status='running'");
     $s->execute([':m'=>$message,':p'=>$phase,':c'=>$current,':t'=>$total,':d'=>json_encode($diagnostic,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':id'=>$id]);
-    if($s->rowCount()!==1)apiError(409,'Importauftrag läuft nicht mehr.');
+    cqConfirmHeartbeat($id,$body,$s->rowCount());
     apiJson(['ok'=>true,'job'=>cqRow($id)]);
 }
 if($action==='complete'){

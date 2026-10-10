@@ -42,3 +42,15 @@ Regressionstest: neues Manifest mit altem Worker bleibt erkennbar, altes
 Startsignal startet keinen neuen Import, Schadennummer und Modus bleiben beim
 V2-Start vollständig erhalten. Eine Bestätigung als vollständiger Live-Import
 ist weiterhin offen und erfordert den echten Einzelimport mit Bestandsabgleich.
+
+## Identische Fortschrittsmeldungen
+
+Nach echter Erweiterungs-Neuladung bestätigte Chrome den Worker 1.4.59.
+Job 82999 startete korrekt nur 26-085905-9 (Auftrag 1/1, Datei 3/151).
+Zwei identische Heartbeats innerhalb derselben Sekunde erhielten jedoch 200
+und anschließend 409 „Importauftrag läuft nicht mehr“, obwohl der Auftrag
+noch lief. MySQL `rowCount()` zählt geänderte, nicht alle passenden Zeilen.
+Die falsche Ablehnung löste STOP_IMPORT aus. Bei null geänderten Zeilen
+prüft der Server daher erneut den aktiven Stationsbesitzer. Nur tatsächlich
+beendete oder fremde Aufträge bleiben abgelehnt. Regressionstest deckt den
+gültigen unveränderten Heartbeat und beide echten Ablehnungsfälle ab.

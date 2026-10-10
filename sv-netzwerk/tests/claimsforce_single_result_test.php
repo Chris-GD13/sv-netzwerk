@@ -14,3 +14,11 @@ foreach([array_replace($owner,['stationId'=>'22222222-2222-4222-8222-22222222222
     try{cqRequireOwner(44,$other);throw new Exception('Fremde oder alte Importstation akzeptiert');}catch(RuntimeException$e){if($e->getCode()!==409)throw $e;}
 }
 echo "Nur die übernehmende aktuelle Importstation darf Fortschritt oder Abschluss schreiben.\n";
+// Zwei gleiche Heartbeats innerhalb einer Sekunde ändern in MySQL keine Spalte.
+cqConfirmHeartbeat(44,$owner,0);
+cqConfirmHeartbeat(44,$owner,1);
+$GLOBALS['testOwner']='';
+try{cqConfirmHeartbeat(44,$owner,0);throw new Exception('Beendeter Auftrag wurde als aktiver Heartbeat bestätigt');}catch(RuntimeException$e){if($e->getCode()!==409)throw$e;}
+$GLOBALS['testOwner']=hash('sha256','22222222-2222-4222-8222-222222222222');
+try{cqConfirmHeartbeat(44,$owner,0);throw new Exception('Fremder Auftrag wurde als Heartbeat bestätigt');}catch(RuntimeException$e){if($e->getCode()!==409)throw$e;}
+echo "Identische Heartbeats bleiben gültig; beendete und fremde Aufträge bleiben gesperrt.\n";

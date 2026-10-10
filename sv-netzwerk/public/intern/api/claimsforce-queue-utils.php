@@ -22,3 +22,9 @@ function cqRequireOwner(int$id,array$body):void{
     $stored=(string)($s->fetchColumn()?:'');
     if($stored===''||!hash_equals($stored,$key))apiError(409,'Der Auftrag gehört einer anderen Importstation oder läuft nicht mehr.');
 }
+function cqConfirmHeartbeat(int$id,array$body,int$changedRows):void{
+    // MySQL meldet bei gleichen Daten und gleichem NOW()-Sekundenwert 0 Änderungen.
+    // Das ist kein Abbruch: nur ein tatsächlich beendeter/fremder Auftrag wird abgelehnt.
+    if($changedRows===0)cqRequireOwner($id,$body);
+    elseif($changedRows!==1)apiError(409,'Importauftrag konnte nicht eindeutig aktualisiert werden.');
+}
