@@ -30,6 +30,14 @@ Betreff: Versicherer-Schadennummer zuerst. Christian verwendet den vollständige
 Absender als Regulierer und Bausachverständiger von SV-Netzwerk mit
 cw@sv-netzwerk.eu. Globale Regeln werden nicht aus Kundennachrichten gelernt.
 
+Vorleistungen werden nur auf die belegte zugehörige Schadenposition angerechnet.
+Eine Zahlung für Rollos oder Lüfter mindert beispielsweise keine Poolrechnung.
+Für die gemeinsame fachliche Schlussbewertung wird `OPENAI_WORK_MODEL` verwendet
+(Standard `gpt-5.4`, vertiefte Prüfung); das bisherige Modell für die übrigen
+Portalabläufe bleibt unverändert. Strukturierte Ausgabeformate sichern exakte
+Quellenbezeichnungen. Nicht vollständig zugeordnete Dokumentpakete werden
+einzeln erneut gelesen; eine erfolglose Inhaltsprüfung wird nicht übergangen.
+
 Die Masterquelle der Regeln bleibt Google Drive. Die Portal-KI verwendet die
 importierten IONOS-Fassungen mit Quellenmanifest und Inhaltsprüfsummen; sie
 behauptet keinen Live-Drive-Abgleich. Binäre Regeltranskriptionen werden nur bei

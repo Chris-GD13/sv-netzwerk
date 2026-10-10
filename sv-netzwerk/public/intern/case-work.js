@@ -28,9 +28,10 @@
     const render=()=>{
       const fingerprint=JSON.stringify(turns);if(fingerprint===lastRender)return;lastRender=fingerprint;
       historyBox.replaceChildren();
-      turns.forEach(turn=>{
-        const article=document.createElement('article');article.className='vf-work-turn';
-        const heading=document.createElement('h3');heading.textContent='Dein Auftrag · '+turn.created_at;article.append(heading);para(article,turn.instructions);
+      turns.forEach((turn,index)=>{
+        const previousFailure=turn.status==='failed'&&index<turns.length-1;
+        const article=document.createElement(previousFailure?'details':'article');article.className='vf-work-turn';
+        const heading=document.createElement(previousFailure?'summary':'h3');heading.textContent=(previousFailure?'Früherer abgebrochener Versuch · ':'Dein Auftrag · ')+turn.created_at;article.append(heading);para(article,turn.instructions);
         const result=turn.result;
         if(result){
           const answer=document.createElement('div');answer.className='vf-work-answer';
