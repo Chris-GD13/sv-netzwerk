@@ -194,7 +194,8 @@
           "instruction": "Einmal neu und den Beitrag überall löschen; recherchierter Beitrag über Abdichtungen zum Fenstereinbau",
           "old_article_slug": "fenstermontage-anschlussfugen-maengel-nachbesserung",
           "old_linkedin_submitted": false,
-          "state": "researched-replacement-reserved"
+          "state": "replacement-published-verified",
+          "completed_at": "2026-10-10T09:49:39.222Z"
         }
       }
     }

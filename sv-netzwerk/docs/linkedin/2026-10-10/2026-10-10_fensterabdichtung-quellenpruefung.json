@@ -1,0 +1,69 @@
+{
+  "checked_at": "2026-10-10T09:32:59.372178+00:00",
+  "sources": [
+    {
+      "url": "https://ralfenster.de/wp-content/uploads/2024/10/LzM_2024_Leseprobe-2.pdf",
+      "status": 200,
+      "final_url": "https://ralfenster.de/wp-content/uploads/2024/10/LzM_2024_Leseprobe-2.pdf",
+      "content_type": "application/pdf",
+      "bytes": 1210763,
+      "title": "PDF"
+    },
+    {
+      "url": "https://www.abdichten.de/faq/faq.html",
+      "status": 200,
+      "final_url": "https://www.abdichten.de/faq/faq.html",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 72426,
+      "title": ""
+    },
+    {
+      "url": "https://www.illbruck.com/de_AT/produkt/me500-twinaktiv-4/",
+      "status": 200,
+      "final_url": "https://www.illbruck.com/de-de/produkte/produktfinder/me500-twinaktiv/",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 156869,
+      "title": "ME500 I-MEMBRANE | Twin Aktiv"
+    },
+    {
+      "url": "https://www.iso-chemie.eu/uploads/Verarbeitungsrichtlinien_ISO_BLOCO_3a7c92313f.pdf",
+      "status": 200,
+      "final_url": "https://www.iso-chemie.eu/uploads/Verarbeitungsrichtlinien_ISO_BLOCO_3a7c92313f.pdf",
+      "content_type": "application/pdf",
+      "bytes": 400576,
+      "title": "PDF"
+    },
+    {
+      "url": "https://www.soudal.de/pro/fensteranschlussfolien",
+      "status": 200,
+      "final_url": "https://www.soudal.de/pro/fensteranschlussfolien",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 113274,
+      "title": "Fensteranschlussfolien | Soudal"
+    },
+    {
+      "url": "https://www.soudal.de/pro/flussigmembranen",
+      "status": 200,
+      "final_url": "https://www.soudal.de/pro/flussigmembranen",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 951759,
+      "title": "Flüssigmembranen | Soudal"
+    },
+    {
+      "url": "https://www.soudal.de/pro/mf167-PRO",
+      "status": 200,
+      "final_url": "https://www.soudal.de/pro/mf167-PRO",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 111349,
+      "title": "MF 167 PRO Click &amp; Fix | Soudal"
+    },
+    {
+      "url": "https://www.soudal.de/sites/default/files/soudal_api/document/900014776/TDS_Soudal_Soudatight_Hybrid_9900650_German_Soudal_Germany.pdf",
+      "status": 200,
+      "final_url": "https://www.soudal.de/sites/default/files/soudal_api/document/900014776/TDS_Soudal_Soudatight_Hybrid_9900650_German_Soudal_Germany.pdf",
+      "content_type": "application/pdf",
+      "bytes": 64884,
+      "title": "PDF"
+    }
+  ]
+}
