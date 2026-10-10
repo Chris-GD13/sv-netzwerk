@@ -61,7 +61,12 @@ IONOS-Ablage. `MASTER-ARBEITSSTANDARD.md` muss vorhanden sein. Gemeinsam erreich
 Originale werden nur einmal gelesen; es gibt keine Auswahl der ersten Regeln.
 MD/TXT werden unverändert eingelesen, PDF- und Office-Vorgaben werden zuvor
 quellentreu durch die API ausgelesen. Unlesbare Vorgaben und Größenüberschreitungen
-sperren die Analyse. Die maschinelle Transkription ersetzt keine layoutgetreue
+sperren die Analyse. Inhaltsvollständigkeit und reine Layoutgrenzen werden
+getrennt geprüft: Fehlende Tabelleninhalte, Formularfelder oder Zuordnungen
+blockieren weiterhin; ausschließlich visuelle Layoutgrenzen werden im Entwurf
+als offene Punkte und im Regelmanifest gespeichert, ohne die inhaltliche Analyse
+zu sperren. Fehlende strukturierte Vollständigkeitsprüfung ist ein Fehler.
+Die maschinelle Transkription ersetzt keine layoutgetreue
 Originalvorlage und muss fachlich geprüft werden.
 
 Unter `/intern/versicherungswissen/` können Administratoren den aktuellen
