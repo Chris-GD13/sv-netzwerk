@@ -20,6 +20,16 @@ Rollen: Christian ist Product Owner, ChatGPT verantwortet Architektur und Projek
 
 Das Astro-Projekt liegt in `sv-netzwerk/`.
 
+Die interne Seite `/intern/aufgaben/` zeigt Outlook-Nachrichten aus „Zu erledigen“
+als kompakte Tabelle mit Eingang, Schadennummer, Absender, Betreff, IONOS-Ablage
+und Aktionen. Suche, Fallfilter und Sortierung ermöglichen gezieltes Abarbeiten;
+Mailvorschauen werden nur auf Wunsch aufgeklappt. Erkannte Schadennummern
+verlinken den Fall mit der konkreten Aufgaben-ID in einem neuen Tab, sodass die
+Arbeitsliste erhalten bleibt. „Aufgabe bearbeiten“ öffnet ebenfalls die
+fallbezogene Nachricht, „Erledigt“ verschiebt sie in den gleichnamigen
+Outlook-Ordner. Der automatische IONOS-Abgleich zeigt seinen Stand je Nachricht
+separat an und ersetzt keine fachliche Erledigung.
+
 ```text
 cd sv-netzwerk
 npm ci
