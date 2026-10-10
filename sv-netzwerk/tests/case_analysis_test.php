@@ -1,0 +1,60 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__.'/../public/intern/api/case-analysis-core.php';
+require_once __DIR__.'/../public/intern/api/case-identity.php';
+
+function check(bool $condition, string $message): void {
+    if (!$condition) throw new RuntimeException($message);
+}
+function fails(callable $run, string $message): void {
+    try { $run(); } catch (RuntimeException $error) { check(str_contains($error->getMessage(), $message), $error->getMessage()); return; }
+    throw new RuntimeException('Expected error: '.$message);
+}
+$queries = [];
+$list = function(string $query) use (&$queries): array {
+    $queries[] = $query;
+    foreach (CA_RULE_ROOTS as $index=>$name) if (str_contains($query, "name='".$name."'")) {
+        $root = ['id'=>'root-'.$index, 'name'=>$name, 'parents'=>['drive-root']];
+        return $index === 0 ? [$root, ['id'=>'duplicate-standard', 'parents'=>['root-1']]] : [$root];
+    }
+    if (str_contains($query, "'root-0' in parents")) return [
+        ['id'=>'master', 'name'=>'MASTER.md', 'mimeType'=>'text/markdown'],
+        ['id'=>'always', 'name'=>'ab sofort immer gültig', 'mimeType'=>'application/vnd.google-apps.folder'],
+    ];
+    if (str_contains($query, "'always' in parents")) return [['id'=>'current', 'name'=>'AKTUELL.md', 'mimeType'=>'text/markdown']];
+    return [['id'=>hash('sha256', $query), 'name'=>'Regel.md', 'mimeType'=>'text/markdown']];
+};
+$rules = caRuleFiles($list);
+check(count($rules) === 4, 'Every rule root and the always-binding directory must be loaded');
+check(count(array_filter($rules, fn($file)=>str_contains($file['path'], 'ab sofort immer gültig'))) === 1, 'Binding subfolder missing');
+fails(fn()=>caRuleFiles(fn($query)=>[]), 'nicht eindeutig');
+fails(fn()=>caRuleFiles(function($query) use($list) {
+    if (str_contains($query, "'always' in parents")) return [];
+    return $list($query);
+}), 'ab sofort immer gültig');
+check(caFileKind('Angebot.pdf','application/pdf') === 'file', 'PDF original');
+check(caFileKind('Boden.jpg','image/jpeg') === 'image', 'Photo original');
+check(caFileKind('Original.eml','message/rfc822') === 'text', 'Original mail');
+check(caFileKind('Archiv.zip','application/zip') === 'unsupported', 'No silent ZIP handling');
+caTaskMatches(['case_number'=>'26-031 578-4'], ['schaden_nr'=>'26-031578-4']);
+fails(fn()=>caTaskMatches(['case_number'=>'26-031578-4'], ['schaden_nr'=>'26-031579-4']), 'anderen Schadennummer');
+$result = ['summary'=>'Entwurf', 'assessment'=>'Prüfvorschlag', 'reply_draft'=>'Bitte Nachweise senden.',
+    'facts'=>[], 'open_points'=>[], 'next_steps'=>[], 'rule_checks'=>['MASTER.md geprüft']];
+check(caValidateResult($result) === $result, 'Valid result');
+$invalid = $result; $invalid['rule_checks'] = [];
+fails(fn()=>caValidateResult($invalid), 'MD-Regelprüfung');
+$invalid = $result; $invalid['reply_draft'] = null;
+fails(fn()=>caValidateResult($invalid), 'reply_draft');
+$batch = [['name'=>'03_Rechnungen/Angebot.pdf'], ['name'=>'02_Bilder/Boden.jpg']];
+$read = ['documents'=>[
+    ['name'=>$batch[0]['name'], 'findings'=>'Angebot mit Originalsumme und Leistungsumfang', 'warnings'=>[]],
+    ['name'=>$batch[1]['name'], 'findings'=>'Bodenaufnahme', 'warnings'=>['Aufnahmedatum fehlt']],
+]];
+check(count(caValidateEvidence($read,$batch)) === 2, 'All original sources processed');
+$wrong = $read; $wrong['documents'][1]['name'] = 'Anderer_Fall.pdf';
+fails(fn()=>caValidateEvidence($wrong,$batch), 'falsche oder fehlende');
+$wrong = $read; array_pop($wrong['documents']);
+fails(fn()=>caValidateEvidence($wrong,$batch), 'unvollständig');
+check(str_contains(caPrompt('Originalregel'), 'Originalregel'), 'Actual MD contents in instruction');
+check(str_contains(caPrompt(''), 'ENTWURF'), 'Never an automatic release');
+echo "case_analysis_test: ok\n";

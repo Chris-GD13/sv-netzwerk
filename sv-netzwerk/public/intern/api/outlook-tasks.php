@@ -150,6 +150,25 @@ function otMessage(string $mailbox, string $folderId, string $id): array {
     return otGraph('GET', 'users/' . rawurlencode($mailbox) . '/mailFolders/' . rawurlencode($folderId) . '/messages/' . rawurlencode($id) . '?$select=id,subject,receivedDateTime,body,bodyPreview,webLink,from,replyTo');
 }
 
+function otTaskDetail(array $message, array $attachments): array {
+    $body = (string)($message['body']['content'] ?? $message['bodyPreview'] ?? '');
+    if (strcasecmp((string)($message['body']['contentType'] ?? ''), 'html') === 0) {
+        $body = html_entity_decode(strip_tags(preg_replace('/<\s*br\s*\/?\s*>/i', "\n", $body) ?? $body), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+    return [
+        'id' => (string)($message['id'] ?? ''), 'subject' => (string)($message['subject'] ?? ''),
+        'received_at' => (string)($message['receivedDateTime'] ?? ''),
+        'case_number' => otCaseNumber((string)($message['subject'] ?? '') . ' ' . $body),
+        'body' => trim($body), 'from' => (string)($message['from']['emailAddress']['address'] ?? ''),
+        'web_link' => (string)($message['webLink'] ?? ''),
+        'attachments' => array_values(array_map(static fn(array $a): array => [
+            'id' => (string)($a['id'] ?? ''), 'name' => (string)($a['name'] ?? ''), 'size' => (int)($a['size'] ?? 0),
+        ], array_filter($attachments, static fn(array $a): bool => empty($a['isInline']) && ($a['@odata.type'] ?? '') === '#microsoft.graph.fileAttachment'))),
+    ];
+}
+
+if (defined('SVNET_OUTLOOK_LIBRARY_ONLY')) return;
+
 $profileMailbox = otMailbox($user);
 $action = (string)($_GET['action'] ?? 'list');
 
@@ -211,16 +230,7 @@ try {
             apiJson(['ok' => true, 'name' => basename((string)($attachment['name'] ?? 'Anhang')), 'content_type' => (string)($attachment['contentType'] ?? 'application/octet-stream'), 'content_base64' => (string)$attachment['contentBytes']]);
         }
         $attachments = otPage($path . '?$select=id,name,contentType,size,isInline&$top=100');
-        $body = (string)($message['body']['content'] ?? $message['bodyPreview'] ?? '');
-        if (strcasecmp((string)($message['body']['contentType'] ?? ''), 'html') === 0) $body = html_entity_decode(strip_tags(preg_replace('/<\s*br\s*\/?\s*>/i', "\n", $body) ?? $body), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        apiJson(['ok' => true, 'task' => [
-            'id' => (string)($message['id'] ?? ''), 'subject' => (string)($message['subject'] ?? ''),
-            'received_at' => (string)($message['receivedDateTime'] ?? ''),
-            'case_number' => otCaseNumber((string)($message['subject'] ?? '') . ' ' . $body),
-            'body' => trim($body), 'from' => (string)($message['from']['emailAddress']['address'] ?? ''),
-            'web_link' => (string)($message['webLink'] ?? ''),
-            'attachments' => array_values(array_map(static fn(array $a): array => ['id' => (string)($a['id'] ?? ''), 'name' => (string)($a['name'] ?? ''), 'size' => (int)($a['size'] ?? 0)], array_filter($attachments, static fn(array $a): bool => empty($a['isInline']) && ($a['@odata.type'] ?? '') === '#microsoft.graph.fileAttachment'))),
-        ]]);
+        apiJson(['ok' => true, 'task' => otTaskDetail($message, $attachments)]);
     }
 
     if ($action === 'move') {

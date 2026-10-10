@@ -2,7 +2,7 @@
 
 module.exports = defineConfig({
   testDir: '.',
-  testMatch: ['portal_screenshot_test.js', 'outlook_tasks_table_test.js'],
+  testMatch: ['portal_screenshot_test.js', 'outlook_tasks_table_test.js', 'case_analysis_test.js'],
   timeout: 120000,
   use: {
     baseURL: process.env.PORTAL_URL || 'https://www.sv-netzwerk.eu',
