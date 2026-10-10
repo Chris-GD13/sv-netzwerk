@@ -29,7 +29,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,stationId,bridgeVersion,workerVersion,protocol:2})});
   const show=(t,b=false)=>{if(context.claims_agent&&bridgeProblem){t=bridgeProblem;b=true;button.disabled=true;if(fullButton)fullButton.disabled=true;}state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.4.59',currentBridgeVersion='1.4.59';
+  const minimumBridgeVersion='1.4.60',currentBridgeVersion='1.4.60';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -158,7 +158,8 @@
   async function completeAgent(ok,result,error){
     if(!agentJob)return;
     const id=agentJob.id;
-    try{await post('complete',{id,ok,result:result||null,message:ok?`${result?.claims||0} Aufträge geprüft · ${result?.updated||0} aktualisiert · ${result?.skipped||0} unverändert übersprungen${result?.failed?` · ${result.failed} fehlgeschlagen (${String(result.firstError||'').slice(0,200)})`:''}.`:(error||'ClaimsForce-Import fehlgeschlagen.')});if(ok)window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'))}
+    const restricted=(result?.inventories||[]).reduce((count,item)=>count+(item.restrictedFiles||[]).length,0);
+    try{await post('complete',{id,ok,result:result||null,message:ok?`${result?.claims||0} Aufträge geprüft · ${result?.updated||0} aktualisiert · ${result?.skipped||0} unverändert übersprungen${result?.failed?` · ${result.failed} fehlgeschlagen (${String(result.firstError||'').slice(0,200)})`:''}${restricted?` · ${restricted} geschützte Anhangsreferenz(en) dokumentiert; Dateiinhalte in ClaimsForce gesperrt`:''}.`:(error||'ClaimsForce-Import fehlgeschlagen.')});if(ok)window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'))}
     catch(e){showAgent(`Import ${id}: Abschlussstatus konnte nicht gespeichert werden (${e.message}).`,true)}
     agentJob=null;busy=false;lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
     await resumeWatch();
@@ -174,7 +175,7 @@
       bridgeVersion=String(d.version||'0.0.0');
       document.documentElement.setAttribute('data-svnet-claims-bridge-version',bridgeVersion);
       workerVersion=String(d.workerVersion||'');
-      bridge=versionAtLeast(bridgeVersion,minimumBridgeVersion)&&d.protocol===2&&d.portalVersion==='1.4.59'&&workerVersion==='1.4.59';
+      bridge=versionAtLeast(bridgeVersion,minimumBridgeVersion)&&d.protocol===2&&d.portalVersion==='1.4.60'&&workerVersion==='1.4.60';
       bridgeProblem=bridge?'':`Browser-Brücke neu laden: Dateien ${bridgeVersion}, tatsächlich laufendes Importprogramm ${workerVersion||'alter Stand'}. Einzelimport bleibt gesperrt.`;
       if(!bridge)show(bridgeProblem,true);
       else if(!userJobs.length){button.disabled=false;if(fullButton)fullButton.disabled=false;}

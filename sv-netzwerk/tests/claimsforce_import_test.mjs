@@ -218,7 +218,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20261010-3'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20261010-4'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
 assert(portal.includes('Schadennummer für Vollimport') && portal.includes('Diesen Schaden vollständig einlesen'), 'Der Vollimport ist als gezielter Einzelfallimport mit Schadennummer beschrieben');
 assert(dashboard.includes('<input id="vf-claims-number" type="text">') && !dashboard.includes('value="2026-01-01"'), 'Dashboard-Host stellt das Feld für die Einzelfall-Schadennummer ohne voreingestellten Filter bereit');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(portal.includes(`<option value="${key}">${label}</option>`), `${label} ist als Bearbeiterprofil auswählbar`);
@@ -340,7 +340,7 @@ assert(central.includes('setTimeout(()=>show(text,failed),1000)'), 'Terminaler I
 assert(central.includes('data-svnet-claims-jobs') && central.includes("`${job.id}|${job.profile}|${job.status}|${job.phase"), 'Letzte Serverergebnisse sind unabhängig von UI-Listenern geheimnisfrei im DOM prüfbar');
 assert(central.includes('data-svnet-claims-results') && central.includes('resultOf'), 'Der Live-Nachweis enthält sichere Fall-, Datei-, Nachrichten- und Terminzahlen');
 assert(central.includes('SVNET_CLAIMS_RUNTIME_STATUS') && central.includes('SVNET_CLAIMS_RUNTIME_PING'), 'Portal zeigt den persistenten Browserlauf auch nach einem Worker-Neustart an');
-assert(central.includes("minimumBridgeVersion='1.4.59'") && central.includes('versionAtLeast(bridgeVersion,minimumBridgeVersion)'), 'Die zentrale Importstation darf nur mit der unmittelbar startenden und anforderungsbezogen gerouteten Brücke laufen');
+assert(central.includes(`minimumBridgeVersion='${manifest.version}'`) && central.includes('versionAtLeast(bridgeVersion,minimumBridgeVersion)'), 'Die zentrale Importstation darf nur mit der unmittelbar startenden und anforderungsbezogen gerouteten Brücke laufen');
 assert(central.includes("runtime.status==='failed'") && central.includes('Browserlauf wurde abgebrochen'), 'Ein im Browser bereits fehlgeschlagener Lauf muss den noch aktiven Serverauftrag sicher beenden');
 assert(central.includes("d.type==='SVNET_CLAIMS_RUNTIME_STATUS_V2'&&!agentJob&&!reconciling") && central.includes('button.disabled=false'), 'Ein vor der Auftragsuebernahme gemeldeter Browserabbruch muss abgeglichen und die Importschaltflaeche wieder freigegeben werden');
 assert(central.includes('reconciledJobs=new Set()') && central.includes('reconciledJobs.add(Number(active.jobId))'), 'Ein bereits abgeglichener Browserabbruch darf nicht bei jedem Laufzeit-Ping erneut gemeldet werden');

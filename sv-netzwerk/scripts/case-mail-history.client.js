@@ -1,5 +1,6 @@
 import * as MsgReaderPackage from '@kenjiuno/msgreader';
 import PostalMime from 'postal-mime';
+import { normalizeClaimsforceMail } from './claimsforce-mail.js';
 
 const MsgReader = typeof MsgReaderPackage.default === 'function'
   ? MsgReaderPackage.default
@@ -37,7 +38,8 @@ const MsgReader = typeof MsgReaderPackage.default === 'function'
     if (!response.ok) throw Error(data.error || `HTTP ${response.status}`);
     return data;
   };
-  const isMessage = item => /\.(?:msg|eml)$/i.test(item.name || '') || ['message/rfc822', 'application/vnd.ms-outlook'].includes(item.mimeType || '');
+  const isClaimsforceMessage = item => /^Mail_ClaimsForce-Nachricht_.*\.json$/i.test(item.name || '');
+  const isMessage = item => isClaimsforceMessage(item) || /\.(?:msg|eml)$/i.test(item.name || '') || ['message/rfc822', 'application/vnd.ms-outlook'].includes(item.mimeType || '');
   const flatten = (items, inCorrespondence = false, result = []) => {
     for (const item of items || []) {
       const normalizedName = String(item.name || '').toLowerCase().replace(/ä/g, 'ae');
@@ -156,6 +158,12 @@ const MsgReader = typeof MsgReaderPackage.default === 'function'
       const heading = document.createElement('strong'); heading.textContent = `Anhänge (${mail.attachments.length})`;
       attachments.append(heading, document.createElement('br'));
       for (const attachment of mail.attachments) {
+        if (attachment.reference) {
+          const reference = document.createElement('p');
+          reference.textContent = `${attachment.name}${attachment.path ? ` · ${attachment.path}` : ''} · ${attachment.status}`;
+          attachments.append(reference);
+          continue;
+        }
         const url = URL.createObjectURL(new Blob([attachment.content], { type: attachment.type }));
         previewUrls.push(url);
         const link = document.createElement('a'); link.href = url; link.download = attachment.name; link.textContent = attachment.name;
@@ -179,7 +187,9 @@ const MsgReader = typeof MsgReaderPackage.default === 'function'
       const response = await fetch(fileUrl, { credentials: 'same-origin' });
       if (!response.ok) throw Error(`HTTP ${response.status}`);
       const buffer = await response.arrayBuffer();
-      const mail = /\.eml$/i.test(item.name || '')
+      const mail = isClaimsforceMessage(item)
+        ? normalizeClaimsforceMail(JSON.parse(new TextDecoder().decode(buffer)), textFromHtml)
+        : /\.eml$/i.test(item.name || '')
         ? normalizeEml(await new PostalMime().parse(buffer))
         : (() => {
           if (typeof MsgReader !== 'function') throw Error('MSG-Parser konnte nicht initialisiert werden.');

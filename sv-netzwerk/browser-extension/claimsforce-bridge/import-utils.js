@@ -186,3 +186,23 @@ export function safeFileName(value, fallback = 'ClaimsForce-Datei') {
   const name = String(value || fallback).replace(/[<>:"/\\|?*\x00-\x1f]/g, '-').trim();
   return name.slice(0, 180) || fallback;
 }
+
+// /files enthält den gesamten Fallbestand; parentFolderId erhält die Unterordnerzuordnung.
+export function claimFolderPath(file, folders = []) {
+  const roots = { ORDER: 'Auftragsdokumente', IMAGE: 'Bilder', REPORT: 'Berichte', FORM: 'Formulare', CALCULATION: 'Kalkulationen', CALCULATION_OFFER: 'Angebote', CALCULATION_INVOICE: 'Rechnungen', OTHER: 'Weitere Dokumente' };
+  const byId = new Map(folders.map(folder => [String(folder.id), folder]));
+  const names = [], seen = new Set();
+  let id = String(file.parentFolderId || file.rootFolderId || '');
+  while (id) {
+    if (seen.has(id)) throw new Error('Zyklische ClaimsForce-Unterordnerzuordnung.');
+    seen.add(id);
+    if (roots[id]) { names.unshift(roots[id]); break; }
+    const folder = byId.get(id);
+    if (!folder) { names.unshift(id); break; }
+    names.unshift(String(folder.name || folder.folderName || id));
+    id = String(folder.parentFolderId || folder.rootFolderId || '');
+  }
+  const root = roots[file.rootFolderId];
+  if (root && names[0] !== root) names.unshift(root);
+  return names.join('/');
+}

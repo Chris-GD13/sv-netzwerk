@@ -5,6 +5,7 @@ function cqSingleResultValid(array $job,array $result):bool{
     if(($job['sync_mode']??'')!=='single')return true;
     $inventory=$result['inventories']??[];
     if(!is_array($inventory)||count($inventory)!==1||!is_array($inventory[0]))return false;
+    if(!empty($inventory[0]['errors']))return false;
     foreach(['files','messages','notes','tasks','attachments']as$field)if(!isset($inventory[0][$field])||!is_numeric($inventory[0][$field])||(int)$inventory[0][$field]<0)return false;
     return (int)($result['claims']??0)===1 && (int)($result['updated']??0)+(int)($result['skipped']??0)===1
         && (int)($result['failed']??0)===0 && $normalize($result['claimNumber']??'')===$normalize($job['claim_number']??'')
@@ -12,7 +13,7 @@ function cqSingleResultValid(array $job,array $result):bool{
 }
 function cqStationKey(array$body):string{
     $id=(string)($body['stationId']??'');
-    if(!preg_match('/^[a-f0-9-]{36}$/i',$id)||version_compare((string)($body['bridgeVersion']??'0'),'1.4.59','<')||($body['workerVersion']??'')!=='1.4.59'||(int)($body['protocol']??0)!==2)apiError(409,'Aktuelle Browser-Brücke 1.4.59 erforderlich. Diese alte Importstation darf keinen Auftrag übernehmen.');
+    if(!preg_match('/^[a-f0-9-]{36}$/i',$id)||version_compare((string)($body['bridgeVersion']??'0'),'1.4.60','<')||($body['workerVersion']??'')!=='1.4.60'||(int)($body['protocol']??0)!==2)apiError(409,'Aktuelle Browser-Brücke 1.4.60 erforderlich. Diese alte Importstation darf keinen Auftrag übernehmen.');
     return hash('sha256',$id);
 }
 function cqRequireOwner(int$id,array$body):void{

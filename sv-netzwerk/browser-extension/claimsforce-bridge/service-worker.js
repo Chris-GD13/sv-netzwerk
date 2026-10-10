@@ -1,5 +1,5 @@
 import { clearCredentials, loadCredentials, loadPortalCredentials, saveCredentials } from './vault.js';
-import { collectInvestigationClaims, mapClaim, safeFileName, sameImportScope, assertSingleClaim, mergeClaimFiles } from './import-utils.js';
+import { collectInvestigationClaims, mapClaim, safeFileName, sameImportScope, assertSingleClaim, mergeClaimFiles, claimFolderPath } from './import-utils.js';
 import { isActiveRekonTask, mapRekonTask, ownerMatchesRekonProfile, rekonFileVersion, rekonMessageVersion, rekonProfileKey } from './rekon-utils.js';
 
 const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
@@ -20,7 +20,7 @@ const PROFILE_EMAILS = {
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS', 'SW'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
-const WORKER_CODE_VERSION = '1.4.59';
+const WORKER_CODE_VERSION = '1.4.60';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
@@ -216,7 +216,10 @@ async function claimsTab(profile, run, credential) {
   const invokingTab = await chrome.tabs.get(run.portalTabId);
   const available = await chrome.tabs.query({ url: ['https://web.claimsforce.com/*', 'https://claimsforce.eu.auth0.com/*'] });
   let tab = available.find(candidate => candidate.windowId === invokingTab.windowId && candidate.groupId === invokingTab.groupId);
-  if (!tab) tab = await chrome.tabs.create({ url: 'https://web.claimsforce.com/login', windowId: invokingTab.windowId, index: invokingTab.index + 1, active: false });
+  if (!tab) {
+    tab = await chrome.tabs.create({ url: 'https://web.claimsforce.com/login', windowId: invokingTab.windowId, index: invokingTab.index + 1, active: false });
+    if (Number.isInteger(invokingTab.groupId) && invokingTab.groupId >= 0) await chrome.tabs.group({ groupId: invokingTab.groupId, tabIds: [tab.id] });
+  }
   tab = await waitTab(tab.id);
   if (safeRoute(tab.url) === '/login') await chrome.storage.session.remove(['claimsToken', 'claimsTokenProfile']);
   await diagnostic(run, 'CF-AUTH-02', 'ClaimsForce-Seite ist geladen.', { route: safeRoute(tab.url) });
@@ -424,7 +427,7 @@ async function fingerprint(value) {
 }
 
 const fileVersion = file => [file?.id, file?.updatedDate || file?.updatedAt || file?.modifiedAt || file?.createdDate || file?.createdAt, file?.sizeInBytes || file?.size || file?.fileSize, file?.name || file?.fileName || file?.originalFilename].map(value => String(value || '')).join('|');
-const messageVersion = message => [message?.id, message?.updatedDate || message?.updatedAt || message?.createdDate || message?.createdAt || message?.sentAt].map(value => String(value || '')).join('|');
+const messageVersion = message => ['v3', message?.id, message?.updatedDate || message?.updatedAt || message?.createdDate || message?.createdAt || message?.sentAt].map(value => String(value || '')).join('|');
 
 async function uploadBuffer(portalTabId, profile, folderId, name, mime, modified, buffer) {
   const uploadId = crypto.randomUUID();
@@ -587,7 +590,7 @@ async function runImport(run) {
     }
     await diagnostic(run, 'CF-CASE-FETCH', `Auftrag ${index + 1}/${claims.length}: Falldaten werden geladen.`, { current: index, total: claims.length, claimIndex: index + 1 });
     await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length} wird eingelesen …`, index, claims.length);
-    const [rawDisposition, rawCommunication, rawFiles, rawMessages, rawNotes, rawAppointments, rawStakeholders, rawClientFiles, rawTasks] = await Promise.all([
+    const [rawDisposition, rawCommunication, rawFiles, rawMessages, rawNotes, rawAppointments, rawStakeholders, rawClientFiles, rawTasks, rawFolders] = await Promise.all([
       requestJson(`${config.DISPOSITION_API_ENDPOINT}/claims/${id}`, token),
       requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}`, token, true),
       requestJson(`${config.FILES_API_ENDPOINT}/claims/${id}/files`, token),
@@ -596,7 +599,8 @@ async function runImport(run) {
       requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}/appointments`, token, true),
       requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}/stakeholders`, token, true),
       requestJson(`${config.FILES_API_ENDPOINT}/claims/${id}/client-files`, token),
-      requestJson('https://tasks-api.claimsforce.com/tasks', token)
+      requestJson('https://tasks-api.claimsforce.com/tasks', token),
+      requestJson(`${config.FILES_API_ENDPOINT}/claims/${id}/folders`, token)
     ]);
     const disposition = unwrap(rawDisposition, 'claim');
     const communication = unwrap(rawCommunication, 'claim');
@@ -604,6 +608,8 @@ async function runImport(run) {
     const appointments = unwrap(rawAppointments, 'appointments');
     const messages = Array.isArray(unwrap(rawMessages, 'messages')) ? unwrap(rawMessages, 'messages') : [];
     const files = mergeClaimFiles(unwrap(rawFiles, 'files') || [], unwrap(rawClientFiles, 'files') || [], messages);
+    const folders = unwrap(rawFolders, 'folders') || [];
+    const fileIndex = files.map(file => ({ id: file.id, name: file.fileName || file.name, path: claimFolderPath(file, folders), parentFolderId: file.parentFolderId, rootFolderId: file.rootFolderId, attachmentReference: !!file.attachmentReference }));
     const tasks = (unwrap(rawTasks, 'tasks') || []).filter(task => task.claimId === id);
     const notes = collectClaimsforceNotes([rawNotes, rawCommunication, rawDisposition]).map(note => {
       const source = (unwrap(rawNotes, 'notes') || []).find(item => item.id === note.id);
@@ -618,10 +624,13 @@ async function runImport(run) {
     const stableMapped = { ...mapped };
     delete stableMapped.claimsforce_zuletzt_eingelesen;
     const appointmentVersions = (Array.isArray(appointments) ? appointments : []).map(appointment => [appointment?.id, appointment?.updatedAt, appointment?.startDate, appointment?.endDate].map(value => String(value || '')).join('|'));
-    const signature = await fingerprint({ mapped: stableMapped, fileVersions, messageVersions, appointmentVersions, notes, tasks, schema: 2 });
+    const signature = await fingerprint({ mapped: stableMapped, fileVersions, messageVersions, appointmentVersions, notes, tasks, folders, fileIndex, schema: 3 });
     const state = await portal(portalTabId(), { type: 'PORTAL_SYNC_STATE', mapped, profile });
     const existingMeta = state.result?.meta || {};
     if (state.result?.existed && existingMeta.claimsforce_sync_signature === signature) {
+      inventory.restrictedFiles = existingMeta.claimsforce_importbestand?.restrictedFiles || [];
+      inventory.errors = [];
+      inventory.filesAccessible = files.length - inventory.restrictedFiles.length;
       skipped++;
       await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length}: unverändert, wird übersprungen.`, index + 1, claims.length);
       await diagnostic(run, 'CF-CASE-SKIP', `Auftrag ${index + 1}/${claims.length} ist bereits vollständig und unverändert vorhanden.`, { current: index + 1, total: claims.length, claimIndex: index + 1, skippedCases: skipped });
@@ -631,12 +640,15 @@ async function runImport(run) {
     const upsert = await portalOperation(portalTabId(), { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, profile, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, tasks, importedAt: new Date().toISOString() }, knownState: { existed: !!state.result?.existed, folderId: state.result?.folderId || '', meta: existingMeta } });
     const folderId = upsert.folderId;
     await uploadBuffer(portalTabId(), profile, folderId, 'ClaimsForce_Aufgaben_Notizen.json', 'application/json', 0, new TextEncoder().encode(JSON.stringify({ inventory, tasks, notes, sourceNotes: rawNotes }, null, 2)).buffer);
+    await uploadBuffer(portalTabId(), profile, folderId, 'ClaimsForce_Ordner_Dokumentenverzeichnis.json', 'application/json', 0, new TextEncoder().encode(JSON.stringify({ folders, files: fileIndex, messages: messages.map(message => ({ id: message.id, attachments: message.attachments || [] })) }, null, 2)).buffer);
     await diagnostic(run, 'CF-CASE-FILES', `Auftrag ${index + 1}/${claims.length}: Anhänge und Nachrichten werden übernommen (Bridge ${BRIDGE_VERSION}).`, { current: index, total: claims.length, claimIndex: index + 1 });
     let caseDeadline = Date.now() + 300000;
     const checkDeadline = where => { if (Date.now() > caseDeadline) throw new Error(`Zeitlimit von 5 Minuten ohne Fortschritt für diesen Auftrag überschritten (${where}).`); };
     const knownFileVersions = new Set(Array.isArray(existingMeta.claimsforce_file_versions) ? existingMeta.claimsforce_file_versions.map(String) : []);
     const doneFileVersions = new Set(knownFileVersions);
-    const savePartial = () => portal(portalTabId(), { type: 'PORTAL_COMMIT_SYNC', folderId, signature: '', partial: true, fileVersions: [...doneFileVersions], messageVersions: existingMeta.claimsforce_message_versions || [], notes: null, listVersion: '', profile });
+    const doneMessageVersions = new Set(Array.isArray(existingMeta.claimsforce_message_versions) ? existingMeta.claimsforce_message_versions.map(String) : []);
+    const sourceErrors = [], restrictedFiles = [], unavailableFileIds = new Set();
+    const savePartial = () => portal(portalTabId(), { type: 'PORTAL_COMMIT_SYNC', folderId, signature: '', partial: true, fileVersions: [...doneFileVersions], messageVersions: [...doneMessageVersions], notes, tasks, inventory: { ...inventory, errors: sourceErrors, restrictedFiles, filesAccessible: files.length - restrictedFiles.length }, listVersion: '', profile });
     let fileNumber = 0;
     for (const file of files) {
       if (!file?.id) continue;
@@ -646,7 +658,7 @@ async function runImport(run) {
       if (run.stopRequested) { await savePartial().catch(() => {}); throw new Error('Import wurde pausiert.'); }
       checkDeadline(`Datei ${fileNumber}/${files.length}`);
       await diagnostic(run, 'CF-CASE-FILE', `Auftrag ${index + 1}/${claims.length}: Datei ${fileNumber}/${files.length} wird übertragen.`, { current: index, total: claims.length, claimIndex: index + 1 });
-      const sourcePath = String(file.folderPath || file.path || file.folder?.path || file.folder?.name || '').replaceAll('\\', '/').replace(/^\/+|\/+$/g, '');
+      const sourcePath = String(file.folderPath || file.path || claimFolderPath(file, folders) || '').replaceAll('\\', '/').replace(/^\/+|\/+$/g, '');
       const baseName = safeFileName(file.name || file.fileName || file.originalFilename, `ClaimsForce-${file.id}`);
       let name = safeFileName(sourcePath ? `${sourcePath}__${baseName}` : baseName);
       await progress(portalTabId(), `${mapped.schaden_nr || item.label}: ${name}`, index, claims.length);
@@ -656,7 +668,20 @@ async function runImport(run) {
       try { response = await fetch(url, { signal: controller.signal }); if (response.ok) fileBuffer = await response.arrayBuffer(); }
       catch (error) { throw new Error(error?.name === 'AbortError' ? `Datei „${name}“ hat das Zeitlimit überschritten.` : `Datei „${name}“ konnte nicht geladen werden.`); }
       finally { clearTimeout(timer); }
-      if (!response.ok) throw new Error(`Datei „${name}“ konnte nicht geladen werden (${response.status}).`);
+      if (!response.ok) {
+        const error = `Datei „${name}“ konnte nicht geladen werden (${response.status}).`;
+        if (file.attachmentReference && response.status === 403) {
+          restrictedFiles.push({ id: file.id, name, status: 403, reason: 'Geschützter Mailanhang: nicht im zugänglichen Dokumentenbestand; Referenz und Mail bleiben erhalten.' });
+          unavailableFileIds.add(file.id);
+          caseDeadline = Date.now() + 300000;
+          continue;
+        }
+        sourceErrors.push({ kind: 'file', id: file.id, name, status: response.status, message: error });
+        unavailableFileIds.add(file.id);
+        await diagnostic(run, 'CF-SOURCE-FILE', `${error} Übrige Inhalte werden weiter übernommen.`, { current: index, total: claims.length, claimIndex: index + 1 });
+        caseDeadline = Date.now() + 300000;
+        continue;
+      }
       if (file.attachmentReference) {
         const disposition = response.headers.get('content-disposition') || '';
         const filename = /filename\*=UTF-8''([^;]+)/i.exec(disposition)?.[1] || /filename="?([^";]+)/i.exec(disposition)?.[1];
@@ -681,13 +706,21 @@ async function runImport(run) {
       const record = detail == null ? message : unwrap(detail, 'message');
       const stamp = String(record?.sentAt || record?.createdAt || record?.createdDate || '').slice(0, 10) || 'ohne-Datum';
       const subject = safeFileName(record?.subject || record?.payload?.subject || record?.id, 'Nachricht');
-      const bytes = new TextEncoder().encode(JSON.stringify(record, null, 2));
+      const archivedRecord = { ...record, _svnetImport: { attachments: (record?.attachments || []).map(attachment => {
+        const file = fileIndex.find(file => file.id === attachment.id);
+        return { id: attachment.id, name: file?.name || attachment.fileName || attachment.name || `Falldokument ${attachment.id}`, path: file?.path || '', restricted: restrictedFiles.some(file => file.id === attachment.id) };
+      }) } };
+      const bytes = new TextEncoder().encode(JSON.stringify(archivedRecord, null, 2));
       const uploaded = await uploadBuffer(portalTabId(), profile, folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${record?.id || message.id}_${subject}.json`, 'application/json', Date.parse(record?.updatedDate || record?.updatedAt || record?.createdDate || record?.createdAt || '') || 0, bytes.buffer);
       if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) messagesDone++;
+      let messageComplete = true;
       const attachments = Array.isArray(record?.attachments) ? record.attachments : (Array.isArray(record?.files) ? record.files : []);
       for (const attachment of attachments) {
+        if (run.stopRequested) { await savePartial(); throw new Error('Import wurde pausiert.'); }
         // CLAIM_FILE-Anhänge sind dieselben Dateien wie im Falldokumentenbestand.
         if (attachment.type === 'CLAIM_FILE' && doneFileVersions.has(fileVersion(files.find(file => file.id === attachment.id)))) continue;
+        // Ein abgewiesener Falldatei-Verweis wird nicht über einen anderen Endpunkt erneut versucht.
+        if (attachment.type === 'CLAIM_FILE' && unavailableFileIds.has(attachment.id)) { if (!restrictedFiles.some(file => file.id === attachment.id)) messageComplete = false; continue; }
         const attachmentName = safeFileName(attachment.name || attachment.fileName || attachment.filename, 'Anhang-' + (attachment.id || crypto.randomUUID()));
         let attachmentBuffer = null;
         if (attachment.contentBytes) { const binary = atob(String(attachment.contentBytes)); const bytes = new Uint8Array(binary.length); for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i); attachmentBuffer = bytes.buffer; }
@@ -696,12 +729,19 @@ async function runImport(run) {
           let response;
           try { response = await fetch(attachmentUrl, { headers: { Authorization: 'Bearer ' + token }, signal: AbortSignal.timeout(30000) }); }
           catch (error) { throw new Error(error?.name === 'TimeoutError' ? `Mail-Anhang „${attachmentName}“ hat das Zeitlimit überschritten.` : `Mail-Anhang „${attachmentName}“ konnte nicht geladen werden.`); }
-          if (!response.ok) throw new Error(`Mail-Anhang „${attachmentName}“ konnte nicht geladen werden (${response.status}).`);
+          if (!response.ok) {
+            sourceErrors.push({ kind: 'attachment', id: attachment.id, messageId: record.id, name: attachmentName, status: response.status, message: `Mail-Anhang „${attachmentName}“ konnte nicht geladen werden (${response.status}).` });
+            messageComplete = false;
+            continue;
+          }
           attachmentBuffer = await response.arrayBuffer();
         }
         if (attachmentBuffer === null) throw new Error(`Mail-Anhang „${attachmentName}“ enthält keine abrufbaren Dateidaten.`);
         await uploadBuffer(portalTabId(), profile, folderId, 'Mail_ClaimsForce-Anhang_' + stamp + '_' + attachmentName, attachment.mimeType || attachment.contentType || 'application/octet-stream', Date.parse(attachment.updatedAt || attachment.createdAt || '') || 0, attachmentBuffer);
       }
+      if (messageComplete) doneMessageVersions.add(version);
+      caseDeadline = Date.now() + 300000;
+      await savePartial();
     }
     if (!['christian', 'jens'].includes(profile)) {
       for (const appointment of Array.isArray(appointments) ? appointments : []) {
@@ -710,9 +750,17 @@ async function runImport(run) {
         if (!appointmentResult?.result?.skipped) appointmentsDone++;
       }
     }
-    await portal(portalTabId(), { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions, notes, tasks, inventory, listVersion: item.listVersion || '', profile });
+    inventory.errors = sourceErrors;
+    inventory.restrictedFiles = restrictedFiles;
+    inventory.filesAccessible = files.length - restrictedFiles.length;
+    await uploadBuffer(portalTabId(), profile, folderId, 'ClaimsForce_Aufgaben_Notizen.json', 'application/json', 0, new TextEncoder().encode(JSON.stringify({ inventory, tasks, notes, sourceNotes: rawNotes }, null, 2)).buffer);
+    if (sourceErrors.length) {
+      await savePartial();
+      throw new Error(`[CF-SOURCE-INCOMPLETE] ${doneFileVersions.size}/${files.length} Dateien und ${messages.length} Nachrichten geprüft; Aufgaben und Notizen übernommen. ${sourceErrors.length} Quellenfehler offen: ${sourceErrors[0].message}`);
+    }
+    await portal(portalTabId(), { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions: [...doneFileVersions], messageVersions: [...doneMessageVersions], notes, tasks, inventory, listVersion: item.listVersion || '', profile });
     updated++;
-    await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length} wurde vollständig im Portal verarbeitet.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
+    await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length}: zugängliche Inhalte übernommen${restrictedFiles.length ? `; ${restrictedFiles.length} geschützte Anhangsreferenz(en) dokumentiert` : ''}.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
     } catch (error) {
       failed++;
       const message = String(error?.message || 'Portal-Falloperation fehlgeschlagen.').slice(0, 500);
@@ -723,7 +771,8 @@ async function runImport(run) {
   }
   if (run.stopRequested) throw new Error('Import wurde pausiert.');
   const sourceSummary = useInvoicedClaims ? ` (${bucketCounts.INVOICED_CLAIMS || 0} aus Kostennoten)` : '';
-  await progress(portalTabId(), `${claims.length} Fälle${sourceSummary} geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${failed} fehlgeschlagen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, claims.length, claims.length);
+  const restrictedCount = inventories.reduce((n, item) => n + (item.restrictedFiles || []).length, 0);
+  await progress(portalTabId(), `${claims.length} Fälle${sourceSummary} geprüft: ${updated} aktualisiert, ${skipped} unverändert übersprungen, ${failed} fehlgeschlagen, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.${restrictedCount ? ` ${restrictedCount} geschützte Anhangsreferenz(en) dokumentiert; deren Dateiinhalte bleiben gesperrt.` : ''}`, claims.length, claims.length);
   await chrome.storage.session.set({ claimsLoggedProfile: profile });
   await chrome.storage.local.set({ claimsLoggedProfile: profile });
   if (failed > 0 && failed === claims.length) throw new Error(`[CF-CASE-ALL] Alle ${failed} Aufträge sind fehlgeschlagen. Erste Ursache: ${firstError}`.slice(0, 480));

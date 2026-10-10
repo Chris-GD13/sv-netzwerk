@@ -90,6 +90,7 @@ jobs:
           php tests/outlook_task_number_test.php
           node tests/claimsforce_single_scope_test.mjs
           node tests/claimsforce_worker_handshake_test.mjs
+          node tests/claimsforce_source_restrictions_test.mjs
           node tests/financial_register_preset_test.mjs
 
       - name: Ausschließlich Portaldateien vorbereiten
