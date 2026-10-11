@@ -140,6 +140,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     const [status,recent]=await Promise.all([request('/intern/api/google-drive-sync.php?action=status'),request('/intern/api/google-drive-sync.php?action=recent_cases')]);
     const profile=String(status.backoffice?status.selected_expert:status.claims_profile||'');
     $('dc-profile').textContent=`Arbeitsstand für ${profileNames[profile]||'das ausgewählte Profil'}`;
+    $('dc-case-count').closest('.dc-summary-card').hidden=profile==='jens';
     $('dc-case-count').textContent=String(status.folders?.cases?.items??0);$('dc-case-folder').textContent=status.folders?.cases?.name||'Fallordner';
     setSystem('drive','ok',`${status.folders?.cases?.items??0} Fälle · ${status.cached?'geprüfter Zwischenspeicher':'direkt verbunden'}`);
     recentCases=Array.isArray(recent.results)?recent.results:[];let warnings=0;

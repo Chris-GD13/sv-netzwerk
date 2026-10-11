@@ -131,10 +131,14 @@ function registerCaseFolderOwner(string $folderId, array $user, array $meta = []
 function requireCaseFolderAccess(string $folderId, array $user): void
 {
     if ($folderId === '') apiError(400, 'Kein aktiver Fallordner.');
-    $stmt = db()->prepare('SELECT user_id FROM case_folder_owners WHERE folder_id=:f LIMIT 1');
+    require_once __DIR__ . '/profile-routing.php';
+    $profile = svnetSelectedProfile($user, (string)($_SESSION['svnet_selected_expert'] ?? ''));
+    if ($profile === 'jens') apiError(403, 'Für den Maurer-Zugang sind keine Portal-Fälle freigegeben.');
+    $stmt = db()->prepare('SELECT user_id,user_email FROM case_folder_owners WHERE folder_id=:f LIMIT 1');
     $stmt->execute([':f'=>$folderId]);
-    $owner = $stmt->fetchColumn();
-    if ($owner === false || (int)$owner !== (int)($user['id']??0)) {
+    $owner = $stmt->fetch(PDO::FETCH_ASSOC);
+    $ownerProfile = $owner ? svnetUserProfile(['email'=>(string)$owner['user_email']]) : '';
+    if (!$owner || $ownerProfile === '' || $ownerProfile !== $profile) {
         apiError(403, 'Dieser Schadenfall gehört zu einem anderen Benutzer und darf nicht geöffnet oder verändert werden.');
     }
 }
