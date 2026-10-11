@@ -6,7 +6,7 @@ class Element {
   constructor(){this.children=[];this.style={};this.value='';this.files=[];this.disabled=false;this.checked=true;this.dataset={};this.classList={remove(){}};}
   append(...children){this.children.push(...children);}
   replaceChildren(...children){this.children=children;}
-  addEventListener(){} querySelector(){return null;} closest(){return null;} focus(){} scrollIntoView(){}
+  addEventListener(event,handler){this['on'+event]=handler;} querySelector(){return null;} closest(){return null;} focus(){} scrollIntoView(){}
 }
 const ids=Object.fromEntries(['vf-analysis-start','vf-analysis-refresh','vf-analysis-state','vf-work-history','vf-analysis-order','vf-analysis-files','vf-work-reload','vf-work-import-retry','vf-work-local','vf-active'].map(id=>[id,new Element()]));
 const store=new Map(),observers=[],requests=[];let importState='queued';const histories=new Map();
@@ -44,5 +44,30 @@ store.set('svnet-case',JSON.stringify({folder_id:'case-b',meta:{schaden_nr:'26-9
 assert.equal(ids['vf-work-history'].children.length,0,'Previous case response leaked into new case');
 assert.equal(ids['vf-analysis-order'].value,'');
 assert.equal(requests.filter(r=>r.body.action==='start'&&r.body.folder_id==='case-b').length,0);
+ids['vf-analysis-order'].value='Vorhandene Unterlagen bearbeiten';
+await ids['vf-work-local'].onclick();await flush();
+assert.equal(histories.get('case-b').length,1,'Local continuation must also start a new local-only request');
+store.delete('svnet-case');
+ids['vf-analysis-order'].value='Eingabe behalten';ids['vf-analysis-files'].value='selected.pdf';
+const before=requests.length;
+await ids['vf-analysis-start'].onclick();
+assert.match(ids['vf-analysis-state'].textContent,/Kein Fall geladen/);
+assert.equal(requests.length,before,'Missing selection must not submit into a stale case');
+assert.equal(ids['vf-analysis-order'].value,'Eingabe behalten');
+assert.equal(ids['vf-analysis-files'].value,'selected.pdf');
+ids['vf-analysis-refresh'].onclick();assert.match(ids['vf-analysis-state'].textContent,/Kein Fall geladen/);
+ids['vf-work-import-retry'].onclick();assert.match(ids['vf-analysis-state'].textContent,/Kein Fall geladen/);
+await ids['vf-work-local'].onclick();assert.match(ids['vf-analysis-state'].textContent,/Kein Fall geladen/);
 assert.equal(requests.some(r=>/send|complete/.test(r.url)),false,'No external mail or completion action');
+// Execute the production launch function with an unrelated profile import.
+const importer=fs.readFileSync(new URL('../public/intern/claimsforce-central.js',import.meta.url),'utf8');
+const launch=importer.slice(importer.indexOf('  async function launch('),importer.indexOf('  async function poll(){'));
+store.set('svnet-case','selected-maurer-case');
+const dispatched=[];
+await vm.runInNewContext(launch+';launch({id:7,profile:"christian",sync_mode:"full",claim_number:"another-case"})',{
+  sessionStorage:storage,localStorage:storage,supportedProfiles:['christian','jens'],heartbeat:async()=>{},
+  window:{postMessage:message=>dispatched.push(message)},location:{origin:'https://www.sv-netzwerk.eu'}
+});
+assert.equal(store.get('svnet-case'),'selected-maurer-case','Background import must preserve the active workspace');
+assert.equal(dispatched[0].profile,'christian','Import must retain its own profile scope');
 console.log('case_work_ui_test: import gate, follow-up, persistence and case isolation passed');

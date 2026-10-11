@@ -7,7 +7,7 @@
     if (!start || !historyBox) return;
     const taskId=new URLSearchParams(location.search).get('aufgabe') || '';
     let folder='', epoch=0, timer=null, busy=false, lastRender='', turns=[];
-    const active=()=>{try{return JSON.parse(sessionStorage.getItem('svnet-case')||'null');}catch{return null;}};
+    const active=()=>{for(const storage of [sessionStorage,localStorage])try{const current=JSON.parse(storage.getItem('svnet-case')||'null');if(current?.folder_id)return current;}catch{}return null;};
     const pendingKey=id=>'svnet-work-pending:'+String(localStorage.getItem('svnet-case-owner')||'')+':'+id;
     const pending=id=>{try{return JSON.parse(sessionStorage.getItem(pendingKey(id))||'null');}catch{return null;}};
     const savePending=(id,value)=>value?sessionStorage.setItem(pendingKey(id),JSON.stringify(value)):sessionStorage.removeItem(pendingKey(id));
@@ -22,6 +22,7 @@
       finally {clearTimeout(timeout);}
     };
     const notice=(text,bad=false)=>{state.textContent=text;state.className='vf-meta'+(bad?' vf-claims-bad':'');};
+    const requireCase=()=>{const current=active();if(!current)notice('Kein Fall geladen. Bitte den gewünschten Fall suchen und mit Öffnen laden. Deine Eingaben und ausgewählten Anhänge bleiben zunächst erhalten.',true);return current;};
     const button=(label,handler)=>{const b=document.createElement('button');b.type='button';b.className='vf-secondary';b.textContent=label;b.onclick=handler;return b;};
     const para=(parent,text)=>{const p=document.createElement('p');p.style.whiteSpace='pre-wrap';p.textContent=text||'';parent.append(p);};
     const details=(parent,label,items)=>{if(!items?.length)return;const d=document.createElement('details'),s=document.createElement('summary');s.textContent=label;d.append(s);for(const item of items)para(d,item);parent.append(d);};
@@ -124,7 +125,7 @@
       notice(id?'Fall-Chat wird geladen …':'Bitte zuerst einen Fall öffnen.');if(id)poll(current,epoch);
     };
     start.onclick=async()=>{
-      const current=active();if(!current?.folder_id||busy)return;
+      const current=requireCase();if(!current)return;if(busy){notice('Die Bearbeitung läuft bereits. Mit Status aktualisieren kannst du den Fortschritt prüfen.');return;}
       const version=epoch;busy=true;start.disabled=true;
       notice('Arbeitsauftrag wird vorbereitet …');
       const instructions=order.value.trim()||'Bitte abarbeiten',requestKey=crypto.randomUUID();
@@ -141,10 +142,10 @@
         if(version!==epoch)return;order.value='';reload.checked=false;await poll(current,version);
       }catch(error){if(version!==epoch)return;notice(error.message,true);busy=false;start.disabled=false;}
     };
-    refresh.onclick=()=>{const current=active();if(current?.folder_id)poll(current,epoch);};
-    el('vf-work-import-retry')?.addEventListener('click',()=>{const current=active();if(!current?.folder_id)return;const work=pending(current.folder_id);if(work){delete work.import_id;savePending(current.folder_id,work);poll(current,epoch);}else{reload.checked=true;notice('Nachladen für den nächsten Arbeitsauftrag aktiviert.');}});
+    refresh.onclick=()=>{const current=requireCase();if(current)poll(current,epoch);};
+    el('vf-work-import-retry')?.addEventListener('click',()=>{const current=requireCase();if(!current)return;const work=pending(current.folder_id);if(work){delete work.import_id;savePending(current.folder_id,work);poll(current,epoch);}else{reload.checked=true;notice('Nachladen für den nächsten Arbeitsauftrag aktiviert.');}});
     el('vf-work-local')?.addEventListener('click',async()=>{
-      const current=active(),work=current&&pending(current.folder_id);if(!work)return;
+      const current=requireCase();if(!current)return;const work=pending(current.folder_id);if(!work){reload.checked=false;await start.onclick();return;}
       try{await api({action:'start',folder_id:current.folder_id,task_id:work.task_id,instructions:work.instructions+'\nClaims-Nachladen war nicht erfolgreich. Ausschließlich vorhandenen Bestand bearbeiten und fehlenden Importstand offen kennzeichnen.',request_key:work.request_key});savePending(current.folder_id,null);poll(current,epoch);}catch(error){notice(error.message,true);}
     });
     document.querySelectorAll('[data-work-prompt]').forEach(b=>b.addEventListener('click',()=>{order.value=b.dataset.workPrompt;order.focus();}));
