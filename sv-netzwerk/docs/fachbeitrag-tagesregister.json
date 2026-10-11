@@ -213,12 +213,14 @@
         "verified_at": "2026-10-11T04:17:13.641Z"
       },
       "linkedin": {
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-linkedin-20261011-01a12959",
         "reserved_at": "2026-10-11T05:11:06.391Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung/"
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung/",
+        "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7514916673649487874/",
+        "verified_at": "2026-10-11T05:18:40.947Z"
       }
     }
   },
-  "updated_at": "2026-10-11T05:11:06.391Z"
+  "updated_at": "2026-10-11T05:18:40.947Z"
 }
