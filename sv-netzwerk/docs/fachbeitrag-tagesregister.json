@@ -218,7 +218,19 @@
         "reserved_at": "2026-10-11T05:11:06.391Z",
         "article_url": "https://www.sv-netzwerk.eu/fachwissen/innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung/",
         "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7514916673649487874/",
-        "verified_at": "2026-10-11T05:18:40.947Z"
+        "verified_at": "2026-10-11T05:18:40.947Z",
+        "published_at_berlin": "2026-10-11T07:15+02:00",
+        "verified_at_berlin": "2026-10-11T07:18:40.947+02:00",
+        "image_path": "docs/linkedin/2026-10-11/2026-10-11_innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung_symbolbild.png",
+        "text_path": "docs/linkedin/2026-10-11/2026-10-11_innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung_linkedin.txt",
+        "proof_path": "docs/linkedin-veroeffentlichung-2026-10-11.md",
+        "screenshots": [
+          "docs/linkedin/2026-10-11/2026-10-11_innentueren-linkedin-text-live.jpg",
+          "docs/linkedin/2026-10-11/2026-10-11_innentueren-linkedin-bild-live.jpg"
+        ],
+        "duplicate_check_note": "Profilaktivitaeten vor Erstellung und unmittelbar vor Absenden neu geladen: kein heutiger Innentueren-Beitrag; letzter eigener Fachbeitrag Fensterabdichtung vom 10.10.2026.",
+        "website_live_commit": "42917d7636d760064a685c3045a6ab81d5224d16",
+        "website_live_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38111467530"
       }
     }
   },
