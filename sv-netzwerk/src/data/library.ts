@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Innentüren, Zargen und Beschläge: Schäden fachlich prüfen und Nachbesserung abgrenzen',
+    description: 'Türblatt, Zarge, Beschläge, Passung und Oberfläche werden getrennt geprüft, um Nachbesserung, Austausch und schadenbedingte Kosten nachvollziehbar abzugrenzen.',
+    href: '/fachwissen/innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung/',
+    category: 'Schreinerhandwerk und Innenausbau',
+    tags: ['Innentür', 'Türblatt', 'Zarge', 'Beschlag', 'Passung', 'Oberfläche', 'Nachbesserung', 'Kostenprüfung'],
+    date: '2026-10-11',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Brandmeldeanlagen nach Wasser- und Brandschäden fachlich prüfen',
     description: 'Brandmeldeanlagen werden nach Wasser-, Rauch- oder Wärmeeinwirkung anhand von Schutzumfang, Fachprüfung, Wiederinbetriebnahme und schadenbedingten Kosten bewertet.',
     href: '/fachwissen/brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung/',
