@@ -198,7 +198,21 @@
           "completed_at": "2026-10-10T09:49:39.222Z"
         }
       }
+    },
+    "2026-10-11": {
+      "publication_id": "2026-10-11-innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung",
+      "article": {
+        "title": "Innentüren, Zargen und Beschläge: Schäden fachlich prüfen und Nachbesserung abgrenzen",
+        "slug": "innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung/",
+        "status": "reserved",
+        "owner": "codex-2026-10-11-0600",
+        "reserved_at": "2026-10-11T03:58:49.363Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-10-10T09:49:39.222Z"
+  "updated_at": "2026-10-11T03:58:49.363Z"
 }
