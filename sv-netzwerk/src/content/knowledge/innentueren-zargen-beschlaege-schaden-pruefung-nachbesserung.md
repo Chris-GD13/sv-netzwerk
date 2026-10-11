@@ -112,11 +112,11 @@ Ein Angebot sollte jede Tür eindeutig bezeichnen und Türblatt, Zarge, Bänder,
 
 Mehrkosten für höherwertige Oberflächen, geänderte Beschläge, zusätzliche Schallschutz- oder Sicherheitsfunktionen sowie die Erneuerung unbeschädigter Vergleichstüren werden gesondert behandelt. Bei nicht mehr lieferbaren Altprodukten sind Kompatibilität, technisch notwendige Folgearbeiten und mögliche Alternativen nachvollziehbar zu begründen. Kostenvoranschlag, technische Freigabe, Auftrag, Rechnung und Zahlung bleiben unterschiedliche Bearbeitungsstände.
 
-## Fiktives Praxisbeispiel
+## Prüfablauf ausschließlich mit belegten Objektdaten
 
-In einem ausdrücklich fiktiven Bürogebäude schließen nach Innenausbauarbeiten drei Innentüren nicht mehr einwandfrei. Der erste Kostenvoranschlag sieht drei vollständige Türelemente vor. Die dokumentierte Prüfung zeigt jedoch unterschiedliche Befunde: Bei einer Tür ist das Schließblech versetzt, bei der zweiten ist eine Bandbefestigung gelockert, bei der dritten weist das Türblatt eine messbare Verformung und eine abgelöste Decklage auf.
+Die Bewertung wird nicht mit erfundenen Fällen oder Messwerten veranschaulicht. Im konkreten Auftrag sind stattdessen je Türelement der tatsächliche Befund, die dokumentierte Funktionsprüfung, die verwendete Messmethode, Produktunterlagen und der nachweisbare Vorzustand zusammenzuführen. Fehlt eine dieser Grundlagen, wird die verbleibende Unsicherheit benannt; sie darf nicht durch einen angenommenen Schadenverlauf ersetzt werden.
 
-Die Maßnahmen werden deshalb getrennt geplant: Schließblech fachgerecht anpassen und Funktion prüfen, Bandaufnahme instand setzen und Tür neu justieren sowie für das geschädigte Türblatt Produktanforderung und Austauschumfang klären. Das Beispiel enthält keine realen Messwerte und keine Aussage zur Versicherungsdeckung. Es zeigt nur, warum ein einheitlicher Komplettaustausch ohne bauteilbezogenen Befund nicht prüffähig wäre.
+Auch Maßnahmen werden erst nach dieser Zuordnung festgelegt. Einstellen, Beschlag- oder Oberflächenreparatur, Arbeiten am Zargenanschluss sowie ein Teil- oder Komplettaustausch bleiben getrennte Optionen. Welche davon fachgerecht und wirtschaftlich ist, entscheidet der belegte Einzelfall und nicht ein schematisches Beispiel.
 
 ## Handlungsempfehlungen
 

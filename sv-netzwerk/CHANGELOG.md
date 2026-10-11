@@ -2,6 +2,7 @@
 - Fachbeitrag „Innentüren, Zargen und Beschläge: Schäden fachlich prüfen und Nachbesserung abgrenzen“ ergänzt
 - Türblatt, Zarge, Beschläge, Passung, Oberfläche, Reparaturgrenze und schadenbedingte Kosten getrennt dokumentiert
 - DIN 18101:2014-08, DIN 68706-1/-2:2020-06, DIN 18355:2019-09 und RAL-GZ 426:2026-02 mit Status und praktischer Bedeutung eingeordnet
+- Prüfablauf ohne erfundene Fälle oder Messwerte ausschließlich auf belegte Objektdaten ausgerichtet
 - Beitragsbild, Fachwissensübersicht, Suchindex und Sitemap-Integration ergänzt
 - LinkedIn-Begleittext als `prepared-not-posted` abgelegt
 
