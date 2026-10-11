@@ -51,13 +51,13 @@
     if (heading) heading.textContent = 'Outlook-Mails hochladen / ablegen';
     if (hint) hint.textContent = 'MSG- und EML-Dateien zum aktiven Fall speichern und abgelegte Mails ansehen';
   }
-  const offers = makeGroup('vf-offer-group', 'Angebot / KVA prüfen', 'Prüfung mit Entscheidung, Freigabe-E-Mail oder technischem Formular', [
+  const offers = makeGroup('vf-offer-group', '6 · Angebot / KVA prüfen', 'Prüfung mit Entscheidung, Freigabe-E-Mail oder technischem Formular', [
     { label: 'Angebot prüfen und Entscheidung / E-Mail vorbereiten', panel: document.getElementById('dr-offer') },
     { label: 'Freigabe-E-Mail an Sanierer vorbereiten', panel: document.querySelector('.vf-kva') },
     { label: 'Technische Freigabe / Formular für VN', panel: document.querySelector('.vf-technical-release') },
   ], document.querySelector('.vf-release-grid'));
   const invoice = document.getElementById('dr-invoice');
-  if (invoice) { const step = invoice.querySelector('summary b'); if (step) step.textContent = 'R'; }
+  if (invoice) { const step = invoice.querySelector('summary b'); if (step) step.textContent = '7'; }
   document.getElementById('vf-task-reply')?.addEventListener('click', () => mail?.reveal(0));
   document.getElementById('vf-task-kva')?.addEventListener('click', () => offers?.reveal(2));
   // Existing mail history reply actions fill this input and then focus it.

@@ -352,6 +352,7 @@ jobs:
           test "$status" = 200
           grep -Fq 'case-action-groups.js?v=20261011-1' "$page"
           grep -Fq 'case-action-groups.css?v=20261011-1' "$page"
+          grep -Fq 'id="vf-analysis" class="vf-card vf-collapsible is-collapsed"' "$page"
           echo "/intern/versicherungsfaelle/: HTTP $status, vereinfachte Fallaktionen geladen"
           curl --max-time 20 --silent --show-error -b "$jar" -X POST -o /dev/null 'https://www.sv-netzwerk.eu/intern/api/auth.php?action=logout' || true
           rm -f "$jar" "$page"
