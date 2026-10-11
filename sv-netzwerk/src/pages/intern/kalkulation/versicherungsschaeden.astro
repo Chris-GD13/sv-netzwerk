@@ -12,7 +12,8 @@ const groups = [...new Set(positions.map((p) => p.group))];
     <section class="vs-head"><div><p class="vs-kicker">Versicherungsschäden</p><h1>Kalkulation Versicherungsschäden</h1><p>Leckageortung, Trocknung, Sanierung, Rückbau und weitere typische Schadenleistungen mit fest hinterlegten Netto-Einheitspreisen.</p></div><div class="vs-case-tools"><div id="vs-case" class="vs-case">Freie Kalkulation · keinem Fall zugeordnet</div><button id="vs-case-calc" class="primary vs-case-calc" type="button" disabled>Diesen Fall kalkulieren</button><small id="vs-case-calc-note">Aktiven Wasserschaden öffnen, um den Schnelldurchgang zu starten.</small></div></section>
     <section class="vs-card vs-catalog">
       <div class="vs-tools"><label>Position suchen<input id="vs-search" type="search" placeholder="z. B. Trocknung, Rückbau, Leckage …"></label><button id="vs-clear" class="secondary" type="button">Auswahl löschen</button></div>
-      <div class="vs-groups"><button class="group on" data-group="Alle">Alle</button>{groups.map((group) => <button class="group" data-group={group}>{group}</button>)}</div>
+      <label class="vs-category">Leistungsbereich<select id="vs-category"><option value="Alle">Alle Leistungen</option>{groups.map(group => <option value={group}>{group}</option>)}</select></label>
+      <div class="vs-groups" hidden><button class="group on" data-group="Alle">Alle</button>{groups.map((group) => <button class="group" data-group={group}>{group}</button>)}</div>
       <div id="vs-list" class="vs-list"></div>
       <div class="vs-actions"><button id="vs-add" class="primary" type="button">Auswahl übernehmen</button><span id="vs-state"></span></div>
       <p class="vs-source">Preisstand 2025/2026. Festpreise ohne Regionalfaktor. Positionen ohne Listenpreis bleiben editierbare Freipositionen. Prozentpositionen werden auf den als Menge eingetragenen Fremdkostenbetrag berechnet.</p>
@@ -22,15 +23,17 @@ const groups = [...new Set(positions.map((p) => p.group))];
       <div class="title-row"><div><p class="print-kicker">Versicherungsschäden</p><h2>Kalkulation</h2></div><button id="vs-manual" class="secondary" type="button">Freie Position hinzufügen</button></div>
       <div class="table-wrap"><table><thead><tr><th>Pos.</th><th>Leistung</th><th>Menge</th><th>Einheit</th><th>EP netto</th><th>Gesamt netto</th><th></th></tr></thead><tbody id="vs-lines"></tbody></table></div>
       <div class="summary"><label>USt. %<input id="vs-vat" type="number" value="19"></label><div><span>Netto</span><strong id="vs-net">0,00 €</strong></div><div><span>USt.</span><strong id="vs-tax">0,00 €</strong></div><div class="grand"><span>Brutto</span><strong id="vs-gross">0,00 €</strong></div></div>
+      <details class="vs-completion"><summary>Hinweise, Abgeltung und Unterschrift</summary>
       <div class="notes"><strong>Hinweise / Vereinbarungen</strong><div class="checks"><label><input type="checkbox" class="note-choice" value="Kalkulation vor Ort mit dem VN besprochen; der VN stimmt der Kalkulation zu."> Kalkulation vor Ort mit VN besprochen; VN stimmt der Kalkulation zu.</label><label><input type="checkbox" class="note-choice" value="Die Kalkulation verwendet fest hinterlegte Einheitspreise für typische Leistungen bei Versicherungsschäden."> Fest hinterlegte Einheitspreise für typische Leistungen bei Versicherungsschäden verwendet.</label><label><input type="checkbox" class="note-choice" value="Der ausgewiesene Betrag wird als pauschale Abgeltung an den VN ausgezahlt."> Betrag wird als pauschale Abgeltung an den VN ausgezahlt.</label><label><input type="checkbox" class="note-choice" value="Die Auszahlung bzw. Abgeltungsvereinbarung steht unter dem Vorbehalt der Zustimmung des Versicherers."> Auszahlung/Abgeltung vorbehaltlich Zustimmung des Versicherers.</label><label><input type="checkbox" class="note-choice" value="Mit der vereinbarten Zahlung sind ausschließlich die in dieser Kalkulation ausdrücklich als abgegolten bezeichneten Schadenpositionen abschließend reguliert."> Die ausdrücklich als abgegolten bezeichneten Schadenpositionen sind abschließend reguliert.</label></div><div class="optical-settlement"><div><strong>Optischer Schaden</strong><span>Fügt eine editierbare Abgeltungsvereinbarung für ausdrücklich bezeichnete Positionen ein.</span></div><button type="button" class="secondary" data-optical-settlement-template data-note-target="vs-note">Mustertext einfügen</button></div><label class="note">Zusätzlicher Hinweis / Abgeltungsvermerk<textarea id="vs-note" rows="3" data-auto-grow></textarea></label></div>
       <div class="signatures" data-signature-section><div class="sign-options"><label><input type="checkbox" data-signature-alternative> Keine Unterschrift erforderlich</label><label><input type="checkbox" data-signature-alternative> Zur Unterzeichnung per E-Mail an VN/Bevollmächtigten versandt</label><label><input id="vs-sign-on-site" type="checkbox" data-signature-toggle> VN/Bevollmächtigter unterschreibt jetzt vor Ort</label></div><div class="signature-capture" data-signature-capture hidden><div class="signature-capture-head"><strong>Unterschrift VN oder Bevollmächtigter</strong><button type="button" class="secondary" data-signature-clear>Unterschrift löschen</button></div><canvas data-signature-canvas aria-label="Unterschriftenfeld für VN oder Bevollmächtigten"></canvas><small>Bitte mit Finger oder Stift im Feld unterschreiben.</small></div><label class="date">Datum<input id="vs-date" type="date"></label><div class="sign-grid"><div data-signature-print><div class="sig-line"></div><strong>VN oder Bevollmächtigter</strong></div><div><input id="vs-regulator" class="sig-name" placeholder="Name Regulierer"><div class="sig-line"></div><strong>Regulierer</strong></div></div></div>
+      </details>
       <div class="footer-actions"><button id="vs-save" class="primary" type="button">Kalkulation speichern</button><button id="vs-print" class="secondary" type="button">Drucken / PDF</button><span id="vs-save-state"></span></div>
     </section>
-    <section class="vs-card vs-history">
+    <details class="vs-card vs-history"><summary>Gespeicherte Kalkulationen</summary>
       <div class="title-row"><div><p class="print-kicker">Fallakte</p><h2>Gespeicherte Kalkulationen</h2></div><button id="vs-history-refresh" class="secondary" type="button">Neu laden</button></div>
       <p class="vs-history-help">Hier stehen die gespeicherten Kalkulationen des aktiven Falls. „Weiter bearbeiten“ lädt Positionen, Mengen, Preise, Umsatzsteuer und Hinweise wieder in die Kalkulation oben.</p>
       <div id="vs-history" class="vs-history-list">Gespeicherte Kalkulationen werden geladen …</div>
-    </section>
+    </details>
     <dialog id="vs-view-dialog" class="vs-dialog"><div class="vs-dialog-head"><div><p class="print-kicker">Gespeicherte Kalkulation</p><h2 id="vs-view-title">Kalkulation</h2></div><button id="vs-view-close" class="secondary" type="button">Schließen</button></div><div id="vs-view-content"></div></dialog>
   </main>
 </InternalLayout>
@@ -62,3 +65,13 @@ const groups = [...new Set(positions.map((p) => p.group))];
 </script>
 <script is:inline src="/intern/signature-pad.js"></script>
 <script is:inline src="/intern/calculation-note-helper.js"></script>
+
+<script is:inline>
+document.getElementById('vs-category')?.addEventListener('change', event => {
+  const group = event.target.value;
+  [...document.querySelectorAll('.vs-groups [data-group]')].find(button => button.dataset.group === group)?.click();
+});
+</script>
+<style is:global>
+.vs-groups[hidden]{display:none!important}.vs-category{display:grid;gap:5px;max-width:460px;margin:12px 0;font-weight:750}.vs-category select{width:100%;padding:10px;border:1px solid #bdcbd6;border-radius:5px;background:#fff;color:#17324a;font:inherit}.vs-completion{margin-top:16px;border-top:1px solid #d9dde1;padding-top:12px}.vs-completion summary,.vs-history>summary{font-weight:800;cursor:pointer}.vs-history[open]>summary{margin-bottom:12px}.vs-history{padding:12px 16px}.vs-history .title-row h2{display:none}@media print{.vs-history,.vs-completion>summary{display:none!important}.vs-completion{border:0;padding:0}.vs-completion>*:not(summary){display:block!important}}
+</style>

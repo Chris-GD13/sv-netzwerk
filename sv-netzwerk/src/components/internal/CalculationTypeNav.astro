@@ -13,18 +13,22 @@ const entries = [
 ] as const;
 ---
 <section class="calculation-type-nav" aria-label="Kalkulationsart">
-  <strong>Kalkulationsart</strong>
-  <nav>
-    {entries.map((entry) => active === entry.id
-      ? <span class="active" aria-current="page">{entry.label}</span>
-      : <a href={entry.href}>{entry.label}</a>)}
-  </nav>
+  <label>Berechnungsart
+    <select data-calculation-type aria-label="Berechnungsart auswählen">
+      {entries.map((entry) => <option value={entry.href} selected={active === entry.id}>{entry.label}</option>)}
+    </select>
+  </label>
+  <noscript><nav>{entries.map((entry) => <a href={entry.href}>{entry.label}</a>)}</nav></noscript>
 </section>
+<script is:inline>
+document.querySelectorAll('[data-calculation-type]').forEach(select => {
+  select.addEventListener('change', () => {
+    const url = new URL(select.value, location.origin);
+    url.search = location.search;
+    location.assign(url.pathname + url.search);
+  });
+});
+</script>
 <style is:global>
-  .calculation-type-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid #dce5ec;border-radius:15px;padding:18px;margin-bottom:16px;color:#17324a}
-  .calculation-type-nav nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
-  .calculation-type-nav a,.calculation-type-nav span{border:1px solid #b8c7d2;border-radius:9px;padding:9px 13px;font-weight:800;text-decoration:none;color:#17324a;white-space:nowrap}
-  .calculation-type-nav .active{background:#17324a;color:#fff;border-color:#17324a}
-  @media(max-width:760px){.calculation-type-nav{align-items:flex-start;flex-direction:column}.calculation-type-nav nav{justify-content:flex-start}}
-  @media print{.calculation-type-nav{display:none!important}}
+.calculation-type-nav{margin-bottom:16px;color:#17324a}.calculation-type-nav label{display:grid;grid-template-columns:auto minmax(200px,460px);align-items:center;gap:12px;font-weight:800}.calculation-type-nav select{width:100%;min-width:0;border:1px solid #b8c7d2;border-radius:5px;background:#fff;padding:10px 12px;font:inherit;color:#17324a}.calculation-type-nav nav{display:flex;flex-wrap:wrap;gap:10px}@media(max-width:760px){.calculation-type-nav label{grid-template-columns:1fr;gap:5px}}@media print{.calculation-type-nav{display:none!important}}
 </style>

@@ -32,6 +32,7 @@ assert(paritaetCatalog.some((row) => /Duschkabine, Glaswände/.test(row.name) &&
 assert(page.includes('Korrekturfaktor 0,8–1,2') && page.includes('Begrenzende Restlebensdauer') && page.includes('Teilreparatur ohne Verlängerung der Nutzungsdauer'));
 assert(page.includes('Paritätische Lebensdauertabelle') && page.includes('Gewerbe, stark beansprucht −50 %'));
 assert(page.includes('svnet-time-value-transfer') && calculation.includes('svnet-time-value-transfer'));
-assert(layout.includes("label: 'Zeitwertberechnung'") && layout.includes("href: '/intern/zeitwertberechnung/'"));
+const typeNav = await readFile(new URL('../src/components/internal/CalculationTypeNav.astro', import.meta.url), 'utf8');
+assert(typeNav.includes("label: 'Zeitwertberechnung'") && typeNav.includes("href: '/intern/zeitwertberechnung/'"));
 
 console.log('Zeitwertberechnung: BTE-Katalog, Formeln, Begründungstext und Kalkulationsübernahme geprüft.');

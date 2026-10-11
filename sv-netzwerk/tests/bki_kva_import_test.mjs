@@ -62,7 +62,7 @@ assert(settlementPdf.includes('Der Freigabebetrag wird auf den positionsweise er
 assert(settlementPdf.includes('darf den ursprünglichen KVA-Betrag nicht überschreiten'), 'Eine Freigabe oberhalb des ursprünglichen KVA-Betrags muss serverseitig abgelehnt werden.');
 assert(settlementPdf.includes("'Prüfergebnis'") && settlementPdf.includes('wurde positionsweise mit BKI-Preisen nachkalkuliert'), 'Die KVA-Prüfung muss einen neutralen Prüftext ohne Abgeltung erzeugen.');
 assert(settlementPdf.includes("'Geprüft:'") && settlementPdf.includes("'Sachverständiger & Regulierer'") && settlementPdf.includes("if($isKvaReview){needSpace"), 'Die KVA-Prüfung darf statt Unterschriftenfeldern nur den Prüfvermerk des Sachverständigen zeigen.');
-assert(page.includes("card.querySelector('.bk-collapse-toggle')?.addEventListener('click'") && page.includes("data.calculations||data.items||[]"), 'Gespeicherte Kalkulationen müssen beim Aufklappen zuverlässig neu geladen werden.');
+assert(page.includes("addEventListener('toggle'") && page.includes("data.calculations||data.items||[]"), 'Gespeicherte Kalkulationen müssen beim Aufklappen zuverlässig neu geladen werden.');
 
 assert(noteHelper.includes("if(line.type==='section')return;"), 'Abschnittsüberschriften dürfen nicht in die Abgeltungsberechnung eingehen.');
 assert(!noteHelper.includes("if(event.target.matches?.('input[data-k]'))updateSettlementNote()"), 'Positionsänderungen dürfen den Mustertext nicht automatisch verändern.');
