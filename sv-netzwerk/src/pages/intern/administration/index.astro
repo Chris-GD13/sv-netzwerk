@@ -1,0 +1,33 @@
+---
+import InternalLayout from '../../../layouts/InternalLayout.astro';
+---
+<InternalLayout title="Administration" description="Verwaltung verbindlicher Arbeitsvorgaben und Originalvorlagen.">
+<section class="administration-page">
+  <header><p class="intern-header__eyebrow">ADMINISTRATION</p><h1>Arbeitsvorgaben und Vorlagen</h1></header>
+  <section id="case-rules-import" class="knowledge-card" hidden>
+    <h2>Verbindliche Arbeitsvorgaben</h2>
+    <p>Import in die bestehende Wissensbasis. Originale bleiben unverändert; gleiche Dateien werden nicht doppelt gespeichert. Die Fallanalyse liest den gesamten Regelbestand einschließlich PDF- und Office-Originalen. Fachliche Vollständigkeit vor dem Start prüfen.</p>
+    <p id="case-rules-status" role="status"></p>
+    <form id="case-rules-form">
+      <div class="knowledge-controls">
+        <label>Ablagebereich<select id="case-rules-target">
+          <option value="standards">Standards · ab sofort immer gültig</option>
+          <option value="knowledge">KI-Wissensbasis</option>
+          <option value="project">SV-Netzwerk-Projekt</option>
+          <option value="templates">Originalvorlagen</option>
+        </select></label>
+        <label>Originaldateien (MD, TXT, PDF, DOCX, XLSX, PPTX; höchstens 30 MB pro Datei)<input id="case-rules-files" type="file" multiple accept=".md,.txt,.pdf,.docx,.xlsx,.pptx" required /></label>
+      </div>
+      <p><label><input id="case-rules-replace" type="checkbox" /> Andere gleichnamige Fassung ersetzen (IONOS sichert die Vorversion).</label></p>
+      <button type="submit" class="knowledge-refresh">Originale auf IONOS importieren</button>
+      <button id="case-rules-refresh" type="button" class="knowledge-refresh">IONOS-Bestand prüfen</button>
+    </form>
+    <ul id="case-rules-results" aria-live="polite"></ul>
+    <details><summary>Vorhandene Vorgaben und Originalvorlagen</summary><ul id="case-rules-list"></ul></details>
+  </section>
+</section>
+<style>
+.administration-page{max-width:1200px;margin:auto;padding:28px 22px}.administration-page h1{margin:0 0 20px;color:#17324a}.knowledge-card{padding:20px;border:1px solid #d6dce1;border-top:4px solid #f59a23;background:#fff}.knowledge-card[hidden]{display:none}.knowledge-controls{display:grid;grid-template-columns:280px minmax(240px,1fr);gap:12px}.knowledge-controls label{display:grid;gap:5px;font-weight:800;font-size:.82rem}.knowledge-controls input,.knowledge-controls select{min-width:0;width:100%;box-sizing:border-box;border:1px solid #bdcbd6;border-radius:3px;padding:10px;font:inherit;background:#fff}.knowledge-refresh{border:1px solid #315f86;border-radius:3px;background:#fff;color:#17324a;padding:8px 12px;font:inherit;font-weight:800;cursor:pointer}.knowledge-refresh:disabled{opacity:.6;cursor:wait}li{overflow-wrap:anywhere}@media(max-width:700px){.administration-page{padding:20px 12px}.knowledge-controls{grid-template-columns:1fr}}
+</style>
+<script is:inline src="/intern/case-rules-import.js?v=20261011-admin"></script>
+</InternalLayout>

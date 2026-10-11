@@ -29,7 +29,7 @@
       element('case-rules-list').replaceChildren();
       for (const file of data.files) item(element('case-rules-list'), file.path);
     } catch (error) {
-      if (initial && error.status === 403) return;
+      if (error.status === 401 || error.status === 403) { panel.hidden = true; return; }
       panel.hidden = false;
       status.textContent = `Bestandsprüfung fehlgeschlagen: ${error.message}`;
     }

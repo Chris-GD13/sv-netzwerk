@@ -25,7 +25,10 @@ const walk = (directory) => {
 
     const html = fs.readFileSync(absolute, 'utf8');
     const phpFile = path.join(directory, 'index.php');
-    fs.writeFileSync(phpFile, phpGuard + html, 'utf8');
+    const guard = directory === path.join(internRoot, 'administration')
+      ? "<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/intern/administration_check.php'; ?>\n"
+      : phpGuard;
+    fs.writeFileSync(phpFile, guard + html, 'utf8');
     fs.rmSync(absolute);
     protectedPages += 1;
   }

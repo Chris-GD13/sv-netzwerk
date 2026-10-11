@@ -3,9 +3,14 @@ declare(strict_types=1);
 require_once __DIR__.'/config.php';
 require_once __DIR__.'/ionos-storage.php';
 require_once __DIR__.'/case-rules.php';
+require_once __DIR__.'/administration-access.php';
 commonHeaders();
 $user = requireAuth();
-if (($user['role'] ?? '') !== 'administrator') apiError(403, 'Nur Administratoren dürfen verbindliche Vorgaben importieren.');
+if (($_GET['action'] ?? '') === 'access') {
+    if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'GET') apiError(405, 'Nur GET ist zulässig.');
+    apiJson(['ok'=>true, 'visible'=>svnetCanManageWorkRules($user)]);
+}
+if (!svnetCanManageWorkRules($user)) apiError(403, 'Verbindliche Vorgaben sind für dieses Benutzerkonto nicht freigegeben.');
 try {
     if (!ionosStorageEnabled()) throw new RuntimeException('Der geprüfte IONOS-Dateibestand ist nicht aktiv.');
     if (($_SERVER['REQUEST_METHOD'] ?? '') === 'GET') {

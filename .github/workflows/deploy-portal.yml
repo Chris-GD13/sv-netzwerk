@@ -105,6 +105,7 @@ jobs:
           php tests/case_work_docx_test.php
           node tests/case_work_ui_test.mjs
           php tests/case_rules_import_test.php
+          php tests/administration_access_test.php
           node tests/claimsforce_single_scope_test.mjs
           node tests/claimsforce_worker_handshake_test.mjs
           node tests/claimsforce_source_restrictions_test.mjs
@@ -120,6 +121,12 @@ jobs:
           test -f deploy-portal/.well-known/oauth-protected-resource/intern/mcp/index.php
           test -f deploy-portal/intern/versicherungsfaelle/index.php
           test -f deploy-portal/intern/auth_check.php
+          test -f deploy-portal/intern/administration/index.php
+          grep -Fq '/intern/administration_check.php' deploy-portal/intern/administration/index.php
+          if grep -Fq 'id="case-rules-import"' deploy-portal/intern/versicherungswissen/index.php; then
+            echo "::error::Arbeitsvorgaben dürfen nicht im Versicherungswissen stehen."
+            exit 1
+          fi
           test -f deploy-portal/intern/login/index.html
           test "$(head -n 1 deploy-portal/intern/versicherungsfaelle/index.php)" = "<?php require_once \$_SERVER['DOCUMENT_ROOT'] . '/intern/auth_check.php'; ?>"
           test -z "$(find deploy-portal/intern -name index.html ! -path '*/login/index.html' -print -quit)"
@@ -316,9 +323,22 @@ jobs:
           test "$status" = "200"
           grep -Fq 'Tagescockpit' "$page"
           echo "/intern/tagescockpit/: HTTP $status, Dashboard geladen"
-          status="$(curl --max-time 60 --silent --show-error -b "$jar" -o "$page" -w '%{http_code}' https://www.sv-netzwerk.eu/intern/api/case-rules-import.php)"
+          status="$(curl --max-time 20 --silent --show-error -b "$jar" -o "$page" -w '%{http_code}' 'https://www.sv-netzwerk.eu/intern/api/case-rules-import.php?action=access')"
           test "$status" = "200"
-          node -e "const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); if(!d.ok || !d.root || !Array.isArray(d.files)) process.exit(1); console.log('IONOS-Regelbestand erreichbar: '+d.files.length+' Originale; Master vorhanden: '+Boolean(d.ready)); if(d.message) console.log('IONOS-Regelhinweis: '+d.message);" "$page"
+          visible="$(node -e "const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); if(!d.ok || typeof d.visible!=='boolean') process.exit(1); console.log(d.visible);" "$page")"
+          expected_visible="$(node -e "const e=(process.env.PORTAL_CHECK_EMAIL||'').trim().toLowerCase(); console.log(['cw@sv-schuett.eu','info@sv-schuett.eu'].includes(e));")"
+          test "$visible" = "$expected_visible"
+          expected_status=403
+          if [ "$visible" = "true" ]; then expected_status=200; fi
+          status="$(curl --max-time 20 --max-redirs 0 --silent --show-error -b "$jar" -o "$page" -w '%{http_code}' https://www.sv-netzwerk.eu/intern/administration/)"
+          test "$status" = "$expected_status"
+          if [ "$visible" = "true" ]; then grep -Fq 'id="case-rules-import"' "$page"; fi
+          echo "/intern/administration/: HTTP $status, Kontofreigabe geprüft"
+          status="$(curl --max-time 60 --silent --show-error -b "$jar" -o "$page" -w '%{http_code}' https://www.sv-netzwerk.eu/intern/api/case-rules-import.php)"
+          test "$status" = "$expected_status"
+          if [ "$visible" = "true" ]; then
+            node -e "const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); if(!d.ok || !d.root || !Array.isArray(d.files)) process.exit(1); console.log('IONOS-Regelbestand erreichbar: '+d.files.length+' Originale; Master vorhanden: '+Boolean(d.ready));" "$page"
+          fi
           curl --max-time 20 --silent --show-error -b "$jar" -X POST -o /dev/null 'https://www.sv-netzwerk.eu/intern/api/auth.php?action=logout' || true
           rm -f "$jar" "$page"
           zip_live="$(mktemp)"

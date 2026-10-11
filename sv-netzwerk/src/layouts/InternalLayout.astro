@@ -52,6 +52,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar { display: flex; flex-direction: column; justify-content: flex-start; gap: 0; padding: 22px 14px; background: #f0f1f2; border-right: 1px solid #d9dde1; }
       .intern-sidebar__nav { display: grid; gap: 4px; }
       .intern-sidebar__nav a { position: relative; display: flex; align-items: center; gap: 11px; padding: 11px 13px; color: #263746; text-decoration: none; font-weight: 700; border: 1px solid transparent; border-radius: 3px; }
+      .intern-sidebar__nav a[hidden] { display: none; }
       .intern-sidebar__nav a:hover { background: #e7e9eb; }
       .intern-sidebar__nav a.active { background: #fff; border-color: #d9dde1; }
       .intern-sidebar__nav a.active::before { content: ''; position: absolute; left: -1px; top: 8px; bottom: 8px; width: 3px; background: #f59a23; }
@@ -190,6 +191,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       <aside class="intern-sidebar">
         <nav aria-label="Interne Navigation" class="intern-sidebar__nav">
           {internalLinks.map((link) => link.divider ? <div class="intern-sidebar__divider" aria-hidden="true"></div> : link.dynamic === 'whatsapp' ? <a id="intern-whatsapp-link" class:list={{ active: isActive('/intern/whatsapp/') }} href="/intern/whatsapp/" aria-current={isActive('/intern/whatsapp/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : link.dynamic === 'settlement' ? <a id="intern-settlement-link" class:list={{ active: isActive('/intern/abrechnungen/') }} href="/intern/abrechnungen/" aria-current={isActive('/intern/abrechnungen/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : <a class:list={{ active: isActive(link.href ?? ''), sub: link.sub }} href={link.href ?? '#'} aria-current={isActive(link.href ?? '') ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
+          <a id="intern-administration-link" class:list={{ active: isActive('/intern/administration/') }} href="/intern/administration/" aria-current={isActive('/intern/administration/') ? 'page' : undefined} hidden><span>⚙</span>Administration</a>
           <slot name="sidebar-extra" />
         </nav>
       </aside>
@@ -292,6 +294,13 @@ const isActive = (href: string) => currentPath.startsWith(href);
         }
       };
       loadRevenueSummary();
+      const administrationLink = document.getElementById('intern-administration-link');
+      if (administrationLink instanceof HTMLElement) {
+        fetch('/intern/api/case-rules-import.php?action=access', { credentials: 'same-origin', cache: 'no-store' })
+          .then((response) => response.ok ? response.json() : Promise.reject())
+          .then((data) => { administrationLink.hidden = data.ok !== true || data.visible !== true; })
+          .catch(() => { administrationLink.hidden = true; });
+      }
       if (whatsappLink instanceof HTMLElement) {
         fetch('/intern/api/whatsapp-case.php?action=menu_access', { credentials: 'same-origin', cache: 'no-store' })
           .then((response) => response.ok ? response.json() : Promise.reject())
