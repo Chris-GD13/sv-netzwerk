@@ -90,6 +90,9 @@ jobs:
           php tests/gf_case_isolation_test.php
           php tests/kva_bundle_test.php
           php tests/kva_openai_error_test.php
+          php tests/private_orders_test.php
+          node tests/work_center_test.mjs
+          node tests/claimsforce_resume_controls_test.mjs
           php tests/document_review_test.php
           php tests/document_review_workflow_test.php
           php tests/review_sender_test.php
@@ -292,6 +295,19 @@ jobs:
           echo "SFTP-Zielverzeichnis: $deploy_dir"
           timeout 1200s lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $deploy_dir; put dist/.well-known/.htaccess -o .well-known/.htaccess; mirror --reverse --overwrite --parallel=4 --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern/photos --exclude-glob intern/photos/** --exclude-glob intern/api/config.php deploy-portal/ .; put deploy-portal/intern/versicherungsfaelle/index.php -o intern/versicherungsfaelle/index.php; put deploy-portal/intern/tagescockpit/index.php -o intern/tagescockpit/index.php; put deploy-portal/intern/arbeitszentrale/index.php -o intern/arbeitszentrale/index.php; put deploy-portal/intern/claimsforce-central.js -o intern/claimsforce-central.js; put deploy-portal/intern/deploy-version.txt -o intern/deploy-version.txt; quit"
 
+      - name: Bestehende Privataufträge einmalig einsortieren und prüfen
+        env:
+          SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          target="/tmp/svnet-private-sort-${GITHUB_RUN_ID}.php"
+          scp -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -P "$SFTP_PORT" scripts/sort-private-orders.php "$SFTP_USERNAME@$SFTP_HOST:$target"
+          output="$(ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT" "$SFTP_USERNAME@$SFTP_HOST" "php '$target' '$SFTP_REMOTE_DIR'; rm -f '$target'")"
+          printf '%s\n' "$output"
+          printf '%s\n' "$output" | grep -Fq PRIVATE_SORT_COMPLETE
+
       - name: Portal online verifizieren
         env:
           EXPECTED_SHA: ${{ github.sha }}
@@ -354,6 +370,15 @@ jobs:
           grep -Fq 'case-action-groups.css?v=20261011-2' "$page"
           grep -Fq 'id="vf-analysis" class="vf-card vf-collapsible is-collapsed"' "$page"
           echo "/intern/versicherungsfaelle/: HTTP $status, vereinfachte Fallaktionen geladen"
+          status="$(curl --max-time 20 --max-redirs 0 --silent --show-error -b "$jar" -o "$page" -w '%{http_code}' https://www.sv-netzwerk.eu/intern/privatauftraege/)"
+          test "$status" = 200
+          grep -Fq 'id="alphabet"' "$page"
+          grep -Fq 'id="breadcrumbs"' "$page"
+          status="$(curl --max-time 20 --max-redirs 0 --silent --show-error -b "$jar" -o "$page" -w '%{http_code}' https://www.sv-netzwerk.eu/intern/arbeitszentrale/)"
+          test "$status" = 200
+          grep -Fq 'id="wc-open"' "$page"
+          if grep -Fq 'Vollständigkeitsquote' "$page"; then exit 1; fi
+          echo "Privataufträge und vereinfachte Arbeitsorganisation online geprüft"
           curl --max-time 20 --silent --show-error -b "$jar" -X POST -o /dev/null 'https://www.sv-netzwerk.eu/intern/api/auth.php?action=logout' || true
           rm -f "$jar" "$page"
           zip_live="$(mktemp)"

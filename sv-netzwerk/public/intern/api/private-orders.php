@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/profile-routing.php';
+require_once __DIR__ . '/private-order-classification.php';
 commonHeaders();
 $user = requireAuth();
 $profile = svnetUserProfile($user);
@@ -13,72 +14,47 @@ $roots = [
 if (!isset($roots[$profile])) apiError(403, 'Für dieses Benutzerprofil sind keine Privataufträge freigegeben.');
 $action = (string)($_GET['action'] ?? 'list');
 
-function poConfig(string $key, string $default = ''): string { $v = getenv($key); return $v === false || trim($v) === '' ? $default : trim($v); }
-function poToken(): string {
-    static $token = null; if (is_string($token) && $token !== '') return $token;
-    $tenant = poConfig('MS_TENANT_ID'); $client = poConfig('MS_CLIENT_ID'); $secret = poConfig('MS_CLIENT_SECRET');
-    if ($tenant === '' || $client === '' || $secret === '') apiError(503, 'Die SharePoint-Verbindung ist auf dem Server noch nicht vollständig eingerichtet.');
-    $ch = curl_init(msLoginBase() . '/' . rawurlencode($tenant) . '/oauth2/v2.0/token');
-    curl_setopt_array($ch, [CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>30,CURLOPT_HTTPHEADER=>['Content-Type: application/x-www-form-urlencoded'],CURLOPT_POSTFIELDS=>http_build_query(['client_id'=>$client,'client_secret'=>$secret,'scope'=>'https://graph.microsoft.com/.default','grant_type'=>'client_credentials'])]);
-    $body = curl_exec($ch); $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch); $json = is_string($body) ? json_decode($body, true) : null;
-    if ($status < 200 || $status >= 300 || !is_array($json) || empty($json['access_token'])) apiError(503, 'Microsoft-Anmeldung für die Privataufträge fehlgeschlagen.');
-    return $token = (string)$json['access_token'];
-}
-function poRequest(string $url, bool $binary = false): array|string {
-    $ch = curl_init($url); curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true,CURLOPT_FOLLOWLOCATION=>true,CURLOPT_TIMEOUT=>$binary?120:45,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.poToken()]]);
-    $body = curl_exec($ch); $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); $type = (string)curl_getinfo($ch, CURLINFO_CONTENT_TYPE); curl_close($ch);
-    if ($status < 200 || $status >= 300 || !is_string($body)) apiError(503, 'Privataufträge konnten nicht aus OneDrive gelesen werden (HTTP '.$status.').');
-    if ($binary) return ['body'=>$body,'content_type'=>$type]; $json = json_decode($body, true); if (!is_array($json)) apiError(503, 'OneDrive hat eine ungültige Antwort geliefert.'); return $json;
-}
-function poRequestJson(string $method, string $url, array $payload): array {
-    $ch=curl_init($url); curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_TIMEOUT=>60,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.poToken(),'Content-Type: application/json'],CURLOPT_POSTFIELDS=>json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)]);
-    $body=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);$json=is_string($body)?json_decode($body,true):null;
-    if($status<200||$status>=300||!is_array($json)) apiError(503,'Privatauftrag konnte in OneDrive nicht angelegt werden (HTTP '.$status.').'); return $json;
-}
-function poRequestUpload(string $url,string $name,string $bytes,string $mime): array {
-    $ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>'PUT',CURLOPT_TIMEOUT=>180,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.poToken(),'Content-Type'=>($mime!==''?$mime:'application/octet-stream'),'Content-Length'=>strlen($bytes)],CURLOPT_POSTFIELDS=>$bytes]);$body=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);$json=is_string($body)?json_decode($body,true):null;if($status<200||$status>=300||!is_array($json))apiError(503,'Datei konnte nicht in den Privatauftrag hochgeladen werden (HTTP '.$status.').');return $json;
-}
-function poDriveId(): string { static $id=null; if (is_string($id)&&$id!=='') return $id; if (($id=poConfig('MS_SHAREPOINT_DRIVE_ID'))!=='') return $id; $host=poConfig('MS_SHAREPOINT_HOST','sv1schuett.sharepoint.com'); $path=poConfig('MS_SHAREPOINT_SITE_PATH','/sites/SVBroSchtt'); $site=poRequest('https://graph.microsoft.com/v1.0/sites/'.rawurlencode($host).':'.str_replace('%2F','/',rawurlencode($path)).'?$select=id'); $d=poRequest('https://graph.microsoft.com/v1.0/sites/'.rawurlencode((string)($site['id']??'')).'/drive?$select=id'); $id=(string)($d['id']??''); if($id==='')apiError(503,'Die SharePoint-Dokumentbibliothek wurde nicht gefunden.'); return $id; }
-function poItemByPath(string $path): array { $parent=''; $match=null; foreach(array_values(array_filter(explode('/',trim($path,'/')),fn($p)=>$p!=='')) as $part){$url='https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).($parent===''?'/root/children':'/items/'.rawurlencode($parent).'/children'). '?$select=id,name,size,file,folder,createdDateTime,lastModifiedDateTime,webUrl&$top=200'; $match=null; do{$page=poRequest($url);foreach(($page['value']??[]) as $item){if(is_array($item)&&strcasecmp((string)($item['name']??''),$part)===0){$match=$item;break 2;}}$url=(string)($page['@odata.nextLink']??'');}while($url!==''); if(!is_array($match)||empty($match['id']))apiError(404,'Privatauftragsordner nicht gefunden: '.$part);$parent=(string)$match['id'];} return $match?:[]; }
-function poTree(string $id,string $path='',int $depth=0): array { if($depth>8)return []; $url='https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id).'/children?$select=id,name,size,file,folder,createdDateTime,lastModifiedDateTime,webUrl&$top=200';$out=[];do{$page=poRequest($url);foreach(($page['value']??[]) as $item){if(!is_array($item)||empty($item['id']))continue;$name=(string)($item['name']??'');$row=['id'=>(string)$item['id'],'name'=>$name,'path'=>ltrim($path.'/'.$name,'/'),'folder'=>isset($item['folder']),'size'=>(int)($item['size']??0),'modified'=>(string)($item['lastModifiedDateTime']??''),'webUrl'=>(string)($item['webUrl']??'')];if($row['folder'])$row['children']=poTree($row['id'],$row['path'],$depth+1);$out[]=$row;}$url=(string)($page['@odata.nextLink']??'');}while($url!=='');usort($out,fn($a,$b)=>[$b['folder'],$a['name']]<=>[$a['folder'],$b['name']]);return $out; }
-function poFind(array $rows,string $id): ?array { foreach($rows as $row){ if(hash_equals((string)($row['id']??''),$id)) return $row; if(!empty($row['folder'])){ $found=poFind((array)($row['children']??[]),$id); if($found)return $found; } } return null; }
-function poChildren(string $id,string $path=''): array { $url='https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id).'/children?$select=id,name,size,file,folder,createdDateTime,lastModifiedDateTime,webUrl,parentReference&$top=200';$out=[];do{$page=poRequest($url);foreach(($page['value']??[]) as $item){if(!is_array($item)||empty($item['id']))continue;$name=(string)($item['name']??'');$out[]=['id'=>(string)$item['id'],'name'=>$name,'path'=>ltrim($path.'/'.$name,'/'),'folder'=>isset($item['folder']),'size'=>(int)($item['size']??0),'modified'=>(string)($item['lastModifiedDateTime']??''),'webUrl'=>(string)($item['webUrl']??'')];}$url=(string)($page['@odata.nextLink']??'');}while($url!=='');usort($out,fn($a,$b)=>[$b['folder'],$a['name']]<=>[$b['folder'],$b['name']]);return $out; }
-function poValidateScope(string $id,string $rootId): array { $current=$id;for($i=0;$i<12;$i++){ $item=poRequest('https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($current).'?$select=id,name,size,file,folder,createdDateTime,lastModifiedDateTime,webUrl,parentReference');if((string)($item['id']??'')===$rootId)return $item;$parent=(string)($item['parentReference']['id']??'');if($parent===''||$parent===$current)break;$current=$parent;}apiError(403,'Dieser Eintrag gehört nicht zum eigenen Privatauftragsbereich.');return []; }
-function poStandardFolders(): array { return ['Auftrag','Fotos','Gutachten','Angebot','Rechnungen','E-Mails','Bilder','Dateien','Sonstige Unterlagen','Eingang KI']; }
-function poIsYearFolder(array $item): bool { return !empty($item['folder']) && preg_match('/^(?:19|20)\d{2}$/', trim((string)($item['name'] ?? ''))) === 1; }
-function poIsStandardFolder(array $item): bool { static $names=null; $names ??= array_map(fn($v)=>mb_strtolower($v,'UTF-8'), poStandardFolders()); return !empty($item['folder']) && in_array(mb_strtolower(trim((string)($item['name'] ?? '')), 'UTF-8'), $names, true); }
-function poOrders(array $tree): array { $orders=[]; foreach($tree as $item){ if(empty($item['folder'])||poIsStandardFolder($item)) continue; if(poIsYearFolder($item)){ foreach((array)($item['children']??[]) as $candidate) if(!empty($candidate['folder'])&&!poIsStandardFolder($candidate)) $orders[]=$candidate; } elseif(!preg_match('/^(?:19|20)\d{2}$/',trim((string)($item['name']??'')))) $orders[]=$item; } usort($orders,fn($a,$b)=>strcasecmp((string)($a['name']??''),(string)($b['name']??''))); return $orders; }
-function poCategory(array $file): string { $name=mb_strtolower((string)($file['name']??''),'UTF-8');$path=mb_strtolower((string)($file['path']??''),'UTF-8');$ext=mb_strtolower(pathinfo($name,PATHINFO_EXTENSION),'UTF-8');if(in_array($ext,['msg','eml'],true))return 'E-Mails';if(in_array($ext,['jpg','jpeg','png','gif','webp','heic','tif','tiff','bmp','mov','mp4','m4v','avi','mts','3gp'],true)||str_contains($path,'icloud fotos'))return 'Bilder';if(preg_match('/rechnung|honorar|invoice/u',$name))return 'Rechnungen';if(preg_match('/gutachten|stellungnahme|expertise/u',$name))return 'Gutachten';if(preg_match('/angebot|kostenvoranschlag|(^|[^a-z])kva([^a-z]|$)/u',$name))return 'Angebot';if(preg_match('/vertrag|vereinbarung|vollmacht|auftrag/u',$name))return 'Auftrag';return 'Dateien'; }
-function poLooseFiles(array $rows,bool $insideStandard=false,array &$out=[]): array { foreach($rows as $row){if(!empty($row['folder'])){poLooseFiles((array)($row['children']??[]),$insideStandard||poIsStandardFolder($row),$out);}elseif(!$insideStandard)$out[]=$row;}return $out; }
-function poMoveFile(string $id,string $folderId): void { poRequestJson('PATCH','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id),['parentReference'=>['id'=>$folderId]]); }
-function poEnsureFolders(array $item): void {
-    if (empty($item['id']) || empty($item['folder'])) return;
-    $existing = [];
-    foreach ((array)($item['children'] ?? []) as $child) if (!empty($child['folder'])) $existing[mb_strtolower((string)($child['name'] ?? ''), 'UTF-8')] = true;
-    foreach (poStandardFolders() as $name) {
-        if (isset($existing[mb_strtolower($name, 'UTF-8')])) continue;
-        try {
-            poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode((string)$item['id']).'/children',['name'=>$name,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'fail']);
-        } catch (Throwable $e) {
-            // Leserechte genügen für die Aktenansicht; die Liste darf bei einem
-            // schreibgeschützten OneDrive nicht mit HTTP 403 abbrechen.
-            continue;
-        }
-    }
-}
+require_once __DIR__ . '/private-order-storage.php';
 $root=poItemByPath($roots[$profile]);
 if ($action==='list' || $action==='cases') {
     $top=poChildren((string)$root['id'],$roots[$profile]);$items=[];
-    foreach($top as $item){if(!$item['folder']||poIsStandardFolder($item))continue;if(poIsYearFolder($item)){foreach(poChildren($item['id'],$item['path']) as $candidate)if($candidate['folder']&&!poIsStandardFolder($candidate))$items[]=$candidate;}else $items[]=$item;}
+    foreach($top as $item){if(!$item['folder']||poIsStandardFolder($item)||mb_strtolower($item['name'],'UTF-8')==='versicherungsaufträge')continue;if(poIsYearFolder($item)){foreach(poChildren($item['id'],$item['path']) as $candidate)if($candidate['folder']&&!poIsStandardFolder($candidate))$items[]=$candidate;}else $items[]=$item;}
     usort($items,fn($a,$b)=>strcasecmp((string)$a['name'],(string)$b['name']));
     apiJson(['ok'=>true,'profile'=>$profile,'root'=>['name'=>$root['name']??basename($roots[$profile]),'path'=>$roots[$profile]],'items'=>$items,'standard_folders'=>poStandardFolders()]);
 }
 if ($action==='case') {
     $id=trim((string)($_GET['id']??''));if($id==='')apiError(400,'Auftrags-ID fehlt.');$item=poValidateScope($id,(string)$root['id']);if(empty($item['folder']))apiError(403,'Ungültiger Auftragsordner.');$path=ltrim((string)($item['name']??''),'/');$children=poChildren($id,$path);foreach($children as &$child){if($child['folder'])$child['children']=poChildren($child['id'],$child['path']);}unset($child);$item=['id'=>(string)$item['id'],'name'=>(string)($item['name']??''),'path'=>$path,'folder'=>true,'children'=>$children];apiJson(['ok'=>true,'item'=>$item]);
 }
+if ($action==='folder') {
+    $id=trim((string)($_GET['id']??''));if($id==='')apiError(400,'Ordner-ID fehlt.');
+    $item=poValidateScope($id,(string)$root['id']);if(empty($item['folder']))apiError(403,'Ungültiger Ordner.');
+    apiJson(['ok'=>true,'item'=>['id'=>$id,'name'=>(string)$item['name'],'folder'=>true,'children'=>poChildren($id)]]);
+}
+if ($action==='organize-case' && $_SERVER['REQUEST_METHOD']==='POST') {
+    $input=json_decode((string)file_get_contents('php://input'),true);$id=trim((string)($input['id']??''));
+    if($id==='')apiError(400,'Auftrags-ID fehlt.');
+    $order=poValidateScope($id,(string)$root['id']);
+    if(empty($order['folder'])||$id===(string)$root['id']||poIsYearFolder($order)||poIsStandardFolder($order))apiError(403,'Ungültiger Auftragsordner.');
+    $parent=(string)($order['parentReference']['id']??'');
+    if($parent!==(string)$root['id']){
+        $year=poRequest('https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($parent).'?$select=id,name,folder,parentReference');
+        if(!poIsYearFolder($year)||(string)($year['parentReference']['id']??'')!==(string)$root['id'])apiError(403,'Bitte einen Auftrag auswählen.');
+    }
+    $children=poChildren($id);$targets=[];foreach($children as $child)if(poIsStandardFolder($child))$targets[mb_strtolower($child['name'],'UTF-8')]=$child['id'];
+    $moved=0;$categories=[];
+    foreach($children as $entry){
+        if(poIsStandardFolder($entry))continue;
+        $category=poCategory($entry);$key=mb_strtolower($category,'UTF-8');
+        if(!isset($targets[$key])){
+            $created=poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id).'/children',['name'=>$category,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'fail']);$targets[$key]=(string)$created['id'];
+        }
+        poMoveFile($entry['id'],$targets[$key]);$moved++;$categories[$category]=($categories[$category]??0)+1;
+    }
+    apiJson(['ok'=>true,'moved'=>$moved,'categories'=>$categories]);
+}
 if ($action==='organize-lite' && $_SERVER['REQUEST_METHOD']==='POST') {
     $top=poChildren((string)$root['id'],$roots[$profile]);$orders=[];
-    foreach($top as $item){if(!$item['folder']||poIsStandardFolder($item))continue;if(poIsYearFolder($item)){foreach(poChildren($item['id'],$item['path']) as $candidate)if($candidate['folder']&&!poIsStandardFolder($candidate))$orders[]=$candidate;}else $orders[]=$item;}
+    foreach($top as $item){if(!$item['folder']||poIsStandardFolder($item)||mb_strtolower($item['name'],'UTF-8')==='versicherungsaufträge')continue;if(poIsYearFolder($item)){foreach(poChildren($item['id'],$item['path']) as $candidate)if($candidate['folder']&&!poIsStandardFolder($candidate))$orders[]=$candidate;}else $orders[]=$item;}
     $moved=0;$created=0;
     foreach($orders as $order){$children=poChildren($order['id'],$order['path']);$folders=[];foreach($children as $child)if($child['folder'])$folders[mb_strtolower($child['name'],'UTF-8')]=(string)$child['id'];foreach(poStandardFolders() as $folderName){$key=mb_strtolower($folderName,'UTF-8');if(isset($folders[$key]))continue;$new=poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($order['id']).'/children',['name'=>$folderName,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'fail']);if(!empty($new['id'])){$folders[$key]=(string)$new['id'];$created++;}}foreach($children as $file){if($file['folder'])continue;$target=$folders[mb_strtolower(poCategory($file),'UTF-8')]??'';if($target==='')continue;poMoveFile($file['id'],$target);$moved++;}}
     apiJson(['ok'=>true,'cases'=>count($orders),'moved'=>$moved,'created'=>$created]);

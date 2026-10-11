@@ -25,9 +25,10 @@
   let context={},bridge=false,bridgeVersion='',workerVersion='',bridgeProblem='',agentJob=null,userJobs=[],busy=false,reconciling=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}},reconciledJobs=new Set(),controlJobs=[],controlButton=null,controlBusy=false;
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
   const driveStatus=()=>window.svnetDriveStatus?window.svnetDriveStatus():json('/intern/api/google-drive-sync.php?action=status');
+  const mobileClient=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   const stationId=crypto.randomUUID();
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,stationId,bridgeVersion,workerVersion,protocol:2})});
-  const show=(t,b=false)=>{if(context.claims_agent&&bridgeProblem){t=bridgeProblem;b=true;button.disabled=true;if(fullButton)fullButton.disabled=true;}state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
+  const show=(t,b=false)=>{if(context.claims_agent&&bridgeProblem&&!mobileClient){t=bridgeProblem;b=true;button.disabled=true;if(fullButton)fullButton.disabled=true;}state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
   const minimumBridgeVersion='1.4.61',currentBridgeVersion='1.4.61';
   const selectedProfile=()=>{
@@ -47,7 +48,7 @@
     let control;try{control=importControlState(controlJobs,selectedProfile())}catch{control={action:'idle',job:null}}
     const labels={pause:'Import pausieren',resume:'Import fortsetzen',recheck:'Import erneut prüfen',idle:'Import pausieren'};
     controlButton.textContent=labels[control.action];
-    controlButton.disabled=controlBusy||control.action==='idle'||(control.action!=='pause'&&context.claims_agent&&!bridge);
+    controlButton.disabled=controlBusy||control.action==='idle'||(control.action!=='pause'&&context.claims_agent&&!bridge&&!mobileClient);
     controlButton.dataset.importAction=control.action;
     controlButton.title=control.job?.sync_mode==='single'?`${control.job.claim_number||''} · gleicher Einzelauftrag`:'';
   };
@@ -94,7 +95,7 @@
 
   const enqueue=async(mode,targetProfile='',previousJob=null,workRequest=false)=>{
     if(userJobs.length){if(workRequest)throw Error('Ein Claims-Import läuft bereits. Bitte dessen Abschluss abwarten.');return}
-    if(context.claims_agent&&!bridge){if(workRequest)throw Error('Diese zentrale Importstation ist nicht bereit.');show('Diese zentrale Importstation ist nicht bereit.',true);return}
+    if(context.claims_agent&&!bridge&&!mobileClient){if(workRequest)throw Error('Diese zentrale Importstation ist nicht bereit.');show('Diese zentrale Importstation ist nicht bereit.',true);return}
     button.disabled=true;if(fullButton)fullButton.disabled=true;if(claimInput)claimInput.disabled=true;
     try{
       const profile=targetProfile||selectedProfile(),payload={profile};
