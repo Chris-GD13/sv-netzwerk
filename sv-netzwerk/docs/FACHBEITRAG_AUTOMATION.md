@@ -37,3 +37,7 @@ Am 10.10.2026 war bereits ein abweichender Brandmeldeanlagen-Artikel live. Linke
 ## Rücknahme und Neufassung 10.10.2026
 
 Direkter Nutzerauftrag: den abgelehnten Fensterbau-Beitrag überall löschen und auf Basis recherchierter Primärquellen einen neuen Beitrag zur Abdichtung beim Fenstereinbau erstellen. Die bisherige aktive Fensterbau-Reservierung wird deshalb zurückgenommen und anschließend mit erhaltenem Rücknahmenachweis durch die Neufassung ersetzt. Keine erfundenen Fälle oder Messwerte; keine pauschale Behauptung gegen fachgerechtes Nachstellen. Für den neuen Artikel gelten die vollständigen Qualitäts- und Live-Prüfungen sowie genau ein tatsächlich veröffentlichter eigener LinkedIn-Beitrag.
+
+## Redaktionelle Präzisierung vom 11.10.2026
+
+Baugewerke-Themen werden mit konkretem technischem Erkenntnisgewinn behandelt. Keine künstliche Ansprache von Versicherern bei allgemeinen Funktions- oder Qualitätsfragen. Versicherungsbezug nur bei nachvollziehbarem konkretem Schaden- und Vertragsbezug. Christian Wächter tritt in diesen Beiträgen als Sachverständiger & Großschadenregulierer auf, nicht als Schreinermeister. Der abgelehnte Innentüren-Text und der vom Nutzer gelöschte LinkedIn-Beitrag dürfen nicht erneut veröffentlicht werden. Freigegebene Neufassung: Schallschutz, Prüfwert, Einbau und Schallwege.

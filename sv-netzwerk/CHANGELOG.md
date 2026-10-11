@@ -1,3 +1,10 @@
+## 2026-10-11 – Fachliche Neufassung Innentüren
+
+- Abgelehnten Tagesartikel durch Schallschutz-Fachartikel ersetzt: Produktkennwerte, Einbaudetails, Raumleistung, Frequenzband-Rechenbeispiel und gezielte Nachbesserung.
+- Aktuellen DIN-4109-35-Stand 2026-10 bibliografisch geprüft; keine pauschale rückwirkende Anwendung.
+- Freigegebenes Bild wiederverwendet; alter Slug wird auf die Neufassung weitergeleitet.
+- Frühere LinkedIn-Veröffentlichung laut Nutzer gelöscht; Nachweis erhalten, Wiederverwendung des alten Textes gesperrt.
+
 ## 2026-10-11
 - Fachbeitrag „Innentüren, Zargen und Beschläge: Schäden fachlich prüfen und Nachbesserung abgrenzen“ ergänzt
 - Türblatt, Zarge, Beschläge, Passung, Oberfläche, Reparaturgrenze und schadenbedingte Kosten getrennt dokumentiert
