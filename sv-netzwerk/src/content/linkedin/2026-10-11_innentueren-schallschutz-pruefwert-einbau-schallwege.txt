@@ -1,0 +1,35 @@
+Schallschutz bei Innentüren: Türblattmasse allein ist kein Leistungsnachweis
+
+Wird ein Raum trotz geschlossener Tür als akustisch unzureichend abgeschirmt wahrgenommen, lässt sich daraus noch kein Mangel des Türblatts ableiten. Für eine belastbare Bewertung müssen Bauteilleistung, Einbauqualität und Schallübertragung zwischen den Räumen getrennt untersucht werden.
+
+Das bewertete Schalldämmmaß Rw beschreibt die Luftschalldämmung eines Bauteils. Ein Laborwert des Türelements gilt für den geprüften Aufbau: Türblatt, Zarge, Dichtungen, Beschläge und Anschlussbedingungen. Ähnliche Türblattdicke oder gleiches Gewicht belegen keine akustische Gleichwertigkeit.
+
+Besonders relevant sind akustische Leckagen:
+
+• Falzdichtungen müssen durchgehend mit dem vorgesehenen Anpressdruck anliegen. Fehlstellen und ungleichmäßiger Kontakt können die Elementleistung beeinträchtigen.
+
+• Eine absenkbare Bodendichtung muss über die gesamte Breite auf einer geeigneten Bodenfläche schließen. Unebenheiten und Belagswechsel können verbleibende Schallwege verursachen.
+
+• Der Zargenanschluss muss dem nachgewiesenen System und der Montageanleitung entsprechen. Eine optisch geschlossene Fuge belegt noch keine ausreichende akustische Abdichtung.
+
+Hinzu kommt die zusammengesetzte Trennfläche: Tür und Wand wirken gemeinsam. Ihr resultierendes Schalldämmmaß entsteht aus den flächenbezogenen Schalltransmissionen – nicht aus einem arithmetischen Mittelwert der dB-Werte. Ein schwächeres Türelement kann die Leistung einer gut dämmenden Wand erheblich begrenzen.
+
+Der Schallschutz zwischen zwei Räumen umfasst außerdem flankierende Übertragungswege. Das Bau-Schalldämmmaß R′w und die Standard-Schallpegeldifferenz DnT,w sind vom Produktkennwert Rw zu unterscheiden. Diese Größen haben unterschiedliche Bezugsgrößen und sind nicht austauschbar.
+
+Für die sachverständige Prüfung folgt daraus:
+
+Zuerst geschuldete Anforderung und Kenngröße bestimmen. Dann Produktnachweis und eingebautes Element abgleichen, Dichtungs- und Anschlussdetails prüfen und Nebenwege erfassen. Bei Bedarf ist eine qualifizierte bauakustische Messung erforderlich.
+
+Ein zur Luftüberströmung vorgesehener Bodenspalt darf dabei nicht ohne Prüfung des Lüftungskonzepts geschlossen werden.
+
+Mehr Türblattmasse allein löst weder eine akustische Leckage noch eine flankierende Schallübertragung.
+
+Der Fachartikel erläutert die Kenngrößen, die Prüfsystematik und ein Frequenzband-Rechenbeispiel:
+https://www.sv-netzwerk.eu/fachwissen/innentueren-schallschutz-pruefwert-einbau-schallwege/
+
+Christian Wächter
+Sachverständiger & Großschadenregulierer
+
+#Bauakustik #Schallschutz #Innentüren #Sachverständigenwesen #Bauqualität
+
+Bild: KI-generiertes Symbolbild, kein geprüfter Schallschutzaufbau.

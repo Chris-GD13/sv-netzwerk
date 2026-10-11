@@ -14,11 +14,11 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
-    title: 'Innentüren, Zargen und Beschläge: Schäden fachlich prüfen und Nachbesserung abgrenzen',
-    description: 'Türblatt, Zarge, Beschläge, Passung und Oberfläche werden getrennt geprüft, um Nachbesserung, Austausch und schadenbedingte Kosten nachvollziehbar abzugrenzen.',
-    href: '/fachwissen/innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung/',
+    title: 'Schallschutz bei Innentüren: Prüfwert, Einbau und Schallwege richtig bewerten',
+    description: 'Produktkennwert, Einbauqualität und Raumleistung unterscheiden; Dichtungen, Zargenanschlüsse und Schallwege vor einer Nachbesserung prüfen.',
+    href: '/fachwissen/innentueren-schallschutz-pruefwert-einbau-schallwege/',
     category: 'Schreinerhandwerk und Innenausbau',
-    tags: ['Innentür', 'Türblatt', 'Zarge', 'Beschlag', 'Passung', 'Oberfläche', 'Nachbesserung', 'Kostenprüfung'],
+    tags: ['Innentür', 'Schallschutz', 'Bauakustik', 'Zarge', 'Bodendichtung', 'Schallübertragung', 'Montage'],
     date: '2026-10-11',
     type: 'article',
     featured: false,

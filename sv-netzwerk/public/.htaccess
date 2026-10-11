@@ -36,6 +36,9 @@ RewriteRule ^wissen/?$ /fachwissen/ [R=301,L,NC]
 RewriteRule ^svos/fachwissen/?$ /fachwissen/ [R=301,L,NC]
 RewriteRule ^svos/fachwissen/(.*)$ /fachwissen/$1 [R=301,L,NC]
 
+# Fachliche Neufassung nach Nutzerfreigabe am 11.10.2026
+RewriteRule ^fachwissen/innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung/?$ /fachwissen/innentueren-schallschutz-pruefwert-einbau-schallwege/ [R=301,L,NC]
+
 # Legacy Fachwissen URLs with clear successor pages
 RewriteRule ^fachwissen/komplexschaeden-regulierung/?$ /fachwissen/schadenabgrenzung/ [R=301,L,NC]
 RewriteRule ^fachwissen/komplexschaeden-strukturiert-regulieren/?$ /fachwissen/schadenabgrenzung/ [R=301,L,NC]
