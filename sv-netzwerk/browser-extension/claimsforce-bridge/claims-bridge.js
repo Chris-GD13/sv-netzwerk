@@ -367,7 +367,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
   if (message?.type === 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER') {
     const damageNumber = String(message.damageNumber || '').trim();
-    const key = damageNumber.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    const key = damageNumber.replace(/[^A-Za-z0-9]/g, '').toUpperCase().replace(/^(\d{9})GF$/, '$1');
+    const searchNumber = /^\d{2}-\d{6}-\d\s+GF$/i.test(damageNumber) ? damageNumber.replace(/\s+GF$/i, '') : damageNumber;
     const claimPattern = /\/claims\/([0-9a-f-]{20,})(?:\/|$)/i;
     const damageNumberPattern = /\b[A-Za-z]{1,4}\d[A-Za-z0-9]*(?:[-.][A-Za-z0-9]+)+\b|\b(?:\d{2,3}-)?\d{2,9}(?:-\d{1,9}){1,3}\b|\b\d{2}\.\d{5,}\.\d{1,3}\b|\b\d{8,14}\b/;
     if (!key) {
@@ -388,7 +389,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       sendResponse({ ok: false, error: '[CF-SINGLE-01] ClaimsForce-Suchfeld konnte nicht gesetzt werden.' });
       return;
     }
-    setter.call(input, damageNumber);
+    setter.call(input, searchNumber);
     input.dispatchEvent(new Event('input', { bubbles: true }));
     input.dispatchEvent(new Event('change', { bubbles: true }));
     (async () => {

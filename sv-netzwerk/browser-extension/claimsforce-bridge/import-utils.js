@@ -1,6 +1,8 @@
 export const isBlank = value => value == null || (typeof value === 'string' && value.trim() === '');
 
-export const normalizedClaimNumber = value => String(value || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+// GF is a case classification on SV numbers, not part of the insurer's number.
+// Keep other alphanumeric claim numbers and suffixes distinct.
+export const normalizedClaimNumber = value => String(value || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase().replace(/^(\d{9})gf$/, '$1');
 export const sameImportScope = (a, b) => Number(a?.jobId) === Number(b?.jobId) && a?.profile === b?.profile && a?.mode === b?.mode && normalizedClaimNumber(a?.claimNumber) === normalizedClaimNumber(b?.claimNumber);
 export function assertSingleClaim(number, claims) {
   if (!normalizedClaimNumber(number) || claims.length !== 1 || !claims[0]?.id || normalizedClaimNumber(claims[0].label || claims[0].schaden_nr) !== normalizedClaimNumber(number)) throw new Error('[CF-SINGLE-SCOPE] Der Einzelimport hat nicht genau den angeforderten Schaden geliefert.');
