@@ -348,6 +348,11 @@ jobs:
           grep -Fq 'data-bk-method="kva"' "$page"
           grep -Fq 'calculation-workspace.js?v=20261011-1' "$page"
           echo "/intern/kalkulation/: HTTP $status, kompakte Berechnungsauswahl geladen"
+          status="$(curl --max-time 20 --max-redirs 0 --silent --show-error -b "$jar" -o "$page" -w '%{http_code}' https://www.sv-netzwerk.eu/intern/versicherungsfaelle/)"
+          test "$status" = 200
+          grep -Fq 'case-action-groups.js?v=20261011-1' "$page"
+          grep -Fq 'case-action-groups.css?v=20261011-1' "$page"
+          echo "/intern/versicherungsfaelle/: HTTP $status, vereinfachte Fallaktionen geladen"
           curl --max-time 20 --silent --show-error -b "$jar" -X POST -o /dev/null 'https://www.sv-netzwerk.eu/intern/api/auth.php?action=logout' || true
           rm -f "$jar" "$page"
           zip_live="$(mktemp)"
