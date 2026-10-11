@@ -91,7 +91,7 @@ $body=$_SERVER['REQUEST_METHOD']==='POST'?requestBody():[];
 if($action==='summary'){
     $visible=cqVisibleProfiles($user);
     $selectedProfile=(string)array_key_first($visible);
-    if(($_GET['include_maurer']??'')==='1'&&(cqIsCentralAgent($user)||cqProfile($user)==='christian'))$visible['jens']='Maurer';
+
     $placeholders=implode(',',array_fill(0,count($visible),'?'));
     $s=db()->prepare('SELECT profile,open_count,updated_at,source_job_id FROM claimsforce_task_status WHERE profile IN ('.$placeholders.')');
     $s->execute(array_keys($visible));

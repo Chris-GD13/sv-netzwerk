@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/profile-routing.php';
 commonHeaders();
 $user = requireAuth();
 if (!in_array((string)($user['role'] ?? ''), ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) apiError(403, 'Keine Berechtigung.');
@@ -13,9 +14,9 @@ const DEFAULT_BLANCO_FOLDER_ID = '1_3p6moLBt3cD5Gzy9jvPw3BXpqnAvl2k';
 function ocEnv(string $key, string $default=''):string{$v=getenv($key);return$v===false||trim($v)===''?$default:trim($v);}
 function ocCalendarProfile(array $user):array{$email=mb_strtolower(trim((string)($user['email']??'')),'UTF-8');$name=mb_strtolower(trim((string)($user['full_name']??'')),'UTF-8');if($email==='ms@sv-schuett.eu'||str_contains($name,'marc'))return['mailbox'=>'ms@sv-schuett.eu','calendar_name'=>null,'calendar_label'=>'Kalender Marc Schütt','sender'=>'ms@sv-schuett.eu','sender_name'=>'Marc Schütt'];if($email==='hr@sv-schuett.eu'||str_contains($name,'holger'))return['mailbox'=>'hr@sv-schuett.eu','calendar_name'=>null,'calendar_label'=>'Kalender Holger Roth','sender'=>'hr@sv-schuett.eu','sender_name'=>'Holger Roth'];if($email==='ws@sv-schuett.eu'||str_contains($name,'susanne'))return['mailbox'=>'cw@sv-schuett.eu','calendar_name'=>'Calender Christian','calendar_label'=>'Calender Christian','sender'=>'ws@sv-schuett.eu','sender_name'=>'Susanne Wächter'];return['mailbox'=>'cw@sv-schuett.eu','calendar_name'=>'Calender Christian','calendar_label'=>'Calender Christian','sender'=>'cw@sv-schuett.eu','sender_name'=>'Christian Wächter'];}
 function ocProfileKey(string$value):string{$value=mb_strtolower(trim($value),'UTF-8');return match($value){'jens'=>'christian','christian','marc','holger'=>$value,default=>''};}
-function ocUserProfileKey(array$user):string{$email=mb_strtolower(trim((string)($user['email']??'')),'UTF-8');$name=mb_strtolower(trim((string)($user['full_name']??'')),'UTF-8');if(str_contains($email,'ms@')||str_contains($name,'marc'))return'marc';if(str_contains($email,'hr@')||str_contains($name,'holger'))return'holger';return'christian';}
-function ocIsCentralBackoffice(array$user):bool{$own=ocUserProfileKey($user);$email=mb_strtolower(trim((string)($user['email']??'')),'UTF-8');$name=mb_strtolower(trim((string)($user['full_name']??'')),'UTF-8');return($own==='christian'&&(string)($user['role']??'')==='administrator')||str_contains($email,'ws@')||str_contains($name,'susanne');}
-function ocTargetProfileKey(array$user):string{$raw=trim((string)($_SERVER['HTTP_X_SVNET_EXPERT_PROFILE']??''));$requested=ocProfileKey($raw);if($raw!==''&&$requested==='')apiError(400,'Unbekanntes Importprofil.');$own=ocUserProfileKey($user);if(!ocIsCentralBackoffice($user)){if($requested!==''&&$requested!==$own)apiError(403,'Das angeforderte Importprofil ist für diesen Benutzer nicht freigegeben.');return$own;}if($requested!=='')return$requested;$selected=ocProfileKey((string)($_SESSION['svnet_selected_expert']??'christian'));return$selected!==''?$selected:'christian';}
+function ocUserProfileKey(array$user):string{return svnetSelectedProfile($user,(string)($_SESSION['svnet_selected_expert']??''));}
+function ocIsCentralBackoffice(array$user):bool{return svnetIsBackofficeUser($user);}
+function ocTargetProfileKey(array$user):string{$raw=trim((string)($_SERVER['HTTP_X_SVNET_EXPERT_PROFILE']??''));$requested=ocProfileKey($raw);if($raw!==''&&$requested==='')apiError(400,'Unbekanntes Importprofil.');$own=ocUserProfileKey($user);if($own==='jens')apiError(403,'Für den Maurer-Zugang ist kein fremder Kalender freigegeben.');if($requested!==''&&$requested!==$own)apiError(403,'Das angeforderte Importprofil ist für diesen Benutzer nicht freigegeben.');if($requested!=='')return$requested;return$own;}
 function ocProfileUser(string$key,array$user):array{return match(ocProfileKey($key)){'marc'=>array_merge($user,['email'=>'ms@sv-schuett.eu','full_name'=>'Marc Schütt']),'holger'=>array_merge($user,['email'=>'hr@sv-schuett.eu','full_name'=>'Holger Roth']),default=>array_merge($user,['email'=>'cw@sv-schuett.eu','full_name'=>'Christian Wächter'])};}
 function ocCaseOwnerProfile(string$folderId):string{$stmt=db()->prepare('SELECT user_email FROM case_folder_owners WHERE folder_id=:f LIMIT 1');$stmt->execute([':f'=>$folderId]);$email=mb_strtolower(trim((string)($stmt->fetchColumn()?:'')),'UTF-8');if(str_contains($email,'ms@'))return'marc';if(str_contains($email,'hr@'))return'holger';if(str_contains($email,'cw@'))return'christian';return'';}
 function ocAssertClaimsProfile(string$folderId,string$requested,string$target,array$meta):void{$requested=ocProfileKey($requested);if($requested===''||$requested!==$target)apiError(409,'ClaimsForce-Profil und ausgewählter Sachverständiger stimmen nicht überein. Termin wurde nicht angelegt.');$owner=ocCaseOwnerProfile($folderId);if($owner===''||$owner!==$requested)apiError(409,'ClaimsForce-Profil und persönlicher Fallordner stimmen nicht überein. Termin wurde nicht angelegt.');$stored=ocProfileKey((string)($meta['claimsforce_profile']??''));if($stored!==''&&$stored!==$requested)apiError(409,'Gespeichertes ClaimsForce-Profil und Terminprofil stimmen nicht überein. Termin wurde nicht angelegt.');}
@@ -37,6 +38,7 @@ function ocAttachments(string $folderId):array{$out=[];foreach(ocDriveList($fold
 function ocDate(string $date,string $time):string{if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date)||!preg_match('/^\d{2}:\d{2}$/',$time))throw new RuntimeException('Datum oder Uhrzeit ist ungültig.');return$date.'T'.$time.':00';}
 
 $action=(string)($_GET['action']??'status');
+if(ocUserProfileKey($user)==='jens'&&$action==='list')apiJson(['ok'=>true,'events'=>[]]);
 $targetProfile=ocTargetProfileKey($user);
 $profile=ocCalendarProfile(ocProfileUser($targetProfile,$user));
 try{

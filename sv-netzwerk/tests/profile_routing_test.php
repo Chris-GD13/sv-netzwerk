@@ -1,47 +1,26 @@
 <?php
 declare(strict_types=1);
-
 require_once dirname(__DIR__).'/public/intern/api/profile-routing.php';
-
-function expectSame(string $actual, string $expected, string $label): void
-{
-    if ($actual !== $expected) throw new RuntimeException($label.': erwartet '.$expected.', erhalten '.$actual);
-}
-
-$susanne=['email'=>'ws@sv-schuett.eu','full_name'=>'Susanne Wächter','role'=>'administrator'];
-$susanneByPortalEmail=['email'=>'ws@sv-schuett.eu','full_name'=>'S. Wächter','role'=>'administrator'];
-$katja=['email'=>'ks@sv-schuett.eu','full_name'=>'Katja Schäfer','role'=>'projektleiter'];
-$christianAdmin=['email'=>'cw@sv-netzwerk.eu','full_name'=>'Christian Wächter','role'=>'administrator'];
-$matrix=[
-    ['label'=>'Susanne -> Christian','user'=>$susanne,'selected'=>'christian','expected'=>'christian'],
-    ['label'=>'Susanne -> Holger','user'=>$susanne,'selected'=>'holger','expected'=>'holger'],
-    ['label'=>'Susanne -> Marc','user'=>$susanne,'selected'=>'marc','expected'=>'marc'],
-    ['label'=>'Susanne -> Jens','user'=>$susanne,'selected'=>'jens','expected'=>'jens'],
-    ['label'=>'kein Profil -> Christian','user'=>$susanne,'selected'=>'','expected'=>'christian'],
-    ['label'=>'Administrator Christian -> Holger','user'=>$christianAdmin,'selected'=>'holger','expected'=>'holger'],
-    ['label'=>'Katja -> Marc','user'=>$katja,'selected'=>'marc','expected'=>'marc'],
-    ['label'=>'Christian -> Christian','user'=>['email'=>'cw@example.invalid','full_name'=>'Christian Wächter'],'selected'=>null,'expected'=>'christian'],
-    ['label'=>'Holger -> Holger','user'=>['email'=>'hr@example.invalid','full_name'=>'Holger Roth'],'selected'=>null,'expected'=>'holger'],
-    ['label'=>'Marc -> Marc','user'=>['email'=>'ms@example.invalid','full_name'=>'Marc Schütt'],'selected'=>null,'expected'=>'marc'],
-    ['label'=>'Jens -> Jens','user'=>['email'=>'jens@example.invalid','full_name'=>'Jens Maurer'],'selected'=>null,'expected'=>'jens'],
+$users=[
+ ['email'=>'cw@sv-netzwerk.eu','full_name'=>'Christian Wächter','role'=>'administrator'],
+ ['email'=>'ms@sv-schuett.eu','full_name'=>'Marc Schütt','role'=>'administrator'],
+ ['email'=>'hr@sv-schuett.eu','full_name'=>'Holger Roth','role'=>'administrator'],
+ ['email'=>'jens@example.invalid','full_name'=>'Jens Maurer','role'=>'administrator'],
+ ['email'=>'ws@sv-schuett.eu','full_name'=>'Susanne Wächter','role'=>'administrator'],
 ];
-
-foreach($matrix as $row) expectSame(svnetSelectedProfile($row['user'],$row['selected']),$row['expected'],$row['label']);
-
-if(!svnetIsBackofficeUser($susanne))throw new RuntimeException('Susanne muss als Backoffice erkannt werden.');
-if(!svnetIsBackofficeUser($susanneByPortalEmail))throw new RuntimeException('Susannes Portaladresse muss unabhängig vom Anzeigenamen als Backoffice erkannt werden.');
-if(!svnetIsBackofficeUser($katja))throw new RuntimeException('Katja muss als Backoffice Werdohl erkannt werden.');
-if(!svnetIsBackofficeUser($christianAdmin))throw new RuntimeException('Der Christian-Administratorzugang muss die zentrale Bearbeiterauswahl erhalten.');
-foreach(array_slice($matrix,7)as$row)if(svnetIsBackofficeUser($row['user']))throw new RuntimeException($row['label'].' darf nicht als Backoffice erkannt werden.');
-
-foreach(['christian','holger','marc','jens']as$profile){
-    $identity=svnetExpertIdentity($profile,$susanne);
-    expectSame(svnetUserProfile($identity),$profile,'Identität '.$profile);
-    if(!str_starts_with(svnetCasesFolderName($profile),'Schadenfälle '))throw new RuntimeException('Fallordner fehlt für '.$profile);
+foreach($users as$i=>$user){
+ $expected=['christian','marc','holger','jens','christian'][$i];
+ foreach(['','christian','marc','holger','jens','unbekannt']as$selected){
+  if(svnetSelectedProfile($user,$selected)!==$expected)throw new RuntimeException('Fremdes Profil für '.$user['email']);
+ }
+ if(svnetIsBackofficeUser($user)!==($i===4))throw new RuntimeException('Administrator darf keine Freigabe erteilen.');
 }
-
+foreach(['marc','holger','jens']as$profile){
+ $rejected=false;
+ try{svnetExpertIdentity($profile,$users[4]);}catch(InvalidArgumentException){$rejected=true;}
+ if(!$rejected)throw new RuntimeException('Susanne darf kein fremdes Profil übernehmen.');
+}
 $rejected=false;
-try{svnetSelectedProfile($susanne,'unbekannt');}catch(InvalidArgumentException){$rejected=true;}
-if(!$rejected)throw new RuntimeException('Ein unbekanntes Profil darf nicht auf Christian zurückfallen.');
-
-echo "Profilrouting: ".count($matrix)." Zuordnungen und unbekanntes Profil geprüft.\n";
+try{svnetSelectedProfile(['email'=>'unknown@example.invalid','role'=>'administrator']);}catch(InvalidArgumentException){$rejected=true;}
+if(!$rejected)throw new RuntimeException('Unbekannte Administratoren dürfen nicht auf Christian zurückfallen.');
+echo "Profilrouting: eigene Profile, alte Sitzungen und Susanne-Ausnahme geprüft.\n";

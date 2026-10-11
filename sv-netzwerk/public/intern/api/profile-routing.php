@@ -15,14 +15,8 @@ function svnetProfileText(string $value): string
 
 function svnetIsBackofficeUser(array $user): bool
 {
-    $email = svnetProfileText((string)($user['email'] ?? ''));
-    $name = svnetProfileText((string)($user['full_name'] ?? ''));
-    return (string)($user['role'] ?? '') === 'administrator'
-        || $email === 'ws@sv-schuett.eu'
-        || $email === 'ks@sv-schuett.eu'
-        || str_contains($email, 'susanne')
-        || str_contains($name, 'susanne')
-        || str_contains($name, 'katja schaefer');
+    // Only Susanne may act for Christian; an administrator role grants no case access.
+    return svnetProfileText((string)($user['email'] ?? '')) === 'ws@sv-schuett.eu';
 }
 
 function svnetUserProfile(array $user): string
@@ -47,16 +41,14 @@ function svnetSelectedProfile(array $user, ?string $selected = null): string
         return $profile;
     }
 
-    $profile = svnetProfileText((string)$selected);
-    if ($profile === '') return 'christian';
-    if (!in_array($profile, svnetSupportedProfiles(), true)) {
-        throw new InvalidArgumentException('Das gespeicherte Bearbeiterprofil ist ungültig.');
-    }
-    return $profile;
+    return 'christian';
 }
 
 function svnetExpertIdentity(string $profile, array $backoffice): array
 {
+    if ($profile !== 'christian' || !svnetIsBackofficeUser($backoffice)) {
+        throw new InvalidArgumentException('Dieses Bearbeiterprofil ist nicht freigegeben.');
+    }
     return match ($profile) {
         'christian' => array_merge($backoffice, ['email'=>'cw@sv-netzwerk.eu', 'full_name'=>'Christian Wächter', 'svnet_expert_profile'=>'christian']),
         'holger' => array_merge($backoffice, ['email'=>'hr@sv-schuett.eu', 'full_name'=>'Holger Roth', 'svnet_expert_profile'=>'holger']),
