@@ -25,7 +25,7 @@
   let context={},bridge=false,bridgeVersion='',workerVersion='',bridgeProblem='',agentJob=null,userJobs=[],busy=false,reconciling=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}},reconciledJobs=new Set(),controlJobs=[],controlButton=null,controlBusy=false;
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
   const driveStatus=()=>window.svnetDriveStatus?window.svnetDriveStatus():json('/intern/api/google-drive-sync.php?action=status');
-  const mobileClient=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const mobileClient=typeof navigator!=='undefined'&&(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1));
   const stationId=crypto.randomUUID();
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,stationId,bridgeVersion,workerVersion,protocol:2})});
   const show=(t,b=false)=>{if(context.claims_agent&&bridgeProblem&&!mobileClient){t=bridgeProblem;b=true;button.disabled=true;if(fullButton)fullButton.disabled=true;}state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
