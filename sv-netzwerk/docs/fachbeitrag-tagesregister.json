@@ -205,14 +205,17 @@
         "title": "Innentüren, Zargen und Beschläge: Schäden fachlich prüfen und Nachbesserung abgrenzen",
         "slug": "innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung",
         "url": "https://www.sv-netzwerk.eu/fachwissen/innentueren-zargen-beschlaege-schaden-pruefung-nachbesserung/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-2026-10-11-0600",
-        "reserved_at": "2026-10-11T03:58:49.363Z"
+        "reserved_at": "2026-10-11T03:58:49.363Z",
+        "commit": "0cdc96854919dcbadc58c0bcd1f6fcceaff49f88",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38110737828",
+        "verified_at": "2026-10-11T04:17:13.641Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-11T03:58:49.363Z"
+  "updated_at": "2026-10-11T04:17:13.641Z"
 }
