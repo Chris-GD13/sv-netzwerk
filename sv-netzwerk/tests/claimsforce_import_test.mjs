@@ -308,15 +308,15 @@ assert(queue.includes("$syncMode=$claimNumber!==''?'single':") && queue.includes
 assert(queue.includes("$action==='schedule'") && queue.includes("new DateTimeZone('Europe/Berlin')"), 'Werktagsautomatik muss serverseitig in Berliner Zeit geplant werden');
 assert(queue.includes('$weekday>5||$clock<300||$clock>=1000'), 'Automatik darf nur Montag bis Freitag ab 03:00 Uhr innerhalb des Nachholfensters eingeplant werden');
 assert(queue.includes('uq_claims_schedule_key') && queue.includes('INSERT IGNORE INTO claimsforce_import_jobs'), 'Pro Arbeitstag, Profil und Importmodus darf höchstens ein Automatikauftrag entstehen');
-assert(queue.includes('foreach(svnetSupportedProfiles()as$profile)') && queue.includes("'CF-AUTO-QUEUED'"), 'Werktagsautomatik reiht alle unterstützten ClaimsForce-Profile ein');
+assert(queue.includes('foreach(svnetClaimsStationProfiles($user)as$profile)') && queue.includes("'CF-AUTO-QUEUED'"), 'Werktagsautomatik reiht die für die Station freigegebenen Quellen Christian und Maurer ein');
 assert(queue.includes('schedule_key,sync_mode,since_date,claim_number,created_at') && queue.includes("foreach(['quick','full']as$mode)") && queue.includes("'-'.$mode") && queue.includes("':mode'=>$mode") && queue.includes('ClaimsForce-Abgleich'), 'Der idempotente Werktagslauf plant neue Planungsfälle und Kostennoten-Vollabgleich ohne Stichtag ein');
 assert(queue.includes('SELECT sync_mode FROM claimsforce_import_jobs WHERE schedule_key=:k LIMIT 1') && queue.includes("if($legacy->fetchColumn()===$mode)continue"), 'Migration der Tagesautomatik darf vorhandene Läufe desselben Modus nicht duplizieren');
 assert(queue.includes('claimsforce_task_status') && queue.includes("$action==='summary'"), 'Die offenen Claims-Aufgaben werden je Profil dauerhaft gespeichert und portalweit bereitgestellt');
 assert(queue.includes("'jens'=>'Jens'"), 'Jens besitzt einen eigenständigen Aufgabenstatus');
 assert(!queue.includes("VALUES('christian',17,NOW(),NULL),('jens',6,NOW(),NULL)"), 'Die Queue darf keine veralteten ClaimsForce-Ausgangswerte mehr setzen');
-assert(queue.includes('function cqIsSusanne') && queue.includes('return cqIsSusanne($user)'), 'Die Queue verwendet die zentrale Backoffice-Freigabe');
+assert(queue.includes('function cqIsSusanne') && queue.includes('return svnetCanRunClaimsStation($user)'), 'Die Queue trennt Susannes Assistenzfreigabe von Christians und Susannes Importstationsfreigabe');
 assert(queue.includes('$allowed=array_keys(cqVisibleProfiles($user))') && queue.includes('ClaimsForce-Profil und ausgewählter Sachverständiger stimmen nicht überein'), 'Auch die Queue darf nur das aktuell ausgewählte Profil annehmen');
-assert(queue.includes("if(!cqIsCentralAgent($user))apiError(403,'Nur eine freigegebene zentrale Backoffice-Importstation darf Aufträge übernehmen.')"), 'Die Queue erzwingt die freigegebene Backoffice-Station serverseitig');
+assert(queue.includes("if(!cqIsCentralAgent($user))apiError(403,'Nur Christian oder Susanne dürfen die zentrale Importstation betreiben.')"), 'Die Queue erzwingt Christians und Susannes Stationsfreigabe serverseitig');
 assert(queue.includes("is_numeric($result['openTasks']??null)") && queue.includes("(int)$result['openTasks']") && queue.includes('ON DUPLICATE KEY UPDATE open_count=VALUES(open_count)'), 'Ein erfolgreicher Import speichert ausschließlich den Zähler Aufgaben – Alle');
 assert(routing.includes("return ['christian', 'holger', 'marc', 'jens']"), 'Die vier Sachverständigenprofile bleiben als eigene Benutzerprofile unterstützt');
 assert(queue.includes("$action==='mine'") && queue.includes('WHERE requested_by=:u ORDER BY id DESC LIMIT 20'), 'Eigene Warteschlangenläufe müssen nach einem Portal-Neuladen wiedergefunden werden');
