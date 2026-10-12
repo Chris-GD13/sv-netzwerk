@@ -29,13 +29,14 @@ function caseIdentityUnlock(string $name): void {
 }
 function caseIdentityFind(array $user, string $number): array {
     $key=caseNumberKey($number);if ($key==='') return [];
-    $root=gdUserCasesRoot($user);$matches=[];
+    $roots=function_exists('gdAccessibleCaseRoots')?gdAccessibleCaseRoots($user):[gdUserCasesRoot($user)];$matches=[];
+    foreach($roots as$root){
     if(ionosStorageEnabled()) {
         $stmt=ionosStorageDb()->prepare('SELECT c.id,c.name,f.id AS meta_id FROM items c LEFT JOIN items f ON f.parent=c.id AND f.name=? AND f.verified=1 WHERE c.parent=? AND c.mime=? AND c.verified=1');
         $stmt->execute([CASE_META_NAME,(string)$root['id'],'application/vnd.google-apps.folder']);
         foreach($stmt->fetchAll() as $row){$meta=!empty($row['meta_id'])?json_decode(ionosBytes((string)$row['meta_id']),true,512,JSON_THROW_ON_ERROR):[];
             if(caseNumberKey((string)($meta['schaden_nr']??$row['name']))===$key)$matches[(string)$row['id']]=$meta;}
-        return $matches;
+        continue;
     }
     foreach(gdListChildren((string)$root['id'],'application/vnd.google-apps.folder',1000) as $folder) {
         $meta=gdCaseMeta((string)$folder['id']);
@@ -45,6 +46,7 @@ function caseIdentityFind(array $user, string $number): array {
         if(caseNumberKey((string)($row['meta']['schaden_nr']??''))!==$key)continue;
         $id=caseIdentityResolve((string)$row['id']);$folder=gdFileMeta($id);
         if(in_array((string)$root['id'],$folder['parents']??[],true))$matches[$id]=gdCaseMeta($id);
+    }
     }
     return $matches;
 }
