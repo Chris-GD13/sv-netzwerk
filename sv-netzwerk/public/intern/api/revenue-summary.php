@@ -31,7 +31,7 @@ function rsCanViewProfile(array $user,string $profile):bool {
     $own=svnetUserProfile($user);
     if(rsCanRefresh($user)||in_array($own,['christian','marc'],true))return true;
     if($own==='holger')return in_array($profile,['holger','rekon_holger'],true);
-    return str_starts_with($profile,'rekon_')&&rsIsKatja($user);
+    return str_starts_with($profile,'rekon_')&&(rsIsKatja($user)||svnetUserProfile($user)==='christian');
 }
 function rsAllowedProfiles(array $user):array {
     return array_values(array_filter(['christian','claims_marc','holger','rekon_marc','rekon_holger','annual'],fn($profile)=>rsCanViewProfile($user,$profile)));
@@ -40,7 +40,7 @@ function rsDefaultProfile(array $user):?string {
     $own=svnetUserProfile($user);if($own==='holger')return'holger';if($own==='marc')return'claims_marc';if(rsIsKatja($user))return'rekon_marc';return rsCanViewProfile($user,'christian')?'christian':null;
 }
 function rsCanRefreshProfile(array $user,string $profile):bool {
-    if($profile==='annual')return false;return rsCanRefresh($user)||(str_starts_with($profile,'rekon_')&&rsIsKatja($user));
+    if($profile==='annual')return false;return rsCanRefresh($user)||(str_starts_with($profile,'rekon_')&&(rsIsKatja($user)||svnetUserProfile($user)==='christian'));
 }
 function rsEnsureTable():void {
     db()->exec("CREATE TABLE IF NOT EXISTS portal_revenue_summary(profile VARCHAR(30) PRIMARY KEY,payload_json MEDIUMTEXT NOT NULL,source_modified_at VARCHAR(40) NULL,updated_by VARCHAR(255) NOT NULL,updated_at DATETIME NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
@@ -254,8 +254,55 @@ function rsRekonIdentity(string $value):string {
     $text=rsText($value);if(str_contains($text,'holger')||str_contains($text,'roth'))return'rekon_holger';if(str_contains($text,'marc')||str_contains($text,'schuett'))return'rekon_marc';return'';
 }
 function rsRekonEntries(array $sources):array {
-    $entries=[];foreach($sources as[$meta,$bytes]){$tmp=tempnam(sys_get_temp_dir(),'revenue-rekon-');if($tmp===false||file_put_contents($tmp,$bytes)===false)throw new RuntimeException('Eine Rekon-Datei konnte nicht zwischengespeichert werden.');try{$sheets=rsWorkbook($tmp);}finally{@unlink($tmp);}foreach($sheets as$sheetName=>$sheet){$month=RS_MONTHS[rsText((string)$sheetName)]??0;if(!$month&&preg_match('/^(\d{4})-(\d{2})/',trim((string)rsCell($sheet,9,3)),$dateMatch))$month=(int)$dateMatch[2];$period=trim((string)rsCell($sheet,9,3));$year=preg_match('/(20\d{2})/',$period,$yearMatch)?(int)$yearMatch[1]:0;if(!$year||$month<1||$month>12)continue;$max=rsMaxRow($sheet);for($row=1;$row<=$max;$row++){$id=trim((string)rsCell($sheet,$row,2));$payout=rsNullableMoney(rsCell($sheet,$row,6));$profile=rsRekonIdentity((string)rsCell($sheet,$row,5));if($id===''||$payout===null||$payout<=0||$profile==='')continue;$actual=round($payout/0.60,2);$rekon=round($actual-$payout,2);$entries[]=['profile'=>$profile,'year'=>$year,'month'=>$month,'month_label'=>RS_MONTH_LABELS[$month],'id'=>$id,'claim_no'=>trim((string)rsCell($sheet,$row,3)),'insurer'=>trim((string)rsCell($sheet,$row,4)),'regulator'=>trim((string)rsCell($sheet,$row,5)),'invoice_date'=>rsExcelDate(rsCell($sheet,$row,7)),'appointment'=>rsExcelDate(rsCell($sheet,$row,8)),'invoice_type'=>trim((string)rsCell($sheet,$row,10)),'payout_net'=>$payout,'payout_gross'=>round($payout*1.19,2),'actual_order_net'=>$actual,'actual_order_gross'=>round($actual*1.19,2),'rekon_net'=>$rekon,'rekon_gross'=>round($rekon*1.19,2),'source'=>(string)($meta['name']??'Rekon-Einzelpostenliste')];}}}
-    usort($entries,fn($a,$b)=>[$b['year'],$b['month'],$b['invoice_date'],$b['id']]<=>[$a['year'],$a['month'],$a['invoice_date'],$a['id']]);return$entries;
+    $entries=[];
+    foreach($sources as[$meta,$bytes]) {
+        $tmp=tempnam(sys_get_temp_dir(),'revenue-rekon-');
+        if($tmp===false||file_put_contents($tmp,$bytes)===false)throw new RuntimeException('Eine Rekon-Datei konnte nicht zwischengespeichert werden.');
+        try{$sheets=rsWorkbook($tmp);}finally{@unlink($tmp);}
+        foreach($sheets as$sheetName=>$sheet) {
+            $period=trim((string)rsCell($sheet,9,3));
+            if(!preg_match('/(20\d{2})/',$period,$date))continue;
+            $year=(int)$date[1];$month=RS_MONTHS[rsText((string)$sheetName)]??0;
+            if(preg_match('/^20\d{2}-(\d{2})/',$period,$monthMatch))$month=(int)$monthMatch[1];if($month<1||$month>12)continue;
+            $owner=rsRekonIdentity((string)rsCell($sheet,10,3));
+            $sheetRows=[];$expected=null;
+            for($row=13;$row<=rsMaxRow($sheet);$row++) {
+                $name=trim((string)rsCell($sheet,$row,5));
+                $payout=rsNullableMoney(rsCell($sheet,$row,6));
+                if(rsText($name)==='summe'){$expected=$payout;continue;}
+                $regulatorProfile=rsRekonIdentity($name);
+                $id=trim((string)rsCell($sheet,$row,2));
+                $description=trim((string)rsCell($sheet,$row,4));
+                if($payout===null||$name===''||($id===''&&$description===''))continue;
+                // Statement owner controls reversals charged to this statement, even if
+                // the original service was assigned to another regulator.
+                $profile=$owner!==''?$owner:$regulatorProfile;
+                if($profile===''||in_array(rsText($name),['mwst. 19%','gesamtsumme'],true))continue;
+                $adjustment=$id===''||$payout<0||($regulatorProfile!==''&&$regulatorProfile!==$profile)||$regulatorProfile==='';
+                $actual=$adjustment?null:round($payout/0.60,2);
+                $rekon=$adjustment?null:round($actual-$payout,2);
+                $sheetRows[]=['profile'=>$profile,'year'=>$year,'month'=>$month,'month_label'=>RS_MONTH_LABELS[$month],
+                    'id'=>$id,'claim_no'=>trim((string)rsCell($sheet,$row,3)),
+                    'insurer'=>$description,'regulator'=>$name,'invoice_date'=>rsExcelDate(rsCell($sheet,$row,7)),
+                    'appointment'=>rsExcelDate(rsCell($sheet,$row,8)),
+                    'invoice_type'=>$adjustment?'Korrektur / Erstattung':trim((string)rsCell($sheet,$row,10)),
+                    'is_adjustment'=>$adjustment,'source_row'=>$row,'source_sheet'=>(string)$sheetName,
+                    'payout_net'=>$payout,'payout_gross'=>round($payout*1.19,2),
+                    'actual_order_net'=>$actual,'actual_order_gross'=>$actual===null?null:round($actual*1.19,2),
+                    'rekon_net'=>$rekon,'rekon_gross'=>$rekon===null?null:round($rekon*1.19,2),
+                    'source'=>(string)($meta['name']??'Rekon-Einzelpostenliste')];
+            }
+            $sum=round(array_sum(array_column($sheetRows,'payout_net')),2);
+            if($sheetRows&&$expected!==null&&abs($sum-$expected)>0.011)throw new RuntimeException('Rekon-Summenabweichung in '.($meta['name']??'Datei').' / '.$sheetName.': Einzelposten stimmen nicht mit der Quellsumme überein.');
+            array_push($entries,...$sheetRows);
+        }
+    }
+    usort($entries,fn($a,$b)=>[$b['year'],$b['month'],$b['invoice_date'],$b['id']]<=>[$a['year'],$a['month'],$a['invoice_date'],$a['id']]);
+    return$entries;
+}
+function rsRekonMergeYears(array $previous,array $incoming):array {
+    $years=array_unique(array_column($incoming,'year'));
+    return array_merge(array_values(array_filter($previous,fn($row)=>!in_array($row['year'],$years,true))),$incoming);
 }
 function rsRekonPeriod(array $entries,int $year,int $through):array {
     $rows=array_values(array_filter($entries,fn($row)=>(int)$row['year']===$year&&(int)$row['month']<=$through));$sum=fn(string$key)=>round(array_sum(array_map(fn($row)=>(float)($row[$key]??0),$rows)),2);$count=count($rows);$payout=$sum('payout_net');
@@ -265,7 +312,7 @@ function rsRekonPayload(string $profile,array $entries,array $sources):array {
     $own=array_values(array_filter($entries,fn($row)=>$row['profile']===$profile));$years=array_values(array_unique(array_map(fn($row)=>(int)$row['year'],$own)));rsort($years);$currentYear=(int)date('Y');$previousYear=$currentYear-1;$months=array_map(fn($row)=>(int)$row['month'],array_filter($own,fn($row)=>(int)$row['year']===$currentYear));$through=$months?max($months):max(1,(int)date('n'));$names=array_values(array_unique(array_map(fn($source)=>(string)($source[0]['name']??'Rekon-Einzelpostenliste'),$sources)));$modified=array_values(array_filter(array_map(fn($source)=>(string)($source[0]['lastModifiedDateTime']??''),$sources)));sort($modified);return['profile'=>$profile,'provider'=>'rekon','person'=>$profile==='rekon_holger'?'Holger Roth':'Marc Schütt','source'=>implode(', ',$names),'source_provider'=>(string)($sources[0][0]['sourceProvider']??'Rekon'),'source_updated_at'=>$modified?date('d.m.Y H:i',strtotime((string)end($modified))):date('d.m.Y H:i'),'comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'vat_rate'=>0.19,'current'=>rsRekonPeriod($own,$currentYear,$through),'previous'=>rsRekonPeriod($own,$previousYear,$through),'available_years'=>$years,'entries'=>$own];
 }
 function rsRefreshRekon(array $user,array $sources,string $requested=''):array {
-    $entries=rsRekonEntries($sources);if(!$entries)throw new RuntimeException('In den Rekon-Dateien wurden keine abrechenbaren Einzelposten für Marc oder Holger gefunden.');$saved=[];foreach(['rekon_marc','rekon_holger']as$profile){$own=array_filter($entries,fn($row)=>$row['profile']===$profile);if(!$own)continue;$payload=rsRekonPayload($profile,$entries,$sources);$meta=['lastModifiedDateTime'=>date(DATE_ATOM)];rsPersist($profile,$payload,$meta,$user);$saved[$profile]=$payload;}if($requested!==''&&!isset($saved[$requested]))throw new RuntimeException($requested==='rekon_holger'?'In den ausgewählten Rekon-Dateien wurden noch keine Holger-Positionen gefunden.':'In den ausgewählten Rekon-Dateien wurden keine Marc-Positionen gefunden.');return$requested!==''?$saved[$requested]:$saved;
+    $entries=rsRekonEntries($sources);if(!$entries)throw new RuntimeException('In den Rekon-Dateien wurden keine abrechenbaren Einzelposten für Marc oder Holger gefunden.');$saved=[];foreach(['rekon_marc','rekon_holger']as$profile){$own=array_filter($entries,fn($row)=>$row['profile']===$profile);if(!$own)continue;$existing=rsStored($profile);$merged=rsRekonMergeYears(is_array($existing['entries']??null)?$existing['entries']:[],array_values($own));$payload=rsRekonPayload($profile,$merged,$sources);$meta=['lastModifiedDateTime'=>date(DATE_ATOM)];rsPersist($profile,$payload,$meta,$user);$saved[$profile]=$payload;}if($requested!==''&&!isset($saved[$requested]))throw new RuntimeException($requested==='rekon_holger'?'In den ausgewählten Rekon-Dateien wurden noch keine Holger-Positionen gefunden.':'In den ausgewählten Rekon-Dateien wurden keine Marc-Positionen gefunden.');return$requested!==''?$saved[$requested]:$saved;
 }
 function rsRekonEmpty(string $profile):array {
     return['profile'=>$profile,'provider'=>'rekon','person'=>$profile==='rekon_holger'?'Holger Roth':'Marc Schütt','source'=>'Rekon-Einzelpostenlisten','source_provider'=>'Noch nicht eingelesen','source_updated_at'=>'–','comparison'=>'gleicher Zeitraum','share_rate'=>0.60,'vat_rate'=>0.19,'current'=>[],'previous'=>[],'available_years'=>[],'entries'=>[]];
@@ -312,6 +359,6 @@ if($action==='access'){
 }
 if(!rsVisible($user)||!rsCanViewProfile($user,$profile))apiJson(['ok'=>true,'visible'=>false,'default_profile'=>rsDefaultProfile($user),'allowed_profiles'=>rsAllowedProfiles($user)]);
 try{
-    if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if($profile==='annual')apiError(400,'Die Jahresabrechnung wird automatisch aus den Einzelbereichen gebildet.');if(!rsCanRefreshProfile($user,$profile))apiError(403,str_starts_with($profile,'rekon_')?'Nur Katja oder Susanne dürfen Rekon manuell aktualisieren.':'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');if(str_starts_with($profile,'rekon_'))$payload=rsRefreshRekon($user,rsUploadedSources(),$profile);else{$source=rsUploadedSource();$payload=$profile==='holger'?rsRefreshHolger($user,$source):($profile==='claims_marc'?rsRefreshMarc($user,$source):rsRefresh($user,$source));}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,'allowed_profiles'=>rsAllowedProfiles($user),...$payload]);}
+    if($action==='refresh'){if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');if($profile==='annual')apiError(400,'Die Jahresabrechnung wird automatisch aus den Einzelbereichen gebildet.');if(!rsCanRefreshProfile($user,$profile))apiError(403,str_starts_with($profile,'rekon_')?'Nur Christian, Katja oder Susanne dürfen Rekon manuell aktualisieren.':'Nur Susanne darf die Umsatzdatei manuell aktualisieren.');if(str_starts_with($profile,'rekon_'))$payload=rsRefreshRekon($user,rsUploadedSources(),$profile);else{$source=rsUploadedSource();$payload=$profile==='holger'?rsRefreshHolger($user,$source):($profile==='claims_marc'?rsRefreshMarc($user,$source):rsRefresh($user,$source));}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>true,'allowed_profiles'=>rsAllowedProfiles($user),...$payload]);}
     $payload=$profile==='annual'?rsAnnualPayload():(rsStored($profile)??($profile==='holger'?rsHolgerEmpty():($profile==='claims_marc'?rsMarcEmpty():(str_starts_with($profile,'rekon_')?rsRekonEmpty($profile):rsFallback()))));if($action!=='settlement'){unset($payload['entries'],$payload['private_entries'],$payload['available_years']);}apiJson(['ok'=>true,'visible'=>true,'can_refresh'=>$action==='settlement'&&rsCanRefreshProfile($user,$profile),'allowed_profiles'=>rsAllowedProfiles($user),...$payload]);
 }catch(Throwable $error){error_log('[revenue-summary] '.$error->getMessage());apiError(503,$error->getMessage());}

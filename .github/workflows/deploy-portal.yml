@@ -91,6 +91,7 @@ jobs:
           php tests/kva_bundle_test.php
           php tests/kva_openai_error_test.php
           php tests/private_orders_test.php
+          php tests/revenue_rekon_test.php
           node tests/work_center_test.mjs
           node tests/claimsforce_resume_controls_test.mjs
           php tests/document_review_test.php
