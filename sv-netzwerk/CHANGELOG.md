@@ -1,3 +1,12 @@
+## 2026-10-12 – Expertenrotation: Carmen Gohl / Schimmelsanierung
+
+- Eigenständigen sachverständigen Fachbeitrag zur Kontrolle von Schimmelsanierungen ergänzt; kein erneuter Wasserschaden- oder künstlicher Versicherungsschwerpunkt.
+- Carmen Gohl anhand von Live-Profil und Repository dem belegten Fachgebiet Schimmelpilze, Sanierungsbegleitung und Sanierungskontrolle zugeordnet; Profil intern verlinkt, keine Autorenschaft behauptet.
+- UBA-Schimmelleitfaden in der aktualisierten Fassung April 2024, DGUV Information 201-028 und aktuelle BSS-Information im benötigten Umfang geöffnet und geprüft.
+- Feuchteursache, Trocknung, Rückbau, Feinreinigung und Erfolgskontrolle als getrennte Nachweisschritte beschrieben; keine erfundenen Fälle oder Messwerte verwendet.
+- Zyklusstart mit Carmen Gohl dokumentiert; Claudius Freiberg bleibt für den 13.10.2026 vorgemerkt, übrige aktive Fachprofile folgen ohne Wiederholung.
+- Beitrag ohne öffentliches Bild; LinkedIn-Begleittext als `prepared-not-posted` erstellt.
+
 ## 2026-10-11 – Fachliche Neufassung Innentüren
 
 - Abgelehnten Tagesartikel durch Schallschutz-Fachartikel ersetzt: Produktkennwerte, Einbaudetails, Raumleistung, Frequenzband-Rechenbeispiel und gezielte Nachbesserung.

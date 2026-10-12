@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Schimmelsanierung kontrollieren: Feuchteursache, Feinreinigung und Sanierungserfolg prüfen',
+    description: 'Ursachenbeseitigung, Trocknung, Rückbau, Feinreinigung und Sanierungserfolg als getrennte Prüfschritte nachvollziehbar bewerten.',
+    href: '/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/',
+    category: 'Schimmel und Innenraumhygiene',
+    tags: ['Schimmel', 'Sanierungskontrolle', 'Feuchteursache', 'Feinreinigung', 'Innenraumhygiene', 'Sachverständigenprüfung'],
+    date: '2026-10-12',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Schallschutz bei Innentüren: Prüfwert, Einbau und Schallwege richtig bewerten',
     description: 'Produktkennwert, Einbauqualität und Raumleistung unterscheiden; Dichtungen, Zargenanschlüsse und Schallwege vor einer Nachbesserung prüfen.',
     href: '/fachwissen/innentueren-schallschutz-pruefwert-einbau-schallwege/',
