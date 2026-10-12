@@ -56,7 +56,7 @@ function paRetireWrongForms(array $children): int {
 }
 
 /** Fill the existing SV-Netzwerk calculation form; signatures remain unsigned. */
-function paPrepareForm(string $folder,array $user,bool $retireOnly=false): array {
+function paPrepareForm(string $folder,array $user,bool $retireOnly=false,bool $preview=false): array {
     requireCaseFolderAccess($folder,$user);
     $children=ionosList(['q'=>"'".str_replace("'","\\'",$folder)."' in parents and trashed=false",'pageSize'=>1000])['files'];
     $parent='';$meta=[];
@@ -64,12 +64,13 @@ function paPrepareForm(string $folder,array $user,bool $retireOnly=false): array
         if(($file['mimeType']??'')==='application/vnd.google-apps.folder'&&str_starts_with((string)$file['name'],'08_'))$parent=(string)$file['id'];
         if(($file['name']??'')==='00_Falldaten.json')$meta=json_decode(ionosBytes((string)$file['id']),true,512,JSON_THROW_ON_ERROR);
     }
-    $retired=$parent!==''?paRetireWrongForms(ionosList(['q'=>"'".$parent."' in parents and trashed=false",'pageSize'=>1000])['files']):0;
+    $retired=!$preview&&$parent!==''?paRetireWrongForms(ionosList(['q'=>"'".$parent."' in parents and trashed=false",'pageSize'=>1000])['files']):0;
     if($retireOnly)return ['retired'=>$retired];
     $statement=db()->prepare('SELECT * FROM bki_calculations WHERE folder_id=:folder ORDER BY id DESC LIMIT 1');
     $statement->execute([':folder'=>$folder]);$calculation=$statement->fetch(PDO::FETCH_ASSOC);
     if(!is_array($calculation))throw new RuntimeException('Keine gespeicherte Kalkulation für diesen Fall vorhanden. Bitte die Abgeltung in der Kalkulation festlegen und speichern.');
     $payload=paSettlementPayload($calculation,$meta);$document=\SvNetSettlement\build($payload);$bytes=$document['bytes'];
+    if($preview)return $document;
     if($parent==='')$parent=(string)ionosWrite(['name'=>'08_Abschluss','mimeType'=>'application/vnd.google-apps.folder','parents'=>[$folder]])['id'];
     $prefix=preg_replace('/[^\p{L}\p{N}._-]/u','_',$payload['case_no']);
     $name=$prefix.'_SV-Netzwerk_Abgeltungsvereinbarung_Entwurf_Kalkulation-'.(int)$calculation['id'].'_'.date('Y-m-d_His').'.pdf';
