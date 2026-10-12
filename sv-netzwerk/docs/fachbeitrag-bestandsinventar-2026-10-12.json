@@ -1,6 +1,6 @@
 {
   "date": "2026-10-12",
-  "master_commit": "3c4d2724b3c4a098801d7d86bd8ef889adb19d58",
+  "master_commit": "32c70f67b513f8a5b3a02fa74080c38de1068f4f",
   "scope": "Strukturinventar aller vorhandenen Content-Dateien; keine pauschale Quellenfreigabe",
   "articles": [
     {
@@ -1565,6 +1565,21 @@
         "https://www.gesetze-im-internet.de/vvg_2008/"
       ],
       "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen",
+      "source_sha256": "b0a769c891ddd7b7973df3fff58a0fe66f097dfc611f219a098597d6fbe52e56",
+      "published_at": "2026-10-12",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://bss-schimmelpilz.de/fachkundenachweis-schimmelsanierung-modul-b3-sanierungskontrolle/",
+        "https://publikationen.dguv.de/widgets/pdf/download/article/644",
+        "https://www.umweltbundesamt.de/system/files/medien/4031/publikationen/240513_uba_fb_schimmelleitfaden_0.pdf",
+        "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/aktueller-uba-schimmelleitfaden"
+      ],
+      "review_status": "current-day-article; fiktives Praxisbeispiel ergänzt"
     }
   ]
 }

@@ -3,7 +3,7 @@
 Master: GitHub Chris-GD13/sv-netzwerk, main. Kein ZIP- oder Drive-Veröffentlichungsweg.
 
 ## Umfang und Grenzen
-101 bestehende Content-Dateien strukturell inventarisiert. 16 Beiträge gezielt korrigiert. Bei den übrigen Beiträgen bleibt die individuelle Prüfung sämtlicher Rechts-, Normen- und Marktquellen offen; dieses Inventar ist keine vollständige fachliche Freigabe. Keine pauschale Aktualisierung ihrer Datumsfelder.
+102 Content-Dateien einschließlich des neuen Tagesbeitrags strukturell inventarisiert. 16 Beiträge gezielt korrigiert. Bei den übrigen Beiträgen bleibt die individuelle Prüfung sämtlicher Rechts-, Normen- und Marktquellen offen; dieses Inventar ist keine vollständige fachliche Freigabe. Keine pauschale Aktualisierung ihrer Datumsfelder.
 
 Kein fehlender Veröffentlichungstag vom 15.09. bis einschließlich 11.10.2026. Der 12.10. ist im gemeinsamen Tagesregister durch einen anderen Lauf reserviert; kein zweiter Tagesartikel wird erzeugt.
 
@@ -40,3 +40,5 @@ Website-Deployment: efabd0e86ed0e271f17430fc432fa42060f028ca, https://github.com
 Build, interne Links, Suche, Sitemap und gezielte Live-Stichproben werden vor Abschluss geprüft. Der abschließende Laufnachweis folgt nach erfolgreichem Deployment.
 
 Sitemap-lastmod wird ausschließlich aus tatsächlichen redaktionellen updatedAt-/publishedAt-Daten gebildet; unveränderte Beiträge erhalten kein pauschales neues Datum.
+
+Der Tagesartikel wurde auf main übernommen (32c70f6). Ein ausdrücklich fiktives Praxisbeispiel wird als Standardergänzung ergänzt; es behauptet keine tatsächlichen Fall- oder Messdaten.
