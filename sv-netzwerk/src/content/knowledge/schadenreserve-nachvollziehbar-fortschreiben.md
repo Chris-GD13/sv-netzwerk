@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-20
-  updatedAt: 2026-09-20
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Schadenreserve nachvollziehbar fortschreiben"
@@ -80,15 +80,19 @@ In einem fiktiven Großschaden sind Rückbau und Trocknung freigegeben, der Ausb
 
 ## Handlungsempfehlungen
 
-- Versicherungsnehmer sollten Regulierer sollten Änderungen mit Datum und Begründung protokollieren.
-- Versicherer sollten Sachverständige sollten offene Risiken und Mengen klar benennen.
-- Sachverständige sollten Versicherungsnehmer und Dienstleister sollten Nachträge vor Ausführung schriftlich begründen und belegen.
+- Regulierer sollten Änderungen mit Datum und Begründung protokollieren.
+- Sachverständige sollten offene Risiken und Mengen klar benennen.
+- Versicherungsnehmer und Dienstleister sollten Nachträge vor Ausführung schriftlich begründen und belegen.
 - Alle Beteiligten sollten eine einheitliche Kostenlogik verwenden und zwischen Prognose, Freigabe, Rechnung und Zahlung unterscheiden.
 - Bei jeder wesentlichen Änderung sollte der alte Reservewert erhalten bleiben, damit die Entwicklung später prüfbar ist.
 
 ## Fazit
 
 Eine Reserve ist belastbar, wenn sie aus dokumentierten Kostenbausteinen entsteht. Ihre Qualität zeigt sich nicht an der Höhe, sondern an der nachvollziehbaren Herleitung und laufenden Bereinigung. Eine klare Trennung von Befund, Kostenstatus, Deckungsbewertung und Zahlung schafft dabei die entscheidende Prüfbarkeit.
+
+## Marktstand für die Kostenprüfung vom 12.10.2026
+
+[Destatis, Pressemitteilung 360 vom 09.10.2026](https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_360_61261.html): Neubaupreise für Wohngebäude lagen im Berichtsmonat August 2026 um 5,5 % über August 2025. Dies ist eine amtliche Statistik, kein verbindlicher Reparaturtarif und kein Geltungsbeginn für Verträge. Für offene Leistungen Preisstand und Terminrisiko dokumentieren; bereits ausgeführte Leistungen nicht nochmals indexieren. Der Neubauindex ist nicht ungeprüft auf einzelne Sanierungsleistungen zu übertragen.
 
 ## Quellen und weiterführende Hinweise
 

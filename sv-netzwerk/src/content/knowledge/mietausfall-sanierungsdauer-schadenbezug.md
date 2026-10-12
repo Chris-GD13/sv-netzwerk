@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-18
-  updatedAt: 2026-09-18
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Mietausfall bei Sanierung nachvollziehbar prüfen"
@@ -75,9 +75,9 @@ In einem fiktiven Mehrfamilienhaus ist ein Bad zunächst vollständig gesperrt, 
 
 ## Handlungsempfehlungen
 
-- Versicherungsnehmer sollten Vermieter und Mieter sollten Nutzbarkeit und Termine schriftlich festhalten.
-- Versicherer sollten Versicherer sollten Zeitraum und Quote mit dem technischen Verlauf abgleichen.
-- Sachverständige sollten Sachverständige sollten Teilnutzung und schadenfremde Verzögerungen ausdrücklich dokumentieren..
+- Vermieter und Mieter sollten Nutzbarkeit und Termine schriftlich festhalten.
+- Versicherer sollten Zeitraum und Quote mit dem technischen Verlauf abgleichen.
+- Sachverständige sollten Teilnutzung und schadenfremde Verzögerungen ausdrücklich dokumentieren.
 
 ## Fazit
 
@@ -87,4 +87,4 @@ Mietausfall wird durch zeit- und raumbezogene Nachweise prüffähig. Entscheiden
 
 - [Quelle 1](https://www.gesetze-im-internet.de/bgb/__536.html) – offizieller Bezug zum jeweiligen Prüffeld.
 - [Quelle 2](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – fachliche oder sicherheitsbezogene Einordnung.
-- [Quelle 3](https://www.gesetze-im-internet.de/vvg_2008/__249.html) – gesetzlicher beziehungsweise technischer Rahmen.
+- [Quelle 3](https://www.gesetze-im-internet.de/bgb/__249.html) – gesetzlicher beziehungsweise technischer Rahmen.

@@ -16,7 +16,7 @@ relatedLinks: ["/schadenarten/leitungswasser/", "/fachwissen/kontrollierter-ruec
 damageTypes: ["leitungswasser"]
 publication:
   publishedAt: 2026-07-18
-  updatedAt: 2026-08-09
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Leitungswasserschaden: Erste Maßnahmen sicher dokumentieren"
@@ -113,7 +113,7 @@ Bereits bei der Erstversorgung hilfreich:
 - **Orientierende Feuchtemessungen** (kapazitiv): Betroffene Zonen einzugrenzen; Stellen für genauere Untersuchung identifizieren.
 - **Fotodokumentation mit Maßstab**: Für Risse, Schäden und Materialzustand.
 
-Vollständige messtechnische Erfassung mit CM-Messung, Trocknungsplanung und Abnahme erfolgen in einem separaten Schritt durch Fachleute.
+Weitergehende Material- und Schichtuntersuchungen, Trocknungsplanung und Erfolgskontrolle erfolgen durch geeignete Fachleute. Das Messverfahren wird aus dem Prüfziel abgeleitet; eine einzelne CM-Probe ersetzt diese Untersuchung nicht.
 
 ## Was Sofortmaßnahmen nicht ersetzen
 
@@ -146,6 +146,10 @@ Erst danach entfernt er einen Verkleidungsbereich, um den Leckagebereich zugäng
 ## Fazit
 
 Gute Erstergreifung und frühe Dokumentation legen den Grundstein für eine reibungslose Regulierung. Was in den ersten Stunden versäumt wird, lässt sich später nur schwer nachholen. Die Reihenfolge entscheidet: Stoppen – Sichern – Dokumentieren – Fachliche Beurteilung.
+
+## Ergänzung zur späteren Wiederbelegung vom 12.10.2026
+
+Der [TKB-Bericht 11, Stand 19.07.2024](https://www.klebstoffe.com/wp-content/uploads/2024/07/B-TKB-11-Belegreife.pdf), behandelt Belegreife als Gesamtheit relevanter Untergrundeigenschaften. Trockenheit allein reicht nicht. Aus dem Fachbericht entstehen ausdrücklich keine neuen Prüfpflichten. Praktisch ist die Trocknungsbeendigung von der Freigabe des späteren Bodenaufbaus zu trennen; Quelle geprüft am 12.10.2026, kein gesetzlicher Geltungsbeginn.
 
 ## Quellen und weiterführende Hinweise
 

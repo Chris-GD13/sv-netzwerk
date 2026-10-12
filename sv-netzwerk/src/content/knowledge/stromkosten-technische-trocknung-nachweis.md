@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-16
-  updatedAt: 2026-09-16
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Stromkosten der Trocknung prüffähig nachweisen"
@@ -75,9 +75,9 @@ In einem fiktiven Leitungswasserschaden laufen zwei Kondensationstrockner und dr
 
 ## Handlungsempfehlungen
 
-- Versicherungsnehmer sollten Versicherungsnehmer sollten Stromrechnung, Zählerstände und Trocknungsprotokolle sammeln.
-- Versicherer sollten Versicherer sollten Pauschalen nur nach nachvollziehbarer Herleitung berücksichtigen.
-- Sachverständige sollten Sachverständige sollten Verbrauch und Preis als getrennte Prüffelder ausweisen..
+- Versicherungsnehmer sollten Stromrechnung, Zählerstände und Trocknungsprotokolle sammeln.
+- Versicherer sollten Pauschalen nur nach nachvollziehbarer Herleitung berücksichtigen.
+- Sachverständige sollten Verbrauch und Preis als getrennte Prüffelder ausweisen.
 
 ## Fazit
 

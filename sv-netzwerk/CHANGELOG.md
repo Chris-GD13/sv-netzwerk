@@ -1,3 +1,12 @@
+## 2026-10-12 – Quellenpräzisierungen und Veröffentlichungsnachweise
+
+- CM-/KRL-Aussagen, Schichtabgrenzung und Belegreife in älteren Fachbeiträgen präzisiert.
+- Amtliche Asbest-Formularstände und Übergangsdatum sowie Destatis-Baupreisstand ergänzt; keine pauschale Preisfreigabe.
+- Rollen-Dopplungen, einen falschen Gesetzeslink und einen internen Ortungslink korrigiert.
+- Schallschutz-Neufassung und tatsächlichen LinkedIn-Permalink vom 11.10.2026 nachgetragen; Rücknahmenachweis erhalten.
+- Sitemap-lastmod aus tatsächlichen redaktionellen Datumsfeldern erzeugt.
+- Bestand inventarisiert; offene individuelle Quellenprüfung ausdrücklich ausgewiesen.
+
 ## 2026-10-11 – Fachliche Neufassung Innentüren
 
 - Abgelehnten Tagesartikel durch Schallschutz-Fachartikel ersetzt: Produktkennwerte, Einbaudetails, Raumleistung, Frequenzband-Rechenbeispiel und gezielte Nachbesserung.

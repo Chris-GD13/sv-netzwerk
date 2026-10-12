@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["leitungswasser", "gebaeude"]
 publication:
   publishedAt: 2026-07-28
-  updatedAt: 2026-08-09
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Leitungswasserschäden: Sanierungssteuerung und Regulierung"
@@ -111,7 +111,7 @@ Bei Kumulereignissen hilft ein einheitliches Protokollformat, das für alle glei
 Die Durchfeuchtung nach Leitungswasserschäden ist ohne Messtechnik nicht zuverlässig einzugrenzen:
 
 - **Kapazitive oder impedanzbasierte Feuchtemessgeräte**: Für die Erstorientierung in Böden und Wänden; geeignet, um betroffene Zonen abzugrenzen und Rückbauumfang zu begrenzen.
-- **CM-Messung (Calciumcarbid-Methode)**: Für genaue Feuchtegehalte im Estrich; Grundlage für Trocknungsplanung und Abnahme.
+- **CM-Messung (Calciumcarbid-Methode)**: Methodenspezifischer Feuchtewert einer Estrichprobe; Material, Probenahme und Bewertungsmaßstab dokumentieren. Eine Estrichprobe beurteilt keine darunterliegende Dämmschicht.
 - **Thermographie**: Bei Verdacht auf verdeckte Feuchteverteilung in Decken oder hinter Wandverkleidungen.
 - **Regelmäßige Kontrollmessungen während der Trocknung**: Trocknungsfortschritt ist mit Datum, Messstelle und Sollwert zu dokumentieren; die Abnahme nach Trocknung setzt messbasierte Freigabewerte voraus.
 
@@ -190,6 +190,12 @@ Für die Regulierung ergibt sich: Sofortmaßnahmen (Absaugen, Trockneraufstellun
 ## Fazit
 
 Großflächige Leitungswasserschäden verlangen keine anderen fachlichen Grundsätze als Einzelfälle – aber eine konsequentere Disziplin bei der Einhaltung dieser Grundsätze. Strukturierte Dokumentation, messbasierte Rückbauplanung und klare Abgrenzung zwischen Sofortmaßnahme, Trocknung und Wiederherstellung sind nicht Aufwand, sondern Schutz: vor unkontrollierten Kosten, vor Regulierungskonflikten und vor späteren Nachfragen.
+
+## Präzisierung der Feuchtemessung vom 12.10.2026
+
+[TKB-Merkblatt 8](https://www.klebstoffe.com/wp-content/uploads/2026/04/TKB-8-Untergrundbeurteilung-Veroeffentlichung.pdf) unterscheidet CM-Wassergehalt und korrespondierende relative Luftfeuchte. Einheiten und Grenzwerte sind nicht austauschbar. Praktisch sind Prüfziel, Schicht und Referenz vor der Freigabe festzulegen.
+
+Quellenstatus: Verbandsmerkblatt, Deckblatt Mai 2026; Seitenfuß abweichend April 2026. Kein Gesetz oder Norm-Entwurf; kein allgemeiner rückwirkender Geltungsbeginn. Quellenabruf: 12.10.2026.
 
 ## Quellen und weiterführende Hinweise
 

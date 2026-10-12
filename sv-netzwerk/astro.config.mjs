@@ -1,11 +1,27 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { VitePWA } from 'vite-plugin-pwa';
+import { readdirSync, readFileSync } from 'node:fs';
+
+// Only genuine editorial dates from the content are exposed as sitemap lastmod.
+const knowledgeDirectory = new URL('./src/content/knowledge/', import.meta.url);
+const knowledgeModified = new Map(readdirSync(knowledgeDirectory)
+  .filter((file) => /\.mdx?$/.test(file))
+  .flatMap((file) => {
+    const frontmatter = readFileSync(new URL(file, knowledgeDirectory), 'utf8').split('---')[1] || '';
+    const canonical = frontmatter.match(/^\s+canonical:\s*["']([^"']+)["']/m)?.[1];
+    const date = frontmatter.match(/^\s+updatedAt:\s*(\d{4}-\d{2}-\d{2})/m)?.[1]
+      || frontmatter.match(/^\s+publishedAt:\s*(\d{4}-\d{2}-\d{2})/m)?.[1];
+    return canonical && date ? [[canonical, `${date}T00:00:00.000Z`]] : [];
+  }));
 
 export default defineConfig({
   site: 'https://www.sv-netzwerk.eu',
   integrations: [
     sitemap({
+      serialize: (item) => knowledgeModified.has(item.url)
+        ? { ...item, lastmod: knowledgeModified.get(item.url) }
+        : item,
       filter: (page) =>
         !page.includes('/wissen-in-180-sekunden') &&
         !page.includes('/komponenten') &&

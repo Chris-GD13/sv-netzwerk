@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/experten/", "/fachwissen/ko
 damageTypes: ["gebaeude", "leitungswasser", "brand", "sturm"]
 publication:
   publishedAt: 2026-09-06
-  updatedAt: 2026-09-06
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Schadstoffverdacht beim Rückbau richtig einordnen"
@@ -97,6 +97,12 @@ Schadstoffverdacht macht einen schadenbedingten Rückbau nicht automatisch groß
 ## Call-to-Action
 
 Für die strukturierte Bearbeitung unterstützen wir mit [kontrollierter Rückbauplanung](/fachwissen/kontrollierter-rueckbau-bei-leitungswasserschaeden/), [prüffähiger Dokumentation](/fachwissen/prueffaehige-dokumentation/), nachvollziehbarer [Sanierungsplanung](/fachwissen/sanierungsplanung-rueckbau-trocknung-strategie/) und [Kostenprüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).
+
+## Aktualisierung zu Asbest-Anzeigeunterlagen vom 12.10.2026
+
+Die [BMAS-Bekanntmachung vom 21.05.2026](https://www.gewerbeaufsicht.niedersachsen.de/download/223019/Hinweis_Zulassung_und_Anzeige_fuer_die_TRGS_519_Stand_11_2025.pdf) enthält an die Gefahrstoffverordnung angepasste Hinweise und Musterformulare, Fassung 19.05.2026. Für Abbrucharbeiten im niedrigen und mittleren Risikobereich ist der Genehmigungsnachweis laut Übergangshinweis ab **20.12.2026** erforderlich. Veröffentlichung, Formularfassung und Nachweisbeginn sind damit unterschiedliche Daten.
+
+Praktische Bedeutung: Vor Beauftragung Tätigkeit und Risikobereich durch das Fachunternehmen bestimmen lassen und die dafür einschlägigen Anzeigen beziehungsweise Nachweise erfassen. Nicht pauschal behaupten, alle alten Formulare seien ungültig: Die Bekanntmachung lässt ihre Verwendung für klassische ASI-Arbeiten weiterhin zu. Status: amtliche Bekanntmachung und Vollzugshinweise, kein Norm-Entwurf. Die tätigkeitsbezogene Prüfung bleibt erforderlich.
 
 ## Quellen und weiterführende Hinweise
 
