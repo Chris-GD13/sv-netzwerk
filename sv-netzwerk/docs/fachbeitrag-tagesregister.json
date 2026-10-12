@@ -289,9 +289,24 @@
         }
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "not-posted",
+        "blocker": {
+          "status": "blocked-browser-connection",
+          "checked_at": "2026-10-12T07:06:32+02:00",
+          "reason": "Chrome Christian nicht mit unterstützter Browsersteuerung verbunden; direkter Chrome-Aufruf meldet Browser is not available: chrome. Codex-Browser führt Profilaktivitäten zur LinkedIn-Anmeldesperre.",
+          "duplicate_check": "not-completed-login-blocked",
+          "send_attempted": false,
+          "proof": "sv-netzwerk/docs/linkedin-veroeffentlichung-2026-10-12.md"
+        },
+        "image_cost_decision": {
+          "additional_budget_usd": 0,
+          "additional_spend_usd": 0,
+          "model_or_api_called": false,
+          "path": "no-image-planned-publication-blocked",
+          "note": "Konkrete enthaltene Work-Abrechnung nicht verifizierbar; kein Bildmodellaufruf. Kein freigegebener passender Bestand belegt. Sachlicher Linkbeitrag ohne Bild vorgesehen; wegen fehlender Duplikatprüfung kein finaler Text/Bild erstellt oder veröffentlicht."
+        }
       }
     }
   },
-  "updated_at": "2026-10-12T04:38:09.652483+00:00"
+  "updated_at": "2026-10-12T07:06:32+02:00"
 }
