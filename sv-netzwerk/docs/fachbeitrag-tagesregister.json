@@ -264,7 +264,7 @@
           "instruction": "Fachartikel zum Schallschutz bei Innentüren erstellen und LinkedIn mit freigegebenem Bild veröffentlichen",
           "old_content_status": "superseded-user-content-rejected",
           "state": "replacement-published-verified",
-          "completed_at": "2026-10-11T10:16:00Z"
+          "completed_at": "2026-10-11T10:16Z"
         }
       }
     },
@@ -274,14 +274,17 @@
         "title": "Schimmelsanierung kontrollieren: Feuchteursache, Feinreinigung und Sanierungserfolg prüfen",
         "slug": "schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen",
         "url": "https://www.sv-netzwerk.eu/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-website-20261012-01a12e40-f716-7920-b851-589ea7df9035",
-        "reserved_at": "2026-10-12T04:02:50.792Z"
+        "reserved_at": "2026-10-12T04:02:50.792Z",
+        "commit": "32c70f67b513f8a5b3a02fa74080c38de1068f4f",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38202943712",
+        "verified_at": "2026-10-12T04:19:38.973Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-12T04:09:58.485022+00:00"
+  "updated_at": "2026-10-12T04:22:28.654183+00:00"
 }
