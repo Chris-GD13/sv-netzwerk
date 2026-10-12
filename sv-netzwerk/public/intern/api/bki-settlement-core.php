@@ -28,7 +28,8 @@ function paragraph(array &$pages,array &$ops,float &$y,string $text,int $max=96,
 
 function build(array $data): array {
  global $navy,$orange,$muted,$lineColor,$panel,$section,$blue,$documentTopLabel,$tableLastHeader;
- $isKvaReview=($data['document_type']??'settlement')==='kva_review';
+ $documentType=(string)($data['document_type']??'settlement');
+ $isKvaReview=$documentType==='kva_review';
 $caseNo=trim((string)($data['case_no']??''));
 $vn=trim((string)($data['vn']??''));
 $location=trim((string)($data['location']??''));
