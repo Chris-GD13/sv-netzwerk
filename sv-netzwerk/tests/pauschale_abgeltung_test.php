@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__.'/../public/intern/api/pauschale-abgeltung-core.php';
 $written=[];$stored=[];$allowed=true;
+foreach(['Christian Wächter','Holger Roth','Marc Schütt']as$name)if(paRegulatorName(['full_name'=>$name])!==$name)throw new RuntimeException('Falscher Bearbeitername.');
 $meta=['schaden_nr'=>'MUSTER-001','vn_objekt'=>'Musterkunde','schaden_strasse'=>'Musterstraße 1','schaden_plz'=>'12345','schaden_ort'=>'Musterort'];
 $calculation=['id'=>17,'case_no'=>'MUSTER-001','vat_rate'=>19,'note'=>'Nur bezeichnete Positionen.','items_json'=>json_encode([
     ['description'=>'Muster Anstrich','quantity'=>10,'unit'=>'m²','unit_price'=>40,'regional_factor'=>1,'settlement_mode'=>'percent','settlement_percent'=>30],
@@ -13,9 +14,9 @@ function ionosList($query){return ['files'=>str_contains($query['q'],"'end'")?[]
 function ionosBytes($id){return $id==='meta'?json_encode($GLOBALS['meta']):$GLOBALS['stored'][$id];}
 function ionosWrite($meta,$bytes=null){$id='form-'.count($GLOBALS['written']);$GLOBALS['written'][]=$meta;$GLOBALS['stored'][$id]=$bytes;return ['id'=>$id];}
 function db(){return new class{function prepare($sql){return new class{function execute($args){}function fetch($mode){return $GLOBALS['calculation'];}};}};}
-$preview=paPrepareForm('case',[],false,true);
+$preview=paPrepareForm('case',['full_name'=>'Christian Wächter'],false,true);
 if(count($written)!==0||!str_contains($preview['bytes'],'239,00 EUR'))throw new RuntimeException('Vorschau nicht ausgefüllt oder verändert die Fallakte.');
-$result=paPrepareForm('case',[]);
+$result=paPrepareForm('case',['full_name'=>'Christian Wächter']);
 if($result['type']!=='pauschale_abgeltung'||$result['status']!=='filled_unsigned_draft'||abs($result['payout']-239)>.001)throw new RuntimeException('Keine belegt ausgefüllte Abgeltung.');
 if($written[0]['parents']!==['end']||!str_starts_with($written[0]['name'],'MUSTER-001_SV-Netzwerk_Abgeltungsvereinbarung_Entwurf_Kalkulation-17_'))throw new RuntimeException('Falsche Fallablage.');
 $pdf=$stored[$result['id']];
@@ -29,7 +30,7 @@ $kva=\SvNetSettlement\build(['document_type'=>'kva_review','case_no'=>'MUSTER-KV
 if(!str_contains($kva['bytes'],'119,00 EUR'))throw new RuntimeException('KVA-Export zurückgebaut.');
 if(getenv('PA_TEST_PDF'))file_put_contents(getenv('PA_TEST_PDF'),$pdf);
 $allowed=false;$before=count($written);
-try{paPrepareForm('case',[]);throw new RuntimeException('Fremder Fall akzeptiert');}catch(RuntimeException $error){if($error->getCode()!==403)throw$error;}
+try{paPrepareForm('case',['full_name'=>'Christian Wächter']);throw new RuntimeException('Fremder Fall akzeptiert');}catch(RuntimeException $error){if($error->getCode()!==403)throw$error;}
 if(count($written)!==$before)throw new RuntimeException('Vor Berechtigungsprüfung geschrieben.');
 $ui=file_get_contents(__DIR__.'/../src/pages/intern/versicherungsfaelle/index.astro');
 foreach(['value="pauschale_abgeltung"',"key==='pauschale_abgeltung'",'/intern/api/pauschale-abgeltung.php','Abgeltungsvereinbarung|Dokumentenindex','id="vf-abgeltung-form"']as$needle)if(!str_contains($ui,$needle))throw new RuntimeException('Fehlende UI-Anbindung '.$needle);

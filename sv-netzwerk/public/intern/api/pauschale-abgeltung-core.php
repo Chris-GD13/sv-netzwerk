@@ -3,6 +3,14 @@ declare(strict_types=1);
 
 require_once __DIR__.'/bki-settlement-core.php';
 
+function paRegulatorName(array $user): string {
+    $email=strtolower(trim((string)($user['email']??'')));
+    if($email==='ws@sv-schuett.eu')return 'Christian Wächter';
+    $name=trim((string)($user['full_name']??''));
+    if($name==='')throw new RuntimeException('Name des angemeldeten Bearbeiters fehlt.');
+    return $name;
+}
+
 function paSettlementPayload(array $calculation,array $meta): array {
     if(!is_numeric($calculation['vat_rate']??null)||!is_finite((float)$calculation['vat_rate'])||(float)$calculation['vat_rate']<0||(float)$calculation['vat_rate']>100)throw new RuntimeException('Umsatzsteuersatz der Kalkulation fehlt.');
     $lines=json_decode((string)($calculation['items_json']??''),true,512,JSON_THROW_ON_ERROR);
@@ -39,7 +47,7 @@ function paSettlementPayload(array $calculation,array $meta): array {
     if(preg_match('/\[(?:Betrag|Positionen|Prozentsatz)[^\]]*\]/u',$note))throw new RuntimeException('Der gespeicherte Abgeltungsvermerk enthält noch Platzhalter. Bitte in der Kalkulation vervollständigen.');
     return ['document_type'=>'settlement','case_no'=>$number,'vn'=>$vn,'location'=>$location,
         'date'=>(new DateTimeImmutable('now',new DateTimeZone('Europe/Berlin')))->format('Y-m-d'),
-        'regulator'=>'Christian Wächter · SV-Netzwerk','vat'=>(float)$calculation['vat_rate'],'lines'=>$lines,
+        'regulator'=>'','vat'=>(float)$calculation['vat_rate'],'lines'=>$lines,
         'note'=>'Abgeltung gemäß gespeicherter Kalkulation Nr. '.(int)$calculation['id']."\n\n".implode("\n\n",$sections)."\n\n".
             'Mit Auszahlung des vereinbarten Abgeltungsbetrages sind ausschließlich die ausdrücklich als abgegolten bezeichneten Schadenpositionen abschließend reguliert.'.($note!==''?"\n\n".$note:'')];
 }
@@ -69,7 +77,8 @@ function paPrepareForm(string $folder,array $user,bool $retireOnly=false,bool $p
     $statement=db()->prepare('SELECT * FROM bki_calculations WHERE folder_id=:folder ORDER BY id DESC LIMIT 1');
     $statement->execute([':folder'=>$folder]);$calculation=$statement->fetch(PDO::FETCH_ASSOC);
     if(!is_array($calculation))throw new RuntimeException('Keine gespeicherte Kalkulation für diesen Fall vorhanden. Bitte die Abgeltung in der Kalkulation festlegen und speichern.');
-    $payload=paSettlementPayload($calculation,$meta);$document=\SvNetSettlement\build($payload);$bytes=$document['bytes'];
+    $payload=paSettlementPayload($calculation,$meta);$payload['regulator']=paRegulatorName($user).' · SV-Netzwerk';
+    $document=\SvNetSettlement\build($payload);$bytes=$document['bytes'];
     if($preview)return $document;
     if($parent==='')$parent=(string)ionosWrite(['name'=>'08_Abschluss','mimeType'=>'application/vnd.google-apps.folder','parents'=>[$folder]])['id'];
     $prefix=preg_replace('/[^\p{L}\p{N}._-]/u','_',$payload['case_no']);

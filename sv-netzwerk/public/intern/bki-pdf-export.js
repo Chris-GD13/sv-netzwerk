@@ -8,7 +8,13 @@
   const lines=()=>bridge()?.getLines?.()||[];
   const meta=()=>bridge()?.getMeta?.()||{};
   const vat=()=>num(document.getElementById('bk-vat')?.value)||0;
-  const regulator=()=>document.getElementById('bk-regulator')?.value?.trim()||'Christian Wächter';
+  let regulatorName='';
+  let regulatorEdited=false;
+  const regulatorReady=fetch('/intern/api/auth.php?action=session',{credentials:'same-origin',cache:'no-store'})
+    .then(response=>response.ok?response.json():Promise.reject(new Error('Bearbeiter konnte nicht geladen werden.')))
+    .then(data=>{const user=data.user||{};regulatorName=user.email==='ws@sv-schuett.eu'?'Christian Wächter':String(user.full_name||'').trim();const input=document.getElementById('bk-regulator');if(input&&!regulatorEdited)input.value=regulatorName;return regulatorName;})
+    .catch(()=> '');
+  const regulator=()=>document.getElementById('bk-regulator')?.value?.trim()||regulatorName;
   const note=()=>document.getElementById('bk-note')?.value?.trim()||'';
   const germanNumber=value=>{const normalized=String(value??'').replace(/[^0-9,.-]/g,'').replace(/\./g,'').replace(',','.');const parsed=Number(normalized);return Number.isFinite(parsed)?parsed:0;};
   const calculatedGross=()=>lines().reduce((sum,line)=>line?.type==='section'?sum:sum+(num(line?.quantity)*num(line?.unit_price)*num(line?.regional_factor||1)*(1+vat()/100)),0);
@@ -41,7 +47,9 @@
   }
 
   async function generatePdf({download=false,type='settlement'}={}){
+    await regulatorReady;
     const data=payload(type);
+    if(!data.regulator)throw new Error('Name des Bearbeiters fehlt. Bitte Anmeldung prüfen oder den Namen eintragen.');
     if(!data.lines.length)throw new Error('Keine Kalkulationspositionen vorhanden.');
     if(type==='kva_review'&&data.lines.some(line=>line.type!=='section'&&(line.comparison_basis==='kva_open'||(line.source_position_code&&!line.bki_scope_checked))))throw new Error('BKI-Abgleich ist noch offen. Eine automatische KVA-Freigabe oder Kürzung ist daraus nicht möglich. Offene Leistungen zuerst fachlich klären.');
     if(type==='kva_review'&&(!data.kva.company||!data.kva.quote_number||data.kva.gross_total<=0))throw new Error('Für die KVA-Prüfung fehlen Firma, KVA-Nummer oder KVA-Gesamtbetrag. Bitte den KVA zuerst auslesen.');
@@ -75,6 +83,8 @@
   }
 
   function install(){
+    const input=document.getElementById('bk-regulator');
+    if(input&&!input.dataset.identityBound){input.dataset.identityBound='true';input.addEventListener('input',()=>{regulatorEdited=true;});if(regulatorName&&!regulatorEdited)input.value=regulatorName;}
     if(document.getElementById('bk-create-pdf'))return;
     const host=document.querySelector('.bk-footer-actions')||document.querySelector('.bk-notes');
     if(!host)return;
