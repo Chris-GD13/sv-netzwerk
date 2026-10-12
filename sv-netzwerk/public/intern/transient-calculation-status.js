@@ -36,7 +36,7 @@
   function interruptedBox(){
     const box=document.getElementById('vf-job');
     const text=box?.textContent||'';
-    return box&&interruptedTexts.some(needle=>text.includes(needle))?box:null;
+    return box&&box.dataset.generationKind!=='native'&&interruptedTexts.some(needle=>text.includes(needle))?box:null;
   }
 
   function renderDone(box,job){
@@ -71,7 +71,7 @@
   async function recoverOnce(fromVisibleInterruption=true){
     if(recovering)return;
     const box=document.getElementById('vf-job'),current=activeCase();
-    if(!box||!current?.folder_id||(fromVisibleInterruption&&!interruptedBox()))return;
+    if(!box||box.dataset.generationKind==='native'||!current?.folder_id||(fromVisibleInterruption&&!interruptedBox()))return;
     recovering=true;
     box.hidden=false;
     try{
@@ -89,7 +89,7 @@
       }
       await poll(jobId,box);
     }catch(error){
-      renderStopped(box,String(error?.message||error));
+      if(fromVisibleInterruption&&box.dataset.generationKind!=='native')renderStopped(box,String(error?.message||error));
     }finally{
       recovering=false;
     }
