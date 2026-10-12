@@ -208,3 +208,15 @@ export function claimFolderPath(file, folders = []) {
   if (root && names[0] !== root) names.unshift(root);
   return names.join('/');
 }
+
+export async function resolveClaimSource(profiles, lookup) {
+  const hits=[];
+  for(const profile of profiles){
+    const claims=await lookup(profile);
+    if(claims.length>1)throw new Error('[CF-SOURCE-AMBIGUOUS] Mehrere exakte Treffer im selben Zugang. Bitte den Fall eindeutig zuordnen.');
+    if(claims.length===1)hits.push({profile,claim:claims[0]});
+  }
+  if(hits.length>1)throw new Error('[CF-SOURCE-AMBIGUOUS] Schadennummer in Christian und Maurer gefunden. Bitte den Zugang auswählen.');
+  if(!hits.length)throw new Error('[CF-SOURCE-NOT-FOUND] Schadennummer in keinem freigegebenen ClaimsForce-Zugang gefunden.');
+  return hits[0];
+}

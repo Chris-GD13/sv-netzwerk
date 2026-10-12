@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once __DIR__.'/config.php';
 require_once __DIR__.'/profile-routing.php';
 require_once __DIR__.'/claimsforce-queue-utils.php';
+require_once __DIR__.'/case-search.php';
 commonHeaders();
 $user=requireAuth();
 if(!in_array((string)($user['role']??''),['administrator','projektleiter','pruefer','sachverstaendiger'],true))apiError(403,'Keine Berechtigung.');
@@ -22,7 +23,8 @@ function cqEnsureColumns():void{
         'sync_mode'=>'VARCHAR(20) NOT NULL DEFAULT \'quick\'',
         'since_date'=>'DATE NULL',
         'claim_number'=>'VARCHAR(120) NULL',
-        'agent_key'=>'CHAR(64) NULL'
+        'agent_key'=>'CHAR(64) NULL',
+        'source_profiles_json'=>'TEXT NULL'
     ];
     $check=db()->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=:table AND COLUMN_NAME=:column');
     foreach($columns as$name=>$definition){
@@ -68,13 +70,14 @@ function cqVisibleProfiles(array$user):array{
     return[$profile=>$labels[$profile]];
 }
 function cqRow(int$id):array{
-    $s=db()->prepare('SELECT id,profile,status,message,result_json,created_at,started_at,heartbeat_at,attempt_count,phase,progress_current,progress_total,diagnostic_json,finished_at,requested_by,sync_mode,since_date,claim_number FROM claimsforce_import_jobs WHERE id=:id LIMIT 1');
+    $s=db()->prepare('SELECT id,profile,status,message,result_json,created_at,started_at,heartbeat_at,attempt_count,phase,progress_current,progress_total,diagnostic_json,finished_at,requested_by,sync_mode,since_date,claim_number,source_profiles_json FROM claimsforce_import_jobs WHERE id=:id LIMIT 1');
     $s->execute([':id'=>$id]);
     $row=$s->fetch(PDO::FETCH_ASSOC)?:[];
     if($row){
         $row['result']=$row['result_json']?json_decode((string)$row['result_json'],true):null;
         $row['diagnostic']=$row['diagnostic_json']?json_decode((string)$row['diagnostic_json'],true):null;
-        unset($row['result_json'],$row['diagnostic_json']);
+        $row['source_profiles']=json_decode((string)($row['source_profiles_json']??''),true)?:[$row['profile']];
+        unset($row['result_json'],$row['diagnostic_json'],$row['source_profiles_json']);
     }
     return$row;
 }
@@ -120,6 +123,15 @@ if($action==='enqueue'){
     }else{
         $claimNumber='';
     }
+    $sourceProfiles=[$profile];
+    if($syncMode==='single'){
+        $known=[];
+        $owners=db()->prepare('SELECT case_no,user_email FROM case_folder_owners WHERE '.caseSearchOwnerScope($user).' ORDER BY registered_at DESC LIMIT 1000');
+        $owners->execute([':user_id'=>(int)$user['id'],':user_email'=>(string)$user['email']]);
+        foreach($owners->fetchAll(PDO::FETCH_ASSOC)as$owner)if(caseNumberKey((string)$owner['case_no'])===caseNumberKey($claimNumber))$known[]=svnetUserProfile(['email'=>$owner['user_email']]);
+        try{$sourceProfiles=cqSingleSourceProfiles($user,trim((string)($body['source_profile']??'')),$known);}
+        catch(InvalidArgumentException$e){apiError(403,$e->getMessage());}
+    }
     if($syncMode==='tasks'&&$profile==='jens'&&(cqIsCentralAgent($user)||cqProfile($user)==='christian'))$allowed[]='jens';
     if(!in_array($profile,$allowed,true))apiError(409,'ClaimsForce-Profil und ausgewählter Sachverständiger stimmen nicht überein.');
     if (!empty($body['preserve_active'])) {
@@ -132,8 +144,8 @@ if($action==='enqueue'){
     }
     $stop=db()->prepare("UPDATE claimsforce_import_jobs SET status='failed',message='Durch einen neuen manuellen Import ersetzt.',phase='CF-FAIL-REPLACED',heartbeat_at=NOW(),finished_at=NOW() WHERE requested_by=:u AND profile=:p AND status IN ('queued','running')");
     $stop->execute([':p'=>$profile,':u'=>(string)($user['email']??'')]);
-    $s=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,sync_mode,since_date,claim_number,created_at) VALUES(:p,'queued',:u,:m,'CF-QUEUED',:mode,:since,:claim,NOW())");
-    $s->execute([':p'=>$profile,':u'=>(string)($user['email']??''),':m'=>$syncMode==='full'?'Vollständiger ClaimsForce-Abgleich wartet auf die zentrale Importstation.':($syncMode==='single'?'Einzelfall-Vollimport wartet auf die zentrale Importstation.':'Import wartet auf die zentrale Importstation.'),':mode'=>$syncMode,':since'=>$sinceDate,':claim'=>$claimNumber!==''?$claimNumber:null]);
+    $s=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,sync_mode,since_date,claim_number,source_profiles_json,created_at) VALUES(:p,'queued',:u,:m,'CF-QUEUED',:mode,:since,:claim,:sources,NOW())");
+    $s->execute([':p'=>$profile,':u'=>(string)($user['email']??''),':m'=>$syncMode==='full'?'Vollständiger ClaimsForce-Abgleich wartet auf die zentrale Importstation.':($syncMode==='single'?'Einzelfall-Vollimport wartet auf die zentrale Importstation.':'Import wartet auf die zentrale Importstation.'),':mode'=>$syncMode,':since'=>$sinceDate,':claim'=>$claimNumber!==''?$claimNumber:null,':sources'=>json_encode($sourceProfiles)]);
     apiJson(['ok'=>true,'job'=>cqRow((int)db()->lastInsertId())]);
 }
 if($action==='status'){

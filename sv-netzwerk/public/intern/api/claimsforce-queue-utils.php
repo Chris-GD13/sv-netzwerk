@@ -3,6 +3,7 @@ declare(strict_types=1);
 function cqSingleResultValid(array $job,array $result):bool{
     $normalize=static fn($v)=>preg_replace('/^(\d{9})gf$/','$1',strtolower(preg_replace('/[^A-Za-z0-9]/','',(string)$v)));
     if(($job['sync_mode']??'')!=='single')return true;
+    if(!empty($job['source_profiles'])&&!in_array((string)($result['sourceProfile']??''),(array)$job['source_profiles'],true))return false;
     $inventory=$result['inventories']??[];
     if(!is_array($inventory)||count($inventory)!==1||!is_array($inventory[0]))return false;
     if(!empty($inventory[0]['errors']))return false;
@@ -13,7 +14,7 @@ function cqSingleResultValid(array $job,array $result):bool{
 }
 function cqStationKey(array$body):string{
     $id=(string)($body['stationId']??'');
-    if(!preg_match('/^[a-f0-9-]{36}$/i',$id)||version_compare((string)($body['bridgeVersion']??'0'),'1.4.61','<')||($body['workerVersion']??'')!=='1.4.61'||(int)($body['protocol']??0)!==2)apiError(409,'Aktuelle Browser-Brücke 1.4.61 erforderlich. Diese alte Importstation darf keinen Auftrag übernehmen.');
+    if(!preg_match('/^[a-f0-9-]{36}$/i',$id)||version_compare((string)($body['bridgeVersion']??'0'),'1.4.62','<')||($body['workerVersion']??'')!=='1.4.62'||(int)($body['protocol']??0)!==2)apiError(409,'Aktuelle Browser-Brücke 1.4.62 erforderlich. Diese alte Importstation darf keinen Auftrag übernehmen.');
     return hash('sha256',$id);
 }
 function cqRequireOwner(int$id,array$body):void{
@@ -28,4 +29,14 @@ function cqConfirmHeartbeat(int$id,array$body,int$changedRows):void{
     // Das ist kein Abbruch: nur ein tatsächlich beendeter/fremder Auftrag wird abgelehnt.
     if($changedRows===0)cqRequireOwner($id,$body);
     elseif($changedRows!==1)apiError(409,'Importauftrag konnte nicht eindeutig aktualisiert werden.');
+}
+
+function cqSingleSourceProfiles(array $user,string $requested,array $known=[]):array{
+    $allowed=svnetAccessibleCaseProfiles($user);
+    if($requested!==''){
+        if(!in_array($requested,$allowed,true))throw new InvalidArgumentException('Dieser ClaimsForce-Zugang ist nicht freigegeben.');
+        return[$requested];
+    }
+    $known=array_values(array_unique(array_intersect($known,$allowed)));
+    return count($known)===1?$known:$allowed;
 }

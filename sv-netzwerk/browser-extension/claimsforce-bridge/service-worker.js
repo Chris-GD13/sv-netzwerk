@@ -1,5 +1,5 @@
 import { clearCredentials, loadCredentials, loadPortalCredentials, saveCredentials } from './vault.js';
-import { collectInvestigationClaims, mapClaim, safeFileName, sameImportScope, assertSingleClaim, mergeClaimFiles, claimFolderPath } from './import-utils.js';
+import { collectInvestigationClaims, mapClaim, safeFileName, sameImportScope, assertSingleClaim, mergeClaimFiles, claimFolderPath, resolveClaimSource } from './import-utils.js';
 import { isActiveRekonTask, mapRekonTask, ownerMatchesRekonProfile, rekonFileVersion, rekonMessageVersion, rekonProfileKey } from './rekon-utils.js';
 
 const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
@@ -20,7 +20,7 @@ const PROFILE_EMAILS = {
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS', 'SW'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
-const WORKER_CODE_VERSION = '1.4.61';
+const WORKER_CODE_VERSION = '1.4.62';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
@@ -488,11 +488,37 @@ async function openSelectedClaimTab(tabId, claimId) {
   throw new Error('[CF-SINGLE-01] Der exakte ClaimsForce-Suchtreffer wurde nicht geöffnet. Bitte prüfen, ob der Eintrag aus „Suchergebnisse“ angeklickt wurde.');
 }
 
+async function discoverSingleClaimSource(run) {
+  const profiles=run.sourceProfiles;
+  const found=await resolveClaimSource(profiles,async profile=>{
+    await diagnostic(run,'CF-SOURCE-01',`Schadennummer wird im Zugang ${profile==='jens'?'Maurer':'Christian'} gesucht.`,{sourceProfile:profile});
+    await chrome.storage.session.set({activeProfile:profile});
+    await resetClaimsSession(run);
+    const credential=await credentialsFor(profile);
+    if(!credential||!credentialMatchesProfile(profile,credential.value))throw new Error(`[CF-CRED-01] Zugang ${profile==='jens'?'Maurer':'Christian'} ist nicht bereit. Beide Quellen konnten nicht vollständig geprüft werden.`);
+    const {tab}=await claimsTab(profile,run,credential);
+    const result=await chrome.tabs.sendMessage(tab.id,{type:'SCRAPE_CLAIM_BY_DAMAGE_NUMBER',damageNumber:run.claimNumber});
+    if(!result?.ok){
+      if(String(result?.error||'').startsWith('[CF-SOURCE-NOT-FOUND]'))return[];
+      throw new Error(result?.error||'ClaimsForce-Suche konnte nicht geprüft werden.');
+    }
+    const claims=Array.isArray(result.claims)?result.claims:[];
+    if(claims.length===1)assertSingleClaim(run.claimNumber,claims);
+    return claims;
+  });
+  return found.profile;
+}
+
 async function runImport(run) {
-  const portalTabId = () => Number(run.portalTabId || 0), profile = profileKey(run.profile), singleClaimNumber = String(run.claimNumber || '').trim(), singleSync = run.mode === 'single' || singleClaimNumber !== '', fullSync = run.mode === 'full' || !!run.full;
+  const portalTabId = () => Number(run.portalTabId || 0), singleClaimNumber = String(run.claimNumber || '').trim(), singleSync = run.mode === 'single' || singleClaimNumber !== '', fullSync = run.mode === 'full' || !!run.full;
   const useInvoicedClaims = fullSync || singleSync;
   if (singleSync && !singleClaimNumber.replace(/[^A-Za-z0-9]/g, '')) throw new Error('[CF-SINGLE-01] Für den Einzelfallimport fehlt die Schadennummer.');
-  run.profile = profile;
+  let profile=profileKey(run.profile);
+  if(singleSync&&Array.isArray(run.sourceProfiles)&&run.sourceProfiles.length){
+    profile=run.sourceProfiles.length===1?profileKey(run.sourceProfiles[0]):await discoverSingleClaimSource(run);
+    await chrome.storage.session.set({activeProfile:profile});
+    await resetClaimsSession(run);
+  }
   await chrome.storage.session.set({ activeProfile: profile });
   if (!singleSync) await resetClaimsSession(run);
   const credential = await credentialsFor(profile);
@@ -776,7 +802,7 @@ async function runImport(run) {
   await chrome.storage.session.set({ claimsLoggedProfile: profile });
   await chrome.storage.local.set({ claimsLoggedProfile: profile });
   if (failed > 0 && failed === claims.length) throw new Error(`[CF-CASE-ALL] Alle ${failed} Aufträge sind fehlgeschlagen. Erste Ursache: ${firstError}`.slice(0, 480));
-  return { claims: claims.length, openTasks, updated, skipped, failed, firstError, claimNumber: singleClaimNumber, files: filesDone, messages: messagesDone, notes: inventories.reduce((n, item) => n + item.notes, 0), tasks: inventories.reduce((n, item) => n + item.tasks, 0), inventories, appointments: appointmentsDone, sources: useInvoicedClaims ? bucketCounts : {} };
+  return { claims: claims.length, openTasks, updated, skipped, failed, firstError, claimNumber: singleClaimNumber, sourceProfile:profile, files: filesDone, messages: messagesDone, notes: inventories.reduce((n, item) => n + item.notes, 0), tasks: inventories.reduce((n, item) => n + item.tasks, 0), inventories, appointments: appointmentsDone, sources: useInvoicedClaims ? bucketCounts : {} };
 }
 
 async function startImport(sender, message) {
@@ -784,7 +810,7 @@ async function startImport(sender, message) {
   const portalTabId = sender.tab?.id;
   if (!portalTabId) return { ok: false, error: '[CF-RUN-00] Portal-Registerkarte fehlt.' };
   const claimNumber = String(message.claimNumber || '').trim();
-  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), mode: claimNumber ? 'single' : message.mode === 'tasks' ? 'tasks' : message.mode === 'single' ? 'single' : message.mode === 'full' || message.full ? 'full' : 'quick', claimNumber, since: String(message.since || ''), portalTabId, startedAt: new Date().toISOString() };
+  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), mode: claimNumber ? 'single' : message.mode === 'tasks' ? 'tasks' : message.mode === 'single' ? 'single' : message.mode === 'full' || message.full ? 'full' : 'quick', sourceProfiles: Array.isArray(message.sourceProfiles)?message.sourceProfiles.filter(p=>['christian','jens'].includes(p)&&profileKey(message.profile)==='christian'):[], claimNumber, since: String(message.since || ''), portalTabId, startedAt: new Date().toISOString() };
   if (runningImport) {
     if (sameImportScope(runningImport, requested) && !runningImport.stopRequested) {
       runningImport.portalTabId = portalTabId;

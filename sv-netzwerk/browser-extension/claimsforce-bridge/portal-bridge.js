@@ -1,7 +1,7 @@
 const API = '/intern/api/google-drive-sync.php';
 const CAL = '/intern/api/outlook-case-calendar.php';
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
-const PORTAL_CODE_VERSION = '1.4.61';
+const PORTAL_CODE_VERSION = '1.4.62';
 const CONTEXT_RELOAD_MESSAGE = 'Die Browser-Brücke wurde aktualisiert. Bitte diese Portalseite einmal neu laden und den Import danach erneut starten.';
 let contextReloadReported = false;
 const invalidExtensionContext = error => /Extension context invalidated|Receiving end does not exist|message port closed/i.test(String(error?.message || error || ''));
@@ -263,6 +263,7 @@ window.addEventListener('message', event => {
       mode: String(event.data.claimNumber || '').trim() ? 'single' : event.data.mode === 'tasks' ? 'tasks' : event.data.mode === 'single' ? 'single' : event.data.mode === 'full' || event.data.full ? 'full' : 'quick',
       full: event.data.full === true,
       claimNumber: String(event.data.claimNumber || ''),
+      sourceProfiles: Array.isArray(event.data.sourceProfiles)?event.data.sourceProfiles:[],
       since: String(event.data.since || '')
     };
     const request = activeRequest;

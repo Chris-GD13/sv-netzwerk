@@ -32,8 +32,7 @@ $isBackoffice=gdIsSusanne($portalUser);
 $claimsProfile=gdClaimsProfile($portalUser);
 $requestedExpert=mb_strtolower(trim((string)($_SERVER['HTTP_X_SVNET_EXPERT_PROFILE']??'')),'UTF-8');
 if($requestedExpert!==''&&!in_array($requestedExpert,gdSupportedExpertKeys(),true))apiError(400,'Unbekanntes Importprofil.');
-if(!$isBackoffice&&$requestedExpert!==''&&$requestedExpert!==$claimsProfile)apiError(403,'Das angeforderte Importprofil ist für diesen Benutzer nicht freigegeben.');
-if($isBackoffice&&$requestedExpert!==''&&$requestedExpert!=='christian')apiError(403,'Dieses Bearbeiterprofil ist nicht freigegeben.');
+if($requestedExpert!==''&&(!in_array($requestedExpert,svnetAccessibleCaseProfiles($portalUser),true)||($requestedExpert==='jens'&&svnetSelectedProfile($portalUser)!=='christian')))apiError(403,'Das angeforderte Importprofil ist für diesen Benutzer nicht freigegeben.');
 if($isBackoffice&&$action==='select_expert'){
     if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');
     $body=requestBody();$expert=mb_strtolower(trim((string)($body['expert']??'')),'UTF-8');
@@ -43,7 +42,7 @@ if($isBackoffice&&$action==='select_expert'){
 }
 $selectedExpert='';
 if($isBackoffice){
-    if($requestedExpert!=='')$selectedExpert=$requestedExpert;
+    if($requestedExpert!=='')$selectedExpert=$requestedExpert==='jens'?'christian':$requestedExpert;
     else{
         $storedExpert=(string)($_SESSION['svnet_selected_expert']??'');
         try{$storedExpert=svnetSelectedProfile($portalUser,$storedExpert);}
@@ -55,6 +54,9 @@ if($isBackoffice){
     }
 }
 if($isBackoffice)$user=gdExpertIdentity($selectedExpert,$portalUser);
+if($requestedExpert==='jens'){
+    $user=array_merge($portalUser,['email'=>'jens@profile.sv-netzwerk','full_name'=>'Jens Maurer','svnet_expert_profile'=>'jens','svnet_source_import'=>true]);
+}
 
 function gdEnsureSettingsTable():void{
     db()->exec("CREATE TABLE IF NOT EXISTS app_settings (
@@ -136,7 +138,7 @@ function gdIsHolger(array $user):bool{$email=gdUserKey($user);$name=gdNormalize(
 function gdUserCasesName(array $user):string{$name=trim((string)($user['full_name']??''));if($name===''){$local=explode('@',gdUserKey($user),2)[0]??'Benutzer';$name=preg_replace('/[^a-z0-9._-]+/i',' ',(string)$local)?:'Benutzer';}return'Schadenfälle '.$name;}
 function gdUserCasesRoot(array $user,bool $sharedSource=false):array{
     $legacy=gdFolderId('cases');$profile=gdClaimsProfile($user);
-    if($profile==='jens'&&!$sharedSource)apiError(403,'Für den Maurer-Zugang sind keine Portal-Fälle freigegeben.');
+    if($profile==='jens'&&!$sharedSource&&empty($user['svnet_source_import']))apiError(403,'Für den Maurer-Zugang sind keine Portal-Fälle freigegeben.');
     if($profile==='christian')return['id'=>$legacy,'name'=>svnetCasesFolderName($profile)];
     if(!in_array($profile,['holger','marc','jens'],true))apiError(409,'Für den angemeldeten Benutzer ist kein unterstütztes Bearbeiterprofil hinterlegt.');
     $meta=gdFileMeta($legacy);$parent=trim((string)(($meta['parents']??[])[0]??''));
@@ -147,7 +149,7 @@ function gdUserCasesRoot(array $user,bool $sharedSource=false):array{
 }
 function gdEnsureKnownCasesRoots():void{$legacy=gdFolderId('cases');$meta=gdFileMeta($legacy);$parent=trim((string)(($meta['parents']??[])[0]??''));if($parent==='')return;foreach(['Schadenfälle Holger Roth','Schadenfälle Marc Schütt','Schadenfälle Jens Maurer']as$name){$folder=gdFindChildByName($parent,$name);if(!$folder||($folder['mimeType']??'')!=='application/vnd.google-apps.folder')gdCreateFolder($parent,$name);}}
 function gdAccessibleCaseRoots(array $user):array{
-    if(svnetSelectedProfile($user)==='jens')apiError(403,'Für den Maurer-Zugang sind keine Portal-Fälle freigegeben.');
+    if(svnetSelectedProfile($user)==='jens'&&empty($user['svnet_source_import']))apiError(403,'Für den Maurer-Zugang sind keine Portal-Fälle freigegeben.');
     static$cache=[];
     $key=gdUserKey($user).'|'.svnetSelectedProfile($user);
     if(isset($cache[$key]))return$cache[$key];
@@ -239,7 +241,7 @@ function gdPrivateRoot(array $user):array{$profile=gdClaimsProfile($user);if(!in
 function gdPrivateTree(string $id,string $path=''):array{$out=[];foreach(gdListChildren($id,null,1000)as$f){$name=(string)($f['name']??'');$row=['id'=>(string)$f['id'],'name'=>$name,'path'=>ltrim($path.'/'.$name,'/'),'folder'=>($f['mimeType']??'')==='application/vnd.google-apps.folder','size'=>(int)($f['size']??0),'modified'=>(string)($f['modifiedTime']??'')];if($row['folder'])$row['children']=gdPrivateTree($row['id'],$row['path']);$out[]=$row;}usort($out,fn($a,$b)=>[$b['folder'],$a['name']]<=>[$b['folder'],$b['name']]);return$out;}
 function gdPrivateFind(array $rows,string $id):?array{foreach($rows as$r){if((string)($r['id']??'')===$id)return$r;if(!empty($r['folder'])){if($x=gdPrivateFind((array)($r['children']??[]),$id))return$x;}}return null;}
 function gdPrivateAssert(string $id,array $user):array{$root=gdPrivateRoot($user);if($id===$root['id'])return$root;$meta=gdFileMeta($id);if(!in_array($root['id'],$meta['parents']??[],true)){$tree=gdPrivateTree($root['id']);if(!gdPrivateFind($tree,$id))apiError(403,'Ordner gehört nicht zum eigenen Privatauftragsbereich.');}return$meta;}
-if(gdClaimsProfile($user)==='jens'){
+if(gdClaimsProfile($user)==='jens'&&empty($user['svnet_source_import'])){
     if($action==='status')apiJson(['ok'=>true,'connected'=>true,'cached'=>false,'user_scope'=>hash('sha256',gdUserKey($user)),'backoffice'=>false,'selected_expert'=>'','claims_profile'=>'jens','claims_agent'=>false,'folders'=>['cases'=>['id'=>'','name'=>'','items'=>0]]]);
     if(in_array($action,['recent_cases','search_cases','incoming_phone'],true))apiJson(['ok'=>true,'results'=>[]]);
 }

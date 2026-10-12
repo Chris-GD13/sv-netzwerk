@@ -288,11 +288,11 @@ assert(calendarApi.includes("$action==='delete_claimsforce_event'") && calendarA
 assert(drive.includes("'claims_profile'=>\$claimsProfile"), 'Status liefert das Claims-Profil des angemeldeten Sachverständigen');
 assert(drive.includes("$isBackoffice=gdIsSusanne($portalUser)") && routing.includes("=== 'ws@sv-schuett.eu'") && !routing.includes("=== 'administrator'"), 'Nur Susanne besitzt die explizite Assistenzfreigabe; Administratorrollen erweitern keine Profile');
 assert(routing.includes("'jens' => array_merge") && routing.includes("'full_name'=>'Jens Maurer'") && routing.includes("'svnet_expert_profile'=>'jens'"), 'Jens besitzt eine eigenständige Backend-Identität');
-assert(drive.includes("if($profile==='jens'&&!$sharedSource)apiError(403") && drive.includes("if($profile==='christian')return"), 'Maurer besitzt keine Portal-Fallfreigabe; Christian verwendet seinen bisherigen Ordner');
+assert(drive.includes("if($profile==='jens'&&!$sharedSource&&empty($user['svnet_source_import']))apiError(403") && drive.includes("if($profile==='christian')return"), 'Maurer besitzt keine Portal-Fallfreigabe; Christian verwendet seinen bisherigen Ordner');
 assert(routing.includes("if ($profile === '') throw new InvalidArgumentException"), 'Unbekannte Benutzer dürfen nicht auf Christian zurückfallen');
 assert(routing.includes("if ($profile !== 'christian' || !svnetIsBackofficeUser($backoffice))"), 'Die Assistenzidentität ist ausschließlich für Christians Profil freigegeben');
 assert(drive.includes("gdUserKey($portalUser).'|'.$claimsProfile.'|'.$selectedExpert"), 'Der Statuscache darf die Brückenberechtigung verschiedener Administratoren nicht vermischen');
-assert(drive.includes("HTTP_X_SVNET_EXPERT_PROFILE") && drive.includes("if($requestedExpert!=='')$selectedExpert=$requestedExpert"), 'Drive-Operationen verwenden das Importprofil nur anforderungsbezogen und ändern nicht die sichtbare Portalauswahl');
+assert(drive.includes("HTTP_X_SVNET_EXPERT_PROFILE") && drive.includes("$selectedExpert=$requestedExpert==='jens'?'christian':$requestedExpert"), 'Drive-Operationen verwenden das Importprofil nur anforderungsbezogen und ändern nicht die sichtbare Portalauswahl');
 const driveStatusCache = fs.readFileSync(path.join(root, 'public/intern/drive-status-cache.js'), 'utf8');
 assert(driveStatusCache.includes('window.svnetDriveStatus=load') && driveStatusCache.includes('pending') && driveStatusCache.includes('Date.now()+45000'), 'Parallele Portalabfragen teilen sich einen einzigen Drive-Status und behalten ihn 45 Sekunden');
 assert(internLayout.includes('drive-status-cache.js?v=20260829-1'), 'Der gemeinsame Drive-Status steht vor allen Portalmodulen bereit');

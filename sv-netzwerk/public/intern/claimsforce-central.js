@@ -30,7 +30,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,stationId,bridgeVersion,workerVersion,protocol:2})});
   const show=(t,b=false)=>{if(context.claims_agent&&bridgeProblem&&!mobileClient){t=bridgeProblem;b=true;button.disabled=true;if(fullButton)fullButton.disabled=true;}state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.4.61',currentBridgeVersion='1.4.61';
+  const minimumBridgeVersion='1.4.62',currentBridgeVersion='1.4.62';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -70,6 +70,7 @@
       const jobs=await Promise.all(userJobs.map(async id=>(await json('/intern/api/claimsforce-queue.php?action=status&id='+id)).job));
       controlJobs=[...jobs,...controlJobs.filter(job=>!jobs.some(current=>Number(current.id)===Number(job.id)))];refreshControl();
       const failed=jobs.some(job=>job.status==='failed');
+      if(jobs.some(job=>String(job.message||'').includes('[CF-SOURCE-AMBIGUOUS]')))sourceChoice.hidden=false;
       show(jobs.map(job=>job.message||'Import läuft …').join(' · '),failed);
       if(jobs.every(job=>['done','failed'].includes(job.status))){button.disabled=false;if(fullButton)fullButton.disabled=false;if(claimInput)claimInput.disabled=false;userJobs=[];window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'));return}
     }catch(e){show(e.message,true)}
@@ -93,6 +94,11 @@
     }catch(e){show('Importstatus konnte nicht wiederhergestellt werden: '+e.message,true)}
   }
 
+  const sourceChoice=document.createElement('select');
+  sourceChoice.hidden=true;sourceChoice.setAttribute('aria-label','ClaimsForce-Zugang auswählen');
+  sourceChoice.innerHTML='<option value="">Zugang automatisch ermitteln</option><option value="christian">Christian</option><option value="jens">Maurer</option>';
+  claimInput?.insertAdjacentElement('afterend',sourceChoice);
+  claimInput?.addEventListener('input',()=>{sourceChoice.value='';sourceChoice.hidden=true});
   const enqueue=async(mode,targetProfile='',previousJob=null,workRequest=false)=>{
     if(userJobs.length){if(workRequest)throw Error('Ein Claims-Import läuft bereits. Bitte dessen Abschluss abwarten.');return}
     if(context.claims_agent&&!bridge&&!mobileClient){if(workRequest)throw Error('Diese zentrale Importstation ist nicht bereit.');show('Diese zentrale Importstation ist nicht bereit.',true);return}
@@ -105,6 +111,7 @@
         if(!claimNumber)throw Error('Bitte eine Schadennummer für den Vollimport eingeben.');
         payload.mode='single';
         payload.claimNumber=claimNumber;
+        if(!sourceChoice.hidden&&sourceChoice.value)payload.source_profile=sourceChoice.value;
         if(claimInput)claimInput.value=claimNumber;
       }
       if(mode==='tasks'||mode==='full')payload.mode=mode;
@@ -172,7 +179,7 @@
     if(!supportedProfiles.includes(target))throw Error('Importauftrag enthält ein ungültiges Bearbeiterprofil.');
     // Background imports are scoped by job.profile and must preserve the open case.
     // The explicit profile switch handles clearing the user's case selection.
-    window.postMessage({type:'SVNET_CLAIMS_IMPORT_START_V2',profile:job.profile,mode:job.sync_mode||'quick',full:job.sync_mode==='full',claimNumber:job.claim_number||'',since:job.since_date||'',jobId:Number(job.id),runId:`claimsforce-${job.id}-${job.attempt_count||1}`},location.origin);
+    window.postMessage({type:'SVNET_CLAIMS_IMPORT_START_V2',profile:job.profile,sourceProfiles:job.source_profiles,mode:job.sync_mode||'quick',full:job.sync_mode==='full',claimNumber:job.claim_number||'',since:job.since_date||'',jobId:Number(job.id),runId:`claimsforce-${job.id}-${job.attempt_count||1}`},location.origin);
   }
 
   async function poll(){
@@ -219,7 +226,7 @@
       bridgeVersion=String(d.version||'0.0.0');
       document.documentElement.setAttribute('data-svnet-claims-bridge-version',bridgeVersion);
       workerVersion=String(d.workerVersion||'');
-      bridge=versionAtLeast(bridgeVersion,minimumBridgeVersion)&&d.protocol===2&&d.portalVersion==='1.4.61'&&workerVersion==='1.4.61';
+      bridge=versionAtLeast(bridgeVersion,minimumBridgeVersion)&&d.protocol===2&&d.portalVersion==='1.4.62'&&workerVersion==='1.4.62';
       bridgeProblem=bridge?'':`Browser-Brücke neu laden: Dateien ${bridgeVersion}, tatsächlich laufendes Importprogramm ${workerVersion||'alter Stand'}. Einzelimport bleibt gesperrt.`;
       refreshControl();
       if(!bridge)show(bridgeProblem,true);
