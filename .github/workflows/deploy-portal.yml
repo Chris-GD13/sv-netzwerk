@@ -17,6 +17,7 @@ on:
       - "sv-netzwerk/src/assets/sv-netzwerk-logo-portal.svg"
       - "sv-netzwerk/scripts/prepare-deploy-scope.mjs"
       - "sv-netzwerk/browser-extension/claimsforce-bridge/**"
+      - "sv-netzwerk/tests/**"
       - "sv-netzwerk/package.json"
       - "sv-netzwerk/package-lock.json"
       - "sv-netzwerk/astro.config.mjs"
