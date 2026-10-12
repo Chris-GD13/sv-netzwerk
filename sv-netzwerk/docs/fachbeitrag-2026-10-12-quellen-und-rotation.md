@@ -27,7 +27,7 @@ Backoffice-Profile sind im Repository als `group: backoffice` gekennzeichnet und
 
 Der neue Zyklus beginnt am 12.10.2026.
 
-1. Carmen Gohl – 12.10.2026 – Schimmel / Sanierungskontrolle – reserviert und in Bearbeitung.
+1. Carmen Gohl – 12.10.2026 – Schimmel / Sanierungskontrolle – veröffentlicht und live verifiziert.
 2. Claudius Freiberg – 13.10.2026 – Oberflächen – durch direkten Nutzerauftrag vorgemerkt, konkretes Thema erst am Veröffentlichungstag.
 3. Übrige aktuelle Fachprofile – ab 14.10.2026 fair ohne Wiederholung bis zum vollständigen Zyklus; Reihenfolge am jeweiligen Tag gegen Live-Verzeichnis, Projektunterlagen und Archiv prüfen.
 
@@ -45,3 +45,12 @@ Abruf am 12.10.2026; die jeweils benötigten Abschnitte wurden vor Texterstellun
    `https://bss-schimmelpilz.de/fachkundenachweis-schimmelsanierung-modul-b3-sanierungskontrolle/`
 
 Kostenpflichtige Volltexte, insbesondere WTA-Merkblätter oder DIN-Normen, wurden nicht als eingesehen ausgegeben. Der Beitrag übernimmt daraus keine eigenständigen Detailanforderungen.
+
+## Veröffentlichungsnachweis
+
+- Inhalts-Commit: `32c70f67b513f8a5b3a02fa74080c38de1068f4f`.
+- Erfolgreicher Deployment-Lauf: `https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38202943712`.
+- Live-Prüfung: 12.10.2026, 06:19 Uhr Europe/Berlin.
+- Sichtbar geprüft: kanonische Detailseite, Fachwissen-Übersicht, Kategorie `Schimmel und Innenraumhygiene`, Tags `Schimmel` und `Sanierungskontrolle` sowie der interne Link zum Profil Carmen Gohl.
+- Per HTTP geprüft: Detailseite, Übersicht, Kategorie, Tags, `sitemap-index.xml`, ausgelagerte Sitemap, `robots.txt` und `deploy-version.txt` mit exakt dem Inhalts-Commit.
+- Tagesregister: `published-verified`; LinkedIn: `prepared-not-posted` beziehungsweise im Register `not-posted`.
