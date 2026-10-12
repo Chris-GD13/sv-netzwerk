@@ -1,38 +1,47 @@
-# LinkedIn-Veröffentlichungsnachweis 12.10.2026 – blockiert
+# LinkedIn-Veröffentlichung 12.10.2026 – published-verified
 
-Prüfzeit: 2026-10-12T07:06:32+02:00 (Europe/Berlin). Keine Veröffentlichung durch diesen Lauf. Keine LinkedIn-Reservierung, kein Upload, kein Absendeversuch und kein Permalink. Der tatsächliche öffentliche LinkedIn-Veröffentlichungsstand ist wegen der Anmeldesperre ungeklärt; `not-posted` im Register ist kein Beweis, dass kein manueller Beitrag existiert.
+Genau einmal auf Christian Wächters persönlichem Profil veröffentlicht und am tatsächlichen Permalink sichtbar live geprüft:
 
-## Heutiger Websiteartikel
+https://www.linkedin.com/feed/update/urn:li:activity:7515294243175936000/
+
+Live verifiziert: **2026-10-12T08:17:53+02:00 (Europe/Berlin)**. Veröffentlichung nach atomarer Reservierung um 2026-10-12T08:13:09+02:00 und vor 08:17:50 Europe/Berlin; ein sekundengenauer Absendezeitpunkt wurde nicht separat erfasst. Ein einziger Klick auf Posten, anschließend LinkedIn-Erfolgsmeldung „Der Beitrag wurde gepostet“, Profil neu geladen und Permalink geöffnet. Keine Wiederholung des Absendevorgangs.
+
+## Artikel, Thema und Fachgebietszuordnung
 
 - Artikelkennung: `2026-10-12-schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen`.
 - Titel: Schimmelsanierung kontrollieren: Feuchteursache, Feinreinigung und Sanierungserfolg prüfen.
-- Kanonische URL: https://www.sv-netzwerk.eu/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/.
-- Sichtbar im Codex-Browser geprüft: Fachwissen-Übersicht mit Datum 12.10.2026 sowie vollständige Detailseite, Titel, Autor Christian Wächter, Datum und interne Fachgebietszuordnung Carmen Gohl. Canonical aus dem aktuellen DOM geprüft.
-- Profil https://www.sv-netzwerk.eu/experten/carmen-gohl/ sichtbar gelesen: Schimmelpilze in Gebäuden, Ursachen-/Schadensbewertung, Sanierungsplanung, Sanierungsbegleitung und Sanierungskontrolle. Zuordnung ist belegt; keine Autorenschaft Carmen Gohls behauptet.
-- Ursprünglicher Artikelcommit: `32c70f67b513f8a5b3a02fa74080c38de1068f4f`.
-- Endgültiger live ausgelieferter Websitecommit: `1fe12ec94df6cdef582fcfec6d594dc0a78a47be`, unter https://www.sv-netzwerk.eu/deploy-version.txt per HTTPS gelesen.
-- https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38203988621 sichtbar geöffnet: Status Success, Commit 1fe12ec, Job deploy erfolgreich.
+- Artikel: https://www.sv-netzwerk.eu/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/.
+- Heutiges Datum 12.10.2026, vollständiger Inhalt, Canonical und Übersicht im vorangegangenen Lauf geprüft; Detailseite vor Veröffentlichung nochmals im angemeldeten Chrome-Browser gelesen.
+- Eigenständiges Sachverständigenthema, kein künstlicher Versicherungsfall. Fachliche Zuordnung Carmen Gohl; aktuelles Profil belegt Schimmelpilze in Gebäuden und Sanierungskontrolle. Keine Autorenschaft Carmen Gohls behauptet.
+- Endgültiger Websitecommit `1fe12ec94df6cdef582fcfec6d594dc0a78a47be` live erneut per deploy-version.txt bestätigt. Zugehöriger erfolgreicher Website-Run: https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38203988621 . Sichtbare Success-Prüfung im vorherigen Lauf dieses Chats.
 
-## Konkreter LinkedIn-Blocker
+## Duplikatkontrolle und Reservierung
 
-Browserinventar und erneute Verbindungssuche bieten nur Codex In-app Browser und MCP Apps. Der direkte unterstützte Aufruf von Chrome für https://www.linkedin.com/in/christian-w-156408204/recent-activity/all/ scheitert mit „Browser is not available: chrome“. Die ersatzweise sichtbare Weboberfläche im Codex-Browser leitet zur LinkedIn-Anmeldesperre um. Keine Anmeldung vorgenommen und keine Sperre umgangen.
+Chrome-Profil Christian war nach dem Nutzerhinweis verbunden und LinkedIn angemeldet. Persönliche Aktivitäten unter https://www.linkedin.com/in/christian-w-156408204/recent-activity/all/ vor Erstellung sowie unmittelbar vor Absenden neu geladen. Letzter eigener Fachbeitrag: gestriger Schallschutzartikel mit Aktivität 7514992211571331072. Kein heutiger Beitrag zur Sanierungskontrolle vorhanden. Älterer Beitrag vom 30.09. zu Schimmel nach Wasserschäden ist ein anderer Artikel.
 
-Damit fehlen die Live-Duplikatprüfung vor Erstellung, der Absendernachweis und der mögliche Veröffentlichungsablauf. Register und heutige CSV wurden gelesen; Register LinkedIn `not-posted`, CSV vorher `prepared-not-posted`. Kein finaler Begleittext erstellt, weil die vorgeschaltete Live-Duplikatprüfung nicht möglich ist. Die Quellenbelege des Website-Auftrags wurden gelesen; keine eigene Quellenrecherche oder Veröffentlichung eines LinkedIn-Textes als abgeschlossen ausgegeben.
+Tagesregister und heutige CSV-Hauptzeile vor Erstellung und unmittelbar vor Absenden geprüft. Eigene atomare Reservierung per publication-day-guard.mjs claim-linkedin: `64b523640d6665169ecd0554078218e89b365ccc`; Owner `codex-linkedin-20261012-01a12e7c-resumed`. Keine fremde Reservierung übergangen. Live-Verifikation per verify-linkedin erst nach sichtbarem Permalink-/Text-/Linknachweis: `32045b704b2d8ed937e030a60871aaae4bed9636`.
 
-Fortsetzung: Chrome-Profil Christian mit der unterstützten Browsersteuerung verbinden und LinkedIn angemeldet öffnen. Danach erneut heutigen Artikel, Register, CSV und jüngste persönliche Beiträge prüfen; einen tatsächlich vorhandenen Beitrag zuerst live klären. Erst nach erfolgreicher Duplikatprüfung atomar reservieren und gegebenenfalls genau einmal veröffentlichen.
+## Sichtbarer Veröffentlichungsnachweis
 
-## Verbindliche Bild- und Kostenentscheidung
+Am tatsächlichen Permalink geprüft: Absender Christian Wächter, vollständiger Text mit fünf Prüffragen, Carmen-Gohl-Fachgebietsbezug, Rollenbezeichnung, eigener Hashtagabsatz und Artikelvorschau. Keine Bilddatei hochgeladen und kein Bildhinweis erfunden. Der sichtbare Kurzlink https://lnkd.in/eg_4A-2Y wurde im Browser bis zum korrekten kanonischen Tagesartikel verfolgt; dessen h1 und Canonical stimmen überein.
 
-Zusatzbudget 0 USD; tatsächliche zusätzliche Bildkosten dieses Laufs 0 USD. Kein Bildmodell, keine Bild-API, kein API-Schlüssel, keine zusätzlichen Credits oder Stockkäufe genutzt. Die konkrete Abrechnung eines enthaltenen Work-Bildwegs ist nicht verifiziert, daher wurde dieser Weg ohne Testaufruf übersprungen. Kein ausdrücklich freigegebener fachlich passender Bildbestand belegt. Für die Fortsetzung ist ein sachlicher Linkbeitrag ohne Bild vorgesehen; eine lokale Titelkarte wurde für diesen erklärenden Fachtext nicht als erforderlich angesehen. Tatsächlich wurde wegen des Browserblockers weder mit noch ohne Bild veröffentlicht. Kein Bildhinweis erfunden.
+![Veröffentlichter Beitrag am tatsächlichen Permalink](linkedin/2026-10-12/2026-10-12-linkedin-live.jpg)
 
-## Vorgaben und Git-Nachweis
+## Fach- und Kostenprüfung
 
-Gelesen: Desktop-Anweisung; aktuelle einschlägige Drive-Dateien FACHBEITRAG_AUTOMATION.md (Stand 07.10.), FACHBEITRAG_STANDARD.md, linkedin-veroeffentlichung-2026-10-06.md und Master-Arbeitsstandards einschließlich „ab sofort immer gültig“; Repository AGENTS.md, DEPLOYMENT.md, Website-Workflow und beide angeforderten Veröffentlichungsdokumente. Die ausdrückliche Nutzerfreigabe und Kostenregel dieses Auftrags gehen älteren Bildpflichten und prepared-only-Regeln vor.
+UBA-Schimmelleitfaden April 2024 und DGUV Information 201-028 November 2022 vor Texterstellung tatsächlich geöffnet und die für die Aussagen benötigten Abschnitte gelesen. Abrufdatum 12.10.2026 und Aussagenzuordnung in [Quellenprüfung](linkedin/2026-10-12/2026-10-12-linkedin-quellenpruefung.md). Keine erfundenen Fälle, Messwerte, Normgrenzwerte oder Zusicherungen. Keine aus einem nicht eingesehenen Normvolltext übernommenen Detailanforderungen.
 
-Git-Verwaltungsbasis mit origin https://github.com/Chris-GD13/sv-netzwerk.git verifiziert und origin/main frisch geholt. Verschmutzte Verwaltungsbasis nicht bearbeitet. Sauberer frischer Worktree aus `ec7b4492` verwendet. Nur Status-/Nachweisdokumentation mit [skip ci]; kein zusätzlicher Website-Deploy.
+Zusatzbudget **0 USD**, tatsächliche zusätzliche Bildkosten **0 USD**. Veröffentlichung **ohne Bild**. Konkrete Abrechnung eines enthaltenen Work-Bildwegs nicht verifizierbar; dieser Weg wurde ohne Testaufruf übersprungen. Kein ausdrücklich freigegebener fachlich passender Bildbestand belegt. Die fachliche Prüfliste ist ohne zusätzliche lokale Titelkarte sinnvoll. Kein Bildmodell, keine Bild-API, kein Bildschlüssel, keine Credits und keine Stockkäufe verwendet.
 
-## Screenshots
+## Artefakte und Status
 
-![Heutiger Live-Artikel](linkedin/2026-10-12/2026-10-12-artikel-live.jpg)
+- [Tatsächlich veröffentlichter Text](linkedin/2026-10-12/2026-10-12-schimmelsanierung-linkedin.txt).
+- [Quellenprüfung](linkedin/2026-10-12/2026-10-12-linkedin-quellenpruefung.md).
+- [Duplikatprüfung vor Erstellung](linkedin/2026-10-12/2026-10-12-duplikatpruefung-vorher.jpg).
+- [Beitragsvorschau](linkedin/2026-10-12/2026-10-12-linkedin-vorschau.jpg).
 
-![LinkedIn-Anmeldesperre](linkedin/2026-10-12/2026-10-12-linkedin-login-blocker.jpg)
+Register und heutige CSV-Hauptzeile stehen auf published-verified mit echtem Permalink und Berliner Verifikationszeit. Die Bildentscheidung ist in beiden Nachweisen dokumentiert. Nur Status-/Nachweisdokumentation mit [skip ci]; kein zusätzlicher Website-Deploy. Verschmutzte Git-Verwaltungsbasis nicht bearbeitet; sauberer Worktree und normale Push-Prüfung ohne force verwendet.
+
+## Frühere Sperre – behoben
+
+Der frühere Lauf um 07:06 Europe/Berlin war wegen fehlender Chrome-Verbindung blockiert und führte keinen Absendeversuch aus. Historischer Nachweiscommit: `d12f2e40bf409847f2234fe241fbe71026750c32`. Nach Nutzerhinweisen „ist im Tab geöffnet“ und „ohne weitere nachfrage veröffentlichen“ bestand die verbundene angemeldete Chrome-Sitzung Christian. Die Veröffentlichung wurde mit erneuter Live-Duplikatprüfung fortgesetzt. Der frühere Blocker ist erledigt; diesen Tagesbeitrag nicht erneut senden.

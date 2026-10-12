@@ -294,9 +294,44 @@
         "reserved_at": "2026-10-12T06:13:09.680Z",
         "article_url": "https://www.sv-netzwerk.eu/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/",
         "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7515294243175936000/",
-        "verified_at": "2026-10-12T06:17:53.042Z"
+        "verified_at": "2026-10-12T06:17:53.042Z",
+        "verified_at_berlin": "2026-10-12T08:17:53+02:00",
+        "publication_window_berlin": {
+          "after": "2026-10-12T08:13:09+02:00",
+          "before": "2026-10-12T08:17:50+02:00"
+        },
+        "publication_time_note": "Absenden genau einmal innerhalb dieses beobachteten Zeitfensters; sekundengenauer Absendezeitpunkt nicht gesondert erfasst.",
+        "profile_url": "https://www.linkedin.com/in/christian-w-156408204/",
+        "text_path": "docs/linkedin/2026-10-12/2026-10-12-schimmelsanierung-linkedin.txt",
+        "proof_path": "docs/linkedin-veroeffentlichung-2026-10-12.md",
+        "sources_path": "docs/linkedin/2026-10-12/2026-10-12-linkedin-quellenpruefung.md",
+        "screenshots": [
+          "docs/linkedin/2026-10-12/2026-10-12-linkedin-live.jpg"
+        ],
+        "image_path": null,
+        "image_cost_decision": {
+          "additional_budget_usd": 0,
+          "additional_spend_usd": 0,
+          "model_or_api_called": false,
+          "path": "published-without-image",
+          "note": "Konkrete enthaltene Work-Bildabrechnung nicht verifizierbar, ohne Test übersprungen. Kein freigegebener passender Bestand belegt. Sachliche Prüfliste ohne zusätzliche Titelkarte veröffentlicht; keine Bildkosten und kein erfundener Bildhinweis."
+        },
+        "duplicate_check_note": "Persönliche Aktivitäten vor Erstellung und unmittelbar vor Absenden neu geladen: letzter eigener Fachbeitrag Schallschutz vom 11.10.; kein heutiger Sanierungskontrollbeitrag. Register/CSV erneut geprüft, eigene atomare Reservierung bestätigt.",
+        "website_live_commit": "1fe12ec94df6cdef582fcfec6d594dc0a78a47be",
+        "website_live_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38203988621",
+        "resolved_blocker": {
+          "type": "blocked-browser-connection",
+          "initial_proof_commit": "d12f2e40bf409847f2234fe241fbe71026750c32",
+          "resolution": "Nutzer öffnete LinkedIn; Chrome-Profil Christian danach verbunden und angemeldet."
+        },
+        "article_type": "sachverstaendigenthema",
+        "expert_assignment": {
+          "name": "Carmen Gohl",
+          "profile_url": "https://www.sv-netzwerk.eu/experten/carmen-gohl/",
+          "scope": "Schimmelpilze in Gebäuden und Sanierungskontrolle; keine behauptete Autorenschaft"
+        }
       }
     }
   },
-  "updated_at": "2026-10-12T06:17:53.042Z"
+  "updated_at": "2026-10-12T08:19:53+02:00"
 }
