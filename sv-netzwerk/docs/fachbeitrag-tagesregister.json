@@ -289,12 +289,14 @@
         }
       },
       "linkedin": {
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-linkedin-20261012-01a12e7c-resumed",
         "reserved_at": "2026-10-12T06:13:09.680Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/"
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/",
+        "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7515294243175936000/",
+        "verified_at": "2026-10-12T06:17:53.042Z"
       }
     }
   },
-  "updated_at": "2026-10-12T06:13:09.680Z"
+  "updated_at": "2026-10-12T06:17:53.042Z"
 }
