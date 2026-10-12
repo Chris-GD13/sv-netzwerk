@@ -6,7 +6,7 @@ async function station(workerStatus) {
   const handlers = [], requests = [], messages = [], attributes = {};
   const window = { addEventListener(type, listener) { if (type === 'message') handlers.push(listener); }, postMessage(data) { messages.push(data); } };
   const chrome = { runtime: {
-    getManifest: () => ({ version: '1.4.61' }),
+    getManifest: () => ({ version: '1.4.62' }),
     onMessage: { addListener() {} },
     connect: () => ({ onDisconnect: { addListener() {} }, postMessage() {}, disconnect() {} }),
     async sendMessage(request) { requests.push(request); return request.type === 'GET_RUNTIME_STATUS' ? workerStatus : { ok: true, runId: request.runId }; }
@@ -21,17 +21,17 @@ async function station(workerStatus) {
 // Ein neuer Manifestwert darf einen noch alten Hintergrundprozess nicht bestätigen.
 const stale = await station({ ok: true, active: { status: 'idle' } });
 const staleReady = stale.messages.find(m => m.type === 'SVNET_CLAIMS_BRIDGE_READY_V2');
-assert.equal(staleReady.version, '1.4.61');
+assert.equal(staleReady.version, '1.4.62');
 assert.equal(staleReady.workerVersion, '');
 assert.equal(staleReady.protocol, 0);
 assert.equal(stale.attributes['data-svnet-claims-worker-version'], 'nicht geladen');
-const current = await station({ ok: true, workerVersion: '1.4.61', protocol: 2, active: { status: 'idle' } });
+const current = await station({ ok: true, workerVersion: '1.4.62', protocol: 2, active: { status: 'idle' } });
 await current.send({ type: 'SVNET_CLAIMS_IMPORT_START', profile: 'christian', jobId: 9 });
 assert.equal(current.requests.filter(r => r.type.startsWith('START_IMPORT')).length, 0, 'Altes Startsignal muss ignoriert werden');
-await current.send({ type: 'SVNET_CLAIMS_IMPORT_START_V2', profile: 'christian', jobId: 10, claimNumber: '26-085905-9', mode: 'single', runId: 'single-10' });
+await current.send({ type: 'SVNET_CLAIMS_IMPORT_START_V2', profile: 'christian', jobId: 10, claimNumber: '26-085905-9', mode: 'single', runId: 'single-10', sourceProfiles:['christian','jens'] });
 const starts = current.requests.filter(r => r.type.startsWith('START_IMPORT'));
 assert.equal(starts.length, 1);
-assert.deepEqual(JSON.parse(JSON.stringify(starts[0])), { type: 'START_IMPORT_V2', protocol: 2, workerVersion: '1.4.61', profile: 'christian', jobId: 10, runId: 'single-10', mode: 'single', full: false, claimNumber: '26-085905-9', since: '' });
+assert.deepEqual(JSON.parse(JSON.stringify(starts[0])), { type: 'START_IMPORT_V2', protocol: 2, workerVersion: '1.4.62', profile: 'christian', jobId: 10, runId: 'single-10', mode: 'single', full: false, claimNumber: '26-085905-9', sourceProfiles:['christian','jens'], since: '' });
 console.log('Alter Worker wird erkannt; altes Startsignal bleibt wirkungslos; Einzelauftrag bleibt vollständig erhalten.');
 
 const centralCode = fs.readFileSync(new URL('../public/intern/claimsforce-central.js', import.meta.url), 'utf8');
@@ -42,7 +42,7 @@ async function centralStation() {
   const window = { addEventListener(type, handler) { if (type === 'message') handlers.push(handler); }, postMessage(data) { messages.push(data); }, dispatchEvent() {}, svnetDriveStatus: async () => ({ claims_agent: true, backoffice: true, selected_expert: 'christian' }) };
   const job = { id: 91, profile: 'christian', sync_mode: 'single', claim_number: '26-085905-9', attempt_count: 1 };
   vm.runInNewContext(centralCode, { window,
-    document: { getElementById: id => elements[id] || null, querySelector: () => null, createElement: () => ({ dataset: {}, addEventListener() {} }), documentElement: { getAttribute: () => '', setAttribute() {} } },
+    document: { getElementById: id => elements[id] || null, querySelector: () => null, createElement: () => ({ dataset: {}, addEventListener() {},setAttribute() {} }), documentElement: { getAttribute: () => '', setAttribute() {} } },
     async fetch(url, options) { calls.push({ url, body: options?.body ? JSON.parse(options.body) : null }); const result = url.endsWith('action=mine') ? { jobs: [] } : url.endsWith('action=active') ? { job: null, busy: false } : url.endsWith('action=claim') ? { job } : {}; return { ok: true, json: async () => ({ ok: true, ...result }) }; },
     location: { origin: 'https://www.sv-netzwerk.eu' }, crypto: { randomUUID: () => '11111111-1111-4111-8111-111111111111' },
     sessionStorage: { removeItem() {} }, localStorage: { removeItem() {} }, CustomEvent: class {},
@@ -54,21 +54,35 @@ async function centralStation() {
   };
 }
 const blocked = await centralStation();
-await blocked.send({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: '1.4.61' });
+await blocked.send({ type: 'SVNET_CLAIMS_BRIDGE_READY', version: '1.4.62' });
 await blocked.poll();
 assert.equal(blocked.calls.filter(c => c.url.endsWith('action=claim')).length, 0);
-await blocked.send({ type: 'SVNET_CLAIMS_BRIDGE_READY_V2', version: '1.4.61', portalVersion: '1.4.61', workerVersion: '', protocol: 0 });
+await blocked.send({ type: 'SVNET_CLAIMS_BRIDGE_READY_V2', version: '1.4.62', portalVersion: '1.4.62', workerVersion: '', protocol: 0 });
 await blocked.poll();
 assert.equal(blocked.calls.filter(c => c.url.endsWith('action=claim')).length, 0, 'Manifest allein darf keinen Auftrag übernehmen');
 assert.equal(blocked.elements['vf-claims-full'].disabled, true);
 const verified = await centralStation();
-await verified.send({ type: 'SVNET_CLAIMS_BRIDGE_READY_V2', version: '1.4.61', portalVersion: '1.4.61', workerVersion: '1.4.61', protocol: 2 });
+await verified.send({ type: 'SVNET_CLAIMS_BRIDGE_READY_V2', version: '1.4.62', portalVersion: '1.4.62', workerVersion: '1.4.62', protocol: 2 });
 await verified.poll();
 const launch = verified.messages.find(m => m.type === 'SVNET_CLAIMS_IMPORT_START_V2');
 assert.equal(launch.claimNumber, '26-085905-9');
 assert.equal(launch.mode, 'single');
 assert.equal(verified.messages.some(m => m.type === 'SVNET_CLAIMS_IMPORT_START'), false, 'Alte Brücken dürfen das Startsignal nicht empfangen');
 const claim = verified.calls.find(c => c.url.endsWith('action=claim'));
-assert.equal(claim.body.workerVersion, '1.4.61');
+assert.equal(claim.body.workerVersion, '1.4.62');
 assert.equal(claim.body.protocol, 2);
 console.log('Portal startet nur nach echter Worker-Prüfung; alte Brücken bleiben gesperrt.');
+
+// Automatic discovery performs only probes and accepts one exact source.
+const { resolveClaimSource } = await import('../browser-extension/claimsforce-bridge/import-utils.js');
+const probes=[];
+const found=await resolveClaimSource(['christian','jens'],async profile=>{probes.push(profile);return profile==='jens'?[{id:'maurer-claim'}]:[]});
+assert.deepEqual(probes,['christian','jens']);
+assert.equal(found.profile,'jens');
+assert.equal(found.claim.id,'maurer-claim');
+await assert.rejects(resolveClaimSource(['christian','jens'],async()=>[{id:'same-number'}]),/CF-SOURCE-AMBIGUOUS/);
+await assert.rejects(resolveClaimSource(['christian','jens'],async()=>[]),/CF-SOURCE-NOT-FOUND/);
+let checked=[];
+await assert.rejects(resolveClaimSource(['christian','jens'],async profile=>{checked.push(profile);throw Error('Login fehlgeschlagen')}),/Login fehlgeschlagen/);
+assert.deepEqual(checked,['christian'],'Anmeldefehler dürfen nicht als fehlender Fall behandelt werden');
+console.log('Automatische Quellenwahl: Maurer-Treffer, Mehrdeutigkeit, kein Treffer und Anmeldefehler geprüft.');

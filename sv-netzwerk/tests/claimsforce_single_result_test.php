@@ -17,7 +17,7 @@ foreach([['claims'=>26],['updated'=>0],['claimNumber'=>'26-076821-6'],['inventor
 echo "Einzelfallabschluss weist Sammelläufe, falsche Fälle und unvollständige Ergebnisse zurück.\n";
 function apiError($status,$text){throw new RuntimeException($text,$status);}
 function db(){return new class{function prepare($sql){return new class{function execute($args){}function fetchColumn(){return $GLOBALS['testOwner']??'';}};}};}
-$owner=['stationId'=>'11111111-1111-4111-8111-111111111111','bridgeVersion'=>'1.4.61','workerVersion'=>'1.4.61','protocol'=>2];
+$owner=['stationId'=>'11111111-1111-4111-8111-111111111111','bridgeVersion'=>'1.4.62','workerVersion'=>'1.4.62','protocol'=>2];
 $GLOBALS['testOwner']=cqStationKey($owner);
 cqRequireOwner(44,$owner);
 foreach([array_replace($owner,['stationId'=>'22222222-2222-4222-8222-222222222222']),array_replace($owner,['bridgeVersion'=>'1.4.51']),array_replace($owner,['workerVersion'=>'']),array_replace($owner,['workerVersion'=>'1.4.58']),array_replace($owner,['protocol'=>1]),[]]as$other){
@@ -32,3 +32,17 @@ try{cqConfirmHeartbeat(44,$owner,0);throw new Exception('Beendeter Auftrag wurde
 $GLOBALS['testOwner']=hash('sha256','22222222-2222-4222-8222-222222222222');
 try{cqConfirmHeartbeat(44,$owner,0);throw new Exception('Fremder Auftrag wurde als Heartbeat bestätigt');}catch(RuntimeException$e){if($e->getCode()!==409)throw$e;}
 echo "Identische Heartbeats bleiben gültig; beendete und fremde Aufträge bleiben gesperrt.\n";
+
+require_once dirname(__DIR__).'/public/intern/api/profile-routing.php';
+foreach(['cw@sv-schuett.eu','ws@sv-schuett.eu']as$email){
+ $user=['email'=>$email];
+ if(cqSingleSourceProfiles($user,'')!==['christian','jens'])throw new RuntimeException('Beide Quellen fehlen.');
+ if(cqSingleSourceProfiles($user,'',['jens'])!==['jens'])throw new RuntimeException('Bestehender Maurer-Fall wird falsch nachgeladen.');
+ if(cqSingleSourceProfiles($user,'jens')!==['jens'])throw new RuntimeException('Explizite Quellenwahl fehlt.');
+}
+foreach(['ms@sv-schuett.eu','hr@sv-schuett.eu']as$email){
+ $rejected=false;
+ try{cqSingleSourceProfiles(['email'=>$email],'jens');}catch(InvalidArgumentException){$rejected=true;}
+ if(!$rejected)throw new RuntimeException('Fremder Zugriff auf Maurer-Quelle.');
+}
+echo "Erstimport: freigegebene Quellen und Nachladen bestehender Maurer-Fälle geprüft.\n";
