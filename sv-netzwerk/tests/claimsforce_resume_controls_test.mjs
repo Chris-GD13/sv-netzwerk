@@ -18,7 +18,7 @@ assert.equal(selected.job.sync_mode,'single');
 // Die echte Enqueue-Funktion darf beim Fortsetzen keine geänderte Eingabe übernehmen.
 const enqueue=source.slice(source.indexOf('  const enqueue=async'),source.indexOf('  // Narrow interface for Fall-Work'));
 const queued=[];const claimInput={value:'26-076821-6',disabled:false};
-const sandbox={userJobs:[],context:{claims_agent:true},bridge:true,button:{},fullButton:{},claimInput,controlJobs:[],selectedProfile:()=> 'christian',show:()=>{},refreshControl:()=>{},watch:()=>{},post:async(action,payload)=>{queued.push({action,payload});return {job:{id:20,profile:payload.profile,sync_mode:payload.mode,claim_number:payload.claimNumber}};}};
+const sandbox={userJobs:[],context:{claims_agent:true},bridge:true,button:{},fullButton:{},claimInput,controlJobs:[],sourceChoice:{hidden:true,value:''},selectedProfile:()=> 'christian',show:()=>{},refreshControl:()=>{},watch:()=>{},post:async(action,payload)=>{queued.push({action,payload});return {job:{id:20,profile:payload.profile,sync_mode:payload.mode,claim_number:payload.claimNumber}};}};
 await vm.runInNewContext(enqueue+'enqueue;',sandbox)('single','christian',stopped);
 assert.equal(queued[0].payload.claimNumber,'26-085905-9');
 assert.equal(queued[0].payload.mode,'single');
