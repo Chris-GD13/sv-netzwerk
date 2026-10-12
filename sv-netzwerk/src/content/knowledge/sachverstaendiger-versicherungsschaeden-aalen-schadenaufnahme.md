@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/schadenabgrenzung/", "/fachwissen/leitungswasserscha
 damageTypes: ["leitungswasser", "sturm", "brand", "gebaeude"]
 publication:
   publishedAt: 2026-07-27
-  updatedAt: 2026-08-09
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Sachverständiger Versicherungsschäden Aalen – erste Schadenaufnahme"
@@ -106,7 +106,7 @@ Ohne diese Grundlage lassen sich Schadenumfang, Ursache und Kostenrahmen nicht b
 Für eine vollständige Schadenbewertung sind folgende Messverfahren relevant:
 
 - **Kapazitive und impedanzbasierte Feuchtemessgeräte**: Für die Ortung durchfeuchteter Zonen in Böden und Wänden.
-- **CM-Messung**: Für genaue Feuchtegehalte im Estrich und Betonuntergrund.
+- **Feuchtemessung am Untergrund**: Verfahren, Probenahme und Beurteilungsmaßstab material- und entscheidungsbezogen wählen. CM-Werte nicht als universelle Freigabe für Estrich, Beton und Dämmschicht verwenden.
 - **Thermographie**: Bei Verdacht auf verdeckte Feuchteverteilung hinter Wandverkleidungen oder in Deckenhohlräumen.
 - **Rissbreitenmessung**: Bei Verdacht auf Rissbildung durch Schadeneinwirkung.
 
@@ -156,6 +156,10 @@ Für die Regulierung ergibt sich: Das Niederschlagswasserereignis ist ursächlic
 ## Fazit
 
 Die erste Schadenaufnahme bei Versicherungsschäden in Aalen und dem Ostalbkreis bestimmt die Qualität der gesamten Regulierung. Wer Ursache, Schadenumfang, Sofortmaßnahmen und Vorschäden strukturiert erfasst und dokumentiert, schafft die Grundlage für eine belastbare und nachvollziehbare Regulierung – ohne spätere Diskussionen über Umfang und Kostenabgrenzung.
+
+## Normenbezug zur Untergrundprüfung – geprüft am 12.10.2026
+
+[DIN EN 17668:2022-11](https://www.dinmedia.de/de/norm/din-en-17668/352617408) behandelt die korrespondierende Luftfeuchte mineralischer Untergründe vor geklebten Bodenaufbauten; lose Verlegung ist ausgenommen. DIN Media führt die Norm als aktuell. Das Ausgabedatum ist kein pauschaler Geltungsbeginn für ältere Verträge. Die praktische Folgerung: Das Messverfahren muss die konkrete Wiederbelegung beantworten; die Quellen-Metadaten ersetzen keine Prüfung des vollständigen Normtexts.
 
 ## Quellen und weiterführende Hinweise
 

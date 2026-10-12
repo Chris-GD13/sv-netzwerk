@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/stromkosten-technische-trocknung-nac
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-23
-  updatedAt: 2026-09-30
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Baufeuchte und Schadenfeuchte fachlich abgrenzen"
@@ -115,6 +115,12 @@ Baufeuchte und Schadenfeuchte lassen sich nicht anhand eines einzelnen Messwerts
 ## Aktualitätsprüfung zum 30.09.2026
 
 Der Umweltbundesamt-Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall liegt in einer aktualisierten Auflage von April 2024 vor; die zugehörige UBA-Informationsseite wurde am 17.01.2025 aktualisiert. Diese fachliche Leitlinie bestätigt für die Praxis die hier beschriebene Reihenfolge: Feuchteursache klären, Befund erfassen, Sanierungsumfang begründen und Erfolg kontrollieren. Sie ersetzt weder eine objektspezifische Bauwerksdiagnostik noch eine Deckungsentscheidung. Veröffentlichungsdatum dieses Beitrags (23.09.2026), Aktualisierungsdatum (30.09.2026) und der Geltungsstand der Quelle (April 2024/17.01.2025) sind damit getrennt dokumentiert.
+
+## Ergänzung zur Aussagegrenze von Messverfahren vom 12.10.2026
+
+Die [TKB-KRL-Fachinformation](https://www.klebstoffe.com/krl-methode/) unterscheidet Feuchtepotential und materialabhängigen Wassergehalt. Eine Umrechnung zwischen KRL und CM-Prozent ist nicht allgemein möglich. Für die Ursachenabgrenzung folgt daraus: Unterschiedliche Einheiten nicht als gemeinsame Messreihe darstellen; Probenlage und Verlauf getrennt dokumentieren.
+
+Status: fachliche Information, kein Gesetz; Abruf 12.10.2026. Kein Veröffentlichungsdatum oder rückwirkender Geltungsbeginn unterstellt.
 
 ## Quellen und weiterführende Hinweise
 

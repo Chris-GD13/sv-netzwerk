@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-17
-  updatedAt: 2026-10-09
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Fenster- und Glasschäden prüffähig abgrenzen"
@@ -75,9 +75,9 @@ In einem fiktiven Hagelschaden weist ein Fenster eine beschädigte Außenscheibe
 
 ## Handlungsempfehlungen
 
-- Versicherungsnehmer sollten Versicherungsnehmer sollten Bruchbild und Elementdaten vor Ausbau sichern.
-- Versicherer sollten Versicherer sollten Komplettaustausch technisch begründen lassen.
-- Sachverständige sollten Sachverständige sollten Reparaturfähigkeit, Glasaufbau und Nebenleistungen getrennt bewerten..
+- Versicherungsnehmer sollten Bruchbild und Elementdaten vor Ausbau sichern.
+- Versicherer sollten Komplettaustausch technisch begründen lassen.
+- Sachverständige sollten Reparaturfähigkeit, Glasaufbau und Nebenleistungen getrennt bewerten.
 
 ## Fazit
 

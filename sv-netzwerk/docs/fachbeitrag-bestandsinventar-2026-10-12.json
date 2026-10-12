@@ -1,0 +1,1585 @@
+{
+  "date": "2026-10-12",
+  "master_commit": "32c70f67b513f8a5b3a02fa74080c38de1068f4f",
+  "scope": "Strukturinventar aller vorhandenen Content-Dateien; keine pauschale Quellenfreigabe",
+  "articles": [
+    {
+      "slug": "abgrenzung-versicherter-nichtversicherter-schadteil",
+      "source_sha256": "c4c207468fa8c26c5c8e4b2d0822b6e9cab4357e5bc8b1a757ae09e3035efebf",
+      "published_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "aufmass-fotodokumentation-polycam-pruefffaehig",
+      "source_sha256": "276f96fc59290664a9bb39d7abf8231c38300481acda679207ffe40389c8891b",
+      "published_at": "2026-09-19",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6",
+        "https://www.dguv.de/medien/inhalt/publikationen/regelwerk/regelwerk_dguv-informationen/index.jsp",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "aufzug-wasserschaden-stillsetzung-pruefung-kostenabgrenzung",
+      "source_sha256": "54ffd7dc4614f2fc71aa3232648c37f36a3837aa76213bf7a8e25a1279608245",
+      "published_at": "2026-10-03",
+      "updated_at": "2026-10-03",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS-1201-Teil-4",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS-3121",
+        "https://www.dguv.de/fb-holzundmetall/sg/sg_smsa/aufzuege/index.jsp",
+        "https://www.gesetze-im-internet.de/betrsichv_2015/",
+        "https://www.gesetze-im-internet.de/betrsichv_2015/__15.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "badfugen-abdichtung-feuchteeintritt-schadenabgrenzung",
+      "source_sha256": "506eb01824fcd2ef21d63447dac620b7848020d237bead4d71cdbc4e8f8f52c2",
+      "published_at": "2026-09-25",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/",
+        "https://www.dinmedia.de/",
+        "https://www.gesetze-im-internet.de/vvg_2008/",
+        "https://www.klebstoffe.com/tkb-22-bodenbelaege-mit-wassereinwirkung-veroeffentlichung/",
+        "https://www.umweltbundesamt.de/themen/gesundheit/innenraumhygiene"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung",
+      "source_sha256": "2fdbde9cec889d50edc7c11f775b644f512ce84c78a72820a2ae6139c393bd26",
+      "published_at": "2026-09-24",
+      "updated_at": "2026-09-24",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/",
+        "https://www.dinmedia.de/",
+        "https://www.gesetze-im-internet.de/vvg_2008/",
+        "https://www.umweltbundesamt.de/themen/gesundheit/innenraumhygiene"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung",
+      "source_sha256": "6ec653fd7c3a853662c8a4b423930d35db71b82110023f74055391dcab0ceb8e",
+      "published_at": "2026-10-09",
+      "updated_at": "2026-10-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/regelwerk/dguv-informationen/4668/brandschutz-beim-umgang-mit-lithium-ionen-batterien",
+        "https://www.dinmedia.de/de/norm-entwurf/din-en-iec-62933-5-2/392951038",
+        "https://www.dinmedia.de/de/norm/din-en-iec-62619/366856432",
+        "https://www.dinmedia.de/en/standard/din-en-iec-62933-5-2/343286758",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html",
+        "https://www.umweltbundesamt.de/themen/abfall-ressourcen/produktverantwortung-in-der-abfallwirtschaft/batterien-altbatterien",
+        "https://www.vde-verlag.de/p/normen/vde-ar-e-2510-2-vde-ar-e-2510-2-anwendungsregel-2021-02/0500195-DE-PR",
+        "https://www.vde-verlag.de/p/normen/vde-ar-e-2510-50-vde-ar-e-2510-50-anwendungsregel-2017-05/0500098-DE-PR",
+        "https://www.vde.com/topics-de/verbraucherschutz/elektronik-hochwasser"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung",
+      "source_sha256": "86106f8871d470e12b641ef38513050262201de15b775b9807549af7233dc3a4",
+      "published_at": "2026-09-23",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/",
+        "https://www.gesetze-im-internet.de/vvg_2008/",
+        "https://www.klebstoffe.com/krl-methode/",
+        "https://www.umweltbundesamt.de/publikationen/schimmel-im-haus",
+        "https://www.umweltbundesamt.de/themen/gesundheit/innenraumhygiene",
+        "https://www.wta-international.org/"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "baumsturz-astbruch-sturm-schadenaufnahme-standfestigkeit-vorschaden",
+      "source_sha256": "dc022d46600f04a5416ad31708f85c81348a4551e13c6052d62007a0b4f337dd",
+      "published_at": "2026-08-17",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://shop.fll.de/de/baeume-und-gehoelze/fll-baumuntersuchung.html",
+        "https://shop.fll.de/de/baumkontrollrichtlinien-richtlinien-fuer-baumkontrollen-zur-ueberpruefung-der-verkehrssicherheit.html",
+        "https://shop.fll.de/de/ztv-baumpflege-zusaetzliche-technische-vertragsbedingungen-und-richtlinien-fuer-baumpflege-2017-broschuere.html",
+        "https://www.dwd.de/DE/leistungen/wetterinfo/wetterinfo_schadensfall.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "bauteiloeffnung-schadenfall-freigabe-beweissicherung",
+      "source_sha256": "f553e086fde00a8619fe57c54bdfbcc49d64200ae9532c5f05ff1a793ab69269",
+      "published_at": "2026-09-21",
+      "updated_at": "2026-09-21",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519",
+        "https://www.gesetze-im-internet.de/bgb/__249.html",
+        "https://www.gesetze-im-internet.de/gefstoffv_2010/",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "beweissicherung-fotodokumentation-standards",
+      "source_sha256": "60156f27486237e2b5a2b8bab9d9a81aa47c40f45a4846791fbaf2d3702ed9ba",
+      "published_at": "2026-08-26",
+      "updated_at": "2026-08-26",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "blitz-ueberspannungsschaden-gebaeudetechnik-pruefen",
+      "source_sha256": "67dfddf28f1a5064411af28607b1cb4392d52bbeb2b263beec36f38fac924960",
+      "published_at": "2026-09-05",
+      "updated_at": "2026-09-05",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.vde.com/de/blitzschutz/infos/gebaeudetechnische-anlagen-im-blitzschutz",
+        "https://www.vde.com/de/blitzschutz/infos/ueberspannungsschutz-und-innerer-blitzschutz",
+        "https://www.vde.com/dke-de/arbeitsfelder/core-safety/blitzschutznormen/2081096-2081096"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung",
+      "source_sha256": "5b7fb2808d941fd1dabab72c479475a407bcd5e9e3ee8942f0d0de6c85cae159",
+      "published_at": "2026-10-10",
+      "updated_at": "2026-10-10",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1052/elektrische-anlagen-und-betriebsmittel",
+        "https://vds.de/kompetenzen/brandschutz/zertifizierung/errichter-und-fachfirmen/errichterunternehmen-fuer-gefahrenmeldeanlagen",
+        "https://vds.de/nachrichten/2019/newsdetailseite/planung-und-einbau-von-brandmeldeanlagen",
+        "https://www.dinmedia.de/de/norm/din-14675-1/310931928",
+        "https://www.gesetze-im-internet.de/betrsichv_2015/__14.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html",
+        "https://www.vde-verlag.de/p/normen/din-vde-0833-2-vde-0833-2-2022-06/0800803-DE-PR"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "brandschaden-mehrere-gebaeude-koordination",
+      "source_sha256": "58d9383f2ed19eb49d5d7aafd37609319fd498d34dd4350e55ac43d8cc4f9939",
+      "published_at": "2026-08-01",
+      "updated_at": "2026-08-01",
+      "canonical_explicit": true,
+      "noindex_false_explicit": false,
+      "source_urls": [],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "brandschaden-notmassnahmen-uebergang-zur-wiederherstellung",
+      "source_sha256": "121611685fec0f6323c4bd7ceecf8375015333a671178f664cbeed39b68e7a65",
+      "published_at": "2026-07-17",
+      "updated_at": "2026-08-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "brandschaden-rauch-russ-kontamination-schadenbereiche-sanierungsumfang",
+      "source_sha256": "f5cfcde19fa97c318638cd39ef98c361e271a9b3b92486f7fc73c854b95e617e",
+      "published_at": "2026-08-06",
+      "updated_at": "2026-08-06",
+      "canonical_explicit": true,
+      "noindex_false_explicit": false,
+      "source_urls": [
+        "https://www.dguv.de/de/praevention/themen-a-z/gefahrstoffe/index.jsp",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "eigenleistungen-gebaeudeschaden-stunden-material-nachweis",
+      "source_sha256": "66b6d9cf4052809d1942a1f6665954429f62b640ca29684766ce68a3956eb5b9",
+      "published_at": "2026-09-27",
+      "updated_at": "2026-09-27",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1052/elektrische-anlagen-und-betriebsmittel",
+        "https://www.gesetze-im-internet.de/bgb/__249.html",
+        "https://www.gesetze-im-internet.de/hwo/anlage_a.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "elektrische-anlagen-nach-wasserschaden-pruefen",
+      "source_sha256": "76ec7c4aa02d78d5741ba1534bf818434f35ac125ff0174039d5edf1642cb3ed",
+      "published_at": "2026-09-07",
+      "updated_at": "2026-09-07",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/regelwerk/dguv-informationen/313/betrieb-elektrischer-anlagen-und-betriebsmittel",
+        "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1052/elektrische-anlagen-und-betriebsmittel",
+        "https://www.dguv.de/fb-etem/regelwerk/index.jsp"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung",
+      "source_sha256": "3fe13a282f4e0fc427b5b92d7b2288b3270f1b266204d8bbec9779194d3c6488",
+      "published_at": "2026-08-10",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.dinmedia.de/de/norm/din-en-60079-14-vde-0165-1/303132206",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.vde-verlag.de/",
+        "https://www.vds.de/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "entsorgungskosten-gebaeudeschaden-nachweis-abgrenzung",
+      "source_sha256": "eca7537a5431988aac6269a516ef75bd0f54348d811313a852b64fee16845c8b",
+      "published_at": "2026-09-26",
+      "updated_at": "2026-09-26",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524",
+        "https://www.gesetze-im-internet.de/krwg/",
+        "https://www.gesetze-im-internet.de/nachwv_2007/",
+        "https://www.umweltbundesamt.de/daten/ressourcen-abfall/verwertung-entsorgung-ausgewaehlter-abfallarten/bauabfaelle",
+        "https://www.umweltbundesamt.de/themen/abfall-ressourcen/abfallwirtschaft/abfallarten/einstufung-von-abfaellen"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "fachgrenzen-schadenpruefung-fachplaner",
+      "source_sha256": "1c97e921ba1c74420bab0fd62a2b733d53154b79ade071c4a30cb321fcf6a3de",
+      "published_at": "2026-09-10",
+      "updated_at": "2026-09-10",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://bingk.de/",
+        "https://www.baua.de/DE/Themen/Arbeitsgestaltung-im-Betrieb/Gefahrstoffe/Gefahrstoffe_node.html",
+        "https://www.dguv.de/de/praevention/index.jsp",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "fachliche-zustaendigkeit-im-schadenfall",
+      "source_sha256": "5d5eb559072454033dd90519390179fb35045e143796b0a6b0ce2f856a35211d",
+      "published_at": "2026-07-15",
+      "updated_at": "2026-08-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/bgb/__634.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.gesetze-im-internet.de/zpo/__402.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "farbtonabweichung-anstrich-wiederherstellung-schadenfall",
+      "source_sha256": "b26fa9f53693ca5aa30a72d0343b02ee4349055af6456900e84a93cc79d2d539",
+      "published_at": "2026-10-01",
+      "updated_at": "2026-10-01",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.dinmedia.de/de/norm/din-18363/310839867",
+        "https://www.farbe.de/aktuell/nachricht/artikel/neu-nr-25-farbuebereinstimmungen-und-farbabweichungen-beurteilung",
+        "https://www.gesetze-im-internet.de/bgb/__249.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "fenster-glasschaden-verglasung-reparaturgrenze",
+      "source_sha256": "b0e68fd2b176f6e7c3db5593dd860541d3c06acc2cdef71d0b5fed5a0c14e99f",
+      "published_at": "2026-09-17",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "fenster-tueren-kostenvoranschlag-pruefen",
+      "source_sha256": "e82682c43410cee1510559c3d141ca94136ffeeac0e94e2a0b1dbdfe58ea6bc5",
+      "published_at": "2026-08-25",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR",
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6",
+        "https://www.dibt.de/de/wir-bieten/technische-baubestimmungen",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen",
+      "source_sha256": "552432ce4dbd63911240cc5ad2db2b6d3360ae97a07923d7cff1b783fdfa19c9",
+      "published_at": "2026-08-23",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6",
+        "https://www.dibt.de/de/wir-bieten/technische-baubestimmungen",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.ift-rosenheim.de/pruefung-luftdurchlaessigkeit-fenster-tueren",
+        "https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl",
+      "source_sha256": "abb77fdb574b91cd27d24573d00c9135c8223d5c5079e862f71646b06f64dda8",
+      "published_at": "2026-10-10",
+      "updated_at": "2026-10-10",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://ralfenster.de/wp-content/uploads/2024/10/LzM_2024_Leseprobe-2.pdf",
+        "https://www.abdichten.de/faq/faq.html",
+        "https://www.illbruck.com/de_AT/produkt/me500-twinaktiv-4/",
+        "https://www.iso-chemie.eu/uploads/Verarbeitungsrichtlinien_ISO_BLOCO_3a7c92313f.pdf",
+        "https://www.soudal.de/pro/fensteranschlussfolien",
+        "https://www.soudal.de/pro/flussigmembranen",
+        "https://www.soudal.de/pro/mf167-PRO",
+        "https://www.soudal.de/sites/default/files/soudal_api/document/900014776/TDS_Soudal_Soudatight_Hybrid_9900650_German_Soudal_Germany.pdf"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "flachdachschaden-pruefpfad-windsog-entwaesserung",
+      "source_sha256": "7a0face5fa73cc4a89ea440c4127a3002c611a170fe3662d01fc66175d9e35ff",
+      "published_at": "2026-09-11",
+      "updated_at": "2026-09-11",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.bbk.bund.de/DE/Themen/Naturgefahren/naturgefahren_node.html",
+        "https://www.dwd.de/DE/leistungen/starkregen/starkregen_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.zvdh.de/technik-regelwerk/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "flachdachschaden-sturm-starkregen-windsog-abdichtung-entwaesserung",
+      "source_sha256": "a7b39e6b9fe3f669de1c44461467f5a6c94820b601563303bb79dd64420d8b4a",
+      "published_at": "2026-08-14",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.bbsr.bund.de/BBSR/DE/veroeffentlichungen/sonderveroeffentlichungen/2018/leitfaden-starkregen.html",
+        "https://www.dinmedia.de/de/norm/din-18531-1/258236530",
+        "https://www.dinmedia.de/de/norm/din-1986-100/264064948",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung",
+      "source_sha256": "0e06b0e3ea802eb4a739aa611dcd0af6e6a1eb1f65417edf167bbde61df947cf",
+      "published_at": "2026-08-02",
+      "updated_at": "2026-08-02",
+      "canonical_explicit": true,
+      "noindex_false_explicit": false,
+      "source_urls": [
+        "https://www.dvgw.de/themen/wasser/trinkwasser-installation",
+        "https://www.gesetze-im-internet.de/trinkwv_2023/__13.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "geruchsschaden-ursache-sanierung-erfolgskontrolle",
+      "source_sha256": "442a6ef747c837181ccc1a8c662aadc94c472596641927dc1a51060a7a10240e",
+      "published_at": "2026-09-22",
+      "updated_at": "2026-09-30",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://shop.vds.de/",
+        "https://www.dguv.de/",
+        "https://www.gesetze-im-internet.de/vvg_2008/",
+        "https://www.umweltbundesamt.de/themen/gesundheit/innenraumhygiene"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "geruestkosten-gebaeudeschaden-umfang-standzeit-pruefung",
+      "source_sha256": "a598ea5a1072e9ce4062ead6a38daa26d03aee0f02782e3a5242ea3095af0826",
+      "published_at": "2026-09-28",
+      "updated_at": "2026-09-28",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/regelwerk/dguv-informationen/793/verwendung-von-arbeits-schutz-und-montagegeruesten",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS-2121-Teil-1",
+        "https://www.gesetze-im-internet.de/betrsichv_2015/anhang_1.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit",
+      "source_sha256": "766c2e6b0afd81af3d8efc92e9b2f62b6477dfee984b870099cfb93f921a2910",
+      "published_at": "2026-08-18",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.dinmedia.de/de/norm/din-18008-1/312359991",
+        "https://www.dinmedia.de/de/norm/din-18008-2/312360009",
+        "https://www.dinmedia.de/de/norm/din-en-12150-1/323111198",
+        "https://www.dinmedia.de/de/norm/din-en-1279-1/281205722",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "grossflaechige-leitungswasserschaeden-sanierungssteuerung-2",
+      "source_sha256": "310df82c1df71d5cad69abdd19b00ac12270730b99a4e066c7f9a0e469a6a875",
+      "published_at": "2026-08-15",
+      "updated_at": "2026-08-15",
+      "canonical_explicit": true,
+      "noindex_false_explicit": false,
+      "source_urls": [],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "grossflaechige-leitungswasserschaeden-sanierungssteuerung-3",
+      "source_sha256": "9b6e35790ac391802d697724d06bd3c39925fc2fac5df1cabe594b917b72781d",
+      "published_at": "2026-08-19",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://shop.vds.de/download/vds-3151",
+        "https://www.baua.de/DE/Themen/Arbeitsgestaltung-im-Betrieb/Gefahrstoffe/Gefahrstoffe_node.html",
+        "https://www.dinmedia.de/de/norm/din-18560-1/328759231",
+        "https://www.dvgw.de/themen/wasser",
+        "https://www.klebstoffe.com/wp-content/uploads/2026/04/TKB-8-Untergrundbeurteilung-Veroeffentlichung.pdf",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "grossflaechige-leitungswasserschaeden-sanierungssteuerung",
+      "source_sha256": "f0508cafd7ae61918fb4db211f8a8a1423042f71b23fc8651284b184d3617573",
+      "published_at": "2026-07-28",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.klebstoffe.com/wp-content/uploads/2026/04/TKB-8-Untergrundbeurteilung-Veroeffentlichung.pdf",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "gutachter-plattform-regional-kumulschaden",
+      "source_sha256": "a32b66eeb6ff1f3c4a9c7bae8164eaff800ce728ab6efc6b0aa7b7d8eda19967",
+      "published_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "hagelschaden-dach-fassade-schadenspuren-vorschaden-reparaturfaehigkeit",
+      "source_sha256": "134c8da53cf171c1c2466120e824f865f03769beca48898ca10deae35cf44276",
+      "published_at": "2026-08-05",
+      "updated_at": "2026-08-05",
+      "canonical_explicit": true,
+      "noindex_false_explicit": false,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "heizungswasserschaden-leckage-korrosion-frost-abgrenzung",
+      "source_sha256": "376860317a2ef349b6e732f61b955698a50fc707be5b9b2d6716ec02b804fb56",
+      "published_at": "2026-09-14",
+      "updated_at": "2026-09-14",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/widgets/pdf/download/article/1306",
+        "https://www.dvgw.de/leistungen/dienstleistungen/analyse-von-korrosionsschaeden-in-wasserfuehrenden-systemen",
+        "https://www.dvgw.de/themen/wasser/trinkwasser-installation",
+        "https://www.dvgw.de/themen/wasser/verbraucherinformationen/trinkwasser-installation/heizungsraum",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning",
+      "source_sha256": "812e4d43098f68b1ec6adb9ef7f8f1858168606bf7560e60d09d4f2057a65e0a",
+      "published_at": "2026-07-20",
+      "updated_at": "2026-08-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von",
+        "https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "innentueren-schallschutz-pruefwert-einbau-schallwege",
+      "source_sha256": "df0bfa9c69142c56b2ff88af25cb64801f4905e9948c6be78452c9b0533af39e",
+      "published_at": "2026-10-11",
+      "updated_at": "2026-10-11",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.dinmedia.de/de/norm/din-4109-35/404487077",
+        "https://www.dinmedia.de/de/norm/din-en-iso-10140-2/334753459",
+        "https://www.dinmedia.de/de/norm/din-en-iso-16283-1/275504470",
+        "https://www.dinmedia.de/de/norm/din-en-iso-717-1/329418506",
+        "https://www.hoermann.de/fileadmin/_country/kataloge/pdf/HOER-HANDBUCH-Bd-01-Grundwissen_2019_.pdf",
+        "https://www.huga.de/tueren/funktionstueren/schallschutz/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "interdisziplinaeres-sachverstaendigennetzwerk-gutachter-plattform-schadenregulierung",
+      "source_sha256": "bf5994a0d7e6c11fef6cd1574571e0e841f1a0e47a9558c6ba020b84ab003ce0",
+      "published_at": "2026-08-22",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__81.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.gesetze-im-internet.de/zpo/__402.html",
+        "https://www.gesetze-im-internet.de/zpo/__404.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "katastrophenschaeden-region-management-koordination",
+      "source_sha256": "f8e6c26281fcb96b1b52ead4e295a3b94924a31793572012b2ee69e5ad89c600",
+      "published_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "kommunikation-beteiligte-schadenfall-struktur",
+      "source_sha256": "2df7a184bc4e8e67801413f86f4b315cca9a8c3dcd9cfc8b83ed2a7d2574b96c",
+      "published_at": "2026-08-31",
+      "updated_at": "2026-08-31",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "kontrollierter-rueckbau-bei-leitungswasserschaeden",
+      "source_sha256": "1bc0b9419fc98177794bbee5622a1c9ea382bfa30e45e31f321f582b7fb2e725",
+      "published_at": "2026-07-12",
+      "updated_at": "2026-07-14",
+      "canonical_explicit": false,
+      "noindex_false_explicit": false,
+      "source_urls": [],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "koordination-sachverstaendige-kumulereignis-einsatz",
+      "source_sha256": "5c2a8b936c15f5201a1d56d428195335ce62e75a65e32bead0783d5943a892b1",
+      "published_at": "2026-08-28",
+      "updated_at": "2026-08-28",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "kumulschaeden-hochwasser-ueberflutung-priorisierung-regulierung",
+      "source_sha256": "bb34d3a5050171f04b4706a2df3a5d77225288338279db7022d1fbb45b9bdf65",
+      "published_at": "2026-08-30",
+      "updated_at": "2026-08-30",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "kumulschaeden-in-der-region-priorisierung-koordination-dokumentation",
+      "source_sha256": "e281549f095449f5e6e1fe6814854db8e4ada8e2dea478a0c85b0d6af5963049",
+      "published_at": "2026-07-19",
+      "updated_at": "2026-08-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "kumulschaeden-sturm-hagel-prueffolge-regulierung",
+      "source_sha256": "f28254186ad6fe745b628329ecb6abf1c27318b4a68a2ed2932a8ec04a4c2774",
+      "published_at": "2026-08-12",
+      "updated_at": "2026-08-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": false,
+      "source_urls": [],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "leckageortung-leitungswasserschaden-messverfahren-suchoeffnungen-ursachenbeweis",
+      "source_sha256": "72e2c6d55ec572fbc88baec62e921837ed6a5a9ac7a807b462005f66fb369bcd",
+      "published_at": "2026-08-12",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.dinmedia.de/de/norm/din-1986-100/264064948",
+        "https://www.dinmedia.de/de/norm/din-en-12056-1/23912115",
+        "https://www.dinmedia.de/de/norm/din-en-12056-4/23912386",
+        "https://www.gesetze-im-internet.de/trinkwv_2023/__13.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "leitungswasserschaden-aalen-sachverstaendiger-aufgaben",
+      "source_sha256": "a6a31fe94097ace786bf6cb48b2d35e0fb037c332e63c822063c49b91f970590",
+      "published_at": "2026-07-27",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.klebstoffe.com/krl-methode/",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "leitungswasserschaden-erstmassnahmen",
+      "source_sha256": "e804cc201203dda9654d807c188592b4a6e85f201a47573a6435b9d02f868702",
+      "published_at": "2026-07-18",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.klebstoffe.com/wp-content/uploads/2024/07/B-TKB-11-Belegreife.pdf",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "leitungswasserschaden-leckageortung-pruefstrategie",
+      "source_sha256": "1dd2e3ccfa5e4753ee46a38792b29cfbbd5030d85bb1b1d04d50d897b2937509",
+      "published_at": "2026-09-08",
+      "updated_at": "2026-10-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.dvgw.de/themen/wasser",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.umweltbundesamt.de/themen/wasser/trinkwasser",
+        "https://www.wta-international.org/de/technische-mitteilungen/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "loeschwasserschaden-kontamination-korrosion-trocknung-sanierungsumfang",
+      "source_sha256": "dad5c11ce6e5298e4b2f1e948e9a57827cfe6a738a3c7e0bffacb3839a8dbac3",
+      "published_at": "2026-08-16",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://vds.de/fileadmin/Website_Content_Images/VdS_Publikationen/vds_2357_web.pdf",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von",
+        "https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "massenanfall-einzelschaeden-einsatzsteuerung",
+      "source_sha256": "2d47f69e7c72b3e4f5f934d5c47f9c96618ef0e608bc2e1cdd9a1e5235c9f351",
+      "published_at": "2026-09-01",
+      "updated_at": "2026-09-01",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "mietausfall-sanierungsdauer-schadenbezug",
+      "source_sha256": "7d3dbdacf76b1b1c4bbaad14454cc24bc3e9a36cde622b1abccb45bfe2c6028e",
+      "published_at": "2026-09-18",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__249.html",
+        "https://www.gesetze-im-internet.de/bgb/__536.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation",
+      "source_sha256": "9574724d994c4266df5c1a605443b0889d394ec4611b68f9db0ee37d24e9345e",
+      "published_at": "2026-08-20",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von",
+        "https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken",
+      "source_sha256": "3f8dcf2e69b7bccaaaa22027381c1c47f75d3961d286d596474b157f62d5a4d1",
+      "published_at": "2026-08-11",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/regelwerk/dguv-informationen/2896/montage-und-instandhaltung-von-photovoltaik-anlagen",
+        "https://www.dguv.de/fb-bauwesen/sachgebiete/hochbau/index.jsp",
+        "https://www.dinmedia.de/de/norm/din-en-62446-1/299821500",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.vde-verlag.de/p/normen/din-vde-0100-712-vde-0100-712-2016-10/0100340-DE-PR"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "photovoltaikfragmente-brand-landwirtschaft-gewerbehaftpflicht-fremddach",
+      "source_sha256": "f10fb941bd8180e11cef96c465976515d7edb662c65b30be7e863bb9f5ebfd1d",
+      "published_at": "2026-08-17",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/regelwerk/dguv-informationen/865/einsatz-an-photovoltaikanlagen-informationen-fuer-einsatzkraefte-von-feuerwehren-und-hilfeleistungso",
+        "https://www.gdv.de/gdv/neu-strukturierte-haftpflichtbedingungen-ab-2014--5962",
+        "https://www.gdv.de/resource/blob/6050/660018557810032516684138e19d5dfc/19-musterbedingung-betriebshaftpflichtversicherung-land-und-forstwirtschaft-avb-bhv-luf-data.pdf",
+        "https://www.gesetze-im-internet.de/bbodschg/",
+        "https://www.gesetze-im-internet.de/bgb/",
+        "https://www.gesetze-im-internet.de/eeg_2014/__3.html",
+        "https://www.gesetze-im-internet.de/uschadg/",
+        "https://www.gesetze-im-internet.de/vvg_2008/",
+        "https://www.ise.fraunhofer.de/de/forschungsprojekte/pv-brandschutz.html",
+        "https://www.umweltbundesamt.de/themen/klima-energie/erneuerbare-energien/photovoltaik"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "plausibilitaetspruefung-schadenbild-kausalitaet",
+      "source_sha256": "6b68bd89283d60ddbab008baebae07ff387728f3b0560985b719d7cf2a22f64f",
+      "published_at": "2026-08-26",
+      "updated_at": "2026-08-26",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "polycarbonat-stegplatten-hagel-spannungsrisse-montagefehler",
+      "source_sha256": "4a0006fc745f12ff5e86cca565836c8ddb4f35823eb69f6488f14ff4010e128e",
+      "published_at": "2026-08-15",
+      "updated_at": "2026-08-15",
+      "canonical_explicit": true,
+      "noindex_false_explicit": false,
+      "source_urls": [
+        "https://www.brettmartin.com/plastic-sheets/our-products/product/marlon-st-bioplus",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.palram.com/us/product/palgard/",
+        "https://www.palram.com/us/product/sunlite/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "prueffaehige-dokumentation",
+      "source_sha256": "9250aee0adae0f45e00dd4cc3d5e392b3789fc3a6bcc62fb89f5c0e3d25f1667",
+      "published_at": "2026-07-13",
+      "updated_at": "2026-07-14",
+      "canonical_explicit": false,
+      "noindex_false_explicit": false,
+      "source_urls": [],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "pv-anlage-hagelschaden-pruefung-kostenabgrenzung",
+      "source_sha256": "8afb04dbf68479f32179fe91ac8f44d23bc804c97748c5a9b5fb59d3a375a799",
+      "published_at": "2026-10-06",
+      "updated_at": "2026-10-06",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/regelwerk/dguv-informationen/2896/montage-und-instandhaltung-von-photovoltaik-anlagen",
+        "https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/ErneuerbareEnergien/Solaranlagen/Anmeldung_table.html",
+        "https://www.dinmedia.de/de/norm/din-en-62446-1/299821500",
+        "https://www.dinmedia.de/en/draft-standard/din-en-iec-62446-1/396967530",
+        "https://www.gesetze-im-internet.de/betrsichv_2015/",
+        "https://www.gesetze-im-internet.de/bgb/__249.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "rauchwaermeabzug-brandschaden-funktionspruefung-kostenabgrenzung",
+      "source_sha256": "c3a87e86231164bcf0bcdabae7e53e1f9a6b926cc0c7399664f0f88e2a912284",
+      "published_at": "2026-10-04",
+      "updated_at": "2026-10-04",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS-1112",
+        "https://www.dibt.de/de/wir-bieten/zulassungen-eta-und-mehr/bauprodukte-fuer-die-entraeuchung-oder-rauchableitung",
+        "https://www.dinmedia.de/de/norm/din-18232-10/380671595",
+        "https://www.dinmedia.de/de/norm/din-18232-101/392517948",
+        "https://www.dinmedia.de/de/norm/din-18232-2/102938461",
+        "https://www.dinmedia.de/de/norm/din-18232-5/148446167",
+        "https://www.gesetze-im-internet.de/vvg_2008/",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "rechnungs-kva-pruefung-freigabe-schadenfall",
+      "source_sha256": "18dcfe784080683578ac31d1fa61a2a6aad0bd36ef876389821a3af4c4a9d2a9",
+      "published_at": "2026-08-29",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_360_61261.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "rechnungskuerzung-schadenfall-prueffaehigkeit",
+      "source_sha256": "df20d0fe3cd762f32fb1a1fef1ff132ac01076726d122ed1bfa2bbbff0f36de2",
+      "published_at": "2026-09-15",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR.html",
+        "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_360_61261.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug",
+      "source_sha256": "7aec73fdef88bac7073930554d6040dec178bfcb1c832d40cbae3cad15370443",
+      "published_at": "2026-08-21",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/bgb/__650b.html",
+        "https://www.gesetze-im-internet.de/bgb/__650c.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "regiekosten-im-schadenfall-pruefen",
+      "source_sha256": "c184919585cd602911f72f7d89d3559783baac7cda4b08f8e721ab53e4181d64",
+      "published_at": "2026-07-16",
+      "updated_at": "2026-08-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/bgb/__634.html",
+        "https://www.gesetze-im-internet.de/bgb/__650b.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "regiekosten-schadenregulierung-abgrenzung",
+      "source_sha256": "ec37b01989de3287c19b29cc60d925ec94eeff992320ec1f6301cfc4e9113805",
+      "published_at": "2026-09-09",
+      "updated_at": "2026-10-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.bmwsb.bund.de/Webs/BMWSB/DE/themen/bauen/bauen-node.html",
+        "https://www.gesetze-im-internet.de/haoi_2013/",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.vdi.de/richtlinien"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "reservierung-grosser-schadenbestand-methodik",
+      "source_sha256": "8e8ad559b0db2ce4dbaec6a5054b1d9ab704336ce8e1a0b8aeabfc9a2b2ef6a7",
+      "published_at": "2026-08-30",
+      "updated_at": "2026-08-30",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "rueckbau-brandschaden-fachlich-begrenzen-dokumentieren",
+      "source_sha256": "2d645a0845fe39b7c9e81e753414667b238ebf9980972b158f8f05c2c2e580b5",
+      "published_at": "2026-09-29",
+      "updated_at": "2026-09-29",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-400",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "rueckstauschaden-im-fitnessstudio-gebaeude-und-inhaltsschaden-trennen",
+      "source_sha256": "dbfdff1431faaef0e0d9c464b8a0188494c54ecdef47afa6aeceea222ae8faf1",
+      "published_at": "2026-07-31",
+      "updated_at": "2026-08-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von",
+        "https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus",
+        "https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "sachverstaendiger-versicherungsschaeden-aalen-schadenaufnahme",
+      "source_sha256": "923a60c6b87ae53f57080b51b154f36daee930ecfd25c49e62d4b670803c73e3",
+      "published_at": "2026-07-27",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.dinmedia.de/de/norm/din-en-17668/352617408",
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "sanierungsplanung-rueckbau-trocknung-strategie",
+      "source_sha256": "93580a39e69fddcff660932352f6101bddf637b76219c4b4344af606ab538dc9",
+      "published_at": "2026-08-27",
+      "updated_at": "2026-08-27",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schadenabgrenzung",
+      "source_sha256": "23066574b8446c26183c82b82cb959e2fd6878259df70d534516d6239e3144f7",
+      "published_at": "2026-07-14",
+      "updated_at": "2026-07-14",
+      "canonical_explicit": false,
+      "noindex_false_explicit": false,
+      "source_urls": [],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schadenakte-nachvollziehbar-strukturieren",
+      "source_sha256": "5ec1da501eef1957b7d363614f77f1bb49fff5dbb4958259020f4ce74642e3aa",
+      "published_at": "2026-07-17",
+      "updated_at": "2026-08-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/bgb/__634.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schadenminderung-obliegenheit-sofortmassnahmen-praxis",
+      "source_sha256": "89ed2cfb61aaf34590640dc77837a935bf8bd53f3bc67ac27d43be1b177c0466",
+      "published_at": "2026-09-01",
+      "updated_at": "2026-09-01",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schadenregulierer-versicherungen-technische-pruefung-schadensteuerung",
+      "source_sha256": "1e0e81b25eb226b4b6a3bd07ad9244192f08b78efde7e09ce22f94a2e1f63dd4",
+      "published_at": "2026-07-27",
+      "updated_at": "2026-08-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/bgb/__634.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung",
+      "source_sha256": "6ef1f43db7e386020191e18f49cc48dadf1014a891efc79aa2ac73b975da4a6c",
+      "published_at": "2026-08-15",
+      "updated_at": "2026-08-15",
+      "canonical_explicit": true,
+      "noindex_false_explicit": false,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__164.html",
+        "https://www.gesetze-im-internet.de/bgb/__167.html",
+        "https://www.gesetze-im-internet.de/bgb/__779.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__28.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__78.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__79.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__81.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schadenreserve-nachvollziehbar-fortschreiben",
+      "source_sha256": "a81afaa6ff4b428fc4eec1eb848fb94da164cfbece99a4bd2b41dd9dd8be1efa",
+      "published_at": "2026-09-20",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_360_61261.html",
+        "https://www.gesetze-im-internet.de/bgb/__249.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "schadentrocknung-bautrocknung-schadenziel-messkonzept-erfolgskontrolle",
+      "source_sha256": "cfb24d171fea73db060314dc334c2eb5d6c0229ba46fb6d2887a797dece2b0f9",
+      "published_at": "2026-08-15",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.dinmedia.de/de/technische-regel/wta-merkblatt-6-16/305869554",
+        "https://www.gesetze-im-internet.de/trinkwv_2023/__13.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von",
+        "https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schadstoffverdacht-rueckbau-bestandsgebaeude",
+      "source_sha256": "6877e83b53ab11c631ecc8479a4bed463b42846b858d87d29a3a0afc9fc57ff9",
+      "published_at": "2026-09-06",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519.html",
+        "https://www.baua.de/DE/Themen/Chemikalien-Biostoffe/Gefahrstoffe/Informationsportal-Asbest/Asbest_Dossier/Asbest_Durchfuehrung_dossier",
+        "https://www.baua.de/DE/Themen/Chemikalien-Biostoffe/Gefahrstoffe/Informationsportal-Asbest/Asbest_Dossier/Asbest_Planung_dossier",
+        "https://www.gewerbeaufsicht.niedersachsen.de/download/223019/Hinweis_Zulassung_und_Anzeige_fuer_die_TRGS_519_Stand_11_2025.pdf"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "schimmel-nach-wasserschaden-ursache-sanierungsumfang-kostenabgrenzung",
+      "source_sha256": "cddad38d94ccc71b4edeafaf84ee1037639ea9f55e97b3efb2cd59c26b130b75",
+      "published_at": "2026-09-30",
+      "updated_at": "2026-09-30",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von",
+        "https://www.umweltbundesamt.de/service/uba-fragen/was-tun-bei-schimmel-in-meiner-wohnung",
+        "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/aktueller-uba-schimmelleitfaden"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schlagregeneintritt-fassade-fenster-anschluesse-dichtheit-schadenabgrenzung",
+      "source_sha256": "d20f320c77967bb07edcd5ba4bbee7cc2a7a050e1b2e1ea5be7b084af1df6617",
+      "published_at": "2026-08-19",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.dwd.de/DE/service/lexikon/lexikon_node.html",
+        "https://www.gesetze-im-internet.de/bgb/__634.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schliessanlage-einbruchschaden-austausch-kosten-pruefen",
+      "source_sha256": "3938b9654f9529204eba5780f74aa40cee9fb46a7a61b92af6327872b147f0be",
+      "published_at": "2026-10-02",
+      "updated_at": "2026-10-02",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://shop.vds.de/download/vds-2386/4d37bf6e-2ce6-4dce-ae21-155e72c3ada0",
+        "https://vds.de/fileadmin/publikationen/richtlinien/vds_5504.pdf",
+        "https://www.dinmedia.de/de/norm/din-en-1303/401073981",
+        "https://www.gesetze-im-internet.de/bgb/__249.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html",
+        "https://www.polizei-beratung.de/themen-und-tipps/einbruch/technische-sicherheit/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schneedruck-winterschaeden-bewertung-regulierung",
+      "source_sha256": "f91a21f8904ebc4d22a82ceb29067587ccfff231000ce83a59815d5ac4c5b75b",
+      "published_at": "2026-08-08",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/regelwerk/publikationen-nach-fachbereich/persoenliche-schutzausru-stungen/persoenliche-schutzausruestung-gegen-absturzrettungsausruestungen/3098/schneeraeumung-auf-dachflaechen",
+        "https://www.bbk.bund.de/DE/Themen/Risikomanagement/Baulicher-Bevoelkerungsschutz/Schutz-vor-Naturgefahren/Schneelast/schneelast.html",
+        "https://www.dinmedia.de/de/norm/din-en-1991-1-3-na/301647243",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung",
+      "source_sha256": "68d710933c78f633b25d2c7a1184d0571baf9dc160b693dbadbf2391830e06b5",
+      "published_at": "2026-08-13",
+      "updated_at": "2026-09-30",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/widgets/pdf/download/article/3727",
+        "https://www.gesetze-im-internet.de/arbst_ttv_2004/__4.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von",
+        "https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung",
+      "source_sha256": "e371bffacf632ca8eca69f92ff648c17cdedadca824aeb465ad376f8a0105376",
+      "published_at": "2026-10-05",
+      "updated_at": "2026-10-05",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://shop.vds.de/download/V2091/7bbeb334-f7ea-4c13-bd34-1cbfe54145c8",
+        "https://vds.de/pruefung-anerkennung/technische-pruefstelle/information-innovation/informationen-news/sprinklerrichtlinie",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS",
+        "https://www.gesetze-im-internet.de/betrsichv_2015/",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "starkregen-rueckstau-eintrittswege-rueckstauebene-schadenbereiche",
+      "source_sha256": "92dbe15521fd19c19bf279114c963af4df12170c67dc13b24ddab7bc5947844b",
+      "published_at": "2026-08-03",
+      "updated_at": "2026-08-03",
+      "canonical_explicit": true,
+      "noindex_false_explicit": false,
+      "source_urls": [
+        "https://www.bbsr.bund.de/BBSR/DE/veroeffentlichungen/sonderveroeffentlichungen/2018/leitfaden-starkregen.html",
+        "https://www.dinmedia.de/de/norm/din-1986-100/264064948",
+        "https://www.dinmedia.de/de/norm/din-en-12056-1/23912115",
+        "https://www.dinmedia.de/de/norm/din-en-12056-4/23912386",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning",
+      "source_sha256": "0be2b9a57a70fdd141f73600fd43e9743a9584b79e0c707223811d5e6fa61cc1",
+      "published_at": "2026-07-20",
+      "updated_at": "2026-08-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von",
+        "https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "starkregen-rueckstau-schadenaufnahme-regulierung",
+      "source_sha256": "ac1961ff0bef7ff57cd8a77bcbfde4f9f477220b11501ebc04ea5cd40e527126",
+      "published_at": "2026-08-11",
+      "updated_at": "2026-08-11",
+      "canonical_explicit": true,
+      "noindex_false_explicit": false,
+      "source_urls": [],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "stromkosten-technische-trocknung-nachweis",
+      "source_sha256": "4fe38f701b07c36111450f9d3ea30a17ece20d28b2cf227b8eeb3d57ec53645c",
+      "published_at": "2026-09-16",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR.html",
+        "https://www.dguv.de/medien/inhalt/publikationen/regelwerk/regelwerk_dguv-informationen/index.jsp",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning",
+      "source_sha256": "8f87c33c349ca3d6731b19cda0095f117878b17cf9238ebba06b7a98eaceda3f",
+      "published_at": "2026-07-21",
+      "updated_at": "2026-08-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/bgb/__634.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "sturmschaden-windwirkung-vorschaden-abgrenzung",
+      "source_sha256": "96953c7fa85cd70c41ce4cb6d60162d87ac18cb74d34aaf2e9f88204b5dfe204",
+      "published_at": "2026-07-17",
+      "updated_at": "2026-08-09",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "svos-foundation",
+      "source_sha256": "96ae257cc8c85211a041efbe771e601a66122a53411b22b1815dfbb0068758a0",
+      "published_at": "2026-07-14",
+      "updated_at": null,
+      "canonical_explicit": false,
+      "noindex_false_explicit": false,
+      "source_urls": [],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle",
+      "source_sha256": "86cb40eb465ccae9dedb9a5d7119f3c242e02a4550e6dd766fba249682234b97",
+      "published_at": "2026-08-04",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.klebstoffe.com/wp-content/uploads/2024/07/B-TKB-11-Belegreife.pdf",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von",
+        "https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus"
+      ],
+      "review_status": "targeted-correction"
+    },
+    {
+      "slug": "tornado-lokale-sturmereignisse-schadenaufnahme",
+      "source_sha256": "42ece1d0c748e13e7756ae65dea39c1f2b67ad3444945095dd5985a9f4b5cb3f",
+      "published_at": "2026-08-07",
+      "updated_at": "2026-08-07",
+      "canonical_explicit": true,
+      "noindex_false_explicit": false,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung",
+      "source_sha256": "062c69fc4ab671e4c48dec292c59e7ec31e3578620464d307bcd92a3fe4d63c1",
+      "published_at": "2026-08-09",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.bbk.bund.de/DE/Themen/Risikomanagement/Baulicher-Bevoelkerungsschutz/Objektschutz-und-bauliche-Vorsorge/Hochwasserschutzfibel/hochwasserschutzfibel_node.html",
+        "https://www.dinmedia.de/de/norm/din-18533-1/270192249",
+        "https://www.dwa.de/dwa/",
+        "https://www.gdv.de/gdv/themen/naturgefahren",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "waermepumpe-ueberflutung-pruefung-kostenabgrenzung",
+      "source_sha256": "7bafb3d9449d00d18049c943a2dae34c619afefb7481712b7347659cc27bee07",
+      "published_at": "2026-10-07",
+      "updated_at": "2026-10-07",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html",
+        "https://www.vde.com/resource/blob/1574620/fda279015cf78879792fcb038468b4e1/vde-infoblatt-ueberflutung-data.pdf",
+        "https://www.waermepumpe.de/verbraucher/darum-waermepumpe/fragen-sie-die-experten/antwort-der-experten/wie-schuetze-ich-meine-waermepumpe-vor-hochwasser-welche-folgen-kann-die-ueberschwemmung-fuer-meine-waermepumpe-haben/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung",
+      "source_sha256": "41010f2353d6519efbb8680425267c59f0f97ab37cc3c5af66900c588407f791",
+      "published_at": "2026-10-08",
+      "updated_at": "2026-10-08",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/regelwerk/dguv-informationen/2879/wiederkehrende-pruefungen-elektrischer-anlagen-und-ortsfester-betriebsmittel-fachwissen-fuer-pruefper",
+        "https://publikationen.dguv.de/regelwerk/dguv-regeln/1346/fahrzeuginstandhaltung",
+        "https://www.dinmedia.de/de/norm-entwurf/din-en-iec-61851-1/401725186",
+        "https://www.dinmedia.de/de/norm/din-en-iec-61851-1/312355027",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__83.html",
+        "https://www.vde.com/de/fnn/themen/elektromobilitaet",
+        "https://www.vde.com/resource/blob/1574620/fda279015cf78879792fcb038468b4e1/vde-infoblatt-ueberflutung-data.pdf"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "wintergarten-schaden-tragwerk-verglasung-entwaesserung",
+      "source_sha256": "87a93062cc7beab38d6ac0391cf21a1d83054fabbab967726dfd518316fd55c5",
+      "published_at": "2026-08-24",
+      "updated_at": null,
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6",
+        "https://www.dibt.de/de/wir-bieten/technische-baubestimmungen",
+        "https://www.dwd.de/DE/wetter/warnungen_aktuell/warnungen_aktuell_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "zusammenarbeit-fachplaner-sanierer-schadenfall",
+      "source_sha256": "f1ee523017e08bff23df1c38d52caea52ec88a0116a578aa2cf243780f836c92",
+      "published_at": "2026-09-04",
+      "updated_at": "2026-09-04",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://publikationen.dguv.de/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/"
+      ],
+      "review_status": "structural-inventory-only; individual-source-review-open"
+    },
+    {
+      "slug": "schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen",
+      "source_sha256": "b0a769c891ddd7b7973df3fff58a0fe66f097dfc611f219a098597d6fbe52e56",
+      "published_at": "2026-10-12",
+      "updated_at": "2026-10-12",
+      "canonical_explicit": true,
+      "noindex_false_explicit": true,
+      "source_urls": [
+        "https://bss-schimmelpilz.de/fachkundenachweis-schimmelsanierung-modul-b3-sanierungskontrolle/",
+        "https://publikationen.dguv.de/widgets/pdf/download/article/644",
+        "https://www.umweltbundesamt.de/system/files/medien/4031/publikationen/240513_uba_fb_schimmelleitfaden_0.pdf",
+        "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/aktueller-uba-schimmelleitfaden"
+      ],
+      "review_status": "current-day-article; fiktives Praxisbeispiel ergänzt"
+    }
+  ]
+}

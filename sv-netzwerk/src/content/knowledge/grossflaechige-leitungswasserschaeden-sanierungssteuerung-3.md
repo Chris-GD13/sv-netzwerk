@@ -16,9 +16,10 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/schadenabgrenzung/", "/fachwisse
 damageTypes: ["leitungswasser", "gebaeude"]
 publication:
   publishedAt: 2026-08-19
-  updatedAt: 2026-08-19
+  updatedAt: 2026-10-12
   status: published
 seo:
+  noindex: false
   title: "Leitungswasserschäden unter Estrich fachlich bewerten"
   description: "Dämmschichttrocknung, Hygiene, Rückbau, Messkonzept und Kostenprüfung bei Leitungswasserschäden in Estrichkonstruktionen fachlich einordnen."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-3/"
@@ -282,6 +283,12 @@ Für die Kostenprüfung müssten die angebotenen Flächen, Geräte und Laufzeite
 Bei Leitungswasserschäden in Estrich-Dämmschichten gibt es keine fachlich belastbare Standardantwort „trocknen“ oder „ausbauen“. Entscheidend ist eine dokumentierte Kette aus Schadenursache, Bauteilaufbau, Feuchteverteilung, Wasserart, Einwirkdauer, Materialzustand, hygienischer Bewertung und kontrollierbarem Sanierungsziel.
 
 Eine gute Regulierung erkennt weder jede angebotene Maßnahme pauschal an noch reduziert sie den Schaden allein aus Kostengründen auf das günstigste Verfahren. Sie verlangt, dass jede wesentliche Entscheidung technisch hergeleitet und später anhand von Fotos, Messungen, Mengen und Abschlussnachweisen nachvollzogen werden kann. Genau diese Prüffähigkeit ist die Grundlage für angemessene Freigaben, belastbare Kostenprüfungen und eine technisch ordnungsgemäße Wiederherstellung.
+
+## Ergänzung zur Schichtabgrenzung vom 12.10.2026
+
+[TKB-Merkblatt 8](https://www.klebstoffe.com/wp-content/uploads/2026/04/TKB-8-Untergrundbeurteilung-Veroeffentlichung.pdf) beurteilt den Untergrund für eine neue Bodenbelegung; die obere Estrichschicht ist von darunterliegenden Schichten zu unterscheiden. Ein günstiger Estrichwert ist deshalb kein Freigabenachweis der Dämmschicht. Messstellen im Schadenbericht eindeutig schichtbezogen zuordnen.
+
+Status: unverbindliches Verbandsmerkblatt; Deckblatt Mai 2026, Seitenfuß April 2026. Quellenprüfung: 12.10.2026; kein allgemeiner Geltungsbeginn oder Ersatz der Hygienebewertung.
 
 ## Quellen und weiterführende Regelwerke
 

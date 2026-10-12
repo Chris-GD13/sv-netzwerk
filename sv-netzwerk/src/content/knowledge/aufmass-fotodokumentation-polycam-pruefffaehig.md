@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-19
-  updatedAt: 2026-09-19
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Digitales Aufmaß prüffähig dokumentieren"
@@ -79,9 +79,9 @@ In einem fiktiven Leitungswasserschaden wird ein mit Polycam erstelltes Aufmaß 
 
 ## Handlungsempfehlungen
 
-- Versicherungsnehmer sollten Aufnehmende sollten Originaldaten, Referenzmaße und Grenzen dokumentieren.
-- Versicherer sollten Versicherer sollten digitale Aufmaße mit Fotos und Kontrollmaßen abgleichen.
-- Sachverständige sollten Sachverständige sollten Modellwerte, Messwerte und Schätzungen klar kennzeichnen.
+- Aufnehmende sollten Originaldaten, Referenzmaße und Grenzen dokumentieren.
+- Versicherer sollten digitale Aufmaße mit Fotos und Kontrollmaßen abgleichen.
+- Sachverständige sollten Modellwerte, Messwerte und Schätzungen klar kennzeichnen.
 - Alle Beteiligten sollten die unveränderte Ausgangsdatei zusammen mit Export, Kontrollmaßen und Versionsnotiz archivieren.
 - Bei relevanten Abweichungen sollte die Messung wiederholt oder durch eine geeignete Fachperson ergänzt werden.
 

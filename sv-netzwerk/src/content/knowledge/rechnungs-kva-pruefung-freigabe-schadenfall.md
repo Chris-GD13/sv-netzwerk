@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["gebaeude", "leitungswasser", "brand"]
 publication:
   publishedAt: 2026-08-29
-  updatedAt: 2026-08-29
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Rechnungs- und KVA-Prüfung im Schadenfall: Freigabe auf belastbarer"
@@ -121,6 +121,10 @@ Bei rechnungs- und kva-prüfung ist nicht die Geschwindigkeit allein entscheiden
 
 ## Call-to-Action
 Für die operative Umsetzung unterstützen wir mit strukturierter [Schadenmeldung](/schaden-melden/), methodischer [technischer Schadenabgrenzung](/fachwissen/schadenabgrenzung/), [prüffähiger Dokumentation](/fachwissen/prueffaehige-dokumentation/) und – je nach Fragestellung – der [Gutachter-Plattform](/gutachter-plattform/).
+
+## Marktstand für die Kostenprüfung vom 12.10.2026
+
+[Destatis, Pressemitteilung 360 vom 09.10.2026](https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_360_61261.html): Neubaupreise für Wohngebäude lagen im Berichtsmonat August 2026 um 5,5 % über August 2025. Dies ist eine amtliche Statistik, kein verbindlicher Reparaturtarif und kein Geltungsbeginn für Verträge. Bei Preisabweichungen Angebotsdatum, Ausführungsdatum, Gewerk und Leistungsumfang vergleichen. Der Neubauindex ist nicht ungeprüft auf einzelne Sanierungsleistungen zu übertragen.
 
 ## Quellen und weiterführende Hinweise
 - [Bundesministerium der Justiz: Versicherungsvertragsgesetz (VVG)](https://www.gesetze-im-internet.de/vvg_2008/) – gesetzlicher Rahmen; die konkrete Deckungs- und Leistungsprüfung bleibt einzelfallabhängig.

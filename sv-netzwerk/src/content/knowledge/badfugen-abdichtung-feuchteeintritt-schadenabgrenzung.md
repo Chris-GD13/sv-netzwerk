@@ -12,11 +12,11 @@ linkedinSummary: "Feuchte im Bad wird erst dann belastbar bewertet, wenn Wartung
 cta:
   label: "Schaden strukturiert melden"
   href: "/schaden-melden/"
-relatedLinks: ["/fachwissen/", "/fachwissen/leitungswasser-leckageortung-pruefstrategie/", "/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/", "/schaden-melden/"]
+relatedLinks: ["/fachwissen/", "/fachwissen/leitungswasserschaden-leckageortung-pruefstrategie/", "/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/", "/schaden-melden/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-25
-  updatedAt: 2026-09-25
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Badfugen und Abdichtungen fachlich abgrenzen"
@@ -98,6 +98,12 @@ In einem ausdrücklich fiktiven Fall zeigt sich unterhalb einer Dusche eine feuc
 ## Fazit
 
 Feuchte im Bad wird erst dann belastbar bewertet, wenn Oberfläche, Wartungsfuge, Abdichtung, Installation, Vorzustand und Folgeschaden getrennt betrachtet werden. Eine begrenzte, dokumentierte Prüfung verhindert sowohl vorschnelle Ablehnungen als auch pauschale Komplettsanierungen.
+
+## Ergänzung zu Parkett und Designbelägen im Bad vom 12.10.2026
+
+[TKB-Merkblatt 22](https://www.klebstoffe.com/tkb-22-bodenbelaege-mit-wassereinwirkung-veroeffentlichung/) behandelt entsprechende Beläge in Wohn- und Hotelbereichen mit Wassereinwirkung. Derartige Ausführungen sind anhand des vollständigen Abdichtungs- und Herstellersystems zu prüfen; die Belagsoberfläche ist kein Ersatz für die Abdichtung. Praktisch sind Belagsart, vorgesehene Nutzung, Systemfreigabe und Anschlüsse in der Schadenakte festzuhalten.
+
+Status und Datierung: Das aktuell verlinkte PDF trägt März 2026, die Herausgebermeldung vom 20.05.2026 nennt April 2026. Diese Abweichung ist dokumentiert; sie wird nicht als gesicherter Geltungsbeginn ausgegeben. Fachliches Verbandsmerkblatt, kein Gesetz und keine pauschale bauaufsichtliche Zulassung. Ein im Literaturverzeichnis benannter Prüfgrundsatz-Entwurf wird nicht als verbindliche Regel übernommen.
 
 ## Quellen und weiterführende Hinweise
 

@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/leitungswasserschaden-erstmassnahmen/", "/fachwissen
 damageTypes: ["leitungswasser", "gebaeude"]
 publication:
   publishedAt: 2026-07-27
-  updatedAt: 2026-08-09
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Leitungswasserschaden Aalen – Sachverständiger Versicherungsschäden"
@@ -107,7 +107,7 @@ Eine prüffähige Erstaufnahme bei Leitungswasserschäden erfordert:
 Für eine vollständige Bewertung sind folgende Messverfahren relevant:
 
 - **Kapazitive und impedanzbasierte Feuchtemessgeräte**: Erste Orientierung zu Schadenzonen und Ausbreitung.
-- **CM-Messung**: Genaue Feuchtegehalte im Estrich; Grundlage für Trocknungsplanung und Abnahme.
+- **CM-Messung**: Feuchtebestimmung an einer zugeordneten Estrichprobe. Prüfziel und Bewertungsgrundlage bestimmen, ob sie für die vorgesehene Entscheidung ausreicht.
 - **Leitungsortung und Leckageortung**: Bei unklarem Leckageort in Fußbodenheizungen oder verlegten Rohren.
 - **Thermographie**: Bei Verdacht auf verdeckte Feuchteverteilung.
 - **Regelmäßige Kontrollmessungen während der Trocknung**: Trocknungsfortschritt dokumentieren; Abnahme mit Sollwerten.
@@ -164,6 +164,12 @@ Für die Regulierung ergibt sich: Sofortmaßnahmen (Absaugen des Kellerwassers, 
 ## Fazit
 
 Leitungswasserschäden in Aalen verlangen keine anderen fachlichen Grundsätze als anderswo – aber eine konsequente Anwendung dieser Grundsätze. Ursache eindeutig feststellen, Rückbau auf den nachgewiesenen Bedarf begrenzen, Kosten sauber abgrenzen und den gesamten Vorgang prüffähig dokumentieren: Das ist die Grundlage für eine belastbare Regulierung, die auch nachträglich standhält.
+
+## Messwerte richtig zuordnen – Präzisierung vom 12.10.2026
+
+Die [TKB-Fachinformation zur KRL-Methode](https://www.klebstoffe.com/krl-methode/) erläutert: KRL misst relative Luftfeuchte, CM einen materialabhängigen Feuchtegehalt; eine allgemeine Umrechnung gibt es nicht. Für die Schadenakte müssen deshalb Methode, Einheit und Probenort zusammengeführt werden.
+
+Status: Fachinformation des Herausgebers, kein Deckungs- oder Preisregelwerk. Abruf 12.10.2026; kein gesondertes Veröffentlichungsdatum ausgewiesen und kein allgemeiner Geltungsbeginn behauptet.
 
 ## Quellen und weiterführende Hinweise
 

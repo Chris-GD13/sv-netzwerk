@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-15
-  updatedAt: 2026-09-15
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Rechnungskürzungen im Schadenfall prüfen"
@@ -75,13 +75,17 @@ In einem fiktiven Wasserschaden wird zunächst die Öffnung einer Wand freigegeb
 
 ## Handlungsempfehlungen
 
-- Versicherungsnehmer sollten Versicherungsnehmer sollten Angebote, Freigaben, Nachträge und Rechnungen vollständig vorlegen.
-- Versicherer sollten Versicherer sollten Kürzungen positionsbezogen begründen.
-- Sachverständige sollten Sachverständige sollten Befund, Menge, Ausführung und Schadenbezug getrennt dokumentieren..
+- Versicherungsnehmer sollten Angebote, Freigaben, Nachträge und Rechnungen vollständig vorlegen.
+- Versicherer sollten Kürzungen positionsbezogen begründen.
+- Sachverständige sollten Befund, Menge, Ausführung und Schadenbezug getrennt dokumentieren.
 
 ## Fazit
 
 Eine belastbare Rechnungskürzung ist kein pauschaler Prozentabzug. Sie entsteht aus dem Vergleich von Auftrag, Befund, Freigabe, Aufmaß und Ausführung. Erst diese Kette macht die Entscheidung nachvollziehbar.
+
+## Marktstand für die Kostenprüfung vom 12.10.2026
+
+[Destatis, Pressemitteilung 360 vom 09.10.2026](https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_360_61261.html): Neubaupreise für Wohngebäude lagen im Berichtsmonat August 2026 um 5,5 % über August 2025. Dies ist eine amtliche Statistik, kein verbindlicher Reparaturtarif und kein Geltungsbeginn für Verträge. Eine Kürzung braucht weiterhin die konkrete Position und Vergleichsgrundlage; der Gesamtindex trägt keinen pauschalen Abzug. Der Neubauindex ist nicht ungeprüft auf einzelne Sanierungsleistungen zu übertragen.
 
 ## Quellen und weiterführende Hinweise
 

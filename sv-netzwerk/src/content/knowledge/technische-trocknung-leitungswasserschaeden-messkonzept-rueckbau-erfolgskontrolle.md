@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/kontrollierter-rueckbau-bei-leit
 damageTypes: ["leitungswasser", "gebaeude"]
 publication:
   publishedAt: 2026-08-04
-  updatedAt: 2026-09-30
+  updatedAt: 2026-10-12
   status: published
 seo:
   title: "Technische Trocknung bei Wasserschaden: Ablauf und Nachweise"
@@ -251,6 +251,10 @@ Technische Trocknung nach Leitungswasserschäden ist keine Standardroutine, sond
 ## Aktualitätsprüfung zum 30.09.2026
 
 Die Ergänzung berücksichtigt den UBA-Schimmelleitfaden in der aktualisierten Auflage April 2024 sowie die am 17.01.2025 aktualisierte UBA-Informationsseite. Beide Quellen sind fachliche Leitlinien und keine verbindlichen Preis- oder Deckungsregeln. Ihre praktische Bedeutung für die Trocknungsprüfung liegt in der Reihenfolge aus Ursachenklärung, Erfassung, fachlich begründetem Sanierungsumfang und dokumentierter Erfolgskontrolle. Veröffentlichungsdatum (04.08.2026), Aktualisierungsdatum (30.09.2026) und Quellenstand (April 2024/17.01.2025) werden getrennt geführt.
+
+## Ergänzung zur Wiederbelegungsfreigabe vom 12.10.2026
+
+Nach [TKB-Bericht 11, 19.07.2024](https://www.klebstoffe.com/wp-content/uploads/2024/07/B-TKB-11-Belegreife.pdf), ist Belegreife mehr als ein Feuchtewert. Der Bericht ist eine fachliche Erläuterung ohne neue Prüfpflichten. Für Regulierer bedeutet dies: Gerätestopp, Hygienebewertung und Freigabe des neuen Belags als getrennte Ergebnisse dokumentieren. Nicht aus einem trockenen Estrich auf schadensfreie Klebstoff- oder Dämmschichten schließen. Quellenprüfung: 12.10.2026; kein gesetzlicher Geltungsbeginn.
 
 ## Quellen und weiterführende Hinweise
 
