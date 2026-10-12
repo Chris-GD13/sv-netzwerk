@@ -1,8 +1,7 @@
 name: Rekon-Abrechnung aktualisieren
 
 on:
-  schedule:
-    - cron: '20 5 15 * *'
+  # Scheduled reconciliation is managed by the Codex heartbeat for the 5th/25th business-day rule.
   workflow_dispatch:
 
 permissions:
