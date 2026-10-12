@@ -29,9 +29,20 @@ try {
     $results = searchCaseFolderIndex($user, '160966 Testobjekt');
     registryExpect(count($results) === 1, 'Registrierter Fall wurde nicht gefunden.');
     registryExpect(($results[0]['id']??'') === $folderId, 'Falscher Fall wurde zurückgegeben.');
+    $maurerId=$folderId.'-maurer';
+    registerCaseFolderOwner($maurerId,['id'=>$userId,'email'=>'jens@profile.sv-netzwerk'],['schaden_nr'=>'26-990077-4','vn_objekt'=>'Maurer Test']);
+    foreach(['cw@sv-schuett.eu','ws@sv-schuett.eu']as$email){
+        $shared=searchCaseFolderIndex(['id'=>$userId,'email'=>$email],'26-990077-4');
+        registryExpect(count($shared)===1&&$shared[0]['id']===$maurerId,'Maurer-Schadennummer fehlt für '.$email);
+    }
+    foreach(['ms@sv-schuett.eu','hr@sv-schuett.eu']as$email){
+        registryExpect(searchCaseFolderIndex(['id'=>$userId,'email'=>$email],'26-990077-4')===[],'Maurer-Schaden für fremdes Profil sichtbar.');
+    }
+
 } finally {
     $stmt = $pdo->prepare('DELETE FROM case_folder_owners WHERE folder_id=:id');
     $stmt->execute([':id'=>$folderId]);
+    $stmt->execute([':id'=>$folderId.'-maurer']);
 }
 
 echo "OK: Fallsuch-Register funktioniert mit dem produktiven Tabellenschema.\n";

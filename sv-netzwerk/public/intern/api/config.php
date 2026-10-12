@@ -138,7 +138,7 @@ function requireCaseFolderAccess(string $folderId, array $user): void
     $stmt->execute([':f'=>$folderId]);
     $owner = $stmt->fetch(PDO::FETCH_ASSOC);
     $ownerProfile = $owner ? svnetUserProfile(['email'=>(string)$owner['user_email']]) : '';
-    if (!$owner || $ownerProfile === '' || $ownerProfile !== $profile) {
+    if (!$owner || $ownerProfile === '' || !svnetCanAccessCaseProfile($user, $ownerProfile)) {
         apiError(403, 'Dieser Schadenfall gehört zu einem anderen Benutzer und darf nicht geöffnet oder verändert werden.');
     }
 }

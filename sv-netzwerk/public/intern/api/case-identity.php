@@ -29,13 +29,14 @@ function caseIdentityUnlock(string $name): void {
 }
 function caseIdentityFind(array $user, string $number): array {
     $key=caseNumberKey($number);if ($key==='') return [];
-    $root=gdUserCasesRoot($user);$matches=[];
+    $roots=function_exists('gdAccessibleCaseRoots')?gdAccessibleCaseRoots($user):[gdUserCasesRoot($user)];$matches=[];
+    foreach($roots as$root){
     if(ionosStorageEnabled()) {
         $stmt=ionosStorageDb()->prepare('SELECT c.id,c.name,f.id AS meta_id FROM items c LEFT JOIN items f ON f.parent=c.id AND f.name=? AND f.verified=1 WHERE c.parent=? AND c.mime=? AND c.verified=1');
         $stmt->execute([CASE_META_NAME,(string)$root['id'],'application/vnd.google-apps.folder']);
         foreach($stmt->fetchAll() as $row){$meta=!empty($row['meta_id'])?json_decode(ionosBytes((string)$row['meta_id']),true,512,JSON_THROW_ON_ERROR):[];
             if(caseNumberKey((string)($meta['schaden_nr']??$row['name']))===$key)$matches[(string)$row['id']]=$meta;}
-        return $matches;
+        continue;
     }
     foreach(gdListChildren((string)$root['id'],'application/vnd.google-apps.folder',1000) as $folder) {
         $meta=gdCaseMeta((string)$folder['id']);
@@ -45,6 +46,7 @@ function caseIdentityFind(array $user, string $number): array {
         if(caseNumberKey((string)($row['meta']['schaden_nr']??''))!==$key)continue;
         $id=caseIdentityResolve((string)$row['id']);$folder=gdFileMeta($id);
         if(in_array((string)$root['id'],$folder['parents']??[],true))$matches[$id]=gdCaseMeta($id);
+    }
     }
     return $matches;
 }
@@ -82,7 +84,7 @@ function caseIdentitySave(array $user, array $body): array {
             $data=array_replace($old,$data);
         }
         $data['updated_at']=gmdate('c');$data['updated_by']=$user['full_name']??$user['email'];
-        gdUploadJson($folderId,CASE_META_NAME,$data);registerCaseFolderOwner($folderId,$user,$data);
+        gdUploadJson($folderId,CASE_META_NAME,$data);if(function_exists('gdRegisterCaseOwner'))gdRegisterCaseOwner($folderId,$user,$data);else registerCaseFolderOwner($folderId,$user,$data);
         return ['ok'=>true,'folder_id'=>$folderId,'name'=>gdCaseName($data),'meta'=>$data,'reused'=>$reused];
     } finally {caseIdentityUnlock($lock);}
 }
@@ -111,10 +113,10 @@ function caseIdentityMerge(array $user, array $body): array {
         $audit=['at'=>gmdate('c'),'by'=>$user['email'],'source_folder'=>$sourceFolder,'target_id'=>$target,'target_before'=>$a,'source_before'=>$b,'source_items'=>$sourceItems,'target_items'=>$targetItems,'conflicts'=>$conflicts];
         $auditFile=gdUploadJson($target,'00_Zusammenfuehrung_'.$source.'.json',$audit);
         $merged['merged_case_ids']=array_values(array_unique(array_merge((array)($a['merged_case_ids']??[]),[$source])));
-        gdUploadJson($target,CASE_META_NAME,$merged);registerCaseFolderOwner($target,$user,$merged);
+        gdUploadJson($target,CASE_META_NAME,$merged);if(function_exists('gdRegisterCaseOwner'))gdRegisterCaseOwner($target,$user,$merged);else registerCaseFolderOwner($target,$user,$merged);
         try {
             ionosWrite(['parents'=>[$target],'name'=>'Zusammengeführt · '.($b['schaden_nr']??$source),'appProperties'=>array_replace((array)($sourceFolder['appProperties']??[]),['svCaseMergedInto'=>$target])],null,$source);
-        }catch(Throwable$e){gdUploadJson($target,CASE_META_NAME,$a);registerCaseFolderOwner($target,$user,$a);throw $e;}
+        }catch(Throwable$e){gdUploadJson($target,CASE_META_NAME,$a);if(function_exists('gdRegisterCaseOwner'))gdRegisterCaseOwner($target,$user,$a);else registerCaseFolderOwner($target,$user,$a);throw $e;}
         foreach($sourceItems as$item){$after=ionosItem((string)$item['id']);foreach(['parents','md5Checksum','size']as$field)if(($after[$field]??null)!==($item[$field]??null))throw new RuntimeException('Bestandsprüfung fehlgeschlagen: '.$item['id']);}
         return ['ok'=>true,'folder_id'=>$target,'meta'=>$merged,'preserved_items'=>count($sourceItems),'audit_id'=>$auditFile['id'],'conflicts'=>$conflicts];
     }finally{caseIdentityUnlock($lock);}
