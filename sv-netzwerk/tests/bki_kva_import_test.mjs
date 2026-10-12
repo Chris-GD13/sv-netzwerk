@@ -7,7 +7,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const page = fs.readFileSync(path.join(root, 'src/pages/intern/kalkulation/index.astro'), 'utf8');
 const api = fs.readFileSync(path.join(root, 'public/intern/api/bki-calculator.php'), 'utf8');
 const noteHelper = fs.readFileSync(path.join(root, 'public/intern/calculation-note-helper.js'), 'utf8');
-const settlementPdf = fs.readFileSync(path.join(root, 'public/intern/api/bki-settlement-pdf.php'), 'utf8');
+const settlementPdf = fs.readFileSync(path.join(root, 'public/intern/api/bki-settlement-core.php'), 'utf8');
+assert(fs.readFileSync(path.join(root, 'public/intern/api/bki-settlement-pdf.php'), 'utf8').includes('\\SvNetSettlement\\build($data)'), 'Der bisherige Kalkulations-PDF-Button verwendet weiterhin denselben Generator.');
 const pdfExport = fs.readFileSync(path.join(root, 'public/intern/bki-pdf-export.js'), 'utf8');
 const offline = fs.readFileSync(path.join(root, 'public/intern/bki-offline.js'), 'utf8');
 
