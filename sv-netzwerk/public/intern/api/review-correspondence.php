@@ -7,9 +7,17 @@ function reviewCorrespondenceProblem(string $text): bool {
 }
 
 function reviewAssertCorrespondence(string $text): void {
+    if (!mb_check_encoding($text, 'UTF-8') || str_contains($text, "\u{FFFD}")) {
+        throw new RuntimeException('Der Mailtext enthält beschädigte Zeichen. Bitte die betroffenen Wörter vor dem Versand korrigieren.');
+    }
     if (reviewCorrespondenceProblem($text)) {
         throw new RuntimeException('Bitte die Stellungnahme für die Mail fachlich formulieren. Interne Prüf- und Quellenhinweise sowie Angaben zur automatisierten Verarbeitung dürfen nicht in die Korrespondenz übernommen werden. Konkrete Vorbehalte oder benötigte Unterlagen bitte direkt benennen.');
     }
+}
+
+function reviewSignature(string $name): string {
+    if ($name === 'Christian Wächter') return $name."\nRegulierer und Bausachverständiger\nSV-Netzwerk\nDIN EN ISO/IEC 17024 zertifiziert\ncw@sv-netzwerk.eu\nhttps://www.sv-netzwerk.eu/";
+    return $name."\nSV-Büro Marc Schütt e.K.";
 }
 
 function reviewMailSubject(string $text, string $caseNo): string {

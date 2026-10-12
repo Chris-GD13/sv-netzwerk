@@ -28,7 +28,7 @@ check($message['bccRecipients'][0]['emailAddress']['address']==='Archiv@sv.de','
 check(str_contains($message['body']['content'],'ohne erneute Prüfung'),'Direct wording');
 check(!str_contains($message['body']['content'],'Prüfergebnis:'),'Never claim a direct invoice was checked');
 check(str_contains($message['body']['content'],'1.190,00 EUR brutto'),'Exact cents in email');
-check(str_contains($message['body']['content'],'Bausachverständiger') && str_contains($message['body']['content'],'cw@sv-schuett.eu'),'Full Christian signature with connected sender');
+check(str_contains($message['body']['content'],'Bausachverständiger') && str_contains($message['body']['content'],'cw@sv-netzwerk.eu'),'Full Christian signature with network contact');
 check(!str_contains($message['body']['content'],'SV-Büro Marc Schütt'),'No wrong office in Christian signature');
 $rejected=drValidate(['mode'=>'review','analysis'=>['assessment'=>'Plausibility']],array_replace($values,['decision'=>'rejected','assessment'=>'Doppelt berechnet','review_confirmed'=>true,'reason'=>'Bereits abgerechnet']));
 check($rejected['release_amount']===0.0,'Rejected is never a payment');
@@ -54,6 +54,9 @@ foreach (['Die Rechnung wurde durch KI geprüft.','Automatisierte Freigabe','Off
     fails(fn()=>reviewAssertCorrespondence($forbidden),'Internal or machine wording blocked');
 }
 reviewAssertCorrespondence('Die Freigabe umfasst ausschließlich die aufgeführten Leistungen. Der Zahlungsstand ist vor Auszahlung abzugleichen. Bitte reichen Sie die Fremdgewerksrechnung nach.');
+reviewAssertCorrespondence('Prüfung über 19.040,00 EUR. Grüße von Christian Wächter.');
+fails(fn()=>reviewAssertCorrespondence("Pr\u{FFFD}fung"),'Replacement characters cannot be mailed');
+fails(fn()=>reviewAssertCorrespondence("Pr\xfcfung"),'Invalid UTF-8 cannot be mailed');
 fails(fn()=>drRecipients('not-an-address'),'Invalid email rejected');
 check(count(drRecipients('test@example.org, TEST@example.org'))===1,'Deduplicate recipients');
 $energy=drValidate(['mode'=>'direct'],array_replace($values,['energy_enabled'=>true,'energy_kwh'=>'431','energy_rate'=>'0,35','energy_vn'=>'ETG Bussenstraße 45a']));

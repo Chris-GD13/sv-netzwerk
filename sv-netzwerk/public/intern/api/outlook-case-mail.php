@@ -17,6 +17,9 @@ function omProfile(array $user): array {
     $email = mb_strtolower(trim((string)($user['email'] ?? '')), 'UTF-8');
     $name = mb_strtolower(trim((string)($user['full_name'] ?? '')), 'UTF-8');
 
+    $mailboxes = ['cw@sv-schuett.eu'=>'Christian Wächter', 'ms@sv-schuett.eu'=>'Marc Schütt', 'hr@sv-schuett.eu'=>'Holger Roth', 'ws@sv-schuett.eu'=>'Susanne Wächter'];
+    if (isset($mailboxes[$email])) return ['sender'=>$email, 'sender_name'=>$mailboxes[$email]];
+
     if ($email === 'ms@sv-schuett.eu' || str_contains($name, 'marc')) {
         return ['sender' => 'ms@sv-schuett.eu', 'sender_name' => 'Marc Schütt'];
     }
@@ -75,7 +78,7 @@ function omGraph(string $method, string $path, ?array $json=null): array {
     $body = null;
     if ($json !== null) {
         $headers[] = 'Content-Type: application/json';
-        $body = json_encode($json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $body = json_encode($json, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
     $response = omHttp($method, 'https://graph.microsoft.com/v1.0/' . $path, $headers, $body);
     $data = $response['body'] !== '' ? json_decode($response['body'], true) : [];
@@ -169,9 +172,8 @@ try {
         if ($text === '') throw new RuntimeException('E-Mail-Text fehlt.');
         reviewAssertCorrespondence($subject."\n".$text);
 
-        $signature = '<p>Mit freundlichen Grüßen<br>'
-            . htmlspecialchars((string)$profile['sender_name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
-            . '<br>SV-Büro Marc Schütt e.K.</p>';
+        $signature = preg_match('/Mit freundlichen Grüßen\s*'.preg_quote((string)$profile['sender_name'],'/').'/iu', $text)
+            ? '' : '<p>'.omHtml("Mit freundlichen Grüßen\n".reviewSignature((string)$profile['sender_name'])).'</p>';
 
         $message = [
             'subject' => $subject,
