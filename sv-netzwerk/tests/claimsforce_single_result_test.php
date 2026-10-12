@@ -1,5 +1,8 @@
 <?php
 require __DIR__.'/../public/intern/api/claimsforce-queue-utils.php';
+require_once __DIR__.'/../public/intern/api/profile-routing.php';
+function requireAuth(){return ['email'=>'cw@sv-schuett.eu'];}
+function cqRow($id){return ['profile'=>$GLOBALS['testProfile']??'christian'];}
 $job=['sync_mode'=>'single','claim_number'=>'26-085905-9'];
 $good=['claims'=>1,'updated'=>1,'skipped'=>0,'failed'=>0,'claimNumber'=>'26-085905-9','inventories'=>[['claimNumber'=>'26-085905-9','files'=>145,'messages'=>42,'tasks'=>1,'notes'=>9,'attachments'=>104]]];
 if(!cqSingleResultValid($job,$good))throw new Exception('Vollständiger Einzelfall abgelehnt');
@@ -32,6 +35,13 @@ try{cqConfirmHeartbeat(44,$owner,0);throw new Exception('Beendeter Auftrag wurde
 $GLOBALS['testOwner']=hash('sha256','22222222-2222-4222-8222-222222222222');
 try{cqConfirmHeartbeat(44,$owner,0);throw new Exception('Fremder Auftrag wurde als Heartbeat bestätigt');}catch(RuntimeException$e){if($e->getCode()!==409)throw$e;}
 echo "Identische Heartbeats bleiben gültig; beendete und fremde Aufträge bleiben gesperrt.\n";
+$GLOBALS['testOwner']=cqStationKey($owner);
+$GLOBALS['testProfile']='jens';
+cqRequireOwner(44,$owner);
+foreach(['marc','holger']as$profile){
+    $GLOBALS['testProfile']=$profile;
+    try{cqRequireOwner(44,$owner);throw new Exception('Fremder Bestand akzeptiert');}catch(RuntimeException$e){if($e->getCode()!==403)throw$e;}
+}
 
 require_once dirname(__DIR__).'/public/intern/api/profile-routing.php';
 foreach(['cw@sv-schuett.eu','ws@sv-schuett.eu']as$email){

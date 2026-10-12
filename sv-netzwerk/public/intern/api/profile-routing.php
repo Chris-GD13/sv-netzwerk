@@ -33,6 +33,17 @@ function svnetUserProfile(array $user): string
     return '';
 }
 
+function svnetCanRunClaimsStation(array $user): bool
+{
+    return svnetIsBackofficeUser($user) || svnetUserProfile($user) === 'christian';
+}
+
+function svnetClaimsStationProfiles(array $user): array
+{
+    if (!svnetCanRunClaimsStation($user)) return [];
+    return ['christian', 'jens'];
+}
+
 function svnetSelectedProfile(array $user, ?string $selected = null): string
 {
     if (!svnetIsBackofficeUser($user)) {

@@ -273,7 +273,7 @@
   setInterval(()=>window.postMessage({type:'SVNET_CLAIMS_RUNTIME_PING'},location.origin),5000);
   driveStatus().then(async d=>{
     context=d;
-    const personalBridgeBlocked=!d.backoffice&&supportedProfiles.includes(String(d.claims_profile||''));
+    const personalBridgeBlocked=!d.claims_agent&&!d.backoffice&&supportedProfiles.includes(String(d.claims_profile||''));
     if(personalBridgeBlocked){
       settings?.remove();
       download?.remove();

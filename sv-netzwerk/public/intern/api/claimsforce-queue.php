@@ -56,11 +56,11 @@ function cqIsSusanne(array$user):bool{
     return svnetIsBackofficeUser($user);
 }
 function cqIsCentralAgent(array$user):bool{
-    return cqIsSusanne($user);
+    return svnetCanRunClaimsStation($user);
 }
 function cqVisibleProfiles(array$user):array{
     $labels=['christian'=>'Christian','holger'=>'Holger','marc'=>'Marc','jens'=>'Jens'];
-    if(cqIsCentralAgent($user)){
+    if(cqIsSusanne($user)){
         try{$selected=svnetSelectedProfile($user,(string)($_SESSION['svnet_selected_expert']??''));}
         catch(InvalidArgumentException){apiError(409,'Das gespeicherte Bearbeiterprofil ist ungültig.');}
         return[$selected=>$labels[$selected]];
@@ -173,7 +173,7 @@ if($action==='stop'){
     $s->execute([':u'=>(string)($user['email']??''),':admin'=>$isAdmin?1:0,':target_check'=>$targetId,':target_id'=>$targetId]);
     apiJson(['ok'=>true,'stopped'=>$s->rowCount()]);
 }
-if(!cqIsCentralAgent($user))apiError(403,'Nur eine freigegebene zentrale Backoffice-Importstation darf Aufträge übernehmen.');
+if(!cqIsCentralAgent($user))apiError(403,'Nur Christian oder Susanne dürfen die zentrale Importstation betreiben.');
 
 if($action==='schedule'){
     $now=new DateTimeImmutable('now',new DateTimeZone('Europe/Berlin'));
@@ -185,7 +185,7 @@ if($action==='schedule'){
     $legacy=db()->prepare('SELECT sync_mode FROM claimsforce_import_jobs WHERE schedule_key=:k LIMIT 1');
     $scheduled=[];
     $scheduledModes=[];
-    foreach(svnetSupportedProfiles()as$profile){
+    foreach(svnetClaimsStationProfiles($user)as$profile){
         foreach(['quick','full']as$mode){
             $legacy->execute([':k'=>'claims-auto-'.$legacySchedule.'-'.$profile]);
             if($legacy->fetchColumn()===$mode)continue;
@@ -206,7 +206,7 @@ if($action==='active'){
     $row=db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='running' ORDER BY heartbeat_at DESC,id LIMIT 1")->fetch(PDO::FETCH_ASSOC);
     if(!$row)apiJson(['ok'=>true,'job'=>null,'busy'=>false]);
     $s=db()->prepare('SELECT agent_key FROM claimsforce_import_jobs WHERE id=:id');$s->execute([':id'=>(int)$row['id']]);
-    $own=hash_equals((string)($s->fetchColumn()?:''),$key);
+    $own=hash_equals((string)($s->fetchColumn()?:''),$key) && in_array((string)(cqRow((int)$row['id'])['profile']??''),svnetClaimsStationProfiles($user),true);
     apiJson(['ok'=>true,'job'=>$own?cqRow((int)$row['id']):null,'busy'=>!$own]);
 }
 if($action==='claim'){
@@ -215,7 +215,9 @@ if($action==='claim'){
     if((int)db()->query("SELECT GET_LOCK('svnet-claimsforce-import',3)")->fetchColumn()!==1)apiJson(['ok'=>true,'job'=>null]);
     db()->beginTransaction();
     if(db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='running' LIMIT 1 FOR UPDATE")->fetchColumn()){db()->commit();db()->query("SELECT RELEASE_LOCK('svnet-claimsforce-import')");apiJson(['ok'=>true,'job'=>null]);}
-    $row=db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='queued' ORDER BY (sync_mode='single') DESC,(requested_by='system:claimsforce') ASC,created_at,id LIMIT 1 FOR UPDATE")->fetch(PDO::FETCH_ASSOC);
+    $claim=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE status='queued' AND profile IN (?,?) ORDER BY (sync_mode='single') DESC,(requested_by='system:claimsforce') ASC,created_at,id LIMIT 1 FOR UPDATE");
+    $claim->execute(svnetClaimsStationProfiles($user));
+    $row=$claim->fetch(PDO::FETCH_ASSOC);
     if(!$row){db()->commit();db()->query("SELECT RELEASE_LOCK('svnet-claimsforce-import')");apiJson(['ok'=>true,'job'=>null]);}
     $id=(int)$row['id'];
     $s=db()->prepare("UPDATE claimsforce_import_jobs SET status='running',agent_key=:key,message='Import wird auf der zentralen Station ausgeführt.',phase='CF-CLAIMED',started_at=NOW(),heartbeat_at=NOW(),attempt_count=attempt_count+1 WHERE id=:id AND status='queued'");

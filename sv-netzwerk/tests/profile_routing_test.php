@@ -34,6 +34,14 @@ foreach($users as$i=>$user){
  }
 }
 echo "Maurer: nur Christian und Susanne erhalten den gemeinsamen Fallbestand.\n";
+foreach($users as$i=>$user){
+    $allowed=$i===0||$i===4;
+    if(svnetCanRunClaimsStation($user)!==$allowed)throw new RuntimeException('Falsche Importstationsfreigabe.');
+    if(svnetClaimsStationProfiles($user)!==($allowed?['christian','jens']:[]))throw new RuntimeException('Fremder Importbestand.');
+}
+if(!svnetCanRunClaimsStation(['email'=>'cw@sv-schuett.eu']))throw new RuntimeException('Christian-Claims-Adresse fehlt.');
+if(svnetCanRunClaimsStation(['email'=>'unknown@example.invalid','role'=>'administrator']))throw new RuntimeException('Unbekannter Administrator erhält Importrecht.');
+echo "Christian und Susanne betreiben die Importstation für beide freigegebenen Quellen.\n";
 
 // Exercise the real Drive access helpers with isolated folders and no remote writes.
 function apiError(int $status,string $message):never{throw new RuntimeException($message,$status);}

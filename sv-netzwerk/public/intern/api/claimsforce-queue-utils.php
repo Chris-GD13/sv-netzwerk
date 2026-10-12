@@ -23,6 +23,7 @@ function cqRequireOwner(int$id,array$body):void{
     $s->execute([':id'=>$id]);
     $stored=(string)($s->fetchColumn()?:'');
     if($stored===''||!hash_equals($stored,$key))apiError(409,'Der Auftrag gehört einer anderen Importstation oder läuft nicht mehr.');
+    if(!in_array((string)(cqRow($id)['profile']??''),svnetClaimsStationProfiles(requireAuth()),true))apiError(403,'Dieser Quellzugang ist für die Importstation nicht freigegeben.');
 }
 function cqConfirmHeartbeat(int$id,array$body,int$changedRows):void{
     // MySQL meldet bei gleichen Daten und gleichem NOW()-Sekundenwert 0 Änderungen.
