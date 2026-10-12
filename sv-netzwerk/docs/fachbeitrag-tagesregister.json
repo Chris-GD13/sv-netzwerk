@@ -258,7 +258,21 @@
           "state": "replacement-prepared"
         }
       }
+    },
+    "2026-10-12": {
+      "publication_id": "2026-10-12-schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen",
+      "article": {
+        "title": "Schimmelsanierung kontrollieren: Feuchteursache, Feinreinigung und Sanierungserfolg prüfen",
+        "slug": "schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/",
+        "status": "reserved",
+        "owner": "codex-website-20261012-01a12e40-f716-7920-b851-589ea7df9035",
+        "reserved_at": "2026-10-12T04:02:50.792Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-10-11T08:21:08Z"
+  "updated_at": "2026-10-12T04:02:50.792Z"
 }
