@@ -279,12 +279,19 @@
         "reserved_at": "2026-10-12T04:02:50.792Z",
         "commit": "32c70f67b513f8a5b3a02fa74080c38de1068f4f",
         "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38202943712",
-        "verified_at": "2026-10-12T04:19:38.973Z"
+        "verified_at": "2026-10-12T04:19:38.973Z",
+        "content_verification": {
+          "commit": "1fe12ec94df6cdef582fcfec6d594dc0a78a47be",
+          "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38203988621",
+          "verified_at": "2026-10-12T04:38:09.652483+00:00",
+          "status": "published-verified",
+          "note": "Endgültiger Tagesartikel ohne zwischenzeitliches Praxisbeispiel, HTTP200, Canonical, kein noindex, Übersicht, Suchindex und Sitemap geprüft."
+        }
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-12T04:22:28.654183+00:00"
+  "updated_at": "2026-10-12T04:38:09.652483+00:00"
 }

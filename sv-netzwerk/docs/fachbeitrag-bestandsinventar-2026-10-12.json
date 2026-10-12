@@ -1568,7 +1568,7 @@
     },
     {
       "slug": "schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen",
-      "source_sha256": "b0a769c891ddd7b7973df3fff58a0fe66f097dfc611f219a098597d6fbe52e56",
+      "source_sha256": "69780341e0193baf383e66b2bbcdd7d25bf51d4dfef8206e62091a3a74919a0f",
       "published_at": "2026-10-12",
       "updated_at": "2026-10-12",
       "canonical_explicit": true,
@@ -1579,7 +1579,7 @@
         "https://www.umweltbundesamt.de/system/files/medien/4031/publikationen/240513_uba_fb_schimmelleitfaden_0.pdf",
         "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/aktueller-uba-schimmelleitfaden"
       ],
-      "review_status": "current-day-article; fiktives Praxisbeispiel ergänzt"
+      "review_status": "current-day-article; final main ohne zwischenzeitliches Praxisbeispiel"
     }
   ]
 }

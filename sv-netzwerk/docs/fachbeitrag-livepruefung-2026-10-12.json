@@ -1,0 +1,204 @@
+{
+  "date": "2026-10-12",
+  "commit": "1fe12ec94df6cdef582fcfec6d594dc0a78a47be",
+  "detail_checks": [
+    {
+      "slug": "grossflaechige-leitungswasserschaeden-sanierungssteuerung",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "sachverstaendiger-versicherungsschaeden-aalen-schadenaufnahme",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sachverstaendiger-versicherungsschaeden-aalen-schadenaufnahme/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "leitungswasserschaden-aalen-sachverstaendiger-aufgaben",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-aalen-sachverstaendiger-aufgaben/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "leitungswasserschaden-erstmassnahmen",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-erstmassnahmen/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "grossflaechige-leitungswasserschaeden-sanierungssteuerung-3",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-3/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "badfugen-abdichtung-feuchteeintritt-schadenabgrenzung",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/badfugen-abdichtung-feuchteeintritt-schadenabgrenzung/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "schadstoffverdacht-rueckbau-bestandsgebaeude",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadstoffverdacht-rueckbau-bestandsgebaeude/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "rechnungs-kva-pruefung-freigabe-schadenfall",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "rechnungskuerzung-schadenfall-prueffaehigkeit",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rechnungskuerzung-schadenfall-prueffaehigkeit/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "schadenreserve-nachvollziehbar-fortschreiben",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenreserve-nachvollziehbar-fortschreiben/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "stromkosten-technische-trocknung-nachweis",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/stromkosten-technische-trocknung-nachweis/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "aufmass-fotodokumentation-polycam-pruefffaehig",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/aufmass-fotodokumentation-polycam-pruefffaehig/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "mietausfall-sanierungsdauer-schadenbezug",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/mietausfall-sanierungsdauer-schadenbezug/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "fenster-glasschaden-verglasung-reparaturgrenze",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fenster-glasschaden-verglasung-reparaturgrenze/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": true
+    },
+    {
+      "slug": "schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/",
+      "http": 200,
+      "canonical_ok": true,
+      "noindex": false,
+      "updated_date_visible": true,
+      "addition_visible": false,
+      "latest_article_checked": true,
+      "note": "Zwischenzeitliches fiktives Beispiel in anschließendem main-Commit entfernt; endgültiger Artikel geprüft, kein zweiter Tagesartikel."
+    }
+  ],
+  "integration_checks": {
+    "fachwissen/": {
+      "http": 200,
+      "current_slug": true
+    },
+    "search-index.json": {
+      "http": 200,
+      "current_slug": true
+    },
+    "sitemap-0.xml": {
+      "http": 200,
+      "current_slug": true,
+      "modified_dates": {
+        "https://www.sv-netzwerk.eu/fachwissen/aufmass-fotodokumentation-polycam-pruefffaehig/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/badfugen-abdichtung-feuchteeintritt-schadenabgrenzung/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/fenster-glasschaden-verglasung-reparaturgrenze/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-3/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-aalen-sachverstaendiger-aufgaben/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-erstmassnahmen/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/mietausfall-sanierungsdauer-schadenbezug/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/rechnungskuerzung-schadenfall-prueffaehigkeit/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/sachverstaendiger-versicherungsschaeden-aalen-schadenaufnahme/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/schadenreserve-nachvollziehbar-fortschreiben/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/schadstoffverdacht-rueckbau-bestandsgebaeude/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/stromkosten-technische-trocknung-nachweis/": "2026-10-12T00:00:00.000Z",
+        "https://www.sv-netzwerk.eu/fachwissen/technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle/": "2026-10-12T00:00:00.000Z"
+      }
+    },
+    "robots.txt": {
+      "http": 200,
+      "current_slug": false,
+      "content": "User-agent: *\nAllow: /\nDisallow: /intern/\nSitemap: https://www.sv-netzwerk.eu/sitemap-index.xml\n"
+    }
+  },
+  "verified_at": "2026-10-12T04:38:09.652483+00:00",
+  "deployment_status": "success",
+  "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38203988621",
+  "all_canonical_routes_checked": 102,
+  "transient_http_502_recheck": 200
+}

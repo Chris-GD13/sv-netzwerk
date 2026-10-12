@@ -37,8 +37,29 @@ BMAS-Bekanntmachung 21.05.2026, Formularfassung 19.05.2026 und Nachweisbeginn 20
 Website-Deployment: efabd0e86ed0e271f17430fc432fa42060f028ca, https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38129647183. LinkedIn: https://www.linkedin.com/feed/update/urn:li:activity:7514992211571331072/. Nachweise stammen aus dem tatsächlich ausgeführten Freigabechat; die Bildanzeige und Detailseite wurden dort sichtbar geprüft. Keine erneute Veröffentlichung. Frühere Löschung und Ablehnung bleiben erhalten.
 
 ## Prüfungen und Livegang
-Build, interne Links, Suche, Sitemap und gezielte Live-Stichproben werden vor Abschluss geprüft. Der abschließende Laufnachweis folgt nach erfolgreichem Deployment.
+Build und Qualitätsprüfungen bestanden: 0 Fehler, 0 Warnungen, 64 bestehende Hinweise. Dist-Tagesprüfung mit genau einem Pflichtbeitrag, Suchindex, Sitemap und internen Links bestanden. GitHub Build Check und Portal Tests (Datenintegrität/API) erfolgreich. PHP war lokal nicht installiert; die PHP-Prüfungen wurden im GitHub-Runner erfolgreich ausgeführt.
 
 Sitemap-lastmod wird ausschließlich aus tatsächlichen redaktionellen updatedAt-/publishedAt-Daten gebildet; unveränderte Beiträge erhalten kein pauschales neues Datum.
 
-Der Tagesartikel wurde auf main übernommen (32c70f6). Ein ausdrücklich fiktives Praxisbeispiel wird als Standardergänzung ergänzt; es behauptet keine tatsächlichen Fall- oder Messdaten.
+Der Tagesartikel wurde durch den anderen Publisher auf main übernommen (32c70f6). Ein zwischenzeitlich ergänztes, ausdrücklich fiktives Praxisbeispiel wurde im nachfolgenden Master-Commit 1fe12ec wieder entfernt. Der endgültige Tagesartikel bleibt ohne diesen Absatz; er wurde live geprüft. Keine erneute Ergänzung und kein zweiter Tagesartikel.
+
+CSV-Prüfung: 19 Spalten, 16 eindeutige neue Aktualisierungsereignisse; historische Zeilen einschließlich fünf alter August-Nachträge mit identischer damaliger Publikations-ID erhalten. Keine Löschung historischer Nachträge.
+
+## Deployment-Wechsel
+Der Lauf 38203777173 für 32be403 wurde durch den nachfolgenden main-Commit 1fe12ec abgebrochen (cancelled). Ursache war die Änderung des Tagesartikels durch den anderen Publisher. Der abgebrochene Lauf wird nicht als erfolgreich gewertet. Die 16 Bestandskorrekturen und Sitemap-lastmod bleiben im nachfolgenden Master enthalten.
+
+## Abschließender Live-Nachweis
+
+- Deployment-Commit: `1fe12ec94df6cdef582fcfec6d594dc0a78a47be`.
+- Erfolgreicher Website-Lauf: https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38203988621. `/deploy-version.txt` weist denselben Commit aus.
+- Alle 102 kanonischen Bestandsrouten geprüft; HTTP 200 und kein noindex. Ein einmaliger HTTP 502 beim älteren Schimmelbeitrag war beim kontrollierten Wiederholungsabruf nicht mehr vorhanden (200).
+- 16 geänderte Altbeiträge: HTTP 200, Canonical, sichtbare Korrekturen und tatsächliches Änderungsdatum geprüft.
+- Tagesartikel: HTTP 200, Canonical, kein noindex, Datum, Inhalt und Einbindung in Übersicht, Suchindex und Sitemap geprüft.
+- `robots.txt`: HTTP 200, öffentlicher Bereich erlaubt, `/intern/` gesperrt, Sitemap-Verweis vorhanden.
+- Sitemap-lastmod: für alle 16 geänderten Altbeiträge und den Tagesartikel 12.10.2026; unveränderte Datumsfelder nicht hochgesetzt.
+- Sichtprüfung im Browser: Tagesartikel sowie ältere Beiträge zu Asbest, Rechnungskürzung und Feuchtemessung. Darstellung ohne erkennbaren Überlauf; Link- und Datumsangaben sichtbar.
+- Bildnachweis: `docs/fachbeitrag-nachtrag-live-2026-10-12.jpg`.
+- Prüfstand: 2026-10-12T04:38:09.652483+00:00.
+
+## Weiter offener Auftrag
+Die rückwirkende individuelle Quellenprüfung sämtlicher übriger Artikel ist nicht abgeschlossen. Das vollständige Struktur- und HTTP-Inventar ersetzt keine vollständige Prüfung aller Normen, Rechtsaussagen und Kostenquellen. Generische Quellenbeschriftungen und themenspezifische Regelwerksstände bleiben Gegenstand dieser Einzelprüfung.
