@@ -103,6 +103,7 @@ jobs:
           node tests/technical_release_multi_kva_test.mjs
           php tests/claimsforce_single_result_test.php
           php tests/profile_routing_test.php
+          php tests/pauschale_abgeltung_test.php
           php tests/outlook_task_number_test.php
           node tests/task_case_address_test.mjs
           php tests/case_analysis_test.php
