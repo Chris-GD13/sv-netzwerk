@@ -49,7 +49,7 @@ function gdFileMeta(string $id):array{
 function gdListChildren(string $root,?string $mime=null,int $limit=1000):array{
  return [gdFileMeta(str_replace('root-','',$root).'-case')];
 }
-function gdCaseMeta(string $id):array{return ['schaden_nr'=>'26-160966-8'];}
+function gdCaseMeta(string $id):array{return ['schaden_nr'=>str_starts_with($id,'jens-')?'26-990077-4':'26-160966-8'];}
 function registerCaseFolderOwner(string $id,array $user,array $meta=[]):void{
  $GLOBALS['registered_owner']=['id'=>$id,'profile'=>svnetUserProfile($user),'meta'=>$meta];
 }
@@ -72,3 +72,15 @@ foreach([$users[1],$users[2]]as$user){
  if(!$rejected)throw new RuntimeException('Maurer für anderen Bearbeiter freigegeben.');
 }
 echo "Gemeinsame Übersicht, Maurer-Bearbeitung, Herkunft und Fremdzugriff geprüft.\n";
+
+function ionosStorageEnabled():bool{return false;}
+function searchCaseFolderIndex(array$user,string$number,int$limit=30):array{return [];}
+require_once dirname(__DIR__).'/public/intern/api/case-identity.php';
+foreach([$users[0],$users[4]]as$user){
+ $matches=caseIdentityFind($user,'26-990077-4');
+ if(array_keys($matches)!==['jens-case'])throw new RuntimeException('Vorhandener Maurer-Fall wird bei Speicherung nicht wiederverwendet.');
+}
+foreach([$users[1],$users[2]]as$user){
+ if(caseIdentityFind($user,'26-990077-4')!==[])throw new RuntimeException('Maurer-Fall über Identitätssuche sichtbar.');
+}
+echo "Schadennummer findet denselben Maurer-Fall ohne Kopie.\n";
