@@ -1,6 +1,5 @@
 ## 2026-10-12 – Quellenpräzisierungen und Veröffentlichungsnachweise
 
-- Tagesbeitrag um ein ausdrücklich fiktives Praxisbeispiel ergänzt.
 - CM-/KRL-Aussagen, Schichtabgrenzung und Belegreife in älteren Fachbeiträgen präzisiert.
 - Amtliche Asbest-Formularstände und Übergangsdatum sowie Destatis-Baupreisstand ergänzt; keine pauschale Preisfreigabe.
 - Rollen-Dopplungen, einen falschen Gesetzeslink und einen internen Ortungslink korrigiert.

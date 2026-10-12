@@ -128,12 +128,6 @@ Die sanierende Firma dokumentiert ihre Ausführung. Die Auftraggebenden legen Sa
 
 Medizinische Beschwerden werden ärztlich abgeklärt. Gebäudeschadstoffe, raumlufttechnische Anlagen, tragende Bauteile und besondere Nutzungen erfordern gegebenenfalls weitere Fachdisziplinen. Die technische Sanierungskontrolle darf diese Zuständigkeiten nicht ersetzen.
 
-## Fiktives Praxisbeispiel: Kontrolle vor dem Wiederaufbau
-
-Das folgende Beispiel ist ausdrücklich fiktiv und enthält keine tatsächlichen Fall- oder Messdaten: Nach einer reparierten Rohrleckage wurden befallene Bekleidungen zurückgebaut. Die Firma meldet den Raum als fertig, legt aber nur das Trocknungsabschlussprotokoll vor. Bei der vereinbarten Kontrolle werden noch Staubablagerungen hinter einer Heizkörperverkleidung festgestellt.
-
-Die Prüfung bestätigt den dokumentierten Trocknungsstand nur für die erfassten Bauteile. Sie hält die unvollständige Feinreinigung als eigenen Befund fest und veranlasst eine begrenzte Nachreinigung mit erneuter Kontrolle vor Aufhebung der Abschottung. Dadurch bleibt nachvollziehbar, welche Leistung fehlt; eine bereits bestätigte Trocknung wird weder pauschal verworfen noch als Reinigungsnachweis behandelt. Über die versicherungsvertragliche Erstattung entscheidet dieses Beispiel nicht.
-
 ## Fachlicher Bezug im SV-Netzwerk
 
 Das aktuelle [Expertenprofil von Carmen Gohl](/experten/carmen-gohl/) weist Schimmelpilze in Gebäuden sowie Ursachen- und Schadensbewertung, Sanierungsplanung, Sanierungsbegleitung und Sanierungskontrolle als belegte Schwerpunkte aus. Der heutige Beitrag ist diesem Fachgebiet in der Expertenrotation zugeordnet. Diese Zuordnung macht die vorhandene Netzwerkkompetenz sichtbar, behauptet aber keine Autorenschaft und ersetzt keine projektbezogene Zuständigkeitsbestätigung.
