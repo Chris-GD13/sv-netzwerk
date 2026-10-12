@@ -188,7 +188,7 @@ foreach (['Bearbeitung angehalten', 'Failed to fetch', 'interruptedTexts.some'] 
     }
 }
 $portalLayout = file_get_contents(__DIR__.'/../src/layouts/InternalLayout.astro');
-if (!is_string($portalLayout) || !str_contains($portalLayout, 'transient-calculation-status.js?v=20260901-1')) {
+if (!is_string($portalLayout) || !str_contains($portalLayout, 'transient-calculation-status.js?v=20261012-1')) {
     fwrite(STDERR, "Cache-Busting für die korrigierte Statuswiederaufnahme fehlt.\n");
     exit(1);
 }
