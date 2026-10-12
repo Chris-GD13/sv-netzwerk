@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/case-identity.php';
+require_once __DIR__ . '/profile-routing.php';
 
 /** Normalized representation used by the local case search index. */
 function caseSearchNormalize(string $value): string
@@ -77,8 +78,9 @@ function searchCasePhoneIndex(array $user, string $number, int $limit = 10): arr
 {
     $wanted = casePhoneKey($number);
     if (empty($user['id']) || strlen($wanted) < 6) return [];
+    $scope = caseSearchOwnerScope($user);
     $stmt = db()->prepare('SELECT folder_id,case_no,policy_no,object_name,damage_type,case_type,phone,mobile,contractor_phone,contractor_mobile,phone_contacts,registered_at
-        FROM case_folder_owners WHERE user_id=:user_id AND user_email=:user_email ORDER BY registered_at DESC LIMIT 1000');
+        FROM case_folder_owners WHERE '. $scope .' ORDER BY registered_at DESC LIMIT 1000');
     $stmt->execute([':user_id'=>(int)$user['id'], ':user_email'=>(string)($user['email']??'')]);
     $results = [];
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -116,8 +118,9 @@ function caseSearchHydrateExactRows(array $rows, string $query, callable $loadMe
 function searchCaseFolderIndex(array $user, string $query, int $limit = 30): array
 {
     if (empty($user['id']) || caseSearchNormalize($query) === '') return [];
+    $scope = caseSearchOwnerScope($user);
     $stmt = db()->prepare('SELECT folder_id,case_no,policy_no,object_name,damage_type,case_type,phone,mobile,contractor_phone,contractor_mobile,phone_contacts,registered_at
-        FROM case_folder_owners WHERE user_id=:user_id AND user_email=:user_email ORDER BY registered_at DESC LIMIT 1000');
+        FROM case_folder_owners WHERE '. $scope .' ORDER BY registered_at DESC LIMIT 1000');
     $stmt->execute([':user_id'=>(int)$user['id'],':user_email'=>(string)($user['email']??'')]);
     $results = [];
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -135,4 +138,14 @@ function searchCaseFolderIndex(array $user, string $query, int $limit = 30): arr
         if (count($results) >= $limit) break;
     }
     return $results;
+}
+
+/** Keep existing owner lookup; additionally search both shared portfolios for Christian/Susanne. */
+function caseSearchOwnerScope(array $user): string
+{
+    $own = '(user_id=:user_id AND user_email=:user_email)';
+    if (svnetIsBackofficeUser($user) || svnetUserProfile($user) === 'christian') {
+        return "(".$own." OR LOWER(user_email) LIKE 'cw@%' OR LOWER(user_email) LIKE '%jens%')";
+    }
+    return $own;
 }

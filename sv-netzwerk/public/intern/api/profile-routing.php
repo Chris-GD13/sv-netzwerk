@@ -68,3 +68,15 @@ function svnetCasesFolderName(string $profile): string
         default => throw new InvalidArgumentException('Unbekanntes Bearbeiterprofil.'),
     };
 }
+
+/** Christian and Susanne work on the original Maurer cases without switching profiles. */
+function svnetAccessibleCaseProfiles(array $user): array
+{
+    $profile = svnetSelectedProfile($user);
+    return $profile === 'christian' ? ['christian', 'jens'] : [$profile];
+}
+
+function svnetCanAccessCaseProfile(array $user, string $ownerProfile): bool
+{
+    return $ownerProfile !== '' && in_array($ownerProfile, svnetAccessibleCaseProfiles($user), true);
+}

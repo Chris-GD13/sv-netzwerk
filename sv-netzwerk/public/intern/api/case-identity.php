@@ -82,7 +82,7 @@ function caseIdentitySave(array $user, array $body): array {
             $data=array_replace($old,$data);
         }
         $data['updated_at']=gmdate('c');$data['updated_by']=$user['full_name']??$user['email'];
-        gdUploadJson($folderId,CASE_META_NAME,$data);registerCaseFolderOwner($folderId,$user,$data);
+        gdUploadJson($folderId,CASE_META_NAME,$data);if(function_exists('gdRegisterCaseOwner'))gdRegisterCaseOwner($folderId,$user,$data);else registerCaseFolderOwner($folderId,$user,$data);
         return ['ok'=>true,'folder_id'=>$folderId,'name'=>gdCaseName($data),'meta'=>$data,'reused'=>$reused];
     } finally {caseIdentityUnlock($lock);}
 }
@@ -111,10 +111,10 @@ function caseIdentityMerge(array $user, array $body): array {
         $audit=['at'=>gmdate('c'),'by'=>$user['email'],'source_folder'=>$sourceFolder,'target_id'=>$target,'target_before'=>$a,'source_before'=>$b,'source_items'=>$sourceItems,'target_items'=>$targetItems,'conflicts'=>$conflicts];
         $auditFile=gdUploadJson($target,'00_Zusammenfuehrung_'.$source.'.json',$audit);
         $merged['merged_case_ids']=array_values(array_unique(array_merge((array)($a['merged_case_ids']??[]),[$source])));
-        gdUploadJson($target,CASE_META_NAME,$merged);registerCaseFolderOwner($target,$user,$merged);
+        gdUploadJson($target,CASE_META_NAME,$merged);if(function_exists('gdRegisterCaseOwner'))gdRegisterCaseOwner($target,$user,$merged);else registerCaseFolderOwner($target,$user,$merged);
         try {
             ionosWrite(['parents'=>[$target],'name'=>'Zusammengeführt · '.($b['schaden_nr']??$source),'appProperties'=>array_replace((array)($sourceFolder['appProperties']??[]),['svCaseMergedInto'=>$target])],null,$source);
-        }catch(Throwable$e){gdUploadJson($target,CASE_META_NAME,$a);registerCaseFolderOwner($target,$user,$a);throw $e;}
+        }catch(Throwable$e){gdUploadJson($target,CASE_META_NAME,$a);if(function_exists('gdRegisterCaseOwner'))gdRegisterCaseOwner($target,$user,$a);else registerCaseFolderOwner($target,$user,$a);throw $e;}
         foreach($sourceItems as$item){$after=ionosItem((string)$item['id']);foreach(['parents','md5Checksum','size']as$field)if(($after[$field]??null)!==($item[$field]??null))throw new RuntimeException('Bestandsprüfung fehlgeschlagen: '.$item['id']);}
         return ['ok'=>true,'folder_id'=>$target,'meta'=>$merged,'preserved_items'=>count($sourceItems),'audit_id'=>$auditFile['id'],'conflicts'=>$conflicts];
     }finally{caseIdentityUnlock($lock);}
