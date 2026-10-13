@@ -44,5 +44,215 @@
       "contains_slug": false,
       "content": "Commit: 1e3af8bd2baf6e2f287a1dd1657fad5117871901\nBuild-Zeit: 2026-10-13T04:18:18.139Z\nVersion: Homepage-v5\n"
     }
-  ]
+  ],
+  "final_deployment_commit": "7f78040dc932677b3fbd7902fcd99e2703b6da3e",
+  "final_deployment_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38348010495",
+  "final_checks": [
+    {
+      "path": "/fachwissen/entsorgungskosten-gebaeudeschaden-nachweis-abgrenzung/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/entsorgungskosten-gebaeudeschaden-nachweis-abgrenzung/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:53:51.889431+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/entsorgungskosten-gebaeudeschaden-nachweis-abgrenzung/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/rueckbau-brandschaden-fachlich-begrenzen-dokumentieren/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rueckbau-brandschaden-fachlich-begrenzen-dokumentieren/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:53:51.679361+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/rueckbau-brandschaden-fachlich-begrenzen-dokumentieren/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/loeschwasserschaden-kontamination-korrosion-trocknung-sanierungsumfang/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/loeschwasserschaden-kontamination-korrosion-trocknung-sanierungsumfang/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:53:51.811106+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/loeschwasserschaden-kontamination-korrosion-trocknung-sanierungsumfang/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/geruestkosten-gebaeudeschaden-umfang-standzeit-pruefung/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/geruestkosten-gebaeudeschaden-umfang-standzeit-pruefung/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:53:52.185612+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/geruestkosten-gebaeudeschaden-umfang-standzeit-pruefung/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/eigenleistungen-gebaeudeschaden-stunden-material-nachweis/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/eigenleistungen-gebaeudeschaden-stunden-material-nachweis/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:53:52.124246+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/eigenleistungen-gebaeudeschaden-stunden-material-nachweis/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:53:57.101692+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/bauteiloeffnung-schadenfall-freigabe-beweissicherung/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/bauteiloeffnung-schadenfall-freigabe-beweissicherung/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:53:57.459392+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/bauteiloeffnung-schadenfall-freigabe-beweissicherung/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:53:57.361349+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/brandschaden-rauch-russ-kontamination-schadenbereiche-sanierungsumfang/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-rauch-russ-kontamination-schadenbereiche-sanierungsumfang/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:53:57.292420+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-rauch-russ-kontamination-schadenbereiche-sanierungsumfang/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/flachdachschaden-sturm-starkregen-windsog-abdichtung-entwaesserung/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/flachdachschaden-sturm-starkregen-windsog-abdichtung-entwaesserung/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:53:57.092771+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/flachdachschaden-sturm-starkregen-windsog-abdichtung-entwaesserung/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:54:04.678294+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/badfugen-abdichtung-feuchteeintritt-schadenabgrenzung/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/badfugen-abdichtung-feuchteeintritt-schadenabgrenzung/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:54:04.728852+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/badfugen-abdichtung-feuchteeintritt-schadenabgrenzung/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:54:04.862526+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:54:04.860915+00:00",
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/",
+      "noindex": false,
+      "x_robots_tag": "",
+      "visible_review_or_publication_date": true
+    },
+    {
+      "path": "/fachwissen/",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/",
+      "status": 200,
+      "checked_at": "2026-10-13T04:54:04.864652+00:00",
+      "missing_slugs": [],
+      "scope": "current article on paginated overview; all changed articles separately checked in search and sitemap"
+    },
+    {
+      "path": "/search-index.json",
+      "url": "https://www.sv-netzwerk.eu/search-index.json",
+      "status": 200,
+      "checked_at": "2026-10-13T04:54:10.522209+00:00",
+      "missing_slugs": []
+    },
+    {
+      "path": "/sitemap-0.xml",
+      "url": "https://www.sv-netzwerk.eu/sitemap-0.xml",
+      "status": 200,
+      "checked_at": "2026-10-13T04:54:10.524844+00:00",
+      "missing_slugs": []
+    },
+    {
+      "path": "/sitemap-index.xml",
+      "url": "https://www.sv-netzwerk.eu/sitemap-index.xml",
+      "status": 200,
+      "checked_at": "2026-10-13T04:54:10.228608+00:00",
+      "sitemap_present": true
+    },
+    {
+      "path": "/robots.txt",
+      "url": "https://www.sv-netzwerk.eu/robots.txt",
+      "status": 200,
+      "checked_at": "2026-10-13T04:54:10.336094+00:00",
+      "content": "User-agent: *\nAllow: /\nDisallow: /intern/\nSitemap: https://www.sv-netzwerk.eu/sitemap-index.xml\n"
+    },
+    {
+      "path": "/deploy-version.txt",
+      "url": "https://www.sv-netzwerk.eu/deploy-version.txt",
+      "status": 200,
+      "checked_at": "2026-10-13T04:54:10.406999+00:00",
+      "content": "Commit: 7f78040dc932677b3fbd7902fcd99e2703b6da3e\nBuild-Zeit: 2026-10-13T04:46:02.627Z\nVersion: Homepage-v5\n"
+    }
+  ],
+  "visual_samples": [
+    {
+      "slug": "schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung",
+      "status": "visible-update-and-rendering-verified",
+      "checked_at": "2026-10-13T04:56:24.243302+00:00"
+    },
+    {
+      "slug": "ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung",
+      "status": "visible-update-and-rendering-verified",
+      "checked_at": "2026-10-13T04:56:24.243302+00:00"
+    },
+    {
+      "slug": "badfugen-abdichtung-feuchteeintritt-schadenabgrenzung",
+      "status": "visible-update-and-rendering-verified",
+      "checked_at": "2026-10-13T04:56:24.243302+00:00"
+    },
+    {
+      "slug": "parkett-holzfeuchte-raumklima-untergrund-pruefen",
+      "status": "visible-update-and-rendering-verified",
+      "checked_at": "2026-10-13T04:56:24.243302+00:00"
+    }
+  ],
+  "visual_proof": "docs/fachbeitrag-2026-10-13-schwarzwasser-live.jpg"
 }

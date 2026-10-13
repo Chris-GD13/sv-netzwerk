@@ -45,7 +45,7 @@ DGUV201-011 Ausgabe Januar2023, benötigte Kapitel zur Prüfung/Übergabe/Nutzun
 
 ## Prüfungen und offene Punkte
 
-Astro-Build inklusive Qualitäts-/SEO-/Linkprüfungen bestanden; endgültige Commit- und Live-Nachweise werden nach Deployment ergänzt. CSV: 19 Spalten; vorhandene Altzeilen erhalten und dreizehn eindeutige Aktualisierungsereignisse ergänzt. Kein externer LinkedIn-Post für Bestandskorrekturen.
+Astro-Build inklusive Qualitäts-/SEO-/Linkprüfungen bestanden; endgültige Commit- und Live-Nachweise stehen im abschließenden Abschnitt. CSV: 19 Spalten; vorhandene Altzeilen erhalten und dreizehn eindeutige Aktualisierungsereignisse ergänzt. Kein externer LinkedIn-Post für Bestandskorrekturen.
 
 Die vollständige individuelle Prüfung der übrigen Archivbeiträge bleibt offen. Vorläufige Struktur-/HTTP-Prüfungen und die dreizehn gezielten Quellenkorrekturen sind keine Vollfreigabe. Weiter zu prüfen: themenspezifische Normenstände, generische Quellenlabels, nicht belegte Praxisfälle, rechtliche Aktualisierungen und konkrete Kostenbezüge. Kein pauschaler Rechts-/Normen-/Preisnachtrag.
 
@@ -70,3 +70,9 @@ URLs:
 - https://de.dwa.de/files/_media/content/05_PUBLIKATIONEN/DWA-Regelwerk/1_Gesamtliste%20DWA-Regelwerk.pdf
 - https://www.dwa-bw.de/files/_media/content/PDFs/LV_Baden-Wuerttemberg/Homepage/BW-Dokumente/Homepage%202013/Publikationen/Flyer%20R%C3%BCckstau_Muster.pdf
 - https://www.landkreis-verden.de/portal/seiten/hochwasser-im-landkreis-verden-901001899-20600.html
+
+## Abschließender Deployment- und Live-Nachweis
+
+PR 392 nach erfolgreichem Build, Datenintegritäts- und API-Tests übernommen. Commit 7f78040dc932677b3fbd7902fcd99e2703b6da3e; Deployment https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38348010495 abgeschlossen mit success. Nach Abschluss 20 öffentliche Routen geprüft: alle 13 geänderten Artikel und heutiger Beitrag HTTP200, korrekterCanonical, keinNoindex, sichtbares Datum 13.10.2026; heutiger Beitrag auf erster Übersichtsseite, alle geänderten Slugs im Suchindex und in der Sitemap. Sitemapindex/robots korrekt, Deploy-Kennung exakt. Drei ältere Beiträge und heutiger Artikel im Browser auf sichtbare Änderungen und Darstellung geprüft. Screenshot der Schwarzwasser-Quellenkorrektur gesichert. Dreizehn Aktualisierungszeilen in 19-spaltiger CSV mit echtem Commit/Run/Prüfzeit vervollständigt; übrige Zeilen erhalten.
+
+Stand: keine fehlenden Veröffentlichungstage 15.09.–13.10.; genau ein heutiger Tagesartikel. Dies belegt technische Veröffentlichung, keine vollständige fachliche Quellenfreigabe des restlichen Archivs. LinkedIn-Begleittext in diesem Lauf prepared-not-posted. Gemeinsames Tagesregister beibehalten; keine fremde Reservierung überschrieben.

@@ -1,5 +1,7 @@
 ## 2026-10-13 – Bestandskorrekturen zu Arbeitsschutz und Quellen
 
+- PR 392; Commit 7f78040dc932677b3fbd7902fcd99e2703b6da3e; Build/Portal-Tests und Deployment 38348010495 success. 20 Live-Routen, sichtbare Aktualisierungen und korrekte SEO-/Such-/Sitemap-Integration geprüft; 13 CSV-Aktualisierungsnachweise vervollständigt.
+
 - Veraltete DIN-18531-/18533-Nachweise ersetzt; aktuellen DIN-18534-Stand vom Änderungsentwurf getrennt. Rückstaubezug und Sicherheitsgrenze vor Leerpumpen korrigiert.
 - Neufassung TRGS 524 mit Bekanntmachung 17.07.2026 und transparenter BAuA/BG-BAU-Datierungsabweichung in einschlägigen Altbeiträgen eingeordnet.
 - Entsorgungsbelege für Kleinmengen, Gerüstersteller-/Nutzerprüfung und Veranlasserinformationen vor Bauteilöffnungen präzisiert.
