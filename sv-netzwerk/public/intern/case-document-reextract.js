@@ -89,9 +89,7 @@
   const card=document.querySelector('.vf-upload-card');
   if(!card||$('vf-reextract'))return;
   const wrap=document.createElement('div');wrap.className='vf-reextract';
-  wrap.innerHTML='<button type="button" id="vf-reextract" class="vf-secondary">Gespeicherte Unterlagen erneut einlesen</button><div id="vf-reextract-state" class="vf-meta">Ergänzt nur leere Falldaten; vorhandene Eingaben bleiben erhalten.</div>';
+  wrap.innerHTML='<button type="button" id="vf-reextract" class="vf-secondary">Gespeicherte Unterlagen mit KI auslesen</button><div id="vf-reextract-state" class="vf-meta">Dateien werden ohne KI-Auswertung abgelegt. Dieser separate Schritt startet eine kostenpflichtige KI-Auswertung und ergänzt nur leere Falldaten.</div>';
   card.appendChild(wrap);
   $('vf-reextract').addEventListener('click',reextractStored);
-  $('vf-files')?.addEventListener('change',event=>{if(activeCase()?.folder_id)extractFiles([...event.currentTarget.files],'Neue Unterlagen')});
-  $('vf-drop')?.addEventListener('drop',event=>{if(activeCase()?.folder_id)extractFiles([...event.dataTransfer.files],'Neue Unterlagen')});
 })();
