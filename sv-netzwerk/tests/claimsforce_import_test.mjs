@@ -316,7 +316,7 @@ assert(queue.includes("'jens'=>'Jens'"), 'Jens besitzt einen eigenständigen Auf
 assert(!queue.includes("VALUES('christian',17,NOW(),NULL),('jens',6,NOW(),NULL)"), 'Die Queue darf keine veralteten ClaimsForce-Ausgangswerte mehr setzen');
 assert(queue.includes('function cqIsSusanne') && queue.includes('return svnetCanRunClaimsStation($user)'), 'Die Queue trennt Susannes Assistenzfreigabe von Christians und Susannes Importstationsfreigabe');
 assert(queue.includes('$allowed=array_keys(cqVisibleProfiles($user))') && queue.includes('ClaimsForce-Profil und ausgewählter Sachverständiger stimmen nicht überein'), 'Auch die Queue darf nur das aktuell ausgewählte Profil annehmen');
-assert(queue.includes("if(!cqIsCentralAgent($user))apiError(403,'Nur Christian oder Susanne dürfen die zentrale Importstation betreiben.')"), 'Die Queue erzwingt Christians und Susannes Stationsfreigabe serverseitig');
+assert(queue.includes("if(!cqIsCentralAgent($user))apiError(403,'Für diesen Benutzer ist keine Importstation freigegeben.')"), 'Die Queue erzwingt Christians und Susannes Stationsfreigabe serverseitig');
 assert(queue.includes("is_numeric($result['openTasks']??null)") && queue.includes("(int)$result['openTasks']") && queue.includes('ON DUPLICATE KEY UPDATE open_count=VALUES(open_count)'), 'Ein erfolgreicher Import speichert ausschließlich den Zähler Aufgaben – Alle');
 assert(routing.includes("return ['christian', 'holger', 'marc', 'jens']"), 'Die vier Sachverständigenprofile bleiben als eigene Benutzerprofile unterstützt');
 assert(queue.includes("$action==='mine'") && queue.includes('WHERE requested_by=:u ORDER BY id DESC LIMIT 20'), 'Eigene Warteschlangenläufe müssen nach einem Portal-Neuladen wiedergefunden werden');

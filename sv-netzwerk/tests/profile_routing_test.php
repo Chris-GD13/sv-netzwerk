@@ -35,9 +35,9 @@ foreach($users as$i=>$user){
 }
 echo "Maurer: nur Christian und Susanne erhalten den gemeinsamen Fallbestand.\n";
 foreach($users as$i=>$user){
-    $allowed=$i===0||$i===4;
+    $allowed=$i===0||$i===1||$i===4;
     if(svnetCanRunClaimsStation($user)!==$allowed)throw new RuntimeException('Falsche Importstationsfreigabe.');
-    if(svnetClaimsStationProfiles($user)!==($allowed?['christian','jens']:[]))throw new RuntimeException('Fremder Importbestand.');
+    if(svnetClaimsStationProfiles($user)!==($i===1?['marc']:($allowed?['christian','jens']:[])))throw new RuntimeException('Fremder Importbestand.');
 }
 if(!svnetCanRunClaimsStation(['email'=>'cw@sv-schuett.eu']))throw new RuntimeException('Christian-Claims-Adresse fehlt.');
 if(svnetCanRunClaimsStation(['email'=>'unknown@example.invalid','role'=>'administrator']))throw new RuntimeException('Unbekannter Administrator erhält Importrecht.');

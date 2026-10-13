@@ -132,7 +132,7 @@ if($action==='enqueue'){
         try{$sourceProfiles=cqSingleSourceProfiles($user,trim((string)($body['source_profile']??'')),$known);}
         catch(InvalidArgumentException$e){apiError(403,$e->getMessage());}
     }
-    if($syncMode==='tasks'&&$profile==='jens'&&(cqIsCentralAgent($user)||cqProfile($user)==='christian'))$allowed[]='jens';
+    if($syncMode==='tasks'&&$profile==='jens'&&in_array('jens',svnetAccessibleCaseProfiles($user),true))$allowed[]='jens';
     if(!in_array($profile,$allowed,true))apiError(409,'ClaimsForce-Profil und ausgewählter Sachverständiger stimmen nicht überein.');
     if (!empty($body['preserve_active'])) {
         $lock=db()->prepare('SELECT GET_LOCK(:k,0)');
@@ -173,7 +173,7 @@ if($action==='stop'){
     $s->execute([':u'=>(string)($user['email']??''),':admin'=>$isAdmin?1:0,':target_check'=>$targetId,':target_id'=>$targetId]);
     apiJson(['ok'=>true,'stopped'=>$s->rowCount()]);
 }
-if(!cqIsCentralAgent($user))apiError(403,'Nur Christian oder Susanne dürfen die zentrale Importstation betreiben.');
+if(!cqIsCentralAgent($user))apiError(403,'Für diesen Benutzer ist keine Importstation freigegeben.');
 
 if($action==='schedule'){
     $now=new DateTimeImmutable('now',new DateTimeZone('Europe/Berlin'));
@@ -215,8 +215,10 @@ if($action==='claim'){
     if((int)db()->query("SELECT GET_LOCK('svnet-claimsforce-import',3)")->fetchColumn()!==1)apiJson(['ok'=>true,'job'=>null]);
     db()->beginTransaction();
     if(db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='running' LIMIT 1 FOR UPDATE")->fetchColumn()){db()->commit();db()->query("SELECT RELEASE_LOCK('svnet-claimsforce-import')");apiJson(['ok'=>true,'job'=>null]);}
-    $claim=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE status='queued' AND profile IN (?,?) ORDER BY (sync_mode='single') DESC,(requested_by='system:claimsforce') ASC,created_at,id LIMIT 1 FOR UPDATE");
-    $claim->execute(svnetClaimsStationProfiles($user));
+    $stationProfiles=svnetClaimsStationProfiles($user);
+    $profileSlots=implode(',',array_fill(0,count($stationProfiles),'?'));
+    $claim=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE status='queued' AND profile IN ($profileSlots) ORDER BY (sync_mode='single') DESC,(requested_by='system:claimsforce') ASC,created_at,id LIMIT 1 FOR UPDATE");
+    $claim->execute($stationProfiles);
     $row=$claim->fetch(PDO::FETCH_ASSOC);
     if(!$row){db()->commit();db()->query("SELECT RELEASE_LOCK('svnet-claimsforce-import')");apiJson(['ok'=>true,'job'=>null]);}
     $id=(int)$row['id'];

@@ -35,13 +35,13 @@ function svnetUserProfile(array $user): string
 
 function svnetCanRunClaimsStation(array $user): bool
 {
-    return svnetIsBackofficeUser($user) || svnetUserProfile($user) === 'christian';
+    return svnetIsBackofficeUser($user) || in_array(svnetUserProfile($user), ['christian', 'marc'], true);
 }
 
 function svnetClaimsStationProfiles(array $user): array
 {
     if (!svnetCanRunClaimsStation($user)) return [];
-    return ['christian', 'jens'];
+    return svnetUserProfile($user) === 'marc' ? ['marc'] : ['christian', 'jens'];
 }
 
 function svnetSelectedProfile(array $user, ?string $selected = null): string
