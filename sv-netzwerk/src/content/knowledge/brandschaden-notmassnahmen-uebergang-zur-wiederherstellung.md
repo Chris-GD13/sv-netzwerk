@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/schadenabgrenzung/", "/fachwissen/prueffaehige-dokum
 damageTypes: ["brand", "gebaeude", "gewerbe-industrie"]
 publication:
   publishedAt: 2026-07-17
-  updatedAt: 2026-08-09
+  updatedAt: 2026-10-13
   status: published
 seo:
   title: "Brandschaden: Notmaßnahme und Wiederherstellung trennen"
@@ -29,11 +29,9 @@ Nach einem Brandschaden laufen in kurzer Zeit viele Schritte parallel: Feuerwehr
 
 Der fachliche Kern liegt in einer klaren Trennung der Bearbeitungsebenen: **Feststellung**, **Bewertung** und **Empfehlung**. Zusätzlich muss nachvollziehbar bleiben, was unmittelbar schadenbedingt ist und was als Vorschaden, Mangel oder reguläre Instandhaltung separat zu behandeln ist.
 
-## Ausgangssituation aus der Praxis
+## Prüfsituation bei der Übergabe
 
-Nach einem Entstehungsbrand in einer gewerblich genutzten Einheit wurden betroffene Bereiche zunächst gelöscht und gesichert. Fenster wurden geöffnet, mobile Geräte ausgelagert, lose Brandreste entfernt und provisorische Absperrungen gesetzt. Am Folgetag lagen bereits erste Angebote für Reinigung, Rückbau und Wiederherstellung vor.
-
-Im Erstüberblick war jedoch unklar:
+Nach Löschung und Sicherung ist vor weiteren Angeboten und Arbeiten zu klären:
 
 - welche Maßnahmen reine Gefahrenabwehr waren,
 - welche Positionen bereits in der Notmaßnahme enthalten waren,
@@ -114,6 +112,12 @@ Diese Checkliste ersetzt keine Einzelfallprüfung, sie stabilisiert jedoch die Q
 Nach Brandschäden entscheidet die Qualität der Übergangsphase über die spätere Prüffähigkeit. Die Trennung von Feststellung, Bewertung und Empfehlung ist dabei der zentrale Standard. Zusätzlich müssen schadenbedingte Maßnahmen von Vorschäden, Mängeln und Instandhaltung klar abgegrenzt werden.
 
 Wer diese Struktur konsequent anwendet, schafft verlässliche Entscheidungsgrundlagen statt nachträglicher Korrekturen. Für die fachliche Einordnung eines konkreten Vorgangs helfen die [Schadenmeldung](/schaden-melden/) sowie die vertiefenden Beiträge zur [technischen Schadenabgrenzung](/fachwissen/schadenabgrenzung/) und [prüffähigen Dokumentation](/fachwissen/prueffaehige-dokumentation/).
+
+## Quellenpräzisierung vom 13.10.2026: Akute Gefahr und planmäßige Sanierung
+
+Die am 17.07.2026 bekannt gemachte Neufassung der [TRGS 524, Abschnitt 1](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/1.htm), nimmt unmittelbare Sofort-, Sicherungs- und Bergungsmaßnahmen zur Abwehr akuter Gefahren aus ihrem Anwendungsbereich aus. Daraus folgt keine Schutzfreiheit für anschließende Räumung und Sanierung. Die Tätigkeitsphase ist ausdrücklich festzuhalten. Die Regel ist kein Entwurf; für einen gesonderten späteren Geltungsbeginn wird kein Datum erfunden.
+
+Für Sachverständige und Großschadenregulierer bedeutet das: Den Übergang von unmittelbarer Gefahrenabwehr zu geplanter Sanierung anhand der tatsächlichen Tätigkeit dokumentieren.
 
 ## Quellen und weiterführende Hinweise
 

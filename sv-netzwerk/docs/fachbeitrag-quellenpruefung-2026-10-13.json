@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-13",
+  "review_type": "thirteen targeted individual corrections, not full archive clearance",
+  "changes": {
+    "entsorgungskosten-gebaeudeschaden-nachweis-abgrenzung": {
+      "old_sha256": "eca7537a5431988aac6269a516ef75bd0f54348d811313a852b64fee16845c8b",
+      "new_sha256": "742d4ed9c7b1e8735f0357f8853c587d7c7f0bf50d415ef92cb09f706a7f6e6a",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    },
+    "rueckbau-brandschaden-fachlich-begrenzen-dokumentieren": {
+      "old_sha256": "2d645a0845fe39b7c9e81e753414667b238ebf9980972b158f8f05c2c2e580b5",
+      "new_sha256": "7a4e89111a42caf08c323228679f33d596d971c17b9df11935976a5664c0c74d",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    },
+    "loeschwasserschaden-kontamination-korrosion-trocknung-sanierungsumfang": {
+      "old_sha256": "dad5c11ce6e5298e4b2f1e948e9a57827cfe6a738a3c7e0bffacb3839a8dbac3",
+      "new_sha256": "2cdc07150f21635b551e04c247ce2d318f6c3b6e22f0e5a6cbb5c8351a60c2ab",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    },
+    "geruestkosten-gebaeudeschaden-umfang-standzeit-pruefung": {
+      "old_sha256": "a598ea5a1072e9ce4062ead6a38daa26d03aee0f02782e3a5242ea3095af0826",
+      "new_sha256": "42bf8a50ddeb0fc723c868471ef591e4496cc99716896cdbb49e891657b52403",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    },
+    "eigenleistungen-gebaeudeschaden-stunden-material-nachweis": {
+      "old_sha256": "66b6d9cf4052809d1942a1f6665954429f62b640ca29684766ce68a3956eb5b9",
+      "new_sha256": "a82267a1c71bf9962c7317c80e327821dfa722d9577c1ff1908f1c06a61b5b91",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    },
+    "brandschaden-notmassnahmen-uebergang-zur-wiederherstellung": {
+      "old_sha256": "121611685fec0f6323c4bd7ceecf8375015333a671178f664cbeed39b68e7a65",
+      "new_sha256": "ecca31f334b1726ccd9f052ffcef8d5b5db5e9c8c43047442bfabeffab32ef60",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    },
+    "bauteiloeffnung-schadenfall-freigabe-beweissicherung": {
+      "old_sha256": "f553e086fde00a8619fe57c54bdfbcc49d64200ae9532c5f05ff1a793ab69269",
+      "new_sha256": "b464ccce41ccb54419b9c7296412c973ba8b999d82b2ba5b742d782cd73e0789",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    },
+    "schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung": {
+      "old_sha256": "68d710933c78f633b25d2c7a1184d0571baf9dc160b693dbadbf2391830e06b5",
+      "new_sha256": "154363b6ae9b469308fa1cec2b6d01f78734b1c19f6a35ff13bd1e0f20931595",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    },
+    "brandschaden-rauch-russ-kontamination-schadenbereiche-sanierungsumfang": {
+      "old_sha256": "f5cfcde19fa97c318638cd39ef98c361e271a9b3b92486f7fc73c854b95e617e",
+      "new_sha256": "38fd1ec5f03168ea98fd36da23663006283e25895f62df46a35501f1b74e303c",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    },
+    "flachdachschaden-sturm-starkregen-windsog-abdichtung-entwaesserung": {
+      "old_sha256": "a7b39e6b9fe3f669de1c44461467f5a6c94820b601563303bb79dd64420d8b4a",
+      "new_sha256": "83f0714462471cb7fa2c45d30c3514eb8f5211807f7d22c20862094ff1d36d1e",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    },
+    "balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung": {
+      "old_sha256": "2fdbde9cec889d50edc7c11f775b644f512ce84c78a72820a2ae6139c393bd26",
+      "new_sha256": "36f389aa6ca819dd5044104485e9b69442fdaa9ff000750f56ccc50a89cf2767",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    },
+    "badfugen-abdichtung-feuchteeintritt-schadenabgrenzung": {
+      "old_sha256": "506eb01824fcd2ef21d63447dac620b7848020d237bead4d71cdbc4e8f8f52c2",
+      "new_sha256": "a6415b911e4fd2b3537b8e394b8f1e311f14f4b713780491a38dce77d7d48c17",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    },
+    "ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung": {
+      "old_sha256": "062c69fc4ab671e4c48dec292c59e7ec31e3578620464d307bcd92a3fe4d63c1",
+      "new_sha256": "2bd5ffddda6e9fcf2d0439011612f64910c7a40b6b144fb087153a85add9dba9",
+      "scope": "targeted-individual-source-correction; remaining article claims not globally certified"
+    }
+  }
+}

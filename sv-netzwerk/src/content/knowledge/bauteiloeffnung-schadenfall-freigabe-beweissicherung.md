@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-21
-  updatedAt: 2026-09-21
+  updatedAt: 2026-10-13
   status: published
 seo:
   title: "Bauteilöffnungen im Schadenfall prüfen"
@@ -117,6 +117,12 @@ In einem ausdrücklich fiktiven Leitungswasserschaden zeigt eine Wand im Bereich
 ## Fazit
 
 Bauteilöffnungen sind belastbar, wenn sie als kontrollierter Prüfschritt geplant und dokumentiert werden. Ein konkretes Prüfziel, ein begrenzter Freigabeumfang, vollständige Beweissicherung und die rechtzeitige Einbindung zuständiger Fachpersonen verhindern unnötigen Rückbau und schaffen eine prüffähige Grundlage für die weitere Regulierung.
+
+## Quellenpräzisierung vom 13.10.2026: Informationen vor der Öffnung
+
+[§ 5a GefStoffV](https://www.gesetze-im-internet.de/gefstoffv_2010/__5a.html) verlangt vom Veranlasser vor Beginn der Tätigkeiten die Weitergabe der vorhandenen Informationen zur Bau- und Nutzungsgeschichte über bekannte oder vermutete Gefahrstoffe. Zugängliche Unterlagen sind mit zumutbarem Aufwand heranzuziehen. Der amtliche Text wurde am 13.10.2026 geprüft; ein neues Inkrafttreten wird nicht behauptet.
+
+Bedeutung für die Öffnungsplanung: Vorhandene Informationen zusammen mit dem Prüfziel an das ausführende Unternehmen übergeben. Diese Informationspflicht ersetzt nicht dessen Gefährdungsbeurteilung und ist keine pauschale Freigabe zum Öffnen schadstoffverdächtiger Bauteile.
 
 ## Quellen und weiterführende Hinweise
 

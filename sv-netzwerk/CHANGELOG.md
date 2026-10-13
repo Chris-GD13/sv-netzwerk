@@ -1,3 +1,12 @@
+## 2026-10-13 – Bestandskorrekturen zu Arbeitsschutz und Quellen
+
+- Veraltete DIN-18531-/18533-Nachweise ersetzt; aktuellen DIN-18534-Stand vom Änderungsentwurf getrennt. Rückstaubezug und Sicherheitsgrenze vor Leerpumpen korrigiert.
+- Neufassung TRGS 524 mit Bekanntmachung 17.07.2026 und transparenter BAuA/BG-BAU-Datierungsabweichung in einschlägigen Altbeiträgen eingeordnet.
+- Entsorgungsbelege für Kleinmengen, Gerüstersteller-/Nutzerprüfung und Veranlasserinformationen vor Bauteilöffnungen präzisiert.
+- HwO-Anwendungsbereich bei Eigenleistungen korrigiert; keinen pauschalen Fachbetriebsvorbehalt aus Anlage A abgeleitet.
+- Falsch bezeichnete DGUV-Quelle im Schwarzwasserartikel ersetzt; nicht belegte Fallbehauptung im älteren Erstmaßnahmenartikel entfernt.
+- Dreizehn tatsächliche Inhaltsänderungen mit updatedAt 13.10.2026; übrige Artikel ohne pauschales neues Änderungsdatum. Individuelle Vollprüfung des übrigen Archivs bleibt offen.
+
 ## 2026-10-13 – Parkettoberflächen und Reparaturgrenzen
 
 - Genau einen Tagesartikel unter eigener atomarer Reservierung ergänzt: Pflegeschicht, Beschichtung, Holz und Untergrund getrennt beurteilen.

@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/brandschaden-notmassnahmen-uebergang
 damageTypes: ["brand", "gebaeude"]
 publication:
   publishedAt: 2026-09-29
-  updatedAt: 2026-09-29
+  updatedAt: 2026-10-13
   status: published
 seo:
   title: "Rückbau nach Brandschäden fachlich prüfen"
@@ -96,6 +96,14 @@ In einem ausdrücklich fiktiven Fall brennt es in der Küche eines Mehrfamilienh
 - Sachverständige sollten Schadenbezug, technische Erforderlichkeit, Fachgrenzen und Kostenfolge getrennt bewerten.
 
 Rückbau nach Brandschäden wird prüffähig, wenn Befund, Gefährdung, Schutzkonzept, Freigabe, Menge und Kostenposition eine geschlossene Nachweiskette bilden. Eine pauschale Entkernung ersetzt diese Prüfung nicht.
+
+## Quellenpräzisierung vom 13.10.2026: Planung und Arbeitgeberprüfung
+
+Die [BAuA](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524) führt die TRGS 524 als Ausgabe Juli 2026, bekannt gemacht am 17.07.2026 (GMBl Nr. 18/19). Die [BG-BAU-Wiedergabe](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/titel.htm) nennt abweichend März 2026 bei derselben Bekanntmachung. Maßgeblich ist die bekannt gemachte Fassung; kein Entwurf und kein erfundener gesonderter Geltungsbeginn.
+
+Nach [Abschnitt 3 der TRGS 524](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/3.htm) sind Erkundungsinformationen des Auftraggebers, ein gegebenenfalls erstellter Arbeits- und Sicherheitsplan und die Gefährdungsbeurteilung des ausführenden Arbeitgebers auseinanderzuhalten. Ein vorgelegter Plan ersetzt die eigene Prüfung nicht. Neue Gefahrstoffbefunde während des Rückbaus erfordern eine angepasste Bewertung und Schutzmaßnahmen vor der Fortsetzung.
+
+Die konkrete Anwendung ist nach [Abschnitt 1](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/1.htm) zu prüfen: Unmittelbare akute Gefahrenabwehr sowie unter anderem Asbestarbeiten sind ausgenommen; für Asbest gilt die einschlägige Spezialregel. Bedeutung für die Schadensteuerung: Rückbauauftrag, Schutzplanung und Sonderfachkunde getrennt prüfen, ohne eine Kostenfreigabe zur Arbeitsschutzfreigabe umzudeuten.
 
 ## Quellen und weiterführende Hinweise
 

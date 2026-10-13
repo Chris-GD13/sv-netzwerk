@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/brandschaden-notmassnahmen-ueber
 damageTypes: ["brand", "gebaeude"]
 publication:
   publishedAt: 2026-08-06
-  updatedAt: 2026-08-06
+  updatedAt: 2026-10-13
   status: published
 seo:
   title: "Rauch- und Rußschäden fachlich sauber abgrenzen"
@@ -284,6 +284,12 @@ Bei der Erstaufnahme werden Primärbrandraum, angrenzende Aufenthaltsräume und 
 ## Fazit
 
 Brandschäden durch Rauch und Ruß werden erst dann prüffähig, wenn Primärbrandbereich, Kontamination, verdeckte Beaufschlagung, technische Funktion und Sanierungsziel sauber getrennt aufgenommen werden. Gerade diese Trennung entscheidet darüber, ob Reinigung, Dekontamination, Ausbau und Ersatz fachlich sowie kostenmäßig nachvollziehbar begründet werden können.
+
+## Quellenpräzisierung vom 13.10.2026: Arbeitsschutz und Nutzungsfreigabe
+
+[TRGS 524, Abschnitt 7](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/7.htm), in der am 17.07.2026 bekannt gemachten Neufassung, behandelt die Wirksamkeit tätigkeitsbezogener Schutzmaßnahmen. Eine Arbeitsplatzmessung erfasst den Ort und Zeitpunkt der Untersuchung; sie ist keine pauschale Aussage über jeden späteren Zustand. Arbeitsschutz während der Sanierung und die Eignung für die spätere Raumnutzung müssen deshalb mit jeweils passendem Prüfziel bewertet werden.
+
+Die [Dokumentationshinweise in Anlage 11](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/anl11.htm) ordnen Unterlagen den Verantwortlichen zu. Bedeutung für die Akte: Erkundungsdaten, gegebenenfalls Arbeits- und Sicherheitsplan, Arbeitgeber-Gefährdungsbeurteilung und Wirksamkeitsnachweise getrennt führen. Die technische Regel konkretisiert Gefahrstoffrecht, ist kein Entwurf und keine pauschale Versicherungszusage. Quellenstand geprüft am 13.10.2026; kein zusätzlicher Geltungsbeginn erfunden.
 
 ## Quellen und weiterführende Hinweise
 

@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/rechnungskuerzung-schadenfall-prueff
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-27
-  updatedAt: 2026-09-27
+  updatedAt: 2026-10-13
   status: published
 seo:
   title: "Eigenleistungen nach Gebäudeschäden prüfen"
@@ -74,7 +74,7 @@ Werden verdeckte Bauteile geöffnet, sind Zustand und Schichtenaufbau vor dem we
 
 ## Zuständigkeits- und Fachgrenzen
 
-Der Sachverständige kann Schadenbezug, Plausibilität, Mengen, Doppelansätze und technische Erforderlichkeit bewerten. Er bestätigt damit nicht automatisch die handwerksrechtliche Zulässigkeit oder die fachgerechte Ausführung jeder Eigenleistung. Die Handwerksordnung führt in Anlage A zulassungspflichtige Handwerke auf. Ob eine konkrete Tätigkeit wesentlich, zulassungspflichtig oder durch einen Fachbetrieb abzunehmen ist, muss im Einzelfall geklärt werden.
+Der Sachverständige kann Schadenbezug, Plausibilität, Mengen, Doppelansätze und technische Erforderlichkeit bewerten. Er bestätigt damit nicht automatisch die handwerksrechtliche Zulässigkeit oder die fachgerechte Ausführung jeder Eigenleistung. § 1 Handwerksordnung betrifft den selbständigen Betrieb eines zulassungspflichtigen Handwerks als stehendes Gewerbe. Die Liste in Anlage A ist deshalb kein pauschales Verbot privater Eigenarbeit. Davon unabhängig sind tätigkeitsbezogene Sicherheits-, Fachkunde- und gegebenenfalls Abnahmeanforderungen zu prüfen. Aus der Handwerksordnung allein folgt keine allgemeine Abnahmepflicht jeder privaten Eigenleistung.
 
 Bei unklarer Standsicherheit, elektrischen Gefahren, mikrobieller Kontamination oder Gebäudeschadstoffen sind geeignete Fachplaner, Fachunternehmen oder Labore einzubinden. Weitere Hinweise enthält der Beitrag [Fachgrenzen in der Schadenprüfung](/fachwissen/fachgrenzen-schadenpruefung-fachplaner/).
 
@@ -105,6 +105,10 @@ In einem ausdrücklich fiktiven Fall entfernt der Versicherungsnehmer nach einem
 ## Fazit
 
 Eigenleistungen werden nicht durch eine pauschale Stundensumme, sondern durch eine geschlossene Nachweiskette prüffähig. Tätigkeit, ausführende Person, Zeit, Menge, Material, Vorzustand und Schadenbezug müssen zusammenpassen. Die klare Beachtung von Fachgrenzen schützt Personen und Gebäude und verhindert sowohl Doppelvergütungen als auch unbegründete Kürzungen.
+
+## Quellenpräzisierung vom 13.10.2026: Gewerberecht und Sicherheit
+
+[§ 1 HwO im amtlichen Gesetzestext](https://www.gesetze-im-internet.de/hwo/BJNR014110953.html) wurde am 13.10.2026 auf den beschriebenen Anwendungsbereich geprüft. Dies ist eine Klarstellung der geltenden Regel, keine neue Zulassung oder Inkraftsetzung. Für die Regulierung bedeutet sie: Private Eigenarbeit, gewerbliche Tätigkeit, tatsächliche Qualifikation und Sicherheitsanforderungen getrennt bewerten; eine Versicherungsvergütung wird dadurch nicht festgelegt.
 
 ## Quellen und weiterführende Hinweise
 
