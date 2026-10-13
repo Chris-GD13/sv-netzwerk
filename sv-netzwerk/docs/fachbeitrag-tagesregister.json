@@ -331,7 +331,21 @@
           "scope": "Schimmelpilze in Gebäuden und Sanierungskontrolle; keine behauptete Autorenschaft"
         }
       }
+    },
+    "2026-10-13": {
+      "publication_id": "2026-10-13-parkett-holzfeuchte-raumklima-untergrund-pruefen",
+      "article": {
+        "title": "Parkett beurteilen: Holzfeuchte, Raumklima und Untergrund getrennt prüfen",
+        "slug": "parkett-holzfeuchte-raumklima-untergrund-pruefen",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/",
+        "status": "reserved",
+        "owner": "codex-cloud-20261013-0603",
+        "reserved_at": "2026-10-13T04:07:36.127Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-10-12T08:19:53+02:00"
+  "updated_at": "2026-10-13T04:07:36.127Z"
 }
