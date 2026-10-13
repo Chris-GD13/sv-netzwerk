@@ -16,7 +16,7 @@ relatedLinks: ["/experten/carmen-gohl/", "/fachwissen/schimmel-nach-wasserschade
 damageTypes: ["feuchte", "gebaeude"]
 publication:
   publishedAt: 2026-10-12
-  updatedAt: 2026-10-12
+  updatedAt: 2026-10-13
   status: published
 seo:
   title: "Schimmelsanierung und Sanierungserfolg prüfen"
@@ -104,6 +104,14 @@ Messungen sind kein Selbstzweck. Der UBA-Leitfaden nennt für größere Schäden
 
 Nach dem Wiedereinbringen von gereinigtem Inventar kann je nach Fragestellung eine weitere Kontrolle sinnvoll sein. Ziel ist dabei nicht ein völlig schimmelpilzfreier Innenraum, sondern ein Zustand ohne maßgebliche zusätzliche Belastung gegenüber der üblichen Hintergrundkonzentration.
 
+## Ergänzende fachliche Orientierung: WTA-Merkblatt 4-12
+
+Ergänzend zu den hier herangezogenen UBA- und DGUV-Veröffentlichungen ist das WTA-Merkblatt 4-12 „Ziele und Kontrolle von Schimmelpilzschadensanierungen in Innenräumen“ als einschlägiges Fachregelwerk zu berücksichtigen. Es stellt bereits im Titel die Festlegung von Sanierungszielen und deren Kontrolle in den Mittelpunkt. Der Hinweis hierauf wurde im fachlichen Austausch zum Beitrag von Sven Kattner gegeben.
+
+Für die praktische Anwendung ist deshalb besonders wichtig, Sanierungsziel, Prüfumfang und Abnahmekriterien vor der Kontrolle nachvollziehbar festzulegen. Ursachenbeseitigung, ausgeführter Rückbau, Trocknung und Feinreinigung sind anhand der jeweils passenden Nachweise zu bewerten; einzelne Messwerte dürfen nicht isoliert als Nachweis des gesamten Sanierungserfolgs behandelt werden. Die konkrete Anwendung eines Regelwerks hängt von Schadensbild, Nutzung, Auftrag und vereinbartem Leistungsumfang ab.
+
+**Quellenabgrenzung:** Der vollständige Wortlaut des WTA-Merkblatts 4-12 wurde für diese Ergänzung nicht eingesehen. Daher werden ihm hier keine konkreten Einzelanforderungen, Grenzwerte oder verbindlichen Abnahmekriterien zugeschrieben. Die vorstehenden Prüfschritte sind im Artikel anhand der gesondert aufgeführten UBA- und DGUV-Quellen begründet.
+
 ## Prüffähiges Abnahmeprotokoll
 
 Ein belastbares Protokoll trennt Beobachtung, Messwert und Bewertung. Es nennt:
@@ -140,9 +148,9 @@ Der sachverständige Mehrwert liegt in der belastbaren Zuordnung: Welche Ursache
 
 ## Quellen, Stand und praktische Bedeutung
 
-Quellenprüfung und Abruf am 12.10.2026. Verwendet wurden die öffentlich zugänglichen Originalfassungen im für die Aussagen erforderlichen Umfang. Kostenpflichtige Norm- oder Merkblattinhalte wurden nicht als eingesehen behandelt.
+Quellenprüfung und Abruf der ursprünglichen Quellen am 12.10.2026; redaktionelle Ergänzung zum WTA-Merkblatt am 13.10.2026. Verwendet wurden die öffentlich zugänglichen Originalfassungen im für die Aussagen erforderlichen Umfang. Kostenpflichtige Norm- oder Merkblattinhalte wurden nicht als eingesehen behandelt.
 
-- Umweltbundesamt, [Aktueller UBA-Schimmelleitfaden](https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/aktueller-uba-schimmelleitfaden), Seite zuletzt aktualisiert am 17.01.2025. Sie bestätigt die aktualisierte Leitfadenfassung April 2024 und den Anwendungsbereich für Sachverständige sowie die Kontrolle des Sanierungserfolgs.
+- WTA, Merkblatt 4-12 „Ziele und Kontrolle von Schimmelpilzschadensanierungen in Innenräumen“ (ergänzender Fachregelwerks-Hinweis; Volltext für diese Ergänzung nicht geprüft).\n- Umweltbundesamt, [Aktueller UBA-Schimmelleitfaden](https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/aktueller-uba-schimmelleitfaden), Seite zuletzt aktualisiert am 17.01.2025. Sie bestätigt die aktualisierte Leitfadenfassung April 2024 und den Anwendungsbereich für Sachverständige sowie die Kontrolle des Sanierungserfolgs.
 - Umweltbundesamt, [Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, aktualisierte Fassung April 2024](https://www.umweltbundesamt.de/system/files/medien/4031/publikationen/240513_uba_fb_schimmelleitfaden_0.pdf), insbesondere Kapitel 6.3.3 bis 6.3.8 und 6.6. Praktische Bedeutung: Ursachenbeseitigung, Trocknung, Rückbau, Feinreinigung und Erfolgskontrolle getrennt planen, prüfen und dokumentieren.
 - Deutsche Gesetzliche Unfallversicherung, [DGUV Information 201-028 „Gesundheitsgefährdungen durch Biostoffe bei der Schimmelpilzsanierung“, Ausgabe November 2022](https://publikationen.dguv.de/widgets/pdf/download/article/644), insbesondere Kapitel 3, 4.3 und 9.2.3. Praktische Bedeutung: Schutzmaßnahmen, Feinreinigung und Abnahme in den Sanierungsablauf einordnen.
 - Bundesverband Schimmel- und Schadstoffsanierung e. V., [Fachkundenachweis Schimmelsanierung – Modul B3 Sanierungskontrolle](https://bss-schimmelpilz.de/fachkundenachweis-schimmelsanierung-modul-b3-sanierungskontrolle/), Abruf 12.10.2026. Praktische Bedeutung: Sanierungskontrolle als eigener fachlicher Schritt; Kontrollumfang im Einzelfall festlegen und den Begriff „Freimessung“ nicht auf eine Luftmessung verengen.
