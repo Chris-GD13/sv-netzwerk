@@ -346,12 +346,14 @@
         "verified_at": "2026-10-13T04:26:29.817Z"
       },
       "linkedin": {
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-linkedin-20261013-01a133e0",
         "reserved_at": "2026-10-13T06:16:08.091Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/"
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/",
+        "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7515657563250737152/",
+        "verified_at": "2026-10-13T06:21:22.475Z"
       }
     }
   },
-  "updated_at": "2026-10-13T06:16:08.091Z"
+  "updated_at": "2026-10-13T06:21:22.475Z"
 }
