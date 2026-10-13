@@ -338,14 +338,17 @@
         "title": "Parkettoberflächen beurteilen: Beschichtung, Holzfeuchte und Untergrund trennen",
         "slug": "parkett-holzfeuchte-raumklima-untergrund-pruefen",
         "url": "https://www.sv-netzwerk.eu/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-cloud-20261013-0603",
-        "reserved_at": "2026-10-13T04:07:36.127Z"
+        "reserved_at": "2026-10-13T04:07:36.127Z",
+        "commit": "1e3af8bd2baf6e2f287a1dd1657fad5117871901",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38345770008",
+        "verified_at": "2026-10-13T04:26:29.817Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-13T04:07:36.127Z"
+  "updated_at": "2026-10-13T04:26:29.817Z"
 }
