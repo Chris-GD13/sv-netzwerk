@@ -1,0 +1,17 @@
+# Quellenprüfung LinkedIn – 13.10.2026
+
+Artikelkennung: 2026-10-13-parkett-holzfeuchte-raumklima-untergrund-pruefen. Abruf und Prüfung sämtlicher nachstehender Primärquellen am 13.10.2026 vor Veröffentlichung.
+
+- [Bona Polish, technisches Merkblatt 30.09.2025](https://www.bona.com/globalassets/catalogassets/tds-bona-polish-de_20250930082309.pdf): Seiten 1–3 gelesen. Zusätzliche Pflegeschicht für versiegelte Holzböden, Ausschluss geölter/gewachster Böden, Haftungs- und Ergebnisprüfung. Stützt Pflegefilm, Systemverträglichkeit und Probefläche; ausschließlich produktspezifisch.
+- [Pallmann, Parkett richtig pflegen](https://de.pallmann.net/wissen-technik/know-how/parkett-richtig-pflegen): vollständiger fachlicher Seiteninhalt gelesen. Unterschiedliche Anforderungen für lackierte und geölte Oberflächen, geeignete Pflege. Kein universeller Reparatur- oder Normnachweis.
+- [TKB-Merkblatt 1, März 2022](https://www.klebstoffe.com/wp-content/uploads/2023/09/TKB-01-Parkett-2022-03-14-Layout-2023.pdf): Abschnitte 2.1.1, 2.2.1 und 2.2.4 einschließlich produktspezifischer Abweichungen gelesen. Holzart, Aufbau und Oberflächenbehandlung beeinflussen Feuchteverhalten. Keine Grenzwerte oder behaupteten Norminhalte im LinkedIn-Text.
+- [TKB-Merkblatt 17, Juli 2025](https://www.klebstoffe.com/wp-content/uploads/2025/08/TKB-17-Raumklima-2025-07-23-Veroeffentlichung.pdf): Einleitung, Raumklimaparameter und Abschnitt 2.3.1 gelesen. Verlege-/Nutzungsklima und zeitlich unterschiedliche Feuchteanpassung. Ein gegenwärtiger Messwert ist als sachverständige Ableitung kein Nachweis früherer Bedingungen.
+- [TKB-Merkblatt 8, Deckblatt Mai 2026, Seitenfuß April 2026](https://www.klebstoffe.com/wp-content/uploads/2026/04/TKB-8-Untergrundbeurteilung-Veroeffentlichung.pdf): Einordnung, Belegreife, Abschnitte 3.12–3.13 sowie 4.1 gelesen. Haftung, Trennschichten, Untergrund und Aufbauempfehlungen gesondert prüfen. Datierungsabweichung beibehalten; keine erfundene Inkraftsetzung.
+
+Die vier Prüfpunkte und Dokumentationsschritte sind eine sachverständige Zusammenführung der eingesehenen Systemgrenzen. Keine erfundenen Fälle oder Messwerte, keine pauschale Reparatur-, Kosten- oder Versicherungszusage. Fachgrenzen sind benannt.
+
+Aktuelles [Expertenprofil Claudius Freiberg](https://www.sv-netzwerk.eu/experten/claudius-freiberg/) sichtbar gelesen: Oberflächenschäden, Materialbewertung, Beschichtungen und Holz belegt. Nur fachliche Zuordnung; keine behauptete Autorenschaft oder Mitwirkung.
+
+Vollständiger Tagesartikel, Live-Übersicht, Datum 13.10.2026 und Canonical sichtbar geprüft. Aktuell ausgelieferter Websitecommit 7f78040dc932677b3fbd7902fcd99e2703b6da3e über HTTP-200-Marker bestätigt; [Deployment 38348010495](https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38348010495) im Chrome-Browser Success. Parkett-Quelldatei zwischen Artikelcommit 1e3af8bd2baf6e2f287a1dd1657fad5117871901 und aktuellem Livecommit unverändert (Git-Diff leer). Browseraufruf der TXT-Markerdatei durch Client blockiert; der HTTPS-Readback wurde separat durchgeführt. Artikel und Workflow sichtbar geprüft.
+
+Kostenentscheidung: Zusatzbudget 0 USD; keine Bildmodell-/API-Aufrufe, keine Schlüssel oder Credits genutzt. Konkreter in Tariflimits enthaltener Work-Bildweg nicht verifizierbar und ohne Test übersprungen. Kein freigegebener fachlich passender Bildbestand belegt. Zusätzliche lokale Titelkarte für diesen fachlichen Linkbeitrag nicht sinnvoll; Veröffentlichung ohne Bild vorgesehen, ohne erfundenen Bildhinweis.
