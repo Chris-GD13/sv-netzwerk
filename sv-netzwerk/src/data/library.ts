@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Parkettoberflächen beurteilen: Beschichtung, Holzfeuchte und Untergrund trennen',
+    description: 'Pflegeschicht, Beschichtung, Holz und Untergrund unterscheiden; Untersuchungen und Reparaturgrenzen aus dem betroffenen Aufbau ableiten.',
+    href: '/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/',
+    category: 'Oberflächen und Innenausbau',
+    tags: ['Parkett', 'Oberflächenschäden', 'Beschichtung', 'Holzfeuchte', 'Raumklima', 'Untergrund', 'Reparatur'],
+    date: '2026-10-13',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Schimmelsanierung kontrollieren: Feuchteursache, Feinreinigung und Sanierungserfolg prüfen',
     description: 'Ursachenbeseitigung, Trocknung, Rückbau, Feinreinigung und Sanierungserfolg als getrennte Prüfschritte nachvollziehbar bewerten.',
     href: '/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/',

@@ -1,3 +1,10 @@
+## 2026-10-13 – Parkettoberflächen und Reparaturgrenzen
+
+- Genau einen Tagesartikel unter eigener atomarer Reservierung ergänzt: Pflegeschicht, Beschichtung, Holz und Untergrund getrennt beurteilen.
+- Vorgemerkte Oberflächen-Profilrotation mit Claudius Freiberg berücksichtigt; keine behauptete Mitautorenschaft.
+- Geöffnete Primärquellen mit Ausgabedatum, Veröffentlichungsdatum, Status und Bedeutung dokumentiert; keine erfundenen Fallbeispiele oder pauschalen Versicherungsbezüge.
+- Library, interne Links, Suchindex-/Sitemap-Datenbasis und CSV ergänzt; LinkedIn prepared-not-posted.
+
 ## 2026-10-12 – Quellenpräzisierungen und Veröffentlichungsnachweise
 
 - CM-/KRL-Aussagen, Schichtabgrenzung und Belegreife in älteren Fachbeiträgen präzisiert.
