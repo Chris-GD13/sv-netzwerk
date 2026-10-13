@@ -11,3 +11,7 @@ Kein fiktiver Schadenfall und keine erfundenen Messwerte. Methodische Prüffrage
 LinkedIn: prepared-not-posted. Kein externer Post in diesem Lauf; kein geprüftes Bild erfunden.
 
 Build und Live-Veröffentlichung werden nach tatsächlicher Prüfung ergänzend nachgetragen. Ein vorbereiteter Dateistand ist kein Veröffentlichungserfolg.
+
+## Verifizierte Website-Veröffentlichung
+
+Commit 1e3af8bd2baf6e2f287a1dd1657fad5117871901; Deployment https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38345770008 erfolgreich. Live-Prüfung 13.10.2026, 06:26 Berlin. Detail200, Titel/Datum/Inhalt, Canonical, kein noindex, Profilverlinkung, Übersicht/Suche/Sitemap/robots und exakte Deploy-Kennung geprüft. Bildnachweis fachbeitrag-2026-10-13-live.jpg. LinkedIn bleibt prepared-not-posted; kein Absenden in diesem Lauf.

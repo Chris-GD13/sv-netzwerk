@@ -1,0 +1,48 @@
+{
+  "initial_deployment_commit": "1e3af8bd2baf6e2f287a1dd1657fad5117871901",
+  "initial_deployment_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38345770008",
+  "initial_checks": [
+    {
+      "path": "/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/",
+      "status": 200,
+      "contains_slug": true,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/",
+      "noindex": false,
+      "date": true,
+      "h1": "Parkettoberflächen beurteilen: Beschichtung, Holzfeuchte und Untergrund trennen",
+      "expert": true
+    },
+    {
+      "path": "/fachwissen/",
+      "status": 200,
+      "contains_slug": true
+    },
+    {
+      "path": "/search-index.json",
+      "status": 200,
+      "contains_slug": true
+    },
+    {
+      "path": "/sitemap-0.xml",
+      "status": 200,
+      "contains_slug": true
+    },
+    {
+      "path": "/sitemap-index.xml",
+      "status": 200,
+      "contains_slug": false
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "contains_slug": false,
+      "content": "User-agent: *\nAllow: /\nDisallow: /intern/\nSitemap: https://www.sv-netzwerk.eu/sitemap-index.xml\n"
+    },
+    {
+      "path": "/deploy-version.txt",
+      "status": 200,
+      "contains_slug": false,
+      "content": "Commit: 1e3af8bd2baf6e2f287a1dd1657fad5117871901\nBuild-Zeit: 2026-10-13T04:18:18.139Z\nVersion: Homepage-v5\n"
+    }
+  ]
+}

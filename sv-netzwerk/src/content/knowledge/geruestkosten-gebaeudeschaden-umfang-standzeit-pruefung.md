@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/rechnungskuerzung-schadenfall-prueff
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-28
-  updatedAt: 2026-09-28
+  updatedAt: 2026-10-13
   status: published
 seo:
   title: "Gerüstkosten nach Gebäudeschäden prüfen"
@@ -93,6 +93,12 @@ In einem ausdrücklich fiktiven Fall löst ein Sturm Teile der Fassadenbekleidun
 - Sachverständige sollten technische Notwendigkeit, Schadenbezug und Kostenpositionen nachvollziehbar bewerten, ohne eine Gerüstfreigabe zu ersetzen.
 
 Gerüstkosten sind prüffähig, wenn ein geschlossener Zusammenhang zwischen Schadenort, sicherem Arbeitsverfahren, Gerüstausführung, tatsächlichem Umfang und belegter Standzeit besteht. Maßgeblich ist der dokumentierte Einzelfall; weder eine pauschale Fläche noch eine pauschale Kürzung genügt diesem Maßstab.
+
+## Quellenpräzisierung vom 13.10.2026: Erstellerprüfung und Nutzerkontrolle
+
+Die [DGUV Information 201-011](https://publikationen.dguv.de/widgets/pdf/download/article/793), Ausgabe Januar 2023, unterscheidet die Prüfung nach Fertigstellung durch eine zur Prüfung befähigte Person von der Verantwortung des Gerüstnutzers. Prüfprotokoll, Kennzeichnung und Plan für den Gebrauch gehören zur Übergabe; außergewöhnliche Ereignisse können eine erneute Prüfung erforderlich machen. Die BAuA führt die [TRBS 2121 Teil 1](https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS-2121-Teil-1) weiterhin mit Ausgabe Januar 2019 und Bekanntmachung vom 11.02.2019. Beide Quellen wurden am 13.10.2026 geprüft. Die DGUV-Unterlage ist eine Handlungshilfe; die TRBS konkretisiert Betriebssicherheitsrecht. Kein neuer gesetzlicher Geltungsbeginn wird aus dem Abrufdatum abgeleitet.
+
+Bedeutung für die Kostenprüfung: Aufstellung, Prüfung, Übergabe, tatsächliche Nutzbarkeit und spätere Einschränkungen sind zeitlich getrennt zu belegen. Eine Rechnung über Standzeit bestätigt weder eine ordnungsgemäße Prüfung noch die durchgehende Nutzbarkeit. Der regulierende Sachverständige übernimmt diese Fachfreigaben nicht.
 
 ## Quellen und weiterführende Hinweise
 
