@@ -7,7 +7,7 @@ import { isActiveRekonTask, mapRekonTask, ownerMatchesRekonProfile, rekonProfile
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const extension = path.join(root, 'browser-extension/claimsforce-bridge');
 const manifest = JSON.parse(fs.readFileSync(path.join(extension, 'manifest.json'), 'utf8'));
-const worker = fs.readFileSync(path.join(extension, 'service-worker.js'), 'utf8');
+const worker = fs.readFileSync(path.join(extension, 'service-worker.js'), 'utf8').replace(/\r\n/g,'\n');
 const portal = fs.readFileSync(path.join(extension, 'portal-bridge.js'), 'utf8');
 const page = fs.readFileSync(path.join(root, 'src/pages/intern/versicherungsfaelle/index.astro'), 'utf8');
 
@@ -44,7 +44,7 @@ assert(worker.includes("rekon: runningRekonImport ? { status: 'running'") && por
 assert(worker.includes("Object.assign(runningRekonImport, { text, current, total })") && portal.includes("rekon.status === 'running' && rekon.text"), 'Der gepollte Laufstatus stellt Fortschritt auch bei verlorenen Edge-Ereignissen wieder her');
 assert(portal.includes('if (!PORTAL_REQUEST_TYPES.has(message?.type)) return;'), 'Rekon-Fortschritt wird nicht als unbekannter Portalauftrag mit offenem Antwortkanal abgefangen');
 assert(worker.includes("ownerMatchesRekonProfile"), 'Rekon-Konto und Portalziel werden abgeglichen');
-assert(page.includes("minimum='1.4.12'") && page.includes('event.stopImmediatePropagation()'), 'Eine veraltete Browser-Brücke darf keinen scheinbar gestarteten Rekon-Lauf mehr auslösen');
+assert(page.includes("minimum='1.4.62'") && page.includes('event.stopImmediatePropagation()'), 'Eine veraltete Browser-Brücke darf keinen scheinbar gestarteten Rekon-Lauf mehr auslösen');
 assert(worker.includes("!session?.identity") && worker.includes("while ((!token || !session?.identity)"), 'Die sichtbare Rekon-Profilkennung wird nach dem Seitenaufbau abgewartet');
 assert(worker.includes("Mail_Rekon-Nachricht_"), 'E-Mails werden als Korrespondenz archiviert');
 assert(worker.includes("for (const attachment of email.attachments || [])"), 'E-Mail-Anhänge werden separat übertragen');
@@ -55,3 +55,4 @@ assert(page.includes('Aktive Aufträge aus Rekon einlesen'));
 assert(page.includes('SVNET_REKON_IMPORT_START'));
 
 console.log('Rekon-Import: aktive Fälle, Profilbindung, Dateien, Nachrichten, Anhänge und Termine geprüft.');
+
