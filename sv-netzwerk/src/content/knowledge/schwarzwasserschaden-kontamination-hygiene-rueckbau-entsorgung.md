@@ -89,7 +89,7 @@ Schwarzwasserschäden sind nur dann belastbar zu bewerten, wenn Kontaminationswe
 
 ## Aktualitätsprüfung zum 30.09.2026
 
-Die Quellenprüfung wurde um den UBA-Schimmelleitfaden in der aktualisierten Auflage April 2024 und die am 17.01.2025 aktualisierte UBA-Informationsseite ergänzt. Diese Quellen sind fachliche Leitlinien für Erfassung und Sanierung; sie ersetzen keine objektspezifische Hygiene- oder Arbeitsschutzbeurteilung. Für die Praxis bedeutet das: direkte Kontamination, Folgefeuchte, Rückbau, Reinigung und Erfolgskontrolle müssen weiterhin getrennt nachgewiesen werden. Veröffentlichungsdatum (13.08.2026), Aktualisierungsdatum (30.09.2026) und Quellenstand (April 2024/17.01.2025) sind getrennt dokumentiert.
+Die Quellenprüfung wurde um den UBA-Schimmelleitfaden in der aktualisierten Auflage April 2024 und die am 17.01.2025 aktualisierte UBA-Informationsseite ergänzt. Diese Quellen sind fachliche Leitlinien für Erfassung und Sanierung; sie ersetzen keine objektspezifische Hygiene- oder Arbeitsschutzbeurteilung. Für die Praxis bedeutet das: direkte Kontamination, Folgefeuchte, Rückbau, Reinigung und Erfolgskontrolle müssen weiterhin getrennt nachgewiesen werden. Veröffentlichungsdatum (13.08.2026), früherer Quellenprüfstand (30.09.2026) und Quellenstand dieser UBA-Ergänzung (April 2024/17.01.2025) sind getrennt dokumentiert. Die anschließende Quellenkorrektur vom 13.10.2026 ist im folgenden Abschnitt ausgewiesen.
 
 ## Quellenkorrektur vom 13.10.2026: Biologische Gefährdungen
 

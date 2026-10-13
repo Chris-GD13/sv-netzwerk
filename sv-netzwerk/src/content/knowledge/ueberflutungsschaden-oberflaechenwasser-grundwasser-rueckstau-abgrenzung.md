@@ -16,6 +16,7 @@ relatedLinks: ["/fachwissen/starkregen-rueckstau-eintrittswege-rueckstauebene-sc
 damageTypes: ["hochwasser", "ueberflutung", "rueckstau", "gebaeude"]
 publication:
   publishedAt: 2026-08-09
+  updatedAt: 2026-10-13
   status: published
 seo:
   title: "Überflutungsschäden am Gebäude fachlich prüfen und abgrenzen"
@@ -40,7 +41,7 @@ Oberflächenwasser fließt bei Starkregen oder Hochwasser oberirdisch über befe
 
 ### Grundwasser
 
-Grundwasser steigt bei lang anhaltendem Niederschlag oder Hochwasser in der Fläche an und baut einen hydrostatischen Druck gegen erdberührte Bauteile auf. Kellerwände und Bodenflächen können bei nicht ausreichend bemessener Kellerabdichtung von innen druckbelastet werden. Schadenspuren zeigen sich oft flächig und symmetrisch, unabhängig von Eintrittswegen auf Geländeniveau.
+Grundwasser steigt bei lang anhaltendem Niederschlag oder Hochwasser in der Fläche an und baut einen hydrostatischen Druck gegen erdberührte Bauteile auf. Auf Kellerwände und Bodenplatte wirkt Wasser von außen; bei hohem Außenwasserstand sind Druck- und Auftriebswirkungen fachlich zu prüfen. Flächige Feuchte ist für sich kein eindeutiger Nachweis eines Grundwasseranstiegs.
 
 ### Sickerwasser
 
@@ -48,11 +49,11 @@ Sickerwasser entsteht aus Niederschlag, der im Erdreich versickert und seitlich 
 
 ### Rückstau
 
-Rückstau entsteht, wenn öffentliche oder private Entwässerungsanlagen bei Starkregen überlastet sind und das Wasser drucklos oder druckbehaftet in das Gebäude zurückfließt. Eintrittspunkte sind vor allem Bodenabläufe, Waschmaschinenanschlüsse, Toiletten und andere Anschlüsse unterhalb der Rückstauebene. Rückstau hat in der Regel eine klare Zeitabhängigkeit vom Regenereignis und führt zu charakteristischen Schadenspuren in Kellerräumen, die keinen direkten Wandkontakt mit dem Erdreich haben.
+Rückstau entsteht, wenn öffentliche oder private Entwässerungsanlagen bei Starkregen überlastet sind und das Wasser drucklos oder druckbehaftet in das Gebäude zurückfließt. Eintrittspunkte sind vor allem Bodenabläufe, Waschmaschinenanschlüsse, Toiletten und andere Anschlüsse unterhalb der Rückstauebene. Rückstau kann durch Starkregen, aber auch durch Verstopfungen oder andere Störungen entstehen. Der Zeitverlauf und die tatsächlichen Austrittsstellen sind zu prüfen; eine Regenabhängigkeit darf nicht pauschal vorausgesetzt werden.
 
 ## Eintrittswege und Rückstauebene
 
-Die Rückstauebene entspricht in der Regel der Höhe der Straßenoberkante oder der Einmündung des Anschlusses in den öffentlichen Kanal. Anschlüsse unterhalb dieser Ebene sind ohne funktionsfähige Rückstausicherung bei Starkregen schutzlos.
+Der konkrete Höhenbezug der Rückstauebene ist anhand der örtlichen Entwässerungsregelung zu klären. Häufig ist die Straßenoberkante an der Anschlussstelle maßgeblich; sie ist von der tiefer liegenden Rohr-Einmündung zu unterscheiden. Anschlüsse unterhalb dieser Ebene sind ohne funktionsfähige Rückstausicherung bei Starkregen schutzlos.
 
 Häufige Eintrittswege bei Überflutungen:
 
@@ -122,7 +123,7 @@ Werden diese Grundlagen nicht dokumentiert, bleiben Fragen nach der Ursache, dem
 
 Unmittelbar nach dem Ereignis sind folgende Sofortmaßnahmen relevant:
 
-- Beseitigung des eingedrungenen Wassers durch Pumpen oder Absaugen,
+- Kontrollierte Wasserbeseitigung erst nach Klärung von elektrischer Sicherheit, Außenwasserstand und möglicher Druck- beziehungsweise Auftriebsgefährdung,
 - Bergung feuchteempfindlicher Einrichtungen und Güter,
 - Belüftung und erste Belüftungsmaßnahmen zur Verhinderung von Schimmelbildung,
 - Trockenschutz für empfindliche Bauteile,
@@ -178,7 +179,7 @@ Die Dokumentation trennt deshalb drei Schadenebenen: aktuell ereignisbedingte Sc
 ### Für Versicherungsnehmer
 
 - Wasserstand und Eintrittspunkte sofort nach dem Ereignis dokumentieren.
-- Wasser schnellstmöglich beseitigen und mit Trocknung beginnen.
+- Wasserbeseitigung und Trocknung nach fachlicher Sicherheitsbewertung einleiten; überflutete Keller nicht eigenmächtig betreten.
 - Feuchteempfindliche Güter aus dem betroffenen Bereich entfernen.
 - Vorhandensein und Funktion einer Rückstausicherung dokumentieren lassen.
 
@@ -198,10 +199,18 @@ Die Dokumentation trennt deshalb drei Schadenebenen: aktuell ereignisbedingte Sc
 
 Überflutungsschäden am Gebäude sind keine einheitliche Schadenkategorie. Die fachlich belastbare Einordnung setzt voraus, dass Wasserweg, Eintrittspunkte, Rückstauebene, Kellerabdichtung und Vorzustand sauber dokumentiert und getrennt bewertet werden. Nur dann können Ursache, Schadenumfang und erforderliche Maßnahmen nachvollziehbar abgegrenzt und die Kostenprüfung prüffähig gestaltet werden.
 
+## Quellen- und Sicherheitspräzisierung vom 13.10.2026
+
+[DIN 18533-1:2026-06](https://www.dinmedia.de/de/norm/din-18533-1/399850897) ersetzt laut DIN Media 2017-07 einschließlich A1:2018-09. Geprüft wurden die bibliografischen Angaben und der öffentlich beschriebene Anwendungsbereich, kein kostenpflichtiger Volltext. Für die Schadenprüfung sind Ausführungszeitpunkt, Konstruktion und projektbezogene Anwendbarkeit zu bestimmen; die neue Normausgabe erzeugt keine pauschale rückwirkende Sanierungspflicht.
+
+Die [DWA-Information Schutz vor Rückstau](https://www.dwa-bw.de/files/_media/content/PDFs/LV_Baden-Wuerttemberg/Homepage/BW-Dokumente/Homepage%202013/Publikationen/Flyer%20R%C3%BCckstau_Muster.pdf) erklärt auch Rückstau durch Verstopfung unabhängig vom Regen. Die zuständige Entwässerungsstelle beziehungsweise örtliche Satzung ist für den konkreten Höhenbezug heranzuziehen; die Rohr-Einmündungshöhe ist nicht pauschal die Rückstauebene. Die undatierte Verbandsinformation wurde am 13.10.2026 gelesen, ein Veröffentlichungsdatum wird nicht erfunden. Der bislang behauptete DWA-M-382-Nachweis ist in der aktuellen offiziellen Regelwerksliste vom 01.10.2026 nicht belegt und wurde durch einen tatsächlich geprüften Bezug ersetzt.
+
+Vor dem Abpumpen sind elektrische Gefahren, Außenwasserstand und Standsicherheit zu klären. Der [Landkreis Verden](https://www.landkreis-verden.de/portal/seiten/hochwasser-im-landkreis-verden-901001899-20600.html) warnt in seinen Hochwasserhinweisen vor Gebäudeschäden durch zu frühes Abpumpen bei hohem Grundwasser. Dieser Behördenhinweis stützt die allgemeine Sicherheitsgrenze, keinen behaupteten aktuellen Schadenfall. Für Eigentümer und Regulierer folgt daraus: Keine pauschale Aufforderung zum sofortigen Leerpumpen; bei unklaren Verhältnissen fachkundige Gefahrenbewertung und Anweisungen der örtlichen Einsatzkräfte einholen.
+
 ## Quellen und weiterführende Hinweise
 
 1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-2. DIN 18533-1:2017-07, Abdichtung von erdberührten Bauteilen – Teil 1: Anforderungen, Planungs- und Ausführungsgrundsätze, DIN Media, https://www.dinmedia.de/de/norm/din-18533-1/270192249
-3. DWA-M 382, Kleinkläranlagen und Grundstücksentwässerung – Rückstausicherung, Deutsche Vereinigung für Wasserwirtschaft, Abwasser und Abfall, https://www.dwa.de/dwa/
+2. DIN 18533-1:2026-06, Abdichtung von erdberührten Bauteilen – Teil 1, aktuelle bibliografische Normausgabe, DIN Media: https://www.dinmedia.de/de/norm/din-18533-1/399850897
+3. DWA-Landesverband Baden-Württemberg, Schutz vor Rückstau, undatierte allgemeine Information: https://www.dwa-bw.de/files/_media/content/PDFs/LV_Baden-Wuerttemberg/Homepage/BW-Dokumente/Homepage%202013/Publikationen/Flyer%20R%C3%BCckstau_Muster.pdf
 4. GDV, Naturgefahren und Elementarschäden (Themenbereich), Gesamtverband der Deutschen Versicherungswirtschaft, https://www.gdv.de/gdv/themen/naturgefahren
 5. BBK, Hochwasserschutzfibel, Bundesamt für Bevölkerungsschutz und Katastrophenhilfe, https://www.bbk.bund.de/DE/Themen/Risikomanagement/Baulicher-Bevoelkerungsschutz/Objektschutz-und-bauliche-Vorsorge/Hochwasserschutzfibel/hochwasserschutzfibel_node.html

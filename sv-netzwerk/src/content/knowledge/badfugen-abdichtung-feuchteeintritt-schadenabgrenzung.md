@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/leitungswasserschaden-leckageortung-
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-25
-  updatedAt: 2026-10-12
+  updatedAt: 2026-10-13
   status: published
 seo:
   title: "Badfugen und Abdichtungen fachlich abgrenzen"
@@ -105,9 +105,16 @@ Feuchte im Bad wird erst dann belastbar bewertet, wenn Oberfläche, Wartungsfuge
 
 Status und Datierung: Das aktuell verlinkte PDF trägt März 2026, die Herausgebermeldung vom 20.05.2026 nennt April 2026. Diese Abweichung ist dokumentiert; sie wird nicht als gesicherter Geltungsbeginn ausgegeben. Fachliches Verbandsmerkblatt, kein Gesetz und keine pauschale bauaufsichtliche Zulassung. Ein im Literaturverzeichnis benannter Prüfgrundsatz-Entwurf wird nicht als verbindliche Regel übernommen.
 
+## Norm und Änderungsentwurf getrennt – Prüfung vom 13.10.2026
+
+DIN Media führt [DIN 18534-1:2025-10](https://www.dinmedia.de/de/norm/din-18534-1/391755876) als aktuelle Norm; sie ersetzt die Ausgabe 2017-07. Daneben ist [DIN 18534-1/A1:2026-09](https://www.dinmedia.de/en/draft-standard/din-18534-1-a1/404186525) ausdrücklich ein Norm-Entwurf. Der Entwurf darf nicht als bereits geltende Änderung ausgegeben werden. Sein Katalog nennt Bereitstellung am 07.08.2026 und Ausgabemonat September 2026; beides ist keine Inkraftsetzung einer verbindlichen Änderung.
+
+Für Sachverständige bedeutet das: Den Abdichtungsaufbau und den projektbezogen maßgeblichen Regelwerksstand dokumentieren. Aus der bloßen Existenz eines Entwurfs folgt kein neuer Reparaturumfang. Geprüft wurden die öffentlichen bibliografischen Angaben; kostenpflichtige Volltexte und konkrete neue Ausführungsdetails werden nicht als geprüft behauptet.
+
 ## Quellen und weiterführende Hinweise
 
 - Versicherungsvertragsgesetz, insbesondere §§ 82 und 86: https://www.gesetze-im-internet.de/vvg_2008/
-- DIN Media, DIN 18534 – Abdichtung von Innenräumen: https://www.dinmedia.de/
+- DIN Media, DIN 18534-1:2025-10, Abdichtung von Innenräumen, aktuelle Normausgabe: https://www.dinmedia.de/de/norm/din-18534-1/391755876
+- DIN Media, DIN 18534-1/A1:2026-09, ausdrücklich Norm-Entwurf: https://www.dinmedia.de/en/draft-standard/din-18534-1-a1/404186525
 - Umweltbundesamt, Innenraumhygiene und Feuchte: https://www.umweltbundesamt.de/themen/gesundheit/innenraumhygiene
 - Bundesanstalt für Arbeitsschutz und Arbeitsmedizin, sichere Arbeiten auf Baustellen: https://www.baua.de/

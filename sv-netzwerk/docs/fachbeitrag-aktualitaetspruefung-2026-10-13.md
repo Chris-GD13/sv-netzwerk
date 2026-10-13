@@ -4,7 +4,7 @@ Master bei Beginn der Korrektur: 1e3af8bd2baf6e2f287a1dd1657fad5117871901, Tages
 
 ## Tatsächlicher Umfang
 
-Neun ältere Artikel in den jeweils dokumentierten Prüffeldern gelesen und gezielt geändert. Dies ist keine vollständige Freigabe aller Aussagen des Archivs. Artikel und Inhalts-Hashes stehen in fachbeitrag-quellenpruefung-2026-10-13.json. Unveränderte Artikel erhalten kein neues Änderungsdatum.
+Dreizehn ältere Artikel in den jeweils dokumentierten Prüffeldern gelesen und gezielt geändert. Dies ist keine vollständige Freigabe aller Aussagen des Archivs. Artikel und Inhalts-Hashes stehen in fachbeitrag-quellenpruefung-2026-10-13.json. Unveränderte Artikel erhalten kein neues Änderungsdatum.
 
 - Entsorgungskosten: Kleinmengenregel (höchstens 2 t insgesamt jährlich beim Erzeuger) und verbleibende Übernahmescheinpflicht; Lade-/Transporttätigkeiten im Schutzkonzept.
 - Brandrückbau: Auftraggeberinformationen, Arbeits- und Sicherheitsplan, eigene Arbeitgeberprüfung sowie Anwendungsbereich/Spezialregeln auseinanderhalten.
@@ -45,10 +45,28 @@ DGUV201-011 Ausgabe Januar2023, benötigte Kapitel zur Prüfung/Übergabe/Nutzun
 
 ## Prüfungen und offene Punkte
 
-Astro-Build inklusive Qualitäts-/SEO-/Linkprüfungen bestanden; endgültige Commit- und Live-Nachweise werden nach Deployment ergänzt. CSV: 19 Spalten; vorhandene Altzeilen erhalten und neun eindeutige Aktualisierungsereignisse ergänzt. Kein externer LinkedIn-Post für Bestandskorrekturen.
+Astro-Build inklusive Qualitäts-/SEO-/Linkprüfungen bestanden; endgültige Commit- und Live-Nachweise werden nach Deployment ergänzt. CSV: 19 Spalten; vorhandene Altzeilen erhalten und dreizehn eindeutige Aktualisierungsereignisse ergänzt. Kein externer LinkedIn-Post für Bestandskorrekturen.
 
-Die vollständige individuelle Prüfung der übrigen Archivbeiträge bleibt offen. Vorläufige Struktur-/HTTP-Prüfungen und die neun gezielten Quellenkorrekturen sind keine Vollfreigabe. Weiter zu prüfen: themenspezifische Normenstände, generische Quellenlabels, nicht belegte Praxisfälle, rechtliche Aktualisierungen und konkrete Kostenbezüge. Kein pauschaler Rechts-/Normen-/Preisnachtrag.
+Die vollständige individuelle Prüfung der übrigen Archivbeiträge bleibt offen. Vorläufige Struktur-/HTTP-Prüfungen und die dreizehn gezielten Quellenkorrekturen sind keine Vollfreigabe. Weiter zu prüfen: themenspezifische Normenstände, generische Quellenlabels, nicht belegte Praxisfälle, rechtliche Aktualisierungen und konkrete Kostenbezüge. Kein pauschaler Rechts-/Normen-/Preisnachtrag.
 
 ## Vor der Bestandsübernahme bestätigter Live-Stand
 
 Tagesdeployment 38345770008 für 1e3af8bd2baf6e2f287a1dd1657fad5117871901 abgeschlossen mit success. Alle103 aktuellen kanonischen Content-Routen HTTP200, korrekterCanonical, keinNoindex. Sieben ältere pending-Websiteprotokolle vom15.–21.09. mit aktuellen Live-Nachweisen ergänzt; keine historischen Prüfzeiten erfunden. Vollständige CSV-Zeilenstruktur erhalten.
+
+## Ergänzende Abdichtungs- und Wasserwegprüfung
+
+Vier weitere tatsächliche Inhaltsänderungen: Flachdachartikel mit ersetzter DIN18531-1:2017-07; Überflutungsartikel mit ersetzter DIN18533-1:2017-07 und nicht belegtem DWA-M382-Nachweis; Balkon-/Terrassenartikel mit differenzierter Bauteilzuordnung und konkreten aktuellen Katalogseiten; Badfugenartikel mit aktueller DIN18534-1:2025-10 und klar gekennzeichnetem A1-Entwurf2026-09.
+
+DIN-Media-Katalogseiten geöffnet und Status/Ersatzvermerke geprüft. DIN18531-1/-5 Ausgaben2025-08, DIN18533-1 Ausgabe2026-06, DIN18534-1 Ausgabe2025-10. A1-Entwurf: Katalogbereitstellung07.08.2026, Ausgabemonat09/2026, kein geltender Ersatz. Keine kostenpflichtigen Volltexte als eingesehen ausgegeben; keine neuen Grenzwerte erfunden.
+
+DWA-Regelwerksliste Stand01.10.2026 geöffnet; der behauptete M382-Titel nicht belegt. Tatsächlicher DWA-Rückstau-Flyer vollständig geöffnet und gelesen: Rückstau kann auch ohne Regen auftreten; örtlicher Höhenbezug statt Rohr-Einmündung. Wasserdruckrichtung und Aussagegrenzen des Feuchtebilds präzisiert. Pauschale Sofort-Leerpump-Empfehlung ersetzt durch fachliche Sicherheitsbewertung. Die Warnung des Landkreises Verden ist über den aktuellen offiziellen Suchindex nachgewiesen; direkter Seitenabruf403. Kein vollständiger Seitenabruf behauptet, keine aktuelle Lage erfunden.
+
+URLs:
+- https://www.dinmedia.de/de/norm/din-18531-1/391197155
+- https://www.dinmedia.de/de/norm/din-18531-5/391197608
+- https://www.dinmedia.de/de/norm/din-18533-1/399850897
+- https://www.dinmedia.de/de/norm/din-18534-1/391755876
+- https://www.dinmedia.de/en/draft-standard/din-18534-1-a1/404186525
+- https://de.dwa.de/files/_media/content/05_PUBLIKATIONEN/DWA-Regelwerk/1_Gesamtliste%20DWA-Regelwerk.pdf
+- https://www.dwa-bw.de/files/_media/content/PDFs/LV_Baden-Wuerttemberg/Homepage/BW-Dokumente/Homepage%202013/Publikationen/Flyer%20R%C3%BCckstau_Muster.pdf
+- https://www.landkreis-verden.de/portal/seiten/hochwasser-im-landkreis-verden-901001899-20600.html
