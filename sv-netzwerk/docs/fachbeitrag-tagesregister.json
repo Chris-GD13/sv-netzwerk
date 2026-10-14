@@ -399,9 +399,12 @@
         "verified_at": "2026-10-14T04:33:08.051Z"
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "reserved",
+        "owner": "codex-linkedin-20261014-01a1391a",
+        "reserved_at": "2026-10-14T06:37:01.571Z",
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/"
       }
     }
   },
-  "updated_at": "2026-10-14T04:33:08.051Z"
+  "updated_at": "2026-10-14T06:37:01.571Z"
 }
