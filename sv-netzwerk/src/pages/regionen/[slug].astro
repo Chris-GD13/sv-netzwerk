@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ExpertCard from '../../components/platform/ExpertCard.astro';
+import CallToAction from '../../components/CallToAction.astro';
+import { regionalAreas } from '../../data/regions';
+import { experts } from '../../data/experts';
+import { damageTypes } from '../../data/damage-types';
+import { getCollection } from 'astro:content';
+import { filterPublishedKnowledgeItems } from '../../utils/publication';
+export function getStaticPaths(){return regionalAreas.map((area)=>({params:{slug:area.slug},props:{area}}));}
+interface Props { area: (typeof regionalAreas)[number] }
+const { area } = Astro.props;
+const localExperts=experts.filter((expert)=>expert.status==='active' && expert.group==='expert' && area.expertSlugs.includes(expert.slug));
+const localDamage=damageTypes.filter((item)=>area.damageSlugs.includes(item.slug));
+const knowledge=filterPublishedKnowledgeItems((await getCollection('knowledge')).filter((entry)=>entry.data.publication.status==='published'));
+const articles=knowledge.filter((entry)=>area.articles.includes(entry.id));
+const isAdjuster=localExperts.every((expert)=>expert.role==='Regulierer');
+const serviceName=isAdjuster?`Schadenregulierer in ${area.city}`:`Gutachter und Sachverständige in ${area.city}`;
+const schema={'@context':'https://schema.org','@type':'Service',name:serviceName,description:area.lead,serviceType:localExperts.flatMap((expert)=>expert.expertise).join(', '),areaServed:{'@type':'City',name:area.city,containedInPlace:{'@type':'AdministrativeArea',name:area.region}},provider:{'@id':'https://www.sv-netzwerk.eu/#organization'},url:new URL(`/regionen/${area.slug}/`,Astro.site).toString()};
+---
+<BaseLayout title={`${serviceName} | SV-Netzwerk`} description={`${serviceName}: ${localExperts.map((expert)=>expert.name).join(', ')}. Fachkompetenz, Schadenbewertung und Kontakt für Versicherungsnehmer und Versicherer.`} structuredData={schema} breadcrumbs={[{label:'Start',href:'/'},{label:'Standorte und Regionen',href:'/regionen/'},{label:area.city}]}>
+  <section class="sv-section"><div class="sv-container intro"><p class="sv-eyebrow">{area.region} · regionale Fachkompetenz</p><h1>{serviceName}</h1><p class="sv-lead">{area.lead}</p><a class="sv-button sv-button-primary" href="/schaden-melden/">Prüfauftrag für {area.city} anfragen</a></div></section>
+  <section class="sv-section sv-section-alt"><div class="sv-container"><h2>Fachgebiete und Prüfaufträge in {area.city}</h2><p class="regional-focus">{area.focus}</p><div class="expert-grid">{localExperts.map((expert)=><ExpertCard expert={expert}/>)}</div></div></section>
+  <section class="sv-section"><div class="sv-container region-grid"><article class="sv-card"><h2>Für Versicherungsnehmer und Eigentümer</h2><p>Sie möchten einen Schaden aufnehmen oder eine technische Bewertung prüfen lassen? Beschreiben Sie Objekt, Schadenort, Ereignis und die konkrete Frage. Fotos, vorhandene Berichte und Angebote helfen, den Prüfauftrag zu bestimmen.</p><p>Beauftragung, Leistungsumfang und Kosten werden vor der Bearbeitung abgestimmt. Die technische Feststellung ist von einer Versicherungs- oder Haftungsentscheidung zu unterscheiden.</p><a href="/leistungen/schadengutachten/">Schadengutachten und technische Bewertung</a></article><article class="sv-card"><h2>Für Versicherer und Sachbearbeiter</h2><p>Für einen regionalen Prüfauftrag benötigen wir Schadenort, Schadenart, Unterlagenstand und Prüfziel. Fachzuständigkeit, Besichtigung und gewünschte Bearbeitungstiefe werden darauf abgestimmt.</p><p>Bei umfangreichen Fällen werden zusätzliche Disziplinen im Netzwerk auftragsbezogen eingebunden. Eine regionale Zuordnung ist keine Zusage einer sofortigen Vor-Ort-Verfügbarkeit.</p><a href="/leistungen/schadenregulierung-fuer-versicherer/">Schadenregulierung für Versicherer</a></article></div></section>
+  <section class="sv-section sv-section-alt"><div class="sv-container"><h2>Passende Schadenfragen und Fachwissen</h2><p>Die folgenden Bereiche können eine fachliche Beteiligung der hier genannten Experten erfordern. Ob der konkrete Auftrag passt, wird anhand des betroffenen Bauteils und der Fragestellung geprüft.</p><nav class="topic-links" aria-label="Schadenarten in der Region">{localDamage.map((item)=><a href={`/schadenarten/${item.slug}/`}>{item.title}</a>)}</nav><ul>{articles.map((entry)=><li><a href={`/fachwissen/${entry.id}/`}>{entry.data.title}</a></li>)}</ul></div></section>
+  <section class="sv-section"><div class="sv-container intro"><h2>Besichtigung im Ort und Umland abstimmen</h2><p>Nennen Sie die genaue Lage des Schadenobjekts. Die regionale Zuordnung hilft bei der Auswahl des Ansprechpartners; notwendige Untersuchungen, Anfahrt und verfügbare Termine werden vor der Beauftragung geklärt. Für andere Orte finden Sie weitere Fachleute in der <a href="/regionen/">Standortübersicht</a>.</p></div></section>
+  <CallToAction title={`Ansprechpartner für ${area.city} anfragen`} text="Schadenort, betroffene Bauteile und Prüfziel übermitteln. Die Bearbeitung wird fachlich und regional zugeordnet." href="/schaden-melden/" label="Schaden und Prüfauftrag anfragen" />
+</BaseLayout>
+<style>.intro{max-width:78ch}.intro h1{margin-top:0}.regional-focus{max-width:90ch}.region-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sv-space-5)}.sv-card{padding:clamp(1.3rem,2.8vw,2rem)}.expert-grid{max-width:36rem;margin-top:1.5rem}.topic-links{display:flex;flex-wrap:wrap;gap:.75rem;margin-block:1.5rem}.topic-links a{border:1px solid var(--sv-color-line);padding:.7rem 1rem;border-radius:.6rem;text-decoration:none;font-weight:700}.intro .sv-button{white-space:normal}@media(max-width:58rem){.region-grid{grid-template-columns:1fr}}</style>
