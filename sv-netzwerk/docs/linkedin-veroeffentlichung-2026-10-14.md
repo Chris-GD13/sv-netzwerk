@@ -39,4 +39,6 @@ Zusatzbudget 0 USD, tatsächliche Zusatzbildkosten 0 USD. Keine Bild-API, kein B
 
 ## Ablage
 
-Finaltext, Quellenprüfung, Vorschau und zwei Live-Screenshots lokal im outputs-Ordner sowie unter sv-netzwerk/docs/linkedin/2026-10-14/. Dieser Nachweis unter sv-netzwerk/docs/linkedin-veroeffentlichung-2026-10-14.md. Zentrales Tagesregister und ausschließlich heutige CSV-Tagesartikelzeile auf published-verified mit echtem Permalink, Berliner Zeit und Kostenentscheidung ergänzen; redaktionelle Bestandszeilen nicht ändern.
+Finaltext, Quellenprüfung, Vorschau und zwei Live-Screenshots lokal im outputs-Ordner sowie unter sv-netzwerk/docs/linkedin/2026-10-14/. Dieser Nachweis unter sv-netzwerk/docs/linkedin-veroeffentlichung-2026-10-14.md. Zentrales Tagesregister und ausschließlich heutige CSV-Tagesartikelzeile sind auf published-verified mit echtem Permalink, Berliner Zeit und Kostenentscheidung ergänzt; redaktionelle Bestandszeilen unverändert.
+
+Nachweisdokumentation auf main: 36830067e665cf035b29354881f18a16864d73f0, korrigierter unterer Screenshot 71973c6f0f1bd28f1ffdb6cd6ebef244d06e1157. Remote-Readback bestätigte HEAD=origin/main und einen sauberen Worktree. Beide Commits mit [skip ci]; kein eigener Website-Deploy.
