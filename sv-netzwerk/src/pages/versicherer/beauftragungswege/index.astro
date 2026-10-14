@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Digitale Beauftragungswege für Versicherer | SV-Netzwerk" description="Auftrag an das SV-Netzwerk senden oder eine Dienstleister-Verknüpfung über GDV, BiPRO und KUSS abstimmen." breadcrumbs={[{label:'Start',href:'/'},{label:'Versicherer',href:'/versicherer/fuer-wen-wir-taetig-sind/'},{label:'Beauftragungswege'}]}>
+  <section class="sv-section"><div class="sv-container">
+    <p class="sv-eyebrow">Für Versicherer und Auftraggeber</p>
+    <h1>Auftrag senden oder das SV-Netzwerk verknüpfen</h1>
+    <p class="sv-lead">Reichen Sie einen Schadenauftrag mit Unterlagen direkt ein oder stimmen Sie die Aufnahme des SV-Netzwerks in Ihr Dienstleistersystem mit uns ab.</p>
+    <div class="actions"><a class="sv-button sv-button-primary" href="/schaden-melden/">Auftrag mit Unterlagen senden</a><a class="sv-button sv-button-secondary" href="/assets/downloads/auftraggeberprofil-sv-netzwerk.pdf" target="_blank" rel="noopener">Auftraggeberprofil als PDF</a></div>
+    <p>Die automatische Übertragung über GDV, BiPRO oder KUSS setzt eine eingerichtete und freigeschaltete Verbindung zum jeweiligen Auftragssystem voraus. Über das folgende Formular stimmen wir diese Verbindung ab.</p>
+  </div></section>
+  <section class="sv-section sv-section-alt"><div class="sv-container channels">
+    <article class="sv-card"><h2>GDV Schaden-Service</h2><p>Der Schaden-Service verbindet Versicherer und Dienstleister für die elektronische Schadenkommunikation. Eine Freischaltung und die technische Verbindung sind gesondert einzurichten.</p><a href="https://www.gdv-dl.de/services" target="_blank" rel="noopener">Informationen der GDV DL ↗</a></article>
+    <article class="sv-card"><h2>BiPRO</h2><p>BiPRO standardisiert Versicherungsprozesse. Für Schadenprozesse kommen unter anderem der Schadenservice (Norm 503) und die Übermittlung schadenbezogener Geschäftsvorfälle (Norm 430.5) in Betracht. Wir stimmen den benötigten Dienst mit Ihrem Systemverantwortlichen ab.</p><a href="https://bipro.net/ueber-bipro/bipro-normen/" target="_blank" rel="noopener">BiPRO-Normen im Überblick ↗</a></article>
+    <article class="sv-card"><h2>KUSS-ServicePortal</h2><p>Versicherer können im KUSS-ServicePortal freigeschaltete Dienstleister auswählen und beauftragen. Für die Beauftragung des SV-Netzwerks ist die passende Dienstleisterzuordnung erforderlich.</p><a href="https://www.kussgmbh.de/service-portal.html" target="_blank" rel="noopener">Informationen zum KUSS-ServicePortal ↗</a></article>
+  </div></section>
+  <section class="sv-section" id="verknuepfung"><div class="sv-container sv-card form-card">
+    <h2>Dienstleister-Verknüpfung abstimmen</h2>
+    <p>Nennen Sie uns Ihr Auftragssystem und den Ansprechpartner für die Einrichtung. Bitte übermitteln Sie hier keine Kennwörter, Zertifikate oder API-Schlüssel.</p>
+    <p id="link-status" role="status" hidden></p>
+    <form action="/dienstleister-verknuepfung.php" method="post" accept-charset="UTF-8">
+      <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <div class="form-grid">
+        <label>Beauftragungsweg<select name="Beauftragungsweg" required><option value="">Bitte auswählen</option><option>GDV Schaden-Service</option><option>BiPRO</option><option>KUSS-ServicePortal</option><option>Sonstiges Auftragssystem</option></select></label>
+        <label>Versicherer / Unternehmen<input name="Unternehmen" required maxlength="200" /></label>
+        <label>Ansprechpartner<input name="Name" required maxlength="200" autocomplete="name" /></label>
+        <label>E-Mail<input name="E-Mail" type="email" required maxlength="254" autocomplete="email" /></label>
+        <label>Telefon (optional)<input name="Telefon" type="tel" maxlength="80" autocomplete="tel" /></label>
+        <label class="full">Auftragssystem und gewünschte Verknüpfung<textarea name="Nachricht" rows="6" required maxlength="5000" placeholder="Welches System nutzen Sie, und wer betreut die Einrichtung der Dienstleisterverbindung?"></textarea></label>
+        <label class="full check"><input type="checkbox" name="Datenschutz" value="akzeptiert" required /><span>Ich stimme der Verarbeitung meiner Angaben zur Bearbeitung dieser Anfrage gemäß der <a href="/datenschutzerklaerung/">Datenschutzerklärung</a> zu.</span></label>
+      </div>
+      <button class="sv-button sv-button-primary" type="submit">Verknüpfung anfragen</button>
+    </form>
+  </div></section>
+</BaseLayout>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const channels: Record<string, string> = {gdv:'GDV Schaden-Service',bipro:'BiPRO',kuss:'KUSS-ServicePortal'};
+  const select = document.querySelector<HTMLSelectElement>('select[name="Beauftragungsweg"]');
+  const channel = params.get('kanal') ?? '';
+  if (select && Object.hasOwn(channels, channel)) select.value = channels[channel];
+  const status = document.querySelector<HTMLParagraphElement>('#link-status');
+  if (status && (params.get('gesendet') === '1' || params.has('fehler'))) {
+    status.hidden = false;
+    status.textContent = params.get('gesendet') === '1' ? 'Ihre Anfrage wurde übermittelt. Die technische Verknüpfung wird gesondert abgestimmt.' : 'Die Anfrage konnte nicht vollständig übermittelt werden. Bitte kontaktieren Sie uns unter info@sv-netzwerk.eu.';
+  }
+</script>
+
+<style>
+  .actions{display:flex;flex-wrap:wrap;gap:.75rem;margin:1.5rem 0}
+  .channels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5rem}
+  .sv-card{padding:clamp(1.4rem,3vw,2rem)}
+  .form-card{max-width:60rem}
+  #verknuepfung{scroll-margin-top:8rem}
+  .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-bottom:1.5rem}
+  label{display:grid;gap:.5rem;font-weight:800}
+  input,select,textarea{width:100%;padding:.8rem;border:1px solid var(--sv-color-line);border-radius:.6rem;background:white}
+  .full{grid-column:1/-1}.check{display:flex;gap:.7rem;align-items:flex-start}.check input{width:auto;margin-top:.3rem}
+  .hp-field{position:absolute;left:-100vw;width:1px;height:1px;opacity:0}
+  #link-status{padding:1rem;border:1px solid var(--sv-color-line);border-radius:.6rem}
+  @media(max-width:58rem){.channels,.form-grid{grid-template-columns:1fr}}
+</style>

@@ -16,6 +16,25 @@ import { insurerClients } from '../../../data/insurer-clients';
       <p>Die Tätigkeit erfolgt je nach Beauftragung unmittelbar für Versicherer oder mittelbar über Regulierungsunternehmen, Sachverständigenorganisationen und weitere beauftragte Partner. Der konkrete Leistungsumfang richtet sich nach Schadenart, Auftragsziel und erforderlicher Bearbeitungstiefe.</p>
       <p class="intro-partner-label">Direkte und mittelbare Beauftragungswege bestehen unter anderem über:</p>
       <img class="intro-partner-logo" src="/assets/images/partners/die-regulierer.png" alt="Logo Die Regulierer" width="240" height="80" loading="lazy" />
+      <div class="entry-actions">
+        <a class="sv-button sv-button-primary" href="/schaden-melden/">Auftrag mit Unterlagen senden</a>
+        <a class="sv-button sv-button-secondary" href="/versicherer/beauftragungswege/">GDV, BiPRO und KUSS · Dienstleister verknüpfen</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sv-section sv-section-alt" aria-labelledby="beauftragungswege-title">
+    <div class="sv-container">
+      <div class="section-copy">
+        <p class="sv-eyebrow">Digitale Beauftragung</p>
+        <h2 id="beauftragungswege-title">GDV, BiPRO und KUSS</h2>
+        <p>Sie möchten das SV-Netzwerk in Ihrem Auftragssystem als Dienstleister hinterlegen? Übermitteln Sie uns den gewünschten Beauftragungsweg und Ihren Ansprechpartner. Die Freischaltung und der Datenaustausch werden für Ihr System abgestimmt. Einen einzelnen Auftrag können Sie direkt über unser Schadenformular einreichen.</p>
+      </div>
+      <div class="channel-grid">
+        <article class="sv-card"><h3>GDV Schaden-Service</h3><p>Beauftragung und Schadenkommunikation über die GDV-Dienstleisterverbindung. Die Teilnahme am Schaden-Service wird gesondert abgestimmt.</p><a href="/versicherer/beauftragungswege/?kanal=gdv#verknuepfung">GDV-Verknüpfung anfragen →</a></article>
+        <article class="sv-card"><h3>BiPRO</h3><p>Strukturierter Austausch von Schadendaten und Dokumenten. Der konkrete Dienst und die unterstützten Normen richten sich nach der Anbindung des Versicherers.</p><a href="/versicherer/beauftragungswege/?kanal=bipro#verknuepfung">BiPRO-Anbindung abstimmen →</a></article>
+        <article class="sv-card"><h3>KUSS-ServicePortal</h3><p>Beauftragung über das Dienstleisterportal. Die Zuordnung zum Dienstleisterprofil und die Freischaltung erfolgen im KUSS-System.</p><a href="/versicherer/beauftragungswege/?kanal=kuss#verknuepfung">KUSS-Verknüpfung anfragen →</a></article>
+      </div>
     </div>
   </section>
 
@@ -112,6 +131,10 @@ import { insurerClients } from '../../../data/insurer-clients';
   .intro>p:not(.sv-eyebrow):not(.sv-lead):not(.intro-partner-label){max-width:78ch}
   .intro-partner-label{margin:1.15rem 0 .45rem;font-weight:850;color:var(--sv-color-text)}
   .intro-partner-logo{display:block;max-width:min(100%,15rem);max-height:4rem;width:auto;height:auto;object-fit:contain}
+  .entry-actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}
+  .channel-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sv-space-5)}
+  .channel-grid .sv-card{padding:1.5rem}
+  @media(max-width:50rem){.channel-grid{grid-template-columns:1fr}}
   .section-copy{max-width:76ch;margin-bottom:var(--sv-space-6)}
   .logo-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sv-space-4)}
   .logo-card{display:grid;place-items:center;min-height:6rem;padding:1rem;border:1px solid var(--sv-color-line);border-radius:var(--sv-radius-lg);background:rgba(255,255,255,.78);text-align:center}
