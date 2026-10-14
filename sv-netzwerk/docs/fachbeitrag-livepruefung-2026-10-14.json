@@ -159,6 +159,51 @@
       }
     ]
   },
+  "quality_label_correction": {
+    "deployment_commit": "6e1be607a3b420343cfbcb280b202459e8eb7504",
+    "deployment_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38523729334",
+    "verified_at": "2026-10-14T06:48:14.1724930+00:00",
+    "change_scope": "Nur zwei bestehende Abschnittsüberschriften für die automatisierte Fachbeitragsprüfung präzisiert; keine Sach-, Quellen-, URL-, Reservierungs- oder Bildänderung.",
+    "checks": [
+      {
+        "path": "/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/",
+        "status": 200,
+        "canonical": true,
+        "visible_date": true,
+        "new_headings_visible": true
+      },
+      {
+        "path": "/fachwissen/",
+        "status": 200,
+        "article_visible": true
+      },
+      {
+        "path": "/fachwissen/kategorie/sanierungsplanung-und-baukoordination/",
+        "status": 200,
+        "article_visible": true
+      },
+      {
+        "path": "/fachwissen/tag/sigeko/",
+        "status": 200,
+        "article_visible": true
+      },
+      {
+        "path": "/sitemap-index.xml",
+        "status": 200,
+        "article_in_sitemap_0": true
+      },
+      {
+        "path": "/robots.txt",
+        "status": 200,
+        "sitemap_declared": true
+      },
+      {
+        "path": "/deploy-version.txt",
+        "status": 200,
+        "commit_matches": true
+      }
+    ]
+  },
   "visual_checks": {
     "date": "2026-10-14",
     "method": "browser AX content and screenshots",
