@@ -83,7 +83,7 @@ Die folgenden Prüffragen sind eine sachverständige Ableitung für den Sanierun
 
 Akute Gefährdungen müssen fachkundig gesichert werden. Ein Termin- oder Kostenfreigabetermin rechtfertigt nicht, Beschäftigte oder Gebäudenutzer einem ungeklärten Risiko auszusetzen. Die weitere bauliche Sanierung ist davon getrennt zu planen. Eine Behördenabstimmung im dringlichen Einzelfall ist nicht durch eine allgemeine Behauptung zu ersetzen, Sanierungen seien von Planungspflichten ausgenommen.
 
-## Dokumentation und prüffähige Kostenabgrenzung
+## Dokumentation, versicherungstechnische Einordnung und prüffähige Kostenabgrenzung
 
 Zur Akte gehören das Tätigkeits- und Arbeitgeberverzeichnis, der Bauablauf mit Schnittstellen, Bestellung und Leistungsumfang der Beteiligten, vorhandene Schutzunterlagen sowie datierte Änderungs- und Besprechungsnachweise. Ein Prüfvermerk sollte erkennbar machen, welche Voraussetzung geprüft und welche fachliche Entscheidung noch offen ist. Die Unterlage für spätere Arbeiten nach § 3 Absatz 2 ist außerdem vom aktuellen SiGePlan zu unterscheiden.
 
@@ -91,7 +91,7 @@ Bei einer Rechnung sind Anlass, Tätigkeit, Zeitaufwand und Ergebnis mit dem Auf
 
 Für einen versicherten Gebäudeschaden bleiben technische Erforderlichkeit, Auftrag und Vertragsdeckung eigene Prüffelder. Die BaustellV begründet keine automatische Erstattung durch einen Versicherer. Allgemeine Baumaßnahmen ohne belegten Schadenbezug werden dadurch nicht zu Versicherungsleistungen. Ergänzend erläutert der Beitrag zur [Regiekostenprüfung](/fachwissen/regiekosten-schadenregulierung-abgrenzung/) die leistungsbezogene Nachweisführung.
 
-## Fiktive Prüfsituation: Getrennte Firmen, gemeinsamer Zugang
+## Fiktives Praxisbeispiel: Getrennte Firmen, gemeinsamer Zugang
 
 Ein ausdrücklich fiktives Beispiel: Ein Bestandsgebäude wird baulich saniert. Rückbau, Elektroarbeiten und Wiederherstellung übernehmen verschiedene Unternehmen. Sie kommen überwiegend nacheinander. Nach dem Rückbau bleibt eine Öffnung im Verkehrsbereich zurück; außerdem wird ein Gebäudeteil weiter genutzt. Das Angebot enthält eine Position „Bauleitung und Sicherheit“ ohne Aufgabenbeschreibung.
 

@@ -15,6 +15,7 @@
 - Lenna Maria Walczok gemäß belegten Fachgebieten in die Profilrotation aufgenommen; keine behauptete Mitautorenschaft.
 - Aktuellen amtlichen Verordnungstext von alten RAB-Tabellen unterschieden; gesetzliche Pflichten, konkrete Aufträge und Kostendeckung getrennt.
 - Library, interne Links, Such-/Sitemap-Datenbasis, CSV und separater LinkedIn-Text vorbereitet; LinkedIn prepared-not-posted.
+- Bestehende Abschnitte für die automatisierte Qualitätsprüfung eindeutig als versicherungstechnische Einordnung und fiktives Praxisbeispiel benannt; keine Sach-, Quellen-, URL- oder Tagesregisteränderung.
 
 ## 2026-10-13 – Bestandskorrekturen zu Arbeitsschutz und Quellen
 
