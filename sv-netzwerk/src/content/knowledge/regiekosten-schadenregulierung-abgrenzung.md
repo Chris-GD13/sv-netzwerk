@@ -12,11 +12,11 @@ linkedinSummary: "Regiekosten im Schadenfall brauchen einen konkreten Leistungsn
 cta:
   label: "Fachliche Prüfung für Versicherer anfragen"
   href: "/versicherer/#anfrage"
-relatedLinks: ["/schaden-melden/", "/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/", "/fachwissen/prueffaehige-dokumentation/", "/fachwissen/schadenabgrenzung/", "/gutachter-plattform/"]
+relatedLinks: ["/schaden-melden/", "/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/", "/fachwissen/prueffaehige-dokumentation/", "/fachwissen/schadenabgrenzung/", "/gutachter-plattform/", "/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/"]
 damageTypes: ["gebaeude", "leitungswasser", "brand"]
 publication:
   publishedAt: 2026-09-09
-  updatedAt: 2026-10-09
+  updatedAt: 2026-10-14
   status: published
 seo:
   title: "Regiekosten: Bedeutung, Nachweise und Prüfung im Schadenfall"
@@ -51,7 +51,7 @@ Zu prüfen sind außerdem Doppelberechnungen: Koordiniert der Generalunternehmer
 
 Ein belastbarer Regienachweis nennt Datum, Ort, Beteiligte, Anlass, Tätigkeit, Dauer und Ergebnis. „Baustellenbetreuung“ genügt nicht. Besser ist etwa: „Besprechung zur Trennung von Nass- und Trockenbereichen, Prüfung der Trocknungszugänge, Abstimmung mit Elektrofachkraft, 1,5 Stunden“. Ein Stundenbericht sollte die zugehörige Schadenposition oder das Protokoll verlinken.
 
-Bei Pauschalen ist eine Aufschlüsselung nach Leistungsphasen erforderlich. Dazu gehören Gefahrenabwehr, Ursachenklärung, Rückbauplanung, Trocknungssteuerung, Wiederherstellung und Abnahme. So wird sichtbar, ob eine Leistung bereits in einer Fachfirma enthalten ist oder ob sie eine eigenständige, schadenbezogene Koordination darstellt.
+Bei Pauschalen sind vereinbartes Leistungsbild und tatsächlich erbrachte Aufgaben abzugleichen. Eine Aufschlüsselung nach Gefahrenabwehr, Ursachenklärung, Rückbauplanung, Trocknungssteuerung und Wiederherstellung kann die Schadenprüfung unterstützen. Eine wirksam vereinbarte Pauschalvergütung wird dadurch nicht automatisch zur Stundenlohnabrechnung. Die Nachweistiefe folgt aus Vertrag und Prüfgegenstand; ein fehlender Stundenbericht allein beweist bei einer Pauschale keine fehlende Leistung.
 
 ## Konkrete Prüffragen
 
@@ -122,11 +122,18 @@ Als Mindestbestand sollten Auftrag, Leistungsbeschreibung, Tages- oder Stundenbe
 
 ## Quellen und weiterführende Hinweise
 
+### Vergütung und Rollenabgrenzung, geprüft am 14.10.2026
+
+[§ 632 Absatz 2 BGB](https://www.gesetze-im-internet.de/bgb/__632.html) nennt die taxmäßige beziehungsweise übliche Vergütung, wenn die Höhe nicht bestimmt ist. Diese Regel ersetzt keinen vereinbarten Preis und macht einen Schadenprüfwert nicht zum allgemeinen Vertragstarif. Praktisch sind Vergütungsform, abgegoltene Aufgaben, zusätzliche Bestellung und Leistungsnachweise getrennt festzuhalten. Fehlende Unterlagen begründen eine konkrete Rückfrage; ein Anspruchsverlust darf daraus nicht ohne Prüfung abgeleitet werden.
+
+Die [BaustellV, §§ 3 bis 5](https://www.gesetze-im-internet.de/baustellv/BJNR128300998.html), trennt Koordinatorbestellung, Bauherrenverantwortung und Arbeitgeberpflichten. Eine Koordinationsrechnung belegt keine automatische Bestellung zum SiGeKo. Unterschiedliche beauftragte Aufgaben sind nicht allein wegen eines gemeinsamen Besprechungstermins identisch. Der [Fachbeitrag zu Sanierungsbaustellen](/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/) erläutert diese Prüfung.
+
+Status: geltende amtliche Texte, am 14.10.2026 gelesen. BaustellV ausgewiesener Änderungsstand 17.12.2025; Abrufdatum ist kein neuer Geltungsbeginn. Keine neue Rechtsprechung oder verbindliche Preisliste behauptet.
+
 - § 82 VVG, Schadenminderung: https://www.gesetze-im-internet.de/vvg_2008/__82.html
 - § 86 VVG, Übergang von Ersatzansprüchen: https://www.gesetze-im-internet.de/vvg_2008/__86.html
-- HOAI, Verordnung über die Honorare für Architekten- und Ingenieurleistungen: https://www.gesetze-im-internet.de/haoi_2013/
-- Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen, Bauwesen: https://www.bmwsb.bund.de/Webs/BMWSB/DE/themen/bauen/bauen-node.html
-- VDI, Richtlinien und technische Gebäudeausrüstung: https://www.vdi.de/richtlinien
+- § 632 BGB, Vergütung; konkrete Anwendbarkeit im vorstehenden Nachtrag: https://www.gesetze-im-internet.de/bgb/__632.html
+- BaustellV, Rollen und Arbeitgeberpflichten; keine Vergütungsvorschrift: https://www.gesetze-im-internet.de/baustellv/BJNR128300998.html
 
 ## Fachliche Prüfung für Ihre Schadenakte
 

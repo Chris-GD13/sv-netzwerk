@@ -1,3 +1,10 @@
+## 2026-10-14 – Vier Quellenpräzisierungen zu Kosten- und Vertragsprüfung
+
+- §83VVG und damalige Erkenntnislage von späterem Maßnahmenerfolg getrennt; unbestätigtes Praxisbeispiel als fiktiv gekennzeichnet.
+- Pauschalvergütung von Stundenabrechnung unterschieden; konkrete Rollen-/Vergütungsquellen statt allgemeiner Übersichtslinks.
+- Anwendungsbereich von Nachtragsanordnung, Urkalkulation, Schlussrechnungsprüfung und Kostenanschlag präzisiert.
+- Zwei bestehende Marktstandabsätze ohne Änderung bestätigt; nur geänderte Artikel erhalten updatedAt14.10.2026. Vollprüfung des übrigen Archivs bleibt offen.
+
 ## 2026-10-14 – Sanierungsbaustellen und Verantwortlichkeiten
 
 - Genau einen Tagesartikel unter atomarer Reservierung ergänzt: Voraussetzungen für Koordinator, SiGePlan, Vorankündigung und Ein-Arbeitgeber-Unterrichtung getrennt.

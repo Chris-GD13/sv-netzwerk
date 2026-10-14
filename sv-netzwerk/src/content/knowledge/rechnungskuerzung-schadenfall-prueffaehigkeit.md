@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-15
-  updatedAt: 2026-10-12
+  updatedAt: 2026-10-14
   status: published
 seo:
   title: "Rechnungskürzungen im Schadenfall prüfen"
@@ -67,6 +67,12 @@ Die technische Plausibilität einer Position ist keine Deckungszusage. Ob Kosten
 
 ## Anforderungen an die prüffähige Kostenprüfung
 
+### Vertragliche Prüffähigkeit und KVA-Überschreitung, geprüft am 14.10.2026
+
+Bei einem Bauvertrag verlangt [§ 650g Absatz 4 BGB](https://www.gesetze-im-internet.de/bgb/__650g.html) eine für den Besteller nachvollziehbare Schlussrechnung und die weiteren gesetzlichen Fälligkeitsvoraussetzungen. Erhebt der Besteller innerhalb von 30 Tagen nach Zugang keine begründeten Einwendungen gegen die Prüffähigkeit, gilt die Rechnung als prüffähig. Diese Regel ist nicht mit einer Anerkennung jeder Menge, jedes Preises oder der Versicherungsdeckung gleichzusetzen. Zugang beim Besteller und Zugang beim Versicherer sind getrennt festzuhalten; die interne Versicherungsprüfung verlängert diese Frist nicht automatisch.
+
+[§ 649 BGB](https://www.gesetze-im-internet.de/bgb/__649.html) betrifft einen dem Vertrag zugrunde gelegten Kostenanschlag ohne Gewähr für seine Richtigkeit. Ist eine wesentliche Überschreitung zu erwarten, ist sie dem Besteller unverzüglich anzuzeigen. Daraus folgt weder eine feste Prozentgrenze noch die Gleichsetzung eines unverbindlichen Kostenanschlags mit einem garantierten Festpreis. Die Vereinbarung ist vor einer Kürzung zu prüfen. Beide amtlichen Einzelnormen wurden am 14.10.2026 gelesen. Status: geltendes Recht, keine neue Gerichtsentscheidung; Prüfdatum ist kein erfundener Geltungsbeginn. Praktischer Nutzen: begründete Prüffähigkeitseinwendungen, materielle Rechnungsprüfung und Deckungsentscheidung separat dokumentieren.
+
 Prüffähig ist eine Rechnung, wenn jede Position mit Menge, Einheit, Preis, Leistungsbeschreibung und Schadenbezug erkennbar ist. Zuschläge, Fahrtkosten, Entsorgung und Regiestunden sind nicht automatisch unzulässig, müssen aber sachlich begründet und dürfen nicht doppelt angesetzt werden.
 
 ## Fiktives Praxisbeispiel
@@ -89,6 +95,6 @@ Eine belastbare Rechnungskürzung ist kein pauschaler Prozentabzug. Sie entsteht
 
 ## Quellen und weiterführende Hinweise
 
-- [Quelle 1](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – offizieller Bezug zum jeweiligen Prüffeld.
-- [Quelle 2](https://www.gesetze-im-internet.de/vvg_2008/__86.html) – fachliche oder sicherheitsbezogene Einordnung.
-- [Quelle 3](https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR.html) – gesetzlicher beziehungsweise technischer Rahmen.
+- [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – Schadenabwendung und Schadenminderung, keine allgemeine Rechnungskürzungsregel.
+- [§ 650g Absatz 4 BGB](https://www.gesetze-im-internet.de/bgb/__650g.html) – Prüffähigkeit der Schlussrechnung beim Bauvertrag; konkreter Bezug im Nachtrag.
+- [§ 649 BGB](https://www.gesetze-im-internet.de/bgb/__649.html) – Kostenanschlag und Anzeige erwarteter wesentlicher Überschreitungen.

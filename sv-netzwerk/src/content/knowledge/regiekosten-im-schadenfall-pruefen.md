@@ -17,7 +17,7 @@ relatedLinks: ["/leistungen/", "/fachwissen/", "/kontakt/"]
 damageTypes: ["leitungswasser", "brand", "sturm-hagel", "gewerbe-industrie"]
 publication:
   publishedAt: 2026-07-16
-  updatedAt: 2026-08-09
+  updatedAt: 2026-10-14
   status: published
 seo:
   title: "Regiekosten im Schadenfall: Nachweise korrekt prüfen"
@@ -135,7 +135,7 @@ Vor der Freigabe ist deshalb zu prüfen, ob eine Regieleistung bereits in einer 
 
 ## Praxisbeispiel: Sofortmaßnahmen nach Leitungswasserschaden
 
-Nach einem Leitungswasserschaden in einem Mehrfamilienhaus wurde ein Sanierungsdienstleister mit Wasseraufnahme, Sicherung des Inventars und Vorbereitung der technischen Trocknung beauftragt. Die erste Rechnung enthielt umfangreiche Regiestunden für Räumarbeiten, Demontage, Fahrten und Projektleitung.
+Ein ausdrücklich fiktives Prüfbeispiel: Nach einem Leitungswasserschaden in einem Mehrfamilienhaus wird ein Sanierungsdienstleister mit Wasseraufnahme, Sicherung des Inventars und Vorbereitung der technischen Trocknung beauftragt. Die erste Rechnung enthält umfangreiche Regiestunden für Räumarbeiten, Demontage, Fahrten und Projektleitung. Das folgende Beispiel behauptet keinen tatsächlich bearbeiteten Schadenfall.
 
 Die Prüfung ergab, dass mehrere Stundenlohnzettel nur die Sammelbezeichnung „Schadenbearbeitung“ enthielten. Gleichzeitig waren in einem späteren Pauschalangebot bereits Baustelleneinrichtung, Schutzmaßnahmen und Teilbereiche der Demontage enthalten. Für einen eingesetzten Nachunternehmer lag zunächst nur eine Weiterberechnung ohne Ursprungsrechnung vor.
 
@@ -179,7 +179,7 @@ Besonders hilfreich ist es, offene Punkte nicht erst am Ende zu sammeln, sondern
 
 Werden diese Punkte frühzeitig benannt, können Dienstleister fehlende Angaben meist ohne größeren Aufwand ergänzen. Das reduziert Rückfragen, verkürzt Durchlaufzeiten und verhindert, dass pauschale Kürzungen allein wegen Zeitdrucks ausgesprochen werden.
 
-Für eine faire und rechtssichere Entscheidung sollte außerdem zwischen **nicht nachgewiesen**, **nicht erforderlich** und **nicht schadenbedingt** unterschieden werden. Diese drei Bewertungsgründe führen zwar jeweils zu einer Kürzung oder Zurückstellung, haben aber unterschiedliche fachliche und kommunikative Konsequenzen im Prüfprozess. Ein nicht nachgewiesener Aufwand kann häufig durch Belege nachträglich geklärt werden. Ein nicht erforderlicher Aufwand bleibt dagegen selbst bei vollständiger Dokumentation regelmäßig nicht freigabefähig. Ein nicht schadenbedingter Aufwand ist dem eigentlichen Schadenereignis zu entkoppeln und separat zu behandeln.
+Für eine faire Entscheidung sollte zwischen **nicht nachgewiesen**, **nicht gerechtfertigt** und **nicht schadenbedingt** unterschieden werden. Ein fehlender Nachweis kann häufig nachgereicht werden. Ein nach dem maßgeblichen rechtlichen Prüfmaßstab nicht gerechtfertigter Aufwand wird durch Dokumentation nicht automatisch erstattungsfähig. Bei Schadenminderungsaufwendungen ist allerdings die damalige Erkenntnislage und nicht allein der spätere Erfolg entscheidend. Nicht schadenbedingter Aufwand ist gesondert zu behandeln; die jeweilige Begründung muss im Prüfvermerk erkennbar bleiben.
 
 ## Fazit
 
@@ -190,6 +190,12 @@ Eine sachgerechte Prüfung würdigt den notwendigen Aufwand, ohne unklare oder d
 Weitere Informationen zur fachlichen Begleitung komplexer Schadenfälle finden sich unter [Leistungen](/leistungen/) und in der [Fachwissensbibliothek](/fachwissen/). Eine konkrete Prüfungsanfrage kann über den [Kontakt](/kontakt/) übermittelt werden.
 
 ## Quellen und weiterführende Hinweise
+
+### Rechtliche Präzisierung vom 14.10.2026: Erfolglosigkeit allein trägt keine Kürzung
+
+[§ 83 Absatz 1 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html) betrifft Aufwendungen des Versicherungsnehmers nach § 82 Absatz 1 und 2, die er den Umständen nach für geboten halten durfte; auch erfolglose Maßnahmen können erfasst sein. Das ist keine Blankofreigabe einer Dienstleisterrechnung. Für die Prüfung sind damalige Erkenntnisse, etwaige Weisungen, Maßnahme und Betrag festzuhalten. Ausbleibender Erfolg allein macht den Aufwand nicht rückblickend unberechtigt. Bauvertragsvergütung gegenüber dem Auftragnehmer und Aufwendungsersatz gegenüber dem Versicherer sind getrennte Ansprüche.
+
+Die genannten Bauvertragsregeln setzen ihren Anwendungsbereich voraus: [§ 650a BGB](https://www.gesetze-im-internet.de/bgb/__650a.html) betrifft auch Wiederherstellung und bestimmte wesentliche Instandhaltungsleistungen, nicht automatisch jeden Dienstleistungsauftrag. Beide amtlichen Normtexte wurden am 14.10.2026 gelesen. Status: geltendes Recht, kein Entwurf und keine neue Gerichtsentscheidung. Praktische Bedeutung: Entscheidungsgrundlage zum Maßnahmenzeitpunkt sichern sowie Vertragsparteien und Ansprüche getrennt prüfen. Die [Abgrenzung von SiGeKo und Bauleitung](/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/) ergänzt die Rollenprüfung, ersetzt aber keine Beauftragung.
 
 1. Bürgerliches Gesetzbuch (BGB), § 631 Vertragstypische Pflichten beim Werkvertrag, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__631.html
 2. Bürgerliches Gesetzbuch (BGB), § 634 Rechte des Bestellers bei Mängeln, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__634.html
