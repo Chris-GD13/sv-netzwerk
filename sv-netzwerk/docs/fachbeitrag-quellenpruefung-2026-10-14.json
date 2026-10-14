@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-14",
+  "review_type": "four targeted individual corrections, two source fields checked without change; not full archive clearance",
+  "changes": {
+    "regiekosten-im-schadenfall-pruefen": {
+      "old_sha256": "c184919585cd602911f72f7d89d3559783baac7cda4b08f8e721ab53e4181d64",
+      "new_sha256": "e0880d667b508eecb6f6ccfbb5d43e3f87097065b1f3eb53dc5a9a86446efff8",
+      "scope": "targeted individual legal/cost correction; not full article or archive clearance"
+    },
+    "regiekosten-schadenregulierung-abgrenzung": {
+      "old_sha256": "ec37b01989de3287c19b29cc60d925ec94eeff992320ec1f6301cfc4e9113805",
+      "new_sha256": "0e40b911d57b40edc267aab7b8b5bfd5feff3308a971acf08279e037db65fd77",
+      "scope": "targeted individual legal/cost correction; not full article or archive clearance"
+    },
+    "rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug": {
+      "old_sha256": "7aec73fdef88bac7073930554d6040dec178bfcb1c832d40cbae3cad15370443",
+      "new_sha256": "bb058e9a77cba3edd93b51e23859ac765eaa629b41314c38d0ed974a5ee12012",
+      "scope": "targeted individual legal/cost correction; not full article or archive clearance"
+    },
+    "rechnungskuerzung-schadenfall-prueffaehigkeit": {
+      "old_sha256": "df20d0fe3cd762f32fb1a1fef1ff132ac01076726d122ed1bfa2bbbff0f36de2",
+      "new_sha256": "0794722a92d0f5d4860ec527db008b7b9aa8894f350f0b6938418dbf81f36212",
+      "scope": "targeted individual legal/cost correction; not full article or archive clearance"
+    }
+  },
+  "reviewed_without_change": {
+    "rechnungs-kva-pruefung-freigabe-schadenfall": {
+      "sha256": "18dcfe784080683578ac31d1fa61a2a6aad0bd36ef876389821a3af4c4a9d2a9",
+      "scope": "existing Destatis market paragraph only",
+      "source": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_360_61261.html",
+      "status": "checked-without-content-change"
+    },
+    "schadenreserve-nachvollziehbar-fortschreiben": {
+      "sha256": "a81afaa6ff4b428fc4eec1eb848fb94da164cfbece99a4bd2b41dd9dd8be1efa",
+      "scope": "existing Destatis market paragraph only",
+      "source": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_360_61261.html",
+      "status": "checked-without-content-change"
+    }
+  }
+}

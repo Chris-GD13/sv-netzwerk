@@ -16,6 +16,7 @@ relatedLinks: ["/fachwissen/regiekosten-im-schadenfall-pruefen/", "/fachwissen/p
 damageTypes: ["gebaeude", "leitungswasser", "brand", "sturm"]
 publication:
   publishedAt: 2026-08-21
+  updatedAt: 2026-10-14
   status: published
 seo:
   title: "Rechnungs- und Nachtragsprüfung fachlich trennen"
@@ -47,6 +48,12 @@ Mengenprüfung bedeutet nicht nur, Zahlen in einer Rechnung nachzurechnen. Erfor
 Besonders kritisch sind Positionen, bei denen derselbe Bereich mehrfach in unterschiedlichen Leistungskapiteln auftaucht, etwa bei Rückbau, Schutzabdeckung, Trocknungsvorbereitung und Wiederherstellung. Hier muss geprüft werden, ob tatsächlich unterschiedliche Leistungen vorliegen oder ob Überschneidungen entstehen.
 
 ## Nachträge und geänderte Randbedingungen
+
+### Bauvertragsrecht konkretisieren: Quellenprüfung vom 14.10.2026
+
+Vor Anwendung der [§§ 650b](https://www.gesetze-im-internet.de/bgb/__650b.html) und [650c BGB](https://www.gesetze-im-internet.de/bgb/__650c.html) sind Vertragsart und Leistungsänderung zu klären. [§ 650a BGB](https://www.gesetze-im-internet.de/bgb/__650a.html) beschreibt den Bauvertrag; nicht jeder Dienstleistungsauftrag ist automatisch ein solcher Vertrag. Ein Änderungsbegehren des Bestellers, eine Einigung und eine spätere Anordnung sind getrennte Vorgänge. Die 30-Tage-Regel des § 650b Absatz 2 läuft ab Zugang des Änderungsbegehrens beim Unternehmer und betrifft die Möglichkeit einer Anordnung in Textform bei ausbleibender Einigung; sie ist keine allgemeine Wartefrist für jede einvernehmliche Zusatzleistung.
+
+§ 650c behandelt Mehr- oder Minderaufwand infolge einer solchen Anordnung. Neben tatsächlich erforderlichen Kosten und angemessenen Zuschlägen enthält Absatz 2 einen Rückgriff auf die vereinbarungsgemäß hinterlegte Urkalkulation mit Vermutung. Daraus folgt keine einheitliche Berechnung für jeden beliebig bezeichneten Nachtrag. Praktisch sind Besteller, Begehren, Zugang, Einigung beziehungsweise Anordnung, Planungsverantwortung und Preisgrundlage zu sichern. Eine Freigabe des Versicherers ist nicht ohne Vollmachts- und Vertragsprüfung eine Anordnung des Bestellers. Die amtlichen Texte wurden am 14.10.2026 gelesen: geltendes Recht, kein Entwurf und keine neu verkündete Entscheidung. Vertragsvergütung und Versicherungsdeckung bleiben getrennt.
 
 Nicht jeder Nachtrag ist verdächtig, aber auch nicht jeder Nachtrag ist automatisch gerechtfertigt. Fachlich zu unterscheiden ist, ob sich der Schadenumfang erst im Baufortschritt gezeigt hat, ob zusätzliche Schutz- oder Sicherungsmaßnahmen erforderlich wurden, ob ein freigegebener Leistungsumfang erweitert wurde oder ob lediglich kalkulatorische Lücken nachträglich geschlossen werden sollen.
 
