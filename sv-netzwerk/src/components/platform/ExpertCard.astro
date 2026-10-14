@@ -12,6 +12,7 @@ const imagePosition = expert.imagePosition ?? 'center 24%';
     <p class="sv-eyebrow">{expert.group === 'backoffice' ? 'Backoffice' : (expert.roleLabel ?? expert.role)}</p>
     <h2><a href={`/experten/${expert.slug}/`}>{expert.name}</a></h2>
     <strong>{expert.function}</strong>
+    {expert.location && <p class="expert-location">{expert.location.label}: <a href={`/regionen/${expert.location.slug}/`}>{expert.location.city}</a></p>}
     {!compact && <p>{expert.shortProfile}</p>}
     {!compact && <ul>{expert.expertise.slice(0,4).map((item)=><li>{item}</li>)}</ul>}
     <div class="expert-card__links">

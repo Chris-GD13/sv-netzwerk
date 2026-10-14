@@ -22,6 +22,7 @@ export interface ExpertProfile {
   expertise: string[];
   expertiseDetails?: string[];
   regions: string[];
+  location?: { city: string; slug: string; region: string; label: 'Standort' | 'Region'; sourceUrl?: string };
   qualifications: string[];
   certifications: string[];
   shortProfile: string;

@@ -7,18 +7,27 @@ import ExpertCard from '../../components/platform/ExpertCard.astro';
 import CallToAction from '../../components/CallToAction.astro';
 import { damageTypes } from '../../data/damage-types';
 import { experts } from '../../data/experts';
+import { damageSearchContent } from '../../data/damage-search-content';
+import { getCollection } from 'astro:content';
+import { filterPublishedKnowledgeItems } from '../../utils/publication';
 import type { DamageType } from '../../types/platform';
 export function getStaticPaths(){return damageTypes.map((item)=>({params:{slug:item.slug},props:{item}}));}
 interface Props { item: DamageType }
 const { item } = Astro.props;
-const relatedExperts=experts.filter((expert)=>item.relatedExperts.includes(expert.slug));
+const copy = damageSearchContent[item.slug];
+const relatedExperts=experts.filter((expert)=>expert.status === 'active' && (copy?.experts ?? item.relatedExperts).includes(expert.slug));
+const knowledge = filterPublishedKnowledgeItems((await getCollection('knowledge')).filter((entry) => entry.data.publication.status === 'published'));
+const relatedArticles = knowledge.filter((entry) => (copy?.articles ?? item.relatedKnowledge).includes(entry.id));
+const serviceSchema = {'@context':'https://schema.org','@type':'Service',name:copy?.h1 ?? item.title,description:copy?.description ?? item.description,serviceType:item.title,areaServed:'DE',provider:{'@id':'https://www.sv-netzwerk.eu/#organization'},url:new URL(`/schadenarten/${item.slug}/`,Astro.site).toString()};
 ---
-<BaseLayout title={item.seoTitle} description={item.seoDescription} breadcrumbs={[{label:'Start',href:'/'},{label:'Schadenarten',href:'/schadenarten/'},{label:item.shortTitle}]}>
-  <Hero compact eyebrow="Kompetenzbereich" title={item.title} text={item.description} primaryLabel="Schaden melden" primaryHref="/schaden-melden/" secondaryLabel="Experten" secondaryHref="/experten/" />
+<BaseLayout title={copy?.title ?? item.seoTitle} description={copy?.description ?? item.seoDescription} structuredData={serviceSchema} breadcrumbs={[{label:'Start',href:'/'},{label:'Schadenarten',href:'/schadenarten/'},{label:item.shortTitle}]}>
+  <Hero compact eyebrow="Gutachten und technische Schadenbewertung" title={copy?.h1 ?? item.title} text={copy?.intro ?? item.description} primaryLabel="Schaden prüfen lassen" primaryHref="/schaden-melden/" secondaryLabel="Experten in Ihrer Region" secondaryHref="/regionen/" />
+  {copy && <section class="sv-section"><div class="sv-container audience-grid"><article class="sv-card"><h2>{copy.insuredTitle}</h2><p>{copy.insured}</p><a href="/leistungen/schadengutachten/">Schadengutachten und Prüfauftrag</a></article><article class="sv-card"><h2>{copy.insurerTitle}</h2><p>{copy.insurer}</p><a href="/leistungen/schadenregulierung-fuer-versicherer/">Schadenregulierung für Versicherer</a></article></div></section>}
   <section class="sv-section"><div class="sv-container"><SectionHeader eyebrow="Schadenpraxis" title="Typische Schadenbilder"/><div class="sv-grid sv-grid-3">{item.typicalLosses.map((text,index)=><FeatureCard index={String(index+1).padStart(2,'0')} title={text} text={`Die konkrete Bewertung erfolgt anhand von Ursache, Konstruktion, Ausdehnung und dokumentiertem Zustand.`}/>)}</div></div></section>
   <section class="sv-section sv-section-alt"><div class="sv-container"><SectionHeader eyebrow="Prüfauftrag" title="Fachliche Prüfgegenstände"/><div class="sv-grid sv-grid-3">{item.inspectionTopics.map((text,index)=><FeatureCard index={String(index+1).padStart(2,'0')} title={text} text="Feststellung, Bewertungsgrundlage, Aussagegrenze und Empfehlung werden getrennt ausgewiesen." tone="soft"/>)}</div></div></section>
-  <section class="sv-section"><div class="sv-container links"><div><h2>Verknüpfte Inhalte</h2><p>Fachartikel werden über stabile Kennungen dieser Schadenart zugeordnet.</p></div><nav aria-label="Verknüpfte Inhalte"><a href="/fachwissen/">Fachartikel ({item.relatedKnowledge.length})</a></nav></div></section>
+  <section class="sv-section"><div class="sv-container links"><div><h2>Fachwissen zu {item.title}</h2><p>Diese Beiträge erläutern konkrete Prüffragen und ergänzen die Untersuchung des Schadenfalls.</p></div><nav aria-label="Fachbeiträge zur Schadenart">{relatedArticles.map((entry)=><a href={`/fachwissen/${entry.id}/`}>{entry.data.title}</a>)}<a href="/fachwissen/">Alle Fachartikel</a></nav></div></section>
+  {copy && <section class="sv-section sv-section-alt"><div class="sv-container"><h2>{copy.faqQuestion}</h2><p>{copy.faqAnswer}</p><h3>Gutachter in der Nähe finden</h3><p>Die Fachkompetenz muss zum Schaden passen. In unserer <a href="/regionen/">regionalen Expertenübersicht</a> finden Sie die tatsächlichen Standorte und regionalen Zuordnungen. Besichtigung, Verfügbarkeit und Leistungsumfang werden für den konkreten Schadenort abgestimmt.</p></div></section>}
   {relatedExperts.length>0&&<section class="sv-section sv-section-alt"><div class="sv-container"><SectionHeader eyebrow="Ansprechpartner" title="Passende Experten"/><div class="sv-grid">{relatedExperts.map((expert)=><ExpertCard expert={expert}/>)}</div></div></section>}
   <CallToAction title={`${item.shortTitle}-Schaden strukturiert einordnen`} text="Fotos, zeitlichen Verlauf, Objektangaben und vorhandene Unterlagen für die technische Erstklassifizierung bereitstellen." href="/schaden-melden/" label="Schadenmeldung starten" />
 </BaseLayout>
-<style>.links{display:grid;grid-template-columns:1fr 1fr;gap:3rem}.links nav{display:grid;gap:.7rem}.links a{padding:1rem;border:1px solid var(--sv-color-line);border-radius:.8rem;font-weight:850;text-decoration:none}@media(max-width:42rem){.links{grid-template-columns:1fr}}</style>
+<style>.links{display:grid;grid-template-columns:1fr 1fr;gap:3rem}.links nav{display:grid;gap:.7rem}.links a{padding:1rem;border:1px solid var(--sv-color-line);border-radius:.8rem;font-weight:850;text-decoration:none}.audience-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sv-space-5)}.audience-grid .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}@media(max-width:42rem){.links,.audience-grid{grid-template-columns:1fr}}</style>
