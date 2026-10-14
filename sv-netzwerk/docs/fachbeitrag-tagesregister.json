@@ -384,7 +384,21 @@
         },
         "shortlink": "https://lnkd.in/eHnXGvmv"
       }
+    },
+    "2026-10-14": {
+      "publication_id": "2026-10-14-sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten",
+      "article": {
+        "title": "Sanierungsbaustellen koordinieren: SiGeKo, Bauleitung und Arbeitgeberpflichten trennen",
+        "slug": "sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/",
+        "status": "reserved",
+        "owner": "codex-cloud-20261014-0556",
+        "reserved_at": "2026-10-14T04:00:23.089Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-10-13T06:21:22.475Z"
+  "updated_at": "2026-10-14T04:00:23.089Z"
 }
