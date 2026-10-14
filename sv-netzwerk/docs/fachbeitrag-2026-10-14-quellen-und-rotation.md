@@ -1,0 +1,13 @@
+# Quellen- und Rotationsprüfung 14.10.2026
+
+Master bei Beginn: a42fb5fbabfe04886de1b9d1f01563b0624982dd. Der gemeinsame Publication-Day-Guard wurde mit frisch gelesenem main-Register ausgeführt; eigene atomare Reservierung über GitHub expected_sha bestätigt. Owner codex-cloud-20261014-0556, Tages-ID 2026-10-14-sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten. Keine fehlenden Veröffentlichungstage vom 15.09. bis 13.10.; nur 14.10. zunächst offen.
+
+Profilrotation: Carmen Gohl am 12.10., Claudius Freiberg am 13.10., heute Lenna Maria Walczok. Aktives Repositoryprofil und Live-Profil geprüft: Baucontrolling, Gebäudeschäden, Nachtragsprüfung, SiGeKo, Sanierungsberatung. Keine behauptete Mitautorenschaft oder Fallbestellung. Übrige unberücksichtigte aktive Fachprofile vor der nächsten Themenwahl frisch prüfen.
+
+Quellen: Amtlicher Gesamttext BaustellV einschließlich aktuellem Anhang II, §§2–5 und Übergangsregel §8 gelesen; §8 ArbSchG gelesen; RAB30 PDF Abschnitte3/4 gelesen; RAB31 Abschnitt3 in offizieller BGN-Wiedergabe gelesen und BG-BAU-Titel mit Stand/Veröffentlichung gelesen. BG-BAU-Artikel vom10.03.2021 für Rollenabgrenzung gelesen. BAuA-RAB31-PDF zunächst erreichbar, später403; kein durchgehend vollständiger PDF-Abruf behauptet. Alte RAB31-Tabelle mit überholten Gefahrstoffbegriffen nicht auf den heutigen Rechtsstand übertragen.
+
+Wichtige Datentrennung: BaustellV im amtlichen Text zuletzt geändert17.12.2025 (nicht pauschal weiterhin2022); kein neuer Geltungsbeginn erfunden. RAB30 Stand27.03.2003; RAB31 Stand12.11.2003, BArbBl.3/2004 S59. Alte Erläuterung ersetzt nicht die aktuelle Ein-Arbeitgeber-Unterrichtung nach §2Abs4. Keine fiktiven aktuellen Ereignisse, Messwerte, Preise oder pauschale Deckung. Fiktive Prüfsituation ausdrücklich gekennzeichnet.
+
+LinkedIn in diesem Lauf ausschließlich prepared-not-posted. Tatsächlicher gestriger Parkett-Post wird nicht erneut veröffentlicht: Permalink im frisch gelesenen Tagesregister https://www.linkedin.com/feed/update/urn:li:activity:7515657563250737152/; zugehöriger Live-Nachweis und Rücknahmehistorie erhalten.
+
+Build, Commit und Live-Nachweis werden erst nach tatsächlicher Prüfung im abschließenden Nachweis dokumentiert. Eine Reservierung oder vorbereitete Datei ist kein Veröffentlichungserfolg.
