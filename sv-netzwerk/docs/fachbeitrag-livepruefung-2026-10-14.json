@@ -1,0 +1,62 @@
+{
+  "initial": {
+    "deployment_commit": "8da6ad25fe0ca46dbb95ec972d55ac7f02af1360",
+    "deployment_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38510872325",
+    "checks": [
+      {
+        "path": "/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/",
+        "status": 200,
+        "checked_at": "2026-10-14T04:28:31.310926+00:00",
+        "canonical": "https://www.sv-netzwerk.eu/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/",
+        "noindex": false,
+        "x_robots_tag": "",
+        "visible_date": true,
+        "h1": "Sanierungsbaustellen koordinieren: SiGeKo, Bauleitung und Arbeitgeberpflichten trennen",
+        "expert_link": true
+      },
+      {
+        "path": "/fachwissen/",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/",
+        "status": 200,
+        "checked_at": "2026-10-14T04:28:31.340743+00:00",
+        "missing_slugs": []
+      },
+      {
+        "path": "/search-index.json",
+        "url": "https://www.sv-netzwerk.eu/search-index.json",
+        "status": 200,
+        "checked_at": "2026-10-14T04:28:31.563511+00:00",
+        "missing_slugs": []
+      },
+      {
+        "path": "/sitemap-0.xml",
+        "url": "https://www.sv-netzwerk.eu/sitemap-0.xml",
+        "status": 200,
+        "checked_at": "2026-10-14T04:28:31.392244+00:00",
+        "missing_slugs": [],
+        "wrong_lastmod": []
+      },
+      {
+        "path": "/sitemap-index.xml",
+        "url": "https://www.sv-netzwerk.eu/sitemap-index.xml",
+        "status": 200,
+        "checked_at": "2026-10-14T04:28:31.102213+00:00"
+      },
+      {
+        "path": "/robots.txt",
+        "url": "https://www.sv-netzwerk.eu/robots.txt",
+        "status": 200,
+        "checked_at": "2026-10-14T04:28:38.817911+00:00",
+        "content": "User-agent: *\nAllow: /\nDisallow: /intern/\nSitemap: https://www.sv-netzwerk.eu/sitemap-index.xml\n"
+      },
+      {
+        "path": "/deploy-version.txt",
+        "url": "https://www.sv-netzwerk.eu/deploy-version.txt",
+        "status": 200,
+        "checked_at": "2026-10-14T04:28:38.911658+00:00",
+        "content": "Commit: 8da6ad25fe0ca46dbb95ec972d55ac7f02af1360\nBuild-Zeit: 2026-10-14T04:20:38.959Z\nVersion: Homepage-v5\n"
+      }
+    ]
+  }
+}
