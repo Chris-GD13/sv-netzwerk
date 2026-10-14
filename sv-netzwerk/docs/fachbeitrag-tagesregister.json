@@ -404,7 +404,41 @@
         "reserved_at": "2026-10-14T06:37:01.571Z",
         "article_url": "https://www.sv-netzwerk.eu/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/",
         "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7516024899413417984/",
-        "verified_at": "2026-10-14T06:41:28.191Z"
+        "verified_at": "2026-10-14T06:41:28.191Z",
+        "published_at_berlin": "2026-10-14T08:39:36+02:00",
+        "publication_window_berlin": {
+          "after": "2026-10-14T08:39:36.423+02:00",
+          "before": "2026-10-14T08:39:36.856+02:00"
+        },
+        "publication_time_note": "Exactly one Posten click in the recorded client-side call window; server processing time not separately measured.",
+        "live_checked_at_berlin": "2026-10-14T08:40:47.942+02:00",
+        "verified_at_berlin": "2026-10-14T08:41:28.191+02:00",
+        "profile_url": "https://www.linkedin.com/in/christian-w-156408204/",
+        "text_path": "docs/linkedin/2026-10-14/2026-10-14-sigeko-linkedin.txt",
+        "proof_path": "docs/linkedin-veroeffentlichung-2026-10-14.md",
+        "sources_path": "docs/linkedin/2026-10-14/2026-10-14-linkedin-quellenpruefung.md",
+        "screenshots": [
+          "docs/linkedin/2026-10-14/2026-10-14-linkedin-live.jpg",
+          "docs/linkedin/2026-10-14/2026-10-14-linkedin-link-live.jpg"
+        ],
+        "image_path": null,
+        "image_cost_decision": {
+          "additional_budget_usd": 0,
+          "additional_spend_usd": 0,
+          "model_or_api_called": false,
+          "path": "published-without-image",
+          "note": "Work tariff coverage not verifiable without test; skipped. No suitable explicitly licensed image inventory evidenced. Additional local title card not useful for this technical link post. Published without image or image notice."
+        },
+        "duplicate_check_note": "Personal profile freshly reloaded before text creation and immediately before posting: latest own daily post was Parkett 13.10.; no SiGeKo duplicate by title, topic, date or URL. Own atomic claim and CSV rechecked. Exactly one new own post after submitting.",
+        "website_live_commit": "6aefbd75e8da6794e7d802efe398767bdedb8f4f",
+        "website_live_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38522008533",
+        "article_type": "sachverstaendigenthema",
+        "expert_assignment": {
+          "name": "Lenna Maria Walczok",
+          "profile_url": "https://www.sv-netzwerk.eu/experten/lenna-maria-walczok/",
+          "scope": "Baucontrolling, Sanierungsberatung, SiGeKo; no authorship or actual appointment claimed"
+        },
+        "shortlink": "https://lnkd.in/eXHZFczU"
       }
     }
   },
