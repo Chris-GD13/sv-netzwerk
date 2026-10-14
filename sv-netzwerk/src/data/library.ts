@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Sanierungsbaustellen koordinieren: SiGeKo, Bauleitung und Arbeitgeberpflichten trennen',
+    description: 'Koordinator, Vorankündigung und SiGePlan getrennt prüfen; Verantwortlichkeiten, Schnittstellen und Koordinationsleistungen nachvollziehbar abgrenzen.',
+    href: '/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/',
+    category: 'Sanierungsplanung und Baukoordination',
+    tags: ['Sanierungsbaustelle', 'SiGeKo', 'SiGePlan', 'Baustellenverordnung', 'Bauleitung', 'Arbeitsschutz', 'Leistungsabgrenzung'],
+    date: '2026-10-14',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Parkettoberflächen beurteilen: Beschichtung, Holzfeuchte und Untergrund trennen',
     description: 'Pflegeschicht, Beschichtung, Holz und Untergrund unterscheiden; Untersuchungen und Reparaturgrenzen aus dem betroffenen Aufbau ableiten.',
     href: '/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/',

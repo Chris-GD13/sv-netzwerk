@@ -1,3 +1,10 @@
+## 2026-10-14 – Sanierungsbaustellen und Verantwortlichkeiten
+
+- Genau einen Tagesartikel unter atomarer Reservierung ergänzt: Voraussetzungen für Koordinator, SiGePlan, Vorankündigung und Ein-Arbeitgeber-Unterrichtung getrennt.
+- Lenna Maria Walczok gemäß belegten Fachgebieten in die Profilrotation aufgenommen; keine behauptete Mitautorenschaft.
+- Aktuellen amtlichen Verordnungstext von alten RAB-Tabellen unterschieden; gesetzliche Pflichten, konkrete Aufträge und Kostendeckung getrennt.
+- Library, interne Links, Such-/Sitemap-Datenbasis, CSV und separater LinkedIn-Text vorbereitet; LinkedIn prepared-not-posted.
+
 ## 2026-10-13 – Bestandskorrekturen zu Arbeitsschutz und Quellen
 
 - PR 392; Commit 7f78040dc932677b3fbd7902fcd99e2703b6da3e; Build/Portal-Tests und Deployment 38348010495 success. 20 Live-Routen, sichtbare Aktualisierungen und korrekte SEO-/Such-/Sitemap-Integration geprüft; 13 CSV-Aktualisierungsnachweise vervollständigt.
