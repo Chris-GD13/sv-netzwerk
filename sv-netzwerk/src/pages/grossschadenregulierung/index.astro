@@ -13,13 +13,13 @@ const serviceSchema = {
   url: 'https://www.sv-netzwerk.eu/grossschadenregulierung/',
 };
 ---
-<BaseLayout title="Großschadenregulierung für Versicherer | Großschaden beauftragen" description="Großschadenregulierung für Versicherer mit klaren Eskalationsstufen, strukturierter Kostenprüfung und belastbarer Entscheidungsvorlage." structuredData={serviceSchema} breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Großschadenregulierung'}]}>
+<BaseLayout title="Großschadenregulierer für Versicherer | SV-Netzwerk" description="Großschadenregulierer für komplexe Gebäude- und Sachschäden: technische Schadenbewertung, Kostenprüfung, Reservefortschreibung und Koordination für Versicherer." structuredData={serviceSchema} breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Großschadenregulierung'}]}>
   <section class="sv-section" id="grossschaden-formular">
     <div class="sv-container gross-grid">
       <article class="sv-card form-card">
         <p class="sv-eyebrow">Großschaden</p>
-        <h1>Großschadenregulierung für Versicherer direkt beauftragen</h1>
-        <p class="sv-lead">Schadenlage, Dringlichkeit und Prüfziel übermitteln und die Bearbeitung mit klarem Eskalationsrahmen starten.</p>
+        <h1>Großschadenregulierer für komplexe Versicherungsschäden</h1>
+        <p class="sv-lead">Wir koordinieren die technische Bearbeitung von Groß- und Komplexschäden für Versicherer. Schadenumfang, Maßnahmen, Kosten und Reserveentwicklung werden nachvollziehbar zusammengeführt.</p>
         <h2>Großschaden-Formular</h2>
         {sent && <p class="status success">Der Auftrag wurde übermittelt. Sie erhalten eine Eingangsbestätigung per E-Mail.</p>}
         {error && <p class="status error">Die Übermittlung konnte nicht verarbeitet werden. Bitte Eingaben prüfen.</p>}
@@ -69,7 +69,10 @@ const serviceSchema = {
       </article>
 
       <article class="sv-card">
-        <h2>Einsatzrahmen</h2>
+        <h2>Wann Großschadenregulierer unterstützen</h2>
+        <p>Umfangreiche Brand-, Wasser- oder Elementarschäden können mehrere Gewerke, Fachprüfungen und Beteiligte betreffen. Ein Großschadenregulierer hält die Befunde, erforderlichen Maßnahmen und offenen Entscheidungen in einer gemeinsamen Schadenakte zusammen.</p>
+        <p>Fachzuständigkeit, Vollmacht, Freigaben und Berichtstakt werden auftragsbezogen festgelegt. Die technische Bewertung bleibt von der Deckungsentscheidung des Versicherers getrennt.</p>
+        <h3>Einsatzrahmen</h3>
         <ul>
           <li>Eskalationsstufe und Erstreaktion nach SLA-Vereinbarung</li>
           <li>Schadenort, Schadenart und belastbare Dringlichkeitsbegründung</li>
@@ -111,6 +114,13 @@ const serviceSchema = {
           <li><a href="/fachwissen/schadenabgrenzung/">Fachstandard Schadenabgrenzung</a> und <a href="/fachwissen/">Fachartikel</a> sind direkt eingebunden.</li>
         </ul>
       </article>
+    </div>
+  </section>
+  <section class="sv-section">
+    <div class="sv-container">
+      <h2>Gutachten und Regulierung im Großschaden</h2>
+      <p>Bei komplexen Einzelfällen ergänzen sich <a href="/leistungen/schadengutachten/">Schadengutachten</a>, fachliche Kostenprüfung und koordinierte Regulierung. Für mehrere Schäden aus einem gemeinsamen Ereignis steht das <a href="/leistungen/kumulschadenmanagement/">Kumulschadenmanagement</a> zur Verfügung.</p>
+      <p><a href="/fachwissen/schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung/">Fachwissen zu Vollmacht und Grenzen der Schadenregulierung</a> · <a href="/leistungen/schadenregulierung-fuer-versicherer/">Schadenregulierer für Versicherungen</a></p>
     </div>
   </section>
 </BaseLayout>

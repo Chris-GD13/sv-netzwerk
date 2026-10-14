@@ -1,0 +1,97 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import CallToAction from '../../../components/CallToAction.astro';
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Schadengutachten für Gebäude- und Versicherungsschäden',
+  serviceType: 'Schadengutachten und technische Bewertung von Versicherungsschäden',
+  areaServed: 'DE',
+  provider: { '@id': 'https://www.sv-netzwerk.eu/#organization' },
+  url: 'https://www.sv-netzwerk.eu/leistungen/schadengutachten/',
+};
+---
+
+<BaseLayout
+  title="Schadengutachten und Versicherungsgutachter | SV-Netzwerk"
+  description="Schadengutachten für Gebäude- und Sachschäden: Ursache, Schadenumfang und Wiederherstellungskosten nachvollziehbar bewerten. Sachverständige für Versicherungsschäden."
+  breadcrumbs={[{label:'Start',href:'/'},{label:'Leistungen',href:'/leistungen/'},{label:'Schadengutachten'}]}
+  structuredData={serviceSchema}
+>
+  <section class="sv-section">
+    <div class="sv-container intro">
+      <p class="sv-eyebrow">Sachverständige für Versicherungsschäden</p>
+      <h1>Schadengutachten für Gebäude- und Sachschäden</h1>
+      <p class="sv-lead">Was wurde beschädigt, wodurch ist der Schaden entstanden und welche Wiederherstellung ist erforderlich? Das SV-Netzwerk dokumentiert Befunde, bewertet den Schadenumfang und prüft die zugehörigen Kosten für Versicherer und weitere Auftraggeber.</p>
+      <p>Vom Standort Aalen aus koordinieren wir Einsätze bundesweit nach Aufgabenstellung. Die Auswahl des Sachverständigen richtet sich nach Schadenart, betroffenen Bauteilen und benötigter Fachkompetenz.</p>
+      <a class="sv-button sv-button-primary" href="/schaden-melden/">Schadengutachten anfragen</a>
+    </div>
+  </section>
+
+  <section class="sv-section sv-section-alt">
+    <div class="sv-container grid">
+      <article class="sv-card">
+        <h2>Was ein Schadengutachten klärt</h2>
+        <ul>
+          <li>Schadenbild und Zustand der betroffenen Bauteile</li>
+          <li>Technische Ursache und Zusammenhang mit dem Ereignis</li>
+          <li>Abgrenzung zu Vorschäden, Mängeln und Instandhaltung</li>
+          <li>Reparaturfähigkeit und erforderlicher Wiederherstellungsumfang</li>
+          <li>Nachvollziehbare Zuordnung von Mengen, Leistungen und Kosten</li>
+        </ul>
+        <p>Feststellungen, fachliche Bewertung und offene Fragen werden getrennt ausgewiesen. Fehlende Nachweise werden benannt, damit weitere Untersuchungen gezielt beauftragt werden können.</p>
+      </article>
+      <article class="sv-card">
+        <h2>Versicherungsgutachter und Schadenregulierer</h2>
+        <p>Wer einen Versicherungsgutachter sucht, benötigt einen Sachverständigen mit der passenden Fachkompetenz für den konkreten Versicherungsschaden. Der Gutachter untersucht und bewertet die technischen Tatsachen. Ein Schadenregulierer bearbeitet zusätzlich den Vorgang im vereinbarten Auftrags- und Vollmachtsrahmen.</p>
+        <p>Ein technischer Befund allein ist keine Deckungszusage. Versicherungsumfang, Ersatzpflicht und Freigaben müssen im jeweiligen Auftrag und anhand des Vertrags geklärt werden.</p>
+        <a href="/leistungen/schadenregulierung-fuer-versicherer/">Schadenregulierer für Versicherungen</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="sv-section">
+    <div class="sv-container grid">
+      <article class="sv-card">
+        <h2>Gebäudeschäden fachlich zuordnen</h2>
+        <p>Bei Brand, Leitungswasser, Sturm, Hagel oder Elementarereignissen hängen Prüfverfahren und Wiederherstellungsumfang vom betroffenen Aufbau ab. Sichtbare Spuren, Messwerte, Unterlagen zum Vorzustand und erforderliche Bauteilöffnungen werden fallbezogen zusammengeführt.</p>
+        <p>Für Fenster, Türen, Fassaden, Oberflächen oder schadstoffbelastete Bereiche werden passende Fachkompetenzen eingebunden. Die Qualifikationen und Tätigkeitsfelder sind in den <a href="/experten/">Expertenprofilen</a> beschrieben.</p>
+        <p><a href="/schadenarten/gebaeude/">Gebäudeschäden</a> · <a href="/grossschadenregulierung/">Großschadenregulierung</a> · <a href="/leistungen/rechnungs-und-kva-pruefung/">Rechnungs- und KVA-Prüfung</a></p>
+      </article>
+      <article class="sv-card">
+        <h2>Vom Prüfauftrag zum Gutachten</h2>
+        <ol>
+          <li>Schadenort, Ereignis, Prüfziel und vorhandene Unterlagen abstimmen.</li>
+          <li>Fachzuständigkeit und erforderlichen Besichtigungsumfang festlegen.</li>
+          <li>Befunde sichern und Ursache sowie Schadenumfang bewerten.</li>
+          <li>Maßnahmen und Kosten anhand der Nachweise prüfen.</li>
+          <li>Ergebnis mit begründeten Empfehlungen und offenen Punkten übergeben.</li>
+        </ol>
+        <p>Hilfreich sind Fotos, Schadenbeschreibung, vorhandene Berichte, Pläne sowie Kostenvoranschläge und Rechnungen. Welche Unterlagen zusätzlich benötigt werden, ergibt sich aus dem Prüfziel.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="sv-section sv-section-alt">
+    <div class="sv-container intro">
+      <h2>Fachwissen zur Schadenbewertung</h2>
+      <p>Unsere Fachbeiträge erläutern einzelne Prüffragen aus der Schadenpraxis. Sie ergänzen die fallbezogene Untersuchung und ersetzen keinen Befund am Objekt.</p>
+      <ul>
+        <li><a href="/fachwissen/schadenabgrenzung/">Schadenabgrenzung und technische Bewertung</a></li>
+        <li><a href="/fachwissen/plausibilitaetspruefung-schadenbild-kausalitaet/">Schadenbild, Kausalität und Vorzustand</a></li>
+        <li><a href="/fachwissen/schadenregulierer-versicherungen-technische-pruefung-schadensteuerung/">Technische Prüfung und Schadensteuerung für Versicherungen</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <CallToAction title="Schadengutachten für Ihren Fall anfragen" text="Übermitteln Sie Schadenort, Schadenart und Prüfziel. Vorhandene Unterlagen helfen bei der fachlichen Zuordnung." href="/schaden-melden/" label="Schaden und Prüfauftrag übermitteln" />
+</BaseLayout>
+
+<style>
+  .intro{max-width:75ch;display:grid;gap:1rem}.intro h1,.intro p{margin:0}.intro .sv-button{justify-self:start}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sv-space-5)}
+  .sv-card{padding:clamp(1.3rem,2.8vw,2rem)}
+  ul,ol{display:grid;gap:.55rem;padding-left:1.2rem}
+  @media(max-width:58rem){.grid{grid-template-columns:1fr}}
+</style>
