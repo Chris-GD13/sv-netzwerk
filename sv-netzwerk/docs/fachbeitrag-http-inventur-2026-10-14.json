@@ -1,0 +1,757 @@
+{
+  "checked_at": "2026-10-14T04:44:07.570397+00:00",
+  "scope": "HTTP and SEO availability only; not individual professional source clearance",
+  "count": 107,
+  "failures": [],
+  "checks": [
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/abgrenzung-versicherter-nichtversicherter-schadteil/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/abgrenzung-versicherter-nichtversicherter-schadteil/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/aufmass-fotodokumentation-polycam-pruefffaehig/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/aufmass-fotodokumentation-polycam-pruefffaehig/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/aufzug-wasserschaden-stillsetzung-pruefung-kostenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/aufzug-wasserschaden-stillsetzung-pruefung-kostenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/badfugen-abdichtung-feuchteeintritt-schadenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/badfugen-abdichtung-feuchteeintritt-schadenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/baumsturz-astbruch-sturm-schadenaufnahme-standfestigkeit-vorschaden/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/baumsturz-astbruch-sturm-schadenaufnahme-standfestigkeit-vorschaden/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/bauteiloeffnung-schadenfall-freigabe-beweissicherung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/bauteiloeffnung-schadenfall-freigabe-beweissicherung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/beweissicherung-fotodokumentation-standards/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/beweissicherung-fotodokumentation-standards/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/blitz-ueberspannungsschaden-gebaeudetechnik-pruefen/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/blitz-ueberspannungsschaden-gebaeudetechnik-pruefen/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-mehrere-gebaeude-koordination/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-mehrere-gebaeude-koordination/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-rauch-russ-kontamination-schadenbereiche-sanierungsumfang/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-rauch-russ-kontamination-schadenbereiche-sanierungsumfang/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/eigenleistungen-gebaeudeschaden-stunden-material-nachweis/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/eigenleistungen-gebaeudeschaden-stunden-material-nachweis/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/entsorgungskosten-gebaeudeschaden-nachweis-abgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/entsorgungskosten-gebaeudeschaden-nachweis-abgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fachgrenzen-schadenpruefung-fachplaner/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/fachgrenzen-schadenpruefung-fachplaner/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fachliche-zustaendigkeit-im-schadenfall/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/fachliche-zustaendigkeit-im-schadenfall/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/farbtonabweichung-anstrich-wiederherstellung-schadenfall/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/farbtonabweichung-anstrich-wiederherstellung-schadenfall/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fenster-glasschaden-verglasung-reparaturgrenze/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/fenster-glasschaden-verglasung-reparaturgrenze/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fenster-tueren-kostenvoranschlag-pruefen/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/fenster-tueren-kostenvoranschlag-pruefen/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/flachdachschaden-pruefpfad-windsog-entwaesserung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/flachdachschaden-pruefpfad-windsog-entwaesserung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/flachdachschaden-sturm-starkregen-windsog-abdichtung-entwaesserung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/flachdachschaden-sturm-starkregen-windsog-abdichtung-entwaesserung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/geruchsschaden-ursache-sanierung-erfolgskontrolle/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/geruchsschaden-ursache-sanierung-erfolgskontrolle/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/geruestkosten-gebaeudeschaden-umfang-standzeit-pruefung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/geruestkosten-gebaeudeschaden-umfang-standzeit-pruefung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-3/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-3/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/gutachter-plattform-regional-kumulschaden/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/gutachter-plattform-regional-kumulschaden/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/hagelschaden-dach-fassade-schadenspuren-vorschaden-reparaturfaehigkeit/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/hagelschaden-dach-fassade-schadenspuren-vorschaden-reparaturfaehigkeit/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/heizungswasserschaden-leckage-korrosion-frost-abgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/heizungswasserschaden-leckage-korrosion-frost-abgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/innentueren-schallschutz-pruefwert-einbau-schallwege/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/innentueren-schallschutz-pruefwert-einbau-schallwege/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/interdisziplinaeres-sachverstaendigennetzwerk-gutachter-plattform-schadenregulierung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/interdisziplinaeres-sachverstaendigennetzwerk-gutachter-plattform-schadenregulierung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/katastrophenschaeden-region-management-koordination/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/katastrophenschaeden-region-management-koordination/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/kommunikation-beteiligte-schadenfall-struktur/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/kommunikation-beteiligte-schadenfall-struktur/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/koordination-sachverstaendige-kumulereignis-einsatz/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/koordination-sachverstaendige-kumulereignis-einsatz/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/kumulschaeden-hochwasser-ueberflutung-priorisierung-regulierung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/kumulschaeden-hochwasser-ueberflutung-priorisierung-regulierung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/kumulschaeden-in-der-region-priorisierung-koordination-dokumentation/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/kumulschaeden-in-der-region-priorisierung-koordination-dokumentation/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/kumulschaeden-sturm-hagel-prueffolge-regulierung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/kumulschaeden-sturm-hagel-prueffolge-regulierung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/leckageortung-leitungswasserschaden-messverfahren-suchoeffnungen-ursachenbeweis/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/leckageortung-leitungswasserschaden-messverfahren-suchoeffnungen-ursachenbeweis/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-aalen-sachverstaendiger-aufgaben/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-aalen-sachverstaendiger-aufgaben/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-erstmassnahmen/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-erstmassnahmen/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-leckageortung-pruefstrategie/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-leckageortung-pruefstrategie/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/loeschwasserschaden-kontamination-korrosion-trocknung-sanierungsumfang/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/loeschwasserschaden-kontamination-korrosion-trocknung-sanierungsumfang/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/massenanfall-einzelschaeden-einsatzsteuerung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/massenanfall-einzelschaeden-einsatzsteuerung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/mietausfall-sanierungsdauer-schadenbezug/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/mietausfall-sanierungsdauer-schadenbezug/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/photovoltaikfragmente-brand-landwirtschaft-gewerbehaftpflicht-fremddach/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/photovoltaikfragmente-brand-landwirtschaft-gewerbehaftpflicht-fremddach/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/plausibilitaetspruefung-schadenbild-kausalitaet/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/plausibilitaetspruefung-schadenbild-kausalitaet/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/polycarbonat-stegplatten-hagel-spannungsrisse-montagefehler/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/polycarbonat-stegplatten-hagel-spannungsrisse-montagefehler/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/pv-anlage-hagelschaden-pruefung-kostenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/pv-anlage-hagelschaden-pruefung-kostenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rauchwaermeabzug-brandschaden-funktionspruefung-kostenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/rauchwaermeabzug-brandschaden-funktionspruefung-kostenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rechnungskuerzung-schadenfall-prueffaehigkeit/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/rechnungskuerzung-schadenfall-prueffaehigkeit/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/regiekosten-im-schadenfall-pruefen/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/regiekosten-im-schadenfall-pruefen/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/regiekosten-schadenregulierung-abgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/regiekosten-schadenregulierung-abgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/reservierung-grosser-schadenbestand-methodik/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/reservierung-grosser-schadenbestand-methodik/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rueckbau-brandschaden-fachlich-begrenzen-dokumentieren/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/rueckbau-brandschaden-fachlich-begrenzen-dokumentieren/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rueckstauschaden-im-fitnessstudio-gebaeude-und-inhaltsschaden-trennen/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/rueckstauschaden-im-fitnessstudio-gebaeude-und-inhaltsschaden-trennen/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sachverstaendiger-versicherungsschaeden-aalen-schadenaufnahme/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/sachverstaendiger-versicherungsschaeden-aalen-schadenaufnahme/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sanierungsplanung-rueckbau-trocknung-strategie/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/sanierungsplanung-rueckbau-trocknung-strategie/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenakte-nachvollziehbar-strukturieren/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schadenakte-nachvollziehbar-strukturieren/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenminderung-obliegenheit-sofortmassnahmen-praxis/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schadenminderung-obliegenheit-sofortmassnahmen-praxis/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenregulierer-versicherungen-technische-pruefung-schadensteuerung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schadenregulierer-versicherungen-technische-pruefung-schadensteuerung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenreserve-nachvollziehbar-fortschreiben/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schadenreserve-nachvollziehbar-fortschreiben/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadentrocknung-bautrocknung-schadenziel-messkonzept-erfolgskontrolle/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schadentrocknung-bautrocknung-schadenziel-messkonzept-erfolgskontrolle/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadstoffverdacht-rueckbau-bestandsgebaeude/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schadstoffverdacht-rueckbau-bestandsgebaeude/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schimmel-nach-wasserschaden-ursache-sanierungsumfang-kostenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schimmel-nach-wasserschaden-ursache-sanierungsumfang-kostenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schlagregeneintritt-fassade-fenster-anschluesse-dichtheit-schadenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schlagregeneintritt-fassade-fenster-anschluesse-dichtheit-schadenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schliessanlage-einbruchschaden-austausch-kosten-pruefen/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schliessanlage-einbruchschaden-austausch-kosten-pruefen/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schneedruck-winterschaeden-bewertung-regulierung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schneedruck-winterschaeden-bewertung-regulierung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/starkregen-rueckstau-eintrittswege-rueckstauebene-schadenbereiche/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/starkregen-rueckstau-eintrittswege-rueckstauebene-schadenbereiche/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/stromkosten-technische-trocknung-nachweis/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/stromkosten-technische-trocknung-nachweis/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sturmschaden-windwirkung-vorschaden-abgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/sturmschaden-windwirkung-vorschaden-abgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/tornado-lokale-sturmereignisse-schadenaufnahme/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/tornado-lokale-sturmereignisse-schadenaufnahme/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/waermepumpe-ueberflutung-pruefung-kostenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/waermepumpe-ueberflutung-pruefung-kostenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/wintergarten-schaden-tragwerk-verglasung-entwaesserung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/wintergarten-schaden-tragwerk-verglasung-entwaesserung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/zusammenarbeit-fachplaner-sanierer-schadenfall/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/zusammenarbeit-fachplaner-sanierer-schadenfall/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fenster-tueren-fassaden/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/fenster-tueren-fassaden/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/kontrollierter-rueckbau-bei-leitungswasserschaeden/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/kontrollierter-rueckbau-bei-leitungswasserschaeden/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/lichtbogen-led-lichtleiste-brandschaden/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/lichtbogen-led-lichtleiste-brandschaden/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/prueffaehige-dokumentation/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/prueffaehige-dokumentation/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenabgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/schadenabgrenzung/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/svos-foundation/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/svos-foundation/",
+      "noindex": false,
+      "passed": true
+    },
+    {
+      "url": "https://www.sv-netzwerk.eu/fachwissen/wasserschaden-rueckbau-technische-abgrenzung/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/wasserschaden-rueckbau-technische-abgrenzung/",
+      "noindex": false,
+      "passed": true
+    }
+  ]
+}

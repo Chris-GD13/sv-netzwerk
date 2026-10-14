@@ -1,11 +1,15 @@
 ## 2026-10-14 – Vier Quellenpräzisierungen zu Kosten- und Vertragsprüfung
 
+- PR394 / Commit091035b9818a3d181f5ad1d6ac950e66d45ea008; Build, API-/Datenprüfungen und Deployment38512462492 success. Elf finale Live-Endpunkte und vier alte Beiträge visuell geprüft; CSV-Abschlussnachweise vollständig. Technische HTTP-/SEO-Inventur107Artikelrouten ohne Fehler, ausdrücklich keine fachliche Vollfreigabe.
+
 - §83VVG und damalige Erkenntnislage von späterem Maßnahmenerfolg getrennt; unbestätigtes Praxisbeispiel als fiktiv gekennzeichnet.
 - Pauschalvergütung von Stundenabrechnung unterschieden; konkrete Rollen-/Vergütungsquellen statt allgemeiner Übersichtslinks.
 - Anwendungsbereich von Nachtragsanordnung, Urkalkulation, Schlussrechnungsprüfung und Kostenanschlag präzisiert.
 - Zwei bestehende Marktstandabsätze ohne Änderung bestätigt; nur geänderte Artikel erhalten updatedAt14.10.2026. Vollprüfung des übrigen Archivs bleibt offen.
 
 ## 2026-10-14 – Sanierungsbaustellen und Verantwortlichkeiten
+
+- PR393 / Commit8da6ad25fe0ca46dbb95ec972d55ac7f02af1360; Deployment38510872325 success, sieben initiale Live-Endpunkte und exakter Commit bestätigt. Tagesregister atomar published-verified, CSV vollständig, LinkedIn prepared-not-posted. Kein zweiter Tagesartikel.
 
 - Genau einen Tagesartikel unter atomarer Reservierung ergänzt: Voraussetzungen für Koordinator, SiGePlan, Vorankündigung und Ein-Arbeitgeber-Unterrichtung getrennt.
 - Lenna Maria Walczok gemäß belegten Fachgebieten in die Profilrotation aufgenommen; keine behauptete Mitautorenschaft.

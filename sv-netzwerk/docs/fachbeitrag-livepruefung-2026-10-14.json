@@ -58,5 +58,144 @@
         "content": "Commit: 8da6ad25fe0ca46dbb95ec972d55ac7f02af1360\nBuild-Zeit: 2026-10-14T04:20:38.959Z\nVersion: Homepage-v5\n"
       }
     ]
+  },
+  "final": {
+    "deployment_commit": "091035b9818a3d181f5ad1d6ac950e66d45ea008",
+    "deployment_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38512462492",
+    "checks": [
+      {
+        "path": "/fachwissen/regiekosten-im-schadenfall-pruefen/",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/regiekosten-im-schadenfall-pruefen/",
+        "status": 200,
+        "checked_at": "2026-10-14T04:44:34.003750+00:00",
+        "canonical": "https://www.sv-netzwerk.eu/fachwissen/regiekosten-im-schadenfall-pruefen/",
+        "noindex": false,
+        "x_robots_tag": "",
+        "visible_date": true
+      },
+      {
+        "path": "/fachwissen/regiekosten-schadenregulierung-abgrenzung/",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/regiekosten-schadenregulierung-abgrenzung/",
+        "status": 200,
+        "checked_at": "2026-10-14T04:44:33.965220+00:00",
+        "canonical": "https://www.sv-netzwerk.eu/fachwissen/regiekosten-schadenregulierung-abgrenzung/",
+        "noindex": false,
+        "x_robots_tag": "",
+        "visible_date": true
+      },
+      {
+        "path": "/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug/",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug/",
+        "status": 200,
+        "checked_at": "2026-10-14T04:44:33.908919+00:00",
+        "canonical": "https://www.sv-netzwerk.eu/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug/",
+        "noindex": false,
+        "x_robots_tag": "",
+        "visible_date": true
+      },
+      {
+        "path": "/fachwissen/rechnungskuerzung-schadenfall-prueffaehigkeit/",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/rechnungskuerzung-schadenfall-prueffaehigkeit/",
+        "status": 200,
+        "checked_at": "2026-10-14T04:44:33.789839+00:00",
+        "canonical": "https://www.sv-netzwerk.eu/fachwissen/rechnungskuerzung-schadenfall-prueffaehigkeit/",
+        "noindex": false,
+        "x_robots_tag": "",
+        "visible_date": true
+      },
+      {
+        "path": "/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/",
+        "status": 200,
+        "checked_at": "2026-10-14T04:44:33.773902+00:00",
+        "canonical": "https://www.sv-netzwerk.eu/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/",
+        "noindex": false,
+        "x_robots_tag": "",
+        "visible_date": true,
+        "h1": "Sanierungsbaustellen koordinieren: SiGeKo, Bauleitung und Arbeitgeberpflichten trennen",
+        "expert_link": true
+      },
+      {
+        "path": "/fachwissen/",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/",
+        "status": 200,
+        "checked_at": "2026-10-14T04:44:41.446540+00:00",
+        "missing_slugs": []
+      },
+      {
+        "path": "/search-index.json",
+        "url": "https://www.sv-netzwerk.eu/search-index.json",
+        "status": 200,
+        "checked_at": "2026-10-14T04:44:41.576216+00:00",
+        "missing_slugs": []
+      },
+      {
+        "path": "/sitemap-0.xml",
+        "url": "https://www.sv-netzwerk.eu/sitemap-0.xml",
+        "status": 200,
+        "checked_at": "2026-10-14T04:44:41.306931+00:00",
+        "missing_slugs": [],
+        "wrong_lastmod": []
+      },
+      {
+        "path": "/sitemap-index.xml",
+        "url": "https://www.sv-netzwerk.eu/sitemap-index.xml",
+        "status": 200,
+        "checked_at": "2026-10-14T04:44:41.241684+00:00"
+      },
+      {
+        "path": "/robots.txt",
+        "url": "https://www.sv-netzwerk.eu/robots.txt",
+        "status": 200,
+        "checked_at": "2026-10-14T04:44:41.376726+00:00",
+        "content": "User-agent: *\nAllow: /\nDisallow: /intern/\nSitemap: https://www.sv-netzwerk.eu/sitemap-index.xml\n"
+      },
+      {
+        "path": "/deploy-version.txt",
+        "url": "https://www.sv-netzwerk.eu/deploy-version.txt",
+        "status": 200,
+        "checked_at": "2026-10-14T04:44:48.325084+00:00",
+        "content": "Commit: 091035b9818a3d181f5ad1d6ac950e66d45ea008\nBuild-Zeit: 2026-10-14T04:39:04.453Z\nVersion: Homepage-v5\n"
+      }
+    ]
+  },
+  "visual_checks": {
+    "date": "2026-10-14",
+    "method": "browser AX content and screenshots",
+    "current": {
+      "slug": "sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten",
+      "rendering": "verified; heading, publication date, responsibility table, author role and expert link",
+      "screenshot": "fachbeitrag-2026-10-14-live.jpg"
+    },
+    "older": [
+      {
+        "slug": "regiekosten-im-schadenfall-pruefen",
+        "updated_date": "2026-10-14",
+        "original_publication_date_preserved": true,
+        "visible_changed_content": true,
+        "rendering": "verified in browser"
+      },
+      {
+        "slug": "regiekosten-schadenregulierung-abgrenzung",
+        "updated_date": "2026-10-14",
+        "original_publication_date_preserved": true,
+        "visible_changed_content": true,
+        "rendering": "verified in browser"
+      },
+      {
+        "slug": "rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug",
+        "updated_date": "2026-10-14",
+        "original_publication_date_preserved": true,
+        "visible_changed_content": true,
+        "rendering": "verified in browser"
+      },
+      {
+        "slug": "rechnungskuerzung-schadenfall-prueffaehigkeit",
+        "updated_date": "2026-10-14",
+        "original_publication_date_preserved": true,
+        "visible_changed_content": true,
+        "rendering": "verified in browser"
+      }
+    ]
   }
 }
