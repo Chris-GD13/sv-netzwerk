@@ -77,6 +77,20 @@ in Logs, Quellcode oder Dokumentation schreiben.
 
 ## IONOS-Laufzeit
 
+### Mailversand der öffentlichen Formulare (14.10.2026)
+
+Die öffentlichen Formulare verwenden `info@sv-netzwerk.eu` als Absender.
+PHP benötigt dafür einen funktionierenden Sendmail-Transport. Auf dem VPS
+wurde am 14.10.2026 `msmtp-mta` installiert, nachdem der echte Formulartest
+einen Versandfehler und die Serverprüfung den fehlenden Transport belegten.
+Die authentisierte IONOS-SMTP-Konfiguration bleibt ein Laufzeitbestand unter
+`/etc/msmtprc` außerhalb des Webverzeichnisses und des Repositorys.
+Zugangsdaten niemals in Quellcode, Git, CI-Ausgaben oder Protokolle schreiben.
+Ein erfolgreicher Build bestätigt keinen Mailversand: Formular live absenden
+und Teamnachricht sowie Bestätigung im jeweiligen Firmenpostfach prüfen.
+Aktivierung des SMTP-Zugangs steht bis zur vertraulichen Eingabe des
+bestehenden Postfachkennworts noch aus.
+
 PHP läuft über die globale IONOS-PHP-FPM-Konfiguration. In `.htaccess` keinen
 `SetHandler` ergänzen: Das kann PHP-FPM überschreiben und PHP-Quelltext
 offenlegen. `.env` und `intern/photos` werden vom Deployment nie überschrieben.

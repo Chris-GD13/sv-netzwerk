@@ -18,3 +18,6 @@
 @media(max-width:75rem){.desktop-nav,.site-header__actions>.search-button{display:none}.hamburger{display:flex}}
 @media(max-width:46rem){.site-header__notice{padding:.52rem .7rem;font-size:.68rem;text-align:left}.site-header__bar,.is-scrolled .site-header__bar{min-height:6rem}.site-header__bar{gap:.65rem}.site-brand{flex:1;min-width:0}.site-brand__logo,.is-scrolled .site-brand__logo{width:min(13rem,100%);height:auto}.site-header__actions{flex:none}.header-platform-cta{display:none}}
 @media(max-width:23rem){.site-brand__logo,.is-scrolled .site-brand__logo{width:min(10.5rem,100%);height:auto}.hamburger__label{display:none}}
+
+/* Der Hauptweg bleibt auch auf kleinen Bildschirmen sichtbar. */
+@media(max-width:46rem){.site-header__bar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.65rem;padding-block:.7rem}.site-header__actions{display:contents}.site-header__actions>.hamburger{grid-column:2;grid-row:1}.header-platform-cta{display:flex;grid-column:1/-1;grid-row:2;justify-content:center;min-height:2.9rem;padding:.65rem 1rem}.site-brand{grid-column:1;grid-row:1}.site-brand__logo,.is-scrolled .site-brand__logo{width:min(13rem,100%);height:auto}}

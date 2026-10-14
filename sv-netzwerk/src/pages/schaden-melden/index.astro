@@ -1,23 +1,20 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
-const sent = Astro.url.searchParams.get('gesendet') === '1';
-const error = Astro.url.searchParams.get('fehler');
 ---
 
 <BaseLayout
-  title="Schaden melden"
-  description="Schadenmeldung mit Dateiupload für eine schnelle Erstbearbeitung."
-  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Schaden melden' }]}
+  title="Schaden übermitteln · Schadenformular | SV-Netzwerk"
+  description="Schadenauftrag mit Unterlagen an das SV-Netzwerk übermitteln."
+  breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Schaden übermitteln', href: '/schaden-uebermitteln/' }, { label: 'Schadenformular' }]}
 >
   <section class="sv-section">
     <div class="sv-container report-grid">
       <article class="sv-card form-card">
-        <p class="sv-eyebrow">Schadenmeldung</p>
+        <p class="sv-eyebrow">Schaden übermitteln</p>
         <h1>Schadenfall direkt einreichen</h1>
         <p class="sv-lead">Formular ausfüllen, Unterlagen hochladen, absenden.</p>
-        {sent && <p class="status success">Die Schadenmeldung wurde erfolgreich übermittelt.</p>}
-        {error && <p class="status error">Die Schadenmeldung konnte nicht verarbeitet werden. Bitte Eingaben prüfen.</p>}
+        <p id="submission-status" class="status" role="status" hidden></p>
 
         <form action="/schadenmeldung.php" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
           <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
@@ -85,12 +82,13 @@ const error = Astro.url.searchParams.get('fehler');
             </label>
           </div>
 
-          <button class="sv-button sv-button-primary" type="submit">Schadenmeldung senden</button>
+          <button class="sv-button sv-button-primary" type="submit">Schaden übermitteln</button>
         </form>
       </article>
 
       <article class="sv-card info-card">
         <h2>Hinweise zur Einreichung</h2>
+        <p>Für die digitale Beauftragung und Dienstleister-Verknüpfung finden Sie hier die <a href="/versicherer/beauftragungswege/">Wege über GDV, BiPRO und KUSS</a>.</p>
         <ul>
           <li>Dateiformate: JPG, PNG, WEBP, HEIC, PDF (je Datei bis 10 MB)</li>
           <li>Schadendatum und Schadenort möglichst genau angeben</li>
@@ -98,13 +96,24 @@ const error = Astro.url.searchParams.get('fehler');
           <li>Für Groß- oder Kumulschäden passende Spezialformulare nutzen</li>
         </ul>
         <div class="entry-actions">
-          <a class="sv-button sv-button-secondary" href="/grossschadenregulierung/#grossschaden-formular">Großschaden melden</a>
-          <a class="sv-button sv-button-secondary" href="/leistungen/kumulschadenmanagement/#kumulschaden-formular">Kumulschaden melden</a>
+          <a class="sv-button sv-button-secondary" href="/grossschadenregulierung/#grossschaden-formular">Großschaden übermitteln</a>
+          <a class="sv-button sv-button-secondary" href="/leistungen/kumulschadenmanagement/#kumulschaden-formular">Kumulschaden übermitteln</a>
         </div>
       </article>
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const status = document.querySelector<HTMLParagraphElement>('#submission-status');
+  if (status && (params.get('gesendet') === '1' || params.has('fehler'))) {
+    const success = params.get('gesendet') === '1';
+    status.hidden = false;
+    status.classList.add(success ? 'success' : 'error');
+    status.textContent = success ? 'Ihr Schadenauftrag wurde übermittelt.' : 'Ihr Schadenauftrag konnte nicht vollständig übermittelt werden. Bitte kontaktieren Sie uns unter info@sv-netzwerk.eu.';
+  }
+</script>
 
 <style>
   .form-card h1{margin:0}

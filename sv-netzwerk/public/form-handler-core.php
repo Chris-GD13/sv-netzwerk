@@ -72,6 +72,7 @@ function sv_send_mail(
     }
     $headers[] = 'MIME-Version: 1.0';
     $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+    $headers[] = 'Content-Transfer-Encoding: 8bit';
     $headers[] = 'X-Mailer: PHP/' . phpversion();
 
     return mail(
@@ -155,7 +156,7 @@ function sv_process_form(array $config): void
 {
     $returnUrl = $config['return_url'];
     $successUrl = $config['success_url'];
-    $from = 'ws@sv-schuett.eu';
+    $from = 'info@sv-netzwerk.eu';
 
     if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
         sv_redirect($returnUrl);
@@ -225,7 +226,7 @@ function sv_process_form(array $config): void
         $replyEmail
     );
 
-    $confirmationBody = "Vielen Dank fuer Ihre Anfrage bei SV-Netzwerk.\n\n";
+    $confirmationBody = "Vielen Dank für Ihre Anfrage bei SV-Netzwerk.\n\n";
     $confirmationBody .= "Wir haben Ihre Angaben erhalten und melden uns zeitnah.\n\n";
     $confirmationBody .= "Formular: " . $config['subject'] . "\n";
     $confirmationBody .= "Zeitpunkt: " . date('d.m.Y H:i:s') . "\n";

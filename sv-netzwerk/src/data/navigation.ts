@@ -14,24 +14,19 @@ export type NavItem = {
 export const navigation: NavItem[] = [
   { label: 'Start', href: '/' },
   {
-    label: 'Schaden melden',
-    href: '/schaden-melden/',
-    description: 'Direkteinstiege für allgemeine Schadenfälle, Großschaden und Kumulschaden.',
+    label: 'Gutachter-Plattform',
+    href: '/gutachter-plattform/',
+    description: 'Fachliche Prüfleistungen und Gutachter-Plattform.',
     children: [
       {
-        label: 'Schaden melden',
-        href: '/schaden-melden/',
-        description: 'Allgemeinen Schadenfall mit Unterlagen direkt einreichen.',
+        label: 'Gutachter-Plattform',
+        href: '/gutachter-plattform/',
+        description: 'Prüfleistungen und Zusammenarbeit kennenlernen.',
       },
       {
-        label: 'Großschaden melden',
-        href: '/grossschadenregulierung/#grossschaden-formular',
-        description: 'Großschaden direkt erfassen und ohne Zwischenschritt beauftragen.',
-      },
-      {
-        label: 'Kumulschaden melden',
-        href: '/leistungen/kumulschadenmanagement/#kumulschaden-formular',
-        description: 'Kumulschaden- oder Unwetterlage strukturiert melden.',
+        label: 'Prüfauftrag anfragen',
+        href: '/gutachter-plattform/anfrage/',
+        description: 'Fachlichen Prüfbedarf strukturiert übermitteln.',
       },
     ],
   },

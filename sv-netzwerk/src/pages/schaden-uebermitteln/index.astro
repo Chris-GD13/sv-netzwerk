@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Schaden übermitteln · Formular und digitale Beauftragungswege | SV-Netzwerk" description="Schadenauftrag und Unterlagen an das SV-Netzwerk übermitteln: per Formular oder über abgestimmte Beauftragungswege mit GDV, BiPRO und KUSS." breadcrumbs={[{label:'Start',href:'/'},{label:'Schaden übermitteln'}]}>
+  <section class="sv-section"><div class="sv-container">
+    <p class="sv-eyebrow">Schadenregulierung und Sachverständigenleistungen</p>
+    <h1>Schaden übermitteln</h1>
+    <p class="sv-lead">Übermitteln Sie uns Ihren Schadenauftrag und die vorhandenen Unterlagen. Wählen Sie das Formular für einen einzelnen Schaden oder die digitalen Beauftragungswege für Versicherer und Auftraggeber.</p>
+    <div class="route-grid">
+      <article class="sv-card"><p class="sv-eyebrow">Formular</p><h2>Schaden und Unterlagen direkt übermitteln</h2><p>Erfassen Sie Schadenort, Schadenart und Prüfauftrag und ergänzen Sie Fotos, Angebote und weitere Unterlagen.</p><a class="sv-button sv-button-primary" href="/schaden-melden/">Zum Schadenformular</a><div class="more-links"><a href="/grossschadenregulierung/#grossschaden-formular">Großschaden übermitteln →</a><a href="/leistungen/kumulschadenmanagement/#kumulschaden-formular">Kumulschaden übermitteln →</a></div></article>
+      <article class="sv-card"><p class="sv-eyebrow">Für Versicherer und Auftraggeber</p><h2>GDV, BiPRO und KUSS</h2><p>Stimmen Sie die Dienstleister-Verknüpfung und den Austausch von Aufträgen, Unterlagen und Rückmeldungen mit dem SV-Netzwerk ab. Die automatische Übertragung setzt die Freischaltung im jeweiligen Auftragssystem voraus.</p><a class="sv-button sv-button-primary" href="/versicherer/beauftragungswege/">Zu den digitalen Beauftragungswegen</a><div class="more-links"><a href="/versicherer/beauftragungswege/?kanal=gdv#verknuepfung">GDV Schaden-Service →</a><a href="/versicherer/beauftragungswege/?kanal=bipro#verknuepfung">BiPRO →</a><a href="/versicherer/beauftragungswege/?kanal=kuss#verknuepfung">KUSS-ServicePortal →</a></div></article>
+    </div>
+    <p>Sie benötigen Unterstützung bei der Zuordnung? <a href="/kontakt/">Kontaktieren Sie uns</a>. Nicht jeder Schaden erfordert ein Gutachten. Wir stimmen die erforderliche Regulierung und fachliche Prüfung mit Ihnen ab.</p>
+  </div></section>
+</BaseLayout>
+
+<style>
+  .sv-container{max-width:76rem}
+  .route-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;margin:2rem 0}
+  .sv-card{padding:clamp(1.4rem,3vw,2.2rem);display:flex;flex-direction:column;align-items:flex-start}
+  .sv-card h2{max-width:26ch}.sv-card>p:not(.sv-eyebrow){flex:1}
+  .more-links{display:grid;gap:.6rem;margin-top:1.2rem}
+  @media(max-width:55rem){.route-grid{grid-template-columns:1fr}}
+</style>
