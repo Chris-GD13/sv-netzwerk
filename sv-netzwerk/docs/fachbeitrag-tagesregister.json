@@ -460,9 +460,43 @@
         "reserved_at": "2026-10-15T05:03:05.013Z",
         "article_url": "https://www.sv-netzwerk.eu/fachwissen/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen/",
         "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7516363455986024448/",
-        "verified_at": "2026-10-15T05:06:01.136Z"
+        "verified_at": "2026-10-15T05:06:01.136Z",
+        "published_at_berlin": "2026-10-15T07:04:54+02:00",
+        "publication_window_berlin": {
+          "after": "2026-10-15T07:04:53.851+02:00",
+          "before": "2026-10-15T07:04:54.726+02:00"
+        },
+        "publication_time_note": "Ein Posten-Klick im clientseitigen Zeitfenster; Serverzeit nicht separat gemessen.",
+        "live_checked_at_berlin": "2026-10-15T07:05:34.354+02:00",
+        "verified_at_berlin": "2026-10-15T07:06:01.136+02:00",
+        "profile_url": "https://www.linkedin.com/in/christian-w-156408204/",
+        "text_path": "docs/linkedin/2026-10-15/2026-10-15-haftpflicht-linkedin.txt",
+        "proof_path": "docs/linkedin-veroeffentlichung-2026-10-15.md",
+        "sources_path": "docs/linkedin/2026-10-15/2026-10-15-linkedin-quellenpruefung.md",
+        "screenshots": [
+          "docs/linkedin/2026-10-15/2026-10-15-linkedin-live.jpg",
+          "docs/linkedin/2026-10-15/2026-10-15-linkedin-link-live.jpg"
+        ],
+        "image_path": null,
+        "image_cost_decision": {
+          "additional_budget_usd": 0,
+          "additional_spend_usd": 0,
+          "model_or_api_called": false,
+          "path": "published-without-image",
+          "note": "Work-Tarifdeckung ohne Test nicht nachweisbar; kein passendes ausdrücklich freigegebenes Bestandsmotiv. Lokale Titelkarte bietet keinen fachlichen Mehrwert gegenüber Prüfpunkten und Linkvorschau. Ohne Bild und Bildhinweis veröffentlicht."
+        },
+        "duplicate_check_note": "Profil vor Erstellung und unmittelbar vor Absenden frisch geladen: letzter eigener Tagespost SiGeKo 14.10.; kein Haftpflichtduplikat. Register/CSV erneut geprüft. Genau ein Posten-Klick und genau ein neuer eigener Beitrag sichtbar.",
+        "website_live_commit": "15f1eb66245745777814e444e7c718e153fa94cf",
+        "website_live_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38681524857",
+        "article_type": "versicherungsfachliches-thema",
+        "expert_assignment": {
+          "name": "Holger Roth",
+          "profile_url": "https://www.sv-netzwerk.eu/experten/holger-roth/",
+          "scope": "Schadenregulierer für Sach- und Haftpflichtschäden; keine Autorenschaft oder konkrete Fallzuständigkeit behauptet"
+        },
+        "shortlink": "https://lnkd.in/eQugq9MW"
       }
     }
   },
-  "updated_at": "2026-10-15T05:06:01.136Z"
+  "updated_at": "2026-10-15T05:07:25.127Z"
 }
