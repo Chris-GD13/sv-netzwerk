@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-18
-  updatedAt: 2026-10-12
+  updatedAt: 2026-10-15
   status: published
 seo:
   title: "Mietausfall bei Sanierung nachvollziehbar prüfen"
@@ -67,7 +67,13 @@ Mietausfall oder Mietminderung ist nicht automatisch in jeder Gebäude- oder Hau
 
 ## Anforderungen an die prüffähige Kostenprüfung
 
-Zu prüfen sind Nettokaltmiete, umlagefähige Bestandteile, Minderungsquote, Zeitraum und bereits erhaltene Zahlungen. Der Endbetrag darf nicht aus einer abstrakten Tagespauschale ohne Vertragsbezug entstehen. Sanierungs- und Mietausfallzeiträume sind getrennt zu vergleichen.
+Zunächst sind zwei Berechnungen zu trennen: die mietrechtliche Herabsetzung der geschuldeten Miete und der nach dem Versicherungsvertrag ersatzfähige Ausfall. Grundmiete, Nebenkostenvereinbarung, betroffene Mietobjekte, Quote, Zeitraum und Zahlungen müssen nachvollziehbar ausgewiesen werden. Die Nettokaltmiete ist nicht ungeprüft die Bemessungsgrundlage jeder Mietminderung. Umgekehrt begründet die mietrechtliche Berechnung keine automatische Erstattung sämtlicher Nebenkosten durch die Gebäudeversicherung. Sanierungs- und Mietausfallzeiträume sind getrennt zu vergleichen.
+
+### Quellenpräzisierung vom 15.10.2026: Rechtsfolge, Zeitraum und Rechenbasis
+
+[§ 536 BGB](https://www.gesetze-im-internet.de/bgb/__536.html) knüpft die Minderung an die aufgehobene oder geminderte Gebrauchstauglichkeit; eine unerhebliche Einschränkung bleibt außer Betracht. Ein Minderungsschreiben oder eine Zustimmung des Vermieters ist daher nicht der alleinige Rechtsgrund. [§ 536c BGB](https://www.gesetze-im-internet.de/bgb/__536c.html) verlangt die unverzügliche Mängelanzeige. Ein Rechtsverlust wegen unterlassener Anzeige setzt nach Absatz 2 insbesondere voraus, dass der Vermieter deshalb nicht abhelfen konnte. Eine verspätete Anzeige ist nicht pauschal mit dem Wegfall jeder Minderung gleichzusetzen. Beide geltenden Einzelnormen wurden am 15.10.2026 gelesen; das Prüfdatum ist kein neuer Geltungsbeginn.
+
+Eine konkrete historische Gerichtsquelle zur Rechenmethodik ist der [Hinweisbeschluss des OLG Düsseldorf vom 12.09.2019, 24 U 197/18](https://nrwe.justiz.nrw.de/olgs/duesseldorf/j2019/24_U_197_18_Beschluss_20190912.html), insbesondere Randnummern 50 und 63–66. In einer ausdrücklich hilfsweisen Berechnung trennt das Gericht beeinträchtigte Zeiträume und Mietobjekte und berücksichtigt die Bruttomiete des betroffenen Ladenlokals einschließlich Nebenkostenvorauszahlungen. Daraus folgt keine übertragbare Minderungsquote und keine Versicherungsdeckung. Es handelt sich nicht um eine neue Entscheidung von 2026; ein gesondertes Veröffentlichungsdatum weist die amtliche Fundstelle nicht aus. Praktischer Nutzen: technische Nutzungsabschnitte dokumentieren und die rechtliche Rechenbasis getrennt vom versicherten Ertragsausfall prüfen.
 
 ## Fiktives Praxisbeispiel
 
@@ -85,6 +91,6 @@ Mietausfall wird durch zeit- und raumbezogene Nachweise prüffähig. Entscheiden
 
 ## Quellen und weiterführende Hinweise
 
-- [Quelle 1](https://www.gesetze-im-internet.de/bgb/__536.html) – offizieller Bezug zum jeweiligen Prüffeld.
-- [Quelle 2](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – fachliche oder sicherheitsbezogene Einordnung.
-- [Quelle 3](https://www.gesetze-im-internet.de/bgb/__249.html) – gesetzlicher beziehungsweise technischer Rahmen.
+- [§ 536 BGB, Mietminderung](https://www.gesetze-im-internet.de/bgb/__536.html) und [§ 536c BGB, Mängelanzeige](https://www.gesetze-im-internet.de/bgb/__536c.html): Rechtsfolge und Grenzen der Anzeigeversäumnis, geltende Texte.
+- [OLG Düsseldorf, Hinweisbeschluss 12.09.2019, 24 U 197/18](https://nrwe.justiz.nrw.de/olgs/duesseldorf/j2019/24_U_197_18_Beschluss_20190912.html): zeit- und objektbezogene Hilfsberechnung; kein pauschaler Quotentarif.
+- [§ 82 VVG, Schadenabwendung und Schadenminderung](https://www.gesetze-im-internet.de/vvg_2008/__82.html): eigenständige versicherungsvertragliche Prüfung, nicht die mietrechtliche Berechnungsgrundlage.

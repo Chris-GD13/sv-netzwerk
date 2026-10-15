@@ -1,3 +1,10 @@
+## 2026-10-15 – Drei individuelle Quellenpräzisierungen im Bestand
+
+- Mietrechtliche Minderungsbasis und Versicherungsentschädigung getrennt; historische amtliche OLG-Hilfsberechnung ohne Quotenübernahme eingeordnet.
+- Vertragliche Obliegenheitsfolgen, besondere Beweislast und Genehmigung bei fehlender Vertretungsmacht präzisiert.
+- Baumherkunft von deliktischer Haftung getrennt; FLL-Ausgaben2020/2017 anhand öffentlicher Herausgeberangaben bestätigt, keine Volltextfreigabe behauptet.
+- Nur drei tatsächlich geänderte Artikel mit updatedAt15.10.2026; Quellen, Abrufgrenzen und Hashes dokumentiert. Fremde Tagesreservierung unverändert, kein zweiter Tagesartikel.
+
 ## 2026-10-15 – Haftpflichtschäden strukturiert regulieren
 
 - Genau einen Tagesartikel unter atomarer Reservierung ergänzt: Anspruchsgrund, Verursachung, Schadenhöhe, Mitverursachung und Haftpflichtdeckung getrennt prüfen.

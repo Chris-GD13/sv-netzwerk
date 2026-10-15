@@ -1,0 +1,62 @@
+{
+  "initial": {
+    "deployment_commit": "9325dbe4fabac78176ed0aca81eb9fd07707e4df",
+    "deployment_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38680343216",
+    "checks": [
+      {
+        "url": "https://www.sv-netzwerk.eu/fachwissen/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen/",
+        "status": 200,
+        "checked_at": "2026-10-15T04:19:27.762435+00:00",
+        "canonical": "https://www.sv-netzwerk.eu/fachwissen/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen/",
+        "noindex": false,
+        "visible_update": true,
+        "h1": "Haftpflichtschäden regulieren: Anspruchsgrund, Schadenhöhe und Deckung trennen",
+        "expert_link": true
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/fachwissen/",
+        "status": 200,
+        "checked_at": "2026-10-15T04:19:28.027192+00:00"
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/fachwissen/kategorie/regulierung-und-versicherungsrecht/",
+        "status": 200,
+        "checked_at": "2026-10-15T04:19:28.124765+00:00"
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/fachwissen/tag/haftpflichtschaden/",
+        "status": 200,
+        "checked_at": "2026-10-15T04:19:27.750597+00:00"
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/search-index.json",
+        "status": 200,
+        "checked_at": "2026-10-15T04:19:32.738777+00:00",
+        "missing_slugs": []
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/sitemap-0.xml",
+        "status": 200,
+        "checked_at": "2026-10-15T04:19:32.499407+00:00",
+        "wrong_lastmod": []
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/sitemap-index.xml",
+        "status": 200,
+        "checked_at": "2026-10-15T04:19:32.384047+00:00"
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/robots.txt",
+        "status": 200,
+        "checked_at": "2026-10-15T04:19:32.229634+00:00",
+        "content": "User-agent: *\nAllow: /\nDisallow: /intern/\nSitemap: https://www.sv-netzwerk.eu/sitemap-index.xml\n"
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/deploy-version.txt",
+        "status": 200,
+        "checked_at": "2026-10-15T04:19:36.433329+00:00",
+        "content": "Commit: 9325dbe4fabac78176ed0aca81eb9fd07707e4df\nBuild-Zeit: 2026-10-15T04:13:44.943Z\nVersion: Homepage-v5\n"
+      }
+    ]
+  }
+}
