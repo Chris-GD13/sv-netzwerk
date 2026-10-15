@@ -110,13 +110,13 @@ function analyzeWindowGeometry(
     return { error: 'Could not identify main window' };
   }
 
-  const [x, y, w, h] = window.bbox;
+  const [x, , w, h] = window.bbox;
 
   // Detect vertical divisions (sashes/flügel)
   const fluegelCount = detectFluegelCount(w, h);
 
   // Detect swing direction based on handle position heuristics
-  const swingDirection = detectSwingDirection(x, y, w, h, imageWidth, imageHeight);
+  const swingDirection = detectSwingDirection(x, w, imageWidth);
 
   return {
     windowFluegelCount: fluegelCount,
@@ -145,11 +145,8 @@ function detectFluegelCount(width: number, height: number): number {
  */
 function detectSwingDirection(
   x: number,
-  y: number,
   w: number,
-  h: number,
   imageWidth: number,
-  imageHeight: number
 ): 'left' | 'right' | 'center' {
   // Horizontal center position of window in image
   const windowCenter = x + w / 2;
@@ -368,11 +365,7 @@ async function analyzePhotoWithCloudAPI(options: PhotoAnalysisOptions): Promise<
       );
 
       if (windowObjects.length > 0) {
-        // Use first/largest window
-        const mainWindow = windowObjects[0];
-        const vertices = mainWindow.boundingPoly?.normalizedVertices || [];
-
-        // Estimate flügel count and direction from bounding box
+        // Estimate flügel count and direction from the largest mapped bounding box.
         const result = analyzeWindowGeometry(
           windowObjects.map((w: any) => ({
             bbox: [

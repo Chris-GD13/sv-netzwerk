@@ -3,7 +3,6 @@ import { readFile } from 'node:fs/promises';
 import { calculateTimeValue, buildTimeValueText } from '../public/intern/time-value.js';
 
 const page = await readFile(new URL('../src/pages/intern/zeitwertberechnung/index.astro', import.meta.url), 'utf8');
-const layout = await readFile(new URL('../src/layouts/InternalLayout.astro', import.meta.url), 'utf8');
 const calculation = await readFile(new URL('../src/pages/intern/kalkulation/index.astro', import.meta.url), 'utf8');
 const catalog = JSON.parse(await readFile(new URL('../src/data/bte-life-expectancy.json', import.meta.url), 'utf8'));
 const paritaetCatalog = JSON.parse(await readFile(new URL('../src/data/paritaet-life-expectancy.json', import.meta.url), 'utf8'));

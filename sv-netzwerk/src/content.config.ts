@@ -18,7 +18,7 @@ const publicationSchema = z.object({
 }).superRefine((value, ctx) => {
   if (value.status === 'published' && !value.publishedAt) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: 'custom',
       message: 'publication.publishedAt ist für veröffentlichte Inhalte erforderlich.',
       path: ['publishedAt'],
     });

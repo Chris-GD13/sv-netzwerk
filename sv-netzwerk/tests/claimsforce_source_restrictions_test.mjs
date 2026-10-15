@@ -48,8 +48,8 @@ async function run(status, reference) {
     filesDone: 0, messagesDone: 0, appointmentsDone: 0, appointments: [], notes: [{ id: 'note' }], tasks: [{ id: 'task' }], rawNotes: [],
     inventory: { files: 2, messages: 2, notes: 1, tasks: 1 }, signature: 'complete',
     async diagnostic() {}, async progress() {},
-    async portal(tabId, message) { commits.push(message); return {}; },
-    async uploadBuffer(tabId, profile, folderId, name) { uploaded.push(name); return { result: {} }; },
+    async portal(_tabId, message) { commits.push(message); return {}; },
+    async uploadBuffer(_tabId, _profile, _folderId, name) { uploaded.push(name); return { result: {} }; },
     async requestJson(url) { return messages.find(message => url.endsWith(message.id)); },
     unwrap: value => value,
     async fetch(url) { calls.push(url); const blocked = url.includes('/locked?'); return { ok: !blocked, status: blocked ? status : 200, headers: { get: () => 'application/pdf' }, arrayBuffer: async () => new ArrayBuffer(1) }; }

@@ -1,10 +1,8 @@
 import QRCode from 'qrcode';
 import { calculateWindowWeights } from './calculations';
 import { loadAllDrafts, loadDraft, removeDraft, saveDraft } from './offline';
-import { loadTemplates, saveTemplate, markTemplateUsed, deleteTemplate, updateTemplate } from './templates';
+import { loadTemplates, saveTemplate, markTemplateUsed, deleteTemplate } from './templates';
 import { analyzePhoto, prefillFormFromAnalysis, type PhotoAnalysisResult } from './photo-analysis';
-import { initializeSyncWorker, performSync } from './sync-worker';
-import { initOfflineStatusUI } from './sync-ui';
 import {
   exportDefinitions,
   getFieldDefinition,
@@ -86,7 +84,6 @@ import {
   apiMoveRoom,
   apiDeleteWindow,
   apiCreateWindowInRoom,
-  apiMoveWindow,
   apiCompleteEntity,
   apiReopenEntity,
   apiManageAnalysisGroup,
@@ -95,7 +92,6 @@ import {
   apiGetSash,
   apiCreateSash,
   apiSaveSash,
-  apiDeleteSash,
   apiListSashPhotos,
   apiUploadSashPhoto,
   // Demo
@@ -120,7 +116,6 @@ import type {
   WindowSashRecord,
   WindowSashSummary,
   WindowSummary,
-  WindowTemplate,
 } from './types';
 import type { AiAnalysisItem, AiAnalysisResult, SharePointImportRow, SharePointImportTarget, SharePointPhoto, SharePointSyncResult } from './php-api';
 
@@ -139,7 +134,6 @@ interface AppContext {
 
 const LOCK_TIMEOUT_MINUTES = 15;
 const SAVE_DEBOUNCE_MS = 1200;
-const SYNC_WARNING_MESSAGE = 'Es liegen noch nicht synchronisierte Änderungen vor.';
 const ONLINE_WINDOW_MINUTES = 10;
 
 /** Basis-URL für das aktuelle Projekt (z.B. '/intern/fensterpruefung-bonn'). */
@@ -174,7 +168,6 @@ export async function mountInternalPortal(root: HTMLElement) {
   const beforeUnloadHandler = (event: BeforeUnloadEvent) => {
     if (!context.draftDirty) return;
     event.preventDefault();
-    event.returnValue = SYNC_WARNING_MESSAGE;
   };
   window.addEventListener('beforeunload', beforeUnloadHandler);
   disposers.push(() => window.removeEventListener('beforeunload', beforeUnloadHandler));
@@ -2250,7 +2243,6 @@ async function renderRecord(context: AppContext) {
   });
 
   // Template Management
-  const templateSection = context.root.querySelector<HTMLElement>('#template-section');
   const templateSelector = context.root.querySelector<HTMLSelectElement>('#template-selector');
   const loadTemplateBtn = context.root.querySelector<HTMLButtonElement>('#load-template-btn');
   const deleteTemplateBtn = context.root.querySelector<HTMLButtonElement>('#delete-template-btn');
@@ -2939,7 +2931,6 @@ async function renderSharePointImport(context: AppContext) {
       const excel = await apiImportSharePointExcel();
       if (!excel) throw new Error('Excel-Datei konnte nicht aus SharePoint gelesen werden.');
       excelRows = excel.rows;
-      excelColumns = excel.columns;
       excelStatus.innerHTML = successAlert(`„${escapeHtml(excel.file_name)}“: ${excel.rows.length} Zeilen erkannt.`);
       renderExcelPreview(excel.rows, excel.columns);
       const schlagzahlCol = excel.columns.find((column) => /schlagzahl|schlagnr|fenster.?nr|window.?no/i.test(column)) ?? '';
@@ -2988,7 +2979,6 @@ async function renderSharePointImport(context: AppContext) {
   const excelStatus = context.root.querySelector<HTMLElement>('#excel-status')!;
   const excelPreview = context.root.querySelector<HTMLElement>('#excel-preview')!;
   let excelRows: SharePointImportRow[] = [];
-  let excelColumns: string[] = [];
   let importTargets: SharePointImportTarget[] = [];
 
   excelDropZone.addEventListener('dragover', (e) => { e.preventDefault(); excelDropZone.classList.add('intern-ai-upload--hover'); });
@@ -3019,7 +3009,6 @@ async function renderSharePointImport(context: AppContext) {
       excelStatus.innerHTML = errorAlert('Bitte nur echte Excel-Dateien einlesen (.xlsx, .xls, .xlsm, .xlsb, .csv). Ein Bild oder Screenshot wurde erkannt.');
       excelPreview.style.display = 'none';
       excelRows = [];
-      excelColumns = [];
       return;
     }
 
@@ -3031,7 +3020,6 @@ async function renderSharePointImport(context: AppContext) {
       return;
     }
     excelRows = result.rows;
-    excelColumns = result.columns;
     excelStatus.innerHTML = successAlert(`${result.rows.length} Zeilen erkannt, ${result.columns.length} Spalten.`);
     renderExcelPreview(result.rows, result.columns);
   }
@@ -3116,7 +3104,6 @@ async function renderSharePointImport(context: AppContext) {
   context.root.querySelector<HTMLButtonElement>('#excel-cancel-btn')?.addEventListener('click', () => {
     excelPreview.style.display = 'none';
     excelRows = [];
-    excelColumns = [];
     importTargets = [];
     excelStatus.innerHTML = '';
   });
@@ -4213,32 +4200,6 @@ async function saveWindow(context: AppContext, record: WindowRecord, data: Recor
   if (explicitSave) showInlineMessage(context.root, successAlert('Datensatz wurde gespeichert.'));
 }
 
-function deriveSummaryColumns(id: string, data: Record<string, unknown>, user: PortalUser) {
-  const completed = requiredBeforeCompletion.filter((field) => !isMissing(data[field])).length;
-  return {
-    id,
-    progressPercent: Math.round((completed / requiredBeforeCompletion.length) * 100),
-    assignedName: user.profile.full_name ?? user.email,
-  };
-}
-
-function hasDefect(data: Record<string, unknown>) {
-  return [
-    'hinge_fastening_loose',
-    'hinge_screws_missing',
-    'hinge_deformation',
-    'hinge_corrosion',
-    'hinge_damage',
-    'scissor_fastening_loose',
-    'scissor_deformation',
-    'scissor_corrosion',
-    'scissor_damage',
-    'wing_scrapes',
-    'wing_hangs',
-    'unsafe_until_repair',
-  ].some((field) => Boolean(data[field]));
-}
-
 async function createWindowRecord(context: AppContext, sourceId: string | null) {
   if (!context.user) return null;
   let formData: Record<string, unknown> = {
@@ -4256,7 +4217,7 @@ async function createWindowRecord(context: AppContext, sourceId: string | null) 
   return apiCreateWindow(formData);
 }
 
-async function acquireLock(context: AppContext, windowId: string): Promise<LockResult | null> {
+async function acquireLock(_context: AppContext, windowId: string): Promise<LockResult | null> {
   return apiAcquireLock(windowId, LOCK_TIMEOUT_MINUTES);
 }
 
@@ -4277,7 +4238,7 @@ function activateLockMaintenance(context: AppContext, windowId: string) {
   window.addEventListener('beforeunload', () => void releaseLock(context, windowId), { once: true });
 }
 
-async function releaseLock(context: AppContext, windowId: string) {
+async function releaseLock(_context: AppContext, windowId: string) {
   await apiReleaseLock(windowId);
 }
 
@@ -4427,13 +4388,6 @@ async function fetchReportPhoto(url: string): Promise<string | null> {
   } catch { return null; }
 }
 
-function reportValue(value: unknown): string {
-  if (value === true) return 'Ja';
-  if (value === false) return 'Nein';
-  if (Array.isArray(value)) return value.map(String).join(', ');
-  return String(value ?? '').trim();
-}
-
 function buildAssessmentReport(
   items: Array<{ record: WindowRecord; photos: PhotoItem[] }>,
   photoSources: Map<string, string>,
@@ -4553,6 +4507,11 @@ function wrapWordDocument(bodyHtml: string): string {
   return `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" lang="de"><head><meta charset="utf-8"><title>Gutachten Fensterprüfung</title><style>@page{size:A4;margin:18mm}body{font-family:Arial,sans-serif;color:#071a2e;font-size:10pt;line-height:1.4}h1{font-size:20pt}h2{font-size:14pt;border-bottom:2px solid #f59b16;padding-bottom:4px}h3{font-size:11pt;background:#eaf1f6;padding:5px}table{width:100%;border-collapse:collapse;margin:0 0 10px}th,td{border:1px solid #bcc9d3;padding:5px;text-align:left;vertical-align:top}th{width:36%;background:#eef4f8}.window-report{page-break-before:always}.photo-appendix-section{page-break-before:always}.photo-appendix{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.photo-appendix figure{margin:0;page-break-inside:avoid;text-align:center}.photo-appendix img{height:4.5cm;max-height:4.5cm;width:auto;max-width:100%;object-fit:contain;border:0}</style></head><body>${bodyHtml}</body></html>`;
 }
 
+function setPopupDocument(popup: Window, html: string): void {
+  const parsed = new DOMParser().parseFromString(html, 'text/html');
+  popup.document.replaceChild(popup.document.importNode(parsed.documentElement, true), popup.document.documentElement);
+}
+
 async function archiveAssessmentReport(
   report: GeneratedAssessmentReport,
   windowCount: number,
@@ -4601,11 +4560,11 @@ async function saveAssessmentReportAs(report: GeneratedAssessmentReport): Promis
 function printAssessmentReport(bodyHtml: string): void {
   const popup = window.open('', '_blank', 'width=1100,height=900');
   if (!popup) { alert('Bitte Pop-ups für diese Seite erlauben.'); return; }
-  popup.document.write(wrapWordDocument(`<button class="no-print" onclick="window.print()">Drucken</button>${bodyHtml}`).replace('</style>', '@media print{.no-print{display:none}}</style>'));
-  popup.document.close(); popup.focus();
+  setPopupDocument(popup, wrapWordDocument(`<button class="no-print" onclick="window.print()">Drucken</button>${bodyHtml}`).replace('</style>', '@media print{.no-print{display:none}}</style>'));
+  popup.focus();
 }
 
-async function exportRecords(context: AppContext, exportId: string, records: WindowSummary[]) {
+async function exportRecords(_context: AppContext, exportId: string, records: WindowSummary[]) {
   const definition = exportDefinitions.find((item) => item.id === exportId);
   if (!definition) return;
   const rows = records.filter(definition.filter);
@@ -4655,44 +4614,6 @@ function createExcelCompatibleWorkbook(header: string[], rows: Array<Array<unkno
   </style><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Fenster</x:Name><x:WorksheetOptions><x:Selected/><x:FitToPage/><x:Print><x:ValidPrinterInfo/><x:HorizontalResolution>600</x:HorizontalResolution><x:VerticalResolution>600</x:VerticalResolution><x:Landscape/><x:FitWidth>1</x:FitWidth><x:FitHeight>0</x:FitHeight></x:Print></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table><colgroup>${header.map(() => '<col style="mso-width-source:autofit">').join('')}</colgroup><thead><tr>${header.map((v) => cell(v, true)).join('')}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((v) => cell(v)).join('')}</tr>`).join('')}</tbody></table></body></html>`;
 }
 
-async function printSummary(records: WindowSummary[]) {
-  if (!records.length) { alert('Für das Sammelprotokoll sind keine Datensätze vorhanden.'); return; }
-  const popup = window.open('', '_blank', 'width=1200,height=900');
-  if (!popup) { alert('Bitte Pop-ups für diese Seite erlauben.'); return; }
-  popup.opener = null;
-  popup.document.write(`
-    <!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>SV-Netzwerk – Sammelprotokoll</title><style>
-      @page{size:A4 landscape;margin:12mm}body{font-family:Arial,sans-serif;padding:0;color:#071a2e}table{width:100%;border-collapse:collapse;font-size:9pt}th,td{border:1px solid #d6e0e8;padding:5px;text-align:left;vertical-align:top}h1{margin-top:0}.no-print{margin:0 0 16px}@media print{.no-print{display:none}}
-    </style></head><body>
-    <button class="no-print" onclick="window.print()">Als PDF drucken</button>
-    <h1>SV-Netzwerk – Sammelprotokoll</h1>
-    <p>Datenstand: ${escapeHtml(new Date().toLocaleString('de-DE'))}</p>
-    <table><thead><tr><th>Fenster</th><th>Standort</th><th>Status</th><th>Bewertung</th><th>Prioritaet</th></tr></thead><tbody>
-    ${records.map((record) => `<tr><td>${escapeHtml(record.window_number || record.record_id)}</td><td>${escapeHtml([record.building_label, record.section_label, record.floor_label, record.room_number].filter(Boolean).join(' · '))}</td><td>${escapeHtml(record.status)}</td><td>${escapeHtml(record.overall_rating ?? '')}</td><td>${escapeHtml(record.priority ?? '')}</td></tr>`).join('')}
-    </tbody></table></body></html>
-  `);
-  popup.document.close();
-  popup.focus();
-}
-
-function printWindowReport(record: WindowRecord, photos: PhotoItem[]): void {
-  const popup = window.open('', '_blank', 'width=1000,height=900');
-  if (!popup) { alert('Bitte Pop-ups für diese Seite erlauben.'); return; }
-  popup.opener = null;
-  const data = record.form_data ?? {};
-  const value = (key: string) => escapeHtml(String(data[key] ?? '—'));
-  const photoHtml = photos.length
-    ? photos.map((photo) => `<figure><img src="/intern/api/photos.php?id=${encodeURIComponent(photo.id)}" alt="${escapeHtml(photo.category)}"><figcaption>${escapeHtml(photo.category)} · ${escapeHtml(photo.file_name)}</figcaption></figure>`).join('')
-    : '<p>Keine Fotos zugeordnet.</p>';
-  popup.document.write(`<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>Fenster ${escapeHtml(record.window_number || record.record_id)}</title><style>
-    @page{size:A4 portrait;margin:15mm}body{font-family:Arial,sans-serif;color:#071a2e;font-size:10pt}h1{margin:0 0 12px}h2{background:#071a2e;color:#fff;padding:6px 8px;font-size:11pt}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccd7e0;padding:6px;text-align:left;vertical-align:top}th{width:32%;background:#eef4f8}.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.photos img{width:100%;height:220px;object-fit:contain;border:1px solid #ccd7e0}.photos figure{margin:0;break-inside:avoid}.photos figcaption{font-size:8pt;margin-top:3px}.no-print{margin-bottom:12px}@media print{.no-print{display:none}}
-  </style></head><body><button class="no-print" onclick="window.print()">Als PDF drucken</button><h1>Fensterprotokoll ${escapeHtml(record.window_number || record.record_id)}</h1><table>
-    <tr><th>Gebäude</th><td>${escapeHtml(record.building_label ?? '—')}</td></tr><tr><th>Etage</th><td>${escapeHtml(record.floor_label ?? '—')}</td></tr><tr><th>Raum</th><td>${escapeHtml(record.room_number ?? record.room_label ?? '—')}</td></tr><tr><th>Status</th><td>${escapeHtml(record.status)}</td></tr><tr><th>Prüfer</th><td>${escapeHtml(record.assigned_name ?? '—')}</td></tr><tr><th>Sichtbare Besonderheiten</th><td>${value('visible_special_features')}</td></tr><tr><th>Empfohlene Maßnahme</th><td>${value('recommended_action')}</td></tr><tr><th>Sachverständige Bemerkung</th><td>${value('expert_note')}</td></tr>
-  </table><h2>Fotodokumentation</h2><div class="photos">${photoHtml}</div></body></html>`);
-  popup.document.close();
-  popup.focus();
-}
-
 function printSashReport(sash: WindowSashRecord, data: Record<string, unknown>, photos: PhotoItem[]): void {
   const popup = window.open('', '_blank', 'width=900,height=1200');
   if (!popup) { alert('Bitte Pop-ups für diese Seite erlauben.'); return; }
@@ -4735,7 +4656,7 @@ function printSashReport(sash: WindowSashRecord, data: Record<string, unknown>, 
     ? photos.slice(0, 12).map((p) => `<div class="photo-item"><img src="/intern/api/photos.php?id=${encodeURIComponent(p.id)}" alt="${escapeHtml(p.caption ?? p.category)}" /><p>${escapeHtml(p.caption ?? p.category)}</p></div>`).join('')
     : '<p>Keine Fotos vorhanden.</p>';
 
-  popup.document.write(`<!DOCTYPE html>
+  setPopupDocument(popup, `<!DOCTYPE html>
 <html lang="de"><head>
 <meta charset="utf-8" />
 <title>Prüfbericht – ${escapeHtml(sash.sash_label || `Flügel ${sash.sash_number}`)}</title>
@@ -4822,7 +4743,6 @@ function printSashReport(sash: WindowSashRecord, data: Record<string, unknown>, 
 </div>
 
 </body></html>`);
-  popup.document.close();
   popup.focus();
   setTimeout(() => popup.print(), 300);
 }
@@ -4831,8 +4751,7 @@ function printSashReport(sash: WindowSashRecord, data: Record<string, unknown>, 
 async function downloadQrOverview(records: WindowSummary[]) {
   const popup = window.open('', '_blank', 'noopener,noreferrer,width=1200,height=900');
   if (!popup) return;
-  popup.document.write('<html lang="de"><head><title>QR-Codes Fensterpruefung</title><style>body{font-family:Arial,sans-serif;padding:24px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.card{border:1px solid #d6e0e8;border-radius:12px;padding:16px}</style></head><body><h1>QR-Code-Liste</h1><div class="grid" id="grid"></div></body></html>');
-  popup.document.close();
+  setPopupDocument(popup, '<html lang="de"><head><title>QR-Codes Fensterpruefung</title><style>body{font-family:Arial,sans-serif;padding:24px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.card{border:1px solid #d6e0e8;border-radius:12px;padding:16px}</style></head><body><h1>QR-Code-Liste</h1><div class="grid" id="grid"></div></body></html>');
   const grid = popup.document.getElementById('grid');
   if (!grid) return;
   for (const record of records) {
@@ -4909,12 +4828,6 @@ function canEdit(context: AppContext): boolean {
   return !['gast', 'auswertung'].includes(role);
 }
 
-/** Prüft ob der Benutzer Admin-Funktionen nutzen darf (nur Admin/Projektleiter). */
-function isAdminRole(context: AppContext): boolean {
-  const role = context.user?.profile.role ?? 'gast';
-  return ['administrator', 'projektleiter'].includes(role);
-}
-
 function subscribeToWindowChanges(_context: AppContext, _handler: () => void) {
   // Statusaktualisierung erfolgt über Polling; kein separater Kanal erforderlich.
 }
@@ -4970,11 +4883,6 @@ function fillPhotoCategories(select: HTMLSelectElement | null) {
     ['Mangel', 'Mangel'],
     ['sonstiges', 'Sonstiges'],
   ].map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join('');
-}
-
-function createPhotoPlaceholder(label: string) {
-  const text = encodeURIComponent(label);
-  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 480'%3E%3Crect width='640' height='480' fill='%230b4f7a'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='Arial' font-size='28'%3E${text}%3C/text%3E%3C/svg%3E`;
 }
 
 function quoteCsv(value: unknown, delimiter: string) {
@@ -5049,10 +4957,6 @@ function formatNumber(value: number) {
   return new Intl.NumberFormat('de-DE', { minimumFractionDigits: value % 1 === 0 ? 0 : 1, maximumFractionDigits: 1 }).format(value);
 }
 
-function sanitizeFileName(name: string) {
-  return name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
-}
-
 function toNumber(value: unknown): number | null {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (typeof value === 'string') {
@@ -5062,11 +4966,6 @@ function toNumber(value: unknown): number | null {
     return Number.isFinite(parsed) ? parsed : null;
   }
   return null;
-}
-
-function stringOrNull(value: unknown) {
-  const stringValue = String(value ?? '').trim();
-  return stringValue ? stringValue : null;
 }
 
 function isMissing(value: unknown) {

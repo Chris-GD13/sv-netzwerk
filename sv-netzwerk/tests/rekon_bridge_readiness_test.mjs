@@ -6,8 +6,8 @@ const scripts=[...source.matchAll(/<script is:inline>([\s\S]*?)<\/script>/g)].ma
 assert.equal(scripts.length,2);
 async function scenario(message,profile='marc'){
  const listeners=[],clicks=[],sent=[],nodes={};
- for(const id of ['vf-rekon-import','vf-rekon-state','vf-rekon-progress','vf-rekon-target'])nodes[id]={dataset:{},style:{},classList:{add(){},remove(){}},querySelector(){return this},addEventListener(type,fn,capture){clicks.push({fn,capture})}};
- const window={svnetDriveStatus:()=>Promise.resolve({claims_profile:profile,folders:{cases:{name:'Schadenfälle Marc Schütt'}}}),addEventListener(type,fn){listeners.push(fn)},postMessage(data){sent.push(data)},dispatchEvent(){}};
+ for(const id of ['vf-rekon-import','vf-rekon-state','vf-rekon-progress','vf-rekon-target'])nodes[id]={dataset:{},style:{},classList:{add(){},remove(){}},querySelector(){return this},addEventListener(_type,fn,capture){clicks.push({fn,capture})}};
+ const window={svnetDriveStatus:()=>Promise.resolve({claims_profile:profile,folders:{cases:{name:'Schadenfälle Marc Schütt'}}}),addEventListener(_type,fn){listeners.push(fn)},postMessage(data){sent.push(data)},dispatchEvent(){}};
  const context=vm.createContext({window,document:{getElementById:id=>nodes[id]},location:{origin:'https://www.sv-netzwerk.eu'},setTimeout(){},CustomEvent:class{},console});
  for(const script of scripts)vm.runInContext(script,context);
  await new Promise(resolve=>setImmediate(resolve));

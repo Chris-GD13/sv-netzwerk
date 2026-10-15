@@ -1,5 +1,5 @@
 import { clearCredentials, loadCredentials, loadPortalCredentials, saveCredentials } from './vault.js';
-import { collectInvestigationClaims, mapClaim, safeFileName, sameImportScope, assertSingleClaim, mergeClaimFiles, claimFolderPath, resolveClaimSource } from './import-utils.js';
+import { mapClaim, safeFileName, sameImportScope, assertSingleClaim, mergeClaimFiles, claimFolderPath, resolveClaimSource } from './import-utils.js';
 import { isActiveRekonTask, mapRekonTask, ownerMatchesRekonProfile, rekonFileVersion, rekonMessageVersion, rekonProfileKey } from './rekon-utils.js';
 
 const CREDENTIAL_HOST = 'eu.svnetzwerk.claimsforce_credentials';
@@ -319,69 +319,6 @@ async function requestJson(url, token, optional = false, timeout = 20000) {
     if (String(error?.message || '').startsWith('ClaimsForce-Abruf fehlgeschlagen')) throw error;
     throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Abruf hat das Zeitlimit überschritten.' : 'ClaimsForce-Abruf ist fehlgeschlagen.');
   } finally { clearTimeout(timer); }
-}
-
-const INVESTIGATION_QUERIES = {
-  sentReports: { status: { in: ['SENT'] }, investigationType: { notEqual: 'ADDENDUM' } },
-  sentFollowUps: { status: { in: ['SENT'] }, investigationType: { equal: 'ADDENDUM' } },
-  openReports: { status: { notIn: ['SENT'] } }
-};
-
-async function requestInvestigationList(endpoint, token, name, query, tabId) {
-  const authorizations = [`Bearer ${token}`, token];
-  const attempts = [];
-  for (let round = 0; round < 2; round++) {
-    for (const [index, authorization] of authorizations.entries()) {
-      let result = null;
-      try {
-        if (tabId) result = await chrome.tabs.sendMessage(tabId, { type: 'FETCH_INVESTIGATIONS', endpoint, authorization, queries: { [name]: query } });
-      } catch { result = null; }
-      if (!result) {
-        const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 60000);
-        try {
-          const response = await fetch(`${String(endpoint).replace(/\/+$/, '')}/investigation-list`, {
-            method: 'POST',
-            headers: { Authorization: authorization, 'Content-Type': 'application/json; charset=UTF-8' },
-            body: JSON.stringify({ queries: { [name]: query }, countsOnly: false }),
-            signal: controller.signal
-          });
-          result = { ok: response.ok, status: response.status, via: 'worker', info: [response.headers.get('x-amzn-errortype'), response.headers.get('content-type')].filter(Boolean).join(','), body: response.ok ? await response.json().catch(() => null) : (await response.text().catch(() => '')).slice(0, 120) };
-        } catch (error) { result = { ok: false, status: 0, via: 'worker', body: error?.name === 'AbortError' ? 'Zeitlimit' : 'Netzwerk' }; }
-        finally { clearTimeout(timer); }
-      }
-      const list = result.body?.results?.[name]?.investigations;
-      if (result.ok && Array.isArray(list)) return { list };
-      const entry = `${result.ok ? 'Format' : result.status} [${result.via || '?'}${result.info ? ' ' + result.info : ''}]${result.body && typeof result.body === 'string' ? ` "${result.body.replace(/\s+/g, ' ').slice(0, 60)}"` : ''}${index ? ' roh' : ''}`;
-      if (!attempts.includes(entry)) attempts.push(entry);
-      if (result.via === 'seite') break;
-    }
-    await sleep(1500);
-  }
-  return { error: `${name}: ${attempts.join(' | ')}` };
-}
-async function requestInvestigationClaims(endpoint, token, since, tabId) {
-  const investigations = [], errors = [];
-  if (tabId) {
-    const reportsNavigation = await chrome.tabs.sendMessage(tabId, { type: 'OPEN_REPORTS' }).catch(() => null);
-    await sleep(7000);
-    const currentTab = await chrome.tabs.get(tabId).catch(() => null);
-    if (!reportsNavigation?.ok || currentTab?.url?.includes('/claims')) {
-      await diagnostic(run, 'CF-REPORTS-01', 'ClaimsForce-Berichte-Ansicht konnte nicht sicher geöffnet werden.', {
-        clicked: !!reportsNavigation?.ok,
-        control: reportsNavigation?.control || '',
-        href: reportsNavigation?.href || '',
-        routeBefore: reportsNavigation?.route || '',
-        routeAfter: currentTab?.url ? safeRoute(currentTab.url) : ''
-      });
-    }
-  }
-  for (const [name, query] of Object.entries(INVESTIGATION_QUERIES)) {
-    const result = await requestInvestigationList(endpoint, token, name, query, tabId);
-    if (result.list) investigations.push(...result.list); else errors.push(result.error);
-  }
-  if (errors.length === Object.keys(INVESTIGATION_QUERIES).length) throw new Error(`ClaimsForce-Berichte und Nachträge konnten nicht gelesen werden [Bridge ${chrome.runtime.getManifest().version}] (${errors.join(', ')}).`);
-  const collected = collectInvestigationClaims(investigations, since);
-  return { ...collected, errors };
 }
 
 async function portal(tabId, message) {
@@ -910,7 +847,7 @@ async function rekonSession(profile, portalTabId) {
   let token = await rekonTokenValue();
   let session = await chrome.tabs.sendMessage(tab.id, { type: 'REKON_SESSION_STATE' }).catch(() => null);
   if (!token || !session?.ok || !session?.identity) {
-    await rekonProgress(portalTabId, 'Rekon-Sitzung wird im Microsoft Edge neu eingelesen …');
+    rekonProgress(portalTabId, 'Rekon-Sitzung wird im Microsoft Edge neu eingelesen …');
     await chrome.tabs.reload(tab.id);
     tab = await waitTab(tab.id, 60000);
     const deadline = Date.now() + 30000;
@@ -937,7 +874,7 @@ async function readRekonTasks(token, portalTabId) {
     const page = data.tasks?.data || [];
     total = Number(data.tasks?.paginatorInfo?.total || page.length);
     all.push(...page);
-    await rekonProgress(portalTabId, `Rekon-Auftragsliste wird eingelesen (${Math.min(all.length, total)} von ${total}) …`, Math.min(all.length, total), total);
+    rekonProgress(portalTabId, `Rekon-Auftragsliste wird eingelesen (${Math.min(all.length, total)} von ${total}) …`, Math.min(all.length, total), total);
     if (!page.length) break;
   }
   return all.filter(isActiveRekonTask);
@@ -957,7 +894,7 @@ async function downloadRekonFile(file, token) {
 
 async function runRekonImport(run) {
   const profile = rekonProfileKey(run.profile), portalTabId = Number(run.portalTabId || 0);
-  await rekonProgress(portalTabId, 'Rekon-Import wird im Microsoft Edge vorbereitet …');
+  rekonProgress(portalTabId, 'Rekon-Import wird im Microsoft Edge vorbereitet …');
   const { token } = await rekonSession(profile, portalTabId);
   const tasks = await readRekonTasks(token, portalTabId);
   if (!tasks.length) throw new Error('Rekon hat keine aktiven Aufträge geliefert. Der Import wurde ohne Änderungen beendet.');
@@ -966,7 +903,7 @@ async function runRekonImport(run) {
   let updated = 0, skipped = 0, filesDone = 0, messagesDone = 0, appointmentsDone = 0;
   for (let index = 0; index < tasks.length; index++) {
     const task = tasks[index], mapped = mapRekonTask(task), id = String(task.id);
-    await rekonProgress(portalTabId, `Rekon ${mapped.schaden_nr || id}: Dateien und E-Mails werden geprüft …`, index, tasks.length);
+    rekonProgress(portalTabId, `Rekon ${mapped.schaden_nr || id}: Dateien und E-Mails werden geprüft …`, index, tasks.length);
     const [fileData, emailData, logData] = await Promise.all([
       rekonGraph(REKON_FILES_QUERY, { task_id: id }, token),
       rekonGraph(REKON_EMAILS_QUERY, { taskId: id }, token, true),
@@ -1018,7 +955,7 @@ async function runRekonImport(run) {
     await portal(portalTabId, { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions, messageVersions, listVersion: String(task.updated_at || task.state_changed_date || ''), profile, sourceType: 'rekon' });
     updated++;
   }
-  await rekonProgress(portalTabId, `${tasks.length} aktive Rekon-Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, tasks.length, tasks.length);
+  rekonProgress(portalTabId, `${tasks.length} aktive Rekon-Aufträge geprüft: ${updated} aktualisiert, ${skipped} unverändert, ${filesDone} neue Dateien, ${messagesDone} neue Nachrichten und ${appointmentsDone} neue Termine.`, tasks.length, tasks.length);
   return { tasks: tasks.length, updated, skipped, files: filesDone, messages: messagesDone, appointments: appointmentsDone };
 }
 

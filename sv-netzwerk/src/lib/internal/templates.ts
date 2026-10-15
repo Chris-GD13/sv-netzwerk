@@ -39,7 +39,7 @@ export async function saveTemplate(template: Omit<WindowTemplate, 'id' | 'create
   const database = await getDB();
   const fullTemplate: WindowTemplate = {
     ...template,
-    id: `${template.projectId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: `${template.projectId}_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
     createdAt: new Date().toISOString(),
   };
 

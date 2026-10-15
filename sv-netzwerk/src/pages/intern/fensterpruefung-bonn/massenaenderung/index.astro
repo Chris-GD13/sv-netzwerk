@@ -71,7 +71,7 @@ const bulkSectionsJson = JSON.stringify(bulkSections).replace(/</g, '\\u003c');
         <button id="save-report-bottom" type="button" class="sv-button sv-button-secondary">Speichern & neue Gutachtenfassung erzeugen</button>
       </div>
     </section>
-    <script type="application/json" id="bulk-sections" set:html={bulkSectionsJson}></script>
+    <script is:inline type="application/json" id="bulk-sections" set:html={bulkSectionsJson}></script>
   </main>
 
   <script is:inline>

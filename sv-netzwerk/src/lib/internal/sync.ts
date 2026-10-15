@@ -1,5 +1,3 @@
-import type { OfflineDraft } from './types';
-
 export interface SyncQueueItem {
   id: string;
   windowId: string;
