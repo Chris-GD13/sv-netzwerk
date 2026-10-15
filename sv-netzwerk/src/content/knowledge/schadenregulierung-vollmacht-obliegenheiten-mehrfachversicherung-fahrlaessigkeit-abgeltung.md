@@ -17,12 +17,13 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/prueffaehige-dokumentation/", "/
 damageTypes: ["gebaeude", "leitungswasser", "brand", "sturm"]
 publication:
   publishedAt: 2026-08-15
-  updatedAt: 2026-08-15
+  updatedAt: 2026-10-15
   status: published
 seo:
   title: "Schadenregulierung: Vollmacht, Obliegenheiten und Abgeltung"
   description: "Vollmacht, Obliegenheiten, Mehrfachversicherung, Fahrlässigkeit, Schadenminderung und pauschale Abgeltung im Schadenfall sicher einordnen."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung/"
+  noindex: false
 ---
 
 Bei größeren Sachschäden müssen innerhalb kurzer Zeit Entscheidungen getroffen werden: Wer darf Maßnahmen freigeben? Welche Angaben und Unterlagen werden benötigt? Welche Sofortmaßnahmen sind zumutbar? Besteht Versicherungsschutz bei mehreren Versicherern? Und welche Folgen hat eine Erklärung, mit der ein Schaden pauschal abgegolten werden soll?
@@ -87,7 +88,13 @@ Eine technische Freigabe sollte klar benennen, ob sie lediglich der Gefahrenabwe
 
 Obliegenheiten sind keine gewöhnlichen Leistungspflichten. Der Versicherungsnehmer kann zu einem bestimmten Verhalten angehalten sein, etwa zur unverzüglichen Schadenanzeige, wahrheitsgemäßen Auskunft, Vorlage von Belegen, Erhaltung des Schadenbildes, Mitwirkung an der Aufklärung oder Einhaltung zumutbarer Weisungen.
 
-§ 28 VVG unterscheidet nach Verschuldensgrad und Kausalität. Bei vorsätzlicher Verletzung kann Leistungsfreiheit eintreten. Bei grob fahrlässiger Verletzung kommt grundsätzlich eine Kürzung entsprechend der Schwere des Verschuldens in Betracht. Zugleich bleibt zu prüfen, ob die Verletzung für Eintritt oder Feststellung des Versicherungsfalls oder für Feststellung und Umfang der Leistungspflicht ursächlich war. Für arglistige Verletzungen gelten strengere Folgen. Bei nach dem Schaden bestehenden Auskunfts- oder Aufklärungsobliegenheiten verlangt das Gesetz für eine vollständige oder teilweise Leistungsfreiheit außerdem einen gesonderten Hinweis in Textform auf diese Rechtsfolge.
+§ 28 VVG betrifft vertragliche Obliegenheiten. Für die Rechtsfolgen nach Absatz 2 ist zunächst die entsprechende vertragliche Vereinbarung festzustellen. Bei vorsätzlicher Verletzung kann Leistungsfreiheit eintreten; bei grob fahrlässiger Verletzung kommt eine verschuldensabhängige Kürzung in Betracht. Nach Absatz 3 bleibt die Leistungspflicht jedoch bestehen, soweit die Verletzung für Eintritt oder Feststellung des Versicherungsfalls und für Feststellung oder Umfang der Leistungspflicht nicht ursächlich war; die Ausnahme bei Arglist ist gesondert zu prüfen. Für nach dem Schaden bestehende Auskunfts- oder Aufklärungsobliegenheiten verlangt Absatz 4 außerdem eine gesonderte Mitteilung in Textform über die Rechtsfolge. Das ist kein pauschales Belehrungserfordernis für jeden gesetzlichen Obliegenheitstatbestand.
+
+### Quellenpräzisierung vom 15.10.2026: Tatbestand und Nachweis trennen
+
+Die amtlichen Texte zu [§ 28 VVG](https://www.gesetze-im-internet.de/vvg_2008/__28.html), [§ 81 VVG](https://www.gesetze-im-internet.de/vvg_2008/__81.html) und [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) wurden am 15.10.2026 gelesen. Status: geltendes Recht, keine neue Gerichtsentscheidung. § 28 Absatz 2 und § 82 Absatz 3 ordnen ausdrücklich die Beweislast für das Nichtvorliegen grober Fahrlässigkeit dem Versicherungsnehmer zu. Daraus folgt keine pauschale Beweislastumkehr für sämtliche Schaden-, Kausalitäts- und Vertragsfragen. § 81 betrifft dagegen die Herbeiführung des Versicherungsfalls; die besonderen Voraussetzungen von § 28 dürfen nicht ungeprüft darauf übertragen werden. Praktisch gehören Klausel, konkreter Tatbestand, Verschuldensbewertung, Kausalität und jeweils einschlägige formelle Voraussetzung in getrennte Prüffelder.
+
+Bei einer Abgeltungsvereinbarung ohne ausreichende Vertretungsmacht ist zudem [§ 177 Absatz 1 BGB](https://www.gesetze-im-internet.de/bgb/__177.html) zu beachten: Die Wirksamkeit für den Vertretenen hängt von dessen Genehmigung ab. Deshalb sind fehlende Abschlussvollmacht und endgültige Unwirksamkeit nicht gleichzusetzen. Amtlicher geltender Text, gelesen am 15.10.2026; kein neu behaupteter Geltungsbeginn. Der Sachverständige dokumentiert Vollmachtsnachweis und Erklärungsinhalt, die rechtliche Bindungswirkung bleibt gesondert zu prüfen.
 
 Eine belastbare Prüfung folgt deshalb nicht dem verkürzten Satz „Obliegenheit verletzt – keine Leistung“, sondern mindestens dieser Reihenfolge:
 
@@ -261,3 +268,4 @@ Wer diese Ebenen voneinander trennt und anschließend kontrolliert zusammenführ
 6. Versicherungsvertragsgesetz (VVG), § 83 – Aufwendungsersatz, https://www.gesetze-im-internet.de/vvg_2008/__83.html
 7. Bürgerliches Gesetzbuch (BGB), §§ 164 und 167 – Wirkung der Erklärung des Vertreters und Erteilung der Vollmacht, https://www.gesetze-im-internet.de/bgb/__164.html und https://www.gesetze-im-internet.de/bgb/__167.html
 8. Bürgerliches Gesetzbuch (BGB), § 779 – Begriff des Vergleichs und Irrtum über die Vergleichsgrundlage, https://www.gesetze-im-internet.de/bgb/__779.html
+9. Bürgerliches Gesetzbuch (BGB), § 177 Absatz 1 – Vertragsschluss ohne Vertretungsmacht und Genehmigung, https://www.gesetze-im-internet.de/bgb/__177.html; amtlicher geltender Text, geprüft am 15.10.2026.

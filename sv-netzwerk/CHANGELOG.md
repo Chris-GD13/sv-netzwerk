@@ -1,3 +1,10 @@
+## 2026-10-15 – Drei individuelle Quellenpräzisierungen im Bestand
+
+- Mietrechtliche Minderungsbasis und Versicherungsentschädigung getrennt; historische amtliche OLG-Hilfsberechnung ohne Quotenübernahme eingeordnet.
+- Vertragliche Obliegenheitsfolgen, besondere Beweislast und Genehmigung bei fehlender Vertretungsmacht präzisiert.
+- Baumherkunft von deliktischer Haftung getrennt; FLL-Ausgaben2020/2017 anhand öffentlicher Herausgeberangaben bestätigt, keine Volltextfreigabe behauptet.
+- Nur drei tatsächlich geänderte Artikel mit updatedAt15.10.2026; Quellen, Abrufgrenzen und Hashes dokumentiert. Fremde Tagesreservierung unverändert, kein zweiter Tagesartikel.
+
 ## 2026-10-14 – Vier Quellenpräzisierungen zu Kosten- und Vertragsprüfung
 
 - PR394 / Commit091035b9818a3d181f5ad1d6ac950e66d45ea008; Build, API-/Datenprüfungen und Deployment38512462492 success. Elf finale Live-Endpunkte und vier alte Beiträge visuell geprüft; CSV-Abschlussnachweise vollständig. Technische HTTP-/SEO-Inventur107Artikelrouten ohne Fehler, ausdrücklich keine fachliche Vollfreigabe.

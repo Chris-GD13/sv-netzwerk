@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-15",
+  "base_commit": "fc7c4f37498adb7a1a60665f18cfe74fc87aee84",
+  "scope": "Three targeted individual corrections; not full source clearance of articles or archive",
+  "changes": {
+    "mietausfall-sanierungsdauer-schadenbezug": {
+      "old_sha256": "7d3dbdacf76b1b1c4bbaad14454cc24bc3e9a36cde622b1abccb45bfe2c6028e",
+      "new_sha256": "f1819ee52a6cd1de722430d4f736b15f3f21e96cdd034d4b37b1813e02234dcf",
+      "checked_fields": "Mietrechtliche Minderung, Anzeige, Rechenbasis und Vertragserstattung getrennt; OLG-Hilfsberechnung eingeordnet",
+      "updated_at": "2026-10-15",
+      "status": "built-not-yet-deployed"
+    },
+    "schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung": {
+      "old_sha256": "6ef1f43db7e386020191e18f49cc48dadf1014a891efc79aa2ac73b975da4a6c",
+      "new_sha256": "b0440478a95e3aa6f194f37f99ce77e0a0be506daa0697b22126839b26d10b13",
+      "checked_fields": "Vertragliche Kürzungsvoraussetzung, besondere Beweislast und Genehmigung bei fehlender Vertretungsmacht präzisiert",
+      "updated_at": "2026-10-15",
+      "status": "built-not-yet-deployed"
+    },
+    "baumsturz-astbruch-sturm-schadenaufnahme-standfestigkeit-vorschaden": {
+      "old_sha256": "dc022d46600f04a5416ad31708f85c81348a4551e13c6052d62007a0b4f337dd",
+      "new_sha256": "8c84f083fcf4d82c6ed92dfd1cb3744f9ba5c3ff03117ee3c87e6bfbe0ec37a2",
+      "checked_fields": "Deliktische Haftungsprüfung von Baumherkunft getrennt; FLL-Ausgaben und begrenzter Prüfungsumfang bestätigt",
+      "updated_at": "2026-10-15",
+      "status": "built-not-yet-deployed"
+    }
+  },
+  "sources": [
+    {
+      "url": "https://www.gesetze-im-internet.de/bgb/__536.html",
+      "status": "geltendes Recht",
+      "checked_at": "2026-10-15"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/bgb/__536c.html",
+      "status": "geltendes Recht",
+      "checked_at": "2026-10-15"
+    },
+    {
+      "url": "https://nrwe.justiz.nrw.de/olgs/duesseldorf/j2019/24_U_197_18_Beschluss_20190912.html",
+      "decision_date": "2019-09-12",
+      "publication_date": null,
+      "status": "Hinweisbeschluss, nicht Urteil; amtliche Datenbank nennt rechtskräftig; keine neue Entscheidung 2026",
+      "read_sections": "Tenor, Rn50,63–66 and surrounding reasons",
+      "practical_use": "Perioden, Mietobjekte und Bruttomiete in Hilfsberechnung; keine übertragene Quote oder Deckung"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__28.html",
+      "status": "geltendes Recht",
+      "practical_use": "Vertragliche Voraussetzung, Verschulden, Kausalität und Belehrung getrennt"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__81.html",
+      "status": "geltendes Recht",
+      "practical_use": "Herbeiführung des Versicherungsfalls nicht mit §28 gleichsetzen"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+      "status": "geltendes Recht",
+      "practical_use": "Eigenständige gesetzliche Schadenminderungsobliegenheit"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/bgb/__177.html",
+      "status": "geltendes Recht",
+      "practical_use": "Vertrag ohne Vertretungsmacht genehmigungsabhängig"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/bgb/__823.html",
+      "status": "geltendes Recht",
+      "practical_use": "Baumherkunft allein belegt keine deliktische Haftung"
+    },
+    {
+      "url": "https://shop.fll.de/de/baumkontrollrichtlinien-richtlinien-fuer-baumkontrollen-zur-ueberpruefung-der-verkehrssicherheit.html",
+      "edition": "2020",
+      "status": "Herausgeber führt veröffentlichte Ausgabe; kein Entwurf",
+      "review_limit": "Bibliografie und öffentlich beschriebener Anwendungsbereich, keine Volltextprüfung"
+    },
+    {
+      "url": "https://shop.fll.de/de/ztv-baumpflege-zusaetzliche-technische-vertragsbedingungen-und-richtlinien-fuer-baumpflege-2017-broschuere.html",
+      "edition": "6. Ausgabe 2017",
+      "status": "Herausgeber führt veröffentlichte Ausgabe; kein Entwurf",
+      "review_limit": "Bibliografie und öffentlich beschriebener Anwendungsbereich, keine Volltextprüfung"
+    }
+  ],
+  "date_note": "Quellenprüfung 15.10.2026 ist kein neu behaupteter Geltungsbeginn. Kein nicht belegtes Veröffentlichungsdatum ergänzt.",
+  "limits": [
+    {
+      "step": "BGH-Volltextprüfung XII ZR225/03 vom06.04.2005",
+      "cause": "Amtlicher PDF- und HTML-Abruf HTTP403; kein Volltextnachtrag daraus. Stattdessen tatsächlich zugängliche amtliche OLG-Quelle präzise begrenzt verwendet."
+    },
+    {
+      "step": "BGB164-Abruf",
+      "cause": "Wiederholter Abruffehler; keine neue Aussage daraus. Bestehende Passage nicht als frisch vollgeprüft ausgegeben."
+    }
+  ],
+  "today_guard": {
+    "owner": "codex-website-20261015-0600",
+    "action": "foreign reservation respected; no second article, no overwrite"
+  },
+  "checks": {
+    "astro_check": "0 errors,0 warnings,67 pre-existing hints",
+    "build": "passed",
+    "article_urls": 107,
+    "sitemap_pages": 187,
+    "internal_links": 19710
+  },
+  "full_archive_clearance": false
+}
