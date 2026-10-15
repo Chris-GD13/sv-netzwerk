@@ -95,7 +95,8 @@
   ],
   "today_guard": {
     "owner": "codex-website-20261015-0600",
-    "action": "foreign reservation respected; no second article, no overwrite"
+    "action": "foreign reservation respected; no second article, no overwrite",
+    "status": "published-verified by original owner; preserved"
   },
   "checks": {
     "astro_check": "0 errors,0 warnings,67 pre-existing hints",
@@ -116,5 +117,21 @@
     "read_sections": "title/instructions page1; A1-4.1/A1-4.2 pages8–9",
     "vvg_100_105": "separation of defence/indemnity and acknowledgement checked against current official texts",
     "limit": "other statements not represented as individually re-cleared here"
-  }
+  },
+  "independent_olg_confirmation": {
+    "url": "https://nrwe.justiz.nrw.de/olgs/duesseldorf/j2019/24_U_197_18_Beschluss_20190912.html",
+    "status": 200,
+    "sha256": "db24f21146a5d99c5b9896b42ea2db357a793e34a7a501e19104d61ae67a231a",
+    "checked_at": "2026-10-15T04:19:09.265206+00:00",
+    "checks": {
+      "decision_date": true,
+      "case_number": true,
+      "notice_character": true,
+      "hypothetical_calculation": true,
+      "gross_rent": true,
+      "time_segmentation": true
+    },
+    "scope": "Independent HTTP confirmation of cited original passages; not a general rule for rent reduction rates"
+  },
+  "integration_metadata_base": "ef6c2804b2339b227f6e1294165f28b654f7eea5"
 }

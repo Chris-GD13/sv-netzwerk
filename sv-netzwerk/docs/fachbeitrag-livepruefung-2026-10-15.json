@@ -1,0 +1,69 @@
+{
+  "deployment_commit": "9325dbe4fabac78176ed0aca81eb9fd07707e4df",
+  "deployment_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38680343216",
+  "verified_at": "2026-10-15T04:20:12.5982444Z",
+  "checks": [
+    {
+      "path": "/fachwissen/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen/",
+      "status": 200,
+      "canonical": "https://www.sv-netzwerk.eu/fachwissen/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen/",
+      "noindex": false,
+      "visible_date": true,
+      "h1": "Haftpflichtschäden regulieren: Anspruchsgrund, Schadenhöhe und Deckung trennen",
+      "expert_link": "https://www.sv-netzwerk.eu/experten/holger-roth/"
+    },
+    {
+      "path": "/fachwissen/",
+      "status": 200,
+      "article_visible": true
+    },
+    {
+      "path": "/fachwissen/kategorie/regulierung-und-versicherungsrecht/",
+      "status": 200,
+      "article_visible": true
+    },
+    {
+      "path": "/fachwissen/tag/haftpflichtschaden/",
+      "status": 200,
+      "article_visible": true
+    },
+    {
+      "path": "/search-index.json",
+      "status": 200,
+      "article_visible": true
+    },
+    {
+      "path": "/sitemap-index.xml",
+      "status": 200,
+      "article_in_sitemap_0": true
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "sitemap_declared": true
+    },
+    {
+      "path": "/deploy-version.txt",
+      "status": 200,
+      "commit_matches": true,
+      "content": "Commit: 9325dbe4fabac78176ed0aca81eb9fd07707e4df\nBuild-Zeit: 2026-10-15T04:13:44.943Z\nVersion: Homepage-v5\n"
+    }
+  ],
+  "visual_checks": {
+    "method": "browser accessibility tree",
+    "detail": true,
+    "overview": true,
+    "category": true,
+    "tag": true
+  },
+  "workflow_checks": {
+    "build_check": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38680343270",
+    "portal_tests": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38680343217",
+    "deployment": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38680343216",
+    "conclusion": "success"
+  },
+  "linkedin": {
+    "status": "prepared-not-posted",
+    "publication_owner": "07:00-Auftrag"
+  }
+}

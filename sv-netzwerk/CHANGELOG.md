@@ -13,6 +13,7 @@
 - Keine erfundenen Fälle, Messwerte oder Kosten und kein künstlicher Bauteil- oder Wasserschwerpunkt; versicherungsfachliches Thema mit konkreter Anspruchs- und Deckungsfrage.
 - Library, interne Links, Suchindex-/Sitemap-Datenbasis und CSV vorbereitet; LinkedIn-Begleittext bleibt `prepared-not-posted`.
 - Ohne öffentliches Beitragsbild, weil kein fachlich passendes geprüftes Motiv vorlag; keine SVG- oder Titelkarten-Platzhalter.
+- Commit `9325dbe4fabac78176ed0aca81eb9fd07707e4df` über Deployment-Lauf `38680343216` live bestätigt; Detail, Übersicht, Kategorie, Tag, Suchindex, Sitemap, robots.txt und `deploy-version.txt` geprüft.
 
 ## 2026-10-14 – Vier Quellenpräzisierungen zu Kosten- und Vertragsprüfung
 
