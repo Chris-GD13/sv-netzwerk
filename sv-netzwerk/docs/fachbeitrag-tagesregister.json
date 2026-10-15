@@ -455,12 +455,14 @@
         "verified_at": "2026-10-15T04:19:58.108Z"
       },
       "linkedin": {
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-linkedin-20261015-01a13dee",
         "reserved_at": "2026-10-15T05:03:05.013Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen/"
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen/",
+        "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7516363455986024448/",
+        "verified_at": "2026-10-15T05:06:01.136Z"
       }
     }
   },
-  "updated_at": "2026-10-15T05:03:05.013Z"
+  "updated_at": "2026-10-15T05:06:01.136Z"
 }
