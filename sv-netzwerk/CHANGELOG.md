@@ -1,3 +1,12 @@
+## 2026-10-15 – Haftpflichtschäden strukturiert regulieren
+
+- Genau einen Tagesartikel unter atomarer Reservierung ergänzt: Anspruchsgrund, Verursachung, Schadenhöhe, Mitverursachung und Haftpflichtdeckung getrennt prüfen.
+- Holger Roth gemäß aktuellem Live-Profil dem belegten Fachgebiet Sach- und Haftpflichtschäden sowie Schadenregulierung zugeordnet; keine behauptete Autorenschaft oder konkrete Fallzuständigkeit.
+- Amtliche VVG- und BGB-Einzelnormen sowie die am 14.10.2026 veröffentlichten unverbindlichen GDV-Musterbedingungen im benötigten Umfang geöffnet und geprüft; konkreter Vertrag bleibt maßgeblich.
+- Keine erfundenen Fälle, Messwerte oder Kosten und kein künstlicher Bauteil- oder Wasserschwerpunkt; versicherungsfachliches Thema mit konkreter Anspruchs- und Deckungsfrage.
+- Library, interne Links, Suchindex-/Sitemap-Datenbasis und CSV vorbereitet; LinkedIn-Begleittext bleibt `prepared-not-posted`.
+- Ohne öffentliches Beitragsbild, weil kein fachlich passendes geprüftes Motiv vorlag; keine SVG- oder Titelkarten-Platzhalter.
+
 ## 2026-10-14 – Vier Quellenpräzisierungen zu Kosten- und Vertragsprüfung
 
 - PR394 / Commit091035b9818a3d181f5ad1d6ac950e66d45ea008; Build, API-/Datenprüfungen und Deployment38512462492 success. Elf finale Live-Endpunkte und vier alte Beiträge visuell geprüft; CSV-Abschlussnachweise vollständig. Technische HTTP-/SEO-Inventur107Artikelrouten ohne Fehler, ausdrücklich keine fachliche Vollfreigabe.
