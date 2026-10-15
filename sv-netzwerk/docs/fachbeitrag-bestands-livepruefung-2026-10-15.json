@@ -58,5 +58,123 @@
         "content": "Commit: 9325dbe4fabac78176ed0aca81eb9fd07707e4df\nBuild-Zeit: 2026-10-15T04:13:44.943Z\nVersion: Homepage-v5\n"
       }
     ]
-  }
+  },
+  "final": {
+    "deployment_commit": "15f1eb66245745777814e444e7c718e153fa94cf",
+    "deployment_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38681524857",
+    "checks": [
+      {
+        "url": "https://www.sv-netzwerk.eu/fachwissen/mietausfall-sanierungsdauer-schadenbezug/",
+        "status": 200,
+        "checked_at": "2026-10-15T04:33:57.715386+00:00",
+        "canonical": "https://www.sv-netzwerk.eu/fachwissen/mietausfall-sanierungsdauer-schadenbezug/",
+        "noindex": false,
+        "visible_update": true
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/fachwissen/schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung/",
+        "status": 200,
+        "checked_at": "2026-10-15T04:33:57.420696+00:00",
+        "canonical": "https://www.sv-netzwerk.eu/fachwissen/schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung/",
+        "noindex": false,
+        "visible_update": true
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/fachwissen/baumsturz-astbruch-sturm-schadenaufnahme-standfestigkeit-vorschaden/",
+        "status": 200,
+        "checked_at": "2026-10-15T04:33:57.712520+00:00",
+        "canonical": "https://www.sv-netzwerk.eu/fachwissen/baumsturz-astbruch-sturm-schadenaufnahme-standfestigkeit-vorschaden/",
+        "noindex": false,
+        "visible_update": true
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/fachwissen/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen/",
+        "status": 200,
+        "checked_at": "2026-10-15T04:33:57.583524+00:00",
+        "canonical": "https://www.sv-netzwerk.eu/fachwissen/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen/",
+        "noindex": false,
+        "visible_update": true,
+        "h1": "Haftpflichtschäden regulieren: Anspruchsgrund, Schadenhöhe und Deckung trennen",
+        "expert_link": true
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/fachwissen/",
+        "status": 200,
+        "checked_at": "2026-10-15T04:34:02.037067+00:00"
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/fachwissen/kategorie/regulierung-und-versicherungsrecht/",
+        "status": 200,
+        "checked_at": "2026-10-15T04:34:02.363157+00:00"
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/fachwissen/tag/haftpflichtschaden/",
+        "status": 200,
+        "checked_at": "2026-10-15T04:34:02.338260+00:00"
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/search-index.json",
+        "status": 200,
+        "checked_at": "2026-10-15T04:34:02.460276+00:00",
+        "missing_slugs": []
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/sitemap-0.xml",
+        "status": 200,
+        "checked_at": "2026-10-15T04:34:07.036448+00:00",
+        "wrong_lastmod": []
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/sitemap-index.xml",
+        "status": 200,
+        "checked_at": "2026-10-15T04:34:07.044787+00:00"
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/robots.txt",
+        "status": 200,
+        "checked_at": "2026-10-15T04:34:07.000902+00:00",
+        "content": "User-agent: *\nAllow: /\nDisallow: /intern/\nSitemap: https://www.sv-netzwerk.eu/sitemap-index.xml\n"
+      },
+      {
+        "url": "https://www.sv-netzwerk.eu/deploy-version.txt",
+        "status": 200,
+        "checked_at": "2026-10-15T04:34:06.883458+00:00",
+        "content": "Commit: 15f1eb66245745777814e444e7c718e153fa94cf\nBuild-Zeit: 2026-10-15T04:27:25.171Z\nVersion: Homepage-v5\n"
+      }
+    ]
+  },
+  "visual_checks": {
+    "date": "2026-10-15",
+    "method": "browser AX state plus screenshots",
+    "today": {
+      "slug": "haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen",
+      "date_visible": true,
+      "table_rendering": "verified",
+      "screenshot": "fachbeitrag-2026-10-15-haftpflicht-live.jpg"
+    },
+    "older": [
+      {
+        "slug": "mietausfall-sanierungsdauer-schadenbezug",
+        "visible_source_update": true,
+        "original_publication_date_preserved": true,
+        "updated_date": "2026-10-15",
+        "rendering": "verified"
+      },
+      {
+        "slug": "schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung",
+        "visible_source_update": true,
+        "original_publication_date_preserved": true,
+        "updated_date": "2026-10-15",
+        "rendering": "verified"
+      },
+      {
+        "slug": "baumsturz-astbruch-sturm-schadenaufnahme-standfestigkeit-vorschaden",
+        "visible_source_update": true,
+        "original_publication_date_preserved": true,
+        "updated_date": "2026-10-15",
+        "rendering": "verified"
+      }
+    ]
+  },
+  "search_scope": "Library metadata and slug availability; no full-text indexing claim"
 }

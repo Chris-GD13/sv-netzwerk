@@ -1,5 +1,7 @@
 ## 2026-10-15 – Drei individuelle Quellenpräzisierungen im Bestand
 
+- PR397 / Commit 15f1eb66245745777814e444e7c718e153fa94cf; Build, API-/Datenprüfungen und Deployment38681524857 erfolgreich. Zwölf finale Live-Endpunkte einschließlich Tagesartikel, drei alter Artikel, Übersicht, Kategorie, Tag, Suche, Sitemap und robots geprüft; exakter Live-Commit bestätigt. Drei alte Beiträge zusätzlich im Browser auf sichtbare Nachträge, korrekte Darstellung und erhaltene Erstveröffentlichungsdaten geprüft; CSV vollständig.
+
 - Mietrechtliche Minderungsbasis und Versicherungsentschädigung getrennt; historische amtliche OLG-Hilfsberechnung ohne Quotenübernahme eingeordnet.
 - Vertragliche Obliegenheitsfolgen, besondere Beweislast und Genehmigung bei fehlender Vertretungsmacht präzisiert.
 - Baumherkunft von deliktischer Haftung getrennt; FLL-Ausgaben2020/2017 anhand öffentlicher Herausgeberangaben bestätigt, keine Volltextfreigabe behauptet.

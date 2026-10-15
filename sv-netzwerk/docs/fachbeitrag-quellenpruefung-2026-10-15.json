@@ -8,21 +8,30 @@
       "new_sha256": "f1819ee52a6cd1de722430d4f736b15f3f21e96cdd034d4b37b1813e02234dcf",
       "checked_fields": "Mietrechtliche Minderung, Anzeige, Rechenbasis und Vertragserstattung getrennt; OLG-Hilfsberechnung eingeordnet",
       "updated_at": "2026-10-15",
-      "status": "built-not-yet-deployed"
+      "status": "published-verified",
+      "publication_commit": "15f1eb66245745777814e444e7c718e153fa94cf",
+      "deployment_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38681524857",
+      "live_proof": "fachbeitrag-bestands-livepruefung-2026-10-15.json"
     },
     "schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung": {
       "old_sha256": "6ef1f43db7e386020191e18f49cc48dadf1014a891efc79aa2ac73b975da4a6c",
       "new_sha256": "b0440478a95e3aa6f194f37f99ce77e0a0be506daa0697b22126839b26d10b13",
       "checked_fields": "Vertragliche Kürzungsvoraussetzung, besondere Beweislast und Genehmigung bei fehlender Vertretungsmacht präzisiert",
       "updated_at": "2026-10-15",
-      "status": "built-not-yet-deployed"
+      "status": "published-verified",
+      "publication_commit": "15f1eb66245745777814e444e7c718e153fa94cf",
+      "deployment_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38681524857",
+      "live_proof": "fachbeitrag-bestands-livepruefung-2026-10-15.json"
     },
     "baumsturz-astbruch-sturm-schadenaufnahme-standfestigkeit-vorschaden": {
       "old_sha256": "dc022d46600f04a5416ad31708f85c81348a4551e13c6052d62007a0b4f337dd",
       "new_sha256": "8c84f083fcf4d82c6ed92dfd1cb3744f9ba5c3ff03117ee3c87e6bfbe0ec37a2",
       "checked_fields": "Deliktische Haftungsprüfung von Baumherkunft getrennt; FLL-Ausgaben und begrenzter Prüfungsumfang bestätigt",
       "updated_at": "2026-10-15",
-      "status": "built-not-yet-deployed"
+      "status": "published-verified",
+      "publication_commit": "15f1eb66245745777814e444e7c718e153fa94cf",
+      "deployment_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38681524857",
+      "live_proof": "fachbeitrag-bestands-livepruefung-2026-10-15.json"
     }
   },
   "sources": [
