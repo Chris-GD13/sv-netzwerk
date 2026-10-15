@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Haftpflichtschäden regulieren: Anspruchsgrund, Schadenhöhe und Deckung trennen',
+    description: 'Anspruchsgrund, Verursachung, Schadenhöhe, Mitverursachung und Deckung als getrennte Entscheidungsebenen prüfen und dokumentieren.',
+    href: '/fachwissen/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen/',
+    category: 'Regulierung und Versicherungsrecht',
+    tags: ['Haftpflichtschaden', 'Schadenregulierung', 'Anspruchsprüfung', 'Schadenhöhe', 'Deckungsprüfung', 'Beweissicherung', 'Kostenprüfung'],
+    date: '2026-10-15',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Sanierungsbaustellen koordinieren: SiGeKo, Bauleitung und Arbeitgeberpflichten trennen',
     description: 'Koordinator, Vorankündigung und SiGePlan getrennt prüfen; Verantwortlichkeiten, Schnittstellen und Koordinationsleistungen nachvollziehbar abgrenzen.',
     href: '/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/',

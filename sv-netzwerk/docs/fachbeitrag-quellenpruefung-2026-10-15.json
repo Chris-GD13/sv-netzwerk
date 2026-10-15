@@ -99,10 +99,22 @@
   },
   "checks": {
     "astro_check": "0 errors,0 warnings,67 pre-existing hints",
-    "build": "passed",
-    "article_urls": 107,
-    "sitemap_pages": 187,
-    "internal_links": 19710
+    "build": "passed after integration of existing daily article",
+    "article_urls": 108,
+    "sitemap_pages": 188,
+    "internal_links": 19866
   },
-  "full_archive_clearance": false
+  "full_archive_clearance": false,
+  "integration_base": "9325dbe4fabac78176ed0aca81eb9fd07707e4df",
+  "daily_source_spot_check": {
+    "status": "content spot check; no rewrite, not second article",
+    "gdv_publication_date": "2026-10-14",
+    "gdv_edition": "October2026",
+    "gdv_status": "Unverbindliche fakultative Musterbedingungen; kein automatischer Vertragswechsel",
+    "gdv_page": "https://www.gdv.de/gdv/neu-strukturierte-haftpflichtbedingungen-ab-2014--5962",
+    "pdf": "https://www.gdv.de/resource/blob/6240/36c13de815d5b5e6cde419e1eaa4225f/02-avb-betriebs-und-berufshaftpflichtversicherung-2020-data.pdf",
+    "read_sections": "title/instructions page1; A1-4.1/A1-4.2 pages8–9",
+    "vvg_100_105": "separation of defence/indemnity and acknowledgement checked against current official texts",
+    "limit": "other statements not represented as individually re-cleared here"
+  }
 }
