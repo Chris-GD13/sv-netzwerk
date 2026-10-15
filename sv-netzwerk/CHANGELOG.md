@@ -1,3 +1,9 @@
+## 2026-10-15 – Astro- und TypeScript-Diagnosen bereinigt
+
+- 67 bestehende Hinweise aus Portal, ClaimsForce-Brücke, Fachwissensrouten und Tests einzeln behoben; `astro check` meldet 0 Fehler, 0 Warnungen und 0 Hinweise.
+- Unbenutzte Funktionen, Parameter und Importe entfernt; Druckansichten ohne `document.write`, Kopierfunktion mit manueller Ausweichmöglichkeit und Diktaterkennung ohne fehlerhafte Typannahme umgesetzt.
+- Browserseitige Skripte ausdrücklich als Inline-Skripte gekennzeichnet; veraltete Zod-/String-Aufrufe ersetzt. Build, SEO-/Linkprüfungen und einschlägige Portal- und Brückentests bestanden.
+
 ## 2026-10-15 – Drei individuelle Quellenpräzisierungen im Bestand
 
 - PR397 / Commit 15f1eb66245745777814e444e7c718e153fa94cf; Build, API-/Datenprüfungen und Deployment38681524857 erfolgreich. Zwölf finale Live-Endpunkte einschließlich Tagesartikel, drei alter Artikel, Übersicht, Kategorie, Tag, Suche, Sitemap und robots geprüft; exakter Live-Commit bestätigt. Drei alte Beiträge zusätzlich im Browser auf sichtbare Nachträge, korrekte Darstellung und erhaltene Erstveröffentlichungsdaten geprüft; CSV vollständig.

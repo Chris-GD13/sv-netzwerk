@@ -110,7 +110,6 @@ const { route, recordId = '' } = Astro.props;
     const beforeUnload = (event: BeforeUnloadEvent) => {
       if (!running) return;
       event.preventDefault();
-      event.returnValue = 'Die Fotoanalyse läuft noch. Seite nicht schließen oder aktualisieren.';
     };
     window.addEventListener('beforeunload', beforeUnload);
 
@@ -164,7 +163,6 @@ const { route, recordId = '' } = Astro.props;
     const beforeUnload = (event: BeforeUnloadEvent) => {
       if (!running) return;
       event.preventDefault();
-      event.returnValue = 'Das Gutachten wird noch erzeugt.';
     };
     window.addEventListener('beforeunload', beforeUnload);
 

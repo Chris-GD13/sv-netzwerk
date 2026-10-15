@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 const handlers = new Map();
-const choice = (name, checked) => ({ dataset: { bkMethod: name }, checked, addEventListener(type, callback) { handlers.set(name, callback); } });
+const choice = (name, checked) => ({ dataset: { bkMethod: name }, checked, addEventListener(_type, callback) { handlers.set(name, callback); } });
 const choices = [choice('quick', true), choice('kva', false), choice('search', false)];
 const panels = choices.map(c => ({ dataset: { bkPanel: c.dataset.bkMethod }, hidden: false, value: 'already entered' }));
 const document = { querySelectorAll(selector) { return selector === '[data-bk-method]' ? choices : panels; }, getElementById() { return null; } };

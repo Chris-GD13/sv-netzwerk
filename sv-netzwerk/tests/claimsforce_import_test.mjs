@@ -258,7 +258,7 @@ assert(importWorker.includes('(fullSync && !singleSync && alreadyComplete)') && 
 assert(importWorker.includes("type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER'") && claimsPageBridge.includes("message?.type === 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER'") && claimsPageBridge.includes('Schadennummer ${damageNumber} wurde über die ClaimsForce-Suche nicht gefunden'), 'Der Einzelfall-Vollimport löst nur die angegebene Schadennummer über die globale Suche auf');
 assert(importWorker.includes('await openSelectedClaimTab(tab.id, allClaims[0].id)') && importWorker.includes('chrome.tabs.update(tabId, { url: selectedUrl })') && importWorker.includes("!route.endsWith('/redirect')"), 'Service Worker öffnet erst nach Fallauflösung den exakten ClaimsForce-Treffer und wartet auf die Zieldetailseite');
 assert(importWorker.includes('if (attachmentBuffer === null) throw new Error') && importWorker.includes('Mail-Anhang „${attachmentName}“ konnte nicht geladen werden'), 'Nicht herunterladbare Mail-Anhänge müssen den Import als fehlgeschlagen melden statt unbemerkt ausgelassen zu werden');
-const claimsRequestJson = importWorker.slice(importWorker.indexOf('async function requestJson'), importWorker.indexOf('const INVESTIGATION_QUERIES'));
+const claimsRequestJson = importWorker.slice(importWorker.indexOf('async function requestJson'), importWorker.indexOf('async function portal'));
 assert(!claimsRequestJson.includes('if (optional) return null;') && claimsRequestJson.includes('if (optional && response.status === 404) return null;'), 'Optionale ClaimsForce-Bereiche dürfen nur bei HTTP 404 leer bleiben; Netzwerk- und Serverfehler müssen sichtbar fehlschlagen');
 
 const vault = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/vault.js'), 'utf8');

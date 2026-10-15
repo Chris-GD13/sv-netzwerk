@@ -21,7 +21,7 @@
     row.textContent = text;
     list.append(row);
   }
-  async function refresh(initial = false) {
+  async function refresh() {
     try {
       const data = await request();
       panel.hidden = false;
@@ -67,5 +67,5 @@
       controls.forEach(control => { control.disabled = false; });
     }
   };
-  refresh(true);
+  refresh();
 })();

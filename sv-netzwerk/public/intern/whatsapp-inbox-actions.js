@@ -12,7 +12,6 @@
   if(!messages)return;
   const request=async(url,options={})=>{const response=await fetch(url,{credentials:'same-origin',cache:'no-store',...options}),data=await response.json().catch(()=>({}));if(!response.ok||data.ok===false)throw Error(data.error||`HTTP ${response.status}`);return data};
   const state=(text,kind='')=>{if(!composeState)return;composeState.textContent=text;composeState.className='wa-compose-state '+kind};
-  const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   let rows=[];
   const assign=async row=>{
     const query=prompt('Schaden-Nr. oder Name des Versicherungsnehmers eingeben:');
