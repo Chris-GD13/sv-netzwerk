@@ -511,12 +511,14 @@
         "verified_at": "2026-10-16T04:19:38.675Z"
       },
       "linkedin": {
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-linkedin-20261016-01a14312",
         "reserved_at": "2026-10-16T05:01:47.277Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/sachwertverfahren-immobilien-gebaeudewert-bodenwert-marktanpassung/"
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/sachwertverfahren-immobilien-gebaeudewert-bodenwert-marktanpassung/",
+        "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7516725430578520064/",
+        "verified_at": "2026-10-16T05:04:41.174Z"
       }
     }
   },
-  "updated_at": "2026-10-16T05:01:47.277Z"
+  "updated_at": "2026-10-16T05:04:41.174Z"
 }
