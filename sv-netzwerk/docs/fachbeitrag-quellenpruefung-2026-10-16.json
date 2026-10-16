@@ -1,11 +1,18 @@
 {
   "date": "2026-10-16",
-  "scope": "Gezielte individuelle Quellen- und Aussageprüfung eines Bestandsbeitrags; keine Vollfreigabe des Artikels oder Archivs",
+  "scope": "Gezielte individuelle Quellen- und Aussageprüfung zweier Bestandsbeiträge; keine Vollfreigabe der Artikel oder des Archivs",
   "changes": {
     "abgrenzung-versicherter-nichtversicherter-schadteil": {
       "old_sha256": "c4c207468fa8c26c5c8e4b2d0822b6e9cab4357e5bc8b1a757ae09e3035efebf",
       "new_sha256": "59ceedb31ae97f590f08f6ce21dd7c046ab7f17575c95a02cd40f5414935a42f",
       "checked_fields": "Fiktives Beispiel statt unbelegter Anonymisierungsbehauptung; Vertragsbezug und Schadenminderung getrennt; unbelegte absolute Qualitätsaussagen eingeschränkt",
+      "updated_at": "2026-10-16",
+      "status": "prepared-for-review"
+    },
+    "brandschaden-mehrere-gebaeude-koordination": {
+      "old_sha256": "58d9383f2ed19eb49d5d7aafd37609319fd498d34dd4350e55ac43d8cc4f9939",
+      "new_sha256": "b955020be9a8207983dd384ef8ab25583e18d7329feaf8842a86c454591a5df3",
+      "checked_fields": "Fiktives Brandbeispiel statt fachfremder Starkregenlage; Rauch-/Ruß-, Löschwasser- und thermische Einwirkungen getrennt; Arbeitsschutzquellen auf Anwendungsbereich begrenzt; typografisches Platzhalterbild aus SEO entfernt",
       "updated_at": "2026-10-16",
       "status": "prepared-for-review"
     }
@@ -26,7 +33,22 @@
       "publication_date": null,
       "new_effective_date_claimed": false,
       "practical_use": "Schadenmindernde Sofortmaßnahmen separat dokumentieren, ohne daraus eine pauschale Sanierungsfreigabe abzuleiten"
+    },
+    {
+      "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524",
+      "status": "veröffentlichte Technische Regel für Gefahrstoffe, kein Entwurf",
+      "edition": "Juli 2026",
+      "notice_date": "2026-07-17",
+      "checked_at": "2026-10-16",
+      "practical_use": "Tätigkeiten in kontaminierten Bereichen objektspezifisch beurteilen; keine pauschale Abfalleinstufung"
+    },
+    {
+      "url": "https://publikationen.dguv.de/regelwerk/dguv-informationen/525/instandsetzungsarbeiten-an-elektrischen-anlagen-auf-brandstellen",
+      "status": "veröffentlichte DGUV Information 203-018; spezifischer Anwendungsbereich",
+      "edition": "Mai 2000",
+      "checked_at": "2026-10-16",
+      "practical_use": "Gefährdungen bei Arbeiten an elektrischen Anlagen auf erkalteten Brandstellen berücksichtigen, nicht auf alle Baugewerke übertragen"
     }
   ],
-  "review_limit": "Nur die genannten Normsätze und redaktionell korrigierten Aussagen geprüft. Keine Rechtsprechung, Normneuausgabe, Markt- oder Kostenentwicklung behauptet. Strukturinventur ist keine fachliche Vollprüfung."
+  "review_limit": "Nur die genannten Normsätze, öffentlichen Herausgeberangaben und redaktionell korrigierten Aussagen geprüft. Keine Rechtsprechung, ungelesene Regelwerkdetails, Markt- oder Kostenentwicklung behauptet. Strukturinventur ist keine fachliche Vollprüfung."
 }
