@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/form-spam-guard.php';
+
 function sv_clean_text(string $value, bool $singleLine = true): string
 {
     $value = trim(strip_tags($value));
@@ -162,6 +164,14 @@ function sv_process_form(array $config): void
         sv_redirect($returnUrl);
     }
 
+    if (sv_form_campaign_blocked($_POST, $_SERVER)) {
+        sv_log_event($config['form_key'], 'Spam-Kampagne blockiert; kein Mailversand.');
+        http_response_code(403);
+        header('Content-Type: text/plain; charset=UTF-8');
+        echo 'Die Anfrage konnte nicht angenommen werden.';
+        exit;
+    }
+
     if (!empty($_POST['website'] ?? '')) {
         sv_log_event($config['form_key'], 'Honeypot ausgelost.');
         sv_redirect($successUrl);
@@ -196,14 +206,23 @@ function sv_process_form(array $config): void
         $errors[] = 'gueltige E-Mail';
     }
 
-    $uploadSummary = [];
-    if (!empty($config['upload_field'])) {
-        $uploadSummary = sv_collect_uploads($config['upload_field']);
-    }
-
     if ($errors) {
         sv_log_event($config['form_key'], 'Validierungsfehler: ' . implode(', ', $errors));
         sv_redirect($config['error_url']);
+    }
+
+    if (!sv_form_rate_allowed((string)($_SERVER['REMOTE_ADDR'] ?? 'unknown'))) {
+        sv_log_event($config['form_key'], 'Mengenbegrenzung erreicht; kein Mailversand.');
+        http_response_code(429);
+        header('Retry-After: 900');
+        header('Content-Type: text/plain; charset=UTF-8');
+        echo 'Bitte versuchen Sie es in 15 Minuten erneut oder schreiben Sie an info@sv-netzwerk.eu.';
+        exit;
+    }
+
+    $uploadSummary = [];
+    if (!empty($config['upload_field'])) {
+        $uploadSummary = sv_collect_uploads($config['upload_field']);
     }
 
     $body = $config['intro'] . "\n\n";
