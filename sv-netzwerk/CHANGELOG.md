@@ -1,9 +1,10 @@
-## 2026-10-16 – Zwei Bestandsbeiträge individuell präzisiert
+## 2026-10-16 – Drei Bestandsbeiträge individuell präzisiert
 
 - Unbelegte Behauptung eines anonymisierten Praxisfalls entfernt; Beispiel eindeutig als fiktiv gekennzeichnet.
 - § 1 und § 82 Absatz 1 VVG im benötigten Umfang an amtlichen Einzelnormen geprüft; technischen Befund, vereinbarten Versicherungsfall, Sofortmaßnahmen und Sanierungsfreigabe getrennt.
 - Fachfremde Starkregenlage aus dem Brandschadenbeispiel entfernt, fiktives Brandbeispiel mit getrennten Einwirkungen ergänzt. BAuA TRGS 524 und DGUV 203-018 im jeweiligen Anwendungsbereich eingeordnet; typografisches SEO-Platzhalterbild entfernt.
-- Absolute Aussagen zu Kumulkoordination und Trocknungsprüfung eingegrenzt. Nur die zwei tatsächlich geänderten Altbeiträge erhalten ein neues Änderungsdatum; individuelle Quellenprüfung und Grenzen separat dokumentiert.
+- Sofortmaßnahmenbeitrag: § 82 und § 83 VVG sowie damalige Erkenntnislage von späterem Erfolg getrennt; abgeschnittene SEO-Metadaten und unpassendes Beispiel korrigiert.
+- Absolute Aussagen zu Kumulkoordination und Trocknungsprüfung eingegrenzt. Nur die drei tatsächlich geänderten Altbeiträge erhalten ein neues Änderungsdatum; individuelle Quellenprüfung und Grenzen separat dokumentiert.
 
 ## 2026-10-15 – Astro- und TypeScript-Diagnosen bereinigt
 
