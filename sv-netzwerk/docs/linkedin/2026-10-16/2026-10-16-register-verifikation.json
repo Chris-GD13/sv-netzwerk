@@ -1,0 +1,26 @@
+{
+  "outcome": "updated",
+  "day": {
+    "publication_id": "2026-10-16-sachwertverfahren-immobilien-gebaeudewert-bodenwert-marktanpassung",
+    "article": {
+      "title": "Sachwertverfahren bei Immobilien: Gebäudewert, Bodenwert und Marktanpassung trennen",
+      "slug": "sachwertverfahren-immobilien-gebaeudewert-bodenwert-marktanpassung",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sachwertverfahren-immobilien-gebaeudewert-bodenwert-marktanpassung/",
+      "status": "published-verified",
+      "owner": "codex-website-20261016-0600",
+      "reserved_at": "2026-10-16T04:01:26.689Z",
+      "commit": "74a1880f06fa82b9a76eded3ebee73ba9db7f986",
+      "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38849479289",
+      "verified_at": "2026-10-16T04:19:38.675Z"
+    },
+    "linkedin": {
+      "status": "published-verified",
+      "owner": "codex-linkedin-20261016-01a14312",
+      "reserved_at": "2026-10-16T05:01:47.277Z",
+      "article_url": "https://www.sv-netzwerk.eu/fachwissen/sachwertverfahren-immobilien-gebaeudewert-bodenwert-marktanpassung/",
+      "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7516725430578520064/",
+      "verified_at": "2026-10-16T05:04:41.174Z"
+    }
+  },
+  "commit": "5e1ad23a9cee22bbb60f208f240eee40eb7fcba3"
+}
