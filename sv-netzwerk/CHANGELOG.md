@@ -9,6 +9,15 @@
 - Persönliche Autorenschaft nicht unterstellt: sichtbare Zeile und strukturierte Daten verwenden `SV-Netzwerk Redaktion`; Marc Schütt bleibt ausschließlich als fachlich passendes Expertenprofil verknüpft.
 - Initialer Livegang des Inhaltscommits `74a1880f06fa82b9a76eded3ebee73ba9db7f986` über Deployment [38849479289](https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38849479289) geprüft; Detail, Übersicht, Kategorie, Schlagwort, Sitemap, robots.txt und exakter Deploy-Marker bestätigt.
 
+## 2026-10-16 – Drei Bestandsbeiträge individuell präzisiert
+
+- Unbelegte Behauptung eines anonymisierten Praxisfalls entfernt; Beispiel eindeutig als fiktiv gekennzeichnet.
+- § 1 und § 82 Absatz 1 VVG im benötigten Umfang an amtlichen Einzelnormen geprüft; technischen Befund, vereinbarten Versicherungsfall, Sofortmaßnahmen und Sanierungsfreigabe getrennt.
+- Fachfremde Starkregenlage aus dem Brandschadenbeispiel entfernt, fiktives Brandbeispiel mit getrennten Einwirkungen ergänzt. BAuA TRGS 524 und DGUV 203-018 im jeweiligen Anwendungsbereich eingeordnet; typografisches SEO-Platzhalterbild entfernt.
+- Sofortmaßnahmenbeitrag: § 82 und § 83 VVG sowie damalige Erkenntnislage von späterem Erfolg getrennt; abgeschnittene SEO-Metadaten und unpassendes Beispiel korrigiert.
+- Absolute Aussagen zu Kumulkoordination und Trocknungsprüfung eingegrenzt. Nur die drei tatsächlich geänderten Altbeiträge erhalten ein neues Änderungsdatum; individuelle Quellenprüfung und Grenzen separat dokumentiert.
+- Doppelte Tag-Routen durch kollidierende Singular-/Plural-Slugs entfernt; Taxonomie und Fachwissensfilter bündeln gleiche Slugs, ohne Beiträge aus der Trefferliste zu verlieren. Build ohne Astro-Routenwarnungen geprüft.
+
 ## 2026-10-15 – Astro- und TypeScript-Diagnosen bereinigt
 
 - 67 bestehende Hinweise aus Portal, ClaimsForce-Brücke, Fachwissensrouten und Tests einzeln behoben; `astro check` meldet 0 Fehler, 0 Warnungen und 0 Hinweise.

@@ -11,7 +11,7 @@ export function getStaticPaths() {
 }
 
 const { tag } = Astro.props;
-const items = sortedLibrary.filter((item) => item.tags.includes(tag));
+const items = sortedLibrary.filter((item) => item.tags.some((itemTag) => slugify(itemTag) === slugify(tag)));
 ---
 <BaseLayout title={`#${tag} – Fachartikel | SV-Netzwerk`} description={`Fachbeiträge und Praxishinweise des SV-Netzwerks zum Schlagwort ${tag}.`} noindex>
   <Hero eyebrow="Fachartikel nach Schlagwort" title={`#${tag}`} text={`${items.length} ${items.length === 1 ? 'Beitrag' : 'Beiträge'} mit diesem Schlagwort.`} />

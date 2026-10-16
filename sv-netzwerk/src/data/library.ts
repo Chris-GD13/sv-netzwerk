@@ -1128,4 +1128,5 @@ export const categories = [...new Set(sortedLibrary.map((item) => item.category)
   .sort((a, b) => a.localeCompare(b, 'de'));
 
 export const tags = [...new Set(sortedLibrary.flatMap((item) => item.tags))]
-  .sort((a, b) => a.localeCompare(b, 'de'));
+  .sort((a, b) => a.localeCompare(b, 'de'))
+  .filter((tag, index, all) => all.findIndex((candidate) => slugify(candidate) === slugify(tag)) === index);
