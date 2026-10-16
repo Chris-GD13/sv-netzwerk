@@ -14,11 +14,18 @@ export const sortByPublicationDate = <C extends CollectionKey>(entries: Collecti
   });
 
 export const buildTaxonomy = (values: string[]): TaxonomyTerm[] => {
-  const counts = new Map<string, number>();
-  values.forEach((value) => counts.set(value, (counts.get(value) ?? 0) + 1));
+  const terms = new Map<string, TaxonomyTerm>();
+  values.forEach((label) => {
+    const slug = slugify(label);
+    const existing = terms.get(slug);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      terms.set(slug, { label, count: 1, slug });
+    }
+  });
 
-  return [...counts.entries()]
-    .map(([label, count]) => ({ label, count, slug: slugify(label) }))
+  return [...terms.values()]
     .sort((a, b) => a.label.localeCompare(b.label, 'de'));
 };
 

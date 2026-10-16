@@ -16,6 +16,7 @@
 - Fachfremde Starkregenlage aus dem Brandschadenbeispiel entfernt, fiktives Brandbeispiel mit getrennten Einwirkungen ergänzt. BAuA TRGS 524 und DGUV 203-018 im jeweiligen Anwendungsbereich eingeordnet; typografisches SEO-Platzhalterbild entfernt.
 - Sofortmaßnahmenbeitrag: § 82 und § 83 VVG sowie damalige Erkenntnislage von späterem Erfolg getrennt; abgeschnittene SEO-Metadaten und unpassendes Beispiel korrigiert.
 - Absolute Aussagen zu Kumulkoordination und Trocknungsprüfung eingegrenzt. Nur die drei tatsächlich geänderten Altbeiträge erhalten ein neues Änderungsdatum; individuelle Quellenprüfung und Grenzen separat dokumentiert.
+- Doppelte Tag-Routen durch kollidierende Singular-/Plural-Slugs entfernt; Taxonomie und Fachwissensfilter bündeln gleiche Slugs, ohne Beiträge aus der Trefferliste zu verlieren. Build ohne Astro-Routenwarnungen geprüft.
 
 ## 2026-10-15 – Astro- und TypeScript-Diagnosen bereinigt
 
