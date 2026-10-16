@@ -35,8 +35,14 @@ for (const url of urls) {
     checkedLinks += 1;
   }
   if (url.includes('/fachwissen/') && html.includes('class="knowledge-meta"')) {
-    assert(/href="\/experten\/christian-waechter\/" rel="author"/.test(html), `Autorenprofil fehlt: ${url}`);
-    assert(html.includes('https://www.sv-netzwerk.eu/experten/christian-waechter/#person'), `Article-Autorenidentität fehlt: ${url}`);
+    const editorialAuthor = html.includes('"author":{"@type":"Organization","@id":"https://www.sv-netzwerk.eu#organization","name":"SV-Netzwerk Redaktion"}');
+    if (editorialAuthor) {
+      assert(html.includes('Von SV-Netzwerk Redaktion'), `Redaktionelle Autorenzeile fehlt: ${url}`);
+    } else {
+      const profileSlug = html.match(/href="\/experten\/([a-z0-9-]+)\/" rel="author"/)?.[1];
+      assert(profileSlug, `Autorenprofil fehlt: ${url}`);
+      assert(html.includes(`https://www.sv-netzwerk.eu/experten/${profileSlug}/#person`), `Article-Autorenidentität fehlt: ${url}`);
+    }
   }
   for (const [, image] of html.matchAll(/<meta (?:property="og:image"|name="twitter:image") content="([^"]+)"/g)) {
     assert(image.startsWith('https://'), `Vorschaubild muss absolut sein: ${url}`);

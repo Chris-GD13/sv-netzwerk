@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Sachwertverfahren bei Immobilien: Gebäudewert, Bodenwert und Marktanpassung trennen',
+    description: 'Gebäudewert, Außenanlagen, Bodenwert, Alterswertminderung, Sachwertfaktor und besondere Objektmerkmale modellkonform und nachvollziehbar herleiten.',
+    href: '/fachwissen/sachwertverfahren-immobilien-gebaeudewert-bodenwert-marktanpassung/',
+    category: 'Wertermittlung und Immobilienbewertung',
+    tags: ['Sachwertverfahren', 'Immobilienbewertung', 'Bodenwert', 'Sachwertfaktor', 'Restnutzungsdauer', 'Marktanpassung', 'Modellkonformität'],
+    date: '2026-10-16',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Haftpflichtschäden regulieren: Anspruchsgrund, Schadenhöhe und Deckung trennen',
     description: 'Anspruchsgrund, Verursachung, Schadenhöhe, Mitverursachung und Deckung als getrennte Entscheidungsebenen prüfen und dokumentieren.',
     href: '/fachwissen/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen/',
