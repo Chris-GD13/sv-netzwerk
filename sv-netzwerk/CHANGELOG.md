@@ -1,3 +1,12 @@
+## 2026-10-16 – Sachwertverfahren modellkonform herleiten
+
+- Genau einen Tagesartikel unter atomarer Reservierung vorbereitet: Gebäudewert, Außenanlagen, Bodenwert, Alterswertminderung, Sachwertfaktor und besondere objektspezifische Grundstücksmerkmale getrennt herleiten.
+- Marc Schütt gemäß aktuellem Live-Profil dem belegten Fachgebiet Wertermittlung nach Sachwertverfahren zugeordnet; keine behauptete Autorenschaft oder konkrete Fallzuständigkeit.
+- Amtliche ImmoWertV einschließlich §§ 4, 6, 8–10, 21 und 35–40, § 194 BauGB, die BMWSB-Erläuterungen und die Destatis-Methodik zum Baupreisindex im benötigten Umfang geöffnet und geprüft.
+- Kein erfundener Bewertungsfall, keine Beispielbeträge und keine pauschale Markt- oder Versicherungsbehauptung; eigenständiges Sachverständigenthema.
+- Library, interne Profilverknüpfung, Suchindex-/Sitemap-Datenbasis, CSV und separater LinkedIn-Begleittext vorbereitet; LinkedIn bleibt `prepared-not-posted`.
+- Ohne öffentliches Beitragsbild, weil kein fachlich passendes geprüftes Motiv vorlag; keine SVG- oder Titelkarten-Platzhalter.
+
 ## 2026-10-15 – Astro- und TypeScript-Diagnosen bereinigt
 
 - 67 bestehende Hinweise aus Portal, ClaimsForce-Brücke, Fachwissensrouten und Tests einzeln behoben; `astro check` meldet 0 Fehler, 0 Warnungen und 0 Hinweise.
