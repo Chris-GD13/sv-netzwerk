@@ -6,6 +6,8 @@
 - Kein erfundener Bewertungsfall, keine Beispielbeträge und keine pauschale Markt- oder Versicherungsbehauptung; eigenständiges Sachverständigenthema.
 - Library, interne Profilverknüpfung, Suchindex-/Sitemap-Datenbasis, CSV und separater LinkedIn-Begleittext vorbereitet; LinkedIn bleibt `prepared-not-posted`.
 - Ohne öffentliches Beitragsbild, weil kein fachlich passendes geprüftes Motiv vorlag; keine SVG- oder Titelkarten-Platzhalter.
+- Persönliche Autorenschaft nicht unterstellt: sichtbare Zeile und strukturierte Daten verwenden `SV-Netzwerk Redaktion`; Marc Schütt bleibt ausschließlich als fachlich passendes Expertenprofil verknüpft.
+- Initialer Livegang des Inhaltscommits `74a1880f06fa82b9a76eded3ebee73ba9db7f986` über Deployment [38849479289](https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38849479289) geprüft; Detail, Übersicht, Kategorie, Schlagwort, Sitemap, robots.txt und exakter Deploy-Marker bestätigt.
 
 ## 2026-10-16 – Drei Bestandsbeiträge individuell präzisiert
 
