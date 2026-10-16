@@ -503,14 +503,17 @@
         "title": "Sachwertverfahren bei Immobilien: Gebäudewert, Bodenwert und Marktanpassung trennen",
         "slug": "sachwertverfahren-immobilien-gebaeudewert-bodenwert-marktanpassung",
         "url": "https://www.sv-netzwerk.eu/fachwissen/sachwertverfahren-immobilien-gebaeudewert-bodenwert-marktanpassung/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-website-20261016-0600",
-        "reserved_at": "2026-10-16T04:01:26.689Z"
+        "reserved_at": "2026-10-16T04:01:26.689Z",
+        "commit": "74a1880f06fa82b9a76eded3ebee73ba9db7f986",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38849479289",
+        "verified_at": "2026-10-16T04:19:38.675Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-16T04:01:26.689Z"
+  "updated_at": "2026-10-16T04:19:38.675Z"
 }
