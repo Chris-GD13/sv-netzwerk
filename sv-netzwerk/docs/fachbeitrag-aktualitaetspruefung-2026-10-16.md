@@ -1,0 +1,7 @@
+# Individuelle Quellenprüfung 16.10.2026
+
+Der ältere Fachbeitrag „Abgrenzung versicherter und nicht versicherter Schadteile“ wurde in einzelnen Prüffeldern gelesen und präzisiert. Die bisherige Behauptung eines anonymisierten Praxisfalls war nicht belegt und wurde durch eine eindeutige Kennzeichnung des Beispiels als fiktiv ersetzt. Pauschale Aussagen zu zwangsläufigen Folgen, einer allein ausreichenden Koordinationsform und stets erforderlichen Trocknungsprüfungen wurden auf ihren tatsächlichen Anwendungsbereich begrenzt.
+
+Die amtlichen Einzelnormen § 1 und § 82 Absatz 1 VVG wurden am 16.10.2026 für Vertragsbezug und Schadenminderung geprüft. Status: geltendes Bundesrecht. Das Prüfdatum ist nicht das Veröffentlichungsdatum der Norm oder ein neu behaupteter Geltungsbeginn. Für Sachverständige und Großschadenregulierer ist entscheidend, Sofortmaßnahmen, technische Schadenabgrenzung, vertraglichen Versicherungsfall und späteren Sanierungsumfang getrennt zu dokumentieren. Quellen und die alten/neuen Datei-Hashes stehen im maschinenlesbaren Prüfprotokoll gleichen Datums.
+
+Das ursprüngliche Veröffentlichungsdatum bleibt erhalten. Nur dieser tatsächlich inhaltlich geänderte Beitrag erhält `updatedAt: 2026-10-16`. Dies ist eine gezielte Korrektur, keine vollständige fachliche Quellenfreigabe des Artikels oder des Archivs. Weitere Bestandsbeiträge bleiben individuell zu prüfen. Der Tagesbeitrag zum Sachwertverfahren ist durch einen anderen Lauf reserviert; kein zweiter Tagesbeitrag und kein LinkedIn-Post in diesem Prüflauf.

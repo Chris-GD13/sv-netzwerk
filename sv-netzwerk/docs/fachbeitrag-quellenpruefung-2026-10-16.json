@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-16",
+  "scope": "Gezielte individuelle Quellen- und Aussageprüfung eines Bestandsbeitrags; keine Vollfreigabe des Artikels oder Archivs",
+  "changes": {
+    "abgrenzung-versicherter-nichtversicherter-schadteil": {
+      "old_sha256": "c4c207468fa8c26c5c8e4b2d0822b6e9cab4357e5bc8b1a757ae09e3035efebf",
+      "new_sha256": "59ceedb31ae97f590f08f6ce21dd7c046ab7f17575c95a02cd40f5414935a42f",
+      "checked_fields": "Fiktives Beispiel statt unbelegter Anonymisierungsbehauptung; Vertragsbezug und Schadenminderung getrennt; unbelegte absolute Qualitätsaussagen eingeschränkt",
+      "updated_at": "2026-10-16",
+      "status": "prepared-for-review"
+    }
+  },
+  "sources": [
+    {
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__1.html",
+      "status": "geltendes Bundesrecht",
+      "checked_at": "2026-10-16",
+      "publication_date": null,
+      "new_effective_date_claimed": false,
+      "practical_use": "Technischer Schadenbefund nicht mit vertraglich vereinbartem Versicherungsfall gleichsetzen"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+      "status": "geltendes Bundesrecht",
+      "checked_at": "2026-10-16",
+      "publication_date": null,
+      "new_effective_date_claimed": false,
+      "practical_use": "Schadenmindernde Sofortmaßnahmen separat dokumentieren, ohne daraus eine pauschale Sanierungsfreigabe abzuleiten"
+    }
+  ],
+  "review_limit": "Nur die genannten Normsätze und redaktionell korrigierten Aussagen geprüft. Keine Rechtsprechung, Normneuausgabe, Markt- oder Kostenentwicklung behauptet. Strukturinventur ist keine fachliche Vollprüfung."
+}

@@ -1,3 +1,9 @@
+## 2026-10-16 – Bestandsbeitrag zur Schadenabgrenzung präzisiert
+
+- Unbelegte Behauptung eines anonymisierten Praxisfalls entfernt; Beispiel eindeutig als fiktiv gekennzeichnet.
+- § 1 und § 82 Absatz 1 VVG im benötigten Umfang an amtlichen Einzelnormen geprüft; technischen Befund, vereinbarten Versicherungsfall, Sofortmaßnahmen und Sanierungsfreigabe getrennt.
+- Absolute Aussagen zu Kumulkoordination und Trocknungsprüfung eingegrenzt. Nur der tatsächlich geänderte Altbeitrag erhält ein neues Änderungsdatum; individuelle Quellenprüfung und Grenzen separat dokumentiert.
+
 ## 2026-10-15 – Astro- und TypeScript-Diagnosen bereinigt
 
 - 67 bestehende Hinweise aus Portal, ClaimsForce-Brücke, Fachwissensrouten und Tests einzeln behoben; `astro check` meldet 0 Fehler, 0 Warnungen und 0 Hinweise.
