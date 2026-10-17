@@ -96,6 +96,6 @@ Eine Reserve ist belastbar, wenn sie aus dokumentierten Kostenbausteinen entsteh
 
 ## Quellen und weiterführende Hinweise
 
-- [Quelle 1](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – offizieller Bezug zum jeweiligen Prüffeld.
-- [Quelle 2](https://www.gesetze-im-internet.de/vvg_2008/__86.html) – fachliche oder sicherheitsbezogene Einordnung.
-- [Quelle 3](https://www.gesetze-im-internet.de/bgb/__249.html) – gesetzlicher beziehungsweise technischer Rahmen.
+- Bundesministerium der Justiz, [§ 82 VVG – Schadenabwendung und Schadenminderung](https://www.gesetze-im-internet.de/vvg_2008/__82.html).
+- Bundesministerium der Justiz, [§ 86 VVG – Übergang von Ersatzansprüchen](https://www.gesetze-im-internet.de/vvg_2008/__86.html).
+- Bundesministerium der Justiz, [§ 249 BGB – Art und Umfang des Schadensersatzes](https://www.gesetze-im-internet.de/bgb/__249.html).
