@@ -20,10 +20,31 @@ function pbSection(array &$pages,array &$ops,float &$y,string $name,string $titl
 function pbAddressText(array $a): string {return trim($a['street'].', '.$a['postcode'].' '.$a['city'],', ');}
 function pbClientBlock(array &$pages,array &$ops,float &$y,string $title,array $r): void {$d=$r['data'];$left=[pbCustomer($d)?:'Noch nicht angegeben',$d['billing_street'],trim($d['billing_postcode'].' '.$d['billing_city']),($d['phone']??'')!==''?'Telefon: '.$d['phone']:'',($d['mobile']??'')!==''?'Mobil: '.$d['mobile']:'',($d['other_phone']??'')!==''?'Sonstige Nummer: '.$d['other_phone']:'',$d['email'],$d['additional_email']??''];$site=pbSite($d);$right=[$site['street'],trim($site['postcode'].' '.$site['city']),$d['contact']!==''?'Kontakt: '.$d['contact']:'',$d['appointment']!==''?'Termin: '.$d['appointment']:''];$columns=[];foreach([$left,$right]as$col){$lines=[];foreach($col as$value)if($value!=='')$lines=array_merge($lines,trWrap($value,43));$columns[]=$lines;}$height=max(count($columns[0]),count($columns[1]))*13+45;trFill($ops,44,$y-$height,507,$height,[.96,.975,.98]);foreach($columns as$i=>$lines){$x=$i===0?55:313;trText($ops,$x,$y-17,$i===0?'Auftraggeber / Rechnung':'Ortstermin / Objekt',9,true,[.13,.30,.40]);foreach($lines as$j=>$line)trText($ops,$x,$y-37-$j*13,$line,8.8,false,[.08,.16,.22]);}$y-=$height+16;}
 function pbPriceBlock(array &$pages,array &$ops,float &$y,string $title,array $r): void {
-    $d=$r['data'];$t=pbTotals($d);pbSection($pages,$ops,$y,$d['pricing']==='flat'?'Vereinbarte Pauschale':'Kostenkalkulation nach Aufwand',$title,$r);
-    foreach($t['lines']as$line)pbParagraph($pages,$ops,$y,$line['label'].': '.trNumber(round($line['quantity'],3)).' '.$line['unit'].' × '.trMoney($line['rate']).' = '.trMoney($line['net']).' netto',$title,$r);
+    $d=$r['data'];$t=pbTotals($d);$rows=[];$tableHeight=26+57;
+    foreach($t['lines']as$line){$line['wrapped']=trWrap($line['label'],36);$line['height']=max(22,count($line['wrapped'])*11+8);$rows[]=$line;$tableHeight+=$line['height'];}
+    if($y-$tableHeight-30<80){$pages[]=$ops;$ops=[];$y=pbHeader($ops,$title,$r);}
+    pbSection($pages,$ops,$y,$d['pricing']==='flat'?'Vereinbarte Pauschale':'Kostenkalkulation nach Aufwand',$title,$r);
+    $top=$y+6;$bottom=$top-$tableHeight;$navy=[.06,.20,.30];$border=[.78,.83,.86];
+    trFill($ops,44,$top-26,507,26,$navy);
+    trText($ops,52,$top-17,'Leistung',8.5,true,[1,1,1]);
+    trRight($ops,316,$top-17,'Menge',8.5,true,[1,1,1]);
+    trText($ops,328,$top-17,'Einheit',8.5,true,[1,1,1]);
+    trRight($ops,451,$top-12,'Einzelpreis',8.5,true,[1,1,1]);trRight($ops,451,$top-22,'netto (EUR)',7,false,[1,1,1]);
+    trRight($ops,543,$top-12,'Gesamtpreis',8.5,true,[1,1,1]);trRight($ops,543,$top-22,'netto (EUR)',7,false,[1,1,1]);
+    $rowTop=$top-26;
+    foreach($rows as$i=>$line){$h=$line['height'];trFill($ops,44,$rowTop-$h,507,$h,$i%2===0?[.96,.975,.98]:[1,1,1]);
+        foreach($line['wrapped']as$j=>$text)trText($ops,52,$rowTop-16-$j*11,$text,8.5,false,[.08,.16,.22]);
+        trRight($ops,316,$rowTop-16,trNumber(round($line['quantity'],3)),8.5);trText($ops,328,$rowTop-16,$line['unit'],8.2);
+        trRight($ops,451,$rowTop-16,number_format($line['rate'],2,',','.'),8.5);trRight($ops,543,$rowTop-16,number_format($line['net'],2,',','.'),8.5);
+        $rowTop-=$h;trLine($ops,44,$rowTop,551,$rowTop,$border,.5);
+    }
+    foreach([44,275,322,374,459,551]as$x)trLine($ops,$x,$top-26,$x,$rowTop,$border,.5);
+    foreach([['Summe netto',$t['net']],['Umsatzsteuer '.trNumber($d['vat_rate']).' %',$t['vat']],['Gesamt brutto',$t['gross']]]as$i=>$sum){
+        $color=$i===2?[1,1,1]:[.08,.16,.22];trFill($ops,275,$rowTop-19,276,19,$i===2?$navy:[.94,.96,.97]);
+        trText($ops,283,$rowTop-13,$sum[0],9,true,$color);trRight($ops,543,$rowTop-13,trMoney($sum[1]),9,true,$color);$rowTop-=19;
+    }
+    $y=$bottom-12;
     if($d['pricing']==='flat')pbParagraph($pages,$ops,$y,'Die Einzelansätze dienen der Kalkulation. Maßgeblich ist die angebotene Gesamtpauschale von '.trMoney($t['net']).' netto.',$title,$r,true);
-    pbParagraph($pages,$ops,$y,'Netto: '.trMoney($t['net']).' | Umsatzsteuer '.trNumber($d['vat_rate']).' %: '.trMoney($t['vat']).' | Gesamt brutto: '.trMoney($t['gross']),$title,$r,true);
     if(str_contains($title,'Auftragsformular')){pbParagraph($pages,$ops,$y,'Anfahrt ab '.pbAddressText(pbOrigin($d)).'; '.$d['visits'].' Termin(e), jeweils Hin- und Rückweg. Bei Aufwandsabrechnung gelten die dokumentierten tatsächlichen Zeiten und Mengen.',$title,$r);return;}
     pbParagraph($pages,$ops,$y,'Start: '.pbAddressText(pbOrigin($d)).' | Ziel: '.pbAddressText(pbSite($d))."\n".$d['visits'].' Termin(e); einfache Strecke '.trNumber($d['oneway_km']).' km / '.trNumber($d['oneway_minutes']).' Minuten. Berechnet werden Hin- und Rückweg: '.trNumber($t['km_total']).' km und '.trNumber(round($t['travel_hours'],3)).' Stunden.', $title,$r);
     if($d['pricing']==='effort')pbParagraph($pages,$ops,$y,'Der Gesamtbetrag ist eine Kostenschätzung für den beschriebenen Leistungsumfang. Abgerechnet wird der tatsächlich dokumentierte Aufwand zu den vereinbarten Sätzen. Erhebliche absehbare Überschreitungen werden vor Fortsetzung mit dem Auftraggeber abgestimmt.',$title,$r);
