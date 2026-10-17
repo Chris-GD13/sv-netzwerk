@@ -71,9 +71,9 @@ Zunächst sind zwei Berechnungen zu trennen: die mietrechtliche Herabsetzung der
 
 ### Quellenpräzisierung vom 15.10.2026: Rechtsfolge, Zeitraum und Rechenbasis
 
-[§ 536 BGB](https://www.gesetze-im-internet.de/bgb/__536.html) knüpft die Minderung an die aufgehobene oder geminderte Gebrauchstauglichkeit; eine unerhebliche Einschränkung bleibt außer Betracht. Ein Minderungsschreiben oder eine Zustimmung des Vermieters ist daher nicht der alleinige Rechtsgrund. [§ 536c BGB](https://www.gesetze-im-internet.de/bgb/__536c.html) verlangt die unverzügliche Mängelanzeige. Ein Rechtsverlust wegen unterlassener Anzeige setzt nach Absatz 2 insbesondere voraus, dass der Vermieter deshalb nicht abhelfen konnte. Eine verspätete Anzeige ist nicht pauschal mit dem Wegfall jeder Minderung gleichzusetzen. Beide geltenden Einzelnormen wurden am 15.10.2026 gelesen; das Prüfdatum ist kein neuer Geltungsbeginn.
+[§ 536 BGB](https://www.gesetze-im-internet.de/bgb/__536.html) knüpft die Minderung an die aufgehobene oder geminderte Gebrauchstauglichkeit; eine unerhebliche Einschränkung bleibt außer Betracht. Ein Minderungsschreiben oder eine Zustimmung des Vermieters ist daher nicht der alleinige Rechtsgrund. [§ 536c BGB](https://www.gesetze-im-internet.de/bgb/__536c.html) verlangt die unverzügliche Mängelanzeige. Ein Rechtsverlust wegen unterlassener Anzeige setzt nach Absatz 2 insbesondere voraus, dass der Vermieter deshalb nicht abhelfen konnte. Eine verspätete Anzeige ist nicht pauschal mit dem Wegfall jeder Minderung gleichzusetzen. 
 
-Eine konkrete historische Gerichtsquelle zur Rechenmethodik ist der [Hinweisbeschluss des OLG Düsseldorf vom 12.09.2019, 24 U 197/18](https://nrwe.justiz.nrw.de/olgs/duesseldorf/j2019/24_U_197_18_Beschluss_20190912.html), insbesondere Randnummern 50 und 63–66. In einer ausdrücklich hilfsweisen Berechnung trennt das Gericht beeinträchtigte Zeiträume und Mietobjekte und berücksichtigt die Bruttomiete des betroffenen Ladenlokals einschließlich Nebenkostenvorauszahlungen. Daraus folgt keine übertragbare Minderungsquote und keine Versicherungsdeckung. Es handelt sich nicht um eine neue Entscheidung von 2026; ein gesondertes Veröffentlichungsdatum weist die amtliche Fundstelle nicht aus. Praktischer Nutzen: technische Nutzungsabschnitte dokumentieren und die rechtliche Rechenbasis getrennt vom versicherten Ertragsausfall prüfen.
+Eine konkrete historische Gerichtsquelle zur Rechenmethodik ist der [Hinweisbeschluss des OLG Düsseldorf vom 12.09.2019, 24 U 197/18](https://nrwe.justiz.nrw.de/olgs/duesseldorf/j2019/24_U_197_18_Beschluss_20190912.html), insbesondere Randnummern 50 und 63–66. In einer ausdrücklich hilfsweisen Berechnung trennt das Gericht beeinträchtigte Zeiträume und Mietobjekte und berücksichtigt die Bruttomiete des betroffenen Ladenlokals einschließlich Nebenkostenvorauszahlungen. Daraus folgt keine übertragbare Minderungsquote und keine Versicherungsdeckung. Die technische Nutzungsdauer und die rechtliche Rechenbasis sind getrennt vom versicherten Ertragsausfall zu prüfen.
 
 ## Fiktives Praxisbeispiel
 
@@ -91,6 +91,6 @@ Mietausfall wird durch zeit- und raumbezogene Nachweise prüffähig. Entscheiden
 
 ## Quellen und weiterführende Hinweise
 
-- [§ 536 BGB, Mietminderung](https://www.gesetze-im-internet.de/bgb/__536.html) und [§ 536c BGB, Mängelanzeige](https://www.gesetze-im-internet.de/bgb/__536c.html): Rechtsfolge und Grenzen der Anzeigeversäumnis, geltende Texte.
-- [OLG Düsseldorf, Hinweisbeschluss 12.09.2019, 24 U 197/18](https://nrwe.justiz.nrw.de/olgs/duesseldorf/j2019/24_U_197_18_Beschluss_20190912.html): zeit- und objektbezogene Hilfsberechnung; kein pauschaler Quotentarif.
-- [§ 82 VVG, Schadenabwendung und Schadenminderung](https://www.gesetze-im-internet.de/vvg_2008/__82.html): eigenständige versicherungsvertragliche Prüfung, nicht die mietrechtliche Berechnungsgrundlage.
+- [§ 536 BGB, Mietminderung](https://www.gesetze-im-internet.de/bgb/__536.html) und [§ 536c BGB, Mängelanzeige](https://www.gesetze-im-internet.de/bgb/__536c.html).
+- [OLG Düsseldorf, Hinweisbeschluss 12.09.2019, 24 U 197/18](https://nrwe.justiz.nrw.de/olgs/duesseldorf/j2019/24_U_197_18_Beschluss_20190912.html).
+- [§ 82 VVG, Schadenabwendung und Schadenminderung](https://www.gesetze-im-internet.de/vvg_2008/__82.html).
