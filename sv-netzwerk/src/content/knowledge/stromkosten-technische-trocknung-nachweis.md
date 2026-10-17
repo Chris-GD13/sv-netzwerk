@@ -85,6 +85,6 @@ Trocknungsstrom wird durch Nachweis regulierungsfähig. Entscheidend sind nicht 
 
 ## Quellen und weiterführende Hinweise
 
-- [Quelle 1](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – offizieller Bezug zum jeweiligen Prüffeld.
-- [Quelle 2](https://www.dguv.de/medien/inhalt/publikationen/regelwerk/regelwerk_dguv-informationen/index.jsp) – fachliche oder sicherheitsbezogene Einordnung.
-- [Quelle 3](https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR.html) – gesetzlicher beziehungsweise technischer Rahmen.
+- Bundesministerium der Justiz, [§ 82 VVG – Schadenabwendung und Schadenminderung](https://www.gesetze-im-internet.de/vvg_2008/__82.html).
+- Deutsche Gesetzliche Unfallversicherung, [DGUV-Informationen – Regelwerk](https://www.dguv.de/medien/inhalt/publikationen/regelwerk/regelwerk_dguv-informationen/index.jsp).
+- Bundesanstalt für Arbeitsschutz und Arbeitsmedizin, [Technische Regeln für Arbeitsstätten (ASR)](https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR.html).
