@@ -571,7 +571,37 @@
         "reserved_at": "2026-10-17T05:08:33.090Z",
         "article_url": "https://www.sv-netzwerk.eu/fachwissen/drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation/",
         "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7517089654450438144/",
-        "verified_at": "2026-10-17T05:11:56.602Z"
+        "verified_at": "2026-10-17T05:11:56.602Z",
+        "published_at_berlin": "2026-10-17T07:10:33+02:00",
+        "published_time_precision": "client-side-click-window",
+        "published_click_window_berlin": [
+          "2026-10-17T07:10:33.478+02:00",
+          "2026-10-17T07:10:33.879+02:00"
+        ],
+        "verified_at_berlin": "2026-10-17T07:11:56.602+02:00",
+        "profile_url": "https://www.linkedin.com/in/christian-w-156408204/",
+        "proof_document": "docs/linkedin-veroeffentlichung-2026-10-17.md",
+        "text_file": "docs/linkedin/2026-10-17/2026-10-17-drohnen-linkedin.txt",
+        "source_file": "docs/linkedin/2026-10-17/2026-10-17-linkedin-quellenpruefung.md",
+        "screenshot": "docs/linkedin/2026-10-17/2026-10-17-linkedin-vollstaendig.jpg",
+        "image_path": null,
+        "image_cost_policy": {
+          "additional_budget_usd": 0,
+          "additional_spend_usd": 0,
+          "model_or_api_called": false,
+          "path": "published-without-image",
+          "note": "Work-Tarifdeckung ohne Test nicht verifizierbar; kein ausdrücklich freigegebenes passendes Bestandsmotiv; zusätzliche Titelkarte ohne fachlichen Mehrwert. Ohne Bild und ohne Bildhinweis veröffentlicht."
+        },
+        "duplicate_check_note": "Profil vor Erstellung und unmittelbar vor Absenden frisch geladen: zuletzt manueller Fenster-/Halloween-Beitrag und Sachwert-Tagesbeitrag 16.10.; kein Drohnenbeitrag. Eigene atomare Reservierung und CSV nochmals geprüft. Genau ein Posten-Klick und genau ein neuer Profilbeitrag.",
+        "website_live_commit": "abca7bae635f830eb029ddcec75814e0e6de04d8",
+        "website_live_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39002708168",
+        "article_type": "eigenstaendiges-sachverstaendigenthema",
+        "expert_assignment": {
+          "name": "Christian Wächter",
+          "profile_url": "https://www.sv-netzwerk.eu/experten/christian-waechter/",
+          "scope": "Drohnen; belegtes Fachgebiet, keine behauptete Autorenschaft oder konkrete Fallzuständigkeit"
+        },
+        "shortlink": "https://lnkd.in/e_nQzcmE"
       }
     }
   },
