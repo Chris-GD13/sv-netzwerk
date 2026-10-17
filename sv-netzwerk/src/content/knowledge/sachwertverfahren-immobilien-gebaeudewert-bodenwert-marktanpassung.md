@@ -3,7 +3,7 @@ title: "Sachwertverfahren bei Immobilien: Gebäudewert, Bodenwert und Marktanpas
 description: "Sachwertverfahren nachvollziehbar anwenden: Gebäudewert, Außenanlagen, Bodenwert, Alterswertminderung, Sachwertfaktor und besondere Objektmerkmale modellkonform herleiten."
 category: "Wertermittlung und Immobilienbewertung"
 tags: ["Sachwertverfahren", "Immobilienbewertung", "Bodenwert", "Sachwertfaktor", "Restnutzungsdauer", "Marktanpassung", "Modellkonformität"]
-author: "SV-Netzwerk Redaktion"
+author: "christian-waechter"
 featured: false
 dailyStandard: true
 contentLevel: "B"
@@ -16,7 +16,7 @@ relatedLinks: ["/experten/marc-schuett/", "/fachwissen/prueffaehige-dokumentatio
 damageTypes: ["gebaeude"]
 publication:
   publishedAt: 2026-10-16
-  updatedAt: 2026-10-16
+  updatedAt: 2026-10-17
   status: published
 seo:
   title: "Sachwertverfahren: Gebäudewert und Bodenwert trennen"
@@ -148,9 +148,7 @@ Dieser Beitrag ist daher ein eigenständiges Sachverständigenthema. Erst wenn e
 
 Ein fiktives Praxisbeispiel mit Flächen, Baujahr, Restnutzungsdauer, Bodenrichtwert oder Sachwertfaktor könnte scheinbar genaue Ergebnisse erzeugen, ohne einen realen Teilmarkt und eine echte Modellbeschreibung abzubilden. Deshalb verwendet dieser Beitrag entsprechend der aktuellen Nutzervorgabe keine erfundenen Fälle, Messwerte oder Eurobeträge. Die Prüfschritte werden stattdessen als nachvollziehbare Entscheidungskette beschrieben.
 
-## Fachgrenzen und Zuordnung im Expertenzyklus
-
-Das aktuelle [Expertenprofil von Marc Schütt](/experten/marc-schuett/) belegt unter anderem sein Fachgebiet Wertermittlung nach Sachwertverfahren. Der heutige Beitrag ist diesem Fachgebiet in der laufenden Expertenrotation zugeordnet. Die Verknüpfung behauptet weder Autorenschaft noch eine konkrete Fallzuständigkeit.
+## Fachgrenzen und ergänzende Untersuchungen
 
 Für planungsrechtliche, bodenkundliche, statische, schadstoffbezogene oder juristische Spezialfragen sind die jeweils qualifizierten Fachleute einzubeziehen. Die sachverständige Wertermittlung koordiniert deren belastbare Ergebnisse, ersetzt aber nicht deren Fachprüfung.
 
@@ -162,12 +160,9 @@ So bleibt erkennbar, wie aus modellhaften Herstellungskosten ein marktangepasste
 
 ## Quellen und weiterführende Hinweise
 
-Quellenprüfung und Abruf am 16.10.2026. Die nachstehenden Primär- und Originalquellen wurden im für die Aussagen erforderlichen Umfang geöffnet und gelesen. Der Beitrag bewertet kein konkretes Grundstück und verwendet keine erfundenen Objekt-, Flächen-, Faktor- oder Kostendaten.
-
-1. Bundesministerium der Justiz und Bundesamt für Justiz, [Immobilienwertermittlungsverordnung – amtlicher Volltext](https://www.gesetze-im-internet.de/immowertv_2022/ImmoWertV.pdf). Gelesen wurden insbesondere §§ 4, 6, 8 bis 10, 12, 21 und 35 bis 40 sowie die für NHK 2010 maßgeblichen Grundsätze der Anlage 4. Praktische Bedeutung: Verfahrenswahl, Modellkonformität, Herstellungskosten, Restnutzungsdauer, Bodenwert, Sachwertfaktor und besondere Objektmerkmale in der richtigen Stufe behandeln.
-2. Bundesministerium der Justiz und Bundesamt für Justiz, [§ 194 BauGB – Verkehrswert](https://www.gesetze-im-internet.de/bbaug/__194.html). Praktische Bedeutung: Stichtag, gewöhnlicher Geschäftsverkehr sowie rechtliche und tatsächliche Grundstücksmerkmale bestimmen den Verkehrswertbegriff.
-3. Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen, [Novellierung des Wertermittlungsrechts](https://www.bmwsb.bund.de/SharedDocs/gesetzgebungsverfahren/DE/novellierung-des-wertermittlungsrechts.html). Im benötigten Umfang gelesen. Praktische Bedeutung: ImmoWertV 2021 bündelt die maßgeblichen Vorgaben; die NHK 2010 wurden in Anlage 4 integriert. Anwendungshinweise ersetzen nicht den amtlichen Verordnungstext.
-4. Statistisches Bundesamt, [Umstellung der Preisindizes für die Bauwirtschaft auf das Basisjahr 2021](https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/revision_baupreise.html) und [aktuelle Baupreisindizes für Wohn- und Nichtwohngebäude](https://www.destatis.de/DE/Themen/Wirtschaft/Konjunkturindikatoren/Preise/bpr110.html). Praktische Bedeutung: geeignete Indexreihe, Basisjahr und Stichtag dokumentieren; ein Basiswechsel ist keine zusätzliche Wertsteigerung.
-5. SV-Netzwerk, [Live-Expertenprofil Marc Schütt](https://www.sv-netzwerk.eu/experten/marc-schuett/), sichtbar geprüft am 16.10.2026. Es belegt die fachliche Zuordnung unter anderem zur Wertermittlung nach Sachwertverfahren; keine behauptete Autorenschaft oder konkrete Fallzuständigkeit.
+- Bundesministerium der Justiz und Bundesamt für Justiz, [Immobilienwertermittlungsverordnung – amtlicher Volltext](https://www.gesetze-im-internet.de/immowertv_2022/ImmoWertV.pdf).
+- Bundesministerium der Justiz und Bundesamt für Justiz, [§ 194 BauGB – Verkehrswert](https://www.gesetze-im-internet.de/bbaug/__194.html).
+- Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen, [Novellierung des Wertermittlungsrechts](https://www.bmwsb.bund.de/SharedDocs/gesetzgebungsverfahren/DE/novellierung-des-wertermittlungsrechts.html).
+- Statistisches Bundesamt, [Umstellung der Preisindizes für die Bauwirtschaft auf das Basisjahr 2021](https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/revision_baupreise.html); [aktuelle Baupreisindizes für Wohn- und Nichtwohngebäude](https://www.destatis.de/DE/Themen/Wirtschaft/Konjunkturindikatoren/Preise/bpr110.html).
 
 Weiterführend: [Prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/) und [Kontakt zur sachverständigen Einordnung](/kontakt/).

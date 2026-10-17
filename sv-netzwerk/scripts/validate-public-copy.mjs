@@ -6,6 +6,8 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 const distDirectory = path.join(projectRoot, 'dist');
 
 const forbidden = [
+  ['interner Quellenlesevermerk', /Amtliche Einzelnormen vollständig gelesen|Primär- und Originalquellen wurden|Im benötigten Umfang gelesen|Vollständig gelesen/iu],
+  ['interne Autoren- und Rotationslogik', /Expertenrotation|Expertenzyklus|(?:behauptet|behauptete|behaupteten)\s+(?:weder\s+)?(?:Mit)?Autorenschaft|keine\s+Autorenschaft/iu],
   ['redaktioneller Wiederherstellungshinweis', /wieder vollständig/iu],
   ['Zukunftsformulierung', /\bkünftig(?:e|er|en|em|es)?\b/iu],
   ['spätere Inhaltsverknüpfung', /spätere(?:n|r|s|m)?\s+(?:Fall-|Wissens-|Experten-)/iu],
