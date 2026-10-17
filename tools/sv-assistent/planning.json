@@ -1,0 +1,34 @@
+{
+  "checked_at": "2026-10-17",
+  "purpose": "planning_only_no_spending_authorization",
+  "rate_unit": "USD per 1000000 tokens, Standard short context; no cache discount",
+  "source": "https://developers.openai.com/api/docs/pricing",
+  "models": {
+    "gpt-6-luna": {"input": 0.1, "output": 0.5},
+    "gpt-6.1-sol": {"input": 2, "output": 10}
+  },
+  "factors": {"usd_to_eur_planning_assumption_not_market_rate": 1, "regional_processing_allowance": 1.1, "tax_allowance_not_tax_advice": 1.19, "retry_allowance": 1.2},
+  "scenarios": {
+    "small": {"documents": "5-10 mainly text documents, approximately 15 pages", "calls": [
+      {"model": "gpt-6-luna", "input_tokens": 20000, "output_tokens": 2000},
+      {"model": "gpt-6.1-sol", "input_tokens": 12000, "output_tokens": 3000},
+      {"model": "gpt-6.1-sol", "input_tokens": 6000, "output_tokens": 1000}
+    ]},
+    "average": {"documents": "15-25 documents, approximately 50 pages, report plus separate evidence extraction and review", "calls": [
+      {"model": "gpt-6-luna", "input_tokens": 35000, "output_tokens": 4000},
+      {"model": "gpt-6-luna", "input_tokens": 35000, "output_tokens": 4000},
+      {"model": "gpt-6.1-sol", "input_tokens": 22000, "output_tokens": 6000},
+      {"model": "gpt-6.1-sol", "input_tokens": 13000, "output_tokens": 2000}
+    ]},
+    "large": {"documents": "60-100 documents, approximately 200 pages, long report; aggregate tokens across bounded batches", "calls": [
+      {"model": "gpt-6-luna", "input_tokens": 60000, "output_tokens": 6000},
+      {"model": "gpt-6-luna", "input_tokens": 60000, "output_tokens": 6000},
+      {"model": "gpt-6-luna", "input_tokens": 60000, "output_tokens": 6000},
+      {"model": "gpt-6-luna", "input_tokens": 60000, "output_tokens": 6000},
+      {"model": "gpt-6-luna", "input_tokens": 60000, "output_tokens": 6000},
+      {"model": "gpt-6.1-sol", "input_tokens": 40000, "output_tokens": 10000},
+      {"model": "gpt-6.1-sol", "input_tokens": 40000, "output_tokens": 10000},
+      {"model": "gpt-6.1-sol", "input_tokens": 40000, "output_tokens": 10000}
+    ]}
+  }
+}
