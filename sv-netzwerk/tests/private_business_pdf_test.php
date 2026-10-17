@@ -7,4 +7,5 @@ $logo=__DIR__.'/../public/intern/assets/private-business/sv-netzwerk-eu-logo.jpg
 if(hash_file('sha256',$logo)!=='f329c3cb5245846da2f99007f6a1030e03a51bd3bd851eb8ebd8db65ec0bf96f')throw new RuntimeException('Use official sv-netzwerk.eu logo only; never the .de car logo');
 foreach(['main','contract','withdrawal','packet']as$kind){if(!str_starts_with($files[$kind],'%PDF-1.4')||!str_contains($files[$kind],'/LogoSchuett')||!str_contains($files[$kind],'/LogoNetzwerk'))throw new RuntimeException('PDF or correct dual branding missing');}
 if(!str_contains($files['withdrawal'],'Muster-Widerrufsformular')||!str_contains($files['withdrawal'],'[ ]')||str_contains($files['withdrawal'],'[x]'))throw new RuntimeException('Withdrawal must include form and unselected declarations');
+if(str_contains($files['withdrawal'],'Feldstra')||!str_contains($files['withdrawal'],'73432 Aalen'))throw new RuntimeException('Withdrawal correspondence must use the Aalen address');
 echo "private_business_pdf_test: ok (three documents, packet, Schuett and official eu logo, unsigned declarations)\n";

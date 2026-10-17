@@ -5,8 +5,8 @@ require_once __DIR__.'/private-business-core.php';
 
 function pbHeader(array &$ops,string $title,array $r): float {
     $navy=[.06,.20,.30];$ops[]='q 104 0 0 69.64 44 757 cm /LogoSchuett Do Q';$ops[]='q 147 0 0 26 404 796 cm /LogoNetzwerk Do Q';trText($ops,166,811,'Sachverständigenbüro Marc Schütt e.K.',10,true,$navy);
-    trText($ops,166,793,'Feldstraße 108 · 58791 Werdohl',8,false,$navy);
-    trText($ops,166,779,'Niederlassung Süd: Nordstraße 17 · 73432 Aalen',8,false,$navy);
+    trText($ops,166,793,str_contains($title,'Widerruf')?'Nordstraße 17 · 73432 Aalen':'Feldstraße 108 · 58791 Werdohl',8,false,$navy);
+    trText($ops,166,779,str_contains($title,'Widerruf')?'Niederlassung Süd · Widerruf und Korrespondenz':'Niederlassung Süd: Nordstraße 17 · 73432 Aalen',8,false,$navy);
     trText($ops,166,762,'07367 3939783 · ws@sv-schuett.eu',8,false,$navy);
     trLine($ops,44,740,551,740,[.35,.46,.52],1);trText($ops,44,716,$title,16,true,$navy);trRight($ops,551,716,$r['number'],12,true,$navy);
     trText($ops,44,697,'Stand '.(new DateTimeImmutable($r['updated_at'],new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('Europe/Berlin'))->format('d.m.Y').' · Version '.$r['revision'],8,false,[.4,.45,.5]);
@@ -72,7 +72,7 @@ function pbDocumentPages(array $r,string $kind): array {
         pbParagraph($pages,$ops,$y,'Die nachfolgende Belehrung gilt für Verbraucher bei Fernabsatzverträgen und außerhalb von Geschäftsräumen geschlossenen Verträgen.',$title,$r);
         pbSection($pages,$ops,$y,'Widerrufsrecht',$title,$r);
         pbParagraph($pages,$ops,$y,'Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsabschlusses.',$title,$r);
-        pbParagraph($pages,$ops,$y,'Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (Sachverständigenbüro Marc Schütt e.K., Feldstraße 108, 58791 Werdohl; Telefon 07367 3939783; E-Mail ws@sv-schuett.eu) mittels einer eindeutigen Erklärung (z. B. ein mit der Post versandter Brief oder eine E-Mail) über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist.',$title,$r);
+        pbParagraph($pages,$ops,$y,'Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (Sachverständigenbüro Marc Schütt e.K., Nordstraße 17, 73432 Aalen; Telefon 07367 3939783; E-Mail ws@sv-schuett.eu) mittels einer eindeutigen Erklärung (z. B. ein mit der Post versandter Brief oder eine E-Mail) über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist.',$title,$r);
         pbParagraph($pages,$ops,$y,'Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung über die Ausübung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.',$title,$r);
         pbSection($pages,$ops,$y,'Folgen des Widerrufs',$title,$r);
         pbParagraph($pages,$ops,$y,'Wenn Sie diesen Vertrag widerrufen, haben wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, einschließlich der Lieferkosten (mit Ausnahme der zusätzlichen Kosten, die sich daraus ergeben, dass Sie eine andere Art der Lieferung als die von uns angebotene, günstigste Standardlieferung gewählt haben), unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über Ihren Widerruf dieses Vertrags bei uns eingegangen ist. Für diese Rückzahlung verwenden wir dasselbe Zahlungsmittel, das Sie bei der ursprünglichen Transaktion eingesetzt haben, es sei denn, mit Ihnen wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden Ihnen wegen dieser Rückzahlung Entgelte berechnet.',$title,$r);
@@ -85,7 +85,7 @@ function pbDocumentPages(array $r,string $kind): array {
         pbParagraph($pages,$ops,$y,"Ort / Datum: ____________________________________\nUnterschrift Verbraucher: ___________________________",$title,$r);
         pbSection($pages,$ops,$y,'Muster-Widerrufsformular',$title,$r);
         pbParagraph($pages,$ops,$y,'Wenn Sie den Vertrag widerrufen wollen, füllen Sie bitte dieses Formular aus und senden Sie es zurück.',$title,$r);
-        pbParagraph($pages,$ops,$y,"An: Sachverständigenbüro Marc Schütt e.K.\nFeldstraße 108, 58791 Werdohl\nE-Mail: ws@sv-schuett.eu",$title,$r);
+        pbParagraph($pages,$ops,$y,"An: Sachverständigenbüro Marc Schütt e.K.\nNordstraße 17, 73432 Aalen\nE-Mail: ws@sv-schuett.eu",$title,$r);
         pbParagraph($pages,$ops,$y,'Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über die Erbringung der folgenden Dienstleistung:',$title,$r);
         pbParagraph($pages,$ops,$y,"_________________________________________________________\nVertrags-/Angebotsnummer: ".$r['number']."\nBestellt am: _____________________________________________\nName des/der Verbraucher(s): ______________________________\nAnschrift des/der Verbraucher(s): ___________________________\n_________________________________________________________\nDatum: __________________________________________________\nUnterschrift (nur bei Mitteilung auf Papier): ___________________\n(*) Unzutreffendes streichen.",$title,$r);
     }
