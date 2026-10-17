@@ -121,11 +121,11 @@ Ein fachgerechter Fensteranschluss beginnt mit einem passenden Detail und nachge
 
 Recherche und Abruf am 10.10.2026. Die verlinkten Primärquellen stützen die jeweils unmittelbar zugeordneten technischen Prüffelder. Herstellerbeispiele erläutern unterschiedliche Systemansätze und sind keine Produktempfehlung. Maßgeblich sind die zur konkreten Ausführung gehörenden aktuellen Unterlagen. Es werden keine unzugänglichen Norminhalte als geprüft ausgegeben.
 
-1. [RAL-Gütegemeinschaft und ift Rosenheim: Montageleitfaden März 2024, Leseprobe](https://ralfenster.de/wp-content/uploads/2024/10/LzM_2024_Leseprobe-2.pdf) – Planungs- und Gewerkschnittstellen, Inhaltsübersicht der Anschluss- und Fensterbankthemen; keine Behauptung, den vollständigen kostenpflichtigen Leitfaden gelesen zu haben.
-2. [IVD: FAQ](https://www.abdichten.de/faq/faq.html) – Funktionsbereiche, spritzbare Dichtstoffe und Hinterfüllung.
-3. [ISO-Chemie: ISO-BLOCO-Verarbeitungsrichtlinie DE-V041125](https://www.iso-chemie.eu/uploads/Verarbeitungsrichtlinien_ISO_BLOCO_3a7c92313f.pdf) – Fugenbreite, Bandwahl, Temperatur, Stöße und Rahmenseiten.
-4. [Soudal: Fensteranschlussfolien](https://www.soudal.de/pro/fensteranschlussfolien) – Folienverklebung, Ecken und Entlastungsschleife.
-5. [illbruck: ME500 TwinAktiv](https://www.illbruck.com/de_AT/produkt/me500-twinaktiv-4/) – feuchtevariable Folie als konkretes Materialbeispiel.
-6. [Soudal: Flüssigmembranen](https://www.soudal.de/pro/flussigmembranen) – Auftrag und Nassschichtkontrolle.
-7. [Soudal: Soudatight Hybrid, Datenblatt vom 26.02.2026](https://www.soudal.de/sites/default/files/soudal_api/document/900014776/TDS_Soudal_Soudatight_Hybrid_9900650_German_Soudal_Germany.pdf) – Untergrund, Verträglichkeit, Anwendung und Verarbeitung.
-8. [Soudal: MF 167 PRO](https://www.soudal.de/pro/mf167-PRO) – spezifische Luftdichtheitsfunktion mit zugehörigen Systemkombinationen und äußerem Schutz.
+1. [RAL-Gütegemeinschaft und ift Rosenheim: Montageleitfaden März 2024, Leseprobe](https://ralfenster.de/wp-content/uploads/2024/10/LzM_2024_Leseprobe-2.pdf).
+2. [IVD: FAQ](https://www.abdichten.de/faq/faq.html).
+3. [ISO-Chemie: ISO-BLOCO-Verarbeitungsrichtlinie DE-V041125](https://www.iso-chemie.eu/uploads/Verarbeitungsrichtlinien_ISO_BLOCO_3a7c92313f.pdf).
+4. [Soudal: Fensteranschlussfolien](https://www.soudal.de/pro/fensteranschlussfolien).
+5. [illbruck: ME500 TwinAktiv](https://www.illbruck.com/de_AT/produkt/me500-twinaktiv-4/).
+6. [Soudal: Flüssigmembranen](https://www.soudal.de/pro/flussigmembranen).
+7. [Soudal: Soudatight Hybrid, Datenblatt vom 26.02.2026](https://www.soudal.de/sites/default/files/soudal_api/document/900014776/TDS_Soudal_Soudatight_Hybrid_9900650_German_Soudal_Germany.pdf).
+8. [Soudal: MF 167 PRO](https://www.soudal.de/pro/mf167-PRO).
