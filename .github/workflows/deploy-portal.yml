@@ -98,6 +98,7 @@ jobs:
           php tests/private_orders_archive_index_test.php
           php tests/private_business_test.php
           php tests/private_business_pdf_test.php
+          php tests/private_business_recipients_test.php
           php tests/private_business_pdf_cache_test.php
           php tests/private_orders_index_cache_test.php
           node tests/private_business_download_test.mjs

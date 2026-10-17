@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-const PB_PDF_TEMPLATE = '2026-10-17-contact-withdrawal-4';
+const PB_PDF_TEMPLATE = '2026-10-17-contact-withdrawal-5';
 
 function pbPdfCacheSchema(PDO $db): void {
     $db->exec('CREATE TABLE IF NOT EXISTS private_business_pdf_cache (record_id VARCHAR(36) NOT NULL, revision INTEGER NOT NULL, kind VARCHAR(30) NOT NULL, filename VARCHAR(240) NOT NULL, sha256 VARCHAR(64) NOT NULL, template_version VARCHAR(80) NOT NULL, pdf_bytes MEDIUMBLOB NOT NULL, PRIMARY KEY(record_id,revision,kind))');
