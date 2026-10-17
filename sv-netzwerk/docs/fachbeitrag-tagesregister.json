@@ -558,14 +558,17 @@
         "title": "Drohnen bei Gebäudeschäden: Einsatzgrenzen, Bildbefund und Dokumentation trennen",
         "slug": "drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation",
         "url": "https://www.sv-netzwerk.eu/fachwissen/drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-website-20261017-0600",
-        "reserved_at": "2026-10-17T04:07:09.707Z"
+        "reserved_at": "2026-10-17T04:07:09.707Z",
+        "commit": "79bb447e3569b8f26c843fba8b36f748a864fd6c",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39001969280",
+        "verified_at": "2026-10-17T04:23:18.602Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-17T04:07:09.707Z"
+  "updated_at": "2026-10-17T04:23:18.602Z"
 }
