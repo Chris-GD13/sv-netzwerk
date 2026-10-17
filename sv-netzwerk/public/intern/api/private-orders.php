@@ -31,8 +31,7 @@ if (in_array($action, ['convert-inquiry','merge-inquiry'], true) && $_SERVER['RE
     apiJson(['ok'=>true] + $result);
 }
 if ($action==='list' || $action==='cases') {
-    $top=poChildren((string)$root['id'],$roots[$profile]);$items=[];
-    foreach($top as $item){if(!$item['folder']||poIsStandardFolder($item)||mb_strtolower($item['name'],'UTF-8')==='versicherungsaufträge')continue;if(poIsYearFolder($item)){foreach(poChildren($item['id'],$item['path']) as $candidate)if($candidate['folder']&&!poIsStandardFolder($candidate))$items[]=$candidate;}else $items[]=$item;}
+    $items=poListOrders((string)$root['id'],$roots[$profile]);
     usort($items,fn($a,$b)=>strcasecmp((string)$a['name'],(string)$b['name']));
     $numbers=db();pbSchema($numbers);foreach($items as &$numbered){if(poIsInquiryName($numbered['name']))continue;$year=preg_match('~/(20\d{2})/~',$numbered['path'],$match)?(int)$match[1]:null;$numbered['number']=pbNativeCaseNumber($numbers,$numbered['id'],$year);}unset($numbered);
     apiJson(['ok'=>true,'profile'=>$profile,'can_create'=>pbCanCreate($user),'root'=>['name'=>$root['name']??basename($roots[$profile]),'path'=>$roots[$profile]],'items'=>$items,'standard_folders'=>poStandardFolders()]);
@@ -48,13 +47,7 @@ if ($action==='folder') {
 if ($action==='organize-case' && $_SERVER['REQUEST_METHOD']==='POST') {
     $input=json_decode((string)file_get_contents('php://input'),true);$id=trim((string)($input['id']??''));
     if($id==='')apiError(400,'Auftrags-ID fehlt.');
-    $order=poValidateScope($id,(string)$root['id']);
-    if(empty($order['folder'])||$id===(string)$root['id']||poIsYearFolder($order)||poIsStandardFolder($order))apiError(403,'Ungültiger Auftragsordner.');
-    $parent=(string)($order['parentReference']['id']??'');
-    if($parent!==(string)$root['id']){
-        $year=poRequest('https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($parent).'?$select=id,name,folder,parentReference');
-        if(!poIsYearFolder($year)||(string)($year['parentReference']['id']??'')!==(string)$root['id'])apiError(403,'Bitte einen Auftrag auswählen.');
-    }
+    $order=poValidateTopOrder($id,(string)$root['id']);
     $children=poChildren($id);$targets=[];foreach($children as $child)if(poIsStandardFolder($child))$targets[mb_strtolower($child['name'],'UTF-8')]=$child['id'];
     $moved=0;$categories=[];
     foreach($children as $entry){
@@ -68,8 +61,7 @@ if ($action==='organize-case' && $_SERVER['REQUEST_METHOD']==='POST') {
     apiJson(['ok'=>true,'moved'=>$moved,'categories'=>$categories]);
 }
 if ($action==='organize-lite' && $_SERVER['REQUEST_METHOD']==='POST') {
-    $top=poChildren((string)$root['id'],$roots[$profile]);$orders=[];
-    foreach($top as $item){if(!$item['folder']||poIsStandardFolder($item)||mb_strtolower($item['name'],'UTF-8')==='versicherungsaufträge')continue;if(poIsYearFolder($item)){foreach(poChildren($item['id'],$item['path']) as $candidate)if($candidate['folder']&&!poIsStandardFolder($candidate))$orders[]=$candidate;}else $orders[]=$item;}
+    $orders=poListOrders((string)$root['id'],$roots[$profile]);
     $moved=0;$created=0;
     foreach($orders as $order){$children=poChildren($order['id'],$order['path']);$folders=[];foreach($children as $child)if($child['folder'])$folders[mb_strtolower($child['name'],'UTF-8')]=(string)$child['id'];foreach(poStandardFolders() as $folderName){$key=mb_strtolower($folderName,'UTF-8');if(isset($folders[$key]))continue;$new=poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($order['id']).'/children',['name'=>$folderName,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'fail']);if(!empty($new['id'])){$folders[$key]=(string)$new['id'];$created++;}}foreach($children as $file){if($file['folder'])continue;$target=$folders[mb_strtolower(poCategory($file),'UTF-8')]??'';if($target==='')continue;poMoveFile($file['id'],$target);$moved++;}}
     apiJson(['ok'=>true,'cases'=>count($orders),'moved'=>$moved,'created'=>$created]);

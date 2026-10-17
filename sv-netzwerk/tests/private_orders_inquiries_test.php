@@ -11,6 +11,9 @@ $items = [
     'archive'=>['id'=>'archive','name'=>'Sonstige Unterlagen','folder'=>['childCount'=>1],'parentReference'=>['id'=>'order']],
 ];
 $writes=[];
+$items['legacy']=['id'=>'legacy','name'=>'Gutachtenfälle','folder'=>['childCount'=>1],'parentReference'=>['id'=>'root']];
+$items['oldyear']=['id'=>'oldyear','name'=>'2020 und älter','folder'=>['childCount'=>1],'parentReference'=>['id'=>'legacy']];
+$items['oldorder']=['id'=>'oldorder','name'=>'Alter Kunde','folder'=>['childCount'=>1],'parentReference'=>['id'=>'oldyear']];
 function apiError(int $code,string $message): never { throw new RuntimeException($message,$code); }
 function poDriveId(): string {return 'drive';}
 function poStandardFolders(): array {return ['Auftrag','Sonstige Unterlagen','E-Mails'];}
@@ -21,6 +24,8 @@ function poChildren(string $id): array {global $items;return array_values(array_
 function poRequestJson(string $method,string $url,array $payload): array {global $items,$writes;$writes[]=[$method,$url,$payload];preg_match('~/items/([^/?]+)~',$url,$m);$id=urldecode($m[1]);if($method==='PATCH'){$items[$id]=array_replace_recursive($items[$id],$payload);return $items[$id];}throw new RuntimeException('Unexpected write');}
 function check(bool $value,string $message): void {if(!$value)throw new RuntimeException($message);}
 check(poIsInquiryName('Anfrage_Kunde')&&!poIsInquiryName('Anfragebogen GmbH'),'Inquiry prefix must be bounded');
+check(poValidateTopOrder('oldorder','root')['id']==='oldorder','Nested archive case must remain accessible');
+try{poValidateTopOrder('legacy','root');throw new RuntimeException('Archive container treated as customer');}catch(RuntimeException $e){check($e->getCode()===403,'Archive container must never be organized as a case');}
 $original=$items['inquiry'];
 $result=poConvertInquiry('inquiry','Kunde_Ort_2','root');
 check($result['order_id']==='inquiry'&&count($writes)===1,'Convert must reuse the original ID');

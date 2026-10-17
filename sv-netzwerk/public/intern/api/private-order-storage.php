@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/private-order-classification.php';
 function poConfig(string $key, string $default = ''): string { $v = getenv($key); return $v === false || trim($v) === '' ? $default : trim($v); }
 function poToken(): string {
     static $token = null; if (is_string($token) && $token !== '') return $token;
@@ -32,8 +33,19 @@ function poFind(array $rows,string $id): ?array { foreach($rows as $row){ if(has
 function poChildren(string $id,string $path=''): array { $url='https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id).'/children?$select=id,name,size,file,folder,createdDateTime,lastModifiedDateTime,webUrl,parentReference&$top=200';$out=[];do{$page=poRequest($url);foreach(($page['value']??[]) as $item){if(!is_array($item)||empty($item['id']))continue;$name=(string)($item['name']??'');$out[]=['id'=>(string)$item['id'],'name'=>$name,'path'=>ltrim($path.'/'.$name,'/'),'folder'=>isset($item['folder']),'size'=>(int)($item['size']??0),'modified'=>(string)($item['lastModifiedDateTime']??''),'webUrl'=>(string)($item['webUrl']??'')];}$url=(string)($page['@odata.nextLink']??'');}while($url!=='');usort($out,fn($a,$b)=>[$b['folder'],$a['name']]<=>[$b['folder'],$b['name']]);return $out; }
 function poStandardFolders(): array { return ['Auftrag','Fotos','Gutachten','Angebot','Rechnungen','E-Mails','Bilder','Dateien','Sonstige Unterlagen','Eingang KI']; }
 function poIsYearFolder(array $item): bool { return !empty($item['folder']) && preg_match('/^(?:19|20)\d{2}$/', trim((string)($item['name'] ?? ''))) === 1; }
+// Only known archive/year containers are traversed, never the contents of cases.
+function poListOrders(string $rootId,string $path='',int $depth=0): array {
+    if($depth>4)throw new RuntimeException('Die Archivstruktur ist zu tief.');
+    $orders=[];
+    foreach(poChildren($rootId,$path)as$item){
+        if(!$item['folder']||poIsStandardFolder($item)||mb_strtolower($item['name'],'UTF-8')==='versicherungsaufträge')continue;
+        if(poIsOrderContainer($item))$orders=array_merge($orders,poListOrders($item['id'],$item['path'],$depth+1));
+        else $orders[]=$item;
+    }
+    return $orders;
+}
 function poIsStandardFolder(array $item): bool { static $names=null; $names ??= array_map(fn($v)=>mb_strtolower($v,'UTF-8'), poStandardFolders()); return !empty($item['folder']) && in_array(mb_strtolower(trim((string)($item['name'] ?? '')), 'UTF-8'), $names, true); }
-function poOrders(array $tree): array { $orders=[]; foreach($tree as $item){ if(empty($item['folder'])||poIsStandardFolder($item)) continue; if(poIsYearFolder($item)){ foreach((array)($item['children']??[]) as $candidate) if(!empty($candidate['folder'])&&!poIsStandardFolder($candidate)) $orders[]=$candidate; } elseif(!preg_match('/^(?:19|20)\d{2}$/',trim((string)($item['name']??'')))) $orders[]=$item; } usort($orders,fn($a,$b)=>strcasecmp((string)($a['name']??''),(string)($b['name']??''))); return $orders; }
+function poOrders(array $tree): array { $orders=[]; foreach($tree as $item){if(empty($item['folder'])||poIsStandardFolder($item)||mb_strtolower((string)($item['name']??''),'UTF-8')==='versicherungsaufträge')continue;if(poIsOrderContainer($item))$orders=array_merge($orders,poOrders((array)($item['children']??[])));else $orders[]=$item;}usort($orders,fn($a,$b)=>strcasecmp((string)($a['name']??''),(string)($b['name']??'')));return $orders; }
 function poLooseFiles(array $rows,bool $insideStandard=false,array &$out=[]): array { foreach($rows as $row){if(!empty($row['folder'])){poLooseFiles((array)($row['children']??[]),$insideStandard||poIsStandardFolder($row),$out);}elseif(!$insideStandard)$out[]=$row;}return $out; }
 function poMoveFile(string $id,string $folderId): void { poRequestJson('PATCH','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id),['parentReference'=>['id'=>$folderId]]); }
 function poEnsureFolders(array $item): void {

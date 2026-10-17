@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+function poIsOrderContainer(array $item): bool { return isset($item['folder']) && $item['folder'] !== false && (preg_match('/^(?:19|20)\d{2}(?: und älter)?$/iu', trim((string)($item['name'] ?? ''))) === 1 || mb_strtolower(trim((string)($item['name'] ?? '')), 'UTF-8') === 'gutachtenfälle'); }
+
 function poCategory(array $file): string {
     $name = mb_strtolower((string)($file['name'] ?? ''), 'UTF-8');
     $ext = mb_strtolower(pathinfo($name, PATHINFO_EXTENSION), 'UTF-8');

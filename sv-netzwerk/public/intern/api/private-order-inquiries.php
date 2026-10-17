@@ -8,11 +8,13 @@ function poIsInquiryName(string $name): bool {
 function poValidateTopOrder(string $id, string $rootId): array {
     if ($id === '' || $id === $rootId) apiError(400, 'Bitte einen Auftrag auswählen.');
     $order = poValidateScope($id, $rootId);
-    if (!isset($order['folder']) || poIsYearFolder($order) || poIsStandardFolder($order)) apiError(403, 'Bitte einen Auftrag auswählen.');
+    if (!isset($order['folder']) || poIsOrderContainer($order) || poIsStandardFolder($order)) apiError(403, 'Bitte einen Auftrag auswählen.');
     $parent = (string)($order['parentReference']['id'] ?? '');
-    if ($parent !== $rootId) {
+    for ($depth=0;$parent !== $rootId;$depth++) {
+        if($depth>=4||$parent==='')apiError(403, 'Bitte einen Auftrag aus der Auftragsliste auswählen.');
         $year = poRequest('https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($parent).'?$select=id,name,folder,parentReference');
-        if (!poIsYearFolder($year) || (string)($year['parentReference']['id'] ?? '') !== $rootId) apiError(403, 'Bitte einen Auftrag aus der Auftragsliste auswählen.');
+        if (!poIsOrderContainer($year)) apiError(403, 'Bitte einen Auftrag aus der Auftragsliste auswählen.');
+        $parent=(string)($year['parentReference']['id'] ?? '');
     }
     return $order;
 }
