@@ -4,6 +4,7 @@ require_once __DIR__.'/ionos-storage.php';
 require_once __DIR__.'/case-rules.php';
 require_once __DIR__.'/services/RuleDriveRead.php';
 require_once __DIR__.'/administration-access.php';
+require_once __DIR__.'/assistant-provider-diagnostic.php';
 function svAssistantValidateRelease(array $release,callable $readMaster): array {
     if(($release['status']??'')!=='approved'||!preg_match('/^[a-f0-9]{64}$/',(string)($release['source_hash']??'')))throw new RuntimeException('RULE_RELEASE_UNAPPROVED');
     $ids=[];
@@ -35,6 +36,11 @@ function svAssistantRelease(): array {
         return $r['body'];
     });
 }
+function svAssistantLatestRejection(PDO $db,int $userId): ?array {
+    $join=$db->getAttribute(PDO::ATTR_DRIVER_NAME)==='sqlite'?"'assistant:' || a.id":"CONCAT('assistant:',a.id)";
+    $q=$db->prepare("SELECT u.usage_json FROM case_work_ai_usage u JOIN case_analysis_jobs a ON u.operation_id=$join WHERE a.user_id=? AND JSON_EXTRACT(u.usage_json,'$.provider_rejected')=true ORDER BY a.id DESC LIMIT 1");
+    $q->execute([$userId]);$raw=$q->fetchColumn();return $raw===false?null:json_decode((string)$raw,true,512,JSON_THROW_ON_ERROR);
+}
 function svAssistantConnections(array $user): array {
     if(empty($user['is_active'])||!in_array($user['role']??'',['administrator','projektleiter','pruefer','sachverstaendiger'],true))throw new RuntimeException('USER_FORBIDDEN');
     $storage=ionosStorageEnabled();$release=null;$ruleError=null;
@@ -47,7 +53,7 @@ function svAssistantConnections(array $user): array {
         require_once __DIR__.'/assistant-model-readiness.php';
         $catalogue=svAssistantModelCatalogue(trim(env('OPENAI_API_KEY','')));
         $summary.=' · Modellkatalog HTTP '.$catalogue['http_status'].' · verfügbare Budgetmodelle: '.implode(', ',$catalogue['available']);
-        try{$q=db()->prepare("SELECT u.usage_json FROM case_work_ai_usage u JOIN case_analysis_jobs a ON u.operation_id=CONCAT('assistant:',a.id) WHERE a.user_id=? ORDER BY a.id DESC LIMIT 1");$q->execute([(int)$user['id']]);$last=json_decode((string)$q->fetchColumn(),true);if(!empty($last['provider_rejected']))$summary.=' · letzte Anbieterablehnung HTTP '.(int)$last['http_status'].' '.($last['provider_error']['code']??'');}catch(Throwable){}
+        try{$last=svAssistantLatestRejection(db(),(int)$user['id']);if($last)$summary.=' · letzte Anbieterablehnung HTTP '.(int)$last['http_status'].' '.svAssistantDiagnostic($last['provider_error']??[]);}catch(Throwable){}
     }
     $summary.=' · Claimsforce-Notizen nur manuell · Work-Übergabe manuell.';
     return ['storage_ready'=>$storage,'rules_ready'=>(bool)$release,'release'=>$release['id']??null,'paid_assistant_enabled'=>$ai&&(bool)$release,'claims_notes'=>'manual','can_manage_rules'=>svnetCanManageWorkRules($user),'summary'=>$summary];

@@ -15,6 +15,8 @@ pfail(fn()=>svAssistantCaseAccess($acl,['id'=>2],'maurer'),'CASE_FORBIDDEN');
 $acl->exec('UPDATE users SET is_active=0 WHERE id=1');
 pfail(fn()=>svAssistantCaseAccess($acl,['id'=>1],'own'),'USER_FORBIDDEN');
 pfail(fn()=>svAssistantSyncMaster(['is_active'=>1,'email'=>'other@example.invalid']),'USER_FORBIDDEN');
+pcheck(svAssistantDiagnostic(['code'=>null,'type'=>'invalid_request_error','param'=>'model'])==='type=invalid_request_error, param=model','diagnostic retains type and param without a code');
+pcheck(svAssistantDiagnostic(['code'=>'<unsafe>','type'=>'ok','message'=>'secret'])==='type=ok','diagnostic excludes unsafe values and raw messages');
 $master='synthetic master';$r=assistantTestRelease();$r['source_hash']=hash('sha256',$master);foreach($r['rules'] as &$rule)$rule['sources']=[['id'=>'synthetic-master-id']];unset($rule);
 pcheck(svAssistantValidateRelease($r,fn()=>$master)['master_text']===$master,'approved release pinned to fresh master bytes');
 pfail(fn()=>svAssistantValidateRelease($r,fn()=>'changed'),'RULE_MASTER_CHANGED');
@@ -41,6 +43,8 @@ $fake->mode='prepare-fail';$id=$engine->start($u,$ctx['token'],$tab,'paid-operat
 $fake->mode='rejected';$id=$engine->start($u,$ctx['token'],$tab,'paid-operation-0004','check','')['job_id'];$engine->step($u,$ctx['token'],$tab,$id);pcheck($engine->step($u,$ctx['token'],$tab,$id)['status']==='failed'&&$engine->budget()['reserved_micro']===0,'explicit provider rejection does not claim success');
 $fake->mode='ok';$fake->during=function()use(&$cases){$cases['fixture-a']['revision']='changed';};
 $id=$engine->start($u,$ctx['token'],$tab,'paid-operation-0005','report','')['job_id'];$engine->step($u,$ctx['token'],$tab,$id);$before=$engine->budget()['spent_micro'];$x=$engine->step($u,$ctx['token'],$tab,$id);
+pcheck((svAssistantLatestRejection($db,(int)$u['id'])['http_status']??null)===401,'later reservation and completion retain previous rejection diagnostic');
+pcheck(svAssistantLatestRejection($db,999999)===null,'rejection diagnostic never crosses users');
 pcheck($x['status']==='failed'&&!isset($x['result']['answer'])&&$engine->budget()['spent_micro']===$before+15000,'case change during network discards answer but records usage');
 pfail(fn()=>SvAiPaidPermit::issue($db,'unreserved',str_repeat('0',64)),'AI_DISPATCH_NOT_RESERVED');
 // Actual provider payload: fixed endpoint/model, no tools, source hashes and unsupported formats.
