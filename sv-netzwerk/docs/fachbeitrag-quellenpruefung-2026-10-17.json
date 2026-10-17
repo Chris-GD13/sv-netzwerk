@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-17",
+  "publication_id": "2026-10-17-drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation",
+  "status": "prepared",
+  "article_type": "eigenstaendiges-sachverstaendigenthema",
+  "expert_assignment": {
+    "name": "Christian Wächter",
+    "profile_url": "https://www.sv-netzwerk.eu/experten/christian-waechter/",
+    "verified_scope": "Komplex- und Großschäden, Bauforensik, Thermografie, Drohnen sowie Fenster, Türen und Fassaden",
+    "authorship_claimed": false
+  },
+  "rotation": {
+    "cycle_complete_after_publication": true,
+    "sequence": [
+      "2026-10-12 Carmen Gohl",
+      "2026-10-13 Claudius Freiberg",
+      "2026-10-14 Lenna Maria Walczok",
+      "2026-10-15 Holger Roth",
+      "2026-10-16 Marc Schütt",
+      "2026-10-17 Christian Wächter"
+    ]
+  },
+  "sources": [
+    {
+      "url": "https://eur-lex.europa.eu/eli/reg_impl/2019/947/oj",
+      "publisher": "Europäische Union",
+      "checked_at": "2026-10-17",
+      "scope": "Betriebskategorien und Voraussetzungen der offenen Kategorie"
+    },
+    {
+      "url": "https://www.easa.europa.eu/en/document-library/easy-access-rules/online-publications/easy-access-rules-unmanned-aircraft-systems",
+      "publisher": "EASA",
+      "edition": "Revision Juni 2026",
+      "checked_at": "2026-10-17",
+      "scope": "Unterkategorien, Verantwortlichkeiten, geografische Informationen und Betriebsgrenzen"
+    },
+    {
+      "url": "https://www.dipul.de/homepage/de/informationen/allgemeines/erste-schritte/schnell-sicher-in-die-luft-version-1.2.pdf?cid=1v8",
+      "publisher": "DIPUL",
+      "edition": "Version 1.2",
+      "checked_at": "2026-10-17",
+      "scope": "Registrierung, e-ID, Kompetenznachweis, Versicherung und geografische Gebiete"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/luftvo_2015/__21h.html",
+      "publisher": "Bundesministerium der Justiz und Bundesamt für Justiz",
+      "checked_at": "2026-10-17",
+      "scope": "Geografische Gebiete und besondere örtliche Bedingungen"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/luftvg/__43.html",
+      "publisher": "Bundesministerium der Justiz und Bundesamt für Justiz",
+      "checked_at": "2026-10-17",
+      "scope": "Haftpflichtversicherung"
+    },
+    {
+      "url": "https://www.datenschutzkonferenz-online.de/media/oh/20190116_oh_positionspapier_kameradrohnen.pdf",
+      "publisher": "Datenschutzkonferenz",
+      "checked_at": "2026-10-17",
+      "scope": "Rechtsgrundlage, Interessenabwägung, Informationspflichten und Rechte Dritter"
+    },
+    {
+      "url": "https://doi.org/10.5194/isprs-annals-IV-2-W2-163-2017",
+      "publisher": "ISPRS Annals",
+      "checked_at": "2026-10-17",
+      "scope": "Kalibrierung, Flugplanung, Aufnahmegeometrie, Auswertung und Qualitätskontrolle"
+    }
+  ],
+  "image": {
+    "status": "published-without-image",
+    "reason": "Kein fachlich passendes geprüftes und freigegebenes Motiv; kein Platzhalterbild."
+  },
+  "linkedin": {
+    "status": "prepared-not-posted",
+    "file": "src/content/linkedin/2026-10-17_drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation.txt"
+  },
+  "technical_proof": {
+    "content_commit": null,
+    "deployment_run": null,
+    "live_status": "pending"
+  }
+}

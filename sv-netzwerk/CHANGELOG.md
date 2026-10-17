@@ -1,3 +1,13 @@
+## 2026-10-17 – Drohnenaufnahmen bei Gebäudeschäden prüffähig einordnen
+
+- Genau einen Tagesartikel unter atomarer Reservierung vorbereitet: rechtlichen und sicheren Flugbetrieb, sichtbaren Bildbefund, photogrammetrische Auswertung und Ursachenbewertung getrennt dokumentieren.
+- Christian Wächter gemäß aktuellem Live-Profil den belegten Fachgebieten Drohnen, Bauforensik und Thermografie zugeordnet; keine behauptete Autorenschaft oder konkrete Fallzuständigkeit.
+- Durchführungsverordnung (EU) 2019/947, EASA-Regeln Revision Juni 2026, DIPUL, § 21h LuftVO, § 43 LuftVG, DSK-Positionspapier und primäre ISPRS-Fachliteratur im benötigten Umfang geöffnet und geprüft.
+- Kein erfundener Flug, Schadenfall, Messwert oder Versicherungsbezug; eigenständiges Sachverständigenthema mit klaren Grenzen für Luftbilder und Photogrammetrie.
+- Library, Profilverknüpfung, Suchindex-/Sitemap-Datenbasis, CSV und separater LinkedIn-Begleittext vorbereitet; LinkedIn bleibt `prepared-not-posted`.
+- Ohne öffentliches Beitragsbild, weil kein fachlich passendes geprüftes Motiv vorlag; keine SVG- oder Titelkarten-Platzhalter.
+- Prozentwert aus dem HTML-`width`-Attribut des Podcast-Players entfernt und die responsive Breite in CSS beibehalten; HTML-Validierung von Beitrag, Übersicht, Kategorie und Schlagwort wiederholt.
+
 ## 2026-10-16 – Sachwertverfahren modellkonform herleiten
 
 - Genau einen Tagesartikel unter atomarer Reservierung vorbereitet: Gebäudewert, Außenanlagen, Bodenwert, Alterswertminderung, Sachwertfaktor und besondere objektspezifische Grundstücksmerkmale getrennt herleiten.
