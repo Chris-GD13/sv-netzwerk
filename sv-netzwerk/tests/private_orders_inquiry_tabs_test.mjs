@@ -17,3 +17,9 @@ assert.equal(elements['convert-inquiry'].hidden,true);
 ctx.canCreate=true;ctx.renderCases();assert.equal(elements['convert-inquiry'].hidden,false);
 assert.equal(ctx.firstLetter('26-12345_Krämer Bopfingen'),'K');
 console.log('private_orders_inquiry_tabs_test: ok (separate lists, readable names, search)');
+
+assert.equal(elements['delete-inquiry'].hidden,false);
+ctx.canCreate=false;ctx.renderCases();assert.equal(elements['delete-inquiry'].hidden,true);
+assert.match(page,/Anfrage löschen\?/);
+assert.match(page,/SharePoint-Papierkorb/);
+assert.match(page,/inquiryMode==='delete'\)\{await openCase\(null\)/);

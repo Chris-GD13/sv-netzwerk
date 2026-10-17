@@ -5,6 +5,13 @@ function poIsInquiryName(string $name): bool {
     return preg_match('/^Anfragen?(?:[ _·-]|$)/iu', trim($name)) === 1;
 }
 
+function poDeleteInquiry(string $id, string $rootId): array {
+    $source = poValidateTopOrder($id, $rootId);
+    if (!poIsInquiryName((string)$source['name'])) apiError(409, 'Dieser Eintrag ist keine offene Anfrage mehr.');
+    poRecycleItem($id,(string)($source['eTag']??''));
+    return ['inquiry_id'=>$id,'recycled'=>true];
+}
+
 function poValidateTopOrder(string $id, string $rootId): array {
     if ($id === '' || $id === $rootId) apiError(400, 'Bitte einen Auftrag auswählen.');
     $order = poValidateScope($id, $rootId);

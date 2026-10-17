@@ -14,7 +14,7 @@ $roots = [
 ];
 if (!isset($roots[$profile])) apiError(403, 'Für dieses Benutzerprofil sind keine Privataufträge freigegeben.');
 $action = (string)($_GET['action'] ?? 'list');
-if (in_array($action, ['create', 'convert-inquiry'], true) && !pbCanCreate($user)) {
+if (in_array($action, ['create', 'convert-inquiry', 'delete-inquiry'], true) && !pbCanCreate($user)) {
     apiError(403, 'Die Erstellung von Angeboten und Aufträgen ist für dieses Benutzerkonto nicht freigegeben.');
 }
 
@@ -24,6 +24,11 @@ require_once __DIR__ . '/private-business-core.php';
 require_once __DIR__.'/private-order-index-cache.php';
 try {
 if($action!=='list'&&$action!=='cases')$root=poItemByPath($roots[$profile]);
+if ($action==='delete-inquiry' && $_SERVER['REQUEST_METHOD']==='POST') {
+    $input=json_decode((string)file_get_contents('php://input'),true);
+    $result=poDeleteInquiry(trim((string)($input['id']??'')),(string)$root['id']);
+    poInvalidateIndex(db(),$profile,$roots[$profile]);apiJson(['ok'=>true]+$result);
+}
 if (in_array($action, ['convert-inquiry','merge-inquiry'], true) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode((string)file_get_contents('php://input'), true);
     $id = trim((string)($input['id'] ?? ''));

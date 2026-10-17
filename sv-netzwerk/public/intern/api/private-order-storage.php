@@ -23,6 +23,15 @@ function poRequestJson(string $method, string $url, array $payload): array {
     $body=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);$json=is_string($body)?json_decode($body,true):null;
     if($status<200||$status>=300||!is_array($json)) apiError(503,'Privatauftrag konnte in OneDrive nicht angelegt werden (HTTP '.$status.').'); return $json;
 }
+// Microsoft DELETE moves the complete folder to the SharePoint recycle bin.
+function poRecycleItem(string $id,string $tag): void {
+    $url='https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id);
+    if($tag==='')apiError(409,'Die Anfrage konnte nicht zum Löschen gesichert werden. Bitte erneut öffnen.');
+    $ch=curl_init($url);
+    curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>'DELETE',CURLOPT_TIMEOUT=>45,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.poToken(),'If-Match: '.$tag]]);
+    curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);
+    if($status!==204)apiError($status===412?409:503,$status===412?'Die Anfrage wurde zwischenzeitlich geändert. Bitte erneut öffnen.':'Die Anfrage konnte nicht in den SharePoint-Papierkorb verschoben werden (HTTP '.$status.').');
+}
 function poRequestUpload(string $url,string $name,string $bytes,string $mime): array {
     $ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>'PUT',CURLOPT_TIMEOUT=>180,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.poToken(),'Content-Type: '.($mime!==''?$mime:'application/octet-stream'),'Content-Length: '.strlen($bytes)],CURLOPT_POSTFIELDS=>$bytes]);$body=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);$json=is_string($body)?json_decode($body,true):null;if($status<200||$status>=300||!is_array($json))apiError(503,'Datei konnte nicht in den Privatauftrag hochgeladen werden (HTTP '.$status.').');return $json;
 }

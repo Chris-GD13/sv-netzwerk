@@ -19,7 +19,7 @@ function poCategory(array $file): string {
 function poValidateScope(string $id, string $rootId): array {
     $current = $id; $requested = null;
     for ($i = 0; $i < 12; $i++) {
-        $item = poRequest('https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($current).'?$select=id,name,size,file,folder,createdDateTime,lastModifiedDateTime,webUrl,parentReference');
+        $item = poRequest('https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($current).'?$select=id,name,size,file,folder,eTag,createdDateTime,lastModifiedDateTime,webUrl,parentReference');
         $requested ??= $item;
         if ((string)($item['id'] ?? '') === $rootId) return $requested;
         $parent = (string)($item['parentReference']['id'] ?? '');

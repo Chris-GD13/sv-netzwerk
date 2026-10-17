@@ -40,3 +40,10 @@ check($writes[0][2]['@microsoft.graph.conflictBehavior']==='fail','Existing cont
 poMergeInquiry('inquiry','order','root');check(count($writes)===1,'Merge retry must be idempotent');
 foreach([fn()=>poMergeInquiry('outside','order','root'),fn()=>poMergeInquiry('order','order','root'),fn()=>poConvertInquiry('archive','New','root')] as $attempt){$before=count($writes);try{$attempt();throw new RuntimeException('Invalid target accepted');}catch(RuntimeException $e){check(in_array($e->getCode(),[400,403],true),'Expected a scope/selection error');}check(count($writes)===$before,'Rejected requests must not mutate storage');}
 echo "private_orders_inquiries_test: ok (conversion, atomic merge, retry, scope, preserved children)\n";
+
+function poRecycleItem(string $id,string $tag): void {global $writes;$writes[]=['RECYCLE',$id,$tag];}
+$items['inquiry']=$original;$items['inquiry']['eTag']='version-one';$writes=[];
+poDeleteInquiry('inquiry','root');
+check($writes===[['RECYCLE','inquiry','version-one']],'Delete must recycle only the scoped inquiry with concurrency protection');
+foreach(['order','root','outside','archive','legacy'] as $id){$before=count($writes);try{poDeleteInquiry($id,'root');throw new RuntimeException('Invalid delete accepted');}catch(RuntimeException $e){check(in_array($e->getCode(),[400,403,409],true),'Expected delete boundary rejection');}check(count($writes)===$before,'Rejected delete must not mutate storage');}
+echo "private_orders_delete_test: ok (inquiry only, scope, recycle, concurrency)\n";
