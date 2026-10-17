@@ -91,6 +91,6 @@ Digitale Aufmaße sind wertvoll, wenn ihre Entstehung nachvollziehbar bleibt. Ge
 
 ## Quellen und weiterführende Hinweise
 
-- [Quelle 1](https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6) – offizieller Bezug zum jeweiligen Prüffeld.
-- [Quelle 2](https://www.dguv.de/medien/inhalt/publikationen/regelwerk/regelwerk_dguv-informationen/index.jsp) – fachliche oder sicherheitsbezogene Einordnung.
-- [Quelle 3](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – gesetzlicher beziehungsweise technischer Rahmen.
+- Bundesanstalt für Arbeitsschutz und Arbeitsmedizin, [ASR A1.6 – Fenster, Oberlichter, lichtdurchlässige Wände](https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6).
+- Deutsche Gesetzliche Unfallversicherung, [DGUV-Informationen – Regelwerk](https://www.dguv.de/medien/inhalt/publikationen/regelwerk/regelwerk_dguv-informationen/index.jsp).
+- Bundesministerium der Justiz, [§ 82 VVG – Schadenabwendung und Schadenminderung](https://www.gesetze-im-internet.de/vvg_2008/__82.html).
