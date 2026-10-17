@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+if(!defined('SVNET_ASSISTANT_REQUEST'))define('SVNET_ASSISTANT_REQUEST',true);
 require_once __DIR__.'/case-work-assistant-core.php';
 
 /** Test router provides the same boundary with synthetic source/auth and SQLite.

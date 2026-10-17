@@ -43,8 +43,9 @@ check($held===250000,'unknown usage keeps reservation');check($a->step($u,$c['to
 $a->reconcile($u,$c['token'],$tab,$unknown,300000,['provider'=>'synthetic','input_tokens'=>500,'output_tokens'=>200]);check($a->status($u,$c['token'],$tab,$unknown)['result']['budget_overrun'],'actual overrun captured, job failed');
 $month=$a->budget()['month_key'];$db->exec("UPDATE case_work_budget SET spent_micro=29900000 WHERE month_key='$month'");rejects(fn()=>$a->start($u,$c['token'],$tab,'operation-0000008','check',''),'MONTHLY_BUDGET_EXCEEDED');
 check((int)$a->budget()['reserved_micro']===0,'failed reserve fully rolled back');
-$h=curl_init('https://api.openai.com/v1/responses');rejects(fn()=>svAiGuardHandle($h),'PAID_AI_DISABLED');curl_close($h);
-$h=curl_init('https://api.anthropic.com/v1/messages');rejects(fn()=>svAiGuardHandle($h),'PAID_AI_DISABLED');curl_close($h);
+putenv('SVNET_AI_TRANSPORT_MODE=deny');
+$h=curl_init('https://api.openai.com/v1/responses');rejects(fn()=>svAiGuardHandle($h,'kva-http'),'PAID_AI_DISABLED');curl_close($h);
+$h=curl_init('https://api.anthropic.com/v1/messages');rejects(fn()=>svAiGuardHandle($h,'kva-http'),'PAID_AI_DISABLED');curl_close($h);
 // Exact boundary and arithmetic tests use synthetic rule values, not insurer prices.
 foreach([99999=>false,100000=>true,100001=>true] as $amount=>$expected){
  $case=assistantTestCases()['fixture-a'];$case['documents']=[['id'=>'boundary','sha256'=>hash('sha256','boundary'),'evidence'=>true,'amount_cents'=>$amount]];

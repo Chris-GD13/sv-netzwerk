@@ -127,7 +127,7 @@ curl_setopt_array($ch,[
     CURLOPT_CONNECTTIMEOUT=>12,
     CURLOPT_TIMEOUT=>180,
 ]);
-$response = curl_exec(svAiGuardHandle($ch));
+$response = curl_exec(svAiGuardHandle($ch,'case-extract'));
 $status = (int)curl_getinfo($ch,CURLINFO_HTTP_CODE);
 $error = curl_error($ch);
 curl_close($ch);

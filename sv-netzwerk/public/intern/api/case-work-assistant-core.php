@@ -4,11 +4,14 @@ declare(strict_types=1);
 /** Existing case_work_turns / case_analysis_jobs, same DB and case source.
  * The only provider is an in-process deterministic simulation, never HTTP.
  */
+require_once __DIR__.'/ai-budget-gateway.php';
 final class CaseWorkAssistant {
+    private SvAiBudgetLedger $ledger;
     private bool $sqlite;
     private Closure $source;
     private Closure $clock;
     public function __construct(private PDO $db, callable $source, private array $release, private string $session, ?callable $clock=null) {
+        $this->ledger=new SvAiBudgetLedger($db,'simulation');
         $this->sqlite=$db->getAttribute(PDO::ATTR_DRIVER_NAME)==='sqlite';
         $this->source=Closure::fromCallable($source);
         $this->clock=$clock ? Closure::fromCallable($clock) : fn()=>time();
@@ -35,11 +38,7 @@ final class CaseWorkAssistant {
         // Global ledger mutex; one DB transaction serializes all context/job/budget mutations.
         $this->db->exec("$insert INTO case_work_budget VALUES('mutex',0,0,0)");
     }
-    private function tx(callable $f): mixed {
-        if($this->sqlite)$this->db->exec('BEGIN IMMEDIATE');else{$this->db->beginTransaction();$this->db->query("SELECT * FROM case_work_budget WHERE month_key='mutex' FOR UPDATE")->fetch();}
-        try{$v=$f();if($this->sqlite)$this->db->exec('COMMIT');else $this->db->commit();return $v;}
-        catch(Throwable $e){if($this->sqlite)$this->db->exec('ROLLBACK');elseif($this->db->inTransaction())$this->db->rollBack();throw $e;}
-    }
+    private function tx(callable $f): mixed {return $this->ledger->transaction($f);}
     private function event(?int $job,string $kind,mixed $details): void {$this->query('INSERT INTO case_work_assistant_events(job_id,event_type,created_at,detail_hash) VALUES(?,?,?,?)',[$job,$kind,$this->now(),self::hash($details)]);}
     private function case(array $user,string $folder): array {
         if(empty($user['active'])||!in_array($user['role']??'', ['administrator','projektleiter','pruefer','sachverstaendiger'],true))$this->fail('USER_FORBIDDEN');
@@ -88,16 +87,7 @@ final class CaseWorkAssistant {
             $this->event(null,'context_closed',[$user['id'],$token]);return ['closed'=>true];
         });
     }
-    private function reserve(string $operation,int $micro): void {
-        if($micro<0||$micro>30000000)$this->fail('COST_BOUND_INVALID');
-        $insert=$this->sqlite?'INSERT OR IGNORE':'INSERT IGNORE';$month=$this->month();
-        $this->query("$insert INTO case_work_budget VALUES(?,30000000,0,0)",[$month]);
-        $b=$this->query('SELECT * FROM case_work_budget WHERE month_key=?',[$month])->fetch(PDO::FETCH_ASSOC);
-        $limit=min(30000000,(int)$b['limit_micro']);
-        if((int)$b['spent_micro']+(int)$b['reserved_micro']+$micro>$limit)$this->fail('MONTHLY_BUDGET_EXCEEDED');
-        $this->query('UPDATE case_work_budget SET reserved_micro=reserved_micro+? WHERE month_key=?',[$micro,$month]);
-        $this->query('INSERT INTO case_work_usage VALUES(?,?,?,NULL,?,NULL)',[$operation,$month,$micro,'reserved']);
-    }
+    private function reserve(string $operation,int $micro): void {$this->ledger->reserve($operation,$this->month(),$micro);}
     public function start(array $user,string $token,string $tab,string $key,string $action,string $instruction,string $route='assistant',int $maximum=250000): array {
         if(!preg_match('/^[a-zA-Z0-9-]{16,64}$/',$key)||strlen($instruction)>24000)$this->fail('REQUEST_INVALID');
         if(!in_array($action,['check','invoices','report','tasks','custom'],true)||!in_array($route,['assistant','work'],true))$this->fail('ACTION_INVALID');
@@ -124,14 +114,7 @@ final class CaseWorkAssistant {
         if($payload['context']!==$token)$this->fail('JOB_CONTEXT_MISMATCH');
         return [$job,$payload,$ctx['snapshot']['case']];
     }
-    private function settle(int $id,int $actual,array $usage): void {
-        $op='assistant:'.$id;$row=$this->query('SELECT * FROM case_work_usage WHERE operation_id=?',[$op])->fetch(PDO::FETCH_ASSOC);
-        if(!$row||$row['status']==='settled')$this->fail('USAGE_STATE_INVALID');
-        if($actual<0)$this->fail('USAGE_INVALID');
-        // Overrun is charged and visibly blocks the job, never hidden by clamping actual usage.
-        $this->query('UPDATE case_work_budget SET reserved_micro=reserved_micro-?,spent_micro=spent_micro+? WHERE month_key=?',[$row['reserved_micro'],$actual,$row['month_key']]);
-        $this->query('UPDATE case_work_usage SET actual_micro=?,status=?,usage_json=? WHERE operation_id=?',[$actual,'settled',self::json($usage),$op]);
-    }
+    private function settle(int $id,int $actual,array $usage): void {$this->ledger->settle('assistant:'.$id,$actual,$usage);}
     private function update(int $id,string $status,array $result): void {$this->query('UPDATE case_analysis_jobs SET status=?,message=?,result_json=?,updated_at=? WHERE id=?',[$status,$status,self::json($result),gmdate('Y-m-d H:i:s',$this->now()),$id]);$this->event($id,$status,$result);}
     public function step(array $user,string $token,string $tab,int $id): array {
         return $this->tx(function()use($user,$token,$tab,$id){
@@ -194,7 +177,7 @@ final class CaseWorkAssistant {
             $r=json_decode($j['result_json'],true);$this->update($id,$next,$r);return ['id'=>$id,'status'=>$next];
         });
     }
-    public function budget(): array {$b=$this->query('SELECT * FROM case_work_budget WHERE month_key=?',[$this->month()])->fetch(PDO::FETCH_ASSOC);return $b?:['month_key'=>$this->month(),'limit_micro'=>30000000,'spent_micro'=>0,'reserved_micro'=>0];}
+    public function budget(): array {return $this->ledger->budget($this->month());}
     public static function analyse(array $case,array $rules,string $action,string $instruction): array {
         $open=[];$findings=[];$total=0;$seen=[];$replaced=[];$ids=[];
         foreach($case['documents'] as $d){if(isset($ids[$d['id']]))throw new RuntimeException('DUPLICATE_DOCUMENT_ID');$ids[$d['id']]=true;}

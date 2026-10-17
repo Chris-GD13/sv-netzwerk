@@ -1,0 +1,34 @@
+<!doctype html><html lang="de"><meta charset="utf-8"><title>Claims notes local fixture</title>
+<style>body{font:16px system-ui;margin:2rem;max-width:900px}button{margin:.3rem;padding:.5rem}article{padding:.7rem;border-bottom:1px solid #ccc}pre{background:#eee;padding:1rem}section{border:1px solid #ccc;padding:1rem}</style>
+<h1>Lokaler Notiztest mit synthetischen Fällen</h1>
+<p>Verwendet das tatsächliche UI-Modul; Bridge und Speicherung sind ausschließlich lokal simuliert.</p>
+<button id="open-a">Fall A öffnen</button><button id="open-b">Fall B öffnen</button><button id="close">Fall schließen</button>
+<label><input id="delay" type="checkbox">Antwort verzögern</label><button id="release">Verzögerte Antwort freigeben</button>
+<p id="active">Kein Fall geladen</p>
+<section id="vf-claims-notes" hidden><strong>ClaimsForce-Notizen</strong><button id="vf-claims-notes-refresh" disabled>Notizen aktualisieren</button><p id="vf-claims-notes-status" role="status"></p><div id="vf-claims-notes-list"></div></section>
+<pre id="counts"></pre>
+<script type="module">
+import {mergeNotes} from '../../public/intern/claims-notes-state.mjs';
+const cases={A:{_loaded:true,folder_id:'fixture-A',meta:{claimsforce_claim_id:'11111111-1111-4111-8111-111111111111',claimsforce_profile:'christian',schaden_nr:'FIXTURE-A',claimsforce_notizen:[{id:'saved-A',text:'Gespeicherte Notiz A'}]}},B:{_loaded:true,folder_id:'fixture-B',meta:{claimsforce_claim_id:'22222222-2222-4222-8222-222222222222',claimsforce_profile:'marc',schaden_nr:'FIXTURE-B',claimsforce_notizen:[{id:'saved-B',text:'Gespeicherte Notiz B'}]}}};
+const fixture=window.fixture={reads:0,saves:0,pending:[]};
+const counts=()=>document.getElementById('counts').textContent=JSON.stringify({notesReads:fixture.reads,localSaves:fixture.saves,pending:fixture.pending.length},null,2);
+window.fetch=async(url,options)=>{
+ if(url!=='/intern/api/google-drive-sync.php?action=merge_claimsforce_notes')throw Error('FIXTURE_NETWORK_BLOCKED');
+ if(options.signal?.aborted)throw Error('NOTES_ABORTED');
+ fixture.saves++;const input=JSON.parse(options.body),item=Object.values(cases).find(value=>value.folder_id===input.folder_id);
+ item.meta.claimsforce_notizen=mergeNotes(item.meta.claimsforce_notizen,input.notes);counts();
+ return new Response(JSON.stringify({ok:true,identity:input.identity,notes:item.meta.claimsforce_notizen}),{headers:{'Content-Type':'application/json'}});
+};
+window.addEventListener('message',event=>{
+ if(event.source!==window||event.origin!==location.origin||event.data?.type!=='SVNET_CLAIMS_NOTES_READ')return;
+ fixture.reads++;const request=event.data;
+ const reply=()=>window.postMessage({type:'SVNET_CLAIMS_NOTES_RESULT',requestId:request.requestId,ok:true,result:{identity:request.identity,notes:[{id:'manual-'+request.identity.folderId,text:'Manuell gelesene Notiz '+request.identity.folderId,updatedAt:'2026-10-17T10:00:00Z'}]}},location.origin);
+ document.getElementById('delay').checked?fixture.pending.push(reply):reply();counts();
+});
+for(const key of ['A','B'])document.getElementById('open-'+key.toLowerCase()).onclick=()=>{window.svnetOpenedClaimsCase=structuredClone(cases[key]);document.getElementById('active').textContent='Geladener Fall '+key;window.dispatchEvent(new CustomEvent('svnet:case-opened',{detail:window.svnetOpenedClaimsCase}))};
+document.getElementById('close').onclick=()=>{window.svnetOpenedClaimsCase=null;document.getElementById('active').textContent='Kein Fall geladen';window.dispatchEvent(new CustomEvent('svnet:case-opened',{detail:null}))};
+document.getElementById('release').onclick=()=>{fixture.pending.splice(0).forEach(reply=>reply());counts()};
+// Storage residue must never select a case in the UI.
+localStorage.setItem('svnet-case',JSON.stringify(cases.A));
+await import('../../public/intern/claims-notes-ui.mjs');counts();
+</script></html>

@@ -97,7 +97,7 @@ function gfFinancialUploadPart(string $path, string $name): string
 {
     $ch=curl_init('https://api.openai.com/v1/files');
     curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.trim(env('OPENAI_API_KEY',''))],CURLOPT_POSTFIELDS=>['purpose'=>'user_data','file'=>new CURLFile($path,'application/pdf',$name)],CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>180]);
-    $response=curl_exec(svAiGuardHandle($ch)); $status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE); curl_close($ch);
+    $response=curl_exec(svAiGuardHandle($ch,'gf-evidence-upload')); $status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE); curl_close($ch);
     $id=(string)(json_decode((string)$response,true)['id']??'');
     if ($status<200||$status>=300||$id==='') throw new RuntimeException('PDF-Seitenblock konnte nicht zur Originalprüfung bereitgestellt werden.');
     return $id;

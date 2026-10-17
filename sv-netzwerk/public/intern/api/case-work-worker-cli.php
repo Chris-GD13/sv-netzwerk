@@ -19,7 +19,7 @@ try{
     if(svnetIsBackofficeUser($user)&&!empty($turn['expert_profile']))$user=svnetExpertIdentity($turn['expert_profile'],$user);
     define('SVNET_CASE_WORK_USER',$user);define('SVNET_CASE_ANALYSIS_LIBRARY_ONLY',true);
     require_once __DIR__.'/case-analysis.php';require_once __DIR__.'/case-work-core.php';
-    $s=db()->prepare('SELECT w.instructions,w.created_at,a.result_json FROM case_work_turns w LEFT JOIN case_analysis_jobs a ON a.id=w.analysis_id WHERE w.folder_id=:f AND w.user_id=:u AND w.id<:id ORDER BY w.id');
+    $s=db()->prepare('SELECT w.instructions,w.created_at,a.result_json FROM case_work_turns w LEFT JOIN case_analysis_jobs a ON a.id=w.analysis_id WHERE w.folder_id=:f AND w.user_id=:u AND w.id<:id AND w.task_id<>\'assistant:v1\' ORDER BY w.id');
     $s->execute([':f'=>$turn['folder_id'],':u'=>$user['id'],':id'=>$turnId]);$history=cwHistoryContext($s->fetchAll(PDO::FETCH_ASSOC));
     $import=null;
     if($turn['import_id']){$s=db()->prepare('SELECT id,status,finished_at,result_json FROM claimsforce_import_jobs WHERE id=:id AND requested_by=:u');$s->execute([':id'=>$turn['import_id'],':u'=>$authUser['email']]);$import=$s->fetch(PDO::FETCH_ASSOC);if($import){$import['result']=json_decode((string)$import['result_json'],true);unset($import['result_json']);}}

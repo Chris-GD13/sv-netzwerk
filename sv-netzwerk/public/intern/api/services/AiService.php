@@ -140,7 +140,7 @@ class AiService
             CURLOPT_CONNECTTIMEOUT => 10,
         ]);
 
-        $response = curl_exec(svAiGuardHandle($ch));
+        $response = curl_exec(svAiGuardHandle($ch,'ai-service'));
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $curlErr  = curl_error($ch);
         curl_close($ch);

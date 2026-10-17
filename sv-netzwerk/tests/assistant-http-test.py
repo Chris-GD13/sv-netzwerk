@@ -11,7 +11,7 @@ import urllib.request
 
 root=pathlib.Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory() as temp:
-    env=dict(os.environ, SVNET_TEST_DB=str(pathlib.Path(temp)/'http.sqlite'))
+    env=dict(os.environ, SVNET_TEST_DB=str(pathlib.Path(temp)/'http.sqlite'),SVNET_AI_TRANSPORT_MODE='deny')
     env.pop('SVNET_TEST_RULE_RELEASE',None)
     env.pop('SVNET_ASSISTANT_TEST_DSN',None)
     with socket.socket() as sock:
@@ -45,6 +45,13 @@ with tempfile.TemporaryDirectory() as temp:
         _,b=post({**open_a,'folder_id':'fixture-b','claim_number':'TEST-B-002'})
         status,result=post({**ctx,'action':'assistant_status','job_id':job});assert status==409 and result['error']=='CONTEXT_INVALID'
         status,result=post({'action':'assistant_close','tab_id':open_a['tab_id'],'token':b['data']['token']});assert status==200
+        # Execute the actual legacy AiService and JSON parser against a loopback fake provider.
+        # Guard still runs, no external network endpoint or real key is used.
+        service=(root/'public/intern/api/services/AiService.php').as_posix()
+        code="require '"+service+"'; $s=new AiService('synthetic-key'); $p=new ReflectionProperty(AiService::class,'endpoint');$p->setValue($s,$argv[1]); echo json_encode($s->detectDefects('synthetic-bytes'));"
+        check=subprocess.run(['php','-r',code,base+'/mock-model'],env=env,capture_output=True,text=True,check=True)
+        assert json.loads(check.stdout)['defects'][0]['type']=='synthetic-test',check.stdout
+        print('PASS actual legacy AiService roundtrip through gateway and loopback simulated provider')
         print('PASS HTTP: real endpoint, origin/ACL checks, idempotence, report, ledger, case switch, close')
     finally:
         proc.terminate();proc.wait(timeout=5)

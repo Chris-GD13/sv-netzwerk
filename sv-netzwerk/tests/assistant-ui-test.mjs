@@ -30,7 +30,7 @@ Object.defineProperty(context,'sessionStorage',{get(){throw Error('Storage used 
 Object.defineProperty(context,'localStorage',{get(){throw Error('Storage used as identity');}});
 vm.runInNewContext(fs.readFileSync(new URL('../public/intern/case-work-assistant.js',import.meta.url),'utf8'),context);
 window.svnetSetupAssistant();assert.equal(requests.length,0,'startup must not query');assert(buttons.every(b=>b.disabled));
-const open=(folder,number)=>handlers['svnet:case-opened']({detail:{folder_id:folder,meta:{schaden_nr:number}}});
+const open=(folder,number)=>handlers['svnet:case-opened']({detail:{_loaded:true,folder_id:folder,meta:{schaden_nr:number}}});
 const a=open('a','A');const b=open('b','B');
 opens[1].resolve(response({token:'token-b',claim_number:'B',profile:'profile-b',release:'r1'}));await b;
 opens[0].resolve(response({token:'token-a',claim_number:'A',profile:'profile-a',release:'r1'}));await a;
