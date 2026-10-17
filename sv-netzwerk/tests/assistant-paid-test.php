@@ -15,6 +15,8 @@ pfail(fn()=>svAssistantCaseAccess($acl,['id'=>2],'maurer'),'CASE_FORBIDDEN');
 $acl->exec('UPDATE users SET is_active=0 WHERE id=1');
 pfail(fn()=>svAssistantCaseAccess($acl,['id'=>1],'own'),'USER_FORBIDDEN');
 pfail(fn()=>svAssistantSyncMaster(['is_active'=>1,'email'=>'other@example.invalid']),'USER_FORBIDDEN');
+pcheck(svAssistantDiagnostic(['code'=>null,'type'=>'invalid_request_error','param'=>'model'])==='type=invalid_request_error, param=model','diagnostic retains type and param without a code');
+pcheck(svAssistantDiagnostic(['code'=>'<unsafe>','type'=>'ok','message'=>'secret'])==='type=ok','diagnostic excludes unsafe values and raw messages');
 $master='synthetic master';$r=assistantTestRelease();$r['source_hash']=hash('sha256',$master);foreach($r['rules'] as &$rule)$rule['sources']=[['id'=>'synthetic-master-id']];unset($rule);
 pcheck(svAssistantValidateRelease($r,fn()=>$master)['master_text']===$master,'approved release pinned to fresh master bytes');
 pfail(fn()=>svAssistantValidateRelease($r,fn()=>'changed'),'RULE_MASTER_CHANGED');

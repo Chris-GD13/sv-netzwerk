@@ -2,9 +2,10 @@
 declare(strict_types=1);
 
 /** Existing case_work_turns / case_analysis_jobs, same DB and case source.
- * The only provider is an in-process deterministic simulation, never HTTP.
+ * Provider injection separates deterministic simulation from reserved paid calls.
  */
 require_once __DIR__.'/ai-budget-gateway.php';
+require_once __DIR__.'/assistant-provider-diagnostic.php';
 final class CaseWorkAssistant {
     private SvAiBudgetLedger $ledger;
     private bool $sqlite;
@@ -156,7 +157,7 @@ final class CaseWorkAssistant {
             if($s!=='dispatching')$this->fail('USAGE_STATE_INVALID');
             if(!empty($response['uncertain'])){$this->ledger->unknown('assistant:'.$id);$this->update($id,'unknown',['checkpoint'=>'provider_uncertain','response_id'=>$response['response_id']??null]);return ['id'=>$id,'status'=>'unknown','result'=>['notice'=>'Verbrauchsstatus unklar. Reservierung bleibt gesperrt; kein automatischer neuer KI-Aufruf.']];}
             if(!empty($response['rejected'])){
-                $detail=$response['provider_error']??[];$notice='KI-Anfrage abgewiesen: HTTP '.(int)$response['http_status'].(isset($detail['code'])?' · '.$detail['code']:'').'. Keine erfolgreiche Bearbeitung; kein Verbrauch gebucht.';
+                $detail=$response['provider_error']??[];$diagnostic=svAssistantDiagnostic($detail);$notice='KI-Anfrage abgewiesen: HTTP '.(int)$response['http_status'].($diagnostic!==''?' · '.$diagnostic:'').'. Keine erfolgreiche Bearbeitung; kein Verbrauch gebucht.';
                 $this->settle($id,0,['provider_rejected'=>true,'http_status'=>$response['http_status'],'provider_error'=>$detail]);
                 $result=['checkpoint'=>'provider_rejected','http_status'=>$response['http_status'],'provider_error'=>$detail,'notice'=>$notice];$this->update($id,'failed',$result);
                 return ['id'=>$id,'status'=>'failed','result'=>$result];
