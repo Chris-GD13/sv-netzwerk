@@ -16,7 +16,7 @@ const context={document:{readyState:'complete',getElementById:id=>ids[id],create
   sessionStorage:storage,localStorage:{getItem:()=> 'user-scope'},location:{search:''},URLSearchParams,AbortController,FormData,
   crypto:{randomUUID},navigator:{clipboard:{writeText:async()=>{}}},confirm:()=>true,
   setTimeout:()=>1,clearTimeout:()=>{},MutationObserver:class{constructor(fn){observers.push(fn);}observe(){}disconnect(){}},
-  window:{addEventListener(){},svnetClaimsReloadCase:async number=>{assert.equal(number,'26-123456-1');return{id:11};}},
+  window:{addEventListener(){},get svnetOpenedClaimsCase(){const c=JSON.parse(store.get('svnet-case')||'null');return c?{...c,_loaded:true}:null;},svnetClaimsReloadCase:async number=>{assert.equal(number,'26-123456-1');return{id:11};}},
   fetch:async(url,options)=>{
     const body=options.body?JSON.parse(options.body):{};requests.push({url,body});let data;
     if(url.includes('claimsforce-queue'))data={ok:true,job:{id:11,status:importState,message:'Importstatus'}};

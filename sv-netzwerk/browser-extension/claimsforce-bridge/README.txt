@@ -14,3 +14,9 @@ Bereits vollständig importierte und unveränderte Fälle werden übersprungen. 
 Vor einer namentlichen Anmeldung schließt die Brücke alle vorhandenen ClaimsForce-Seiten und entfernt ausschließlich die Sitzungsdaten von ClaimsForce und ClaimsForce-Auth0. Dadurch können auch flüchtige alte Anwendungs- oder SSO-Sitzungen nicht mehr versehentlich unter dem neu ausgewählten Profil weiterlaufen. Ist die angemeldete E-Mail im Sitzungstoken erkennbar, wird sie vor dem ersten Fall nochmals mit dem ausgewählten Profil verglichen.
 
 Werktags um 03:00 Uhr öffnet oder lädt die Brücke die zentrale Importstation und reiht dort nacheinander die Aufträge aller vier hinterlegten SV-Profile ein. Chrome und der Rechner müssen dafür laufen. Wird Chrome erst später gestartet, wird der Import bis 10:00 Uhr nachgeholt. Ein gespeicherter ClaimsForce-Zugang wird nur noch verwendet, wenn seine E-Mail-Adresse eindeutig zum ausgewählten Bearbeiterprofil gehört.
+
+Entwicklungsstand 1.4.63 (17.10.2026)
+- Claims-Notizen werden nur über „Notizen aktualisieren“ im bestätigten geöffneten Fall geladen. Der allgemeine Import aktualisiert keine Notizen.
+- Native SE/ZB: der neue lesende Diagnosepfad nutzt bestehende interne Links und prüft Fall-/Formular-/Profilidentität sowie Feldbereitschaft. Er speichert, signiert und versendet nichts.
+- native-draft-simulation.mjs und die QS-/Planmodule sind isolierte Bausteine; kein produktiver SE-/ZB-Schreibadapter ist aktiviert. Mock-Rücklesen ist kein echter Speichernachweis.
+- Änderungen benötigen gemeinsame Test-/Integrationsfreigabe; nicht einzelne neue Dateien in eine alte laufende Brücke kopieren. Details: docs/claimsforce-stabilisierung-2026-10-17.md im Repository.

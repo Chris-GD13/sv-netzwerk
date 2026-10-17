@@ -10,6 +10,7 @@ function cwQueueDocuments(int $turnId,string $folder,array $user,bool $saveText=
     try {
         $s=db()->prepare('SELECT w.*,a.status,a.result_json FROM case_work_turns w JOIN case_analysis_jobs a ON a.id=w.analysis_id WHERE w.id=:id AND w.folder_id=:f AND w.user_id=:u');
         $s->execute([':id'=>$turnId,':f'=>$folder,':u'=>$user['id']]);$turn=$s->fetch(PDO::FETCH_ASSOC);
+        if(($turn['task_id']??'')==='assistant:v1')throw new RuntimeException('ASSISTANT_DOCUMENT_ROUTE_FORBIDDEN');
         if(!$turn)throw new RuntimeException('Dokumentauftrag gehört nicht zu diesem Fall und Benutzer.');
         if ($turn['document_id']) return (int)$turn['document_id'];
         if ($turn['status'] !== 'done') return 0;

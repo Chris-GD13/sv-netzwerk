@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+if (isset($_GET['assistant'])) { require __DIR__.'/case-work-assistant.php'; exit; }
 define('SVNET_CASE_ANALYSIS_LIBRARY_ONLY', true);
 require_once __DIR__.'/case-analysis.php';
 require_once __DIR__.'/case-work-core.php';
@@ -8,7 +9,7 @@ require_once __DIR__.'/gf-jobs-schema.php';
 require_once __DIR__.'/profile-routing.php';
 
 function cwRows(string $folder, int $userId): array {
-    $s = db()->prepare('SELECT w.*,a.status,a.message,a.result_json,a.updated_at FROM case_work_turns w LEFT JOIN case_analysis_jobs a ON a.id=w.analysis_id WHERE w.folder_id=:f AND w.user_id=:u ORDER BY w.id');
+    $s = db()->prepare('SELECT w.*,a.status,a.message,a.result_json,a.updated_at FROM case_work_turns w LEFT JOIN case_analysis_jobs a ON a.id=w.analysis_id WHERE w.folder_id=:f AND w.user_id=:u AND w.task_id<>\'assistant:v1\' ORDER BY w.id');
     $s->execute([':f'=>$folder, ':u'=>$userId]);
     return $s->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -62,6 +63,7 @@ try {
     if (mb_strlen($instructions) > 12000) apiError(400, 'Arbeitsauftrag zu lang.');
     if (trim(env('OPENAI_API_KEY', '')) === '') throw new RuntimeException('OpenAI-Anbindung fehlt.');
     $history = cwHistoryContext($rows); $taskId = trim((string)($body['task_id'] ?? ''));
+    if($taskId==='assistant:v1')apiError(400,'Der SV-Assistent benötigt seinen bestätigten Auftragskontext.');
     $importId = (int)($body['import_id'] ?? 0); $import = null;
     if(!$importId)foreach(array_reverse($rows) as $previous){if($previous['import_id']){$importId=(int)$previous['import_id'];break;}}
     if ($importId) {
@@ -75,12 +77,17 @@ try {
         if (!cqSingleResultValid($import, $importResult)) apiError(409, 'Import hat keinen vollständigen Einzelfallnachweis geliefert.');
         $import = ['id'=>$importId, 'status'=>'done', 'finished_at'=>$import['finished_at'], 'result'=>$importResult];
     }
-    db()->beginTransaction();
+    require_once __DIR__.'/ai-budget-gateway.php';
+    $gateway=new SvAiBudgetLedger(db(),'simulation');$gateway->initializeMutex();
+    [$job,$turn]=$gateway->transaction(function()use($folder,$taskId,$uid,$key,$instructions,$importId,$profile){
+    $busy=db()->prepare("SELECT id FROM case_analysis_jobs WHERE folder_id=? AND status IN ('queued','running','paused','unknown','dispatching','handoff')");$busy->execute([$folder]);
+    if($busy->fetchColumn())throw new RuntimeException('CASE_BUSY');
     $s=db()->prepare("INSERT INTO case_analysis_jobs(folder_id,task_key,user_id,status,message,created_at,updated_at) VALUES(:f,:t,:u,'running','Fallbearbeitung angenommen.',NOW(),NOW())");
     $s->execute([':f'=>$folder, ':t'=>hash('sha256', $taskId), ':u'=>$uid]); $job=(int)db()->lastInsertId();
     $s=db()->prepare('INSERT INTO case_work_turns(folder_id,user_id,request_key,instructions,task_id,analysis_id,import_id,expert_profile,created_at) VALUES(:f,:u,:k,:i,:t,:a,:p,:profile,NOW())');
     $s->execute([':f'=>$folder, ':u'=>$uid, ':k'=>$key, ':i'=>$instructions, ':t'=>$taskId, ':a'=>$job, ':p'=>$importId ?: null, ':profile'=>$profile]);
-    $turn=(int)db()->lastInsertId(); db()->commit();
+    $turn=(int)db()->lastInsertId();return [$job,$turn];
+    });
     if (!is_executable('/usr/bin/php') || !is_executable('/usr/bin/setsid') || !function_exists('exec')) {
         caUpdate($job,'failed','Hintergrundverarbeitung auf diesem Server nicht verfügbar.');
         throw new RuntimeException('Hintergrundverarbeitung auf diesem Server nicht verfügbar.');
@@ -91,6 +98,7 @@ try {
     apiJson(['ok'=>true, 'job_id'=>$job, 'turn_id'=>$turn]);
 } catch (Throwable $error) {
     if (db()->inTransaction()) db()->rollBack();
+    if($error->getMessage()==='CASE_BUSY')apiError(409,'Für diesen Fall läuft bereits ein Auftrag oder eine offene Work-Übergabe.');
     error_log('[case-work] '.$error->getMessage());
     apiError(500, $error->getMessage());
 } finally {

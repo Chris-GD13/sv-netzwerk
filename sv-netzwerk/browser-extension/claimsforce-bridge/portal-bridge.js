@@ -1,7 +1,7 @@
 const API = '/intern/api/google-drive-sync.php';
 const CAL = '/intern/api/outlook-case-calendar.php';
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
-const PORTAL_CODE_VERSION = '1.4.62';
+const PORTAL_CODE_VERSION = '1.4.63';
 const CONTEXT_RELOAD_MESSAGE = 'Die Browser-Brücke wurde aktualisiert. Bitte diese Portalseite einmal neu laden und den Import danach erneut starten.';
 let contextReloadReported = false;
 const invalidExtensionContext = error => /Extension context invalidated|Receiving end does not exist|message port closed/i.test(String(error?.message || error || ''));
@@ -24,7 +24,7 @@ const profileKey = value => {
 const uploads = new Map();
 const operations = new Map();
 const operationControllers = new Map();
-const PORTAL_REQUEST_TYPES = new Set(['PORTAL_UPSERT', 'PORTAL_UPLOAD_START', 'PORTAL_UPLOAD_CHUNK', 'PORTAL_UPLOAD_FINISH', 'PORTAL_APPOINTMENT', 'PORTAL_SYNC_STATE', 'PORTAL_COMMIT_SYNC']);
+const PORTAL_REQUEST_TYPES = new Set(['PORTAL_UPSERT', 'PORTAL_UPLOAD_START', 'PORTAL_UPLOAD_CHUNK', 'PORTAL_UPLOAD_FINISH', 'PORTAL_APPOINTMENT', 'PORTAL_SYNC_STATE', 'PORTAL_COMMIT_SYNC', 'PORTAL_SOURCE_STATE', 'PORTAL_SOURCE_UPLOAD_START', 'PORTAL_SOURCE_UPLOAD_FINISH']);
 let keepalivePort = null;
 let keepaliveTimer = 0;
 let activeRequest = null;
@@ -113,7 +113,7 @@ async function commitSync(message) {
   meta[`${prefix}_profile`] = profile;
   meta[`${prefix}_file_versions`] = [...new Set((message.fileVersions || []).map(String).filter(Boolean))];
   meta[`${prefix}_message_versions`] = [...new Set((message.messageVersions || []).map(String).filter(Boolean))];
-  if (prefix === 'claimsforce' && Array.isArray(message.notes)) meta.claimsforce_notizen = message.notes;
+  // Notes are persisted only by merge_claimsforce_notes; ordinary imports preserve them.
   if (prefix === 'claimsforce' && Array.isArray(message.tasks)) meta.claimsforce_aufgaben = message.tasks;
   if (prefix === 'claimsforce' && message.inventory) meta.claimsforce_importbestand = message.inventory;
   meta[`${prefix}_list_version`] = String(message.listVersion || '');
@@ -135,6 +135,7 @@ async function finishUpload(message) {
   const form = new FormData();
   form.append('folder_id', entry.folderId);
   form.append('last_modified', String(entry.modified || 0));
+  if (entry.supportingIdentity) form.append('supporting_identity', JSON.stringify(entry.supportingIdentity));
   form.append('file', new File(bytes, entry.name, { type: entry.mime, lastModified: entry.modified || Date.now() }));
   return scopedApi(entry.profile, `${API}?action=upload_case_document`, { method: 'POST', body: form });
 }
@@ -166,6 +167,7 @@ async function appointment(message) {
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (typeof message?.type === 'string' && message.type.startsWith('PORTAL_SOURCE_') && _sender?.id !== chrome.runtime.id) { sendResponse({ ok: false, error: 'SOURCE_SENDER_REJECTED' }); return; }
   if (message?.type === 'PORTAL_UPSERT_ASYNC') {
     const operationId = String(message.operationId || '');
     if (!operationId) { sendResponse({ ok: false, error: 'Portal-Operations-ID fehlt.' }); return; }
@@ -192,6 +194,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
   if (!PORTAL_REQUEST_TYPES.has(message?.type)) return;
   (async () => {
+    if (message?.type === 'PORTAL_SOURCE_STATE') return { ok: true, result: await readSourceState(message) };
+    if (message?.type === 'PORTAL_SOURCE_UPLOAD_START') { if (!message.sourceIdentity || !message.originalReadState || !message.sourceSha256) throw new Error('SOURCE_CONTEXT_REQUIRED'); uploads.set(message.uploadId, { ...message, chunks: [] }); return { ok: true }; }
+    if (message?.type === 'PORTAL_SOURCE_UPLOAD_FINISH') return { ok: true, result: await finishSourceUpload(message) };
     if (message?.type === 'PORTAL_UPSERT') return { ok: true, ...(await upsert(message)) };
     if (message?.type === 'PORTAL_UPLOAD_START') { uploads.set(message.uploadId, { ...message, chunks: [] }); return { ok: true }; }
     if (message?.type === 'PORTAL_UPLOAD_CHUNK') { const entry = uploads.get(message.uploadId); if (!entry) throw new Error('Unbekannte Dateiübertragung.'); entry.chunks.push(message.chunk); return { ok: true }; }
@@ -248,6 +253,18 @@ window.addEventListener('message', event => {
       if (invalidExtensionContext(error)) reportInvalidExtensionContext();
       window.postMessage({ type: 'SVNET_CLAIMS_CREDENTIAL_STATUS', requestId, ok: false, profile, phase: 'bridge-unavailable' }, location.origin);
     });
+  }
+  if (event.data?.type === 'SVNET_CLAIMS_NATIVE_FORM_READONLY') {
+    const requestId=String(event.data.requestId||'');
+    if(!requestId)return;
+    chrome.runtime.sendMessage({type:'OPEN_NATIVE_FORM_READONLY',profile:event.data.profile,caseId:event.data.caseId,formId:event.data.formId,tabId:event.data.tabId,requiredFields:event.data.requiredFields}).then(response=>window.postMessage({type:'SVNET_CLAIMS_NATIVE_FORM_RESULT',requestId,...response},location.origin)).catch(error=>window.postMessage({type:'SVNET_CLAIMS_NATIVE_FORM_RESULT',requestId,ok:false,error:error.message},location.origin));
+  }
+  if (event.data?.type === 'SVNET_CLAIMS_NOTES_READ') {
+    const requestId=String(event.data.requestId||'');
+    if(!requestId)return;
+    chrome.runtime.sendMessage({type:'READ_CLAIMS_NOTES',identity:event.data.identity}).then(response=>{
+      window.postMessage({type:'SVNET_CLAIMS_NOTES_RESULT',requestId,...response},location.origin);
+    }).catch(error=>window.postMessage({type:'SVNET_CLAIMS_NOTES_RESULT',requestId,ok:false,error:error.message},location.origin));
   }
   if (event.data?.type === 'SVNET_CLAIMS_IMPORT_START_V2') {
     let profile;
@@ -336,3 +353,45 @@ function connectKeepalive() {
 }
 reportRuntime();
 setInterval(reportRuntime, 5000);
+
+// Source refresh uses stable Claims identity and read-before-write CAS.
+function validateSourceState(state, identity) {
+  const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+  if (!identity || !uuid.test(identity.claimId || '') || !uuid.test(identity.sourceFileId || '') || !['christian', 'marc', 'holger', 'jens'].includes(identity.profile) || !identity.targetFolderId) throw new Error('SOURCE_CONTEXT_REQUIRED');
+  if (!state || !['NEW_SOURCE', 'EXISTING_SOURCE'].includes(state.kind) || !/^[a-f0-9]{64}$/.test(state.sourceHash || '') || state.context?.profile !== identity.profile || state.context?.caseId !== identity.claimId || state.context?.sourceFileId !== identity.sourceFileId || state.context?.targetFolderId !== identity.targetFolderId) throw new Error('SOURCE_READ_STATE_IDENTITY_MISMATCH');
+  if (!Array.isArray(state.context.contextRecords) || !state.context.contextRecords.length || state.context.contextRecords.some(r => !r.id || !/^[a-f0-9]{64}$/.test(r.rowFingerprint || '') || !['content', 'metadata'].includes(r.kind) || (r.kind === 'content' && !/^[a-f0-9]{64}$/.test(r.sha256 || '')))) throw new Error('SOURCE_CONTEXT_VERSION_REQUIRED');
+  if (state.kind === 'EXISTING_SOURCE' && (!state.portalFileId || state.originalPrecondition?.id !== state.portalFileId || !/^[a-f0-9]{64}$/.test(state.originalPrecondition?.rowFingerprint || '') || !/^[a-f0-9]{64}$/.test(state.originalPrecondition?.sha256 || ''))) throw new Error('SOURCE_ORIGINAL_READ_REQUIRED');
+  return state;
+}
+async function readSourceState(message) {
+  if (!['christian', 'marc', 'holger', 'jens'].includes(message.profile) || !message.folderId || !message.sourceIdentity || message.sourceIdentity.profile !== profileKey(message.profile)) throw new Error('SOURCE_CONTEXT_REQUIRED');
+  const result = await scopedApi(message.profile, `${API}?action=claimsforce_source_state`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder_id: message.folderId, source_identity: message.sourceIdentity }) });
+  validateSourceState(result.source_state, message.sourceIdentity); return result;
+}
+async function sourceOperationId(state, newHash) {
+  if (typeof crypto === 'undefined' || !crypto.subtle) throw new Error('SOURCE_CRYPTO_UNAVAILABLE');
+  const records = state.context.contextRecords.map(r => [r.id, r.kind, r.rowFingerprint, r.sha256 || null]);
+  const payload = ['claimsforce-source-refresh-v1', state.sourceHash, state.kind, state.context.targetFolderId, state.portalFileId || null, state.originalPrecondition?.rowFingerprint || null, state.originalPrecondition?.sha256 || null, records, newHash];
+  return [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(payload))))].map(v => v.toString(16).padStart(2, '0')).join('');
+}
+async function finishSourceUpload(message) {
+  const entry = uploads.get(message.uploadId);
+  if (!entry) throw new Error('SOURCE_UPLOAD_INCOMPLETE');
+  uploads.delete(message.uploadId);
+  if (!['christian', 'marc', 'holger', 'jens'].includes(entry.profile) || !entry.folderId || !entry.sourceIdentity || !entry.originalReadState || entry.sourceIdentity.profile !== profileKey(entry.profile) || !/^[a-f0-9]{64}$/.test(entry.sourceSha256 || '')) throw new Error('SOURCE_CONTEXT_REQUIRED');
+  validateSourceState(entry.originalReadState, entry.sourceIdentity);
+  const operationId = await sourceOperationId(entry.originalReadState, entry.sourceSha256);
+  const bytes = [];
+  for (const encoded of entry.chunks) { const binary = atob(encoded), chunk = new Uint8Array(binary.length); for (let index = 0; index < binary.length; index++) chunk[index] = binary.charCodeAt(index); bytes.push(chunk); }
+  const form = new FormData();
+  form.append('folder_id', entry.folderId);
+  form.append('source_identity', JSON.stringify(entry.sourceIdentity));
+  form.append('original_read_state', JSON.stringify(entry.originalReadState));
+  form.append('source_sha256', entry.sourceSha256);
+  form.append('operation_id', operationId);
+  form.append('file', new File(bytes, entry.name, { type: entry.mime || 'application/octet-stream' }));
+  const result = await scopedApi(entry.profile, `${API}?action=claimsforce_source_upload`, { method: 'POST', body: form });
+  const state = validateSourceState(result.sourceState, entry.sourceIdentity);
+  if (result.operationId !== operationId || state.kind !== 'EXISTING_SOURCE' || state.originalPrecondition?.sha256 !== entry.sourceSha256 || result.file?.id !== state.portalFileId || (entry.originalReadState.kind === 'EXISTING_SOURCE' && result.file.id !== entry.originalReadState.portalFileId)) throw new Error('SOURCE_READBACK_MISMATCH');
+  return result;
+}

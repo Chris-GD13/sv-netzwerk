@@ -1,0 +1,46 @@
+name: SV-Assistent Phase 3 Integration (ohne Deployment)
+on:
+  pull_request:
+    paths: ['sv-netzwerk/**', 'tools/sv-assistent/**', '.github/workflows/sv-assistent-phase3.yml']
+  push:
+    branches: ['codex/sv-assistent-phase3']
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testpass
+          MYSQL_DATABASE: assistant_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping" --health-interval=10s
+          --health-timeout=5s --health-retries=5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, pdo_sqlite, mbstring, curl, fileinfo, zip, simplexml
+      - name: Gemeinsame synthetische Integration und Bestandsregression
+        env:
+          SVNET_AI_TRANSPORT_MODE: deny
+        run: python3 tools/sv-assistent/run-phase3-tests.py --report /tmp/phase3-tests.json
+      - name: MySQL lifecycle and shared queue mutex
+        env:
+          SVNET_ASSISTANT_TEST_DSN: mysql:host=127.0.0.1;port=3306;dbname=assistant_test;charset=utf8mb4
+          SVNET_ASSISTANT_TEST_USER: root
+          SVNET_ASSISTANT_TEST_PASSWORD: testpass
+          SVNET_AI_TRANSPORT_MODE: deny
+        run: |
+          php sv-netzwerk/tests/assistant-integration-budget-test.php
+          php sv-netzwerk/tests/assistant-core-test.php
+      - name: Patchprüfung
+        run: git diff --check

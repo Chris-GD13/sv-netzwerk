@@ -30,7 +30,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,stationId,bridgeVersion,workerVersion,protocol:2})});
   const show=(t,b=false)=>{if(context.claims_agent&&bridgeProblem&&!mobileClient){t=bridgeProblem;b=true;button.disabled=true;if(fullButton)fullButton.disabled=true;}state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.4.62',currentBridgeVersion='1.4.62';
+  const minimumBridgeVersion='1.4.63',currentBridgeVersion='1.4.63';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -226,7 +226,7 @@
       bridgeVersion=String(d.version||'0.0.0');
       document.documentElement.setAttribute('data-svnet-claims-bridge-version',bridgeVersion);
       workerVersion=String(d.workerVersion||'');
-      bridge=versionAtLeast(bridgeVersion,minimumBridgeVersion)&&d.protocol===2&&d.portalVersion==='1.4.62'&&workerVersion==='1.4.62';
+      bridge=versionAtLeast(bridgeVersion,minimumBridgeVersion)&&d.protocol===2&&d.portalVersion==='1.4.63'&&workerVersion==='1.4.63';
       bridgeProblem=bridge?'':`Browser-Brücke neu laden: Dateien ${bridgeVersion}, tatsächlich laufendes Importprogramm ${workerVersion||'alter Stand'}. Einzelimport bleibt gesperrt.`;
       refreshControl();
       if(!bridge)show(bridgeProblem,true);

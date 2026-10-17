@@ -15,6 +15,7 @@
  */
 
 declare(strict_types=1);
+require_once __DIR__ . '/../ai-budget-gateway.php';
 
 class AiService
 {
@@ -139,7 +140,7 @@ class AiService
             CURLOPT_CONNECTTIMEOUT => 10,
         ]);
 
-        $response = curl_exec($ch);
+        $response = curl_exec(svAiGuardHandle($ch,'ai-service'));
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $curlErr  = curl_error($ch);
         curl_close($ch);

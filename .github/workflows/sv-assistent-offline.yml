@@ -1,0 +1,28 @@
+name: SV-Assistent Offline-Werkzeuge
+
+on:
+  pull_request:
+    paths:
+      - 'tools/sv-assistent/**'
+      - 'docs/sv-assistent-phase1.md'
+      - '.github/workflows/sv-assistent-offline.yml'
+  push:
+    branches: ['codex/sv-assistent-bestandsaufnahme']
+    paths:
+      - 'tools/sv-assistent/**'
+      - 'docs/sv-assistent-phase1.md'
+      - '.github/workflows/sv-assistent-offline.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Isolierte Quellen- und Kostenprüfungen
+        run: python3 -m unittest discover -s tools/sv-assistent -p 'test_*.py' -v
+      - name: Reproduzierbare Kostenplanung
+        run: python3 tools/sv-assistent/costs.py

@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__ . '/ai-budget-gateway.php';
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/case-upload-ignore.php';
@@ -126,7 +127,7 @@ curl_setopt_array($ch,[
     CURLOPT_CONNECTTIMEOUT=>12,
     CURLOPT_TIMEOUT=>180,
 ]);
-$response = curl_exec($ch);
+$response = curl_exec(svAiGuardHandle($ch,'case-extract'));
 $status = (int)curl_getinfo($ch,CURLINFO_HTTP_CODE);
 $error = curl_error($ch);
 curl_close($ch);

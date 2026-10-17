@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/ionos-storage-recovery.php';
 
 /** ID-preserving local document store. Remote services remain disabled until verified cutover. */
 function ionosStorageEnabled(): bool {
@@ -29,33 +30,59 @@ function ionosItem(string $id): array {
     unset($m['webContentLink'],$m['webViewLink']);
     return $m;
 }
-function ionosBytes(string $id): string {
-    $m=ionosItem($id);if($m['mimeType']==='application/vnd.google-apps.folder')throw new RuntimeException('Ordner enthält keine Datei.');
-    if(!preg_match('/^[A-Za-z0-9_-]+$/D',$id))throw new RuntimeException('Ungültige Datei-ID.');
-    $v=file_get_contents(ionosStorageRoot().'/objects/'.$id);if($v===false)throw new RuntimeException('IONOS-Datei konnte nicht gelesen werden.');return$v;
-}
-function ionosWrite(array $meta, ?string $bytes=null, ?string $id=null): array {
-    $db=ionosStorageDb();$db->exec('BEGIN IMMEDIATE');
+function ionosBytes(string $id): string { return ionosReadBytesConsistent($id); }
+function ionosWrite(array $meta, ?string $bytes=null, ?string $id=null, ?array $precondition=null): array {
+    $db=ionosStorageDb();$db->exec('BEGIN IMMEDIATE');$intentId=null;
     try {
-        $old=$id!==null?ionosItem($id):[];$id??='ionos_'.bin2hex(random_bytes(16));
+        foreach($precondition['contextRecords']??[] as $contextRecord){
+            $contextId=$contextRecord['id']??'';ionosIntentPath($contextId);
+            if(ionosRowFingerprint(ionosRow($contextId))!==($contextRecord['rowFingerprint']??null))throw new RuntimeException('SOURCE_CONTEXT_VERSION_CONFLICT');
+            $contextKind=$contextRecord['kind']??'content';
+            if(!in_array($contextKind,['content','metadata'],true)||($contextKind==='content'&&(!is_file(ionosStorageRoot().'/objects/'.$contextId)||hash_file('sha256',ionosStorageRoot().'/objects/'.$contextId)!==($contextRecord['sha256']??null))))throw new RuntimeException('SOURCE_CONTEXT_VERSION_CONFLICT');
+        }
+        if($id!==null)ionosRecoverIntentLocked($id);
+        $requestedId=$id;$id??='ionos_'.bin2hex(random_bytes(16));
+        $oldRow=ionosRow($id);$path=ionosStorageRoot().'/objects/'.$id;
+        if($requestedId!==null&&$oldRow===null&&empty($precondition['allowCreate']))throw new RuntimeException('Datei nicht im geprüften IONOS-Bestand: '.$id);
+        $old=$oldRow!==null?ionosItem($id):[];
+        $oldSha=is_file($path)?hash_file('sha256',$path):null;
+        if($precondition!==null){
+            if(($precondition['id']??null)!==$id||($precondition['rowFingerprint']??null)!==ionosRowFingerprint($oldRow)||($precondition['sha256']??null)!==$oldSha)throw new RuntimeException('SOURCE_VERSION_CONFLICT');
+        }
+        if($oldSha!==null&&((isset($old['sha256Checksum'])&&!hash_equals($old['sha256Checksum'],$oldSha))||(isset($old['md5Checksum'])&&!hash_equals($old['md5Checksum'],md5_file($path)))))throw new RuntimeException('Datei und Index passen nicht zusammen.');
         $m=array_replace($old,$meta,['id'=>$id]);$m['name']=$m['name']??'Datei';$m['mimeType']=$m['mimeType']??'application/octet-stream';
         $parent=(string)($m['parents'][0]??'root');
         if($parent===$id)throw new RuntimeException('Ordner kann nicht sich selbst enthalten.');
         $p=ionosItem($parent);if($p['mimeType']!=='application/vnd.google-apps.folder')throw new RuntimeException('Ungültiger Zielordner.');
-        for($ancestor=$parent,$i=0;$ancestor!==''&&$i<100;$i++){$a=ionosItem($ancestor);if($ancestor===$id)throw new RuntimeException('Zyklische Ordnerzuordnung.');$ancestor=(string)($a['parents'][0]??'');}
-        $path=ionosStorageRoot().'/objects/'.$id;
-        if($bytes!==null){
-            if(is_file($path)){$versions=ionosStorageRoot().'/versions';if(!is_dir($versions)&&!mkdir($versions,0770,true))throw new RuntimeException('Versionsordner fehlt.');if(!copy($path,$versions.'/'.$id.'-'.bin2hex(random_bytes(8))))throw new RuntimeException('Vorversion konnte nicht gesichert werden.');}
-            $tmp=tempnam(ionosStorageRoot().'/objects','write-');if($tmp===false||file_put_contents($tmp,$bytes)!==strlen($bytes))throw new RuntimeException('Datei konnte nicht vollständig geschrieben werden.');chmod($tmp,0660);
-            // Maintenance writes must remain readable by the existing storage service.
-            if(function_exists('posix_geteuid')&&posix_geteuid()===0){$owner=stat(ionosStorageRoot().'/objects');if(!$owner||!chown($tmp,$owner['uid'])||!chgrp($tmp,$owner['gid']))throw new RuntimeException('Dienstbesitzer der gespeicherten Datei konnte nicht erhalten werden.');}
-            if(!rename($tmp,$path))throw new RuntimeException('Datei konnte nicht übernommen werden.');
-            $m['size']=(string)strlen($bytes);$m['md5Checksum']=md5($bytes);
-        } elseif($m['mimeType']!=='application/vnd.google-apps.folder'&&!is_file($path))throw new RuntimeException('Dateiinhalt fehlt.');
+        for($ancestor=$parent,$j=0;$ancestor!==''&&$j<100;$j++){$a=ionosItem($ancestor);if($ancestor===$id)throw new RuntimeException('Zyklische Ordnerzuordnung.');$ancestor=(string)($a['parents'][0]??'');}
         $m['modifiedTime']=gmdate('Y-m-d\TH:i:s\Z');$m['createdTime']??=$m['modifiedTime'];$m['trashed']??=false;
-        $s=$db->prepare('INSERT OR REPLACE INTO items VALUES(?,?,?,?,?,?,1)');$s->execute([$id,$parent,$m['name'],$m['mimeType'],json_encode($m,JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE),$m['mimeType']==='application/vnd.google-apps.folder'?'':$path]);$db->exec('COMMIT');return$m;
-    }catch(Throwable$e){$db->exec('ROLLBACK');throw$e;}
+        if($bytes!==null){
+            $backup=null;
+            if(is_file($path)){
+                $versions=ionosStorageRoot().'/versions';if(!is_dir($versions)&&!mkdir($versions,0770,true))throw new RuntimeException('Versionsordner fehlt.');
+                $backup=$id.'-'.bin2hex(random_bytes(8));if(!copy($path,$versions.'/'.$backup)||hash_file('sha256',$versions.'/'.$backup)!==$oldSha)throw new RuntimeException('Vorversion konnte nicht gesichert werden.');
+            }
+            $tmp=tempnam(ionosStorageRoot().'/objects','write-');if($tmp===false)throw new RuntimeException('Datei konnte nicht geschrieben werden.');
+            $f=fopen($tmp,'wb');if(!$f)throw new RuntimeException('Datei konnte nicht geöffnet werden.');
+            try{if(fwrite($f,$bytes)!==strlen($bytes)||!fflush($f)||(function_exists('fsync')&&!fsync($f)))throw new RuntimeException('Datei konnte nicht vollständig gesichert werden.');}finally{fclose($f);}
+            chmod($tmp,0660);
+            if(function_exists('posix_geteuid')&&posix_geteuid()===0){$owner=stat(ionosStorageRoot().'/objects');if(!$owner||!chown($tmp,$owner['uid'])||!chgrp($tmp,$owner['gid']))throw new RuntimeException('Dienstbesitzer konnte nicht erhalten werden.');}
+            $m['size']=(string)strlen($bytes);$m['md5Checksum']=md5($bytes);$m['sha256Checksum']=hash('sha256',$bytes);$operation=bin2hex(random_bytes(16));$m['_svnet_write_operation']=$operation;
+            $intent=['id'=>$id,'operation'=>$operation,'oldRowFingerprint'=>ionosRowFingerprint($oldRow),'oldSha256'=>$oldSha,'newSha256'=>$m['sha256Checksum'],'backup'=>$backup];
+            ionosDurableJson(ionosIntentPath($id),$intent);$intentId=$id;
+            if(!rename($tmp,$path))throw new RuntimeException('Datei konnte nicht übernommen werden.');
+        }elseif($m['mimeType']!=='application/vnd.google-apps.folder'&&!is_file($path))throw new RuntimeException('Dateiinhalt fehlt.');
+        $s=$db->prepare('INSERT OR REPLACE INTO items VALUES(?,?,?,?,?,?,1)');$s->execute([$id,$parent,$m['name'],$m['mimeType'],json_encode($m,JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE),$m['mimeType']==='application/vnd.google-apps.folder'?'':$path]);
+        $db->exec('COMMIT');
+        if($intentId!==null)ionosRecoverPending($intentId);
+        return $m;
+    }catch(Throwable $e){
+        try{$db->exec('ROLLBACK');}catch(Throwable $alreadyCommitted){}
+        if($intentId!==null)ionosRecoverPending($intentId);
+        throw $e;
+    }
 }
+
 function ionosList(array $query): array {
     $q=(string)($query['q']??'');$clauses=preg_split('/\s+and\s+(?=(?:[^\x27]*\x27[^\x27]*\x27)*[^\x27]*$)/',$q)?:[];
     $s=ionosStorageDb()->query('SELECT id FROM items WHERE verified=1 ORDER BY name,id');$out=[];
