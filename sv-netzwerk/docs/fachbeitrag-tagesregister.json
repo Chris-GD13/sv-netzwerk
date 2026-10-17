@@ -566,9 +566,12 @@
         "verified_at": "2026-10-17T04:23:18.602Z"
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "reserved",
+        "owner": "codex-linkedin-20261017-01a1483f",
+        "reserved_at": "2026-10-17T05:08:33.090Z",
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation/"
       }
     }
   },
-  "updated_at": "2026-10-17T04:23:18.602Z"
+  "updated_at": "2026-10-17T05:08:33.090Z"
 }
