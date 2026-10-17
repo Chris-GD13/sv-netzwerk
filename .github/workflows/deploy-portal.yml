@@ -93,6 +93,8 @@ jobs:
           php tests/kva_openai_error_test.php
           php tests/private_orders_test.php
           node tests/private_orders_upload_test.mjs
+          node tests/private_orders_inquiry_tabs_test.mjs
+          php tests/private_orders_inquiries_test.php
           php tests/revenue_rekon_test.php
           node tests/work_center_test.mjs
           node tests/claimsforce_resume_controls_test.mjs

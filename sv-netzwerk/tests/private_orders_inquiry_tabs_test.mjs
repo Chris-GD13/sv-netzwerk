@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const page=fs.readFileSync(new URL('../src/pages/intern/privatauftraege/index.astro',import.meta.url),'utf8');
+new vm.Script(page.match(/<script is:inline>([\s\S]*?)<\/script>/)[1]);
+const names=['norm','caseRows','firstLetter','isInquiry','inquiryName','displayName','renderCases'];
+const functions=names.map(name=>page.match(new RegExp(`function ${name}\\([^\\n]+`))?.[0]).join('\n');
+const elements={};
+const element=id=>elements[id]??=({innerHTML:'',textContent:'',hidden:false,setAttribute(){},querySelectorAll(){return[];}});
+const ctx={root:[{id:'one',name:'Auftrag Müller',folder:true},{id:'two',name:'Anfrage_Krämer_Bopfingen',folder:true}],q:{value:''},view:'orders',letter:'',active:null,cases:element('cases'),$:element,esc:s=>String(s),flat:r=>r,openCase(){}};
+vm.createContext(ctx);vm.runInContext(functions,ctx);
+ctx.renderCases();assert.match(elements.cases.innerHTML,/Auftrag Müller/);assert.doesNotMatch(elements.cases.innerHTML,/Krämer/);assert.equal(elements.alphabet.hidden,false);
+ctx.view='inquiries';ctx.renderCases();assert.match(elements.cases.innerHTML,/Krämer Bopfingen/);assert.doesNotMatch(elements.cases.innerHTML,/Auftrag Müller|po-letter-group/);assert.equal(elements.alphabet.hidden,true);
+ctx.q.value='Krämer Bopfingen';ctx.renderCases();assert.match(elements.cases.innerHTML,/Krämer Bopfingen/);
+assert.match(page,/Auftrag aus Anfrage anlegen/);assert.match(page,/Bestehendem Auftrag hinzufügen/);
+console.log('private_orders_inquiry_tabs_test: ok (separate lists, readable names, search)');

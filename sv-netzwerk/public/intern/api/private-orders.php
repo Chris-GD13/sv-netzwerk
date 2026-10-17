@@ -15,7 +15,16 @@ if (!isset($roots[$profile])) apiError(403, 'Für dieses Benutzerprofil sind kei
 $action = (string)($_GET['action'] ?? 'list');
 
 require_once __DIR__ . '/private-order-storage.php';
+require_once __DIR__ . '/private-order-inquiries.php';
 $root=poItemByPath($roots[$profile]);
+if (in_array($action, ['convert-inquiry','merge-inquiry'], true) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode((string)file_get_contents('php://input'), true);
+    $id = trim((string)($input['id'] ?? ''));
+    $result = $action === 'convert-inquiry'
+        ? poConvertInquiry($id, (string)($input['name'] ?? ''), (string)$root['id'])
+        : poMergeInquiry($id, trim((string)($input['target_id'] ?? '')), (string)$root['id']);
+    apiJson(['ok'=>true] + $result);
+}
 if ($action==='list' || $action==='cases') {
     $top=poChildren((string)$root['id'],$roots[$profile]);$items=[];
     foreach($top as $item){if(!$item['folder']||poIsStandardFolder($item)||mb_strtolower($item['name'],'UTF-8')==='versicherungsaufträge')continue;if(poIsYearFolder($item)){foreach(poChildren($item['id'],$item['path']) as $candidate)if($candidate['folder']&&!poIsStandardFolder($candidate))$items[]=$candidate;}else $items[]=$item;}
