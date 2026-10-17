@@ -1,6 +1,6 @@
 (() => {
   const setup = () => {
-    if (document.getElementById('vf-assistant') && window.svnetSetupAssistant) { window.svnetSetupAssistant(); return; }
+    if (document.getElementById('vf-assistant') && window.svnetSetupAssistant) { window.svnetSetupAssistant(); }
     const el = id => document.getElementById(id);
     const start=el('vf-analysis-start'), refresh=el('vf-analysis-refresh'), state=el('vf-analysis-state');
     const historyBox=el('vf-work-history'), order=el('vf-analysis-order'), files=el('vf-analysis-files');
@@ -8,7 +8,7 @@
     if (!start || !historyBox) return;
     const taskId=new URLSearchParams(location.search).get('aufgabe') || '';
     let folder='', epoch=0, timer=null, busy=false, lastRender='', turns=[];
-    const active=()=>{for(const storage of [sessionStorage,localStorage])try{const current=JSON.parse(storage.getItem('svnet-case')||'null');if(current?.folder_id)return current;}catch{}return null;};
+    const active=()=>window.svnetOpenedClaimsCase?._loaded===true?window.svnetOpenedClaimsCase:null;
     const pendingKey=id=>'svnet-work-pending:'+String(localStorage.getItem('svnet-case-owner')||'')+':'+id;
     const pending=id=>{try{return JSON.parse(sessionStorage.getItem(pendingKey(id))||'null');}catch{return null;}};
     const savePending=(id,value)=>value?sessionStorage.setItem(pendingKey(id),JSON.stringify(value)):sessionStorage.removeItem(pendingKey(id));
@@ -123,7 +123,7 @@
       const current=active(),id=current?.folder_id||'';if(id===folder)return;
       folder=id;epoch++;clearTimeout(timer);busy=false;turns=[];lastRender='';historyBox.replaceChildren();order.value='';files.value='';
       start.disabled=!id;refresh.disabled=!id;reload.checked=true;
-      notice(id?'Fall-Chat wird geladen …':'Bitte zuerst einen Fall öffnen.');if(id)poll(current,epoch);
+      notice(id?'Fall bestätigt. Auftrag eingeben oder Status ausdrücklich aktualisieren.':'Bitte zuerst einen Fall öffnen.');
     };
     start.onclick=async()=>{
       const current=requireCase();if(!current)return;if(busy){notice('Die Bearbeitung läuft bereits. Mit Status aktualisieren kannst du den Fortschritt prüfen.');return;}

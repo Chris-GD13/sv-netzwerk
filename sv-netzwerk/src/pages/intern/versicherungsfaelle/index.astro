@@ -4,6 +4,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 <InternalLayout title="Versicherungsfälle" description="Automatische, fallzentrierte Schadenbearbeitung.">
 <section slot="sidebar-extra" id="vf-expert-panel" class="intern-sidebar__expert" hidden><label class="vf-order-label" for="vf-expert-select"><strong>Bearbeitung für</strong><small>Fallordner und ClaimsForce-Anmeldung des ausgewählten Profils</small></label><select id="vf-expert-select"><option value="christian">Christian Wächter</option><option value="holger">Holger Roth</option><option value="marc">Marc Schütt</option><option value="jens">Jens Maurer</option></select></section>
 <main class="vf-app">
+  <nav class="vf-calendar-actions" aria-label="Fallbearbeitung"><a class="vf-secondary" href="#vf-assistant-panel" data-case-menu="vf-assistant-panel">SV-Assistent</a><a class="vf-secondary" href="#vf-analysis" data-case-menu="vf-analysis">Fall-Work</a><a class="vf-secondary" href="#vf-claims-notes">Claimsforce-Notizen</a><a class="vf-secondary" href="/intern/versicherungswissen/">Richtlinien</a></nav>
   <section id="vf-active" class="vf-active"><div><i></i><strong>Noch kein Fall geöffnet</strong><small>Fall suchen, neu anlegen oder Unterlagen zur automatischen Anlage hochladen.</small></div></section>
   <section id="vf-claims-notes" class="vf-card vf-claims-notes" hidden>
     <strong>ClaimsForce-Notizen</strong>
@@ -12,12 +13,12 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     <div id="vf-claims-notes-list"></div>
   </section>
   <section id="vf-task-context" class="vf-card vf-task-context" hidden aria-live="polite"><header class="vf-step"><b>✉</b><div><strong>Aufgabe bearbeiten</strong><small id="vf-task-meta">Aufgabe wird geladen …</small></div></header><h2 id="vf-task-subject"></h2><div id="vf-task-body" class="vf-task-body"></div><div id="vf-task-attachments" class="vf-task-attachments"></div><div class="vf-calendar-actions"><button id="vf-task-reply" class="vf-primary" type="button">Antwort im Fall verfassen</button><button id="vf-task-kva" class="vf-secondary" type="button">KVA prüfen / freigeben</button><button id="vf-task-done" class="vf-secondary" type="button">Aufgabe erledigen</button><a id="vf-task-outlook" class="vf-secondary" target="_blank" rel="noreferrer" hidden>In Outlook öffnen</a></div><p id="vf-task-state" class="vf-meta"></p></section>
-  <script is:inline src="/intern/case-work-assistant.js?v=20261017-2"></script>
-  <script is:inline src="/intern/case-work.js?v=20261017-2"></script>
+  <script is:inline src="/intern/case-work-assistant.js?v=20261017-3"></script>
+  <script is:inline src="/intern/case-work.js?v=20261017-3"></script>
   <style is:global>
-    #vf-analysis .vf-analysis-order{width:100%;box-sizing:border-box;resize:vertical;font:inherit;padding:10px;border:1px solid #b8c8d6;border-radius:8px}
+    #vf-analysis .vf-analysis-order,#vf-assistant-panel .vf-assistant-order{width:100%;box-sizing:border-box;resize:vertical;font:inherit;padding:10px;border:1px solid #b8c8d6;border-radius:8px}
     .vf-work-turn{border-top:1px solid #d6dce1;padding:16px 0;overflow-wrap:anywhere}.vf-work-turn h3{font-size:1rem}.vf-work-answer{padding:14px;background:#f6f8fa;border-left:3px solid #b9852f}.vf-work-answer button,.vf-work-answer a{margin:5px 8px 5px 0;display:inline-block}.vf-work-answer details{margin:12px 0}.vf-work-answer summary{cursor:pointer;font-weight:600}
-    .vf-assistant-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:8px;margin:12px 0}.vf-assistant-actions button,#vf-work-route{font:inherit;white-space:normal;padding:10px;min-width:0;max-width:100%}#vf-assistant pre{white-space:pre-wrap;overflow-wrap:anywhere}#vf-assistant{overflow-wrap:anywhere}
+    .vf-assistant-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:8px;margin:12px 0}.vf-assistant-actions button,#vf-assistant-route{font:inherit;white-space:normal;padding:10px;min-width:0;max-width:100%}#vf-assistant pre{white-space:pre-wrap;overflow-wrap:anywhere}#vf-assistant{overflow-wrap:anywhere}
     #vf-analysis input[type="file"]{max-width:100%}
     #vf-analysis-result section{margin-top:16px}
     #vf-analysis-result h3{font-size:1rem;margin:0 0 6px}
@@ -34,31 +35,45 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     <section class="vf-work">
       <div class="vf-command-grid">
         <div class="vf-command-main">
-  <section id="vf-analysis" class="vf-card vf-collapsible is-collapsed" aria-labelledby="vf-analysis-title">
-    <header class="vf-step vf-collapse-trigger" role="button" tabindex="0" aria-expanded="false"><b>2</b><div><strong id="vf-analysis-title">SV-Assistent</strong><small>Vorhandene Fall-Work · lokaler Prototyp mit simulierter KI</small></div></header>
-    <div id="vf-assistant">
+  <section id="vf-assistant-panel" class="vf-card vf-collapsible is-collapsed" aria-labelledby="vf-assistant-title">
+    <header class="vf-step vf-collapse-trigger" role="button" tabindex="0" aria-expanded="false"><b>2</b><div><strong id="vf-assistant-title">SV-Assistent</strong><small>Fall prüfen · Rechnungen prüfen · Bericht vorbereiten · Aufgaben ermitteln</small></div></header>
+    <div id="vf-assistant"><p class="vf-meta">Der Assistent nutzt den geöffneten Fall erst nach deiner Auswahl. Für die neue KI gilt maximal 30 EUR Zusatzbudget pro Monat einschließlich Sicherheitspuffer. Ergebnisse bleiben fachlich zu prüfende Entwürfe. Work-Übergaben werden manuell vorbereitet.</p><div class="vf-calendar-actions"><button id="vf-assistant-open" class="vf-secondary" type="button">Geöffneten Fall übernehmen</button><button id="vf-assistant-connections" class="vf-secondary" type="button">Verbindungen prüfen</button><button id="vf-assistant-sync" class="vf-secondary" type="button" hidden>Gemeinsamen Master abgleichen</button><button id="vf-assistant-demo" class="vf-secondary" type="button">KI-Verbindung mit Testdaten prüfen</button></div><p id="vf-assistant-connections-state" class="vf-meta" role="status"></p>
       <p id="vf-assistant-context" role="status">Bitte zuerst einen Fall öffnen.</p>
-      <label for="vf-work-route">Bearbeitungsweg</label>
-      <select id="vf-work-route"><option value="assistant">SV-Assistent (Simulation)</option><option value="work">ChatGPT Work (manuelle Übergabe)</option></select>
+      <label for="vf-assistant-route">Bearbeitungsweg</label>
+      <select id="vf-assistant-route"><option value="assistant">SV-Assistent (Zusatzbudget bis 30 EUR)</option><option value="work">ChatGPT Work (manuelle Übergabe)</option></select>
       <div class="vf-assistant-actions">
         <button type="button" data-assistant-task="check" disabled>Fall vollständig prüfen</button>
         <button type="button" data-assistant-task="invoices" disabled>Rechnungen und Angebote prüfen</button>
         <button type="button" data-assistant-task="report" disabled>Bericht vorbereiten</button>
         <button type="button" data-assistant-task="tasks" disabled>Offene Aufgaben ermitteln</button>
       </div>
-      <label for="vf-analysis-order">Individuelle Anweisung</label>
-      <textarea id="vf-analysis-order" class="vf-analysis-order" rows="3" maxlength="12000"></textarea>
+      <label for="vf-assistant-order">Individuelle Anweisung</label>
+      <textarea id="vf-assistant-order" class="vf-assistant-order" rows="3" maxlength="12000"></textarea>
       <div class="vf-assistant-actions">
         <button type="button" data-assistant-task="custom" disabled>Anweisung bearbeiten</button>
-        <button id="vf-analysis-refresh" type="button" disabled>Status aktualisieren</button>
+        <button id="vf-assistant-refresh" type="button" disabled>Status aktualisieren</button>
         <button id="vf-assistant-history" type="button">Gespeicherten Auftrag laden</button>
         <button id="vf-assistant-resume" type="button" disabled>Wiederaufnehmen</button>
         <button id="vf-assistant-cancel" type="button" disabled>Auftrag abbrechen / Übergabe beenden</button>
       </div>
       <p id="vf-assistant-budget">Monatslimit der Simulation: 30 € · echte KI-Aufrufe gesperrt.</p>
-      <p id="vf-analysis-state" role="status" aria-live="polite">Bereit nach bestätigter Fallöffnung.</p>
-      <div id="vf-work-history" aria-label="Arbeitsergebnis"></div>
+      <p id="vf-assistant-state" role="status" aria-live="polite">Bereit nach bestätigter Fallöffnung.</p>
+      <div id="vf-assistant-results" aria-label="Arbeitsergebnis"></div>
     </div>
+  </section>
+  <section id="vf-analysis" class="vf-card vf-collapsible is-collapsed" aria-labelledby="vf-analysis-title">
+    <header class="vf-step vf-collapse-trigger" role="button" tabindex="0" aria-expanded="false"><b>2</b><div><strong id="vf-analysis-title">KI · Fall-Work · gemeinsam abarbeiten</strong><small>Fall laden, „Bitte abarbeiten“ – danach im Gespräch weiterarbeiten</small></div></header>
+    <p class="vf-meta">Mails, Anhänge, Rechnungen, Angebote, bereits gespeicherte Claims-Notizen und offene Aufgaben werden zusammen ausgewertet. Der Verlauf bleibt im Fall gespeichert. Benötigte Berichte werden anschließend erstellt und hier zum Download angeboten. Freigaben, Versand und Erledigt-Markierungen erfolgen über die bestehenden Fallfunktionen.</p>
+    <div id="vf-work-history" aria-label="Gespeicherter Fall-Chat"></div>
+    <label class="vf-order-label" for="vf-analysis-order"><strong>Dein Auftrag oder deine Korrektur</strong></label>
+    <textarea id="vf-analysis-order" class="vf-analysis-order" rows="3" maxlength="12000" placeholder="Bitte abarbeiten – oder z. B.: Erstelle den nächsten Zwischenbericht nach Engel. Die unstrittigen Beträge bitte gesondert ausweisen."></textarea>
+    <div class="vf-calendar-actions"><button class="vf-secondary" type="button" data-work-prompt="Bitte abarbeiten">Bitte abarbeiten</button><button class="vf-secondary" type="button" data-work-prompt="Bitte die neuen Rechnungen prüfen und eine Übersicht erstellen: Forderung, bereits bezahlt, jetzt auszuzahlen, strittiger Rest mit Begründung. Energieverbrauch separat berücksichtigen.">Rechnungen prüfen</button><button class="vf-secondary" type="button" data-work-prompt="Bitte den nächsten Zwischenbericht streng nach der einschlägigen Engel-Vorgabe als Word erstellen und den letzten freigegebenen Bericht fortschreiben.">Zwischenbericht erstellen</button></div>
+    <label class="vf-order-label" for="vf-analysis-files"><strong>Unterlagen ergänzen</strong></label>
+    <input id="vf-analysis-files" type="file" multiple accept=".pdf,.docx,.xlsx,.pptx,.txt,.md,.csv,.json,.eml,.jpg,.jpeg,.png,.webp,.gif">
+    <p><label><input id="vf-work-reload" type="checkbox" checked> Den geladenen Fall vor der Bearbeitung vollständig aus Claims nachladen</label></p>
+    <div class="vf-calendar-actions"><button id="vf-analysis-start" class="vf-primary" type="button" disabled>Bitte abarbeiten</button><button id="vf-analysis-refresh" class="vf-secondary" type="button" disabled>Status aktualisieren</button></div>
+    <p id="vf-analysis-state" class="vf-meta" role="status" aria-live="polite">Bitte zuerst einen Fall öffnen.</p>
+    <details><summary>Wenn der Import unterbrochen ist</summary><p>Der Auftrag bleibt in diesem Browser erhalten. Bei gesperrten Quellen kann die vorhandene Akte mit ausdrücklich benannten Lücken bearbeitet werden.</p><button id="vf-work-import-retry" class="vf-secondary" type="button">Nachladen erneut versuchen</button> <button id="vf-work-local" class="vf-secondary" type="button">Vorhandenen Bestand bearbeiten</button></details>
   </section>
 
           <section class="vf-card vf-upload-card"><header class="vf-step"><b>3</b><div><strong>Unterlagen hochladen</strong><small>PDF, Word, Excel, E-Mail, Bilder oder komplette Fallakte</small></div></header><input id="vf-files" type="file" multiple hidden accept=".pdf,.doc,.docx,.xls,.xlsx,.xlsm,.csv,.txt,.md,.rtf,.msg,.eml,.jpg,.jpeg,.png,.webp,.tif,.tiff,.zip"><div id="vf-drop" class="vf-drop" tabindex="0"><span>⇧</span><strong>Unterlagen hier hineinziehen</strong><small>oder zum Auswählen klicken</small><em>Dateien werden im geöffneten Fall gespeichert. Keine automatische KI-Auswertung.</em></div><div id="vf-file-list"></div><div id="vf-progress" class="vf-progress" hidden><div><span></span></div><p>Unterlagen werden vorbereitet.</p></div></section>

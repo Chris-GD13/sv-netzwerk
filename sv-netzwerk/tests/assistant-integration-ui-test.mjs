@@ -11,8 +11,8 @@ class Element extends EventTarget {
 const page=fs.readFileSync(new URL('../src/pages/intern/versicherungsfaelle/index.astro',import.meta.url),'utf8');
 const assistant=fs.readFileSync(new URL('../public/intern/case-work-assistant.js',import.meta.url),'utf8');
 const nodes=new Map();const el=id=>{if(!nodes.has(id))nodes.set(id,new Element());return nodes.get(id);};
-const doc={getElementById:el,querySelectorAll:()=>[el('action')],createElement:()=>new Element()};
-el('action').dataset.assistantTask='check';el('vf-work-route').value='assistant';
+const doc={getElementById:el,querySelectorAll:selector=>selector==='[data-assistant-task]'?[el('action')]:[],createElement:()=>new Element()};
+el('action').dataset.assistantTask='check';el('vf-assistant-route').value='assistant';
 const win=new EventTarget();win.location={origin:'http://localhost'};win.sent=[];win.postMessage=data=>win.sent.push(data);
 class Custom extends Event{constructor(type,options){super(type);this.detail=options?.detail;}}
 const requests=[];
@@ -29,7 +29,7 @@ const showEnd=page.indexOf('function fill(',page.indexOf('function show(){'));
 const segment=page.slice(page.indexOf('function show(){'),showEnd);
 vm.runInContext("let active=null,files=[],caseGeneration=0;const $=id=>document.getElementById(id);const e=x=>String(x??'');function fill(){};function updateMailFields(){};"+keepFn+segment+';this.keep=keep;this.invalidate=invalidateOpenedCase;this.show=show;',sandbox);
 const open={_loaded:true,folder_id:'fixture-a',meta:{schaden_nr:'TEST-A-001',claimsforce_claim_id:'11111111-1111-4111-8111-111111111111',claimsforce_profile:'christian',claimsforce_notizen:[{text:'cached synthetic'}]}};
-sandbox.keep(open);await new Promise(setImmediate);
+sandbox.keep(open);assert.equal(requests.length,0,'case selection creates no assistant request');await el('vf-assistant-open').onclick();await new Promise(setImmediate);
 assert.equal(requests.filter(r=>r.action==='assistant_open').length,1);
 assert.equal(win.sent.length,0,'case opening sends no notes bridge request');
 assert(notes.state.identity);
@@ -38,7 +38,7 @@ assert.equal(requests.filter(r=>r.action==='assistant_open').length,1,'repaint d
 await el('action').onclick();assert.equal(win.sent.length,0,'assistant action sends no notes bridge request');
 sandbox.invalidate();assert.equal(notes.state.identity,null,'case loading clears notes synchronously');
 assert(el('action').disabled,'case loading disables assistant');
-assert.equal(el('vf-work-history').children.length,0);
+assert.equal(el('vf-assistant-results').children.length,0);
 sandbox.keep({...open,_loaded:false,folder_id:'fixture-b'});await new Promise(setImmediate);
 assert.equal(notes.state.identity,null,'unloaded browser data cannot open notes');
 assert.equal(requests.filter(r=>r.action==='assistant_open').length,1,'unloaded browser data cannot open assistant');

@@ -87,10 +87,39 @@ final class SvAiBudgetLedger {
         $this->query("UPDATE $this->accounts SET reserved_micro=reserved_micro-?,spent_micro=spent_micro+? WHERE month_key=?",[$row['reserved_micro'],$actual,$row['month_key']]);
         $this->query("UPDATE $this->operations SET actual_micro=?,status=?,usage_json=? WHERE operation_id=?",[$actual,'settled',json_encode($usage,JSON_THROW_ON_ERROR),$operation]);
     }
+    public function dispatch(string $operation,string $payloadHash): void {
+        $this->requireLock();
+        $s=$this->query("SELECT status FROM $this->operations WHERE operation_id=?",[$operation]);
+        if($s->fetchColumn()!=='reserved')throw new RuntimeException('USAGE_STATE_INVALID');
+        $this->query("UPDATE $this->operations SET status='dispatching',usage_json=? WHERE operation_id=?",[json_encode(['payload_hash'=>$payloadHash],JSON_THROW_ON_ERROR),$operation]);
+    }
+    public function unknown(string $operation): void {$this->requireLock();$this->query("UPDATE $this->operations SET status='unknown' WHERE operation_id=? AND status<>'settled'",[$operation]);}
     public function budget(string $month): array {
         $b=$this->query("SELECT * FROM $this->accounts WHERE month_key=?",[$month])->fetch(PDO::FETCH_ASSOC);
         $b=$b?:['month_key'=>$month,'limit_micro'=>$this->limit,'spent_micro'=>0,'reserved_micro'=>0];
         $b['limit_micro']=min($this->limit,(int)$b['limit_micro']);
         return $b+['budget_lane'=>$this->lane,'billing'=>svAiBudgetPolicy($this->lane)['billing']];
     }
+}
+
+/** A paid transport requires a committed, request-bound reservation. */
+final class SvAiPaidPermit {
+    private bool $used=false;
+    private function __construct(public readonly string $operation,private string $hash){}
+    public static function issue(PDO $db,string $operation,string $hash): self {
+        $s=$db->prepare('SELECT * FROM case_work_ai_usage WHERE operation_id=?');$s->execute([$operation]);$r=$s->fetch(PDO::FETCH_ASSOC);
+        $detail=$r?json_decode($r['usage_json']??'null',true):null;
+        if(!$r||$r['status']!=='dispatching'||(int)$r['reserved_micro']<1100000||!hash_equals($detail['payload_hash']??'',$hash))throw new RuntimeException('AI_DISPATCH_NOT_RESERVED');
+        return new self($operation,$hash);
+    }
+    public function consume(array $payload):void {
+        if($this->used||!hash_equals($this->hash,hash('sha256',json_encode($payload,JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE))))throw new RuntimeException('AI_DISPATCH_INVALID');
+        if(($payload['model']??'')!=='gpt-6-luna'||($payload['service_tier']??'')!=='default'||($payload['store']??true)!==false||($payload['max_output_tokens']??0)!==8000||!empty($payload['tools'])||isset($payload['_svnet_gaps']))throw new RuntimeException('AI_TARIFF_MISMATCH');
+        $this->used=true;
+    }
+}
+function svAiGuardPaidHandle($handle,SvAiPaidPermit $permit,array $payload): mixed {
+    if(getenv('SVNET_AI_TRANSPORT_MODE')==='deny')throw new RuntimeException('PAID_AI_DISABLED');
+    if((string)curl_getinfo($handle,CURLINFO_EFFECTIVE_URL)!=='https://api.openai.com/v1/responses')throw new RuntimeException('AI_TRANSPORT_UNREGISTERED');
+    $permit->consume($payload);return $handle;
 }

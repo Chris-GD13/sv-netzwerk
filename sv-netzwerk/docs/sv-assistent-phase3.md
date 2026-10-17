@@ -1,3 +1,5 @@
+> Historischer Integrationsstand vor der erweiterten Betriebsfreigabe. Aktueller Betrieb: [sv-assistent-betrieb.md](sv-assistent-betrieb.md).
+
 # Phase 3 – Claimsforce und SV-Assistent gemeinsam integrieren
 
 Status: Entwicklungsstand zur Prüfung, 17.10.2026. Kein Merge nach main, kein Deployment,

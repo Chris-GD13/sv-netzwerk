@@ -80,7 +80,7 @@ try {
     require_once __DIR__.'/ai-budget-gateway.php';
     $gateway=new SvAiBudgetLedger(db(),'simulation');$gateway->initializeMutex();
     [$job,$turn]=$gateway->transaction(function()use($folder,$taskId,$uid,$key,$instructions,$importId,$profile){
-    $busy=db()->prepare("SELECT id FROM case_analysis_jobs WHERE folder_id=? AND status IN ('queued','running','paused','unknown','handoff')");$busy->execute([$folder]);
+    $busy=db()->prepare("SELECT id FROM case_analysis_jobs WHERE folder_id=? AND status IN ('queued','running','paused','unknown','dispatching','handoff')");$busy->execute([$folder]);
     if($busy->fetchColumn())throw new RuntimeException('CASE_BUSY');
     $s=db()->prepare("INSERT INTO case_analysis_jobs(folder_id,task_key,user_id,status,message,created_at,updated_at) VALUES(:f,:t,:u,'running','Fallbearbeitung angenommen.',NOW(),NOW())");
     $s->execute([':f'=>$folder, ':t'=>hash('sha256', $taskId), ':u'=>$uid]); $job=(int)db()->lastInsertId();
