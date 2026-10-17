@@ -120,7 +120,7 @@ Der Umweltbundesamt-Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimm
 
 Die [TKB-KRL-Fachinformation](https://www.klebstoffe.com/krl-methode/) unterscheidet Feuchtepotential und materialabhängigen Wassergehalt. Eine Umrechnung zwischen KRL und CM-Prozent ist nicht allgemein möglich. Für die Ursachenabgrenzung folgt daraus: Unterschiedliche Einheiten nicht als gemeinsame Messreihe darstellen; Probenlage und Verlauf getrennt dokumentieren.
 
-Status: fachliche Information, kein Gesetz; Abruf 12.10.2026. Kein Veröffentlichungsdatum oder rückwirkender Geltungsbeginn unterstellt.
+Die KRL-Fachinformation ist eine technische Fachinformation und keine gesetzliche Vorschrift.
 
 ## Quellen und weiterführende Hinweise
 
