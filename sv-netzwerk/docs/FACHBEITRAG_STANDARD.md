@@ -1,3 +1,16 @@
+# Rückwirkender Redaktionsstandard – verbindlich ab 17.10.2026
+
+Diese Vorgaben gelten für **sämtliche bereits veröffentlichten und künftigen Fachbeiträge**, nicht nur für neue oder aktuell bearbeitete Artikel. Der vollständige Bestand unter `src/content/knowledge/` sowie öffentlich sichtbare Begleittexte ist einzeln zu prüfen und bei Bedarf redaktionell zu bereinigen. Eine Stichprobe oder Bereinigung nur der zuletzt veröffentlichten Artikel reicht nicht aus.
+
+- Autorenperspektive: Fachbeiträge aus Christian Wächters sachverständiger Perspektive verfassen. Keine erfundenen persönlichen Erfahrungen, Einsätze oder Qualifikationen; abweichende historisch belegte Autorenschaft nicht stillschweigend verfälschen.
+- Öffentlich sichtbare Inhalte: Keine internen Rotations-, Autorenzuteilungs-, KI-, Recherche-, Prüfprozess- oder Veröffentlichungsanweisungen.
+- Quellenverzeichnisse: Ausschließlich Herausgeber, Titel, Ausgabe/Fundstelle beziehungsweise Datum und Link; keine Lesebestätigungen, internen Prüfbemerkungen oder wertenden Zusätze. Inhaltlich notwendige Einordnung gehört in den Fließtext.
+- Sprache: Natürlich und sachverständig, ohne KI-typische Floskeln, schematische Bulletpoint-Serien oder künstliche Schlussfragen; notwendige technische Aufzählungen bleiben möglich.
+- Bestandssicherung: Fachliche Aussagen, Quellenbelege, Slugs, Metadaten und interne Verlinkungen bei der Überarbeitung erhalten und validieren.
+- Abschlusskriterium: Vollständiges Inventar mit Datei, URL, Befund, Korrektur und Prüfstatus; Build, Tests, Deployment und anschließende Live-Prüfung sämtlicher betroffener Seiten. Ohne diesen Nachweis darf die rückwirkende Bereinigung nicht als abgeschlossen gemeldet werden.
+
+---
+
 # Aktuelle Auftragsfreigabe vom 07.10.2026
 
 Täglich genau ein Fachartikel um 06:00 Europe/Berlin, anschließend dessen verifizierten Live-Stand ab 07:00 auf Christian Wächters persönlichem LinkedIn-Profil veröffentlichen. Diese ausdrückliche Nutzerfreigabe ersetzt für diesen täglichen Auftrag frühere Arbeitstags-/Zwei-Slot-Regeln und Beschränkungen auf lediglich vorbereitete LinkedIn-Texte. Alle fachlichen Qualitätsvorgaben unten bleiben verbindlich. Der gemeinsame Doppelveröffentlichungsschutz ist in FACHBEITRAG_AUTOMATION.md beschrieben.
