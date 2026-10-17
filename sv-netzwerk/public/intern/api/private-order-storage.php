@@ -15,7 +15,7 @@ function poToken(): string {
 function poRequest(string $url, bool $binary = false): array|string {
     $ch = curl_init($url); curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true,CURLOPT_FOLLOWLOCATION=>true,CURLOPT_TIMEOUT=>$binary?120:45,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.poToken()]]);
     $body = curl_exec($ch); $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); $type = (string)curl_getinfo($ch, CURLINFO_CONTENT_TYPE); curl_close($ch);
-    if ($status < 200 || $status >= 300 || !is_string($body)) apiError(503, 'Privataufträge konnten nicht aus OneDrive gelesen werden (HTTP '.$status.').');
+    if ($status < 200 || $status >= 300 || !is_string($body)) throw new RuntimeException($status===429?'Microsoft begrenzt momentan die Zugriffe. Bitte kurz warten und erneut versuchen.':'Privataufträge konnten momentan nicht gelesen werden (HTTP '.$status.').',$status===429?429:503);
     if ($binary) return ['body'=>$body,'content_type'=>$type]; $json = json_decode($body, true); if (!is_array($json)) apiError(503, 'OneDrive hat eine ungültige Antwort geliefert.'); return $json;
 }
 function poRequestJson(string $method, string $url, array $payload): array {
