@@ -37,3 +37,10 @@ AddDefaultCharset UTF-8
 <FilesMatch "^insurance-knowledge-index\.json$">
   Require all denied
 </FilesMatch>
+
+# Geschützte Formular-PDFs dürfen ausschließlich im eigenen Portal angezeigt werden.
+<Files "private-business.php">
+  <IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+  </IfModule>
+</Files>
