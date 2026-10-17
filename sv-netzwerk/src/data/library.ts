@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Drohnen bei Gebäudeschäden: Einsatzgrenzen, Bildbefund und Dokumentation trennen',
+    description: 'Drohnenaufnahmen rechtssicher planen, sichtbare Befunde systematisch sichern und Bilddokumentation, Photogrammetrie, Ursachenbewertung sowie Fachprüfung klar voneinander abgrenzen.',
+    href: '/fachwissen/drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation/',
+    category: 'Beweissicherung und Fotodokumentation',
+    tags: ['Drohne', 'Gebäudeschaden', 'Beweissicherung', 'Fotodokumentation', 'Photogrammetrie', 'Datenschutz', 'UAS'],
+    date: '2026-10-17',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Sachwertverfahren bei Immobilien: Gebäudewert, Bodenwert und Marktanpassung trennen',
     description: 'Gebäudewert, Außenanlagen, Bodenwert, Alterswertminderung, Sachwertfaktor und besondere Objektmerkmale modellkonform und nachvollziehbar herleiten.',
     href: '/fachwissen/sachwertverfahren-immobilien-gebaeudewert-bodenwert-marktanpassung/',
