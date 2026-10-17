@@ -13,4 +13,5 @@ foreach(array_merge([''=>''],array_column(pbExperts(),'name','id'))as$key=>$name
     foreach(['main','contract']as$kind){if($name===''){if(str_contains($pdf[$kind],trCp('Sachverständiger:')))throw new RuntimeException('Unnamed expert must not be printed');}elseif(!str_contains($pdf[$kind],trCp('Sachverständiger: '.$name)))throw new RuntimeException('Full expert name missing');}
 }
 $katja=$r;$katja['data']['correspondence_email']='ks@sv-schuett.eu';foreach(pbDocuments($katja)as$pdf){if(!str_contains($pdf,'ks@sv-schuett.eu')||str_contains($pdf,'ws@sv-schuett.eu'))throw new RuntimeException('All Katja document contact and withdrawal addresses must use Katja email');}
+if(!str_contains($files['contract'],'Factoringunternehmen')||str_contains($files['contract'],'TeamFaktor')||str_contains($files['contract'],'Finnya'))throw new RuntimeException('Contract must give the generic factoring notice without naming the provider');
 echo "private_business_pdf_test: ok (three documents, packet, Schuett and official eu logo, unsigned declarations)\n";
