@@ -45,7 +45,10 @@ final class SvAssistantProvider {
         $raw=curl_exec(svAiGuardPaidHandle($ch,$permit,$payload));$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$error=curl_error($ch);curl_close($ch);
         if($raw===false||$error!=='')return ['uncertain'=>true];
         $body=json_decode($raw,true);
-        if(in_array($status,[400,401,403,404,413,422,429],true))return ['rejected'=>true,'http_status'=>$status];
+        if(in_array($status,[400,401,403,404,413,422,429],true)){
+            $detail=[];foreach(['code','type','param'] as $field){$value=$body['error'][$field]??null;if(is_string($value)&&preg_match('/^[a-zA-Z0-9_.-]{1,100}$/',$value))$detail[$field]=$value;}
+            return ['rejected'=>true,'http_status'=>$status,'provider_error'=>$detail];
+        }
         if($status!==200||!is_array($body['usage']??null))return ['uncertain'=>true,'response_id'=>$body['id']??null];
         $in=$body['usage']['input_tokens']??null;$out=$body['usage']['output_tokens']??null;
         if(!is_int($in)||!is_int($out)||$in<0||$out<0)return ['uncertain'=>true,'response_id'=>$body['id']??null];

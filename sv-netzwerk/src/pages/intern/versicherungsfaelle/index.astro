@@ -16,6 +16,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   <script is:inline src="/intern/case-work-assistant.js?v=20261017-3"></script>
   <script is:inline src="/intern/case-work.js?v=20261017-3"></script>
   <style is:global>
+    @media(max-width:760px){nav[aria-label="Fallbearbeitung"]{display:grid;grid-template-columns:1fr 1fr}nav[aria-label="Fallbearbeitung"] a{overflow-wrap:normal;word-break:normal}#vf-assistant .vf-calendar-actions{display:grid;grid-template-columns:1fr}#vf-assistant .vf-calendar-actions button{width:100%;min-height:44px;overflow-wrap:normal;word-break:normal}#vf-assistant-route{width:100%;max-width:100%}}
     #vf-analysis .vf-analysis-order,#vf-assistant-panel .vf-assistant-order{width:100%;box-sizing:border-box;resize:vertical;font:inherit;padding:10px;border:1px solid #b8c8d6;border-radius:8px}
     .vf-work-turn{border-top:1px solid #d6dce1;padding:16px 0;overflow-wrap:anywhere}.vf-work-turn h3{font-size:1rem}.vf-work-answer{padding:14px;background:#f6f8fa;border-left:3px solid #b9852f}.vf-work-answer button,.vf-work-answer a{margin:5px 8px 5px 0;display:inline-block}.vf-work-answer details{margin:12px 0}.vf-work-answer summary{cursor:pointer;font-weight:600}
     .vf-assistant-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:8px;margin:12px 0}.vf-assistant-actions button,#vf-assistant-route{font:inherit;white-space:normal;padding:10px;min-width:0;max-width:100%}#vf-assistant pre{white-space:pre-wrap;overflow-wrap:anywhere}#vf-assistant{overflow-wrap:anywhere}
