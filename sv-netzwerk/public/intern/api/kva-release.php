@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__ . '/ai-budget-gateway.php';
 require_once __DIR__.'/config.php';commonHeaders();$user=(PHP_SAPI==='cli'&&defined('SVNET_CASE_WORK_USER'))?SVNET_CASE_WORK_USER:requireAuth();
 require_once __DIR__.'/kva-contact-merge.php';
 require_once __DIR__.'/kva-upload-name.php';
@@ -8,7 +9,7 @@ require_once __DIR__.'/ionos-storage.php';
 if(!in_array((string)($user['role']??''),['administrator','projektleiter','pruefer','sachverstaendiger'],true))apiError(403,'Keine Berechtigung.');
 const KR_ARCHIVE='archiv@sv.de';
 function krSenderProfile(array$user):array{$email=mb_strtolower(trim((string)($user['email']??'')),'UTF-8');$name=mb_strtolower(trim((string)($user['full_name']??'')),'UTF-8');$mailboxes=['cw@sv-schuett.eu'=>'Christian Wächter','ms@sv-schuett.eu'=>'Marc Schütt','hr@sv-schuett.eu'=>'Holger Roth','ws@sv-schuett.eu'=>'Susanne Wächter'];if(isset($mailboxes[$email]))return['email'=>$email,'name'=>$mailboxes[$email]];if(str_contains($name,'marc'))return['email'=>'ms@sv-schuett.eu','name'=>'Marc Schütt'];if(str_contains($name,'holger'))return['email'=>'hr@sv-schuett.eu','name'=>'Holger Roth'];if(str_contains($name,'susanne'))return['email'=>'ws@sv-schuett.eu','name'=>'Susanne Wächter'];return['email'=>'cw@sv-schuett.eu','name'=>'Christian Wächter'];}
-function krHttp(string$m,string$u,array$h=[],mixed$b=null,int$t=240):array{$c=curl_init($u);curl_setopt_array($c,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$m,CURLOPT_HTTPHEADER=>$h,CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>$t]);if($b!==null)curl_setopt($c,CURLOPT_POSTFIELDS,$b);$r=curl_exec($c);$s=(int)curl_getinfo($c,CURLINFO_HTTP_CODE);$e=curl_error($c);curl_close($c);if($r===false||$e!=='')throw new RuntimeException('Externe Verbindung fehlgeschlagen.');return['status'=>$s,'body'=>(string)$r];}
+function krHttp(string$m,string$u,array$h=[],mixed$b=null,int$t=240):array{$c=curl_init($u);curl_setopt_array($c,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$m,CURLOPT_HTTPHEADER=>$h,CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>$t]);if($b!==null)curl_setopt($c,CURLOPT_POSTFIELDS,$b);$r=curl_exec(svAiGuardHandle($c));$s=(int)curl_getinfo($c,CURLINFO_HTTP_CODE);$e=curl_error($c);curl_close($c);if($r===false||$e!=='')throw new RuntimeException('Externe Verbindung fehlgeschlagen.');return['status'=>$s,'body'=>(string)$r];}
 function krSetting(string$k):string{try{$s=db()->prepare('SELECT setting_value FROM app_settings WHERE setting_key=:k LIMIT 1');$s->execute([':k'=>$k]);return(string)($s->fetchColumn()?:'');}catch(Throwable){return'';}}
 function krB64(string$v):string{return rtrim(strtr(base64_encode($v),'+/','-_'),'=');}
 function krMicrosoftSetting(string$name):string{return env('MS_'.$name,env('M365_'.$name,''));}

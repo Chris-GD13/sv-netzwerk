@@ -1,5 +1,6 @@
 (() => {
   const setup = () => {
+    if (document.getElementById('vf-assistant') && window.svnetSetupAssistant) { window.svnetSetupAssistant(); return; }
     const el = id => document.getElementById(id);
     const start=el('vf-analysis-start'), refresh=el('vf-analysis-refresh'), state=el('vf-analysis-state');
     const historyBox=el('vf-work-history'), order=el('vf-analysis-order'), files=el('vf-analysis-files');

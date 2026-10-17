@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+if (isset($_GET['assistant'])) { require __DIR__.'/case-work-assistant.php'; exit; }
 define('SVNET_CASE_ANALYSIS_LIBRARY_ONLY', true);
 require_once __DIR__.'/case-analysis.php';
 require_once __DIR__.'/case-work-core.php';

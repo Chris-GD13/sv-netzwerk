@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__ . '/ai-budget-gateway.php';
 
 /**
  * Nur CLI: legt für Fallordner ohne 00_Falldaten.json die Falldaten aus den gespeicherten Unterlagen an
@@ -31,7 +32,7 @@ function openAiExtract(string $apiKey, string $name, string $mime, string $bytes
     $payload = ['model' => env('OPENAI_MODEL', 'gpt-5.4-mini'), 'instructions' => PROMPT . json_encode(array_fill_keys(FIELDS, ''), JSON_UNESCAPED_UNICODE), 'input' => [['role' => 'user', 'content' => $content]], 'max_output_tokens' => 2200];
     $ch = curl_init('https://api.openai.com/v1/responses');
     curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $apiKey], CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), CURLOPT_CONNECTTIMEOUT => 12, CURLOPT_TIMEOUT => 180]);
-    $response = curl_exec($ch); $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+    $response = curl_exec(svAiGuardHandle($ch)); $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
     if ($response === false || $status < 200 || $status >= 300) throw new RuntimeException('KI-Anfrage fehlgeschlagen (HTTP ' . $status . ').');
     $decoded = json_decode((string)$response, true);
     $text = is_string($decoded['output_text'] ?? null) ? trim($decoded['output_text']) : '';

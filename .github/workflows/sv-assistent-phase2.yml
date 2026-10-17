@@ -1,0 +1,42 @@
+name: SV-Assistent Phase 2
+on:
+  pull_request:
+    paths: ['sv-netzwerk/**', '.github/workflows/sv-assistent-phase2.yml']
+  push:
+    branches: ['codex/sv-assistent-phase2']
+permissions:
+  contents: read
+jobs:
+  prototype:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testpass
+          MYSQL_DATABASE: assistant_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping" --health-interval=10s
+          --health-timeout=5s --health-retries=5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, pdo_sqlite, mbstring, curl
+      - name: SQLite lifecycle, budget, rules and costs
+        run: php sv-netzwerk/tests/assistant-core-test.php
+      - name: Four concurrent real processes
+        run: python3 sv-netzwerk/tests/assistant-concurrency-test.py
+      - name: Frontend stale-response and no-background checks
+        run: node sv-netzwerk/tests/assistant-ui-test.mjs
+      - name: Provider egress cannot bypass the gateway
+        run: python3 sv-netzwerk/tests/assistant-egress-test.py
+      - name: MySQL lifecycle and transaction path
+        env:
+          SVNET_ASSISTANT_TEST_DSN: mysql:host=127.0.0.1;port=3306;dbname=assistant_test;charset=utf8mb4
+          SVNET_ASSISTANT_TEST_USER: root
+          SVNET_ASSISTANT_TEST_PASSWORD: testpass
+        run: php sv-netzwerk/tests/assistant-core-test.php

@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__ . '/ai-budget-gateway.php';
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/ionos-storage.php';
 require_once __DIR__ . '/gf-case-storage.php';
@@ -47,12 +48,12 @@ function bkCalculationForUser(int $id,array $user):array{
 function bkSettingGet(string $k,string $d=''):string{try{db()->exec("CREATE TABLE IF NOT EXISTS app_settings(setting_key VARCHAR(190) PRIMARY KEY,setting_value MEDIUMTEXT NULL,updated_at DATETIME NOT NULL,updated_by VARCHAR(190) NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");$s=db()->prepare('SELECT setting_value FROM app_settings WHERE setting_key=:k LIMIT 1');$s->execute([':k'=>$k]);$v=$s->fetchColumn();return$v===false?$d:(string)$v;}catch(Throwable){return$d;}}
 function bkSettingSet(string $k,string $v):void{try{$s=db()->prepare('INSERT INTO app_settings(setting_key,setting_value,updated_at,updated_by) VALUES(:k,:v,NOW(),:u) ON DUPLICATE KEY UPDATE setting_value=VALUES(setting_value),updated_at=NOW(),updated_by=VALUES(updated_by)');$s->execute([':k'=>$k,':v'=>$v,':u'=>'bki-calculator']);}catch(Throwable){}}
 function bkB64url(string $s):string{return rtrim(strtr(base64_encode($s),'+/','-_'),'=');}
-function bkHttp(string $method,string $url,array $headers=[],?string $body=null,int $timeout=240):array{$ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_HTTPHEADER=>$headers,CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>$timeout,CURLOPT_FOLLOWLOCATION=>true]);if($body!==null)curl_setopt($ch,CURLOPT_POSTFIELDS,$body);$r=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$err=curl_error($ch);curl_close($ch);if($r===false||$err!=='')throw new RuntimeException('Verbindung fehlgeschlagen: '.($err?:'unbekannter Fehler'));return['status'=>$status,'body'=>(string)$r];}
+function bkHttp(string $method,string $url,array $headers=[],?string $body=null,int $timeout=240):array{$ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_HTTPHEADER=>$headers,CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>$timeout,CURLOPT_FOLLOWLOCATION=>true]);if($body!==null)curl_setopt($ch,CURLOPT_POSTFIELDS,$body);$r=curl_exec(svAiGuardHandle($ch));$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$err=curl_error($ch);curl_close($ch);if($r===false||$err!=='')throw new RuntimeException('Verbindung fehlgeschlagen: '.($err?:'unbekannter Fehler'));return['status'=>$status,'body'=>(string)$r];}
 function bkGoogleToken():string{static$t=null;if($t!==null)return$t;$svcJson=trim(env('GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON',''));if($svcJson!==''){if(!str_starts_with($svcJson,'{')){$d=base64_decode($svcJson,true);if($d!==false)$svcJson=$d;}$svc=json_decode($svcJson,true);if(is_array($svc)&&!empty($svc['client_email'])&&!empty($svc['private_key'])){$now=time();$h=bkB64url(json_encode(['alg'=>'RS256','typ'=>'JWT']));$c=bkB64url(json_encode(['iss'=>$svc['client_email'],'scope'=>'https://www.googleapis.com/auth/drive','aud'=>'https://oauth2.googleapis.com/token','iat'=>$now,'exp'=>$now+3500]));$in=$h.'.'.$c;$sig='';if(openssl_sign($in,$sig,$svc['private_key'],OPENSSL_ALGO_SHA256)){$jwt=$in.'.'.bkB64url($sig);$r=bkHttp('POST','https://oauth2.googleapis.com/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['grant_type'=>'urn:ietf:params:oauth:grant-type:jwt-bearer','assertion'=>$jwt]),90);$j=json_decode($r['body'],true);if($r['status']===200&&!empty($j['access_token']))return$t=(string)$j['access_token'];}}}$cid=env('GOOGLE_DRIVE_CLIENT_ID',bkSettingGet('google_drive_client_id'));$sec=env('GOOGLE_DRIVE_CLIENT_SECRET',bkSettingGet('google_drive_client_secret'));$ref=env('GOOGLE_DRIVE_REFRESH_TOKEN',bkSettingGet('google_drive_refresh_token'));if($cid!==''&&$sec!==''&&$ref!==''){$r=bkHttp('POST','https://oauth2.googleapis.com/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['client_id'=>$cid,'client_secret'=>$sec,'refresh_token'=>$ref,'grant_type'=>'refresh_token']),90);$j=json_decode($r['body'],true);if($r['status']===200&&!empty($j['access_token']))return$t=(string)$j['access_token'];}throw new RuntimeException('Google Drive ist nicht verbunden.');}
 function bkDriveMeta(string $id):array{if(gfCaseStorageLocal($id))return ionosItem($id);$r=bkHttp('GET','https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'?'.http_build_query(['fields'=>'id,name,mimeType,modifiedTime,size,parents','supportsAllDrives'=>'true']),['Authorization: Bearer '.bkGoogleToken()],null,120);if($r['status']!==200)throw new RuntimeException('BKI-Datei konnte nicht gelesen werden.');$j=json_decode($r['body'],true);return is_array($j)?$j:[];}
 function bkDriveBelongsToCase(string $fileId,string $folderId):bool{$pending=[$fileId];$seen=[];$depth=0;while($pending&&$depth<12){$next=[];foreach($pending as$id){if(isset($seen[$id]))continue;$seen[$id]=true;$meta=bkDriveMeta($id);foreach(array_map('strval',is_array($meta['parents']??null)?$meta['parents']:[])as$parent){if(hash_equals($folderId,$parent))return true;if(!isset($seen[$parent]))$next[]=$parent;}}$pending=array_values(array_unique($next));$depth++;}return false;}
 function bkDriveBytes(string $id):array{if(gfCaseStorageLocal($id)){$m=ionosItem($id);return['name'=>$m['name'],'mime'=>$m['mimeType'],'modified'=>$m['modifiedTime']??'','bytes'=>ionosBytes($id)];}$m=bkDriveMeta($id);$r=bkHttp('GET','https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'?alt=media&supportsAllDrives=true',['Authorization: Bearer '.bkGoogleToken()],null,300);if($r['status']!==200)throw new RuntimeException('BKI-Datei konnte nicht geladen werden.');return['name'=>(string)($m['name']??'BKI.pdf'),'mime'=>(string)($m['mimeType']??'application/pdf'),'modified'=>(string)($m['modifiedTime']??''),'bytes'=>$r['body']];}
-function bkOpenAIFile(string $driveId):array{$meta=bkDriveMeta($driveId);$cacheKey='openai_bki_calc_'.$driveId;$cached=json_decode(bkSettingGet($cacheKey,'{}'),true);if(is_array($cached)){$valid=bkCachedOpenAIFile($cached,(string)($meta['modifiedTime']??''));if($valid!==null)return$valid;}$apiKey=trim(env('OPENAI_API_KEY',''));if($apiKey==='')throw new RuntimeException('OpenAI API-Key ist nicht konfiguriert.');$d=bkDriveBytes($driveId);$tmp=tempnam(sys_get_temp_dir(),'bki-');if($tmp===false)throw new RuntimeException('Temporäre BKI-Datei konnte nicht erstellt werden.');file_put_contents($tmp,$d['bytes']);$ch=curl_init('https://api.openai.com/v1/files');curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$apiKey],CURLOPT_POSTFIELDS=>['purpose'=>'user_data','file'=>new CURLFile($tmp,$d['mime'],$d['name'])],CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>420]);$resp=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$err=curl_error($ch);curl_close($ch);@unlink($tmp);if($resp===false||$err!==''||$status<200||$status>=300)throw new RuntimeException('BKI-Datei konnte für die Suche nicht vorbereitet werden.');$j=json_decode((string)$resp,true);$fid=(string)($j['id']??'');if($fid==='')throw new RuntimeException('BKI-Datei-ID fehlt.');bkSettingSet($cacheKey,json_encode(['file_id'=>$fid,'modified'=>$d['modified'],'name'=>$d['name']],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));return['file_id'=>$fid,'name'=>$d['name']];}
+function bkOpenAIFile(string $driveId):array{$meta=bkDriveMeta($driveId);$cacheKey='openai_bki_calc_'.$driveId;$cached=json_decode(bkSettingGet($cacheKey,'{}'),true);if(is_array($cached)){$valid=bkCachedOpenAIFile($cached,(string)($meta['modifiedTime']??''));if($valid!==null)return$valid;}$apiKey=trim(env('OPENAI_API_KEY',''));if($apiKey==='')throw new RuntimeException('OpenAI API-Key ist nicht konfiguriert.');$d=bkDriveBytes($driveId);$tmp=tempnam(sys_get_temp_dir(),'bki-');if($tmp===false)throw new RuntimeException('Temporäre BKI-Datei konnte nicht erstellt werden.');file_put_contents($tmp,$d['bytes']);$ch=curl_init('https://api.openai.com/v1/files');curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$apiKey],CURLOPT_POSTFIELDS=>['purpose'=>'user_data','file'=>new CURLFile($tmp,$d['mime'],$d['name'])],CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>420]);$resp=curl_exec(svAiGuardHandle($ch));$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$err=curl_error($ch);curl_close($ch);@unlink($tmp);if($resp===false||$err!==''||$status<200||$status>=300)throw new RuntimeException('BKI-Datei konnte für die Suche nicht vorbereitet werden.');$j=json_decode((string)$resp,true);$fid=(string)($j['id']??'');if($fid==='')throw new RuntimeException('BKI-Datei-ID fehlt.');bkSettingSet($cacheKey,json_encode(['file_id'=>$fid,'modified'=>$d['modified'],'name'=>$d['name']],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));return['file_id'=>$fid,'name'=>$d['name']];}
 function bkOpenAIJson(string $method,string $path,?array $payload=null,int $timeout=360):array{
   $key=trim(env('OPENAI_API_KEY',''));
   if($key==='')throw new RuntimeException('OpenAI API-Key ist nicht konfiguriert.');
@@ -91,7 +92,7 @@ function bkOpenAIUploadBytes(string $name,string $mime,string $bytes):string{
     if($key==='')throw new RuntimeException('OpenAI API-Key ist nicht konfiguriert.');
     $ch=curl_init('https://api.openai.com/v1/files');
     curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$key],CURLOPT_POSTFIELDS=>['purpose'=>'user_data','file'=>new CURLFile($tmp,$mime,$name)],CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>420]);
-    $response=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$error=curl_error($ch);curl_close($ch);
+    $response=curl_exec(svAiGuardHandle($ch));$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$error=curl_error($ch);curl_close($ch);
     $json=json_decode((string)$response,true);$message=is_array($json)?trim((string)($json['error']['message']??'')):'';$code=is_array($json)?strtolower(trim((string)($json['error']['code']??''))):'';
     if($code==='insufficient_quota'||str_contains(strtolower($message),'no credits remaining'))throw new RuntimeException('Die KVA-Auswertung ist derzeit nicht verfügbar, weil das hinterlegte KI-API-Guthaben aufgebraucht ist. Datei und Fallzuordnung sind in Ordnung; nach Aufladung bitte erneut auslesen.');
     if($response===false||$error!==''||$status<200||$status>=300)throw new RuntimeException('KVA konnte nicht für die Auswertung bereitgestellt werden.');
@@ -138,12 +139,65 @@ PROMPT;
   return['warnings'=>$warnings,'source_name'=>$name,'quote_number'=>trim((string)($raw['quote_number']??'')),'company'=>trim((string)($raw['company']??'')),'net_total'=>is_numeric($raw['net_total']??null)?(float)$raw['net_total']:null,'positions'=>$positions];
 }
 function bkSearch(array $in):array{
-  require_once __DIR__.'/bki-library.php';
-  $q=trim((string)($in['query']??''));if($q==='')throw new RuntimeException('Leistungsbeschreibung fehlt.');
-  if(bklStatus()['positions']<1)throw new RuntimeException('Der IONOS-Preisbestand fehlt.');
-  $positions=array_values(array_filter(bklSearch($q,24),fn($p)=>($p['source_kind']??'bki')==='bki'));
-  foreach($positions as &$p){$p['regional_factor']=1;$p['source_page']='Seite '.$p['source_page'];$p['note']=$p['scope'];$p['recommended_quantity']=null;}unset($p);
-  return ['positions'=>$positions,'regional_factor'=>null,'regional_factor_note'=>'Bundesdurchschnitt; kein belegter Regionalfaktor.','search_mode'=>'ionos_catalog'];
+  $q=trim((string)($in['query']??''));
+  if($q==='')throw new RuntimeException('Leistungsbeschreibung fehlt.');
+  $location=trim((string)($in['location']??''));
+  $qty=trim((string)($in['quantity']??''));
+  $unit=trim((string)($in['unit']??''));
+  $case=is_array($in['case_meta']??null)?$in['case_meta']:[];
+  $vectorStoreId=bkVectorStore();
+  $instructions=<<<'PROMPT'
+Du arbeitest ausschließlich mit den über die Dateisuche zugänglichen lizenzierten BKI-Unterlagen "BKI Baukosten Positionen Altbau 2026" und "BKI Baukosten Gebäude Altbau 2026". Nutze die Dateisuche gezielt, um für die konkrete Schaden- oder Instandsetzungsleistung passende BKI-Altbau-Positionen und – soweit erforderlich – den Regionalfaktor zu finden. Erfinde keine Positionsnummern, Einheiten, Seiten oder Preise. Wenn eine Angabe nicht belastbar aus den BKI-Dateien auffindbar ist, lasse das Feld leer bzw. null. Verwende keine allgemeinen Marktpreise außerhalb der BKI-Dateien.
+
+Antworte ausschließlich als JSON:
+{"regional_factor":null,"regional_factor_note":"","positions":[{"position_code":"","description":"","unit":"","price_low":null,"price_mid":null,"price_high":null,"recommended_quantity":null,"source_page":"","source_name":"BKI Baukosten Positionen Altbau 2026","note":""}]}
+
+Regeln:
+- maximal 6 wirklich passende Positionen.
+- BKI-Preise als Netto-Einheitspreise in EUR numerisch zurückgeben.
+- Wenn mehrere notwendige Teilleistungen bestehen, z. B. Ausbau/Entsorgung und Neueinbau, dürfen mehrere Positionen vorgeschlagen werden.
+- recommended_quantity aus der Nutzereingabe ableiten, aber nur bei eindeutiger Umrechnung. Beispiel: 5 Elemente à 2 m² und BKI-Einheit m² => 10; BKI-Einheit Stück => 5.
+- regional_factor nur aus den BKI-Regionalfaktoren bestimmen, wenn Ort/PLZ eindeutig zuordenbar; sonst null und kurze Erläuterung.
+- source_page muss die BKI-Seite enthalten, soweit sie aus dem Suchtreffer belastbar hervorgeht.
+PROMPT;
+  $text="Leistung: {$q}\nOrt/Region: {$location}\nExplizite Menge: {$qty}\nExplizite Einheit: {$unit}\nSchadenart: ".trim((string)($case['schadenart']??''));
+  $payload=[
+    'model'=>env('OPENAI_MODEL','gpt-5.4-mini'),
+    'instructions'=>$instructions,
+    'input'=>$text,
+    'tools'=>[[
+      'type'=>'file_search',
+      'vector_store_ids'=>[$vectorStoreId],
+      'max_num_results'=>12
+    ]],
+    'max_output_tokens'=>4500
+  ];
+  $d=bkOpenAIJson('POST','responses',$payload,360);
+  $out=bkJson(bkOutputText($d));
+  $rf=is_numeric($out['regional_factor']??null)?(float)$out['regional_factor']:null;
+  $positions=[];
+  foreach(($out['positions']??[])as$p){
+    if(!is_array($p))continue;
+    $positions[]=[
+      'position_code'=>trim((string)($p['position_code']??'')),
+      'description'=>trim((string)($p['description']??'')),
+      'unit'=>trim((string)($p['unit']??'')),
+      'price_low'=>is_numeric($p['price_low']??null)?(float)$p['price_low']:null,
+      'price_mid'=>is_numeric($p['price_mid']??null)?(float)$p['price_mid']:null,
+      'price_high'=>is_numeric($p['price_high']??null)?(float)$p['price_high']:null,
+      'recommended_quantity'=>is_numeric($p['recommended_quantity']??null)?(float)$p['recommended_quantity']:null,
+      'regional_factor'=>$rf,
+      'source_page'=>trim((string)($p['source_page']??'')),
+      'source_name'=>trim((string)($p['source_name']??'BKI Baukosten Positionen Altbau 2026')),
+      'note'=>trim((string)($p['note']??''))
+    ];
+  }
+  return[
+    'positions'=>$positions,
+    'regional_factor'=>$rf,
+    'regional_factor_note'=>trim((string)($out['regional_factor_note']??'')),
+    'search_mode'=>'file_search'
+  ];
 }
 
 function bkSafeName(string $value):string{

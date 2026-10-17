@@ -9,6 +9,8 @@ try{
     $lock=db()->prepare('SELECT GET_LOCK(:k,0)');$lock->execute([':k'=>'case-work-turn:'.$turnId]);if((int)$lock->fetchColumn()!==1)exit;
     $s=db()->prepare('SELECT w.*,a.status FROM case_work_turns w JOIN case_analysis_jobs a ON a.id=w.analysis_id WHERE w.id=:id');$s->execute([':id'=>$turnId]);$turn=$s->fetch(PDO::FETCH_ASSOC);
     if(!$turn||$turn['status']!=='running')exit;
+    // The simulated assistant advances through explicit, context-checked steps only.
+    if(($turn['task_id']??'')==='assistant:v1')exit;
     $job=(int)$turn['analysis_id'];
     $s=db()->prepare('SELECT id,email,full_name,role,is_active FROM users WHERE id=:id AND is_active=1');$s->execute([':id'=>$turn['user_id']]);$user=$s->fetch(PDO::FETCH_ASSOC);
     if(!$user||!in_array($user['role'],['administrator','projektleiter','pruefer','sachverstaendiger'],true))throw new RuntimeException('Benutzerberechtigung nicht mehr gültig.');
