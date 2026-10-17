@@ -7,6 +7,7 @@
 - Library, Profilverknüpfung, Suchindex-/Sitemap-Datenbasis, CSV und separater LinkedIn-Begleittext vorbereitet; LinkedIn bleibt `prepared-not-posted`.
 - Ohne öffentliches Beitragsbild, weil kein fachlich passendes geprüftes Motiv vorlag; keine SVG- oder Titelkarten-Platzhalter.
 - Prozentwert aus dem HTML-`width`-Attribut des Podcast-Players entfernt und die responsive Breite in CSS beibehalten; HTML-Validierung von Beitrag, Übersicht, Kategorie und Schlagwort wiederholt.
+- Inhaltscommit `79bb447e3569b8f26c843fba8b36f748a864fd6c` über [Deployment 39001969280](https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39001969280) live bestätigt; Detail, cachefreie Übersicht, Kategorie, Schlagwort, Sitemap, robots.txt und exakter Deploy-Marker geprüft.
 
 ## 2026-10-16 – Sachwertverfahren modellkonform herleiten
 

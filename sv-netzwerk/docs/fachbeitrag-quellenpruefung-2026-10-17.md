@@ -1,6 +1,6 @@
 # Quellen- und Rotationsprüfung 17.10.2026
 
-Status: Website `prepared`; LinkedIn `prepared-not-posted`.
+Status: Website `published-verified`; LinkedIn `prepared-not-posted`.
 
 ## Tages- und Dublettenprüfung
 
@@ -38,7 +38,12 @@ Abrufdatum sämtlicher Quellen: 17.10.2026.
 - Photogrammetrische Messbarkeit nur bei dokumentierter Aufnahme-, Referenzierungs-, Auswertungs- und Kontrollkette.
 - Kein öffentliches Beitragsbild: Ein fachlich passendes, geprüftes und freigegebenes Motiv lag nicht vor; keine SVG- oder Titelkarten-Platzhalter.
 
-## Noch ausstehender technischer und öffentlicher Nachweis
+## Technischer und öffentlicher Nachweis
 
-- Lokale Prüfkette, Inhaltscommit, Produktionslauf, Live-Detail, Übersicht, Kategorie, Schlagwort, Sitemap, robots.txt und exakter Deploy-Marker werden nach erfolgreicher Veröffentlichung ergänzt.
-- LinkedIn bleibt in diesem Lauf `prepared-not-posted`; der separate 07:00-Auftrag ist alleiniger Publisher.
+- Inhaltscommit: `79bb447e3569b8f26c843fba8b36f748a864fd6c`.
+- Erfolgreicher Produktionslauf: <https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39001969280>; Build Check <https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39001969317> und Portal Tests <https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39001969307> desselben Commits ebenfalls erfolgreich.
+- Lokale Prüfkette: `npm ci`, Fachbeitrags-Preflight, Encoding- und Knowledge-Validierung, `npm run check` mit 0 Fehlern/0 Warnungen/0 Hinweisen, vollständiger `npm run build`, SEO-, Sitemap- und interne Linkprüfung bestanden. Der unter Windows nicht funktionsfähige Store-Alias `python3` wurde für dieselbe Buildkette durch den gebündelten Codex-Python-Pfad ersetzt.
+- Zusätzliche HTML-Validierung von Artikel, Übersicht, Kategorie und Schlagwort bestanden. Dabei wurde ein bestehender ungültiger Prozentwert im HTML-`width`-Attribut des Podcast-Players standardskonform in CSS verlagert und die Prüfung wiederholt.
+- Live sichtbar geprüft: vollständige kanonische Detailseite mit redaktioneller Organisationszeile, Datum, Quellen und verlinktem Profil Christian Wächter; cachefreie Fachwissenübersicht; Kategorie `Beweissicherung und Fotodokumentation`; Schlagwort `Drohne`.
+- HTTP 200 geprüft: Detail, Übersicht, Kategorie, Schlagwort, `sitemap-index.xml`, `sitemap-0.xml`, `robots.txt` und `deploy-version.txt`. Die Sitemap enthält den Slug, Canonical ist exakt, `noindex` fehlt wie vorgesehen und der Marker wies exakt den Inhaltscommit aus.
+- Tagesregister anschließend atomar durch Commit `41d15fbd1a7cf4d03dc845a33aed9d8454bd6dc4` auf `published-verified` gesetzt. LinkedIn blieb `not-posted` und der Begleittext nur vorbereitet.

@@ -1,7 +1,7 @@
 {
   "date": "2026-10-17",
   "publication_id": "2026-10-17-drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation",
-  "status": "prepared",
+  "status": "published-verified",
   "article_type": "eigenstaendiges-sachverstaendigenthema",
   "expert_assignment": {
     "name": "Christian Wächter",
@@ -75,8 +75,12 @@
     "file": "src/content/linkedin/2026-10-17_drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation.txt"
   },
   "technical_proof": {
-    "content_commit": null,
-    "deployment_run": null,
-    "live_status": "pending"
+    "content_commit": "79bb447e3569b8f26c843fba8b36f748a864fd6c",
+    "deployment_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39001969280",
+    "build_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39001969317",
+    "portal_tests_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39001969307",
+    "register_verification_commit": "41d15fbd1a7cf4d03dc845a33aed9d8454bd6dc4",
+    "live_verified_at": "2026-10-17T06:23:18+02:00",
+    "live_status": "success"
   }
 }
