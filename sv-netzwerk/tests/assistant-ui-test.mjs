@@ -9,7 +9,7 @@ class Element {
 const names=['vf-assistant','vf-analysis-state','vf-work-history','vf-analysis-order','vf-assistant-context','vf-assistant-budget','vf-analysis-refresh','vf-assistant-resume','vf-assistant-history','vf-assistant-cancel','vf-work-route'];
 const ids=Object.fromEntries(names.map(n=>[n,new Element()]));ids['vf-work-route'].value='assistant';
 const buttons=['check','invoices','report','tasks','custom'].map(task=>Object.assign(new Element(),{dataset:{assistantTask:task}}));
-const handlers={},requests=[],opens=[];let delayedStep=null,delay=false;
+const handlers={},requests=[],opens=[];let delayedStep=null,delay=false,invalidStatus=false;
 const response=data=>({ok:true,json:async()=>({ok:true,data})});
 const window={addEventListener:(event,fn)=>{handlers[event]=fn;}};
 const context={window,document:{getElementById:n=>ids[n],querySelectorAll:()=>buttons,createElement:()=>new Element()},crypto:{randomUUID},AbortController,navigator:{clipboard:{writeText:async()=>{}}},
@@ -18,6 +18,7 @@ const context={window,document:{getElementById:n=>ids[n],querySelectorAll:()=>bu
     if(body.action==='assistant_open')return new Promise(resolve=>opens.push({body,resolve}));
     if(body.action==='assistant_start')return response({job_id:7});
     if(body.action==='assistant_close')return response({closed:true});
+    if(body.action==='assistant_status'&&invalidStatus)return {ok:false,json:async()=>({ok:false,error:'CASE_CHANGED'})};
     if(body.action==='assistant_step'){
       if(delay)return new Promise(resolve=>{delayedStep=resolve;});
       return response({id:7,status:'done',result:{action:'check',notice:'CASE-B ONLY',findings:[],open_points:[],total_cents:1500}});
@@ -36,6 +37,9 @@ opens[0].resolve(response({token:'token-a',claim_number:'A',profile:'profile-a',
 assert.match(ids['vf-assistant-context'].textContent,/Schaden B/);assert(!buttons[0].disabled);
 await buttons[0].onclick();assert.equal(requests.find(r=>r.body.action==='assistant_start').body.token,'token-b');
 assert.match(ids['vf-work-history'].children[0].textContent,/CASE-B ONLY/);
+invalidStatus=true;await ids['vf-analysis-refresh'].onclick();
+assert.equal(ids['vf-work-history'].children.length,0,'changed source must clear stale result');assert(buttons.every(b=>b.disabled));
+invalidStatus=false;const reopened=open('b','B');opens[2].resolve(response({token:'token-b2',claim_number:'B',profile:'profile-b',release:'r1'}));await reopened;
 delay=true;const pending=buttons[2].onclick();await new Promise(setImmediate);
 handlers['svnet:case-cleared']();delayedStep(response({id:7,status:'done',result:{draft:'STALE B REPORT'}}));await pending;
 assert.equal(ids['vf-work-history'].children.length,0,'late result must not appear');assert(buttons.every(b=>b.disabled));

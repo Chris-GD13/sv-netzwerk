@@ -12,7 +12,10 @@ window.svnetSetupAssistant = () => {
     const token=context?.token;const c=new AbortController();controller=c;
     const r=await fetch('/intern/api/case-work.php?assistant=1',{method:'POST',credentials:'same-origin',signal:c.signal,headers:{'Content-Type':'application/json','X-SV-Assistant':'1'},body:JSON.stringify({action,token,tab_id:tab,...extra})});
     const body=await r.json();if(version!==generation)throw Error('STALE_RESPONSE');
-    if(!r.ok||!body.ok)throw Error(body.error||'Auftrag fehlgeschlagen');
+    if(!r.ok||!body.ok){
+      if(['CONTEXT_INVALID','CASE_CHANGED','RULE_RELEASE_CHANGED','CASE_FORBIDDEN','USER_FORBIDDEN'].includes(body.error)){clear();state('Fall-/Regelstand oder Berechtigung geändert. Fall erneut öffnen.');}
+      throw Error(body.error||'Auftrag fehlgeschlagen');
+    }
     if(body.budget){const b=body.budget;el('vf-assistant-budget').textContent=`Simulation · Monatslimit ${(Number(b.limit_micro)/1e6).toFixed(2)} € · verbraucht ${(Number(b.spent_micro)/1e6).toFixed(2)} € · reserviert ${(Number(b.reserved_micro)/1e6).toFixed(2)} € · echte Kosten 0 €`;}
     return body.data;
   }

@@ -30,6 +30,8 @@ jobs:
         run: php sv-netzwerk/tests/assistant-core-test.php
       - name: Four concurrent real processes
         run: python3 sv-netzwerk/tests/assistant-concurrency-test.py
+      - name: Local HTTP through existing case-work endpoint
+        run: python3 sv-netzwerk/tests/assistant-http-test.py
       - name: Frontend stale-response and no-background checks
         run: node sv-netzwerk/tests/assistant-ui-test.mjs
       - name: Provider egress cannot bypass the gateway
