@@ -551,7 +551,21 @@
         },
         "shortlink": "https://lnkd.in/eE2aHRH6"
       }
+    },
+    "2026-10-17": {
+      "publication_id": "2026-10-17-drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation",
+      "article": {
+        "title": "Drohnen bei Gebäudeschäden: Einsatzgrenzen, Bildbefund und Dokumentation trennen",
+        "slug": "drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation/",
+        "status": "reserved",
+        "owner": "codex-website-20261017-0600",
+        "reserved_at": "2026-10-17T04:07:09.707Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-10-16T05:04:41.174Z"
+  "updated_at": "2026-10-17T04:07:09.707Z"
 }
