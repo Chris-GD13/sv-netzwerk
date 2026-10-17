@@ -14,4 +14,5 @@ foreach(array_merge([''=>''],array_column(pbExperts(),'name','id'))as$key=>$name
 }
 $katja=$r;$katja['data']['correspondence_email']='ks@sv-schuett.eu';foreach(pbDocuments($katja)as$pdf){if(!str_contains($pdf,'ks@sv-schuett.eu')||str_contains($pdf,'ws@sv-schuett.eu'))throw new RuntimeException('All Katja document contact and withdrawal addresses must use Katja email');}
 if(!str_contains($files['contract'],'Factoringunternehmen')||str_contains($files['contract'],'TeamFaktor')||str_contains($files['contract'],'Finnya'))throw new RuntimeException('Contract must give the generic factoring notice without naming the provider');
+foreach(['main','contract']as$kind)if(!str_contains($files[$kind],'100 % Vorkasse')||!str_contains($files[$kind],'Zahlungsbedingungen')||!str_contains($files[$kind],trCp('vollständigem')))throw new RuntimeException('Full gross prepayment after factoring rejection and before acceptance/performance must be transparent');
 echo "private_business_pdf_test: ok (three documents, packet, Schuett and official eu logo, unsigned declarations)\n";
