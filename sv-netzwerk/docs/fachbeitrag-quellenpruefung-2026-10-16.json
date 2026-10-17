@@ -7,21 +7,21 @@
       "new_sha256": "59ceedb31ae97f590f08f6ce21dd7c046ab7f17575c95a02cd40f5414935a42f",
       "checked_fields": "Fiktives Beispiel statt unbelegter Anonymisierungsbehauptung; Vertragsbezug und Schadenminderung getrennt; unbelegte absolute Qualitätsaussagen eingeschränkt",
       "updated_at": "2026-10-16",
-      "status": "prepared-for-review"
+      "status": "targeted-correction-live-verified"
     },
     "brandschaden-mehrere-gebaeude-koordination": {
       "old_sha256": "58d9383f2ed19eb49d5d7aafd37609319fd498d34dd4350e55ac43d8cc4f9939",
       "new_sha256": "b955020be9a8207983dd384ef8ab25583e18d7329feaf8842a86c454591a5df3",
       "checked_fields": "Fiktives Brandbeispiel statt fachfremder Starkregenlage; Rauch-/Ruß-, Löschwasser- und thermische Einwirkungen getrennt; Arbeitsschutzquellen auf Anwendungsbereich begrenzt; typografisches Platzhalterbild aus SEO entfernt",
       "updated_at": "2026-10-16",
-      "status": "prepared-for-review"
+      "status": "targeted-correction-live-verified"
     },
     "schadenminderung-obliegenheit-sofortmassnahmen-praxis": {
       "old_sha256": "89ed2cfb61aaf34590640dc77837a935bf8bd53f3bc67ac27d43be1b177c0466",
       "new_sha256": "74b564113d2e94a724734b3fcdcf6efddba46e87139d1dc762487e93cbffaa38",
       "checked_fields": "§ 82 und § 83 VVG getrennt, damalige Erkenntnislage statt rückblickendem Erfolgszwang; fiktives statt behauptet anonymisiertes Beispiel; SEO-Titel/-Beschreibung konkretisiert",
       "updated_at": "2026-10-16",
-      "status": "prepared-for-review"
+      "status": "targeted-correction-live-verified"
     }
   },
   "sources": [
@@ -65,5 +65,13 @@
       "practical_use": "Gefährdungen bei Arbeiten an elektrischen Anlagen auf erkalteten Brandstellen berücksichtigen, nicht auf alle Baugewerke übertragen"
     }
   ],
-  "review_limit": "Nur die genannten Normsätze, öffentlichen Herausgeberangaben und redaktionell korrigierten Aussagen geprüft. Keine Rechtsprechung, ungelesene Regelwerkdetails, Markt- oder Kostenentwicklung behauptet. Strukturinventur ist keine fachliche Vollprüfung."
+  "review_limit": "Nur die genannten Normsätze, öffentlichen Herausgeberangaben und redaktionell korrigierten Aussagen geprüft. Keine Rechtsprechung, ungelesene Regelwerkdetails, Markt- oder Kostenentwicklung behauptet. Strukturinventur ist keine fachliche Vollprüfung.",
+  "publication_proof": {
+    "checked_at": "2026-10-17",
+    "content_commit": "504ad45ad2d94b08fadca878f31eca8d0a7fc82f",
+    "successful_deployment": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/38851254486",
+    "live_marker": "4bc162d98b91e8be999d48c1f1768d0d65fe6234",
+    "checks": "Drei korrigierte Detailrouten HTTP 200; jeweils korrekter Canonical, kein noindex, sichtbare Korrektur; Fachwissensübersicht, Suchindex, Sitemap und robots.txt HTTP 200. Live-Marker ist ein Nachfolge-Commit des Inhaltsmerges.",
+    "limit": "Kein vollständiges fachliches Audit des Altbestands und keine erneute Veröffentlichung auf LinkedIn."
+  }
 }
