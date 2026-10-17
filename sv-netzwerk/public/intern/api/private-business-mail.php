@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-function pbMailSender(array $user): string {$email=strtolower(trim((string)($user['email']??'')));if(in_array($email,['cw@sv-schuett.eu','ms@sv-schuett.eu','ws@sv-schuett.eu','ks@sv-schuett.eu'],true))return$email;return svnetUserProfile($user)==='marc'?'ms@sv-schuett.eu':'cw@sv-schuett.eu';}
+function pbMailSender(array $user): string {return 'ws@sv-schuett.eu';}
 function pbGraph(string $method,string $path,?array $payload=null,bool $raw=false): array|string {
     $ch=curl_init('https://graph.microsoft.com/v1.0/'.$path);$headers=['Authorization: Bearer '.poToken(),'Content-Type: application/json'];curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_CONNECTTIMEOUT=>10,CURLOPT_TIMEOUT=>60,CURLOPT_HTTPHEADER=>$headers]);if($payload!==null)curl_setopt($ch,CURLOPT_POSTFIELDS,json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR));$body=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);if(!is_string($body)||$status<200||$status>=300)throw new RuntimeException('Outlook hat den Vorgang nicht bestätigt (HTTP '.$status.'). Bitte den Versandstatus prüfen, bevor Sie erneut senden.');return$raw?$body:($body===''?[]:json_decode($body,true,512,JSON_THROW_ON_ERROR));
 }

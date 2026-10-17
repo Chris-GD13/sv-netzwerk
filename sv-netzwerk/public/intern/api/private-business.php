@@ -22,6 +22,7 @@ try{
         header('Content-Type: application/pdf');header('Content-Length: '.strlen($f['pdf_bytes']));header('Content-Disposition: '.(isset($_GET['download'])?'attachment':'inline').'; filename="'.basename($f['filename']).'"');header('Cache-Control: private, no-store');header('X-Content-Type-Options: nosniff');echo$f['pdf_bytes'];exit;
     }
     if(!$isPost)apiError(405,'POST erforderlich.');$in=requestBody();
+    if($action==='postal-places')apiJson(['ok'=>true,'places'=>pbPostalPlaces((string)($in['postcode']??''))]);
     if($action==='route')apiJson(['ok'=>true,'route'=>pbRoute((array)($in['data']??[]))]);
     if($action==='save'){$r=pbSave($db,$profile,$in);if(empty($r['folder_id'])&&!empty($in['folder_id'])){$root=pbRoot($profile);$f=poValidateTopOrder((string)$in['folder_id'],(string)$root['id']);$q=$db->prepare('UPDATE private_business_records SET folder_id=? WHERE id=? AND folder_id IS NULL');$q->execute([$f['id'],$r['id']]);$r=pbRecord($db,$r['id'],$profile);}pbCachePdfDocuments($db,$r);if(empty($in['sync_cloud']))apiJson(['ok'=>true,'record'=>pbPublicRecord($db,$r)]);try{$r=pbArchive($db,$r);}catch(Throwable$e){apiJson(['ok'=>true,'record'=>pbPublicRecord($db,$r),'archive_error'=>$e->getMessage()]);}apiJson(['ok'=>true,'record'=>pbPublicRecord($db,$r)]);}
     if($action==='archive'){$r=pbRecord($db,(string)($in['id']??''),$profile);apiJson(['ok'=>true,'record'=>pbPublicRecord($db,pbArchive($db,$r))]);}
