@@ -43,6 +43,12 @@ function svAssistantConnections(array $user): array {
     $summary.=$release?'Regelstand '.$release['id'].' mit führender Drive-Masterdatei abgeglichen':'Regelanbindung offen ('.$ruleError.'). Freigegebenen Regelrelease in der Administration als SV-Assistent-Regelrelease.txt importieren bzw. vorhandene Drive-Verbindung prüfen.';
     $ai=trim(env('OPENAI_API_KEY',''))!=='';
     $summary.=$ai?' · KI-Zugang vorhanden · Zusatzbudget maximal 30 EUR/Monat inklusive Sicherheitspuffer':' · KI-Zugang fehlt';
+    if($ai){
+        require_once __DIR__.'/assistant-model-readiness.php';
+        $catalogue=svAssistantModelCatalogue(trim(env('OPENAI_API_KEY','')));
+        $summary.=' · Modellkatalog HTTP '.$catalogue['http_status'].' · verfügbare Budgetmodelle: '.implode(', ',$catalogue['available']);
+        try{$q=db()->prepare("SELECT u.usage_json FROM case_work_ai_usage u JOIN case_analysis_jobs a ON u.operation_id=CONCAT('assistant:',a.id) WHERE a.user_id=? ORDER BY a.id DESC LIMIT 1");$q->execute([(int)$user['id']]);$last=json_decode((string)$q->fetchColumn(),true);if(!empty($last['provider_rejected']))$summary.=' · letzte Anbieterablehnung HTTP '.(int)$last['http_status'];}catch(Throwable){}
+    }
     $summary.=' · Claimsforce-Notizen nur manuell · Work-Übergabe manuell.';
     return ['storage_ready'=>$storage,'rules_ready'=>(bool)$release,'release'=>$release['id']??null,'paid_assistant_enabled'=>$ai&&(bool)$release,'claims_notes'=>'manual','can_manage_rules'=>svnetCanManageWorkRules($user),'summary'=>$summary];
 }
