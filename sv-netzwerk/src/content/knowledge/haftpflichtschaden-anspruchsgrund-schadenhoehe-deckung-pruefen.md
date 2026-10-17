@@ -16,7 +16,7 @@ relatedLinks: ["/experten/holger-roth/", "/fachwissen/prueffaehige-dokumentation
 damageTypes: ["gebaeude", "haftpflicht"]
 publication:
   publishedAt: 2026-10-15
-  updatedAt: 2026-10-15
+  updatedAt: 2026-10-17
   status: published
 seo:
   title: "Haftpflichtschaden: Anspruch, Schadenhöhe und Deckung prüfen"
@@ -181,22 +181,17 @@ Das Ergebnis kann in einzelnen Punkten unterschiedlich ausfallen: Ein Teil des A
 
 Regulierer strukturieren Sachverhalt, Beteiligte, Unterlagen, Kosten und Entscheidungen. Sachverständige untersuchen technische Befunde, Ursachen und erforderliche Maßnahmen innerhalb ihres Fachgebiets. Rechtsanwältinnen und Rechtsanwälte beurteilen streitige Rechtsfragen und vertreten Parteien. Fachplaner, Labore oder Spezialunternehmen sind einzubeziehen, wenn Tragwerk, Elektroanlage, Schadstoffe, Brandschutz oder andere besondere Disziplinen betroffen sind.
 
-Das aktuelle [Expertenprofil von Holger Roth](/experten/holger-roth/) belegt seine Tätigkeit als Schadenregulierer für Sach- und Haftpflichtschäden. Der heutige Beitrag ist diesem Fachgebiet in der Expertenrotation zugeordnet. Die Verknüpfung behauptet weder Autorenschaft noch eine konkrete Fallzuständigkeit.
-
 ## Fazit
 
 Haftpflichtschäden lassen sich nicht allein über Schadenfoto, Kostenvoranschlag oder die Frage nach einer vorhandenen Police entscheiden. Der belastbare Weg führt über vier getrennte Ebenen: Anspruchsgrund, Verursachung, Schadenhöhe und Deckung. Beweissicherung, Gefahrenabwehr und Kostenprüfung werden jeweils mit ihrem konkreten Zweck dokumentiert.
 
 So entsteht eine nachvollziehbare Entscheidungskette: Welche Pflicht ist betroffen, welcher Schaden ist ihr zurechenbar, welcher Wiederherstellungsaufwand ist erforderlich, welche Mitverursachung ist belegt und welche Leistung schuldet der Versicherer nach dem konkreten Vertrag? Offene Punkte bleiben sichtbar; unbegründete Ansprüche können abgewehrt und begründete Positionen sachgerecht reguliert werden.
 
-## Quellen, Stand und praktische Bedeutung
+## Quellen und weiterführende Hinweise
 
-Quellenprüfung und Abruf am 15.10.2026. Die nachstehenden Primär- und Originalquellen wurden im für die Aussagen erforderlichen Umfang geöffnet und gelesen. Der Beitrag berichtet keinen aktuellen Einzelfall und verwendet keine erfundenen Fall-, Mess- oder Kostendaten.
-
-1. [§ 100 VVG](https://www.gesetze-im-internet.de/vvg_2008/__100.html), [§ 101 VVG](https://www.gesetze-im-internet.de/vvg_2008/__101.html), [§ 104 VVG](https://www.gesetze-im-internet.de/vvg_2008/__104.html), [§ 105 VVG](https://www.gesetze-im-internet.de/vvg_2008/__105.html) und [§ 106 VVG](https://www.gesetze-im-internet.de/vvg_2008/__106.html), amtliche Einzelnormen. Praktische Bedeutung: Freistellung und Anspruchsabwehr, Abwehrkosten, Anzeige, Anerkenntnis und Fälligkeit als unterschiedliche Regelungsbereiche behandeln.
-2. [§ 280 BGB](https://www.gesetze-im-internet.de/bgb/__280.html) und [§ 823 BGB](https://www.gesetze-im-internet.de/bgb/__823.html), amtliche Einzelnormen. Praktische Bedeutung: vertragliche Pflichtverletzung und außervertragliche Rechtsverletzung nicht pauschal gleichsetzen.
-3. [§ 249 BGB](https://www.gesetze-im-internet.de/bgb/__249.html) und [§ 254 BGB](https://www.gesetze-im-internet.de/bgb/__254.html), amtliche Einzelnormen. Praktische Bedeutung: Wiederherstellungszustand, tatsächlicher Umsatzsteueranfall, Mitverursachung und Schadenminderung positionsbezogen prüfen.
-4. GDV, [Neu strukturierte Haftpflichtbedingungen](https://www.gdv.de/gdv/neu-strukturierte-haftpflichtbedingungen-ab-2014--5962) und [AVB BHV, Stand Oktober 2026](https://www.gdv.de/resource/blob/6240/36c13de815d5b5e6cde419e1eaa4225f/02-avb-betriebs-und-berufshaftpflichtversicherung-2020-data.pdf), veröffentlicht am 14.10.2026. Seiten 1 bis 9 mit Aufbau, versichertem Risiko, Versicherungsfall sowie Leistungen und Vollmacht gelesen. Unverbindliche Musterbedingungen zur fakultativen Verwendung; abweichende Vereinbarungen sind möglich und der konkrete Vertrag bleibt maßgeblich.
-5. SV-Netzwerk, [Live-Expertenprofil Holger Roth](https://www.sv-netzwerk.eu/experten/holger-roth/), sichtbar geprüft am 15.10.2026. Es belegt die fachliche Zuordnung zu Sachschäden, Haftpflichtschäden und Schadenregulierung; keine behauptete Autorenschaft oder konkrete Fallzuständigkeit.
+- [§ 100 VVG](https://www.gesetze-im-internet.de/vvg_2008/__100.html); [§ 101 VVG](https://www.gesetze-im-internet.de/vvg_2008/__101.html); [§ 104 VVG](https://www.gesetze-im-internet.de/vvg_2008/__104.html); [§ 105 VVG](https://www.gesetze-im-internet.de/vvg_2008/__105.html); [§ 106 VVG](https://www.gesetze-im-internet.de/vvg_2008/__106.html).
+- [§ 280 BGB](https://www.gesetze-im-internet.de/bgb/__280.html); [§ 823 BGB](https://www.gesetze-im-internet.de/bgb/__823.html).
+- [§ 249 BGB](https://www.gesetze-im-internet.de/bgb/__249.html); [§ 254 BGB](https://www.gesetze-im-internet.de/bgb/__254.html).
+- GDV, [Neu strukturierte Haftpflichtbedingungen](https://www.gdv.de/gdv/neu-strukturierte-haftpflichtbedingungen-ab-2014--5962); [AVB BHV, Stand Oktober 2026](https://www.gdv.de/resource/blob/6240/36c13de815d5b5e6cde419e1eaa4225f/02-avb-betriebs-und-berufshaftpflichtversicherung-2020-data.pdf), 14.10.2026.
 
 Weiterführend: [Prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/), [technische Schadenabgrenzung](/fachwissen/schadenabgrenzung/) und [Schadenregulierung für Versicherer](/leistungen/schadenregulierung-fuer-versicherer/).

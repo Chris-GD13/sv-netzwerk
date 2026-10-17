@@ -16,7 +16,7 @@ relatedLinks: ["/experten/claudius-freiberg/", "/fachwissen/baufeuchte-schadenfe
 damageTypes: ["gebaeude", "feuchte"]
 publication:
   publishedAt: 2026-10-13
-  updatedAt: 2026-10-13
+  updatedAt: 2026-10-17
   status: published
 seo:
   title: "Parkettoberflächen: Beschichtung und Feuchte prüfen"
@@ -83,7 +83,7 @@ Eine prüffähige Dokumentation beantwortet mindestens:
 
 Bei bloßen optischen Beanstandungen besteht regelmäßig kein Anlass für einen sofortigen zerstörenden Eingriff. Ein fortdauernder Feuchteeintrag ist jedoch zu unterbinden; stehende Flüssigkeit darf nicht auf dem Holz verbleiben. Pflege- oder Lösemittelversuche ohne geklärte Verträglichkeit können den Befund verändern und Folgeschäden verursachen.
 
-Die Oberflächenbewertung ist dem belegten Fachgebiet von [Claudius Freiberg](/experten/claudius-freiberg/) zugeordnet. Das ist eine fachliche Profilverknüpfung, keine behauptete Mitautorenschaft oder Mitwirkung an einem konkreten Fall. Bei ungeklärter Beschichtungszusammensetzung oder Haftungsstörung können Herstellerberatung, ein Beschichtungsspezialist oder eine geeignete Laboruntersuchung erforderlich sein. Fragen des Estrichs, der Konstruktion und verdeckter Feuchte sind durch die jeweils qualifizierten Fachleute zu bearbeiten.
+Bei ungeklärter Beschichtungszusammensetzung oder Haftungsstörung können Herstellerberatung, ein Beschichtungsspezialist oder eine geeignete Laboruntersuchung erforderlich sein. Fragen des Estrichs, der Konstruktion und verdeckter Feuchte sind durch die jeweils qualifizierten Fachleute zu bearbeiten.
 
 ## Reparaturgrenze und prüffähige Kostenprüfung
 
@@ -97,16 +97,14 @@ Dieser Beitrag behandelt Material- und Ausführungsqualität. Daraus folgt keine
 
 Eigentümer sollten Unterlagen und Pflegehistorie sichern und weitere Versuche bis zur Befundaufnahme zurückstellen. Ausführende sollten das vorhandene System und die Eignung der geplanten Bearbeitung prüfen. Sachverständige müssen Oberfläche, Holz und Untergrund sowie beobachteten Zustand und zeitliche Ursache auseinanderhalten. So entsteht eine begründete Entscheidung, welche Schicht bearbeitet werden muss und welcher Umfang tatsächlich erforderlich ist.
 
-## Quellen: Datum, Status und praktische Bedeutung
+## Quellen und weiterführende Hinweise
 
-Quellenprüfung am 13.10.2026. Kein erfundener Einzelfall und keine ungesicherte Rechtsprechungs- oder Preisaktualisierung. Die methodischen Prüffragen sind eine sachverständige Ableitung aus den genannten Systemgrenzen.
-
-- [TKB-Merkblatt 1, Kleben von Parkett und Holzpflaster](https://www.klebstoffe.com/wp-content/uploads/2023/09/TKB-01-Parkett-2022-03-14-Layout-2023.pdf), Ausgabe März 2022. Verbandsinformation, kein Gesetz. Begründet die differenzierte Einordnung von Holzfeuchte und Elementaufbau; der Dateipfad 2023 ist kein neues Ausgabedatum.
-- [TKB-Merkblatt 17, Raumklima](https://www.klebstoffe.com/wp-content/uploads/2025/08/TKB-17-Raumklima-2025-07-23-Veroeffentlichung.pdf), Ausgabe Juli 2025; [Herausgebermeldung](https://www.klebstoffe.com/die-tkb-informiert-tkb-merkblaetter-17-und-21-und-tkb-bericht-12/) vom 25.08.2025. Fachliche Empfehlung für Verlegung und Nutzung; kein allgemeiner gesetzlicher Geltungsbeginn. Bedeutung: Klima, Material und Boden getrennt erfassen.
-- [TKB-Merkblatt 8, Untergrundbeurteilung](https://www.klebstoffe.com/wp-content/uploads/2026/04/TKB-8-Untergrundbeurteilung-Veroeffentlichung.pdf), Deckblatt Mai 2026, Seitenfuß April 2026; [Herausgebermeldung](https://www.klebstoffe.com/die-tkb-informiert-aktuelles-zu-den-merkblaettern-8-und-22-sowie-zur-krl-homepage/) vom 20.05.2026 bestätigt Mai. Aktuelle Verbandsausgabe. Bedeutung: Altuntergründe vor dem geplanten Neuaufbau beurteilen.
-- [TKB-Bericht 11, Belegreife – Herausgeberinformation](https://www.klebstoffe.com/die-tkb-informiert-tkb-bericht-11-belegreife/), veröffentlicht am 18.03.2025; Bericht erstmals am 19.07.2024. Fachbericht, kein Norm-Entwurf und kein neues Gesetz. Bedeutung: Trockenheit allein ist keine umfassende Belegreife.
-- [TKB, KRL-Methode](https://www.klebstoffe.com/krl-methode/), aktueller Abruf 13.10.2026; kein gesondertes Seitendatum behauptet. Fachinformation zu mineralischen Untergründen. Bedeutung: Verfahren und Ergebnisgröße nicht mit Holzfeuchte oder CM-Werten gleichsetzen.
-- [Bona Polish, technisches Merkblatt](https://www.bona.com/globalassets/catalogassets/tds-bona-polish-de_20250930082309.pdf), Fassung 30.09.2025. Produktspezifische Herstellerinformation, laut Herausgeber Ersatz früherer Hinweise zu diesem Produkt. Bedeutung: Pflegefilm, Systemverträglichkeit und Probefläche; keine Empfehlung zur Anwendung auf beliebigem Parkett.
-- [Pallmann, Parkett richtig pflegen](https://de.pallmann.net/wissen-technik/know-how/parkett-richtig-pflegen), undatierte Herstellerinformation, Abruf 13.10.2026. Bedeutung: Reinigung und Pflege nach tatsächlichem Oberflächensystem unterscheiden; kein allgemeiner Normnachweis.
+- [TKB-Merkblatt 1, Kleben von Parkett und Holzpflaster](https://www.klebstoffe.com/wp-content/uploads/2023/09/TKB-01-Parkett-2022-03-14-Layout-2023.pdf), Ausgabe März 2022.
+- [TKB-Merkblatt 17, Raumklima](https://www.klebstoffe.com/wp-content/uploads/2025/08/TKB-17-Raumklima-2025-07-23-Veroeffentlichung.pdf); [Herausgebermeldung](https://www.klebstoffe.com/die-tkb-informiert-tkb-merkblaetter-17-und-21-und-tkb-bericht-12/), Ausgabe Juli 2025.
+- [TKB-Merkblatt 8, Untergrundbeurteilung](https://www.klebstoffe.com/wp-content/uploads/2026/04/TKB-8-Untergrundbeurteilung-Veroeffentlichung.pdf); [Herausgebermeldung](https://www.klebstoffe.com/die-tkb-informiert-aktuelles-zu-den-merkblaettern-8-und-22-sowie-zur-krl-homepage/), Ausgabe Mai 2026.
+- [TKB-Bericht 11, Belegreife – Herausgeberinformation](https://www.klebstoffe.com/die-tkb-informiert-tkb-bericht-11-belegreife/), Bericht vom 19.07.2024; Herausgebermeldung vom 18.03.2025.
+- [TKB, KRL-Methode](https://www.klebstoffe.com/krl-methode/).
+- [Bona Polish, technisches Merkblatt](https://www.bona.com/globalassets/catalogassets/tds-bona-polish-de_20250930082309.pdf), Fassung 30.09.2025.
+- [Pallmann, Parkett richtig pflegen](https://de.pallmann.net/wissen-technik/know-how/parkett-richtig-pflegen).
 
 Weiterführend: [Feuchtequellen fachlich abgrenzen](/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/) und [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/).

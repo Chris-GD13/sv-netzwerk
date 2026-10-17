@@ -16,7 +16,7 @@ relatedLinks: ["/experten/carmen-gohl/", "/fachwissen/schimmel-nach-wasserschade
 damageTypes: ["feuchte", "gebaeude"]
 publication:
   publishedAt: 2026-10-12
-  updatedAt: 2026-10-13
+  updatedAt: 2026-10-17
   status: published
 seo:
   title: "Schimmelsanierung und Sanierungserfolg prüfen"
@@ -138,21 +138,18 @@ Medizinische Beschwerden werden ärztlich abgeklärt. Gebäudeschadstoffe, rauml
 
 ## Fachlicher Bezug im SV-Netzwerk
 
-Das aktuelle [Expertenprofil von Carmen Gohl](/experten/carmen-gohl/) weist Schimmelpilze in Gebäuden sowie Ursachen- und Schadensbewertung, Sanierungsplanung, Sanierungsbegleitung und Sanierungskontrolle als belegte Schwerpunkte aus. Der heutige Beitrag ist diesem Fachgebiet in der Expertenrotation zugeordnet. Diese Zuordnung macht die vorhandene Netzwerkkompetenz sichtbar, behauptet aber keine Autorenschaft und ersetzt keine projektbezogene Zuständigkeitsbestätigung.
-
 ## Fazit
 
 Eine Schimmelsanierung ist dann nachvollziehbar kontrollierbar, wenn Ursache, Trocknung, Rückbau, Feinreinigung und Erfolgskontrolle als getrennte Prüfschritte dokumentiert sind. Die Kontrollmethode richtet sich nach Schadensumfang, Nutzung, Sanierungsziel und konkreter Fragestellung. Pauschale Sichtfreigaben und unklare „Freimessungen“ reichen nicht aus; ebenso wenig ist in jedem Fall dieselbe Laboruntersuchung erforderlich.
 
 Der sachverständige Mehrwert liegt in der belastbaren Zuordnung: Welche Ursache wurde beseitigt, welche Leistung war geschuldet, welche Bereiche wurden tatsächlich bearbeitet, welches Kontrollverfahren beantwortet die offene Frage und welche Nacharbeiten bleiben erforderlich?
 
-## Quellen, Stand und praktische Bedeutung
+## Quellen und weiterführende Hinweise
 
-Quellenprüfung und Abruf der ursprünglichen Quellen am 12.10.2026; redaktionelle Ergänzung zum WTA-Merkblatt am 13.10.2026. Verwendet wurden die öffentlich zugänglichen Originalfassungen im für die Aussagen erforderlichen Umfang. Kostenpflichtige Norm- oder Merkblattinhalte wurden nicht als eingesehen behandelt.
-
-- WTA, Merkblatt 4-12 „Ziele und Kontrolle von Schimmelpilzschadensanierungen in Innenräumen“ (ergänzender Fachregelwerks-Hinweis; Volltext für diese Ergänzung nicht geprüft).\n- Umweltbundesamt, [Aktueller UBA-Schimmelleitfaden](https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/aktueller-uba-schimmelleitfaden), Seite zuletzt aktualisiert am 17.01.2025. Sie bestätigt die aktualisierte Leitfadenfassung April 2024 und den Anwendungsbereich für Sachverständige sowie die Kontrolle des Sanierungserfolgs.
-- Umweltbundesamt, [Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, aktualisierte Fassung April 2024](https://www.umweltbundesamt.de/system/files/medien/4031/publikationen/240513_uba_fb_schimmelleitfaden_0.pdf), insbesondere Kapitel 6.3.3 bis 6.3.8 und 6.6. Praktische Bedeutung: Ursachenbeseitigung, Trocknung, Rückbau, Feinreinigung und Erfolgskontrolle getrennt planen, prüfen und dokumentieren.
-- Deutsche Gesetzliche Unfallversicherung, [DGUV Information 201-028 „Gesundheitsgefährdungen durch Biostoffe bei der Schimmelpilzsanierung“, Ausgabe November 2022](https://publikationen.dguv.de/widgets/pdf/download/article/644), insbesondere Kapitel 3, 4.3 und 9.2.3. Praktische Bedeutung: Schutzmaßnahmen, Feinreinigung und Abnahme in den Sanierungsablauf einordnen.
-- Bundesverband Schimmel- und Schadstoffsanierung e. V., [Fachkundenachweis Schimmelsanierung – Modul B3 Sanierungskontrolle](https://bss-schimmelpilz.de/fachkundenachweis-schimmelsanierung-modul-b3-sanierungskontrolle/), Abruf 12.10.2026. Praktische Bedeutung: Sanierungskontrolle als eigener fachlicher Schritt; Kontrollumfang im Einzelfall festlegen und den Begriff „Freimessung“ nicht auf eine Luftmessung verengen.
+- WTA, Merkblatt 4-12 „Ziele und Kontrolle von Schimmelpilzschadensanierungen in Innenräumen“.
+- Umweltbundesamt, [Aktueller UBA-Schimmelleitfaden](https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/aktueller-uba-schimmelleitfaden), 17.01.2025.
+- Umweltbundesamt, [Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, aktualisierte Fassung April 2024](https://www.umweltbundesamt.de/system/files/medien/4031/publikationen/240513_uba_fb_schimmelleitfaden_0.pdf).
+- Deutsche Gesetzliche Unfallversicherung, [DGUV Information 201-028 „Gesundheitsgefährdungen durch Biostoffe bei der Schimmelpilzsanierung“, Ausgabe November 2022](https://publikationen.dguv.de/widgets/pdf/download/article/644).
+- Bundesverband Schimmel- und Schadstoffsanierung e. V., [Fachkundenachweis Schimmelsanierung – Modul B3 Sanierungskontrolle](https://bss-schimmelpilz.de/fachkundenachweis-schimmelsanierung-modul-b3-sanierungskontrolle/).
 
 Weiterführend: [Schimmel nach Wasserschäden fachlich einordnen](/fachwissen/schimmel-nach-wasserschaden-ursache-sanierungsumfang-kostenabgrenzung/), [Baufeuchte und Schadenfeuchte abgrenzen](/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/) und [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/).

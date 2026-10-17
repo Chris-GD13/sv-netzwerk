@@ -3,7 +3,7 @@ title: "Drohnen bei Gebäudeschäden: Einsatzgrenzen, Bildbefund und Dokumentati
 description: "Drohnenaufnahmen bei Gebäudeschäden fachlich planen: Flugbetrieb, Datenschutz, sichtbaren Bildbefund, Photogrammetrie, Ursachenbewertung und Dokumentation sauber trennen."
 category: "Beweissicherung und Fotodokumentation"
 tags: ["Drohne", "Gebäudeschaden", "Beweissicherung", "Fotodokumentation", "Photogrammetrie", "Datenschutz", "UAS"]
-author: "SV-Netzwerk Redaktion"
+author: "christian-waechter"
 featured: false
 dailyStandard: true
 contentLevel: "B"
@@ -29,14 +29,14 @@ seo:
 
 Drohnen können Dachflächen, Attiken, Fassaden, Entwässerungen und schwer zugängliche Übergänge aus Blickrichtungen erfassen, die vom Boden aus fehlen. Das erweitert die Ortsbesichtigung. Aus einem scharfen Luftbild folgt jedoch noch keine vollständige Bauteilprüfung: Sichtbar sind Oberflächen und Geometrien im aufgenommenen Bereich. Verdeckte Schichten, Befestigungen, Haftverbund, Feuchte im Aufbau oder die zeitliche Entstehung eines Schadens bleiben ohne ergänzende Untersuchung offen.
 
-Eine fachgerechte Drohnenaufnahme trennt deshalb vier Ebenen:
+Bei der sachverständigen Auswertung unterscheide ich vier Ebenen:
 
 1. **Flugbetrieb:** Darf und kann an diesem Ort unter den konkreten Bedingungen sicher geflogen werden?
 2. **Bildbefund:** Was ist auf welcher Aufnahme tatsächlich sichtbar?
 3. **Auswertung:** Reicht die Aufnahme für Orientierung, Vergleich, Kartierung oder eine nachvollziehbar geprüfte Messung?
 4. **Bewertung:** Welche Ursache oder Maßnahme lässt sich zusammen mit weiteren Unterlagen und Untersuchungen fachlich begründen?
 
-Dieser Beitrag beschreibt die Prüflogik. Er enthält keinen erfundenen Schadenfall, keine Beispielmesswerte und keine pauschale Aussage zur versicherungsvertraglichen Deckung.
+Für meine sachverständige Bewertung ist entscheidend, welche Aussage eine Aufnahme tatsächlich trägt. Ich trenne deshalb den sichtbaren Befund von der Ursachenhypothese und benenne die ergänzenden Untersuchungen, die für eine belastbare Schlussfolgerung erforderlich sind.
 
 ## Auftrag und Erkenntnisziel vor dem Start festlegen
 
@@ -146,15 +146,9 @@ Kostenunterlagen sollten Flugleistung, Datenaufbereitung, Modellberechnung, fach
 
 Der Drohnenbefund kann in einem Schadenfall die technische Dokumentation unterstützen. Er beantwortet allein aber weder, ob ein versichertes Ereignis vorliegt, noch ob ein Vorschaden, Ausschluss oder bestimmter Kostenumfang vertraglich erfasst ist. Ereignis, zeitliche Zuordnung, versicherte Sache, technischer Schaden, erforderliche Wiederherstellung und Versicherungsbedingungen bleiben getrennte Prüffelder.
 
-Dieser Beitrag ist daher ein eigenständiges Sachverständigenthema. Erst ein konkreter Auftrag mit den zugehörigen Vertrags- und Schadenunterlagen erlaubt eine versicherungsfachliche Bewertung. Aus der Aufnahme folgt weder eine Deckungszusage noch eine Sanierungsfreigabe.
+Eine versicherungsfachliche Bewertung nehme ich erst anhand des konkreten Auftrags sowie der zugehörigen Vertrags- und Schadenunterlagen vor. Aus der Aufnahme allein leite ich weder eine Deckungszusage noch eine Sanierungsfreigabe ab.
 
-## Warum kein fiktives Praxisbeispiel verwendet wird
-
-Ein erfundener Flug mit scheinbar präzisen Höhen, Abständen, Flächen oder Genauigkeitswerten würde eine belastbare Einsatzplanung nur vortäuschen. Zulässigkeit, Bildqualität und Messgenauigkeit hängen vom Ort, System, Wetter, Flugprofil und Erkenntnisziel ab. Deshalb beschreibt dieser Beitrag die Prüfung ohne fiktiven Fall und ohne erfundene Messwerte.
-
-## Fachgrenzen und Zuordnung im Expertenzyklus
-
-Das aktuelle [Expertenprofil von Christian Wächter](/experten/christian-waechter/) nennt unter anderem Bauforensik, Thermografie, Drohnen sowie Fenster, Türen und Fassaden als Spezialgebiete. Der heutige Beitrag ist dem belegten Drohnenschwerpunkt in der laufenden Expertenrotation zugeordnet. Die Verknüpfung behauptet weder Autorenschaft noch eine konkrete Fallzuständigkeit.
+## Fachgrenzen und ergänzende Untersuchungen
 
 Die Bedienberechtigung für das eingesetzte UAS ersetzt keine bautechnische Qualifikation. Ebenso macht bautechnische Erfahrung einen rechtlich unzulässigen oder flugbetrieblich unsicheren Einsatz nicht zulässig. Für Luftrecht, Datenschutz, Tragwerk, Elektrotechnik oder andere Spezialfragen sind bei Bedarf die jeweils qualifizierten Stellen einzubeziehen.
 
@@ -166,14 +160,11 @@ Belastbar ist nicht die größte Bildmenge, sondern die nachvollziehbare Kette v
 
 ## Quellen und weiterführende Hinweise
 
-Quellenprüfung und Abruf am 17.10.2026. Die nachstehenden Primär- und Originalquellen wurden im für die Aussagen erforderlichen Umfang geöffnet und gelesen. Der Beitrag bewertet keinen konkreten Flug oder Gebäudeschaden.
-
-1. Europäische Union, [Durchführungsverordnung (EU) 2019/947 über die Vorschriften und Verfahren für den Betrieb unbemannter Luftfahrzeuge](https://eur-lex.europa.eu/eli/reg_impl/2019/947/oj). Konsolidierter Text im benötigten Umfang gelesen. Praktische Bedeutung: Betriebskategorien, Grundvoraussetzungen der offenen Kategorie, direkter Sichtkontakt, Abstand und Höhenbegrenzung unterscheiden.
-2. European Union Aviation Safety Agency, [Easy Access Rules for Unmanned Aircraft Systems](https://www.easa.europa.eu/en/document-library/easy-access-rules/online-publications/easy-access-rules-unmanned-aircraft-systems), Revision Juni 2026. Im benötigten Umfang gelesen. Praktische Bedeutung: Verantwortlichkeiten, Unterkategorien A1/A2/A3, aktuelle geografische Informationen, Flugvorbereitung und Betriebsgrenzen zusammen prüfen.
-3. Digitale Plattform Unbemannte Luftfahrt, [Schnell und sicher in die Luft](https://www.dipul.de/homepage/de/informationen/allgemeines/erste-schritte/schnell-sicher-in-die-luft-version-1.2.pdf), Version 1.2. Vollständig gelesen. Praktische Bedeutung: Registrierung, e-ID, Kenntnisnachweis, Haftpflichtversicherung und geografische Gebiete vor dem Flug prüfen.
-4. Bundesministerium der Justiz und Bundesamt für Justiz, [§ 21h LuftVO – geografische Gebiete](https://www.gesetze-im-internet.de/luftvo_2015/__21h.html) und [§ 43 LuftVG – Haftpflichtversicherung](https://www.gesetze-im-internet.de/luftvg/__43.html). Amtliche Einzelnormen vollständig gelesen. Praktische Bedeutung: besondere örtliche Betriebsbedingungen und Versicherungspflicht nicht durch eine pauschale Freigabe ersetzen.
-5. Konferenz der unabhängigen Datenschutzaufsichtsbehörden des Bundes und der Länder, [Positionspapier zur Nutzung von Kameradrohnen durch nicht-öffentliche Stellen](https://www.datenschutzkonferenz-online.de/media/oh/20190116_oh_positionspapier_kameradrohnen.pdf), 16.01.2019. Vollständig gelesen. Praktische Bedeutung: Rechtsgrundlage, Interessenabwägung, Informationspflichten und Schutz der Rechte Dritter bereits in die Aufnahmeplanung einbeziehen.
-6. Murtiyoso, Grussenmeyer, Börlin, Vandermeerschen und Freville, [Open source and independent methods for bundle adjustment assessment in close-range UAV photogrammetry](https://doi.org/10.5194/isprs-annals-IV-2-W2-163-2017), ISPRS Annals, 2017. Im benötigten Umfang gelesen. Praktische Bedeutung: Kalibrierung, Flugplanung, Aufnahmegeometrie, Auswertung und Qualitätskontrolle bestimmen die Belastbarkeit photogrammetrischer Ergebnisse.
-7. SV-Netzwerk, [Live-Expertenprofil Christian Wächter](https://www.sv-netzwerk.eu/experten/christian-waechter/), sichtbar geprüft am 17.10.2026. Es belegt die fachliche Zuordnung unter anderem zu Bauforensik, Thermografie und Drohnen; keine behauptete Autorenschaft oder konkrete Fallzuständigkeit.
+- Europäische Union, [Durchführungsverordnung (EU) 2019/947 über die Vorschriften und Verfahren für den Betrieb unbemannter Luftfahrzeuge](https://eur-lex.europa.eu/eli/reg_impl/2019/947/oj).
+- European Union Aviation Safety Agency, [Easy Access Rules for Unmanned Aircraft Systems](https://www.easa.europa.eu/en/document-library/easy-access-rules/online-publications/easy-access-rules-unmanned-aircraft-systems), Revision Juni 2026.
+- Digitale Plattform Unbemannte Luftfahrt, [Schnell und sicher in die Luft](https://www.dipul.de/homepage/de/informationen/allgemeines/erste-schritte/schnell-sicher-in-die-luft-version-1.2.pdf), Version 1.2.
+- Bundesministerium der Justiz und Bundesamt für Justiz, [§ 21h LuftVO – geografische Gebiete](https://www.gesetze-im-internet.de/luftvo_2015/__21h.html); [§ 43 LuftVG – Haftpflichtversicherung](https://www.gesetze-im-internet.de/luftvg/__43.html).
+- Konferenz der unabhängigen Datenschutzaufsichtsbehörden des Bundes und der Länder, [Positionspapier zur Nutzung von Kameradrohnen durch nicht-öffentliche Stellen](https://www.datenschutzkonferenz-online.de/media/oh/20190116_oh_positionspapier_kameradrohnen.pdf), 16.01.2019.
+- Murtiyoso, Grussenmeyer, Börlin, Vandermeerschen und Freville, [Open source and independent methods for bundle adjustment assessment in close-range UAV photogrammetry](https://doi.org/10.5194/isprs-annals-IV-2-W2-163-2017), ISPRS Annals, 2017.
 
 Weiterführend: [Beweissicherung und Fotodokumentation](/fachwissen/beweissicherung-fotodokumentation-standards/), [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/) und [Kontakt zur sachverständigen Einordnung](/kontakt/).

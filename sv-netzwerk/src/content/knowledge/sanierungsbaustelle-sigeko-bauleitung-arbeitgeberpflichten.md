@@ -16,7 +16,7 @@ relatedLinks: ["/experten/lenna-maria-walczok/", "/fachwissen/regiekosten-schade
 damageTypes: ["gebaeude", "sanierung"]
 publication:
   publishedAt: 2026-10-14
-  updatedAt: 2026-10-14
+  updatedAt: 2026-10-17
   status: published
 seo:
   title: "Sanierungsbaustelle: SiGeKo und Bauleitung abgrenzen"
@@ -60,7 +60,7 @@ Der SiGeKo bearbeitet die sicherheits- und gesundheitsschutzrelevanten Schnittst
 
 RAB 30 beschreibt die Auswahl anhand baulicher, arbeitsschutzfachlicher und spezieller Koordinatorenkenntnisse sowie einschlägiger Berufserfahrung. Ein Lehrgangstitel allein beantwortet nicht, ob eine Person für die konkrete Baustelle geeignet ist. Bei Bestandsgebäuden zählen etwa schwierige Zugänge, fortgesetzte Nutzung, wechselnde Unternehmen und unbekannte Konstruktionen zum tatsächlichen Anforderungsprofil.
 
-Die fachliche Profilverknüpfung dieses Beitrags führt zu [Lenna Maria Walczok](/experten/lenna-maria-walczok/), deren Netzwerkprofil Baucontrolling, Sanierungsberatung und SiGeKo nennt. Das ist keine behauptete Mitautorenschaft oder Bestellung für einen konkreten Auftrag. Gefahrstoff-, Elektro- oder Tragwerksfragen müssen die dafür qualifizierten Fachleute beurteilen.
+Gefahrstoff-, Elektro- oder Tragwerksfragen müssen die dafür qualifizierten Fachleute beurteilen.
 
 ## Schnittstellen vor dem Gewerkwechsel prüfen
 
@@ -103,13 +103,11 @@ Bauherren und Auftraggeber sollten die Rollen vor dem baulichen Eingriff festleg
 
 Der Nutzen liegt in einer prüfbaren Entscheidungskette: Anwendungsbereich, Arbeitgeberstruktur, zusätzliche Planungsanforderungen, Eignung, Schnittstellen und Leistungsnachweise. So lassen sich auch kleinere Sanierungen ohne pauschale Gleichsetzung von SiGeKo und Bauleitung fachlich strukturieren.
 
-## Quellen, Datierung und praktische Bedeutung
+## Quellen und weiterführende Hinweise
 
-Quellenprüfung: 14.10.2026. Dieser Beitrag berichtet kein neues Schadenereignis und keine neue Gerichtsentscheidung.
-
-1. [Baustellenverordnung, amtlicher konsolidierter Text](https://www.gesetze-im-internet.de/baustellv/BJNR128300998.html): Ausfertigung 10.06.1998; ausgewiesener letzter Änderungsstand 17.12.2025, BGBl. 2025 I Nr. 337. Geltendes Recht, kein Entwurf. §§ 1–5 und Anhang II stützen Anwendungsbereich, Voraussetzungen und Verantwortlichkeiten. Für vor dem 01.04.2023 begonnene Bauvorhaben ist die Übergangsregel des § 8 Absatz 2 zu beachten. Änderungsdatum und Abrufdatum sind keine neu erfundenen Geltungsbeginne.
-2. [§ 2 BaustellV](https://www.gesetze-im-internet.de/baustellv/__2.html), [§ 3 BaustellV](https://www.gesetze-im-internet.de/baustellv/__3.html), [§ 4 BaustellV](https://www.gesetze-im-internet.de/baustellv/__4.html) und [§ 5 BaustellV](https://www.gesetze-im-internet.de/baustellv/__5.html): geltende Einzelnormen, gelesen am 14.10.2026. Praktische Bedeutung: vier getrennte Prüfungen statt einer einzigen Größen- oder Kostenpauschale.
-3. [§ 8 ArbSchG](https://www.gesetze-im-internet.de/arbschg/__8.html): geltender amtlicher Text, gelesen am 14.10.2026. Gegenseitige Gefahreninformation und Zusammenarbeit; kein Ersatz betrieblicher Arbeitgeberpflichten durch externe Koordination.
-4. [RAB 30, Geeigneter Koordinator](https://www.baua.de/DE/Angebote/Regelwerk/RAB/pdf/RAB-30.pdf?__blob=publicationFile): Stand 27.03.2003, Abschnitte 3 und 4 gelesen. Konkretisierende Regel, keine eigene gesetzliche Kosten- oder Deckungsregel. Praktische Bedeutung: Eignung auf die tatsächlichen Bau- und Gefährdungsbedingungen beziehen.
-5. [RAB 31, Abschnitt 3, offizielle Wiedergabe der BGN](https://vorschriften.bgn-branchenwissen.de/daten/tr/rab31/3.htm): Regelstand 12.11.2003; Titel der BG-BAU-Wiedergabe nennt Veröffentlichung BArbBl. 3/2004, Seite 59. Abschnitt 3 zu Inhalt und Anpassung gelesen. Historische Tabellen und Gefahrstoffbegriffe werden nicht anstelle des aktuellen Verordnungstextes übernommen. Praktische Bedeutung: gewerkeübergreifende Gefährdungen räumlich und zeitlich zuordnen.
-6. [BG BAU, Von Anfang an](https://bgbauaktuell.bgbau.de/bg-bau-aktuell-12021/artikel-12021/schwerpunkt-baustellenverordnung), veröffentlicht am 10.03.2021: erläuternde Fachinformation zur Aufgabenabgrenzung und gesonderten Klärung von Weisungsbefugnissen. Keine Übertragung des alten Überblicks auf inzwischen geänderte gesetzliche Voraussetzungen.
+- [Baustellenverordnung, amtlicher konsolidierter Text](https://www.gesetze-im-internet.de/baustellv/BJNR128300998.html), Ausfertigung 10.06.1998; zuletzt geändert am 17.12.2025.
+- [§ 2 BaustellV](https://www.gesetze-im-internet.de/baustellv/__2.html); [§ 3 BaustellV](https://www.gesetze-im-internet.de/baustellv/__3.html); [§ 4 BaustellV](https://www.gesetze-im-internet.de/baustellv/__4.html); [§ 5 BaustellV](https://www.gesetze-im-internet.de/baustellv/__5.html).
+- [§ 8 ArbSchG](https://www.gesetze-im-internet.de/arbschg/__8.html).
+- [RAB 30, Geeigneter Koordinator](https://www.baua.de/DE/Angebote/Regelwerk/RAB/pdf/RAB-30.pdf?__blob=publicationFile), Stand 27.03.2003.
+- [RAB 31, Abschnitt 3, offizielle Wiedergabe der BGN](https://vorschriften.bgn-branchenwissen.de/daten/tr/rab31/3.htm), Regelstand 12.11.2003.
+- [BG BAU, Von Anfang an](https://bgbauaktuell.bgbau.de/bg-bau-aktuell-12021/artikel-12021/schwerpunkt-baustellenverordnung), 10.03.2021.
