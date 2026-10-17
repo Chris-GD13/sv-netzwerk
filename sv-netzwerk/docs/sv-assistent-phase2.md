@@ -195,7 +195,19 @@ Blind-Retry für unklare externe Vorgänge zulassen. Tatsächliche MariaDB-/Webb
 und PHP-CLI-Rechte auf IONOS getrennt verifizieren. Datenschutz-/Providerfreigabe,
 Kostenfreigabe und echte Tarifgrenzen fehlen weiterhin.
 
-PR #402 wurde nicht übernommen. Notiz-/Claimsforce-Skripte wurden nicht geändert;
+PR #402 wurde nicht übernommen. Eine reine Git-Mergebaumanalyse (ohne Checkout,
+Mergecommit oder Branchänderung) fand einen Inhaltskonflikt in der bestehenden
+langen Inline-Skriptzeile von `versicherungsfaelle/index.astro`. Grund: #402 ergänzt
+`_loaded`/Notizkontext in `keep(d)`, dieser Branch ergänzt die Assistentenereignisse
+in `keep(d)` und beim Leeren. Für einen später freigegebenen gemeinsamen Einbau
+zuerst die #402-Identitäts-/Notizlogik vollständig erhalten; danach in dessen
+`keep(d)` nach `active=d` nur bei bestätigtem `_loaded` das Ereignis
+`svnet:case-opened` senden, andernfalls `svnet:case-cleared`. Beim Leeren ebenfalls
+`svnet:case-cleared` senden. Anschließend beide Kontext-/Notizsuiten und die
+Assistentensuite gemeinsam ausführen. Dies ist ein dokumentierter Integrationspunkt,
+kein bereits als konfliktfrei oder gemeinsam getestet ausgegebener Stand.
+
+Notiz-/Claimsforce-Skripte wurden nicht geändert;
 der neue Controller ruft keine Notiz-/Importendpunkte auf. Der spätere gemeinsame
 Einbau muss die tatsächlich freigegebene Stabilisierung erneut prüfen. PR #403
 bleibt unverändert; Phase 2 besitzt einen eigenen Branch auf dessen Quellstand.
