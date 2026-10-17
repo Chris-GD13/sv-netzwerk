@@ -155,7 +155,12 @@ final class CaseWorkAssistant {
             $s=$this->query('SELECT status FROM case_analysis_jobs WHERE id=?',[$id])->fetchColumn();
             if($s!=='dispatching')$this->fail('USAGE_STATE_INVALID');
             if(!empty($response['uncertain'])){$this->ledger->unknown('assistant:'.$id);$this->update($id,'unknown',['checkpoint'=>'provider_uncertain','response_id'=>$response['response_id']??null]);return ['id'=>$id,'status'=>'unknown','result'=>['notice'=>'Verbrauchsstatus unklar. Reservierung bleibt gesperrt; kein automatischer neuer KI-Aufruf.']];}
-            if(!empty($response['rejected'])){$this->settle($id,0,['provider_rejected'=>true,'http_status'=>$response['http_status']]);$this->update($id,'failed',['checkpoint'=>'provider_rejected','http_status'=>$response['http_status']]);return ['id'=>$id,'status'=>'failed','result'=>['notice'=>'KI-Anfrage wurde abgewiesen. Zugang/Modell prüfen; keine erfolgreiche Bearbeitung.']];}
+            if(!empty($response['rejected'])){
+                $detail=$response['provider_error']??[];$notice='KI-Anfrage abgewiesen: HTTP '.(int)$response['http_status'].(isset($detail['code'])?' · '.$detail['code']:'').'. Keine erfolgreiche Bearbeitung; kein Verbrauch gebucht.';
+                $this->settle($id,0,['provider_rejected'=>true,'http_status'=>$response['http_status'],'provider_error'=>$detail]);
+                $result=['checkpoint'=>'provider_rejected','http_status'=>$response['http_status'],'provider_error'=>$detail,'notice'=>$notice];$this->update($id,'failed',$result);
+                return ['id'=>$id,'status'=>'failed','result'=>$result];
+            }
             $actual=(int)$response['actual_micro'];$this->settle($id,$actual,$response['usage']);
             // Always account usage, even if user switched case or source/rights changed in flight.
             try{$this->context($user,$token,$tab);}catch(Throwable){$this->update($id,'failed',['checkpoint'=>'source_changed_after_dispatch','actual_micro'=>$actual]);return ['id'=>$id,'status'=>'failed','result'=>['notice'=>'Fallstand oder Berechtigung wurde geändert. Ergebnis verworfen; Verbrauch erfasst.']];}
