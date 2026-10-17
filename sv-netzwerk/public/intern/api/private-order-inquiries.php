@@ -22,9 +22,10 @@ function poConvertInquiry(string $id, string $name, string $rootId): array {
     $name = trim($name);
     if ($name === '' || mb_strlen($name) > 120 || str_contains($name, '/') || str_contains($name, '\\') || preg_match('/[\x00-\x1F]/u', $name) || preg_match('/[. ]$/u', $name) || poIsInquiryName($name)) apiError(400, 'Bitte einen gültigen Auftragsnamen ohne den Zusatz Anfrage eingeben.');
     if (!poIsInquiryName((string)$source['name'])) {
-        if ((string)$source['name'] === $name) return ['order_id'=>$id, 'already_done'=>true];
+        if ((string)$source['name'] === $name || preg_replace('/^\d{2}-\d{5}[_ ]+/','',(string)$source['name']) === $name) return ['order_id'=>$id, 'already_done'=>true];
         apiError(409, 'Dieser Eintrag ist keine offene Anfrage mehr.');
     }
+    if(function_exists('db')&&function_exists('pbNativeCaseNumber')){$db=db();pbSchema($db);$q=$db->prepare("SELECT id FROM private_business_records WHERE folder_id=? AND kind='offer' LIMIT 1");$q->execute([$id]);if($q->fetchColumn())apiError(409,'Bitte das Angebot öffnen und dort in einen Auftrag überführen. So bleiben beide Nummern verknüpft.');$name=pbNativeCaseNumber($db,$id).'_'.$name;}
     // Rename the existing folder; all file/folder IDs and contents are retained.
     poRequestJson('PATCH', 'https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id), ['name'=>$name, '@microsoft.graph.conflictBehavior'=>'fail']);
     return ['order_id'=>$id];

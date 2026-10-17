@@ -6,16 +6,21 @@ require_once __DIR__ . '/profile-routing.php';
 require_once __DIR__ . '/private-order-classification.php';
 commonHeaders();
 $user = requireAuth();
-$profile = svnetUserProfile($user);
+require_once __DIR__ . '/private-business-access.php';
+$profile = pbPrivateProfile($user);
 $roots = [
     'christian' => getenv('MS_SHAREPOINT_CHRISTIAN_PRIVATE_PATH') ?: 'VS Schäden/Christian/Privatgutachten_NL Süd',
     'marc' => getenv('MS_SHAREPOINT_MARC_PRIVATE_PATH') ?: 'VS Schäden/Marc/Privatgutachten',
 ];
 if (!isset($roots[$profile])) apiError(403, 'Für dieses Benutzerprofil sind keine Privataufträge freigegeben.');
 $action = (string)($_GET['action'] ?? 'list');
+if (in_array($action, ['create', 'convert-inquiry'], true) && !pbCanCreate($user)) {
+    apiError(403, 'Die Erstellung von Angeboten und Aufträgen ist für dieses Benutzerkonto nicht freigegeben.');
+}
 
 require_once __DIR__ . '/private-order-storage.php';
 require_once __DIR__ . '/private-order-inquiries.php';
+require_once __DIR__ . '/private-business-core.php';
 $root=poItemByPath($roots[$profile]);
 if (in_array($action, ['convert-inquiry','merge-inquiry'], true) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode((string)file_get_contents('php://input'), true);
@@ -29,7 +34,8 @@ if ($action==='list' || $action==='cases') {
     $top=poChildren((string)$root['id'],$roots[$profile]);$items=[];
     foreach($top as $item){if(!$item['folder']||poIsStandardFolder($item)||mb_strtolower($item['name'],'UTF-8')==='versicherungsaufträge')continue;if(poIsYearFolder($item)){foreach(poChildren($item['id'],$item['path']) as $candidate)if($candidate['folder']&&!poIsStandardFolder($candidate))$items[]=$candidate;}else $items[]=$item;}
     usort($items,fn($a,$b)=>strcasecmp((string)$a['name'],(string)$b['name']));
-    apiJson(['ok'=>true,'profile'=>$profile,'root'=>['name'=>$root['name']??basename($roots[$profile]),'path'=>$roots[$profile]],'items'=>$items,'standard_folders'=>poStandardFolders()]);
+    $numbers=db();pbSchema($numbers);foreach($items as &$numbered){if(poIsInquiryName($numbered['name']))continue;$year=preg_match('~/(20\d{2})/~',$numbered['path'],$match)?(int)$match[1]:null;$numbered['number']=pbNativeCaseNumber($numbers,$numbered['id'],$year);}unset($numbered);
+    apiJson(['ok'=>true,'profile'=>$profile,'can_create'=>pbCanCreate($user),'root'=>['name'=>$root['name']??basename($roots[$profile]),'path'=>$roots[$profile]],'items'=>$items,'standard_folders'=>poStandardFolders()]);
 }
 if ($action==='case') {
     $id=trim((string)($_GET['id']??''));if($id==='')apiError(400,'Auftrags-ID fehlt.');$item=poValidateScope($id,(string)$root['id']);if(empty($item['folder']))apiError(403,'Ungültiger Auftragsordner.');$path=ltrim((string)($item['name']??''),'/');$children=poChildren($id,$path);foreach($children as &$child){if($child['folder'])$child['children']=poChildren($child['id'],$child['path']);}unset($child);$item=['id'=>(string)$item['id'],'name'=>(string)($item['name']??''),'path'=>$path,'folder'=>true,'children'=>$children];apiJson(['ok'=>true,'item'=>$item]);
@@ -82,7 +88,7 @@ if ($action==='organize' && $_SERVER['REQUEST_METHOD']==='POST') {
     apiJson(['ok'=>true,'moved'=>$moved,'complete'=>$moved===0]);
 }
 if ($action==='file') { $id=trim((string)($_GET['id']??'')); if($id==='')apiError(400,'Datei-ID fehlt.'); $item=poValidateScope($id,(string)$root['id']); if(isset($item['folder']))apiError(403,'Diese Datei gehört nicht zum eigenen Privatauftragsbereich.'); $r=poRequest('https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($id).'/content',true); header('Content-Type: '.($r['content_type']?:'application/octet-stream')); header('Content-Disposition: inline; filename="'.str_replace('"','',basename((string)$item['name'])).'"'); echo $r['body']; exit; }
-if ($action==='create' && $_SERVER['REQUEST_METHOD']==='POST') { $input=json_decode((string)file_get_contents('php://input'),true);$name=trim((string)($input['name']??''));$parent=trim((string)($input['parent_id']??$root['id']));if($name===''||mb_strlen($name)>120||preg_match('/[\\\/\x00-\x1F]/u',$name))apiError(400,'Bitte einen gültigen Auftragsnamen eingeben.');if($parent!==(string)$root['id']){$tree=poTree((string)$root['id']);if(!poFind($tree,$parent))apiError(403,'Der Zielordner gehört nicht zum eigenen Privatauftragsbereich.');}$created=poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($parent).'/children',['name'=>$name,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'rename']);foreach(['Auftrag','Fotos','Gutachten','Angebot','Rechnungen','E-Mails','Bilder','Dateien','Sonstige Unterlagen','Eingang KI'] as $sub)poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode((string)($created['id']??'')).'/children',['name'=>$sub,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'fail']);apiJson(['ok'=>true,'item'=>$created]);}
+if ($action==='create' && $_SERVER['REQUEST_METHOD']==='POST') { $input=json_decode((string)file_get_contents('php://input'),true);$name=trim((string)($input['name']??''));$parent=trim((string)($input['parent_id']??$root['id']));if($name===''||mb_strlen($name)>120||preg_match('/[\\\/\x00-\x1F]/u',$name))apiError(400,'Bitte einen gültigen Auftragsnamen eingeben.');if($parent!==(string)$root['id']){$tree=poTree((string)$root['id']);if(!poFind($tree,$parent))apiError(403,'Der Zielordner gehört nicht zum eigenen Privatauftragsbereich.');}$created=poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($parent).'/children',['name'=>$name,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'rename']);foreach(['Auftrag','Fotos','Gutachten','Angebot','Rechnungen','E-Mails','Bilder','Dateien','Sonstige Unterlagen','Eingang KI'] as $sub)poRequestJson('POST','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode((string)($created['id']??'')).'/children',['name'=>$sub,'folder'=>new stdClass(),'@microsoft.graph.conflictBehavior'=>'fail']);if(!poIsInquiryName($name)){$numbers=db();pbSchema($numbers);$number=pbNativeCaseNumber($numbers,(string)$created['id']);$created=poRequestJson('PATCH','https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode((string)$created['id']),['name'=>$number.'_'.$name,'@microsoft.graph.conflictBehavior'=>'fail']);}apiJson(['ok'=>true,'item'=>$created]);}
 if ($action==='upload' && $_SERVER['REQUEST_METHOD']==='POST') { $parent=trim((string)($_POST['folder_id']??''));if($parent==='')apiError(400,'Zielordner fehlt.');$folder=poValidateScope($parent,(string)$root['id']);if(!isset($folder['folder']))apiError(403,'Der Zielordner gehört nicht zum eigenen Privatauftragsbereich.');$file=$_FILES['file']??null;if(!is_array($file)||($file['error']??UPLOAD_ERR_NO_FILE)!==UPLOAD_ERR_OK)apiError(400,'Keine gültige Datei empfangen.');if((int)($file['size']??0)>4194304)apiError(413,'Dateien bis 4 MB können direkt abgelegt werden.');$name=basename((string)($file['name']??'Datei'));if($name===''||preg_match('/[\\\/\x00-\x1F]/u',$name))apiError(400,'Ungültiger Dateiname.');$bytes=file_get_contents((string)$file['tmp_name']);if(!is_string($bytes))apiError(400,'Datei konnte nicht gelesen werden.');$mime=(string)($file['type']??'application/octet-stream');$uploaded=poRequestUpload('https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($parent).':/'.rawurlencode($name).':/content',$name,$bytes,$mime);$children=poChildren($parent,(string)($folder['name']??''));$hasStandard=false;$targets=[];foreach($children as $child)if($child['folder']&&poIsStandardFolder($child)){$hasStandard=true;$targets[mb_strtolower($child['name'],'UTF-8')]=(string)$child['id'];}if($hasStandard){$category=poCategory(['name'=>$name,'path'=>$name]);$target=$targets[mb_strtolower($category,'UTF-8')]??'';if($target!=='')poMoveFile((string)($uploaded['id']??''),$target);}apiJson(['ok'=>true,'sorted'=>$hasStandard,'category'=>$hasStandard?poCategory(['name'=>$name,'path'=>$name]):null,'item'=>['id'=>(string)($uploaded['id']??''),'name'=>(string)($uploaded['name']??$name)]]);}
 apiError(404,'Unbekannte Aktion für Privataufträge.');
 

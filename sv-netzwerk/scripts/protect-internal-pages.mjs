@@ -27,7 +27,9 @@ const walk = (directory) => {
     const phpFile = path.join(directory, 'index.php');
     const guard = directory === path.join(internRoot, 'administration')
       ? "<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/intern/administration_check.php'; ?>\n"
-      : phpGuard;
+      : directory === path.join(internRoot, 'privatauftraege', 'angebot')
+        ? "<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/intern/private-business-check.php'; ?>\n"
+        : phpGuard;
     fs.writeFileSync(phpFile, guard + html, 'utf8');
     fs.rmSync(absolute);
     protectedPages += 1;

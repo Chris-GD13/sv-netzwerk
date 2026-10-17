@@ -7,10 +7,13 @@ const names=['norm','caseRows','firstLetter','isInquiry','inquiryName','displayN
 const functions=names.map(name=>page.match(new RegExp(`function ${name}\\([^\\n]+`))?.[0]).join('\n');
 const elements={};
 const element=id=>elements[id]??=({innerHTML:'',textContent:'',hidden:false,setAttribute(){},querySelectorAll(){return[];}});
-const ctx={root:[{id:'one',name:'Auftrag Müller',folder:true},{id:'two',name:'Anfrage_Krämer_Bopfingen',folder:true}],q:{value:''},view:'orders',letter:'',active:null,cases:element('cases'),$:element,esc:s=>String(s),flat:r=>r,openCase(){}};
+const ctx={canCreate:false,root:[{id:'one',name:'Auftrag Müller',folder:true},{id:'two',name:'Anfrage_Krämer_Bopfingen',folder:true}],q:{value:''},view:'orders',letter:'',active:null,cases:element('cases'),$:element,esc:s=>String(s),flat:r=>r,openCase(){}};
 vm.createContext(ctx);vm.runInContext(functions,ctx);
 ctx.renderCases();assert.match(elements.cases.innerHTML,/Auftrag Müller/);assert.doesNotMatch(elements.cases.innerHTML,/Krämer/);assert.equal(elements.alphabet.hidden,false);
 ctx.view='inquiries';ctx.renderCases();assert.match(elements.cases.innerHTML,/Krämer Bopfingen/);assert.doesNotMatch(elements.cases.innerHTML,/Auftrag Müller|po-letter-group/);assert.equal(elements.alphabet.hidden,true);
 ctx.q.value='Krämer Bopfingen';ctx.renderCases();assert.match(elements.cases.innerHTML,/Krämer Bopfingen/);
 assert.match(page,/Auftrag aus Anfrage anlegen/);assert.match(page,/Bestehendem Auftrag hinzufügen/);
+assert.equal(elements['convert-inquiry'].hidden,true);
+ctx.canCreate=true;ctx.renderCases();assert.equal(elements['convert-inquiry'].hidden,false);
+assert.equal(ctx.firstLetter('26-12345_Krämer Bopfingen'),'K');
 console.log('private_orders_inquiry_tabs_test: ok (separate lists, readable names, search)');

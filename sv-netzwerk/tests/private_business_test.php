@@ -1,0 +1,17 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__.'/../public/intern/api/private-business-core.php';
+set_error_handler(static function($severity,$message,$file,$line){throw new ErrorException($message,0,$severity,$file,$line);});
+function pbCheck(bool $ok,string $message): void {if(!$ok)throw new RuntimeException($message);}
+$db=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);pbSchema($db);
+$a=pbNumber($db,'offer','one',2026,fn()=>12345);$tries=[12345,54321];$b=pbNumber($db,'order','two',2027,function()use(&$tries){return array_shift($tries);});pbCheck($a==='26-12345'&&$b==='27-54321','Number collision must retry, including across years');pbCheck(pbNumber($db,'offer','one')===$a,'Allocated number must not change');
+$d=pbDefaults('christian');pbCheck($d['hour_rate']===220&&$d['km_rate']===0.98,'Current rates from the later user template');$d=array_replace($d,['company'=>'Prüfauftrag','billing_street'=>'Nordstraße 17','billing_postcode'=>'73432','billing_city'=>'Aalen','site_same'=>false,'site_street'=>'Feldstraße 108','site_postcode'=>'58791','site_city'=>'Werdohl','scope'=>'Interne Prüfung','hours'=>5,'oneway_km'=>120,'oneway_minutes'=>90,'visits'=>2]);$t=pbTotals($d);pbCheck(abs($t['km_total']-480)<0.00001&&abs($t['travel_hours']-6)<0.00001,'Round trip and multiple visits');pbCheck($t['net']===2390.4&&$t['gross']===2844.58,'Cent-exact totals');pbCheck(pbSite($d)['city']==='Werdohl','Travel destination must be site rather than invoice address');
+$key=pbUuid();$r=pbSave($db,'christian',['request_key'=>$key,'data'=>$d]);$again=pbSave($db,'christian',['request_key'=>$key,'data'=>$d]);pbCheck($r['id']===$again['id']&&$r['number']===$again['number'],'Retry must not create another offer');
+try{pbRecord($db,$r['id'],'marc');throw new RuntimeException('Cross-profile read allowed');}catch(RuntimeException$e){pbCheck($e->getCode()===403,'Profile isolation');}
+$changed=$d;$changed['hour_rate']=250;$r2=pbSave($db,'christian',['id'=>$r['id'],'revision'=>1,'request_key'=>$key,'data'=>$changed]);pbCheck($r2['number']===$r['number']&&(int)$r2['revision']===2,'Edits must retain number and increment revision');
+try{pbSave($db,'christian',['id'=>$r['id'],'revision'=>1,'request_key'=>$key,'data'=>$d]);throw new RuntimeException('Stale overwrite accepted');}catch(RuntimeException$e){pbCheck($e->getCode()===409,'Stale changes must be rejected');}
+$order=pbConvert($db,'christian',$r['id'],true);pbCheck($order['number']!==$r['number']&&$order['parent_id']===$r['id']&&$order['data']['offer_number']===$r['number'],'Order requires its own linked number');$retry=pbConvert($db,'christian',$r['id'],true);pbCheck($retry['id']===$order['id'],'Conversion retry must not create a second order');
+try{pbConvert($db,'christian',$r['id'],false);throw new RuntimeException('Unconfirmed conversion accepted');}catch(RuntimeException$e){pbCheck(str_contains($e->getMessage(),'bestätigen'),'Actual appointment must be confirmed');}
+$order2=pbSave($db,'christian',['id'=>$order['id'],'revision'=>1,'request_key'=>pbUuid(),'data'=>$changed]);pbCheck($order2['data']['offer_number']===$r['number'],'Editing an order must retain offer linkage');
+$empty=pbSave($db,'christian',['request_key'=>pbUuid(),'data'=>[]]);pbCheck(count(pbMissing($empty['data']))>0,'Partial drafts are allowed and marked incomplete');
+echo "private_business_test: ok (unique immutable numbers, collisions, retry, round trips, prices, profiles, revisions, conversion)\n";
