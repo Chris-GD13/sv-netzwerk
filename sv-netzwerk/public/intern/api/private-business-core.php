@@ -17,12 +17,29 @@ function pbNumber(PDO $db,string $kind,string $source,?int $year=null,?callable 
     throw new RuntimeException('Keine freie Nummer gefunden. Bitte erneut speichern.');
 }
 function pbNativeCaseNumber(PDO $db,string $folderId,?int $year=null): string {$q=$db->prepare('SELECT number FROM private_business_numbers WHERE source_key=?');$q->execute(['folder:'.$folderId]);if($n=$q->fetchColumn())return(string)$n;$q=$db->prepare("SELECT number FROM private_business_records WHERE folder_id=? ORDER BY kind DESC,created_at DESC LIMIT 1");$q->execute([$folderId]);if($n=$q->fetchColumn())return(string)$n;return pbNumber($db,'order','folder:'.$folderId,$year);}
-function pbDefaults(string $profile): array {
-    return ['customer_type'=>'consumer','company'=>'','first_name'=>'','last_name'=>'','billing_street'=>'','billing_postcode'=>'','billing_city'=>'','email'=>'','additional_email'=>'','phone'=>'','mobile'=>'','other_phone'=>'','contact'=>'','expert'=>'','site_same'=>true,'site_street'=>'','site_postcode'=>'','site_city'=>'','scope'=>'','appointment'=>'','valid_until'=>'','pricing'=>'effort','flat_net'=>0,'hours'=>0,'hour_rate'=>220,'travel_rate'=>130,'km_rate'=>0.98,'incidental'=>40,'vat_rate'=>19,'origin'=>$profile==='marc'?'werdohl':'aalen','origin_street'=>'','origin_postcode'=>'','origin_city'=>'','oneway_km'=>0,'oneway_minutes'=>0,'visits'=>1,'route_source'=>'','notes'=>''];
+function pbExperts(): array {
+    static $items=null;if($items!==null)return $items;
+    $items=json_decode((string)file_get_contents(__DIR__.'/private-business-experts.json'),true,512,JSON_THROW_ON_ERROR);
+    if(!is_array($items)||!$items)throw new RuntimeException('Die Expertenliste konnte nicht geladen werden.');return $items;
 }
-function pbClean(array $in,string $profile): array {
+function pbExpertId(string $id): string {return match($id){'christian'=>'christian-waechter','marc'=>'marc-schuett',default=>$id};}
+function pbExpertName(array $d): string {
+    if(empty($d['expert']))return '';if(!empty($d['expert_name']))return (string)$d['expert_name'];
+    $names=array_column(pbExperts(),'name','id');return $names[pbExpertId((string)$d['expert'])]??'';
+}
+function pbUserOfficeEmail(array $user): string {return strtolower(trim((string)($user['email']??'')))==='ks@sv-schuett.eu'?'ks@sv-schuett.eu':'ws@sv-schuett.eu';}
+function pbOfficeEmail(array $data): string {return ($data['correspondence_email']??'')==='ks@sv-schuett.eu'?'ks@sv-schuett.eu':'ws@sv-schuett.eu';}
+function pbDefaults(string $profile): array {
+    return ['customer_type'=>'consumer','company'=>'','first_name'=>'','last_name'=>'','billing_street'=>'','billing_postcode'=>'','billing_city'=>'','email'=>'','additional_email'=>'','phone'=>'','mobile'=>'','other_phone'=>'','contact'=>'','expert'=>'','expert_name'=>'','site_same'=>true,'site_street'=>'','site_postcode'=>'','site_city'=>'','scope'=>'','appointment'=>'','valid_until'=>'','pricing'=>'effort','flat_net'=>0,'hours'=>0,'hour_rate'=>220,'travel_rate'=>130,'km_rate'=>0.98,'incidental'=>40,'vat_rate'=>19,'origin'=>$profile==='marc'?'werdohl':'aalen','origin_street'=>'','origin_postcode'=>'','origin_city'=>'','oneway_km'=>0,'oneway_minutes'=>0,'visits'=>1,'route_source'=>'','notes'=>''];
+}
+function pbClean(array $in,string $profile,array $previous=[]): array {
     $d=pbDefaults($profile);foreach($d as $key=>$default){if(!array_key_exists($key,$in))continue;if(is_bool($default))$d[$key]=(bool)$in[$key];elseif(is_numeric($default)){if(!is_numeric($in[$key])||!is_finite((float)$in[$key])||(float)$in[$key]<0||(float)$in[$key]>1000000)throw new RuntimeException('Ungültiger Wert für '.$key.'.');$d[$key]=round((float)$in[$key],4);}else{$d[$key]=trim((string)$in[$key]);if(mb_strlen($d[$key])>($key==='scope'||$key==='notes'?12000:500))throw new RuntimeException('Eingabe zu lang: '.$key);}}
-    if(!in_array($d['expert'],['','christian','marc'],true))throw new RuntimeException('Ungültige Auswahl des Sachverständigen.');
+    $d['expert']=pbExpertId($d['expert']);$names=array_column(pbExperts(),'name','id');$d['expert_name']='';
+    if($d['expert']!==''){
+        if(isset($names[$d['expert']]))$d['expert_name']=$names[$d['expert']];
+        elseif($d['expert']===pbExpertId((string)($previous['expert']??''))&&!empty($previous['expert_name']))$d['expert_name']=$previous['expert_name'];
+        else throw new RuntimeException('Der Sachverständige ist nicht mehr in der aktuellen Expertenliste. Bitte neu auswählen oder nicht benannt wählen.');
+    }
     if(!in_array($d['customer_type'],['consumer','business'],true)||!in_array($d['origin'],['aalen','werdohl','custom'],true)||!in_array($d['pricing'],['effort','flat'],true))throw new RuntimeException('Ungültige Auswahl.');
     foreach(['email','additional_email']as$key)if($d[$key]!==''&&!filter_var($d[$key],FILTER_VALIDATE_EMAIL))throw new RuntimeException('Ungültige E-Mail-Adresse: '.$d[$key]);
     if($d['visits']<1||$d['visits']>100||floor((float)$d['visits'])!==(float)$d['visits'])throw new RuntimeException('Bitte eine ganze Zahl von 1 bis 100 Terminen eingeben.');
@@ -39,10 +56,10 @@ function pbTotals(array $d): array {
     return ['lines'=>$lines,'km_total'=>$km,'travel_hours'=>$hours,'net'=>$net,'vat'=>$vat,'gross'=>round($net+$vat,2)];
 }
 function pbMissing(array $d): array {$missing=[];foreach(['billing_street'=>'Rechnungsstraße','billing_postcode'=>'Rechnungs-PLZ','billing_city'=>'Rechnungsort','scope'=>'Leistungsbeschreibung']as$k=>$label)if($d[$k]==='')$missing[]=$label;if(pbCustomer($d)==='')$missing[]='Auftraggeber';foreach(pbSite($d)as$k=>$v)if($v==='')$missing[]='Terminadresse: '.$k;if($d['pricing']==='effort'&&$d['hours']<=0)$missing[]='Geschätzter Arbeitsumfang';if($d['pricing']==='flat'&&$d['flat_net']<=0)$missing[]='Pauschalhonorar';return $missing;}
-function pbRecord(PDO $db,string $id,string $profile,bool $lock=false): array {$q=$db->prepare('SELECT * FROM private_business_records WHERE id=? AND profile=?'.($lock&&$db->getAttribute(PDO::ATTR_DRIVER_NAME)==='mysql'?' FOR UPDATE':''));$q->execute([$id,$profile]);$r=$q->fetch();if(!$r)throw new RuntimeException('Angebot oder Auftrag nicht gefunden oder nicht freigegeben.',403);$r['data']=json_decode($r['payload_json'],true,512,JSON_THROW_ON_ERROR);return $r;}
+function pbRecord(PDO $db,string $id,string $profile,bool $lock=false): array {$q=$db->prepare('SELECT * FROM private_business_records WHERE id=? AND profile=?'.($lock&&$db->getAttribute(PDO::ATTR_DRIVER_NAME)==='mysql'?' FOR UPDATE':''));$q->execute([$id,$profile]);$r=$q->fetch();if(!$r)throw new RuntimeException('Angebot oder Auftrag nicht gefunden oder nicht freigegeben.',403);$r['data']=json_decode($r['payload_json'],true,512,JSON_THROW_ON_ERROR);$r['data']['expert']=pbExpertId((string)($r['data']['expert']??''));$r['data']['expert_name']=pbExpertName($r['data']);return $r;}
 function pbEvent(PDO $db,string $id,string $event,array $detail=[]): void {$q=$db->prepare('INSERT INTO private_business_events(id,record_id,event,detail_json,created_at) VALUES(?,?,?,?,?)');$q->execute([pbUuid(),$id,$event,json_encode($detail,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),pbNow()]);}
-function pbSave(PDO $db,string $profile,array $input): array {
-    $data=pbClean((array)($input['data']??[]),$profile);$id=trim((string)($input['id']??''));$key=trim((string)($input['request_key']??''));if(!preg_match('/^[a-f0-9-]{36}$/i',$key))throw new RuntimeException('Speicherkennung fehlt. Bitte die Seite neu öffnen.');
+function pbSave(PDO $db,string $profile,array $input,array $user=[]): array {
+    $id=trim((string)($input['id']??''));$previous=$id!==''?pbRecord($db,$id,$profile)['data']:[];$data=pbClean((array)($input['data']??[]),$profile,$previous);$data['correspondence_email']=$id!==''?pbOfficeEmail($previous):pbUserOfficeEmail($user);$key=trim((string)($input['request_key']??''));if(!preg_match('/^[a-f0-9-]{36}$/i',$key))throw new RuntimeException('Speicherkennung fehlt. Bitte die Seite neu öffnen.');
     $db->beginTransaction();try{
         if($id===''){$q=$db->prepare('SELECT id FROM private_business_records WHERE request_key=? AND profile=?');$q->execute([$key,$profile]);$id=(string)($q->fetchColumn()?:'');if($id!==''){$r=pbRecord($db,$id,$profile);$db->commit();return$r;}}
         if($id===''){$id=pbUuid();$number=pbNumber($db,'offer','offer:'.$key);$q=$db->prepare('INSERT INTO private_business_records(id,profile,number,kind,parent_id,request_key,folder_id,payload_json,revision,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)');$q->execute([$id,$profile,$number,'offer',null,$key,null,json_encode($data,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),1,'draft',pbNow(),pbNow()]);}

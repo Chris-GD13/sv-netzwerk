@@ -25,6 +25,6 @@ function pbGeocode(array $a): array {
     throw new RuntimeException('Adresse nicht eindeutig gefunden: '.$a['street'].', '.$a['postcode'].' '.$a['city'].'. Bitte PLZ und Ortsvorschlag prüfen sowie Hausnummer ergänzen. Es wurden keine geschätzten Streckenwerte übernommen.');
 }
 function pbRoute(array $data): array {
-    $d=pbClean($data,'christian');try{$from=pbGeocode(pbOrigin($d));}catch(Throwable$e){throw new RuntimeException('Startadresse: '.$e->getMessage());}try{$to=pbGeocode(pbSite($d));}catch(Throwable$e){throw new RuntimeException('Terminadresse: '.$e->getMessage());}
+    unset($data['expert'],$data['expert_name']);$d=pbClean($data,'christian');try{$from=pbGeocode(pbOrigin($d));}catch(Throwable$e){throw new RuntimeException('Startadresse: '.$e->getMessage());}try{$to=pbGeocode(pbSite($d));}catch(Throwable$e){throw new RuntimeException('Terminadresse: '.$e->getMessage());}
     $url='https://router.project-osrm.org/route/v1/driving/'.rawurlencode($from['lon']).','.rawurlencode($from['lat']).';'.rawurlencode($to['lon']).','.rawurlencode($to['lat']).'?overview=false';$r=pbRouteCached($url);if(($r['code']??'')!=='Ok'||!isset($r['routes'][0]['distance'],$r['routes'][0]['duration']))throw new RuntimeException('Keine Fahrstrecke gefunden. Bitte Werte manuell eingeben.');return['oneway_km'=>round($r['routes'][0]['distance']/1000,1),'oneway_minutes'=>(int)ceil($r['routes'][0]['duration']/60),'route_source'=>'OpenStreetMap / OSRM · '.gmdate('Y-m-d H:i').' UTC','from'=>$from['display_name'],'to'=>$to['display_name']];
 }

@@ -9,6 +9,8 @@ on:
       - "sv-netzwerk/public/.well-known/**"
       - "sv-netzwerk/public/.htaccess"
       - "sv-netzwerk/src/pages/intern/**"
+      - "sv-netzwerk/src/data/experts.ts"
+      - "sv-netzwerk/scripts/build-private-business-experts.mjs"
       - "sv-netzwerk/src/layouts/InternalLayout.astro"
       - "sv-netzwerk/src/styles/internal-portal.css"
       - "sv-netzwerk/src/styles/global.css"
