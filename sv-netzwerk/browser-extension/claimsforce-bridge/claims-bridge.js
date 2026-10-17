@@ -29,6 +29,28 @@ window.addEventListener('message', event => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (['NAVIGATE_NATIVE_FORM_LIST','OPEN_EXISTING_NATIVE_FORM'].includes(message?.type)) {
+    if (_sender?.id !== chrome.runtime.id) { sendResponse({ok:false,error:'sender-rejected'}); return; }
+    const idPattern=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
+    if(!idPattern.test(message.caseId)||!idPattern.test(message.formId)||!location.pathname.startsWith(`/claims/${message.caseId}/`)){sendResponse({ok:false,error:'identity-mismatch'});return;}
+    const path=message.type==='NAVIGATE_NATIVE_FORM_LIST'?`/claims/${message.caseId}/investigations`:`/claims/${message.caseId}/forms/${message.formId}`;
+    if(message.type==='NAVIGATE_NATIVE_FORM_LIST' && /\/forms\//.test(location.pathname)){
+      const save=[...document.querySelectorAll('button')].find(button=>button.textContent.trim()==='Entwurf speichern');
+      // Navigation must never discard a user's unsaved native form edits.
+      if(!save || !save.disabled){sendResponse({ok:false,error:'native-form-unsaved-or-unverified'});return;}
+    }
+    const links=[...document.querySelectorAll('a[href]')].filter(a=>a.getAttribute('href')===path && a.getClientRects().length>0);
+    // Prefer the visible back link; no guessed endpoints, reload, edit, attach or save controls.
+    const back=links.find(a=>a.textContent.trim()==='Zurück');
+    const link=message.type==='NAVIGATE_NATIVE_FORM_LIST'?back:links.length===1?links[0]:null;
+    if(!link){sendResponse({ok:false,error:'native-link-unavailable'});return;}
+    link.click();sendResponse({ok:true});return;
+  }
+  if (message?.type === 'READ_FORM_READINESS') {
+    if (_sender?.id !== chrome.runtime.id) { sendResponse({ok:false,state:'sender-rejected'}); return; }
+    sendResponse(window.SVNET_FORM_READINESS.observe(document, location, message));
+    return;
+  }
   if (message?.type === 'FETCH_INVESTIGATIONS') {
     // Zuerst mit dem Authorization-Header, den die ClaimsForce-Seite selbst an diese API sendet.
     requestViaPage(message.endpoint, message.queries).then(pageResult => {

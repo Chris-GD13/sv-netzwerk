@@ -1,3 +1,6 @@
+import {openExistingNativeForm} from './native-form-navigation.mjs';
+import { createManualNotesReader } from './claims-notes-reader.mjs';
+import { waitForViewer } from './draft-agent-core.mjs';
 import { clearCredentials, loadCredentials, loadPortalCredentials, saveCredentials } from './vault.js';
 import { mapClaim, safeFileName, sameImportScope, assertSingleClaim, mergeClaimFiles, claimFolderPath, resolveClaimSource } from './import-utils.js';
 import { isActiveRekonTask, mapRekonTask, ownerMatchesRekonProfile, rekonFileVersion, rekonMessageVersion, rekonProfileKey } from './rekon-utils.js';
@@ -20,7 +23,7 @@ const PROFILE_EMAILS = {
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS', 'SW'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
-const WORKER_CODE_VERSION = '1.4.62';
+const WORKER_CODE_VERSION = '1.4.63';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
@@ -40,7 +43,7 @@ const tokenEmail = token => {
     const payload = String(token || '').split('.')[1];
     if (!payload) return '';
     const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(payload.length / 4) * 4, '=')));
-    return normalizeEmail(decoded.email || decoded.preferred_username || decoded.upn || decoded['https://claimsforce.com/email']);
+    return normalizeEmail(decoded.email || decoded.preferred_username || decoded.upn || decoded['https://claimsforce.com/email'] || String(decoded.username || '').replace(/\[at\]/gi,'@'));
   } catch { return ''; }
 };
 const authHeaders = token => ({ Authorization: `Bearer ${token}`, Accept: 'application/json' });
@@ -184,11 +187,28 @@ async function tokenValue(profile) {
   return row.claimsToken && row.claimsTokenProfile === profile ? row.claimsToken : '';
 }
 
-async function waitTab(tabId, timeout = 30000) {
+async function waitTab(tabId, timeout = 30000, formExpectation = null) {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
     const tab = await chrome.tabs.get(tabId);
-    if (tab.status === 'complete') { await sleep(1200); return tab; }
+    if (tab.status === 'complete') {
+      const route = String(tab.url || '').match(/^https:\/\/web\.claimsforce\.com\/claims\/([^/]+)\/forms\/([^/?#]+)/);
+      if (formExpectation) {
+        if (!route || route[1] !== formExpectation.caseId || route[2] !== formExpectation.formId) throw new Error('[CF-FORM-WRONG-TARGET]');
+        // Read-only readiness check. An unavailable field mapping fails closed.
+        const outcome = await waitForViewer(async () => {
+          const probe = await chrome.tabs.sendMessage(tabId, {
+            type:'READ_FORM_READINESS', caseId:route[1], formId:route[2], requiredFields:formExpectation.requiredFields || []
+          });
+          if (!probe?.ok) return {observationBlocked:true};
+          return probe.observation;
+        }, {clock:()=>Date.now(), pause:sleep, timeoutMs:Math.max(1,deadline-Date.now()), intervalMs:200});
+        if (!outcome.ok) throw new Error(`[CF-FORM-NOT-READY] ${outcome.state}; native field mapping/readback not yet proven.`);
+        return tab;
+      }
+      // Existing import/login calls stay unchanged. Only an explicit form operation opts in.
+      await sleep(1200); return tab;
+    }
     await sleep(300);
   }
   throw new Error('ClaimsForce hat nicht rechtzeitig geladen.');
@@ -366,9 +386,29 @@ async function fingerprint(value) {
 const fileVersion = file => [file?.id, file?.updatedDate || file?.updatedAt || file?.modifiedAt || file?.createdDate || file?.createdAt, file?.sizeInBytes || file?.size || file?.fileSize, file?.name || file?.fileName || file?.originalFilename].map(value => String(value || '')).join('|');
 const messageVersion = message => ['v3', message?.id, message?.updatedDate || message?.updatedAt || message?.createdDate || message?.createdAt || message?.sentAt].map(value => String(value || '')).join('|');
 
-async function uploadBuffer(portalTabId, profile, folderId, name, mime, modified, buffer) {
+async function prepareSourceUpload(portalTabId, profile, folderId, claimId, sourceFileId) {
+  const sourceIdentity = { profile, claimId, sourceFileId, targetFolderId: folderId };
+  const response = await portal(portalTabId, { type: 'PORTAL_SOURCE_STATE', profile, folderId, sourceIdentity });
+  const originalReadState = response?.result?.source_state;
+  if (!originalReadState || originalReadState.context?.caseId !== claimId || originalReadState.context?.sourceFileId !== sourceFileId || originalReadState.context?.profile !== profile) throw new Error('SOURCE_CONTEXT_REQUIRED');
+  return { sourceIdentity, originalReadState };
+}
+async function uploadSourceBuffer(portalTabId, profile, folderId, name, mime, buffer, source) {
+  const sourceSha256 = [...new Uint8Array(await crypto.subtle.digest('SHA-256', buffer))].map(v => v.toString(16).padStart(2, '0')).join('');
   const uploadId = crypto.randomUUID();
-  await portal(portalTabId, { type: 'PORTAL_UPLOAD_START', uploadId, profile, folderId, name: safeFileName(name), mime: mime || 'application/octet-stream', modified: modified || 0 });
+  await portal(portalTabId, { type: 'PORTAL_SOURCE_UPLOAD_START', uploadId, profile, folderId, name: safeFileName(name), mime: mime || 'application/octet-stream', ...source, sourceSha256 });
+  const bytes = new Uint8Array(buffer), size = 384 * 1024;
+  for (let offset = 0; offset < bytes.length; offset += size) {
+    const chunk = bytes.subarray(offset, Math.min(offset + size, bytes.length)); let binary = '';
+    for (let index = 0; index < chunk.length; index += 0x8000) binary += String.fromCharCode(...chunk.subarray(index, index + 0x8000));
+    await portal(portalTabId, { type: 'PORTAL_UPLOAD_CHUNK', uploadId, chunk: btoa(binary) });
+  }
+  return portal(portalTabId, { type: 'PORTAL_SOURCE_UPLOAD_FINISH', uploadId });
+}
+
+async function uploadBuffer(portalTabId, profile, folderId, name, mime, modified, buffer, supportingIdentity = null) {
+  const uploadId = crypto.randomUUID();
+  await portal(portalTabId, { type: 'PORTAL_UPLOAD_START', uploadId, profile, folderId, name: safeFileName(name), mime: mime || 'application/octet-stream', modified: modified || 0, supportingIdentity });
   const bytes = new Uint8Array(buffer), size = 384 * 1024;
   for (let offset = 0; offset < bytes.length; offset += size) {
     const chunk = bytes.subarray(offset, Math.min(offset + size, bytes.length));
@@ -379,7 +419,6 @@ async function uploadBuffer(portalTabId, profile, folderId, name, mime, modified
   return portal(portalTabId, { type: 'PORTAL_UPLOAD_FINISH', uploadId });
 }
 
-function collectClaimsforceNotes(values){const out=[],seen=new Set();const visit=(v,d=0)=>{if(v==null||d>8||typeof v==='string')return;if(Array.isArray(v)){v.forEach(x=>visit(x,d+1));return}if(typeof v!=='object'||seen.has(v))return;seen.add(v);for(const [k,c] of Object.entries(v)){if(/^(notes?|internalNotes|claimsforceNotes)$/i.test(k)){const list=Array.isArray(c)?c:(c&&typeof c==='object'?Object.values(c):[c]);for(const n of list){if(typeof n==='string'&&n.trim())out.push({text:n.trim()});else if(n&&typeof n==='object'){const text=String(n.text||n.body||n.content||n.note||'').trim();if(text)out.push({id:String(n.id||''),text,author:String(n.author?.name||n.author||n.createdBy?.name||n.user?.name||n.user||''),createdAt:String(n.createdAt||n.updatedAt||n.date||'')})}}}else visit(c,d+1)}};values.forEach(v=>visit(v));const unique=new Map();for(const n of out)unique.set([n.id,n.createdAt,n.author,n.text].join('|'),n);return[...unique.values()]}
 
 async function ensureInvoicedListTab(tabId){
   const current=await chrome.tabs.get(tabId);
@@ -543,9 +582,7 @@ async function runImport(run) {
     const preliminary = { claimsforce_claim_id: id, schaden_nr: String(item.label || '').trim() };
     const preliminaryState = await portal(portalTabId(), { type: 'PORTAL_SYNC_STATE', mapped: preliminary, profile });
     const preliminaryMeta = preliminaryState.result?.meta || {};
-    // Ein Vollabgleich übernimmt nur noch Fälle, die noch nicht vollständig im Portal liegen (Signatur wird erst nach erfolgreichem Fall gespeichert); so setzt ein abgebrochener Lauf dort fort, wo er stand.
-    const alreadyComplete = !!preliminaryState.result?.existed && !!preliminaryMeta.claimsforce_sync_signature;
-    if ((fullSync && !singleSync && alreadyComplete) || (!useInvoicedClaims && preliminaryState.result?.existed && item.listVersion && preliminaryMeta.claimsforce_list_version === item.listVersion)) {
+    if (!fullSync && !singleSync && !useInvoicedClaims && preliminaryState.result?.existed && item.listVersion && preliminaryMeta.claimsforce_list_version === item.listVersion) {
       skipped++;
       await progress(portalTabId(), `Auftrag ${index + 1}/${claims.length}: seit dem letzten Import unverändert, wird ohne erneuten Detailabruf übersprungen.`, index + 1, claims.length);
       await diagnostic(run, 'CF-CASE-DELTA-SKIP', `Auftrag ${index + 1}/${claims.length} ist laut ClaimsForce-Änderungsstand unverändert.`, { current: index + 1, total: claims.length, claimIndex: index + 1, skippedCases: skipped });
@@ -558,7 +595,7 @@ async function runImport(run) {
       requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}`, token, true),
       requestJson(`${config.FILES_API_ENDPOINT}/claims/${id}/files`, token),
       requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}/messages`, token),
-      requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}/notes`, token),
+      Promise.resolve(null), // Notes are read only by the explicit manual notes action.
       requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}/appointments`, token, true),
       requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}/stakeholders`, token, true),
       requestJson(`${config.FILES_API_ENDPOINT}/claims/${id}/client-files`, token),
@@ -574,10 +611,7 @@ async function runImport(run) {
     const folders = unwrap(rawFolders, 'folders') || [];
     const fileIndex = files.map(file => ({ id: file.id, name: file.fileName || file.name, path: claimFolderPath(file, folders), parentFolderId: file.parentFolderId, rootFolderId: file.rootFolderId, attachmentReference: !!file.attachmentReference }));
     const tasks = (unwrap(rawTasks, 'tasks') || []).filter(task => task.claimId === id);
-    const notes = collectClaimsforceNotes([rawNotes, rawCommunication, rawDisposition]).map(note => {
-      const source = (unwrap(rawNotes, 'notes') || []).find(item => item.id === note.id);
-      return source ? { ...note, createdAt: source.created?.date || note.createdAt, updatedAt: source.updated?.date || '', author: source.created?.by?.name || source.created?.by?.id || note.author, source } : note;
-    });
+    const notes = Array.isArray(preliminaryMeta.claimsforce_notizen) ? preliminaryMeta.claimsforce_notizen : [];
     const mapped = mapClaim(disposition, communication, Array.isArray(appointments) ? appointments : [], rawStakeholders || {});
     if (singleSync) assertSingleClaim(singleClaimNumber, [{ id, schaden_nr: mapped.schaden_nr }]);
     const inventory = { claimId: id, claimNumber: mapped.schaden_nr, files: files.length, messages: messages.length, notes: notes.length, tasks: tasks.length, attachments: messages.reduce((n, m) => n + (m.attachments || []).length, 0) };
@@ -590,7 +624,7 @@ async function runImport(run) {
     const signature = await fingerprint({ mapped: stableMapped, fileVersions, messageVersions, appointmentVersions, notes, tasks, folders, fileIndex, schema: 3 });
     const state = await portal(portalTabId(), { type: 'PORTAL_SYNC_STATE', mapped, profile });
     const existingMeta = state.result?.meta || {};
-    if (state.result?.existed && existingMeta.claimsforce_sync_signature === signature) {
+    if (!fullSync && !singleSync && state.result?.existed && existingMeta.claimsforce_sync_signature === signature) {
       inventory.restrictedFiles = existingMeta.claimsforce_importbestand?.restrictedFiles || [];
       inventory.errors = [];
       inventory.filesAccessible = files.length - inventory.restrictedFiles.length;
@@ -602,8 +636,9 @@ async function runImport(run) {
     await diagnostic(run, 'CF-CASE-UPSERT', `Auftrag ${index + 1}/${claims.length}: Portal-Fall wird angelegt oder ergänzt.`, { current: index, total: claims.length, claimIndex: index + 1 });
     const upsert = await portalOperation(portalTabId(), { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, profile, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, tasks, importedAt: new Date().toISOString() }, knownState: { existed: !!state.result?.existed, folderId: state.result?.folderId || '', meta: existingMeta } });
     const folderId = upsert.folderId;
-    await uploadBuffer(portalTabId(), profile, folderId, 'ClaimsForce_Aufgaben_Notizen.json', 'application/json', 0, new TextEncoder().encode(JSON.stringify({ inventory, tasks, notes, sourceNotes: rawNotes }, null, 2)).buffer);
-    await uploadBuffer(portalTabId(), profile, folderId, 'ClaimsForce_Ordner_Dokumentenverzeichnis.json', 'application/json', 0, new TextEncoder().encode(JSON.stringify({ folders, files: fileIndex, messages: messages.map(message => ({ id: message.id, attachments: message.attachments || [] })) }, null, 2)).buffer);
+    const uploadSupporting = (name,mime,modified,buffer) => uploadBuffer(portalTabId(),profile,folderId,name,mime,modified,buffer,{claimId:id,profile});
+    await uploadSupporting( 'ClaimsForce_Aufgaben_Notizen.json', 'application/json', 0, new TextEncoder().encode(JSON.stringify({ inventory, tasks, notes, sourceNotes: rawNotes }, null, 2)).buffer);
+    await uploadSupporting( 'ClaimsForce_Ordner_Dokumentenverzeichnis.json', 'application/json', 0, new TextEncoder().encode(JSON.stringify({ folders, files: fileIndex, messages: messages.map(message => ({ id: message.id, attachments: message.attachments || [] })) }, null, 2)).buffer);
     await diagnostic(run, 'CF-CASE-FILES', `Auftrag ${index + 1}/${claims.length}: Anhänge und Nachrichten werden übernommen (Bridge ${BRIDGE_VERSION}).`, { current: index, total: claims.length, claimIndex: index + 1 });
     let caseDeadline = Date.now() + 300000;
     const checkDeadline = where => { if (Date.now() > caseDeadline) throw new Error(`Zeitlimit von 5 Minuten ohne Fortschritt für diesen Auftrag überschritten (${where}).`); };
@@ -616,7 +651,7 @@ async function runImport(run) {
     for (const file of files) {
       if (!file?.id) continue;
       const version = fileVersion(file);
-      if (knownFileVersions.has(version)) continue;
+      if (!fullSync && !singleSync && knownFileVersions.has(version)) continue;
       fileNumber++;
       if (run.stopRequested) { await savePartial().catch(() => {}); throw new Error('Import wurde pausiert.'); }
       checkDeadline(`Datei ${fileNumber}/${files.length}`);
@@ -625,6 +660,8 @@ async function runImport(run) {
       const baseName = safeFileName(file.name || file.fileName || file.originalFilename, `ClaimsForce-${file.id}`);
       let name = safeFileName(sourcePath ? `${sourcePath}__${baseName}` : baseName);
       await progress(portalTabId(), `${mapped.schaden_nr || item.label}: ${name}`, index, claims.length);
+      // Capture the portal original BEFORE downloading Claims bytes; CAS rejects intervening edits.
+      const source = await prepareSourceUpload(portalTabId(), profile, folderId, id, file.id);
       const url = `${config.FILES_API_ENDPOINT}/claims/${encodeURIComponent(id)}/files/${encodeURIComponent(file.id)}?token=${encodeURIComponent(token)}`;
       const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
       let response, fileBuffer;
@@ -650,7 +687,7 @@ async function runImport(run) {
         const filename = /filename\*=UTF-8''([^;]+)/i.exec(disposition)?.[1] || /filename="?([^";]+)/i.exec(disposition)?.[1];
         if (filename) { try { name = safeFileName(decodeURIComponent(filename)); } catch { name = safeFileName(filename); } }
       }
-      const uploaded = await uploadBuffer(portalTabId(), profile, folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), Date.parse(file.updatedAt || file.createdAt || '') || 0, fileBuffer);
+      const uploaded = await uploadSourceBuffer(portalTabId(), profile, folderId, name, file.mimeType || file.contentType || response.headers.get('content-type'), fileBuffer, source);
       if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) filesDone++;
       doneFileVersions.add(version);
       caseDeadline = Date.now() + 300000;
@@ -674,7 +711,7 @@ async function runImport(run) {
         return { id: attachment.id, name: file?.name || attachment.fileName || attachment.name || `Falldokument ${attachment.id}`, path: file?.path || '', restricted: restrictedFiles.some(file => file.id === attachment.id) };
       }) } };
       const bytes = new TextEncoder().encode(JSON.stringify(archivedRecord, null, 2));
-      const uploaded = await uploadBuffer(portalTabId(), profile, folderId, `Mail_ClaimsForce-Nachricht_${stamp}_${record?.id || message.id}_${subject}.json`, 'application/json', Date.parse(record?.updatedDate || record?.updatedAt || record?.createdDate || record?.createdAt || '') || 0, bytes.buffer);
+      const uploaded = await uploadSupporting( `Mail_ClaimsForce-Nachricht_${stamp}_${record?.id || message.id}_${subject}.json`, 'application/json', Date.parse(record?.updatedDate || record?.updatedAt || record?.createdDate || record?.createdAt || '') || 0, bytes.buffer);
       if (!uploaded?.result?.duplicate && !uploaded?.result?.excluded) messagesDone++;
       let messageComplete = true;
       const attachments = Array.isArray(record?.attachments) ? record.attachments : (Array.isArray(record?.files) ? record.files : []);
@@ -700,7 +737,7 @@ async function runImport(run) {
           attachmentBuffer = await response.arrayBuffer();
         }
         if (attachmentBuffer === null) throw new Error(`Mail-Anhang „${attachmentName}“ enthält keine abrufbaren Dateidaten.`);
-        await uploadBuffer(portalTabId(), profile, folderId, 'Mail_ClaimsForce-Anhang_' + stamp + '_' + attachmentName, attachment.mimeType || attachment.contentType || 'application/octet-stream', Date.parse(attachment.updatedAt || attachment.createdAt || '') || 0, attachmentBuffer);
+        await uploadSupporting( 'Mail_ClaimsForce-Anhang_' + stamp + '_' + attachmentName, attachment.mimeType || attachment.contentType || 'application/octet-stream', Date.parse(attachment.updatedAt || attachment.createdAt || '') || 0, attachmentBuffer);
       }
       if (messageComplete) doneMessageVersions.add(version);
       caseDeadline = Date.now() + 300000;
@@ -716,10 +753,10 @@ async function runImport(run) {
     inventory.errors = sourceErrors;
     inventory.restrictedFiles = restrictedFiles;
     inventory.filesAccessible = files.length - restrictedFiles.length;
-    await uploadBuffer(portalTabId(), profile, folderId, 'ClaimsForce_Aufgaben_Notizen.json', 'application/json', 0, new TextEncoder().encode(JSON.stringify({ inventory, tasks, notes, sourceNotes: rawNotes }, null, 2)).buffer);
+    await uploadSupporting( 'ClaimsForce_Aufgaben_Notizen.json', 'application/json', 0, new TextEncoder().encode(JSON.stringify({ inventory, tasks, notes, sourceNotes: rawNotes }, null, 2)).buffer);
     if (sourceErrors.length) {
       await savePartial();
-      throw new Error(`[CF-SOURCE-INCOMPLETE] ${doneFileVersions.size}/${files.length} Dateien und ${messages.length} Nachrichten geprüft; Aufgaben und Notizen übernommen. ${sourceErrors.length} Quellenfehler offen: ${sourceErrors[0].message}`);
+      throw new Error(`[CF-SOURCE-INCOMPLETE] ${doneFileVersions.size}/${files.length} Dateien und ${messages.length} Nachrichten geprüft; Aufgaben übernommen; vorhandene Notizen beibehalten. ${sourceErrors.length} Quellenfehler offen: ${sourceErrors[0].message}`);
     }
     await portal(portalTabId(), { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions: [...doneFileVersions], messageVersions: [...doneMessageVersions], notes, tasks, inventory, listVersion: item.listVersion || '', profile });
     updated++;
@@ -743,6 +780,7 @@ async function runImport(run) {
 }
 
 async function startImport(sender, message) {
+  if(readManualNotes.isBusy())throw Error('NOTES_REQUEST_BUSY');
   if (message.protocol !== 2 || message.workerVersion !== WORKER_CODE_VERSION) return { ok: false, error: '[CF-WORKER-VERSION] Importprogramm muss neu geladen werden.' };
   const portalTabId = sender.tab?.id;
   if (!portalTabId) return { ok: false, error: '[CF-RUN-00] Portal-Registerkarte fehlt.' };
@@ -761,6 +799,7 @@ async function startImport(sender, message) {
   const saved = (await chrome.storage.local.get('claimsActiveRun')).claimsActiveRun;
   const resumesSaved = saved?.status === 'running' && sameImportScope(saved, requested) && !saved.stopRequested;
   const run = resumesSaved ? { ...saved, portalTabId, runId: saved.runId || requested.runId } : requested;
+  if(readManualNotes.isBusy())throw Error('NOTES_REQUEST_BUSY');
   runningImport = run;
   runImport(run).then(async result => {
     await chrome.storage.local.set({ claimsActiveRun: { ...run, status: 'done', result, finishedAt: new Date().toISOString() } });
@@ -960,6 +999,7 @@ async function runRekonImport(run) {
 }
 
 function startRekonImport(sender, message) {
+  if(readManualNotes.isBusy())throw Error('NOTES_REQUEST_BUSY');
   const portalTabId = sender.tab?.id;
   if (!portalTabId) return { ok: false, error: 'Portal-Registerkarte fehlt.' };
   const run = { runId: message.runId || crypto.randomUUID(), profile: rekonProfileKey(message.profile), portalTabId, startedAt: new Date().toISOString() };
@@ -974,7 +1014,31 @@ chrome.runtime.onConnect.addListener(port => {
   port.onMessage.addListener(() => {});
 });
 
+const readManualNotes = createManualNotesReader({
+  getToken: async profile => { const token=await tokenValue(profile); return token && tokenEmail(token)===PROFILE_EMAILS[profile] ? token : ''; },
+  getConfig: () => requestJson('https://web.claimsforce.com/config', '', false, 10000),
+  request: (url,token) => requestJson(url,token,false,20000),
+  isImportRunning: () => !!runningImport || !!runningRekonImport
+});
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if(message?.type==='OPEN_NATIVE_FORM_READONLY'){
+    let origin='';try{origin=new URL(sender.tab?.url||'').origin;}catch{}
+    if(sender.id!==chrome.runtime.id||origin!=='https://www.sv-netzwerk.eu'){sendResponse({ok:false,error:'CF_FORM_SENDER_REJECTED'});return;}
+    if(runningImport||runningRekonImport){sendResponse({ok:false,error:'CF_FORM_IMPORT_BUSY'});return;}
+    openExistingNativeForm(message,{
+      sessionProfile:async()=>{const state=await chrome.storage.session.get(['claimsTokenProfile']);return state.claimsTokenProfile;},
+      getTab:id=>chrome.tabs.get(id),send:(id,data)=>chrome.tabs.sendMessage(id,data),clock:()=>Date.now(),pause:sleep
+    }).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));
+    return true;
+  }
+
+  if (message?.type === 'READ_CLAIMS_NOTES') {
+    const url = String(sender.tab?.url || sender.url || '');
+    if (sender.id !== chrome.runtime.id || !/^https:\/\/www\.sv-netzwerk\.eu\/intern\//.test(url)) { sendResponse({ok:false,error:'NOTES_SENDER_REJECTED'}); return; }
+    readManualNotes(message.identity).then(result => sendResponse({ok:true,result})).catch(error => sendResponse({ok:false,error:error.message}));
+    return true;
+  }
+
   if (message?.type === 'KUSS_SCAN_JOBS' && sender.tab?.id) {
     scanKussJobs().then(result => sendResponse(result)).catch(error => sendResponse({ ok: false, error: error.message }));
     return true;

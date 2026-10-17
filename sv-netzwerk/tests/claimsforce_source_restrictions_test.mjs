@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { webcrypto } from 'node:crypto';
 import { claimFolderPath, safeFileName } from '../browser-extension/claimsforce-bridge/import-utils.js';
 import { isClaimsforceMail, normalizeClaimsforceMail } from '../scripts/claimsforce-mail.js';
 
@@ -33,14 +34,15 @@ for (const groupId of [7, -1]) {
   assert.equal(groups.length, groupId >= 0 ? 1 : 0);
   if (groupId >= 0) assert.equal(groups[0].groupId, groupId, 'Neuer Tab bleibt im aufrufenden Chat');
 }
+const sourceTransport = worker.slice(worker.indexOf('async function prepareSourceUpload('), worker.indexOf('async function uploadBuffer('));
 const transfer = worker.slice(worker.indexOf('    let caseDeadline ='), worker.indexOf('\n    updated++;'));
 async function run(status, reference) {
-  const uploaded = [], calls = [], commits = [];
+  const uploaded = [], calls = [], commits = [], sourceStates = [], sourceUploads = new Map();
   const files = [ { id: 'locked', fileName: 'Kostennote.pdf', attachmentReference: reference },
     { id: 'accessible', fileName: 'Messprotokoll.pdf', parentFolderId: 'OTHER' } ];
   const messages = [ { id: 'mail-1', createdDate: '2026-07-06', payload: { subject: 'Kostennote' }, attachments: [{ id: 'locked', type: 'CLAIM_FILE' }] },
     { id: 'mail-2', payload: { subject: 'Weitere Nachricht' }, attachments: [{ id: 'accessible', type: 'CLAIM_FILE' }] } ];
-  const context = { Date, Set, Map, TextEncoder, AbortController, AbortSignal, setTimeout, clearTimeout,
+  const context = { Date, Set, Map, TextEncoder, Uint8Array, AbortController, AbortSignal, setTimeout, clearTimeout, crypto: webcrypto, btoa: value => Buffer.from(value, 'binary').toString('base64'), fullSync: true, singleSync: false,
     run: {}, files, fileIndex: files.map(file => ({ id: file.id, name: file.fileName })), messages, folders: [], existingMeta: {}, index: 0, claims: [{}], mapped: { schaden_nr: '26-085905-9' }, item: {},
     profile: 'christian', folderId: 'case', id: 'claim', token: 'test', config: { FILES_API_ENDPOINT: 'https://files.example', COMMUNICATION_API_ENDPOINT: 'https://messages.example' },
     fileVersion: file => file?.id || '', messageVersion: message => message.id,
@@ -48,17 +50,34 @@ async function run(status, reference) {
     filesDone: 0, messagesDone: 0, appointmentsDone: 0, appointments: [], notes: [{ id: 'note' }], tasks: [{ id: 'task' }], rawNotes: [],
     inventory: { files: 2, messages: 2, notes: 1, tasks: 1 }, signature: 'complete',
     async diagnostic() {}, async progress() {},
-    async portal(_tabId, message) { commits.push(message); return {}; },
-    async uploadBuffer(_tabId, _profile, _folderId, name) { uploaded.push(name); return { result: {} }; },
+    async portal(_tabId, message) {
+      if (message.type === 'PORTAL_SOURCE_STATE') {
+        sourceStates.push(message.sourceIdentity);
+        return { result: { source_state: { kind: 'EXISTING_SOURCE', context: { caseId: message.sourceIdentity.claimId, sourceFileId: message.sourceIdentity.sourceFileId, profile: message.profile }, portalFileId: `stored-${message.sourceIdentity.sourceFileId}`, originalPrecondition: { sha256: 'original-fixture-hash' } } } };
+      }
+      if (message.type === 'PORTAL_SOURCE_UPLOAD_START') { sourceUploads.set(message.uploadId, {...message, chunks: []}); return {ok:true}; }
+      if (message.type === 'PORTAL_UPLOAD_CHUNK') { sourceUploads.get(message.uploadId).chunks.push(message.chunk); return {ok:true}; }
+      if (message.type === 'PORTAL_SOURCE_UPLOAD_FINISH') {
+        const source = sourceUploads.get(message.uploadId);
+        assert(source.originalReadState && /^[a-f0-9]{64}$/.test(source.sourceSha256));
+        uploaded.push(source.name);
+        return {result:{file:{id:source.originalReadState.portalFileId}}};
+      }
+      commits.push(message); return {};
+    },
+    async uploadSupporting(name) { uploaded.push(name); return { result: {} }; },
     async requestJson(url) { return messages.find(message => url.endsWith(message.id)); },
     unwrap: value => value,
     async fetch(url) { calls.push(url); const blocked = url.includes('/locked?'); return { ok: !blocked, status: blocked ? status : 200, headers: { get: () => 'application/pdf' }, arrayBuffer: async () => new ArrayBuffer(1) }; }
   };
-  const outcome = await vm.runInNewContext(`(async()=>{try{${transfer}\nreturn {ok:true};}catch(error){return {ok:false,message:error.message};}})()`, context);
-  return { outcome, uploaded, calls, commits, context };
+  const outcome = await vm.runInNewContext(`(async()=>{${sourceTransport}try{${transfer}\nreturn {ok:true};}catch(error){return {ok:false,message:error.message};}})()`, context);
+  return { outcome, uploaded, calls, commits, context, sourceStates, sourceUploads };
 }
 const protectedReference = await run(403, true);
-assert(protectedReference.outcome.ok);
+assert(protectedReference.outcome.ok, protectedReference.outcome.message);
+assert.equal(protectedReference.sourceStates.length, 2, 'Beide Originaldateien erhalten vor Download einen Source-State');
+assert.equal(protectedReference.sourceUploads.size, 1, 'Die gesperrte Referenz darf keinen Source-Upload beginnen');
+assert.equal([...protectedReference.sourceUploads.values()][0].sourceIdentity.sourceFileId, 'accessible');
 assert.equal(protectedReference.context.inventory.restrictedFiles.length, 1);
 assert.equal(protectedReference.context.inventory.errors.length, 0);
 assert.equal(protectedReference.context.filesDone, 1);

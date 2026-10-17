@@ -1,0 +1,54 @@
+name: Claimsforce Stabilisierung (ohne Deployment)
+on:
+  pull_request:
+    paths:
+      - 'sv-netzwerk/browser-extension/claimsforce-bridge/**'
+      - 'sv-netzwerk/public/intern/**'
+      - 'sv-netzwerk/src/pages/intern/versicherungsfaelle/**'
+      - 'sv-netzwerk/tests/**'
+      - '.github/workflows/claimsforce-stabilisation.yml'
+  push:
+    branches: ['codex/claimsforce-stabilisierung']
+permissions:
+  contents: read
+jobs:
+  isolated-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_sqlite, mbstring, fileinfo
+      - name: Native Bereitschaft, GF-Grenzen und simulierter Speicherweg
+        run: |
+          for test in sv-netzwerk/tests/claims_native_*-test.mjs sv-netzwerk/tests/claims_native_navigation_test.mjs; do node "$test"; done
+      - name: Manuelle Notizen und Source-Transport
+        run: |
+          node sv-netzwerk/tests/claims_notes_test.mjs
+          node sv-netzwerk/tests/claims_source_transport_test.mjs
+          php sv-netzwerk/tests/notes_import_test.php
+          php sv-netzwerk/tests/claimsforce_source_storage_test.php
+          php sv-netzwerk/tests/storage_integrity_test.php
+          php sv-netzwerk/tests/claimsforce_context_snapshot_test.php
+          node sv-netzwerk/tests/claimsforce_worker_source_refresh_test.mjs
+      - name: Vorhandene Bridge-Regression
+        run: |
+          node sv-netzwerk/tests/claimsforce_worker_handshake_test.mjs
+          node sv-netzwerk/tests/claimsforce_source_restrictions_test.mjs
+          node sv-netzwerk/tests/claimsforce_single_scope_test.mjs
+          node sv-netzwerk/tests/claimsforce_import_test.mjs
+          node sv-netzwerk/tests/rekon_bridge_readiness_test.mjs
+      - name: Syntax und Patch
+        run: |
+          php -l sv-netzwerk/public/intern/api/google-drive-sync.php
+          php -l sv-netzwerk/public/intern/api/ionos-storage.php
+          php -l sv-netzwerk/public/intern/api/ionos-storage-recovery.php
+          php -l sv-netzwerk/public/intern/api/claimsforce-source-refresh-core.php
+          php -l sv-netzwerk/public/intern/api/notes-import-core.php
+          node --check sv-netzwerk/browser-extension/claimsforce-bridge/service-worker.js
+          git diff --check

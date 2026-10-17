@@ -16,7 +16,7 @@ async function scenario(message,profile='marc'){
  for(const click of clicks.sort((a,b)=>Number(!!b.capture)-Number(!!a.capture))){if(stopped)break;click.fn({preventDefault(){},stopImmediatePropagation(){stopped=true}})}
  return {sent,nodes};
 }
-const valid={type:'SVNET_CLAIMS_BRIDGE_READY_V2',version:'1.4.62',workerVersion:'1.4.62',protocol:2};
+const valid={type:'SVNET_CLAIMS_BRIDGE_READY_V2',version:'1.4.63',workerVersion:'1.4.63',protocol:2};
 const good=await scenario(valid);
 assert(good.sent.some(x=>x.type==='SVNET_CLAIMS_BRIDGE_PING'));
 assert(good.sent.some(x=>x.type==='SVNET_REKON_IMPORT_START'&&x.profile==='marc'));
