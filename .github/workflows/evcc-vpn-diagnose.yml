@@ -1,0 +1,45 @@
+name: EVCC VPN diagnosis (read only)
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/evcc-vpn-diagnose.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect existing server without modifying services
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          printf "WireGuard service: "; systemctl is-active wg-quick@evcc-home || true
+          wg show evcc-home
+          ip -4 route show dev evcc-home
+          printf "VPN and evcc listeners\n"
+          ss -lntu | grep -E '51820|7070|8887' || true
+          printf "Host firewall\n"
+          if command -v ufw >/dev/null 2>&1; then ufw status; fi
+          printf "Container status\n"
+          docker ps --filter name=evcc-energy --format '{{.Names}} {{.Status}} {{.Ports}}'
+          printf "Private evcc HTTP: "
+          curl --max-time 5 -s -o /dev/null -w '%{http_code}\n' http://10.77.66.1:7070/ || true
+          CHECK
