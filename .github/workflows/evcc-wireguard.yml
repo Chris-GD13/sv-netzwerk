@@ -1,0 +1,73 @@
+name: EVCC private WireGuard link
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/evcc-wireguard.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Set up dedicated WireGuard link for energy services
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          test "$(id -u)" = 0
+          test ! -e /etc/wireguard/evcc-home.conf
+          if ip route show | grep -q '10.77.66.'; then echo "VPN subnet already used"; exit 1; fi
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          apt-get install -y -qq wireguard-tools
+          install -d -m 700 /etc/wireguard
+          umask 077
+          wg genkey > /etc/wireguard/evcc-home.key
+          pub=$(wg pubkey < /etc/wireguard/evcc-home.key)
+          {
+           printf '[Interface]\nAddress = 10.77.66.1/24\nListenPort = 51820\nPrivateKey = '
+           cat /etc/wireguard/evcc-home.key
+           printf '\n[Peer]\nPublicKey = rXbqUT2JOe/61OSfSyJwbvaFEiOAxWZMAckig6sfUFg=\nAllowedIPs = 10.77.66.2/32, 192.168.178.0/24\n'
+          } > /etc/wireguard/evcc-home.conf
+          chmod 600 /etc/wireguard/evcc-home.conf
+          systemctl enable --now wg-quick@evcc-home
+          if command -v ufw >/dev/null && ufw status | grep -q '^Status: active'; then
+           ufw allow 51820/udp comment 'EVCC WireGuard'
+          fi
+          cp -p /opt/evcc-energy/compose.yml /opt/evcc-energy/compose.before-vpn.yml
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/opt/evcc-energy/compose.yml')
+          s=p.read_text()
+          assert '127.0.0.1:7070:7070' in s and '127.0.0.1:8887:8887' in s
+          s=s.replace('127.0.0.1:7070:7070','10.77.66.1:7070:7070').replace('127.0.0.1:8887:8887','10.77.66.1:8887:8887')
+          p.write_text(s)
+          PY
+          docker compose -f /opt/evcc-energy/compose.yml up -d
+          for attempt in $(seq 1 20); do
+           if curl --silent --fail --output /dev/null http://10.77.66.1:7070/; then break; fi
+           sleep 2
+          done
+          curl --silent --fail --output /dev/null http://10.77.66.1:7070/
+          docker port evcc-energy
+          systemctl is-active apache2 wg-quick@evcc-home
+          printf 'EVCC_WG_PUBLIC_KEY=%s\n' "$pub"
+          echo "EVCC_VPN_SERVER_READY"
+          CHECK
