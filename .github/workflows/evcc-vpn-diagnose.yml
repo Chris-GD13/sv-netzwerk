@@ -43,3 +43,5 @@ jobs:
           printf "Private evcc HTTP: "
           curl --max-time 5 -s -o /dev/null -w '%{http_code}\n' http://10.77.66.1:7070/ || true
           CHECK
+
+# Verify provider firewall update.
