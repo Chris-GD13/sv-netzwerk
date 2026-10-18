@@ -1,0 +1,176 @@
+name: Account for delayed charging meter on startup
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/warmwasser-start-alignment.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Read available energy inputs without changes
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          cp /opt/anker-homeassistant/config/packages/warmwasser.yaml /opt/anker-homeassistant/backups/warmwasser-before-start-alignment.yaml
+          cat > /opt/anker-homeassistant/config/packages/warmwasser.yaml <<'PACKAGE'
+          # Additional comfort control, not electrical overload protection.
+          # Net-import residual detection can be masked by generation/storage.
+          rest:
+            - resource: http://10.77.66.1:7070/api/state
+              scan_interval: 5
+              timeout: 4
+              sensor:
+                - name: ww_evcc_zeit
+                  unique_id: ww_evcc_zeit
+                  value_template: "{{ now().isoformat() if (value_json.get('result', value_json).get('loadpoints', []) | length > 0) else 'unknown' }}"
+                - name: ww_evcc_modus
+                  unique_id: ww_evcc_modus
+                  value_template: "{{ value_json.get('result', value_json)['loadpoints'][0]['mode'] }}"
+                - name: ww_evcc_leistung
+                  unique_id: ww_evcc_leistung
+                  unit_of_measurement: W
+                  device_class: power
+                  value_template: "{{ value_json.get('result', value_json)['loadpoints'][0]['chargePower'] }}"
+          rest_command:
+            ww_evcc_modus:
+              url: "http://10.77.66.1:7070/api/loadpoints/1/mode/{{ modus if modus in ['off','smart','now'] else 'off' }}"
+              method: POST
+              timeout: 4
+          input_boolean:
+            ww_pause:
+              name: Warmwasser Ladepause aktiv
+              icon: mdi:water-boiler
+            ww_test:
+              name: Warmwasser Pausentest
+              initial: false
+          input_select:
+            ww_vorheriger_modus:
+              name: Lademodus vor Warmwasserpause
+              options: ["off", "smart", "now"]
+          template:
+            - sensor:
+                - name: ww_netzlast_ohne_auto
+                  unique_id: ww_netzlast_ohne_auto
+                  unit_of_measurement: W
+                  device_class: power
+                  state: >-
+                    {% if is_number(states('sensor.smart_meter_netznutzung')) and is_number(states('sensor.smart_meter_netzeinspeisung')) and is_number(states('sensor.ww_evcc_leistung')) %}
+                    {{ (states('sensor.smart_meter_netznutzung')|float - states('sensor.smart_meter_netzeinspeisung')|float - states('sensor.ww_evcc_leistung')|float)|round(0) }}
+                    {% else %}{{ this.state }}{% endif %}
+              binary_sensor:
+                - name: ww_messung_aktuell
+                  unique_id: ww_messung_aktuell
+                  delay_off: "00:00:02"
+                  state: >-
+                    {% set t = as_timestamp(states('sensor.smart_meter_mqtt_zeit'), 0) %}
+                    {% set e = as_timestamp(states('sensor.ww_evcc_zeit'), 0) %}
+                    {{ 0 <= as_timestamp(now())-t < 25 and 0 <= as_timestamp(now())-e < 15
+                       and is_number(states('sensor.ww_netzlast_ohne_auto'))
+                       and is_number(states('sensor.smart_meter_netznutzung'))
+                       and is_number(states('sensor.smart_meter_netzeinspeisung'))
+                       and is_number(states('sensor.ww_evcc_leistung'))
+                       and states('sensor.ww_evcc_modus') in ['off','smart','now'] }}
+                - name: ww_hohe_restlast
+                  unique_id: ww_hohe_restlast
+                  delay_on: "00:00:35"
+                  state: "{{ is_state('binary_sensor.ww_messung_aktuell','on') and states('sensor.ww_netzlast_ohne_auto')|float(0) >= 8000 }}"
+                - name: ww_freigabe
+                  unique_id: ww_freigabe
+                  delay_on: "00:01:00"
+                  state: "{{ is_state('binary_sensor.ww_messung_aktuell','on') and states('sensor.ww_netzlast_ohne_auto')|float(99999) < 4000 and is_state('input_boolean.ww_test','off') }}"
+          automation:
+            - id: ww_anker_livewerte
+              alias: "Warmwasser - schnelle Anker Messwerte aufrechterhalten"
+              triggers:
+                - trigger: homeassistant
+                  event: start
+                - trigger: time_pattern
+                  minutes: "/2"
+              actions:
+                - action: switch.turn_on
+                  target:
+                    entity_id: switch.smart_meter_mqtt_uberlagerung
+                - action: number.set_value
+                  target:
+                    entity_id: number.smart_meter_mqtt_statusintervall
+                  data:
+                    value: 5
+                - action: button.press
+                  target:
+                    entity_id: button.smart_meter_mqtt_echtzeitdaten
+              mode: single
+            - id: ww_ladepause_regeln
+              alias: "Warmwasser - Laden pausieren und danach fortsetzen"
+              description: "Zusatzregel: Netzlast ohne Auto ab 8 kW fuer 35 s pausiert; ab 24 kW Netzbezug und 8 kW Restlast sofort. Versatz der Wallboxmessung beim Ladestart wird abgefangen; unter 4 kW nach 60 s fortsetzen. Alte Messwerte pausieren. Keine elektrische Schutzfunktion; Solar/ Speicher koennen Netzlast verdecken."
+              triggers:
+                - trigger: time_pattern
+                  seconds: "/5"
+              actions:
+                - variables:
+                    modus: "{{ states('sensor.ww_evcc_modus') }}"
+                    sperre: "{{ not is_state('binary_sensor.ww_messung_aktuell','on') or is_state('binary_sensor.ww_hohe_restlast','on') or (states('sensor.smart_meter_netznutzung')|float(0) >= 24000 and states('sensor.ww_netzlast_ohne_auto')|float(0) >= 8000) or is_state('input_boolean.ww_test','on') }}"
+                - choose:
+                    - conditions: "{{ sperre and (modus in ['smart','now'] or is_state('input_boolean.ww_pause','on')) }}"
+                      sequence:
+                        - if: "{{ is_state('input_boolean.ww_pause','off') and modus in ['smart','now'] }}"
+                          then:
+                            - action: input_select.select_option
+                              target:
+                                entity_id: input_select.ww_vorheriger_modus
+                              data:
+                                option: "{{ modus }}"
+                            - action: input_boolean.turn_on
+                              target:
+                                entity_id: input_boolean.ww_pause
+                        - action: rest_command.ww_evcc_modus
+                          data:
+                            modus: "off"
+                          response_variable: antwort
+                    - conditions: "{{ is_state('input_boolean.ww_pause','on') and is_state('binary_sensor.ww_freigabe','on') and not sperre }}"
+                      sequence:
+                        - action: rest_command.ww_evcc_modus
+                          data:
+                            modus: "{{ states('input_select.ww_vorheriger_modus') }}"
+                          response_variable: antwort
+                        - condition: template
+                          value_template: "{{ antwort.status == 200 }}"
+                        - action: input_boolean.turn_off
+                          target:
+                            entity_id: input_boolean.ww_pause
+              mode: single
+            - id: ww_stopp_kontrolle
+              alias: "Warmwasser - fehlende Ladeabschaltung melden"
+              triggers:
+                - trigger: template
+                  value_template: "{{ is_state('input_boolean.ww_pause','on') and states('sensor.ww_evcc_leistung')|float(99999) > 300 }}"
+                  for: "00:00:45"
+              actions:
+                - action: persistent_notification.create
+                  data:
+                    notification_id: ww_stopp_fehler
+                    title: "Ladepause nicht bestaetigt"
+                    message: "Die Warmwasserregel hat eine Pause angefordert, aber die Ladeleistung ist nach 45 Sekunden nicht unter 300 W oder fehlt. Wallbox und Verbindung pruefen."
+          
+          PACKAGE
+          docker exec anker-homeassistant python -m homeassistant --script check_config --config /config
+          CHECK
