@@ -1,0 +1,65 @@
+name: Install approved Anker Solix integration
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/anker-solix-install.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Install checksum-verified Anker Solix 3.9.0 integration
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          umask 077
+          test -d /opt/anker-homeassistant/config
+          test ! -e /opt/anker-homeassistant/config/custom_components/anker_solix
+          install -d -m 700 /opt/anker-homeassistant/downloads
+          curl --fail --silent --show-error --location --max-time 120 https://codeload.github.com/thomluther/ha-anker-solix/tar.gz/5ffabdbdf6218770bafdb9f6632ed0dd3ae80a10 -o /opt/anker-homeassistant/downloads/anker-solix-3.9.0.tar.gz
+          printf '%s\n' '21962c6ad90f7fb81af219a8584cf6bcf909de57850cd768d772d69a51483c1e  /opt/anker-homeassistant/downloads/anker-solix-3.9.0.tar.gz' | sha256sum --check --status
+          python3 - <<'PY'
+          import tarfile, pathlib, json
+          root=pathlib.Path('/opt/anker-homeassistant')
+          prefix='ha-anker-solix-5ffabdbdf6218770bafdb9f6632ed0dd3ae80a10/custom_components/anker_solix/'
+          dest=root/'config/custom_components/anker_solix'
+          with tarfile.open(root/'downloads/anker-solix-3.9.0.tar.gz') as archive:
+              members=[m for m in archive.getmembers() if m.name.startswith(prefix) and m.isfile()]
+              assert members
+              for member in members:
+                  rel=pathlib.PurePosixPath(member.name[len(prefix):])
+                  assert not rel.is_absolute() and '..' not in rel.parts
+                  target=dest.joinpath(*rel.parts)
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  target.write_bytes(archive.extractfile(member).read())
+          assert json.loads((dest/'manifest.json').read_text())['version']=='3.9.0'
+          print('ANKER_COMPONENT_VERSION_3_9_0_VERIFIED')
+          PY
+          docker restart --time 60 anker-homeassistant >/dev/null
+          for attempt in $(seq 1 36); do
+            if curl --max-time 5 --fail --silent --output /dev/null http://10.77.66.1:8123/; then break; fi
+            sleep 5
+          done
+          curl --max-time 5 --fail --silent --output /dev/null http://10.77.66.1:8123/
+          systemctl is-active apache2 wg-quick@evcc-home
+          echo ANKER_INTEGRATION_INSTALLED_READY_FOR_LOGIN
+          CHECK
