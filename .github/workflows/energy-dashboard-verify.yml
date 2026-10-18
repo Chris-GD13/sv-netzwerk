@@ -31,18 +31,6 @@ jobs:
           ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
           ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
           set -eu
-          docker inspect anker-homeassistant --format '{{.State.Status}}'
-          python3 - <<'PY'
-          import pathlib,sqlite3,json
-          base=pathlib.Path('/opt/anker-homeassistant/config')
-          db=sqlite3.connect('file:'+str(base/'home-assistant_v2.db')+'?mode=ro',uri=True)
-          for row in db.execute("SELECT DISTINCT entity_id FROM states_meta WHERE entity_id LIKE 'sensor.energiebilanz_%'"):
-           e=row[0]
-           r=db.execute("SELECT s.state,a.shared_attrs FROM states s JOIN states_meta m ON s.metadata_id=m.metadata_id LEFT JOIN state_attributes a ON a.attributes_id=s.attributes_id WHERE m.entity_id=? ORDER BY s.state_id DESC LIMIT 1",(e,)).fetchone()
-           print('METER',e,r)
-          for e in ['sensor.solix_power_dock_akkuleistung_gesamt','sensor.smart_meter_netznutzung','binary_sensor.ww_messwerte_frisch','input_boolean.ww_pause','input_boolean.ww_test']:
-              print('STATUS',e,db.execute("SELECT s.state FROM states s JOIN states_meta m ON s.metadata_id=m.metadata_id WHERE m.entity_id=? ORDER BY s.state_id DESC LIMIT 1",(e,)).fetchone())
-          print('WARM_WATER_PACKAGE_PRESENT',(base/'packages/warmwasser.yaml').exists())
-          PY
-          docker logs --since 4m anker-homeassistant 2>&1 | grep -E 'energy_dashboard|Invalid config|energiebilanz' | tail -20 || true
+          docker inspect evcc-energy --format '{{.State.Status}} restart={{.RestartCount}}'
+          docker logs --tail 65 evcc-energy 2>&1 | sed -E 's/(token|password|secret)[=:][^ ,]+/REDACTED/gi'
           CHECK
