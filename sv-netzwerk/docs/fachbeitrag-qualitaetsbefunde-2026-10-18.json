@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-18",
+  "astro": {
+    "errors": 0,
+    "warnings": 0,
+    "hints": 0,
+    "build": "success"
+  },
+  "html_full_build": {
+    "command": "npx --yes html-validate@9 \"dist/**/*.html\"",
+    "baseline_before_archive_changes": 584,
+    "after_author_landmark_fix": 476,
+    "status": "failed-existing-backlog",
+    "rules": {
+      "aria-label-misuse": 1,
+      "tel-non-breaking": 1,
+      "element-required-attributes": 1,
+      "element-required-content": 1,
+      "no-inline-style": 53,
+      "no-implicit-input-type": 22,
+      "doctype-style": 11,
+      "meta-refresh": 5,
+      "unique-landmark": 76,
+      "long-title": 95,
+      "no-raw-characters": 2,
+      "valid-id": 204,
+      "void-style": 4
+    },
+    "today_article_has_findings": false,
+    "no_blanket_quality_release": true
+  },
+  "external_links": {
+    "scope": "Heutiger und 20 redigierte öffentliche Fachartikel, mit absoluter Buildwurzel und statischen Indexdateien",
+    "initial_result": {
+      "unique_urls": 249,
+      "checks": 1937,
+      "errors": 33,
+      "timeouts": 1
+    },
+    "diagnosis": "Tatsächliche 404-Fundstellen korrigiert. Wiederholungsprüfung hat keine 404, keine 502 und keinen Timeout mehr ergeben; 15 wiederholte Fundstellen liefern beim CLI-Abruf der BAuA HTTP 403. Dies ist keine erfolgreiche vollständige externe Linkprüfung.",
+    "global_workflow_configuration": "Die alte Linkchecker-Konfiguration gab keine Buildwurzel an; root-relative lokale Links waren dadurch nicht korrekt auflösbar.",
+    "repaired_result": {
+      "checks": 1936,
+      "unique_urls": 247,
+      "ok": 1900,
+      "errors": 15,
+      "timeouts": 0,
+      "remaining_status_codes": [
+        403
+      ],
+      "remaining_host": "www.baua.de",
+      "all_detected_404s_fixed": true
+    }
+  },
+  "visual_probe": {
+    "articles": [
+      "innentueren-schallschutz-pruefwert-einbau-schallwege",
+      "waermepumpe-ueberflutung-pruefung-kostenabgrenzung",
+      "balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung",
+      "fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum"
+    ],
+    "article_body_and_sources": "lesbar, Quellen ohne Recherchekommentare",
+    "open_layout_observation": "Im gemeinsamen Footer überlagerten sich in einer Browserprobe bei etwa 1350 Pixel Breite die große Überschrift und der Kontaktlink. Separate Layoutkorrektur offen."
+  },
+  "deployment_history": {
+    "archive_merge": "e9b656be1b6bb7dce26009eda54868201c661f4f",
+    "cancelled_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39096924606",
+    "replacement_commit": "402665082d0c1f88344327414ec6a0c3bec1c49f",
+    "replacement_successful_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39097181706"
+  },
+  "overall": "Inhalte veröffentlicht; technische Gesamtprüfung nicht vollständig fehlerfrei. Vollständige individuelle fachliche Archivprüfung offen."
+}

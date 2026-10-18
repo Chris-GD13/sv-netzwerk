@@ -36,6 +36,8 @@ jobs:
             --verbose
             --no-progress
             --max-retries 2
+            --root-dir ${{ github.workspace }}/sv-netzwerk/dist
+            --index-files index.html,index.php
             --accept 200,204,206,301,302,307,308,429
             "sv-netzwerk/dist/**/*.html"
           fail: true
