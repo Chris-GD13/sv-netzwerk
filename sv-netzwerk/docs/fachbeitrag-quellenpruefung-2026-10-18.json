@@ -3,7 +3,15 @@
   "publication_id": "2026-10-18-fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum",
   "article": "fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum",
   "author": "christian-waechter",
-  "status": "built-deployment-pending",
+  "status": "published-verified",
+  "article_type": "eigenstaendiges-sachverstaendigenthema",
+  "expert_rotation": {
+    "selected_person": "Christian Wächter",
+    "profile_url": "https://www.sv-netzwerk.eu/experten/christian-waechter/",
+    "verified_specialty": "Fenster, Türen und Fassaden; Profil und Artikelzuordnung am 18.10.2026 live geprüft",
+    "progress": "Der vollständige erste Zyklus vom 12. bis 17.10.2026 ist abgeschlossen. Die bestehende Tagesreservierung eröffnet am 18.10.2026 den nächsten Zyklus; innerhalb dieses neuen Zyklus liegt noch keine Wiederholung vor.",
+    "selection_basis": "Bestehende atomare Tagesreservierung übernommen; Thema und Profil passen fachlich zusammen. Keine zusätzliche konkrete Fallzuständigkeit behauptet."
+  },
   "source_review": {
     "checked_at": "2026-10-18",
     "decision_date": null,
@@ -114,6 +122,23 @@
     "encoding": "passed",
     "public_copy": "passed",
     "visible_umlauts": "passed",
-    "knowledge_dist_links_search_sitemap": "passed"
+    "knowledge_dist_links_search_sitemap": "passed",
+    "verified_again_at": "2026-10-18T06:14:00+02:00",
+    "python_runtime_note": "Windows python3 war nur der Microsoft-Store-Alias. Die identische npm-Buildkette wurde mit C:/Users/chris/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe als python3-Ersatz vollständig erfolgreich ausgeführt."
+  },
+  "deployment": {
+    "content_commit": "155c34345630678cf1f7be9cb7b005208010cb43",
+    "register_verification_commit": "6c6973c076d408d3bb42c840f51c79be4e6655f0",
+    "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39096105150",
+    "conclusion": "success",
+    "verified_at": "2026-10-18T06:16:45.484+02:00",
+    "live_evidence": [
+      "canonical detail page HTTP 200 and visibly rendered",
+      "cache-busted Fachwissen overview visibly lists the 18.10.2026 article",
+      "Fenster und Türen category and Kondensat tag visibly list the article",
+      "sitemap-0.xml contains the canonical URL",
+      "robots.txt allows public pages and references sitemap-index.xml",
+      "deploy-version.txt reports the content commit"
+    ]
   }
 }
