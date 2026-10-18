@@ -1,0 +1,47 @@
+name: Read camera entities
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/home-camera-inventory.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Read available energy inputs without changes
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          python3 - <<'PY'
+          import json,pathlib,sqlite3
+          base=pathlib.Path('/opt/anker-homeassistant/config')
+          entities=json.loads((base/'.storage/core.entity_registry').read_text())['data']['entities']
+          devices={d['id']:d for d in json.loads((base/'.storage/core.device_registry').read_text())['data']['devices']}
+          db=sqlite3.connect('file:'+str(base/'home-assistant_v2.db')+'?mode=ro',uri=True)
+          for e in entities:
+           if e['entity_id'].startswith('camera.'):
+            d=devices.get(e.get('device_id'),{})
+            row=db.execute('SELECT s.state FROM states s JOIN states_meta m ON s.metadata_id=m.metadata_id WHERE m.entity_id=? ORDER BY s.state_id DESC LIMIT 1',(e['entity_id'],)).fetchone()
+            print('CAMERA',json.dumps({k:e.get(k) for k in ['entity_id','platform','disabled_by','name','original_name']}),json.dumps({k:d.get(k) for k in ['name','name_by_user','manufacturer','model']}),'state',row)
+          print('CONFIG', (base/'configuration.yaml').read_text())
+          PY
+          CHECK
