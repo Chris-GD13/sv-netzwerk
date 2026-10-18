@@ -1,0 +1,37 @@
+name: HomePilot connection check
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/homepilot-connection-check.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check HomePilot over existing VPN without changes
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          ip route get 192.168.178.34
+          curl --connect-timeout 8 --max-time 15 --fail --silent --output /dev/null --write-out 'HOMEPILOT_HTTP=%{http_code}\n' http://192.168.178.34/
+          docker exec anker-homeassistant python -c "import urllib.request; r=urllib.request.urlopen('http://192.168.178.34/', timeout=10); print('HA_CONTAINER_HOMEPILOT_HTTP=' + str(r.status))"
+          CHECK
