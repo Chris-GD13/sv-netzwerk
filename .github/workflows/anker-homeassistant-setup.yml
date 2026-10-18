@@ -1,0 +1,77 @@
+name: Private Home Assistant for Anker
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/anker-homeassistant-setup.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Install isolated official Home Assistant with VPN-only web access
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          test "$(id -u)" = 0
+          systemctl is-active --quiet wg-quick@evcc-home
+          test ! -e /opt/anker-homeassistant/compose.yml
+          if docker container inspect anker-homeassistant >/dev/null 2>&1; then
+            echo "Existing Home Assistant found; refusing to overwrite"
+            exit 1
+          fi
+          test "$(awk '/MemAvailable/ {print $2}' /proc/meminfo)" -gt 2200000
+          install -d -m 700 /opt/anker-homeassistant/config
+          cat > /opt/anker-homeassistant/compose.yml <<'COMPOSE'
+          services:
+            homeassistant:
+              image: ghcr.io/home-assistant/home-assistant:2026.10.2
+              container_name: anker-homeassistant
+              restart: unless-stopped
+              stop_grace_period: 60s
+              ports:
+                - "10.77.66.1:8123:8123"
+              environment:
+                TZ: Europe/Berlin
+              volumes:
+                - ./config:/config
+              mem_limit: 2g
+              cpus: 1.5
+              security_opt:
+                - no-new-privileges:true
+              logging:
+                driver: json-file
+                options:
+                  max-size: "10m"
+                  max-file: "3"
+          COMPOSE
+          docker compose -f /opt/anker-homeassistant/compose.yml config --quiet
+          docker compose -f /opt/anker-homeassistant/compose.yml pull --quiet
+          docker compose -f /opt/anker-homeassistant/compose.yml up -d
+          for attempt in $(seq 1 36); do
+            if curl --max-time 5 --fail --silent --output /dev/null http://10.77.66.1:8123/; then break; fi
+            sleep 5
+          done
+          curl --max-time 5 --fail --silent --output /dev/null http://10.77.66.1:8123/
+          docker port anker-homeassistant
+          systemctl is-active apache2 wg-quick@evcc-home
+          echo HOME_ASSISTANT_PRIVATE_READY
+          CHECK
