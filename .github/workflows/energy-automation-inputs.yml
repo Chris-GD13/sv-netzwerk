@@ -1,0 +1,56 @@
+name: Read energy automation inputs
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/energy-automation-inputs.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Read available energy inputs without changes
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          python3 - <<'PY'
+          import json, urllib.request, urllib.error, pathlib
+          for path in ('/api/state','/api/health'):
+              try:
+                  with urllib.request.urlopen('http://10.77.66.1:7070'+path,timeout=5) as r:
+                      print('EVCC_HTTP',path,r.status)
+                      if path == '/api/state':
+                          d=json.load(r)
+                          if isinstance(d,dict) and 'result' in d: d=d['result']
+                          print('EVCC_STATE',json.dumps({k:d.get(k) for k in ['gridPower','pvPower','batteryPower','homePower']}))
+                          for i,l in enumerate(d.get('loadpoints',[])):
+                              print('LOADPOINT',i+1,json.dumps({k:l.get(k) for k in ['title','mode','chargePower','connected','charging','maxCurrent','enabled']}))
+              except urllib.error.HTTPError as e: print('EVCC_HTTP',path,e.code)
+              except Exception as e: print('EVCC_READ_ERROR',type(e).__name__)
+          p=pathlib.Path('/opt/anker-homeassistant/config/.storage/core.entity_registry')
+          data=json.loads(p.read_text())['data']['entities']
+          for e in data:
+              if e.get('platform')=='anker_solix' and any(s in e['entity_id'] for s in ['power','leistung','netznutzung','einspeis','mqtt','verbrauch','zeit']):
+                  print('ANKER_ENTITY',e['entity_id'],'disabled='+str(e.get('disabled_by')))
+          c=pathlib.Path('/opt/anker-homeassistant/config/configuration.yaml').read_text()
+          print('HA_CONFIG_TOP_LEVEL_KEYS',[line.split(':')[0] for line in c.splitlines() if line and not line[0].isspace() and not line.startswith('#')])
+          PY
+          CHECK
