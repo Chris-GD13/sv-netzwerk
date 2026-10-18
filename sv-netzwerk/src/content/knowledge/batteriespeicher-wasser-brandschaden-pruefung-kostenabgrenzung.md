@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/", "/
 damageTypes: ["gebaeude", "elementar", "brand", "technik"]
 publication:
   publishedAt: 2026-10-09
-  updatedAt: 2026-10-09
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Batteriespeicher nach Wasser- oder Brandschaden prüfen"
@@ -119,22 +119,24 @@ Die Schadenprüfung dokumentiert zuerst Wasserhöhe, Systemaufbau und Identifika
 
 **Für Sachverständige:** Befund, Ursache, Sicherheitsentscheidung und Kostenfolge sichtbar trennen. Eigene Fachgrenzen benennen, Datenverluste durch Reset oder Demontage vermeiden und offene Nachweise konkret formulieren.
 
+## Technischer Regelwerksbezug
+
+Die DIN EN IEC 62933-5-2:2025-08 ist ein **Norm-Entwurf** und ersetzt nicht die veröffentlichte Fassung von November 2021. Die genannten Regelwerke begründen Prüffelder; die konkrete Freigabe richtet sich zusätzlich nach Anlage, Hersteller und tatsächlichem Schadenbefund.
+
 ## Fazit
 
 Nach Wasser- oder Brandeinwirkung ist ein Batteriespeicher nicht aufgrund seines äußeren Zustands oder einer App-Anzeige freizugeben. Entscheidend sind kontrollierte Gefahrenabwehr, dokumentierte Exposition, hersteller- und fachbezogene Diagnose sowie eine eindeutige System- und Kostenabgrenzung. Erst dieser Prüfpfad schafft eine belastbare Grundlage für Wiederinbetriebnahme, Austauschentscheidung und Regulierung.
 
-## Quellen und Aktualitätsstand
+## Quellen und weiterführende Hinweise
 
-Quellenprüfung und Veröffentlichung: **09.10.2026**. Veröffentlichungsdatum und Geltungsstatus wurden getrennt geprüft. Die DIN EN IEC 62933-5-2:2025-08 ist ein **Norm-Entwurf** und ersetzt nicht die veröffentlichte Fassung von November 2021. Die genannten Regelwerke begründen Prüffelder; die konkrete Freigabe richtet sich zusätzlich nach Anlage, Hersteller und tatsächlichem Schadenbefund.
-
-- [VDE: Elektrische Geräte und Anlagen bei Hochwasser](https://www.vde.com/topics-de/verbraucherschutz/elektronik-hochwasser) – Gefahrenlage und Fachprüfung vor Wiederinbetriebnahme.
-- [DGUV Information 205-041, Ausgabe 02/2024](https://publikationen.dguv.de/regelwerk/dguv-informationen/4668/brandschutz-beim-umgang-mit-lithium-ionen-batterien) – Brandgefahren, Prävention und organisatorische Maßnahmen.
-- [VDE-AR-E 2510-50:2017-05](https://www.vde-verlag.de/p/normen/vde-ar-e-2510-50-vde-ar-e-2510-50-anwendungsregel-2017-05/0500098-DE-PR) – Sicherheitsanforderungen stationärer Lithium-Batteriespeicher.
-- [VDE-AR-E 2510-2:2021-02](https://www.vde-verlag.de/p/normen/vde-ar-e-2510-2-vde-ar-e-2510-2-anwendungsregel-2021-02/0500195-DE-PR) – Planung, Errichtung, Betrieb, Demontage und Entsorgung am Niederspannungsnetz.
-- [DIN EN IEC 62619:2023-08](https://www.dinmedia.de/de/norm/din-en-iec-62619/366856432) – veröffentlichte Sicherheitsanforderungen für Lithiumzellen und -batterien in industriellen Anwendungen.
-- [DIN EN IEC 62933-5-2:2021-11](https://www.dinmedia.de/en/standard/din-en-iec-62933-5-2/343286758) – veröffentlichte Sicherheitsanforderungen an netzintegrierte elektrochemische Energiespeichersysteme.
-- [DIN EN IEC 62933-5-2:2025-08](https://www.dinmedia.de/de/norm-entwurf/din-en-iec-62933-5-2/392951038) – ausdrücklich als Norm-Entwurf dokumentiert.
-- [Umweltbundesamt: Batterien und Altbatterien](https://www.umweltbundesamt.de/themen/abfall-ressourcen/produktverantwortung-in-der-abfallwirtschaft/batterien-altbatterien) – Rücknahme-, Transport- und Verwertungswege.
-- [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html) – Schadenminderung und Aufwendungsersatz.
+- [VDE: Elektrische Geräte und Anlagen bei Hochwasser](https://www.vde.com/topics-de/verbraucherschutz/elektronik-hochwasser).
+- [DGUV Information 205-041, Ausgabe 02/2024](https://publikationen.dguv.de/regelwerk/dguv-informationen/4668/brandschutz-beim-umgang-mit-lithium-ionen-batterien).
+- [VDE-AR-E 2510-50:2017-05](https://www.vde-verlag.de/p/normen/vde-ar-e-2510-50-vde-ar-e-2510-50-anwendungsregel-2017-05/0500098-DE-PR).
+- [VDE-AR-E 2510-2:2021-02](https://www.vde-verlag.de/p/normen/vde-ar-e-2510-2-vde-ar-e-2510-2-anwendungsregel-2021-02/0500195-DE-PR).
+- DIN Media, [DIN EN IEC 62619:2023-08](https://www.dinmedia.de/de/norm/din-en-iec-62619/366856432).
+- DIN Media, [DIN EN IEC 62933-5-2:2021-11](https://www.dinmedia.de/en/standard/din-en-iec-62933-5-2/343286758).
+- DIN Media, [DIN EN IEC 62933-5-2:2025-08](https://www.dinmedia.de/de/norm-entwurf/din-en-iec-62933-5-2/392951038), Norm-Entwurf.
+- [Umweltbundesamt: Batterien und Altbatterien](https://www.umweltbundesamt.de/themen/abfall-ressourcen/produktverantwortung-in-der-abfallwirtschaft/batterien-altbatterien).
+- [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html).
 
 Weiterführend: [Elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/), [elektrische Brandursachen](/fachwissen/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung/), [Photovoltaikanlagen nach Sturm und Hagel](/fachwissen/pv-anlage-hagelschaden-pruefung-kostenabgrenzung/) und [prüffähige Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).

@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/", "/
 damageTypes: ["gebaeude", "elementar", "technik"]
 publication:
   publishedAt: 2026-10-08
-  updatedAt: 2026-10-08
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Wallbox nach Überflutung: Prüfung und Kostenabgrenzung"
@@ -109,19 +109,21 @@ Die Prüfung ordnet zunächst jedem Ladepunkt seinen tatsächlichen Befund zu un
 
 **Für Sachverständige:** Feststellung, Schilderung und technische Bewertung sichtbar trennen. Eigene Fachgrenzen benennen, offene Nachweise konkret anfordern und keine elektrotechnische Freigabe ersetzen. Die Kostenprüfung erst auf eine belastbare Anlagen- und Schadenabgrenzung stützen.
 
+## Technischer Regelwerksbezug
+
+Die DIN EN IEC 61851-1:2019-12 ist die veröffentlichte Normfassung; spätere Berichtigungen sind bei der Fachanwendung zu berücksichtigen. Die DIN EN IEC 61851-1:2026-06 ist zum Prüfdatum ein **Norm-Entwurf** und ersetzt die veröffentlichte Fassung nicht. Der VDE-Sicherheitshinweis, die VDE|FNN-Informationen und die DGUV-Veröffentlichungen begründen Sicherheits-, Zuständigkeits- und Dokumentationsanforderungen; sie ersetzen keine hersteller- und anlagenbezogene Einzelfallprüfung. Die VVG-Quellen dienen nur der begrenzten rechtlichen Einordnung.
+
 ## Fazit
 
 Nach einer Überflutung entscheidet nicht die trockene Oberfläche über die weitere Nutzung einer Wallbox. Erforderlich sind eine sichere Außerbetriebnahme, eine bauteilbezogene Aufnahme und ein dokumentierter elektrotechnischer Prüfpfad. Erst wenn Befund, Herstelleranforderungen und Freigabe zusammenpassen, lassen sich Reparatur, Austausch und Modernisierung prüffähig trennen. Diese Methodik schafft zugleich die Grundlage für eine sachgerechte Kosten- und Deckungsprüfung im Einzelfall.
 
-## Quellen und Aktualitätsstand
+## Quellen und weiterführende Hinweise
 
-Quellenprüfung und Veröffentlichung: **08.10.2026**. Die DIN EN IEC 61851-1:2019-12 ist die veröffentlichte Normfassung; spätere Berichtigungen sind bei der Fachanwendung zu berücksichtigen. Die DIN EN IEC 61851-1:2026-06 ist zum Prüfdatum ein **Norm-Entwurf** und ersetzt die veröffentlichte Fassung nicht. Der VDE-Sicherheitshinweis, die VDE|FNN-Informationen und die DGUV-Veröffentlichungen begründen Sicherheits-, Zuständigkeits- und Dokumentationsanforderungen; sie ersetzen keine hersteller- und anlagenbezogene Einzelfallprüfung. Die VVG-Quellen dienen nur der begrenzten rechtlichen Einordnung.
-
-- [VDE: Richtiges Verhalten bei überfluteten Räumen](https://www.vde.com/resource/blob/1574620/fda279015cf78879792fcb038468b4e1/vde-infoblatt-ueberflutung-data.pdf) – elektrische Gefahren und fachkundige Freigabe.
-- [DIN EN IEC 61851-1:2019-12](https://www.dinmedia.de/de/norm/din-en-iec-61851-1/312355027) – veröffentlichte Grundanforderungen an konduktive Ladesysteme.
-- [DIN EN IEC 61851-1:2026-06](https://www.dinmedia.de/de/norm-entwurf/din-en-iec-61851-1/401725186) – ausdrücklich als Norm-Entwurf dokumentiert.
-- [VDE|FNN: Elektromobilität](https://www.vde.com/de/fnn/themen/elektromobilitaet) – Netzanschluss, Installation und Zuständigkeiten.
-- [DGUV Information 203-072](https://publikationen.dguv.de/regelwerk/dguv-informationen/2879/wiederkehrende-pruefungen-elektrischer-anlagen-und-ortsfester-betriebsmittel-fachwissen-fuer-pruefper) – Prüfgrundsätze für ortsfeste elektrische Anlagen.
-- [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html) – Schadenminderung und Aufwendungsersatz.
+- [VDE: Richtiges Verhalten bei überfluteten Räumen](https://www.vde.com/resource/blob/1574620/fda279015cf78879792fcb038468b4e1/vde-infoblatt-ueberflutung-data.pdf).
+- DIN Media, [DIN EN IEC 61851-1:2019-12](https://www.dinmedia.de/de/norm/din-en-iec-61851-1/312355027).
+- DIN Media, [DIN EN IEC 61851-1:2026-06](https://www.dinmedia.de/de/norm-entwurf/din-en-iec-61851-1/401725186), Norm-Entwurf.
+- [VDE|FNN: Elektromobilität](https://www.vde.com/de/fnn/themen/elektromobilitaet).
+- [DGUV Information 203-072](https://publikationen.dguv.de/regelwerk/dguv-informationen/2879/wiederkehrende-pruefungen-elektrischer-anlagen-und-ortsfester-betriebsmittel-fachwissen-fuer-pruefper).
+- [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html).
 
 Weiterführend: [Elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/), [Wärmepumpen nach Überflutung](/fachwissen/waermepumpe-ueberflutung-pruefung-kostenabgrenzung/), [Eintrittswege bei Überflutung](/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/) und [Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).

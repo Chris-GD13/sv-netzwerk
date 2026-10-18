@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/brandschaden-rauch-russ-kontamination-schadenbereich
 damageTypes: ["gebaeude", "brand", "technik"]
 publication:
   publishedAt: 2026-10-04
-  updatedAt: 2026-10-04
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Rauch- und Wärmeabzug nach Brandschaden prüfen"
@@ -108,15 +108,15 @@ Für eine belastbare Akte sollten Schadenmeldung, Einsatz- und Stillsetzungsberi
 
 Nach einem Brandschaden ist die RWA-Anlage als sicherheitsrelevante Funktionskette zu prüfen. Ein belastbarer Vorgang verbindet Schadenbild, Mess- und Prüfauftrag, fachkundige Freigabe und eine transparente Kostenprüfung. So bleiben technische Sicherheitsentscheidung, versicherungsrechtliche Einzelfallprüfung und eine mögliche Verbesserung sauber getrennt.
 
-## Aktualitäts- und Geltungsstand
+## Technische und rechtliche Einordnung
 
-Dieser Beitrag wurde am **04.10.2026** veröffentlicht und am selben Tag fachlich geprüft. Die genannten DIN-Normen sind mit dem bei DIN Media ausgewiesenen Status „aktuell“ beziehungsweise als im September 2026 veröffentlichte DIN 18232-101 gekennzeichnet. Normen werden nicht rückwirkend zum Entscheidungs- oder Schadenstag angewendet; maßgeblich sind im Einzelfall Anlagenzulassung, Genehmigung, Vertrag, Betreiberpflichten und der zum relevanten Zeitpunkt geltende technische Regelstand. Der Beitrag enthält keine Aussage, dass ein Norm-Entwurf verbindlich sei.
+Die genannten DIN-Normen sind mit dem bei DIN Media ausgewiesenen Status „aktuell“ beziehungsweise als im September 2026 veröffentlichte DIN 18232-101 gekennzeichnet. Normen werden nicht rückwirkend zum Entscheidungs- oder Schadenstag angewendet; maßgeblich sind im Einzelfall Anlagenzulassung, Genehmigung, Vertrag, Betreiberpflichten und der zum relevanten Zeitpunkt geltende technische Regelstand. Der Beitrag enthält keine Aussage, dass ein Norm-Entwurf verbindlich sei.
 
 ## Quellen
 
-- [DIN Media: DIN 18232-10:2024-12](https://www.dinmedia.de/de/norm/din-18232-10/380671595), aktueller Standard für Anforderungen an Fachunternehmen.
-- [DIN Media: DIN 18232-101:2026-09](https://www.dinmedia.de/de/norm/din-18232-101/392517948), veröffentlichter Kompetenznachweis-Standard.
-- [DIN Media: DIN 18232-2:2007-11](https://www.dinmedia.de/de/norm/din-18232-2/102938461) und [DIN 18232-5:2012-11](https://www.dinmedia.de/de/norm/din-18232-5/148446167), natürliche und maschinelle Rauchabzugsanlagen.
-- [DIBt: Bauprodukte für Entrauchung oder Rauchableitung](https://www.dibt.de/de/wir-bieten/zulassungen-eta-und-mehr/bauprodukte-fuer-die-entraeuchung-oder-rauchableitung), Produkt- und Systemkontext.
-- [BAuA: TRBS 1112 Instandhaltung](https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS-1112), sicherheitsgerechte Organisation von Instandhaltungsarbeiten.
-- [Gesetze im Internet: §§ 82, 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/), versicherungsrechtlicher Rahmen für Abwendung und Minderung des Schadens.
+- [DIN Media: DIN 18232-10:2024-12](https://www.dinmedia.de/de/norm/din-18232-10/380671595).
+- [DIN Media: DIN 18232-101:2026-09](https://www.dinmedia.de/de/norm/din-18232-101/392517948).
+- [DIN Media: DIN 18232-2:2007-11](https://www.dinmedia.de/de/norm/din-18232-2/102938461) und [DIN 18232-5:2012-11](https://www.dinmedia.de/de/norm/din-18232-5/148446167).
+- [DIBt: Bauprodukte für Entrauchung oder Rauchableitung](https://www.dibt.de/de/wir-bieten/zulassungen-eta-und-mehr/bauprodukte-fuer-die-entraeuchung-oder-rauchableitung).
+- [BAuA: TRBS 1112 Instandhaltung](https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS-1112).
+- [Gesetze im Internet: §§ 82, 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/).

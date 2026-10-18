@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-mor
 damageTypes: ["gebaeude", "elementar", "sturm", "hagel", "technik"]
 publication:
   publishedAt: 2026-10-06
-  updatedAt: 2026-10-06
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Photovoltaikanlagen nach Sturm- und Hagelschäden prüfen"
@@ -106,17 +106,17 @@ Ein behaupteter Ertragsausfall benötigt eine nachvollziehbare Vergleichsbasis. 
 
 Nach Sturm oder Hagel ist eine PV-Anlage erst dann prüffähig bewertet, wenn Modul- und Montageschäden, elektrische Sicherheit, Dachanschlüsse, Ertragsfolge und Kosten jeweils mit konkretem Befund und Zuständigkeit dokumentiert sind. Sichtbare Schäden, eine Wechselrichteranzeige oder ein einzelner Messwert reichen nicht für eine pauschale Freigabe oder einen vollständigen Austausch. Die belastbare Regulierung folgt einer dokumentierten Prüfkette: sichern, zuordnen, messen, fachlich freigeben und Kosten schadenbezogen abgrenzen.
 
-## Quellen- und Aktualitätsstand
+## Technischer Regelwerksbezug
 
-Veröffentlichung dieses Beitrags: 06.10.2026. Quellenprüfung: 06.10.2026. Die DIN EN 62446-1:2019-04 wird bei DIN Media als geltender Standard für Dokumentation, Inbetriebnahmeprüfung und Prüfanforderungen netzgekoppelter PV-Systeme geführt. Der bei DIN Media ausgewiesene Stand DIN EN IEC 62446-1:2026-01 ist ein Norm-Entwurf und deshalb kein Ersatz für verbindliche Regeln. Die DGUV Information 203-080 (Ausgabe 2015-04) beschreibt die besonderen Absturz- und Elektrogefährdungen bei Montage, Wartung und Instandhaltung. Die BetrSichV gilt abhängig von Betreiber, Nutzung und Arbeitsmittelbezug. Für Sachverständige und Großschadenregulierer folgt daraus die getrennte Dokumentation von Ereignis, Anlagenbefund, elektrischer Sicherheit, Dach- und Befestigungsschäden, Ertragsfolge und Kostenfolge.
+Die DIN EN 62446-1:2019-04 wird bei DIN Media als geltender Standard für Dokumentation, Inbetriebnahmeprüfung und Prüfanforderungen netzgekoppelter PV-Systeme geführt. Der bei DIN Media ausgewiesene Stand DIN EN IEC 62446-1:2026-01 ist ein Norm-Entwurf und deshalb kein Ersatz für verbindliche Regeln. Die DGUV Information 203-080 (Ausgabe 2015-04) beschreibt die besonderen Absturz- und Elektrogefährdungen bei Montage, Wartung und Instandhaltung. Die BetrSichV gilt abhängig von Betreiber, Nutzung und Arbeitsmittelbezug. Für Sachverständige und Großschadenregulierer folgt daraus die getrennte Dokumentation von Ereignis, Anlagenbefund, elektrischer Sicherheit, Dach- und Befestigungsschäden, Ertragsfolge und Kostenfolge.
 
 ## Weiterführende Quellen
 
-- [DIN EN 62446-1:2019-04 – DIN Media](https://www.dinmedia.de/de/norm/din-en-62446-1/299821500)
-- [DIN EN IEC 62446-1:2026-01 – Norm-Entwurf, DIN Media](https://www.dinmedia.de/en/draft-standard/din-en-iec-62446-1/396967530)
-- [DGUV Information 203-080 – Montage und Instandhaltung von Photovoltaik-Anlagen](https://publikationen.dguv.de/regelwerk/dguv-informationen/2896/montage-und-instandhaltung-von-photovoltaik-anlagen)
-- [Betriebssicherheitsverordnung – Gesetze im Internet](https://www.gesetze-im-internet.de/betrsichv_2015/)
-- [Bundesnetzagentur – Anmeldung, Anschluss und Registrierung von Solaranlagen](https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/ErneuerbareEnergien/Solaranlagen/Anmeldung_table.html)
-- [§ 82 VVG – Gesetze im Internet](https://www.gesetze-im-internet.de/vvg_2008/__82.html)
-- [§ 83 VVG – Gesetze im Internet](https://www.gesetze-im-internet.de/vvg_2008/__83.html)
-- [§ 249 BGB – Gesetze im Internet](https://www.gesetze-im-internet.de/bgb/__249.html)
+- DIN Media, [DIN EN 62446-1:2019-04 – DIN Media](https://www.dinmedia.de/de/norm/din-en-62446-1/299821500).
+- DIN Media, [DIN EN IEC 62446-1:2026-01 – Norm-Entwurf, DIN Media](https://www.dinmedia.de/en/draft-standard/din-en-iec-62446-1/396967530).
+- [DGUV Information 203-080 – Montage und Instandhaltung von Photovoltaik-Anlagen](https://publikationen.dguv.de/regelwerk/dguv-informationen/2896/montage-und-instandhaltung-von-photovoltaik-anlagen).
+- [Betriebssicherheitsverordnung – Gesetze im Internet](https://www.gesetze-im-internet.de/betrsichv_2015/).
+- [Bundesnetzagentur – Anmeldung, Anschluss und Registrierung von Solaranlagen](https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/ErneuerbareEnergien/Solaranlagen/Anmeldung_table.html).
+- [§ 82 VVG – Gesetze im Internet](https://www.gesetze-im-internet.de/vvg_2008/__82.html).
+- [§ 83 VVG – Gesetze im Internet](https://www.gesetze-im-internet.de/vvg_2008/__83.html).
+- [§ 249 BGB – Gesetze im Internet](https://www.gesetze-im-internet.de/bgb/__249.html).

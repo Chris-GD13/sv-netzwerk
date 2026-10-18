@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/fenster-tueren-schadenaufnahme-funkt
 damageTypes: ["gebaeude", "einbruch", "diebstahl"]
 publication:
   publishedAt: 2026-10-02
-  updatedAt: 2026-10-02
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Schließanlagen nach Einbruchschäden prüfen"
@@ -114,15 +114,15 @@ Für die Sofortmaßnahme wird zunächst die Eingangstür provisorisch gesichert.
 
 Nach einem Einbruch oder Schlüsselverlust ist die richtige Prüffrage nicht „ein Zylinder oder alles?“, sondern: Welche Sicherheitsfunktion ist beeinträchtigt, welche Bereiche sind tatsächlich betroffen und welche Maßnahme schließt die dokumentierte Sicherheitslücke? Erst aus dieser Kette lassen sich Austauschumfang und Kosten belastbar beurteilen.
 
-## Aktualitäts- und Geltungsstand
+## Technische und rechtliche Einordnung
 
-Veröffentlichung dieses Beitrags: 02.10.2026. Quellenprüfung: 02.10.2026. DIN EN 1303:2026-08 ist laut DIN Media die aktuelle veröffentlichte Ausgabe und ersetzt DIN EN 1303:2015-08; der Norm-Entwurf prEN 1303:2024-03 wird nicht als verbindliche Regel verwendet. VdS 2386 ist eine fachliche Richtlinie für anerkannte Schließanlagen und gilt nach ihrem eigenen Anwendungsbereich nicht für elektronische Schließsysteme; eine allgemeine Verbindlichkeit wird nicht behauptet. Die Polizeiberatung ist eine behördliche technische Orientierung zur abgestimmten mechanischen Sicherung. §§ 249 BGB sowie 82 und 83 VVG sind amtliche Gesetzestexte. Für Sachverständige und Großschadenregulierer folgt daraus die getrennte Dokumentation von Angriffsschaden, Schlüsselgefährdung, Sofortsicherung, Systemumfang und vertraglicher Leistungspflicht.
+DIN EN 1303:2026-08 ist laut DIN Media die aktuelle veröffentlichte Ausgabe und ersetzt DIN EN 1303:2015-08; der Norm-Entwurf prEN 1303:2024-03 wird nicht als verbindliche Regel verwendet. VdS 2386 ist eine fachliche Richtlinie für anerkannte Schließanlagen und gilt nach ihrem eigenen Anwendungsbereich nicht für elektronische Schließsysteme; eine allgemeine Verbindlichkeit wird nicht behauptet. Die Polizeiberatung ist eine behördliche technische Orientierung zur abgestimmten mechanischen Sicherung. §§ 249 BGB sowie 82 und 83 VVG sind amtliche Gesetzestexte. Für Sachverständige und Großschadenregulierer folgt daraus die getrennte Dokumentation von Angriffsschaden, Schlüsselgefährdung, Sofortsicherung, Systemumfang und vertraglicher Leistungspflicht.
 
 ## Quellen und weiterführende Hinweise
 
-- DIN Media, [DIN EN 1303:2026-08: Schließzylinder und Hauptschlüsselanlagen](https://www.dinmedia.de/de/norm/din-en-1303/401073981), Ausgabedatum August 2026; aktuelle veröffentlichte Norm, ersetzt DIN EN 1303:2015-08.
-- Polizei-Beratung, [Technische Sicherheit – Einbruchschutz](https://www.polizei-beratung.de/themen-und-tipps/einbruch/technische-sicherheit/), Abruf 02.10.2026; abgestimmte mechanische Sicherung und fachgerechte Montage.
-- VdS Schadenverhütung, [Schließzylinder mit VdS-Anerkennung](https://vds.de/fileadmin/publikationen/richtlinien/vds_5504.pdf), fachliche Information; Profilzylinder und Sicherheitsmerkmale.
-- VdS Schadenverhütung, [VdS 2386 Schließanlagen](https://shop.vds.de/download/vds-2386/4d37bf6e-2ce6-4dce-ae21-155e72c3ada0), Richtlinie mit abgegrenztem Anwendungsbereich; Projektierung und sicherheitsrelevante Bereiche.
-- Bundesministerium der Justiz, [§ 249 BGB](https://www.gesetze-im-internet.de/bgb/__249.html), amtlicher Gesetzestext, Abruf 02.10.2026.
-- Bundesministerium der Justiz, [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html), amtliche Gesetzestexte, Abruf 02.10.2026.
+- DIN Media, [DIN EN 1303:2026-08: Schließzylinder und Hauptschlüsselanlagen](https://www.dinmedia.de/de/norm/din-en-1303/401073981).
+- Polizei-Beratung, [Technische Sicherheit – Einbruchschutz](https://www.polizei-beratung.de/themen-und-tipps/einbruch/technische-sicherheit/).
+- VdS Schadenverhütung, [Schließzylinder mit VdS-Anerkennung](https://vds.de/fileadmin/publikationen/richtlinien/vds_5504.pdf).
+- VdS Schadenverhütung, [VdS 2386 Schließanlagen](https://shop.vds.de/download/vds-2386/4d37bf6e-2ce6-4dce-ae21-155e72c3ada0).
+- Bundesministerium der Justiz, [§ 249 BGB](https://www.gesetze-im-internet.de/bgb/__249.html).
+- Bundesministerium der Justiz, [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html).

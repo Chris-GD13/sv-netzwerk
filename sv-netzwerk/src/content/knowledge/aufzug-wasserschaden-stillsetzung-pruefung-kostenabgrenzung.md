@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/", "/
 damageTypes: ["gebaeude", "leitungswasser", "technik"]
 publication:
   publishedAt: 2026-10-03
-  updatedAt: 2026-10-03
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Aufzüge nach Wasserschäden fachlich prüfen"
@@ -117,15 +117,15 @@ Zuerst wird die Anlage abgesperrt und durch den Aufzugsfachbetrieb gesichert. De
 
 Ein Aufzug nach Wassereintritt ist erst dann wieder belastbar bewertbar, wenn Gefahrenlage, betroffene Baugruppen, Prüfbedarf und Freigabeweg dokumentiert sind. Der sichtbare Wasserstand und ein kurzer Funktionstest reichen dafür nicht aus.
 
-## Aktualitäts- und Geltungsstand
+## Technische und rechtliche Einordnung
 
-Veröffentlichung dieses Beitrags: 03.10.2026. Quellenprüfung: 03.10.2026. Die BetrSichV ist der amtliche Rechtsrahmen; § 15 betrifft die Prüfung vor der Wiederinbetriebnahme nach prüfpflichtigen Änderungen. Die BAuA führt TRBS 3121 und TRBS 1201 Teil 4 als geltende technische Regeln und weist für TRBS 3121 sowie TRBS 1201 Teil 4 Änderungsstände aus 2025 aus. Diese Technischen Regeln konkretisieren den sicheren Betrieb und die Prüfungen, ersetzen aber keine anlagenbezogene Entscheidung durch eine befähigte Stelle oder zugelassene Überwachungsstelle. DGUV-Hinweise unterstützen die Arbeitssicherheit bei Montage, Instandhaltung und Prüfung. Für Sachverständige und Großschadenregulierer folgt daraus die getrennte Dokumentation von Wasserursache, Anlagenbefund, Sicherung, Prüfbedarf, Reparatur und Wiederinbetriebnahme.
+Die BetrSichV ist der amtliche Rechtsrahmen; § 15 betrifft die Prüfung vor der Wiederinbetriebnahme nach prüfpflichtigen Änderungen. Die BAuA führt TRBS 3121 und TRBS 1201 Teil 4 als geltende technische Regeln und weist für TRBS 3121 sowie TRBS 1201 Teil 4 Änderungsstände aus 2025 aus. Diese Technischen Regeln konkretisieren den sicheren Betrieb und die Prüfungen, ersetzen aber keine anlagenbezogene Entscheidung durch eine befähigte Stelle oder zugelassene Überwachungsstelle. DGUV-Hinweise unterstützen die Arbeitssicherheit bei Montage, Instandhaltung und Prüfung. Für Sachverständige und Großschadenregulierer folgt daraus die getrennte Dokumentation von Wasserursache, Anlagenbefund, Sicherung, Prüfbedarf, Reparatur und Wiederinbetriebnahme.
 
 ## Quellen und weiterführende Hinweise
 
-- [Betriebssicherheitsverordnung (BetrSichV)](https://www.gesetze-im-internet.de/betrsichv_2015/), amtlicher Gesetzestext, insbesondere §§ 14–16 und Anhang 2, Abruf 03.10.2026.
-- [§ 15 BetrSichV – Prüfung vor Inbetriebnahme und vor Wiederinbetriebnahme](https://www.gesetze-im-internet.de/betrsichv_2015/__15.html), amtlicher Gesetzestext, Abruf 03.10.2026.
-- BAuA, [TRBS 3121 Betrieb von Aufzugsanlagen](https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS-3121), geltende technische Regel mit Änderungsstand 17.10.2025, Abruf 03.10.2026.
-- BAuA, [TRBS 1201 Teil 4 Prüfung von Aufzugsanlagen](https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS-1201-Teil-4), geltende technische Regel mit veröffentlichten Änderungen, Abruf 03.10.2026.
-- DGUV, [Themenfeld Aufzüge](https://www.dguv.de/fb-holzundmetall/sg/sg_smsa/aufzuege/index.jsp), Arbeitssicherheit bei Montage, Instandhaltung und Prüfung, Abruf 03.10.2026.
-- [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html), amtliche Gesetzestexte, Abruf 03.10.2026.
+- [Betriebssicherheitsverordnung (BetrSichV)](https://www.gesetze-im-internet.de/betrsichv_2015/).
+- [§ 15 BetrSichV – Prüfung vor Inbetriebnahme und vor Wiederinbetriebnahme](https://www.gesetze-im-internet.de/betrsichv_2015/__15.html).
+- BAuA, [TRBS 3121 Betrieb von Aufzugsanlagen](https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS-3121), Änderungsstand 17.10.2025.
+- BAuA, [TRBS 1201 Teil 4 Prüfung von Aufzugsanlagen](https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS-1201-Teil-4).
+- DGUV, [Themenfeld Aufzüge](https://www.dguv.de/fb-holzundmetall/sg/sg_smsa/aufzuege/index.jsp).
+- [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html).

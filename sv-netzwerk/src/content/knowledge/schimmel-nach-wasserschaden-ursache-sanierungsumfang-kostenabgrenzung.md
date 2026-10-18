@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/baufeuchte-schadenfeuchte-feuchteque
 damageTypes: ["leitungswasser", "feuchte", "gebaeude"]
 publication:
   publishedAt: 2026-09-30
-  updatedAt: 2026-09-30
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Schimmel nach Wasserschäden fachlich prüfen"
@@ -88,14 +88,14 @@ In einem ausdrücklich fiktiven Fall tritt Wasser aus einer Küchenleitung in ei
 
 Schimmel nach einem Wasserschaden wird prüffähig, wenn die Feuchteursache abgestellt, der Befund bauteilbezogen gesichert, das Sanierungsziel erklärt und die Kostenpositionen nachvollziehbar getrennt sind. Sichtbarer Befall allein ersetzt diese Nachweiskette nicht.
 
-## Aktualitäts- und Geltungsstand zum Beitrag
+## Technische und rechtliche Einordnung
 
-Der Beitrag wurde am 30.09.2026 veröffentlicht und am selben Tag redaktionell geprüft. Der UBA-Schimmelleitfaden liegt laut Umweltbundesamt in einer aktualisierten Auflage von April 2024 vor; die UBA-Informationsseite zum aktuellen Schimmelleitfaden wurde am 17.01.2025 aktualisiert. Beide Quellen sind fachliche Leitlinien, keine gesetzlichen Leistungszusagen. §§ 82 und 83 VVG werden im amtlichen Gesetzesportal als geltende Vorschriften abgerufen (Abruf: 30.09.2026). Die praktische Bedeutung für Sachverständige und Großschadenregulierer ist die saubere Trennung von Befund, Ursache, Sanierungsziel und Kostenposition; Norm- oder Leitlinienentwürfe werden im Beitrag nicht als verbindliche Regeln verwendet.
+Der UBA-Schimmelleitfaden liegt laut Umweltbundesamt in einer aktualisierten Auflage von April 2024 vor; die UBA-Informationsseite zum aktuellen Schimmelleitfaden wurde am 17.01.2025 aktualisiert. Beide Quellen sind fachliche Leitlinien, keine gesetzlichen Leistungszusagen. §§ 82 und 83 VVG regeln Schadenminderung und den Ersatz der dort erfassten Aufwendungen. Ich trenne Befund, Ursache, Sanierungsziel und Kostenposition. Ein Leitfaden ersetzt dabei weder den konkreten Schadenbefund noch die Vertragsprüfung.
 
 ## Quellen und weiterführende Hinweise
 
-- Umweltbundesamt, [Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden](https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von), aktualisierte Auflage April 2024, fachliche Leitlinie.
-- Umweltbundesamt, [Aktueller UBA-Schimmelleitfaden](https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/aktueller-uba-schimmelleitfaden), zuletzt aktualisiert 17.01.2025, fachliche Einordnung und Geltungsstand.
-- Umweltbundesamt, [Was tun bei Schimmel in meiner Wohnung?](https://www.umweltbundesamt.de/service/uba-fragen/was-tun-bei-schimmel-in-meiner-wohnung), praktische Hinweise zu Ursachenklärung und fachkundiger Sanierung.
-- Versicherungsvertragsgesetz, [§ 82 Abwendung und Minderung des Schadens](https://www.gesetze-im-internet.de/vvg_2008/__82.html), amtliche Fassung, Abruf 30.09.2026.
-- Versicherungsvertragsgesetz, [§ 83 Aufwendungsersatz](https://www.gesetze-im-internet.de/vvg_2008/__83.html), amtliche Fassung, Abruf 30.09.2026.
+- Umweltbundesamt, [Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden](https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von), aktualisierte Auflage April 2024.
+- Umweltbundesamt, [Aktueller UBA-Schimmelleitfaden](https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/aktueller-uba-schimmelleitfaden), 17.01.2025.
+- Umweltbundesamt, [Was tun bei Schimmel in meiner Wohnung?](https://www.umweltbundesamt.de/service/uba-fragen/was-tun-bei-schimmel-in-meiner-wohnung).
+- Versicherungsvertragsgesetz, [§ 82 Abwendung und Minderung des Schadens](https://www.gesetze-im-internet.de/vvg_2008/__82.html).
+- Versicherungsvertragsgesetz, [§ 83 Aufwendungsersatz](https://www.gesetze-im-internet.de/vvg_2008/__83.html).

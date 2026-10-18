@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/fenster-tueren-kostenvoranschlag-pruefen/", "/fachwi
 damageTypes: ["gebaeude"]
 publication:
   publishedAt: 2026-10-10
-  updatedAt: 2026-10-10
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Fensteranschluss richtig abdichten: Fuge und Materialwahl"
@@ -118,8 +118,6 @@ Für Versicherer und Schadenregulierer bleiben technische Erforderlichkeit und v
 Ein fachgerechter Fensteranschluss beginnt mit einem passenden Detail und nachgewiesenen Materialfunktionen. Untergrund, Fugenmaß, Ecken und Übergänge müssen zur gewählten Verarbeitung passen. Besonders aussagekräftig ist die Dokumentation vor dem Verdecken. Sachverständige begründen ihre Bewertung mit diesen Feststellungen und den passenden Produktunterlagen; Versicherer erhalten dadurch eine nachvollziehbare Grundlage für die weitere Schaden- und Kostenprüfung.
 
 ## Quellen und weiterführende Hinweise
-
-Recherche und Abruf am 10.10.2026. Die verlinkten Primärquellen stützen die jeweils unmittelbar zugeordneten technischen Prüffelder. Herstellerbeispiele erläutern unterschiedliche Systemansätze und sind keine Produktempfehlung. Maßgeblich sind die zur konkreten Ausführung gehörenden aktuellen Unterlagen. Es werden keine unzugänglichen Norminhalte als geprüft ausgegeben.
 
 1. [RAL-Gütegemeinschaft und ift Rosenheim: Montageleitfaden März 2024, Leseprobe](https://ralfenster.de/wp-content/uploads/2024/10/LzM_2024_Leseprobe-2.pdf).
 2. [IVD: FAQ](https://www.abdichten.de/faq/faq.html).

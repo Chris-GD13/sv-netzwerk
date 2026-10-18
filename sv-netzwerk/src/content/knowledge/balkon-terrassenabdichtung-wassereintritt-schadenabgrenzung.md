@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/flachdachschaden-pruefpfad-windsog-e
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-24
-  updatedAt: 2026-10-13
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Balkon- und Terrassenabdichtungen fachlich prüfen"
@@ -103,11 +103,11 @@ In einem ausdrücklich fiktiven Fall zeigt sich nach mehreren Regenereignissen e
 
 Balkon- und Terrassenschäden werden erst durch die Verbindung von Außenbefund, Wasserweg, Innenmessung und kontrollierter Erfolgskontrolle prüffähig. Eine begrenzte, dokumentierte Ursachenprüfung verhindert pauschalen Rückbau und schafft eine belastbare Grundlage für Sanierung und Regulierung.
 
-## Normenstand geprüft am 13.10.2026: Konstruktion bestimmt den Bezug
+## Konstruktion und technischer Regelwerksbezug
 
 [DIN 18531-5:2025-08](https://www.dinmedia.de/de/norm/din-18531-5/391197608) behandelt Balkone, Loggien und Laubengänge und ersetzt die Ausgabe 2017-07. Eine genutzte Dachfläche und eine erdberührte Konstruktion sind dagegen anhand ihrer tatsächlichen Bauart einzuordnen; die Bezeichnung „Terrasse“ allein bestimmt die Normenzuordnung nicht. Für erdberührte Bauteile führt der Katalog [DIN 18533-1:2026-06](https://www.dinmedia.de/de/norm/din-18533-1/399850897) als aktuelle Ausgabe.
 
-Praktische Bedeutung: Lage, tragender Aufbau, Abdichtungsebene und Nutzung zuerst bestimmen und erst danach den passenden Regelwerksbezug auswählen. Beide Angaben sind bibliografisch geprüft, keine ungelesenen Detailklauseln. Normausgabedatum und projektbezogene Anwendbarkeit sind getrennt; keine pauschale rückwirkende Erneuerungspflicht oder gesonderte gesetzliche Inkraftsetzung wird behauptet.
+Ich bestimme zuerst Lage, tragenden Aufbau, Abdichtungsebene und Nutzung. Danach wähle ich den passenden Regelwerksbezug. Die aktuelle Normausgabe begründet für sich allein keine rückwirkende Erneuerungspflicht für den Bestand.
 
 ## Quellen und weiterführende Hinweise
 

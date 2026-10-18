@@ -16,7 +16,7 @@ relatedLinks: ["/experten/carmen-gohl/", "/fachwissen/schimmel-nach-wasserschade
 damageTypes: ["feuchte", "gebaeude"]
 publication:
   publishedAt: 2026-10-12
-  updatedAt: 2026-10-17
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Schimmelsanierung und Sanierungserfolg prüfen"
@@ -136,8 +136,6 @@ Die sanierende Firma dokumentiert ihre Ausführung. Die Auftraggebenden legen Sa
 
 Medizinische Beschwerden werden ärztlich abgeklärt. Gebäudeschadstoffe, raumlufttechnische Anlagen, tragende Bauteile und besondere Nutzungen erfordern gegebenenfalls weitere Fachdisziplinen. Die technische Sanierungskontrolle darf diese Zuständigkeiten nicht ersetzen.
 
-## Fachlicher Bezug im SV-Netzwerk
-
 ## Fazit
 
 Eine Schimmelsanierung ist dann nachvollziehbar kontrollierbar, wenn Ursache, Trocknung, Rückbau, Feinreinigung und Erfolgskontrolle als getrennte Prüfschritte dokumentiert sind. Die Kontrollmethode richtet sich nach Schadensumfang, Nutzung, Sanierungsziel und konkreter Fragestellung. Pauschale Sichtfreigaben und unklare „Freimessungen“ reichen nicht aus; ebenso wenig ist in jedem Fall dieselbe Laboruntersuchung erforderlich.
@@ -148,7 +146,7 @@ Der sachverständige Mehrwert liegt in der belastbaren Zuordnung: Welche Ursache
 
 - WTA, Merkblatt 4-12 „Ziele und Kontrolle von Schimmelpilzschadensanierungen in Innenräumen“.
 - Umweltbundesamt, [Aktueller UBA-Schimmelleitfaden](https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/aktueller-uba-schimmelleitfaden), 17.01.2025.
-- Umweltbundesamt, [Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, aktualisierte Fassung April 2024](https://www.umweltbundesamt.de/system/files/medien/4031/publikationen/240513_uba_fb_schimmelleitfaden_0.pdf).
+- Umweltbundesamt, [Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, aktualisierte Fassung April 2024](https://www.umweltbundesamt.de/system/files/medien/4031/publikationen/240513_uba_fb_schimmelleitfaden_0.pdf), aktualisierte Auflage April 2024.
 - Deutsche Gesetzliche Unfallversicherung, [DGUV Information 201-028 „Gesundheitsgefährdungen durch Biostoffe bei der Schimmelpilzsanierung“, Ausgabe November 2022](https://publikationen.dguv.de/widgets/pdf/download/article/644).
 - Bundesverband Schimmel- und Schadstoffsanierung e. V., [Fachkundenachweis Schimmelsanierung – Modul B3 Sanierungskontrolle](https://bss-schimmelpilz.de/fachkundenachweis-schimmelsanierung-modul-b3-sanierungskontrolle/).
 

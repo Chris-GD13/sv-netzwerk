@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/schadstoffverdacht-rueckbau-bestands
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-26
-  updatedAt: 2026-10-13
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Entsorgungskosten nach Gebäudeschäden prüfen"
@@ -102,11 +102,11 @@ In einem ausdrücklich fiktiven Fall werden nach einem Leitungswasserschaden Bod
 
 Entsorgungskosten nach Gebäudeschäden sind belastbar, wenn Material, Ausbauort, Menge, Einstufung, Transport und Annahmebeleg eine durchgehende Beweiskette bilden. Die klare Trennung von Schadenfolge, Vorzustand, Modernisierung und abfallrechtlich erforderlichen Maßnahmen verhindert pauschale Freigaben ebenso wie unbegründete Kürzungen.
 
-## Quellenpräzisierung vom 13.10.2026: Nachweise und Ladebereich
+## Nachweise und Ladebereich
 
-Nach [§ 2 Absatz 2 und § 16 NachwV](https://www.gesetze-im-internet.de/nachwv_2007/BJNR229810006.html) sind bei insgesamt höchstens zwei Tonnen gefährlicher Abfälle jährlich bestimmte Erzeuger-Nachweispflichten ausgenommen; die Übernahmescheinpflicht bleibt bestehen. Diese Erzeuger-Jahresmenge ist keine allgemeine Freigrenze je Container. Der amtliche Gesetzestext wurde am 13.10.2026 geprüft; hier wird keine neue Inkraftsetzung behauptet. Bedeutung für die Kostenprüfung: Auch eine Kleinmenge braucht die zum konkreten Entsorgungsweg passenden Belege.
+Nach [§ 2 Absatz 2 und § 16 NachwV](https://www.gesetze-im-internet.de/nachwv_2007/BJNR229810006.html) sind bei insgesamt höchstens zwei Tonnen gefährlicher Abfälle jährlich bestimmte Erzeuger-Nachweispflichten ausgenommen; die Übernahmescheinpflicht bleibt bestehen. Diese Erzeuger-Jahresmenge ist keine allgemeine Freigrenze je Container. Für meine Kostenprüfung bedeutet das: Auch eine Kleinmenge braucht die zum konkreten Entsorgungsweg passenden Belege.
 
-Die [BAuA](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524) führt die TRGS 524 als Ausgabe Juli 2026, bekannt gemacht am 17.07.2026 (GMBl Nr. 18/19). Die [BG-BAU-Wiedergabe](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/titel.htm) nennt abweichend März 2026 bei derselben Bekanntmachung. Maßgeblich ist die bekannt gemachte Fassung; kein Entwurf und kein erfundener gesonderter Geltungsbeginn.
+Die [BAuA](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524) führt die TRGS 524 als Ausgabe Juli 2026, bekannt gemacht am 17.07.2026 (GMBl Nr. 18/19). Die [BG-BAU-Wiedergabe](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/titel.htm) nennt abweichend März 2026 bei derselben Bekanntmachung. Maßgeblich ist die bekannt gemachte Fassung.
 
 Die [TRGS 524, Abschnitt 5.2.5](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/5.htm), bezieht auch Bereitstellung, Verladen und Transporttätigkeiten in die tätigkeitsbezogene Gefährdungsbeurteilung ein. Schutzaufwand endet somit nicht bereits mit dem Ausbau. Die Einstufung eines Abfalls ist dennoch eine eigene Prüfung; die Arbeitsschutzregel ersetzt weder Abfallschlüssel noch Entsorgungsnachweis.
 
