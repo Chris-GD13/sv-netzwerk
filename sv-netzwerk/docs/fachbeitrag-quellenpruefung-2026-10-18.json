@@ -1,0 +1,119 @@
+{
+  "date": "2026-10-18",
+  "publication_id": "2026-10-18-fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum",
+  "article": "fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum",
+  "author": "christian-waechter",
+  "status": "built-deployment-pending",
+  "source_review": {
+    "checked_at": "2026-10-18",
+    "decision_date": null,
+    "new_event_claimed": false,
+    "norm_effective_date_claimed": false,
+    "notes": "Ausgabedatum, Aktualisierungsdatum und Abrufdatum getrennt. Keine vollständige Normlektüre behauptet. Fachliche Bewertung ohne erfundene Fallpraxis."
+  },
+  "sources": [
+    {
+      "publisher": "Bundesverband Flachglas",
+      "title": "Leitfaden zur Verwendung von Dreifach-Isolierglas",
+      "publication_or_update_date": "Januar 2020",
+      "edition": "BF 003/2008, Änderungsindex 4",
+      "status": "Fachverbandshinweis, kein Gesetz und keine Norm",
+      "read_scope": "PDF vollständig abgerufen; Abschnitt 5.1 zu Außenkondensat ausgewertet",
+      "practical_meaning": "Außenbeschlag nach nächtlicher Abstrahlung nicht mit Zwischenraumbeschlag gleichsetzen",
+      "url": "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/bf-merkblaetter/BF-Merkblatt_003-2008_AEI4_01-2020_Leitfaden_zur_Verwendung_von_Dreifach-Isolierglas.pdf",
+      "checked_at": "2026-10-18"
+    },
+    {
+      "publisher": "Bundesverband Flachglas",
+      "title": "Verglasungsrichtlinie",
+      "publication_or_update_date": "Februar 2020",
+      "edition": "BF 022/2018, Änderungsindex 1",
+      "status": "Fachverbandshinweis, keine eigenständige Vertragsvereinbarung",
+      "read_scope": "PDF abgerufen; Grundlagen zum Glasfalz und Feuchteschutz ausgewertet",
+      "practical_meaning": "Glasfalz und Randverbund unterscheiden, Feuchteableitung und Einbausituation prüfen",
+      "url": "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/bf-merkblaetter/BF-Merkblatt_022-2018_AEI1_02-2020_Verglasungsrichtlinie.pdf",
+      "checked_at": "2026-10-18"
+    },
+    {
+      "publisher": "Glas Fandel / Glas Trösch",
+      "title": "Taupunktunterschreitung bei Mehrscheiben-Isolierglas",
+      "publication_or_update_date": "2024-07-10",
+      "edition": "Kundeninformation 2021-005",
+      "status": "Herstellerinformation, keine allgemeine rechtliche Freistellung",
+      "read_scope": "Zweiseitige Kundeninformation vollständig gelesen",
+      "practical_meaning": "Einzelne vorübergehende Eiskristalle von anhaltendem flächigem Beschlag unterscheiden; keine pauschale Mangelfreiheit ableiten",
+      "url": "https://www.glas-fandel.de/images/PDFs/Kundeninformation/KI_-_2021-005_Taupunktunterschreitung_bei_Mehrscheiben_Isolierglas.pdf",
+      "checked_at": "2026-10-18"
+    },
+    {
+      "publisher": "Umweltbundesamt",
+      "title": "Schimmel",
+      "publication_or_update_date": "2025-01-27",
+      "edition": "Webseite",
+      "status": "Behördliche Fachinformation",
+      "read_scope": "Webseite gelesen, Ursachenübersicht ausgewertet",
+      "practical_meaning": "Baufeuchte, Feuchtequellen und kalte Oberflächen gemeinsam berücksichtigen",
+      "url": "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel",
+      "checked_at": "2026-10-18"
+    },
+    {
+      "publisher": "Umweltbundesamt",
+      "title": "Wie lüfte ich richtig? – Tipps und Tricks zur Schimmelvermeidung",
+      "publication_or_update_date": "2024-12-13",
+      "edition": "Webseite",
+      "status": "Behördliche Fachinformation",
+      "read_scope": "Webseite gelesen",
+      "practical_meaning": "Raumklima und Nutzung einbeziehen, keine Einzelaufnahme als Lüftungsnachweis ausgeben",
+      "url": "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/wie-luefte-ich-richtig-tipps-tricks-zur",
+      "checked_at": "2026-10-18"
+    },
+    {
+      "publisher": "DIN Media",
+      "title": "DIN EN 1279-1:2018-10",
+      "publication_or_update_date": "2018-10",
+      "edition": "DIN EN 1279-1:2018-10",
+      "status": "Als aktuell gelistete veröffentlichte Norm; kein Entwurf",
+      "read_scope": "Nur frei zugängliche Verlagsmetadaten, Titel und Anwendungsbereich; kein Normvolltext",
+      "practical_meaning": "Systembeschreibung und visuelle Qualität als Produktnormbereich benennen, keine unzugänglichen Klauseln behaupten",
+      "url": "https://www.dinmedia.de/de/norm/din-en-1279-1/281205722",
+      "checked_at": "2026-10-18"
+    },
+    {
+      "publisher": "DIN Media",
+      "title": "DIN EN 1279-2:2018-10",
+      "publication_or_update_date": "2018-10",
+      "edition": "DIN EN 1279-2:2018-10",
+      "status": "Als aktuell gelistete veröffentlichte Norm; kein Entwurf",
+      "read_scope": "Nur frei zugängliche Verlagsmetadaten, Titel und Anwendungsbereich; kein Normvolltext",
+      "practical_meaning": "Produkt-Langzeitprüfungen von der Diagnose am eingebauten Element trennen",
+      "url": "https://www.dinmedia.de/de/norm/din-en-1279-2/281596947",
+      "checked_at": "2026-10-18"
+    }
+  ],
+  "linkedin": {
+    "status": "prepared-not-posted",
+    "file": "src/content/linkedin/2026-10-18_fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum.txt"
+  },
+  "archive_review": {
+    "date_coverage": "2026-09-15 bis 2026-10-17 lückenlos anhand Frontmatter; 18.10. einmal reserviert",
+    "full_individual_archive_clearance": false
+  },
+  "local_checks": {
+    "astro_check": {
+      "errors": 0,
+      "warnings": 0,
+      "hints": 0,
+      "files": 354
+    },
+    "build": "success",
+    "pages": 1057,
+    "knowledge_urls": 111,
+    "sitemap_pages": 192,
+    "internal_links": 20804,
+    "daily_count": 1,
+    "encoding": "passed",
+    "public_copy": "passed",
+    "visible_umlauts": "passed",
+    "knowledge_dist_links_search_sitemap": "passed"
+  }
+}

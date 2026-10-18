@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Beschlagene Fensterscheiben: Kondensat außen, innen und im Scheibenzwischenraum unterscheiden',
+    description: 'Beschlag an Fenstern lokalisieren, Klima und Glasaufbau erfassen und den Untersuchungsbedarf vor einer Ersatzverglasung oder einem Fenstertausch bestimmen.',
+    href: '/fachwissen/fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum/',
+    category: 'Fenster und Türen',
+    tags: ['Kondensat', 'Isolierglas', 'Fenster', 'Bauphysik', 'Randverbund', 'Beweissicherung'],
+    date: '2026-10-18',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Drohnen bei Gebäudeschäden: Einsatzgrenzen, Bildbefund und Dokumentation trennen',
     description: 'Drohnenaufnahmen rechtssicher planen, sichtbare Befunde systematisch sichern und Bilddokumentation, Photogrammetrie, Ursachenbewertung sowie Fachprüfung klar voneinander abgrenzen.',
     href: '/fachwissen/drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation/',
