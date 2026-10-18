@@ -1,0 +1,54 @@
+name: Install approved Rademacher HomePilot
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/rademacher-homepilot-setup.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Install pinned Rademacher integration without sending device commands
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          umask 077
+          test ! -e /opt/anker-homeassistant/config/custom_components/rademacher
+          curl --connect-timeout 8 --max-time 15 --fail --silent --output /dev/null http://192.168.178.34/
+          stage=$(mktemp -d /opt/anker-homeassistant/rademacher-stage.XXXXXX)
+          curl --fail --silent --show-error --location https://codeload.github.com/peribeir/homeassistant-rademacher/tar.gz/95578e59888779e8c6130a61b5d268fdce42a4e6 -o "$stage/source.tar.gz"
+          printf '%s  %s\n' '49065382ed8c231ec220c017fb9d995d41d177bcfeb748b49f79d519de040be2' "$stage/source.tar.gz" | sha256sum -c -
+          mkdir "$stage/source"
+          tar -xzf "$stage/source.tar.gz" --strip-components=1 -C "$stage/source"
+          docker exec anker-homeassistant python -c "import homeassistant; print('HOME_ASSISTANT_READY_FOR_COMPONENT')"
+          install -d -m 700 /opt/anker-homeassistant/config/custom_components
+          cp -a "$stage/source/custom_components/rademacher" /opt/anker-homeassistant/config/custom_components/rademacher
+          docker exec anker-homeassistant python -m compileall -q /config/custom_components/rademacher
+          docker restart anker-homeassistant >/dev/null
+          for attempt in $(seq 1 36); do
+            if curl --max-time 5 --fail --silent --output /dev/null http://10.77.66.1:8123/; then break; fi
+            sleep 5
+          done
+          curl --max-time 5 --fail --silent --output /dev/null http://10.77.66.1:8123/
+          docker exec anker-homeassistant python -c "import json; m=json.load(open('/config/custom_components/rademacher/manifest.json')); print('RADEMACHER_VERSION=' + m['version'])"
+          echo RADEMACHER_COMPONENT_INSTALLED_NO_DEVICE_COMMANDS
+          CHECK
