@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/", "/
 damageTypes: ["gebaeude", "elementar", "technik"]
 publication:
   publishedAt: 2026-10-07
-  updatedAt: 2026-10-07
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Wärmepumpe nach Überflutung: Prüfung und Kostenabgrenzung"
@@ -108,17 +108,19 @@ Der Fachbetrieb soll darlegen, welche Baugruppen untersucht wurden, welche Repar
 
 **Für Sachverständige:** Den Bericht nach Ereignis, Befund, Ursachenbewertung, Fachgrenzen und Kostenfolge strukturieren. Feststellungen von Schilderungen unterscheiden. Ausstehende Fachprüfungen und die Voraussetzungen der Freigabe so benennen, dass alle Beteiligten den nächsten notwendigen Schritt erkennen können.
 
+## Technischer Regelwerksbezug
+
+Der BWP-Beitrag vom 27.02.2018 ist eine fachverbandliche Orientierung zur Prüfung nach Hochwasser, keine aktuelle gerätespezifische Freigabe. Das VDE-Merkblatt, Stand 2022, begründet die Sicherheits- und Zuständigkeitsgrenzen. Die amtlichen VVG-Texte dienen der begrenzten Einordnung von Schadenminderung und Aufwendungen; die konkrete Vertragsprüfung bleibt erforderlich.
+
 ## Fazit
 
 Die belastbare Bewertung einer überfluteten Wärmepumpe beginnt mit einer sicheren, bauteilbezogenen Aufnahme. Eine nachvollziehbare Fachprüfung verbindet den dokumentierten Befund mit Reparaturentscheidung und Wiederinbetriebnahme. Erst diese Grundlage ermöglicht eine prüffähige Abgrenzung von Wiederherstellung, Verbesserungen und vorübergehender Versorgung. Ein verschwundener Wasserstand oder eine einzelne Störmeldung ersetzt keine dieser Entscheidungen.
 
-## Quellen und Aktualitätsstand
+## Quellen und weiterführende Hinweise
 
-Quellenprüfung und Veröffentlichung: 07.10.2026. Der BWP-Beitrag vom 27.02.2018 ist eine fachverbandliche Orientierung zur Prüfung nach Hochwasser, keine aktuelle gerätespezifische Freigabe. Das VDE-Merkblatt, Stand 2022, begründet die Sicherheits- und Zuständigkeitsgrenzen. Die amtlichen VVG-Texte dienen der begrenzten Einordnung von Schadenminderung und Aufwendungen; die konkrete Vertragsprüfung bleibt erforderlich. Die vorstehende Akten- und Kostenstruktur ist eine methodische Ableitung für die Regulierungspraxis, kein aus einer Quelle übernommener Prüfstandard.
-
-- [BWP: Wärmepumpen und Hochwasser](https://www.waermepumpe.de/verbraucher/darum-waermepumpe/fragen-sie-die-experten/antwort-der-experten/wie-schuetze-ich-meine-waermepumpe-vor-hochwasser-welche-folgen-kann-die-ueberschwemmung-fuer-meine-waermepumpe-haben/) – Fachbetriebsprüfung und betroffene technische Bereiche.
-- [VDE: Richtiges Verhalten bei überfluteten Räumen](https://www.vde.com/resource/blob/1574620/fda279015cf78879792fcb038468b4e1/vde-infoblatt-ueberflutung-data.pdf) – elektrische Gefahren und fachkundige Wiederinbetriebnahme.
-- [§ 82 VVG: Abwendung und Minderung des Schadens](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – Dokumentation von Schadenminderungsmaßnahmen.
-- [§ 83 VVG: Aufwendungsersatz](https://www.gesetze-im-internet.de/vvg_2008/__83.html) – rechtlicher Ausgangspunkt der gesonderten Aufwendungsprüfung.
+- [BWP: Wärmepumpen und Hochwasser](https://www.waermepumpe.de/verbraucher/darum-waermepumpe/fragen-sie-die-experten/antwort-der-experten/wie-schuetze-ich-meine-waermepumpe-vor-hochwasser-welche-folgen-kann-die-ueberschwemmung-fuer-meine-waermepumpe-haben/).
+- [VDE: Richtiges Verhalten bei überfluteten Räumen](https://www.vde.com/resource/blob/1574620/fda279015cf78879792fcb038468b4e1/vde-infoblatt-ueberflutung-data.pdf).
+- [§ 82 VVG: Abwendung und Minderung des Schadens](https://www.gesetze-im-internet.de/vvg_2008/__82.html).
+- [§ 83 VVG: Aufwendungsersatz](https://www.gesetze-im-internet.de/vvg_2008/__83.html).
 
 Weiterführend: [Elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/), [Eintrittswege bei Überflutung](/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/) und [Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).

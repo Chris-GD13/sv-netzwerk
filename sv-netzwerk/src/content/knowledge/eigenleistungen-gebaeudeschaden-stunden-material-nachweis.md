@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/rechnungskuerzung-schadenfall-prueff
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-27
-  updatedAt: 2026-10-13
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Eigenleistungen nach Gebäudeschäden prüfen"
@@ -106,9 +106,9 @@ In einem ausdrücklich fiktiven Fall entfernt der Versicherungsnehmer nach einem
 
 Eigenleistungen werden nicht durch eine pauschale Stundensumme, sondern durch eine geschlossene Nachweiskette prüffähig. Tätigkeit, ausführende Person, Zeit, Menge, Material, Vorzustand und Schadenbezug müssen zusammenpassen. Die klare Beachtung von Fachgrenzen schützt Personen und Gebäude und verhindert sowohl Doppelvergütungen als auch unbegründete Kürzungen.
 
-## Quellenpräzisierung vom 13.10.2026: Gewerberecht und Sicherheit
+## Gewerberecht und Sicherheit
 
-[§ 1 HwO im amtlichen Gesetzestext](https://www.gesetze-im-internet.de/hwo/BJNR014110953.html) wurde am 13.10.2026 auf den beschriebenen Anwendungsbereich geprüft. Dies ist eine Klarstellung der geltenden Regel, keine neue Zulassung oder Inkraftsetzung. Für die Regulierung bedeutet sie: Private Eigenarbeit, gewerbliche Tätigkeit, tatsächliche Qualifikation und Sicherheitsanforderungen getrennt bewerten; eine Versicherungsvergütung wird dadurch nicht festgelegt.
+Bei der Einordnung nach [§ 1 HwO](https://www.gesetze-im-internet.de/hwo/BJNR014110953.html) trenne ich private Eigenarbeit, gewerbliche Tätigkeit, tatsächliche Qualifikation und Sicherheitsanforderungen. Eine Versicherungsvergütung wird dadurch nicht festgelegt.
 
 ## Quellen und weiterführende Hinweise
 

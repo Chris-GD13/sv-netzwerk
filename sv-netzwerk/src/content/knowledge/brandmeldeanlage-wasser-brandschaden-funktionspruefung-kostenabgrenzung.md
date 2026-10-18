@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/rauchwaermeabzug-brandschaden-funktionspruefung-kost
 damageTypes: ["gebaeude", "brand", "leitungswasser", "technik"]
 publication:
   publishedAt: 2026-10-10
-  updatedAt: 2026-10-10
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Brandmeldeanlagen nach Wasser- oder Brandschaden prüfen"
@@ -119,20 +119,22 @@ Die Schadenprüfung dokumentiert Wasserweg, Anzeigen, Ereignisspeicher, Systemau
 
 **Für Sachverständige:** Wasser-, Rauch- und Wärmeweg bauteilbezogen dokumentieren, Vorzustand und Wartung einordnen, eigene Fachgrenzen sichtbar benennen und schadenbedingte Kosten von Instandhaltung und Verbesserung trennen.
 
+## Technischer Regelwerksbezug
+
+DIN 14675-1:2020-01 ist bei DIN Media als aktuell ausgewiesen; DIN VDE 0833-2:2022-06 ist eine veröffentlichte Norm. VdS 2095 wird nur im projekt- und vereinbarungsbezogenen Anwendungsbereich eingeordnet.
+
 ## Fazit
 
 Nach Wasser- oder Brandschäden ist eine Brandmeldeanlage nicht durch Rücksetzen der Zentrale oder eine einzelne Testauslösung freigegeben. Belastbar wird die Regulierung erst durch dokumentierte Gefahrenabwehr, klare Systemgrenzen, gesicherte Ereignisdaten, qualifizierte Fachprüfung und eine nachvollziehbare Kostenabgrenzung. Die Wiederinbetriebnahme muss den tatsächlich geprüften Schutzumfang und verbleibende Abweichungen eindeutig ausweisen.
 
-## Quellen und Aktualitätsstand
+## Quellen und weiterführende Hinweise
 
-Quellenprüfung und Veröffentlichung: **10.10.2026**. Veröffentlichungsdatum und Geltungsstatus wurden getrennt geprüft. DIN 14675-1:2020-01 ist bei DIN Media als aktuell ausgewiesen; DIN VDE 0833-2:2022-06 ist eine veröffentlichte Norm. Für diesen Beitrag wurde kein Norm-Entwurf als verbindliche Regel verwendet. VdS 2095 wird nur im projekt- und vereinbarungsbezogenen Anwendungsbereich eingeordnet.
-
-- [DIN 14675-1:2020-01](https://www.dinmedia.de/de/norm/din-14675-1/310931928) – aktuelle veröffentlichte Norm zu Aufbau und Betrieb von Brandmeldeanlagen.
-- [DIN VDE 0833-2 (VDE 0833-2):2022-06](https://www.vde-verlag.de/p/normen/din-vde-0833-2-vde-0833-2-2022-06/0800803-DE-PR) – veröffentlichte Festlegungen für Brandmeldeanlagen.
-- [VdS: Planung und Einbau von Brandmeldeanlagen](https://vds.de/nachrichten/2019/newsdetailseite/planung-und-einbau-von-brandmeldeanlagen) – fachliche Einordnung der VdS 2095.
-- [VdS: Anerkannte Errichterunternehmen für Gefahrenmeldeanlagen](https://vds.de/kompetenzen/brandschutz/zertifizierung/errichter-und-fachfirmen/errichterunternehmen-fuer-gefahrenmeldeanlagen) – Anforderungen an anerkannte Fachfirmen und Instandhaltung.
-- [DGUV Vorschrift 3](https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1052/elektrische-anlagen-und-betriebsmittel) – elektrische Anlagen und Betriebsmittel.
-- [§ 14 BetrSichV](https://www.gesetze-im-internet.de/betrsichv_2015/__14.html) – Prüfungen nach schädigenden Einflüssen im betrieblichen Anwendungsbereich.
-- [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html) – Schadenminderung und Aufwendungsersatz.
+- [DIN 14675-1:2020-01](https://www.dinmedia.de/de/norm/din-14675-1/310931928).
+- [DIN VDE 0833-2 (VDE 0833-2):2022-06](https://www.vde-verlag.de/p/normen/din-vde-0833-2-vde-0833-2-2022-06/0800803-DE-PR).
+- [VdS: Planung und Einbau von Brandmeldeanlagen](https://vds.de/nachrichten/2019/newsdetailseite/planung-und-einbau-von-brandmeldeanlagen).
+- [VdS: Anerkannte Errichterunternehmen für Gefahrenmeldeanlagen](https://vds.de/kompetenzen/brandschutz/zertifizierung/errichter-und-fachfirmen/errichterunternehmen-fuer-gefahrenmeldeanlagen).
+- [DGUV Vorschrift 3](https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1052/elektrische-anlagen-und-betriebsmittel).
+- [§ 14 BetrSichV](https://www.gesetze-im-internet.de/betrsichv_2015/__14.html).
+- [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html).
 
 Weiterführend: [Rauch- und Wärmeabzugsanlagen nach Brandschäden](/fachwissen/rauchwaermeabzug-brandschaden-funktionspruefung-kostenabgrenzung/), [Sprinkleranlagen nach Auslösung](/fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/), [elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/) und [prüffähige Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).

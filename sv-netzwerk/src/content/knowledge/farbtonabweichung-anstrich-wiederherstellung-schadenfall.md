@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/rechnungs-kva-pruefung-freigabe-scha
 damageTypes: ["gebaeude", "leitungswasser", "brand"]
 publication:
   publishedAt: 2026-10-01
-  updatedAt: 2026-10-01
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Farbtonabweichung nach Schaden: Anstrich prüfen"
@@ -80,13 +80,13 @@ In einem fiktiven Schadenfall wird nach einer Leitungsleckage ein begrenzter Put
 
 Farbtonabweichungen lassen sich erst belastbar regulieren, wenn Ausgangszustand, Reparaturstelle, Beschichtung und räumliche Anschlussfläche dokumentiert sind. Die neue BFS-Fachregel unterstützt die fachliche Beurteilung innerhalb ihres Geltungsbereichs; sie ersetzt weder die Einzelfallprüfung noch die Vertragsauslegung.
 
-## Aktualitäts- und Geltungsstand
+## Technische und rechtliche Einordnung
 
-Veröffentlichung dieses Beitrags: 01.10.2026. Quellenprüfung: 01.10.2026. Die BFS-Fachregel Nr. 25 hat den Stand November 2025 und wurde vom Bundesverband Farbe am 27.11.2025 als Nachfolger der Ausgabe August 2003 vorgestellt. Sie ist eine fachliche Regel für die beschriebenen Beschichtungen, kein Gesetz und kein Norm-Entwurf. DIN 18363:2019-09 ist laut DIN Media die veröffentlichte Ausgabe für Beschichtungsarbeiten; ein Entwurf wird hier nicht an ihre Stelle gesetzt. Die verlinkten §§ 249 BGB sowie 82 und 83 VVG sind amtliche Gesetzestexte. Für Sachverständige und Großschadenregulierer folgt daraus die dokumentierte Trennung von optischem Befund, fachgerechter Angleichung, schadenbedingter Menge und rechtlicher Anspruchsgrundlage.
+Die BFS-Fachregel Nr. 25 hat den Stand November 2025 und wurde vom Bundesverband Farbe am 27.11.2025 als Nachfolger der Ausgabe August 2003 vorgestellt. Sie ist eine fachliche Regel für die beschriebenen Beschichtungen, kein Gesetz und kein Norm-Entwurf. DIN 18363:2019-09 ist laut DIN Media die veröffentlichte Ausgabe für Beschichtungsarbeiten; ein Entwurf wird hier nicht an ihre Stelle gesetzt. Die verlinkten §§ 249 BGB sowie 82 und 83 VVG sind amtliche Gesetzestexte. Für Sachverständige und Großschadenregulierer folgt daraus die dokumentierte Trennung von optischem Befund, fachgerechter Angleichung, schadenbedingter Menge und rechtlicher Anspruchsgrundlage.
 
 ## Quellen und weiterführende Hinweise
 
-- Bundesverband Farbe Gestaltung Bautenschutz, [BFS-Fachregel Nr. 25: Farbübereinstimmungen und Farbabweichungen](https://www.farbe.de/aktuell/nachricht/artikel/neu-nr-25-farbuebereinstimmungen-und-farbabweichungen-beurteilung), Meldung vom 27.11.2025; Fachregel Stand November 2025, Geltungsbereich einfarbige Beschichtungen.
-- DIN Media, [ATV DIN 18363:2019-09: Maler- und Lackiererarbeiten – Beschichtungen](https://www.dinmedia.de/de/norm/din-18363/310839867), veröffentlichte Normausgabe September 2019; technischer Bezugsrahmen für Beschichtungsarbeiten.
-- Bundesministerium der Justiz, [§ 249 BGB](https://www.gesetze-im-internet.de/bgb/__249.html), amtlicher Gesetzestext, Abruf 01.10.2026; Wiederherstellungsgrundsatz im Schadensersatzrecht.
-- Bundesministerium der Justiz, [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html), amtliche Gesetzestexte, Abruf 01.10.2026; Schadenminderung und Aufwendungsersatz.
+- Bundesverband Farbe Gestaltung Bautenschutz, [BFS-Fachregel Nr. 25: Farbübereinstimmungen und Farbabweichungen](https://www.farbe.de/aktuell/nachricht/artikel/neu-nr-25-farbuebereinstimmungen-und-farbabweichungen-beurteilung), November 2025; Meldung vom 27.11.2025.
+- DIN Media, [ATV DIN 18363:2019-09: Maler- und Lackiererarbeiten – Beschichtungen](https://www.dinmedia.de/de/norm/din-18363/310839867).
+- Bundesministerium der Justiz, [§ 249 BGB](https://www.gesetze-im-internet.de/bgb/__249.html).
+- Bundesministerium der Justiz, [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html).

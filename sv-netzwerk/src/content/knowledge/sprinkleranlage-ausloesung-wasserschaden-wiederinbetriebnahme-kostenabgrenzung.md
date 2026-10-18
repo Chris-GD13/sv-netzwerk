@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/rauchwaermeabzug-brandschaden-funktionspruefung-kost
 damageTypes: ["gebaeude", "leitungswasser", "brand", "technik"]
 publication:
   publishedAt: 2026-10-05
-  updatedAt: 2026-10-05
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Sprinkleranlagen nach Auslösung fachlich prüfen"
@@ -121,14 +121,14 @@ Der Betreiber lässt die Zone sichern und beauftragt den anerkannten Errichter. 
 
 Eine Sprinkleranlage ist nach Auslösung oder Wasserschaden erst dann wieder belastbar bewertbar, wenn Ursache, betroffene Zone, Sicherheitszustand, Fachprüfung und Rückkehr in die Betriebsbereitschaft zusammen dokumentiert sind. Das Schließen eines Ventils und ein kurzer Probelauf reichen dafür nicht aus.
 
-## Aktualitäts- und Geltungsstand
+## Technische und rechtliche Einordnung
 
-Veröffentlichung dieses Beitrags: 05.10.2026. Quellenprüfung: 05.10.2026. VdS 2091 wird als Merkblatt zur Erhaltung der Betriebsbereitschaft von Sprinkleranlagen geführt und enthält Verfahren nach einer Auslösung; VdS CEA 4001 ist das von VdS beschriebene Regelwerk für Planung und Einbau. Die BetrSichV ist der amtliche Rechtsrahmen für die dort erfassten Arbeitsmittel und überwachungsbedürftigen Anlagen. Die BAuA-Übersicht beschreibt den Status Technischer Regeln; sie ersetzt nicht die Prüfung der konkreten Anlage. Für Sachverständige und Großschadenregulierer folgt daraus die getrennte Dokumentation von Auslöseursache, Wasserweg, Anlagenbefund, Ersatzmaßnahme, Fachprüfung, Wiederinbetriebnahme und Kostenfolge.
+VdS 2091 wird als Merkblatt zur Erhaltung der Betriebsbereitschaft von Sprinkleranlagen geführt und enthält Verfahren nach einer Auslösung; VdS CEA 4001 ist das von VdS beschriebene Regelwerk für Planung und Einbau. Die BetrSichV ist der amtliche Rechtsrahmen für die dort erfassten Arbeitsmittel und überwachungsbedürftigen Anlagen. Die BAuA-Übersicht beschreibt den Status Technischer Regeln; sie ersetzt nicht die Prüfung der konkreten Anlage. Für Sachverständige und Großschadenregulierer folgt daraus die getrennte Dokumentation von Auslöseursache, Wasserweg, Anlagenbefund, Ersatzmaßnahme, Fachprüfung, Wiederinbetriebnahme und Kostenfolge.
 
 ## Quellen und weiterführende Hinweise
 
-- VdS, [Sprinklerrichtlinie / VdS CEA 4001](https://vds.de/pruefung-anerkennung/technische-pruefstelle/information-innovation/informationen-news/sprinklerrichtlinie), Informationen zur Richtlinie, Abruf 05.10.2026.
-- VdS, [VdS 2091 – Erhaltung der Betriebsbereitschaft von Wasserlöschanlagen](https://shop.vds.de/download/V2091/7bbeb334-f7ea-4c13-bd34-1cbfe54145c8), Ausgabe 2022-03 (09), insbesondere Auslösung und Kontrollprogramm, Abruf 05.10.2026.
-- [Betriebssicherheitsverordnung (BetrSichV)](https://www.gesetze-im-internet.de/betrsichv_2015/), amtlicher Gesetzestext, Abruf 05.10.2026.
-- BAuA, [Technische Regeln für Betriebssicherheit](https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS), Statusübersicht, Abruf 05.10.2026.
-- [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html), amtliche Gesetzestexte, Abruf 05.10.2026.
+- VdS, [Sprinklerrichtlinie / VdS CEA 4001](https://vds.de/pruefung-anerkennung/technische-pruefstelle/information-innovation/informationen-news/sprinklerrichtlinie).
+- VdS, [VdS 2091 – Erhaltung der Betriebsbereitschaft von Wasserlöschanlagen](https://shop.vds.de/download/V2091/7bbeb334-f7ea-4c13-bd34-1cbfe54145c8), Ausgabe 2022-03 (09).
+- [Betriebssicherheitsverordnung (BetrSichV)](https://www.gesetze-im-internet.de/betrsichv_2015/).
+- BAuA, [Technische Regeln für Betriebssicherheit](https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS).
+- [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html).

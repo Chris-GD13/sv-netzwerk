@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-mat
 damageTypes: ["gebaeude"]
 publication:
   publishedAt: 2026-10-11
-  updatedAt: 2026-10-11
+  updatedAt: 2026-10-18
   status: published
 seo:
   title: "Schallschutz bei Innentüren: Prüfwert und Einbau bewerten"
@@ -113,19 +113,21 @@ Angebote sollten Diagnose, Bauteile, Anschlussarbeiten, Wiederherstellung und Er
 
 Dieser Beitrag behandelt Bauqualität und Bauakustik. Eine akustische Beanstandung begründet für sich keinen Versicherungsschutz. Die technische Bewertung bleibt von einer gegebenenfalls gesonderten Vertrags- oder Deckungsprüfung getrennt.
 
+## Regelwerksbezug bei rechnerischen Nachweisen
+
+DIN 4109-35:2026-10 enthält Bauteildaten unter anderem zu Innentüren, Öffnungen und Fugen. Sie ist nur zusammen mit DIN 4109-31 anwendbar und ersetzt die Ausgabe 2016-07 sowie deren Änderung A1:2019-12. Der Entwurf von Dezember 2025 ist zurückgezogen. Bei einem rechnerischen Nachweis kläre ich deshalb zuerst, welche Ausgabe und welcher projektbezogene Anwendungsrahmen maßgeblich sind. Aus der Veröffentlichung einer neuen Norm folgt keine pauschale rückwirkende Nachrüstpflicht für bestehende Türen.
+
 ## Fazit
 
 Guter Schallschutz entsteht aus einer passenden Anforderung, einem nachgewiesenen Türelement und einer geeigneten Einbausituation. Sachverständige müssen Produktkennwerte, Raumleistung und Übertragungswege unterscheiden. Die Untersuchung von Dichtungen, Bodenabschluss und Zargenanschluss kann eine gezielte Nachbesserung ermöglichen; bei ungeklärter Raumleistung ist eine qualifizierte bauakustische Untersuchung erforderlich.
 
-## Quellen, Ausgabedatum, Status und praktische Bedeutung
+## Quellen und weiterführende Hinweise
 
-Quellenprüfung am 11.10.2026. Die Normen wurden anhand der öffentlichen DIN-Media-Kataloginformationen bibliografisch geprüft; die kostenpflichtigen Volltexte wurden nicht als vollständig eingesehen ausgegeben. Ausgabedatum, Artikel-Veröffentlichungsdatum und bauaufsichtliche beziehungsweise vertragliche Anwendbarkeit sind getrennt zu beurteilen. Aus einer neuen Ausgabe folgt kein pauschaler rückwirkender Geltungsbeginn für Bestandsobjekte.
-
-- [DIN EN ISO 10140-2:2021-09](https://www.dinmedia.de/de/norm/din-en-iso-10140-2/334753459), im Katalog aktuell: Prüfstandsmessung der Luftschalldämmung; Bezug für die Unterscheidung von Produktprüfung und Messung am Bau.
-- [DIN EN ISO 16283-1:2018-04](https://www.dinmedia.de/de/norm/din-en-iso-16283-1/275504470), im Katalog aktuell: Messung der Luftschalldämmung am Bau; Bezug für das objektbezogene Messkonzept.
-- [DIN EN ISO 717-1:2021-05](https://www.dinmedia.de/de/norm/din-en-iso-717-1/329418506), im Katalog aktuell: Bewertung der Luftschalldämmung; Bezug für Einzahlangaben aus frequenzabhängigen Ergebnissen.
-- [DIN 4109-35:2026-10](https://www.dinmedia.de/de/norm/din-4109-35/404487077), neue aktuelle Normausgabe: Bauteildaten unter anderem zu Innentüren, Öffnungen und Fugen; laut Katalog nur zusammen mit DIN 4109-31 anzuwenden. Sie ersetzt 2016-07 und A1:2019-12. Der Entwurf 2025-12 ist zurückgezogen und wird hier nicht als geltende Norm verwendet. Praktisch: Bei rechnerischen Nachweisen die zutreffende Ausgabe und den Anwendungsbezug prüfen; keine ungeprüfte Übernahme alter Tabellen.
-- [HUGA: Schallschutz](https://www.huga.de/tueren/funktionstueren/schallschutz/), undatierte Herstellerinformation, Abruf 11.10.2026: Zusammenhang von Türblattkonstruktion und Bodendichtung sowie Unterscheidung veröffentlichter Labor- und Rechenwerte; keine produktübergreifende Leistungszusage.
-- [Hörmann: Grundwissen Türen, Auflage 1/2019](https://www.hoermann.de/fileadmin/_country/kataloge/pdf/HOER-HANDBUCH-Bd-01-Grundwissen_2019_.pdf), Hersteller-Fachinformation: bauakustische Grundlagen und flankierende Übertragung. Ältere Normverweise sind vor Anwendung auf den konkreten Nachweis zu prüfen.
+- DIN Media, [DIN EN ISO 10140-2:2021-09](https://www.dinmedia.de/de/norm/din-en-iso-10140-2/334753459).
+- DIN Media, [DIN EN ISO 16283-1:2018-04](https://www.dinmedia.de/de/norm/din-en-iso-16283-1/275504470).
+- DIN Media, [DIN EN ISO 717-1:2021-05](https://www.dinmedia.de/de/norm/din-en-iso-717-1/329418506).
+- DIN Media, [DIN 4109-35:2026-10](https://www.dinmedia.de/de/norm/din-4109-35/404487077).
+- [HUGA: Schallschutz](https://www.huga.de/tueren/funktionstueren/schallschutz/).
+- [Hörmann: Grundwissen Türen, Auflage 1/2019](https://www.hoermann.de/fileadmin/_country/kataloge/pdf/HOER-HANDBUCH-Bd-01-Grundwissen_2019_.pdf).
 
 Weiterführend: [Anschlussdetails und Untergrund fachlich beurteilen](/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/) und [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/).

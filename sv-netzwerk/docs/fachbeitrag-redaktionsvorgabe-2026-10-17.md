@@ -9,3 +9,5 @@ Quellenverzeichnisse zeigen ausschließlich Herausgeber, Titel, Fundstelle bezie
 Umsetzung: sechs Fachbeiträge redaktionell bereinigt, Drohnenartikel in Autorenperspektive überarbeitet, vorbereiteten Begleittext korrigiert und die vorhandene öffentliche Textprüfung um bekannte interne Formulierungen ergänzt. Historische Veröffentlichungsnachweise werden nicht nachträglich umgeschrieben.
 
 Prüfung: npm run build erfolgreich; 0 Fehler, 0 Warnungen, 0 Hinweise. Fachwissen-SEO, Suchmetadaten, Sitemap und interne Links erfolgreich geprüft.
+
+Ergänzung 18.10.2026: LinkedIn-Begleittexte in natürlichem Fließtext verfassen. Keine eingerückten Punkte, schematischen Aufzählungen, künstlichen Gliederungen oder Profilzuweisungen. Konkrete fachliche Aussage, kurze zusammenhängende Absätze und nachvollziehbarer Nutzen; keine erfundenen persönlichen Erfahrungen. In vorbereitenden Läufen bleibt der Status prepared-not-posted, bis tatsächlich veröffentlicht und mit echtem Permalink bestätigt.
