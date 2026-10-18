@@ -42,6 +42,10 @@ jobs:
           docker ps --filter name=evcc-energy --format '{{.Names}} {{.Status}} {{.Ports}}'
           printf "Private evcc HTTP: "
           curl --max-time 5 -s -o /dev/null -w '%{http_code}\n' http://10.77.66.1:7070/ || true
+          printf "KEBA HTTP: "
+          curl --max-time 8 -s -o /dev/null -w '%{http_code}\n' http://192.168.178.106/ || true
+          printf "Recent charger connection events\n"
+          docker logs --since 15m evcc-energy 2>&1 | grep -Ei 'ocpp|charger|loadpoint|timeout|listening|fatal' | tail -n 35 || true
           CHECK
 
 # Verify provider firewall update.
