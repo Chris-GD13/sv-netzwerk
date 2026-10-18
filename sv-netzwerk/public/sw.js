@@ -16,6 +16,12 @@ self.addEventListener('install', () => self.skipWaiting());
 precacheAndRoute(self.__WB_MANIFEST || []);
 
 // HTML pages - Network First (online priority, fallback to cache)
+// Personal energy access and VPN keys must never enter an offline cache.
+registerRoute(
+  ({ url }) => url.pathname === '/intern/api/energy.php' || url.pathname.startsWith('/intern/energie/'),
+  new NetworkOnly()
+);
+
 registerRoute(
   ({ request }) => request.mode === 'navigate',
   new NetworkFirst({
@@ -92,3 +98,4 @@ self.addEventListener('activate', (event) => {
     ])
   );
 });
+

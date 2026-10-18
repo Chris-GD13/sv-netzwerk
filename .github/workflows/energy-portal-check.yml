@@ -1,0 +1,32 @@
+name: Private energy portal checks
+on:
+  push:
+    branches: [codex/energy-portal]
+    paths: ['sv-netzwerk/**', '.github/workflows/energy-portal-check.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - run: npm ci --no-audit --no-fund
+      - run: |
+          php -l public/intern/api/energy.php
+          php -l public/intern/energy-check.php
+          php tests/energy_access_test.php
+          npm run build
+          test -f dist/intern/energie/index.php
+          grep -Fq "/intern/energy-check.php" dist/intern/energie/index.php
+          test ! -f dist/intern/energie/index.html
+          grep -Fq "data-energy-access" dist/intern/tagescockpit/index.php
