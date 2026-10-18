@@ -1,0 +1,53 @@
+name: Check charge pause and meter data
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/energy-pause-check.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Read available energy inputs without changes
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          python3 - <<'PY'
+          import json,urllib.request,urllib.error,sqlite3
+          base='http://10.77.66.1:7070/api'
+          def get():
+           with urllib.request.urlopen(base+'/state',timeout=5) as r:
+            d=json.load(r);return d.get('result',d)
+          d=get()
+          print('STATE',json.dumps({k:d.get(k) for k in ['grid','pv','battery','homePower','interval']}))
+          print('LOADPOINT',json.dumps({k:d.get('loadpoints',[{}])[0].get(k) for k in ['mode','chargePower','connected','charging','enabled','chargeCurrents','offeredCurrent']}))
+          try:
+           req=urllib.request.Request(base+'/loadpoints/1/mode/off',data=b'',method='POST')
+           with urllib.request.urlopen(req,timeout=10) as r: print('PAUSE_API_STATUS',r.status)
+          except urllib.error.HTTPError as e:print('PAUSE_API_STATUS',e.code)
+          con=sqlite3.connect('file:/opt/anker-homeassistant/config/home-assistant_v2.db?mode=ro',uri=True)
+          names=['sensor.smart_meter_netznutzung','sensor.smart_meter_netzeinspeisung','sensor.smart_meter_mqtt_zeit','sensor.solix_power_dock_ac_hausabgabe','sensor.solix_power_dock_hausbedarf','sensor.solix_power_dock_netzleistung','sensor.solix_power_dock_mqtt_zeit','sensor.solix_power_dock_gerateleistung_gesamt','sensor.solix_power_dock_solarleistung_gesamt','sensor.solix_power_dock_akkuleistung_gesamt']
+          for name in names:
+           row=con.execute('SELECT s.state,s.last_updated_ts FROM states s JOIN states_meta m ON s.metadata_id=m.metadata_id WHERE m.entity_id=? ORDER BY s.state_id DESC LIMIT 1',(name,)).fetchone()
+           print('METER',name,row)
+          PY
+          CHECK
