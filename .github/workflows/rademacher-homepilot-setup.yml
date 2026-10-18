@@ -33,7 +33,6 @@ jobs:
           set -eu
           umask 077
           test ! -e /opt/anker-homeassistant/config/custom_components/rademacher
-          curl --connect-timeout 8 --max-time 15 --fail --silent --output /dev/null http://192.168.178.34/
           stage=$(mktemp -d /opt/anker-homeassistant/rademacher-stage.XXXXXX)
           curl --fail --silent --show-error --location https://codeload.github.com/peribeir/homeassistant-rademacher/tar.gz/95578e59888779e8c6130a61b5d268fdce42a4e6 -o "$stage/source.tar.gz"
           printf '%s  %s\n' '49065382ed8c231ec220c017fb9d995d41d177bcfeb748b49f79d519de040be2' "$stage/source.tar.gz" | sha256sum -c -
