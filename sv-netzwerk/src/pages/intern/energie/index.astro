@@ -2,13 +2,13 @@
 import InternalLayout from '../../../layouts/InternalLayout.astro';
 const services = [
   { id: 'evcc', title: 'Ladeübersicht', text: 'Ladestatus, Fahrzeug und Überschussladen mit evcc.', icon: '⚡' },
-  { id: 'anker', title: 'Anker & Speicher', text: 'Solarbank, Power Dock, Smart Meter und smarte Steckdosen.', icon: '☀' },
+  { id: 'anker', title: 'Haussteuerung & Kameras', text: 'Geräte bedienen, Kamerabilder ansehen und Solarenergie im Blick behalten.', icon: '⌂' },
   { id: 'keba', title: 'KEBA-Einstellungen', text: 'Die Oberfläche deiner Wallbox für Status und Einstellungen.', icon: '⚙' },
 ];
 ---
 <InternalLayout title="Energiesteuerung" description="Persönlicher Zugang zu Laden, Solarenergie und Wallbox.">
   <section class="energy-page">
-    <header><p class="intern-header__eyebrow">MEIN ZUHAUSE</p><h1>Energiesteuerung</h1><p>Laden, Solarenergie und Speicher an einem Ort.</p></header>
+    <header><p class="intern-header__eyebrow">MEIN ZUHAUSE</p><h1>Energiesteuerung</h1><p>Laden, Haussteuerung und Kameras an einem Ort.</p></header>
     <nav class="energy-tabs" aria-label="Tagescockpit Ansichten"><a href="/intern/tagescockpit/">Übersicht</a><a href="/intern/energie/" aria-current="page">Energiesteuerung</a><a href="/intern/arbeitszentrale/">Arbeitsorganisation</a></nav>
     <div class="energy-cards">
       {services.map(service => <article><span class="energy-icon" aria-hidden="true">{service.icon}</span><h2>{service.title}</h2><p>{service.text}</p><a href={`/intern/api/energy.php?service=${service.id}`} target="_blank" rel="noopener noreferrer">{service.title} öffnen <span aria-hidden="true">↗</span></a></article>)}
