@@ -1,0 +1,93 @@
+name: Prepare private energy VPN profiles
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/energy-mobile-vpn.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Prepare three private client profiles without restarting KEBA or VPN
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          umask 077
+          test "$(id -u)" = 0
+          systemctl is-active --quiet wg-quick@evcc-home
+          test ! -e /opt/evcc-energy/client-profiles
+          test ! -e /usr/local/sbin/evcc-mobile-routing
+          test "$(cat /proc/sys/net/ipv4/ip_forward)" = 1
+          for addr in 10 11 12; do
+            if wg show evcc-home allowed-ips | grep -Fq "10.77.66.$addr/32"; then echo "Client address already assigned"; exit 1; fi
+          done
+          cp -p /etc/wireguard/evcc-home.conf /etc/wireguard/evcc-home.before-mobile.conf
+          install -d -m 750 -g www-data /opt/evcc-energy/client-profiles
+          chgrp www-data /opt/evcc-energy
+          chmod 710 /opt/evcc-energy
+          server_public=$(wg show evcc-home public-key)
+          for item in handy:10 surface:11 laptop:12; do
+            name=$(printf '%s' "$item" | cut -d: -f1)
+            addr=$(printf '%s' "$item" | cut -d: -f2)
+            private=$(wg genkey)
+            public=$(printf '%s' "$private" | wg pubkey)
+            file="/opt/evcc-energy/client-profiles/$name.conf"
+            printf '[Interface]\nPrivateKey = %s\nAddress = 10.77.66.%s/32\n\n[Peer]\nPublicKey = %s\nEndpoint = 217.160.143.102:51820\nAllowedIPs = 10.77.66.1/32, 192.168.178.106/32\nPersistentKeepalive = 25\n' "$private" "$addr" "$server_public" > "$file"
+            chmod 640 "$file"
+            chgrp www-data "$file"
+            printf '\n# Energy mobile client %s\n[Peer]\nPublicKey = %s\nAllowedIPs = 10.77.66.%s/32\n' "$name" "$public" "$addr" >> /etc/wireguard/evcc-home.conf
+            wg set evcc-home peer "$public" allowed-ips "10.77.66.$addr/32"
+            unset private public
+          done
+          cat > /usr/local/sbin/evcc-mobile-routing <<'ROUTING'
+          #!/bin/sh
+          set -eu
+          for addr in 10 11 12; do
+            ip="10.77.66.$addr/32"
+            iptables -w -t nat -C POSTROUTING -s "$ip" -d 192.168.178.106/32 -o evcc-home -j SNAT --to-source 10.77.66.1 2>/dev/null || iptables -w -t nat -A POSTROUTING -s "$ip" -d 192.168.178.106/32 -o evcc-home -j SNAT --to-source 10.77.66.1
+            iptables -w -C FORWARD -i evcc-home -o evcc-home -s "$ip" -j DROP 2>/dev/null || iptables -w -I FORWARD 1 -i evcc-home -o evcc-home -s "$ip" -j DROP
+            iptables -w -C FORWARD -i evcc-home -o evcc-home -s "$ip" -d 192.168.178.106/32 -p tcp --dport 80 -j ACCEPT 2>/dev/null || iptables -w -I FORWARD 1 -i evcc-home -o evcc-home -s "$ip" -d 192.168.178.106/32 -p tcp --dport 80 -j ACCEPT
+            iptables -w -C FORWARD -i evcc-home -o evcc-home -s 192.168.178.106/32 -d "$ip" -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT 2>/dev/null || iptables -w -I FORWARD 1 -i evcc-home -o evcc-home -s 192.168.178.106/32 -d "$ip" -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+          done
+          ROUTING
+          chmod 700 /usr/local/sbin/evcc-mobile-routing
+          cat > /etc/systemd/system/evcc-mobile-routing.service <<'SERVICE'
+          [Unit]
+          Description=Restricted mobile access to KEBA over energy VPN
+          Requires=wg-quick@evcc-home.service
+          After=wg-quick@evcc-home.service docker.service
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/local/sbin/evcc-mobile-routing
+          RemainAfterExit=yes
+          [Install]
+          WantedBy=multi-user.target
+          SERVICE
+          systemctl daemon-reload
+          systemctl enable --now evcc-mobile-routing.service
+          for name in handy surface laptop; do
+            runuser -u www-data -- test -r "/opt/evcc-energy/client-profiles/$name.conf"
+          done
+          test "$(wg show evcc-home peers | wc -l)" -ge 4
+          systemctl is-active apache2 wg-quick@evcc-home evcc-mobile-routing
+          echo MOBILE_PROFILES_READY_NO_KEYS_LOGGED
+          CHECK
