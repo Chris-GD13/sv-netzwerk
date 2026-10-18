@@ -610,14 +610,17 @@
         "title": "Beschlagene Fensterscheiben: Kondensat außen, innen und im Scheibenzwischenraum unterscheiden",
         "slug": "fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum",
         "url": "https://www.sv-netzwerk.eu/fachwissen/fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-fachbeitraege-20261018-0355",
-        "reserved_at": "2026-10-18T03:56:51.476Z"
+        "reserved_at": "2026-10-18T03:56:51.476Z",
+        "commit": "155c34345630678cf1f7be9cb7b005208010cb43",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39096105150",
+        "verified_at": "2026-10-18T04:16:45.484Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-18T03:56:51.476Z"
+  "updated_at": "2026-10-18T04:16:45.484Z"
 }
