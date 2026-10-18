@@ -191,6 +191,10 @@ const isActive = (href: string) => currentPath.startsWith(href);
         <nav aria-label="Interne Navigation" class="intern-sidebar__nav">
           {internalLinks.map((link) => link.divider ? <div class="intern-sidebar__divider" aria-hidden="true"></div> : link.dynamic === 'whatsapp' ? <a id="intern-whatsapp-link" class:list={{ active: isActive('/intern/whatsapp/') }} href="/intern/whatsapp/" aria-current={isActive('/intern/whatsapp/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : link.dynamic === 'settlement' ? <a id="intern-settlement-link" class:list={{ active: isActive('/intern/abrechnungen/') }} href="/intern/abrechnungen/" aria-current={isActive('/intern/abrechnungen/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : <a class:list={{ active: isActive(link.href ?? ''), sub: link.sub }} href={link.href ?? '#'} aria-current={isActive(link.href ?? '') ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
           <a id="intern-administration-link" class:list={{ active: isActive('/intern/administration/') }} href="/intern/administration/" aria-current={isActive('/intern/administration/') ? 'page' : undefined} hidden><span>⚙</span>Administration</a>
+          <a href="/intern/energie/" data-energy-access hidden class:list={{ active: isActive('/intern/energie/') }}><span>⚡</span>Energiesteuerung</a>
+          <a href="/intern/api/energy.php?service=evcc" data-energy-access hidden class="sub" target="_blank" rel="noopener noreferrer"><span>↗</span>Ladeübersicht</a>
+          <a href="/intern/api/energy.php?service=anker" data-energy-access hidden class="sub" target="_blank" rel="noopener noreferrer"><span>☀</span>Anker & Speicher</a>
+          <a href="/intern/api/energy.php?service=keba" data-energy-access hidden class="sub" target="_blank" rel="noopener noreferrer"><span>⚙</span>KEBA-Einstellungen</a>
           <slot name="sidebar-extra" />
         </nav>
       </aside>
@@ -216,6 +220,8 @@ const isActive = (href: string) => currentPath.startsWith(href);
         <p id="chatgpt-onboarding-state" class="chatgpt-onboarding__state" role="status" aria-live="polite" hidden></p>
       </div>
     </section>
+    <style is:global>[data-energy-access][hidden]{display:none!important}</style>
+    <script is:inline src="/intern/energy-navigation.js?v=20261018-1" defer></script>
     <script is:inline src="/intern/erstbericht-output-options.js" defer></script>
     <script is:inline src="/intern/versicherungsfaelle-enhancements.js" defer></script>
     <script is:inline src="/intern/case-document-browser.js?v=20260901-2" defer></script>
