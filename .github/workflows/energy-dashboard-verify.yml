@@ -1,0 +1,46 @@
+name: Read energy automation inputs
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/energy-dashboard-verify.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Read available energy inputs without changes
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          docker exec anker-homeassistant sh -c 'grep -R -n "stat_rate_from\|stat_rate_to\|power_config" /usr/src/homeassistant/homeassistant/components/energy/*.py' | head -80
+          python3 - <<'PY'
+          import pathlib,sqlite3,json
+          base=pathlib.Path('/opt/anker-homeassistant/config')
+          db=sqlite3.connect('file:'+str(base/'home-assistant_v2.db')+'?mode=ro',uri=True)
+          for row in db.execute("SELECT DISTINCT entity_id FROM states_meta WHERE entity_id LIKE 'sensor.energiebilanz_%'"):
+           e=row[0]
+           r=db.execute("SELECT s.state,a.shared_attrs FROM states s JOIN states_meta m ON s.metadata_id=m.metadata_id LEFT JOIN state_attributes a ON a.attributes_id=s.attributes_id WHERE m.entity_id=? ORDER BY s.state_id DESC LIMIT 1",(e,)).fetchone()
+           print('METER',e,r)
+          print('WARM_WATER_PACKAGE_PRESENT',(base/'packages/warmwasser.yaml').exists())
+          PY
+          docker logs --since 4m anker-homeassistant 2>&1 | grep -E 'energy_dashboard|Invalid config|energiebilanz' | tail -20 || true
+          CHECK
