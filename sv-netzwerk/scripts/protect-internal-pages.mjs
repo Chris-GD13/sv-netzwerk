@@ -27,6 +27,8 @@ const walk = (directory) => {
     const phpFile = path.join(directory, 'index.php');
     const guard = directory === path.join(internRoot, 'administration')
       ? "<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/intern/administration_check.php'; ?>\n"
+      : directory === path.join(internRoot, 'energie')
+        ? "<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/intern/energy-check.php'; ?>\n"
       : directory === path.join(internRoot, 'privatauftraege', 'angebot')
         ? "<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/intern/private-business-check.php'; ?>\n"
         : phpGuard;
