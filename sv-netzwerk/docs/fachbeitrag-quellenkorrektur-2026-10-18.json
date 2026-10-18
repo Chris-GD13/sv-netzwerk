@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-18",
+  "scope": "Gezielte Reparatur tatsächlich fehlerhafter Quellenlinks; keine vollständige Archivfreigabe",
+  "affected_articles": [
+    "rauchwaermeabzug-brandschaden-funktionspruefung-kostenabgrenzung",
+    "badfugen-abdichtung-feuchteeintritt-schadenabgrenzung",
+    "balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung",
+    "fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum"
+  ],
+  "corrected_links": [
+    {
+      "old": "https://www.dinmedia.de/de/norm/din-18232-10/380671595",
+      "new": "https://www.dinmedia.de/de/norm/din-18232-10/383088996"
+    },
+    {
+      "old": "https://www.dinmedia.de/de/norm/din-18232-101/392517948",
+      "new": "https://www.dinmedia.de/de/norm/din-18232-101/402729846"
+    },
+    {
+      "old": "https://www.dinmedia.de/de/norm/din-18232-2/102938461",
+      "new": "https://www.dinmedia.de/de/norm/din-18232-2/101330298"
+    },
+    {
+      "old": "https://www.dinmedia.de/de/norm/din-18232-5/148446167",
+      "new": "https://www.dinmedia.de/de/norm/din-18232-5/164519109"
+    },
+    {
+      "old": "https://www.dibt.de/de/wir-bieten/zulassungen-eta-und-mehr/bauprodukte-fuer-die-entraeuchung-oder-rauchableitung",
+      "new": "https://www.dibt.de/de/bauprodukte/informationsportal-bauprodukte-und-bauarten/produktgruppen/bauprodukte-detail/bauprodukt/bauprodukte-fuer-die-entrauchung-oder-rauchableitung/"
+    }
+  ],
+  "uba_replacement": {
+    "old": "https://www.umweltbundesamt.de/themen/gesundheit/innenraumhygiene",
+    "new": "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel",
+    "publication_or_update_date": "2025-01-27"
+  },
+  "din_read_scope": "Öffentliche Verlagsmetadaten, Status und Einführungsbeiträge; kein Normvolltext",
+  "norms": [
+    {
+      "name": "DIN 18232-10",
+      "edition": "2024-12",
+      "status": "veröffentlicht, aktuell"
+    },
+    {
+      "name": "DIN 18232-101",
+      "edition": "2026-09",
+      "status": "veröffentlicht; Entwurf 2025-05 zurückgezogen"
+    },
+    {
+      "name": "DIN 18232-2",
+      "edition": "2007-11",
+      "status": "veröffentlicht, aktuell"
+    },
+    {
+      "name": "DIN 18232-5",
+      "edition": "2012-11",
+      "status": "veröffentlicht, aktuell"
+    }
+  ],
+  "practical_meaning": "Nachvollziehbare Fundstellen zu Dienstleisterkompetenz, Bemessung und Produkt-/Systembezug; keine unzugänglichen Klauseln hinzugefügt.",
+  "manufacturer_source": {
+    "status": "aus öffentlichem Artikel und Begleittext entfernt",
+    "reason": "Der direkt geprüfte PDF-Link führt inzwischen über Weiterleitungen zu einer allgemeinen Herstellerseite. Die allein auf dieser Fundstelle beruhende Eiskristall-Differenzierung wurde deshalb entfernt; keine Ersatzquelle vorgetäuscht."
+  },
+  "linkcheck_configuration": "Absolute Buildwurzel und index.html/index.php ergänzt, damit root-relative Links korrekt aufgelöst werden."
+}

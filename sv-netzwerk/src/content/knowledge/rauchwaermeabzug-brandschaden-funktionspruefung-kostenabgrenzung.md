@@ -33,7 +33,7 @@ Rauch- und Wärmeabzugsanlagen (RWA) sollen im Brandfall eine definierte Rauchab
 
 Für die Schadenprüfung sind deshalb vier Fragen zu trennen: Welche Einwirkung lag vor, welche Komponenten waren tatsächlich betroffen, welche Maßnahme war für die sichere Gefahrenabwehr erforderlich und welche Prüfung ist für eine Wiederinbetriebnahme geschuldet? Ein geöffneter Deckel oder ein kurzer Probelauf beantwortet keine dieser Fragen vollständig.
 
-Die [DIN 18232-10:2024-12](https://www.dinmedia.de/de/norm/din-18232-10/380671595) beschreibt Anforderungen an Fachunternehmen für Planung, Ausführung, Inbetriebnahme, Prüfung, Abnahme und Instandhaltung von Rauch- und Wärmefreihaltungsanlagen. Für den Kompetenznachweis ist seit September 2026 außerdem [DIN 18232-101:2026-09](https://www.dinmedia.de/de/norm/din-18232-101/392517948) veröffentlicht. Beide Normen sind fachliche Prüfmaßstäbe; sie ersetzen weder die konkrete Anlagenzulassung noch eine versicherungsrechtliche Deckungsentscheidung.
+Die [DIN 18232-10:2024-12](https://www.dinmedia.de/de/norm/din-18232-10/383088996) beschreibt Anforderungen an Fachunternehmen für Planung, Ausführung, Inbetriebnahme, Prüfung, Abnahme und Instandhaltung von Rauch- und Wärmefreihaltungsanlagen. Für den Kompetenznachweis ist seit September 2026 außerdem [DIN 18232-101:2026-09](https://www.dinmedia.de/de/norm/din-18232-101/402729846) veröffentlicht. Beide Normen sind fachliche Prüfmaßstäbe; sie ersetzen weder die konkrete Anlagenzulassung noch eine versicherungsrechtliche Deckungsentscheidung.
 
 ## Schadenbild und abzugrenzende Ursachen
 
@@ -68,13 +68,13 @@ Die Prüfung sollte die Funktionskette nachvollziehbar abbilden:
 5. Rückmeldung, Endlagen, Störanzeige und gegebenenfalls sichere Rückstellung;
 6. Zusammenspiel mit Zuluft, Rauchabschnitten, Türen und der vorhandenen Brandschutzdokumentation.
 
-Die [DIN 18232-2:2007-11](https://www.dinmedia.de/de/norm/din-18232-2/102938461) und [DIN 18232-5:2012-11](https://www.dinmedia.de/de/norm/din-18232-5/148446167) enthalten Anforderungen und Bemessungsgrundsätze für natürliche beziehungsweise maschinelle Rauchabzugsanlagen. Welche Normen, Bauartnachweise und Herstellerangaben im Einzelfall gelten, hängt vom Anlagentyp, Baujahr, Genehmigungsstand und Verwendungszweck ab.
+Die [DIN 18232-2:2007-11](https://www.dinmedia.de/de/norm/din-18232-2/101330298) und [DIN 18232-5:2012-11](https://www.dinmedia.de/de/norm/din-18232-5/164519109) enthalten Anforderungen und Bemessungsgrundsätze für natürliche beziehungsweise maschinelle Rauchabzugsanlagen. Welche Normen, Bauartnachweise und Herstellerangaben im Einzelfall gelten, hängt vom Anlagentyp, Baujahr, Genehmigungsstand und Verwendungszweck ab.
 
 ## Wiederinbetriebnahme und Fachgrenzen
 
 Eine Wiederinbetriebnahme setzt eine dokumentierte fachkundige Bewertung voraus. Je nach Schaden sind Messungen der Isolation, Prüfung von Akkus und Netzversorgung, Sicht- und Bewegungsprüfungen, Funktionsprüfungen der Antriebe, Reinigung von Sensorik und eine Kontrolle der Zuluftwege erforderlich. Bei mechanischen Anlagen können zusätzlich Ventilator, Klappen, Kanalabschnitte und die tatsächliche Luftführung zu bewerten sein. Das Prüfprotokoll muss festhalten, welche Teile geprüft wurden, mit welchem Ergebnis und unter welchen Einschränkungen eine Freigabe erteilt wurde.
 
-Die [DIBt-Information zu Bauprodukten für Entrauchung und Rauchableitung](https://www.dibt.de/de/wir-bieten/zulassungen-eta-und-mehr/bauprodukte-fuer-die-entraeuchung-oder-rauchableitung) ordnet unter anderem feuer- und temperaturbeständige Leitungen sowie mechanische Rauchabzugsgeräte als Komponenten entsprechender Systeme ein. Produkt- und Zulassungsanforderungen sind daher anhand der konkreten Anlage zu prüfen; eine allgemeine Aussage „alles austauschen“ ist daraus nicht ableitbar.
+Die [DIBt-Information zu Bauprodukten für Entrauchung und Rauchableitung](https://www.dibt.de/de/bauprodukte/informationsportal-bauprodukte-und-bauarten/produktgruppen/bauprodukte-detail/bauprodukt/bauprodukte-fuer-die-entrauchung-oder-rauchableitung/) ordnet unter anderem feuer- und temperaturbeständige Leitungen sowie mechanische Rauchabzugsgeräte als Komponenten entsprechender Systeme ein. Produkt- und Zulassungsanforderungen sind daher anhand der konkreten Anlage zu prüfen; eine allgemeine Aussage „alles austauschen“ ist daraus nicht ableitbar.
 
 Der Sachverständige kann Befund, zeitliche Abfolge, Plausibilität und Kostenstruktur bewerten. Er ersetzt jedoch keine erforderliche Fachprüfung, keine bauordnungsrechtliche Abnahme und keine Betreiberfreigabe. Werden Bauteile geöffnet, sind Zweck, Umfang, Sicherung der ausgebauten Teile und Rückbau getrennt zu dokumentieren.
 
@@ -114,9 +114,9 @@ Die genannten DIN-Normen sind mit dem bei DIN Media ausgewiesenen Status „aktu
 
 ## Quellen
 
-- [DIN Media: DIN 18232-10:2024-12](https://www.dinmedia.de/de/norm/din-18232-10/380671595).
-- [DIN Media: DIN 18232-101:2026-09](https://www.dinmedia.de/de/norm/din-18232-101/392517948).
-- [DIN Media: DIN 18232-2:2007-11](https://www.dinmedia.de/de/norm/din-18232-2/102938461) und [DIN 18232-5:2012-11](https://www.dinmedia.de/de/norm/din-18232-5/148446167).
-- [DIBt: Bauprodukte für Entrauchung oder Rauchableitung](https://www.dibt.de/de/wir-bieten/zulassungen-eta-und-mehr/bauprodukte-fuer-die-entraeuchung-oder-rauchableitung).
+- [DIN Media: DIN 18232-10:2024-12](https://www.dinmedia.de/de/norm/din-18232-10/383088996).
+- [DIN Media: DIN 18232-101:2026-09](https://www.dinmedia.de/de/norm/din-18232-101/402729846).
+- [DIN Media: DIN 18232-2:2007-11](https://www.dinmedia.de/de/norm/din-18232-2/101330298) und [DIN 18232-5:2012-11](https://www.dinmedia.de/de/norm/din-18232-5/164519109).
+- [DIBt: Bauprodukte für Entrauchung oder Rauchableitung](https://www.dibt.de/de/bauprodukte/informationsportal-bauprodukte-und-bauarten/produktgruppen/bauprodukte-detail/bauprodukt/bauprodukte-fuer-die-entrauchung-oder-rauchableitung/).
 - [BAuA: TRBS 1112 Instandhaltung](https://www.baua.de/DE/Angebote/Regelwerk/TRBS/TRBS-1112).
 - [Gesetze im Internet: §§ 82, 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/).

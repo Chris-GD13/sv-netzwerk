@@ -116,5 +116,5 @@ Ich dokumentiere den Abdichtungsaufbau und den projektbezogen maßgeblichen Rege
 - Versicherungsvertragsgesetz, insbesondere §§ 82 und 86: https://www.gesetze-im-internet.de/vvg_2008/
 - DIN Media, DIN 18534-1:2025-10, Abdichtung von Innenräumen, aktuelle Normausgabe: https://www.dinmedia.de/de/norm/din-18534-1/391755876
 - DIN Media, DIN 18534-1/A1:2026-09, ausdrücklich Norm-Entwurf: https://www.dinmedia.de/en/draft-standard/din-18534-1-a1/404186525
-- Umweltbundesamt, Innenraumhygiene und Feuchte: https://www.umweltbundesamt.de/themen/gesundheit/innenraumhygiene
+- Umweltbundesamt, Schimmel, 27.01.2025: https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel
 - Bundesanstalt für Arbeitsschutz und Arbeitsmedizin, sichere Arbeiten auf Baustellen: https://www.baua.de/

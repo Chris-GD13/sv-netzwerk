@@ -115,4 +115,4 @@ Ich bestimme zuerst Lage, tragenden Aufbau, Abdichtungsebene und Nutzung. Danach
 - DIN Media, DIN 18531-5:2025-08, Balkone, Loggien und Laubengänge: https://www.dinmedia.de/de/norm/din-18531-5/391197608
 - DIN Media, DIN 18533-1:2026-06, erdberührte Bauteile: https://www.dinmedia.de/de/norm/din-18533-1/399850897
 - Bundesanstalt für Arbeitsschutz und Arbeitsmedizin, sichere Arbeiten auf Baustellen: https://www.baua.de/
-- Umweltbundesamt, Innenraumhygiene und Feuchte: https://www.umweltbundesamt.de/themen/gesundheit/innenraumhygiene
+- Umweltbundesamt, Schimmel, 27.01.2025: https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel
