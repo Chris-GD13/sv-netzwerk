@@ -1,0 +1,44 @@
+name: Stabilize meter update transition
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/warmwasser-debounce.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Read available energy inputs without changes
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          cp /opt/anker-homeassistant/config/packages/warmwasser.yaml /opt/anker-homeassistant/backups/warmwasser-before-debounce.yaml
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/opt/anker-homeassistant/config/packages/warmwasser.yaml')
+          s=p.read_text()
+          old='unique_id: ww_messung_aktuell\n        state:'
+          assert old in s
+          p.write_text(s.replace(old,'unique_id: ww_messung_aktuell\n        delay_off: "00:00:02"\n        state:',1))
+          PY
+          docker exec anker-homeassistant python -m homeassistant --script check_config --config /config
+          CHECK
