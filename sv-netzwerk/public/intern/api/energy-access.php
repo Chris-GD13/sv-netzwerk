@@ -11,7 +11,7 @@ function svnetEnergyDestination(string $service): ?string
 {
     return [
         'evcc' => 'http://10.77.66.1:7070/#/',
-        'anker' => 'http://10.77.66.1:8123/config/integrations/integration/anker_solix',
+        'anker' => 'http://10.77.66.1:8123/haussteuerung/uebersicht',
         'keba' => 'http://192.168.178.106/',
     ][$service] ?? null;
 }
