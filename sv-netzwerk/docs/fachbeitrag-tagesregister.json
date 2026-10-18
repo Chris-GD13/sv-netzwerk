@@ -618,9 +618,12 @@
         "verified_at": "2026-10-18T04:16:45.484Z"
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "reserved",
+        "owner": "codex-linkedin-20261018-01a14d62",
+        "reserved_at": "2026-10-18T05:04:37.357Z",
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum/"
       }
     }
   },
-  "updated_at": "2026-10-18T04:16:45.484Z"
+  "updated_at": "2026-10-18T05:04:37.357Z"
 }
