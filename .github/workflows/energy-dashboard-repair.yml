@@ -1,0 +1,80 @@
+name: Read energy automation inputs
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/energy-dashboard-repair.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Read available energy inputs without changes
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          python3 - <<'PY'
+          import json,pathlib,shutil,datetime,urllib.request
+          base=pathlib.Path('/opt/anker-homeassistant/config')
+          d=json.load(urllib.request.urlopen('http://10.77.66.1:7070/api/state',timeout=10))
+          d=d.get('result',d)
+          assert all((l.get('chargePower') or 0)<300 for l in d.get('loadpoints',[])), 'Charging active; restart deferred'
+          assert 'packages:' in (base/'configuration.yaml').read_text()
+          p=base/'packages/energy_dashboard.yaml'
+          assert not p.exists(), 'Package already exists; inspect before updating'
+          backup=base/'backups'/('energy-dashboard-'+datetime.datetime.now().strftime('%Y%m%d-%H%M%S'))
+          backup.mkdir(parents=True)
+          shutil.copy2(base/'.storage/energy',backup/'energy')
+          p.write_text("{\n  \"template\": [\n    {\n      \"sensor\": [\n        {\n          \"name\": \"Energiebilanz batterieladung Leistung\",\n          \"unique_id\": \"energiebilanz_batterieladung_leistung\",\n          \"default_entity_id\": \"sensor.energiebilanz_batterieladung_leistung\",\n          \"unit_of_measurement\": \"W\",\n          \"device_class\": \"power\",\n          \"state_class\": \"measurement\",\n          \"availability\": \"{{ is_number(states('sensor.solix_power_dock_akkuleistung_gesamt')) }}\",\n          \"state\": \"{{ [0, (states('sensor.solix_power_dock_akkuleistung_gesamt') | float(0)) * 1] | max }}\"\n        },\n        {\n          \"name\": \"Energiebilanz batterieentladung Leistung\",\n          \"unique_id\": \"energiebilanz_batterieentladung_leistung\",\n          \"default_entity_id\": \"sensor.energiebilanz_batterieentladung_leistung\",\n          \"unit_of_measurement\": \"W\",\n          \"device_class\": \"power\",\n          \"state_class\": \"measurement\",\n          \"availability\": \"{{ is_number(states('sensor.solix_power_dock_akkuleistung_gesamt')) }}\",\n          \"state\": \"{{ [0, (states('sensor.solix_power_dock_akkuleistung_gesamt') | float(0)) * -1] | max }}\"\n        }\n      ]\n    }\n  ],\n  \"sensor\": [\n    {\n      \"platform\": \"integration\",\n      \"source\": \"sensor.smart_meter_netznutzung\",\n      \"name\": \"Energiebilanz netzbezug\",\n      \"unique_id\": \"energiebilanz_netzbezug\",\n      \"unit_prefix\": \"k\",\n      \"unit_time\": \"h\",\n      \"method\": \"left\",\n      \"round\": 4,\n      \"max_sub_interval\": {\n        \"minutes\": 1\n      }\n    },\n    {\n      \"platform\": \"integration\",\n      \"source\": \"sensor.smart_meter_netzeinspeisung\",\n      \"name\": \"Energiebilanz netzeinspeisung\",\n      \"unique_id\": \"energiebilanz_netzeinspeisung\",\n      \"unit_prefix\": \"k\",\n      \"unit_time\": \"h\",\n      \"method\": \"left\",\n      \"round\": 4,\n      \"max_sub_interval\": {\n        \"minutes\": 1\n      }\n    },\n    {\n      \"platform\": \"integration\",\n      \"source\": \"sensor.energiebilanz_batterieladung_leistung\",\n      \"name\": \"Energiebilanz batterieladung\",\n      \"unique_id\": \"energiebilanz_batterieladung\",\n      \"unit_prefix\": \"k\",\n      \"unit_time\": \"h\",\n      \"method\": \"left\",\n      \"round\": 4,\n      \"max_sub_interval\": {\n        \"minutes\": 1\n      }\n    },\n    {\n      \"platform\": \"integration\",\n      \"source\": \"sensor.energiebilanz_batterieentladung_leistung\",\n      \"name\": \"Energiebilanz batterieentladung\",\n      \"unique_id\": \"energiebilanz_batterieentladung\",\n      \"unit_prefix\": \"k\",\n      \"unit_time\": \"h\",\n      \"method\": \"left\",\n      \"round\": 4,\n      \"max_sub_interval\": {\n        \"minutes\": 1\n      }\n    }\n  ]\n}")
+          print('PACKAGE_CREATED',p,'BACKUP',backup)
+          PY
+          if ! docker exec anker-homeassistant python -m homeassistant --script check_config --config /config; then
+            mv /opt/anker-homeassistant/config/packages/energy_dashboard.yaml /opt/anker-homeassistant/config/backups/energy_dashboard.rejected
+            exit 1
+          fi
+          docker stop anker-homeassistant >/dev/null
+          trap 'docker start anker-homeassistant >/dev/null' EXIT
+          python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('/opt/anker-homeassistant/config/.storage/energy')
+          d=json.loads(p.read_text())
+          for s in d['data']['energy_sources']:
+           if s['type']=='grid':
+            s['stat_energy_from']='sensor.energiebilanz_netzbezug'
+            s['stat_energy_to']='sensor.energiebilanz_netzeinspeisung'
+            s.pop('stat_rate',None)
+            s['power_config']={'stat_rate_from':'sensor.smart_meter_netznutzung','stat_rate_to':'sensor.smart_meter_netzeinspeisung'}
+           elif s['type']=='solar':
+            s['stat_rate']='sensor.solix_power_dock_solarleistung_gesamt'
+           elif s['type']=='battery':
+            s['stat_energy_from']='sensor.energiebilanz_batterieentladung'
+            s['stat_energy_to']='sensor.energiebilanz_batterieladung'
+            s.pop('stat_rate',None)
+            s['power_config']={'stat_rate_from':'sensor.energiebilanz_batterieentladung_leistung','stat_rate_to':'sensor.energiebilanz_batterieladung_leistung'}
+          tmp=p.with_suffix('.tmp')
+          tmp.write_text(json.dumps(d,indent=2))
+          tmp.replace(p)
+          print('ENERGY_MAPPINGS_UPDATED')
+          PY
+          docker start anker-homeassistant >/dev/null
+          trap - EXIT
+          echo ENERGY_REPAIR_STARTED
+          CHECK
