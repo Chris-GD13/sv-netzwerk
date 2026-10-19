@@ -211,6 +211,14 @@ function sv_process_form(array $config): void
         sv_redirect($config['error_url']);
     }
 
+    if (sv_form_sender_domain_blocked($replyEmail)) {
+        sv_log_event($config['form_key'], 'Absenderdomain gesperrt; kein Mailversand.');
+        http_response_code(403);
+        header('Content-Type: text/plain; charset=UTF-8');
+        echo 'Anfragen mit Yahoo-Adressen werden nicht angenommen. Bitte verwenden Sie Ihre geschäftliche E-Mail-Adresse.';
+        exit;
+    }
+
     if (!sv_form_rate_allowed((string)($_SERVER['REMOTE_ADDR'] ?? 'unknown'))) {
         sv_log_event($config['form_key'], 'Mengenbegrenzung erreicht; kein Mailversand.');
         http_response_code(429);

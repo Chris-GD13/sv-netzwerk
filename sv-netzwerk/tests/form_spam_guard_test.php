@@ -4,6 +4,12 @@ require_once __DIR__ . '/../public/form-spam-guard.php';
 function expect(bool $condition, string $message): void {
     if (!$condition) throw new RuntimeException($message);
 }
+foreach (['rshneka17@yahoo.com', 'TEST@YAHOO.DE', ' test@yahoo.co.uk ', 'test@yahoo.com.au', 'test@sub.yahoo.fr', 'test@yahoo.co.jp'] as $email) {
+    expect(sv_form_sender_domain_blocked($email), 'Yahoo sender must be blocked: '.$email);
+}
+foreach (['info@sv-netzwerk.eu', 'service@allianz.de', 'yahoo@insurance.example', 'test@notyahoo.com', 'test@yahoo.com.example', 'test@yahoo-example.com', 'test@ymail.com', ''] as $email) {
+    expect(!sv_form_sender_domain_blocked($email), 'Unrelated domain must remain allowed: '.$email);
+}
 expect(sv_form_campaign_blocked(['Name'=>'RobertVom'], ['REMOTE_ADDR'=>'192.0.2.1']), 'Campaign name must be blocked even after IP rotation');
 expect(sv_form_campaign_blocked(['Name'=>'Other'], ['REMOTE_ADDR'=>'80.94.95.202']), 'Known campaign address must be blocked');
 expect(!sv_form_campaign_blocked(['Name'=>'Robert Vogt'], ['REMOTE_ADDR'=>'192.0.2.1']), 'Legitimate similar name must remain allowed');

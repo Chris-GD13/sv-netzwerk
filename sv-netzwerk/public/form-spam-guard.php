@@ -1,6 +1,16 @@
 <?php
 declare(strict_types=1);
 
+/** Public forms do not accept Yahoo senders (company policy, 19 October 2026). */
+function sv_form_sender_domain_blocked(string $email): bool
+{
+    $email = strtolower(trim($email));
+    $at = strrpos($email, '@');
+    if ($at === false) return false;
+    $domain = substr($email, $at + 1);
+    return preg_match('/\A(?:[a-z0-9-]+\.)*yahoo\.(?:[a-z]{2,}|(?:co|com)\.[a-z]{2})\z/D', $domain) === 1;
+}
+
 /** Reject the observed contact-form campaign without blocking our sender address. */
 function sv_form_campaign_blocked(array $post, array $server): bool
 {
