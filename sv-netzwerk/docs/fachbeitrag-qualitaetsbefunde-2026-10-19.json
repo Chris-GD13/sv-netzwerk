@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-19",
+  "build": "success",
+  "astro": {
+    "errors": 0,
+    "warnings": 0,
+    "hints": 0
+  },
+  "daily_preflight": "passed; exactly one daily article; same reservation",
+  "seo": {
+    "knowledge_urls": 112,
+    "sitemap_pages": 193,
+    "internal_links_checked": 20942
+  },
+  "html_validation": {
+    "status": "failed-existing-backlog",
+    "full_build_findings": 476,
+    "previous_full_build_findings": 476,
+    "first20_findings": 73,
+    "same20_before_changes": 73,
+    "today_detail": "passed; no findings",
+    "no_suppression_applied": true
+  },
+  "external_links": {
+    "checked_articles": 56,
+    "checks": 5069,
+    "unique_urls": 442,
+    "ok": 4981,
+    "errors": 30,
+    "timeouts": 2,
+    "excluded": 56,
+    "redirects": 6,
+    "initial_404": "DGUV article313 identified; replaced with confirmed203-001 primary reference; repeat check pending",
+    "remaining_access_failures": "BAuA403, DGUV/ift503, Dachdecker.org timeout; not declared successfully checked."
+  },
+  "archive_source_review": "Source format checked across all109 source files; no full individual technical/legal archive clearance claimed.",
+  "daily_deployment": {
+    "initial_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39198584259",
+    "initial_commit": "55edb6948b5a38b00848d8f0a5f994b53f41bc61",
+    "initial_status": "success",
+    "correction_deployment": "pending"
+  },
+  "publication_log": "Minimized supplementary CSV; historic central CSV not retransmitted after prior automatic approval rejection of full historic payload. Daily row provided by existing publisher on main; prepared-not-posted."
+}

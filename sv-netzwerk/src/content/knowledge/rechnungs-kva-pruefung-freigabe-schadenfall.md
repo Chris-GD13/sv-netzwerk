@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["gebaeude", "leitungswasser", "brand"]
 publication:
   publishedAt: 2026-08-29
-  updatedAt: 2026-10-12
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Rechnungs- und KVA-Prüfung im Schadenfall: Freigabe auf belastbarer"
@@ -127,7 +127,7 @@ Für die operative Umsetzung unterstützen wir mit strukturierter [Schadenmeldun
 [Destatis, Pressemitteilung 360 vom 09.10.2026](https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_360_61261.html): Neubaupreise für Wohngebäude lagen im Berichtsmonat August 2026 um 5,5 % über August 2025. Dies ist eine amtliche Statistik, kein verbindlicher Reparaturtarif und kein Geltungsbeginn für Verträge. Bei Preisabweichungen Angebotsdatum, Ausführungsdatum, Gewerk und Leistungsumfang vergleichen. Der Neubauindex ist nicht ungeprüft auf einzelne Sanierungsleistungen zu übertragen.
 
 ## Quellen und weiterführende Hinweise
-- [Bundesministerium der Justiz: Versicherungsvertragsgesetz (VVG)](https://www.gesetze-im-internet.de/vvg_2008/) – gesetzlicher Rahmen; die konkrete Deckungs- und Leistungsprüfung bleibt einzelfallabhängig.
-- [Bundesanstalt für Arbeitsschutz und Arbeitsmedizin: Technische Regeln für Gefahrstoffe](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html) – Ausgangspunkt für die Gefährdungsbeurteilung bei Tätigkeiten mit möglichen Gefahrstoffen.
-- [Deutsche Gesetzliche Unfallversicherung: Publikationen](https://publikationen.dguv.de/) – offizielle Regeln und Informationen zu Arbeitsschutz, Gefährdungsbeurteilung und sicheren Arbeitsverfahren.
-- [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Vorsorge und Verhalten bei Gefahren](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html) – Hinweise zur Gefahrenvorsorge und zum Verhalten in Schadenlagen.
+- [Bundesministerium der Justiz: Versicherungsvertragsgesetz (VVG)](https://www.gesetze-im-internet.de/vvg_2008/)
+- [Bundesanstalt für Arbeitsschutz und Arbeitsmedizin: Technische Regeln für Gefahrstoffe](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html)
+- [Deutsche Gesetzliche Unfallversicherung: Publikationen](https://publikationen.dguv.de/)
+- [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Vorsorge und Verhalten bei Gefahren](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html)

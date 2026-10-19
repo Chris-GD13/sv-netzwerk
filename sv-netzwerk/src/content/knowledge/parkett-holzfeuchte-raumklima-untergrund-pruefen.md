@@ -16,7 +16,7 @@ relatedLinks: ["/experten/claudius-freiberg/", "/fachwissen/baufeuchte-schadenfe
 damageTypes: ["gebaeude", "feuchte"]
 publication:
   publishedAt: 2026-10-13
-  updatedAt: 2026-10-17
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Parkettoberflächen: Beschichtung und Feuchte prüfen"
@@ -107,4 +107,6 @@ Eigentümer sollten Unterlagen und Pflegehistorie sichern und weitere Versuche b
 - [Bona Polish, technisches Merkblatt](https://www.bona.com/globalassets/catalogassets/tds-bona-polish-de_20250930082309.pdf), Fassung 30.09.2025.
 - [Pallmann, Parkett richtig pflegen](https://de.pallmann.net/wissen-technik/know-how/parkett-richtig-pflegen).
 
-Weiterführend: [Feuchtequellen fachlich abgrenzen](/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/) und [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/).
+## Weiterführende Fachbeiträge
+
+[Feuchtequellen fachlich abgrenzen](/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/) und [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/).

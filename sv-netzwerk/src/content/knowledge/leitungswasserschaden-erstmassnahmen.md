@@ -16,7 +16,7 @@ relatedLinks: ["/schadenarten/leitungswasser/", "/fachwissen/kontrollierter-ruec
 damageTypes: ["leitungswasser"]
 publication:
   publishedAt: 2026-07-18
-  updatedAt: 2026-10-12
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Leitungswasserschaden: Erste Maßnahmen sicher dokumentieren"
@@ -149,12 +149,14 @@ Gute Erstergreifung und frühe Dokumentation legen den Grundstein für eine reib
 
 ## Ergänzung zur späteren Wiederbelegung vom 12.10.2026
 
-Der [TKB-Bericht 11, Stand 19.07.2024](https://www.klebstoffe.com/wp-content/uploads/2024/07/B-TKB-11-Belegreife.pdf), behandelt Belegreife als Gesamtheit relevanter Untergrundeigenschaften. Trockenheit allein reicht nicht. Aus dem Fachbericht entstehen ausdrücklich keine neuen Prüfpflichten. Praktisch ist die Trocknungsbeendigung von der Freigabe des späteren Bodenaufbaus zu trennen; Quelle geprüft am 12.10.2026, kein gesetzlicher Geltungsbeginn.
+Der [TKB-Bericht 11, Stand 19.07.2024](https://www.klebstoffe.com/wp-content/uploads/2024/07/B-TKB-11-Belegreife.pdf), behandelt Belegreife als Gesamtheit relevanter Untergrundeigenschaften. Trockenheit allein reicht nicht. Aus dem Fachbericht entstehen ausdrücklich keine neuen Prüfpflichten. Praktisch ist die Trocknungsbeendigung von der Freigabe des späteren Bodenaufbaus zu trennen.
 
 ## Quellen und weiterführende Hinweise
 
-1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-2. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
-3. Bürgerliches Gesetzbuch (BGB), § 631 Vertragstypische Pflichten beim Werkvertrag, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__631.html
-4. Bürgerliches Gesetzbuch (BGB), § 254 Mitverschulden, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__254.html
-5. Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
+- Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+- Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
+- Bürgerliches Gesetzbuch (BGB), § 631 Vertragstypische Pflichten beim Werkvertrag, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__631.html
+- Bürgerliches Gesetzbuch (BGB), § 254 Mitverschulden, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__254.html
+- Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
+
+- Industrieverband Klebstoffe / TKB, Bericht 11 – Belegreife, Stand 19.07.2024: https://www.klebstoffe.com/wp-content/uploads/2024/07/B-TKB-11-Belegreife.pdf

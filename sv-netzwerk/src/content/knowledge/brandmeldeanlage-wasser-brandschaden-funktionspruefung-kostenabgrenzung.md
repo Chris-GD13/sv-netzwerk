@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/rauchwaermeabzug-brandschaden-funktionspruefung-kost
 damageTypes: ["gebaeude", "brand", "leitungswasser", "technik"]
 publication:
   publishedAt: 2026-10-10
-  updatedAt: 2026-10-18
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Brandmeldeanlagen nach Wasser- oder Brandschaden prüfen"
@@ -137,4 +137,6 @@ Nach Wasser- oder Brandschäden ist eine Brandmeldeanlage nicht durch Rücksetze
 - [§ 14 BetrSichV](https://www.gesetze-im-internet.de/betrsichv_2015/__14.html).
 - [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html).
 
-Weiterführend: [Rauch- und Wärmeabzugsanlagen nach Brandschäden](/fachwissen/rauchwaermeabzug-brandschaden-funktionspruefung-kostenabgrenzung/), [Sprinkleranlagen nach Auslösung](/fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/), [elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/) und [prüffähige Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).
+## Weiterführende Fachbeiträge
+
+[Rauch- und Wärmeabzugsanlagen nach Brandschäden](/fachwissen/rauchwaermeabzug-brandschaden-funktionspruefung-kostenabgrenzung/), [Sprinkleranlagen nach Auslösung](/fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/), [elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/) und [prüffähige Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).

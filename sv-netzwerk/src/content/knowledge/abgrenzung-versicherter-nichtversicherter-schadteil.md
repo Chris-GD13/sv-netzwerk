@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["gebaeude", "leitungswasser", "sturm", "brand"]
 publication:
   publishedAt: 2026-09-02
-  updatedAt: 2026-10-16
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Abgrenzung versicherter und nicht versicherter Schadteile: Methodik"
@@ -121,15 +121,16 @@ Die Nachprüfung verbindet den technischen Befund mit der Kostenprüfung. Änder
 ## Fazit
 Bei der Abgrenzung versicherter und nicht versicherter Schadteile ist die Prüffähigkeit jeder Einzelentscheidung maßgeblich. Befund, technische Kausalität, vertragliche Einordnung und Kostenfolge brauchen jeweils eigene Belege. Wo diese fehlen, bleibt die Entscheidung ausdrücklich vorläufig.
 
-## Quellenprüfung vom 16.10.2026: Vertragsbezug und Schadenminderung
+## Vertragsbezug und Schadenminderung
 
-Die amtlichen Einzelnormen [§ 1 VVG](https://www.gesetze-im-internet.de/vvg_2008/__1.html) und [§ 82 Absatz 1 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) wurden am 16.10.2026 für die oben genannten Aussagen geprüft. Status: geltendes Bundesrecht; das Prüfdatum ist weder Veröffentlichungsdatum noch ein neu behaupteter Geltungsbeginn. Praktische Bedeutung für Sachverständige und Großschadenregulierer: Die Akte trennt technisch notwendige Sofortmaßnahmen, den vertraglich vereinbarten Versicherungsfall und den späteren Wiederherstellungsumfang. Die Prüfung erfasst keine pauschale Aussage zur Deckung oder zu Rechtsfolgen einer Obliegenheitsverletzung.
+[§ 1 VVG](https://www.gesetze-im-internet.de/vvg_2008/__1.html) knüpft die Versicherungsleistung an den vereinbarten Versicherungsfall. [§ 82 Absatz 1 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) betrifft die Abwendung und Minderung des Schadens. Ich trenne deshalb in der Akte technisch notwendige Sofortmaßnahmen, den vertraglich vereinbarten Versicherungsfall und den späteren Wiederherstellungsumfang. Aus der technischen Erforderlichkeit allein folgt keine Deckungsentscheidung.
 
 ## Call-to-Action
 Für die operative Umsetzung unterstützen wir mit strukturierter [Schadenmeldung](/schaden-melden/), methodischer [technischer Schadenabgrenzung](/fachwissen/schadenabgrenzung/), [prüffähiger Dokumentation](/fachwissen/prueffaehige-dokumentation/) und – je nach Fragestellung – der [Gutachter-Plattform](/gutachter-plattform/).
 
 ## Quellen und weiterführende Hinweise
-- [Bundesministerium der Justiz: Versicherungsvertragsgesetz (VVG)](https://www.gesetze-im-internet.de/vvg_2008/) – gesetzlicher Rahmen; die konkrete Deckungs- und Leistungsprüfung bleibt einzelfallabhängig.
-- [Bundesanstalt für Arbeitsschutz und Arbeitsmedizin: Technische Regeln für Gefahrstoffe](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html) – Ausgangspunkt für die Gefährdungsbeurteilung bei Tätigkeiten mit möglichen Gefahrstoffen.
-- [Deutsche Gesetzliche Unfallversicherung: Publikationen](https://publikationen.dguv.de/) – offizielle Regeln und Informationen zu Arbeitsschutz, Gefährdungsbeurteilung und sicheren Arbeitsverfahren.
-- [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Vorsorge und Verhalten bei Gefahren](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html) – Hinweise zur Gefahrenvorsorge und zum Verhalten in Schadenlagen.
+
+- [Bundesministerium der Justiz: Versicherungsvertragsgesetz (VVG)](https://www.gesetze-im-internet.de/vvg_2008/)
+- [Bundesanstalt für Arbeitsschutz und Arbeitsmedizin: Technische Regeln für Gefahrstoffe](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html)
+- [Deutsche Gesetzliche Unfallversicherung: Publikationen](https://publikationen.dguv.de/)
+- [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Vorsorge und Verhalten bei Gefahren](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html)

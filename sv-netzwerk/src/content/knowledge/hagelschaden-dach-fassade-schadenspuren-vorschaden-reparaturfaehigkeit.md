@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/prueffaehige-dokumentation/", "/
 damageTypes: ["sturm", "gebaeude"]
 publication:
   publishedAt: 2026-08-05
-  updatedAt: 2026-08-05
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Hagelschäden an Dach und Fassade fachlich sauber bewerten"
@@ -248,10 +248,13 @@ Ein Dachdecker prüft die Austauschbarkeit der betroffenen Deckelemente, währen
 
 Hagelschäden an Dach und Fassade werden erst dann prüffähig, wenn frische Schadenspuren, Vorschäden, technische Funktion und tatsächliche Reparaturfähigkeit sauber getrennt erfasst werden. Gerade diese Trennung entscheidet darüber, ob Teilersatz, lokale Reparatur oder weitergehende Maßnahmen fachlich und kostenmäßig nachvollziehbar begründet werden können.
 
+## Hagelwiderstand und Windbeanspruchung unterscheiden
+
+Der GDV-Leitfaden VdS 6100, Ausgabe 2018-10, behandelt den baulichen Hagelschutz. DIN EN 1991-1-4:2010-12 betrifft dagegen Windlasten. Ich verwende einen Windlastnachweis deshalb nicht als Nachweis der Hagelwiderstandsfähigkeit eines konkreten Produkts. Hersteller, Bauteilaufbau und zugehörige Prüfunterlagen müssen zur tatsächlich eingebauten Ausführung passen.
+
 ## Quellen und weiterführende Hinweise
 
-1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-2. DIN EN 1991-1-4, Eurocode 1: Einwirkungen auf Tragwerke - Teil 1-4: Allgemeine Einwirkungen - Windlasten, DIN Media GmbH, bibliografischer Hinweis als Regelwerksbezug für Einwirkungs- und Expositionsfragen; konkrete Objektbewertung bleibt einzelfallbezogen.
-3. ZVDH-Regelwerk für Dachdeckungen und Dachabdichtungen, Zentralverband des Deutschen Dachdeckerhandwerks, bibliografischer Hinweis als fachlicher System- und Ausführungsbezug ohne Wiedergabe nicht frei zugänglicher Detailinhalte.
-4. ift Rosenheim, Hinweise zur Beurteilung von Hagelschäden an Bauteilen der Gebäudehülle, bibliografischer Hinweis als fachlicher Prüfkontext für Fenster- und Fassadenbauteile.
-5. Deutsche Bundesstiftung Umwelt / Fachbeiträge zur Widerstandsfähigkeit der Gebäudehülle gegen Extremwetter, bibliografischer Hinweis für weiterführende Systemperspektiven; konkrete Schadenzuordnung bleibt bauteilbezogen.
+- Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+- DIN Media, DIN EN 1991-1-4:2010-12 – Eurocode 1, Einwirkungen auf Tragwerke, Windlasten: https://www.dinmedia.de/de/norm/din-en-1991-1-4/127478352
+- GDV / VdS, VdS 6100 – Gebäudeschutz vor Hagel, Ausgabe 2018-10 (01): https://shop.vds.de/download/vds-6100
+- Zentralverband des Deutschen Dachdeckerhandwerks, Regelübersicht: https://dachdecker.org/betriebsinhaber/regeluebersicht/

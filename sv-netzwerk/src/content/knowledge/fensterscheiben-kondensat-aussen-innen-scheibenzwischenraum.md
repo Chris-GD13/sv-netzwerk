@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-mat
 damageTypes: ["gebaeude"]
 publication:
   publishedAt: 2026-10-18
-  updatedAt: 2026-10-18
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Beschlagene Fenster: Kondensat fachlich unterscheiden"
@@ -113,4 +113,6 @@ Vor der Bewertung eines beschlagenen Fensters steht die sichere Zuordnung der Fe
 - Umweltbundesamt, [Wie lüfte ich richtig? – Tipps und Tricks zur Schimmelvermeidung, 13.12.2024](https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/wie-luefte-ich-richtig-tipps-tricks-zur).
 - DIN Media, [DIN EN 1279-1:2018-10](https://www.dinmedia.de/de/norm/din-en-1279-1/281205722) und [DIN EN 1279-2:2018-10](https://www.dinmedia.de/de/norm/din-en-1279-2/281596947).
 
-Weiterführend: [Fensteranschlüsse fachlich beurteilen](/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/), [Feuchtequellen unterscheiden](/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/) und [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/).
+## Weiterführende Fachbeiträge
+
+[Fensteranschlüsse fachlich beurteilen](/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/), [Feuchtequellen unterscheiden](/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/) und [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/).

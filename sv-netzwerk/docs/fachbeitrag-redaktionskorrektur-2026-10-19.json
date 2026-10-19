@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-19",
+  "master_commit": "55edb6948b5a38b00848d8f0a5f994b53f41bc61",
+  "slug": "asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme",
+  "publication_day_guard": "Bestehende Reservierung unverändert; derselbe Tagesbeitrag repariert; keine zweite Erstellung.",
+  "changes": [
+    "Öffentliche Profilzuordnung und Autorenschaftsvorbehalt entfernt; sachliche Aufgabenabgrenzung ergänzt.",
+    "Absatz über den Erstellungsprozess durch ein klar fiktives Praxisbeispiel ersetzt, ohne feste Probenzahlen oder erfundene persönliche Einsätze.",
+    "§5a Absatz2: Baujahr und Baubeginn sprachlich korrekt getrennt, Übermittlungsform benannt.",
+    "Probenahme: Faserfreisetzung möglichst verhindern statt absolute Nullfreisetzung zu versprechen.",
+    "Öffentliche Quellen ohne Abrufvermerke; Bibliografie, Ausgaben und Links erhalten."
+  ],
+  "source_checks": [
+    {
+      "publisher": "Bundesministerium der Justiz / juris",
+      "title": "GefStoffV §§5a und11a",
+      "urls": [
+        "https://www.gesetze-im-internet.de/gefstoffv_2010/__5a.html",
+        "https://www.gesetze-im-internet.de/gefstoffv_2010/__11a.html"
+      ],
+      "checked_at": "2026-10-19",
+      "status": "Amtlich aktuell bereitgestellter Verordnungstext",
+      "read_scope": "Beide Einzelnormen vollständig abgerufen; Absätze5a(1),(2),(4) und11a(1),(2) für die konkreten Aussagen ausgewertet. Kein neuer Geltungsbeginn behauptet.",
+      "meaning": "Informationspflicht und Arbeitgeberpflichten nicht vermischen. Baujahre1993bis1996 unterscheiden, Qualifikation und Materialbearbeitung tätigkeitsbezogen prüfen."
+    },
+    {
+      "publisher": "BAuA",
+      "title": "Informationsplattform Asbest – Planung und Vorbereitung, Erkundung",
+      "url": "https://www.baua.de/DE/Themen/Chemikalien-Biostoffe/Gefahrstoffe/Informationsportal-Asbest/Asbest_Dossier/Asbest_Planung_dossier?pos=1",
+      "checked_at": "2026-10-19",
+      "status": "Behördliche Fachinformation",
+      "read_scope": "Aktuelle Herausgeberfundstelle zu Probenahme, Sicherung und Laborqualifikation",
+      "meaning": "Faserfreisetzung in den Raum möglichst verhindern, Entnahmestelle sichern und Proben staubdicht verpacken."
+    },
+    {
+      "publisher": "BAuA",
+      "title": "TRGS519",
+      "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519",
+      "edition": "Januar2014; Änderungen28.02.2025",
+      "checked_at": "2026-10-19",
+      "status": "Veröffentlichte technische Regel; kein Entwurf",
+      "read_scope": "Herausgeberseite und Änderungsnachweis; kein neuer vollständiger TRGS-Volltextabgleich.",
+      "meaning": "Vorhandene bibliografische Ausgabe bestätigt; keine unbelegten technischen Grenzwerte ergänzt."
+    }
+  ],
+  "linkedin": "Vorhandener natürlicher Begleittext unverändert; in diesem Lauf prepared-not-posted, keine externe Veröffentlichung.",
+  "full_source_clearance": false
+}

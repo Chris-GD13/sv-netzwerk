@@ -16,7 +16,7 @@ relatedLinks: ["/experten/marc-schuett/", "/fachwissen/prueffaehige-dokumentatio
 damageTypes: ["gebaeude"]
 publication:
   publishedAt: 2026-10-16
-  updatedAt: 2026-10-17
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Sachwertverfahren: Gebäudewert und Bodenwert trennen"
@@ -165,4 +165,6 @@ So bleibt erkennbar, wie aus modellhaften Herstellungskosten ein marktangepasste
 - Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen, [Novellierung des Wertermittlungsrechts](https://www.bmwsb.bund.de/SharedDocs/gesetzgebungsverfahren/DE/novellierung-des-wertermittlungsrechts.html).
 - Statistisches Bundesamt, [Umstellung der Preisindizes für die Bauwirtschaft auf das Basisjahr 2021](https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/revision_baupreise.html); [aktuelle Baupreisindizes für Wohn- und Nichtwohngebäude](https://www.destatis.de/DE/Themen/Wirtschaft/Konjunkturindikatoren/Preise/bpr110.html).
 
-Weiterführend: [Prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/) und [Kontakt zur sachverständigen Einordnung](/kontakt/).
+## Weiterführende Fachbeiträge
+
+[Prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/) und [Kontakt zur sachverständigen Einordnung](/kontakt/).

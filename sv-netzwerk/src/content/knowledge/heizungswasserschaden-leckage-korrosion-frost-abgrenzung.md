@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/leitungswasserschaden-leckageort
 damageTypes: ["leitungswasser", "gebaeude", "frost"]
 publication:
   publishedAt: 2026-09-14
-  updatedAt: 2026-09-14
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Heizungswasserschäden fachlich prüfen und abgrenzen"
@@ -113,9 +113,9 @@ Ein Heizungswasserschaden ist erst dann belastbar bewertet, wenn Austrittsstelle
 
 ## Quellen und weiterführende Hinweise
 
-- [Versicherungsvertragsgesetz, § 82 Schadenabwendung und Schadenminderung](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – gesetzlicher Rahmen für zumutbare Sofortmaßnahmen.
-- [Versicherungsvertragsgesetz, § 86 Übergang von Ersatzansprüchen](https://www.gesetze-im-internet.de/vvg_2008/__86.html) – Hinweise zur Sicherung möglicher Ansprüche gegen Dritte.
-- [DVGW: Analyse von Korrosionsschäden in wasserführenden Systemen](https://www.dvgw.de/leistungen/dienstleistungen/analyse-von-korrosionsschaeden-in-wasserfuehrenden-systemen) – technische Einordnung von Korrosion, Leckagen und Folgeschäden.
-- [DVGW: Heizungsraum und Heizungsfülleinrichtung](https://www.dvgw.de/themen/wasser/verbraucherinformationen/trinkwasser-installation/heizungsraum) – Schnittstelle von Trinkwasser-Installation, Heizungsanlage und Sicherungseinrichtungen.
-- [DVGW: Trinkwasser-Installation](https://www.dvgw.de/themen/wasser/trinkwasser-installation) – technische und hygienische Grundanforderungen sowie Hinweise zu Werkstoffen und Korrosion.
-- [DGUV: Sicherheit bei elektrischen Anlagen](https://publikationen.dguv.de/widgets/pdf/download/article/1306) – Sicherheitsgrundsätze für elektrische Anlagen in Bereichen mit Wassergefährdung.
+- [Versicherungsvertragsgesetz, § 82 Schadenabwendung und Schadenminderung](https://www.gesetze-im-internet.de/vvg_2008/__82.html)
+- [Versicherungsvertragsgesetz, § 86 Übergang von Ersatzansprüchen](https://www.gesetze-im-internet.de/vvg_2008/__86.html)
+- [DVGW: Analyse von Korrosionsschäden in wasserführenden Systemen](https://www.dvgw.de/leistungen/dienstleistungen/analyse-von-korrosionsschaeden-in-wasserfuehrenden-systemen)
+- [DVGW: Heizungsraum und Heizungsfülleinrichtung](https://www.dvgw.de/themen/wasser/verbraucherinformationen/trinkwasser-installation/heizungsraum)
+- [DVGW: Trinkwasser-Installation](https://www.dvgw.de/themen/wasser/trinkwasser-installation)
+- [DGUV: Sicherheit bei elektrischen Anlagen](https://publikationen.dguv.de/widgets/pdf/download/article/1306)

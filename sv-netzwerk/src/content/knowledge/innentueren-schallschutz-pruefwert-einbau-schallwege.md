@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-mat
 damageTypes: ["gebaeude"]
 publication:
   publishedAt: 2026-10-11
-  updatedAt: 2026-10-18
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Schallschutz bei Innentüren: Prüfwert und Einbau bewerten"
@@ -130,4 +130,6 @@ Guter Schallschutz entsteht aus einer passenden Anforderung, einem nachgewiesene
 - [HUGA: Schallschutz](https://www.huga.de/tueren/funktionstueren/schallschutz/).
 - [Hörmann: Grundwissen Türen, Auflage 1/2019](https://www.hoermann.de/fileadmin/_country/kataloge/pdf/HOER-HANDBUCH-Bd-01-Grundwissen_2019_.pdf).
 
-Weiterführend: [Anschlussdetails und Untergrund fachlich beurteilen](/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/) und [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/).
+## Weiterführende Fachbeiträge
+
+[Anschlussdetails und Untergrund fachlich beurteilen](/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/) und [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/).

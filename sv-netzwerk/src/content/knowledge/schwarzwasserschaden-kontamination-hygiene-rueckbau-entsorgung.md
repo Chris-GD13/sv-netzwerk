@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/starkregen-rueckstau-eintrittswege-rueckstauebene-sc
 damageTypes: ["rueckstau", "ueberflutung", "gebaeude"]
 publication:
   publishedAt: 2026-08-13
-  updatedAt: 2026-10-13
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Schwarzwasserschäden fachlich sauber bewerten"
@@ -87,19 +87,18 @@ Erst die getrennte Dokumentation zeigt jedoch Unterschiede: Die gefliesten Flurf
 
 Schwarzwasserschäden sind nur dann belastbar zu bewerten, wenn Kontaminationsweg, hygienische Gefährdung, Materialbetroffenheit, Rückbaugrenze und Entsorgungsweg als getrennte Prüffelder behandelt werden. Erst diese Trennung schafft eine fachlich tragfähige Grundlage für Sanierung und Regulierung.
 
-## Aktualitätsprüfung zum 30.09.2026
+## Kontamination und Folgefeuchte
 
-Die Quellenprüfung wurde um den UBA-Schimmelleitfaden in der aktualisierten Auflage April 2024 und die am 17.01.2025 aktualisierte UBA-Informationsseite ergänzt. Diese Quellen sind fachliche Leitlinien für Erfassung und Sanierung; sie ersetzen keine objektspezifische Hygiene- oder Arbeitsschutzbeurteilung. Für die Praxis bedeutet das: direkte Kontamination, Folgefeuchte, Rückbau, Reinigung und Erfolgskontrolle müssen weiterhin getrennt nachgewiesen werden. Veröffentlichungsdatum (13.08.2026), früherer Quellenprüfstand (30.09.2026) und Quellenstand dieser UBA-Ergänzung (April 2024/17.01.2025) sind getrennt dokumentiert. Die anschließende Quellenkorrektur vom 13.10.2026 ist im folgenden Abschnitt ausgewiesen.
+Direkte Kontamination, Folgefeuchte, Rückbau, Reinigung und Erfolgskontrolle sind getrennte Prüffelder. Der UBA-Schimmelleitfaden, aktualisierte Auflage April 2024, unterstützt die Bewertung von Schimmelbefall. Eine objektspezifische Hygiene- und Arbeitsschutzbeurteilung bei fäkalhaltigem Abwasser kann er nicht ersetzen.
 
-## Quellenkorrektur vom 13.10.2026: Biologische Gefährdungen
+## Biologische Gefährdungen vor Arbeitsbeginn bewerten
 
-Der frühere Quellenname zur DGUV Information 207-206 war falsch: Die tatsächliche Publikation behandelt Desinfektionsmittel im Gesundheitsdienst. Dieser unzutreffende Gebäudeschaden-Nachweis wurde entfernt. [§ 4 BioStoffV](https://www.gesetze-im-internet.de/biostoffv_2013/__4.html) verlangt vor Tätigkeiten eine fachkundige Gefährdungsbeurteilung; sie ist tätigkeitsbezogen und bei relevanten Änderungen zu aktualisieren. Der aktuelle Gesetzestext wurde am 13.10.2026 geprüft. Für die Schadensteuerung bedeutet das: Wasser- und Materialbefund sind mit dem tatsächlichen Arbeitsverfahren zu verbinden; die Auswahl der Schutzmaßnahmen bleibt eine Fachaufgabe und keine Folge der Kostenfreigabe.
+[§ 4 BioStoffV](https://www.gesetze-im-internet.de/biostoffv_2013/__4.html) verlangt vor Tätigkeiten eine fachkundige Gefährdungsbeurteilung; sie ist tätigkeitsbezogen und bei relevanten Änderungen zu aktualisieren. Wasser- und Materialbefund sind mit dem tatsächlichen Arbeitsverfahren zu verbinden. Die Auswahl der Schutzmaßnahmen bleibt eine Fachaufgabe und ergibt sich nicht aus einer Kostenfreigabe. Die DGUV Information 201-028, Ausgabe November 2022, behandelt in Abschnitt 11.2 zusätzliche infektiöse Risiken durch fäkalhaltiges Abwasser im Zusammenhang mit Schimmelpilzsanierung. Daraus folgt keine einheitliche Rückbauvorgabe für jeden Abwasserschaden.
 
 ## Quellen und weiterführende Hinweise
 
-1. Verordnung über Arbeitsstätten (ArbStättV), § 4 Instandhaltung und Reinigung von Arbeitsstätten, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/arbst_ttv_2004/__4.html
-2. Umweltbundesamt, Ratgeber: Schimmel im Haus, https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus
-3. Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
-4. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-5. [BioStoffV, § 4 Gefährdungsbeurteilung](https://www.gesetze-im-internet.de/biostoffv_2013/__4.html), geltender amtlicher Text, geprüft am 13.10.2026. Anforderungen bei Tätigkeiten mit biologischen Arbeitsstoffen; keine pauschale bauliche Sanierungsfreigabe.
-6. [DGUV Information 201-028](https://publikationen.dguv.de/widgets/pdf/download/article/644), Gesundheitsgefährdungen durch Biostoffe bei der Schimmelpilzsanierung, Ausgabe November 2022, insbesondere Abschnitt 11.2 zu zusätzlichen infektiösen Risiken bei fäkalhaltigem Abwasser. Ergänzende Handlungshilfe im beschriebenen Sanierungskontext, keine allgemeine Rückbauvorgabe für jeden Abwasserschaden.
+- Verordnung über Arbeitsstätten (ArbStättV), § 4 Instandhaltung und Reinigung von Arbeitsstätten, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/arbst_ttv_2004/__4.html
+- Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
+- Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+- Biostoffverordnung (BioStoffV), § 4 Gefährdungsbeurteilung: https://www.gesetze-im-internet.de/biostoffv_2013/__4.html
+- DGUV, Information 201-028 – Gesundheitsgefährdungen durch Biostoffe bei der Schimmelpilzsanierung, November 2022, Abschnitt 11.2: https://publikationen.dguv.de/widgets/pdf/download/article/644

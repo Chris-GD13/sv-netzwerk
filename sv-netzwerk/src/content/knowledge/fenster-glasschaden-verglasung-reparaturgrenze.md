@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-17
-  updatedAt: 2026-10-12
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Fenster- und Glasschäden prüffähig abgrenzen"
@@ -85,10 +85,9 @@ Die Reparaturgrenze folgt dem konkreten Befund. Erst die bauteilbezogene Trennun
 
 ## Quellen und weiterführende Hinweise
 
-- [Quelle 1](https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren) – offizieller Bezug zum jeweiligen Prüffeld.
-- [Quelle 2](https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6) – fachliche oder sicherheitsbezogene Einordnung.
-- [Quelle 3](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – gesetzlicher beziehungsweise technischer Rahmen.
-
+- [ift Rosenheim: Prüfung der Schlagregendichtheit von Fenstern und Türen](https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren)
+- [BAuA: ASR A1.6 – Fenster, Oberlichter, lichtdurchlässige Wände](https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6)
+- [Bundesministerium der Justiz / juris: VVG § 82 – Abwendung und Minderung des Schadens](https://www.gesetze-im-internet.de/vvg_2008/__82.html)
 ## Fachliche Prüfung für Ihre Schadenakte
 
 Für Versicherer, Schadenabteilungen und Regulierer bieten wir abgegrenzte technische Prüfaufträge und die Bearbeitung komplexer Schadenlagen an. Prüfziel, Unterlagenstand und gewünschte Bearbeitungstiefe werden vorab abgestimmt.

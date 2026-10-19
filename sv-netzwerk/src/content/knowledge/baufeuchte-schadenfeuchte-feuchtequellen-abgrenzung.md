@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/fachwissen/stromkosten-technische-trocknung-nac
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-23
-  updatedAt: 2026-10-12
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Baufeuchte und Schadenfeuchte fachlich abgrenzen"
@@ -112,9 +112,9 @@ In einem ausdrücklich fiktiven Fall werden nach einer gemeldeten Leitungsleckag
 
 Baufeuchte und Schadenfeuchte lassen sich nicht anhand eines einzelnen Messwerts unterscheiden. Eine belastbare Bewertung verbindet zeitliche Einordnung, Bauteilkenntnis, geeignete Messverfahren, Vergleichswerte und ein konkret begründetes Trocknungsziel. Die getrennte Dokumentation von Ursache, Maßnahme, Verlauf und Kosten schafft eine nachvollziehbare Grundlage für Sanierung und Regulierung.
 
-## Aktualitätsprüfung zum 30.09.2026
+## Feuchteursache und Sanierungsziel
 
-Der Umweltbundesamt-Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall liegt in einer aktualisierten Auflage von April 2024 vor; die zugehörige UBA-Informationsseite wurde am 17.01.2025 aktualisiert. Diese fachliche Leitlinie bestätigt für die Praxis die hier beschriebene Reihenfolge: Feuchteursache klären, Befund erfassen, Sanierungsumfang begründen und Erfolg kontrollieren. Sie ersetzt weder eine objektspezifische Bauwerksdiagnostik noch eine Deckungsentscheidung. Veröffentlichungsdatum dieses Beitrags (23.09.2026), Aktualisierungsdatum (30.09.2026) und der Geltungsstand der Quelle (April 2024/17.01.2025) sind damit getrennt dokumentiert.
+Bei Feuchteschäden trenne ich Ursachenklärung, Befunderfassung, Sanierungsumfang und Erfolgskontrolle. Der UBA-Schimmelleitfaden, aktualisierte Auflage April 2024, bietet dafür einen fachlichen Rahmen; er ersetzt weder die objektspezifische Bauwerksdiagnostik noch eine Deckungsentscheidung.
 
 ## Ergänzung zur Aussagegrenze von Messverfahren vom 12.10.2026
 
@@ -125,7 +125,6 @@ Die KRL-Fachinformation ist eine technische Fachinformation und keine gesetzlich
 ## Quellen und weiterführende Hinweise
 
 - Versicherungsvertragsgesetz, insbesondere §§ 82 und 86: https://www.gesetze-im-internet.de/vvg_2008/
-- Umweltbundesamt, Innenraumhygiene und Feuchte: https://www.umweltbundesamt.de/themen/gesundheit/innenraumhygiene
-- Umweltbundesamt, Ratgeber Schimmel im Haus: https://www.umweltbundesamt.de/publikationen/schimmel-im-haus
-- Bundesanstalt für Arbeitsschutz und Arbeitsmedizin, Gefahrstoffe und Feuchtarbeit: https://www.baua.de/
-- WTA, Technische Merkblätter zur Bauwerksdiagnostik und Feuchtebewertung: https://www.wta-international.org/
+- Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, aktualisierte Auflage April 2024: https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
+
+- Industrieverband Klebstoffe / TKB, KRL-Methode – Fachinformationen: https://www.klebstoffe.com/krl-methode/

@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/experten/", "/fachwissen/lo
 damageTypes: ["tga", "leitungswasser", "brand", "gebaeude"]
 publication:
   publishedAt: 2026-09-07
-  updatedAt: 2026-09-07
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Elektrische Anlagen nach Wasserschäden sicher prüfen"
@@ -106,6 +106,6 @@ Für die objektbezogene Bearbeitung unterstützen wir mit strukturierter [Schade
 
 ## Quellen und weiterführende Hinweise
 
-- [DGUV Vorschrift 3: Elektrische Anlagen und Betriebsmittel](https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1052/elektrische-anlagen-und-betriebsmittel) – Prüfpflichten vor Wiederinbetriebnahme nach Änderung oder Instandsetzung.
-- [DGUV Information: Betrieb elektrischer Anlagen und Betriebsmittel](https://publikationen.dguv.de/regelwerk/dguv-informationen/313/betrieb-elektrischer-anlagen-und-betriebsmittel) – Hinweise zu Besichtigen, Messen, Erproben und zur Prüfung durch Elektrofachkräfte.
-- [DGUV Fachbereich ETEM: Vorschriften- und Regelwerk](https://www.dguv.de/fb-etem/regelwerk/index.jsp) – zentrale Übersicht zu elektrotechnischen Regeln und Informationen.
+- [DGUV Vorschrift 3: Elektrische Anlagen und Betriebsmittel](https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1052/elektrische-anlagen-und-betriebsmittel)
+- [DGUV Information 203-001: Sicherheit bei Arbeiten an elektrischen Anlagen](https://publikationen.dguv.de/regelwerk/dguv-informationen/284/sicherheit-bei-arbeiten-an-elektrischen-anlagen)
+- [DGUV Fachbereich ETEM: Vorschriften- und Regelwerk](https://www.dguv.de/fb-etem/regelwerk/index.jsp)

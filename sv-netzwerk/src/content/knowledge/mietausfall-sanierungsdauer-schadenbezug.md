@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-18
-  updatedAt: 2026-10-15
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Mietausfall bei Sanierung nachvollziehbar prüfen"
@@ -69,7 +69,7 @@ Mietausfall oder Mietminderung ist nicht automatisch in jeder Gebäude- oder Hau
 
 Zunächst sind zwei Berechnungen zu trennen: die mietrechtliche Herabsetzung der geschuldeten Miete und der nach dem Versicherungsvertrag ersatzfähige Ausfall. Grundmiete, Nebenkostenvereinbarung, betroffene Mietobjekte, Quote, Zeitraum und Zahlungen müssen nachvollziehbar ausgewiesen werden. Die Nettokaltmiete ist nicht ungeprüft die Bemessungsgrundlage jeder Mietminderung. Umgekehrt begründet die mietrechtliche Berechnung keine automatische Erstattung sämtlicher Nebenkosten durch die Gebäudeversicherung. Sanierungs- und Mietausfallzeiträume sind getrennt zu vergleichen.
 
-### Quellenpräzisierung vom 15.10.2026: Rechtsfolge, Zeitraum und Rechenbasis
+### Rechtsfolge, Zeitraum und Rechenbasis
 
 [§ 536 BGB](https://www.gesetze-im-internet.de/bgb/__536.html) knüpft die Minderung an die aufgehobene oder geminderte Gebrauchstauglichkeit; eine unerhebliche Einschränkung bleibt außer Betracht. Ein Minderungsschreiben oder eine Zustimmung des Vermieters ist daher nicht der alleinige Rechtsgrund. [§ 536c BGB](https://www.gesetze-im-internet.de/bgb/__536c.html) verlangt die unverzügliche Mängelanzeige. Ein Rechtsverlust wegen unterlassener Anzeige setzt nach Absatz 2 insbesondere voraus, dass der Vermieter deshalb nicht abhelfen konnte. Eine verspätete Anzeige ist nicht pauschal mit dem Wegfall jeder Minderung gleichzusetzen. 
 

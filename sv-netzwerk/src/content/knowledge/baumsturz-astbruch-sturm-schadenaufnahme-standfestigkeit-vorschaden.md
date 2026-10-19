@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/sturmschaden-windwirkung-vorschaden-abgrenzung/", "/
 damageTypes: ["sturm", "gebaeude"]
 publication:
   publishedAt: 2026-08-17
-  updatedAt: 2026-10-15
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Baumsturz und Astbruch fachlich sauber bewerten"
@@ -59,11 +59,11 @@ Technische Feststellung, Wetterursache, Baumzustand und Deckungsfrage sind getre
 
 Gleichzeitig wäre es unzutreffend, bei jedem Vorschadenhinweis den aktuellen Sturmbezug vorschnell zu verneinen. Erst die dokumentierte Trennung der Einflussfaktoren schafft eine belastbare Grundlage.
 
-### Quellenpräzisierung vom 15.10.2026: Baumzustand ist noch kein Haftungsnachweis
+### Baumzustand ist noch kein Haftungsnachweis
 
-Für eine Prüfung nach [§ 823 Absatz 1 BGB](https://www.gesetze-im-internet.de/bgb/__823.html) genügt nicht allein, dass der Baum vom Nachbargrundstück stammt. Widerrechtliche Rechtsverletzung, ursächliches Verhalten beziehungsweise eine einschlägige Pflichtverletzung und Verschulden sind eigenständige Prüffelder. Ob ein Defekt vor dem Ereignis erkennbar war, welche Kontrollen dokumentiert sind und wann Sicherungsmaßnahmen möglich waren, muss deshalb mit Baumfachleuten geklärt werden. Ein Bruchbild nach dem Sturm beweist nicht für sich allein die vorherige Erkennbarkeit. Dies ist eine praktische Prüfableitung, keine pauschale Haftungsaussage und kein Ausschluss anderer Anspruchsgrundlagen. Amtlicher geltender Gesetzestext gelesen am 15.10.2026; keine neue Entscheidung oder neuer Geltungsbeginn.
+Für eine Prüfung nach [§ 823 Absatz 1 BGB](https://www.gesetze-im-internet.de/bgb/__823.html) genügt nicht allein, dass der Baum vom Nachbargrundstück stammt. Widerrechtliche Rechtsverletzung, ursächliches Verhalten beziehungsweise eine einschlägige Pflichtverletzung und Verschulden sind eigenständige Prüffelder. Ob ein Defekt vor dem Ereignis erkennbar war, welche Kontrollen dokumentiert sind und wann Sicherungsmaßnahmen möglich waren, muss deshalb mit Baumfachleuten geklärt werden. Ein Bruchbild nach dem Sturm beweist nicht für sich allein die vorherige Erkennbarkeit. Dies ist eine praktische Prüfableitung, keine pauschale Haftungsaussage und kein Ausschluss anderer Anspruchsgrundlagen.
 
-Die FLL führt bei der Quellenprüfung weiterhin die [Baumkontrollrichtlinien, Ausgabe 2020](https://shop.fll.de/de/baumkontrollrichtlinien-richtlinien-fuer-baumkontrollen-zur-ueberpruefung-der-verkehrssicherheit.html), und [ZTV-Baumpflege, 6. Ausgabe 2017](https://shop.fll.de/de/ztv-baumpflege-zusaetzliche-technische-vertragsbedingungen-und-richtlinien-fuer-baumpflege-2017-broschuere.html). Die erste Veröffentlichung betrifft Kontrollen der Verkehrssicherheit; die ZTV betrifft Leistungsbeschreibung und Ausführung von Pflegemaßnahmen. Diese Regelwerke sind weder ein Versicherungsvertrag noch eine automatische Haftungsentscheidung. Bestätigt wurden Herausgeberangaben, Ausgaben und öffentlich beschriebene Anwendungsbereiche, nicht sämtliche kostenpflichtigen Detailtexte. Keine neue Ausgabe und kein Entwurf werden unterstellt. Praktischer Nutzen: Kontrollunterlagen, vertiefenden Untersuchungsauftrag und angebotene Pflege- oder Räumleistungen getrennt anfordern, statt sie als einen einzigen Nachweis zu behandeln.
+Die FLL unterscheidet die [Baumkontrollrichtlinien, Ausgabe 2020](https://shop.fll.de/de/baumkontrollrichtlinien-richtlinien-fuer-baumkontrollen-zur-ueberpruefung-der-verkehrssicherheit.html), und [ZTV-Baumpflege, 6. Ausgabe 2017](https://shop.fll.de/de/ztv-baumpflege-zusaetzliche-technische-vertragsbedingungen-und-richtlinien-fuer-baumpflege-2017-broschuere.html). Die erste Veröffentlichung betrifft Kontrollen der Verkehrssicherheit; die ZTV betrifft Leistungsbeschreibung und Ausführung von Pflegemaßnahmen. Diese Regelwerke sind weder ein Versicherungsvertrag noch eine automatische Haftungsentscheidung. Kontrollunterlagen, vertiefenden Untersuchungsauftrag und angebotene Pflege- oder Räumleistungen getrennt anfordern, statt sie als einen einzigen Nachweis zu behandeln.
 
 ## Praxisbeispiel
 
@@ -83,9 +83,9 @@ Baumsturz- und Astbruchschäden lassen sich nur belastbar bewerten, wenn Sturmer
 
 ## Quellen und weiterführende Hinweise
 
-1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-2. FLL-Baumuntersuchungsrichtlinien – Richtlinien für eingehende Untersuchungen zur Überprüfung der Verkehrssicherheit von Bäumen, https://shop.fll.de/de/baeume-und-gehoelze/fll-baumuntersuchung.html
-3. Deutscher Wetterdienst – Wetterinformationen für Schadensfälle, https://www.dwd.de/DE/leistungen/wetterinfo/wetterinfo_schadensfall.html
-4. FLL ZTV-Baumpflege 2017 – Zusätzliche Technische Vertragsbedingungen und Richtlinien für Baumpflege, https://shop.fll.de/de/ztv-baumpflege-zusaetzliche-technische-vertragsbedingungen-und-richtlinien-fuer-baumpflege-2017-broschuere.html
-5. FLL-Baumkontrollrichtlinien 2020 – Richtlinien für Baumkontrollen zur Überprüfung der Verkehrssicherheit von Bäumen, https://shop.fll.de/de/baumkontrollrichtlinien-richtlinien-fuer-baumkontrollen-zur-ueberpruefung-der-verkehrssicherheit.html
-6. Bürgerliches Gesetzbuch (BGB), § 823 Absatz 1 – Voraussetzungen deliktischen Schadensersatzes, https://www.gesetze-im-internet.de/bgb/__823.html; geltender amtlicher Text, geprüft am 15.10.2026.
+- Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+- FLL-Baumuntersuchungsrichtlinien – Richtlinien für eingehende Untersuchungen zur Überprüfung der Verkehrssicherheit von Bäumen, https://shop.fll.de/de/baeume-und-gehoelze/fll-baumuntersuchung.html
+- Deutscher Wetterdienst – Wetterinformationen für Schadensfälle, https://www.dwd.de/DE/leistungen/wetterinfo/wetterinfo_schadensfall.html
+- FLL ZTV-Baumpflege 2017 – Zusätzliche Technische Vertragsbedingungen und Richtlinien für Baumpflege, https://shop.fll.de/de/ztv-baumpflege-zusaetzliche-technische-vertragsbedingungen-und-richtlinien-fuer-baumpflege-2017-broschuere.html
+- FLL-Baumkontrollrichtlinien 2020 – Richtlinien für Baumkontrollen zur Überprüfung der Verkehrssicherheit von Bäumen, https://shop.fll.de/de/baumkontrollrichtlinien-richtlinien-fuer-baumkontrollen-zur-ueberpruefung-der-verkehrssicherheit.html
+- Bürgerliches Gesetzbuch (BGB), § 823 Absatz 1 – Voraussetzungen deliktischen Schadensersatzes, https://www.gesetze-im-internet.de/bgb/__823.html

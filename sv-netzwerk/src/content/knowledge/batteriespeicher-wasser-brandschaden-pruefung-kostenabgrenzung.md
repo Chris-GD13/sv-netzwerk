@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/", "/
 damageTypes: ["gebaeude", "elementar", "brand", "technik"]
 publication:
   publishedAt: 2026-10-09
-  updatedAt: 2026-10-18
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Batteriespeicher nach Wasser- oder Brandschaden prüfen"
@@ -139,4 +139,6 @@ Nach Wasser- oder Brandeinwirkung ist ein Batteriespeicher nicht aufgrund seines
 - [Umweltbundesamt: Batterien und Altbatterien](https://www.umweltbundesamt.de/themen/abfall-ressourcen/produktverantwortung-in-der-abfallwirtschaft/batterien-altbatterien).
 - [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html).
 
-Weiterführend: [Elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/), [elektrische Brandursachen](/fachwissen/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung/), [Photovoltaikanlagen nach Sturm und Hagel](/fachwissen/pv-anlage-hagelschaden-pruefung-kostenabgrenzung/) und [prüffähige Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).
+## Weiterführende Fachbeiträge
+
+[Elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/), [elektrische Brandursachen](/fachwissen/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung/), [Photovoltaikanlagen nach Sturm und Hagel](/fachwissen/pv-anlage-hagelschaden-pruefung-kostenabgrenzung/) und [prüffähige Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).

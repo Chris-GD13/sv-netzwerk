@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/sturmschaden-windwirkung-vorscha
 damageTypes: ["sturm", "gebaeude"]
 publication:
   publishedAt: 2026-08-07
-  updatedAt: 2026-08-07
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Tornadoereignisse und lokale Sturmereignisse fachlich einordnen"
@@ -211,10 +211,12 @@ Bei der Erstaufnahme wird nicht pauschal die gesamte Gebäudehülle als gleichar
 
 Tornadoereignisse und lokale Sturmereignisse werden erst dann prüffähig, wenn Windwirkung, Trümmeranprall, Vorschäden, Befestigungszustand und Schadenzonen sauber getrennt erfasst werden. Gerade diese Trennung entscheidet darüber, ob Sicherungsmaßnahmen, Reparaturumfang und Kostenfolge fachlich nachvollziehbar begründet werden können.
 
+## Windlastnorm und Ereignisnachweis
+
+Für die Tragwerksbewertung ist der projektbezogen maßgebliche Regelwerksstand zu bestimmen. Der veröffentlichte Nationale Anhang DIN EN 1991-1-4/NA:2024-08 ersetzt die Ausgabe 2010-12. Er ist von Norm-Entwürfen zu trennen. Ein solcher Windlastbezug beantwortet die konstruktive Frage; er beweist weder die örtliche Windgeschwindigkeit des konkreten Ereignisses noch dessen Einstufung als Tornado. Dafür sind Wetter- und Schadenbefunde gesondert auszuwerten.
+
 ## Quellen und weiterführende Hinweise
 
-1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-2. DIN EN 1991-1-4/NA, Nationaler Anhang - Eurocode 1: Einwirkungen auf Tragwerke - Teil 1-4: Windlasten, bibliografischer Hinweis als Regelwerksbezug für Windbeanspruchung; objektspezifische Bewertung bleibt Fachplaneraufgabe.
-3. ZVDH-Regelwerk für Dachdeckungen und Dachabdichtungen, bibliografischer Hinweis als fachlicher Ausführungs- und Befestigungsbezug.
-4. BBK, Hinweise zu Naturgefahren und baulichem Bevölkerungsschutz bei Sturmereignissen, bibliografischer Hinweis als allgemeiner Schutz- und Risikokontext.
-5. Fachliteratur zu Sturm- und Tornadoschäden in der Schadenpraxis, bibliografischer Hinweis für weiterführende Musterbewertung; konkrete Ursachenzuordnung bleibt am Objekt zu dokumentieren.
+- Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+- DIN Media, DIN EN 1991-1-4/NA:2024-08 – Nationaler Anhang, Windlasten: https://www.dinmedia.de/de/norm/din-en-1991-1-4-na/379080426
+- Zentralverband des Deutschen Dachdeckerhandwerks, Regelübersicht: https://dachdecker.org/betriebsinhaber/regeluebersicht/

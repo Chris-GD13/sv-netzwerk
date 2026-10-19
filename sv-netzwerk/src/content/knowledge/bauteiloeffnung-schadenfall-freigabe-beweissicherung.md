@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-21
-  updatedAt: 2026-10-13
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Bauteilöffnungen im Schadenfall prüfen"
@@ -118,15 +118,15 @@ In einem ausdrücklich fiktiven Leitungswasserschaden zeigt eine Wand im Bereich
 
 Bauteilöffnungen sind belastbar, wenn sie als kontrollierter Prüfschritt geplant und dokumentiert werden. Ein konkretes Prüfziel, ein begrenzter Freigabeumfang, vollständige Beweissicherung und die rechtzeitige Einbindung zuständiger Fachpersonen verhindern unnötigen Rückbau und schaffen eine prüffähige Grundlage für die weitere Regulierung.
 
-## Quellenpräzisierung vom 13.10.2026: Informationen vor der Öffnung
+## Informationen vor der Öffnung
 
-[§ 5a GefStoffV](https://www.gesetze-im-internet.de/gefstoffv_2010/__5a.html) verlangt vom Veranlasser vor Beginn der Tätigkeiten die Weitergabe der vorhandenen Informationen zur Bau- und Nutzungsgeschichte über bekannte oder vermutete Gefahrstoffe. Zugängliche Unterlagen sind mit zumutbarem Aufwand heranzuziehen. Der amtliche Text wurde am 13.10.2026 geprüft; ein neues Inkrafttreten wird nicht behauptet.
+[§ 5a GefStoffV](https://www.gesetze-im-internet.de/gefstoffv_2010/__5a.html) verlangt vom Veranlasser vor Beginn der Tätigkeiten die Weitergabe der vorhandenen Informationen zur Bau- und Nutzungsgeschichte über bekannte oder vermutete Gefahrstoffe. Zugängliche Unterlagen sind mit zumutbarem Aufwand heranzuziehen.
 
 Bedeutung für die Öffnungsplanung: Vorhandene Informationen zusammen mit dem Prüfziel an das ausführende Unternehmen übergeben. Diese Informationspflicht ersetzt nicht dessen Gefährdungsbeurteilung und ist keine pauschale Freigabe zum Öffnen schadstoffverdächtiger Bauteile.
 
 ## Quellen und weiterführende Hinweise
 
-- [§ 82 VVG – Abwendung und Minderung des Schadens](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – rechtlicher Rahmen für erforderliche Schadenminderungsmaßnahmen.
-- [§ 249 BGB – Art und Umfang des Schadensersatzes](https://www.gesetze-im-internet.de/bgb/__249.html) – gesetzlicher Bezug zur Wiederherstellung im Haftungsfall.
-- [Gefahrstoffverordnung](https://www.gesetze-im-internet.de/gefstoffv_2010/) – Anforderungen beim möglichen Umgang mit Gefahrstoffen.
-- [BAuA: TRGS 519 – Asbest](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519) – offizielle technische Regel für Arbeiten mit Asbest.
+- [§ 82 VVG – Abwendung und Minderung des Schadens](https://www.gesetze-im-internet.de/vvg_2008/__82.html)
+- [§ 249 BGB – Art und Umfang des Schadensersatzes](https://www.gesetze-im-internet.de/bgb/__249.html)
+- [Gefahrstoffverordnung](https://www.gesetze-im-internet.de/gefstoffv_2010/)
+- [BAuA: TRGS 519 – Asbest](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519)

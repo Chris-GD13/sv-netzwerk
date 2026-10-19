@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/rechnungs-kva-pruefung-freigabe-
 damageTypes: ["gebaeude", "leitungswasser", "brand"]
 publication:
   publishedAt: 2026-09-09
-  updatedAt: 2026-10-14
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Regiekosten: Bedeutung, Nachweise und Prüfung im Schadenfall"
@@ -120,21 +120,18 @@ Auch Nachträge werden nicht allein wegen ihrer zeitlichen Nähe zum Schaden ane
 
 Als Mindestbestand sollten Auftrag, Leistungsbeschreibung, Tages- oder Stundenberichte, relevante Besprechungsprotokolle, Freigaben, Nachträge und Schlussrechnung gemeinsam abgelegt werden. E-Mails werden nur übernommen, wenn sie eine technische Entscheidung oder eine konkrete Koordination belegen. Interne Notizen ohne Schadenbezug gehören nicht in die abrechnungsbegründende Nachweiskette. So bleibt die Akte übersichtlich und auch für eine spätere Prüfung durch Dritte verständlich.
 
-## Quellen und weiterführende Hinweise
-
-### Vergütung und Rollenabgrenzung, geprüft am 14.10.2026
+## Vergütung und Rollenabgrenzung
 
 [§ 632 Absatz 2 BGB](https://www.gesetze-im-internet.de/bgb/__632.html) nennt die taxmäßige beziehungsweise übliche Vergütung, wenn die Höhe nicht bestimmt ist. Diese Regel ersetzt keinen vereinbarten Preis und macht einen Schadenprüfwert nicht zum allgemeinen Vertragstarif. Praktisch sind Vergütungsform, abgegoltene Aufgaben, zusätzliche Bestellung und Leistungsnachweise getrennt festzuhalten. Fehlende Unterlagen begründen eine konkrete Rückfrage; ein Anspruchsverlust darf daraus nicht ohne Prüfung abgeleitet werden.
 
 Die [BaustellV, §§ 3 bis 5](https://www.gesetze-im-internet.de/baustellv/BJNR128300998.html), trennt Koordinatorbestellung, Bauherrenverantwortung und Arbeitgeberpflichten. Eine Koordinationsrechnung belegt keine automatische Bestellung zum SiGeKo. Unterschiedliche beauftragte Aufgaben sind nicht allein wegen eines gemeinsamen Besprechungstermins identisch. Der [Fachbeitrag zu Sanierungsbaustellen](/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/) erläutert diese Prüfung.
 
-Status: geltende amtliche Texte, am 14.10.2026 gelesen. BaustellV ausgewiesener Änderungsstand 17.12.2025; Abrufdatum ist kein neuer Geltungsbeginn. Keine neue Rechtsprechung oder verbindliche Preisliste behauptet.
+## Quellen und weiterführende Hinweise
 
-- § 82 VVG, Schadenminderung: https://www.gesetze-im-internet.de/vvg_2008/__82.html
+- Versicherungsvertragsgesetz (VVG), § 82 Abwendung und Minderung des Schadens: https://www.gesetze-im-internet.de/vvg_2008/__82.html
 - § 86 VVG, Übergang von Ersatzansprüchen: https://www.gesetze-im-internet.de/vvg_2008/__86.html
-- § 632 BGB, Vergütung; konkrete Anwendbarkeit im vorstehenden Nachtrag: https://www.gesetze-im-internet.de/bgb/__632.html
-- BaustellV, Rollen und Arbeitgeberpflichten; keine Vergütungsvorschrift: https://www.gesetze-im-internet.de/baustellv/BJNR128300998.html
-
+- Bürgerliches Gesetzbuch (BGB), § 632 Vergütung: https://www.gesetze-im-internet.de/bgb/__632.html
+- Baustellenverordnung (BaustellV), §§ 3 bis 5: https://www.gesetze-im-internet.de/baustellv/BJNR128300998.html
 ## Fachliche Prüfung für Ihre Schadenakte
 
 Für Versicherer, Schadenabteilungen und Regulierer bieten wir abgegrenzte technische Prüfaufträge und die Bearbeitung komplexer Schadenlagen an. Prüfziel, Unterlagenstand und gewünschte Bearbeitungstiefe werden vorab abgestimmt.

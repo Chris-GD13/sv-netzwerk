@@ -16,7 +16,7 @@ relatedLinks: ["/experten/christian-waechter/", "/fachwissen/beweissicherung-fot
 damageTypes: ["gebaeude"]
 publication:
   publishedAt: 2026-10-17
-  updatedAt: 2026-10-17
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Drohnen bei Gebäudeschäden fachlich einsetzen"
@@ -167,4 +167,6 @@ Belastbar ist nicht die größte Bildmenge, sondern die nachvollziehbare Kette v
 - Konferenz der unabhängigen Datenschutzaufsichtsbehörden des Bundes und der Länder, [Positionspapier zur Nutzung von Kameradrohnen durch nicht-öffentliche Stellen](https://www.datenschutzkonferenz-online.de/media/oh/20190116_oh_positionspapier_kameradrohnen.pdf), 16.01.2019.
 - Murtiyoso, Grussenmeyer, Börlin, Vandermeerschen und Freville, [Open source and independent methods for bundle adjustment assessment in close-range UAV photogrammetry](https://doi.org/10.5194/isprs-annals-IV-2-W2-163-2017), ISPRS Annals, 2017.
 
-Weiterführend: [Beweissicherung und Fotodokumentation](/fachwissen/beweissicherung-fotodokumentation-standards/), [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/) und [Kontakt zur sachverständigen Einordnung](/kontakt/).
+## Weiterführende Fachbeiträge
+
+[Beweissicherung und Fotodokumentation](/fachwissen/beweissicherung-fotodokumentation-standards/), [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/) und [Kontakt zur sachverständigen Einordnung](/kontakt/).

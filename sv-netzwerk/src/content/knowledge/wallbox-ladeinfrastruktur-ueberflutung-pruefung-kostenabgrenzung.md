@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/", "/
 damageTypes: ["gebaeude", "elementar", "technik"]
 publication:
   publishedAt: 2026-10-08
-  updatedAt: 2026-10-18
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Wallbox nach Überflutung: Prüfung und Kostenabgrenzung"
@@ -126,4 +126,6 @@ Nach einer Überflutung entscheidet nicht die trockene Oberfläche über die wei
 - [DGUV Information 203-072](https://publikationen.dguv.de/regelwerk/dguv-informationen/2879/wiederkehrende-pruefungen-elektrischer-anlagen-und-ortsfester-betriebsmittel-fachwissen-fuer-pruefper).
 - [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html).
 
-Weiterführend: [Elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/), [Wärmepumpen nach Überflutung](/fachwissen/waermepumpe-ueberflutung-pruefung-kostenabgrenzung/), [Eintrittswege bei Überflutung](/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/) und [Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).
+## Weiterführende Fachbeiträge
+
+[Elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/), [Wärmepumpen nach Überflutung](/fachwissen/waermepumpe-ueberflutung-pruefung-kostenabgrenzung/), [Eintrittswege bei Überflutung](/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/) und [Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).

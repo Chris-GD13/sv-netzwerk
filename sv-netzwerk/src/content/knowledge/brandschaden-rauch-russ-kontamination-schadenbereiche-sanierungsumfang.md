@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/brandschaden-notmassnahmen-ueber
 damageTypes: ["brand", "gebaeude"]
 publication:
   publishedAt: 2026-08-06
-  updatedAt: 2026-10-13
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Rauch- und Rußschäden fachlich sauber abgrenzen"
@@ -285,16 +285,14 @@ Bei der Erstaufnahme werden Primärbrandraum, angrenzende Aufenthaltsräume und 
 
 Brandschäden durch Rauch und Ruß werden erst dann prüffähig, wenn Primärbrandbereich, Kontamination, verdeckte Beaufschlagung, technische Funktion und Sanierungsziel sauber getrennt aufgenommen werden. Gerade diese Trennung entscheidet darüber, ob Reinigung, Dekontamination, Ausbau und Ersatz fachlich sowie kostenmäßig nachvollziehbar begründet werden können.
 
-## Quellenpräzisierung vom 13.10.2026: Arbeitsschutz und Nutzungsfreigabe
+## Arbeitsschutz und spätere Nutzungsfreigabe
 
 [TRGS 524, Abschnitt 7](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/7.htm), in der am 17.07.2026 bekannt gemachten Neufassung, behandelt die Wirksamkeit tätigkeitsbezogener Schutzmaßnahmen. Eine Arbeitsplatzmessung erfasst den Ort und Zeitpunkt der Untersuchung; sie ist keine pauschale Aussage über jeden späteren Zustand. Arbeitsschutz während der Sanierung und die Eignung für die spätere Raumnutzung müssen deshalb mit jeweils passendem Prüfziel bewertet werden.
 
-Die [Dokumentationshinweise in Anlage 11](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/anl11.htm) ordnen Unterlagen den Verantwortlichen zu. Bedeutung für die Akte: Erkundungsdaten, gegebenenfalls Arbeits- und Sicherheitsplan, Arbeitgeber-Gefährdungsbeurteilung und Wirksamkeitsnachweise getrennt führen. Die technische Regel konkretisiert Gefahrstoffrecht, ist kein Entwurf und keine pauschale Versicherungszusage. Quellenstand geprüft am 13.10.2026; kein zusätzlicher Geltungsbeginn erfunden.
+Die [Dokumentationshinweise in Anlage 11](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/anl11.htm) ordnen Unterlagen den Verantwortlichen zu. Bedeutung für die Akte: Erkundungsdaten, gegebenenfalls Arbeits- und Sicherheitsplan, Arbeitgeber-Gefährdungsbeurteilung und Wirksamkeitsnachweise getrennt führen. Die technische Regel konkretisiert Gefahrstoffrecht, ist kein Entwurf und keine pauschale Versicherungszusage.
 
 ## Quellen und weiterführende Hinweise
 
-1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-2. DGUV, Thema Gefahrstoffe, https://www.dguv.de/de/praevention/themen-a-z/gefahrstoffe/index.jsp
-3. VdS 2357, Brandschadensanierung, bibliografischer Hinweis als anerkannter fachlicher Regelwerksbezug ohne Wiedergabe nicht frei zugänglicher Detailinhalte.
-4. VDI 3810 Blatt 2 / technische Betreiber- und Instandhaltungsbezüge für gebäudetechnische Anlagen, bibliografischer Hinweis als Prüfkontext für Anlagenwiederinbetriebnahme.
-5. Fachverband Schaden- und Sanierungsmanagement / anerkannte Brandschadensanierungspraxis, bibliografischer Hinweis für weiterführende Verfahren; konkrete Maßnahmen bleiben objekt- und materialbezogen zu prüfen.
+- Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+- DGUV, Thema Gefahrstoffe, https://www.dguv.de/de/praevention/themen-a-z/gefahrstoffe/index.jsp
+- GDV / VdS, VdS 2357 – Richtlinien zur Brandschadensanierung, Ausgabe 2014-06 (06): https://shop.vds.de/download/vds-2357

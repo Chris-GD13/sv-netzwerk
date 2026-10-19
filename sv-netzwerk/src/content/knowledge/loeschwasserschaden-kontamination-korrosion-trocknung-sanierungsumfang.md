@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/brandschaden-rauch-russ-kontamination-schadenbereich
 damageTypes: ["brand", "gebaeude"]
 publication:
   publishedAt: 2026-08-16
-  updatedAt: 2026-10-13
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Löschwasserschäden fachlich sauber abgrenzen"
@@ -87,9 +87,9 @@ Für die technische Bewertung ist nun zu trennen: Der Flur ist vor allem feuchte
 
 Löschwasserschäden lassen sich nur belastbar bewerten, wenn Kontamination, Korrosionsrisiko, Trocknungsbedarf und Sanierungsumfang als getrennte Prüffelder behandelt werden. Erst diese Trennung ermöglicht eine technisch nachvollziehbare und kostenrelevante Schadenabgrenzung.
 
-## Quellenpräzisierung vom 13.10.2026: Schutzwirksamkeit getrennt nachweisen
+## Schutzwirksamkeit getrennt nachweisen
 
-Die [BAuA](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524) führt die TRGS 524 als Ausgabe Juli 2026, bekannt gemacht am 17.07.2026 (GMBl Nr. 18/19). Die [BG-BAU-Wiedergabe](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/titel.htm) nennt abweichend März 2026 bei derselben Bekanntmachung. Maßgeblich ist die bekannt gemachte Fassung; kein Entwurf und kein erfundener gesonderter Geltungsbeginn.
+Die [BAuA](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524) führt die TRGS 524 als Ausgabe Juli 2026, bekannt gemacht am 17.07.2026 (GMBl Nr. 18/19). Die [BG-BAU-Wiedergabe](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/titel.htm) nennt abweichend März 2026 bei derselben Bekanntmachung. Maßgeblich ist die bekannt gemachte Fassung; maßgeblich ist die veröffentlichte technische Regel.
 
 [Abschnitt 7 der TRGS 524](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/7.htm) verlangt im Anwendungsbereich die Kontrolle der vorhandenen Schutzmaßnahmen und ihrer Wirksamkeit. Eine Materialanalyse liefert keine zahlenmäßig exakte Prognose der Luftkonzentration; die tatsächliche Tätigkeit und örtlichen Bedingungen sind mit zu bewerten. Für die Schadenakte folgt daraus: Trocknungserfolg, Materialzustand, Schutzwirksamkeit und spätere Nutzungsfreigabe sind getrennte Nachweise. Ein unauffälliger Feuchtewert bestätigt keine stoffliche Unbedenklichkeit.
 

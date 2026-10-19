@@ -16,7 +16,7 @@ relatedLinks: ["/experten/carmen-gohl/", "/fachwissen/schimmel-nach-wasserschade
 damageTypes: ["feuchte", "gebaeude"]
 publication:
   publishedAt: 2026-10-12
-  updatedAt: 2026-10-18
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Schimmelsanierung und Sanierungserfolg prüfen"
@@ -144,10 +144,12 @@ Der sachverständige Mehrwert liegt in der belastbaren Zuordnung: Welche Ursache
 
 ## Quellen und weiterführende Hinweise
 
-- WTA, Merkblatt 4-12 „Ziele und Kontrolle von Schimmelpilzschadensanierungen in Innenräumen“.
+- WTA / DIN Media, Merkblatt 4-12:2021-05 – Ziele und Kontrolle von Schimmelpilzschadensanierungen in Innenräumen: https://www.dinmedia.de/de/technische-regel/wta-merkblatt-4-12/342998074
 - Umweltbundesamt, [Aktueller UBA-Schimmelleitfaden](https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/aktueller-uba-schimmelleitfaden), 17.01.2025.
 - Umweltbundesamt, [Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, aktualisierte Fassung April 2024](https://www.umweltbundesamt.de/system/files/medien/4031/publikationen/240513_uba_fb_schimmelleitfaden_0.pdf), aktualisierte Auflage April 2024.
 - Deutsche Gesetzliche Unfallversicherung, [DGUV Information 201-028 „Gesundheitsgefährdungen durch Biostoffe bei der Schimmelpilzsanierung“, Ausgabe November 2022](https://publikationen.dguv.de/widgets/pdf/download/article/644).
 - Bundesverband Schimmel- und Schadstoffsanierung e. V., [Fachkundenachweis Schimmelsanierung – Modul B3 Sanierungskontrolle](https://bss-schimmelpilz.de/fachkundenachweis-schimmelsanierung-modul-b3-sanierungskontrolle/).
 
-Weiterführend: [Schimmel nach Wasserschäden fachlich einordnen](/fachwissen/schimmel-nach-wasserschaden-ursache-sanierungsumfang-kostenabgrenzung/), [Baufeuchte und Schadenfeuchte abgrenzen](/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/) und [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/).
+## Weiterführende Fachbeiträge
+
+[Schimmel nach Wasserschäden fachlich einordnen](/fachwissen/schimmel-nach-wasserschaden-ursache-sanierungsumfang-kostenabgrenzung/), [Baufeuchte und Schadenfeuchte abgrenzen](/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/) und [prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/).
