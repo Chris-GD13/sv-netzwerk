@@ -154,7 +154,7 @@
       "original_sha256": "0e40b911d57b40edc267aab7b8b5bfd5feff3308a971acf08279e037db65fd77",
       "original_source_block": "\n- Versicherungsvertragsgesetz (VVG), § 82 Abwendung und Minderung des Schadens: https://www.gesetze-im-internet.de/vvg_2008/__82.html\n- § 86 VVG, Übergang von Ersatzansprüchen: https://www.gesetze-im-internet.de/vvg_2008/__86.html\n- Bürgerliches Gesetzbuch (BGB), § 632 Vergütung: https://www.gesetze-im-internet.de/bgb/__632.html\n- Baustellenverordnung (BaustellV), §§ 3 bis 5: https://www.gesetze-im-internet.de/baustellv/BJNR128300998.html\n\n",
       "removed_unspecific_references": [],
-      "result_sha256": "6f1f7ffb615a1ff5ac1bf99c1adf5f24744a991670dd1938246303eff075e5ff",
+      "result_sha256": "18d2d11b17137d807fc72e2773caf7230b5d0345a30132cf861a9a00353f9223",
       "remaining_work": "Nicht sämtlichen technischen, historischen und rechtlichen Behauptungen vollständig gegen Primärquellen nachgegangen. Weitere individuelle Quellenprüfung erforderlich."
     },
     {
@@ -344,5 +344,6 @@
   "targeted_claim_checks": {
     "rechnungskuerzung-schadenfall-prueffaehigkeit": "Gesamten Artikel gelesen; konkrete gesetzliche Aussagen und Marktzahl frisch abgeglichen. Methodische Kostenprüfempfehlungen als sachverständige Ableitung, keine Rechtsberatung oder pauschale Vergütungsregel.",
     "schadenminderung-obliegenheit-sofortmassnahmen-praxis": "Gezielter neuer Absatz zu §§82/83 VVG, keine vollständige Neubewertung aller Bestandsabsätze."
-  }
+  },
+  "final_inventory": "docs/fachbeitrag-bestandsfortschritt-2026-10-19.json"
 }

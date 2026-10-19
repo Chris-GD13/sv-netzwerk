@@ -6,6 +6,10 @@ Im vertieften Satz von 20 Beiträgen wurden konkrete Quellenbezüge zusätzlich 
 
 Das vollständige Dateiinventar und die Einzelbefunde liegen im Bestandsfortschritt; gezielter Quellenleseumfang in den beiden Redaktionsnachweisen. Dies ist keine vollständige fachliche Quellenfreigabe sämtlicher Altbeiträge. Keine pauschalen Aktualitätsbehauptungen oder neuen Geltungsbeginne. Die bestehende Tagesreservierung 19.10. bleibt unangetastet. Kein LinkedIn-Posting in diesem Lauf.
 
-Prüfung und Live-Nachweis werden nach dem Build beziehungsweise Deployment ergänzt. Die 20 gestern redigierten Seiten wurden heute erneut live geprüft; alle HTTP200 mit korrektem Canonical und ohne noindex.
+Vollständiger Astro-Build erfolgreich: 0 Fehler, 0 Warnungen, 0 Hinweise. GitHub Build Check, Portal Tests und das abschließende Website-Deployment erfolgreich. Alle 56 geänderten Detailrouten gegen den gebauten sichtbaren Artikeltext geprüft: HTTP 200, korrekter Canonical, noindex=false, tatsächliches Änderungsdatum. Übersicht, Suchindex, Sitemap und robots.txt geprüft. Ein im Schneedruckbeitrag fehlendes Änderungsdatum wurde in PR414 nachgetragen und erneut gebaut. Die 20 gestern redigierten Seiten wurden heute erneut live geprüft; alle HTTP200 mit korrektem Canonical und ohne noindex.
 
 Tagesartikel: interne Profilzuordnung und Erstellungsabsatz entfernt, fiktives Praxisbeispiel und Aussagen zu Baujahr, Übermittlungsform und Probenahme präzisiert. Die bestehende natürliche LinkedIn-Vorlage bleibt prepared-not-posted.
+
+Offen dokumentiert: 476 unveränderte HTML-Validierungsbefunde im Gesamtbestand, externe Quellenzugriffe mit HTTP 403/503 beziehungsweise Zeitüberschreitung und die vollständige individuelle fachliche Quellenprüfung der Altartikel. Ein fehlerhafter DGUV-Link wurde ersetzt und mit HTTP 200 nachgeprüft. Bestandsnachträge stehen im minimierten ergänzenden CSV-Nachweis; die historische Haupt-CSV wurde nach der früheren automatischen Ablehnung ihrer vollständigen Übertragung nicht erneut übertragen.
+
+Abschließender Deploy: https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39200888548; Inhaltcommit 3507e2279a30780c3cc5197d0b26c3d15db9a9f1. Nachweise in docs/fachbeitrag-livepruefung-2026-10-19-redaktion.json. LinkedIn weiterhin prepared-not-posted.

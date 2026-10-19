@@ -19,7 +19,89 @@
     "first20_findings": 73,
     "same20_before_changes": 73,
     "today_detail": "passed; no findings",
-    "no_suppression_applied": true
+    "no_suppression_applied": true,
+    "rule_counts": {
+      "aria-label-misuse": 1,
+      "doctype-style": 11,
+      "element-required-attributes": 1,
+      "element-required-content": 1,
+      "long-title": 95,
+      "meta-refresh": 5,
+      "no-implicit-input-type": 22,
+      "no-inline-style": 53,
+      "no-raw-characters": 2,
+      "tel-non-breaking": 1,
+      "unique-landmark": 76,
+      "valid-id": 204,
+      "void-style": 4
+    },
+    "examples_by_rule": {
+      "aria-label-misuse": {
+        "page": "/index.html",
+        "position": "90:1366",
+        "message": "\"aria-label\" cannot be used on this element"
+      },
+      "tel-non-breaking": {
+        "page": "/index.html",
+        "position": "90:25241",
+        "message": "\" \" should be replaced with \"&nbsp;\" (non-breaking space) in telephone number"
+      },
+      "element-required-attributes": {
+        "page": "/yandex_150ebb07ac955858.html",
+        "position": "1:2",
+        "message": "<html> is missing required \"lang\" attribute"
+      },
+      "element-required-content": {
+        "page": "/yandex_150ebb07ac955858.html",
+        "position": "2:2",
+        "message": "<head> element must have <title> as content"
+      },
+      "no-inline-style": {
+        "page": "/experten/index.html",
+        "position": "94:1797",
+        "message": "Inline style is not allowed"
+      },
+      "no-implicit-input-type": {
+        "page": "/grossschadenregulierung/index.html",
+        "position": "92:1502",
+        "message": "<input> is missing recommended \"type\" attribute"
+      },
+      "doctype-style": {
+        "page": "/kompetenzzentrum/index.html",
+        "position": "1:1",
+        "message": "DOCTYPE should be uppercase"
+      },
+      "meta-refresh": {
+        "page": "/komponenten/index.html",
+        "position": "1:84",
+        "message": "Meta refresh must be instant (0 second delay)"
+      },
+      "unique-landmark": {
+        "page": "/podcast/index.html",
+        "position": "92:2159",
+        "message": "Landmarks must have a non-empty and unique accessible name (aria-label or aria-labelledby)"
+      },
+      "long-title": {
+        "page": "/schaden-uebermitteln/index.html",
+        "position": "1:408",
+        "message": "title text cannot be longer than 70 characters"
+      },
+      "no-raw-characters": {
+        "page": "/versicherer/index.html",
+        "position": "95:10638",
+        "message": "Raw \"&\" must be encoded as \"&amp;\""
+      },
+      "valid-id": {
+        "page": "/fachwissen/blitz-ueberspannungsschaden-gebaeudetechnik-pruefen/index.html",
+        "position": "102:9",
+        "message": "element id \"1-ereignis-und-zeitachse-sichern\" must begin with a letter"
+      },
+      "void-style": {
+        "page": "/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/index.html",
+        "position": "95:3168",
+        "message": "Expected omitted end tag <img> instead of self-closing element <img/>"
+      }
+    }
   },
   "external_links": {
     "checked_articles": 56,
@@ -30,15 +112,103 @@
     "timeouts": 2,
     "excluded": 56,
     "redirects": 6,
-    "initial_404": "DGUV article313 identified; replaced with confirmed203-001 primary reference; repeat check pending",
-    "remaining_access_failures": "BAuA403, DGUV/ift503, Dachdecker.org timeout; not declared successfully checked."
+    "initial_404": "DGUV article313 replaced with confirmed203-001 primary reference; direct GET repeat check HTTP200. Whole external-link suite remains non-green.",
+    "remaining_access_failures": "BAuA403, DGUV/ift503, Dachdecker.org timeout; not declared successfully checked.",
+    "concrete_initial_failures": [
+      {
+        "status": "403",
+        "url": "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6",
+        "occurrences": 1,
+        "resolution": "unresolved-source-access; not reported as passed"
+      },
+      {
+        "status": "403",
+        "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519",
+        "occurrences": 2,
+        "resolution": "unresolved-source-access; not reported as passed"
+      },
+      {
+        "status": "403",
+        "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519.html",
+        "occurrences": 1,
+        "resolution": "unresolved-source-access; not reported as passed"
+      },
+      {
+        "status": "403",
+        "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524",
+        "occurrences": 5,
+        "resolution": "unresolved-source-access; not reported as passed"
+      },
+      {
+        "status": "403",
+        "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "occurrences": 14,
+        "resolution": "unresolved-source-access; not reported as passed"
+      },
+      {
+        "status": "403",
+        "url": "https://www.baua.de/DE/Themen/Arbeitsgestaltung-im-Betrieb/Gefahrstoffe/Gefahrstoffe_node.html",
+        "occurrences": 1,
+        "resolution": "unresolved-source-access; not reported as passed"
+      },
+      {
+        "status": "403",
+        "url": "https://www.baua.de/DE/Themen/Chemikalien-Biostoffe/Gefahrstoffe/Informationsportal-Asbest/Asbest_Dossier/Asbest_Durchfuehrung_dossier",
+        "occurrences": 1,
+        "resolution": "unresolved-source-access; not reported as passed"
+      },
+      {
+        "status": "403",
+        "url": "https://www.baua.de/DE/Themen/Chemikalien-Biostoffe/Gefahrstoffe/Informationsportal-Asbest/Asbest_Dossier/Asbest_Planung_dossier",
+        "occurrences": 2,
+        "resolution": "unresolved-source-access; not reported as passed"
+      },
+      {
+        "status": "404",
+        "url": "https://publikationen.dguv.de/regelwerk/dguv-informationen/313/betrieb-elektrischer-anlagen-und-betriebsmittel",
+        "occurrences": 1,
+        "resolution": "replaced; corrected DGUV reference GET200"
+      },
+      {
+        "status": "503",
+        "url": "https://www.dguv.de/",
+        "occurrences": 1,
+        "resolution": "unresolved-source-access; not reported as passed"
+      },
+      {
+        "status": "503",
+        "url": "https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren",
+        "occurrences": 1,
+        "resolution": "unresolved-source-access; not reported as passed"
+      },
+      {
+        "status": "TIMEOUT",
+        "url": "https://dachdecker.org/betriebsinhaber/regeluebersicht/",
+        "occurrences": 2,
+        "resolution": "unresolved-source-access; not reported as passed"
+      }
+    ]
   },
   "archive_source_review": "Source format checked across all109 source files; no full individual technical/legal archive clearance claimed.",
   "daily_deployment": {
     "initial_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39198584259",
     "initial_commit": "55edb6948b5a38b00848d8f0a5f994b53f41bc61",
     "initial_status": "success",
-    "correction_deployment": "pending"
+    "correction_deployment": {
+      "status": "success",
+      "commit": "3507e2279a30780c3cc5197d0b26c3d15db9a9f1",
+      "run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39200888548",
+      "live_proof": "docs/fachbeitrag-livepruefung-2026-10-19-redaktion.json"
+    }
   },
-  "publication_log": "Minimized supplementary CSV; historic central CSV not retransmitted after prior automatic approval rejection of full historic payload. Daily row provided by existing publisher on main; prepared-not-posted."
+  "publication_log": "Minimized supplementary CSV; historic central CSV not retransmitted after prior automatic approval rejection of full historic payload. Daily row provided by existing publisher on main; prepared-not-posted.",
+  "live_checks": {
+    "changed_routes": 56,
+    "passed": true,
+    "backlog_routes": 36,
+    "backlog_passed": true,
+    "integration": "overview, search index, sitemap index, sitemap, robots and deploy-version checked"
+  },
+  "metadata_followup": "Schneedruckartikel: fehlendes tatsächliches Änderungsdatum aus Live-Prüfung ergänzt; separater PR414, vollständiger Build bestanden.",
+  "process_inventory": "One active daily publication task; seven matching legacy website/upload tasks found disabled. No new task created and no recurring publication task disabled."
 }

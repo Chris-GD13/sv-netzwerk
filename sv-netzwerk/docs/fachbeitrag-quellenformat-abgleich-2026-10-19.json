@@ -79,25 +79,13 @@
     {
       "slug": "elektrische-anlagen-nach-wasserschaden-pruefen",
       "original_sha256": "76ec7c4aa02d78d5741ba1534bf818434f35ac125ff0174039d5edf1642cb3ed",
-      "result_sha256": "ba39a5e88c31c36b56905905d35af82f3103bf8bc4b05056f6d6874872d7c336",
+      "result_sha256": "a1476551f0e1734ef883a9ad972d430ababcdfd58a11458af4f7b9aa9b653625",
       "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
     },
     {
       "slug": "fenster-glasschaden-verglasung-reparaturgrenze",
       "original_sha256": "b0e68fd2b176f6e7c3db5593dd860541d3c06acc2cdef71d0b5fed5a0c14e99f",
       "result_sha256": "027b141f185f6bafbfb9291aa49de0b48fabe254c8312930048a10f68d779629",
-      "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
-    },
-    {
-      "slug": "fenster-tueren-kostenvoranschlag-pruefen",
-      "original_sha256": "e82682c43410cee1510559c3d141ca94136ffeeac0e94e2a0b1dbdfe58ea6bc5",
-      "result_sha256": "e82682c43410cee1510559c3d141ca94136ffeeac0e94e2a0b1dbdfe58ea6bc5",
-      "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
-    },
-    {
-      "slug": "fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen",
-      "original_sha256": "552432ce4dbd63911240cc5ad2db2b6d3360ae97a07923d7cff1b783fdfa19c9",
-      "result_sha256": "552432ce4dbd63911240cc5ad2db2b6d3360ae97a07923d7cff1b783fdfa19c9",
       "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
     },
     {
@@ -115,19 +103,13 @@
     {
       "slug": "frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung",
       "original_sha256": "0e06b0e3ea802eb4a739aa611dcd0af6e6a1eb1f65417edf167bbde61df947cf",
-      "result_sha256": "29f1fe8de7d217f8e7a1f9cb3237da82e19867c07ae427f1c2b9b93106b78c7b",
+      "result_sha256": "873196300bbbeff6ea4ca940bd80b7ef10e20d5a84ee566edf4cec07a8f20980",
       "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
     },
     {
       "slug": "geruchsschaden-ursache-sanierung-erfolgskontrolle",
       "original_sha256": "b03a4f003fa9bcdc8cbd4c237cd5df28737e27584003d47c1aeef0c3a070d476",
       "result_sha256": "b03a4f003fa9bcdc8cbd4c237cd5df28737e27584003d47c1aeef0c3a070d476",
-      "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
-    },
-    {
-      "slug": "glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit",
-      "original_sha256": "766c2e6b0afd81af3d8efc92e9b2f62b6477dfee984b870099cfb93f921a2910",
-      "result_sha256": "766c2e6b0afd81af3d8efc92e9b2f62b6477dfee984b870099cfb93f921a2910",
       "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
     },
     {
@@ -167,12 +149,6 @@
       "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
     },
     {
-      "slug": "interdisziplinaeres-sachverstaendigennetzwerk-gutachter-plattform-schadenregulierung",
-      "original_sha256": "bf5994a0d7e6c11fef6cd1574571e0e841f1a0e47a9558c6ba020b84ab003ce0",
-      "result_sha256": "bf5994a0d7e6c11fef6cd1574571e0e841f1a0e47a9558c6ba020b84ab003ce0",
-      "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
-    },
-    {
       "slug": "katastrophenschaeden-region-management-koordination",
       "original_sha256": "f8e6c26281fcb96b1b52ead4e295a3b94924a31793572012b2ee69e5ad89c600",
       "result_sha256": "68d14105a7a07febb985dfc1e8d553c0a859ea3d40cce3f6aa65332b0863954d",
@@ -194,12 +170,6 @@
       "slug": "kumulschaeden-hochwasser-ueberflutung-priorisierung-regulierung",
       "original_sha256": "bb34d3a5050171f04b4706a2df3a5d77225288338279db7022d1fbb45b9bdf65",
       "result_sha256": "f3d5881e28bfc5ba699cbf489330adb5c236e23bebc3237f278ac3134a2a77f9",
-      "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
-    },
-    {
-      "slug": "leckageortung-leitungswasserschaden-messverfahren-suchoeffnungen-ursachenbeweis",
-      "original_sha256": "72e2c6d55ec572fbc88baec62e921837ed6a5a9ac7a807b462005f66fb369bcd",
-      "result_sha256": "72e2c6d55ec572fbc88baec62e921837ed6a5a9ac7a807b462005f66fb369bcd",
       "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
     },
     {
@@ -227,27 +197,9 @@
       "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
     },
     {
-      "slug": "notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation",
-      "original_sha256": "9574724d994c4266df5c1a605443b0889d394ec4611b68f9db0ee37d24e9345e",
-      "result_sha256": "9574724d994c4266df5c1a605443b0889d394ec4611b68f9db0ee37d24e9345e",
-      "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
-    },
-    {
       "slug": "parkett-holzfeuchte-raumklima-untergrund-pruefen",
       "original_sha256": "360c01f7543279f6c0882c1870ea83afac49b675fd1f1d2573a586516a64e242",
       "result_sha256": "0321164ef625af35646d148bde59c61111adcea5db5e6a303e11a504ec44d5ec",
-      "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
-    },
-    {
-      "slug": "photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken",
-      "original_sha256": "3f8dcf2e69b7bccaaaa22027381c1c47f75d3961d286d596474b157f62d5a4d1",
-      "result_sha256": "3f8dcf2e69b7bccaaaa22027381c1c47f75d3961d286d596474b157f62d5a4d1",
-      "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
-    },
-    {
-      "slug": "photovoltaikfragmente-brand-landwirtschaft-gewerbehaftpflicht-fremddach",
-      "original_sha256": "f10fb941bd8180e11cef96c465976515d7edb662c65b30be7e863bb9f5ebfd1d",
-      "result_sha256": "f10fb941bd8180e11cef96c465976515d7edb662c65b30be7e863bb9f5ebfd1d",
       "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
     },
     {
@@ -323,12 +275,6 @@
       "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
     },
     {
-      "slug": "schadentrocknung-bautrocknung-schadenziel-messkonzept-erfolgskontrolle",
-      "original_sha256": "cfb24d171fea73db060314dc334c2eb5d6c0229ba46fb6d2887a797dece2b0f9",
-      "result_sha256": "cfb24d171fea73db060314dc334c2eb5d6c0229ba46fb6d2887a797dece2b0f9",
-      "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
-    },
-    {
       "slug": "schadstoffverdacht-rueckbau-bestandsgebaeude",
       "original_sha256": "8bc1994c1c610f1e6c16ff5bc74abbfe265b0dd6c5caba034ecf5289f5dfd593",
       "result_sha256": "8bc1994c1c610f1e6c16ff5bc74abbfe265b0dd6c5caba034ecf5289f5dfd593",
@@ -341,15 +287,9 @@
       "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
     },
     {
-      "slug": "schlagregeneintritt-fassade-fenster-anschluesse-dichtheit-schadenabgrenzung",
-      "original_sha256": "d20f320c77967bb07edcd5ba4bbee7cc2a7a050e1b2e1ea5be7b084af1df6617",
-      "result_sha256": "d20f320c77967bb07edcd5ba4bbee7cc2a7a050e1b2e1ea5be7b084af1df6617",
-      "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
-    },
-    {
       "slug": "schneedruck-winterschaeden-bewertung-regulierung",
       "original_sha256": "f91a21f8904ebc4d22a82ceb29067587ccfff231000ce83a59815d5ac4c5b75b",
-      "result_sha256": "46b61b07fe74defc1dc0d271814fcc19f168bc02f82bc63cacbcfd70e6d9b270",
+      "result_sha256": "f7aaa6464e4512d6355ae58ad9e8b06fd2a23c617ced37cea26334d0f4fba58e",
       "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
     },
     {
@@ -380,12 +320,6 @@
       "slug": "wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung",
       "original_sha256": "c0e2b6fe5a0ca4bbe469edb41f37f3cb8dbc17cf156abe335dc4c1936f1f440b",
       "result_sha256": "0ca570c51aa23589602f922e6725358bc88656748364b6b612d969edb97eccfc",
-      "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
-    },
-    {
-      "slug": "wintergarten-schaden-tragwerk-verglasung-entwaesserung",
-      "original_sha256": "87a93062cc7beab38d6ac0391cf21a1d83054fabbab967726dfd518316fd55c5",
-      "result_sha256": "87a93062cc7beab38d6ac0391cf21a1d83054fabbab967726dfd518316fd55c5",
       "scope": "Quellenformat, Rechercheüberschrift oder Trennung weiterführender interner Links; keine vollständige fachliche Quellenfreigabe."
     },
     {
@@ -452,5 +386,6 @@
       "meaning": "404-Fundstelle313 mit nicht belegbarem Titel durch existierende konkrete Information ersetzt."
     }
   ],
-  "whitespace_only_changes_discarded": 33
+  "whitespace_only_changes_discarded": 33,
+  "result_note": "Nur tatsächlich vom Hauptstand geänderte Dateien gezählt. Originaldateien sind über Master-Commit und Git-Historie unverändert nachvollziehbar."
 }

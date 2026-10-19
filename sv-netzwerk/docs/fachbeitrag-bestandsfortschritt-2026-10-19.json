@@ -5,7 +5,7 @@
   "total_files": 109,
   "changed_files": 56,
   "backlog_dates_through_2026_10_18_without_content": [],
-  "today": "existing-reservation-respected; same-article-repaired; build-passed; final-deployment-verification-pending",
+  "today": "existing-reservation-respected; same-article-repaired; build-passed; deployment-success; all56-changed-routes-live-verified",
   "entries": [
     {
       "file": "sv-netzwerk/src/content/knowledge/abgrenzung-versicherter-nichtversicherter-schadteil.md",
@@ -1576,11 +1576,11 @@
       "slug": "schneedruck-winterschaeden-bewertung-regulierung",
       "url": "https://www.sv-netzwerk.eu/fachwissen/schneedruck-winterschaeden-bewertung-regulierung/",
       "publication_date": "2026-08-08",
-      "updated_at": null,
+      "updated_at": "2026-10-19",
       "author": "christian-waechter",
       "changed_this_run": true,
       "before_sha256": "f91a21f8904ebc4d22a82ceb29067587ccfff231000ce83a59815d5ac4c5b75b",
-      "result_sha256": "46b61b07fe74defc1dc0d271814fcc19f168bc02f82bc63cacbcfd70e6d9b270",
+      "result_sha256": "f7aaa6464e4512d6355ae58ad9e8b06fd2a23c617ced37cea26334d0f4fba58e",
       "source_section_present": true,
       "source_format_checked": true,
       "individual_full_source_clearance": false,
@@ -1860,5 +1860,6 @@
       "finding": "Keine bekannten Rechercheformeln oder erläuternden Quellenzusätze nach dem Formatabgleich erkannt.",
       "correction": "Bibliografie beziehungsweise öffentliche Recherchehinweise korrigiert; Einzelheiten in Git-Diff und Redaktionsnachweisen."
     }
-  ]
+  ],
+  "deployment_commit": "3507e2279a30780c3cc5197d0b26c3d15db9a9f1"
 }
