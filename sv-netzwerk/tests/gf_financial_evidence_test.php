@@ -39,6 +39,7 @@ foreach([1,2]as$i){
 }
 check(gfExcelPrepareResult('schlusserklaerung',$prepared,'KVA noch nicht freigeben.')===$prepared,'Wiederaufnahme darf Reservekennzeichnung nicht verdoppeln.');
 check(gfExcelPrepareResult('schlusserklaerung',['entries'=>[$entry]],'KVA freigeben.')===['entries'=>[$entry]],'Ausdrückliche KVA-Freigabe muss erhalten bleiben.');
+check(gfExcelValidateData('zahlungsbefuerwortung',['entries'=>[$entry]],'Freigabe für den Kostenvoranschlag.')['passed'],'Unqualifizierte ausdrückliche Freigabe muss weiterhin zulässig sein.');
 check(gfExcelPrepareResult('zahlungsbefuerwortung',$input,'KVA nur auflisten.')===$input,'SE-Normalisierung darf keine Zahlungsbefürwortung ändern.');
 $invoice=['description'=>'Schlussrechnung zum Angebot A-123','source_type'=>'Rechnung','source_reference'=>'R-9','amount'=>123.45];
 check(gfExcelPrepareResult('schlusserklaerung',['entries'=>[$invoice]],'SE erstellen.')['entries'][0]===$invoice,'Eine Rechnung mit Angebotsverweis muss Rechnung bleiben.');
