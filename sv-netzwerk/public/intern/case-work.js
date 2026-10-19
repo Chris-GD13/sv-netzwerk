@@ -5,6 +5,7 @@
     const start=el('vf-analysis-start'), refresh=el('vf-analysis-refresh'), state=el('vf-analysis-state');
     const historyBox=el('vf-work-history'), order=el('vf-analysis-order'), files=el('vf-analysis-files');
     const reload=el('vf-work-reload');
+    const recovery=el('vf-work-import-help');
     if (!start || !historyBox) return;
     const taskId=new URLSearchParams(location.search).get('aufgabe') || '';
     let folder='', epoch=0, timer=null, busy=false, lastRender='', turns=[];
@@ -86,7 +87,7 @@
     };
     const advanceImport=async(current,version,work)=>{
       if(work.reload===false){
-        await api({action:'start',folder_id:current.folder_id,task_id:work.task_id,instructions:work.instructions,request_key:work.request_key});
+        await api({action:'start',folder_id:current.folder_id,task_id:work.task_id,instructions:work.instructions,request_key:work.request_key,source_mode:'portal'});
         if(version===epoch)savePending(current.folder_id,null);return true;
       }
       if(!work.import_id){
@@ -97,9 +98,9 @@
       if(version!==epoch)return false;
       const job=data.job;
       if(job.status==='failed')throw Error('Claims-Nachladen fehlgeschlagen: '+(job.message||'Unbekannter Fehler')+'. Der Arbeitsauftrag bleibt erhalten.');
-      if(job.status!=='done'){notice('Claims wird nachgeladen: '+(job.message||'Warten auf Importstation …'));return true;}
+      if(job.status!=='done'){if(recovery)recovery.hidden=false;notice('Wartet auf Claims-Import: '+(job.message||'Die Büro-Importstation ist erforderlich.')+' Du kannst unten mit dem vorhandenen Portalbestand weiterarbeiten.');return true;}
       notice('Import abgeschlossen. Fallunterlagen werden jetzt erneut gelesen.');
-      await api({action:'start',folder_id:current.folder_id,task_id:work.task_id,instructions:work.instructions,request_key:work.request_key,import_id:work.import_id});
+      await api({action:'start',folder_id:current.folder_id,task_id:work.task_id,instructions:work.instructions,request_key:work.request_key,source_mode:'claims',import_id:work.import_id});
       if(version===epoch)savePending(current.folder_id,null);
       return true;
     };
@@ -107,14 +108,15 @@
       clearTimeout(timer);
       try{
         const work=pending(current.folder_id);
-        if(work){busy=true;start.disabled=true;await advanceImport(current,version,work);if(version!==epoch)return;}
+        if(work){busy=true;start.disabled=true;if(recovery)recovery.hidden=work.reload===false&&!work.import_id;await advanceImport(current,version,work);if(version!==epoch)return;}
         const data=await api({action:'history',folder_id:current.folder_id});if(version!==epoch)return;
         turns=data.turns||[];render();
         let docsRunning=false;
         for(const turn of turns)if(turn.result&&(turn.document_id||turn.result.document_requests?.length))docsRunning=(await checkDocs(turn,current,version))||docsRunning;
         if(version!==epoch)return;
         const running=turns.find(t=>t.status==='running');busy=!!running||!!pending(current.folder_id);
-        start.disabled=busy;start.textContent=busy?'Bearbeitung läuft …':turns.length?'Auftrag ausführen':'Bitte abarbeiten';
+        if(recovery)recovery.hidden=!pending(current.folder_id);
+        start.disabled=busy;start.textContent=pending(current.folder_id)?'Wartet auf Claims-Import':busy?'Bearbeitung läuft …':turns.length?'Auftrag ausführen':'Bitte abarbeiten';
         if(!pending(current.folder_id))notice(running?.message||(docsRunning?'Dokumente werden erstellt …':turns.at(-1)?.status==='failed'?turns.at(-1).message:'Bereit. Du kannst einen neuen Auftrag oder eine Korrektur schreiben.'),turns.at(-1)?.status==='failed');
         if(busy||docsRunning)timer=setTimeout(()=>poll(current,version),4000);
       }catch(error){if(version!==epoch)return;notice(error.message,true);start.disabled=!!pending(current.folder_id);busy=false;}
@@ -122,8 +124,11 @@
     const sync=()=>{
       const current=active(),id=current?.folder_id||'';if(id===folder)return;
       folder=id;epoch++;clearTimeout(timer);busy=false;turns=[];lastRender='';historyBox.replaceChildren();order.value='';files.value='';
-      start.disabled=!id;refresh.disabled=!id;reload.checked=true;
-      notice(id?'Fall bestätigt. Auftrag eingeben oder Status ausdrücklich aktualisieren.':'Bitte zuerst einen Fall öffnen.');
+      const work=id?pending(id):null;
+      start.disabled=!id||!!work;refresh.disabled=!id;reload.checked=false;if(recovery)recovery.hidden=!work;
+      if(work)order.value=work.instructions;
+      start.textContent=work?'Auftrag wartet auf Claims-Import':'Auftrag mit Portalbestand ausführen';
+      notice(work?'Ein gespeicherter Auftrag wartet auf Claims. Status prüfen oder mit dem vorhandenen Portalbestand weiterarbeiten.':id?'Bereit für den vorhandenen Portalbestand – auch ohne Büro-Importstation. Ein neuer Claims-Abgleich ist optional und benötigt die Station.':'Bitte zuerst einen Fall öffnen.');
     };
     start.onclick=async()=>{
       const current=requireCase();if(!current)return;if(busy){notice('Die Bearbeitung läuft bereits. Mit Status aktualisieren kannst du den Fortschritt prüfen.');return;}
@@ -146,8 +151,12 @@
     refresh.onclick=()=>{const current=requireCase();if(current)poll(current,epoch);};
     el('vf-work-import-retry')?.addEventListener('click',()=>{const current=requireCase();if(!current)return;const work=pending(current.folder_id);if(work){delete work.import_id;savePending(current.folder_id,work);poll(current,epoch);}else{reload.checked=true;notice('Nachladen für den nächsten Arbeitsauftrag aktiviert.');}});
     el('vf-work-local')?.addEventListener('click',async()=>{
-      const current=requireCase();if(!current)return;const work=pending(current.folder_id);if(!work){reload.checked=false;await start.onclick();return;}
-      try{await api({action:'start',folder_id:current.folder_id,task_id:work.task_id,instructions:work.instructions+'\nClaims-Nachladen war nicht erfolgreich. Ausschließlich vorhandenen Bestand bearbeiten und fehlenden Importstand offen kennzeichnen.',request_key:work.request_key});savePending(current.folder_id,null);poll(current,epoch);}catch(error){notice(error.message,true);}
+      const current=requireCase();if(!current)return;const work=pending(current.folder_id);if(!work){reload.checked=false;await start.onclick();return;}const version=++epoch;
+      clearTimeout(timer);
+      // Persist the chosen source mode before sending. An uncertain response is
+      // retried with the same request key and never queues a second import.
+      work.reload=false;savePending(current.folder_id,work);
+      try{await api({action:'start',folder_id:current.folder_id,task_id:work.task_id,instructions:work.instructions,request_key:work.request_key,source_mode:'portal'});if(version!==epoch)return;savePending(current.folder_id,null);if(recovery)recovery.hidden=true;poll(current,version);}catch(error){if(version===epoch)notice(error.message,true);}
     });
     document.querySelectorAll('[data-work-prompt]').forEach(b=>b.addEventListener('click',()=>{order.value=b.dataset.workPrompt;order.focus();}));
     const observer=new MutationObserver(sync);if(el('vf-active'))observer.observe(el('vf-active'),{childList:true,subtree:true});

@@ -46,4 +46,27 @@ assert.equal(ids['vf-assistant-results'].children.length,0,'late result must not
 assert(requests.some(r=>r.body.action==='assistant_close'),'closing revokes server context');
 assert(requests.every(r=>r.url==='/intern/api/case-work.php?assistant=1'),'no notes, imports, model, mail or alternate endpoint');
 assert(!requests.some(r=>r.body.action==='assistant_history'),'history only after click');
+// Phone workflow: the user taps the task directly, without a separate bind button.
+delay=false;let before=requests.length;
+handlers['svnet:case-opened']({detail:{_loaded:true,folder_id:'mobile-c',meta:{schaden_nr:'TEST-C'}}});
+assert(buttons.every(b=>!b.disabled),'Opened case must offer tasks immediately');
+assert.equal(requests.length,before,'Offering tasks must not make any background request');
+ids['vf-assistant-order'].value='Synthetic mobile instruction';
+const direct=buttons[4].onclick();
+assert.equal(requests.at(-1).body.action,'assistant_open','Server binding must precede the task');
+opens.at(-1).resolve(response({token:'token-c',claim_number:'TEST-C',profile:'profile-c',release:'r1'}));await direct;
+const started=requests.filter(r=>r.body.action==='assistant_start').at(-1).body;
+assert.equal(started.token,'token-c');assert.equal(started.instruction,'Synthetic mobile instruction');
+assert.equal(started.task,'custom');
+// A case switch while server binding is pending must never start the old task.
+handlers['svnet:case-opened']({detail:{_loaded:true,folder_id:'mobile-d',meta:{schaden_nr:'TEST-D'}}});
+const stale=buttons[0].onclick(),staleOpen=opens.at(-1);before=requests.filter(r=>r.body.action==='assistant_start').length;
+handlers['svnet:case-opened']({detail:{_loaded:true,folder_id:'mobile-e',meta:{schaden_nr:'TEST-E'}}});
+staleOpen.resolve(response({token:'token-d',claim_number:'TEST-D',profile:'profile-d',release:'r1'}));await stale;
+assert.equal(requests.filter(r=>r.body.action==='assistant_start').length,before);
+assert.match(ids['vf-assistant-context'].textContent,/TEST-E/);
+// Explicit denial at the fresh bind cannot reach the paid start at all.
+const denied=buttons[0].onclick();
+opens.at(-1).resolve({ok:false,status:403,json:async()=>({ok:false,error:'CASE_FORBIDDEN'})});await denied;
+assert.equal(requests.filter(r=>r.body.action==='assistant_start').length,before);assert(buttons.every(b=>b.disabled));
 console.log('assistant-ui-test: startup/no-polling, no storage identity, stale open, late result, server close, original endpoint passed');
