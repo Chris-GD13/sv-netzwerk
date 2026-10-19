@@ -17,6 +17,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/fachwissen/prueffaehige-dok
 damageTypes: ["schneedruck", "gebaeude"]
 publication:
   publishedAt: 2026-08-08
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Schneedruck und Winterschäden an Dächern fachlich prüfen"
