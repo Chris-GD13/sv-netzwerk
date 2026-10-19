@@ -3,7 +3,7 @@
   "publication_id": "2026-10-19-asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme",
   "article": "asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme",
   "author": "christian-waechter",
-  "status": "prepared-for-deployment",
+  "status": "published-verified",
   "article_type": "eigenstaendiges-sachverstaendigenthema",
   "expert_rotation": {
     "selected_person": "Carmen Gohl",
@@ -101,10 +101,19 @@
     "python_runtime_note": "Windows python3 war nur der Microsoft-Store-Alias. Die identische npm-Buildkette wurde mit C:/Users/chris/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe als python3-Ersatz vollständig erfolgreich ausgeführt."
   },
   "deployment": {
-    "content_commit": null,
-    "run_url": null,
-    "conclusion": "pending",
-    "verified_at": null,
-    "live_evidence": []
+    "content_commit": "55edb6948b5a38b00848d8f0a5f994b53f41bc61",
+    "register_verification_commit": "35a85a0cd32a9bd28e502409ec7687443fa0cfd6",
+    "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39198584259",
+    "conclusion": "success",
+    "verified_at": "2026-10-19T06:22:25.257+02:00",
+    "live_evidence": [
+      "canonical detail page HTTP 200 and visibly rendered with title, publication date and complete article",
+      "cache-busted Fachwissen overview visibly lists the 19.10.2026 article",
+      "Innenraumschadstoffe und Sanierung category and all six tag pages list the article",
+      "article visibly links Carmen Gohl and her live profile confirms the stated asbestos specialty",
+      "sitemap-0.xml contains the canonical URL",
+      "robots.txt allows public pages and references sitemap-index.xml",
+      "deploy-version.txt reports the content commit 55edb6948b5a38b00848d8f0a5f994b53f41bc61"
+    ]
   }
 }
