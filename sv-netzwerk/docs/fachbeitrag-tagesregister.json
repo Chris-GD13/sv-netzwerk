@@ -665,14 +665,17 @@
         "title": "Asbesterkundung vor Sanierungsarbeiten: Baujahr, Verdachtsflächen und Probenahme richtig dokumentieren",
         "slug": "asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme",
         "url": "https://www.sv-netzwerk.eu/fachwissen/asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-website-20261019-0600",
-        "reserved_at": "2026-10-19T04:06:02.678Z"
+        "reserved_at": "2026-10-19T04:06:02.678Z",
+        "commit": "55edb6948b5a38b00848d8f0a5f994b53f41bc61",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39198584259",
+        "verified_at": "2026-10-19T04:22:25.257Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-19T04:06:02.678Z"
+  "updated_at": "2026-10-19T04:22:25.257Z"
 }
