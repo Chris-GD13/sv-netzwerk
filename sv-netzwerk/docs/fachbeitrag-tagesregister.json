@@ -678,7 +678,40 @@
         "reserved_at": "2026-10-19T05:08:39.268Z",
         "article_url": "https://www.sv-netzwerk.eu/fachwissen/asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme/",
         "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7517814354298187776/",
-        "verified_at": "2026-10-19T05:10:58.869Z"
+        "verified_at": "2026-10-19T05:10:58.869Z",
+        "published_at_berlin": "2026-10-19T07:10:14+02:00",
+        "published_time_precision": "client-side-click-window",
+        "published_click_window_berlin": [
+          "2026-10-19T07:10:14.735+02:00",
+          "2026-10-19T07:10:15.780+02:00"
+        ],
+        "verified_at_berlin": "2026-10-19T07:10:58.869+02:00",
+        "profile_url": "https://www.linkedin.com/in/christian-w-156408204/",
+        "proof_document": "docs/linkedin-veroeffentlichung-2026-10-19.md",
+        "text_file": "docs/linkedin/2026-10-19/2026-10-19-asbesterkundung-linkedin.txt",
+        "source_file": "docs/linkedin/2026-10-19/2026-10-19-linkedin-quellenpruefung.md",
+        "screenshots": [
+          "docs/linkedin/2026-10-19/2026-10-19-linkedin-live.jpg",
+          "docs/linkedin/2026-10-19/2026-10-19-linkedin-link-live.jpg"
+        ],
+        "image_path": null,
+        "image_cost_policy": {
+          "additional_budget_usd": 0,
+          "additional_spend_usd": 0,
+          "model_or_api_called": false,
+          "path": "published-without-image",
+          "note": "Work-Tarifdeckung ohne Test nicht verifizierbar; kein ausdrücklich freigegebenes passendes Bestandsmotiv; lokale Titelkarte ohne Zusatznutzen. Ohne Bild/Bildhinweis veröffentlicht."
+        },
+        "duplicate_check_note": "Vor Erstellung und unmittelbar vor Absenden frische Profil-/Register-/CSV-Prüfung; jüngster eigener Tagespost Fensterkondensat18.10.; kein heutiger Asbestbeitrag. Eigene Reservierung und genau ein Posten-Klick bestätigt.",
+        "website_live_commit": "3507e2279a30780c3cc5197d0b26c3d15db9a9f1",
+        "website_live_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39200888548",
+        "article_type": "eigenstaendiges-sachverstaendigenthema",
+        "expert_assignment": {
+          "name": "Carmen Gohl",
+          "profile_url": "https://www.sv-netzwerk.eu/experten/carmen-gohl/",
+          "scope": "Innenraumschadstoffe einschließlich Asbest, Probenahmen und Sanierungsbegleitung; Auswahl des Website-Auftrags übernommen, keine Autorenschaft behauptet"
+        },
+        "shortlink": "https://lnkd.in/eNkFZxeP"
       }
     }
   },
