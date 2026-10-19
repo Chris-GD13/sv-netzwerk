@@ -44,6 +44,25 @@ check(gfExcelPrepareResult('zahlungsbefuerwortung',$input,'KVA nur auflisten.')=
 $invoice=['description'=>'Schlussrechnung zum Angebot A-123','source_type'=>'Rechnung','source_reference'=>'R-9','amount'=>123.45];
 check(gfExcelPrepareResult('schlusserklaerung',['entries'=>[$invoice]],'SE erstellen.')['entries'][0]===$invoice,'Eine Rechnung mit Angebotsverweis muss Rechnung bleiben.');
 check(gfExcelValidateData('zahlungsbefuerwortung',['entries'=>[$invoice]],'Rechnung prüfen.')['passed'],'Angebotsverweis darf eine Rechnung nicht als KVA sperren.');
+$scopedCases=[
+    [['source_reference'=>'Angebot Firma B-456'],'Angebot Firma A-123 freigeben.',false],
+    [['source_reference'=>'12345'],'Angebot 12345 freigeben.',true],
+    [['source_reference'=>'A-123'],'KVA freigeben? Noch nicht freigeben.',false],
+    [['source_reference'=>'B'],'Angebot A freigeben, Angebot B nur auflisten.',false],
+    [['source_reference'=>'B'],'Angebot freigeben: A.',false],
+    [['source_reference'=>'A'],'Angebot freigeben: A.',true],
+    [['source_reference'=>'A'],'Angebot A freigeben. Angebot B nicht freigeben.',true],
+    [['source_reference'=>'A-123'],'Freigabe für den Kostenvoranschlag.',true],
+];
+foreach($scopedCases as[$fields,$instruction,$expected]){
+    $scoped=array_merge(['description'=>'Wiederherstellung','source_type'=>'Freigegebener KVA','amount'=>100],$fields);
+    check(gfExcelEntryApprovedKva($scoped,$instruction)===$expected,'Dokumentbezogene Freigabe falsch: '.$instruction.' / '.$fields['source_reference']);
+    $se=gfExcelPrepareResult('schlusserklaerung',['entries'=>[$scoped]],$instruction);
+    check(gfExcelValidateData('schlusserklaerung',$se,$instruction)['passed'],'Dokumentbezogene SE muss den korrekten Freigabe-/Reservestatus akzeptieren.');
+    check(str_contains($se['entries'][0]['description'],'derzeit als Reserve')===!$expected,'Falsche Reservekennzeichnung nach dokumentbezogener Prüfung.');
+    $paymentPassed=true;try{gfExcelValidateData('zahlungsbefuerwortung',['entries'=>[$scoped]],$instruction);}catch(RuntimeException){$paymentPassed=false;}
+    check($paymentPassed===$expected,'Dokumentbezogene Zahlungssperre falsch: '.$instruction);
+}
 $mixed=['entries'=>[
     ['description'=>'Boden','source_type'=>'Freigegebener KVA','source_reference'=>'A','amount'=>100.0],
     ['description'=>'Wand','source_type'=>'Freigegebener KVA','source_reference'=>'B','amount'=>200.0],
