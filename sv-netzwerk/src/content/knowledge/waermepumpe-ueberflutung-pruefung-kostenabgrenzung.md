@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/", "/
 damageTypes: ["gebaeude", "elementar", "technik"]
 publication:
   publishedAt: 2026-10-07
-  updatedAt: 2026-10-18
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Wärmepumpe nach Überflutung: Prüfung und Kostenabgrenzung"
@@ -123,4 +123,6 @@ Die belastbare Bewertung einer überfluteten Wärmepumpe beginnt mit einer siche
 - [§ 82 VVG: Abwendung und Minderung des Schadens](https://www.gesetze-im-internet.de/vvg_2008/__82.html).
 - [§ 83 VVG: Aufwendungsersatz](https://www.gesetze-im-internet.de/vvg_2008/__83.html).
 
-Weiterführend: [Elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/), [Eintrittswege bei Überflutung](/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/) und [Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).
+## Weiterführende Fachbeiträge
+
+[Elektrische Anlagen nach Wasserschäden](/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/), [Eintrittswege bei Überflutung](/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/) und [Rechnungs- und KVA-Prüfung](/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/).

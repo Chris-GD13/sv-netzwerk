@@ -17,7 +17,7 @@ relatedLinks: ["/leistungen/", "/fachwissen/", "/kontakt/"]
 damageTypes: ["leitungswasser", "brand", "sturm-hagel", "gewerbe-industrie"]
 publication:
   publishedAt: 2026-07-16
-  updatedAt: 2026-10-14
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Regiekosten im Schadenfall: Nachweise korrekt prüfen"
@@ -189,14 +189,13 @@ Eine sachgerechte Prüfung würdigt den notwendigen Aufwand, ohne unklare oder d
 
 Weitere Informationen zur fachlichen Begleitung komplexer Schadenfälle finden sich unter [Leistungen](/leistungen/) und in der [Fachwissensbibliothek](/fachwissen/). Eine konkrete Prüfungsanfrage kann über den [Kontakt](/kontakt/) übermittelt werden.
 
-## Quellen und weiterführende Hinweise
-
-### Rechtliche Präzisierung vom 14.10.2026: Erfolglosigkeit allein trägt keine Kürzung
+## Erfolglosigkeit allein trägt keine Kürzung
 
 [§ 83 Absatz 1 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html) betrifft Aufwendungen des Versicherungsnehmers nach § 82 Absatz 1 und 2, die er den Umständen nach für geboten halten durfte; auch erfolglose Maßnahmen können erfasst sein. Das ist keine Blankofreigabe einer Dienstleisterrechnung. Für die Prüfung sind damalige Erkenntnisse, etwaige Weisungen, Maßnahme und Betrag festzuhalten. Ausbleibender Erfolg allein macht den Aufwand nicht rückblickend unberechtigt. Bauvertragsvergütung gegenüber dem Auftragnehmer und Aufwendungsersatz gegenüber dem Versicherer sind getrennte Ansprüche.
 
 Die genannten Bauvertragsregeln setzen ihren Anwendungsbereich voraus: [§ 650a BGB](https://www.gesetze-im-internet.de/bgb/__650a.html) betrifft auch Wiederherstellung und bestimmte wesentliche Instandhaltungsleistungen, nicht automatisch jeden Dienstleistungsauftrag. Die Entscheidungsgrundlage zum Maßnahmenzeitpunkt ist zu sichern; Vertragsparteien und Ansprüche sind getrennt zu prüfen. Die [Abgrenzung von SiGeKo und Bauleitung](/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/) ergänzt die Rollenprüfung, ersetzt aber keine Beauftragung.
 
+## Quellen und weiterführende Hinweise
 1. Bürgerliches Gesetzbuch (BGB), § 631 Vertragstypische Pflichten beim Werkvertrag, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__631.html
 2. Bürgerliches Gesetzbuch (BGB), § 634 Rechte des Bestellers bei Mängeln, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__634.html
 3. Bürgerliches Gesetzbuch (BGB), § 650b Änderung des Vertrags; Anordnungsrecht des Bestellers, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/bgb/__650b.html

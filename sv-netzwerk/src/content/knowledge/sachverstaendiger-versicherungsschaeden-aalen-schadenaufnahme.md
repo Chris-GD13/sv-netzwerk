@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/schadenabgrenzung/", "/fachwissen/leitungswasserscha
 damageTypes: ["leitungswasser", "sturm", "brand", "gebaeude"]
 publication:
   publishedAt: 2026-07-27
-  updatedAt: 2026-10-12
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Sachverständiger Versicherungsschäden Aalen – erste Schadenaufnahme"
@@ -157,9 +157,9 @@ Für die Regulierung ergibt sich: Das Niederschlagswasserereignis ist ursächlic
 
 Die erste Schadenaufnahme bei Versicherungsschäden in Aalen und dem Ostalbkreis bestimmt die Qualität der gesamten Regulierung. Wer Ursache, Schadenumfang, Sofortmaßnahmen und Vorschäden strukturiert erfasst und dokumentiert, schafft die Grundlage für eine belastbare und nachvollziehbare Regulierung – ohne spätere Diskussionen über Umfang und Kostenabgrenzung.
 
-## Normenbezug zur Untergrundprüfung – geprüft am 12.10.2026
+## Messverfahren für die Wiederbelegung
 
-[DIN EN 17668:2022-11](https://www.dinmedia.de/de/norm/din-en-17668/352617408) behandelt die korrespondierende Luftfeuchte mineralischer Untergründe vor geklebten Bodenaufbauten; lose Verlegung ist ausgenommen. DIN Media führt die Norm als aktuell. Das Ausgabedatum ist kein pauschaler Geltungsbeginn für ältere Verträge. Die praktische Folgerung: Das Messverfahren muss die konkrete Wiederbelegung beantworten; die Quellen-Metadaten ersetzen keine Prüfung des vollständigen Normtexts.
+[DIN EN 17668:2022-11](https://www.dinmedia.de/de/norm/din-en-17668/352617408) behandelt die korrespondierende Luftfeuchte mineralischer Untergründe vor geklebten Bodenaufbauten; lose Verlegung ist ausgenommen. DIN Media führt die Norm als aktuell. Das Ausgabedatum ist kein pauschaler Geltungsbeginn für ältere Verträge. Das Messverfahren muss zur konkreten Wiederbelegung passen. Eine feuchtetechnische Bewertung des Untergrunds ersetzt nicht die Bewertung aller anderen Schichten.
 
 ## Quellen und weiterführende Hinweise
 
@@ -168,3 +168,4 @@ Die erste Schadenaufnahme bei Versicherungsschäden in Aalen und dem Ostalbkreis
 3. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
 4. Versicherungsvertragsgesetz (VVG), § 86 Übergang von Ersatzansprüchen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__86.html
 5. Umweltbundesamt, Starkregen, https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen
+6. DIN Media, DIN EN 17668:2022-11 – Klebstoffe für Bodenbeläge, Bestimmung der korrespondierenden relativen Luftfeuchte mineralischer Untergründe: https://www.dinmedia.de/de/norm/din-en-17668/352617408

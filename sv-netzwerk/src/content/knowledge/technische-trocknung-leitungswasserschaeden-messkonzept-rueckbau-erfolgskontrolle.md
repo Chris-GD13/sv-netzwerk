@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/kontrollierter-rueckbau-bei-leit
 damageTypes: ["leitungswasser", "gebaeude"]
 publication:
   publishedAt: 2026-08-04
-  updatedAt: 2026-10-12
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Technische Trocknung bei Wasserschaden: Ablauf und Nachweise"
@@ -248,18 +248,19 @@ Der Rückbau beschränkt sich auf jene Zonen, die für Zugang, Luftführung und 
 
 Technische Trocknung nach Leitungswasserschäden ist keine Standardroutine, sondern eine nachvollziehbar zu begründende Maßnahme. Erst Messkonzept, schichtbezogene Schadenabgrenzung, technisch begründeter Rückbau und dokumentierte Erfolgskontrolle machen Trocknung prüffähig. Genau diese Trennung entscheidet darüber, ob Aufwand, Maßnahme und Ergebnis später belastbar zusammenpassen.
 
-## Aktualitätsprüfung zum 30.09.2026
+## Trocknung und hygienische Bewertung
 
-Die Ergänzung berücksichtigt den UBA-Schimmelleitfaden in der aktualisierten Auflage April 2024 sowie die am 17.01.2025 aktualisierte UBA-Informationsseite. Beide Quellen sind fachliche Leitlinien und keine verbindlichen Preis- oder Deckungsregeln. Ihre praktische Bedeutung für die Trocknungsprüfung liegt in der Reihenfolge aus Ursachenklärung, Erfassung, fachlich begründetem Sanierungsumfang und dokumentierter Erfolgskontrolle. Veröffentlichungsdatum (04.08.2026), Aktualisierungsdatum (30.09.2026) und Quellenstand (April 2024/17.01.2025) werden getrennt geführt.
+Ursachenklärung, Befunderfassung, Sanierungsumfang und Erfolgskontrolle sind auch nach einer technischen Trocknung getrennt zu dokumentieren. Der UBA-Schimmelleitfaden, aktualisierte Auflage April 2024, gibt dafür einen fachlichen Rahmen. Er legt weder Reparaturpreise noch Versicherungsleistungen fest.
 
 ## Ergänzung zur Wiederbelegungsfreigabe vom 12.10.2026
 
-Nach [TKB-Bericht 11, 19.07.2024](https://www.klebstoffe.com/wp-content/uploads/2024/07/B-TKB-11-Belegreife.pdf), ist Belegreife mehr als ein Feuchtewert. Der Bericht ist eine fachliche Erläuterung ohne neue Prüfpflichten. Für Regulierer bedeutet dies: Gerätestopp, Hygienebewertung und Freigabe des neuen Belags als getrennte Ergebnisse dokumentieren. Nicht aus einem trockenen Estrich auf schadensfreie Klebstoff- oder Dämmschichten schließen. Quellenprüfung: 12.10.2026; kein gesetzlicher Geltungsbeginn.
+Nach [TKB-Bericht 11, 19.07.2024](https://www.klebstoffe.com/wp-content/uploads/2024/07/B-TKB-11-Belegreife.pdf), ist Belegreife mehr als ein Feuchtewert. Der Bericht ist eine fachliche Erläuterung ohne neue Prüfpflichten. Für Regulierer bedeutet dies: Gerätestopp, Hygienebewertung und Freigabe des neuen Belags als getrennte Ergebnisse dokumentieren. Nicht aus einem trockenen Estrich auf schadensfreie Klebstoff- oder Dämmschichten schließen.
 
 ## Quellen und weiterführende Hinweise
 
-1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-2. WTA-Merkblatt 6-15, Technische Trocknung von durchfeuchteten Bauteilen, Wissenschaftlich-Technische Arbeitsgemeinschaft für Bauwerkserhaltung und Denkmalpflege e. V., bibliografischer Hinweis: nur als fachlicher Regelwerksverweis, ohne Wiedergabe nicht frei zugänglicher Detailinhalte.
-3. DIN EN 13183-2:2002-07, Feuchtegehalt eines Stückes Schnittholz - Teil 2: Schätzung durch elektrisches Widerstands-Messverfahren, DIN Media GmbH, bibliografischer Hinweis als Beispiel für normgebundene Messverfahren; objektspezifische Eignung ist im Einzelfall zu prüfen.
-4. Umweltbundesamt, Ratgeber: Schimmel im Haus, https://www.umweltbundesamt.de/publikationen/ratgeber-schimmel-im-haus
-5. Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
+- Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+- WTA / DIN Media, WTA-Merkblatt 6-15:2013-08 – Technische Trocknung durchfeuchteter Bauteile, Teil 1: Grundlagen: https://www.dinmedia.de/de/technische-regel/wta-merkblatt-6-15/200010841
+- DIN EN 13183-2:2002-07, Feuchtegehalt eines Stückes Schnittholz - Teil 2: Schätzung durch elektrisches Widerstands-Messverfahren, DIN Media GmbH: https://www.dinmedia.de/de/norm/din-en-13183-2/43796311
+- Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
+
+- Industrieverband Klebstoffe / TKB, Bericht 11 – Belegreife, Stand 19.07.2024: https://www.klebstoffe.com/wp-content/uploads/2024/07/B-TKB-11-Belegreife.pdf

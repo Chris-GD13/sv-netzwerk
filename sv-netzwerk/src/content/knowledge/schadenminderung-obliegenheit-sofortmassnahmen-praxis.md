@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["gebaeude", "leitungswasser", "sturm"]
 publication:
   publishedAt: 2026-09-01
-  updatedAt: 2026-10-16
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Schadenminderung: Sofortmaßnahmen und Aufwendungsersatz prüfen"
@@ -121,15 +121,16 @@ Die Nachprüfung verbindet den technischen Befund mit der Kostenprüfung. Änder
 ## Fazit
 Bei Sofortmaßnahmen zählt neben dem Schadenbild die damalige Entscheidungslage. § 82 VVG betrifft Abwendung, Minderung und zumutbare Weisungen; § 83 VVG regelt den Aufwendungsersatz unter seinen Voraussetzungen. Eine spätere Erfolglosigkeit allein widerlegt nicht, dass eine Maßnahme zu ihrem Zeitpunkt geboten erscheinen durfte.
 
-## Quellenprüfung vom 16.10.2026
+## Maßnahme und Aufwendungsersatz getrennt dokumentieren
 
-Die amtlichen Einzelnormen [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) und [§ 83 Absatz 1 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html) wurden am 16.10.2026 für die oben genannten Aussagen geprüft. Status: geltendes Bundesrecht; das Prüfdatum ist weder ein neues Veröffentlichungsdatum der Norm noch ein behaupteter Geltungsbeginn. Bedeutung für Sachverständige und Großschadenregulierer: Die erforderliche Maßnahme nach damaliger Lage, eine mögliche Weisung, ihre Kosten und die spätere Wiederherstellung getrennt erfassen. Die Quellenprüfung ist keine pauschale Deckungs- oder Erstattungszusage und keine vollständige Prüfung aller Rechtsfolgen von Obliegenheitsverletzungen.
+[§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) regelt Schadenminderung und zumutbare Weisungen. Nach [§ 83 Absatz 1 VVG](https://www.gesetze-im-internet.de/vvg_2008/__83.html) kommt es beim Aufwendungsersatz darauf an, was der Versicherungsnehmer den Umständen nach für geboten halten durfte; ein späterer Misserfolg schließt Ersatz nicht für sich allein aus. Ich halte deshalb die damalige Gefahrenlage, mögliche Weisungen, den Entscheidungszeitpunkt und die Kosten getrennt von der späteren Wiederherstellung fest. Die weiteren gesetzlichen und vertraglichen Voraussetzungen bleiben gesondert zu prüfen.
 
 ## Call-to-Action
 Für die operative Umsetzung unterstützen wir mit strukturierter [Schadenmeldung](/schaden-melden/), methodischer [technischer Schadenabgrenzung](/fachwissen/schadenabgrenzung/), [prüffähiger Dokumentation](/fachwissen/prueffaehige-dokumentation/) und – je nach Fragestellung – der [Gutachter-Plattform](/gutachter-plattform/).
 
 ## Quellen und weiterführende Hinweise
-- [Bundesministerium der Justiz: Versicherungsvertragsgesetz (VVG)](https://www.gesetze-im-internet.de/vvg_2008/) – gesetzlicher Rahmen; die konkrete Deckungs- und Leistungsprüfung bleibt einzelfallabhängig.
-- [Bundesanstalt für Arbeitsschutz und Arbeitsmedizin: Technische Regeln für Gefahrstoffe](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html) – Ausgangspunkt für die Gefährdungsbeurteilung bei Tätigkeiten mit möglichen Gefahrstoffen.
-- [Deutsche Gesetzliche Unfallversicherung: Publikationen](https://publikationen.dguv.de/) – offizielle Regeln und Informationen zu Arbeitsschutz, Gefährdungsbeurteilung und sicheren Arbeitsverfahren.
-- [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Vorsorge und Verhalten bei Gefahren](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html) – Hinweise zur Gefahrenvorsorge und zum Verhalten in Schadenlagen.
+
+- [Bundesministerium der Justiz: Versicherungsvertragsgesetz (VVG)](https://www.gesetze-im-internet.de/vvg_2008/)
+- [Bundesanstalt für Arbeitsschutz und Arbeitsmedizin: Technische Regeln für Gefahrstoffe](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html)
+- [Deutsche Gesetzliche Unfallversicherung: Publikationen](https://publikationen.dguv.de/)
+- [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Vorsorge und Verhalten bei Gefahren](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html)

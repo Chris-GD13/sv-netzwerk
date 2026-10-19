@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-22
-  updatedAt: 2026-09-30
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Geruchsschäden nach Gebäudeereignissen prüfen"
@@ -112,13 +112,13 @@ In einem ausdrücklich fiktiven Leitungswasserschaden wird nach der Trocknung we
 
 Geruchsschäden werden erst durch eine belastbare Ursachen- und Materialzuordnung prüffähig. Eine strukturierte Aufnahme, fachgerechte Gefahrenabwehr, getrennte Kostenprüfung und dokumentierte Erfolgskontrolle verhindern pauschale Sanierungsentscheidungen und schaffen eine nachvollziehbare Grundlage für die weitere Regulierung.
 
-## Aktualitätsprüfung zum 30.09.2026
+## Mikrobielle Gerüche und Materialbefund
 
-Für die Einordnung mikrobiell bedingter Gerüche wurde der aktuelle UBA-Schimmelleitfaden geprüft. Die aktualisierte Auflage stammt aus April 2024; die UBA-Informationsseite zum Leitfaden wurde am 17.01.2025 aktualisiert. Die Quelle ist eine fachliche Leitlinie und keine verbindliche Deckungs- oder Kostenregel. Praktisch bestätigt sie die im Beitrag geforderte Trennung von Ursache, betroffenen Materialien, Sanierungsmaßnahme und Erfolgskontrolle. Veröffentlichungsdatum (22.09.2026), Aktualisierungsdatum (30.09.2026) und Quellenstand (April 2024/17.01.2025) bleiben getrennt ausgewiesen.
+Bei mikrobiell bedingten Gerüchen müssen Ursache, betroffene Materialien, Sanierungsmaßnahme und Erfolgskontrolle zusammenpassen. Der UBA-Schimmelleitfaden, aktualisierte Auflage April 2024, ist eine fachliche Orientierung für Erfassung und Sanierung. Er ist weder eine verbindliche Kostenregel noch ein Nachweis der Versicherungsdeckung.
 
 ## Quellen und weiterführende Hinweise
 
 - Versicherungsvertragsgesetz, insbesondere §§ 82 und 86: https://www.gesetze-im-internet.de/vvg_2008/
-- Umweltbundesamt, Innenraumhygiene und Schimmel: https://www.umweltbundesamt.de/themen/gesundheit/innenraumhygiene
-- VdS 2357, Richtlinien zur Brandschadensanierung: https://shop.vds.de/
+- Umweltbundesamt, Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, aktualisierte Auflage April 2024: https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
+- GDV / VdS, VdS 2357 – Richtlinien zur Brandschadensanierung, Ausgabe 2014-06 (06): https://shop.vds.de/download/vds-2357
 - DGUV Informationen zu Gefahrstoffen und Schutzmaßnahmen: https://www.dguv.de/

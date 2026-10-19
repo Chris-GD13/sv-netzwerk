@@ -16,7 +16,7 @@ relatedLinks: ["/experten/holger-roth/", "/fachwissen/prueffaehige-dokumentation
 damageTypes: ["gebaeude", "haftpflicht"]
 publication:
   publishedAt: 2026-10-15
-  updatedAt: 2026-10-17
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Haftpflichtschaden: Anspruch, Schadenhöhe und Deckung prüfen"
@@ -194,4 +194,6 @@ So entsteht eine nachvollziehbare Entscheidungskette: Welche Pflicht ist betroff
 - [§ 249 BGB](https://www.gesetze-im-internet.de/bgb/__249.html); [§ 254 BGB](https://www.gesetze-im-internet.de/bgb/__254.html).
 - GDV, [Neu strukturierte Haftpflichtbedingungen](https://www.gdv.de/gdv/neu-strukturierte-haftpflichtbedingungen-ab-2014--5962); [AVB BHV, Stand Oktober 2026](https://www.gdv.de/resource/blob/6240/36c13de815d5b5e6cde419e1eaa4225f/02-avb-betriebs-und-berufshaftpflichtversicherung-2020-data.pdf), 14.10.2026.
 
-Weiterführend: [Prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/), [technische Schadenabgrenzung](/fachwissen/schadenabgrenzung/) und [Schadenregulierung für Versicherer](/leistungen/schadenregulierung-fuer-versicherer/).
+## Weiterführende Fachbeiträge
+
+[Prüffähige Dokumentation](/fachwissen/prueffaehige-dokumentation/), [technische Schadenabgrenzung](/fachwissen/schadenabgrenzung/) und [Schadenregulierung für Versicherer](/leistungen/schadenregulierung-fuer-versicherer/).

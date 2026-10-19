@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/sturmschaden-windwirkung-vorschaden-abgrenzung/", "/
 damageTypes: ["sturm", "starkregen", "gebaeude"]
 publication:
   publishedAt: 2026-08-14
-  updatedAt: 2026-10-13
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Flachdachschäden nach Sturm und Starkregen prüfen"
@@ -87,16 +87,16 @@ Eine vorschnelle Bewertung nur als "verstopfter Ablauf" oder nur als "Sturmschad
 
 Flachdachschäden nach Sturm und Starkregen sind nur dann belastbar zu bewerten, wenn Windsog, Abdichtungsversagen, Entwässerung, stehendes Wasser und Vorschäden als eigenständige Prüffelder behandelt werden. Erst diese Trennung ermöglicht eine nachvollziehbare technische und kostenrelevante Schadenabgrenzung.
 
-## Normenstand geprüft am 13.10.2026
+## Regelwerksfassung und bestehende Dachkonstruktion
 
 [DIN 18531-1:2025-08](https://www.dinmedia.de/de/norm/din-18531-1/391197155) ersetzt laut DIN-Media-Katalog die Ausgabe 2017-07. Der veröffentlichte Änderungsvermerk nennt unter anderem überarbeitete Gefälleregelungen und den Wegfall der Anwendungsklassen K1/K2. Die frühere Ausgabe ist damit kein undatierter aktueller Prüfmaßstab.
 
-Bedeutung für die Begutachtung: Errichtungs- und Reparaturzeit, vereinbarte Ausführung und maßgebliche Regelwerksfassung festhalten; einen älteren Bestand nicht allein wegen einer neuen Ausgabe rückwirkend als mangelhaft bewerten. Ausgabe August 2025 ist ein Normdatum, kein pauschaler gesetzlicher Geltungsbeginn. Bibliografische und öffentlich zugängliche Änderungsinformationen geprüft; der kostenpflichtige Volltext wurde nicht als eingesehen ausgegeben und daraus werden keine Detailgrenzwerte übernommen.
+Bedeutung für die Begutachtung: Errichtungs- und Reparaturzeit, vereinbarte Ausführung und maßgebliche Regelwerksfassung festhalten; einen älteren Bestand nicht allein wegen einer neuen Ausgabe rückwirkend als mangelhaft bewerten. Ausgabe August 2025 ist ein Normdatum, kein pauschaler gesetzlicher Geltungsbeginn.
 
 ## Quellen und weiterführende Hinweise
 
-1. Umweltbundesamt, Starkregen, https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen
-2. Bundesinstitut für Bau-, Stadt- und Raumforschung (BBSR), Leitfaden Starkregen – Objektschutz und bauliche Vorsorge, https://www.bbsr.bund.de/BBSR/DE/veroeffentlichungen/sonderveroeffentlichungen/2018/leitfaden-starkregen.html
-3. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
-4. DIN 18531-1:2025-08, Abdichtung von Dächern sowie von Balkonen, Loggien und Laubengängen – Teil 1, aktuelle Katalogausgabe, DIN Media: https://www.dinmedia.de/de/norm/din-18531-1/391197155
-5. DIN 1986-100:2016-12, Entwässerungsanlagen für Gebäude und Grundstücke - Bestimmungen in Verbindung mit DIN EN 752 und DIN EN 12056, DIN Media, https://www.dinmedia.de/de/norm/din-1986-100/264064948
+- Umweltbundesamt, Starkregen, https://www.umweltbundesamt.de/themen/wasser/extremereignisse/starkregen
+- Bundesinstitut für Bau-, Stadt- und Raumforschung (BBSR), Leitfaden Starkregen – Objektschutz und bauliche Vorsorge, https://www.bbsr.bund.de/BBSR/DE/veroeffentlichungen/sonderveroeffentlichungen/2018/leitfaden-starkregen.html
+- Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+- DIN 18531-1:2025-08, Abdichtung von Dächern sowie von Balkonen, Loggien und Laubengängen – Teil 1, aktuelle Katalogausgabe, DIN Media: https://www.dinmedia.de/de/norm/din-18531-1/391197155
+- DIN 1986-100:2016-12, Entwässerungsanlagen für Gebäude und Grundstücke - Bestimmungen in Verbindung mit DIN EN 752 und DIN EN 12056, DIN Media, https://www.dinmedia.de/de/norm/din-1986-100/264064948

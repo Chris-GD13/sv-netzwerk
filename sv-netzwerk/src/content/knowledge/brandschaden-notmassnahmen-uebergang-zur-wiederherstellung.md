@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/schadenabgrenzung/", "/fachwissen/prueffaehige-dokum
 damageTypes: ["brand", "gebaeude", "gewerbe-industrie"]
 publication:
   publishedAt: 2026-07-17
-  updatedAt: 2026-10-13
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Brandschaden: Notmaßnahme und Wiederherstellung trennen"
@@ -113,9 +113,9 @@ Nach Brandschäden entscheidet die Qualität der Übergangsphase über die spät
 
 Wer diese Struktur konsequent anwendet, schafft verlässliche Entscheidungsgrundlagen statt nachträglicher Korrekturen. Für die fachliche Einordnung eines konkreten Vorgangs helfen die [Schadenmeldung](/schaden-melden/) sowie die vertiefenden Beiträge zur [technischen Schadenabgrenzung](/fachwissen/schadenabgrenzung/) und [prüffähigen Dokumentation](/fachwissen/prueffaehige-dokumentation/).
 
-## Quellenpräzisierung vom 13.10.2026: Akute Gefahr und planmäßige Sanierung
+## Akute Gefahr und planmäßige Sanierung
 
-Die am 17.07.2026 bekannt gemachte Neufassung der [TRGS 524, Abschnitt 1](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/1.htm), nimmt unmittelbare Sofort-, Sicherungs- und Bergungsmaßnahmen zur Abwehr akuter Gefahren aus ihrem Anwendungsbereich aus. Daraus folgt keine Schutzfreiheit für anschließende Räumung und Sanierung. Die Tätigkeitsphase ist ausdrücklich festzuhalten. Die Regel ist kein Entwurf; für einen gesonderten späteren Geltungsbeginn wird kein Datum erfunden.
+Die am 17.07.2026 bekannt gemachte Neufassung der [TRGS 524, Abschnitt 1](https://www.bgbau-medien.de/handlungshilfen_gb/daten/tr/trgs524/1.htm), nimmt unmittelbare Sofort-, Sicherungs- und Bergungsmaßnahmen zur Abwehr akuter Gefahren aus ihrem Anwendungsbereich aus. Daraus folgt keine Schutzfreiheit für anschließende Räumung und Sanierung. Die Tätigkeitsphase ist ausdrücklich festzuhalten.
 
 Für Sachverständige und Großschadenregulierer bedeutet das: Den Übergang von unmittelbarer Gefahrenabwehr zu geplanter Sanierung anhand der tatsächlichen Tätigkeit dokumentieren.
 

@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["gebaeude", "kumulschaden"]
 publication:
   publishedAt: 2026-09-02
-  updatedAt: 2026-09-02
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Gutachter-Plattform und regionale Sachverständigennetzwerke:"
@@ -123,7 +123,7 @@ Bei gutachter-plattform und regionale netzwerke ist nicht die Geschwindigkeit al
 Für die operative Umsetzung unterstützen wir mit strukturierter [Schadenmeldung](/schaden-melden/), methodischer [technischer Schadenabgrenzung](/fachwissen/schadenabgrenzung/), [prüffähiger Dokumentation](/fachwissen/prueffaehige-dokumentation/) und – je nach Fragestellung – der [Gutachter-Plattform](/gutachter-plattform/).
 
 ## Quellen und weiterführende Hinweise
-- [Bundesministerium der Justiz: Versicherungsvertragsgesetz (VVG)](https://www.gesetze-im-internet.de/vvg_2008/) – gesetzlicher Rahmen; die konkrete Deckungs- und Leistungsprüfung bleibt einzelfallabhängig.
-- [Bundesanstalt für Arbeitsschutz und Arbeitsmedizin: Technische Regeln für Gefahrstoffe](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html) – Ausgangspunkt für die Gefährdungsbeurteilung bei Tätigkeiten mit möglichen Gefahrstoffen.
-- [Deutsche Gesetzliche Unfallversicherung: Publikationen](https://publikationen.dguv.de/) – offizielle Regeln und Informationen zu Arbeitsschutz, Gefährdungsbeurteilung und sicheren Arbeitsverfahren.
-- [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Vorsorge und Verhalten bei Gefahren](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html) – Hinweise zur Gefahrenvorsorge und zum Verhalten in Schadenlagen.
+- [Bundesministerium der Justiz: Versicherungsvertragsgesetz (VVG)](https://www.gesetze-im-internet.de/vvg_2008/)
+- [Bundesanstalt für Arbeitsschutz und Arbeitsmedizin: Technische Regeln für Gefahrstoffe](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html)
+- [Deutsche Gesetzliche Unfallversicherung: Publikationen](https://publikationen.dguv.de/)
+- [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Vorsorge und Verhalten bei Gefahren](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html)

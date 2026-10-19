@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["brand", "gebaeude"]
 publication:
   publishedAt: 2026-08-01
-  updatedAt: 2026-10-16
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Brandschaden an mehreren Gebäuden: Erstaufnahme und Abgrenzung"
@@ -100,9 +100,14 @@ Für Versicherer bedeutet das: Freigaben sind nur auf Basis dokumentierter Befun
 ## Fazit
 Bei Brandschäden an mehreren Gebäuden entscheidet die objektspezifische Beweiskette über belastbare Maßnahmen und Kosten. Thermische Schäden, Rauch-/Rußeinwirkung und Löschwasserfolgen dürfen weder vermischt noch aus bloßer Nähe zum Brandort abgeleitet werden.
 
-## Quellenprüfung vom 16.10.2026
+## Arbeitsbereiche und elektrische Anlagen
 
-Die [BAuA führt TRGS 524](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524) als veröffentlichte technische Regel für Tätigkeiten in kontaminierten Bereichen (Ausgabe Juli 2026, Bekanntmachung 17.07.2026); sie ist kein Norm-Entwurf. Die [DGUV Information 203-018](https://publikationen.dguv.de/regelwerk/dguv-informationen/525/instandsetzungsarbeiten-an-elektrischen-anlagen-auf-brandstellen) betrifft Instandsetzungsarbeiten an elektrischen Anlagen auf erkalteten Brandstellen (Ausgabe Mai 2000). Beide Herausgeberangaben und die jeweils genannten Anwendungsbereiche wurden am 16.10.2026 geprüft; das Prüfdatum ist kein neuer Geltungsbeginn. Für Sachverständige und Großschadenregulierer folgt daraus: Arbeitsbereich, Fachzuständigkeit und Schadenzone je Gebäude dokumentieren, bevor Rückbau und Kosten zugeordnet werden. Die öffentlich zugänglichen Angaben ersetzen weder eine vollständige Gefährdungsbeurteilung noch eine Detailprüfung kostenpflichtiger Regelwerke.
+Die [TRGS 524](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524), Ausgabe Juli 2026, bekannt gemacht am 17.07.2026, konkretisiert den Arbeitsschutz bei Tätigkeiten in kontaminierten Bereichen. Die [DGUV Information 203-018](https://publikationen.dguv.de/regelwerk/dguv-informationen/525/instandsetzungsarbeiten-an-elektrischen-anlagen-auf-brandstellen), Ausgabe Mai 2000, behandelt Instandsetzungsarbeiten an elektrischen Anlagen auf erkalteten Brandstellen. Für jedes Gebäude sind Arbeitsbereich, Fachzuständigkeit und Schadenzone zuzuordnen. Eine Kostenfreigabe ersetzt weder die Gefährdungsbeurteilung noch die elektrotechnische Prüfung.
 
 ## Call-to-Action
 Für die operative Umsetzung unterstützen wir mit strukturierter [Schadenmeldung](/schaden-melden/), methodischer [technischer Schadenabgrenzung](/fachwissen/schadenabgrenzung/), [prüffähiger Dokumentation](/fachwissen/prueffaehige-dokumentation/) und – je nach Fragestellung – der [Gutachter-Plattform](/gutachter-plattform/).
+
+## Quellen und weiterführende Hinweise
+
+- BAuA, TRGS 524 – Schutzmaßnahmen bei Tätigkeiten in kontaminierten Bereichen, Juli 2026, Bekanntmachung 17.07.2026: https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-524
+- DGUV, Information 203-018 – Instandsetzungsarbeiten an elektrischen Anlagen auf Brandstellen, Mai 2000: https://publikationen.dguv.de/regelwerk/dguv-informationen/525/instandsetzungsarbeiten-an-elektrischen-anlagen-auf-brandstellen

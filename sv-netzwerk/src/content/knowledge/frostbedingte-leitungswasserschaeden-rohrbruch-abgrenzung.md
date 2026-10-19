@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/fachwissen/leitungswassersc
 damageTypes: ["leitungswasser", "gebaeude"]
 publication:
   publishedAt: 2026-08-02
-  updatedAt: 2026-08-02
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Frostbedingte Leitungswasserschäden fachlich abgrenzen"
@@ -303,6 +303,6 @@ Frostbedingte Leitungswasserschäden sind fachlich nur dann belastbar zu beurtei
 
 1. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
 2. Trinkwasserverordnung (TrinkwV 2023), § 13 Wasserversorgungsanlagen, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/trinkwv_2023/__13.html
-3. DVGW / BTGA / figawa / gefma / ZVSHK, Trinkwasserinstallation in Gebäuden - gesetzliche Vorgaben und technische Grundanforderungen; Überblick zu gesetzlichen Anforderungen und allgemein anerkannten Regeln der Technik für Planung, Errichtung und Betrieb von Trinkwasserinstallationen, https://www.dvgw.de/themen/wasser/trinkwasser-installation
-4. DIN EN 806-1:2000-12, Technische Regeln für Trinkwasser-Installationen - Teil 1: Allgemeines; sowie die zugehörigen Folgeteile der Reihe DIN EN 806 für Planung, Ausführung, Betrieb und Instandhaltung. Aussagen hierzu nur bibliografisch und einzelfallbezogen, soweit der Volltext nicht vorliegt.
-5. DIN 1988-200:2012-05, Technische Regeln für Trinkwasser-Installationen - Teil 200: Installation Typ A (geschlossene Systeme) - Planung, Bauteile, Apparate, Werkstoffe; bibliografische Bezugnahme ohne Behauptung nicht frei zugänglicher Detailanforderungen.
+3. DVGW / BTGA / figawa / gefma / ZVSHK, Trinkwasserinstallation in Gebäuden - gesetzliche Vorgaben und technische Grundanforderungen, https://www.dvgw.de/themen/wasser/trinkwasser-installation
+4. DIN Media, DIN EN 806-1:2001-12 – Technische Regeln für Trinkwasser-Installationen, Teil 1: Allgemeines: https://www.dinmedia.de/de/norm/din-en-806-1/44698245
+5. DIN 1988-200:2012-05, Technische Regeln für Trinkwasser-Installationen - Teil 200: Installation Typ A (geschlossene Systeme) - Planung, Bauteile, Apparate, Werkstoffe: https://www.dinmedia.de/de/norm/din-1988-200/151775404

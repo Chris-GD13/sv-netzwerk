@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/hagelschaden-dach-fassade-schade
 damageTypes: ["hagel", "sturm", "gebaeude"]
 publication:
   publishedAt: 2026-08-15
-  updatedAt: 2026-08-15
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Polycarbonat-Stegplatten: Hagel oder Spannungsriss?"
@@ -235,9 +235,9 @@ Risse und Ausbrüche an Polycarbonat-Stegplatten sind weder automatisch Hagelsch
 
 ## Quellen und weiterführende Hinweise
 
-1. Brett Martin, technische Hinweise zu Marlon-ST-Polycarbonat-Stegplatten: thermische Bewegung, übergroße Befestigungsbohrungen, nicht überzogene Befestiger, Mindestgefälle und systemgerechte Dichtstoffe, https://www.brettmartin.com/plastic-sheets/our-products/product/marlon-st-bioplus
-2. Palram Industries, SUNLITE Polycarbonate Multiwall Sheets: technische Daten sowie Installations-, Pflege-, Biege- und Chemikalienhinweise, https://www.palram.com/us/product/sunlite/
-3. Palram Industries, Hinweise zur chemischen Beständigkeit und Pflege von Polycarbonatprodukten, abrufbar im Downloadbereich der Polycarbonat-Produktseiten, https://www.palram.com/us/product/palgard/
-4. DIN EN 16153, Lichtdurchlässige, flache Stegplatten aus Polycarbonat für Innen- und Außenanwendungen an Dächern, Wänden und Decken – Anforderungen und Prüfverfahren; bibliografischer Regelwerksbezug.
-5. Gesamtverband der Deutschen Versicherungswirtschaft, VdS 6100, Hagel: Hinweise zur Schadenverhütung und Risikobewertung; bibliografischer Hinweis für den Ereignis- und Schadenpräventionskontext.
-6. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, https://www.gesetze-im-internet.de/vvg_2008/__82.html
+- Brett Martin, Marlon ST BioPlus – Produkt- und Montageinformationen: https://www.brettmartin.com/plastic-sheets/our-products/product/marlon-st-bioplus
+- Palram Industries, SUNLITE – Polycarbonate Multiwall Sheets: https://www.palram.com/us/product/sunlite/
+- Palram Industries, PALGARD – Produkt- und Pflegeinformationen: https://www.palram.com/us/product/palgard/
+- DIN Media, DIN EN 16153:2015-05 – Lichtdurchlässige, flache Stegmehrfachplatten aus Polycarbonat (PC), Anforderungen und Prüfverfahren: https://www.dinmedia.de/de/norm/din-en-16153/230527485
+- GDV / VdS, VdS 6100 – Gebäudeschutz vor Hagel, Ausgabe 2018-10 (01): https://shop.vds.de/download/vds-6100
+- Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, https://www.gesetze-im-internet.de/vvg_2008/__82.html

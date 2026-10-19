@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/schadenabgrenzung/", "/fachwisse
 damageTypes: ["leitungswasser", "gebaeude"]
 publication:
   publishedAt: 2026-08-19
-  updatedAt: 2026-10-12
+  updatedAt: 2026-10-19
   status: published
 seo:
   noindex: false
@@ -288,16 +288,14 @@ Eine gute Regulierung erkennt weder jede angebotene Maßnahme pauschal an noch r
 
 [TKB-Merkblatt 8](https://www.klebstoffe.com/wp-content/uploads/2026/04/TKB-8-Untergrundbeurteilung-Veroeffentlichung.pdf) beurteilt den Untergrund für eine neue Bodenbelegung; die obere Estrichschicht ist von darunterliegenden Schichten zu unterscheiden. Ein günstiger Estrichwert ist deshalb kein Freigabenachweis der Dämmschicht. Messstellen im Schadenbericht eindeutig schichtbezogen zuordnen.
 
-Status: unverbindliches Verbandsmerkblatt; Deckblatt Mai 2026, Seitenfuß April 2026. Quellenprüfung: 12.10.2026; kein allgemeiner Geltungsbeginn oder Ersatz der Hygienebewertung.
+Das Verbandsmerkblatt trägt auf dem Deckblatt den Stand Mai 2026 und im Seitenfuß April 2026. Es ist keine gesetzliche Vorschrift und ersetzt die Hygienebewertung der Dämmschicht nicht.
 
 ## Quellen und weiterführende Regelwerke
 
-Abruf und redaktionelle Prüfung der nachfolgenden Quellen: 19.08.2026.
+- Umweltbundesamt (UBA): Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden, aktualisierte Auflage April 2024: https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von
+- VdS Schadenverhütung GmbH: VdS 3151 – Richtlinien zur Schimmelpilzsanierung nach Leitungswasserschäden, Ausgabe 2020-03 (02): https://shop.vds.de/download/vds-3151
+- DIN 18560-1:2021-02, Estriche im Bauwesen – Teil 1: Allgemeine Anforderungen, Prüfung und Ausführung, einschließlich Berichtigung 1:2021-07: https://www.dinmedia.de/de/norm/din-18560-1/328759231
+- DVGW – Themenbereich Wasser und Trinkwasserinstallation: https://www.dvgw.de/themen/wasser
+- Bundesanstalt für Arbeitsschutz und Arbeitsmedizin (BAuA): Gefahrstoffe und biologische Arbeitsstoffe: https://www.baua.de/DE/Themen/Arbeitsgestaltung-im-Betrieb/Gefahrstoffe/Gefahrstoffe_node.html
 
-1. **Umweltbundesamt (UBA): Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden**, aktualisierte Auflage April 2024. Fachliche Grundlage insbesondere für Feuchteursachen, verdeckte mikrobielle Schäden, Erfassung und Sanierungsgrundsätze. [Umweltbundesamt – Schimmelleitfaden](https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von)
-2. **VdS Schadenverhütung GmbH: VdS 3151 – Richtlinien zur Schimmelpilzsanierung nach Leitungswasserschäden**, Ausgabe 2020-03 (02). Regulierungsnaher Bezugsrahmen für die fachgerechte Behandlung mikrobieller Fragestellungen nach Leitungswasserschäden. [VdS 3151](https://shop.vds.de/download/vds-3151)
-3. **DIN 18560-1:2021-02, Estriche im Bauwesen – Teil 1: Allgemeine Anforderungen, Prüfung und Ausführung**, einschließlich Berichtigung 1:2021-07. Technischer Bezugsrahmen für Estrichkonstruktionen; keine pauschale Sanierungsanweisung für Wasserschäden. [DIN Media – DIN 18560-1](https://www.dinmedia.de/de/norm/din-18560-1/328759231)
-4. **DVGW – Themenbereich Wasser und Trinkwasserinstallation.** Fachinformationen des Deutschen Vereins des Gas- und Wasserfaches zur Trinkwasserhygiene und technischen Regelsetzung. [DVGW – Wasser](https://www.dvgw.de/themen/wasser)
-5. **Bundesanstalt für Arbeitsschutz und Arbeitsmedizin (BAuA): Gefahrstoffe und biologische Arbeitsstoffe.** Bei Sanierungsarbeiten mit möglicher biologischer Belastung sind Arbeitsschutz und Gefährdungsbeurteilung gesondert zu beachten. [BAuA](https://www.baua.de/DE/Themen/Arbeitsgestaltung-im-Betrieb/Gefahrstoffe/Gefahrstoffe_node.html)
-
-Die genannten Normen, Richtlinien und Fachinformationen sind jeweils in der für den konkreten Schadenfall einschlägigen Fassung und im tatsächlichen Anwendungsbereich zu prüfen. Der Beitrag ersetzt weder eine objektspezifische Fachplanung noch eine versicherungsrechtliche Deckungsentscheidung.
+- Industrieverband Klebstoffe / TKB, Merkblatt 8 – Beurteilen und Vorbereiten von Untergründen, Deckblatt Mai 2026: https://www.klebstoffe.com/wp-content/uploads/2026/04/TKB-8-Untergrundbeurteilung-Veroeffentlichung.pdf

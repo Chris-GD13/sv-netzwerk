@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-15
-  updatedAt: 2026-10-14
+  updatedAt: 2026-10-19
   status: published
 seo:
   title: "Rechnungskürzungen im Schadenfall prüfen"
@@ -67,11 +67,11 @@ Die technische Plausibilität einer Position ist keine Deckungszusage. Ob Kosten
 
 ## Anforderungen an die prüffähige Kostenprüfung
 
-### Vertragliche Prüffähigkeit und KVA-Überschreitung, geprüft am 14.10.2026
+### Vertragliche Prüffähigkeit und KVA-Überschreitung
 
 Bei einem Bauvertrag verlangt [§ 650g Absatz 4 BGB](https://www.gesetze-im-internet.de/bgb/__650g.html) eine für den Besteller nachvollziehbare Schlussrechnung und die weiteren gesetzlichen Fälligkeitsvoraussetzungen. Erhebt der Besteller innerhalb von 30 Tagen nach Zugang keine begründeten Einwendungen gegen die Prüffähigkeit, gilt die Rechnung als prüffähig. Diese Regel ist nicht mit einer Anerkennung jeder Menge, jedes Preises oder der Versicherungsdeckung gleichzusetzen. Zugang beim Besteller und Zugang beim Versicherer sind getrennt festzuhalten; die interne Versicherungsprüfung verlängert diese Frist nicht automatisch.
 
-[§ 649 BGB](https://www.gesetze-im-internet.de/bgb/__649.html) betrifft einen dem Vertrag zugrunde gelegten Kostenanschlag ohne Gewähr für seine Richtigkeit. Ist eine wesentliche Überschreitung zu erwarten, ist sie dem Besteller unverzüglich anzuzeigen. Daraus folgt weder eine feste Prozentgrenze noch die Gleichsetzung eines unverbindlichen Kostenanschlags mit einem garantierten Festpreis. Die Vereinbarung ist vor einer Kürzung zu prüfen. Für die Schadenprüfung sind insbesondere begründete Prüffähigkeitseinwendungen, materielle Rechnungsprüfung und Deckungsentscheidung separat dokumentieren.
+[§ 649 BGB](https://www.gesetze-im-internet.de/bgb/__649.html) betrifft einen dem Vertrag zugrunde gelegten Kostenanschlag ohne Gewähr für seine Richtigkeit. Ist eine wesentliche Überschreitung zu erwarten, ist sie dem Besteller unverzüglich anzuzeigen. Daraus folgt weder eine feste Prozentgrenze noch die Gleichsetzung eines unverbindlichen Kostenanschlags mit einem garantierten Festpreis. Die Vereinbarung ist vor einer Kürzung zu prüfen. Für die Schadenprüfung sind insbesondere begründete Prüffähigkeitseinwendungen, materielle Rechnungsprüfung und Deckungsentscheidung separat zu dokumentieren.
 
 Prüffähig ist eine Rechnung, wenn jede Position mit Menge, Einheit, Preis, Leistungsbeschreibung und Schadenbezug erkennbar ist. Zuschläge, Fahrtkosten, Entsorgung und Regiestunden sind nicht automatisch unzulässig, müssen aber sachlich begründet und dürfen nicht doppelt angesetzt werden.
 
@@ -95,6 +95,8 @@ Eine belastbare Rechnungskürzung ist kein pauschaler Prozentabzug. Sie entsteht
 
 ## Quellen und weiterführende Hinweise
 
-- [§ 82 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) – Schadenabwendung und Schadenminderung.
-- [§ 650g Absatz 4 BGB](https://www.gesetze-im-internet.de/bgb/__650g.html) – Prüffähigkeit der Schlussrechnung beim Bauvertrag.
-- [§ 649 BGB](https://www.gesetze-im-internet.de/bgb/__649.html) – Kostenanschlag.
+- Bundesministerium der Justiz / juris, Versicherungsvertragsgesetz (VVG), § 82 Abwendung und Minderung des Schadens: https://www.gesetze-im-internet.de/vvg_2008/__82.html
+- Bundesministerium der Justiz / juris, Bürgerliches Gesetzbuch (BGB), § 650g Zustandsfeststellung bei Verweigerung der Abnahme; Schlussrechnung, Absatz 4: https://www.gesetze-im-internet.de/bgb/__650g.html
+- Bundesministerium der Justiz / juris, Bürgerliches Gesetzbuch (BGB), § 649 Kostenanschlag: https://www.gesetze-im-internet.de/bgb/__649.html
+
+- Statistisches Bundesamt, Pressemitteilung 360 vom 09.10.2026, Baupreise für Wohngebäude August 2026: https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_360_61261.html
