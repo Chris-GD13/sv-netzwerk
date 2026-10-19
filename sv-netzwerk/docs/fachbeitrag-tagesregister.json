@@ -673,9 +673,12 @@
         "verified_at": "2026-10-19T04:22:25.257Z"
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "reserved",
+        "owner": "codex-linkedin-20261019-01a1528b",
+        "reserved_at": "2026-10-19T05:08:39.268Z",
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme/"
       }
     }
   },
-  "updated_at": "2026-10-19T04:22:25.257Z"
+  "updated_at": "2026-10-19T05:08:39.268Z"
 }
