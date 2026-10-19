@@ -106,14 +106,40 @@ function gfExcelTemplate(string $key,string $caseFolder):array{$wanted=$key==='s
 function gfExcelEntries(array $result):array{$entries=[];foreach(($result['entries']??[])as$entry){if(!is_array($entry))continue;$amount=$entry['amount']??null;if(is_string($amount)){$amount=str_replace(['.',' ','€','EUR'],['','','',''],$amount);$amount=str_replace(',','.',$amount);}$entries[]=['description'=>trim((string)($entry['description']??'')),'source_type'=>trim((string)($entry['source_type']??'')),'source_reference'=>trim((string)($entry['source_reference']??'')),'date'=>trim((string)($entry['date']??'')),'recipient'=>trim((string)($entry['recipient']??'')),'recipient_type'=>mb_strtolower(trim((string)($entry['recipient_type']??'vn')),'UTF-8'),'amount'=>(float)$amount];}return$entries;}
 function gfExcelEntryIsKva(array $entry):bool
 {
+    $type=gfNorm((string)($entry['source_type']??''));
+    if(in_array($type,['rechnung','abgeltung','pauschale','kalkulation','übertrag'],true))return false;
     $text=implode(' ',[(string)($entry['description']??''),(string)($entry['source_reference']??''),(string)($entry['source_type']??'')]);
     return preg_match('/\b(?:KVA|Kostenvoranschl[aä]g(?:e|en)?|Angebot(?:e|en)?)\b/ui',$text)===1;
 }
+function gfExcelEntryApprovedKva(array $entry,string $instructions):bool
+{
+    if(!gfExcelEntryIsKva($entry))return false;
+    // Match an explicit document reference, never approve another estimate merely
+    // because an instruction somewhere contains a release verb.
+    $references=[];
+    foreach(preg_split('/[\s,;()]+/u',(string)($entry['source_reference']??''))?:[]as$ref){
+        $ref=trim($ref," .:");
+        if($ref===''||preg_match('/\.(?:pdf|docx?|xlsx?|msg|eml)$/ui',$ref)||preg_match('/^(?:S|Seite|Seiten|Brief|Angebot|KVA)$/ui',$ref))continue;
+        if(preg_match('/[A-Za-zÄÖÜäöüß]/u',$ref))$references[]=$ref;
+    }
+    $approved=false;
+    foreach(preg_split('/[;.!?\r\n]+/u',$instructions)?:[]as$clause){
+        $matchesEntry=false;
+        foreach($references as$ref)if(preg_match('/(?<![\p{L}\p{N}])'.preg_quote($ref,'/').'(?![\p{L}\p{N}])/ui',$clause)){$matchesEntry=true;break;}
+        if($matchesEntry&&preg_match('/\b(?:Reserve|nicht|keine?|ohne|vorbehaltlich|erst\s+nach|nur\s+nach)\b/ui',$clause))return false;
+        if(!gfInstructionApprovesKva($clause))continue;
+        // Bare or collective instructions are unqualified. A named estimate
+        // requires the same reference as the position being considered.
+        $generic=preg_match('/\b(?:KVA|KV|Kostenvoranschl[aä]g(?:e|en)?|Angebot(?:e|en)?)\b\s+(?:(?:und\s+Rechnungen|bitte|jetzt|ausdrücklich|alle|sämtliche|auflisten|prüfen|und)\s+)*(?:freigeben|freigegeben|genehmigen|genehmigt|anerkennen|anerkannt|bestätigen|bestätigt)\b/ui',$clause)===1;
+        if($matchesEntry||$generic)$approved=true;
+    }
+    return$approved;
+}
 function gfExcelPrepareResult(string $key,array $result,string $instructions=''):array
 {
-    if($key!=='schlusserklaerung'||gfInstructionApprovesKva($instructions))return$result;
+    if($key!=='schlusserklaerung')return$result;
     foreach(($result['entries']??[])as$i=>$entry){
-        if(!is_array($entry)||!gfExcelEntryIsKva($entry))continue;
+        if(!is_array($entry)||!gfExcelEntryIsKva($entry)||gfExcelEntryApprovedKva($entry,$instructions))continue;
         // An estimate is part of the loss assessment, never proof of a release or payment.
         $result['entries'][$i]['source_type']='KVA';
         $description=trim((string)($entry['description']??''));
@@ -139,14 +165,14 @@ function gfInstructionApprovesKva(string $instructions):bool
 }
 function gfExcelValidateData(string $key,array $result,string $instructions=''):array
 {
-    $errors=[];$entries=gfExcelEntries(gfExcelPrepareResult($key,$result,$instructions));$approvedKva=gfInstructionApprovesKva($instructions);
+    $errors=[];$entries=gfExcelEntries(gfExcelPrepareResult($key,$result,$instructions));
     $approvedCalculation=$key==='schlusserklaerung'&&gfInstructionUsesSavedCalculation($instructions);
     if(!$entries)$errors[]='Keine belegten Rechnungs-, KVA-, Abgeltungs- oder Kalkulationspositionen erkannt.';
     foreach($entries as$i=>$entry){
         $n=$i+1;$type=gfNorm($entry['source_type']);$hay=$entry['description'].' '.$entry['source_reference'].' '.$entry['source_type'];
-        $isKva=gfExcelEntryIsKva($entry);$isCalculation=$type==='kalkulation';
-        $reserveKva=$key==='schlusserklaerung'&&$isKva&&!$approvedKva;
-        if($isKva&&!$approvedKva&&!$reserveKva)$errors[]='Position '.$n.': KVA/Angebot ist nur mit ausdrücklicher Freigabe im Arbeitsauftrag als Zahlungsposition zulässig.';
+        $isKva=gfExcelEntryIsKva($entry);$entryApprovedKva=gfExcelEntryApprovedKva($entry,$instructions);$isCalculation=$type==='kalkulation';
+        $reserveKva=$key==='schlusserklaerung'&&$isKva&&!$entryApprovedKva;
+        if($isKva&&!$entryApprovedKva&&!$reserveKva)$errors[]='Position '.$n.': KVA/Angebot ist nur mit ausdrücklicher Freigabe im Arbeitsauftrag als Zahlungsposition zulässig.';
         if($reserveKva&&(preg_match('/\bderzeit\s+als\s+Reserve\b/ui',$entry['description'])!==1||!in_array($type,['kva','kostenvoranschlag','angebot'],true)))$errors[]='Position '.$n.': Nicht freigegebenen KVA in der SE ausdrücklich als derzeit als Reserve kennzeichnen.';
         if($isCalculation&&!$approvedCalculation)$errors[]='Position '.$n.': Eine Kalkulation darf nur bei ausdrücklichem Auftrag als Grundlage der Schlusserklärung verwendet werden.';
         if(!$isKva&&!$isCalculation&&!in_array($type,['rechnung','abgeltung','pauschale'],true))$errors[]='Position '.$n.': nur Rechnung, Abgeltung, Pauschale oder eine ausdrücklich beauftragte gespeicherte Kalkulation zulässig.';
@@ -166,11 +192,11 @@ function gfExcelBuildOne(string $templateBytes,string $key,array $meta,array $pa
 function gfExcelValidateWorkbook(string $templateBytes,string $bytes,string $key,array $page,string $instructions=''):array{$tmpA=tempnam(sys_get_temp_dir(),'svnet-xlsm-a-');$tmpB=tempnam(sys_get_temp_dir(),'svnet-xlsm-b-');if($tmpA===false||$tmpB===false)throw new RuntimeException('Excel-QS-Sperre konnte nicht gestartet werden.');file_put_contents($tmpA,$templateBytes);file_put_contents($tmpB,$bytes);$a=new ZipArchive();$b=new ZipArchive();if($a->open($tmpA)!==true||$b->open($tmpB)!==true)throw new RuntimeException('Excel-QS-Sperre: ungültige XLSM-Datei.');$namesA=[];$namesB=[];for($i=0;$i<$a->numFiles;$i++)$namesA[]=$a->getNameIndex($i);for($i=0;$i<$b->numFiles;$i++)$namesB[]=$b->getNameIndex($i);sort($namesA);sort($namesB);if($namesA!==$namesB)throw new RuntimeException('Excel-QS-Sperre: Paketstruktur des Originalformulars wurde verändert.');$required=['[Content_Types].xml','xl/workbook.xml','xl/worksheets/sheet1.xml','xl/styles.xml'];foreach($required as$name)if($b->locateName($name)===false)throw new RuntimeException('Excel-QS-Sperre: Originalbestandteil fehlt: '.$name.'.');if($a->locateName('xl/vbaProject.bin')!==false&&$b->locateName('xl/vbaProject.bin')===false)throw new RuntimeException('Excel-QS-Sperre: VBA-Projekt des Originals fehlt.');foreach($namesA as$name){if(in_array($name,['xl/workbook.xml','xl/worksheets/sheet1.xml'],true))continue;$original=$a->getFromName($name);$generated=$b->getFromName($name);if(!is_string($original)||!is_string($generated)||!hash_equals(hash('sha256',$original),hash('sha256',$generated)))throw new RuntimeException('Excel-QS-Sperre: Originalbestandteil wurde verändert: '.$name.'.');}$workbook=$b->getFromName('xl/workbook.xml');if(!is_string($workbook))throw new RuntimeException('Excel-QS-Sperre: workbook.xml nicht lesbar.');gfExcelAssertWorkbookCalcOrder($workbook);$sheet=$b->getFromName('xl/worksheets/sheet1.xml');$a->close();$b->close();@unlink($tmpA);@unlink($tmpB);if(!is_string($sheet))throw new RuntimeException('Excel-QS-Sperre: Tabellenblatt nicht lesbar.');foreach(($key==='schlusserklaerung'?$page['entries']:array_merge($page['entries']['vn'],$page['entries']['partner']))as$entry){$probe=htmlspecialchars(mb_substr($entry['description'],0,24),ENT_XML1|ENT_QUOTES,'UTF-8');if($probe!==''&&!str_contains($sheet,$probe))throw new RuntimeException('Excel-QS-Sperre: Position nicht in das Originalformular übertragen: '.$entry['description'].'.');}$pageEntries=$key==='schlusserklaerung'?$page['entries']:array_merge($page['entries']['vn'],$page['entries']['partner']);
 $validationEntries=array_values(array_filter($pageEntries,static fn(array$entry):bool=>($entry['source_type']??'')!=='Übertrag'));
 gfExcelValidateData($key,['entries'=>$validationEntries],$instructions);
-if($key==='schlusserklaerung'&&!gfInstructionApprovesKva($instructions)){
+if($key==='schlusserklaerung'){
     $sheetDom=new DOMDocument();if(!@$sheetDom->loadXML($sheet))throw new RuntimeException('Excel-QS-Sperre: Tabellenblatt ist strukturell ungültig.');
     $sheetXp=new DOMXPath($sheetDom);$sheetXp->registerNamespace('x','http://schemas.openxmlformats.org/spreadsheetml/2006/main');
     foreach($pageEntries as$i=>$entry){
-        if(!gfExcelEntryIsKva($entry))continue;
+        if(!gfExcelEntryIsKva($entry)||gfExcelEntryApprovedKva($entry,$instructions))continue;
         $label=$sheetXp->query('//x:c[@r="A'.(19+$i).'"]')?->item(0)?->textContent??'';
         if(preg_match('/\bderzeit\s+als\s+Reserve\b/ui',$label)!==1)throw new RuntimeException('Excel-QS-Sperre: Reservekennzeichnung des KVA fehlt im gespeicherten Formular.');
     }
