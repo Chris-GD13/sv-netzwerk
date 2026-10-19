@@ -1,6 +1,19 @@
 <?php
 declare(strict_types=1);
 
+/** Explicit portal processing never inherits an older Claims import proof. */
+function cwImportId(array $body,array $rows): int {
+    $mode=$body['source_mode']??null;
+    if($mode!==null&&!in_array($mode,['portal','claims'],true))throw new RuntimeException('Ungültiger Quellenmodus.');
+    $id=(int)($body['import_id']??0);
+    if($mode==='portal'){
+        if($id!==0)throw new RuntimeException('Portalbestand darf keinen Claims-Importnachweis übernehmen.');
+        return 0;
+    }
+    if(!$id)foreach(array_reverse($rows) as $row)if(!empty($row['import_id']))return (int)$row['import_id'];
+    return $id;
+}
+
 /** Operator rules are code-reviewed, never learned from imported correspondence. */
 function cwRules(): string {
     return <<<'RULES'

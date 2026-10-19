@@ -4,7 +4,7 @@ window.svnetSetupAssistant = () => {
   let generation=0, context=null, job=null, pendingKey=null, busy=false, controller=null, openedKey=null, candidate=null, sandbox=false;
   const buttons=[...document.querySelectorAll('[data-assistant-task]')];
   const state=text=>{el('vf-assistant-state').textContent=text;};
-  const enable=()=>{el('vf-assistant-demo').disabled=busy;el('vf-assistant-open').disabled=!candidate||busy;el('vf-assistant-connections').disabled=busy;buttons.forEach(b=>b.disabled=!context||busy);el('vf-assistant-refresh').disabled=!context||!job||busy;el('vf-assistant-history').disabled=!context||busy;el('vf-assistant-resume').disabled=!context||!job||busy;el('vf-assistant-cancel').disabled=!context||!job||busy;el('vf-assistant-route').disabled=busy;};
+  const enable=()=>{el('vf-assistant-demo').disabled=busy;el('vf-assistant-open').disabled=!candidate||busy;el('vf-assistant-connections').disabled=busy;buttons.forEach(b=>b.disabled=(!context&&!candidate)||busy);el('vf-assistant-refresh').disabled=!context||!job||busy;el('vf-assistant-history').disabled=(!context&&!candidate)||busy;el('vf-assistant-resume').disabled=!context||!job||busy;el('vf-assistant-cancel').disabled=!context||!job||busy;el('vf-assistant-route').disabled=busy;};
   const clear=()=>{const previous=context,previousSandbox=sandbox;sandbox=false;generation++;controller?.abort();controller=null;context=null;openedKey=null;candidate=null;job=null;pendingKey=null;busy=false;el('vf-assistant-results').replaceChildren();el('vf-assistant-order').value='';el('vf-assistant-context').textContent='Kein bestätigter Fallkontext.';enable();
     if(previous)fetch('/intern/api/case-work.php?assistant=1',{method:'POST',credentials:'same-origin',keepalive:true,headers:{'Content-Type':'application/json','X-SV-Assistant':'1'},body:JSON.stringify({action:'assistant_close',token:previous.token,tab_id:tab,sandbox:previousSandbox})}).catch(()=>{});
   };
@@ -36,13 +36,20 @@ window.svnetSetupAssistant = () => {
     if(current?._loaded!==true||!current?.folder_id||!current.meta?.schaden_nr){clear();return;}
     const key=JSON.stringify([current.folder_id,current.meta.schaden_nr,current.meta.claimsforce_claim_id,current.meta.claimsforce_profile,current.meta.versicherer,current.meta.sparte]);
     if(openedKey===key)return;clear();openedKey=key;candidate=current;
-    el('vf-assistant-context').textContent=`Geöffneter Schaden ${current.meta.schaden_nr} · noch nicht vom Assistenten übernommen`;
-    state('Geöffneten Fall übernehmen oder Verbindungen prüfen.');enable();
+    el('vf-assistant-context').textContent=`Geöffneter Schaden ${current.meta.schaden_nr} · wird beim Auftrag serverseitig geprüft`;
+    state('Aufgabe auswählen oder Anweisung eingeben und starten. Der geöffnete Fall wird vor dem Auftrag geprüft.');enable();
   });
-  el('vf-assistant-open').onclick=async()=>{
-    if(!candidate||busy)return;const current=candidate,version=generation;busy=true;enable();
+  async function bind(version){
+    if(context)return;
+    const current=candidate;if(!current)throw Error('Bitte zuerst einen Fall öffnen.');
     state('Fall und Profil werden serverseitig geprüft …');
-    try{const c=await api('assistant_open',{folder_id:current.folder_id,claim_number:current.meta.schaden_nr},version);context=c;el('vf-assistant-context').textContent=`Schaden ${c.claim_number} · Profil ${c.profile} · Regelstand ${c.release} · ${c.mode==='live'?'KI mit 30-EUR-Zusatzbudget':'Simulation'}`;state('Fall serverseitig bestätigt. Aktion auswählen.');}
+    const c=await api('assistant_open',{folder_id:current.folder_id,claim_number:current.meta.schaden_nr},version);
+    context=c;el('vf-assistant-context').textContent=`Schaden ${c.claim_number} · Profil ${c.profile} · Regelstand ${c.release} · ${c.mode==='live'?'KI mit 30-EUR-Zusatzbudget':'Simulation'}`;
+  }
+  el('vf-assistant-open').onclick=async()=>{
+    if(!candidate||busy)return;const version=generation;busy=true;enable();
+    state('Fall und Profil werden serverseitig geprüft …');
+    try{await bind(version);state('Fall serverseitig bestätigt. Aktion auswählen.');}
     catch(e){if(version===generation&&e.name!=='AbortError')state(e.message);}
     finally{if(version===generation){busy=false;enable();}}
   };
@@ -70,12 +77,12 @@ window.svnetSetupAssistant = () => {
   window.addEventListener('storage',e=>{if(['svnet-case','svnet-case-owner'].includes(e.key))clear();});
   window.addEventListener('pagehide',clear);
   buttons.forEach(button=>button.onclick=async()=>{
-    if(!context||busy)return;const version=generation;busy=true;enable();pendingKey ||= crypto.randomUUID();
-    try{const r=await api('assistant_start',{request_key:pendingKey,task:button.dataset.assistantTask,instruction:el('vf-assistant-order').value,route:el('vf-assistant-route').value},version);job=r.job_id;pendingKey=null;await run(version);}
+    if((!context&&!candidate)||busy)return;const version=generation,instruction=el('vf-assistant-order').value,route=el('vf-assistant-route').value;busy=true;enable();pendingKey ||= crypto.randomUUID();
+    try{await bind(version);const r=await api('assistant_start',{request_key:pendingKey,task:button.dataset.assistantTask,instruction,route},version);job=r.job_id;pendingKey=null;await run(version);}
     catch(e){if(version===generation&&e.name!=='AbortError'){if(['CASE_BUSY','MONTHLY_BUDGET_EXCEEDED','IDEMPOTENCY_CONFLICT','ACTION_INVALID'].includes(e.code))pendingKey=null;state(e.message+(!e.code?' · Startstatus unklar: denselben Auftrag unverändert erneut versuchen.':''));}}
     finally{if(version===generation){busy=false;enable();}}
   });
-  el('vf-assistant-history').onclick=async()=>{const v=generation;if(!context||busy)return;busy=true;enable();try{const rows=await api('assistant_history',{},v);if(!rows.length){state('Keine gespeicherten Assistentenaufträge.');return;}job=Number(rows[0].id);enable();await api('assistant_recover',{job_id:job},v);enable();state('Auftrag geladen. Status prüfen oder Wiederaufnehmen wählen.');}catch(e){if(v===generation)state(e.message);}finally{if(v===generation){busy=false;enable();}}};
+  el('vf-assistant-history').onclick=async()=>{const v=generation;if((!context&&!candidate)||busy)return;busy=true;enable();try{await bind(v);const rows=await api('assistant_history',{},v);if(!rows.length){state('Keine gespeicherten Assistentenaufträge.');return;}job=Number(rows[0].id);enable();await api('assistant_recover',{job_id:job},v);enable();state('Auftrag geladen. Status prüfen oder Wiederaufnehmen wählen.');}catch(e){if(v===generation)state(e.message);}finally{if(v===generation){busy=false;enable();}}};
   el('vf-assistant-refresh').onclick=async()=>{const v=generation;if(!context||busy)return;busy=true;enable();try{const r=await api('assistant_status',{job_id:job},v);state(`Auftrag ${r.id}: ${r.status}`);render(r.result);}catch(e){if(v===generation)state(e.message);}finally{if(v===generation){busy=false;enable();}}};
   el('vf-assistant-resume').onclick=async()=>{const v=generation;if(busy)return;busy=true;enable();try{const s=await api('assistant_status',{job_id:job},v);if(s.status==='paused')await api('assistant_resume',{job_id:job},v);await run(v);}catch(e){if(v===generation)state(e.message);}finally{if(v===generation){busy=false;enable();}}};
   el('vf-assistant-cancel').onclick=async()=>{const v=generation;if(!context||busy)return;busy=true;enable();try{await api('assistant_cancel',{job_id:job},v);state('Auftrag beendet.');job=null;render(null);enable();}catch(e){if(v===generation)state(e.message);}finally{if(v===generation){busy=false;enable();}}};

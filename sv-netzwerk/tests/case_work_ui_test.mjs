@@ -8,7 +8,7 @@ class Element {
   replaceChildren(...children){this.children=children;}
   addEventListener(event,handler){this['on'+event]=handler;} querySelector(){return null;} closest(){return null;} focus(){} scrollIntoView(){}
 }
-const ids=Object.fromEntries(['vf-analysis-start','vf-analysis-refresh','vf-analysis-state','vf-work-history','vf-analysis-order','vf-analysis-files','vf-work-reload','vf-work-import-retry','vf-work-local','vf-active'].map(id=>[id,new Element()]));
+const ids=Object.fromEntries(['vf-analysis-start','vf-analysis-refresh','vf-analysis-state','vf-work-history','vf-analysis-order','vf-analysis-files','vf-work-reload','vf-work-import-retry','vf-work-local','vf-work-import-help','vf-active'].map(id=>[id,new Element()]));
 const store=new Map(),observers=[],requests=[];let importState='queued';const histories=new Map();
 store.set('svnet-case',JSON.stringify({folder_id:'case-a',meta:{schaden_nr:'26-123456-1'}}));
 const storage={getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v),removeItem:k=>store.delete(k)};
@@ -30,16 +30,33 @@ const context={document:{readyState:'complete',getElementById:id=>ids[id],create
 vm.runInNewContext(fs.readFileSync(new URL('../public/intern/case-work.js',import.meta.url),'utf8'),context);
 const flush=()=>new Promise(resolve=>setImmediate(resolve));await flush();
 assert.equal(ids['vf-analysis-start'].disabled,false);
+assert.equal(ids['vf-work-reload'].checked,false,'Phone workflow defaults to saved portal sources');
+assert.equal(requests.length,0,'Opening a case must not query or import');
+ids['vf-analysis-order'].value='Mobile saved documents';await ids['vf-analysis-start'].onclick();
+assert.equal(histories.get('case-a').length,1);
+assert.equal(requests.find(r=>r.body.action==='start').body.source_mode,'portal');
+assert(!requests.some(r=>r.url.includes('claimsforce-queue')));
+ids['vf-work-reload'].checked=true;
 ids['vf-analysis-order'].value='Bitte abarbeiten';await ids['vf-analysis-start'].onclick();
-assert.equal(requests.filter(r=>r.body.action==='start').length,0,'Analysis must wait for import');
+assert.equal(requests.filter(r=>r.body.action==='start').length,1,'Explicit reload must wait for import');
 assert.equal(ids['vf-analysis-start'].disabled,true);
 importState='done';ids['vf-analysis-refresh'].onclick();await flush();await flush();
-assert.equal(requests.filter(r=>r.body.action==='start').length,1);
-assert.equal(requests.find(r=>r.body.action==='start').body.import_id,11);
-assert.equal(histories.get('case-a').length,1);
-ids['vf-analysis-order'].value='Korrektur: Strompreis 0,40 EUR';await ids['vf-analysis-start'].onclick();
+assert.equal(requests.filter(r=>r.body.action==='start').length,2);
+assert.equal(requests.filter(r=>r.body.action==='start').at(-1).body.import_id,11);
 assert.equal(histories.get('case-a').length,2);
+ids['vf-analysis-order'].value='Korrektur: Strompreis 0,40 EUR';await ids['vf-analysis-start'].onclick();
+assert.equal(histories.get('case-a').length,3);
 assert.equal(requests.filter(r=>r.body.action==='start').at(-1).body.instructions,'Korrektur: Strompreis 0,40 EUR');
+// Waiting imports expose continuation instead of hiding it in a disclosure.
+importState='queued';ids['vf-work-reload'].checked=true;ids['vf-analysis-order'].value='Keep this mobile instruction';
+await ids['vf-analysis-start'].onclick();assert.equal(ids['vf-work-import-help'].hidden,false);
+assert.match(ids['vf-analysis-start'].textContent,/Claims-Import/);
+const pendingWork=JSON.parse([...store.entries()].find(([k])=>k.includes('pending:')&&k.endsWith(':case-a'))[1]);
+await ids['vf-work-local'].onclick();await flush();
+const resumed=requests.filter(r=>r.body.action==='start').at(-1).body;
+assert.equal(resumed.request_key,pendingWork.request_key,'Continuation must reuse the existing request key');
+assert.equal(resumed.instructions,'Keep this mobile instruction');assert.equal(resumed.source_mode,'portal');
+assert.equal(histories.get('case-a').length,4,'Exactly one resumed job');assert.equal(ids['vf-work-import-help'].hidden,true);
 store.set('svnet-case',JSON.stringify({folder_id:'case-b',meta:{schaden_nr:'26-999999-1'}}));observers[0]();await flush();
 assert.equal(ids['vf-work-history'].children.length,0,'Previous case response leaked into new case');
 assert.equal(ids['vf-analysis-order'].value,'');

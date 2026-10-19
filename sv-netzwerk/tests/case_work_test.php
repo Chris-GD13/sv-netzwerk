@@ -13,4 +13,10 @@ check($history[0]['role']==='operator'&&$history[1]['role']==='assistant_draft',
 check(count(cwDocumentRequests(['document_requests'=>[['type'=>'zwischenbericht','instructions'=>'Nr. 3'],['type'=>'zwischenbericht','instructions'=>'Nr. 3 korrigiert']]]))===1,'Duplicate document type');
 try{cwDocumentRequests(['document_requests'=>[['type'=>'send_mail','instructions'=>'Send now']]]);throw new LogicException('Forbidden tool accepted');}catch(RuntimeException $e){check(!$e instanceof LogicException,'Invalid action accepted');}
 try{cwHistoryContext([['instructions'=>str_repeat('x',260000),'created_at'=>'today','result_json'=>null]]);throw new LogicException('Silent history truncation');}catch(RuntimeException $e){check(!$e instanceof LogicException,'Context limit failed');}
+$previous=[['import_id'=>77],['import_id'=>88]];
+check(cwImportId(['source_mode'=>'portal'],$previous)===0,'Mobile portal processing inherited an older import proof');
+check(cwImportId(['source_mode'=>'claims','import_id'=>99],$previous)===99,'Explicit import lost its identity');
+check(cwImportId([],$previous)===88,'Existing clients lost their history compatibility');
+try{cwImportId(['source_mode'=>'portal','import_id'=>99],$previous);throw new LogicException('Contradictory source proof accepted');}catch(RuntimeException $e){check(!$e instanceof LogicException,'Source proof conflict accepted');}
+try{cwImportId(['source_mode'=>'invented'],$previous);throw new LogicException('Invalid mode accepted');}catch(RuntimeException $e){check(!$e instanceof LogicException,'Invalid source mode accepted');}
 echo "case_work_test: ok\n";
