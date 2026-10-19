@@ -40,7 +40,14 @@ foreach([1,2]as$i){
 check(gfExcelPrepareResult('schlusserklaerung',$prepared,'KVA noch nicht freigeben.')===$prepared,'Wiederaufnahme darf Reservekennzeichnung nicht verdoppeln.');
 check(gfExcelPrepareResult('schlusserklaerung',['entries'=>[$entry]],'KVA freigeben.')===['entries'=>[$entry]],'Ausdrückliche KVA-Freigabe muss erhalten bleiben.');
 check(gfExcelPrepareResult('zahlungsbefuerwortung',$input,'KVA nur auflisten.')===$input,'SE-Normalisierung darf keine Zahlungsbefürwortung ändern.');
-foreach(['zahlungsbefuerwortung','schlusserklaerung']as$type){
+foreach(['gfExcelOutput','gfEngelValidate']as$function){
+    $a=strpos($core,'function '.$function.'(');$b=strpos($core,"\nfunction ",$a+1);eval(substr($core,$a,$b-$a));
+}
+$throughValidation=$input;
+check(gfEngelValidate('schlusserklaerung',$throughValidation,[],'KVA nicht freigeben.')['passed'],'Aktiver Validierungsweg muss die Reservekorrektur anwenden.');
+check($throughValidation===$input,'Die Validierung darf die Originaldaten nicht verändern.');
+
+foreach(['zahlungsbefuerwortung']as$type){
     $bad=$type==='zahlungsbefuerwortung'?$prepared:$input;
     try{gfExcelValidateData($type,$bad,'KVA nicht freigeben.');throw new LogicException('Unzulässige Position wurde akzeptiert.');}
     catch(RuntimeException $error){check(str_contains($error->getMessage(),'Excel-QS-Sperre'),'Falscher Fehler bei unzulässiger Position.');}
