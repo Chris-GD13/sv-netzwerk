@@ -38,6 +38,13 @@ function ionosList(array $query): array {
         return ['files'=>[['id'=>hash('sha256', $q), 'name'=>'REGEL.md', 'mimeType'=>'text/markdown']]];
     }
     if (str_contains($query['q'], "'reports'")) return ['files'=>[]];
+    if ($mode === 'large-case' && str_contains($query['q'], "'case-folder' in parents")) return ['files'=>[
+        ['id'=>'meta', 'name'=>'00_Falldaten.json', 'mimeType'=>'application/json', 'size'=>100],
+        ['id'=>'offer', 'name'=>'Angebot neu.pdf', 'mimeType'=>'application/pdf', 'size'=>12],
+        ['id'=>'photos', 'name'=>'02_Bilder', 'mimeType'=>'application/vnd.google-apps.folder'],
+        ['id'=>'reports', 'name'=>'05_Berichte', 'mimeType'=>'application/vnd.google-apps.folder'],
+        ...array_map(fn($index)=>['id'=>'large-'.$index,'name'=>'Original-'.$index.'.pdf','mimeType'=>'application/pdf','size'=>25*1024*1024],range(1,9)),
+    ]];
     if (str_contains($query['q'], "'photos'")) return ['files'=>[['id'=>'photo', 'name'=>'Boden.jpg', 'mimeType'=>'image/jpeg', 'size'=>8]]];
     return ['files'=>[
         ['id'=>'meta', 'name'=>'00_Falldaten.json', 'mimeType'=>'application/json', 'size'=>100],
@@ -48,6 +55,7 @@ function ionosList(array $query): array {
     ]];
 }
 function ionosBytes(string $id): string {
+    if (str_starts_with($id,'large-')) return $id.str_repeat('p',25*1024*1024-strlen($id));
     if ($id === 'master' || preg_match('/^[a-f0-9]{64}$/D', $id)) return 'Verbindliche Originalregel: Fakten und Bewertung trennen.';
     return match ($id) { 'meta'=>json_encode(['schaden_nr'=>'26-031578-4', 'vn_objekt'=>'Testobjekt']), 'offer'=>'PDF-original', 'photo'=>'photo-original', 'rule-pdf'=>'PDF-rule-original', default=>throw new RuntimeException('Unexpected original '.$id) };
 }
@@ -151,6 +159,15 @@ foreach (range(1, 10) as $index) {
     assertWorker(str_contains(end($aiCalls)['prompt'], 'Aktuelle E-Mail\/Original-'.$index.'.pdf'),
         'Current attachment '.$index.' must reach the final work context');
 }
+$mode = 'large-case'; $updates = []; $written = []; $aiCalls = [];
+caRun(3,'case-folder','task-one','Vollständige Akte prüfen',['id'=>1]);
+assertWorker(end($updates)[':s']==='done','A case above 200 MB must finish through bounded batches.');
+$largeRecord=$written[0]['record'];
+assertWorker(count(array_filter($largeRecord['sources'],fn($file)=>str_starts_with($file['name'],'Original-')))===9,'All nine large originals must remain in the source manifest.');
+foreach(range(1,9)as$index)assertWorker(str_contains(end($aiCalls)['prompt'],'Original-'.$index.'.pdf'),'Original '.$index.' must reach final analysis, including files after the old 200 MB boundary.');
+$batchUpdates=array_filter($updates,fn($update)=>str_starts_with($update[':m'],'Originalunterlagen werden geprüft: Paket'));
+assertWorker(count($batchUpdates)>=9,'225 MB of originals must be split into bounded requests.');
+assertWorker(count($uploaded)===count($deleted),'Large cases must clean up every temporary provider file.');
 $mode = 'open-task-result'; $updates = []; $written = [];
 caRun(2, 'case-folder', 'task-one', '', ['id'=>1]);
 assertWorker(end($updates)[':s'] === 'done' && count($written[0]['record']['task_results']) === 2,

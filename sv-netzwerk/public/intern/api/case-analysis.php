@@ -183,7 +183,7 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
         }
         if (strlen($rules) > 700000) throw new RuntimeException('Die MD-Vorgaben überschreiten die gemeinsame Kontextgrenze; keine gekürzte Analyse gestartet.');
         array_push($gaps, ...$ruleLayoutWarnings);
-        $batch = []; $batchBytes = 0; $hashes = []; $totalBytes = 0; $evidence = []; $batchNumber = 0;
+        $batch = []; $batchBytes = 0; $hashes = []; $evidence = []; $batchNumber = 0;
         foreach ($files as $file) {
             if (preg_match('/_Fallanalyse_.*\.json$/i', $file['name'])) continue;
             $kind = caFileKind($file['name'], $file['mimeType'] ?? '');
@@ -204,8 +204,8 @@ function caRun(int $job, string $folder, string $taskId, string $instructions, a
             $sources[] = ['id'=>$file['id'], 'name'=>$file['path'], 'sha256'=>$hash, 'duplicate_of'=>$hashes[$hash] ?? null];
             if (isset($hashes[$hash])) continue;
             $hashes[$hash] = $file['path'];
-            $totalBytes += strlen($bytes);
-            if ($totalBytes > 200*1024*1024) throw new RuntimeException('Fallunterlagen überschreiten 200 MB; keine gekürzte Analyse gestartet.');
+            // Read all originals through the bounded batches below; the complete case
+            // need not fit into a single request or an arbitrary total-byte budget.
             if (preg_match('/\.eml$/i', $file['name'])) $gaps[] = 'MIME-Mail als Originaltext gelesen; eingebettete Anhänge nur soweit separat vorhanden geprüft: '.$file['path'];
             if ($batch && (count($batch) >= 8 || $batchBytes + strlen($bytes) > 40*1024*1024)) {
                 caUpdate($job, 'running', 'Originalunterlagen werden geprüft: Paket '.(++$batchNumber).'.');
