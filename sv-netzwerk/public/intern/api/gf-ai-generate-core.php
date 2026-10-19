@@ -111,28 +111,48 @@ function gfExcelEntryIsKva(array $entry):bool
     $text=implode(' ',[(string)($entry['description']??''),(string)($entry['source_reference']??''),(string)($entry['source_type']??'')]);
     return preg_match('/\b(?:KVA|Kostenvoranschl[aä]g(?:e|en)?|Angebot(?:e|en)?)\b/ui',$text)===1;
 }
+function gfExcelKvaReferences(string $text):array
+{
+    // Issuers, file names, dates and page citations are not document numbers.
+    $text=preg_replace('/\S+\.(?:pdf|docx?|xlsx?|msg|eml)\b|\b\d{1,2}\.\d{1,2}\.\d{2,4}\b|\b(?:Seiten?|S\.)\s*\d+(?:\s*[-–]\s*\d+)?/ui',' ',$text)??$text;
+    preg_match_all('/(?<![\p{L}\p{N}])(?:[A-Za-z0-9]+(?:[-_\/]?[A-Za-z0-9]+)*)(?![\p{L}\p{N}])/u',$text,$matches);
+    $refs=[];
+    foreach($matches[0]as$ref){
+        if(preg_match('/\d/u',$ref)||preg_match('/^[A-Z]$/D',$ref))$refs[]=mb_strtolower($ref,'UTF-8');
+    }
+    return array_values(array_unique($refs));
+}
 function gfExcelEntryApprovedKva(array $entry,string $instructions):bool
 {
     if(!gfExcelEntryIsKva($entry))return false;
-    // Match an explicit document reference, never approve another estimate merely
-    // because an instruction somewhere contains a release verb.
-    $references=[];
-    foreach(preg_split('/[\s,;()]+/u',(string)($entry['source_reference']??''))?:[]as$ref){
-        $ref=trim($ref," .:");
-        if($ref===''||preg_match('/\.(?:pdf|docx?|xlsx?|msg|eml)$/ui',$ref)||preg_match('/^(?:S|Seite|Seiten|Brief|Angebot|KVA)$/ui',$ref))continue;
-        if(preg_match('/[A-Za-zÄÖÜäöüß]/u',$ref))$references[]=$ref;
-    }
+    $references=gfExcelKvaReferences((string)($entry['source_reference']??''));
+    $document='(?:KVA|KV|Kostenvoranschl[aä]g(?:e|en)?|Angebot(?:e|en)?)';
+    $approval='(?:freigeben|freigegeben|Freigabe|genehmigen|genehmigt|anerkennen|anerkannt|bestätigen|bestätigt)';
+    $prefix='(?:bitte\s+)?(?:(?:alle|sämtliche|den|die|das)\s+)?';
     $approved=false;
-    foreach(preg_split('/[;.!?\r\n]+/u',$instructions)?:[]as$clause){
-        $matchesEntry=false;
-        foreach($references as$ref)if(preg_match('/(?<![\p{L}\p{N}])'.preg_quote($ref,'/').'(?![\p{L}\p{N}])/ui',$clause)){$matchesEntry=true;break;}
-        if($matchesEntry&&preg_match('/\b(?:Reserve|nicht|keine?|ohne|vorbehaltlich|erst\s+nach|nur\s+nach)\b/ui',$clause))return false;
+    // A second named document or a separate clause is a separate decision.
+    $clauses=preg_split('/[;.!?\r\n,]+|\bund\s+(?='.$document.'\b)/ui',$instructions)?:[];
+    foreach($clauses as$clause){
+        $clause=trim($clause);if($clause==='')continue;
+        $hasDocument=preg_match('/\b'.$document.'\b/ui',$clause)===1;
+        $ids=gfExcelKvaReferences($clause);
+        $matchesEntry=$references&&array_intersect($references,$ids);
+        $negative=preg_match('/\b(?:Reserve|nicht|keine?|ohne|niemals|vorbehaltlich|erst\s+nach|nur\s+nach|nur\s+auflisten)\b/ui',$clause)===1;
+        if($negative){
+            // An unqualified deferral also revokes an earlier general approval.
+            if($matchesEntry||(!$ids&&($hasDocument||preg_match('/\b'.$approval.'\b/ui',$clause))))return false;
+            continue;
+        }
         if(!gfInstructionApprovesKva($clause))continue;
-        // Bare or collective instructions are unqualified. A named estimate
-        // requires the same reference as the position being considered.
-        $generic=preg_match('/\b(?:KVA|KV|Kostenvoranschl[aä]g(?:e|en)?|Angebot(?:e|en)?)\b\s+(?:(?:und\s+Rechnungen|bitte|jetzt|ausdrücklich|alle|sämtliche|auflisten|prüfen|und)\s+)*(?:freigeben|freigegeben|genehmigen|genehmigt|anerkennen|anerkannt|bestätigen|bestätigt)\b/ui',$clause)===1;
-        $generic=$generic||preg_match('/^\s*(?:Freigabe|Genehmigung|Bestätigung)\s+(?:für\s+)?(?:(?:den|die|das|alle|sämtliche)\s+)?(?:KVA|KV|Kostenvoranschl[aä]g(?:e|en)?|Angebot(?:e|en)?)\s*$/ui',$clause)===1;
-        if($matchesEntry||$generic)$approved=true;
+        if($ids){
+            // Never share one release verb between multiple named documents.
+            if(preg_match_all('/\b'.$document.'\b/ui',$clause)===1&&$matchesEntry)$approved=true;
+            continue;
+        }
+        // Generic releases must be genuinely unqualified, including after the verb.
+        $generic='/^\s*(?:'.$prefix.$document.'(?:\s+und\s+Rechnungen)?(?:\s+(?:auflisten|prüfen)\s+und)?\s+'.$approval
+            .'|(?:bitte\s+)?'.$approval.'\s+(?:für\s+)?(?:(?:alle|sämtliche|den|die|das)\s+)?'.$document.')\s*$/ui';
+        if(preg_match($generic,$clause))$approved=true;
     }
     return$approved;
 }
