@@ -131,6 +131,7 @@ function gfExcelEntryApprovedKva(array $entry,string $instructions):bool
         // Bare or collective instructions are unqualified. A named estimate
         // requires the same reference as the position being considered.
         $generic=preg_match('/\b(?:KVA|KV|Kostenvoranschl[aä]g(?:e|en)?|Angebot(?:e|en)?)\b\s+(?:(?:und\s+Rechnungen|bitte|jetzt|ausdrücklich|alle|sämtliche|auflisten|prüfen|und)\s+)*(?:freigeben|freigegeben|genehmigen|genehmigt|anerkennen|anerkannt|bestätigen|bestätigt)\b/ui',$clause)===1;
+        $generic=$generic||preg_match('/^\s*(?:Freigabe|Genehmigung|Bestätigung)\s+(?:für\s+)?(?:(?:den|die|das|alle|sämtliche)\s+)?(?:KVA|KV|Kostenvoranschl[aä]g(?:e|en)?|Angebot(?:e|en)?)\s*$/ui',$clause)===1;
         if($matchesEntry||$generic)$approved=true;
     }
     return$approved;
