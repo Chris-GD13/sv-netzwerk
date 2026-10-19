@@ -636,3 +636,9 @@
 ## 2026-10-10 – Fensteranschluss-Abdichtung, recherchierte Neufassung
 
 Abgelehnten Fensterbau-Beitrag mit Bild und Detailrouten zurückgenommen. Neue eigenständige Darstellung zur Fensteranschluss-Abdichtung anhand von acht überprüften Primärquellen: Funktionsbereiche, Untergrund, Fugenmaß, Folien, Flüssigmembranen und spezifische luftdichte Dämmstoffe. Keine erfundenen Fälle oder Messwerte. Alte und neue Veröffentlichungen bleiben im gemeinsamen Tagesregister eindeutig getrennt.
+# 2026-10-19
+
+- Täglicher Fachbeitrag zur Asbesterkundung vor Sanierungsarbeiten ergänzt: Baujahr, Verdachtsflächen, Probenplan, Laborbefund, Arbeitsplanung und Kostenabgrenzung.
+- Carmen Gohls belegtes Spezialgebiet Innenraumschadstoffe im zweiten Expertenrotationszyklus berücksichtigt; Profilverknüpfung ohne Autorenschaftsbehauptung ergänzt.
+- LinkedIn-Begleittext und Quellenprüfung vorbereitet, nicht veröffentlicht; Beitrag bewusst ohne Bild.
+

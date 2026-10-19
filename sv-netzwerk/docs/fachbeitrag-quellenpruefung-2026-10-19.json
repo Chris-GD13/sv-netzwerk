@@ -1,0 +1,110 @@
+{
+  "date": "2026-10-19",
+  "publication_id": "2026-10-19-asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme",
+  "article": "asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme",
+  "author": "christian-waechter",
+  "status": "prepared-for-deployment",
+  "article_type": "eigenstaendiges-sachverstaendigenthema",
+  "expert_rotation": {
+    "selected_person": "Carmen Gohl",
+    "profile_url": "https://www.sv-netzwerk.eu/experten/carmen-gohl/",
+    "verified_specialty": "Innenraumschadstoffe einschließlich Asbest; Probenahmen, Raumluftmessungen und Sanierungsbegleitung; live und im Repository am 19.10.2026 geprüft",
+    "progress": "Der erste Zyklus 12. bis 17.10.2026 ist abgeschlossen. Im zweiten Zyklus wurde am 18.10.2026 Christian Wächter berücksichtigt; Carmen Gohl folgt am 19.10.2026 ohne Wiederholung.",
+    "selection_basis": "Thema aus dem belegten Profil und nach Archivabgleich abgeleitet; keine Autorenschaft oder konkrete Fallzuständigkeit behauptet."
+  },
+  "source_review": {
+    "checked_at": "2026-10-19",
+    "decision_date": "2026-10-19",
+    "new_event_claimed": false,
+    "norm_effective_date_claimed": true,
+    "notes": "Aktuelle amtliche Fassungen und Behördenseiten geöffnet; TRGS-Fassungshistorie geprüft. Keine nicht eingesehenen Normklauseln und keine erfundene Fallpraxis."
+  },
+  "sources": [
+    {
+      "publisher": "Bundesministerium der Justiz / Bundesamt für Justiz",
+      "title": "Gefahrstoffverordnung § 5a",
+      "status": "amtliche Gesetzesfassung",
+      "read_scope": "Seite vollständig geöffnet und Informationspflichten für Veranlasser ausgewertet",
+      "practical_meaning": "Bau- und Nutzungsgeschichte sowie Angaben zum Baujahr als Ausgangsinformation dokumentieren",
+      "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__5a.html",
+      "checked_at": "2026-10-19"
+    },
+    {
+      "publisher": "Bundesministerium der Justiz / Bundesamt für Justiz",
+      "title": "Gefahrstoffverordnung § 11a",
+      "status": "amtliche Gesetzesfassung",
+      "read_scope": "Anforderungen an Plausibilitätsprüfung, Gefährdungsbeurteilung, Arbeitsplan, Fachkunde und Anzeige ausgewertet",
+      "practical_meaning": "Informationspflichten des Veranlassers und Arbeitgeberpflichten getrennt darstellen",
+      "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__11a.html",
+      "checked_at": "2026-10-19"
+    },
+    {
+      "publisher": "Bundesanstalt für Arbeitsschutz und Arbeitsmedizin",
+      "title": "Informationsportal Asbest – Planung und Vorbereitung: Erkundung",
+      "status": "behördliche Fachinformation",
+      "read_scope": "Erkundungsseite vollständig geöffnet und zu Baualter, Probenplanung, Labor, Dokumentation und Unsicherheiten ausgewertet",
+      "practical_meaning": "Erkundung auf Arbeitsumfang beziehen und verbleibende Unsicherheiten sichtbar halten",
+      "url": "https://www.baua.de/DE/Themen/Chemikalien-Biostoffe/Gefahrstoffe/Informationsportal-Asbest/Asbest_Dossier/Asbest_Planung_dossier?pos=1",
+      "checked_at": "2026-10-19"
+    },
+    {
+      "publisher": "Bundesanstalt für Arbeitsschutz und Arbeitsmedizin",
+      "title": "TRGS 519 – Asbest: Abbruch-, Sanierungs- oder Instandhaltungsarbeiten",
+      "publication_or_update_date": "zuletzt geändert und ergänzt 28.02.2025",
+      "status": "technische Regel, aktuelle Fassungshistorie geprüft",
+      "read_scope": "BAuA-Metadaten und Anwendungsbezug geöffnet; keine darüber hinausgehende Volltextklausel behauptet",
+      "practical_meaning": "Arbeitsplanung und Ausführung als fachkundige Folgeschritte der Erkundung einordnen",
+      "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519",
+      "checked_at": "2026-10-19"
+    },
+    {
+      "publisher": "Umweltbundesamt, BAuA und BBSR",
+      "title": "Leitlinie für die Asbesterkundung zur Vorbereitung von Arbeiten in und an älteren Gebäuden",
+      "publication_or_update_date": "April 2020",
+      "status": "gemeinsame Behördenleitlinie",
+      "read_scope": "Publikationsseite und Leitlinie im für den Arbeitsablauf benötigten Umfang ausgewertet",
+      "practical_meaning": "Baugeschichte, Verdachtsflächen, Probenahme und Arbeitsplanung als zusammenhängenden Prozess darstellen",
+      "url": "https://www.umweltbundesamt.de/publikationen/leitlinie-fuer-die-asbesterkundung-zur-vorbereitung",
+      "checked_at": "2026-10-19"
+    }
+  ],
+  "linkedin": {
+    "status": "prepared-not-posted",
+    "file": "src/content/linkedin/2026-10-19_asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme.txt"
+  },
+  "archive_review": {
+    "existing_related_article": "schadstoffverdacht-rueckbau-bestandsgebaeude",
+    "distinction": "Der bestehende Beitrag behandelt den breiten Schadstoffverdacht beim Rückbau; der neue Beitrag fokussiert die asbestspezifische Erkundung und Dokumentation vor Sanierungsarbeiten.",
+    "daily_count_before_creation": 0
+  },
+  "local_checks": {
+    "npm_ci": "success; 743 Pakete installiert, bestehende Audit-Hinweise unverändert dokumentiert",
+    "astro_check": {
+      "errors": 0,
+      "warnings": 0,
+      "hints": 0,
+      "files": 356
+    },
+    "preflight": "success",
+    "build": "success",
+    "article_words": 1647,
+    "pages": 1066,
+    "knowledge_urls": 112,
+    "sitemap_pages": 193,
+    "internal_links": 20942,
+    "daily_count": 1,
+    "encoding": "passed",
+    "public_copy": "passed",
+    "visible_umlauts": "passed",
+    "knowledge_dist_links_search_sitemap": "passed",
+    "verified_at": "2026-10-19T06:14:00+02:00",
+    "python_runtime_note": "Windows python3 war nur der Microsoft-Store-Alias. Die identische npm-Buildkette wurde mit C:/Users/chris/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe als python3-Ersatz vollständig erfolgreich ausgeführt."
+  },
+  "deployment": {
+    "content_commit": null,
+    "run_url": null,
+    "conclusion": "pending",
+    "verified_at": null,
+    "live_evidence": []
+  }
+}

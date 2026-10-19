@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Asbesterkundung vor Sanierungsarbeiten: Baujahr, Verdachtsflächen und Probenahme richtig dokumentieren',
+    description: 'Asbestverdacht vor der Sanierung anhand von Baugeschichte, betroffenen Materialien, Probenplan, Laborbefund und verbleibenden Unsicherheiten nachvollziehbar klären.',
+    href: '/fachwissen/asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme/',
+    category: 'Innenraumschadstoffe und Sanierung',
+    tags: ['Asbest', 'Schadstofferkundung', 'Probenahme', 'Sanierung', 'Arbeitsschutz', 'Beweissicherung'],
+    date: '2026-10-19',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Beschlagene Fensterscheiben: Kondensat außen, innen und im Scheibenzwischenraum unterscheiden',
     description: 'Beschlag an Fenstern lokalisieren, Klima und Glasaufbau erfassen und den Untersuchungsbedarf vor einer Ersatzverglasung oder einem Fenstertausch bestimmen.',
     href: '/fachwissen/fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum/',
