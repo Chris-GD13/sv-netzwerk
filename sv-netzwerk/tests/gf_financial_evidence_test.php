@@ -19,8 +19,88 @@ foreach (['KVA nur auflisten.', 'KVA nicht freigeben.', 'Keine Angebote freigebe
 }
 $entry = ['description'=>'Wiederherstellung','source_type'=>'Freigegebener KVA','source_reference'=>'Brief.pdf, S. 10–12, Angebot A-123','amount'=>1441.57];
 check(gfExcelValidateData('schlusserklaerung', ['entries'=>[$entry]], 'Alle KVA und Rechnungen auflisten und freigeben')['passed'], 'Neutral benannte Originalquelle blockiert geprüften KVA.');
-try { gfExcelValidateData('schlusserklaerung', ['entries'=>[$entry]], 'KVA nur auflisten'); throw new LogicException('Fehlende Freigabe wurde akzeptiert.'); }
+try { gfExcelValidateData('zahlungsbefuerwortung', ['entries'=>[$entry]], 'KVA nur auflisten'); throw new LogicException('Fehlende Freigabe wurde akzeptiert.'); }
 catch (RuntimeException $e) { check(str_contains($e->getMessage(), 'ausdrücklicher Freigabe'), 'Falsche Sperre.'); }
+
+
+// Reproduce one invoice and the two estimates that blocked the SE.
+$input=['entries'=>[
+    ['description'=>'Ortung und Reparatur','source_type'=>'Rechnung','source_reference'=>'R-1','amount'=>100.0],
+    ['description'=>'Wiederherstellung Boden','source_type'=>'KVA','source_reference'=>'A-2','amount'=>200.0],
+    ['description'=>'Wiederherstellung Wand','source_type'=>'Freigegebener KVA','source_reference'=>'A-3','amount'=>300.0],
+], 'totals'=>['self_retention'=>10,'partial_payments'=>50,'direct_payments'=>0,'rest_reserve'=>0]];
+$prepared=gfExcelPrepareResult('schlusserklaerung',$input,'SE aktualisieren. KVA noch nicht freigeben.');
+check(gfExcelValidateData('schlusserklaerung',$prepared,'KVA noch nicht freigeben.')['passed'],'Belegte KVA müssen die SE als Reserve passieren.');
+check($prepared['entries'][0]===$input['entries'][0]&&$prepared['totals']===$input['totals'],'Rechnung, Zahlungen und Summen dürfen nicht verändert werden.');
+foreach([1,2]as$i){
+    check($prepared['entries'][$i]['source_type']==='KVA','Ohne Freigabe darf die KI keine Freigabe behaupten.');
+    check(str_contains($prepared['entries'][$i]['description'],'derzeit als Reserve'),'Reservekennzeichnung fehlt.');
+    check($prepared['entries'][$i]['amount']===$input['entries'][$i]['amount'],'Originalbetrag wurde verändert.');
+}
+check(gfExcelPrepareResult('schlusserklaerung',$prepared,'KVA noch nicht freigeben.')===$prepared,'Wiederaufnahme darf Reservekennzeichnung nicht verdoppeln.');
+check(gfExcelPrepareResult('schlusserklaerung',['entries'=>[$entry]],'KVA freigeben.')===['entries'=>[$entry]],'Ausdrückliche KVA-Freigabe muss erhalten bleiben.');
+check(gfExcelPrepareResult('zahlungsbefuerwortung',$input,'KVA nur auflisten.')===$input,'SE-Normalisierung darf keine Zahlungsbefürwortung ändern.');
+$invoice=['description'=>'Schlussrechnung zum Angebot A-123','source_type'=>'Rechnung','source_reference'=>'R-9','amount'=>123.45];
+check(gfExcelPrepareResult('schlusserklaerung',['entries'=>[$invoice]],'SE erstellen.')['entries'][0]===$invoice,'Eine Rechnung mit Angebotsverweis muss Rechnung bleiben.');
+check(gfExcelValidateData('zahlungsbefuerwortung',['entries'=>[$invoice]],'Rechnung prüfen.')['passed'],'Angebotsverweis darf eine Rechnung nicht als KVA sperren.');
+$mixed=['entries'=>[
+    ['description'=>'Boden','source_type'=>'Freigegebener KVA','source_reference'=>'A','amount'=>100.0],
+    ['description'=>'Wand','source_type'=>'Freigegebener KVA','source_reference'=>'B','amount'=>200.0],
+]];
+$mixedInstruction='Angebot A freigeben. Angebot B als Reserve aufnehmen.';
+$mixedPrepared=gfExcelPrepareResult('schlusserklaerung',$mixed,$mixedInstruction);
+check($mixedPrepared['entries'][0]===$mixed['entries'][0],'Ausdrücklich freigegebenes Angebot A muss erhalten bleiben.');
+check($mixedPrepared['entries'][1]['source_type']==='KVA'&&str_contains($mixedPrepared['entries'][1]['description'],'derzeit als Reserve'),'Freigabe A darf Angebot B nicht freigeben.');
+check(gfExcelValidateData('schlusserklaerung',$mixedPrepared,$mixedInstruction)['passed'],'Gemischter Freigabe-/Reservestand muss zulässig sein.');
+try{gfExcelValidateData('zahlungsbefuerwortung',['entries'=>[$mixed['entries'][1]]],$mixedInstruction);throw new LogicException('Angebot B ohne eigene Freigabe als Zahlung akzeptiert.');}
+catch(RuntimeException $error){check(str_contains($error->getMessage(),'ausdrücklicher Freigabe'),'Falsche Sperre bei fremder KVA-Freigabe.');}
+
+foreach(['gfExcelOutput','gfEngelValidate']as$function){
+    $a=strpos($core,'function '.$function.'(');$b=strpos($core,"\nfunction ",$a+1);eval(substr($core,$a,$b-$a));
+}
+$throughValidation=$input;
+check(gfEngelValidate('schlusserklaerung',$throughValidation,[],'KVA nicht freigeben.')['passed'],'Aktiver Validierungsweg muss die Reservekorrektur anwenden.');
+check($throughValidation===$input,'Die Validierung darf die Originaldaten nicht verändern.');
+
+foreach(['zahlungsbefuerwortung']as$type){
+    $bad=$type==='zahlungsbefuerwortung'?$prepared:$input;
+    try{gfExcelValidateData($type,$bad,'KVA nicht freigeben.');throw new LogicException('Unzulässige Position wurde akzeptiert.');}
+    catch(RuntimeException $error){check(str_contains($error->getMessage(),'Excel-QS-Sperre'),'Falscher Fehler bei unzulässiger Position.');}
+}
+check(str_contains(gfExcelResponseRule('schlusserklaerung'),'derzeit als Reserve'),'SE-Anweisung muss KVA als Reserve berücksichtigen.');
+check(str_contains(gfExcelResponseRule('zahlungsbefuerwortung'),'ausschließlich bei ausdrücklicher Freigabe'),'Zahlungsanweisung muss Freigabe weiterhin verlangen.');
+
+require_once __DIR__.'/../public/intern/api/gf-excel-ooxml.php';
+foreach(['gfExcelCell','gfExcelSet','gfExcelHeaders','gfExcelPages','gfExcelBuildOne','gfExcelValidateWorkbook']as$function){
+    $a=strpos($core,'function '.$function.'(');$b=strpos($core,"\nfunction ",$a+1);
+    eval(substr($core,$a,$b-$a));
+}
+$templatePath=tempnam(sys_get_temp_dir(),'kva-template-');
+$zip=new ZipArchive();$zip->open($templatePath,ZipArchive::OVERWRITE);
+$ns='http://schemas.openxmlformats.org/spreadsheetml/2006/main';
+foreach(['[Content_Types].xml'=>'<Types/>','xl/workbook.xml'=>'<workbook xmlns="'.$ns.'"><sheets/><extLst/></workbook>','xl/styles.xml'=>'<styleSheet/>','xl/vbaProject.bin'=>'original-macro-bytes','xl/worksheets/sheet1.xml'=>'<worksheet xmlns="'.$ns.'"><sheetData/></worksheet>']as$name=>$bytes)$zip->addFromString($name,$bytes);
+$zip->close();$template=file_get_contents($templatePath);unlink($templatePath);
+$mixedPages=gfExcelPages('schlusserklaerung',gfExcelEntries($mixedPrepared));
+$mixedWorkbook=gfExcelBuildOne($template,'schlusserklaerung',[],$mixedPages[0],$mixedPrepared);
+check(gfExcelValidateWorkbook($template,$mixedWorkbook,'schlusserklaerung',$mixedPages[0],$mixedInstruction)['passed'],'Auch die gespeicherte SE muss A als Freigabe und B als Reserve prüfen.');
+$mixedPath=tempnam(sys_get_temp_dir(),'kva-mixed-');file_put_contents($mixedPath,$mixedWorkbook);$zip=new ZipArchive();$zip->open($mixedPath);
+$zip->addFromString('xl/worksheets/sheet1.xml',str_replace('derzeit als Reserve','',$zip->getFromName('xl/worksheets/sheet1.xml')));$zip->close();$mixedDamaged=file_get_contents($mixedPath);unlink($mixedPath);
+try{gfExcelValidateWorkbook($template,$mixedDamaged,'schlusserklaerung',$mixedPages[0],$mixedInstruction);throw new LogicException('Freigabe A verdeckt fehlende Reservekennzeichnung B.');}
+catch(RuntimeException $error){check(str_contains($error->getMessage(),'Excel-QS-Sperre'),'Falsche gemischte Formular-QS-Sperre.');}
+$pages=gfExcelPages('schlusserklaerung',gfExcelEntries($prepared));
+check(count($pages)===1&&$pages[0]['total']===600.0,'KVA müssen genau einmal in die SE-Summe eingehen.');
+$workbook=gfExcelBuildOne($template,'schlusserklaerung',[],$pages[0],$prepared);
+check(gfExcelValidateWorkbook($template,$workbook,'schlusserklaerung',$pages[0],'KVA nicht freigeben.')['passed'],'Auch die fertige XLSM muss KVA als Reserve akzeptieren.');
+$path=tempnam(sys_get_temp_dir(),'kva-output-');file_put_contents($path,$workbook);$zip=new ZipArchive();$zip->open($path);
+$sheet=$zip->getFromName('xl/worksheets/sheet1.xml');
+check($zip->getFromName('xl/vbaProject.bin')==='original-macro-bytes','Originalmakros verändert.');
+$dom=new DOMDocument();$dom->loadXML($sheet);$xp=new DOMXPath($dom);$xp->registerNamespace('x',$ns);
+foreach(['N19'=>100,'N20'=>200,'N21'=>300,'N38'=>600,'N40'=>50,'N42'=>540]as$ref=>$amount)check((float)$xp->evaluate('string(//x:c[@r="'.$ref.'"]/x:v)')===(float)$amount,'Falscher Betrag in '.$ref);
+check(substr_count($sheet,'derzeit als Reserve')===2,'Beide Reservepositionen müssen im Formular erkennbar sein.');
+// A missing marker in the actual saved sheet must still fail the second QS.
+$zip->addFromString('xl/worksheets/sheet1.xml',str_replace('derzeit als Reserve','',$sheet));$zip->close();$damaged=file_get_contents($path);unlink($path);
+try{gfExcelValidateWorkbook($template,$damaged,'schlusserklaerung',$pages[0],'KVA nicht freigeben.');throw new LogicException('Fehlende Reservekennzeichnung im Formular akzeptiert.');}
+catch(RuntimeException $error){check(str_contains($error->getMessage(),'Reservekennzeichnung'),'Falsche Formular-QS-Sperre.');}
 
 $cache=[]; $calls=0; $missing=false;
 function gfSettingGet(string $key, string $default=''): string { return $GLOBALS['cache'][$key] ?? $default; }
