@@ -728,12 +728,14 @@
         "verified_at": "2026-10-20T04:26:41.252Z"
       },
       "linkedin": {
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-linkedin-20261020-01a157ac-resumed",
         "reserved_at": "2026-10-20T06:36:08.705Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/"
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/",
+        "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7518198728848064512/",
+        "verified_at": "2026-10-20T06:39:11.022Z"
       }
     }
   },
-  "updated_at": "2026-10-20T06:36:08.705Z"
+  "updated_at": "2026-10-20T06:39:11.022Z"
 }
