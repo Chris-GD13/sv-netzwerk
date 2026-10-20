@@ -99,6 +99,7 @@ jobs:
           php tests/private_orders_inquiries_test.php
           php tests/private_orders_archive_index_test.php
           php tests/private_business_test.php
+          php tests/partner_contract_test.php
           php tests/private_business_pdf_test.php
           php tests/private_business_recipients_test.php
           php tests/private_business_pdf_cache_test.php
