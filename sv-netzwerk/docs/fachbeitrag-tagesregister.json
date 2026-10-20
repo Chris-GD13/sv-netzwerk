@@ -728,23 +728,12 @@
         "verified_at": "2026-10-20T04:26:41.252Z"
       },
       "linkedin": {
-        "status": "not-posted",
-        "blocker": {
-          "code": "chrome-christian-not-connected",
-          "observed_at": "2026-10-20T05:02:24.029Z",
-          "observed_at_berlin": "2026-10-20 07:02:24",
-          "note": "Browserinventur wiederholt geprüft: nur Edge Profil 1, In-App-Browser und MCP Apps; Chrome Christian fehlt. Profil-/Duplikatprüfung und tatsächliche Veröffentlichung nicht ausführbar. Kein Sendeversuch und keine Reservierung.",
-          "required_action": "Chrome mit Profil Christian über die bestehende Browseranbindung verbinden; anschließend Master/Neuerungen neu lesen, Profil/Register/CSV erneut prüfen, erst danach atomar reservieren und genau einmal veröffentlichen.",
-          "proof_document": "docs/linkedin-veroeffentlichung-2026-10-20.md",
-          "website_live_commit": "7290f607eaeb083fc66308d7c3cc98f3b483e351",
-          "website_live_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39370239945",
-          "additional_image_budget_usd": 0,
-          "additional_image_spend_usd": 0,
-          "image_model_or_api_called": false,
-          "image_path": "no-image-action-publication-blocked"
-        }
+        "status": "reserved",
+        "owner": "codex-linkedin-20261020-01a157ac-resumed",
+        "reserved_at": "2026-10-20T06:36:08.705Z",
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/"
       }
     }
   },
-  "updated_at": "2026-10-20T04:26:41.252Z"
+  "updated_at": "2026-10-20T06:36:08.705Z"
 }
