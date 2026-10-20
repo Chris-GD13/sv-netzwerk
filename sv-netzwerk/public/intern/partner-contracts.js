@@ -31,7 +31,7 @@
     if(!form.reportValidity())return;
     busy=true;buttons();
     const payload=data();for(const field of form.elements)field.disabled=true;
-    try{const result=await api('save',{id,revision,data:payload});load(result.record);await list();if(preview){el('pc-preview-section').hidden=false;el('pc-preview-frame').src='/intern/api/partner-contracts.php?action=preview&id='+encodeURIComponent(id);el('pc-preview-section').scrollIntoView({behavior:'smooth'});}}
+    try{const result=await api('save',{id,revision,data:payload});load(result.record);await list();if(preview){const response=await fetch('/intern/api/partner-contracts.php?action=preview&id='+encodeURIComponent(id),{credentials:'same-origin',cache:'no-store'});if(!response.ok)throw new Error('Gespeichert; Vorschau konnte nicht geladen werden.');el('pc-preview-frame').srcdoc=await response.text();el('pc-preview-section').hidden=false;el('pc-preview-section').scrollIntoView({behavior:'smooth'});}}
     catch(error){state(error.message+' Ihre Eingaben bleiben erhalten.');}
     finally{for(const field of form.elements)field.disabled=false;busy=false;buttons();}
   }
