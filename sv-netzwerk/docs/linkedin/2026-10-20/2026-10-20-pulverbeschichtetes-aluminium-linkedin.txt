@@ -1,22 +1,16 @@
-Fleckige Aluminiumprofile? Vor der Nachbesserung steht die Ursachenprüfung.
+Wenn eine pulverbeschichtete Fassade fleckig wirkt oder einzelne Aluminiumprofile stärker glänzen als andere, muss vor der Nachbesserung geklärt werden, was sich an der Oberfläche verändert hat.
 
-Ein Farb- oder Glanzunterschied ist noch keine Diagnose. Bei pulverbeschichteten Fenstern, Türen und Fassaden können Verschmutzung, Reinigungseinflüsse und Veränderungen der Beschichtung unterschiedlich zu bewerten sein.
+Für die Beurteilung brauche ich zunächst eine verlässliche Vergleichsgrundlage. Dazu gehören die vereinbarten Muster und die Unterlagen zum Beschichtungssystem. Auch Licht, Blickrichtung und Betrachtungsabstand müssen festgehalten werden. Ein Foto allein reicht als Farbvergleich häufig nicht aus.
 
-Für die Untersuchung sind fünf Prüfpunkte hilfreich:
+Farbton, Glanz und Struktur sind getrennt zu betrachten. Eine Ablösung oder eine korrosionsverdächtige Stelle erfordert eine andere Untersuchung als eine Verschmutzung. Aus dem Aussehen allein lässt sich die Ursache noch nicht ableiten.
 
-• Vergleichsgrundlage klären: vereinbarte Muster und Produktunterlagen zuordnen. Licht, Blickrichtung und Betrachtungsabstand dokumentieren.
+Vor einer flächigen Reinigung sollte eine geeignete Musterfläche abgestimmt und der Zustand davor und danach dokumentiert werden. Gerade bei matten und strukturierten Beschichtungen kommt es auf die passende Methode an. Ungeeignete Mittel können den Glanz verändern oder Scheuerspuren hinterlassen.
 
-• Befunde trennen: Farbton, Glanz und Struktur einzeln erfassen. Ablösungen oder korrosionsverdächtige Stellen gesondert untersuchen, statt sie allein nach ihrem Aussehen einer Ursache zuzuordnen.
+Auch bei Messungen muss klar sein, welche Frage beantwortet werden soll. Schichtdicke, Farbe und Glanz sind unterschiedliche Prüfgrößen. Messstellen, Verfahren und Referenzen gehören deshalb zum Befund. Ein Gitterschnitt greift in die Beschichtung ein; Prüfstelle, Freigabe und anschließende Reparatur müssen vorab geklärt sein.
 
-• Reinigung prüfen: Bei matten und strukturierten Oberflächen zunächst eine geeignete, repräsentative Musterfläche abstimmen und den Zustand vor und nach der Arbeitsprobe festhalten. Ein Reinigungsmittel oder Hilfsmittel passt nicht zu jeder Oberfläche.
+Ob gereinigt, örtlich ausgebessert oder weiter untersucht werden muss, ergibt sich aus dem Befund und dem jeweiligen Beschichtungssystem. Prüfvorgaben aus der Produktion lassen sich nicht pauschal auf eingebaute Bauteile übertragen. Wo eine Laboruntersuchung erforderlich ist, gehört sie in die Hände einer geeigneten Fachstelle.
 
-• Messungen zuordnen: Schichtdicke, Farbe und Glanz sind unterschiedliche Prüfgrößen. Messstellen, Verfahren und Referenzen müssen zur jeweiligen Fragestellung passen.
-
-• Eingriffe abstimmen: Ein Gitterschnitt verletzt die Beschichtung. Vor einer solchen Prüfung am eingebauten Bauteil müssen Prüfstelle, Freigabe und Reparaturfolge geklärt sein.
-
-Prüfungen aus der Produktionskontrolle lassen sich nicht pauschal als Abnahmekriterium für jeden Bestand übernehmen. Vertrag, Beschichtungssystem und Objektzustand bleiben maßgeblich; erforderliche Laborprüfungen gehören zu geeigneten Fachstellen.
-
-Oberflächenschäden sowie Material- und Beschichtungsbewertung an Aluminium gehören zu Claudius Freibergs Schwerpunkten im SV-Netzwerk. Der heutige Fachartikel erläutert die Prüfwege und ihre Grenzen:
+Im heutigen Fachartikel auf unserer SV-Netzwerk-Seite erläutere ich diese Zusammenhänge und die Grenzen der einzelnen Prüfungen:
 https://www.sv-netzwerk.eu/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/
 
 Christian Wächter

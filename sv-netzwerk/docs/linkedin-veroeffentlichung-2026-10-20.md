@@ -43,3 +43,15 @@ verify-linkedin db90c30f2ccd827d4a74f7882d15136defc789f1 nach Liveprüfung. Regi
 Der frühe Lauf um07:03 war wegen fehlender Chrome-Verbindung beendet worden. Dieser damalige Befund ist historisch; nach Nutzerfreigabe war Chrome verfügbar und der Blocker wurde durch die oben belegte tatsächliche Veröffentlichung erledigt. Historischer Nachweis in docs/linkedin/2026-10-20/2026-10-20-browser-blocker.json; keine erneute Veröffentlichung daraus ableiten.
 
 Diesen Aluminiumbeitrag niemals erneut senden.
+
+## Korrektur am bestehenden Beitrag – 20.10.2026
+
+Die ausdrückliche Nutzerkorrektur beanstandet die sichtbare Aufzählung trotz der bereits am 18.10.2026 festgelegten Fließtextregel. Der bestehende Beitrag wurde über „Beitrag bearbeiten“ geändert und um 2026-10-20T08:55:17.911000+02:00 gespeichert. Es erfolgten weder Löschung noch erneute Veröffentlichung. Permalink und ursprüngliche Veröffentlichungszeit bleiben erhalten: https://www.linkedin.com/feed/update/urn:li:activity:7518198728848064512/
+
+Nach erneutem Laden wurden persönlicher Absender Christian Wächter, der vollständige überarbeitete Text, kurze zusammenhängende Absätze, fehlende Aufzählungszeichen/Einrückungen, Rollenbezeichnung, Hashtags und die unveränderte Artikelvorschau sichtbar geprüft. Neu verifiziert: 2026-10-20T08:57:21.995000+02:00. Die Profilzuweisung wurde aus dem öffentlichen Begleittext entfernt; die fachliche Expertenzuordnung des Artikels bleibt unverändert im Register dokumentiert. Screenshots: docs/linkedin/2026-10-20/2026-10-20-linkedin-korrigiert-live.jpg und 2026-10-20-linkedin-korrigiert-link.jpg.
+
+Der überarbeitete Text wurde gegen die in diesem Chat erneut geöffneten GSB AL 631-1/7 Januar 2026 und GRM Merkblatt 07 Dezember 2021 geprüft; Abrufdatum 20.10.2026. Keine neuen Normgrenzwerte, Fallbehauptungen oder Messwerte ergänzt. Änderung betrifft die sprachliche Darstellung, nicht den Tagesartikel.
+
+Die führende bestehende Cloud-Masterdatei mit derselben Drive-ID wurde nach vollständig erneuter Lektüre von Fassung 4.22 auf 4.23 fortgeschrieben: neue Sachregel 2.4 und sichtbarer NEUERUNG-Block in Abschnitt 29. Cloud-Rücklese bestätigt. Beide bestehenden täglichen Automationen wurden per automation_update um exakt dieselbe Stilregel am Promptanfang ergänzt. Rücklese der gespeicherten TOML-Dateien bestätigt den vollständigen bisherigen Prompt als unveränderten Rest und alle übrigen Einstellungen unverändert, einschließlich Zeiten, Modelle, Status und Projektzuordnung. Redaktionelle Repositoryvorgaben und Content-AGENTS verankern dieselbe Regel.
+
+Veröffentlichung weiterhin ohne Bild, zusätzliche Bildkosten unverändert 0 USD. Kein Bildmodell/API-Aufruf. Nur Text-, Regel- und Nachweisdokumentation mit [skip ci]; kein Website-Deployment erforderlich. Historische Screenshots und ursprüngliche Verifikation bleiben als Verlauf erhalten.

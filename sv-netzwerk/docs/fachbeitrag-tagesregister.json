@@ -778,9 +778,30 @@
           "master_version": "4.21",
           "date": "2026-10-20",
           "full_master_and_changes_reread": true
-        }
+        },
+        "edit_history": [
+          {
+            "reason": "Ausdrückliche Nutzerkorrektur: natürlicher Fließtext ohne Aufzählungen, Einrückungen oder schematische KI-Sprache",
+            "operation": "edit-existing-post",
+            "saved_click_window_berlin": [
+              "2026-10-20T08:55:17.911000+02:00",
+              "2026-10-20T08:55:18.184000+02:00"
+            ],
+            "verified_at_berlin": "2026-10-20T08:57:21.995000+02:00",
+            "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7518198728848064512/",
+            "deleted": false,
+            "reposted": false,
+            "text_file": "docs/linkedin/2026-10-20/2026-10-20-pulverbeschichtetes-aluminium-linkedin.txt",
+            "screenshots": [
+              "docs/linkedin/2026-10-20/2026-10-20-linkedin-korrigiert-live.jpg",
+              "docs/linkedin/2026-10-20/2026-10-20-linkedin-korrigiert-link.jpg"
+            ],
+            "additional_image_spend_usd": 0,
+            "master_version": "4.23"
+          }
+        ]
       }
     }
   },
-  "updated_at": "2026-10-20T06:39:11.022Z"
+  "updated_at": "2026-10-20T06:57:21.995Z"
 }
