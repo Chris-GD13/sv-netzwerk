@@ -720,14 +720,17 @@
         "title": "Pulverbeschichtete Aluminiumbauteile prüfen: Farbton, Glanz, Haftung und Korrosion trennen",
         "slug": "pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen",
         "url": "https://www.sv-netzwerk.eu/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-local-website-2026-10-20T0605+02",
-        "reserved_at": "2026-10-20T04:05:50.757Z"
+        "reserved_at": "2026-10-20T04:05:50.757Z",
+        "commit": "1a03feff30eb7a2a1a2279876ec5bc3215144e17",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39368941804",
+        "verified_at": "2026-10-20T04:26:41.252Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-20T04:05:50.757Z"
+  "updated_at": "2026-10-20T04:26:41.252Z"
 }
