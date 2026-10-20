@@ -1,0 +1,32 @@
+---
+import InternalLayout from '../../../layouts/InternalLayout.astro';
+const groups: {title:string; fields:[string,string,('textarea'|'email'|'date'|'text')?][]}[] = [
+ {title:'Netzwerkbetreiber',fields:[['operator_name','Vollständige Firma'],['operator_address','Geschäftsanschrift','textarea'],['operator_representative','Inhaber / vertretungsberechtigte Person'],['operator_register','Registereintrag'],['operator_email','Kontakt-E-Mail','email']]},
+ {title:'Partner',fields:[['partner_name','Partner / vollständige Firma'],['partner_address','Partneranschrift','textarea'],['partner_representative','Inhaber / vertretungsberechtigte Person'],['partner_register','Registereintrag (falls vorhanden)'],['partner_email','Partner-E-Mail','email'],['partner_phone','Telefon']]},
+ {title:'Fachlicher Einsatz',fields:[['fields','Fachgebiete','textarea'],['region','Einsatzgebiet'],['qualifications','Qualifikationen / Zulassungen / Versicherungsschutz','textarea']]},
+ {title:'Provisionsvereinbarung',fields:[['commission','Vorgeschlagener Provisionssatz (%)'],['place','Vertragsort'],['date','Vertragsdatum','date']]},
+];
+---
+<InternalLayout title="Partner" description="Partnervereinbarungen im SV-Netzwerk ausfüllen, speichern und als PDF herunterladen.">
+  <link rel="stylesheet" href="/intern/partner-contract.css" />
+  <div class="partner-app">
+    <header class="partner-head"><div><p>SV-Netzwerk</p><h1>Partner</h1><p>Kooperation vereinbaren. Fachlich unabhängig zusammenarbeiten.</p></div><button type="button" id="pc-new">Neue Vereinbarung</button></header>
+    <p class="partner-notice">Die Aufnahme ist kostenfrei. Provisionen werden vor jedem konkreten Auftrag ausdrücklich vereinbart. Vertragspartner ist derzeit das Sachverständigenbüro Marc Schütt e.K.; eine spätere UG übernimmt Verträge nur nach gesonderter Zustimmung.</p>
+    <div class="partner-grid">
+      <aside class="partner-card"><h2>Gespeicherte Entwürfe</h2><p>Nur Ihre eigenen Vereinbarungen werden angezeigt.</p><button type="button" id="pc-show-archive">Archiv anzeigen</button><div id="pc-list" aria-live="polite">Wird geladen …</div><a href="/intern/api/partner-contracts.php?action=template" id="pc-template">Leere Vertragsvorlage als PDF</a><p id="pc-archive-result" role="status"></p><button type="button" id="pc-undo" hidden>Archivierung rückgängig machen</button></aside>
+      <section class="partner-card"><h2 id="pc-title">Neue Partnervereinbarung</h2>
+        <p id="pc-state" role="status">Vorlage wird geladen …</p>
+        <form id="pc-form">
+          {groups.map(group=><fieldset><legend>{group.title}</legend><div class="partner-fields">{group.fields.map(([name,label,type])=><label>{label}{type==='textarea'?<textarea name={name} rows={name==='qualifications'?4:2}></textarea>:<input name={name} type={type??'text'} inputmode={name==='commission'?'decimal':undefined} maxlength={name==='commission'?5:1500} />}</label>)}</div></fieldset>)}
+          <p>Berechnungsgrundlage: tatsächlich eingegangenes Nettohonorar der eigenen Fachleistung, ohne Umsatzsteuer, gesonderte Reisekosten, Auslagen und durchlaufende Fremdkosten. Der Satz wird vor jedem Einzelauftrag ausdrücklich bestätigt.</p>
+          <label class="partner-profile">Expertenprofil<select name="profile_permission"><option value="no">Derzeit keine Veröffentlichung gewünscht</option><option value="yes">Profilentwurf zur gesonderten Freigabe gewünscht</option></select></label>
+          <p>Die konkrete Profil- und Bildfreigabe erfolgt getrennt in Anlage 2. Das Formular erteilt keine automatische Veröffentlichungserlaubnis.</p>
+          <div class="partner-actions"><button id="pc-save" type="submit">Entwurf speichern</button><button id="pc-preview" type="button">Speichern und Vorschau</button><a id="pc-pdf" href="#" hidden>PDF herunterladen</a><button id="pc-archive" type="button" hidden>Entwurf archivieren</button></div>
+        </form>
+        <p class="partner-legal">Speichern und PDF-Erstellung schließen keinen Vertrag und lösen keine Provision aus. Die Annahme durch beide Parteien ist gesondert einzuholen. Die Vorlage wurde anhand Ihrer Vorgaben erstellt; eine anwaltliche Einzelfallprüfung ist damit nicht ersetzt.</p>
+      </section>
+    </div>
+    <section class="partner-card" id="pc-preview-section" hidden><h2>Vertragsvorschau</h2><p>Vollständiger Rahmenvertrag mit Einzelauftragsbestätigung und gesonderter Profilfreigabe.</p><iframe id="pc-preview-frame" title="Vorschau Partnervereinbarung"></iframe></section>
+  </div>
+  <script is:inline src="/intern/partner-contracts.js?v=20261020-1" defer></script>
+</InternalLayout>
