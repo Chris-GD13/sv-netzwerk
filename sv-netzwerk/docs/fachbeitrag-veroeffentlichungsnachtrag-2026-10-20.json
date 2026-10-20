@@ -3,7 +3,9 @@
   "kind": "publication-corrections-addendum-not-new-publication",
   "central_daily_row": "Tagesartikel ist bereits im fachbeitrag-veroeffentlichungsprotokoll.csv auf main eingetragen. Historische CSV wird in diesem Korrektur-PR nicht vollständig überschrieben.",
   "publication_day_guard": "Fremde Reservierung vom 20.10.2026 beachtet; kein zweiter Tagesartikel, keine Reservierungsänderung.",
-  "status": "build-passed-awaiting-pr-merge-and-live-verification",
+  "status": "published-verified",
+  "deployment_commit": "7290f607eaeb083fc66308d7c3cc98f3b483e351",
+  "live_proof": "fachbeitrag-livepruefung-2026-10-20-bestandsredaktion.json",
   "entries": [
     {
       "path": "sv-netzwerk/src/content/knowledge/aufmass-fotodokumentation-polycam-pruefffaehig.md",
