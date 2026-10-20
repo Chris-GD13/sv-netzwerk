@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace SvNetSettlement;
 use DateTimeImmutable;
 use RuntimeException;
+require_once __DIR__.'/svnet-branding.php';
 
 function cp(string $text): string { $value = @iconv('UTF-8', 'Windows-1252//TRANSLIT', $text); return $value === false ? (preg_replace('/[^\x20-\x7E]/', '?', $text) ?? '') : $value; }
 function esc(string $text): string { return str_replace(['\\','(',')',"\r"], ['\\\\','\\(','\\)',''], cp($text)); }
@@ -18,7 +19,7 @@ function textLine(array &$ops,float $x,float $y,string $text,float $size=9,bool 
 function rightText(array &$ops,float $right,float $y,string $text,float $size=9,bool $bold=false,array $color=[0,0,0]):void{$width=strlen(cp($text))*$size*0.49;textLine($ops,max(40,$right-$width),$y,$text,$size,$bold,$color);}
 function fillRect(array &$ops,float $x,float $y,float $width,float $height,array $color):void{$ops[]=sprintf('%.3F %.3F %.3F rg %.2F %.2F %.2F %.2F re f',$color[0],$color[1],$color[2],$x,$y,$width,$height);}
 function strokeLine(array &$ops,float $x1,float $y1,float $x2,float $y2,array $color,float $width=.5):void{$ops[]=sprintf('%.2F w %.3F %.3F %.3F RG %.2F %.2F m %.2F %.2F l S',$width,$color[0],$color[1],$color[2],$x1,$y1,$x2,$y2);}
-function drawLogo(array &$ops):void{global $navy,$orange,$muted;textLine($ops,45,793,'SV',26,true,$orange);textLine($ops,88,799,'sv-netzwerk.eu',15,true,$navy);textLine($ops,89,787,'BAU - SCHADEN - REGULIERUNG',6.5,true,$muted);}
+function drawLogo(array &$ops):void{$ops[]=\svnetBrandPdfLogo();}
 function drawPageHeader(array &$ops,bool $continuation=false):float{global $navy,$orange,$muted,$lineColor,$documentTopLabel;drawLogo($ops);rightText($ops,550,799,$documentTopLabel,8,true,$navy);if($continuation)rightText($ops,550,787,'Fortsetzung',7,false,$muted);strokeLine($ops,45,775,550,775,$lineColor,.7);fillRect($ops,45,771,72,3,$orange);return 752;}
 function drawTableHeader(array &$ops,float &$y):void{global $navy,$panel,$tableLastHeader;fillRect($ops,45,$y-20,505,20,$panel);textLine($ops,50,$y-13,'Pos.',7.5,true,$navy);textLine($ops,78,$y-13,'Leistung',7.5,true,$navy);textLine($ops,318,$y-13,'Grundlage',7.5,true,$navy);rightText($ops,462,$y-13,'Betrag brutto',7.5,true,$navy);textLine($ops,472,$y-13,$tableLastHeader,7.5,true,$navy);$y-=23;}
 function startPage(array &$pages,array &$ops,float &$y,bool $table=false):void{if($ops)$pages[]=$ops;$ops=[];$y=drawPageHeader($ops,count($pages)>0);if($table)drawTableHeader($ops,$y);}
@@ -102,7 +103,7 @@ if($isKvaReview){needSpace($pages,$ops,$y,70,false);$y-=24;textLine($ops,45,$y,'
 $pageCount=count($pages);foreach($pages as$index=>&$pageOps){strokeLine($pageOps,45,45,550,45,$lineColor,.5);textLine($pageOps,45,31,'SV-Netzwerk Pruefportal',6.5,false,$muted);rightText($pageOps,550,31,'Seite '.($index+1).' von '.$pageCount,6.5,false,$muted);}unset($pageOps);
 $objects=[1=>'<< /Type /Catalog /Pages 2 0 R >>'];$pageObjectStart=5;$contentObjectStart=$pageObjectStart+$pageCount;$kids=[];for($index=0;$index<$pageCount;$index++)$kids[]=($pageObjectStart+$index).' 0 R';$objects[2]='<< /Type /Pages /Kids ['.implode(' ',$kids).'] /Count '.$pageCount.' >>';$objects[3]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';$objects[4]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
 foreach($pages as$index=>$pageOps){$objects[$pageObjectStart+$index]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents '.($contentObjectStart+$index).' 0 R >>';$stream=implode("\n",$pageOps);$objects[$contentObjectStart+$index]="<< /Length ".strlen($stream).">>\nstream\n$stream\nendstream";}
-ksort($objects);$pdf="%PDF-1.4\n%\xE2\xE3\xCF\xD3\n";$offsets=[0];foreach($objects as$number=>$object){$offsets[$number]=strlen($pdf);$pdf.="$number 0 obj\n$object\nendobj\n";}$xref=strlen($pdf);$max=max(array_keys($objects));$pdf.="xref\n0 ".($max+1)."\n0000000000 65535 f \n";for($index=1;$index<=$max;$index++)$pdf.=sprintf('%010d 00000 n ',$offsets[$index]??0)."\n";$pdf.="trailer\n<< /Size ".($max+1)." /Root 1 0 R >>\nstartxref\n$xref\n%%EOF";
+\svnetBrandPdfObjects($objects);ksort($objects);$pdf="%PDF-1.4\n%\xE2\xE3\xCF\xD3\n";$offsets=[0];foreach($objects as$number=>$object){$offsets[$number]=strlen($pdf);$pdf.="$number 0 obj\n$object\nendobj\n";}$xref=strlen($pdf);$max=max(array_keys($objects));$pdf.="xref\n0 ".($max+1)."\n0000000000 65535 f \n";for($index=1;$index<=$max;$index++)$pdf.=sprintf('%010d 00000 n ',$offsets[$index]??0)."\n";$pdf.="trailer\n<< /Size ".($max+1)." /Root 1 0 R >>\nstartxref\n$xref\n%%EOF";
 
 $filename=preg_replace('/[^A-Za-z0-9._-]+/','-',$caseNo!==''?$caseNo:'Schaden').($isKvaReview?'_KVA-Pruefung_':'_Abgeltungsvereinbarung_').$date.'.pdf';
 return ['bytes'=>$pdf,'filename'=>$filename,'payout'=>$payout,'gross'=>$totalGross];

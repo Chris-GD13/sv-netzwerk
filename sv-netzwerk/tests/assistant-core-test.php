@@ -8,6 +8,8 @@ function rejects(callable $fn,string $code):void {try{$fn();}catch(RuntimeExcept
 $path=tempnam(sys_get_temp_dir(),'sv-assistant-');$db=assistantTestDb($path);$cases=assistantTestCases();$release=assistantTestRelease();$time=1792230000;
 $a=new CaseWorkAssistant($db,assistantTestLoader($cases),$release,'test-session',function()use(&$time){return $time;});$a->schema();$u=assistantTestUser();$tab='test-tab-00000000001';
 $c=$a->open($u,$tab,'fixture-a','TEST-A-001');check($c['profile']==='christian','server profile');check(count($c['rules'])===2,'unreviewed excluded');
+check($c['insurer']==='DEMO-SV'&&$c['line']==='building','workspace insurer and line from authorized server source');
+check($c['document_count']===4,'workspace document count from current authorized case');
 rejects(fn()=>$a->open($u,$tab,'fixture-a','TEST-B-002'),'CLAIM_NUMBER_MISMATCH');
 rejects(fn()=>$a->open(assistantTestUser(2),$tab,'fixture-a','TEST-A-001'),'CASE_FORBIDDEN');
 rejects(fn()=>$a->open($u,$tab,'fixture-c','TEST-C-003'),'CASE_FORBIDDEN');

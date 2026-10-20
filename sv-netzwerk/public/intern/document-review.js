@@ -3,10 +3,8 @@
   const API = '/intern/api/document-review.php';
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const active = () => {
-    for (const store of [sessionStorage, localStorage]) {
-      try { const row = JSON.parse(store.getItem('svnet-case') || 'null'); if (row?.folder_id) return row; } catch {}
-    }
-    return null;
+    const row = window.svnetOpenedClaimsCase;
+    return row?._loaded === true && row.folder_id ? row : null;
   };
   const request = async (action, folder, data) => {
     const response = await fetch(`${API}?action=${action}${data ? '' : `&folder_id=${encodeURIComponent(folder)}`}`, {
@@ -36,7 +34,7 @@
       <div class="dr-content">
         <p id="${prefix}sender" class="vf-meta" style="white-space:pre-line"></p>
         <label class="dr-choice"><input id="${prefix}standalone" type="checkbox"> Ohne angelegten Schadenfall prüfen</label>
-        <div id="${prefix}workspace-controls" hidden>${field('case_no','Schadennummer der Versicherung (für Mail erforderlich)')}<button id="${prefix}new-workspace" type="button" class="vf-secondary">Neue freie Prüfung</button><p class="vf-meta">Belege und Ergebnis werden in deinem persönlichen Prüfvorgang gespeichert. Es wird kein Schadenfall angelegt.</p></div>
+        <div id="${prefix}workspace-controls" hidden>${field('case_no','Schadennummer, falls bereits bekannt (optional)')}<button id="${prefix}new-workspace" type="button" class="vf-secondary">Neue freie Prüfung</button><p class="vf-meta">Belege und Ergebnis werden in deinem persönlichen Prüfvorgang gespeichert. Es wird kein Schadenfall angelegt.</p></div>
         <label>Hauptbeleg: ${noun} / Sammelangebot<select id="${prefix}file"><option value="">Belege hochladen oder aus dem Fall wählen</option></select></label>
         <div class="dr-actions"><button class="vf-secondary" type="button" id="${prefix}reload">Belege aktualisieren</button><label class="vf-secondary dr-upload">Mehrere Belege hochladen<input type="file" id="${prefix}upload" multiple accept=".pdf,.docx,.jpg,.jpeg,.png,.webp" hidden></label><a id="${prefix}original" class="vf-secondary" target="_blank" rel="noopener" hidden>Original öffnen</a></div>
         <fieldset><legend>Ergänzende Belege gemeinsam prüfen</legend><div id="${prefix}supports" class="dr-supports"></div><p class="vf-meta">z. B. Messprotokoll, Energieverbrauch, Fotos oder bisherige Freigaben. Hauptbeleg oben auswählen.</p></fieldset>
@@ -46,7 +44,7 @@
         <label id="${prefix}reference-label">Vergleichsangebot / bisheriger Beleg (optional)<select id="${prefix}reference"><option value="">Kein Vergleichsbeleg ausgewählt</option></select></label>
         <button id="${prefix}prepare" class="vf-primary" type="button">${noun} prüfen</button>
         <p id="${prefix}state" class="vf-meta" role="status"></p>
-        <div id="${prefix}history" class="dr-history" hidden></div>
+        <div id="${prefix}history" class="dr-history" hidden></div><div id="${prefix}adoption" class="dr-adoption" hidden><strong>Freie Prüfung einem Schaden zuordnen</strong><p>Originalbelege und gespeicherte Prüfung werden übernommen. Die Entscheidung muss im Zielschaden erneut bestätigt werden.</p><label>Gespeicherte Prüfung<select id="${prefix}adoption-record"></select></label><p id="${prefix}adoption-target"></p><button id="${prefix}adopt" type="button" class="vf-secondary">In geöffneten Schaden übernehmen</button><p id="${prefix}adoption-state" role="status"></p></div>
         <div id="${prefix}edit" hidden>
           <div id="${prefix}checks" class="dr-checks"></div>
           <div class="dr-fields">${field('company',kind==='invoice'?'Rechnungssteller':'Angebotssteller')}${field('number',`${noun}snummer`)}${field('date','Belegdatum')}${field('net','Netto EUR')}${field('vat','Umsatzsteuer EUR')}${field('gross','Original-Bruttobetrag EUR')}</div>
@@ -74,7 +72,7 @@
       </div>`;
     wrap.append(panel);
     const el = name => document.getElementById(prefix+name);
-    const state = {folder:'', workspace:sessionStorage.getItem('svnet-review-'+kind)||'', files:[], support:new Set(), token:'', recordId:'', busy:false, sender:'', source:''};
+    const state = {folder:'', workspace:sessionStorage.getItem('svnet-review-'+kind)||'', files:[], support:new Set(), token:'', recordId:'', busy:false, sender:'', source:'', adoptionRecords:[]};
     const reasonPresets=kind==='invoice'?['Ich habe die Rechnung geprüft. Der Rechnungsbetrag ist der Höhe nach in Ordnung.','Die Rechnung wurde bereits geprüft. Ich übernehme den festgestellten Rechnungsbetrag.','Es handelt sich um eine Abschlagsrechnung. Die Freigabe bezieht sich auf die dem festgestellten Baufortschritt entsprechenden Leistungen.']:['Ich habe das Angebot geprüft. Der angebotene Betrag ist der Höhe nach in Ordnung.','Das Angebot wurde bereits geprüft. Ich übernehme den festgestellten Angebotsbetrag.','Die Freigabe bezieht sich auf die dem festgestellten Baufortschritt entsprechenden angebotenen Leistungen.'];
     panel.querySelectorAll('[data-reason-preset]').forEach(button=>button.onclick=()=>{const text=reasonPresets[Number(button.dataset.reasonPreset)],current=el('reason').value.trim();if(!current.includes(text))el('reason').value=current?current+'\n'+text:text;el('reason').dispatchEvent(new Event('input',{bubbles:true}));el('reason').focus();});
     const context = () => el('standalone').checked ? state.workspace : (active()?.folder_id||'');
@@ -131,8 +129,9 @@
       state.files=data.files; state.sender=data.sender;
       el('sender').textContent=`Absender: ${data.sender}\n${data.signature || data.sender_name || ''}`;
       const history=(data.reviews||[]).filter(r=>r.kind===kind);
+      if(el('standalone').checked){state.adoptionRecords=history;renderAdoption();}
       el('history').hidden=!history.length;
-      el('history').innerHTML='<strong>Gespeicherte Entscheidungen</strong>'+history.map(r=>`<p><a target="_blank" rel="noopener" href="${sourceLink(r.id)}">${esc(r.company)} · ${esc(r.number)}</a><br>${r.decision==='approved'?'freigegeben':'nicht freigegeben'}${r.decision==='approved'?` · ${Number(r.release_amount).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} EUR brutto`:''} · ${r.mode==='direct'?'ohne erneute Prüfung':'fachlich bestätigt'} · ${r.send_status==='sent'?'Mail versendet':r.send_status==='unsent'?'noch nicht versendet':'Versandstatus klären'}${r.send_status==='unsent'?` <button type="button" data-reopen-review="${esc(r.id)}">Entwurf öffnen</button>`:''}</p>`).join('');
+      el('history').innerHTML='<strong>Gespeicherte Entscheidungen</strong>'+history.map(r=>`<p><a target="_blank" rel="noopener" href="${sourceLink(r.id)}">${esc(r.company)} · ${esc(r.number)}</a><br>${r.adoption_requires_review?'Übernommen · im Zielschaden erneut bestätigen':r.decision==='approved'?'freigegeben':'nicht freigegeben'}${r.decision==='approved'?` · ${Number(r.release_amount).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} EUR brutto`:''} · ${r.mode==='direct'?'ohne erneute Prüfung':'fachlich bestätigt'} · ${r.send_status==='sent'?'Mail versendet':r.send_status==='unsent'?'noch nicht versendet':'Versandstatus klären'}${r.send_status==='unsent'?` <button type="button" data-reopen-review="${esc(r.id)}">Entwurf öffnen</button>`:''}</p>`).join('');
       // All eligible originals remain selectable, including generically named imported scans.
       const ranked=[...data.files].sort((a,b)=>Number(new RegExp(kind==='invoice'?'rechnung|invoice|abschlag|schlussrechnung':'angebot|kva|kostenvoranschlag','i').test(b.name))-Number(new RegExp(kind==='invoice'?'rechnung|invoice|abschlag|schlussrechnung':'angebot|kva|kostenvoranschlag','i').test(a.name)));
       el('file').innerHTML='<option value="">Originalbeleg auswählen</option>'+ranked.map(f=>`<option value="${esc(f.id)}">${esc(f.name)}</option>`).join('');
@@ -147,6 +146,29 @@
       if (!panel.querySelector('[data-address="vn"]').value) panel.querySelector('[data-address="vn"]').value=meta.vn_email||meta.email||document.getElementById('vf-email')?.value||'';
       original();
     }
+    function renderAdoption(){
+      const target=active();el('adoption').hidden=!state.workspace||!state.adoptionRecords.length;
+      const old=el('adoption-record').value;
+      el('adoption-record').innerHTML=state.adoptionRecords.map(r=>`<option value="${esc(r.id)}">${esc(r.company)} · ${esc(r.number)}</option>`).join('');
+      if(state.adoptionRecords.some(r=>r.id===old))el('adoption-record').value=old;
+      el('adoption-target').textContent=target?`Ziel: ${target.meta.schaden_nr} · ${target.meta.versicherer||''}`:'Bitte den gewünschten Schaden oben suchen und öffnen. Die freie Prüfung bleibt erhalten.';
+      el('adopt').disabled=!target;
+    }
+    window.addEventListener('svnet:case-opened',renderAdoption);window.addEventListener('svnet:case-cleared',renderAdoption);
+    el('adopt').onclick=async()=>{
+      const target=active(),workspace=state.workspace,record=el('adoption-record').value;
+      if(!target||!record)return;const number=target.meta.schaden_nr;el('adopt').disabled=true;
+      el('adoption-state').textContent='Originale und Prüfung werden sicher übernommen …';
+      try{
+        const result=await request('adopt',workspace,{record_id:record,target_folder_id:target.folder_id,expected_claim_number:number});
+        // A delayed answer must never switch or populate a different case.
+        if(active()?.folder_id!==target.folder_id||active()?.meta?.schaden_nr!==number)throw Error(`Übernahme nach ${result.claim_number} erfolgt. Der geöffnete Schaden wurde inzwischen gewechselt; bitte den Zielschaden erneut öffnen.`);
+        el('standalone').checked=false;clear();state.folder='';await load();
+        message(`${result.documents} Originalbelege und Prüfung in ${result.claim_number} gespeichert und zurückgelesen. Entscheidung dort erneut kontrollieren und bestätigen. Keine Mail versendet.`);
+        el('adoption-state').textContent=`Übernahme nach ${result.claim_number} bestätigt.`;
+      }catch(error){el('adoption-state').textContent=error.message;}
+      finally{renderAdoption();}
+    };
     el('history').onclick=async event=>{
       const id=event.target.dataset.reopenReview;if(!id)return;
       const folder=context();reset();message('Gespeicherte Entscheidung wird mit der aktuellen Mailfassung geöffnet …');
@@ -252,6 +274,7 @@
       try {
         const v=values();const data=await request('save',folder,{token:state.token,values:v,case_no:el('case_no').value.trim()});sameCase(folder);
         state.recordId=data.record_id;
+        if(el('standalone').checked){state.adoptionRecords.unshift({id:data.record_id,company:v.company,number:v.number});renderAdoption();}
         el('mail-header').textContent=`Von: ${data.sender}\nAn: ${v.to||'noch nicht ausgewählt'}\nCC: ${v.cc||'–'}\nBCC: ${v.bcc||'–'}\nAnhang: ${state.source}`;
         el('mail-subject').value=data.subject;el('mail-body').value=data.body;el('mail').hidden=false;el('send').disabled=!v.to;el('send-state').textContent='';
         saveMessage(`Entscheidung ${el('standalone').checked?'im persönlichen Prüfvorgang':'im Fall unter 06_Freigaben_Zahlungen'} gespeichert. ${v.to?'Mail bereit zur Durchsicht.':'Für den Versand einen An-Empfänger auswählen und erneut speichern.'}`);
@@ -284,4 +307,5 @@
   };
   new MutationObserver(onCaseChange).observe(document.getElementById('vf-active'),{childList:true,subtree:true});
   window.addEventListener('storage',onCaseChange);window.addEventListener('svnet:cases-changed',onCaseChange);
+  window.addEventListener('svnet:case-opened',onCaseChange);window.addEventListener('svnet:case-cleared',onCaseChange);
 })();

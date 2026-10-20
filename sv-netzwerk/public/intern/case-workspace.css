@@ -1,0 +1,76 @@
+/* Progressive composition of the existing, individually authorized controllers. */
+[hidden]{display:none!important}
+.vf-workspace-print-brand{display:none}
+.vf-unified .vf-grid,.vf-unified .vf-command-grid,.vf-unified .vf-command-main,.vf-unified .vf-analysis-grid{display:contents}
+.vf-unified .vf-app{max-width:1180px;margin:auto}
+.vf-unified #vf-case-selection{margin-bottom:14px}
+.vf-unified .vf-app .vf-step>b,.vf-unified .vf-app .vf-step-number,.vf-unified .vf-app .vf-plaud-head>span{display:none!important}
+.vf-unified #vf-assistant-panel{display:block!important}
+.vf-unified #vf-assistant-panel>header{cursor:default}
+.vf-unified #vf-assistant{display:block!important}
+.vf-workspace-heading{margin:0 0 6px;font-size:1.35rem;color:#17324a}
+.vf-workspace-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0}
+.vf-workspace-actions button{font:inherit;font-weight:700;min-height:64px;background:#fff;border:1px solid #b8c8d6;border-radius:8px;padding:12px;color:#17324a;cursor:pointer}
+.vf-workspace-actions button[aria-pressed=true]{border:2px solid #17324a;background:#eaf1f5}
+.vf-workspace-actions button:focus-visible,.vf-unified button:focus-visible,.vf-unified summary:focus-visible{outline:3px solid #e69732;outline-offset:3px}
+.vf-workspace-options{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.vf-workspace-options label{display:grid;gap:6px;font-weight:600}
+.vf-workspace-options select{width:100%;min-width:0;font:inherit;padding:10px;background:white;border:1px solid #b8c8d6;border-radius:6px}
+.vf-workspace-preview{background:#f1f5f7;border-left:4px solid #d48c2a;padding:14px;margin:14px 0;line-height:1.5}
+.vf-workspace-preview p{margin:5px 0}
+.vf-unified #vf-assistant-state{padding:12px;background:#f5f7f8;white-space:pre-wrap}
+.vf-unified #vf-workspace-start{min-height:48px;font:inherit;padding:12px 22px;border-radius:6px}
+.vf-unified #vf-assistant-results section{border-top:1px solid #d8e0e6;padding:12px 0;line-height:1.5}
+.vf-unified #vf-assistant-results h3{font-size:1rem;margin:0 0 8px}
+.vf-unified #vf-assistant-results pre{font:inherit;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.vf-unified #vf-assistant-context{line-height:1.6;background:#f6f8fa;padding:12px;border-radius:6px}
+.vf-workspace-tools{margin:18px 0;border-top:1px solid #d8e0e6;padding-top:14px}
+.vf-workspace-tools>.vf-action-group,.vf-workspace-tools>.vf-processing{margin:10px 0;box-shadow:none}
+.vf-unified #vf-more-functions,.vf-unified #vf-workspace-history{margin-top:16px}
+.vf-unified #vf-more-functions>summary,.vf-unified #vf-workspace-history>summary{font-weight:700;cursor:pointer;padding:12px 0}
+.vf-unified .vf-more-links{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.vf-unified .vf-more-links button{min-height:44px;padding:9px 12px;font:inherit}
+.vf-unified #vf-more-content{display:grid;gap:12px}
+.vf-unified #vf-more-content .vf-mail-row,.vf-unified #vf-more-content .vf-import-grid{display:contents}
+.vf-unified #vf-analysis>header,.vf-unified #vf-analysis>.vf-meta,.vf-unified #vf-analysis>label,.vf-unified #vf-analysis>textarea,.vf-unified #vf-analysis>input,.vf-unified #vf-analysis>.vf-calendar-actions [data-work-prompt],.vf-unified #vf-analysis-start{display:none!important}
+.vf-unified #vf-analysis{box-shadow:none;border:0;padding:0}
+.vf-unified #vf-analysis>*{display:revert}
+.vf-unified .vf-legacy-instruction,.vf-unified .vf-processing>.vf-order-label{display:none!important}
+.vf-unified #vf-instructions{display:none!important}
+.vf-unified #vf-review-group>summary,.vf-unified .vf-processing>summary{display:none}
+.vf-unified .vf-processing .vf-work-handoff:not(.vf-workspace-handoff-active){display:none}
+.vf-unified .vf-workspace-tools>.vf-action-group::before,.vf-unified .vf-workspace-tools>.vf-processing::before,.vf-unified #vf-workspace-history::before,.vf-unified #vf-more-functions::before{content:none}
+.vf-unified #vf-diagnostic-view pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.vf-unified #vf-diagnostic-view .vf-card{margin:14px 0}
+.vf-unified .vf-workspace-footer{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}
+@media(max-width:760px){
+ .vf-unified .vf-app{padding:12px 10px 32px}
+ .vf-workspace-actions{grid-template-columns:1fr 1fr;gap:8px}
+ .vf-workspace-options{grid-template-columns:1fr}
+ .vf-unified .vf-card{padding:14px;min-width:0}
+ .vf-unified #vf-workspace-start{width:100%}
+ .vf-unified .vf-assistant-actions{grid-template-columns:1fr}
+ .vf-unified .vf-more-links{display:grid;grid-template-columns:1fr 1fr}
+ .vf-unified input,.vf-unified textarea,.vf-unified select{max-width:100%;box-sizing:border-box}
+ .vf-unified .vf-workspace-footer{flex-direction:column}
+}
+@media print{
+ .vf-workspace-print-brand{display:block!important;margin:0 0 18px}
+ .vf-workspace-print-brand img{width:300px;height:auto}
+ .intern-sidebar,.intern-topbar,.intern-header,nav,#vf-case-selection,#vf-more-functions,#vf-diagnostic-view,.vf-workspace-actions,.vf-workspace-options,.vf-workspace-preview,#vf-workspace-start,#vf-workspace-history,.vf-workspace-tools,#vf-assistant-order,.vf-order-label{display:none!important}
+ .vf-unified .vf-app{padding:0;max-width:none}
+ .vf-unified .vf-card{border:0;box-shadow:none;break-inside:auto}
+ .vf-unified #vf-assistant-results section{break-inside:avoid}
+}
+
+.vf-unified #vf-case-documents{margin:14px 0}
+.vf-unified #vf-case-documents>summary{font-weight:700;cursor:pointer;padding:10px 0}
+.vf-unified #vf-case-documents .vf-upload-card{border:0;box-shadow:none;padding:10px 0}
+.vf-output-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.vf-output-actions button{min-height:44px;font:inherit;padding:8px 12px}
+.vf-output-box{clear:both;margin:8px 0 14px}
+.vf-output-box p:empty{display:none}
+.dr-adoption{padding:12px;background:#f1f5f7;margin:12px 0}
+@media(max-width:760px){.vf-output-actions{display:grid;grid-template-columns:1fr 1fr}.vf-case-submenu{flex-wrap:wrap;min-width:0!important}.vf-case-submenu a{font-size:.85rem}.vf-case-navigation a{min-height:44px}}
+@media print{.vf-output-box,.vf-case-submenu{display:none!important}}
+.vf-unified .vfdb-file>.vf-output-box{grid-column:1/-1}@media print{#vf-case-documents{display:none!important}}

@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/svnet-branding.php';
 require_once __DIR__.'/review-correspondence.php';
 
 const KR_MEY_GENERALBAU_RECIPIENT = 'backoffice@meygeneralbau.de';
@@ -371,7 +372,7 @@ function krV2Handle(array $user): void
             $message = ['subject'=>$subject,'body'=>['contentType'=>'HTML','content'=>'<p>'.nl2br(htmlspecialchars($body,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8')).'</p>'],'toRecipients'=>[krRec($to)]];
             if ($cc !== []) $message['ccRecipients'] = array_values($cc);
             if ($reviewed['sparkasse']) $message['bccRecipients'] = [krRec(KR_ARCHIVE)];
-            $response = krHttp('POST','https://graph.microsoft.com/v1.0/users/'.rawurlencode($sender).'/sendMail',['Authorization: Bearer '.krMs(),'Content-Type: application/json'],json_encode(['message'=>$message,'saveToSentItems'=>true],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+            $response = krHttp('POST','https://graph.microsoft.com/v1.0/users/'.rawurlencode($sender).'/sendMail',['Authorization: Bearer '.krMs(),'Content-Type: application/json'],json_encode(['message'=>svnetBrandMailMessage($message),'saveToSentItems'=>true],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
             if ($response['status'] < 200 || $response['status'] >= 300) {
                 $graph = json_decode($response['body'], true);
                 $code = trim((string)($graph['error']['code'] ?? ''));

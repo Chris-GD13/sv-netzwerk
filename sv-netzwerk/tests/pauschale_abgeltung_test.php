@@ -20,7 +20,8 @@ $result=paPrepareForm('case',['full_name'=>'Christian Wächter']);
 if($result['type']!=='pauschale_abgeltung'||$result['status']!=='filled_unsigned_draft'||abs($result['payout']-239)>.001)throw new RuntimeException('Keine belegt ausgefüllte Abgeltung.');
 if($written[0]['parents']!==['end']||!str_starts_with($written[0]['name'],'MUSTER-001_SV-Netzwerk_Abgeltungsvereinbarung_Entwurf_Kalkulation-17_'))throw new RuntimeException('Falsche Fallablage.');
 $pdf=$stored[$result['id']];
-foreach(['sv-netzwerk.eu','MUSTER-001','Musterkunde','239,00 EUR','30 % vom Netto']as$needle)if(!str_contains($pdf,$needle))throw new RuntimeException('Nicht ausgefülltes PDF: '.$needle);
+if(!str_contains($pdf,'/Subtype /Image')||!str_contains($pdf,'/SVNetLogo Do'))throw new RuntimeException('SV-Logo nicht eingebettet.');
+foreach(['MUSTER-001','Musterkunde','239,00 EUR','30 % vom Netto']as$needle)if(!str_contains($pdf,$needle))throw new RuntimeException('Nicht ausgefülltes PDF: '.$needle);
 if(str_contains($pdf,'DIE REGULIERER'))throw new RuntimeException('Fremdes Branding.');
 $bad=$calculation;$rows=json_decode($bad['items_json'],true);unset($rows[0]['settlement_percent']);$bad['items_json']=json_encode($rows);
 try{paSettlementPayload($bad,$meta);throw new RuntimeException('Erfundener Standardsatz akzeptiert');}catch(RuntimeException $e){if(!str_contains($e->getMessage(),'Abgeltungssatz fehlt'))throw$e;}
