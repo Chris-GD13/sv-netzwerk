@@ -18,6 +18,12 @@ const internalLinks = [
   { href: '/intern/tagescockpit/', label: 'Tagescockpit', icon: '●' },
   { href: '/intern/aufgaben/', label: 'Aufgaben', icon: '✓' },
   { href: '/intern/versicherungsfaelle/', label: 'Versicherungsfälle', icon: '⌂' },
+  ...(currentPath.startsWith('/intern/versicherungsfaelle/') ? [
+    { href: '/intern/versicherungsfaelle/#vf-case-selection', label: 'Schaden öffnen', icon: '', sub: true },
+    { href: '/intern/versicherungsfaelle/#vf-assistant-panel', label: 'Schaden bearbeiten', icon: '', sub: true },
+    { href: '/intern/versicherungsfaelle/?aktion=beleg', label: 'Rechnung / KVA ohne Schaden', icon: '', sub: true },
+    { href: '/intern/versicherungsfaelle/#vf-case-documents', label: 'Unterlagen und Ergebnisse', icon: '', sub: true },
+  ] : []),
   { href: '/intern/versicherungswissen/', label: 'Versicherungswissen', icon: '▤' },
   { divider: true },
   { href: '/intern/telefon/', label: 'Telefonzentrale', icon: '☎' },
@@ -197,6 +203,8 @@ const isActive = (href: string) => currentPath.startsWith(href);
           <a href="/intern/api/energy.php?service=keba" data-energy-access hidden class="sub" target="_blank" rel="noopener noreferrer"><span>⚙</span>KEBA-Einstellungen</a>
           <slot name="sidebar-extra" />
         </nav>
+
+
       </aside>
       <script is:inline src="/intern/drive-status-cache.js?v=20260829-1"></script>
       <main id="intern-main"><slot /></main>
@@ -224,7 +232,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
     <script is:inline src="/intern/energy-navigation.js?v=20261018-1" defer></script>
     <script is:inline src="/intern/erstbericht-output-options.js" defer></script>
     <script is:inline src="/intern/versicherungsfaelle-enhancements.js" defer></script>
-    <script is:inline src="/intern/case-document-browser.js?v=20260901-2" defer></script>
+    <script is:inline src="/intern/case-document-browser.js?v=20261020-casebinding" defer></script>
     <script is:inline src="/intern/bki-offline.js?v=20261008-2" defer></script>
     <script is:inline src="/intern/transient-calculation-status.js?v=20261012-1" defer></script>
     <script is:inline src="/intern/chatgpt-onboarding.js?v=20260831-1" defer></script>

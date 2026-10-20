@@ -73,7 +73,7 @@ foreach(['invoice','offer']as$kind){
     check(!str_contains(drBody(array_replace($record,['kind'=>$kind,'values'=>array_replace($accepted,['energy_kwh'=>0,'energy_amount'=>0])])),'Stromkosten'),'Legacy zero draft has no energy text');
 }
 $edited=array_replace($record,['mail_body'=>"Sehr geehrter Herr Hollenbach,\n\nMein bearbeiteter Text.\n",'mail_subject'=>'TEST-17 · Individueller Betreff']);
-check(drMessage($edited,'original')['body']['content']===$edited['mail_body'],'Exact edited body is transmitted');
+check(html_entity_decode(strip_tags(drMessage($edited,'original')['body']['content']),ENT_QUOTES,'UTF-8')===$edited['mail_body'],'Exact edited body is transmitted');
 check(drMessage($edited,'original')['subject']===$edited['mail_subject'],'Exact edited subject is transmitted');
 fails(fn()=>drSubject(array_replace($edited,['mail_subject'=>'TEST-170 · Falscher Fall'])),'Partial case number is rejected');
 fails(fn()=>drSubject(array_replace($edited,['mail_subject'=>'Individueller Betreff'])),'Claim number is mandatory');

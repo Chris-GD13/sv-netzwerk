@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/svnet-branding.php';
 require_once __DIR__.'/review-correspondence.php';
 
 require_once __DIR__ . '/config.php';
@@ -185,6 +186,7 @@ try {
         $attachments = omAttachments();
         if ($attachments) $message['attachments'] = $attachments;
 
+        $message=svnetBrandMailMessage($message);
         omGraph('POST', 'users/' . rawurlencode((string)$profile['sender']) . '/sendMail', [
             'message' => $message,
             'saveToSentItems' => true,

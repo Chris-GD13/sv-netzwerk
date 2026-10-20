@@ -72,7 +72,7 @@ final class CaseWorkAssistant {
             $token=bin2hex(random_bytes(32));$snapshot=['case'=>$case,'release_hash'=>self::hash($this->release),'release_id'=>$this->release['id'],'billing_lane'=>$this->provider?'assistant':'simulation'];
             $this->query('INSERT INTO case_work_assistant_contexts VALUES(?,?,?,?,?,?,?,1)',[$token,hash('sha256',$this->session),$tab,$user['id'],$folder,self::json($snapshot),$this->now()+1800]);
             $this->event(null,'context_open',[$user['id'],$folder,$token]);
-            return ['token'=>$token,'folder_id'=>$folder,'claim_number'=>$case['claim_number'],'profile'=>$case['profile'],'revision'=>$case['revision'],'release'=>$this->release['id'],'rules'=>array_map(fn($r)=>['id'=>$r['id'],'sources'=>$r['sources']],$rules),'mode'=>$this->provider?'live':'mock'];
+            return ['token'=>$token,'folder_id'=>$folder,'claim_number'=>$case['claim_number'],'profile'=>$case['profile'],'insurer'=>$case['insurer'],'line'=>$case['line'],'document_count'=>count($case['documents']),'revision'=>$case['revision'],'release'=>$this->release['id'],'rules'=>array_map(fn($r)=>['id'=>$r['id'],'sources'=>$r['sources']],$rules),'mode'=>$this->provider?'live':'mock'];
         });
     }
     private function context(array $user,string $token,string $tab): array {
@@ -188,7 +188,7 @@ final class CaseWorkAssistant {
     }
     public function history(array $user,string $token,string $tab): array {
         $ctx=$this->context($user,$token,$tab);
-        return $this->query('SELECT a.id,a.status FROM case_analysis_jobs a JOIN case_work_turns w ON a.id=w.analysis_id WHERE a.folder_id=? AND a.user_id=? AND w.task_id=? ORDER BY a.id DESC LIMIT 10',[$ctx['folder_id'],$user['id'],'assistant:v1'])->fetchAll(PDO::FETCH_ASSOC);
+        return $this->query('SELECT a.id,a.status,a.created_at FROM case_analysis_jobs a JOIN case_work_turns w ON a.id=w.analysis_id WHERE a.folder_id=? AND a.user_id=? AND w.task_id=? ORDER BY a.id DESC LIMIT 10',[$ctx['folder_id'],$user['id'],'assistant:v1'])->fetchAll(PDO::FETCH_ASSOC);
     }
     public function discard(array $user,string $token,string $tab,int $id): array {
         return $this->tx(function()use($user,$token,$tab,$id){

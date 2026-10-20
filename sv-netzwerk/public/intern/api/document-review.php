@@ -4,6 +4,7 @@ define('SVNET_KVA_LIBRARY_ONLY', true);
 require_once __DIR__.'/kva-release.php';
 require_once __DIR__.'/document-review-core.php';
 require_once __DIR__.'/document-review-storage.php';
+require_once __DIR__.'/document-review-adoption.php';
 
 function drChildren(string $folder): array {
     return ionosList(['q'=>"'".str_replace("'", "\\'", $folder)."' in parents and trashed=false",'pageSize'=>1000])['files'];
@@ -66,6 +67,7 @@ try {
     }
     if ($action==='workspace' && $_SERVER['REQUEST_METHOD']==='POST') apiJson(['ok'=>true,'folder_id'=>drWorkspaceCreate($user)]);
     drRequireContext($folder,$user);
+    if($action==='adopt'&&$_SERVER['REQUEST_METHOD']==='POST')apiJson(['ok'=>true,...drAdoptReview($folder,(string)($input['record_id']??''),(string)($input['target_folder_id']??''),(string)($input['expected_claim_number']??''),$user)]);
     if ($action==='download') {
         $source=drSelected($folder,(string)($input['file_id']??''));
         header('Content-Type: '.$source['mime']); header('Content-Disposition: inline; filename="'.str_replace(['"',"\r","\n"],'_',basename($source['name'])).'"');
@@ -78,7 +80,7 @@ try {
             if (preg_match('/\.(pdf|docx|png|jpe?g|webp)$/i',$file['name'])) $files[]=['id'=>$file['id'],'name'=>$file['name'],'size'=>(int)($file['size']??0)];
             if (preg_match('/_(Rechnungspruefung|Angebotspruefung)_.*\.json$/',$file['name'])) {
                 try { $saved=json_decode(drSelected($folder,$file['id'])['bytes'],true,512,JSON_THROW_ON_ERROR);
-                    if (($saved['folder_id']??'')===$folder && isset($saved['values']['decision'])) $reviews[]=['id'=>$file['id'],'kind'=>$saved['kind'],'company'=>$saved['values']['company'],'number'=>$saved['values']['number'],'decision'=>$saved['values']['decision'],'release_amount'=>$saved['values']['release_amount'],'mode'=>$saved['mode'],'saved_at'=>$saved['saved_at'],'send_status'=>$saved['send_status']];
+                    if (($saved['folder_id']??'')===$folder && isset($saved['values']['decision'])) $reviews[]=['id'=>$file['id'],'kind'=>$saved['kind'],'company'=>$saved['values']['company'],'number'=>$saved['values']['number'],'decision'=>$saved['values']['decision'],'release_amount'=>$saved['values']['release_amount'],'mode'=>$saved['mode'],'saved_at'=>$saved['saved_at'],'send_status'=>$saved['send_status'],'adoption_requires_review'=>(bool)($saved['adoption_requires_review']??false)];
                 } catch (Throwable) {}
             }
         }
@@ -174,7 +176,8 @@ try {
                 $sendAttempted=true;
                 $response=krHttp('POST',$base.'/sendMail',$headers,json_encode(['message'=>$message,'saveToSentItems'=>true],JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE));
             } else {
-                unset($message['attachments']);
+                // Keep the inline logo on the draft; upload only original evidence separately.
+                $message['attachments']=array_values(array_filter($message['attachments']??[],fn($a)=>!empty($a['isInline'])));
                 $draft=krHttp('POST',$base.'/messages',$headers,json_encode($message,JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE));
                 $draftId=(string)(json_decode($draft['body'],true)['id']??'');
                 if ($draft['status']!==201||$draftId==='') throw new RuntimeException('Outlook-Entwurf konnte nicht angelegt werden.');

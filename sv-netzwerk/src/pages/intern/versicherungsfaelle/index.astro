@@ -4,7 +4,8 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 <InternalLayout title="Versicherungsfälle" description="Automatische, fallzentrierte Schadenbearbeitung.">
 <section slot="sidebar-extra" id="vf-expert-panel" class="intern-sidebar__expert" hidden><label class="vf-order-label" for="vf-expert-select"><strong>Bearbeitung für</strong><small>Fallordner und ClaimsForce-Anmeldung des ausgewählten Profils</small></label><select id="vf-expert-select"><option value="christian">Christian Wächter</option><option value="holger">Holger Roth</option><option value="marc">Marc Schütt</option><option value="jens">Jens Maurer</option></select></section>
 <main class="vf-app">
-  <nav class="vf-calendar-actions" aria-label="Fallbearbeitung"><a class="vf-secondary" href="#vf-assistant-panel" data-case-menu="vf-assistant-panel">SV-Assistent</a><a class="vf-secondary" href="#vf-analysis" data-case-menu="vf-analysis">Fall-Work</a><a class="vf-secondary" href="#vf-claims-notes">Claimsforce-Notizen</a><a class="vf-secondary" href="/intern/versicherungswissen/">Richtlinien</a></nav>
+  <div class="vf-workspace-print-brand"><img src="/intern/assets/private-business/sv-netzwerk-eu-logo.jpg" alt="SV-Netzwerk · sv-netzwerk.eu" width="300" height="53"></div>
+  <nav class="vf-calendar-actions vf-case-navigation" aria-label="Fallbearbeitung"><a class="vf-secondary" href="#vf-case-selection">Schaden öffnen</a><a class="vf-secondary" href="#vf-assistant-panel" data-case-menu="vf-assistant-panel">Bearbeitung</a><a class="vf-secondary" href="#vf-workspace-history">Verlauf und Ergebnisse</a><a class="vf-secondary" href="#vf-case-documents">Unterlagen</a><a class="vf-secondary" href="#vf-more-functions">Weitere Funktionen</a></nav>
   <section id="vf-active" class="vf-active"><div><i></i><strong>Noch kein Fall geöffnet</strong><small>Fall suchen, neu anlegen oder Unterlagen zur automatischen Anlage hochladen.</small></div></section>
   <section id="vf-claims-notes" class="vf-card vf-claims-notes" hidden>
     <strong>ClaimsForce-Notizen</strong>
@@ -13,7 +14,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     <div id="vf-claims-notes-list"></div>
   </section>
   <section id="vf-task-context" class="vf-card vf-task-context" hidden aria-live="polite"><header class="vf-step"><b>✉</b><div><strong>Aufgabe bearbeiten</strong><small id="vf-task-meta">Aufgabe wird geladen …</small></div></header><h2 id="vf-task-subject"></h2><div id="vf-task-body" class="vf-task-body"></div><div id="vf-task-attachments" class="vf-task-attachments"></div><div class="vf-calendar-actions"><button id="vf-task-reply" class="vf-primary" type="button">Antwort im Fall verfassen</button><button id="vf-task-kva" class="vf-secondary" type="button">KVA prüfen / freigeben</button><button id="vf-task-done" class="vf-secondary" type="button">Aufgabe erledigen</button><a id="vf-task-outlook" class="vf-secondary" target="_blank" rel="noreferrer" hidden>In Outlook öffnen</a></div><p id="vf-task-state" class="vf-meta"></p></section>
-  <script is:inline src="/intern/case-work-assistant.js?v=20261019-mobile1"></script>
+  <script is:inline src="/intern/case-work-assistant.js?v=20261020-workspace"></script>
   <script is:inline src="/intern/case-work.js?v=20261019-mobile1"></script>
   <style is:global>
     @media(max-width:760px){#vf-analysis .vf-calendar-actions{display:grid;grid-template-columns:1fr}#vf-analysis .vf-calendar-actions button{width:100%;min-height:44px;overflow-wrap:normal;word-break:normal}}
@@ -37,30 +38,45 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     <section class="vf-work">
       <div class="vf-command-grid">
         <div class="vf-command-main">
-  <section id="vf-assistant-panel" class="vf-card vf-collapsible is-collapsed" aria-labelledby="vf-assistant-title">
-    <header class="vf-step vf-collapse-trigger" role="button" tabindex="0" aria-expanded="false"><b>2</b><div><strong id="vf-assistant-title">SV-Assistent</strong><small>Fall prüfen · Rechnungen prüfen · Bericht vorbereiten · Aufgaben ermitteln</small></div></header>
-    <div id="vf-assistant"><p class="vf-meta">Fall öffnen, Aufgabe auswählen oder Anweisung eingeben und starten. Der Assistent prüft Fall und Berechtigung direkt vor dem Auftrag; eine zusätzliche Übernahme ist nicht nötig. Für die neue KI gilt maximal 30 EUR Zusatzbudget pro Monat einschließlich Sicherheitspuffer. Ergebnisse bleiben fachlich zu prüfende Entwürfe. Work-Übergaben werden manuell vorbereitet.</p><div class="vf-calendar-actions"><button id="vf-assistant-open" class="vf-secondary" type="button">Fallzuordnung prüfen</button><button id="vf-assistant-connections" class="vf-secondary" type="button">Verbindungen prüfen</button><button id="vf-assistant-sync" class="vf-secondary" type="button" hidden>Gemeinsamen Master abgleichen</button><button id="vf-assistant-demo" class="vf-secondary" type="button">KI-Verbindung mit Testdaten prüfen</button></div><p id="vf-assistant-connections-state" class="vf-meta" role="status"></p>
+  <section id="vf-assistant-panel" class="vf-card" aria-labelledby="vf-assistant-title">
+    <header><h1 id="vf-assistant-title" class="vf-workspace-heading">Schaden bearbeiten</h1><p>Eine Akte, ein Auftrag, ein gemeinsames Ergebnis.</p></header>
+    <div id="vf-assistant">
+      <div id="vf-assistant-diagnostic-controls" hidden><button id="vf-assistant-open" type="button">Fallzuordnung prüfen</button><button id="vf-assistant-connections" type="button">Verbindungen prüfen</button><button id="vf-assistant-sync" type="button" hidden>Gemeinsamen Master abgleichen</button><button id="vf-assistant-demo" type="button">KI-Verbindung mit Testdaten prüfen</button><p id="vf-assistant-connections-state" role="status"></p></div>
       <p id="vf-assistant-context" role="status">Bitte zuerst einen Fall öffnen.</p>
-      <label for="vf-assistant-route">Bearbeitungsweg</label>
-      <select id="vf-assistant-route"><option value="assistant">SV-Assistent (Zusatzbudget bis 30 EUR)</option><option value="work">ChatGPT Work (manuelle Übergabe)</option></select>
-      <div class="vf-assistant-actions">
+      <div class="vf-workspace-actions" aria-label="Hauptaktionen">
+        <button type="button" data-case-action="check" aria-pressed="true">Schaden bearbeiten</button>
+        <button type="button" data-case-action="invoices" aria-pressed="false">Rechnung / KVA prüfen</button>
+        <button type="button" data-case-action="report" aria-pressed="false">Bericht erstellen</button>
+        <button type="button" data-case-action="tasks" aria-pressed="false">Offene Aufgaben</button>
+      </div>
+      <div class="vf-workspace-options">
+      <label for="vf-workspace-flow">Arbeitsablauf<select id="vf-workspace-flow"><option value="new">Neuer Schaden</option><option value="review" selected>Bestehende Akte aufarbeiten</option><option value="supplement">Neuer Beleg / Nachtrag</option><option value="closing">Schadenabschluss vorbereiten</option></select></label>
+      <label for="vf-assistant-route">Bearbeitungsweg
+      <select id="vf-assistant-route"><option value="assistant">SV-Assistent (Zusatzbudget bis 30 EUR)</option><option value="work">ChatGPT Work (manuelle Übergabe)</option></select></label>
+      </div>
+      <div hidden>
         <button type="button" data-assistant-task="check" disabled>Fall vollständig prüfen</button>
         <button type="button" data-assistant-task="invoices" disabled>Rechnungen und Angebote prüfen</button>
         <button type="button" data-assistant-task="report" disabled>Bericht vorbereiten</button>
         <button type="button" data-assistant-task="tasks" disabled>Offene Aufgaben ermitteln</button>
       </div>
-      <label for="vf-assistant-order">Individuelle Anweisung</label>
+      <label class="vf-order-label" for="vf-assistant-order"><strong>Besondere Anweisungen</strong><small>Was sollen wir bei diesem Auftrag zusätzlich berücksichtigen?</small></label>
       <textarea id="vf-assistant-order" class="vf-assistant-order" rows="3" maxlength="12000"></textarea>
-      <div class="vf-assistant-actions">
-        <button type="button" data-assistant-task="custom" disabled>Anweisung bearbeiten</button>
+      <div class="vf-workspace-preview" aria-labelledby="vf-preview-title"><strong id="vf-preview-title">So wird der Auftrag ausgeführt</strong><p id="vf-workspace-preview"></p><p>Ergebnisse bleiben Entwürfe. Versand, Freigaben und Fallabschluss werden gesondert veranlasst.</p></div>
+      <button id="vf-workspace-start" class="vf-primary" type="button" disabled>Auftrag ausführen</button>
+      <div class="vf-assistant-actions" id="vf-assistant-job-controls">
+        <button type="button" data-assistant-task="custom" hidden disabled>Anweisung bearbeiten</button>
         <button id="vf-assistant-refresh" type="button" disabled>Status aktualisieren</button>
         <button id="vf-assistant-history" type="button">Gespeicherten Auftrag laden</button>
         <button id="vf-assistant-resume" type="button" disabled>Wiederaufnehmen</button>
         <button id="vf-assistant-cancel" type="button" disabled>Auftrag abbrechen / Übergabe beenden</button>
       </div>
-      <p id="vf-assistant-budget">Zusatzbudget: maximal 30 € im Monat · Verbrauch wird beim Auftrag geladen.</p>
+      <p id="vf-assistant-budget" hidden>Zusatzbudget: maximal 30 € im Monat · Verbrauch wird beim Auftrag geladen.</p>
       <p id="vf-assistant-state" role="status" aria-live="polite">Bereit nach bestätigter Fallöffnung.</p>
       <div id="vf-assistant-results" aria-label="Arbeitsergebnis"></div>
+      <div id="vf-workspace-invoice-tools" class="vf-workspace-tools" hidden><h2>Einzelbeleg prüfen und Entscheidung vorbereiten</h2><p>Für die Prüfung einer bestimmten Rechnung oder eines KVA die vorhandenen Belegwerkzeuge öffnen.</p><button type="button" id="vf-workspace-invoice-open" class="vf-secondary">Beleg auswählen</button><div id="vf-workspace-invoice-host" hidden></div></div>
+      <div id="vf-workspace-report-tools" class="vf-workspace-tools" hidden><h2>Dokumente aus der Akte erstellen</h2><p>Für fertige Dateien die benötigten Originaldokumente auswählen. Es gilt dieselbe besondere Anweisung wie oben.</p><button type="button" id="vf-workspace-report-open" class="vf-secondary">Dokumentauswahl öffnen</button><div id="vf-workspace-report-host" hidden></div></div>
+      <details id="vf-workspace-history"><summary>Bearbeitungsverlauf und laufende Aufträge</summary><div id="vf-workspace-history-host"></div><div id="vf-workspace-history-list"></div><h3>Frühere Bearbeitungen</h3><div id="vf-workspace-legacy-host"></div></details>
     </div>
   </section>
   <section id="vf-analysis" class="vf-card vf-collapsible is-collapsed" aria-labelledby="vf-analysis-title">
@@ -466,7 +482,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 <script is:inline>
 (() => {
   document.querySelectorAll('.vf-app section.vf-card:not(.vf-processing)').forEach((card,index)=>{
-    if(card.id==='vf-case-selection')return;
+    if(['vf-case-selection','vf-assistant-panel'].includes(card.id))return;
     const trigger=card.querySelector(':scope > .vf-step, :scope > .vf-title, :scope > .vf-plaud-head');
     if(!trigger)return;
     const initiallyExpanded=card.id==='vf-form';
@@ -589,6 +605,7 @@ document.addEventListener('click',event=>{
   const panel=document.getElementById('vf-system-panel'),home=document.getElementById('vf-system-home'),sidebar=document.querySelector('.intern-sidebar'),logout=document.getElementById('intern-logout'),desktop=window.matchMedia('(min-width:901px)');
   if(!panel||!home||!sidebar)return;
   const place=()=>{
+    if(panel.closest('#vf-diagnostic-view'))return;
     if(desktop.matches){panel.classList.add('vf-sidebar-tools');sidebar.insertBefore(panel,logout?.parentNode===sidebar?logout:null)}
     else{panel.classList.remove('vf-sidebar-tools');home.after(panel)}
   };
@@ -798,7 +815,11 @@ document.getElementById('vf-recent')?.addEventListener('click',async()=>{
 
 <script is:inline src="/intern/case-duplicate-merge.js?v=20261008-1"></script>
 <link rel="stylesheet" href="/intern/document-review.css?v=20261010-8">
-<script is:inline src="/intern/document-review.js?v=20261010-8"></script>
+<script is:inline src="/intern/document-review.js?v=20261020-workspace"></script>
 
 <link rel="stylesheet" href="/intern/case-action-groups.css?v=20261011-2">
 <script is:inline src="/intern/case-action-groups.js?v=20261011-2"></script>
+
+<link rel="stylesheet" href="/intern/case-workspace.css?v=20261020-1">
+<script is:inline src="/intern/case-workspace.js?v=20261020-2"></script>
+<script is:inline src="/intern/case-output-actions.js?v=20261020-1"></script>

@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/config.php';
+require_once __DIR__.'/svnet-branding.php';
 commonHeaders();
 $user=requireAuth();
 if(!in_array((string)($user['role']??''),['administrator','projektleiter','pruefer','sachverstaendiger'],true))apiError(403,'Keine Berechtigung.');
@@ -20,7 +21,7 @@ $rows=is_array($data['rows']??null)?array_slice($data['rows'],0,30):[];
 $total=max(0,(float)($data['total1914']??0));$current=max(0,(float)($data['currentValue']??0));$factor=max(0,(float)($data['factor']??0));
 if(!$rows||$total<=0||$current<=0||$factor<=0){http_response_code(400);echo'Unvollständige Berechnung.';exit;}
 $navy=[.027,.102,.180];$orange=[1,.616,.071];$muted=[.35,.443,.522];$line=[.82,.867,.902];$panel=[.956,.972,.984];$green=[.929,.973,.949];$ops=[];
-vtext($ops,45,793,'SV',26,true,$orange);vtext($ops,88,799,'sv-netzwerk.eu',15,true,$navy);vtext($ops,89,787,'BAU - SCHADEN - REGULIERUNG',6.5,true,$muted);vright($ops,550,799,'WERTERMITTLUNG 1914',8,true,$navy);vline($ops,45,775,550,775,$line,.7);vrect($ops,45,771,72,3,$orange);
+$ops[]=svnetBrandPdfLogo();vright($ops,550,799,'WERTERMITTLUNG 1914',8,true,$navy);vline($ops,45,775,550,775,$line,.7);vrect($ops,45,771,72,3,$orange);
 vtext($ops,45,742,'Ermittlung der Versicherungssumme 1914',18,true,$navy);vtext($ops,45,725,'Wohngebäude - vereinfachtes Wertermittlungsverfahren',9,false,$muted);
 $y=700;vrect($ops,45,$y-92,505,92,$panel);vrect($ops,45,$y-92,4,92,$orange);
 $meta=[['SCHADEN-NR.',(string)($data['caseNo']??'')],['VERSICHERUNGSSCHEIN-NR.',(string)($data['policyNo']??'')],['VERSICHERUNGSNEHMER / OBJEKT',(string)($data['object']??'')],['VERSICHERUNGSGRUNDSTÜCK',(string)($data['address']??'')]];
@@ -31,5 +32,5 @@ $y-=12;vrect($ops,45,$y-68,505,68,$green);vrect($ops,45,$y-68,4,68,$orange);vtex
 $special=trim((string)($data['specialNote']??''));$outbuilding=trim((string)($data['outbuildingUse']??''));if($special!==''||$outbuilding!==''){vtext($ops,45,$y,'Ergänzende Angaben',11,true,$navy);$y-=16;foreach([['Sonderausstattungen',$special],['Nebengebäude',trim($outbuilding.' · '.(string)($data['outbuildingSize']??'').' m² · '.(string)($data['outbuildingConstruction']??''),' ·')]]as$row){if($row[1]==='')continue;foreach(vwrap($row[0].': '.$row[1],94)as$part){vtext($ops,50,$y,$part,8,false,$navy);$y-=11;}}}
 vline($ops,45,45,550,45,$line,.5);vtext($ops,45,31,'SV-Netzwerk Prüfportal',6.5,false,$muted);vright($ops,550,31,'Seite 1 von 1',6.5,false,$muted);
 $stream=implode("\n",$ops);$objects=[1=>'<< /Type /Catalog /Pages 2 0 R >>',2=>'<< /Type /Pages /Kids [5 0 R] /Count 1 >>',3=>'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',4=>'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',5=>'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>',6=>'<< /Length '.strlen($stream).">>\nstream\n$stream\nendstream"];
-$pdf="%PDF-1.4\n%\xE2\xE3\xCF\xD3\n";$offsets=[0];foreach($objects as$n=>$object){$offsets[$n]=strlen($pdf);$pdf.="$n 0 obj\n$object\nendobj\n";}$xref=strlen($pdf);$pdf.="xref\n0 7\n0000000000 65535 f \n";for($i=1;$i<=6;$i++)$pdf.=sprintf('%010d 00000 n ',$offsets[$i])."\n";$pdf.="trailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n$xref\n%%EOF";
+$pdf=svnetBrandPdfSerialize($objects);
 header_remove('Content-Type');header('Content-Type: application/pdf');header('Content-Disposition: inline; filename="Wertermittlung-1914.pdf"');header('Content-Length: '.strlen($pdf));echo$pdf;

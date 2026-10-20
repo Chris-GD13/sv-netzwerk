@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/svnet-branding.php';
 require_once __DIR__.'/review-correspondence.php';
 
 function drMoney(mixed $value): ?float {
@@ -126,5 +127,5 @@ function drMessage(array $record, string $bytes): array {
     if ($cc) $message['ccRecipients'] = $cc;
     if ($bcc) $message['bccRecipients'] = $bcc;
     $message['attachments'] = [['@odata.type'=>'#microsoft.graph.fileAttachment','name'=>$record['file_name'],'contentType'=>$record['mime'],'contentBytes'=>base64_encode($bytes)]];
-    return $message;
+    return svnetBrandMailMessage($message);
 }
