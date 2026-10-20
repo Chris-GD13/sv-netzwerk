@@ -8,7 +8,7 @@ $_SESSION['partner_csrf']??=bin2hex(random_bytes(32));
 try {
     if($action==='status')apiJson(['ok'=>true,'defaults'=>pcFields(),'version'=>PC_VERSION,'csrf'=>$_SESSION['partner_csrf']]);
     $db=db();pcSchema($db);
-    if($action==='list'){$q=$db->prepare('SELECT id,revision,payload_json,updated_at FROM partner_contracts WHERE owner_id=? AND archived=0 ORDER BY updated_at DESC');$q->execute([$owner]);$items=[];foreach($q->fetchAll() as $row){$data=json_decode($row['payload_json'],true);unset($row['payload_json']);$row['name']=$data['partner_name']?:'Unbenannter Entwurf';$items[]=$row;}apiJson(['ok'=>true,'items'=>$items]);}
+    if($action==='list'){$q=$db->prepare('SELECT id,revision,payload_json,updated_at,archived FROM partner_contracts WHERE owner_id=? AND archived=? ORDER BY updated_at DESC');$q->execute([$owner,($_GET['archived']??'')==='1'?1:0]);$items=[];foreach($q->fetchAll() as $row){$data=json_decode($row['payload_json'],true);unset($row['payload_json']);$row['name']=$data['partner_name']?:'Unbenannter Entwurf';$items[]=$row;}apiJson(['ok'=>true,'items'=>$items]);}
     if(in_array($action,['get','preview','pdf','template'],true)){
         $r=$action==='template'?['data'=>pcFields(),'revision'=>0]:pcGet($db,(string)($_GET['id']??''),$owner);
         if($action==='get')apiJson(['ok'=>true,'record'=>$r]);

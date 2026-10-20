@@ -13,7 +13,7 @@ const groups: {title:string; fields:[string,string,('textarea'|'email'|'date'|'t
     <header class="partner-head"><div><p>SV-Netzwerk</p><h1>Partner</h1><p>Kooperation vereinbaren. Fachlich unabhängig zusammenarbeiten.</p></div><button type="button" id="pc-new">Neue Vereinbarung</button></header>
     <p class="partner-notice">Die Aufnahme ist kostenfrei. Provisionen werden vor jedem konkreten Auftrag ausdrücklich vereinbart. Vertragspartner ist derzeit das Sachverständigenbüro Marc Schütt e.K.; eine spätere UG übernimmt Verträge nur nach gesonderter Zustimmung.</p>
     <div class="partner-grid">
-      <aside class="partner-card"><h2>Gespeicherte Entwürfe</h2><p>Nur Ihre eigenen Vereinbarungen werden angezeigt.</p><div id="pc-list" aria-live="polite">Wird geladen …</div><a href="/intern/api/partner-contracts.php?action=template" id="pc-template">Leere Vertragsvorlage als PDF</a><p id="pc-archive-result" role="status"></p><button type="button" id="pc-undo" hidden>Archivierung rückgängig machen</button></aside>
+      <aside class="partner-card"><h2>Gespeicherte Entwürfe</h2><p>Nur Ihre eigenen Vereinbarungen werden angezeigt.</p><button type="button" id="pc-show-archive">Archiv anzeigen</button><div id="pc-list" aria-live="polite">Wird geladen …</div><a href="/intern/api/partner-contracts.php?action=template" id="pc-template">Leere Vertragsvorlage als PDF</a><p id="pc-archive-result" role="status"></p><button type="button" id="pc-undo" hidden>Archivierung rückgängig machen</button></aside>
       <section class="partner-card"><h2 id="pc-title">Neue Partnervereinbarung</h2>
         <p id="pc-state" role="status">Vorlage wird geladen …</p>
         <form id="pc-form">

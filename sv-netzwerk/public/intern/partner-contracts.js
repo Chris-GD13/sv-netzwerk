@@ -2,7 +2,7 @@
   'use strict';
   const form=document.querySelector('#pc-form');if(!form)return;
   const el=id=>document.getElementById(id);
-  let csrf='',defaults={},id='',revision=0,dirty=false,busy=false,archived=null;
+  let csrf='',defaults={},id='',revision=0,dirty=false,busy=false,archived=null,showArchive=false;
   const state=text=>{el('pc-state').textContent=text;};
   const buttons=()=>{for(const x of [el('pc-save'),el('pc-preview'),el('pc-new'),el('pc-archive'),el('pc-undo')])x.disabled=busy;};
   async function api(action,payload){
@@ -20,10 +20,11 @@
     state(revision?'Gespeichert · Revision '+revision+((record.missing||[]).length?' · Noch auszufüllen: '+record.missing.join(', '):' · Pflichtangaben vollständig; Annahme noch einzuholen.'):'Neuer Entwurf · noch nicht gespeichert.');
   }
   async function list(){
-    const result=await api('list');el('pc-list').replaceChildren();
-    if(!result.items.length){el('pc-list').textContent='Noch keine gespeicherten Entwürfe.';return;}
+    const result=await api('list&archived='+(showArchive?'1':'0'));el('pc-list').replaceChildren();
+    if(!result.items.length){el('pc-list').textContent=showArchive?'Keine archivierten Entwürfe.':'Noch keine gespeicherten Entwürfe.';return;}
     for(const item of result.items){const button=document.createElement('button');button.type='button';button.className='partner-record';button.textContent=item.name+' · R'+item.revision;
-      button.addEventListener('click',async()=>{if(dirty&&!confirm('Ungespeicherte Eingaben verwerfen und diesen Entwurf öffnen?'))return;try{load((await api('get&id='+encodeURIComponent(item.id))).record);}catch(error){state(error.message);}});el('pc-list').append(button);}
+      if(showArchive)button.textContent+=' · Wiederherstellen';
+      button.addEventListener('click',async()=>{if(busy)return;if(showArchive){busy=true;buttons();try{await api('restore',{id:item.id,revision:Number(item.revision)});await list();el('pc-archive-result').textContent='Entwurf wiederhergestellt.';}catch(error){state(error.message);}finally{busy=false;buttons();}return;}if(dirty&&!confirm('Ungespeicherte Eingaben verwerfen und diesen Entwurf öffnen?'))return;try{load((await api('get&id='+encodeURIComponent(item.id))).record);}catch(error){state(error.message);}});el('pc-list').append(button);}
   }
   async function save(preview=false){
     if(busy||!csrf)return;
@@ -37,6 +38,7 @@
   form.addEventListener('submit',event=>{event.preventDefault();save();});
   form.addEventListener('input',()=>{dirty=true;el('pc-pdf').hidden=true;state('Ungespeicherte Änderungen. Vor PDF-Ausgabe speichern.');});
   el('pc-new').addEventListener('click',()=>{if(dirty&&!confirm('Ungespeicherte Eingaben verwerfen?'))return;load(null);});
+  el('pc-show-archive').addEventListener('click',async()=>{if(busy)return;showArchive=!showArchive;el('pc-show-archive').textContent=showArchive?'Aktive Entwürfe anzeigen':'Archiv anzeigen';try{await list();}catch(error){state(error.message);}});
   el('pc-preview').addEventListener('click',()=>save(true));
   el('pc-archive').addEventListener('click',async()=>{
     if(busy)return;if(dirty&&!confirm('Ungespeicherte Änderungen verwerfen und gespeicherten Entwurf archivieren?'))return;
