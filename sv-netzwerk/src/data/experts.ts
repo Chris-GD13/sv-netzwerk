@@ -73,7 +73,7 @@ export const experts: ExpertProfile[] = [
     regions: ['Forchtenberg-Sindringen', 'Baden-Württemberg', 'Bundesweit nach Aufgabenstellung'], qualifications: ['Sachverständiger im Tischlerhandwerk'], certifications: ['Öffentlich bestellt und vereidigt'],
     location: { city: 'Forchtenberg-Sindringen', slug: 'forchtenberg', region: 'Baden-Württemberg', label: 'Standort', sourceUrl: 'https://claudius-freiberg.de/impressum/' },
     shortProfile: 'Öffentlich bestellter und vereidigter Sachverständiger im Tischlerhandwerk mit Schwerpunkt Oberflächenschäden sowie Material- und Beschichtungsbewertung an Holz, Aluminium, Kunststoff und weiteren Werkstoffen.',
-    contact: centralContact, linkedin: 'https://www.linkedin.com/in/claudius-freiberg/', image: '/assets/images/team/claudius-freiberg-aktuell-bw.webp', status: 'active', tags: ['Oberflächenschäden', 'Materialbewertung', 'Beschichtungen'], publications: [], articles: [],
+    contact: centralContact, linkedin: 'https://www.linkedin.com/in/claudius-freiberg/', image: '/assets/images/team/claudius-freiberg-aktuell-bw.webp', status: 'active', tags: ['Oberflächenschäden', 'Materialbewertung', 'Beschichtungen'], publications: [], articles: ['/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/', '/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/'],
     company: {
       name: 'Sachverständigenbüro Claudius Freiberg',
       description: 'Claudius Freiberg führt ein eigenständiges Sachverständigenbüro mit Spezialisierung auf Oberflächen, Material- und Beschichtungsschäden an Holz, Aluminium und Kunststoff sowie auf das Tischler- und Schreinerhandwerk.',

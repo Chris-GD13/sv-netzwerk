@@ -1,3 +1,12 @@
+## 2026-10-20 – Pulverbeschichtetes Aluminium fachlich prüfen
+
+- Genau einen Tagesartikel unter atomarer Reservierung vorbereitet: Farbton, Glanz, Struktur, Schichtdicke, Haftung, Reinigungseinfluss und Korrosion getrennt untersuchen.
+- Claudius Freiberg gemäß aktuellem Live-Profil den belegten Fachgebieten Oberflächenschäden, Materialbewertung und Beschichtungen an Aluminium zugeordnet; keine behauptete Autorenschaft oder konkrete Fallzuständigkeit.
+- Aktuelle deutsche GSB-Qualitätsrichtlinien AL 631 Teile 1, 5 und 7, GSB-Ausschreibungsempfehlung sowie GRM-Merkblätter 01 und 07 im benötigten Umfang geöffnet und geprüft.
+- Kein erfundener Schadenfall oder Messwert; ausschließlich ein ausdrücklich fiktives Beispiel ohne Zahlen und ohne künstliche Umdeutung zum Versicherungsschaden.
+- Library, Profilverknüpfung, Suchindex-/Sitemap-Datenbasis, CSV und separater LinkedIn-Begleittext vorbereitet; LinkedIn bleibt `prepared-not-posted`.
+- Ohne öffentliches Beitragsbild, weil kein fachlich passendes geprüftes Motiv vorlag; keine SVG- oder Titelkarten-Platzhalter.
+
 ## 2026-10-17 – Drohnenaufnahmen bei Gebäudeschäden prüffähig einordnen
 
 - Genau einen Tagesartikel unter atomarer Reservierung vorbereitet: rechtlichen und sicheren Flugbetrieb, sichtbaren Bildbefund, photogrammetrische Auswertung und Ursachenbewertung getrennt dokumentieren.

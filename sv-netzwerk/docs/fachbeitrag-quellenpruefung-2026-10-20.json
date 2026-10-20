@@ -1,0 +1,127 @@
+{
+  "date": "2026-10-20",
+  "publication_id": "2026-10-20-pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen",
+  "article": "pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen",
+  "author": "christian-waechter",
+  "status": "prepared",
+  "article_type": "eigenstaendiges-sachverstaendigenthema",
+  "expert_rotation": {
+    "selected_person": "Claudius Freiberg",
+    "profile_url": "https://www.sv-netzwerk.eu/experten/claudius-freiberg/",
+    "verified_specialty": "Oberflächenschäden, Materialbewertung und Beschichtungen an Holz, Aluminium und Kunststoff; Live-Profil und Repository am 20.10.2026 geprüft",
+    "progress": "Der erste Zyklus 12. bis 17.10.2026 ist abgeschlossen. Im zweiten Zyklus wurden Christian Wächter am 18.10. und Carmen Gohl am 19.10. berücksichtigt; Claudius Freiberg folgt am 20.10. ohne Wiederholung.",
+    "selection_basis": "Thema aus dem belegten Profil und nach Archivabgleich abgeleitet; keine Autorenschaft oder konkrete Fallzuständigkeit behauptet."
+  },
+  "source_review": {
+    "checked_at": "2026-10-20",
+    "decision_date": "2026-10-20",
+    "new_event_claimed": false,
+    "norm_effective_date_claimed": true,
+    "notes": "Aktuelle deutsche GSB-Qualitätsrichtlinien Januar 2026 und offizielle GRM-Unterlagen geöffnet und im benötigten Umfang gelesen. GSB-Anwendungsbereich von Objektbefund, Wartung und Reinigung abgegrenzt. Keine nicht eingesehenen Normklauseln, erfundenen Praxisfälle oder Messwerte verwendet."
+  },
+  "sources": [
+    {
+      "publisher": "GSB International e. V.",
+      "title": "GSB AL 631-1 / GSB ST 663-1 – Allgemeine Bestimmungen",
+      "publication_or_update_date": "Ausgabe Januar 2026; gültig ab 01.01.2026",
+      "status": "aktuelle deutsche Qualitätsrichtlinie",
+      "read_scope": "Volltext geöffnet; Geltungsbereich, Ausschlüsse für handwerkliche Vor-Ort-Beschichtung sowie Wartung und Reinigung, Empfehlungen zur Auswahl nach Witterungs- und Korrosionsbelastung ausgewertet",
+      "practical_meaning": "Industrielle Beschichtung und Objektzustand trennen; Exposition und Systemwahl in die Ursachenprüfung aufnehmen",
+      "url": "https://gsb-international.de/wp-content/uploads/2026/01/01-GSB-QR-AL-631-1-ST-663-1-Allgemeiner-Teil-2026-01-01-de.pdf",
+      "checked_at": "2026-10-20"
+    },
+    {
+      "publisher": "GSB International e. V.",
+      "title": "GSB AL 631-5 – Beschichter Aluminium",
+      "publication_or_update_date": "Ausgabe Januar 2026; gültig ab 01.01.2026",
+      "status": "aktuelle deutsche Qualitätsrichtlinie",
+      "read_scope": "Volltext geöffnet; werkseigene Produktionskontrolle, Dokumentation und Prüfungen an beschichteten Teilen einschließlich Schichtdicke, Glanz, Farbe, Haftung und Korrosionsprüfungen ausgewertet",
+      "practical_meaning": "Herstellungsnachweise und Rückstellmuster als Vergleichsgrundlage nutzen, einzelne Prüfgrößen nicht zur alleinigen Ursachendiagnose machen",
+      "url": "https://gsb-international.de/wp-content/uploads/2025/12/05-GSB-QR-AL-631-5-Beschichter-AL-2026-01-01-de.pdf",
+      "checked_at": "2026-10-20"
+    },
+    {
+      "publisher": "GSB International e. V.",
+      "title": "GSB AL 631-7 / GSB ST 663-7 – Mess- und Prüfverfahren, Normen und Richtlinien",
+      "publication_or_update_date": "Ausgabe Januar 2026; gültig ab 01.01.2026",
+      "status": "aktuelle deutsche Qualitätsrichtlinie",
+      "read_scope": "Volltext geöffnet; Schichtdickenmessung, Gitterschnitt, Korrosionsbewertung, Farb- und Glanzmessung sowie visuelle Prüfung fertiger Produkte ausgewertet",
+      "practical_meaning": "Messverfahren, Messstellen und Betrachtungsbedingungen dokumentieren; zerstörende Prüfung nur auf klare Fragestellung stützen",
+      "url": "https://gsb-international.de/wp-content/uploads/2026/01/07-GSB-QR-AL-631-7-ST-663-7-Normen-Richtlinien-2026-01-01-de.pdf",
+      "checked_at": "2026-10-20"
+    },
+    {
+      "publisher": "GSB International e. V.",
+      "title": "Empfehlungstexte Ausschreibung – Beschichtung von Aluminiumprofilen und -blechen",
+      "status": "offizielle Planungsempfehlung",
+      "read_scope": "Seite vollständig geöffnet; Qualitätsmuster, Testberichte, Farbgleichheit, Glanz, Struktur und Aufbewahrung von Prüfprotokollen ausgewertet",
+      "practical_meaning": "Vereinbarte Qualitäts- und Grenzwertmuster vor der Bewertung identifizieren",
+      "url": "https://gsb-international.de/architekten-und-planer/informationen/empfehlungstexte-ausschreibung/",
+      "checked_at": "2026-10-20"
+    },
+    {
+      "publisher": "Gütegemeinschaft Reinigung von Fassaden e. V.",
+      "title": "GRM Merkblatt 07 – Reinigung von matten und strukturiert beschichteten Metalloberflächen",
+      "publication_or_update_date": "Dezember 2021",
+      "status": "offizielles Fachmerkblatt",
+      "read_scope": "Volltext mit acht Seiten geöffnet; Oberflächentypen, Musterfläche, Vorher-Nachher-Dokumentation und Risiken ungeeigneter Reinigungsmethoden ausgewertet",
+      "practical_meaning": "Reinigungseinfluss zunächst auf dokumentierter Musterfläche zerstörungsarm eingrenzen",
+      "url": "https://fassadenreinigung.grm-online.de/fileadmin/Redaktion/Downloads/MERKBLA%CC%88TTER/GRM_MERKBLATT_07.pdf",
+      "checked_at": "2026-10-20"
+    },
+    {
+      "publisher": "Gütegemeinschaft Reinigung von Fassaden e. V.",
+      "title": "GRM Merkblatt 01 – Empfehlungen zur Vergabe und Durchführung sachgerechter Fassadenreinigungen",
+      "status": "offizielles Fachmerkblatt über die Herausgeberseite",
+      "read_scope": "Merkblatt im benötigten Umfang geöffnet; Bestandsaufnahme, mechanische Schäden, Korrosion, Musterreinigung sowie Vorher-Nachher-Prüfung ausgewertet",
+      "practical_meaning": "Oberflächenzustand und Reinigungshistorie vor einer flächigen Maßnahme sichern",
+      "url": "https://fassadenreinigung.grm-online.de/downloads/",
+      "checked_at": "2026-10-20"
+    },
+    {
+      "publisher": "Verband Fenster + Fassade",
+      "title": "VFF Merkblatt AL.02 – Leseprobe zur visuellen Beurteilung organisch beschichteter Aluminiumoberflächen",
+      "publication_or_update_date": "August 2016",
+      "status": "offizielle Leseprobe des Herausgebers",
+      "read_scope": "Vollständige Leseprobe geöffnet; Geltungsbereich für einbaufertige und eingebaute Oberflächen, Ausschlüsse und Betrachtungsbedingungen ausgewertet",
+      "practical_meaning": "Abweichende Betrachtungsabstände gegenüber der GSB-Prüfung fertiger Produkte dem jeweiligen Geltungsbereich zuordnen",
+      "url": "https://vff-shop.de/wp-content/uploads/2024/04/AL02_1608_leseprobe.pdf",
+      "checked_at": "2026-10-20"
+    }
+  ],
+  "linkedin": {
+    "status": "prepared-not-posted",
+    "file": "src/content/linkedin/2026-10-20_pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen.txt",
+    "prepared_file": "docs/linkedin/2026-10-20/2026-10-20-pulverbeschichtetes-aluminium-linkedin.txt",
+    "source_review": "docs/linkedin/2026-10-20/2026-10-20-linkedin-quellenpruefung.md"
+  },
+  "archive_review": {
+    "existing_related_article": "parkett-holzfeuchte-raumklima-untergrund-pruefen",
+    "distinction": "Der bestehende Beitrag behandelt Parkett und den mehrschichtigen Innenausbau. Der neue Beitrag untersucht industriell pulverbeschichtete Aluminiumbauteile mit eigenen Prüfgrößen für Farbe, Glanz, Haftung, Reinigungseinfluss und Korrosion.",
+    "daily_count_before_creation": 0
+  },
+  "local_checks": {
+    "npm_ci": "success; 743 Pakete installiert, bestehende npm-Hinweise dokumentiert",
+    "astro_check": {
+      "errors": 0,
+      "warnings": 0,
+      "hints": 0,
+      "files": 356
+    },
+    "preflight": "success",
+    "build": "success",
+    "article_words": 1955,
+    "pages": 1078,
+    "knowledge_urls": 113,
+    "sitemap_pages": 194,
+    "internal_links": 21119,
+    "daily_count": 1,
+    "encoding": "passed",
+    "public_copy": "passed",
+    "visible_umlauts": "passed",
+    "knowledge_dist_links_search_sitemap": "passed",
+    "verified_at": "2026-10-20T06:16:10+02:00",
+    "python_runtime_note": "Windows python3 war nur der Microsoft-Store-Alias. Die identische npm-Buildkette wurde über einen lokalen Shim mit C:/Users/chris/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe vollständig erfolgreich ausgeführt."
+  },
+  "deployment": {}
+}

@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Pulverbeschichtete Aluminiumbauteile prüfen: Farbton, Glanz, Haftung und Korrosion trennen',
+    description: 'Farbton, Glanz, Struktur, Schichtdicke, Haftung, Reinigungseinfluss und Korrosion an pulverbeschichteten Aluminiumbauteilen nachvollziehbar untersuchen.',
+    href: '/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/',
+    category: 'Oberflächen und Innenausbau',
+    tags: ['Pulverbeschichtung', 'Aluminium', 'Oberflächenschäden', 'Farbton', 'Glanz', 'Haftung', 'Korrosion'],
+    date: '2026-10-20',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Asbesterkundung vor Sanierungsarbeiten: Baujahr, Verdachtsflächen und Probenahme richtig dokumentieren',
     description: 'Asbestverdacht vor der Sanierung anhand von Baugeschichte, betroffenen Materialien, Probenplan, Laborbefund und verbleibenden Unsicherheiten nachvollziehbar klären.',
     href: '/fachwissen/asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme/',
