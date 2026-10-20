@@ -1,15 +1,25 @@
-Pulverbeschichtetes Aluminium prüfen: Auffälligkeit ist noch keine Ursache.
+Fleckige Aluminiumprofile? Vor der Nachbesserung steht die Ursachenprüfung.
 
-Wenn eine Fassade, ein Fensterprofil oder ein Geländer fleckig, glänzender oder beschädigt erscheint, braucht es zuerst eine saubere Trennung. Liegt eine Verschmutzung vor? Hat eine Reinigung Glanz oder Struktur verändert? Ist der Schichtverbund betroffen? Oder beginnt die Auffälligkeit an einer Kante, einem Kratzer oder einer Bearbeitungsstelle?
+Ein Farb- oder Glanzunterschied ist noch keine Diagnose. Bei pulverbeschichteten Fenstern, Türen und Fassaden können Verschmutzung, Reinigungseinflüsse und Veränderungen der Beschichtung unterschiedlich zu bewerten sein.
 
-Für eine belastbare Bewertung müssen Betrachtungsbedingungen und Referenzen feststehen. Farbe, Glanz und Struktur wirken je nach Licht, Blickrichtung und Oberfläche unterschiedlich. Messwerte helfen nur, wenn Messstellen, Verfahren und Vergleichsflächen dokumentiert sind.
+Für die Untersuchung sind fünf Prüfpunkte hilfreich:
 
-Besonders wichtig: nicht vorschnell reinigen oder zerstörend prüfen. Eine kleine, dokumentierte Musterfläche kann zeigen, ob sich eine Auflage entfernen lässt, ohne die Beschichtung zu verändern. Haftungsprüfungen greifen dagegen in die Oberfläche ein und brauchen eine klare Fragestellung sowie eine abgestimmte Reparaturfolge.
+• Vergleichsgrundlage klären: vereinbarte Muster und Produktunterlagen zuordnen. Licht, Blickrichtung und Betrachtungsabstand dokumentieren.
 
-Oberflächenschäden, Materialbewertung sowie Beschichtungen an Aluminium gehören zu den belegten Schwerpunkten von Claudius Freiberg im SV-Netzwerk. Der heutige Fachartikel zeigt, wie Farbton, Glanz, Schichtdicke, Haftung, Reinigungseinfluss und Korrosion getrennt untersucht und fachgerechte Maßnahmen abgeleitet werden:
+• Befunde trennen: Farbton, Glanz und Struktur einzeln erfassen. Ablösungen oder korrosionsverdächtige Stellen gesondert untersuchen, statt sie allein nach ihrem Aussehen einer Ursache zuzuordnen.
+
+• Reinigung prüfen: Bei matten und strukturierten Oberflächen zunächst eine geeignete, repräsentative Musterfläche abstimmen und den Zustand vor und nach der Arbeitsprobe festhalten. Ein Reinigungsmittel oder Hilfsmittel passt nicht zu jeder Oberfläche.
+
+• Messungen zuordnen: Schichtdicke, Farbe und Glanz sind unterschiedliche Prüfgrößen. Messstellen, Verfahren und Referenzen müssen zur jeweiligen Fragestellung passen.
+
+• Eingriffe abstimmen: Ein Gitterschnitt verletzt die Beschichtung. Vor einer solchen Prüfung am eingebauten Bauteil müssen Prüfstelle, Freigabe und Reparaturfolge geklärt sein.
+
+Prüfungen aus der Produktionskontrolle lassen sich nicht pauschal als Abnahmekriterium für jeden Bestand übernehmen. Vertrag, Beschichtungssystem und Objektzustand bleiben maßgeblich; erforderliche Laborprüfungen gehören zu geeigneten Fachstellen.
+
+Oberflächenschäden sowie Material- und Beschichtungsbewertung an Aluminium gehören zu Claudius Freibergs Schwerpunkten im SV-Netzwerk. Der heutige Fachartikel erläutert die Prüfwege und ihre Grenzen:
 https://www.sv-netzwerk.eu/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/
 
 Christian Wächter
 Sachverständiger | Regulierung im Komplex- und Großschaden
 
-#Pulverbeschichtung #Aluminium #Oberflächenschaden #Beschichtung #Sachverständige
+#Pulverbeschichtung #Aluminium #Oberflächenschäden #Beschichtung #Sachverständige

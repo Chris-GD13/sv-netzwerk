@@ -1,35 +1,45 @@
-# LinkedIn-Lauf 20.10.2026 – Veröffentlichung blockiert
+# LinkedIn-Veröffentlichung 20.10.2026 – published-verified
 
-Prüfstand: 2026-10-20 07:02:24 Europe/Berlin (2026-10-20T05:02:24.029Z).
+Genau einmal auf Christian Wächters persönlichem Profil veröffentlicht:
 
-## Ergebnis
+https://www.linkedin.com/feed/update/urn:li:activity:7518198728848064512/
 
-In diesem Lauf wurde kein LinkedIn-Beitrag veröffentlicht. Die aktuelle Browserinventur enthält nur Edge (Profil 1), den In-App-Browser und MCP Apps. Die ausdrücklich beauftragte angemeldete Chrome-Sitzung Christian ist nicht verbunden. Daher konnten die persönlichen Profilaktivitäten nicht auf Duplikate geprüft, die Vorschau nicht geprüft und kein Post abgesendet oder live verifiziert werden. Ein Registerstatus not-posted beweist für sich keine Abwesenheit eines manuellen Beitrags.
+Posten-Klick am 20.10.2026 im clientseitigen Zeitfenster 2026-10-20T08:37:37.642+02:00 bis 2026-10-20T08:37:38.013+02:00 (Europe/Berlin). LinkedIn bestätigte „Der Beitrag wurde gepostet“ und lieferte diesen echten Permalink. Live geprüft 2026-10-20T08:38:23.030+02:00, Registerverifikation 2026-10-20T08:39:11.022+02:00. Kein zweiter Sendeversuch.
 
-Keine LinkedIn-Reservierung, kein Upload, kein Absendeversuch, kein Permalink und kein published-verified-Status. Nutzer um legitime Wiederverbindung der vorhandenen Chrome-Sitzung gebeten; keine Sitzung oder Sperre umgangen.
-
-## Geprüfter Tagesartikel
+## Artikel und fachlicher Bezug
 
 Pulverbeschichtete Aluminiumbauteile prüfen: Farbton, Glanz, Haftung und Korrosion trennen
 
 https://www.sv-netzwerk.eu/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/
 
-Artikelkennung: 2026-10-20-pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen. Website-Übersicht und vollständige kanonische Artikelseite im sichtbaren In-App-Browser gelesen; Datum 20. Oktober 2026, Titel, Inhalt und Canonical stimmen. Die Websitezuordnung zu Claudius Freiberg wurde aus Artikel und Tagesprotokoll übernommen; das aktuelle Expertenprofil wurde in diesem Lauf nicht zusätzlich geprüft. Kein Ersatzartikel oder neues Thema erstellt.
+Artikelkennung: 2026-10-20-pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen. Eigenständiges Sachverständigenthema; Fachprofil Claudius Freiberg mit Oberflächenschäden und Material-/Beschichtungsbewertung an Aluminium aktuell gelesen. Auswahl des Website-Laufs übernommen. Keine Autorenschaft, individuelle Fallzuständigkeit oder zusätzliche Qualifikation behauptet. Keine erfundenen Fälle/Messwerte/Normgrenzwerte oder künstliche Versicherungsfallzuordnung.
 
-Ursprünglicher Artikelcommit: 1a03feff30eb7a2a1a2279876ec5bc3215144e17; ursprünglicher Run: https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39368941804. Aktueller öffentlicher Marker HTTP 200: 7290f607eaeb083fc66308d7c3cc98f3b483e351. Website-Deployment über GitHub API aktuell completed/success: https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39370239945 . Screenshot: docs/linkedin/2026-10-20/2026-10-20-tagesartikel-live.png.
+Website-Übersicht und vollständige Detailseite wurden im früheren Teil dieses Tageslaufs sichtbar gelesen. In der Fortsetzung HTTP200 mit richtigem Titel/Canonical und unverändertem öffentlichem Deploymentmarker geprüft. Der LinkedIn-Kurzlink https://lnkd.in/euaGiYbA wurde im freigegebenen Tab tatsächlich bis zu exakt dieser kanonischen Artikelseite geöffnet; H1 und Canonical stimmen. Artikelcommit 1a03feff30eb7a2a1a2279876ec5bc3215144e17; ursprünglicher Run https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39368941804. Aktuelle redaktionelle Livefassung 7290f607eaeb083fc66308d7c3cc98f3b483e351, Website-Run https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39370239945 per aktueller GitHub-API completed/success bestätigt. Spätere redaktionelle Änderungen und fiktives Websitebeispiel wurden nicht als persönlicher Fall in LinkedIn übernommen.
 
-## Maßgebliche Vorgaben
+## Vorgaben und Duplikatkontrolle
 
-Desktop-Datei Chat CPT Anweisung.txt zuerst gelesen. Führende Cloud-Masterdatei G:/Meine Ablage/Neuerungen/MASTER-ARBEITSSTANDARD_Stand-2026-10-12.md in Fassung 4.20 einschließlich aktueller Neuerungen vollständig neu gelesen, insbesondere Abschnitt 2.1 und NEUERUNG-BEGIN 19.10.2026 20:28. Portal-Übergabe aus Neuerungen, einschlägige Drive-Projekt-/Compliancevorgaben und Teilregulierungs-/Kopiertextregel gelesen. Repository AGENTS.md, FACHBEITRAG_STANDARD.md, FACHBEITRAG_AUTOMATION.md, linkedin-veroeffentlichung-2026-10-06.md und Deploymentvorgaben berücksichtigt. Direkter aktueller Nutzerauftrag hat Vorrang vor älteren Bild- und prepared-only-Regeln.
+Bei Fortsetzung führende Cloud-Masterdatei G:/Meine Ablage/Neuerungen/MASTER-ARBEITSSTANDARD_Stand-2026-10-12.md vollständig neu gelesen: Fassung4.21, einschließlich aller aktuellen NEUERUNG-Blöcke, Abschnitt2.1 und 19.10.2026 20:28. Aktuelle Publikationsvorgaben erneut gelesen; zuvor vollständig gelesene unveränderte Detailregeln weiter berücksichtigt. Keine zweite Masterdatei angelegt. Direkte Nutzerfreigabe gilt vor älteren prepared-only-/Bildpflichtregeln.
 
-Origin der Verwaltungsbasis verifiziert: https://github.com/Chris-GD13/sv-netzwerk.git. Fetch origin main, frischer sauberer detached Worktree von origin/main; verschmutzte Verwaltungsbasis nicht bearbeitet. Tagesregister, CSV und inspect-Ergebnis stimmen für Artikelkennung und Websiteveröffentlichung überein.
+Nutzerfreigabe der Fortsetzung: ausschließlich der vorhandene LinkedIn-Tab rechts; alle anderen Tabs tabu. Aktuelle Inventur: ChromeChristian vorhanden. Nur Tab137857359 gebunden und gesteuert. Kein anderer vorhandener Tab geöffnet, gelesen oder verändert; keine zusätzlichen Tabs erstellt. Fachquellen über separates Recherchewerkzeug geöffnet, keine anderen Chrome-Tabs verwendet. Der tatsächliche Permalink bleibt im freigegebenen Tab geöffnet.
 
-## Bild- und Kostenentscheidung
+Vor Textübernahme sowie nach frischem Reload vor dem Absenden Profilaktivitäten, Register und CSV geprüft. Letzte Profilkontrolle 2026-10-20T08:36:39.551+02:00: jüngster eigener Tagesbeitrag Asbest19.10., kein heutiger Aluminiumbeitrag. Eigene atomare Reservierung claim-linkedin f9b5a3a7e0a4978fb70666b3d0ca9b814a0a1b79, Owner codex-linkedin-20261020-01a157ac-resumed. Unmittelbar vor Posten eigener Registerclaim und CSV nochmals gelesen. Vorschau mit persönlichem Absender, „Mit allen teilen“, vollständigem Text/Link und ohne Bild geprüft. Danach nur einmal Posten. Profil nach Veröffentlichung frisch geöffnet und genau einen neuen Aluminiumbeitrag vor dem Asbestbeitrag angezeigt.
 
-Zusatzbudget 0 USD, tatsächliche zusätzliche Bildkosten 0 USD. Kein Bildmodell, keine Bild-API, kein API-Schlüssel, keine Credits und kein Stockkauf verwendet. Keine Bildauswahl, Bilderstellung oder Veröffentlichung durchgeführt, da die verbindliche Profil-/Duplikatprüfung bereits blockiert ist. Bei Fortsetzung die Bildreihenfolge neu prüfen; ein Beitrag ohne Bild bleibt ausdrücklich zulässig. Keine unbelegte Aussage über enthaltene Work-Tariflimits.
+## Sichtbarer Live-Nachweis
 
-## Dokumentation und Fortsetzung
+Permalink unabhängig geöffnet und erneut geladen; persönlicher Absender, vollständiger Text mit fünf Prüfpunkten, Fachgrenzen, Claudius-Fachbezug, öffentliche Rolle, Hashtags und korrekte Linkvorschau sichtbar bestätigt. Alle13 nichtleeren Nicht-URL-Textzeilen des finalen Textes stimmen mit dem unabhängigen Live-Readback überein. Die kanonische URL wurde von LinkedIn zu https://lnkd.in/euaGiYbA gekürzt; Ziel im Browser verifiziert. Kein Bild hochgeladen; kein Bildhinweis erfunden.
 
-Registerstatus bleibt not-posted mit konkretem blocker-Objekt; heutige CSV-Hauptzeile lautet blocked-browser-connection. Ältere Tage und Artikelobjekt unverändert. Nur Status-/Nachweisdokumentation mit [skip ci], kein Website-Deployment ausgelöst. Bereits vom Website-Lauf vorbereiteter Text und Quellenprüfung wurden nicht als eigener veröffentlichungsfertiger Text bestätigt oder geändert. Vor einer späteren Veröffentlichung Primärquellen tatsächlich lesen und Aussagen abgleichen.
+Oberer Screenshot: docs/linkedin/2026-10-20/2026-10-20-linkedin-live.png. Unterer Screenshot mit Link, Fachgrenzen, Rolle und Hashtags: docs/linkedin/2026-10-20/2026-10-20-linkedin-link-live.png. Screenshots sichtbar geprüft; FullPage-Aufnahme enthält in dieser Verbindung nur den Viewport, deshalb zusätzlich nach regulärem Scrollen den unteren Teil gesichert.
 
-Fortsetzung: Chrome Christian legitim verbinden. Führende Masterdatei und aktuelle Neuerungen erneut vollständig lesen; Profil, Register und CSV neu auf Datum/Titel/URL/Thema prüfen. Eventuell manuell vorhandenen Beitrag live klären. Erst dann claim-linkedin, Vorschauprüfung und genau ein Absendevorgang; tatsächlichen Permalink öffnen und screenshotten. published-verified erst nach sichtbarer Verifikation dokumentieren.
+## Quellen und Bildkosten
+
+GSB AL631 Teile1/5/7 (Januar2026), VFF AL.02 offizielle Leseprobe und GRM07 (Dezember2021) in dieser Fortsetzung tatsächlich geöffnet und im für jede Aussage benötigten Umfang gelesen. Konkrete Abschnitte, Abrufdatum20.10.2026 und Fachgrenzen in docs/linkedin/2026-10-20/2026-10-20-linkedin-quellenpruefung.md dokumentiert. Keine ungelesenen DIN-/ISO-Normvolltexte behauptet, keine universellen Betrachtungsabstände übernommen.
+
+Zusatzbudget0USD, tatsächliche zusätzliche Bildkosten0USD. Konkrete Work-Tarifdeckung ohne Test nicht nachweisbar, kein passendes ausdrücklich freigegebenes Bestandsmotiv, zusätzliche lokale Titelkarte ohne fachlichen Mehrwert. Daher ohne Bild und ohne Bildhinweis veröffentlicht. Kein Bildmodell, keine Bild-API, kein API-Schlüssel, keine Credits und kein Stockkauf verwendet.
+
+## Dokumentation und früherer Blocker
+
+verify-linkedin db90c30f2ccd827d4a74f7882d15136defc789f1 nach Liveprüfung. Register published-verified mit echtem Permalink/Berliner Zeit/Artikel-URL/Bildkosten; nur heutige CSV-Hauptzeile fortgeschrieben. Frühere Registertage und Artikelobjekt unverändert. Finaler Text, Quellenprüfung, Verifikation und Screenshots im Artefaktordner und Repository gespeichert. Nur Dokumentationsänderungen mit[skip ci]; kein Website-Deployment ausgelöst. Sauberer Worktree von origin/main aus verifizierter Gitverwaltung, verschmutzte Verwaltungsbasis unverändert.
+
+Der frühe Lauf um07:03 war wegen fehlender Chrome-Verbindung beendet worden. Dieser damalige Befund ist historisch; nach Nutzerfreigabe war Chrome verfügbar und der Blocker wurde durch die oben belegte tatsächliche Veröffentlichung erledigt. Historischer Nachweis in docs/linkedin/2026-10-20/2026-10-20-browser-blocker.json; keine erneute Veröffentlichung daraus ableiten.
+
+Diesen Aluminiumbeitrag niemals erneut senden.

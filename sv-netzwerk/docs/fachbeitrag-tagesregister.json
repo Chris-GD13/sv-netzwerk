@@ -733,7 +733,52 @@
         "reserved_at": "2026-10-20T06:36:08.705Z",
         "article_url": "https://www.sv-netzwerk.eu/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/",
         "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7518198728848064512/",
-        "verified_at": "2026-10-20T06:39:11.022Z"
+        "verified_at": "2026-10-20T06:39:11.022Z",
+        "published_at_berlin": "2026-10-20T08:37:37.642+02:00",
+        "published_time_precision": "client-side-click-window",
+        "published_click_window_berlin": [
+          "2026-10-20T08:37:37.642+02:00",
+          "2026-10-20T08:37:38.013+02:00"
+        ],
+        "verified_at_berlin": "2026-10-20T08:39:11.022+02:00",
+        "live_checked_at_berlin": "2026-10-20T08:38:23.030+02:00",
+        "profile_url": "https://www.linkedin.com/in/christian-w-156408204/",
+        "proof_document": "docs/linkedin-veroeffentlichung-2026-10-20.md",
+        "text_file": "docs/linkedin/2026-10-20/2026-10-20-pulverbeschichtetes-aluminium-linkedin.txt",
+        "source_file": "docs/linkedin/2026-10-20/2026-10-20-linkedin-quellenpruefung.md",
+        "screenshots": [
+          "docs/linkedin/2026-10-20/2026-10-20-linkedin-live.png",
+          "docs/linkedin/2026-10-20/2026-10-20-linkedin-link-live.png"
+        ],
+        "image_path": null,
+        "image_cost_policy": {
+          "additional_budget_usd": 0,
+          "additional_spend_usd": 0,
+          "model_or_api_called": false,
+          "path": "published-without-image",
+          "note": "Konkrete Work-Tarifdeckung ohne Test nicht verifizierbar; kein fachlich passendes ausdrücklich freigegebenes Bestandsmotiv; zusätzliche lokale Titelkarte ohne fachlichen Mehrwert. Ohne Bild und Bildhinweis veröffentlicht."
+        },
+        "duplicate_check_note": "Profil vor Erstellung und nochmals nach frischem Reload vor dem Absenden geprüft: zuletzt Asbest19.10.; kein Pulverbeschichtungsbeitrag. Letzte Profilkontrolle 2026-10-20T08:36:39.551+02:00. Register/CSV vor Absenden erneut geprüft; eigener atomarer Claim. Genau ein Posten-Klick; Profil anschließend genau ein neuer Aluminiumbeitrag.",
+        "website_live_commit": "7290f607eaeb083fc66308d7c3cc98f3b483e351",
+        "website_live_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39370239945",
+        "article_type": "eigenstaendiges-sachverstaendigenthema",
+        "expert_assignment": {
+          "name": "Claudius Freiberg",
+          "profile_url": "https://www.sv-netzwerk.eu/experten/claudius-freiberg/",
+          "scope": "Oberflächenschäden sowie Material- und Beschichtungsbewertung an Aluminium; aktuelles Profil gelesen; Websiteauswahl übernommen, keine Autorenschaft behauptet"
+        },
+        "shortlink": "https://lnkd.in/euaGiYbA",
+        "earlier_attempt": {
+          "status": "blocked-browser-connection",
+          "observed_at": "2026-10-20T05:02:24.029Z",
+          "resolved": true,
+          "resolved_note": "Nutzer gab ausschließlich den vorhandenen LinkedIn-Tab rechts frei; Chrome Christian in der aktuellen Inventur verfügbar. Andere Tabs nicht geöffnet, gelesen oder verändert."
+        },
+        "instruction_read": {
+          "master_version": "4.21",
+          "date": "2026-10-20",
+          "full_master_and_changes_reread": true
+        }
       }
     }
   },
