@@ -3,7 +3,7 @@
   "publication_id": "2026-10-20-pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen",
   "article": "pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen",
   "author": "christian-waechter",
-  "status": "prepared",
+  "status": "published-verified",
   "article_type": "eigenstaendiges-sachverstaendigenthema",
   "expert_rotation": {
     "selected_person": "Claudius Freiberg",
@@ -123,5 +123,20 @@
     "verified_at": "2026-10-20T06:16:10+02:00",
     "python_runtime_note": "Windows python3 war nur der Microsoft-Store-Alias. Die identische npm-Buildkette wurde über einen lokalen Shim mit C:/Users/chris/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe vollständig erfolgreich ausgeführt."
   },
-  "deployment": {}
+  "deployment": {
+    "content_commit": "1a03feff30eb7a2a1a2279876ec5bc3215144e17",
+    "register_verification_commit": "6a76da27737e69356caa0e46987e5075b682c7f9",
+    "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39368941804",
+    "conclusion": "success",
+    "verified_at": "2026-10-20T06:26:21+02:00",
+    "live_evidence": [
+      "canonical detail page HTTP 200 and visibly rendered with title, publication date and complete article",
+      "cache-busted Fachwissen overview visibly lists the 20.10.2026 article",
+      "Oberflächen und Innenausbau category and all seven tag pages visibly list the article",
+      "article visibly links Claudius Freiberg and his live profile confirms the stated surface, material and coating specialty",
+      "search-index.json and sitemap-0.xml contain the canonical URL",
+      "robots.txt allows public pages and references sitemap-index.xml",
+      "deploy-version.txt reports the content commit 1a03feff30eb7a2a1a2279876ec5bc3215144e17"
+    ]
+  }
 }

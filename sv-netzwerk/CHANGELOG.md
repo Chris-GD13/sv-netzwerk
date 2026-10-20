@@ -6,6 +6,7 @@
 - Kein erfundener Schadenfall oder Messwert; ausschließlich ein ausdrücklich fiktives Beispiel ohne Zahlen und ohne künstliche Umdeutung zum Versicherungsschaden.
 - Library, Profilverknüpfung, Suchindex-/Sitemap-Datenbasis, CSV und separater LinkedIn-Begleittext vorbereitet; LinkedIn bleibt `prepared-not-posted`.
 - Ohne öffentliches Beitragsbild, weil kein fachlich passendes geprüftes Motiv vorlag; keine SVG- oder Titelkarten-Platzhalter.
+- Inhaltscommit `1a03feff30eb7a2a1a2279876ec5bc3215144e17` über [Deployment 39368941804](https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39368941804) live bestätigt; Detail, cachefreie Übersicht, Kategorie, alle sieben Tags, Suchindex, Sitemap, robots.txt und exakter Deploy-Marker geprüft.
 
 ## 2026-10-17 – Drohnenaufnahmen bei Gebäudeschäden prüffähig einordnen
 
