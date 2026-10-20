@@ -16,7 +16,7 @@ $checks = [
     'Zielordner-Auswahl vorhanden'=>str_contains($browser, 'id="vfdb-move-target"'),
     'Verschiebe-Schaltfläche vorhanden'=>str_contains($browser, 'id="vfdb-move-selected"'),
     'Mehrfachauswahl wird übergeben'=>str_contains($browser, 'file_ids:selected.map(n=>n.dataset.id)'),
-    'Cache-Version aktualisiert'=>str_contains($layout, 'case-document-browser.js?v=20260901-2'),
+    'Cache-Version aktualisiert'=>str_contains($layout, 'case-document-browser.js?v=20261020-casebinding'),
 ];
 $failed = array_keys(array_filter($checks, static fn(bool $passed): bool => !$passed));
 if ($failed !== []) {
@@ -24,3 +24,4 @@ if ($failed !== []) {
     exit(1);
 }
 echo "Fallakten lassen sich kontrolliert in vorhandene Unterordner verschieben.\n";
+
