@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-19
-  updatedAt: 2026-10-12
+  updatedAt: 2026-10-20
   status: published
 seo:
   title: "Digitales Aufmaß prüffähig dokumentieren"
@@ -59,7 +59,7 @@ Fotos sollten Raum, Blickrichtung und Maßstab zeigen. Referenzstrecken sind mit
 
 ## Qualitätskontrolle digitaler Modelle
 
-Vor der Verwendung werden mindestens drei unterschiedliche Kontrollmaße an verschiedenen Stellen mit dem Modell verglichen. Die Abweichung ist mit Einheit und Messmethode zu dokumentieren. Große, glänzende, verdeckte oder strukturlose Flächen können die Erkennung beeinflussen; solche Bereiche sind im Bericht zu markieren. Werden Maße geglättet, ergänzt oder aus einer Punktwolke abgeleitet, muss der Bearbeitungsschritt nachvollziehbar bleiben. Ein Export ohne Projektdatei ist bei späteren Rückfragen nur eingeschränkt prüfbar.
+Vor der Verwendung lege ich ein Kontrollmaßnetz passend zur Messaufgabe fest. Dazu gehören verteilte Referenzstrecken und besonders die Maße, aus denen kostenrelevante Mengen entstehen. Eine starre Mindestzahl von drei Maßen wäre für unterschiedliche Räume und Genauigkeitsanforderungen nicht aussagekräftig. Abweichungen werden mit Einheit und unabhängiger Messmethode protokolliert; bei relevanten Unterschieden wird nachgemessen. Glänzende, verdeckte oder strukturarme Flächen und unvollständige Aufnahmen können das Modell beeinträchtigen. Nachträgliche Ergänzungen bleiben von erfasster Geometrie unterscheidbar. Herstellerangaben zur Aufnahme sind keine objektspezifische Genauigkeitsbescheinigung.
 
 ## Zuständigkeits- und Fachgrenzen
 
@@ -91,6 +91,6 @@ Digitale Aufmaße sind wertvoll, wenn ihre Entstehung nachvollziehbar bleibt. Ge
 
 ## Quellen und weiterführende Hinweise
 
-- Bundesanstalt für Arbeitsschutz und Arbeitsmedizin, [ASR A1.6 – Fenster, Oberlichter, lichtdurchlässige Wände](https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6).
-- Deutsche Gesetzliche Unfallversicherung, [DGUV-Informationen – Regelwerk](https://www.dguv.de/medien/inhalt/publikationen/regelwerk/regelwerk_dguv-informationen/index.jsp).
+- Polycam, [How to Measure a Room With Your Phone](https://poly.cam/blog/how-to-measure-a-room-with-your-phone).
+- Bundesministerium der Justiz / Bundesamt für Justiz, [§ 371 ZPO – Beweis durch Augenschein](https://www.gesetze-im-internet.de/zpo/__371.html).
 - Bundesministerium der Justiz, [§ 82 VVG – Schadenabwendung und Schadenminderung](https://www.gesetze-im-internet.de/vvg_2008/__82.html).

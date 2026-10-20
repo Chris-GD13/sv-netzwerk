@@ -1,0 +1,152 @@
+{
+  "date": "2026-10-20",
+  "kind": "publication-corrections-addendum-not-new-publication",
+  "central_daily_row": "Tagesartikel ist bereits im fachbeitrag-veroeffentlichungsprotokoll.csv auf main eingetragen. Historische CSV wird in diesem Korrektur-PR nicht vollständig überschrieben.",
+  "publication_day_guard": "Fremde Reservierung vom 20.10.2026 beachtet; kein zweiter Tagesartikel, keine Reservierungsänderung.",
+  "status": "build-passed-awaiting-pr-merge-and-live-verification",
+  "entries": [
+    {
+      "path": "sv-netzwerk/src/content/knowledge/aufmass-fotodokumentation-polycam-pruefffaehig.md",
+      "slug": "aufmass-fotodokumentation-polycam-pruefffaehig",
+      "sha256": "096cb2c2f16dbd99e78ec2e794a2e01f0cdaed2a26c9de10eeeff55ae0727b79",
+      "publication": "2026-09-19",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/aufmass-fotodokumentation-polycam-pruefffaehig/",
+      "new_daily_article": false,
+      "reason": "Gezielte Bestandskorrektur; vollständige individuelle Quellenfreigabe bleibt offen",
+      "linkedin_status": "unchanged-no-post-this-run"
+    },
+    {
+      "path": "sv-netzwerk/src/content/knowledge/beweissicherung-fotodokumentation-standards.md",
+      "slug": "beweissicherung-fotodokumentation-standards",
+      "sha256": "f5d225be79934508bc27b7f8800f91ad1d6e2ce226ce7f5177fa41ea5bd45753",
+      "publication": "2026-08-26",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/beweissicherung-fotodokumentation-standards/",
+      "new_daily_article": false,
+      "reason": "Gezielte Bestandskorrektur; vollständige individuelle Quellenfreigabe bleibt offen",
+      "linkedin_status": "unchanged-no-post-this-run"
+    },
+    {
+      "path": "sv-netzwerk/src/content/knowledge/blitz-ueberspannungsschaden-gebaeudetechnik-pruefen.md",
+      "slug": "blitz-ueberspannungsschaden-gebaeudetechnik-pruefen",
+      "sha256": "7203f7d74641c5b1b21ed7f134cf19a3e9b5e23e5831fdc9adc684ad9daab243",
+      "publication": "2026-09-05",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/blitz-ueberspannungsschaden-gebaeudetechnik-pruefen/",
+      "new_daily_article": false,
+      "reason": "Gezielte Bestandskorrektur; vollständige individuelle Quellenfreigabe bleibt offen",
+      "linkedin_status": "unchanged-no-post-this-run"
+    },
+    {
+      "path": "sv-netzwerk/src/content/knowledge/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung.md",
+      "slug": "elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung",
+      "sha256": "42bb460b7219d03e25536a1c768d4de30195c14d97fb904fa1792e382f6b14f3",
+      "publication": "2026-08-10",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung/",
+      "new_daily_article": false,
+      "reason": "Gezielte Bestandskorrektur; vollständige individuelle Quellenfreigabe bleibt offen",
+      "linkedin_status": "unchanged-no-post-this-run"
+    },
+    {
+      "path": "sv-netzwerk/src/content/knowledge/fenster-glasschaden-verglasung-reparaturgrenze.md",
+      "slug": "fenster-glasschaden-verglasung-reparaturgrenze",
+      "sha256": "4cd62ee47f0f2799240c98477f3222c890ca3c71b58ea002e773fa1e7053f478",
+      "publication": "2026-09-17",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fenster-glasschaden-verglasung-reparaturgrenze/",
+      "new_daily_article": false,
+      "reason": "Gezielte Bestandskorrektur; vollständige individuelle Quellenfreigabe bleibt offen",
+      "linkedin_status": "unchanged-no-post-this-run"
+    },
+    {
+      "path": "sv-netzwerk/src/content/knowledge/fenster-tueren-kostenvoranschlag-pruefen.md",
+      "slug": "fenster-tueren-kostenvoranschlag-pruefen",
+      "sha256": "abb452bf7f5861241baefd4064c1a137d9829da392bba6905140629b7f6082c1",
+      "publication": "2026-08-25",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fenster-tueren-kostenvoranschlag-pruefen/",
+      "new_daily_article": false,
+      "reason": "Gezielte Bestandskorrektur; vollständige individuelle Quellenfreigabe bleibt offen",
+      "linkedin_status": "unchanged-no-post-this-run"
+    },
+    {
+      "path": "sv-netzwerk/src/content/knowledge/fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen.md",
+      "slug": "fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen",
+      "sha256": "b72aaa8950ebeb3fbfe7053de23d6458a18fd027f1d5a67a21c9cf687e914df2",
+      "publication": "2026-08-23",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen/",
+      "new_daily_article": false,
+      "reason": "Gezielte Bestandskorrektur; vollständige individuelle Quellenfreigabe bleibt offen",
+      "linkedin_status": "unchanged-no-post-this-run"
+    },
+    {
+      "path": "sv-netzwerk/src/content/knowledge/flachdachschaden-pruefpfad-windsog-entwaesserung.md",
+      "slug": "flachdachschaden-pruefpfad-windsog-entwaesserung",
+      "sha256": "4470b3d43a4c4120e7a714bc8852c68e812188f5b3358739168dc55a82962740",
+      "publication": "2026-09-11",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/flachdachschaden-pruefpfad-windsog-entwaesserung/",
+      "new_daily_article": false,
+      "reason": "Gezielte Bestandskorrektur; vollständige individuelle Quellenfreigabe bleibt offen",
+      "linkedin_status": "unchanged-no-post-this-run"
+    },
+    {
+      "path": "sv-netzwerk/src/content/knowledge/frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung.md",
+      "slug": "frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung",
+      "sha256": "34353d7a1dabddebf55a304f08143f19113231c57d9b998edb13be4ea872ec7c",
+      "publication": "2026-08-02",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung/",
+      "new_daily_article": false,
+      "reason": "Gezielte Bestandskorrektur; vollständige individuelle Quellenfreigabe bleibt offen",
+      "linkedin_status": "unchanged-no-post-this-run"
+    },
+    {
+      "path": "sv-netzwerk/src/content/knowledge/glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit.md",
+      "slug": "glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit",
+      "sha256": "2eecbc569314c797f4f232072e2dc234728894d01eeebb83a7b95decd64bc27c",
+      "publication": "2026-08-18",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit/",
+      "new_daily_article": false,
+      "reason": "Gezielte Bestandskorrektur; vollständige individuelle Quellenfreigabe bleibt offen",
+      "linkedin_status": "unchanged-no-post-this-run"
+    },
+    {
+      "path": "sv-netzwerk/src/content/knowledge/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2.md",
+      "slug": "grossflaechige-leitungswasserschaeden-sanierungssteuerung-2",
+      "sha256": "45356f0042093c34e70dd9ef082fc7e7738ae2b3d62affda00cafe2c7828f6e2",
+      "publication": "2026-08-15",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2/",
+      "new_daily_article": false,
+      "reason": "Gezielte Bestandskorrektur; vollständige individuelle Quellenfreigabe bleibt offen",
+      "linkedin_status": "unchanged-no-post-this-run"
+    },
+    {
+      "path": "sv-netzwerk/src/content/knowledge/grossflaechige-leitungswasserschaeden-sanierungssteuerung.md",
+      "slug": "grossflaechige-leitungswasserschaeden-sanierungssteuerung",
+      "sha256": "17e6c7faecee6555e5ae7df775193661eab8355151734e18bc94602e8ce17dc1",
+      "publication": "2026-07-28",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/",
+      "new_daily_article": false,
+      "reason": "Gezielte Bestandskorrektur; vollständige individuelle Quellenfreigabe bleibt offen",
+      "linkedin_status": "unchanged-no-post-this-run"
+    },
+    {
+      "path": "sv-netzwerk/src/content/knowledge/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen.md",
+      "slug": "pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen",
+      "sha256": "8c9d5f86bf950d06bd8fc2fc11b4454d37463d2cdc22f9f7513d25797e34ace5",
+      "publication": "2026-10-20",
+      "updated": "2026-10-20",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/",
+      "new_daily_article": false,
+      "reason": "Redaktioneller Nachtrag zum vorhandenen Tagesartikel",
+      "linkedin_status": "unchanged-no-post-this-run"
+    }
+  ]
+}

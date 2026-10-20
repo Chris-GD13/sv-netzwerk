@@ -16,6 +16,7 @@ relatedLinks: ["/fachwissen/glasbruch-fenster-fassade-schadenbild-ursache-repara
 damageTypes: ["gebaeude", "sturm", "elementar", "glas"]
 publication:
   publishedAt: 2026-08-23
+  updatedAt: 2026-10-20
   status: published
 seo:
   title: "Fenster- und Türschäden fachlich bewerten"
@@ -100,10 +101,15 @@ Fenster- und Türschäden werden belastbar, wenn Bauteilsystem, Ereignis, Schade
 
 Sie schafft zugleich eine gemeinsame Grundlage für Eigentümer, Versicherer, Fachunternehmen und Sachverständige, weil jede spätere Entscheidung auf eindeutig bezeichnete Elemente und nachprüfbare Feststellungen zurückgeführt werden kann.
 
-## Quellen und weiterführende Hinweise
+## Anwendungsbereich der Arbeitsstättenregeln
+
+Die ArbStättV schützt Beschäftigte beim Einrichten und Betreiben von Arbeitsstätten. Bei einem privaten Wohngebäude ist deshalb zu klären, welche Anforderungen tatsächlich aus Nutzung, Bauordnungsrecht, Produkt und Auftrag folgen. ASR A1.6 darf nicht allein aufgrund ihrer Erwähnung im Quellenverzeichnis zum allgemeinen Austauschmaßstab für jedes Wohnfenster werden.
+
+## Quellen
 
 1. ift Rosenheim, Prüfung der Schlagregendichtheit von Fenstern und Türen nach EN 1027, https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren
 2. ift Rosenheim, Prüfung der Luftdurchlässigkeit von Fenstern und Türen nach EN 1026, https://www.ift-rosenheim.de/pruefung-luftdurchlaessigkeit-fenster-tueren
 3. BAuA, ASR A1.6 Fenster, Oberlichter und lichtdurchlässige Wände, https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6
 4. Bundesministerium der Justiz, § 82 VVG Schadenabwendungs- und Schadenminderungspflicht, https://www.gesetze-im-internet.de/vvg_2008/__82.html
 5. Deutsches Institut für Bautechnik, Technische Baubestimmungen, https://www.dibt.de/de/wir-bieten/technische-baubestimmungen
+6. Bundesministerium der Justiz / Bundesamt für Justiz, ArbStättV § 1 – Ziel, Anwendungsbereich, https://www.gesetze-im-internet.de/arbst_ttv_2004/__1.html

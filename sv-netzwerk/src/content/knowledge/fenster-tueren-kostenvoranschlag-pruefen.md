@@ -16,6 +16,7 @@ relatedLinks: ["/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistunge
 damageTypes: ["gebaeude", "sturm", "glas", "elementar"]
 publication:
   publishedAt: 2026-08-25
+  updatedAt: 2026-10-20
   status: published
 seo:
   title: "Fenster- und Türenangebote im Schadenfall prüfen"
@@ -113,10 +114,16 @@ Auch regionale Verfügbarkeit, Lieferzeit und Zugangssituation sind zu berücksi
 
 Ein prüffähiger Kostenvoranschlag für Fenster und Türen verbindet jeden Preis mit einem konkreten Schaden und einer technisch erforderlichen Leistung. Diese Trennung verbessert Nachvollziehbarkeit, verhindert Doppelansätze und ermöglicht eine sachgerechte Entscheidung über Reparatur, Teilersatz oder Komplettaustausch.
 
-## Quellen und weiterführende Hinweise
+## Anwendungsbereich technischer Anforderungen
+
+Arbeitsstättenregeln betreffen den Schutz von Beschäftigten im Anwendungsbereich der ArbStättV. Sie sind kein pauschaler Maßstab für den Ersatz jedes Fensters in einer Privatwohnung. Im Angebot muss deshalb erkennbar sein, ob die geforderte Ausführung aus Nutzung, Bauordnungsrecht, bestehender Ausstattung oder einer ausdrücklich vereinbarten Änderung folgt. Eine höhere Anforderung allein aus einer allgemein genannten Regelnummer abzuleiten, reicht für die Kostenzuordnung nicht aus.
+
+## Quellen
+
 
 1. ift Rosenheim, Schlagregendichtheit von Fenstern und Türen, https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren
 2. BAuA, ASR A1.6 Fenster und lichtdurchlässige Wände, https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6
 3. BAuA, Technische Regeln für Arbeitsstätten mit ASR A1.7 Türen und Tore, https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR
 4. Bundesministerium der Justiz, § 82 VVG, https://www.gesetze-im-internet.de/vvg_2008/__82.html
 5. Deutsches Institut für Bautechnik, Technische Baubestimmungen, https://www.dibt.de/de/wir-bieten/technische-baubestimmungen
+6. Bundesministerium der Justiz / Bundesamt für Justiz, ArbStättV § 1 – Ziel, Anwendungsbereich, https://www.gesetze-im-internet.de/arbst_ttv_2004/__1.html

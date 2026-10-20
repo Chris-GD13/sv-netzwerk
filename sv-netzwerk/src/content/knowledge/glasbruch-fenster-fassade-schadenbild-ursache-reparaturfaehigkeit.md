@@ -16,6 +16,7 @@ relatedLinks: ["/fachwissen/hagelschaden-dach-fassade-schadenspuren-vorschaden-r
 damageTypes: ["gebaeude", "sturm"]
 publication:
   publishedAt: 2026-08-18
+  updatedAt: 2026-10-20
   status: published
 seo:
   title: "Glasbruch an Fenster und Fassade fachlich bewerten"
@@ -45,6 +46,8 @@ Für die Regulierungspraxis ist wesentlich, dass das Schadenbild vor weiteren R�
 Ein Glasbruch kann durch äußeren Anprall oder Sturmereignisse ebenso ausgelöst werden wie durch Zwängungen, thermische Spannungen, Randbeschädigungen oder Setzungen angrenzender Bauteile. Daher sind Rahmenzustand, Glashalteleisten, Dichtungen, Auflagerpunkte, Fugen und mögliche Verformungen der Konstruktion gesondert zu dokumentieren.
 
 Vorschäden, frühere Glasreparaturen, bestehende Randbeschädigungen oder bekannte Fassadenbewegungen dürfen nicht übergangen werden. Sie schließen einen aktuellen Schadenbezug nicht automatisch aus, können das Schadenbild aber wesentlich mitprägen.
+
+Bei einer thermischen Hypothese erfasse ich zusätzlich Himmelsrichtung, zeitlichen Sonnenstand, Teilverschattung, nahe Wärmequellen sowie Glasaufbau und Randzustand. Das BF/FKG-Merkblatt zu thermisch induzierten Spannungen behandelt diese Einflüsse im Zusammenhang mit der jeweiligen Einbausituation. Ein Rissverlauf allein erlaubt deshalb keine pauschale Zuordnung zur Sonneneinstrahlung. Bleibt die Beanspruchung unklar, kann eine objektbezogene thermische Spannungsanalyse durch entsprechende Fachleute erforderlich werden.
 
 ## Reparaturfähigkeit und Austauschumfang
 
@@ -85,3 +88,4 @@ Glasbruchschäden an Fenstern und Fassaden lassen sich nur belastbar bewerten, w
 3. DIN EN 12150-1:2020-07 – Thermisch vorgespanntes Kalknatron-Einscheiben-Sicherheitsglas, https://www.dinmedia.de/de/norm/din-en-12150-1/323111198
 4. Versicherungsvertragsgesetz (VVG), § 82 Schadenabwendungs- und Schadenminderungspflicht, Bundesministerium der Justiz / juris, https://www.gesetze-im-internet.de/vvg_2008/__82.html
 5. DIN EN 1279-1:2018-10 – Glas im Bauwesen, Mehrscheiben-Isolierglas, Teil 1: Allgemeines, Systembeschreibung, Austauschregeln, Toleranzen und visuelle Qualität, https://www.dinmedia.de/de/norm/din-en-1279-1/281205722
+6. Bundesverband Flachglas / Fachverband Konstruktiver Glasbau, Merkblatt für thermisch induzierte Spannungen bei Vertikalverglasungen, Dokumentfassung 2024, https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/BF-FKG-Merkblaetter/BF-FKG_Merkblatt_01_2025-03_Thermisch_induzierte_Spannungen.pdf

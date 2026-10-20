@@ -123,11 +123,11 @@ An einer ausdrücklich fiktiven Aluminiumfassade fallen nach einer Reinigung gl�
 
 Für die Glanzbahnen werden Reinigungsunterlagen, unbehandelte Vergleichsflächen und eine kleine dokumentierte Musterfläche herangezogen. Visuelle Beurteilung und Vergleichsmessungen klären, ob Schmutz entfernt wurde oder sich Glanz und Struktur der Oberfläche verändert haben. Die Kantenstelle erhält eine eigene Kennung. Vor einer Öffnung werden Verlauf, Feuchteweg, Bearbeitungskante und angrenzende Beschichtung gesichert; erst danach wird über Labor- oder Bauteilprüfung entschieden.
 
-Das fiktive Beispiel enthält bewusst keine erfundenen Messwerte oder Grenzwerte. Es zeigt nur die Prüflogik: Zwei gleichzeitig sichtbare Auffälligkeiten können verschiedene Ursachen und verschiedene Maßnahmen erfordern.
+Zwei gleichzeitig sichtbare Auffälligkeiten können verschiedene Ursachen und verschiedene Maßnahmen erfordern. Die Glanzbahnen und der Kantenbefund brauchen deshalb jeweils eine eigene Bewertung.
 
 ## Fachgrenzen und Zusammenarbeit
 
-Eine qualifizierte Oberflächenbewertung verbindet Werkstoffkenntnis, Beschichtungstechnik, Bauzustand und nachvollziehbare Dokumentation. [Claudius Freiberg](/experten/claudius-freiberg/) ist im SV-Netzwerk als öffentlich bestellter und vereidigter Sachverständiger im Tischlerhandwerk mit den belegten Schwerpunkten Oberflächenschäden, Materialbewertung sowie Beschichtungen an Holz, Aluminium und Kunststoff geführt.
+Eine qualifizierte Oberflächenbewertung verbindet Werkstoffkenntnis, Beschichtungstechnik, Bauzustand und nachvollziehbare Dokumentation. Für die Zusammenarbeit bei Oberflächenschäden und Materialbewertungen steht im SV-Netzwerk unter anderem [Claudius Freiberg](/experten/claudius-freiberg/) als öffentlich bestellter und vereidigter Sachverständiger im Tischlerhandwerk zur Verfügung.
 
 Laborprüfungen, zerstörende Untersuchungen und Reparaturfreigaben gehören jeweils in die Hände dafür geeigneter Fachstellen. Herstellerangaben, vertragliche Beschaffenheit und objektspezifische Exposition bleiben maßgeblich.
 
@@ -142,7 +142,7 @@ Der entscheidende Schritt ist die Verbindung von Erscheinungsbild und Schichtsys
 - GSB International e. V.: [GSB AL 631-1 / GSB ST 663-1 – Allgemeine Bestimmungen](https://gsb-international.de/wp-content/uploads/2026/01/01-GSB-QR-AL-631-1-ST-663-1-Allgemeiner-Teil-2026-01-01-de.pdf), Ausgabe Januar 2026, gültig ab 01.01.2026.
 - GSB International e. V.: [GSB AL 631-5 – Beschichter Aluminium](https://gsb-international.de/wp-content/uploads/2025/12/05-GSB-QR-AL-631-5-Beschichter-AL-2026-01-01-de.pdf), Ausgabe Januar 2026, gültig ab 01.01.2026.
 - GSB International e. V.: [GSB AL 631-7 / GSB ST 663-7 – Mess- und Prüfverfahren, Normen und Richtlinien](https://gsb-international.de/wp-content/uploads/2026/01/07-GSB-QR-AL-631-7-ST-663-7-Normen-Richtlinien-2026-01-01-de.pdf), Ausgabe Januar 2026, gültig ab 01.01.2026.
-- GSB International e. V.: [Empfehlungstexte Ausschreibung – Beschichtung von Aluminiumprofilen und -blechen](https://gsb-international.de/architekten-und-planer/informationen/empfehlungstexte-ausschreibung/), Qualitätsmuster, Testberichte und Referenzkriterien.
-- Verband Fenster + Fassade: [VFF Merkblatt AL.02 – Leseprobe zur visuellen Beurteilung organisch beschichteter Aluminiumoberflächen](https://vff-shop.de/wp-content/uploads/2024/04/AL02_1608_leseprobe.pdf), Ausgabe August 2016, Geltungsbereich und Betrachtungsbedingungen.
+- GSB International e. V.: [Empfehlungstexte Ausschreibung – Beschichtung von Aluminiumprofilen und -blechen](https://gsb-international.de/architekten-und-planer/informationen/empfehlungstexte-ausschreibung/).
+- Verband Fenster + Fassade: [VFF Merkblatt AL.02 – Leseprobe zur visuellen Beurteilung organisch beschichteter Aluminiumoberflächen](https://vff-shop.de/wp-content/uploads/2024/04/AL02_1608_leseprobe.pdf), Ausgabe August 2016.
 - Gütegemeinschaft Reinigung von Fassaden e. V.: [GRM Merkblatt 07 – Reinigung von matten und strukturiert beschichteten Metalloberflächen](https://fassadenreinigung.grm-online.de/fileadmin/Redaktion/Downloads/MERKBLA%CC%88TTER/GRM_MERKBLATT_07.pdf), Stand Dezember 2021.
 - Gütegemeinschaft Reinigung von Fassaden e. V.: [GRM-Downloads und Merkblatt 01 – Empfehlungen zur Vergabe und Durchführung sachgerechter Fassadenreinigungen](https://fassadenreinigung.grm-online.de/downloads/).
