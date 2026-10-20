@@ -17,20 +17,19 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["leitungswasser", "gebaeude"]
 publication:
   publishedAt: 2026-08-15
-  updatedAt: 2026-08-15
+  updatedAt: 2026-10-20
   status: published
 seo:
   title: "Leitungswasserschäden im Kumulereignis: Rollen und Koordination"
   description: "Leitungswasserschäden: Vorgehen für Schadenaufnahme, Plausibilitätsprüfung, Dokumentation, Sanierungssteuerung und belastbare Regulierung bei hoher Schadenfrequenz."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2/"
-  image: "https://www.sv-netzwerk.eu/assets/images/linkedin/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2.svg"
-  imageAlt: "Symbolbild: Leitungswasserschäden im Kontext der Schadenregulierung und Kumulschadensteuerung"
+  noindex: false
 ---
 ## Einleitung
 Bei regional gehäuften Leitungswasserschäden müssen Erstmaßnahmen, Trocknung und Rückbau eng gesteuert werden, um Folgekosten zu begrenzen. Die Qualität der Dokumentation entscheidet über belastbare Entscheidungen bei hoher Schadenfrequenz.
 
 ## Anlass und Einordnung
-Dieser Beitrag nutzt ein anonymisiertes typisches Praxisbeispiel aus der Regulierung. Damit werden keine identifizierbaren Einzelfalldaten veröffentlicht, aber belastbare Vorgehensstandards für Versicherer, Sachverständige und Schadenregulierer dargestellt.
+Für die Bearbeitung mehrerer Schäden müssen Sofortmaßnahmen, Untersuchung und spätere Wiederherstellung je Objekt nachvollziehbar bleiben. Gemeinsame Koordination ersetzt keine individuelle Feststellung der Ursache und des erforderlichen Sanierungsumfangs.
 
 ## Hauptteil
 
@@ -79,7 +78,7 @@ Für Auftraggeber ist wichtig, dass Sofortmaßnahmen nicht automatisch eine Frei
 3. KVA ohne Bezug zur dokumentierten Schadenzone
 
 ## Praxisbeispiel
-Beispielhafte Einordnung ohne Regionalbezug: Bei einem typischen Kumulereignis werden Meldungen zunächst nach Sicherheitsrisiko und Substanzgefährdung priorisiert. In der Erstbesichtigung werden ausschließlich belegbare Feststellungen dokumentiert; unklare Ursachen bleiben ausdrücklich vorläufig. Erst danach folgen belastbare Freigaben für Sanierung und Kosten.
+Fiktives Praxisbeispiel: Nach mehreren Leitungswassermeldungen in einem Wohnquartier werden gefährdete elektrische Bereiche zuerst durch Fachkräfte gesichert. Bei einem Objekt ist der Bodenaufbau unbekannt, bei einem anderen liegt ein dokumentierter Altbefund vor. Beide erhalten deshalb unterschiedliche Untersuchungsaufträge. Die gemeinsame Einsatzplanung führt nicht zu identischen Rückbau- oder Trocknungsfreigaben.
 
 ### Vorgehen bei Besichtigung, Dokumentation und Regulierung
 1. Lage und Schadenhergang mit Zeitachse dokumentieren; offene Punkte als vorläufig kennzeichnen.
@@ -103,3 +102,13 @@ Bei leitungswasserschäden ist nicht die Geschwindigkeit allein entscheidend, so
 
 ## Call-to-Action
 Für die operative Umsetzung unterstützen wir mit strukturierter [Schadenmeldung](/schaden-melden/), methodischer [technischer Schadenabgrenzung](/fachwissen/schadenabgrenzung/), [prüffähiger Dokumentation](/fachwissen/prueffaehige-dokumentation/) und – je nach Fragestellung – der [Gutachter-Plattform](/gutachter-plattform/).
+
+## Quellen
+
+- Bundesministerium der Justiz / Bundesamt für Justiz, [VVG § 82 – Abwendung und Minderung des Schadens](https://www.gesetze-im-internet.de/vvg_2008/__82.html).
+- Bundesministerium der Justiz / Bundesamt für Justiz, [VVG § 86 – Übergang von Ersatzansprüchen](https://www.gesetze-im-internet.de/vvg_2008/__86.html).
+- Umweltbundesamt, [Leitfaden zur Vorbeugung, Erfassung und Sanierung von Schimmelbefall in Gebäuden](https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von), aktualisierte Auflage April 2024.
+
+## Weiterführende Fachbeiträge
+
+[Hygienische Sanierungskontrolle](/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/) und [technische Trocknung](/fachwissen/technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle/).

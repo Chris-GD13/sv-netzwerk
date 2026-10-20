@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/schadenarten/technische-geb
 damageTypes: ["tga", "gebaeude", "brand"]
 publication:
   publishedAt: 2026-09-05
-  updatedAt: 2026-10-19
+  updatedAt: 2026-10-20
   status: published
 seo:
   title: "Blitz- und Überspannungsschäden fachlich prüfen"
@@ -102,4 +102,4 @@ Für eine objektbezogene Prüfung unterstützen wir mit strukturierter [Schadenm
 
 - [VDE: Überspannungsschutz und Innerer Blitzschutz](https://www.vde.com/de/blitzschutz/infos/ueberspannungsschutz-und-innerer-blitzschutz)
 - [VDE: Gebäudetechnische Anlagen im Blitzschutz](https://www.vde.com/de/blitzschutz/infos/gebaeudetechnische-anlagen-im-blitzschutz)
-- [VDE DKE: Blitzschutznormen DIN EN 62305](https://www.vde.com/dke-de/arbeitsfelder/core-safety/blitzschutznormen/2081096-2081096)
+- VDE DKE, [Blitzschutznormen für die Sicherheit von Mensch, Tier und Technik: DIN EN IEC 62305 im Überblick](https://www.vde.com/dke-de/arbeitsfelder/core-safety/blitzschutznormen/2081096-2081096), 23.01.2026.

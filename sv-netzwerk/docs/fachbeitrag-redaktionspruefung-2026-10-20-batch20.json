@@ -1,0 +1,878 @@
+{
+  "date": "2026-10-20",
+  "scope": "20 ausgewählte Altartikel: Quellenverzeichnis, bibliografischer Bezug und Linkzugriff. Kein vollständiger technischer Nachweis sämtlicher Aussagen.",
+  "entries": [
+    {
+      "file": "asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme.md",
+      "slug": "asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme",
+      "original_sha256": "efc6debd6101496197bcb86068361b7af0d9abf36849f7ccdf530e6533007fa9",
+      "title": "Asbesterkundung vor Sanierungsarbeiten: Baujahr, Verdachtsflächen und Probenahme richtig dokumentieren",
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/gefstoffv_2010/__5a.html",
+        "https://www.gesetze-im-internet.de/gefstoffv_2010/__11a.html",
+        "https://www.baua.de/DE/Themen/Chemikalien-Biostoffe/Gefahrstoffe/Informationsportal-Asbest/Asbest_Dossier/Asbest_Planung_dossier",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519",
+        "https://www.umweltbundesamt.de/publikationen/leitlinie-fuer-die-asbesterkundung-zur-vorbereitung"
+      ],
+      "current_sha256": "efc6debd6101496197bcb86068361b7af0d9abf36849f7ccdf530e6533007fa9",
+      "changed": false,
+      "updated_at": "2026-10-19",
+      "review_status": "source-catalogue-and-access-only",
+      "changes": [],
+      "full_claim_review": false
+    },
+    {
+      "file": "aufmass-fotodokumentation-polycam-pruefffaehig.md",
+      "slug": "aufmass-fotodokumentation-polycam-pruefffaehig",
+      "original_sha256": "ed0403b79be6b9cc6df679c37717c4cf3970d1a9f65f2bc58185b573981008a1",
+      "title": "Digitales Aufmaß im Schadenfall prüffähig dokumentieren",
+      "source_urls": [
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6",
+        "https://www.dguv.de/medien/inhalt/publikationen/regelwerk/regelwerk_dguv-informationen/index.jsp",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "current_sha256": "096cb2c2f16dbd99e78ec2e794a2e01f0cdaed2a26c9de10eeeff55ae0727b79",
+      "changed": true,
+      "updated_at": "2026-10-20",
+      "review_status": "targeted-claims-corrected-full-review-open",
+      "changes": [
+        "Unbelegte pauschale Mindestzahl von drei Kontrollmaßen durch aufgabenbezogene unabhängige Kontrollmaße ersetzt.",
+        "Sachfremden ASR-Verweis und defekten DGUV-Link entfernt; Herstellerinformation und § 371 ZPO für den begrenzten Aussagebereich ergänzt."
+      ],
+      "full_claim_review": false
+    },
+    {
+      "file": "bauteiloeffnung-schadenfall-freigabe-beweissicherung.md",
+      "slug": "bauteiloeffnung-schadenfall-freigabe-beweissicherung",
+      "original_sha256": "27361609e5a75b381c8d7bdb9d190e9e8ddb5816b4399891b31685a5f30198c5",
+      "title": "Bauteilöffnungen im Schadenfall fachlich und prüffähig steuern",
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/bgb/__249.html",
+        "https://www.gesetze-im-internet.de/gefstoffv_2010/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519"
+      ],
+      "current_sha256": "27361609e5a75b381c8d7bdb9d190e9e8ddb5816b4399891b31685a5f30198c5",
+      "changed": false,
+      "updated_at": "2026-10-19",
+      "review_status": "source-catalogue-and-access-only",
+      "changes": [],
+      "full_claim_review": false
+    },
+    {
+      "file": "beweissicherung-fotodokumentation-standards.md",
+      "slug": "beweissicherung-fotodokumentation-standards",
+      "original_sha256": "ef231f8e123098fa89ced42a4ade3886cf97028293669ad7678232dd603b7d7b",
+      "title": "Beweissicherung und Fotodokumentation: Standards für belastbare Schadenakten",
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/",
+        "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+        "https://publikationen.dguv.de/",
+        "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html"
+      ],
+      "current_sha256": "f5d225be79934508bc27b7f8800f91ad1d6e2ce226ce7f5177fa41ea5bd45753",
+      "changed": true,
+      "updated_at": "2026-10-20",
+      "review_status": "targeted-claims-corrected-full-review-open",
+      "changes": [
+        "Anonymisierungs- und Herstellungsbehauptung entfernt; GPS- und Zeitdaten nicht als zwingenden oder manipulationssicheren Beweis dargestellt.",
+        "Unspezifische Herausgeber-Startseiten durch § 371 ZPO sowie §§ 82, 86 VVG ersetzt."
+      ],
+      "full_claim_review": false
+    },
+    {
+      "file": "blitz-ueberspannungsschaden-gebaeudetechnik-pruefen.md",
+      "slug": "blitz-ueberspannungsschaden-gebaeudetechnik-pruefen",
+      "original_sha256": "3ec7db58f50b86cac65e41331b4d577950235843714b56ecb1119b4f8471965e",
+      "title": "Blitz- und Überspannungsschäden an Gebäudetechnik fachlich prüfen",
+      "source_urls": [
+        "https://www.vde.com/de/blitzschutz/infos/ueberspannungsschutz-und-innerer-blitzschutz",
+        "https://www.vde.com/de/blitzschutz/infos/gebaeudetechnische-anlagen-im-blitzschutz",
+        "https://www.vde.com/dke-de/arbeitsfelder/core-safety/blitzschutznormen/2081096-2081096"
+      ],
+      "current_sha256": "7203f7d74641c5b1b21ed7f134cf19a3e9b5e23e5831fdc9adc684ad9daab243",
+      "changed": true,
+      "updated_at": "2026-10-20",
+      "review_status": "targeted-claims-corrected-full-review-open",
+      "changes": [
+        "Bibliografie an die tatsächlich verlinkte VDE/DKE-Übersicht zur Reihe DIN EN IEC 62305 vom 23.01.2026 angepasst; kein nicht eingesehener Normvolltext behauptet."
+      ],
+      "full_claim_review": false
+    },
+    {
+      "file": "brandschaden-notmassnahmen-uebergang-zur-wiederherstellung.md",
+      "slug": "brandschaden-notmassnahmen-uebergang-zur-wiederherstellung",
+      "original_sha256": "1d0a5d58a7e4904c98de8c5f4352f73843647377c7b5c8c0a33b727a936ae036",
+      "title": "Brandschaden nach Erstmaßnahmen: Übergang zur Wiederherstellung sauber steuern",
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von"
+      ],
+      "current_sha256": "1d0a5d58a7e4904c98de8c5f4352f73843647377c7b5c8c0a33b727a936ae036",
+      "changed": false,
+      "updated_at": "2026-10-19",
+      "review_status": "source-catalogue-and-access-only",
+      "changes": [],
+      "full_claim_review": false
+    },
+    {
+      "file": "drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation.md",
+      "slug": "drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation",
+      "original_sha256": "293d7a634abd060c89a55169901a23b32f41699689caf60ddbe181300248832a",
+      "title": "Drohnen bei Gebäudeschäden: Einsatzgrenzen, Bildbefund und Dokumentation trennen",
+      "source_urls": [
+        "https://eur-lex.europa.eu/eli/reg_impl/2019/947/oj",
+        "https://www.easa.europa.eu/en/document-library/easy-access-rules/online-publications/easy-access-rules-unmanned-aircraft-systems",
+        "https://www.dipul.de/homepage/de/informationen/allgemeines/erste-schritte/schnell-sicher-in-die-luft-version-1.2.pdf",
+        "https://www.gesetze-im-internet.de/luftvo_2015/__21h.html",
+        "https://www.gesetze-im-internet.de/luftvg/__43.html",
+        "https://www.datenschutzkonferenz-online.de/media/oh/20190116_oh_positionspapier_kameradrohnen.pdf",
+        "https://doi.org/10.5194/isprs-annals-IV-2-W2-163-2017"
+      ],
+      "current_sha256": "293d7a634abd060c89a55169901a23b32f41699689caf60ddbe181300248832a",
+      "changed": false,
+      "updated_at": "2026-10-19",
+      "review_status": "source-catalogue-and-access-only",
+      "changes": [],
+      "full_claim_review": false
+    },
+    {
+      "file": "elektrische-anlagen-nach-wasserschaden-pruefen.md",
+      "slug": "elektrische-anlagen-nach-wasserschaden-pruefen",
+      "original_sha256": "a1476551f0e1734ef883a9ad972d430ababcdfd58a11458af4f7b9aa9b653625",
+      "title": "Elektrische Anlagen nach Wasser- und Löschwasserschäden sicher prüfen",
+      "source_urls": [
+        "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1052/elektrische-anlagen-und-betriebsmittel",
+        "https://publikationen.dguv.de/regelwerk/dguv-informationen/284/sicherheit-bei-arbeiten-an-elektrischen-anlagen",
+        "https://www.dguv.de/fb-etem/regelwerk/index.jsp"
+      ],
+      "current_sha256": "a1476551f0e1734ef883a9ad972d430ababcdfd58a11458af4f7b9aa9b653625",
+      "changed": false,
+      "updated_at": "2026-10-19",
+      "review_status": "source-catalogue-and-access-only",
+      "changes": [],
+      "full_claim_review": false
+    },
+    {
+      "file": "elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung.md",
+      "slug": "elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung",
+      "original_sha256": "3fe13a282f4e0fc427b5b92d7b2288b3270f1b266204d8bbec9779194d3c6488",
+      "title": "Elektrische Brandursachen: Lichtbogen, Kurzschluss und thermische Überlastung beweissicher unterscheiden",
+      "source_urls": [
+        "https://www.vde-verlag.de/",
+        "https://www.dinmedia.de/de/norm/din-en-60079-14-vde-0165-1/303132206",
+        "https://www.vds.de/",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html"
+      ],
+      "current_sha256": "42bb460b7219d03e25536a1c768d4de30195c14d97fb904fa1792e382f6b14f3",
+      "changed": true,
+      "updated_at": "2026-10-20",
+      "review_status": "targeted-claims-corrected-full-review-open",
+      "changes": [
+        "Primär- und Sekundärlichtbogen, Übergangswiderstand und Überlast deutlicher getrennt; Schmelzspuren nicht allein zur Ursachen- oder Regressfeststellung verwendet.",
+        "Unbelegte Häufigkeitsrangfolge, sachfremden defekten Ex-Anlagen-Normlink und nicht verifizierte VdS-3457-Titelzuordnung entfernt.",
+        "Aktuelle Katalogfundstelle DIN VDE 0100-430:2010-10, konkrete IFS-Veröffentlichungen und DGUV 203-001 ergänzt; keine vollständige Normeinsicht behauptet."
+      ],
+      "full_claim_review": false
+    },
+    {
+      "file": "fachgrenzen-schadenpruefung-fachplaner.md",
+      "slug": "fachgrenzen-schadenpruefung-fachplaner",
+      "original_sha256": "1c97e921ba1c74420bab0fd62a2b733d53154b79ade071c4a30cb321fcf6a3de",
+      "title": "Fachgrenzen in der Schadenprüfung: Wann Fachplaner einzubinden sind",
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.dguv.de/de/praevention/index.jsp",
+        "https://www.baua.de/DE/Themen/Arbeitsgestaltung-im-Betrieb/Gefahrstoffe/Gefahrstoffe_node.html",
+        "https://bingk.de/"
+      ],
+      "current_sha256": "1c97e921ba1c74420bab0fd62a2b733d53154b79ade071c4a30cb321fcf6a3de",
+      "changed": false,
+      "updated_at": "2026-09-10",
+      "review_status": "source-catalogue-and-access-only",
+      "changes": [],
+      "full_claim_review": false
+    },
+    {
+      "file": "fachliche-zustaendigkeit-im-schadenfall.md",
+      "slug": "fachliche-zustaendigkeit-im-schadenfall",
+      "original_sha256": "5d5eb559072454033dd90519390179fb35045e143796b0a6b0ce2f856a35211d",
+      "title": "Fachliche Zuständigkeit im Schadenfall klar zuordnen",
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/bgb/__634.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.gesetze-im-internet.de/zpo/__402.html"
+      ],
+      "current_sha256": "5d5eb559072454033dd90519390179fb35045e143796b0a6b0ce2f856a35211d",
+      "changed": false,
+      "updated_at": "2026-08-09",
+      "review_status": "source-catalogue-and-access-only",
+      "changes": [],
+      "full_claim_review": false
+    },
+    {
+      "file": "fenster-glasschaden-verglasung-reparaturgrenze.md",
+      "slug": "fenster-glasschaden-verglasung-reparaturgrenze",
+      "original_sha256": "027b141f185f6bafbfb9291aa49de0b48fabe254c8312930048a10f68d779629",
+      "title": "Fenster- und Glasschäden prüffähig abgrenzen",
+      "source_urls": [
+        "https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren",
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+      ],
+      "current_sha256": "4cd62ee47f0f2799240c98477f3222c890ca3c71b58ea002e773fa1e7053f478",
+      "changed": true,
+      "updated_at": "2026-10-20",
+      "review_status": "targeted-claims-corrected-full-review-open",
+      "changes": [
+        "ASR A1.6 auf ihren Arbeitsstättenbezug begrenzt; private Wohnfenster nicht pauschal den Arbeitsstättenregeln unterworfen (§ 1 ArbStättV)."
+      ],
+      "full_claim_review": false
+    },
+    {
+      "file": "fenster-tueren-kostenvoranschlag-pruefen.md",
+      "slug": "fenster-tueren-kostenvoranschlag-pruefen",
+      "original_sha256": "e82682c43410cee1510559c3d141ca94136ffeeac0e94e2a0b1dbdfe58ea6bc5",
+      "title": "Kostenvoranschläge für Fenster und Türen prüfen: Schadenumfang und Nebenleistungen trennen",
+      "source_urls": [
+        "https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren",
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6",
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.dibt.de/de/wir-bieten/technische-baubestimmungen"
+      ],
+      "current_sha256": "abb452bf7f5861241baefd4064c1a137d9829da392bba6905140629b7f6082c1",
+      "changed": true,
+      "updated_at": "2026-10-20",
+      "review_status": "targeted-claims-corrected-full-review-open",
+      "changes": [
+        "Geltungsbereich der Arbeitsstättenregeln gegenüber privaten Wohnfenstern und vertraglichen Produktanforderungen abgegrenzt (§ 1 ArbStättV)."
+      ],
+      "full_claim_review": false
+    },
+    {
+      "file": "fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen.md",
+      "slug": "fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen",
+      "original_sha256": "552432ce4dbd63911240cc5ad2db2b6d3360ae97a07923d7cff1b783fdfa19c9",
+      "title": "Fenster- und Türschäden fachlich bewerten: Funktion, Anschlüsse und Reparaturgrenzen",
+      "source_urls": [
+        "https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren",
+        "https://www.ift-rosenheim.de/pruefung-luftdurchlaessigkeit-fenster-tueren",
+        "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.dibt.de/de/wir-bieten/technische-baubestimmungen"
+      ],
+      "current_sha256": "b72aaa8950ebeb3fbfe7053de23d6458a18fd027f1d5a67a21c9cf687e914df2",
+      "changed": true,
+      "updated_at": "2026-10-20",
+      "review_status": "targeted-claims-corrected-full-review-open",
+      "changes": [
+        "Arbeitsstättenregeln nicht als allgemeine Regel für jedes private Wohnfenster dargestellt; § 1 ArbStättV als Geltungsbezug ergänzt."
+      ],
+      "full_claim_review": false
+    },
+    {
+      "file": "fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum.md",
+      "slug": "fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum",
+      "original_sha256": "0ae9057c5c5e782fcf21b06cad6cccc60c9f730b68e6e55a640290ee337cdf7a",
+      "title": "Beschlagene Fensterscheiben: Kondensat außen, innen und im Scheibenzwischenraum unterscheiden",
+      "source_urls": [
+        "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/bf-merkblaetter/BF-Merkblatt_003-2008_AEI4_01-2020_Leitfaden_zur_Verwendung_von_Dreifach-Isolierglas.pdf",
+        "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/bf-merkblaetter/BF-Merkblatt_022-2018_AEI1_02-2020_Verglasungsrichtlinie.pdf",
+        "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel",
+        "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/wie-luefte-ich-richtig-tipps-tricks-zur",
+        "https://www.dinmedia.de/de/norm/din-en-1279-1/281205722",
+        "https://www.dinmedia.de/de/norm/din-en-1279-2/281596947"
+      ],
+      "current_sha256": "0ae9057c5c5e782fcf21b06cad6cccc60c9f730b68e6e55a640290ee337cdf7a",
+      "changed": false,
+      "updated_at": "2026-10-19",
+      "review_status": "source-catalogue-and-access-only",
+      "changes": [],
+      "full_claim_review": false
+    },
+    {
+      "file": "flachdachschaden-pruefpfad-windsog-entwaesserung.md",
+      "slug": "flachdachschaden-pruefpfad-windsog-entwaesserung",
+      "original_sha256": "7a0face5fa73cc4a89ea440c4127a3002c611a170fe3662d01fc66175d9e35ff",
+      "title": "Flachdachschäden nach Sturm und Starkregen: Windsog, Abdichtung und Entwässerung trennen",
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.dwd.de/DE/leistungen/starkregen/starkregen_node.html",
+        "https://www.bbk.bund.de/DE/Themen/Naturgefahren/naturgefahren_node.html",
+        "https://www.zvdh.de/technik-regelwerk/"
+      ],
+      "current_sha256": "4470b3d43a4c4120e7a714bc8852c68e812188f5b3358739168dc55a82962740",
+      "changed": true,
+      "updated_at": "2026-10-20",
+      "review_status": "targeted-claims-corrected-full-review-open",
+      "changes": [
+        "Fehlende sichtbare Tragwerksverformung nicht mit statischer Freigabe gleichgesetzt.",
+        "Defekten DWD-Verweis entfernt, BBK-Route aktualisiert und ZVDH auf die aktuelle Regelübersicht verlinkt; kein Volltextzugang zu kostenpflichtigen Fachregeln behauptet."
+      ],
+      "full_claim_review": false
+    },
+    {
+      "file": "frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung.md",
+      "slug": "frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung",
+      "original_sha256": "873196300bbbeff6ea4ca940bd80b7ef10e20d5a84ee566edf4cec07a8f20980",
+      "title": "Frostbedingte Leitungswasserschäden: Rohrbruch, Auftauen und Vorschäden fachlich abgrenzen",
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/trinkwv_2023/__13.html",
+        "https://www.dvgw.de/themen/wasser/trinkwasser-installation",
+        "https://www.dinmedia.de/de/norm/din-en-806-1/44698245",
+        "https://www.dinmedia.de/de/norm/din-1988-200/151775404"
+      ],
+      "current_sha256": "34353d7a1dabddebf55a304f08143f19113231c57d9b998edb13be4ea872ec7c",
+      "changed": true,
+      "updated_at": "2026-10-20",
+      "review_status": "targeted-claims-corrected-full-review-open",
+      "changes": [
+        "Nicht belegte gemeinsame Herausgeberschaft mehrerer Verbände durch die tatsächlich verlinkte DVGW-Fachseite ersetzt."
+      ],
+      "full_claim_review": false
+    },
+    {
+      "file": "glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit.md",
+      "slug": "glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit",
+      "original_sha256": "766c2e6b0afd81af3d8efc92e9b2f62b6477dfee984b870099cfb93f921a2910",
+      "title": "Glasbruch an Fenster und Fassade: Schadenbild, Ursache und Reparaturfähigkeit fachlich trennen",
+      "source_urls": [
+        "https://www.dinmedia.de/de/norm/din-18008-1/312359991",
+        "https://www.dinmedia.de/de/norm/din-18008-2/312360009",
+        "https://www.dinmedia.de/de/norm/din-en-12150-1/323111198",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.dinmedia.de/de/norm/din-en-1279-1/281205722"
+      ],
+      "current_sha256": "2eecbc569314c797f4f232072e2dc234728894d01eeebb83a7b95decd64bc27c",
+      "changed": true,
+      "updated_at": "2026-10-20",
+      "review_status": "targeted-claims-corrected-full-review-open",
+      "changes": [
+        "Thermische Bruchhypothese um Verschattung, Exposition, Glaskanten und erforderliche objektbezogene Analyse ergänzt.",
+        "BF/FKG-Merkblatt nach Dokumentstand 2024 eingeordnet, nicht nach dem späteren URL-Dateinamen als Veröffentlichung 2025 umdatiert."
+      ],
+      "full_claim_review": false
+    },
+    {
+      "file": "grossflaechige-leitungswasserschaeden-sanierungssteuerung-2.md",
+      "slug": "grossflaechige-leitungswasserschaeden-sanierungssteuerung-2",
+      "original_sha256": "310df82c1df71d5cad69abdd19b00ac12270730b99a4e066c7f9a0e469a6a875",
+      "title": "Leitungswasserschäden bei hoher Schadenfrequenz: Rollen, Koordination und Dokumentation",
+      "source_urls": [],
+      "current_sha256": "45356f0042093c34e70dd9ef082fc7e7738ae2b3d62affda00cafe2c7828f6e2",
+      "changed": true,
+      "updated_at": "2026-10-20",
+      "review_status": "targeted-claims-corrected-full-review-open",
+      "changes": [
+        "Irreführende Praxis-/Anonymisierungsbehauptung und Platzhalter-SVG-Metadaten entfernt; Beispiel ausdrücklich fiktiv.",
+        "Fehlendes Quellenverzeichnis mit konkreten VVG- und UBA-Fundstellen sowie passende interne Vertiefungslinks ergänzt; noindex=false explizit gesetzt."
+      ],
+      "full_claim_review": false
+    },
+    {
+      "file": "grossflaechige-leitungswasserschaeden-sanierungssteuerung.md",
+      "slug": "grossflaechige-leitungswasserschaeden-sanierungssteuerung",
+      "original_sha256": "f0508cafd7ae61918fb4db211f8a8a1423042f71b23fc8651284b184d3617573",
+      "title": "Großflächige Leitungswasserschäden: Sanierungssteuerung unter hoher Schadenfrequenz",
+      "source_urls": [
+        "https://www.gesetze-im-internet.de/bgb/__631.html",
+        "https://www.gesetze-im-internet.de/bgb/__254.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von"
+      ],
+      "current_sha256": "17e6c7faecee6555e5ae7df775193661eab8355151734e18bc94602e8ce17dc1",
+      "changed": true,
+      "updated_at": "2026-10-20",
+      "review_status": "targeted-claims-corrected-full-review-open",
+      "changes": [
+        "Pauschale Deckungsausschlüsse und automatische Neu-für-alt-Logik durch vertragsspezifische Abgrenzung präzisiert (§ 1 VVG).",
+        "Technische Trocknung und hygienische Sanierung getrennt; Materialrückbau, sichere Elektroarbeiten und unabhängige Abschlussbewertung präzisiert.",
+        "Unplausibles fiktives Mehrfachleck-Szenario korrigiert, öffentliche Recherchevermerke und Platzhalter-SVG-Metadaten entfernt."
+      ],
+      "full_claim_review": false
+    }
+  ],
+  "access_checks": [
+    {
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__5a.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__5a.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__11a.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__11a.html"
+    },
+    {
+      "url": "https://www.dguv.de/medien/inhalt/publikationen/regelwerk/regelwerk_dguv-informationen/index.jsp",
+      "status": 404,
+      "resolved_url": "https://www.dguv.de/medien/inhalt/publikationen/regelwerk/regelwerk_dguv-informationen/index.jsp"
+    },
+    {
+      "url": "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6",
+      "status": 403,
+      "resolved_url": "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6"
+    },
+    {
+      "url": "https://www.baua.de/DE/Themen/Chemikalien-Biostoffe/Gefahrstoffe/Informationsportal-Asbest/Asbest_Dossier/Asbest_Planung_dossier",
+      "status": 403,
+      "resolved_url": "https://www.baua.de/DE/Themen/Chemikalien-Biostoffe/Gefahrstoffe/Informationsportal-Asbest/Asbest_Dossier/Asbest_Planung_dossier"
+    },
+    {
+      "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519",
+      "status": 403,
+      "resolved_url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519"
+    },
+    {
+      "url": "https://www.umweltbundesamt.de/publikationen/leitlinie-fuer-die-asbesterkundung-zur-vorbereitung",
+      "status": 200,
+      "resolved_url": "https://www.umweltbundesamt.de/publikationen/leitlinie-fuer-die-asbesterkundung-zur-vorbereitung"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/bgb/__249.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/bgb/__249.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/gefstoffv_2010/"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/vvg_2008/"
+    },
+    {
+      "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html",
+      "status": 403,
+      "resolved_url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/bgb/__254.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/bgb/__254.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/vvg_2008/__86.html"
+    },
+    {
+      "url": "https://publikationen.dguv.de/",
+      "status": 200,
+      "resolved_url": "https://publikationen.dguv.de/"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/bgb/__631.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/bgb/__631.html"
+    },
+    {
+      "url": "https://www.vde.com/de/blitzschutz/infos/ueberspannungsschutz-und-innerer-blitzschutz",
+      "status": 200,
+      "resolved_url": "https://www.vde.com/de/blitzschutz/infos/ueberspannungsschutz-und-innerer-blitzschutz"
+    },
+    {
+      "url": "https://www.vde.com/dke-de/arbeitsfelder/core-safety/blitzschutznormen/2081096-2081096",
+      "status": 200,
+      "resolved_url": "https://www.vde.com/dke-de/arbeitsfelder/core-safety/blitzschutznormen/2081096-2081096"
+    },
+    {
+      "url": "https://www.vde.com/de/blitzschutz/infos/gebaeudetechnische-anlagen-im-blitzschutz",
+      "status": 200,
+      "resolved_url": "https://www.vde.com/de/blitzschutz/infos/gebaeudetechnische-anlagen-im-blitzschutz"
+    },
+    {
+      "url": "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html",
+      "status": 200,
+      "resolved_url": "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html"
+    },
+    {
+      "url": "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von",
+      "status": 200,
+      "resolved_url": "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von"
+    },
+    {
+      "url": "https://eur-lex.europa.eu/eli/reg_impl/2019/947/oj",
+      "status": 202,
+      "resolved_url": "https://eur-lex.europa.eu/eli/reg_impl/2019/947/oj"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/luftvo_2015/__21h.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/luftvo_2015/__21h.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/luftvg/__43.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/luftvg/__43.html"
+    },
+    {
+      "url": "https://www.easa.europa.eu/en/document-library/easy-access-rules/online-publications/easy-access-rules-unmanned-aircraft-systems",
+      "status": 200,
+      "resolved_url": "https://www.easa.europa.eu/en/document-library/easy-access-rules/online-publications/easy-access-rules-unmanned-aircraft-systems"
+    },
+    {
+      "url": "https://www.dipul.de/homepage/de/informationen/allgemeines/erste-schritte/schnell-sicher-in-die-luft-version-1.2.pdf",
+      "status": 200,
+      "resolved_url": "https://www.dipul.de/homepage/de/informationen/allgemeines/erste-schritte/schnell-sicher-in-die-luft-version-1.2.pdf?cid=2rj"
+    },
+    {
+      "url": "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1052/elektrische-anlagen-und-betriebsmittel",
+      "status": 200,
+      "resolved_url": "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1052/elektrische-anlagen-und-betriebsmittel"
+    },
+    {
+      "url": "https://publikationen.dguv.de/regelwerk/dguv-informationen/284/sicherheit-bei-arbeiten-an-elektrischen-anlagen",
+      "status": 200,
+      "resolved_url": "https://publikationen.dguv.de/regelwerk/dguv-informationen/284/sicherheit-bei-arbeiten-an-elektrischen-anlagen"
+    },
+    {
+      "url": "https://www.datenschutzkonferenz-online.de/media/oh/20190116_oh_positionspapier_kameradrohnen.pdf",
+      "status": 200,
+      "error": "curl: (92) HTTP/2 stream 1 was not closed cleanly: INTERNAL_ERROR (err 2)\n"
+    },
+    {
+      "url": "https://doi.org/10.5194/isprs-annals-IV-2-W2-163-2017",
+      "status": 200,
+      "resolved_url": "https://isprs-annals.copernicus.org/articles/IV-2-W2/163/2017/"
+    },
+    {
+      "url": "https://www.dguv.de/de/praevention/index.jsp",
+      "status": 200,
+      "resolved_url": "https://www.dguv.de/de/praevention/index.jsp"
+    },
+    {
+      "url": "https://www.dguv.de/fb-etem/regelwerk/index.jsp",
+      "status": 200,
+      "resolved_url": "https://www.dguv.de/fb-etem/regelwerk/index.jsp"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-en-60079-14-vde-0165-1/303132206",
+      "status": 404,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-en-60079-14-vde-0165-1/303132206"
+    },
+    {
+      "url": "https://www.baua.de/DE/Themen/Arbeitsgestaltung-im-Betrieb/Gefahrstoffe/Gefahrstoffe_node.html",
+      "status": 403,
+      "resolved_url": "https://www.baua.de/DE/Themen/Arbeitsgestaltung-im-Betrieb/Gefahrstoffe/Gefahrstoffe_node.html"
+    },
+    {
+      "url": "https://www.vde-verlag.de/",
+      "status": 200,
+      "resolved_url": "https://www.vde-verlag.de/"
+    },
+    {
+      "url": "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR",
+      "status": 403,
+      "resolved_url": "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/bgb/__634.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/bgb/__634.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/zpo/__402.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/zpo/__402.html"
+    },
+    {
+      "url": "https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren",
+      "status": 503,
+      "resolved_url": "https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren"
+    },
+    {
+      "url": "https://bingk.de/",
+      "status": 200,
+      "resolved_url": "https://bingk.de/"
+    },
+    {
+      "url": "https://www.ift-rosenheim.de/pruefung-luftdurchlaessigkeit-fenster-tueren",
+      "status": 503,
+      "resolved_url": "https://www.ift-rosenheim.de/pruefung-luftdurchlaessigkeit-fenster-tueren"
+    },
+    {
+      "url": "https://www.vds.de/",
+      "status": 200,
+      "resolved_url": "https://vds.de/"
+    },
+    {
+      "url": "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/bf-merkblaetter/BF-Merkblatt_022-2018_AEI1_02-2020_Verglasungsrichtlinie.pdf",
+      "status": 200,
+      "resolved_url": "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/bf-merkblaetter/BF-Merkblatt_022-2018_AEI1_02-2020_Verglasungsrichtlinie.pdf"
+    },
+    {
+      "url": "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel",
+      "status": 200,
+      "resolved_url": "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel"
+    },
+    {
+      "url": "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/bf-merkblaetter/BF-Merkblatt_003-2008_AEI4_01-2020_Leitfaden_zur_Verwendung_von_Dreifach-Isolierglas.pdf",
+      "status": 200,
+      "resolved_url": "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/bf-merkblaetter/BF-Merkblatt_003-2008_AEI4_01-2020_Leitfaden_zur_Verwendung_von_Dreifach-Isolierglas.pdf"
+    },
+    {
+      "url": "https://www.dibt.de/de/wir-bieten/technische-baubestimmungen",
+      "status": 200,
+      "resolved_url": "https://www.dibt.de/de/wir-bieten/technische-baubestimmungen"
+    },
+    {
+      "url": "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/wie-luefte-ich-richtig-tipps-tricks-zur",
+      "status": 200,
+      "resolved_url": "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/wie-luefte-ich-richtig-tipps-tricks-zur"
+    },
+    {
+      "url": "https://www.dwd.de/DE/leistungen/starkregen/starkregen_node.html",
+      "status": 404,
+      "resolved_url": "https://www.dwd.de/DE/leistungen/starkregen/starkregen_node.html"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-en-1279-1/281205722",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-en-1279-1/281205722"
+    },
+    {
+      "url": "https://www.bbk.bund.de/DE/Themen/Naturgefahren/naturgefahren_node.html",
+      "status": 404,
+      "resolved_url": "https://www.bbk.bund.de/DE/Themen/Naturgefahren/naturgefahren_node.html"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-en-806-1/44698245",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-en-806-1/44698245"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-en-1279-2/281596947",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-en-1279-2/281596947"
+    },
+    {
+      "url": "https://www.zvdh.de/technik-regelwerk/",
+      "status": 503,
+      "resolved_url": "https://www.zvdh.de/technik-regelwerk/"
+    },
+    {
+      "url": "https://www.dvgw.de/themen/wasser/trinkwasser-installation",
+      "status": 200,
+      "resolved_url": "https://www.dvgw.de/themen/wasser/trinkwasser-installation"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/trinkwv_2023/__13.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/trinkwv_2023/__13.html"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-en-12150-1/323111198",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-en-12150-1/323111198"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-18008-1/312359991",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-18008-1/312359991"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-18008-2/312360009",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-18008-2/312360009"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-1988-200/151775404",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-1988-200/151775404"
+    }
+  ],
+  "checked_at": "2026-10-20T04:09:26.440Z",
+  "source_ledger": [
+    {
+      "id": "VVG",
+      "urls": [
+        "https://www.gesetze-im-internet.de/vvg_2008/__1.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+        "https://www.gesetze-im-internet.de/vvg_2008/__86.html"
+      ],
+      "publication_date": null,
+      "decision_date": null,
+      "effective_date": "Keine neue Inkraftsetzung behauptet; konsolidierter Gesetzestext am 20.10.2026 abgerufen.",
+      "status": "Gesetz; für den konkreten Vertrag und Sachverhalt anzuwenden.",
+      "read_scope": "§§ 1, 82 und 86 geöffnet; keine vollständige Vertrags- oder Rechtsprechungsprüfung.",
+      "meaning": "Technischen Befund, vertraglich versichertes Risiko, Schadenminderung und Anspruchsübergang getrennt beurteilen."
+    },
+    {
+      "id": "ZPO371",
+      "urls": [
+        "https://www.gesetze-im-internet.de/zpo/__371.html"
+      ],
+      "publication_date": null,
+      "decision_date": null,
+      "effective_date": "Kein neues Geltungsdatum behauptet.",
+      "status": "Gesetz, konsolidierter Abruf 20.10.2026.",
+      "read_scope": "§ 371 geöffnet.",
+      "meaning": "Elektronische Dateien können Gegenstand des Augenscheins sein; Geodaten und Dateizeit beweisen ihre Unverändertheit nicht automatisch."
+    },
+    {
+      "id": "ArbStaettV1",
+      "urls": [
+        "https://www.gesetze-im-internet.de/arbst_ttv_2004/__1.html"
+      ],
+      "publication_date": null,
+      "decision_date": null,
+      "effective_date": "Kein neues Geltungsdatum behauptet.",
+      "status": "Verordnung; Geltungsbereich für Arbeitsstätten.",
+      "read_scope": "§ 1 geöffnet. Verlinkte BAuA-ASR-Fundstellen durch Zugriffsschutz teilweise nicht lesbar.",
+      "meaning": "Arbeitsstättenbezug zuerst klären; keine pauschale Anwendung auf alle privaten Wohnfenster."
+    },
+    {
+      "id": "UBA2024",
+      "urls": [
+        "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von",
+        "https://www.umweltbundesamt.de/system/files/medien/4031/publikationen/240513_uba_fb_schimmelleitfaden_0.pdf"
+      ],
+      "publication_date": "Ursprünglich Dezember 2017; aktualisierter Dokumentstand April 2024.",
+      "decision_date": null,
+      "effective_date": null,
+      "status": "Fachleitfaden; keine neue verbindliche Norm oder gesetzliche Inkraftsetzung.",
+      "read_scope": "Herausgeberseite, Impressum und Abschnitte 6.3.5 bis 6.3.8 im erforderlichen Umfang (PDF-Seiten 141–147); nicht alle 192 Seiten vollständig freigegeben.",
+      "meaning": "Trocknung, Entfernung belasteter Materialien, Reinigung und Kontrolle unterscheiden; Wiederaufbau setzt baulich und hygienisch geeigneten Zustand voraus."
+    },
+    {
+      "id": "IFS2020",
+      "urls": [
+        "https://www.ifs-ev.org/brand-in-einer-als-lager-genutzten-hotelsauna/"
+      ],
+      "publication_date": "2020-06-22",
+      "decision_date": null,
+      "effective_date": null,
+      "status": "Konkreter Untersuchungsbericht des Instituts, keine allgemeine Norm.",
+      "read_scope": "Bericht geöffnet: Schmelzspuren konnten durch den Brand sekundär entstehen.",
+      "meaning": "Ein Lichtbogenbefund beweist nicht ohne räumliche und zeitliche Einordnung die Brandentstehung."
+    },
+    {
+      "id": "IFS2015",
+      "urls": [
+        "https://www.ifs-ev.org/archiv/literatur/das_elektrohandwerk_17-2015.pdf",
+        "https://www.ifs-ev.org/archiv/literatur/das_elektrohandwerk_18-2015.pdf"
+      ],
+      "publication_date": "de 17/2015 und 18/2015",
+      "decision_date": null,
+      "effective_date": null,
+      "status": "Technische Fachaufsätze; keine aktuelle Rechts- oder Normsetzung.",
+      "read_scope": "Relevante Passagen zu Übergangswiderständen, Schutzorganen und Untersuchungsgrenzen geöffnet.",
+      "meaning": "Lokale Kontakterwärmung muss nicht durch Überstrom ausgelöst oder durch Schutzorgane erkannt werden."
+    },
+    {
+      "id": "DIN0100430",
+      "urls": [
+        "https://www.vde-verlag.de/p/normen/din-vde-0100-430-vde-0100-430-2010-10/0100154-DE-PR"
+      ],
+      "publication_date": "2010-10",
+      "decision_date": null,
+      "effective_date": null,
+      "status": "Aktuelle Katalogfundstelle; der gesonderte Entwurf E DIN VDE 0100-430:2021-12 ersetzt sie nicht.",
+      "read_scope": "Katalog/Einführung; kostenpflichtiger Normvolltext nicht vollständig eingesehen.",
+      "meaning": "Anlagenschutz und konkrete Brandursache nicht gleichsetzen."
+    },
+    {
+      "id": "DGUV203001",
+      "urls": [
+        "https://publikationen.dguv.de/regelwerk/dguv-informationen/284/sicherheit-bei-arbeiten-an-elektrischen-anlagen"
+      ],
+      "publication_date": "2015-10",
+      "decision_date": null,
+      "effective_date": null,
+      "status": "DGUV Information; kein Ersatz für objektbezogene Elektrofachprüfung.",
+      "read_scope": "Katalogfundstelle und Erreichbarkeit; keine vollständige Prüfung sämtlicher Detailregeln.",
+      "meaning": "Elektrische Sicherheit vor Untersuchung und Wiederinbetriebnahme fachgerecht herstellen."
+    },
+    {
+      "id": "BF_FKG",
+      "urls": [
+        "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/BF-FKG-Merkblaetter/BF-FKG_Merkblatt_01_2025-03_Thermisch_induzierte_Spannungen.pdf"
+      ],
+      "publication_date": "Dokumentstand 01.2024 / Copyright 2024; URL enthält 2025-03.",
+      "decision_date": null,
+      "effective_date": null,
+      "status": "Fachmerkblatt; keine gesetzliche Inkraftsetzung.",
+      "read_scope": "Relevante Abschnitte zu Randbedingungen thermischer Spannungen und Aussagegrenzen; keine Vollprüfung sämtlicher Berechnungen.",
+      "meaning": "Beschattung, Glasart, Kante und Geometrie in die objektbezogene thermische Bruchhypothese einbeziehen."
+    },
+    {
+      "id": "POLYCAM",
+      "urls": [
+        "https://poly.cam/blog/how-to-measure-a-room-with-your-phone"
+      ],
+      "publication_date": null,
+      "decision_date": null,
+      "effective_date": null,
+      "status": "Herstellerinformation, keine unabhängige Genauigkeitszertifizierung.",
+      "read_scope": "Seite zu Aufnahme und Raumaufmaß geöffnet.",
+      "meaning": "Unabhängige Kontrollmaße und aufgabenbezogene Plausibilisierung erforderlich; keine universelle Mindestzahl oder Genauigkeit erfunden."
+    },
+    {
+      "id": "VDE62305",
+      "urls": [
+        "https://www.vde.com/dke-de/arbeitsfelder/core-safety/blitzschutznormen/2081096-2081096"
+      ],
+      "publication_date": "2026-01-23",
+      "decision_date": null,
+      "effective_date": null,
+      "status": "VDE/DKE-Übersicht zur Reihe DIN EN IEC 62305, kein selbst eingesehener Normvolltext.",
+      "read_scope": "Titel, Datum und Einordnung der Herausgeberseite.",
+      "meaning": "Bibliografie korrekt zur verlinkten Übersicht, keine erfundenen Normzitate."
+    },
+    {
+      "id": "TKB8",
+      "urls": [
+        "https://www.klebstoffe.com/wp-content/uploads/2026/04/TKB-8-Untergrundbeurteilung-Veroeffentlichung.pdf"
+      ],
+      "publication_date": "Deckblatt Mai 2026; Seitenfuß April 2026; Herausgeberankündigung 20.05.2026.",
+      "decision_date": null,
+      "effective_date": null,
+      "status": "Verbandsmerkblatt; kein Gesetz oder Norm-Entwurf und kein allgemeiner rückwirkender Geltungsbeginn.",
+      "read_scope": "Merkblatt mit 17 Seiten geöffnet; relevante Abschnitte zu CM/KRL und Untergrundbeurteilung ausgewertet.",
+      "meaning": "Einheit, Schicht, Verfahren und Prüfziel getrennt dokumentieren; Wassergehalt und relative Luftfeuchte nicht numerisch austauschen."
+    },
+    {
+      "id": "DVGW",
+      "urls": [
+        "https://www.dvgw.de/themen/wasser/trinkwasser-installation"
+      ],
+      "publication_date": null,
+      "decision_date": null,
+      "effective_date": null,
+      "status": "Herausgeber-Fachseite; kein Beleg einer gemeinschaftlichen Verbändepublikation.",
+      "read_scope": "Herausgeber und Linkbezug geprüft; keine technische Gesamtfreigabe.",
+      "meaning": "Frost- und Installationsfragen nicht mit ungesicherter Verbändeautorität begründen."
+    }
+  ],
+  "summary": {
+    "selected_articles": 20,
+    "changed_old_articles": 12,
+    "unchanged_articles": 8,
+    "individual_full_source_clearance": 0,
+    "removed_or_replaced_original_404_links": 4,
+    "archive_complete": false,
+    "public_research_notes_added": false,
+    "updated_dates_only_after_content_changes": true
+  },
+  "reviewed_at": "2026-10-20T04:23:07.767Z"
+}
+

@@ -16,7 +16,7 @@ relatedLinks: ["/fachwissen/", "/schaden-melden/", "/gutachter-plattform/"]
 damageTypes: ["gebaeude", "versicherung"]
 publication:
   publishedAt: 2026-09-17
-  updatedAt: 2026-10-19
+  updatedAt: 2026-10-20
   status: published
 seo:
   title: "Fenster- und Glasschäden prüffähig abgrenzen"
@@ -61,6 +61,8 @@ Vor Ausbau sind Übersicht, Detail und Kennzeichnung des Elements zu fotografier
 
 Fensterbauer beurteilen Systemkompatibilität und Ausführung. Glasfachbetriebe beurteilen Verglasung und Sicherheitsanforderungen. Bei statisch oder bauphysikalisch relevanten Anschlussfragen sind Fachplaner einzubeziehen. Die Schadenbewertung ersetzt keine Ausführungsplanung.
 
+Bei der Verwendung von Arbeitsstättenregeln ist deren Anwendungsbereich zu beachten: Die ArbStättV dient nach § 1 dem Schutz der Beschäftigten beim Einrichten und Betreiben von Arbeitsstätten. Eine daraus abgeleitete Anforderung darf nicht ohne Prüfung auf jedes private Wohnfenster übertragen werden. Bauordnungsrechtliche Anforderungen und die Eigenschaften des konkreten Fensters sind gesondert zu bestimmen.
+
 ## Versicherungstechnische Einordnung ohne Deckungszusage
 
 Technische Erforderlichkeit und Versicherungsdeckung sind getrennte Fragen. Ob Glasbruch, Rahmen, Ausbau und Anschlusskosten erfasst sind, richtet sich nach Vertrag, Ursache und Schadenumfang. Eine optische Abweichung allein begründet nicht automatisch eine vollständige Erneuerung.
@@ -88,6 +90,7 @@ Die Reparaturgrenze folgt dem konkreten Befund. Erst die bauteilbezogene Trennun
 - [ift Rosenheim: Prüfung der Schlagregendichtheit von Fenstern und Türen](https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren)
 - [BAuA: ASR A1.6 – Fenster, Oberlichter, lichtdurchlässige Wände](https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6)
 - [Bundesministerium der Justiz / juris: VVG § 82 – Abwendung und Minderung des Schadens](https://www.gesetze-im-internet.de/vvg_2008/__82.html)
+- Bundesministerium der Justiz / Bundesamt für Justiz, [ArbStättV § 1 – Ziel, Anwendungsbereich](https://www.gesetze-im-internet.de/arbst_ttv_2004/__1.html).
 ## Fachliche Prüfung für Ihre Schadenakte
 
 Für Versicherer, Schadenabteilungen und Regulierer bieten wir abgegrenzte technische Prüfaufträge und die Bearbeitung komplexer Schadenlagen an. Prüfziel, Unterlagenstand und gewünschte Bearbeitungstiefe werden vorab abgestimmt.

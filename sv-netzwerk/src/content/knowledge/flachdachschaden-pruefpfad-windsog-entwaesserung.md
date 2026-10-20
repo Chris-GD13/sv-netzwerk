@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/fachwissen/schadenabgrenzung/", "/fachwisse
 damageTypes: ["sturm", "starkregen", "gebaeude"]
 publication:
   publishedAt: 2026-09-11
-  updatedAt: 2026-09-11
+  updatedAt: 2026-10-20
   status: published
 seo:
   title: "Flachdachschaden prüfen: Windsog, Befestigung und Entwässerung"
@@ -94,7 +94,7 @@ Nachträge benötigen einen neuen Befund oder eine dokumentierte technische Änd
 
 ## Praxisbeispiel (fiktiv)
 
-Fiktiv meldet ein Gewerbebetrieb nach einem Starkregen Wasserflecken unter einer Flachdachfläche. Die Aufnahme findet eine verstopfte Ablaufzone und eine ältere, bereits nachgedichtete Durchdringung. An einer Randzone ist zusätzlich ein gelöstes Profil erkennbar. Die Prüfung trennt den hydraulischen Rückstau, den Vorzustand der Durchdringung und die mögliche Windbeanspruchung des Profils. Eine Dachfachfirma prüft die Abdichtung, ein Tragwerksplaner wird nicht benötigt, weil keine tragenden Verformungen vorliegen.
+Fiktiv meldet ein Gewerbebetrieb nach einem Starkregen Wasserflecken unter einer Flachdachfläche. Die Aufnahme findet eine verstopfte Ablaufzone und eine ältere, bereits nachgedichtete Durchdringung. An einer Randzone ist zusätzlich ein gelöstes Profil erkennbar. Die Prüfung trennt den hydraulischen Rückstau, den Vorzustand der Durchdringung und die mögliche Windbeanspruchung des Profils. Eine Dachfachfirma prüft die Abdichtung. Ob ergänzend Tragwerksplanung erforderlich ist, hängt auch von Wasserlast, Dachaufbau und vorhandenen Nachweisen ab; fehlende sichtbare Verformung ist keine statische Freigabe.
 
 Das Beispiel ist fiktiv und zeigt, warum mehrere Befunde nicht zu einer einzigen pauschalen Ursache zusammengezogen werden dürfen.
 
@@ -128,6 +128,5 @@ Die abschließende Prüfung berücksichtigt außerdem die Bedienbarkeit der Abl�
 
 - § 82 VVG, Schadenminderung: https://www.gesetze-im-internet.de/vvg_2008/__82.html
 - § 86 VVG, Übergang von Ersatzansprüchen: https://www.gesetze-im-internet.de/vvg_2008/__86.html
-- Deutscher Wetterdienst, Starkregen und Niederschlag: https://www.dwd.de/DE/leistungen/starkregen/starkregen_node.html
-- Bundesamt für Bevölkerungsschutz und Katastrophenhilfe, Naturgefahren: https://www.bbk.bund.de/DE/Themen/Naturgefahren/naturgefahren_node.html
-- Zentralverband des Deutschen Dachdeckerhandwerks, Technik und Regelwerk: https://www.zvdh.de/technik-regelwerk/
+- Bundesamt für Bevölkerungsschutz und Katastrophenhilfe, [Mit Naturgefahren umgehen](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/Mit-Naturgefahren-umgehen/mit-naturgefahren-umgehen_node.html).
+- Zentralverband des Deutschen Dachdeckerhandwerks, [Regelübersicht](https://dachdecker.org/betriebsinhaber/regeluebersicht/).

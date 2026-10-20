@@ -1,0 +1,343 @@
+{
+  "checked_at": "2026-10-20T04:23:00.104Z",
+  "method": "HTTP GET, Redirects verfolgt, Zeitlimit 20 Sekunden; kein Beleg einer vollständigen fachlichen Quellenprüfung",
+  "articles": 21,
+  "unique_sources": 67,
+  "results": [
+    {
+      "url": "https://www.umweltbundesamt.de/publikationen/leitlinie-fuer-die-asbesterkundung-zur-vorbereitung",
+      "status": 200,
+      "resolved_url": "https://www.umweltbundesamt.de/publikationen/leitlinie-fuer-die-asbesterkundung-zur-vorbereitung"
+    },
+    {
+      "url": "https://poly.cam/blog/how-to-measure-a-room-with-your-phone",
+      "status": 200,
+      "resolved_url": "https://poly.cam/blog/how-to-measure-a-room-with-your-phone"
+    },
+    {
+      "url": "https://www.baua.de/DE/Themen/Chemikalien-Biostoffe/Gefahrstoffe/Informationsportal-Asbest/Asbest_Dossier/Asbest_Planung_dossier",
+      "status": 403,
+      "resolved_url": "https://www.baua.de/DE/Themen/Chemikalien-Biostoffe/Gefahrstoffe/Informationsportal-Asbest/Asbest_Dossier/Asbest_Planung_dossier"
+    },
+    {
+      "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519",
+      "status": 403,
+      "resolved_url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-519"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__5a.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__5a.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__82.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/vvg_2008/__82.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__11a.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__11a.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/zpo/__371.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/zpo/__371.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/bgb/__249.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/bgb/__249.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/bgb/__631.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/bgb/__631.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__86.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/vvg_2008/__86.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/gefstoffv_2010/"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/bgb/__254.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/bgb/__254.html"
+    },
+    {
+      "url": "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von",
+      "status": 200,
+      "resolved_url": "https://www.umweltbundesamt.de/publikationen/leitfaden-zur-vorbeugung-erfassung-sanierung-von"
+    },
+    {
+      "url": "https://www.vde.com/dke-de/arbeitsfelder/core-safety/blitzschutznormen/2081096-2081096",
+      "status": 200,
+      "resolved_url": "https://www.vde.com/dke-de/arbeitsfelder/core-safety/blitzschutznormen/2081096-2081096"
+    },
+    {
+      "url": "https://www.vde.com/de/blitzschutz/infos/gebaeudetechnische-anlagen-im-blitzschutz",
+      "status": 200,
+      "resolved_url": "https://www.vde.com/de/blitzschutz/infos/gebaeudetechnische-anlagen-im-blitzschutz"
+    },
+    {
+      "url": "https://www.vde.com/de/blitzschutz/infos/ueberspannungsschutz-und-innerer-blitzschutz",
+      "status": 200,
+      "resolved_url": "https://www.vde.com/de/blitzschutz/infos/ueberspannungsschutz-und-innerer-blitzschutz"
+    },
+    {
+      "url": "https://eur-lex.europa.eu/eli/reg_impl/2019/947/oj",
+      "status": 202,
+      "resolved_url": "https://eur-lex.europa.eu/eli/reg_impl/2019/947/oj"
+    },
+    {
+      "url": "https://www.easa.europa.eu/en/document-library/easy-access-rules/online-publications/easy-access-rules-unmanned-aircraft-systems",
+      "status": 200,
+      "resolved_url": "https://www.easa.europa.eu/en/document-library/easy-access-rules/online-publications/easy-access-rules-unmanned-aircraft-systems"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/luftvo_2015/__21h.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/luftvo_2015/__21h.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/luftvg/__43.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/luftvg/__43.html"
+    },
+    {
+      "url": "https://www.dipul.de/homepage/de/informationen/allgemeines/erste-schritte/schnell-sicher-in-die-luft-version-1.2.pdf",
+      "status": 200,
+      "resolved_url": "https://www.dipul.de/homepage/de/informationen/allgemeines/erste-schritte/schnell-sicher-in-die-luft-version-1.2.pdf?cid=2rj"
+    },
+    {
+      "url": "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1052/elektrische-anlagen-und-betriebsmittel",
+      "status": 200,
+      "resolved_url": "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/1052/elektrische-anlagen-und-betriebsmittel"
+    },
+    {
+      "url": "https://publikationen.dguv.de/regelwerk/dguv-informationen/284/sicherheit-bei-arbeiten-an-elektrischen-anlagen",
+      "status": 200,
+      "resolved_url": "https://publikationen.dguv.de/regelwerk/dguv-informationen/284/sicherheit-bei-arbeiten-an-elektrischen-anlagen"
+    },
+    {
+      "url": "https://www.dguv.de/fb-etem/regelwerk/index.jsp",
+      "status": 200,
+      "resolved_url": "https://www.dguv.de/fb-etem/regelwerk/index.jsp"
+    },
+    {
+      "url": "https://www.datenschutzkonferenz-online.de/media/oh/20190116_oh_positionspapier_kameradrohnen.pdf",
+      "status": 200,
+      "resolved_url": "https://www.datenschutzkonferenz-online.de/media/oh/20190116_oh_positionspapier_kameradrohnen.pdf"
+    },
+    {
+      "url": "https://doi.org/10.5194/isprs-annals-IV-2-W2-163-2017",
+      "status": 200,
+      "resolved_url": "https://isprs-annals.copernicus.org/articles/IV-2-W2/163/2017/"
+    },
+    {
+      "url": "https://www.vde-verlag.de/p/normen/din-vde-0100-430-vde-0100-430-2010-10/0100154-DE-PR",
+      "status": 200,
+      "resolved_url": "https://www.vde-verlag.de/p/normen/din-vde-0100-430-vde-0100-430-2010-10/0100154-DE-PR"
+    },
+    {
+      "url": "https://www.ifs-ev.org/brand-in-einer-als-lager-genutzten-hotelsauna/",
+      "status": 200,
+      "resolved_url": "https://www.ifs-ev.org/brand-in-einer-als-lager-genutzten-hotelsauna/"
+    },
+    {
+      "url": "https://www.ifs-ev.org/archiv/literatur/das_elektrohandwerk_18-2015.pdf",
+      "status": 200,
+      "resolved_url": "https://www.ifs-ev.org/archiv/literatur/das_elektrohandwerk_18-2015.pdf"
+    },
+    {
+      "url": "https://www.ifs-ev.org/archiv/literatur/das_elektrohandwerk_17-2015.pdf",
+      "status": 200,
+      "resolved_url": "https://www.ifs-ev.org/archiv/literatur/das_elektrohandwerk_17-2015.pdf"
+    },
+    {
+      "url": "https://www.baua.de/DE/Themen/Arbeitsgestaltung-im-Betrieb/Gefahrstoffe/Gefahrstoffe_node.html",
+      "status": 403,
+      "resolved_url": "https://www.baua.de/DE/Themen/Arbeitsgestaltung-im-Betrieb/Gefahrstoffe/Gefahrstoffe_node.html"
+    },
+    {
+      "url": "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6",
+      "status": 403,
+      "resolved_url": "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A1-6"
+    },
+    {
+      "url": "https://www.dguv.de/de/praevention/index.jsp",
+      "status": 200,
+      "resolved_url": "https://www.dguv.de/de/praevention/index.jsp"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/zpo/__402.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/zpo/__402.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/bgb/__634.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/bgb/__634.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/arbst_ttv_2004/__1.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/arbst_ttv_2004/__1.html"
+    },
+    {
+      "url": "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR",
+      "status": 403,
+      "resolved_url": "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR"
+    },
+    {
+      "url": "https://www.ift-rosenheim.de/pruefung-luftdurchlaessigkeit-fenster-tueren",
+      "status": 503,
+      "resolved_url": "https://www.ift-rosenheim.de/pruefung-luftdurchlaessigkeit-fenster-tueren"
+    },
+    {
+      "url": "https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren",
+      "status": 503,
+      "resolved_url": "https://www.ift-rosenheim.de/pruefung-schlagregendichtheit-fenster-tueren"
+    },
+    {
+      "url": "https://bingk.de/",
+      "status": 200,
+      "resolved_url": "https://bingk.de/"
+    },
+    {
+      "url": "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/wie-luefte-ich-richtig-tipps-tricks-zur",
+      "status": 200,
+      "resolved_url": "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/wie-luefte-ich-richtig-tipps-tricks-zur"
+    },
+    {
+      "url": "https://www.dibt.de/de/wir-bieten/technische-baubestimmungen",
+      "status": 200,
+      "resolved_url": "https://www.dibt.de/de/wir-bieten/technische-baubestimmungen"
+    },
+    {
+      "url": "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel",
+      "status": 200,
+      "resolved_url": "https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel"
+    },
+    {
+      "url": "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/bf-merkblaetter/BF-Merkblatt_003-2008_AEI4_01-2020_Leitfaden_zur_Verwendung_von_Dreifach-Isolierglas.pdf",
+      "status": 200,
+      "resolved_url": "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/bf-merkblaetter/BF-Merkblatt_003-2008_AEI4_01-2020_Leitfaden_zur_Verwendung_von_Dreifach-Isolierglas.pdf"
+    },
+    {
+      "url": "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/bf-merkblaetter/BF-Merkblatt_022-2018_AEI1_02-2020_Verglasungsrichtlinie.pdf",
+      "status": 200,
+      "resolved_url": "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/bf-merkblaetter/BF-Merkblatt_022-2018_AEI1_02-2020_Verglasungsrichtlinie.pdf"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-en-1279-2/281596947",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-en-1279-2/281596947"
+    },
+    {
+      "url": "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/Mit-Naturgefahren-umgehen/mit-naturgefahren-umgehen_node.html",
+      "status": 200,
+      "resolved_url": "https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/Mit-Naturgefahren-umgehen/mit-naturgefahren-umgehen_node.html"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/trinkwv_2023/__13.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/trinkwv_2023/__13.html"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-en-1279-1/281205722",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-en-1279-1/281205722"
+    },
+    {
+      "url": "https://www.dvgw.de/themen/wasser/trinkwasser-installation",
+      "status": 200,
+      "resolved_url": "https://www.dvgw.de/themen/wasser/trinkwasser-installation"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-en-12150-1/323111198",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-en-12150-1/323111198"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-18008-2/312360009",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-18008-2/312360009"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-1988-200/151775404",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-1988-200/151775404"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-18008-1/312359991",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-18008-1/312359991"
+    },
+    {
+      "url": "https://www.dinmedia.de/de/norm/din-en-806-1/44698245",
+      "status": 200,
+      "resolved_url": "https://www.dinmedia.de/de/norm/din-en-806-1/44698245"
+    },
+    {
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__1.html",
+      "status": 200,
+      "resolved_url": "https://www.gesetze-im-internet.de/vvg_2008/__1.html"
+    },
+    {
+      "url": "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/BF-FKG-Merkblaetter/BF-FKG_Merkblatt_01_2025-03_Thermisch_induzierte_Spannungen.pdf",
+      "status": 200,
+      "resolved_url": "https://www.bundesverband-flachglas.de/wp-content/uploads/simple-file-list/BF-FKG-Merkblaetter/BF-FKG_Merkblatt_01_2025-03_Thermisch_induzierte_Spannungen.pdf"
+    },
+    {
+      "url": "https://www.klebstoffe.com/wp-content/uploads/2026/04/TKB-8-Untergrundbeurteilung-Veroeffentlichung.pdf",
+      "status": 200,
+      "resolved_url": "https://www.klebstoffe.com/wp-content/uploads/2026/04/TKB-8-Untergrundbeurteilung-Veroeffentlichung.pdf"
+    },
+    {
+      "url": "https://gsb-international.de/wp-content/uploads/2026/01/01-GSB-QR-AL-631-1-ST-663-1-Allgemeiner-Teil-2026-01-01-de.pdf",
+      "status": 200,
+      "resolved_url": "https://gsb-international.de/wp-content/uploads/2026/01/01-GSB-QR-AL-631-1-ST-663-1-Allgemeiner-Teil-2026-01-01-de.pdf"
+    },
+    {
+      "url": "https://gsb-international.de/wp-content/uploads/2026/01/07-GSB-QR-AL-631-7-ST-663-7-Normen-Richtlinien-2026-01-01-de.pdf",
+      "status": 200,
+      "resolved_url": "https://gsb-international.de/wp-content/uploads/2026/01/07-GSB-QR-AL-631-7-ST-663-7-Normen-Richtlinien-2026-01-01-de.pdf"
+    },
+    {
+      "url": "https://gsb-international.de/wp-content/uploads/2025/12/05-GSB-QR-AL-631-5-Beschichter-AL-2026-01-01-de.pdf",
+      "status": 200,
+      "resolved_url": "https://gsb-international.de/wp-content/uploads/2025/12/05-GSB-QR-AL-631-5-Beschichter-AL-2026-01-01-de.pdf"
+    },
+    {
+      "url": "https://gsb-international.de/architekten-und-planer/informationen/empfehlungstexte-ausschreibung/",
+      "status": 200,
+      "resolved_url": "https://gsb-international.de/architekten-und-planer/informationen/empfehlungstexte-ausschreibung/"
+    },
+    {
+      "url": "https://fassadenreinigung.grm-online.de/downloads/",
+      "status": 200,
+      "resolved_url": "https://fassadenreinigung.grm-online.de/downloads/"
+    },
+    {
+      "url": "https://fassadenreinigung.grm-online.de/fileadmin/Redaktion/Downloads/MERKBLA%CC%88TTER/GRM_MERKBLATT_07.pdf",
+      "status": 200,
+      "resolved_url": "https://fassadenreinigung.grm-online.de/fileadmin/Redaktion/Downloads/MERKBLA%CC%88TTER/GRM_MERKBLATT_07.pdf"
+    },
+    {
+      "url": "https://dachdecker.org/betriebsinhaber/regeluebersicht/",
+      "status": 0,
+      "error": "curl: (28) Operation timed out after 20002 milliseconds with 0 bytes received\n"
+    },
+    {
+      "url": "https://vff-shop.de/wp-content/uploads/2024/04/AL02_1608_leseprobe.pdf",
+      "status": 200,
+      "error": "curl: (28) Operation timed out after 20000 milliseconds with 147214 out of 238224 bytes received\n"
+    }
+  ]
+}

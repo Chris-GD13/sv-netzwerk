@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["gebaeude", "leitungswasser", "brand", "sturm"]
 publication:
   publishedAt: 2026-08-26
-  updatedAt: 2026-10-19
+  updatedAt: 2026-10-20
   status: published
 seo:
   title: "Beweissicherung und Fotodokumentation: Standards für belastbare"
@@ -28,7 +28,7 @@ seo:
 Eine lückenhafte Beweissicherung gefährdet nicht nur die Regulierung, sondern kann im Streitfall die gesamte Sachverhaltsrekonstruktion unmöglich machen. Die Qualität der Dokumentation entscheidet über belastbare Entscheidungen bei hoher Schadenfrequenz.
 
 ## Anlass und Einordnung
-Dieser Beitrag nutzt ein anonymisiertes typisches Praxisbeispiel aus der Regulierung. Damit werden keine identifizierbaren Einzelfalldaten veröffentlicht, aber belastbare Vorgehensstandards für Versicherer, Sachverständige und Schadenregulierer dargestellt.
+Eine Schadenakte muss erkennen lassen, welches Bauteil zu welchem Zeitpunkt welchen Zustand zeigte. Die Zuordnung zwischen Bild, Feststellung und späterer Maßnahme ist entscheidend, besonders wenn der Ausgangszustand durch Sicherung oder Rückbau verändert wird.
 
 ## Hauptteil
 
@@ -42,7 +42,7 @@ Das SV-Netzwerk verbindet regional verankerte Sachverständige und erfahrene Sch
 Für die operative Verzahnung werden Leistungen, Schadenarten, Expertenprofile und weiterführende Fachbeiträge gemeinsam genutzt: [Leistungen](/leistungen/), [Schadenarten für Komplexschäden](/komplexschaeden/), [Experten im Netzwerk](/experten/), [Gutachter-Plattform](/gutachter-plattform/) sowie der Fachbeitrag [Kumulschäden in der Region: Priorisierung, Koordination und Dokumentation](/fachwissen/kumulschaeden-in-der-region-priorisierung-koordination-dokumentation/).
 
 ### Technische und regulatorische Einordnung
-Beweissichernde Fotodokumentation umfasst Übersichts-, Detail- und Messaufnahmen mit Zeitstempel, Georeferenz und eindeutiger Zuordnung zu Bauteil, Gewerk und Schadensphase. Rückbauöffnungen sind vor Verschluss vollständig zu dokumentieren.
+Beweissichernde Fotodokumentation verbindet Übersicht, Detail und Messaufnahme mit einer eindeutigen Raum- und Bauteilzuordnung. Aufnahmedatum, verantwortliche Person und unveränderte Ausgangsdatei bleiben erhalten. Automatische Zeit- oder Standortdaten können helfen, sind aber weder alleiniger Echtheitsnachweis noch zwingend in jedem Foto erforderlich. Die rechtliche Würdigung eines elektronischen Dokuments richtet sich nach dem jeweiligen Verfahren; § 371 ZPO behandelt den Augenscheinsbeweis durch Vorlage beziehungsweise Übermittlung der Datei. Eine bestimmte Dateibenennung garantiert keinen Beweiswert. Rückbauöffnungen sind vor Verschluss nachvollziehbar zu dokumentieren.
 
 Die fachliche Einordnung beginnt mit dem dokumentierten Schadenbild und den hieraus abgeleiteten Prüffragen. Technische Bewertung und versicherungstechnische Entscheidung sind getrennt zu behandeln. Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung, ersetzt jedoch keine individuelle Deckungszusage oder Einzelfallprüfung.
 
@@ -123,7 +123,6 @@ Bei beweissicherung und fotodokumentation ist nicht die Geschwindigkeit allein e
 Für die operative Umsetzung unterstützen wir mit strukturierter [Schadenmeldung](/schaden-melden/), methodischer [technischer Schadenabgrenzung](/fachwissen/schadenabgrenzung/), [prüffähiger Dokumentation](/fachwissen/prueffaehige-dokumentation/) und – je nach Fragestellung – der [Gutachter-Plattform](/gutachter-plattform/).
 
 ## Quellen und weiterführende Hinweise
-- [Bundesministerium der Justiz: Versicherungsvertragsgesetz (VVG)](https://www.gesetze-im-internet.de/vvg_2008/)
-- [Bundesanstalt für Arbeitsschutz und Arbeitsmedizin: Technische Regeln für Gefahrstoffe](https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS.html)
-- [Deutsche Gesetzliche Unfallversicherung: Publikationen](https://publikationen.dguv.de/)
-- [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Vorsorge und Verhalten bei Gefahren](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/vorsorge_node.html)
+- Bundesministerium der Justiz / Bundesamt für Justiz, [ZPO § 371 – Beweis durch Augenschein](https://www.gesetze-im-internet.de/zpo/__371.html).
+- Bundesministerium der Justiz / Bundesamt für Justiz, [VVG § 82 – Abwendung und Minderung des Schadens](https://www.gesetze-im-internet.de/vvg_2008/__82.html).
+- Bundesministerium der Justiz / Bundesamt für Justiz, [VVG § 86 – Übergang von Ersatzansprüchen](https://www.gesetze-im-internet.de/vvg_2008/__86.html).

@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-20",
+  "build": "success",
+  "astro": {
+    "errors": 0,
+    "warnings": 0,
+    "hints": 0
+  },
+  "daily_preflight": "passed; existing reservation respected; exactly one daily article",
+  "seo": {
+    "knowledge_urls": 113,
+    "sitemap_pages": 194,
+    "internal_links_checked": 21121
+  },
+  "html_validation": {
+    "status": "failed-existing-backlog",
+    "files": 187,
+    "errors": 476,
+    "warnings": 0,
+    "rules": {
+      "aria-label-misuse": 1,
+      "tel-non-breaking": 1,
+      "element-required-attributes": 1,
+      "element-required-content": 1,
+      "no-inline-style": 53,
+      "no-implicit-input-type": 22,
+      "doctype-style": 11,
+      "meta-refresh": 5,
+      "unique-landmark": 76,
+      "long-title": 95,
+      "no-raw-characters": 2,
+      "valid-id": 204,
+      "void-style": 4
+    },
+    "today": [],
+    "previous_full_build_errors": 476,
+    "today_detail": "no findings in completed full scan",
+    "no_suppression_applied": true
+  },
+  "internal_link_validation": {
+    "tool": "lychee offline, complete built HTML",
+    "status": "failed",
+    "total": 222915,
+    "unique": 2500,
+    "ok": 218825,
+    "errors": 45,
+    "excluded": 4045,
+    "examples": [
+      "/fachwissen/kategorie/svos",
+      "/fachwissen/tag/architektur",
+      "/fachwissen/tag/content-collections",
+      "/fachwissen/tag/flachenverunreinigung",
+      "/fachwissen/tag/svos"
+    ],
+    "note": "Fehlerstellen an bestehenden Kategorien/Tags; kein vollständiger Online-Link-Workflow. Ausschlüsse folgen dem Offline-Modus, nicht einer Fehlerunterdrückung."
+  },
+  "external_sources": {
+    "articles": 21,
+    "unique_urls": 67,
+    "ok_200": 58,
+    "not_200": 9,
+    "results_file": "fachbeitrag-quellenzugriff-2026-10-20-batch20.json",
+    "status": "not-all-successful",
+    "no_403_503_or_timeouts_suppressed": true
+  },
+  "remaining": "Vollständige individuelle Quellenprüfung des Archivs sowie HTML- und Link-Rückstand bleiben offen.",
+  "verified_at": "2026-10-20T04:29:31.920Z"
+}
