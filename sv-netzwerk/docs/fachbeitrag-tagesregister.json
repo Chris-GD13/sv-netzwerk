@@ -816,9 +816,12 @@
         "verified_at": "2026-10-21T04:22:16.081Z"
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "reserved",
+        "owner": "codex-linkedin-20261021-01a15cd6",
+        "reserved_at": "2026-10-21T05:07:12.070Z",
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus/"
       }
     }
   },
-  "updated_at": "2026-10-21T04:22:16.081Z"
+  "updated_at": "2026-10-21T05:07:12.070Z"
 }
