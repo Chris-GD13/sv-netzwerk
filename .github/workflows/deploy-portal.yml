@@ -86,6 +86,7 @@ jobs:
         run: |
           npm run build
           find public/intern -name '*.php' -print0 | xargs -0 -n1 php -l
+          php tests/kuss_api_test.php
           php tests/gf_financial_evidence_test.php
           php tests/gf_case_storage_test.php
           php tests/gf_evidence_cache_test.php
