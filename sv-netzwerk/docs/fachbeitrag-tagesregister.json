@@ -801,7 +801,21 @@
           }
         ]
       }
+    },
+    "2026-10-21": {
+      "publication_id": "2026-10-21-teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus",
+      "article": {
+        "title": "Teilzahlungen im Sachschaden: anerkannte Beträge, offene Positionen und Zahlungsstatus trennen",
+        "slug": "teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus/",
+        "status": "reserved",
+        "owner": "codex-website-20261021-0602",
+        "reserved_at": "2026-10-21T04:05:40.781Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-10-20T06:57:21.995Z"
+  "updated_at": "2026-10-21T04:05:40.781Z"
 }
