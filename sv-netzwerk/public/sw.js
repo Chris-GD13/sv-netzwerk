@@ -5,7 +5,7 @@ import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
 
-const CACHE_VERSION = '20260929-1';
+const CACHE_VERSION = '20261021-kuss-1';
 const PAGE_CACHE = `portal-pages-${CACHE_VERSION}`;
 const API_CACHE = `api-cache-${CACHE_VERSION}`;
 const ASSET_CACHE = `assets-cache-${CACHE_VERSION}`;
@@ -18,7 +18,7 @@ precacheAndRoute(self.__WB_MANIFEST || []);
 // HTML pages - Network First (online priority, fallback to cache)
 // Personal energy access and VPN keys must never enter an offline cache.
 registerRoute(
-  ({ url }) => url.pathname === '/intern/api/energy.php' || url.pathname.startsWith('/intern/energie/'),
+  ({ url }) => url.pathname === '/intern/api/kuss.php' || url.pathname === '/intern/api/energy.php' || url.pathname.startsWith('/intern/energie/'),
   new NetworkOnly()
 );
 
