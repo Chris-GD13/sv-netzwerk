@@ -18,7 +18,7 @@ precacheAndRoute(self.__WB_MANIFEST || []);
 // HTML pages - Network First (online priority, fallback to cache)
 // Personal energy access and VPN keys must never enter an offline cache.
 registerRoute(
-  ({ url }) => url.pathname === '/intern/api/energy.php' || url.pathname.startsWith('/intern/energie/'),
+  ({ url }) => url.pathname === '/intern/api/kuss.php' || url.pathname === '/intern/api/energy.php' || url.pathname.startsWith('/intern/energie/'),
   new NetworkOnly()
 );
 
@@ -32,7 +32,7 @@ registerRoute(
 
 // Authentication state must never fall back to a cached session response.
 registerRoute(
-  ({ url }) => ['/intern/api/auth.php', '/intern/api/kuss.php'].includes(url.pathname),
+  ({ url }) => url.pathname === '/intern/api/auth.php',
   new NetworkOnly()
 );
 

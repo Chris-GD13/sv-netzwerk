@@ -8,8 +8,8 @@ vm.runInNewContext(worker.replace(/^import .*;\r?\n/gm, ''), {
   precacheAndRoute() {}, registerRoute: (match, strategy) => routes.push({ match, strategy }),
   NetworkOnly: class NetworkOnly {}, NetworkFirst: class NetworkFirst {}, CacheFirst: class CacheFirst {},
 });
-for (const action of ['status', 'jobs', 'connect']) {
-  const request = { mode: 'cors' }, url = new URL(`https://www.sv-netzwerk.eu/intern/api/kuss.php?action=${action}`);
+for (const mode of ['cors', 'navigate']) for (const action of ['status', 'jobs', 'connect']) {
+  const request = { mode }, url = new URL(`https://www.sv-netzwerk.eu/intern/api/kuss.php?action=${action}`);
   const route = routes.find(item => item.match({ request, url }));
   assert.equal(route.strategy.constructor.name, 'NetworkOnly', `${action} must never fall back to another user's cached data`);
 }
