@@ -212,7 +212,7 @@ const internLayout = fs.readFileSync(path.join(root, 'src/layouts/InternalLayout
 const calculationPage = fs.readFileSync(path.join(root, 'src/pages/intern/kalkulation/index.astro'), 'utf8');
 assert(internEntry.includes("location.replace('/intern/login/')"), 'Der Aufruf von /intern/ führt ohne Umweg auf die Anmeldeseite');
 assert(internLayout.includes('class="intern-header__login" href="/intern/login/"') && internLayout.includes('Anmelden</a>'), 'Oben links im dunklen Kopfbereich ist dauerhaft ein direkter Anmeldebutton sichtbar');
-assert(internLayout.includes("label: 'Fenstergutachten'") && !internLayout.includes("label: 'Fenster',"), 'Der Menüpunkt ist eindeutig als Fenstergutachten bezeichnet');
+assert(internLayout.includes('href="/intern/fensterpruefung-bonn/">Fenstergutachten</a>') && !internLayout.includes("label: 'Fenster',"), 'Der Menüpunkt ist eindeutig als Fenstergutachten bezeichnet');
 assert(calculationPage.indexOf('data-kva-import') < calculationPage.indexOf('bk-input-card'), 'Die KVA-Nachkalkulation steht als erste Arbeitskarte vor Suche und Schnellkalkulation');
 assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');

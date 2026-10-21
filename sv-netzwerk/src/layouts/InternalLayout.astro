@@ -17,26 +17,17 @@ const currentPath = props.currentPath ?? Astro.url.pathname;
 const internalLinks = [
   { href: '/intern/tagescockpit/', label: 'Tagescockpit', icon: '●' },
   { href: '/intern/aufgaben/', label: 'Aufgaben', icon: '✓' },
-  { href: '/intern/versicherungsfaelle/', label: 'Versicherungsfälle', icon: '⌂' },
-  ...(currentPath.startsWith('/intern/versicherungsfaelle/') ? [
-    { href: '/intern/versicherungsfaelle/#vf-case-selection', label: 'Schaden öffnen', icon: '', sub: true },
-    { href: '/intern/versicherungsfaelle/#vf-assistant-panel', label: 'Schaden bearbeiten', icon: '', sub: true },
-    { href: '/intern/versicherungsfaelle/?aktion=beleg', label: 'Rechnung / KVA ohne Schaden', icon: '', sub: true },
-    { href: '/intern/versicherungsfaelle/#vf-case-documents', label: 'Unterlagen und Ergebnisse', icon: '', sub: true },
-  ] : []),
+  { href: '/intern/versicherungsfaelle/', label: 'Versicherungsfälle', icon: '⌂', dynamic: 'cases' },
   { href: '/intern/versicherungswissen/', label: 'Versicherungswissen', icon: '▤' },
   { divider: true },
   { href: '/intern/telefon/', label: 'Telefonzentrale', icon: '☎' },
   { dynamic: 'whatsapp', label: 'WhatsApp', icon: '◉' },
   { href: '/intern/kalender/', label: 'Kalender', icon: '□' },
   { divider: true },
-  { href: '/intern/kalkulation/', label: 'Kalkulation', icon: '▦' },
-  { divider: true },
   { dynamic: 'settlement', label: 'Buchhaltung', icon: '€' },
   { divider: true },
-  { href: '/intern/privatauftraege/', label: 'Privatgutachten', icon: '⌑' },
+  { href: '/intern/privatauftraege/', label: 'Privatgutachten', icon: '⌑', dynamic: 'private' },
   { href: '/intern/partner/', label: 'Partner', icon: '◇' },
-  { href: '/intern/fensterpruefung-bonn/', label: 'Fenstergutachten', icon: '▣', sub: true },
 ];
 const isActive = (href: string) => currentPath.startsWith(href);
 ---
@@ -59,6 +50,17 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .intern-sidebar__nav { display: grid; gap: 4px; }
       .intern-sidebar__nav a { position: relative; display: flex; align-items: center; gap: 11px; padding: 11px 13px; color: #263746; text-decoration: none; font-weight: 700; border: 1px solid transparent; border-radius: 3px; }
       .intern-sidebar__nav a[hidden] { display: none; }
+      .intern-nav-group[hidden], .intern-nav-group:not([open]) > :not(summary) { display: none !important; }
+      .intern-nav-group { min-width: 0; }
+      .intern-nav-group > summary { display: flex; align-items: center; gap: 11px; padding: 11px 13px; color: #263746; font-weight: 700; cursor: pointer; list-style: none; }
+      .intern-nav-group > summary::-webkit-details-marker { display: none; }
+      .intern-nav-group > summary > span { width: 22px; color: #f59a23; text-align: center; }
+      .intern-nav-group > summary::after { content: '›'; margin-left: auto; }
+      .intern-nav-group[open] > summary::after { transform: rotate(90deg); }
+      .intern-nav-group > summary:hover { background: #e7e9eb; }
+      .intern-nav-group > summary:focus-visible { outline: 3px solid #f59a23; outline-offset: -3px; }
+      @media(max-width:680px) { .intern-nav-group { flex: 0 0 auto; } .intern-nav-group[open] { max-width: 280px; } }
+
       .intern-sidebar__nav a:hover { background: #e7e9eb; }
       .intern-sidebar__nav a.active { background: #fff; border-color: #d9dde1; }
       .intern-sidebar__nav a.active::before { content: ''; position: absolute; left: -1px; top: 8px; bottom: 8px; width: 3px; background: #f59a23; }
@@ -196,12 +198,15 @@ const isActive = (href: string) => currentPath.startsWith(href);
     <div class="intern-portal-shell">
       <aside class="intern-sidebar">
         <nav aria-label="Interne Navigation" class="intern-sidebar__nav">
-          {internalLinks.map((link) => link.divider ? <div class="intern-sidebar__divider" aria-hidden="true"></div> : link.dynamic === 'whatsapp' ? <a id="intern-whatsapp-link" class:list={{ active: isActive('/intern/whatsapp/') }} href="/intern/whatsapp/" aria-current={isActive('/intern/whatsapp/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : link.dynamic === 'settlement' ? <a id="intern-settlement-link" class:list={{ active: isActive('/intern/abrechnungen/') }} href="/intern/abrechnungen/" aria-current={isActive('/intern/abrechnungen/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : <a class:list={{ active: isActive(link.href ?? ''), sub: link.sub }} href={link.href ?? '#'} aria-current={isActive(link.href ?? '') ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
+          {internalLinks.map((link) => link.divider ? <div class="intern-sidebar__divider" aria-hidden="true"></div> : link.dynamic === 'cases' ? <details class="intern-nav-group"><summary><span>{link.icon}</span>{link.label}</summary><a href="/intern/versicherungsfaelle/">Übersicht öffnen</a><a class="sub" href="/intern/versicherungsfaelle/#vf-case-selection">Schaden öffnen</a><a class="sub" href="/intern/versicherungsfaelle/#vf-assistant-panel">Schaden bearbeiten</a><a class="sub" href="/intern/versicherungsfaelle/?aktion=beleg">Rechnung / KVA ohne Schaden</a><a class="sub" href="/intern/kalkulation/">Kalkulation</a><a class="sub" href="/intern/versicherungsfaelle/#vf-case-documents">Unterlagen und Ergebnisse</a></details> : link.dynamic === 'private' ? <details class="intern-nav-group"><summary><span>{link.icon}</span>{link.label}</summary><a class="sub" href="/intern/privatauftraege/">Privatgutachten öffnen</a><a class="sub" href="/intern/fensterpruefung-bonn/">Fenstergutachten</a></details> : link.dynamic === 'whatsapp' ? <a id="intern-whatsapp-link" class:list={{ active: isActive('/intern/whatsapp/') }} href="/intern/whatsapp/" aria-current={isActive('/intern/whatsapp/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : link.dynamic === 'settlement' ? <a id="intern-settlement-link" class:list={{ active: isActive('/intern/abrechnungen/') }} href="/intern/abrechnungen/" aria-current={isActive('/intern/abrechnungen/') ? 'page' : undefined} hidden><span>{link.icon}</span>{link.label}</a> : <a class:list={{ active: isActive(link.href ?? '') }} href={link.href ?? '#'} aria-current={isActive(link.href ?? '') ? 'page' : undefined}><span>{link.icon}</span>{link.label}</a>)}
           <a id="intern-administration-link" class:list={{ active: isActive('/intern/administration/') }} href="/intern/administration/" aria-current={isActive('/intern/administration/') ? 'page' : undefined} hidden><span>⚙</span>Administration</a>
+          <details class="intern-nav-group" data-energy-access hidden>
+            <summary><span>⚡</span>Energiesteuerung</summary>
           <a href="/intern/energie/" data-energy-access hidden class:list={{ active: isActive('/intern/energie/') }}><span>⚡</span>Energiesteuerung</a>
           <a href="/intern/api/energy.php?service=evcc" data-energy-access hidden class="sub" target="_blank" rel="noopener noreferrer"><span>↗</span>Ladeübersicht</a>
           <a href="/intern/api/energy.php?service=anker" data-energy-access hidden class="sub" target="_blank" rel="noopener noreferrer"><span>☀</span>Anker & Speicher</a>
           <a href="/intern/api/energy.php?service=keba" data-energy-access hidden class="sub" target="_blank" rel="noopener noreferrer"><span>⚙</span>KEBA-Einstellungen</a>
+          </details>
           <slot name="sidebar-extra" />
         </nav>
 
