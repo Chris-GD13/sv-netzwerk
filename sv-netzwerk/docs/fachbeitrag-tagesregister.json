@@ -821,7 +821,46 @@
         "reserved_at": "2026-10-21T05:07:12.070Z",
         "article_url": "https://www.sv-netzwerk.eu/fachwissen/teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus/",
         "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7518538813476995072/",
-        "verified_at": "2026-10-21T05:10:02.204Z"
+        "verified_at": "2026-10-21T05:10:02.204Z",
+        "published_at_berlin": "2026-10-21T07:08:59.633+02:00",
+        "published_click_window_berlin": [
+          "2026-10-21T07:08:59.633+02:00",
+          "2026-10-21T07:09:00.038+02:00"
+        ],
+        "published_time_precision": "client-side-click-window",
+        "verified_at_berlin": "2026-10-21T07:10:02.204+02:00",
+        "profile_url": "https://www.linkedin.com/in/christian-w-156408204/",
+        "proof_document": "docs/linkedin-veroeffentlichung-2026-10-21.md",
+        "text_file": "docs/linkedin/2026-10-21/2026-10-21-teilzahlungen-sachschaden-linkedin.txt",
+        "source_file": "docs/linkedin/2026-10-21/2026-10-21-teilzahlungen-sachschaden-quellenpruefung.md",
+        "screenshots": [
+          "docs/linkedin/2026-10-21/2026-10-21-linkedin-live.png",
+          "docs/linkedin/2026-10-21/2026-10-21-linkedin-link-live.png"
+        ],
+        "image_path": null,
+        "image_cost_policy": {
+          "additional_budget_usd": 0,
+          "additional_spend_usd": 0,
+          "model_or_api_called": false,
+          "path": "published-without-image",
+          "note": "Konkrete Work-Tarifdeckung ohne kostenpflichtigen Test nicht verifizierbar. Kein fachlich passendes ausdrücklich freigegebenes Bestandsmotiv festgestellt. Eine zusätzliche Titelkarte bringt für dieses abstrakte Regulierungsthema keinen fachlichen Mehrwert. Ohne Bild und ohne Bildhinweis veröffentlicht; keine API, Schlüssel, Credits oder Stockkäufe."
+        },
+        "duplicate_check_note": "Profil vor Erstellung und unmittelbar vor Absenden frisch geprüft. Letzte Kontrolle 07:08:49.212 Europe/Berlin: jüngster eigener Artikelbeitrag Aluminium20.10.; kein Teilzahlungsthema. Register/CSV erneut gelesen, atomarer eigener Claim. Genau ein Posten-Klick. Profil nach Veröffentlichung genau ein Vorkommen des neuen Einstiegs.",
+        "website_live_commit": "d64ea75c903613603c9330a116437d9e62e8472b",
+        "website_live_run": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39544177948",
+        "article_type": "eigenstaendiges-versicherungsthema",
+        "expert_assignment": {
+          "name": "Holger Roth",
+          "profile_url": "https://www.sv-netzwerk.eu/experten/holger-roth/",
+          "scope": "Sach- und Haftpflichtschadenregulierung; heutige Websiteauswahl übernommen; aktuelles Profil gelesen. Keine Autorenschaft oder Fallzuständigkeit behauptet."
+        },
+        "shortlink": "https://lnkd.in/ei9zuePY",
+        "instruction_read": {
+          "master_version": "4.31",
+          "date": "2026-10-21",
+          "full_master_and_changes_reread": true,
+          "cloud_file_id": "1vnhgUieiMOoX_S0AmCKWazSGg8OxFuS2"
+        }
       }
     }
   },
