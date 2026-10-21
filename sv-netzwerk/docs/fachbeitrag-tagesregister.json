@@ -808,14 +808,17 @@
         "title": "Teilzahlungen im Sachschaden: anerkannte Beträge, offene Positionen und Zahlungsstatus trennen",
         "slug": "teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus",
         "url": "https://www.sv-netzwerk.eu/fachwissen/teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-website-20261021-0602",
-        "reserved_at": "2026-10-21T04:05:40.781Z"
+        "reserved_at": "2026-10-21T04:05:40.781Z",
+        "commit": "e354b0126f0d8781b98f476e435b75838bc09040",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39542976735",
+        "verified_at": "2026-10-21T04:22:16.081Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-21T04:05:40.781Z"
+  "updated_at": "2026-10-21T04:22:16.081Z"
 }
