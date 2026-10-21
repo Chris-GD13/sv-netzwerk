@@ -1,0 +1,102 @@
+{
+  "date": "2026-10-21",
+  "publication_id": "2026-10-21-teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus",
+  "article": "teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus",
+  "author": "christian-waechter",
+  "status": "validated-ready-for-deploy",
+  "article_type": "eigenstaendiges-versicherungsthema",
+  "expert_rotation": {
+    "selected_person": "Holger Roth",
+    "profile_url": "https://www.sv-netzwerk.eu/experten/holger-roth/",
+    "verified_specialty": "Schadenregulierer für Sach- und Haftpflichtschäden; Live-Profil und Repository am 21.10.2026 geprüft",
+    "progress": "Der erste Zyklus 12. bis 17.10.2026 ist abgeschlossen. Im zweiten Zyklus folgten Christian Wächter am 18.10., Carmen Gohl am 19.10. und Claudius Freiberg am 20.10.; Holger Roth folgt am 21.10. ohne Wiederholung.",
+    "selection_basis": "Versicherungsfachliches Thema aus dem belegten Regulierungsprofil und nach Archivabgleich abgeleitet; keine konkrete Fallzuständigkeit behauptet."
+  },
+  "source_review": {
+    "checked_at": "2026-10-21",
+    "decision_date": "2026-10-21",
+    "new_event_claimed": false,
+    "norm_effective_date_claimed": true,
+    "notes": "Amtliche VVG-Einzelnormen, Gesetzesbegründung und aktuelle GDV-Musterbedingungen geöffnet und im benötigten Umfang gelesen. Gesetzlichen Abschlagsanspruch, vertragliche Leistungsberechnung und tatsächlichen Zahlungsstatus getrennt. Keine pauschale gesetzliche Prozentquote behauptet."
+  },
+  "sources": [
+    {
+      "publisher": "Bundesministerium der Justiz und Bundesamt für Justiz",
+      "title": "§ 14 VVG – Fälligkeit der Geldleistung",
+      "status": "amtliche geltende Fassung",
+      "read_scope": "Vollständige Einzelnorm einschließlich Fälligkeit, Einmonatsfrist, Abschlagsbetrag und Hemmung ausgewertet",
+      "practical_meaning": "Abschlag aus dem voraussichtlich mindestens geschuldeten Betrag statt aus einer pauschalen Quote herleiten",
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__14.html",
+      "checked_at": "2026-10-21"
+    },
+    {
+      "publisher": "Bundesministerium der Justiz und Bundesamt für Justiz",
+      "title": "§ 31 VVG – Auskunftspflicht des Versicherungsnehmers",
+      "status": "amtliche geltende Fassung",
+      "read_scope": "Vollständige Einzelnorm zu erforderlichen Auskünften und zumutbar beschaffbaren Belegen ausgewertet",
+      "practical_meaning": "Unterlagen zielgerichtet an der offenen Prüffrage ausrichten",
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__31.html",
+      "checked_at": "2026-10-21"
+    },
+    {
+      "publisher": "Deutscher Bundestag",
+      "title": "Drucksache 16/3945 – Entwurf eines Gesetzes zur Reform des Versicherungsvertragsrechts",
+      "publication_or_update_date": "20.12.2006",
+      "status": "amtliche Gesetzesmaterialie",
+      "read_scope": "Normtext und Begründung zu § 14 VVG im benötigten Umfang geöffnet und ausgewertet",
+      "practical_meaning": "Fälligkeit und Abschlagsrecht in ihrer gesetzlichen Systematik einordnen",
+      "url": "https://dserver.bundestag.de/btd/16/039/1603945.pdf",
+      "checked_at": "2026-10-21"
+    },
+    {
+      "publisher": "Gesamtverband der Deutschen Versicherungswirtschaft e. V.",
+      "title": "Allgemeine Wohngebäude Versicherungsbedingungen VGB 2022 – Wohnflächenmodell",
+      "publication_or_update_date": "Stand Juni 2026",
+      "status": "unverbindliche Musterbedingungen",
+      "read_scope": "Abschnitte A 17 und A 19 zu Entschädigungsberechnung, Reparaturkosten, Zeitwert, Neuwertanteil, Umsatzsteuer, Selbstbehalt, Fälligkeit und Abschlag ausgewertet",
+      "practical_meaning": "Vertragliche Leistungsbestandteile und Voraussetzungen getrennt ausweisen; konkreten Vertrag als maßgeblich benennen",
+      "url": "https://www.gdv.de/resource/blob/37090/85030e2f2518d925d739fd751f523a5a/allgemeine-wohngebaeude-versicherungsbedingungen--vgb-2016---wohnflaechenmodell--data.pdf",
+      "checked_at": "2026-10-21"
+    }
+  ],
+  "linkedin": {
+    "status": "prepared-not-posted",
+    "file": "src/content/linkedin/2026-10-21_teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus.txt",
+    "prepared_file": "docs/linkedin/2026-10-21/2026-10-21-teilzahlungen-sachschaden-linkedin.txt",
+    "source_review": "docs/linkedin/2026-10-21/2026-10-21-teilzahlungen-sachschaden-quellenpruefung.md"
+  },
+  "archive_review": {
+    "existing_related_article": "schadenreserve-dynamisch-steuern",
+    "distinction": "Der bestehende Beitrag behandelt die Prognose des erwarteten Gesamtaufwands. Der neue Beitrag behandelt die positionsbezogene Herleitung einer Teilzahlung und die Trennung von Freigabe, Anweisung und tatsächlicher Zahlung.",
+    "daily_count_before_creation": 0
+  },
+  "local_checks": {
+    "npm_ci": "success; 743 Pakete installiert, bestehende npm-Hinweise dokumentiert",
+    "astro_check": {
+      "errors": 0,
+      "warnings": 0,
+      "hints": 0,
+      "files": 363
+    },
+    "preflight": "success",
+    "build": "success",
+    "article_words": 1756,
+    "article_headings": 14,
+    "article_list_lines": 0,
+    "pages": 1089,
+    "knowledge_urls": 114,
+    "sitemap_pages": 195,
+    "internal_links": 21276,
+    "daily_count": 1,
+    "encoding": "passed",
+    "public_copy": "passed",
+    "visible_umlauts": "passed",
+    "knowledge_dist_links_search_sitemap": "passed",
+    "visual_preview": "passed; lokale kanonische Detailseite mit Titel, Datum, Autor, Fließtext, Quellen und Holger-Roth-Profilbezug sichtbar gerendert",
+    "verified_at": "2026-10-21T06:13:42+02:00",
+    "python_runtime_note": "Windows python3 war nur der Microsoft-Store-Alias. Die identische npm-Buildkette wurde über einen lokalen Shim mit C:/Users/chris/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe vollständig erfolgreich ausgeführt."
+  },
+  "deployment": {
+    "status": "pending"
+  }
+}

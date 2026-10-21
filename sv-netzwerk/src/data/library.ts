@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Teilzahlungen im Sachschaden: Anerkannte Beträge, offene Positionen und Zahlungsstatus trennen',
+    description: 'Anerkannte Beträge, offene Positionen, Abschläge und tatsächliche Zahlungen im Sachschaden sauber trennen und prüffähig dokumentieren.',
+    href: '/fachwissen/teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus/',
+    category: 'Schadenregulierung',
+    tags: ['Teilzahlung', 'Sachschaden', 'Schadenregulierung', 'Zahlungsstatus', 'Dokumentation', 'VVG'],
+    date: '2026-10-21',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Pulverbeschichtete Aluminiumbauteile prüfen: Farbton, Glanz, Haftung und Korrosion trennen',
     description: 'Farbton, Glanz, Struktur, Schichtdicke, Haftung, Reinigungseinfluss und Korrosion an pulverbeschichteten Aluminiumbauteilen nachvollziehbar untersuchen.',
     href: '/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/',

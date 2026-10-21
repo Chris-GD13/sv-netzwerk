@@ -1,3 +1,12 @@
+## 2026-10-21 – Teilzahlungen im Sachschaden nachvollziehbar steuern
+
+- Genau einen Tagesartikel unter atomarer Reservierung vorbereitet: Anspruchsgrund, anerkannte Schadenshöhe, offene Positionen und tatsächlichen Zahlungsstatus getrennt dokumentieren.
+- Holger Roth gemäß aktuellem Live-Profil dem belegten Fachgebiet der Sach- und Haftpflichtschadenregulierung zugeordnet; keine erfundene Autorenschaft oder konkrete Fallzuständigkeit.
+- § 14 und § 31 VVG, die Gesetzesbegründung in Bundestagsdrucksache 16/3945 sowie die unverbindlichen VGB-2022-Musterbedingungen im benötigten Umfang geöffnet und geprüft.
+- Öffentlicher Artikel und LinkedIn-Begleittext vollständig als verbundener Fließtext ohne Aufzählungszeichen, nummerierte Listen oder schematische Prüfpunkte vorbereitet.
+- Library, Profilverknüpfung, Suchindex-/Sitemap-Datenbasis, CSV und separater LinkedIn-Begleittext vorbereitet; LinkedIn bleibt `prepared-not-posted`.
+- Ohne öffentliches Beitragsbild, weil kein fachlich passendes geprüftes Motiv vorlag; keine SVG- oder Titelkarten-Platzhalter.
+
 ## 2026-10-20 – Pulverbeschichtetes Aluminium fachlich prüfen
 
 - Genau einen Tagesartikel unter atomarer Reservierung vorbereitet: Farbton, Glanz, Struktur, Schichtdicke, Haftung, Reinigungseinfluss und Korrosion getrennt untersuchen.
