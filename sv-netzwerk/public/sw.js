@@ -5,7 +5,7 @@ import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
 
-const CACHE_VERSION = '20260929-1';
+const CACHE_VERSION = '20261021-kuss-1';
 const PAGE_CACHE = `portal-pages-${CACHE_VERSION}`;
 const API_CACHE = `api-cache-${CACHE_VERSION}`;
 const ASSET_CACHE = `assets-cache-${CACHE_VERSION}`;
@@ -32,7 +32,7 @@ registerRoute(
 
 // Authentication state must never fall back to a cached session response.
 registerRoute(
-  ({ url }) => url.pathname === '/intern/api/auth.php',
+  ({ url }) => ['/intern/api/auth.php', '/intern/api/kuss.php'].includes(url.pathname),
   new NetworkOnly()
 );
 
