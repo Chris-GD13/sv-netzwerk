@@ -6,6 +6,7 @@
 - Öffentlicher Artikel und LinkedIn-Begleittext vollständig als verbundener Fließtext ohne Aufzählungszeichen, nummerierte Listen oder schematische Prüfpunkte vorbereitet.
 - Library, Profilverknüpfung, Suchindex-/Sitemap-Datenbasis, CSV und separater LinkedIn-Begleittext vorbereitet; LinkedIn bleibt `prepared-not-posted`.
 - Ohne öffentliches Beitragsbild, weil kein fachlich passendes geprüftes Motiv vorlag; keine SVG- oder Titelkarten-Platzhalter.
+- Inhaltscommit `e354b0126f0d8781b98f476e435b75838bc09040` über [Deployment 39542976735](https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39542976735) live bestätigt; Detail, cachefreie Übersicht, Kategorie, alle sechs Tags, Suchindex, Sitemap, robots.txt, Holger-Roth-Profilbezug und exakter Deploy-Marker geprüft.
 
 ## 2026-10-20 – Pulverbeschichtetes Aluminium fachlich prüfen
 

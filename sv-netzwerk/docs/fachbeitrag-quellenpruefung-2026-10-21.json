@@ -3,7 +3,7 @@
   "publication_id": "2026-10-21-teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus",
   "article": "teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus",
   "author": "christian-waechter",
-  "status": "validated-ready-for-deploy",
+  "status": "published-verified",
   "article_type": "eigenstaendiges-versicherungsthema",
   "expert_rotation": {
     "selected_person": "Holger Roth",
@@ -97,6 +97,19 @@
     "python_runtime_note": "Windows python3 war nur der Microsoft-Store-Alias. Die identische npm-Buildkette wurde über einen lokalen Shim mit C:/Users/chris/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe vollständig erfolgreich ausgeführt."
   },
   "deployment": {
-    "status": "pending"
+    "content_commit": "e354b0126f0d8781b98f476e435b75838bc09040",
+    "register_verification_commit": "7763f320c7b6eb3b0aaec57b57429980b6083e66",
+    "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/39542976735",
+    "conclusion": "success",
+    "verified_at": "2026-10-21T06:22:16+02:00",
+    "live_evidence": [
+      "canonical detail page HTTP 200 and visibly rendered with title, publication date, author line, complete article and sources",
+      "cache-busted Fachwissen overview visibly lists the 21.10.2026 article first",
+      "Schadenregulierung category and all six tag pages visibly list the article",
+      "article visibly links Holger Roth and his live profile confirms Sach- und Haftpflichtschadenregulierung",
+      "search-index.json and sitemap-0.xml contain the canonical URL",
+      "robots.txt references sitemap-index.xml",
+      "deploy-version.txt reports the content commit e354b0126f0d8781b98f476e435b75838bc09040"
+    ]
   }
 }
