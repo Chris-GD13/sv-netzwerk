@@ -55,7 +55,7 @@
       "status": "unverbindliche Musterbedingungen",
       "read_scope": "Abschnitte A 17 und A 19 zu Entschädigungsberechnung, Reparaturkosten, Zeitwert, Neuwertanteil, Umsatzsteuer, Selbstbehalt, Fälligkeit und Abschlag ausgewertet",
       "practical_meaning": "Vertragliche Leistungsbestandteile und Voraussetzungen getrennt ausweisen; konkreten Vertrag als maßgeblich benennen",
-      "url": "https://www.gdv.de/resource/blob/37090/85030e2f2518d925d739fd751f523a5a/allgemeine-wohngebaeude-versicherungsbedingungen--vgb-2016---wohnflaechenmodell--data.pdf",
+      "url": "https://www.gdv.de/resource/blob/37090/fff03be8dd44ccd31b6231b86462a15b/allgemeine-wohngebaeude-versicherungsbedingungen-vgb-2022-wohnflaechenmodell--data.pdf",
       "checked_at": "2026-10-21"
     }
   ],
@@ -92,7 +92,7 @@
     "public_copy": "passed",
     "visible_umlauts": "passed",
     "knowledge_dist_links_search_sitemap": "passed",
-    "visual_preview": "passed; lokale kanonische Detailseite mit Titel, Datum, Autor, Fließtext, Quellen und Holger-Roth-Profilbezug sichtbar gerendert",
+    "visual_preview": "passed; lokale kanonische Detailseite mit Titel, Datum, Autor, Fließtext und Quellen sichtbar gerendert; öffentlicher Profilbezug vor Veröffentlichung entfernt",
     "verified_at": "2026-10-21T06:13:42+02:00",
     "python_runtime_note": "Windows python3 war nur der Microsoft-Store-Alias. Die identische npm-Buildkette wurde über einen lokalen Shim mit C:/Users/chris/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe vollständig erfolgreich ausgeführt."
   },

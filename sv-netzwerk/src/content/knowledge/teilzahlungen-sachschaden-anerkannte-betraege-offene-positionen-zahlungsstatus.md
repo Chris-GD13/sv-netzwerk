@@ -12,7 +12,7 @@ linkedinSummary: "Teilzahlung, Freigabe und tatsächlicher Zahlungseingang sind 
 cta:
   label: "Schadenregulierung nachvollziehbar strukturieren"
   href: "/kontakt/"
-relatedLinks: ["/experten/holger-roth/", "/fachwissen/prueffaehige-dokumentation/", "/fachwissen/schadenreserve-dynamisch-steuern/", "/kontakt/"]
+relatedLinks: ["/fachwissen/prueffaehige-dokumentation/", "/fachwissen/schadenreserve-dynamisch-steuern/", "/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug/", "/kontakt/"]
 damageTypes: ["gebaeude"]
 publication:
   publishedAt: 2026-10-21
@@ -113,7 +113,7 @@ Der noch nicht zugängliche Bereich bleibt mit der konkreten Prüffrage offen. D
 
 ## Fachgrenzen und Zusammenarbeit
 
-Eine tragfähige Teilzahlungsentscheidung verbindet technischen Befund, Kostenprüfung, Vertragsbezug und eindeutigen Zahlungsstatus. Für die Schadenregulierung von Sach- und Haftpflichtschäden steht im SV-Netzwerk unter anderem [Holger Roth](/experten/holger-roth/) als Schadenregulierer zur Verfügung.
+Eine tragfähige Teilzahlungsentscheidung verbindet technischen Befund, Kostenprüfung, Vertragsbezug und eindeutigen Zahlungsstatus. Die Zuständigkeiten für technische Prüfung, Deckungsentscheidung, Zahlungsfreigabe und Buchung müssen dabei nachvollziehbar getrennt bleiben.
 
 Die fachliche Einordnung darf dabei keine Rechtsberatung oder Zahlungsentscheidung vortäuschen. Unklare Vertragsauslegung, streitige Anspruchsberechtigung und rechtliche Einwendungen müssen von den jeweils zuständigen Stellen beurteilt werden. Ebenso brauchen besondere technische Gewerke eine geeignete Fachplanung oder Untersuchung, wenn der Schadenumfang mit der allgemeinen Ortsaufnahme nicht belastbar geklärt werden kann.
 
@@ -131,4 +131,4 @@ Bundesministerium der Justiz und Bundesamt für Justiz: [§ 31 VVG – Auskunfts
 
 Deutscher Bundestag: [Drucksache 16/3945 – Entwurf eines Gesetzes zur Reform des Versicherungsvertragsrechts](https://dserver.bundestag.de/btd/16/039/1603945.pdf), 20.12.2006, insbesondere Begründung zu § 14 VVG.
 
-Gesamtverband der Deutschen Versicherungswirtschaft e. V.: [Allgemeine Wohngebäude Versicherungsbedingungen VGB 2022 – Wohnflächenmodell](https://www.gdv.de/resource/blob/37090/85030e2f2518d925d739fd751f523a5a/allgemeine-wohngebaeude-versicherungsbedingungen--vgb-2016---wohnflaechenmodell--data.pdf), unverbindliche Musterbedingungen, Stand Juni 2026.
+Gesamtverband der Deutschen Versicherungswirtschaft e. V.: [Allgemeine Wohngebäude Versicherungsbedingungen VGB 2022 – Wohnflächenmodell](https://www.gdv.de/resource/blob/37090/fff03be8dd44ccd31b6231b86462a15b/allgemeine-wohngebaeude-versicherungsbedingungen-vgb-2022-wohnflaechenmodell--data.pdf), unverbindliche Musterbedingungen, Stand Juni 2026.
