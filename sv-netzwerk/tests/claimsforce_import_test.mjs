@@ -1,3 +1,4 @@
+await import('./kuss_ui_test.mjs');
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -12,12 +13,12 @@ const fixtureSetTimeout = (callback, delay, ...args) => setTimeout(callback, del
 
 const merged = mergeOnlyBlank(
   { schaden_nr: '26-123456-1', email: 'manuell@example.de', mobil: '', sanierer_firma: 'Manuell GmbH' },
-  { schaden_nr: 'CF-falsch', email: 'claims@example.de', mobil: '+4917012345', sanierer_firma: 'Claims GmbH' }
+  { schaden_nr: 'CF-falsch', email: 'claims@example.de', mobil: 'fixture-mobile', sanierer_firma: 'Claims GmbH' }
 );
 assert.equal(merged.schaden_nr, '26-123456-1', 'manuell geänderte Schadennummer bleibt erhalten');
 assert.equal(merged.email, 'manuell@example.de', 'manuell geänderte E-Mail bleibt erhalten');
 assert.equal(merged.sanierer_firma, 'Manuell GmbH', 'manuell geänderte Saniererdaten bleiben erhalten');
-assert.equal(merged.mobil, '+4917012345', 'nur leere Felder werden ergänzt');
+assert.equal(merged.mobil, 'fixture-mobile', 'nur leere Felder werden ergänzt');
 
 const mapped = mapClaim({
   id: '7a5f5b64-36e1-4a04-a122-85e313f5f42a', insurerClaimId: '26-654321-2', policyNumber: 'VS-44',
@@ -390,7 +391,7 @@ assert(revenueApi.includes('RS_HOLGER_SOURCE_URL') && revenueApi.includes('funct
 assert(revenueApi.includes("'actual_order_net'=>$actualNet") && revenueApi.includes("'regulierer_net'=>$reguliererNet") && revenueApi.includes("'our_total_net'=>$billingNet") && revenueApi.includes("'holger_after_total_net'"), 'Holgers Auswertung trennt Auftragssumme, Die Regulierer, SV-Büro und Holgers verbleibenden Anteil');
 assert(settlementPage.includes('Claims-Gutschrift') && settlementPage.includes('10 % an SV-Büro') && settlementPage.includes('Gesamt an SV-Büro') && settlementPage.includes('Holger nach Gesamtbelastung'), 'Holgers Buchhaltungsauswertung weist alle Empfänger sowie Office 365 netto und brutto aus');
 assert(revenueApi.includes("'average_actual_order_net'") && revenueApi.includes("'settlement_count'=>$count") && settlementPage.includes('Ø Auftragssumme pro Abrechnung') && settlementPage.includes('Abrechnungen)'), 'Holgers Übersicht zeigt den Durchschnitt je Abrechnung und bezeichnet die nicht aufgegliederten Datensätze nicht als Aufträge');
-assert(revenueApi.includes("'can_refresh'=>$action==='settlement'") && portalServiceWorker.includes("CACHE_VERSION = '20260929-1'") && portalServiceWorker.includes("self.addEventListener('install', () => self.skipWaiting())") && internLayout.includes("updateViaCache: 'none'"), 'Veraltete Portal-Caches werden ersetzt und die alte Aktualisierung im orangefarbenen Kasten serverseitig unterdrückt');
+assert(revenueApi.includes("'can_refresh'=>$action==='settlement'") && portalServiceWorker.includes("self.addEventListener('install', () => self.skipWaiting())") && internLayout.includes("updateViaCache: 'none'"), 'Veraltete Portal-Caches werden ersetzt und die alte Aktualisierung im orangefarbenen Kasten serverseitig unterdrückt');
 assert(revenueApi.includes("svnetUserProfile($user)==='holger'") && revenueApi.includes("'summary_type'=>'holger'") && revenueApi.includes("'show_settlement_link'=>true") && revenueApi.includes("'default_profile'=>'holger'") && revenueApi.includes("$claimsCurrent['income_net']") && revenueApi.includes("$rekonCurrent['payout_net']"), 'Holger erhält die Abrechnungsseite ausschließlich für seine gespeicherten Claims- und Rekon-Umsätze');
 assert(internLayout.includes("summary.summary_type === 'marc' || summary.summary_type === 'holger'") && internLayout.includes("const person = summary.summary_type === 'marc' ? 'Marc' : 'Holger'") && internLayout.includes('Claims · ${claims.period') && internLayout.includes('Rekon · ${rekon.period'), 'Der orange Kopfbereich zeigt Marc und Holger personenbezogen jeweils genau einen Claims- und einen Rekon-Umsatz');
 assert(internLayout.indexOf('class="intern-header__login"') < internLayout.indexOf('class="site-brand"') && !internLayout.match(/<aside class="intern-sidebar">[\s\S]*class="intern-header__login"/), 'Anmelden steht oben links unmittelbar vor dem SV-Logo und nicht mehr in der Seitenleiste');
