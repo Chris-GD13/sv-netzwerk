@@ -1,0 +1,15 @@
+Eine Teilzahlung kann die Regulierung beschleunigen. Unübersichtlich wird sie erst dann, wenn nicht mehr klar ist, welcher Betrag geprüft, freigegeben, angewiesen oder tatsächlich eingegangen ist.
+
+In einer belastbaren Schadenakte sind diese Schritte getrennt. Der technische Prüfbetrag ist noch keine Zahlungszusage. Eine Zahlungsanweisung ist noch kein bestätigter Geldeingang. Und ein gezahlter Abschlag entscheidet nicht automatisch über die noch offenen Positionen der Schlussabrechnung.
+
+Besonders wichtig ist die eindeutige Zuordnung. Empfänger, Schaden- oder Vorgangsnummer, Zahlungszweck, Anweisungsdatum und Wertstellung müssen zusammenpassen. Selbstbeteiligung, Umsatzsteuer, noch ungeprüfte Nachträge und bereits berücksichtigte Abschläge dürfen nicht in einem unklaren Restsaldo verschwinden.
+
+§ 14 VVG sieht ausdrücklich Abschlagszahlungen auf den Betrag vor, den der Versicherer voraussichtlich mindestens zu zahlen hat, wenn die notwendigen Erhebungen einen Monat nach Schadenanzeige noch nicht abgeschlossen sind. Das ersetzt keine Schlussprüfung, schafft aber eine klare Grundlage für unstreitige Mindestbeträge.
+
+Im heutigen Fachbeitrag zeige ich, wie sich Prüfbetrag, Entscheidung, Zahlungsstatus, Reserve und offener Rest ohne Doppelzählung fortschreiben lassen:
+https://www.sv-netzwerk.eu/fachwissen/teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus/
+
+Christian Wächter
+Sachverständiger | Regulierung im Komplex- und Großschaden
+
+#Schadenregulierung #Teilzahlung #Sachschaden #Kostenprüfung #Schadenreserve

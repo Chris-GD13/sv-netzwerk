@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-21",
+  "publication_id": "2026-10-21-teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus",
+  "article": "teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus",
+  "author": "christian-waechter",
+  "status": "prepared",
+  "new_event_claimed": false,
+  "sources": [
+    {
+      "publisher": "Bundesministerium der Justiz und Bundesamt für Justiz",
+      "title": "Versicherungsvertragsgesetz, § 14 – Fälligkeit der Geldleistung",
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__14.html",
+      "checked_at": "2026-10-21",
+      "scope": "Absätze 1 bis 3; Fälligkeit, Abschlagszahlung nach einem Monat und Hemmung der Frist"
+    },
+    {
+      "publisher": "Bundesministerium der Justiz und Bundesamt für Justiz",
+      "title": "Bürgerliches Gesetzbuch, §§ 362, 366 und 367",
+      "url": "https://www.gesetze-im-internet.de/bgb/",
+      "checked_at": "2026-10-21",
+      "scope": "Erfüllungswirkung und gesetzliche Zuordnung unzureichender Zahlungen; Anwendbarkeit im Einzelfall rechtlich abzugrenzen"
+    },
+    {
+      "publisher": "Bundesanstalt für Finanzdienstleistungsaufsicht",
+      "title": "Leistungsanträge in der Versicherungsbranche",
+      "url": "https://www.bafin.de/SharedDocs/Veroeffentlichungen/DE/Aufsichtsmitteilung/2025/aufsichtsmitteilung_250411_Leistungsantraege_va.html",
+      "publication_date": "2025-04-11",
+      "checked_at": "2026-10-21",
+      "scope": "Notwendige Erhebungen nach § 14 Absatz 1 VVG und Anforderungen an eine zügige Leistungsprüfung"
+    },
+    {
+      "publisher": "Gesamtverband der Deutschen Versicherungswirtschaft e. V.",
+      "title": "Allgemeine Wohngebäude Versicherungsbedingungen VGB 2022 – Wohnflächenmodell",
+      "url": "https://www.gdv.de/resource/blob/37090/fff03be8dd44ccd31b6231b86462a15b/allgemeine-wohngebaeude-versicherungsbedingungen-vgb-2022-wohnflaechenmodell--data.pdf",
+      "publication_date": "Stand Juni 2026",
+      "checked_at": "2026-10-21",
+      "scope": "Unverbindliches Bedingungsmuster als Beispiel für vertragliche Entschädigungs- und Abzugsregelungen; konkreter Vertrag bleibt maßgeblich"
+    }
+  ],
+  "linkedin": {
+    "status": "prepared-not-posted",
+    "file": "src/content/linkedin/2026-10-21_teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus.txt"
+  }
+}
