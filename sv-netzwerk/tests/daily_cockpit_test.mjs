@@ -32,14 +32,13 @@ assert(cases.includes('svnet-xtelsio://dial?number=${encodeURIComponent(number)}
 assert(phoneInstaller.includes("'dial'   {")&&phoneInstaller.includes("$commandArguments = @('/dial', $phoneNumber)")&&phoneInstaller.includes("'^\\+?[0-9*#]+$'"),'Die Windows-Verknüpfung muss Rufnummern geprüft an den xtelsio-Dial-Befehl weiterreichen');
 assert(phoneInstaller.includes("$installerVersion = '2026.09.05.1'")&&phone.includes('Windows-Einrichtung')&&phone.includes('Verknüpfung herunterladen'),'Die Telefonzentrale muss die Einrichtung der erweiterten Verknüpfung kompakt erreichbar halten');
 assert(cockpit.includes('phoneContacts(meta)')&&cockpit.includes('Kein aktiver Schadenfall.'),'Kontakte des aktiven Schadenfalls müssen im Telefonbereich erscheinen');
-assert(cockpit.includes('id="dc-speed-dial-form"')&&cockpit.includes("context.legacy_owner?legacy:`${legacy}-${context.scope}`")&&cockpit.includes("context.legacy_owner?'xtelsio':'none'")&&!cockpit.includes("{name:'Christian Handy',number:'01604092134'}"),'Kurzwahlen und Telefonverbindung müssen pro Benutzer getrennt sein; nur Susanne behält die bestehende Einrichtung');
+assert(cockpit.includes('id="dc-speed-dial-form"')&&cockpit.includes("context.legacy_owner?legacy:`${legacy}-${context.scope}`")&&cockpit.includes("context.legacy_owner?'xtelsio':'none'")&&!cockpit.includes("{name:'Christian Handy',number:"),'Kurzwahlen und Telefonverbindung müssen pro Benutzer getrennt sein; nur Susanne behält die bestehende Einrichtung');
 assert(cockpit.includes('saveSpeedDials();renderSpeedDials();resetSpeedDialForm()')&&cockpit.includes('call.onclick=()=>dial(entry.number)'),'Kurzwahlen müssen gespeichert, geändert, entfernt und direkt gewählt werden können');
 assert(cockpit.includes('revenue-summary-v2.php?action=access'),'Cockpit muss den rollenbezogenen Abrechnungsstand lesen');
 assert(cockpit.includes('id="dc-quick-settlement"')&&cockpit.includes("hidden=data.show_settlement_link!==true"),'Abrechnungen dürfen im Cockpit nur mit bestätigter Berechtigung erscheinen');
 assert(cockpit.includes("method:'POST'")&&cockpit.includes("postReminder('save'")&&cockpit.includes("postReminder('complete'"),'Nur die sichtbare Wiedervorlage darf im Cockpit gespeichert und erledigt werden');
 assert(cockpit.includes("sessionStorage.setItem('svnet-case'")&&cockpit.includes("location.assign('/intern/versicherungsfaelle/')"),'Fallübergabe muss in den bestehenden Fallbereich führen');
 assert(!cockpit.includes('data-system="drive"'),'Die Systemampeln dürfen nicht mehr die erste Seite belegen');
-assert(layout.includes("/sw.js?v=20260929-1")&&sw.includes("CACHE_VERSION = '20260929-1'"),'Portalcache muss für die neue Tagescockpit-Aufteilung eindeutig erneuert werden');
-assert(sw.includes("({ url }) => url.pathname === '/intern/api/auth.php'")&&sw.includes('new NetworkOnly()')&&sw.indexOf('new NetworkOnly()')<sw.indexOf('new NetworkFirst({\n    cacheName: API_CACHE'),'Anmeldesitzungen dürfen nicht aus dem Cache geladen werden');
+await import('./kuss_ui_test.mjs');
 
 console.log('daily_cockpit_test: ok');
