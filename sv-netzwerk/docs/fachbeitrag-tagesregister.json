@@ -862,7 +862,21 @@
           "cloud_file_id": "1vnhgUieiMOoX_S0AmCKWazSGg8OxFuS2"
         }
       }
+    },
+    "2026-10-22": {
+      "publication_id": "2026-10-22-unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug",
+      "article": {
+        "title": "Unterversicherung in der Gebäudeversicherung: Versicherungssumme, Versicherungswert und Schadenabzug trennen",
+        "slug": "unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug/",
+        "status": "reserved",
+        "owner": "codex-website-20261022-0603",
+        "reserved_at": "2026-10-22T04:07:08.161Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-10-21T05:10:02.204Z"
+  "updated_at": "2026-10-22T04:07:08.161Z"
 }
