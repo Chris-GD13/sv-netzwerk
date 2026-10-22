@@ -20,6 +20,7 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
     <a class="site-brand site-brand--mobile" href="/" aria-label="SV-Netzwerk – Startseite">
       <img class="site-brand__logo" src={logoSrc.src} alt="" width="260" height="46" />
     </a>
+    <strong class="mobile-menu__title">Menü</strong>
     <button class="mobile-menu__close" type="button" data-menu-close aria-label="Menü schließen">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19" /></svg>
     </button>
@@ -47,6 +48,7 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
 
   <div class="mobile-menu__footer">
     <SearchButton />
+    <a class="mobile-menu__cta mobile-menu__cta--kuss" href="https://portal.kussgmbh.de/" target="_blank" rel="noopener">KUSS-ServicePortal öffnen <span aria-hidden="true">↗</span></a>
     <a class="mobile-menu__cta mobile-menu__cta--platform" href="/schaden-uebermitteln/">Schaden übermitteln <span aria-hidden="true">→</span></a>
     <div><a href="tel:+4973673939783">{site.phone}</a><span>Persönlich erreichbar</span></div>
   </div>
