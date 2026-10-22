@@ -58,6 +58,10 @@
   background: #071a2e;
 }
 
+.public-site .mobile-menu__title {
+  color: #fff;
+}
+
 .public-site .sv-card,
 .public-site .search-panel,
 .public-site .search-field,
