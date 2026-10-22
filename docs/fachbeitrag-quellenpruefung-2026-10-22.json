@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-22",
+  "publication_id": "2026-10-22-unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug",
+  "article": "unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug",
+  "author": "christian-waechter",
+  "status": "prepared",
+  "article_type": "eigenstaendiges-versicherungsthema",
+  "source_review": {
+    "checked_at": "2026-10-22",
+    "new_event_claimed": false,
+    "norm_effective_date_claimed": false,
+    "notes": "Versicherungssumme, Versicherungswert am Schadentag, Taxe, Unterversicherungsverzicht und Schadenabzug getrennt. Keine Musterbedingung als konkreter Vertragsinhalt ausgegeben."
+  },
+  "sources": [
+    {
+      "publisher": "Bundesministerium der Justiz und Bundesamt für Justiz",
+      "title": "§ 75 VVG – Unterversicherung",
+      "status": "amtliche geltende Fassung",
+      "read_scope": "Vollständige Einzelnorm zur erheblichen Unterschreitung und verhältnismäßigen Leistung ausgewertet",
+      "practical_meaning": "Unterversicherung als Verhältnis von Versicherungssumme und Versicherungswert am Schadentag prüfen",
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__75.html",
+      "checked_at": "2026-10-22"
+    },
+    {
+      "publisher": "Bundesministerium der Justiz und Bundesamt für Justiz",
+      "title": "§ 76 VVG – Taxe",
+      "status": "amtliche geltende Fassung",
+      "read_scope": "Vollständige Einzelnorm zur vereinbarten Wertfestsetzung und Grenze bei erheblicher Überhöhung ausgewertet",
+      "practical_meaning": "Vereinbarte Taxe nicht wie eine freie Kostenschätzung behandeln",
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__76.html",
+      "checked_at": "2026-10-22"
+    },
+    {
+      "publisher": "Bundesministerium der Justiz und Bundesamt für Justiz",
+      "title": "§ 88 VVG – Versicherungswert",
+      "status": "amtliche geltende Fassung",
+      "read_scope": "Vollständige Einzelnorm zum gesetzlichen Ausgangspunkt des Versicherungswerts in der Feuerversicherung ausgewertet",
+      "practical_meaning": "Wiederherstellungswert, Minderwert und abweichende Vertragsvereinbarung auseinanderhalten",
+      "url": "https://www.gesetze-im-internet.de/vvg_2008/__88.html",
+      "checked_at": "2026-10-22"
+    },
+    {
+      "publisher": "Gesamtverband der Deutschen Versicherungswirtschaft e. V.",
+      "title": "Allgemeine Wohngebäude Versicherungsbedingungen VGB 2022 – Wert 1914, Gleitender Neuwert Plus",
+      "publication_or_update_date": "Stand Juni 2026",
+      "status": "unverbindliche Musterbedingungen",
+      "read_scope": "Abschnitte A 13, A 14 und A 17 zu Versicherungswert, Wert 1914, Unterversicherungsverzicht und Entschädigungsberechnung ausgewertet",
+      "practical_meaning": "Konkrete Bedingungsfassung und Voraussetzungen des Unterversicherungsverzichts vor einer Verhältnisrechnung prüfen",
+      "url": "https://www.gdv.de/resource/blob/37086/f47b12926546495dd7b6133f9dbf58aa/allgemeine-wohngebaeude-versicherungsbedingungen-vgb-2022-wert-1914-gleitender-neuwert-plus--data.pdf",
+      "checked_at": "2026-10-22"
+    }
+  ],
+  "linkedin": {
+    "status": "prepared-not-posted",
+    "file": "src/content/linkedin/2026-10-22_unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug.txt",
+    "prepared_file": "docs/linkedin/2026-10-22/2026-10-22-unterversicherung-gebaeudeversicherung-linkedin.txt",
+    "source_review": "docs/linkedin/2026-10-22/2026-10-22-unterversicherung-gebaeudeversicherung-quellenpruefung.md"
+  },
+  "archive_review": {
+    "existing_related_article": "teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus",
+    "distinction": "Der bestehende Beitrag behandelt Teilzahlungen und Zahlungsstatus. Der neue Beitrag behandelt die vertragliche Wertbasis und Voraussetzungen eines möglichen Unterversicherungsabzugs.",
+    "daily_count_before_creation": 0
+  },
+  "local_checks": {
+    "npm_ci": "success; 751 Pakete installiert",
+    "astro_check": {
+      "errors": 0,
+      "warnings": 0,
+      "hints": 0,
+      "files": 364
+    },
+    "preflight": "success",
+    "build": "success",
+    "article_words": 1708,
+    "article_headings": 14,
+    "article_list_lines": 0,
+    "pages": 1100,
+    "knowledge_urls": 115,
+    "sitemap_pages": 197,
+    "internal_links": 21888,
+    "daily_count": 1,
+    "encoding": "passed",
+    "public_copy": "passed",
+    "visible_umlauts": "passed",
+    "knowledge_dist_links_search_sitemap": "passed",
+    "portal_tests": "passed",
+    "verified_at": "2026-10-22T06:16:00+02:00"
+  },
+  "deployment": {
+    "content_commit": "56e0141179a44f17e6ffc67514bdf447c33e101b",
+    "status": "pending"
+  }
+}
