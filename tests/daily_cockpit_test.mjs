@@ -1,0 +1,43 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root=path.resolve(import.meta.dirname,'..');
+const cockpit=fs.readFileSync(path.join(root,'src/pages/intern/tagescockpit/index.astro'),'utf8');
+const phone=fs.readFileSync(path.join(root,'src/pages/intern/telefon/index.astro'),'utf8');
+const cases=fs.readFileSync(path.join(root,'src/pages/intern/versicherungsfaelle/index.astro'),'utf8');
+const phoneInstaller=fs.readFileSync(path.join(root,'public/intern/downloads/Install-SVNetzwerk-Telefon.ps1'),'utf8');
+const layout=fs.readFileSync(path.join(root,'src/layouts/InternalLayout.astro'),'utf8');
+const client=fs.readFileSync(path.join(root,'src/lib/internal/client.ts'),'utf8');
+const assert=(condition,message)=>{if(!condition)throw new Error(message)};
+
+assert(layout.includes("'/intern/tagescockpit/'")&&layout.includes("label: 'Tagescockpit'"),'Tagescockpit fehlt als erster eigener Portalbereich');
+assert(layout.indexOf("'/intern/tagescockpit/'")<layout.indexOf("'/intern/versicherungsfaelle/'"),'Tagescockpit muss vor den Versicherungsfällen stehen');
+assert(cockpit.includes('Tagescockpit Ansichten')&&cockpit.includes('Arbeitsorganisation'),'Die Arbeitsorganisation muss im gemeinsamen Tagescockpit erreichbar sein');
+assert(cockpit.includes('id="dc-reminder-form"')&&cockpit.includes('data-reminder-done')&&cockpit.includes("work-center.php?action=${action}"),'Wiedervorlagen müssen auf der ersten Tagescockpit-Seite vollständig bearbeitbar sein');
+assert(!cockpit.includes('<h2>Systemstatus</h2>'),'Der große Systemstatus darf die erste Tagescockpit-Seite nicht mehr belegen');
+assert(client.includes("redirectTo('/intern/tagescockpit/')"),'Nach erfolgreicher Anmeldung muss das Tagescockpit starten');
+assert(!client.includes('INACTIVITY_MS')&&!client.includes("reason=inactivity"),'Das Portal darf angemeldete Benutzer nicht wegen Inaktivität automatisch abmelden');
+assert(client.includes("querySelector<HTMLButtonElement>('#header-logout')")&&client.includes('await apiLogout()'),'Die Abmeldung muss weiterhin bewusst über den manuellen Abmeldeknopf erfolgen');
+assert(layout.includes('id="intern-logout"')&&layout.includes("auth.php?action=logout"),'Auch die neue Portalnavigation muss den manuellen Abmeldeknopf behalten');
+assert(cockpit.includes('google-drive-sync.php?action=status')&&cockpit.includes('google-drive-sync.php?action=recent_cases'),'Cockpit muss Drive-Status und letzte Fälle lesen');
+assert(cockpit.includes('outlook-case-calendar.php?action=list'),'Cockpit muss die bestehende Kalenderansicht lesen');
+assert(cockpit.includes('claimsforce-queue.php?action=summary'),'Cockpit muss den ClaimsForce-Aufgabenstand anzeigen');
+assert(cockpit.includes('class="dc-summary-card" href="#dc-cases-section"')&&cockpit.includes('href="#dc-today-section"'),'Fall-, Hinweis- und Terminkennzahlen müssen zu ihren sichtbaren Detailbereichen führen');
+assert(cockpit.includes('href="https://web.claimsforce.com/tasks"')&&cockpit.includes('In ClaimsForce bearbeiten'),'Claims-Aufgaben müssen zur tatsächlich bearbeitbaren ClaimsForce-Aufgabenansicht führen');
+assert(cockpit.includes('id="dc-phone-number"')&&cockpit.includes('data-dc-phone-action="answer"')&&cockpit.includes('data-dc-phone-action="drop"'),'Das Tagescockpit muss Wählen, Annehmen und Auflegen kompakt bereitstellen');
+assert(cockpit.includes('svnet-xtelsio://dial?number=${encodeURIComponent(clean)}')&&cockpit.includes('svnet-xtelsio://${action}')&&!cockpit.includes("'callto'"),'Die kompakte Telefonsteuerung muss Wählen, Annehmen und Auflegen direkt an xtelsio übergeben');
+assert(phone.includes('svnet-xtelsio://dial?number=${encodeURIComponent(clean)}')&&!phone.includes("'callto'"),'Die Telefonzentrale darf beim Wählen nicht die Windows-Zuordnung und damit Teams verwenden');
+assert(cases.includes('svnet-xtelsio://dial?number=${encodeURIComponent(number)}')&&!cases.includes("'callto'"),'Auch fallbezogene Rufnummern müssen direkt an xtelsio übergeben werden');
+assert(phoneInstaller.includes("'dial'   {")&&phoneInstaller.includes("$commandArguments = @('/dial', $phoneNumber)")&&phoneInstaller.includes("'^\\+?[0-9*#]+$'"),'Die Windows-Verknüpfung muss Rufnummern geprüft an den xtelsio-Dial-Befehl weiterreichen');
+assert(phoneInstaller.includes("$installerVersion = '2026.09.05.1'")&&phone.includes('Windows-Einrichtung')&&phone.includes('Verknüpfung herunterladen'),'Die Telefonzentrale muss die Einrichtung der erweiterten Verknüpfung kompakt erreichbar halten');
+assert(cockpit.includes('phoneContacts(meta)')&&cockpit.includes('Kein aktiver Schadenfall.'),'Kontakte des aktiven Schadenfalls müssen im Telefonbereich erscheinen');
+assert(cockpit.includes('id="dc-speed-dial-form"')&&cockpit.includes("context.legacy_owner?legacy:`${legacy}-${context.scope}`")&&cockpit.includes("context.legacy_owner?'xtelsio':'none'")&&!cockpit.includes("{name:'Christian Handy',number:"),'Kurzwahlen und Telefonverbindung müssen pro Benutzer getrennt sein; nur Susanne behält die bestehende Einrichtung');
+assert(cockpit.includes('saveSpeedDials();renderSpeedDials();resetSpeedDialForm()')&&cockpit.includes('call.onclick=()=>dial(entry.number)'),'Kurzwahlen müssen gespeichert, geändert, entfernt und direkt gewählt werden können');
+assert(cockpit.includes('revenue-summary-v2.php?action=access'),'Cockpit muss den rollenbezogenen Abrechnungsstand lesen');
+assert(cockpit.includes('id="dc-quick-settlement"')&&cockpit.includes("hidden=data.show_settlement_link!==true"),'Abrechnungen dürfen im Cockpit nur mit bestätigter Berechtigung erscheinen');
+assert(cockpit.includes("method:'POST'")&&cockpit.includes("postReminder('save'")&&cockpit.includes("postReminder('complete'"),'Nur die sichtbare Wiedervorlage darf im Cockpit gespeichert und erledigt werden');
+assert(cockpit.includes("sessionStorage.setItem('svnet-case'")&&cockpit.includes("location.assign('/intern/versicherungsfaelle/')"),'Fallübergabe muss in den bestehenden Fallbereich führen');
+assert(!cockpit.includes('data-system="drive"'),'Die Systemampeln dürfen nicht mehr die erste Seite belegen');
+await import('./kuss_ui_test.mjs');
+
+console.log('daily_cockpit_test: ok');
