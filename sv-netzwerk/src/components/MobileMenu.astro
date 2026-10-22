@@ -27,6 +27,7 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
   </div>
 
   <div class="mobile-menu__scroll">
+    <a class="mobile-menu__portal" href="https://portal.kussgmbh.de/" target="_blank" rel="noopener">KUSS-ServicePortal öffnen <span aria-hidden="true">↗</span></a>
     <nav aria-label="Mobile Hauptnavigation">
       {items.map((item) => item.children ? (
         <details class="mobile-menu__group" open={isItemActive(item)}>
@@ -48,7 +49,6 @@ const isItemActive = (item: NavItem) => isActive(item.href) || Boolean(item.chil
 
   <div class="mobile-menu__footer">
     <SearchButton />
-    <a class="mobile-menu__cta mobile-menu__cta--kuss" href="https://portal.kussgmbh.de/" target="_blank" rel="noopener">KUSS-ServicePortal öffnen <span aria-hidden="true">↗</span></a>
     <a class="mobile-menu__cta mobile-menu__cta--platform" href="/schaden-uebermitteln/">Schaden übermitteln <span aria-hidden="true">→</span></a>
     <div><a href="tel:+4973673939783">{site.phone}</a><span>Persönlich erreichbar</span></div>
   </div>
