@@ -2,10 +2,9 @@ Ein Nachtrag im Sachschaden ist weder automatisch notwendig noch automatisch unb
 
 Ein Befund kann einen Nachtrag tragen, etwa wenn sich nach dem Rückbau zeigt, dass eine Durchfeuchtung weiter reicht als sichtbar war. Eine höhere Gesamtsumme allein reicht dafür nicht. Sie verdeckt oft, ob eine Position neu hinzukommt, eine Menge korrigiert wurde oder nur der Einheitspreis steigt. Diese Fälle haben unterschiedliche Ursachen und brauchen unterschiedliche Nachweise.
 
-Auch Verbesserungen gehören sauber getrennt. Wird ein Bauteil im Zuge der Wiederherstellung höherwertig ausgeführt, als zur Schadenbeseitigung nötig wäre, ist dieser Anteil gesondert auszuweisen. Bei der Kostenprüfung helfen klare Bezüge zum Ausgangsangebot, zur Freigabe und zum letzten Bericht. Doppelansätze entstehen besonders dann, wenn eine ursprüngliche Position im Nachtrag noch einmal vollständig auftaucht.
+Auch Verbesserungen trenne ich sauber ab. Wird ein Bauteil im Zuge der Wiederherstellung höherwertig ausgeführt, als zur Schadenbeseitigung nötig wäre, weise ich diesen Anteil gesondert aus. Bei der Kostenprüfung helfen klare Bezüge zum Ausgangsangebot, zur Freigabe und zum letzten Bericht. Doppelansätze entstehen besonders dann, wenn eine ursprüngliche Position im Nachtrag noch einmal vollständig auftaucht.
 
-Ein prüffähiger Nachtrag zeigt Befund, Mengenänderung, Leistungsänderung, Schadenbezug und Kostenstatus getrennt. Erst dann wird aus einer höheren Rechnung eine nachvollziehbare Entscheidung.
-
-Den Beitrag finden Sie hier: https://www.sv-netzwerk.eu/fachwissen/nachtraege-sachschaden-technische-notwendigkeit-mengen-kostenpruefung/
+Im neuen Fachartikel erläutere ich diese Prüfkette, von der technischen Notwendigkeit bis zum Kostenbezug:
+https://www.sv-netzwerk.eu/fachwissen/nachtraege-sachschaden-technische-notwendigkeit-mengen-kostenpruefung/
 
 #Nachtrag #Sachschaden #Schadenregulierung #Kostenprüfung #Dokumentation
