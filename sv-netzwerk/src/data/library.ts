@@ -14,6 +14,25 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Unterversicherung in der Gebäudeversicherung: Versicherungssumme, Versicherungswert und Schadenabzug trennen',
+    description: 'Versicherungssumme, Versicherungswert, Wertänderungen und Unterversicherungsverzicht vor einem Schadenabzug nachvollziehbar prüfen.',
+    href: '/fachwissen/unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug/',
+    category: 'Schadenregulierung',
+    tags: ['Unterversicherung', 'Gebäudeversicherung', 'Versicherungssumme', 'Versicherungswert', 'Schadenabzug', 'VVG'],
+    date: '2026-10-22',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Nachträge im Sachschaden: technische Notwendigkeit, Mengen und Kosten sauber prüfen',
+    description: 'Technische Notwendigkeit, Mengenänderung, Leistungsumfang und Kostenbezug von Nachträgen im Sachschaden nachvollziehbar dokumentieren.',
+    href: '/fachwissen/nachtraege-sachschaden-technische-notwendigkeit-mengen-kostenpruefung/',
+    category: 'Schadenregulierung',
+    tags: ['Nachtrag', 'Sachschaden', 'Kostenprüfung', 'Schadenabgrenzung', 'Dokumentation', 'VVG'],
+    date: '2026-10-23',
+    type: 'article',
+    featured: false,
+  },  {
     title: 'Teilzahlungen im Sachschaden: Anerkannte Beträge, offene Positionen und Zahlungsstatus trennen',
     description: 'Anerkannte Beträge, offene Positionen, Abschläge und tatsächliche Zahlungen im Sachschaden sauber trennen und prüffähig dokumentieren.',
     href: '/fachwissen/teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus/',
