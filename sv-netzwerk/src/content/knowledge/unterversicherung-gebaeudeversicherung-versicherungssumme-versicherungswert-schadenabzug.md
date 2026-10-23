@@ -69,7 +69,7 @@ Das ist kein Beleg für den Inhalt eines konkreten Vertrags. Die Musterbedingung
 
 Ein Unterversicherungsverzicht ist kein pauschaler Erlass jeder Wertprüfung. Sein Umfang und seine Voraussetzungen ergeben sich aus dem Vertrag. Je nach Modell kann er daran anknüpfen, dass die Versicherungssumme nach einem vorgegebenen Verfahren ermittelt wurde, die Wohnfläche richtig angegeben ist oder wertsteigernde Veränderungen gemeldet werden.
 
-Deshalb genügt der Hinweis „Unterversicherungsverzicht vereinbart“ nicht. Zu klären ist, welche Klausel gilt, auf welche versicherten Positionen sie sich erstreckt und ob ihre Voraussetzungen eingehalten wurden. In den VGB 2022 Wert 1914 wird der Verzicht beispielweise auch auf versicherte Kosten und Mietausfall bezogen. Gleichzeitig enthalten die Musterbedingungen Ausnahmen für fehlerhafte Antragsangaben und bestimmte nicht angezeigte Wertsteigerungen.
+Deshalb genügt der Hinweis „Unterversicherungsverzicht vereinbart“ nicht. Zu klären ist, welche Klausel gilt, auf welche versicherten Positionen sie sich erstreckt und ob ihre Voraussetzungen eingehalten wurden. In den VGB 2022 Wert 1914 wird der Verzicht beispielsweise auch auf versicherte Kosten und Mietausfall bezogen. Gleichzeitig enthalten die Musterbedingungen Ausnahmen für fehlerhafte Antragsangaben und bestimmte nicht angezeigte Wertsteigerungen.
 
 Erst nach dieser Vertragsprüfung steht fest, ob ein rechnerisch feststellbarer Wertunterschied leistungsrelevant wird. Ein Wertunterschied und ein zulässiger Schadenabzug sind nicht dasselbe.
 
@@ -127,10 +127,10 @@ Ein belastbarer Schadenabzug setzt deshalb eine dokumentierte Prüfkette voraus.
 
 ## Quellen
 
-Bundesministerium der Justiz und Bundesamt für Justiz: [§ 75 VVG – Unterversicherung](https://www.gesetze-im-internet.de/vvg_2008/__75.html), geltende Fassung, abgerufen am 22.10.2026.
+Bundesministerium der Justiz und Bundesamt für Justiz: § 75 VVG, Unterversicherung, https://www.gesetze-im-internet.de/vvg_2008/__75.html, geltende Fassung, abgerufen am 22.10.2026.
 
-Bundesministerium der Justiz und Bundesamt für Justiz: [§ 76 VVG – Taxe](https://www.gesetze-im-internet.de/vvg_2008/__76.html), geltende Fassung, abgerufen am 22.10.2026.
+Bundesministerium der Justiz und Bundesamt für Justiz: § 76 VVG, Taxe, https://www.gesetze-im-internet.de/vvg_2008/__76.html, geltende Fassung, abgerufen am 22.10.2026.
 
-Bundesministerium der Justiz und Bundesamt für Justiz: [§ 88 VVG – Versicherungswert](https://www.gesetze-im-internet.de/vvg_2008/__88.html), geltende Fassung, abgerufen am 22.10.2026.
+Bundesministerium der Justiz und Bundesamt für Justiz: § 88 VVG, Versicherungswert, https://www.gesetze-im-internet.de/vvg_2008/__88.html, geltende Fassung, abgerufen am 22.10.2026.
 
-Gesamtverband der Deutschen Versicherungswirtschaft e. V.: [Allgemeine Wohngebäude Versicherungsbedingungen VGB 2022 – Wert 1914, Gleitender Neuwert Plus](https://www.gdv.de/resource/blob/37086/f47b12926546495dd7b6133f9dbf58aa/allgemeine-wohngebaeude-versicherungsbedingungen-vgb-2022-wert-1914-gleitender-neuwert-plus--data.pdf), unverbindliche Musterbedingungen, Stand Juni 2026.
+Gesamtverband der Deutschen Versicherungswirtschaft e. V.: Allgemeine Wohngebäude Versicherungsbedingungen VGB 2022, Wert 1914, Gleitender Neuwert Plus, https://www.gdv.de/resource/blob/37086/f47b12926546495dd7b6133f9dbf58aa/allgemeine-wohngebaeude-versicherungsbedingungen-vgb-2022-wert-1914-gleitender-neuwert-plus--data.pdf, unverbindliche Musterbedingungen, Stand Juni 2026.
