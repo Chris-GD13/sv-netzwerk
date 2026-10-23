@@ -869,14 +869,34 @@
         "title": "Unterversicherung in der Gebäudeversicherung: Versicherungssumme, Versicherungswert und Schadenabzug trennen",
         "slug": "unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug",
         "url": "https://www.sv-netzwerk.eu/fachwissen/unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-website-20261022-0603",
-        "reserved_at": "2026-10-22T04:07:08.161Z"
+        "reserved_at": "2026-10-22T04:07:08.161Z",
+        "commit": "c918e8ae7de93f51af2eec2db4ac029d3d662e11",
+        "blob": "77645549b85392dbdd2df4292677d4211cd75d5f",
+        "verification_note": "Artikel live erreichbar. Korrektur beispielweise zu beispielsweise im Repository; auf der Live-Seite am 23.10.2026 noch nicht sichtbar, Deployment offen."
       },
       "linkedin": {
         "status": "not-posted"
       }
+    },
+    "2026-10-23": {
+      "publication_id": "2026-10-23-nachtraege-sachschaden-technische-notwendigkeit-mengen-kostenpruefung",
+      "article": {
+        "title": "Nachtragsketten im Sachschaden: Einzelne Nachträge gegen die Ausgangskalkulation prüfen",
+        "slug": "nachtraege-sachschaden-technische-notwendigkeit-mengen-kostenpruefung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/nachtraege-sachschaden-technische-notwendigkeit-mengen-kostenpruefung/",
+        "status": "published-verified",
+        "owner": "manuell-chat-20261023",
+        "blob": "f298a47091a7588695f29b82b912d54ce5730298",
+        "verification_note": "Live am 23.10.2026 mit neuer Fassung geprüft. Commit-SHA nicht separat ermittelt."
+      },
+      "linkedin": {
+        "status": "not-posted",
+        "text_path": "docs/linkedin/2026-10-23/2026-10-23_nachtraege-sachschaden-linkedin.txt",
+        "blob": "4fef903ed5e9b055eb268c61405eb1793fcbafd1"
+      }
     }
   },
-  "updated_at": "2026-10-22T04:07:08.161Z"
+  "updated_at": "2026-10-23T17:30:00.000Z"
 }
