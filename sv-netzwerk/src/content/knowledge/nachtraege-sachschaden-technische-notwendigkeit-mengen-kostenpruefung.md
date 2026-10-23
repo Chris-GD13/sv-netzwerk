@@ -1,6 +1,6 @@
 ---
 title: "Nachträge im Sachschaden: technische Notwendigkeit, Mengen und Kosten sauber prüfen"
-description: "Nachträge im Sachschaden nachvollziehbar bewerten: technische Notwendigkeit, Mengenänderung, Leistungsumfang und Kostenbezug getrennt dokumentieren.",
+description: "Nachträge im Sachschaden nachvollziehbar bewerten: technische Notwendigkeit, Mengenänderung, Leistungsumfang und Kostenbezug getrennt dokumentieren."
 category: "Schadenregulierung"
 tags: ["Nachtrag", "Sachschaden", "Kostenprüfung", "Schadenabgrenzung", "Dokumentation", "VVG"]
 author: "christian-waechter"
