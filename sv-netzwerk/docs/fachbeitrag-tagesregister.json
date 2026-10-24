@@ -8,14 +8,17 @@
         "title": "Bauablauf im Schadenfall: Terminplan, Behinderungsanzeige und Stillstandskosten sauber trennen",
         "slug": "bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten",
         "url": "https://www.sv-netzwerk.eu/fachwissen/bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-website-20261024-0600",
-        "reserved_at": "2026-10-24T11:41:25.075Z"
+        "reserved_at": "2026-10-24T11:41:25.075Z",
+        "commit": "b8341b587073c22501af58eaca27d36dcba80849",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40092171022",
+        "verified_at": "2026-10-24T12:10:25.201Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-24T11:41:25.075Z"
+  "updated_at": "2026-10-24T12:10:25.201Z"
 }
