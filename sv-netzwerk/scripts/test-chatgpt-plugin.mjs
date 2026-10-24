@@ -88,6 +88,8 @@ assert.match(mcpServer, /if \(!oauthBearerUserOrNull\('cases:read'\)\) oauthChal
 assert.match(mcpServer, /resource_metadata="https:\/\/www\.sv-netzwerk\.eu\/\.well-known\/oauth-protected-resource\/intern\/mcp\/"/);
 
 const oauthLib = await read('sv-netzwerk/public/intern/oauth/lib.php');
+assert.match(oauthLib, /REDIRECT_HTTP_AUTHORIZATION/, 'OAuth bearer fallback must support Apache CGI header forwarding');
+assert.match(oauthLib, /getallheaders/, 'OAuth bearer parsing must support standard PHP request headers');
 assert.match(oauthLib, /resource_metadata="https:\/\/www\.sv-netzwerk\.eu\/\.well-known\/oauth-protected-resource\/intern\/mcp\/"/);
 
 const protectedResource = await read('sv-netzwerk/public/.well-known/oauth-protected-resource/intern/mcp/index.php');

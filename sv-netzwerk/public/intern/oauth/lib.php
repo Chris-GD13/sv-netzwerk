@@ -110,7 +110,15 @@ function oauthNormalizeScope(string $scope): string
 function oauthBearerUserOrNull(string $requiredScope = 'cases:read'): ?array
 {
     oauthSchema();
-    $header = (string)($_SERVER['HTTP_AUTHORIZATION'] ?? '');
+    $header = (string)($_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '');
+    if ($header === '' && function_exists('getallheaders')) {
+        foreach (getallheaders() ?: [] as $name => $value) {
+            if (strcasecmp((string)$name, 'Authorization') === 0) {
+                $header = (string)$value;
+                break;
+            }
+        }
+    }
     if (!preg_match('/^Bearer\s+(.+)$/i', $header, $match)) return null;
     $hash = hash('sha256', trim($match[1]));
     $stmt = db()->prepare(
