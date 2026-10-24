@@ -103,18 +103,8 @@ function mcpDriveApi(string $path, array $query = []): array
 
 function mcpDriveChildren(string $parentId): array
 {
-    if (str_starts_with($parentId, 'ionos_') || ionosStorageEnabled()) {
-        if (!ionosStorageEnabled()) throw new RuntimeException('Der IONOS-Dateispeicher ist derzeit nicht erreichbar.');
-        return ionosList(['q'=>"'".str_replace("'", "\\'", $parentId)."' in parents and trashed=false", 'pageSize'=>1000])['files'] ?? [];
-    }
-    $escaped = str_replace("'", "\\'", $parentId);
-    $data = mcpDriveApi('files', [
-        'q'=>"'{$escaped}' in parents and trashed=false",
-        'fields'=>'files(id,name,mimeType,modifiedTime,size,webViewLink,parents)',
-        'pageSize'=>1000,
-        'orderBy'=>'name_natural',
-    ]);
-    return is_array($data['files'] ?? null) ? $data['files'] : [];
+    if (!ionosStorageEnabled()) throw new RuntimeException('Der IONOS-Dateispeicher ist derzeit nicht erreichbar.');
+    return ionosList(['q'=>"'".str_replace("'", "\\'", $parentId)."' in parents and trashed=false", 'pageSize'=>1000])['files'] ?? [];
 }
 
 function mcpDriveCaseFiles(string $folderId): array
@@ -165,23 +155,11 @@ function mcpDriveFindCaseFile(string $folderId, string $fileId): array
 
 function mcpDriveDownload(string $fileId, string $mimeType): array
 {
-    if (str_starts_with($fileId, 'ionos_') || ionosStorageEnabled()) {
-        if (!ionosStorageEnabled()) throw new RuntimeException('Der IONOS-Dateispeicher ist derzeit nicht erreichbar.');
-        $item = ionosItem($fileId);
-        return ['bytes'=>ionosBytes($fileId), 'mime_type'=>(string)($item['mimeType'] ?? $mimeType)];
-    }
-    $exportMime = null;
-    if ($mimeType === 'application/vnd.google-apps.document') $exportMime = 'text/plain';
-    if ($mimeType === 'application/vnd.google-apps.spreadsheet') $exportMime = 'text/csv';
-    if ($mimeType === 'application/vnd.google-apps.presentation') $exportMime = 'application/pdf';
-    $path = 'https://www.googleapis.com/drive/v3/files/'.rawurlencode($fileId);
-    $url = $exportMime !== null
-        ? $path.'/export?'.http_build_query(['mimeType'=>$exportMime])
-        : $path.'?'.http_build_query(['alt'=>'media','supportsAllDrives'=>'true']);
-    $response = mcpDriveHttp('GET', $url);
-    if ($response['status'] !== 200) throw new RuntimeException('Die ausgewählte Akte konnte nicht aus Google Drive geladen werden.');
-    if (strlen($response['body']) > MCP_MAX_FILE_BYTES) throw new RuntimeException('Die Datei ist für die direkte Auswertung größer als 15 MB.');
-    return ['bytes'=>$response['body'], 'mime_type'=>$exportMime ?? $mimeType];
+    if (!ionosStorageEnabled()) throw new RuntimeException('Der IONOS-Dateispeicher ist derzeit nicht erreichbar.');
+    $item = ionosItem($fileId);
+    $bytes = ionosBytes($fileId);
+    if (strlen($bytes) > MCP_MAX_FILE_BYTES) throw new RuntimeException('Die Datei ist für die direkte Auswertung größer als 15 MB.');
+    return ['bytes'=>$bytes, 'mime_type'=>(string)($item['mimeType'] ?? $mimeType)];
 }
 
 function mcpDriveIsText(string $mimeType): bool
