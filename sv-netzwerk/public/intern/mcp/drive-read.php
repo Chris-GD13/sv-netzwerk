@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once dirname(__DIR__) . '/api/ionos-storage.php';
+
 const MCP_CASE_META_NAME = '00_Falldaten.json';
 const MCP_DRIVE_FOLDER_MIME = 'application/vnd.google-apps.folder';
 const MCP_MAX_CASE_FILES = 250;
@@ -101,6 +103,10 @@ function mcpDriveApi(string $path, array $query = []): array
 
 function mcpDriveChildren(string $parentId): array
 {
+    if (str_starts_with($parentId, 'ionos_') || ionosStorageEnabled()) {
+        if (!ionosStorageEnabled()) throw new RuntimeException('Der IONOS-Dateispeicher ist derzeit nicht erreichbar.');
+        return ionosList(['q'=>"'".str_replace("'", "\\'", $parentId)."' in parents and trashed=false", 'pageSize'=>1000])['files'] ?? [];
+    }
     $escaped = str_replace("'", "\\'", $parentId);
     $data = mcpDriveApi('files', [
         'q'=>"'{$escaped}' in parents and trashed=false",
@@ -159,6 +165,11 @@ function mcpDriveFindCaseFile(string $folderId, string $fileId): array
 
 function mcpDriveDownload(string $fileId, string $mimeType): array
 {
+    if (str_starts_with($fileId, 'ionos_') || ionosStorageEnabled()) {
+        if (!ionosStorageEnabled()) throw new RuntimeException('Der IONOS-Dateispeicher ist derzeit nicht erreichbar.');
+        $item = ionosItem($fileId);
+        return ['bytes'=>ionosBytes($fileId), 'mime_type'=>(string)($item['mimeType'] ?? $mimeType)];
+    }
     $exportMime = null;
     if ($mimeType === 'application/vnd.google-apps.document') $exportMime = 'text/plain';
     if ($mimeType === 'application/vnd.google-apps.spreadsheet') $exportMime = 'text/csv';

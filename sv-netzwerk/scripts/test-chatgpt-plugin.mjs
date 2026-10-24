@@ -75,10 +75,13 @@ assert.match(wellKnownApache, /DirectorySlash Off/);
 assert.match(wellKnownApache, /RewriteRule \^oauth-protected-resource\/intern\/mcp\$/);
 
 const mcpServer = await read('sv-netzwerk/public/intern/mcp/index.php');
+const mcpDriveRead = await read('sv-netzwerk/public/intern/mcp/drive-read.php');
 assert.match(mcpServer, /REQUEST_METHOD'\]\s*!==\s*'POST'\)\s*oauthChallenge\('cases:read cases:drafts\.write'\)/, 'MCP GET probe must return an OAuth challenge');
 assert.match(mcpServer, /'name'=>'read_case_file'/);
 assert.match(mcpServer, /requireCaseFolderAccess\(\$folder,\$user\)/);
 assert.match(mcpServer, /mcpDriveFindCaseFile/);
+assert.match(mcpDriveRead, /ionosStorageEnabled\(\)/, 'MCP case files must use the verified IONOS store');
+assert.match(mcpDriveRead, /ionosBytes\(\$fileId\)/, 'MCP case downloads must read IONOS bytes');
 
 const oauthRegistration = await read('sv-netzwerk/public/intern/oauth/register.php');
 assert.match(oauthRegistration, /\['127\.0\.0\.1','localhost'\]/, 'Codex loopback callbacks must be explicitly allowlisted');
