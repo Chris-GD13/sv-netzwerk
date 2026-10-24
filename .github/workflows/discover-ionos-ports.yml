@@ -1,0 +1,29 @@
+name: IONOS SSH Ports prüfen
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/discover-ionos-ports.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Öffentliche SSH-Ports prüfen
+        run: |
+          set -euo pipefail
+          host="217.160.143.102"
+          found=0
+          for port in 22 2022 2200 2222 10022 22222; do
+            if timeout 8 bash -c "cat < /dev/null > /dev/tcp/$host/$port" 2>/dev/null; then
+              echo "OPEN_PORT=$port"
+              found=1
+            fi
+          done
+          test "$found" = 1
