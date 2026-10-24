@@ -16,12 +16,14 @@
         "verified_at": "2026-10-24T12:10:25.201Z"
       },
       "linkedin": {
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-linkedin-20261024-01a16daf",
         "reserved_at": "2026-10-24T12:23:28.525Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten/"
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten/",
+        "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7519735612388696064/",
+        "verified_at": "2026-10-24T12:25:51.070Z"
       }
     }
   },
-  "updated_at": "2026-10-24T12:23:28.525Z"
+  "updated_at": "2026-10-24T12:25:51.070Z"
 }
