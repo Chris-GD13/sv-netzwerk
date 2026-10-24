@@ -102,10 +102,18 @@ if ($method==='tools/call') {
         try{$file=mcpDriveFindCaseFile($folder,$fileId);$download=mcpDriveDownload($fileId,(string)$file['mime_type']);}catch(Throwable $error){mcpFailure($id,-32011,$error->getMessage());}
         $mime=(string)$download['mime_type'];$uri='svnet://case/'.rawurlencode($folder).'/file/'.rawurlencode($fileId);
         $header=['type'=>'text','text'=>json_encode(['case_id'=>$folder,'file'=>$file,'effective_mime_type'=>$mime],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)];
-        $fileContent=mcpDriveIsText($mime)
-          ? ['type'=>'text','text'=>mb_substr((string)$download['bytes'],0,500000)]
-          : ['type'=>'resource','resource'=>['uri'=>$uri,'mimeType'=>$mime,'blob'=>base64_encode((string)$download['bytes'])]];
-        mcpResult($id,['content'=>[$header,$fileContent],'structuredContent'=>['case_id'=>$folder,'file_id'=>$fileId,'name'=>$file['name'],'mime_type'=>$mime,'read_only'=>true]]);
+        $contentBlocks=[$header];
+        if (mcpDriveIsText($mime)) {
+            $contentBlocks[]=['type'=>'text','text'=>mb_substr((string)$download['bytes'],0,500000)];
+        } elseif ($mime==='application/pdf') {
+            $pdfText=mcpDrivePdfText((string)$download['bytes']);
+            if ($pdfText!=='') $contentBlocks[]=['type'=>'text','text'=>"Aus dem PDF extrahierter Text (vollständige Textebene, bis 500.000 Zeichen):\n\n".$pdfText];
+            else $contentBlocks[]=['type'=>'text','text'=>'Die PDF wurde gelesen, enthält aber keine auswertbare Textebene. Für eine visuelle Prüfung steht der PDF-Anhang als Resource bereit.'];
+            $contentBlocks[]=['type'=>'resource','resource'=>['uri'=>$uri,'mimeType'=>$mime,'blob'=>base64_encode((string)$download['bytes'])]];
+        } else {
+            $contentBlocks[]=['type'=>'resource','resource'=>['uri'=>$uri,'mimeType'=>$mime,'blob'=>base64_encode((string)$download['bytes'])]];
+        }
+        mcpResult($id,['content'=>$contentBlocks,'structuredContent'=>['case_id'=>$folder,'file_id'=>$fileId,'name'=>$file['name'],'mime_type'=>$mime,'read_only'=>true]]);
     }
     if ($name==='save_case_draft') {
         $folder=trim((string)($args['id']??''));requireCaseFolderAccess($folder,$user);

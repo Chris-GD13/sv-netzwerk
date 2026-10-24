@@ -171,3 +171,20 @@ function mcpDriveIsText(string $mimeType): bool
         'application/javascript',
     ], true);
 }
+
+/** Return a bounded text layer for PDFs so MCP clients can review figures without
+ * having to decode a binary resource in their own sandbox. */
+function mcpDrivePdfText(string $bytes): string
+{
+    if (!function_exists('exec') || !function_exists('shell_exec') || $bytes === '') return '';
+    $binary = trim((string)@shell_exec('command -v pdftotext 2>/dev/null'));
+    if ($binary === '') return '';
+    $tmp = tempnam(sys_get_temp_dir(), 'mcp-pdf-');
+    if ($tmp === false || @file_put_contents($tmp, $bytes) !== strlen($bytes)) { if ($tmp) @unlink($tmp); return ''; }
+    try {
+        $out = [];
+        @exec(escapeshellarg($binary).' -layout '.escapeshellarg($tmp).' - 2>/dev/null', $out, $code);
+        if ($code !== 0) return '';
+        return mb_substr(trim(implode("\n", $out)), 0, 500000);
+    } finally { @unlink($tmp); }
+}
