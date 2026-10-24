@@ -11,3 +11,5 @@ Quellenprüfung: Amtlicher Volltext von § 642 BGB, amtlicher Volltext von § 65
 Stilprüfung: Der öffentliche Artikel und der vorbereitete LinkedIn-Text bestehen aus zusammenhängenden kurzen Absätzen ohne Aufzählungszeichen, nummerierte Listen, künstliche Frage-Antwort-Einstiege oder interne Rotationshinweise. Ein fiktives Praxisbeispiel wurde wegen der fehlenden Originaldaten nicht verwendet; es gibt keine erfundenen Fälle, Messwerte oder persönlichen Erfahrungen.
 
 LinkedIn: Begleittext vorbereitet, nicht veröffentlicht. Veröffentlichung bleibt dem separaten 07:00-Auftrag vorbehalten. Ohne Bild und ohne Zusatzkosten.
+
+Live-Nachweis: Inhaltscommit `b8341b587073c22501af58eaca27d36dcba80849`, erfolgreicher Deploy-Lauf `40092171022`, Register-Verify-Commit `1ed18869182ceb07e6ed461a700afa64e294fd1f`. Am 24.10.2026 wurden Detailseite, cachefreie Übersicht, Kategorie, sieben Tag-Routen sowie Sitemap, robots.txt und deploy-version.txt sichtbar beziehungsweise per HTTP geprüft. Die Übersicht führt den Beitrag an erster Stelle; der Tagesregisterstatus ist `published-verified`.
