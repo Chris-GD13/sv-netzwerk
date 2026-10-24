@@ -12,14 +12,19 @@ foreach ($uris as $uri) {
     $host = strtolower((string)($parts['host'] ?? ''));
     $isChatGpt = ($parts['scheme'] ?? '') === 'https'
         && in_array($host, ['chatgpt.com','www.chatgpt.com'], true);
+    $isLangdockClaimsforce = ($parts['scheme'] ?? '') === 'https'
+        && $host === 'app.langdock.com'
+        && (string)($parts['path'] ?? '') === '/api/integrations/9cb5dacd-d747-4cde-9cbb-686197f732fc/callback'
+        && !isset($parts['port']) && !isset($parts['query']) && !isset($parts['fragment'])
+        && !isset($parts['user']) && !isset($parts['pass']);
     $isCodexLoopback = ($parts['scheme'] ?? '') === 'http'
         && in_array($host, ['127.0.0.1','localhost'], true)
         && isset($parts['port']) && (int)$parts['port'] > 0
         && preg_match('#^/callback(?:/[A-Za-z0-9_-]{12})?$#', (string)($parts['path'] ?? '')) === 1
         && !isset($parts['query']) && !isset($parts['fragment'])
         && !isset($parts['user']) && !isset($parts['pass']);
-    if (!$isChatGpt && !$isCodexLoopback) {
-        oauthError('invalid_redirect_uri', 'Zulässig sind ausschließlich ChatGPT-HTTPS-Callbacks oder lokale Codex-PKCE-Callbacks.');
+    if (!$isChatGpt && !$isLangdockClaimsforce && !$isCodexLoopback) {
+        oauthError('invalid_redirect_uri', 'Zulässig sind ausschließlich ChatGPT-HTTPS-Callbacks, der freigegebene Langdock-Callback oder lokale Codex-PKCE-Callbacks.');
     }
 }
 $method = (string)($body['token_endpoint_auth_method'] ?? 'none');
