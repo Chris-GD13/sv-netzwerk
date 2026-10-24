@@ -47,11 +47,11 @@ function svAssistantConnections(array $user): array {
     try{$release=svAssistantRelease();}catch(Throwable $e){$ruleError=preg_match('/^[A-Z_]+$/',$e->getMessage())?$e->getMessage():'RULE_CHECK_FAILED';}
     $summary='Anmeldung bestätigt · Fallablage '.($storage?'IONOS bereit':'nicht bereit').' · ';
     $summary.=$release?'Regelstand '.$release['id'].' mit führender Drive-Masterdatei abgeglichen':'Regelanbindung offen ('.$ruleError.'). Freigegebenen Regelrelease in der Administration als SV-Assistent-Regelrelease.txt importieren bzw. vorhandene Drive-Verbindung prüfen.';
-    $ai=trim(env('OPENAI_API_KEY',''))!=='';
+    $ai=trim(env('OPENAI_ASSISTANT_API_KEY',''))!=='';
     $summary.=$ai?' · KI-Zugang vorhanden · Zusatzbudget maximal 30 EUR/Monat inklusive Sicherheitspuffer':' · KI-Zugang fehlt';
     if($ai){
         require_once __DIR__.'/assistant-model-readiness.php';
-        $catalogue=svAssistantModelCatalogue(trim(env('OPENAI_API_KEY','')));
+        $catalogue=svAssistantModelCatalogue(trim(env('OPENAI_ASSISTANT_API_KEY','')));
         $summary.=' · Modellkatalog HTTP '.$catalogue['http_status'].' · verfügbare Budgetmodelle: '.implode(', ',$catalogue['available']);
         try{$last=svAssistantLatestRejection(db(),(int)$user['id']);if($last)$summary.=' · letzte Anbieterablehnung HTTP '.(int)$last['http_status'].' '.svAssistantDiagnostic($last['provider_error']??[]);}catch(Throwable){}
     }

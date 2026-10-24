@@ -40,7 +40,7 @@ if (!function_exists('svAssistantEnvironment')) {
             $read=fn(string $id)=>$id==='sv-demo-document'?['name'=>'Synthetischer-Verbindungstest.txt','mime'=>'text/plain','bytes'=>$demoBytes]:throw new RuntimeException('CASE_FORBIDDEN');
         }
         require_once __DIR__.'/case-work-assistant-provider.php';
-        $provider=env('CASE_WORK_ASSISTANT_MODE','live')==='live'?new SvAssistantProvider(trim(env('OPENAI_API_KEY','')),Closure::fromCallable($read)):null;
+        $provider=env('CASE_WORK_ASSISTANT_MODE','live')==='live'?new SvAssistantProvider(trim(env('OPENAI_ASSISTANT_API_KEY','')),Closure::fromCallable($read)):null;
         return ['engine'=>new CaseWorkAssistant(db(),$loader,$release,$session,null,$provider),'user'=>array_merge($user,['active'=>!empty($user['is_active'])])];
     }
 }

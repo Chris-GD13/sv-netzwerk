@@ -173,7 +173,7 @@ function loadEnv(): void
             // PHP-FPM workers can retain values previously written with putenv()
             // across requests. The portal setup updates OPENAI_API_KEY in .env,
             // so this secret must always be refreshed from the current file.
-            $refreshFromFile = $key === 'OPENAI_API_KEY';
+            $refreshFromFile = in_array($key, ['OPENAI_API_KEY', 'OPENAI_ASSISTANT_API_KEY'], true);
             if ($key !== '' && ($refreshFromFile || !isset($_ENV[$key]))) {
                 $_ENV[$key] = $value;
                 putenv("$key=$value");
