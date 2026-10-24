@@ -609,10 +609,15 @@ async function runImport(run) {
     const messages = Array.isArray(unwrap(rawMessages, 'messages')) ? unwrap(rawMessages, 'messages') : [];
     const files = mergeClaimFiles(unwrap(rawFiles, 'files') || [], unwrap(rawClientFiles, 'files') || [], messages);
     const folders = unwrap(rawFolders, 'folders') || [];
-    const fileIndex = files.map(file => ({ id: file.id, name: file.fileName || file.name, path: claimFolderPath(file, folders), parentFolderId: file.parentFolderId, rootFolderId: file.rootFolderId, attachmentReference: !!file.attachmentReference }));
-    const tasks = (unwrap(rawTasks, 'tasks') || []).filter(task => task.claimId === id);
-    const notes = Array.isArray(preliminaryMeta.claimsforce_notizen) ? preliminaryMeta.claimsforce_notizen : [];
     const mapped = mapClaim(disposition, communication, Array.isArray(appointments) ? appointments : [], rawStakeholders || {});
+    const claimKeys = new Set([id, mapped.claimsforce_claim_id, mapped.schaden_nr, mapped.claim_number].map(value => String(value || '').trim()).filter(Boolean));
+    const taskMatchesClaim = task => {
+      const candidates = [task?.claimId, task?.claim_id, task?.claim?.id, task?.claim?.claimId, task?.damageId, task?.damage_id, task?.caseId, task?.case_id, task?.claimNumber, task?.claim_number, task?.damageNumber, task?.damage_number, task?.caseNumber, task?.case_number];
+      return candidates.some(value => claimKeys.has(String(value || '').trim()));
+    };
+    const fileIndex = files.map(file => ({ id: file.id, name: file.fileName || file.name, path: claimFolderPath(file, folders), parentFolderId: file.parentFolderId, rootFolderId: file.rootFolderId, attachmentReference: !!file.attachmentReference }));
+    const tasks = (unwrap(rawTasks, 'tasks') || []).filter(taskMatchesClaim);
+    const notes = Array.isArray(preliminaryMeta.claimsforce_notizen) ? preliminaryMeta.claimsforce_notizen : [];
     if (singleSync) assertSingleClaim(singleClaimNumber, [{ id, schaden_nr: mapped.schaden_nr }]);
     const inventory = { claimId: id, claimNumber: mapped.schaden_nr, files: files.length, messages: messages.length, notes: notes.length, tasks: tasks.length, attachments: messages.reduce((n, m) => n + (m.attachments || []).length, 0) };
     inventories.push(inventory);

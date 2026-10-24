@@ -185,6 +185,39 @@ function mcpDrivePdfText(string $bytes): string
         $out = [];
         @exec(escapeshellarg($binary).' -layout '.escapeshellarg($tmp).' - 2>/dev/null', $out, $code);
         if ($code !== 0) return '';
-        return mb_substr(trim(implode("\n", $out)), 0, 500000);
+        $text = trim(implode("\n", $out));
+        // Some PDFs expose a font-encoded glyph stream which is technically a
+        // text layer but is not readable (control characters and glyph IDs).
+        // Do not present that as usable text to the model.
+        $printable = preg_replace('/[^\P{C}\t\r\n]/u', '', $text) ?? '';
+        $visible = preg_replace('/\s+/u', '', $printable) ?? '';
+        $ratio = $text === '' ? 0.0 : strlen($visible) / max(1, strlen(preg_replace('/\s+/u', '', $text) ?? ''));
+        if ($ratio < 0.70 || mb_strlen($visible) < 40) return '';
+        return mb_substr($text, 0, 500000);
     } finally { @unlink($tmp); }
+}
+
+/** Render pages when a PDF's embedded font map makes its text layer unusable. */
+function mcpDrivePdfImages(string $bytes): array
+{
+    if (!function_exists('exec') || $bytes === '') return [];
+    $binary = trim((string)@shell_exec('command -v pdftoppm 2>/dev/null'));
+    if ($binary === '') return [];
+    $tmp = tempnam(sys_get_temp_dir(), 'mcp-pdf-');
+    if ($tmp === false || @file_put_contents($tmp, $bytes) !== strlen($bytes)) { if ($tmp) @unlink($tmp); return []; }
+    $dir = $tmp.'_pages'; @mkdir($dir, 0700, true);
+    try {
+        $prefix = $dir.'/page'; $out = []; $code = 1;
+        @exec(escapeshellarg($binary).' -png -f 1 -l 6 -scale-to 1600 '.escapeshellarg($tmp).' '.escapeshellarg($prefix).' 2>/dev/null', $out, $code);
+        if ($code !== 0) return [];
+        $images = [];
+        foreach (glob($prefix.'-*.png') ?: [] as $path) {
+            $image = @file_get_contents($path);
+            if ($image !== false && strlen($image) <= 2500000) $images[] = ['mimeType'=>'image/png', 'data'=>base64_encode($image)];
+        }
+        return array_slice($images, 0, 6);
+    } finally {
+        foreach (glob($dir.'/*') ?: [] as $path) @unlink($path);
+        @rmdir($dir); @unlink($tmp);
+    }
 }

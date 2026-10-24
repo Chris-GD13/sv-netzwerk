@@ -108,7 +108,10 @@ if ($method==='tools/call') {
         } elseif ($mime==='application/pdf') {
             $pdfText=mcpDrivePdfText((string)$download['bytes']);
             if ($pdfText!=='') $contentBlocks[]=['type'=>'text','text'=>"Aus dem PDF extrahierter Text (vollständige Textebene, bis 500.000 Zeichen):\n\n".$pdfText];
-            else $contentBlocks[]=['type'=>'text','text'=>'Die PDF wurde gelesen, enthält aber keine auswertbare Textebene. Für eine visuelle Prüfung steht der PDF-Anhang als Resource bereit.'];
+            else {
+                $contentBlocks[]=['type'=>'text','text'=>'Die PDF enthält keine zuverlässig lesbare Textebene. Die Seiten wurden deshalb zusätzlich als Bilder gerendert; Werte sind ausschließlich aus diesen Seitenbildern abzulesen.'];
+                foreach (mcpDrivePdfImages((string)$download['bytes']) as $image) $contentBlocks[]=['type'=>'image','data'=>$image['data'],'mimeType'=>$image['mimeType']];
+            }
             $contentBlocks[]=['type'=>'resource','resource'=>['uri'=>$uri,'mimeType'=>$mime,'blob'=>base64_encode((string)$download['bytes'])]];
         } else {
             $contentBlocks[]=['type'=>'resource','resource'=>['uri'=>$uri,'mimeType'=>$mime,'blob'=>base64_encode((string)$download['bytes'])]];
