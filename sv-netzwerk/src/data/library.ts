@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Bauablauf im Schadenfall: Terminplan, Behinderungsanzeige und Stillstandskosten sauber trennen',
+    description: 'Vertragsfristen, Terminplan, Behinderungsanzeige, Wiederanlauf und Stillstandskosten im Gebäudeschaden nachvollziehbar prüfen.',
+    href: '/fachwissen/bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten/',
+    category: 'Schadenregulierung',
+    tags: ['Bauablauf', 'Terminmanagement', 'Behinderungsanzeige', 'Stillstandskosten', 'Nachtragsprüfung', 'VOB/B', 'Baucontrolling'],
+    date: '2026-10-24',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Unterversicherung in der Gebäudeversicherung: Versicherungssumme, Versicherungswert und Schadenabzug trennen',
     description: 'Versicherungssumme, Versicherungswert, Wertänderungen und Unterversicherungsverzicht vor einem Schadenabzug nachvollziehbar prüfen.',
     href: '/fachwissen/unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug/',
