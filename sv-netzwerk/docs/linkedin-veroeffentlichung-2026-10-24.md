@@ -1,41 +1,29 @@
-# LinkedIn-Veröffentlichung 24.10.2026: kein live geprüfter Tagesartikel
+# LinkedIn-Veröffentlichung 24.10.2026: published-verified
 
-Prüfstand: 2026-10-24 13:46:53 +02:00 Europe/Berlin. Ergebnis: nicht veröffentlicht; konkreter Blocker `blocked-no-live-article`.
+Prüfstand: 24.10.2026, Europe/Berlin. Der zuvor temporär fehlende Website-Livegang wurde durch den bestehenden 06:00-Lauf fortgesetzt und repariert. Danach wurde der heutige Artikel genau einmal auf Christian Wächters persönlichem LinkedIn-Profil veröffentlicht und am echten Permalink sichtbar verifiziert.
 
-Vor der Prüfung wurden die Desktop-Anweisung, die führende Google-Drive-Masterfassung 4.33 vom 21.10.2026, die führende Neuerungen-Zusammenführung vom 23.10.2026 sowie die einschlägigen Fachbeitrags- und LinkedIn-Regeln erneut gelesen. Die tägliche LinkedIn-Veröffentlichung bleibt auf genau einen tatsächlich live geprüften Tagesartikel begrenzt. Es wurde kein Ersatzthema erstellt und kein fremder oder älterer Artikel verwendet.
+## Website-Livegang
 
-## Register- und Repositorystand
+Artikel: „Bauablauf im Schadenfall: Terminplan, Behinderungsanzeige und Stillstandskosten sauber trennen“
 
-Das zentrale Tagesregister auf `origin/main` enthält für den 24.10.2026 ausschließlich eine Website-Reservierung:
+Artikel-URL: https://www.sv-netzwerk.eu/fachwissen/bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten/
 
-Publication-ID: `2026-10-24-bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten`
+Der Live-Stand zeigt Datum 24. Oktober 2026, Titel, vollständigen Inhalt, Christian Wächter als Absender, Canonical, Übersicht, Kategorie, sieben Tag-Routen, Sitemap und robots. Registerstatus: `published-verified`. Website-Commit: `b8341b587073c22501af58eaca27d36dcba80849`. Deployment: https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40092171022. Der abschließende Dokumentations-/Live-Prüfstand wurde mit `0776b519b40912cde915e4f4e2d4a4a45e72998` und dem finalen Deploy-Nachweis im Register dokumentiert.
 
-Titel: „Bauablauf im Schadenfall: Terminplan, Behinderungsanzeige und Stillstandskosten sauber trennen“
+## Duplikatprüfung und Veröffentlichung
 
-Kanonische URL: https://www.sv-netzwerk.eu/fachwissen/bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten/
+Vor dem Absenden wurde die aktuelle persönliche Aktivitätsseite von Christian Wächter im angemeldeten Chrome-Profil neu geladen. Der jüngste eigene Fachbeitrag war vom 21.10.2026; ein Beitrag zum Bauablauf-Thema vom 24.10.2026 war nicht vorhanden. Der gemeinsame Register-Guard reservierte die LinkedIn-Veröffentlichung atomar für `codex-linkedin-20261024-01a16daf`.
 
-Website-Status: `reserved`; Eigentümer: `codex-website-20261024-0600`; Reservierung: `2026-10-24T11:41:25.075Z`; LinkedIn-Status: `not-posted`.
+Der Begleittext wurde als natürlicher Fließtext mit drei Absätzen, getrenntem Hashtag-Absatz, Fachgrenzen und kanonischem Artikellink eingefügt. Es gab keine Aufzählungsmarker, keine interne Rotationserklärung und keine erfundenen Fälle oder Messwerte. Vor dem Absenden war die tatsächliche Vorschau sichtbar geprüft. Das Bildbudget betrug 0 USD; der Beitrag wurde ohne Bild und ohne Bildhinweis veröffentlicht.
 
-Die Registerreservierung ist keine Veröffentlichung und keine Freigabe für LinkedIn.
+LinkedIn bestätigte „Der Beitrag wurde gepostet“. Echter Permalink: https://www.linkedin.com/feed/update/urn:li:activity:7519735612388696064/
 
-## Sichtbare Live-Prüfung
+Veröffentlichungszeit und Verifikation: 24.10.2026, 14:25:51 Europe/Berlin. Am Permalink wurden Christian Wächter als Absender, der vollständige Text, Hashtags, die Linkvorschau „Bauablauf im Schadenfall fachlich prüfen | SV-Netzwerk“ und der korrekte Artikelbezug sichtbar geprüft. Ein Screenshot des Permalinks wurde im Lauf visuell gesichert.
 
-Die Fachwissensübersicht https://www.sv-netzwerk.eu/fachwissen/ zeigt als jüngsten Eintrag weiterhin den Artikel vom 23.10.2026 „Nachträge im Sachschaden: technische Notwendigkeit, Mengen und Kosten sauber prüfen“. Die reservierte 24.-Oktober-URL wurde im sichtbaren Browser geöffnet und liefert `404 Not Found`; eine kanonische Detailseite, ein Veröffentlichungsdatum und ein vollständiger Artikel sind nicht vorhanden.
+Registerstatus: `published-verified`; Verifikationscommit: `d60ba396669f312c81eb42007d9f031308c3e435`. Es wurde kein zweiter Beitrag gesendet und kein bestehender Beitrag gelöscht oder bearbeitet.
 
-Der sichtbare Live-Marker https://www.sv-netzwerk.eu/deploy-version.txt weist weiterhin aus:
+## Automationsreparatur
 
-`Commit: 1ee67c5d8922321eaa8a4c70884ee479d70e4a49`
+Die aktive 06:00-Automation „SV-Netzwerk – täglich genau ein Fachartikel“ wurde um eine Recovery-Regel ergänzt: bestehende Reservierungen werden bei anfänglichem 404 oder verspätetem Quellpfad innerhalb des Prüffensters mit derselben Publication-ID und demselben Owner fortgesetzt. Ein zweites Tagesthema wird nicht erzeugt. Die 07:00-Automation „SV-Netzwerk – LinkedIn täglich veröffentlichen“ bleibt aktiv; sie übernimmt nur `published-verified`-Artikel und prüft Profil, Register und Permalink vor und nach dem Absenden.
 
-`Build-Zeit: 2026-10-23T16:47:50.731Z`
-
-Damit ist für den 24.10.2026 kein erfolgreich live ausgelieferter Tagesartikel nachgewiesen. Der Quellpfad des reservierten Artikels ist im aktuellen `origin/main` ebenfalls noch nicht vorhanden.
-
-## LinkedIn-Entscheidung
-
-Es wurde keine LinkedIn-Reservierung angelegt, weil der gemeinsame Schutzmechanismus vor der LinkedIn-Reservierung einen `published-verified`-Website-Status verlangt. Es wurde kein Begleittext erstellt, kein Bild erzeugt oder hochgeladen, kein Absenden ausgelöst und kein Permalink behauptet. Zusatzbudget und tatsächliche Bildkosten bleiben 0 USD.
-
-## Erforderlicher nächster Schritt
-
-Der Website-Lauf muss den reservierten Artikel fachlich fertigstellen, deployen und die kanonische Detailseite mit Datum, Inhalt, `deploy-version.txt` und erfolgreichem Deployment-Run nachweisen. Erst danach darf ein neuer LinkedIn-Lauf den Registerstatus erneut prüfen, die jüngsten Profilaktivitäten live abgleichen und gegebenenfalls genau einmal veröffentlichen. Bis dahin bleibt der Auftrag blockiert; ein alter Artikel darf nicht ersatzweise gepostet werden.
-
-Nur Status- und Nachweisdokumentation wird mit `[skip ci]` auf `main` gespeichert; kein zusätzlicher Website-Deploy wird ausgelöst.
+Zusatzbudget und tatsächliche Bildkosten: 0 USD. Keine Bild-API, kein API-Schlüssel, keine Credits und kein Stockkauf.
