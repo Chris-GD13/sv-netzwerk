@@ -613,7 +613,13 @@ async function runImport(run) {
     const claimKeys = new Set([id, mapped.claimsforce_claim_id, mapped.schaden_nr, mapped.claim_number].map(value => String(value || '').trim()).filter(Boolean));
     const taskMatchesClaim = task => {
       const candidates = [task?.claimId, task?.claim_id, task?.claim?.id, task?.claim?.claimId, task?.damageId, task?.damage_id, task?.caseId, task?.case_id, task?.claimNumber, task?.claim_number, task?.damageNumber, task?.damage_number, task?.caseNumber, task?.case_number];
-      return candidates.some(value => claimKeys.has(String(value || '').trim()));
+      if (candidates.some(value => claimKeys.has(String(value || '').trim()))) return true;
+      // ClaimsForce has returned several task envelope shapes over time. As a
+      // safe fallback, accept an exact claim-id/number occurrence anywhere in
+      // the task JSON; this avoids dropping a real task merely because its
+      // identifier is nested under a versioned envelope.
+      const blob = JSON.stringify(task || {});
+      return [...claimKeys].some(key => key.length >= 6 && blob.includes(`"${key}"`));
     };
     const fileIndex = files.map(file => ({ id: file.id, name: file.fileName || file.name, path: claimFolderPath(file, folders), parentFolderId: file.parentFolderId, rootFolderId: file.rootFolderId, attachmentReference: !!file.attachmentReference }));
     const tasks = (unwrap(rawTasks, 'tasks') || []).filter(taskMatchesClaim);
