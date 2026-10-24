@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/oauth/lib.php';
+require_once dirname(__DIR__) . '/api/case-search.php';
 require_once __DIR__ . '/drive-read.php';
 commonHeaders();
 
@@ -35,8 +36,8 @@ function ownCases(array $user, string $query=''): array {
       COALESCE(NULLIF(o.case_no,''),(SELECT b.case_no FROM bki_calculations b WHERE b.folder_id=o.folder_id ORDER BY b.created_at DESC LIMIT 1)) case_no,
       COALESCE(NULLIF(o.object_name,''),(SELECT b.object_name FROM bki_calculations b WHERE b.folder_id=o.folder_id ORDER BY b.created_at DESC LIMIT 1)) object_name,
       COALESCE(NULLIF(o.damage_type,''),(SELECT b.damage_type FROM bki_calculations b WHERE b.folder_id=o.folder_id ORDER BY b.created_at DESC LIMIT 1)) damage_type
-      FROM case_folder_owners o WHERE o.user_id=:user";
-    $params=[':user'=>(int)$user['id']];
+      FROM case_folder_owners o WHERE ".caseSearchOwnerScope($user);
+    $params=[':user_id'=>(int)$user['id'], ':user_email'=>(string)($user['email']??'')];
     if ($query!=='') { $sql .= " AND (o.folder_id LIKE :q OR o.case_no LIKE :q OR o.policy_no LIKE :q OR o.object_name LIKE :q OR o.damage_type LIKE :q OR o.case_type LIKE :q OR EXISTS(SELECT 1 FROM bki_calculations b WHERE b.folder_id=o.folder_id AND (b.case_no LIKE :q OR b.object_name LIKE :q OR b.damage_type LIKE :q)))"; $params[':q']='%'.$query.'%'; }
     $sql .= ' ORDER BY o.registered_at DESC LIMIT 50';
     $stmt=db()->prepare($sql);$stmt->execute($params);return $stmt->fetchAll() ?: [];
@@ -46,8 +47,8 @@ function ownCase(array $user, string $folderId): ?array {
       COALESCE(NULLIF(o.case_no,''),(SELECT b.case_no FROM bki_calculations b WHERE b.folder_id=o.folder_id ORDER BY b.created_at DESC LIMIT 1)) case_no,
       COALESCE(NULLIF(o.object_name,''),(SELECT b.object_name FROM bki_calculations b WHERE b.folder_id=o.folder_id ORDER BY b.created_at DESC LIMIT 1)) object_name,
       COALESCE(NULLIF(o.damage_type,''),(SELECT b.damage_type FROM bki_calculations b WHERE b.folder_id=o.folder_id ORDER BY b.created_at DESC LIMIT 1)) damage_type
-      FROM case_folder_owners o WHERE o.user_id=:user AND o.folder_id=:folder LIMIT 1");
-    $stmt->execute([':user'=>(int)$user['id'],':folder'=>$folderId]);
+      FROM case_folder_owners o WHERE ".caseSearchOwnerScope($user)." AND o.folder_id=:folder LIMIT 1");
+    $stmt->execute([':user_id'=>(int)$user['id'],':user_email'=>(string)($user['email']??''),':folder'=>$folderId]);
     $row=$stmt->fetch();
     return $row ?: null;
 }
