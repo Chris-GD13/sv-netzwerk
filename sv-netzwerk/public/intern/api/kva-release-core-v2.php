@@ -64,6 +64,58 @@ function krCaseContacts(string $folder): array
     return [];
 }
 
+/**
+ * Dedupe expensive KVA reads across mobile retries, refreshes and parallel tabs.
+ * The key includes the case, action and exact source bytes. A completed result
+ * is reused; a concurrent request is rejected instead of starting another
+ * provider chain. Failed work is released so a later intentional retry remains
+ * possible.
+ */
+function krKvaCached(string $action, string $folder, string $name, string $mime, string $bytes, callable $producer): array
+{
+    $key = hash('sha256', $action."\0".$folder."\0".$name."\0".$mime."\0".$bytes);
+    $db = db();
+    $db->exec('CREATE TABLE IF NOT EXISTS kva_ai_cache (cache_key CHAR(64) PRIMARY KEY, folder_id VARCHAR(190) NOT NULL, action VARCHAR(40) NOT NULL, status VARCHAR(16) NOT NULL, result_json MEDIUMTEXT NULL, updated_at BIGINT NOT NULL, INDEX idx_kva_ai_cache_folder (folder_id, action))');
+    $read = $db->prepare('SELECT status, result_json, updated_at FROM kva_ai_cache WHERE cache_key=:key LIMIT 1');
+    $read->execute([':key'=>$key]);
+    $existing = $read->fetch(PDO::FETCH_ASSOC);
+    if (is_array($existing) && (string)$existing['status'] === 'ready' && is_string($existing['result_json'] ?? null)) {
+        $cached = json_decode((string)$existing['result_json'], true);
+        if (is_array($cached)) return $cached;
+    }
+    if (is_array($existing) && (string)$existing['status'] === 'running' && time()-(int)($existing['updated_at'] ?? 0) < 900) {
+        throw new RuntimeException('KVA-Auswertung läuft bereits. Bitte das Ergebnis abwarten und nicht erneut starten.');
+    }
+    if (is_array($existing) && (string)$existing['status'] === 'running') {
+        $reset = $db->prepare('UPDATE kva_ai_cache SET updated_at=:updated WHERE cache_key=:key AND status="running"');
+        $reset->execute([':updated'=>time(), ':key'=>$key]);
+    }
+    $insert = $db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite' ? 'INSERT OR IGNORE' : 'INSERT IGNORE';
+    $claimedAt = time();
+    $claim = $db->prepare("$insert INTO kva_ai_cache (cache_key, folder_id, action, status, result_json, updated_at) VALUES (:key,:folder,'$action','running',NULL,:updated)");
+    $claim->execute([':key'=>$key, ':folder'=>$folder, ':updated'=>$claimedAt]);
+    $read->execute([':key'=>$key]);
+    $state = $read->fetch(PDO::FETCH_ASSOC);
+    if (is_array($state) && (string)$state['status'] === 'ready' && is_string($state['result_json'] ?? null)) {
+        $cached = json_decode((string)$state['result_json'], true);
+        if (is_array($cached)) return $cached;
+    }
+    if (is_array($state) && (string)$state['status'] === 'running' && (int)($state['updated_at'] ?? 0) !== $claimedAt) {
+        throw new RuntimeException('KVA-Auswertung läuft bereits. Bitte das Ergebnis abwarten und nicht erneut starten.');
+    }
+    try {
+        $result = $producer();
+        if (!is_array($result)) throw new RuntimeException('KVA-Auswertung lieferte kein verwertbares Ergebnis.');
+        $save = $db->prepare('UPDATE kva_ai_cache SET status="ready", result_json=:result, updated_at=:updated WHERE cache_key=:key');
+        $save->execute([':result'=>json_encode($result, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), ':updated'=>time(), ':key'=>$key]);
+        return $result;
+    } catch (Throwable $error) {
+        $drop = $db->prepare('DELETE FROM kva_ai_cache WHERE cache_key=:key AND status="running"');
+        $drop->execute([':key'=>$key]);
+        throw $error;
+    }
+}
+
 function krMergeContacts(array $case, array $result): array
 {
     $fields = ['company'=>'sanierer_firma','contact_person'=>'sanierer_ansprechpartner','street'=>'sanierer_strasse','postal_code'=>'sanierer_plz','city'=>'sanierer_ort','email'=>'sanierer_email','phone'=>'sanierer_telefon','fax'=>'sanierer_fax','website'=>'sanierer_website'];
@@ -234,7 +286,8 @@ function krV2Handle(array $user): void
             $name = basename((string)($file['name'] ?? 'KVA'));
             $mime = (string)(mime_content_type((string)$file['tmp_name']) ?: ($file['type'] ?? 'application/octet-stream'));
             $bytes = (string)file_get_contents((string)$file['tmp_name']);
-            apiJson(['ok'=>true,'source'=>$name,'analysis'=>krAnalyzeCalculation($name, $mime, $bytes)]);
+            $analysis = krKvaCached('technical_analyze', '', $name, $mime, $bytes, fn()=>krAnalyzeCalculation($name, $mime, $bytes));
+            apiJson(['ok'=>true,'source'=>$name,'analysis'=>$analysis]);
         }
         $folder = trim((string)($_REQUEST['folder_id'] ?? ''));
         requireCaseFolderAccess($folder, $user);
@@ -250,7 +303,8 @@ function krV2Handle(array $user): void
             } else {
                 ['name'=>$name,'mime'=>$mime,'bytes'=>$bytes] = krSelected($folder, trim((string)($_POST['file_id'] ?? '')));
             }
-            apiJson(['ok'=>true,'source'=>$name,'analysis'=>krAnalyzeCalculation($name, $mime, $bytes)]);
+            $analysis = krKvaCached('calculation_analyze', $folder, $name, $mime, $bytes, fn()=>krAnalyzeCalculation($name, $mime, $bytes));
+            apiJson(['ok'=>true,'source'=>$name,'analysis'=>$analysis]);
         }
         if ($action === 'refresh_contacts') {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') apiError(405, 'POST erforderlich.');
@@ -258,7 +312,8 @@ function krV2Handle(array $user): void
             if ($kvas === []) throw new RuntimeException('Im aktiven Schadenfall wurde kein KVA oder Angebot gefunden.');
             $selected = $kvas[0];
             ['name'=>$name,'mime'=>$mime,'bytes'=>$bytes] = krSelected($folder, (string)$selected['id']);
-            $detectedContacts = kvaDetectedCaseContacts(krAnalyzeContacts($name, $mime, $bytes));
+            $contactAnalysis = krKvaCached('refresh_contacts', $folder, $name, $mime, $bytes, fn()=>krAnalyzeContacts($name, $mime, $bytes));
+            $detectedContacts = kvaDetectedCaseContacts($contactAnalysis);
             if ($detectedContacts === []) throw new RuntimeException('Aus dem neuesten KVA konnten keine Saniererdaten sicher erkannt werden.');
             $contactMerge = kvaMergeCaseContacts(krCaseContacts($folder), $detectedContacts, $name, '');
             apiJson(['ok'=>true,'source'=>$name,'contacts'=>$detectedContacts,'case_contact_updates'=>$contactMerge['applied'],'contact_hints'=>$contactMerge['conflicts']]);
@@ -284,8 +339,14 @@ function krV2Handle(array $user): void
                 ['name'=>$name,'mime'=>$mime,'bytes'=>$bytes] = krSelected($folder, trim((string)($_POST['file_id'] ?? '')));
             }
             $uploadName = kvaOpenAiUploadName($name, $mime);
-            $result = krAnalyze($uploadName, $mime, $bytes);
-            $contactAnalysis = krAnalyzeContacts($uploadName, $mime, $bytes);
+            $bundle = krKvaCached('analyze', $folder, $name, $mime, $bytes, function () use ($uploadName, $mime, $bytes): array {
+                return [
+                    'result'=>krAnalyze($uploadName, $mime, $bytes),
+                    'contact_analysis'=>krAnalyzeContacts($uploadName, $mime, $bytes),
+                ];
+            });
+            $result = is_array($bundle['result'] ?? null) ? $bundle['result'] : [];
+            $contactAnalysis = is_array($bundle['contact_analysis'] ?? null) ? $bundle['contact_analysis'] : [];
             $detectedContacts = kvaDetectedCaseContacts($contactAnalysis);
             $caseContacts = krCaseContacts($folder);
             $net = krMoney($result['net_total'] ?? null);
