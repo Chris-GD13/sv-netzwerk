@@ -180,16 +180,6 @@ jobs:
           chmod 600 ~/.ssh/portal_key
           ssh-keyscan -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           echo "set sftp:connect-program \"ssh -a -x -i $HOME/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes\"" > ~/.lftp/rc
-      - name: Claimsforce Browser Worker auf dem Portalserver installieren
-        env:
-          SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
-          SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
-          SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
-        run: |
-          set -euo pipefail
-          scp -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -P "$SFTP_PORT"             claimsforce-worker/install.sh             "$SFTP_USERNAME@$SFTP_HOST:/tmp/install-claimsforce-worker.sh"
-          ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT"             "$SFTP_USERNAME@$SFTP_HOST"             "chmod 700 /tmp/install-claimsforce-worker.sh && /tmp/install-claimsforce-worker.sh && rm -f /tmp/install-claimsforce-worker.sh"
-
       - name: PDF-Seitenprüfung auf dem Portalserver sicherstellen
         env:
           SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
