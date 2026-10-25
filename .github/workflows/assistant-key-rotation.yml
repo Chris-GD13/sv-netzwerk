@@ -12,6 +12,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - name: Verify byte-preserving environment update
+        run: python3 -m unittest discover -s scripts -p 'test_env_key_update.py'
       - name: Configure and verify dedicated key without application deployment
         env:
           SSH_KEY: ${{ secrets.PORTAL_SSH_KEY }}
@@ -27,6 +29,7 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/portal_key
           chmod 600 ~/.ssh/portal_key
           ssh-keyscan -p "$PORT" "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
-          target="/tmp/assistant-key-${GITHUB_RUN_ID}.py"
-          scp -i ~/.ssh/portal_key -o BatchMode=yes -P "$PORT" scripts/configure-assistant-key.py "$USER@$HOST:$target"
-          printf '%s' "$ASSISTANT_KEY" | ssh -i ~/.ssh/portal_key -o BatchMode=yes -p "$PORT" "$USER@$HOST" "python3 '$target' '$ROOT'; result=\$?; rm -f '$target'; exit \$result"
+          target="/tmp/assistant-key-${GITHUB_RUN_ID}"
+          ssh -i ~/.ssh/portal_key -o BatchMode=yes -p "$PORT" "$USER@$HOST" "mkdir -m 700 '$target'"
+          scp -i ~/.ssh/portal_key -o BatchMode=yes -P "$PORT" scripts/configure-assistant-key.py scripts/env_key_update.py "$USER@$HOST:$target/"
+          printf '%s' "$ASSISTANT_KEY" | ssh -i ~/.ssh/portal_key -o BatchMode=yes -p "$PORT" "$USER@$HOST" "PYTHONDONTWRITEBYTECODE=1 python3 '$target/configure-assistant-key.py' '$ROOT'; result=\$?; rm -f '$target/configure-assistant-key.py' '$target/env_key_update.py'; rmdir '$target'; exit \$result"
