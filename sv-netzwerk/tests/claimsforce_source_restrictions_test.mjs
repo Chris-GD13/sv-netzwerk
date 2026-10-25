@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import { webcrypto } from 'node:crypto';
 import { claimFolderPath, safeFileName } from '../browser-extension/claimsforce-bridge/import-utils.js';
 import { isClaimsforceMail, normalizeClaimsforceMail } from '../scripts/claimsforce-mail.js';
+import {readSourceOrRecordLegacyConflict} from '../browser-extension/claimsforce-bridge/source-read-isolation.mjs';
 
 assert(isClaimsforceMail({name:'Mail_ClaimsForce-Nachricht_langer-Betreff-ohne-Endung',mimeType:'application/json'}));
 assert(isClaimsforceMail({name:'Mail_ClaimsForce-Nachricht_kurz.json'}));
@@ -46,13 +47,14 @@ async function run(status, reference) {
     run: {}, files, fileIndex: files.map(file => ({ id: file.id, name: file.fileName })), messages, folders: [], existingMeta: {}, index: 0, claims: [{}], mapped: { schaden_nr: '26-085905-9' }, item: {},
     profile: 'christian', folderId: 'case', id: 'claim', token: 'test', config: { FILES_API_ENDPOINT: 'https://files.example', COMMUNICATION_API_ENDPOINT: 'https://messages.example' },
     fileVersion: file => file?.id || '', messageVersion: message => message.id,
-    claimFolderPath, safeFileName, portalTabId: () => 1,
+    claimFolderPath, safeFileName, readSourceOrRecordLegacyConflict, portalTabId: () => 1,
     filesDone: 0, messagesDone: 0, appointmentsDone: 0, appointments: [], notes: [{ id: 'note' }], tasks: [{ id: 'task' }], rawNotes: [],
     inventory: { files: 2, messages: 2, notes: 1, tasks: 1 }, signature: 'complete',
     async diagnostic() {}, async progress() {},
     async portal(_tabId, message) {
       if (message.type === 'PORTAL_SOURCE_STATE') {
         sourceStates.push(message.sourceIdentity);
+        if(status==='legacy' && message.sourceIdentity.sourceFileId==='locked')throw Error('LEGACY_SOURCE_BINDING_REQUIRED: fixture');
         return { result: { source_state: { kind: 'EXISTING_SOURCE', context: { caseId: message.sourceIdentity.claimId, sourceFileId: message.sourceIdentity.sourceFileId, profile: message.profile }, portalFileId: `stored-${message.sourceIdentity.sourceFileId}`, originalPrecondition: { sha256: 'original-fixture-hash' } } } };
       }
       if (message.type === 'PORTAL_SOURCE_UPLOAD_START') { sourceUploads.set(message.uploadId, {...message, chunks: []}); return {ok:true}; }
@@ -90,6 +92,13 @@ assert.deepEqual([...complete.fileVersions], ['accessible']);
 assert.deepEqual([...complete.messageVersions], ['mail-1', 'mail-2']);
 assert.equal(complete.notes.length, 1);
 assert.equal(complete.tasks.length, 1);
+const legacy = await run('legacy', false);
+assert.equal(legacy.outcome.ok,false);
+assert.match(legacy.outcome.message,/CF-SOURCE-INCOMPLETE/);
+assert.equal(legacy.context.messagesDone,2,'Altdatei-Konflikt darf die Aufgabenmail nicht verschlucken');
+assert.equal(legacy.context.filesDone,1,'Unabhängiges gebundenes Original wird weiter gelesen');
+assert.equal(legacy.calls.filter(url=>url.includes('locked')).length,0,'Kein Ersatzendpunkt oder Upload für ungebundene Altdatei');
+assert.deepEqual([...legacy.commits.at(-1).messageVersions],['mail-2'],'Mail mit ungeklärtem Beleg bleibt unvollständig');
 const mail = normalizeClaimsforceMail({ payload: { subject: 'Schadenfall', from: {name: 'Absender', email:'test@example.org'}, to: ['target@example.org'], body: 'Originaltext' }, attachments: [{id:'locked'}], _svnetImport: {attachments:[{id:'locked',name:'Kostennote',restricted:true}]} });
 assert.equal(mail.body, 'Originaltext');
 assert.equal(mail.from, 'Absender <test@example.org>');
