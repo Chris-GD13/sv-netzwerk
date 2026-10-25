@@ -38,9 +38,12 @@
         "verified_at": "2026-10-25T05:20:13.908Z"
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "reserved",
+        "owner": "codex-linkedin-20261025-01a171a2",
+        "reserved_at": "2026-10-25T06:00:17.150Z",
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/luftdichtheitsmessung-gebaeude-messziel-praeparation-leckagebefund/"
       }
     }
   },
-  "updated_at": "2026-10-25T05:20:13.908Z"
+  "updated_at": "2026-10-25T06:00:17.150Z"
 }
