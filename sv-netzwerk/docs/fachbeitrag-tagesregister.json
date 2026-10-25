@@ -30,14 +30,17 @@
         "title": "Luftdichtheitsmessung am Gebäude: Messziel, Präparation und Leckagebefund sauber trennen",
         "slug": "luftdichtheitsmessung-gebaeude-messziel-praeparation-leckagebefund",
         "url": "https://www.sv-netzwerk.eu/fachwissen/luftdichtheitsmessung-gebaeude-messziel-praeparation-leckagebefund/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-website-20261025-0600",
-        "reserved_at": "2026-10-25T05:04:47.382Z"
+        "reserved_at": "2026-10-25T05:04:47.382Z",
+        "commit": "e514123c2800f296c1d788a0164be56a968e3b99",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40164652179",
+        "verified_at": "2026-10-25T05:20:13.908Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-25T05:04:47.382Z"
+  "updated_at": "2026-10-25T05:20:13.908Z"
 }
