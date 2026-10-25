@@ -1,4 +1,6 @@
 import {openExistingNativeForm} from './native-form-navigation.mjs';
+import {readSourceOrRecordLegacyConflict} from './source-read-isolation.mjs';
+import {readClaimsSource, parseSourceRequest} from './claims-source-reader.mjs';
 import { createManualNotesReader } from './claims-notes-reader.mjs';
 import { waitForViewer } from './draft-agent-core.mjs';
 import { clearCredentials, loadCredentials, loadPortalCredentials, saveCredentials } from './vault.js';
@@ -23,7 +25,7 @@ const PROFILE_EMAILS = {
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS', 'SW'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
-const WORKER_CODE_VERSION = '1.4.65';
+const WORKER_CODE_VERSION = '1.4.66';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
@@ -486,7 +488,9 @@ async function discoverSingleClaimSource(run) {
 }
 
 async function runImport(run) {
-  const portalTabId = () => Number(run.portalTabId || 0), singleClaimNumber = String(run.claimNumber || '').trim(), singleSync = run.mode === 'single' || singleClaimNumber !== '', fullSync = run.mode === 'full' || !!run.full;
+  const directRead = run.mode === 'source';
+  if (directRead) parseSourceRequest(run.claimNumber);
+  const portalTabId = () => Number(run.portalTabId || 0), singleClaimNumber = String(run.claimNumber || '').trim(), singleSync = !directRead && (run.mode === 'single' || singleClaimNumber !== ''), fullSync = run.mode === 'full' || !!run.full;
   const useInvoicedClaims = fullSync || singleSync;
   if (singleSync && !singleClaimNumber.replace(/[^A-Za-z0-9]/g, '')) throw new Error('[CF-SINGLE-01] Für den Einzelfallimport fehlt die Schadennummer.');
   let profile=profileKey(run.profile);
@@ -504,8 +508,8 @@ async function runImport(run) {
   const { tab, token } = await claimsTab(profile, run, credential);
   run.claimsTabId = tab.id;
   await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
-  const openTasks = singleSync ? null : await readOpenTasks(tab.id);
-  if (!singleSync) await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks, reader: lastTaskDebug });
+  const openTasks = singleSync || directRead ? null : await readOpenTasks(tab.id);
+  if (!singleSync && !directRead) await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks, reader: lastTaskDebug });
   if(run.mode==='tasks'){
     if(!Number.isInteger(openTasks))throw new Error(`[CF-TASKS-04] Zaehler nicht lesbar. ${lastTaskDebug?.path || '?'}; K=${JSON.stringify(lastTaskDebug?.candidates || [])}; ${(lastTaskDebug?.samples || []).filter(t => t.startsWith('Umfeld')).slice(0, 2).join(' // ').replace(/Umfeld: /g, '')}`.slice(0, 480));
     const response = await requestJson('https://tasks-api.claimsforce.com/tasks', token);
@@ -519,6 +523,20 @@ async function runImport(run) {
   try { config = await (await fetch('https://web.claimsforce.com/config', { signal: configController.signal })).json(); }
   catch (error) { throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Konfiguration hat das Zeitlimit überschritten.' : 'ClaimsForce-Konfiguration konnte nicht geladen werden.'); }
   finally { clearTimeout(configTimer); }
+  if (directRead) return readClaimsSource(run.claimNumber, {
+    profile, config, json:url=>requestJson(url, token),
+    bytes:async url=>{
+      const response=await fetch(`${url}?token=${encodeURIComponent(token)}`, {signal:AbortSignal.timeout(30000)});
+      if (!response.ok) throw Error(`SOURCE_DOCUMENT_HTTP_${response.status}`);
+      if (Number(response.headers.get('content-length'))>8*1024*1024) throw Error('SOURCE_DOCUMENT_LIMIT_8MB');
+      const buffer=await response.arrayBuffer();
+      if (buffer.byteLength>8*1024*1024) throw Error('SOURCE_DOCUMENT_LIMIT_8MB');
+      let binary=''; const data=new Uint8Array(buffer);
+      for(let offset=0;offset<data.length;offset+=0x8000) binary+=String.fromCharCode(...data.subarray(offset,offset+0x8000));
+      const sha256=[...new Uint8Array(await crypto.subtle.digest('SHA-256',buffer))].map(v=>v.toString(16).padStart(2,'0')).join('');
+      return {mime:response.headers.get('content-type') || 'application/octet-stream',sha256,base64:btoa(binary)};
+    }
+  });
   const claimsById = new Map(), bucketCounts = {};
   if (useInvoicedClaims) {
     const fullSyncWindow = run.since ? `ab ${run.since}` : 'ohne Datumsgrenze';
@@ -676,7 +694,15 @@ async function runImport(run) {
       let name = safeFileName(sourcePath ? `${sourcePath}__${baseName}` : baseName);
       await progress(portalTabId(), `${mapped.schaden_nr || item.label}: ${name}`, index, claims.length);
       // Capture the portal original BEFORE downloading Claims bytes; CAS rejects intervening edits.
-      const source = await prepareSourceUpload(portalTabId(), profile, folderId, id, file.id);
+      const source = await readSourceOrRecordLegacyConflict(
+        () => prepareSourceUpload(portalTabId(), profile, folderId, id, file.id),
+        async error => {
+          sourceErrors.push({ kind: 'file', id: file.id, name, code: 'LEGACY_SOURCE_BINDING_REQUIRED', message: error.message });
+          unavailableFileIds.add(file.id);
+          await diagnostic(run, 'CF-SOURCE-LEGACY', `Altdateizuordnung für „${name}“ offen. Weitere Dateien und Nachrichten werden geprüft.`, { current: index, total: claims.length, claimIndex: index + 1 });
+        }
+      );
+      if (source === null) { caseDeadline = Date.now() + 300000; continue; }
       const url = `${config.FILES_API_ENDPOINT}/claims/${encodeURIComponent(id)}/files/${encodeURIComponent(file.id)}?token=${encodeURIComponent(token)}`;
       const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 30000);
       let response, fileBuffer;
@@ -723,7 +749,7 @@ async function runImport(run) {
       const subject = safeFileName(record?.subject || record?.payload?.subject || record?.id, 'Nachricht');
       const archivedRecord = { ...record, _svnetImport: { attachments: (record?.attachments || []).map(attachment => {
         const file = fileIndex.find(file => file.id === attachment.id);
-        return { id: attachment.id, name: file?.name || attachment.fileName || attachment.name || `Falldokument ${attachment.id}`, path: file?.path || '', restricted: restrictedFiles.some(file => file.id === attachment.id) };
+        return { id: attachment.id, name: file?.name || attachment.fileName || attachment.name || `Falldokument ${attachment.id}`, path: file?.path || '', restricted: restrictedFiles.some(file => file.id === attachment.id), available: !unavailableFileIds.has(attachment.id), error: sourceErrors.find(error => error.id === attachment.id)?.code || null };
       }) } };
       const bytes = new TextEncoder().encode(JSON.stringify(archivedRecord, null, 2));
       const uploaded = await uploadSupporting( `Mail_ClaimsForce-Nachricht_${stamp}_${record?.id || message.id}_${subject}.json`, 'application/json', Date.parse(record?.updatedDate || record?.updatedAt || record?.createdDate || record?.createdAt || '') || 0, bytes.buffer);
@@ -800,7 +826,7 @@ async function startImport(sender, message) {
   const portalTabId = sender.tab?.id;
   if (!portalTabId) return { ok: false, error: '[CF-RUN-00] Portal-Registerkarte fehlt.' };
   const claimNumber = String(message.claimNumber || '').trim();
-  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), mode: claimNumber ? 'single' : message.mode === 'tasks' ? 'tasks' : message.mode === 'single' ? 'single' : message.mode === 'full' || message.full ? 'full' : 'quick', sourceProfiles: Array.isArray(message.sourceProfiles)?message.sourceProfiles.filter(p=>['christian','jens'].includes(p)&&profileKey(message.profile)==='christian'):[], claimNumber, since: String(message.since || ''), portalTabId, startedAt: new Date().toISOString() };
+  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), mode: message.mode === 'source' ? 'source' : claimNumber ? 'single' : message.mode === 'tasks' ? 'tasks' : message.mode === 'single' ? 'single' : message.mode === 'full' || message.full ? 'full' : 'quick', sourceProfiles: Array.isArray(message.sourceProfiles)?message.sourceProfiles.filter(p=>['christian','jens'].includes(p)&&profileKey(message.profile)==='christian'):[], claimNumber, since: String(message.since || ''), portalTabId, startedAt: new Date().toISOString() };
   if (runningImport) {
     if (sameImportScope(runningImport, requested) && !runningImport.stopRequested) {
       runningImport.portalTabId = portalTabId;

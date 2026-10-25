@@ -217,7 +217,9 @@ if($action==='claim'){
     if(db()->query("SELECT id FROM claimsforce_import_jobs WHERE status='running' LIMIT 1 FOR UPDATE")->fetchColumn()){db()->commit();db()->query("SELECT RELEASE_LOCK('svnet-claimsforce-import')");apiJson(['ok'=>true,'job'=>null]);}
     $stationProfiles=svnetClaimsStationProfiles($user);
     $profileSlots=implode(',',array_fill(0,count($stationProfiles),'?'));
-    $claim=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE status='queued' AND profile IN ($profileSlots) ORDER BY (sync_mode='single') DESC,(requested_by='system:claimsforce') ASC,created_at,id LIMIT 1 FOR UPDATE");
+    // Old workers cannot interpret direct source requests; leave them queued.
+    $sourceCapability=version_compare((string)($body['workerVersion']??''),'1.4.66','>=')?'1=1':"sync_mode<>'source'";
+    $claim=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE status='queued' AND profile IN ($profileSlots) AND ($sourceCapability) ORDER BY (sync_mode IN ('single','source')) DESC,(requested_by='system:claimsforce') ASC,created_at,id LIMIT 1 FOR UPDATE");
     $claim->execute($stationProfiles);
     $row=$claim->fetch(PDO::FETCH_ASSOC);
     if(!$row){db()->commit();db()->query("SELECT RELEASE_LOCK('svnet-claimsforce-import')");apiJson(['ok'=>true,'job'=>null]);}

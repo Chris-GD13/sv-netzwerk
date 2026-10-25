@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import {parseSourceRequest,readClaimsSource} from '../browser-extension/claimsforce-bridge/claims-source-reader.mjs';
+const c='11111111-1111-4111-8111-111111111111', m='22222222-2222-4222-8222-222222222222', f='33333333-3333-4333-8333-333333333333';
+const config={DISPOSITION_API_ENDPOINT:'https://disposition-api.claimsforce.com',COMMUNICATION_API_ENDPOINT:'https://communication-api.claimsforce.com',FILES_API_ENDPOINT:'https://files-api.claimsforce.com'};
+let reads=[], downloaded=0;
+const adapter={profile:'christian',config,json:async url=>{
+  reads.push(url);
+  if(url===`${config.DISPOSITION_API_ENDPOINT}/claims/${c}`)return {claim:{id:c}};
+  if(url.endsWith('/messages'))return {messages:[{id:m,subject:'Zahlungsrückfrage',attachments:[{id:f,type:'CLAIM_FILE'}]}]};
+  if(url.endsWith(`/messages/${m}`))return {id:m,claimId:c,subject:'Zahlungsrückfrage',body:'Gezahlt sind 10.132,11 EUR.',attachments:[{id:f,type:'CLAIM_FILE'}]};
+  if(url.endsWith('/files'))return {files:[]};
+  throw Error('UNEXPECTED_GET');
+},bytes:async()=>{downloaded++;return {base64:'YWJj',sha256:'hash',mime:'application/pdf'};}};
+assert.equal((await readClaimsSource(`${c}:messages`,adapter)).messages[0].id,m);
+assert.equal((await readClaimsSource(`${c}:message:${m}`,adapter)).message.body,'Gezahlt sind 10.132,11 EUR.');
+assert.equal((await readClaimsSource(`${c}:document:${f}`,adapter)).sourceId,f);
+assert.equal(downloaded,1);
+await assert.rejects(()=>readClaimsSource(`${c}:document:${m}`,adapter),/SOURCE_FILE_NOT_IN_CLAIM/);
+await assert.rejects(()=>readClaimsSource(`${c}:message:${f}`,adapter),/SOURCE_MESSAGE_NOT_IN_CLAIM/);
+assert.equal(downloaded,1);
+await assert.rejects(()=>readClaimsSource(`${c}:messages`,{...adapter,json:async()=>({id:m})}),/SOURCE_CLAIM_IDENTITY_MISMATCH/);
+await assert.rejects(()=>readClaimsSource(`${c}:messages`,{...adapter,config:{...config,FILES_API_ENDPOINT:'https://claimsforce.com.evil.test'}}),/SOURCE_ENDPOINT_INVALID/);
+for(const key of [`${c}:messages:${m}`,`${c}:document:../../secret`,`${c}:message`,`${c}:message:${m}:x`])assert.throws(()=>parseSourceRequest(key),/INVALID/);
+assert.ok(reads.every(u=>!u.includes('/notes')));
+console.log('PASS: exact task mail and known attachment read; foreign IDs, wrong claim and hostile endpoint rejected; no notes or writes');

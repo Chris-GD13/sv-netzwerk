@@ -4,6 +4,7 @@ require_once dirname(__DIR__) . '/oauth/lib.php';
 require_once dirname(__DIR__) . '/api/case-search.php';
 require_once __DIR__ . '/drive-read.php';
 require_once __DIR__ . '/claims-tasks.php';
+require_once __DIR__ . '/claims-source.php';
 commonHeaders();
 
 function mcpResult(mixed $id, array $result): never { oauthJson(['jsonrpc'=>'2.0','id'=>$id,'result'=>$result]); }
@@ -72,6 +73,7 @@ if ($method==='initialize') mcpResult($id,['protocolVersion'=>(string)($params['
 if ($method==='notifications/initialized') { http_response_code(202); exit; }
 if ($method==='ping') mcpResult($id,(object)[]);
 if ($method==='tools/list') mcpResult($id,['tools'=>[
+  ['name'=>'read_claimsforce_source','title'=>'Claimsforce-Mail oder Originalbeleg direkt lesen','description'=>'Read a case source through the existing authenticated Claimsforce bridge, independently of an incomplete portal file import. Use id from fetch; kind messages lists native message IDs, message reads the selected message_id, document reads a CLAIM_FILE attachment ID. Set refresh=true once to request a read, then poll refresh=false. The browser bridge must be active. No Claimsforce writes, notes or status changes. PDF results include extracted text or local OCR; never treat a list entry as read evidence.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string'],'kind'=>['type'=>'string','enum'=>['messages','message','document']],'source_id'=>['type'=>'string','description'=>'Native message UUID or CLAIM_FILE UUID; omit for messages'],'refresh'=>['type'=>'boolean','default'=>false]],'required'=>['id','kind'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>false,'openWorldHint'=>false,'destructiveHint'=>false]],
   ['name'=>'list_claimsforce_tasks','title'=>'Eigene Claimsforce-Aufgaben lesen und aktualisieren','description'=>'Read the actual Claimsforce task snapshot from the existing authenticated browser bridge. Set refresh=true to queue a fresh read; poll later with refresh=false. Never treat stale or pending data as current. This does not edit or complete Claimsforce tasks.','inputSchema'=>['type'=>'object','properties'=>['refresh'=>['type'=>'boolean','default'=>false]],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>false,'openWorldHint'=>false,'destructiveHint'=>false]],
   ['name'=>'search','title'=>'Eigene Versicherungsfälle suchen','description'=>'Use this when the user wants to find or review insurance claims assigned to their own SV-Netzwerk account.','inputSchema'=>['type'=>'object','properties'=>['query'=>['type'=>'string','description'=>'Schaden-Nr., VN/Objekt, Schadenart oder Suchbegriff']],'required'=>['query'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>true,'openWorldHint'=>false,'destructiveHint'=>false]],
   ['name'=>'fetch','title'=>'Eigenen Versicherungsfall abrufen','description'=>'Use this when a case returned by search must be opened and its verified portal data reviewed.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string','description'=>'Fallordner-ID aus search']],'required'=>['id'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>true,'openWorldHint'=>false,'destructiveHint'=>false]],
@@ -83,6 +85,11 @@ if ($method==='tools/call') {
     $requiredScope=$name==='save_case_draft'?'cases:drafts.write':'cases:read';
     $user = oauthBearerUserOrNull($requiredScope);
     if (!$user) mcpAuthFailure($id,$requiredScope);
+    if ($name==='read_claimsforce_source') {
+        try { $snapshot=mcpClaimsSource($user,trim((string)($args['id']??'')),(string)($args['kind']??''),(string)($args['source_id']??''),($args['refresh']??false)===true); $blocks=mcpSourceContent($snapshot); }
+        catch (Throwable $error) { mcpFailure($id,-32013,$error->getMessage()); }
+        mcpResult($id,['content'=>$blocks]);
+    }
     if ($name==='list_claimsforce_tasks') {
         try { $snapshot=mcpClaimsTasks($user,($args['refresh']??false)===true); }
         catch (Throwable $error) { mcpFailure($id,-32012,$error->getMessage()); }
