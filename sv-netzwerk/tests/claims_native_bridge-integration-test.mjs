@@ -4,7 +4,7 @@ import {moneyCents,validateLinkedEvidence} from '../browser-extension/claimsforc
 const folder=new URL('../browser-extension/claimsforce-bridge/',import.meta.url);
 const tests=[];async function test(name,fn){const t=performance.now();try{const detail=await fn();tests.push({name,ok:true,ms:performance.now()-t,detail});}catch(e){tests.push({name,ok:false,error:e.stack});}}
 function documentMock({duplicate=false,readonly=false,missing=false,blocked=false}={}) {
- const input={name:'Schaden-Nr.',value:'offline',disabled:false,readOnly:readonly,getAttribute:()=>null,getClientRects:()=>[{}]};
+ const input={name:'Schaden-Nr.',value:'offline',disabled:false,readOnly:readonly,getAttribute:()=>null,closest:()=>null,getClientRects:()=>[{}]};
  const inner={body:{},readyState:'complete',querySelectorAll:()=>missing?[]:duplicate?[input,input]:[input]};
  const frame={id:'webviewer-3',getAttribute:()=>'/apryse/11.11.0/./ui/index.html#a=1&basePath=%2Fclaims%2Foffline%2Fforms%2Fform-1',get contentDocument(){if(blocked)throw new Error('cross-origin');return inner;}};
  return {readyState:'complete',querySelectorAll:()=>[frame]};
@@ -15,6 +15,8 @@ function probe(doc,args={}){
  return window.SVNET_FORM_READINESS.observe(doc,location,{caseId:'offline',formId:'form-1',requiredFields:['Schaden-Nr.'],...args});
 }
 await test('native-dom-probe-ready-with-exact-fields',()=>assert.equal(viewerState(probe(documentMock()).observation),'ready'));
+await test('live-Apryse-parent-field-id-with-nameless-input',()=>{const doc=documentMock(),input=doc.querySelectorAll()[0].contentDocument.querySelectorAll()[0];input.name='';input.closest=()=>({id:'Schaden-Nr.'});assert.equal(viewerState(probe(doc).observation),'ready')});
+await test('toolbar-input-is-not-a-native-field',()=>{const doc=documentMock(),input=doc.querySelectorAll()[0].contentDocument.querySelectorAll()[0];input.name='';assert.notEqual(viewerState(probe(doc).observation),'ready')});
 for(const [name,opts,expected] of [['readonly',{readonly:true},'form-unverified'],['missing',{missing:true},'form-unverified'],['duplicate',{duplicate:true},'form-unverified'],['blocked',{blocked:true},'observation-blocked']])await test(`native-dom-${name}`,()=>assert.equal(viewerState(probe(documentMock(opts)).observation),expected));
 await test('native-dom-no-mapping-fails-closed',()=>assert.equal(viewerState(probe(documentMock(),{requiredFields:[]}).observation),'form-unverified'));
 await test('native-dom-wrong-case',()=>assert.equal(viewerState(probe(documentMock(),{caseId:'other'}).observation),'identity-unverified'));

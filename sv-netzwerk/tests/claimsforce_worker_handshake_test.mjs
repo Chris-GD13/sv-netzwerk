@@ -34,6 +34,10 @@ const starts = current.requests.filter(r => r.type.startsWith('START_IMPORT'));
 assert.equal(starts.length, 1);
 assert.deepEqual(JSON.parse(JSON.stringify(starts[0])), { type: 'START_IMPORT_V2', protocol: 2, workerVersion: bridgeVersion, profile: 'christian', jobId: 10, runId: 'single-10', mode: 'single', full: false, claimNumber: '26-085905-9', sourceProfiles:['christian','jens'], since: '' });
 console.log('Alter Worker wird erkannt; altes Startsignal bleibt wirkungslos; Einzelauftrag bleibt vollständig erhalten.');
+await current.send({type:'SVNET_CLAIMS_IMPORT_START_V2',profile:'christian',jobId:11,claimNumber:'operation-uuid',mode:'nativeform',nativeRequest:{action:'inspect',operationId:'operation-uuid'}});
+const nativeStart=current.requests.filter(r=>r.type==='START_IMPORT_V2').at(-1);
+assert.equal(nativeStart.mode,'nativeform','A native operation key must never become a single-claim import');
+assert.equal(nativeStart.nativeRequest.action,'inspect');
 
 const centralCode = fs.readFileSync(new URL('../public/intern/claimsforce-central.js', import.meta.url), 'utf8');
 async function centralStation() {

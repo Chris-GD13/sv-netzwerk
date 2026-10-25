@@ -29,6 +29,27 @@ window.addEventListener('message', event => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if(message?.type==='NATIVE_FORM_INVENTORY'){
+    if(_sender?.id!==chrome.runtime.id||location.pathname!==`/claims/${message.caseId}/investigations`){sendResponse({ok:false,error:'native-inventory-context'});return;}
+    const forms=[];
+    for(const a of document.querySelectorAll('a[href]')){
+      const match=a.getAttribute('href').match(/^\/claims\/([a-f0-9-]+)\/forms\/([a-f0-9-]+)$/i);
+      if(!match||match[1]!==message.caseId||!a.getClientRects().length)continue;
+      let card=a.parentElement;
+      for(let n=0;n<4&&card&&!card.textContent.includes('Formular');n++)card=card.parentElement;
+      const label=(card?.textContent||'').replace(/\s+/g,' ').trim();
+      const count=card?[...card.querySelectorAll('a[href]')].filter(n=>/\/forms\//.test(n.getAttribute('href'))).length:0;
+      forms.push({formId:match[2],label,status:count===1&&label.includes('Formular')&&label.includes('In Bearbeitung')?'draft':label.includes('Versendet')?'sent':'unknown'});
+    }
+    sendResponse({ok:true,result:forms});return;
+  }
+  if (['NATIVE_FORM_SNAPSHOT','NATIVE_FORM_APPLY','NATIVE_FORM_SAVE'].includes(message?.type)) {
+    if (_sender?.id !== chrome.runtime.id) { sendResponse({ok:false,error:'sender-rejected'}); return; }
+    const method={NATIVE_FORM_SNAPSHOT:'snapshot',NATIVE_FORM_APPLY:'apply',NATIVE_FORM_SAVE:'save'}[message.type];
+    Promise.resolve().then(()=>window.SVNET_NATIVE_FORM_DOM[method](message))
+      .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));
+    return true;
+  }
   if (['NAVIGATE_NATIVE_FORM_LIST','OPEN_EXISTING_NATIVE_FORM'].includes(message?.type)) {
     if (_sender?.id !== chrome.runtime.id) { sendResponse({ok:false,error:'sender-rejected'}); return; }
     const idPattern=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;

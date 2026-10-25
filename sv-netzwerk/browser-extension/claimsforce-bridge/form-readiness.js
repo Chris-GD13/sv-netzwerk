@@ -29,7 +29,9 @@
     const names=expected.requiredFields;
     if (!Array.isArray(names)||!names.length||names.some(n=>typeof n!=='string'||!n.trim())) return {ok:true,observation:result};
     const controls=Array.from(inner.querySelectorAll('input,textarea,select'));
-    const matched=names.map(name=>controls.filter(n=>[n.name,n.getAttribute('aria-label'),n.getAttribute('data-field-name')].includes(name)));
+    // Native Apryse widgets carry their field ID on the text/choice wrapper,
+    // including date inputs nested one level deeper. Never match toolbar inputs.
+    const matched=names.map(name=>controls.filter(n=>[n.name,n.getAttribute('aria-label'),n.getAttribute('data-field-name'),n.closest('.text[id],.choice[id]')?.id].includes(name)));
     result.fieldsReadable=matched.every(nodes=>nodes.length===1 && 'value' in nodes[0] && nodes[0].getClientRects().length>0);
     result.fieldsEditable=result.fieldsReadable && matched.every(([n])=>!n.disabled&&!n.readOnly);
     return {ok:true,observation:result};

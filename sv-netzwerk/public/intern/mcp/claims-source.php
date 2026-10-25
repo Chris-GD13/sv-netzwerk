@@ -49,6 +49,7 @@ function mcpSourceContent(array $snapshot): array {
     unset($snapshot['result']['base64']);
     $blocks=[['type'=>'text','text'=>json_encode($snapshot,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR)]];
     $mime=(new finfo(FILEINFO_MIME_TYPE))->buffer($bytes);
+    if(str_starts_with($bytes,"PK\x03\x04")&&in_array($mime,['application/zip','application/vnd.openxmlformats-officedocument.wordprocessingml.document'],true))return array_merge($blocks,mcpDocxContent($bytes));
     if($mime==='application/pdf'){
         $text=mcpDrivePdfText($bytes);
         if($text!=='')$blocks[]=['type'=>'text','text'=>$text];

@@ -77,6 +77,11 @@ function cqRow(int$id):array{
         $row['result']=$row['result_json']?json_decode((string)$row['result_json'],true):null;
         $row['diagnostic']=$row['diagnostic_json']?json_decode((string)$row['diagnostic_json'],true):null;
         $row['source_profiles']=json_decode((string)($row['source_profiles_json']??''),true)?:[$row['profile']];
+        if($row['sync_mode']==='nativeform'){
+            $native=db()->prepare('SELECT request_json FROM claimsforce_native_operations WHERE operation_id=:operation AND job_id=:job AND profile=:profile');
+            $native->execute([':operation'=>$row['claim_number'],':job'=>$row['id'],':profile'=>$row['profile']]);
+            $row['native_request']=json_decode((string)($native->fetchColumn()?:''),true);
+        }
         unset($row['result_json'],$row['diagnostic_json'],$row['source_profiles_json']);
     }
     return$row;
@@ -219,6 +224,7 @@ if($action==='claim'){
     $profileSlots=implode(',',array_fill(0,count($stationProfiles),'?'));
     // Old workers cannot interpret direct source requests; leave them queued.
     $sourceCapability=version_compare((string)($body['workerVersion']??''),'1.4.66','>=')?'1=1':"sync_mode<>'source'";
+    if(version_compare((string)($body['workerVersion']??''),'1.4.70','<'))$sourceCapability.=" AND sync_mode<>'nativeform'";
     $claim=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE status='queued' AND profile IN ($profileSlots) AND ($sourceCapability) ORDER BY (sync_mode IN ('single','source')) DESC,(requested_by='system:claimsforce') ASC,created_at,id LIMIT 1 FOR UPDATE");
     $claim->execute($stationProfiles);
     $row=$claim->fetch(PDO::FETCH_ASSOC);
@@ -250,6 +256,14 @@ if($action==='complete'){
     $job=cqRow($id);
     $message=mb_substr(trim((string)($body['message']??($ok?'Import abgeschlossen.':'Import fehlgeschlagen.'))),0,500);
     if($ok&&!cqSingleResultValid($job,is_array($body['result']??null)?$body['result']:[])){$ok=false;$message='Einzelfallimport unvollständig oder falscher Umfang. Ergebnis wird nicht als erfolgreich bestätigt.';}
+    if($ok&&($job['sync_mode']??'')==='nativeform'){
+        $r=is_array($body['result']??null)?$body['result']:[];$request=$job['native_request']??[];
+        $identity=$r['after']??$r['snapshot']??$r;
+        $valid=($r['source']??'')==='claimsforce-native-form'&&($identity['caseId']??'')===($request['caseId']??'')&&($identity['profile']??'')===($request['profile']??'');
+        if(($request['action']??'')==='save')$valid=$valid&&($r['verified']??false)===true&&($r['operationId']??'')===($request['operationId']??'')&&($identity['formId']??'')===($request['formId']??'');
+        else $valid=$valid&&($r['readOnly']??false)===true;
+        if(!$valid){$ok=false;$message='Native Formularprüfung fehlt oder gehört nicht zum beauftragten Fall.';}
+    }
     $s=db()->prepare("UPDATE claimsforce_import_jobs SET status=:s,message=:m,phase=:p,result_json=:r,heartbeat_at=NOW(),finished_at=NOW() WHERE id=:id AND status='running'");
     $s->execute([':s'=>$ok?'done':'failed',':m'=>$message,':p'=>$ok?'CF-DONE-07':'CF-FAIL-99',':r'=>json_encode($body['result']??null,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':id'=>$id]);
     if($s->rowCount()!==1)apiError(409,'Importauftrag wurde bereits abgeschlossen oder erneut eingeplant.');

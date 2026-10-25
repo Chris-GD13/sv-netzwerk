@@ -5,6 +5,8 @@ require_once dirname(__DIR__) . '/api/case-search.php';
 require_once __DIR__ . '/drive-read.php';
 require_once __DIR__ . '/claims-tasks.php';
 require_once __DIR__ . '/claims-source.php';
+require_once __DIR__ . '/native-forms.php';
+require_once __DIR__ . '/docx-content.php';
 require_once __DIR__ . '/pdf-content.php';
 commonHeaders();
 
@@ -70,10 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') oauthChallenge('cases:read cases:draf
 if (!oauthBearerUserOrNull('cases:read')) oauthChallenge('cases:read cases:drafts.write');
 
 $request=requestBody();$id=$request['id']??null;$method=(string)($request['method']??'');$params=is_array($request['params']??null)?$request['params']:[];
-if ($method==='initialize') mcpResult($id,['protocolVersion'=>(string)($params['protocolVersion']??'2025-06-18'),'capabilities'=>['tools'=>(object)[]],'serverInfo'=>['name'=>'sv-netzwerk-fallbearbeitung','version'=>'1.3.0'],'instructions'=>'Nutze ausschließlich Fälle des angemeldeten Portalbenutzers. Die Fallakten und Unterlagen liegen im geprüften IONOS-Prüfportal; Google Drive ist keine Fallablage. Vor jeder inhaltlichen Bearbeitung zuerst search und anschließend fetch aufrufen. Relevante Akten anschließend gezielt mit read_case_file lesen. Normale Schadenberichte und SV-GF-/Groß-TF-Schäden haben unterschiedliche verbindliche Gliederungen. Gib nur die angeforderten Falldaten oder Ergebnisse aus. Interne Test-, Browser-, QS- und Verbindungsdetails gehören nicht in die Antwort. Ergebnisse nur auf ausdrücklichen Wunsch des Benutzers mit save_case_draft als neuen Entwurf zurückgeben. Originalunterlagen und Falldaten niemals verändern.']);
+if ($method==='initialize') mcpResult($id,['protocolVersion'=>(string)($params['protocolVersion']??'2025-06-18'),'capabilities'=>['tools'=>(object)[]],'serverInfo'=>['name'=>'sv-netzwerk-fallbearbeitung','version'=>'1.3.0'],'instructions'=>'Nutze ausschließlich Fälle des angemeldeten Portalbenutzers. Die Fallakten und Unterlagen liegen im geprüften IONOS-Prüfportal; Google Drive ist keine Fallablage. Vor jeder inhaltlichen Bearbeitung zuerst search und anschließend fetch aufrufen. Relevante Akten anschließend gezielt mit read_case_file lesen. Normale Schadenberichte und SV-GF-/Groß-TF-Schäden haben unterschiedliche verbindliche Gliederungen. Gib nur die angeforderten Falldaten oder Ergebnisse aus. Interne Test-, Browser-, QS- und Verbindungsdetails gehören nicht in die Antwort. Ergebnisse nur auf ausdrücklichen Wunsch des Benutzers mit save_case_draft als neuen Entwurf zurückgeben. Originalbelege und versandte Fassungen niemals verändern. Ausdrücklich beauftragte Änderungen an vorhandenen nativen Formularentwürfen ausschließlich mit claimsforce_native_form und bestätigtem Rücklesen ausführen. save_case_draft ist nur Portaltextablage. Weder Speichern noch ein erfolgreicher Toolaufruf beweisen vollständige fachliche Bearbeitung, QS oder Versand.']);
 if ($method==='notifications/initialized') { http_response_code(202); exit; }
 if ($method==='ping') mcpResult($id,(object)[]);
 if ($method==='tools/list') mcpResult($id,['tools'=>[
+  ['name'=>'claimsforce_native_form','title'=>'Natives Claimsforce-Originalformular lesen und Entwurf speichern','description'=>'Use the existing browser bridge (1.4.70+) for native SE/ZB drafts. inspect without form_id lists existing forms; inspect with form_id and exact claim_number reads actual fields and a snapshot hash. save requires that hash and exact before/after values; only existing drafts, never sent originals. Use a fresh UUID operation_id per logical request, reuse it on uncertain retries. poll retrieves the same operation. Saving is verified only after native save plus reopen/readback. No new form creation, report upload, attachments, QS or sending. A successful field save does not establish financial correctness or document completeness.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string'],'operation_id'=>['type'=>'string'],'action'=>['type'=>'string','enum'=>['inspect','save','poll']],'form_id'=>['type'=>'string'],'claim_number'=>['type'=>'string'],'expected_hash'=>['type'=>'string'],'changes'=>['type'=>'array','maxItems'=>100,'items'=>['type'=>'object','properties'=>['field'=>['type'=>'string'],'before'=>['type'=>'string'],'after'=>['type'=>'string','maxLength'=>10000]],'required'=>['field','before','after'],'additionalProperties'=>false]]],'required'=>['id','operation_id','action'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read','cases:drafts.write']]],'annotations'=>['readOnlyHint'=>false,'openWorldHint'=>false,'destructiveHint'=>false,'idempotentHint'=>true]],
   ['name'=>'read_claimsforce_source','title'=>'Claimsforce-Mail oder Originalbeleg direkt lesen','description'=>'Read a case source through the existing authenticated Claimsforce bridge, independently of an incomplete portal file import. Use id from fetch; kind messages lists native message IDs, message reads the selected message_id, document reads a CLAIM_FILE attachment ID. Set refresh=true once to request a read, then poll refresh=false. The browser bridge must be active. No Claimsforce writes, notes or status changes. PDF results include extracted text or local OCR; never treat a list entry as read evidence.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string'],'kind'=>['type'=>'string','enum'=>['messages','message','document']],'source_id'=>['type'=>'string','description'=>'Native message UUID or CLAIM_FILE UUID; omit for messages'],'refresh'=>['type'=>'boolean','default'=>false]],'required'=>['id','kind'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>false,'openWorldHint'=>false,'destructiveHint'=>false]],
   ['name'=>'list_claimsforce_tasks','title'=>'Eigene Claimsforce-Aufgaben lesen und aktualisieren','description'=>'Read the actual Claimsforce task snapshot from the existing authenticated browser bridge. Set refresh=true to queue a fresh read; poll later with refresh=false. Never treat stale or pending data as current. This does not edit or complete Claimsforce tasks.','inputSchema'=>['type'=>'object','properties'=>['refresh'=>['type'=>'boolean','default'=>false]],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>false,'openWorldHint'=>false,'destructiveHint'=>false]],
   ['name'=>'search','title'=>'Eigene Versicherungsfälle suchen','description'=>'Use this when the user wants to find or review insurance claims assigned to their own SV-Netzwerk account.','inputSchema'=>['type'=>'object','properties'=>['query'=>['type'=>'string','description'=>'Schaden-Nr., VN/Objekt, Schadenart oder Suchbegriff']],'required'=>['query'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>true,'openWorldHint'=>false,'destructiveHint'=>false]],
@@ -83,9 +86,13 @@ if ($method==='tools/list') mcpResult($id,['tools'=>[
 ]]);
 if ($method==='tools/call') {
     $name=(string)($params['name']??'');$args=is_array($params['arguments']??null)?$params['arguments']:[];
-    $requiredScope=$name==='save_case_draft'?'cases:drafts.write':'cases:read';
+    $requiredScope=in_array($name,['save_case_draft','claimsforce_native_form'],true)?'cases:drafts.write':'cases:read';
     $user = oauthBearerUserOrNull($requiredScope);
     if (!$user) mcpAuthFailure($id,$requiredScope);
+    if($name==='claimsforce_native_form'){
+        try{$snapshot=mcpNativeForms($user,$args);}catch(Throwable $error){mcpFailure($id,-32014,$error->getMessage());}
+        mcpResult($id,['content'=>[['type'=>'text','text'=>json_encode($snapshot,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)]],'structuredContent'=>$snapshot]);
+    }
     if ($name==='read_claimsforce_source') {
         try { $snapshot=mcpClaimsSource($user,trim((string)($args['id']??'')),(string)($args['kind']??''),(string)($args['source_id']??''),($args['refresh']??false)===true); $blocks=mcpSourceContent($snapshot); }
         catch (Throwable $error) { mcpFailure($id,-32013,$error->getMessage()); }
@@ -122,6 +129,8 @@ if ($method==='tools/call') {
             $contentBlocks[]=['type'=>'text','text'=>mb_substr((string)$download['bytes'],0,500000)];
         } elseif ($mime==='application/pdf') {
             $contentBlocks=array_merge($contentBlocks,mcpPdfContent((string)$download['bytes'],($args['include_images']??false)===true));
+        } elseif ($mime==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'||preg_match('/\.docx$/i',(string)$file['name'])) {
+            try{$contentBlocks=array_merge($contentBlocks,mcpDocxContent((string)$download['bytes']));}catch(Throwable $error){mcpFailure($id,-32015,$error->getMessage());}
         } else {
             $contentBlocks[]=['type'=>'resource','resource'=>['uri'=>$uri,'mimeType'=>$mime,'blob'=>base64_encode((string)$download['bytes'])]];
         }

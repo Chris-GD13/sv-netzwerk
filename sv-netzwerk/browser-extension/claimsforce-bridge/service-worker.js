@@ -1,5 +1,6 @@
 import {requireReadOnlySession, capturedTokenProfile} from './read-only-session.mjs';
 import {openExistingNativeForm} from './native-form-navigation.mjs';
+import {runNativeForm} from './native-form-worker.mjs';
 import {readSourceOrRecordLegacyConflict} from './source-read-isolation.mjs';
 import {readClaimsSource, parseSourceRequest} from './claims-source-reader.mjs';
 import { createManualNotesReader } from './claims-notes-reader.mjs';
@@ -26,7 +27,7 @@ const PROFILE_EMAILS = {
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS', 'SW'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
-const WORKER_CODE_VERSION = '1.4.69';
+const WORKER_CODE_VERSION = '1.4.70';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
@@ -524,6 +525,16 @@ async function runReadOnlyImport(run) {
 }
 
 async function runImport(run) {
+  if(run.mode==='nativeform'){
+    const request=run.nativeRequest;
+    if(!request||request.profile!==run.profile||request.operationId!==run.claimNumber)throw Error('NATIVE_QUEUE_IDENTITY_MISMATCH');
+    return runNativeForm(request,{
+      assertAccount:profile=>requireReadOnlySession({profile,expectedEmail:PROFILE_EMAILS[profile],emailOf:tokenEmail,readSession:()=>chrome.storage.session.get(['claimsToken','claimsTokenProfile'])}),
+      createTab:url=>chrome.tabs.create({url,active:false}),waitTab,getTab:id=>chrome.tabs.get(id),
+      send:(id,message)=>chrome.tabs.sendMessage(id,message),pause:sleep,closeTab:id=>chrome.tabs.remove(id),
+      journal:{get:async id=>(await chrome.storage.local.get(`nativeOperation:${id}`))[`nativeOperation:${id}`],set:async(id,value)=>chrome.storage.local.set({[`nativeOperation:${id}`]:value})}
+    });
+  }
   if (run.mode === 'source' || run.mode === 'tasks') return runReadOnlyImport(run);
   const directRead = run.mode === 'source';
   if (directRead) parseSourceRequest(run.claimNumber);
@@ -863,8 +874,9 @@ async function startImport(sender, message) {
   const portalTabId = sender.tab?.id;
   if (!portalTabId) return { ok: false, error: '[CF-RUN-00] Portal-Registerkarte fehlt.' };
   const claimNumber = String(message.claimNumber || '').trim();
-  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), mode: message.mode === 'source' ? 'source' : claimNumber ? 'single' : message.mode === 'tasks' ? 'tasks' : message.mode === 'single' ? 'single' : message.mode === 'full' || message.full ? 'full' : 'quick', sourceProfiles: Array.isArray(message.sourceProfiles)?message.sourceProfiles.filter(p=>['christian','jens'].includes(p)&&profileKey(message.profile)==='christian'):[], claimNumber, since: String(message.since || ''), portalTabId, startedAt: new Date().toISOString() };
+  const requested = { runId: message.runId || crypto.randomUUID(), jobId: Number(message.jobId || 0), profile: profileKey(message.profile), nativeRequest: message.nativeRequest || null, mode: message.mode === 'nativeform' ? 'nativeform' : message.mode === 'source' ? 'source' : claimNumber ? 'single' : message.mode === 'tasks' ? 'tasks' : message.mode === 'single' ? 'single' : message.mode === 'full' || message.full ? 'full' : 'quick', sourceProfiles: Array.isArray(message.sourceProfiles)?message.sourceProfiles.filter(p=>['christian','jens'].includes(p)&&profileKey(message.profile)==='christian'):[], claimNumber, since: String(message.since || ''), portalTabId, startedAt: new Date().toISOString() };
   if (runningImport) {
+    if(runningImport.mode==='nativeform')return {ok:false,error:'NATIVE_OPERATION_BUSY: Formularvorgang zuerst abschließen; kein Sitzungswechsel während des Speicherns.'};
     if (sameImportScope(runningImport, requested) && !runningImport.stopRequested) {
       runningImport.portalTabId = portalTabId;
       await chrome.storage.local.set({ claimsActiveRun: { ...runningImport, status: 'running', updatedAt: new Date().toISOString() } });

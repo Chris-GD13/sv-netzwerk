@@ -179,7 +179,7 @@
     if(!supportedProfiles.includes(target))throw Error('Importauftrag enthält ein ungültiges Bearbeiterprofil.');
     // Background imports are scoped by job.profile and must preserve the open case.
     // The explicit profile switch handles clearing the user's case selection.
-    window.postMessage({type:'SVNET_CLAIMS_IMPORT_START_V2',profile:job.profile,sourceProfiles:job.source_profiles,mode:job.sync_mode||'quick',full:job.sync_mode==='full',claimNumber:job.claim_number||'',since:job.since_date||'',jobId:Number(job.id),runId:`claimsforce-${job.id}-${job.attempt_count||1}`},location.origin);
+    window.postMessage({type:'SVNET_CLAIMS_IMPORT_START_V2',profile:job.profile,sourceProfiles:job.source_profiles,nativeRequest:job.native_request,mode:job.sync_mode||'quick',full:job.sync_mode==='full',claimNumber:job.claim_number||'',since:job.since_date||'',jobId:Number(job.id),runId:`claimsforce-${job.id}-${job.attempt_count||1}`},location.origin);
   }
 
   async function poll(){

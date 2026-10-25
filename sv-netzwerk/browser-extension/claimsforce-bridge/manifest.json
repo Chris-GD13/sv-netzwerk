@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SV-Netzwerk Auftragsbrücke",
-  "version": "1.4.69",
+  "version": "1.4.70",
   "description": "Liest ClaimsForce- und Rekon-Aufträge samt Dateien, Nachrichten und Terminen in das SV-Netzwerk ein.",
   "permissions": ["storage", "tabs", "nativeMessaging", "browsingData", "alarms"],
   "host_permissions": [
@@ -26,7 +26,7 @@
     },
     {
       "matches": ["https://web.claimsforce.com/*"],
-      "js": ["form-readiness.js", "claims-bridge.js"],
+      "js": ["form-readiness.js", "native-form-dom.js", "claims-bridge.js"],
       "run_at": "document_start"
     },
     {
