@@ -14,4 +14,6 @@ Stilprüfung: Öffentlicher Artikel und vorbereiteter LinkedIn-Text bestehen aus
 
 LinkedIn: Begleittext vorbereitet, nicht veröffentlicht. Die tatsächliche Veröffentlichung bleibt ausschließlich dem separaten 07:00-Auftrag vorbehalten. Ohne Bild und ohne Zusatzkosten.
 
-Live-Nachweis: wird erst nach erfolgreichem Deployment und sichtbarer Prüfung ergänzt. Bis dahin bleiben Deploy- und Live-Status offen.
+Live-Nachweis: Der Website-Commit `e514123c2800f296c1d788a0164be56a968e3b99` wurde mit dem erfolgreichen Deployment-Lauf [40164652179](https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40164652179) veröffentlicht. Am 25.10.2026 um 06:20 Uhr Europe/Berlin wurden die kanonische Detailseite, die Fachartikelübersicht, die Kategorie „Gebäudehülle und Abdichtung“, sämtliche zugeordneten Schlagwortseiten, Sitemap, robots.txt und `deploy-version.txt` per HTTP geprüft. Detailseite, Übersicht, Kategorie und Schlagwortseite wurden zusätzlich im sichtbaren Browser kontrolliert. Der Deploy-Marker weist exakt den Website-Commit aus. Das zentrale Tagesregister steht für die bestehende Publication-ID auf `published-verified`; LinkedIn bleibt `not-posted`.
+
+CI-Einordnung: Der Build Check und der Website-Deployment-Lauf waren erfolgreich. Der getrennte Portaltest scheiterte unverändert in `claimsforce_worker_handshake_test.mjs`; derselbe ClaimsForce-Fehler bestand bereits auf dem unmittelbar vorherigen Hauptstand und ist von den ausschließlich artikelbezogenen Änderungen unberührt.
