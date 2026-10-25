@@ -23,7 +23,7 @@ const PROFILE_EMAILS = {
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS', 'SW'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
-const WORKER_CODE_VERSION = '1.4.64';
+const WORKER_CODE_VERSION = '1.4.65';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
@@ -508,7 +508,11 @@ async function runImport(run) {
   if (!singleSync) await diagnostic(run, 'CF-TASKS-04', Number.isInteger(openTasks) ? `${openTasks} offene Aufgabe/Aufgaben wurden unter „Aufgaben – Alle“ erkannt.` : 'Der Zähler „Aufgaben – Alle“ konnte nicht sicher gelesen werden.', { openTasks, reader: lastTaskDebug });
   if(run.mode==='tasks'){
     if(!Number.isInteger(openTasks))throw new Error(`[CF-TASKS-04] Zaehler nicht lesbar. ${lastTaskDebug?.path || '?'}; K=${JSON.stringify(lastTaskDebug?.candidates || [])}; ${(lastTaskDebug?.samples || []).filter(t => t.startsWith('Umfeld')).slice(0, 2).join(' // ').replace(/Umfeld: /g, '')}`.slice(0, 480));
-    return { claims: 0, openTasks, taskCheck: true, updated: 0, skipped: 0, bridge: BRIDGE_VERSION, rows: lastTaskDebug?.rows ?? null };
+    const response = await requestJson('https://tasks-api.claimsforce.com/tasks', token);
+    const tasks = unwrap(response, 'tasks');
+    if (!Array.isArray(tasks)) throw new Error('CF-TASKS-SHAPE: Aufgabenantwort ist keine lesbare Aufgabenliste.');
+    return { claims: 0, openTasks, taskCheck: true, updated: 0, skipped: 0, bridge: BRIDGE_VERSION, rows: lastTaskDebug?.rows ?? null,
+      source: 'claimsforce-tasks-api', sourceProfile: profile, fetchedAt: new Date().toISOString(), tasks };
   }
   const configController = new AbortController(), configTimer = setTimeout(() => configController.abort(), 15000);
   let config;

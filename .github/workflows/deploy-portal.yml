@@ -140,6 +140,7 @@ jobs:
           node tests/claimsforce_resume_controls_test.mjs
           php tests/claimsforce_resume_metadata_test.php
           php tests/mcp_pdf_ocr_test.php
+          php tests/mcp_claims_tasks_test.php
           node tests/financial_register_preset_test.mjs
 
       - name: Ausschließlich Portaldateien vorbereiten

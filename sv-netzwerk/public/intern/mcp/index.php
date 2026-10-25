@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/oauth/lib.php';
 require_once dirname(__DIR__) . '/api/case-search.php';
 require_once __DIR__ . '/drive-read.php';
+require_once __DIR__ . '/claims-tasks.php';
 commonHeaders();
 
 function mcpResult(mixed $id, array $result): never { oauthJson(['jsonrpc'=>'2.0','id'=>$id,'result'=>$result]); }
@@ -71,6 +72,7 @@ if ($method==='initialize') mcpResult($id,['protocolVersion'=>(string)($params['
 if ($method==='notifications/initialized') { http_response_code(202); exit; }
 if ($method==='ping') mcpResult($id,(object)[]);
 if ($method==='tools/list') mcpResult($id,['tools'=>[
+  ['name'=>'list_claimsforce_tasks','title'=>'Eigene Claimsforce-Aufgaben lesen und aktualisieren','description'=>'Read the actual Claimsforce task snapshot from the existing authenticated browser bridge. Set refresh=true to queue a fresh read; poll later with refresh=false. Never treat stale or pending data as current. This does not edit or complete Claimsforce tasks.','inputSchema'=>['type'=>'object','properties'=>['refresh'=>['type'=>'boolean','default'=>false]],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>false,'openWorldHint'=>false,'destructiveHint'=>false]],
   ['name'=>'search','title'=>'Eigene Versicherungsfälle suchen','description'=>'Use this when the user wants to find or review insurance claims assigned to their own SV-Netzwerk account.','inputSchema'=>['type'=>'object','properties'=>['query'=>['type'=>'string','description'=>'Schaden-Nr., VN/Objekt, Schadenart oder Suchbegriff']],'required'=>['query'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>true,'openWorldHint'=>false,'destructiveHint'=>false]],
   ['name'=>'fetch','title'=>'Eigenen Versicherungsfall abrufen','description'=>'Use this when a case returned by search must be opened and its verified portal data reviewed.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string','description'=>'Fallordner-ID aus search']],'required'=>['id'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>true,'openWorldHint'=>false,'destructiveHint'=>false]],
   ['name'=>'read_case_file','title'=>'Unterlage aus dem eigenen Schadenfall lesen','description'=>'Use this after fetch to read one relevant document, image, PDF, spreadsheet, or drone recording from the authenticated user’s own case.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string','description'=>'Fallordner-ID aus search/fetch'],'file_id'=>['type'=>'string','description'=>'Datei-ID aus der Dokumentenliste von fetch']],'required'=>['id','file_id'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>true,'openWorldHint'=>false,'destructiveHint'=>false]],
@@ -81,6 +83,11 @@ if ($method==='tools/call') {
     $requiredScope=$name==='save_case_draft'?'cases:drafts.write':'cases:read';
     $user = oauthBearerUserOrNull($requiredScope);
     if (!$user) mcpAuthFailure($id,$requiredScope);
+    if ($name==='list_claimsforce_tasks') {
+        try { $snapshot=mcpClaimsTasks($user,($args['refresh']??false)===true); }
+        catch (Throwable $error) { mcpFailure($id,-32012,$error->getMessage()); }
+        mcpResult($id,['content'=>[['type'=>'text','text'=>json_encode($snapshot,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)]],'structuredContent'=>$snapshot]);
+    }
     if ($name==='search') {
         $query=mb_substr(trim((string)($args['query']??'')),0,200);$results=[];
         foreach(ownCases($user,$query) as $row)$results[]=['id'=>(string)$row['folder_id'],'title'=>caseTitle($row),'url'=>caseUrl((string)$row['folder_id'])];
