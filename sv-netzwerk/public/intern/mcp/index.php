@@ -5,6 +5,7 @@ require_once dirname(__DIR__) . '/api/case-search.php';
 require_once __DIR__ . '/drive-read.php';
 require_once __DIR__ . '/claims-tasks.php';
 require_once __DIR__ . '/claims-source.php';
+require_once __DIR__ . '/pdf-content.php';
 commonHeaders();
 
 function mcpResult(mixed $id, array $result): never { oauthJson(['jsonrpc'=>'2.0','id'=>$id,'result'=>$result]); }
@@ -77,7 +78,7 @@ if ($method==='tools/list') mcpResult($id,['tools'=>[
   ['name'=>'list_claimsforce_tasks','title'=>'Eigene Claimsforce-Aufgaben lesen und aktualisieren','description'=>'Read the actual Claimsforce task snapshot from the existing authenticated browser bridge. Set refresh=true to queue a fresh read; poll later with refresh=false. Never treat stale or pending data as current. This does not edit or complete Claimsforce tasks.','inputSchema'=>['type'=>'object','properties'=>['refresh'=>['type'=>'boolean','default'=>false]],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>false,'openWorldHint'=>false,'destructiveHint'=>false]],
   ['name'=>'search','title'=>'Eigene Versicherungsfälle suchen','description'=>'Use this when the user wants to find or review insurance claims assigned to their own SV-Netzwerk account.','inputSchema'=>['type'=>'object','properties'=>['query'=>['type'=>'string','description'=>'Schaden-Nr., VN/Objekt, Schadenart oder Suchbegriff']],'required'=>['query'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>true,'openWorldHint'=>false,'destructiveHint'=>false]],
   ['name'=>'fetch','title'=>'Eigenen Versicherungsfall abrufen','description'=>'Use this when a case returned by search must be opened and its verified portal data reviewed.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string','description'=>'Fallordner-ID aus search']],'required'=>['id'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>true,'openWorldHint'=>false,'destructiveHint'=>false]],
-  ['name'=>'read_case_file','title'=>'Unterlage aus dem eigenen Schadenfall lesen','description'=>'Use this after fetch to read one relevant document, image, PDF, spreadsheet, or drone recording from the authenticated user’s own case.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string','description'=>'Fallordner-ID aus search/fetch'],'file_id'=>['type'=>'string','description'=>'Datei-ID aus der Dokumentenliste von fetch']],'required'=>['id','file_id'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>true,'openWorldHint'=>false,'destructiveHint'=>false]],
+  ['name'=>'read_case_file','title'=>'Unterlage aus dem eigenen Schadenfall lesen','description'=>'Use this after fetch to read one relevant document, image, PDF, spreadsheet, or drone recording from the authenticated user’s own case.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string','description'=>'Fallordner-ID aus search/fetch'],'file_id'=>['type'=>'string','description'=>'Datei-ID aus der Dokumentenliste von fetch'],'include_images'=>['type'=>'boolean','default'=>false,'description'=>'Optional PDF page images for explicit visual review; default returns compact extracted text or OCR without binary data']],'required'=>['id','file_id'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>true,'openWorldHint'=>false,'destructiveHint'=>false]],
   ['name'=>'save_case_draft','title'=>'ChatGPT-Entwurf zum eigenen Fall speichern','description'=>'Use this when the user explicitly asks to return a completed text from ChatGPT Work to their own SV-Netzwerk case as a new draft. This never changes originals, case data, approvals, or sent documents.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string','description'=>'Fallordner-ID aus search/fetch'],'title'=>['type'=>'string','description'=>'Kurzer Titel des Entwurfs','maxLength'=>500],'content'=>['type'=>'string','description'=>'Vollständiger, vom Benutzer angeforderter Entwurf','maxLength'=>100000],'task'=>['type'=>'string','description'=>'Zugehöriger Arbeitsauftrag oder Berichtswunsch','maxLength'=>20000]],'required'=>['id','title','content'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read','cases:drafts.write']]],'annotations'=>['readOnlyHint'=>false,'openWorldHint'=>false,'destructiveHint'=>false,'idempotentHint'=>false]]
 ]]);
 if ($method==='tools/call') {
@@ -120,15 +121,7 @@ if ($method==='tools/call') {
         if (mcpDriveIsText($mime)) {
             $contentBlocks[]=['type'=>'text','text'=>mb_substr((string)$download['bytes'],0,500000)];
         } elseif ($mime==='application/pdf') {
-            $pdfText=mcpDrivePdfText((string)$download['bytes']);
-            if ($pdfText!=='') $contentBlocks[]=['type'=>'text','text'=>"Aus dem PDF extrahierter Text (vollständige Textebene, bis 500.000 Zeichen):\n\n".$pdfText];
-            else {
-                $ocr=mcpPdfOcr((string)$download['bytes']);
-                $contentBlocks[]=['type'=>'text','text'=>"Lokale OCR der Original-PDF. OCR ist keine geprüfte Kalkulation; Beträge anhand der Originalseiten und Summen abgleichen. Vollständigkeit und Seitenzahlen stehen im Ergebnis. Bei complete=false fehlen Seiten; niemals als vollständig geprüft behandeln.\n".json_encode($ocr,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_INVALID_UTF8_SUBSTITUTE)];
-                $contentBlocks[]=['type'=>'text','text'=>'Die PDF enthält keine zuverlässig lesbare Textebene. Die Seiten wurden deshalb zusätzlich als Bilder gerendert; Werte sind ausschließlich aus diesen Seitenbildern abzulesen.'];
-                foreach (mcpDrivePdfImages((string)$download['bytes']) as $image) $contentBlocks[]=['type'=>'image','data'=>$image['data'],'mimeType'=>$image['mimeType']];
-            }
-            $contentBlocks[]=['type'=>'resource','resource'=>['uri'=>$uri,'mimeType'=>$mime,'blob'=>base64_encode((string)$download['bytes'])]];
+            $contentBlocks=array_merge($contentBlocks,mcpPdfContent((string)$download['bytes'],($args['include_images']??false)===true));
         } else {
             $contentBlocks[]=['type'=>'resource','resource'=>['uri'=>$uri,'mimeType'=>$mime,'blob'=>base64_encode((string)$download['bytes'])]];
         }
