@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/api/ionos-storage.php';
 require_once __DIR__ . '/pdf-ocr.php';
+require_once __DIR__ . '/pdf-text-quality.php';
 
 const MCP_CASE_META_NAME = '00_Falldaten.json';
 const MCP_DRIVE_FOLDER_MIME = 'application/vnd.google-apps.folder';
@@ -190,10 +191,7 @@ function mcpDrivePdfText(string $bytes): string
         // Some PDFs expose a font-encoded glyph stream which is technically a
         // text layer but is not readable (control characters and glyph IDs).
         // Do not present that as usable text to the model.
-        $printable = preg_replace('/[^\P{C}\t\r\n]/u', '', $text) ?? '';
-        $visible = preg_replace('/\s+/u', '', $printable) ?? '';
-        $ratio = $text === '' ? 0.0 : strlen($visible) / max(1, strlen(preg_replace('/\s+/u', '', $text) ?? ''));
-        if ($ratio < 0.70 || mb_strlen($visible) < 40) return '';
+        if (!mcpPdfTextUsable($text)) return '';
         return mb_substr($text, 0, 500000);
     } finally { @unlink($tmp); }
 }
