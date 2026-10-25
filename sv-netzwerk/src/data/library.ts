@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Luftdichtheitsmessung am Gebäude: Messziel, Präparation und Leckagebefund sauber trennen',
+    description: 'Messziel, Gebäudepräparation, Bezugsgrößen, Kennwerte und Leckagebefunde einer Luftdichtheitsmessung nachvollziehbar beurteilen.',
+    href: '/fachwissen/luftdichtheitsmessung-gebaeude-messziel-praeparation-leckagebefund/',
+    category: 'Gebäudehülle und Abdichtung',
+    tags: ['Luftdichtheit', 'Differenzdruckmessung', 'Gebäudehülle', 'Leckageortung', 'Prüfbericht', 'GModG', 'Bauphysik'],
+    date: '2026-10-25',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Bauablauf im Schadenfall: Terminplan, Behinderungsanzeige und Stillstandskosten sauber trennen',
     description: 'Vertragsfristen, Terminplan, Behinderungsanzeige, Wiederanlauf und Stillstandskosten im Gebäudeschaden nachvollziehbar prüfen.',
     href: '/fachwissen/bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten/',
