@@ -1,3 +1,4 @@
+import {requireReadOnlySession, capturedTokenProfile} from './read-only-session.mjs';
 import {openExistingNativeForm} from './native-form-navigation.mjs';
 import {readSourceOrRecordLegacyConflict} from './source-read-isolation.mjs';
 import {readClaimsSource, parseSourceRequest} from './claims-source-reader.mjs';
@@ -25,7 +26,7 @@ const PROFILE_EMAILS = {
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS', 'SW'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
-const WORKER_CODE_VERSION = '1.4.67';
+const WORKER_CODE_VERSION = '1.4.69';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
@@ -487,7 +488,43 @@ async function discoverSingleClaimSource(run) {
   return found.profile;
 }
 
+async function runReadOnlyImport(run) {
+  const profile = profileKey(run.profile);
+  const token = await requireReadOnlySession({
+    profile, expectedEmail: PROFILE_EMAILS[profile], emailOf: tokenEmail,
+    readSession: () => chrome.storage.session.get(['claimsToken', 'claimsTokenProfile'])
+  });
+  if (run.mode === 'tasks') {
+    const response = await requestJson('https://tasks-api.claimsforce.com/tasks', token);
+    const tasks = unwrap(response, 'tasks');
+    if (!Array.isArray(tasks)) throw new Error('CF-TASKS-SHAPE: Aufgabenantwort ist keine lesbare Aufgabenliste.');
+    return { claims: 0, openTasks: tasks.length, taskCheck: true, updated: 0, skipped: 0,
+      bridge: BRIDGE_VERSION, source: 'claimsforce-tasks-api', sourceProfile: profile,
+      fetchedAt: new Date().toISOString(), tasks, readOnly: true };
+  }
+  const configController = new AbortController(), configTimer = setTimeout(() => configController.abort(), 15000);
+  let config;
+  try { config = await (await fetch('https://web.claimsforce.com/config', { signal: configController.signal })).json(); }
+  catch (error) { throw new Error(error?.name === 'AbortError' ? 'ClaimsForce-Konfiguration hat das Zeitlimit überschritten.' : 'ClaimsForce-Konfiguration konnte nicht geladen werden.'); }
+  finally { clearTimeout(configTimer); }
+  return readClaimsSource(run.claimNumber, {
+    profile, config, json:url=>requestJson(url, token),
+    bytes:async url=>{
+      const response=await fetch(`${url}?token=${encodeURIComponent(token)}`, {signal:AbortSignal.timeout(30000)});
+      if (!response.ok) throw Error(`SOURCE_DOCUMENT_HTTP_${response.status}`);
+      if (Number(response.headers.get('content-length'))>8*1024*1024) throw Error('SOURCE_DOCUMENT_LIMIT_8MB');
+      const buffer=await response.arrayBuffer();
+      if (buffer.byteLength>8*1024*1024) throw Error('SOURCE_DOCUMENT_LIMIT_8MB');
+      let binary=''; const data=new Uint8Array(buffer);
+      for(let offset=0;offset<data.length;offset+=0x8000) binary+=String.fromCharCode(...data.subarray(offset,offset+0x8000));
+      const sha256=[...new Uint8Array(await crypto.subtle.digest('SHA-256',buffer))].map(v=>v.toString(16).padStart(2,'0')).join('');
+      return {mime:response.headers.get('content-type') || 'application/octet-stream',sha256,base64:btoa(binary)};
+    }
+  });
+}
+
 async function runImport(run) {
+  if (run.mode === 'source' || run.mode === 'tasks') return runReadOnlyImport(run);
   const directRead = run.mode === 'source';
   if (directRead) parseSourceRequest(run.claimNumber);
   const portalTabId = () => Number(run.portalTabId || 0), singleClaimNumber = String(run.claimNumber || '').trim(), singleSync = !directRead && (run.mode === 'single' || singleClaimNumber !== ''), fullSync = run.mode === 'full' || !!run.full;
@@ -1107,7 +1144,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
   if (message?.type === 'CLAIMS_TOKEN') {
-    chrome.storage.session.get('activeProfile').then(row => chrome.storage.session.set({ claimsToken: message.token, claimsTokenProfile: profileKey(row.activeProfile), claimsTokenAt: Date.now() })).then(() => sendResponse({ ok: true })).catch(error => sendResponse({ ok: false, error: error.message }));
+    Promise.resolve().then(() => {
+      const profile = capturedTokenProfile(message.token, PROFILE_EMAILS, tokenEmail);
+      return chrome.storage.session.set({ claimsToken: message.token, claimsTokenProfile: profile, claimsTokenAt: Date.now() });
+    }).then(() => sendResponse({ ok: true })).catch(error => sendResponse({ ok: false, error: error.message }));
     return true;
   }
   if (message?.type === 'GET_CREDENTIALS') {
