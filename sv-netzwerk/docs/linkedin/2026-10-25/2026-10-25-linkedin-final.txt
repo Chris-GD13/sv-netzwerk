@@ -1,0 +1,14 @@
+Ein guter Blower-Door-Kennwert schließt eine örtliche Leckage nicht aus. Umgekehrt zeigt ein ungünstiger Wert allein noch nicht, welcher Anschluss die Ursache ist. Für meine sachverständige Bewertung brauche ich deshalb mehr als die Zahl auf dem Zertifikat.
+
+Zuerst muss klar sein, ob die Messung einem Nachweis, der baubegleitenden Qualitätssicherung oder einer konkreten Ursachensuche dient. Dazu gehören die abgegrenzte Prüfzone und der Ausbauzustand. Ebenso nachvollziehbar muss sein, welche Öffnungen geschlossen oder vorübergehend abgedichtet wurden. Eine zusätzlich abgeklebte Fuge verändert den untersuchten Zustand und darf in der Dokumentation nicht verschwinden.
+
+Auch Luftvolumen beziehungsweise Hüllfläche, Messreihen und Randbedingungen gehören zum Ergebnis. Das Differenzdruckverfahren erfasst die Luftdurchlässigkeit der geprüften Gebäudehülle. Die Bewertung eines einzelnen Fensters oder einer Anschlussfuge lässt sich daraus nicht unmittelbar ableiten. Verdeckte Leckagen können trotz der Messung unentdeckt bleiben.
+
+Für eine Nachbesserung muss der konkrete Leckagebefund daher gesondert untersucht und zugeordnet werden. Erst daraus lässt sich der erforderliche Eingriff begründen. Im heutigen Fachartikel erläutere ich, wie Messziel, Gebäudepräparation und Befund zusammenhängen und welche Unterlagen eine prüffähige Bewertung braucht.
+
+https://www.sv-netzwerk.eu/fachwissen/luftdichtheitsmessung-gebaeude-messziel-praeparation-leckagebefund/
+
+Christian Wächter
+Sachverständiger | Regulierung im Komplex- und Großschaden
+
+#Luftdichtheit #BlowerDoor #Gebäudehülle #Bauphysik #Sachverständige
