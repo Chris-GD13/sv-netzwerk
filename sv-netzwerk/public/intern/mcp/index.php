@@ -109,6 +109,8 @@ if ($method==='tools/call') {
             $pdfText=mcpDrivePdfText((string)$download['bytes']);
             if ($pdfText!=='') $contentBlocks[]=['type'=>'text','text'=>"Aus dem PDF extrahierter Text (vollständige Textebene, bis 500.000 Zeichen):\n\n".$pdfText];
             else {
+                $ocr=mcpPdfOcr((string)$download['bytes']);
+                $contentBlocks[]=['type'=>'text','text'=>"Lokale OCR der Original-PDF. OCR ist keine geprüfte Kalkulation; Beträge anhand der Originalseiten und Summen abgleichen. Vollständigkeit und Seitenzahlen stehen im Ergebnis. Bei complete=false fehlen Seiten; niemals als vollständig geprüft behandeln.\n".json_encode($ocr,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_INVALID_UTF8_SUBSTITUTE)];
                 $contentBlocks[]=['type'=>'text','text'=>'Die PDF enthält keine zuverlässig lesbare Textebene. Die Seiten wurden deshalb zusätzlich als Bilder gerendert; Werte sind ausschließlich aus diesen Seitenbildern abzulesen.'];
                 foreach (mcpDrivePdfImages((string)$download['bytes']) as $image) $contentBlocks[]=['type'=>'image','data'=>$image['data'],'mimeType'=>$image['mimeType']];
             }

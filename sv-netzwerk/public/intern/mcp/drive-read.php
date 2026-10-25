@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/api/ionos-storage.php';
+require_once __DIR__ . '/pdf-ocr.php';
 
 const MCP_CASE_META_NAME = '00_Falldaten.json';
 const MCP_DRIVE_FOLDER_MIME = 'application/vnd.google-apps.folder';
