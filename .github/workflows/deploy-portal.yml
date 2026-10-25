@@ -229,6 +229,9 @@ jobs:
           fi
           echo "Zuordnung bestätigt: SFTP_REMOTE_DIR liefert unter https://www.sv-netzwerk.eu/intern/ aus."
 
+      - name: Geheimnisschutz vor Konfigurationsänderungen zwingend prüfen
+        run: python3 scripts/verify-secret-boundary.py
+
       - name: Serverkonfiguration absichern
         env:
           SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
@@ -348,6 +351,7 @@ jobs:
           PORTAL_CHECK_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
         run: |
           set -euo pipefail
+          python3 scripts/verify-secret-boundary.py
           marker="$(curl --silent --show-error --retry 6 --retry-delay 5 https://www.sv-netzwerk.eu/intern/deploy-version.txt || true)"
           printf '%s\n' "$marker"
           if ! printf '%s\n' "$marker" | grep -Fx "Commit: $EXPECTED_SHA"; then

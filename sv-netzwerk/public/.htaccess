@@ -1,6 +1,13 @@
 RewriteEngine On
 DirectoryIndex index.php index.html
 
+# Mandatory security boundary: never expose runtime secrets, backups or source control.
+# Do not remove for troubleshooting. Deployment verifies this boundary over HTTPS.
+<FilesMatch "(?i)^(?:\.env.*|\.git.*|.*\.(?:sql|sql\.gz|pem|key))$">
+    Require all denied
+</FilesMatch>
+RewriteRule (^|/)(\.git|\.svn)(/|$) - [F,L,NC]
+
 # Geschützte Portal-Seiten werden als index.php ausgeliefert. Alte, bei früheren
 # Deployments verbliebene HTML-Einstiegspunkte dürfen die Auth-Prüfung nicht umgehen.
 RewriteRule ^intern/(?!login/)(?:.*/)?index\.html$ - [R=404,L,NC]
