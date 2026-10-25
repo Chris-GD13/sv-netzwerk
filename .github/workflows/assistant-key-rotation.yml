@@ -1,0 +1,32 @@
+name: Configure dedicated assistant key
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: assistant-key-rotation
+  cancel-in-progress: false
+jobs:
+  configure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure and verify dedicated key without application deployment
+        env:
+          SSH_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+          HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          ROOT: ${{ secrets.PORTAL_SFTP_REMOTE_DIR }}
+          ASSISTANT_KEY: ${{ secrets.OPENAI_ASSISTANT_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$ROOT" && test -n "$ASSISTANT_KEY"
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/portal_key
+          chmod 600 ~/.ssh/portal_key
+          ssh-keyscan -p "$PORT" "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          target="/tmp/assistant-key-${GITHUB_RUN_ID}.py"
+          scp -i ~/.ssh/portal_key -o BatchMode=yes -P "$PORT" scripts/configure-assistant-key.py "$USER@$HOST:$target"
+          printf '%s' "$ASSISTANT_KEY" | ssh -i ~/.ssh/portal_key -o BatchMode=yes -p "$PORT" "$USER@$HOST" "python3 '$target' '$ROOT'; result=\$?; rm -f '$target'; exit \$result"
