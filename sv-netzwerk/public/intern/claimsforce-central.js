@@ -202,7 +202,7 @@
         const claimed=await post('claim');
         if(claimed.job)await launch(claimed.job,false);
       }
-    }catch(e){showAgent('Zentrale Importstation: '+e.message,true);agentJob=null;busy=false;await resumeWatch()}
+    }catch(e){agentJob=null;busy=false;await resumeWatch();show('Zentrale Importstation: '+e.message,true)}
     setTimeout(poll,3000);
   }
 

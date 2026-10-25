@@ -14,7 +14,8 @@ function cqSingleResultValid(array $job,array $result):bool{
 }
 function cqStationKey(array$body):string{
     $id=(string)($body['stationId']??'');
-    if(!preg_match('/^[a-f0-9-]{36}$/i',$id)||version_compare((string)($body['bridgeVersion']??'0'),'1.4.63','<')||($body['workerVersion']??'')!=='1.4.63'||(int)($body['protocol']??0)!==2)apiError(409,'Aktuelle Browser-Brücke 1.4.63 erforderlich. Diese alte Importstation darf keinen Auftrag übernehmen.');
+    $version=(string)($body['bridgeVersion']??'');
+    if(!preg_match('/^[a-f0-9-]{36}$/i',$id)||!preg_match('/^\d+\.\d+\.\d+$/D',$version)||version_compare($version,'1.4.65','<')||($body['workerVersion']??'')!==$version||(int)($body['protocol']??0)!==2)apiError(409,'Browser-Brücke ab 1.4.65 mit identischer laufender Importprogramm-Version erforderlich. Bitte Brücke und Portalseite neu laden.');
     return hash('sha256',$id);
 }
 function cqRequireOwner(int$id,array$body):void{

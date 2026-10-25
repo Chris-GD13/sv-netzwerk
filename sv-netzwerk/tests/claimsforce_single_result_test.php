@@ -20,7 +20,12 @@ foreach([['claims'=>26],['updated'=>0],['claimNumber'=>'26-076821-6'],['inventor
 echo "Einzelfallabschluss weist Sammelläufe, falsche Fälle und unvollständige Ergebnisse zurück.\n";
 function apiError($status,$text){throw new RuntimeException($text,$status);}
 function db(){return new class{function prepare($sql){return new class{function execute($args){}function fetchColumn(){return $GLOBALS['testOwner']??'';}};}};}
-$owner=['stationId'=>'11111111-1111-4111-8111-111111111111','bridgeVersion'=>'1.4.63','workerVersion'=>'1.4.63','protocol'=>2];
+$version=json_decode(file_get_contents(__DIR__.'/../browser-extension/claimsforce-bridge/manifest.json'),true)['version'];
+$owner=['stationId'=>'11111111-1111-4111-8111-111111111111','bridgeVersion'=>$version,'workerVersion'=>$version,'protocol'=>2];
+foreach(['1.4.63','1.4.64'] as $oldVersion){
+    try{cqStationKey(array_replace($owner,['bridgeVersion'=>$oldVersion,'workerVersion'=>$oldVersion]));throw new Exception('Alter Aufgabenleser akzeptiert');}catch(RuntimeException $e){if($e->getCode()!==409)throw $e;}
+}
+try{cqStationKey(array_replace($owner,['workerVersion'=>'1.4.63']));throw new Exception('Gemischte Versionen akzeptiert');}catch(RuntimeException $e){if($e->getCode()!==409)throw $e;}
 $GLOBALS['testOwner']=cqStationKey($owner);
 cqRequireOwner(44,$owner);
 foreach([array_replace($owner,['stationId'=>'22222222-2222-4222-8222-222222222222']),array_replace($owner,['bridgeVersion'=>'1.4.51']),array_replace($owner,['workerVersion'=>'']),array_replace($owner,['workerVersion'=>'1.4.58']),array_replace($owner,['protocol'=>1]),[]]as$other){
