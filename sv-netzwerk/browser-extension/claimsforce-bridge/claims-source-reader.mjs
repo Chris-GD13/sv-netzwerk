@@ -10,9 +10,15 @@ export function parseSourceRequest(key) {
 export async function readClaimsSource(key, {profile, json, bytes, config}) {
   const request = parseSourceRequest(key), {claimId, kind, sourceId} = request;
   if (!['christian','jens','marc','holger'].includes(profile)) throw Error('SOURCE_PROFILE_REQUIRED');
+  // Exact API Gateway endpoints published by web.claimsforce.com/config.
+  // Do not allow arbitrary AWS gateways or cross-service substitutions.
+  const gateway = {
+    DISPOSITION_API_ENDPOINT: 'https://lrb5f35qpf.execute-api.eu-central-1.amazonaws.com/Prod',
+    COMMUNICATION_API_ENDPOINT: 'https://os0q3t0kde.execute-api.eu-central-1.amazonaws.com/Prod'
+  };
   for (const k of ['DISPOSITION_API_ENDPOINT','COMMUNICATION_API_ENDPOINT','FILES_API_ENDPOINT']) {
     const url = new URL(config[k]);
-    if (url.protocol !== 'https:' || !url.hostname.endsWith('.claimsforce.com') || url.username || url.password) throw Error('SOURCE_ENDPOINT_INVALID');
+    if (url.protocol !== 'https:' || (!url.hostname.endsWith('.claimsforce.com') && url.href !== gateway[k]) || url.username || url.password || url.search || url.hash) throw Error('SOURCE_ENDPOINT_INVALID');
   }
   const unwrap = (value, name) => value?.[name] ?? value;
   const claim = unwrap(await json(`${config.DISPOSITION_API_ENDPOINT}/claims/${claimId}`), 'claim');

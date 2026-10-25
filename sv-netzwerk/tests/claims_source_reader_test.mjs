@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {parseSourceRequest,readClaimsSource} from '../browser-extension/claimsforce-bridge/claims-source-reader.mjs';
 const c='11111111-1111-4111-8111-111111111111', m='22222222-2222-4222-8222-222222222222', f='33333333-3333-4333-8333-333333333333';
-const config={DISPOSITION_API_ENDPOINT:'https://disposition-api.claimsforce.com',COMMUNICATION_API_ENDPOINT:'https://communication-api.claimsforce.com',FILES_API_ENDPOINT:'https://files-api.claimsforce.com'};
+const config={DISPOSITION_API_ENDPOINT:'https://lrb5f35qpf.execute-api.eu-central-1.amazonaws.com/Prod',COMMUNICATION_API_ENDPOINT:'https://os0q3t0kde.execute-api.eu-central-1.amazonaws.com/Prod',FILES_API_ENDPOINT:'https://files-api.claimsforce.com'};
 let reads=[], downloaded=0;
 const adapter={profile:'christian',config,json:async url=>{
   reads.push(url);
@@ -15,6 +15,7 @@ assert.equal((await readClaimsSource(`${c}:messages`,adapter)).messages[0].id,m)
 assert.equal((await readClaimsSource(`${c}:message:${m}`,adapter)).message.body,'Gezahlt sind 10.132,11 EUR.');
 assert.equal((await readClaimsSource(`${c}:document:${f}`,adapter)).sourceId,f);
 assert.equal(downloaded,1);
+for (const endpoint of ['https://other.execute-api.eu-central-1.amazonaws.com/Prod', config.COMMUNICATION_API_ENDPOINT, config.DISPOSITION_API_ENDPOINT+'?redirect=x']) await assert.rejects(()=>readClaimsSource(`${c}:messages`,{...adapter,config:{...config,DISPOSITION_API_ENDPOINT:endpoint}}),/SOURCE_ENDPOINT_INVALID/);
 await assert.rejects(()=>readClaimsSource(`${c}:document:${m}`,adapter),/SOURCE_FILE_NOT_IN_CLAIM/);
 await assert.rejects(()=>readClaimsSource(`${c}:message:${f}`,adapter),/SOURCE_MESSAGE_NOT_IN_CLAIM/);
 assert.equal(downloaded,1);

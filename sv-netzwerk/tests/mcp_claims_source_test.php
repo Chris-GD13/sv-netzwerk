@@ -11,6 +11,8 @@ check(mcpSourceSnapshot($row,'christian',$claim,'message',$source)['available'])
 check(!mcpSourceSnapshot($row,'jens',$claim,'message',$source)['available']);
 check(!mcpSourceSnapshot($row,'christian',$source,'message',$source)['available']);
 check(!mcpSourceSnapshot(array_replace($row,['status'=>'running']),'christian',$claim,'message',$source)['available']);
+check(mcpSourceSnapshot(array_replace($row,['status'=>'failed','message'=>'SOURCE_ENDPOINT_INVALID']),'christian',$claim,'message',$source)['reason']==='SOURCE_READ_FAILED');
+check(mcpSourceSnapshot(array_replace($row,['status'=>'failed','message'=>'SOURCE_ENDPOINT_INVALID']),'christian',$claim,'message',$source)['detail']==='SOURCE_ENDPOINT_INVALID');
 $result['fetchedAt']=gmdate('c',time()-600);$row['result_json']=json_encode($result);
 check(mcpSourceSnapshot($row,'christian',$claim,'message',$source)['stale']);
 try{mcpSourceContent(['result'=>['kind'=>'document','base64'=>'YWJj','sha256'=>str_repeat('0',64)]]);throw new RuntimeException('hash must fail');}catch(RuntimeException $e){check($e->getMessage()==='SOURCE_DOCUMENT_HASH_MISMATCH');}

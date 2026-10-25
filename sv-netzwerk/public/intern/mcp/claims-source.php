@@ -7,6 +7,7 @@ function mcpSourceKey(string $claimId,string $kind,string $sourceId): string {
     return $claimId.':'.$kind.($sourceId!==''?':'.$sourceId:'');
 }
 function mcpSourceSnapshot(array $row,string $profile,string $claimId,string $kind,string $sourceId): array {
+    if(in_array($row['status']??'',['queued','running','failed'],true))return ['available'=>false,'job_id'=>(int)$row['id'],'status'=>$row['status'],'reason'=>$row['status']==='failed'?'SOURCE_READ_FAILED':'SOURCE_READ_PENDING','detail'=>(string)($row['message']??''),'retry'=>false];
     $r=json_decode((string)($row['result_json']??''),true);
     if(($row['status']??'')!=='done'||!is_array($r)||($r['source']??'')!=='claimsforce-source-read'||($r['sourceProfile']??'')!==$profile||($r['claimId']??'')!==$claimId||($r['kind']??'')!==$kind||($r['sourceId']??'')!==$sourceId||($r['readOnly']??false)!==true)return ['available'=>false,'reason'=>'NO_VERIFIED_SOURCE_READ'];
     $stamp=strtotime((string)($r['fetchedAt']??''));
@@ -20,7 +21,7 @@ function mcpClaimsSource(array $user,string $folder,string $kind,string $sourceI
     $profile=svnetUserProfile($user);$claimId=(string)($meta['claimsforce_claim_id']??'');
     if($profile===''||($meta['claimsforce_profile']??'')!==$profile)throw new RuntimeException('SOURCE_PROFILE_MISMATCH');
     $key=mcpSourceKey($claimId,$kind,$sourceId);$email=(string)$user['email'];
-    $s=db()->prepare("SELECT id,status,result_json FROM claimsforce_import_jobs WHERE requested_by=:email AND profile=:profile AND sync_mode='source' AND claim_number=:key AND status='done' ORDER BY id DESC LIMIT 1");
+    $s=db()->prepare("SELECT id,status,message,result_json FROM claimsforce_import_jobs WHERE requested_by=:email AND profile=:profile AND sync_mode='source' AND claim_number=:key ORDER BY id DESC LIMIT 1");
     $s->execute([':email'=>$email,':profile'=>$profile,':key'=>$key]);
     $snapshot=mcpSourceSnapshot($s->fetch()?:[],$profile,$claimId,$kind,$sourceId);
     if(!$refresh)return $snapshot;
