@@ -42,7 +42,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         if(candidates.length>1)break;
       }
       if(!button||button.disabled)throw Error('NATIVE_TEMPLATE_BUTTON_UNAVAILABLE');
-      if(button.getAttribute('aria-expanded')!=='true')button.click();
+      // The observed Radix trigger opens on pointerdown, not HTMLElement.click().
+      if(button.getAttribute('aria-expanded')!=='true'){
+        button.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true,button:0,pointerType:'mouse',isPrimary:true}));
+        button.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,cancelable:true,button:0,pointerType:'mouse',isPrimary:true}));
+      }
       let menu;
       const deadline=Date.now()+5000;
       do {menu=document.getElementById(button.getAttribute('aria-controls'));if(menu&&visible(menu))break;await new Promise(r=>setTimeout(r,100));}while(Date.now()<deadline);

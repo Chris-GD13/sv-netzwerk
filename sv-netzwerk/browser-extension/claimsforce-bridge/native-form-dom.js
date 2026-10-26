@@ -35,7 +35,7 @@
       const n=nodes[0];return{id,value:n.value,type:n.tagName.toLowerCase(),count:nodes.length,calculated:protectedIds.has(id)&&!id.startsWith('insurer'),writable:nodes.length===1&&!protectedIds.has(id)&&!n.disabled&&!n.readOnly,...(n.tagName==='SELECT'?{options:[...n.options].map(o=>o.value)}:{})};
     }).sort((a,b)=>a.id.localeCompare(b.id));
     const number=fields.find(f=>f.id==='insurerClaimId');
-    if(!number||number.value!==expected.claimNumber)throw Error('NATIVE_CLAIM_NUMBER_MISMATCH');
+    if(!number||number.value!==expected.claimNumber)throw Error('NATIVE_CLAIM_NUMBER_MISMATCH: '+JSON.stringify({expected:expected.claimNumber,observed:number?.value??null})+'; no fields changed');
     const hash=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(fields))))].map(v=>v.toString(16).padStart(2,'0')).join('');
     return{caseId:expected.caseId,formId:expected.formId,profile:expected.profile,claimNumber:number.value,fields,hash,dirty:!saveButton().disabled};
   }

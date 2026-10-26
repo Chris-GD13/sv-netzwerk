@@ -3,10 +3,10 @@ const source=fs.readFileSync(new URL('../browser-extension/claimsforce-bridge/cl
 function fixture({duplicate=false,disabled=false,foreign=false,wrongRoute=false}={}) {
  let clicks=0,opened=false,handler;const item={textContent:'SV Schlusserklärung',getClientRects:()=>[{}],getAttribute:()=>disabled?'true':null,click:()=>clicks++};
  const menu={getClientRects:()=>[{}],getAttribute:()=> 'menu',querySelectorAll:()=>duplicate?[item,item]:[item]};
- const button={textContent:'Hinzufügen',getClientRects:()=>[{}],disabled:false,click:()=>{opened=true},getAttribute:k=>k==='aria-expanded'?(opened?'true':'false'):'form-menu'};
+ const button={textContent:'Hinzufügen',getClientRects:()=>[{}],disabled:false,click:()=>{throw Error('Radix does not open on click')},dispatchEvent:e=>{if(e.type==='pointerdown'&&e.button===0)opened=true},getAttribute:k=>k==='aria-expanded'?(opened?'true':'false'):'form-menu'};
  const heading={textContent:'Formulare',getClientRects:()=>[{}],parentElement:{querySelectorAll:()=>[button]}};
- const document={querySelectorAll:()=>[heading],getElementById:()=>menu};
- vm.runInNewContext(source,{window:{addEventListener(){}},document,location:{pathname:wrongRoute?'/wrong':'/claims/case/investigations'},chrome:{runtime:{id:'extension',onMessage:{addListener:h=>handler=h}}},Map,Set,Date,setTimeout});
+ const document={querySelectorAll:()=>[heading],getElementById:()=>opened?menu:null};
+ vm.runInNewContext(source,{PointerEvent:class{constructor(type,args){this.type=type;Object.assign(this,args)}},window:{addEventListener(){}},document,location:{pathname:wrongRoute?'/wrong':'/claims/case/investigations'},chrome:{runtime:{id:'extension',onMessage:{addListener:h=>handler=h}}},Map,Set,Date,setTimeout});
  return{clicks:()=>clicks,send:message=>new Promise(resolve=>handler({caseId:'case',...message},{id:foreign?'other':'extension'},resolve))};
 }
 let count=0;async function test(name,fn){await fn();count++;console.log('ok',name)}
