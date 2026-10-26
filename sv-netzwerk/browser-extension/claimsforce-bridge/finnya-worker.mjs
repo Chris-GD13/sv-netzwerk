@@ -29,7 +29,9 @@ chrome.runtime.onMessage.addListener((message,sender,reply)=>{
     if(!job||Date.now()-job.createdAt>ttl){await chrome.storage.session.remove(key(sender.tab.id));return {ok:false,error:'Kein aktueller Angebotsauftrag.'};}
     if(message.type==='FINNYA_JOB')return {ok:true,job};
     const result=message.result;
-    if(!result||result.source_url!==sender.url)throw Error('Ungültige Finnya-Rückmeldung.');
+    const current=await chrome.tabs.get(sender.tab.id);
+    const source=new URL(result?.source_url||'https://invalid.local');
+    if(!result||source.origin!==FINNYA||!(source.pathname.startsWith('/debtors/')||(result.error&&source.pathname==='/debtors'))||source.href!==new URL(current.url).href)throw Error('Ungültige Finnya-Rückmeldung.');
     const saved=await chrome.tabs.sendMessage(job.portalTabId,{type:'FINNYA_PORTAL_RESULT',recordId:job.recordId,customerKey:job.customerKey,result});
     if(!saved?.ok)throw Error(saved?.error||'Portalablage nicht bestätigt.');
     await chrome.storage.session.remove(key(sender.tab.id));

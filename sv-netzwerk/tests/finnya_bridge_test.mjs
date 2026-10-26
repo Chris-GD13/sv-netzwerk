@@ -3,7 +3,7 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 const dir=new URL('../browser-extension/claimsforce-bridge/',import.meta.url);
 let listener;let id=10;const storage={};const tabs=[];const returned=[];
-const chrome={runtime:{onMessage:{addListener:f=>listener=f}},storage:{session:{get:async k=>k?{[k]:storage[k]}:{...storage},set:async v=>Object.assign(storage,v),remove:async k=>delete storage[k]}},tabs:{create:async x=>{tabs.push(x);return {id:++id}},update:async (id,x)=>tabs.push({id,...x}),sendMessage:async(id,x)=>{returned.push({id,...x});return {ok:true}},onRemoved:{addListener(){}}}};
+const chrome={runtime:{onMessage:{addListener:f=>listener=f}},storage:{session:{get:async k=>k?{[k]:storage[k]}:{...storage},set:async v=>Object.assign(storage,v),remove:async k=>delete storage[k]}},tabs:{get:async()=>({url:'https://factoringplus.dv-portal.de/debtors/test'}),create:async x=>{tabs.push(x);return {id:++id}},update:async (id,x)=>tabs.push({id,...x}),sendMessage:async(id,x)=>{returned.push({id,...x});return {ok:true}},onRemoved:{addListener(){}}}};
 vm.runInNewContext(readFileSync(new URL('finnya-worker.mjs',dir),'utf8'),{chrome,URL,Date,Error});
 const call=(message,sender)=>new Promise(resolve=>listener(message,sender,resolve));
 const portal={url:'https://www.sv-netzwerk.eu/intern/privatauftraege/angebot/',frameId:0,tab:{id:5}};
@@ -13,11 +13,11 @@ assert.equal((await call({type:'FINNYA_OPEN',job},{...portal,frameId:1})).ok,fal
 assert.equal((await call({type:'FINNYA_OPEN',job},portal)).ok,true);
 assert.equal((await call({type:'FINNYA_OPEN',job},portal)).ok,false,'double clicks do not create two tasks');
 assert.equal(tabs.length,2);
-const finn={url:'https://factoringplus.dv-portal.de/debtors/test',frameId:0,tab:{id:11}};
+const finn={url:'https://factoringplus.dv-portal.de/debtors?createDebtor=true',frameId:0,tab:{id:11}};
 assert.equal((await call({type:'FINNYA_JOB'},finn)).job.recordId,job.recordId);
 assert.equal((await call({type:'FINNYA_JOB'},{...finn,tab:{id:12}})).ok,false,'unbound tab cannot read customer data');
 assert.equal((await call({type:'FINNYA_RESULT',result:{source_url:'https://evil.example/'}},finn)).ok,false);
-assert.equal((await call({type:'FINNYA_RESULT',result:{source_url:finn.url,status:'confirmed'}},finn)).ok,true);
+assert.equal((await call({type:'FINNYA_RESULT',result:{source_url:'https://factoringplus.dv-portal.de/debtors/test',status:'confirmed'}},finn)).ok,true);
 assert.equal(returned[0].id,5);assert.equal(Object.keys(storage).length,0);
 
 // Execute the real content script against synthetic vendor dialogs. No live customer is created.

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SV-Netzwerk AuftragsbrÃ¼cke",
-  "version": "1.4.79",
+  "version": "1.4.80",
   "description": "Liest ClaimsForce- und Rekon-AuftrÃ¤ge samt Dateien, Nachrichten und Terminen in das SV-Netzwerk ein.",
   "permissions": [
     "storage",
