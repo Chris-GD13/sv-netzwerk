@@ -1,5 +1,18 @@
 <?php
 declare(strict_types=1);
+// One bounded wait avoids rapid identical tool calls while the browser works.
+// This only reads the already-authorized job; it never starts/retries a write.
+function mcpNativeAwaitJob(callable $read, ?callable $clock=null, ?callable $sleep=null): array {
+    $clock ??= static fn(): float => hrtime(true)/1e9;
+    $sleep ??= static fn() => usleep(250000);
+    $deadline=$clock()+8.0;
+    do {
+        $job=$read();
+        if(!$job)throw new RuntimeException('NATIVE_JOB_NOT_FOUND');
+        if(!in_array($job['status'],['queued','running'],true)||$clock()>=$deadline)return $job;
+        $sleep();
+    } while(true);
+}
 // Native draft requests remain in the existing authenticated station queue.
 function mcpNativeSchema(): void {
     db()->exec("CREATE TABLE IF NOT EXISTS claimsforce_native_operations(operation_id CHAR(36) PRIMARY KEY,user_id INT UNSIGNED NOT NULL,folder_id VARCHAR(190) NOT NULL,profile VARCHAR(30) NOT NULL,request_hash CHAR(64) NOT NULL,request_json MEDIUMTEXT NOT NULL,job_id BIGINT UNSIGNED NULL,created_at DATETIME NOT NULL,INDEX idx_native_user(user_id,created_at)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
@@ -19,9 +32,12 @@ function mcpNativeForms(array $user,array $args): array {
     if(($args['action']??'')==='poll'){
         if(!$existing)throw new RuntimeException('NATIVE_OPERATION_NOT_FOUND');
         $s=db()->prepare('SELECT id,status,message,result_json FROM claimsforce_import_jobs WHERE id=:id AND requested_by=:email AND profile=:profile');
-        $s->execute([':id'=>$existing['job_id'],':email'=>$user['email'],':profile'=>$profile]);$job=$s->fetch();
-        if(!$job)throw new RuntimeException('NATIVE_JOB_NOT_FOUND');
-        return ['operation_id'=>$operation,'status'=>$job['status'],'detail'=>$job['message'],'result'=>$job['status']==='done'?json_decode((string)$job['result_json'],true):null];
+        if(session_status()===PHP_SESSION_ACTIVE)session_write_close();
+        $job=mcpNativeAwaitJob(static function()use($s,$existing,$user,$profile){
+            $s->execute([':id'=>$existing['job_id'],':email'=>$user['email'],':profile'=>$profile]);
+            return $s->fetch();
+        });
+        return ['operation_id'=>$operation,'job_id'=>(int)$job['id'],'status'=>$job['status'],'detail'=>$job['message'],'result'=>$job['status']==='done'?json_decode((string)$job['result_json'],true):null];
     }
     $action=(string)($args['action']??'');$form=(string)($args['form_id']??'');
     if(!in_array($action,['inspect','save'],true)||($form!==''&&!preg_match($uuid,$form)))throw new InvalidArgumentException('NATIVE_ACTION_INVALID');

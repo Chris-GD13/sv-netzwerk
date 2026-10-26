@@ -1,7 +1,7 @@
 const API = '/intern/api/google-drive-sync.php';
 const CAL = '/intern/api/outlook-case-calendar.php';
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
-const PORTAL_CODE_VERSION = '1.4.73';
+const PORTAL_CODE_VERSION = '1.4.74';
 const CONTEXT_RELOAD_MESSAGE = 'Die Browser-Brücke wurde aktualisiert. Bitte diese Portalseite einmal neu laden und den Import danach erneut starten.';
 let contextReloadReported = false;
 const invalidExtensionContext = error => /Extension context invalidated|Receiving end does not exist|message port closed/i.test(String(error?.message || error || ''));
@@ -9,7 +9,7 @@ function reportInvalidExtensionContext() {
   if (contextReloadReported) return;
   contextReloadReported = true;
   document.documentElement.setAttribute('data-svnet-claims-runtime', 'unavailable|CF-EXTENSION-RELOAD|0');
-  window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', error: CONTEXT_RELOAD_MESSAGE }, location.origin);
+  window.postMessage({ type: 'SVNET_CLAIMS_IMPORT_ERROR', bridgeInvalidated: true, error: CONTEXT_RELOAD_MESSAGE }, location.origin);
 }
 function safeSendResponse(sendResponse, value) {
   try { sendResponse(value); }
@@ -214,7 +214,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 function reportRuntime() {
-  return chrome.runtime.sendMessage({ type: 'GET_RUNTIME_STATUS' }).then(status => {
+  return Promise.resolve().then(() => chrome.runtime.sendMessage({ type: 'GET_RUNTIME_STATUS' })).then(status => {
     const active = status?.active || {}, diagnostic = status?.diagnostic || {};
     document.documentElement.setAttribute('data-svnet-claims-runtime', [active.status || 'idle', diagnostic.phase || active.phase || 'CF-IDLE', Number(active.jobId || 0), active.profile || 'none'].join('|'));
     const rekon = status?.rekon || {};

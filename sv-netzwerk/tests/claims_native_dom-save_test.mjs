@@ -34,5 +34,12 @@ await test('route change after save remains an error',async()=>{
  const s=fixture();s.setDirty(true);s.button.click=()=>{s.location.pathname='/claims/other/forms/form';};
  await assert.rejects(s.api.save(s.expected),/NATIVE_ROUTE_MISMATCH/);
 });
+await test('saved preview without editable widgets is only acknowledged, never verified',async()=>{
+ const s=fixture();s.setDirty(true);const original=s.button.click;
+ s.button.click=()=>{original();s.frame.contentDocument.querySelectorAll=()=>[];};
+ const result=await s.api.save(s.expected);
+ assert.equal(result.acknowledged,true);assert.equal(result.verified,false);
+ assert.equal(s.events.filter(x=>x==='save').length,1);
+});
 await test('foreground native focusout is not duplicated',async()=>{const s=fixture({nativeFocusOut:true}),r=await s.api.snapshot(s.expected);await s.api.apply({...s.expected,expectedHash:r.hash,changes:[{field:'Hinweis1',before:'Old',after:'New'}]});assert.equal(s.events.filter(x=>x==='focusout').length,1);assert.equal(s.controls[1].persisted,'New');});
 console.log(`${n} DOM adapter tests passed; synthetic DOM, not installed browser transport.`);

@@ -154,6 +154,7 @@ jobs:
           node tests/claims_native_worker_test.mjs
           node tests/claims_native_completion_test.mjs
           node tests/bridge-read-only-session.test.mjs
+          node tests/bridge-runtime-reload.test.mjs
           node tests/read_session_recovery_test.mjs
           node tests/claims_native_bridge-integration-test.mjs
           node tests/claims_native_navigation_test.mjs

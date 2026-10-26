@@ -29,6 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Native poll deadline tests
+        run: php sv-netzwerk/tests/claims_native_poll_test.php
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:

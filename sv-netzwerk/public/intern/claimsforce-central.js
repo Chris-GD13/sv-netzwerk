@@ -30,7 +30,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,stationId,bridgeVersion,workerVersion,protocol:2})});
   const show=(t,b=false)=>{if(context.claims_agent&&bridgeProblem&&!mobileClient){t=bridgeProblem;b=true;button.disabled=true;if(fullButton)fullButton.disabled=true;}state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
-  const minimumBridgeVersion='1.4.65',currentBridgeVersion='1.4.73';
+  const minimumBridgeVersion='1.4.65',currentBridgeVersion='1.4.74';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
@@ -229,6 +229,10 @@
   window.addEventListener('message',async e=>{
     if(e.source!==window||e.origin!==location.origin)return;
     const d=e.data||{},runtime=d.runtime||{};
+    if(d.type==='SVNET_CLAIMS_IMPORT_ERROR'&&d.bridgeInvalidated===true){
+      bridge=false;bridgeProblem=String(d.error||'Browser-Brücke getrennt. Portalseite neu laden.');
+      refreshControl();show(bridgeProblem,true);
+    }
     if(d.type==='SVNET_CLAIMS_BRIDGE_READY'){
       if(!bridge){bridgeProblem='Das tatsächlich laufende Importprogramm ist nicht geprüft. Bitte die Browser-Brücke in Chrome neu laden; ein normaler Fensterneustart reicht dafür möglicherweise nicht.';show(bridgeProblem,true);}
     }

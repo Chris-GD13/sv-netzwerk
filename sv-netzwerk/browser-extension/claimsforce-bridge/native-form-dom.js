@@ -8,9 +8,13 @@
     const nodes=[...document.querySelectorAll('button')].filter(n=>visible(n)&&n.textContent.trim()==='Entwurf speichern');
     if(nodes.length!==1)throw Error('NATIVE_SAVE_CONTROL_MISSING');return nodes[0];
   };
-  function context(expected){
+  function assertRoute(expected){
     const path=`/claims/${expected.caseId}/forms/${expected.formId}`;
     if(location.origin!=='https://web.claimsforce.com'||location.pathname!==path)throw Error('NATIVE_ROUTE_MISMATCH');
+    return path;
+  }
+  function context(expected){
+    const path=assertRoute(expected);
     const frames=[...document.querySelectorAll('iframe')].filter(f=>{
       try{const u=new URL(f.src,location.href);let base=new URLSearchParams(u.hash.slice(1)).get('basePath')||u.searchParams.get('basePath')||'';
         for(let i=0;i<2&&base.includes('%');i++)base=decodeURIComponent(base);
@@ -76,13 +80,10 @@
     const deadline=Date.now()+20000;
     while(Date.now()<deadline){
       await pause(200);
-      try { context(expected); }
-      catch(error) {
-        // Claims rebuilds Apryse widgets after acknowledging the save.
-        // Keep waiting for that same document; never click Save again.
-        if(['NATIVE_FRAME_NOT_READY','NATIVE_WIDGETS_NOT_READY'].includes(error.message))continue;
-        throw error;
-      }
+      // Claims may replace the editable widgets with its saved preview.
+      // The disabled button acknowledges only the request; the caller must
+      // reopen the same native form and compare every field before verification.
+      assertRoute(expected);
       if(saveButton().disabled)return{acknowledged:true,verified:false};
     }
     throw Error('NATIVE_SAVE_ACK_TIMEOUT');
