@@ -26,14 +26,42 @@ export async function readClaimsSource(key, {profile, json, bytes, config}) {
   const messages = unwrap(await json(`${config.COMMUNICATION_API_ENDPOINT}/claims/${claimId}/messages`), 'messages');
   if (!Array.isArray(messages)) throw Error('SOURCE_MESSAGES_SHAPE_INVALID');
   const result = {source:'claimsforce-source-read', sourceProfile:profile, ...request, fetchedAt:new Date().toISOString(), readOnly:true};
+  // Names/types are selection hints, never evidence that a document was read.
+  // One same-claim inventory prevents downloading every signature image merely
+  // to discover its name. No binary content or cross-case URLs are exposed.
+  const attachmentInventory = async () => {
+    try {
+      const files=unwrap(await json(`${config.FILES_API_ENDPOINT}/claims/${claimId}/files`),'files');
+      if(!Array.isArray(files))throw Error('SOURCE_FILES_SHAPE_INVALID');
+      const seen=new Set();
+      const documents=files.map(file=>{
+        if(!uuid.test(file?.id)||seen.has(file.id)||(file.claimId&&file.claimId!==claimId))throw Error('SOURCE_FILES_IDENTITY_MISMATCH');
+        seen.add(file.id);
+        const name=file.name || file.fileName;
+        const mime=file.mimeType || file.contentType;
+        return {id:file.id,...(typeof name==='string'?{name}:{}),...(typeof mime==='string'?{mimeType:mime}:{}),
+          ...(Number.isSafeInteger(file.size)&&file.size>=0?{size:file.size}:{}),contentRead:false};
+      });
+      return {documents,attachmentMetadataStatus:'available'};
+    } catch {
+      // Reading a mail must remain possible if optional filename lookup fails.
+      return {documents:[],attachmentMetadataStatus:'unavailable'};
+    }
+  };
+  const namedAttachments=(attachments,documents)=>Array.isArray(attachments)?attachments.map(a=>{
+    const metadata=a.type==='CLAIM_FILE'?documents.find(file=>file.id===a.id):null;
+    return metadata?{...a,...metadata}:a;
+  }):[];
   if (kind === 'messages') {
-    return {...result, messages:messages.map(m=>({id:m.id, subject:m.subject || m.payload?.subject || '', createdAt:m.createdAt || m.createdDate || '', sentAt:m.sentAt || '', updatedAt:m.updatedAt || m.updatedDate || '', attachments:m.attachments || []}))};
+    const inventory=await attachmentInventory();
+    return {...result,...inventory, messages:messages.map(m=>({id:m.id, subject:m.subject || m.payload?.subject || '', createdAt:m.createdAt || m.createdDate || '', sentAt:m.sentAt || '', updatedAt:m.updatedAt || m.updatedDate || '', attachments:namedAttachments(m.attachments,inventory.documents)}))};
   }
   if (kind === 'message') {
     if (!messages.some(m=>m.id === sourceId)) throw Error('SOURCE_MESSAGE_NOT_IN_CLAIM');
     const message = unwrap(await json(`${config.COMMUNICATION_API_ENDPOINT}/claims/${claimId}/messages/${sourceId}`), 'message');
     if (message?.id !== sourceId || (message.claimId && message.claimId !== claimId)) throw Error('SOURCE_MESSAGE_IDENTITY_MISMATCH');
-    return {...result, message};
+    const inventory=await attachmentInventory();
+    return {...result,...inventory, message:{...message,attachments:namedAttachments(message.attachments,inventory.documents)}};
   }
   const files = unwrap(await json(`${config.FILES_API_ENDPOINT}/claims/${claimId}/files`), 'files');
   if (!Array.isArray(files)) throw Error('SOURCE_FILES_SHAPE_INVALID');
