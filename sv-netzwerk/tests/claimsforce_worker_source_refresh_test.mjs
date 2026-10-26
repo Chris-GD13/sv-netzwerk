@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { webcrypto } from 'node:crypto';
+import { readSourceOrRecordLegacyConflict } from '../browser-extension/claimsforce-bridge/source-read-isolation.mjs';
 const code=fs.readFileSync(new URL('../browser-extension/claimsforce-bridge/service-worker.js',import.meta.url),'utf8');
 const helper=code.slice(code.indexOf('async function prepareSourceUpload('),code.indexOf('async function uploadBuffer('));
 const worker=code.slice(code.indexOf('async function runImport('),code.indexOf('async function startImport('));
@@ -10,7 +11,7 @@ const file={id:sourceFileId,name:'SE.pdf',updatedAt:'2026-10-17T10:00:00Z',size:
 const version=[file.id,file.updatedAt,file.size,file.name].join('|');
 async function execute(mode,contents){
   const events=[],uploads=[];let entry;const prior={claimsforce_file_versions:[version],claimsforce_sync_signature:'same-signature',claimsforce_list_version:'same-list'};
-  const context={console,URL,Map,Set,Date,JSON,String,Number,Array,Error,Promise,TextEncoder,Uint8Array,AbortController,setTimeout,clearTimeout,crypto:webcrypto,btoa:s=>Buffer.from(s,'binary').toString('base64'),
+  const context={console,URL,Map,Set,Date,JSON,String,Number,Array,Error,Promise,TextEncoder,Uint8Array,AbortController,setTimeout,clearTimeout,crypto:webcrypto,btoa:s=>Buffer.from(s,'binary').toString('base64'),readSourceOrRecordLegacyConflict,
     BRIDGE_VERSION:'test',credentialDiagnostic:'',lastTaskDebug:{},profileKey:p=>p,credentialsFor:async()=>({value:{},source:'fixture'}),credentialMatchesProfile:()=>true,
     resetClaimsSession:async()=>{},claimsTab:async()=>({tab:{id:2},token:'fixture'}),readOpenTasks:async()=>0,ensureInvoicedListTab:async()=>{},openSelectedClaimTab:async()=>{},
     diagnostic:async()=>{},progress:async()=>{},safeRoute:x=>x,safeFileName:x=>x,assertSingleClaim:()=>{},claimFolderPath:()=>'',fileVersion:()=>version,messageVersion:()=>'',
