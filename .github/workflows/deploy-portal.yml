@@ -152,6 +152,10 @@ jobs:
           node tests/claims_native_draft-operation_test.mjs
           node tests/claims_native_dom-save_test.mjs
           node tests/claims_native_worker_test.mjs
+          node tests/claims_native_create_test.mjs
+          node tests/claims_native_create_dom_test.mjs
+          node tests/claims_native_create_worker_test.mjs
+          php tests/claims_native_create_guard_test.php
           node tests/claims_native_completion_test.mjs
           node tests/bridge-read-only-session.test.mjs
           node tests/bridge-runtime-reload.test.mjs

@@ -225,6 +225,7 @@ if($action==='claim'){
     // Old workers cannot interpret direct source requests; leave them queued.
     $sourceCapability=version_compare((string)($body['workerVersion']??''),'1.4.66','>=')?'1=1':"sync_mode<>'source'";
     if(version_compare((string)($body['workerVersion']??''),'1.4.70','<'))$sourceCapability.=" AND sync_mode<>'nativeform'";
+    if(version_compare((string)($body['workerVersion']??''),'1.4.77','<'))$sourceCapability.=" AND phase<>'CF-NATIVE-CREATE-QUEUED'";
     $claim=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE status='queued' AND profile IN ($profileSlots) AND ($sourceCapability) ORDER BY (sync_mode IN ('single','source')) DESC,(requested_by='system:claimsforce') ASC,created_at,id LIMIT 1 FOR UPDATE");
     $claim->execute($stationProfiles);
     $row=$claim->fetch(PDO::FETCH_ASSOC);
@@ -261,6 +262,7 @@ if($action==='complete'){
         $identity=$r['after']??$r['snapshot']??$r;
         $valid=($r['source']??'')==='claimsforce-native-form'&&($identity['caseId']??'')===($request['caseId']??'')&&($identity['profile']??'')===($request['profile']??'');
         if(($request['action']??'')==='save')$valid=$valid&&($r['verified']??false)===true&&($r['operationId']??'')===($request['operationId']??'')&&($identity['formId']??'')===($request['formId']??'');
+        elseif(($request['action']??'')==='create')$valid=$valid&&($r['created']??false)===true&&($r['verified']??false)===true&&($r['operationId']??'')===($request['operationId']??'')&&!empty($r['formId'])&&($identity['formId']??'')===$r['formId']&&($identity['status']??'')==='draft'&&($identity['dirty']??null)===false&&($identity['claimNumber']??'')===($request['claimNumber']??'')&&($identity['templateName']??'')===($request['templateName']??'');
         else $valid=$valid&&($r['readOnly']??false)===true;
         if(!$valid){$ok=false;$message='Native Formularprüfung fehlt oder gehört nicht zum beauftragten Fall.';}
     }

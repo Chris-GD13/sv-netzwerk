@@ -208,6 +208,7 @@
 
   function nativeCompletionMessage(result){
     if(result?.source!=='claimsforce-native-form')return null;
+    if(result.created===true&&result.verified===true)return 'Nativer Formularentwurf angelegt und erneut geöffnet; fachliche Befüllung steht noch aus.';
     if(result.readOnly===true)return result.snapshot
       ?`Natives Formular gelesen · ${result.snapshot.fields?.length||0} Felder · keine Änderung.`
       :`Native Formularliste gelesen · ${result.forms?.length||0} Formulare · keine Änderung.`;

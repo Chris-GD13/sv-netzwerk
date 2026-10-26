@@ -10,6 +10,7 @@ const base={source:'claimsforce-native-form'};
 assert.match(message({...base,readOnly:true,forms:[{},{}]}),/2 Formulare.*keine Änderung/);
 assert.match(message({...base,readOnly:true,snapshot:{fields:Array(67).fill({})}}),/67 Felder.*keine Änderung/);
 assert.match(message({...base,verified:true}),/gespeichert und nach erneutem Öffnen/);
+assert.match(message({...base,verified:true,created:true}),/angelegt.*fachliche Befüllung steht noch aus/);
 assert.match(message({...base,verified:false}),/nicht bestätigt/);
 assert.equal(message({claims:12}),null);
-console.log('5 native completion cases passed: inventory, fields, verified save, unverified result, legacy import.');
+console.log('6 native completion cases passed: inventory, fields, verified save, created draft, unverified result, legacy import.');

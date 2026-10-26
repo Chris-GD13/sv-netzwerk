@@ -1,5 +1,6 @@
 import {openExistingNativeForm} from './native-form-navigation.mjs';
 import {executeNativeDraft} from './native-draft-operation.mjs';
+import {runNativeCreate} from './native-create-worker.mjs';
 const hash=async value=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(value))))].map(n=>n.toString(16).padStart(2,'0')).join('');
 let active=false;
 export async function runNativeForm(request,io){
@@ -8,10 +9,15 @@ export async function runNativeForm(request,io){
   const timed=result=>({...result,durationMs:Math.max(0,Date.now()-startedAt)});
   let tabId,keep=false;
   try{
-    if(!['inspect','save'].includes(request.action)||!['christian','jens'].includes(request.profile)||!/^[a-f0-9-]{36}$/.test(request.caseId))throw Error('NATIVE_REQUEST_INVALID');
+    if(!['inspect','save','inspect_templates','create'].includes(request.action)||!['christian','jens'].includes(request.profile)||!/^[a-f0-9-]{36}$/.test(request.caseId))throw Error('NATIVE_REQUEST_INVALID');
     await io.assertAccount(request.profile);
     const tab=await io.createTab(`https://web.claimsforce.com/claims/${request.caseId}/investigations`);tabId=tab.id;
     await io.waitTab(tabId);
+    if(['inspect_templates','create'].includes(request.action)){
+      keep=request.action==='create';
+      const result=await runNativeCreate(request,io,tabId,hash);
+      keep=false;return timed({source:'claimsforce-native-form',operationId:request.operationId,...result});
+    }
     const send=async message=>{const r=await io.send(tabId,message);if(!r?.ok)throw Error(r?.error||'NATIVE_CHANNEL_FAILED');return r.result};
     let forms=[];
     const clock=io.clock||Date.now,deadline=clock()+15000;

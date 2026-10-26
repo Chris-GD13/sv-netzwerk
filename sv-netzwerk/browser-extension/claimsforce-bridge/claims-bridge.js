@@ -29,6 +29,34 @@ window.addEventListener('message', event => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (['NATIVE_FORM_TEMPLATES','NATIVE_FORM_CREATE'].includes(message?.type)) {
+    if(_sender?.id!==chrome.runtime.id||location.pathname!==`/claims/${message.caseId}/investigations`){sendResponse({ok:false,error:'native-create-context'});return;}
+    (async()=>{
+      const visible=n=>n.getClientRects().length>0;
+      const headings=[...document.querySelectorAll('.heading')].filter(n=>visible(n)&&n.textContent.trim()==='Formulare');
+      if(headings.length!==1)throw Error('NATIVE_TEMPLATE_SECTION_UNAVAILABLE');
+      let scope=headings[0].parentElement,button;
+      for(let i=0;i<4&&scope;i++,scope=scope.parentElement){
+        const candidates=[...scope.querySelectorAll('button')].filter(n=>visible(n)&&n.textContent.trim()==='Hinzufügen');
+        if(candidates.length===1){button=candidates[0];break;}
+        if(candidates.length>1)break;
+      }
+      if(!button||button.disabled)throw Error('NATIVE_TEMPLATE_BUTTON_UNAVAILABLE');
+      if(button.getAttribute('aria-expanded')!=='true')button.click();
+      let menu;
+      const deadline=Date.now()+5000;
+      do {menu=document.getElementById(button.getAttribute('aria-controls'));if(menu&&visible(menu))break;await new Promise(r=>setTimeout(r,100));}while(Date.now()<deadline);
+      if(!menu||!visible(menu)||menu.getAttribute('role')!=='menu')throw Error('NATIVE_TEMPLATE_MENU_UNAVAILABLE');
+      const items=[...menu.querySelectorAll('[role="menuitem"]')].filter(visible);
+      const templates=items.map(n=>n.textContent.trim());
+      if(message.type==='NATIVE_FORM_TEMPLATES')return{templates};
+      const matches=items.filter(n=>n.textContent.trim()===message.templateName&&n.getAttribute('aria-disabled')!=='true');
+      if(matches.length!==1)throw Error('NATIVE_TEMPLATE_NOT_UNIQUE');
+      // Caller has already durably journalled the operation before this one click.
+      matches[0].click();return{acknowledged:true,verified:false};
+    })().then(result=>sendResponse({ok:true,result})).catch(e=>sendResponse({ok:false,error:e.message}));
+    return true;
+  }
   if(message?.type==='NATIVE_FORM_INVENTORY'){
     if(_sender?.id!==chrome.runtime.id||location.pathname!==`/claims/${message.caseId}/investigations`){sendResponse({ok:false,error:'native-inventory-context'});return;}
     const forms=[];
@@ -39,7 +67,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       for(let n=0;n<4&&card&&!card.textContent.includes('Formular');n++)card=card.parentElement;
       const label=(card?.textContent||'').replace(/\s+/g,' ').trim();
       const count=card?[...card.querySelectorAll('a[href]')].filter(n=>/\/forms\//.test(n.getAttribute('href'))).length:0;
-      forms.push({formId:match[2],label,status:count===1&&label.includes('Formular')&&label.includes('In Bearbeitung')?'draft':label.includes('Versendet')?'sent':'unknown'});
+      const templateName=label.replace(/^Formular\s*(?:In Bearbeitung|Versendet)\s*/,'').replace(/\s*-\s*\d{2}\.\d{2}\.\d{4}\s*Öffnen\s*$/,'').trim();
+      forms.push({formId:match[2],label,templateName,status:count===1&&label.includes('Formular')&&label.includes('In Bearbeitung')?'draft':label.includes('Versendet')?'sent':'unknown'});
     }
     sendResponse({ok:true,result:forms});return;
   }
