@@ -25,6 +25,8 @@ function mcpNativeCreateUnresolved(array $row): bool {
     return ($row['status']??'')!=='done'||($result['verified']??false)!==true||empty($result['formId']);
 }
 function mcpNativeForms(array $user,array $args): array {
+    // User correction 26.10: continue original forms, never replace with blanks.
+    if(($args['action']??'')==='create')throw new RuntimeException('NATIVE_CREATE_DISABLED_USE_EXISTING_ORIGINAL');
     $folder=trim((string)($args['id']??''));requireCaseFolderAccess($folder,$user);
     if(!ownCase($user,$folder))throw new RuntimeException('NATIVE_CASE_ACCESS_DENIED');
     $meta=mcpDriveCaseMeta($folder,mcpDriveCaseFiles($folder));$profile=svnetUserProfile($user);
