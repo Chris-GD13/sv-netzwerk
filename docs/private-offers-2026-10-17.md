@@ -5,10 +5,19 @@
 Angebot anlegen, speichern, als PDF herunterladen/drucken, nach separater
 Versandprüfung mailen und nach bestätigter Beauftragung in einen Auftrag mit
 eigener Nummer überführen. Erstellung ausschließlich Christian, Susanne und
-Katja (exakte Konten in private-business-access.php). Keine Freigabe durch Rolle
+Katja sowie seit Christians Freigabe vom 26.10.2026 auch Marc Schütt (exakte
+Konten in private-business-access.php). Marc bleibt im eigenen Privatgutachten-
+Bestand mit Ausgangsort Werdohl; die gemeinsame Büroablage der bisherigen
+Ersteller bleibt unverändert. Keine Freigabe durch Rolle
 oder Anzeigename. Seite, API und bisherige Auftragserstellung prüfen dieselbe
 Freigabe. Bestehende Lesebereiche bleiben erhalten; keine Erweiterung der
 Versicherungsfallberechtigungen.
+
+Der direkte Menüpunkt „Angebote erstellen“ führt ohne Zwischenschritt zur
+bestehenden Angebotsmaske. Er wird nur nach bestätigter serverseitiger Freigabe
+eingeblendet. Die dafür verwendete Zugriffsabfrage lädt keine Akten oder Ordner
+und legt keine Tabellen an. Auch beim direkten Seiten- oder API-Aufruf bleibt
+die serverseitige Konto- und Profilprüfung verbindlich.
 
 ## Vorlagen und Preise
 

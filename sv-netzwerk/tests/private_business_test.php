@@ -19,4 +19,10 @@ try{pbClean(['expert'=>'unknown-expert','expert_name'=>'Arbitrary name'],'christ
 $katja=pbSave($db,'christian',['request_key'=>pbUuid(),'data'=>$d],['email'=>'ks@sv-schuett.eu']);pbCheck(pbOfficeEmail($katja['data'])==='ks@sv-schuett.eu','Katja creations must use Katja correspondence');
 $katjaEdited=pbSave($db,'christian',['id'=>$katja['id'],'revision'=>1,'request_key'=>pbUuid(),'data'=>array_replace($d,['correspondence_email'=>'ws@sv-schuett.eu'])],['email'=>'cw@sv-schuett.eu']);pbCheck(pbOfficeEmail($katjaEdited['data'])==='ks@sv-schuett.eu','Editing must preserve correspondence ownership and ignore client override');
 $katjaOrder=pbConvert($db,'christian',$katja['id'],true);pbCheck(pbOfficeEmail($katjaOrder['data'])==='ks@sv-schuett.eu','Order conversion must preserve Katja correspondence');
-echo "private_business_test: ok (unique immutable numbers, collisions, retry, round trips, prices, profiles, revisions, conversion)\n";
+$marcData=$d;$marcData['origin']=pbDefaults('marc')['origin'];$marcData['first_name']='Synthetisch';$marcData['last_name']='Profiltest';
+$marcOffer=pbSave($db,'marc',['request_key'=>pbUuid(),'data'=>$marcData],['email'=>'ms@sv-schuett.eu']);
+pbCheck($marcOffer['profile']==='marc'&&$marcOffer['data']['origin']==='werdohl','Marc offers must retain own inventory and Werdohl origin');
+try{pbRecord($db,$marcOffer['id'],'christian');throw new LogicException('Christian read Marc offer');}catch(RuntimeException$e){pbCheck($e->getCode()===403,'Marc offers must be isolated from Christian');}
+try{pbSave($db,'christian',['id'=>$marcOffer['id'],'revision'=>1,'request_key'=>pbUuid(),'data'=>$d]);throw new LogicException('Cross-profile edit accepted');}catch(RuntimeException$e){pbCheck($e->getCode()===403,'Cross-profile edits must fail');}
+$marcOrder=pbConvert($db,'marc',$marcOffer['id'],true);pbCheck($marcOrder['profile']==='marc'&&$marcOrder['parent_id']===$marcOffer['id'],'Marc conversion must remain in own inventory');
+echo "private_business_test: ok (unique immutable numbers, collisions, retry, round trips, prices, profiles, revisions, conversion, Marc offer isolation)\n";
