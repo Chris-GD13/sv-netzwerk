@@ -18,7 +18,28 @@ function pbParagraph(array &$pages,array &$ops,float &$y,string $text,string $ti
 }
 function pbSection(array &$pages,array &$ops,float &$y,string $name,string $title,array $r): void {if($y<118){$pages[]=$ops;$ops=[];$y=pbHeader($ops,$title,$r);} $y-=6;trText($ops,44,$y,$name,11,true,[.13,.30,.40]);$y-=19;}
 function pbAddressText(array $a): string {return trim($a['street'].', '.$a['postcode'].' '.$a['city'],', ');}
-function pbClientBlock(array &$pages,array &$ops,float &$y,string $title,array $r): void {$d=$r['data'];$left=[pbCustomer($d)?:'Noch nicht angegeben',$d['billing_street'],trim($d['billing_postcode'].' '.$d['billing_city']),($d['phone']??'')!==''?'Telefon: '.$d['phone']:'',($d['mobile']??'')!==''?'Mobil: '.$d['mobile']:'',($d['other_phone']??'')!==''?'Sonstige Nummer: '.$d['other_phone']:'',$d['email'],$d['additional_email']??''];$site=pbSite($d);$expert=pbExpertName($d);$right=[$site['street'],trim($site['postcode'].' '.$site['city']),];$columns=[];foreach([$left,$right]as$col){$lines=[];foreach($col as$value)if($value!=='')$lines=array_merge($lines,trWrap($value,43));$columns[]=$lines;}$height=max(count($columns[0]),count($columns[1]))*13+45;trFill($ops,44,$y-$height,507,$height,[.96,.975,.98]);foreach($columns as$i=>$lines){$x=$i===0?55:313;trText($ops,$x,$y-17,$i===0?'Auftraggeber / Rechnung':'Ortstermin / Objekt',9,true,[.13,.30,.40]);foreach($lines as$j=>$line)trText($ops,$x,$y-37-$j*13,$line,8.8,false,[.08,.16,.22]);}$y-=$height+16;}
+function pbExpertContactLines(array $d): array {
+    $name=pbExpertName($d);
+    if($name==='')return [];
+    return match(pbExpertId((string)($d['expert']??''))){
+        'marc-schuett'=>[$name,'Feldstraße 108','58791 Werdohl','Mobil: 0171 211 97 77','E-Mail: ms@sv-schuett.eu'],
+        'christian-waechter'=>[$name,'Nordstraße 17','73432 Aalen','Bürokontakt: Susanne Wächter','Telefon: 07367 3939783','E-Mail: ws@sv-schuett.eu'],
+        default=>[$name],
+    };
+}
+function pbClientBlock(array &$pages,array &$ops,float &$y,string $title,array $r): void {
+    $d=$r['data'];
+    $left=[pbCustomer($d)?:'Noch nicht angegeben',$d['billing_street'],trim($d['billing_postcode'].' '.$d['billing_city']),($d['phone']??'')!==''?'Telefon: '.$d['phone']:'',($d['mobile']??'')!==''?'Mobil: '.$d['mobile']:'',($d['other_phone']??'')!==''?'Sonstige Nummer: '.$d['other_phone']:'',$d['email'],$d['additional_email']??''];
+    $site=pbSite($d);$right=[$site['street'],trim($site['postcode'].' '.$site['city'])];
+    $expert=pbExpertContactLines($d);$heading='Beauftragter Sachverständiger';
+    if($expert)$right=array_merge($right,[' ',$heading],$expert);
+    $columns=[];foreach([$left,$right]as$col){$lines=[];foreach($col as$value)if($value!=='')$lines=array_merge($lines,$value===' '?[' ']:trWrap($value,43));$columns[]=$lines;}
+    $height=max(count($columns[0]),count($columns[1]))*13+45;
+    if($y-$height<70){$pages[]=$ops;$ops=[];$y=pbHeader($ops,$title,$r);}
+    trFill($ops,44,$y-$height,507,$height,[.96,.975,.98]);
+    foreach($columns as$i=>$lines){$x=$i===0?55:313;trText($ops,$x,$y-17,$i===0?'Auftraggeber / Rechnung':'Ortstermin / Objekt',9,true,[.13,.30,.40]);foreach($lines as$j=>$line)trText($ops,$x,$y-37-$j*13,$line,8.8,$i===1&&$line===$heading,[.08,.16,.22]);}
+    $y-=$height+16;
+}
 function pbServiceBlock(array &$pages,array &$ops,float &$y,string $title,array $r): void {
     $d=$r['data'];
     pbSection($pages,$ops,$y,'Terminadresse & Leistung',$title,$r);
