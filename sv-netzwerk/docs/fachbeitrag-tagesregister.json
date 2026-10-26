@@ -60,12 +60,14 @@
         "verified_at": "2026-10-26T05:14:59.513Z"
       },
       "linkedin": {
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-linkedin-20261026-01a176cc",
         "reserved_at": "2026-10-26T06:04:49.640Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen/"
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen/",
+        "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7520365576859443200/",
+        "verified_at": "2026-10-26T06:08:45.147Z"
       }
     }
   },
-  "updated_at": "2026-10-26T06:04:49.640Z"
+  "updated_at": "2026-10-26T06:08:45.147Z"
 }
