@@ -7,7 +7,12 @@ require_once __DIR__.'/private-business-storage.php';
 require_once __DIR__.'/private-business-route.php';
 require_once __DIR__.'/private-business-mail.php';
 require_once __DIR__.'/private-business-access.php';
-commonHeaders();$user=requireAuth();if(!pbCanCreate($user))apiError(403,'Die Erstellung von Angeboten und Aufträgen ist für dieses Benutzerkonto nicht freigegeben.');$profile=pbPrivateProfile($user);
+commonHeaders();$user=requireAuth();
+// Navigation needs only the server decision, without loading records, folders or the schema.
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($_GET['action'] ?? '') === 'access') {
+    apiJson(['ok'=>true,'can_create'=>pbCanCreate($user)]);
+}
+if(!pbCanCreate($user))apiError(403,'Die Erstellung von Angeboten und Aufträgen ist für dieses Benutzerkonto nicht freigegeben.');$profile=pbPrivateProfile($user);
 $action=(string)($_GET['action']??'status');$isPost=$_SERVER['REQUEST_METHOD']==='POST';
 if($isPost){if(!str_starts_with(strtolower((string)($_SERVER['CONTENT_TYPE']??'')),'application/json'))apiError(415,'JSON erforderlich.');if(isset($_SERVER['HTTP_ORIGIN'])&&parse_url($_SERVER['HTTP_ORIGIN'],PHP_URL_HOST)!==($_SERVER['HTTP_HOST']??''))apiError(403,'Ungültiger Ursprung.');}
 try{
