@@ -14,4 +14,4 @@ Stilprüfung: Öffentlicher Artikel und vorbereiteter LinkedIn-Text bestehen aus
 
 LinkedIn: Begleittext vorbereitet, nicht veröffentlicht. Die tatsächliche Veröffentlichung bleibt ausschließlich dem separaten 07:00-Auftrag vorbehalten. Ohne Bild und ohne Zusatzkosten.
 
-Live-Nachweis: wird erst nach erfolgreichem Deployment und sichtbarer Prüfung ergänzt. Bis dahin bleiben Deploy- und Live-Status offen.
+Live-Nachweis: Der Inhaltscommit `80f4770ff233a711ed18ab59f13d014514b735b3` wurde mit dem erfolgreichen Deployment-Run `40272673449` veröffentlicht. Am 26.10.2026 um 06:15 Europe/Berlin wurden die kanonische Detailseite, die cachefreie Fachartikelübersicht, die Kategorie, die Tag-Routen, das Christian-Wächter-Profil, Sitemap und `robots.txt` per HTTP und im sichtbaren Browser geprüft. `deploy-version.txt` weist exakt den Inhaltscommit aus. Der Tagesregistereintrag wurde mit Commit `c6b07a91a2a052ea1a1803a2c55433f4825603c6` auf `published-verified` fortgeschrieben. LinkedIn bleibt `prepared-not-posted`.
