@@ -8,6 +8,16 @@ foreach([[$claim,'messages',$source],[$claim,'document','../file'],[$claim,'bad'
 $result=['source'=>'claimsforce-source-read','sourceProfile'=>'christian','claimId'=>$claim,'kind'=>'message','sourceId'=>$source,'fetchedAt'=>gmdate('c'),'readOnly'=>true,'message'=>['id'=>$source,'body'=>'test']];
 $row=['id'=>1,'status'=>'done','result_json'=>json_encode($result)];
 check(mcpSourceSnapshot($row,'christian',$claim,'message',$source)['available']);
+$inventory=[['id'=>$source,'name'=>'invoice.pdf','contentRead'=>false]];
+$mailSnapshot=['available'=>true,'result'=>$result+['documents'=>$inventory,'attachmentMetadataStatus'=>'available']];
+$mailSnapshot['result']['message']['attachments']=$inventory;
+$mailOutput=json_decode(mcpSourceContent($mailSnapshot)[0]['text'],true);
+check(!array_key_exists('documents',$mailOutput['result']));
+check($mailOutput['result']['message']===$mailSnapshot['result']['message']);
+check($mailOutput['result']['attachmentMetadataStatus']==='available');
+$listSnapshot=$mailSnapshot;$listSnapshot['result']['kind']='messages';
+check(json_decode(mcpSourceContent($listSnapshot)[0]['text'],true)['result']['documents']===$inventory);
+check($mailSnapshot['result']['documents']===$inventory);
 check(!mcpSourceSnapshot($row,'jens',$claim,'message',$source)['available']);
 check(!mcpSourceSnapshot($row,'christian',$source,'message',$source)['available']);
 check(!mcpSourceSnapshot(array_replace($row,['status'=>'running']),'christian',$claim,'message',$source)['available']);

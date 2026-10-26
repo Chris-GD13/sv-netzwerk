@@ -43,6 +43,10 @@ function mcpClaimsSource(array $user,string $folder,string $kind,string $sourceI
 }
 function mcpSourceContent(array $snapshot): array {
     $r=$snapshot['result']??null;
+    // The message list is the document inventory entrypoint. Repeating every
+    // case filename for each single mail wastes context and causes compaction.
+    // Keep the complete mail and its named attachments unchanged.
+    if(is_array($r)&&($r['kind']??'')==='message')unset($snapshot['result']['documents']);
     if(!is_array($r)||($r['kind']??'')!=='document')return [['type'=>'text','text'=>json_encode($snapshot,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR)]];
     $bytes=base64_decode((string)($r['base64']??''),true);
     if($bytes===false||strlen($bytes)>8*1024*1024||!hash_equals((string)($r['sha256']??''),hash('sha256',$bytes)))throw new RuntimeException('SOURCE_DOCUMENT_HASH_MISMATCH');
