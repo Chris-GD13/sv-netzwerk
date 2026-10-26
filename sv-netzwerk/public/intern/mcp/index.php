@@ -67,11 +67,11 @@ function caseTitle(array $row): string {
 // OAuth-aware MCP clients probe the endpoint with GET before sending an
 // initialize request. Return the same RFC 9728 challenge as an unauthenticated
 // POST; a 200 informational document is otherwise mistaken for auth metadata.
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') oauthChallenge('cases:read cases:drafts.write');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') oauthChallenge('cases:read cases:drafts.write files:read files:write');
 
 // Challenge the MCP client before initialization so ChatGPT starts the
 // personal OAuth flow instead of merely listing an unauthenticated server.
-if (!oauthBearerUserOrNull('cases:read')) oauthChallenge('cases:read cases:drafts.write');
+if (!oauthBearerUserOrNull('cases:read')) oauthChallenge('cases:read cases:drafts.write files:read files:write');
 
 $request=requestBody();$id=$request['id']??null;$method=(string)($request['method']??'');$params=is_array($request['params']??null)?$request['params']:[];
 if ($method==='initialize') mcpResult($id,['protocolVersion'=>(string)($params['protocolVersion']??'2025-06-18'),'capabilities'=>['tools'=>(object)[]],'serverInfo'=>['name'=>'sv-netzwerk-fallbearbeitung','version'=>'1.3.0'],'instructions'=>'Nutze ausschließlich Fälle des angemeldeten Portalbenutzers. Die Fallakten und Unterlagen liegen im geprüften IONOS-Prüfportal; Google Drive ist keine Fallablage. Vor jeder inhaltlichen Bearbeitung zuerst search und anschließend fetch aufrufen. Relevante Akten anschließend gezielt mit read_case_file lesen. Normale Schadenberichte und SV-GF-/Groß-TF-Schäden haben unterschiedliche verbindliche Gliederungen. Gib nur die angeforderten Falldaten oder Ergebnisse aus. Interne Test-, Browser-, QS- und Verbindungsdetails gehören nicht in die Antwort. Ergebnisse nur auf ausdrücklichen Wunsch des Benutzers mit save_case_draft als neuen Entwurf zurückgeben. Originalbelege und versandte Fassungen niemals verändern. Ausdrücklich beauftragte Änderungen an vorhandenen nativen Formularentwürfen ausschließlich mit claimsforce_native_form und bestätigtem Rücklesen ausführen. save_case_draft ist nur Portaltextablage. Weder Speichern noch ein erfolgreicher Toolaufruf beweisen vollständige fachliche Bearbeitung, QS oder Versand.']);
