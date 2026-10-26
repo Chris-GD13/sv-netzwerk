@@ -18,3 +18,31 @@ export async function requireReadOnlySession({ profile, expectedEmail, readSessi
   }
   return token;
 }
+
+// Extension reload clears session storage while Claims itself can stay logged in.
+// Recover only through an owned read-only tab, never reload/logout a user tab.
+export async function recoverReadOnlySession(options, io) {
+  try { return await requireReadOnlySession(options); }
+  catch (error) {
+    if (!/^CF-READ-SESSION(?::|-EXPIRED:)/.test(String(error.message))) throw error;
+    const existing = await options.readSession();
+    if (existing?.claimsToken && (existing.claimsTokenProfile !== options.profile || options.emailOf(existing.claimsToken) !== options.expectedEmail)) throw error;
+    let tab;
+    try {
+      tab = await io.open();
+      const deadline = io.now() + 15000;
+      while (io.now() < deadline) {
+        const row = await options.readSession();
+        if (row?.claimsToken && (row.claimsTokenProfile !== options.profile || options.emailOf(row.claimsToken) !== options.expectedEmail)) throw error;
+        try { return await requireReadOnlySession(options); }
+        catch (current) {
+          if (!/^CF-READ-SESSION(?::|-EXPIRED:)/.test(String(current.message))) throw current;
+        }
+        await io.pause(200);
+      }
+      throw new Error('CF-READ-SESSION-RECOVERY: Bestehende Claims-Anmeldung konnte im eigenen Lesetab nicht bestaetigt werden. Kein Kontowechsel ausgefuehrt.');
+    } finally {
+      if (tab?.id != null) await io.close(tab.id).catch(() => {});
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import {requireReadOnlySession, capturedTokenProfile} from './read-only-session.mjs';
+import {requireReadOnlySession, recoverReadOnlySession, capturedTokenProfile} from './read-only-session.mjs';
 import {openExistingNativeForm} from './native-form-navigation.mjs';
 import {runNativeForm} from './native-form-worker.mjs';
 import {readSourceOrRecordLegacyConflict} from './source-read-isolation.mjs';
@@ -27,7 +27,7 @@ const PROFILE_EMAILS = {
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS', 'SW'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
-const WORKER_CODE_VERSION = '1.4.71';
+const WORKER_CODE_VERSION = '1.4.72';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
@@ -489,12 +489,17 @@ async function discoverSingleClaimSource(run) {
   return found.profile;
 }
 
+async function prepareReadOnlySession(profile) {
+  return recoverReadOnlySession({profile, expectedEmail: PROFILE_EMAILS[profile], emailOf: tokenEmail,
+    readSession: () => chrome.storage.session.get(['claimsToken', 'claimsTokenProfile'])}, {
+    open: () => chrome.tabs.create({url:'https://web.claimsforce.com/planning', active:false}),
+    close: id => chrome.tabs.remove(id), now: Date.now, pause: sleep
+  });
+}
+
 async function runReadOnlyImport(run) {
   const profile = profileKey(run.profile);
-  const token = await requireReadOnlySession({
-    profile, expectedEmail: PROFILE_EMAILS[profile], emailOf: tokenEmail,
-    readSession: () => chrome.storage.session.get(['claimsToken', 'claimsTokenProfile'])
-  });
+  const token = await prepareReadOnlySession(profile);
   if (run.mode === 'tasks') {
     const response = await requestJson('https://tasks-api.claimsforce.com/tasks', token);
     const tasks = unwrap(response, 'tasks');
@@ -528,6 +533,7 @@ async function runImport(run) {
   if(run.mode==='nativeform'){
     const request=run.nativeRequest;
     if(!request||request.profile!==run.profile||request.operationId!==run.claimNumber)throw Error('NATIVE_QUEUE_IDENTITY_MISMATCH');
+    await prepareReadOnlySession(run.profile);
     return runNativeForm(request,{
       assertAccount:profile=>requireReadOnlySession({profile,expectedEmail:PROFILE_EMAILS[profile],emailOf:tokenEmail,readSession:()=>chrome.storage.session.get(['claimsToken','claimsTokenProfile'])}),
       createTab:url=>chrome.tabs.create({url,active:false}),waitTab,getTab:id=>chrome.tabs.get(id),

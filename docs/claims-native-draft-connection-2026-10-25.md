@@ -83,3 +83,11 @@ switching is not yet proven.
 The sent SE's menu provides download, attach and delete. The viewer's top
 Bearbeiten button enters title editing; it is not evidence of a revision API.
 No new revision or field edit was made during that investigation.
+
+## 26.10.2026 – 1.4.71 live und Wiederaufnahme nach Reload
+- Browser-DOM bestätigt bridgeVersion und workerVersion 1.4.71.
+- Job 121184 / e0dda973-87c6-4939-8a49-984dee9fedfc scheiterte nach Erweiterungsreload an CF-READ-SESSION.
+- Der bestehende Claims-Tab war weiterhin als CW angemeldet. Nach eigenem Seitenreload: Job 121185 / c9c25bba-fe2f-4779-8288-01e1229f4689 erfolgreich in ca. 15 s (Langdock-Messung 10:30:57–10:31:12 UTC). Inventar: ZB draft, Vorblatt sent, SE sent. Abschlussmeldung korrekt: Native Formularliste gelesen, 3 Formulare, keine Änderung.
+- Ursache: Leerer extension-session-Speicher wurde vor einer normalen Claims-Seitenanfrage als fehlende Anmeldung behandelt.
+- 1.4.72 ergänzt einen begrenzten Wiederaufnahmeversuch über einen ausschließlich eigenen Lesetab. Keine fremden Tabs neu laden, kein Logout, kein Kontowechsel, keine Zugangsdaten nötig. Vorhandene fremde Kontozuordnung blockiert weiterhin.
+- Sechs isolierte Wiederaufnahmetests und zehn bestehende Sitzungsprüfungen bestanden. Native Save/Reopen bleibt noch ohne produktiven Erfolgsnachweis; keine finanziellen Werte geändert.

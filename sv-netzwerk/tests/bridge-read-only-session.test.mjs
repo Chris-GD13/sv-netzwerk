@@ -21,5 +21,9 @@ test('source/tasks dispatch before legacy session reset and their handler has no
   const source=readFileSync(new URL('../browser-extension/claimsforce-bridge/service-worker.js',import.meta.url),'utf8');
   const handler=source.slice(source.indexOf('async function runReadOnlyImport'),source.indexOf('async function runImport'));
   assert.doesNotMatch(handler,/resetClaimsSession|claimsTab\(|chrome\.tabs|browsingData|credentialsFor|storage\.(local|session)\.(set|remove)/);
-  assert.match(source,/async function runImport\(run\) \{\s*if \(run.mode === 'source' \|\| run.mode === 'tasks'\) return runReadOnlyImport\(run\);/);
+  const dispatch=source.slice(source.indexOf('async function runImport'));
+  const readDispatch=dispatch.indexOf("if (run.mode === 'source' || run.mode === 'tasks') return runReadOnlyImport(run);");
+  assert(readDispatch>0 && readDispatch<dispatch.indexOf('resetClaimsSession('), 'Read-only dispatch must precede legacy session mutation');
+  const preparation=source.slice(source.indexOf('async function prepareReadOnlySession'),source.indexOf('async function runReadOnlyImport'));
+  assert.doesNotMatch(preparation,/resetClaimsSession|claimsTab\(|browsingData|credentialsFor|tabs\.(query|reload|update)|storage\.(local|session)\.(set|remove)/);
 });
