@@ -1,9 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "SV-Netzwerk Auftragsbrücke",
-  "version": "1.4.78",
-  "description": "Liest ClaimsForce- und Rekon-Aufträge samt Dateien, Nachrichten und Terminen in das SV-Netzwerk ein.",
-  "permissions": ["storage", "tabs", "nativeMessaging", "browsingData", "alarms"],
+  "name": "SV-Netzwerk AuftragsbrÃ¼cke",
+  "version": "1.4.79",
+  "description": "Liest ClaimsForce- und Rekon-AuftrÃ¤ge samt Dateien, Nachrichten und Terminen in das SV-Netzwerk ein.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "nativeMessaging",
+    "browsingData",
+    "alarms"
+  ],
   "host_permissions": [
     "https://web.claimsforce.com/*",
     "https://*.claimsforce.com/*",
@@ -13,53 +19,108 @@
     "https://www.rekoninterschaden-portal.de/*",
     "https://api.www.rekoninterschaden-portal.de/*",
     "https://www.sv-netzwerk.eu/*",
-    "http://127.0.0.1:47831/*"
+    "http://127.0.0.1:47831/*",
+    "https://factoringplus.dv-portal.de/*"
   ],
-  "background": { "service_worker": "service-worker.js", "type": "module" },
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
   "options_page": "options.html",
   "content_scripts": [
     {
-      "matches": ["https://web.claimsforce.com/*"],
-      "js": ["claims-main.js"],
+      "matches": [
+        "https://web.claimsforce.com/*"
+      ],
+      "js": [
+        "claims-main.js"
+      ],
       "run_at": "document_start",
       "world": "MAIN"
     },
     {
-      "matches": ["https://web.claimsforce.com/*"],
-      "js": ["form-readiness.js", "native-form-dom.js", "claims-bridge.js"],
+      "matches": [
+        "https://web.claimsforce.com/*"
+      ],
+      "js": [
+        "form-readiness.js",
+        "native-form-dom.js",
+        "claims-bridge.js"
+      ],
       "run_at": "document_start"
     },
     {
-      "matches": ["https://portal.kussgmbh.de/*"],
-      "js": ["kuss-bridge.js"],
+      "matches": [
+        "https://portal.kussgmbh.de/*"
+      ],
+      "js": [
+        "kuss-bridge.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://www.rekoninterschaden-portal.de/*"],
-      "js": ["rekon-main.js"],
+      "matches": [
+        "https://www.rekoninterschaden-portal.de/*"
+      ],
+      "js": [
+        "rekon-main.js"
+      ],
       "run_at": "document_start",
       "world": "MAIN"
     },
     {
-      "matches": ["https://www.rekoninterschaden-portal.de/*"],
-      "js": ["rekon-bridge.js"],
+      "matches": [
+        "https://www.rekoninterschaden-portal.de/*"
+      ],
+      "js": [
+        "rekon-bridge.js"
+      ],
       "run_at": "document_start"
     },
     {
       "matches": [
         "https://www.sv-netzwerk.eu/intern/*"
       ],
-      "js": ["portal-bridge.js"],
+      "js": [
+        "portal-bridge.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://www.sv-netzwerk.eu/intern/login/*"],
-      "js": ["portal-login-helper.js"],
+      "matches": [
+        "https://www.sv-netzwerk.eu/intern/login/*"
+      ],
+      "js": [
+        "portal-login-helper.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://*.claimsforce.com/*", "https://claimsforce.eu.auth0.com/*"],
-      "js": ["login-helper.js"],
+      "matches": [
+        "https://*.claimsforce.com/*",
+        "https://claimsforce.eu.auth0.com/*"
+      ],
+      "js": [
+        "login-helper.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.sv-netzwerk.eu/intern/privatauftraege/angebot/*"
+      ],
+      "js": [
+        "finnya-portal.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://factoringplus.dv-portal.de/*"
+      ],
+      "js": [
+        "finnya-page.js"
+      ],
       "run_at": "document_idle"
     }
   ]

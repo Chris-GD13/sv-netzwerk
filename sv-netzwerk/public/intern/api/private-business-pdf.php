@@ -18,7 +18,18 @@ function pbParagraph(array &$pages,array &$ops,float &$y,string $text,string $ti
 }
 function pbSection(array &$pages,array &$ops,float &$y,string $name,string $title,array $r): void {if($y<118){$pages[]=$ops;$ops=[];$y=pbHeader($ops,$title,$r);} $y-=6;trText($ops,44,$y,$name,11,true,[.13,.30,.40]);$y-=19;}
 function pbAddressText(array $a): string {return trim($a['street'].', '.$a['postcode'].' '.$a['city'],', ');}
-function pbClientBlock(array &$pages,array &$ops,float &$y,string $title,array $r): void {$d=$r['data'];$left=[pbCustomer($d)?:'Noch nicht angegeben',$d['billing_street'],trim($d['billing_postcode'].' '.$d['billing_city']),($d['phone']??'')!==''?'Telefon: '.$d['phone']:'',($d['mobile']??'')!==''?'Mobil: '.$d['mobile']:'',($d['other_phone']??'')!==''?'Sonstige Nummer: '.$d['other_phone']:'',$d['email'],$d['additional_email']??''];$site=pbSite($d);$expert=pbExpertName($d);$right=[$site['street'],trim($site['postcode'].' '.$site['city']),$d['contact']!==''?'Kontakt: '.$d['contact']:'',$d['appointment']!==''?'Termin: '.$d['appointment']:'',$expert!==''?'Sachverständiger: '.$expert:''];$columns=[];foreach([$left,$right]as$col){$lines=[];foreach($col as$value)if($value!=='')$lines=array_merge($lines,trWrap($value,43));$columns[]=$lines;}$height=max(count($columns[0]),count($columns[1]))*13+45;trFill($ops,44,$y-$height,507,$height,[.96,.975,.98]);foreach($columns as$i=>$lines){$x=$i===0?55:313;trText($ops,$x,$y-17,$i===0?'Auftraggeber / Rechnung':'Ortstermin / Objekt',9,true,[.13,.30,.40]);foreach($lines as$j=>$line)trText($ops,$x,$y-37-$j*13,$line,8.8,false,[.08,.16,.22]);}$y-=$height+16;}
+function pbClientBlock(array &$pages,array &$ops,float &$y,string $title,array $r): void {$d=$r['data'];$left=[pbCustomer($d)?:'Noch nicht angegeben',$d['billing_street'],trim($d['billing_postcode'].' '.$d['billing_city']),($d['phone']??'')!==''?'Telefon: '.$d['phone']:'',($d['mobile']??'')!==''?'Mobil: '.$d['mobile']:'',($d['other_phone']??'')!==''?'Sonstige Nummer: '.$d['other_phone']:'',$d['email'],$d['additional_email']??''];$site=pbSite($d);$expert=pbExpertName($d);$right=[$site['street'],trim($site['postcode'].' '.$site['city']),];$columns=[];foreach([$left,$right]as$col){$lines=[];foreach($col as$value)if($value!=='')$lines=array_merge($lines,trWrap($value,43));$columns[]=$lines;}$height=max(count($columns[0]),count($columns[1]))*13+45;trFill($ops,44,$y-$height,507,$height,[.96,.975,.98]);foreach($columns as$i=>$lines){$x=$i===0?55:313;trText($ops,$x,$y-17,$i===0?'Auftraggeber / Rechnung':'Ortstermin / Objekt',9,true,[.13,.30,.40]);foreach($lines as$j=>$line)trText($ops,$x,$y-37-$j*13,$line,8.8,false,[.08,.16,.22]);}$y-=$height+16;}
+function pbServiceBlock(array &$pages,array &$ops,float &$y,string $title,array $r): void {
+    $d=$r['data'];
+    pbSection($pages,$ops,$y,'Terminadresse & Leistung',$title,$r);
+    $expert=pbExpertName($d);
+    if($expert!=='')pbParagraph($pages,$ops,$y,'Sachverständiger: '.$expert,$title,$r,true);
+    pbParagraph($pages,$ops,$y,'Terminadresse: '.pbAddressText(pbSite($d)).($d['site_same']?' (entspricht der Rechnungsadresse)':''),$title,$r);
+    pbParagraph($pages,$ops,$y,'Ansprechpartner vor Ort: '.($d['contact']?:'Noch nicht angegeben'),$title,$r);
+    pbParagraph($pages,$ops,$y,'Vorgesehener Termin: '.($d['appointment']?:'Noch nicht angegeben'),$title,$r);
+    pbParagraph($pages,$ops,$y,'Leistungsbeschreibung:',$title,$r,true);
+    pbParagraph($pages,$ops,$y,$d['scope']?:'Leistungsbeschreibung wird ergänzt.',$title,$r);
+}
 function pbPriceBlock(array &$pages,array &$ops,float &$y,string $title,array $r): void {
     $d=$r['data'];$t=pbTotals($d);$rows=[];$tableHeight=26+57;
     foreach($t['lines']as$line){$line['wrapped']=trWrap($line['label'],36);$line['height']=max(22,count($line['wrapped'])*11+8);$rows[]=$line;$tableHeight+=$line['height'];}
@@ -54,7 +65,7 @@ function pbDocumentPages(array $r,string $kind): array {
     $pages=[];$ops=[];$y=pbHeader($ops,$title,$r);
     if($kind!=='withdrawal'){
         if(!empty($d['offer_number']))pbParagraph($pages,$ops,$y,'Zugehöriges Angebot: '.$d['offer_number'],$title,$r);
-        pbClientBlock($pages,$ops,$y,$title,$r);pbSection($pages,$ops,$y,'Leistungsgegenstand',$title,$r);pbParagraph($pages,$ops,$y,$d['scope']?:'Leistungsbeschreibung wird ergänzt.',$title,$r);pbPriceBlock($pages,$ops,$y,$title,$r);
+        pbClientBlock($pages,$ops,$y,$title,$r);pbServiceBlock($pages,$ops,$y,$title,$r);pbPriceBlock($pages,$ops,$y,$title,$r);
         if($kind==='main'){
             if($y<210){$pages[]=$ops;$ops=[];$y=pbHeader($ops,$title,$r);}
             pbSection($pages,$ops,$y,'Zahlungsbedingungen',$title,$r);

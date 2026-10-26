@@ -18,3 +18,15 @@ function pbPrivateProfile(array $user): string
     if (strtolower(trim((string)($user['email'] ?? ''))) === 'ms@sv-schuett.eu') return 'marc';
     return pbCanCreate($user) ? 'christian' : svnetUserProfile($user);
 }
+
+// Shared editing applies only to these business records, never to insurance cases.
+// Keep the record's original inventory, correspondence address and archive root.
+function pbTeamRecordProfile(PDO $db, string $id, array $user): string
+{
+    if (!pbCanCreate($user)) throw new RuntimeException('Nicht freigegeben.', 403);
+    $q = $db->prepare("SELECT profile FROM private_business_records WHERE id=? AND profile IN ('christian','marc')");
+    $q->execute([$id]);
+    $profile = $q->fetchColumn();
+    if (!$profile) throw new RuntimeException('Angebot oder Auftrag nicht gefunden oder nicht freigegeben.', 403);
+    return (string)$profile;
+}

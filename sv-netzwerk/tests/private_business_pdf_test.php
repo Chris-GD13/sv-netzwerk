@@ -16,3 +16,7 @@ $katja=$r;$katja['data']['correspondence_email']='ks@sv-schuett.eu';foreach(pbDo
 if(!str_contains($files['contract'],'Factoringunternehmen')||str_contains($files['contract'],'TeamFaktor')||str_contains($files['contract'],'Finnya'))throw new RuntimeException('Contract must give the generic factoring notice without naming the provider');
 foreach(['main','contract']as$kind)if(!str_contains($files[$kind],'100 % Vorkasse')||!str_contains($files[$kind],'Zahlungsbedingungen')||!str_contains($files[$kind],trCp('vollständigem')))throw new RuntimeException('Full gross prepayment after factoring rejection and before acceptance/performance must be transparent');
 echo "private_business_pdf_test: ok (three documents, packet, Schuett and official eu logo, unsigned declarations)\n";
+
+$site=$r;$site['data']=pbClean(array_replace($d,['expert'=>'marc-schuett','contact'=>'Frau Beispiel','appointment'=>'30.10.2026, 10 Uhr','site_same'=>false,'site_street'=>'Objektweg 9','site_postcode'=>'54321','site_city'=>'Andersort','scope'=>'Feuchtemessung an der Kellerwand.']),'marc');
+foreach(['offer','order'] as $kind){$site['kind']=$kind;$generated=pbDocuments($site);foreach(['main','contract'] as $document)foreach(['Terminadresse & Leistung','Sachverständiger: Marc Schütt','Frau Beispiel','30.10.2026, 10 Uhr','Objektweg 9','54321 Andersort','Feuchtemessung an der Kellerwand.'] as $text)if(!str_contains($generated[$document],trCp($text)))throw new RuntimeException('Missing service data: '.$text);}
+echo "service block: ok (offer and order, main and contract)\n";

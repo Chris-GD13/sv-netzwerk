@@ -1,3 +1,4 @@
+import './finnya-worker.mjs';
 import {requireReadOnlySession, recoverReadOnlySession, capturedTokenProfile} from './read-only-session.mjs';
 import {openExistingNativeForm} from './native-form-navigation.mjs';
 import {runNativeForm} from './native-form-worker.mjs';
@@ -27,7 +28,7 @@ const PROFILE_EMAILS = {
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS', 'SW'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
-const WORKER_CODE_VERSION = '1.4.78';
+const WORKER_CODE_VERSION = '1.4.79';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';

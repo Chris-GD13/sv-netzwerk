@@ -17,8 +17,11 @@ $action=(string)($_GET['action']??'status');$isPost=$_SERVER['REQUEST_METHOD']==
 if($isPost){if(!str_starts_with(strtolower((string)($_SERVER['CONTENT_TYPE']??'')),'application/json'))apiError(415,'JSON erforderlich.');if(isset($_SERVER['HTTP_ORIGIN'])&&parse_url($_SERVER['HTTP_ORIGIN'],PHP_URL_HOST)!==($_SERVER['HTTP_HOST']??''))apiError(403,'Ungültiger Ursprung.');}
 try{
     $db=db();pbSchema($db);
+    $in=$isPost?requestBody():[];
+    $recordId=(string)($isPost?($in['id']??''):($_GET['id']??''));
+    if($recordId!==''&&in_array($action,['get','file','save','archive','convert','send','dispatch-status','factoring-result'],true))$profile=pbTeamRecordProfile($db,$recordId,$user);
     if($action==='status')apiJson(['ok'=>true,'profile'=>$profile,'defaults'=>pbDefaults($profile),'experts'=>pbExperts(),'sender'=>pbMailSender($user),'legal_version'=>'2026-10-17']);
-    if($action==='list'){$q=$db->prepare('SELECT id,number,kind,status,payload_json,updated_at FROM private_business_records WHERE profile=? ORDER BY updated_at DESC');$q->execute([$profile]);$rows=$q->fetchAll();foreach($rows as&$r){$r['customer']=pbCustomer(json_decode($r['payload_json'],true));unset($r['payload_json']);}apiJson(['ok'=>true,'items'=>$rows]);}
+    if($action==='list'){$q=$db->prepare("SELECT id,number,kind,status,payload_json,updated_at FROM private_business_records WHERE profile IN ('christian','marc') ORDER BY updated_at DESC");$q->execute();$rows=$q->fetchAll();foreach($rows as&$r){$r['customer']=pbCustomer(json_decode($r['payload_json'],true));unset($r['payload_json']);}apiJson(['ok'=>true,'items'=>$rows]);}
     if($action==='get'){$id=(string)($_GET['id']??'');if($id===''&&!empty($_GET['folder_id'])){$root=pbRoot($profile);poValidateTopOrder((string)$_GET['folder_id'],(string)$root['id']);$q=$db->prepare('SELECT id FROM private_business_records WHERE folder_id=? AND profile=? ORDER BY created_at DESC,kind DESC LIMIT 1');$q->execute([$_GET['folder_id'],$profile]);$id=(string)($q->fetchColumn()?:'');}apiJson(['ok'=>true,'record'=>$id===''?null:pbPublicRecord($db,pbRecord($db,$id,$profile))]);}
     if($action==='file'){
         $r=pbRecord($db,(string)($_GET['id']??''),$profile);$revision=(int)($_GET['revision']??$r['revision']);$kind=(string)($_GET['kind']??'packet');
@@ -26,7 +29,8 @@ try{
         if(!$f){$q=$db->prepare('SELECT * FROM private_business_documents WHERE record_id=? AND revision=? AND kind=?');$q->execute([$r['id'],$revision,$kind]);$f=$q->fetch();if(!$f)throw new RuntimeException('PDF ist noch nicht gespeichert.',404);$root=pbRoot($profile);poValidateScope($f['item_id'],(string)$root['id']);$v=poRequest('https://graph.microsoft.com/v1.0/drives/'.rawurlencode(poDriveId()).'/items/'.rawurlencode($f['item_id']).'/content',true);$f['pdf_bytes']=$v['body'];if(!hash_equals($f['sha256'],hash('sha256',$f['pdf_bytes'])))throw new RuntimeException('Das PDF stimmt nicht mit dem gespeicherten Stand überein.');}
         header('X-Frame-Options: SAMEORIGIN');header("Content-Security-Policy: frame-ancestors 'self'");header('Content-Type: application/pdf');header('Content-Length: '.strlen($f['pdf_bytes']));header('Content-Disposition: '.(isset($_GET['download'])?'attachment':'inline').'; filename="'.basename($f['filename']).'"');header('Cache-Control: private, no-store');header('X-Content-Type-Options: nosniff');echo$f['pdf_bytes'];exit;
     }
-    if(!$isPost)apiError(405,'POST erforderlich.');$in=requestBody();
+    if(!$isPost)apiError(405,'POST erforderlich.');
+    if($action==='factoring-result'){$r=pbRecord($db,(string)($in['id']??''),$profile);apiJson(['ok'=>true,'factoring'=>pbFactoringSave($db,$r,$in)]);}
     if($action==='postal-places')apiJson(['ok'=>true,'places'=>pbPostalPlaces((string)($in['postcode']??''))]);
     if($action==='route')apiJson(['ok'=>true,'route'=>pbRoute((array)($in['data']??[]))]);
     if($action==='save'){$r=pbSave($db,$profile,$in,$user);if(empty($r['folder_id'])&&!empty($in['folder_id'])){$root=pbRoot($profile);$f=poValidateTopOrder((string)$in['folder_id'],(string)$root['id']);$q=$db->prepare('UPDATE private_business_records SET folder_id=? WHERE id=? AND folder_id IS NULL');$q->execute([$f['id'],$r['id']]);$r=pbRecord($db,$r['id'],$profile);}pbCachePdfDocuments($db,$r);if(empty($in['sync_cloud']))apiJson(['ok'=>true,'record'=>pbPublicRecord($db,$r)]);try{$r=pbArchive($db,$r);}catch(Throwable$e){apiJson(['ok'=>true,'record'=>pbPublicRecord($db,$r),'archive_error'=>$e->getMessage()]);}apiJson(['ok'=>true,'record'=>pbPublicRecord($db,$r)]);}
