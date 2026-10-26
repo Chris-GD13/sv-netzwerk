@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { isActiveRekonTask, mapRekonTask, ownerMatchesRekonProfile, rekonProfileKey } from '../browser-extension/claimsforce-bridge/rekon-utils.js';
 
@@ -44,7 +45,28 @@ assert(worker.includes("rekon: runningRekonImport ? { status: 'running'") && por
 assert(worker.includes("Object.assign(runningRekonImport, { text, current, total })") && portal.includes("rekon.status === 'running' && rekon.text"), 'Der gepollte Laufstatus stellt Fortschritt auch bei verlorenen Edge-Ereignissen wieder her');
 assert(portal.includes('if (!PORTAL_REQUEST_TYPES.has(message?.type)) return;'), 'Rekon-Fortschritt wird nicht als unbekannter Portalauftrag mit offenem Antwortkanal abgefangen');
 assert(worker.includes("ownerMatchesRekonProfile"), 'Rekon-Konto und Portalziel werden abgeglichen');
-assert(page.includes(`minimum='${manifest.version}'`) && page.includes('event.stopImmediatePropagation()'), 'Eine veraltete Browser-Brücke darf keinen scheinbar gestarteten Rekon-Lauf mehr auslösen');
+// The compatibility floor is independent of later Claims-only releases.
+const gate = [...page.matchAll(/<script is:inline>([\s\S]*?)<\/script>/g)]
+  .map(match => match[1]).find(script => script.includes("minimum='1.4.63'"));
+assert(gate, 'Der Rekon-Kompatibilitaetsfilter muss vorhanden sein');
+for (const [version, workerVersion, protocol, blocked] of [
+  ['1.4.62', '1.4.62', 2, true],
+  ['1.4.63', '1.4.63', 2, false],
+  [manifest.version, manifest.version, 2, false],
+  [manifest.version, '1.4.62', 2, true],
+  [manifest.version, manifest.version, 1, true],
+]) {
+  let click, message, stopped = false, prevented = false;
+  const button = { addEventListener: (_, handler, capture) => { assert.equal(capture, true); click = handler; } };
+  const state = {};
+  const window = { addEventListener: (_, handler) => { message = handler; }, postMessage() {} };
+  const location = { origin: 'https://www.sv-netzwerk.eu' };
+  vm.runInNewContext(gate, { document: { getElementById: id => id === 'vf-rekon-import' ? button : state }, window, location });
+  message({ source: window, origin: location.origin, data: { type: 'SVNET_CLAIMS_BRIDGE_READY_V2', version, workerVersion, protocol } });
+  click({ preventDefault() { prevented = true; }, stopImmediatePropagation() { stopped = true; } });
+  assert.equal(stopped, blocked, `Rekon start gate: ${version}/${workerVersion}/protocol ${protocol}`);
+  assert.equal(prevented, blocked);
+}
 assert(worker.includes("!session?.identity") && worker.includes("while ((!token || !session?.identity)"), 'Die sichtbare Rekon-Profilkennung wird nach dem Seitenaufbau abgewartet');
 assert(worker.includes("Mail_Rekon-Nachricht_"), 'E-Mails werden als Korrespondenz archiviert');
 assert(worker.includes("for (const attachment of email.attachments || [])"), 'E-Mail-Anhänge werden separat übertragen');
