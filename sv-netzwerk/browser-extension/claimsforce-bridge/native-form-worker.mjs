@@ -4,6 +4,8 @@ const hash=async value=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',
 let active=false;
 export async function runNativeForm(request,io){
   if(active)throw Error('NATIVE_WORKER_BUSY');active=true;
+  const startedAt=Date.now();
+  const timed=result=>({...result,durationMs:Math.max(0,Date.now()-startedAt)});
   let tabId,keep=false;
   try{
     if(!['inspect','save'].includes(request.action)||!['christian','jens'].includes(request.profile)||!/^[a-f0-9-]{36}$/.test(request.caseId))throw Error('NATIVE_REQUEST_INVALID');
@@ -26,7 +28,7 @@ export async function runNativeForm(request,io){
     }while(clock()<deadline);
     if(!forms.length)throw Error('NATIVE_INVENTORY_NOT_READY_OR_EMPTY');
     if(request.action==='save'&&!settled)throw Error('NATIVE_INVENTORY_STATUS_NOT_READY');
-    if(!request.formId)return{source:'claimsforce-native-form',readOnly:true,caseId:request.caseId,profile:request.profile,forms};
+    if(!request.formId)return timed({source:'claimsforce-native-form',readOnly:true,caseId:request.caseId,profile:request.profile,forms});
     const matches=forms.filter(f=>f.formId===request.formId);
     if(matches.length!==1)throw Error('NATIVE_FORM_NOT_IN_INVENTORY');
     const openRead=async()=>{
@@ -34,7 +36,7 @@ export async function runNativeForm(request,io){
       if(!ready.ok)throw Error('NATIVE_VIEWER_NOT_READY');
       return{...await send({...request,type:'NATIVE_FORM_SNAPSHOT'}),status:matches[0].status};
     };
-    if(request.action==='inspect')return{source:'claimsforce-native-form',readOnly:true,forms,snapshot:await openRead()};
+    if(request.action==='inspect')return timed({source:'claimsforce-native-form',readOnly:true,forms,snapshot:await openRead()});
     const result=await executeNativeDraft(request,{
       hash,withLock:async(_profile,fn)=>fn(),journal:io.journal,assertAccount:io.assertAccount,
       openAndRead:openRead,
@@ -42,7 +44,7 @@ export async function runNativeForm(request,io){
       save:()=>send({...request,type:'NATIVE_FORM_SAVE'}),
       reopenAndRead:openRead
     });
-    keep=false;return{source:'claimsforce-native-form',...result};
+    keep=false;return timed({source:'claimsforce-native-form',...result});
   }finally{
     // Keep an uncertain/dirty own tab for reconciliation; never close user tabs.
     if(tabId&&!keep)await io.closeTab(tabId).catch(()=>{});

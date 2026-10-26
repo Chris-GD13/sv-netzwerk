@@ -13,7 +13,17 @@ export async function openExistingNativeForm({tabId,caseId,formId,profile,requir
   // A direct document navigation may stall Apryse. Re-enter through the existing SPA list.
   if(current!==list){const back=await call(()=>io.send(tabId,{type:'NAVIGATE_NATIVE_FORM_LIST',caseId,formId}));if(!back?.ok)throw Error('CF_FORM_LIST_LINK_UNAVAILABLE');}
   while(await route()!==list){if(io.clock()-started>=timeoutMs)throw Error('CF_FORM_NAVIGATION_TIMEOUT');await io.pause(100);}
-  const opened=await call(()=>io.send(tabId,{type:'OPEN_EXISTING_NATIVE_FORM',caseId,formId}));if(!opened?.ok)throw Error('CF_FORM_LINK_UNAVAILABLE');
+  // The SPA route changes before its form cards arrive. Wait for the existing
+  // exact link, including after save/reopen; never invent a destination or retry a save.
+  while(true){
+    if(await call(()=>io.sessionProfile())!==profile)throw Error('CF_FORM_PROFILE_MISMATCH');
+    if(await route()!==list)throw Error('CF_FORM_CASE_MISMATCH');
+    const opened=await call(()=>io.send(tabId,{type:'OPEN_EXISTING_NATIVE_FORM',caseId,formId}));
+    if(opened?.ok)break;
+    if(opened?.error!=='native-link-unavailable')throw Error('CF_FORM_LINK_UNAVAILABLE');
+    if(io.clock()-started>=timeoutMs)throw Error('CF_FORM_LINK_UNAVAILABLE');
+    await io.pause(200);
+  }
   return waitForViewer(async()=>{
     if(await call(()=>io.sessionProfile())!==profile)return {identityMismatch:true};
     current=await route();if(current===list)return {outerLoaded:false};
