@@ -53,7 +53,20 @@
       const proto=n.tagName==='SELECT'?w.HTMLSelectElement.prototype:n.tagName==='TEXTAREA'?w.HTMLTextAreaElement.prototype:w.HTMLInputElement.prototype;
       const setter=Object.getOwnPropertyDescriptor(proto,'value')?.set;
       if(!setter)throw Error('NATIVE_SETTER_UNAVAILABLE');
-      n.focus();setter.call(n,c.after);n.dispatchEvent(new w.Event('input',{bubbles:true}));n.dispatchEvent(new w.Event('change',{bubbles:true}));n.blur();
+      // Apryse commits the widget value on focusout. In a background tab,
+      // focus()/blur() need not emit that event even though the DOM value changes.
+      // Supply only the missing DOM event; never dispatch a second commit.
+      let lostFocus=false;
+      const sawFocusOut=()=>{lostFocus=true};
+      n.addEventListener('focusout',sawFocusOut);
+      try {
+        n.focus();setter.call(n,c.after);
+        n.dispatchEvent(new w.Event('input',{bubbles:true}));
+        n.dispatchEvent(new w.Event('change',{bubbles:true}));
+        n.blur();
+        if(!lostFocus)n.dispatchEvent(new w.FocusEvent('focusout',{bubbles:true}));
+      } finally { n.removeEventListener('focusout',sawFocusOut); }
+      await pause(0);
     }
     return snapshot(expected);
   }
@@ -61,7 +74,17 @@
     context(expected);const button=saveButton();
     if(button.disabled)throw Error('NATIVE_SAVE_NOT_ENABLED');button.click();
     const deadline=Date.now()+20000;
-    while(Date.now()<deadline){await pause(200);context(expected);if(saveButton().disabled)return{acknowledged:true,verified:false};}
+    while(Date.now()<deadline){
+      await pause(200);
+      try { context(expected); }
+      catch(error) {
+        // Claims rebuilds Apryse widgets after acknowledging the save.
+        // Keep waiting for that same document; never click Save again.
+        if(['NATIVE_FRAME_NOT_READY','NATIVE_WIDGETS_NOT_READY'].includes(error.message))continue;
+        throw error;
+      }
+      if(saveButton().disabled)return{acknowledged:true,verified:false};
+    }
     throw Error('NATIVE_SAVE_ACK_TIMEOUT');
   }
   window.SVNET_NATIVE_FORM_DOM={snapshot,apply,save};
