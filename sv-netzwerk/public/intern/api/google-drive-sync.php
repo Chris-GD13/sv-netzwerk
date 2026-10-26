@@ -361,11 +361,15 @@ case'schedule_cases':
     }
   }
   $rows=[];
+  $includeScheduled=(string)($_GET['include_scheduled']??'')==='1';
   foreach($results as$row){
     $meta=is_array($row['meta']??null)?$row['meta']:[];
     $sources=[];
     if(trim((string)($meta['claimsforce_claim_id']??''))!=='')$sources[]='Claimsforce';
     if(trim((string)($meta['rekon_task_id']??''))!=='')$sources[]='Rekon';
+    // Terminplanung zeigt standardmäßig nur offene, eindeutig zugeordnete Fälle.
+    // Vollständige Bestände bleiben für Diagnosezwecke mit include_scheduled=1 abrufbar.
+    if(!$includeScheduled&&(!$sources||trim((string)($meta['claimsforce_termin']??''))!==''||trim((string)($meta['rekon_termin']??''))!==''))continue;
     $rows[]=['id'=>(string)($row['id']??''),'name'=>(string)($row['name']??''),'modifiedTime'=>$row['modifiedTime']??null,'meta'=>$meta,'case_profile'=>(string)($row['case_profile']??''),'source_labels'=>$sources,'source_ids'=>['claimsforce'=>(string)($meta['claimsforce_claim_id']??''),'rekon'=>(string)($meta['rekon_task_id']??'')]];
   }
   apiJson(['ok'=>true,'query'=>$term,'results'=>$rows,'profile'=>gdClaimsProfile($user),'backoffice'=>$isBackoffice,'selected_expert'=>$selectedExpert]);
