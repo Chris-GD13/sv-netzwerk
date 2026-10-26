@@ -12,9 +12,20 @@ export async function runNativeForm(request,io){
     await io.waitTab(tabId);
     const send=async message=>{const r=await io.send(tabId,message);if(!r?.ok)throw Error(r?.error||'NATIVE_CHANNEL_FAILED');return r.result};
     let forms=[];
-    const deadline=Date.now()+15000;
-    do{forms=await send({type:'NATIVE_FORM_INVENTORY',caseId:request.caseId});if(forms.length)break;await io.pause(200)}while(Date.now()<deadline);
+    const clock=io.clock||Date.now,deadline=clock()+15000;
+    let previous='',settled=false;
+    do{
+      forms=await send({type:'NATIVE_FORM_INVENTORY',caseId:request.caseId});
+      // Cards arrive before their status badges. Never treat a visible link as
+      // proof that the inventory has finished loading or is safe to edit.
+      const signature=JSON.stringify(forms.map(f=>[f.formId,f.status]).sort());
+      const ready=forms.length&&forms.every(f=>['draft','sent'].includes(f.status));
+      if(ready&&signature===previous){settled=true;break;}
+      previous=signature;
+      await io.pause(200);
+    }while(clock()<deadline);
     if(!forms.length)throw Error('NATIVE_INVENTORY_NOT_READY_OR_EMPTY');
+    if(request.action==='save'&&!settled)throw Error('NATIVE_INVENTORY_STATUS_NOT_READY');
     if(!request.formId)return{source:'claimsforce-native-form',readOnly:true,caseId:request.caseId,profile:request.profile,forms};
     const matches=forms.filter(f=>f.formId===request.formId);
     if(matches.length!==1)throw Error('NATIVE_FORM_NOT_IN_INVENTORY');

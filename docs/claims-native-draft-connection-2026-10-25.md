@@ -53,3 +53,33 @@ this adapter must reject them rather than silently overwrite them. Native report
 authoring, new-form creation and upload/attachment work are not completed here.
 The observed Langdock result also incorrectly used gross for the 70% net basis;
 that result is not acceptable and must not be used as a financial patch.
+
+## Live continuation, 26 October 2026
+
+The existing integration and agent now both expose seven selected actions.
+The agent's old association retained six until the same integration was
+removed from its selection and selected again; no second integration was made.
+The installed portal and worker both report 1.4.70.
+
+An SW session correctly failed before reading the CW case (job 114816).
+After the user's CW login, job 115269 returned three native forms (23 seconds
+shown by Langdock). Job 115322 returned the native payment recommendation with
+67 fields, clean draft status and a snapshot hash. Neither operation wrote.
+The separate save/reopen/readback acceptance remains open.
+
+The first inventory saw links before status badges and returned unknown;
+the next inventory returned draft/sent. The local worker now waits for two
+matching inventories with known statuses, bounded to 15 seconds. A save is
+rejected if that readiness never occurs. Two additional synthetic tests cover
+the observed delayed badge and an unresolved badge. This local fix has not
+yet been shipped to the user's extension.
+
+Persistent agent instructions now explicitly distinguish native ZB/ZBW
+(Zahlungsbefuerwortung) from Zwischenbericht. Existing credentials are located
+in the user's Google drive; their use must stay within authorized account
+login and must not expose them in prompts, case files or logs. Automatic account
+switching is not yet proven.
+
+The sent SE's menu provides download, attach and delete. The viewer's top
+Bearbeiten button enters title editing; it is not evidence of a revision API.
+No new revision or field edit was made during that investigation.

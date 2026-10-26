@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+const source=fs.readFileSync(new URL('../public/intern/claimsforce-central.js',import.meta.url),'utf8');
+const start=source.indexOf('  function nativeCompletionMessage(');
+const end=source.indexOf('  async function completeAgent(',start);
+assert.ok(start>=0&&end>start);
+const message=vm.runInNewContext(source.slice(start,end)+';nativeCompletionMessage');
+const base={source:'claimsforce-native-form'};
+assert.match(message({...base,readOnly:true,forms:[{},{}]}),/2 Formulare.*keine Änderung/);
+assert.match(message({...base,readOnly:true,snapshot:{fields:Array(67).fill({})}}),/67 Felder.*keine Änderung/);
+assert.match(message({...base,verified:true}),/gespeichert und nach erneutem Öffnen/);
+assert.match(message({...base,verified:false}),/nicht bestätigt/);
+assert.equal(message({claims:12}),null);
+console.log('5 native completion cases passed: inventory, fields, verified save, unverified result, legacy import.');

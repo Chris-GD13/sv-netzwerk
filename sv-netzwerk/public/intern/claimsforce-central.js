@@ -206,11 +206,21 @@
     setTimeout(poll,3000);
   }
 
+  function nativeCompletionMessage(result){
+    if(result?.source!=='claimsforce-native-form')return null;
+    if(result.readOnly===true)return result.snapshot
+      ?`Natives Formular gelesen · ${result.snapshot.fields?.length||0} Felder · keine Änderung.`
+      :`Native Formularliste gelesen · ${result.forms?.length||0} Formulare · keine Änderung.`;
+    return result.verified===true
+      ?'Nativer Formularentwurf gespeichert und nach erneutem Öffnen feldweise geprüft.'
+      :'Native Formularoperation beendet; Speicherprüfung nicht bestätigt.';
+  }
+
   async function completeAgent(ok,result,error){
     if(!agentJob)return;
     const id=agentJob.id;
     const restricted=(result?.inventories||[]).reduce((count,item)=>count+(item.restrictedFiles||[]).length,0);
-    try{await post('complete',{id,ok,result:result||null,message:ok?`${result?.claims||0} Aufträge geprüft · ${result?.updated||0} aktualisiert · ${result?.skipped||0} unverändert übersprungen${result?.failed?` · ${result.failed} fehlgeschlagen (${String(result.firstError||'').slice(0,200)})`:''}${restricted?` · ${restricted} geschützte Anhangsreferenz(en) dokumentiert; Dateiinhalte in ClaimsForce gesperrt`:''}.`:(error||'ClaimsForce-Import fehlgeschlagen.')});if(ok)window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'))}
+    try{await post('complete',{id,ok,result:result||null,message:ok?(nativeCompletionMessage(result)||`${result?.claims||0} Aufträge geprüft · ${result?.updated||0} aktualisiert · ${result?.skipped||0} unverändert übersprungen${result?.failed?` · ${result.failed} fehlgeschlagen (${String(result.firstError||'').slice(0,200)})`:''}${restricted?` · ${restricted} geschützte Anhangsreferenz(en) dokumentiert; Dateiinhalte in ClaimsForce gesperrt`:''}.`):(error||'ClaimsForce-Import fehlgeschlagen.')});if(ok)window.dispatchEvent(new CustomEvent('svnet:claims-summary-update'))}
     catch(e){showAgent(`Import ${id}: Abschlussstatus konnte nicht gespeichert werden (${e.message}).`,true)}
     agentJob=null;busy=false;lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}};
     await resumeWatch();
