@@ -344,6 +344,31 @@ case'recent_cases':
     $results[]=gdCaseResultLabel(['id'=>$folder['id'],'name'=>$folder['name'],'modifiedTime'=>$folder['modifiedTime']??null,'webViewLink'=>$folder['webViewLink']??null,'meta'=>$meta],(string)$folder['case_profile']);
   }
   apiJson(['ok'=>true,'results'=>$results]);
+case'schedule_cases':
+  $term=trim((string)($_GET['q']??''));
+  $limit=max(1,min(120,(int)($_GET['limit']??80)));
+  if($term!==''){
+    $results=gdFastCaseSearch($user,$term,$limit);
+    if(!$results)$results=gdReconcileCaseSearch($user,$term,$limit);
+  }else{
+    $folders=gdAccessibleCaseFolders($user);
+    usort($folders,static fn(array $a,array $b):int=>strcmp((string)($b['modifiedTime']??''),(string)($a['modifiedTime']??'')));
+    $results=[];
+    foreach(array_slice($folders,0,$limit)as$folder){
+      try{$meta=gdCaseMeta((string)$folder['id']);}catch(Throwable){$meta=[];}
+      gdRegisterCaseOwner((string)$folder['id'],$user,$meta);
+      $results[]=gdCaseResultLabel(['id'=>$folder['id'],'name'=>$folder['name'],'modifiedTime'=>$folder['modifiedTime']??null,'webViewLink'=>$folder['webViewLink']??null,'meta'=>$meta],(string)$folder['case_profile']);
+    }
+  }
+  $rows=[];
+  foreach($results as$row){
+    $meta=is_array($row['meta']??null)?$row['meta']:[];
+    $sources=[];
+    if(trim((string)($meta['claimsforce_claim_id']??''))!=='')$sources[]='Claimsforce';
+    if(trim((string)($meta['rekon_task_id']??''))!=='')$sources[]='Rekon';
+    $rows[]=['id'=>(string)($row['id']??''),'name'=>(string)($row['name']??''),'modifiedTime'=>$row['modifiedTime']??null,'meta'=>$meta,'case_profile'=>(string)($row['case_profile']??''),'source_labels'=>$sources,'source_ids'=>['claimsforce'=>(string)($meta['claimsforce_claim_id']??''),'rekon'=>(string)($meta['rekon_task_id']??'')]];
+  }
+  apiJson(['ok'=>true,'query'=>$term,'results'=>$rows,'profile'=>gdClaimsProfile($user),'backoffice'=>$isBackoffice,'selected_expert'=>$selectedExpert]);
 case'search_cases':$term=trim((string)($_GET['q']??''));if(mb_strlen($term)<2)apiJson(['ok'=>true,'query'=>$term,'results'=>[]]);$results=gdFastCaseSearch($user,$term,30);if(!$results)$results=gdReconcileCaseSearch($user,$term,30);apiJson(['ok'=>true,'query'=>$term,'results'=>$results]);
 case'incoming_phone':$number=trim((string)($_GET['number']??''));if(strlen(casePhoneKey($number))<6)apiError(400,'Keine gültige Anrufernummer übergeben.');apiJson(['ok'=>true,'number'=>$number,'results'=>gdIncomingPhoneSearch($user,$number,10)]);
 case'save_phone_contact':if($_SERVER['REQUEST_METHOD']!=='POST')apiError(405,'POST erforderlich.');$body=requestBody();$folderId=caseIdentityResolve(trim((string)($body['folder_id']??'')));$number=mb_substr(trim((string)($body['number']??'')),0,100);$name=mb_substr(trim((string)($body['name']??'')),0,160);if(strlen(casePhoneKey($number))<6)apiError(400,'Keine gültige Rufnummer angegeben.');if($name==='')apiError(400,'Bitte einen Namen oder Ansprechpartner angeben.');gdAssertCaseAccess($folderId,$user);$meta=gdCaseMeta($folderId);$contacts=is_array($meta['telefonkontakte']??null)?$meta['telefonkontakte']:[];$updated=false;foreach($contacts as&$contact){if(!is_array($contact)||casePhoneKey((string)($contact['nummer']??''))!==casePhoneKey($number))continue;$contact=['name'=>$name,'nummer'=>$number];$updated=true;break;}unset($contact);if(!$updated)$contacts[]=['name'=>$name,'nummer'=>$number];$meta['telefonkontakte']=array_slice($contacts,-50);$meta['updated_at']=gmdate('c');$meta['updated_by']=$user['full_name']??($user['email']??'');gdRegisterCaseOwner($folderId,$user,$meta);gdUploadJson($folderId,CASE_META_NAME,$meta);apiJson(['ok'=>true,'folder_id'=>$folderId,'contact'=>['name'=>$name,'nummer'=>$number],'meta'=>$meta]);
