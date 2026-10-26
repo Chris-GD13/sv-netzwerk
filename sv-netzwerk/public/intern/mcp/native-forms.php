@@ -8,6 +8,7 @@ function mcpNativeForms(array $user,array $args): array {
     $folder=trim((string)($args['id']??''));requireCaseFolderAccess($folder,$user);
     if(!ownCase($user,$folder))throw new RuntimeException('NATIVE_CASE_ACCESS_DENIED');
     $meta=mcpDriveCaseMeta($folder,mcpDriveCaseFiles($folder));$profile=svnetUserProfile($user);
+    if(empty($meta['claimsforce_profile'])||empty($meta['claimsforce_claim_id']))throw new RuntimeException('NATIVE_SOURCE_BINDING_REQUIRED: Portalakte hat noch keine bestaetigte Claimsforce-Zuordnung; dies ist kein Anmeldefehler.');
     if($profile===''||($meta['claimsforce_profile']??'')!==$profile)throw new RuntimeException('NATIVE_PROFILE_MISMATCH');
     $uuid='/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/Di';
     $operation=(string)($args['operation_id']??'');$claim=(string)($meta['claimsforce_claim_id']??'');
