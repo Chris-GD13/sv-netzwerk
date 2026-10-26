@@ -52,7 +52,7 @@ const mutations={
  'wrong-report-folder':p=>{p.documents[0].folder='Formulare';},
  'pdf-instead-of-word':p=>{p.documents[0].format='pdf';},
  'pdf-instead-of-native-se':p=>{p.documents[1].native=false;},
- 'obsolete-zahlungsbefuerwortung':p=>{p.documents.push({...p.documents[1],kind:'Zahlungsbefürwortung',hash:'obsolete'});},
+ 'obsolete-zahlungsbefuerwortung':p=>{p.documents.push({...p.documents[1],kind:'Zahlungsbefürwortung',hash:'obsolete',current:false});},
  'internal-problem-in-report':p=>{p.containsInternalNotes=true;},
  'unreviewed-external-text':p=>{p.externalTextReviewed=false;},
  'dispatch-request':p=>{p.operation='send';}
@@ -62,7 +62,7 @@ for(const [name,mutate] of Object.entries(mutations)) await test(`qs-block-${nam
 });
 await test('qs-valid-plan',()=>assert.equal(qualityGate(plan()).ok,true));
 function linkedPlan() {
- const p=plan(1700000);p.reportingGroup={id:'offline-event',relationVerified:true,profile:p.profile,claims:[
+ const p=plan(1700000);p.documents.push({...p.documents[1],kind:'Zahlungsbefürwortung',hash:'zb-hash',current:true});p.reportingGroup={id:'offline-event',relationVerified:true,profile:p.profile,claims:[
  {caseId:p.caseId,profile:p.profile,exposureCents:1700000,evidenceVerified:true,evidenceHash:'own-source'},
  {caseId:'offline-household',profile:p.profile,exposureCents:800000,evidenceVerified:true,evidenceHash:'related-source'}]};return p;
 }
@@ -75,6 +75,11 @@ for(const [name,mutate] of Object.entries({
  'no-link-evidence':p=>{p.reportingGroup.relationVerified=false;},
  'foreign-profile':p=>{p.reportingGroup.claims[1].profile='marc';},
  'mixed-se':p=>{p.documents[1].positionCaseIds.push('offline-household');},
+ 'missing-zb':p=>{p.documents=p.documents.filter(d=>d.kind!=='Zahlungsbefürwortung');},
+ 'foreign-zb':p=>{p.documents.find(d=>d.kind==='Zahlungsbefürwortung').caseId='offline-household';},
+ 'mixed-zb':p=>{p.documents.find(d=>d.kind==='Zahlungsbefürwortung').positionCaseIds=['offline-test-case','offline-household'];},
+ 'pdf-zb':p=>{p.documents.find(d=>d.kind==='Zahlungsbefürwortung').native=false;},
+ 'obsolete-zb':p=>{p.documents.find(d=>d.kind==='Zahlungsbefürwortung').current=false;},
  'group-sum-in-own-se':p=>{p.remainingCents=2440000;},
  'linked-case-position-in-own-ledger':p=>{p.positions[0].caseId='offline-household';},
  'no-word-at-combined-threshold':p=>{p.documents=p.documents.filter(d=>d.kind!=='report');}

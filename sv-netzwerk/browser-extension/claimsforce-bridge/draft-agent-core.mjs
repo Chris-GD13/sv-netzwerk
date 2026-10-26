@@ -87,6 +87,13 @@ export function qualityGate(p) {
   // Group exposure drives reporting only. The SE balance above remains strictly case-specific.
   fail('SE_CASE_SEPARATION', docs.filter(d=>d.kind === 'SE').every(d=>d.caseId === p.caseId
     && d.positionCaseIds?.length === 1 && d.positionCaseIds[0] === p.caseId));
+  const paymentForms=docs.filter(d=>d.kind === 'Zahlungsbefürwortung');
+  fail('ZB_CASE_SEPARATION', paymentForms.every(d=>d.caseId === p.caseId
+    && d.positionCaseIds?.length === 1 && d.positionCaseIds[0] === p.caseId));
+  fail('ZB_NATIVE_CURRENT', paymentForms.every(d=>d.native === true && d.contentChecked === true && d.current === true));
+  // Linked building/household claims share reporting, never their own forms.
+  // A ZB is a Zahlungsbefuerwortung, not an obsolete Zwischenbericht.
+  if(p.reportingGroup || p.zbRequired === true)fail('REQUIRED_NATIVE_ZB',paymentForms.length === 1);
   const gfReportRequired = p.gf === true && reportingExposureCents >= 2500000;
   if (gfReportRequired) {
     const engel=engelPaymentTableGate(p.engelPaymentTable,p.sources);
@@ -96,7 +103,6 @@ export function qualityGate(p) {
     fail('GF_WORD_REPORT', docs.some(d=>d.kind === 'report' && d.format === 'docx' && d.folder === 'Berichte'
       && /^Zwischenbericht Nr\. [1-9][0-9]*$/.test(d.title) && d.contentChecked === true));
     fail('GF_NATIVE_SE', docs.some(d=>d.kind === 'SE' && d.native === true && d.contentChecked === true));
-    fail('GF_OBSOLETE_ZB', !docs.some(d=>d.kind === 'Zahlungsbefürwortung'));
   }
   fail('EXTERNAL_TEXT_REVIEW', p.externalTextReviewed === true && p.containsInternalNotes === false);
   fail('DRAFT_ONLY', p.operation === 'prepare-draft');
