@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["gebaeude", "leitungswasser", "sturm"]
 publication:
   publishedAt: 2026-09-01
-  updatedAt: 2026-10-19
+  updatedAt: 2026-10-26
   status: published
 seo:
   title: "Schadenminderung: Sofortmaßnahmen und Aufwendungsersatz prüfen"
@@ -46,7 +46,7 @@ Sofortmaßnahmen zur Schadenminderung sind von der späteren Wiederherstellung z
 
 [§ 82 Absatz 2 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) verlangt, zumutbare Weisungen des Versicherers zu befolgen und Weisungen einzuholen, wenn die Umstände dies gestatten. Eine akut notwendige Gefahrenabwehr darf deshalb nicht pauschal mit einer erst später möglichen Abstimmung gleichgesetzt werden; Kommunikationsversuche und Gründe für sofortiges Handeln gehören in die Akte.
 
-Die fachliche Einordnung beginnt mit dem dokumentierten Schadenbild und den hieraus abgeleiteten Prüffragen. Technische Bewertung und versicherungstechnische Entscheidung sind getrennt zu behandeln. Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung, ersetzt jedoch keine individuelle Deckungszusage oder Einzelfallprüfung.
+Die fachliche Einordnung beginnt mit dem dokumentierten Schadenbild und den hieraus abgeleiteten Prüffragen. Technische Bewertung und versicherungstechnische Entscheidung sind getrennt zu behandeln.
 
 In Kumulereignissen ist zudem die Reihenfolge der Bearbeitung entscheidend: Sicherheitsrelevante Objekte werden zuerst stabilisiert, parallel erfolgt die Erstklassifizierung nach Schadenumfang und Komplexität. Dadurch lassen sich Vor-Ort-Ressourcen, Nachunternehmer und Regulierkapazitäten priorisiert steuern, ohne dass die Dokumentationsqualität sinkt.
 

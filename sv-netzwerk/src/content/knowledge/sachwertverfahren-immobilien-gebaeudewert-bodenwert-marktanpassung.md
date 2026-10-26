@@ -16,7 +16,7 @@ relatedLinks: ["/experten/marc-schuett/", "/fachwissen/prueffaehige-dokumentatio
 damageTypes: ["gebaeude"]
 publication:
   publishedAt: 2026-10-16
-  updatedAt: 2026-10-19
+  updatedAt: 2026-10-26
   status: published
 seo:
   title: "Sachwertverfahren: Gebäudewert und Bodenwert trennen"
@@ -30,8 +30,6 @@ seo:
 Das Sachwertverfahren ist eines der in der Immobilienwertermittlungsverordnung vorgesehenen Verfahren zur Ermittlung des Verkehrswerts. Es wird häufig bei Grundstücken eingesetzt, bei denen die bauliche Substanz und die Herstellungskosten für die Preisbildung bedeutsam sind. Die Wahl ist dennoch kein Automatismus. Nach § 6 ImmoWertV sind Objektart, Gepflogenheiten des gewöhnlichen Geschäftsverkehrs, Umstände des Einzelfalls und Eignung der verfügbaren Daten zu berücksichtigen; die Verfahrenswahl ist zu begründen.
 
 Der Verkehrswert nach § 194 BauGB bezieht sich auf den Preis, der am Wertermittlungsstichtag im gewöhnlichen Geschäftsverkehr unter Berücksichtigung der rechtlichen Gegebenheiten, tatsächlichen Eigenschaften, sonstigen Beschaffenheit und Lage erzielbar wäre. Deshalb genügt es nicht, Normalherstellungskosten hochzurechnen und das Ergebnis als Marktwert auszugeben. Der Rechengang muss die allgemeinen Wertverhältnisse des Grundstücksmarkts sowie die besonderen Merkmale des konkreten Objekts in der vorgeschriebenen Reihenfolge abbilden.
-
-Dieser Beitrag erläutert die Prüflogik, nicht die Bewertung eines bestimmten Grundstücks. Er enthält weder erfundene Flächen noch Beispielbeträge, pauschale Faktoren oder eine individuelle Wertfeststellung.
 
 ## Verfahrenswahl und Stichtage vor der Rechnung festlegen
 
@@ -138,15 +136,11 @@ Kostenunterlagen können den Befund zu Modernisierungen, Schäden oder erforderl
 
 Bei besonderen objektspezifischen Grundstücksmerkmalen ist darzustellen, ob ein Kostenansatz, ein marktüblicher Zu- oder Abschlag oder eine andere wertbezogene Methode verwendet wird. Die Wahl muss zum Merkmal und zum örtlichen Markt passen. Pauschale Übernahme eines Brutto-Angebots als Wertminderung ist ohne weitere Begründung nicht prüffähig.
 
-## Versicherungstechnische Einordnung ohne künstlichen Schadenfall
+## Versicherungstechnische Einordnung
 
 Das Sachwertverfahren nach ImmoWertV dient der Verkehrswertermittlung und ist nicht mit einer versicherungsvertraglichen Entschädigungsberechnung gleichzusetzen. Versicherungswert, Wiederherstellungskosten nach einem Schaden, Zeitwert und Verkehrswert verfolgen unterschiedliche Zwecke und können auf unterschiedlichen Vertrags- oder Bewertungsgrundlagen beruhen.
 
-Dieser Beitrag ist daher ein eigenständiges Sachverständigenthema. Erst wenn ein konkreter Auftrag zusätzlich eine versicherungsfachliche Frage enthält, sind Versicherungsvertrag, Bedingungen, versicherte Sache, Schadenereignis und Bewertungsmaßstab gesondert zu prüfen. Aus dem Sachwertverfahren folgt weder eine Deckungszusage noch eine Entschädigungshöhe.
-
-## Warum kein fiktives Praxisbeispiel verwendet wird
-
-Ein fiktives Praxisbeispiel mit Flächen, Baujahr, Restnutzungsdauer, Bodenrichtwert oder Sachwertfaktor könnte scheinbar genaue Ergebnisse erzeugen, ohne einen realen Teilmarkt und eine echte Modellbeschreibung abzubilden. Deshalb verwendet dieser Beitrag entsprechend der aktuellen Nutzervorgabe keine erfundenen Fälle, Messwerte oder Eurobeträge. Die Prüfschritte werden stattdessen als nachvollziehbare Entscheidungskette beschrieben.
+Das Sachwertverfahren bleibt daher ein eigenständiges Sachverständigenthema. Erst wenn ein konkreter Auftrag zusätzlich eine versicherungsfachliche Frage enthält, sind Versicherungsvertrag, Bedingungen, versicherte Sache, Schadenereignis und Bewertungsmaßstab gesondert zu prüfen. Aus dem Sachwertverfahren folgt weder eine Deckungszusage noch eine Entschädigungshöhe.
 
 ## Fachgrenzen und ergänzende Untersuchungen
 

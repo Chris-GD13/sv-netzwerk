@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["gebaeude", "leitungswasser", "sturm", "brand"]
 publication:
   publishedAt: 2026-09-02
-  updatedAt: 2026-10-19
+  updatedAt: 2026-10-26
   status: published
 seo:
   title: "Abgrenzung versicherter und nicht versicherter Schadteile: Methodik"
@@ -44,7 +44,7 @@ Für die operative Verzahnung werden Leistungen, Schadenarten, Expertenprofile u
 ### Technische und regulatorische Einordnung
 Maßgebliche Kriterien sind: zeitlicher Zusammenhang mit dem Schadenereignis, technische Kausalität, Nachweis des Vorzustands, Unterscheidung von Schadenminderung und Instandsetzung sowie schadenbedingter und nicht schadenbedingter Maßnahmenanteil.
 
-Die fachliche Einordnung beginnt mit dem dokumentierten Schadenbild und den hieraus abgeleiteten Prüffragen. Technische Bewertung und versicherungstechnische Entscheidung sind getrennt zu behandeln. Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung, ersetzt jedoch keine individuelle Deckungszusage oder Einzelfallprüfung.
+Die fachliche Einordnung beginnt mit dem dokumentierten Schadenbild und den hieraus abgeleiteten Prüffragen. Technische Bewertung und versicherungstechnische Entscheidung sind getrennt zu behandeln.
 
 [§ 1 VVG](https://www.gesetze-im-internet.de/vvg_2008/__1.html) knüpft die Leistung des Versicherers an den *vereinbarten* Versicherungsfall. Ein technisch festgestellter Schadenanteil ist deshalb noch keine Aussage über dessen vertragliche Deckung. [§ 82 Absatz 1 VVG](https://www.gesetze-im-internet.de/vvg_2008/__82.html) verlangt vom Versicherungsnehmer bei Eintritt des Versicherungsfalls nach Möglichkeit die Abwendung und Minderung des Schadens. Für die Praxis sind notwendige Sofortmaßnahmen und deren Gründe gesondert zu dokumentieren; die Vorschrift begründet keine pauschale Freigabe jeder anschließenden Sanierungsposition. Welche weiteren Rechtsfolgen im Einzelfall in Betracht kommen, ist gesondert anhand Vertrag und vollständigem Gesetzestext zu prüfen.
 

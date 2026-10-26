@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["leitungswasser", "gebaeude"]
 publication:
   publishedAt: 2026-08-15
-  updatedAt: 2026-10-20
+  updatedAt: 2026-10-26
   status: published
 seo:
   title: "Leitungswasserschäden im Kumulereignis: Rollen und Koordination"
@@ -45,7 +45,7 @@ Für die operative Verzahnung werden Leistungen, Schadenarten, Expertenprofile u
 ### Technische und regulatorische Einordnung
 Technisch sind Leckageort, Durchfeuchtungsgrad, Materialverträglichkeit und Trocknungsfähigkeit je Bauteil zu bewerten. Kaufmännisch braucht es früh prüffähige Mengen- und Leistungstrennung.
 
-Technische Bewertung und versicherungsrechtliche Entscheidung sind getrennt zu behandeln. Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung, ersetzt jedoch keine individuelle Deckungsprüfung.
+Technische Bewertung und versicherungsrechtliche Entscheidung sind getrennt zu behandeln.
 
 In Kumulereignissen ist zudem die Reihenfolge der Bearbeitung entscheidend: Sicherheitsrelevante Objekte werden zuerst stabilisiert, parallel erfolgt die Erstklassifizierung nach Schadenumfang und Komplexität. Dadurch lassen sich Vor-Ort-Ressourcen, Nachunternehmer und Regulierkapazitäten priorisiert steuern, ohne dass die Dokumentationsqualität sinkt.
 

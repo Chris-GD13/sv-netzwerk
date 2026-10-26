@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["brand", "gebaeude"]
 publication:
   publishedAt: 2026-08-01
-  updatedAt: 2026-10-19
+  updatedAt: 2026-10-26
   status: published
 seo:
   title: "Brandschaden an mehreren Gebäuden: Erstaufnahme und Abgrenzung"
@@ -45,7 +45,7 @@ Für die operative Verzahnung werden Leistungen, Schadenarten, Expertenprofile u
 ### Technische und regulatorische Einordnung
 Erforderlich sind getrennte Objektakten, nachvollziehbare Schadenzonen und eine klare Trennung von Gefahrenabwehr und Wiederherstellung. Rauch, Ruß, Löschwasser und unmittelbare thermische Schäden können verschiedene Gebäude und Bauteile unterschiedlich betreffen. Befund und Sanierungsumfang werden daher je Objekt und Zone dokumentiert; die Kostenreservierung folgt erst dieser Zuordnung.
 
-Technische Bewertung und versicherungsrechtliche Entscheidung sind getrennt zu behandeln. Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung, ersetzt jedoch keine individuelle Deckungsprüfung.
+Technische Bewertung und versicherungsrechtliche Entscheidung sind getrennt zu behandeln.
 
 In Kumulereignissen ist zudem die Reihenfolge der Bearbeitung entscheidend: Sicherheitsrelevante Objekte werden zuerst stabilisiert, parallel erfolgt die Erstklassifizierung nach Schadenumfang und Komplexität. Dadurch lassen sich Vor-Ort-Ressourcen, Nachunternehmer und Regulierkapazitäten priorisiert steuern, ohne dass die Dokumentationsqualität sinkt.
 

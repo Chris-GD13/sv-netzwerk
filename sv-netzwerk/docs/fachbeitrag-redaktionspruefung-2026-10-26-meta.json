@@ -1,0 +1,831 @@
+{
+  "audit_date": "2026-10-26",
+  "scope": "vollständiger veröffentlichter Knowledge-Bestand",
+  "total_files": 116,
+  "corrected_files": 22,
+  "unchanged_files": 94,
+  "forbidden_patterns": [
+    "Überschriften „Keine erfundenen …“",
+    "Überschrift „Warum kein fiktives Praxisbeispiel …“",
+    "Selbstbeschreibung „Dieser Beitrag nutzt ein anonymisiertes typisches Praxisbeispiel …“",
+    "schematische Selbstbeschreibung „Dieser Beitrag liefert die fachliche Grundlage …“",
+    "Hinweise auf eine aktuelle Nutzervorgabe",
+    "öffentliche Erklärungen darüber, was der Beitrag nicht erfindet"
+  ],
+  "result": "Nach den Korrekturen kein Treffer der festgeschriebenen öffentlichen Meta-/Rechtfertigungsmuster.",
+  "inventory": [
+    {
+      "file": "src/content/knowledge/abgrenzung-versicherter-nichtversicherter-schadteil.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/abgrenzung-versicherter-nichtversicherter-schadteil/",
+      "finding": "schematisch wiederholte Selbstbeschreibung „Dieser Beitrag liefert …“",
+      "correction": "öffentliche Boilerplate-Formulierung entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/asbesterkundung-sanierung-baujahr-verdachtsflaechen-probenahme/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/aufmass-fotodokumentation-polycam-pruefffaehig.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/aufmass-fotodokumentation-polycam-pruefffaehig/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/aufzug-wasserschaden-stillsetzung-pruefung-kostenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/aufzug-wasserschaden-stillsetzung-pruefung-kostenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/badfugen-abdichtung-feuchteeintritt-schadenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/badfugen-abdichtung-feuchteeintritt-schadenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/balkon-terrassenabdichtung-wassereintritt-schadenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/batteriespeicher-wasser-brandschaden-pruefung-kostenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten/",
+      "finding": "öffentliche Rechtfertigungssektion mit Überschrift „Keine erfundenen …“",
+      "correction": "gesamte Metasektion entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/baufeuchte-schadenfeuchte-feuchtequellen-abgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/baumsturz-astbruch-sturm-schadenaufnahme-standfestigkeit-vorschaden.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/baumsturz-astbruch-sturm-schadenaufnahme-standfestigkeit-vorschaden/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/bauteiloeffnung-schadenfall-freigabe-beweissicherung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/bauteiloeffnung-schadenfall-freigabe-beweissicherung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen/",
+      "finding": "öffentliche Rechtfertigungssektion mit Überschrift „Keine erfundenen …“",
+      "correction": "gesamte Metasektion entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/beweissicherung-fotodokumentation-standards.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/beweissicherung-fotodokumentation-standards/",
+      "finding": "schematisch wiederholte Selbstbeschreibung „Dieser Beitrag liefert …“",
+      "correction": "öffentliche Boilerplate-Formulierung entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/blitz-ueberspannungsschaden-gebaeudetechnik-pruefen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/blitz-ueberspannungsschaden-gebaeudetechnik-pruefen/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/brandmeldeanlage-wasser-brandschaden-funktionspruefung-kostenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/brandschaden-mehrere-gebaeude-koordination.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-mehrere-gebaeude-koordination/",
+      "finding": "schematisch wiederholte Selbstbeschreibung „Dieser Beitrag liefert …“",
+      "correction": "öffentliche Boilerplate-Formulierung entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-notmassnahmen-uebergang-zur-wiederherstellung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/brandschaden-rauch-russ-kontamination-schadenbereiche-sanierungsumfang.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-rauch-russ-kontamination-schadenbereiche-sanierungsumfang/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/drohnen-gebaeudeschaden-einsatzgrenzen-bildbefund-dokumentation/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/eigenleistungen-gebaeudeschaden-stunden-material-nachweis.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/eigenleistungen-gebaeudeschaden-stunden-material-nachweis/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/elektrische-anlagen-nach-wasserschaden-pruefen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/elektrische-anlagen-nach-wasserschaden-pruefen/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/elektrische-brandursachen-lichtbogen-kurzschluss-thermische-ueberlastung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/entsorgungskosten-gebaeudeschaden-nachweis-abgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/entsorgungskosten-gebaeudeschaden-nachweis-abgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/fachgrenzen-schadenpruefung-fachplaner.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fachgrenzen-schadenpruefung-fachplaner/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/fachliche-zustaendigkeit-im-schadenfall.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fachliche-zustaendigkeit-im-schadenfall/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/farbtonabweichung-anstrich-wiederherstellung-schadenfall.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/farbtonabweichung-anstrich-wiederherstellung-schadenfall/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/fenster-glasschaden-verglasung-reparaturgrenze.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fenster-glasschaden-verglasung-reparaturgrenze/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/fenster-tueren-kostenvoranschlag-pruefen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fenster-tueren-kostenvoranschlag-pruefen/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fenster-tueren-schadenaufnahme-funktion-anschluesse-reparaturgrenzen/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fensteranschluss-abdichtung-untergrund-fugenmass-materialwahl/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/fensterscheiben-kondensat-aussen-innen-scheibenzwischenraum/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/flachdachschaden-pruefpfad-windsog-entwaesserung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/flachdachschaden-pruefpfad-windsog-entwaesserung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/flachdachschaden-sturm-starkregen-windsog-abdichtung-entwaesserung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/flachdachschaden-sturm-starkregen-windsog-abdichtung-entwaesserung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/frostbedingte-leitungswasserschaeden-rohrbruch-abgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/geruchsschaden-ursache-sanierung-erfolgskontrolle.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/geruchsschaden-ursache-sanierung-erfolgskontrolle/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/geruestkosten-gebaeudeschaden-umfang-standzeit-pruefung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/geruestkosten-gebaeudeschaden-umfang-standzeit-pruefung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/glasbruch-fenster-fassade-schadenbild-ursache-reparaturfaehigkeit/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-2/",
+      "finding": "schematisch wiederholte Selbstbeschreibung „Dieser Beitrag liefert …“",
+      "correction": "öffentliche Boilerplate-Formulierung entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/grossflaechige-leitungswasserschaeden-sanierungssteuerung-3.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung-3/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/grossflaechige-leitungswasserschaeden-sanierungssteuerung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/gutachter-plattform-regional-kumulschaden.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/gutachter-plattform-regional-kumulschaden/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/haftpflichtschaden-anspruchsgrund-schadenhoehe-deckung-pruefen/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/hagelschaden-dach-fassade-schadenspuren-vorschaden-reparaturfaehigkeit.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/hagelschaden-dach-fassade-schadenspuren-vorschaden-reparaturfaehigkeit/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/heizungswasserschaden-leckage-korrosion-frost-abgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/heizungswasserschaden-leckage-korrosion-frost-abgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/innentueren-schallschutz-pruefwert-einbau-schallwege.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/innentueren-schallschutz-pruefwert-einbau-schallwege/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/interdisziplinaeres-sachverstaendigennetzwerk-gutachter-plattform-schadenregulierung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/interdisziplinaeres-sachverstaendigennetzwerk-gutachter-plattform-schadenregulierung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/katastrophenschaeden-region-management-koordination.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/katastrophenschaeden-region-management-koordination/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/kommunikation-beteiligte-schadenfall-struktur.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/kommunikation-beteiligte-schadenfall-struktur/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/kontrollierter-rueckbau-bei-leitungswasserschaeden.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/kontrollierter-rueckbau-bei-leitungswasserschaeden/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/koordination-sachverstaendige-kumulereignis-einsatz.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/koordination-sachverstaendige-kumulereignis-einsatz/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/kumulschaeden-hochwasser-ueberflutung-priorisierung-regulierung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/kumulschaeden-hochwasser-ueberflutung-priorisierung-regulierung/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/kumulschaeden-in-der-region-priorisierung-koordination-dokumentation.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/kumulschaeden-in-der-region-priorisierung-koordination-dokumentation/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/kumulschaeden-sturm-hagel-prueffolge-regulierung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/kumulschaeden-sturm-hagel-prueffolge-regulierung/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/leckageortung-leitungswasserschaden-messverfahren-suchoeffnungen-ursachenbeweis.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/leckageortung-leitungswasserschaden-messverfahren-suchoeffnungen-ursachenbeweis/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/leitungswasserschaden-aalen-sachverstaendiger-aufgaben.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-aalen-sachverstaendiger-aufgaben/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/leitungswasserschaden-erstmassnahmen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-erstmassnahmen/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/leitungswasserschaden-leckageortung-pruefstrategie.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/leitungswasserschaden-leckageortung-pruefstrategie/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/loeschwasserschaden-kontamination-korrosion-trocknung-sanierungsumfang.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/loeschwasserschaden-kontamination-korrosion-trocknung-sanierungsumfang/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/luftdichtheitsmessung-gebaeude-messziel-praeparation-leckagebefund.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/luftdichtheitsmessung-gebaeude-messziel-praeparation-leckagebefund/",
+      "finding": "öffentliche Rechtfertigungssektion mit Überschrift „Keine erfundenen …“",
+      "correction": "gesamte Metasektion entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/massenanfall-einzelschaeden-einsatzsteuerung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/massenanfall-einzelschaeden-einsatzsteuerung/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/mietausfall-sanierungsdauer-schadenbezug.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/mietausfall-sanierungsdauer-schadenbezug/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/nachtraege-sachschaden-technische-notwendigkeit-mengen-kostenpruefung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/nachtraege-sachschaden-technische-notwendigkeit-mengen-kostenpruefung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/notmassnahmen-wiederherstellung-schadenminderung-freigabe-dokumentation/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/parkett-holzfeuchte-raumklima-untergrund-pruefen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/parkett-holzfeuchte-raumklima-untergrund-pruefen/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/photovoltaikanlagen-sturm-hagel-brand-module-unterkonstruktion-elektrische-risiken/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/photovoltaikfragmente-brand-landwirtschaft-gewerbehaftpflicht-fremddach.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/photovoltaikfragmente-brand-landwirtschaft-gewerbehaftpflicht-fremddach/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/plausibilitaetspruefung-schadenbild-kausalitaet.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/plausibilitaetspruefung-schadenbild-kausalitaet/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/polycarbonat-stegplatten-hagel-spannungsrisse-montagefehler.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/polycarbonat-stegplatten-hagel-spannungsrisse-montagefehler/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/prueffaehige-dokumentation.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/prueffaehige-dokumentation/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/pulverbeschichtete-aluminiumbauteile-farbton-glanz-haftung-korrosion-pruefen/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/pv-anlage-hagelschaden-pruefung-kostenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/pv-anlage-hagelschaden-pruefung-kostenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/rauchwaermeabzug-brandschaden-funktionspruefung-kostenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rauchwaermeabzug-brandschaden-funktionspruefung-kostenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/rechnungs-kva-pruefung-freigabe-schadenfall.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rechnungs-kva-pruefung-freigabe-schadenfall/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/rechnungskuerzung-schadenfall-prueffaehigkeit.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rechnungskuerzung-schadenfall-prueffaehigkeit/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rechnungspruefung-nachtragspruefung-mengen-leistungen-kosten-schadenbezug/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/regiekosten-im-schadenfall-pruefen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/regiekosten-im-schadenfall-pruefen/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/regiekosten-schadenregulierung-abgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/regiekosten-schadenregulierung-abgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/reservierung-grosser-schadenbestand-methodik.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/reservierung-grosser-schadenbestand-methodik/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/rueckbau-brandschaden-fachlich-begrenzen-dokumentieren.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rueckbau-brandschaden-fachlich-begrenzen-dokumentieren/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/rueckstauschaden-im-fitnessstudio-gebaeude-und-inhaltsschaden-trennen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/rueckstauschaden-im-fitnessstudio-gebaeude-und-inhaltsschaden-trennen/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/sachverstaendiger-versicherungsschaeden-aalen-schadenaufnahme.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sachverstaendiger-versicherungsschaeden-aalen-schadenaufnahme/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/sachwertverfahren-immobilien-gebaeudewert-bodenwert-marktanpassung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sachwertverfahren-immobilien-gebaeudewert-bodenwert-marktanpassung/",
+      "finding": "mehrere öffentliche Rechtfertigungssätze einschließlich „Warum kein fiktives Praxisbeispiel verwendet wird“",
+      "correction": "Metasätze und Metasektion entfernt; sachliche Zwischenüberschrift hergestellt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sanierungsbaustelle-sigeko-bauleitung-arbeitgeberpflichten/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/sanierungsplanung-rueckbau-trocknung-strategie.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sanierungsplanung-rueckbau-trocknung-strategie/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schadenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schadenakte-nachvollziehbar-strukturieren.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenakte-nachvollziehbar-strukturieren/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schadenminderung-obliegenheit-sofortmassnahmen-praxis.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenminderung-obliegenheit-sofortmassnahmen-praxis/",
+      "finding": "schematisch wiederholte Selbstbeschreibung „Dieser Beitrag liefert …“",
+      "correction": "öffentliche Boilerplate-Formulierung entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schadenregulierer-versicherungen-technische-pruefung-schadensteuerung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenregulierer-versicherungen-technische-pruefung-schadensteuerung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenregulierung-vollmacht-obliegenheiten-mehrfachversicherung-fahrlaessigkeit-abgeltung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schadenreserve-nachvollziehbar-fortschreiben.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadenreserve-nachvollziehbar-fortschreiben/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schadentrocknung-bautrocknung-schadenziel-messkonzept-erfolgskontrolle.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadentrocknung-bautrocknung-schadenziel-messkonzept-erfolgskontrolle/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schadstoffverdacht-rueckbau-bestandsgebaeude.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schadstoffverdacht-rueckbau-bestandsgebaeude/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schimmel-nach-wasserschaden-ursache-sanierungsumfang-kostenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schimmel-nach-wasserschaden-ursache-sanierungsumfang-kostenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schimmelsanierung-feuchteursache-feinreinigung-sanierungserfolg-pruefen/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schlagregeneintritt-fassade-fenster-anschluesse-dichtheit-schadenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schlagregeneintritt-fassade-fenster-anschluesse-dichtheit-schadenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schliessanlage-einbruchschaden-austausch-kosten-pruefen.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schliessanlage-einbruchschaden-austausch-kosten-pruefen/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schneedruck-winterschaeden-bewertung-regulierung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schneedruck-winterschaeden-bewertung-regulierung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/schwarzwasserschaden-kontamination-hygiene-rueckbau-entsorgung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sprinkleranlage-ausloesung-wasserschaden-wiederinbetriebnahme-kostenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/starkregen-rueckstau-eintrittswege-rueckstauebene-schadenbereiche.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/starkregen-rueckstau-eintrittswege-rueckstauebene-schadenbereiche/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/starkregen-rueckstau-schadenaufnahme-regulierung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/stromkosten-technische-trocknung-nachweis.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/stromkosten-technische-trocknung-nachweis/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/sturmschaden-windwirkung-vorschaden-abgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/sturmschaden-windwirkung-vorschaden-abgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/svos-foundation.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/svos-foundation/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/technische-trocknung-leitungswasserschaeden-messkonzept-rueckbau-erfolgskontrolle/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/teilzahlungen-sachschaden-anerkannte-betraege-offene-positionen-zahlungsstatus/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/tornado-lokale-sturmereignisse-schadenaufnahme.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/tornado-lokale-sturmereignisse-schadenaufnahme/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/ueberflutungsschaden-oberflaechenwasser-grundwasser-rueckstau-abgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/waermepumpe-ueberflutung-pruefung-kostenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/waermepumpe-ueberflutung-pruefung-kostenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/wintergarten-schaden-tragwerk-verglasung-entwaesserung.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/wintergarten-schaden-tragwerk-verglasung-entwaesserung/",
+      "finding": "kein Treffer der verbindlichen Meta-/Rechtfertigungsmuster",
+      "correction": "keine Änderung",
+      "status": "passed-after-correction"
+    },
+    {
+      "file": "src/content/knowledge/zusammenarbeit-fachplaner-sanierer-schadenfall.md",
+      "url": "https://www.sv-netzwerk.eu/fachwissen/zusammenarbeit-fachplaner-sanierer-schadenfall/",
+      "finding": "schematisch wiederholte Selbstbeschreibung eines angeblich anonymisierten Praxisbeispiels und des Beitragszwecks",
+      "correction": "beide öffentlichen Boilerplate-Formulierungen entfernt",
+      "status": "passed-after-correction"
+    }
+  ]
+}
+

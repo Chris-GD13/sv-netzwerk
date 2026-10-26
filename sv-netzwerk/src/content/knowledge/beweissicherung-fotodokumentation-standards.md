@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["gebaeude", "leitungswasser", "brand", "sturm"]
 publication:
   publishedAt: 2026-08-26
-  updatedAt: 2026-10-20
+  updatedAt: 2026-10-26
   status: published
 seo:
   title: "Beweissicherung und Fotodokumentation: Standards für belastbare"
@@ -44,7 +44,7 @@ Für die operative Verzahnung werden Leistungen, Schadenarten, Expertenprofile u
 ### Technische und regulatorische Einordnung
 Beweissichernde Fotodokumentation verbindet Übersicht, Detail und Messaufnahme mit einer eindeutigen Raum- und Bauteilzuordnung. Aufnahmedatum, verantwortliche Person und unveränderte Ausgangsdatei bleiben erhalten. Automatische Zeit- oder Standortdaten können helfen, sind aber weder alleiniger Echtheitsnachweis noch zwingend in jedem Foto erforderlich. Die rechtliche Würdigung eines elektronischen Dokuments richtet sich nach dem jeweiligen Verfahren; § 371 ZPO behandelt den Augenscheinsbeweis durch Vorlage beziehungsweise Übermittlung der Datei. Eine bestimmte Dateibenennung garantiert keinen Beweiswert. Rückbauöffnungen sind vor Verschluss nachvollziehbar zu dokumentieren.
 
-Die fachliche Einordnung beginnt mit dem dokumentierten Schadenbild und den hieraus abgeleiteten Prüffragen. Technische Bewertung und versicherungstechnische Entscheidung sind getrennt zu behandeln. Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung, ersetzt jedoch keine individuelle Deckungszusage oder Einzelfallprüfung.
+Die fachliche Einordnung beginnt mit dem dokumentierten Schadenbild und den hieraus abgeleiteten Prüffragen. Technische Bewertung und versicherungstechnische Entscheidung sind getrennt zu behandeln.
 
 In Kumulereignissen ist zudem die Reihenfolge der Bearbeitung entscheidend: Sicherheitsrelevante Objekte werden zuerst stabilisiert, parallel erfolgt die Erstklassifizierung nach Schadenumfang und Komplexität. Dadurch lassen sich Vor-Ort-Ressourcen, Nachunternehmer und Regulierkapazitäten priorisiert steuern, ohne dass die Dokumentationsqualität sinkt.
 

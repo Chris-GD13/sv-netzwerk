@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["sturm", "hagel", "gebaeude"]
 publication:
   publishedAt: 2026-08-12
-  updatedAt: 2026-08-12
+  updatedAt: 2026-10-26
   status: published
 seo:
   title: "Kumulschäden nach Sturm und Hagel: Belastbare Prüffolge für die"
@@ -30,8 +30,6 @@ seo:
 Bei regionalen Sturm- und Hagelkumulagen führt nur eine bauteilbezogene Prüffolge zu nachvollziehbaren Entscheidungen. Die Qualität der Dokumentation entscheidet über belastbare Entscheidungen bei hoher Schadenfrequenz.
 
 ## Anlass und Einordnung
-Dieser Beitrag nutzt ein anonymisiertes typisches Praxisbeispiel aus der Regulierung. Damit werden keine identifizierbaren Einzelfalldaten veröffentlicht, aber belastbare Vorgehensstandards für Versicherer, Sachverständige und Schadenregulierer dargestellt.
-
 ## Hauptteil
 
 ### Fachlicher Rahmen: Sachverständige und Schadenregulierer
@@ -46,7 +44,7 @@ Für die operative Verzahnung werden Leistungen, Schadenarten, Expertenprofile u
 ### Technische und regulatorische Einordnung
 Windwirkung, Befestigungszustand, Materialalterung und Schadenzeitpunkt sind gemeinsam zu prüfen. Nur dokumentierte Feststellungen dürfen in Freigaben und Reserven überführt werden.
 
-Technische Bewertung und versicherungsrechtliche Entscheidung sind getrennt zu behandeln. Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung, ersetzt jedoch keine individuelle Deckungsprüfung.
+Technische Bewertung und versicherungsrechtliche Entscheidung sind getrennt zu behandeln.
 
 In Kumulereignissen ist zudem die Reihenfolge der Bearbeitung entscheidend: Sicherheitsrelevante Objekte werden zuerst stabilisiert, parallel erfolgt die Erstklassifizierung nach Schadenumfang und Komplexität. Dadurch lassen sich Vor-Ort-Ressourcen, Nachunternehmer und Regulierkapazitäten priorisiert steuern, ohne dass die Dokumentationsqualität sinkt.
 

@@ -16,7 +16,7 @@ relatedLinks: ["/experten/marc-schuett/", "/fachwissen/fensteranschluss-abdichtu
 damageTypes: ["gebaeude", "sanierung"]
 publication:
   publishedAt: 2026-10-25
-  updatedAt: 2026-10-25
+  updatedAt: 2026-10-26
   status: published
 seo:
   title: "Luftdichtheitsmessung am Gebäude fachlich prüfen"
@@ -88,10 +88,6 @@ Bei der Kostenprüfung sind Messung, Leckageortung, Bauteilöffnung, Nachbesseru
 Der Messdienstleister ermittelt die Luftdurchlässigkeit unter den dokumentierten Randbedingungen. Die fachliche Ursachenbewertung kann zusätzliche Kenntnisse zu Gebäudehülle, Fenstern, Türen, Anschlüssen und Ausbau erfordern. Bei strittigen Vertragsanforderungen oder komplexen bauphysikalischen Zusammenhängen sind die dafür zuständigen Fachplaner und gegebenenfalls die rechtliche Beratung einzubeziehen. Eine Messung ersetzt weder die Fachplanung noch die Deckungsentscheidung des Versicherers.
 
 Versicherungstechnisch folgt aus einem auffälligen Kennwert daher noch keine Deckungszusage. Ob überhaupt ein versichertes Ereignis vorliegt und welche Kosten zuzuordnen sind, bleibt eine Einzelfallprüfung anhand des Vertrags, des belegten Schadenverlaufs und der festgestellten Ursache.
-
-## Keine erfundenen Vergleichswerte
-
-Ein fiktives Praxisbeispiel würde bei diesem Thema eine Genauigkeit vortäuschen, die nur aus der tatsächlichen Prüfzone, den Bezugsgrößen und den Messreihen entstehen kann. Deshalb werden hier keine erfundenen Luftwechselraten, Leckageflächen oder Sanierungskosten verwendet. Für jeden Einzelfall sind der Originalprüfbericht, der Gebäudezustand und die konkrete Anforderung maßgeblich.
 
 ## Fazit
 

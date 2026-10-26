@@ -16,7 +16,7 @@ relatedLinks: ["/experten/lenna-maria-walczok/", "/fachwissen/nachtraege-sachsch
 damageTypes: ["gebaeude", "sanierung"]
 publication:
   publishedAt: 2026-10-24
-  updatedAt: 2026-10-24
+  updatedAt: 2026-10-26
   status: published
 seo:
   title: "Bauablauf im Schadenfall fachlich prüfen"
@@ -82,10 +82,6 @@ Entscheidend ist die Wirkung auf die kritische Abfolge, nicht die bloße Existen
 Für die Kostenprüfung müssen Rechnung, Leistungszeitraum und behauptete Ursache zusammenpassen. Bei Vorhaltekosten gehören die eingesetzten Geräte oder Gerüste, der konkrete Vorhaltezeitraum, die vertragliche Preisgrundlage und ersparte Aufwendungen in die Unterlagen. Bei einer erneuten Mobilisierung sind Anfahrt, Personal, Material und der Anlass der Wiederaufnahme getrennt auszuweisen. Eine bloße Sammelposition „Bauzeitverlängerung“ ist ohne diese Zuordnung nicht prüffähig.
 
 Auch die Form der Nachweise ist relevant. E-Mails, Bautagebuch, Fotodokumentation, Lieferscheine, Freigaben und Arbeitszeitaufstellungen müssen dieselben Zeitpunkte und Flächen beschreiben. Widersprüchliche Daten sind kein Anlass für eine pauschale Kürzung, sondern für eine gezielte Rückfrage und eine dokumentierte Aussagegrenze. Erst danach lässt sich entscheiden, welche Position technisch belegt, offen oder nicht dem Schadenereignis zuzuordnen ist.
-
-## Keine erfundenen Zeiträume oder Kosten
-
-Ein fiktives Praxisbeispiel mit ausgedachten Baustellentagen, Mitarbeiterstunden oder Eurobeträgen würde bei diesem Thema eine Genauigkeit vortäuschen, die ohne Vertrag und Originalunterlagen nicht besteht. Deshalb werden hier keine Fallzahlen erfunden. Die Entscheidungskette lässt sich nur mit dem tatsächlichen Vertrag, dem belegten Ablauf und den konkreten Kostenunterlagen des jeweiligen Schadenfalls anwenden.
 
 ## Versicherungsfachliche Einordnung und Fachgrenzen
 

@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["hochwasser", "ueberflutung", "gebaeude"]
 publication:
   publishedAt: 2026-08-30
-  updatedAt: 2026-10-19
+  updatedAt: 2026-10-26
   status: published
 seo:
   title: "Kumulschäden nach Hochwasser und Überflutung: Priorisierung und"
@@ -28,8 +28,6 @@ seo:
 Bei regionalen Hochwasserlagen laufen Besichtigungen, Sofortmaßnahmen und Reservierung parallel und erfordern belastbare Einsatzsteuerung. Die Qualität der Dokumentation entscheidet über belastbare Entscheidungen bei hoher Schadenfrequenz.
 
 ## Anlass und Einordnung
-Dieser Beitrag nutzt ein anonymisiertes typisches Praxisbeispiel aus der Regulierung. Damit werden keine identifizierbaren Einzelfalldaten veröffentlicht, aber belastbare Vorgehensstandards für Versicherer, Sachverständige und Schadenregulierer dargestellt.
-
 ## Hauptteil
 
 ### Fachlicher Rahmen: Sachverständige und Schadenregulierer
@@ -44,7 +42,7 @@ Für die operative Verzahnung werden Leistungen, Schadenarten, Expertenprofile u
 ### Technische und regulatorische Einordnung
 Für die technische Einordnung sind Wasserstandsentwicklung, Einwirkdauer, betroffene Konstruktionen und Trocknungspfad maßgeblich. Regulatorisch bleibt die saubere Trennung zwischen versichertem Schadenanteil und nicht versicherten Vorzuständen zentral.
 
-Die fachliche Einordnung beginnt mit dem dokumentierten Schadenbild und den hieraus abgeleiteten Prüffragen. Technische Bewertung und versicherungstechnische Entscheidung sind getrennt zu behandeln. Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung, ersetzt jedoch keine individuelle Deckungszusage oder Einzelfallprüfung.
+Die fachliche Einordnung beginnt mit dem dokumentierten Schadenbild und den hieraus abgeleiteten Prüffragen. Technische Bewertung und versicherungstechnische Entscheidung sind getrennt zu behandeln.
 
 In Kumulereignissen ist zudem die Reihenfolge der Bearbeitung entscheidend: Sicherheitsrelevante Objekte werden zuerst stabilisiert, parallel erfolgt die Erstklassifizierung nach Schadenumfang und Komplexität. Dadurch lassen sich Vor-Ort-Ressourcen, Nachunternehmer und Regulierkapazitäten priorisiert steuern, ohne dass die Dokumentationsqualität sinkt.
 

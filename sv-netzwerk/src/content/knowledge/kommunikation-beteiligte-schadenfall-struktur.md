@@ -16,7 +16,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["gebaeude", "kumulschaden"]
 publication:
   publishedAt: 2026-08-31
-  updatedAt: 2026-10-19
+  updatedAt: 2026-10-26
   status: published
 seo:
   title: "Kommunikation mit Versicherern, Schadenregulierern und"
@@ -28,8 +28,6 @@ seo:
 Strukturierte Kommunikation im Schadenfall verhindert Missverständnisse, spart Eskalationen und sichert nachvollziehbare Entscheidungsgrundlagen für alle Beteiligten. Die Qualität der Dokumentation entscheidet über belastbare Entscheidungen bei hoher Schadenfrequenz.
 
 ## Anlass und Einordnung
-Dieser Beitrag nutzt ein anonymisiertes typisches Praxisbeispiel aus der Regulierung. Damit werden keine identifizierbaren Einzelfalldaten veröffentlicht, aber belastbare Vorgehensstandards für Versicherer, Sachverständige und Schadenregulierer dargestellt.
-
 ## Hauptteil
 
 ### Fachlicher Rahmen: Sachverständige und Schadenregulierer
@@ -44,7 +42,7 @@ Für die operative Verzahnung werden Leistungen, Schadenarten, Expertenprofile u
 ### Technische und regulatorische Einordnung
 Jede kommunizierte Einschätzung zu Ursache, Umfang oder Kosten muss auf dokumentierten Feststellungen beruhen. Vorläufige Aussagen sind als solche zu kennzeichnen. Protokollierte Abstimmungen ersetzen mündliche Absprachen im Streitfall.
 
-Die fachliche Einordnung beginnt mit dem dokumentierten Schadenbild und den hieraus abgeleiteten Prüffragen. Technische Bewertung und versicherungstechnische Entscheidung sind getrennt zu behandeln. Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung, ersetzt jedoch keine individuelle Deckungszusage oder Einzelfallprüfung.
+Die fachliche Einordnung beginnt mit dem dokumentierten Schadenbild und den hieraus abgeleiteten Prüffragen. Technische Bewertung und versicherungstechnische Entscheidung sind getrennt zu behandeln.
 
 In Kumulereignissen ist zudem die Reihenfolge der Bearbeitung entscheidend: Sicherheitsrelevante Objekte werden zuerst stabilisiert, parallel erfolgt die Erstklassifizierung nach Schadenumfang und Komplexität. Dadurch lassen sich Vor-Ort-Ressourcen, Nachunternehmer und Regulierkapazitäten priorisiert steuern, ohne dass die Dokumentationsqualität sinkt.
 

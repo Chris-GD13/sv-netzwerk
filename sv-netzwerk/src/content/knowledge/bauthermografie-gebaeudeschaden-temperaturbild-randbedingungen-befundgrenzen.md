@@ -87,12 +87,6 @@ Auch Kosten lassen sich erst danach sinnvoll abgrenzen. Thermografische Aufnahme
 
 Versicherungstechnisch folgt aus einer thermischen Auffälligkeit keine Deckungszusage. Entscheidend bleiben der nachgewiesene Schadenverlauf, die Ursache, der Vertragsumfang und die Abgrenzung zwischen Schadenbeseitigung, Instandhaltung und Verbesserung. Die Thermografie liefert dafür einen Baustein der technischen Tatsachengrundlage.
 
-## Keine erfundenen Temperaturgrenzen
-
-Für diesen Beitrag werden keine pauschalen Temperaturdifferenzen, Emissionsgrade oder Grenzwerte erfunden. Solche Werte hängen von Prüfziel, Oberfläche, Gerät, Bauteil, Klima und angewendetem Regelwerk ab. Maßgeblich sind die dokumentierten Bedingungen des konkreten Objekts und die für die jeweilige Untersuchung tatsächlich eingesehenen technischen Vorgaben.
-
-Auch ein erfundenes Praxisbeispiel würde hier eine Eindeutigkeit vortäuschen, die aus einem einzelnen Thermogramm nicht entstehen kann. Die fachliche Einordnung braucht die Originalaufnahme, die tatsächlichen Randbedingungen und den realen Bauteilaufbau.
-
 ## Fazit
 
 Bauthermografie ist besonders wertvoll, wenn sie nicht als farbiges Endurteil, sondern als nachvollziehbares Prüfverfahren eingesetzt wird. Prüfziel, Bauteilaufbau, Oberflächeneigenschaften, Umgebungsbedingungen und Vergleichsflächen bestimmen die Aussage. Thermische Muster können eine Hypothese stützen und weitere Untersuchungen gezielt lenken. Die Ursache eines Gebäudeschadens wird erst belastbar, wenn Thermogramm, Sichtbefund und passende ergänzende Messungen zusammenpassen und die Grenzen der Aussage offen dokumentiert sind.

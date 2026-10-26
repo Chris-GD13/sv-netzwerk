@@ -17,7 +17,7 @@ relatedLinks: ["/schaden-melden/", "/leistungen/", "/komplexschaeden/", "/expert
 damageTypes: ["starkregen", "rueckstau", "gebaeude"]
 publication:
   publishedAt: 2026-08-11
-  updatedAt: 2026-08-11
+  updatedAt: 2026-10-26
   status: published
 seo:
   title: "Starkregen und Rückstau: Schadenbereiche und Kosten abgrenzen"
@@ -30,8 +30,6 @@ seo:
 Bei Starkregenlagen mit zahlreichen Meldungen in kurzer Zeit entscheidet eine strukturierte Erstaufnahme über die spätere Prüffähigkeit. Die Qualität der Dokumentation entscheidet über belastbare Entscheidungen bei hoher Schadenfrequenz.
 
 ## Anlass und Einordnung
-Dieser Beitrag nutzt ein anonymisiertes typisches Praxisbeispiel aus der Regulierung. Damit werden keine identifizierbaren Einzelfalldaten veröffentlicht, aber belastbare Vorgehensstandards für Versicherer, Sachverständige und Schadenregulierer dargestellt.
-
 ## Hauptteil
 
 ### Fachlicher Rahmen: Sachverständige und Schadenregulierer
@@ -46,7 +44,7 @@ Für die operative Verzahnung werden Leistungen, Schadenarten, Expertenprofile u
 ### Technische und regulatorische Einordnung
 Wesentlich ist die Trennung zwischen Niederschlagseinwirkung, Rückstaueinfluss, baulichem Zustand und Vorzustand. Technisch sind Eintrittswege, Wasserstände, Durchfeuchtungszonen und betroffene Gewerke getrennt zu erfassen.
 
-Technische Bewertung und versicherungsrechtliche Entscheidung sind getrennt zu behandeln. Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung, ersetzt jedoch keine individuelle Deckungsprüfung.
+Technische Bewertung und versicherungsrechtliche Entscheidung sind getrennt zu behandeln.
 
 In Kumulereignissen ist zudem die Reihenfolge der Bearbeitung entscheidend: Sicherheitsrelevante Objekte werden zuerst stabilisiert, parallel erfolgt die Erstklassifizierung nach Schadenumfang und Komplexität. Dadurch lassen sich Vor-Ort-Ressourcen, Nachunternehmer und Regulierkapazitäten priorisiert steuern, ohne dass die Dokumentationsqualität sinkt.
 

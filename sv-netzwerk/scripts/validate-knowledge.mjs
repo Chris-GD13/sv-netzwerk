@@ -97,13 +97,32 @@ for (const entry of today) {
     /(fachgrenze|fachplaner|spezialist)/i,
     /(versicherungstechn|deckung|einzelfallprüfung|einzelfallpruefung)/i,
     /(kostenprüfung|kostenpruefung|prüffähig|prueffaehig)/i,
-    /praxisbeispiel/i,
     /fazit/i,
     /(quellen|weiterführende hinweise|weiterfuehrende hinweise)/i,
   ];
   const conceptHits = requiredConcepts.filter((rx) => rx.test(entry.parsed.body)).length;
-  if (conceptHits < 10) {
-    errors.push(`${entry.file}: Fachbeitragsstandard nicht ausreichend abgebildet (${conceptHits}/12 Kernkonzepte erkannt).`);
+  if (conceptHits < 9) {
+    errors.push(`${entry.file}: Fachbeitragsstandard nicht ausreichend abgebildet (${conceptHits}/${requiredConcepts.length} Kernkonzepte erkannt).`);
+  }
+}
+
+const forbiddenPublicMetaPatterns = [
+  /##\s+Keine erfundenen/i,
+  /##\s+Warum kein fiktives Praxisbeispiel/i,
+  /Dieser Beitrag nutzt ein anonymisiertes typisches Praxisbeispiel/i,
+  /Dieser Beitrag liefert die fachliche Grundlage für Begutachtung und Regulierung/i,
+  /Für diesen Beitrag werden keine .* erfunden/i,
+  /Dieser Beitrag .* erfundene/i,
+  /entsprechend der aktuellen Nutzervorgabe/i,
+  /erfundenes Praxisbeispiel würde/i,
+  /fiktives Praxisbeispiel .* würde .* vortäuschen/i,
+];
+
+for (const entry of entries) {
+  for (const pattern of forbiddenPublicMetaPatterns) {
+    if (pattern.test(entry.parsed.body)) {
+      errors.push(`${entry.file}: öffentliche Meta-/Rechtfertigungssprache erkannt (${pattern.source}).`);
+    }
   }
 }
 

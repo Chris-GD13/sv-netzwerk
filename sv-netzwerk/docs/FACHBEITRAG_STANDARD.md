@@ -41,7 +41,7 @@ Jeder Fachbeitrag enthält, soweit für das Thema relevant:
 9. erforderliche Einbindung externer Fachplaner oder Spezialisten;
 10. versicherungstechnische Einordnung ohne Deckungszusage;
 11. Anforderungen an eine prüffähige Kostenprüfung;
-12. ein ausdrücklich als fiktiv gekennzeichnetes Praxisbeispiel;
+12. eine unmittelbare fachliche Erläuterung ohne erfundenen Praxisfall;
 13. konkrete Handlungsempfehlungen für Versicherungsnehmer, Versicherer und Sachverständige;
 14. Fazit;
 15. belastbare Quellen und weiterführende Hinweise.
@@ -57,7 +57,7 @@ Jeder Fachbeitrag enthält, soweit für das Thema relevant:
 - konsequente Trennung von Befund, Ursache, Bewertung, Zuständigkeit und Kostenfolge;
 - Formulierungen wie "nicht automatisch", "einzelfallabhängig", "technisch zu prüfen" und "keine pauschale Deckungszusage", wo fachlich erforderlich;
 - keine unzulässige Übernahme von Aufgaben anderer Fachdisziplinen;
-- Praxisbeispiele ausschließlich fiktiv und eindeutig so gekennzeichnet.
+- keine fiktiven oder nur behauptet anonymisierten Praxisfälle als Pflichtbaustein; fachliche Zusammenhänge unmittelbar aus belegten Grundlagen erklären.
 
 ## 3. Fachliche Nachweisqualität
 
@@ -123,3 +123,7 @@ Keine typografischen Platzhalterbilder veröffentlichen. Solange kein fachlich p
 ## Verbindliche Stilkorrektur 20.10.2026
 
 VERBINDLICHE STILVORGABE VOM 20.10.2026 – gilt für Fachartikel und LinkedIn-Begleittexte: Natürlich, persönlich und fachlich aus Christian Wächters Perspektive als Sachverständiger und Großschadenregulierer schreiben. Keine erkennbar schematischen KI-Formulierungen, Floskeln, künstlichen Frage-Antwort-Einstiege, Werbesprache oder mechanischen Gliederungen. Öffentliche Texte als zusammenhängenden Fließtext mit kurzen, sinnvoll verbundenen Absätzen verfassen: keine Einrückungen, keine Aufzählungspunkte (auch keine •, -, *, Pfeile oder Emojis als Listenmarker), keine nummerierten Listen und keine als Absätze getarnte Checkliste nach dem Muster „Prüfpunkt: Erklärung“. Fachliche Kernpunkte im Satzfluss erklären; eine ältere Vorgabe zu 3–5 Prüfpunkten beschreibt ausschließlich den Inhalt, niemals eine Listenform. Keine internen Rotations-/Profilprüfhinweise oder Profilzuweisungen im öffentlichen Begleittext. Keine erfundenen persönlichen Fälle, Einsätze oder Erfahrungen. Fachartikeltitel, sachlich nötige Zwischenüberschriften, reguläre Satzzeichen und separate Quellenangaben bleiben zulässig; Quellen nicht als Aufzählung gestalten. Hashtags im LinkedIn-Beitrag stehen in einem eigenen Absatz. Vor Speicherung und unmittelbar vor jeder Veröffentlichung die tatsächliche Vorschau auf diese Stilvorgabe prüfen und sichtbare Abweichungen zuerst beheben. Bei einer Korrektur eines bereits veröffentlichten LinkedIn-Beitrags ausschließlich „Beitrag bearbeiten“ am bestehenden Permalink verwenden; niemals löschen und neu posten. Kosten-, Quellen-, Tages-, Reservierungs- und Freigabegrenzen bleiben bestehen. Diese ausdrückliche Nutzerkorrektur ersetzt jede ältere widersprechende Formatvorgabe.
+
+## Verbindliche Präzisierung 26.10.2026
+
+Öffentliche Fachartikel und LinkedIn-Begleittexte enthalten keine internen Absicherungs-, Prompt- oder Rechtfertigungssätze. Überschriften und Absätze wie „Keine erfundenen …“, „Warum kein fiktives Praxisbeispiel …“, Hinweise auf eine „aktuelle Nutzervorgabe“ oder Erklärungen, was der Beitrag bewusst nicht erfindet, gehören nicht in die Veröffentlichung. Die Qualitätsanforderung wird intern geprüft; öffentlich steht ausschließlich der fachliche Inhalt. Ein fiktives Praxisbeispiel ist kein Pflichtbestandteil und darf nicht ergänzt werden, um eine Prüfroutine oder Gliederungsvorgabe zu erfüllen. Vor jeder Veröffentlichung und bei Bestandskorrekturen ist der gesamte öffentliche Text auf solche Metasprache zu prüfen.
