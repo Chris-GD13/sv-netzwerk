@@ -346,7 +346,7 @@ case'recent_cases':
   apiJson(['ok'=>true,'results'=>$results]);
 case'schedule_cases':
   $term=trim((string)($_GET['q']??''));
-  $limit=max(1,min(120,(int)($_GET['limit']??80)));
+  $limit=max(1,min(120,(int)($_GET['limit']??30)));
   if($term!==''){
     $results=gdFastCaseSearch($user,$term,$limit);
     if(!$results)$results=gdReconcileCaseSearch($user,$term,$limit);
@@ -356,7 +356,6 @@ case'schedule_cases':
     $results=[];
     foreach(array_slice($folders,0,$limit)as$folder){
       try{$meta=gdCaseMeta((string)$folder['id']);}catch(Throwable){$meta=[];}
-      gdRegisterCaseOwner((string)$folder['id'],$user,$meta);
       $results[]=gdCaseResultLabel(['id'=>$folder['id'],'name'=>$folder['name'],'modifiedTime'=>$folder['modifiedTime']??null,'webViewLink'=>$folder['webViewLink']??null,'meta'=>$meta],(string)$folder['case_profile']);
     }
   }
@@ -369,7 +368,9 @@ case'schedule_cases':
     if(trim((string)($meta['rekon_task_id']??''))!=='')$sources[]='Rekon';
     // Terminplanung zeigt standardmäßig nur offene, eindeutig zugeordnete Fälle.
     // Vollständige Bestände bleiben für Diagnosezwecke mit include_scheduled=1 abrufbar.
-    if(!$includeScheduled&&(!$sources||trim((string)($meta['claimsforce_termin']??''))!==''||trim((string)($meta['rekon_termin']??''))!==''))continue;
+    $claimsBucket=strtoupper(trim((string)($meta['claimsforce_bucket']??'')));
+    $claimsOpen=$claimsBucket==='WITHOUT_APPOINTMENT';
+    if(!$includeScheduled&&(!$sources||($meta['claimsforce_claim_id']??'')!==''&&!$claimsOpen||trim((string)($meta['claimsforce_termin']??''))!==''||trim((string)($meta['rekon_termin']??''))!==''))continue;
     $rows[]=['id'=>(string)($row['id']??''),'name'=>(string)($row['name']??''),'modifiedTime'=>$row['modifiedTime']??null,'meta'=>$meta,'case_profile'=>(string)($row['case_profile']??''),'source_labels'=>$sources,'source_ids'=>['claimsforce'=>(string)($meta['claimsforce_claim_id']??''),'rekon'=>(string)($meta['rekon_task_id']??'')]];
   }
   apiJson(['ok'=>true,'query'=>$term,'results'=>$rows,'profile'=>gdClaimsProfile($user),'backoffice'=>$isBackoffice,'selected_expert'=>$selectedExpert]);

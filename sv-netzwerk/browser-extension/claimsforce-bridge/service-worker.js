@@ -641,7 +641,7 @@ async function runImport(run) {
     const scraped = await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIMS' });
     const bucketClaims = scraped?.claims || [];
     bucketCounts[planningBucket.key] = bucketClaims.length;
-    for (const claim of bucketClaims) if (claim?.id) claimsById.set(claim.id, { ...(claimsById.get(claim.id) || {}), ...claim });
+    for (const claim of bucketClaims) if (claim?.id) claimsById.set(claim.id, { ...(claimsById.get(claim.id) || {}), ...claim, claimsforce_bucket: planningBucket.key });
     await diagnostic(run, 'CF-LIST-05', `${bucketClaims.length} Auftrag/Aufträge wurden in „${planningBucket.label}“ erkannt.`, { bucket: planningBucket.key, count: bucketClaims.length, combined: claimsById.size, openTasks, observedApi: scraped?.observedClaims || 0, route: scraped?.route || safeRoute((await chrome.tabs.get(tab.id)).url) });
   }
   const claims = [...claimsById.values()];

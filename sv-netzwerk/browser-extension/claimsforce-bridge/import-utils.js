@@ -136,6 +136,7 @@ export function mapClaim(claim, communication = {}, appointments = [], stakehold
     mobil: first(policyholder, ['mobile', 'mobilePhone', 'cellPhone']),
     email: first(policyholder, ['email', 'emailAddress']),
     claimsforce_claim_id: text(claim?.id),
+    claimsforce_bucket: first(claim, ['claimsforce_bucket', 'bucket', 'planningBucket']),
     claimsforce_termin: next,
     claimsforce_zuletzt_eingelesen: new Date().toISOString()
   };
