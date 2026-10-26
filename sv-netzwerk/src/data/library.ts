@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Bauthermografie am Gebäudeschaden: Temperaturbild, Randbedingungen und Befundgrenzen richtig einordnen',
+    description: 'Temperaturbilder, Messbedingungen, Oberflächeneinflüsse und ergänzende Untersuchungen am Gebäudeschaden nachvollziehbar bewerten.',
+    href: '/fachwissen/bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen/',
+    category: 'Bauforensik und Gebäudediagnostik',
+    tags: ['Bauthermografie', 'Gebäudeschaden', 'Bauforensik', 'Wärmebrücke', 'Feuchte', 'Gebäudehülle', 'Beweissicherung'],
+    date: '2026-10-26',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Luftdichtheitsmessung am Gebäude: Messziel, Präparation und Leckagebefund sauber trennen',
     description: 'Messziel, Gebäudepräparation, Bezugsgrößen, Kennwerte und Leckagebefunde einer Luftdichtheitsmessung nachvollziehbar beurteilen.',
     href: '/fachwissen/luftdichtheitsmessung-gebaeude-messziel-praeparation-leckagebefund/',
