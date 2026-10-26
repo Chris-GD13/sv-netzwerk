@@ -52,14 +52,17 @@
         "title": "Bauthermografie am Gebäudeschaden: Temperaturbild, Randbedingungen und Befundgrenzen richtig einordnen",
         "slug": "bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen",
         "url": "https://www.sv-netzwerk.eu/fachwissen/bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-website-20261026-0600",
-        "reserved_at": "2026-10-26T05:01:55.640Z"
+        "reserved_at": "2026-10-26T05:01:55.640Z",
+        "commit": "80f4770ff233a711ed18ab59f13d014514b735b3",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40272673449",
+        "verified_at": "2026-10-26T05:14:59.513Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-26T05:01:55.640Z"
+  "updated_at": "2026-10-26T05:14:59.513Z"
 }
