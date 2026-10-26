@@ -8,4 +8,6 @@ Die Ursache wurde im Fachbeitragsstandard und im Knowledge-Validator beseitigt. 
 
 Die vorbereiteten und dokumentierten LinkedIn-Begleittexte wurden mit denselben Mustern geprüft. Es gab keinen Treffer in einem öffentlichen LinkedIn-Text; deshalb wurde kein bestehender LinkedIn-Beitrag verändert und nichts neu veröffentlicht.
 
-Deployment- und Live-Nachweise werden nach erfolgreicher Veröffentlichung dieses Korrekturstands ergänzt.
+Der Korrekturstand wurde mit Commit `ff3409cbff6a4ed0dc8d5d012ca761745e678f15` veröffentlicht. Der konkrete Website-Lauf [40336166597](https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40336166597), der Build-Check [40336166600](https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40336166600) und die Portal-Tests [40336166336](https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40336166336) wurden erfolgreich abgeschlossen.
+
+Die kanonische Bauthermografie-Seite wurde anschließend im Browser sichtbar geprüft. Der beanstandete Abschnitt ist nicht mehr vorhanden; die fachliche Darstellung führt ohne öffentliche Rechtfertigungssprache zum Fazit. Zusätzlich wurden alle 116 veröffentlichten Fachartikel per HTTP gegen die festgeschriebenen Muster geprüft. Alle Detailseiten antworteten mit HTTP 200 und ohne Treffer. Fachartikelübersicht, Kategorie `bauforensik-und-gebaudediagnostik`, Tag `bauthermografie`, Sitemap, robots.txt und `deploy-version.txt` antworteten ebenfalls mit HTTP 200. Der Deploy-Marker nennt den Korrektur-Commit und die Build-Zeit `2026-10-26T14:04:17.424Z`.
