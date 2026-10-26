@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-26",
+  "timezone": "Europe/Berlin",
+  "publication_id": "2026-10-26-bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen",
+  "article": {
+    "title": "Bauthermografie am Gebäudeschaden: Temperaturbild, Randbedingungen und Befundgrenzen richtig einordnen",
+    "slug": "bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen",
+    "url": "https://www.sv-netzwerk.eu/fachwissen/bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen/",
+    "status": "published-verified",
+    "owner": "codex-website-20261026-0600",
+    "reserved_at": "2026-10-26T05:01:55.640Z",
+    "commit": "80f4770ff233a711ed18ab59f13d014514b735b3",
+    "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40272673449",
+    "verified_at": "2026-10-26T05:14:59.513Z"
+  },
+  "linkedin": {
+    "status": "published-verified",
+    "owner": "codex-linkedin-20261026-01a176cc",
+    "reserved_at": "2026-10-26T06:04:49.640Z",
+    "article_url": "https://www.sv-netzwerk.eu/fachwissen/bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen/",
+    "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7520365576859443200/",
+    "verified_at": "2026-10-26T06:08:45.147Z"
+  },
+  "posted_at_berlin": "2026-10-26T07:07:53.354+01:00",
+  "post_click_returned_at_berlin": "2026-10-26T07:07:54.432+01:00",
+  "last_duplicate_check_berlin": "2026-10-26T07:07:38.716+01:00",
+  "visible_readback_at_berlin": "2026-10-26T07:08:22.880+01:00",
+  "claim_commit": "5d9a14fdb0d720f91a441aa542675224dcb8b87f",
+  "verify_commit": "9ce2030bde4a9abe8c73372c1b6b84b028bf0013",
+  "verification": {
+    "sender": true,
+    "paragraphs": true,
+    "all_six_non_url_text_lines": true,
+    "all_five_hashtags": true,
+    "article_link": true,
+    "no_uploaded_image": true,
+    "profile_new_article_cards": 1
+  },
+  "cost": {
+    "additional_budget_usd": 0,
+    "additional_spend_usd": 0,
+    "image_path": null,
+    "decision": "Ohne Bild. Tarifdeckung nicht belegt; kein freigegebenes passendes Bestandsmotiv; lokale Titelkarte ohne fachlichen Mehrwert."
+  },
+  "website": {
+    "deployment_status": "completed/success",
+    "live_marker_commit": "80f4770ff233a711ed18ab59f13d014514b735b3"
+  },
+  "deleted": false,
+  "reposted": false
+}
