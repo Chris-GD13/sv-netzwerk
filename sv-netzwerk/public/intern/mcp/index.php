@@ -8,11 +8,13 @@ require_once __DIR__ . '/claims-source.php';
 require_once __DIR__ . '/native-forms.php';
 require_once __DIR__ . '/docx-content.php';
 require_once __DIR__ . '/pdf-content.php';
+require_once __DIR__ . '/storage-files.php';
 commonHeaders();
 
 function mcpResult(mixed $id, array $result): never { oauthJson(['jsonrpc'=>'2.0','id'=>$id,'result'=>$result]); }
 function mcpFailure(mixed $id, int $code, string $message): never { oauthJson(['jsonrpc'=>'2.0','id'=>$id,'error'=>['code'=>$code,'message'=>$message]], 200); }
 function mcpAuthFailure(mixed $id, string $scope='cases:read'): never {
+    if(str_starts_with($scope,'files:')) $scope='cases:read cases:drafts.write files:read files:write';
     $challenge = 'Bearer resource_metadata="https://www.sv-netzwerk.eu/.well-known/oauth-protected-resource/intern/mcp/", scope="'.$scope.'"';
     mcpResult($id,[
         'content'=>[['type'=>'text','text'=>'Bitte zuerst den persönlichen SV-Netzwerk-Zugang verbinden.']],
@@ -76,6 +78,7 @@ if ($method==='initialize') mcpResult($id,['protocolVersion'=>(string)($params['
 if ($method==='notifications/initialized') { http_response_code(202); exit; }
 if ($method==='ping') mcpResult($id,(object)[]);
 if ($method==='tools/list') mcpResult($id,['tools'=>[
+  ...mcpStorageTools(),
   ['name'=>'claimsforce_native_form','title'=>'Natives Claimsforce-Originalformular lesen und Entwurf speichern','description'=>'Use the existing browser bridge (1.4.70+) for native SE/ZB drafts. inspect without form_id lists existing forms; inspect with form_id and exact claim_number reads actual fields and a snapshot hash. save requires that hash and exact before/after values; only existing drafts, never sent originals. Use a fresh UUID operation_id per logical request, reuse it on uncertain retries. poll retrieves the same operation. Saving is verified only after native save plus reopen/readback. inspect_templates can read original template names. Blank form creation is disabled: continue the existing original SE/ZB with its previous content. If a sent form requires native reopening, inspect the original UI workflow rather than creating an empty replacement. Preserve prior sent exports. No report upload, attachments, QS or sending. A successful field save does not establish financial correctness or document completeness.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string'],'operation_id'=>['type'=>'string'],'action'=>['type'=>'string','enum'=>['inspect','save','inspect_templates','poll']],'form_id'=>['type'=>'string'],'template_name'=>['type'=>'string','enum'=>['SV Schlusserklärung','SV Zahlungsbefürwortung']],'claim_number'=>['type'=>'string'],'expected_hash'=>['type'=>'string'],'changes'=>['type'=>'array','maxItems'=>100,'items'=>['type'=>'object','properties'=>['field'=>['type'=>'string'],'before'=>['type'=>'string'],'after'=>['type'=>'string','maxLength'=>10000]],'required'=>['field','before','after'],'additionalProperties'=>false]]],'required'=>['id','operation_id','action'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read','cases:drafts.write']]],'annotations'=>['readOnlyHint'=>false,'openWorldHint'=>false,'destructiveHint'=>false,'idempotentHint'=>true]],
   ['name'=>'read_claimsforce_source','title'=>'Claimsforce-Mail oder Originalbeleg direkt lesen','description'=>'Read a case source through the existing authenticated Claimsforce bridge, independently of an incomplete portal file import. Use id from fetch; kind messages lists native message IDs, message reads the selected message_id, document reads a CLAIM_FILE attachment ID. Set refresh=true once to request a read, then poll refresh=false. The browser bridge must be active. No Claimsforce writes, notes or status changes. PDF results include extracted text or local OCR; never treat a list entry as read evidence.','inputSchema'=>['type'=>'object','properties'=>['id'=>['type'=>'string'],'kind'=>['type'=>'string','enum'=>['messages','message','document']],'source_id'=>['type'=>'string','description'=>'Native message UUID or CLAIM_FILE UUID; omit for messages'],'refresh'=>['type'=>'boolean','default'=>false]],'required'=>['id','kind'],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>false,'openWorldHint'=>false,'destructiveHint'=>false]],
   ['name'=>'list_claimsforce_tasks','title'=>'Eigene Claimsforce-Aufgaben lesen und aktualisieren','description'=>'Read the actual Claimsforce task snapshot from the existing authenticated browser bridge. Set refresh=true to queue a fresh read; poll later with refresh=false. Never treat stale or pending data as current. This does not edit or complete Claimsforce tasks.','inputSchema'=>['type'=>'object','properties'=>['refresh'=>['type'=>'boolean','default'=>false]],'additionalProperties'=>false],'securitySchemes'=>[['type'=>'oauth2','scopes'=>['cases:read']]],'annotations'=>['readOnlyHint'=>false,'openWorldHint'=>false,'destructiveHint'=>false]],
@@ -86,9 +89,25 @@ if ($method==='tools/list') mcpResult($id,['tools'=>[
 ]]);
 if ($method==='tools/call') {
     $name=(string)($params['name']??'');$args=is_array($params['arguments']??null)?$params['arguments']:[];
-    $requiredScope=in_array($name,['save_case_draft','claimsforce_native_form'],true)?'cases:drafts.write':'cases:read';
+    $requiredScope=match($name){'ionos_files_read'=>'files:read','ionos_files_write'=>'files:write', 'save_case_draft','claimsforce_native_form'=>'cases:drafts.write',default=>'cases:read'};
     $user = oauthBearerUserOrNull($requiredScope);
     if (!$user) mcpAuthFailure($id,$requiredScope);
+    if ($name==='ionos_files_read'||$name==='ionos_files_write') {
+        try {
+            $result=$name==='ionos_files_read'?mcpStorageRead($user,$args):mcpStorageWrite($user,$args);
+            $blocks=[];
+            if(isset($result['content_base64'])) {
+                $bytes=base64_decode($result['content_base64'],true); unset($result['content_base64']);
+                $mime=$result['item']['mimeType'];
+                if(mcpDriveIsText($mime)) $blocks[]=['type'=>'text','text'=>mb_substr($bytes,0,500000)];
+                elseif($mime==='application/pdf') $blocks=mcpPdfContent($bytes,false);
+                elseif(preg_match('/\.docx$/i',$result['item']['name'])) $blocks=mcpDocxContent($bytes);
+                else $blocks[]=['type'=>'resource','resource'=>['uri'=>'svnet://files/'.$result['item']['id'],'mimeType'=>$mime,'blob'=>base64_encode($bytes)]];
+            }
+            array_unshift($blocks,['type'=>'text','text'=>json_encode($result,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)]);
+            mcpResult($id,['content'=>$blocks,'structuredContent'=>$result]);
+        } catch(Throwable $error) { mcpFailure($id,-32016,$error->getMessage()); }
+    }
     if($name==='claimsforce_native_form'){
         try{$snapshot=mcpNativeForms($user,$args);}catch(Throwable $error){mcpFailure($id,-32014,$error->getMessage());}
         mcpResult($id,['content'=>[['type'=>'text','text'=>json_encode($snapshot,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)]],'structuredContent'=>$snapshot]);

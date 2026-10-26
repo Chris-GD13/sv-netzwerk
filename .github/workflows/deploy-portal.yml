@@ -143,6 +143,7 @@ jobs:
           php tests/mcp_pdf_ocr_test.php
           php tests/mcp_claims_tasks_test.php
           php tests/mcp_claims_source_test.php
+          php tests/mcp_storage_files_test.php
           php tests/mcp_docx_content_test.php
           php tests/mcp_pdf_content_test.php
           php tests/mcp_pdf_text_quality_test.php
