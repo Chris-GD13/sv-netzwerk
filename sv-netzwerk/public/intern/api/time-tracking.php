@@ -14,7 +14,9 @@ $action = (string)($_GET['action'] ?? 'summary');
 
 match (true) {
     $method === 'GET' && $action === 'summary' => handleSummary($actor),
+    $method === 'GET' && $action === 'lexware_export' => handleLexwareExport($actor),
     $method === 'POST' && $action === 'clock_in' => handleClockIn($actor),
+    $method === 'POST' && $action === 'pause_toggle' => handlePauseToggle($actor),
     $method === 'POST' && $action === 'clock_out' => handleClockOut($actor),
     $method === 'POST' && $action === 'leave_submit' => handleLeaveSubmit($actor),
     $method === 'POST' && $action === 'leave_admin_save' => handleAdminLeaveSave($actor),
@@ -44,6 +46,11 @@ function ensureTimeTrackingSchema(): void
         carryover_leave_days DECIMAL(5,2) NOT NULL DEFAULT 0,
         contractual_minutes_per_week INT UNSIGNED NULL,
         hourly_wage DECIMAL(10,2) NULL,
+        holiday_region VARCHAR(8) NOT NULL DEFAULT 'BW',
+        balance_adjustment_minutes INT NOT NULL DEFAULT 0,
+        balance_adjustment_year SMALLINT UNSIGNED NULL,
+        vacation_adjustment_days DECIMAL(6,2) NOT NULL DEFAULT 0,
+        vacation_adjustment_year SMALLINT UNSIGNED NULL,
         updated_by INT UNSIGNED NULL,
         updated_at DATETIME NOT NULL,
         CONSTRAINT fk_time_settings_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -52,12 +59,18 @@ function ensureTimeTrackingSchema(): void
     ttEnsureColumn($pdo, 'carryover_leave_days', 'DECIMAL(5,2) NOT NULL DEFAULT 0');
     ttEnsureColumn($pdo, 'contractual_minutes_per_week', 'INT UNSIGNED NULL');
     ttEnsureColumn($pdo, 'hourly_wage', 'DECIMAL(10,2) NULL');
+    ttEnsureColumn($pdo, 'holiday_region', "VARCHAR(8) NOT NULL DEFAULT 'BW'");
+    ttEnsureColumn($pdo, 'balance_adjustment_minutes', 'INT NOT NULL DEFAULT 0');
+    ttEnsureColumn($pdo, 'balance_adjustment_year', 'SMALLINT UNSIGNED NULL');
+    ttEnsureColumn($pdo, 'vacation_adjustment_days', 'DECIMAL(6,2) NOT NULL DEFAULT 0');
+    ttEnsureColumn($pdo, 'vacation_adjustment_year', 'SMALLINT UNSIGNED NULL');
     $pdo->exec("CREATE TABLE IF NOT EXISTS time_entries (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         user_id INT UNSIGNED NOT NULL,
         started_at DATETIME NOT NULL,
         ended_at DATETIME NULL,
         break_minutes INT UNSIGNED NOT NULL DEFAULT 0,
+        pause_started_at DATETIME NULL,
         worked_minutes INT UNSIGNED NOT NULL DEFAULT 0,
         planned_minutes INT UNSIGNED NULL,
         balance_minutes INT NOT NULL DEFAULT 0,
@@ -72,6 +85,8 @@ function ensureTimeTrackingSchema(): void
         KEY idx_time_entries_user_started (user_id, started_at),
         CONSTRAINT fk_time_entries_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    $pauseColumn = $pdo->query("SHOW COLUMNS FROM time_entries LIKE 'pause_started_at'")->fetch();
+    if (!$pauseColumn) $pdo->exec('ALTER TABLE time_entries ADD COLUMN pause_started_at DATETIME NULL AFTER break_minutes');
     $pdo->exec("CREATE TABLE IF NOT EXISTS time_leave_requests (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         user_id INT UNSIGNED NOT NULL,
@@ -109,7 +124,7 @@ function ensureTimeTrackingSchema(): void
 
 function ttEnsureColumn(PDO $pdo, string $column, string $definition): void
 {
-    $allowed = ['annual_leave_days', 'carryover_leave_days', 'contractual_minutes_per_week', 'hourly_wage'];
+    $allowed = ['annual_leave_days', 'carryover_leave_days', 'contractual_minutes_per_week', 'hourly_wage', 'holiday_region', 'balance_adjustment_minutes', 'balance_adjustment_year', 'vacation_adjustment_days', 'vacation_adjustment_year'];
     if (!in_array($column, $allowed, true)) return;
     $exists = $pdo->query('SHOW COLUMNS FROM time_user_settings LIKE ' . $pdo->quote($column))->fetch();
     if (!$exists) $pdo->exec("ALTER TABLE time_user_settings ADD COLUMN `$column` $definition");
@@ -193,20 +208,79 @@ function ttTarget(PDO $pdo, int $userId): ?int
     return $value === false || $value === null ? null : (int)$value;
 }
 
-function ttLeaveDays(array $leave, ?int $targetMinutes): float
+function ttHolidayDates(int $year, string $region): array
+{
+    $region = strtoupper($region) === 'NRW' ? 'NRW' : 'BW';
+    $easter = (new DateTimeImmutable(sprintf('%04d-03-21', $year), new DateTimeZone('UTC')))->modify('+' . easter_days($year) . ' days');
+    $dates = [
+        sprintf('%04d-01-01', $year),
+        sprintf('%04d-05-01', $year),
+        sprintf('%04d-10-03', $year),
+        sprintf('%04d-12-25', $year),
+        sprintf('%04d-12-26', $year),
+        $easter->modify('-2 days')->format('Y-m-d'),
+        $easter->modify('+1 day')->format('Y-m-d'),
+        $easter->modify('+39 days')->format('Y-m-d'),
+        $easter->modify('+50 days')->format('Y-m-d'),
+        $easter->modify('+60 days')->format('Y-m-d'),
+    ];
+    if ($region === 'BW') {
+        $dates[] = sprintf('%04d-01-06', $year); // Heilige Drei Könige
+        $dates[] = sprintf('%04d-11-01', $year); // Allerheiligen
+    } else {
+        $dates[] = sprintf('%04d-11-01', $year); // Allerheiligen
+    }
+    return array_values(array_unique($dates));
+}
+
+function ttHolidayRegion(array $setting): string
+{
+    return strtoupper((string)($setting['holiday_region'] ?? 'BW')) === 'NRW' ? 'NRW' : 'BW';
+}
+
+function ttWorkdaysBetween(DateTimeImmutable $from, DateTimeImmutable $to, string $region): int
+{
+    if ($to < $from) return 0;
+    $holidays = array_flip(ttHolidayDates((int)$from->format('Y'), $region));
+    if ((int)$to->format('Y') !== (int)$from->format('Y')) {
+        for ($year = (int)$from->format('Y') + 1; $year <= (int)$to->format('Y'); $year++) {
+            foreach (ttHolidayDates($year, $region) as $holiday) $holidays[$holiday] = true;
+        }
+    }
+    $days = 0;
+    for ($day = $from; $day <= $to; $day = $day->modify('+1 day')) {
+        if ((int)$day->format('N') <= 5 && !isset($holidays[$day->format('Y-m-d')])) $days++;
+    }
+    return $days;
+}
+
+function ttLeaveDays(array $leave, ?int $targetMinutes, string $region): float
 {
     if ((string)($leave['leave_type'] ?? '') !== 'urlaub') return 0.0;
-    $hours = (float)($leave['hours'] ?? 0);
-    if ($hours > 0 && $targetMinutes && $targetMinutes > 0) return round(($hours * 60) / $targetMinutes, 2);
     $from = DateTimeImmutable::createFromFormat('!Y-m-d', (string)($leave['starts_on'] ?? ''));
     $to = DateTimeImmutable::createFromFormat('!Y-m-d', (string)($leave['ends_on'] ?? ''));
     if (!$from || !$to || $to < $from) return 0.0;
-    $days = 0;
-    for ($day = $from; $day <= $to; $day = $day->modify('+1 day')) {
-        $weekday = (int)$day->format('N');
-        if ($weekday <= 5) $days++;
+    $workdays = ttWorkdaysBetween($from, $to, $region);
+    if ($workdays <= 0) return 0.0;
+    $hours = (float)($leave['hours'] ?? 0);
+    if ($hours > 0 && $targetMinutes && $targetMinutes > 0) return min((float)$workdays, round(($hours * 60) / $targetMinutes, 2));
+    return (float)$workdays;
+}
+
+function ttWeekendDate(string $date): bool
+{
+    $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', substr($date, 0, 10));
+    return $parsed instanceof DateTimeImmutable && (int)$parsed->format('N') >= 6;
+}
+
+function ttHolidayMinutesForMonth(int $year, int $month, string $region, ?int $targetMinutes): int
+{
+    if (!$targetMinutes || $targetMinutes <= 0) return 0;
+    $minutes = 0;
+    foreach (ttHolidayDates($year, $region) as $date) {
+        if ((int)substr($date, 5, 2) === $month && !ttWeekendDate($date)) $minutes += $targetMinutes;
     }
-    return (float)$days;
+    return $minutes;
 }
 
 function ttParseMinutes(?string $value): ?int
@@ -279,11 +353,14 @@ function handleSummary(array $actor): never
     $yearStart = date('Y-01-01 00:00:00');
     $monthStart = date('Y-m-01 00:00:00');
     $year = (int)date('Y');
+    $month = (int)date('n');
+    $today = date('Y-m-d');
     $aggregate = [];
     foreach ($trackedUsers as $user) {
         if (!$permissions['can_view_all'] && (int)$user['id'] !== (int)$actor['id']) continue;
         $worked = 0; $balance = 0; $open = false; $hasEntries = false; $monthWorked = 0;
         foreach ($entries as $entry) if ((int)$entry['user_id'] === (int)$user['id'] && (string)$entry['started_at'] >= $yearStart) {
+            if ((string)($entry['source'] ?? '') === 'timemoto_import' && ttWeekendDate((string)$entry['started_at'])) continue;
             $hasEntries = true; $worked += (int)$entry['worked_minutes']; $balance += (int)$entry['balance_minutes']; $open = $open || $entry['ended_at'] === null;
             if ((string)$entry['started_at'] >= $monthStart) $monthWorked += (int)$entry['worked_minutes'];
         }
@@ -292,13 +369,19 @@ function handleSummary(array $actor): never
         $compMinutes = (int)round(((float)$compStmt->fetchColumn()) * 60);
         $targetMinutes = ttTarget($pdo,(int)$user['id']);
         $setting = $settingsByUser[(int)$user['id']] ?? [];
+        $region = ttHolidayRegion($setting);
+        if ((int)($setting['balance_adjustment_year'] ?? 0) === $year) $balance += (int)($setting['balance_adjustment_minutes'] ?? 0);
         $annualDays = !array_key_exists('annual_leave_days', $setting) || $setting['annual_leave_days'] === null ? null : (float)$setting['annual_leave_days'];
         $carryoverDays = (float)($setting['carryover_leave_days'] ?? 0);
-        $takenDays = 0.0; $pendingDays = 0.0; $monthVacationHours = 0.0; $monthSickHours = 0.0;
+        $takenDays = 0.0; $pendingDays = 0.0; $futureApprovedDays = 0.0; $futureApproved = []; $monthVacationHours = 0.0; $monthSickHours = 0.0;
         foreach ($leaves as $leave) if ((int)$leave['user_id'] === (int)$user['id'] && (int)substr((string)$leave['starts_on'], 0, 4) === $year) {
-            $days = ttLeaveDays($leave, $targetMinutes);
+            $days = ttLeaveDays($leave, $targetMinutes, $region);
             if ((string)$leave['status'] === 'approved') $takenDays += $days;
             if ((string)$leave['status'] === 'pending') $pendingDays += $days;
+            if ((string)$leave['status'] === 'approved' && (string)$leave['leave_type'] === 'urlaub' && (string)$leave['starts_on'] > $today && $days > 0) {
+                $futureApprovedDays += $days;
+                $futureApproved[] = ['starts_on'=>$leave['starts_on'], 'ends_on'=>$leave['ends_on'], 'days'=>round($days, 2)];
+            }
             if ((string)$leave['status'] === 'approved' && str_starts_with((string)$leave['starts_on'], date('Y-m-'))) {
                 $hours = (float)$leave['hours'];
                 if ($hours <= 0) $hours = $days * (($targetMinutes ?? 0) / 60);
@@ -306,17 +389,22 @@ function handleSummary(array $actor): never
                 if ((string)$leave['leave_type'] === 'krank') $monthSickHours += $hours;
             }
         }
+        if ((int)($setting['vacation_adjustment_year'] ?? 0) === $year) $takenDays += (float)($setting['vacation_adjustment_days'] ?? 0);
         $entitlementDays = $annualDays === null ? null : round($annualDays + $carryoverDays, 2);
         $remainingDays = $entitlementDays === null ? null : round($entitlementDays - $takenDays, 2);
         $hourlyWage = array_key_exists('hourly_wage', $setting) && $setting['hourly_wage'] !== null ? (float)$setting['hourly_wage'] : 0.0;
+        $holidayMinutes = ttHolidayMinutesForMonth($year, $month, $region, $targetMinutes);
+        $monthHolidayHours = $holidayMinutes / 60;
         $monthly = [
             'worked_minutes'=>$monthWorked,
             'vacation_minutes'=>(int)round($monthVacationHours * 60),
             'sick_minutes'=>(int)round($monthSickHours * 60),
+            'holiday_minutes'=>$holidayMinutes,
             'worked_amount'=>round(($monthWorked / 60) * $hourlyWage, 2),
             'vacation_amount'=>round($monthVacationHours * $hourlyWage, 2),
             'sick_amount'=>round($monthSickHours * $hourlyWage, 2),
-            'total_amount'=>round((($monthWorked / 60) + $monthVacationHours + $monthSickHours) * $hourlyWage, 2),
+            'holiday_amount'=>round($monthHolidayHours * $hourlyWage, 2),
+            'total_amount'=>round((($monthWorked / 60) + $monthVacationHours + $monthSickHours + $monthHolidayHours) * $hourlyWage, 2),
         ];
         $aggregate[] = [
             'id'=>(int)$user['id'],'identity'=>ttIdentity($user),'name'=>$user['full_name'],
@@ -326,7 +414,8 @@ function handleSummary(array $actor): never
             'contractual_minutes_per_week'=>array_key_exists('contractual_minutes_per_week', $setting) && $setting['contractual_minutes_per_week'] !== null ? (int)$setting['contractual_minutes_per_week'] : null,
             'hourly_wage'=>$hourlyWage > 0 ? $hourlyWage : null,
             'monthly'=>$monthly,
-            'vacation'=>['annual_days'=>$annualDays,'carryover_days'=>round($carryoverDays,2),'entitlement_days'=>$entitlementDays,'taken_days'=>round($takenDays,2),'pending_days'=>round($pendingDays,2),'remaining_days'=>$remainingDays],
+            'holiday_region'=>$region,
+            'vacation'=>['annual_days'=>$annualDays,'carryover_days'=>round($carryoverDays,2),'entitlement_days'=>$entitlementDays,'taken_days'=>round($takenDays,2),'pending_days'=>round($pendingDays,2),'remaining_days'=>$remainingDays,'future_approved_days'=>round($futureApprovedDays,2),'future_approved'=>$futureApproved],
         ];
     }
     $directory = [];
@@ -340,6 +429,46 @@ function handleSummary(array $actor): never
     apiJson(['ok'=>true,'year'=>$year,'actor'=>['id'=>(int)$actor['id'],'name'=>$actor['full_name'],'identity'=>$permissions['identity'],'time_tracking_enabled'=>$actorEnabled],'permissions'=>$permissions,'users'=>$aggregate,'all_users'=>$directory,'entries'=>$entries,'leaves'=>$leaves]);
 }
 
+function handleLexwareExport(array $actor): never
+{
+    $permissions = ttPermissions($actor);
+    if (!$permissions['can_view_all']) apiError(403, 'Nur freigegebene Konten dürfen den Buchhaltungsexport abrufen.');
+    $year = max(2020, min(2100, (int)($_GET['year'] ?? date('Y'))));
+    $pdo = db();
+    $users = array_values(array_filter(ttUsers($pdo), static fn(array $user): bool => ttEnabled($user)));
+    $ids = array_map(static fn(array $user): int => (int)$user['id'], $users);
+    $settings = [];
+    foreach ($pdo->query('SELECT * FROM time_user_settings')->fetchAll() as $setting) $settings[(int)$setting['user_id']] = $setting;
+    $rows = [['Mitarbeiter','Jahr','Typ','Von','Bis','Stunden','Saldo','Status','Quelle','Hinweis']];
+    if ($ids) {
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $entryStmt = $pdo->prepare("SELECT e.*,u.full_name FROM time_entries e JOIN users u ON u.id=e.user_id WHERE e.user_id IN ($placeholders) AND e.started_at >= ? AND e.started_at < ? ORDER BY u.full_name,e.started_at");
+        $entryStmt->execute([...$ids, sprintf('%04d-01-01 00:00:00', $year), sprintf('%04d-01-01 00:00:00', $year + 1)]);
+        foreach ($entryStmt->fetchAll() as $entry) {
+            if ((string)($entry['source'] ?? '') === 'timemoto_import' && ttWeekendDate((string)$entry['started_at'])) continue;
+            $rows[] = [$entry['full_name'], (string)$year, 'Arbeitszeit', substr((string)$entry['started_at'],0,10), substr((string)$entry['ended_at'],0,10), number_format(((int)$entry['worked_minutes']) / 60, 2, ',', ''), number_format(ttEffectiveBalance($entry) / 60, 2, ',', ''), 'gebucht', (string)$entry['source'], (string)($entry['note'] ?? '')];
+        }
+        $leaveStmt = $pdo->prepare("SELECT l.*,u.full_name FROM time_leave_requests l JOIN users u ON u.id=l.user_id WHERE l.user_id IN ($placeholders) AND l.starts_on >= ? AND l.starts_on < ? ORDER BY u.full_name,l.starts_on,l.id");
+        $leaveStmt->execute([...$ids, sprintf('%04d-01-01', $year), sprintf('%04d-01-01', $year + 1)]);
+        foreach ($leaveStmt->fetchAll() as $leave) {
+            $rows[] = [$leave['full_name'], (string)$year, match ((string)$leave['leave_type']) {'urlaub'=>'Urlaub','zeitausgleich'=>'Zeitausgleich','krank'=>'Krankheit','sonderurlaub'=>'Sonderurlaub',default=>(string)$leave['leave_type']}, $leave['starts_on'], $leave['ends_on'], number_format((float)$leave['hours'], 2, ',', ''), '', (string)$leave['status'], (string)$leave['source'], (string)($leave['note'] ?? '')];
+        }
+        foreach ($users as $user) {
+            $region = ttHolidayRegion($settings[(int)$user['id']] ?? []);
+            $target = ttTarget($pdo, (int)$user['id']);
+            foreach (ttHolidayDates($year, $region) as $holiday) if (!ttWeekendDate($holiday) && $target) {
+                $rows[] = [$user['full_name'], (string)$year, 'Feiertag', $holiday, $holiday, number_format($target / 60, 2, ',', ''), '', 'bezahlt', 'Feiertagskalender ' . $region, ''];
+            }
+        }
+    }
+    $lines = [];
+    foreach ($rows as $row) $lines[] = implode(';', array_map(static fn($value): string => '"' . str_replace('"', '""', (string)$value) . '"', $row));
+    header('Content-Type: text/csv; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="sv-netzwerk-lexware-' . $year . '.csv"');
+    echo "\xEF\xBB\xBF" . implode("\r\n", $lines) . "\r\n";
+    exit;
+}
+
 function handleClockIn(array $actor): never
 {
     $pdo = db();
@@ -349,8 +478,9 @@ function handleClockIn(array $actor): never
     $existing->execute([':id'=>$userId]);
     if ($existing->fetchColumn()) apiError(409, 'Für dieses Konto läuft bereits eine Buchung.');
     $now = nowUtc();
+    $planned = ttWeekendDate($now) ? 0 : ttTarget($pdo,$userId);
     $pdo->prepare('INSERT INTO time_entries (user_id,started_at,worked_minutes,planned_minutes,balance_minutes,source,created_by,updated_by,created_at,updated_at) VALUES (:user,:started,0,:planned,0,\'portal\',:creator,:updater,:created,:updated)')->execute([
-        ':user'=>$userId, ':started'=>$now, ':planned'=>ttTarget($pdo,$userId), ':creator'=>$userId, ':updater'=>$userId, ':created'=>$now, ':updated'=>$now,
+        ':user'=>$userId, ':started'=>$now, ':planned'=>$planned, ':creator'=>$userId, ':updater'=>$userId, ':created'=>$now, ':updated'=>$now,
     ]);
     $id = (int)$pdo->lastInsertId();
     ttAudit($actor,'clock_in','time_entry',$id,null,['user_id'=>$userId,'started_at'=>$now]);
@@ -363,11 +493,31 @@ function handleClockOut(array $actor): never
     ttRequireEnabled($pdo, $userId);
     $stmt = $pdo->prepare('SELECT * FROM time_entries WHERE user_id=:id AND ended_at IS NULL ORDER BY started_at DESC LIMIT 1'); $stmt->execute([':id'=>$userId]); $entry=$stmt->fetch();
     if (!$entry) apiError(409,'Für dieses Konto läuft keine offene Buchung.');
-    $now = nowUtc(); $worked = max(0,(int)floor((strtotime($now)-strtotime((string)$entry['started_at']))/60)) - (int)$entry['break_minutes'];
+    $now = nowUtc(); $break = (int)$entry['break_minutes']; if (!empty($entry['pause_started_at'])) $break += max(0, (int)floor((strtotime($now)-strtotime((string)$entry['pause_started_at']))/60)); $worked = max(0,(int)floor((strtotime($now)-strtotime((string)$entry['started_at']))/60)) - $break;
     $planned = $entry['planned_minutes'] === null ? null : (int)$entry['planned_minutes']; $balance = $planned === null ? 0 : $worked - $planned;
-    $pdo->prepare('UPDATE time_entries SET ended_at=:ended,worked_minutes=:worked,balance_minutes=:balance,updated_by=:updater,updated_at=:updated WHERE id=:id')->execute([':ended'=>$now,':worked'=>$worked,':balance'=>$balance,':updater'=>$userId,':updated'=>$now,':id'=>(int)$entry['id']]);
+    $pdo->prepare('UPDATE time_entries SET ended_at=:ended,break_minutes=:break,pause_started_at=NULL,worked_minutes=:worked,balance_minutes=:balance,updated_by=:updater,updated_at=:updated WHERE id=:id')->execute([':ended'=>$now,':break'=>$break,':worked'=>$worked,':balance'=>$balance,':updater'=>$userId,':updated'=>$now,':id'=>(int)$entry['id']]);
     ttAudit($actor,'clock_out','time_entry',(int)$entry['id'],$entry,['ended_at'=>$now,'worked_minutes'=>$worked,'balance_minutes'=>$balance]);
     apiJson(['ok'=>true,'id'=>(int)$entry['id'],'ended_at'=>$now,'worked_minutes'=>$worked,'balance_minutes'=>$balance]);
+}
+
+function handlePauseToggle(array $actor): never
+{
+    $pdo = db(); $userId = (int)$actor['id'];
+    ttRequireEnabled($pdo, $userId);
+    $stmt = $pdo->prepare('SELECT * FROM time_entries WHERE user_id=:id AND ended_at IS NULL ORDER BY started_at DESC LIMIT 1');
+    $stmt->execute([':id'=>$userId]); $entry=$stmt->fetch();
+    if (!$entry) apiError(409, 'Für dieses Konto läuft keine offene Buchung.');
+    $now = nowUtc();
+    if (!empty($entry['pause_started_at'])) {
+        $pauseMinutes = max(0, (int)floor((strtotime($now)-strtotime((string)$entry['pause_started_at']))/60));
+        $break = (int)$entry['break_minutes'] + $pauseMinutes;
+        $pdo->prepare('UPDATE time_entries SET break_minutes=:break,pause_started_at=NULL,updated_by=:updater,updated_at=:updated WHERE id=:id')->execute([':break'=>$break,':updater'=>$userId,':updated'=>$now,':id'=>(int)$entry['id']]);
+        ttAudit($actor,'pause_end','time_entry',(int)$entry['id'],$entry,['break_minutes'=>$break,'pause_minutes'=>$pauseMinutes]);
+        apiJson(['ok'=>true,'paused'=>false,'break_minutes'=>$break,'pause_minutes'=>$pauseMinutes]);
+    }
+    $pdo->prepare('UPDATE time_entries SET pause_started_at=:started,updated_by=:updater,updated_at=:updated WHERE id=:id')->execute([':started'=>$now,':updater'=>$userId,':updated'=>$now,':id'=>(int)$entry['id']]);
+    ttAudit($actor,'pause_start','time_entry',(int)$entry['id'],$entry,['pause_started_at'=>$now]);
+    apiJson(['ok'=>true,'paused'=>true,'pause_started_at'=>$now]);
 }
 
 function handleSaveEntry(array $actor): never
@@ -376,7 +526,7 @@ function handleSaveEntry(array $actor): never
     $body=requestBody(); $pdo=db(); $id=(int)($body['id']??0); $userId=(int)($body['user_id']??0); $user=ttUser($pdo,$userId); if (!$user) apiError(400,'Mitarbeiter nicht gefunden.');
     $started=ttDateTime((string)($body['date']??''),(string)($body['start']??'')); $ended=ttDateTime((string)($body['date']??''),(string)($body['end']??''));
     if (!$started) apiError(400,'Datum und Beginn sind erforderlich.'); if ($ended && strtotime($ended)<strtotime($started)) apiError(400,'Das Ende muss nach dem Beginn liegen.');
-    $break=max(0,(int)($body['break_minutes']??0)); $worked=$ended?max(0,(int)floor((strtotime($ended)-strtotime($started))/60)-$break):0; $planned=array_key_exists('planned_minutes',$body)&&$body['planned_minutes']!==''?(int)$body['planned_minutes']:ttTarget($pdo,$userId); $balance=array_key_exists('balance_minutes',$body)&&$body['balance_minutes']!==''?(int)$body['balance_minutes']:($planned===null?0:$worked-$planned); $now=nowUtc();
+    $break=max(0,(int)($body['break_minutes']??0)); $worked=$ended?max(0,(int)floor((strtotime($ended)-strtotime($started))/60)-$break):0; $isWeekend=ttWeekendDate($started); $planned=$isWeekend?0:(array_key_exists('planned_minutes',$body)&&$body['planned_minutes']!==''?(int)$body['planned_minutes']:ttTarget($pdo,$userId)); $balance=array_key_exists('balance_minutes',$body)&&$body['balance_minutes']!==''?(int)$body['balance_minutes']:($planned===null?0:$worked-$planned); $now=nowUtc();
     if ($id>0) { $q=$pdo->prepare('SELECT * FROM time_entries WHERE id=:id');$q->execute([':id'=>$id]);$before=$q->fetch();if(!$before)apiError(404,'Zeitbuchung nicht gefunden.');$pdo->prepare('UPDATE time_entries SET user_id=:user,started_at=:started,ended_at=:ended,break_minutes=:break,worked_minutes=:worked,planned_minutes=:planned,balance_minutes=:balance,note=:note,source=\'portal\',updated_by=:updater,updated_at=:updated WHERE id=:id')->execute([':user'=>$userId,':started'=>$started,':ended'=>$ended,':break'=>$break,':worked'=>$worked,':planned'=>$planned,':balance'=>$balance,':note'=>trim((string)($body['note']??'')),':updater'=>(int)$actor['id'],':updated'=>$now,':id'=>$id]);ttAudit($actor,'entry_update','time_entry',$id,$before,['user_id'=>$userId,'started_at'=>$started,'ended_at'=>$ended,'worked_minutes'=>$worked,'balance_minutes'=>$balance]);apiJson(['ok'=>true,'id'=>$id]); }
     $pdo->prepare('INSERT INTO time_entries (user_id,started_at,ended_at,break_minutes,worked_minutes,planned_minutes,balance_minutes,source,note,created_by,updated_by,created_at,updated_at) VALUES (:user,:started,:ended,:break,:worked,:planned,:balance,\'portal\',:note,:creator,:updater,:created,:updated)')->execute([':user'=>$userId,':started'=>$started,':ended'=>$ended,':break'=>$break,':worked'=>$worked,':planned'=>$planned,':balance'=>$balance,':note'=>trim((string)($body['note']??'')),':creator'=>(int)$actor['id'],':updater'=>(int)$actor['id'],':created'=>$now,':updated'=>$now]);$newId=(int)$pdo->lastInsertId();ttAudit($actor,'entry_create','time_entry',$newId,null,['user_id'=>$userId,'started_at'=>$started,'ended_at'=>$ended,'worked_minutes'=>$worked,'balance_minutes'=>$balance]);apiJson(['ok'=>true,'id'=>$newId],201);
 }
@@ -496,21 +646,47 @@ function handleSaveLeaveEntitlement(array $actor): never
     $weeklyMinutes = array_key_exists('contractual_minutes_per_week', $body) && $body['contractual_minutes_per_week'] !== '' && $body['contractual_minutes_per_week'] !== null ? (int)$body['contractual_minutes_per_week'] : null;
     $dailyMinutes = array_key_exists('target_minutes_per_day', $body) && $body['target_minutes_per_day'] !== '' && $body['target_minutes_per_day'] !== null ? (int)$body['target_minutes_per_day'] : null;
     $hourlyWage = array_key_exists('hourly_wage', $body) && $body['hourly_wage'] !== '' && $body['hourly_wage'] !== null ? (float)$body['hourly_wage'] : null;
+    $holidayRegion = strtoupper((string)($body['holiday_region'] ?? 'BW')) === 'NRW' ? 'NRW' : 'BW';
+    $balanceTarget = array_key_exists('balance_target_minutes', $body) && $body['balance_target_minutes'] !== '' ? (int)$body['balance_target_minutes'] : null;
+    $vacationRemainingTarget = array_key_exists('vacation_remaining_target', $body) && $body['vacation_remaining_target'] !== '' ? (float)$body['vacation_remaining_target'] : null;
     $timeTrackingEnabled = array_key_exists('time_tracking_enabled', $body) ? (int)(bool)$body['time_tracking_enabled'] : (int)($user['time_tracking_enabled'] ?? 1);
-    if (($annual !== null && ($annual < 0 || $annual > 365)) || $carryover < 0 || $carryover > 365 || ($weeklyMinutes !== null && ($weeklyMinutes < 0 || $weeklyMinutes > 10080)) || ($dailyMinutes !== null && ($dailyMinutes < 0 || $dailyMinutes > 1440)) || ($hourlyWage !== null && ($hourlyWage < 0 || $hourlyWage > 10000))) apiError(400, 'Anspruch, Arbeitszeit und Stundenlohn enthalten ungültige Werte.');
+    if (($annual !== null && ($annual < 0 || $annual > 365)) || $carryover < 0 || $carryover > 365 || ($weeklyMinutes !== null && ($weeklyMinutes < 0 || $weeklyMinutes > 10080)) || ($dailyMinutes !== null && ($dailyMinutes < 0 || $dailyMinutes > 1440)) || ($hourlyWage !== null && ($hourlyWage < 0 || $hourlyWage > 10000)) || ($balanceTarget !== null && ($balanceTarget < -1000000 || $balanceTarget > 1000000)) || ($vacationRemainingTarget !== null && ($vacationRemainingTarget < -365 || $vacationRemainingTarget > 365))) apiError(400, 'Anspruch, Arbeitszeit, Saldo und Urlaub enthalten ungültige Werte.');
     $beforeStmt = $pdo->prepare('SELECT * FROM time_user_settings WHERE user_id=:id');
     $beforeStmt->execute([':id'=>$userId]);
     $before = $beforeStmt->fetch() ?: null;
     $now = nowUtc();
+    $year = (int)date('Y');
+    $rawBalance = 0;
+    $entryStmt = $pdo->prepare('SELECT started_at,balance_minutes,source FROM time_entries WHERE user_id=:id AND started_at >= :year_start');
+    $entryStmt->execute([':id'=>$userId, ':year_start'=>date('Y-01-01 00:00:00')]);
+    foreach ($entryStmt->fetchAll() as $entry) if (!((string)($entry['source'] ?? '') === 'timemoto_import' && ttWeekendDate((string)$entry['started_at']))) $rawBalance += ttEffectiveBalance($entry);
+    $compStmt = $pdo->prepare("SELECT COALESCE(SUM(hours),0) FROM time_leave_requests WHERE user_id=:id AND leave_type='zeitausgleich' AND status='approved' AND ends_on >= :year_start");
+    $compStmt->execute([':id'=>$userId, ':year_start'=>date('Y-01-01')]);
+    $compMinutes = (int)round(((float)$compStmt->fetchColumn()) * 60);
+    $balanceAdjustment = (int)($before['balance_adjustment_minutes'] ?? 0);
+    $balanceAdjustmentYear = $before['balance_adjustment_year'] ?? null;
+    if ($balanceTarget !== null) { $balanceAdjustment = $balanceTarget + $compMinutes - $rawBalance; $balanceAdjustmentYear = $year; }
+    $vacationAdjustment = (float)($before['vacation_adjustment_days'] ?? 0);
+    $vacationAdjustmentYear = $before['vacation_adjustment_year'] ?? null;
+    if ($vacationRemainingTarget !== null) {
+        $settingForDays = $before ?: ['holiday_region'=>'BW'];
+        $region = ttHolidayRegion($settingForDays);
+        $leaveStmt = $pdo->prepare("SELECT * FROM time_leave_requests WHERE user_id=:id AND starts_on >= :year_start AND starts_on < :next_year");
+        $leaveStmt->execute([':id'=>$userId, ':year_start'=>date('Y-01-01'), ':next_year'=>date(($year + 1) . '-01-01')]);
+        $takenBase = 0.0; $targetForDays = $dailyMinutes ?? ttTarget($pdo, $userId);
+        foreach ($leaveStmt->fetchAll() as $leave) if ((string)$leave['status'] === 'approved') $takenBase += ttLeaveDays($leave, $targetForDays, $region);
+        $entitlement = $annual === null ? null : $annual + $carryover;
+        if ($entitlement !== null) { $vacationAdjustment = $entitlement - $vacationRemainingTarget - $takenBase; $vacationAdjustmentYear = $year; }
+    }
     $pdo->prepare('UPDATE users SET time_tracking_enabled=:enabled,updated_at=:updated WHERE id=:id')->execute([':enabled'=>$timeTrackingEnabled,':updated'=>$now,':id'=>$userId]);
-    $pdo->prepare("INSERT INTO time_user_settings (user_id,target_minutes_per_day,annual_leave_days,carryover_leave_days,contractual_minutes_per_week,hourly_wage,updated_by,updated_at) VALUES (:id,:daily,:annual,:carryover,:weekly,:wage,:actor,:updated) ON DUPLICATE KEY UPDATE target_minutes_per_day=VALUES(target_minutes_per_day),annual_leave_days=VALUES(annual_leave_days),carryover_leave_days=VALUES(carryover_leave_days),contractual_minutes_per_week=VALUES(contractual_minutes_per_week),hourly_wage=VALUES(hourly_wage),updated_by=VALUES(updated_by),updated_at=VALUES(updated_at)")->execute([':id'=>$userId,':daily'=>$dailyMinutes,':annual'=>$annual,':carryover'=>$carryover,':weekly'=>$weeklyMinutes,':wage'=>$hourlyWage,':actor'=>(int)$actor['id'],':updated'=>$now]);
-    ttAudit($actor, 'employee_settings_save', 'user_settings', $userId, $before, ['target_minutes_per_day'=>$dailyMinutes,'annual_leave_days'=>$annual,'carryover_leave_days'=>$carryover,'contractual_minutes_per_week'=>$weeklyMinutes,'hourly_wage'=>$hourlyWage,'time_tracking_enabled'=>$timeTrackingEnabled]);
-    apiJson(['ok'=>true,'user_id'=>$userId,'target_minutes_per_day'=>$dailyMinutes,'annual_leave_days'=>$annual,'carryover_leave_days'=>$carryover,'contractual_minutes_per_week'=>$weeklyMinutes,'hourly_wage'=>$hourlyWage,'time_tracking_enabled'=>$timeTrackingEnabled]);
+    $pdo->prepare("INSERT INTO time_user_settings (user_id,target_minutes_per_day,annual_leave_days,carryover_leave_days,contractual_minutes_per_week,hourly_wage,holiday_region,balance_adjustment_minutes,balance_adjustment_year,vacation_adjustment_days,vacation_adjustment_year,updated_by,updated_at) VALUES (:id,:daily,:annual,:carryover,:weekly,:wage,:region,:balance_adjustment,:balance_year,:vacation_adjustment,:vacation_year,:actor,:updated) ON DUPLICATE KEY UPDATE target_minutes_per_day=VALUES(target_minutes_per_day),annual_leave_days=VALUES(annual_leave_days),carryover_leave_days=VALUES(carryover_leave_days),contractual_minutes_per_week=VALUES(contractual_minutes_per_week),hourly_wage=VALUES(hourly_wage),holiday_region=VALUES(holiday_region),balance_adjustment_minutes=VALUES(balance_adjustment_minutes),balance_adjustment_year=VALUES(balance_adjustment_year),vacation_adjustment_days=VALUES(vacation_adjustment_days),vacation_adjustment_year=VALUES(vacation_adjustment_year),updated_by=VALUES(updated_by),updated_at=VALUES(updated_at)")->execute([':id'=>$userId,':daily'=>$dailyMinutes,':annual'=>$annual,':carryover'=>$carryover,':weekly'=>$weeklyMinutes,':wage'=>$hourlyWage,':region'=>$holidayRegion,':balance_adjustment'=>$balanceAdjustment,':balance_year'=>$balanceAdjustmentYear,':vacation_adjustment'=>$vacationAdjustment,':vacation_year'=>$vacationAdjustmentYear,':actor'=>(int)$actor['id'],':updated'=>$now]);
+    ttAudit($actor, 'employee_settings_save', 'user_settings', $userId, $before, ['target_minutes_per_day'=>$dailyMinutes,'annual_leave_days'=>$annual,'carryover_leave_days'=>$carryover,'contractual_minutes_per_week'=>$weeklyMinutes,'hourly_wage'=>$hourlyWage,'holiday_region'=>$holidayRegion,'balance_adjustment_minutes'=>$balanceAdjustment,'balance_adjustment_year'=>$balanceAdjustmentYear,'vacation_adjustment_days'=>$vacationAdjustment,'vacation_adjustment_year'=>$vacationAdjustmentYear,'time_tracking_enabled'=>$timeTrackingEnabled]);
+    apiJson(['ok'=>true,'user_id'=>$userId,'target_minutes_per_day'=>$dailyMinutes,'annual_leave_days'=>$annual,'carryover_leave_days'=>$carryover,'contractual_minutes_per_week'=>$weeklyMinutes,'hourly_wage'=>$hourlyWage,'holiday_region'=>$holidayRegion,'time_tracking_enabled'=>$timeTrackingEnabled]);
 }
 
 function handleTimeMotoImport(array $actor): never
 {
-    $permissions=ttPermissions($actor);if(!$permissions['can_edit_all'])apiError(403,'Nur Christian darf TimeMoto-Daten importieren.');if(empty($_FILES['file'])||!is_uploaded_file($_FILES['file']['tmp_name']))apiError(400,'Bitte eine TimeMoto-Excel-Datei auswählen.');$file=$_FILES['file'];if((int)$file['error']!==UPLOAD_ERR_OK)apiError(400,'TimeMoto-Datei konnte nicht gelesen werden.');$pdo=db();$rows=timeMotoRows((string)$file['tmp_name']);$entries=0;$leaves=0;$skipped=0;$now=nowUtc();foreach($rows as $row){$first=trim((string)($row['Vorname']??''));$last=trim((string)($row['Nachname']??''));$date=trim((string)($row['Datum']??''));$user=findTimeMotoUser($pdo,$first,$last);if(!$user||!ttEnabled($user)||$date===''){$skipped++;continue;}$remark=ttText((string)($row['Remarks']??''));$hours=ttParseMinutes((string)($row['Abwesenheit']??''));$leaveType=str_contains($remark,'ueberstunden')?'zeitausgleich':(str_contains($remark,'urlaub')?'urlaub':(str_contains($remark,'krank')?'krank':''));if($leaveType!==''&&$hours!==null&&$hours>0){$key=hash('sha256', 'leave|'.(int)$user['id'].'|'.$date.'|'.$remark.'|'.$hours);$stmt=$pdo->prepare('INSERT IGNORE INTO time_leave_requests (user_id,leave_type,starts_on,ends_on,hours,note,status,source,external_key,requested_by,decided_by,decided_at,created_at,updated_at) VALUES (:user,:type,:from,:to,:hours,:note,\'approved\',\'timemoto_import\',:key,:requester,:decider,:decided,:created,:updated)');$stmt->execute([':user'=>(int)$user['id'],':type'=>$leaveType,':from'=>substr((string)ttDateTime($date),0,10),':to'=>substr((string)ttDateTime($date),0,10),':hours'=>$hours/60,':note'=>'TimeMoto: '.ucfirst($leaveType),':key'=>$key,':requester'=>(int)$actor['id'],':decider'=>(int)$actor['id'],':decided'=>$now,':created'=>$now,':updated'=>$now]);if($stmt->rowCount()){$leaves++;ttAudit($actor,'timemoto_import','leave_request',(int)$pdo->lastInsertId(),null,['user_id'=>(int)$user['id'],'leave_type'=>$leaveType,'hours'=>$hours/60,'source_key'=>$key]);}continue;}$started=ttDateTime($date,(string)($row['Hinein']??''));$ended=ttDateTime($date,(string)($row['Hinaus']??''));if(!$started||!$ended){$skipped++;continue;}$worked=ttParseMinutes((string)($row['Gearbeitete Stunden']??''))??ttParseMinutes((string)($row['Dauer']??''))??0;$planned=ttParseMinutes((string)($row['Geplant']??''));if($planned!==null&&$planned>0){$settingQ=$pdo->prepare('SELECT target_minutes_per_day FROM time_user_settings WHERE user_id=:id');$settingQ->execute([':id'=>(int)$user['id']]);$currentTarget=$settingQ->fetchColumn();if($currentTarget===false||$currentTarget===null){$pdo->prepare('INSERT INTO time_user_settings (user_id,target_minutes_per_day,updated_by,updated_at) VALUES (:id,:target,:actor,:updated) ON DUPLICATE KEY UPDATE target_minutes_per_day=VALUES(target_minutes_per_day),updated_by=VALUES(updated_by),updated_at=VALUES(updated_at)')->execute([':id'=>(int)$user['id'],':target'=>$planned,':actor'=>(int)$actor['id'],':updated'=>$now]);}}$balance=($planned!==null&&$planned>0)?$worked-$planned:0;$key=hash('sha256',implode('|',[(int)$user['id'],$date,$started,$ended,$worked,$balance]));$stmt=$pdo->prepare('INSERT IGNORE INTO time_entries (user_id,started_at,ended_at,break_minutes,worked_minutes,planned_minutes,balance_minutes,source,external_key,note,created_by,updated_by,created_at,updated_at) VALUES (:user,:started,:ended,0,:worked,:planned,:balance,\'timemoto_import\',:key,:note,:creator,:updater,:created,:updated)');$stmt->execute([':user'=>(int)$user['id'],':started'=>$started,':ended'=>$ended,':worked'=>$worked,':planned'=>$planned,':balance'=>$balance,':key'=>$key,':note'=>trim((string)($row['Comments']??'')),':creator'=>(int)$actor['id'],':updater'=>(int)$actor['id'],':created'=>$now,':updated'=>$now]);if($stmt->rowCount()){$entries++;ttAudit($actor,'timemoto_import','time_entry',(int)$pdo->lastInsertId(),null,['user_id'=>(int)$user['id'],'source_key'=>$key]);}}
+    $permissions=ttPermissions($actor);if(!$permissions['can_edit_all'])apiError(403,'Nur Christian darf TimeMoto-Daten importieren.');if(empty($_FILES['file'])||!is_uploaded_file($_FILES['file']['tmp_name']))apiError(400,'Bitte eine TimeMoto-Excel-Datei auswählen.');$file=$_FILES['file'];if((int)$file['error']!==UPLOAD_ERR_OK)apiError(400,'TimeMoto-Datei konnte nicht gelesen werden.');$pdo=db();$rows=timeMotoRows((string)$file['tmp_name']);$entries=0;$leaves=0;$skipped=0;$now=nowUtc();foreach($rows as $row){$first=trim((string)($row['Vorname']??''));$last=trim((string)($row['Nachname']??''));$date=trim((string)($row['Datum']??''));$user=findTimeMotoUser($pdo,$first,$last);if(!$user||!ttEnabled($user)||$date===''){$skipped++;continue;}$remark=ttText((string)($row['Remarks']??''));$hours=ttParseMinutes((string)($row['Abwesenheit']??''));$leaveType=str_contains($remark,'ueberstunden')?'zeitausgleich':(str_contains($remark,'urlaub')?'urlaub':(str_contains($remark,'krank')?'krank':''));if($leaveType!==''&&$hours!==null&&$hours>0){$key=hash('sha256', 'leave|'.(int)$user['id'].'|'.$date.'|'.$remark.'|'.$hours);$stmt=$pdo->prepare('INSERT IGNORE INTO time_leave_requests (user_id,leave_type,starts_on,ends_on,hours,note,status,source,external_key,requested_by,decided_by,decided_at,created_at,updated_at) VALUES (:user,:type,:from,:to,:hours,:note,\'approved\',\'timemoto_import\',:key,:requester,:decider,:decided,:created,:updated)');$stmt->execute([':user'=>(int)$user['id'],':type'=>$leaveType,':from'=>substr((string)ttDateTime($date),0,10),':to'=>substr((string)ttDateTime($date),0,10),':hours'=>$hours/60,':note'=>'TimeMoto: '.ucfirst($leaveType),':key'=>$key,':requester'=>(int)$actor['id'],':decider'=>(int)$actor['id'],':decided'=>$now,':created'=>$now,':updated'=>$now]);if($stmt->rowCount()){$leaves++;ttAudit($actor,'timemoto_import','leave_request',(int)$pdo->lastInsertId(),null,['user_id'=>(int)$user['id'],'leave_type'=>$leaveType,'hours'=>$hours/60,'source_key'=>$key]);}continue;}$started=ttDateTime($date,(string)($row['Hinein']??''));$ended=ttDateTime($date,(string)($row['Hinaus']??''));if(!$started||!$ended){$skipped++;continue;}if(ttWeekendDate($started)){$skipped++;continue;}$worked=ttParseMinutes((string)($row['Gearbeitete Stunden']??''))??ttParseMinutes((string)($row['Dauer']??''))??0;$planned=ttParseMinutes((string)($row['Geplant']??''));if($planned!==null&&$planned>0){$settingQ=$pdo->prepare('SELECT target_minutes_per_day FROM time_user_settings WHERE user_id=:id');$settingQ->execute([':id'=>(int)$user['id']]);$currentTarget=$settingQ->fetchColumn();if($currentTarget===false||$currentTarget===null){$pdo->prepare('INSERT INTO time_user_settings (user_id,target_minutes_per_day,updated_by,updated_at) VALUES (:id,:target,:actor,:updated) ON DUPLICATE KEY UPDATE target_minutes_per_day=VALUES(target_minutes_per_day),updated_by=VALUES(updated_by),updated_at=VALUES(updated_at)')->execute([':id'=>(int)$user['id'],':target'=>$planned,':actor'=>(int)$actor['id'],':updated'=>$now]);}}$balance=($planned!==null&&$planned>0)?$worked-$planned:0;$key=hash('sha256',implode('|',[(int)$user['id'],$date,$started,$ended,$worked,$balance]));$stmt=$pdo->prepare('INSERT IGNORE INTO time_entries (user_id,started_at,ended_at,break_minutes,worked_minutes,planned_minutes,balance_minutes,source,external_key,note,created_by,updated_by,created_at,updated_at) VALUES (:user,:started,:ended,0,:worked,:planned,:balance,\'timemoto_import\',:key,:note,:creator,:updater,:created,:updated)');$stmt->execute([':user'=>(int)$user['id'],':started'=>$started,':ended'=>$ended,':worked'=>$worked,':planned'=>$planned,':balance'=>$balance,':key'=>$key,':note'=>trim((string)($row['Comments']??'')),':creator'=>(int)$actor['id'],':updater'=>(int)$actor['id'],':created'=>$now,':updated'=>$now]);if($stmt->rowCount()){$entries++;ttAudit($actor,'timemoto_import','time_entry',(int)$pdo->lastInsertId(),null,['user_id'=>(int)$user['id'],'source_key'=>$key]);}}
     apiJson(['ok'=>true,'entries_imported'=>$entries,'leave_imported'=>$leaves,'skipped'=>$skipped,'rows'=>count($rows)]);
 }
 

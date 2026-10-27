@@ -163,6 +163,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
         .intern-sidebar { display: block; padding: 7px 10px; border-right: 0; border-bottom: 1px solid #d9dde1; overflow-x: auto; }
         .intern-sidebar__nav { display: flex; min-width: max-content; }
         .intern-sidebar__nav a { padding: 9px 11px; }
+        .intern-sidebar__nav > a[href="/intern/zeiterfassung/"] { order: -10; }
       .intern-sidebar__expert { grid-template-columns: auto minmax(190px, 1fr); align-items: center; gap: 8px; margin: 0 0 0 8px; padding: 0 0 0 12px; border-top: 0; border-left: 1px solid #d9dde1; }
       .intern-sidebar__expert label small { display: none; }
         .intern-sidebar .intern-header__logout { display: none; }
