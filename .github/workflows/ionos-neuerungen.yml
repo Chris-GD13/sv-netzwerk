@@ -29,7 +29,7 @@ jobs:
           test -n "$PORTAL_SFTP_PORT"
           test -n "$PORTAL_SSH_KEY"
           install -d -m 700 "$HOME/.ssh"
-          printf '%s\n' "$PORTAL_SSH_KEY" > "$HOME/.ssh/portal_key"
+          printf '%s' "$PORTAL_SSH_KEY" | sed 's/\\\\n/\n/g' | tr -d '\r' > "$HOME/.ssh/portal_key"
           chmod 600 "$HOME/.ssh/portal_key"
           ssh-keygen -y -f "$HOME/.ssh/portal_key" > "$HOME/.ssh/portal_key.pub"
           echo "SSH key parsed successfully"
