@@ -1,0 +1,183 @@
+name: IONOS Neuerungen Migration und Backup
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/ionos-neuerungen.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  migrate-and-backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PORTAL_SFTP_HOST: \${{ secrets.PORTAL_SFTP_HOST }}
+      PORTAL_SFTP_USERNAME: \${{ secrets.PORTAL_SFTP_USERNAME }}
+      PORTAL_SFTP_PORT: \${{ secrets.PORTAL_SFTP_PORT }}
+      PORTAL_SSH_KEY: \${{ secrets.PORTAL_SSH_KEY }}
+    steps:
+      - name: SSH-Verbindung vorbereiten
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$PORTAL_SFTP_HOST"
+          test -n "$PORTAL_SFTP_USERNAME"
+          test -n "$PORTAL_SFTP_PORT"
+          test -n "$PORTAL_SSH_KEY"
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$PORTAL_SSH_KEY" > "$HOME/.ssh/portal_key"
+          chmod 600 "$HOME/.ssh/portal_key"
+          ssh-keyscan -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_HOST" >> "$HOME/.ssh/known_hosts" 2>/dev/null
+          ssh -o BatchMode=yes -o IdentitiesOnly=yes -i "$HOME/.ssh/portal_key" -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_USERNAME@$PORTAL_SFTP_HOST" 'id; printf "shell=%s\n" "$SHELL"; pwd; command -v php; command -v curl; command -v sha256sum'
+
+      - name: Synchronisationsskript erstellen
+        shell: bash
+        run: |
+          cat > sync.php <<'PHP'
+          <?php
+          declare(strict_types=1);
+          $cfg = ['/var/www/sv-netzwerk/intern/api/config.php','/var/www/sv-netzwerk/public/intern/api/config.php'];
+          $loaded = false;
+          foreach ($cfg as $p) { if (is_file($p)) { require_once $p; $loaded = true; break; } }
+          if (!$loaded) throw new RuntimeException('Portal-Konfiguration nicht gefunden.');
+          function b64u(string $s): string { return rtrim(strtr(base64_encode($s), '+/', '-_'), '='); }
+          function token(): string {
+            static $t = null; if ($t !== null) return $t;
+            $svc = trim(env('GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON', ''));
+            if ($svc !== '') {
+              if (!str_starts_with($svc, '{')) $svc = (string)(base64_decode($svc, true) ?: $svc);
+              $j = json_decode($svc, true);
+              if (is_array($j) && !empty($j['client_email']) && !empty($j['private_key'])) {
+                $now = time();
+                $h = b64u(json_encode(['alg'=>'RS256','typ'=>'JWT'], JSON_UNESCAPED_SLASHES));
+                $c = b64u(json_encode(['iss'=>$j['client_email'],'scope'=>'https://www.googleapis.com/auth/drive','aud'=>'https://oauth2.googleapis.com/token','iat'=>$now,'exp'=>$now+3500], JSON_UNESCAPED_SLASHES));
+                $in = $h.'.'.$c; $sig = '';
+                if (openssl_sign($in, $sig, $j['private_key'], OPENSSL_ALGO_SHA256)) {
+                  $ch = curl_init('https://oauth2.googleapis.com/token');
+                  curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_POSTFIELDS=>http_build_query(['grant_type'=>'urn:ietf:params:oauth:grant-type:jwt-bearer','assertion'=>$in.'.'.b64u($sig)]),CURLOPT_HTTPHEADER=>['Content-Type: application/x-www-form-urlencoded'],CURLOPT_TIMEOUT=>45]);
+                  $r = curl_exec($ch); $s = (int)curl_getinfo($ch,CURLINFO_HTTP_CODE); curl_close($ch);
+                  $d = json_decode((string)$r,true);
+                  if ($s===200 && !empty($d['access_token'])) return $t=(string)$d['access_token'];
+                }
+              }
+            }
+            $ch = env('GOOGLE_DRIVE_CLIENT_ID',''); $cs = env('GOOGLE_DRIVE_CLIENT_SECRET',''); $rt = env('GOOGLE_DRIVE_REFRESH_TOKEN','');
+            if ($ch==='' || $cs==='' || $rt==='') throw new RuntimeException('Google-Drive-Zugang auf dem Server fehlt.');
+            $h = curl_init('https://oauth2.googleapis.com/token');
+            curl_setopt_array($h,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_POSTFIELDS=>http_build_query(['client_id'=>$ch,'client_secret'=>$cs,'refresh_token'=>$rt,'grant_type'=>'refresh_token']),CURLOPT_HTTPHEADER=>['Content-Type: application/x-www-form-urlencoded'],CURLOPT_TIMEOUT=>45]);
+            $r = curl_exec($h); $s=(int)curl_getinfo($h,CURLINFO_HTTP_CODE); curl_close($h); $d=json_decode((string)$r,true);
+            if ($s!==200 || empty($d['access_token'])) throw new RuntimeException('Google-Drive-Token konnte nicht erzeugt werden.');
+            return $t=(string)$d['access_token'];
+          }
+          function req(string $method,string $url,?string $body=null,?string $mime=null,bool $auth=true): array {
+            $headers=[]; if ($auth) $headers[]='Authorization: Bearer '.token(); if ($mime) $headers[]='Content-Type: '.$mime;
+            $h=curl_init($url); curl_setopt_array($h,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_HTTPHEADER=>$headers,CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>120,CURLOPT_FOLLOWLOCATION=>true]);
+            if ($body!==null) curl_setopt($h,CURLOPT_POSTFIELDS,$body); $r=curl_exec($h); $s=(int)curl_getinfo($h,CURLINFO_HTTP_CODE); $e=curl_error($h); curl_close($h);
+            if ($r===false || $e!=='') throw new RuntimeException('HTTP: '.$e); return [$s,(string)$r];
+          }
+          function api(string $method,string $path,array $q=[],?array $json=null): array {
+            $u='https://www.googleapis.com/drive/v3/'.ltrim($path,'/'); $q['supportsAllDrives']='true'; if ($q) $u.='?'.http_build_query($q);
+            [$s,$r]=req($method,$u,$json===null?null:json_encode($json,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),'application/json; charset=utf-8');
+            if ($s<200 || $s>=300) throw new RuntimeException('Drive API '.$s.': '.substr($r,0,300)); return json_decode($r,true)?:[];
+          }
+          function child(string $parent,string $name): ?array {
+            $q="'".str_replace("'","\\'",$parent)."' in parents and trashed=false and name='".str_replace("'","\\'",$name)."'";
+            $d=api('GET','files',['q'=>$q,'fields'=>'files(id,name,mimeType,modifiedTime)','pageSize'=>20]); return $d['files'][0]??null;
+          }
+          function folder(string $parent,string $name): string {
+            $f=child($parent,$name); if ($f && ($f['mimeType']??'')==='application/vnd.google-apps.folder') return (string)$f['id'];
+            $d=api('POST','files',['fields'=>'id,name'],['name'=>$name,'mimeType'=>'application/vnd.google-apps.folder','parents'=>[$parent]]); return (string)$d['id'];
+          }
+          function media(string $id,string $mime,bool $native=false): string {
+            $u=$native?'https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'/export?mimeType=text%2Fplain':'https://www.googleapis.com/drive/v3/files/'.rawurlencode($id).'?alt=media';
+            [$s,$r]=req('GET',$u); if ($s!==200) throw new RuntimeException('Drive-Download '.$s); return $r;
+          }
+          function upload(string $parent,string $name,string $mime,string $bytes): array {
+            $b='svnet'.bin2hex(random_bytes(8)); $meta=json_encode(['name'=>$name,'mimeType'=>$mime,'parents'=>[$parent]],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+            $body='--'.$b."\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n".$meta."\r\n--".$b."\r\nContent-Type: ".$mime."\r\n\r\n".$bytes."\r\n--".$b."--";
+            [$s,$r]=req('POST','https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true&fields=id,name,mimeType', $body, 'multipart/related; boundary='.$b);
+            if ($s<200 || $s>=300) throw new RuntimeException('Drive-Upload '.$s.': '.substr($r,0,300)); return json_decode($r,true)?:[];
+          }
+          $target='/var/lib/sv-netzwerk/neuerungen';
+          if (!is_dir($target) && !mkdir($target,0750,true)) throw new RuntimeException('Zielverzeichnis konnte nicht angelegt werden.');
+          if (!chmod($target,0750)) throw new RuntimeException('chmod 750 fehlgeschlagen.');
+          if (function_exists('posix_geteuid') && posix_geteuid()===0) { chown($target,'root'); chgrp($target,'root'); }
+          $map=[
+            ['id'=>'1-S_4S3_6hK6HTEqEy2toowQNroFG7fLO','name'=>'SV-NETZWERK-KI-BETRIEBSBUCH.md','mime'=>'text/markdown','native'=>false],
+            ['id'=>'1vnhgUieiMOoX_S0AmCKWazSGg8OxFuS2','name'=>'MASTER-ARBEITSSTANDARD_Stand-2026-10-12.md','mime'=>'text/markdown','native'=>false],
+            ['id'=>'18Gw1CErv4UE4GBOUyiQaOenMA4NHLkfy','name'=>'FUEHRENDE-NEUERUNGEN_Zusammenfuehrung_Stand-2026-10-23.md','mime'=>'text/markdown','native'=>false],
+            ['id'=>'19-QKD3h4ChUW6kJZo3gQMjr60K9kuo1nYEzxoObWSps','name'=>'Claimsforce Browser API und eigener Serverbrowser.txt','mime'=>'text/plain','native'=>true],
+            ['id'=>'1x_uo5DQDRMyUKD-0ZCvLJ-4eqJ4FvMx-','name'=>'2026-10-16 Claims am Freitagnachmittag.pdf','mime'=>'application/pdf','native'=>false],
+            ['id'=>'1HO3tP1eSAF8fuX2OjU3xkNYZ64km2Mg4','name'=>'portal-umsetzungen-2026-10-12.md','mime'=>'text/markdown','native'=>false],
+          ];
+          $rule="\n\nNEUERUNG 27.10.2026 – IONOS als führende Wissens- und Arbeitsablage\n\nAb sofort ist nach erfolgreicher Migration ausschließlich die auf dem IONOS-Server unter /var/lib/sv-netzwerk/neuerungen gespeicherte Fassung der Arbeitsgrundlagen führend.\n\nAlle berechtigten KI-Assistenten, Automationen und Systeme, darunter ChatGPT, Work, Codex und Langdock, müssen vor der Bearbeitung von SV-Netzwerk-Aufgaben die jeweils aktuelle IONOS-Fassung abrufen und berücksichtigen, sofern sie technisch dazu berechtigt und in der Lage sind.\n\nNeue Erkenntnisse, Arbeitsanweisungen, Korrekturen, technische Änderungen und verbindliche Entscheidungen sind künftig in der führenden IONOS-Dokumentation festzuhalten.\n\nGoogle Drive dient ausschließlich als Sicherheitskopie. Änderungen an der Google-Kopie dürfen die führende IONOS-Fassung nicht überschreiben.\n\nDie Arbeitsgrundlagen sind vertraulich und dürfen nicht öffentlich zugänglich sein.\n\nDie technische Quellcodeverwaltung auf GitHub bleibt davon unberührt.\n";
+          $local=[]; foreach($map as $m){ $bytes=media($m['id'],$m['mime'],$m['native']); if($m['name']==='FUEHRENDE-NEUERUNGEN_Zusammenfuehrung_Stand-2026-10-23.md' && !str_contains($bytes,'NEUERUNG 27.10.2026 – IONOS als führende Wissens- und Arbeitsablage')) $bytes.=$rule; $tmp=$target.'/.'.basename($m['name']).'.tmp'; if(file_put_contents($tmp,$bytes)!==strlen($bytes)) throw new RuntimeException('Schreiben fehlgeschlagen: '.$m['name']); chmod($tmp,0640); if(function_exists('posix_geteuid')&&posix_geteuid()===0){chown($tmp,'root');chgrp($tmp,'root');} rename($tmp,$target.'/'.$m['name']); if(!is_readable($target.'/'.$m['name'])) throw new RuntimeException('Datei nicht lesbar: '.$m['name']); $local[]=['name'=>$m['name'],'sha256'=>hash_file('sha256',$target.'/'.$m['name']),'bytes'=>filesize($target.'/'.$m['name'])]; }
+          $parent='1XKQSSk3tFtwd4C-y0b1Av0SKvyfrf6N1'; $backup=folder($parent,'IONOS-Backup'); $stamp=(new DateTimeImmutable('now',new DateTimeZone('Europe/Berlin')))->format('Y-m-d_H-i-s'); $run=folder($backup,$stamp);
+          foreach($map as $m){$p=$target.'/'.$m['name']; upload($run,$m['name'],$m['mime'],(string)file_get_contents($p));}
+          foreach($local as $x){$q=child($run,$x['name']); if(!$q) throw new RuntimeException('Backup-Datei fehlt: '.$x['name']); $bytes=media((string)$q['id'],(string)($q['mimeType']??'application/octet-stream'),false); $hash=hash('sha256',$bytes); if($hash!==$x['sha256']) throw new RuntimeException('Restore-Prüfsumme abweichend: '.$x['name']);}
+          file_put_contents($target.'/.last-backup.json',json_encode(['created_at'=>gmdate('c'),'drive_folder'=>$run,'files'=>$local],JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)); chmod($target.'/.last-backup.json',0640);
+          echo json_encode(['ok'=>true,'target'=>$target,'files'=>$local,'backup_folder'=>$run,'restored'=>true,'mode'=>'one-time'],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)."\n";
+          PHP
+          scp -o BatchMode=yes -o IdentitiesOnly=yes -i "$HOME/.ssh/portal_key" -P "$PORTAL_SFTP_PORT" sync.php "$PORTAL_SFTP_USERNAME@$PORTAL_SFTP_HOST:/tmp/svnet-neuerungen-sync.php"
+          ssh -o BatchMode=yes -o IdentitiesOnly=yes -i "$HOME/.ssh/portal_key" -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_USERNAME@$PORTAL_SFTP_HOST" 'php /tmp/svnet-neuerungen-sync.php; rm -f /tmp/svnet-neuerungen-sync.php'
+
+      - name: Öffentlichen Zugriff ausschließen
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="$(curl --silent --show-error --location --retry 3 https://www.sv-netzwerk.eu/var/lib/sv-netzwerk/neuerungen/FUEHRENDE-NEUERUNGEN_Zusammenfuehrung_Stand-2026-10-23.md || true)"
+          if printf '%s' "$body" | grep -Fq 'NEUERUNG 27.10.2026 – IONOS als führende Wissens- und Arbeitsablage'; then
+            echo "::error::Die vertrauliche Datei ist öffentlich erreichbar."
+            exit 1
+          fi
+          echo "Kein führender Dokumentinhalt über den öffentlichen Webpfad ausgeliefert."
+
+      - name: Backup-Skript und Systemd-Timer installieren
+        shell: bash
+        run: |
+          cat > backup.php <<'PHP'
+          <?php
+          declare(strict_types=1);
+          $cfg='/var/www/sv-netzwerk/intern/api/config.php'; if(!is_file($cfg)) $cfg='/var/www/sv-netzwerk/public/intern/api/config.php'; require_once $cfg;
+          function b64u2(string $s): string{return rtrim(strtr(base64_encode($s),'+/','-_'),'=');}
+          function tok2():string{static $t=null;if($t!==null)return$t;$c=env('GOOGLE_DRIVE_CLIENT_ID','');$s=env('GOOGLE_DRIVE_CLIENT_SECRET','');$r=env('GOOGLE_DRIVE_REFRESH_TOKEN','');if($c===''||$s===''||$r==='')throw new RuntimeException('Google Drive nicht verbunden.');$h=curl_init('https://oauth2.googleapis.com/token');curl_setopt_array($h,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_POSTFIELDS=>http_build_query(['client_id'=>$c,'client_secret'=>$s,'refresh_token'=>$r,'grant_type'=>'refresh_token']),CURLOPT_HTTPHEADER=>['Content-Type: application/x-www-form-urlencoded'],CURLOPT_TIMEOUT=>45]);$b=curl_exec($h);$n=(int)curl_getinfo($h,CURLINFO_HTTP_CODE);curl_close($h);$d=json_decode((string)$b,true);if($n!==200||empty($d['access_token']))throw new RuntimeException('Google Token fehlgeschlagen.');return$t=(string)$d['access_token'];}
+          function rq2(string $m,string $u,?string $b=null,?string $mi=null):array{$h=['Authorization: Bearer '.tok2()];if($mi)$h[]='Content-Type: '.$mi;$c=curl_init($u);curl_setopt_array($c,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$m,CURLOPT_HTTPHEADER=>$h,CURLOPT_TIMEOUT=>120]);if($b!==null)curl_setopt($c,CURLOPT_POSTFIELDS,$b);$r=curl_exec($c);$n=(int)curl_getinfo($c,CURLINFO_HTTP_CODE);curl_close($c);if($r===false||$n<200||$n>=300)throw new RuntimeException('Google API '.$n);return[$n,(string)$r];}
+          function ap2(string $m,string $p,array $q=[],?array $j=null):array{$u='https://www.googleapis.com/drive/v3/'.ltrim($p,'/');$q['supportsAllDrives']='true';$u.='?'.http_build_query($q);[$n,$r]=rq2($m,$u,$j===null?null:json_encode($j,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),'application/json; charset=utf-8');return json_decode($r,true)?:[];}
+          function ch2(string$p,string$n):?array{$q="'".str_replace("'","\\'",$p)."' in parents and trashed=false and name='".str_replace("'","\\'",$n)."'";$d=ap2('GET','files',['q'=>$q,'fields'=>'files(id,name,mimeType)','pageSize'=>20]);return$d['files'][0]??null;}
+          function fo2(string$p,string$n):string{$f=ch2($p,$n);if($f)return(string)$f['id'];$d=ap2('POST','files',['fields'=>'id'],['name'=>$n,'mimeType'=>'application/vnd.google-apps.folder','parents'=>[$p]]);return(string)$d['id'];}
+          function up2(string$p,string$n,string$m,string$b):void{$x='b'.bin2hex(random_bytes(8));$meta=json_encode(['name'=>$n,'mimeType'=>$m,'parents'=>[$p]],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);$body='--'.$x."\r\nContent-Type: application/json\r\n\r\n".$meta."\r\n--".$x."\r\nContent-Type: ".$m."\r\n\r\n".$b."\r\n--".$x."--";rq2('POST','https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true',$body,'multipart/related; boundary='.$x);}
+          $src='/var/lib/sv-netzwerk/neuerungen';$parent='1XKQSSk3tFtwd4C-y0b1Av0SKvyfrf6N1';$root=fo2($parent,'IONOS-Backup');$stamp=(new DateTimeImmutable('now',new DateTimeZone('Europe/Berlin')))->format('Y-m-d_H-i-s');$run=fo2($root,$stamp);$it=new RecursiveIteratorIterator(new RecursiveDirectoryIterator($src,FilesystemIterator::SKIP_DOTS));$count=0;foreach($it as $f){if(!$f->isFile()||str_starts_with($f->getFilename(),'.'))continue;$rel=substr($f->getPathname(),strlen($src)+1);$mime=(new finfo(FILEINFO_MIME_TYPE))->file($f->getPathname())?:'application/octet-stream';up2($run,$rel,$mime,(string)file_get_contents($f->getPathname()));$count++;}file_put_contents('/var/log/svnet-neuerungen-backup.log',gmdate('c')." OK ".$count." files folder ".$run."\n",FILE_APPEND);echo"OK ".$count." files\n";
+          PHP
+          scp -o BatchMode=yes -o IdentitiesOnly=yes -i "$HOME/.ssh/portal_key" -P "$PORTAL_SFTP_PORT" backup.php "$PORTAL_SFTP_USERNAME@$PORTAL_SFTP_HOST:/tmp/svnet-neuerungen-backup.php"
+          ssh -o BatchMode=yes -o IdentitiesOnly=yes -i "$HOME/.ssh/portal_key" -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_USERNAME@$PORTAL_SFTP_HOST" 'install -o root -g root -m 750 /tmp/svnet-neuerungen-backup.php /usr/local/sbin/svnet-neuerungen-backup.php; rm -f /tmp/svnet-neuerungen-backup.php'
+          ssh -o BatchMode=yes -o IdentitiesOnly=yes -i "$HOME/.ssh/portal_key" -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_USERNAME@$PORTAL_SFTP_HOST" "cat > /etc/systemd/system/svnet-neuerungen-backup.service <<'UNIT'
+          [Unit]
+          Description=SV-Netzwerk Neuerungen Google-Drive-Backup
+          After=network-online.target
+          Wants=network-online.target
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/bin/php /usr/local/sbin/svnet-neuerungen-backup.php
+          UNIT
+          cat > /etc/systemd/system/svnet-neuerungen-backup.timer <<'UNIT'
+          [Unit]
+          Description=SV-Netzwerk Neuerungen Backup sonntags 02:30 Europe/Berlin
+          [Timer]
+          OnCalendar=Sun *-*-* 02:30:00 Europe/Berlin
+          Persistent=true
+          Unit=svnet-neuerungen-backup.service
+          [Install]
+          WantedBy=timers.target
+          UNIT
+          systemctl daemon-reload
+          systemctl enable --now svnet-neuerungen-backup.timer
+          systemctl start svnet-neuerungen-backup.service
+          systemctl --no-pager --full status svnet-neuerungen-backup.timer
+          systemctl show svnet-neuerungen-backup.timer -p NextElapseUSecRealtime
+          stat -c '%A %U:%G %n' /var/lib/sv-netzwerk/neuerungen
+          find /var/lib/sv-netzwerk/neuerungen -maxdepth 1 -type f -printf '%f %s bytes\n' | sort
+          sha256sum /var/lib/sv-netzwerk/neuerungen/*"
