@@ -657,7 +657,7 @@ function handleSaveLeaveEntitlement(array $actor): never
     $now = nowUtc();
     $year = (int)date('Y');
     $rawBalance = 0;
-    $entryStmt = $pdo->prepare('SELECT started_at,balance_minutes,source FROM time_entries WHERE user_id=:id AND started_at >= :year_start');
+    $entryStmt = $pdo->prepare('SELECT started_at,worked_minutes,planned_minutes,balance_minutes,source FROM time_entries WHERE user_id=:id AND started_at >= :year_start');
     $entryStmt->execute([':id'=>$userId, ':year_start'=>date('Y-01-01 00:00:00')]);
     foreach ($entryStmt->fetchAll() as $entry) if (!((string)($entry['source'] ?? '') === 'timemoto_import' && ttWeekendDate((string)$entry['started_at']))) $rawBalance += ttEffectiveBalance($entry);
     $compStmt = $pdo->prepare("SELECT COALESCE(SUM(hours),0) FROM time_leave_requests WHERE user_id=:id AND leave_type='zeitausgleich' AND status='approved' AND ends_on >= :year_start");
