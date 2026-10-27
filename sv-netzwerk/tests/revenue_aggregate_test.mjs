@@ -13,7 +13,7 @@ for (const profile of ['rekon_christian', 'annual_claims', 'annual_rekon']) {
 for (const person of ['Christian Wächter', 'Marc Schütt', 'Holger Roth']) {
   assert.match(api, new RegExp(person), `Sachverständiger fehlt in Aggregation: ${person}`);
 }
-for (const field of ['total_net', 'total_gross', 'annualized_net', 'annualized_gross', 'missing_count']) {
+for (const field of ['total_net', 'total_gross', 'claims_net', 'claims_gross', 'volume_net', 'volume_gross', 'annualized_net', 'annualized_gross', 'annualized_claims_net', 'annualized_volume_net', 'missing_count']) {
   assert.match(api, new RegExp(field), `Aggregatfeld fehlt: ${field}`);
 }
 assert.match(page, /Gesamtabrechnung \(Claims\)/);
