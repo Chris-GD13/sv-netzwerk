@@ -74,14 +74,17 @@
         "title": "Schimmelbefall im Innenraum: Feuchteursache, Befund und Sanierungsumfang sauber trennen",
         "slug": "schimmelbefall-innenraum-feuchteursache-befund-sanierungsumfang",
         "url": "https://www.sv-netzwerk.eu/fachwissen/schimmelbefall-innenraum-feuchteursache-befund-sanierungsumfang/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-website-20261027-0600",
-        "reserved_at": "2026-10-27T05:03:48.165Z"
+        "reserved_at": "2026-10-27T05:03:48.165Z",
+        "commit": "f364ff47479b97862ae6e1dd5c75b42d631fc794",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40454414787",
+        "verified_at": "2026-10-27T05:27:01.468Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-27T05:03:48.165Z"
+  "updated_at": "2026-10-27T05:27:01.468Z"
 }
