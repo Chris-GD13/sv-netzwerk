@@ -6,6 +6,7 @@
 - Öffentlicher Artikel und LinkedIn-Begleittext als natürliche, verbundene Absätze ohne Aufzählungszeichen, nummerierte Listen, erfundene Fälle oder interne Metasprache erstellt.
 - Library, Profilverknüpfung, Suchindex-/Sitemap-Datenbasis, CSV und separater LinkedIn-Begleittext ergänzt; LinkedIn bleibt `prepared-not-posted`.
 - Ohne öffentliches Beitragsbild, weil kein fachlich passendes geprüftes Motiv vorlag; keine SVG- oder Titelkarten-Platzhalter.
+- Inhaltscommit `f364ff47479b97862ae6e1dd5c75b42d631fc794` über [Deployment 40454414787](https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40454414787) live bestätigt; Detail, Übersicht, Kategorie, sieben Tag-Routen, Sitemap, robots.txt, deploy-version.txt und sichtbarer Inhalt geprüft. LinkedIn bleibt `prepared-not-posted`.
 
 ## 2026-10-21 – Teilzahlungen im Sachschaden nachvollziehbar steuern
 
