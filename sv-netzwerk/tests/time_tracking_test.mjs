@@ -9,8 +9,8 @@ const api = fs.readFileSync(path.join(root, 'public/intern/api/time-tracking.php
 const layout = fs.readFileSync(path.join(root, 'src/layouts/InternalLayout.astro'), 'utf8');
 
 assert.match(layout, /\/intern\/zeiterfassung\//);
-for (const label of ['Einbuchen', 'Ausbuchen', 'Überstunden \/ Saldo', 'Zeitausgleich', 'Auszahlung', 'Urlaubsübersicht', 'Resturlaub', 'Stundenlohn', 'Vereinbarte Wochenstunden']) assert.match(page, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-for (const action of ['clock_in', 'clock_out', 'leave_submit', 'leave_decide', 'save_leave_entitlement', 'save_entry', 'import_timemoto']) assert.match(api, new RegExp(`action === '${action}'`));
+for (const label of ['Einbuchen', 'Ausbuchen', 'Überstunden \/ Saldo', 'Zeitausgleich', 'Auszahlung', 'Urlaubsübersicht', 'Resturlaub', 'Stundenlohn', 'Vereinbarte Wochenstunden', 'Abwesenheit nachtragen', 'Urlaub genommen', 'Krankheit']) assert.match(page, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+for (const action of ['clock_in', 'clock_out', 'leave_submit', 'leave_admin_save', 'leave_decide', 'save_leave_entitlement', 'save_entry', 'import_timemoto']) assert.match(api, new RegExp(`action === '${action}'`));
 assert.match(api, /ttIdentity/);
 assert.match(api, /can_approve_leave/);
 assert.match(api, /timemoto_import/);
@@ -19,6 +19,9 @@ assert.match(api, /INSERT IGNORE/);
 assert.match(api, /annual_leave_days/);
 assert.match(api, /record\['Abwesenheit'\].*record\['Dauer'\]/);
 assert.match(api, /hourly_wage/);
-assert.match(page, /Mitarbeiter anlegen, bearbeiten oder deaktivieren/);
+assert.match(page, /Mitarbeiter anlegen, bearbeiten, ausblenden oder löschen/);
+assert.match(page, /href="\/intern\/fensterpruefung-bonn\/admin\/"/);
 assert.match(page, /Keine automatische Auszahlung/);
+assert.ok(page.indexOf('id="tt-entries"') > page.indexOf('id="tt-admin"'), 'Buchungsliste bleibt am Ende der Ansicht');
+assert.match(api, /leave_admin_create/);
 console.log('time_tracking_test: passed');
