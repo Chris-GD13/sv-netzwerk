@@ -82,9 +82,12 @@
         "verified_at": "2026-10-27T05:27:01.468Z"
       },
       "linkedin": {
-        "status": "not-posted"
+        "status": "reserved",
+        "owner": "codex-linkedin-20261027-01a17bee",
+        "reserved_at": "2026-10-27T07:27:27.470Z",
+        "article_url": "https://www.sv-netzwerk.eu/fachwissen/schimmelbefall-innenraum-feuchteursache-befund-sanierungsumfang/"
       }
     }
   },
-  "updated_at": "2026-10-27T05:27:01.468Z"
+  "updated_at": "2026-10-27T07:27:27.470Z"
 }
