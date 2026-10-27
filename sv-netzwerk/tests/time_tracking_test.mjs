@@ -32,6 +32,8 @@ assert.match(api, /pause_started_at/);
 assert.match(api, /balance_target_minutes/);
 assert.match(api, /balance_target_year/);
 assert.match(page, /Überstunden-Saldo nach Zeitausgleich \(Stunden\)/);
+assert.match(page, /class="tt-columns tt-admin-grid"/);
+assert.ok(page.indexOf('id="tt-entitlement-form"') > page.indexOf('id="tt-entry-form"'), 'Admin-Formulare bleiben gemeinsam angeordnet');
 assert.match(layout, /href="\/intern\/zeiterfassung\/"\].*order: -10/s);
 assert.ok(page.indexOf('id="tt-entries"') > page.indexOf('id="tt-admin"'), 'Buchungsliste bleibt am Ende der Ansicht');
 assert.match(api, /leave_admin_create/);
