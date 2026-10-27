@@ -128,7 +128,7 @@ function ensureTimeTrackingSchema(): void
 
 function ttEnsureColumn(PDO $pdo, string $column, string $definition): void
 {
-    $allowed = ['annual_leave_days', 'carryover_leave_days', 'contractual_minutes_per_week', 'hourly_wage', 'holiday_region', 'balance_adjustment_minutes', 'balance_adjustment_year', 'vacation_adjustment_days', 'vacation_adjustment_year'];
+    $allowed = ['annual_leave_days', 'carryover_leave_days', 'contractual_minutes_per_week', 'hourly_wage', 'holiday_region', 'balance_adjustment_minutes', 'balance_adjustment_year', 'balance_target_minutes', 'balance_target_year', 'vacation_adjustment_days', 'vacation_adjustment_year'];
     if (!in_array($column, $allowed, true)) return;
     $exists = $pdo->query('SHOW COLUMNS FROM time_user_settings LIKE ' . $pdo->quote($column))->fetch();
     if (!$exists) $pdo->exec("ALTER TABLE time_user_settings ADD COLUMN `$column` $definition");
