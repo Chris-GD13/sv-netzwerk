@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Schimmelbefall im Innenraum: Feuchteursache, Befund und Sanierungsumfang sauber trennen',
+    description: 'Feuchteursache, sichtbare und verdeckte Befunde, Schutzmaßnahmen, Sanierungsziel und Kosten bei Schimmelbefall nachvollziehbar abgrenzen.',
+    href: '/fachwissen/schimmelbefall-innenraum-feuchteursache-befund-sanierungsumfang/',
+    category: 'Schimmel und Innenraumhygiene',
+    tags: ['Schimmel', 'Feuchteursache', 'Innenraumhygiene', 'Sanierung', 'Bauforensik', 'Beweissicherung', 'Kostenprüfung'],
+    date: '2026-10-27',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Bauthermografie am Gebäudeschaden: Temperaturbild, Randbedingungen und Befundgrenzen richtig einordnen',
     description: 'Temperaturbilder, Messbedingungen, Oberflächeneinflüsse und ergänzende Untersuchungen am Gebäudeschaden nachvollziehbar bewerten.',
     href: '/fachwissen/bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen/',

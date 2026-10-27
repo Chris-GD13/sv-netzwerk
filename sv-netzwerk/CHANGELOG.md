@@ -1,3 +1,12 @@
+## 2026-10-27 – Schimmelbefall im Innenraum fachlich abgrenzen
+
+- Genau einen Tagesartikel unter atomarer Reservierung vorbereitet: Feuchteursache, sichtbaren und verdeckten Befund, Schutzmaßnahmen, Sanierungsziel und Kostenfolge getrennt bewerten.
+- Carmen Gohl gemäß dem aktuellen Live-Profil mit den belegten Fachgebieten Schimmelpilze in Gebäuden, Innenraumschadstoffe sowie Sanierungsplanung, -begleitung und -kontrolle berücksichtigt; keine Autorenschaft oder konkrete Fallzuständigkeit behauptet.
+- Den aktuellen UBA-Schimmelleitfaden, die UBA-FAQ zum Schimmel in Wohnungen, DGUV Information 201-028 und die BAuA-Hinweise zur Gefährdungsbeurteilung bei Biostoffen im benötigten Umfang geöffnet und fachlich abgeglichen.
+- Öffentlicher Artikel und LinkedIn-Begleittext als natürliche, verbundene Absätze ohne Aufzählungszeichen, nummerierte Listen, erfundene Fälle oder interne Metasprache erstellt.
+- Library, Profilverknüpfung, Suchindex-/Sitemap-Datenbasis, CSV und separater LinkedIn-Begleittext ergänzt; LinkedIn bleibt `prepared-not-posted`.
+- Ohne öffentliches Beitragsbild, weil kein fachlich passendes geprüftes Motiv vorlag; keine SVG- oder Titelkarten-Platzhalter.
+
 ## 2026-10-21 – Teilzahlungen im Sachschaden nachvollziehbar steuern
 
 - Genau einen Tagesartikel unter atomarer Reservierung vorbereitet: Anspruchsgrund, anerkannte Schadenshöhe, offene Positionen und tatsächlichen Zahlungsstatus getrennt dokumentieren.
