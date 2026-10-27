@@ -1,0 +1,92 @@
+---
+import InternalLayout from '../../../layouts/InternalLayout.astro';
+---
+<InternalLayout title="Zeiterfassung" description="Arbeitszeit, Überstunden und Urlaub im SV-Netzwerk-Portal." currentPath="/intern/zeiterfassung/">
+  <main class="tt-app">
+    <header class="tt-head">
+      <div><p class="tt-kicker">SV-Netzwerk</p><h1>Zeiterfassung</h1><p id="tt-identity">Anmeldung wird geprüft …</p></div>
+      <button id="tt-refresh" type="button">Aktualisieren</button>
+    </header>
+
+    <section class="tt-summary" aria-label="Arbeitszeitkonto">
+      <article><span>Offene Buchung</span><strong id="tt-open">–</strong><small id="tt-open-detail">Noch keine Daten geladen</small></article>
+      <article class="tt-overtime"><span>Überstunden / Saldo</span><strong id="tt-balance">–</strong><small>Positive Salden können durch Zeitausgleich abgefeiert werden.</small></article>
+      <article><span>Zeitausgleich genommen</span><strong id="tt-compensated">–</strong><small>Genehmigte Stunden im laufenden Jahr</small></article>
+      <article><span>Auszahlung</span><strong>0:00</strong><small>Keine automatische Auszahlung; Auszahlung ist nicht der Standard.</small></article>
+    </section>
+
+    <section class="tt-card tt-clock">
+      <div><h2>Meine Arbeitszeit</h2><p>Mit deinem Konto ein- und ausbuchen. Eine offene Buchung kann nicht doppelt gestartet werden.</p></div>
+      <div class="tt-actions"><button id="tt-clock-in" type="button">Einbuchen</button><button id="tt-clock-out" class="secondary" type="button">Ausbuchen</button></div>
+      <p id="tt-clock-state" class="tt-state" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="tt-overview" class="tt-card" hidden>
+      <div class="tt-section-head"><div><h2>Teamübersicht</h2><p>Christian, Katja, Sanne und Marc sehen die für sie freigegebenen Kontostände. Marc hat Lesezugriff und darf Urlaube genehmigen.</p></div></div>
+      <div class="tt-table-wrap"><table><thead><tr><th>Person</th><th>Gearbeitet</th><th>Überstunden / Saldo</th><th>Zeitausgleich</th><th>Status</th></tr></thead><tbody id="tt-users"></tbody></table></div>
+    </section>
+
+    <div class="tt-columns">
+      <section class="tt-card">
+        <h2>Urlaub oder Zeitausgleich beantragen</h2>
+        <form id="tt-leave-form" class="tt-form">
+          <label>Art<select id="tt-leave-type"><option value="urlaub">Urlaub</option><option value="zeitausgleich">Zeitausgleich aus Überstunden</option><option value="krank">Krankheit</option><option value="sonderurlaub">Sonderurlaub</option></select></label>
+          <div class="tt-form-row"><label>Von<input id="tt-leave-from" type="date" required /></label><label>Bis<input id="tt-leave-to" type="date" required /></label></div>
+          <label>Stunden (optional, für Zeitausgleich)<input id="tt-leave-hours" type="number" min="0" step="0.25" placeholder="z. B. 5" /></label>
+          <label>Hinweis<textarea id="tt-leave-note" rows="3" maxlength="2000" placeholder="Optionaler Hinweis"></textarea></label>
+          <button type="submit">Antrag speichern</button><p id="tt-leave-state" class="tt-state" role="status"></p>
+        </form>
+      </section>
+      <section id="tt-approvals" class="tt-card" hidden><h2>Offene Genehmigungen</h2><p id="tt-approval-note">Urlaubsanträge werden hier nachvollziehbar entschieden.</p><div id="tt-approval-list" class="tt-list"></div></section>
+    </div>
+
+    <section class="tt-card"><div class="tt-section-head"><div><h2>Meine und freigegebene Buchungen</h2><p>Änderungen werden protokolliert. Der Saldo bleibt sichtbar und wird nicht stillschweigend ausgezahlt.</p></div></div><div class="tt-table-wrap"><table><thead><tr><th>Person</th><th>Datum</th><th>Beginn</th><th>Ende</th><th>Gearbeitet</th><th>Saldo</th><th>Quelle</th><th>Notiz</th></tr></thead><tbody id="tt-entries"></tbody></table></div></section>
+
+    <section id="tt-admin" class="tt-card" hidden>
+      <div class="tt-section-head"><div><h2>Administration</h2><p>Nur Christian kann Buchungen nachtragen, ändern und TimeMoto-Dateien importieren.</p></div></div>
+      <form id="tt-entry-form" class="tt-form tt-admin-form"><input id="tt-entry-id" type="hidden" /><label>Mitarbeiter<select id="tt-entry-user"></select></label><div class="tt-form-row"><label>Datum<input id="tt-entry-date" type="date" required /></label><label>Pause in Minuten<input id="tt-entry-break" type="number" min="0" step="1" value="0" /></label></div><div class="tt-form-row"><label>Beginn<input id="tt-entry-start" type="time" required /></label><label>Ende<input id="tt-entry-end" type="time" /></label></div><div class="tt-form-row"><label>Sollzeit in Minuten<input id="tt-entry-planned" type="number" min="0" step="1" placeholder="optional" /></label><label>Saldo in Minuten<input id="tt-entry-balance" type="number" step="1" placeholder="automatisch berechnen" /></label></div><label>Notiz<input id="tt-entry-note" maxlength="2000" /></label><div class="tt-actions"><button type="submit">Buchung speichern</button><button id="tt-entry-reset" class="secondary" type="button">Leeren</button></div><p id="tt-entry-state" class="tt-state" role="status"></p></form>
+      <form id="tt-import-form" class="tt-import"><label>TimeMoto-Zeitbericht (.xlsx)<input id="tt-import-file" type="file" accept=".xlsx,.xlsm" required /></label><button type="submit">TimeMoto importieren</button><p id="tt-import-state" class="tt-state" role="status"></p></form>
+    </section>
+  </main>
+</InternalLayout>
+
+<style is:global>
+.tt-app{min-height:calc(100vh - 112px);box-sizing:border-box;padding:26px;color:#17324a}.tt-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:18px}.tt-kicker{margin:0;color:#f59a23;font-size:.8rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.tt-head h1{margin:3px 0;font-size:2.1rem;color:#071a2e}.tt-head p{margin:0;color:#647789}.tt-head button,.tt-actions button,.tt-form button,.tt-import button{border:1px solid #17324a;background:#17324a;color:#fff;padding:10px 14px;font:inherit;font-weight:800;cursor:pointer}.tt-actions .secondary,.tt-form button.secondary{background:#fff;color:#17324a}.tt-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}.tt-summary article{min-height:98px;padding:14px 15px;border-top:4px solid #f59a23;background:#fff;box-sizing:border-box}.tt-summary article.tt-overtime{border-top-color:#2f8a4b}.tt-summary span,.tt-summary small{display:block;color:#647789}.tt-summary span{font-size:.76rem;font-weight:800}.tt-summary strong{display:block;margin:7px 0 4px;color:#071a2e;font-size:1.55rem}.tt-summary small{font-size:.72rem;line-height:1.35}.tt-card{margin-bottom:14px;padding:18px;border:1px solid #d5dde3;background:#fff}.tt-card h2{margin:0 0 6px;color:#071a2e;font-size:1.12rem}.tt-card p{margin:0;color:#647789;line-height:1.45}.tt-clock{display:flex;align-items:center;justify-content:space-between;gap:16px}.tt-actions{display:flex;flex-wrap:wrap;gap:8px}.tt-state{min-height:1.2em;margin-top:10px!important;color:#647789;font-size:.78rem}.tt-state.ok{color:#24713c}.tt-state.bad{color:#ae382f}.tt-columns{display:grid;grid-template-columns:minmax(280px,1fr) minmax(300px,1fr);gap:14px}.tt-form{display:grid;gap:10px;margin-top:14px}.tt-form label,.tt-import label{display:grid;gap:5px;color:#52697a;font-size:.78rem;font-weight:800}.tt-form input,.tt-form select,.tt-form textarea,.tt-import input{box-sizing:border-box;width:100%;border:1px solid #bac7d0;background:#fff;color:#17324a;padding:9px;font:inherit}.tt-form textarea{resize:vertical}.tt-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tt-section-head{display:flex;justify-content:space-between;gap:14px;margin-bottom:10px}.tt-table-wrap{overflow:auto;border:1px solid #cdd6dd;margin-top:10px}.tt-table-wrap table{width:100%;border-collapse:collapse;font-size:.82rem;white-space:nowrap}.tt-table-wrap th{padding:9px;background:#17324a;color:#fff;text-align:left}.tt-table-wrap td{padding:8px;border-bottom:1px solid #e1e6ea}.tt-table-wrap tbody tr:nth-child(even){background:#f6f8f9}.tt-list{display:grid;gap:8px;margin-top:12px}.tt-list article{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;background:#f3f6f8;border-left:4px solid #f59a23}.tt-list article strong,.tt-list article small{display:block}.tt-list article small{margin-top:3px;color:#647789}.tt-inline-edit{margin-left:7px;border:1px solid #17324a;background:#fff;color:#17324a;padding:3px 6px;font:inherit;font-size:.7rem;font-weight:800;cursor:pointer}.tt-list button{border:1px solid #17324a;background:#fff;color:#17324a;padding:7px 9px;font:inherit;font-weight:800;cursor:pointer}.tt-admin-form{max-width:750px}.tt-import{display:grid;grid-template-columns:minmax(260px,1fr) auto;align-items:end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #d5dde3}.tt-import .tt-state{grid-column:1/-1}.tt-empty{padding:14px;color:#718291;background:#f3f6f8}@media(max-width:950px){.tt-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.tt-columns{grid-template-columns:1fr}}@media(max-width:650px){.tt-app{padding:14px}.tt-head,.tt-clock{align-items:flex-start;flex-direction:column}.tt-summary{grid-template-columns:1fr}.tt-form-row,.tt-import{grid-template-columns:1fr}.tt-import .tt-state{grid-column:auto}.tt-head button{width:100%}}
+</style>
+
+<script is:inline>
+(() => {
+  const API='/intern/api/time-tracking.php';
+  const $=id=>document.getElementById(id);
+  const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const request=async(url,options={})=>{const response=await fetch(url,{credentials:'same-origin',cache:'no-store',...options});const data=await response.json().catch(()=>({}));if(!response.ok||data.ok===false)throw Error(data.error||`HTTP ${response.status}`);return data};
+  const fmtMinutes=value=>{const n=Number(value)||0,s=n<0?'-':'',m=Math.abs(n);return `${s}${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`};
+  const dateOnly=value=>String(value||'').slice(0,10).split('-').reverse().join('.');
+  const timeOnly=value=>String(value||'').slice(11,16);
+  const state=(id,text,kind='')=>{const el=$(id);el.textContent=text;el.className=`tt-state ${kind}`};
+  let data=null;
+  function currentUser(){return (data?.users||[]).find(user=>Number(user.id)===Number(data?.actor?.id))||null}
+  function render(){
+    const own=currentUser();const permissions=data.permissions||{};const ownEntry=(data.entries||[]).find(entry=>Number(entry.user_id)===Number(data.actor.id)&&!entry.ended_at);$('tt-identity').textContent=`Angemeldet als ${data.actor.name} · ${permissions.can_edit_all?'Administrator':permissions.can_approve_leave&&permissions.can_view_all?'Lesen und Urlaub genehmigen':'Eigene Buchungen'}`;
+    $('tt-open').textContent=ownEntry?'läuft':'geschlossen';$('tt-open-detail').textContent=ownEntry?`Seit ${new Date(String(ownEntry.started_at).replace(' ','T')+'Z').toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} Uhr`:'Keine offene Buchung';$('tt-clock-in').disabled=!!ownEntry;$('tt-clock-out').disabled=!ownEntry;
+    const ownSummary=own||{balance_minutes:0,compensated_minutes:0};$('tt-balance').textContent=fmtMinutes(Number(ownSummary.balance_minutes)-Number(ownSummary.compensated_minutes));$('tt-compensated').textContent=fmtMinutes(ownSummary.compensated_minutes);
+    $('tt-overview').hidden=!permissions.can_view_all;$('tt-admin').hidden=!permissions.can_edit_all;$('tt-approvals').hidden=!permissions.can_approve_leave;
+    $('tt-users').innerHTML=(data.users||[]).map(user=>`<tr><td><strong>${esc(user.name)}</strong></td><td>${fmtMinutes(user.worked_minutes)}</td><td><strong>${fmtMinutes(Number(user.balance_minutes)-Number(user.compensated_minutes))}</strong></td><td>${fmtMinutes(user.compensated_minutes)}</td><td>${user.open?'offen':'geschlossen'}</td></tr>`).join('')||'<tr><td colspan="5">Keine Mitarbeiterdaten verfügbar.</td></tr>';
+    $('tt-entries').innerHTML=(data.entries||[]).map(entry=>`<tr><td>${esc(entry.full_name)}</td><td>${dateOnly(entry.started_at)}</td><td>${timeOnly(entry.started_at)}</td><td>${entry.ended_at?timeOnly(entry.ended_at):'offen'}</td><td>${fmtMinutes(entry.worked_minutes)}</td><td>${fmtMinutes(entry.balance_minutes)}</td><td>${esc(entry.source==='timemoto_import'?'TimeMoto':'Portal')}</td><td>${esc(entry.note||'')}${permissions.can_edit_all?` <button class="tt-inline-edit" type="button" data-entry-id="${entry.id}">Bearbeiten</button>`:''}</td></tr>`).join('')||'<tr><td colspan="8">Noch keine Zeitbuchungen vorhanden.</td></tr>';
+    document.querySelectorAll('[data-entry-id]').forEach(button=>button.addEventListener('click',()=>{const entry=(data.entries||[]).find(item=>Number(item.id)===Number(button.dataset.entryId));if(!entry)return;$('tt-entry-id').value=entry.id;$('tt-entry-user').value=entry.user_id;$('tt-entry-date').value=String(entry.started_at).slice(0,10);$('tt-entry-start').value=timeOnly(entry.started_at);$('tt-entry-end').value=entry.ended_at?timeOnly(entry.ended_at):'';$('tt-entry-break').value=entry.break_minutes||0;$('tt-entry-planned').value=entry.planned_minutes??'';$('tt-entry-balance').value=entry.balance_minutes??'';$('tt-entry-note').value=entry.note||'';document.getElementById('tt-admin').scrollIntoView({behavior:'smooth',block:'start'});state('tt-entry-state',`Buchung ${entry.id} zur Bearbeitung geladen.`)}));
+    $('tt-approval-list').innerHTML=(data.leaves||[]).filter(item=>item.status==='pending').map(item=>`<article><div><strong>${esc(item.full_name)} · ${esc(item.leave_type)}</strong><small>${dateOnly(item.starts_on)} – ${dateOnly(item.ends_on)}${Number(item.hours)?` · ${fmtMinutes(Math.round(Number(item.hours)*60))}`:''}</small></div><div class="tt-actions"><button type="button" data-decision="approved" data-id="${item.id}">Genehmigen</button><button type="button" data-decision="rejected" data-id="${item.id}">Ablehnen</button></div></article>`).join('')||'<p class="tt-empty">Keine offenen Anträge.</p>';
+    $('tt-approval-list').querySelectorAll('[data-decision]').forEach(button=>button.addEventListener('click',async()=>{button.disabled=true;try{await request(`${API}?action=leave_decide`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:Number(button.dataset.id),status:button.dataset.decision})});await load()}catch(error){state('tt-approval-note',error.message,'bad')}}));
+    if(permissions.can_edit_all){$('tt-entry-user').innerHTML=(data.users||[]).map(user=>`<option value="${user.id}">${esc(user.name)}</option>`).join('')}
+  }
+  async function load(){try{data=await request(`${API}?action=summary`);render()}catch(error){state('tt-clock-state',error.message,'bad');$('tt-identity').textContent='Zeiterfassung konnte nicht geladen werden.'}}
+  $('tt-clock-in').addEventListener('click',async()=>{try{await request(`${API}?action=clock_in`,{method:'POST'});state('tt-clock-state','Eingebucht.','ok');await load()}catch(error){state('tt-clock-state',error.message,'bad')}});
+  $('tt-clock-out').addEventListener('click',async()=>{try{const result=await request(`${API}?action=clock_out`,{method:'POST'});state('tt-clock-state',`Ausgebucht · gearbeitet ${fmtMinutes(result.worked_minutes)} · Saldo ${fmtMinutes(result.balance_minutes)}.`,'ok');await load()}catch(error){state('tt-clock-state',error.message,'bad')}});
+  $('tt-refresh').addEventListener('click',load);
+  $('tt-leave-form').addEventListener('submit',async event=>{event.preventDefault();try{await request(`${API}?action=leave_submit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({leave_type:$('tt-leave-type').value,starts_on:$('tt-leave-from').value,ends_on:$('tt-leave-to').value,hours:$('tt-leave-hours').value,note:$('tt-leave-note').value})});state('tt-leave-state','Antrag gespeichert und zur Genehmigung vorgemerkt.','ok');event.target.reset();await load()}catch(error){state('tt-leave-state',error.message,'bad')}});
+  $('tt-entry-form').addEventListener('submit',async event=>{event.preventDefault();try{await request(`${API}?action=save_entry`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:Number($('tt-entry-id').value)||0,user_id:Number($('tt-entry-user').value),date:$('tt-entry-date').value,start:$('tt-entry-start').value,end:$('tt-entry-end').value,break_minutes:$('tt-entry-break').value,planned_minutes:$('tt-entry-planned').value,balance_minutes:$('tt-entry-balance').value,note:$('tt-entry-note').value})});state('tt-entry-state','Buchung gespeichert und protokolliert.','ok');$('tt-entry-reset').click();await load()}catch(error){state('tt-entry-state',error.message,'bad')}});
+  $('tt-entry-reset').addEventListener('click',()=>{$('tt-entry-id').value='';$('tt-entry-date').value='';$('tt-entry-start').value='';$('tt-entry-end').value='';$('tt-entry-break').value='0';$('tt-entry-planned').value='';$('tt-entry-balance').value='';$('tt-entry-note').value=''});
+  $('tt-import-form').addEventListener('submit',async event=>{event.preventDefault();const file=$('tt-import-file').files[0];if(!file){state('tt-import-state','Bitte eine Datei auswählen.','bad');return}const form=new FormData();form.append('file',file);state('tt-import-state','Import läuft …');try{const result=await request(`${API}?action=import_timemoto`,{method:'POST',body:form});state('tt-import-state',`${result.entries_imported} Zeitbuchung(en) und ${result.leave_imported} Zeitausgleich(e) importiert; ${result.skipped} Zeile(n) übersprungen.`,'ok');event.target.reset();await load()}catch(error){state('tt-import-state',error.message,'bad')}});
+  load();
+})();
+</script>
+
