@@ -9,8 +9,9 @@ const api = fs.readFileSync(path.join(root, 'public/intern/api/time-tracking.php
 const layout = fs.readFileSync(path.join(root, 'src/layouts/InternalLayout.astro'), 'utf8');
 
 assert.match(layout, /\/intern\/zeiterfassung\//);
-for (const label of ['Einbuchen', 'Ausbuchen', 'Überstunden \/ Saldo', 'Zeitausgleich', 'Auszahlung', 'Urlaubsübersicht', 'Resturlaub', 'Stundenlohn', 'Vereinbarte Wochenstunden', 'Abwesenheit nachtragen', 'Urlaub genommen', 'Krankheit']) assert.match(page, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-for (const action of ['clock_in', 'clock_out', 'leave_submit', 'leave_admin_save', 'leave_decide', 'save_leave_entitlement', 'save_entry', 'import_timemoto']) assert.match(api, new RegExp(`action === '${action}'`));
+for (const label of ['Einbuchen', 'Ausbuchen', 'Überstunden / Saldo', 'Zeitausgleich', 'Auszahlung', 'Urlaubsübersicht', 'Resturlaub', 'Stundenlohn', 'Vereinbarte Wochenstunden', 'Abwesenheit nachtragen', 'Urlaub genommen', 'Krankheit', 'Auszahlung laufender Monat', 'Bearbeiten', 'Löschen']) assert.ok(page.includes(label), `missing label: ${label}`);
+assert.match(page, /tt-entitlement-enabled/);
+for (const action of ['clock_in', 'clock_out', 'leave_submit', 'leave_admin_save', 'leave_admin_update', 'leave_admin_delete', 'leave_decide', 'save_leave_entitlement', 'save_entry', 'import_timemoto']) assert.match(api, new RegExp(`action === '${action}'`));
 assert.match(api, /ttIdentity/);
 assert.match(api, /can_approve_leave/);
 assert.match(api, /timemoto_import/);
@@ -21,7 +22,12 @@ assert.match(api, /record\['Abwesenheit'\].*record\['Dauer'\]/);
 assert.match(api, /hourly_wage/);
 assert.match(page, /Mitarbeiter anlegen, bearbeiten, ausblenden oder löschen/);
 assert.match(page, /href="\/intern\/fensterpruefung-bonn\/admin\/"/);
-assert.match(page, /Keine automatische Auszahlung/);
+assert.match(page, /Auszahlung laufender Monat/);
+assert.match(page, /tt-payout-total/);
+assert.match(api, /time_tracking_enabled/);
+assert.match(api, /ttEffectiveBalance/);
+assert.match(api, /leave_admin_update/);
+assert.match(api, /leave_admin_delete/);
 assert.ok(page.indexOf('id="tt-entries"') > page.indexOf('id="tt-admin"'), 'Buchungsliste bleibt am Ende der Ansicht');
 assert.match(api, /leave_admin_create/);
 console.log('time_tracking_test: passed');
