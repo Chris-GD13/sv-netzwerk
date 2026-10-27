@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+ title="Sachverständiger werden | Partner im SV-Netzwerk"
+ description="Als Sachverständiger oder Schadenregulierer im SV-Netzwerk mitarbeiten. Informieren Sie sich über die Zusammenarbeit und nehmen Sie Kontakt auf."
+ breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Sachverständiger werden' }]}
+>
+ <section class="sv-section">
+  <div class="sv-container partner-shell">
+   <p class="sv-eyebrow">Zusammenarbeit im SV-Netzwerk</p>
+   <h1>Sie sind Sachverständiger? Lernen wir uns kennen.</h1>
+   <p class="sv-lead">Wir möchten unser Netzwerk um qualifizierte Sachverständige und Schadenregulierer erweitern. Wenn Sie Versicherungsschäden fachlich fundiert beurteilen, freuen wir uns über Ihre Kontaktaufnahme.</p>
+   <a class="sv-button sv-button-primary" href="/kontakt/">Zusammenarbeit anfragen</a>
+  </div>
+ </section>
+ <section class="sv-section sv-section-alt">
+  <div class="sv-container">
+   <h2>Wen wir suchen</h2>
+   <div class="partner-grid">
+    <article class="sv-card"><h3>Fachliche Erfahrung</h3><p>Sie verfügen über Erfahrung in der Begutachtung oder Regulierung von Sach- und Versicherungsschäden und können Ihre Qualifikation nachvollziehbar darstellen.</p></article>
+    <article class="sv-card"><h3>Regionale Präsenz</h3><p>Wir interessieren uns für Sachverständige aus unterschiedlichen Regionen Deutschlands. Nennen Sie uns Ihren Standort und Ihr Einsatzgebiet.</p></article>
+    <article class="sv-card"><h3>Nachvollziehbare Arbeit</h3><p>Sie dokumentieren Feststellungen sorgfältig und beurteilen Schadenursachen, erforderliche Maßnahmen und Kosten nachvollziehbar.</p></article>
+   </div>
+  </div>
+ </section>
+ <section class="sv-section">
+  <div class="sv-container partner-shell">
+   <h2>So kommen wir ins Gespräch</h2>
+   <p>Schreiben Sie uns, in welchen Fachgebieten Sie tätig sind, welche Qualifikationen Sie mitbringen und in welcher Region Sie Aufträge übernehmen können. Wir prüfen anschließend gemeinsam, ob eine Zusammenarbeit passt.</p>
+   <p>Eine Kontaktaufnahme begründet noch keine Aufnahme in das Netzwerk und keinen Anspruch auf Aufträge.</p>
+   <a class="sv-button sv-button-primary" href="/kontakt/">Jetzt Kontakt aufnehmen</a>
+   <p class="partner-note">Die Anfrage erfolgt über den öffentlichen Kontaktbereich. Interne Schadenakten und personenbezogene Versicherungsnehmerdaten sind darüber nicht zugänglich.</p>
+  </div>
+ </section>
+</BaseLayout>
+<style>
+ .partner-shell{max-width:57rem}.partner-shell h1{max-width:18ch}.partner-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.partner-grid .sv-card{padding:1.5rem}.partner-grid h3{margin-bottom:.7rem}.partner-grid p{margin-bottom:0}.partner-note{margin-top:1.5rem;color:var(--sv-color-ink-soft);font-size:.9rem}@media(max-width:48rem){.partner-grid{grid-template-columns:1fr}}
+</style>
