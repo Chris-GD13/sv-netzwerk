@@ -31,7 +31,15 @@ jobs:
           install -d -m 700 "$HOME/.ssh"
           printf '%s' "$PORTAL_SSH_KEY" | sed 's/\\\\n/\n/g' | tr -d '\r' > "$HOME/.ssh/portal_key"
           chmod 600 "$HOME/.ssh/portal_key"
-          ssh-keygen -y -f "$HOME/.ssh/portal_key" > "$HOME/.ssh/portal_key.pub"
+          if ! ssh-keygen -y -f "$HOME/.ssh/portal_key" > "$HOME/.ssh/portal_key.pub" 2> "$HOME/.ssh/key.err"; then
+            if printf '%s' "$PORTAL_SSH_KEY" | base64 -d > "$HOME/.ssh/portal_key.b64" 2>/dev/null && ssh-keygen -y -f "$HOME/.ssh/portal_key.b64" > "$HOME/.ssh/portal_key.pub" 2> "$HOME/.ssh/key.err"; then
+              mv "$HOME/.ssh/portal_key.b64" "$HOME/.ssh/portal_key"
+            else
+              echo "SSH key format invalid after newline normalization and base64 fallback:"
+              cat "$HOME/.ssh/key.err"
+              exit 1
+            fi
+          fi
           echo "SSH key parsed successfully"
           ssh-keyscan -4 -T 10 -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_HOST" >> "$HOME/.ssh/known_hosts" 2>/dev/null
           set +e
