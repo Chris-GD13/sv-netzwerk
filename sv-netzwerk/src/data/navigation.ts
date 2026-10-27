@@ -31,6 +31,7 @@ export const navigation: NavItem[] = [
     ],
   },
   { label: 'Experten', href: '/experten/' },
+  { label: 'Partner werden', href: '/sachverstaendige-werden/' },
   { label: 'Fachartikel', href: '/fachwissen/' },
   { label: 'Podcast', href: '/podcast/' },
   { label: 'Kontakt', href: '/kontakt/' },
