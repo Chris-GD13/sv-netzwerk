@@ -17,6 +17,7 @@ assert.match(api, /timemoto_import/);
 assert.match(api, /zeitausgleich/);
 assert.match(api, /INSERT IGNORE/);
 assert.match(api, /annual_leave_days/);
+assert.match(api, /record\['Abwesenheit'\].*record\['Dauer'\]/);
 assert.match(api, /hourly_wage/);
 assert.match(page, /Mitarbeiter anlegen, bearbeiten oder deaktivieren/);
 assert.match(page, /Keine automatische Auszahlung/);
