@@ -49,6 +49,8 @@ function ensureTimeTrackingSchema(): void
         holiday_region VARCHAR(8) NOT NULL DEFAULT 'BW',
         balance_adjustment_minutes INT NOT NULL DEFAULT 0,
         balance_adjustment_year SMALLINT UNSIGNED NULL,
+        balance_target_minutes INT NULL,
+        balance_target_year SMALLINT UNSIGNED NULL,
         vacation_adjustment_days DECIMAL(6,2) NOT NULL DEFAULT 0,
         vacation_adjustment_year SMALLINT UNSIGNED NULL,
         updated_by INT UNSIGNED NULL,
@@ -62,6 +64,8 @@ function ensureTimeTrackingSchema(): void
     ttEnsureColumn($pdo, 'holiday_region', "VARCHAR(8) NOT NULL DEFAULT 'BW'");
     ttEnsureColumn($pdo, 'balance_adjustment_minutes', 'INT NOT NULL DEFAULT 0');
     ttEnsureColumn($pdo, 'balance_adjustment_year', 'SMALLINT UNSIGNED NULL');
+    ttEnsureColumn($pdo, 'balance_target_minutes', 'INT NULL');
+    ttEnsureColumn($pdo, 'balance_target_year', 'SMALLINT UNSIGNED NULL');
     ttEnsureColumn($pdo, 'vacation_adjustment_days', 'DECIMAL(6,2) NOT NULL DEFAULT 0');
     ttEnsureColumn($pdo, 'vacation_adjustment_year', 'SMALLINT UNSIGNED NULL');
     $pdo->exec("CREATE TABLE IF NOT EXISTS time_entries (
@@ -370,7 +374,11 @@ function handleSummary(array $actor): never
         $targetMinutes = ttTarget($pdo,(int)$user['id']);
         $setting = $settingsByUser[(int)$user['id']] ?? [];
         $region = ttHolidayRegion($setting);
-        if ((int)($setting['balance_adjustment_year'] ?? 0) === $year) $balance += (int)($setting['balance_adjustment_minutes'] ?? 0);
+        if ((int)($setting['balance_target_year'] ?? 0) === $year && $setting['balance_target_minutes'] !== null) {
+            $balance = (int)$setting['balance_target_minutes'] + $compMinutes;
+        } elseif ((int)($setting['balance_adjustment_year'] ?? 0) === $year) {
+            $balance += (int)($setting['balance_adjustment_minutes'] ?? 0);
+        }
         $annualDays = !array_key_exists('annual_leave_days', $setting) || $setting['annual_leave_days'] === null ? null : (float)$setting['annual_leave_days'];
         $carryoverDays = (float)($setting['carryover_leave_days'] ?? 0);
         $takenDays = 0.0; $pendingDays = 0.0; $futureApprovedDays = 0.0; $futureApproved = []; $monthVacationHours = 0.0; $monthSickHours = 0.0;
@@ -409,7 +417,7 @@ function handleSummary(array $actor): never
         $aggregate[] = [
             'id'=>(int)$user['id'],'identity'=>ttIdentity($user),'name'=>$user['full_name'],
             'time_tracking_enabled'=>ttEnabled($user),
-            'worked_minutes'=>$worked,'balance_minutes'=>$balance,'compensated_minutes'=>$compMinutes,'open'=>$open,'has_entries'=>$hasEntries,
+            'worked_minutes'=>$worked,'balance_minutes'=>$balance,'balance_target_minutes'=>((int)($setting['balance_target_year'] ?? 0) === $year && $setting['balance_target_minutes'] !== null ? (int)$setting['balance_target_minutes'] : null),'compensated_minutes'=>$compMinutes,'open'=>$open,'has_entries'=>$hasEntries,
             'target_minutes_per_day'=>$targetMinutes,
             'contractual_minutes_per_week'=>array_key_exists('contractual_minutes_per_week', $setting) && $setting['contractual_minutes_per_week'] !== null ? (int)$setting['contractual_minutes_per_week'] : null,
             'hourly_wage'=>$hourlyWage > 0 ? $hourlyWage : null,
@@ -665,7 +673,8 @@ function handleSaveLeaveEntitlement(array $actor): never
     $compMinutes = (int)round(((float)$compStmt->fetchColumn()) * 60);
     $balanceAdjustment = (int)($before['balance_adjustment_minutes'] ?? 0);
     $balanceAdjustmentYear = $before['balance_adjustment_year'] ?? null;
-    if ($balanceTarget !== null) { $balanceAdjustment = $balanceTarget + $compMinutes - $rawBalance; $balanceAdjustmentYear = $year; }
+    $balanceTargetYear = $before['balance_target_year'] ?? null;
+    if ($balanceTarget !== null) { $balanceTargetYear = $year; }
     $vacationAdjustment = (float)($before['vacation_adjustment_days'] ?? 0);
     $vacationAdjustmentYear = $before['vacation_adjustment_year'] ?? null;
     if ($vacationRemainingTarget !== null) {
@@ -679,7 +688,7 @@ function handleSaveLeaveEntitlement(array $actor): never
         if ($entitlement !== null) { $vacationAdjustment = $entitlement - $vacationRemainingTarget - $takenBase; $vacationAdjustmentYear = $year; }
     }
     $pdo->prepare('UPDATE users SET time_tracking_enabled=:enabled,updated_at=:updated WHERE id=:id')->execute([':enabled'=>$timeTrackingEnabled,':updated'=>$now,':id'=>$userId]);
-    $pdo->prepare("INSERT INTO time_user_settings (user_id,target_minutes_per_day,annual_leave_days,carryover_leave_days,contractual_minutes_per_week,hourly_wage,holiday_region,balance_adjustment_minutes,balance_adjustment_year,vacation_adjustment_days,vacation_adjustment_year,updated_by,updated_at) VALUES (:id,:daily,:annual,:carryover,:weekly,:wage,:region,:balance_adjustment,:balance_year,:vacation_adjustment,:vacation_year,:actor,:updated) ON DUPLICATE KEY UPDATE target_minutes_per_day=VALUES(target_minutes_per_day),annual_leave_days=VALUES(annual_leave_days),carryover_leave_days=VALUES(carryover_leave_days),contractual_minutes_per_week=VALUES(contractual_minutes_per_week),hourly_wage=VALUES(hourly_wage),holiday_region=VALUES(holiday_region),balance_adjustment_minutes=VALUES(balance_adjustment_minutes),balance_adjustment_year=VALUES(balance_adjustment_year),vacation_adjustment_days=VALUES(vacation_adjustment_days),vacation_adjustment_year=VALUES(vacation_adjustment_year),updated_by=VALUES(updated_by),updated_at=VALUES(updated_at)")->execute([':id'=>$userId,':daily'=>$dailyMinutes,':annual'=>$annual,':carryover'=>$carryover,':weekly'=>$weeklyMinutes,':wage'=>$hourlyWage,':region'=>$holidayRegion,':balance_adjustment'=>$balanceAdjustment,':balance_year'=>$balanceAdjustmentYear,':vacation_adjustment'=>$vacationAdjustment,':vacation_year'=>$vacationAdjustmentYear,':actor'=>(int)$actor['id'],':updated'=>$now]);
+    $pdo->prepare("INSERT INTO time_user_settings (user_id,target_minutes_per_day,annual_leave_days,carryover_leave_days,contractual_minutes_per_week,hourly_wage,holiday_region,balance_adjustment_minutes,balance_adjustment_year,balance_target_minutes,balance_target_year,vacation_adjustment_days,vacation_adjustment_year,updated_by,updated_at) VALUES (:id,:daily,:annual,:carryover,:weekly,:wage,:region,:balance_adjustment,:balance_year,:balance_target,:balance_target_year,:vacation_adjustment,:vacation_year,:actor,:updated) ON DUPLICATE KEY UPDATE target_minutes_per_day=VALUES(target_minutes_per_day),annual_leave_days=VALUES(annual_leave_days),carryover_leave_days=VALUES(carryover_leave_days),contractual_minutes_per_week=VALUES(contractual_minutes_per_week),hourly_wage=VALUES(hourly_wage),holiday_region=VALUES(holiday_region),balance_adjustment_minutes=VALUES(balance_adjustment_minutes),balance_adjustment_year=VALUES(balance_adjustment_year),balance_target_minutes=VALUES(balance_target_minutes),balance_target_year=VALUES(balance_target_year),vacation_adjustment_days=VALUES(vacation_adjustment_days),vacation_adjustment_year=VALUES(vacation_adjustment_year),updated_by=VALUES(updated_by),updated_at=VALUES(updated_at)")->execute([':id'=>$userId,':daily'=>$dailyMinutes,':annual'=>$annual,':carryover'=>$carryover,':weekly'=>$weeklyMinutes,':wage'=>$hourlyWage,':region'=>$holidayRegion,':balance_adjustment'=>$balanceAdjustment,':balance_year'=>$balanceAdjustmentYear,':balance_target'=>$balanceTarget,':balance_target_year'=>$balanceTargetYear,':vacation_adjustment'=>$vacationAdjustment,':vacation_year'=>$vacationAdjustmentYear,':actor'=>(int)$actor['id'],':updated'=>$now]);
     ttAudit($actor, 'employee_settings_save', 'user_settings', $userId, $before, ['target_minutes_per_day'=>$dailyMinutes,'annual_leave_days'=>$annual,'carryover_leave_days'=>$carryover,'contractual_minutes_per_week'=>$weeklyMinutes,'hourly_wage'=>$hourlyWage,'holiday_region'=>$holidayRegion,'balance_adjustment_minutes'=>$balanceAdjustment,'balance_adjustment_year'=>$balanceAdjustmentYear,'vacation_adjustment_days'=>$vacationAdjustment,'vacation_adjustment_year'=>$vacationAdjustmentYear,'time_tracking_enabled'=>$timeTrackingEnabled]);
     apiJson(['ok'=>true,'user_id'=>$userId,'target_minutes_per_day'=>$dailyMinutes,'annual_leave_days'=>$annual,'carryover_leave_days'=>$carryover,'contractual_minutes_per_week'=>$weeklyMinutes,'hourly_wage'=>$hourlyWage,'holiday_region'=>$holidayRegion,'time_tracking_enabled'=>$timeTrackingEnabled]);
 }
