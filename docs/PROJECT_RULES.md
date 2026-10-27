@@ -2,7 +2,7 @@
 
 ## Verbindlicher Master
 
-`Chris-GD13/sv-netzwerk` auf `main` ist die einzige technische Quelle der Wahrheit. Produktiver Code, Inhalte, Workflows und Projektdokumentation werden dort versioniert. Lokale oder serverseitige Dateien ohne Repository-Bezug gelten nicht als freigegebener Stand.
+Für produktiven Quellcode, Deployments und versionierte technische Projektdokumentation ist `Chris-GD13/sv-netzwerk` auf `main` maßgeblich. Für operative Arbeitsgrundlagen und die Datei `Neuerungen` ist nach der bestätigten Migration ausschließlich die geschützte IONOS-Fassung führend. Google Drive ist deren Backup. Bis die Migration samt Rückleseprüfung abgeschlossen ist, bleibt die vorhandene Google-Drive-Fassung die unveränderte Ausgangsquelle; keine nicht verifizierte IONOS-Fassung als führend behaupten.
 
 ## Rollen
 
