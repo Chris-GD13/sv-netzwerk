@@ -31,7 +31,7 @@ jobs:
           install -d -m 700 "$HOME/.ssh"
           printf '%s\n' "$PORTAL_SSH_KEY" > "$HOME/.ssh/portal_key"
           chmod 600 "$HOME/.ssh/portal_key"
-          ssh-keyscan -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_HOST" >> "$HOME/.ssh/known_hosts" 2>/dev/null
+          ssh-keyscan -4 -T 10 -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_HOST" >> "$HOME/.ssh/known_hosts" 2>/dev/null
           ssh -o BatchMode=yes -o IdentitiesOnly=yes -i "$HOME/.ssh/portal_key" -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_USERNAME@$PORTAL_SFTP_HOST" 'id; printf "shell=%s\n" "$SHELL"; pwd; command -v php; command -v curl; command -v sha256sum'
 
       - name: Synchronisationsskript erstellen
