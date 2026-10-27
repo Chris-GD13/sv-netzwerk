@@ -31,6 +31,8 @@ jobs:
           install -d -m 700 "$HOME/.ssh"
           printf '%s\n' "$PORTAL_SSH_KEY" > "$HOME/.ssh/portal_key"
           chmod 600 "$HOME/.ssh/portal_key"
+          ssh-keygen -y -f "$HOME/.ssh/portal_key" > "$HOME/.ssh/portal_key.pub"
+          echo "SSH key parsed successfully"
           ssh-keyscan -4 -T 10 -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_HOST" >> "$HOME/.ssh/known_hosts" 2>/dev/null
           set +e
           ssh -vvv -o BatchMode=yes -o ConnectTimeout=15 -o IdentitiesOnly=yes -i "$HOME/.ssh/portal_key" -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_USERNAME@$PORTAL_SFTP_HOST" 'id; printf "shell=%s\n" "$SHELL"; pwd; command -v php; command -v curl; command -v sha256sum' 2>&1
