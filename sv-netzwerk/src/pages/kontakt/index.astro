@@ -9,14 +9,14 @@ const error = Astro.url.searchParams.get('fehler');
 
 <BaseLayout
   title="Kontakt"
-  description="Kontaktformular für Schadenfälle, Rückfragen und Beauftragungen beim SV-Netzwerk."
+  description="Kontakt zu SV-Netzwerk für Schadenfälle, Beauftragungen und die Zusammenarbeit mit Sachverständigen."
   breadcrumbs={[{ label: 'Start', href: '/' }, { label: 'Kontakt' }]}
 >
   <Hero
     compact
     eyebrow="Kontakt"
-    title="Schadenfall oder Projektanfrage einreichen."
-    text="Nutzen Sie das Kontaktformular für eine strukturierte Erstaufnahme. Wir prüfen Ihr Anliegen und melden uns zeitnah zurück."
+    title="Kontaktieren Sie das SV-Netzwerk."
+    text="Ob Schadenfall, Beauftragung oder Interesse an einer Zusammenarbeit als Sachverständiger: Schreiben Sie uns. Wir melden uns bei Ihnen."
   />
 
   <section class="sv-section">
@@ -32,6 +32,7 @@ const error = Astro.url.searchParams.get('fehler');
 
       <article class="sv-card form-card">
         <h2>Kontaktformular</h2>
+        <p>Sie möchten als Sachverständiger mit uns zusammenarbeiten? Nennen Sie im Formular Ihr Fachgebiet und Ihre Einsatzregion. <a href="/sachverstaendige-werden/">Mehr zur Zusammenarbeit</a>.</p>
         {sent && <p class="status success">Ihre Anfrage wurde erfolgreich übermittelt. Sie erhalten zusätzlich eine Eingangsbestätigung per E-Mail.</p>}
         {error && <p class="status error">Die Anfrage konnte nicht verarbeitet werden. Bitte prüfen Sie die Eingaben und senden Sie erneut.</p>}
         <form action="/anfrage.php" method="post" accept-charset="UTF-8">
