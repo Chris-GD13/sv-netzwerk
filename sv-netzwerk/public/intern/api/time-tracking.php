@@ -17,6 +17,7 @@ match (true) {
     $method === 'POST' && $action === 'clock_in' => handleClockIn($actor),
     $method === 'POST' && $action === 'clock_out' => handleClockOut($actor),
     $method === 'POST' && $action === 'leave_submit' => handleLeaveSubmit($actor),
+    $method === 'POST' && $action === 'leave_admin_save' => handleAdminLeaveSave($actor),
     $method === 'POST' && $action === 'leave_decide' => handleLeaveDecision($actor),
     $method === 'POST' && $action === 'save_leave_entitlement' => handleSaveLeaveEntitlement($actor),
     $method === 'POST' && $action === 'save_entry' => handleSaveEntry($actor),
@@ -319,6 +320,31 @@ function handleSaveEntry(array $actor): never
 function handleLeaveSubmit(array $actor): never
 {
     $body=requestBody();$pdo=db();$userId=(int)($body['user_id']??$actor['id']);ttEnsureKnownUser($actor,$userId);$type=(string)($body['leave_type']??'urlaub');if(!in_array($type,['urlaub','zeitausgleich','krank','sonderurlaub'],true))apiError(400,'Ungültige Abwesenheitsart.');$from=(string)($body['starts_on']??'');$to=(string)($body['ends_on']??$from);$fromDate=DateTimeImmutable::createFromFormat('!Y-m-d',$from);$toDate=DateTimeImmutable::createFromFormat('!Y-m-d',$to);if(!$fromDate||!$toDate||$toDate<$fromDate)apiError(400,'Gültiger Zeitraum erforderlich.');$hours=max(0,(float)($body['hours']??0));$now=nowUtc();$pdo->prepare('INSERT INTO time_leave_requests (user_id,leave_type,starts_on,ends_on,hours,note,status,source,requested_by,created_at,updated_at) VALUES (:user,:type,:from,:to,:hours,:note,\'pending\',\'portal\',:requester,:created,:updated)')->execute([':user'=>$userId,':type'=>$type,':from'=>$from,':to'=>$to,':hours'=>$hours,':note'=>trim((string)($body['note']??'')),':requester'=>(int)$actor['id'],':created'=>$now,':updated'=>$now]);$id=(int)$pdo->lastInsertId();ttAudit($actor,'leave_submit','leave_request',$id,null,['user_id'=>$userId,'leave_type'=>$type,'starts_on'=>$from,'ends_on'=>$to,'hours'=>$hours]);apiJson(['ok'=>true,'id'=>$id],201);
+}
+
+function handleAdminLeaveSave(array $actor): never
+{
+    $permissions = ttPermissions($actor);
+    if (!$permissions['can_edit_all']) apiError(403, 'Nur Christian darf Abwesenheiten nachtragen.');
+    $body = requestBody();
+    $pdo = db();
+    $userId = (int)($body['user_id'] ?? 0);
+    $user = ttUser($pdo, $userId);
+    if (!$user || ttIdentity($user) === '') apiError(400, 'Mitarbeiter nicht gefunden.');
+    $type = (string)($body['leave_type'] ?? 'urlaub');
+    if (!in_array($type, ['urlaub', 'zeitausgleich', 'krank', 'sonderurlaub'], true)) apiError(400, 'Ungültige Abwesenheitsart.');
+    $from = (string)($body['starts_on'] ?? '');
+    $to = (string)($body['ends_on'] ?? $from);
+    $fromDate = DateTimeImmutable::createFromFormat('!Y-m-d', $from);
+    $toDate = DateTimeImmutable::createFromFormat('!Y-m-d', $to);
+    if (!$fromDate || !$toDate || $toDate < $fromDate) apiError(400, 'Gültiger Zeitraum erforderlich.');
+    $hours = max(0, (float)($body['hours'] ?? 0));
+    $now = nowUtc();
+    $stmt = $pdo->prepare('INSERT INTO time_leave_requests (user_id,leave_type,starts_on,ends_on,hours,note,status,source,requested_by,decided_by,decided_at,created_at,updated_at) VALUES (:user,:type,:from,:to,:hours,:note,\'approved\',\'admin\',:requester,:decider,:decided,:created,:updated)');
+    $stmt->execute([':user'=>$userId, ':type'=>$type, ':from'=>$from, ':to'=>$to, ':hours'=>$hours, ':note'=>trim((string)($body['note'] ?? '')), ':requester'=>(int)$actor['id'], ':decider'=>(int)$actor['id'], ':decided'=>$now, ':created'=>$now, ':updated'=>$now]);
+    $id = (int)$pdo->lastInsertId();
+    ttAudit($actor, 'leave_admin_create', 'leave_request', $id, null, ['user_id'=>$userId, 'leave_type'=>$type, 'starts_on'=>$from, 'ends_on'=>$to, 'hours'=>$hours, 'status'=>'approved']);
+    apiJson(['ok'=>true, 'id'=>$id, 'status'=>'approved'], 201);
 }
 
 function handleLeaveDecision(array $actor): never
