@@ -2,92 +2,20 @@
   "version": 1,
   "timezone": "Europe/Berlin",
   "days": {
-    "2026-10-24": {
-      "publication_id": "2026-10-24-bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten",
+    "2026-10-28": {
+      "publication_id": "2026-10-28-holzfenster-beschichtungen-schadenfall-haftung-schichtaufbau-reparaturgrenzen",
       "article": {
-        "title": "Bauablauf im Schadenfall: Terminplan, Behinderungsanzeige und Stillstandskosten sauber trennen",
-        "slug": "bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten/",
-        "status": "published-verified",
-        "owner": "codex-website-20261024-0600",
-        "reserved_at": "2026-10-24T11:41:25.075Z",
-        "commit": "b8341b587073c22501af58eaca27d36dcba80849",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40092171022",
-        "verified_at": "2026-10-24T12:10:25.201Z"
-      },
-      "linkedin": {
-        "status": "published-verified",
-        "owner": "codex-linkedin-20261024-01a16daf",
-        "reserved_at": "2026-10-24T12:23:28.525Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/bauablauf-schadenfall-terminplan-behinderungsanzeige-stillstandskosten/",
-        "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7519735612388696064/",
-        "verified_at": "2026-10-24T12:25:51.070Z"
-      }
-    },
-    "2026-10-25": {
-      "publication_id": "2026-10-25-luftdichtheitsmessung-gebaeude-messziel-praeparation-leckagebefund",
-      "article": {
-        "title": "Luftdichtheitsmessung am Gebäude: Messziel, Präparation und Leckagebefund sauber trennen",
-        "slug": "luftdichtheitsmessung-gebaeude-messziel-praeparation-leckagebefund",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/luftdichtheitsmessung-gebaeude-messziel-praeparation-leckagebefund/",
-        "status": "published-verified",
-        "owner": "codex-website-20261025-0600",
-        "reserved_at": "2026-10-25T05:04:47.382Z",
-        "commit": "e514123c2800f296c1d788a0164be56a968e3b99",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40164652179",
-        "verified_at": "2026-10-25T05:20:13.908Z"
-      },
-      "linkedin": {
-        "status": "published-verified",
-        "owner": "codex-linkedin-20261025-01a171a2",
-        "reserved_at": "2026-10-25T06:00:17.150Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/luftdichtheitsmessung-gebaeude-messziel-praeparation-leckagebefund/",
-        "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7520001946255167488/",
-        "verified_at": "2026-10-25T06:04:04.112Z"
-      }
-    },
-    "2026-10-26": {
-      "publication_id": "2026-10-26-bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen",
-      "article": {
-        "title": "Bauthermografie am Gebäudeschaden: Temperaturbild, Randbedingungen und Befundgrenzen richtig einordnen",
-        "slug": "bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen/",
-        "status": "published-verified",
-        "owner": "codex-website-20261026-0600",
-        "reserved_at": "2026-10-26T05:01:55.640Z",
-        "commit": "80f4770ff233a711ed18ab59f13d014514b735b3",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40272673449",
-        "verified_at": "2026-10-26T05:14:59.513Z"
-      },
-      "linkedin": {
-        "status": "published-verified",
-        "owner": "codex-linkedin-20261026-01a176cc",
-        "reserved_at": "2026-10-26T06:04:49.640Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/bauthermografie-gebaeudeschaden-temperaturbild-randbedingungen-befundgrenzen/",
-        "permalink": "https://www.linkedin.com/feed/update/urn:li:activity:7520365576859443200/",
-        "verified_at": "2026-10-26T06:08:45.147Z"
-      }
-    },
-    "2026-10-27": {
-      "publication_id": "2026-10-27-schimmelbefall-innenraum-feuchteursache-befund-sanierungsumfang",
-      "article": {
-        "title": "Schimmelbefall im Innenraum: Feuchteursache, Befund und Sanierungsumfang sauber trennen",
-        "slug": "schimmelbefall-innenraum-feuchteursache-befund-sanierungsumfang",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/schimmelbefall-innenraum-feuchteursache-befund-sanierungsumfang/",
-        "status": "published-verified",
-        "owner": "codex-website-20261027-0600",
-        "reserved_at": "2026-10-27T05:03:48.165Z",
-        "commit": "f364ff47479b97862ae6e1dd5c75b42d631fc794",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40454414787",
-        "verified_at": "2026-10-27T05:27:01.468Z"
-      },
-      "linkedin": {
+        "title": "Holzfenster-Beschichtungen im Schadenfall: Haftung, Schichtaufbau und Reparaturgrenzen prüfen",
+        "slug": "holzfenster-beschichtungen-schadenfall-haftung-schichtaufbau-reparaturgrenzen",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/holzfenster-beschichtungen-schadenfall-haftung-schichtaufbau-reparaturgrenzen/",
         "status": "reserved",
-        "owner": "codex-linkedin-20261027-01a17bee",
-        "reserved_at": "2026-10-27T07:27:27.470Z",
-        "article_url": "https://www.sv-netzwerk.eu/fachwissen/schimmelbefall-innenraum-feuchteursache-befund-sanierungsumfang/"
+        "owner": "codex-website-20261028-0600",
+        "reserved_at": "2026-10-28T05:06:55.901Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-27T07:27:27.470Z"
+  "updated_at": "2026-10-28T05:06:55.901Z"
 }
