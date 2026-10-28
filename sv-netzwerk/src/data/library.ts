@@ -14,6 +14,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Holzfenster-Beschichtungen im Schadenfall: Haftung, Schichtaufbau und Reparaturgrenzen prüfen',
+    description: 'Untergrund, Schichtaufbau, Haftung, Holzfeuchte und Reparaturgrenzen bei beschädigten Holzfensterbeschichtungen nachvollziehbar bewerten.',
+    href: '/fachwissen/holzfenster-beschichtungen-schadenfall-haftung-schichtaufbau-reparaturgrenzen/',
+    category: 'Oberflächen und Innenausbau',
+    tags: ['Holzfenster', 'Beschichtung', 'Oberflächenschäden', 'Haftung', 'Holzfeuchte', 'Reparatur', 'Schadenprüfung'],
+    date: '2026-10-28',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Schimmelbefall im Innenraum: Feuchteursache, Befund und Sanierungsumfang sauber trennen',
     description: 'Feuchteursache, sichtbare und verdeckte Befunde, Schutzmaßnahmen, Sanierungsziel und Kosten bei Schimmelbefall nachvollziehbar abgrenzen.',
     href: '/fachwissen/schimmelbefall-innenraum-feuchteursache-befund-sanierungsumfang/',

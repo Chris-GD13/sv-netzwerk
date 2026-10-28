@@ -113,6 +113,8 @@ for (const entry of todayDaily) {
     errors.push(`${entry.file}: Quellenbasis zu schmal (${sourceUrls.length} URLs / ${distinctHosts.size} unterschiedliche Hosts; mindestens 4 belastbare Links aus 3 Quellenbereichen erforderlich).`);
   }
 
+  // Ein fiktives Praxisbeispiel ist seit der verbindlichen Korrektur vom 26.10.2026
+  // kein Pflichtbestandteil mehr. Der Preflight prüft ausschließlich fachliche Konzepte.
   const requiredConcepts = [
     /fachliche\s+einordnung/i,
     /(schadenbild|befund)/i,
@@ -123,12 +125,11 @@ for (const entry of todayDaily) {
     /(fachgrenze|spezialist|fachplaner)/i,
     /(versicherungstechn|deckungszusage|einzelfallprüfung|einzelfallpruefung)/i,
     /(kostenprüfung|kostenpruefung|prüffähig|prueffaehig)/i,
-    /(fiktiv.*praxisbeispiel|praxisbeispiel.*fiktiv)/i,
     /fazit/i,
   ];
   const conceptHits = requiredConcepts.filter((rx) => rx.test(entry.body)).length;
-  if (conceptHits < 10) {
-    errors.push(`${entry.file}: Fachbeitragsstandard nicht vollständig abgebildet (${conceptHits}/11 Pflichtkonzepte erkannt).`);
+  if (conceptHits < 9) {
+    errors.push(`${entry.file}: Fachbeitragsstandard nicht vollständig abgebildet (${conceptHits}/${requiredConcepts.length} Pflichtkonzepte erkannt).`);
   }
 
   if (/^\s*(?:image|imageAlt):.*\.svg/i.test(entry.front) || /assets\/images\/linkedin\/.+\.svg/i.test(entry.front)) {
