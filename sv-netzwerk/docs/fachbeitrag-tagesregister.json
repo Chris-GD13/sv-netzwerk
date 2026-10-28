@@ -8,14 +8,17 @@
         "title": "Holzfenster-Beschichtungen im Schadenfall: Haftung, Schichtaufbau und Reparaturgrenzen prüfen",
         "slug": "holzfenster-beschichtungen-schadenfall-haftung-schichtaufbau-reparaturgrenzen",
         "url": "https://www.sv-netzwerk.eu/fachwissen/holzfenster-beschichtungen-schadenfall-haftung-schichtaufbau-reparaturgrenzen/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-website-20261028-0600",
-        "reserved_at": "2026-10-28T05:06:55.901Z"
+        "reserved_at": "2026-10-28T05:06:55.901Z",
+        "commit": "bd3d10a69c9d9e309316feae2709394ea3ab2d13",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/40637821726",
+        "verified_at": "2026-10-28T05:35:19.727Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-10-28T05:06:55.901Z"
+  "updated_at": "2026-10-28T05:35:19.727Z"
 }
