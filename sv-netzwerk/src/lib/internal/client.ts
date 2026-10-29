@@ -628,7 +628,8 @@ async function redirectAfterLogin() {
       // Ignore invalid return URLs and continue to the standard portal landing page.
     }
   }
-  redirectTo('/intern/tagescockpit/');
+  const isMobileDevice = window.matchMedia('(max-width: 680px)').matches || Boolean(navigator.userAgentData?.mobile) || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  redirectTo(isMobileDevice ? '/intern/zeiterfassung/' : '/intern/tagescockpit/');
 }
 
 function renderLogin(context: AppContext) {
