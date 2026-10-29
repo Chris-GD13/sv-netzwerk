@@ -11,6 +11,6 @@ assert(authorize.includes("['return'=>$returnPath]"), 'OAuth authorization must 
 assert(client.includes("new URLSearchParams(window.location.search).get('return')"), 'Login must read the OAuth return path');
 assert(client.includes("returnUrl.origin === window.location.origin && returnUrl.pathname === '/intern/oauth/authorize.php'"), 'Login may only continue to the same-origin OAuth authorization endpoint');
 assert(client.includes("redirectTo(`${returnUrl.pathname}${returnUrl.search}`)"), 'Successful portal login must resume OAuth authorization');
-assert(client.includes("redirectTo('/intern/tagescockpit/')"), 'Normal portal login must keep its existing destination');
+assert(client.includes("redirectTo(isMobileDevice ? '/intern/zeiterfassung/' : '/intern/tagescockpit/')"), 'Normal portal login must use device-appropriate destination');
 
 console.log('oauth_login_return_test: ok');
