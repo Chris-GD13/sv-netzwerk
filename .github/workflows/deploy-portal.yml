@@ -469,3 +469,4 @@ jobs:
 # Portal deployment trigger: Bridge install/update notice
 # Portal deployment trigger: Bridge notice for all users
 # Portal deployment trigger: mobile login landing
+# Portal deployment trigger: mobile detection compatibility
