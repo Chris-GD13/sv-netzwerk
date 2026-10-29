@@ -1,5 +1,5 @@
 (()=>{
-  const old=document.getElementById('vf-claims-import'),fullButton=document.getElementById('vf-claims-full'),claimInput=document.getElementById('vf-claims-number'),state=document.getElementById('vf-claims-state'),settings=document.getElementById('vf-claims-settings'),download=document.getElementById('vf-claims-download');
+  const old=document.getElementById('vf-claims-import'),fullButton=document.getElementById('vf-claims-full'),claimInput=document.getElementById('vf-claims-number'),state=document.getElementById('vf-claims-state'),settings=document.getElementById('vf-claims-settings'),download=document.getElementById('vf-claims-download'),bridgeHelp=document.getElementById('vf-claims-bridge-help');
   if(!old)return;
   const button=old.cloneNode(true);old.replaceWith(button);
   const claimsCard=button.closest('.vf-claims-import');
@@ -28,7 +28,7 @@
   const mobileClient=typeof navigator!=='undefined'&&(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1));
   const stationId=crypto.randomUUID();
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,stationId,bridgeVersion,workerVersion,protocol:2})});
-  const show=(t,b=false)=>{if(context.claims_agent&&bridgeProblem&&!mobileClient){t=bridgeProblem;b=true;button.disabled=true;if(fullButton)fullButton.disabled=true;}state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
+  const show=(t,b=false)=>{if(context.claims_agent&&bridgeProblem&&!mobileClient){t=bridgeProblem;b=true;button.disabled=true;if(fullButton)fullButton.disabled=true;}if(bridgeHelp&&/Browser-Brücke|Browser-Bruecke|Bridge/i.test(String(t||'')))bridgeHelp.hidden=false;state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
   const minimumBridgeVersion='1.4.65',currentBridgeVersion='1.4.80';
   const selectedProfile=()=>{
