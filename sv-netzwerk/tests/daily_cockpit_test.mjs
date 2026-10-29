@@ -16,7 +16,7 @@ assert(layout.indexOf("'/intern/tagescockpit/'")<layout.indexOf("'/intern/versic
 assert(cockpit.includes('Tagescockpit Ansichten')&&cockpit.includes('Arbeitsorganisation'),'Die Arbeitsorganisation muss im gemeinsamen Tagescockpit erreichbar sein');
 assert(cockpit.includes('id="dc-reminder-form"')&&cockpit.includes('data-reminder-done')&&cockpit.includes("work-center.php?action=${action}"),'Wiedervorlagen müssen auf der ersten Tagescockpit-Seite vollständig bearbeitbar sein');
 assert(!cockpit.includes('<h2>Systemstatus</h2>'),'Der große Systemstatus darf die erste Tagescockpit-Seite nicht mehr belegen');
-assert(client.includes("redirectTo('/intern/tagescockpit/')"),'Nach erfolgreicher Anmeldung muss das Tagescockpit starten');
+assert(client.includes("redirectTo(isMobileDevice ? '/intern/zeiterfassung/' : '/intern/tagescockpit/')")&&client.includes("matchMedia('(max-width: 680px)"),'Mobile Anmeldung muss die Zeiterfassung öffnen, Desktop das Tagescockpit');
 assert(!client.includes('INACTIVITY_MS')&&!client.includes("reason=inactivity"),'Das Portal darf angemeldete Benutzer nicht wegen Inaktivität automatisch abmelden');
 assert(client.includes("querySelector<HTMLButtonElement>('#header-logout')")&&client.includes('await apiLogout()'),'Die Abmeldung muss weiterhin bewusst über den manuellen Abmeldeknopf erfolgen');
 assert(layout.includes('id="intern-logout"')&&layout.includes("auth.php?action=logout"),'Auch die neue Portalnavigation muss den manuellen Abmeldeknopf behalten');
