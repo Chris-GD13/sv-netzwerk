@@ -464,3 +464,4 @@ jobs:
             rm -f "$headers" "$body"
           done
 # Portal deployment trigger: authenticated work basis
+# Portal deployment trigger: corrected nested portal source paths
