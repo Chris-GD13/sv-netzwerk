@@ -463,5 +463,4 @@ jobs:
             echo "$path: HTTP $status, JSON ohne Redirect"
             rm -f "$headers" "$body"
           done
-
-
+# Portal deployment trigger: authenticated work basis
