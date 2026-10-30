@@ -1,0 +1,23 @@
+name: Monatlicher DATEV-Spesenexport
+
+on:
+  schedule:
+    - cron: '55 22 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: DATEV-Spesenexport auslösen
+        env:
+          CRON_TOKEN: ${{ secrets.APP_SECRET }}
+        run: |
+          test -n "$CRON_TOKEN"
+          curl --fail --silent --show-error --request POST \
+            --header "X-SPESEN-CRON: $CRON_TOKEN" \
+            --header "Accept: application/json" \
+            "https://www.sv-netzwerk.eu/intern/api/spesen.php?action=monthly_export"
