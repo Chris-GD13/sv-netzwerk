@@ -18,9 +18,6 @@ $cronToken = trim((string)($_SERVER['HTTP_X_SPESEN_CRON'] ?? ''));
 $configuredCronToken = env('SPESEN_CRON_TOKEN', env('APP_SECRET', ''));
 $isCron = $action === 'monthly_export' && $method === 'POST' && $cronToken !== '' && $configuredCronToken !== '' && hash_equals($configuredCronToken, $cronToken);
 $actor = $isCron ? ['id'=>0,'email'=>'','full_name'=>'Spesen-Automatik','role'=>'administrator','is_active'=>1] : requireAuth();
-if (!$isCron && strcasecmp((string)($actor['email'] ?? ''), env('SPESEN_OWNER_EMAIL', 'cw@sv-schuett.eu')) !== 0) {
-    apiError(404, 'Unbekannter Spesen-Endpunkt.');
-}
 
 match (true) {
     $method === 'GET' && $action === 'access' => handleSpesenAccess($actor),
