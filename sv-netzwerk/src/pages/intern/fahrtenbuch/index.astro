@@ -1,0 +1,42 @@
+---
+import InternalLayout from '../../../layouts/InternalLayout.astro';
+---
+
+<InternalLayout title="Fahrtenbuch" description="Mobiles Fahrtenbuch für Womo und GLE/VLE." currentPath="/intern/fahrtenbuch/">
+  <section class="fb-shell">
+    <header class="fb-head">
+      <div>
+        <p class="fb-kicker">SV-Netzwerk</p>
+        <h1>Fahrtenbuch</h1>
+        <p>Womo GD-SC 137 · GLE / VLE GD-CW 137E</p>
+      </div>
+      <a class="fb-open" href="https://fahrtenbuch-mb-portal.netzwerk-5149.chatgpt.site/" target="_blank" rel="noopener noreferrer">In neuem Fenster öffnen</a>
+    </header>
+    <div class="fb-frame-wrap">
+      <iframe
+        title="Mercedes Fahrtenbuch"
+        src="https://fahrtenbuch-mb-portal.netzwerk-5149.chatgpt.site/"
+        loading="eager"
+        referrerpolicy="strict-origin-when-cross-origin"
+      ></iframe>
+    </div>
+  </section>
+</InternalLayout>
+
+<style is:global>
+  .fb-shell { min-height: calc(100vh - 112px); padding: 22px; box-sizing: border-box; background: #f4f5f6; color: #17324a; }
+  .fb-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+  .fb-kicker { margin: 0; color: #f59a23; font-weight: 800; }
+  .fb-head h1 { margin: 3px 0; }
+  .fb-head p:last-child { margin: 0; color: #647789; }
+  .fb-open { display: inline-flex; align-items: center; min-height: 42px; padding: 0 14px; border-radius: 4px; background: #17324a; color: #fff; text-decoration: none; font-weight: 800; }
+  .fb-open:hover, .fb-open:focus-visible { background: #0d263c; }
+  .fb-frame-wrap { min-height: calc(100vh - 214px); overflow: hidden; border: 1px solid #d5dde3; border-radius: 6px; background: #fff; box-shadow: 0 5px 18px rgba(23,50,74,.08); }
+  .fb-frame-wrap iframe { display: block; width: 100%; height: calc(100vh - 214px); min-height: 760px; border: 0; background: #fff; }
+  @media (max-width: 680px) {
+    .fb-shell { padding: 12px; }
+    .fb-head { align-items: stretch; flex-direction: column; }
+    .fb-open { justify-content: center; }
+    .fb-frame-wrap, .fb-frame-wrap iframe { min-height: calc(100vh - 230px); height: calc(100vh - 230px); }
+  }
+</style>
