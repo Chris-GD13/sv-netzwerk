@@ -41,10 +41,3 @@ if ($user === null) {
     exit();
 }
 
-$requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
-if (is_string($requestPath) && rtrim($requestPath, '/') === '/intern/spesen' && strcasecmp((string)($user['email'] ?? ''), env('SPESEN_OWNER_EMAIL', 'cw@sv-schuett.eu')) !== 0) {
-    http_response_code(404);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo 'Not Found';
-    exit();
-}
