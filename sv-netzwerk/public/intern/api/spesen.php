@@ -61,6 +61,8 @@ function ensureSpesenSchema(): void
         notes TEXT NULL,
         per_diem_full DECIMAL(8,2) NOT NULL DEFAULT 28.00,
         per_diem_partial DECIMAL(8,2) NOT NULL DEFAULT 14.00,
+        overnight_enabled TINYINT(1) NOT NULL DEFAULT 1,
+        overnight_rate DECIMAL(8,2) NOT NULL DEFAULT 20.00,
         mileage_km DECIMAL(10,2) NOT NULL DEFAULT 0,
         mileage_rate DECIMAL(8,3) NOT NULL DEFAULT 0.300,
         meal_breakfast TINYINT(1) NOT NULL DEFAULT 0,
@@ -77,6 +79,8 @@ function ensureSpesenSchema(): void
         KEY idx_spesen_trips_status (status),
         CONSTRAINT fk_spesen_trips_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    try {$pdo->exec('ALTER TABLE spesen_trips ADD COLUMN overnight_enabled TINYINT(1) NOT NULL DEFAULT 1');} catch (Throwable) {}
+    try {$pdo->exec('ALTER TABLE spesen_trips ADD COLUMN overnight_rate DECIMAL(8,2) NOT NULL DEFAULT 20.00');} catch (Throwable) {}
     $pdo->exec("CREATE TABLE IF NOT EXISTS spesen_expenses (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         trip_id BIGINT UNSIGNED NULL,
@@ -246,7 +250,7 @@ function handleSaveTrip(array $actor): never
         ':country'=>strtoupper(preg_match('/^[A-Za-z]{2}$/', (string)($body['country_code']??'DE')) ? (string)$body['country_code'] : 'DE'),
         ':starts'=>$starts, ':ends'=>$ends, ':start_time'=>spesenText($body['start_time']??'',8) ?: null, ':end_time'=>spesenText($body['end_time']??'',8) ?: null,
         ':cost_center'=>spesenText($body['cost_center']??'',120), ':notes'=>spesenText($body['notes']??'',2000),
-        ':full'=>spesenMoney($body['per_diem_full']??28,28), ':partial'=>spesenMoney($body['per_diem_partial']??14,14),
+        ':full'=>spesenMoney($body['per_diem_full']??28,28), ':partial'=>spesenMoney($body['per_diem_partial']??14,14), ':overnight_enabled'=>!empty($body['overnight_enabled'])?1:0, ':overnight_rate'=>spesenMoney($body['overnight_rate']??20,20),
         ':km'=>spesenRate($body['mileage_km']??0,0), ':km_rate'=>spesenRate($body['mileage_rate']??0.30,0.30),
         ':breakfast'=>!empty($body['meal_breakfast'])?1:0, ':lunch'=>!empty($body['meal_lunch'])?1:0, ':dinner'=>!empty($body['meal_dinner'])?1:0,
     ];
@@ -256,10 +260,10 @@ function handleSaveTrip(array $actor): never
         if ((int)$existing['user_id']!==(int)$actor['id'] && !spesenApprover($actor)) apiError(403,'Diese Reise darf nicht geändert werden.');
         if (!spesenApprover($actor) && !in_array($existing['status'],['draft','rejected'],true)) apiError(409,'Eingereichte oder freigegebene Reisen sind gesperrt.');
         $data[':id']=$id;$data[':updated']=$now;
-        $pdo->prepare('UPDATE spesen_trips SET title=:title,purpose=:purpose,origin=:origin,destination=:destination,intermediate_stops=:stops,country_code=:country,starts_on=:starts,ends_on=:ends,start_time=:start_time,end_time=:end_time,cost_center=:cost_center,notes=:notes,per_diem_full=:full,per_diem_partial=:partial,mileage_km=:km,mileage_rate=:km_rate,meal_breakfast=:breakfast,meal_lunch=:lunch,meal_dinner=:dinner,status=IF(status="rejected","draft",status),updated_at=:updated WHERE id=:id')->execute($data);
+        $pdo->prepare('UPDATE spesen_trips SET title=:title,purpose=:purpose,origin=:origin,destination=:destination,intermediate_stops=:stops,country_code=:country,starts_on=:starts,ends_on=:ends,start_time=:start_time,end_time=:end_time,cost_center=:cost_center,notes=:notes,per_diem_full=:full,per_diem_partial=:partial,overnight_enabled=:overnight_enabled,overnight_rate=:overnight_rate,mileage_km=:km,mileage_rate=:km_rate,meal_breakfast=:breakfast,meal_lunch=:lunch,meal_dinner=:dinner,status=IF(status="rejected","draft",status),updated_at=:updated WHERE id=:id')->execute($data);
     } else {
         $data[':user']=(int)$actor['id'];$data[':created']=$now;$data[':updated']=$now;
-        $pdo->prepare('INSERT INTO spesen_trips(user_id,title,purpose,origin,destination,intermediate_stops,country_code,starts_on,ends_on,start_time,end_time,cost_center,notes,per_diem_full,per_diem_partial,mileage_km,mileage_rate,meal_breakfast,meal_lunch,meal_dinner,status,created_at,updated_at) VALUES(:user,:title,:purpose,:origin,:destination,:stops,:country,:starts,:ends,:start_time,:end_time,:cost_center,:notes,:full,:partial,:km,:km_rate,:breakfast,:lunch,:dinner,"draft",:created,:updated)')->execute($data);
+        $pdo->prepare('INSERT INTO spesen_trips(user_id,title,purpose,origin,destination,intermediate_stops,country_code,starts_on,ends_on,start_time,end_time,cost_center,notes,per_diem_full,per_diem_partial,overnight_enabled,overnight_rate,mileage_km,mileage_rate,meal_breakfast,meal_lunch,meal_dinner,status,created_at,updated_at) VALUES(:user,:title,:purpose,:origin,:destination,:stops,:country,:starts,:ends,:start_time,:end_time,:cost_center,:notes,:full,:partial,:overnight_enabled,:overnight_rate,:km,:km_rate,:breakfast,:lunch,:dinner,"draft",:created,:updated)')->execute($data);
         $id=(int)$pdo->lastInsertId();
     }
     apiJson(['ok'=>true,'trip'=>spesenTrip($pdo,$id)]);
@@ -425,7 +429,7 @@ function spesenDatevRows(PDO $pdo, string $from, string $to): array
         $perDiem = (float)$estimate['per_diem'];
         if ($perDiem > 0) $rows[] = $base($trip, 'Tagespauschale', $perDiem, $perDiem, 0, env('SPESEN_ACCOUNT_PER_DIEM', '6664'), max(0, (int)$estimate['days'] - 1));
         $nights = max(0, (int)$estimate['days'] - 1);
-        $overnight = $nights * (float)env('SPESEN_OVERNIGHT_FLAT', '20');
+        $overnight = !empty($trip['overnight_enabled']) ? $nights * (float)($trip['overnight_rate'] ?? env('SPESEN_OVERNIGHT_FLAT', '20')) : 0;
         if ($overnight > 0) $rows[] = $base($trip, 'Übernachtungspauschale', $overnight, $overnight, 0, env('SPESEN_ACCOUNT_OVERNIGHT', '6660'), $nights);
         if ((float)$trip['mileage_km'] > 0) $rows[] = $base($trip, 'Privatfahrzeug', (float)$trip['mileage_km'] * (float)$trip['mileage_rate'], (float)$trip['mileage_km'] * (float)$trip['mileage_rate'], 0, env('SPESEN_ACCOUNT_MILEAGE', '4660'), 0, 0, (float)$trip['mileage_km']);
     }
