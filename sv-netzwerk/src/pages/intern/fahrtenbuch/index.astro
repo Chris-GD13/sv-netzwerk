@@ -13,7 +13,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     <div class="fb-kpis"><div><span>Gefahrene Strecke</span><strong id="fb-km">0 km</strong></div><div><span>Fahrten</span><strong id="fb-count">0</strong></div><div><span>Geschäftlich</span><strong id="fb-biz">0 km</strong></div><div><span>Privat</span><strong id="fb-priv">0 km</strong></div></div>
     <div class="fb-grid">
       <section class="fb-card"><div class="fb-title"><h2>Fahrten</h2><div class="fb-title-tools"><select id="fb-year-filter" class="fb-year-filter"><option value="all">Alle Jahre</option></select><button id="fb-export-pdf" class="fb-btn small">PDF exportieren</button><span id="fb-vehicle-label"></span></div></div><div class="fb-table-wrap"><table><thead><tr><th>Datum</th><th>Start / Ziel</th><th>km</th><th>Odometer</th><th>Typ</th><th>Anlass</th></tr></thead><tbody id="fb-rows"></tbody></table></div></section>
-      <section class="fb-card"><div class="fb-title"><h2>Outlook-Termine</h2><div><button id="fb-import-all" class="fb-btn small">Alle mit Adresse übernehmen</button><button id="fb-home" class="fb-btn small">Heimatadresse</button></div></div><div id="fb-events" class="fb-events">Noch keine Termine geladen.</div></section>
+      <section class="fb-card"><div class="fb-title"><h2>Outlook-Termine</h2><div><button id="fb-import-all" type="button" class="fb-btn small">Alle mit Adresse übernehmen</button><button id="fb-home" class="fb-btn small">Heimatadresse</button></div></div><div id="fb-events" class="fb-events">Noch keine Termine geladen.</div></section>
     </div>
   </section>
 
@@ -88,14 +88,15 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   async function importEventGroups(groups){
     const all=groups.flat(),valid=all.filter(hasAddress);
     if(!valid.length){setState('Keine Termine mit Adresse übernommen.','bad');return}
-    const prepared=[];let skipped=0,discarded=all.length-valid.length;
-    for(const group of groups){
+    const prepared=[];let skipped=0,discarded=all.length-valid.length,failed=0;
+    for(const [groupIndex,group] of groups.entries()){
+      setState(`Tagesfahrt ${groupIndex+1} von ${groups.length} wird berechnet …`);
       const usable=group.filter(hasAddress);if(!usable.length)continue;
       const sourceKey=importedKey(usable);if(trips.some(t=>t.sourceKey===sourceKey)){skipped++;continue}
       const ordered=usable.slice().sort((a,b)=>String(a.start||a.date).localeCompare(String(b.start||b.date)));
       const stops=[];for(const e of ordered){const a=cleanAddress(e.location);if(a&&!stops.includes(a))stops.push(a)}
       if(!stops.length)continue;
-      const routeResult=await calculateRoute(stops);if(!routeResult||routeResult.km<=0){discarded+=usable.length;continue}
+      const routeResult=await calculateRoute(stops);if(!routeResult||routeResult.km<=0){failed++;discarded+=usable.length;continue}
       const km=Number(routeResult.km.toFixed(1));
       const route=[home,...routeResult.addresses,home].join(' → ');
       const vacation=ordered.some(e=>/urlaub|ferien/i.test((e.subject||'')+' '+(e.location||'')));
@@ -108,7 +109,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     for(let i=prepared.length-1;i>=0;i--){const item=prepared[i];const odoEnd=cursor===null?null:Number(cursor.toFixed(1));const odoStart=cursor===null?null:Number((cursor-item.km).toFixed(1));created.push({...item,odoStart,odoEnd});if(odoStart!==null)cursor=odoStart;}
     const stamp=Date.now();created.reverse().forEach((item,i)=>trips.push({id:'outlook-'+stamp+'-'+i,sourceKey:item.sourceKey,sourceEventIds:item.ordered.map(e=>e.id),vehicle:selected,date:item.ordered[0].date,start:item.ordered[0].start,route:item.route,km:item.km,odoStart:item.odoStart,odoEnd:item.odoEnd,type:item.type,reason:item.ordered.map(e=>e.subject).join(' · ')}));
     if(cursor!==null)odometers[selected]=cursor;
-    try{await save();render();setState(prepared.length+' Tagesfahrten dauerhaft übernommen'+(discarded?' · '+discarded+' Termine ohne Adresse verworfen':'')+(skipped?' · '+skipped+' bereits vorhanden übersprungen':'')+'.','ok');}
+    try{await save();render();setState(prepared.length+' Tagesfahrten dauerhaft übernommen'+(discarded?' · '+discarded+' Termine ohne Adresse verworfen':'')+(failed?' · '+failed+' Tagesfahrten konnten nicht berechnet werden':'')+(skipped?' · '+skipped+' bereits vorhanden übersprungen':'')+'.',failed?'bad':'ok');}
     catch(error){render();setState(error.message||'Import lokal gespeichert, aber nicht dauerhaft bestätigt.','bad');}
   }
   async function loadOutlook(){const year=$('#fb-year').value,month=$('#fb-month').value,start=year+'-'+month+'-01';setState('Outlook wird über das SV-Portal abgefragt …');const begin=new Date(start+'T12:00:00');const end=new Date();const all=[];for(let d=new Date(begin);d<end;d.setDate(d.getDate()+7)){const response=await fetch('/intern/api/outlook-case-calendar.php?action=list&start='+encodeURIComponent(d.toISOString().slice(0,10)),{credentials:'same-origin'});const data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)throw new Error(data.error||'Outlook-Kalender konnte nicht geladen werden.');for(const event of(data.events||[])){const id=event.id||event.subject+'|'+event.start;if(!all.some(x=>x.id===id))all.push({id,subject:event.subject||'(Ohne Titel)',location:cleanAddress(event.location),date:(event.start||'').slice(0,10),start:event.start||''});}}events=all.filter(hasAddress);const removed=all.length-events.length;renderEvents();setState(events.length+' Outlook-Termine geladen. Mit „Alle mit Adresse übernehmen“ einmalig bestätigen.'+(removed?' '+removed+' Termine ohne Adresse wurden ausgeblendet.':''),'ok');}
