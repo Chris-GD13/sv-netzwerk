@@ -107,7 +107,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
       if(trips.some(t=>t.sourceEventIds?.includes(event.id)||t.sourceKey===sourceKey)){skipped++;continue}
       const address=cleanAddress(event.location);let km=0;let route=home+' → '+address+' → '+home;let calculationNote='';
       const routeResult=await calculateRoute([address]);
-      if(routeResult&&routeResult.km>0){km=Number(routeResult.km.toFixed(1));route=[home,...routeResult.addresses,home].join(' → ')}else{failed++;discarded++;calculationNote=' · Kilometer konnten nicht berechnet werden'}
+      if(routeResult&&routeResult.km>0){km=Number(routeResult.km.toFixed(1));route=[home,...routeResult.addresses,home].join(' → ')}else{failed++;calculationNote=' · Kilometer noch offen'}
       const vacation=/urlaub|ferien/i.test((event.subject||'')+' '+(event.location||''));
       prepared.push({sourceKey,ordered:[event],route,km,type:vacation?'Privat':'Geschäftlich',calculationNote});
     }
