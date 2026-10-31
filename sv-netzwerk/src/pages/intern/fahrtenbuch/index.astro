@@ -87,19 +87,15 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   const importedKey=group=>selected+'|'+group.map(e=>e.id).sort().join(',');
   function renderEvents(){if(!events.length){$('#fb-events').textContent='Keine Outlook-Termine mit Adresse gefunden.';return}$('#fb-events').innerHTML=events.map(e=>'<div class="fb-event"><strong>'+esc(e.subject)+'</strong><small>'+esc(e.date)+' · '+esc(e.location)+'</small></div>').join('');}
   async function importEventGroups(groups){
-    const prepared=[];let skipped=0,missing=0,failed=0;
-    for(const [index,group] of groups.entries()){
+    const prepared=[];let skipped=0,failed=0,discarded=0;const validGroups=groups.filter(group=>group[0]&&hasAddress(group[0]));
+    for(const [index,group] of validGroups.entries()){
       const event=group[0];if(!event)continue;
-      setState(`Termin ${index+1} von ${groups.length} wird übernommen …`);
+      setState(`Termin ${index+1} von ${validGroups.length} wird übernommen …`);
       const sourceKey=importedKey(group);
       if(trips.some(t=>t.sourceEventIds?.includes(event.id)||t.sourceKey===sourceKey)){skipped++;continue}
-      const address=cleanAddress(event.location);
-      let km=0;let route=address?[home+' → '+address+' → '+home]:((event.subject||'(Ohne Titel)')+' · keine Adresse');
-      let calculationNote='';
-      if(hasAddress(event)){
-        const routeResult=await calculateRoute([address]);
-        if(routeResult&&routeResult.km>0){km=Number(routeResult.km.toFixed(1));route=[home,...routeResult.addresses,home].join(' → ')}else{failed++;calculationNote=' · Kilometer konnten nicht berechnet werden'}
-      }else{missing++;calculationNote=' · keine Adresse vorhanden'}
+      const address=cleanAddress(event.location);let km=0;let route=home+' → '+address+' → '+home;let calculationNote='';
+      const routeResult=await calculateRoute([address]);
+      if(routeResult&&routeResult.km>0){km=Number(routeResult.km.toFixed(1));route=[home,...routeResult.addresses,home].join(' → ')}else{failed++;discarded++;calculationNote=' · Kilometer konnten nicht berechnet werden'}
       const vacation=/urlaub|ferien/i.test((event.subject||'')+' '+(event.location||''));
       prepared.push({sourceKey,ordered:[event],route,km,type:vacation?'Privat':'Geschäftlich',calculationNote});
     }
@@ -109,7 +105,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     for(let i=prepared.length-1;i>=0;i--){const item=prepared[i];const odoEnd=cursor===null?null:Number(cursor.toFixed(1));const odoStart=cursor===null?null:Number((cursor-item.km).toFixed(1));created.push({...item,odoStart,odoEnd});if(odoStart!==null)cursor=odoStart}
     const stamp=Date.now();created.reverse().forEach((item,i)=>{const e=item.ordered[0];trips.push({id:'outlook-'+stamp+'-'+i,sourceKey:item.sourceKey,sourceEventIds:[e.id],vehicle:selected,date:e.date,start:e.start,route:item.route,km:item.km,odoStart:item.odoStart,odoEnd:item.odoEnd,type:item.type,reason:(e.subject||'(Ohne Titel)')+item.calculationNote})});
     if(cursor!==null)odometers[selected]=cursor;
-    try{await save();render();setState(prepared.length+' Outlook-Termine dauerhaft übernommen'+(missing?' · '+missing+' ohne Adresse':'')+(failed?' · '+failed+' ohne berechenbare Kilometer':'')+(skipped?' · '+skipped+' bereits vorhanden übersprungen':'')+'.',(missing||failed)?'bad':'ok');}
+    try{await save();render();setState(prepared.length+' Outlook-Termine dauerhaft übernommen'+(discarded?' · '+discarded+' wegen nicht berechenbarer Kilometer verworfen':'')+(skipped?' · '+skipped+' bereits vorhanden übersprungen':'')+'.',discarded?'bad':'ok');}
     catch(error){render();setState(error.message||'Import lokal gespeichert, aber nicht dauerhaft bestätigt.','bad')}
   }
   let wakeLock=null;
@@ -131,7 +127,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
         for(const event of(data.events||[])){const id=event.id||event.subject+'|'+event.start;if(!all.some(x=>x.id===id))all.push({id,subject:event.subject||'(Ohne Titel)',location:cleanAddress(event.location),date:(event.start||'').slice(0,10),start:event.start||''});}
         setState(year+' · '+all.length+' Termine gelesen …');
       }
-      events=all;renderEvents();setState(year+' · '+events.length+' Termine geladen. Jeder Termin wird jetzt dauerhaft übernommen …','ok');await importEventGroups(events.map(event=>[event]));
+      events=all.filter(hasAddress);const removed=all.length-events.length;renderEvents();setState(year+' · '+events.length+' Termine mit Adresse geladen. Übernahme läuft …','ok');await importEventGroups(events.map(event=>[event]));if(removed)setState($('#fb-state').textContent+' · '+removed+' Termine ohne Adresse verworfen','ok');
     }finally{await releaseAwake()}
   }
 
