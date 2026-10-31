@@ -34,7 +34,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   let trips=JSON.parse(localStorage.getItem(key)||'null'); if(!Array.isArray(trips)) trips=seed;
   const $=s=>document.querySelector(s); const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let remoteReady=false; let saveQueue=Promise.resolve();
-  const snapshot=()=>({trips,odometers,home});
+  const snapshot=()=>({trips,odometers,home,events});
   const save=()=>{
     localStorage.setItem(key,JSON.stringify(trips));
     localStorage.setItem('svnet-fahrtenbuch-odometers',JSON.stringify(odometers));
@@ -61,6 +61,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
           trips=[...merged.values()];
         }
         if(payload.data.odometers&&typeof payload.data.odometers==='object')odometers={...odometers,...payload.data.odometers};
+        if(Array.isArray(payload.data.events)&&payload.data.events.length)events=payload.data.events;
         if(typeof payload.data.home==='string'&&payload.data.home.trim())home=payload.data.home;
       }
       remoteReady=true;
@@ -86,31 +87,30 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
   const importedKey=group=>selected+'|'+group.map(e=>e.id).sort().join(',');
   function renderEvents(){if(!events.length){$('#fb-events').textContent='Keine Outlook-Termine mit Adresse gefunden.';return}$('#fb-events').innerHTML=events.map(e=>'<div class="fb-event"><strong>'+esc(e.subject)+'</strong><small>'+esc(e.date)+' · '+esc(e.location)+'</small></div>').join('');}
   async function importEventGroups(groups){
-    const all=groups.flat(),valid=all.filter(hasAddress);
-    if(!valid.length){setState('Keine Termine mit Adresse übernommen.','bad');return}
-    const prepared=[];let skipped=0,discarded=all.length-valid.length,failed=0;
-    for(const [groupIndex,group] of groups.entries()){
-      setState(`Tagesfahrt ${groupIndex+1} von ${groups.length} wird berechnet …`);
-      const usable=group.filter(hasAddress);if(!usable.length)continue;
-      const sourceKey=importedKey(usable);if(trips.some(t=>t.sourceKey===sourceKey)){skipped++;continue}
-      const ordered=usable.slice().sort((a,b)=>String(a.start||a.date).localeCompare(String(b.start||b.date)));
-      const stops=[];for(const e of ordered){const a=cleanAddress(e.location);if(a&&!stops.includes(a))stops.push(a)}
-      if(!stops.length)continue;
-      const routeResult=await calculateRoute(stops);if(!routeResult||routeResult.km<=0){failed++;discarded+=usable.length;continue}
-      const km=Number(routeResult.km.toFixed(1));
-      const route=[home,...routeResult.addresses,home].join(' → ');
-      const vacation=ordered.some(e=>/urlaub|ferien/i.test((e.subject||'')+' '+(e.location||'')));
-      prepared.push({sourceKey,ordered,route,km,type:vacation?'Privat':'Geschäftlich'});
+    const prepared=[];let skipped=0,missing=0,failed=0;
+    for(const [index,group] of groups.entries()){
+      const event=group[0];if(!event)continue;
+      setState(`Termin ${index+1} von ${groups.length} wird übernommen …`);
+      const sourceKey=importedKey(group);
+      if(trips.some(t=>t.sourceEventIds?.includes(event.id)||t.sourceKey===sourceKey)){skipped++;continue}
+      const address=cleanAddress(event.location);
+      let km=0;let route=address?[home+' → '+address+' → '+home]:((event.subject||'(Ohne Titel)')+' · keine Adresse');
+      let calculationNote='';
+      if(hasAddress(event)){
+        const routeResult=await calculateRoute([address]);
+        if(routeResult&&routeResult.km>0){km=Number(routeResult.km.toFixed(1));route=[home,...routeResult.addresses,home].join(' → ')}else{failed++;calculationNote=' · Kilometer konnten nicht berechnet werden'}
+      }else{missing++;calculationNote=' · keine Adresse vorhanden'}
+      const vacation=/urlaub|ferien/i.test((event.subject||'')+' '+(event.location||''));
+      prepared.push({sourceKey,ordered:[event],route,km,type:vacation?'Privat':'Geschäftlich',calculationNote});
     }
-    if(!prepared.length){setState('Keine neuen Outlook-Termine zur Übernahme vorhanden.','ok');return}
-    // Rückwärts rechnen: Der aktuelle km-Stand ist der Endstand der jüngsten Fahrt.
+    if(!prepared.length){setState('Keine neuen Outlook-Termine vorhanden. Bereits gespeicherte Termine wurden nicht doppelt übernommen.','ok');return}
     prepared.sort((a,b)=>String(a.ordered[0].date).localeCompare(String(b.ordered[0].date)));
     let cursor=Number(odometers[selected]||0)||null;const created=[];
-    for(let i=prepared.length-1;i>=0;i--){const item=prepared[i];const odoEnd=cursor===null?null:Number(cursor.toFixed(1));const odoStart=cursor===null?null:Number((cursor-item.km).toFixed(1));created.push({...item,odoStart,odoEnd});if(odoStart!==null)cursor=odoStart;}
-    const stamp=Date.now();created.reverse().forEach((item,i)=>trips.push({id:'outlook-'+stamp+'-'+i,sourceKey:item.sourceKey,sourceEventIds:item.ordered.map(e=>e.id),vehicle:selected,date:item.ordered[0].date,start:item.ordered[0].start,route:item.route,km:item.km,odoStart:item.odoStart,odoEnd:item.odoEnd,type:item.type,reason:item.ordered.map(e=>e.subject).join(' · ')}));
+    for(let i=prepared.length-1;i>=0;i--){const item=prepared[i];const odoEnd=cursor===null?null:Number(cursor.toFixed(1));const odoStart=cursor===null?null:Number((cursor-item.km).toFixed(1));created.push({...item,odoStart,odoEnd});if(odoStart!==null)cursor=odoStart}
+    const stamp=Date.now();created.reverse().forEach((item,i)=>{const e=item.ordered[0];trips.push({id:'outlook-'+stamp+'-'+i,sourceKey:item.sourceKey,sourceEventIds:[e.id],vehicle:selected,date:e.date,start:e.start,route:item.route,km:item.km,odoStart:item.odoStart,odoEnd:item.odoEnd,type:item.type,reason:(e.subject||'(Ohne Titel)')+item.calculationNote})});
     if(cursor!==null)odometers[selected]=cursor;
-    try{await save();render();setState(prepared.length+' Tagesfahrten dauerhaft übernommen'+(discarded?' · '+discarded+' Termine ohne Adresse verworfen':'')+(failed?' · '+failed+' Tagesfahrten konnten nicht berechnet werden':'')+(skipped?' · '+skipped+' bereits vorhanden übersprungen':'')+'.',failed?'bad':'ok');}
-    catch(error){render();setState(error.message||'Import lokal gespeichert, aber nicht dauerhaft bestätigt.','bad');}
+    try{await save();render();setState(prepared.length+' Outlook-Termine dauerhaft übernommen'+(missing?' · '+missing+' ohne Adresse':'')+(failed?' · '+failed+' ohne berechenbare Kilometer':'')+(skipped?' · '+skipped+' bereits vorhanden übersprungen':'')+'.',(missing||failed)?'bad':'ok');}
+    catch(error){render();setState(error.message||'Import lokal gespeichert, aber nicht dauerhaft bestätigt.','bad')}
   }
   let wakeLock=null;
   async function keepAwake(){try{if('wakeLock' in navigator)wakeLock=await navigator.wakeLock.request('screen')}catch(_){}}
@@ -131,10 +131,10 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
         for(const event of(data.events||[])){const id=event.id||event.subject+'|'+event.start;if(!all.some(x=>x.id===id))all.push({id,subject:event.subject||'(Ohne Titel)',location:cleanAddress(event.location),date:(event.start||'').slice(0,10),start:event.start||''});}
         setState(year+' · '+all.length+' Termine gelesen …');
       }
-      events=all.filter(hasAddress);const removed=all.length-events.length;renderEvents();setState(year+' · '+events.length+' Termine geladen. Kilometer werden jetzt berechnet …','ok');await importEventGroups(groupByDay(events));if(removed)setState($('#fb-state').textContent+' · '+removed+' Termine ohne Adresse ausgeblendet','ok');
+      events=all;renderEvents();setState(year+' · '+events.length+' Termine geladen. Jeder Termin wird jetzt dauerhaft übernommen …','ok');await importEventGroups(events.map(event=>[event]));
     }finally{await releaseAwake()}
   }
 
-  $('#fb-import-all').onclick=async()=>{if(!events.length){setState('Bitte zuerst Outlook-Termine laden.','bad');return}const button=$('#fb-import-all');button.disabled=true;try{setState('Alle Outlook-Termine werden berechnet und übernommen …');await importEventGroups(groupByDay(events));}catch(e){setState(e.message||'Import konnte nicht abgeschlossen werden.','bad')}finally{button.disabled=false}}; $('#fb-year-filter').onchange=render; $('#fb-export-pdf').onclick=exportPdf; $('#fb-odo-save').onclick=()=>{const value=Number($('#fb-odo').value);if(!Number.isFinite(value)||value<0){setState('Bitte einen gültigen km-Stand eingeben.','bad');return}odometers[selected]=Math.round(value);localStorage.setItem('svnet-fahrtenbuch-odometers',JSON.stringify(odometers));save().then(()=>setState('km-Stand dauerhaft gespeichert.','ok')).catch(e=>setState(e.message||'km-Stand konnte nicht dauerhaft gespeichert werden.','bad'));$('#fb-odo-state').textContent=Math.round(value).toLocaleString('de-DE')+' km';setState('km-Stand gespeichert.','ok')}; $('#fb-outlook').onclick=()=>$('#fb-outlook-modal').hidden=false; $('#fb-free').onclick=()=>$('#fb-free-modal').hidden=false; $('#fb-home').onclick=()=>{$('#fb-home-input').value=home;$('#fb-home-modal').hidden=false}; document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$('#'+b.dataset.close).hidden=true); $('#fb-load').onclick=async()=>{try{$('#fb-outlook-modal').hidden=true;await loadOutlook()}catch(e){setState(e.message||'Outlook konnte nicht geladen werden.','bad')}}; $('#fb-home-form').onsubmit=e=>{e.preventDefault();home=$('#fb-home-input').value.trim();localStorage.setItem(homeKey,home);save().then(()=>setState('Heimatadresse dauerhaft gespeichert.','ok')).catch(e=>setState(e.message||'Heimatadresse konnte nicht dauerhaft gespeichert werden.','bad'));$('#fb-home-modal').hidden=true;setState('Heimatadresse gespeichert.','ok')}; $('#fb-form').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);const km=Number(f.get('km')||0); const odoStart=Number(odometers[selected]||0)||null; const odoEnd=odoStart===null?null:odoStart+km; trips.unshift({id:'manual-'+Date.now(),vehicle:selected,date:f.get('date'),route:f.get('route'),km,odoStart,odoEnd,type:f.get('type'),reason:f.get('reason')||''}); if(odoEnd!==null){odometers[selected]=odoEnd;localStorage.setItem('svnet-fahrtenbuch-odometers',JSON.stringify(odometers));}save().then(()=>setState('Freie Fahrt dauerhaft gespeichert.','ok')).catch(e=>setState(e.message||'Freie Fahrt konnte nicht dauerhaft gespeichert werden.','bad'));$('#fb-free-modal').hidden=true;e.target.reset();render();setState('Freie Fahrt gespeichert.','ok')}; render(); loadRemote().then(async()=>{await repairZeroTrips();render();});
+  $('#fb-import-all').onclick=async()=>{if(!events.length){setState('Bitte zuerst ein Kalenderjahr laden.','bad');return}const button=$('#fb-import-all');button.disabled=true;try{setState('Alle Outlook-Termine werden berechnet und übernommen …');await importEventGroups(groupByDay(events));}catch(e){setState(e.message||'Import konnte nicht abgeschlossen werden.','bad')}finally{button.disabled=false}}; $('#fb-year-filter').onchange=render; $('#fb-export-pdf').onclick=exportPdf; $('#fb-odo-save').onclick=()=>{const value=Number($('#fb-odo').value);if(!Number.isFinite(value)||value<0){setState('Bitte einen gültigen km-Stand eingeben.','bad');return}odometers[selected]=Math.round(value);localStorage.setItem('svnet-fahrtenbuch-odometers',JSON.stringify(odometers));save().then(()=>setState('km-Stand dauerhaft gespeichert.','ok')).catch(e=>setState(e.message||'km-Stand konnte nicht dauerhaft gespeichert werden.','bad'));$('#fb-odo-state').textContent=Math.round(value).toLocaleString('de-DE')+' km';setState('km-Stand gespeichert.','ok')}; $('#fb-outlook').onclick=()=>$('#fb-outlook-modal').hidden=false; $('#fb-free').onclick=()=>$('#fb-free-modal').hidden=false; $('#fb-home').onclick=()=>{$('#fb-home-input').value=home;$('#fb-home-modal').hidden=false}; document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$('#'+b.dataset.close).hidden=true); $('#fb-load').onclick=async()=>{try{$('#fb-outlook-modal').hidden=true;await loadOutlook()}catch(e){setState(e.message||'Outlook konnte nicht geladen werden.','bad')}}; $('#fb-home-form').onsubmit=e=>{e.preventDefault();home=$('#fb-home-input').value.trim();localStorage.setItem(homeKey,home);save().then(()=>setState('Heimatadresse dauerhaft gespeichert.','ok')).catch(e=>setState(e.message||'Heimatadresse konnte nicht dauerhaft gespeichert werden.','bad'));$('#fb-home-modal').hidden=true;setState('Heimatadresse gespeichert.','ok')}; $('#fb-form').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);const km=Number(f.get('km')||0); const odoStart=Number(odometers[selected]||0)||null; const odoEnd=odoStart===null?null:odoStart+km; trips.unshift({id:'manual-'+Date.now(),vehicle:selected,date:f.get('date'),route:f.get('route'),km,odoStart,odoEnd,type:f.get('type'),reason:f.get('reason')||''}); if(odoEnd!==null){odometers[selected]=odoEnd;localStorage.setItem('svnet-fahrtenbuch-odometers',JSON.stringify(odometers));}save().then(()=>setState('Freie Fahrt dauerhaft gespeichert.','ok')).catch(e=>setState(e.message||'Freie Fahrt konnte nicht dauerhaft gespeichert werden.','bad'));$('#fb-free-modal').hidden=true;e.target.reset();render();setState('Freie Fahrt gespeichert.','ok')}; render(); loadRemote().then(async()=>{await repairZeroTrips();render();});
 })();
 </script>
