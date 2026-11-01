@@ -14,6 +14,17 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Quooker-Einbau fachlich prüfen: Wasseranschlüsse, Sicherheitsgruppe und Folgeschäden abgrenzen',
+    description: 'Armatur, Reservoir, Sicherheitsgruppe, Ablauf und Stromversorgung beim Quooker-Einbau sowie mögliche Wasserschäden und Kosten fachlich trennen.',
+    href: '/fachwissen/quooker-einbau-wasserschaden-anschluesse-kostenpruefung/',
+    category: 'Gebäudetechnik und Wasserschäden',
+    tags: ['Quooker', 'Kochendwasserarmatur', 'Wasserschaden', 'Kücheninstallation', 'Sicherheitsgruppe', 'Leckage', 'Kostenprüfung'],
+    date: '2026-11-01',
+    publishedAt: '2026-11-01T15:00:00.000Z',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Fotodokumentation im Gebäudeschaden: Befund, Zuordnung und Beweissicherung',
     description: 'Übersichtsaufnahmen, Detailbefund, Lagezuordnung und technische Bewertung im Gebäudeschaden nachvollziehbar verbinden.',
     href: '/fachwissen/haftpflichtbericht-risikobeschreibung-regress-fotodokumentation/',

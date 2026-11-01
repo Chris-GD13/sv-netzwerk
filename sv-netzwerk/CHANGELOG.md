@@ -1,3 +1,10 @@
+## 2026-11-01
+
+- Fachbeitrag „Quooker-Einbau fachlich prüfen: Wasseranschlüsse, Sicherheitsgruppe und Folgeschäden abgrenzen“ ergänzt
+- Einbau, Wasseranschluss, Sicherheitsgruppe, Ablauf, Stromversorgung und Folgeschäden fachlich getrennt beschrieben
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt
+- ohne öffentliches Beitragsbild gemäß Fachbeitragsstandard
+
 ## 2026-10-27 – Schimmelbefall im Innenraum fachlich abgrenzen
 
 - Genau einen Tagesartikel unter atomarer Reservierung vorbereitet: Feuchteursache, sichtbaren und verdeckten Befund, Schutzmaßnahmen, Sanierungsziel und Kostenfolge getrennt bewerten.
