@@ -14,6 +14,17 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Mietschäden am Bodenbelag in der Haftpflicht fachlich abgrenzen',
+    description: 'Einzelereignis, normale Abnutzung und übermäßige Beanspruchung bei Mietschäden an Parkett und anderen Bodenbelägen fachlich trennen.',
+    href: '/fachwissen/mietschaeden-bodenbelag-haftpflicht-abnutzung-uebermaessige-beanspruchung/',
+    category: 'Regulierung und Versicherungsrecht',
+    tags: ['Haftpflichtschaden', 'Mietschaden', 'Bodenbelag', 'Parkett', 'Abnutzung', 'Schadenprüfung', 'Deckungsprüfung'],
+    date: '2026-11-01',
+    publishedAt: '2026-11-01T15:00:00.000Z',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Unterversicherung in der Gebäudeversicherung: Versicherungssumme, Versicherungswert und Schadenabzug trennen',
     description: 'Versicherungssumme, Versicherungswert, Wertänderungen und Unterversicherungsverzicht vor einem Schadenabzug nachvollziehbar prüfen.',
     href: '/fachwissen/unterversicherung-gebaeudeversicherung-versicherungssumme-versicherungswert-schadenabzug/',
