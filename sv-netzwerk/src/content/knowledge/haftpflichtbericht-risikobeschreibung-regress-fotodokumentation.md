@@ -73,7 +73,7 @@ Bundesministerium der Justiz: Bürgerliches Gesetzbuch, §§ 249, 254 und 823, a
 
 Bundesministerium der Justiz: Versicherungsvertragsgesetz, §§ 100 bis 106, abgerufen am 01.11.2026.
 
-Die Regulierer AG: Regionaltreffen 2026, Neuerung Haftpflichtprüfung und Berichtswesen, eingelesen am 29.10.2026.
+Die Regulierer AG: Regionaltreffen 2026, Haftpflichtprüfung und Berichtswesen.
 
 #Haftpflichtbericht
 #Risikobeschreibung
