@@ -62,3 +62,4 @@ Die Handlungsempfehlung muss den nächsten Schritt konkret benennen. Das kann ei
 ## Fazit
 
 Plausibilität, Haftung und Deckung beantworten drei verschiedene Fragen. Wer sie in dieser Reihenfolge prüft, hält technische Feststellung, rechtliche Verantwortlichkeit und Versicherungsumfang sauber auseinander. Das macht den Bericht nachvollziehbar und verhindert vorschnelle Entscheidungen.
+\n## Quellen\n\nBundesministerium der Justiz: Bürgerliches Gesetzbuch, §§ 249, 254 und 823, abgerufen am 01.11.2026.\n\nBundesministerium der Justiz: Versicherungsvertragsgesetz, §§ 100 bis 106, abgerufen am 01.11.2026.\n\nDie Regulierer AG: Regionaltreffen 2026, Neuerung Haftpflichtprüfung und Berichtswesen, eingelesen am 29.10.2026.\n\n#Haftpflichtschaden\n#Plausibilität\n#Haftung\n#Deckung\n#Schadenregulierung\n#Beweissicherung\n
