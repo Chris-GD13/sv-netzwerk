@@ -66,3 +66,4 @@ Auch die Begründung von Kürzungen muss zum tatsächlichen Prüfstand passen. E
 ## Fazit
 
 Ein prüffähiger Haftpflichtbericht verbindet Risiko, Befund, Schadenumfang, Regressprüfung, Kosten und Handlungsempfehlung. Die Fotodokumentation muss erläutert und der gesamte Bericht vor Abgabe gegengelesen werden. So bleibt nachvollziehbar, welche Feststellung zu welcher Entscheidung geführt hat.
+\n## Quellen\n\nBundesministerium der Justiz: Bürgerliches Gesetzbuch, §§ 249, 254 und 823, abgerufen am 01.11.2026.\n\nBundesministerium der Justiz: Versicherungsvertragsgesetz, §§ 100 bis 106, abgerufen am 01.11.2026.\n\nDie Regulierer AG: Regionaltreffen 2026, Neuerung Haftpflichtprüfung und Berichtswesen, eingelesen am 29.10.2026.\n\n#Haftpflichtbericht\n#Risikobeschreibung\n#Regress\n#Doppelversicherung\n#Fotodokumentation\n#Schadenregulierung\n
