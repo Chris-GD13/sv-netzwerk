@@ -1246,6 +1246,16 @@ export const library: LibraryItem[] = [
     date: '2026-07-01',
     type: 'article',
   },
+  {
+    title: 'Estrich nach Leitungswasserschaden fachlich bewerten',
+    description: 'Restfeuchte, Belegreife, Trocknungsziel und Wiederherstellung bei Estrichschäden nachvollziehbar prüfen.',
+    href: '/fachwissen/estrich-leitungswasserschaden-restfeuchte-belegreife-wiederherstellung/',
+    category: 'Leitungswasser',
+    tags: ['Leitungswasser', 'Estrich', 'Restfeuchte', 'Trocknung', 'Wiederherstellung', 'Kostenprüfung'],
+    date: '2026-11-01',
+    type: 'article',
+    featured: false,
+  },
 ];
 
 export const PAGE_SIZE = 6;
