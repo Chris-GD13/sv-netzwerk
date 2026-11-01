@@ -18,7 +18,46 @@
       "linkedin": {
         "status": "not-posted"
       }
+    },
+    "2026-10-29": {
+      "publication_id": "2026-10-29-haftpflichtpruefung-plausibilitaet-haftung-deckung-pruefreihenfolge",
+      "article": {
+        "title": "Haftpflichtschäden prüfen: Plausibilität, Haftung und Deckung in der richtigen Reihenfolge",
+        "slug": "haftpflichtpruefung-plausibilitaet-haftung-deckung-pruefreihenfolge",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/haftpflichtpruefung-plausibilitaet-haftung-deckung-pruefreihenfolge/",
+        "status": "published-pending-live",
+        "owner": "codex-website-2026-10-29-0600"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
+    },
+    "2026-10-30": {
+      "publication_id": "2026-10-30-mietschaden-bodenbelag-einzelereignis-uebermaessige-beanspruchung-abnutzung",
+      "article": {
+        "title": "Mietschäden am Bodenbelag: Einzelereignis, übermäßige Beanspruchung und Abnutzung trennen",
+        "slug": "mietschaden-bodenbelag-einzelereignis-uebermaessige-beanspruchung-abnutzung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/mietschaden-bodenbelag-einzelereignis-uebermaessige-beanspruchung-abnutzung/",
+        "status": "published-pending-live",
+        "owner": "codex-website-2026-10-30-0600"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
+    },
+    "2026-10-31": {
+      "publication_id": "2026-10-31-haftpflichtbericht-risikobeschreibung-regress-fotodokumentation",
+      "article": {
+        "title": "Haftpflichtberichte prüffähig aufbauen: Risikobeschreibung, Regress und Fotodokumentation",
+        "slug": "haftpflichtbericht-risikobeschreibung-regress-fotodokumentation",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/haftpflichtbericht-risikobeschreibung-regress-fotodokumentation/",
+        "status": "published-pending-live",
+        "owner": "codex-website-2026-10-31-0600"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-10-28T05:35:19.727Z"
+  "updated_at": "2026-11-01T08:00:00Z"
 }
