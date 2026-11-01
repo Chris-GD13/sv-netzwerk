@@ -57,7 +57,21 @@
       "linkedin": {
         "status": "not-posted"
       }
+    },
+    "2026-11-01": {
+      "publication_id": "2026-11-01-nachmeldungen-gebaeudeschaden-erstbefund-kausalitaet-schadenabgrenzung",
+      "article": {
+        "title": "Nachmeldungen im Gebäudeschaden: Erstbefund, neue Schäden und Kausalität sauber trennen",
+        "slug": "nachmeldungen-gebaeudeschaden-erstbefund-kausalitaet-schadenabgrenzung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/nachmeldungen-gebaeudeschaden-erstbefund-kausalitaet-schadenabgrenzung/",
+        "status": "reserved",
+        "owner": "codex-website-2026-11-01-0900",
+        "reserved_at": "2026-11-01T08:00:00Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-11-01T08:00:00Z"
+  "updated_at": "2026-11-01T09:00:00Z"
 }
