@@ -1,3 +1,11 @@
+## 2026-11-02
+
+- Fiktiven und vollständig anonymisierten Tagesbeitrag „Brandschäden mit Todesfolge fachlich einordnen: Rauchwarnmelder, Rauchverteilung und Beweissicherung trennen“ ergänzt
+- Rauchwarnmelder, Brandentstehung, Rauchverteilung, Evakuierungsbedingungen und Beweissicherung als getrennte Prüffelder beschrieben
+- Kein realer Fallbezug: keine Namen, Orte, Termine, Aktenzeichen oder individuell erkennbare Merkmale
+- LinkedIn-Begleittext als `prepared-not-posted` abgelegt
+- Ohne öffentliches Beitragsbild gemäß Fachbeitragsstandard
+
 ## 2026-11-01
 
 - Fachbeitrag „Quooker-Einbau fachlich prüfen: Wasseranschlüsse, Sicherheitsgruppe und Folgeschäden abgrenzen“ ergänzt
