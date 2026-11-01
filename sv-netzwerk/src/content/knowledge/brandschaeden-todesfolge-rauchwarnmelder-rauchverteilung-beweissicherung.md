@@ -1,6 +1,6 @@
 ---
 title: "Brandschäden mit Todesfolge fachlich einordnen: Rauchwarnmelder, Rauchverteilung und Beweissicherung trennen"
-description: "Bei schweren Brandschäden müssen Rauchwarnmelder, Brandentstehung, Rauchverteilung, Evakuierungsbedingungen und Beweissicherung getrennt geprüft werden. Dieser fiktive Beitrag zeigt eine sachliche Vorgehensweise."
+description: "Bei schweren Brandschäden müssen Rauchwarnmelder, Brandentstehung, Rauchverteilung, Evakuierungsbedingungen und Beweissicherung getrennt geprüft werden. Der Beitrag zeigt eine sachliche Vorgehensweise."
 category: "Brand und Kontamination"
 tags: ["Brandschaden", "Rauchwarnmelder", "Rauchverteilung", "Brandursache", "Beweissicherung", "Ruß", "Schadenprüfung"]
 author: "christian-waechter"
@@ -8,8 +8,8 @@ featured: false
 dailyStandard: true
 contentLevel: "B"
 publishedAt: "2026-11-02T05:00:00.000Z"
-teaser: "Ein Brand mit Todesfolge verlangt eine besonders klare technische Trennung: Waren Rauchwarnmelder vorhanden und funktionsfähig, wie bewegte sich der Rauch, wo lag der Brandentstehungsbereich und welche Feststellungen sind noch beweissicher? Der Beitrag beschreibt eine fiktive, anonymisierte Prüfsystematik."
-linkedinSummary: "Bei Brandschäden mit Todesfolge müssen Rauchwarnmelder, Brandentstehung, Rauchverteilung, Evakuierungsbedingungen und Beweissicherung getrennt betrachtet werden. Der Beitrag bleibt ausdrücklich fiktiv und anonymisiert. Entscheidend ist, technische Befunde, Kausalitätsfragen, Deckung und Verantwortlichkeit nicht vorschnell miteinander zu vermischen."
+teaser: "Ein Brand mit Todesfolge verlangt eine besonders klare technische Trennung: Waren Rauchwarnmelder vorhanden und funktionsfähig, wie bewegte sich der Rauch, wo lag der Brandentstehungsbereich und welche Feststellungen sind noch beweissicher? Beschrieben wird eine sachliche Prüfsystematik."
+linkedinSummary: "Bei Brandschäden mit Todesfolge müssen Rauchwarnmelder, Brandentstehung, Rauchverteilung, Evakuierungsbedingungen und Beweissicherung getrennt betrachtet werden. Entscheidend ist, technische Befunde, Kausalitätsfragen, Deckung und Verantwortlichkeit nicht vorschnell miteinander zu vermischen."
 cta:
   label: "Brandschäden fachlich und nachvollziehbar prüfen"
   href: "/kontakt/"
