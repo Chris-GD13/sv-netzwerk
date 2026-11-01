@@ -76,3 +76,4 @@ Eine Freigabeempfehlung muss das konkret geprüfte Gewerk, den erforderlichen Um
 ## Fazit
 
 Bei Mietschäden am Bodenbelag entscheidet die Entstehungsart über die weitere Prüfung. Einzelereignis, übermäßige Beanspruchung und normale Abnutzung sind getrennt festzustellen. Erst danach können Haftung, Deckung und erforderliche Wiederherstellung belastbar bewertet werden.
+\n## Quellen\n\nBundesministerium der Justiz: Bürgerliches Gesetzbuch, §§ 249, 254 und 823, abgerufen am 01.11.2026.\n\nBundesministerium der Justiz: Versicherungsvertragsgesetz, §§ 100 bis 106, abgerufen am 01.11.2026.\n\nDie Regulierer AG: Regionaltreffen 2026, Neuerung Haftpflichtprüfung und Berichtswesen, eingelesen am 29.10.2026.\n\n#Mietschaden\n#Bodenbelag\n#Parkett\n#Abnutzung\n#Haftpflichtschaden\n#Kostenprüfung\n
