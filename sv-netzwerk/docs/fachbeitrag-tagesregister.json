@@ -57,7 +57,20 @@
       "linkedin": {
         "status": "not-posted"
       }
+    },
+    "2026-11-01": {
+      "publication_id": "2026-11-01-estrich-leitungswasserschaden-restfeuchte-belegreife-wiederherstellung",
+      "article": {
+        "title": "Estrich nach Leitungswasserschaden: Restfeuchte, Belegreife und Wiederherstellung trennen",
+        "slug": "estrich-leitungswasserschaden-restfeuchte-belegreife-wiederherstellung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/estrich-leitungswasserschaden-restfeuchte-belegreife-wiederherstellung/",
+        "status": "published-pending-live",
+        "owner": "codex-website-20261101-0600"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-11-01T10:00:00Z"
+  "updated_at": "2026-11-01T00:00:00Z"
 }
