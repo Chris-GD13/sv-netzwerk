@@ -19,6 +19,7 @@ publication:
   publishedAt: 2026-11-02
   updatedAt: 2026-11-01
   status: published
+  earlyAccess: true
 seo:
   title: "Brandschäden mit Todesfolge fachlich prüfen"
   description: "Rauchwarnmelder, Rauchverteilung, Brandentstehung und Beweissicherung bei schweren Brandschäden sachlich und getrennt bewerten."

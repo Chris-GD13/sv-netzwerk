@@ -1,4 +1,4 @@
-type PublicationRecord = { status?: string; publishedAt?: Date | string };
+type PublicationRecord = { status?: string; publishedAt?: Date | string; earlyAccess?: boolean };
 type PublicationCarrier = { data: { publication: PublicationRecord } };
 type PublicationCarrierAlt = { publication: PublicationRecord };
 
@@ -36,7 +36,9 @@ export const isKnowledgeItemPublished = (
       ? item.publication
       : item;
   if (!publication || publication.status !== 'published' || !publication.publishedAt) return false;
-  return now.getTime() >= new Date(publicationStartIso(publication.publishedAt)).getTime();
+  const publicationTime = new Date(publicationStartIso(publication.publishedAt)).getTime();
+  const earlyAccessWindow = publication.earlyAccess ? 24 * 60 * 60 * 1000 : 0;
+  return now.getTime() >= publicationTime - earlyAccessWindow;
 };
 
 export const filterPublishedKnowledgeItems = <T extends PublicationCarrier>(

@@ -15,6 +15,7 @@ const publicationSchema = z.object({
   publishedAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   status: z.enum(['draft', 'review', 'published', 'archived']).default('draft'),
+  earlyAccess: z.boolean().default(false),
 }).superRefine((value, ctx) => {
   if (value.status === 'published' && !value.publishedAt) {
     ctx.addIssue({
