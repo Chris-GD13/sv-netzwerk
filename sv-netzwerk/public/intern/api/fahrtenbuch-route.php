@@ -19,10 +19,6 @@ $geocodeCacheFile=sys_get_temp_dir().'/svnet-fahrtenbuch-geocode-cache.json';
 function geocodeCacheKey(string $value):string{return strtolower(trim(preg_replace('/\\s+/u',' ', $value)??$value));}
 function geocodeCacheRead(string $key):?array{global $geocodeCacheFile;if(!is_file($geocodeCacheFile))return null;$data=json_decode((string)@file_get_contents($geocodeCacheFile),true);$hit=is_array($data)?($data[$key]??null):null;return is_array($hit)&&isset($hit['lat'],$hit['lon'])?['lat'=>(float)$hit['lat'],'lon'=>(float)$hit['lon'],'label'=>(string)($hit['label']??$key)]:null;}
 function geocodeCacheWrite(string $key,array $point):void{global $geocodeCacheFile;$data=[];if(is_file($geocodeCacheFile)){$decoded=json_decode((string)@file_get_contents($geocodeCacheFile),true);if(is_array($decoded))$data=$decoded;}$data[$key]=$point;@file_put_contents($geocodeCacheFile,json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),LOCK_EX);}
-$geocodeCacheFile=sys_get_temp_dir().'/svnet-fahrtenbuch-geocode-cache.json';
-function geocodeCacheKey(string $value):string{return strtolower(trim(preg_replace('/\\s+/u',' ', $value)??$value));}
-function geocodeCacheRead(string $key):?array{global $geocodeCacheFile;if(!is_file($geocodeCacheFile))return null;$data=json_decode((string)@file_get_contents($geocodeCacheFile),true);$hit=is_array($data)?($data[$key]??null):null;return is_array($hit)&&isset($hit['lat'],$hit['lon'])?['lat'=>(float)$hit['lat'],'lon'=>(float)$hit['lon'],'label'=>(string)($hit['label']??$key)]:null;}
-function geocodeCacheWrite(string $key,array $point):void{global $geocodeCacheFile;$data=[];if(is_file($geocodeCacheFile)){$decoded=json_decode((string)@file_get_contents($geocodeCacheFile),true);if(is_array($decoded))$data=$decoded;}$data[$key]=$point;@file_put_contents($geocodeCacheFile,json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),LOCK_EX);}
 function routeQuery(string $address,string $home):string{
   $a=preg_replace('/\s+/u',' ',trim($address))??trim($address);
   if(!preg_match('/\b\d{5}\b/u',$a)&&!preg_match('/\b(?:Aalen|Urbach|Dinkelsbühl|Schwäbisch Hall|Waldenburg)\b/ui',$a)){
