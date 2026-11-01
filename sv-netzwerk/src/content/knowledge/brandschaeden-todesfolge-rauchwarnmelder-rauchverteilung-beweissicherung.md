@@ -27,8 +27,6 @@ seo:
   noindex: false
 ---
 
-> **Fiktiver Fachbeitrag:** Dieser Text beschreibt kein konkretes Ereignis. Alle Angaben sind bewusst allgemein gehalten und so verändert, dass keine Rückschlüsse auf Personen, Orte, Gebäude, Termine oder Akten möglich sind.
-
 ## Bei einem tödlichen Brand zuerst die Prüffragen trennen
 
 Ein Brandschaden mit Todesfolge erzeugt sofort einen starken Zusammenhang zwischen Brand, Rauch und dem eingetretenen Personenschaden. Technisch und forensisch darf dieser Zusammenhang trotzdem nicht als fertige Ursache behandelt werden. Für eine belastbare Bewertung müssen zunächst vier Ebenen getrennt werden: der Brandentstehungsbereich, die Ausbreitung von Rauch und Wärme, die vorhandenen oder fehlenden Warn- und Schutzvorrichtungen sowie die Frage, welche Feststellungen noch unverändert gesichert werden können.
@@ -73,8 +71,14 @@ Ein Bericht sollte klar ausweisen, welche Aussagen auf einer eigenen Besichtigun
 
 Bei einem Todesfall kommt hinzu, dass mehrere Untersuchungen und Zuständigkeiten zusammenlaufen können. Der sachverständige Bericht sollte deshalb weder Ermittlungen vorwegnehmen noch menschliche Verantwortlichkeit aus einem einzelnen technischen Detail ableiten. Seine Aufgabe ist, Befunde zu sichern, Unsicherheiten zu benennen und die nächsten fachlich geeigneten Prüfungen nachvollziehbar zu machen.
 
-## Fazit für die Schadenprüfung
+## Fazit
 
 Ein schwerer Brandschaden mit Todesfolge verlangt eine ruhige, nachvollziehbare Dokumentation. Rauchwarnmelder, Brandentstehung, Rauchverteilung, Wärmeeinwirkung, Fluchtbedingungen und Sanierungsmaßnahmen sind jeweils eigene Prüffelder. Wer diese Ebenen trennt, verhindert vorschnelle Kausalbehauptungen und schafft eine belastbare Grundlage für weitere technische, versicherungsrechtliche und behördliche Entscheidungen.
 
-Der gesamte Beitrag bleibt fiktiv und anonymisiert. Er verwendet keine realen Namen, Orte, Termine, Aktenzeichen oder individuellen Merkmale.
+Eine belastbare Schadenprüfung trennt technische Feststellungen von Kausalitäts- und Verantwortlichkeitsfragen. So bleiben die nächsten Schritte nachvollziehbar und die Beweislage wird durch notwendige Sicherungs- und Sanierungsmaßnahmen nicht unnötig verändert.
+
+## Quellen
+
+- [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Brandschutz, Vorsorgen für den Brandfall](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/Brandschutz/_documents/feuer-vorsorgen_dossier1.html)
+- [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Feuer, technische Gefahr](https://www.bbk.bund.de/DE/Themen/Risikomanagement/Baulicher-Bevoelkerungsschutz/Schutz-vor-technischen-Gefahren/Feuer/feuer.html)
+- [Landesrecht Baden-Württemberg: Landesbauordnung, § 15 Brandschutz](https://www.landesrecht-bw.de/perma?j=BauO_BW)
