@@ -14,6 +14,17 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Nachmeldungen im Gebäudeschaden: Erstbefund, neue Schäden und Kausalität sauber trennen',
+    description: 'Erstbefund, neue Schäden, Kausalität, Beweissicherung und zusätzliche Kosten bei Nachmeldungen im Gebäudeschaden nachvollziehbar prüfen.',
+    href: '/fachwissen/nachmeldungen-gebaeudeschaden-erstbefund-kausalitaet-schadenabgrenzung/',
+    category: 'Schadenregulierung',
+    tags: ['Nachmeldung', 'Gebäudeschaden', 'Kausalität', 'Schadenabgrenzung', 'Beweissicherung', 'Kostenprüfung'],
+    date: '2026-11-01',
+    type: 'article',
+    featured: false,
+  },
+
+  {
     title: 'Haftpflichtberichte prüffähig aufbauen: Risikobeschreibung, Regress und Fotodokumentation',
     description: 'Risikobeschreibung, Schadenumfang, Regressprüfung, Handlungsempfehlung und Fotodokumentation im Haftpflichtbericht nachvollziehbar verbinden.',
     href: '/fachwissen/haftpflichtbericht-risikobeschreibung-regress-fotodokumentation/',
