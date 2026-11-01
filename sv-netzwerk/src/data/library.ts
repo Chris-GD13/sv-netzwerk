@@ -14,6 +14,17 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Brandschäden mit Todesfolge fachlich einordnen: Rauchwarnmelder, Rauchverteilung und Beweissicherung trennen',
+    description: 'Rauchwarnmelder, Brandentstehung, Rauchverteilung, Evakuierungsbedingungen und Beweissicherung bei schweren Brandschäden sachlich getrennt bewerten.',
+    href: '/fachwissen/brandschaeden-todesfolge-rauchwarnmelder-rauchverteilung-beweissicherung/',
+    category: 'Brand und Kontamination',
+    tags: ['Brandschaden', 'Rauchwarnmelder', 'Rauchverteilung', 'Brandursache', 'Beweissicherung', 'Ruß', 'Schadenprüfung'],
+    date: '2026-11-02',
+    publishedAt: '2026-11-02T05:00:00.000Z',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Quooker-Einbau fachlich prüfen: Wasseranschlüsse, Sicherheitsgruppe und Folgeschäden abgrenzen',
     description: 'Armatur, Reservoir, Sicherheitsgruppe, Ablauf und Stromversorgung beim Quooker-Einbau sowie mögliche Wasserschäden und Kosten fachlich trennen.',
     href: '/fachwissen/quooker-einbau-wasserschaden-anschluesse-kostenpruefung/',
