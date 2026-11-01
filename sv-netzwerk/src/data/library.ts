@@ -33,7 +33,7 @@ export const library: LibraryItem[] = [
     date: '2026-11-01',
     publishedAt: '2026-11-01T15:00:00.000Z',
     type: 'article',
-    featured: false,
+    featured: false,\n    earlyAccess: true,
   },
   {
     title: 'Fotodokumentation im Gebäudeschaden: Befund, Zuordnung und Beweissicherung',
