@@ -1,5 +1,12 @@
 ## 2026-11-02
 
+- Fachbeitrag in der öffentlichen Fachwissen-Übersicht sichtbar gemacht, obwohl er für den 02.11. datiert und am 01.11. vorab freigegeben ist
+- KI-typischen Selbsthinweis aus dem Beitrag entfernt
+- Verbindliche Abschnitte „Fazit“ und „Quellen“ ergänzt
+- Quellen auf BBK und Landesrecht Baden-Württemberg verlinkt
+
+## 2026-11-02
+
 - Frühfreigabe für den ausdrücklich fiktiven und vollständig anonymisierten Tagesbeitrag am 01.11. ergänzt
 - Das Veröffentlichungsdatum bleibt im Beitrag der 02.11.2026; die Ein-Tages-Frühfreigabe gilt nur für diesen markierten Beitrag
 

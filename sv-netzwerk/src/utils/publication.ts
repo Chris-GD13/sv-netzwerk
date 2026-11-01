@@ -53,7 +53,7 @@ export const isLibraryItemPublished = (
   ? now.getTime() >= new Date(publicationStartIso(item.date)).getTime()
   : true;
 
-export const filterPublishedLibraryItems = <T extends { date: string; type: string }>(
+export const filterPublishedLibraryItems = <T extends { date: string; type: string; earlyAccess?: boolean }>(
   entries: T[],
   now = getPublicationNow(),
 ) => entries.filter((entry) => isLibraryItemPublished(entry, now));
