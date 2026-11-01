@@ -24,6 +24,7 @@ export const library: LibraryItem[] = [
     publishedAt: '2026-11-02T05:00:00.000Z',
     type: 'article',
     featured: false,
+    earlyAccess: true,
   },
   {
     title: 'Quooker-Einbau fachlich prüfen: Wasseranschlüsse, Sicherheitsgruppe und Folgeschäden abgrenzen',
@@ -35,8 +36,7 @@ export const library: LibraryItem[] = [
     publishedAt: '2026-11-01T15:00:00.000Z',
     type: 'article',
     featured: false,
-    earlyAccess: true,\n    earlyAccess: true,
-  },
+      },
   {
     title: 'Fotodokumentation im Gebäudeschaden: Befund, Zuordnung und Beweissicherung',
     description: 'Übersichtsaufnahmen, Detailbefund, Lagezuordnung und technische Bewertung im Gebäudeschaden nachvollziehbar verbinden.',
