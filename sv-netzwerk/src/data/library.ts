@@ -14,6 +14,36 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Haftpflichtberichte prüffähig aufbauen: Risikobeschreibung, Regress und Fotodokumentation',
+    description: 'Risikobeschreibung, Schadenumfang, Regressprüfung, Handlungsempfehlung und Fotodokumentation im Haftpflichtbericht nachvollziehbar verbinden.',
+    href: '/fachwissen/haftpflichtbericht-risikobeschreibung-regress-fotodokumentation/',
+    category: 'Regulierung und Versicherungsrecht',
+    tags: ['Haftpflichtbericht', 'Risikobeschreibung', 'Regress', 'Doppelversicherung', 'Fotodokumentation', 'Schadenregulierung'],
+    date: '2026-10-31',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Mietschäden am Bodenbelag: Einzelereignis, übermäßige Beanspruchung und Abnutzung trennen',
+    description: 'Einzelereignis, übermäßige Beanspruchung und normale Abnutzung bei Mietschäden am Bodenbelag getrennt bewerten.',
+    href: '/fachwissen/mietschaden-bodenbelag-einzelereignis-uebermaessige-beanspruchung-abnutzung/',
+    category: 'Regulierung und Versicherungsrecht',
+    tags: ['Mietschaden', 'Bodenbelag', 'Parkett', 'Abnutzung', 'Haftpflichtschaden', 'Kostenprüfung'],
+    date: '2026-10-30',
+    type: 'article',
+    featured: false,
+  },
+  {
+    title: 'Haftpflichtschäden prüfen: Plausibilität, Haftung und Deckung in der richtigen Reihenfolge',
+    description: 'Plausibilität, Haftung und Deckung bei Haftpflichtschäden getrennt und in der richtigen Reihenfolge prüfen.',
+    href: '/fachwissen/haftpflichtpruefung-plausibilitaet-haftung-deckung-pruefreihenfolge/',
+    category: 'Regulierung und Versicherungsrecht',
+    tags: ['Haftpflichtschaden', 'Plausibilität', 'Haftung', 'Deckung', 'Schadenregulierung'],
+    date: '2026-10-29',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Holzfenster-Beschichtungen im Schadenfall: Haftung, Schichtaufbau und Reparaturgrenzen prüfen',
     description: 'Untergrund, Schichtaufbau, Haftung, Holzfeuchte und Reparaturgrenzen bei beschädigten Holzfensterbeschichtungen nachvollziehbar bewerten.',
     href: '/fachwissen/holzfenster-beschichtungen-schadenfall-haftung-schichtaufbau-reparaturgrenzen/',
