@@ -47,10 +47,10 @@ export const filterPublishedKnowledgeItems = <T extends PublicationCarrier>(
 ) => entries.filter((entry) => isKnowledgeItemPublished(entry, now));
 
 export const isLibraryItemPublished = (
-  item: { date: string; type: string },
+  item: { date: string; type: string; earlyAccess?: boolean },
   now = getPublicationNow(),
 ) => item.type === 'article'
-  ? now.getTime() >= new Date(publicationStartIso(item.date)).getTime()
+  ? now.getTime() >= new Date(publicationStartIso(item.date)).getTime() - (item.earlyAccess ? 24 * 60 * 60 * 1000 : 0)
   : true;
 
 export const filterPublishedLibraryItems = <T extends { date: string; type: string; earlyAccess?: boolean }>(
