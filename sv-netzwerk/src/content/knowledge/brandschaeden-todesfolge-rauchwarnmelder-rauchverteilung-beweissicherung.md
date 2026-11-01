@@ -81,4 +81,4 @@ Eine belastbare Schadenprüfung trennt technische Feststellungen von Kausalität
 
 - [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Brandschutz, Vorsorgen für den Brandfall](https://www.bbk.bund.de/DE/Warnung-Vorsorge/Vorsorge/Brandschutz/_documents/feuer-vorsorgen_dossier1.html)
 - [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe: Feuer, technische Gefahr](https://www.bbk.bund.de/DE/Themen/Risikomanagement/Baulicher-Bevoelkerungsschutz/Schutz-vor-technischen-Gefahren/Feuer/feuer.html)
-- [Landesrecht Baden-Württemberg: Landesbauordnung, § 15 Brandschutz](https://www.landesrecht-bw.de/perma?j=BauO_BW)
+- [Landesrecht Baden-Württemberg: Landesbauordnung, § 15 Brandschutz](https://www.landesrecht-bw.de/bsbw/document/jlr-NNLBW00007BCC/format/xsl/part/X/anchor/resultlistentry1)
