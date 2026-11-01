@@ -1,3 +1,9 @@
+## 2026-11-01 – Nachmeldungen im Gebäudeschaden
+
+- Einen neuen Fachbeitrag zu Erstbefund, Nachmeldung, Kausalität, Beweissicherung und Kostenprüfung ergänzt.
+- Tagesregister, Bibliothek, Veröffentlichungsprotokoll und natürlicher LinkedIn-Begleittext ergänzt; LinkedIn bleibt prepared-not-posted.
+- Detailroute, Suchindex und Sitemap werden über den Astro-Build aus der Content Collection erzeugt.
+
 ## 2026-10-27 – Schimmelbefall im Innenraum fachlich abgrenzen
 
 - Genau einen Tagesartikel unter atomarer Reservierung vorbereitet: Feuchteursache, sichtbaren und verdeckten Befund, Schutzmaßnahmen, Sanierungsziel und Kostenfolge getrennt bewerten.
