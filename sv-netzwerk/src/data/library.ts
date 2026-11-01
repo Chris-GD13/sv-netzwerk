@@ -14,11 +14,11 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
-    title: 'Haftpflichtberichte prüffähig aufbauen: Risikobeschreibung, Regress und Fotodokumentation',
-    description: 'Risikobeschreibung, Schadenumfang, Regressprüfung, Handlungsempfehlung und Fotodokumentation im Haftpflichtbericht nachvollziehbar verbinden.',
+    title: 'Fotodokumentation im Gebäudeschaden: Befund, Zuordnung und Beweissicherung',
+    description: 'Übersichtsaufnahmen, Detailbefund, Lagezuordnung und technische Bewertung im Gebäudeschaden nachvollziehbar verbinden.',
     href: '/fachwissen/haftpflichtbericht-risikobeschreibung-regress-fotodokumentation/',
-    category: 'Regulierung und Versicherungsrecht',
-    tags: ['Haftpflichtbericht', 'Risikobeschreibung', 'Regress', 'Doppelversicherung', 'Fotodokumentation', 'Schadenregulierung'],
+    category: 'Beweissicherung und Fotodokumentation',
+    tags: ['Fotodokumentation', 'Gebäudeschaden', 'Beweissicherung', 'Befundaufnahme', 'Schadenregulierung', 'Kostenprüfung'],
     date: '2026-10-31',
     type: 'article',
     featured: false,
