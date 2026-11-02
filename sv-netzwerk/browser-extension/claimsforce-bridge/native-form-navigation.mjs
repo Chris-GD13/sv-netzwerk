@@ -1,8 +1,9 @@
+import {NATIVE_PROFILES} from './native-field-contract.mjs';
 // Read-only UI navigation in the existing bridge. Never creates, edits or saves a form.
 import {waitForViewer} from './draft-agent-core.mjs';
 const uuid=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
 export async function openExistingNativeForm({tabId,caseId,formId,profile,requiredFields}, io, {timeoutMs=15000}={}) {
-  if(!Number.isInteger(tabId)||!uuid.test(caseId)||!uuid.test(formId)||!['christian','jens'].includes(profile)
+  if(!Number.isInteger(tabId)||!uuid.test(caseId)||!uuid.test(formId)||!NATIVE_PROFILES.includes(profile)
     ||!Array.isArray(requiredFields)||!requiredFields.length||requiredFields.some(x=>typeof x!=='string'||!x.trim()))throw Error('CF_FORM_CONTEXT_REQUIRED');
   const started=io.clock();
   const call=async fn=>{let timer;try{return await Promise.race([Promise.resolve().then(fn),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('CF_FORM_NAVIGATION_TIMEOUT')),Math.max(1,timeoutMs-(io.clock()-started)));})]);}finally{clearTimeout(timer)}};
