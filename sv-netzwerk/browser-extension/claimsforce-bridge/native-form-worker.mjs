@@ -1,3 +1,4 @@
+import {NATIVE_PROFILES} from './native-field-contract.mjs';
 import {openExistingNativeForm} from './native-form-navigation.mjs';
 import {executeNativeDraft} from './native-draft-operation.mjs';
 import {runNativeCreate} from './native-create-worker.mjs';
@@ -9,10 +10,11 @@ export async function runNativeForm(request,io){
   const timed=result=>({...result,durationMs:Math.max(0,Date.now()-startedAt)});
   let tabId,keep=false;
   try{
-    if(!['inspect','save','inspect_templates','create'].includes(request.action)||!['christian','jens'].includes(request.profile)||!/^[a-f0-9-]{36}$/.test(request.caseId))throw Error('NATIVE_REQUEST_INVALID');
+    if(!['inspect','save','inspect_templates','create'].includes(request.action)||!NATIVE_PROFILES.includes(request.profile)||!/^[a-f0-9-]{36}$/.test(request.caseId))throw Error('NATIVE_REQUEST_INVALID');
     await io.assertAccount(request.profile);
     const tab=await io.createTab(`https://web.claimsforce.com/claims/${request.caseId}/investigations`);tabId=tab.id;
     await io.waitTab(tabId);
+    if(io.assertVisibleAccount)await io.assertVisibleAccount(request.profile,tabId);
     if(['inspect_templates','create'].includes(request.action)){
       keep=request.action==='create';
       const result=await runNativeCreate(request,io,tabId,hash);
@@ -38,7 +40,7 @@ export async function runNativeForm(request,io){
     const matches=forms.filter(f=>f.formId===request.formId);
     if(matches.length!==1)throw Error('NATIVE_FORM_NOT_IN_INVENTORY');
     const openRead=async()=>{
-      const ready=await openExistingNativeForm({...request,tabId,requiredFields:['insurerClaimId']},{clock:Date.now,pause:io.pause,sessionProfile:async()=>{await io.assertAccount(request.profile);return request.profile},getTab:io.getTab,send:io.send});
+      const ready=await openExistingNativeForm({...request,tabId,requiredFields:['insurerClaimId']},{clock:Date.now,pause:io.pause,sessionProfile:async()=>{await io.assertAccount(request.profile);if(io.assertVisibleAccount)await io.assertVisibleAccount(request.profile,tabId);return request.profile},getTab:io.getTab,send:io.send});
       if(!ready.ok)throw Error('NATIVE_VIEWER_NOT_READY');
       return{...await send({...request,type:'NATIVE_FORM_SNAPSHOT'}),status:matches[0].status};
     };
@@ -46,7 +48,7 @@ export async function runNativeForm(request,io){
     const result=await executeNativeDraft(request,{
       hash,withLock:async(_profile,fn)=>fn(),journal:io.journal,assertAccount:io.assertAccount,
       openAndRead:openRead,
-      apply:async()=>{keep=true;return send({...request,type:'NATIVE_FORM_APPLY'})},
+      apply:async()=>{keep=true;if(io.assertVisibleAccount)await io.assertVisibleAccount(request.profile,tabId);return send({...request,type:'NATIVE_FORM_APPLY'})},
       save:()=>send({...request,type:'NATIVE_FORM_SAVE'}),
       reopenAndRead:openRead
     });
