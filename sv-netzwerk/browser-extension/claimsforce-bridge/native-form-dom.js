@@ -6,7 +6,7 @@
   const textLabel=node=>String(node?.textContent||node?.getAttribute?.('aria-label')||node?.getAttribute?.('title')||'').replace(/\s+/gu,' ').trim();
   const fieldLabel=(wrapper,node,doc)=>{
     const values=[];
-    for(const el of [wrapper,node]) for(const attr of ['aria-label','data-label','title']) if(el?.getAttribute?.(attr)) values.push(el.getAttribute(attr));
+    for(const el of [wrapper,node]) for(const attr of ['aria-label','data-label','title']) {if(el?.getAttribute?.(attr))values.push(el.getAttribute(attr));const prop=attr==='aria-label'?'ariaLabel':attr;if(el?.[prop])values.push(el[prop]);if(el?.[attr])values.push(el[attr]);}
     const labelledBy=[...new Set([wrapper?.getAttribute?.('aria-labelledby'),node?.getAttribute?.('aria-labelledby')].filter(Boolean).flatMap(v=>v.split(/\\s+/u)))];
     for(const id of labelledBy){const el=doc.getElementById?.(id);if(el)values.push(textLabel(el));}
     for(const label of doc.querySelectorAll?.('label,[role="label"],legend,.field-label,.label')||[]) {
