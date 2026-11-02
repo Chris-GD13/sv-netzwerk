@@ -1,3 +1,4 @@
+import {NATIVE_PROFILES} from './native-field-contract.mjs';
 import {createNativeDraft} from './native-create-operation.mjs';
 import {openExistingNativeForm} from './native-form-navigation.mjs';
 export async function runNativeCreate(request,io,tabId,hash) {
@@ -57,7 +58,7 @@ export async function runNativeCreate(request,io,tabId,hash) {
    }while(Date.now()<deadline);
    if(!found||found.status!=='draft')throw Error('NATIVE_CREATE_NEW_DRAFT_NOT_LISTED');
    const expected={...request,formId};
-   const ready=await openExistingNativeForm({...expected,tabId,requiredFields:['insurerClaimId']},{clock:Date.now,pause:io.pause,sessionProfile:async()=>{await io.assertAccount(request.profile);return request.profile;},getTab:io.getTab,send:io.send});
+   const ready=await openExistingNativeForm({...expected,tabId,requiredFields:['insurerClaimId']},{clock:Date.now,pause:io.pause,sessionProfile:async()=>{await io.assertAccount(request.profile);if(io.assertVisibleAccount)await io.assertVisibleAccount(request.profile,tabId);return request.profile;},getTab:io.getTab,send:io.send});
    if(!ready.ok)throw Error('NATIVE_CREATE_VIEWER_NOT_READY');
    const snapshot=await send({...expected,type:'NATIVE_FORM_SNAPSHOT'});
    return{...snapshot,status:found.status,templateName:found.templateName};
