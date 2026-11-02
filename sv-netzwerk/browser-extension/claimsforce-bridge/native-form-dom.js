@@ -3,7 +3,7 @@
 (() => {
   const protectedIds=new Set(['insurerClaimId','insurerPolicyId','Gesamt','Gesamt Freigabe','Gesamt Restreserve','Endergebnis']);
   const normalizeLabel=value=>String(value??'').normalize('NFKC').replace(/\s+/gu,' ').trim().toLocaleLowerCase('de-DE');
-  const textLabel=node=>String(node?.textContent||node?.getAttribute?.('aria-label')||node?.getAttribute?.('title')||'').replace(/\s+/gu,' ').trim();
+  const textLabel=node=>typeof node==='string'?node.replace(/\s+/gu,' ').trim():String(node?.textContent||node?.getAttribute?.('aria-label')||node?.getAttribute?.('title')||'').replace(/\s+/gu,' ').trim();
   const fieldLabel=(wrapper,node,doc)=>{
     const values=[];
     for(const el of [wrapper,node]) for(const attr of ['aria-label','data-label','title']) {if(el?.getAttribute?.(attr))values.push(el.getAttribute(attr));const prop=attr==='aria-label'?'ariaLabel':attr;if(el?.[prop])values.push(el[prop]);if(el?.[attr])values.push(el[attr]);}
