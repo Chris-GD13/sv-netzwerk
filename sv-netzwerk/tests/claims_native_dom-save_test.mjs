@@ -11,7 +11,7 @@ function fixture({nativeFocusOut=false}={}){
  const path='/claims/case/forms/form';
  const frame={src:'https://web.claimsforce.com/apryse/11.11.0/ui/index.html#basePath='+encodeURIComponent(path),contentDocument:{querySelectorAll:()=>controls}};
  const button={textContent:'Entwurf speichern',getClientRects:()=>[{}],get disabled(){return!dirty},click(){dirty=false;events.push('save')}};
- const window={};const document={querySelectorAll:s=>s==='iframe'?[frame]:s==='button'?[button]:[]};
+ const labels=Object.entries({insurerClaimId:'Versicherungsnummer',Hinweis1:'Gesprächspartner',Endergebnis:'Endergebnis'}).map(([htmlFor,textContent])=>({htmlFor,textContent,getClientRects:()=>[{}]}));const window={};const document={querySelectorAll:s=>s==='iframe'?[frame]:s==='button'?[button]:s.startsWith('label')?labels:[]};
  const location={href:'https://web.claimsforce.com'+path,origin:'https://web.claimsforce.com',pathname:path};
  vm.runInNewContext(source,{window,document,location,URL,URLSearchParams,crypto:webcrypto,TextEncoder,setTimeout,Date});
  return{api:window.SVNET_NATIVE_FORM_DOM,expected,controls,events,location,button,frame,setDirty:v=>dirty=v};
