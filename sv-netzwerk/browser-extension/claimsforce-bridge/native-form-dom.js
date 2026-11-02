@@ -2,6 +2,24 @@
 // No SDK internals, guessed write endpoint, export, send or QS action.
 (() => {
   const protectedIds=new Set(['insurerClaimId','insurerPolicyId','Gesamt','Gesamt Freigabe','Gesamt Restreserve','Endergebnis']);
+  const normalizeLabel=value=>String(value??'').normalize('NFKC').replace(/\s+/gu,' ').trim().toLocaleLowerCase('de-DE');
+  const textLabel=node=>typeof node==='string'?node.replace(/\s+/gu,' ').trim():String(node?.textContent||node?.getAttribute?.('aria-label')||node?.getAttribute?.('title')||'').replace(/\s+/gu,' ').trim();
+  const fieldLabel=(wrapper,node,doc)=>{
+    const values=[];
+    for(const el of [wrapper,node]) for(const attr of ['aria-label','data-label','title']) {if(el?.getAttribute?.(attr))values.push(el.getAttribute(attr));const prop=attr==='aria-label'?'ariaLabel':attr;if(el?.[prop])values.push(el[prop]);if(el?.[attr])values.push(el[attr]);}
+    const labelledBy=[...new Set([wrapper?.getAttribute?.('aria-labelledby'),node?.getAttribute?.('aria-labelledby')].filter(Boolean).flatMap(v=>v.split(/\\s+/u)))];
+    for(const id of labelledBy){const el=doc.getElementById?.(id);if(el)values.push(textLabel(el));}
+    for(const label of doc.querySelectorAll?.('label,[role="label"],legend,.field-label,.label')||[]) {
+      if(label.htmlFor===node.id || label.contains?.(node)) values.push(textLabel(label));
+    }
+    const unique=[...new Set(values.map(textLabel).map(v=>v.replace(/[:：]$/u,'').trim()).filter(Boolean))];
+    if(unique.length!==1)throw Error(unique.length?'NATIVE_FIELD_LABEL_AMBIGUOUS':'NATIVE_FIELD_LABEL_MISSING');
+    return unique[0];
+  };
+  const assertLabels=fields=>{
+    const keys=new Set();
+    for(const field of fields){const key=normalizeLabel(field.label);if(!key)throw Error('NATIVE_FIELD_LABEL_MISSING');if(keys.has(key))throw Error('NATIVE_FIELD_LABEL_DUPLICATE');keys.add(key);}
+  };
   const visible=n=>n.getClientRects().length>0;
   const pause=ms=>new Promise(r=>setTimeout(r,ms));
   const saveButton=()=>{
@@ -32,8 +50,10 @@
     for(const node of controls){const id=node.closest('.text[id],.choice[id]').id;const group=groups.get(id)||[];group.push(node);groups.set(id,group)}
     const fields=[...groups].map(([id,nodes])=>{
       if(new Set(nodes.map(n=>n.value)).size!==1)throw Error('NATIVE_MIRROR_VALUES_DIFFER');
-      const n=nodes[0];return{id,value:n.value,type:n.tagName.toLowerCase(),count:nodes.length,calculated:protectedIds.has(id)&&!id.startsWith('insurer'),writable:nodes.length===1&&!protectedIds.has(id)&&!n.disabled&&!n.readOnly,...(n.tagName==='SELECT'?{options:[...n.options].map(o=>o.value)}:{})};
+      const n=nodes[0],wrapper=n.closest('.text[id],.choice[id]'),label=fieldLabel(wrapper,n,controls[0]?.ownerDocument?.querySelectorAll?controls[0].ownerDocument:document);
+      return{id,label,value:n.value,type:n.tagName.toLowerCase(),count:nodes.length,calculated:protectedIds.has(id)&&!id.startsWith('insurer'),writable:nodes.length===1&&!protectedIds.has(id)&&!n.disabled&&!n.readOnly,...(n.tagName==='SELECT'?{options:[...n.options].map(o=>o.value)}:{})};
     }).sort((a,b)=>a.id.localeCompare(b.id));
+    assertLabels(fields);
     const number=fields.find(f=>f.id==='insurerClaimId');
     if(!number||number.value!==expected.claimNumber)throw Error('NATIVE_CLAIM_NUMBER_MISMATCH: '+JSON.stringify({expected:expected.claimNumber,observed:number?.value??null})+'; no fields changed');
     const hash=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(fields))))].map(v=>v.toString(16).padStart(2,'0')).join('');
@@ -46,7 +66,7 @@
     // Validate the entire patch before entering even its first character.
     for(const c of expected.changes||[]){
       const f=before.fields.find(f=>f.id===c.field);
-      if(!f?.writable||f.value!==c.before||typeof c.after!=='string'||c.after.length>10000||(f.options&&!f.options.includes(c.after)))throw Error('NATIVE_PATCH_REJECTED');
+      if(!f?.writable||normalizeLabel(f.label)!==normalizeLabel(c.label)||f.value!==c.before||typeof c.after!=='string'||c.after.length>10000||(f.options&&!f.options.includes(c.after)))throw Error('NATIVE_PATCH_REJECTED');
       if(plan.some(p=>p.field===c.field))throw Error('NATIVE_DUPLICATE_PATCH');
       plan.push({...c,node:controls.find(n=>n.closest('.text[id],.choice[id]').id===c.field)});
     }

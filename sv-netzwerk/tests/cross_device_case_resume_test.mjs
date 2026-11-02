@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const page=fs.readFileSync(new URL('../src/pages/intern/versicherungsfaelle/index.astro',import.meta.url),'utf8');
+const api=fs.readFileSync(new URL('../public/intern/api/google-drive-sync.php',import.meta.url),'utf8');
+assert.match(page,/action=recent_cases/,'Fallliste nutzt den serverseitigen Bestand');
+assert.match(page,/action=load_case&id=/,'Geöffnete Fälle werden auf jedem Gerät aus der zentralen Fallakte nachgeladen');
+assert.match(page,/sessionStorage\.setItem\('svnet-case'/,'Lokaler Cache bleibt nur eine Komfortfunktion');
+assert.match(api,/case'recent_cases'/,'Recent Cases kommen aus dem zentralen Speicher');
+assert.match(api,/gdAccessibleCaseFolders\(\$user\)/,'Recent Cases bleiben auf den angemeldeten Benutzerbereich begrenzt');
+console.log('Cross-device case resume contract passed; no production data accessed.');

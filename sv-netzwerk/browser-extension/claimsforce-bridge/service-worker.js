@@ -537,6 +537,12 @@ async function runImport(run) {
     await prepareReadOnlySession(run.profile);
     return runNativeForm(request,{
       assertAccount:profile=>requireReadOnlySession({profile,expectedEmail:PROFILE_EMAILS[profile],emailOf:tokenEmail,readSession:()=>chrome.storage.session.get(['claimsToken','claimsTokenProfile'])}),
+      assertVisibleAccount:async(profile,tabId)=>{
+        const identity=await chrome.tabs.sendMessage(tabId,{type:'READ_ACCOUNT_IDENTITY'}).catch(()=>null);
+        const badges=Array.isArray(identity?.badges)?identity.badges:[];
+        if(!PROFILE_BADGES[profile].some(badge=>badges.includes(badge)))throw new Error(`[CF-AUTH-04] ClaimsForce zeigt ${badges.join(', ')||'keine eindeutige Konto-Kennung'} statt ${PROFILE_BADGES[profile].join('/')}.`);
+        return badges;
+      },
       createTab:url=>chrome.tabs.create({url,active:false}),waitTab,getTab:id=>chrome.tabs.get(id),
       send:(id,message)=>chrome.tabs.sendMessage(id,message),pause:sleep,closeTab:id=>chrome.tabs.remove(id),
       journal:{get:async id=>(await chrome.storage.local.get(`nativeOperation:${id}`))[`nativeOperation:${id}`],set:async(id,value)=>chrome.storage.local.set({[`nativeOperation:${id}`]:value})}
