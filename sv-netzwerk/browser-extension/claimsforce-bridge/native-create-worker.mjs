@@ -1,4 +1,3 @@
-import {NATIVE_PROFILES} from './native-field-contract.mjs';
 import {createNativeDraft} from './native-create-operation.mjs';
 import {openExistingNativeForm} from './native-form-navigation.mjs';
 export async function runNativeCreate(request,io,tabId,hash) {
