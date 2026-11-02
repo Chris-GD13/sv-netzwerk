@@ -29,7 +29,7 @@ function mcpNativeForms(array $user,array $args): array {
     if(($args['action']??'')==='create')throw new RuntimeException('NATIVE_CREATE_DISABLED_USE_EXISTING_ORIGINAL');
     $folder=trim((string)($args['id']??''));requireCaseFolderAccess($folder,$user);
     if(!ownCase($user,$folder))throw new RuntimeException('NATIVE_CASE_ACCESS_DENIED');
-    $meta=mcpDriveCaseMeta($folder,mcpDriveCaseFiles($folder));$profile=svnetUserProfile($user);
+    $meta=mcpDriveCaseMeta($folder,mcpDriveCaseFiles($folder));$profile=svnetUserProfile($user);$storedClaim=trim((string)($meta['schaden_nr']??''));$requestedClaim=trim((string)($args['claim_number']??''));if($storedClaim===''||$requestedClaim===''||caseNumberKey($storedClaim)!==caseNumberKey($requestedClaim))throw new RuntimeException('NATIVE_CLAIM_BINDING_MISMATCH: Portalakte und Claimsforce-Schadennummer stimmen nicht überein.');
     if(empty($meta['claimsforce_profile'])||empty($meta['claimsforce_claim_id']))throw new RuntimeException('NATIVE_SOURCE_BINDING_REQUIRED: Portalakte hat noch keine bestaetigte Claimsforce-Zuordnung; dies ist kein Anmeldefehler.');
     if($profile===''||($meta['claimsforce_profile']??'')!==$profile)throw new RuntimeException('NATIVE_PROFILE_MISMATCH');
     $uuid='/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/Di';
@@ -50,7 +50,7 @@ function mcpNativeForms(array $user,array $args): array {
     }
     $action=(string)($args['action']??'');$form=(string)($args['form_id']??'');
     if(!in_array($action,['inspect','save','inspect_templates','create'],true)||($form!==''&&!preg_match($uuid,$form)))throw new InvalidArgumentException('NATIVE_ACTION_INVALID');
-    $request=['operationId'=>$operation,'action'=>$action,'profile'=>$profile,'caseId'=>$claim,'formId'=>$form,'claimNumber'=>(string)($args['claim_number']??'')];
+    $requiredLabels=$args['required_labels']??[];if(!is_array($requiredLabels)||count($requiredLabels)>50||array_filter($requiredLabels,fn($v)=>!is_string($v)||trim($v)===''))throw new InvalidArgumentException('NATIVE_REQUIRED_LABELS_INVALID');$request=['operationId'=>$operation,'action'=>$action,'profile'=>$profile,'caseId'=>$claim,'formId'=>$form,'claimNumber'=>$requestedClaim,'requiredLabels'=>array_values($requiredLabels)];
     if($form!==''&&$request['claimNumber']==='')throw new InvalidArgumentException('NATIVE_CLAIM_NUMBER_REQUIRED');
     if($action==='save'){
         $changes=$args['changes']??null;$expected=(string)($args['expected_hash']??'');
