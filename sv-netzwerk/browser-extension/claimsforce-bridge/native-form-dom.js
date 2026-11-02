@@ -50,7 +50,7 @@
     for(const node of controls){const id=node.closest('.text[id],.choice[id]').id;const group=groups.get(id)||[];group.push(node);groups.set(id,group)}
     const fields=[...groups].map(([id,nodes])=>{
       if(new Set(nodes.map(n=>n.value)).size!==1)throw Error('NATIVE_MIRROR_VALUES_DIFFER');
-      const n=nodes[0],wrapper=n.closest('.text[id],.choice[id]'),label=fieldLabel(wrapper,n,controls[0]?.ownerDocument||document);
+      const n=nodes[0],wrapper=n.closest('.text[id],.choice[id]'),label=fieldLabel(wrapper,n,controls[0]?.ownerDocument?.querySelectorAll?controls[0].ownerDocument:document);
       return{id,label,value:n.value,type:n.tagName.toLowerCase(),count:nodes.length,calculated:protectedIds.has(id)&&!id.startsWith('insurer'),writable:nodes.length===1&&!protectedIds.has(id)&&!n.disabled&&!n.readOnly,...(n.tagName==='SELECT'?{options:[...n.options].map(o=>o.value)}:{})};
     }).sort((a,b)=>a.id.localeCompare(b.id));
     assertLabels(fields);
