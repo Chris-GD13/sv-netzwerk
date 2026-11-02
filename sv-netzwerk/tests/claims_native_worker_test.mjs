@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {runNativeForm} from '../browser-extension/claimsforce-bridge/native-form-worker.mjs';
 const caseId='11111111-1111-4111-8111-111111111111',formId='22222222-2222-4222-8222-222222222222';
 function fixture(){
- const request={operationId:'33333333-3333-4333-8333-333333333333',action:'save',caseId,formId,profile:'christian',claimNumber:'SYNTHETIC-001',expectedHash:'a'.repeat(64),changes:[{field:'Hinweis1',before:'Old',after:'New'}]};
+ const request={operationId:'33333333-3333-4333-8333-333333333333',action:'save',caseId,formId,profile:'christian',claimNumber:'SYNTHETIC-001',expectedHash:'a'.repeat(64),requiredLabels:['Gesprächspartner'],changes:[{field:'Hinweis1',label:'Gesprächspartner',before:'Old',after:'New'}]};
  let route=`/claims/${caseId}/investigations`,value='Old',dirty=false;const calls=[],journal=new Map();
  const io={assertAccount:async()=>{},createTab:async url=>{calls.push('create-own');return{id:9,url}},waitTab:async()=>{},getTab:async()=>({url:'https://web.claimsforce.com'+route}),pause:async()=>{},closeTab:async id=>calls.push('close:'+id),journal:{get:async id=>journal.get(id),set:async(id,v)=>journal.set(id,v)},send:async(id,m)=>{
   calls.push(m.type);
@@ -12,7 +12,7 @@ function fixture(){
   if(m.type==='READ_FORM_READINESS')return{ok:true,observation:{outerLoaded:true,viewerInitialized:true,fieldsReadable:true,fieldsEditable:true,identityVerified:true}};
   if(m.type==='NATIVE_FORM_APPLY'){value='New';dirty=true;return{ok:true}}
   if(m.type==='NATIVE_FORM_SAVE'){dirty=false;return{ok:true}}
-  if(m.type==='NATIVE_FORM_SNAPSHOT')return{ok:true,result:{caseId,formId,profile:'christian',claimNumber:'SYNTHETIC-001',dirty,hash:value==='Old'?'a'.repeat(64):'b'.repeat(64),fields:[{id:'Hinweis1',value,writable:true}]}};
+  if(m.type==='NATIVE_FORM_SNAPSHOT')return{ok:true,result:{caseId,formId,profile:'christian',claimNumber:'SYNTHETIC-001',dirty,hash:value==='Old'?'a'.repeat(64):'b'.repeat(64),fields:[{id:'Hinweis1',label:'Gesprächspartner',value,writable:true}]}};
   throw Error('unexpected '+m.type);
  }};return{request,io,calls,journal};
 }
