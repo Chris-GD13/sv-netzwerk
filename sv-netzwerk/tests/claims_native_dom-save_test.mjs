@@ -22,7 +22,7 @@ await test('native setter dispatches change and enables save',async()=>{const s=
 await test('whole patch checked before any mutation',async()=>{const s=fixture(),r=await s.api.snapshot(s.expected);await assert.rejects(s.api.apply({...s.expected,expectedHash:r.hash,changes:[{field:'Hinweis1',label:'Gesprächspartner',before:'Old',after:'New'},{field:'Endergebnis',label:'Endergebnis',before:'100,00 €',after:'200,00 €'}]}),/PATCH_REJECTED/);assert.equal(s.controls[1].value,'Old');assert.deepEqual(s.events,[])});
 await test('wrong native claim rejected',async()=>{const s=fixture();await assert.rejects(s.api.snapshot({...s.expected,claimNumber:'OTHER'}),/CLAIM_NUMBER_MISMATCH/)});
 await test('route changed rejected',async()=>{const s=fixture();s.location.pathname='/claims/other/forms/form';await assert.rejects(s.api.snapshot(s.expected),/ROUTE_MISMATCH/)});
-await test('unsaved user edit rejected',async()=>{const s=fixture(),r=await s.api.snapshot(s.expected);s.setDirty(true);await assert.rejects(s.api.apply({...s.expected,expectedHash:r.hash,changes:[{field:'Hinweis1',before:'Old',after:'New'}]}),/STALE_OR_DIRTY/)});
+await test('unsaved user edit rejected',async()=>{const s=fixture(),r=await s.api.snapshot(s.expected);s.setDirty(true);await assert.rejects(s.api.apply({...s.expected,expectedHash:r.hash,changes:[{field:'Hinweis1',label:'Gesprächspartner',before:'Old',after:'New'}]}),/STALE_OR_DIRTY/)});
 await test('mirrored divergent fields rejected',async()=>{const s=fixture();s.controls.push(Object.assign(Object.create(Object.getPrototypeOf(s.controls[1])),s.controls[1],{_value:'Other'}));await assert.rejects(s.api.snapshot(s.expected),/MIRROR_VALUES_DIFFER/)});
 await test('widget rebuild after save is awaited without a second save click',async()=>{
  const s=fixture();s.setDirty(true);const original=s.button.click;
@@ -41,5 +41,5 @@ await test('saved preview without editable widgets is only acknowledged, never v
  assert.equal(result.acknowledged,true);assert.equal(result.verified,false);
  assert.equal(s.events.filter(x=>x==='save').length,1);
 });
-await test('foreground native focusout is not duplicated',async()=>{const s=fixture({nativeFocusOut:true}),r=await s.api.snapshot(s.expected);await s.api.apply({...s.expected,expectedHash:r.hash,changes:[{field:'Hinweis1',before:'Old',after:'New'}]});assert.equal(s.events.filter(x=>x==='focusout').length,1);assert.equal(s.controls[1].persisted,'New');});
+await test('foreground native focusout is not duplicated',async()=>{const s=fixture({nativeFocusOut:true}),r=await s.api.snapshot(s.expected);await s.api.apply({...s.expected,expectedHash:r.hash,changes:[{field:'Hinweis1',label:'Gesprächspartner',before:'Old',after:'New'}]});assert.equal(s.events.filter(x=>x==='focusout').length,1);assert.equal(s.controls[1].persisted,'New');});
 console.log(`${n} DOM adapter tests passed; synthetic DOM, not installed browser transport.`);
