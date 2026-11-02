@@ -20,7 +20,7 @@ for(const [name,mutate,code] of [
  ['unsaved user edits',s=>s.snapshot.dirty=true,'NOT_CLEAN_DRAFT'],
  ['stale snapshot',s=>s.snapshot.hash='c'.repeat(64),'STALE_SNAPSHOT'],
  ['changed source value',s=>s.snapshot.fields[0].value='Other','FIELD_CONFLICT'],
- ['duplicate widget',s=>s.snapshot.fields.push({...s.snapshot.fields[0]}),'FIELD_NOT_WRITABLE'],
+ ['duplicate widget',s=>s.snapshot.fields.push({...s.snapshot.fields[0]}),'LABEL_DUPLICATE'],
  ['calculated total',s=>{s.request.changes[0].field='Endergebnis';s.snapshot.fields[0].id='Endergebnis'},'FIELD_NOT_WRITABLE'],
  ['invalid dropdown',s=>s.snapshot.fields[0].options=['Old','No'],'OPTION_INVALID']
 ])await test(name,async()=>{const s=setup();mutate(s);await assert.rejects(executeNativeDraft(s.request,s.io),new RegExp(code));assert.deepEqual(s.calls,[])});
