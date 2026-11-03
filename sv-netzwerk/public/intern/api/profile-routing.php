@@ -15,8 +15,10 @@ function svnetProfileText(string $value): string
 
 function svnetIsBackofficeUser(array $user): bool
 {
-    // Only Susanne may act for Christian; an administrator role grants no case access.
-    return svnetProfileText((string)($user['email'] ?? '')) === 'ws@sv-schuett.eu';
+    // Administrators may work across all expert case folders. The legacy
+    // backoffice account remains supported for the existing Christian/Jens flow.
+    return ($user['role'] ?? '') === 'administrator'
+        || svnetProfileText((string)($user['email'] ?? '')) === 'ws@sv-schuett.eu';
 }
 
 function svnetUserProfile(array $user): string
@@ -83,6 +85,9 @@ function svnetCasesFolderName(string $profile): string
 /** Christian and Susanne work on the original Maurer cases without switching profiles. */
 function svnetAccessibleCaseProfiles(array $user): array
 {
+    if (($user['role'] ?? '') === 'administrator') {
+        return svnetSupportedProfiles();
+    }
     $profile = svnetSelectedProfile($user);
     return $profile === 'christian' ? ['christian', 'jens'] : [$profile];
 }
