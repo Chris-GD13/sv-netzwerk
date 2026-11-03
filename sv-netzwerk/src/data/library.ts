@@ -15,6 +15,17 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Sturm- und Hagelschäden an Rollläden und Fassaden fachlich prüfen',
+    description: 'Befund, Funktion, Vorschaden und Wiederherstellungsumfang bei Sturm- und Hagelschäden an Rollläden, Raffstores und Fassaden nachvollziehbar abgrenzen.',
+    href: '/fachwissen/sturm-hagel-rolllaeden-fassade-befund-kostenpruefung/',
+    category: 'Sturm- und Hagelschäden',
+    tags: ['Sturm', 'Hagel', 'Rollladen', 'Fassade', 'Befundaufnahme', 'Kostenprüfung', 'Schadenregulierung'],
+    date: '2026-11-03',
+    publishedAt: '2026-11-03T05:00:00.000Z',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Brandschäden mit Todesfolge fachlich einordnen: Rauchwarnmelder, Rauchverteilung und Beweissicherung trennen',
     description: 'Rauchwarnmelder, Brandentstehung, Rauchverteilung, Evakuierungsbedingungen und Beweissicherung bei schweren Brandschäden sachlich getrennt bewerten.',
     href: '/fachwissen/brandschaeden-todesfolge-rauchwarnmelder-rauchverteilung-beweissicherung/',
