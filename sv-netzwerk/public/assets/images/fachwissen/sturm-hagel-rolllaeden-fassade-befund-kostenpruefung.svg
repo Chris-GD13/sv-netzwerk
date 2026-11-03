@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" role="img" aria-labelledby="title desc">
+<title id="title">Sturm- und Hagelschäden an Gebäudehülle und Rollläden</title>
+<desc id="desc">Stilisierte Gebäudefassade mit beschädigtem Rollladen, Dachkante und Hagelkörnern als Symbolbild für eine technische Schadenprüfung.</desc>
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#17283a"/><stop offset="1" stop-color="#49677a"/></linearGradient>
+  <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9e5dd"/><stop offset="1" stop-color="#b9b5ae"/></linearGradient>
+  <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8eb5c2"/><stop offset="1" stop-color="#304d5b"/></linearGradient>
+  <filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#07131e" flood-opacity=".35"/></filter>
+</defs>
+<rect width="1536" height="1024" fill="url(#sky)"/>
+<path d="M0 260 Q380 170 760 260 T1536 220 V0 H0Z" fill="#0e1c29" opacity=".32"/>
+<g opacity=".35" fill="none" stroke="#b9d0d9" stroke-width="8">
+  <path d="M90 150 Q280 40 500 120"/>
+  <path d="M970 120 Q1210 20 1480 120"/>
+  <path d="M180 420 Q420 270 690 350"/>
+</g>
+<g filter="url(#shadow)">
+  <path d="M160 430 L300 300 L1370 300 L1490 430 V930 H160Z" fill="url(#wall)"/>
+  <path d="M110 430 L280 270 L1395 270 L1515 430 Z" fill="#373c40"/>
+  <path d="M170 430 L290 315 L1378 315 L1460 430 Z" fill="#7b8285"/>
+  <rect x="250" y="475" width="330" height="360" rx="4" fill="url(#glass)" stroke="#313a3e" stroke-width="18"/>
+  <rect x="950" y="475" width="330" height="360" rx="4" fill="url(#glass)" stroke="#313a3e" stroke-width="18"/>
+  <g fill="#7d8588">
+    <rect x="230" y="448" width="370" height="45" rx="8"/>
+    <rect x="930" y="448" width="370" height="45" rx="8"/>
+  </g>
+  <g fill="#596367">
+    <rect x="280" y="520" width="270" height="24"/>
+    <rect x="280" y="558" width="270" height="24"/>
+    <rect x="280" y="596" width="270" height="24"/>
+    <rect x="280" y="634" width="270" height="24"/>
+    <rect x="280" y="672" width="270" height="24"/>
+    <rect x="280" y="710" width="270" height="24"/>
+    <rect x="280" y="748" width="270" height="24"/>
+    <rect x="980" y="520" width="270" height="24"/>
+    <rect x="980" y="558" width="270" height="24"/>
+    <rect x="980" y="596" width="270" height="24"/>
+    <rect x="980" y="634" width="270" height="24"/>
+    <rect x="980" y="672" width="270" height="24"/>
+    <rect x="980" y="710" width="270" height="24"/>
+    <rect x="980" y="748" width="270" height="24"/>
+  </g>
+  <path d="M280 520 L558 520 L540 605 L300 605 Z" fill="#a7afb0" opacity=".92"/>
+  <path d="M294 615 L560 615 L548 690 L305 690 Z" fill="#bdc3c2" opacity=".78"/>
+  <path d="M1170 507 L1268 520 L1248 780 L1162 762 Z" fill="#a55d45" opacity=".88"/>
+  <path d="M1162 485 Q1250 460 1290 500" fill="none" stroke="#bf704f" stroke-width="16"/>
+  <path d="M1170 840 Q1220 790 1270 835" fill="none" stroke="#a55d45" stroke-width="12"/>
+  <path d="M300 845 H1255" stroke="#424b4d" stroke-width="18"/>
+  <path d="M290 845 V925 M1255 845 V925" stroke="#424b4d" stroke-width="18"/>
+  <path d="M160 930 H1490" stroke="#222c31" stroke-width="24"/>
+</g>
+<g fill="#dbe8ec" stroke="#8faab5" stroke-width="5" opacity=".92">
+  <circle cx="210" cy="155" r="26"/><circle cx="420" cy="230" r="18"/><circle cx="680" cy="110" r="23"/>
+  <circle cx="870" cy="230" r="20"/><circle cx="1110" cy="120" r="28"/><circle cx="1320" cy="210" r="22"/>
+  <circle cx="1450" cy="95" r="17"/><circle cx="780" cy="390" r="18"/><circle cx="1040" cy="360" r="24"/>
+</g>
+<g fill="none" stroke="#e8a24d" stroke-width="10" opacity=".92">
+  <path d="M560 390 H760"/><path d="M560 420 H690"/>
+  <path d="M810 820 H1040"/><path d="M860 850 H1120"/>
+</g>
+<g fill="#f4f0e5" opacity=".86">
+  <rect x="70" y="885" width="280" height="70" rx="14"/>
+</g>
+<text x="105" y="930" font-family="Arial,Helvetica,sans-serif" font-size="30" fill="#1b2c35" letter-spacing="2">BEFUND · FUNKTION · KOSTEN</text>
+</svg>
