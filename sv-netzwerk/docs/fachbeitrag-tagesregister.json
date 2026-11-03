@@ -64,13 +64,15 @@
         "title": "Sturm- und Hagelschäden an Rollläden und Fassaden fachlich prüfen",
         "slug": "sturm-hagel-rolllaeden-fassade-befund-kostenpruefung",
         "url": "https://www.sv-netzwerk.eu/fachwissen/sturm-hagel-rolllaeden-fassade-befund-kostenpruefung/",
-        "status": "published-pending-live",
-        "owner": "codex-website-20261103-0600"
+        "status": "published-verified",
+        "owner": "codex-website-20261103-0600",
+        "commit": "c4a81465aebc59fe171c61e96fe3c301ab54a547",
+        "verified_at": "2026-11-03T08:01:13Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-11-03T05:15:00Z"
+  "updated_at": "2026-11-03T08:01:13Z"
 }
