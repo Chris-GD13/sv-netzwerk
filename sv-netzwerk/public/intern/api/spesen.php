@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/ai-budget-gateway.php';
 commonHeaders();
 ensureSpesenSchema();
 
@@ -329,7 +330,7 @@ function spesenGraphHttp(string $method, string $url, array $headers = [], mixed
         CURLOPT_TIMEOUT => 120,
     ]);
     if ($body !== null) curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
-    $response = curl_exec($curl);
+    $response = curl_exec(svAiGuardHandle($curl,'spesen-http'));
     $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE);
     $error = curl_error($curl);
     curl_close($curl);
