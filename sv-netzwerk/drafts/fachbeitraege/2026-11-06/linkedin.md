@@ -1,0 +1,1 @@
+Nach Ausschreitungen wird in der Schadenregulierung oft vorschnell von „inneren Unruhen“ gesprochen. Entscheidend sind aber der konkrete Tathergang, der Bedingungswortlaut, der zeitliche Zusammenhang und die zumutbare Schadenminderung. Unser Fachbeitrag am Freitag ordnet diese Fragen aus der Sicht der Schadenpraxis ein.
