@@ -30,6 +30,7 @@
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,stationId,bridgeVersion,workerVersion,protocol:2})});
   const show=(t,b=false)=>{if(context.claims_agent&&bridgeProblem&&!mobileClient){t=bridgeProblem;b=true;button.disabled=true;if(fullButton)fullButton.disabled=true;}if(bridgeHelp&&/Browser-Brücke|Browser-Bruecke|Bridge/i.test(String(t||'')))bridgeHelp.hidden=false;state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
+  const profileNames={christian:'Christian Wächter',holger:'Holger Roth',marc:'Marc Schütt',jens:'Jens Maurer'};
   const minimumBridgeVersion='1.4.65',currentBridgeVersion='1.4.80';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
@@ -288,6 +289,13 @@
   setInterval(()=>window.postMessage({type:'SVNET_CLAIMS_RUNTIME_PING'},location.origin),5000);
   driveStatus().then(async d=>{
     context=d;
+    const rawProfile=String(d.backoffice?(d.selected_expert||'christian'):d.claims_profile||'').trim().toLowerCase();
+    if(supportedProfiles.includes(rawProfile)){
+      button.dataset.claimsProfile=rawProfile;
+      const folder=String(d.folders?.cases?.name||'').trim();
+      const target=document.getElementById('vf-claims-target');
+      if(target)target.textContent=`Import für ${profileNames[rawProfile]}${folder?` · Ziel: ${folder}`:''}`;
+    }
     const personalBridgeBlocked=!d.claims_agent&&!d.backoffice&&supportedProfiles.includes(String(d.claims_profile||''));
     if(personalBridgeBlocked){
       settings?.remove();
