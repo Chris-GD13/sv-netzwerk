@@ -238,7 +238,10 @@ async function resetClaimsSession(run) {
   } catch {}
   finally { if (Number.isInteger(logoutTab?.id)) await chrome.tabs.remove(logoutTab.id).catch(() => {}); }
   const claimsTabs = await chrome.tabs.query({ url: ['https://web.claimsforce.com/*', 'https://claimsforce.eu.auth0.com/*'] });
-  await Promise.all(claimsTabs.filter(tab => Number.isInteger(tab.id)).map(tab => chrome.tabs.remove(tab.id).catch(() => {})));
+  // Die vorhandene ClaimsForce-Registerkarte bleibt offen. Bei einem Profilwechsel
+  // wird sie auf die Anmeldeseite gesetzt, damit sie nach einem Fehler weiter
+  // verfügbar bleibt und nicht aus dem Browser verschwindet.
+  await Promise.all(claimsTabs.filter(tab => Number.isInteger(tab.id)).map(tab => chrome.tabs.update(tab.id, { url: 'https://web.claimsforce.com/login' }).catch(() => {})));
   await chrome.browsingData.remove(
     { origins: CLAIMS_ORIGINS },
     { cookies: true, cacheStorage: true, indexedDB: true, localStorage: true, serviceWorkers: true }
