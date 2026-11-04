@@ -31,6 +31,8 @@ assert(paritaetCatalog.some((row) => /Duschkabine, Glaswände/.test(row.name) &&
 assert(page.includes('Korrekturfaktor 0,8–1,2') && page.includes('Begrenzende Restlebensdauer') && page.includes('Teilreparatur ohne Verlängerung der Nutzungsdauer'));
 assert(page.includes('Paritätische Lebensdauertabelle') && page.includes('Gewerbe, stark beansprucht −50 %'));
 assert(page.includes('svnet-time-value-transfer') && calculation.includes('svnet-time-value-transfer'));
+assert(page.includes('zw-case-number') && page.includes("action=search_cases") && page.includes("action=list&folder_id="));
+assert(page.includes('Gesamtzeitwert der belegten Positionen') && page.includes('Alter und technische Lebensdauer'));
 const typeNav = await readFile(new URL('../src/components/internal/CalculationTypeNav.astro', import.meta.url), 'utf8');
 assert(typeNav.includes("label: 'Zeitwertberechnung'") && typeNav.includes("href: '/intern/zeitwertberechnung/'"));
 

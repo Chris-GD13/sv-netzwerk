@@ -34,3 +34,7 @@ an Upload-Inhalt oder Zielpfad prüfen, dass Laufzeitdateien (z. B.
 `.env`, `intern/photos`) unangetastet bleiben. SFTP-Zugangsdaten bleiben in
 GitHub-Actions-Secrets und gelangen nie ins Repository. PHP läuft über IONOS
 PHP-FPM; kein `SetHandler` in `.htaccess` ergänzen.
+
+## Arbeitsfreigabe
+
+Wenn Christian die Umsetzung mit Formulierungen wie „programmieren“, „umbauen“, „ändern“, „ergänzen“ oder „mach das“ beauftragt, gilt die Freigabe für die vollständige technische Umsetzung einschließlich Commit, Merge und des vorgesehenen Deploy-Schritts. Eine zusätzliche Freigabe für Merge oder Deployment ist nicht einzuholen. Nur bei einem ausdrücklich genannten lokalen Test oder einer ausdrücklich gewünschten Prüfung ohne Veröffentlichung bleibt der Vorgang lokal.
