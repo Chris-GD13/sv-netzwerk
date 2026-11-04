@@ -140,6 +140,14 @@ async function diagnostic(run, phase, text, details = {}) {
   await progress(run.portalTabId, `[${phase}] ${text}`, details.current || 0, details.total || 0, { runId: run.runId, jobId: run.jobId || 0, phase, details }).catch(() => {});
 }
 
+async function hasExistingClaimsSession() {
+  const tabs = await chrome.tabs.query({ url: ['https://web.claimsforce.com/*', 'https://claimsforce.eu.auth0.com/*'] });
+  return tabs.some(tab => {
+    const url = String(tab.url || '');
+    return Number.isInteger(tab.id) && !url.includes('/login') && !url.includes('/logout');
+  });
+}
+
 async function credentialsFor(profile) {
   profile = profileKey(profile);
   credentialDiagnostic = 'vault';
@@ -555,17 +563,19 @@ async function runImport(run) {
   const useInvoicedClaims = fullSync || singleSync;
   if (singleSync && !singleClaimNumber.replace(/[^A-Za-z0-9]/g, '')) throw new Error('[CF-SINGLE-01] Für den Einzelfallimport fehlt die Schadennummer.');
   let profile=profileKey(run.profile);
+  let preserveClaimsSession=await hasExistingClaimsSession();
   if(singleSync&&Array.isArray(run.sourceProfiles)&&run.sourceProfiles.length){
     profile=run.sourceProfiles.length===1?profileKey(run.sourceProfiles[0]):await discoverSingleClaimSource(run);
     await chrome.storage.session.set({activeProfile:profile});
     await resetClaimsSession(run);
+    preserveClaimsSession=false;
   }
   await chrome.storage.session.set({ activeProfile: profile });
-  if (!singleSync) await resetClaimsSession(run);
-  const credential = await credentialsFor(profile);
-  await diagnostic(run, 'CF-CRED-01', credential ? 'Zugangsdatenquelle ist verfügbar.' : 'Für das Profil ist keine Zugangsdatenquelle verfügbar.', { source: credential?.source || 'keine' });
-  if (!credential) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar. Ursache: ' + (credentialDiagnostic || 'unbekannt') + '.');
-  if (!credentialMatchesProfile(profile, credential.value)) throw new Error('[CF-CRED-02] Das gespeicherte ClaimsForce-Konto gehört nicht zum ausgewählten Bearbeiterprofil.');
+  if (!singleSync && !preserveClaimsSession) await resetClaimsSession(run);
+  const credential = preserveClaimsSession ? null : await credentialsFor(profile);
+  await diagnostic(run, 'CF-CRED-01', preserveClaimsSession ? 'Vorhandene ClaimsForce-Sitzung wird verwendet.' : (credential ? 'Zugangsdatenquelle ist verfügbar.' : 'Für das Profil ist keine Zugangsdatenquelle verfügbar.'), { source: preserveClaimsSession ? 'existing-session' : (credential?.source || 'keine') });
+  if (!credential && !preserveClaimsSession) throw new Error('[CF-CRED-01] Für dieses ClaimsForce-Profil sind keine vollständigen Zugangsdaten verfügbar. Ursache: ' + (credentialDiagnostic || 'unbekannt') + '.');
+  if (credential && !credentialMatchesProfile(profile, credential.value)) throw new Error('[CF-CRED-02] Das gespeicherte ClaimsForce-Konto gehört nicht zum ausgewählten Bearbeiterprofil.');
   const { tab, token } = await claimsTab(profile, run, credential);
   run.claimsTabId = tab.id;
   await diagnostic(run, 'CF-TOKEN-03', 'ClaimsForce-Sitzungstoken wurde übernommen.', { route: safeRoute((await chrome.tabs.get(tab.id)).url) });
