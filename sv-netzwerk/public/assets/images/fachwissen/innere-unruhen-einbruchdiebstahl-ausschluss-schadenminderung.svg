@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Beschädigte Schaufensterscheibe vor einer nächtlichen Stadtsilhouette</title>
+  <desc id="desc">Dunkle Stadtsilhouette, orangefarbener Fensterrahmen und ein stilisiertes Sprungnetz in der Scheibe.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101d34"/>
+      <stop offset="1" stop-color="#233d5b"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9ac5d2" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#e5f4f4" stop-opacity=".08"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#07111f" flood-opacity=".45"/>
+    </filter>
+  </defs>
+  <rect width="1536" height="1024" fill="url(#bg)"/>
+  <circle cx="1180" cy="190" r="92" fill="#f7b955" opacity=".9"/>
+  <path d="M0 742h118v-152h92v82h112V474h118v147h96V406h140v174h113V514h93v112h124V364h123v292h95v-176h110v262h104v-94h101v194H0z" fill="#0a1525"/>
+  <path d="M0 820h1536v204H0z" fill="#07101c"/>
+  <g filter="url(#shadow)">
+    <rect x="188" y="178" width="1160" height="680" rx="18" fill="#d17b32"/>
+    <rect x="229" y="219" width="1078" height="598" fill="url(#glass)" stroke="#f2c38a" stroke-width="8"/>
+    <path d="M768 219v598M229 518h1078" stroke="#e9b879" stroke-width="11" opacity=".8"/>
+    <path d="M572 219l-92 161 112 110-137 151 98 187M963 219l-75 146 118 121-147 153 126 178M229 365l176 87-71 153 205 74M1307 338l-163 113 65 127-185 111" fill="none" stroke="#f4f2dd" stroke-width="13" stroke-linecap="round" opacity=".92"/>
+    <path d="M768 518l-48 72 50 60-40 111M768 518l58 58-49 74 64 85" fill="none" stroke="#ef6e52" stroke-width="16" stroke-linecap="round"/>
+  </g>
+  <g fill="#ef6e52" opacity=".94">
+    <circle cx="342" cy="882" r="22"/><path d="M328 912h28l18 82h-64z"/>
+    <circle cx="476" cy="884" r="20"/><path d="M463 911h26l22 83h-68z"/>
+    <circle cx="1070" cy="884" r="21"/><path d="M1057 912h27l20 82h-68z"/>
+    <circle cx="1196" cy="883" r="23"/><path d="M1181 914h30l20 80h-70z"/>
+  </g>
+  <path d="M279 992h978" stroke="#f7b955" stroke-width="8" stroke-linecap="round"/>
+</svg>
