@@ -15,6 +15,18 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Abnahme nach der Schadenreparatur: Befund, Restmängel und Rechnung sauber trennen',
+    description: 'Ausführung, Restmängel, Nachträge und Rechnung nach einer Schadenreparatur nachvollziehbar abnehmen und fachlich abgrenzen.',
+    href: '/fachwissen/abnahme-schadenreparatur-befund-rechnungspruefung/',
+    category: 'Schadenregulierung',
+    tags: ['Abnahme', 'Schadenreparatur', 'Restmängel', 'Rechnungsprüfung', 'Nachträge', 'Schadenbezug', 'Dokumentation'],
+    date: '2026-11-04',
+    publishedAt: '2026-11-04T05:00:00.000Z',
+    type: 'article',
+    featured: false,
+    earlyAccess: true,
+  },
+  {
     title: 'Sturm- und Hagelschäden an Rollläden und Fassaden fachlich prüfen',
     description: 'Befund, Funktion, Vorschaden und Wiederherstellungsumfang bei Sturm- und Hagelschäden an Rollläden, Raffstores und Fassaden nachvollziehbar abgrenzen.',
     href: '/fachwissen/sturm-hagel-rolllaeden-fassade-befund-kostenpruefung/',
