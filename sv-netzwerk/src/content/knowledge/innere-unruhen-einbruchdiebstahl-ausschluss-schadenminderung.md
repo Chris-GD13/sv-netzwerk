@@ -22,12 +22,9 @@ cta:
   label: "Versicherungsschäden fachlich prüfen lassen"
   href: "/kontakt/"
 relatedLinks:
-  - label: "Prüffähige Dokumentation im Schadenfall"
-    href: "/fachwissen/prueffaehige-dokumentation/"
-  - label: "Haftung, Plausibilität und Deckung in der richtigen Reihenfolge"
-    href: "/fachwissen/haftpflichtpruefung-plausibilitaet-haftung-deckung-pruefreihenfolge/"
-  - label: "Brandschäden mit Todesfolge fachlich einordnen"
-    href: "/fachwissen/brandschaeden-todesfolge-rauchwarnmelder-rauchverteilung-beweissicherung/"
+  - "/fachwissen/prueffaehige-dokumentation/"
+  - "/fachwissen/haftpflichtpruefung-plausibilitaet-haftung-deckung-pruefreihenfolge/"
+  - "/fachwissen/brandschaeden-todesfolge-rauchwarnmelder-rauchverteilung-beweissicherung/"
 damageTypes:
   - "Einbruchdiebstahl"
   - "Vandalismus"
