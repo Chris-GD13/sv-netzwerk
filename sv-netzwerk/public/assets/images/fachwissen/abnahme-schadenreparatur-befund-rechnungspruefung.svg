@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" role="img" aria-labelledby="title desc">
+<title id="title">Abnahme nach der Schadenreparatur</title>
+<desc id="desc">Stilisierte Innenansicht eines instandgesetzten Gebäudebereichs mit Prüfunterlagen und sichtbarer Kontrollmarkierung als Symbolbild für Abnahme und Rechnungsprüfung.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c3040"/><stop offset="1" stop-color="#66808a"/></linearGradient>
+  <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1eee7"/><stop offset="1" stop-color="#c7c2b8"/></linearGradient>
+  <linearGradient id="floor" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9d7657"/><stop offset="1" stop-color="#5b4032"/></linearGradient>
+  <filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#07131e" flood-opacity=".35"/></filter>
+</defs>
+<rect width="1536" height="1024" fill="url(#bg)"/>
+<path d="M0 0H1536V260Q1200 180 820 260T0 210Z" fill="#0f202c" opacity=".35"/>
+<g filter="url(#shadow)">
+  <path d="M130 250H1406V850H130Z" fill="url(#wall)"/>
+  <path d="M130 250L780 95L1406 250Z" fill="#3e4c50"/>
+  <path d="M130 850H1406V980H130Z" fill="url(#floor)"/>
+  <path d="M130 850L780 720L1406 850" fill="#7f5b44" opacity=".55"/>
+  <rect x="230" y="345" width="410" height="310" rx="8" fill="#7ea6b4" stroke="#35474e" stroke-width="18"/>
+  <path d="M435 345V655M230 500H640" stroke="#d4e0df" stroke-width="12" opacity=".9"/>
+  <rect x="900" y="345" width="330" height="310" rx="8" fill="#b5b0a6" stroke="#35474e" stroke-width="18"/>
+  <path d="M920 510H1210M920 585H1210" stroke="#8e8980" stroke-width="16"/>
+  <path d="M900 655H1230" stroke="#35474e" stroke-width="18"/>
+  <rect x="250" y="780" width="1030" height="22" rx="10" fill="#d7d1c5"/>
+</g>
+<g transform="translate(1000 125) rotate(-8)" filter="url(#shadow)">
+  <rect width="315" height="410" rx="12" fill="#f7f3ea" stroke="#38484c" stroke-width="10"/>
+  <rect x="36" y="44" width="240" height="26" rx="8" fill="#b9c7c6"/>
+  <rect x="36" y="112" width="210" height="16" rx="8" fill="#9da9a5"/>
+  <rect x="36" y="150" width="230" height="16" rx="8" fill="#9da9a5"/>
+  <rect x="36" y="188" width="180" height="16" rx="8" fill="#9da9a5"/>
+  <path d="M52 278l48 48 116-136" fill="none" stroke="#e49a45" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="36" y="356" width="150" height="14" rx="7" fill="#9da9a5"/>
+</g>
+<g fill="#e8a44d" opacity=".95">
+  <circle cx="215" cy="160" r="22"/><circle cx="300" cy="125" r="13"/><circle cx="1320" cy="165" r="19"/>
+</g>
+<g fill="none" stroke="#f0b45f" stroke-width="10" opacity=".9">
+  <path d="M180 760H430"/><path d="M180 790H360"/>
+  <path d="M1110 735H1320"/><path d="M1150 765H1320"/>
+</g>
+<rect x="92" y="905" width="575" height="70" rx="14" fill="#f4f0e5" opacity=".9"/>
+<text x="125" y="950" font-family="Arial,Helvetica,sans-serif" font-size="30" fill="#1b2c35" letter-spacing="2">ABNAHME · BEFUND · RECHNUNG</text>
+</svg>
