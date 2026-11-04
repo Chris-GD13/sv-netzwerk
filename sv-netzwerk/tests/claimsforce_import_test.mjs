@@ -208,6 +208,7 @@ assert(manifest.content_scripts.some(entry => entry.matches.includes('https://ww
 assert(manifest.content_scripts.some(entry => entry.js.includes('portal-login-helper.js') && entry.run_at === 'document_idle'), 'Portal-Anmeldehilfe startet erst am vorhandenen Loginformular');
 
 const portal = fs.readFileSync(path.join(root, 'src/pages/intern/versicherungsfaelle/index.astro'), 'utf8');
+const claimsCentral = fs.readFileSync(path.join(root, 'public/intern/claimsforce-central.js'), 'utf8');
 const dashboard = fs.readFileSync(path.join(root, 'src/pages/intern/tagescockpit/index.astro'), 'utf8');
 const internEntry = fs.readFileSync(path.join(root, 'src/pages/intern/index.astro'), 'utf8');
 const internLayout = fs.readFileSync(path.join(root, 'src/layouts/InternalLayout.astro'), 'utf8');
@@ -217,7 +218,7 @@ assert(internLayout.includes('class="intern-header__login" href="/intern/login/"
 assert(internLayout.includes('href="/intern/fensterpruefung-bonn/">Fenstergutachten</a>') && !internLayout.includes("label: 'Fenster',"), 'Der Menüpunkt ist eindeutig als Fenstergutachten bezeichnet');
 assert(calculationPage.indexOf('data-kva-import') < calculationPage.indexOf('bk-input-card'), 'Die KVA-Nachkalkulation steht als erste Arbeitskarte vor Suche und Schnellkalkulation');
 assert(portal.includes('Aufträge aus Claims einlesen'));
-assert(portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
+assert((portal + claimsCentral).includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
 assert(portal.includes('claimsforce-central.js?v=20261011-2'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
@@ -444,6 +445,7 @@ assert(manifest.permissions.includes('browsingData') && serviceWorker.includes('
 assert(serviceWorker.includes('if (!singleSync) await resetClaimsSession(run)') && serviceWorker.includes('const openTasks = singleSync || directRead ? null : await readOpenTasks(tab.id)'), 'Einzelfallimporte und direkte Quellenabrufe überspringen die Aufgaben-Navigation');
 assert(serviceWorker.includes('if (!singleSync) await ensureInvoicedListTab(tab.id)') && serviceWorker.includes("if (!singleSync && scrapedRoute !== '/invoiced')"), 'Nur der Listenabgleich navigiert zu /invoiced; Einzelfallimporte suchen auf der aktuellen ClaimsForce-Seite');
 assert(serviceWorker.includes('await resetClaimsSession(run)') && serviceWorker.includes('chrome.tabs.remove(tab.id)'), 'Vollimporte setzen ClaimsForce-Sitzungen bei einem Profilwechsel weiterhin zurück');
+assert(!serviceWorker.includes('claimsTabs.filter(tab => Number.isInteger(tab.id)).map(tab => chrome.tabs.remove(tab.id)'), 'ClaimsForce-Tabs werden bei einem Profilwechsel nicht mehr geschlossen');
 assert(serviceWorker.includes('tokenEmail') && serviceWorker.includes('CF-AUTH-03'), 'Eine im Sitzungstoken erkennbare fremde ClaimsForce-Identität wird vor dem Einlesen gesperrt');
 assert(serviceWorker.includes("key: 'WITH_FUTURE_APPOINTMENT'") && serviceWorker.includes("key: 'WITHOUT_APPOINTMENT'") && serviceWorker.includes('chrome.tabs.update(tabId, { url: planningUrl })'), 'Nach erfolgreicher Anmeldung werden beide ClaimsForce-Planungsansichten deterministisch geöffnet');
 assert(serviceWorker.includes('claimsById = new Map()') && serviceWorker.includes('bucketCounts') && serviceWorker.includes('unterschiedliche Aufträge mit und ohne Termin'), 'Aufträge aus beiden Ansichten werden vor dem Delta-Abgleich ohne Dubletten zusammengeführt');
