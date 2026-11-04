@@ -219,7 +219,7 @@ assert(internLayout.includes('href="/intern/fensterpruefung-bonn/">Fenstergutach
 assert(calculationPage.indexOf('data-kva-import') < calculationPage.indexOf('bk-input-card'), 'Die KVA-Nachkalkulation steht als erste Arbeitskarte vor Suche und Schnellkalkulation');
 assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(claimsCentral.includes('target.textContent=`Import für ${profileNames[rawProfile]}${folder?` · Ziel: ${folder}`') || portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
-assert(portal.includes('button.dataset.claimsProfile=raw') && portal.includes("supported.includes(raw)"), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
+assert(claimsCentral.includes('supportedProfiles.includes(rawProfile)') && claimsCentral.includes('supportedProfiles.includes(raw)'), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
 assert(portal.includes('claimsforce-central.js?v=20261011-2'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
 assert(portal.includes('Schadennummer für Vollimport') && portal.includes('Diesen Schaden vollständig einlesen'), 'Der Vollimport ist als gezielter Einzelfallimport mit Schadennummer beschrieben');
