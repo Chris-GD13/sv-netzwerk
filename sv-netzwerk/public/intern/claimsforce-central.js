@@ -291,7 +291,6 @@
     context=d;
     const rawProfile=String(d.backoffice?(d.selected_expert||'christian'):d.claims_profile||'').trim().toLowerCase();
     if(supportedProfiles.includes(rawProfile)){
-      button.dataset.claimsProfile=rawProfile;
       const folder=String(d.folders?.cases?.name||'').trim();
       const target=document.getElementById('vf-claims-target');
       if(target)target.textContent=`Import für ${profileNames[rawProfile]}${folder?` · Ziel: ${folder}`:''}`;
