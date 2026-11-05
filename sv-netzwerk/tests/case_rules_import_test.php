@@ -80,4 +80,3 @@ try {
     $database = null;
     if (PHP_OS_FAMILY !== 'Windows') cleanupRuleTest($root);
 }
-
