@@ -25,9 +25,19 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     <ul id="case-rules-results" aria-live="polite"></ul>
     <details><summary>Vorhandene Vorgaben und Originalvorlagen</summary><ul id="case-rules-list"></ul></details>
   </section>
+  <section id="case-rules-cleanup" class="knowledge-card" hidden>
+    <h2>IONOS-Regelbestand sicher bereinigen</h2>
+    <p>Der Dry-Run listet jede gleichnamige Masterdatei mit Pfad, Größe und SHA-256. Beim Anwenden bleibt genau eine geprüfte aktive Kopie übrig; alle anderen Fassungen werden recoverbar nach <code>00_Standards_Regeln/ARCHIV – NICHT AKTIV/2026-11-05/</code> verschoben.</p>
+    <p><strong>Erwarteter SHA-256:</strong> <code>D3151085C71967C9903D48D7408857FD8815A9E83CF656DB81FF525C8CB12B45</code></p>
+    <label>Geprüfte Masterdatei auswählen (nur exakt passende SHA-256-Datei wird akzeptiert)<input id="case-rules-master-file" type="file" accept=".md" /></label>
+    <p><button id="case-rules-cleanup-dry" type="button" class="knowledge-refresh">Dry-Run starten</button> <button id="case-rules-cleanup-apply" type="button" class="knowledge-refresh">Bereinigung anwenden</button></p>
+    <p id="case-rules-cleanup-status" role="status"></p>
+    <ul id="case-rules-cleanup-results" aria-live="polite"></ul>
+  </section>
 </section>
 <style>
 .administration-page{max-width:1200px;margin:auto;padding:28px 22px}.administration-page h1{margin:0 0 20px;color:#17324a}.knowledge-card{padding:20px;border:1px solid #d6dce1;border-top:4px solid #f59a23;background:#fff}.knowledge-card[hidden]{display:none}.knowledge-controls{display:grid;grid-template-columns:280px minmax(240px,1fr);gap:12px}.knowledge-controls label{display:grid;gap:5px;font-weight:800;font-size:.82rem}.knowledge-controls input,.knowledge-controls select{min-width:0;width:100%;box-sizing:border-box;border:1px solid #bdcbd6;border-radius:3px;padding:10px;font:inherit;background:#fff}.knowledge-refresh{border:1px solid #315f86;border-radius:3px;background:#fff;color:#17324a;padding:8px 12px;font:inherit;font-weight:800;cursor:pointer}.knowledge-refresh:disabled{opacity:.6;cursor:wait}li{overflow-wrap:anywhere}@media(max-width:700px){.administration-page{padding:20px 12px}.knowledge-controls{grid-template-columns:1fr}}
 </style>
 <script is:inline src="/intern/case-rules-import.js?v=20261011-admin"></script>
 </InternalLayout>
+
