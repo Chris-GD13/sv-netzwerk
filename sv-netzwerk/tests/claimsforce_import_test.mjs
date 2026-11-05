@@ -474,4 +474,3 @@ assert(vault.includes("AES-GCM"), 'Kennwörter werden verschlüsselt gespeichert
 console.log('ClaimsForce-Import: Zuordnung, Bestandsschutz, Zugangstresor und Browser-Brücke geprüft.');
 
 assert.match(claimsBridgeDiagnostic, /INVOICED_ROWS_REQUEST/, 'Kostennotenliste wird ohne Scrollen aus den Tabellenzeilen gelesen');
-
