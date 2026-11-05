@@ -24,7 +24,6 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     </form>
     <ul id="case-rules-results" aria-live="polite"></ul>
     <details><summary>Vorhandene Vorgaben und Originalvorlagen</summary><ul id="case-rules-list"></ul></details>
-  </section>
   <section id="case-rules-cleanup" class="knowledge-card" hidden>
     <h2>IONOS-Regelbestand sicher bereinigen</h2>
     <p>Der Dry-Run listet jede gleichnamige Masterdatei mit Pfad, Größe und SHA-256. Beim Anwenden bleibt genau eine geprüfte aktive Kopie übrig; alle anderen Fassungen werden recoverbar nach <code>00_Standards_Regeln/ARCHIV – NICHT AKTIV/2026-11-05/</code> verschoben.</p>
@@ -40,4 +39,3 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 </style>
 <script is:inline src="/intern/case-rules-import.js?v=20261011-admin"></script>
 </InternalLayout>
-
