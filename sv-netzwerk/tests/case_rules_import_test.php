@@ -73,7 +73,7 @@ try {
     caImportRule('Richtlinie.pdf', '%PDF-original', 'knowledge', false);
     caImportRule('Vorlage.docx', 'original-template', 'templates', false);
     $rules = caIonosRuleFiles();
-    ruleCheck(count($rules) === 4, 'All MD originals, duplicate master, PDF and Office originals must be available without duplicate traversal');
+    ruleCheck(count($rules) === 3, 'All active MD, PDF and Office originals must be available without duplicate traversal');
     ruleCheck(count(array_filter($rules, fn($file)=>str_contains($file['path'], '/ab sofort immer gültig/'))) === 1, 'Binding originals must retain their path');
     echo "case_rules_import_test: ok\n";
 } finally {
