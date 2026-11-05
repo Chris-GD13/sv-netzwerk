@@ -12,7 +12,7 @@ const version=[file.id,file.updatedAt,file.size,file.name].join('|');
 async function execute(mode,contents){
   const events=[],uploads=[];let entry;const prior={claimsforce_file_versions:[version],claimsforce_sync_signature:'same-signature',claimsforce_list_version:'same-list'};
   const context={console,URL,Map,Set,Date,JSON,String,Number,Array,Error,Promise,TextEncoder,Uint8Array,AbortController,setTimeout,clearTimeout,crypto:webcrypto,btoa:s=>Buffer.from(s,'binary').toString('base64'),readSourceOrRecordLegacyConflict,
-    BRIDGE_VERSION:'test',credentialDiagnostic:'',lastTaskDebug:{},profileKey:p=>p,credentialsFor:async()=>({value:{},source:'fixture'}),credentialMatchesProfile:()=>true,
+    BRIDGE_VERSION:'test',credentialDiagnostic:'',lastTaskDebug:{},profileKey:p=>p,credentialsFor:async()=>({value:{},source:'fixture'}),hasExistingClaimsSession:async()=>false,credentialMatchesProfile:()=>true,
     resetClaimsSession:async()=>{},claimsTab:async()=>({tab:{id:2},token:'fixture'}),readOpenTasks:async()=>0,ensureInvoicedListTab:async()=>{},openSelectedClaimTab:async()=>{},
     diagnostic:async()=>{},progress:async()=>{},safeRoute:x=>x,safeFileName:x=>x,assertSingleClaim:()=>{},claimFolderPath:()=>'',fileVersion:()=>version,messageVersion:()=>'',
     mergeClaimFiles:a=>a,mapClaim:d=>({claimsforce_claim_id:d.id,schaden_nr:'26-TEST'}),unwrap:(v,key)=>v?.[key]??v,fingerprint:async()=> 'same-signature',
