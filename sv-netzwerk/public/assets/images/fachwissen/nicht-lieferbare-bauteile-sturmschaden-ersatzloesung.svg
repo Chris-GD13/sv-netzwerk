@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" role="img" aria-labelledby="title desc">
+<title id="title">Nicht mehr lieferbare Bauteile nach einem Sturmschaden</title>
+<desc id="desc">Stilisierte Gebäudedachfläche mit Solarmodulen, einem markierten Ersatzmodul und technischen Vergleichsunterlagen als Symbolbild für die Prüfung von Ersatzlösungen.</desc>
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#183044"/><stop offset="1" stop-color="#6f8c95"/></linearGradient>
+  <linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7b8584"/><stop offset="1" stop-color="#303b40"/></linearGradient>
+  <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#46788b"/><stop offset="1" stop-color="#1e3546"/></linearGradient>
+  <filter id="shadow"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#07131e" flood-opacity=".38"/></filter>
+</defs>
+<rect width="1536" height="1024" fill="url(#sky)"/>
+<path d="M0 220Q350 110 760 220T1536 180V0H0Z" fill="#0b1a28" opacity=".34"/>
+<g opacity=".35" fill="none" stroke="#bdd3d7" stroke-width="8">
+  <path d="M90 150Q300 40 520 130"/>
+  <path d="M1010 120Q1260 30 1490 140"/>
+</g>
+<g filter="url(#shadow)">
+  <path d="M130 470L760 170L1410 470V900H130Z" fill="url(#roof)"/>
+  <path d="M130 470L760 170L1410 470" fill="none" stroke="#242f35" stroke-width="28"/>
+  <g transform="translate(330 370) rotate(-24)">
+    <rect width="245" height="155" rx="6" fill="url(#panel)" stroke="#172934" stroke-width="12"/>
+    <path d="M82 0V155M164 0V155M0 52H245M0 104H245" stroke="#9ec0c8" stroke-width="5" opacity=".8"/>
+    <path d="M125 0V155M0 78H245" stroke="#e4a34a" stroke-width="8" opacity=".85"/>
+  </g>
+  <g transform="translate(650 235) rotate(-24)">
+    <rect width="245" height="155" rx="6" fill="url(#panel)" stroke="#172934" stroke-width="12"/>
+    <path d="M82 0V155M164 0V155M0 52H245M0 104H245" stroke="#9ec0c8" stroke-width="5" opacity=".8"/>
+  </g>
+  <g transform="translate(970 100) rotate(-24)">
+    <rect width="245" height="155" rx="6" fill="#b7c5c2" stroke="#384c51" stroke-width="12"/>
+    <path d="M82 0V155M164 0V155M0 52H245M0 104H245" stroke="#7b8e8e" stroke-width="5"/>
+    <path d="M44 110L92 70L133 108L190 44" fill="none" stroke="#df9742" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <path d="M160 900H1410" stroke="#222c31" stroke-width="26"/>
+  <rect x="245" y="705" width="285" height="110" rx="8" fill="#d8d5ca" stroke="#4a5758" stroke-width="10"/>
+  <rect x="575" y="705" width="285" height="110" rx="8" fill="#d8d5ca" stroke="#4a5758" stroke-width="10"/>
+  <path d="M280 750H492M610 750H822" stroke="#899393" stroke-width="14"/>
+  <path d="M280 785H430M610 785H770" stroke="#a0aaa5" stroke-width="12"/>
+</g>
+<g fill="#dbe8e6" stroke="#8eaab0" stroke-width="5" opacity=".92">
+  <circle cx="205" cy="165" r="24"/><circle cx="430" cy="110" r="18"/><circle cx="720" cy="95" r="25"/><circle cx="1325" cy="170" r="23"/>
+</g>
+<g fill="#f4f0e5" opacity=".9">
+  <rect x="78" y="914" width="670" height="70" rx="14"/>
+</g>
+<text x="112" y="960" font-family="Arial,Helvetica,sans-serif" font-size="29" fill="#1b2c35" letter-spacing="2">GLEICHWERTIGKEIT · ERSATZ · MEHRWERT</text>
+</svg>
