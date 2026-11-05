@@ -15,6 +15,18 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Nicht mehr lieferbare Bauteile nach Sturm- und Hagelschäden fachlich bewerten',
+    description: 'Technische Gleichwertigkeit, notwendige Anpassungen und Verbesserungen bei nicht mehr lieferbaren Bauteilen nachvollziehbar abgrenzen.',
+    href: '/fachwissen/nicht-lieferbare-bauteile-sturmschaden-ersatzloesung/',
+    category: 'Sturm- und Hagelschäden',
+    tags: ['Sturm', 'Hagel', 'Bauteilersatz', 'Gleichwertigkeit', 'Solaranlage', 'Kostenabgrenzung', 'Schadenregulierung'],
+    date: '2026-11-05',
+    publishedAt: '2026-11-05T05:00:00.000Z',
+    type: 'article',
+    featured: false,
+    earlyAccess: true,
+  },
+  {
     title: 'Abnahme nach der Schadenreparatur: Befund, Restmängel und Rechnung sauber trennen',
     description: 'Ausführung, Restmängel, Nachträge und Rechnung nach einer Schadenreparatur nachvollziehbar abnehmen und fachlich abgrenzen.',
     href: '/fachwissen/abnahme-schadenreparatur-befund-rechnungspruefung/',
