@@ -10,8 +10,9 @@ final class SvAssistantProvider {
     public const MAX_OUTPUT=8000;
     public const RESERVATION=1100000; // Entire 1.05M context + output at buffered rates.
     public static function tariff(): array {return ['id'=>'luna-20261017-buffered-eur-v1','input_micro'=>1,'output_micro'=>5,'input_usd_per_million'=>0.20,'output_usd_per_million'=>0.75,'expires'=>'2026-11-01T00:00:00+01:00'];}
-    public function __construct(private string $key,private Closure $readFile) {if($key==='')throw new RuntimeException('AI_KEY_MISSING');}
-    public function maximum(): int {if(time()>=strtotime(self::tariff()['expires']))throw new RuntimeException('AI_TARIFF_REVIEW_REQUIRED');return self::RESERVATION;}
+    private Closure $clock;
+    public function __construct(private string $key,private Closure $readFile,?Closure $clock=null) {if($key==='')throw new RuntimeException('AI_KEY_MISSING');$this->clock=$clock??static fn():int=>time();}
+    public function maximum(): int {if(($this->clock)()>=strtotime(self::tariff()['expires']))throw new RuntimeException('AI_TARIFF_REVIEW_REQUIRED');return self::RESERVATION;}
     public function prepare(array $case,array $rules,string $action,string $instruction,string $master): array {
         $this->maximum();$input=[];$total=0;$manifest=[];$seen=[];$gaps=[];
         foreach($case['documents'] as $doc){
