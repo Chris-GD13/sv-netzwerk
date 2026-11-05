@@ -444,7 +444,7 @@ assert(serviceWorker.includes("if (!['christian', 'jens'].includes(profile))"), 
 assert(manifest.permissions.includes('browsingData') && serviceWorker.includes('chrome.browsingData.remove') && serviceWorker.includes('CLAIMS_ORIGINS'), 'Beim Profilwechsel werden ausschließlich ClaimsForce- und Auth0-Sitzungsdaten vollständig entfernt');
 assert((serviceWorker.includes('if (!singleSync) await resetClaimsSession(run)') || serviceWorker.includes('if (!singleSync && !preserveClaimsSession) await resetClaimsSession(run)')) && serviceWorker.includes('const openTasks = singleSync || directRead ? null : await readOpenTasks(tab.id)'), 'Einzelfallimporte und direkte Quellenabrufe überspringen die Aufgaben-Navigation');
 assert(serviceWorker.includes('if (!singleSync) await ensureInvoicedListTab(tab.id)') && serviceWorker.includes("if (!singleSync && scrapedRoute !== '/invoiced')"), 'Nur der Listenabgleich navigiert zu /invoiced; Einzelfallimporte suchen auf der aktuellen ClaimsForce-Seite');
-assert(serviceWorker.includes('await resetClaimsSession(run)') && serviceWorker.includes('chrome.tabs.remove(tab.id)'), 'Vollimporte setzen ClaimsForce-Sitzungen bei einem Profilwechsel weiterhin zurück');
+assert(serviceWorker.includes('await resetClaimsSession(run)') && serviceWorker.includes("chrome.tabs.update(tab.id, { url: 'https://web.claimsforce.com/login' })"), 'Vollimporte setzen ClaimsForce-Sitzungen bei einem Profilwechsel zurück und lassen die Registerkarte für die erneute Anmeldung offen');
 assert(!serviceWorker.includes('claimsTabs.filter(tab => Number.isInteger(tab.id)).map(tab => chrome.tabs.remove(tab.id)'), 'ClaimsForce-Tabs werden bei einem Profilwechsel nicht mehr geschlossen');
 assert(serviceWorker.includes('tokenEmail') && serviceWorker.includes('CF-AUTH-03'), 'Eine im Sitzungstoken erkennbare fremde ClaimsForce-Identität wird vor dem Einlesen gesperrt');
 assert(serviceWorker.includes("key: 'WITH_FUTURE_APPOINTMENT'") && serviceWorker.includes("key: 'WITHOUT_APPOINTMENT'") && serviceWorker.includes('chrome.tabs.update(tabId, { url: planningUrl })'), 'Nach erfolgreicher Anmeldung werden beide ClaimsForce-Planungsansichten deterministisch geöffnet');
@@ -474,3 +474,4 @@ assert(vault.includes("AES-GCM"), 'Kennwörter werden verschlüsselt gespeichert
 console.log('ClaimsForce-Import: Zuordnung, Bestandsschutz, Zugangstresor und Browser-Brücke geprüft.');
 
 assert.match(claimsBridgeDiagnostic, /INVOICED_ROWS_REQUEST/, 'Kostennotenliste wird ohne Scrollen aus den Tabellenzeilen gelesen');
+
