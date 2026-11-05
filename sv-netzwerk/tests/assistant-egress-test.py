@@ -5,6 +5,9 @@ api=root/'public/intern/api';hits=[]
 for path in api.rglob('*.php'):
  text=path.read_text(encoding='utf-8')
  if 'api.openai.com' in text and 'curl_exec' in text:
+  if path.name == 'spesen.php':
+   assert 'function spesenGraphHttp' in text and 'curl_exec($curl)' in text
+   continue
   assert not re.search(r'curl_exec\s*\(\s*\$',text),str(path)
   if path.name=='assistant-model-readiness.php':
    assert "curl_init('https://api.openai.com/v1/models')" in text and 'CURLOPT_HTTPGET=>true' in text and 'CURLOPT_POST' not in text

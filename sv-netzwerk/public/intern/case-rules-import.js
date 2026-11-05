@@ -6,6 +6,10 @@
   const form = element('case-rules-form');
   const results = element('case-rules-results');
   const api = '/intern/api/case-rules-import.php';
+  const cleanupPanel = element('case-rules-cleanup');
+  const cleanupStatus = element('case-rules-cleanup-status');
+  const cleanupResults = element('case-rules-cleanup-results');
+  const cleanupApi = '/intern/api/case-rules-cleanup.php';
   async function request(options = {}) {
     const response = await fetch(api, { credentials: 'same-origin', cache: 'no-store', ...options });
     const data = await response.json();
@@ -14,6 +18,13 @@
       error.status = response.status;
       throw error;
     }
+    return data;
+  }
+  async function cleanupRequest(options = {}) {
+    const { url = cleanupApi, ...fetchOptions } = options;
+    const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', ...fetchOptions });
+    const data = await response.json();
+    if (!response.ok || !data.ok) { const error = new Error(data.error || 'IONOS-Regelbestand konnte nicht geprüft werden.'); error.status = response.status; throw error; }
     return data;
   }
   function item(list, text) {
@@ -35,6 +46,36 @@
     }
   }
   element('case-rules-refresh').onclick = () => refresh();
+  async function cleanupDryRun() {
+    try {
+      const data = await cleanupRequest();
+      cleanupPanel.hidden = false;
+      cleanupResults.replaceChildren();
+      for (const file of data.files) item(cleanupResults, `${file.classification} · ${file.path} · ${file.size} Bytes · ${file.sha256}`);
+      cleanupStatus.textContent = `${data.plan.master_count} gleichnamige Masterdatei(en), ${data.plan.canonical_count} kanonisch, ${data.plan.archive_count} zu archivieren.`;
+      return data;
+    } catch (error) {
+      if (error.status === 401 || error.status === 403) { cleanupPanel.hidden = true; return null; }
+      cleanupPanel.hidden = false; cleanupStatus.textContent = `Dry-Run fehlgeschlagen: ${error.message}`; return null;
+    }
+  }
+  element('case-rules-cleanup-dry').onclick = () => cleanupDryRun();
+  element('case-rules-cleanup-apply').onclick = async () => {
+    const file = element('case-rules-master-file').files[0];
+    if (!file) { cleanupStatus.textContent = 'Bitte die geprüfte MASTER-ARBEITSSTANDARD.md auswählen.'; return; }
+    if (!window.confirm('IONOS-Regelbestand jetzt bereinigen? Alte Fassungen werden nur recoverbar archiviert.')) return;
+    const controls = [element('case-rules-cleanup-dry'), element('case-rules-cleanup-apply'), element('case-rules-master-file')];
+    controls.forEach(control => { control.disabled = true; });
+    try {
+      const body = new FormData(); body.append('file', file);
+      const data = await cleanupRequest({ url: `${cleanupApi}?action=apply`, method: 'POST', body, });
+      cleanupResults.replaceChildren();
+      for (const archived of data.archived || []) item(cleanupResults, `Archiviert · ${archived.from} → ${archived.to} · ${archived.sha256}`);
+      cleanupStatus.textContent = `Bereinigung bestätigt: genau eine aktive Masterkopie (${data.canonical.sha256}); Release ${data.release.id} rückgelesen.`;
+      await cleanupDryRun();
+    } catch (error) { cleanupStatus.textContent = `Bereinigung gestoppt: ${error.message}`; }
+    finally { controls.forEach(control => { control.disabled = false; }); }
+  };
   form.onsubmit = async event => {
     event.preventDefault();
     const files = [...element('case-rules-files').files];
@@ -68,4 +109,5 @@
     }
   };
   refresh();
+  cleanupDryRun();
 })();
