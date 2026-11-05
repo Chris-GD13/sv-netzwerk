@@ -55,4 +55,3 @@ function crcBuildPlan(array $files, string $canonicalPath): array
         'ready'=>count($canonical) === 1 && hash_equals(CRC_MASTER_SHA256, strtoupper((string)($keep['sha256'] ?? ''))),
     ];
 }
-
