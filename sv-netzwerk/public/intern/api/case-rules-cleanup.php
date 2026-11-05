@@ -145,4 +145,3 @@ try {
     error_log('[case-rules-cleanup] '.$error->getMessage());
     apiError(422, $error->getMessage());
 }
-
