@@ -1,14 +1,16 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/ionos-storage.php';
+require_once __DIR__ . '/case-search.php';
 commonHeaders();
-requireAuth();
+$user = requireAuth();
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') apiError(405, 'POST erforderlich.');
 
 $file = $_FILES['file'] ?? null;
 if (!is_array($file) || ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) apiError(400, 'Keine gültige Datei empfangen.');
 $size = (int)($file['size'] ?? 0);
-if ($size <= 0 || $size > 30 * 1024 * 1024) apiError(413, 'Datei darf höchstens 30 MB groß sein.');
+if ($size <= 0 || $size > 300 * 1024 * 1024) apiError(413, 'Datei darf höchstens 300 MB groß sein.');
 $name = basename((string)($file['name'] ?? ''));
 $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
 if (!in_array($ext, ['pdf','docx','pptx','xlsx','csv'], true)) apiError(415, 'Nur PDF, DOCX, PPTX, XLSX und CSV werden unterstützt.');
@@ -18,10 +20,38 @@ if (!is_uploaded_file($tmp)) apiError(400, 'Upload konnte nicht bestätigt werde
 try {
     $converted = mdConvert($tmp, $ext, $name);
     if ($converted['markdown'] === '') apiError(422, 'Die Datei enthält keinen auslesbaren Inhalt.');
-    apiJson(['ok'=>true, 'markdown'=>$converted['markdown'], 'filename'=>pathinfo($name, PATHINFO_FILENAME).'.md', 'method'=>$converted['method']]);
+    $caseNumber = trim((string)($_POST['case_number'] ?? ''));
+    $saved = $caseNumber !== '' ? mdSaveToCase($user, $caseNumber, pathinfo($name, PATHINFO_FILENAME).'.md', $converted['markdown']) : null;
+    apiJson(['ok'=>true, 'markdown'=>$converted['markdown'], 'filename'=>pathinfo($name, PATHINFO_FILENAME).'.md', 'method'=>$converted['method'], 'case_number'=>$caseNumber, 'saved'=>$saved]);
 } catch (Throwable $e) {
     error_log('[markdown] '.$e->getMessage());
+    $message = $e->getMessage();
+    if (str_contains($message, 'Schadennummer') || str_contains($message, 'Schadenfall') || str_contains($message, 'Fallakten') || str_contains($message, 'Fallablage')) {
+        apiError(422, $message);
+    }
     apiError(422, 'Die Datei konnte nicht in Markdown umgewandelt werden.');
+}
+
+function mdSaveToCase(array $user, string $caseNumber, string $sourceName, string $markdown): array
+{
+    $key = caseNumberKey($caseNumber);
+    if ($key === '') throw new RuntimeException('Die Schadennummer ist ungültig.');
+    $matches = [];
+    foreach (searchCaseFolderIndex($user, $caseNumber, 1000) as $row) {
+        $metaNumber = (string)($row['meta']['schaden_nr'] ?? '');
+        if ($metaNumber !== '' && caseNumberKey($metaNumber) === $key) $matches[(string)$row['id']] = $row;
+    }
+    if (count($matches) === 0) throw new RuntimeException('Kein zugänglicher Schadenfall mit dieser Schadennummer gefunden.');
+    if (count($matches) > 1) throw new RuntimeException('Mehrere Fallakten tragen diese Schadennummer. Bitte zuerst die Fallzuordnung klären.');
+    $row = array_values($matches)[0];
+    $folderId = trim((string)($row['id'] ?? ''));
+    requireCaseFolderAccess($folderId, $user);
+    if (!ionosStorageEnabled()) throw new RuntimeException('Die Fallablage ist derzeit nicht verfügbar.');
+    $base = preg_replace('/[^\p{L}\p{N}._-]+/u', '-', pathinfo($sourceName, PATHINFO_FILENAME)) ?? 'Unterlage';
+    $base = trim($base, '-_.') ?: 'Unterlage';
+    $name = 'Markdown_'.gmdate('Ymd-His').'_'.mb_substr($base, 0, 120, 'UTF-8').'.md';
+    $saved = ionosWrite(['name'=>$name, 'mimeType'=>'text/markdown', 'parents'=>[$folderId]], $markdown);
+    return ['case_number'=>(string)($row['meta']['schaden_nr'] ?? $caseNumber), 'folder_id'=>$folderId, 'file_id'=>(string)($saved['id'] ?? ''), 'name'=>$name, 'webViewLink'=>'/intern/api/case-file-browser.php?action=file&folder_id='.rawurlencode($folderId).'&file_id='.rawurlencode((string)($saved['id'] ?? ''))];
 }
 
 function mdConvert(string $path, string $ext, string $name): array
