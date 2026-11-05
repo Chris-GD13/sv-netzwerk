@@ -48,7 +48,7 @@ pcheck(svAssistantLatestRejection($db,999999)===null,'rejection diagnostic never
 pcheck($x['status']==='failed'&&!isset($x['result']['answer'])&&$engine->budget()['spent_micro']===$before+15000,'case change during network discards answer but records usage');
 pfail(fn()=>SvAiPaidPermit::issue($db,'unreserved',str_repeat('0',64)),'AI_DISPATCH_NOT_RESERVED');
 // Actual provider payload: fixed endpoint/model, no tools, source hashes and unsupported formats.
-$real=new SvAssistantProvider('synthetic-key',fn($id)=>['name'=>'test.txt','mime'=>'text/plain','bytes'=>'text']);$case=assistantTestCases()['fixture-b'];$case['documents']=[['id'=>'text','sha256'=>hash('sha256','text')]];
+$real=new SvAssistantProvider('synthetic-key',fn($id)=>['name'=>'test.txt','mime'=>'text/plain','bytes'=>'text'],fn()=>strtotime('2026-10-31T23:59:00+01:00'));$case=assistantTestCases()['fixture-b'];$case['documents']=[['id'=>'text','sha256'=>hash('sha256','text')]];
 $payload=$real->prepare($case,[],'invoices','test','synthetic master');pcheck($payload['model']==='gpt-6-luna'&&$payload['store']===false&&!isset($payload['tools']),'fixed cheap model, no retention/tools');
 $case['documents'][0]['sha256']=hash('sha256','other');pfail(fn()=>$real->prepare($case,[],'check','',''),'CASE_CHANGED');
 unset($payload['_svnet_gaps']);
@@ -62,6 +62,6 @@ if(!class_exists('ZipArchive'))throw new RuntimeException('Test needs zip extens
 $tmp=tempnam(sys_get_temp_dir(),'sv-xlsx-test-');$z=new ZipArchive();$z->open($tmp,ZipArchive::OVERWRITE);$rows='';for($i=1;$i<=1001;$i++)$rows.='<row r="'.$i.'"><c r="A'.$i.'"><v>'.$i.'</v></c></row>';
 $z->addFromString('xl/worksheets/sheet1.xml','<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'.$rows.'</sheetData></worksheet>');$z->close();$sheet=file_get_contents($tmp);unlink($tmp);
 pcheck(str_contains(svAssistantSpreadsheetText($sheet),'A1001: 1001'),'full local spreadsheet includes row 1001');
-$reader=new SvAssistantProvider('synthetic-key',fn()=>['name'=>'demo.xlsm','mime'=>'application/vnd.ms-excel.sheet.macroEnabled.12','bytes'=>$sheet]);$case['documents'][0]['sha256']=hash('sha256',$sheet);
+$reader=new SvAssistantProvider('synthetic-key',fn()=>['name'=>'demo.xlsm','mime'=>'application/vnd.ms-excel.sheet.macroEnabled.12','bytes'=>$sheet],fn()=>strtotime('2026-10-31T23:59:00+01:00'));$case['documents'][0]['sha256']=hash('sha256',$sheet);
 $p=$reader->prepare($case,[],'invoices','','');pcheck(str_contains(json_encode($p),'A1001: 1001')&&!str_contains(json_encode($p),'file_data'),'XLSM supplied as complete read-only text, not truncated provider sheet');
 echo "TOTAL $n paid-adapter checks; all transports simulated, actual external cost zero\n";
