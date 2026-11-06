@@ -32,8 +32,8 @@ damageTypes:
   - "Großschaden"
 publication:
   publishedAt: "2026-11-06"
-  updatedAt: "2026-11-04"
-  status: "review"
+  updatedAt: "2026-11-06"
+  status: "published"
   earlyAccess: false
 seo:
   title: "Innere Unruhen im Schadenfall fachlich prüfen"
