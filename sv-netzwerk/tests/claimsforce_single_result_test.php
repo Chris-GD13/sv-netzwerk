@@ -51,7 +51,7 @@ foreach(['marc','holger']as$profile){
 require_once dirname(__DIR__).'/public/intern/api/profile-routing.php';
 foreach(['cw@sv-schuett.eu','ws@sv-schuett.eu']as$email){
  $user=['email'=>$email];
- if(cqSingleSourceProfiles($user,'')!==['christian'])throw new RuntimeException('Christian-Quelle wird nicht als sichere Standardsitzung gewählt.');
+ if(cqSingleSourceProfiles($user,'')!==['christian','jens'])throw new RuntimeException('Beide Quellen fehlen.');
  if(cqSingleSourceProfiles($user,'',['jens'])!==['jens'])throw new RuntimeException('Bestehender Maurer-Fall wird falsch nachgeladen.');
  if(cqSingleSourceProfiles($user,'jens')!==['jens'])throw new RuntimeException('Explizite Quellenwahl fehlt.');
 }
