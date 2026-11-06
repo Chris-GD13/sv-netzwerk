@@ -29,8 +29,9 @@ function paSettlementPayload(array $calculation,array $meta): array {
         if($mode==='percent'){
             $rate=$line['settlement_percent']??null;
             if(!is_numeric($rate)||!is_finite((float)$rate)||(float)$rate<=0||(float)$rate>100)throw new RuntimeException('Abgeltungssatz fehlt in Position '.$position.'.');
-            $amount=$net*(float)$rate/100;
-            $sections[]='Position '.$position.' ('.$line['description'].'): '.number_format((float)$rate,2,',','.').' % des Nettobetrags '.number_format($net,2,',','.').' EUR, Abgeltung '.number_format($amount,2,',','.').' EUR.';
+            $gross=$net*(1+(float)$calculation['vat_rate']/100);
+            $amount=$gross*(float)$rate/100;
+            $sections[]='Position '.$position.' ('.$line['description'].'): '.number_format((float)$rate,2,',','.').' % des Bruttobetrags '.number_format($gross,2,',','.').' EUR, Abgeltung '.number_format($amount,2,',','.').' EUR.';
         }else{
             $amount=$net*(1+(float)$calculation['vat_rate']/100);
             $sections[]='Position '.$position.' ('.$line['description'].'): Auszahlung zu 100 % brutto, '.number_format($amount,2,',','.').' EUR.';
