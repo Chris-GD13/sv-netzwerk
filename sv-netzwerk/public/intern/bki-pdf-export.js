@@ -16,7 +16,7 @@
     .catch(()=> '');
   const regulator=()=>document.getElementById('bk-regulator')?.value?.trim()||regulatorName;
   const note=()=>document.getElementById('bk-note')?.value?.trim()||'';
-  const germanNumber=value=>{const normalized=String(value??'').replace(/[^0-9,.-]/g,'').replace(/\./g,'').replace(',','.');const parsed=Number(normalized);return Number.isFinite(parsed)?parsed:0;};
+  const germanNumber=value=>{let raw=String(value??'').trim().replace(/[^0-9,.-]/g,'');if(raw==='')return 0;const comma=raw.lastIndexOf(','),dot=raw.lastIndexOf('.');if(comma>-1&&dot>-1){raw=comma>dot?raw.replace(/\./g,'').replace(',','.'):raw.replace(/,/g,'');}else if(comma>-1){raw=raw.replace(/\./g,'').replace(',','.');}const parsed=Number(raw);return Number.isFinite(parsed)?parsed:0;};
   const calculatedGross=()=>lines().reduce((sum,line)=>line?.type==='section'?sum:sum+(num(line?.quantity)*num(line?.unit_price)*num(line?.regional_factor||1)*(1+vat()/100)),0);
 
   function kvaReview(){
