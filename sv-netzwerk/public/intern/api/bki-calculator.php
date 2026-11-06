@@ -95,7 +95,7 @@ function bkOpenAIUploadBytes(string $name,string $mime,string $bytes):string{
     $response=curl_exec(svAiGuardHandle($ch,'bki-upload'));$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$error=curl_error($ch);curl_close($ch);
     $json=json_decode((string)$response,true);$message=is_array($json)?trim((string)($json['error']['message']??'')):'';$code=is_array($json)?strtolower(trim((string)($json['error']['code']??''))):'';
     if($code==='insufficient_quota'||str_contains(strtolower($message),'no credits remaining'))throw new RuntimeException('Die KVA-Auswertung ist derzeit nicht verfügbar, weil das hinterlegte KI-API-Guthaben aufgebraucht ist. Datei und Fallzuordnung sind in Ordnung; nach Aufladung bitte erneut auslesen.');
-    if($response===false||$error!==''||$status<200||$status>=300)throw new RuntimeException('KVA konnte nicht für die Auswertung bereitgestellt werden.');
+    if($response===false||$error!==''||$status<200||$status>=300){\n      $detail=$message!==''?$message:($error!==''?$error:('HTTP '.$status));\n      throw new RuntimeException('KVA-Datei konnte an den Auswertungsdienst nicht übergeben werden ('.$detail.').');\n    }
     $id=trim((string)($json['id']??''));
     if($id==='')throw new RuntimeException('KVA-Datei-ID fehlt.');
     return$id;
