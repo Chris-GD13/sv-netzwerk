@@ -27,7 +27,7 @@ echo "Profilrouting: eigene Profile, alte Sitzungen und Susanne-Ausnahme geprüf
 
 foreach($users as$i=>$user){
  $profiles=svnetAccessibleCaseProfiles($user);
- $expected=$i===0||$i===4?['christian','jens']:[['christian'],['marc'],['holger'],['jens']][$i];
+ $expected=$i===0||$i===4?['christian']:[['christian'],['marc'],['holger'],['jens']][$i];
  if($profiles!==$expected)throw new RuntimeException('Falscher gemeinsamer Fallbestand.');
  foreach(svnetSupportedProfiles()as$owner){
   if(svnetCanAccessCaseProfile($user,$owner)!==in_array($owner,$expected,true))throw new RuntimeException('Fremdzugriff auf '.$owner);
@@ -37,7 +37,7 @@ echo "Maurer: nur Christian und Susanne erhalten den gemeinsamen Fallbestand.\n"
 foreach($users as$i=>$user){
     $allowed=$i===0||$i===1||$i===4;
     if(svnetCanRunClaimsStation($user)!==$allowed)throw new RuntimeException('Falsche Importstationsfreigabe.');
-    if(svnetClaimsStationProfiles($user)!==($i===1?['marc']:($allowed?['christian','jens']:[])))throw new RuntimeException('Fremder Importbestand.');
+    if(svnetClaimsStationProfiles($user)!==($i===1?['marc']:($allowed?['christian']:[])))throw new RuntimeException('Fremder Importbestand.');
 }
 if(!svnetCanRunClaimsStation(['email'=>'cw@sv-schuett.eu']))throw new RuntimeException('Christian-Claims-Adresse fehlt.');
 if(svnetCanRunClaimsStation(['email'=>'unknown@example.invalid','role'=>'administrator']))throw new RuntimeException('Unbekannter Administrator erhält Importrecht.');
