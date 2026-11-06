@@ -79,6 +79,12 @@ function kvaBundlePrepare(string $name,string $mime,string $bytes,string $select
         }
         if(!$offers) throw new RuntimeException('In der Sammeldatei wurde kein Originalangebot mit bepreisten Positionen erkannt.');
         if($selected==='') return ['offers'=>array_values($offers),'selection_required'=>true];
+        if(!isset($offers[$selected])){
+            $normalize=static fn(string $value):string=>strtolower(preg_replace('/[^a-z0-9]/i','',$value));
+            foreach($offers as $candidateKey=>$candidate){
+                if($normalize($selected)!==''&&$normalize($selected)===$normalize((string)($candidate['quote_number']??''))){$selected=(string)$candidateKey;break;}
+            }
+        }
         if(!isset($offers[$selected])) throw new RuntimeException('Die Belegauswahl gehört nicht zu dieser Originaldatei. Bitte erneut auslesen.');
         $offer=$offers[$selected]; $part=kvaBundleTemp();
         try { kvaBundleCommand(['/usr/bin/qpdf',$source,'--pages','.',$offer['start'].'-'.$offer['end'],'--',$part]); return ['bytes'=>(string)file_get_contents($part),'quote_number'=>$offer['quote_number'],'company'=>$offer['company']]; }
