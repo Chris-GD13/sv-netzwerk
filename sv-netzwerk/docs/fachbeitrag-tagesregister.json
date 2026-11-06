@@ -72,7 +72,24 @@
       "linkedin": {
         "status": "not-posted"
       }
+    },
+    "2026-11-06": {
+      "publication_id": "2026-11-06-innere-unruhen-einbruchdiebstahl-ausschluss-schadenminderung",
+      "article": {
+        "title": "Innere Unruhen im Schadenfall: Einbruchdiebstahl, Ausschluss und Schadenminderung sauber prüfen",
+        "slug": "innere-unruhen-einbruchdiebstahl-ausschluss-schadenminderung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/innere-unruhen-einbruchdiebstahl-ausschluss-schadenminderung/",
+        "status": "published-verified",
+        "owner": "codex-website-20261106-0600",
+        "reserved_at": "2026-11-06T05:00:00.000Z",
+        "commit": "e2915dc4387b7f2eb06912663f3b44c16913c671",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/42202205965",
+        "verified_at": "2026-11-06T10:29:35.997Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-11-03T08:01:13Z"
+  "updated_at": "2026-11-06T10:29:35.997Z"
 }
