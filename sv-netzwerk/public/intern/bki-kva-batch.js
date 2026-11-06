@@ -13,7 +13,7 @@
     kva_source_position:row.source_position, kva_description:row.description,kva_scope:row.scope,
     bki_scope_checked:result.status==='ready',bki_batch_checked:true,
     comparison_basis:result.status==='ready'?'bki':'kva_open',
-    source_name:result.status==='ready'?'BKI-Vergleichspreis für vollständige KVA-Leistung':'KVA-Angebotspreis erhalten · Preisprüfung offen', offer_label:row.offer_label||'',
+    source_name:result.status==='ready'?'BKI-Vergleichspreis für vollständige KVA-Leistung':'KVA-Angebotspreis erhalten · Preisprüfung offen',
     bki_note:result.reason,
     bki_price_evidence:result.priced_components||result.components||[],
     bki_open_items:result.open_items||[],
@@ -59,7 +59,7 @@
         }).join('');
         results.innerHTML = `<div class="bk-batch-table"><table><thead><tr><th>KVA</th><th>Pos.</th><th>Leistung</th><th>Angebot netto</th><th>Grundlage</th><th>Vergleich netto</th></tr></thead><tbody>${rendered}</tbody></table></div><p>Angebot: ${money(offered)} · Vergleichsentwurf: ${money(proposed)}. ${open?'Mengen, Stückzahlen und Leistungsumfang bleiben aus dem KVA erhalten. Bei unvollständiger Preiszuordnung bleibt der vollständige Angebotspreis bestehen und ist als ungeprüft gekennzeichnet. BKI-Teilpreise sind nur Hinweise in den Details, keine Kürzung.':'Alle ausgewählten Leistungen sind durch BKI-Fundstellen belegt.'} Regionalfaktor ist nicht belegt und wird nicht ergänzt.</p>`;
         if(catalog){
-          results.querySelectorAll('tbody tr').forEach((tr,i)=>{const result=data.positions[i];tr.cells[3].textContent=result.status==='ready'?'Vollständiger BKI-Vergleich':'Angebotspreis erhalten · ungeprüft';});
+          results.querySelectorAll('tbody tr').forEach((tr,i)=>{const result=data.positions[i];tr.cells[4].textContent=result.status==='ready'?'Vollständiger BKI-Vergleich':'Angebotspreis erhalten · ungeprüft';});
           const notice=document.createElement('p');notice.textContent='Preisprüfung bei unverändertem KVA-Leistungsumfang. Unvollständige BKI-Teilpreise ersetzen keinen vollständigen Angebotspreis.';results.prepend(notice);
           const taskList=document.createElement('details');taskList.innerHTML='<summary>Gebündelte Angaben für den Ortstermin</summary><ul>'+[...new Set((data.questions||[]).map(q=>q.label).filter(Boolean))].slice(0,8).map(label=>'<li>'+esc(label)+'</li>').join('')+'</ul>';results.append(taskList);
         }
