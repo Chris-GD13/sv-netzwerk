@@ -87,9 +87,16 @@ function kvaBundlePrepare(string $name,string $mime,string $bytes,string $select
         }
         if(!isset($offers[$selected])) throw new RuntimeException('Die Belegauswahl gehört nicht zu dieser Originaldatei. Bitte erneut auslesen.');
         $offer=$offers[$selected];
-        // Die vollständige Original-PDF bleibt erhalten. Die Angebotsnummer begrenzt
-        // die anschließende Positionsauswertung sicherer als ein ausgeschnittener
-        // Seitenblock, der bei Briefen und fortgesetzten Angeboten Positionen verlieren kann.
+        // Kleine Dateien bleiben vollständig, damit fortgesetzte Angebote und Briefe
+        // nicht durch einen Seitenausschnitt verkürzt werden. Große PDFs werden auf
+        // den gewählten Angebotsblock begrenzt, damit der Auswertungsdienst sie annimmt.
+        if(strlen($bytes)>18*1024*1024){
+            $part=kvaBundleTemp();
+            try{
+                kvaBundleCommand(['/usr/bin/qpdf',$source,'--pages','.',$offer['start'].'-'.$offer['end'],'--',$part]);
+                return ['bytes'=>(string)file_get_contents($part),'quote_number'=>$offer['quote_number'],'company'=>$offer['company']];
+            }finally{@unlink($part);}
+        }
         return ['bytes'=>$bytes,'quote_number'=>$offer['quote_number'],'company'=>$offer['company']];
     } finally { @unlink($source); }
 }
