@@ -15,6 +15,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Innere Unruhen im Schadenfall: Einbruchdiebstahl, Ausschluss und Schadenminderung sauber prüfen',
+    description: 'Einbruchdiebstahl, Ausschluss für innere Unruhen und Schadenminderung bei Ausschreitungen sachlich und fallbezogen bewerten.',
+    href: '/fachwissen/innere-unruhen-einbruchdiebstahl-ausschluss-schadenminderung/',
+    category: 'Versicherungsrecht und Sachversicherung',
+    tags: ['Innere Unruhen', 'Einbruchdiebstahl', 'Sachversicherung', 'Schadenminderung', '§ 82 VVG', 'Schadenregulierung'],
+    date: '2026-11-06',
+    publishedAt: '2026-11-06T05:00:00.000Z',
+    type: 'article',
+    featured: false,
+  },  {
     title: 'Nicht mehr lieferbare Bauteile nach Sturm- und Hagelschäden fachlich bewerten',
     description: 'Technische Gleichwertigkeit, notwendige Anpassungen und Verbesserungen bei nicht mehr lieferbaren Bauteilen nachvollziehbar abgrenzen.',
     href: '/fachwissen/nicht-lieferbare-bauteile-sturmschaden-ersatzloesung/',
