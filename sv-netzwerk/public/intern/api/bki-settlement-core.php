@@ -64,16 +64,16 @@ textLine($ops,60,$y-50,'VERSICHERUNGSNEHMER / OBJEKT',7,true,$muted);foreach(arr
 textLine($ops,60,$y-82,'SCHADENORT',7,true,$muted);textLine($ops,133,$y-82,$location!==''?$location:'-',8.5,false,$navy);
 $y-=112;drawTableHeader($ops,$y);
 
-$totalGross=0.0;$payout=0.0;$position=0;$rowIndex=0;
+$totalGross=0.0;$payout=0.0;$payoutGross=0.0;$nonRestoreGross=0.0;$position=0;$rowIndex=0;
 foreach($lines as$line){
   if(($line['type']??'')==='section'){
     $sectionLines=wrapText((string)($line['description']??'KVA-Positionen'),77);$height=max(28,14+count($sectionLines)*11);needSpace($pages,$ops,$y,$height,true);
     fillRect($ops,45,$y-$height,505,$height,$section);fillRect($ops,45,$y-$height,4,$height,$orange);foreach($sectionLines as$index=>$value)textLine($ops,58,$y-18-$index*11,$value,9,true,$navy);$y-=$height+4;$rowIndex=0;continue;
   }
   $position++;$quantity=(float)($line['quantity']??0);$unit=trim((string)($line['unit']??''));$unitPrice=(float)($line['unit_price']??0);$factor=(float)($line['regional_factor']??1);$net=$quantity*$unitPrice*$factor;$gross=$net*(1+$vat/100);$totalGross+=$gross;
-  $mode=(string)($line['settlement_mode']??'restore');$percent=max(0,min(100,(float)($line['settlement_percent']??30)));$settlementAmount=$mode==='percent'?$net*$percent/100:($mode==='full'?$gross:0.0);if($mode!=='restore')$payout+=$settlementAmount;
+  $mode=(string)($line['settlement_mode']??'restore');$percent=max(0,min(100,(float)($line['settlement_percent']??30)));$settlementAmount=$mode==='percent'?$net*$percent/100:($mode==='full'?$gross:0.0);$settlementAmountGross=$mode==='percent'?$gross*$percent/100:($mode==='full'?$gross:0.0);if($mode!=='restore'){$payout+=$settlementAmount;$payoutGross+=$settlementAmountGross;$nonRestoreGross+=$gross;}
   $description=wrapText((string)($line['description']??'Freie Position'),46);$basisText=numberValue($quantity).($unit!==''?' '.$unit:'').' x '.money($unitPrice);if(abs($factor-1)>.0001)$basisText.=' x '.numberValue($factor);$basis=wrapText($basisText,16);
-  $regulation=$isKvaReview?['BKI-Nachkalkulation']:($mode==='percent'?[numberValue($percent).' % vom Netto',money($settlementAmount)]:($mode==='full'?['Auszahlung 100 %',money($settlementAmount)]:['Wiederherstellung']));
+  $regulation=$isKvaReview?['BKI-Nachkalkulation']:($mode==='percent'?[numberValue($percent).' % vom Brutto',money($settlementAmountGross)]:($mode==='full'?['Auszahlung 100 %',money($settlementAmountGross)]:['Wiederherstellung']));
   $height=max(36,16+count($description)*10,16+count($basis)*9,16+count($regulation)*10);needSpace($pages,$ops,$y,$height,true);if($rowIndex%2===1)fillRect($ops,45,$y-$height,505,$height,[.985,.990,.994]);
   textLine($ops,51,$y-16,(string)$position,8,true,$navy);foreach($description as$index=>$value)textLine($ops,78,$y-16-$index*10,$value,8,false,$navy);foreach($basis as$index=>$value)textLine($ops,318,$y-16-$index*9,$value,7.2,false,$muted);rightText($ops,462,$y-16,money($gross),8,true,$navy);foreach($regulation as$index=>$value)textLine($ops,472,$y-16-$index*10,$value,$index===0?7.2:7.8,$index>0,$index>0?$navy:$muted);
   strokeLine($ops,45,$y-$height,550,$y-$height,$lineColor,.35);$y-=$height;$rowIndex++;
@@ -94,8 +94,9 @@ if($isKvaReview){
   }
   if($y-125<66)startPage($pages,$ops,$y,false);textLine($ops,45,$y,'Prüfergebnis',13,true,$navy);$y-=8;fillRect($ops,45,$y-2,46,3,$orange);$y-=18;paragraph($pages,$ops,$y,$result,96,9,true);
 }else{
-  needSpace($pages,$ops,$y,102,false);$y-=14;fillRect($ops,45,$y-70,505,70,$panel);fillRect($ops,45,$y-70,4,70,$orange);
-  textLine($ops,60,$y-18,'KALKULATIONSSUMME',7,true,$muted);textLine($ops,60,$y-37,'Wiederherstellungsbetrag brutto',9,false,$navy);rightText($ops,535,$y-37,money($totalGross),12,true,$navy);textLine($ops,60,$y-56,'Auszahlung / Abgeltung',9,true,$navy);rightText($ops,535,$y-56,money($payout),12,true,$navy);$y-=92;
+  $kvaData=is_array($data['kva']??null)?$data['kva']:[];$manualApproved=(float)($kvaData['approved_gross']??0);$restorationGross=max(0.0,$totalGross-$nonRestoreGross);$recognizedGross=$manualApproved>0?$manualApproved:$restorationGross+$payoutGross;
+  needSpace($pages,$ops,$y,122,false);$y-=14;fillRect($ops,45,$y-90,505,90,$panel);fillRect($ops,45,$y-90,4,90,$orange);
+  textLine($ops,60,$y-18,'KALKULATIONSSUMME',7,true,$muted);textLine($ops,60,$y-37,'Anerkannter Gesamtbetrag brutto',9,false,$navy);rightText($ops,535,$y-37,money($recognizedGross),12,true,$navy);textLine($ops,60,$y-56,'Reguläre Wiederherstellung brutto',9,false,$navy);rightText($ops,535,$y-56,money($restorationGross),11,true,$navy);textLine($ops,60,$y-75,'Abgeltung brutto',9,true,$navy);rightText($ops,535,$y-75,money($payoutGross),11,true,$navy);$y-=112;
   if($note!==''){$noteParts=preg_split('/\n\s*\n/u',$note)?:[];$noteHeight=34;foreach($noteParts as$part)$noteHeight+=count(wrapText(trim($part),96))*13+4;if($y-($noteHeight+105)<66)startPage($pages,$ops,$y,false);textLine($ops,45,$y,'Vereinbarung',13,true,$navy);$y-=8;fillRect($ops,45,$y-2,46,3,$orange);$y-=18;foreach($noteParts as$index=>$part)paragraph($pages,$ops,$y,trim($part),96,9,$index===0);}
 }
 if($isKvaReview){needSpace($pages,$ops,$y,70,false);$y-=24;textLine($ops,45,$y,'Geprüft:',8,false,$muted);$y-=16;textLine($ops,45,$y,$regulator,10,true,$navy);$y-=14;textLine($ops,45,$y,'Sachverständiger & Regulierer',8,false,$muted);}else{needSpace($pages,$ops,$y,105,false);$y-=28;strokeLine($ops,50,$y,245,$y,$blue,.8);strokeLine($ops,350,$y,545,$y,$blue,.8);$y-=15;textLine($ops,50,$y,'Versicherungsnehmer / Bevollmaechtigter',7.5,true,$navy);textLine($ops,350,$y,$regulator,8.5,true,$navy);$y-=12;textLine($ops,350,$y,'Regulierer',7.5,false,$muted);}if($ops)$pages[]=$ops;
@@ -106,5 +107,5 @@ foreach($pages as$index=>$pageOps){$objects[$pageObjectStart+$index]='<< /Type /
 \svnetBrandPdfObjects($objects);ksort($objects);$pdf="%PDF-1.4\n%\xE2\xE3\xCF\xD3\n";$offsets=[0];foreach($objects as$number=>$object){$offsets[$number]=strlen($pdf);$pdf.="$number 0 obj\n$object\nendobj\n";}$xref=strlen($pdf);$max=max(array_keys($objects));$pdf.="xref\n0 ".($max+1)."\n0000000000 65535 f \n";for($index=1;$index<=$max;$index++)$pdf.=sprintf('%010d 00000 n ',$offsets[$index]??0)."\n";$pdf.="trailer\n<< /Size ".($max+1)." /Root 1 0 R >>\nstartxref\n$xref\n%%EOF";
 
 $filename=preg_replace('/[^A-Za-z0-9._-]+/','-',$caseNo!==''?$caseNo:'Schaden').($isKvaReview?'_KVA-Pruefung_':'_Abgeltungsvereinbarung_').$date.'.pdf';
-return ['bytes'=>$pdf,'filename'=>$filename,'payout'=>$payout,'gross'=>$totalGross];
+return ['bytes'=>$pdf,'filename'=>$filename,'payout'=>$payoutGross,'gross'=>$recognizedGross];
 }
