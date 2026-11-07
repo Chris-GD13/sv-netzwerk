@@ -230,7 +230,7 @@ assert(portal.includes("sessionStorage.removeItem('svnet-case')") && portal.incl
 
 const bridge = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/portal-bridge.js'), 'utf8');
 assert(bridge.includes('mergeBlank(existing?.meta || {}, message.mapped)'), 'Import ergänzt bestehende Falldaten nur in leeren Feldern');
-assert(bridge.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens']") && bridge.includes('profileKey(event.data.profile)'), 'Portal-Brücke übernimmt nur das ausdrücklich übergebene unterstützte Profil');
+assert(bridge.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'susanne', 'katja']") && bridge.includes('profileKey(event.data.profile)'), 'Portal-Brücke übernimmt nur das ausdrücklich übergebene unterstützte Profil');
 assert(!bridge.includes("profile: event.data.profile || 'self'") && !bridge.includes("profile: event.data.profile || 'christian'"), 'Portal-Brücke darf ein übergebenes Profil nicht stillschweigend ersetzen');
 assert(bridge.includes('PORTAL_SYNC_STATE') && bridge.includes('PORTAL_COMMIT_SYNC'), 'Portal stellt einen dauerhaften Änderungsstand pro ClaimsForce-Fall bereit');
 assert(bridge.includes("action=save_case"), 'Import nutzt den angemeldeten bzw. von Susanne ausgewählten persönlichen Fallordner');
