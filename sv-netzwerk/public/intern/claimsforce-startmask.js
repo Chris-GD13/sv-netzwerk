@@ -5,8 +5,8 @@
       'Normaler Versicherungsauftrag': { checks: ['Claims-Schadenbericht nativ','Anhänge vollständig prüfen','Outlook-Kalender auslesen','Alle Claimsforce-Ordner lesen','Offene Nacharbeiten'], task: 'Normaler Versicherungsauftrag: keinen Erstbericht, keinen Zwischenbericht, keinen Schlussbericht, keine native SE und keinen nativen ZB erstellen. Stattdessen den nativen Claimsforce-Schadenbericht vollständig ausfüllen. Alle Seiten, Felder und Spalten des Originalformulars bearbeiten. Claimsforce-Akte, Beauftragung, Brief, Schadenmeldung, Nachrichten, Bilder, Formulare, Weitere Dokumente und Kalenderanhänge vollständig lesen und übernehmen.' },
       'Normaler SV-Schaden': { checks: ['SE nativ','ZB nativ','Anhänge vollständig prüfen','Outlook-Kalender auslesen','Alle Claimsforce-Ordner lesen','Offene Nacharbeiten'], task: 'Normaler SV-Schaden: keinen Erstbericht, kein Schadenprotokoll und keinen zusätzlichen Bericht erstellen. Nur native SE und nativen ZB im bestehenden Claimsforce-Fall vollständig ausfüllen, speichern, erneut öffnen und sichtbar rücklesen. Claimsforce-Akte, Beauftragung, Brief, Nachrichten, alle Unterlagen und den vollständigen Kalendertermin vorher lesen.' }
     };
-    const profileFor = () => PROFILES[box.querySelector('#svcm-kind').value] || PROFILES['GF / TaskForce / Großschaden'];
-    const applyProfile = () => { const p = profileFor(); box.querySelector('#svcm-task').value = p.task; box.querySelectorAll('input[type="checkbox"]').forEach(el => { el.checked = p.checks.includes(el.value); el.dataset.required = el.checked ? 'true' : 'false'; }); };
+    const profileFor = () => { const root = document.querySelector('#sv-claims-startmask'); return PROFILES[root?.querySelector('#svcm-kind')?.value] || PROFILES['GF / TaskForce / Großschaden']; };
+    const applyProfile = () => { const root = document.querySelector('#sv-claims-startmask'); const p = profileFor(); if (!root) return; root.querySelector('#svcm-task').value = p.task; root.querySelectorAll('input[type="checkbox"]').forEach(el => { el.checked = p.checks.includes(el.value); el.dataset.required = el.checked ? 'true' : 'false'; }); };
   const normalizeClaimNumber = (value) => {
     let result = String(value || '').trim();
     result = result.replace(/^(?:mailto:)?[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\s*(?:[/|:;,>-]\s*)?/i, '');
@@ -95,17 +95,17 @@
     box.querySelectorAll('input[type="checkbox"]').forEach((el) => { el.addEventListener('change', () => { if (el.dataset.required === 'true') el.checked = true; }); });
     box.querySelector('#svcm-clear').addEventListener('click', () => {
       box.querySelector('#svcm-insurer').value = ''; caseInput.value = ''; applyProfile(); prompt.value = ''; box.querySelector('#svcm-status').textContent = '';
-      box.querySelectorAll('input[type="checkbox"]').forEach((el) => { el.checked = REQUIRED_OPTIONS.has(el.value); });
+      box.querySelectorAll('input[type="checkbox"]').forEach((el) => { el.checked = profileFor().checks.includes(el.value); });
     });
     const buildPrompt = () => {
-      const profile = box.querySelector('#svcm-profile').value, insurer = box.querySelector('#svcm-insurer').value.trim(), kind = box.querySelector('#svcm-kind').value, caseNo = normalizeClaimNumber(caseInput.value), enteredTask = taskInput.value.trim();
+      const selectedProfile = box.querySelector('#svcm-profile').value, insurer = box.querySelector('#svcm-insurer').value.trim(), kind = box.querySelector('#svcm-kind').value, caseNo = normalizeClaimNumber(caseInput.value), enteredTask = taskInput.value.trim();
       if (caseNo) caseInput.value = caseNo;
-      if (!caseNo) { box.querySelector('#svcm-status').textContent = 'Eine echte Schadennummer im Format 26-222980-5 eingeben.'; return ''; }
+      if (!caseNo) { box.querySelector('#svcm-status').textContent = 'Bitte die echte Schadennummer aus Claimsforce eingeben.'; return ''; }
       const profile = profileFor();
       const extra = enteredTask === profile.task ? '' : enteredTask.replace(profile.task, '').trim();
       const instructions = [profile.task, extra ? 'Zusätzliche fallbezogene Hinweise:\n' + extra : ''].filter(Boolean).join('\n\n');
       const choices = [...box.querySelectorAll('input[type="checkbox"]')].map(x => `${x.checked ? '☒' : '☐'} ${x.value}`).join('\n');
-      return `ARBEITSAUFTRAG FÜR DEN CLAIMSFORCE-AGENTEN\n\nBearbeiter / Claimsforce-Konto: ${profile}\nVersicherer: ${insurer || 'nicht angegeben'}\nAuftragstyp: ${kind}\nSchadennummer: ${caseNo}\n\nVERBINDLICHE STANDARDARBEITSANWEISUNG UND HINWEISE:\n${instructions}\n\nAUSGEWÄHLTE BEARBEITUNG:\n${choices}\n\nDiesen Arbeitsauftrag vollständig ausführen und die Ergebnisse als Entwurf zurückgeben. Nichts versenden, keine Zahlung und keine QS-Übergabe ohne ausdrücklichen Auftrag.`;
+      return `ARBEITSAUFTRAG FÜR DEN CLAIMSFORCE-AGENTEN\n\nBearbeiter / Claimsforce-Konto: ${selectedProfile}\nVersicherer: ${insurer || 'nicht angegeben'}\nAuftragstyp: ${kind}\nSchadennummer: ${caseNo}\n\nVERBINDLICHE STANDARDARBEITSANWEISUNG UND HINWEISE:\n${instructions}\n\nAUSGEWÄHLTE BEARBEITUNG:\n${choices}\n\nDiesen Arbeitsauftrag vollständig ausführen und die Ergebnisse als Entwurf zurückgeben. Nichts versenden, keine Zahlung und keine QS-Übergabe ohne ausdrücklichen Auftrag.`;
     };    box.querySelector('#svcm-start').addEventListener('click', () => {
       const text = buildPrompt();
       if (!text) return;
