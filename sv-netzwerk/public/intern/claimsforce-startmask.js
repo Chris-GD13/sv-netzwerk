@@ -6,7 +6,7 @@
     box.className = 'vf-card';
     box.innerHTML = `
       <header class="vf-step"><b>0</b><div><strong>Claimsforce Auftrag starten</strong><small>Für normale Aufträge und GF-Fälle</small></div></header>
-      <div class="vf-startmask-grid">
+      <div class="vf-startmask-grid">\n        <label>Bearbeiter / Claimsforce-Konto<select id="svcm-profile"><option value="Christian · Standardfälle">Christian · Standardfälle</option><option value="Christian · Maurer-Fälle">Christian · Maurer-Fälle</option><option value="Marc Schütt">Marc Schütt</option><option value="Holger Roth">Holger Roth</option><option value="Susanne Wächter">Susanne Wächter</option><option value="Katja Schäfer">Katja Schäfer</option></select></label>
         <label>Versicherer<input id="svcm-insurer" placeholder="Sparkasse, Württembergische, R+V …"></label>
         <label>Auftragstyp<select id="svcm-kind"><option>Normaler Versicherungsauftrag</option><option>GF / TaskForce / Großschaden</option><option>Hausrat</option><option>Haftpflicht</option><option>Elementar</option><option>Sonstiger Auftrag</option></select></label>
         <label class="wide">Schadennummer<input id="svcm-case" placeholder="z. B. 26-222980-5"></label>
@@ -32,11 +32,11 @@
     panel.parentElement.insertBefore(box, panel);
     box.querySelectorAll('input[type="checkbox"]').forEach((el, i) => { if (i >= 7) el.checked = true; });
     box.querySelector('#svcm-start').addEventListener('click', async () => {
-      const insurer = box.querySelector('#svcm-insurer').value.trim();
+      const profile = box.querySelector("#svcm-profile").value;\n      const insurer = box.querySelector('#svcm-insurer').value.trim();
       const kind = box.querySelector('#svcm-kind').value;
       const caseNo = box.querySelector('#svcm-case').value.trim();
       const task = box.querySelector('#svcm-task').value.trim();
-      if (!caseNo || !task) { box.querySelector('#svcm-status').textContent = 'Schadennummer und Arbeitsauftrag ausfüllen.'; return; }
+      if (!caseNo || !task) { box.querySelector('#svcm-status').textContent = 'Bearbeiter, Schadennummer und Arbeitsauftrag ausfüllen.'; return; }
       const outputs = [...box.querySelectorAll('input[type="checkbox"]:checked')].map(x => x.value);
       const prompt = `Claimsforce Schadenagent
 
