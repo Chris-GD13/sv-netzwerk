@@ -1,0 +1,24 @@
+---
+import InternalLayout from '../../../layouts/InternalLayout.astro';
+---
+
+<InternalLayout title="Rekon Auftrag starten" description="Geschützter Assistent für Rekon-Aufträge." currentPath="/intern/rekon/">
+  <main class="rekon-start-page">
+    <p class="rekon-kicker">Rekon</p>
+    <h1>Rekon Auftrag starten</h1>
+    <section class="rekon-card">
+      <h2>Assistent ist vorgemerkt</h2>
+      <p>Der eigene Rekon-Auftragsassistent folgt hier. Fälle werden weiterhin ausschließlich über die manuelle Fallsuche geöffnet.</p>
+    </section>
+  </main>
+</InternalLayout>
+
+<style is:global>
+  .rekon-start-page { max-width: 900px; padding: 28px 34px 60px; color: #17324a; }
+  .rekon-kicker { margin: 0 0 4px; color: #d67d00; font-size: .75rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+  .rekon-start-page h1 { margin: 0 0 16px; color: #071a2e; font-size: 2rem; }
+  .rekon-card { max-width: 650px; padding: 22px; border: 1px solid #d6dde2; border-top: 4px solid #f59a23; background: #fff; box-shadow: 0 2px 8px rgba(7,26,46,.06); }
+  .rekon-card h2 { margin: 0 0 8px; color: #071a2e; font-size: 1.1rem; }
+  .rekon-card p { margin: 0; color: #647789; }
+  @media (max-width: 700px) { .rekon-start-page { padding: 18px 12px 44px; } .rekon-start-page h1 { font-size: 1.55rem; } }
+</style>

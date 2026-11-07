@@ -17,8 +17,9 @@ const currentPath = props.currentPath ?? Astro.url.pathname;
 const internalLinks = [
   { href: '/intern/tagescockpit/', label: 'Tagescockpit', icon: '●' },
   { href: '/intern/aufgaben/', label: 'Aufgaben', icon: '✓' },
+  { href: '/intern/claimsforce/', label: 'Claimsforce Auftrag starten', icon: '↻' },
+  { href: '/intern/rekon/', label: 'Rekon Auftrag starten', icon: '◌' },
   { href: '/intern/versicherungsfaelle/', label: 'Versicherungsfälle', icon: '⌂', dynamic: 'cases' },
-  { href: '/intern/versicherungsfaelle/#vf-claims-import', label: 'ClaimsForce-Aufträge', icon: '↻', sub: true },
   { href: '/intern/zeitwertberechnung/', label: 'Zeitwertberechnung', icon: '⌛' },
   { href: '/intern/versicherungswissen/', label: 'Versicherungswissen', icon: '▤' },
   { href: '/intern/markdown/', label: 'Markdown-Konverter', icon: '↯' },
