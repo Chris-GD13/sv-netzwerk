@@ -89,7 +89,24 @@
       "linkedin": {
         "status": "not-posted"
       }
+    },
+    "2026-11-07": {
+      "publication_id": "2026-11-07-brandschaden-holzvergaser-heizung-brandbefund-loeschwasser-wiederinbetriebnahme",
+      "article": {
+        "title": "Brandschäden an Holzvergaser-Heizungen: Brandbefund, Löschwasser und Wiederinbetriebnahme trennen",
+        "slug": "brandschaden-holzvergaser-heizung-brandbefund-loeschwasser-wiederinbetriebnahme",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-holzvergaser-heizung-brandbefund-loeschwasser-wiederinbetriebnahme/",
+        "status": "published-verified",
+        "owner": "codex-website-20261107-0600",
+        "reserved_at": "2026-11-07T05:00:00.000Z",
+        "commit": "6167479d75abf94a4415697e646cfc3a7061777d",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/42341136017",
+        "verified_at": "2026-11-07T05:13:45Z"
+      },
+      "linkedin": {
+        "status": "prepared-not-posted"
+      }
     }
   },
-  "updated_at": "2026-11-06T10:29:35.997Z"
+  "updated_at": "2026-11-07T05:13:45Z"
 }
