@@ -1,4 +1,7 @@
 (() => {
+  const STANDARD_INSTRUCTIONS = `Arbeite den Fall vollständig und selbstständig ab. Lies vor jeder Erstellung alle Claimsforce-Bereiche und Unterordner: Beauftragung, Brief, Schadenmeldung, Nachrichten, Bilder, Formulare, Angebote, Rechnungen, Kalkulationen, Weitere Dokumente, Aufgaben und Nacharbeiten. Lies den vollständigen Outlook-Kalendertermin einschließlich Beschreibung, Teilnehmern, Notizen und Anhängen. Gleiche alles mit Prüfportal, Google Drive und den Originalvorlagen ab. Verwende ausschließlich die passende Originalvorlage. Fülle Erstbericht und passendes Schadenprotokoll vollständig aus. Schreibe den konkreten Schadenhergang direkt in den Abschnitt „Schadenhergang/-ursache“. Übernimm alle Claims-Daten, Kontaktdaten, Schadenort, Termine, Teilnehmer, Gebäudedaten, KVA, Zahlungen und Reserve. Ordne fünf richtige Fallbilder eindeutig diesem Fall zu. Erstelle SE und ZB nativ in Claimsforce, fülle sie vollständig, speichere, öffne sie erneut und lies jedes relevante Feld sichtbar zurück. Rendere und prüfe jede Word-Seite sichtbar. Lege die geprüften Word-Dateien unter Claimsforce → Dateien → Berichte ab. Bei einem Fehler die Originalvorlage neu öffnen und den Arbeitsschritt wiederholen, bis alles passt. Nichts versenden, keine Zahlung und keine QS-Übergabe ohne ausdrücklichen Auftrag.`;
+  const REQUIRED_OPTIONS = new Set(['Erstbericht', 'Schadenprotokoll', 'SE nativ', 'ZB nativ', 'Anhänge vollständig prüfen', 'Outlook-Kalender auslesen', 'Alle Claimsforce-Ordner lesen', 'Richtige Fotos zuordnen', 'Word-Ablage', 'Offene Nacharbeiten']);
+  const normalizeClaimNumber = (value) => String(value || '').match(/\b\d{2,3}(?:-\d{2,7}){2,3}\b/)?.[0] || '';
   const mount = () => {
     const target = document.querySelector('#claimsforce-assistant-mount, #vf-assistant-panel');
     if (document.getElementById('sv-claims-startmask') || !target) return;
@@ -50,7 +53,7 @@
               <input id="svcm-claim-number" name="damage_reference" type="search" autocomplete="off" data-lpignore="true" spellcheck="false" readonly placeholder="z. B. 26-222980-5">
             </label>
             <label for="svcm-task">Was soll in diesem Schaden bearbeitet werden?
-              <textarea id="svcm-task" name="claim_task" rows="3" autocomplete="off" data-lpignore="true" placeholder="Zum Beispiel: Erstbericht ausfüllen, alle Anlagen und Fotos prüfen, Reserve und Schadenumfang abgleichen."></textarea>
+              <textarea id="svcm-task" name="claim_task" rows="9" autocomplete="off" data-lpignore="true"></textarea>
             </label>
           </div>
           <fieldset class="svcm-checks"><legend>Benötigte Bearbeitung</legend>
@@ -58,8 +61,9 @@
             <label><input type="checkbox" value="Schlussbericht">Schlussbericht</label><label><input type="checkbox" value="Schadenprotokoll">Schadenprotokoll</label>
             <label><input type="checkbox" value="SE nativ">SE nativ</label><label><input type="checkbox" value="ZB nativ">ZB nativ</label>
             <label><input type="checkbox" value="Claims-Bericht">Claims-Bericht</label><label><input type="checkbox" value="Anhänge vollständig prüfen">Anhänge vollständig prüfen</label>
-            <label><input type="checkbox" value="Outlook-Kalender auslesen">Outlook-Kalender auslesen</label><label><input type="checkbox" value="Richtige Fotos zuordnen">Richtige Fotos zuordnen</label>
-            <label><input type="checkbox" value="KVA, Rechnungen, Zahlungen und Reserve prüfen">KVA, Rechnungen, Zahlungen und Reserve prüfen</label><label><input type="checkbox" value="Word in Claimsforce Dateien → Berichte ablegen">Word in Claimsforce Dateien → Berichte ablegen</label>
+            <label><input type="checkbox" value="Outlook-Kalender auslesen">Outlook-Kalender auslesen</label><label><input type="checkbox" value="Alle Claimsforce-Ordner lesen">Alle Claimsforce-Ordner lesen</label>
+            <label><input type="checkbox" value="Richtige Fotos zuordnen">Richtige Fotos zuordnen</label><label><input type="checkbox" value="Word-Ablage">Word-Ablage</label>
+            <label><input type="checkbox" value="Offene Nacharbeiten">Offene Nacharbeiten</label><label><input type="checkbox" value="KVA, Rechnungen, Zahlungen und Reserve prüfen">KVA, Rechnungen, Zahlungen und Reserve prüfen</label>
           </fieldset>
           <div class="svcm-actions"><button id="svcm-start" type="button">Arbeitsauftrag erstellen</button><button id="svcm-clear" type="button">Leeren</button><small class="svcm-note">Der Text rechts bleibt editierbar. Versand, Zahlung und QS-Übergabe bleiben gesperrt, solange sie nicht ausdrücklich beauftragt werden.</small></div>
         </div>
@@ -72,22 +76,23 @@
         </aside>
       </div>`;
     if (target.id === 'vf-assistant-panel') target.parentElement.insertBefore(box, target); else target.appendChild(box);
-    const caseInput = box.querySelector('#svcm-claim-number'), prompt = box.querySelector('#svcm-prompt');
+    const caseInput = box.querySelector('#svcm-claim-number'), taskInput = box.querySelector('#svcm-task'), prompt = box.querySelector('#svcm-prompt');
+    taskInput.value = STANDARD_INSTRUCTIONS;
     caseInput.addEventListener('focus', () => caseInput.removeAttribute('readonly'), { once: true });
-    box.querySelectorAll('input[type="checkbox"]').forEach((el, i) => { if (i >= 7) el.checked = true; });
+    box.querySelectorAll('input[type="checkbox"]').forEach((el) => { el.checked = REQUIRED_OPTIONS.has(el.value); if (el.checked) el.dataset.required = 'true'; el.addEventListener('change', () => { if (el.dataset.required === 'true') el.checked = true; }); });
     box.querySelector('#svcm-clear').addEventListener('click', () => {
-      box.querySelector('#svcm-insurer').value = ''; caseInput.value = ''; box.querySelector('#svcm-task').value = ''; prompt.value = ''; box.querySelector('#svcm-status').textContent = '';
-      box.querySelectorAll('input[type="checkbox"]').forEach((el, i) => { el.checked = i >= 7; });
+      box.querySelector('#svcm-insurer').value = ''; caseInput.value = ''; taskInput.value = STANDARD_INSTRUCTIONS; prompt.value = ''; box.querySelector('#svcm-status').textContent = '';
+      box.querySelectorAll('input[type="checkbox"]').forEach((el) => { el.checked = REQUIRED_OPTIONS.has(el.value); });
     });
     const buildPrompt = () => {
-      const profile = box.querySelector('#svcm-profile').value, insurer = box.querySelector('#svcm-insurer').value.trim(), kind = box.querySelector('#svcm-kind').value, caseNo = caseInput.value.trim(), task = box.querySelector('#svcm-task').value.trim();
-      if (!caseNo || !task) { box.querySelector('#svcm-status').textContent = 'Bearbeiter, Schadennummer und Arbeitsauftrag ausfüllen.'; return ''; }
-      const outputs = [...box.querySelectorAll('input[type="checkbox"]:checked')].map(x => x.value);
-      return `ARBEITSAUFTRAG FÜR DEN CLAIMSFORCE-AGENTEN\n\nBearbeiter / Claimsforce-Konto: ${profile}\nVersicherer: ${insurer || 'nicht angegeben'}\nAuftragstyp: ${kind}\nSchadennummer: ${caseNo}\nArbeitsauftrag: ${task}\n\nAusgewählte Bearbeitung:\n${outputs.map(x => '☑ ' + x).join('\n')}\n\nBearbeite den Fall vollständig nach dem verbindlichen Master-Arbeitsstandard. Lies Prüfportal, Claimsforce, Google Drive, Outlook-Kalender und alle fallbezogenen Anlagen. Verwende die passende Originalvorlage. Prüfe Word sichtbar und lege geprüfte Dateien unter ClaimsForce → Dateien → Berichte ab. Nichts versenden, keine Zahlung und keine QS-Übergabe ohne ausdrücklichen Auftrag.
-
-BITTE DIESEN ARBEITSAUFTRAG AUSFÜHREN UND DIE ERGEBNISSE ALS ENTWURF ZURÜCKGEBEN.`;
-    };
-    box.querySelector('#svcm-start').addEventListener('click', () => {
+      const profile = box.querySelector('#svcm-profile').value, insurer = box.querySelector('#svcm-insurer').value.trim(), kind = box.querySelector('#svcm-kind').value, caseNo = normalizeClaimNumber(caseInput.value), enteredTask = taskInput.value.trim();
+      if (caseNo) caseInput.value = caseNo;
+      if (!caseNo) { box.querySelector('#svcm-status').textContent = 'Eine echte Schadennummer im Format 26-222980-5 eingeben.'; return ''; }
+      const extra = enteredTask === STANDARD_INSTRUCTIONS ? '' : enteredTask.replace(STANDARD_INSTRUCTIONS, '').trim();
+      const instructions = [STANDARD_INSTRUCTIONS, extra ? `Zusätzliche fallbezogene Hinweise:\n${extra}` : ''].filter(Boolean).join('\n\n');
+      const choices = [...box.querySelectorAll('input[type="checkbox"]')].map(x => `${x.checked ? '☒' : '☐'} ${x.value}`).join('\n');
+      return `ARBEITSAUFTRAG FÜR DEN CLAIMSFORCE-AGENTEN\n\nBearbeiter / Claimsforce-Konto: ${profile}\nVersicherer: ${insurer || 'nicht angegeben'}\nAuftragstyp: ${kind}\nSchadennummer: ${caseNo}\n\nVERBINDLICHE STANDARDARBEITSANWEISUNG UND HINWEISE:\n${instructions}\n\nAUSGEWÄHLTE BEARBEITUNG:\n${choices}\n\nDiesen Arbeitsauftrag vollständig ausführen und die Ergebnisse als Entwurf zurückgeben. Nichts versenden, keine Zahlung und keine QS-Übergabe ohne ausdrücklichen Auftrag.`;
+    };    box.querySelector('#svcm-start').addEventListener('click', () => {
       const text = buildPrompt();
       if (!text) return;
       prompt.value = text;
