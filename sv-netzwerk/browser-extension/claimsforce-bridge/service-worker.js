@@ -16,19 +16,20 @@ const PLANNING_BUCKETS = [
   { key: 'WITHOUT_APPOINTMENT', hash: 'without-appointment', label: 'Ohne Termin' }
 ];
 const CLAIMS_ORIGINS = ['https://web.claimsforce.com', 'https://claimsforce.eu.auth0.com'];
-const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens'];
+const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'susanne', 'katja'];
 const PROFILE_EMAILS = {
   christian: 'cw@sv-schuett.eu',
   holger: 'hr@sv-schuett.eu',
   marc: 'ms@sv-schuett.eu',
-  jens: 'ws@sv-schuett.eu'
+  susanne: 'ws@sv-schuett.eu',
+  katja: 'ks@sv-schuett.eu'
 };
 // Das ws@sv-schuett.eu-Konto wird in ClaimsForce aktuell als Susanne Wächter
 // mit dem Kürzel SW angezeigt. JM/WS bleiben als ältere Kontokennungen gültig.
-const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM', 'WS', 'SW'] };
+const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], susanne: ['SW'], katja: ['KS'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
-const WORKER_CODE_VERSION = '1.4.80';
+const WORKER_CODE_VERSION = '1.4.81';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';

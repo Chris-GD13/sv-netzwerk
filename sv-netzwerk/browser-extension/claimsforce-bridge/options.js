@@ -1,10 +1,10 @@
 import { saveCredentials, loadCredentials, clearCredentials, savePortalCredentials, loadPortalCredentials, clearPortalCredentials } from './vault.js';
-const OPTIONS_CODE_VERSION = '1.4.80';
+const OPTIONS_CODE_VERSION = '1.4.81';
 if (localStorage.getItem('svnet-bridge-options-code-version') !== OPTIONS_CODE_VERSION) {
   localStorage.setItem('svnet-bridge-options-code-version', OPTIONS_CODE_VERSION);
 }
 const profile = document.querySelector('#profile'), email = document.querySelector('#email'), password = document.querySelector('#password'), state = document.querySelector('#state');
-const profileEmails = { christian: 'cw@sv-schuett.eu', holger: 'hr@sv-schuett.eu', marc: 'ms@sv-schuett.eu', jens: 'ws@sv-schuett.eu' };
+const profileEmails = { christian: 'cw@sv-schuett.eu', holger: 'hr@sv-schuett.eu', marc: 'ms@sv-schuett.eu', susanne: 'ws@sv-schuett.eu', katja: 'ks@sv-schuett.eu' };
 const normalizeEmail = value => String(value || '').trim().toLowerCase();
 const active = (await chrome.storage.session.get('activeProfile')).activeProfile;
 const supportedProfiles = [...profile.options].map(option => option.value);
