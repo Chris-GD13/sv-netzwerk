@@ -15,6 +15,17 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Brandschäden an Holzvergaser-Heizungen: Brandbefund, Löschwasser und Wiederinbetriebnahme trennen',
+    description: 'Brandbefund, Löschwasser, Ruß, technische Sicherheit und Wiederinbetriebnahme bei Holzvergaser-Heizungen nachvollziehbar abgrenzen.',
+    href: '/fachwissen/brandschaden-holzvergaser-heizung-brandbefund-loeschwasser-wiederinbetriebnahme/',
+    category: 'Gebäudetechnik und Brandschutz',
+    tags: ['Brandschaden', 'Holzvergaser-Heizung', 'Heizungstechnik', 'Löschwasser', 'Rußschaden', 'Wiederinbetriebnahme', 'Kostenprüfung'],
+    date: '2026-11-07',
+    publishedAt: '2026-11-07T05:00:00.000Z',
+    type: 'article',
+    featured: false,
+  },
+  {
     title: 'Innere Unruhen im Schadenfall: Einbruchdiebstahl, Ausschluss und Schadenminderung sauber prüfen',
     description: 'Einbruchdiebstahl, Ausschluss für innere Unruhen und Schadenminderung bei Ausschreitungen sachlich und fallbezogen bewerten.',
     href: '/fachwissen/innere-unruhen-einbruchdiebstahl-ausschluss-schadenminderung/',
