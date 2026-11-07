@@ -1,6 +1,12 @@
 (() => {
   const STANDARD_INSTRUCTIONS = `Arbeite den Fall vollständig und selbstständig ab. Lies Claimsforce vollständig, einschließlich Beauftragung, Brief, Schadenmeldung, Nachrichten, Bilder, Formulare, Angebote, Rechnungen, Kalkulationen, Weitere Dokumente, Aufgaben und Nacharbeiten. Lies den vollständigen Outlook-Kalendertermin einschließlich Beschreibung, Teilnehmern, Notizen, Links und Anhängen. Gleiche alles mit Prüfportal, Google Drive und den Originalvorlagen ab. Verwende ausschließlich die passende Original-Word-Vorlage. Fülle Erstbericht und passendes Schadenprotokoll vollständig aus. Schreibe den konkreten Schadenhergang direkt in den Abschnitt „Schadenhergang/-ursache“. Übernimm alle Claims-Daten, Kontaktdaten, Schadenort, Termine, Teilnehmer, Gebäudedaten, KVA, Zahlungen und Reserve. Ordne fünf richtige Fallbilder eindeutig diesem Fall zu. Erstelle SE und ZB nativ in Claimsforce, fülle sie vollständig, speichere, öffne sie erneut und lies jedes relevante Feld sichtbar zurück. Rendere und prüfe jede Word-Seite sichtbar. Lege die geprüften Word-Dateien unter Claimsforce → Dateien → Berichte ab. Bei einem Fehler die Originalvorlage neu öffnen und den Arbeitsschritt wiederholen, bis alles passt. Nichts versenden, keine Zahlung und keine QS-Übergabe ohne ausdrücklichen Auftrag.`;
-  const REQUIRED_OPTIONS = new Set(['Erstbericht', 'Schadenprotokoll', 'SE nativ', 'ZB nativ', 'Anhänge vollständig prüfen', 'Outlook-Kalender auslesen', 'Alle Claimsforce-Ordner lesen', 'Richtige Fotos zuordnen', 'Word-Ablage', 'Offene Nacharbeiten']);
+  const PROFILES = {
+      'GF / TaskForce / Großschaden': { checks: ['Erstbericht','Schadenprotokoll','SE nativ','ZB nativ','Anhänge vollständig prüfen','Outlook-Kalender auslesen','Alle Claimsforce-Ordner lesen','Richtige Fotos zuordnen','Word-Ablage','Offene Nacharbeiten','KVA, Rechnungen, Zahlungen und Reserve prüfen'], task: 'GF-Ablauf: vollständige Claimsforce-Akte einschließlich Beauftragung, Brief, Schadenmeldung, Nachrichten, Bilder, Formulare, Angebote, Rechnungen, Kalkulationen, Weitere Dokumente, Aufgaben und Nacharbeiten lesen. Den vollständigen Outlook-Kalendertermin mit Anhängen lesen. Original-Word-Erstbericht und passendes Original-Schadenprotokoll ausfüllen. Schadenhergang, alle Claims-Daten, KVA, Kürzungen, Rechenbrücke und Reserve vollständig begründen. Fünf richtige Fallbilder zuordnen. SE und ZB nativ in Claimsforce vollständig ausfüllen, speichern, erneut öffnen und rücklesen. Word sichtbar prüfen und unter Claimsforce → Dateien → Berichte ablegen.' },
+      'Normaler Versicherungsauftrag': { checks: ['Claims-Schadenbericht nativ','Anhänge vollständig prüfen','Outlook-Kalender auslesen','Alle Claimsforce-Ordner lesen','Offene Nacharbeiten'], task: 'Normaler Versicherungsauftrag: keinen Erstbericht, keinen Zwischenbericht, keinen Schlussbericht, keine native SE und keinen nativen ZB erstellen. Stattdessen den nativen Claimsforce-Schadenbericht vollständig ausfüllen. Alle Seiten, Felder und Spalten des Originalformulars bearbeiten. Claimsforce-Akte, Beauftragung, Brief, Schadenmeldung, Nachrichten, Bilder, Formulare, Weitere Dokumente und Kalenderanhänge vollständig lesen und übernehmen.' },
+      'Normaler SV-Schaden': { checks: ['SE nativ','ZB nativ','Anhänge vollständig prüfen','Outlook-Kalender auslesen','Alle Claimsforce-Ordner lesen','Offene Nacharbeiten'], task: 'Normaler SV-Schaden: keinen Erstbericht, kein Schadenprotokoll und keinen zusätzlichen Bericht erstellen. Nur native SE und nativen ZB im bestehenden Claimsforce-Fall vollständig ausfüllen, speichern, erneut öffnen und sichtbar rücklesen. Claimsforce-Akte, Beauftragung, Brief, Nachrichten, alle Unterlagen und den vollständigen Kalendertermin vorher lesen.' }
+    };
+    const profileFor = () => PROFILES[box.querySelector('#svcm-kind').value] || PROFILES['GF / TaskForce / Großschaden'];
+    const applyProfile = () => { const p = profileFor(); box.querySelector('#svcm-task').value = p.task; box.querySelectorAll('input[type="checkbox"]').forEach(el => { el.checked = p.checks.includes(el.value); el.dataset.required = el.checked ? 'true' : 'false'; }); };
   const normalizeClaimNumber = (value) => {
     let result = String(value || '').trim();
     result = result.replace(/^(?:mailto:)?[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\s*(?:[/|:;,>-]\s*)?/i, '');
@@ -53,7 +59,7 @@
               <input id="svcm-insurer" name="insurer_name" type="text" autocomplete="off" data-lpignore="true" placeholder="z. B. Sparkassenversicherung, Württembergische, R+V">
             </label>
             <label for="svcm-kind">Auftragstyp
-              <select id="svcm-kind" name="order_type" autocomplete="off"><option>Normaler Versicherungsauftrag</option><option>GF / TaskForce / Großschaden</option><option>Hausrat</option><option>Haftpflicht</option><option>Elementar</option><option>Sonstiger Auftrag</option></select>
+              <select id="svcm-kind" name="order_type" autocomplete="off"><option>GF / TaskForce / Großschaden</option><option>Normaler Versicherungsauftrag</option><option>Normaler SV-Schaden</option></select>
             </label>
             <label for="svcm-claim-number">Schadennummer
               <input id="svcm-claim-number" name="damage_reference" type="search" autocomplete="off" data-lpignore="true" spellcheck="false" readonly placeholder="z. B. 26-222980-5">
@@ -66,7 +72,7 @@
             <label><input type="checkbox" value="Erstbericht">Erstbericht</label><label><input type="checkbox" value="Zwischenbericht">Zwischenbericht</label>
             <label><input type="checkbox" value="Schlussbericht">Schlussbericht</label><label><input type="checkbox" value="Schadenprotokoll">Schadenprotokoll</label>
             <label><input type="checkbox" value="SE nativ">SE nativ</label><label><input type="checkbox" value="ZB nativ">ZB nativ</label>
-            <label><input type="checkbox" value="Claims-Bericht">Claims-Bericht</label><label><input type="checkbox" value="Anhänge vollständig prüfen">Anhänge vollständig prüfen</label>
+            <label><input type="checkbox" value="Claims-Schadenbericht nativ">Claims-Schadenbericht nativ</label><label><input type="checkbox" value="Anhänge vollständig prüfen">Anhänge vollständig prüfen</label>
             <label><input type="checkbox" value="Outlook-Kalender auslesen">Outlook-Kalender auslesen</label><label><input type="checkbox" value="Alle Claimsforce-Ordner lesen">Alle Claimsforce-Ordner lesen</label>
             <label><input type="checkbox" value="Richtige Fotos zuordnen">Richtige Fotos zuordnen</label><label><input type="checkbox" value="Word-Ablage">Word-Ablage</label>
             <label><input type="checkbox" value="Offene Nacharbeiten">Offene Nacharbeiten</label><label><input type="checkbox" value="KVA, Rechnungen, Zahlungen und Reserve prüfen">KVA, Rechnungen, Zahlungen und Reserve prüfen</label>
@@ -83,19 +89,21 @@
       </div>`;
     if (target.id === 'vf-assistant-panel') target.parentElement.insertBefore(box, target); else target.appendChild(box);
     const caseInput = box.querySelector('#svcm-claim-number'), taskInput = box.querySelector('#svcm-task'), prompt = box.querySelector('#svcm-prompt');
-    taskInput.value = STANDARD_INSTRUCTIONS;
     caseInput.addEventListener('focus', () => caseInput.removeAttribute('readonly'), { once: true });
-    box.querySelectorAll('input[type="checkbox"]').forEach((el) => { el.checked = REQUIRED_OPTIONS.has(el.value); if (el.checked) el.dataset.required = 'true'; el.addEventListener('change', () => { if (el.dataset.required === 'true') el.checked = true; }); });
+    box.querySelector('#svcm-kind').addEventListener('change', applyProfile);
+    applyProfile();
+    box.querySelectorAll('input[type="checkbox"]').forEach((el) => { el.addEventListener('change', () => { if (el.dataset.required === 'true') el.checked = true; }); });
     box.querySelector('#svcm-clear').addEventListener('click', () => {
-      box.querySelector('#svcm-insurer').value = ''; caseInput.value = ''; taskInput.value = STANDARD_INSTRUCTIONS; prompt.value = ''; box.querySelector('#svcm-status').textContent = '';
+      box.querySelector('#svcm-insurer').value = ''; caseInput.value = ''; applyProfile(); prompt.value = ''; box.querySelector('#svcm-status').textContent = '';
       box.querySelectorAll('input[type="checkbox"]').forEach((el) => { el.checked = REQUIRED_OPTIONS.has(el.value); });
     });
     const buildPrompt = () => {
       const profile = box.querySelector('#svcm-profile').value, insurer = box.querySelector('#svcm-insurer').value.trim(), kind = box.querySelector('#svcm-kind').value, caseNo = normalizeClaimNumber(caseInput.value), enteredTask = taskInput.value.trim();
       if (caseNo) caseInput.value = caseNo;
       if (!caseNo) { box.querySelector('#svcm-status').textContent = 'Eine echte Schadennummer im Format 26-222980-5 eingeben.'; return ''; }
-      const extra = enteredTask === STANDARD_INSTRUCTIONS ? '' : enteredTask.replace(STANDARD_INSTRUCTIONS, '').trim();
-      const instructions = [STANDARD_INSTRUCTIONS, extra ? `Zusätzliche fallbezogene Hinweise:\n${extra}` : ''].filter(Boolean).join('\n\n');
+      const profile = profileFor();
+      const extra = enteredTask === profile.task ? '' : enteredTask.replace(profile.task, '').trim();
+      const instructions = [profile.task, extra ? 'Zusätzliche fallbezogene Hinweise:\n' + extra : ''].filter(Boolean).join('\n\n');
       const choices = [...box.querySelectorAll('input[type="checkbox"]')].map(x => `${x.checked ? '☒' : '☐'} ${x.value}`).join('\n');
       return `ARBEITSAUFTRAG FÜR DEN CLAIMSFORCE-AGENTEN\n\nBearbeiter / Claimsforce-Konto: ${profile}\nVersicherer: ${insurer || 'nicht angegeben'}\nAuftragstyp: ${kind}\nSchadennummer: ${caseNo}\n\nVERBINDLICHE STANDARDARBEITSANWEISUNG UND HINWEISE:\n${instructions}\n\nAUSGEWÄHLTE BEARBEITUNG:\n${choices}\n\nDiesen Arbeitsauftrag vollständig ausführen und die Ergebnisse als Entwurf zurückgeben. Nichts versenden, keine Zahlung und keine QS-Übergabe ohne ausdrücklichen Auftrag.`;
     };    box.querySelector('#svcm-start').addEventListener('click', () => {
