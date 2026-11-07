@@ -470,3 +470,5 @@ jobs:
 # Portal deployment trigger: Bridge notice for all users
 # Portal deployment trigger: mobile login landing
 # Portal deployment trigger: mobile detection compatibility
+
+# Claimsforce start mask deployment path is included in the existing portal deployment.
