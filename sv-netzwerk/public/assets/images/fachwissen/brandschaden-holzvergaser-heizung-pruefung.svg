@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+<title id="title">Holzvergaser-Heizung nach einem Brandschaden</title>
+<desc id="desc">Abstrakte fachliche Darstellung eines Heizkessels mit getrennten Bereichen für Brandspuren, Löschwasser und technische Prüfung.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#071a2e"/><stop offset="1" stop-color="#123d55"/></linearGradient>
+  <linearGradient id="metal" x1="0" x2="1"><stop stop-color="#647785"/><stop offset=".5" stop-color="#d7e0e5"/><stop offset="1" stop-color="#3c5362"/></linearGradient>
+  <linearGradient id="fire" x1="0" x2="0" y1="1" y2="0"><stop stop-color="#f26b21"/><stop offset="1" stop-color="#ffd166"/></linearGradient>
+</defs>
+<rect width="1600" height="900" fill="url(#bg)"/>
+<circle cx="1310" cy="170" r="170" fill="#ffffff" opacity=".04"/>
+<path d="M0 735 C260 675 430 790 700 720 C980 648 1210 755 1600 655 V900 H0Z" fill="#06131f" opacity=".72"/>
+<g transform="translate(365 165)">
+  <rect x="0" y="40" width="620" height="500" rx="26" fill="#243b49" stroke="#b6c7d0" stroke-width="8"/>
+  <rect x="60" y="100" width="500" height="320" rx="16" fill="url(#metal)" opacity=".95"/>
+  <rect x="118" y="164" width="190" height="180" rx="12" fill="#182733" stroke="#1d2730" stroke-width="10"/>
+  <path d="M174 314 C141 261 212 232 220 180 C271 241 278 281 249 314 C230 338 191 339 174 314Z" fill="url(#fire)"/>
+  <path d="M390 164 h112 v180 h-112z" fill="#d6e4e8" opacity=".8"/>
+  <path d="M418 190 C458 225 470 259 458 316" fill="none" stroke="#2f728c" stroke-width="18" stroke-linecap="round"/>
+  <path d="M430 362 C430 362 405 393 413 420 C422 446 462 446 473 417 C481 393 453 376 430 362Z" fill="#3ea6c7" opacity=".9"/>
+  <path d="M76 482 h470" stroke="#89a0ac" stroke-width="14" stroke-linecap="round"/>
+  <path d="M154 540 v70 M466 540 v70" stroke="#89a0ac" stroke-width="18" stroke-linecap="round"/>
+  <path d="M310 40 V0 M310 0 C310 -55 370 -70 394 -116" fill="none" stroke="#98aab4" stroke-width="22" stroke-linecap="round"/>
+  <path d="M104 77 C40 20 100 -30 54 -86" fill="none" stroke="#a8bcc4" stroke-width="18" stroke-linecap="round" opacity=".55"/>
+  <path d="M520 77 C580 26 518 -22 565 -74" fill="none" stroke="#a8bcc4" stroke-width="18" stroke-linecap="round" opacity=".4"/>
+</g>
+<g fill="#eaf4f7" font-family="Arial, Helvetica, sans-serif">
+  <text x="1050" y="290" font-size="52" font-weight="700">Brandschaden</text>
+  <text x="1050" y="355" font-size="52" font-weight="700">an der Heizung</text>
+  <text x="1050" y="440" font-size="30" opacity=".85">Brandbefund, Löschwasser und</text>
+  <text x="1050" y="482" font-size="30" opacity=".85">Wiederinbetriebnahme getrennt prüfen</text>
+</g>
+<g fill="none" stroke-linecap="round">
+  <path d="M1040 548 h350" stroke="#f5a65b" stroke-width="8"/>
+  <path d="M1040 580 h230" stroke="#57b8c8" stroke-width="8"/>
+  <path d="M1040 612 h285" stroke="#b7d77b" stroke-width="8"/>
+</g>
+</svg>
