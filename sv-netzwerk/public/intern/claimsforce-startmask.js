@@ -32,7 +32,8 @@
     panel.parentElement.insertBefore(box, panel);
     box.querySelectorAll('input[type="checkbox"]').forEach((el, i) => { if (i >= 7) el.checked = true; });
     box.querySelector('#svcm-start').addEventListener('click', async () => {
-      const profile = box.querySelector("#svcm-profile").value;\n      const insurer = box.querySelector('#svcm-insurer').value.trim();
+      const profile = box.querySelector("#svcm-profile").value;
+      const insurer = box.querySelector('#svcm-insurer').value.trim();
       const kind = box.querySelector('#svcm-kind').value;
       const caseNo = box.querySelector('#svcm-case').value.trim();
       const task = box.querySelector('#svcm-task').value.trim();
@@ -40,6 +41,7 @@
       const outputs = [...box.querySelectorAll('input[type="checkbox"]:checked')].map(x => x.value);
       const prompt = `Claimsforce Schadenagent
 
+Bearbeiter / Claimsforce-Konto: ${profile}
 Versicherer: ${insurer || 'nicht angegeben'}
 Auftragstyp: ${kind}
 Schadennummer: ${caseNo}
