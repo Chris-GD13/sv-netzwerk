@@ -82,6 +82,7 @@ function gfTemplateFile(string $key,array $meta,string $instructions):?array{
     $isGf=preg_match('/\b(?:sv[- ]?gf|grossschaden|großschaden|taskforce|gewerbe|betrieb|firma|geschäft|unternehmen)\b/ui',$blob)===1;
     if($key==='erstbericht_sv_gf'||($key==='erstbericht'&&$isGf)){
         foreach(gfDriveWalk(GF_KNOWLEDGE_FOLDER_ID,8,1000)as$f)if(strcasecmp((string)($f['name']??''),'2026-08-05_GF_Erstbericht_Vorlage_QS_Engel.docx')===0)return$f;
+        foreach(['1hLPQ50hwoPDHHOeuXG_4w7Fnu5Lhb9AH','1WKwFoj4lLzV3PxIQsz5spN2VaXUgKVRP','1c8Xs919EUnfnP1KaWbZfK07EzIzfT0IE']as$id){$f=['id'=>$id,'name'=>'2026-08-05_GF_Erstbericht_Vorlage_QS_Engel.docx','mimeType'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];try{if(gfDriveDownload($f)!==null)return$f;}catch(Throwable){}}
         throw new RuntimeException('SV-GF-Erstbericht-Blanco nach QS Engel nicht gefunden.');
     }
     $wanted=match($key){'erstbericht'=>'Erstbericht.docx','zwischenbericht'=>'Zwischenbericht.docx','schlussbericht'=>'Schlussbericht.docx','schadenprotokoll'=>preg_match('/\b(frost|frostschaden)\b/ui',$blob)?'Schadenprotokoll_Frostfragebogen.docx':($isGf?'Schadenprotokoll_Gewerbe.docx':'Schadenprotokoll_Privat.docx'),default=>''};
