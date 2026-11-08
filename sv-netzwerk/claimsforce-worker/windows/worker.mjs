@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {execFileSync} from 'node:child_process';
+import {execFileSync, spawn} from 'node:child_process';
 import {chromium} from 'playwright-core';
 
 const root=path.join(process.env.APPDATA||os.homedir(), 'SV-Netzwerk', 'LangdockWorker');
@@ -22,11 +22,29 @@ if(process.argv.includes('--install-startup')){
   log('Autostart eingerichtet: '+cmdFile); process.exit(0);
 }
 let browser;
+let launched=false;
+async function launchWorkerChrome(){
+  if(launched)return;
+  const exeCandidates=[
+    process.env.CHROME_PATH,
+    path.join(process.env.ProgramFiles||'C:\\Program Files','Google','Chrome','Application','chrome.exe'),
+    path.join(process.env.LOCALAPPDATA||'', 'Google','Chrome','Application','chrome.exe'),
+    path.join(process.env.ProgramFiles||'C:\\Program Files','Microsoft','Edge','Application','msedge.exe')
+  ].filter(Boolean);
+  const exe=exeCandidates.find(p=>fs.existsSync(p));
+  if(!exe)throw new Error('Chrome oder Edge wurde nicht gefunden.');
+  const profile=path.join(root,'BrowserProfile');
+  fs.mkdirSync(profile,{recursive:true});
+  spawn(exe,['--remote-debugging-port=9222','--user-data-dir='+profile,'--no-first-run','--no-default-browser-check',cfg.portal+'/intern/langdock/'],{detached:true,stdio:'ignore'}).unref();
+  launched=true;
+  log('Arbeitsbrowser gestartet. Einmalige Anmeldung in diesem Fenster erforderlich.');
+}
 async function connect(){
-  if(browser) return browser;
-  browser=await chromium.connectOverCDP(cfg.cdp);
-  log('Chrome/Edge verbunden');
-  return browser;
+  if(browser)return browser;
+  for(let attempt=0;attempt<2;attempt++){
+    try{browser=await chromium.connectOverCDP(cfg.cdp);log('Chrome/Edge verbunden');return browser;}
+    catch(error){if(attempt===0){await launchWorkerChrome();await new Promise(r=>setTimeout(r,2500));}else throw error;}
+  }
 }
 async function page(){
   const b=await connect();
