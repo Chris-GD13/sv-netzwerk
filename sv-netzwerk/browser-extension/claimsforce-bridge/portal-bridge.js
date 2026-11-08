@@ -24,7 +24,7 @@ const profileKey = value => {
 const uploads = new Map();
 const operations = new Map();
 const operationControllers = new Map();
-const PORTAL_REQUEST_TYPES = new Set(['PORTAL_UPSERT', 'PORTAL_UPLOAD_START', 'PORTAL_UPLOAD_CHUNK', 'PORTAL_UPLOAD_FINISH', 'PORTAL_APPOINTMENT', 'PORTAL_SYNC_STATE', 'PORTAL_COMMIT_SYNC', 'PORTAL_SOURCE_STATE', 'PORTAL_SOURCE_UPLOAD_START', 'PORTAL_SOURCE_UPLOAD_FINISH']);
+const PORTAL_REQUEST_TYPES = new Set(['PORTAL_UPSERT', 'PORTAL_UPLOAD_START', 'PORTAL_UPLOAD_CHUNK', 'PORTAL_UPLOAD_FINISH', 'PORTAL_APPOINTMENT', 'PORTAL_SYNC_STATE', 'PORTAL_COMMIT_SYNC', 'PORTAL_SOURCE_STATE', 'PORTAL_SOURCE_UPLOAD_START', 'PORTAL_SOURCE_UPLOAD_FINISH', 'PORTAL_FETCH_FILE']);
 let keepalivePort = null;
 let keepaliveTimer = 0;
 let activeRequest = null;
@@ -201,6 +201,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message?.type === 'PORTAL_UPLOAD_START') { uploads.set(message.uploadId, { ...message, chunks: [] }); return { ok: true }; }
     if (message?.type === 'PORTAL_UPLOAD_CHUNK') { const entry = uploads.get(message.uploadId); if (!entry) throw new Error('Unbekannte Dateiübertragung.'); entry.chunks.push(message.chunk); return { ok: true }; }
     if (message?.type === 'PORTAL_UPLOAD_FINISH') return { ok: true, result: await finishUpload(message) };
+    if (message?.type === 'PORTAL_FETCH_FILE') {
+      const response = await fetch(String(message.url || ''), { credentials: 'same-origin' });
+      if (!response.ok) throw new Error(`Fallakte-Datei konnte nicht gelesen werden (${response.status}).`);
+      const buffer = new Uint8Array(await response.arrayBuffer());
+      let binary = ''; for (let i = 0; i < buffer.length; i += 0x8000) binary += String.fromCharCode(...buffer.subarray(i, i + 0x8000));
+      return { ok: true, name: String(message.name || response.url.split('/').pop() || 'Datei'), mime: response.headers.get('content-type') || 'application/octet-stream', base64: btoa(binary) };
+    }
     if (message?.type === 'PORTAL_APPOINTMENT') return { ok: true, result: await appointment(message) };
     if (message?.type === 'PORTAL_SYNC_STATE') return { ok: true, result: await syncState(message) };
     if (message?.type === 'PORTAL_COMMIT_SYNC') return { ok: true, result: await commitSync(message) };
@@ -297,6 +304,9 @@ window.addEventListener('message', event => {
     });
   }
   if (event.data?.type === 'SVNET_CLAIMS_IMPORT_STOP') chrome.runtime.sendMessage({ type: 'STOP_IMPORT', jobId: Number(event.data.jobId || 0) }).catch(() => {});
+  if (event.data?.type === 'SVNET_CLAIMS_REPORT_UPLOAD') {
+    chrome.runtime.sendMessage({ type: 'AUTO_UPLOAD_CLAIMS_REPORTS', files: event.data.files || [], claimNumber: event.data.claimNumber || '' }).then(result => window.postMessage({ type: 'SVNET_CLAIMS_REPORT_UPLOAD_RESULT', requestId: event.data.requestId, ...result }, location.origin)).catch(error => window.postMessage({ type: 'SVNET_CLAIMS_REPORT_UPLOAD_RESULT', requestId: event.data.requestId, ok: false, error: error.message }, location.origin));
+  }
   if (event.data?.type === 'SVNET_REKON_IMPORT_START') {
     let profile;
     try { profile = profileKey(event.data.profile); }

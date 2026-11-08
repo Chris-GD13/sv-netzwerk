@@ -29,6 +29,33 @@ window.addEventListener('message', event => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type === 'CLAIMS_UPLOAD_REPORT') {
+    if (_sender?.id !== chrome.runtime.id || !/^\/claims\/[a-f0-9-]+\/investigations(?:\/|$)/i.test(location.pathname)) { sendResponse({ ok: false, error: 'report-upload-context' }); return; }
+    (async () => {
+      const binary = atob(String(message.base64 || '')), bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const input = [...document.querySelectorAll('input[type="file"]')].find(node => node.getClientRects().length || node.accept);
+      if (!input) throw Error('report-upload-input-unavailable');
+      const transfer = new DataTransfer();
+      transfer.items.add(new File([bytes], String(message.name || 'Bericht.docx'), { type: String(message.mime || 'application/octet-stream') }));
+      Object.defineProperty(input, 'files', { configurable: true, value: transfer.files });
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      const name = String(message.name || 'Bericht.docx');
+      const deadline = Date.now() + 30000;
+      let row = null;
+      while (Date.now() < deadline) {
+        row = [...document.querySelectorAll('tr')].find(candidate => (candidate.textContent || '').includes(name));
+        if (row) break;
+        await new Promise(resolve => setTimeout(resolve, 250));
+      }
+      if (!row) throw Error('report-upload-row-not-visible');
+      const toggle = [...row.querySelectorAll('[role="switch"],button')].find(node => /switch/i.test(node.getAttribute('role') || '') || node.getAttribute('aria-checked') !== null);
+      if (toggle && toggle.getAttribute('aria-checked') !== 'true' && !toggle.checked) toggle.click();
+      return { uploaded: true, name };
+    })().then(result => sendResponse({ ok: true, result })).catch(error => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
   if (['NATIVE_FORM_TEMPLATES','NATIVE_FORM_CREATE'].includes(message?.type)) {
     if(_sender?.id!==chrome.runtime.id||location.pathname!==`/claims/${message.caseId}/investigations`){sendResponse({ok:false,error:'native-create-context'});return;}
     (async()=>{

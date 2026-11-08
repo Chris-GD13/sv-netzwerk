@@ -29,7 +29,7 @@ const PROFILE_EMAILS = {
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], susanne: ['SW'], katja: ['KS'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
-const WORKER_CODE_VERSION = '1.4.81';
+const WORKER_CODE_VERSION = '1.4.82';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
@@ -1176,6 +1176,26 @@ const readManualNotes = createManualNotesReader({
   request: (url,token) => requestJson(url,token,false,20000),
   isImportRunning: () => !!runningImport || !!runningRekonImport
 });
+
+async function autoUploadClaimsReports(message, sender) {
+  const portalTabId = sender.tab?.id;
+  if (!Number.isInteger(portalTabId)) throw new Error('REPORT_UPLOAD_PORTAL_TAB_MISSING');
+  const claimsTabs = await chrome.tabs.query({ url: 'https://web.claimsforce.com/claims/*/investigations*' });
+  const target = claimsTabs.find(tab => tab.active) || claimsTabs[0];
+  if (!target?.id) throw new Error('REPORT_UPLOAD_CLAIMS_TAB_MISSING');
+  const files = Array.isArray(message.files) ? message.files : [];
+  if (!files.length) return { ok: true, uploaded: [] };
+  const uploaded = [];
+  for (const file of files) {
+    const source = await chrome.tabs.sendMessage(portalTabId, { type: 'PORTAL_FETCH_FILE', url: file.url, name: file.name });
+    if (!source?.ok || !source.base64) throw new Error(source?.error || `REPORT_SOURCE_READ_FAILED:${file.name}`);
+    const result = await chrome.tabs.sendMessage(target.id, { type: 'CLAIMS_UPLOAD_REPORT', name: file.name, mime: source.mime, base64: source.base64 });
+    if (!result?.ok) throw new Error(result?.error || `REPORT_CLAIMS_UPLOAD_FAILED:${file.name}`);
+    uploaded.push({ name: file.name, result: result.result || null });
+  }
+  return { ok: true, uploaded, tabId: target.id };
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if(message?.type==='OPEN_NATIVE_FORM_READONLY'){
     let origin='';try{origin=new URL(sender.tab?.url||'').origin;}catch{}
@@ -1192,6 +1212,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const url = String(sender.tab?.url || sender.url || '');
     if (sender.id !== chrome.runtime.id || !/^https:\/\/www\.sv-netzwerk\.eu\/intern\//.test(url)) { sendResponse({ok:false,error:'NOTES_SENDER_REJECTED'}); return; }
     readManualNotes(message.identity).then(result => sendResponse({ok:true,result})).catch(error => sendResponse({ok:false,error:error.message}));
+    return true;
+  }
+
+  if (message?.type === 'AUTO_UPLOAD_CLAIMS_REPORTS') {
+    if (sender.id !== chrome.runtime.id || !/^https:\/\/www\.sv-netzwerk\.eu\/intern\//.test(String(sender.tab?.url || ''))) { sendResponse({ ok: false, error: 'REPORT_UPLOAD_SENDER_REJECTED' }); return; }
+    autoUploadClaimsReports(message, sender).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
     return true;
   }
 
