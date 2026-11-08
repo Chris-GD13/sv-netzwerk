@@ -40,7 +40,7 @@ function ionosWrite(array $meta, ?string $bytes=null, ?string $id=null, ?array $
             $contextKind=$contextRecord['kind']??'content';
             if(!in_array($contextKind,['content','metadata'],true)||($contextKind==='content'&&(!is_file(ionosStorageRoot().'/objects/'.$contextId)||hash_file('sha256',ionosStorageRoot().'/objects/'.$contextId)!==($contextRecord['sha256']??null))))throw new RuntimeException('SOURCE_CONTEXT_VERSION_CONFLICT');
         }
-        if($id!==null)ionosRecoverIntentLocked($id);
+        if($id!==null&&((ionosRow($id)!==null)||is_file(ionosIntentPath($id))))ionosRecoverIntentLocked($id);
         $requestedId=$id;$id??='ionos_'.bin2hex(random_bytes(16));
         $oldRow=ionosRow($id);$path=ionosStorageRoot().'/objects/'.$id;
         if($requestedId!==null&&$oldRow===null&&empty($precondition['allowCreate']))throw new RuntimeException('Datei nicht im geprüften IONOS-Bestand: '.$id);
