@@ -56,6 +56,7 @@ try {
         $log=[['event'=>'accepted','message'=>'Auftrag angenommen.','at'=>gmdate('c')]];$s->execute([':wid'=>$workflowId,':folder'=>$folder,':claim'=>$claim,':insurer'=>trim((string)($in['insurer']??''))?:null,':type'=>$type,':profile'=>$profile,':docs'=>json_encode($documents,JSON_UNESCAPED_UNICODE),':instructions'=>trim((string)($in['instructions']??'')),':log'=>json_encode($log,JSON_UNESCAPED_UNICODE),':uid'=>(int)$user['id']]);
         apiJson(['ok'=>true,'job'=>cfwView(cfwJob($workflowId,$user))],201);
     }
+    if($action==='latest'){ $s=db()->prepare("SELECT * FROM claimsforce_workflow_jobs WHERE created_by=:uid ORDER BY updated_at DESC,id DESC LIMIT 1");$s->execute([':uid'=>(int)$user['id']]);$latest=$s->fetch();apiJson(['ok'=>true,'job'=>$latest?cfwView($latest):null]); }
     $workflowId=trim((string)($_GET['workflow_id']??($_POST['workflow_id']??'')));if($workflowId==='')apiError(400,'Workflow-ID fehlt.');$row=cfwJob($workflowId,$user);
     if($action==='upload'&&$_SERVER['REQUEST_METHOD']==='POST'){
         $uploads=$_FILES['files']??null;if(!$uploads||!is_array($uploads['name'])||count($uploads['name'])>20)apiError(400,'Bitte 1 bis 20 Dateien auswählen.');$total=0;$saved=[];
