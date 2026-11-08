@@ -4,7 +4,7 @@ if (localStorage.getItem('svnet-bridge-options-code-version') !== OPTIONS_CODE_V
   localStorage.setItem('svnet-bridge-options-code-version', OPTIONS_CODE_VERSION);
 }
 const profile = document.querySelector('#profile'), email = document.querySelector('#email'), password = document.querySelector('#password'), state = document.querySelector('#state');
-const profileEmails = { christian: 'cw@sv-schuett.eu', holger: 'hr@sv-schuett.eu', marc: 'ms@sv-schuett.eu', susanne: 'ws@sv-schuett.eu', katja: 'ks@sv-schuett.eu' };
+const profileEmails = { christian: 'cw@sv-schuett.eu', holger: 'hr@sv-schuett.eu', marc: 'ms@sv-schuett.eu', jens: 'jm@sv-schuett.eu' };
 const normalizeEmail = value => String(value || '').trim().toLowerCase();
 const active = (await chrome.storage.session.get('activeProfile')).activeProfile;
 const supportedProfiles = [...profile.options].map(option => option.value);
