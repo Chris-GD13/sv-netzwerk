@@ -16,7 +16,7 @@ const PLANNING_BUCKETS = [
   { key: 'WITHOUT_APPOINTMENT', hash: 'without-appointment', label: 'Ohne Termin' }
 ];
 const CLAIMS_ORIGINS = ['https://web.claimsforce.com', 'https://claimsforce.eu.auth0.com'];
-const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'susanne', 'katja'];
+const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens'];
 const PROFILE_EMAILS = {
   christian: 'cw@sv-schuett.eu',
   holger: 'hr@sv-schuett.eu',
