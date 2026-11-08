@@ -1,6 +1,12 @@
 # SV-Netzwerk Langdock Worker für Windows
 
-Der Worker läuft lokal auf dem PC und verwendet eine bereits angemeldete Chrome- oder Edge-Sitzung. Er kommuniziert mit dem Portal unter `/intern/langdock/` und hält den Auftragstatus dauerhaft fest.
+Der Worker läuft lokal auf dem PC und verwendet eine bereits angemeldete Chrome- oder Edge-Sitzung.
+
+Bei jedem Start wird die aktuelle Claimsforce-Brücke automatisch aus dem Portal geladen und nach
+
+`C:\Users\chris\OneDrive\Dokumente\Brücke`
+
+entpackt. Chrome und Edge lesen diese Fassung beim nächsten Neustart ein.
 
 Voraussetzung:
 
@@ -16,4 +22,4 @@ node worker.mjs --install-startup
 node worker.mjs
 ```
 
-Die endgültige Dokumentbefüllung und die nativen SE/ZB werden als getrennte Worker-Phasen ergänzt. Der Worker startet bewusst mit der Aktenaufnahme und hält bei einer noch nicht implementierten Schreibphase an, statt Formulare zu verändern.
+Der Worker übernimmt gespeicherte Langdock-Aufträge, hält die Phase fest und setzt nach Verbindungsabbrüchen fort. Die Dokumentbefüllung und die nativen SE/ZB werden als nächste feste Phasen ergänzt.
