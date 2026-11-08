@@ -114,7 +114,7 @@ function bkBatchSearch(array $input): array {
     if(!is_array($row)||trim((string)($row['description']??''))==='')continue;
     $rows[]=['row_id'=>(string)$index,'source_position'=>trim((string)($row['source_position']??$index+1)),'description'=>trim((string)$row['description']),'scope'=>trim((string)($row['scope']??'')),'quantity'=>(float)($row['quantity']??0),'unit'=>trim((string)($row['unit']??'')),'offered_total'=>is_numeric($row['offered_total']??null)?(float)$row['offered_total']:null];
   }
-  if(!$rows||count($rows)>60)throw new RuntimeException('Bitte 1 bis 60 KVA-Positionen auswählen.');
+  if(!$rows||count($rows)>200)throw new RuntimeException('Bitte 1 bis 200 KVA-Positionen auswählen.');
   set_time_limit(600);
   require_once __DIR__.'/bki-catalog-calculation.php';
   return bkCatalogCalculate($rows,$input);
