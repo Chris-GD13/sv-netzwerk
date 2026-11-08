@@ -8,7 +8,12 @@ Invoke-WebRequest "$repo/start-worker.cmd" -OutFile (Join-Path $base 'start-work
 Invoke-WebRequest "$repo/sync-bridge.ps1" -OutFile (Join-Path $base 'sync-bridge.ps1')
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) { throw 'Node.js 20 oder neuer muss zuerst installiert werden.' }
 Push-Location $base
-npm.cmd install --omit=dev --no-audit --no-fund
+$previousErrorActionPreference = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
+& npm.cmd install --omit=dev --no-audit --no-fund 2>&1 | Out-Host
+$npmExitCode = $LASTEXITCODE
+$ErrorActionPreference = $previousErrorActionPreference
+if ($npmExitCode -ne 0) { throw "npm install fehlgeschlagen (Exit-Code $npmExitCode)." }
 node worker.mjs --install-startup
 Pop-Location
 Write-Host "SVNET_LANGDOCK_WORKER_INSTALLED $base"
