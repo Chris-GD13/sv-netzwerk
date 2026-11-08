@@ -14,9 +14,12 @@ const cfg={...defaults,...readJson(configPath,{})};
 fs.writeFileSync(configPath,JSON.stringify(cfg,null,2));
 const log=(...v)=>console.log(new Date().toISOString(),...v);
 if(process.argv.includes('--install-startup')){
-  const cmd=process.execPath+' "'+path.join(import.meta.dirname,'worker.mjs')+'"';
-  execFileSync('schtasks.exe',['/Create','/SC','ONLOGON','/TN','SV-Netzwerk Langdock Worker','/TR',cmd,'/F'],{stdio:'inherit'});
-  log('Autostart eingerichtet'); process.exit(0);
+  const startup=path.join(process.env.APPDATA||os.homedir(),'Microsoft','Windows','Start Menu','Programs','Startup');
+  fs.mkdirSync(startup,{recursive:true});
+  const cmdFile=path.join(startup,'SV-Netzwerk Langdock Worker.cmd');
+  const workerPath=path.join(import.meta.dirname,'worker.mjs');
+  fs.writeFileSync(cmdFile,'@echo off\\r\\nstart "" "'+process.execPath+'" "'+workerPath+'"\\r\\n','utf8');
+  log('Autostart eingerichtet: '+cmdFile); process.exit(0);
 }
 let browser;
 async function connect(){
