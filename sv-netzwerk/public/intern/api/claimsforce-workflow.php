@@ -47,6 +47,19 @@ function cfwSaveLog(array $row,string $event,string $message): void {
     $log[]=['event'=>$event,'message'=>$message,'at'=>gmdate('c')];
     $s=db()->prepare('UPDATE claimsforce_workflow_jobs SET log_json=:log,updated_at=NOW() WHERE workflow_id=:id AND created_by=:uid');$s->execute([':log'=>json_encode($log,JSON_UNESCAPED_UNICODE),':id'=>$row['workflow_id'],':uid'=>(int)$row['created_by']]);
 }
+function cfwExistingCaseFolder(array $user,string $claim): ?string {
+    $key=strtoupper(preg_replace('/[\s\p{Z}\x{00AD}\x{2010}-\x{2015}\x{2212}-]+/u','',trim($claim))??'');
+    if($key==='')return null;
+    $s=db()->prepare('SELECT folder_id,case_no,user_id,user_email FROM case_folder_owners WHERE (user_id=:uid OR user_email=:email OR LOWER(user_email) LIKE \'cw@%\') ORDER BY registered_at DESC LIMIT 1000');
+    $s->execute([':uid'=>(int)($user['id']??0),':email'=>(string)($user['email']??'')]);
+    foreach($s->fetchAll(PDO::FETCH_ASSOC) as $r){
+        $candidate=strtoupper(preg_replace('/[\s\p{Z}\x{00AD}\x{2010}-\x{2015}\x{2212}-]+/u','',trim((string)($r['case_no']??'')))??'');
+        if($candidate!==$key)continue;
+        $folder=trim((string)($r['folder_id']??''));
+        if($folder!==''&&!drStandalone($folder)){try{ionosItem($folder);return $folder;}catch(Throwable){}}
+    }
+    return null;
+}
 try {
     cfwSchema();
     $action=(string)($_GET['action']??'status');
@@ -55,7 +68,7 @@ try {
         if($claim===''||$profile===''||$type==='')apiError(400,'Schadennummer, Bearbeiterkonto und Auftragstyp sind erforderlich.');
         $documents=array_values(array_filter(array_map('strval',(array)($in['documents']??[]))));
         if(!$documents)apiError(400,'Mindestens ein Dokument muss ausgewählt werden.');
-        $workflowId='CFW-'.gmdate('YmdHis').'-'.strtoupper(bin2hex(random_bytes(4)));$folder=drWorkspaceCreate($user);
+        $workflowId='CFW-'.gmdate('YmdHis').'-'.strtoupper(bin2hex(random_bytes(4)));$folder=cfwExistingCaseFolder($user,$claim)??drWorkspaceCreate($user);
         $s=db()->prepare('INSERT INTO claimsforce_workflow_jobs(workflow_id,folder_id,claim_no,insurer,order_type,profile,documents_json,instructions,log_json,created_by,created_at,updated_at) VALUES(:wid,:folder,:claim,:insurer,:type,:profile,:docs,:instructions,:log,:uid,NOW(),NOW())');
         $log=[['event'=>'accepted','message'=>'Auftrag angenommen.','at'=>gmdate('c')]];$s->execute([':wid'=>$workflowId,':folder'=>$folder,':claim'=>$claim,':insurer'=>trim((string)($in['insurer']??''))?:null,':type'=>$type,':profile'=>$profile,':docs'=>json_encode($documents,JSON_UNESCAPED_UNICODE),':instructions'=>trim((string)($in['instructions']??'')),':log'=>json_encode($log,JSON_UNESCAPED_UNICODE),':uid'=>(int)$user['id']]);
         $queueProfile=str_contains(strtolower($profile),'marc')?'marc':(str_contains(strtolower($profile),'holger')?'holger':'christian');$q=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,sync_mode,claim_number,source_profiles_json,created_at) VALUES(:p,'queued',:u,'Workflowauftrag wird automatisch ausgeführt.','CF-QUEUED','single',:claim,:sources,NOW())");$q->execute([':p'=>$queueProfile,':u'=>(string)$user['email'],':claim'=>$claim,':sources'=>json_encode([$queueProfile])]);$queueJobId=(int)db()->lastInsertId();$up=db()->prepare('UPDATE claimsforce_workflow_jobs SET source_job_id=:job WHERE workflow_id=:id AND created_by=:uid');$up->execute([':job'=>$queueJobId,':id'=>$workflowId,':uid'=>(int)$user['id']]);
