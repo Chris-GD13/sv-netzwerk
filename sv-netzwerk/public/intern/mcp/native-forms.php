@@ -29,7 +29,17 @@ function mcpNativeForms(array $user,array $args): array {
     if(($args['action']??'')==='create')throw new RuntimeException('NATIVE_CREATE_DISABLED_USE_EXISTING_ORIGINAL');
     $folder=trim((string)($args['id']??''));requireCaseFolderAccess($folder,$user);
     if(!ownCase($user,$folder))throw new RuntimeException('NATIVE_CASE_ACCESS_DENIED');
-    $meta=mcpDriveCaseMeta($folder,mcpDriveCaseFiles($folder));$profile=svnetUserProfile($user);$storedClaim=trim((string)($meta['schaden_nr']??''));$requestedClaim=trim((string)($args['claim_number']??''));if(($args['action']??'')!=='inspect_templates'&&($storedClaim===''||$requestedClaim===''||caseNumberKey($storedClaim)!==caseNumberKey($requestedClaim)))throw new RuntimeException('NATIVE_CLAIM_BINDING_MISMATCH: Portalakte und Claimsforce-Schadennummer stimmen nicht überein.');
+    $meta=mcpDriveCaseMeta($folder,mcpDriveCaseFiles($folder));$profile=svnetUserProfile($user);$storedClaim=trim((string)($meta['schaden_nr']??''));$requestedClaim=trim((string)($args['claim_number']??''));
+    // The imported source is the authoritative ClaimsForce identity. Older case
+    // metadata can contain a formatting variant even when the source and the
+    // requested claim number are identical. Accept that verified source match
+    // and carry its canonical value into the browser bridge request.
+    $sourceClaim=trim((string)($meta['claimsforce_quelle']['claim']['insurerClaimId']??''));
+    if(($args['action']??'')!=='inspect_templates'&&($storedClaim===''||$requestedClaim===''))throw new RuntimeException('NATIVE_CLAIM_BINDING_MISMATCH: Portalakte und Claimsforce-Schadennummer stimmen nicht überein.');
+    if(($args['action']??'')!=='inspect_templates'&&caseNumberKey($storedClaim)!==caseNumberKey($requestedClaim)){
+        if($sourceClaim===''||caseNumberKey($sourceClaim)!==caseNumberKey($requestedClaim))throw new RuntimeException('NATIVE_CLAIM_BINDING_MISMATCH: Portalakte und Claimsforce-Schadennummer stimmen nicht überein.');
+        $storedClaim=$sourceClaim;
+    }
     if(empty($meta['claimsforce_profile'])||empty($meta['claimsforce_claim_id']))throw new RuntimeException('NATIVE_SOURCE_BINDING_REQUIRED: Portalakte hat noch keine bestaetigte Claimsforce-Zuordnung; dies ist kein Anmeldefehler.');
     if($profile===''||($meta['claimsforce_profile']??'')!==$profile)throw new RuntimeException('NATIVE_PROFILE_MISMATCH');
     $uuid='/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/Di';
