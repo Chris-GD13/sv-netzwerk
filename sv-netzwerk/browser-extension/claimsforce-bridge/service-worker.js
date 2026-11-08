@@ -914,7 +914,9 @@ async function startImport(sender, message) {
     if (runningImport) return { ok: false, error: '[CF-RUN-00] Ein alter ClaimsForce-Import hängt noch. Bitte Edge neu starten oder die Erweiterung neu laden.' };
   }
   const saved = (await chrome.storage.local.get('claimsActiveRun')).claimsActiveRun;
-  const resumesSaved = saved?.status === 'running' && sameImportScope(saved, requested) && !saved.stopRequested;
+  const savedUpdatedAt=Date.parse(String(saved?.updatedAt||saved?.startedAt||''));
+  const savedFresh=Number.isFinite(savedUpdatedAt)&&Date.now()-savedUpdatedAt<10*60*1000;
+  const resumesSaved = saved?.status === 'running' && savedFresh && sameImportScope(saved, requested) && !saved.stopRequested;
   const run = resumesSaved ? { ...saved, portalTabId, runId: saved.runId || requested.runId } : requested;
   if(readManualNotes.isBusy())throw Error('NOTES_REQUEST_BUSY');
   runningImport = run;
