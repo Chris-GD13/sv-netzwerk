@@ -38,6 +38,7 @@
         #sv-claims-startmask .svcm-actions, #sv-claims-startmask .svcm-output-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
         #sv-claims-startmask button { min-height: 38px; padding: 9px 14px; border: 0; border-radius: 7px; cursor: pointer; font: inherit; font-weight: 700; }
         #sv-claims-startmask #svcm-start, #sv-claims-startmask #svcm-copy { background: #1976d2; color: #fff; }
+        #sv-claims-startmask #svcm-langdock { background: #0f2742; color: #fff; }
         #sv-claims-startmask #svcm-clear, #sv-claims-startmask #svcm-open { background: #e8eef5; color: #173b60; }
         #sv-claims-startmask .svcm-note { flex-basis: 100%; margin: 2px 0 0; color: #647b92; font-size: .7rem; }
         #sv-claims-startmask #svcm-status { margin: 10px 0 0; color: #42627f; font-size: .76rem; }
@@ -83,7 +84,7 @@
           <label for="svcm-prompt">Ausgabe für den Claimsforce-Agenten</label>
           <p class="svcm-output-help">Nach „Arbeitsauftrag erstellen“ erscheint hier der vollständige Text. Du kannst ihn ändern, kopieren und im Agenten einfügen.</p>
           <textarea id="svcm-prompt" autocomplete="off" spellcheck="false" placeholder="Der erzeugte Arbeitsauftrag erscheint hier …"></textarea>
-          <div class="svcm-output-actions"><button id="svcm-copy" type="button">Text kopieren</button><button id="svcm-open" type="button">Agent öffnen</button></div>
+          <div class="svcm-output-actions"><button id="svcm-copy" type="button">Text kopieren</button><button id="svcm-langdock" type="button">Langdock</button><button id="svcm-open" type="button">Agent öffnen</button></div>
           <p id="svcm-status" role="status"></p>
         </aside>
       </div>`;
@@ -113,7 +114,7 @@
       box.querySelector('#svcm-status').textContent = 'Arbeitsauftrag erstellt. Rechts prüfen, bearbeiten oder kopieren.';
       prompt.focus();
     });
-    box.querySelector('#svcm-copy').addEventListener('click', async () => {
+    box.querySelector('#svcm-langdock').addEventListener('click', async () => {\n      if (!prompt.value.trim()) {\n        const generated = buildPrompt();\n        if (!generated) return;\n        prompt.value = generated;\n      }\n      const nl = String.fromCharCode(10);\n      const handoff = ['LANGDOCK-ÜBERGABE', '', 'Bitte übernimm den folgenden Arbeitsauftrag exakt. Christians konkrete Vorgaben haben Vorrang. Eigene Hinweise gehören nur in deine Chatantwort, niemals in Formulare, Berichte oder Originalvorlagen. Das Originalformular darf nicht verändert werden.', '', prompt.value.trim()].join(nl);\n      prompt.value = handoff;\n      try {\n        await navigator.clipboard.writeText(handoff);\n        window.open('https://app.langdock.com/chat/deb37d2b-75b6-448f-8b94-dac3669499db?a=b946918c-517e-4015-8195-161eae96e2c1', '_blank', 'noopener');\n        box.querySelector('#svcm-status').textContent = 'Langdock-Ausgabe kopiert und Langdock geöffnet. Im Agenten einfügen und senden.';\n      } catch {\n        box.querySelector('#svcm-status').textContent = 'Langdock-Ausgabe erstellt. Kopieren wurde vom Browser blockiert.';\n      }\n    });\n    box.querySelector('#svcm-copy').addEventListener('click', async () => {
       if (!prompt.value.trim()) { box.querySelector('#svcm-status').textContent = 'Bitte zuerst den Arbeitsauftrag erstellen.'; return; }
       try { await navigator.clipboard.writeText(prompt.value); box.querySelector('#svcm-status').textContent = 'Text kopiert. Jetzt im Agenten einfügen.'; } catch { box.querySelector('#svcm-status').textContent = 'Kopieren wurde vom Browser blockiert. Text bitte manuell markieren.'; }
     });
