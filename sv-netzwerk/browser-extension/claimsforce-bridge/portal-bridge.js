@@ -217,6 +217,7 @@ function reportRuntime() {
   return Promise.resolve().then(() => chrome.runtime.sendMessage({ type: 'GET_RUNTIME_STATUS' })).then(status => {
     const active = status?.active || {}, diagnostic = status?.diagnostic || {};
     document.documentElement.setAttribute('data-svnet-claims-runtime', [active.status || 'idle', diagnostic.phase || active.phase || 'CF-IDLE', Number(active.jobId || 0), active.profile || 'none'].join('|'));
+    document.documentElement.setAttribute('data-svnet-claims-diagnostic', String(diagnostic.text || diagnostic.error || '').slice(0, 1000));
     const rekon = status?.rekon || {};
     document.documentElement.setAttribute('data-svnet-rekon-runtime', [rekon.status || 'idle', rekon.runId || 'none', rekon.profile || 'none', rekon.current || 0, rekon.total || 0].join('|'));
     if (rekon.status === 'running' && rekon.text) window.postMessage({ type: 'SVNET_REKON_IMPORT_PROGRESS', text: rekon.text, current: rekon.current || 0, total: rekon.total || 0 }, location.origin);
