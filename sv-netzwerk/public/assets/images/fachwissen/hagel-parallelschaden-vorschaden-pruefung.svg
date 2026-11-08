@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" role="img" aria-labelledby="title desc">
+<title id="title">Hagelschadenprüfung an Dach und Fassade</title>
+<desc id="desc">Abstrakte, sachliche Darstellung eines Dachs mit Dachfenstern und unterschiedlich ausgeprägten Hagelspuren zur Prüfung von Vorschäden und neuen Treffern.</desc>
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5c6975"/><stop offset="1" stop-color="#9aa6ae"/></linearGradient>
+  <linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#65717a"/><stop offset="1" stop-color="#313b44"/></linearGradient>
+  <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e3ded5"/><stop offset="1" stop-color="#bcb7ae"/></linearGradient>
+  <filter id="shadow"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#17212b" flood-opacity=".28"/></filter>
+</defs>
+<rect width="1536" height="1024" fill="url(#sky)"/>
+<path d="M0 680 L1536 410 L1536 1024 L0 1024 Z" fill="url(#wall)"/>
+<path d="M0 430 L1536 120 L1536 600 L0 865 Z" fill="url(#roof)" filter="url(#shadow)"/>
+<path d="M0 560 L1536 250" stroke="#aab4bb" stroke-width="8" opacity=".65"/>
+<path d="M0 690 L1536 380" stroke="#202b34" stroke-width="10" opacity=".75"/>
+<g fill="#9aa7af" stroke="#1d2933" stroke-width="8">
+  <path d="M330 372 L520 334 L548 476 L354 520 Z"/>
+  <path d="M856 266 L1035 229 L1064 359 L878 397 Z"/>
+</g>
+<g fill="none" stroke="#eef3f5" stroke-width="7" opacity=".9">
+  <path d="M349 397 L500 367"/><path d="M875 289 L1022 260"/>
+</g>
+<g fill="#b8c3ca" opacity=".8">
+  <circle cx="170" cy="572" r="18"/><circle cx="245" cy="548" r="12"/><circle cx="612" cy="466" r="17"/><circle cx="690" cy="440" r="11"/>
+  <circle cx="1122" cy="343" r="18"/><circle cx="1185" cy="327" r="10"/><circle cx="1320" cy="282" r="15"/>
+</g>
+<g fill="#5d6971" opacity=".8">
+  <ellipse cx="180" cy="573" rx="28" ry="8"/><ellipse cx="615" cy="467" rx="28" ry="8"/><ellipse cx="1124" cy="344" rx="28" ry="8"/>
+</g>
+<path d="M0 837 L1536 526" stroke="#6e777d" stroke-width="12"/>
+<path d="M0 925 L1536 615" stroke="#8f979a" stroke-width="9" opacity=".8"/>
+<g transform="translate(690 690) rotate(-10)" filter="url(#shadow)">
+  <rect x="0" y="0" width="130" height="210" rx="20" fill="#293540"/>
+  <rect x="18" y="26" width="94" height="86" rx="10" fill="#111b24"/>
+  <rect x="28" y="37" width="74" height="64" rx="6" fill="#6f8790"/>
+  <circle cx="34" cy="142" r="9" fill="#f1b44a"/><circle cx="63" cy="142" r="9" fill="#6dc2aa"/><circle cx="92" cy="142" r="9" fill="#c8d1d6"/>
+  <rect x="19" y="166" width="92" height="14" rx="7" fill="#52616b"/>
+</g>
+<g stroke="#d8e4e7" stroke-width="7" stroke-linecap="round" opacity=".8">
+  <path d="M724 875 L667 945"/><path d="M760 875 L714 952"/>
+</g>
+</svg>
