@@ -372,7 +372,9 @@ async function portal(tabId, message) {
     }
     await sleep(1000);
   }
-  throw new Error(lastError || 'Das SV-Netzwerk hat den Import nicht angenommen.');
+  let route = '';
+  try { route = String((await chrome.tabs.get(tabId)).url || ''); } catch {}
+  throw new Error(`[CF-PORTAL-${String(message?.type || 'MESSAGE')}] ${lastError || 'Das SV-Netzwerk hat den Import nicht angenommen.'}${route ? ` (Tab ${route})` : ''}`);
 }
 
 async function progress(tabId, text, current = 0, total = 0, runtime = {}) {
