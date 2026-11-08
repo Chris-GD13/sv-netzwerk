@@ -135,7 +135,7 @@ if ($workerDispatchCount !== 1) {
 $inlineRunNeedle = <<<'PHP_CODE'
 echo $response;if(function_exists('fastcgi_finish_request')){fastcgi_finish_request();}else{while(ob_get_level()>0){@ob_end_flush();}@flush();}gfRunJob($jobId,$payload);exit;
 PHP_CODE;
-$source = str_replace($inlineRunNeedle, 'echo $response;exit;', $source, $inlineRunCount);
+$source = str_replace($inlineRunNeedle, "if(!gfLaunchReportWorker()){gfJobUpdate(\$jobId,'failed',100,'Verarbeitung fehlgeschlagen.',null,'Server-Worker konnte nicht gestartet werden.');apiError(500,'Server-Worker konnte nicht gestartet werden.');}echo \$response;exit;", $source, $inlineRunCount);
 if ($inlineRunCount !== 1) {
     throw new RuntimeException('KI-Hintergrundlauf konnte nicht sicher angebunden werden.');
 }
