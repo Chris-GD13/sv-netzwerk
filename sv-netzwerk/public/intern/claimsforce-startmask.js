@@ -1,145 +1,18 @@
 (() => {
-  const STANDARD_INSTRUCTIONS = `Arbeite den Fall vollständig und selbstständig ab. Lies die vollständige Claimsforce-Akte mit allen vorhandenen Bereichen und Unterordnern, den vollständigen Outlook-Kalendertermin einschließlich Beschreibung, Teilnehmern, Notizen, Links und Anhängen sowie Prüfportal, Google Drive und die passende Originalvorlage. Übernimm die Schadennummer jedes Versicherers unverändert. Entferne nur versehentliche E-Mail- oder technische Präfixe. Eigene Hinweise stehen ergänzend unter der Standardarbeitsanweisung. Prüfe die erzeugte Ausgabe rechts vollständig, bevor der Agent geöffnet wird. Speichere und prüfe Ergebnisse nach dem jeweiligen Auftragstyp sichtbar. Nichts versenden, keine Zahlung und keine QS-Übergabe ohne ausdrücklichen Auftrag.`;
-  const PROFILES = {
-      'GF / TaskForce / Großschaden': { checks: ['Erstbericht','Schadenprotokoll','SE nativ','ZB nativ','Anhänge vollständig prüfen','Outlook-Kalender auslesen','Alle Claimsforce-Ordner lesen','Richtige Fotos zuordnen','Word-Ablage','Offene Nacharbeiten','KVA, Rechnungen, Zahlungen und Reserve prüfen'], task: 'GF-Ablauf: vollständige Claimsforce-Akte einschließlich Beauftragung, Brief, Schadenmeldung, Nachrichten, Bilder, Formulare, Angebote, Rechnungen, Kalkulationen, Weitere Dokumente, Aufgaben und Nacharbeiten lesen. Den vollständigen Outlook-Kalendertermin mit Anhängen lesen. Original-Word-Erstbericht und passendes Original-Schadenprotokoll ausfüllen. Schadenhergang, alle Claims-Daten, KVA, Kürzungen, Rechenbrücke und Reserve vollständig begründen. Fünf richtige Fallbilder zuordnen. SE und ZB nativ in Claimsforce vollständig ausfüllen, speichern, erneut öffnen und rücklesen. Word sichtbar prüfen und unter Claimsforce → Dateien → Berichte ablegen.' },
-      'Normaler Versicherungsauftrag': { checks: ['Claims-Schadenbericht nativ','Anhänge vollständig prüfen','Outlook-Kalender auslesen','Alle Claimsforce-Ordner lesen','Offene Nacharbeiten'], task: 'Normaler Versicherungsauftrag: keinen Erstbericht, keinen Zwischenbericht, keinen Schlussbericht, keine native SE und keinen nativen ZB erstellen. Stattdessen den nativen Claimsforce-Schadenbericht vollständig ausfüllen. Alle Seiten, Felder und Spalten des Originalformulars bearbeiten. Claimsforce-Akte, Beauftragung, Brief, Schadenmeldung, Nachrichten, Bilder, Formulare, Weitere Dokumente und Kalenderanhänge vollständig lesen und übernehmen.' },
-      'Normaler SV-Schaden': { checks: ['SE nativ','ZB nativ','Anhänge vollständig prüfen','Outlook-Kalender auslesen','Alle Claimsforce-Ordner lesen','Offene Nacharbeiten'], task: 'Normaler SV-Schaden: keinen Erstbericht, kein Schadenprotokoll und keinen zusätzlichen Bericht erstellen. Nur native SE und nativen ZB im bestehenden Claimsforce-Fall vollständig ausfüllen, speichern, erneut öffnen und sichtbar rücklesen. Claimsforce-Akte, Beauftragung, Brief, Nachrichten, alle Unterlagen und den vollständigen Kalendertermin vorher lesen.' }
-    };
-    const profileFor = () => { const root = document.querySelector('#sv-claims-startmask'); return PROFILES[root?.querySelector('#svcm-kind')?.value] || PROFILES['GF / TaskForce / Großschaden']; };
-    const applyProfile = () => { const root = document.querySelector('#sv-claims-startmask'); const p = profileFor(); if (!root) return; root.querySelectorAll('input[type="checkbox"]').forEach(el => { el.checked = p.checks.includes(el.value); el.dataset.required = el.checked ? 'true' : 'false'; }); };
-  const normalizeClaimNumber = (value) => {
-    let result = String(value || '').trim();
-    result = result.replace(/^(?:mailto:)?[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\s*(?:[/|:;,>-]\s*)?/i, '');
-    result = result.replace(/^(?:Schaden(?:nummer|nr)?|Schaden)\s*[:#-]?\s*/i, '');
-    result = result.replace(/^(?:Claimsforce|Portal|Konto|Benutzer|User)\s*[:#|/\\>-]\s*/i, '');
-    return result.trim();
-  };
-  const mount = () => {
-    const target = document.querySelector('#claimsforce-assistant-mount, #vf-assistant-panel');
-    if (document.getElementById('sv-claims-startmask') || !target) return;
-    const box = document.createElement('section');
-    box.id = 'sv-claims-startmask';
-    box.className = 'svcm-card';
-    box.innerHTML = `
+  const api='/intern/api/claimsforce-workflow.php';
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const mount=()=>{const target=document.querySelector('#claimsforce-assistant-mount');if(!target||document.getElementById('sv-claims-startmask'))return;
+    const box=document.createElement('section');box.id='sv-claims-startmask';box.innerHTML=`
       <style>
-        #sv-claims-startmask { max-width: 900px; margin: 18px 0 24px; padding: 22px 20px 18px; border: 1px solid #d7e0ea; border-radius: 18px; background: #fff; box-shadow: 0 8px 24px rgba(24, 55, 82, .11); color: #0f2742; }
-        #sv-claims-startmask h2 { margin: 0; font-size: 1.15rem; line-height: 1.25; }
-        #sv-claims-startmask .svcm-intro { margin: 4px 0 18px; color: #526d88; font-size: .86rem; }
-        #sv-claims-startmask .svcm-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr); gap: 22px; align-items: start; }
-        #sv-claims-startmask .svcm-fields { display: grid; gap: 13px; }
-        #sv-claims-startmask label { display: grid; gap: 6px; font-size: .78rem; font-weight: 700; }
-        #sv-claims-startmask input, #sv-claims-startmask select, #sv-claims-startmask textarea { box-sizing: border-box; width: 100%; min-height: 38px; padding: 9px 10px; border: 1px solid #b9c9da; border-radius: 8px; background: #fff; color: #102b46; font: inherit; font-weight: 400; }
-        #sv-claims-startmask textarea { min-height: 94px; resize: vertical; }
-        #sv-claims-startmask input::placeholder, #sv-claims-startmask textarea::placeholder { color: #8395a8; }
-        #sv-claims-startmask .svcm-checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; margin: 18px 0 16px; padding: 13px 10px 12px; border: 1px solid #aebdca; }
-        #sv-claims-startmask .svcm-checks legend { padding: 0 5px; color: #173b60; font-size: .86rem; font-weight: 700; }
-        #sv-claims-startmask .svcm-checks label { display: flex; align-items: flex-start; gap: 8px; font-size: .8rem; font-weight: 500; }
-        #sv-claims-startmask .svcm-checks input { width: 16px; min-height: 16px; margin: 1px 0 0; accent-color: #1976d2; }
-        #sv-claims-startmask .svcm-actions, #sv-claims-startmask .svcm-output-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
-        #sv-claims-startmask button { min-height: 38px; padding: 9px 14px; border: 0; border-radius: 7px; cursor: pointer; font: inherit; font-weight: 700; }
-        #sv-claims-startmask #svcm-start, #sv-claims-startmask #svcm-copy { background: #1976d2; color: #fff; }
-        #sv-claims-startmask #svcm-langdock { background: #0f2742; color: #fff; }
-        #sv-claims-startmask #svcm-clear, #sv-claims-startmask #svcm-open { background: #e8eef5; color: #173b60; }
-        #sv-claims-startmask .svcm-note { flex-basis: 100%; margin: 2px 0 0; color: #647b92; font-size: .7rem; }
-        #sv-claims-startmask #svcm-status { margin: 10px 0 0; color: #42627f; font-size: .76rem; }
-        #sv-claims-startmask .svcm-output { padding: 14px; border: 1px solid #c7d5e2; border-radius: 12px; background: #f4f8fb; }
-        #sv-claims-startmask .svcm-output label { color: #173b60; }
-        #sv-claims-startmask #svcm-prompt { min-height: 360px; line-height: 1.45; background: #fff; }
-        #sv-claims-startmask .svcm-output-help { margin: 6px 0 12px; color: #647b92; font-size: .74rem; line-height: 1.4; }
-        @media (max-width: 760px) { #sv-claims-startmask { margin-inline: 0; padding: 18px 14px 15px; } #sv-claims-startmask .svcm-layout { grid-template-columns: 1fr; gap: 16px; } #sv-claims-startmask .svcm-checks { grid-template-columns: 1fr; } #sv-claims-startmask #svcm-prompt { min-height: 260px; } }
-      </style>
-      <h2>Claimsforce Schadenagent</h2>
-      <p class="svcm-intro">Fall auswählen, Auftrag beschreiben und die benötigten Claims-Arbeiten anhaken.</p>
-      <div class="svcm-layout">
-        <div class="svcm-form">
-          <div class="svcm-fields">
-            <label for="svcm-profile">Bearbeiter / Claimsforce-Konto
-              <select id="svcm-profile" name="claimsforce_profile" autocomplete="off"><option value="Christian · Standardfälle">Christian · Standardfälle</option><option value="Christian · Maurer-Fälle">Christian · Maurer-Fälle</option><option value="Marc Schütt">Marc Schütt</option><option value="Holger Roth">Holger Roth</option><option value="Susanne Wächter">Susanne Wächter</option><option value="Katja Schäfer">Katja Schäfer</option></select>
-            </label>
-            <label for="svcm-insurer">Versicherer
-              <input id="svcm-insurer" name="insurer_name" type="text" autocomplete="off" data-lpignore="true" placeholder="z. B. Sparkassenversicherung, Württembergische, R+V">
-            </label>
-            <label for="svcm-kind">Auftragstyp
-              <select id="svcm-kind" name="order_type" autocomplete="off"><option>GF / TaskForce / Großschaden</option><option>Normaler Versicherungsauftrag</option><option>Normaler SV-Schaden</option></select>
-            </label>
-            <label for="svcm-claim-number">Schadennummer
-              <input id="svcm-claim-number" name="damage_reference" type="search" autocomplete="off" data-lpignore="true" spellcheck="false" readonly placeholder="z. B. 26-222980-5">
-            </label>
-            <label for="svcm-task">Eigene Hinweise zum Schaden (optional)
-              <textarea id="svcm-task" name="claim_task" rows="9" autocomplete="off" data-lpignore="true" placeholder="Nur zusätzliche fallbezogene Hinweise. Die Standardarbeitsanweisung wird automatisch ergänzt."></textarea>
-            </label>
-          </div>
-          <fieldset class="svcm-checks"><legend>Benötigte Bearbeitung</legend>
-            <label><input type="checkbox" value="Erstbericht">Erstbericht</label><label><input type="checkbox" value="Zwischenbericht">Zwischenbericht</label>
-            <label><input type="checkbox" value="Schlussbericht">Schlussbericht</label><label><input type="checkbox" value="Schadenprotokoll">Schadenprotokoll</label>
-            <label><input type="checkbox" value="SE nativ">SE nativ</label><label><input type="checkbox" value="ZB nativ">ZB nativ</label>
-            <label><input type="checkbox" value="Claims-Schadenbericht nativ">Claims-Schadenbericht nativ</label><label><input type="checkbox" value="Anhänge vollständig prüfen">Anhänge vollständig prüfen</label>
-            <label><input type="checkbox" value="Outlook-Kalender auslesen">Outlook-Kalender auslesen</label><label><input type="checkbox" value="Alle Claimsforce-Ordner lesen">Alle Claimsforce-Ordner lesen</label>
-            <label><input type="checkbox" value="Richtige Fotos zuordnen">Richtige Fotos zuordnen</label><label><input type="checkbox" value="Word-Ablage">Word-Ablage</label>
-            <label><input type="checkbox" value="Offene Nacharbeiten">Offene Nacharbeiten</label><label><input type="checkbox" value="KVA, Rechnungen, Zahlungen und Reserve prüfen">KVA, Rechnungen, Zahlungen und Reserve prüfen</label>
-          </fieldset>
-          <div class="svcm-actions"><button id="svcm-start" type="button">Arbeitsauftrag erstellen</button><button id="svcm-clear" type="button">Leeren</button><small class="svcm-note">Der Text rechts bleibt editierbar. Versand, Zahlung und QS-Übergabe bleiben gesperrt, solange sie nicht ausdrücklich beauftragt werden.</small></div>
-        </div>
-        <aside class="svcm-output">
-          <label for="svcm-prompt">Ausgabe für den Claimsforce-Agenten</label>
-          <p class="svcm-output-help">Nach „Arbeitsauftrag erstellen“ erscheint hier der vollständige Text. Du kannst ihn ändern, kopieren und im Agenten einfügen.</p>
-          <textarea id="svcm-prompt" autocomplete="off" spellcheck="false" placeholder="Der erzeugte Arbeitsauftrag erscheint hier …"></textarea>
-          <div class="svcm-output-actions"><button id="svcm-copy" type="button">Text kopieren</button><button id="svcm-langdock" type="button">Langdock</button><button id="svcm-open" type="button">Agent öffnen</button></div>
-          <p id="svcm-status" role="status"></p>
-        </aside>
-      </div>`;
-    if (target.id === 'vf-assistant-panel') target.parentElement.insertBefore(box, target); else target.appendChild(box);
-    const caseInput = box.querySelector('#svcm-claim-number'), taskInput = box.querySelector('#svcm-task'), prompt = box.querySelector('#svcm-prompt');
-    caseInput.addEventListener('focus', () => caseInput.removeAttribute('readonly'), { once: true });
-    box.querySelector('#svcm-kind').addEventListener('change', applyProfile);
-    applyProfile();
-    box.querySelectorAll('input[type="checkbox"]').forEach((el) => { el.addEventListener('change', () => { if (el.dataset.required === 'true') el.checked = true; }); });
-    box.querySelector('#svcm-clear').addEventListener('click', () => {
-      box.querySelector('#svcm-insurer').value = ''; caseInput.value = ''; applyProfile(); prompt.value = ''; box.querySelector('#svcm-status').textContent = '';
-      box.querySelectorAll('input[type="checkbox"]').forEach((el) => { el.checked = profileFor().checks.includes(el.value); });
-    });
-    const buildPrompt = () => {
-      const selectedProfile = box.querySelector('#svcm-profile').value, insurer = box.querySelector('#svcm-insurer').value.trim(), kind = box.querySelector('#svcm-kind').value, caseNo = normalizeClaimNumber(caseInput.value), enteredTask = taskInput.value.trim();
-      if (caseNo) caseInput.value = caseNo;
-      if (!caseNo) { box.querySelector('#svcm-status').textContent = 'Bitte die echte Schadennummer aus Claimsforce eingeben.'; return ''; }
-      const profile = profileFor();
-      const extra = enteredTask === profile.task ? '' : enteredTask.replace(profile.task, '').trim();
-      const instructions = [STANDARD_INSTRUCTIONS, profile.task, extra ? 'Zusätzliche fallbezogene Hinweise:\n' + extra : ''].filter(Boolean).join('\n\n');
-      const choices = [...box.querySelectorAll('input[type="checkbox"]')].map(x => `${x.checked ? '☒' : '☐'} ${x.value}`).join('\n');
-      return `ARBEITSAUFTRAG FÜR DEN CLAIMSFORCE-AGENTEN\n\nBearbeiter / Claimsforce-Konto: ${selectedProfile}\nVersicherer: ${insurer || 'nicht angegeben'}\nAuftragstyp: ${kind}\nSchadennummer: ${caseNo}\n\nVERBINDLICHE STANDARDARBEITSANWEISUNG UND HINWEISE:\n${instructions}\n\nAUSGEWÄHLTE BEARBEITUNG:\n${choices}\n\nDiesen Arbeitsauftrag vollständig ausführen und die Ergebnisse als Entwurf zurückgeben. Nichts versenden, keine Zahlung und keine QS-Übergabe ohne ausdrücklichen Auftrag.`;
-    };    box.querySelector('#svcm-start').addEventListener('click', () => {
-      const text = buildPrompt();
-      if (!text) return;
-      prompt.value = text;
-      box.querySelector('#svcm-status').textContent = 'Arbeitsauftrag erstellt. Rechts prüfen, bearbeiten oder kopieren.';
-      prompt.focus();
-    });
-    box.querySelector('#svcm-langdock').addEventListener('click', async () => {
-      if (!prompt.value.trim()) {
-        const generated = buildPrompt();
-        if (!generated) return;
-        prompt.value = generated;
-      }
-      const nl = String.fromCharCode(10);
-      const handoff = ['LANGDOCK-ÜBERGABE', '', 'Bitte übernimm den folgenden Arbeitsauftrag exakt. Christians konkrete Vorgaben haben Vorrang. Eigene Hinweise gehören nur in deine Chatantwort, niemals in Formulare, Berichte oder Originalvorlagen. Das Originalformular darf nicht verändert werden.', '', prompt.value.trim()].join(nl);
-      prompt.value = handoff;
-      try {
-        await navigator.clipboard.writeText(handoff);
-        window.open('https://app.langdock.com/chat/deb37d2b-75b6-448f-8b94-dac3669499db?a=b946918c-517e-4015-8195-161eae96e2c1', '_blank', 'noopener');
-        box.querySelector('#svcm-status').textContent = 'Langdock-Ausgabe kopiert und Langdock geöffnet. Im Agenten einfügen und senden.';
-      } catch {
-        box.querySelector('#svcm-status').textContent = 'Langdock-Ausgabe erstellt. Kopieren wurde vom Browser blockiert.';
-      }
-    });
-    box.querySelector('#svcm-copy').addEventListener('click', async () => {
-      if (!prompt.value.trim()) { box.querySelector('#svcm-status').textContent = 'Bitte zuerst den Arbeitsauftrag erstellen.'; return; }
-      try { await navigator.clipboard.writeText(prompt.value); box.querySelector('#svcm-status').textContent = 'Text kopiert. Jetzt im Agenten einfügen.'; } catch { box.querySelector('#svcm-status').textContent = 'Kopieren wurde vom Browser blockiert. Text bitte manuell markieren.'; }
-    });
-    box.querySelector('#svcm-open').addEventListener('click', () => {
-      if (!prompt.value.trim()) { box.querySelector('#svcm-status').textContent = 'Bitte zuerst den Arbeitsauftrag erstellen.'; return; }
-      window.open('https://chatgpt.com/plugins/Plugin_f4c7232b44888191bf3092c5a8057fa2', '_blank', 'noopener');
-      box.querySelector('#svcm-status').textContent = 'Agent geöffnet. Den kopierten Text dort einfügen.';
-    });
-  };
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+      #sv-claims-startmask{max-width:980px;padding:22px 20px;border:1px solid #d7e0ea;border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(24,55,82,.11);color:#0f2742}#sv-claims-startmask h2{margin:0;font-size:1.2rem}#sv-claims-startmask .cfw-intro{margin:5px 0 18px;color:#526d88;font-size:.86rem}.cfw-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.cfw-grid label,.cfw-instructions{display:grid;gap:6px;font-size:.78rem;font-weight:700}.cfw-grid input,.cfw-grid select,.cfw-instructions textarea,#cfw-files{box-sizing:border-box;width:100%;min-height:38px;padding:9px 10px;border:1px solid #b9c9da;border-radius:8px;background:#fff;color:#102b46;font:inherit;font-weight:400}.cfw-instructions{margin-top:13px}.cfw-instructions textarea{min-height:86px;resize:vertical}.cfw-docs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0;padding:13px 10px;border:1px solid #aebdca}.cfw-docs legend{padding:0 5px;color:#173b60;font-weight:700}.cfw-docs label{display:flex;gap:7px;align-items:center;font-size:.8rem;font-weight:500}.cfw-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.cfw-actions button{min-height:38px;padding:9px 14px;border:0;border-radius:7px;cursor:pointer;font:inherit;font-weight:700}.cfw-primary{background:#1976d2;color:#fff}.cfw-secondary{background:#e8eef5;color:#173b60}.cfw-status{margin-top:14px;padding:12px;border-radius:10px;background:#f4f8fb;color:#42627f;font-size:.8rem}.cfw-status strong{display:block;color:#173b60}.cfw-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}.cfw-step{padding:8px;border:1px solid #d7e0ea;border-radius:7px;font-size:.7rem;background:#fff}.cfw-step.on{border-color:#1976d2;background:#edf5ff}.cfw-step.done{border-color:#48a868;background:#effaf2}.cfw-results{margin-top:15px}.cfw-results a{display:block;margin:5px 0;color:#1769aa}.cfw-question{margin-top:12px;padding:12px;border-left:4px solid #d67d00;background:#fff8e8}.cfw-question[hidden]{display:none}@media(max-width:700px){.cfw-grid,.cfw-docs,.cfw-steps{grid-template-columns:1fr 1fr}.cfw-grid label:first-child{grid-column:1/-1}}
+      </style><h2>Claimsforce-Fall starten</h2><p class="cfw-intro">Der Fallauftrag wird gespeichert und bleibt nach Verbindungsabbrüchen an seiner letzten Phase fortsetzbar.</p>
+      <div class="cfw-grid"><label>Schadennummer oder Suchbegriff<input id="cfw-claim" placeholder="z. B. 26-188527-7 GF"></label><label>Versicherer<input id="cfw-insurer" placeholder="z. B. Sparkassenversicherung"></label><label>Auftragstyp<select id="cfw-type"><option>GF / TaskForce / Großschaden</option><option>Normaler Versicherungsauftrag</option><option>Normaler SV-Schaden</option></select></label><label>Bearbeiterkonto<select id="cfw-profile"><option>Christian · Standardfälle</option><option>Christian · Maurer-Fälle</option><option>Marc Schütt</option><option>Holger Roth</option><option>Susanne Wächter</option><option>Katja Schäfer</option></select></label></div>
+      <fieldset class="cfw-docs"><legend>Gewünschte Dokumente</legend><label><input type="checkbox" value="Erstbericht" checked> Erstbericht</label><label><input type="checkbox" value="Schadenprotokoll" checked> Schadenprotokoll</label><label><input type="checkbox" value="SE" checked> SE</label><label><input type="checkbox" value="ZB" checked> ZB</label></fieldset>
+      <label class="cfw-instructions">Zusatzvorgaben<textarea id="cfw-instructions" placeholder="Nur fallbezogene Zusatzvorgaben; eigene Feststellungen bleiben im Chat."></textarea></label><label class="cfw-instructions">PDF-, DOCX- und Bilddateien<input id="cfw-files" type="file" multiple accept=".pdf,.docx,.jpg,.jpeg,.png,.webp"></label>
+      <div class="cfw-actions"><button class="cfw-primary" id="cfw-start">Claimsforce-Fall starten</button><button class="cfw-secondary" id="cfw-example" type="button">Beispiel 26-188527-7 GF</button></div><div class="cfw-status" id="cfw-status" role="status" aria-live="polite"><strong>Noch kein Workflowauftrag</strong>Fülle die Startangaben aus.</div><div class="cfw-steps" id="cfw-steps"></div><div class="cfw-question" id="cfw-question" hidden></div><div class="cfw-results" id="cfw-results"></div>`;target.appendChild(box);
+    const $=id=>box.querySelector('#'+id),status=$('cfw-status'),steps=$('cfw-steps'),results=$('cfw-results'),question=$('cfw-question');let job=null;
+    const render=()=>{if(!job)return;status.innerHTML=`<strong>${esc(job.status==='accepted'?'Auftrag angenommen':job.status==='waiting_question'?'Gezielte Rückfrage erforderlich':job.status==='error'?'Technischer Fehler':'Workflowauftrag gespeichert')}</strong>Phase: ${esc(job.phase||'aktenaufnahme')} · ID ${esc(job.workflow_id)}`;steps.innerHTML=['Auftrag angenommen','Claimsforce geöffnet','Akte gelesen','Vorlagen befüllt','Word-Dateien geprüft','native Formulare bearbeitet','Ablage erfolgt','Ergebnis verfügbar'].map((n,i)=>`<div class="cfw-step ${i===0?'on':''}">${esc(n)}</div>`).join('');results.innerHTML='<strong>Auftrag und Dateien</strong><p>Die Dateien werden im gespeicherten Workflowauftrag geführt.</p>'+(job.files||[]).map(f=>`<a href="/intern/api/claimsforce-workflow.php?action=download&workflow_id=${encodeURIComponent(job.workflow_id)}&file_id=${encodeURIComponent(f.id)}" target="_blank">${esc(f.name)}</a>`).join('');if(job.question){question.hidden=false;question.innerHTML='<strong>Angabe erforderlich</strong><br>'+esc(job.question.prompt)}else question.hidden=true;};
+    $('cfw-example').onclick=()=>{$('cfw-claim').value='26-188527-7 GF';$('cfw-insurer').value='Sparkassenversicherung';$('cfw-type').value='GF / TaskForce / Großschaden';$('cfw-instructions').value='Originalvorlagen fortführen; keine E-Mail, Zahlung, Freigabe oder QS-Übergabe.';};
+    $('cfw-start').onclick=async()=>{const claim=$('cfw-claim').value.trim(),insurer=$('cfw-insurer').value.trim(),documents=[...box.querySelectorAll('.cfw-docs input:checked')].map(x=>x.value);if(!claim||!documents.length){status.textContent='Schadennummer und mindestens ein Dokument sind erforderlich.';return}const button=$('cfw-start');button.disabled=true;status.textContent='Workflowauftrag wird angelegt …';try{const res=await fetch(api+'?action=create',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({claim_no:claim,insurer,order_type:$('cfw-type').value,profile:$('cfw-profile').value,documents,instructions:$('cfw-instructions').value.trim()})});const data=await res.json();if(!res.ok)throw Error(data.error||'Workflowauftrag konnte nicht angelegt werden.');job=data.job;if($('cfw-files').files.length){const fd=new FormData();fd.set('workflow_id',job.workflow_id);for(const file of $('cfw-files').files)fd.append('files[]',file);const upload=await fetch(api+'?action=upload',{method:'POST',credentials:'same-origin',body:fd});const up=await upload.json();if(!upload.ok)throw Error(up.error||'Datei-Upload fehlgeschlagen.');job=up.job}render()}catch(e){status.textContent=e.message}finally{button.disabled=false}};
+  };if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 })();
