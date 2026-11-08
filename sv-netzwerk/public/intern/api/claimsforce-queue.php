@@ -226,7 +226,9 @@ if($action==='claim'){
     $sourceCapability=version_compare((string)($body['workerVersion']??''),'1.4.66','>=')?'1=1':"sync_mode<>'source'";
     if(version_compare((string)($body['workerVersion']??''),'1.4.70','<'))$sourceCapability.=" AND sync_mode<>'nativeform'";
     if(version_compare((string)($body['workerVersion']??''),'1.4.77','<'))$sourceCapability.=" AND phase<>'CF-NATIVE-CREATE-QUEUED'";
-    $claim=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE status='queued' AND profile IN ($profileSlots) AND ($sourceCapability) ORDER BY (sync_mode IN ('single','source')) DESC,(requested_by='system:claimsforce') ASC,created_at,id LIMIT 1 FOR UPDATE");
+    // Den jüngsten expliziten Einzelauftrag zuerst ausführen. Alte, festhängende
+    // Warteschlangen dürfen keinen aktuellen Nutzerauftrag blockieren.
+    $claim=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE status='queued' AND profile IN ($profileSlots) AND ($sourceCapability) ORDER BY (sync_mode IN ('single','source')) DESC,(requested_by='system:claimsforce') ASC,created_at DESC,id DESC LIMIT 1 FOR UPDATE");
     $claim->execute($stationProfiles);
     $row=$claim->fetch(PDO::FETCH_ASSOC);
     if(!$row){db()->commit();db()->query("SELECT RELEASE_LOCK('svnet-claimsforce-import')");apiJson(['ok'=>true,'job'=>null]);}
