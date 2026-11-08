@@ -27,6 +27,7 @@ function cfwSchema(): void {
       updated_at DATETIME NOT NULL,
       INDEX idx_cfw_user (created_by,updated_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    try{db()->exec('ALTER TABLE claimsforce_workflow_jobs ADD COLUMN source_job_id BIGINT UNSIGNED NULL');}catch(Throwable){}
 }
 function cfwJob(string $workflowId,array $user): array {
     $s=db()->prepare('SELECT * FROM claimsforce_workflow_jobs WHERE workflow_id=:id AND created_by=:uid LIMIT 1');
@@ -54,6 +55,7 @@ try {
         $workflowId='CFW-'.gmdate('YmdHis').'-'.strtoupper(bin2hex(random_bytes(4)));$folder=drWorkspaceCreate($user);
         $s=db()->prepare('INSERT INTO claimsforce_workflow_jobs(workflow_id,folder_id,claim_no,insurer,order_type,profile,documents_json,instructions,log_json,created_by,created_at,updated_at) VALUES(:wid,:folder,:claim,:insurer,:type,:profile,:docs,:instructions,:log,:uid,NOW(),NOW())');
         $log=[['event'=>'accepted','message'=>'Auftrag angenommen.','at'=>gmdate('c')]];$s->execute([':wid'=>$workflowId,':folder'=>$folder,':claim'=>$claim,':insurer'=>trim((string)($in['insurer']??''))?:null,':type'=>$type,':profile'=>$profile,':docs'=>json_encode($documents,JSON_UNESCAPED_UNICODE),':instructions'=>trim((string)($in['instructions']??'')),':log'=>json_encode($log,JSON_UNESCAPED_UNICODE),':uid'=>(int)$user['id']]);
+        $queueProfile=str_contains(strtolower($profile),'marc')?'marc':(str_contains(strtolower($profile),'holger')?'holger':'christian');$q=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,sync_mode,claim_number,source_profiles_json,created_at) VALUES(:p,'queued',:u,'Workflowauftrag wird automatisch ausgeführt.','CF-QUEUED','single',:claim,:sources,NOW())");$q->execute([':p'=>$queueProfile,':u'=>(string)$user['email'],':claim'=>$claim,':sources'=>json_encode([$queueProfile])]);
         apiJson(['ok'=>true,'job'=>cfwView(cfwJob($workflowId,$user))],201);
     }
     if($action==='latest'){ $s=db()->prepare("SELECT * FROM claimsforce_workflow_jobs WHERE created_by=:uid ORDER BY updated_at DESC,id DESC LIMIT 1");$s->execute([':uid'=>(int)$user['id']]);$latest=$s->fetch();apiJson(['ok'=>true,'job'=>$latest?cfwView($latest):null]); }
