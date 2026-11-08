@@ -28,6 +28,7 @@ function cfwSchema(): void {
       INDEX idx_cfw_user (created_by,updated_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     try{db()->exec('ALTER TABLE claimsforce_workflow_jobs ADD COLUMN source_job_id BIGINT UNSIGNED NULL');}catch(Throwable){}
+    try{db()->exec('ALTER TABLE claimsforce_workflow_jobs ADD COLUMN agent_job_id BIGINT UNSIGNED NULL');}catch(Throwable){}
 }
 function cfwJob(string $workflowId,array $user): array {
     $s=db()->prepare('SELECT * FROM claimsforce_workflow_jobs WHERE workflow_id=:id AND created_by=:uid LIMIT 1');
@@ -39,7 +40,7 @@ function cfwView(array $row): array {
     $source=null;if(empty($row['source_job_id'])){$q=db()->prepare('SELECT id FROM claimsforce_import_jobs WHERE claim_number=:claim ORDER BY id DESC LIMIT 1');$q->execute([':claim'=>$row['claim_no']]);$found=$q->fetchColumn();if($found){$row['source_job_id']=(int)$found;}}if(!empty($row['source_job_id'])){$q=db()->prepare('SELECT status,phase FROM claimsforce_import_jobs WHERE id=:id LIMIT 1');$q->execute([':id'=>(int)$row['source_job_id']]);$source=$q->fetch()?:null;}
     $phase=(string)($row['phase']??'aktenaufnahme');$status=(string)($row['status']??'accepted');if($source){$sp=(string)($source['phase']??'');$workflowStillAtImport=in_array($phase,['aktenaufnahme','claimsforce_geoeffnet'],true);if($workflowStillAtImport&&$sp==='CF-DONE-07')$phase='akte_gelesen';elseif($workflowStillAtImport&&$sp!=='')$phase='claimsforce_geoeffnet';if($workflowStillAtImport&&($source['status']??'')==='running')$status='running';if(($source['status']??'')==='failed')$status='error';}
     $files=[];try{$files=array_map(fn($f)=>['id'=>$f['id'],'name'=>$f['name'],'mime'=>$f['mimeType']??'','size'=>(int)($f['size']??0)],drFiles((string)$row['folder_id']));}catch(Throwable){}
-    return ['workflow_id'=>$row['workflow_id'],'claim_no'=>$row['claim_no'],'insurer'=>$row['insurer'],'order_type'=>$row['order_type'],'profile'=>$row['profile'],'documents'=>json_decode($row['documents_json'],true)?:[],'instructions'=>$row['instructions']??'','status'=>$status,'phase'=>$phase,'question'=>json_decode((string)($row['question_json']??''),true)?:null,'log'=>json_decode((string)($row['log_json']??''),true)?:[],'files'=>$files,'queue_job_id'=>!empty($row['source_job_id'])?(int)$row['source_job_id']:null,'created_at'=>$row['created_at'],'updated_at'=>$row['updated_at']];
+    return ['workflow_id'=>$row['workflow_id'],'folder_id'=>$row['folder_id'],'claim_no'=>$row['claim_no'],'insurer'=>$row['insurer'],'order_type'=>$row['order_type'],'profile'=>$row['profile'],'documents'=>json_decode($row['documents_json'],true)?:[],'instructions'=>$row['instructions']??'','status'=>$status,'phase'=>$phase,'question'=>json_decode((string)($row['question_json']??''),true)?:null,'log'=>json_decode((string)($row['log_json']??''),true)?:[],'files'=>$files,'queue_job_id'=>!empty($row['source_job_id'])?(int)$row['source_job_id']:null,'agent_job_id'=>!empty($row['agent_job_id'])?(int)$row['agent_job_id']:null,'created_at'=>$row['created_at'],'updated_at'=>$row['updated_at']];
 }
 function cfwSaveLog(array $row,string $event,string $message): void {
     $log=json_decode((string)($row['log_json']??''),true);if(!is_array($log))$log=[];
@@ -68,12 +69,12 @@ try {
         apiJson(['ok'=>true,'job'=>$next?cfwView($next):null]);
     }
     if($action==='phase'&&$_SERVER['REQUEST_METHOD']==='POST'){
-        $in=requestBody(); $status=trim((string)($in['status']??'')); $phase=trim((string)($in['phase']??'')); $message=trim((string)($in['message']??''));
+        $in=requestBody(); $status=trim((string)($in['status']??'')); $phase=trim((string)($in['phase']??'')); $message=trim((string)($in['message']??'')); $agentJobId=max(0,(int)($in['agent_job_id']??0));
         $allowedStatus=['accepted','running','waiting_question','completed','error','failed'];
         if(!in_array($status,$allowedStatus,true)||$phase==='') apiError(400,'Ungültiger Workflowstatus oder fehlende Phase.');
-        $s=db()->prepare('UPDATE claimsforce_workflow_jobs SET status=:status,phase=:phase,log_json=:log,updated_at=NOW() WHERE workflow_id=:id AND created_by=:uid');
+        $s=db()->prepare('UPDATE claimsforce_workflow_jobs SET status=:status,phase=:phase,agent_job_id=CASE WHEN :agent>0 THEN :agent ELSE agent_job_id END,log_json=:log,updated_at=NOW() WHERE workflow_id=:id AND created_by=:uid');
         $log=json_decode((string)($row['log_json']??''),true); if(!is_array($log))$log=[]; $log[]=['event'=>'worker_phase','message'=>$message?:$phase,'at'=>gmdate('c')];
-        $s->execute([':status'=>$status,':phase'=>$phase,':log'=>json_encode($log,JSON_UNESCAPED_UNICODE),':id'=>$row['workflow_id'],':uid'=>(int)$user['id']]);
+        $s->execute([':status'=>$status,':phase'=>$phase,':agent'=>$agentJobId,':log'=>json_encode($log,JSON_UNESCAPED_UNICODE),':id'=>$row['workflow_id'],':uid'=>(int)$user['id']]);
         apiJson(['ok'=>true,'job'=>cfwView(cfwJob($workflowId,$user))]);
     }
     if($action==='upload'&&$_SERVER['REQUEST_METHOD']==='POST'){
