@@ -1,0 +1,25 @@
+---
+import InternalLayout from '../../../layouts/InternalLayout.astro';
+---
+
+<InternalLayout title="Langdock Auftrag starten" description="Getrennter Langdock-Auftragsbereich für Claimsforce-Fälle." currentPath="/intern/langdock/">
+  <main class="cf-start-page">
+    <header class="cf-start-head">
+      <p class="cf-kicker">Langdock</p>
+      <h1>Langdock Auftrag starten</h1>
+      <p>Getrennter Auftragsbereich für die lokale Claimsforce-Ausführung über Chrome und Edge. Der ChatGPT-Agent bleibt davon unabhängig.</p>
+    </header>
+    <section id="claimsforce-assistant-mount" aria-label="Langdock-Auftragsassistent"></section>
+  </main>
+</InternalLayout>
+
+<style is:global>
+  .cf-start-page { max-width: 900px; padding: 28px 34px 60px; color: #17324a; }
+  .cf-start-head { margin-bottom: 8px; }
+  .cf-kicker { margin: 0 0 4px; color: #d67d00; font-size: .75rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+  .cf-start-head h1 { margin: 0; color: #071a2e; font-size: 2rem; }
+  .cf-start-head p:last-child { max-width: 680px; margin: 8px 0 0; color: #647789; }
+  @media (max-width: 700px) { .cf-start-page { padding: 18px 12px 44px; } .cf-start-head h1 { font-size: 1.55rem; } }
+</style>
+
+<script is:inline src="/intern/claimsforce-startmask.js?v=20261108-3"></script>
