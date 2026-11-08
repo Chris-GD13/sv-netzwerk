@@ -37,7 +37,8 @@
         #sv-claims-startmask .svcm-checks input { width: 16px; min-height: 16px; margin: 1px 0 0; accent-color: #1976d2; }
         #sv-claims-startmask .svcm-actions, #sv-claims-startmask .svcm-output-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
         #sv-claims-startmask button { min-height: 38px; padding: 9px 14px; border: 0; border-radius: 7px; cursor: pointer; font: inherit; font-weight: 700; }
-        #sv-claims-startmask #svcm-start, #sv-claims-startmask #svcm-copy { background: #1976d2; color: #fff; }\n        #sv-claims-startmask #svcm-langdock { background: #0f2742; color: #fff; }
+        #sv-claims-startmask #svcm-start, #sv-claims-startmask #svcm-copy { background: #1976d2; color: #fff; }
+        #sv-claims-startmask #svcm-langdock { background: #0f2742; color: #fff; }
         #sv-claims-startmask #svcm-clear, #sv-claims-startmask #svcm-open { background: #e8eef5; color: #173b60; }
         #sv-claims-startmask .svcm-note { flex-basis: 100%; margin: 2px 0 0; color: #647b92; font-size: .7rem; }
         #sv-claims-startmask #svcm-status { margin: 10px 0 0; color: #42627f; font-size: .76rem; }
