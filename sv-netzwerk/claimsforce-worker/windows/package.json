@@ -1,0 +1,12 @@
+{
+  "name": "sv-netzwerk-langdock-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node worker.mjs",
+    "install-startup": "node worker.mjs --install-startup"
+  },
+  "dependencies": {
+    "playwright-core": "^1.55.0"
+  }
+}
