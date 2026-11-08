@@ -89,7 +89,8 @@ function ionosStoreNewSource(array $trusted,array $received,array $meta,string $
     for($attempt=0;$attempt<2;$attempt++){
         $db->exec('BEGIN IMMEDIATE');
         try{
-            ionosRecoverIntentLocked($id);$row=ionosRow($id);
+            $row=ionosRow($id);
+            if($row!==null){ionosRecoverIntentLocked($id);$row=ionosRow($id);}
             if($row!==null){
                 $m=ionosItem($id);
                 if(($m['appProperties']['svSourceIdentityHash']??null)===null){
