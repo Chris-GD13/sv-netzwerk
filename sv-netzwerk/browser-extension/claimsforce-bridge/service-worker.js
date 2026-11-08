@@ -458,6 +458,21 @@ async function ensureInvoicedListTab(tabId){
   throw new Error('ClaimsForce-Kostennotenliste unter /invoiced konnte nicht geöffnet werden.');
 }
 
+async function scrapeClaimsTabWhenReady(tabId, message) {
+  let last = null;
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    try {
+      const result = await chrome.tabs.sendMessage(tabId, message);
+      if (result?.ok || !/Suchfeld|Receiving end|message port|nicht gefunden/i.test(String(result?.error || ''))) return result;
+      last = result;
+    } catch (error) {
+      last = { ok: false, error: String(error?.message || error) };
+    }
+    await sleep(500);
+  }
+  return last || { ok: false, error: '[CF-FULL-04] ClaimsForce-Seite wurde nach dem Routenwechsel nicht bereit.' };
+}
+
 async function openSelectedClaimTab(tabId, claimId) {
   const expected = String(claimId || '').toLowerCase();
   if (!/^[0-9a-f-]{20,}$/.test(expected)) throw new Error('[CF-SINGLE-01] ClaimsForce-Suche hat keine gültige Fall-ID geliefert.');
@@ -618,8 +633,8 @@ async function runImport(run) {
     await diagnostic(run, 'CF-FULL-04', singleSync ? `Die globale ClaimsForce-Suche wird auf der aktuellen Seite für Schadennummer ${singleClaimNumber} verwendet.` : `Vollabgleich der ClaimsForce-Kostennoten ${fullSyncWindow}: Schadennummern aus „/invoiced“ werden eingelesen.`, { since: run.since || '', strategy: singleSync ? 'current-page-damage-number-search' : 'invoiced-claims', claimNumber: singleClaimNumber });
     await ensureInvoicedListTab(tab.id);
     const scraped = singleSync
-      ? await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER', damageNumber: singleClaimNumber })
-      : await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
+      ? await scrapeClaimsTabWhenReady(tab.id, { type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER', damageNumber: singleClaimNumber })
+      : await scrapeClaimsTabWhenReady(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
     if (!scraped?.ok) throw new Error(scraped?.error || '[CF-INVOICED-01] Schadennummern aus „/invoiced“ konnten nicht gelesen werden.');
     const scrapedRoute = String(scraped.route || '').replace(/\/+$/, '');
     if (!singleSync && scrapedRoute !== '/invoiced') throw new Error(`[CF-INVOICED-01] Kostennotenliste nicht bestätigt (Route ${safeRoute((await chrome.tabs.get(tab.id)).url)}).`);
