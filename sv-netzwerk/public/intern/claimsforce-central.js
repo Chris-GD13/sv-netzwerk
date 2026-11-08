@@ -31,7 +31,7 @@
   const show=(t,b=false)=>{if(context.claims_agent&&bridgeProblem&&!mobileClient){t=bridgeProblem;b=true;button.disabled=true;if(fullButton)fullButton.disabled=true;}if(bridgeHelp&&/Browser-Brücke|Browser-Bruecke|Bridge/i.test(String(t||'')))bridgeHelp.hidden=false;state.textContent=t;state.className='vf-meta '+(b?'vf-claims-bad':'')};
   const supportedProfiles=['christian','holger','marc','jens'];
   const profileNames={christian:'Christian Wächter',holger:'Holger Roth',marc:'Marc Schütt',jens:'Jens Maurer'};
-  const minimumBridgeVersion='1.4.65',currentBridgeVersion='1.4.81';
+  const minimumBridgeVersion='1.4.65',currentBridgeVersion='1.4.82';
   const selectedProfile=()=>{
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
