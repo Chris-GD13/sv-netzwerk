@@ -759,7 +759,10 @@ async function runImport(run) {
     for (const file of files) {
       if (!file?.id) continue;
       const version = fileVersion(file);
-      if (!fullSync && !singleSync && knownFileVersions.has(version)) continue;
+      // Einzelfallimporte dürfen bereits sauber übernommene Dateien nicht erneut
+      // durch die Legacy-Quellenbindung schicken. Nur Vollabgleiche erzwingen
+      // eine erneute Prüfung aller Dateien.
+      if (!fullSync && knownFileVersions.has(version)) continue;
       fileNumber++;
       if (run.stopRequested) { await savePartial().catch(() => {}); throw new Error('Import wurde pausiert.'); }
       checkDeadline(`Datei ${fileNumber}/${files.length}`);
@@ -815,7 +818,7 @@ async function runImport(run) {
     for (const message of messages) {
       if (run.stopRequested) throw new Error('Import wurde pausiert.');
       const version = messageVersion(message);
-      if (knownMessageVersions.has(version)) continue;
+      if (!fullSync && knownMessageVersions.has(version)) continue;
       checkDeadline('Nachrichten');
       await diagnostic(run, 'CF-CASE-MESSAGE', `Auftrag ${index + 1}/${claims.length}: Nachrichten und Anhänge werden übertragen.`, { current: index, total: claims.length, claimIndex: index + 1 });
       const detail = message?.id ? await requestJson(`${config.COMMUNICATION_API_ENDPOINT}/claims/${id}/messages/${message.id}`, token, true) : message;
