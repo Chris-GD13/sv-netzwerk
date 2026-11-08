@@ -781,8 +781,8 @@ async function runImport(run) {
     const knownFileVersions = new Set(Array.isArray(existingMeta.claimsforce_file_versions) ? existingMeta.claimsforce_file_versions.map(String) : []);
     const doneFileVersions = new Set(knownFileVersions);
     const doneMessageVersions = new Set(Array.isArray(existingMeta.claimsforce_message_versions) ? existingMeta.claimsforce_message_versions.map(String) : []);
-    const sourceErrors = [], restrictedFiles = [], unavailableFileIds = new Set();
-    const savePartial = () => portal(portalTabId(), { type: 'PORTAL_COMMIT_SYNC', folderId, signature: '', partial: true, fileVersions: [...doneFileVersions], messageVersions: [...doneMessageVersions], notes, tasks, inventory: { ...inventory, errors: sourceErrors, restrictedFiles, filesAccessible: files.length - restrictedFiles.length }, listVersion: '', profile });
+    const sourceErrors = [], legacyExisting = [], restrictedFiles = [], unavailableFileIds = new Set();
+    const savePartial = () => portal(portalTabId(), { type: 'PORTAL_COMMIT_SYNC', folderId, signature: '', partial: true, fileVersions: [...doneFileVersions], messageVersions: [...doneMessageVersions], notes, tasks, inventory: { ...inventory, errors: [...sourceErrors, ...legacyExisting], restrictedFiles, filesAccessible: files.length - restrictedFiles.length }, listVersion: '', profile });
     let fileNumber = 0;
     for (const file of files) {
       if (!file?.id) continue;
@@ -803,7 +803,13 @@ async function runImport(run) {
       const source = await readSourceOrRecordLegacyConflict(
         () => prepareSourceUpload(portalTabId(), profile, folderId, id, file.id),
         async error => {
-          sourceErrors.push({ kind: 'file', id: file.id, name, code: 'LEGACY_SOURCE_BINDING_REQUIRED', message: error.message });
+          // A prior import may have placed this exact ClaimsForce file in the
+          // case folder before source identities were introduced.  Preserve
+          // that verified case inventory instead of failing the whole workflow;
+          // the file version is treated as already present and the condition is
+          // retained as a visible warning for later migration.
+          legacyExisting.push({ kind: 'file', id: file.id, name, code: 'LEGACY_SOURCE_BINDING_REQUIRED', message: error.message });
+          doneFileVersions.add(version);
           unavailableFileIds.add(file.id);
           await diagnostic(run, 'CF-SOURCE-LEGACY', `Altdateizuordnung für „${name}“ offen. Weitere Dateien und Nachrichten werden geprüft.`, { current: index, total: claims.length, claimIndex: index + 1 });
         }
@@ -897,7 +903,7 @@ async function runImport(run) {
         if (!appointmentResult?.result?.skipped) appointmentsDone++;
       }
     }
-    inventory.errors = sourceErrors;
+    inventory.errors = [...sourceErrors, ...legacyExisting];
     inventory.restrictedFiles = restrictedFiles;
     inventory.filesAccessible = files.length - restrictedFiles.length;
     await uploadSupporting( 'ClaimsForce_Aufgaben_Notizen.json', 'application/json', 0, new TextEncoder().encode(JSON.stringify({ inventory, tasks, notes, sourceNotes: rawNotes }, null, 2)).buffer);
@@ -907,7 +913,7 @@ async function runImport(run) {
     }
     await portal(portalTabId(), { type: 'PORTAL_COMMIT_SYNC', folderId, signature, fileVersions: [...doneFileVersions], messageVersions: [...doneMessageVersions], notes, tasks, inventory, listVersion: item.listVersion || '', profile });
     updated++;
-    await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length}: zugängliche Inhalte übernommen${restrictedFiles.length ? `; ${restrictedFiles.length} geschützte Anhangsreferenz(en) dokumentiert` : ''}.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
+    await diagnostic(run, 'CF-CASE-06', `Auftrag ${index + 1}/${claims.length}: zugängliche Inhalte übernommen${restrictedFiles.length ? `; ${restrictedFiles.length} geschützte Anhangsreferenz(en) dokumentiert` : ''}${legacyExisting.length ? `; ${legacyExisting.length} vorhandene Altdatei(en) als Bestand übernommen` : ''}.`, { current: index + 1, total: claims.length, completedCases: index + 1, folderCreatedOrUpdated: true });
     } catch (error) {
       failed++;
       const message = String(error?.message || 'Portal-Falloperation fehlgeschlagen.').slice(0, 500);
