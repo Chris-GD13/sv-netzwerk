@@ -616,7 +616,7 @@ async function runImport(run) {
   if (useInvoicedClaims) {
     const fullSyncWindow = run.since ? `ab ${run.since}` : 'ohne Datumsgrenze';
     await diagnostic(run, 'CF-FULL-04', singleSync ? `Die globale ClaimsForce-Suche wird auf der aktuellen Seite für Schadennummer ${singleClaimNumber} verwendet.` : `Vollabgleich der ClaimsForce-Kostennoten ${fullSyncWindow}: Schadennummern aus „/invoiced“ werden eingelesen.`, { since: run.since || '', strategy: singleSync ? 'current-page-damage-number-search' : 'invoiced-claims', claimNumber: singleClaimNumber });
-    if (!singleSync) await ensureInvoicedListTab(tab.id);
+    await ensureInvoicedListTab(tab.id);
     const scraped = singleSync
       ? await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_CLAIM_BY_DAMAGE_NUMBER', damageNumber: singleClaimNumber })
       : await chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_ALL_CLAIMS', since: run.since || '' });
