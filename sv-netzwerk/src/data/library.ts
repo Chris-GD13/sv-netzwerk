@@ -15,6 +15,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Parallelschäden nach Hagel: Vorschäden, neue Treffer und Reparaturumfang sauber trennen',
+    description: 'Wie Vorschäden, Zwischenreparaturen, neue Hageltreffer und der erforderliche Reparaturumfang bei mehreren Ereignissen am selben Gebäude getrennt bewertet werden.',
+    href: '/fachwissen/hagel-parallelschaden-vorschaden-neue-treffer-reparaturumfang/',
+    category: 'Sturm- und Hagelschäden',
+    tags: ['Hagelschaden', 'Parallelschaden', 'Vorschaden', 'Schadenabgrenzung', 'Kostenprüfung'],
+    date: '2026-11-08',
+    publishedAt: '2026-11-08T05:00:00.000Z',
+    type: 'article',
+  },
+  {
     title: 'Brandschäden an Holzvergaser-Heizungen: Brandbefund, Löschwasser und Wiederinbetriebnahme trennen',
     description: 'Brandbefund, Löschwasser, Ruß, technische Sicherheit und Wiederinbetriebnahme bei Holzvergaser-Heizungen nachvollziehbar abgrenzen.',
     href: '/fachwissen/brandschaden-holzvergaser-heizung-brandbefund-loeschwasser-wiederinbetriebnahme/',
