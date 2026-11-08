@@ -106,7 +106,24 @@
       "linkedin": {
         "status": "prepared-not-posted"
       }
+    },
+    "2026-11-08": {
+      "publication_id": "2026-11-08-hagel-parallelschaden-vorschaden-neue-treffer-reparaturumfang",
+      "article": {
+        "title": "Parallelschäden nach Hagel: Vorschäden, neue Treffer und Reparaturumfang sauber trennen",
+        "slug": "hagel-parallelschaden-vorschaden-neue-treffer-reparaturumfang",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/hagel-parallelschaden-vorschaden-neue-treffer-reparaturumfang/",
+        "status": "published-verified",
+        "owner": "codex-website-20261108-0600",
+        "reserved_at": "2026-11-08T05:00:00.000Z",
+        "commit": "72229b02f1944b7bd829a1b6aede9bdce3cd352f",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/42449527713",
+        "verified_at": "2026-11-08T05:17:01Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-11-07T05:13:45Z"
+  "updated_at": "2026-11-08T05:17:01Z"
 }
