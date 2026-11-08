@@ -12,6 +12,13 @@
     for(const label of doc.querySelectorAll?.('label,[role="label"],legend,.field-label,.label')||[]) {
       if(label.htmlFor===node.id || label.contains?.(node)) values.push(textLabel(label));
     }
+    // Apryse's native templates contain a small number of intentionally
+    // blank/derived controls without an aria-label or rendered <label>.
+    // Their stable wrapper id is the only field identity exposed by the
+    // original widget. Use it as the label only when no human label exists;
+    // this keeps the field contract deterministic without inferring by
+    // position or silently dropping the control.
+    if(!values.length && wrapper?.id) values.push(String(wrapper.id));
     const unique=[...new Set(values.map(textLabel).map(v=>v.replace(/[:：]$/u,'').trim()).filter(Boolean))];
     if(unique.length!==1)throw Error(unique.length?'NATIVE_FIELD_LABEL_AMBIGUOUS':'NATIVE_FIELD_LABEL_MISSING');
     return unique[0];
