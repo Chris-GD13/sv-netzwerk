@@ -359,9 +359,20 @@ async function requestJson(url, token, optional = false, timeout = 20000) {
 }
 
 async function portal(tabId, message) {
-  const response = await Promise.race([chrome.tabs.sendMessage(tabId, message), sleep(120000).then(() => ({ ok: false, error: 'Das SV-Netzwerk hat innerhalb von 120 Sekunden nicht geantwortet.' }))]);
-  if (!response?.ok) throw new Error(response?.error || 'Das SV-Netzwerk hat den Import nicht angenommen.');
-  return response;
+  let lastError = null;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const response = await Promise.race([chrome.tabs.sendMessage(tabId, message), sleep(120000).then(() => ({ ok: false, error: 'Das SV-Netzwerk hat innerhalb von 120 Sekunden nicht geantwortet.' }))]);
+      if (response?.ok) return response;
+      lastError = response?.error || 'Das SV-Netzwerk hat den Import nicht angenommen.';
+      if (!/message channel|Receiving end|message port|Antwort/i.test(String(lastError))) throw new Error(lastError);
+    } catch (error) {
+      lastError = error?.message || String(error);
+      if (!/message channel|Receiving end|message port|Antwort/i.test(String(lastError))) throw error;
+    }
+    await sleep(1000);
+  }
+  throw new Error(lastError || 'Das SV-Netzwerk hat den Import nicht angenommen.');
 }
 
 async function progress(tabId, text, current = 0, total = 0, runtime = {}) {
