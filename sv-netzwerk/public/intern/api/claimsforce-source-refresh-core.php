@@ -109,9 +109,17 @@ function cfrSourceStateUnlocked(string $folder,array $user,string $profile,array
     $ctx=cfrContext($folder,$user,$profile,$request);$key=hash('sha256',json_encode([$ctx['profile'],$ctx['caseId'],$ctx['sourceFileId']],JSON_THROW_ON_ERROR));
     $inv=cfrInventory($folder,$key,$ctx);
     if(!$inv['matches']){
-        // Compatibility boundary: old imports have no trustworthy Claims UUID binding.
-        // Do not guess from name, timestamp, size or a possibly copied document.
-        if($inv['unbound'])throw new RuntimeException('LEGACY_SOURCE_BINDING_REQUIRED: Vorhandene Altdateien sind keinem eindeutig geprueften Claims-Quelldokument zugeordnet. Der Dateiimport bleibt bis zur kontrollierten Zuordnung gesperrt; es wurde kein Ersatzdokument angelegt.');
+        // A legacy import can still be migrated safely when the deterministic
+        // source id already exists in this exact target folder. The subsequent
+        // write adopts it only after the downloaded ClaimsForce bytes match
+        // byte-for-byte; names, timestamps and sizes are never used as proof.
+        if($inv['unbound']){
+            $legacyId='ionos_src_'.$key;$legacy=ionosItem($legacyId);
+            if(is_array($legacy)&&($legacy['parents'][0]??null)===$ctx['targetFolderId']&&empty(($legacy['appProperties']??[])['svSourceIdentityHash'])){
+                return ['kind'=>'NEW_SOURCE','context'=>$ctx,'sourceHash'=>$key,'originalPrecondition'=>null,'legacyCandidateId'=>$legacyId];
+            }
+            throw new RuntimeException('LEGACY_SOURCE_BINDING_REQUIRED: Vorhandene Altdateien sind keinem eindeutig geprueften Claims-Quelldokument zugeordnet. Der Dateiimport bleibt bis zur kontrollierten Zuordnung gesperrt; es wurde kein Ersatzdokument angelegt.');
+        }
         return ['kind'=>'NEW_SOURCE','context'=>$ctx,'sourceHash'=>$key,'originalPrecondition'=>null];
     }
     $id=$inv['matches'][0];$row=ionosRow($id);$bytes=ionosBytes($id);

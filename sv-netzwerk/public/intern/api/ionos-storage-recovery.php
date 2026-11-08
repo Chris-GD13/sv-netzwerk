@@ -92,6 +92,16 @@ function ionosStoreNewSource(array $trusted,array $received,array $meta,string $
             ionosRecoverIntentLocked($id);$row=ionosRow($id);
             if($row!==null){
                 $m=ionosItem($id);
+                if(($m['appProperties']['svSourceIdentityHash']??null)===null){
+                    if(($m['parents'][0]??null)!==$trusted['targetFolderId'])throw new RuntimeException('SOURCE_FOLDER_MISMATCH');
+                    $existing=file_get_contents(ionosStorageRoot().'/objects/'.$id);
+                    if($existing===false||hash('sha256',$existing)!==$contentHash)throw new RuntimeException('SOURCE_CONTENT_UPDATE_REQUIRES_PRECONDITION');
+                    $properties=array_replace($m['appProperties']??[],['svSourceIdentityHash'=>$sourceHash,'svClaimsProfile'=>$trusted['profile'],'svClaimsClaimId'=>$trusted['caseId'],'svClaimsSourceFileId'=>$trusted['sourceFileId']]);
+                    $pre=['id'=>$id,'rowFingerprint'=>ionosRowFingerprint($row),'sha256'=>$contentHash,'contextRecords'=>$trusted['contextRecords']??[]];
+                    $db->exec('COMMIT');
+                    $saved=ionosWrite(['appProperties'=>$properties],$existing,$id,$pre);
+                    return ['duplicate'=>true,'file'=>$saved,'legacyBound'=>true];
+                }
                 if(($m['appProperties']['svSourceIdentityHash']??null)!==$sourceHash)throw new RuntimeException('SOURCE_BINDING_CONFLICT');
                 foreach(['profile'=>'svClaimsProfile','caseId'=>'svClaimsClaimId','sourceFileId'=>'svClaimsSourceFileId'] as $k=>$property)if(($m['appProperties'][$property]??null)!==$trusted[$k])throw new RuntimeException('SOURCE_BINDING_CONFLICT');
                 if(($m['parents'][0]??null)!==$trusted['targetFolderId'])throw new RuntimeException('SOURCE_FOLDER_MISMATCH');
