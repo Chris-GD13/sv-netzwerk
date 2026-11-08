@@ -464,20 +464,12 @@ $evidenceBinding = "foreach(\$caseEvidence as\$evidenceIndex=>\$evidence)\$conte
 $source = str_replace($directCaseFilesNeedle, $evidenceBinding, $source, $countEvidenceBinding);
 if ($countEvidenceBinding !== 1) throw new RuntimeException('Evidenzbestand konnte nicht sicher an die Dokumenterstellung angebunden werden.');
 
-// SV-GF-Template nur injizieren, wenn der Kern noch keine Sonderbehandlung kennt.
-if (!str_contains($source, "if(\$key==='erstbericht_sv_gf')")) {
-    $sig = 'function gfTemplateFile(string $key,array $meta,string $instructions):?array{';
-    $rep = "function gfTemplateFile(string \$key,array \$meta,string \$instructions):?array{if(\$key==='erstbericht_sv_gf'){foreach(gfDriveWalk(GF_KNOWLEDGE_FOLDER_ID,6,250)as\$f)if(strcasecmp((string)(\$f['name']??''),'2026-08-05_GF_Erstbericht_Vorlage_QS_Engel.docx')===0)return\$f;throw new RuntimeException('SV-GF-Erstbericht-Blanco nach QS Engel nicht gefunden.');}";
-    $source = str_replace($sig, $rep, $source);
-}
-$templateSignature = 'function gfTemplateFile(string $key,array $meta,string $instructions):?array{';
-if (!str_contains($source, "if(\$key==='erstbericht')return null;")) {
-    $templateNeedle = str_contains($source, $templateSignature."if(\$key==='erstbericht_sv_gf')")
-        ? $templateSignature."if(\$key==='erstbericht_sv_gf')"
-        : $templateSignature;
-    $templateReplacement = $templateSignature."if(\$key==='erstbericht')return null;"
-        . ($templateNeedle !== $templateSignature ? "if(\$key==='erstbericht_sv_gf')" : '');
-    $source = str_replace($templateNeedle, $templateReplacement, $source);
+// Der Generator muss bei SV-GF/Großschaden immer das originale Word-Blanco
+// verwenden. Ein erzwungener HTML-.doc-Fallback würde die nachgelagerte
+// ClaimsForce-Ablage und die visuelle QS unbrauchbar machen. Der Kern enthält
+// die Auswahl bereits; diese Prüfung schützt ältere/opcache-Varianten.
+if (!str_contains($source, "if(\$key==='erstbericht_sv_gf'||(\$key==='erstbericht'&&\$isGf)")) {
+    throw new RuntimeException('SV-GF-Template-Auswahl ist im Live-Kern nicht vorhanden.');
 }
 $engelSignature = <<<'PHP_CODE'
 function gfEngelReport(string $key):bool{return in_array($key,['erstbericht','zwischenbericht','schlussbericht'],true);}
