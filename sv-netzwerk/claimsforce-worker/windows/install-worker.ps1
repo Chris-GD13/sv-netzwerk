@@ -8,7 +8,7 @@ Invoke-WebRequest "$repo/start-worker.cmd" -OutFile (Join-Path $base 'start-work
 Invoke-WebRequest "$repo/sync-bridge.ps1" -OutFile (Join-Path $base 'sync-bridge.ps1')
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) { throw 'Node.js 20 oder neuer muss zuerst installiert werden.' }
 Push-Location $base
-npm install --omit=dev --no-audit --no-fund
+npm.cmd install --omit=dev --no-audit --no-fund
 node worker.mjs --install-startup
 Pop-Location
 Write-Host "SVNET_LANGDOCK_WORKER_INSTALLED $base"
