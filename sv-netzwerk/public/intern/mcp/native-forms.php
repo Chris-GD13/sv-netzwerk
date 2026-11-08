@@ -35,16 +35,7 @@ function mcpNativeForms(array $user,array $args): array {
     // requested claim number are identical. Accept that verified source match
     // and carry its canonical value into the browser bridge request.
     $sourceClaim=trim((string)($meta['claimsforce_quelle']['claim']['insurerClaimId']??''));
-    if(($args['action']??'')!=='inspect_templates'&&($storedClaim===''||$requestedClaim===''))throw new RuntimeException('NATIVE_CLAIM_BINDING_MISMATCH: Portalakte und Claimsforce-Schadennummer stimmen nicht überein.');
-    if(($args['action']??'')!=='inspect_templates'&&caseNumberKey($storedClaim)!==caseNumberKey($requestedClaim)){
-        // A verified ClaimsForce claim id/profile binding is stronger than a
-        // legacy display-number variant in 00_Falldaten. Keep the requested
-        // number for the native field contract and let the bridge verify the
-        // actual form identity before any read or write.
-        $boundId=trim((string)($meta['claimsforce_claim_id']??''));
-        $boundProfile=trim((string)($meta['claimsforce_profile']??''));
-        if($boundId===''||$boundProfile==='')throw new RuntimeException('NATIVE_CLAIM_BINDING_MISMATCH: Portalakte und Claimsforce-Schadennummer stimmen nicht überein.');
-    }
+    if(($args['action']??'')!=='inspect_templates'&&$requestedClaim==='')throw new RuntimeException('NATIVE_CLAIM_BINDING_MISMATCH: Portalakte und Claimsforce-Schadennummer stimmen nicht überein.');
     if(empty($meta['claimsforce_profile'])||empty($meta['claimsforce_claim_id']))throw new RuntimeException('NATIVE_SOURCE_BINDING_REQUIRED: Portalakte hat noch keine bestaetigte Claimsforce-Zuordnung; dies ist kein Anmeldefehler.');
     if($profile===''||($meta['claimsforce_profile']??'')!==$profile)throw new RuntimeException('NATIVE_PROFILE_MISMATCH');
     $uuid='/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/Di';
