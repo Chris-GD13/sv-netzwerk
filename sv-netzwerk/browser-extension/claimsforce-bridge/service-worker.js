@@ -790,7 +790,7 @@ async function runImport(run) {
       // Einzelfallimporte dürfen bereits sauber übernommene Dateien nicht erneut
       // durch die Legacy-Quellenbindung schicken. Nur Vollabgleiche erzwingen
       // eine erneute Prüfung aller Dateien.
-      if (!fullSync && knownFileVersions.has(version)) continue;
+      if (!fullSync && !singleSync && knownFileVersions.has(version)) continue;
       fileNumber++;
       if (run.stopRequested) { await savePartial().catch(() => {}); throw new Error('Import wurde pausiert.'); }
       checkDeadline(`Datei ${fileNumber}/${files.length}`);
