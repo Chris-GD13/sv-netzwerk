@@ -114,7 +114,24 @@
       box.querySelector('#svcm-status').textContent = 'Arbeitsauftrag erstellt. Rechts prüfen, bearbeiten oder kopieren.';
       prompt.focus();
     });
-    box.querySelector('#svcm-langdock').addEventListener('click', async () => {\n      if (!prompt.value.trim()) {\n        const generated = buildPrompt();\n        if (!generated) return;\n        prompt.value = generated;\n      }\n      const nl = String.fromCharCode(10);\n      const handoff = ['LANGDOCK-ÜBERGABE', '', 'Bitte übernimm den folgenden Arbeitsauftrag exakt. Christians konkrete Vorgaben haben Vorrang. Eigene Hinweise gehören nur in deine Chatantwort, niemals in Formulare, Berichte oder Originalvorlagen. Das Originalformular darf nicht verändert werden.', '', prompt.value.trim()].join(nl);\n      prompt.value = handoff;\n      try {\n        await navigator.clipboard.writeText(handoff);\n        window.open('https://app.langdock.com/chat/deb37d2b-75b6-448f-8b94-dac3669499db?a=b946918c-517e-4015-8195-161eae96e2c1', '_blank', 'noopener');\n        box.querySelector('#svcm-status').textContent = 'Langdock-Ausgabe kopiert und Langdock geöffnet. Im Agenten einfügen und senden.';\n      } catch {\n        box.querySelector('#svcm-status').textContent = 'Langdock-Ausgabe erstellt. Kopieren wurde vom Browser blockiert.';\n      }\n    });\n    box.querySelector('#svcm-copy').addEventListener('click', async () => {
+    box.querySelector('#svcm-langdock').addEventListener('click', async () => {
+      if (!prompt.value.trim()) {
+        const generated = buildPrompt();
+        if (!generated) return;
+        prompt.value = generated;
+      }
+      const nl = String.fromCharCode(10);
+      const handoff = ['LANGDOCK-ÜBERGABE', '', 'Bitte übernimm den folgenden Arbeitsauftrag exakt. Christians konkrete Vorgaben haben Vorrang. Eigene Hinweise gehören nur in deine Chatantwort, niemals in Formulare, Berichte oder Originalvorlagen. Das Originalformular darf nicht verändert werden.', '', prompt.value.trim()].join(nl);
+      prompt.value = handoff;
+      try {
+        await navigator.clipboard.writeText(handoff);
+        window.open('https://app.langdock.com/chat/deb37d2b-75b6-448f-8b94-dac3669499db?a=b946918c-517e-4015-8195-161eae96e2c1', '_blank', 'noopener');
+        box.querySelector('#svcm-status').textContent = 'Langdock-Ausgabe kopiert und Langdock geöffnet. Im Agenten einfügen und senden.';
+      } catch {
+        box.querySelector('#svcm-status').textContent = 'Langdock-Ausgabe erstellt. Kopieren wurde vom Browser blockiert.';
+      }
+    });
+    box.querySelector('#svcm-copy').addEventListener('click', async () => {
       if (!prompt.value.trim()) { box.querySelector('#svcm-status').textContent = 'Bitte zuerst den Arbeitsauftrag erstellen.'; return; }
       try { await navigator.clipboard.writeText(prompt.value); box.querySelector('#svcm-status').textContent = 'Text kopiert. Jetzt im Agenten einfügen.'; } catch { box.querySelector('#svcm-status').textContent = 'Kopieren wurde vom Browser blockiert. Text bitte manuell markieren.'; }
     });
