@@ -28,7 +28,7 @@ async function vaultKey() {
   return key;
 }
 
-const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'susanne', 'katja'];
+const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens'];
 const profileKey = value => {
   const profile = String(value || '').trim().toLowerCase();
   if (!SUPPORTED_PROFILES.includes(profile)) throw new Error('Ungültiges ClaimsForce-Profil.');
