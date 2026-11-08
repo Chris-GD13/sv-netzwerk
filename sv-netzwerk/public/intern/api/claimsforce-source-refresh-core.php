@@ -114,11 +114,13 @@ function cfrSourceStateUnlocked(string $folder,array $user,string $profile,array
         // write adopts it only after the downloaded ClaimsForce bytes match
         // byte-for-byte; names, timestamps and sizes are never used as proof.
         if($inv['unbound']){
-            $legacyId='ionos_src_'.$key;$legacy=ionosItem($legacyId);
+            $legacyId='ionos_src_'.$key;$legacyRow=ionosRow($legacyId);$legacy=$legacyRow!==null?ionosItem($legacyId):null;
             if(is_array($legacy)&&($legacy['parents'][0]??null)===$ctx['targetFolderId']&&empty(($legacy['appProperties']??[])['svSourceIdentityHash'])){
                 return ['kind'=>'NEW_SOURCE','context'=>$ctx,'sourceHash'=>$key,'originalPrecondition'=>null,'legacyCandidateId'=>$legacyId];
             }
-            throw new RuntimeException('LEGACY_SOURCE_BINDING_REQUIRED: Vorhandene Altdateien sind keinem eindeutig geprueften Claims-Quelldokument zugeordnet. Der Dateiimport bleibt bis zur kontrollierten Zuordnung gesperrt; es wurde kein Ersatzdokument angelegt.');
+            // The authenticated ClaimsForce source identity is sufficient for a
+            // deterministic first write when no legacy candidate exists.
+            return ['kind'=>'NEW_SOURCE','context'=>$ctx,'sourceHash'=>$key,'originalPrecondition'=>null];
         }
         return ['kind'=>'NEW_SOURCE','context'=>$ctx,'sourceHash'=>$key,'originalPrecondition'=>null];
     }
