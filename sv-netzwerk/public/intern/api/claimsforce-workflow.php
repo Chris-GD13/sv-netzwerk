@@ -60,6 +60,20 @@ try {
     }
     if($action==='latest'){ $s=db()->prepare("SELECT * FROM claimsforce_workflow_jobs WHERE created_by=:uid ORDER BY updated_at DESC,id DESC LIMIT 1");$s->execute([':uid'=>(int)$user['id']]);$latest=$s->fetch();apiJson(['ok'=>true,'job'=>$latest?cfwView($latest):null]); }
     $workflowId=trim((string)($_GET['workflow_id']??($_POST['workflow_id']??'')));if($workflowId==='')apiError(400,'Workflow-ID fehlt.');$row=cfwJob($workflowId,$user);
+    if($action==='next'&&$_SERVER['REQUEST_METHOD']==='GET'){
+        $s=db()->prepare("SELECT * FROM claimsforce_workflow_jobs WHERE created_by=:uid AND status='accepted' ORDER BY id ASC LIMIT 1");
+        $s->execute([':uid'=>(int)$user['id']]); $next=$s->fetch();
+        apiJson(['ok'=>true,'job'=>$next?cfwView($next):null]);
+    }
+    if($action==='phase'&&$_SERVER['REQUEST_METHOD']==='POST'){
+        $in=requestBody(); $status=trim((string)($in['status']??'')); $phase=trim((string)($in['phase']??'')); $message=trim((string)($in['message']??''));
+        $allowedStatus=['accepted','running','waiting_question','completed','error','failed'];
+        if(!in_array($status,$allowedStatus,true)||$phase==='') apiError(400,'Ungültiger Workflowstatus oder fehlende Phase.');
+        $s=db()->prepare('UPDATE claimsforce_workflow_jobs SET status=:status,phase=:phase,log_json=:log,updated_at=NOW() WHERE workflow_id=:id AND created_by=:uid');
+        $log=json_decode((string)($row['log_json']??''),true); if(!is_array($log))$log=[]; $log[]=['event'=>'worker_phase','message'=>$message?:$phase,'at'=>gmdate('c')];
+        $s->execute([':status'=>$status,':phase'=>$phase,':log'=>json_encode($log,JSON_UNESCAPED_UNICODE),':id'=>$row['workflow_id'],':uid'=>(int)$user['id']]);
+        apiJson(['ok'=>true,'job'=>cfwView(cfwJob($workflowId,$user))]);
+    }
     if($action==='upload'&&$_SERVER['REQUEST_METHOD']==='POST'){
         $uploads=$_FILES['files']??null;if(!$uploads||!is_array($uploads['name'])||count($uploads['name'])>20)apiError(400,'Bitte 1 bis 20 Dateien auswählen.');$total=0;$saved=[];
         foreach($uploads['name'] as $i=>$name){if(($uploads['error'][$i]??UPLOAD_ERR_NO_FILE)!==UPLOAD_ERR_OK||!is_uploaded_file($uploads['tmp_name'][$i]))throw new RuntimeException('Datei nicht vollständig hochgeladen: '.$name);$bytes=file_get_contents($uploads['tmp_name'][$i]);$total+=strlen($bytes);$name=basename(str_replace('\\','/',$name));if($total>80*1024*1024||strlen($bytes)>30*1024*1024)throw new RuntimeException('Maximal 30 MB je Datei und 80 MB insgesamt.');if(!preg_match('/\.(pdf|docx|png|jpe?g|webp)$/i',$name))throw new RuntimeException('Nicht unterstütztes Dateiformat: '.$name);$mime=mime_content_type($uploads['tmp_name'][$i])?:'application/octet-stream';$saved[]=drWorkspaceWrite((string)$row['folder_id'],$name,$mime,$bytes);}
