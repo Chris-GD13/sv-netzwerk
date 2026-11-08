@@ -742,7 +742,7 @@ async function runImport(run) {
       continue;
     }
     await diagnostic(run, 'CF-CASE-UPSERT', `Auftrag ${index + 1}/${claims.length}: Portal-Fall wird angelegt oder ergänzt.`, { current: index, total: claims.length, claimIndex: index + 1 });
-    const upsert = await portalOperation(portalTabId(), { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, profile, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, tasks, importedAt: new Date().toISOString() }, knownState: { existed: !!state.result?.existed, folderId: state.result?.folderId || '', meta: existingMeta } });
+    const upsert = await portalOperation(portalTabId(), { type: 'PORTAL_UPSERT_ASYNC', operationId: `${run.runId}:upsert:${id}`, mapped, profile, source: { claim: disposition, communication, stakeholders: rawStakeholders || {}, tasks, importedAt: new Date().toISOString() }, knownState: { existed: !!state.result?.existed, folderId: state.result?.folderId || '', meta: existingMeta } }, 180000);
     const folderId = upsert.folderId;
     const uploadSupporting = (name,mime,modified,buffer) => uploadBuffer(portalTabId(),profile,folderId,name,mime,modified,buffer,{claimId:id,profile});
     await uploadSupporting( 'ClaimsForce_Aufgaben_Notizen.json', 'application/json', 0, new TextEncoder().encode(JSON.stringify({ inventory, tasks, notes, sourceNotes: rawNotes }, null, 2)).buffer);
