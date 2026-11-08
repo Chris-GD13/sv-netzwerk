@@ -15,7 +15,7 @@ function safeSendResponse(sendResponse, value) {
   try { sendResponse(value); }
   catch (error) { if (invalidExtensionContext(error)) reportInvalidExtensionContext(); }
 }
-const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens'];
+const SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'susanne', 'katja'];
 const profileKey = value => {
   const profile = String(value || '').trim().toLowerCase();
   if (!SUPPORTED_PROFILES.includes(profile)) throw new Error('Ungültiges ClaimsForce-Profil.');
