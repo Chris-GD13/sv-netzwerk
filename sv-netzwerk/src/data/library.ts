@@ -15,6 +15,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Leitungswasserschäden im Mehrfamilienhaus: Leitungsstrang, Gemeinschaftseigentum und Wohnungsschäden trennen',
+    description: 'Wie Leitungsstrang, gemeinschaftliche Bauteile, Sondereigentum, Folgeschäden und Trocknungsumfang bei einem Rohrbruch über mehrere Geschosse getrennt bewertet werden.',
+    href: '/fachwissen/leitungswasserschaden-mehrfamilienhaus-leitungsstrang-gemeinschaftseigentum/',
+    category: 'Leitungswasser',
+    tags: ['Leitungswasserschaden', 'Mehrfamilienhaus', 'Leitungsstrang', 'Gemeinschaftseigentum', 'Sondereigentum', 'Trocknung'],
+    date: '2026-11-09',
+    publishedAt: '2026-11-09T05:00:00.000Z',
+    type: 'article',
+  },
+  {
     title: 'Parallelschäden nach Hagel: Vorschäden, neue Treffer und Reparaturumfang sauber trennen',
     description: 'Wie Vorschäden, Zwischenreparaturen, neue Hageltreffer und der erforderliche Reparaturumfang bei mehreren Ereignissen am selben Gebäude getrennt bewertet werden.',
     href: '/fachwissen/hagel-parallelschaden-vorschaden-neue-treffer-reparaturumfang/',
