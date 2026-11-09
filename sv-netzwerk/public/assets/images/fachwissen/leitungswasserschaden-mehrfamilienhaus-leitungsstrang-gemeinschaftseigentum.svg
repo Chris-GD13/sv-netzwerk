@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" role="img" aria-labelledby="title desc">
+<title id="title">Leitungswasserschaden zwischen Geschossen</title>
+<desc id="desc">Sachliche Darstellung eines vertikalen Leitungsstrangs, eines geöffneten Installationsschachts und von Feuchtespuren in zwei übereinanderliegenden Wohnungen.</desc>
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dbe2e5"/><stop offset="1" stop-color="#aeb8bd"/></linearGradient>
+ <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2eee7"/><stop offset="1" stop-color="#c4c7c6"/></linearGradient>
+ <linearGradient id="shaft" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#25333c"/><stop offset="1" stop-color="#55636b"/></linearGradient>
+ <filter id="shadow"><feDropShadow dx="0" dy="10" stdDeviation="13" flood-color="#1d2b33" flood-opacity=".25"/></filter>
+</defs>
+<rect width="1536" height="1024" fill="url(#bg)"/>
+<path d="M0 0H1536V1024H0Z" fill="url(#wall)"/>
+<path d="M0 500H1536" stroke="#7b8588" stroke-width="12"/>
+<path d="M0 522H1536" stroke="#e8e5de" stroke-width="18"/>
+<rect x="128" y="80" width="400" height="864" rx="18" fill="url(#shaft)" filter="url(#shadow)"/>
+<rect x="154" y="108" width="348" height="808" rx="10" fill="#1e2a32" stroke="#9ca7aa" stroke-width="8"/>
+<g fill="none" stroke-linecap="round">
+ <path d="M235 138V875" stroke="#aeb8bd" stroke-width="44"/>
+ <path d="M235 138V875" stroke="#626f76" stroke-width="28"/>
+ <path d="M334 138V875" stroke="#c4c8c9" stroke-width="26"/>
+ <path d="M405 138V875" stroke="#ba7f56" stroke-width="18"/>
+ <path d="M405 138V875" stroke="#6f4e3d" stroke-width="10"/>
+</g>
+<g fill="#a7c2d0" opacity=".95">
+ <circle cx="235" cy="305" r="7"/><circle cx="235" cy="380" r="8"/><circle cx="235" cy="486" r="7"/><circle cx="334" cy="260" r="6"/><circle cx="334" cy="602" r="8"/>
+</g>
+<g fill="none" stroke="#9c7766" stroke-width="8" stroke-linecap="round" opacity=".75">
+ <path d="M704 145 C746 226 693 300 733 378 S700 478 728 522"/>
+ <path d="M1012 580 C1055 650 996 716 1025 804"/>
+</g>
+<g fill="none" stroke="#c2a38c" stroke-width="17" opacity=".55">
+ <path d="M644 164 C692 230 643 300 676 360"/>
+ <path d="M966 588 C1016 656 969 724 995 787"/>
+</g>
+<rect x="582" y="84" width="780" height="400" rx="10" fill="#eae7df" stroke="#aab2b4" stroke-width="10"/>
+<rect x="582" y="540" width="780" height="400" rx="10" fill="#eae7df" stroke="#aab2b4" stroke-width="10"/>
+<path d="M587 470H1360" stroke="#d0cec8" stroke-width="15"/>
+<path d="M587 925H1360" stroke="#d0cec8" stroke-width="15"/>
+<g stroke="#9d6f58" stroke-width="8" opacity=".7">
+ <path d="M724 112V470"/><path d="M1075 112V470"/><path d="M1025 560V940"/>
+</g>
+<g fill="#e9eef0" stroke="#53626a" stroke-width="7" transform="translate(570 710) rotate(-8)" filter="url(#shadow)">
+ <rect x="0" y="0" width="120" height="190" rx="16"/>
+ <rect x="17" y="22" width="86" height="68" rx="8" fill="#6f8992"/>
+ <circle cx="30" cy="129" r="8" fill="#8ad0a8"/><circle cx="60" cy="129" r="8" fill="#d6b15c"/><circle cx="90" cy="129" r="8" fill="#8399a2"/>
+</g>
+<path d="M610 818 L565 890" stroke="#dbe5e8" stroke-width="7" stroke-linecap="round"/>
+<path d="M648 818 L612 898" stroke="#dbe5e8" stroke-width="7" stroke-linecap="round"/>
+</svg>
