@@ -15,6 +15,7 @@ foreach($users as$i=>$user){
  }
  if(svnetIsBackofficeUser($user)!==($i===4))throw new RuntimeException('Administrator darf keine Freigabe erteilen.');
 }
+if(svnetUserProfile($users[4])!=='christian')throw new RuntimeException('Susanne-Eigentümerzeilen werden nicht Christian zugeordnet.');
 foreach(['marc','holger','jens']as$profile){
  $rejected=false;
  try{svnetExpertIdentity($profile,$users[4]);}catch(InvalidArgumentException){$rejected=true;}

@@ -24,6 +24,11 @@ function svnetUserProfile(array $user): string
     $explicit = svnetProfileText((string)($user['svnet_expert_profile'] ?? ''));
     if (in_array($explicit, svnetSupportedProfiles(), true)) return $explicit;
 
+    // Susanne is the authorised backoffice identity for Christian's shared
+    // case inventory. Persisted ownership rows may therefore contain her
+    // login even though the case belongs to Christian's profile.
+    if (svnetIsBackofficeUser($user)) return 'christian';
+
     $email = svnetProfileText((string)($user['email'] ?? ''));
     $name = svnetProfileText((string)($user['full_name'] ?? ''));
     if (str_contains($email, 'hr@') || str_contains($name, 'holger roth')) return 'holger';
