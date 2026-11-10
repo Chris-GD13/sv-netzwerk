@@ -15,6 +15,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Parkett nach einer Geräteleckage: Randzonen, Untergrund und Austauschumfang fachlich prüfen',
+    description: 'Wie Austrittspfad, Parkettrandzonen, Klebung, Untergrund, Restfeuchte und der erforderliche Austauschumfang nach einer Leckage am Haushaltsgerät bewertet werden.',
+    href: '/fachwissen/parkett-leckage-haushaltsgeraet-randzonen-untergrund-austauschumfang/',
+    category: 'Leitungswasser',
+    tags: ['Leitungswasserschaden', 'Parkett', 'Geräteleckage', 'Untergrund', 'Schadenabgrenzung', 'Kostenprüfung'],
+    date: '2026-11-10',
+    publishedAt: '2026-11-10T05:00:00.000Z',
+    type: 'article',
+  },
+  {
     title: 'Leitungswasserschäden im Mehrfamilienhaus: Leitungsstrang, Gemeinschaftseigentum und Wohnungsschäden trennen',
     description: 'Wie Leitungsstrang, gemeinschaftliche Bauteile, Sondereigentum, Folgeschäden und Trocknungsumfang bei einem Rohrbruch über mehrere Geschosse getrennt bewertet werden.',
     href: '/fachwissen/leitungswasserschaden-mehrfamilienhaus-leitungsstrang-gemeinschaftseigentum/',
