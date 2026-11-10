@@ -140,7 +140,24 @@
       "linkedin": {
         "status": "not-posted"
       }
+    },
+    "2026-11-10": {
+      "publication_id": "2026-11-10-parkett-leckage-haushaltsgeraet-randzonen-untergrund-austauschumfang",
+      "article": {
+        "title": "Parkett nach einer Geräteleckage: Randzonen, Untergrund und Austauschumfang fachlich prüfen",
+        "slug": "parkett-leckage-haushaltsgeraet-randzonen-untergrund-austauschumfang",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/parkett-leckage-haushaltsgeraet-randzonen-untergrund-austauschumfang/",
+        "status": "published-verified",
+        "owner": "codex-website-20261110-0600",
+        "reserved_at": "2026-11-10T05:00:00.000Z",
+        "commit": "dc47270686fd9245d91d26d38f7e8b66949a58b1",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/42759572110",
+        "verified_at": "2026-11-10T05:10:09Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-11-09T05:20:21Z"
+  "updated_at": "2026-11-10T05:10:09Z"
 }
