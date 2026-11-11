@@ -100,12 +100,11 @@ jobs:
             echo 'lftp bereits vorhanden.'
             exit 0
           fi
-          if timeout 45s sudo DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends lftp; then
-            exit 0
-          fi
-          echo 'Paketindex nicht ausreichend; einmaliger Updateversuch.'
-          timeout 45s sudo apt-get update -o Acquire::Retries=1 || true
-          timeout 45s sudo DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends lftp
+          deb="${RUNNER_TEMP}/lftp_4.9.2-2ubuntu1.1_amd64.deb"
+          curl --fail --location --retry 3 --connect-timeout 10 --max-time 60 \
+            'https://archive.ubuntu.com/ubuntu/pool/main/l/lftp/lftp_4.9.2-2ubuntu1.1_amd64.deb' \
+            --output "$deb"
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install --yes "$deb"
 
       - name: SSH-Schlüssel für den Server einrichten
         env:
