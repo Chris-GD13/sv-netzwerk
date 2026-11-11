@@ -1,0 +1,460 @@
+name: SV-Netzwerk bereitstellen
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "sv-netzwerk/**"
+      - "!sv-netzwerk/public/intern/**"
+      - "!sv-netzwerk/src/pages/intern/**"
+      - "!sv-netzwerk/browser-extension/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-sv-netzwerk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      SFTP_REMOTE_DIR: ${{ secrets.PORTAL_SFTP_REMOTE_DIR }}
+      SFTP_CONNECT_TIMEOUT_SECONDS: 25
+      SFTP_CHECK_TIMEOUT_SECONDS: 45
+      SFTP_CHECK_ATTEMPTS: 10
+      SFTP_UPLOAD_TIMEOUT_SECONDS: 1200
+      SFTP_UPLOAD_ATTEMPTS: 10
+
+    defaults:
+      run:
+        working-directory: sv-netzwerk
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v7
+
+      - name: Node.js 22 LTS einrichten
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sv-netzwerk/package-lock.json
+          registry-url: https://registry.npmjs.org
+
+      - name: Laufzeitumgebung prüfen
+        run: |
+          echo "Runner: $RUNNER_OS"
+          echo "Arbeitsverzeichnis: $(pwd)"
+          node --version
+          npm --version
+          npm config get registry
+          test -f package.json
+          test -f package-lock.json
+
+      - name: Abhängigkeiten reproduzierbar installieren
+        env:
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+          NPM_CONFIG_AUDIT: "false"
+          NPM_CONFIG_FUND: "false"
+          NPM_CONFIG_PROGRESS: "false"
+          NPM_CONFIG_FETCH_RETRIES: "2"
+          NPM_CONFIG_FETCH_RETRY_MINTIMEOUT: "10000"
+          NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: "30000"
+        run: npm ci --no-audit --no-fund --loglevel=notice
+
+      - name: Astro-Projekt prüfen und bauen
+        run: npm run build
+
+      - name: Build-Ausgabe prüfen
+        run: |
+          set -euo pipefail
+          test -d dist
+          test -n "$(find dist -type f -print -quit)"
+          test -f dist/deploy-version.txt
+          grep -Fx "Commit: $GITHUB_SHA" dist/deploy-version.txt
+          grep -Fx "Version: Homepage-v5" dist/deploy-version.txt
+          test -f dist/fachwissen/hochwasser-ueberflutung-grossschadenkoordination-2026-07-20-morning/index.html
+          test -f dist/fachwissen/starkregen-rueckstau-schadenaufnahme-regulierung-2026-07-20-morning/index.html
+          test -f dist/fachwissen/sturm-hagel-serienschaeden-prueffolge-2026-07-21-morning/index.html
+          test -f dist/fachwissen/grossflaechige-leitungswasserschaeden-sanierungssteuerung/index.html
+          echo "Build erfolgreich; erzeugte Dateien:"
+          find dist -type f | sort | sed -n '1,100p'
+
+      - name: Öffentliches Website-Paket ohne Prüfportal vorbereiten
+        run: |
+          node scripts/prepare-deploy-scope.mjs site dist deploy-site
+          test -f deploy-site/index.html
+          test -f deploy-site/deploy-version.txt
+          test ! -e deploy-site/intern
+
+      - name: SFTP-Werkzeug installieren
+        run: |
+          set -euo pipefail
+          if command -v lftp >/dev/null 2>&1; then
+            echo 'lftp bereits vorhanden.'
+            exit 0
+          fi
+          for attempt in 1 2 3 4 5; do
+            echo "lftp-Installation, Versuch $attempt/5"
+            if sudo apt-get update -o Acquire::Retries=5 && sudo apt-get install --yes --no-install-recommends lftp; then
+              exit 0
+            fi
+            sleep 15
+          done
+          echo 'lftp konnte nach fünf Versuchen nicht installiert werden.' >&2
+          exit 1
+
+      - name: SSH-Schlüssel für den Server einrichten
+        env:
+          PORTAL_SSH_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+          PORTAL_SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          PORTAL_SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          test -n "$PORTAL_SSH_KEY"
+          install -d -m 700 ~/.ssh ~/.lftp
+          printf '%s\n' "$PORTAL_SSH_KEY" > ~/.ssh/portal_key
+          chmod 600 ~/.ssh/portal_key
+          ssh-keyscan -p "$PORTAL_SFTP_PORT" "$PORTAL_SFTP_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "set sftp:connect-program \"ssh -a -x -i $HOME/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes\"" > ~/.lftp/rc
+
+      - name: SFTP-Stammverzeichnis gegen Domain-Dokumentenstamm verifizieren
+        env:
+          SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SFTP_PASSWORD: key-auth
+          SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SFTP_REMOTE_DIR:-}" ]; then
+            echo "::error::Secret PORTAL_SFTP_REMOTE_DIR fehlt. Der IONOS-Dokumentenstamm wird nicht geraten."
+            exit 1
+          fi
+          sftp() {
+            lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; $1; quit"
+          }
+          token="$(openssl rand -hex 16)"
+          probe_name="deploy-probe-${GITHUB_RUN_ID}-${token}.txt"
+          probe_file="$(mktemp)"
+          printf '%s\n' "$token" > "$probe_file"
+          cleanup() {
+            sftp "cd $SFTP_REMOTE_DIR; rm -f $probe_name" >/dev/null 2>&1 || true
+            rm -f "$probe_file"
+          }
+          trap cleanup EXIT
+          if ! sftp "cd $SFTP_REMOTE_DIR; put $probe_file -o $probe_name"; then
+            echo "::error::PORTAL_SFTP_REMOTE_DIR existiert nicht oder ist nicht beschreibbar."
+            exit 1
+          fi
+          live="$(curl --location --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors "https://www.sv-netzwerk.eu/$probe_name" || true)"
+          if [ "$live" != "$token" ]; then
+            echo "::error::PORTAL_SFTP_REMOTE_DIR gehört nicht zum Dokumentenstamm von www.sv-netzwerk.eu. Es wurde nichts bereitgestellt."
+            sftp "pwd; cd $SFTP_REMOTE_DIR; pwd" || true
+            exit 1
+          fi
+          echo "Zuordnung bestätigt: PORTAL_SFTP_REMOTE_DIR liefert unter https://www.sv-netzwerk.eu/ aus."
+
+      - name: Document Root vor dem Upload prüfen
+        env:
+          SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SFTP_PASSWORD: key-auth
+          SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; ls; quit"
+          exit_code=1
+          listing=""
+          for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
+            set +e
+            listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$lftp_script")"
+            exit_code=$?
+            set -e
+            if [ "$exit_code" -eq 0 ]; then
+              break
+            fi
+            if [ "$attempt" -lt "$SFTP_CHECK_ATTEMPTS" ]; then
+              sleep 15
+            fi
+          done
+          if [ "$exit_code" -ne 0 ]; then
+            if [ "$exit_code" -eq 124 ]; then
+              echo "::error::Timeout bei Document-Root-Prüfung nach ${SFTP_CHECK_TIMEOUT_SECONDS}s."
+            else
+              echo "::error::Document Root $SFTP_REMOTE_DIR ist nicht erreichbar oder nicht nutzbar (Exit $exit_code)."
+            fi
+            exit 1
+          fi
+          printf '%s\n' "$listing"
+
+          if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
+            echo "::warning::$SFTP_REMOTE_DIR/dist/ existiert (wird beim Upload bereinigt)."
+          fi
+
+      - name: Abgelehnten Fensterbau-Beitrag vom 10.10.2026 gezielt zurücknehmen
+        env:
+          SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SFTP_PASSWORD: key-auth
+          SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          rejected_slug="fenstermontage-anschlussfugen-maengel-nachbesserung"
+          test ! -e "src/content/knowledge/$rejected_slug.md"
+          test ! -e "deploy-site/fachwissen/$rejected_slug/index.html"
+          # Nur diese drei ausdrücklich zurückgenommenen Dateien entfernen.
+          # Der vorangehende Domain-Probe hat den Dokumentenstamm bestätigt.
+          # rm -f ist auch nach der ersten Rücknahme erfolgreich; nicht
+          # vorhandene Verzeichnisse dürfen Folge-Deployments nicht abbrechen.
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 2; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; rm -f fachwissen/$rejected_slug/index.html; rm -f svos/fachwissen/$rejected_slug/index.html; rm -f assets/images/fachwissen/$rejected_slug.png; quit"
+          timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$lftp_script"
+          for removed_path in "fachwissen/$rejected_slug/" "svos/fachwissen/$rejected_slug/" "assets/images/fachwissen/$rejected_slug.png"; do
+            status="$(curl --silent --show-error --location --retry 2 -o /dev/null -w '%{http_code}' "https://www.sv-netzwerk.eu/$removed_path?withdrawal=$GITHUB_RUN_ID")"
+            case "$status" in
+              404|410) echo "Zurückgenommen: $removed_path HTTP $status" ;;
+              *) echo "::error::Zurücknahme nicht bestätigt: $removed_path HTTP $status"; exit 1 ;;
+            esac
+          done
+
+      - name: Öffentliches Website-Paket nach IONOS übertragen
+        env:
+          SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SFTP_PASSWORD: key-auth
+          SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          latest_entry=""
+          while IFS= read -r file; do
+            published_at="$(sed -n 's/^  publishedAt:[[:space:]]*//p' "$file" | head -n 1)"
+            if [ -n "$published_at" ]; then
+              printf '%s\t%s\n' "$published_at" "$file"
+            fi
+          done < <(find src/content/knowledge -maxdepth 1 -type f -name '*.md' -print | sort) > /tmp/knowledge-dates.txt
+          latest_entry="$(sort /tmp/knowledge-dates.txt | tail -n 1)"
+          latest_file="${latest_entry#*$'\t'}"
+          latest_slug="$(basename "$latest_file" .md)"
+          latest_image="$(sed -n 's/^  image:[[:space:]]*//p' "$latest_file" | head -n 1 | tr -d '"')"
+          if [ -z "$latest_slug" ]; then
+            echo "::error::Kein veröffentlichter Fachbeitrag für den Nachupload gefunden."
+            exit 1
+          fi
+          article_upload_command="mirror --reverse --overwrite --parallel=2 deploy-site/fachwissen/${latest_slug}/ fachwissen/${latest_slug}/;"
+          image_upload_command=""
+          if [ -n "$latest_image" ]; then
+            image_path="${latest_image#/}"
+            image_upload_command="put deploy-site/$image_path -o $image_path;"
+          fi
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; mirror --reverse --overwrite --parallel=4 --exclude-glob .git* --exclude-glob .env* --exclude-glob *.log --exclude-glob .htaccess --exclude-glob intern --exclude-glob intern/** deploy-site/ .; $article_upload_command $image_upload_command rm -f assets/images/fachwissen/wallbox-ladeinfrastruktur-ueberflutung-pruefung-kostenabgrenzung.jpg; quit"
+          exit_code=1
+          for attempt in $(seq 1 "$SFTP_UPLOAD_ATTEMPTS"); do
+            echo "Upload-Versuch $attempt/$SFTP_UPLOAD_ATTEMPTS"
+            set +e
+            timeout "${SFTP_UPLOAD_TIMEOUT_SECONDS}s" lftp -e "$lftp_script"
+            exit_code=$?
+            set -e
+            if [ "$exit_code" -eq 0 ]; then
+              break
+            fi
+            if [ "$exit_code" -eq 124 ]; then
+              break
+            fi
+            if [ "$attempt" -lt "$SFTP_UPLOAD_ATTEMPTS" ]; then
+              sleep 15
+            fi
+          done
+          if [ "$exit_code" -ne 0 ]; then
+            if [ "$exit_code" -eq 124 ]; then
+              echo "::error::Timeout beim Upload nach ${SFTP_UPLOAD_TIMEOUT_SECONDS}s."
+            else
+              echo "::error::Upload nach $SFTP_REMOTE_DIR fehlgeschlagen nach ${SFTP_UPLOAD_ATTEMPTS} Versuch(en) (Exit $exit_code)."
+            fi
+            exit 1
+          fi
+
+          # Den neuesten Fachbeitrag zusätzlich in einem eigenen, nachweisbaren
+          # lftp-Aufruf übertragen. Der Root-Mirror kann bei großen Beständen
+          # erfolgreich enden, obwohl ein neu angelegter Detailpfad im Ziel noch
+          # fehlt; dieser Nachupload darf deshalb nicht nur Teil des langen
+          # Mirror-Kommandos sein.
+          article_source="deploy-site/fachwissen/${latest_slug}/index.html"
+          article_target="fachwissen/${latest_slug}/index.html"
+          test -f "$article_source"
+          article_lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; put $article_source -o $article_target; ls fachwissen/${latest_slug}/;"
+          if [ -n "$latest_image" ]; then
+            image_path="${latest_image#/}"
+            test -f "deploy-site/$image_path"
+            article_lftp_script+=" cd $SFTP_REMOTE_DIR; put deploy-site/$image_path -o $image_path;"
+          fi
+          article_lftp_script+=" quit"
+          article_exit_code=1
+          for attempt in $(seq 1 "$SFTP_UPLOAD_ATTEMPTS"); do
+            echo "Expliziter Fachbeitrags-Nachupload $attempt/$SFTP_UPLOAD_ATTEMPTS"
+            set +e
+            timeout "${SFTP_UPLOAD_TIMEOUT_SECONDS}s" lftp -e "$article_lftp_script"
+            article_exit_code=$?
+            set -e
+            if [ "$article_exit_code" -eq 0 ]; then
+              break
+            fi
+            if [ "$article_exit_code" -eq 124 ]; then
+              break
+            fi
+            if [ "$attempt" -lt "$SFTP_UPLOAD_ATTEMPTS" ]; then
+              sleep 15
+            fi
+          done
+          if [ "$article_exit_code" -ne 0 ]; then
+            echo "::error::Expliziter Nachupload von $article_target fehlgeschlagen (Exit $article_exit_code)."
+            exit 1
+          fi
+
+      - name: Inhalt des Document Root prüfen
+        env:
+          SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SFTP_PASSWORD: key-auth
+          SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          lftp_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; set net:reconnect-interval-base 5; set net:reconnect-interval-multiplier 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; ls $SFTP_REMOTE_DIR; quit"
+          exit_code=1
+          listing=""
+          for attempt in $(seq 1 "$SFTP_CHECK_ATTEMPTS"); do
+            set +e
+            listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$lftp_script")"
+            exit_code=$?
+            set -e
+            if [ "$exit_code" -eq 0 ]; then
+              break
+            fi
+            if [ "$attempt" -lt "$SFTP_CHECK_ATTEMPTS" ]; then
+              sleep 15
+            fi
+          done
+          if [ "$exit_code" -ne 0 ]; then
+            if [ "$exit_code" -eq 124 ]; then
+              echo "::error::Timeout bei Post-Upload-Document-Root-Prüfung nach ${SFTP_CHECK_TIMEOUT_SECONDS}s."
+            else
+              echo "::error::Post-Upload-Prüfung für $SFTP_REMOTE_DIR fehlgeschlagen (Exit $exit_code)."
+            fi
+            exit 1
+          fi
+          printf '%s\n' "$listing"
+
+          printf '%s\n' "$listing" | grep -Eq ' index\.html$'
+          printf '%s\n' "$listing" | grep -Eq ' assets$'
+          printf '%s\n' "$listing" | grep -Eq ' deploy-version\.txt$'
+
+          # Den neuesten Fachbeitrag aus dem Content-Modell ermitteln.
+          latest_entry=""
+          while IFS= read -r file; do
+            published_at="$(sed -n 's/^  publishedAt:[[:space:]]*//p' "$file" | head -n 1)"
+            if [ -n "$published_at" ]; then
+              printf '%s\t%s\n' "$published_at" "$file"
+            fi
+          done < <(find src/content/knowledge -maxdepth 1 -type f -name '*.md' -print | sort) > /tmp/knowledge-dates.txt
+          latest_entry="$(sort /tmp/knowledge-dates.txt | tail -n 1)"
+          latest_file="${latest_entry#*$'\t'}"
+          latest_slug="$(basename "$latest_file" .md)"
+          latest_image="$(sed -n 's/^  image:[[:space:]]*//p' "$latest_file" | head -n 1 | tr -d '"')"
+          if [ -z "$latest_slug" ]; then
+            echo "::error::Kein veröffentlichter Fachbeitrag im Content-Modell gefunden."
+            exit 1
+          fi
+          article_path="fachwissen/${latest_slug}/index.html"
+          article_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR; ls fachwissen/${latest_slug}/; quit"
+          article_listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$article_script")"
+          printf '%s\n' "$article_listing" | grep -Eq ' index\.html$'
+          echo "Fachbeitrag: $article_path vorhanden"
+
+          if [ -n "$latest_image" ]; then
+            image_path="${latest_image#/}"
+            image_dir="$(dirname "$image_path")"
+            image_name="$(basename "$image_path")"
+            image_script="set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout $SFTP_CONNECT_TIMEOUT_SECONDS; set net:max-retries 1; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; cd $SFTP_REMOTE_DIR/$image_dir; cls -1; quit"
+            image_listing="$(timeout "${SFTP_CHECK_TIMEOUT_SECONDS}s" lftp -e "$image_script")"
+            printf '%s\n' "$image_listing"
+            printf '%s\n' "$image_listing" | grep -Fx "$image_name"
+            echo "Fachbeitragsbild: $image_path vorhanden"
+          fi
+
+          if printf '%s\n' "$listing" | grep -Eq ' dist$'; then
+            echo "::error::$SFTP_REMOTE_DIR/dist/ wurde unerwartet angelegt."
+            exit 1
+          fi
+
+      - name: Deployment online verifizieren
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          # 1. Deploy-Marker: muss exakt den aktuellen Commit ausweisen
+          ok=0
+          for i in $(seq 1 12); do
+            response="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+              https://www.sv-netzwerk.eu/deploy-version.txt || true)"
+            actual_sha="$(printf '%s\n' "$response" | sed -n 's/^Commit:[[:space:]]*//p' | head -n 1)"
+            if [ "$actual_sha" = "$EXPECTED_SHA" ]; then ok=1; break; fi
+            sleep 10
+          done
+          printf '%s\n' "$response"
+          if [ "$ok" != "1" ]; then
+            echo "::error::/deploy-version.txt weist nicht den Commit $EXPECTED_SHA aus."
+            exit 1
+          fi
+          echo "deploy-version.txt: OK"
+
+          # 2. Homepage
+          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+            -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/ || true)"
+          if [ "$status" != "200" ]; then
+            echo "::error::Homepage liefert HTTP $status statt 200."
+            exit 1
+          fi
+          echo "Homepage: HTTP $status OK"
+
+          # 3. /intern/login/
+          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+            -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/login/ || true)"
+          if [ "$status" != "200" ]; then
+            echo "::error::/intern/login/ liefert HTTP $status statt 200."
+            exit 1
+          fi
+          echo "/intern/login/: HTTP $status OK"
+
+          # 4. /intern/fensterpruefung-bonn/
+          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+            -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/fensterpruefung-bonn/ || true)"
+          if [ "$status" != "200" ]; then
+            echo "::error::/intern/fensterpruefung-bonn/ liefert HTTP $status statt 200."
+            exit 1
+          fi
+          echo "/intern/fensterpruefung-bonn/: HTTP $status OK"
+
+          # 5. Der neueste Fachbeitrag aus dem Content-Modell
+          latest_entry=""
+          while IFS= read -r file; do
+            published_at="$(sed -n 's/^  publishedAt:[[:space:]]*//p' "$file" | head -n 1)"
+            if [ -n "$published_at" ]; then
+              printf '%s\t%s\n' "$published_at" "$file"
+            fi
+          done < <(find src/content/knowledge -maxdepth 1 -type f -name '*.md' -print | sort) > /tmp/knowledge-dates.txt
+          latest_entry="$(sort /tmp/knowledge-dates.txt | tail -n 1)"
+          latest_file="${latest_entry#*$'\t'}"
+          latest_slug="$(basename "$latest_file" .md)"
+          article_url="https://www.sv-netzwerk.eu/fachwissen/${latest_slug}/"
+          status="$(curl --location --silent --show-error --retry 3 --retry-delay 5 --retry-all-errors \
+            -o /dev/null -w '%{http_code}' "$article_url" || true)"
+          if [ "$status" != "200" ]; then
+            echo "::error::$article_url liefert HTTP $status statt 200."
+            exit 1
+          fi
+          echo "Fachbeitrag: HTTP $status OK ($article_url)"
