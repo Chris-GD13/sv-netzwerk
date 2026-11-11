@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
       SFTP_REMOTE_DIR: ${{ secrets.PORTAL_SFTP_REMOTE_DIR }}
