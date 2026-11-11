@@ -34,6 +34,8 @@ assert.match(api, /balance_target_year/);
 assert.match(api, /balance_target_at/);
 assert.match(api, /postTargetBalance/);
 assert.match(page, /Nicht abgefeierte Stunden verfallen nicht/);
+assert.match(page, /Überstunden \(Tage\)/);
+assert.match(page, /overtimeDaysOf/);
 assert.match(page, /Überstunden-Saldo nach Zeitausgleich \(Stunden\)/);
 assert.match(page, /class="tt-columns tt-admin-grid"/);
 assert.ok(page.indexOf('id="tt-entitlement-form"') > page.indexOf('id="tt-entry-form"'), 'Admin-Formulare bleiben gemeinsam angeordnet');
