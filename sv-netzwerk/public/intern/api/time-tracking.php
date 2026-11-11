@@ -51,6 +51,7 @@ function ensureTimeTrackingSchema(): void
         balance_adjustment_year SMALLINT UNSIGNED NULL,
         balance_target_minutes INT NULL,
         balance_target_year SMALLINT UNSIGNED NULL,
+        balance_target_at DATETIME NULL,
         vacation_adjustment_days DECIMAL(6,2) NOT NULL DEFAULT 0,
         vacation_adjustment_year SMALLINT UNSIGNED NULL,
         updated_by INT UNSIGNED NULL,
@@ -66,6 +67,7 @@ function ensureTimeTrackingSchema(): void
     ttEnsureColumn($pdo, 'balance_adjustment_year', 'SMALLINT UNSIGNED NULL');
     ttEnsureColumn($pdo, 'balance_target_minutes', 'INT NULL');
     ttEnsureColumn($pdo, 'balance_target_year', 'SMALLINT UNSIGNED NULL');
+    ttEnsureColumn($pdo, 'balance_target_at', 'DATETIME NULL');
     ttEnsureColumn($pdo, 'vacation_adjustment_days', 'DECIMAL(6,2) NOT NULL DEFAULT 0');
     ttEnsureColumn($pdo, 'vacation_adjustment_year', 'SMALLINT UNSIGNED NULL');
     $pdo->exec("CREATE TABLE IF NOT EXISTS time_entries (
@@ -128,7 +130,7 @@ function ensureTimeTrackingSchema(): void
 
 function ttEnsureColumn(PDO $pdo, string $column, string $definition): void
 {
-    $allowed = ['annual_leave_days', 'carryover_leave_days', 'contractual_minutes_per_week', 'hourly_wage', 'holiday_region', 'balance_adjustment_minutes', 'balance_adjustment_year', 'balance_target_minutes', 'balance_target_year', 'vacation_adjustment_days', 'vacation_adjustment_year'];
+    $allowed = ['annual_leave_days', 'carryover_leave_days', 'contractual_minutes_per_week', 'hourly_wage', 'holiday_region', 'balance_adjustment_minutes', 'balance_adjustment_year', 'balance_target_minutes', 'balance_target_year', 'balance_target_at', 'vacation_adjustment_days', 'vacation_adjustment_year'];
     if (!in_array($column, $allowed, true)) return;
     $exists = $pdo->query('SHOW COLUMNS FROM time_user_settings LIKE ' . $pdo->quote($column))->fetch();
     if (!$exists) $pdo->exec("ALTER TABLE time_user_settings ADD COLUMN `$column` $definition");
@@ -362,10 +364,15 @@ function handleSummary(array $actor): never
     $aggregate = [];
     foreach ($trackedUsers as $user) {
         if (!$permissions['can_view_all'] && (int)$user['id'] !== (int)$actor['id']) continue;
-        $worked = 0; $balance = 0; $open = false; $hasEntries = false; $monthWorked = 0;
+        $worked = 0; $balance = 0; $postTargetBalance = 0; $open = false; $hasEntries = false; $monthWorked = 0;
         foreach ($entries as $entry) if ((int)$entry['user_id'] === (int)$user['id'] && (string)$entry['started_at'] >= $yearStart) {
             if ((string)($entry['source'] ?? '') === 'timemoto_import' && ttWeekendDate((string)$entry['started_at'])) continue;
-            $hasEntries = true; $worked += (int)$entry['worked_minutes']; $balance += (int)$entry['balance_minutes']; $open = $open || $entry['ended_at'] === null;
+            $hasEntries = true; $worked += (int)$entry['worked_minutes']; $balance += (int)$entry['balance_minutes'];
+            $setting = $settingsByUser[(int)$user['id']] ?? [];
+            $targetAt = $setting['balance_target_at'] ?? null;
+            if (!$targetAt && (int)($setting['balance_target_year'] ?? 0) === $year && $setting['balance_target_minutes'] !== null && $year === 2026) $targetAt = '2026-10-30 23:59:59';
+            if ($targetAt && (string)$entry['started_at'] > (string)$targetAt) $postTargetBalance += (int)$entry['balance_minutes'];
+            $open = $open || $entry['ended_at'] === null;
             if ((string)$entry['started_at'] >= $monthStart) $monthWorked += (int)$entry['worked_minutes'];
         }
         $compStmt = $pdo->prepare("SELECT COALESCE(SUM(hours),0) FROM time_leave_requests WHERE user_id=:id AND leave_type='zeitausgleich' AND status='approved' AND ends_on >= :year_start");
@@ -375,7 +382,16 @@ function handleSummary(array $actor): never
         $setting = $settingsByUser[(int)$user['id']] ?? [];
         $region = ttHolidayRegion($setting);
         if ((int)($setting['balance_target_year'] ?? 0) === $year && $setting['balance_target_minutes'] !== null) {
-            $balance = (int)$setting['balance_target_minutes'] + $compMinutes;
+            $targetAt = $setting['balance_target_at'] ?? null;
+            if (!$targetAt && $year === 2026) $targetAt = '2026-10-30 23:59:59';
+            if ($targetAt) {
+                $postCompStmt = $pdo->prepare("SELECT COALESCE(SUM(hours),0) FROM time_leave_requests WHERE user_id=:id AND leave_type='zeitausgleich' AND status='approved' AND ends_on > :target_date AND ends_on >= :year_start");
+                $postCompStmt->execute([':id'=>(int)$user['id'], ':target_date'=>substr((string)$targetAt, 0, 10), ':year_start'=>substr($yearStart,0,10)]);
+                $postCompMinutes = (int)round(((float)$postCompStmt->fetchColumn()) * 60);
+                $balance = (int)$setting['balance_target_minutes'] + $postTargetBalance + ($compMinutes - $postCompMinutes);
+            } else {
+                $balance = (int)$setting['balance_target_minutes'] + $compMinutes;
+            }
         } elseif ((int)($setting['balance_adjustment_year'] ?? 0) === $year) {
             $balance += (int)($setting['balance_adjustment_minutes'] ?? 0);
         }
@@ -674,7 +690,10 @@ function handleSaveLeaveEntitlement(array $actor): never
     $balanceAdjustment = (int)($before['balance_adjustment_minutes'] ?? 0);
     $balanceAdjustmentYear = $before['balance_adjustment_year'] ?? null;
     $balanceTargetYear = $before['balance_target_year'] ?? null;
-    if ($balanceTarget !== null) { $balanceTargetYear = $year; }
+    $balanceTargetAt = $before['balance_target_at'] ?? null;
+    if ($balanceTarget === null) { $balanceTargetYear = null; $balanceTargetAt = null; }
+    elseif ($balanceTargetYear !== $year || $before === null || (int)($before['balance_target_minutes'] ?? 0) !== $balanceTarget) { $balanceTargetYear = $year; $balanceTargetAt = $now; }
+    elseif (!$balanceTargetAt && $year === 2026) $balanceTargetAt = '2026-10-30 23:59:59';
     $vacationAdjustment = (float)($before['vacation_adjustment_days'] ?? 0);
     $vacationAdjustmentYear = $before['vacation_adjustment_year'] ?? null;
     if ($vacationRemainingTarget !== null) {
@@ -688,7 +707,7 @@ function handleSaveLeaveEntitlement(array $actor): never
         if ($entitlement !== null) { $vacationAdjustment = $entitlement - $vacationRemainingTarget - $takenBase; $vacationAdjustmentYear = $year; }
     }
     $pdo->prepare('UPDATE users SET time_tracking_enabled=:enabled,updated_at=:updated WHERE id=:id')->execute([':enabled'=>$timeTrackingEnabled,':updated'=>$now,':id'=>$userId]);
-    $pdo->prepare("INSERT INTO time_user_settings (user_id,target_minutes_per_day,annual_leave_days,carryover_leave_days,contractual_minutes_per_week,hourly_wage,holiday_region,balance_adjustment_minutes,balance_adjustment_year,balance_target_minutes,balance_target_year,vacation_adjustment_days,vacation_adjustment_year,updated_by,updated_at) VALUES (:id,:daily,:annual,:carryover,:weekly,:wage,:region,:balance_adjustment,:balance_year,:balance_target,:balance_target_year,:vacation_adjustment,:vacation_year,:actor,:updated) ON DUPLICATE KEY UPDATE target_minutes_per_day=VALUES(target_minutes_per_day),annual_leave_days=VALUES(annual_leave_days),carryover_leave_days=VALUES(carryover_leave_days),contractual_minutes_per_week=VALUES(contractual_minutes_per_week),hourly_wage=VALUES(hourly_wage),holiday_region=VALUES(holiday_region),balance_adjustment_minutes=VALUES(balance_adjustment_minutes),balance_adjustment_year=VALUES(balance_adjustment_year),balance_target_minutes=VALUES(balance_target_minutes),balance_target_year=VALUES(balance_target_year),vacation_adjustment_days=VALUES(vacation_adjustment_days),vacation_adjustment_year=VALUES(vacation_adjustment_year),updated_by=VALUES(updated_by),updated_at=VALUES(updated_at)")->execute([':id'=>$userId,':daily'=>$dailyMinutes,':annual'=>$annual,':carryover'=>$carryover,':weekly'=>$weeklyMinutes,':wage'=>$hourlyWage,':region'=>$holidayRegion,':balance_adjustment'=>$balanceAdjustment,':balance_year'=>$balanceAdjustmentYear,':balance_target'=>$balanceTarget,':balance_target_year'=>$balanceTargetYear,':vacation_adjustment'=>$vacationAdjustment,':vacation_year'=>$vacationAdjustmentYear,':actor'=>(int)$actor['id'],':updated'=>$now]);
+    $pdo->prepare("INSERT INTO time_user_settings (user_id,target_minutes_per_day,annual_leave_days,carryover_leave_days,contractual_minutes_per_week,hourly_wage,holiday_region,balance_adjustment_minutes,balance_adjustment_year,balance_target_minutes,balance_target_year,balance_target_at,vacation_adjustment_days,vacation_adjustment_year,updated_by,updated_at) VALUES (:id,:daily,:annual,:carryover,:weekly,:wage,:region,:balance_adjustment,:balance_year,:balance_target,:balance_target_year,:balance_target_at,:vacation_adjustment,:vacation_year,:actor,:updated) ON DUPLICATE KEY UPDATE target_minutes_per_day=VALUES(target_minutes_per_day),annual_leave_days=VALUES(annual_leave_days),carryover_leave_days=VALUES(carryover_leave_days),contractual_minutes_per_week=VALUES(contractual_minutes_per_week),hourly_wage=VALUES(hourly_wage),holiday_region=VALUES(holiday_region),balance_adjustment_minutes=VALUES(balance_adjustment_minutes),balance_adjustment_year=VALUES(balance_adjustment_year),balance_target_minutes=VALUES(balance_target_minutes),balance_target_year=VALUES(balance_target_year),balance_target_at=VALUES(balance_target_at),vacation_adjustment_days=VALUES(vacation_adjustment_days),vacation_adjustment_year=VALUES(vacation_adjustment_year),updated_by=VALUES(updated_by),updated_at=VALUES(updated_at)")->execute([':id'=>$userId,':daily'=>$dailyMinutes,':annual'=>$annual,':carryover'=>$carryover,':weekly'=>$weeklyMinutes,':wage'=>$hourlyWage,':region'=>$holidayRegion,':balance_adjustment'=>$balanceAdjustment,':balance_year'=>$balanceAdjustmentYear,':balance_target'=>$balanceTarget,':balance_target_year'=>$balanceTargetYear,':balance_target_at'=>$balanceTargetAt,':vacation_adjustment'=>$vacationAdjustment,':vacation_year'=>$vacationAdjustmentYear,':actor'=>(int)$actor['id'],':updated'=>$now]);
     ttAudit($actor, 'employee_settings_save', 'user_settings', $userId, $before, ['target_minutes_per_day'=>$dailyMinutes,'annual_leave_days'=>$annual,'carryover_leave_days'=>$carryover,'contractual_minutes_per_week'=>$weeklyMinutes,'hourly_wage'=>$hourlyWage,'holiday_region'=>$holidayRegion,'balance_adjustment_minutes'=>$balanceAdjustment,'balance_adjustment_year'=>$balanceAdjustmentYear,'vacation_adjustment_days'=>$vacationAdjustment,'vacation_adjustment_year'=>$vacationAdjustmentYear,'time_tracking_enabled'=>$timeTrackingEnabled]);
     apiJson(['ok'=>true,'user_id'=>$userId,'target_minutes_per_day'=>$dailyMinutes,'annual_leave_days'=>$annual,'carryover_leave_days'=>$carryover,'contractual_minutes_per_week'=>$weeklyMinutes,'hourly_wage'=>$hourlyWage,'holiday_region'=>$holidayRegion,'time_tracking_enabled'=>$timeTrackingEnabled]);
 }
