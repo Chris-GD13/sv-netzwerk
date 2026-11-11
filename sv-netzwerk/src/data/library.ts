@@ -15,6 +15,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Naturgefahrenschäden an Holzkonstruktionen: Feuchtepfad, Tragfähigkeit und Rückbau fachlich begrenzen',
+    description: 'Wie Eintrittsweg, Schichtenaufbau, Holzfeuchte, Tragfähigkeit, Trocknung und erforderlicher Rückbau nach einem Naturgefahrenschaden nachvollziehbar getrennt bewertet werden.',
+    href: '/fachwissen/naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau/',
+    category: 'Elementar- und Naturgefahrenschäden',
+    tags: ['Elementarschaden', 'Naturgefahr', 'Holzkonstruktion', 'Feuchte', 'Tragfähigkeit', 'Rückbau', 'Schadenminderung', 'Kostenprüfung'],
+    date: '2026-11-11',
+    publishedAt: '2026-11-11T05:00:00.000Z',
+    type: 'article',
+  },
+  {
     title: 'Parkett nach einer Geräteleckage: Randzonen, Untergrund und Austauschumfang fachlich prüfen',
     description: 'Wie Austrittspfad, Parkettrandzonen, Klebung, Untergrund, Restfeuchte und der erforderliche Austauschumfang nach einer Leckage am Haushaltsgerät bewertet werden.',
     href: '/fachwissen/parkett-leckage-haushaltsgeraet-randzonen-untergrund-austauschumfang/',
