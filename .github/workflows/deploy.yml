@@ -100,12 +100,12 @@ jobs:
             echo 'lftp bereits vorhanden.'
             exit 0
           fi
-          for attempt in 1 2 3 4 5; do
-            echo "lftp-Installation, Versuch $attempt/5"
-            if timeout 90s sudo apt-get update -o Acquire::Retries=2 && timeout 90s sudo apt-get install --yes --no-install-recommends lftp; then
+          for attempt in 1 2; do
+            echo "lftp-Installation, Versuch $attempt/2"
+            if timeout 30s sudo apt-get update -o Acquire::Retries=1 && timeout 30s sudo apt-get install --yes --no-install-recommends lftp; then
               exit 0
             fi
-            sleep 15
+            sleep 5
           done
           echo 'lftp konnte innerhalb des Gesamtzeitlimits nicht installiert werden.' >&2
           exit 1
