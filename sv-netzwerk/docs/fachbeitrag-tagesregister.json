@@ -159,5 +159,24 @@
       }
     }
   },
-  "updated_at": "2026-11-10T05:10:09Z"
+  "updated_at": "2026-11-11T05:38:37Z",
+  "entries": {
+    "2026-11-11": {
+      "publication_id": "2026-11-11-naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",
+      "article": {
+        "title": "Naturgefahrenschäden an Holzkonstruktionen: Feuchtepfad, Tragfähigkeit und Rückbau fachlich begrenzen",
+        "slug": "naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau/",
+        "status": "published-verified",
+        "owner": "codex-website-20261111-0600",
+        "reserved_at": "2026-11-11T05:00:00.000Z",
+        "commit": "762164f978a0feca43e1f876448793f2f010a806",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/42966225638",
+        "verified_at": "2026-11-11T05:38:37Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
+    }
+  }
 }
