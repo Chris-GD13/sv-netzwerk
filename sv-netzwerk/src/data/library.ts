@@ -15,6 +15,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Brandschaden im Wohnraum: Brandspuren, Ermittlungsstand und erste Maßnahmen fachlich trennen',
+    description: 'Wie Brandspuren, Ermittlungsstand, Sicherheitsfreigabe, Reinigung und begrenzter Rückbau nach einem Wohnraumbrand nachvollziehbar getrennt bewertet werden.',
+    href: '/fachwissen/brandschaden-wohnraum-beweissicherung-ermittlungsstand/',
+    category: 'Brand und Kontamination',
+    tags: ['Brandschaden', 'Brandursachenermittlung', 'Beweissicherung', 'Rauchschaden', 'Sicherheitsfreigabe', 'Rückbau', 'Schadenminderung', 'Kostenprüfung'],
+    date: '2026-11-12',
+    publishedAt: '2026-11-12T05:00:00.000Z',
+    type: 'article',
+  },
+  {
     title: 'Naturgefahrenschäden an Holzkonstruktionen: Feuchtepfad, Tragfähigkeit und Rückbau fachlich begrenzen',
     description: 'Wie Eintrittsweg, Schichtenaufbau, Holzfeuchte, Tragfähigkeit, Trocknung und erforderlicher Rückbau nach einem Naturgefahrenschaden nachvollziehbar getrennt bewertet werden.',
     href: '/fachwissen/naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau/',
