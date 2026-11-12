@@ -59,23 +59,43 @@ function kussJobsQuery(array $input): array
     if ($search !== '') $query['filter[search]'] = $search;
     return $query;
 }
-function kussRequestJobs(string $token, array $query): array
+function kussRequest(string $token, string $method, string $path, array $query = [], ?array $payload = null, array $expected = [200]): array
 {
     kussTokenClaims($token);
-    $curl = curl_init(KUSS_API_BASE . '/jobs?' . http_build_query($query));
+    $url = KUSS_API_BASE . '/' . ltrim($path, '/');
+    if ($query !== []) $url .= '?' . http_build_query($query);
+    $curl = curl_init($url);
     if ($curl === false) throw new RuntimeException('KUSS ist derzeit nicht erreichbar.');
-    curl_setopt_array($curl, [
-        CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => false,
-        CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_TIMEOUT => 30, CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
-        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $token, 'Accept: application/vnd.api+json', 'Content-Type: application/vnd.api+json'],
-    ]);
+    $headers = ['Authorization: Bearer ' . $token, 'Accept: application/vnd.api+json', 'Content-Type: application/vnd.api+json'];
+    $options = [CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => false, CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_TIMEOUT => 45, CURLOPT_PROTOCOLS => CURLPROTO_HTTPS, CURLOPT_CUSTOMREQUEST => strtoupper($method), CURLOPT_HTTPHEADER => $headers];
+    if ($payload !== null) $options[CURLOPT_POSTFIELDS] = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+    curl_setopt_array($curl, $options);
     $body = curl_exec($curl); $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE); curl_close($curl);
-    // Do not return upstream bodies or transport errors, which may contain private data.
     if ($status === 401 || $status === 403) throw new RuntimeException('KUSS hat den API-Zugriff abgelehnt. Bitte Token und Berechtigungen prüfen.', 502);
-    if ($body === false || $status !== 200) throw new RuntimeException('KUSS konnte nicht abgefragt werden' . ($status ? ' (HTTP ' . $status . ')' : '') . '.', 502);
-    $data = json_decode($body, true);
-    if (!is_array($data) || !isset($data['data']) || !is_array($data['data'])) throw new RuntimeException('KUSS hat keine gültige Auftragsliste geliefert.', 502);
+    if ($body === false || !in_array($status, $expected, true)) throw new RuntimeException('KUSS konnte nicht abgefragt werden' . ($status ? ' (HTTP ' . $status . ')' : '') . '.', 502);
+    $data = json_decode((string)$body, true);
+    if (!is_array($data)) throw new RuntimeException('KUSS hat keine gültige Antwort geliefert.', 502);
     return $data;
+}
+function kussRequestJobs(string $token, array $query): array
+{
+    $data = kussRequest($token, 'GET', '/jobs', $query);
+    if (!isset($data['data']) || !is_array($data['data'])) throw new RuntimeException('KUSS hat keine gültige Auftragsliste geliefert.', 502);
+    return $data;
+}
+function kussRequestJob(string $token, string $id): array { return kussRequest($token, 'GET', '/jobs/' . rawurlencode($id)); }
+function kussRequestJobMessages(string $token, string $id): array { return kussRequest($token, 'GET', '/jobs/' . rawurlencode($id) . '/messages'); }
+function kussRequestJobCaseFile(string $token, string $id): array { return kussRequest($token, 'GET', '/jobs/' . rawurlencode($id) . '/case-file'); }
+function kussRequestAttachment(string $token, string $id): array { return kussRequest($token, 'GET', '/attachments/' . rawurlencode($id)); }
+function kussDownload(string $token, string $path): array
+{
+    kussTokenClaims($token); $curl = curl_init(KUSS_API_BASE . '/' . ltrim($path, '/'));
+    if ($curl === false) throw new RuntimeException('KUSS ist derzeit nicht erreichbar.');
+    curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => false, CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_TIMEOUT => 60, CURLOPT_PROTOCOLS => CURLPROTO_HTTPS, CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $token, 'Accept: */*']]);
+    $body = curl_exec($curl); $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE); $mime = (string)curl_getinfo($curl, CURLINFO_CONTENT_TYPE); curl_close($curl);
+    if ($status === 401 || $status === 403) throw new RuntimeException('KUSS hat den API-Zugriff abgelehnt. Bitte Token und Berechtigungen prüfen.', 502);
+    if ($body === false || $status !== 200) throw new RuntimeException('KUSS-Anhang konnte nicht geladen werden.', 502);
+    return ['bytes' => (string)$body, 'mime' => preg_replace('/;.*$/', '', $mime) ?: 'application/octet-stream'];
 }
 function kussPublicJobs(array $response): array
 {

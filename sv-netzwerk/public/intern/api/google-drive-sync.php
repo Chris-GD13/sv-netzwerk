@@ -11,6 +11,8 @@ require_once __DIR__ . '/ionos-storage.php';
 require_once __DIR__ . '/claimsforce-source-refresh-core.php';
 require_once __DIR__ . '/notes-import-core.php';
 require_once __DIR__ . '/case-identity.php';
+require_once __DIR__ . '/kuss-core.php';
+require_once __DIR__ . '/kuss-import-core.php';
 commonHeaders();
 $user = requireAuth();
 if (!in_array($user['role'], ['administrator','projektleiter','pruefer','sachverstaendiger'], true)) {
@@ -303,6 +305,13 @@ if(gdClaimsProfile($user)==='jens'&&empty($user['svnet_source_import'])){
     if(in_array($action,['recent_cases','search_cases','incoming_phone'],true))apiJson(['ok'=>true,'results'=>[]]);
 }
 switch($action){
+case'kuss_import':
+    if(($_SERVER['REQUEST_METHOD']??'')!=='POST')apiError(405,'POST erforderlich.');
+    if(isset($_SERVER['HTTP_ORIGIN'])&&$_SERVER['HTTP_ORIGIN']!=='https://www.sv-netzwerk.eu')apiError(403,'Ungültiger Ursprung.');
+    $conn=kussConnection(db(),(int)$portalUser['id']); if($conn===null)apiError(409,'Für deine Anmeldung ist noch keine KUSS-API-Verbindung eingerichtet.');
+    try{$token=kussDecrypt((string)$conn['token_ciphertext'],env('APP_SECRET'),(int)$portalUser['id']);$body=requestBody();$summary=kussImportJobs($user,$token,(int)($body['pages']??2));apiJson(['ok'=>true,'summary'=>$summary]);}
+    catch(InvalidArgumentException|RuntimeException $e){apiError($e->getCode()===502?502:409,$e->getMessage());}
+    catch(Throwable $e){error_log('[kuss-import] '.$e->getMessage());apiError(503,'KUSS-Aufträge konnten nicht importiert werden.');}
 case'merge_claimsforce_notes':
     if(($_SERVER['REQUEST_METHOD']??'')!=='POST')apiError(405,'POST erforderlich.');
     if(!ionosStorageEnabled())apiError(503,'NOTES_IONOS_STORAGE_REQUIRED');
