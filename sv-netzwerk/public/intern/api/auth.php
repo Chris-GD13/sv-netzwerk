@@ -88,18 +88,20 @@ function recordLoginAttempt(string $ip, string $email, string $attemptType): voi
     }
 }
 
-function countRecentLoginAttempts(string $ip, string $attemptType): int
+function countRecentLoginAttempts(string $ip, string $email, string $attemptType): int
 {
     try {
         $stmt = db()->prepare(
             'SELECT COUNT(*)
              FROM login_attempts
              WHERE ip = :ip
+               AND email = :email
                AND attempt_type = :attempt_type
                AND attempted_at >= (UTC_TIMESTAMP() - INTERVAL 15 MINUTE)'
         );
         $stmt->execute([
             ':ip'           => $ip,
+            ':email'        => $email,
             ':attempt_type' => $attemptType,
         ]);
         return (int) $stmt->fetchColumn();
@@ -148,11 +150,7 @@ function handleLogin(): never
     $email    = trim((string) ($body['email'] ?? ''));
     $password = (string) ($body['password'] ?? '');
     $ip       = getClientIp();
-    $blockedMessage = 'Zu viele Anmeldeversuche. Bitte in 15 Minuten erneut versuchen.';
-
-    if (isIpBlocked($ip)) {
-        apiError(429, $blockedMessage);
-    }
+    $blockedMessage = 'Zu viele Anmeldeversuche für dieses Konto. Bitte in 15 Minuten erneut versuchen.';
 
     if ($email === '' || $password === '') {
         apiError(400, 'E-Mail und Passwort sind erforderlich.');
@@ -174,8 +172,7 @@ function handleLogin(): never
         // Konstante Antwortzeit gegen Timing-Angriffe (gültiger bcrypt-Hash eines Dummy-Passworts)
         password_verify('dummy', '$2y$12$invalidhashpadding000000000000000000000000000zAIlmfxXfhW');
         recordLoginAttempt($ip, $email, 'email_not_found');
-        if (countRecentLoginAttempts($ip, 'email_not_found') >= 2) {
-            blockLoginIp($ip, $email, 'E-Mail nicht gefunden');
+        if (countRecentLoginAttempts($ip, $email, 'email_not_found') >= 2) {
             apiError(429, $blockedMessage);
         }
         apiError(401, 'Anmeldung fehlgeschlagen.');
@@ -191,8 +188,7 @@ function handleLogin(): never
         // Konstante Antwortzeit gegen Timing-Angriffe (gültiger bcrypt-Hash eines Dummy-Passworts)
         password_verify('dummy', '$2y$12$invalidhashpadding000000000000000000000000000zAIlmfxXfhW');
         recordLoginAttempt($ip, $email, 'wrong_password');
-        if (countRecentLoginAttempts($ip, 'wrong_password') >= 3) {
-            blockLoginIp($ip, $email, 'falsches Passwort');
+        if (countRecentLoginAttempts($ip, $email, 'wrong_password') >= 3) {
             apiError(429, $blockedMessage);
         }
         apiError(401, 'Anmeldung fehlgeschlagen.');

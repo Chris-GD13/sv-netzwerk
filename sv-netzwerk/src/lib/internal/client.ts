@@ -672,7 +672,7 @@ function renderLogin(context: AppContext) {
     message.innerHTML = infoAlert('Anmeldung wird geprüft.');
     const { user, error } = await apiLogin(email, password);
     if (error || !user) {
-      message.innerHTML = errorAlert('Anmeldung fehlgeschlagen. Bitte Zugangsdaten prüfen.');
+      message.innerHTML = errorAlert(error?.message ?? 'Anmeldung fehlgeschlagen. Bitte Zugangsdaten prüfen.');
       return;
     }
     message.innerHTML = successAlert('Anmeldung erfolgreich. Weiterleitung laeuft.');
