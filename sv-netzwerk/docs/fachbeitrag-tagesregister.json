@@ -159,7 +159,7 @@
       }
     }
   },
-  "updated_at": "2026-11-11T05:38:37Z",
+  "updated_at": "2026-11-12T05:52:21Z",
   "entries": {
     "2026-11-11": {
       "publication_id": "2026-11-11-naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",
@@ -173,6 +173,23 @@
         "commit": "762164f978a0feca43e1f876448793f2f010a806",
         "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/42966225638",
         "verified_at": "2026-11-11T05:38:37Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
+    },
+    "2026-11-12": {
+      "publication_id": "2026-11-12-brandschaden-wohnraum-beweissicherung-ermittlungsstand",
+      "article": {
+        "title": "Brandschaden im Wohnraum: Brandspuren, Ermittlungsstand und erste Maßnahmen fachlich trennen",
+        "slug": "brandschaden-wohnraum-beweissicherung-ermittlungsstand",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-wohnraum-beweissicherung-ermittlungsstand/",
+        "status": "published-verified",
+        "owner": "codex-website-20261112-0600",
+        "reserved_at": "2026-11-12T05:00:00.000Z",
+        "commit": "e08c74e0f32a29d1c417f316ac48f5d885af5285",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/43161695020",
+        "verified_at": "2026-11-12T05:52:21Z"
       },
       "linkedin": {
         "status": "not-posted"
