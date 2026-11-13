@@ -1,7 +1,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const defaultCredentialsFile = 'G:\\Meine Ablage\\Zugangsdaten Claims\\Claims.txt';
+// The installed host reads the already provisioned credentials next to the
+// unpacked bridge. A machine-specific JSON file may still override this path.
+const defaultCredentialsFile = path.join(process.env.USERPROFILE || process.cwd(), 'Documents', 'Brücke', 'Claims.txt');
 
 function config() {
   const file = path.join(path.dirname(process.execPath), 'claims-credentials-host.json');

@@ -25,9 +25,6 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     <section class="dc-summary" aria-label="Tagesübersicht">
       <a class="dc-summary-card" href="#dc-cases-section" aria-label="Fälle im Ordner anzeigen"><span>Fälle im Ordner</span><strong id="dc-case-count">–</strong><small id="dc-case-folder">Google Drive</small><em>Fälle anzeigen →</em></a>
       <a class="dc-summary-card" href="#dc-today-section" aria-label="Heutige Termine anzeigen"><span>Termine heute</span><strong id="dc-today-count">–</strong><small id="dc-next-event">Kalender wird geprüft</small><em>Termine anzeigen →</em></a>
-      <a class="dc-summary-card" href="https://web.claimsforce.com/tasks" target="_blank" rel="noopener noreferrer" aria-label="Offene ClaimsForce-Aufgaben in ClaimsForce bearbeiten"><span>ClaimsForce-Aufgaben</span><strong id="dc-claims-count">–</strong><small id="dc-claims-summary">ClaimsForce wird geprüft</small><em>In ClaimsForce bearbeiten →</em></a>
-      <a class="dc-summary-card" id="dc-maurer-card" href="https://web.claimsforce.com/tasks" target="_blank" rel="noopener noreferrer" aria-label="Maurer-Aufgaben in ClaimsForce bearbeiten"><span>ClaimsForce · Maurer-Fälle</span><strong id="dc-maurer-count">–</strong><small>ClaimsForce-Zugang: ws@sv-schuett.eu</small><small id="dc-maurer-summary">Noch kein bestätigter Aufgabenstand</small><em>In ClaimsForce bearbeiten →</em></a>
-
     </section>
 
     <div class="dc-columns">
@@ -155,41 +152,6 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
     setSystem('outlook','ok',`${data.calendar||'Kalender'} · ${data.events?.length||0} Termine diese Woche`);
   }
 
-  const wait=milliseconds=>new Promise(resolve=>setTimeout(resolve,milliseconds));
-  let claimsAutoChecked=false;const claimsFailedProfiles=new Set();
-  async function loadClaims(force=false){
-    let data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1');
-    if(force&&window.svnetClaimsTaskCheck){
-      const own=String(data.selected_profile||'').trim();
-      const profiles=[own,...((data.items||[]).some(row=>row.profile==='jens')&&own!=='jens'?['jens']:[])].filter(Boolean);
-      claimsFailedProfiles.clear();
-      for(const profile of profiles){
-        const before=Number((data.items||[]).find(row=>row.profile===profile)?.source_job_id||0);
-        setSystem('claims','warn','ClaimsForce-Aufgaben werden automatisch aktualisiert …');
-        window.dispatchEvent(new CustomEvent('svnet:claims-task-check',{detail:{profile}}));
-        let done=false;
-        for(let attempt=0;attempt<60&&!done;attempt++){
-          await wait(1500);
-          data=await request('/intern/api/claimsforce-queue.php?action=summary&include_maurer=1');
-          done=Number((data.items||[]).find(row=>row.profile===profile)?.source_job_id||0)>before;
-        }
-        if(!done)claimsFailedProfiles.add(profile);
-      }
-    }    const items=data.items||[];
-    const own=items.find(item=>item.profile===data.selected_profile)||items.find(item=>item.profile!=='jens');
-    const renderCount=(item,countId,summaryId)=>{const claimsCheckFailed=claimsFailedProfiles.has(item?.profile);
-      const known=item?.open_count!==null&&item?.open_count!==undefined&&Number.isFinite(Number(item.open_count));
-      $(countId).textContent=known?String(item.open_count):'–';
-      $(summaryId).textContent=known?`${item.open_count} offene ClaimsForce-Aufgaben`:(claimsCheckFailed?(window.svnetClaimsTaskError||'Prüfung nicht abgeschlossen – bitte unter „Versicherungsfälle → Claims-Zugangsdaten verwalten“ die Anmeldung prüfen und die Erweiterung neu laden.'):'Noch kein bestätigter Aufgabenstand');
-    };
-    renderCount(own,'dc-claims-count','dc-claims-summary');
-    const maurer=items.find(item=>item.profile==='jens');
-    $('dc-maurer-card').hidden=!maurer;
-    renderCount(maurer,'dc-maurer-count','dc-maurer-summary');
-    const unknown=own&&(own.open_count===null||own.open_count===undefined);
-    if(!force&&unknown&&!claimsAutoChecked&&window.svnetClaimsTaskCheck){claimsAutoChecked=true;return loadClaims(true)}
-  }
-
   async function loadRevenue(){
     const data=await request('/intern/api/revenue-summary-v2.php?action=access');
     $('dc-quick-settlement').hidden=data.show_settlement_link!==true;
@@ -200,7 +162,7 @@ import InternalLayout from '../../../layouts/InternalLayout.astro';
 
   async function load(force=false){
     const button=$('dc-refresh');button.disabled=true;$('dc-updated').textContent='Prüfung läuft …';
-    const tasks=[['drive',loadDrive],['outlook',loadCalendar],['claims',()=>loadClaims(force)],['revenue',loadRevenue],['reminders',loadReminders]],results=await Promise.allSettled(tasks.map(([,fn])=>fn()));
+    const tasks=[['drive',loadDrive],['outlook',loadCalendar],['revenue',loadRevenue],['reminders',loadReminders]],results=await Promise.allSettled(tasks.map(([,fn])=>fn()));
     results.forEach((result,index)=>{if(result.status==='rejected'){const key=tasks[index][0];if(key==='reminders'){$('dc-reminder-summary').textContent='nicht erreichbar';$('dc-reminder-list').innerHTML=`<p class="dc-empty">${esc(result.reason?.message||'Wiedervorlagen konnten nicht geladen werden.')}</p>`;return}setSystem(key,'bad',result.reason?.message||'Verbindung fehlgeschlagen');if(key==='outlook'){$('dc-today-count').textContent='–';$('dc-next-event').textContent='Kalender nicht erreichbar';$('dc-events').innerHTML='<p class="dc-empty">Kalender konnte nicht geladen werden.</p>'}}});
     $('dc-updated').textContent='Geprüft '+new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());button.disabled=false;
   }

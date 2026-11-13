@@ -1,10 +1,8 @@
 SV-Netzwerk ClaimsForce-Brücke
 
-1. ZIP-Datei entpacken.
-2. In Chrome chrome://extensions öffnen und den Entwicklermodus einschalten.
-3. "Entpackte Erweiterung laden" wählen und diesen Ordner auswählen.
-4. "Details" / "Erweiterungsoptionen" öffnen und die persönlichen ClaimsForce-Zugangsdaten einmalig speichern. Ist der lokale Zugangsdaten-Helfer mit dem freigegebenen Zugangsdatenordner verbunden, übernimmt die Brücke die benötigten Zugänge automatisch und speichert sie verschlüsselt im Chrome-Profil.
-5. Im SV-Netzwerk unter Versicherungsfälle "Aufträge aus Claims einlesen" wählen.
+1. ZIP-Datei immer in **Dokumente\Brücke** entpacken und den entpackten Ordner dort belassen.
+2. Chrome lädt die entpackte Erweiterung bei jedem Neustart aus diesem Ordner. Die Zugangsdaten sind bereits hinterlegt; es ist keine erneute Eingabe erforderlich.
+3. Im SV-Netzwerk unter Versicherungsfälle "Aufträge aus Claims einlesen" wählen.
 
 Bei einer automatischen Aktualisierung lädt die Brücke eine bereits geöffnete Versicherungsfall-Seite einmal kontrolliert neu. Wurde währenddessen gerade importiert, den Import anschließend im Portal erneut starten.
 
@@ -15,7 +13,7 @@ Vor einer namentlichen Anmeldung schließt die Brücke alle vorhandenen ClaimsFo
 
 Werktags um 03:00 Uhr öffnet oder lädt die Brücke die zentrale Importstation und reiht dort nacheinander die Aufträge aller vier hinterlegten SV-Profile ein. Chrome und der Rechner müssen dafür laufen. Wird Chrome erst später gestartet, wird der Import bis 10:00 Uhr nachgeholt. Ein gespeicherter ClaimsForce-Zugang wird nur noch verwendet, wenn seine E-Mail-Adresse eindeutig zum ausgewählten Bearbeiterprofil gehört.
 
-Entwicklungsstand 1.4.63 (17.10.2026)
+Entwicklungsstand 1.4.82 (09.11.2026)
 - Claims-Notizen werden nur über „Notizen aktualisieren“ im bestätigten geöffneten Fall geladen. Der allgemeine Import aktualisiert keine Notizen.
 - Native SE/ZB: der neue lesende Diagnosepfad nutzt bestehende interne Links und prüft Fall-/Formular-/Profilidentität sowie Feldbereitschaft. Er speichert, signiert und versendet nichts.
 - native-draft-simulation.mjs und die QS-/Planmodule sind isolierte Bausteine; kein produktiver SE-/ZB-Schreibadapter ist aktiviert. Mock-Rücklesen ist kein echter Speichernachweis.

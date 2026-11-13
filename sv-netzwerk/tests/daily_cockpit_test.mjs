@@ -22,9 +22,8 @@ assert(client.includes("querySelector<HTMLButtonElement>('#header-logout')")&&cl
 assert(layout.includes('id="intern-logout"')&&layout.includes("auth.php?action=logout"),'Auch die neue Portalnavigation muss den manuellen Abmeldeknopf behalten');
 assert(cockpit.includes('google-drive-sync.php?action=status')&&cockpit.includes('google-drive-sync.php?action=recent_cases'),'Cockpit muss Drive-Status und letzte Fälle lesen');
 assert(cockpit.includes('outlook-case-calendar.php?action=list'),'Cockpit muss die bestehende Kalenderansicht lesen');
-assert(cockpit.includes('claimsforce-queue.php?action=summary'),'Cockpit muss den ClaimsForce-Aufgabenstand anzeigen');
+assert(!cockpit.includes('claimsforce-queue.php?action=summary')&&!cockpit.includes('dc-claims-count')&&!cockpit.includes('dc-maurer-card'),'Das Tagescockpit darf keinen langsamen ClaimsForce-Aufgabencheck mehr starten');
 assert(cockpit.includes('class="dc-summary-card" href="#dc-cases-section"')&&cockpit.includes('href="#dc-today-section"'),'Fall-, Hinweis- und Terminkennzahlen müssen zu ihren sichtbaren Detailbereichen führen');
-assert(cockpit.includes('href="https://web.claimsforce.com/tasks"')&&cockpit.includes('In ClaimsForce bearbeiten'),'Claims-Aufgaben müssen zur tatsächlich bearbeitbaren ClaimsForce-Aufgabenansicht führen');
 assert(cockpit.includes('id="dc-phone-number"')&&cockpit.includes('data-dc-phone-action="answer"')&&cockpit.includes('data-dc-phone-action="drop"'),'Das Tagescockpit muss Wählen, Annehmen und Auflegen kompakt bereitstellen');
 assert(cockpit.includes('svnet-xtelsio://dial?number=${encodeURIComponent(clean)}')&&cockpit.includes('svnet-xtelsio://${action}')&&!cockpit.includes("'callto'"),'Die kompakte Telefonsteuerung muss Wählen, Annehmen und Auflegen direkt an xtelsio übergeben');
 assert(phone.includes('svnet-xtelsio://dial?number=${encodeURIComponent(clean)}')&&!phone.includes("'callto'"),'Die Telefonzentrale darf beim Wählen nicht die Windows-Zuordnung und damit Teams verwenden');

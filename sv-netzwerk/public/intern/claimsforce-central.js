@@ -24,7 +24,11 @@
   placeImportCards();
   let context={},bridge=false,bridgeVersion='',workerVersion='',bridgeProblem='',agentJob=null,userJobs=[],busy=false,reconciling=false,lastRuntime={phase:'CF-IDLE',message:'Importstation wartet.',current:0,total:0,diagnostic:{}},reconciledJobs=new Set(),controlJobs=[],controlButton=null,controlBusy=false;
   const json=async(url,o={})=>{const r=await fetch(url,{credentials:'same-origin',...o}),j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||`HTTP ${r.status}`);return j};
-  const driveStatus=()=>window.svnetDriveStatus?window.svnetDriveStatus():json('/intern/api/google-drive-sync.php?action=status');
+  const driveStatus=async()=>{
+    const data=await (window.svnetDriveStatus?window.svnetDriveStatus():json('/intern/api/google-drive-sync.php?action=status'));
+    const raw=String(data?.backoffice?(data.selected_expert||'christian'):(data?.claims_profile||'')).trim().toLowerCase();
+    return ['christian','holger','marc','jens'].includes(raw)?data:json('/intern/api/google-drive-sync.php?action=status&refresh=1');
+  };
   const mobileClient=typeof navigator!=='undefined'&&(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1));
   const stationId=crypto.randomUUID();
   const post=(a,d={})=>json('/intern/api/claimsforce-queue.php?action='+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,stationId,bridgeVersion,workerVersion,protocol:2})});
@@ -36,6 +40,12 @@
     const raw=String(context.backoffice?(context.selected_expert||'christian'):context.claims_profile||'').trim().toLowerCase();
     if(!supportedProfiles.includes(raw))throw Error('Kein gültiges Bearbeiterprofil ausgewählt.');
     return raw;
+  };
+  const resolveSelectedProfile=async()=>{
+    try{return selectedProfile()}catch{
+      context=await json('/intern/api/google-drive-sync.php?action=status&refresh=1');
+      return selectedProfile();
+    }
   };
   const isOwnJob=job=>userJobs.includes(Number(job?.id||0));
   const importControlState=(jobs,profile)=>{
@@ -105,7 +115,7 @@
     if(context.claims_agent&&!bridge&&!mobileClient){if(workRequest)throw Error('Diese zentrale Importstation ist nicht bereit.');show('Diese zentrale Importstation ist nicht bereit.',true);return}
     button.disabled=true;if(fullButton)fullButton.disabled=true;if(claimInput)claimInput.disabled=true;
     try{
-      const profile=targetProfile||selectedProfile(),payload={profile};
+      const profile=targetProfile||await resolveSelectedProfile(),payload={profile};
       if(workRequest)payload.preserve_active=true;
       if(mode==='single'){
         const claimNumber=String(previousJob?previousJob.claim_number:claimInput?.value||'').trim();

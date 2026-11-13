@@ -25,7 +25,7 @@ Abschlusstests. Ein vollständiger Live-Nachweis erfordert die geladene Version
 ClaimsForce. Ein bereitgestelltes Paket allein bestätigt keinen Import.
 
 Lokaler Brückenordner laut Nutzer:
-`C:\Users\chris\OneDrive - SV Büro Marc Schütt e.K\Brücke`.
+`C:\Users\chris\Documents\Brücke`.
 
 ## Zweiter Live-Test und Worker-Prüfung
 
