@@ -159,7 +159,7 @@
       }
     }
   },
-  "updated_at": "2026-11-12T05:52:21Z",
+  "updated_at": "2026-11-13T05:12:00Z",
   "entries": {
     "2026-11-11": {
       "publication_id": "2026-11-11-naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",
@@ -190,6 +190,23 @@
         "commit": "e08c74e0f32a29d1c417f316ac48f5d885af5285",
         "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/43161695020",
         "verified_at": "2026-11-12T05:52:21Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
+    },
+    "2026-11-13": {
+      "publication_id": "2026-11-13-brandschaden-freigabe-uebergabe-sanierungsstart",
+      "article": {
+        "title": "Nach der Freigabe einer Brandstelle: Übergabe, Befund und Sanierungsstart fachlich sichern",
+        "slug": "brandschaden-freigabe-uebergabe-sanierungsstart",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/brandschaden-freigabe-uebergabe-sanierungsstart/",
+        "status": "published-verified",
+        "owner": "codex-website-20261113-0600",
+        "reserved_at": "2026-11-13T05:00:00.000Z",
+        "commit": "2ea8058a2e8a3bce6c218588a4e1048dac4ef0ec",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/43369883024",
+        "verified_at": "2026-11-13T05:12:00Z"
       },
       "linkedin": {
         "status": "not-posted"
