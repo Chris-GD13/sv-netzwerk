@@ -92,8 +92,6 @@
   searchButton.addEventListener('click', () => read(1, search.value.trim()));
   search.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); read(1, search.value.trim()); } });
   previous.addEventListener('click', () => read(page - 1)); next.addEventListener('click', () => read(page + 1));
-  // Synchronize once when the case screen is opened. The import is idempotent and
-  // will only add changed KUSS records, messages, or attachments.
-  if (typeof setTimeout === 'function') setTimeout(() => sync(), 900);
-  if (typeof setInterval === 'function') setInterval(() => { if (!document.hidden) sync(); }, 15 * 60 * 1000);
+  // KUSS is intentionally manual. Reading or importing starts only after an
+  // explicit click so opening a case never triggers a long remote comparison.
 })();

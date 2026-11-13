@@ -24,7 +24,7 @@ const api = fs.readFileSync(new URL('../public/intern/api/kuss.php', import.meta
 assert.ok(api.indexOf('session_write_close();') < api.indexOf('kussRequestJobs('), 'Release session lock before remote call');
 const script = fs.readFileSync(new URL('../public/intern/kuss-central.js', import.meta.url), 'utf8');
 assert.ok(script.includes('action=kuss_import'), 'KUSS screen must expose the idempotent import endpoint');
-assert.ok(script.includes('15 * 60 * 1000'), 'KUSS screen must schedule periodic synchronization');
+assert.ok(!script.includes('15 * 60 * 1000') && !script.includes('setTimeout(() => sync()'), 'KUSS screen must not synchronize automatically');
 const elements = [];
 class Element {
   constructor() { this.children=[]; this.handlers={}; this.disabled=false; this.hidden=false; this.value=''; elements.push(this); }
