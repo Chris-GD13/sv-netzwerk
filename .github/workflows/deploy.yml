@@ -154,6 +154,16 @@ jobs:
           fi
           echo "Zuordnung bestätigt: PORTAL_SFTP_REMOTE_DIR liefert unter https://www.sv-netzwerk.eu/ aus."
 
+      - name: SSH-Hostschlüssel registrieren
+        env:
+          # Inhalt erzeugen mit: ssh-keyscan -H -p PORT HOST
+          SFTP_KNOWN_HOST: ${{ secrets.SFTP_KNOWN_HOST }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SFTP_KNOWN_HOST" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
       - name: Document Root vor dem Upload prüfen
         env:
           SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
