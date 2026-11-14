@@ -15,6 +15,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Wiederkehrende Feuchte nach einer Reparatur: Ursache, Nachbesserung und neue Schadenfolge trennen',
+    description: 'Wie Reparaturzustand, aktuelle Messwerte, Kamerabefund und neuer Schadenumfang bei wiederkehrender Feuchte nachvollziehbar getrennt werden.',
+    href: '/fachwissen/lws-wiederkehrende-feuchte-reparatur-nachbesserung-schadenfolge/',
+    category: 'Leitungswasser und Feuchte',
+    tags: ['Leitungswasser', 'Feuchteschaden', 'Nachbesserung', 'Leckageortung', 'Kamerabefahrung', 'Ursachenprüfung', 'Schadenabgrenzung', 'Kostenprüfung'],
+    date: '2026-11-14',
+    publishedAt: '2026-11-14T05:00:00.000Z',
+    type: 'article',
+  },
+  {
     title: 'Nach der Freigabe einer Brandstelle: Übergabe, Befund und Sanierungsstart fachlich sichern',
     description: 'Wie nach der Freigabe einer Brandstelle Befund, Zuständigkeiten, Sicherungsstatus und Sanierungsbeginn prüffähig getrennt dokumentiert werden.',
     href: '/fachwissen/brandschaden-freigabe-uebergabe-sanierungsstart/',
