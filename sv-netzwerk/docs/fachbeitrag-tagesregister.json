@@ -159,7 +159,7 @@
       }
     }
   },
-  "updated_at": "2026-11-13T05:12:00Z",
+  "updated_at": "2026-11-14T05:09:02Z",
   "entries": {
     "2026-11-11": {
       "publication_id": "2026-11-11-naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",
@@ -204,9 +204,26 @@
         "status": "published-verified",
         "owner": "codex-website-20261113-0600",
         "reserved_at": "2026-11-13T05:00:00.000Z",
-        "commit": "2ea8058a2e8a3bce6c218588a4e1048dac4ef0ec",
+        "commit": "4163a7838a3e1f80ce6538c360d9871bd3a5cb96",
         "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/43369883024",
         "verified_at": "2026-11-13T05:12:00Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
+    },
+    "2026-11-14": {
+      "publication_id": "2026-11-14-lws-wiederkehrende-feuchte-reparatur-nachbesserung-schadenfolge",
+      "article": {
+        "title": "Wiederkehrende Feuchte nach einer Reparatur: Ursache, Nachbesserung und neue Schadenfolge trennen",
+        "slug": "lws-wiederkehrende-feuchte-reparatur-nachbesserung-schadenfolge",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/lws-wiederkehrende-feuchte-reparatur-nachbesserung-schadenfolge/",
+        "status": "published-verified",
+        "owner": "codex-website-20261114-0600",
+        "reserved_at": "2026-11-14T05:00:00.000Z",
+        "commit": "2862d90fecf1b2f6febf8c65508cf53e0bd8cc06",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/43559477324",
+        "verified_at": "2026-11-14T05:09:02Z"
       },
       "linkedin": {
         "status": "not-posted"
