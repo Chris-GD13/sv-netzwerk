@@ -20,8 +20,16 @@ publication:
   publishedAt: 2026-11-13
   status: published
   canonical: "https://www.sv-netzwerk.eu/fachwissen/brandschaden-freigabe-uebergabe-sanierungsstart/"
-image: "/assets/images/fachwissen/brandschaden-freigabe-uebergabe.jpg"
+seo:
+  title: "Nach der Freigabe einer Brandstelle fachlich prüfen"
+  description: "Übergabe, Befund, Sicherheitsstatus und Sanierungsbeginn nach der Freigabe einer Brandstelle nachvollziehbar trennen."
+  canonical: "https://www.sv-netzwerk.eu/fachwissen/brandschaden-freigabe-uebergabe-sanierungsstart/"
+  image: "/assets/images/fachwissen/brandschaden-freigabe-uebergabe.jpg"
+  imageAlt: "Dokumentierte Übergabe einer anonymen Brandstelle vor dem Sanierungsbeginn"
+  noindex: false
 ---
+
+<figure><img src="/assets/images/fachwissen/brandschaden-freigabe-uebergabe.jpg" alt="Dokumentierte Übergabe einer anonymen Brandstelle vor dem Sanierungsbeginn" loading="lazy" /><figcaption>Dokumentierter Übergabestatus einer Brandstelle vor dem Sanierungsbeginn.</figcaption></figure>
 
 ## Die Freigabe ist ein Übergabepunkt
 
