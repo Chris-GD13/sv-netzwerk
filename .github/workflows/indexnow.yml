@@ -1,0 +1,47 @@
+name: Bing IndexNow nach Website-Deployment
+
+on:
+  workflow_run:
+    workflows:
+      - SV-Netzwerk bereitstellen
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Öffentliche URLs an Bing IndexNow melden
+        env:
+          INDEXNOW_KEY: e61cb00d338e8723cb8739c40eabf76b
+        run: |
+          set -euo pipefail
+          payload=$(cat <<JSON
+          {
+            "host": "www.sv-netzwerk.eu",
+            "key": "$INDEXNOW_KEY",
+            "keyLocation": "https://www.sv-netzwerk.eu/$INDEXNOW_KEY.txt",
+            "urlList": [
+              "https://www.sv-netzwerk.eu/",
+              "https://www.sv-netzwerk.eu/leistungen/",
+              "https://www.sv-netzwerk.eu/versicherer/",
+              "https://www.sv-netzwerk.eu/experten/",
+              "https://www.sv-netzwerk.eu/experten/christian-waechter/",
+              "https://www.sv-netzwerk.eu/regionen/aalen/",
+              "https://www.sv-netzwerk.eu/fachwissen/",
+              "https://www.sv-netzwerk.eu/kontakt/",
+              "https://www.sv-netzwerk.eu/llms.txt"
+            ]
+          }
+          JSON
+          )
+          curl --fail-with-body --silent --show-error --retry 3 --retry-all-errors \
+            -X POST "https://api.indexnow.org/indexnow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            --data "$payload"

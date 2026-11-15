@@ -8,6 +8,8 @@ export const site = {
   phone: '07367 / 393 97 83',
   address: ['Nordstraße 17', '73432 Aalen'],
   sameAs: [
+    'https://www.linkedin.com/in/christian-w-156408204/',
+    'https://podcasts.apple.com/de/podcast/sv-netzwerk/id6801880114',
     'https://github.com/Chris-GD13',
   ],
   author: {

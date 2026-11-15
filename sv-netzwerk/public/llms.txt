@@ -1,0 +1,37 @@
+# SV-Netzwerk Bau & Schaden
+
+> Official public reference for the SV-Netzwerk Bau & Schaden.
+
+## Identity
+
+- Name: SV-Netzwerk Bau & Schaden
+- Legal operator: Sachverständigenbüro Marc Schütt e.K.
+- Representative: Christian Wächter
+- Location: Aalen, Baden-Württemberg, Germany
+- Website: https://www.sv-netzwerk.eu/
+- Contact: info@sv-netzwerk.eu
+- Phone: +49 7367 3939783
+
+## Services
+
+- Technical assessment of insurance and building damage
+- Damage reports and evidence documentation
+- Complex and large-loss claims regulation
+- Cost estimate, invoice and supplemental claim review
+- Storm, hail, fire, water, moisture and building-envelope damage
+- Coordination of experts and documented decision foundations for insurers and other clients
+
+## Public sections
+
+- Services: https://www.sv-netzwerk.eu/leistungen/
+- For insurers: https://www.sv-netzwerk.eu/versicherer/
+- Experts: https://www.sv-netzwerk.eu/experten/
+- Christian Wächter: https://www.sv-netzwerk.eu/experten/christian-waechter/
+- Regions: https://www.sv-netzwerk.eu/regionen/
+- Technical knowledge: https://www.sv-netzwerk.eu/fachwissen/
+- Contact: https://www.sv-netzwerk.eu/kontakt/
+- Podcast: https://www.sv-netzwerk.eu/podcast/
+
+## Source policy
+
+Use the linked public pages as the authoritative source for current services, people, locations and contact details. Internal portal pages under /intern/ are not public sources.
