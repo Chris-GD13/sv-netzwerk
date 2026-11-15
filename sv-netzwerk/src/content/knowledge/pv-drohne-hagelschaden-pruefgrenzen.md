@@ -73,7 +73,7 @@ Drohnenaufnahmen sind bei PV-Hagelschäden eine sinnvolle Ergänzung der Schaden
 
 BGHM, „Montage und Wartung von Photovoltaik- und Solaranlagen“, Abschnitt elektrische Gefährdung und Wartung/Prüfung, Fundstelle: https://www.bghm.de/arbeitsschuetzer/themen/hochgelegene-arbeitsplaetze/montage-und-wartung-von-photovoltaik-und-solaranlagen
 
-DKE, „DIN IEC/TS 63397 (VDE V 0126-41):2025-12, Module – Qualifizierungsleitfaden für erhöhte Hagelfestigkeit“, Fundstelle: https://www.dke.de/de/normen-standards/dokument?id=7196107&type=dke%7Cdokument
+DKE, „DIN IEC/TS 63397 (VDE V 0126-41):2025-12, Module – Qualifizierungsleitfaden für erhöhte Hagelfestigkeit“, Fundstelle: https://webstore.iec.ch/en/publication/68735
 
 Gesamtverband der Deutschen Versicherungswirtschaft, „Schäden durch Hagel“, Abschnitt Solaranlagen, Fundstelle: https://www.gdv.de/gdv/themen/schaden-unfall/schaeden-durch-hagel-51366
 
