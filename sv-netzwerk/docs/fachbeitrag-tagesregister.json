@@ -157,6 +157,24 @@
       "linkedin": {
         "status": "not-posted"
       }
+    },
+    "2026-11-15": {
+      "publication_id": "2026-11-15-pv-drohne-hagelschaden-pruefgrenzen",
+      "article": {
+        "title": "Drohnenaufnahmen bei PV-Hagelschäden: Bildbefund, Prüfgrenzen und Vor-Ort-Nachweis trennen",
+        "slug": "pv-drohne-hagelschaden-pruefgrenzen",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/pv-drohne-hagelschaden-pruefgrenzen/",
+        "status": "published-verified",
+        "owner": "codex-website-20261115-0600",
+        "reserved_at": "2026-11-15T05:00:00.000Z",
+        "commit": "c898772ad4290d15736ffb89c206d5395eb199de",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/43679475331",
+        "verified_at": "2026-11-15T05:13:00Z"
+      },
+      "linkedin": {
+        "status": "not-posted",
+        "reason": "Kein verbundener LinkedIn-Unternehmenszugriff; Metricool führt nur ein persönliches LinkedIn-Profil."
+      }
     }
   },
   "updated_at": "2026-11-14T05:09:02Z",
