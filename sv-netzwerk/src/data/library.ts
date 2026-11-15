@@ -15,6 +15,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Drohnenaufnahmen bei PV-Hagelschäden: Bildbefund, Prüfgrenzen und Vor-Ort-Nachweis trennen',
+    description: 'Wie Drohnenbilder bei PV-Hagelschäden sinnvoll eingesetzt werden und warum Bildbefund, elektrische Prüfung und Reparaturentscheidung getrennt bleiben müssen.',
+    href: '/fachwissen/pv-drohne-hagelschaden-pruefgrenzen/',
+    category: 'Photovoltaik und Gebäudetechnik',
+    tags: ['Photovoltaik', 'PV-Anlage', 'Hagelschaden', 'Drohne', 'Bildbefund', 'Elektrosicherheit', 'Thermografie', 'Kostenprüfung'],
+    date: '2026-11-15',
+    publishedAt: '2026-11-15T05:00:00.000Z',
+    type: 'article',
+  },
+  {
     title: 'Wiederkehrende Feuchte nach einer Reparatur: Ursache, Nachbesserung und neue Schadenfolge trennen',
     description: 'Wie Reparaturzustand, aktuelle Messwerte, Kamerabefund und neuer Schadenumfang bei wiederkehrender Feuchte nachvollziehbar getrennt werden.',
     href: '/fachwissen/lws-wiederkehrende-feuchte-reparatur-nachbesserung-schadenfolge/',
