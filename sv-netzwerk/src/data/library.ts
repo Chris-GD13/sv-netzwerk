@@ -15,6 +15,18 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Wenn Regenwasser über ein Entlüftungsrohr in das Gebäude gelangt',
+    description: 'Warum ein Entlüftungsrohr bestimmungsgemäß kein häusliches Leitungswasser führt und wie Niederschlagswasser, Einregnung, Rohrfunktion und Vertragsprüfung fachlich getrennt werden.',
+    href: '/fachwissen/entlueftungsrohr-niederschlagswasser-einregnung-leitungswasserabgrenzung/',
+    category: 'Regulierung und Versicherungsrecht',
+    tags: ['Entlüftungsrohr', 'Niederschlagswasser', 'Einregnung', 'Leitungswasserschaden', 'Korrosion', 'Schadenregulierung'],
+    date: '2026-11-16',
+    publishedAt: '2026-11-16T05:00:00.000Z',
+    type: 'article',
+    featured: false,
+  },
+
+  {
     title: 'Wiederholte Kamerabefahrung bei Leitungswasserschäden: technische Notwendigkeit und Rechnungsprüfung',
     description: 'Wie technische Fragestellung, Kamerabefund und Rechnungspositionen bei wiederholten Untersuchungen nach Leitungswasserschäden prüffähig getrennt werden.',
     href: '/fachwissen/lws-kamerabefahrung-rechnungspruefung/',
