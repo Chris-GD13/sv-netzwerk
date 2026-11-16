@@ -1,7 +1,7 @@
 ---
 title: "Wenn Regenwasser über ein Entlüftungsrohr in das Gebäude gelangt"
 description: "Ein beschädigtes Entlüftungsrohr führt nicht automatisch zu einem Leitungswasserschaden. Entscheidend sind Wasserherkunft, Rohrfunktion und Vertragsbedingungen."
-category: "Versicherung und Schadenregulierung"
+category: "Regulierung und Versicherungsrecht"
 tags: ["Entlüftungsrohr", "Niederschlagswasser", "Einregnung", "Leitungswasserschaden", "Korrosion", "Schadenregulierung"]
 author: "christian-waechter"
 featured: false
