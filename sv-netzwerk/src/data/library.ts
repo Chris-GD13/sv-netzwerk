@@ -15,6 +15,17 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Wiederholte Kamerabefahrung bei Leitungswasserschäden: technische Notwendigkeit und Rechnungsprüfung',
+    description: 'Wie technische Fragestellung, Kamerabefund und Rechnungspositionen bei wiederholten Untersuchungen nach Leitungswasserschäden prüffähig getrennt werden.',
+    href: '/fachwissen/lws-kamerabefahrung-rechnungspruefung/',
+    category: 'Leitungswasser und Feuchte',
+    tags: ['Leitungswasser', 'Feuchteschaden', 'Kamerabefahrung', 'Leckageortung', 'Rechnungsprüfung', 'Ursachenprüfung', 'Dokumentation', 'Kostenprüfung'],
+    date: '2026-11-16',
+    publishedAt: '2026-11-16T05:00:00.000Z',
+    type: 'article',
+  },
+
+  {
     title: 'Drohnenaufnahmen bei PV-Hagelschäden: Bildbefund, Prüfgrenzen und Vor-Ort-Nachweis trennen',
     description: 'Wie Drohnenbilder bei PV-Hagelschäden sinnvoll eingesetzt werden und warum Bildbefund, elektrische Prüfung und Reparaturentscheidung getrennt bleiben müssen.',
     href: '/fachwissen/pv-drohne-hagelschaden-pruefgrenzen/',
