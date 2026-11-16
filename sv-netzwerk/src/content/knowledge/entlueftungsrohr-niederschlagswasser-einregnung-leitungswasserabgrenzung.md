@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-11-16
   status: published
 seo:
-  title: "Entlüftungsrohr, Regenwasser und Leitungswasserschaden fachlich abgrenzen"
+  title: "Entlüftungsrohr und Regenwasser fachlich abgrenzen"
   description: "Warum Regenwasser, das über ein korrodiertes Entlüftungsrohr in ein Gebäude gelangt, technisch anders zu bewerten ist als bestimmungswidrig ausgetretenes Leitungswasser."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/entlueftungsrohr-niederschlagswasser-einregnung-leitungswasserabgrenzung/"
   noindex: false
