@@ -175,6 +175,23 @@
         "status": "not-posted",
         "reason": "Kein verbundener LinkedIn-Unternehmenszugriff; Metricool führt nur ein persönliches LinkedIn-Profil."
       }
+    },
+    "2026-11-16": {
+      "publication_id": "2026-11-16-lws-kamerabefahrung-rechnungspruefung",
+      "article": {
+        "title": "Wiederholte Kamerabefahrung bei Leitungswasserschäden: technische Notwendigkeit und Rechnungsprüfung",
+        "slug": "lws-kamerabefahrung-rechnungspruefung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/lws-kamerabefahrung-rechnungspruefung/",
+        "status": "published-verified",
+        "owner": "codex-website-20261116-0600",
+        "reserved_at": "2026-11-16T05:00:00.000Z",
+        "commit": "b662c37f5b24c44d8199bc9fbf3e06cb01c7300b",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/43808476748",
+        "verified_at": "2026-11-16T05:17:00Z"
+      },
+      "linkedin": {
+        "status": "not-scheduled-weekday"
+      }
     }
   },
   "updated_at": "2026-11-14T05:09:02Z",
