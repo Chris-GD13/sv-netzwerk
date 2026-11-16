@@ -19,11 +19,19 @@ publication:
   updatedAt: 2026-11-16
   status: published
 seo:
+  image: "/assets/images/fachwissen/entlueftungsrohr-schadenbereich-2.jpg"
+  imageAlt: "Anonymisierter Schadenbereich mit eingedrungenem Niederschlagswasser"
   title: "Entlüftungsrohr und Regenwasser fachlich abgrenzen"
   description: "Warum Regenwasser, das über ein korrodiertes Entlüftungsrohr in ein Gebäude gelangt, technisch anders zu bewerten ist als bestimmungswidrig ausgetretenes Leitungswasser."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/entlueftungsrohr-niederschlagswasser-einregnung-leitungswasserabgrenzung/"
   noindex: false
 ---
+
+<figure><img src="/assets/images/fachwissen/entlueftungsrohr-schadenbereich-2.jpg" alt="Anonymisierter Schadenbereich mit eingedrungenem Niederschlagswasser" loading="lazy" /><figcaption>Schadenbereich mit sichtbaren Feuchtefolgen nach dem Eintritt von Niederschlagswasser.</figcaption></figure>
+
+<figure><img src="/assets/images/fachwissen/entlueftungsrohr-rohrbogen-lochfrass.jpg" alt="Anonymisierter korrodierter Rohrbogen mit Lochfraß" loading="lazy" /><figcaption>Korrodierter Rohrbogen mit Lochfraß und Öffnungen im Rohrmaterial.</figcaption></figure>
+
+<figure><img src="/assets/images/fachwissen/entlueftungsrohr-schadenbereich-1.jpg" alt="Anonymisierter Bauteilbereich am Entlüftungsrohr" loading="lazy" /><figcaption>Anonymisierter Bauteilbereich am Entlüftungsrohr und angrenzender Konstruktion.</figcaption></figure>
 
 ## Fachliche Einordnung des Schadenhergangs
 
