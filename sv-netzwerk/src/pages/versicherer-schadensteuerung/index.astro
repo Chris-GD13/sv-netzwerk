@@ -1,0 +1,336 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import FeatureCard from '../../components/FeatureCard.astro';
+
+const einsatzfelder = [
+  { title: 'Brand', text: 'Erstaufnahme, Ursacheneinordnung, Abgrenzung von Primär- und Folgeschäden, prüffähige Dokumentation.' },
+  { title: 'Leitungswasser', text: 'Lokalisierung, Schadensermittlung, Bewertung von Austrocknungsmaßnahmen und Folgekosten.' },
+  { title: 'Sturm und Hagel', text: 'Gewerkeübergreifende Erstaufnahme, Trennung von Vorschaden und Sturmereignis, koordinierte Instandsetzung.' },
+  { title: 'Starkregen und Überflutung', text: 'Strukturierte Schadenaufnahme bei Kumulereignissen, regionale Koordination, Einsatzpriorisierung.' },
+  { title: 'Frost', text: 'Technische Abgrenzung von Frostschäden an Gebäude und Anlage, Bewertung von Sofortmaßnahmen.' },
+  { title: 'Glas', text: 'Schadenaufnahme und Bewertung von Glasbruch an Gebäude und Fassade, Zuständigkeitsabgrenzung.' },
+  { title: 'Dach und Fassade', text: 'Gewerkeübergreifende Feststellung, Unterscheidung von Schaden, Mangel und Instandhaltungsbedarf.' },
+  { title: 'Kontamination', text: 'Dokumentation kontaminierter Bereiche, Bewertungsgrundlage für Sanierungs- und Entsorgungsmaßnahmen.' },
+  { title: 'Technische Trocknung', text: 'Prüfung von Trocknungskonzepten, Messdokumentation, Bewertung von KVA und Rechnungen für Trocknungsleistungen.' },
+  { title: 'Komplexe Mehrgewerke-Schäden', text: 'Zentrale Steuerung bei mehreren beteiligten Fachgewerken – einheitliche Dokumentation, klare Zuständigkeiten, prüffähige Kostenherleitung.' },
+];
+
+const prozessSchritte = [
+  { nr: '01', title: 'Schadenübergabe', text: 'Strukturierte Übergabe per Formular, E-Mail oder Telefon mit Schadennummer, Schadenort und Kurzbeschreibung.' },
+  { nr: '02', title: 'Erstaufnahme und Triage', text: 'Fachliche Einordnung von Schadenart, Umfang, beteiligten Gewerken, Dringlichkeit und Handlungsbedarf.' },
+  { nr: '03', title: 'Auswahl der Fachexpertise', text: 'Auswahl geeigneter Sachverständiger, Fachplaner oder Spezialisten aus dem Netzwerk nach fachlicher und regionaler Eignung.' },
+  { nr: '04', title: 'Koordination und Einsatz', text: 'Regionale und gewerkeübergreifende Steuerung der Bearbeitung mit einheitlicher Vorgangsstruktur und dokumentierten Zuständigkeiten.' },
+  { nr: '05', title: 'Dokumentation und Prüfung', text: 'Prüffähige Schadenaufnahme mit Trennung von Befund, Ursache, Bewertung, Zuständigkeit und Kostenfolge.' },
+  { nr: '06', title: 'Entscheidungsvorlage', text: 'Belastbare Grundlage für Reserve- und Regulierungsentscheidung, KVA- und Rechnungsprüfung, Regresshinweise.' },
+];
+
+const faqItems = [
+  {
+    question: 'Welche Schadenarten können übergeben werden?',
+    answer: 'Das SV-Netzwerk nimmt Sach-, Gebäude- und gewerkeübergreifende Schadenfälle außerhalb Kfz an: Brand, Leitungswasser, Sturm/Hagel, Starkregen/Überflutung, Frost, Glas, Dach/Fassade, Kontamination, technische Trocknung und komplexe Mehrgewerke-Schäden.',
+  },
+  {
+    question: 'Wie erfolgt die Schadenübergabe?',
+    answer: 'Per strukturiertem Formular, E-Mail oder Telefon. Für die Erstaufnahme genügen Schadennummer, Schadenort, Schadenart und eine kurze Beschreibung des Sachverhalts.',
+  },
+  {
+    question: 'Wer ist Ansprechpartner für institutionelle Kooperationen?',
+    answer: 'Anfragen von Versicherungsunternehmen, Maklerhäusern und Regulierungsorganisationen können direkt über das Formular auf der Versicherer-Seite oder telefonisch gestellt werden.',
+  },
+  {
+    question: 'Können auch Kumulereignisse bearbeitet werden?',
+    answer: 'Ja. Bei Kumulereignissen wie Unwetterlagen oder Starkregen übernimmt das SV-Netzwerk die strukturierte Erstaufnahme, Einsatzpriorisierung und regionale Koordination der beteiligten Fachkräfte.',
+  },
+  {
+    question: 'Werden Kfz-Schäden bearbeitet?',
+    answer: 'Nein. Das SV-Netzwerk ist ausschließlich außerhalb der Kfz-Regulierung tätig.',
+  },
+];
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Schadensteuerung für Versicherer – SV-Netzwerk als erste Anlaufstelle',
+  serviceType: 'Schadenerstaufnahme, Fachtriage, Koordination, Dokumentation, Kostenprüfung',
+  description: 'Das SV-Netzwerk ist zentrale Eingangsstelle für Sach-, Gebäude- und gewerkeübergreifende Schadenfälle außerhalb Kfz. Strukturierte Erstaufnahme, fachliche Triage, Auswahl der passenden Expertise, regionale Koordination und prüffähige Dokumentation.',
+  areaServed: 'DE',
+  provider: { '@id': 'https://www.sv-netzwerk.eu/#organization' },
+  url: 'https://www.sv-netzwerk.eu/versicherer-schadensteuerung/',
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+---
+
+<BaseLayout
+  title="Schadensteuerung für Versicherer | SV-Netzwerk als erste Anlaufstelle"
+  description="Schaden außerhalb Kfz? Erst zum SV-Netzwerk. Zentrale Erstaufnahme, fachliche Triage, Auswahl der passenden Expertise, regionale Koordination und prüffähige Dokumentation für Versicherer, Schadenabteilungen und Maklergesellschaften."
+  canonical="https://www.sv-netzwerk.eu/versicherer-schadensteuerung/"
+  structuredData={[serviceSchema, faqSchema]}
+  breadcrumbs={[
+    { label: 'Start', href: '/' },
+    { label: 'Schadensteuerung für Versicherer' },
+  ]}
+>
+  <!-- Hero -->
+  <section class="sv-section vsd-hero">
+    <div class="sv-container vsd-hero__inner">
+      <div class="vsd-hero__content">
+        <p class="sv-eyebrow">Versicherer · Schadenabteilungen · Maklerhäuser</p>
+        <h1>Schaden außerhalb&nbsp;Kfz?<br />Erst zum SV-Netzwerk.</h1>
+        <p class="sv-lead">
+          Das SV-Netzwerk ist die zentrale Eingangsstelle für Sach-, Gebäude- und
+          gewerkeübergreifende Schadenfälle. Wir übernehmen die strukturierte Erstaufnahme,
+          die fachliche Triage, die Auswahl der passenden Expertise und die regionale Koordination –
+          mit prüffähiger Dokumentation und klarer Trennung von Befund, Ursache, Bewertung und Kostenfolge.
+        </p>
+        <div class="vsd-hero__actions">
+          <a class="sv-button sv-button-primary" href="/schaden-melden/">Schadenfall übergeben</a>
+          <a class="sv-button sv-button-secondary" href="/versicherer/">Anfrage für Kooperation</a>
+        </div>
+      </div>
+      <aside class="vsd-hero__keypoints" aria-label="Leistungsmerkmale auf einen Blick">
+        <ul>
+          <li><span class="vsd-kp-icon" aria-hidden="true">✔</span> Zentrale Erstaufnahme außerhalb Kfz</li>
+          <li><span class="vsd-kp-icon" aria-hidden="true">✔</span> Fachliche Triage und Gewerkeauswahl</li>
+          <li><span class="vsd-kp-icon" aria-hidden="true">✔</span> Regionale und gewerkeübergreifende Koordination</li>
+          <li><span class="vsd-kp-icon" aria-hidden="true">✔</span> Prüffähige Dokumentation und Kostenprüfung</li>
+          <li><span class="vsd-kp-icon" aria-hidden="true">✔</span> Trennung: Befund · Ursache · Bewertung · Kostenfolge</li>
+          <li><span class="vsd-kp-icon" aria-hidden="true">✔</span> Entscheidungsvorlagen für Reserven und Regulierung</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Warum SV-Netzwerk -->
+  <section class="sv-section sv-section-alt">
+    <div class="sv-container">
+      <SectionHeader
+        eyebrow="Positionierung"
+        title="Warum das SV-Netzwerk als erste Anlaufstelle?"
+      />
+      <div class="sv-grid sv-grid-3">
+        <article class="sv-card">
+          <h3>Geordneter Einstieg statt Mehrfachbesichtigung</h3>
+          <p>Eine strukturierte Erstaufnahme verhindert unkoordinierte Paralleleinsätze. Das SV-Netzwerk ordnet den Sachverhalt fachlich ein, bevor Ressourcen gebunden werden.</p>
+        </article>
+        <article class="sv-card">
+          <h3>Fachliche Triage statt Generalisten-Beauftragung</h3>
+          <p>Je nach Schadenart, Gewerk und Umfang wird die passende Fachexpertise ausgewählt – Sachverständige, Fachplaner oder Spezialisten mit gewerkegenauer Zuständigkeit.</p>
+        </article>
+        <article class="sv-card">
+          <h3>Prüffähige Grundlage statt Bauchgefühl-Reserve</h3>
+          <p>Befund, Ursache, Bewertung, Zuständigkeit und Kostenfolge werden klar getrennt dokumentiert – als belastbare Grundlage für Reserve- und Regulierungsentscheidungen.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Prozess -->
+  <section class="sv-section" id="prozess">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Ablauf" title="Von der Schadenübergabe zur Entscheidungsvorlage" />
+      <ol class="vsd-prozess" aria-label="Prozessschritte">
+        {prozessSchritte.map((s) => (
+          <li class="vsd-prozess__step sv-card">
+            <span class="vsd-prozess__nr" aria-hidden="true">{s.nr}</span>
+            <div>
+              <h3>{s.title}</h3>
+              <p>{s.text}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- Einsatzfelder -->
+  <section class="sv-section sv-section-alt" id="einsatzfelder">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Einsatzfelder" title="Schadenarten außerhalb Kfz" />
+      <div class="sv-grid sv-grid-3">
+        {einsatzfelder.map((ef, i) => (
+          <FeatureCard index={String(i + 1).padStart(2, '0')} title={ef.title} text={ef.text} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Zielgruppen -->
+  <section class="sv-section">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Für wen" title="Zielgruppen und Kooperationsmodelle" />
+      <div class="sv-grid sv-grid-2">
+        <article class="sv-card">
+          <h3>Schadenabteilungen und Versicherungsunternehmen</h3>
+          <p>Direktbeauftragung für Einzelschäden, Großschäden und Kumulereignisse. Einheitliche Übergabe mit Schadennummer, Schadenart und gewünschtem Leistungsumfang.</p>
+          <p><a href="/versicherer/">Beauftragungsformular öffnen →</a></p>
+        </article>
+        <article class="sv-card">
+          <h3>Maklergesellschaften und Poolführer</h3>
+          <p>Weiterleitung von Kundenschäden mit Erstannahme und Triage durch das SV-Netzwerk. Transparente Rückmeldung über Bearbeitungsstand und Ergebnis.</p>
+          <p><a href="/kontakt/">Kooperationsanfrage stellen →</a></p>
+        </article>
+        <article class="sv-card">
+          <h3>Regulierungsorganisationen und Assistance</h3>
+          <p>Ergänzung eigener Kapazitäten bei Spezialthemen, komplexen Gewerken oder Kumulereignissen. Skalierbare Einbindung nach Einsatzlage.</p>
+          <p><a href="/kontakt/">Anfrage für institutionelle Kooperation →</a></p>
+        </article>
+        <article class="sv-card">
+          <h3>Schadenzentren mit Mehrgewerke-Bedarf</h3>
+          <p>Für Schadenlagen mit mehreren Gewerken übernimmt das SV-Netzwerk die Steuerung, Dokumentation und Kostenprüfung als einheitliche Stelle.</p>
+          <p><a href="/schaden-melden/">Schadenfall jetzt übergeben →</a></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Weiterführende Leistungen -->
+  <section class="sv-section sv-section-alt">
+    <div class="sv-container">
+      <SectionHeader eyebrow="Leistungen" title="Weiterführende Leistungsbereiche" />
+      <div class="sv-grid sv-grid-3">
+        <article class="sv-card">
+          <h3>Großschadenregulierung</h3>
+          <p>Priorisierte Steuerung umfangreicher Schadenfälle mit einheitlicher Aktenführung und dokumentierten Zuständigkeiten.</p>
+          <p><a href="/grossschadenregulierung/">Zur Großschadenregulierung →</a></p>
+        </article>
+        <article class="sv-card">
+          <h3>Rechnungs- und KVA-Prüfung</h3>
+          <p>Technische und kaufmännische Prüfung von Kostenvoranschlägen, Rechnungen, Nachträgen und Regiekosten.</p>
+          <p><a href="/leistungen/rechnungs-und-kva-pruefung/">Zur KVA-Prüfung →</a></p>
+        </article>
+        <article class="sv-card">
+          <h3>Kumulschadenmanagement</h3>
+          <p>Strukturierte Erstaufnahme und regionale Koordination bei Unwetterlagen und Kumulereignissen.</p>
+          <p><a href="/leistungen/kumulschadenmanagement/">Zum Kumulschadenmanagement →</a></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="sv-section" id="faq">
+    <div class="sv-container faq-wrap">
+      <SectionHeader eyebrow="FAQ" title="Häufige Fragen von Versicherern und Schadenabteilungen" />
+      <div class="faq-grid">
+        {faqItems.map((item) => (
+          <details class="sv-card">
+            <summary>{item.question}</summary>
+            <p>{item.answer}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="sv-section vsd-cta">
+    <div class="sv-container vsd-cta__inner">
+      <div>
+        <p class="sv-eyebrow">Nächster Schritt</p>
+        <h2>Schadenfall an das SV-Netzwerk übergeben</h2>
+        <p>Strukturierte Erstaufnahme, fachliche Triage, koordinierte Bearbeitung – außerhalb Kfz, gewerkeübergreifend, prüffähig dokumentiert.</p>
+      </div>
+      <div class="vsd-cta__actions">
+        <a class="sv-button sv-button-primary" href="/schaden-melden/">Schadenfall übergeben</a>
+        <a class="sv-button sv-button-secondary" href="/versicherer/">Beauftragungsformular für Versicherer</a>
+        <a class="sv-button sv-button-secondary" href="/kontakt/">Kooperationsanfrage stellen</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero */
+  .vsd-hero__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+  .vsd-hero__content { display: grid; gap: 1rem }
+  .vsd-hero__content h1 { margin: 0 }
+  .vsd-hero__content .sv-lead { margin: 0 }
+  .vsd-hero__actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.25rem }
+  .vsd-hero__keypoints {
+    background: var(--sv-color-surface, #f4f7f9);
+    border: 1px solid var(--sv-color-line, #d0dce6);
+    border-radius: .9rem;
+    padding: clamp(1.2rem, 2.5vw, 1.8rem);
+    margin-top: .5rem;
+  }
+  .vsd-hero__keypoints ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .65rem }
+  .vsd-hero__keypoints li { display: flex; align-items: flex-start; gap: .6rem; font-weight: 700; font-size: .95rem }
+  .vsd-kp-icon { color: var(--sv-color-accent, #1a6bab); flex-shrink: 0 }
+
+  /* Prozess */
+  .vsd-prozess {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sv-space-4, 1.5rem);
+    counter-reset: none;
+  }
+  .vsd-prozess__step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: clamp(1.2rem, 2.5vw, 1.8rem);
+  }
+  .vsd-prozess__step h3 { margin: 0 0 .4rem }
+  .vsd-prozess__step p { margin: 0; color: var(--sv-color-muted, #5a6a77); font-size: .95rem }
+  .vsd-prozess__nr {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--sv-color-accent, #1a6bab);
+    line-height: 1;
+    flex-shrink: 0;
+    min-width: 2rem;
+  }
+
+  /* FAQ */
+  .faq-wrap { display: grid; gap: var(--sv-space-4, 1.5rem) }
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sv-space-4, 1.5rem);
+  }
+  .faq-grid .sv-card { padding: 1.1rem 1.2rem }
+  .faq-grid summary { cursor: pointer; font-weight: 800 }
+  .faq-grid p { margin: .75rem 0 0; color: var(--sv-color-muted, #5a6a77) }
+
+  /* CTA */
+  .vsd-cta { background: var(--sv-color-accent-bg, #eaf2fb) }
+  .vsd-cta__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2rem;
+    align-items: center;
+  }
+  .vsd-cta__inner h2 { margin: .25rem 0 .6rem }
+  .vsd-cta__inner p { margin: 0; color: var(--sv-color-muted, #5a6a77) }
+  .vsd-cta__actions { display: flex; flex-direction: column; gap: .75rem }
+
+  /* Responsive */
+  @media (max-width: 72rem) {
+    .vsd-prozess { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  }
+  @media (max-width: 56rem) {
+    .vsd-hero__inner { grid-template-columns: 1fr }
+    .vsd-cta__inner { grid-template-columns: 1fr }
+    .vsd-cta__actions { flex-direction: row; flex-wrap: wrap }
+    .vsd-prozess { grid-template-columns: 1fr }
+    .faq-grid { grid-template-columns: 1fr }
+  }
+</style>
