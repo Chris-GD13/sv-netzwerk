@@ -15,6 +15,17 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Drohnenaufnahmen bei mehreren Hagelschäden: Vergleichbarkeit, Objekttrennung und Beweiskette',
+    description: 'Wie Drohnenaufnahmen bei mehreren Hagelschäden einheitlich geplant, objektbezogen dokumentiert und von der technischen Bewertung getrennt werden.',
+    href: '/fachwissen/drohnen-serienbefliegung-hagelschaeden-vergleichbarkeit/',
+    category: 'Sturm- und Hagelschäden',
+    tags: ['Hagelschaden', 'Drohne', 'Serienbefliegung', 'Beweissicherung', 'Fotodokumentation', 'Dach', 'Schadenabgrenzung', 'Kostenprüfung'],
+    date: '2026-11-17',
+    publishedAt: '2026-11-17T05:00:00.000Z',
+    type: 'article',
+  },
+
+  {
     title: 'Wenn Regenwasser über ein Entlüftungsrohr in das Gebäude gelangt',
     description: 'Warum ein Entlüftungsrohr bestimmungsgemäß kein häusliches Leitungswasser führt und wie Niederschlagswasser, Einregnung, Rohrfunktion und Vertragsprüfung fachlich getrennt werden.',
     href: '/fachwissen/entlueftungsrohr-niederschlagswasser-einregnung-leitungswasserabgrenzung/',
