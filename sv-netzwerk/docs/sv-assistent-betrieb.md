@@ -14,6 +14,21 @@ Der Assistent übernimmt den tatsächlich geöffneten Fall erst auf Klick. Keine
 
 `Gemeinsamen Master abgleichen` ist auf bestehende Regelverwalter beschränkt. Es aktualisiert vorhandene `MASTER-ARBEITSSTANDARD.md`-Kopien in der gemeinsamen IONOS-Regelablage aus Drive, mit vorhandener Speicherversionierung und Vergleichsschutz. Jede Kopie wird unabhängig zurückgelesen und gehasht. Keine Fallakte wird dabei verändert. Nicht freigegebene Fachregeln werden nicht automatisch verbindlich.
 
+## Kostenfreie Zusatzdienste
+
+Claude, Proactor AI, Grammarly und Gamma sind in der Fall-Work-Oberfläche als
+Weblinks verfügbar. Die Verknüpfungen öffnen die jeweiligen Websites in einem
+neuen Tab. Sie übertragen keine Akten, Anhänge, personenbezogenen Daten oder
+Assistentenergebnisse und lösen keine API-Aufrufe aus. Sie erzeugen keine neuen
+Abonnements oder API-Kosten.
+
+Eine manuelle Nutzung bleibt eine separate Benutzerhandlung. Fallinhalte nur
+außerhalb des Portals verwenden, wenn sie vollständig anonymisiert und für den
+jeweiligen Dienst freigegeben sind. Free-Tier-Kontingente und Tarifgrenzen der
+Anbieter gelten weiterhin; der SV-Assistent prüft diese Kontingente nicht. Die
+kostenfreien Webdienste sind nicht Bestandteil des monatlichen 30-EUR-Budgets
+für den vorhandenen OpenAI-Assistenten.
+
 ## Budget und Abrechnung
 
 Jeder neue bezahlte Assistentenaufruf benötigt `SvAiBudgetLedger` und einen einmaligen, an seinen Payload gebundenen `SvAiPaidPermit`. Reservierungen und Übergänge sind atomar (SQLite BEGIN IMMEDIATE / MySQL FOR UPDATE). Das reale Monatskonto ist auf 30.000.000 Mikro-EUR begrenzt, getrennt von Simulation und vorhandenen KI-Funktionen. Die gemeinsame Auftragssperre verhindert parallele Bearbeitung desselben Falls.
