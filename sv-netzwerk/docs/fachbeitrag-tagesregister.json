@@ -192,6 +192,23 @@
       "linkedin": {
         "status": "not-scheduled-weekday"
       }
+    },
+    "2026-11-17": {
+      "publication_id": "2026-11-17-drohnen-serienbefliegung-hagelschaeden-vergleichbarkeit",
+      "article": {
+        "title": "Drohnenaufnahmen bei mehreren Hagelschäden: Vergleichbarkeit, Objekttrennung und Beweiskette",
+        "slug": "drohnen-serienbefliegung-hagelschaeden-vergleichbarkeit",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/drohnen-serienbefliegung-hagelschaeden-vergleichbarkeit/",
+        "status": "published-verified",
+        "owner": "codex-website-20261117-0600",
+        "reserved_at": "2026-11-17T05:00:00.000Z",
+        "commit": "b446d3607600e688f1bcb7ad5d11b830fe98d77a",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/44021022914",
+        "verified_at": "2026-11-17T05:14:00Z"
+      },
+      "linkedin": {
+        "status": "not-scheduled-weekday"
+      }
     }
   },
   "updated_at": "2026-11-14T05:09:02Z",
