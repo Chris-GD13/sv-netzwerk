@@ -197,7 +197,7 @@ a { color:#164b68; }
 </head>
 <body><main>
 <div class="brand"><span>SV</span>-Netzwerk</div>
-<h1>Schadenfragebogen</h1>
+<h1>Schaden<wbr>fragebogen</h1>
 <?php if ($error !== ''): ?><p class="error" role="alert"><?= escapeForm($error) ?></p><?php endif; ?>
 <?php if ($sent): ?>
     <p>Vielen Dank. Ihr Schadenfragebogen wurde abgesendet.</p>
