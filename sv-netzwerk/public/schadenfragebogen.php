@@ -67,8 +67,8 @@ $groups = [
             'Zeltdach', 'Mansarddach', 'Mehrere Dachformen', 'Sonstiges',
         ]],
         'dachdeckung' => ['Dachdeckung', 'select', [
-            'Dachziegel oder Dachsteine', 'Schiefer', 'Metall oder Blech', 'Bitumen',
-            'Kunststoff- oder Gummibahn', 'Begrüntes Dach', 'Mehrere Dachdeckungen', 'Sonstiges',
+            'Ziegel / Dachsteine', 'Schiefer', 'Metall / Blech', 'Bitumen',
+            'Kunststoff / Gummi', 'Begrüntes Dach', 'Mehrere Materialien', 'Sonstiges',
         ]],
         'keller' => ['Gibt es einen Keller?', 'select', ['Ja', 'Nein', 'Teilweise unterkellert']],
         'bereich' => ['Betroffener Gebäudeteil', 'select', [
@@ -76,7 +76,7 @@ $groups = [
             'Außenbereich', 'Mehrere Gebäudeteile', 'Sonstiges',
         ]],
         'rolle' => ['In welcher Rolle melden Sie den Schaden?', 'select', [
-            'Eigentümer oder Eigentümerin', 'Mieter oder Mieterin', 'Hausverwaltung', 'Sonstiges',
+            'Eigentümer/in', 'Mieter/in', 'Hausverwaltung', 'Sonstiges',
         ]],
         'nutzung' => ['Wie wurde der Bereich vor dem Schaden genutzt?', 'select', [
             'Selbst bewohnt', 'Vermietet', 'Gewerblich genutzt', 'Gemischt genutzt', 'Leerstand', 'Sonstiges',
