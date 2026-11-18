@@ -209,9 +209,23 @@
       "linkedin": {
         "status": "not-scheduled-weekday"
       }
+    },
+    "2026-11-18": {
+      "publication_id": "2026-11-18-bauabfaelle-gebaeudeschaden-trennung-nachweis-kostenpruefung",
+      "article": {
+        "title": "Bauabfälle nach einem Gebäudeschaden: Trennung, Nachweis und Kostenprüfung",
+        "slug": "bauabfaelle-gebaeudeschaden-trennung-nachweis-kostenpruefung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/bauabfaelle-gebaeudeschaden-trennung-nachweis-kostenpruefung/",
+        "status": "reserved",
+        "owner": "codex-20261118-chw",
+        "reserved_at": "2026-11-18T13:22:32.913Z"
+      },
+      "linkedin": {
+        "status": "not-posted"
+      }
     }
   },
-  "updated_at": "2026-11-14T05:09:02Z",
+  "updated_at": "2026-11-18T13:22:32.913Z",
   "entries": {
     "2026-11-11": {
       "publication_id": "2026-11-11-naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",
