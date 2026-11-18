@@ -15,11 +15,11 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
-    title: 'Bauabfälle nach einem Gebäudeschaden: Trennung, Nachweis und Kostenprüfung',
-    description: 'Wie Rückbau- und Entsorgungskosten nach einem Gebäudeschaden durch Material, Mengenbelege und Angaben zum Entsorgungsweg nachvollziehbar werden.',
-    href: '/fachwissen/bauabfaelle-gebaeudeschaden-trennung-nachweis-kostenpruefung/',
+    title: 'Sachverständigenberichte im Gebäudeschaden: Befund, Bewertung und offene Punkte trennen',
+    description: 'Wie technische Feststellungen, fachliche Bewertungen, offene Prüfungen und Kostenabgrenzung in einem Schadenbericht nachvollziehbar bleiben.',
+    href: '/fachwissen/sachverstaendigenbericht-befund-bewertung-offene-punkte/',
     category: 'Schadenregulierung',
-    tags: ['Bauabfälle', 'Rückbau', 'Entsorgung', 'Abfalltrennung', 'Schadenregulierung', 'Kostenprüfung', 'Dokumentation'],
+    tags: ['Sachverständigenbericht', 'Schadenaufnahme', 'Befund', 'Beweissicherung', 'Kostenabgrenzung', 'Qualitätssicherung', 'Dokumentation'],
     date: '2026-11-18',
     publishedAt: '2026-11-18T05:00:00.000Z',
     type: 'article',
