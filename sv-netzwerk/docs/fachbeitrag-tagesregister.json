@@ -216,16 +216,19 @@
         "title": "Sachverständigenberichte im Gebäudeschaden: Befund, Bewertung und offene Punkte trennen",
         "slug": "sachverstaendigenbericht-befund-bewertung-offene-punkte",
         "url": "https://www.sv-netzwerk.eu/fachwissen/sachverstaendigenbericht-befund-bewertung-offene-punkte/",
-        "status": "reserved",
+        "status": "published-verified",
         "owner": "codex-20261118-chw",
-        "reserved_at": "2026-11-18T13:22:32.913Z"
+        "reserved_at": "2026-11-18T13:22:32.913Z",
+        "commit": "af9283b4d3eb6dd545a6483ee252f11b89b0ce8b",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/44335483044",
+        "verified_at": "2026-11-18T15:32:49.089Z"
       },
       "linkedin": {
         "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-11-18T15:22:10.195Z",
+  "updated_at": "2026-11-18T15:32:49.089Z",
   "entries": {
     "2026-11-11": {
       "publication_id": "2026-11-11-naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",
