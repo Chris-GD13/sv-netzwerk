@@ -52,18 +52,38 @@ $groups = [
         'anschrift' => ['Ihre Anschrift, falls abweichend', 'text', 'street-address'],
     ],
     'Gebäude und Nutzung' => [
-        'gebaeudeart' => ['Gebäudeart, zum Beispiel Einfamilienhaus oder Wohnung', 'text'],
-        'baujahr' => ['Baujahr, ungefähr', 'text'],
-        'geschosse' => ['Anzahl der Geschosse und Wohnungen', 'text'],
-        'flaeche' => ['Wohnfläche oder Nutzfläche in m², ungefähr', 'text'],
-        'bauart' => ['Bauart, zum Beispiel Mauerwerk oder Holz', 'text'],
-        'dach' => ['Dachform und Dachdeckung', 'text'],
-        'keller' => ['Gibt es einen Keller?', 'select', ['Ja', 'Nein']],
-        'bereich' => ['Betroffene Wohnung, Etage oder Gebäudeteil', 'text'],
-        'rolle' => ['Sind Sie Eigentümer, Mieter oder für die Verwaltung zuständig?', 'text'],
-        'nutzung' => ['Wie wurde der Bereich vor dem Schaden genutzt?', 'text'],
+        'gebaeudeart' => ['Gebäudeart', 'select', [
+            'Einfamilienhaus', 'Mehrfamilienhaus', 'Wohnung', 'Sonstiges',
+        ]],
+        'baujahr' => ['Baujahr, ungefähr', 'numeric'],
+        'geschosse' => ['Anzahl der Geschosse', 'numeric'],
+        'wohnungen' => ['Anzahl der Wohnungen im Gebäude', 'numeric'],
+        'flaeche' => ['Wohnfläche oder Nutzfläche in m², ungefähr', 'decimal'],
+        'bauart' => ['Bauart', 'select', [
+            'Mauerwerk', 'Beton', 'Holzbau', 'Fachwerk', 'Stahlbau', 'Gemischte Bauweise', 'Sonstiges',
+        ]],
+        'dach' => ['Dachform', 'select', [
+            'Satteldach', 'Flachdach', 'Pultdach', 'Walmdach', 'Krüppelwalmdach',
+            'Zeltdach', 'Mansarddach', 'Mehrere Dachformen', 'Sonstiges',
+        ]],
+        'dachdeckung' => ['Dachdeckung', 'select', [
+            'Dachziegel oder Dachsteine', 'Schiefer', 'Metall oder Blech', 'Bitumen',
+            'Kunststoff- oder Gummibahn', 'Begrüntes Dach', 'Mehrere Dachdeckungen', 'Sonstiges',
+        ]],
+        'keller' => ['Gibt es einen Keller?', 'select', ['Ja', 'Nein', 'Teilweise unterkellert']],
+        'bereich' => ['Betroffener Gebäudeteil', 'select', [
+            'Keller', 'Erdgeschoss', 'Obergeschoss', 'Dachgeschoss', 'Dach', 'Fassade',
+            'Außenbereich', 'Mehrere Gebäudeteile', 'Sonstiges',
+        ]],
+        'rolle' => ['In welcher Rolle melden Sie den Schaden?', 'select', [
+            'Eigentümer oder Eigentümerin', 'Mieter oder Mieterin', 'Hausverwaltung', 'Sonstiges',
+        ]],
+        'nutzung' => ['Wie wurde der Bereich vor dem Schaden genutzt?', 'select', [
+            'Selbst bewohnt', 'Vermietet', 'Gewerblich genutzt', 'Gemischt genutzt', 'Leerstand', 'Sonstiges',
+        ]],
         'nutzung_seit' => ['Bei Vermietung oder Leerstand: seit wann?', 'text'],
-        'leerstand' => ['Bei Leerstand: Wurde er dem Versicherer gemeldet? Wenn ja, wann?', 'text'],
+        'leerstand' => ['Bei Leerstand: Wurde er dem Versicherer gemeldet?', 'select', ['Ja', 'Nein']],
+        'leerstand_meldedatum' => ['Falls ja: Wann wurde der Leerstand gemeldet?', 'text'],
         'vorschaden' => ['Bekannte Vorschäden, frühere Reparaturen oder Sanierungsbedarf', 'textarea'],
     ],
     'Bankverbindung' => [
@@ -76,7 +96,7 @@ $groups = [
         'schadentag' => ['Wann ist der Schaden passiert?', 'text'],
         'entdeckung' => ['Wer hat den Schaden wann und wo zuerst bemerkt?', 'textarea'],
         'beobachtung' => ['Was haben Sie beobachtet? Wie ging es danach weiter?', 'textarea'],
-        'betroffene_raeume' => ['Welche Räume oder Bereiche sind betroffen?', 'text'],
+        'betroffene_raeume' => ['Welche Räume, Wohnungen oder Bereiche sind betroffen?', 'text'],
         'vermutung' => ['Welche Ursache vermuten Sie?', 'textarea'],
         'feststellung' => ['Was hat eine Firma oder Behörde festgestellt? Wer und wann?', 'textarea'],
         'meldung' => ['Wem wurde der Schaden wann gemeldet? Falls bekannt, mit Aktenzeichen.', 'textarea'],
@@ -222,8 +242,10 @@ a { color:#164b68; }
                             <option<?= $value === $option ? ' selected' : '' ?>><?= escapeForm($option) ?></option>
                         <?php endforeach; ?>
                     </select>
-                <?php else: ?>
-                    <input id="<?= escapeForm($key) ?>" name="<?= escapeForm($key) ?>" type="<?= escapeForm($type) ?>" value="<?= escapeForm($value) ?>" maxlength="<?= $key === 'iban' ? '50' : '160' ?>" autocomplete="<?= escapeForm($field[2] ?? 'off') ?>"<?= $key === 'iban' ? ' spellcheck="false" autocapitalize="characters"' : '' ?>>
+                <?php else:
+                    $inputMode = in_array($type, ['numeric', 'decimal'], true) ? $type : null;
+                ?>
+                    <input id="<?= escapeForm($key) ?>" name="<?= escapeForm($key) ?>" type="<?= escapeForm($inputMode === null ? $type : 'text') ?>" value="<?= escapeForm($value) ?>" maxlength="<?= $key === 'iban' ? '50' : '160' ?>" autocomplete="<?= escapeForm($field[2] ?? 'off') ?>"<?= $inputMode === null ? '' : ' inputmode="' . escapeForm($inputMode) . '"' ?><?= $key === 'iban' ? ' spellcheck="false" autocapitalize="characters"' : '' ?>>
                 <?php endif; ?>
             <?php endforeach; ?>
             </section>
