@@ -7,6 +7,9 @@ const INVITE_HASH = 'fee546a2b4b0bb6160a55c58141f4bdf3705432ee1ed228c008feafa32f
 const RECIPIENT = 'ws@sv-schuett.eu';
 const SENDER = 'info@sv-netzwerk.eu';
 
+$directAccess = defined('SCHADENFRAGEBOGEN_DIRECT');
+$formPath = $directAccess ? '/schadenfragebogen/' : '/schadenfragebogen.php';
+
 header('Content-Type: text/html; charset=UTF-8');
 header('Cache-Control: no-store, private');
 header('Referrer-Policy: no-referrer');
@@ -19,12 +22,20 @@ ini_set('session.use_strict_mode', '1');
 session_name('sv_schadenfragebogen');
 session_set_cookie_params([
     'lifetime' => 0,
-    'path' => '/schadenfragebogen.php',
+    'path' => $formPath,
     'secure' => true,
     'httponly' => true,
     'samesite' => 'Lax',
 ]);
 session_start();
+
+function startFormAccess(int $now): void
+{
+    session_regenerate_id(true);
+    $_SESSION['access_until'] = $now + 10800;
+    $_SESSION['form_nonce'] = bin2hex(random_bytes(32));
+    unset($_SESSION['sent']);
+}
 
 function escapeForm(string $value): string
 {
@@ -122,19 +133,27 @@ if (!in_array($method, ['GET', 'POST'], true)) {
     http_response_code(405);
     exit;
 }
-if ($method === 'POST' && ($_POST['action'] ?? '') === 'open') {
+if (!$directAccess && $method === 'POST' && ($_POST['action'] ?? '') === 'open') {
     $key = $_POST['key'] ?? '';
     if (!is_string($key) || !preg_match('/\A[A-Za-z0-9_-]{43}\z/', $key)
         || !hash_equals(INVITE_HASH, hash('sha256', $key))) {
         http_response_code(403);
         exit;
     }
-    session_regenerate_id(true);
-    $_SESSION['access_until'] = $now + 10800;
-    $_SESSION['form_nonce'] = bin2hex(random_bytes(32));
-    unset($_SESSION['sent']);
+    startFormAccess($now);
     http_response_code(204);
     exit;
+}
+
+if ($directAccess && $method === 'GET') {
+    $newForm = !empty($_SESSION['sent']) && ($_GET['neu'] ?? '') === '1';
+    if ((int) ($_SESSION['access_until'] ?? 0) < $now || $newForm) {
+        startFormAccess($now);
+    }
+    if ($newForm) {
+        header('Location: ' . $formPath, true, 303);
+        exit;
+    }
 }
 
 $mayFill = (int) ($_SESSION['access_until'] ?? 0) >= $now;
@@ -150,7 +169,9 @@ if ($method === 'POST') {
     if (($_POST['action'] ?? '') !== 'send' || !$mayFill || $sent || !is_string($csrf)
         || !isset($_SESSION['form_nonce']) || !hash_equals($_SESSION['form_nonce'], $csrf)) {
         http_response_code(403);
-        $error = 'Der Fragebogen konnte nicht gesendet werden. Bitte öffnen Sie den Link aus Ihrer E-Mail erneut.';
+        $error = $directAccess
+            ? 'Der Fragebogen konnte nicht gesendet werden. Bitte öffnen Sie ihn erneut.'
+            : 'Der Fragebogen konnte nicht gesendet werden. Bitte öffnen Sie den Link aus Ihrer E-Mail erneut.';
     } else {
         try {
             $body = ["Schadenfragebogen vom " . date('d.m.Y H:i')];
@@ -174,10 +195,14 @@ if ($method === 'POST') {
             if ($values['name'] === '' || ($values['schadennummer'] === '' && $values['schadenort'] === '')) {
                 http_response_code(422);
                 $error = 'Bitte geben Sie Ihren Namen und die Schadennummer oder den Schadenort an.';
+            } elseif ($directAccess && !sv_form_rate_allowed((string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown'))) {
+                http_response_code(429);
+                header('Retry-After: 900');
+                $error = 'Ihre Angaben stehen noch im Formular. Bitte versuchen Sie es in 15 Minuten erneut.';
             } elseif (sv_send_mail(RECIPIENT, 'SV-Netzwerk: Neuer Schadenfragebogen', implode("\n\n", $body), SENDER, '', '')) {
                 $_SESSION['sent'] = true;
                 unset($_SESSION['form_nonce']);
-                header('Location: /schadenfragebogen.php', true, 303);
+                header('Location: ' . $formPath, true, 303);
                 exit;
             } else {
                 http_response_code(503);
@@ -221,9 +246,10 @@ a { color:#164b68; }
 <?php if ($error !== ''): ?><p class="error" role="alert"><?= escapeForm($error) ?></p><?php endif; ?>
 <?php if ($sent): ?>
     <p>Vielen Dank. Ihr Schadenfragebogen wurde abgesendet.</p>
+    <?php if ($directAccess): ?><p><a href="<?= escapeForm($formPath) ?>?neu=1">Neuen Fragebogen ausfüllen</a></p><?php endif; ?>
 <?php elseif ($mayFill): ?>
     <p>Bitte füllen Sie alle Felder aus, die Sie beantworten können. Was Sie nicht wissen, lassen Sie einfach frei.</p>
-    <form action="/schadenfragebogen.php" method="post">
+    <form action="<?= escapeForm($formPath) ?>" method="post">
         <input type="hidden" name="action" value="send">
         <input type="hidden" name="csrf" value="<?= escapeForm((string) $_SESSION['form_nonce']) ?>">
         <?php foreach ($groups as $heading => $fields): ?>
@@ -253,6 +279,8 @@ a { color:#164b68; }
         <p><a href="/datenschutzerklaerung/">Datenschutzhinweise</a></p>
         <button type="submit">Absenden</button>
     </form>
+<?php elseif ($directAccess): ?>
+    <p><a href="<?= escapeForm($formPath) ?>">Fragebogen erneut öffnen</a></p>
 <?php else: ?>
     <p id="open-status" role="status">Bitte öffnen Sie den Link aus unserer E-Mail.</p>
     <noscript><p>Zum Öffnen des Fragebogens muss JavaScript im Browser aktiviert sein.</p></noscript>
