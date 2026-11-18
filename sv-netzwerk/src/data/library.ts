@@ -15,6 +15,17 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Sachverständigenberichte im Gebäudeschaden: Befund, Bewertung und offene Punkte trennen',
+    description: 'Wie technische Feststellungen, fachliche Bewertungen, offene Prüfungen und Kostenabgrenzung in einem Schadenbericht nachvollziehbar bleiben.',
+    href: '/fachwissen/sachverstaendigenbericht-befund-bewertung-offene-punkte/',
+    category: 'Schadenregulierung',
+    tags: ['Sachverständigenbericht', 'Schadenaufnahme', 'Befund', 'Beweissicherung', 'Kostenabgrenzung', 'Qualitätssicherung', 'Dokumentation'],
+    date: '2026-11-18',
+    publishedAt: '2026-11-18T05:00:00.000Z',
+    type: 'article',
+  },
+
+  {
     title: 'Drohnenaufnahmen bei mehreren Hagelschäden: Vergleichbarkeit, Objekttrennung und Beweiskette',
     description: 'Wie Drohnenaufnahmen bei mehreren Hagelschäden einheitlich geplant, objektbezogen dokumentiert und von der technischen Bewertung getrennt werden.',
     href: '/fachwissen/drohnen-serienbefliegung-hagelschaeden-vergleichbarkeit/',

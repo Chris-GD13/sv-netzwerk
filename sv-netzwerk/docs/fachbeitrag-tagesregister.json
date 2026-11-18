@@ -211,11 +211,11 @@
       }
     },
     "2026-11-18": {
-      "publication_id": "2026-11-18-bauabfaelle-gebaeudeschaden-trennung-nachweis-kostenpruefung",
+      "publication_id": "2026-11-18-sachverstaendigenbericht-befund-bewertung-offene-punkte",
       "article": {
-        "title": "Bauabfälle nach einem Gebäudeschaden: Trennung, Nachweis und Kostenprüfung",
-        "slug": "bauabfaelle-gebaeudeschaden-trennung-nachweis-kostenpruefung",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/bauabfaelle-gebaeudeschaden-trennung-nachweis-kostenpruefung/",
+        "title": "Sachverständigenberichte im Gebäudeschaden: Befund, Bewertung und offene Punkte trennen",
+        "slug": "sachverstaendigenbericht-befund-bewertung-offene-punkte",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/sachverstaendigenbericht-befund-bewertung-offene-punkte/",
         "status": "reserved",
         "owner": "codex-20261118-chw",
         "reserved_at": "2026-11-18T13:22:32.913Z"
@@ -225,7 +225,7 @@
       }
     }
   },
-  "updated_at": "2026-11-18T13:22:32.913Z",
+  "updated_at": "2026-11-18T15:22:10.195Z",
   "entries": {
     "2026-11-11": {
       "publication_id": "2026-11-11-naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",
