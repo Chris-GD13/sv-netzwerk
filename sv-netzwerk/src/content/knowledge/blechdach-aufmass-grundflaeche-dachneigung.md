@@ -53,6 +53,8 @@ Auch ein gutes Dachaufmaß beantwortet noch keine Frage zur Ursache oder zum Umf
 
 Für die Kostenprüfung frage ich bei einer Differenz zuerst, ob die Position die eingedeckte Fläche oder die bestellte Materialmenge bezeichnet. Profilbleche haben eine Lieferbreite und eine nutzbare Deckbreite. Eine seitliche Überdeckung kann den Materialbedarf erhöhen. Ist die Überdeckung bereits im Einheitspreis je Quadratmeter fertiger Deckung berücksichtigt, würde ein zusätzlicher Flächenzuschlag denselben Aufwand zweimal erfassen. Klären lässt sich das anhand der vorgesehenen Anzahl der Bahnen, ihrer Deckbreite und ihrer Bestelllängen. Firstbleche und Ortgangabschlüsse lassen sich dagegen anhand ihrer Längen nachvollziehen.
 
+Bei offenen Stellen im Dach kann vor der endgültigen Mengenermittlung eine provisorische Abdeckung zur Schadenminderung erforderlich sein. Deren Fläche und Befestigung lassen sich gesondert dokumentieren. Ein Provisorium kann über den beschädigten Bereich hinausreichen, etwa um den Anschluss an eine intakte Bahn herzustellen.
+
 ## Wenn Photovoltaik auf dem Dach sitzt
 
 Module verdecken einen Teil der Eindeckung. Unter den Modulen läuft das Blech weiter. Für den Dachdecker bleibt diese Fläche bei einer vollständigen Neueindeckung Bestandteil des Aufmaßes. Für die Demontage der Anlage ist eine andere Menge entscheidend. Hier interessiert, welche Module und welche Teile der Unterkonstruktion tatsächlich aufgenommen werden müssen. Das Angebot sollte deshalb die betroffenen Modulfelder der jeweiligen Dachseite zuordnen. Ob ein benachbartes Feld für den Zugang ebenfalls weichen muss, kann der ausführende Fachbetrieb anhand der geplanten Arbeitsfolge begründen.
@@ -65,6 +67,6 @@ Ist nur eine Dachseite einsehbar, lässt sich die zweite als Annahme kalkulieren
 
 Ein Kürzungsvorschlag allein aus dem Vergleich von 100 Quadratmetern Gebäudegrundfläche und 136 Quadratmetern angebotener Eindeckung wäre im Beispiel kaum begründbar. Die geometrische Rechnung erklärt nahezu die gesamte Differenz. Für die verbleibende Prüfung braucht es die Zuordnung der beschädigten Bahnen und die Mengenbasis des Angebots. Beides lässt sich mit einer bemaßten Dachskizze nachvollziehbar festhalten.
 
-## Quelle
+## Quellen und weiterführende Hinweise
 
 Arbeitsgemeinschaft der Vermessungsverwaltungen der Länder der Bundesrepublik Deutschland, basemap.de, Produktinformation und Workshop zur 3D-Visualisierung, März 2023. [3D-Visualisierung mit amtlichen Geodaten](https://basemap.de/data/website/workshops/03_2023/5_basemap_3D_Visualisierung.pdf)
