@@ -233,15 +233,18 @@
         "title": "Wie viele Quadratmeter Blechdach sind tatsächlich betroffen?",
         "slug": "blechdach-aufmass-grundflaeche-dachneigung",
         "url": "https://www.sv-netzwerk.eu/fachwissen/blechdach-aufmass-grundflaeche-dachneigung/",
-        "status": "reserved",
-        "owner": "codex-20261119"
+        "status": "published-verified",
+        "owner": "codex-20261119",
+        "commit": "e4b65bcc336ef9ba054d23ba7a9253c4128edee6",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/44551755727",
+        "verified_at": "2026-11-19T15:18:27.417Z"
       },
       "linkedin": {
         "status": "not-scheduled-weekday"
       }
     }
   },
-  "updated_at": "2026-11-18T15:32:49.089Z",
+  "updated_at": "2026-11-19T15:18:27.417Z",
   "entries": {
     "2026-11-11": {
       "publication_id": "2026-11-11-naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",
