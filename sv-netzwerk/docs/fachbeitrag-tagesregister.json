@@ -226,6 +226,19 @@
       "linkedin": {
         "status": "not-posted"
       }
+    },
+    "2026-11-19": {
+      "publication_id": "2026-11-19-blechdach-aufmass-grundflaeche-dachneigung",
+      "article": {
+        "title": "Wie viele Quadratmeter Blechdach sind tatsächlich betroffen?",
+        "slug": "blechdach-aufmass-grundflaeche-dachneigung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/blechdach-aufmass-grundflaeche-dachneigung/",
+        "status": "reserved",
+        "owner": "codex-20261119"
+      },
+      "linkedin": {
+        "status": "not-scheduled-weekday"
+      }
     }
   },
   "updated_at": "2026-11-18T15:32:49.089Z",

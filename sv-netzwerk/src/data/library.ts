@@ -15,6 +15,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Wie viele Quadratmeter Blechdach sind tatsächlich betroffen?',
+    description: 'Ein Rechenbeispiel zeigt, wie sich Außenmaß, Dachüberstand und Dachneigung auf die Mengen im Angebot auswirken.',
+    href: '/fachwissen/blechdach-aufmass-grundflaeche-dachneigung/',
+    category: 'Sturm- und Hagelschäden',
+    tags: ['Dachaufmaß', 'Profilblech', 'Hagelschaden', 'Kostenprüfung'],
+    date: '2026-11-19',
+    publishedAt: '2026-11-19T05:00:00.000Z',
+    type: 'article',
+  },
+  {
     title: 'Sachverständigenberichte im Gebäudeschaden: Befund, Bewertung und offene Punkte trennen',
     description: 'Wie technische Feststellungen, fachliche Bewertungen, offene Prüfungen und Kostenabgrenzung in einem Schadenbericht nachvollziehbar bleiben.',
     href: '/fachwissen/sachverstaendigenbericht-befund-bewertung-offene-punkte/',
