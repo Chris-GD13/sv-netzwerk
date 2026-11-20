@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 function cfaOrder(string $type, array $documents): bool
 {
-    return (bool)preg_grep('/^(?:Nachtrag(?:\s*\/\s*Stellungnahme)?|nachtrag_stellungnahme)$/iu', [$type, ...$documents]);
+    return (bool)preg_grep('/^(?:Nachtrag(?:\s*\/\s*Stellungnahme)?|nachtrag_stellungnahme)$/iu',
+        array_map(static fn($value) => trim((string)$value), [$type, ...$documents]));
 }
 
 function cfaText(string $text): string

@@ -439,7 +439,7 @@ jobs:
           grep -Fq 'case-action-groups.css?v=20261011-2' "$page"
           grep -Fq 'id="vf-analysis" class="vf-card vf-collapsible is-collapsed"' "$page"
           echo "/intern/versicherungsfaelle/: HTTP $status, vereinfachte Fallaktionen geladen"
-          grep -Fq 'claimsforce-startmask.js?v=20261120-1' "$page"
+          grep -Fq 'claimsforce-startmask.js?v=20261120-2' "$page"
           curl --max-time 20 --silent --show-error --fail -b "$jar" https://www.sv-netzwerk.eu/intern/claimsforce-addendum-ui.mjs -o "$page"
           cmp "$page" public/intern/claimsforce-addendum-ui.mjs
           status="$(curl --max-time 20 --silent --show-error -b "$jar" -H 'Content-Type: application/json' \

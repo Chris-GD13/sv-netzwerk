@@ -60,15 +60,16 @@ export async function readNativeAddendum(request, io) {
   }
   const linked = report.evidence.filter(file=>['Document','Photo'].includes(file.type));
   if (report.evidence.some(file=>!['Document','Photo','Calculation'].includes(file.type))) throw Error('Anlagen: unbekannter Anlagentyp.');
-  let attachments = [];
+  const attachments = report.evidence.filter(file=>file.type==='Calculation')
+    .map(file=>({id:file.id,name:'Claimsforce-Kalkulation',version:null}));
   if (linked.length) {
     const response = await io.json(endpoint(config.FILES_API_ENDPOINT)+path+'/files');
     if (!Array.isArray(response?.files)) throw Error('Anlagen: Dateifassungen konnten nicht gelesen werden.');
-    attachments = linked.map(link=>{
+    attachments.push(...linked.map(link=>{
       const files = response.files.filter(file=>file.id===link.id && (!file.claimId || file.claimId===claim.id));
       const file = files.length===1 ? files[0] : null;
       return {id:link.id,name:file?.fileName || file?.name || link.id,version:file ? fileVersion(file) : null};
-    });
+    }));
   }
   const forms = Object.keys(request.forms ?? {}).length ? await io.readForms(request) : {};
   await io.assertAccount(request.profile);
