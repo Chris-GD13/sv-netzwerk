@@ -32,19 +32,19 @@ seo:
   <figcaption>Ein Projektwechsel wird erst dann belastbar, wenn der tatsächliche Leistungsstand zu Räumen, Bauteilen und Kosten passt.</figcaption>
 </figure>
 
-## Wenn der Ansprechpartner wechselt
+## Fachliche Einordnung
 
 Ein Wechsel der Projektleitung ist kein eigener Schaden. In einer laufenden Schadensanierung kann er trotzdem darüber entscheiden, ob die Wiederherstellung kontrolliert weiterläuft oder ob bereits erledigte Arbeiten erneut beauftragt, offene Leistungen übersehen und Kosten doppelt angesetzt werden. Eine bloße Weitergabe von E-Mails und Rechnungen genügt dafür nicht.
 
 Aus sachverständiger Sicht braucht der neue Ansprechpartner einen prüffähigen Ausgangsstand. Er muss erkennen können, welche Leistungen vertraglich vereinbart waren, was vor Ort tatsächlich ausgeführt wurde, welche Angaben lediglich von Beteiligten stammen und welche Punkte noch technisch zu klären sind. Erst aus dieser Trennung entsteht eine belastbare Grundlage für weitere Freigaben.
 
-## Leistungsstand am Bauteil feststellen
+## Schadenbild und Befund am Bauteil
 
 Der Übergabestand beginnt nicht in der Kostenaufstellung, sondern am Gebäude. Räume und Bauteile werden eindeutig bezeichnet. Dazu wird festgehalten, ob eine Leistung abgeschlossen, begonnen oder noch nicht ausgeführt ist. Fotos brauchen einen räumlichen Bezug und einen erkennbaren Aufnahmezeitpunkt. Eine Nahaufnahme einer gespachtelten Wand sagt wenig aus, wenn nicht zugeordnet werden kann, in welchem Raum sie entstanden ist und ob die übrige Fläche denselben Stand aufweist.
 
 Die Aussage eines ausführenden Unternehmens, eine Position sei fertiggestellt, bleibt zunächst eine mitgeteilte Angabe. Der sichtbare Zustand vor Ort ist davon zu unterscheiden. Verdeckte Leistungen können anhand von Bautagesberichten, Aufmaßen, Liefernachweisen oder Fotos aus der Ausführungsphase plausibilisiert werden. Wo solche Nachweise fehlen, bleibt der Prüfvorbehalt bestehen. Diese Offenheit ist genauer als eine scheinbar vollständige Übergabeliste.
 
-## Restarbeit, Mangel und Zusatzleistung trennen
+## Ursachen und Abgrenzung offener Leistungen
 
 Nicht jede offene Tätigkeit ist eine Restarbeit. Fehlt eine vertraglich geschuldete Sockelleiste, handelt es sich um eine noch auszuführende Leistung. Ist eine bereits montierte Leiste beschädigt oder ungeeignet befestigt, steht eine mögliche Mangelbeseitigung im Raum. Wird eine zusätzliche Verkleidung gewünscht, die bisher nicht vereinbart war, kann eine geänderte oder zusätzliche Leistung vorliegen.
 
@@ -52,27 +52,35 @@ Diese Einordnung wirkt unmittelbar auf Zuständigkeit, Terminplanung und Kostenp
 
 Nach § 631 BGB schuldet der Unternehmer die Herstellung des versprochenen Werkes. § 633 BGB verlangt ein Werk ohne Sach- und Rechtsmängel. Daraus folgt für die technische Übergabe keine automatische rechtliche Bewertung des Einzelfalls. Es erklärt aber, warum vereinbarter Leistungsumfang und festgestellter Zustand getrennt dokumentiert werden müssen.
 
-## Kostenstand mit dem Bauzustand abgleichen
+## Prüffragen für den Kostenstand
 
 Eine kaufmännische Übersicht allein zeigt noch nicht, ob der abgerechnete Betrag zum Gebäude passt. Für einen belastbaren Kostenstand werden Auftrag, Nachträge, Abschlagsrechnungen, Zahlungen und offene Rechnungsbeträge mit den ausgeführten Leistungen verknüpft. Entscheidend ist dabei nicht nur die Summe. Zu prüfen ist auch, ob dieselbe Leistung in mehreren Positionen enthalten ist oder ob eine neue Beauftragung bereits vergütete Teile nochmals erfasst.
 
 Bei Pauschalpositionen kann der Fertigstellungsgrad nicht beliebig aus einzelnen Arbeitsschritten abgeleitet werden. Bei Einheitspreisleistungen braucht es prüfbare Mengen. Regiearbeiten erfordern nachvollziehbare Stunden- und Materialnachweise. Wenn Unterlagen fehlen, wird der Kostenstand als vorläufig gekennzeichnet. Eine unbelegte Schätzung darf nicht unbemerkt zur freigegebenen Schlussgröße werden.
 
-## Abnahme nicht mit Übergabe verwechseln
+## Fachgrenzen bei Übergabe und Abnahme
 
 Die organisatorische Übergabe an eine neue Projektleitung ist keine Abnahme der Werkleistung. Eine Abnahme hat rechtliche Wirkungen und setzt nach § 640 BGB voraus, dass das vertragsgemäß hergestellte Werk abgenommen wird, sofern nicht wegen der Beschaffenheit eine Abnahme ausgeschlossen ist. Ob und in welchem Umfang eine Abnahme erklärt werden kann, hängt vom konkreten Vertrags- und Leistungsstand ab.
 
 Ist die VOB/B wirksam vereinbart, bestimmt sich der Leistungsumfang aus den Vertragsbestandteilen und deren vereinbarter Rangfolge. Die VOB/B gilt nicht automatisch. Bei der Übergabe muss deshalb erkennbar sein, welche Vertragsgrundlage tatsächlich vereinbart wurde. Eine allgemeine Überschrift wie „Ausführung nach VOB“ ersetzt die Prüfung der Vertragsunterlagen nicht.
 
-## Ein typischer Übergabestand
+## Dokumentation und Beweissicherung im Übergabestand
 
 In einer Wohnung sind Rückbau und Trocknung beendet. Trockenbauflächen wurden teilweise geschlossen, Bodenbeläge sind in einzelnen Räumen verlegt und mehrere Rechnungen liegen vor. Die bisherige Projektleitung scheidet aus. Der neue Ansprechpartner erhält eine raumbezogene Fotodokumentation, die zugehörigen Angebotspositionen und eine Übersicht der bereits geleisteten Zahlungen.
 
 Beim Abgleich zeigt sich, dass gemeldete Fertigstellungen und sichtbarer Zustand nicht überall übereinstimmen. Einige Arbeiten sind noch offen, an anderer Stelle bestehen Hinweise auf nachzubessernde Ausführung. Eine zusätzliche Leistung war bisher nur besprochen, aber nicht beauftragt. Durch diese Trennung lässt sich die Fortführung neu ordnen, ohne reale Einzelheiten eines Schadenfalls zu übernehmen oder unbelegte Annahmen als Tatsachen zu behandeln.
 
+## Sofortmaßnahmen und Schadenminderung
+
+Ein Personalwechsel darf laufende Sicherungs- und Schadenminderungsmaßnahmen nicht unterbrechen. Provisorische Abdeckungen, Trocknung, Zutrittsbeschränkungen oder ein Schutz gegen weitere Verschmutzung werden deshalb mit Verantwortlichkeit und Kontrolltermin übergeben. Der aktuelle Betriebszustand der Geräte und die noch erforderliche Überwachung müssen erkennbar sein. Eine Übergabe ist unvollständig, wenn zwar Rechnungen vorliegen, aber niemand mehr weiß, wer eine zeitkritische Maßnahme kontrolliert.
+
+## Versicherungstechnische Einzelfallprüfung
+
+Der technische Übergabestand beantwortet nicht automatisch, welche Kosten versichert sind. Schadenursache, versicherter Umfang, Vorschäden, Instandhaltungsanteile und mögliche Mehrleistungen bleiben Gegenstand der Einzelfallprüfung. Die Dokumentation sollte diese Fragen ermöglichen, ohne eine Deckungsentscheidung vorwegzunehmen. Gerade bei bereits begonnenen Arbeiten ist zu trennen, was der Schadenbeseitigung dient und was unabhängig davon ohnehin erforderlich oder zusätzlich gewünscht war.
+
 ## Was eine belastbare Übergabe leistet
 
-Eine gute Übergabe ersetzt weder die technische Prüfung noch die Vertragsauslegung. Sie schafft den gemeinsamen Stand, von dem aus beides möglich wird. Offene Punkte bleiben sichtbar, Zuständigkeiten können geklärt und weitere Freigaben auf den tatsächlichen Baufortschritt bezogen werden. Der Projektwechsel wird damit nicht zum Bruch in der Schadenakte.
+Eine gute Übergabe ersetzt weder die technische Prüfung noch die Vertragsauslegung durch die dafür zuständigen Stellen. Wenn Tragwerk, Schadstoffe, Elektroanlagen oder Brandschutz betroffen sind, werden erforderliche Fachplaner oder Spezialisten mit klarer Prüffrage eingebunden. Sie schafft den gemeinsamen Stand, von dem aus beides möglich wird. Offene Punkte bleiben sichtbar, Zuständigkeiten können geklärt und weitere Freigaben auf den tatsächlichen Baufortschritt bezogen werden. Der Projektwechsel wird damit nicht zum Bruch in der Schadenakte.
 
 ## Fazit
 
