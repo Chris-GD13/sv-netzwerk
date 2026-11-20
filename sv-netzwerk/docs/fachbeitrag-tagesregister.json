@@ -242,9 +242,26 @@
       "linkedin": {
         "status": "not-scheduled-weekday"
       }
+    },
+    "2026-11-20": {
+      "publication_id": "2026-11-20-projektwechsel-schadensanierung-leistungsstand-restarbeiten-kosten",
+      "article": {
+        "title": "Projektwechsel in der Schadensanierung: Leistungsstand, Restarbeiten und Kosten sauber übergeben",
+        "slug": "projektwechsel-schadensanierung-leistungsstand-restarbeiten-kosten",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/projektwechsel-schadensanierung-leistungsstand-restarbeiten-kosten/",
+        "status": "published-verified",
+        "owner": "codex-website-20261120-0600",
+        "reserved_at": "2026-11-20T05:00:00.000Z",
+        "commit": "6a72b9076b7db50a0e3af4916582654dd02be28b",
+        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/44679645026",
+        "verified_at": "2026-11-20T05:22:18.876Z"
+      },
+      "linkedin": {
+        "status": "not-scheduled-weekday"
+      }
     }
   },
-  "updated_at": "2026-11-19T15:18:27.417Z",
+  "updated_at": "2026-11-20T05:22:18.876Z",
   "entries": {
     "2026-11-11": {
       "publication_id": "2026-11-11-naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",
