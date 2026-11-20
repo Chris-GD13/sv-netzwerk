@@ -1,0 +1,99 @@
+name: Camper Card installieren
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/camper-card-install.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Camper Card und Dashboard einrichten
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          cd /opt/anker-homeassistant/config
+          stage=$(mktemp -d)
+          trap 'rm -rf "$stage"' EXIT
+          curl -fsSL --retry 2 'https://raw.githubusercontent.com/F30onAir/ha-camper-card/c556f94c8321a30417ac67f7c5ec7427892a6d61/dist/camper-card.js' -o "$stage/card.js"
+          test "$( (printf 'blob 124202\0'; cat "$stage/card.js") | sha1sum | cut -d' ' -f1)" = e16e56881152ac18263ff452fed27ba9cd02ff3e
+          docker exec anker-homeassistant test -d /config/.storage
+          backup=$(mktemp -d /opt/anker-homeassistant/camper-backup.XXXXXX)
+          docker stop anker-homeassistant >/dev/null
+          restore() {
+            docker stop anker-homeassistant >/dev/null || true
+            for file in lovelace_resources lovelace_dashboards lovelace.camper_dashboard; do
+              if test -e "$backup/$file"; then cp -p "$backup/$file" ".storage/$file"; elif test -e "$backup/$file.absent"; then rm -f ".storage/$file"; fi
+            done
+            docker start anker-homeassistant >/dev/null
+            rm -rf "$stage"
+          }
+          trap restore EXIT
+          for file in lovelace_resources lovelace_dashboards lovelace.camper_dashboard; do
+            if test -e ".storage/$file"; then cp -p ".storage/$file" "$backup/"; else touch "$backup/$file.absent"; fi
+          done
+          mkdir -p www/camper-card
+          install -m 644 "$stage/card.js" www/camper-card/camper-card-0.4.1.js
+          python3 - <<'PY'
+          import json, pathlib, uuid, os
+          root = pathlib.Path('.storage')
+          def read(key, default):
+              path = root / key
+              return json.loads(path.read_text()) if path.exists() else dict(version=1, minor_version=1, key=key, data=default)
+          def save(key, obj):
+              path = root / key
+              tmp = path.with_suffix('.tmp-camper')
+              tmp.write_text(json.dumps(obj, ensure_ascii=False))
+              os.replace(tmp, path)
+          resources = read('lovelace_resources', {'items': []})
+          items = resources['data']['items']
+          if not any('camper-card' in r['url'] for r in items):
+              items.append(dict(id=uuid.uuid4().hex, type='module', url='/local/camper-card/camper-card-0.4.1.js'))
+          dashboards = read('lovelace_dashboards', {'items': []})
+          items = dashboards['data']['items']
+          if not any(d.get('id') == 'camper_dashboard' and d.get('url_path') == 'camper-dashboard' for d in items):
+              assert all(d.get('id') != 'camper_dashboard' and d.get('url_path') != 'camper-dashboard' for d in items)
+              items.append(dict(id='camper_dashboard', url_path='camper-dashboard', title='Camper', icon='mdi:rv-truck', mode='storage', show_in_sidebar=True, require_admin=False))
+          key = 'lovelace.camper_dashboard'
+          card = dict(type='custom:camper-card', vehicle='motorhome', title='Wohnmobil')
+          registry = read('core.entity_registry', {'entities': []})['data']['entities']
+          import re
+          candidates = [e['entity_id'] for e in registry if not e.get('disabled_by') and e['entity_id'].startswith('sensor.') and re.search(r'(camper|wohnmobil|reisemobil)', e['entity_id'])]
+          for field, pattern in {'fresh':r'frischwasser|fresh_water','grey':r'grauwasser|grey_water','battery':r'ladezustand|state_of_charge|battery_soc','temp_inside':r'innentemperatur|inside_temperature','temp_outside':r'aussentemperatur|outside_temperature'}.items():
+              found = [e for e in candidates if re.search(pattern, e)]
+              if len(found) == 1 and field.startswith('temp_'):
+                  card[field] = found[0]
+          print('Zugeordnete Fahrzeugtemperaturen:', len(card)-3, 'Camper-Sensorkandidaten:',len(candidates))
+          if not (root/key).exists():
+              save(key,read(key,{'config':{'views':[{'title':'Camper','path':'uebersicht','cards':[card]}]}}))
+          save('lovelace_resources',resources)
+          save('lovelace_dashboards',dashboards)
+          PY
+          docker start anker-homeassistant >/dev/null
+          i=0
+          until curl -fsS --max-time 4 http://10.77.66.1:8123/local/camper-card/camper-card-0.4.1.js -o "$stage/live.js" 2>/dev/null && cmp -s "$stage/card.js" "$stage/live.js"; do
+            i=$((i+1)); test "$i" -lt 60; sleep 2
+          done
+          curl -fsS http://10.77.66.1:8123/camper-dashboard/uebersicht >/dev/null
+          trap 'rm -rf "$stage"' EXIT
+          echo 'Camper-Dashboard und Kartenmodul auf IONOS erreichbar.'
+          CHECK
