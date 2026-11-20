@@ -15,6 +15,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Projektwechsel in der Schadensanierung: Leistungsstand, Restarbeiten und Kosten sauber übergeben',
+    description: 'Wie bei einem Wechsel der Projektleitung Leistungsstand, offene Arbeiten, Mängel und Kosten nachvollziehbar übernommen und weitergeführt werden.',
+    href: '/fachwissen/projektwechsel-schadensanierung-leistungsstand-restarbeiten-kosten/',
+    category: 'Sanierungsplanung und Baukoordination',
+    tags: ['Schadensanierung', 'Projektwechsel', 'Leistungsstand', 'Restarbeiten', 'Baukoordination', 'Dokumentation', 'Kostenprüfung', 'Abnahme'],
+    date: '2026-11-20',
+    publishedAt: '2026-11-20T05:00:00.000Z',
+    type: 'article',
+  },
+  {
     title: 'Wie viele Quadratmeter Blechdach sind tatsächlich betroffen?',
     description: 'Ein Rechenbeispiel zeigt, wie sich Außenmaß, Dachüberstand und Dachneigung auf die Mengen im Angebot auswirken.',
     href: '/fachwissen/blechdach-aufmass-grundflaeche-dachneigung/',
