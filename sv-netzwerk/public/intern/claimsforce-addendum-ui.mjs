@@ -79,13 +79,15 @@ export function renderAddendum(root, job, request) {
   attachments.append(caption);
   const files=Object.values(plan.candidates||{});
   if(!files.length) attachments.append(paragraph('Keine neuen einschlägigen Vorschläge im vorhandenen Fallbestand.'));
+  const confirmed=new Map((plan.attachments||[]).map(file=>[file.id,file.version]));
   for(const file of files) {
     const label=document.createElement('label');
     const control=document.createElement('input');
     control.type='checkbox';
     control.dataset.fileId=file.id;
     control.checked=plan.decisions?.[file.id]===true;
-    label.append(control,' '+file.name+(file.date?' · '+file.date.slice(0,10):''));
+    const updated=control.checked&&confirmed.get(file.id)!==file.version;
+    label.append(control,' '+file.name+(file.date?' · '+file.date.slice(0,10):'')+(updated?' · neue Fassung zur Bestätigung':''));
     const item=document.createElement('div');
     item.append(label);
     attachments.append(item);

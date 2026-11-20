@@ -119,6 +119,10 @@ function cfaWorkflowView(array $row): array
                 } else {
                     $result = json_decode((string)$job['result_json'], true, 512, JSON_THROW_ON_ERROR);
                     $messages = cfaCheck($plan, $result);
+                    $current = cfaState($row);
+                    if ($current['revision'] !== $state['revision']) {
+                        $messages[] = 'Auftrag: Der Prüfstand wurde zwischenzeitlich geändert.';
+                    }
                     $ms = $result['durationMs'] ?? null;
                 }
             } catch (Throwable $error) {
@@ -156,15 +160,17 @@ function cfaPrepare(array $row, array $current, array $in): array
     $plan['salutation'] = str_starts_with($contact, 'Frau ') ? 'Sehr geehrte '.$contact.','
         : (str_starts_with($contact, 'Herr ') ? 'Sehr geehrter '.$contact.',' : 'Sehr geehrte Damen und Herren,');
     $fresh = cfaCandidates($row);
-    $plan['candidates'] += $fresh;
     $choices = $in['choices'] ?? null;
     if (!is_array($choices) || count($choices) > 100) throw new InvalidArgumentException('Anlagen: Auswahl bestätigen.');
-    $plan['decisions'] = $choices + $plan['decisions'];
-    $plan['attachments'] = [];
-    foreach ($plan['decisions'] as $id=>$include) {
+    $attachments = array_column($plan['attachments'],null,'id');
+    foreach ($choices as $id=>$include) {
         if (!isset($plan['candidates'][$id]) || !is_bool($include)) throw new InvalidArgumentException('Anlagen: unbekannte Auswahl.');
-        if ($include) $plan['attachments'][] = $plan['candidates'][$id];
+        if ($include) $attachments[$id] = $plan['candidates'][$id];
+        else unset($attachments[$id]);
     }
+    $plan['decisions'] = $choices + $plan['decisions'];
+    $plan['attachments'] = array_values($attachments);
+    $plan['candidates'] = $fresh + $plan['candidates'];
     $plan['forms'] = [];
     $plan['paymentFields'] = [];
     foreach (['SE','ZB'] as $kind) {
