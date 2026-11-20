@@ -14,6 +14,7 @@ async function execute(mode,contents){
   const context={console,URL,Map,Set,Date,JSON,String,Number,Array,Error,Promise,TextEncoder,Uint8Array,AbortController,setTimeout,clearTimeout,crypto:webcrypto,btoa:s=>Buffer.from(s,'binary').toString('base64'),readSourceOrRecordLegacyConflict,
     BRIDGE_VERSION:'test',credentialDiagnostic:'',lastTaskDebug:{},profileKey:p=>p,credentialsFor:async()=>({value:{},source:'fixture'}),hasExistingClaimsSession:async()=>false,credentialMatchesProfile:()=>true,
     resetClaimsSession:async()=>{},claimsTab:async()=>({tab:{id:2},token:'fixture'}),readOpenTasks:async()=>0,ensureInvoicedListTab:async()=>{},openSelectedClaimTab:async()=>{},
+    scrapeClaimsTabWhenReady:async()=>({ok:true,route:'/invoiced',claims:[{id:claimId,label:'26-TEST',listVersion:'same-list'}]}),
     diagnostic:async()=>{},progress:async()=>{},safeRoute:x=>x,safeFileName:x=>x,assertSingleClaim:()=>{},claimFolderPath:()=>'',fileVersion:()=>version,messageVersion:()=>'',
     mergeClaimFiles:a=>a,mapClaim:d=>({claimsforce_claim_id:d.id,schaden_nr:'26-TEST'}),unwrap:(v,key)=>v?.[key]??v,fingerprint:async()=> 'same-signature',
     uploadBuffer:async()=>({result:{duplicate:false}}),portalOperation:async()=>({folderId:'case-folder'}),

@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once __DIR__.'/config.php';
 require_once __DIR__.'/ionos-storage.php';
 require_once __DIR__.'/document-review-storage.php';
+require_once __DIR__.'/claimsforce-addendum-workflow.php';
 
 commonHeaders();
 $user=requireAuth();
@@ -37,6 +38,10 @@ function cfwJob(string $workflowId,array $user): array {
     return $row;
 }
 function cfwView(array $row): array {
+    if (cfaOrder($row['order_type'], json_decode($row['documents_json'], true) ?: [])) {
+        cfaSchema();
+        return cfaWorkflowView($row);
+    }
     $source=null;if(empty($row['source_job_id'])){$q=db()->prepare('SELECT id FROM claimsforce_import_jobs WHERE claim_number=:claim ORDER BY id DESC LIMIT 1');$q->execute([':claim'=>$row['claim_no']]);$found=$q->fetchColumn();if($found){$row['source_job_id']=(int)$found;}}if(!empty($row['source_job_id'])){$q=db()->prepare('SELECT status,phase FROM claimsforce_import_jobs WHERE id=:id LIMIT 1');$q->execute([':id'=>(int)$row['source_job_id']]);$source=$q->fetch()?:null;}
     if($source&&($source['status']??'')==='failed'){
         $q=db()->prepare('SELECT id,status,phase FROM claimsforce_import_jobs WHERE claim_number=:claim AND id>:id ORDER BY id DESC LIMIT 1');$q->execute([':claim'=>$row['claim_no'],':id'=>(int)$row['source_job_id']]);$replacement=$q->fetch();
@@ -77,7 +82,40 @@ try {
         if($claim===''||$profile===''||$type==='')apiError(400,'Schadennummer, Bearbeiterkonto und Auftragstyp sind erforderlich.');
         $documents=array_values(array_filter(array_map('strval',(array)($in['documents']??[]))));
         if(!$documents)apiError(400,'Mindestens ein Dokument muss ausgewählt werden.');
-        $workflowId='CFW-'.gmdate('YmdHis').'-'.strtoupper(bin2hex(random_bytes(4)));$folder=cfwExistingCaseFolder($user,$claim)??drWorkspaceCreate($user);
+        $workflowId='CFW-'.gmdate('YmdHis').'-'.strtoupper(bin2hex(random_bytes(4)));
+        if (cfaOrder($type, $documents)) {
+            $documents = array_values(array_unique(array_map(static fn($doc)=>cfaOrder('',[$doc]) ? 'Nachtrag' : $doc, $documents)));
+            if (!in_array('Nachtrag',$documents,true) || array_diff($documents,['Nachtrag','SE','ZB'])) {
+                apiError(400,'Beim Nachtragsauftrag Nachtrag und gegebenenfalls SE oder ZB auswählen.');
+            }
+            $profileKey = match ($profile) {
+                'Christian · Standardfälle', 'Christian · Backoffice (Susanne)' => 'christian',
+                'Christian · Maurer-Fälle' => 'jens',
+                'Marc Schütt' => 'marc',
+                'Holger Roth' => 'holger',
+                default => throw new InvalidArgumentException('Konto: kein unterstütztes Claimsforce-Profil.')
+            };
+            [$folder,$insurer,$binding] = cfaCase($user,$claim,trim((string)($in['insurer']??'')),$profileKey);
+            $rules = cfaRules(cfaRoute($insurer,$claim));
+            cfaSchema();
+            db()->beginTransaction();
+            try {
+                $s = db()->prepare("INSERT INTO claimsforce_workflow_jobs
+                    (workflow_id,folder_id,claim_no,insurer,order_type,profile,documents_json,instructions,status,phase,created_by,created_at,updated_at)
+                    VALUES(?,?,?,?,?,?,?,?,'waiting_review','abschlusspruefung',?,NOW(),NOW())");
+                $s->execute([$workflowId,$folder,$claim,$insurer,$type,$profile,cfaJson($documents),trim((string)($in['instructions']??'')),$user['id']]);
+                $row = cfwJob($workflowId,$user);
+                $plan = ['binding'=>$binding,'rules'=>$rules,'candidates'=>cfaCandidates($row),'decisions'=>[], 'attachments'=>[], 'ledger'=>null];
+                $s = db()->prepare('INSERT INTO claimsforce_addendum_orders(workflow_id,plan_json) VALUES(?,?)');
+                $s->execute([$workflowId,cfaJson($plan)]);
+                db()->commit();
+            } catch (Throwable $error) {
+                db()->rollBack();
+                throw $error;
+            }
+            apiJson(['ok'=>true,'job'=>cfwView($row)],201);
+        }
+        $folder=cfwExistingCaseFolder($user,$claim)??drWorkspaceCreate($user);
         $s=db()->prepare('INSERT INTO claimsforce_workflow_jobs(workflow_id,folder_id,claim_no,insurer,order_type,profile,documents_json,instructions,log_json,created_by,created_at,updated_at) VALUES(:wid,:folder,:claim,:insurer,:type,:profile,:docs,:instructions,:log,:uid,NOW(),NOW())');
         $log=[['event'=>'accepted','message'=>'Auftrag angenommen.','at'=>gmdate('c')]];$s->execute([':wid'=>$workflowId,':folder'=>$folder,':claim'=>$claim,':insurer'=>trim((string)($in['insurer']??''))?:null,':type'=>$type,':profile'=>$profile,':docs'=>json_encode($documents,JSON_UNESCAPED_UNICODE),':instructions'=>trim((string)($in['instructions']??'')),':log'=>json_encode($log,JSON_UNESCAPED_UNICODE),':uid'=>(int)$user['id']]);
         $profileKey=mb_strtolower($profile,'UTF-8');
@@ -87,6 +125,14 @@ try {
     }
     if($action==='latest'){ $s=db()->prepare("SELECT * FROM claimsforce_workflow_jobs WHERE created_by=:uid ORDER BY updated_at DESC,id DESC LIMIT 1");$s->execute([':uid'=>(int)$user['id']]);$latest=$s->fetch();apiJson(['ok'=>true,'job'=>$latest?cfwView($latest):null]); }
     $workflowId=trim((string)($_GET['workflow_id']??($_POST['workflow_id']??'')));if($workflowId==='')apiError(400,'Workflow-ID fehlt.');$row=cfwJob($workflowId,$user);
+    if (cfaOrder($row['order_type'], json_decode($row['documents_json'], true) ?: [])) {
+        if ($action === 'status') apiJson(['ok'=>true,'job'=>cfwView($row)]);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action,['prepare_addendum','check_addendum'],true)) {
+            cfaUpdate($row,$user,requestBody(),$action);
+            apiJson(['ok'=>true,'job'=>cfwView(cfwJob($workflowId,$user))]);
+        }
+        apiError(409,'Nachträge werden ausschließlich über die serverseitige Abschlussprüfung abgeschlossen.');
+    }
     if($action==='next'&&$_SERVER['REQUEST_METHOD']==='GET'){
         $s=db()->prepare("SELECT * FROM claimsforce_workflow_jobs WHERE created_by=:uid AND status='accepted' ORDER BY id ASC LIMIT 1");
         $s->execute([':uid'=>(int)$user['id']]); $next=$s->fetch();
@@ -111,4 +157,5 @@ try {
     if($action==='status')apiJson(['ok'=>true,'job'=>cfwView($row)]);
     if($action==='pause'&&$_SERVER['REQUEST_METHOD']==='POST'){ $in=requestBody(); $question=['field'=>trim((string)($in['field']??'')),'prompt'=>trim((string)($in['prompt']??''))];if($question['field']===''||$question['prompt']==='')apiError(400,'Feld und Rückfrage sind erforderlich.');$s=db()->prepare("UPDATE claimsforce_workflow_jobs SET status='waiting_question',question_json=:q,updated_at=NOW() WHERE workflow_id=:id AND created_by=:uid");$s->execute([':q'=>json_encode($question,JSON_UNESCAPED_UNICODE),':id'=>$workflowId,':uid'=>(int)$user['id']]);apiJson(['ok'=>true,'job'=>cfwView(cfwJob($workflowId,$user))]); }
     apiError(404,'Unbekannte Workflowaktion.');
-} catch(Throwable $e){ apiError(500,$e->getMessage()); }
+} catch(InvalidArgumentException $e){ apiError(409,$e->getMessage()); }
+catch(Throwable $e){ apiError(500,$e->getMessage()); }

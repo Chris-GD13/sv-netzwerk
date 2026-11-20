@@ -7,7 +7,7 @@ function svRuleSetting(string $key,string $default=''):string{
 }
 function svRuleHttp(string $method,string $url,array $headers=[],?string $body=null,bool $auth=true): array {
     $host=parse_url($url,PHP_URL_HOST);$path=parse_url($url,PHP_URL_PATH);
-    if(!(($host==='www.googleapis.com'&&$method==='GET'&&str_starts_with($path,'/drive/v3/files/'))||($host==='oauth2.googleapis.com'&&$method==='POST'&&$path==='/token')))throw new RuntimeException('RULE_NETWORK_TARGET_FORBIDDEN');
+    if(!(($host==='www.googleapis.com'&&$method==='GET'&&($path==='/drive/v3/files'||str_starts_with($path,'/drive/v3/files/')))||($host==='oauth2.googleapis.com'&&$method==='POST'&&$path==='/token')))throw new RuntimeException('RULE_NETWORK_TARGET_FORBIDDEN');
     if ($auth) $headers[]='Authorization: Bearer '.svRuleToken();
     $ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_HTTPHEADER=>$headers,CURLOPT_CONNECTTIMEOUT=>12,CURLOPT_TIMEOUT=>20,CURLOPT_FOLLOWLOCATION=>false]);
     if($body!==null)curl_setopt($ch,CURLOPT_POSTFIELDS,$body);$resp=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$err=curl_error($ch);curl_close($ch);

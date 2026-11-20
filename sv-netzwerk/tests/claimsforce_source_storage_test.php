@@ -99,7 +99,10 @@ testAdapter('missing-profile-root-is-not-automatically-created',function()use($r
 seedItem('legacy-case','cw-root','legacy-case',$folder);seedItem('legacy-files','legacy-case','Formulare',$folder);seedItem('legacy-meta','legacy-case','00_Falldaten.json','application/json',json_encode(['schaden_nr'=>'synthetic-legacy']));
 testAdapter('legacy-metadata-without-Claims-UUID-profile-fails-closed',fn()=>blockedAdapter(fn()=>cfrSourceState('legacy-case',$cw,'christian',array_replace($req,['targetFolderId'=>'legacy-files'])),'TRUSTED_CASE_CONTEXT_REQUIRED'));
 seedItem('unbound-pdf','files-ms','same-name.pdf','application/pdf','unknown legacy');
-testAdapter('unknown-legacy-file-prevents-new-duplicate-even-if-name-differs',fn()=>blockedAdapter(fn()=>cfrSourceState('case-ms',$ms,'marc',array_replace($req,['profile'=>'marc','targetFolderId'=>'files-ms'])),'LEGACY_SOURCE_BINDING_REQUIRED'));
+testAdapter('unbound-legacy-file-is-not-adopted-as-the-authenticated-source',function()use($req,$ms){
+    $state=cfrSourceState('case-ms',$ms,'marc',array_replace($req,['profile'=>'marc','targetFolderId'=>'files-ms']));
+    verify($state['kind']==='NEW_SOURCE'&&empty($state['legacyCandidateId'])&&ionosBytes('unbound-pdf')==='unknown legacy');
+});
 $properties=ionosItem($id)['appProperties'];ionosWrite(['appProperties'=>array_replace($properties,['svClaimsProfile'=>'marc'])],null,$id);
 testAdapter('inconsistent-source-binding-profile-blocked',fn()=>blockedAdapter(fn()=>cfrSourceState('case-cw',$cw,'christian',$req),'SOURCE_BINDING_SCOPE_CONFLICT'));
 ionosWrite(['appProperties'=>$properties],null,$id);

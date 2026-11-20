@@ -147,7 +147,7 @@ if($action==='enqueue'){
         $pending->execute([':p'=>$profile,':u'=>(string)$user['email']]);
         if ($pending->fetchColumn()) apiError(409,'Ein Import läuft bereits und wird nicht ersetzt.');
     }
-    $stop=db()->prepare("UPDATE claimsforce_import_jobs SET status='failed',message='Durch einen neuen manuellen Import ersetzt.',phase='CF-FAIL-REPLACED',heartbeat_at=NOW(),finished_at=NOW() WHERE requested_by=:u AND profile=:p AND status IN ('queued','running')");
+    $stop=db()->prepare("UPDATE claimsforce_import_jobs SET status='failed',message='Durch einen neuen manuellen Import ersetzt.',phase='CF-FAIL-REPLACED',heartbeat_at=NOW(),finished_at=NOW() WHERE requested_by=:u AND profile=:p AND status IN ('queued','running') AND sync_mode<>'nativeform'");
     $stop->execute([':p'=>$profile,':u'=>(string)($user['email']??'')]);
     $s=db()->prepare("INSERT INTO claimsforce_import_jobs(profile,status,requested_by,message,phase,sync_mode,since_date,claim_number,source_profiles_json,created_at) VALUES(:p,'queued',:u,:m,'CF-QUEUED',:mode,:since,:claim,:sources,NOW())");
     $s->execute([':p'=>$profile,':u'=>(string)($user['email']??''),':m'=>$syncMode==='full'?'Vollständiger ClaimsForce-Abgleich wartet auf die zentrale Importstation.':($syncMode==='single'?'Einzelfall-Vollimport wartet auf die zentrale Importstation.':'Import wartet auf die zentrale Importstation.'),':mode'=>$syncMode,':since'=>$sinceDate,':claim'=>$claimNumber!==''?$claimNumber:null,':sources'=>json_encode($sourceProfiles)]);
@@ -226,9 +226,10 @@ if($action==='claim'){
     $sourceCapability=version_compare((string)($body['workerVersion']??''),'1.4.66','>=')?'1=1':"sync_mode<>'source'";
     if(version_compare((string)($body['workerVersion']??''),'1.4.70','<'))$sourceCapability.=" AND sync_mode<>'nativeform'";
     if(version_compare((string)($body['workerVersion']??''),'1.4.77','<'))$sourceCapability.=" AND phase<>'CF-NATIVE-CREATE-QUEUED'";
+    if(version_compare((string)($body['workerVersion']??''),'1.4.83','<'))$sourceCapability.=" AND phase<>'CF-NACH-QUEUED'";
     // Den jüngsten expliziten Einzelauftrag zuerst ausführen. Alte, festhängende
     // Warteschlangen dürfen keinen aktuellen Nutzerauftrag blockieren.
-    $claim=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE status='queued' AND profile IN ($profileSlots) AND ($sourceCapability) ORDER BY (sync_mode IN ('single','source')) DESC,(requested_by='system:claimsforce') ASC,created_at DESC,id DESC LIMIT 1 FOR UPDATE");
+    $claim=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE status='queued' AND profile IN ($profileSlots) AND ($sourceCapability) ORDER BY (phase='CF-NACH-QUEUED') DESC,(sync_mode IN ('single','source')) DESC,(requested_by='system:claimsforce') ASC,created_at DESC,id DESC LIMIT 1 FOR UPDATE");
     $claim->execute($stationProfiles);
     $row=$claim->fetch(PDO::FETCH_ASSOC);
     if(!$row){db()->commit();db()->query("SELECT RELEASE_LOCK('svnet-claimsforce-import')");apiJson(['ok'=>true,'job'=>null]);}
@@ -263,7 +264,16 @@ if($action==='complete'){
         $r=is_array($body['result']??null)?$body['result']:[];$request=$job['native_request']??[];
         $identity=$r['after']??$r['snapshot']??$r;
         $valid=($r['source']??'')==='claimsforce-native-form'&&($identity['caseId']??'')===($request['caseId']??'')&&($identity['profile']??'')===($request['profile']??'');
-        if(($request['action']??'')==='save')$valid=$valid&&($r['verified']??false)===true&&($r['operationId']??'')===($request['operationId']??'')&&($identity['formId']??'')===($request['formId']??'');
+        if (($request['action'] ?? '') === 'check_addendum') {
+            $valid = ($r['source'] ?? '') === 'claimsforce-native-addendum'
+                && ($r['readOnly'] ?? false) === true
+                && ($r['operationId'] ?? '') === $request['operationId']
+                && ($r['caseId'] ?? '') === $request['caseId']
+                && ($r['claimNumber'] ?? '') === $request['claimNumber']
+                && ($r['profile'] ?? '') === $request['profile']
+                && ($r['report']['id'] ?? '') === $request['reportId'];
+        }
+        elseif(($request['action']??'')==='save')$valid=$valid&&($r['verified']??false)===true&&($r['operationId']??'')===($request['operationId']??'')&&($identity['formId']??'')===($request['formId']??'');
         elseif(($request['action']??'')==='create')$valid=$valid&&($r['created']??false)===true&&($r['verified']??false)===true&&($r['operationId']??'')===($request['operationId']??'')&&!empty($r['formId'])&&($identity['formId']??'')===$r['formId']&&($identity['status']??'')==='draft'&&($identity['dirty']??null)===false&&($identity['claimNumber']??'')===($request['claimNumber']??'')&&($identity['templateName']??'')===($request['templateName']??'');
         else $valid=$valid&&($r['readOnly']??false)===true;
         if(!$valid){$ok=false;$message='Native Formularprüfung fehlt oder gehört nicht zum beauftragten Fall.';}
