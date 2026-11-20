@@ -43,6 +43,8 @@ console.log('Kleiner Browserauftrag: '+average.toFixed(3)+' ms im Mittel (1000 D
 report.evidence=[{type:'Document',id:fileId}];
 const withFile=await runNativeForm(request,io);
 assert.deepEqual(withFile.report.attachments,[{id:fileId,name:'Rechnung.pdf',version:fileId+'|2026-11-20|111|Rechnung.pdf'}]);
+report.evidence.push({type:'Calculation',id:'ALL'});
+assert.deepEqual((await runNativeForm(request,io)).report.attachments[0],{id:'ALL',name:'Claimsforce-Kalkulation',version:null});
 await assert.rejects(runNativeForm({...request,claimNumber:'FALSCH'},io),/Schadennummer/);
 report.isLocked=true;
 await assert.rejects(runNativeForm(request,io),/kein editierbarer Entwurf/);
@@ -82,6 +84,9 @@ assert.deepEqual(opened,Object.values(formIds));
 assert.equal(assigned.forms.SE.formId,formIds.SE);
 assert.equal(assigned.forms.ZB.formId,formIds.ZB);
 
+const startmask=readFileSync(new URL('../public/intern/claimsforce-startmask.js',import.meta.url),'utf8');
+const submit=startmask.slice(startmask.indexOf('const addendumRequest='),startmask.indexOf('const drawAddendum='));
+assert.ok(!submit.includes('ensureCentralRunner'), 'A targeted readback does not launch the scheduled import page');
 const workflow=readFileSync(new URL('../public/intern/api/claimsforce-workflow.php',import.meta.url),'utf8');
 assert.ok(workflow.indexOf('return cfaWorkflowView($row)')<workflow.indexOf('FROM gf_ai_jobs'));
 assert.ok(workflow.indexOf('Nachträge werden ausschließlich')<workflow.indexOf("if($action==='phase'"));

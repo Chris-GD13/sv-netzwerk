@@ -53,6 +53,7 @@ expect(cfaCheck($plan,$rich)===[],'Rich text conversion failed');
 $cases = [
     'Anrede' => static function(array &$data) { $data['report']['text']=preg_replace('/^.*\n\n/','',$data['report']['text'],1); },
     'Absender' => static function(array &$data) { $data['report']['text']=str_replace('Test Unternehmen','Alter Absender',$data['report']['text']); },
+    'Claimsforce-Kalkulation' => static function(array &$data) { $data['report']['attachments'][]=['id'=>'ALL','name'=>'Claimsforce-Kalkulation']; },
     'unerwartete Anlage' => static function(array &$data) { $data['report']['attachments'][]=['id'=>'older','name'=>'Rechnung.pdf']; },
     'falsche oder nicht belegte Fassung' => static function(array &$data) { $data['report']['attachments'][0]['version']='2026-10-01'; },
     'interne SV-Kosten' => static function(array &$data) { $data['forms']['ZB']['fields'][]=['label'=>'Abzug','value'=>'Deutsche Assist 24,00']; },

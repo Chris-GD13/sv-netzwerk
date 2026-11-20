@@ -226,7 +226,7 @@ if($action==='claim'){
     $sourceCapability=version_compare((string)($body['workerVersion']??''),'1.4.66','>=')?'1=1':"sync_mode<>'source'";
     if(version_compare((string)($body['workerVersion']??''),'1.4.70','<'))$sourceCapability.=" AND sync_mode<>'nativeform'";
     if(version_compare((string)($body['workerVersion']??''),'1.4.77','<'))$sourceCapability.=" AND phase<>'CF-NATIVE-CREATE-QUEUED'";
-    if(version_compare((string)($body['workerVersion']??''),'1.4.83','<'))$sourceCapability.=" AND phase<>'CF-NACH-QUEUED'";
+    if(version_compare((string)($body['workerVersion']??''),'1.4.84','<'))$sourceCapability.=" AND phase<>'CF-NACH-QUEUED'";
     // Den jüngsten expliziten Einzelauftrag zuerst ausführen. Alte, festhängende
     // Warteschlangen dürfen keinen aktuellen Nutzerauftrag blockieren.
     $claim=db()->prepare("SELECT id FROM claimsforce_import_jobs WHERE status='queued' AND profile IN ($profileSlots) AND ($sourceCapability) ORDER BY (phase='CF-NACH-QUEUED') DESC,(sync_mode IN ('single','source')) DESC,(requested_by='system:claimsforce') ASC,created_at DESC,id DESC LIMIT 1 FOR UPDATE");

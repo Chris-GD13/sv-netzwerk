@@ -23,7 +23,6 @@
     };
     addendumInput.addEventListener('change',()=>setScope(true));
     const addendumRequest=async(action,payload)=>{
-      if(action==='check_addendum')ensureCentralRunner();
       const r=await fetch(api+'?action='+action+'&workflow_id='+encodeURIComponent(job.workflow_id),{
         method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({...payload,revision:job.revision})
