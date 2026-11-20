@@ -1,0 +1,49 @@
+name: Victron im Camper prüfen
+on:
+  push:
+    branches: [codex/evcc-server-check]
+    paths: [.github/workflows/camper-victron.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Victron-Geräte und Entitäten prüfen
+        env:
+          SERVER_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SERVER_USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SERVER_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SERVER_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SERVER_HOST"
+          test -n "$SERVER_USER"
+          test -n "$SERVER_PORT"
+          test -n "$SERVER_KEY"
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/evcc_check_key' EXIT
+          printf '%s\n' "$SERVER_KEY" > ~/.ssh/evcc_check_key
+          chmod 600 ~/.ssh/evcc_check_key
+          ssh-keyscan -p "$SERVER_PORT" "$SERVER_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/evcc_check_key -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" 'sh -s' <<'CHECK'
+          set -eu
+          cd /opt/anker-homeassistant/config
+          python3 - <<'PY'
+          import json, pathlib, re
+          root = pathlib.Path('.storage')
+          def records(key, field):
+              return json.loads((root/key).read_text())['data'][field]
+          def victron(row, keys):
+              return any(re.search(r'victron|smartshunt|smartsolar|bluesolar|multiplus|cerbo|orion.tr|lynx shunt|bmv.7|venus.os|ve.direct|ve.bus',str(row.get(k,'')), re.I) for k in keys)
+          entries = {e['entry_id'] for e in records('core.config_entries','entries') if victron(e,['domain','title'])}
+          devices = {d['id'] for d in records('core.device_registry','devices') if victron(d,['manufacturer','model','name','name_by_user','identifiers']) or entries.intersection(d.get('config_entries',[]))}
+          entities = [e for e in records('core.entity_registry','entities') if e.get('device_id') in devices or e.get('config_entry_id') in entries or victron(e,['entity_id','platform','name','original_name','unique_id'])]
+          print(f'INVENTAR Geräte={len(devices)} Integrationen={len(entries)} Entitäten={len(entities)}')
+          for e in entities:
+              print('ZUORDNUNG',e['entity_id'],e.get('unit_of_measurement'),e.get('disabled_by'))
+          PY
+          CHECK
