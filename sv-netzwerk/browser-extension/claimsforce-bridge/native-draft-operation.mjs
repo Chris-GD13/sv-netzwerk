@@ -3,6 +3,12 @@ import {NATIVE_PROFILES, assertFieldLabels, sameFieldLabel} from './native-field
 // success requires a second document load, not merely an acknowledged save.
 const uuid=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
 const protectedFields=new Set(['insurerClaimId','insurerPolicyId','Gesamt','Gesamt Freigabe','Gesamt Restreserve','Endergebnis']);
+export function assertReopenedNativeDraft(request, snapshot) {
+  if (snapshot.caseId !== request.caseId || snapshot.formId !== request.formId || snapshot.profile !== request.profile
+      || snapshot.claimNumber !== request.claimNumber) throw Error('NATIVE_READBACK_IDENTITY_MISMATCH');
+  if (snapshot.status !== 'draft' || snapshot.dirty !== false) throw Error('NATIVE_READBACK_NOT_CLEAN_DRAFT');
+  return snapshot;
+}
 export function validateNativePatch(request,snapshot){
   if(!uuid.test(request.operationId)||!uuid.test(request.caseId)||!uuid.test(request.formId)
     ||!NATIVE_PROFILES.includes(request.profile)||typeof request.claimNumber!=='string'||!request.claimNumber.trim())throw Error('NATIVE_CONTEXT_INVALID');

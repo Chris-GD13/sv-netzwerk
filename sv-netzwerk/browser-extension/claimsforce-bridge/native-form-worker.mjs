@@ -1,6 +1,7 @@
 import {NATIVE_PROFILES} from './native-field-contract.mjs';
 import {openExistingNativeForm} from './native-form-navigation.mjs';
-import {executeNativeDraft} from './native-draft-operation.mjs';
+import {assertReopenedNativeDraft, executeNativeDraft} from './native-draft-operation.mjs';
+import {readNativeAddendum} from './native-addendum-readback.mjs';
 import {runNativeCreate} from './native-create-worker.mjs';
 const hash=async value=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(value))))].map(n=>n.toString(16).padStart(2,'0')).join('');
 let active=false;
@@ -10,6 +11,42 @@ export async function runNativeForm(request,io){
   const timed=result=>({...result,durationMs:Math.max(0,Date.now()-startedAt)});
   let tabId,keep=false;
   try{
+    if (request.action === 'check_addendum') {
+      return await readNativeAddendum(request, {...io, readForms: async request => {
+        const tab = await io.createTab(`https://web.claimsforce.com/claims/${request.caseId}/investigations`);
+        tabId = tab.id;
+        await io.waitTab(tabId);
+        const forms = {};
+        for (const [kind, formId] of Object.entries(request.forms)) {
+          try {
+            const selected = {...request, formId};
+            const ready = await openExistingNativeForm({...selected, tabId, requiredFields:['insurerClaimId']},{
+              clock:Date.now, pause:io.pause, getTab:io.getTab, send:io.send,
+              sessionProfile:async()=>{await io.assertAccount(request.profile);await io.assertVisibleAccount(request.profile,tabId);return request.profile;}
+            });
+            if (!ready.ok) throw Error('Originalformular konnte nicht erneut geöffnet werden.');
+            const response = await io.send(tabId,{...selected,type:'NATIVE_FORM_SNAPSHOT'});
+            if (!response?.ok) throw Error(response?.error || 'Gespeicherte Felder waren nicht lesbar.');
+            const back = await io.send(tabId,{...selected,type:'NAVIGATE_NATIVE_FORM_LIST'});
+            if (!back?.ok) throw Error('Entwurfsstatus nicht bestätigt.');
+            const deadline = Date.now()+4000;
+            let entry;
+            do {
+              const inventory = await io.send(tabId,{type:'NATIVE_FORM_INVENTORY',caseId:request.caseId}).catch(()=>null);
+              const matches = inventory?.result?.filter(f=>f.formId===formId) ?? [];
+              if (matches.length===1 && matches[0].status !== 'unknown') { entry=matches[0]; break; }
+              await io.pause(150);
+            } while (Date.now()<deadline);
+            const names = {SE:'Schlusserklärung', ZB:'Zahlungsbefürwortung'};
+            if (!entry?.templateName?.includes(names[kind])) throw Error('Originalvorlage stimmt nicht mit dem Auftrag überein.');
+            forms[kind] = assertReopenedNativeDraft(selected,{...response.result,status:entry.status});
+          } catch (error) {
+            forms[kind] = {error:String(error.message)};
+          }
+        }
+        return forms;
+      }});
+    }
     if(!['inspect','save','inspect_templates','create'].includes(request.action)||!NATIVE_PROFILES.includes(request.profile)||!/^[a-f0-9-]{36}$/.test(request.caseId))throw Error('NATIVE_REQUEST_INVALID');
     await io.assertAccount(request.profile);
     const tab=await io.createTab(`https://web.claimsforce.com/claims/${request.caseId}/investigations`);tabId=tab.id;

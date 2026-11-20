@@ -29,7 +29,7 @@ const PROFILE_EMAILS = {
 const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], susanne: ['SW'], katja: ['KS'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
-const WORKER_CODE_VERSION = '1.4.82';
+const WORKER_CODE_VERSION = '1.4.83';
 const PORTAL_TAB_PATTERN = 'https://www.sv-netzwerk.eu/intern/*';
 const PORTAL_URL = 'https://www.sv-netzwerk.eu/intern/tagescockpit/';
 const PORTAL_LOGIN_PATTERN = 'https://www.sv-netzwerk.eu/intern/login/*';
@@ -342,10 +342,10 @@ async function readOpenTasks(tabId) {
   return null;
 }
 
-async function requestJson(url, token, optional = false, timeout = 20000) {
+async function requestJson(url, token, optional = false, timeout = 20000, cache = 'default') {
   const controller = new AbortController(), timer = setTimeout(() => controller.abort(), timeout);
   try {
-    const response = await fetch(url, { headers: authHeaders(token), signal: controller.signal });
+    const response = await fetch(url, { headers: authHeaders(token), signal: controller.signal, cache });
     if (optional && response.status === 404) return null;
     if (!response.ok) {
       throw new Error(`ClaimsForce-Abruf fehlgeschlagen (${response.status}).`);
@@ -574,8 +574,14 @@ async function runImport(run) {
   if(run.mode==='nativeform'){
     const request=run.nativeRequest;
     if(!request||request.profile!==run.profile||request.operationId!==run.claimNumber)throw Error('NATIVE_QUEUE_IDENTITY_MISMATCH');
-    await prepareReadOnlySession(run.profile);
+    const token = await prepareReadOnlySession(run.profile);
     return runNativeForm(request,{
+      config:async()=>{
+        const response=await fetch('https://web.claimsforce.com/config',{signal:AbortSignal.timeout(10000)});
+        if (!response.ok) throw Error('Rücklesen: Claimsforce-Konfiguration nicht verfügbar.');
+        return response.json();
+      },
+      json:(url)=>requestJson(url,token,false,12000,'no-store'),
       assertAccount:profile=>requireReadOnlySession({profile,expectedEmail:PROFILE_EMAILS[profile],emailOf:tokenEmail,readSession:()=>chrome.storage.session.get(['claimsToken','claimsTokenProfile'])}),
       assertVisibleAccount:async(profile,tabId)=>{
         const identity=await chrome.tabs.sendMessage(tabId,{type:'READ_ACCOUNT_IDENTITY'}).catch(()=>null);
