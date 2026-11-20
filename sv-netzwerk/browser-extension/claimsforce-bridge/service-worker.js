@@ -21,12 +21,13 @@ const PROFILE_EMAILS = {
   christian: 'cw@sv-schuett.eu',
   holger: 'hr@sv-schuett.eu',
   marc: 'ms@sv-schuett.eu',
+  jens: 'jm@sv-schuett.eu',
   susanne: 'ws@sv-schuett.eu',
   katja: 'ks@sv-schuett.eu'
 };
 // Das ws@sv-schuett.eu-Konto wird in ClaimsForce aktuell als Susanne Wächter
 // mit dem Kürzel SW angezeigt. JM/WS bleiben als ältere Kontokennungen gültig.
-const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], susanne: ['SW'], katja: ['KS'] };
+const PROFILE_BADGES = { christian: ['CW'], holger: ['HR'], marc: ['MS'], jens: ['JM'], susanne: ['SW'], katja: ['KS'] };
 const BRIDGE_VERSION = chrome.runtime.getManifest().version;
 // Der Manifestwert kann nach einem Dateiaustausch neuer als der laufende Worker sein.
 const WORKER_CODE_VERSION = '1.4.83';

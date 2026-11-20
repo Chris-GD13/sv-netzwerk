@@ -47,6 +47,41 @@ await assert.rejects(runNativeForm({...request,claimNumber:'FALSCH'},io),/Schade
 report.isLocked=true;
 await assert.rejects(runNativeForm(request,io),/kein editierbarer Entwurf/);
 
+report.isLocked=false;
+const formIds={SE:'55555555-5555-4555-8555-555555555555',ZB:'66666666-6666-4666-8666-666666666666'};
+const opened=[];
+let ownedTabs=0;
+let route='/claims/'+caseId+'/investigations';
+const assigned=await runNativeForm({...request,forms:formIds},{
+  ...io,
+  createTab:async()=>{ownedTabs++;return {id:9};},
+  waitTab:async()=>{},
+  getTab:async()=>({url:'https://web.claimsforce.com'+route}),
+  assertVisibleAccount:async()=>{},
+  pause:async()=>{},
+  closeTab:async id=>assert.equal(id,9),
+  send:async(id,message)=>{
+    assert.equal(id,9);
+    if(message.type==='OPEN_EXISTING_NATIVE_FORM'){
+      opened.push(message.formId);route='/claims/'+caseId+'/forms/'+message.formId;return {ok:true};
+    }
+    if(message.type==='READ_FORM_READINESS')return {ok:true,observation:{
+      outerLoaded:true,viewerInitialized:true,identityVerified:true,fieldsReadable:true,fieldsEditable:true}};
+    if(message.type==='NATIVE_FORM_SNAPSHOT')return {ok:true,result:{
+      caseId,formId:message.formId,profile:request.profile,claimNumber:request.claimNumber,dirty:false,fields:[]}};
+    if(message.type==='NAVIGATE_NATIVE_FORM_LIST'){route='/claims/'+caseId+'/investigations';return {ok:true};}
+    if(message.type==='NATIVE_FORM_INVENTORY')return {ok:true,result:[
+      {formId:formIds.SE,status:'draft',templateName:'SV Schlusserklärung'},
+      {formId:formIds.ZB,status:'draft',templateName:'SV Zahlungsbefürwortung'}
+    ]};
+    assert.fail('Unexpected form operation '+message.type);
+  }
+});
+assert.equal(ownedTabs,1);
+assert.deepEqual(opened,Object.values(formIds));
+assert.equal(assigned.forms.SE.formId,formIds.SE);
+assert.equal(assigned.forms.ZB.formId,formIds.ZB);
+
 const workflow=readFileSync(new URL('../public/intern/api/claimsforce-workflow.php',import.meta.url),'utf8');
 assert.ok(workflow.indexOf('return cfaWorkflowView($row)')<workflow.indexOf('FROM gf_ai_jobs'));
 assert.ok(workflow.indexOf('Nachträge werden ausschließlich')<workflow.indexOf("if($action==='phase'"));
