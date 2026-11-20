@@ -221,7 +221,7 @@ assert(portal.includes('Aufträge aus Claims einlesen'));
 assert(claimsCentral.includes('target.textContent=`Import für ${profileNames[rawProfile]}${folder?` · Ziel: ${folder}`') || portal.includes('target.textContent=`Import für ${names[raw]}${folder?` · Ziel: ${folder}`'), 'Ausgewählter Sachverständiger und persönlicher Fallordner werden als Importziel angezeigt');
 assert(claimsCentral.includes('supportedProfiles.includes(rawProfile)') && claimsCentral.includes('supportedProfiles.includes(raw)'), 'Portal übergibt ausschließlich ein validiertes Bearbeiterprofil');
 assert(portal.includes('Claims-Zugangsdaten verwalten'));
-assert(portal.includes('claimsforce-central.js?v=20261011-2'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
+assert(portal.includes('claimsforce-central.js?v=20261120-1'), 'Portal lädt die korrigierte Brückensteuerung ohne alten Browsercache');
 assert(portal.includes('Schadennummer für Vollimport') && portal.includes('Diesen Schaden vollständig einlesen'), 'Der Vollimport ist als gezielter Einzelfallimport mit Schadennummer beschrieben');
 assert(dashboard.includes('<input id="vf-claims-number" type="text">') && !dashboard.includes('value="2026-01-01"'), 'Dashboard-Host stellt das Feld für die Einzelfall-Schadennummer ohne voreingestellten Filter bereit');
 for (const [key, label] of [['christian','Christian Wächter'],['holger','Holger Roth'],['marc','Marc Schütt'],['jens','Jens Maurer']]) assert(portal.includes(`<option value="${key}">${label}</option>`), `${label} ist als Bearbeiterprofil auswählbar`);
@@ -230,7 +230,7 @@ assert(portal.includes("sessionStorage.removeItem('svnet-case')") && portal.incl
 
 const bridge = fs.readFileSync(path.join(root, 'browser-extension/claimsforce-bridge/portal-bridge.js'), 'utf8');
 assert(bridge.includes('mergeBlank(existing?.meta || {}, message.mapped)'), 'Import ergänzt bestehende Falldaten nur in leeren Feldern');
-assert(bridge.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'susanne', 'katja']") && bridge.includes('profileKey(event.data.profile)'), 'Portal-Brücke übernimmt nur das ausdrücklich übergebene unterstützte Profil');
+assert(bridge.includes("SUPPORTED_PROFILES = ['christian', 'holger', 'marc', 'jens', 'susanne', 'katja']") && bridge.includes('profileKey(event.data.profile)'), 'Portal-Brücke übernimmt nur das ausdrücklich übergebene unterstützte Profil');
 assert(!bridge.includes("profile: event.data.profile || 'self'") && !bridge.includes("profile: event.data.profile || 'christian'"), 'Portal-Brücke darf ein übergebenes Profil nicht stillschweigend ersetzen');
 assert(bridge.includes('PORTAL_SYNC_STATE') && bridge.includes('PORTAL_COMMIT_SYNC'), 'Portal stellt einen dauerhaften Änderungsstand pro ClaimsForce-Fall bereit');
 assert(bridge.includes("action=save_case"), 'Import nutzt den angemeldeten bzw. von Susanne ausgewählten persönlichen Fallordner');
