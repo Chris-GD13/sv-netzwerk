@@ -308,7 +308,7 @@ assert(queue.includes('claimsforce_import_jobs') && queue.includes("$action==='c
 assert(queue.includes('heartbeat_at') && queue.includes("$action==='heartbeat'") && queue.includes("$action==='active'"), 'Verwaiste Browserimporte müssen per Heartbeat erkannt werden');
 assert(queue.includes("phase='CF-FAIL-STALE'") && queue.includes('cqFailStaleRuns()'), 'Unterbrochene Importe müssen sicher fehlschlagen statt erneut eingeplant zu werden');
 assert(queue.includes("phase='CF-FAIL-REPLACED'") && queue.includes("status IN ('queued','running')"), 'Ein neuer manueller Import muss ältere eigene Profilaufträge eindeutig ersetzen');
-assert(queue.includes("$syncMode=$claimNumber!==''?'single':") && queue.includes("ORDER BY (sync_mode IN ('single','source')) DESC,(requested_by='system:claimsforce') ASC"), 'Einzelfälle und direkte Quellenabrufe werden vor automatischen Sammelläufen eingeplant');
+assert(queue.includes("$syncMode=$claimNumber!==''?'single':") && queue.includes("ORDER BY (phase='CF-NACH-QUEUED') DESC,(sync_mode IN ('single','source')) DESC,(requested_by='system:claimsforce') ASC"), 'Einzelfälle und direkte Quellenabrufe werden vor automatischen Sammelläufen eingeplant');
 assert(queue.includes("$action==='schedule'") && queue.includes("new DateTimeZone('Europe/Berlin')"), 'Werktagsautomatik muss serverseitig in Berliner Zeit geplant werden');
 assert(queue.includes('$weekday>5||$clock<300||$clock>=1000'), 'Automatik darf nur Montag bis Freitag ab 03:00 Uhr innerhalb des Nachholfensters eingeplant werden');
 assert(queue.includes('uq_claims_schedule_key') && queue.includes('INSERT IGNORE INTO claimsforce_import_jobs'), 'Pro Arbeitstag, Profil und Importmodus darf höchstens ein Automatikauftrag entstehen');
