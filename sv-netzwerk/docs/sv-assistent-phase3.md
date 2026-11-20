@@ -89,8 +89,8 @@ Provider aus. Kein echter API-Key oder externer Modellaufruf wird dafür verwend
 
 ## Inventar vorhandener KI-Pfade
 
-Aktiver Deploymentbaum ist `sv-netzwerk/`. Dort wurden 13 tatsächliche `curl_exec`-
-Transportstellen in neun Dateien erfasst. Auch Datei-/Vector-Store-Verwaltung und
+Aktiver Deploymentbaum ist `sv-netzwerk/`. Dort wurden 14 tatsächliche `curl_exec`-
+Transportstellen in zehn Dateien erfasst. Auch Datei-/Vector-Store-Verwaltung und
 File-Search sind berücksichtigt, weil sie Modellverarbeitung bzw. Folgekosten vorbereiten.
 Alle folgenden Pfade bleiben **legacy / bisherige, nicht neu zugeordnete Kosten**:
 
@@ -104,6 +104,7 @@ Alle folgenden Pfade bleiben **legacy / bisherige, nicht neu zugeordnete Kosten*
 | insurance-case-extract.php | case-extract ×1 | Bestehende Anlage/Extraktion von Fallmetadaten. |
 | kva-release.php | kva-http ×1 | KVA-Prüfung inkl. kva-release-core-v2.php; case-analysis.php und case-work.php/Worker; document-review.php; Datei-Uploads/-Löschungen und Responses über krHttp. |
 | polycam-measurement-extract.php | polycam-http ×1 | Bestehende Aufmaßextraktion, Upload und Responses. |
+| spesen.php | spesen-http ×1 | Spesen-Belegauslesung (OpenAI Responses); derselbe HTTP-Helfer bedient auch Microsoft Graph. |
 | services/AiService.php | ai-service ×1 | ai-import.php, Dokument-/Bildanalyse, OCR und Beschlagerkennung über chat/completions. |
 
 Andere HTTP-Helfer für Graph/Drive/Kalender/Claims erhalten keine Modellkosten-
