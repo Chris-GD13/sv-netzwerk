@@ -1,0 +1,53 @@
+name: Verify Camper OpenVPN
+on:
+  push:
+    branches: [codex/diagnose-camper-route-20261121]
+    paths: [.github/workflows/verify-camper-openvpn.yml]
+permissions: {}
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Check tunnel state and the Home Assistant network path
+        shell: bash
+        env:
+          SSH_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+          HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+        run: |
+          set -euo pipefail
+          scratch=$(mktemp -d)
+          trap 'rm -rf "$scratch"' EXIT
+          umask 077
+          printf '%s\n' "$SSH_KEY" > "$scratch/key"
+          ssh-keyscan -T 8 -p "$PORT" "$HOST" > "$scratch/known_hosts" 2>/dev/null
+          ssh -i "$scratch/key" -o IdentitiesOnly=yes -o BatchMode=yes \
+            -o ConnectTimeout=8 -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$scratch/known_hosts" -p "$PORT" "$USER@$HOST" 'sh -s' <<'REMOTE'
+          set -eu
+          systemctl is-active --quiet openvpn-server@camper.service
+          systemctl is-active --quiet camper-vpn-guard.service
+          echo 'Server and restricted tunnel firewall: active'
+          if journalctl -u openvpn-server@camper --since '20 min ago' -o cat | grep -q 'Peer Connection Initiated'; then
+            echo 'Client successfully authenticated: yes'
+          else
+            echo 'Client successfully authenticated: no'
+          fi
+          if journalctl -u openvpn-server@camper --since '20 min ago' -o cat | grep -Eq 'TLS Error|VERIFY ERROR|AUTH_FAILED|TLS Auth Error'; then
+            echo 'Client handshake errors: yes'
+          else
+            echo 'Client handshake errors: no'
+          fi
+          if timeout 5 bash -c 'exec 3<>/dev/tcp/192.168.1.112/6053' 2>/dev/null; then
+            echo 'VPS can reach ESPHome: yes'
+          else
+            echo 'VPS can reach ESPHome: no'
+          fi
+          if timeout 8 docker exec anker-homeassistant python3 -c 'import socket; socket.create_connection(("192.168.1.112", 6053), 5).close()' 2>/dev/null; then
+            echo 'Home Assistant can reach ESPHome: yes'
+          else
+            echo 'Home Assistant can reach ESPHome: no'
+          fi
+          REMOTE
