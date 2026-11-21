@@ -1,0 +1,48 @@
+name: Prepare Camper OpenVPN
+on:
+  push:
+    branches: [codex/diagnose-camper-route-20261121]
+    paths: [.github/workflows/prepare-camper-openvpn.yml]
+permissions: {}
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - name: Inspect the VPS and generate its dedicated certificate request
+        shell: bash
+        env:
+          SSH_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+          HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          USER: ${{ secrets.PORTAL_SFTP_USERNAME }}
+        run: |
+          set -euo pipefail
+          scratch=$(mktemp -d)
+          trap 'rm -rf "$scratch"' EXIT
+          umask 077
+          printf '%s\n' "$SSH_KEY" > "$scratch/key"
+          ssh-keyscan -T 8 -p "$PORT" "$HOST" > "$scratch/known_hosts" 2>/dev/null
+          ssh -i "$scratch/key" -o IdentitiesOnly=yes -o BatchMode=yes \
+            -o ConnectTimeout=8 -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$scratch/known_hosts" -p "$PORT" "$USER@$HOST" 'sh -s' <<'REMOTE'
+          set -eu
+          test "$(id -u)" = 0
+          awk -F= '$1=="ID" || $1=="VERSION_ID" {print "System: " $0}' /etc/os-release
+          printf 'IPv4 forwarding: '; sysctl -n net.ipv4.ip_forward
+          if test -c /dev/net/tun; then echo 'TUN device: ready'; else echo 'TUN device: missing'; fi
+          if ss -Hlun 'sport = :1194' | grep -q .; then echo 'UDP 1194: occupied'; else echo 'UDP 1194: free'; fi
+          if command -v ufw >/dev/null && ufw status | grep -q '^Status: active'; then echo 'UFW: active'; fi
+          if command -v nft >/dev/null; then nft -j list tables | python3 -c 'import json,sys; print("Firewall tables: " + " ".join(x["table"]["family"]+":"+x["table"]["name"] for x in json.load(sys.stdin)["nftables"] if "table" in x))'; fi
+          docker ps --format '{{.Names}} {{.Image}}' | awk '/home.assistant/ {print "Home Assistant container: " $1}'
+          if ip -4 route show | grep -q '^10\.77\.67\.0/24'; then echo 'VPN subnet candidate: occupied'; else echo 'VPN subnet candidate: free'; fi
+          umask 077
+          work=/var/lib/camper-openvpn
+          test ! -L "$work"
+          install -d -m 700 "$work"
+          if test ! -s "$work/server.key"; then
+            openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out "$work/server.key" 2>/dev/null
+          fi
+          openssl req -new -key "$work/server.key" -out "$work/server.csr" -subj /CN=camper-ionos
+          cat "$work/server.csr"
+          REMOTE
