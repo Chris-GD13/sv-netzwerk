@@ -64,8 +64,13 @@ jobs:
           access_token="$(printf '%s' "$token_json" | jq -r .access_token)"
           test -n "$access_token" -a "$access_token" != null
           if [ -z "$folder_id" ]; then
-            folder_json="$(curl --fail --silent --show-error -X POST "https://www.googleapis.com/drive/v3/files?fields=id&supportsAllDrives=true" -H "Authorization: Bearer $access_token" -H 'Content-Type: application/json' --data '{"name":"SV-Netzwerk Backups","mimeType":"application/vnd.google-apps.folder"}')"
-            folder_id="$(printf '%s' "$folder_json" | jq -r .id)"
+            query="name = 'SV-Netzwerk Backups' and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+            folders="$(curl --fail --silent --show-error --get "https://www.googleapis.com/drive/v3/files" -H "Authorization: Bearer $access_token" --data-urlencode "q=$query" --data-urlencode "fields=files(id)" --data-urlencode "pageSize=1")"
+            folder_id="$(printf '%s' "$folders" | jq -r '.files[0].id // empty')"
+            if [ -z "$folder_id" ]; then
+              folder_json="$(curl --fail --silent --show-error -X POST "https://www.googleapis.com/drive/v3/files?fields=id&supportsAllDrives=true" -H "Authorization: Bearer $access_token" -H 'Content-Type: application/json' --data '{"name":"SV-Netzwerk Backups","mimeType":"application/vnd.google-apps.folder"}')"
+              folder_id="$(printf '%s' "$folder_json" | jq -r .id)"
+            fi
             test -n "$folder_id" -a "$folder_id" != null
           fi
           metadata="$(jq -n --arg name "$(basename "$ARCHIVE")" --arg parent "$folder_id" '{name:$name,parents:[$parent]}')"
