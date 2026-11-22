@@ -3,6 +3,9 @@ name: Weekly portal backup to Google Drive
 on:
   schedule:
     - cron: "0 18 * * 5"
+  push:
+    paths:
+      - ".github/workflows/weekly-backup.yml"
   workflow_dispatch:
 
 permissions:
