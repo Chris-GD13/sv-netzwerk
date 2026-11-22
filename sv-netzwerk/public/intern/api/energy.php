@@ -15,7 +15,7 @@ if (!svnetCanAccessEnergy($user)) apiError(403, 'Die Energiesteuerung ist für d
 if (isset($_POST['download'])) {
     if ($method !== 'POST') apiError(405, 'Nur POST ist zulässig.');
     if (($_SERVER['HTTP_ORIGIN'] ?? '') !== 'https://www.sv-netzwerk.eu') apiError(403, 'Download nur aus dem Portal zulässig.');
-    $profiles = ['handy'=>'handy.conf', 'surface'=>'surface.conf', 'laptop'=>'laptop.conf'];
+    $profiles = ['handy'=>'handy.conf', 'surface'=>'surface.conf', 'laptop'=>'laptop.conf', 'cerbo'=>'cerbo.conf'];
     $file = $profiles[(string)$_POST['download']] ?? null;
     if ($file === null) apiError(404, 'Unbekanntes Gerät.');
     $path = '/opt/evcc-energy/client-profiles/'.$file;
@@ -33,4 +33,3 @@ if ($destination === null) apiError(404, 'Unbekannter Dienst.');
 header('Referrer-Policy: no-referrer');
 header('Location: '.$destination, true, 302);
 exit();
-
