@@ -35,7 +35,7 @@ jobs:
 
       - name: Create database and portal archive
         env:
-          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_HOST: db5021006554.hosting-data.io
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASS: ${{ secrets.DB_PASS }}
