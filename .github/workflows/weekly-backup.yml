@@ -34,16 +34,22 @@ jobs:
           printf '%s\n' 'set sftp:connect-program "ssh -a -x -i $HOME/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes"' > ~/.lftp/rc
 
       - name: Create database and portal archive
-        env:
-          DB_HOST: db5021006554.hosting-data.io
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASS: ${{ secrets.DB_PASS }}
         run: |
           set -euo pipefail
           stage="$RUNNER_TEMP/svnet-backup"
           mkdir -p "$stage/portal"
-          mysqldump --single-transaction --routines --triggers --hex-blob             --host="$DB_HOST" --user="$DB_USER" --password="$DB_PASS" "$DB_NAME" > "$stage/database.sql"
+          # Der Dump läuft auf dem Portalserver mit den Zugangsdaten der Server-.env;
+          # Datenbankhost und -zugang werden nicht im Workflow hinterlegt oder geraten.
+          ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT" "$SFTP_USERNAME@$SFTP_HOST" "REMOTE_DIR='$SFTP_REMOTE_DIR' bash -s" > "$stage/database.sql" <<'REMOTE'
+          set -euo pipefail
+          env_get() { sed -n "s/^$1=//p" "$REMOTE_DIR/.env" | tail -n 1 | tr -d '\r'; }
+          db_host="$(env_get DB_HOST)"; db_port="$(env_get DB_PORT)"
+          db_name="$(env_get DB_NAME)"; db_user="$(env_get DB_USER)"; db_pass="$(env_get DB_PASS)"
+          test -n "$db_name" -a -n "$db_user"
+          MYSQL_PWD="$db_pass" mysqldump --single-transaction --routines --triggers --hex-blob \
+            --host="${db_host:-localhost}" --port="${db_port:-3306}" --user="$db_user" "$db_name"
+          REMOTE
+          test -s "$stage/database.sql"
           lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; set net:max-retries 2; open -u $SFTP_USERNAME,key-auth sftp://$SFTP_HOST:$SFTP_PORT; mirror --verbose --parallel=4 --exclude-glob '*.log' '$SFTP_REMOTE_DIR' '$stage/portal'; quit"
           date -u +%Y-%m-%dT%H:%M:%SZ > "$stage/created_at.txt"
           archive="$RUNNER_TEMP/sv-netzwerk-backup-$(date -u +%Y-%m-%d).zip"
@@ -51,11 +57,6 @@ jobs:
           echo "ARCHIVE=$archive" >> "$GITHUB_ENV"
 
       - name: Upload archive to Google Drive
-        env:
-          DB_HOST: db5021006554.hosting-data.io
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASS: ${{ secrets.DB_PASS }}
         run: |
           set -euo pipefail
           stage="$RUNNER_TEMP/drive"
@@ -63,11 +64,12 @@ jobs:
           env_file="$stage/server.env"
           lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,key-auth sftp://$SFTP_HOST:$SFTP_PORT; get '$SFTP_REMOTE_DIR/.env' -o '$env_file'; quit"
           env_get() { sed -n "s/^$1=//p" "$env_file" | tail -n 1; }
+          DB_HOST="$(env_get DB_HOST)"; DB_NAME="$(env_get DB_NAME)"; DB_USER="$(env_get DB_USER)"; DB_PASS="$(env_get DB_PASS)"
           client_id="$(env_get GOOGLE_DRIVE_CLIENT_ID)"
           client_secret="$(env_get GOOGLE_DRIVE_CLIENT_SECRET)"
           refresh_token="$(env_get GOOGLE_DRIVE_REFRESH_TOKEN)"
           db_setting() {
-            mysql --batch --skip-column-names --host="$DB_HOST" --user="$DB_USER" --password="$DB_PASS" "$DB_NAME" -e "SELECT setting_value FROM app_settings WHERE setting_key='$1' LIMIT 1" 2>/dev/null | tail -n 1 || true
+            mysql --batch --skip-column-names --host="${DB_HOST:-localhost}" --user="$DB_USER" --password="$DB_PASS" "$DB_NAME" -e "SELECT setting_value FROM app_settings WHERE setting_key='$1' LIMIT 1" 2>/dev/null | tail -n 1 || true
           }
           client_id="${client_id:-$(db_setting google_drive_client_id)}"
           client_secret="${client_secret:-$(db_setting google_drive_client_secret)}"
