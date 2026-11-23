@@ -17,7 +17,12 @@ jobs:
           CRON_TOKEN: ${{ secrets.APP_SECRET }}
         run: |
           test -n "$CRON_TOKEN"
-          curl --fail --silent --show-error --request POST \
+          status="$(curl --silent --show-error --output response.json --write-out '%{http_code}' --request POST \
             --header "X-SPESEN-CRON: $CRON_TOKEN" \
             --header "Accept: application/json" \
-            "https://www.sv-netzwerk.eu/intern/api/spesen.php?action=monthly_export"
+            "https://www.sv-netzwerk.eu/intern/api/spesen.php?action=monthly_export")"
+          if [ "$status" = "401" ]; then
+            echo "::error::401: Der Server kennt APP_SECRET/SPESEN_CRON_TOKEN nicht. Die Server-.env wurde vermutlich überschrieben (z. B. durch Portal-Setup); Portal-Deployment erneut erfolgreich ausführen."
+          fi
+          cat response.json; echo
+          test "$status" -ge 200 -a "$status" -lt 300
