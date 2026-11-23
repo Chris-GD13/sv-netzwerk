@@ -327,7 +327,7 @@ function ttFormatMinutes(int $minutes): string
 function ttManualDisplayCorrection(array $user): ?array
 {
     return ttIdentity($user) === 'sanne'
-        ? ['balance_minutes' => 31 * 60 + 48, 'compensated_minutes' => 55 * 60]
+        ? ['balance_minutes' => 86 * 60 + 48, 'compensated_minutes' => 55 * 60]
         : null;
 }
 
