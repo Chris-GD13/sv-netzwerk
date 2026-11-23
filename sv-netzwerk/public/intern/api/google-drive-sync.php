@@ -117,7 +117,7 @@ function gdAccessToken(): string {
         $body=json_decode($resp['body'],true);
         if ($resp['status']===200 && !empty($body['access_token'])) return $token=(string)$body['access_token'];
     }
-    apiError(503, 'Google Drive ist noch nicht verbunden. Bitte im Versicherungsportal „Mit Google Drive verbinden“ verwenden.');
+    apiError(503, 'Google Drive ist serverseitig nicht konfiguriert. Bitte die Google-Drive-Zugangsdaten in der Portal-Konfiguration prüfen.');
 }
 
 function gdHttp(string $method,string $url,array $headers=[],?string $body=null,bool $auth=true): array {
