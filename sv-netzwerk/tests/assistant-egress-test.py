@@ -19,7 +19,7 @@ for path in api.rglob('*.php'):
   guards=re.findall(r"curl_exec\(svAiGuardHandle\(\$\w+,'([^']+)'\)\)",text)
   assert len(guards)==text.count('curl_exec('),(str(path),guards)
   hits.extend((str(path.relative_to(api)),i) for i in guards)
-assert len(hits)==13,hits
+assert len(hits)==14,hits
 core=(api/'case-work-assistant-core.php').read_text(encoding='utf-8')
 endpoint=(api/'case-work-assistant.php').read_text(encoding='utf-8')
 assert "define('SVNET_ASSISTANT_REQUEST',true)" in endpoint

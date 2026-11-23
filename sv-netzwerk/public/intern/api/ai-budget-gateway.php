@@ -11,7 +11,7 @@ function svAiBudgetPolicy(string $lane): array {
 }
 function svAiLegacyTransports(): array {
     return ['bki-http','bki-upload','extract-cli','gf-http','gf-smart-http','gf-upload',
-        'gf-evidence-upload','case-extract','kva-http','polycam-http','ai-service'];
+        'gf-evidence-upload','case-extract','kva-http','polycam-http','spesen-http','ai-service'];
 }
 function svAiTransportDecision(string $url,string $transport,string $lane): array {
     $policy=svAiBudgetPolicy($lane);
