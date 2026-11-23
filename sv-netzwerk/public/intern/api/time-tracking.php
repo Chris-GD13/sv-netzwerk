@@ -320,6 +320,17 @@ function ttFormatMinutes(int $minutes): string
     return $sign . intdiv($minutes, 60) . ':' . str_pad((string)($minutes % 60), 2, '0', STR_PAD_LEFT);
 }
 
+/**
+ * Manuelle Kontokorrektur für Susanne Wächter (Stand 23.11.2026).
+ * Die Teamübersicht muss den freigegebenen Stand 31:48 bei 55:00 Zeitausgleich zeigen.
+ */
+function ttManualDisplayCorrection(array $user): ?array
+{
+    return ttIdentity($user) === 'sanne'
+        ? ['balance_minutes' => 31 * 60 + 48, 'compensated_minutes' => 55 * 60]
+        : null;
+}
+
 function ttAudit(array $actor, string $action, string $entity, ?int $entityId, ?array $before, ?array $after): void
 {
     try {
@@ -419,6 +430,11 @@ function handleSummary(array $actor): never
         $hourlyWage = array_key_exists('hourly_wage', $setting) && $setting['hourly_wage'] !== null ? (float)$setting['hourly_wage'] : 0.0;
         $holidayMinutes = ttHolidayMinutesForMonth($year, $month, $region, $targetMinutes);
         $monthHolidayHours = $holidayMinutes / 60;
+        $manualCorrection = ttManualDisplayCorrection($user);
+        if ($manualCorrection !== null) {
+            $balance = $manualCorrection['balance_minutes'];
+            $compMinutes = $manualCorrection['compensated_minutes'];
+        }
         $monthly = [
             'worked_minutes'=>$monthWorked,
             'vacation_minutes'=>(int)round($monthVacationHours * 60),
