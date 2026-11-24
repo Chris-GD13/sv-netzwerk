@@ -172,7 +172,7 @@ function handleLogin(): never
         // Konstante Antwortzeit gegen Timing-Angriffe (gültiger bcrypt-Hash eines Dummy-Passworts)
         password_verify('dummy', '$2y$12$invalidhashpadding000000000000000000000000000zAIlmfxXfhW');
         recordLoginAttempt($ip, $email, 'email_not_found');
-        if (countRecentLoginAttempts($ip, $email, 'email_not_found') >= 2) {
+        if (countRecentLoginAttempts($ip, $email, 'email_not_found') >= 10) {
             apiError(429, $blockedMessage);
         }
         apiError(401, 'Anmeldung fehlgeschlagen.');
@@ -188,7 +188,7 @@ function handleLogin(): never
         // Konstante Antwortzeit gegen Timing-Angriffe (gültiger bcrypt-Hash eines Dummy-Passworts)
         password_verify('dummy', '$2y$12$invalidhashpadding000000000000000000000000000zAIlmfxXfhW');
         recordLoginAttempt($ip, $email, 'wrong_password');
-        if (countRecentLoginAttempts($ip, $email, 'wrong_password') >= 3) {
+        if (countRecentLoginAttempts($ip, $email, 'wrong_password') >= 10) {
             apiError(429, $blockedMessage);
         }
         apiError(401, 'Anmeldung fehlgeschlagen.');
