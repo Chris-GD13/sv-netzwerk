@@ -349,6 +349,40 @@ jobs:
               echo "Google-Drive-Konfiguration: ${google_key}=fehlt"
             fi
           done
+          # Nur Diagnose: vorhandene Google-Werte in der Portal-Datenbank feststellen.
+          # Es werden keine Inhalte oder Geheimnisse ausgegeben.
+          if command -v php >/dev/null 2>&1; then
+            remote_php="$(mktemp)"
+            cat > "$remote_php" <<'PHP'
+<?php
+declare(strict_types=1);
+require $argv[1] . '/intern/api/config.php';
+$keys = [
+    'google_drive_client_id',
+    'google_drive_client_secret',
+    'google_drive_refresh_token',
+    'google_drive_connected_at',
+];
+try {
+    $pdo = db();
+    $stmt = $pdo->prepare('SELECT setting_key, setting_value FROM app_settings WHERE setting_key IN (?,?,?,?)');
+    $stmt->execute($keys);
+    $found = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $found[(string)$row['setting_key']] = trim((string)$row['setting_value']) !== '';
+    }
+    foreach ($keys as $key) {
+        echo 'Google-Drive-Datenbank: ' . strtoupper($key) . '=' . (!empty($found[$key]) ? 'gesetzt' : 'fehlt') . PHP_EOL;
+    }
+} catch (Throwable $e) {
+    echo 'Google-Drive-Datenbank: status=nicht_pruefbar' . PHP_EOL;
+}
+PHP
+            remote_target="/tmp/google-drive-config-${GITHUB_RUN_ID}.php"
+            scp -q -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -P "$SFTP_PORT" "$remote_php" "$SFTP_USERNAME@$SFTP_HOST:$remote_target"
+            ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT" "$SFTP_USERNAME@$SFTP_HOST" "php '$remote_target' '$SFTP_REMOTE_DIR'; rm -f '$remote_target'"
+            rm -f "$remote_php"
+          fi
           {
             printf 'APP_SECRET=%s\n' "$app_secret"
             if [ -n "${PORTAL_OPENAI_ASSISTANT_API_KEY:-}" ]; then
