@@ -282,6 +282,11 @@ jobs:
           PORTAL_WHATSAPP_TOKEN_ENCRYPTION_KEY: ${{ secrets.WHATSAPP_TOKEN_ENCRYPTION_KEY }}
           PORTAL_WHATSAPP_APPOINTMENT_TEMPLATE: ${{ secrets.WHATSAPP_APPOINTMENT_TEMPLATE }}
           PORTAL_WHATSAPP_ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
+          PORTAL_GOOGLE_DRIVE_CLIENT_ID: ${{ secrets.GOOGLE_DRIVE_CLIENT_ID }}
+          PORTAL_GOOGLE_DRIVE_CLIENT_SECRET: ${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}
+          PORTAL_GOOGLE_DRIVE_REFRESH_TOKEN: ${{ secrets.GOOGLE_DRIVE_REFRESH_TOKEN }}
+          PORTAL_GOOGLE_DRIVE_REDIRECT_URI: ${{ secrets.GOOGLE_DRIVE_REDIRECT_URI }}
+          PORTAL_GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON }}
         run: |
           set -euo pipefail
           test -n "$PORTAL_MS_TENANT_ID"
@@ -324,7 +329,19 @@ jobs:
           env_file="$env_dir/server.env"
           trap 'rm -f "$env_file"; rmdir "$env_dir"' EXIT
           lftp -e "set cmd:fail-exit yes; set cmd:interactive false; set sftp:auto-confirm yes; set net:timeout 25; open -u $SFTP_USERNAME,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; get $config_dir/.env -o $env_file; quit"
-          sed -i '/^APP_SECRET=/d;/^OPENAI_ASSISTANT_API_KEY=/d;/^MS_TENANT_ID=/d;/^MS_CLIENT_ID=/d;/^MS_CLIENT_SECRET=/d;/^M365_TENANT_ID=/d;/^M365_CLIENT_ID=/d;/^M365_CLIENT_SECRET=/d;/^WHATSAPP_META_APP_ID=/d;/^WHATSAPP_APP_SECRET=/d;/^WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID=/d;/^WHATSAPP_VERIFY_TOKEN=/d;/^WHATSAPP_TOKEN_ENCRYPTION_KEY=/d;/^WHATSAPP_APPOINTMENT_TEMPLATE=/d;/^WHATSAPP_TEMPLATE_LANGUAGE=/d;/^WHATSAPP_ACCESS_TOKEN=/d;/^GOOGLE_DRIVE_CLIENT_ID=/d;/^GOOGLE_DRIVE_CLIENT_SECRET=/d;/^GOOGLE_DRIVE_REFRESH_TOKEN=/d;/^GOOGLE_DRIVE_REDIRECT_URI=/d;/^GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON=/d' "$env_file"
+          sed -i '/^APP_SECRET=/d;/^OPENAI_ASSISTANT_API_KEY=/d;/^MS_TENANT_ID=/d;/^MS_CLIENT_ID=/d;/^MS_CLIENT_SECRET=/d;/^M365_TENANT_ID=/d;/^M365_CLIENT_ID=/d;/^M365_CLIENT_SECRET=/d;/^WHATSAPP_META_APP_ID=/d;/^WHATSAPP_APP_SECRET=/d;/^WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID=/d;/^WHATSAPP_VERIFY_TOKEN=/d;/^WHATSAPP_TOKEN_ENCRYPTION_KEY=/d;/^WHATSAPP_APPOINTMENT_TEMPLATE=/d;/^WHATSAPP_TEMPLATE_LANGUAGE=/d;/^WHATSAPP_ACCESS_TOKEN=/d' "$env_file"
+          write_optional_env() {
+            local key="$1" value="$2"
+            if [ -n "$value" ]; then
+              sed -i "/^${key}=/d" "$env_file"
+              printf '%s=%s\n' "$key" "$value" >> "$env_file"
+            fi
+          }
+          write_optional_env GOOGLE_DRIVE_CLIENT_ID "$PORTAL_GOOGLE_DRIVE_CLIENT_ID"
+          write_optional_env GOOGLE_DRIVE_CLIENT_SECRET "$PORTAL_GOOGLE_DRIVE_CLIENT_SECRET"
+          write_optional_env GOOGLE_DRIVE_REFRESH_TOKEN "$PORTAL_GOOGLE_DRIVE_REFRESH_TOKEN"
+          write_optional_env GOOGLE_DRIVE_REDIRECT_URI "$PORTAL_GOOGLE_DRIVE_REDIRECT_URI"
+          write_optional_env GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON "$PORTAL_GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON"
           {
             printf 'APP_SECRET=%s\n' "$app_secret"
             if [ -n "${PORTAL_OPENAI_ASSISTANT_API_KEY:-}" ]; then
