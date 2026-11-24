@@ -37,6 +37,13 @@ function gdSettingDelete(string $key): void {
 function gdOauthClientId(): string { return env('GOOGLE_DRIVE_CLIENT_ID', gdSettingGet('google_drive_client_id')); }
 function gdOauthClientSecret(): string { return env('GOOGLE_DRIVE_CLIENT_SECRET', gdSettingGet('google_drive_client_secret')); }
 function gdOauthRefreshToken(): string { return env('GOOGLE_DRIVE_REFRESH_TOKEN', gdSettingGet('google_drive_refresh_token')); }
+function gdOauthServiceAccountConfigured(): bool {
+    $raw = trim(env('GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON', ''));
+    if ($raw === '') return false;
+    if (!str_starts_with($raw, '{')) $raw = (string)(base64_decode($raw, true) ?: $raw);
+    $data = json_decode($raw, true);
+    return is_array($data) && !empty($data['client_email']) && !empty($data['private_key']);
+}
 function gdOauthRedirectUri(): string {
     $configured=env('GOOGLE_DRIVE_REDIRECT_URI','');
     if($configured!=='') return $configured;
@@ -150,8 +157,8 @@ switch($action){
         $clientId=gdOauthClientId();$secret=gdOauthClientSecret();$refresh=gdOauthRefreshToken();
         apiJson([
             'ok'=>true,
-            'client_configured'=>$clientId!=='' && $secret!=='',
-            'connected'=>$refresh!=='',
+            'client_configured'=>($clientId!=='' && $secret!=='') || gdOauthServiceAccountConfigured(),
+            'connected'=>$refresh!=='' || gdOauthServiceAccountConfigured(),
             'redirect_uri'=>gdOauthRedirectUri(),
             'can_configure'=>(($user['role']??'')==='administrator'),
         ]);
@@ -168,7 +175,13 @@ switch($action){
 
     case 'start':
         $clientId=gdOauthClientId();$secret=gdOauthClientSecret();
-        if($clientId==='' || $secret==='') apiError(503,'Google-OAuth-Client ist noch nicht konfiguriert.');
+        if($clientId==='' || $secret==='') {
+            if (gdOauthServiceAccountConfigured()) {
+                header('Location: /intern/versicherungsfaelle/?google_drive=connected&mode=service_account', true, 302);
+                exit;
+            }
+            apiError(503,'Google-OAuth-Client ist noch nicht konfiguriert.');
+        }
         $state=gdOauthCreateState($user);
         $url='https://accounts.google.com/o/oauth2/v2/auth?'.http_build_query([
             'client_id'=>$clientId,
