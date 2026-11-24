@@ -187,17 +187,11 @@ loadEnv();
 
 function env(string $key, string $default = ''): string
 {
-    // Leere Einträge in der Server-.env dürfen gespeicherte Portalwerte
-    // nicht überdecken. Das ist besonders relevant für Google-Drive-OAuth,
-    // dessen Clientdaten nach der Einrichtung in app_settings liegen können.
-    if (isset($_ENV[$key]) && trim((string) $_ENV[$key]) !== '') {
+    if (isset($_ENV[$key])) {
         return (string) $_ENV[$key];
     }
     $val = getenv($key);
-    if ($val !== false && trim((string) $val) !== '') {
-        return (string) $val;
-    }
-    return $default;
+    return $val !== false ? $val : $default;
 }
 
 /** Gibt den konfigurierten Projektnamen zurück. */
