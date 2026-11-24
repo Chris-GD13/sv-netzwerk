@@ -9,12 +9,13 @@ $user = requireAuth();
 $email = mb_strtolower(trim((string)($user['email'] ?? '')), 'UTF-8');
 $name = mb_strtolower(trim((string)($user['full_name'] ?? '')), 'UTF-8');
 $isSusanne = $email === 'ws@sv-schuett.eu' || str_contains($name, 'susanne wächter') || str_contains($name, 'susanne waechter');
+$isPruefer = ($user['role'] ?? '') === 'pruefer';
 $defaultInstallUrl = 'https://chatgpt.com/codex/open-app?target=plugin&plugin_id=Plugin_636243ee5d9481919ece3f9a5af9adc3';
 $configuredInstallUrl = trim(env('SV_CHATGPT_PLUGIN_INSTALL_URL', ''));
 $installUrl = $configuredInstallUrl !== '' ? $configuredInstallUrl : $defaultInstallUrl;
 $launchUrl = trim(env('SV_CHATGPT_PLUGIN_LAUNCH_URL', '')) ?: $installUrl;
 
-if ($isSusanne) {
+if ($isSusanne || $isPruefer) {
     apiJson([
         'ok'=>true,
         'required'=>false,
