@@ -342,22 +342,6 @@ jobs:
           write_optional_env GOOGLE_DRIVE_REFRESH_TOKEN "$PORTAL_GOOGLE_DRIVE_REFRESH_TOKEN"
           write_optional_env GOOGLE_DRIVE_REDIRECT_URI "$PORTAL_GOOGLE_DRIVE_REDIRECT_URI"
           write_optional_env GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON "$PORTAL_GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON"
-          for google_key in GOOGLE_DRIVE_CLIENT_ID GOOGLE_DRIVE_CLIENT_SECRET GOOGLE_DRIVE_REFRESH_TOKEN GOOGLE_DRIVE_REDIRECT_URI GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON; do
-            if grep -q "^${google_key}=" "$env_file"; then
-              echo "Google-Drive-Konfiguration: ${google_key}=gesetzt"
-            else
-              echo "Google-Drive-Konfiguration: ${google_key}=fehlt"
-            fi
-          done
-          # Nur Diagnose: vorhandene Google-Werte in der Portal-Datenbank feststellen.
-          # Es werden keine Inhalte oder Geheimnisse ausgegeben.
-          if command -v php >/dev/null 2>&1; then
-            remote_target="/tmp/google-drive-config-${GITHUB_RUN_ID}.php"
-            printf '%s' 'PD9waHAKZGVjbGFyZShzdHJpY3RfdHlwZXM9MSk7CnJlcXVpcmUgJGFyZ3ZbMV0gLiAnL2ludGVybi9hcGkvY29uZmlnLnBocCc7CiRrZXlzID0gWwogICAgJ2dvb2dsZV9kcml2ZV9jbGllbnRfaWQnLAogICAgJ2dvb2dsZV9kcml2ZV9jbGllbnRfc2VjcmV0JywKICAgICdnb29nbGVfZHJpdmVfcmVmcmVzaF90b2tlbicsCiAgICAnZ29vZ2xlX2RyaXZlX2Nvbm5lY3RlZF9hdCcsCl07CnRyeSB7CiAgICAkcGRvID0gZGIoKTsKICAgICRzdG10ID0gJHBkby0+cHJlcGFyZSgnU0VMRUNUIHNldHRpbmdfa2V5LCBzZXR0aW5nX3ZhbHVlIEZST00gYXBwX3NldHRpbmdzIFdIRVJFIHNldHRpbmdfa2V5IElOICg/LD8sPyw/KScpOwogICAgJHN0bXQtPmV4ZWN1dGUoJGtleXMpOwogICAgJGZvdW5kID0gW107CiAgICB3aGlsZSAoJHJvdyA9ICRzdG10LT5mZXRjaChQRE86OkZFVENIX0FTU09DKSkgewogICAgICAgICRmb3VuZFsoc3RyaW5nKSRyb3dbJ3NldHRpbmdfa2V5J11dID0gdHJpbSgoc3RyaW5nKSRyb3dbJ3NldHRpbmdfdmFsdWUnXSkgIT09ICcnOwogICAgfQogICAgZm9yZWFjaCAoJGtleXMgYXMgJGtleSkgewogICAgICAgIGVjaG8gJ0dvb2dsZS1Ecml2ZS1EYXRlbmJhbms6ICcgLiBzdHJ0b3VwcGVyKCRrZXkpIC4gJz0nIC4gKCFlbXB0eSgkZm91bmRbJGtleV0pID8gJ2dlc2V0enQnIDogJ2ZlaGx0JykgLiBQSFBfRU9MOwogICAgfQp9IGNhdGNoIChUaHJvd2FibGUgJGUpIHsKICAgIGVjaG8gJ0dvb2dsZS1Ecml2ZS1EYXRlbmJhbms6IHN0YXR1cz1uaWNodF9wcnVlZmJhcicgLiBQSFBfRU9MOwp9Cg==' | base64 -d | ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT" "$SFTP_USERNAME@$SFTP_HOST" "cat > '$remote_target'"
-            ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT" "$SFTP_USERNAME@$SFTP_HOST" "php '$remote_target' '$SFTP_REMOTE_DIR'; rm -f '$remote_target'"
-            echo "Google-Drive-Sicherungen:"
-            ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT" "$SFTP_USERNAME@$SFTP_HOST" 'if [ -d /root/svnet-credential-backups ]; then find /root/svnet-credential-backups -maxdepth 3 -type f -printf "%p\\n" | sort; else echo "Sicherungsordner fehlt"; fi'
-          fi
           {
             printf 'APP_SECRET=%s\n' "$app_secret"
             if [ -n "${PORTAL_OPENAI_ASSISTANT_API_KEY:-}" ]; then
