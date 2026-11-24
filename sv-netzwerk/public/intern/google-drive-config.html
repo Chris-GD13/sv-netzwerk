@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Google Drive konfigurieren</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, system-ui, sans-serif; }
+    body { margin: 0; min-height: 100vh; background: #f1f5f7; color: #18344d; }
+    main { width: min(680px, calc(100% - 32px)); margin: 48px auto; }
+    section { background: #fff; border: 1px solid #c7d3db; border-radius: 12px; padding: 28px; box-shadow: 0 6px 20px #18344d18; }
+    h1 { margin: 0 0 12px; font-size: 1.8rem; }
+    p { line-height: 1.55; }
+    label { display: block; margin: 20px 0 8px; font-weight: 700; }
+    input { box-sizing: border-box; width: 100%; padding: 13px 14px; border: 1px solid #aebdc8; border-radius: 8px; font: inherit; }
+    button, a.action { display: inline-block; margin-top: 22px; padding: 13px 18px; border: 0; border-radius: 8px; background: #183f5c; color: #fff; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
+    button.secondary, a.secondary { margin-left: 8px; background: #e7eef2; color: #18344d; }
+    #state { margin-top: 18px; white-space: pre-wrap; }
+    .error { color: #9c2e2e; }
+    .ok { color: #17633d; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <section>
+      <h1>Google Drive konfigurieren</h1>
+      <p>Die Portalverbindung benötigt die OAuth-Client-ID und das Client-Secret aus dem Google-Cloud-Projekt. Diese Angaben werden verschlüsselt im Portal gespeichert. Der dauerhafte Zugriff wird anschließend über Google autorisiert.</p>
+      <div id="login-required" class="error" hidden>Bitte zuerst im Portal anmelden.</div>
+      <form id="config-form" hidden>
+        <label for="client-id">Client-ID</label>
+        <input id="client-id" name="client_id" autocomplete="off" required>
+        <label for="client-secret">Client-Secret</label>
+        <input id="client-secret" name="client_secret" type="password" autocomplete="new-password" required>
+        <button type="submit">Konfiguration speichern</button>
+        <a class="action secondary" href="/intern/api/google-drive-oauth.php?action=start">Google Drive autorisieren</a>
+      </form>
+      <p id="state" role="status" aria-live="polite">Verbindung wird geprüft.</p>
+      <p><a href="/intern/versicherungsfaelle/">Zurück zu den Versicherungsfällen</a></p>
+    </section>
+  </main>
+  <script>
+    const form = document.getElementById('config-form');
+    const state = document.getElementById('state');
+    const loginRequired = document.getElementById('login-required');
+    const setState = (message, type = '') => {
+      state.textContent = message;
+      state.className = type;
+    };
+    async function loadStatus() {
+      try {
+        const response = await fetch('/intern/api/google-drive-oauth.php?action=status', { credentials: 'same-origin' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Anmeldung erforderlich.');
+        if (!data.can_configure) {
+          throw new Error('Nur Administratoren dürfen die Google-Drive-Verbindung einrichten.');
+        }
+        form.hidden = false;
+        setState(data.client_configured ? 'OAuth-Client ist hinterlegt. Jetzt kann die Autorisierung gestartet werden.' : 'OAuth-Client-ID und Client-Secret fehlen noch.');
+      } catch (error) {
+        loginRequired.hidden = false;
+        setState(error.message, 'error');
+      }
+    }
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      setState('Speichere Konfiguration.');
+      const response = await fetch('/intern/api/google-drive-oauth.php?action=save_client', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: document.getElementById('client-id').value.trim(),
+          client_secret: document.getElementById('client-secret').value.trim()
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setState(data.error || 'Konfiguration konnte nicht gespeichert werden.', 'error');
+        return;
+      }
+      document.getElementById('client-secret').value = '';
+      setState('Konfiguration gespeichert. Klicke jetzt auf „Google Drive autorisieren“.', 'ok');
+    });
+    loadStatus();
+  </script>
+</body>
+</html>
