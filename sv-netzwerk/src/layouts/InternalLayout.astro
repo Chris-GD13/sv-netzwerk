@@ -82,7 +82,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
       .chatgpt-onboarding__steps { margin: 18px 0; padding-left: 22px; }
       .chatgpt-onboarding__steps li { margin: 8px 0; }
       .chatgpt-onboarding__actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
-      .chatgpt-onboarding__actions button { padding: 11px 15px; border: 1px solid #18324a; background: #18324a; color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
+      .chatgpt-onboarding__actions button, .chatgpt-onboarding__actions a { display: inline-block; padding: 11px 15px; border: 1px solid #18324a; background: #18324a; color: #fff; font: inherit; font-weight: 800; cursor: pointer; text-decoration: none; }
       .chatgpt-onboarding__actions .secondary { background: #fff; color: #18324a; }
       .chatgpt-onboarding__actions .later { border-color: transparent; background: transparent; color: #526575; }
       .chatgpt-onboarding__state { margin: 16px 0 0; padding: 10px 12px; background: #e9f5eb; border-left: 4px solid #34834b; }
@@ -226,6 +226,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
         <div class="chatgpt-onboarding__actions">
           <button id="chatgpt-onboarding-open" type="button">Plugin jetzt installieren</button>
           <button id="chatgpt-onboarding-check" class="secondary" type="button">Verbindung prüfen</button>
+          <a class="secondary" href="/intern/api/google-drive-oauth.php?action=start">Google Drive verbinden</a>
           <button id="chatgpt-onboarding-later" class="later" type="button">Später</button>
         </div>
         <p id="chatgpt-onboarding-state" class="chatgpt-onboarding__state" role="status" aria-live="polite" hidden></p>
