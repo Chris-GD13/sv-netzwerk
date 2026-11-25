@@ -36,6 +36,19 @@ registerRoute(
   new NetworkOnly()
 );
 
+// These responses contain the signed-in user's workload and permissions.
+// They must never be served from the shared API cache.
+const privateApiPaths = new Set([
+  '/intern/api/google-drive-sync.php',
+  '/intern/api/claimsforce-queue.php',
+  '/intern/api/revenue-summary-v2.php',
+]);
+
+registerRoute(
+  ({ url }) => privateApiPaths.has(url.pathname),
+  new NetworkOnly()
+);
+
 // API calls - Network First with short timeout
 registerRoute(
   ({ url }) => url.pathname.startsWith('/intern/api/'),
@@ -98,4 +111,5 @@ self.addEventListener('activate', (event) => {
     ])
   );
 });
+
 
