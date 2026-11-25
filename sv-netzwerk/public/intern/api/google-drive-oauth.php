@@ -173,7 +173,7 @@ switch($action){
             ]);
         } catch (Throwable $error) {
             error_log('[google-drive-oauth] status failed '.get_class($error).': '.$error->getMessage());
-            apiError(503, 'Google-Drive-Status konnte nicht gelesen werden ('.get_class($error).': '.mb_substr($error->getMessage(), 0, 240).').');
+            apiError(503, 'Google-Drive-Status konnte nicht gelesen werden.');
         }
 
     case 'save_client':
@@ -210,7 +210,7 @@ switch($action){
             header('Location: '.$url, true, 302);exit;
         } catch (Throwable $error) {
             error_log('[google-drive-oauth] start failed '.get_class($error).': '.$error->getMessage());
-            apiError(503, 'Google-Drive-Autorisierung konnte nicht gestartet werden ('.get_class($error).': '.mb_substr($error->getMessage(), 0, 240).').');
+            apiError(503, 'Google-Drive-Autorisierung konnte nicht gestartet werden.');
         }
 
     case 'disconnect':

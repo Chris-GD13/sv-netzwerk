@@ -82,6 +82,14 @@ function gdSettingGet(string $key, string $default=''): string {
         return $default;
     }
 }
+function gdOauthConfigured(string $key, string $fallback = ''): string {
+    // The deployment keeps the shared config.php in place. Support older
+    // portal configs that do not yet expose envConfigured().
+    if (function_exists('envConfigured')) return envConfigured($key, $fallback);
+    $value = function_exists('env') ? env($key, '') : (getenv($key) ?: '');
+    $value = trim((string)$value);
+    return $value !== '' ? $value : trim($fallback);
+}
 function gdStatusCacheRead(string$key):?array{try{gdEnsureSettingsTable();$s=db()->prepare("SELECT setting_value FROM app_settings WHERE setting_key=:k AND updated_at>=DATE_SUB(NOW(),INTERVAL 45 SECOND) LIMIT 1");$s->execute([':k'=>$key]);$value=$s->fetchColumn();if($value===false)return null;$data=json_decode((string)$value,true);return is_array($data)?$data:null;}catch(Throwable){return null;}}
 function gdStatusCacheWrite(string$key,array$value,array$user):void{try{gdEnsureSettingsTable();$s=db()->prepare('INSERT INTO app_settings(setting_key,setting_value,updated_at,updated_by) VALUES(:k,:v,NOW(),:u) ON DUPLICATE KEY UPDATE setting_value=VALUES(setting_value),updated_at=VALUES(updated_at),updated_by=VALUES(updated_by)');$s->execute([':k'=>$key,':v'=>json_encode($value,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),':u'=>(string)($user['email']??'')]);}catch(Throwable){}}
 
@@ -109,9 +117,9 @@ function gdAccessToken(): string {
             if ($resp['status']===200 && !empty($body['access_token'])) return $token=(string)$body['access_token'];
         }
     }
-    $clientId=envConfigured('GOOGLE_DRIVE_CLIENT_ID',gdSettingGet('google_drive_client_id'));
-    $clientSecret=envConfigured('GOOGLE_DRIVE_CLIENT_SECRET',gdSettingGet('google_drive_client_secret'));
-    $refreshToken=envConfigured('GOOGLE_DRIVE_REFRESH_TOKEN',gdSettingGet('google_drive_refresh_token'));
+    $clientId=gdOauthConfigured('GOOGLE_DRIVE_CLIENT_ID',gdSettingGet('google_drive_client_id'));
+    $clientSecret=gdOauthConfigured('GOOGLE_DRIVE_CLIENT_SECRET',gdSettingGet('google_drive_client_secret'));
+    $refreshToken=gdOauthConfigured('GOOGLE_DRIVE_REFRESH_TOKEN',gdSettingGet('google_drive_refresh_token'));
     if ($clientId!=='' && $clientSecret!=='' && $refreshToken!=='') {
         $resp=gdHttp('POST','https://oauth2.googleapis.com/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['client_id'=>$clientId,'client_secret'=>$clientSecret,'refresh_token'=>$refreshToken,'grant_type'=>'refresh_token']),false);
         $body=json_decode($resp['body'],true);
