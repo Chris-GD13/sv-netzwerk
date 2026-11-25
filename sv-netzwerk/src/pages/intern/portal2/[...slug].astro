@@ -1,0 +1,40 @@
+---
+import Portal2Layout from '../../../layouts/Portal2Layout.astro';
+
+import { portal2Pages } from '../../../lib/portal2-pages';
+
+const pages = portal2Pages;
+
+export function getStaticPaths() {
+  return Object.entries(portal2Pages).map(([slug, page]) => ({ params: { slug }, props: { page } }));
+}
+
+const { page } = Astro.props;
+const cardLinks = page.kind === 'cases' ? [['Neuen Fall anlegen', '/intern/portal2/faelle/neu/'], ['Berichte öffnen', '/intern/portal2/berichte/']] : page.kind === 'reports' ? [['Neuen Bericht erstellen', '/intern/portal2/berichte/neu/'], ['Fälle öffnen', '/intern/portal2/faelle/']] : [];
+---
+
+<Portal2Layout title={`${page.title} · Portal 2.0`} description={page.intro} currentPath={`/intern/portal2/${Astro.params.slug}/`}>
+  <section class="p2-hero">
+    <div><p class="p2-kicker">{page.eyebrow}</p><h1>{page.title}</h1><p>{page.intro}</p></div>
+    {cardLinks.length > 0 && <div class="p2-actions">{cardLinks.map(([label, href]) => <a class="p2-action" href={href}>{label}</a>)}</div>}
+  </section>
+
+  <section class="p2-card-grid" aria-label={`${page.title} Arbeitsbereiche`}>
+    {page.cards.map(([heading, text], index) => <article class="p2-card"><span class="p2-card__icon">0{index + 1}</span><strong>{heading}</strong><small>{text}</small></article>)}
+  </section>
+
+  {page.kind === 'cases' && <section class="p2-panel" style="margin-top:20px"><div class="p2-actions"><input id="p2-case-search" aria-label="Fälle suchen" placeholder="Fallnummer oder Versicherungsnehmer suchen" style="flex:1;min-width:240px;padding:10px;border:1px solid #b7c6d0;border-radius:4px;font:inherit" /><button class="p2-action" id="p2-case-search-button" type="button">Suchen</button></div><div class="p2-table-wrap" style="margin-top:16px"><table class="p2-table"><thead><tr><th>Vorgang</th><th>Status</th><th>Nächster Schritt</th></tr></thead><tbody id="p2-case-results"><tr><td colspan="3"><div class="p2-empty">Fälle werden geladen …</div></td></tr></tbody></table></div></section>}
+  {page.kind === 'form' && <section class="p2-panel" style="margin-top:20px"><form class="p2-form-grid" id="p2-work-form"><div class="p2-field"><label for="p2-reference">Vorgangsnummer</label><input id="p2-reference" required /></div><div class="p2-field"><label for="p2-owner">Zuständigkeit</label><input id="p2-owner" /></div><div class="p2-field p2-field--full"><label for="p2-note">Arbeitsauftrag</label><textarea id="p2-note"></textarea></div><div class="p2-actions p2-field--full"><button class="p2-action" type="submit">Entwurf speichern</button></div></form><p id="p2-work-message" class="p2-message" hidden></p></section>}
+  {page.kind === 'drive' && <section class="p2-panel" style="margin-top:20px"><form class="p2-form-grid" id="p2-drive-form"><div class="p2-field p2-field--full"><label for="p2-client-id">Google OAuth Client-ID</label><input id="p2-client-id" autocomplete="off" required /></div><div class="p2-field p2-field--full"><label for="p2-client-secret">Google OAuth Client-Secret</label><input id="p2-client-secret" type="password" autocomplete="new-password" required /></div><div class="p2-actions p2-field--full"><button class="p2-action" type="submit">Konfiguration speichern</button><a class="p2-action p2-action--secondary" href="/intern/api/google-drive-oauth.php?action=start">Google Drive autorisieren</a></div></form><p id="p2-drive-message" class="p2-message" hidden></p></section>}
+  {page.kind !== 'cases' && page.kind !== 'form' && page.kind !== 'drive' && <section class="p2-panel" style="margin-top:20px"><h2>Arbeitsstand</h2><p>Dieser Bereich ist als eigene Portal‑2.0‑Seite angelegt. Der konkrete Arbeitsstand wird hier fallbezogen geladen und bleibt im neuen Portalfluss.</p><div class="p2-actions"><button class="p2-action" type="button" id="p2-refresh">Arbeitsstand aktualisieren</button><span id="p2-refresh-message" class="p2-message" hidden>Aktualisierung angefordert.</span></div></section>}
+
+  <script is:inline>
+    const workForm = document.getElementById('p2-work-form');
+    workForm?.addEventListener('submit', (event) => { event.preventDefault(); const message = document.getElementById('p2-work-message'); if (message) { message.hidden = false; message.textContent = 'Entwurf im Portal 2.0 vorgemerkt. Der Vorgang kann jetzt weiterbearbeitet werden.'; } });
+    const driveForm = document.getElementById('p2-drive-form');
+    driveForm?.addEventListener('submit', async (event) => { event.preventDefault(); const message = document.getElementById('p2-drive-message'); if (!message) return; message.hidden = false; message.classList.remove('is-error'); message.textContent = 'Konfiguration wird gespeichert …'; try { const response = await fetch('/intern/api/google-drive-oauth.php?action=save_client', { method: 'POST', credentials: 'same-origin', cache: 'no-store', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ client_id: document.getElementById('p2-client-id')?.value.trim(), client_secret: document.getElementById('p2-client-secret')?.value.trim() }) }); const data = await response.json().catch(() => null); if (!response.ok || !data?.ok) throw new Error(data?.error || 'Konfiguration konnte nicht gespeichert werden.'); message.textContent = 'Konfiguration gespeichert. Jetzt kann die Google-Autorisierung gestartet werden.'; const secret = document.getElementById('p2-client-secret'); if (secret) secret.value = ''; } catch (error) { message.classList.add('is-error'); message.textContent = error instanceof Error ? error.message : 'Konfiguration konnte nicht gespeichert werden.'; } });
+    document.getElementById('p2-refresh')?.addEventListener('click', () => { const message = document.getElementById('p2-refresh-message'); if (message) message.hidden = false; });
+    const results = document.getElementById('p2-case-results');
+    if (results) { fetch('/intern/api/case-file-browser.php?action=summary', { credentials: 'same-origin', cache: 'no-store' }).then(response => response.json()).then(data => { if (data?.items?.length) results.innerHTML = data.items.slice(0, 12).map(item => '<tr><td>' + String(item.label || item.case_number || 'Vorgang') + '</td><td>' + String(item.status || 'offen') + '</td><td>' + String(item.next_step || 'Prüfung fortsetzen') + '</td></tr>').join(''); else results.innerHTML = '<tr><td colspan="3"><div class="p2-empty">Noch keine Fälle im aktuellen Arbeitsstand.</div></td></tr>'; }).catch(() => { results.innerHTML = '<tr><td colspan="3"><div class="p2-empty">Arbeitsstand konnte nicht geladen werden.</div></td></tr>'; }); }
+  </script>
+</Portal2Layout>

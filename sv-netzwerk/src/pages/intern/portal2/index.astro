@@ -2,72 +2,76 @@
 import Portal2Layout from '../../../layouts/Portal2Layout.astro';
 ---
 
-<Portal2Layout title="Portal 2.0" description="Eigenständige Arbeitszentrale für Fälle, Berichte, Kalkulation und Organisation.">
-  <div class="p2-shell">
-    <header class="p2-hero">
-      <div>
-        <p class="p2-kicker">Portal 2.0</p>
-        <h1>Arbeitszentrale</h1>
-        <p class="p2-lede">Fälle zuerst. Die wichtigsten Arbeitsschritte sind nach Aufgabe und Bearbeitungsstand geordnet.</p>
-      </div>
-      <div class="p2-hero-actions"><a class="p2-primary" href="/intern/versicherungsfaelle/">Fall öffnen</a><a class="p2-secondary" href="/intern/tagescockpit/">Tagescockpit</a></div>
-    </header>
+<Portal2Layout title="Portal 2.0" description="Eigenständige Arbeitszentrale für Fälle, Aufträge und Entscheidungen." currentPath="/intern/portal2/">
+  <section class="p2-hero">
+    <div>
+      <p class="p2-kicker">Portal 2.0 · Arbeitszentrale</p>
+      <h1>Der nächste sinnvolle Schritt.</h1>
+      <p>Fälle, Aufträge und Ergebnisse liegen in einem eigenen Arbeitsbereich. Jeder Bereich öffnet seine eigene Portal‑2.0‑Oberfläche.</p>
+    </div>
+    <div class="p2-actions"><a class="p2-action" href="/intern/portal2/faelle/">Fall auswählen</a><a class="p2-action p2-action--secondary" href="/intern/portal2/import/claimsforce/">Auftrag einlesen</a></div>
+  </section>
 
-    <section class="p2-status" aria-label="Systemstatus">
-      <div><span class="p2-status-dot" data-state="pending"></span><strong id="p2-drive">Google Drive wird geprüft …</strong><small>Fallakten und Vorlagen</small></div>
-      <div><span class="p2-status-dot" data-state="pending"></span><strong id="p2-claims">ClaimsForce wird geprüft …</strong><small>Importaufträge</small></div>
-      <div><span class="p2-status-dot" data-state="pending"></span><strong id="p2-updated">Stand wird geladen …</strong><small>Letzte Aktualisierung</small></div>
-    </section>
+  <section class="p2-status-grid" aria-label="Systemstatus">
+    <div class="p2-status"><span class="p2-status__dot" data-state="pending"></span><strong id="p2-drive-status">Google Drive wird geprüft …</strong><small>Fallakten und Vorlagen</small></div>
+    <div class="p2-status"><span class="p2-status__dot" data-state="pending"></span><strong id="p2-claims-status">Importstand wird geprüft …</strong><small>ClaimsForce und Rekon</small></div>
+    <div class="p2-status"><span class="p2-status__dot" data-state="pending"></span><strong id="p2-case-status">Arbeitsstand wird geladen …</strong><small>Zuletzt bearbeitete Fälle</small></div>
+  </section>
 
-    <section class="p2-section" aria-labelledby="p2-cases-title">
-      <div class="p2-section-head"><div><p class="p2-eyebrow">01 · Bearbeiten</p><h2 id="p2-cases-title">Fälle und Berichte</h2></div><a href="/intern/versicherungsfaelle/">Alle Fälle</a></div>
-      <div class="p2-grid">
-        <a class="p2-card p2-card--accent" href="/intern/versicherungsfaelle/"><span class="p2-card-icon">⌂</span><span><strong>Versicherungsfälle</strong><small>Fall öffnen, Akte prüfen und Unterlagen bearbeiten</small></span><b>→</b></a>
-        <a class="p2-card" href="/intern/claimsforce/"><span class="p2-card-icon">↻</span><span><strong>ClaimsForce einlesen</strong><small>Neue Fälle und Nachrichten in die Akte übernehmen</small></span><b>→</b></a>
-        <a class="p2-card" href="/intern/kalkulation/"><span class="p2-card-icon">▥</span><span><strong>Kalkulation</strong><small>Erstkalkulation, Nachkalkulation und Belege</small></span><b>→</b></a>
-        <a class="p2-card" href="/intern/zeitwertberechnung/"><span class="p2-card-icon">⌛</span><span><strong>Zeitwert</strong><small>Zeitwertberechnung mit dokumentierter Herleitung</small></span><b>→</b></a>
-      </div>
-    </section>
+  <section class="p2-panel" aria-labelledby="p2-focus-title">
+    <p class="p2-eyebrow">Arbeitsfokus</p>
+    <h2 id="p2-focus-title">Fälle und Entscheidungen</h2>
+    <div class="p2-card-grid">
+      <a class="p2-card" href="/intern/portal2/faelle/"><span class="p2-card__icon">⌂</span><strong>Versicherungsfälle</strong><small>Akten öffnen, Schadenstand prüfen und nächste Schritte festlegen.</small></a>
+      <a class="p2-card" href="/intern/portal2/berichte/"><span class="p2-card__icon">▤</span><strong>Berichte und Ergebnisse</strong><small>Entwürfe, Prüfungen und nachvollziehbare Ergebnisse zusammenführen.</small></a>
+      <a class="p2-card" href="/intern/portal2/kalkulation/"><span class="p2-card__icon">▥</span><strong>Kalkulation</strong><small>KVA, Nachkalkulation und Belege fallbezogen bearbeiten.</small></a>
+    </div>
+  </section>
 
-    <section class="p2-section" aria-labelledby="p2-work-title">
-      <div class="p2-section-head"><div><p class="p2-eyebrow">02 · Organisieren</p><h2 id="p2-work-title">Arbeitsstand</h2></div><a href="/intern/arbeitszentrale/">Arbeitsorganisation</a></div>
-      <div class="p2-grid">
-        <a class="p2-card" href="/intern/aufgaben/"><span class="p2-card-icon">✓</span><span><strong>Aufgaben und Wiedervorlagen</strong><small>Offene Schritte nach Priorität abarbeiten</small></span><b>→</b></a>
-        <a class="p2-card" href="/intern/zeiterfassung/"><span class="p2-card-icon">◷</span><span><strong>Zeiterfassung</strong><small>Arbeitszeit fallbezogen erfassen</small></span><b>→</b></a>
-        <a class="p2-card" href="/intern/kalender/"><span class="p2-card-icon">□</span><span><strong>Kalender und Termine</strong><small>Ortstermine und nächste Schritte im Blick</small></span><b>→</b></a>
-        <a class="p2-card" href="/intern/telefon/"><span class="p2-card-icon">☎</span><span><strong>Telefonzentrale</strong><small>Anrufe aufnehmen und Fällen zuordnen</small></span><b>→</b></a>
-      </div>
-    </section>
+  <section class="p2-panel" aria-labelledby="p2-organise-title">
+    <p class="p2-eyebrow">Arbeitsorganisation</p>
+    <h2 id="p2-organise-title">Aufträge ohne Umwege</h2>
+    <div class="p2-card-grid">
+      <a class="p2-card" href="/intern/portal2/import/claimsforce/"><span class="p2-card__icon">↻</span><strong>ClaimsForce importieren</strong><small>Neue Aufträge und Nachrichten strukturiert in den Arbeitsstand übernehmen.</small></a>
+      <a class="p2-card" href="/intern/portal2/import/rekon/"><span class="p2-card__icon">◌</span><strong>Rekon importieren</strong><small>Rechnungs- und Rekonstruktionsaufträge prüfen und zuordnen.</small></a>
+      <a class="p2-card" href="/intern/portal2/aufgaben/"><span class="p2-card__icon">✓</span><strong>Aufgaben</strong><small>Offene Schritte, Wiedervorlagen und Verantwortlichkeiten im Blick behalten.</small></a>
+      <a class="p2-card" href="/intern/portal2/kalender/"><span class="p2-card__icon">□</span><strong>Termine</strong><small>Ortstermine, Fristen und nächste Entscheidungen gemeinsam planen.</small></a>
+      <a class="p2-card" href="/intern/portal2/zeitwert/"><span class="p2-card__icon">⌛</span><strong>Zeitwert</strong><small>Berechnungen mit Herleitung und dokumentiertem Ergebnis erstellen.</small></a>
+      <a class="p2-card" href="/intern/portal2/versicherungswissen/"><span class="p2-card__icon">▤</span><strong>Versicherungswissen</strong><small>Arbeitsstandards und Fachwissen direkt im Vorgang nutzen.</small></a>
+    </div>
+  </section>
 
-    <section class="p2-section" aria-labelledby="p2-services-title">
-      <div class="p2-section-head"><div><p class="p2-eyebrow">03 · Weitere Bereiche</p><h2 id="p2-services-title">Wissen und Aufträge</h2></div><a href="/intern/versicherungswissen/">Versicherungswissen</a></div>
-      <div class="p2-grid">
-        <a class="p2-card" href="/intern/versicherungswissen/"><span class="p2-card-icon">▤</span><span><strong>Versicherungswissen</strong><small>Arbeitsstandards und Fachwissen</small></span><b>→</b></a>
-        <a class="p2-card" href="/intern/privatauftraege/"><span class="p2-card-icon">⌑</span><span><strong>Privat- und Fenstergutachten</strong><small>Aufträge, Angebote und Gutachten</small></span><b>→</b></a>
-        <a class="p2-card" href="/intern/partner/"><span class="p2-card-icon">◇</span><span><strong>Partner</strong><small>Kontakte und Zusammenarbeit</small></span><b>→</b></a>
-        <a class="p2-card" id="p2-settlement" href="/intern/abrechnungen/" hidden><span class="p2-card-icon">€</span><span><strong>Buchhaltung</strong><small>Abrechnung und offene Positionen</small></span><b>→</b></a>
-      </div>
-    </section>
+  <section class="p2-panel" aria-labelledby="p2-system-title">
+    <p class="p2-eyebrow">Verbindungen</p>
+    <h2 id="p2-system-title">Portal‑2.0‑Systeme</h2>
+    <div class="p2-actions"><a class="p2-action" href="/intern/portal2/google-drive/">Google Drive verbinden</a><a class="p2-action p2-action--secondary" href="/intern/portal2/verwaltung/">Benutzer und Regeln</a><a class="p2-action p2-action--secondary" href="/intern/portal2/partner/">Partner verwalten</a></div>
+  </section>
 
-    <footer class="p2-footer"><span>Portal 2.0 läuft parallel. Das bisherige Portal bleibt über die Facharbeitsplätze erreichbar.</span><a href="/intern/">Bestehendes Portal öffnen</a></footer>
-  </div>
+  <script is:inline>
+    const setStatus = (selector, state, text) => {
+      const target = document.querySelector(selector);
+      if (target) target.textContent = text;
+      const dot = target?.parentElement?.querySelector('.p2-status__dot');
+      if (dot) dot.dataset.state = state;
+    };
+    const getJson = async (url) => {
+      const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store' });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data || data.ok === false) throw new Error(data?.error || ('HTTP ' + response.status));
+      return data;
+    };
+    Promise.allSettled([
+      getJson('/intern/api/google-drive-sync.php?action=status'),
+      getJson('/intern/api/claimsforce-queue.php?action=summary'),
+      getJson('/intern/api/case-file-browser.php?action=summary'),
+    ]).then(([drive, imports, cases]) => {
+      setStatus('#p2-drive-status', drive.status === 'fulfilled' ? 'ok' : 'bad', drive.status === 'fulfilled' ? 'Google Drive erreichbar' : 'Google Drive nicht erreichbar');
+      if (imports.status === 'fulfilled') {
+        const count = Array.isArray(imports.value.items) ? imports.value.items.length : 0;
+        setStatus('#p2-claims-status', 'ok', count ? count + ' Importstände vorhanden' : 'Importstand bereit');
+      } else setStatus('#p2-claims-status', 'bad', 'Importstand nicht erreichbar');
+      if (cases.status === 'fulfilled') setStatus('#p2-case-status', 'ok', 'Arbeitsstand verfügbar');
+      else setStatus('#p2-case-status', 'bad', 'Arbeitsstand nicht erreichbar');
+    });
+  </script>
 </Portal2Layout>
-
-<style is:global>
-  .p2-shell{min-height:calc(100vh - 112px);padding:34px clamp(18px,4vw,56px) 48px;background:#f7f8f9;color:#132b40}.p2-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;max-width:1180px;margin:0 auto 24px}.p2-kicker,.p2-eyebrow{margin:0;color:#9a5400;font-size:.74rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.p2-hero h1{margin:6px 0 9px;color:#071a2e;font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.03em}.p2-lede{max-width:640px;margin:0;color:#526575;font-size:1rem}.p2-hero-actions{display:flex;flex-wrap:wrap;gap:8px}.p2-hero-actions a,.p2-section-head a,.p2-footer a{padding:10px 14px;border:1px solid #18324a;color:#18324a;font-weight:800;text-decoration:none}.p2-hero-actions .p2-primary{background:#18324a;color:#fff}.p2-status{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:1180px;margin:0 auto 34px}.p2-status>div{display:grid;grid-template-columns:10px 1fr;column-gap:9px;align-items:center;padding:13px 15px;border:1px solid #dce2e6;background:#fff}.p2-status-dot{grid-row:1/3;width:8px;height:8px;border-radius:50%;background:#9baab5}.p2-status-dot[data-state="ok"]{background:#2e8148}.p2-status-dot[data-state="bad"]{background:#bc453b}.p2-status strong{font-size:.82rem}.p2-status small{grid-column:2;color:#526575;font-size:.7rem}.p2-section{max-width:1180px;margin:0 auto 28px}.p2-section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:11px}.p2-section-head h2{margin:4px 0 0;color:#071a2e;font-size:1.35rem}.p2-section-head a{padding:6px 9px;border:0;color:#526575;font-size:.78rem}.p2-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.p2-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:11px;min-height:92px;padding:15px;border:1px solid #dce2e6;background:#fff;color:#18324a;text-decoration:none;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}.p2-card:hover,.p2-card:focus-visible{border-color:#f59a23;box-shadow:0 7px 22px rgba(7,26,46,.09);transform:translateY(-2px)}.p2-card--accent{border-top:4px solid #f59a23}.p2-card-icon{display:grid;place-items:center;width:34px;height:34px;background:#eef2f4;color:#9a5400;font-size:1.25rem;font-weight:900}.p2-card strong,.p2-card small{display:block}.p2-card strong{color:#071a2e;font-size:.9rem}.p2-card small{margin-top:4px;color:#526575;font-size:.72rem;line-height:1.35}.p2-card b{color:#9a5400;font-size:1.1rem}.p2-footer{display:flex;justify-content:space-between;gap:14px;max-width:1180px;margin:10px auto 0;padding-top:18px;border-top:1px solid #dce2e6;color:#526575;font-size:.75rem}.p2-footer a{padding:0;border:0;color:#18324a;font-size:.75rem}@media(max-width:900px){.p2-hero{align-items:flex-start;flex-direction:column}.p2-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.p2-shell{padding:24px 14px 36px}.p2-status{grid-template-columns:1fr}.p2-grid{grid-template-columns:1fr}.p2-section-head{align-items:flex-start;flex-direction:column;gap:6px}.p2-footer{align-items:flex-start;flex-direction:column}}
-</style>
-
-<script is:inline>
-(() => {
-  const set=(index,state,id,text)=>{const dot=document.querySelectorAll('.p2-status-dot')[index];if(dot)dot.dataset.state=state;const target=document.getElementById(id);if(target)target.textContent=text};
-  const request=async url=>{const response=await fetch(url,{credentials:'same-origin',cache:'no-store'});const data=await response.json().catch(()=>({}));if(!response.ok||data.ok===false)throw Error(data.error||`HTTP ${response.status}`);return data};
-  Promise.allSettled([request('/intern/api/google-drive-sync.php?action=status'),request('/intern/api/claimsforce-queue.php?action=summary'),request('/intern/api/revenue-summary-v2.php?action=access')]).then(([drive,claims,revenue])=>{
-    if(drive.status==='fulfilled'){const folders=drive.value.folders?.cases?.items;set(0,'ok','p2-drive',Number.isFinite(Number(folders))?`Google Drive · ${folders} Fälle`:'Google Drive erreichbar')}else set(0,'bad','p2-drive','Google Drive nicht erreichbar');
-    let latest='';
-    if(claims.status==='fulfilled'){const items=Array.isArray(claims.value.items)?claims.value.items:[];const open=items.reduce((sum,item)=>sum+(Number.isFinite(Number(item.open_count))?Number(item.open_count):0),0);const dates=items.map(item=>item.updated_at).filter(Boolean).sort();latest=dates.at(-1)||'';set(1,'ok','p2-claims',open?`Gespeicherter Importstand · ${open} offen`:'Gespeicherter Importstand')}else set(1,'bad','p2-claims','Importstand nicht verfügbar');
-    if(revenue.status==='fulfilled'&&revenue.value.show_settlement_link===true){document.querySelectorAll('[data-p2-settlement],#p2-settlement').forEach((element)=>{if(element instanceof HTMLElement)element.hidden=false})}
-    set(2,latest?'ok':'pending','p2-updated',latest?`Importstand · ${new Intl.DateTimeFormat('de-DE',{dateStyle:'medium',timeStyle:'short'}).format(new Date(String(latest).replace(' ','T')+'Z'))}`:'Importstand · Datum unbekannt');
-  });
-})();
-</script>
-
