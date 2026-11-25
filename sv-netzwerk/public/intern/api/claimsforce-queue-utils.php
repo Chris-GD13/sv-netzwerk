@@ -24,7 +24,12 @@ function cqRequireOwner(int$id,array$body):void{
     $s->execute([':id'=>$id]);
     $stored=(string)($s->fetchColumn()?:'');
     if($stored===''||!hash_equals($stored,$key))apiError(409,'Der Auftrag gehört einer anderen Importstation oder läuft nicht mehr.');
-    if(!in_array((string)(cqRow($id)['profile']??''),svnetClaimsStationProfiles(requireAuth()),true))apiError(403,'Dieser Quellzugang ist für die Importstation nicht freigegeben.');
+    $user=requireAuth();
+    // The shared administrator account runs Christian's central station. The
+    // queue endpoint applies this mapping before claiming a job, so the same
+    // mapping must be present when heartbeats and completion are verified.
+    if(strtolower(trim((string)($user['email']??'')))==='info@sv-netzwerk.eu')$user['svnet_expert_profile']='christian';
+    if(!in_array((string)(cqRow($id)['profile']??''),svnetClaimsStationProfiles($user),true))apiError(403,'Dieser Quellzugang ist für die Importstation nicht freigegeben.');
 }
 function cqConfirmHeartbeat(int$id,array$body,int$changedRows):void{
     // MySQL meldet bei gleichen Daten und gleichem NOW()-Sekundenwert 0 Änderungen.
