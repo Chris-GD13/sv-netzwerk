@@ -34,9 +34,17 @@ function gdSettingDelete(string $key): void {
     db()->prepare('DELETE FROM app_settings WHERE setting_key=:k')->execute([':k'=>$key]);
 }
 
-function gdOauthClientId(): string { return envConfigured('GOOGLE_DRIVE_CLIENT_ID', gdSettingGet('google_drive_client_id')); }
-function gdOauthClientSecret(): string { return envConfigured('GOOGLE_DRIVE_CLIENT_SECRET', gdSettingGet('google_drive_client_secret')); }
-function gdOauthRefreshToken(): string { return envConfigured('GOOGLE_DRIVE_REFRESH_TOKEN', gdSettingGet('google_drive_refresh_token')); }
+function gdOauthConfigured(string $key, string $fallback = ''): string {
+    // This endpoint is deployed without replacing the shared config.php. Keep
+    // the OAuth flow compatible with older portal config versions as well.
+    if (function_exists('envConfigured')) return envConfigured($key, $fallback);
+    $value = function_exists('env') ? env($key, '') : (getenv($key) ?: '');
+    $value = trim((string)$value);
+    return $value !== '' ? $value : trim($fallback);
+}
+function gdOauthClientId(): string { return gdOauthConfigured('GOOGLE_DRIVE_CLIENT_ID', gdSettingGet('google_drive_client_id')); }
+function gdOauthClientSecret(): string { return gdOauthConfigured('GOOGLE_DRIVE_CLIENT_SECRET', gdSettingGet('google_drive_client_secret')); }
+function gdOauthRefreshToken(): string { return gdOauthConfigured('GOOGLE_DRIVE_REFRESH_TOKEN', gdSettingGet('google_drive_refresh_token')); }
 function gdOauthServiceAccountConfigured(): bool {
     $raw = trim(env('GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON', ''));
     if ($raw === '') return false;
