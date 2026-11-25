@@ -19,6 +19,12 @@ if (!in_array($user['role'], ['administrator','projektleiter','pruefer','sachver
     apiError(403, 'Keine Berechtigung.');
 }
 
+// The portal administrator account is the explicitly designated Drive operator.
+// Limit this mapping to this integration so the general role/profile rules stay intact.
+if (strtolower(trim((string)($user['email'] ?? ''))) === 'info@sv-netzwerk.eu') {
+    $user['svnet_expert_profile'] = 'christian';
+}
+
 const DEFAULT_CASES_FOLDER_ID = '1dqdQkccdGLuo8ijKerGgYdmNO2cBtD4P';
 const DEFAULT_KNOWLEDGE_FOLDER_ID = '1QeJ4Dz6Upg_W5rahWmKE_7KbC4MMgSGe';
 const DEFAULT_BLANCO_FOLDER_ID = '1_3p6moLBt3cD5Gzy9jvPw3BXpqnAvl2k';
