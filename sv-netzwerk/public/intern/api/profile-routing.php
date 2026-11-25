@@ -15,8 +15,9 @@ function svnetProfileText(string $value): string
 
 function svnetIsBackofficeUser(array $user): bool
 {
-    // Only Susanne may act for Christian; an administrator role grants no case access.
-    return svnetProfileText((string)($user['email'] ?? '')) === 'ws@sv-schuett.eu';
+    // The designated backoffice accounts may act for Christian's shared case inventory.
+    $email = svnetProfileText((string)($user['email'] ?? ''));
+    return in_array($email, ['ws@sv-schuett.eu', 'info@sv-netzwerk.eu'], true);
 }
 
 function svnetUserProfile(array $user): string
