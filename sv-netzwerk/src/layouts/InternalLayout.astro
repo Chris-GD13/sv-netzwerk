@@ -15,6 +15,7 @@ interface Props {
 const props = Astro.props;
 const currentPath = props.currentPath ?? Astro.url.pathname;
 const internalLinks = [
+  { href: '/intern/portal2/', label: 'Portal 2.0', icon: '◈' },
   { href: '/intern/tagescockpit/', label: 'Tagescockpit', icon: '●' },
   { href: '/intern/aufgaben/', label: 'Aufgaben', icon: '✓' },
   { href: '/intern/claimsforce/', label: 'Claims-Auftrag einlesen', icon: '↻' },
