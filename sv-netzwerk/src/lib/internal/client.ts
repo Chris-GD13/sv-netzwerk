@@ -652,11 +652,18 @@ function renderLogin(context: AppContext) {
     return;
   }
 
+  const requestedNext = new URLSearchParams(window.location.search).get('next') ?? '';
+  const portal2Login = requestedNext === '/intern/portal2/' || requestedNext.startsWith('/intern/portal2/');
+  const loginTitle = portal2Login ? 'Portal 2.0' : 'SV-Netzwerk Prüfportal';
+  const loginDescription = portal2Login
+    ? 'Melden Sie sich für die eigenständige Portal-2.0-Arbeitszentrale an.'
+    : 'Der interne Bereich ist nur nach Anmeldung verfuegbar. Benutzerkonten werden ausschliesslich administrativ angelegt.';
+
   context.root.innerHTML = `
     <div class="intern-card intern-login">
-      <p class="sv-eyebrow">Anmeldung</p>
-      <h1>SV-Netzwerk Prüfportal</h1>
-      <p>Der interne Bereich ist nur nach Anmeldung verfuegbar. Benutzerkonten werden ausschliesslich administrativ angelegt.</p>
+      <p class="sv-eyebrow">${portal2Login ? 'Portal 2.0 · Anmeldung' : 'Anmeldung'}</p>
+      <h1>${loginTitle}</h1>
+      <p>${loginDescription}</p>
       <form id="intern-login-form" class="intern-form-grid" novalidate>
         <div class="intern-field intern-field--full">
           <label for="login-email">E-Mail</label>
