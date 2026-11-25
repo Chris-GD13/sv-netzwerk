@@ -127,9 +127,9 @@ function reportDriveAccessToken(): string
         }
     }
 
-    $clientId = env('GOOGLE_DRIVE_CLIENT_ID', reportSettingGet('google_drive_client_id'));
-    $clientSecret = env('GOOGLE_DRIVE_CLIENT_SECRET', reportSettingGet('google_drive_client_secret'));
-    $refreshToken = env('GOOGLE_DRIVE_REFRESH_TOKEN', reportSettingGet('google_drive_refresh_token'));
+    $clientId = envConfigured('GOOGLE_DRIVE_CLIENT_ID', reportSettingGet('google_drive_client_id'));
+    $clientSecret = envConfigured('GOOGLE_DRIVE_CLIENT_SECRET', reportSettingGet('google_drive_client_secret'));
+    $refreshToken = envConfigured('GOOGLE_DRIVE_REFRESH_TOKEN', reportSettingGet('google_drive_refresh_token'));
     if ($clientId !== '' && $clientSecret !== '' && $refreshToken !== '') {
         $resp = reportDriveHttp('POST', 'https://oauth2.googleapis.com/token', ['Content-Type: application/x-www-form-urlencoded'], http_build_query([
             'client_id'=>$clientId,

@@ -77,9 +77,9 @@ function mcpDriveToken(): string
             }
         }
     }
-    $clientId = env('GOOGLE_DRIVE_CLIENT_ID', mcpDriveSetting('google_drive_client_id'));
-    $clientSecret = env('GOOGLE_DRIVE_CLIENT_SECRET', mcpDriveSetting('google_drive_client_secret'));
-    $refreshToken = env('GOOGLE_DRIVE_REFRESH_TOKEN', mcpDriveSetting('google_drive_refresh_token'));
+    $clientId = envConfigured('GOOGLE_DRIVE_CLIENT_ID', mcpDriveSetting('google_drive_client_id'));
+    $clientSecret = envConfigured('GOOGLE_DRIVE_CLIENT_SECRET', mcpDriveSetting('google_drive_client_secret'));
+    $refreshToken = envConfigured('GOOGLE_DRIVE_REFRESH_TOKEN', mcpDriveSetting('google_drive_refresh_token'));
     if ($clientId !== '' && $clientSecret !== '' && $refreshToken !== '') {
         $response = mcpDriveHttp('POST', 'https://oauth2.googleapis.com/token', ['Content-Type: application/x-www-form-urlencoded'], http_build_query([
             'client_id'=>$clientId,

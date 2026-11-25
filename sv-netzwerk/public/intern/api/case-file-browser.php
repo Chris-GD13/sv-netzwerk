@@ -31,7 +31,7 @@ function cbToken(): string {
             }
         }
     }
-    $clientId=env('GOOGLE_DRIVE_CLIENT_ID',cbSetting('google_drive_client_id'));$clientSecret=env('GOOGLE_DRIVE_CLIENT_SECRET',cbSetting('google_drive_client_secret'));$refresh=env('GOOGLE_DRIVE_REFRESH_TOKEN',cbSetting('google_drive_refresh_token'));
+    $clientId=envConfigured('GOOGLE_DRIVE_CLIENT_ID',cbSetting('google_drive_client_id'));$clientSecret=envConfigured('GOOGLE_DRIVE_CLIENT_SECRET',cbSetting('google_drive_client_secret'));$refresh=envConfigured('GOOGLE_DRIVE_REFRESH_TOKEN',cbSetting('google_drive_refresh_token'));
     if($clientId!==''&&$clientSecret!==''&&$refresh!==''){
         $r=cbHttp('POST','https://oauth2.googleapis.com/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['client_id'=>$clientId,'client_secret'=>$clientSecret,'refresh_token'=>$refresh,'grant_type'=>'refresh_token']),false);$j=json_decode($r['body'],true);if($r['status']===200&&!empty($j['access_token']))return $token=(string)$j['access_token'];
     }

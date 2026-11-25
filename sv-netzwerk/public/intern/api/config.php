@@ -194,6 +194,13 @@ function env(string $key, string $default = ''): string
     return $val !== false ? $val : $default;
 }
 
+/** Gibt einen nichtleeren Umgebungswert zurück und verwendet sonst den Fallback. */
+function envConfigured(string $key, string $fallback = ''): string
+{
+    $value = trim(env($key, ''));
+    return $value !== '' ? $value : trim($fallback);
+}
+
 /** Gibt den konfigurierten Projektnamen zurück. */
 function msLoginBase(): string
 {

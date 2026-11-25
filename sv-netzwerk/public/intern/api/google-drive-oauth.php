@@ -34,9 +34,9 @@ function gdSettingDelete(string $key): void {
     db()->prepare('DELETE FROM app_settings WHERE setting_key=:k')->execute([':k'=>$key]);
 }
 
-function gdOauthClientId(): string { return env('GOOGLE_DRIVE_CLIENT_ID', gdSettingGet('google_drive_client_id')); }
-function gdOauthClientSecret(): string { return env('GOOGLE_DRIVE_CLIENT_SECRET', gdSettingGet('google_drive_client_secret')); }
-function gdOauthRefreshToken(): string { return env('GOOGLE_DRIVE_REFRESH_TOKEN', gdSettingGet('google_drive_refresh_token')); }
+function gdOauthClientId(): string { return envConfigured('GOOGLE_DRIVE_CLIENT_ID', gdSettingGet('google_drive_client_id')); }
+function gdOauthClientSecret(): string { return envConfigured('GOOGLE_DRIVE_CLIENT_SECRET', gdSettingGet('google_drive_client_secret')); }
+function gdOauthRefreshToken(): string { return envConfigured('GOOGLE_DRIVE_REFRESH_TOKEN', gdSettingGet('google_drive_refresh_token')); }
 function gdOauthServiceAccountConfigured(): bool {
     $raw = trim(env('GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON', ''));
     if ($raw === '') return false;

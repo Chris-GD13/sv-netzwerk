@@ -109,9 +109,9 @@ function gdAccessToken(): string {
             if ($resp['status']===200 && !empty($body['access_token'])) return $token=(string)$body['access_token'];
         }
     }
-    $clientId=env('GOOGLE_DRIVE_CLIENT_ID',gdSettingGet('google_drive_client_id'));
-    $clientSecret=env('GOOGLE_DRIVE_CLIENT_SECRET',gdSettingGet('google_drive_client_secret'));
-    $refreshToken=env('GOOGLE_DRIVE_REFRESH_TOKEN',gdSettingGet('google_drive_refresh_token'));
+    $clientId=envConfigured('GOOGLE_DRIVE_CLIENT_ID',gdSettingGet('google_drive_client_id'));
+    $clientSecret=envConfigured('GOOGLE_DRIVE_CLIENT_SECRET',gdSettingGet('google_drive_client_secret'));
+    $refreshToken=envConfigured('GOOGLE_DRIVE_REFRESH_TOKEN',gdSettingGet('google_drive_refresh_token'));
     if ($clientId!=='' && $clientSecret!=='' && $refreshToken!=='') {
         $resp=gdHttp('POST','https://oauth2.googleapis.com/token',['Content-Type: application/x-www-form-urlencoded'],http_build_query(['client_id'=>$clientId,'client_secret'=>$clientSecret,'refresh_token'=>$refreshToken,'grant_type'=>'refresh_token']),false);
         $body=json_decode($resp['body'],true);
