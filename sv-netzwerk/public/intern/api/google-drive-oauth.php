@@ -154,14 +154,19 @@ $user = requireAuth();
 
 switch($action){
     case 'status':
-        $clientId=gdOauthClientId();$secret=gdOauthClientSecret();$refresh=gdOauthRefreshToken();
-        apiJson([
-            'ok'=>true,
-            'client_configured'=>($clientId!=='' && $secret!=='') || gdOauthServiceAccountConfigured(),
-            'connected'=>$refresh!=='' || gdOauthServiceAccountConfigured(),
-            'redirect_uri'=>gdOauthRedirectUri(),
-            'can_configure'=>(($user['role']??'')==='administrator'),
-        ]);
+        try {
+            $clientId=gdOauthClientId();$secret=gdOauthClientSecret();$refresh=gdOauthRefreshToken();
+            apiJson([
+                'ok'=>true,
+                'client_configured'=>($clientId!=='' && $secret!=='') || gdOauthServiceAccountConfigured(),
+                'connected'=>$refresh!=='' || gdOauthServiceAccountConfigured(),
+                'redirect_uri'=>gdOauthRedirectUri(),
+                'can_configure'=>(($user['role']??'')==='administrator'),
+            ]);
+        } catch (Throwable $error) {
+            error_log('[google-drive-oauth] status failed '.get_class($error).': '.$error->getMessage());
+            apiError(503, 'Google-Drive-Status konnte nicht gelesen werden.');
+        }
 
     case 'save_client':
         if(($user['role']??'')!=='administrator') apiError(403,'Nur Administratoren dürfen Google-OAuth konfigurieren.');
@@ -174,26 +179,31 @@ switch($action){
         apiJson(['ok'=>true,'saved'=>true,'redirect_uri'=>gdOauthRedirectUri()]);
 
     case 'start':
-        $clientId=gdOauthClientId();$secret=gdOauthClientSecret();
-        if($clientId==='' || $secret==='') {
-            if (gdOauthServiceAccountConfigured()) {
-                header('Location: /intern/versicherungsfaelle/?google_drive=connected&mode=service_account', true, 302);
-                exit;
+        try {
+            $clientId=gdOauthClientId();$secret=gdOauthClientSecret();
+            if($clientId==='' || $secret==='') {
+                if (gdOauthServiceAccountConfigured()) {
+                    header('Location: /intern/versicherungsfaelle/?google_drive=connected&mode=service_account', true, 302);
+                    exit;
+                }
+                apiError(503,'Google-OAuth-Client ist noch nicht konfiguriert.');
             }
-            apiError(503,'Google-OAuth-Client ist noch nicht konfiguriert.');
+            $state=gdOauthCreateState($user);
+            $url='https://accounts.google.com/o/oauth2/v2/auth?'.http_build_query([
+                'client_id'=>$clientId,
+                'redirect_uri'=>gdOauthRedirectUri(),
+                'response_type'=>'code',
+                'scope'=>'https://www.googleapis.com/auth/drive',
+                'access_type'=>'offline',
+                'prompt'=>'consent',
+                'include_granted_scopes'=>'true',
+                'state'=>$state,
+            ]);
+            header('Location: '.$url, true, 302);exit;
+        } catch (Throwable $error) {
+            error_log('[google-drive-oauth] start failed '.get_class($error).': '.$error->getMessage());
+            apiError(503, 'Google-Drive-Autorisierung konnte nicht gestartet werden.');
         }
-        $state=gdOauthCreateState($user);
-        $url='https://accounts.google.com/o/oauth2/v2/auth?'.http_build_query([
-            'client_id'=>$clientId,
-            'redirect_uri'=>gdOauthRedirectUri(),
-            'response_type'=>'code',
-            'scope'=>'https://www.googleapis.com/auth/drive',
-            'access_type'=>'offline',
-            'prompt'=>'consent',
-            'include_granted_scopes'=>'true',
-            'state'=>$state,
-        ]);
-        header('Location: '.$url, true, 302);exit;
 
     case 'disconnect':
         if($_SERVER['REQUEST_METHOD']!=='POST') apiError(405,'POST erforderlich.');
