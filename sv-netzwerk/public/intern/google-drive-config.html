@@ -49,7 +49,7 @@
     };
     async function loadStatus() {
       try {
-        const response = await fetch('/intern/api/google-drive-oauth.php?action=status', { credentials: 'same-origin' });
+        const response = await fetch('/intern/api/google-drive-oauth.php?action=status', { credentials: 'same-origin', cache: 'no-store' });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Anmeldung erforderlich.');
         if (!data.can_configure) {
@@ -68,6 +68,7 @@
       const response = await fetch('/intern/api/google-drive-oauth.php?action=save_client', {
         method: 'POST',
         credentials: 'same-origin',
+        cache: 'no-store',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           client_id: document.getElementById('client-id').value.trim(),

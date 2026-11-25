@@ -40,6 +40,7 @@ registerRoute(
 // They must never be served from the shared API cache.
 const privateApiPaths = new Set([
   '/intern/api/google-drive-sync.php',
+  '/intern/api/google-drive-oauth.php',
   '/intern/api/claimsforce-queue.php',
   '/intern/api/revenue-summary-v2.php',
 ]);
