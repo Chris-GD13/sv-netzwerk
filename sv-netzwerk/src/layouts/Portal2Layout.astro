@@ -42,6 +42,17 @@ const navGroups = [
       ['verwaltung', 'Verwaltung', '⚙'],
     ],
   },
+  {
+    label: 'Weitere Werkzeuge',
+    links: [
+      ['projekte', 'Projekte', '▦'],
+      ['privatauftraege', 'Privataufträge', '⌑'],
+      ['angebote', 'Angebote', '+'],
+      ['markdown', 'Markdown-Konverter', '↯'],
+      ['energie', 'Energiesteuerung', '⚡'],
+      ['abrechnungen', 'Abrechnungen', '€'],
+    ],
+  },
 ];
 const isActive = (slug: string) => currentPath === `/intern/portal2/${slug}/` || currentPath.startsWith(`/intern/portal2/${slug}/`);
 ---

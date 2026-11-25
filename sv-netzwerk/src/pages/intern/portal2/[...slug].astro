@@ -3,7 +3,6 @@ import Portal2Layout from '../../../layouts/Portal2Layout.astro';
 
 import { portal2Pages } from '../../../lib/portal2-pages';
 
-const pages = portal2Pages;
 
 export function getStaticPaths() {
   return Object.entries(portal2Pages).map(([slug, page]) => ({ params: { slug }, props: { page } }));
