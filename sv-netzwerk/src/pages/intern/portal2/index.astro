@@ -63,7 +63,7 @@ import Portal2Layout from '../../../layouts/Portal2Layout.astro';
     Promise.allSettled([
       getJson('/intern/api/google-drive-sync.php?action=status'),
       getJson('/intern/api/claimsforce-queue.php?action=summary'),
-      getJson('/intern/api/case-file-browser.php?action=summary'),
+      getJson('/intern/api/google-drive-sync.php?action=recent_cases'),
     ]).then(([drive, imports, cases]) => {
       setStatus('#p2-drive-status', drive.status === 'fulfilled' ? 'ok' : 'bad', drive.status === 'fulfilled' ? 'Google Drive erreichbar' : 'Google Drive nicht erreichbar');
       if (imports.status === 'fulfilled') {

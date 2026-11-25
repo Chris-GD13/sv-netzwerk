@@ -8,6 +8,10 @@ commonHeaders();
 $user=requireAuth();
 if(!in_array((string)($user['role']??''),['administrator','projektleiter','pruefer','sachverstaendiger'],true))apiError(403,'Keine Berechtigung.');
 
+// The designated portal administrator runs the shared Christian import station.
+// Keep the general profile-routing rules unchanged for all other endpoints.
+if(strtolower(trim((string)($user['email']??'')))==='info@sv-netzwerk.eu')$user['svnet_expert_profile']='christian';
+
 db()->exec("CREATE TABLE IF NOT EXISTS claimsforce_import_jobs(id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,profile VARCHAR(30) NOT NULL,status VARCHAR(30) NOT NULL DEFAULT 'queued',requested_by VARCHAR(255) NOT NULL,message VARCHAR(500) NULL,result_json MEDIUMTEXT NULL,created_at DATETIME NOT NULL,started_at DATETIME NULL,finished_at DATETIME NULL,INDEX idx_claims_queue(status,created_at),INDEX idx_claims_user(requested_by,id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 db()->exec("CREATE TABLE IF NOT EXISTS claimsforce_task_status(profile VARCHAR(30) PRIMARY KEY,open_count INT UNSIGNED NOT NULL,updated_at DATETIME NOT NULL,source_job_id BIGINT UNSIGNED NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
