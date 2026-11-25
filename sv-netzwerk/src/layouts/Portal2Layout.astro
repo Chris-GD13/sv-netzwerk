@@ -1,0 +1,87 @@
+---
+import SEO from '../components/SEO.astro';
+import logoSrc from '../assets/sv-netzwerk-logo-portal.svg';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const props = Astro.props;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#102b45" />
+    <meta name="color-scheme" content="light" />
+    <SEO {...props} noindex={true} robotsContent="noindex,nofollow" />
+    <style is:global>
+      :root { --p2-ink: #102b45; --p2-ink-strong: #071a2e; --p2-muted: #5c7080; --p2-line: #dce3e8; --p2-surface: #fff; --p2-background: #f4f7f9; --p2-accent: #e78a16; --p2-accent-dark: #9a5400; }
+      .p2-body { min-height: 100vh; margin: 0; background: var(--p2-background); color: var(--p2-ink); font-family: Inter, "Segoe UI", sans-serif; }
+      .p2-header { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; min-height: 68px; padding: 0 28px; border-bottom: 1px solid var(--p2-line); background: rgba(255,255,255,.96); backdrop-filter: blur(14px); }
+      .p2-brand { display: inline-flex; align-items: center; gap: 14px; color: var(--p2-ink-strong); text-decoration: none; }
+      .p2-brand img { width: 168px; height: auto; }
+      .p2-brand-text { display: grid; gap: 2px; border-left: 1px solid var(--p2-line); padding-left: 14px; }
+      .p2-brand-text strong { font-size: .9rem; letter-spacing: .02em; }
+      .p2-brand-text small { color: var(--p2-muted); font-size: .7rem; }
+      .p2-header-actions { display: flex; align-items: center; gap: 10px; }
+      .p2-header-link, .p2-logout { border: 1px solid var(--p2-line); background: var(--p2-surface); color: var(--p2-ink); padding: 8px 12px; font: inherit; font-size: .78rem; font-weight: 800; text-decoration: none; cursor: pointer; }
+      .p2-header-link:hover, .p2-logout:hover { border-color: var(--p2-accent); }
+      .p2-layout { display: grid; grid-template-columns: 248px minmax(0,1fr); min-height: calc(100vh - 68px); }
+      .p2-sidebar { display: flex; flex-direction: column; gap: 20px; padding: 28px 16px; border-right: 1px solid var(--p2-line); background: #edf2f5; }
+      .p2-sidebar-label { margin: 0 10px; color: var(--p2-accent-dark); font-size: .68rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+      .p2-nav { display: grid; gap: 4px; }
+      .p2-nav a { display: grid; grid-template-columns: 24px minmax(0,1fr); align-items: center; gap: 9px; padding: 10px; border: 1px solid transparent; color: var(--p2-ink); font-size: .84rem; font-weight: 800; text-decoration: none; }
+      .p2-nav a:hover, .p2-nav a:focus-visible { border-color: var(--p2-line); background: var(--p2-surface); }
+      .p2-nav a[data-active="true"] { border-color: #c8d4dc; background: var(--p2-surface); box-shadow: inset 3px 0 0 var(--p2-accent); }
+      .p2-nav-icon { display: grid; place-items: center; width: 24px; height: 24px; color: var(--p2-accent-dark); font-size: 1rem; }
+      .p2-sidebar-note { margin-top: auto; padding: 14px; border: 1px solid var(--p2-line); background: var(--p2-surface); color: var(--p2-muted); font-size: .72rem; line-height: 1.45; }
+      .p2-main { min-width: 0; }
+      .p2-content { width: min(1240px,100%); margin: 0 auto; padding: 32px clamp(18px,4vw,52px) 52px; }
+      @media (max-width: 860px) { .p2-header { padding: 0 16px; } .p2-brand-text { display: none; } .p2-layout { grid-template-columns: 1fr; } .p2-sidebar { position: static; padding: 12px 14px; border-right: 0; border-bottom: 1px solid var(--p2-line); } .p2-sidebar-label, .p2-sidebar-note { display: none; } .p2-nav { grid-template-columns: repeat(4,minmax(0,1fr)); } .p2-nav a { grid-template-columns: 1fr; justify-items: center; gap: 4px; padding: 8px 5px; text-align: center; font-size: .68rem; } }
+      @media (max-width: 540px) { .p2-brand img { width: 138px; } .p2-header-link { display: none; } .p2-nav { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+    </style>
+  </head>
+  <body class="p2-body">
+    <header class="p2-header">
+      <a class="p2-brand" href="/intern/portal2/" aria-label="Portal 2.0 Arbeitszentrale"><img src={logoSrc.src} alt="SV-Netzwerk" width="168" height="35" /><span class="p2-brand-text"><strong>Portal 2.0</strong><small>Arbeitszentrale für Fälle und Aufträge</small></span></a>
+      <div class="p2-header-actions"><a class="p2-header-link" href="/intern/portal2/">Startseite</a><button class="p2-logout" type="button" data-p2-logout>Abmelden</button></div>
+    </header>
+    <div class="p2-layout">
+      <aside class="p2-sidebar">
+        <p class="p2-sidebar-label">Arbeitsbereiche</p>
+        <nav class="p2-nav" aria-label="Portal 2.0 Navigation">
+          <a href="/intern/portal2/" data-active={Astro.url.pathname === '/intern/portal2/' ? 'true' : 'false'}><span class="p2-nav-icon">⌂</span><span>Übersicht</span></a>
+          <a href="/intern/versicherungsfaelle/"><span class="p2-nav-icon">▣</span><span>Fälle und Berichte</span></a>
+          <a href="/intern/claimsforce/"><span class="p2-nav-icon">↻</span><span>ClaimsForce einlesen</span></a>
+          <a href="/intern/kalkulation/"><span class="p2-nav-icon">▥</span><span>Kalkulation</span></a>
+          <a href="/intern/zeitwertberechnung/"><span class="p2-nav-icon">⌛</span><span>Zeitwert</span></a>
+          <a href="/intern/aufgaben/"><span class="p2-nav-icon">✓</span><span>Aufgaben</span></a>
+          <a href="/intern/zeiterfassung/"><span class="p2-nav-icon">◷</span><span>Zeiterfassung</span></a>
+          <a href="/intern/kalender/"><span class="p2-nav-icon">□</span><span>Kalender</span></a>
+          <a href="/intern/telefon/"><span class="p2-nav-icon">☎</span><span>Telefonzentrale</span></a>
+          <a href="/intern/versicherungswissen/"><span class="p2-nav-icon">▤</span><span>Versicherungswissen</span></a>
+          <a href="/intern/privatauftraege/"><span class="p2-nav-icon">⌑</span><span>Privatgutachten</span></a>
+          <a href="/intern/fensterpruefung-bonn/"><span class="p2-nav-icon">▱</span><span>Fenstergutachten</span></a>
+          <a href="/intern/partner/"><span class="p2-nav-icon">◇</span><span>Partner</span></a>
+          <a href="/intern/abrechnungen/" data-p2-settlement hidden><span class="p2-nav-icon">€</span><span>Buchhaltung</span></a>
+        </nav>
+        <p class="p2-sidebar-note">Das bisherige Portal bleibt parallel verfügbar. Die Bearbeitung startet hier und führt zu den jeweiligen Facharbeitsplätzen.</p>
+      </aside>
+      <main class="p2-main"><div class="p2-content"><slot /></div></main>
+    </div>
+    <script is:inline>
+      document.querySelector('[data-p2-logout]')?.addEventListener('click', async (event) => {
+        const button = event.currentTarget;
+        if (!(button instanceof HTMLButtonElement)) return;
+        button.disabled = true;
+        button.textContent = 'Wird abgemeldet …';
+        try { await fetch('/intern/api/auth.php?action=logout', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: '{}' }); } finally { window.location.assign('/intern/login/?next=%2Fintern%2Fportal2%2F'); }
+      });
+      if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=20261125-portal2', { scope: '/intern/', updateViaCache: 'none' }).catch(() => {}));
+    </script>
+  </body>
+</html>

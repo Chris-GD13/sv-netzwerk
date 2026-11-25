@@ -616,7 +616,21 @@ async function showMoveDialog(
 }
 
 async function redirectAfterLogin() {
-  const returnTo = new URLSearchParams(window.location.search).get('return');
+  const params = new URLSearchParams(window.location.search);
+  const next = params.get('next');
+  if (next) {
+    try {
+      const nextUrl = new URL(next, window.location.origin);
+      if (nextUrl.origin === window.location.origin && nextUrl.pathname.startsWith('/intern/') && nextUrl.pathname !== '/intern/login/') {
+        redirectTo(`${nextUrl.pathname}${nextUrl.search}`);
+        return;
+      }
+    } catch {
+      // Ungültige Zielpfade werden verworfen und führen zum Standardbereich.
+    }
+  }
+
+  const returnTo = params.get('return');
   if (returnTo) {
     try {
       const returnUrl = new URL(returnTo, window.location.origin);
