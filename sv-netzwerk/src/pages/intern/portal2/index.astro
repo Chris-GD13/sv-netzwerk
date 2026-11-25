@@ -67,7 +67,9 @@ import Portal2Layout from '../../../layouts/Portal2Layout.astro';
     ]).then(([drive, imports, cases]) => {
       setStatus('#p2-drive-status', drive.status === 'fulfilled' ? 'ok' : 'bad', drive.status === 'fulfilled' ? 'Google Drive erreichbar' : 'Google Drive nicht erreichbar');
       if (imports.status === 'fulfilled') {
-        const count = Array.isArray(imports.value.items) ? imports.value.items.length : 0;
+        const count = Array.isArray(imports.value.items)
+          ? imports.value.items.filter(item => item && item.source_job_id !== null && item.source_job_id !== undefined).length
+          : 0;
         setStatus('#p2-claims-status', 'ok', count ? count + ' Importstände vorhanden' : 'Importstand bereit');
       } else setStatus('#p2-claims-status', 'bad', 'Importstand nicht erreichbar');
       if (cases.status === 'fulfilled') setStatus('#p2-case-status', 'ok', 'Arbeitsstand verfügbar');
