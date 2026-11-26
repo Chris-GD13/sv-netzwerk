@@ -77,6 +77,10 @@ Nach einer Freigabe muss der Übergang in den normalen Betrieb beobachtet werden
 
 Die technische Dokumentation sollte außerdem zeigen, ob angrenzende Bauteile durch den Wiederanlauf belastet werden. Ein wieder in Betrieb genommenes Heizungs- oder Lüftungssystem kann etwa Auswirkungen auf noch nicht abgeschlossene Trocknungs- oder Reinigungsarbeiten haben. Solche Wechselwirkungen gehören in die Ablaufplanung und dürfen nicht allein über die Rechnung erklärt werden.
 
+## Restarbeiten und Abschluss
+
+Offene Restarbeiten werden nach dem Wiederanlauf mit Verantwortlichkeit und Termin geführt. Eine technische Freigabe darf nicht als Abschluss der gesamten Schadenbearbeitung verstanden werden, solange angrenzende Bauteile oder Kostenpositionen noch ungeklärt sind.
+
 ## Quellen und weiterführende Hinweise
 
 Bundesministerium der Justiz, Bürgerliches Gesetzbuch, § 249 Art und Umfang des Schadensersatzes, geltende Fassung. [Gesetze im Internet](https://www.gesetze-im-internet.de/bgb/__249.html)
