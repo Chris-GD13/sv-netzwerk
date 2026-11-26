@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-11-22
   status: published
 seo:
-  title: "Schutz- und Abdeckmaßnahmen im Gebäudeschaden: Erforderlichkeit, Dauer und Kosten prüfen"
+  title: "Schutz- und Abdeckmaßnahmen fachlich prüfen"
   description: "Wie Schutz- und Abdeckmaßnahmen nach einem Gebäudeschaden technisch begründet, zeitlich kontrolliert und von der eigentlichen Wiederherstellung getrennt werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/schutz-und-abdeckmassnahmen-gebaeudeschaden-erforderlichkeit-kosten/"
   noindex: false

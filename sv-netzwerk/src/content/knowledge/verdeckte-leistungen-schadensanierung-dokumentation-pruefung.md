@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-11-24
   status: published
 seo:
-  title: "Verdeckte Leistungen in der Schadensanierung: Öffnungen, Aufmaß und Nachweis sichern"
+  title: "Verdeckte Leistungen in der Schadensanierung prüfen"
   description: "Wie verdeckte Leistungen vor dem Schließen von Bauteilen mit Befund, Aufmaß und Fotodokumentation so gesichert werden, dass Umfang und Kosten prüffähig bleiben."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/verdeckte-leistungen-schadensanierung-dokumentation-pruefung/"
   noindex: false

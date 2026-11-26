@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-11-25
   status: published
 seo:
-  title: "Vorläufige Kostenfreigaben im Schadenfall: Leistungsstand, Prüfvorbehalt und Schlussrechnung trennen"
+  title: "Vorläufige Kostenfreigaben im Schadenfall prüfen"
   description: "Wie vorläufige Kostenfreigaben im Schadenfall so formuliert und fortgeschrieben werden, dass Umfang, Annahmen und spätere Schlussprüfung nachvollziehbar bleiben."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/vorlaeufige-kostenfreigabe-schadensanierung-pruefvorbehalt-schlussrechnung/"
   noindex: false

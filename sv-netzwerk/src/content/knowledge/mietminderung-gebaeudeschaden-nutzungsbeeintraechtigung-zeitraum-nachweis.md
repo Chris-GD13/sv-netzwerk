@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-11-21
   status: published
 seo:
-  title: "Mietminderung nach einem Gebäudeschaden: Nutzungsbeeinträchtigung, Zeitraum und Nachweis trennen"
+  title: "Mietminderung nach Gebäudeschaden fachlich prüfen"
   description: "Wie bei einer Mietminderung nach einem Gebäudeschaden die tatsächliche Gebrauchseinschränkung, der betroffene Zeitraum und der Schadenbezug nachvollziehbar dokumentiert werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/mietminderung-gebaeudeschaden-nutzungsbeeintraechtigung-zeitraum-nachweis/"
   noindex: false

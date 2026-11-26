@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-11-26
   status: published
 seo:
-  title: "Wiederinbetriebnahme nach Gebäudeschäden: Funktionsprüfung, Freigabe und Kosten trennen"
+  title: "Wiederinbetriebnahme nach Gebäudeschäden prüfen"
   description: "Wie technische Anlagen nach einem Gebäudeschaden sicher geprüft, schrittweise wieder in Betrieb genommen und schadenbedingte Kosten von Verbesserungen abgegrenzt werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/wiederinbetriebnahme-gebaeudeschaden-funktionspruefung-freigabe-kosten/"
   noindex: false
