@@ -1,0 +1,17 @@
+---
+import Portal2Layout from '../../../../layouts/Portal2Layout.astro';
+---
+<Portal2Layout title="Buchhaltung | Portal 2.0" description="Gemeinsame Buchhaltung im Portal 2.0." currentPath="/intern/portal2/abrechnungen/">
+  <section class="p2-hero">
+    <div><p class="p2-kicker">04 · Weitere Werkzeuge</p><h1>Buchhaltung</h1><p>Abrechnungen bleiben in der bestehenden Anwendung vollständig funktionsfähig. Diese Ansicht verwendet denselben bestehenden Datenbestand und dieselben Schreibvorgänge wie das alte Portal.</p></div>
+    <div class="p2-actions"><a class="p2-action p2-action--secondary" href="/intern/abrechnungen/">Klassische Ansicht</a></div>
+  </section>
+  <section class="p2-panel p2-mirror">
+    <div class="p2-mirror__head"><strong>Gemeinsame Spiegelansicht</strong><span>Änderungen werden unmittelbar im bestehenden Portalbestand gespeichert.</span></div>
+    <iframe title="Buchhaltung" src="/intern/abrechnungen/" loading="eager"></iframe>
+  </section>
+</Portal2Layout>
+<style>
+.p2-mirror{padding:0;overflow:hidden}.p2-mirror__head{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:16px 20px;border-bottom:1px solid #d7e0e6;background:#f7f9fa;color:#14324a}.p2-mirror__head span{color:#617687;font-size:.78rem}.p2-mirror iframe{display:block;width:100%;min-height:1600px;border:0;background:#fff}
+@media(max-width:720px){.p2-mirror__head{align-items:flex-start;flex-direction:column}.p2-mirror iframe{min-height:1900px}}
+</style>
