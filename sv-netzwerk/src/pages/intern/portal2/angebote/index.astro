@@ -1,0 +1,17 @@
+---
+import Portal2Layout from '../../../../layouts/Portal2Layout.astro';
+---
+<Portal2Layout title="Angebote | Portal 2.0" description="Gemeinsame Angebotserstellung im Portal 2.0." currentPath="/intern/portal2/angebote/">
+  <section class="p2-hero">
+    <div><p class="p2-kicker">04 · Weitere Werkzeuge</p><h1>Angebote anlegen</h1><p>Die bestehende Angebotserstellung wird im Portal 2.0 erreichbar, ohne eine zweite Datenhaltung zu erzeugen. Diese Ansicht verwendet denselben bestehenden Datenbestand und dieselben Schreibvorgänge wie das alte Portal.</p></div>
+    <div class="p2-actions"><a class="p2-action p2-action--secondary" href="/intern/privatauftraege/angebot/">Klassische Ansicht</a></div>
+  </section>
+  <section class="p2-panel p2-mirror">
+    <div class="p2-mirror__head"><strong>Gemeinsame Spiegelansicht</strong><span>Änderungen werden unmittelbar im bestehenden Portalbestand gespeichert.</span></div>
+    <iframe title="Angebote anlegen" src="/intern/privatauftraege/angebot/" loading="eager"></iframe>
+  </section>
+</Portal2Layout>
+<style>
+.p2-mirror{padding:0;overflow:hidden}.p2-mirror__head{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:16px 20px;border-bottom:1px solid #d7e0e6;background:#f7f9fa;color:#14324a}.p2-mirror__head span{color:#617687;font-size:.78rem}.p2-mirror iframe{display:block;width:100%;min-height:1600px;border:0;background:#fff}
+@media(max-width:720px){.p2-mirror__head{align-items:flex-start;flex-direction:column}.p2-mirror iframe{min-height:1900px}}
+</style>
