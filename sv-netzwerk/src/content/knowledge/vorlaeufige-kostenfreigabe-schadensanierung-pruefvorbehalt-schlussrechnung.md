@@ -59,6 +59,18 @@ Nach § 249 BGB richtet sich der Umfang des Schadensersatzes nach der erforderli
 
 Vorläufige Kostenfreigaben verbinden technische Handlungsfähigkeit mit einem offenen Prüfweg. Sie werden belastbar, wenn Befund, zugelassener Umfang, Annahmen, Vorbehalt und spätere Abrechnung jeweils erkennbar bleiben. Die Schlussrechnung ist der Abgleich mit der tatsächlichen Ausführung, nicht die bloße Fortsetzung der ersten Gesamtsumme.
 
+## Fortschreibung bis zum Abschluss
+
+Eine vorläufige Freigabe wird mit dem weiteren Baufortschritt fortgeschrieben. Neue Befunde, geänderte Mengen und zusätzliche Leistungen werden mit ihrer Ursache und dem Zeitpunkt der Feststellung ergänzt. Der bereits freigegebene Umfang bleibt als eigener Stand erhalten. Dadurch lässt sich später erkennen, ob eine Kostensteigerung aus einer echten Änderung, einer Mengenabweichung oder einer verspäteten Prüfung entstand.
+
+Bei größeren Schäden kann es sinnvoll sein, einzelne Gewerke oder Bauabschnitte getrennt zu führen. Das erleichtert die Verbindung von Befund, Freigabe und Rechnung. Eine einheitliche Endsumme ohne diese Zwischenschritte erschwert die Kontrolle.
+
+## Kommunikation der Entscheidung
+
+Die Formulierung der Freigabe sollte verständlich und sachlich bleiben. Sie nennt den zugelassenen Umfang, die offenen Punkte und den nächsten Prüfzeitpunkt. Ein allgemeiner Hinweis auf einen Vorbehalt reicht nicht, wenn die Beteiligten daraus nicht erkennen können, welche Unterlagen noch benötigt werden.
+
+Ändert sich die technische Grundlage, wird die Freigabe angepasst und die alte Fassung nachvollziehbar abgelegt. So bleibt die Entscheidungsgeschichte in der Schadenakte erhalten. Die Kommunikation ersetzt dabei nicht die fachliche Prüfung. Sie muss deren Ergebnis lediglich eindeutig abbilden.
+
 ## Quellen und weiterführende Hinweise
 
 Bundesministerium der Justiz, Bürgerliches Gesetzbuch, § 249 Art und Umfang des Schadensersatzes, geltende Fassung. [Gesetze im Internet](https://www.gesetze-im-internet.de/bgb/__249.html)

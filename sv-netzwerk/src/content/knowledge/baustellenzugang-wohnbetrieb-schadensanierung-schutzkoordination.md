@@ -59,6 +59,18 @@ Bei der Prüfung hilft ein Abgleich von Terminplan, Bautagesberichten, Fotos und
 
 Bei einem bewohnten Gebäude sind Zugang, Schutz, Nutzbarkeit und Bauablauf eng verbunden. Eine belastbare Sanierungsplanung hält diese Zusammenhänge fest und trennt sie in der Kostenprüfung. So bleiben notwendige Schutzmaßnahmen nachvollziehbar, ohne aus jeder organisatorischen Erschwernis automatisch eine schadenbedingte Mehrleistung abzuleiten.
 
+## Beteiligte und Zuständigkeit
+
+Bei bewohnten Gebäuden müssen Bewohner, Eigentümer, ausführende Firmen und gegebenenfalls die Hausverwaltung dieselben Zugangsinformationen erhalten. Die technische Koordination legt fest, wer Termine bestätigt, wer den Arbeitsbereich öffnet und wer die Sicherung nach Feierabend kontrolliert. Eine Zuständigkeitslücke kann zu Verzögerungen führen, die später nur schwer einer Ursache zugeordnet werden können.
+
+Die fachliche Verantwortung bleibt von der organisatorischen Abstimmung getrennt. Ein Bauleiter kann den Ablauf koordinieren. Die Entscheidung über eine elektrische Stillsetzung, eine statische Sicherung oder eine schadstoffbezogene Arbeitsweise gehört in die Hände der jeweils qualifizierten Fachstelle. Diese Grenzen werden in der Akte ausdrücklich benannt.
+
+## Nachweis im Terminplan
+
+Der Terminplan sollte neben Beginn und Ende einer Leistung auch die Nutzungseinschränkung ausweisen. Werden Arbeiten abschnittsweise ausgeführt, wird der Wechsel zwischen den Bereichen sichtbar. Bei Unterbrechungen wird vermerkt, ob Material, Zugang, Freigabe, Witterung oder ein technischer Befund maßgeblich war.
+
+Ein solcher Ablaufnachweis hilft bei der späteren Bewertung von Standzeiten und Ersatzmaßnahmen. Er verhindert zugleich, dass eine lange Gesamtdauer automatisch als durchgehend schadenbedingt verstanden wird. Der technische Ablauf bleibt damit mit der tatsächlichen Nutzung des Gebäudes verbunden.
+
 ## Quellen und weiterführende Hinweise
 
 Bundesministerium der Justiz, Baustellenverordnung, geltende Fassung. [Gesetze im Internet](https://www.gesetze-im-internet.de/baustellv_1998/)

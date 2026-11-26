@@ -59,6 +59,18 @@ Ist die VOB/B wirksam vereinbart, ist zusätzlich die dort geregelte Anzeige und
 
 Verdeckte Leistungen bleiben prüffähig, wenn die technische Frage, der Ausgangsbefund, das Aufmaß und der Zustand vor dem Verschließen zusammen dokumentiert werden. Fotos sind ein wichtiger Bestandteil. Sie brauchen aber Raum-, Bauteil- und Mengenbezug, damit aus einer unsichtbaren Leistung eine nachvollziehbare Position wird.
 
+## Mangelverdacht und Zusatzleistung
+
+Bei verdeckten Bauteilen kann die Dokumentation zugleich Hinweise auf einen Ausführungsfehler oder einen zusätzlichen Schaden liefern. Diese Hinweise werden vom ursprünglichen Schadenbefund getrennt bewertet. Ein mangelhafter Einbau ist nicht allein deshalb schadenbedingt, weil er während der Sanierung entdeckt wurde. Umgekehrt darf eine neue Schadenfolge nicht mit dem Hinweis auf eine frühere Ausführung unbelegt abgetan werden.
+
+Die weitere Prüfung braucht eine klare Fragestellung. Geht es um die Ursache einer Durchfeuchtung, um die Qualität einer bereits ausgeführten Leistung oder um eine zusätzliche Wiederherstellung? Erst mit dieser Trennung lässt sich entscheiden, welche Fachstelle, welche Nachweise und welcher Kostenweg erforderlich sind.
+
+## Übergabe an die Abrechnung
+
+Vor der Rechnungsprüfung werden die verdeckten Leistungen in einer raum- oder bauteilbezogenen Übersicht zusammengeführt. Jede Position erhält den Bezug zu Auftrag, Aufmaß, Foto und gegebenenfalls Prüfprotokoll. Abweichungen werden mit dem Grund und dem Zeitpunkt der Feststellung ergänzt.
+
+Fehlt ein Dokument, wird die Position nicht stillschweigend als vollständig belegt behandelt. Sie kann vorläufig offen bleiben, durch weitere Unterlagen ergänzt oder bei einer erneuten Sichtprüfung eingeschränkt werden. Diese Arbeitsweise hält den tatsächlichen Umfang sichtbar und verhindert, dass eine Pauschalrechnung die technische Prüfung ersetzt.
+
 ## Quellen und weiterführende Hinweise
 
 Bundesministerium der Justiz, Bürgerliches Gesetzbuch, § 631 Vertragstypische Pflichten beim Werkvertrag, geltende Fassung. [Gesetze im Internet](https://www.gesetze-im-internet.de/bgb/__631.html)

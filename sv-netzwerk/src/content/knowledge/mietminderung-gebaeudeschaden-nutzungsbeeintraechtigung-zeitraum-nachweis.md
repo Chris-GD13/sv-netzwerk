@@ -59,6 +59,18 @@ Nach § 536 BGB hängt die Miete bei einer geminderten Tauglichkeit kraft Gesetz
 
 Eine Mietminderungsprüfung wird tragfähig, wenn Nutzungsfunktion, Einschränkungsgrad, Zeitraum und Schadenbezug getrennt erfasst werden. Der technische Befund schafft die Grundlage für die zeitliche Einordnung. Er ersetzt weder die mietrechtliche Prüfung noch eine pauschale Berechnung aus der Reparatursumme.
 
+## Abgrenzung zu Mietausfall und weiteren Ansprüchen
+
+Mietminderung, Mietausfall und ein Anspruch auf Ersatz weiterer Aufwendungen können im selben Schadenfall nebeneinander genannt werden. Sie beruhen aber auf unterschiedlichen Voraussetzungen. Die technische Akte sollte deshalb nicht verschiedene Forderungsarten in einer einzigen Zeitachse zusammenfassen. Für jeden Anspruch wird festgehalten, welche Nutzung betroffen war, wer die Forderung stellt und welcher Zeitraum zugrunde gelegt wird.
+
+Ein Leerstand vor dem Schaden, eine freiwillige Ersatzunterkunft oder ein Umsatzrückgang im Gewerbebetrieb lassen sich nicht ohne Weiteres mit einer Mietminderung gleichsetzen. Auch eine vom Vermieter gewährte Reduzierung belegt noch nicht, dass der gesamte Betrag schadenbedingt ersetzt werden muss. Die Unterlagen werden als Angaben und Nachweise erfasst. Die rechtliche Bewertung erfolgt anschließend anhand des Mietvertrags und der geltenden gesetzlichen Regelungen.
+
+## Praktische Aktenführung
+
+Für die tägliche Bearbeitung bewährt sich eine fortlaufende Raum- und Zeitdokumentation. Jede Änderung der Nutzbarkeit wird mit Datum, betroffener Funktion und technischem Anlass eingetragen. Fotos, Handwerkertermine und Angaben der Nutzer werden dieser Entwicklung zugeordnet. So kann später nachvollzogen werden, ob die Einschränkung durch die ursprüngliche Beschädigung, die notwendige Reparatur oder eine zusätzliche Maßnahme verursacht wurde.
+
+Bleibt eine Frage offen, wird sie als offen gekennzeichnet. Eine scheinbar genaue Minderungsquote ohne belastbare Feststellung ist weniger hilfreich als eine klare Darstellung der noch fehlenden Informationen.
+
 ## Quellen und weiterführende Hinweise
 
 Bundesministerium der Justiz, Bürgerliches Gesetzbuch, § 536 Mietminderung, geltende Fassung. [Gesetze im Internet](https://www.gesetze-im-internet.de/bgb/__536.html)

@@ -59,6 +59,18 @@ Für die Schadenprüfung ist außerdem wichtig, welche Arbeiten durch Wasser, L�
 
 Eine sichere Wiederinbetriebnahme entsteht aus Befund, passender Fachprüfung und dokumentierter Freigabe. Die Kostenprüfung folgt demselben Aufbau. Nur wenn Stillsetzung, Untersuchung, Reparatur und Wiederanlauf getrennt erkennbar sind, lässt sich der schadenbedingte Aufwand belastbar von Verbesserung und Wartung unterscheiden.
 
+## Fachliche Zuständigkeit
+
+Die Wiederinbetriebnahme kann mehrere Fachgebiete berühren. Elektrische Anlagen, Heizungen, Aufzüge, Photovoltaik, Steuerungen und Brandschutztechnik haben jeweils eigene Prüfanforderungen. Der Bericht sollte deshalb benennen, welche Fachstelle welche Funktion geprüft hat. Eine allgemeine Aussage wie technisch in Ordnung ist ohne diese Zuordnung kaum belastbar.
+
+Bei unklarer Ursache oder möglicher Wechselwirkung zwischen Anlage und Gebäude wird die Prüffrage erweitert. Das kann eine ergänzende Messung, eine Herstellerbewertung oder eine Untersuchung angrenzender Bauteile erfordern. Der Umfang wird an der offenen Frage ausgerichtet und nicht pauschal auf das gesamte Gebäude ausgedehnt.
+
+## Dokumentation für die Schlussprüfung
+
+Nach dem Wiederanlauf werden Betriebszustand, Restarbeiten und Überwachung festgehalten. Auffälligkeiten werden mit Zeitpunkt und Reaktion dokumentiert. Falls eine Anlage nur eingeschränkt betrieben werden darf, muss diese Einschränkung in der Kosten- und Ablaufdokumentation sichtbar bleiben.
+
+Für die Schlussprüfung werden Prüfprotokoll, Reparaturrechnung, Freigabe und gegebenenfalls Herstellerunterlagen zusammengeführt. So lässt sich nachvollziehen, welche Kosten für die sichere Wiederherstellung erforderlich waren und welche Positionen auf Wartung, Modernisierung oder eine ohnehin geplante Erneuerung entfallen.
+
 ## Quellen und weiterführende Hinweise
 
 Bundesministerium der Justiz, Bürgerliches Gesetzbuch, § 249 Art und Umfang des Schadensersatzes, geltende Fassung. [Gesetze im Internet](https://www.gesetze-im-internet.de/bgb/__249.html)

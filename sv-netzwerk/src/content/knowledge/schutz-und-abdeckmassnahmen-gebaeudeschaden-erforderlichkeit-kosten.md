@@ -59,6 +59,18 @@ Fachliche Grenzen ergeben sich, wenn die Maßnahme in eine statische Sicherung, 
 
 Schutz- und Abdeckmaßnahmen werden prüffähig, wenn Risiko, Zweck, Fläche, Dauer und Kontrolle miteinander verbunden sind. Die technische Notwendigkeit kann zeitkritisch sein. Die spätere Kostenfreigabe braucht trotzdem eine klare Trennung von Sicherung, provisorischer Nutzung und dauerhafter Wiederherstellung.
 
+## Kontrollintervalle und Ende der Maßnahme
+
+Die Erforderlichkeit einer Schutzmaßnahme wird im Verlauf der Sanierung erneut geprüft. Nach einem Wetterwechsel, einer Änderung des Bauablaufs oder dem Abschluss eines Rückbauschritts kann sich der Schutzbedarf verändern. Ein Kontrolltermin sollte deshalb nicht nur die technische Funktion der Abdeckung bestätigen. Er sollte auch festhalten, ob Fläche, Befestigung, Zugänglichkeit und Dauer noch zum aktuellen Zustand passen.
+
+Endet das Risiko, wird die Maßnahme zeitnah entfernt oder durch eine dauerhaft hergestellte Lösung ersetzt. Bleibt sie wegen einer Verzögerung länger bestehen, wird die Ursache der Verzögerung dokumentiert. So kann zwischen einer schadenbedingt notwendigen Verlängerung und einer vermeidbaren Standzeit unterschieden werden.
+
+## Freigabe und Aktennachweis
+
+Eine Freigabe sollte die zugelassene Maßnahme, den betroffenen Bereich und die offene Kostenprüfung eindeutig benennen. Bei einer späteren Erweiterung wird die neue technische Begründung ergänzt. Bereits geprüfte Positionen werden nicht erneut als offene Gesamtleistung angesetzt. Diese Fortschreibung schützt vor Doppelansätzen und macht sichtbar, welche Sicherung bereits umgesetzt wurde.
+
+Der Nachweis muss auch bei kurzfristigen Sofortmaßnahmen nachholbar bleiben. Fotos, kurze Einsatzberichte und die spätere Zuordnung zum Angebot reichen häufig aus, wenn sie den Zustand am Beginn der Arbeiten und die konkrete Gefahrenlage nachvollziehbar wiedergeben.
+
 ## Quellen und weiterführende Hinweise
 
 Bundesministerium der Justiz, Bürgerliches Gesetzbuch, § 254 Mitverschulden, geltende Fassung. [Gesetze im Internet](https://www.gesetze-im-internet.de/bgb/__254.html)
