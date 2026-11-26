@@ -412,7 +412,7 @@ function handleSummary(array $actor): never
         foreach ($leaves as $leave) if ((int)$leave['user_id'] === (int)$user['id'] && (int)substr((string)$leave['starts_on'], 0, 4) === $year) {
             $days = ttLeaveDays($leave, $targetMinutes, $region);
             $isFutureApprovedVacation = (string)$leave['status'] === 'approved' && (string)$leave['leave_type'] === 'urlaub' && (string)$leave['starts_on'] > $today && $days > 0;
-            if ((string)$leave['status'] === 'approved' && !$isFutureApprovedVacation) $takenDays += $days;
+            if ((string)$leave['status'] === 'approved') $takenDays += $days;
             if ((string)$leave['status'] === 'pending') $pendingDays += $days;
             if ($isFutureApprovedVacation) {
                 $futureApprovedDays += $days;
