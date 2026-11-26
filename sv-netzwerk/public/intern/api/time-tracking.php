@@ -375,7 +375,7 @@ function handleSummary(array $actor): never
     $aggregate = [];
     foreach ($trackedUsers as $user) {
         if (!$permissions['can_view_all'] && (int)$user['id'] !== (int)$actor['id']) continue;
-        $worked = 0; $balance = 0; $postTargetBalance = 0; $open = false; $hasEntries = false; $monthWorked = 0;
+        $worked = 0; $balance = 0; $postTargetBalance = 0; $open = false; $hasEntries = false; $monthWorked = 0; $monthBalance = 0;
         foreach ($entries as $entry) if ((int)$entry['user_id'] === (int)$user['id'] && (string)$entry['started_at'] >= $yearStart) {
             if ((string)($entry['source'] ?? '') === 'timemoto_import' && ttWeekendDate((string)$entry['started_at'])) continue;
             $hasEntries = true; $worked += (int)$entry['worked_minutes']; $balance += (int)$entry['balance_minutes'];
@@ -384,7 +384,7 @@ function handleSummary(array $actor): never
             if (!$targetAt && (int)($setting['balance_target_year'] ?? 0) === $year && $setting['balance_target_minutes'] !== null && $year === 2026) $targetAt = '2026-10-30 23:59:59';
             if ($targetAt && (string)$entry['started_at'] > (string)$targetAt) $postTargetBalance += (int)$entry['balance_minutes'];
             $open = $open || $entry['ended_at'] === null;
-            if ((string)$entry['started_at'] >= $monthStart) $monthWorked += (int)$entry['worked_minutes'];
+            if ((string)$entry['started_at'] >= $monthStart) { $monthWorked += (int)$entry['worked_minutes']; $monthBalance += (int)$entry['balance_minutes']; }
         }
         $compStmt = $pdo->prepare("SELECT COALESCE(SUM(hours),0) FROM time_leave_requests WHERE user_id=:id AND leave_type='zeitausgleich' AND status='approved' AND ends_on >= :year_start");
         $compStmt->execute([':id'=>(int)$user['id'], ':year_start'=>substr($yearStart,0,10)]);
@@ -449,7 +449,7 @@ function handleSummary(array $actor): never
         $aggregate[] = [
             'id'=>(int)$user['id'],'identity'=>ttIdentity($user),'name'=>$user['full_name'],
             'time_tracking_enabled'=>ttEnabled($user),
-            'worked_minutes'=>$worked,'balance_minutes'=>$balance,'balance_target_minutes'=>((int)($setting['balance_target_year'] ?? 0) === $year && $setting['balance_target_minutes'] !== null ? (int)$setting['balance_target_minutes'] : null),'compensated_minutes'=>$compMinutes,'open'=>$open,'has_entries'=>$hasEntries,
+            'worked_minutes'=>$worked,'month_worked_minutes'=>$monthWorked,'month_balance_minutes'=>$monthBalance,'balance_minutes'=>$balance,'balance_target_minutes'=>((int)($setting['balance_target_year'] ?? 0) === $year && $setting['balance_target_minutes'] !== null ? (int)$setting['balance_target_minutes'] : null),'compensated_minutes'=>$compMinutes,'open'=>$open,'has_entries'=>$hasEntries,
             'target_minutes_per_day'=>$targetMinutes,
             'contractual_minutes_per_week'=>array_key_exists('contractual_minutes_per_week', $setting) && $setting['contractual_minutes_per_week'] !== null ? (int)$setting['contractual_minutes_per_week'] : null,
             'hourly_wage'=>$hourlyWage > 0 ? $hourlyWage : null,
