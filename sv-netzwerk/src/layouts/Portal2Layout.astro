@@ -164,6 +164,11 @@ const isActive = (slug: string) => currentPath === `/intern/portal2/${slug}/` ||
           window.location.assign(`/intern/login/?next=${encodeURIComponent(next)}`);
         }
       })();
+      document.querySelectorAll('.p2-nav-group a').forEach((link) => link.addEventListener('click', () => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }));
       document.getElementById('p2-logout')?.addEventListener('click', async (event) => {
         const button = event.currentTarget;
         if (!(button instanceof HTMLButtonElement)) return;
