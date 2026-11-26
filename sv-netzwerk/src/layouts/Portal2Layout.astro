@@ -50,6 +50,8 @@ const navGroups = [
     ],
   },
 ];
+const mirroredPortal2Slugs = new Set(['kalkulation', 'telefon', 'zeiterfassung', 'angebote', 'abrechnungen']);
+const visibleNavGroups = navGroups.map((group) => ({ ...group, links: group.links.filter(([slug]) => mirroredPortal2Slugs.has(slug)) })).filter((group) => group.links.length > 0);
 const isActive = (slug: string) => currentPath === `/intern/portal2/${slug}/` || currentPath.startsWith(`/intern/portal2/${slug}/`);
 ---
 
@@ -142,7 +144,7 @@ const isActive = (slug: string) => currentPath === `/intern/portal2/${slug}/` ||
     <div class="p2-layout">
       <aside class="p2-sidebar">
         <a class="p2-sidebar__home" href="/intern/portal2/">Übersicht</a>
-        {navGroups.map((group) => <section class="p2-nav-group"><h2>{group.label}</h2>{group.links.map(([slug, label, icon]) => <a class:list={{ 'is-active': isActive(slug) }} href={`/intern/portal2/${slug}/`} aria-current={isActive(slug) ? 'page' : undefined}><span>{icon}</span>{label}</a>)}</section>)}
+        {visibleNavGroups.map((group) => <section class="p2-nav-group"><h2>{group.label}</h2>{group.links.map(([slug, label, icon]) => <a class:list={{ 'is-active': isActive(slug) }} href={`/intern/portal2/${slug}/`} aria-current={isActive(slug) ? 'page' : undefined}><span>{icon}</span>{label}</a>)}</section>)}
       </aside>
       <main class="p2-main"><slot /></main>
     </div>
