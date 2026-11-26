@@ -1,0 +1,104 @@
+---
+import Portal2Layout from '../../../layouts/Portal2Layout.astro';
+---
+<Portal2Layout title="Zeiterfassung | Portal 2.0" description="Gemeinsame Zeiterfassung im modernen Portal 2.0." currentPath="/intern/portal2/zeiterfassung/">
+  <section class="p2-hero">
+    <div><p class="p2-kicker">02 · Organisieren</p><h1>Zeiterfassung</h1><p>Arbeitszeit, Urlaub und Salden greifen auf denselben Datenbestand wie die bisherige Zeiterfassung zu.</p></div>
+    <div class="p2-actions"><a class="p2-action p2-action--secondary" href="/intern/zeiterfassung/">Klassische Ansicht</a><button class="p2-action" id="tt-refresh" type="button">Aktualisieren</button></div>
+  </section>
+  <section class="p2-status-grid" aria-label="Arbeitszeitstatus">
+    <article class="p2-status"><i class="p2-status__dot" id="state-dot" data-state="ok"></i><strong id="tt-identity">Sitzung wird geprüft …</strong><small id="tt-open">Daten werden geladen …</small></article>
+    <article class="p2-status"><i class="p2-status__dot" data-state="ok"></i><strong>Überstunden / Saldo</strong><small id="tt-balance">–</small></article>
+    <article class="p2-status"><i class="p2-status__dot" data-state="ok"></i><strong>Zeitausgleich genommen</strong><small id="tt-compensated">–</small></article>
+  </section>
+  <section class="p2-panel">
+    <h2>Meine Arbeitszeit</h2><p>Einbuchen, Pause und Ausbuchen schreiben direkt in das gemeinsame Zeitkonto.</p>
+    <div class="p2-actions" style="margin-top:14px"><button class="p2-action" id="tt-clock-in" type="button">Einbuchen</button><button class="p2-action p2-action--secondary" id="tt-pause" type="button">Pause</button><button class="p2-action p2-action--secondary" id="tt-clock-out" type="button">Ausbuchen</button></div>
+    <div id="tt-clock-state" class="p2-message" hidden></div>
+  </section>
+  <section class="p2-panel">
+    <h2>Urlaubsübersicht <span id="tt-vacation-year"></span></h2>
+    <div class="p2-status-grid">
+      <article class="p2-status"><i class="p2-status__dot" data-state="ok"></i><strong>Anspruch</strong><small id="tt-entitlement">–</small></article>
+      <article class="p2-status"><i class="p2-status__dot" data-state="ok"></i><strong>Genommen</strong><small id="tt-taken">–</small></article>
+      <article class="p2-status"><i class="p2-status__dot" data-state="ok"></i><strong>Resturlaub</strong><small id="tt-remaining">–</small></article>
+    </div>
+    <div class="p2-table-wrap"><table class="p2-table"><thead><tr><th>Person</th><th>Anspruch</th><th>Genommen</th><th>Rest</th><th>Offen</th></tr></thead><tbody id="tt-vacation-users"></tbody></table></div>
+  </section>
+  <section class="p2-panel">
+    <h2>Teamübersicht</h2><p>Monat kumuliert und Jahreswerte stammen aus derselben Berechnung wie in der klassischen Ansicht.</p>
+    <div class="p2-table-wrap"><table class="p2-table"><thead><tr><th>Person</th><th>Monat kumuliert</th><th>Jahr</th><th>Zeitausgleich</th><th>Status</th></tr></thead><tbody id="tt-users"></tbody></table></div>
+  </section>
+  <section class="p2-panel">
+    <h2>Genehmigter noch ausstehender Urlaub</h2><p>Diese Tage sind im Resturlaub bereits berücksichtigt und werden nach dem Urlaubszeitraum nicht erneut gutgeschrieben.</p>
+    <div id="tt-future" class="p2-card-grid"></div>
+  </section>
+  <section class="p2-panel">
+    <h2>Urlaub oder Zeitausgleich beantragen</h2>
+    <form id="tt-leave-form" class="p2-form-grid">
+      <div class="p2-field"><label for="tt-leave-type">Art</label><select id="tt-leave-type"><option value="urlaub">Urlaub</option><option value="zeitausgleich">Zeitausgleich aus Überstunden</option><option value="krank">Krankheit</option><option value="sonderurlaub">Sonderurlaub</option></select></div>
+      <div class="p2-field"><label for="tt-leave-hours">Stunden optional</label><input id="tt-leave-hours" type="number" min="0" step="0.25"></div>
+      <div class="p2-field"><label for="tt-leave-from">Von</label><input id="tt-leave-from" type="date" required></div>
+      <div class="p2-field"><label for="tt-leave-to">Bis</label><input id="tt-leave-to" type="date" required></div>
+      <div class="p2-field p2-field--full"><label for="tt-leave-note">Hinweis</label><textarea id="tt-leave-note" rows="3"></textarea></div>
+      <div class="p2-actions p2-field--full"><button class="p2-action" type="submit">Antrag speichern</button></div>
+    </form>
+    <div id="tt-leave-state" class="p2-message" hidden></div>
+  </section>
+  <section class="p2-panel" id="tt-admin" hidden>
+    <h2>Administration</h2><p>Buchungen, Ansprüche und Abwesenheiten werden über denselben Endpunkt wie bisher gespeichert.</p>
+    <form id="tt-entry-form" class="p2-form-grid">
+      <div class="p2-field"><label for="tt-entry-user">Mitarbeiter</label><select id="tt-entry-user"></select></div>
+      <div class="p2-field"><label for="tt-entry-date">Datum</label><input id="tt-entry-date" type="date" required></div>
+      <div class="p2-field"><label for="tt-entry-start">Beginn</label><input id="tt-entry-start" type="time" required></div>
+      <div class="p2-field"><label for="tt-entry-end">Ende</label><input id="tt-entry-end" type="time"></div>
+      <div class="p2-field"><label for="tt-entry-break">Pause in Minuten</label><input id="tt-entry-break" type="number" min="0" value="0"></div>
+      <div class="p2-field"><label for="tt-entry-note">Notiz</label><input id="tt-entry-note" type="text"></div>
+      <div class="p2-actions p2-field--full"><button class="p2-action" type="submit">Buchung speichern</button></div>
+    </form>
+    <div id="tt-entry-state" class="p2-message" hidden></div>
+  </section>
+</Portal2Layout>
+<script is:inline>
+(() => {
+  const API='/intern/api/time-tracking.php';
+  const $=id=>document.getElementById(id);
+  const esc=value=>String(value??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const request=async(url,options={})=>{const response=await fetch(url,{credentials:'same-origin',cache:'no-store',...options});const data=await response.json().catch(()=>({}));if(!response.ok||data.ok===false)throw Error(data.error||('HTTP '+response.status));return data};
+  const fmtMinutes=value=>{const n=Number(value)||0,s=n<0?'-':'',m=Math.abs(n);return s+Math.floor(m/60)+':'+String(m%60).padStart(2,'0')};
+  const fmtDays=value=>value===null||value===undefined?'nicht hinterlegt':Number(value).toLocaleString('de-DE',{maximumFractionDigits:2})+' Tage';
+  const dateOnly=value=>String(value||'').slice(0,10).split('-').reverse().join('.');
+  const timeOnly=value=>String(value||'').slice(11,16);
+  const vacationOf=user=>user?.vacation||{entitlement_days:null,taken_days:0,remaining_days:null,pending_days:0,future_approved:[]};
+  const message=(id,text,error=false)=>{const el=$(id);el.textContent=text;el.hidden=!text;el.classList.toggle('is-error',error)};
+  let data=null;
+  const own=()=> (data?.users||[]).find(user=>Number(user.id)===Number(data?.actor?.id));
+  function render(){
+    const user=own(), permissions=data.permissions||{}, users=data.users||[];
+    const visible=users.filter(item=>item.identity!=='marc');
+    const v=vacationOf(user);
+    $('tt-identity').textContent='Angemeldet als '+data.actor.name+' · '+(permissions.can_edit_all?'Administrator':'Mitarbeiter');
+    const entry=(data.entries||[]).find(item=>Number(item.user_id)===Number(data.actor.id)&&!item.ended_at);
+    $('tt-open').textContent=entry?(entry.pause_started_at?'Pause läuft':'Arbeitszeit läuft'):'Keine offene Buchung';
+    $('tt-balance').textContent=fmtMinutes(Number(user?.balance_minutes||0)-Number(user?.compensated_minutes||0));
+    $('tt-compensated').textContent=fmtMinutes(user?.compensated_minutes||0);
+    $('tt-vacation-year').textContent=data.year||'';
+    $('tt-entitlement').textContent=fmtDays(v.entitlement_days);$('tt-taken').textContent=fmtDays(v.taken_days);$('tt-remaining').textContent=fmtDays(v.remaining_days);
+    $('tt-vacation-users').innerHTML=visible.map(item=>{const x=vacationOf(item);return '<tr><td><strong>'+esc(item.name)+'</strong></td><td>'+fmtDays(x.entitlement_days)+'</td><td>'+fmtDays(x.taken_days)+'</td><td>'+fmtDays(x.remaining_days)+'</td><td>'+fmtDays(x.pending_days)+'</td></tr>'}).join('');
+    const timeUsers=visible.filter(item=>item.has_entries);
+    $('tt-users').innerHTML=timeUsers.map(item=>'<tr><td><strong>'+esc(item.name)+'</strong></td><td>'+fmtMinutes(item.month_worked_minutes)+'<br><small>Saldo '+fmtMinutes(item.month_balance_minutes)+'</small></td><td>'+fmtMinutes(item.worked_minutes)+'<br><small>Saldo '+fmtMinutes(Number(item.balance_minutes)-Number(item.compensated_minutes||0))+'</small></td><td>'+fmtMinutes(item.compensated_minutes||0)+'</td><td>'+(item.open?'offen':'geschlossen')+'</td></tr>').join('')||'<tr><td colspan="5">Keine Mitarbeiterdaten verfügbar.</td></tr>';
+    const future=[];visible.forEach(item=>vacationOf(item).future_approved.forEach(row=>future.push('<article class="p2-card"><strong>'+esc(item.name)+'</strong><small>'+dateOnly(row.starts_on)+' – '+dateOnly(row.ends_on)+'</small><strong>'+fmtDays(row.days)+'</strong></article>')));$('tt-future').innerHTML=future.join('')||'<div class="p2-empty">Kein genehmigter zukünftiger Urlaub hinterlegt.</div>';
+    $('tt-admin').hidden=!permissions.can_edit_all;
+    if(permissions.can_edit_all){const directory=(data.all_users||users).filter(item=>item.time_tracking_enabled!==false);$('tt-entry-user').innerHTML=directory.map(item=>'<option value="'+item.id+'">'+esc(item.name)+'</option>').join('')}
+    $('tt-clock-in').disabled=!!entry;$('tt-pause').disabled=!entry;$('tt-clock-out').disabled=!entry;
+  }
+  async function load(){try{data=await request(API+'?action=summary');render()}catch(error){message('tt-clock-state',error.message,true)}}
+  $('tt-refresh').addEventListener('click',load);
+  $('tt-clock-in').addEventListener('click',async()=>{try{await request(API+'?action=clock_in',{method:'POST'});message('tt-clock-state','Eingebucht.');await load()}catch(error){message('tt-clock-state',error.message,true)}});
+  $('tt-pause').addEventListener('click',async()=>{try{const result=await request(API+'?action=pause_toggle',{method:'POST'});message('tt-clock-state',result.paused?'Pause gestartet.':'Pause beendet.');await load()}catch(error){message('tt-clock-state',error.message,true)}});
+  $('tt-clock-out').addEventListener('click',async()=>{try{const result=await request(API+'?action=clock_out',{method:'POST'});message('tt-clock-state','Ausgebucht · gearbeitet '+fmtMinutes(result.worked_minutes)+'.');await load()}catch(error){message('tt-clock-state',error.message,true)}});
+  $('tt-leave-form').addEventListener('submit',async event=>{event.preventDefault();try{await request(API+'?action=leave_submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({leave_type:$('tt-leave-type').value,starts_on:$('tt-leave-from').value,ends_on:$('tt-leave-to').value,hours:$('tt-leave-hours').value,note:$('tt-leave-note').value})});message('tt-leave-state','Antrag gespeichert.');event.target.reset();await load()}catch(error){message('tt-leave-state',error.message,true)}});
+  $('tt-entry-form').addEventListener('submit',async event=>{event.preventDefault();try{await request(API+'?action=save_entry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:Number($('tt-entry-user').value),date:$('tt-entry-date').value,start:$('tt-entry-start').value,end:$('tt-entry-end').value,break_minutes:$('tt-entry-break').value,note:$('tt-entry-note').value})});message('tt-entry-state','Buchung gespeichert.');event.target.reset();await load()}catch(error){message('tt-entry-state',error.message,true)}});
+  load();
+})();
+</script>
