@@ -88,6 +88,18 @@ function oauthClient(string $clientId): ?array
     $stmt = db()->prepare('SELECT * FROM oauth_clients WHERE client_id=:id LIMIT 1');
     $stmt->execute([':id' => $clientId]);
     $row = $stmt->fetch();
+    if ($row) return $row;
+
+    // Langdock's previously issued public client must survive a portal database reset.
+    // Recreate only this exact, pre-approved callback-bound client when its row is missing.
+    $langdockClientId = 'svnet_xStICKru8r26rHF7mr31AY6LhM8Q_4v';
+    $langdockRedirect = 'https://app.langdock.com/api/integrations/9cb5dacd-d747-4cde-9cbb-686197f732fc/callback';
+    if ($clientId === $langdockClientId) {
+        db()->prepare('INSERT IGNORE INTO oauth_clients(client_id,client_name,redirect_uris_json,created_at) VALUES(:id,:name,:uris,UTC_TIMESTAMP())')
+            ->execute([':id'=>$langdockClientId, ':name'=>'Langdock ClaimsForce', ':uris'=>json_encode([$langdockRedirect], JSON_UNESCAPED_SLASHES)]);
+        $stmt->execute([':id' => $clientId]);
+        $row = $stmt->fetch();
+    }
     return $row ?: null;
 }
 
