@@ -71,6 +71,12 @@ Nach dem Wiederanlauf werden Betriebszustand, Restarbeiten und Überwachung fest
 
 Für die Schlussprüfung werden Prüfprotokoll, Reparaturrechnung, Freigabe und gegebenenfalls Herstellerunterlagen zusammengeführt. So lässt sich nachvollziehen, welche Kosten für die sichere Wiederherstellung erforderlich waren und welche Positionen auf Wartung, Modernisierung oder eine ohnehin geplante Erneuerung entfallen.
 
+## Übergang in den Regelbetrieb
+
+Nach einer Freigabe muss der Übergang in den normalen Betrieb beobachtet werden. Eine Anlage kann im ersten Funktionstest unauffällig sein und unter Belastung dennoch Auffälligkeiten zeigen. Deshalb werden Betriebsbedingungen, Prüfzeitpunkt und gegebenenfalls eine Nachkontrolle festgehalten. Bei einer nur vorläufigen Freigabe bleiben Überwachung und Restarbeiten ausdrücklich bestehen.
+
+Die technische Dokumentation sollte außerdem zeigen, ob angrenzende Bauteile durch den Wiederanlauf belastet werden. Ein wieder in Betrieb genommenes Heizungs- oder Lüftungssystem kann etwa Auswirkungen auf noch nicht abgeschlossene Trocknungs- oder Reinigungsarbeiten haben. Solche Wechselwirkungen gehören in die Ablaufplanung und dürfen nicht allein über die Rechnung erklärt werden.
+
 ## Quellen und weiterführende Hinweise
 
 Bundesministerium der Justiz, Bürgerliches Gesetzbuch, § 249 Art und Umfang des Schadensersatzes, geltende Fassung. [Gesetze im Internet](https://www.gesetze-im-internet.de/bgb/__249.html)
