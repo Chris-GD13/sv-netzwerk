@@ -1,0 +1,54 @@
+name: Fachbeitrag Veröffentlichungsmonitor
+
+on:
+  schedule:
+    - cron: "15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-current-publication:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Berliner Veröffentlichungszeit prüfen
+        id: berlin-time
+        shell: bash
+        run: |
+          hour="$(TZ=Europe/Berlin date +%H)"
+          echo "hour=$hour" >> "$GITHUB_OUTPUT"
+          if [ "$hour" != "06" ]; then
+            echo "Außerhalb des Prüfzeitfensters. Keine Prüfung."
+            exit 0
+          fi
+
+      - name: Tagesregister und Live-Seite prüfen
+        if: steps.berlin-time.outputs.hour == '06'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          register_url="https://raw.githubusercontent.com/Chris-GD13/sv-netzwerk/main/sv-netzwerk/docs/fachbeitrag-tagesregister.json"
+          register="$(curl --fail --silent --show-error --location "$register_url")"
+          date="$(TZ=Europe/Berlin date +%F)"
+
+          entry="$(printf '%s' "$register" | jq -cer --arg date "$date" '.days[$date]')"
+          status="$(printf '%s' "$entry" | jq -r '.article.status')"
+          title="$(printf '%s' "$entry" | jq -r '.article.title')"
+          url="$(printf '%s' "$entry" | jq -r '.article.url')"
+
+          if [ "$status" != "published-verified" ]; then
+            echo "Tagesartikel $date ist im Register nicht als published-verified markiert."
+            exit 1
+          fi
+
+          if ! printf '%s' "$url" | grep -Eq '^https://www\\.sv-netzwerk\\.eu/fachwissen/[a-z0-9-]+/$'; then
+            echo "Ungültige kanonische Artikel-URL: $url"
+            exit 1
+          fi
+
+          page="$(curl --fail --silent --show-error --location "$url")"
+          printf '%s' "$page" | grep -F -- "$title" >/dev/null
+
+          echo "Verifiziert: $date, $title, HTTP 200, sichtbarer Titel."
