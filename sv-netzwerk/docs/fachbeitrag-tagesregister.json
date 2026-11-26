@@ -259,9 +259,123 @@
       "linkedin": {
         "status": "not-scheduled-weekday"
       }
+    },
+    "2026-11-21": {
+      "publication_id": "2026-11-21-mietminderung-gebaeudeschaden-nutzungsbeeintraechtigung-zeitraum-nachweis",
+      "article": {
+        "title": "Mietminderung nach einem Gebäudeschaden: Nutzungsbeeinträchtigung, Zeitraum und Nachweis trennen",
+        "slug": "mietminderung-gebaeudeschaden-nutzungsbeeintraechtigung-zeitraum-nachweis",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/mietminderung-gebaeudeschaden-nutzungsbeeintraechtigung-zeitraum-nachweis/",
+        "status": "published-pending-live",
+        "owner": "codex-website-recovery-20261126",
+        "reserved_at": "2026-11-26T20:30:00+01:00",
+        "recovery": {
+          "batch": "2026-11-21-bis-26-redaktionelle-nachholung",
+          "approved_at": "2026-11-26",
+          "approval": "explizite redaktionelle Freigabe durch Christian"
+        }
+      },
+      "linkedin": {
+        "status": "prepared-not-posted"
+      }
+    },
+    "2026-11-22": {
+      "publication_id": "2026-11-22-schutz-und-abdeckmassnahmen-gebaeudeschaden-erforderlichkeit-kosten",
+      "article": {
+        "title": "Schutz- und Abdeckmaßnahmen im Gebäudeschaden: Erforderlichkeit, Dauer und Kosten prüfen",
+        "slug": "schutz-und-abdeckmassnahmen-gebaeudeschaden-erforderlichkeit-kosten",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/schutz-und-abdeckmassnahmen-gebaeudeschaden-erforderlichkeit-kosten/",
+        "status": "published-pending-live",
+        "owner": "codex-website-recovery-20261126",
+        "reserved_at": "2026-11-26T20:30:00+01:00",
+        "recovery": {
+          "batch": "2026-11-21-bis-26-redaktionelle-nachholung",
+          "approved_at": "2026-11-26",
+          "approval": "explizite redaktionelle Freigabe durch Christian"
+        }
+      },
+      "linkedin": {
+        "status": "prepared-not-posted"
+      }
+    },
+    "2026-11-23": {
+      "publication_id": "2026-11-23-baustellenzugang-wohnbetrieb-schadensanierung-schutzkoordination",
+      "article": {
+        "title": "Baustellenzugang bei bewohntem Gebäude: Nutzbarkeit, Schutz und Sanierungsablauf trennen",
+        "slug": "baustellenzugang-wohnbetrieb-schadensanierung-schutzkoordination",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/baustellenzugang-wohnbetrieb-schadensanierung-schutzkoordination/",
+        "status": "published-pending-live",
+        "owner": "codex-website-recovery-20261126",
+        "reserved_at": "2026-11-26T20:30:00+01:00",
+        "recovery": {
+          "batch": "2026-11-21-bis-26-redaktionelle-nachholung",
+          "approved_at": "2026-11-26",
+          "approval": "explizite redaktionelle Freigabe durch Christian"
+        }
+      },
+      "linkedin": {
+        "status": "prepared-not-posted"
+      }
+    },
+    "2026-11-24": {
+      "publication_id": "2026-11-24-verdeckte-leistungen-schadensanierung-dokumentation-pruefung",
+      "article": {
+        "title": "Verdeckte Leistungen in der Schadensanierung: Öffnungen, Aufmaß und Nachweis sichern",
+        "slug": "verdeckte-leistungen-schadensanierung-dokumentation-pruefung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/verdeckte-leistungen-schadensanierung-dokumentation-pruefung/",
+        "status": "published-pending-live",
+        "owner": "codex-website-recovery-20261126",
+        "reserved_at": "2026-11-26T20:30:00+01:00",
+        "recovery": {
+          "batch": "2026-11-21-bis-26-redaktionelle-nachholung",
+          "approved_at": "2026-11-26",
+          "approval": "explizite redaktionelle Freigabe durch Christian"
+        }
+      },
+      "linkedin": {
+        "status": "prepared-not-posted"
+      }
+    },
+    "2026-11-25": {
+      "publication_id": "2026-11-25-vorlaeufige-kostenfreigabe-schadensanierung-pruefvorbehalt-schlussrechnung",
+      "article": {
+        "title": "Vorläufige Kostenfreigaben im Schadenfall: Leistungsstand, Prüfvorbehalt und Schlussrechnung trennen",
+        "slug": "vorlaeufige-kostenfreigabe-schadensanierung-pruefvorbehalt-schlussrechnung",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/vorlaeufige-kostenfreigabe-schadensanierung-pruefvorbehalt-schlussrechnung/",
+        "status": "published-pending-live",
+        "owner": "codex-website-recovery-20261126",
+        "reserved_at": "2026-11-26T20:30:00+01:00",
+        "recovery": {
+          "batch": "2026-11-21-bis-26-redaktionelle-nachholung",
+          "approved_at": "2026-11-26",
+          "approval": "explizite redaktionelle Freigabe durch Christian"
+        }
+      },
+      "linkedin": {
+        "status": "prepared-not-posted"
+      }
+    },
+    "2026-11-26": {
+      "publication_id": "2026-11-26-wiederinbetriebnahme-gebaeudeschaden-funktionspruefung-freigabe-kosten",
+      "article": {
+        "title": "Wiederinbetriebnahme nach Gebäudeschäden: Funktionsprüfung, Freigabe und Kosten trennen",
+        "slug": "wiederinbetriebnahme-gebaeudeschaden-funktionspruefung-freigabe-kosten",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/wiederinbetriebnahme-gebaeudeschaden-funktionspruefung-freigabe-kosten/",
+        "status": "published-pending-live",
+        "owner": "codex-website-recovery-20261126",
+        "reserved_at": "2026-11-26T20:30:00+01:00",
+        "recovery": {
+          "batch": "2026-11-21-bis-26-redaktionelle-nachholung",
+          "approved_at": "2026-11-26",
+          "approval": "explizite redaktionelle Freigabe durch Christian"
+        }
+      },
+      "linkedin": {
+        "status": "prepared-not-posted"
+      }
     }
   },
-  "updated_at": "2026-11-20T05:22:18.876Z",
+  "updated_at": "2026-11-26T20:30:00+01:00",
   "entries": {
     "2026-11-11": {
       "publication_id": "2026-11-11-naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",

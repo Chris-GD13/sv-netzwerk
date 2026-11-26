@@ -1,3 +1,11 @@
+## 2026-11-26 – Redaktionelle Nachholung vom 21. bis 26. November
+
+- Sechs fehlende Website-Fachbeiträge für den Zeitraum vom 21. bis 26.11.2026 redaktionell freigegeben und als kontrollierter Wiederherstellungslauf vorbereitet.
+- Standard-Guard bleibt auf das aktuelle Berliner Datum begrenzt; die Nachholung wird im separaten Wiederherstellungsdokument mit Batch und Freigabe dokumentiert.
+- Register und Veröffentlichungsprotokoll zunächst mit `published-pending-live` geführt; die sechs Detailseiten erhalten nach erfolgreicher Live-Prüfung den Status `published-verified`.
+- LinkedIn-Begleittexte als `prepared-not-posted` abgelegt; keine externe Veröffentlichung.
+- Ohne öffentliches Beitragsbild gemäß Fachbeitragsstandard.
+
 ## 2026-11-02
 
 - Fachbeitrag in der öffentlichen Fachwissen-Übersicht sichtbar gemacht, obwohl er für den 02.11. datiert und am 01.11. vorab freigegeben ist
