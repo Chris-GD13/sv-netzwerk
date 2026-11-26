@@ -1,6 +1,6 @@
 ---
 title: "Wiederinbetriebnahme nach Gebäudeschäden: Funktionsprüfung, Freigabe und Kosten trennen"
-description: "Wie technische Anlagen nach einem Gebäudeschaden sicher geprüft, schrittweise wieder in Betrieb genommen und schadenbedingte Kosten von Verbesserungen abgegrenzt werden."
+description: "Wie technische Anlagen nach einem Gebäudeschaden sicher geprüft, in einzelnen Stufen wieder in Betrieb genommen und schadenbedingte Kosten von Verbesserungen abgegrenzt werden."
 category: "Gebäudetechnik und Schadenregulierung"
 tags: ["Wiederinbetriebnahme","Funktionsprüfung","Gebäudetechnik","Wasserschaden","Brandschaden","Kostenabgrenzung"]
 author: "christian-waechter"
@@ -20,7 +20,7 @@ publication:
   status: published
 seo:
   title: "Wiederinbetriebnahme nach Gebäudeschäden prüfen"
-  description: "Wie technische Anlagen nach einem Gebäudeschaden sicher geprüft, schrittweise wieder in Betrieb genommen und schadenbedingte Kosten von Verbesserungen abgegrenzt werden."
+  description: "Wie technische Anlagen nach einem Gebäudeschaden sicher geprüft, in einzelnen Stufen wieder in Betrieb genommen und schadenbedingte Kosten von Verbesserungen abgegrenzt werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/wiederinbetriebnahme-gebaeudeschaden-funktionspruefung-freigabe-kosten/"
   noindex: false
 ---

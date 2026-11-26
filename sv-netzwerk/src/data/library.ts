@@ -66,7 +66,7 @@ export const library: LibraryItem[] = [
   },
   {
     title: "Wiederinbetriebnahme nach Gebäudeschäden: Funktionsprüfung, Freigabe und Kosten trennen",
-    description: "Wie technische Anlagen nach einem Gebäudeschaden sicher geprüft, schrittweise wieder in Betrieb genommen und schadenbedingte Kosten von Verbesserungen abgegrenzt werden.",
+    description: "Wie technische Anlagen nach einem Gebäudeschaden sicher geprüft und in einzelnen Stufen wieder in Betrieb genommen und schadenbedingte Kosten von Verbesserungen abgegrenzt werden.",
     href: '/fachwissen/wiederinbetriebnahme-gebaeudeschaden-funktionspruefung-freigabe-kosten/',
     category: "Gebäudetechnik und Schadenregulierung",
     tags: ["Wiederinbetriebnahme","Funktionsprüfung","Gebäudetechnik","Wasserschaden","Brandschaden","Kostenabgrenzung"],
