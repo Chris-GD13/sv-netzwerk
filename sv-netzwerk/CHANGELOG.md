@@ -1,3 +1,11 @@
+## 2026-11-26 – Nachholung live verifiziert
+
+- Die sechs redaktionell freigegebenen Fachbeiträge vom 21. bis 26.11.2026 sind nach erfolgreichem GitHub-Deploy live verifiziert.
+- Detailseiten, Fachwissensübersicht, Sitemap und `deploy-version.txt` wurden geprüft.
+- Inhaltscommit `b72db6fd5c5c925746c75909c5d6d76910c51beb`; Deploy [`https://github.com/Chris-GD13/sv-netzwerk/actions/runs/45895504402`](https://github.com/Chris-GD13/sv-netzwerk/actions/runs/45895504402).
+- LinkedIn bleibt für alle sechs Beiträge `prepared-not-posted`; es wurde nichts extern veröffentlicht.
+- Der Standard-Guard bleibt auf das aktuelle Berliner Datum begrenzt. Die historische Nachholung bleibt als einmaliger, genehmigter Batch dokumentiert.
+
 ## 2026-11-26 – Redaktionelle Nachholung vom 21. bis 26. November
 
 - Sechs fehlende Website-Fachbeiträge für den Zeitraum vom 21. bis 26.11.2026 redaktionell freigegeben und als kontrollierter Wiederherstellungslauf vorbereitet.
