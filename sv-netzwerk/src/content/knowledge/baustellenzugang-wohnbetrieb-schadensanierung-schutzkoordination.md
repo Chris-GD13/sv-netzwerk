@@ -19,7 +19,7 @@ publication:
   updatedAt: 2026-11-23
   status: published
 seo:
-  title: "Baustellenzugang bei bewohntem Gebäude: Nutzbarkeit, Schutz und Sanierungsablauf trennen"
+  title: "Baustellenzugang bei bewohntem Gebäude fachlich planen"
   description: "Wie Zugang, Schutz der Bewohner und der laufende Sanierungsablauf bei einem bewohnten Gebäude nachvollziehbar abgestimmt und kostenmäßig getrennt werden."
   canonical: "https://www.sv-netzwerk.eu/fachwissen/baustellenzugang-wohnbetrieb-schadensanierung-schutzkoordination/"
   noindex: false
@@ -70,6 +70,10 @@ Die fachliche Verantwortung bleibt von der organisatorischen Abstimmung getrennt
 Der Terminplan sollte neben Beginn und Ende einer Leistung auch die Nutzungseinschränkung ausweisen. Werden Arbeiten abschnittsweise ausgeführt, wird der Wechsel zwischen den Bereichen sichtbar. Bei Unterbrechungen wird vermerkt, ob Material, Zugang, Freigabe, Witterung oder ein technischer Befund maßgeblich war.
 
 Ein solcher Ablaufnachweis hilft bei der späteren Bewertung von Standzeiten und Ersatzmaßnahmen. Er verhindert zugleich, dass eine lange Gesamtdauer automatisch als durchgehend schadenbedingt verstanden wird. Der technische Ablauf bleibt damit mit der tatsächlichen Nutzung des Gebäudes verbunden.
+
+## Abstimmung mit der Nutzung
+
+Die Zugangslösung wird vor Beginn mit den betroffenen Nutzern abgestimmt und bei Bedarf angepasst. Änderungen werden kurz begründet und mit dem neuen Arbeitsabschnitt verbunden. Eine nachvollziehbare Abstimmung reduziert Unterbrechungen, schafft klare Erwartungen und hilft bei der späteren Einordnung zusätzlicher Wege, Schutzarbeiten oder Ersatztermine.
 
 ## Quellen und weiterführende Hinweise
 

@@ -71,6 +71,10 @@ Eine Freigabe sollte die zugelassene Maßnahme, den betroffenen Bereich und die 
 
 Der Nachweis muss auch bei kurzfristigen Sofortmaßnahmen nachholbar bleiben. Fotos, kurze Einsatzberichte und die spätere Zuordnung zum Angebot reichen häufig aus, wenn sie den Zustand am Beginn der Arbeiten und die konkrete Gefahrenlage nachvollziehbar wiedergeben.
 
+## Übergabe an die Wiederherstellung
+
+Sobald die Ursache des unmittelbaren Risikos beseitigt ist, wird der Übergang zur dauerhaften Wiederherstellung dokumentiert. Die provisorische Abdeckung, die laufende Kontrolle und die abschließende Reparatur gehören zeitlich zusammen, bleiben aber eigenständige Leistungen. Diese Trennung erleichtert die Abrechnung und verhindert, dass eine vorläufige Sicherung als fertige Wiederherstellung erscheint.
+
 ## Quellen und weiterführende Hinweise
 
 Bundesministerium der Justiz, Bürgerliches Gesetzbuch, § 254 Mitverschulden, geltende Fassung. [Gesetze im Internet](https://www.gesetze-im-internet.de/bgb/__254.html)

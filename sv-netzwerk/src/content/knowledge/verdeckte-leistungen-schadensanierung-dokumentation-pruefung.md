@@ -71,6 +71,10 @@ Vor der Rechnungsprüfung werden die verdeckten Leistungen in einer raum- oder b
 
 Fehlt ein Dokument, wird die Position nicht stillschweigend als vollständig belegt behandelt. Sie kann vorläufig offen bleiben, durch weitere Unterlagen ergänzt oder bei einer erneuten Sichtprüfung eingeschränkt werden. Diese Arbeitsweise hält den tatsächlichen Umfang sichtbar und verhindert, dass eine Pauschalrechnung die technische Prüfung ersetzt.
 
+## Verantwortlichkeit beim Nachweis
+
+Die Verantwortung für die Dokumentation wird vor dem Verschließen zugeordnet. So ist klar, wer Fotos, Aufmaß und Prüfprotokolle erstellt und wer den Zustand freigibt. Eine spätere Rechnungskontrolle wird dadurch nicht ersetzt. Sie kann aber auf einen eindeutigen Nachweis zurückgreifen, statt die verdeckte Leistung nur aus einer Sammelposition rekonstruieren zu müssen.
+
 ## Quellen und weiterführende Hinweise
 
 Bundesministerium der Justiz, Bürgerliches Gesetzbuch, § 631 Vertragstypische Pflichten beim Werkvertrag, geltende Fassung. [Gesetze im Internet](https://www.gesetze-im-internet.de/bgb/__631.html)

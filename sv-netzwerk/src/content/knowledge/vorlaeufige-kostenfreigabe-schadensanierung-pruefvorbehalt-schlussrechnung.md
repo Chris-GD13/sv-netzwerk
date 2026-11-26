@@ -71,6 +71,14 @@ Die Formulierung der Freigabe sollte verständlich und sachlich bleiben. Sie nen
 
 Ändert sich die technische Grundlage, wird die Freigabe angepasst und die alte Fassung nachvollziehbar abgelegt. So bleibt die Entscheidungsgeschichte in der Schadenakte erhalten. Die Kommunikation ersetzt dabei nicht die fachliche Prüfung. Sie muss deren Ergebnis lediglich eindeutig abbilden.
 
+## Umgang mit Unsicherheiten
+
+Bleibt ein Teil der Leistung technisch oder mengenmäßig offen, wird die Unsicherheit in der Freigabe ausdrücklich beschrieben. Eine Bandbreite kann als Arbeitsgrundlage dienen, wenn ihre Berechnung und ihre Grenzen nachvollziehbar sind. Sie ersetzt keine spätere Abrechnung nach tatsächlicher Ausführung. Bei einer wesentlichen Änderung wird die Freigabe vor der nächsten Arbeitsstufe erneut geprüft.
+
+## Abschluss der Freigabekette
+
+Am Ende werden Freigabe, Nachtrag, Schlussrechnung und Zahlungsstatus in einer einheitlichen Übersicht zusammengeführt. So wird sichtbar, welche Positionen anerkannt, noch offen oder aus dem Schadenbezug herausgenommen wurden. Die Akte erhält damit einen klaren Abschluss, ohne die vorläufigen Entscheidungen rückwirkend umzudeuten.
+
 ## Quellen und weiterführende Hinweise
 
 Bundesministerium der Justiz, Bürgerliches Gesetzbuch, § 249 Art und Umfang des Schadensersatzes, geltende Fassung. [Gesetze im Internet](https://www.gesetze-im-internet.de/bgb/__249.html)
