@@ -9,7 +9,7 @@ const api = fs.readFileSync(path.join(root, 'public/intern/api/time-tracking.php
 const layout = fs.readFileSync(path.join(root, 'src/layouts/InternalLayout.astro'), 'utf8');
 
 assert.match(layout, /\/intern\/zeiterfassung\//);
-for (const label of ['Einbuchen', 'Pause', 'Ausbuchen', 'Überstunden / Saldo', 'Zeitausgleich', 'Auszahlung', 'Urlaubsübersicht', 'Resturlaub', 'Stundenlohn', 'Vereinbarte Wochenstunden', 'Abwesenheit nachtragen', 'Abwesenheiten</summary>', 'Meine und freigegebene Buchungen</summary>', 'Urlaub genommen', 'Krankheit', 'Auszahlung laufender Monat', 'Daten für Lexware/Buchhaltung', 'Bearbeiten', 'Löschen']) assert.ok(page.includes(label), `missing label: ${label}`);
+for (const label of ['Einbuchen', 'Pause', 'Ausbuchen', 'Aktueller Monat kumuliert', 'Jahreswerte', 'Überstunden / Saldo', 'Zeitausgleich', 'Auszahlung', 'Urlaubsübersicht', 'Resturlaub', 'Stundenlohn', 'Vereinbarte Wochenstunden', 'Abwesenheit nachtragen', 'Abwesenheiten</summary>', 'Meine und freigegebene Buchungen</summary>', 'Urlaub genommen', 'Krankheit', 'Auszahlung laufender Monat', 'Daten für Lexware/Buchhaltung', 'Bearbeiten', 'Löschen']) assert.ok(page.includes(label), `missing label: ${label}`);
 assert.match(page, /tt-entitlement-enabled/);
 for (const action of ['clock_in', 'pause_toggle', 'clock_out', 'lexware_export', 'leave_submit', 'leave_admin_save', 'leave_admin_update', 'leave_admin_delete', 'leave_decide', 'save_leave_entitlement', 'save_entry', 'import_timemoto']) assert.match(api, new RegExp(`action === '${action}'`));
 assert.match(api, /ttIdentity/);
@@ -32,7 +32,7 @@ assert.match(api, /pause_started_at/);
 assert.match(api, /balance_target_minutes/);
 assert.match(api, /balance_target_year/);
 assert.match(api, /balance_target_at/);
-assert.match(api, /postTargetBalance/);
+assert.match(api, /postTargetBalance/);\nassert.match(api, /month_worked_minutes/);\nassert.match(api, /month_balance_minutes/);
 assert.match(page, /Nicht abgefeierte Stunden verfallen nicht/);
 assert.match(page, /Überstunden \(Tage\)/);
 assert.match(page, /overtimeDaysOf/);
