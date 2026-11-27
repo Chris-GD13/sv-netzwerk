@@ -14,7 +14,7 @@ $action = (string)($_GET['action'] ?? 'summary');
 
 match (true) {
     $method === 'GET' && $action === 'summary' => handleSummary($actor),
-    $method === 'GET' && $action === 'lexware_export' => handleLexwareExport($actor),
+    $method === 'GET' && in_array($action, ['lexware_export', 'datev_export'], true) => handleLexwareExport($actor),
     $method === 'POST' && $action === 'clock_in' => handleClockIn($actor),
     $method === 'POST' && $action === 'pause_toggle' => handlePauseToggle($actor),
     $method === 'POST' && $action === 'clock_out' => handleClockOut($actor),
@@ -505,7 +505,8 @@ function handleLexwareExport(array $actor): never
     $lines = [];
     foreach ($rows as $row) $lines[] = implode(';', array_map(static fn($value): string => '"' . str_replace('"', '""', (string)$value) . '"', $row));
     header('Content-Type: text/csv; charset=UTF-8');
-    header('Content-Disposition: attachment; filename="sv-netzwerk-lexware-' . $year . '.csv"');
+    $exportName = $action === 'datev_export' ? 'sv-netzwerk-datev-' : 'sv-netzwerk-lexware-';
+    header('Content-Disposition: attachment; filename="' . $exportName . $year . '.csv"');
     echo "\xEF\xBB\xBF" . implode("\r\n", $lines) . "\r\n";
     exit;
 }
