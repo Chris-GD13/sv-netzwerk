@@ -164,9 +164,11 @@ try {
         if (!$to && !$cc && !$bcc) throw new RuntimeException('Empfänger fehlt.');
         $caseNo = trim((string)($_POST['case_no'] ?? ''));
         $damageType = trim((string)($_POST['damage_type'] ?? ''));
-        if ($caseNo === '') throw new RuntimeException('Schaden-Nr. fehlt im aktiven Fall.');
+        $standalone = filter_var($_POST['standalone'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        if ($caseNo === '' && !$standalone) throw new RuntimeException('Schaden-Nr. fehlt im aktiven Fall.');
         $subjectOverride = trim((string)($_POST['subject'] ?? ''));
         if (mb_strlen($subjectOverride, 'UTF-8') > 500) throw new RuntimeException('Der Betreff ist zu lang.');
+        if ($standalone && $subjectOverride === '') throw new RuntimeException('Betreff fehlt.');
         $subject = $subjectOverride !== '' ? $subjectOverride : $caseNo . ($damageType !== '' ? ' – ' . $damageType : '');
         $subject = reviewMailSubject($subject,$caseNo);
         $text = trim((string)($_POST['body'] ?? ''));
