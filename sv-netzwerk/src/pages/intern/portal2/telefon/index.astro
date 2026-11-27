@@ -1,13 +1,10 @@
 ---
 import Portal2Layout from '../../../../layouts/Portal2Layout.astro';
 ---
-<Portal2Layout title="Telefonzentrale | Portal 2.0" description="Telefonzentrale im Portal 2.0." currentPath="/intern/portal2/telefon/">
-  <section class="p2-hero">
-    <div><p class="p2-kicker">02 · Organisieren</p><h1>Telefonzentrale</h1><p>Anrufe, Rückrufe und Gesprächsnotizen werden eins zu eins aus der bestehenden Telefonzentrale gespiegelt. Die bestehende Funktion und der bestehende Datenbestand bleiben maßgeblich. Portal 2.0 stellt eine gemeinsame Spiegelansicht bereit.</p></div>
-    <div class="p2-actions"><a class="p2-action p2-action--secondary" href="/intern/telefon/">Klassische Ansicht</a></div>
-  </section>
-  <section class="p2-panel p2-mirror"><div class="p2-mirror__head"><strong>Gemeinsame Spiegelansicht</strong><span>Änderungen werden direkt im bestehenden Portal gespeichert.</span></div><iframe title="Telefonzentrale" src="/intern/telefon/" loading="eager"></iframe></section>
+<Portal2Layout title="Telefonzentrale | Portal 2.0" description="Vollständige Telefonzentrale im Portal 2.0." currentPath="/intern/portal2/telefon/">
+  <section class="p2-hero"><div><p class="p2-kicker">02 · Organisieren</p><h1>Telefonzentrale</h1></div></section>
+  <section class="mirror-shell"><iframe title="Vollständige Telefonzentrale" src="/intern/telefon/" loading="eager"></iframe></section>
 </Portal2Layout>
 <style>
-.p2-mirror{padding:0;overflow:hidden}.p2-mirror__head{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:16px 20px;border-bottom:1px solid #d7e0e6;background:#f7f9fa;color:#14324a}.p2-mirror__head span{color:#617687;font-size:.78rem}.p2-mirror iframe{display:block;width:100%;min-height:1800px;border:0;background:#fff}@media(max-width:720px){.p2-mirror__head{align-items:flex-start;flex-direction:column}.p2-mirror iframe{min-height:2200px}}
+.mirror-shell{overflow:hidden;border:1px solid #d7e0e6;border-radius:5px;background:#fff;box-shadow:0 5px 18px rgba(16,42,67,.06)}iframe{display:block;width:100%;min-height:3000px;border:0;background:#fff}@media(max-width:720px){iframe{min-height:4800px}}
 </style>
