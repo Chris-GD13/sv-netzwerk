@@ -29,6 +29,7 @@ const navGroups = [
       ['kalender', 'Kalender', '□'],
       ['telefon', 'Telefonzentrale', '☎'],
       ['zeiterfassung', 'Zeiterfassung', '◷'],
+      ['weitere-funktionen', 'Weitere Funktionen', '⋯'],
     ],
   },
   {
@@ -50,7 +51,7 @@ const navGroups = [
     ],
   },
 ];
-const mirroredPortal2Slugs = new Set(['kalkulation', 'telefon', 'zeiterfassung', 'angebote', 'abrechnungen']);
+const mirroredPortal2Slugs = new Set(['kalkulation', 'telefon', 'zeiterfassung', 'weitere-funktionen', 'angebote', 'abrechnungen']);
 const visibleNavGroups = navGroups.map((group) => ({ ...group, links: group.links.filter(([slug]) => mirroredPortal2Slugs.has(slug)) })).filter((group) => group.links.length > 0);
 const isActive = (slug: string) => currentPath === `/intern/portal2/${slug}/` || currentPath.startsWith(`/intern/portal2/${slug}/`);
 ---
