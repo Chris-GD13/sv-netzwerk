@@ -391,9 +391,23 @@
       "linkedin": {
         "status": "prepared-not-posted"
       }
+    },
+    "2026-11-27": {
+      "publication_id": "2026-11-27-mieterregress-geraeteleckage-anschluss-kausalitaet-schadenumfang",
+      "article": {
+        "title": "Mieterregress bei einer Geräteleckage: Anschluss, Kausalität und Schadenumfang sauber trennen",
+        "slug": "mieterregress-geraeteleckage-anschluss-kausalitaet-schadenumfang",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/mieterregress-geraeteleckage-anschluss-kausalitaet-schadenumfang/",
+        "status": "reserved",
+        "owner": "codex-website-20261127-0600",
+        "reserved_at": "2026-11-27T05:09:46.185Z"
+      },
+      "linkedin": {
+        "status": "not-scheduled-weekday"
+      }
     }
   },
-  "updated_at": "2026-11-26T21:13:35Z",
+  "updated_at": "2026-11-27T05:09:46.185Z",
   "entries": {
     "2026-11-11": {
       "publication_id": "2026-11-11-naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",
