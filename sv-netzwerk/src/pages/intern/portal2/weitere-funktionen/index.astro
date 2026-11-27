@@ -1,0 +1,85 @@
+---
+import Portal2Layout from '../../../../layouts/Portal2Layout.astro';
+---
+<Portal2Layout title="Weitere Funktionen | Portal 2.0" description="E-Mail, Termine, Aufmaß und Aufträge im Portal 2.0." currentPath="/intern/portal2/weitere-funktionen/">
+  <section class="p2-hero">
+    <div><p class="p2-kicker">04 · Weitere Funktionen</p><h1>Weitere Funktionen</h1><p>Die Werkzeuge aus der Fallbearbeitung stehen hier als eigener Arbeitsbereich bereit. E-Mail kann auch ohne angelegten Fall mit Originalunterlagen genutzt werden.</p></div>
+  </section>
+  <section class="tool-grid" aria-label="Weitere Funktionen">
+    <button class="tool-card is-active" type="button" data-tool="mail"><strong>E-Mail schreiben</strong><small>Freigaben und Rückfragen direkt aus Unterlagen erstellen</small><span>›</span></button>
+    <button class="tool-card" type="button" data-tool="calendar"><strong>Ortstermin planen</strong><small>Outlook-Termin mit Einladungen und Anhängen</small><span>›</span></button>
+    <button class="tool-card" type="button" data-tool="case-data"><strong>Falldaten ergänzen</strong><small>Stammdaten des geöffneten Falls bearbeiten</small><span>›</span></button>
+    <button class="tool-card" type="button" data-tool="plaud"><strong>Ortstermin einlesen</strong><small>Zusammenfassung aus dem Termin übernehmen</small><span>›</span></button>
+    <button class="tool-card" type="button" data-tool="polycam"><strong>Aufmaß auswerten</strong><small>PDF, Bild oder ZIP prüfen und zuordnen</small><span>›</span></button>
+    <button class="tool-card" type="button" data-tool="claims-notes"><strong>ClaimsForce-Notizen</strong><small>Gespeicherte Notizen des geöffneten Falls lesen und aktualisieren</small><span>›</span></button>
+    <button class="tool-card" type="button" data-tool="claims-orders"><strong>ClaimsForce-Aufträge</strong><small>Auftrag für den geöffneten Fall starten</small><span>›</span></button>
+    <button class="tool-card" type="button" data-tool="rekon-orders"><strong>Rekon-Aufträge</strong><small>Rekon-Auftrag öffnen und bearbeiten</small><span>›</span></button>
+  </section>
+  <section class="tool-panel" data-panel="mail">
+    <div class="panel-heading"><div><p class="p2-eyebrow">E-Mail ohne Fall</p><h2>Freigabe-E-Mail aus Unterlagen erstellen</h2><p>Eine KVA oder Rechnung kann direkt eingelesen und als Anhang verwendet werden. Eine Schadennummer ist optional.</p></div><span class="status-dot" id="mail-status-dot"></span></div>
+    <form id="standalone-mail" class="p2-form-grid">
+      <div class="p2-field"><label for="mail-to">Empfänger</label><input id="mail-to" type="email" required placeholder="service@versicherer.de"></div>
+      <div class="p2-field"><label for="mail-cc">Cc</label><input id="mail-cc" type="text"></div>
+      <div class="p2-field"><label for="mail-case">Schadennummer optional</label><input id="mail-case" type="text" placeholder="z. B. 26-123456-7"></div>
+      <div class="p2-field"><label for="mail-type">Unterlage</label><select id="mail-type"><option value="Kostenvoranschlag">Kostenvoranschlag</option><option value="Rechnung">Rechnung</option><option value="Nachtrag">Nachtrag</option><option value="Sonstige Unterlage">Sonstige Unterlage</option></select></div>
+      <div class="p2-field"><label for="mail-amount">Betrag optional</label><input id="mail-amount" type="text" placeholder="z. B. 4.850,00 € netto"></div>
+      <div class="p2-field p2-field--full"><label for="mail-subject">Betreff</label><input id="mail-subject" required placeholder="Freigabe Kostenvoranschlag"></div>
+      <div class="p2-field p2-field--full"><label for="mail-body">Nachricht</label><textarea id="mail-body" rows="9" required placeholder="Text der E-Mail"></textarea></div>
+      <div class="p2-field p2-field--full"><label for="mail-files">KVA, Rechnung oder weitere Anhänge, maximal 3 MB je Datei</label><input id="mail-files" type="file" multiple></div>
+      <div class="p2-actions p2-field--full"><button class="p2-action p2-action--secondary" id="mail-generate" type="button">Text aus Unterlage vorbereiten</button><button class="p2-action" type="submit">E-Mail senden</button></div>
+    </form>
+    <div id="mail-message" class="p2-message" hidden></div>
+  </section>
+  <section class="tool-panel" data-panel="calendar" hidden>
+    <div class="panel-heading"><div><p class="p2-eyebrow">Outlook</p><h2>Ortstermin planen</h2><p>Für die Zuordnung zu einer Akte zuerst einen Fall öffnen. Die Terminprüfung und Einladung laufen über die bestehende Outlook-Anbindung.</p></div></div>
+    <div class="p2-actions"><a class="p2-action" href="/intern/portal2/faelle/">Fall öffnen</a><a class="p2-action p2-action--secondary" href="/intern/portal2/kalender/">Kalender öffnen</a></div>
+  </section>
+  <section class="tool-panel" data-panel="case-data" hidden><h2>Falldaten ergänzen</h2><p>Öffnen Sie den Fall, um die vorhandenen Datenfelder im gemeinsamen Bestand zu bearbeiten.</p><a class="p2-action" href="/intern/portal2/faelle/">Fall öffnen</a></section>
+  <section class="tool-panel" data-panel="plaud" hidden><h2>Ortstermin einlesen</h2><p>Die eingelesene Zusammenfassung wird dem geöffneten Fall zugeordnet.</p><a class="p2-action" href="/intern/portal2/faelle/">Fall öffnen</a></section>
+  <section class="tool-panel" data-panel="polycam" hidden><h2>Aufmaß auswerten</h2><p>PDF, Bild oder ZIP wird im geöffneten Fall geprüft und abgelegt.</p><a class="p2-action" href="/intern/portal2/faelle/">Fall öffnen</a></section>
+  <section class="tool-panel" data-panel="claims-notes" hidden><h2>ClaimsForce-Notizen</h2><p>Notizen gehören zum geöffneten ClaimsForce-Fall und werden dort gemeinsam gespeichert.</p><a class="p2-action" href="/intern/portal2/faelle/">Fall öffnen</a></section>
+  <section class="tool-panel" data-panel="claims-orders" hidden><h2>ClaimsForce-Aufträge</h2><p>Der Auftrag wird im geöffneten Fall mit den bestehenden Sperren und Freigaben gestartet.</p><a class="p2-action" href="/intern/portal2/faelle/">Fall öffnen</a></section>
+  <section class="tool-panel" data-panel="rekon-orders" hidden><h2>Rekon-Aufträge</h2><p>Rekon-Aufträge werden aus dem geöffneten Fall im gemeinsamen Bestand bearbeitet.</p><a class="p2-action" href="/intern/portal2/faelle/">Fall öffnen</a></section>
+</Portal2Layout>
+<style>
+.tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:20px}.tool-card{position:relative;display:grid;gap:7px;min-height:110px;padding:22px 50px 18px 20px;border:1px solid #b7c6d0;border-radius:5px;background:#fff;color:#14324a;text-align:left;font:inherit;cursor:pointer}.tool-card:hover,.tool-card.is-active{border-color:#d47b00;box-shadow:0 5px 18px rgba(16,42,67,.08)}.tool-card span{position:absolute;right:18px;top:42%;font-size:2rem}.tool-card strong{font-size:1.15rem}.tool-card small{color:#617687;line-height:1.45}.tool-panel{padding:24px;border:1px solid #d7e0e6;border-radius:5px;background:#fff}.tool-panel h2{margin:0 0 8px;color:#102a43}.tool-panel p{color:#617687;line-height:1.55}.panel-heading{display:flex;justify-content:space-between;gap:16px}.status-dot{width:10px;height:10px;margin-top:7px;border-radius:50%;background:#2f8650}.status-dot.bad{background:#bd4a43}.p2-field input[type=file]{padding:8px}@media(max-width:720px){.tool-grid{grid-template-columns:1fr}.tool-panel{padding:16px}.panel-heading{display:block}}
+</style>
+<script is:inline>
+(() => {
+  const q = (id) => document.getElementById(id);
+  const panels = [...document.querySelectorAll('[data-panel]')];
+  document.querySelectorAll('[data-tool]').forEach((button) => button.addEventListener('click', () => {
+    panels.forEach((panel) => { panel.hidden = panel.dataset.panel !== button.dataset.tool; });
+    document.querySelectorAll('[data-tool]').forEach((item) => item.classList.toggle('is-active', item === button));
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }));
+  q('mail-generate')?.addEventListener('click', () => {
+    const kind = q('mail-type').value;
+    const amount = q('mail-amount').value.trim();
+    const fileNames = [...(q('mail-files').files || [])].map((file) => file.name).join(', ');
+    const subject = q('mail-case').value.trim() ? q('mail-case').value.trim() + ' – ' + kind + ' zur Freigabe' : kind + ' zur Freigabe';
+    q('mail-subject').value = subject;
+    q('mail-body').value = 'Guten Tag,\n\nbitte prüfen und genehmigen Sie den beigefügten ' + kind + (amount ? ' über ' + amount : '') + '.' + (fileNames ? '\n\nAnlage: ' + fileNames : '') + '\n\nFreundliche Grüße\nChristian Wächter';
+  });
+  q('standalone-mail')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const message = q('mail-message'); const button = event.submitter;
+    button.disabled = true; message.hidden = false; message.className = 'p2-message'; message.textContent = 'E-Mail wird gesendet …';
+    const form = new FormData();
+    form.append('to', q('mail-to').value.trim()); form.append('cc', q('mail-cc').value.trim());
+    form.append('case_no', q('mail-case').value.trim()); form.append('subject', q('mail-subject').value.trim());
+    form.append('damage_type', q('mail-type').value); form.append('body', q('mail-body').value.trim()); form.append('standalone', '1');
+    [...(q('mail-files').files || [])].forEach((file, index) => form.append('attachment_' + index, file));
+    try {
+      const response = await fetch('/intern/api/outlook-case-mail.php?action=send', { method: 'POST', credentials: 'same-origin', body: form });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.error || 'E-Mail konnte nicht versendet werden.');
+      message.textContent = 'E-Mail wurde gesendet. Absender: ' + data.sender;
+      q('mail-files').value = ''; q('mail-body').value = '';
+    } catch (error) { message.className = 'p2-message is-error'; message.textContent = error.message; }
+    finally { button.disabled = false; }
+  });
+})();
+</script>
