@@ -5,7 +5,7 @@ import { portal2Pages } from '../../../lib/portal2-pages';
 
 
 export function getStaticPaths() {
-  const dedicatedRoutes = new Set(['kalkulation', 'telefon', 'zeiterfassung', 'angebote', 'abrechnungen']);
+  const dedicatedRoutes = new Set(['kalkulation', 'telefon', 'zeiterfassung', 'weitere-funktionen', 'angebote', 'abrechnungen']);
   return Object.entries(portal2Pages)
     .filter(([slug]) => !dedicatedRoutes.has(slug))
     .map(([slug, page]) => ({ params: { slug }, props: { page } }));
