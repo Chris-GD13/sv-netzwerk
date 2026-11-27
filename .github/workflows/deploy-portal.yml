@@ -342,6 +342,10 @@ jobs:
           write_optional_env GOOGLE_DRIVE_REFRESH_TOKEN "$PORTAL_GOOGLE_DRIVE_REFRESH_TOKEN"
           write_optional_env GOOGLE_DRIVE_REDIRECT_URI "$PORTAL_GOOGLE_DRIVE_REDIRECT_URI"
           write_optional_env GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON "$PORTAL_GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON"
+          # Der lokale IONOS-Dateispeicher ist der verbindliche Produktionsbestand.
+          # Diese Werte gehören in die Server-.env, niemals in das Repository.
+          sed -i '/^PORTAL_STORAGE_BACKEND=/d;/^IONOS_STORAGE_ROOT=/d' "$env_file"
+          printf 'PORTAL_STORAGE_BACKEND=ionos\nIONOS_STORAGE_ROOT=/srv/svnet-storage\n' >> "$env_file"
           {
             printf 'APP_SECRET=%s\n' "$app_secret"
             if [ -n "${PORTAL_OPENAI_ASSISTANT_API_KEY:-}" ]; then
@@ -365,6 +369,51 @@ jobs:
           else
             echo "Microsoft- und WhatsApp-Konfiguration sind vollständig hinterlegt; separater Assistentenschlüssel ist noch nicht gesetzt."
           fi
+
+      - name: IONOS-Dateispeicher auf dem VPS verbinden
+        env:
+          SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
+          SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+          SFTP_REMOTE_DIR: ${{ secrets.PORTAL_SFTP_REMOTE_DIR }}
+        run: |
+          set -euo pipefail
+          remote_dir_q="$(printf '%q' "$SFTP_REMOTE_DIR")"
+          ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT" "$SFTP_USERNAME@$SFTP_HOST" "REMOTE_DIR=$remote_dir_q bash -s" <<'REMOTE'
+          set -euo pipefail
+          root=/srv/svnet-storage
+          test "$root" = /srv/svnet-storage
+          test -x "$(command -v php)"
+          php -m | grep -qx 'pdo_sqlite'
+          install -d -o www-data -g www-data -m 0770 "$root" "$root/objects" "$root/versions" "$root/locks" "$root/intents"
+          if [ ! -f "$root/index.sqlite" ]; then
+            php -r '
+              $p="/srv/svnet-storage/index.sqlite";
+              $db=new PDO("sqlite:".$p,null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
+              $db->exec("CREATE TABLE IF NOT EXISTS items (id TEXT PRIMARY KEY,parent TEXT NOT NULL,name TEXT NOT NULL,mime TEXT NOT NULL,meta TEXT NOT NULL,path TEXT NOT NULL,verified INTEGER NOT NULL DEFAULT 1)");
+            '
+          fi
+          knowledge_id="$(sed -n 's/^GOOGLE_DRIVE_KNOWLEDGE_FOLDER_ID=//p' "$REMOTE_DIR/.env" | tail -n 1 | tr -d '')"
+          knowledge_id="${knowledge_id:-1QeJ4Dz6Upg_W5rahWmKE_7KbC4MMgSGe}"
+          KNOWLEDGE_ID="$knowledge_id" php -r '
+            $id=(string)getenv("KNOWLEDGE_ID");
+            $db=new PDO("sqlite:/srv/svnet-storage/index.sqlite",null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
+            $db->exec("CREATE TABLE IF NOT EXISTS items (id TEXT PRIMARY KEY,parent TEXT NOT NULL,name TEXT NOT NULL,mime TEXT NOT NULL,meta TEXT NOT NULL,path TEXT NOT NULL,verified INTEGER NOT NULL DEFAULT 1)");
+            $check=$db->prepare("SELECT 1 FROM items WHERE id=? LIMIT 1");
+            $check->execute([$id]);
+            if (!$check->fetchColumn()) {
+              $meta=json_encode(["id"=>$id,"name"=>"00_KI-Wissensbasis","mimeType"=>"application/vnd.google-apps.folder","parents"=>[],"trashed"=>false],JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
+              $insert=$db->prepare("INSERT INTO items(id,parent,name,mime,meta,path,verified) VALUES(?,?,?,?,?,?,1)");
+              $insert->execute([$id,"","00_KI-Wissensbasis","application/vnd.google-apps.folder",$meta,""]);
+            }
+            $db->query("PRAGMA integrity_check")->fetchColumn();
+          '
+          chown -R www-data:www-data "$root"
+          chmod 0660 "$root/index.sqlite"
+          test -r "$root/index.sqlite"
+          test -w "$root/objects"
+          echo "IONOS-Dateispeicher verbunden: $root"
+          REMOTE
 
       - name: Portalpaket ohne Serverkonfiguration übertragen
         env:
