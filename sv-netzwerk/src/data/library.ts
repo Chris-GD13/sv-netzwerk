@@ -15,6 +15,16 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Mieterregress bei einer Geräteleckage: Anschluss, Kausalität und Schadenumfang sauber trennen',
+    description: 'Wie bei einer Geräteleckage Anschluss, technische Ursache, Mietgebrauch, Schadenumfang und ein möglicher Regress fachlich getrennt geprüft werden.',
+    href: '/fachwissen/mieterregress-geraeteleckage-anschluss-kausalitaet-schadenumfang/',
+    category: 'Leitungswasser und Haftung',
+    tags: ['Geräteleckage', 'Waschmaschine', 'Mieterregress', 'Leitungswasser', 'Kausalität', 'Schadenabgrenzung', 'Beweissicherung', 'Kostenprüfung'],
+    date: '2026-11-27',
+    publishedAt: '2026-11-27T05:00:00.000Z',
+    type: 'article',
+  },
+  {
     title: "Mietminderung nach einem Gebäudeschaden: Nutzungsbeeinträchtigung, Zeitraum und Nachweis trennen",
     description: "Wie bei einer Mietminderung nach einem Gebäudeschaden die tatsächliche Gebrauchseinschränkung, der betroffene Zeitraum und der Schadenbezug nachvollziehbar dokumentiert werden.",
     href: '/fachwissen/mietminderung-gebaeudeschaden-nutzungsbeeintraechtigung-zeitraum-nachweis/',
