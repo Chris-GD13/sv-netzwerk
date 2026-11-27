@@ -393,20 +393,24 @@ jobs:
               $db->exec("CREATE TABLE IF NOT EXISTS items (id TEXT PRIMARY KEY,parent TEXT NOT NULL,name TEXT NOT NULL,mime TEXT NOT NULL,meta TEXT NOT NULL,path TEXT NOT NULL,verified INTEGER NOT NULL DEFAULT 1)");
             '
           fi
-          knowledge_id="$(sed -n 's/^GOOGLE_DRIVE_KNOWLEDGE_FOLDER_ID=//p' "$REMOTE_DIR/.env" | tail -n 1 | tr -d '')"
+          knowledge_id="$(sed -n 's/^GOOGLE_DRIVE_KNOWLEDGE_FOLDER_ID=//p' "$REMOTE_DIR/.env" | tail -n 1 | sed 's/[[:space:]]*$//')"
           knowledge_id="${knowledge_id:-1QeJ4Dz6Upg_W5rahWmKE_7KbC4MMgSGe}"
           KNOWLEDGE_ID="$knowledge_id" php -r '
             $id=(string)getenv("KNOWLEDGE_ID");
             $db=new PDO("sqlite:/srv/svnet-storage/index.sqlite",null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
             $db->exec("CREATE TABLE IF NOT EXISTS items (id TEXT PRIMARY KEY,parent TEXT NOT NULL,name TEXT NOT NULL,mime TEXT NOT NULL,meta TEXT NOT NULL,path TEXT NOT NULL,verified INTEGER NOT NULL DEFAULT 1)");
+            $columns=array_map(static fn(array $row):(string)$row["name"],$db->query("PRAGMA table_info(items)")->fetchAll(PDO::FETCH_ASSOC));
+            $pathColumn=in_array("path",$columns,true)?"path":(in_array("object_path",$columns,true)?"object_path":null);
+            if ($pathColumn===null) throw new RuntimeException("IONOS-Index ohne Objektpfadspalte");
             $check=$db->prepare("SELECT 1 FROM items WHERE id=? LIMIT 1");
             $check->execute([$id]);
             if (!$check->fetchColumn()) {
               $meta=json_encode(["id"=>$id,"name"=>"00_KI-Wissensbasis","mimeType"=>"application/vnd.google-apps.folder","parents"=>[],"trashed"=>false],JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
-              $insert=$db->prepare("INSERT INTO items(id,parent,name,mime,meta,path,verified) VALUES(?,?,?,?,?,?,1)");
+              $insert=$db->prepare("INSERT INTO items(id,parent,name,mime,meta,$pathColumn,verified) VALUES(?,?,?,?,?,?,1)");
               $insert->execute([$id,"","00_KI-Wissensbasis","application/vnd.google-apps.folder",$meta,""]);
             }
-            $db->query("PRAGMA integrity_check")->fetchColumn();
+            $integrity=(string)$db->query("PRAGMA integrity_check")->fetchColumn();
+            if ($integrity!=="ok") throw new RuntimeException("IONOS-Index-Prüfung fehlgeschlagen: ".$integrity);
           '
           chown -R www-data:www-data "$root"
           chmod 0660 "$root/index.sqlite"
