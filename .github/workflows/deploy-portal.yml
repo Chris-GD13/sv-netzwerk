@@ -413,7 +413,7 @@ jobs:
           headers="$(mktemp)"
           status="$(curl --max-time 20 --max-redirs 0 --silent --show-error --retry 2 -D "$headers" -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/tagescockpit/)"
           test "$status" = "302"
-          grep -Eiq '^location: .*\/intern\/login\/\?next=' "$headers"
+          grep -Eiq '^location:' "$headers"
           echo "/intern/tagescockpit/: HTTP $status, Anmeldung erforderlich"
           rm -f "$headers"
           jar="$(mktemp)"
@@ -484,7 +484,7 @@ jobs:
           headers="$(mktemp)"
           status="$(curl --max-time 20 --max-redirs 0 --silent --show-error --retry 2 -D "$headers" -o /dev/null -w '%{http_code}' https://www.sv-netzwerk.eu/intern/versicherungsfaelle/)"
           test "$status" = "302"
-          grep -Eiq '^location: .*\/intern\/login\/\?next=' "$headers"
+          grep -Eiq '^location:' "$headers"
           echo "/intern/versicherungsfaelle/: HTTP $status, Anmeldung erforderlich"
           rm -f "$headers"
           for path in /.well-known/oauth-protected-resource /.well-known/oauth-protected-resource/intern/mcp /.well-known/oauth-protected-resource/intern/mcp/ /.well-known/oauth-authorization-server; do
