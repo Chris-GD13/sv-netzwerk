@@ -5,7 +5,10 @@ import { portal2Pages } from '../../../lib/portal2-pages';
 
 
 export function getStaticPaths() {
-  return Object.entries(portal2Pages).map(([slug, page]) => ({ params: { slug }, props: { page } }));
+  const dedicatedRoutes = new Set(['kalkulation', 'telefon', 'zeiterfassung', 'angebote', 'abrechnungen']);
+  return Object.entries(portal2Pages)
+    .filter(([slug]) => !dedicatedRoutes.has(slug))
+    .map(([slug, page]) => ({ params: { slug }, props: { page } }));
 }
 
 const { page } = Astro.props;
