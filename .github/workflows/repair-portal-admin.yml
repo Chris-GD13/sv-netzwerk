@@ -1,0 +1,117 @@
+name: Portal-Admin-Zugang synchronisieren
+
+on:
+  push:
+    paths:
+      - '.github/workflows/repair-portal-admin.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repair-portal-admin
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SFTP_HOST: ${{ secrets.PORTAL_SFTP_HOST }}
+      SFTP_USERNAME: ${{ secrets.PORTAL_SFTP_USERNAME }}
+      SFTP_PORT: ${{ secrets.PORTAL_SFTP_PORT }}
+      SFTP_REMOTE_DIR: ${{ secrets.PORTAL_SFTP_REMOTE_DIR }}
+      ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - name: SSH-Zugang einrichten
+        env:
+          PORTAL_SSH_KEY: ${{ secrets.PORTAL_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$PORTAL_SSH_KEY"
+          test -n "$SFTP_HOST"
+          test -n "$SFTP_USERNAME"
+          test -n "$SFTP_PORT"
+          test -n "$SFTP_REMOTE_DIR"
+          test -n "$ADMIN_EMAIL"
+          test -n "$ADMIN_PASSWORD"
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$PORTAL_SSH_KEY" > ~/.ssh/portal_key
+          chmod 600 ~/.ssh/portal_key
+          ssh-keyscan -p "$SFTP_PORT" "$SFTP_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Admin-Benutzer auf dem Portal abgleichen
+        run: |
+          set -euo pipefail
+          script="$RUNNER_TEMP/sync-portal-admin.php"
+          cat > "$script" <<'PHP'
+          <?php
+          declare(strict_types=1);
+
+          $root = getenv('PORTAL_ROOT') ?: '';
+          if ($root === '' || !is_dir($root)) {
+              fwrite(STDERR, "Portal-Stammverzeichnis fehlt.\n");
+              exit(2);
+          }
+
+          $email = trim((string) fgets(STDIN));
+          $password = (string) fgets(STDIN);
+          $password = rtrim($password, "\r\n");
+
+          if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($password, 'UTF-8') < 10) {
+              fwrite(STDERR, "ADMIN_EMAIL oder ADMIN_PASSWORD ist ungültig.\n");
+              exit(3);
+          }
+
+          require $root . '/intern/api/config.php';
+
+          $pdo = db();
+          $hash = hashPassword($password);
+          $now = nowUtc();
+          $stmt = $pdo->prepare(
+              'INSERT INTO users (email, full_name, role, password_hash, is_active, created_at, updated_at)
+               VALUES (:email, :name, :role, :hash, 1, :created, :updated)
+               ON DUPLICATE KEY UPDATE
+                 role = :role2,
+                 password_hash = :hash2,
+                 is_active = 1,
+                 updated_at = :updated2'
+          );
+          $stmt->execute([
+              ':email' => $email,
+              ':name' => 'Christian',
+              ':role' => 'administrator',
+              ':hash' => $hash,
+              ':created' => $now,
+              ':updated' => $now,
+              ':role2' => 'administrator',
+              ':hash2' => $hash,
+              ':updated2' => $now,
+          ]);
+
+          echo "ADMIN_SYNC_OK\n";
+          PHP
+
+          remote_root="$(printf '%q' "$SFTP_REMOTE_DIR")"
+          scp -q -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -P "$SFTP_PORT" "$script" "$SFTP_USERNAME@$SFTP_HOST:/tmp/sync-portal-admin.php"
+          result="$(printf '%s\n%s\n' "$ADMIN_EMAIL" "$ADMIN_PASSWORD" | ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT" "$SFTP_USERNAME@$SFTP_HOST" "PORTAL_ROOT=$remote_root php /tmp/sync-portal-admin.php")"
+          rm -f "$script"
+          ssh -i ~/.ssh/portal_key -o IdentitiesOnly=yes -o BatchMode=yes -p "$SFTP_PORT" "$SFTP_USERNAME@$SFTP_HOST" 'rm -f /tmp/sync-portal-admin.php'
+          test "$result" = "ADMIN_SYNC_OK"
+
+      - name: Login und Session live prüfen
+        run: |
+          set -euo pipefail
+          body="$(mktemp)"
+          jar="$(mktemp)"
+          trap 'rm -f "$body" "$jar"' EXIT
+          jq -n --arg email "$ADMIN_EMAIL" --arg password "$ADMIN_PASSWORD" '{email:$email,password:$password}' > "$body"
+          status="$(curl --max-time 30 --silent --show-error -c "$jar" -H 'Content-Type: application/json' --data @"$body" -o /tmp/portal-login.json -w '%{http_code}' 'https://www.sv-netzwerk.eu/intern/api/auth.php?action=login')"
+          test "$status" = "200"
+          jq -e '.email and .role' /tmp/portal-login.json >/dev/null
+          session_status="$(curl --max-time 30 --silent --show-error -b "$jar" -o /tmp/portal-session.json -w '%{http_code}' 'https://www.sv-netzwerk.eu/intern/api/auth.php?action=session')"
+          test "$session_status" = "200"
+          jq -e '.user.email and .user.role' /tmp/portal-session.json >/dev/null
+          echo "Portal-Login und Sitzung funktionieren."
