@@ -15,6 +15,17 @@ export type LibraryItem = {
 
 export const library: LibraryItem[] = [
   {
+    title: 'Schlussrechnung nach der Schadensanierung: Aufmaß, Nachträge und Restarbeiten trennen',
+    description: 'Wie Schlussrechnungen nach einer Schadensanierung anhand von Aufmaß, ausgeführten Leistungen, Nachträgen und offenen Restarbeiten nachvollziehbar geprüft werden.',
+    href: '/fachwissen/schlussrechnung-schadensanierung-aufmass-nachtraege-restarbeiten/',
+    category: 'Schadenregulierung',
+    tags: ['Schlussrechnung', 'Schadensanierung', 'Aufmaß', 'Nachträge', 'Restarbeiten', 'Rechnungsprüfung', 'Kostenprüfung'],
+    date: '2026-11-28',
+    publishedAt: '2026-11-28T05:00:00.000Z',
+    type: 'article',
+  },
+
+  {
     title: 'Mieterregress bei einer Geräteleckage: Anschluss, Kausalität und Schadenumfang sauber trennen',
     description: 'Wie bei einer Geräteleckage Anschluss, technische Ursache, Mietgebrauch, Schadenumfang und ein möglicher Regress fachlich getrennt geprüft werden.',
     href: '/fachwissen/mieterregress-geraeteleckage-anschluss-kausalitaet-schadenumfang/',
