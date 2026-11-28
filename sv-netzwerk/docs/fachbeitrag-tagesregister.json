@@ -227,190 +227,22 @@
         "status": "not-posted"
       }
     },
-    "2026-11-19": {
-      "publication_id": "2026-11-19-blechdach-aufmass-grundflaeche-dachneigung",
+    "2026-11-28": {
+      "publication_id": "2026-11-28-schlussrechnung-schadensanierung-aufmass-nachtraege-restarbeiten",
       "article": {
-        "title": "Wie viele Quadratmeter Blechdach sind tatsächlich betroffen?",
-        "slug": "blechdach-aufmass-grundflaeche-dachneigung",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/blechdach-aufmass-grundflaeche-dachneigung/",
-        "status": "published-verified",
-        "owner": "codex-20261119",
-        "commit": "e4b65bcc336ef9ba054d23ba7a9253c4128edee6",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/44551755727",
-        "verified_at": "2026-11-19T15:18:27.417Z"
+        "title": "Schlussrechnung nach der Schadensanierung: Aufmaß, Nachträge und Restarbeiten trennen",
+        "slug": "schlussrechnung-schadensanierung-aufmass-nachtraege-restarbeiten",
+        "url": "https://www.sv-netzwerk.eu/fachwissen/schlussrechnung-schadensanierung-aufmass-nachtraege-restarbeiten/",
+        "status": "reserved",
+        "owner": "codex-20261128-chw",
+        "reserved_at": "2026-11-28T09:31:48.857Z"
       },
       "linkedin": {
-        "status": "not-scheduled-weekday"
-      }
-    },
-    "2026-11-20": {
-      "publication_id": "2026-11-20-projektwechsel-schadensanierung-leistungsstand-restarbeiten-kosten",
-      "article": {
-        "title": "Projektwechsel in der Schadensanierung: Leistungsstand, Restarbeiten und Kosten sauber übergeben",
-        "slug": "projektwechsel-schadensanierung-leistungsstand-restarbeiten-kosten",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/projektwechsel-schadensanierung-leistungsstand-restarbeiten-kosten/",
-        "status": "published-verified",
-        "owner": "codex-website-20261120-0600",
-        "reserved_at": "2026-11-20T05:00:00.000Z",
-        "commit": "6a72b9076b7db50a0e3af4916582654dd02be28b",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/44679645026",
-        "verified_at": "2026-11-20T05:22:18.876Z"
-      },
-      "linkedin": {
-        "status": "not-scheduled-weekday"
-      }
-    },
-    "2026-11-21": {
-      "publication_id": "2026-11-21-mietminderung-gebaeudeschaden-nutzungsbeeintraechtigung-zeitraum-nachweis",
-      "article": {
-        "title": "Mietminderung nach einem Gebäudeschaden: Nutzungsbeeinträchtigung, Zeitraum und Nachweis trennen",
-        "slug": "mietminderung-gebaeudeschaden-nutzungsbeeintraechtigung-zeitraum-nachweis",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/mietminderung-gebaeudeschaden-nutzungsbeeintraechtigung-zeitraum-nachweis/",
-        "status": "published-verified",
-        "owner": "codex-website-recovery-20261126",
-        "reserved_at": "2026-11-26T20:30:00+01:00",
-        "recovery": {
-          "batch": "2026-11-21-bis-26-redaktionelle-nachholung",
-          "approved_at": "2026-11-26",
-          "approval": "explizite redaktionelle Freigabe durch Christian"
-        },
-        "commit": "b72db6fd5c5c925746c75909c5d6d76910c51beb",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/45895504402",
-        "verified_at": "2026-11-26T21:13:35Z"
-      },
-      "linkedin": {
-        "status": "prepared-not-posted"
-      }
-    },
-    "2026-11-22": {
-      "publication_id": "2026-11-22-schutz-und-abdeckmassnahmen-gebaeudeschaden-erforderlichkeit-kosten",
-      "article": {
-        "title": "Schutz- und Abdeckmaßnahmen im Gebäudeschaden: Erforderlichkeit, Dauer und Kosten prüfen",
-        "slug": "schutz-und-abdeckmassnahmen-gebaeudeschaden-erforderlichkeit-kosten",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/schutz-und-abdeckmassnahmen-gebaeudeschaden-erforderlichkeit-kosten/",
-        "status": "published-verified",
-        "owner": "codex-website-recovery-20261126",
-        "reserved_at": "2026-11-26T20:30:00+01:00",
-        "recovery": {
-          "batch": "2026-11-21-bis-26-redaktionelle-nachholung",
-          "approved_at": "2026-11-26",
-          "approval": "explizite redaktionelle Freigabe durch Christian"
-        },
-        "commit": "b72db6fd5c5c925746c75909c5d6d76910c51beb",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/45895504402",
-        "verified_at": "2026-11-26T21:13:35Z"
-      },
-      "linkedin": {
-        "status": "prepared-not-posted"
-      }
-    },
-    "2026-11-23": {
-      "publication_id": "2026-11-23-baustellenzugang-wohnbetrieb-schadensanierung-schutzkoordination",
-      "article": {
-        "title": "Baustellenzugang bei bewohntem Gebäude: Nutzbarkeit, Schutz und Sanierungsablauf trennen",
-        "slug": "baustellenzugang-wohnbetrieb-schadensanierung-schutzkoordination",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/baustellenzugang-wohnbetrieb-schadensanierung-schutzkoordination/",
-        "status": "published-verified",
-        "owner": "codex-website-recovery-20261126",
-        "reserved_at": "2026-11-26T20:30:00+01:00",
-        "recovery": {
-          "batch": "2026-11-21-bis-26-redaktionelle-nachholung",
-          "approved_at": "2026-11-26",
-          "approval": "explizite redaktionelle Freigabe durch Christian"
-        },
-        "commit": "b72db6fd5c5c925746c75909c5d6d76910c51beb",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/45895504402",
-        "verified_at": "2026-11-26T21:13:35Z"
-      },
-      "linkedin": {
-        "status": "prepared-not-posted"
-      }
-    },
-    "2026-11-24": {
-      "publication_id": "2026-11-24-verdeckte-leistungen-schadensanierung-dokumentation-pruefung",
-      "article": {
-        "title": "Verdeckte Leistungen in der Schadensanierung: Öffnungen, Aufmaß und Nachweis sichern",
-        "slug": "verdeckte-leistungen-schadensanierung-dokumentation-pruefung",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/verdeckte-leistungen-schadensanierung-dokumentation-pruefung/",
-        "status": "published-verified",
-        "owner": "codex-website-recovery-20261126",
-        "reserved_at": "2026-11-26T20:30:00+01:00",
-        "recovery": {
-          "batch": "2026-11-21-bis-26-redaktionelle-nachholung",
-          "approved_at": "2026-11-26",
-          "approval": "explizite redaktionelle Freigabe durch Christian"
-        },
-        "commit": "b72db6fd5c5c925746c75909c5d6d76910c51beb",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/45895504402",
-        "verified_at": "2026-11-26T21:13:35Z"
-      },
-      "linkedin": {
-        "status": "prepared-not-posted"
-      }
-    },
-    "2026-11-25": {
-      "publication_id": "2026-11-25-vorlaeufige-kostenfreigabe-schadensanierung-pruefvorbehalt-schlussrechnung",
-      "article": {
-        "title": "Vorläufige Kostenfreigaben im Schadenfall: Leistungsstand, Prüfvorbehalt und Schlussrechnung trennen",
-        "slug": "vorlaeufige-kostenfreigabe-schadensanierung-pruefvorbehalt-schlussrechnung",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/vorlaeufige-kostenfreigabe-schadensanierung-pruefvorbehalt-schlussrechnung/",
-        "status": "published-verified",
-        "owner": "codex-website-recovery-20261126",
-        "reserved_at": "2026-11-26T20:30:00+01:00",
-        "recovery": {
-          "batch": "2026-11-21-bis-26-redaktionelle-nachholung",
-          "approved_at": "2026-11-26",
-          "approval": "explizite redaktionelle Freigabe durch Christian"
-        },
-        "commit": "b72db6fd5c5c925746c75909c5d6d76910c51beb",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/45895504402",
-        "verified_at": "2026-11-26T21:13:35Z"
-      },
-      "linkedin": {
-        "status": "prepared-not-posted"
-      }
-    },
-    "2026-11-26": {
-      "publication_id": "2026-11-26-wiederinbetriebnahme-gebaeudeschaden-funktionspruefung-freigabe-kosten",
-      "article": {
-        "title": "Wiederinbetriebnahme nach Gebäudeschäden: Funktionsprüfung, Freigabe und Kosten trennen",
-        "slug": "wiederinbetriebnahme-gebaeudeschaden-funktionspruefung-freigabe-kosten",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/wiederinbetriebnahme-gebaeudeschaden-funktionspruefung-freigabe-kosten/",
-        "status": "published-verified",
-        "owner": "codex-website-recovery-20261126",
-        "reserved_at": "2026-11-26T20:30:00+01:00",
-        "recovery": {
-          "batch": "2026-11-21-bis-26-redaktionelle-nachholung",
-          "approved_at": "2026-11-26",
-          "approval": "explizite redaktionelle Freigabe durch Christian"
-        },
-        "commit": "b72db6fd5c5c925746c75909c5d6d76910c51beb",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/45895504402",
-        "verified_at": "2026-11-26T21:13:35Z"
-      },
-      "linkedin": {
-        "status": "prepared-not-posted"
-      }
-    },
-    "2026-11-27": {
-      "publication_id": "2026-11-27-mieterregress-geraeteleckage-anschluss-kausalitaet-schadenumfang",
-      "article": {
-        "title": "Mieterregress bei einer Geräteleckage: Anschluss, Kausalität und Schadenumfang sauber trennen",
-        "slug": "mieterregress-geraeteleckage-anschluss-kausalitaet-schadenumfang",
-        "url": "https://www.sv-netzwerk.eu/fachwissen/mieterregress-geraeteleckage-anschluss-kausalitaet-schadenumfang/",
-        "status": "published-verified",
-        "owner": "codex-website-20261127-0600",
-        "reserved_at": "2026-11-27T05:09:46.185Z",
-        "commit": "fd21991f4b6cca323f0f28f3ff259a04c4505ceb",
-        "run_url": "https://github.com/Chris-GD13/sv-netzwerk/actions/runs/45944602669",
-        "verified_at": "2026-11-27T05:25:46.687Z"
-      },
-      "linkedin": {
-        "status": "not-scheduled-weekday"
+        "status": "not-posted"
       }
     }
   },
-  "updated_at": "2026-11-27T05:25:46.687Z",
+  "updated_at": "2026-11-28T09:31:48.857Z",
   "entries": {
     "2026-11-11": {
       "publication_id": "2026-11-11-naturgefahrenschaden-holzkonstruktion-feuchte-tragfaehigkeit-rueckbau",
@@ -481,4 +313,4 @@
       }
     }
   }
-}
+}\n
